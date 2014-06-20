@@ -55,7 +55,8 @@ namespace stan {
     typename return_type<T_y,T_shape,T_scale>::type
     inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta) {
       static const char* function = "stan::prob::inv_gamma_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type 
+        T_partials_return;
 
       using stan::is_constant_struct;
       using stan::math::check_not_nan;
@@ -109,13 +110,13 @@ namespace stan {
       using stan::math::digamma;
       using stan::agrad::digamma;
 
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_y,T_shape>::value,
-                       is_vector<T_y>::value>
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_y,T_shape>::value,
+                    is_vector<T_y>::value>
         log_y(length(y));
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_y,T_scale>::value,
-                       is_vector<T_y>::value>
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_y,T_scale>::value,
+                    is_vector<T_y>::value>
         inv_y(length(y));
       for(size_t n = 0; n < length(y); n++) {
         if (include_summand<propto,T_y,T_shape>::value)
@@ -125,13 +126,13 @@ namespace stan {
           inv_y[n] = 1.0 / value_of(y_vec[n]);
       }
 
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_shape>::value,
-                       is_vector<T_shape>::value>
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_shape>::value,
+                    is_vector<T_shape>::value>
         lgamma_alpha(length(alpha));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_shape>::value,
-                       is_vector<T_shape>::value>
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_shape>::value,
+                    is_vector<T_shape>::value>
         digamma_alpha(length(alpha));
       for (size_t n = 0; n < length(alpha); n++) {
         if (include_summand<propto,T_shape>::value)
@@ -140,9 +141,9 @@ namespace stan {
           digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
       }
 
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_shape,T_scale>::value,
-                       is_vector<T_scale>::value>
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_shape,T_scale>::value,
+                    is_vector<T_scale>::value>
         log_beta(length(beta));
       if (include_summand<propto,T_shape,T_scale>::value)
         for (size_t n = 0; n < length(beta); n++)
@@ -201,7 +202,8 @@ namespace stan {
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     inv_gamma_cdf(const T_y& y, const T_shape& alpha, const T_scale& beta) { 
-      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+        T_partials_return;
 
       // Size checks
       if (!(stan::length(y) && stan::length(alpha) && stan::length(beta))) 
@@ -262,13 +264,13 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_shape>::value,
-                       is_vector<T_shape>::value> 
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_shape>::value,
+                    is_vector<T_shape>::value> 
         gamma_vec(stan::length(alpha));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_shape>::value,
-                       is_vector<T_shape>::value> 
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_shape>::value,
+                    is_vector<T_shape>::value> 
         digamma_vec(stan::length(alpha));
           
       if (!is_constant_struct<T_shape>::value) {
@@ -299,7 +301,8 @@ namespace stan {
               
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += beta_dbl * y_inv_dbl * y_inv_dbl
-            * exp(-beta_dbl * y_inv_dbl) * pow(beta_dbl * y_inv_dbl,alpha_dbl-1) 
+            * exp(-beta_dbl * y_inv_dbl) * pow(beta_dbl 
+                                               * y_inv_dbl,alpha_dbl-1) 
             / tgamma(alpha_dbl) / Pn;
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x2[n] 
@@ -327,8 +330,10 @@ namespace stan {
 
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
-    inv_gamma_cdf_log(const T_y& y, const T_shape& alpha, const T_scale& beta) { 
-      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
+    inv_gamma_cdf_log(const T_y& y, const T_shape& alpha, 
+                      const T_scale& beta) { 
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+        T_partials_return;
     
       // Size checks
       if (!(stan::length(y) && stan::length(alpha) && stan::length(beta))) 
@@ -374,7 +379,8 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,alpha,beta);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,alpha,beta);
       }
           
       // Compute cdf_log and its gradients
@@ -389,13 +395,13 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_shape>::value,
-                       is_vector<T_shape>::value> 
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_shape>::value,
+                    is_vector<T_shape>::value> 
         gamma_vec(stan::length(alpha));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_shape>::value,
-                       is_vector<T_shape>::value> 
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_shape>::value,
+                    is_vector<T_shape>::value> 
         digamma_vec(stan::length(alpha));
           
       if (!is_constant_struct<T_shape>::value) {
@@ -426,7 +432,8 @@ namespace stan {
               
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += beta_dbl * y_inv_dbl * y_inv_dbl 
-            * exp(-beta_dbl * y_inv_dbl) * pow(beta_dbl * y_inv_dbl,alpha_dbl-1) 
+            * exp(-beta_dbl * y_inv_dbl) * pow(beta_dbl * y_inv_dbl,
+                                               alpha_dbl-1) 
             / tgamma(alpha_dbl) / Pn;
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x2[n] 
@@ -437,15 +444,17 @@ namespace stan {
           operands_and_partials.d_x3[n] += - y_inv_dbl 
             * exp(-beta_dbl * y_inv_dbl) * pow(beta_dbl * y_inv_dbl,alpha_dbl-1)
             / tgamma(alpha_dbl) / Pn;
-     }
+      }
           
       return operands_and_partials.to_var(P,y,alpha,beta);
     }
       
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
-    inv_gamma_ccdf_log(const T_y& y, const T_shape& alpha, const T_scale& beta) { 
-      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
+    inv_gamma_ccdf_log(const T_y& y, const T_shape& alpha,
+                       const T_scale& beta) { 
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+        T_partials_return;
 
       // Size checks
       if (!(stan::length(y) && stan::length(alpha) && stan::length(beta))) 
@@ -506,13 +515,13 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_shape>::value,
-                       is_vector<T_shape>::value> 
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_shape>::value,
+                    is_vector<T_shape>::value> 
         gamma_vec(stan::length(alpha));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_shape>::value,
-                       is_vector<T_shape>::value> 
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_shape>::value,
+                    is_vector<T_shape>::value> 
         digamma_vec(stan::length(alpha));
           
       if (!is_constant_struct<T_shape>::value) {
@@ -528,7 +537,8 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity())
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,alpha,beta);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,alpha,beta);
               
         // Pull out values
         const T_partials_return y_dbl = value_of(y_vec[n]);
@@ -537,13 +547,15 @@ namespace stan {
         const T_partials_return beta_dbl = value_of(beta_vec[n]);
               
         // Compute
-        const T_partials_return Pn = 1.0 - gamma_q(alpha_dbl, beta_dbl * y_inv_dbl);
+        const T_partials_return Pn = 1.0 - gamma_q(alpha_dbl, beta_dbl 
+                                                   * y_inv_dbl);
               
         P += log(Pn);
               
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= beta_dbl * y_inv_dbl * y_inv_dbl 
-            * exp(-beta_dbl * y_inv_dbl) * pow(beta_dbl * y_inv_dbl,alpha_dbl-1) 
+            * exp(-beta_dbl * y_inv_dbl) * pow(beta_dbl * y_inv_dbl,
+                                               alpha_dbl-1) 
             / tgamma(alpha_dbl) / Pn;
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x2[n] 

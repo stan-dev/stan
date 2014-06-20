@@ -20,7 +20,8 @@ namespace stan {
     typename return_type<T_y,T_scale>::type
     rayleigh_log(const T_y& y, const T_scale& sigma) {
       static const char* function = "stan::prob::rayleigh_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_scale>::type 
+        T_partials_return;
 
       using std::log;
       using stan::is_constant_struct;
@@ -58,11 +59,11 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
 
-      DoubleVectorView<T_partials_return,
-                       true,is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_scale>::value,
-                       is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_scale>::value,
+                    is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -108,7 +109,8 @@ namespace stan {
     typename return_type<T_y,T_scale>::type
     rayleigh_cdf(const T_y& y, const T_scale& sigma) {
       static const char* function = "stan::prob::rayleigh_cdf(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_scale>::type 
+        T_partials_return;
 
       using stan::math::check_nonnegative;
       using stan::math::check_positive;
@@ -143,8 +145,8 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
       
-      DoubleVectorView<T_partials_return,
-                       true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    true,is_vector<T_scale>::value> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       }
@@ -182,7 +184,8 @@ namespace stan {
     typename return_type<T_y,T_scale>::type
     rayleigh_cdf_log(const T_y& y, const T_scale& sigma) {
       static const char* function = "stan::prob::rayleigh_cdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_scale>::type
+        T_partials_return;
 
       using stan::math::check_nonnegative;
       using stan::math::check_positive;
@@ -217,8 +220,8 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
       
-      DoubleVectorView<T_partials_return,
-                       true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    true,is_vector<T_scale>::value> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       }
@@ -248,7 +251,8 @@ namespace stan {
     typename return_type<T_y,T_scale>::type
     rayleigh_ccdf_log(const T_y& y, const T_scale& sigma) {
       static const char* function = "stan::prob::rayleigh_ccdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_scale>::type
+        T_partials_return;
 
       using stan::math::check_nonnegative;
       using stan::math::check_positive;
@@ -283,8 +287,8 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
       
-      DoubleVectorView<T_partials_return,
-                       true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    true,is_vector<T_scale>::value> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       }

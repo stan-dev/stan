@@ -45,7 +45,8 @@ namespace stan {
     typename return_type<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta) {
       static const char* function = "stan::prob::exponential_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type 
+        T_partials_return;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -73,14 +74,15 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, beta);
       
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_inv_scale>::value,
-                       is_vector<T_inv_scale>::value> log_beta(length(beta));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_inv_scale>::value,
+                    is_vector<T_inv_scale>::value> log_beta(length(beta));
       for (size_t i = 0; i < length(beta); i++)
         if (include_summand<propto,T_inv_scale>::value)
           log_beta[i] = log(value_of(beta_vec[i]));
 
-      agrad::OperandsAndPartials<T_y,T_inv_scale> operands_and_partials(y, beta);
+      agrad::OperandsAndPartials<T_y,T_inv_scale> 
+        operands_and_partials(y, beta);
 
       for (size_t n = 0; n < N; n++) {
         const T_partials_return beta_dbl = value_of(beta_vec[n]);
@@ -123,7 +125,8 @@ namespace stan {
     template <typename T_y, typename T_inv_scale>
     typename return_type<T_y,T_inv_scale>::type
     exponential_cdf(const T_y& y, const T_inv_scale& beta) {
-      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type 
+        T_partials_return;
 
       static const char* function = "stan::prob::exponential_cdf(%1%)";
 
@@ -227,7 +230,8 @@ namespace stan {
     template <typename T_y, typename T_inv_scale>
     typename return_type<T_y,T_inv_scale>::type
     exponential_ccdf_log(const T_y& y, const T_inv_scale& beta) {
-      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type 
+        T_partials_return;
 
       static const char* function = "stan::prob::exponential_ccdf_log(%1%)";
 

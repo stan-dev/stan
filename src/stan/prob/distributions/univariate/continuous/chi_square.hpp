@@ -56,7 +56,8 @@ namespace stan {
     typename return_type<T_y,T_dof>::type
     chi_square_log(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::chi_square_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_dof>::type 
+        T_partials_return;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -98,24 +99,24 @@ namespace stan {
       using boost::math::lgamma;
       using stan::math::multiply_log;
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_y,T_dof>::value,
                        is_vector<T_y>::value> log_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y,T_dof>::value)
           log_y[i] = log(value_of(y_vec[i]));
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_y>::value,
                        is_vector<T_y>::value> inv_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y>::value)
           inv_y[i] = 1.0 / value_of(y_vec[i]);
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_dof>::value,
                        is_vector<T_dof>::value> lgamma_half_nu(length(nu));
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         digamma_half_nu_over_two(length(nu));
@@ -147,8 +148,8 @@ namespace stan {
           operands_and_partials.d_x1[n] += (half_nu-1.0)*inv_y[n] - 0.5;
         }
         if (!is_constant_struct<T_dof>::value) {
-          operands_and_partials.d_x2[n] 
-            += NEG_LOG_TWO_OVER_TWO - digamma_half_nu_over_two[n] + log_y[n]*0.5; 
+          operands_and_partials.d_x2[n] += NEG_LOG_TWO_OVER_TWO 
+            - digamma_half_nu_over_two[n] + log_y[n]*0.5;
         }
       }
       return operands_and_partials.to_var(logp,y,nu);
@@ -174,7 +175,8 @@ namespace stan {
     typename return_type<T_y,T_dof>::type
     chi_square_cdf(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::chi_square_cdf(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_dof>::type 
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -226,11 +228,11 @@ namespace stan {
       using std::pow;
 
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         gamma_vec(stan::length(nu));
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         digamma_vec(stan::length(nu));
@@ -284,7 +286,8 @@ namespace stan {
     typename return_type<T_y,T_dof>::type
     chi_square_cdf_log(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::chi_square_cdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_dof>::type 
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -320,7 +323,8 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,nu);
       }
           
       // Compute cdf_log and its gradients
@@ -335,11 +339,11 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         gamma_vec(stan::length(nu));
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         digamma_vec(stan::length(nu));
@@ -386,7 +390,8 @@ namespace stan {
     typename return_type<T_y,T_dof>::type
     chi_square_ccdf_log(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::chi_square_ccdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_dof>::type 
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -437,11 +442,11 @@ namespace stan {
       using std::pow;
 
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         gamma_vec(stan::length(nu));
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         digamma_vec(stan::length(nu));
@@ -459,7 +464,8 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity())
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,nu);
               
         // Pull out values
         const T_partials_return y_dbl = value_of(y_vec[n]);

@@ -39,9 +39,11 @@ namespace stan {
               typename T_location, typename T_inv_scale>
     typename return_type<T_location, T_inv_scale>::type
     neg_binomial_2_log(const T_n& n,
-                     const T_location& mu,
-                     const T_inv_scale& phi) {
-      typedef typename stan::partials_return_type<T_n,T_location,T_inv_scale>::type T_partials_return;
+                       const T_location& mu,
+                       const T_inv_scale& phi) {
+      typedef typename stan::partials_return_type<T_n,T_location,
+                                                  T_inv_scale>::type 
+        T_partials_return;
 
       static const char* function = "stan::prob::neg_binomial_log(%1%)";
 
@@ -98,29 +100,29 @@ namespace stan {
       size_t len_ep = max_size(mu, phi);
       size_t len_np = max_size(n, phi);
       
-      DoubleVectorView<T_partials_return,true, is_vector<T_location>::value>
+      VectorBuilder<T_partials_return,true, is_vector<T_location>::value>
         mu__(length(mu));
       for (size_t i = 0, size = length(mu); i < size; ++i)
         mu__[i] = value_of(mu_vec[i]);
   
-      DoubleVectorView<T_partials_return,true, is_vector<T_inv_scale>::value>
+      VectorBuilder<T_partials_return,true, is_vector<T_inv_scale>::value>
         phi__(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         phi__[i] = value_of(phi_vec[i]);
       
-      DoubleVectorView<T_partials_return,true, is_vector<T_inv_scale>::value>
+      VectorBuilder<T_partials_return,true, is_vector<T_inv_scale>::value>
         log_phi(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         log_phi[i] = log(phi__[i]);
 
-      DoubleVectorView<T_partials_return,true, (is_vector<T_location>::value
-                             || is_vector<T_inv_scale>::value)>
+      VectorBuilder<T_partials_return,true, (is_vector<T_location>::value
+                                             || is_vector<T_inv_scale>::value)>
         log_mu_plus_phi(len_ep);
       for (size_t i = 0; i < len_ep; ++i)
         log_mu_plus_phi[i] = log(mu__[i] + phi__[i]);
 
-      DoubleVectorView<T_partials_return,true, (is_vector<T_n>::value
-                             || is_vector<T_inv_scale>::value)>
+      VectorBuilder<T_partials_return,true, (is_vector<T_n>::value
+                                             || is_vector<T_inv_scale>::value)>
         n_plus_phi(len_np);
       for (size_t i = 0; i < len_np; ++i)
         n_plus_phi[i] = n_vec[i] + phi__[i];
@@ -145,7 +147,8 @@ namespace stan {
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x2[i]
             += 1.0 - n_plus_phi[i]/(mu__[i] + phi__[i])
-            + log_phi[i] - log_mu_plus_phi[i] - digamma(phi__[i]) + digamma(n_plus_phi[i]);
+            + log_phi[i] - log_mu_plus_phi[i] - digamma(phi__[i]) 
+            + digamma(n_plus_phi[i]);
       }
       return operands_and_partials.to_var(logp,mu,phi);
     }
@@ -169,7 +172,9 @@ namespace stan {
     neg_binomial_2_log_log(const T_n& n,
                            const T_log_location& eta,
                            const T_inv_scale& phi) {
-      typedef typename stan::partials_return_type<T_n,T_log_location,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_n,T_log_location,
+                                                  T_inv_scale>::type 
+        T_partials_return;
 
       static const char* function = "stan::prob::neg_binomial_log(%1%)";
 
@@ -225,30 +230,30 @@ namespace stan {
       size_t len_ep = max_size(eta, phi);
       size_t len_np = max_size(n, phi);
 
-      DoubleVectorView<T_partials_return,true, is_vector<T_log_location>::value>
+      VectorBuilder<T_partials_return,true, is_vector<T_log_location>::value>
         eta__(length(eta));
       for (size_t i = 0, size = length(eta); i < size; ++i)
         eta__[i] = value_of(eta_vec[i]);
   
-      DoubleVectorView<T_partials_return,true, is_vector<T_inv_scale>::value>
+      VectorBuilder<T_partials_return,true, is_vector<T_inv_scale>::value>
         phi__(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         phi__[i] = value_of(phi_vec[i]);  
         
 
-      DoubleVectorView<T_partials_return,true, is_vector<T_inv_scale>::value>
+      VectorBuilder<T_partials_return,true, is_vector<T_inv_scale>::value>
         log_phi(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         log_phi[i] = log(phi__[i]);
 
-      DoubleVectorView<T_partials_return,true, (is_vector<T_log_location>::value
-                             || is_vector<T_inv_scale>::value)>
+      VectorBuilder<T_partials_return,true, (is_vector<T_log_location>::value
+                                             || is_vector<T_inv_scale>::value)>
         logsumexp_eta_logphi(len_ep);
       for (size_t i = 0; i < len_ep; ++i)
         logsumexp_eta_logphi[i] = log_sum_exp(eta__[i], log_phi[i]);
 
-      DoubleVectorView<T_partials_return,true, (is_vector<T_n>::value
-                             || is_vector<T_inv_scale>::value)>
+      VectorBuilder<T_partials_return,true, (is_vector<T_n>::value
+                                             || is_vector<T_inv_scale>::value)>
         n_plus_phi(len_np);
       for (size_t i = 0; i < len_np; ++i)
         n_plus_phi[i] = n_vec[i] + phi__[i];
@@ -272,7 +277,8 @@ namespace stan {
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x2[i]
             += 1.0 - n_plus_phi[i]/(exp(eta__[i]) + phi__[i])
-            + log_phi[i] - logsumexp_eta_logphi[i] - digamma(phi__[i]) + digamma(n_plus_phi[i]);
+            + log_phi[i] - logsumexp_eta_logphi[i] - digamma(phi__[i]) 
+            + digamma(n_plus_phi[i]);
       }
       return operands_and_partials.to_var(logp,eta,phi);
     }
@@ -282,16 +288,16 @@ namespace stan {
     inline
     typename return_type<T_log_location, T_inv_scale>::type
     neg_binomial_2_log_log(const T_n& n,
-                     const T_log_location& eta,
-                     const T_inv_scale& phi) {
+                           const T_log_location& eta,
+                           const T_inv_scale& phi) {
       return neg_binomial_2_log_log<false>(n,eta,phi);
     }
 
     template <class RNG>
     inline int
     neg_binomial_2_rng(const double mu,
-                     const double phi,
-                     RNG& rng) {
+                       const double phi,
+                       RNG& rng) {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
 
@@ -312,8 +318,8 @@ namespace stan {
     template <class RNG>
     inline int
     neg_binomial_2_log_rng(const double eta,
-                     const double phi,
-                     RNG& rng) {
+                           const double phi,
+                           RNG& rng) {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
 
@@ -326,8 +332,10 @@ namespace stan {
       check_finite(function, phi, "Inverse scale parameter", (double*)0);
       check_positive(function, phi, "Inverse scale parameter", (double*)0);
 
-      return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/std::exp(eta),
-                                                           rng),rng);
+      return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,
+                                                           phi/std::exp(eta),
+                                                           rng),
+                                     rng);
     }
   }
 }

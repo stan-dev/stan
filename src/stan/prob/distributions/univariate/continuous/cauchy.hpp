@@ -41,7 +41,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::cauchy_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       using stan::is_constant_struct;
       using stan::math::check_positive;
@@ -83,11 +84,11 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      DoubleVectorView<T_partials_return,true, 
+      VectorBuilder<T_partials_return,true, 
                        is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<T_partials_return,true,
+      VectorBuilder<T_partials_return,true,
                        is_vector<T_scale>::value> sigma_squared(length(sigma));
-      DoubleVectorView<T_partials_return,include_summand<propto,T_scale>::value,
+      VectorBuilder<T_partials_return,include_summand<propto,T_scale>::value,
                        is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         const T_partials_return sigma_dbl = value_of(sigma_vec[i]);
@@ -98,7 +99,8 @@ namespace stan {
         }
       }
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, sigma);
 
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
@@ -125,11 +127,15 @@ namespace stan {
   
         // gradients
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] -= 2 * y_minus_mu / (sigma_squared[n] + y_minus_mu_squared);
+          operands_and_partials.d_x1[n] -= 2 * y_minus_mu
+            / (sigma_squared[n] + y_minus_mu_squared);
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] += 2 * y_minus_mu / (sigma_squared[n] + y_minus_mu_squared);
+          operands_and_partials.d_x2[n] += 2 * y_minus_mu 
+            / (sigma_squared[n] + y_minus_mu_squared);
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += (y_minus_mu_squared - sigma_squared[n]) * inv_sigma[n] / (sigma_squared[n] + y_minus_mu_squared);
+          operands_and_partials.d_x3[n] 
+            += (y_minus_mu_squared - sigma_squared[n]) 
+            * inv_sigma[n] / (sigma_squared[n] + y_minus_mu_squared);
       }
       return operands_and_partials.to_var(logp,y,mu,sigma);
     }
@@ -160,7 +166,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) 
@@ -259,7 +266,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+        T_partials_return;
               
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) 
@@ -328,7 +336,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) 
@@ -382,7 +391,8 @@ namespace stan {
         ccdf_log += log(Pn);
             
         const T_partials_return rep_deriv = 1.0 / (Pn * pi() 
-                                                   * (z * z * sigma_dbl + sigma_dbl));
+                                                   * (z * z * sigma_dbl 
+                                                      + sigma_dbl));
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= rep_deriv;
         if (!is_constant_struct<T_loc>::value)

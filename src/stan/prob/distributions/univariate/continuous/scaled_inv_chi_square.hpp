@@ -63,7 +63,8 @@ namespace stan {
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s) {
       static const char* function 
         = "stan::prob::scaled_inv_chi_square_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_dof,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_dof,T_scale>::type
+        T_partials_return;
 
       using stan::math::check_finite;
       using stan::math::check_positive;
@@ -111,43 +112,43 @@ namespace stan {
       using stan::agrad::digamma;
       using stan::agrad::square;
       
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_dof,T_y,T_scale>::value,
-                       is_vector<T_dof>::value> half_nu(length(nu));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_dof,T_y,T_scale>::value,
+                    is_vector<T_dof>::value> half_nu(length(nu));
       for (size_t i = 0; i < length(nu); i++)
         if (include_summand<propto,T_dof,T_y,T_scale>::value)
           half_nu[i] = 0.5 * value_of(nu_vec[i]);
 
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_dof,T_y>::value,
-                       is_vector<T_y>::value> log_y(length(y));      
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_dof,T_y>::value,
+                    is_vector<T_y>::value> log_y(length(y));      
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_dof,T_y>::value)
           log_y[i] = log(value_of(y_vec[i]));
 
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_dof,T_y,T_scale>::value,
-                       is_vector<T_y>::value> inv_y(length(y));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_dof,T_y,T_scale>::value,
+                    is_vector<T_y>::value> inv_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_dof,T_y,T_scale>::value)
           inv_y[i] = 1.0 / value_of(y_vec[i]);
       
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_dof,T_scale>::value,
-                       is_vector<T_scale>::value> log_s(length(s));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_dof,T_scale>::value,
+                    is_vector<T_scale>::value> log_s(length(s));
       for (size_t i = 0; i < length(s); i++)
         if (include_summand<propto,T_dof,T_scale>::value)
           log_s[i] = log(value_of(s_vec[i]));
       
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_dof>::value,
-                       is_vector<T_dof>::value> log_half_nu(length(nu));
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_dof>::value,
-                       is_vector<T_dof>::value> lgamma_half_nu(length(nu));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> 
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_dof>::value,
+                    is_vector<T_dof>::value> log_half_nu(length(nu));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_dof>::value,
+                    is_vector<T_dof>::value> lgamma_half_nu(length(nu));
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> 
         digamma_half_nu_over_two(length(nu));
       for (size_t i = 0; i < length(nu); i++) {
         if (include_summand<propto,T_dof>::value)
@@ -218,7 +219,8 @@ namespace stan {
     typename return_type<T_y, T_dof, T_scale>::type
     scaled_inv_chi_square_cdf(const T_y& y, const T_dof& nu, 
                               const T_scale& s) {
-      typedef typename stan::partials_return_type<T_y,T_dof,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_dof,T_scale>::type
+        T_partials_return;
 
       // Size checks
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
@@ -277,12 +279,12 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> gamma_vec(stan::length(nu));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> digamma_vec(stan::length(nu));
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> gamma_vec(stan::length(nu));
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         for (size_t i = 0; i < stan::length(nu); i++) {
@@ -306,7 +308,8 @@ namespace stan {
         const T_partials_return y_inv_dbl = 1.0 / y_dbl;
         const T_partials_return half_nu_dbl = 0.5 * value_of(nu_vec[n]);
         const T_partials_return s_dbl = value_of(s_vec[n]);
-        const T_partials_return half_s2_overx_dbl = 0.5 * s_dbl * s_dbl * y_inv_dbl;
+        const T_partials_return half_s2_overx_dbl = 0.5 * s_dbl * s_dbl 
+          * y_inv_dbl;
         const T_partials_return half_nu_s2_overx_dbl 
           = 2.0 * half_nu_dbl * half_s2_overx_dbl;
                     
@@ -326,8 +329,9 @@ namespace stan {
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
             += (0.5 * stan::math::grad_reg_inc_gamma(half_nu_dbl,
-                                                  half_nu_s2_overx_dbl,
-                                                  gamma_vec[n], digamma_vec[n])
+                                                     half_nu_s2_overx_dbl,
+                                                     gamma_vec[n], 
+                                                     digamma_vec[n])
                 - half_s2_overx_dbl * gamma_p_deriv)
             / Pn;
                     
@@ -355,7 +359,8 @@ namespace stan {
     typename return_type<T_y, T_dof, T_scale>::type
     scaled_inv_chi_square_cdf_log(const T_y& y, const T_dof& nu, 
                                   const T_scale& s) {
-      typedef typename stan::partials_return_type<T_y,T_dof,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_dof,T_scale>::type 
+        T_partials_return;
 
       // Size checks
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
@@ -398,7 +403,8 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu,s);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,nu,s);
       }
           
       // Compute cdf_log and its gradients
@@ -413,12 +419,12 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> gamma_vec(stan::length(nu));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> digamma_vec(stan::length(nu));
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> gamma_vec(stan::length(nu));
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         for (size_t i = 0; i < stan::length(nu); i++) {
@@ -442,7 +448,8 @@ namespace stan {
         const T_partials_return y_inv_dbl = 1.0 / y_dbl;
         const T_partials_return half_nu_dbl = 0.5 * value_of(nu_vec[n]);
         const T_partials_return s_dbl = value_of(s_vec[n]);
-        const T_partials_return half_s2_overx_dbl = 0.5 * s_dbl * s_dbl * y_inv_dbl;
+        const T_partials_return half_s2_overx_dbl = 0.5 * s_dbl * s_dbl 
+          * y_inv_dbl;
         const T_partials_return half_nu_s2_overx_dbl 
           = 2.0 * half_nu_dbl * half_s2_overx_dbl;
                     
@@ -459,13 +466,14 @@ namespace stan {
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
             += (0.5 * stan::math::grad_reg_inc_gamma(half_nu_dbl,
-                                                  half_nu_s2_overx_dbl,
-                                                  gamma_vec[n], digamma_vec[n])
+                                                     half_nu_s2_overx_dbl,
+                                                     gamma_vec[n], 
+                                                     digamma_vec[n])
                 - half_s2_overx_dbl * gamma_p_deriv)
             / Pn;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += - 2.0 * half_nu_dbl * s_dbl * y_inv_dbl 
-            * gamma_p_deriv / Pn;
+          operands_and_partials.d_x3[n] += - 2.0 * half_nu_dbl * s_dbl
+            * y_inv_dbl * gamma_p_deriv / Pn;
       }
 
       return operands_and_partials.to_var(P,y,nu,s);
@@ -475,7 +483,8 @@ namespace stan {
     typename return_type<T_y, T_dof, T_scale>::type
     scaled_inv_chi_square_ccdf_log(const T_y& y, const T_dof& nu, 
                                    const T_scale& s) {
-      typedef typename stan::partials_return_type<T_y,T_dof,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_dof,T_scale>::type
+        T_partials_return;
 
       // Size checks
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
@@ -533,12 +542,12 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> gamma_vec(stan::length(nu));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> digamma_vec(stan::length(nu));
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> gamma_vec(stan::length(nu));
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         for (size_t i = 0; i < stan::length(nu); i++) {
@@ -554,7 +563,8 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu,s);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,nu,s);
         }
               
         // Pull out values
@@ -562,12 +572,14 @@ namespace stan {
         const T_partials_return y_inv_dbl = 1.0 / y_dbl;
         const T_partials_return half_nu_dbl = 0.5 * value_of(nu_vec[n]);
         const T_partials_return s_dbl = value_of(s_vec[n]);
-        const T_partials_return half_s2_overx_dbl = 0.5 * s_dbl * s_dbl * y_inv_dbl;
+        const T_partials_return half_s2_overx_dbl = 0.5 * s_dbl * s_dbl
+          * y_inv_dbl;
         const T_partials_return half_nu_s2_overx_dbl 
           = 2.0 * half_nu_dbl * half_s2_overx_dbl;
                     
         // Compute
-        const T_partials_return Pn = 1.0 - gamma_q(half_nu_dbl, half_nu_s2_overx_dbl);
+        const T_partials_return Pn = 1.0 - gamma_q(half_nu_dbl,
+                                                   half_nu_s2_overx_dbl);
         const T_partials_return gamma_p_deriv = exp(-half_nu_s2_overx_dbl)
           * pow(half_nu_s2_overx_dbl,half_nu_dbl-1) / tgamma(half_nu_dbl);     
      
@@ -579,12 +591,13 @@ namespace stan {
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
             -= (0.5 * stan::math::grad_reg_inc_gamma(half_nu_dbl,
-                                                  half_nu_s2_overx_dbl,
-                                                  gamma_vec[n], digamma_vec[n])
+                                                     half_nu_s2_overx_dbl,
+                                                     gamma_vec[n], 
+                                                     digamma_vec[n])
                 - half_s2_overx_dbl * gamma_p_deriv)
             / Pn;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += 2.0 * half_nu_dbl * s_dbl * y_inv_dbl 
+          operands_and_partials.d_x3[n] += 2.0 * half_nu_dbl * s_dbl * y_inv_dbl
             * gamma_p_deriv / Pn;
       }
 

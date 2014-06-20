@@ -23,7 +23,8 @@ namespace stan {
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
       static const char* function = "stan::prob::weibull_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+        T_partials_return;
 
       using stan::math::check_finite;
       using stan::math::check_not_nan;
@@ -66,38 +67,38 @@ namespace stan {
           return LOG_ZERO;
       }
       
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_shape>::value,
-                       is_vector<T_shape>::value> log_alpha(length(alpha));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_shape>::value,
+                    is_vector<T_shape>::value> log_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
         if (include_summand<propto,T_shape>::value)
           log_alpha[i] = log(value_of(alpha_vec[i]));
       
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_y,T_shape>::value,
-                       is_vector<T_y>::value> log_y(length(y));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_y,T_shape>::value,
+                    is_vector<T_y>::value> log_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y,T_shape>::value)
           log_y[i] = log(value_of(y_vec[i]));
 
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_shape,T_scale>::value,
-                       is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_shape,T_scale>::value,
+                    is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++)
         if (include_summand<propto,T_shape,T_scale>::value)
           log_sigma[i] = log(value_of(sigma_vec[i]));
 
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_y,T_shape,T_scale>::value,
-                       is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_y,T_shape,T_scale>::value,
+                    is_vector<T_scale>::value> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++)
         if (include_summand<propto,T_y,T_shape,T_scale>::value)
           inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_y,T_shape,T_scale>::value,
-                       is_vector<T_y>::value | is_vector<T_shape>::value 
-                       | is_vector<T_scale>::value>
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_y,T_shape,T_scale>::value,
+                    is_vector<T_y>::value | is_vector<T_shape>::value 
+                    | is_vector<T_scale>::value>
         y_div_sigma_pow_alpha(N);
       for (size_t i = 0; i < N; i++)
         if (include_summand<propto,T_y,T_shape,T_scale>::value) {
@@ -106,7 +107,8 @@ namespace stan {
           y_div_sigma_pow_alpha[i] = pow(y_dbl * inv_sigma[i], alpha_dbl);
         }
 
-      agrad::OperandsAndPartials<T_y,T_shape,T_scale> operands_and_partials(y,alpha,sigma);
+      agrad::OperandsAndPartials<T_y,T_shape,T_scale> 
+        operands_and_partials(y,alpha,sigma);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
         if (include_summand<propto,T_shape>::value)
@@ -146,7 +148,8 @@ namespace stan {
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_cdf(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
-      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+        T_partials_return;
 
       static const char* function = "stan::prob::weibull_cdf(%1%)";
 
@@ -213,7 +216,8 @@ namespace stan {
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_cdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
-      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+        T_partials_return;
 
       static const char* function = "stan::prob::weibull_cdf_log(%1%)";
 
@@ -270,7 +274,8 @@ namespace stan {
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_ccdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
-      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type 
+        T_partials_return;
 
       static const char* function = "stan::prob::weibull_ccdf_log(%1%)";
 

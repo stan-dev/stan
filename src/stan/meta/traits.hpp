@@ -327,7 +327,7 @@ namespace stan {
 
   /**
    *
-   *  DoubleVectorView allocates double values to be used as
+   *  VectorBuilder allocates type T values to be used as
    *  intermediate values. There are 2 template parameters:
    *  - used: boolean variable indicating whether this instance
    *      is used. If this is false, there is no storage allocated
@@ -340,31 +340,31 @@ namespace stan {
    *  These values are mutable.
    */
   template<typename partials_return,bool used, bool is_vec>
-  class DoubleVectorView {
+  class VectorBuilder {
   public:
-    DoubleVectorView(size_t /* n */) { }
+    VectorBuilder(size_t /* n */) { }
     partials_return& operator[](size_t /* i */) {
       throw std::runtime_error("used is false. this should never be called");
     }
   };
 
   template<typename partials_return>
-  class DoubleVectorView<partials_return,true, false> {
+  class VectorBuilder<partials_return,true, false> {
   private:
     partials_return x_;
   public:
-    DoubleVectorView(size_t /* n */) : x_(0.0) { }
+    VectorBuilder(size_t /* n */) : x_(0.0) { }
     partials_return& operator[](size_t /* i */) {
       return x_;
     }
   };
 
   template<typename partials_return>
-  class DoubleVectorView<partials_return,true, true> {
+  class VectorBuilder<partials_return,true, true> {
   private:
     std::vector<partials_return> x_;
   public:
-    DoubleVectorView(size_t n) : x_(n) { }
+    VectorBuilder(size_t n) : x_(n) { }
     partials_return& operator[](size_t i) {
       return x_[i];
     }

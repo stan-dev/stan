@@ -19,7 +19,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     gumbel_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
       static const char* function = "stan::prob::gumbel_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+        T_partials_return;
 
       using std::log;
       using std::exp;
@@ -63,9 +64,9 @@ namespace stan {
       VectorView<const T_scale> beta_vec(beta);
       size_t N = max_size(y, mu, beta);
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        true,is_vector<T_scale>::value> inv_beta(length(beta));
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_scale>::value,
                        is_vector<T_scale>::value> log_beta(length(beta));
       for (size_t i = 0; i < length(beta); i++) {
@@ -90,7 +91,8 @@ namespace stan {
           logp += -y_minus_mu_over_beta - exp(-y_minus_mu_over_beta);
 
         // gradients
-        T_partials_return scaled_diff = inv_beta[n] * exp(-y_minus_mu_over_beta);
+        T_partials_return scaled_diff = inv_beta[n] 
+          * exp(-y_minus_mu_over_beta);
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= inv_beta[n] - scaled_diff;
         if (!is_constant_struct<T_loc>::value)
@@ -114,7 +116,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta) {
       static const char* function = "stan::prob::gumbel_cdf(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -150,7 +153,8 @@ namespace stan {
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
         const T_partials_return beta_dbl = value_of(beta_vec[n]);
         const T_partials_return scaled_diff = (y_dbl - mu_dbl) / beta_dbl;
-        const T_partials_return rep_deriv = exp(-scaled_diff - exp(-scaled_diff)) 
+        const T_partials_return rep_deriv = exp(-scaled_diff
+                                                - exp(-scaled_diff)) 
           / beta_dbl;
         const T_partials_return cdf_ = exp(-exp(-scaled_diff));
         cdf *= cdf_;
@@ -183,7 +187,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     gumbel_cdf_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
       static const char* function = "stan::prob::gumbel_cdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -237,7 +242,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     gumbel_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
       static const char* function = "stan::prob::gumbel_ccdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -273,7 +279,8 @@ namespace stan {
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
         const T_partials_return beta_dbl = value_of(beta_vec[n]);
         const T_partials_return scaled_diff = (y_dbl - mu_dbl) / beta_dbl;
-        const T_partials_return rep_deriv = exp(-scaled_diff - exp(-scaled_diff)) 
+        const T_partials_return rep_deriv = exp(-scaled_diff 
+                                                - exp(-scaled_diff)) 
           / beta_dbl;
         const T_partials_return ccdf_log_ = 1.0 - exp(-exp(-scaled_diff));
         ccdf_log += log(ccdf_log_);

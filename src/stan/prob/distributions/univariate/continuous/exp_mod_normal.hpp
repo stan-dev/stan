@@ -26,7 +26,9 @@ namespace stan {
     exp_mod_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                        const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
+                                                  T_inv_scale>::type 
+        T_partials_return;
 
       using stan::is_constant_struct;
       using stan::math::check_positive;
@@ -101,8 +103,7 @@ namespace stan {
                 * (mu_dbl + lambda_dbl * sigma_dbl * sigma_dbl - y_dbl) 
                 / (sigma_dbl * std::sqrt(2.0))) 
           / boost::math::erfc((mu_dbl + lambda_dbl * sigma_dbl * sigma_dbl 
-                               - y_dbl)
-                              / (sigma_dbl * std::sqrt(2.0)));
+                               - y_dbl) / (sigma_dbl * std::sqrt(2.0)));
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 
@@ -142,7 +143,9 @@ namespace stan {
     exp_mod_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                        const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_cdf(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
+                                                  T_inv_scale>::type 
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -197,21 +200,23 @@ namespace stan {
         const T_partials_return u = lambda_dbl * (y_dbl - mu_dbl);
         const T_partials_return v = lambda_dbl * sigma_dbl ;
         const T_partials_return v_sq = v * v;
-        const T_partials_return scaled_diff = (y_dbl - mu_dbl) / (SQRT_2 * sigma_dbl);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) / (SQRT_2 
+                                                                  * sigma_dbl);
         const T_partials_return scaled_diff_sq = scaled_diff * scaled_diff;
-        const T_partials_return erf_calc = 0.5 * (1 + erf(-v / SQRT_2 + scaled_diff));
-        const T_partials_return deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) * erf_calc;
-        const T_partials_return deriv_2 = SQRT_2 / sqrt_pi * 0.5 * exp(0.5 * v_sq 
-                                                            - (scaled_diff 
-                                - (v / SQRT_2)) * (scaled_diff 
-                                - (v / SQRT_2)) - u) / sigma_dbl;
-        const T_partials_return deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) 
-          / sigma_dbl;
+        const T_partials_return erf_calc = 0.5 * (1 + erf(-v / SQRT_2 
+                                                          + scaled_diff));
+        const T_partials_return deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) 
+          * erf_calc;
+        const T_partials_return deriv_2 = SQRT_2 / sqrt_pi * 0.5 
+          * exp(0.5 * v_sq - (scaled_diff - (v / SQRT_2)) 
+                * (scaled_diff - (v / SQRT_2)) - u) / sigma_dbl;
+        const T_partials_return deriv_3 = SQRT_2 / sqrt_pi * 0.5 
+          * exp(-scaled_diff_sq) / sigma_dbl;
 
         const T_partials_return cdf_ = 0.5 * (1 + erf(u / (v * SQRT_2))) 
           - exp(-u + v_sq * 0.5) * (erf_calc);
 
-          cdf *= cdf_;
+        cdf *= cdf_;
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += (deriv_1 - deriv_2 + deriv_3) 
@@ -221,14 +226,17 @@ namespace stan {
             / cdf_;
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] += (-deriv_1 * v - deriv_3 
-            * scaled_diff * SQRT_2 - deriv_2 * sigma_dbl * SQRT_2 * (-SQRT_2 
-            * 0.5 * (-lambda_dbl + scaled_diff * SQRT_2 / sigma_dbl) - SQRT_2 
-            * lambda_dbl)) / cdf_;
+                                            * scaled_diff * SQRT_2 - deriv_2 
+                                            * sigma_dbl * SQRT_2
+                                            * (-SQRT_2 * 0.5 
+                                               * (-lambda_dbl + scaled_diff
+                                                  * SQRT_2 / sigma_dbl) - SQRT_2
+                                               * lambda_dbl)) / cdf_;
         if (!is_constant_struct<T_inv_scale>::value)
-          operands_and_partials.d_x4[n] += exp(0.5 * v_sq - u) * (SQRT_2 
-            / sqrt_pi * 0.5 * sigma_dbl * exp(-(v / SQRT_2 - scaled_diff) * (v
-            / SQRT_2 - scaled_diff)) - (v * sigma_dbl + mu_dbl - y_dbl) 
-            * erf_calc) / cdf_;
+          operands_and_partials.d_x4[n] += exp(0.5 * v_sq - u) 
+            * (SQRT_2 / sqrt_pi * 0.5 * sigma_dbl 
+               * exp(-(v / SQRT_2 - scaled_diff) * (v / SQRT_2 - scaled_diff)) 
+               - (v * sigma_dbl + mu_dbl - y_dbl) * erf_calc) / cdf_;
       }
 
       if (!is_constant_struct<T_y>::value) {
@@ -255,9 +263,11 @@ namespace stan {
               typename T_inv_scale>
     typename return_type<T_y,T_loc,T_scale,T_inv_scale>::type
     exp_mod_normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
-                       const T_inv_scale& lambda) {
+                           const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_cdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
+                                                  T_inv_scale>::type
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -303,7 +313,8 @@ namespace stan {
 
         if(boost::math::isinf(y_vec[n])) {
           if (y_vec[n] < 0.0)
-            return operands_and_partials.to_var(stan::math::negative_infinity(),y,mu,sigma,lambda);
+            return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                                y,mu,sigma,lambda);
           else
             return operands_and_partials.to_var(0.0);
         }
@@ -315,28 +326,33 @@ namespace stan {
         const T_partials_return u = lambda_dbl * (y_dbl - mu_dbl);
         const T_partials_return v = lambda_dbl * sigma_dbl ;
         const T_partials_return v_sq = v * v;
-        const T_partials_return scaled_diff = (y_dbl - mu_dbl) / (SQRT_2 * sigma_dbl);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) 
+          / (SQRT_2 * sigma_dbl);
         const T_partials_return scaled_diff_sq = scaled_diff * scaled_diff;
         const T_partials_return erf_calc1 = 0.5 * (1 + erf(u / (v * SQRT_2)));
-        const T_partials_return erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2) - v / SQRT_2));
-        const T_partials_return deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) * erf_calc2;
+        const T_partials_return erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2) - v
+                                                           / SQRT_2));
+        const T_partials_return deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) 
+          * erf_calc2;
         const T_partials_return deriv_2 = SQRT_2 / sqrt_pi * 0.5 
           * exp(0.5 * v_sq - (-scaled_diff + (v / SQRT_2)) 
                 * (-scaled_diff + (v / SQRT_2)) - u) / sigma_dbl;
-        const T_partials_return deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) 
-          / sigma_dbl;
+        const T_partials_return deriv_3 = SQRT_2 / sqrt_pi * 0.5 
+          * exp(-scaled_diff_sq) / sigma_dbl;
 
-        const T_partials_return denom = erf_calc1 - erf_calc2 * exp(0.5 * v_sq - u);
-        const T_partials_return cdf_ = erf_calc1 - exp(-u + v_sq * 0.5) * (erf_calc2);
+        const T_partials_return denom = erf_calc1 - erf_calc2 
+          * exp(0.5 * v_sq - u);
+        const T_partials_return cdf_ = erf_calc1 - exp(-u + v_sq * 0.5) 
+          * (erf_calc2);
 
         cdf_log += log(cdf_);
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += (deriv_1 - deriv_2 + deriv_3) 
-                                             / denom;
+            / denom;
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] += (-deriv_1 + deriv_2 - deriv_3) 
-                                             / denom;
+            / denom;
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] 
             += (-deriv_1 * v - deriv_3 * scaled_diff 
@@ -362,9 +378,11 @@ namespace stan {
               typename T_inv_scale>
     typename return_type<T_y,T_loc,T_scale,T_inv_scale>::type
     exp_mod_normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
-                       const T_inv_scale& lambda) {
+                            const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_ccdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
+                                                  T_inv_scale>::type
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -410,7 +428,8 @@ namespace stan {
 
         if(boost::math::isinf(y_vec[n])) {
           if (y_vec[n] > 0.0)
-            return operands_and_partials.to_var(stan::math::negative_infinity(),y,mu,sigma,lambda);
+            return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                                y,mu,sigma,lambda);
           else
             return operands_and_partials.to_var(0.0);
         }
@@ -422,20 +441,25 @@ namespace stan {
         const T_partials_return u = lambda_dbl * (y_dbl - mu_dbl);
         const T_partials_return v = lambda_dbl * sigma_dbl ;
         const T_partials_return v_sq = v * v;
-        const T_partials_return scaled_diff = (y_dbl - mu_dbl) / (SQRT_2 * sigma_dbl);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) 
+          / (SQRT_2 * sigma_dbl);
         const T_partials_return scaled_diff_sq = scaled_diff * scaled_diff;
         const T_partials_return erf_calc1 = 0.5 * (1 + erf(u / (v * SQRT_2)));
-        const T_partials_return erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2) - v / SQRT_2));
+        const T_partials_return erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2) 
+                                                           - v / SQRT_2));
 
-        const T_partials_return deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) * erf_calc2;
+        const T_partials_return deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) 
+          * erf_calc2;
         const T_partials_return deriv_2 = SQRT_2 / sqrt_pi * 0.5 
           * exp(0.5 * v_sq 
                 - (-scaled_diff + (v / SQRT_2)) * (-scaled_diff  
                                                    + (v / SQRT_2)) - u) 
           / sigma_dbl;
-        const T_partials_return deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) / sigma_dbl;
+        const T_partials_return deriv_3 = SQRT_2 / sqrt_pi * 0.5 
+          * exp(-scaled_diff_sq) / sigma_dbl;
 
-        const T_partials_return ccdf_ = 1.0 - erf_calc1 + exp(-u + v_sq * 0.5) * (erf_calc2);
+        const T_partials_return ccdf_ = 1.0 - erf_calc1 + exp(-u + v_sq * 0.5) 
+          * (erf_calc2);
 
         ccdf_log += log(ccdf_);
 
@@ -481,7 +505,8 @@ namespace stan {
       check_positive(function, lambda, "Inv_scale parameter", (double*)0);
       check_positive(function, sigma, "Scale parameter", (double*)0);
 
-      return stan::prob::normal_rng(mu, sigma,rng) + stan::prob::exponential_rng(lambda, rng);
+      return stan::prob::normal_rng(mu, sigma,rng) 
+        + stan::prob::exponential_rng(lambda, rng);
     }
   }
 }

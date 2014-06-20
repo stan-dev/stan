@@ -26,7 +26,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     logistic_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::logistic_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -69,25 +70,25 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      DoubleVectorView<T_partials_return,
-                       true,is_vector<T_scale>::value> 
+      VectorBuilder<T_partials_return,
+                    true,is_vector<T_scale>::value> 
         inv_sigma(length(sigma));
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_scale>::value,
-                       is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_scale>::value,
+                    is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
           log_sigma[i] = log(value_of(sigma_vec[i]));
       }
 
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_loc>::value, 
-                       is_vector<T_loc>::value || is_vector<T_scale>::value> 
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_loc>::value, 
+                    is_vector<T_loc>::value || is_vector<T_scale>::value> 
         exp_mu_div_sigma(max_size(mu,sigma));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_loc>::value, 
-                       is_vector<T_y>::value || is_vector<T_scale>::value> 
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_loc>::value, 
+                    is_vector<T_y>::value || is_vector<T_scale>::value> 
         exp_y_div_sigma(max_size(y,sigma));
       if (!is_constant_struct<T_loc>::value) {
         for (size_t n = 0; n < max_size(mu,sigma); n++) 
@@ -104,7 +105,8 @@ namespace stan {
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
   
         const T_partials_return y_minus_mu = y_dbl - mu_dbl;
-        const T_partials_return y_minus_mu_div_sigma = y_minus_mu * inv_sigma[n];
+        const T_partials_return y_minus_mu_div_sigma = y_minus_mu 
+          * inv_sigma[n];
         T_partials_return exp_m_y_minus_mu_div_sigma(0);
         if (include_summand<propto,T_y,T_loc,T_scale>::value)
           exp_m_y_minus_mu_div_sigma = exp(-y_minus_mu_div_sigma);
@@ -147,7 +149,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     logistic_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) 
@@ -208,7 +211,7 @@ namespace stan {
               
         // Compute
         const T_partials_return Pn = 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) 
-                                             * sigma_inv_vec ) );
+                                                        * sigma_inv_vec ) );
                     
         P *= Pn;
               
@@ -243,7 +246,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     logistic_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
     
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) )
@@ -303,7 +307,7 @@ namespace stan {
               
         // Compute
         const T_partials_return Pn = 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) 
-                                             * sigma_inv_vec ) );
+                                                        * sigma_inv_vec ) );
         P += log(Pn);
               
         if (!is_constant_struct<T_y>::value)
@@ -323,7 +327,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     logistic_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
   
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) ) 
@@ -372,7 +377,8 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,alpha,beta);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,alpha,beta);
         }
               
         // Pull out values
@@ -382,8 +388,8 @@ namespace stan {
         const T_partials_return sigma_inv_vec = 1.0 / value_of(sigma_vec[n]);
               
         // Compute
-        const T_partials_return Pn = 1.0 - 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) 
-                                             * sigma_inv_vec ) );
+        const T_partials_return Pn = 1.0 - 1.0 / (1.0 + exp(-(y_dbl - mu_dbl) 
+                                                             * sigma_inv_vec));
         P += log(Pn);
               
         if (!is_constant_struct<T_y>::value)

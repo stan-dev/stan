@@ -59,7 +59,9 @@ namespace stan {
     typename return_type<T_y,T_shape,T_inv_scale>::type
     gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
       static const char* function = "stan::prob::gamma_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_shape,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_shape,
+                                                  T_inv_scale>::type 
+        T_partials_return;
 
       using stan::is_constant_struct;
       using stan::math::check_not_nan;
@@ -106,13 +108,14 @@ namespace stan {
       }
 
       size_t N = max_size(y, alpha, beta);
-      agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale> operands_and_partials(y, alpha, beta);
+      agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale> 
+        operands_and_partials(y, alpha, beta);
 
       using boost::math::lgamma;
       using stan::math::multiply_log;
       using boost::math::digamma;
       
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_y,T_shape>::value,
                        is_vector<T_y>::value>
         log_y(length(y));
@@ -122,11 +125,11 @@ namespace stan {
             log_y[n] = log(value_of(y_vec[n]));
         }
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_shape>::value,
                        is_vector<T_shape>::value>
         lgamma_alpha(length(alpha));
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_shape>::value,
                        is_vector<T_shape>::value>
         digamma_alpha(length(alpha));
@@ -137,7 +140,7 @@ namespace stan {
           digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
       }
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_shape,T_inv_scale>::value,
                        is_vector<T_inv_scale>::value>
         log_beta(length(beta));
@@ -164,7 +167,8 @@ namespace stan {
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += (alpha_dbl-1)/y_dbl - beta_dbl;
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x2[n] += -digamma_alpha[n] + log_beta[n] + log_y[n];
+          operands_and_partials.d_x2[n] += -digamma_alpha[n] + log_beta[n] 
+            + log_y[n];
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x3[n] += alpha_dbl / beta_dbl - y_dbl;
       }
@@ -199,7 +203,9 @@ namespace stan {
       // Size checks
       if (!(stan::length(y) && stan::length(alpha) && stan::length(beta))) 
         return 1.0;
-      typedef typename stan::partials_return_type<T_y,T_shape,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_shape,
+                                                  T_inv_scale>::type
+        T_partials_return;
           
       // Error checks
       static const char* function = "stan::prob::gamma_cdf(%1%)";
@@ -256,11 +262,11 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_shape>::value,
                        is_vector<T_shape>::value> 
         gamma_vec(stan::length(alpha));
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_shape>::value,
                        is_vector<T_shape>::value> 
         digamma_vec(stan::length(alpha));
@@ -322,7 +328,9 @@ namespace stan {
       // Size checks
       if (!(stan::length(y) && stan::length(alpha) && stan::length(beta))) 
         return 0.0;
-      typedef typename stan::partials_return_type<T_y,T_shape,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_shape,
+                                                  T_inv_scale>::type
+        T_partials_return;
 
       // Error checks
       static const char* function = "stan::prob::gamma_cdf_log(%1%)";
@@ -364,7 +372,8 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,alpha,beta);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,alpha,beta);
       }
           
       // Compute cdf_log and its gradients
@@ -379,11 +388,11 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_shape>::value,
                        is_vector<T_shape>::value> 
         gamma_vec(stan::length(alpha));
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_shape>::value,
                        is_vector<T_shape>::value> 
         digamma_vec(stan::length(alpha));
@@ -431,12 +440,15 @@ namespace stan {
 
  template <typename T_y, typename T_shape, typename T_inv_scale>
     typename return_type<T_y,T_shape,T_inv_scale>::type
-    gamma_ccdf_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
+    gamma_ccdf_log(const T_y& y, const T_shape& alpha, 
+                   const T_inv_scale& beta) {
       // Size checks
       if (!(stan::length(y) && stan::length(alpha) && stan::length(beta))) 
         return 0.0;
          
-      typedef typename stan::partials_return_type<T_y,T_shape,T_inv_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_shape,
+                                                  T_inv_scale>::type 
+        T_partials_return;
  
       // Error checks
       static const char* function = "stan::prob::gamma_ccdf_log(%1%)";
@@ -493,11 +505,11 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_shape>::value,
                        is_vector<T_shape>::value> 
         gamma_vec(stan::length(alpha));
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_shape>::value,
                        is_vector<T_shape>::value> 
         digamma_vec(stan::length(alpha));
@@ -515,7 +527,8 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity())
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,alpha,beta);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,alpha,beta);
               
         // Pull out values
         const T_partials_return y_dbl = value_of(y_vec[n]);

@@ -23,7 +23,9 @@ namespace stan {
     skew_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                     const T_shape& alpha) {
       static const char* function = "stan::prob::skew_normal_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_shape>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,
+                                                  T_scale,T_shape>::type 
+        T_partials_return;
 
       using std::log;
       using stan::is_constant_struct;
@@ -69,11 +71,11 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, mu, sigma, alpha);
 
-      DoubleVectorView<T_partials_return,
-                       true,is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_scale>::value,
-                       is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_scale>::value,
+                    is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -123,7 +125,7 @@ namespace stan {
             += -1.0 / sigma_dbl 
             + y_minus_mu_over_sigma * y_minus_mu_over_sigma / sigma_dbl 
             - deriv_logerf * y_minus_mu_over_sigma * alpha_dbl 
-              / (sigma_dbl * std::sqrt(2.0));
+            / (sigma_dbl * std::sqrt(2.0));
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x4[n] 
             += deriv_logerf * y_minus_mu_over_sigma / std::sqrt(2.0);
@@ -144,7 +146,9 @@ namespace stan {
     skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                     const T_shape& alpha) {
       static const char* function = "stan::prob::skew_normal_cdf(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_shape>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
+                                                  T_shape>::type 
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -197,17 +201,20 @@ namespace stan {
         const T_partials_return diff_sq = diff * diff;
         const T_partials_return scaled_diff =  diff / SQRT_2;
         const T_partials_return scaled_diff_sq =  diff_sq * 0.5;
-        const T_partials_return cdf_ = 0.5 * erfc(-scaled_diff) - 2 * owens_t(diff, 
-                                                                 alpha_dbl);
+        const T_partials_return cdf_ = 0.5 * erfc(-scaled_diff) - 2 
+          * owens_t(diff, alpha_dbl);
+
         //cdf
         cdf *= cdf_;
 
         //gradients
-        const T_partials_return deriv_erfc = SQRT_TWO_OVER_PI * 0.5 * exp(-scaled_diff_sq)
+        const T_partials_return deriv_erfc = SQRT_TWO_OVER_PI * 0.5 
+          * exp(-scaled_diff_sq)
           / sigma_dbl;
         const T_partials_return deriv_owens = erf(alpha_dbl * scaled_diff) 
           * exp(-scaled_diff_sq) / SQRT_TWO_OVER_PI / (-2.0 * pi()) / sigma_dbl;
-        const T_partials_return rep_deriv = (-2.0 * deriv_owens + deriv_erfc) / cdf_;
+        const T_partials_return rep_deriv = (-2.0 * deriv_owens + deriv_erfc) 
+          / cdf_;
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv;
@@ -216,8 +223,9 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] -= rep_deriv * diff;
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x4[n] += -2.0 * exp(-0.5 * diff_sq * (1.0 
-                   + alpha_dbl_sq)) / ((1 + alpha_dbl_sq) * 2.0 * pi()) / cdf_;
+          operands_and_partials.d_x4[n] += -2.0 * exp(-0.5 * diff_sq 
+                                                      * (1.0  + alpha_dbl_sq))
+            / ((1 + alpha_dbl_sq) * 2.0 * pi()) / cdf_;
       }
 
       if (!is_constant_struct<T_y>::value)
@@ -239,9 +247,11 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
-                    const T_shape& alpha) {
+                        const T_shape& alpha) {
       static const char* function = "stan::prob::skew_normal_cdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_shape>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
+                                                  T_shape>::type
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -294,17 +304,19 @@ namespace stan {
         const T_partials_return diff_sq = diff * diff;
         const T_partials_return scaled_diff =  diff / SQRT_2;
         const T_partials_return scaled_diff_sq =  diff_sq * 0.5;
-        const T_partials_return cdf_log_ = 0.5 * erfc(-scaled_diff) - 2 * owens_t(diff, 
-                                                                 alpha_dbl);
+        const T_partials_return cdf_log_ = 0.5 * erfc(-scaled_diff) - 2 
+          * owens_t(diff, alpha_dbl);
+
         //cdf_log
         cdf_log += log(cdf_log_);
 
         //gradients
-        const T_partials_return deriv_erfc = SQRT_TWO_OVER_PI * 0.5 * exp(-scaled_diff_sq)
-          / sigma_dbl;
+        const T_partials_return deriv_erfc = SQRT_TWO_OVER_PI * 0.5 
+          * exp(-scaled_diff_sq) / sigma_dbl;
         const T_partials_return deriv_owens = erf(alpha_dbl * scaled_diff) 
           * exp(-scaled_diff_sq) / SQRT_TWO_OVER_PI / (-2.0 * pi()) / sigma_dbl;
-        const T_partials_return rep_deriv = (-2.0 * deriv_owens + deriv_erfc) / cdf_log_;
+        const T_partials_return rep_deriv = (-2.0 * deriv_owens + deriv_erfc) 
+          / cdf_log_;
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv;
@@ -313,8 +325,9 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] -= rep_deriv * diff;
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x4[n] += -2.0 * exp(-0.5 * diff_sq * (1.0
-                + alpha_dbl_sq)) / ((1 + alpha_dbl_sq) * 2.0 * pi()) / cdf_log_;
+          operands_and_partials.d_x4[n] += -2.0 * exp(-0.5 * diff_sq 
+                                                      * (1.0 + alpha_dbl_sq))
+            / ((1 + alpha_dbl_sq) * 2.0 * pi()) / cdf_log_;
       }
 
       return operands_and_partials.to_var(cdf_log,y,mu,sigma,alpha);    
@@ -325,7 +338,9 @@ namespace stan {
     skew_normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                          const T_shape& alpha) {
       static const char* function = "stan::prob::skew_normal_ccdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_shape>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
+                                                  T_shape>::type 
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -378,17 +393,19 @@ namespace stan {
         const T_partials_return diff_sq = diff * diff;
         const T_partials_return scaled_diff =  diff / SQRT_2;
         const T_partials_return scaled_diff_sq =  diff_sq * 0.5;
-        const T_partials_return ccdf_log_ = 1.0 - 0.5 * erfc(-scaled_diff) + 2 * owens_t(diff, 
-                                                                 alpha_dbl);
+        const T_partials_return ccdf_log_ = 1.0 - 0.5 * erfc(-scaled_diff) 
+          + 2 * owens_t(diff, alpha_dbl);
+
         //ccdf_log
         ccdf_log += log(ccdf_log_);
 
         //gradients
-        const T_partials_return deriv_erfc = SQRT_TWO_OVER_PI * 0.5 * exp(-scaled_diff_sq)
-          / sigma_dbl;
+        const T_partials_return deriv_erfc = SQRT_TWO_OVER_PI * 0.5 
+          * exp(-scaled_diff_sq) / sigma_dbl;
         const T_partials_return deriv_owens = erf(alpha_dbl * scaled_diff) 
           * exp(-scaled_diff_sq) / SQRT_TWO_OVER_PI / (-2.0 * pi()) / sigma_dbl;
-        const T_partials_return rep_deriv = (-2.0 * deriv_owens + deriv_erfc) / ccdf_log_;
+        const T_partials_return rep_deriv = (-2.0 * deriv_owens + deriv_erfc) 
+          / ccdf_log_;
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= rep_deriv;
@@ -397,8 +414,9 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] += rep_deriv * diff;
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x4[n] -= -2.0 * exp(-0.5 * diff_sq * (1.0 
-                   + alpha_dbl_sq)) / ((1 + alpha_dbl_sq) * 2.0 * pi()) / ccdf_log_;
+          operands_and_partials.d_x4[n] -= -2.0 * exp(-0.5 * diff_sq 
+                                                      * (1.0 + alpha_dbl_sq)) 
+            / ((1 + alpha_dbl_sq) * 2.0 * pi()) / ccdf_log_;
       }
 
       return operands_and_partials.to_var(ccdf_log,y,mu,sigma,alpha);    

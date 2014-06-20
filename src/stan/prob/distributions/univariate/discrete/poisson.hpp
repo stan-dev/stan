@@ -34,7 +34,8 @@ namespace stan {
               typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_log(const T_n& n, const T_rate& lambda) {
-      typedef typename stan::partials_return_type<T_n,T_rate>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_n,T_rate>::type
+        T_partials_return;
 
       static const char* function = "stan::prob::poisson_log(%1%)";
       
@@ -117,7 +118,8 @@ namespace stan {
               typename T_n, typename T_log_rate>
     typename return_type<T_log_rate>::type
     poisson_log_log(const T_n& n, const T_log_rate& alpha) {
-      typedef typename stan::partials_return_type<T_n,T_log_rate>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_n,T_log_rate>::type
+        T_partials_return;
 
       static const char* function = "stan::prob::poisson_log_log(%1%)";
       
@@ -168,9 +170,9 @@ namespace stan {
       agrad::OperandsAndPartials<T_log_rate> operands_and_partials(alpha);
 
       // FIXME: cache value_of for alpha_vec?  faster if only one?
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_log_rate>::value,
-                       is_vector<T_log_rate>::value>
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_log_rate>::value,
+                    is_vector<T_log_rate>::value>
         exp_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
         if (include_summand<propto,T_log_rate>::value)
@@ -205,7 +207,8 @@ namespace stan {
     typename return_type<T_rate>::type
     poisson_cdf(const T_n& n, const T_rate& lambda) {
       static const char* function = "stan::prob::poisson_cdf(%1%)";
-      typedef typename stan::partials_return_type<T_n,T_rate>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_n,T_rate>::type 
+        T_partials_return;
 
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
@@ -277,7 +280,8 @@ namespace stan {
     typename return_type<T_rate>::type
     poisson_cdf_log(const T_n& n, const T_rate& lambda) {
       static const char* function = "stan::prob::poisson_cdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_n,T_rate>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_n,T_rate>::type 
+        T_partials_return;
 
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
@@ -318,7 +322,8 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as neg infinity
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),lambda);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              lambda);
       }
         
       for (size_t i = 0; i < size; i++) {
@@ -346,7 +351,8 @@ namespace stan {
     typename return_type<T_rate>::type
     poisson_ccdf_log(const T_n& n, const T_rate& lambda) {
       static const char* function = "stan::prob::poisson_ccdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_n,T_rate>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_n,T_rate>::type 
+        T_partials_return;
 
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;

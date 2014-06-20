@@ -39,7 +39,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       using std::log;
       using stan::is_constant_struct;
@@ -73,15 +74,18 @@ namespace stan {
         return 0.0;
       
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      DoubleVectorView<T_partials_return,true,is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<T_partials_return,include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<T_partials_return,true,is_vector<T_scale>::value> 
+        inv_sigma(length(sigma));
+      VectorBuilder<T_partials_return,include_summand<propto,T_scale>::value,
+                    is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -132,7 +136,7 @@ namespace stan {
       return normal_log<false>(y,mu,sigma);
     }
 
-       /**
+    /**
      * Calculates the normal cumulative distribution function for the given
      * variate, location, and scale.
      * 
@@ -154,7 +158,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_cdf(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -180,8 +185,8 @@ namespace stan {
                              "Scale parameter",
                              &cdf);
 
-     agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
-       operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
@@ -228,7 +233,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_cdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -292,7 +298,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_ccdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;

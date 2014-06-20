@@ -42,7 +42,8 @@ namespace stan {
     binomial_log(const T_n& n, 
                  const T_N& N, 
                  const T_prob& theta) {
-      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type 
+        T_partials_return;
 
       static const char* function = "stan::prob::binomial_log(%1%)";
       
@@ -100,7 +101,7 @@ namespace stan {
         for (size_t i = 0; i < size; ++i)
           logp += binomial_coefficient_log(N_vec[i],n_vec[i]);
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        true,is_vector<T_prob>::value> 
         log1m_theta(length(theta));
       for (size_t i = 0; i < length(theta); ++i)
@@ -156,7 +157,8 @@ namespace stan {
     binomial_logit_log(const T_n& n, 
                        const T_N& N, 
                        const T_prob& alpha) {
-      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type 
+        T_partials_return;
 
       static const char* function = "stan::prob::binomial_logit_log(%1%)";
       
@@ -210,13 +212,13 @@ namespace stan {
         for (size_t i = 0; i < size; ++i)
           logp += binomial_coefficient_log(N_vec[i],n_vec[i]);
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        true,is_vector<T_prob>::value> 
         log_inv_logit_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); ++i)
         log_inv_logit_alpha[i] = log_inv_logit(value_of(alpha_vec[i]));
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        true,is_vector<T_prob>::value> 
         log_inv_logit_neg_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); ++i)
@@ -266,7 +268,8 @@ namespace stan {
     template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
     binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta) {
-      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type
+        T_partials_return;
 
       static const char* function = "stan::prob::binomial_cdf(%1%)";
           
@@ -331,13 +334,15 @@ namespace stan {
         const T_partials_return N_dbl = value_of(N_vec[i]);
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
 
-        const T_partials_return Pi = inc_beta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
+        const T_partials_return Pi = inc_beta(N_dbl - n_dbl, n_dbl + 1, 
+                                              1 - theta_dbl);
           
         P *= Pi;
 
         if (!is_constant_struct<T_prob>::value)
           operands_and_partials.d_x1[i] -= pow(theta_dbl,n_dbl)
-            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) / Pi;
+            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) 
+            / Pi;
       }
           
       if (!is_constant_struct<T_prob>::value) {
@@ -352,7 +357,8 @@ namespace stan {
     template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
     binomial_cdf_log(const T_n& n, const T_N& N, const T_prob& theta) {
-      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type
+        T_partials_return;
 
       static const char* function = "stan::prob::binomial_cdf_log(%1%)";
           
@@ -402,7 +408,8 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as negative infinity
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),theta);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              theta);
       }
         
       for (size_t i = 0; i < size; i++) {
@@ -414,13 +421,15 @@ namespace stan {
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return N_dbl = value_of(N_vec[i]);
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
-        const T_partials_return Pi = inc_beta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
+        const T_partials_return Pi = inc_beta(N_dbl - n_dbl, n_dbl + 1, 
+                                              1 - theta_dbl);
 
         P += log(Pi);
 
         if (!is_constant_struct<T_prob>::value)
           operands_and_partials.d_x1[i] -= pow(theta_dbl,n_dbl)
-            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) / Pi;
+            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) 
+            / Pi;
       }
           
       return operands_and_partials.to_var(P,theta);
@@ -429,7 +438,8 @@ namespace stan {
     template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
     binomial_ccdf_log(const T_n& n, const T_N& N, const T_prob& theta) {
-      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type 
+        T_partials_return;
 
       static const char* function = "stan::prob::binomial_ccdf_log(%1%)";
           
@@ -486,18 +496,21 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(n_vec[i]) >= value_of(N_vec[i])) {
-          return operands_and_partials.to_var(stan::math::negative_infinity(),theta);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              theta);
         }
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return N_dbl = value_of(N_vec[i]);
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
-        const T_partials_return Pi = 1.0 - inc_beta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
+        const T_partials_return Pi = 1.0 - inc_beta(N_dbl - n_dbl, n_dbl + 1, 
+                                                    1 - theta_dbl);
 
         P += log(Pi);
 
         if (!is_constant_struct<T_prob>::value)
           operands_and_partials.d_x1[i] += pow(theta_dbl,n_dbl)
-            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) / Pi;
+            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) 
+            / Pi;
       }
           
       return operands_and_partials.to_var(P,theta);

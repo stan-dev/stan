@@ -23,7 +23,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     lognormal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::lognormal_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+        T_partials_return;
 
       using stan::is_constant_struct;
       using stan::math::check_not_nan;
@@ -73,18 +74,18 @@ namespace stan {
       using stan::prob::NEG_LOG_SQRT_TWO_PI;
       
 
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_scale>::value,
-                       is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_scale>::value,
+                    is_vector<T_scale>::value> log_sigma(length(sigma));
       if (include_summand<propto, T_scale>::value)
         for (size_t n = 0; n < length(sigma); n++)
           log_sigma[n] = log(value_of(sigma_vec[n]));
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_y,T_loc,T_scale>::value,
-                       is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_y,T_loc,T_scale>::value,
-                       is_vector<T_scale>::value> inv_sigma_sq(length(sigma));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_y,T_loc,T_scale>::value,
+                    is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_y,T_loc,T_scale>::value,
+                    is_vector<T_scale>::value> inv_sigma_sq(length(sigma));
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
         for (size_t n = 0; n < length(sigma); n++)
           inv_sigma[n] = 1 / value_of(sigma_vec[n]);
@@ -92,15 +93,15 @@ namespace stan {
         for (size_t n = 0; n < length(sigma); n++)
           inv_sigma_sq[n] = inv_sigma[n] * inv_sigma[n];
       
-      DoubleVectorView<T_partials_return,
-                       include_summand<propto,T_y,T_loc,T_scale>::value,
-                       is_vector<T_y>::value> log_y(length(y));
+      VectorBuilder<T_partials_return,
+                    include_summand<propto,T_y,T_loc,T_scale>::value,
+                    is_vector<T_y>::value> log_y(length(y));
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
         for (size_t n = 0; n < length(y); n++)
           log_y[n] = log(value_of(y_vec[n]));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_y>::value,
-                       is_vector<T_y>::value> inv_y(length(y));
+      VectorBuilder<T_partials_return,
+                    !is_constant_struct<T_y>::value,
+                    is_vector<T_y>::value> inv_y(length(y));
       if (!is_constant_struct<T_y>::value)
         for (size_t n = 0; n < length(y); n++)
           inv_y[n] = 1 / value_of(y_vec[n]);
@@ -156,7 +157,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     lognormal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::lognormal_cdf(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       T_partials_return cdf = 1.0;
       
@@ -198,7 +200,8 @@ namespace stan {
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
         const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
-        const T_partials_return scaled_diff = (log(y_dbl) - mu_dbl) / (sigma_dbl * SQRT_2);
+        const T_partials_return scaled_diff = (log(y_dbl) - mu_dbl) 
+          / (sigma_dbl * SQRT_2);
         const T_partials_return rep_deriv = SQRT_2 * 0.5 / sqrt_pi 
           * exp(-scaled_diff * scaled_diff) / sigma_dbl;
 
@@ -207,7 +210,7 @@ namespace stan {
         cdf *= cdf_;
 
         //gradients
-       if (!is_constant_struct<T_y>::value)
+        if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv / cdf_ / y_dbl ;
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] -= rep_deriv / cdf_ ;
@@ -233,7 +236,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     lognormal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::lognormal_cdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       T_partials_return cdf_log = 0.0;
       
@@ -268,7 +272,8 @@ namespace stan {
 
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0.0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,mu,sigma);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,mu,sigma);
       }
 
       const double log_half = std::log(0.5);
@@ -277,7 +282,8 @@ namespace stan {
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
         const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
-        const T_partials_return scaled_diff = (log(y_dbl) - mu_dbl) / (sigma_dbl * SQRT_2);
+        const T_partials_return scaled_diff = (log(y_dbl) - mu_dbl)
+          / (sigma_dbl * SQRT_2);
         const T_partials_return rep_deriv = SQRT_2 / sqrt_pi 
           * exp(-scaled_diff * scaled_diff) / sigma_dbl;
 
@@ -286,7 +292,7 @@ namespace stan {
         cdf_log += log_half + log(erfc_calc);
 
         //gradients
-       if (!is_constant_struct<T_y>::value)
+        if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv / erfc_calc / y_dbl ;
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] -= rep_deriv / erfc_calc;
@@ -302,7 +308,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     lognormal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::lognormal_ccdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       T_partials_return ccdf_log = 0.0;
       
@@ -346,7 +353,8 @@ namespace stan {
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
         const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
-        const T_partials_return scaled_diff = (log(y_dbl) - mu_dbl) / (sigma_dbl * SQRT_2);
+        const T_partials_return scaled_diff = (log(y_dbl) - mu_dbl) 
+          / (sigma_dbl * SQRT_2);
         const T_partials_return rep_deriv = SQRT_2 / sqrt_pi 
           * exp(-scaled_diff * scaled_diff) / sigma_dbl;
 
@@ -355,7 +363,7 @@ namespace stan {
         ccdf_log += log_half + log(erfc_calc);
 
         //gradients
-       if (!is_constant_struct<T_y>::value)
+        if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= rep_deriv / erfc_calc / y_dbl ;
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] += rep_deriv / erfc_calc;

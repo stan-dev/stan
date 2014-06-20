@@ -25,7 +25,8 @@ namespace stan {
                            const T_loc& mu, const T_scale& sigma) {
       static const char* function
         = "stan::prob::double_exponential_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       using stan::is_constant_struct;
       using stan::math::check_finite;
@@ -65,15 +66,15 @@ namespace stan {
       agrad::OperandsAndPartials<T_y,T_loc,T_scale> 
         operands_and_partials(y, mu, sigma);
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_y,T_loc,T_scale>::value,
                        is_vector<T_scale>::value> 
         inv_sigma(length(sigma));
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_scale>::value,
                        is_vector<T_scale>::value> 
         inv_sigma_squared(length(sigma));
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_scale>::value,
                        is_vector<T_scale>::value> 
         log_sigma(length(sigma));
@@ -106,7 +107,8 @@ namespace stan {
   
         // gradients
         T_partials_return sign_y_m_mu_times_inv_sigma(0);
-        if (!is_constant_struct<T_y>::value || !is_constant_struct<T_loc>::value)
+        if (!is_constant_struct<T_y>::value
+            || !is_constant_struct<T_loc>::value)
           sign_y_m_mu_times_inv_sigma = sign(y_m_mu) * inv_sigma[n];
         if (!is_constant_struct<T_y>::value) {
           operands_and_partials.d_x1[n] -= sign_y_m_mu_times_inv_sigma;
@@ -115,7 +117,8 @@ namespace stan {
           operands_and_partials.d_x2[n] += sign_y_m_mu_times_inv_sigma;
         }
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += -inv_sigma[n] + fabs_y_m_mu * inv_sigma_squared[n];
+          operands_and_partials.d_x3[n] += -inv_sigma[n] + fabs_y_m_mu 
+            * inv_sigma_squared[n];
       }
       return operands_and_partials.to_var(logp,y,mu,sigma);
     }
@@ -148,7 +151,8 @@ namespace stan {
                            const T_loc& mu, const T_scale& sigma) {
       static const char* function
         = "stan::prob::double_exponential_cdf(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) 
@@ -236,7 +240,8 @@ namespace stan {
                                const T_scale& sigma) {
       static const char* function
         = "stan::prob::double_exponential_cdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       using stan::math::check_finite;
       using stan::math::check_not_nan;
@@ -315,7 +320,8 @@ namespace stan {
                                const T_scale& sigma) {
       static const char* function
         = "stan::prob::double_exponential_ccdf_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+        T_partials_return;
 
       using stan::math::check_finite;
       using stan::math::check_not_nan;

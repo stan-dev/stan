@@ -23,7 +23,8 @@ namespace stan {
     typename return_type<T_y,T_scale,T_shape>::type
     pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
       static const char* function = "stan::prob::pareto_log(%1%)";
-      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type 
+        T_partials_return;
 
       using stan::math::value_of;
       using stan::math::check_finite;
@@ -70,14 +71,14 @@ namespace stan {
       agrad::OperandsAndPartials<T_y,T_scale,T_shape> 
         operands_and_partials(y, y_min, alpha);
       
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_y,T_shape>::value,
                        is_vector<T_y>::value> log_y(length(y));
       if (include_summand<propto,T_y,T_shape>::value)
         for (size_t n = 0; n < length(y); n++)
           log_y[n] = log(value_of(y_vec[n]));
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_y>::value
                        ||!is_constant_struct<T_shape>::value,
                        is_vector<T_y>::value> inv_y(length(y));
@@ -85,7 +86,7 @@ namespace stan {
         for (size_t n = 0; n < length(y); n++)
           inv_y[n] = 1 / value_of(y_vec[n]);
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_scale,T_shape>::value,
                        is_vector<T_scale>::value> 
         log_y_min(length(y_min));
@@ -93,14 +94,14 @@ namespace stan {
         for (size_t n = 0; n < length(y_min); n++)
           log_y_min[n] = log(value_of(y_min_vec[n]));
 
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        include_summand<propto,T_shape>::value,
                        is_vector<T_shape>::value> log_alpha(length(alpha));
       if (include_summand<propto,T_shape>::value)
         for (size_t n = 0; n < length(alpha); n++)
           log_alpha[n] = log(value_of(alpha_vec[n]));
       
-      DoubleVectorView<T_partials_return,
+      VectorBuilder<T_partials_return,
                        !is_constant_struct<T_shape>::value,
                        is_vector<T_shape>::value> inv_alpha(length(alpha));
       if (!is_constant_struct<T_shape>::value)
@@ -141,7 +142,8 @@ namespace stan {
     template <typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y, T_scale, T_shape>::type
     pareto_cdf(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
-      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type 
+        T_partials_return;
 
       // Check sizes
       // Size checks
@@ -240,7 +242,8 @@ namespace stan {
     template <typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y, T_scale, T_shape>::type
     pareto_cdf_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
-      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type 
+        T_partials_return;
    
       // Size checks
       if ( !( stan::length(y) && stan::length(y_min) && stan::length(alpha) ) )
@@ -283,7 +286,8 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) < value_of(y_min_vec[i])) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,y_min,alpha);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,y_min,alpha);
       }
           
       // Compute vectorized cdf_log and its gradients
@@ -325,7 +329,8 @@ namespace stan {
     typename return_type<T_y, T_scale, T_shape>::type
     pareto_ccdf_log(const T_y& y, const T_scale& y_min,
                     const T_shape& alpha) {
-      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type T_partials_return;
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type
+        T_partials_return;
 
       // Size checks
       if ( !( stan::length(y) && stan::length(y_min) && stan::length(alpha) ) )
@@ -378,7 +383,8 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          return operands_and_partials.to_var(stan::math::negative_infinity(),y,y_min,alpha);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,y_min,alpha);
         }
               
         // Pull out values
