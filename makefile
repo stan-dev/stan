@@ -254,5 +254,6 @@ clean-models:
 
 clean-all: clean clean-manual clean-models
 	$(RM) -r test/* bin
-	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f | sed 's#\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
-
+	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o')
+	cd src/test/unit-distribution/univariate/continuous; $(RM) $(shell find src/test/unit-distribution/univariate/continuous -name '*_generated_test.cpp' -type f | sed 's#src/test/unit-distribution/univariate/continuous/\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
+	cd src/test/unit-distribution/univariate/discrete; $(RM) $(shell find src/test/unit-distribution/univariate/discrete -name '*_generated_test.cpp' -type f | sed 's#src/test/unit-distribution/univariate/discrete/\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
