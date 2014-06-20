@@ -8,15 +8,40 @@
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
-#include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/internal_math.hpp>
 #include <stan/prob/distributions/univariate/continuous/gamma.hpp>
 #include <stan/prob/distributions/univariate/discrete/poisson.hpp>
+
+#include <stan/prob/internal_math/math/grad_reg_inc_beta.hpp>
+#include <stan/prob/internal_math/math/inc_beta.hpp>
+#include <stan/prob/internal_math/fwd/inc_beta.hpp>
+#include <stan/prob/internal_math/rev/inc_beta.hpp>
+
 #include <stan/math/functions/binomial_coefficient_log.hpp>
+#include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/functions/log_sum_exp.hpp>
+#include <stan/math/functions/digamma.hpp>
+#include <stan/math/functions/lgamma.hpp>
+#include <stan/math/functions/lbeta.hpp>
+#include <stan/agrad/fwd/functions/binomial_coefficient_log.hpp>
+#include <stan/agrad/fwd/functions/multiply_log.hpp>
+#include <stan/agrad/fwd/functions/log_sum_exp.hpp>
+#include <stan/agrad/fwd/functions/digamma.hpp>
+#include <stan/agrad/fwd/functions/lgamma.hpp>
+#include <stan/agrad/fwd/functions/lbeta.hpp>
+#include <stan/agrad/fwd/functions/log.hpp>
+#include <stan/agrad/fwd/functions/exp.hpp>
+#include <stan/agrad/fwd/functions/pow.hpp>
+#include <stan/agrad/rev/functions/multiply_log.hpp>
+#include <stan/agrad/rev/functions/log_sum_exp.hpp>
+#include <stan/agrad/rev/functions/digamma.hpp>
+#include <stan/agrad/rev/functions/lgamma.hpp>
+#include <stan/agrad/rev/functions/log.hpp>
+#include <stan/agrad/rev/functions/exp.hpp>
+#include <stan/agrad/rev/functions/pow.hpp>
 
 namespace stan {
 
@@ -65,8 +90,14 @@ namespace stan {
 
       using stan::math::multiply_log;
       using stan::math::binomial_coefficient_log;
-      using boost::math::digamma;
-      using boost::math::lgamma;
+      using stan::math::digamma;
+      using stan::math::lgamma;
+      using std::log;
+      using stan::agrad::multiply_log;
+      using stan::agrad::binomial_coefficient_log;
+      using stan::agrad::digamma;
+      using stan::agrad::lgamma;
+      using stan::agrad::log;
       
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
@@ -146,7 +177,7 @@ namespace stan {
         } else { // standard density definition
           if (include_summand<propto,T_shape>::value)
             if (n_vec[i] != 0)
-              logp += binomial_coefficient_log<double>(n_vec[i] 
+              logp += binomial_coefficient_log(n_vec[i] 
                                                        + value_of(alpha_vec[i])
                                                        - 1.0, 
                                                        n_vec[i]);
@@ -166,7 +197,7 @@ namespace stan {
               - n_vec[i]  / (value_of(beta_vec[i]) + 1.0);
         }
       }
-      return operands_and_partials.to_var(logp,n,alpha,beta);
+      return operands_and_partials.to_var(logp,alpha,beta);
     }
 
     template <typename T_n, 
@@ -220,11 +251,17 @@ namespace stan {
           
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
-      using boost::math::ibeta;
-      using boost::math::ibeta_derivative;
-          
-      using boost::math::digamma;
-          
+      using stan::math::inc_beta;
+      using stan::math::digamma;
+      using stan::math::lbeta;
+      using std::exp;
+      using std::pow;
+      using stan::agrad::inc_beta;
+      using stan::agrad::digamma;
+      using stan::agrad::lbeta;
+      using stan::agrad::exp;
+      using stan::agrad::pow;
+
       agrad::OperandsAndPartials<T_shape, T_inv_scale> 
         operands_and_partials(alpha, beta);
           
@@ -232,7 +269,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) <= 0) 
-          return operands_and_partials.to_var(0.0,n,alpha,beta);
+          return operands_and_partials.to_var(0.0,alpha,beta);
       }
           
       // Cache a few expensive function calls if alpha is a parameter
@@ -248,11 +285,6 @@ namespace stan {
                        !is_constant_struct<T_shape>::value, 
                        is_vector<T_shape>::value> 
         digammaSum_vec(stan::length(alpha));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_shape>::value, 
-                       is_vector<T_shape>::value> 
-        betaFunc_vec(stan::length(alpha));
-          
       if (!is_constant_struct<T_shape>::value) {
               
         for (size_t i = 0; i < stan::length(alpha); i++) {
@@ -262,7 +294,6 @@ namespace stan {
           digammaN_vec[i] = digamma(n_dbl + 1);
           digammaAlpha_vec[i] = digamma(alpha_dbl);
           digammaSum_vec[i] = digamma(n_dbl + alpha_dbl + 1);
-          betaFunc_vec[i] = boost::math::beta(n_dbl + 1, alpha_dbl);
         }
       }
           
@@ -271,8 +302,8 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(n_vec[i]) 
-            == std::numeric_limits<double>::infinity())
-          continue;
+            == std::numeric_limits<int>::max())
+          return operands_and_partials.to_var(1.0,alpha,beta);
               
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
@@ -282,8 +313,11 @@ namespace stan {
         const T_partials_return d_dbl = 1.0 / ( (1.0 + beta_dbl) 
                                      * (1.0 + beta_dbl) );
               
-        const T_partials_return Pi = ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
+        const T_partials_return Pi = inc_beta(alpha_dbl, n_dbl + 1.0, p_dbl);
               
+        const T_partials_return beta_func = exp(lbeta(n_dbl + 1, alpha_dbl));
+
+
         P *= Pi;
               
         if (!is_constant_struct<T_shape>::value) {
@@ -291,21 +325,20 @@ namespace stan {
           T_partials_return g1 = 0;
           T_partials_return g2 = 0;
 
-          stan::math::gradRegIncBeta(g1, g2, alpha_dbl, 
+          stan::math::grad_reg_inc_beta(g1, g2, alpha_dbl, 
                                      n_dbl + 1, p_dbl, 
                                      digammaAlpha_vec[i], 
                                      digammaN_vec[i], 
                                      digammaSum_vec[i], 
-                                     betaFunc_vec[i]);
+                                     beta_func);
                   
           operands_and_partials.d_x1[i] 
             += g1 / Pi;
         }
               
         if (!is_constant_struct<T_inv_scale>::value)
-          operands_and_partials.d_x2[i] 
-            += d_dbl * ibeta_derivative(alpha_dbl, n_dbl + 1, p_dbl)
-            / Pi;
+          operands_and_partials.d_x2[i]  += d_dbl * pow(1-p_dbl,n_dbl) 
+            * pow(p_dbl,alpha_dbl-1) / beta_func / Pi;
               
       }
           
@@ -317,7 +350,7 @@ namespace stan {
         for(size_t i = 0; i < stan::length(beta); ++i)
           operands_and_partials.d_x2[i] *= P;
           
-      return operands_and_partials.to_var(P,n,alpha,beta);
+      return operands_and_partials.to_var(P,alpha,beta);
           
     }
 
@@ -361,10 +394,17 @@ namespace stan {
           
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
-      using boost::math::ibeta;
-      using boost::math::ibeta_derivative;
-          
-      using boost::math::digamma;
+      using stan::math::inc_beta;
+      using stan::math::digamma;
+      using stan::math::lbeta;
+      using std::exp;
+      using std::pow;
+      using stan::agrad::inc_beta;
+      using stan::agrad::digamma;
+      using stan::agrad::lbeta;
+      using stan::agrad::exp;
+      using stan::agrad::pow;
+
           
       agrad::OperandsAndPartials<T_shape, T_inv_scale> 
         operands_and_partials(alpha, beta);
@@ -373,7 +413,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) <= 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),n,alpha,beta);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),alpha,beta);
       }
           
       // Cache a few expensive function calls if alpha is a parameter
@@ -389,10 +429,6 @@ namespace stan {
                        !is_constant_struct<T_shape>::value, 
                        is_vector<T_shape>::value> 
         digammaSum_vec(stan::length(alpha));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_shape>::value, 
-                       is_vector<T_shape>::value> 
-        betaFunc_vec(stan::length(alpha));
           
       if (!is_constant_struct<T_shape>::value) {
         for (size_t i = 0; i < stan::length(alpha); i++) {
@@ -402,16 +438,14 @@ namespace stan {
           digammaN_vec[i] = digamma(n_dbl + 1);
           digammaAlpha_vec[i] = digamma(alpha_dbl);
           digammaSum_vec[i] = digamma(n_dbl + alpha_dbl + 1);
-          betaFunc_vec[i] = boost::math::beta(n_dbl + 1, alpha_dbl);
         }
       }
           
       for (size_t i = 0; i < size; i++) {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
-        if (value_of(n_vec[i]) 
-            == std::numeric_limits<double>::infinity())
-          continue;
+        if (value_of(n_vec[i]) == std::numeric_limits<int>::max())
+          return operands_and_partials.to_var(0.0,alpha,beta);
               
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
@@ -419,28 +453,30 @@ namespace stan {
         const T_partials_return p_dbl = beta_dbl / (1.0 + beta_dbl);
         const T_partials_return d_dbl = 1.0 / ( (1.0 + beta_dbl) 
                                      * (1.0 + beta_dbl) );
-        const T_partials_return Pi = ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
-              
+        const T_partials_return Pi = inc_beta(alpha_dbl, n_dbl + 1.0, p_dbl);
+        const T_partials_return beta_func = exp(lbeta(n_dbl + 1, alpha_dbl));
+
+
         P += log(Pi);
               
         if (!is_constant_struct<T_shape>::value) {
           T_partials_return g1 = 0;
           T_partials_return g2 = 0;
 
-          stan::math::gradRegIncBeta(g1, g2, alpha_dbl, 
+          stan::math::grad_reg_inc_beta(g1, g2, alpha_dbl, 
                                      n_dbl + 1, p_dbl, 
                                      digammaAlpha_vec[i], 
                                      digammaN_vec[i], 
                                      digammaSum_vec[i], 
-                                     betaFunc_vec[i]);
+                                     beta_func);
           operands_and_partials.d_x1[i] += g1 / Pi;
         }
         if (!is_constant_struct<T_inv_scale>::value)
-          operands_and_partials.d_x2[i] 
-            += d_dbl * ibeta_derivative(alpha_dbl, n_dbl + 1, p_dbl) / Pi;
+          operands_and_partials.d_x2[i]  += d_dbl * pow(1-p_dbl,n_dbl) 
+            * pow(p_dbl,alpha_dbl-1) / beta_func / Pi;
       }
           
-      return operands_and_partials.to_var(P,n,alpha,beta);
+      return operands_and_partials.to_var(P,alpha,beta);
     }
 
     template <typename T_n, typename T_shape, 
@@ -483,10 +519,16 @@ namespace stan {
           
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
-      using boost::math::ibeta;
-      using boost::math::ibeta_derivative;
-          
-      using boost::math::digamma;
+      using stan::math::inc_beta;
+      using stan::math::digamma;
+      using stan::math::lbeta;
+      using std::exp;
+      using std::pow;
+      using stan::agrad::inc_beta;
+      using stan::agrad::digamma;
+      using stan::agrad::lbeta;
+      using stan::agrad::exp;
+      using stan::agrad::pow;
           
       agrad::OperandsAndPartials<T_shape, T_inv_scale> 
         operands_and_partials(alpha, beta);
@@ -495,7 +537,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) <= 0) 
-          return operands_and_partials.to_var(0.0,n,alpha,beta);
+          return operands_and_partials.to_var(0.0,alpha,beta);
       }
           
       // Cache a few expensive function calls if alpha is a parameter
@@ -511,10 +553,6 @@ namespace stan {
                        !is_constant_struct<T_shape>::value, 
                        is_vector<T_shape>::value> 
         digammaSum_vec(stan::length(alpha));
-      DoubleVectorView<T_partials_return,
-                       !is_constant_struct<T_shape>::value, 
-                       is_vector<T_shape>::value> 
-        betaFunc_vec(stan::length(alpha));
           
       if (!is_constant_struct<T_shape>::value) {
         for (size_t i = 0; i < stan::length(alpha); i++) {
@@ -524,16 +562,15 @@ namespace stan {
           digammaN_vec[i] = digamma(n_dbl + 1);
           digammaAlpha_vec[i] = digamma(alpha_dbl);
           digammaSum_vec[i] = digamma(n_dbl + alpha_dbl + 1);
-          betaFunc_vec[i] = boost::math::beta(n_dbl + 1, alpha_dbl);
         }
       }
           
       for (size_t i = 0; i < size; i++) {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
-        if (value_of(n_vec[i]) 
-            == std::numeric_limits<double>::infinity())
-          return operands_and_partials.to_var(stan::math::negative_infinity(),n,alpha,beta);
+        if (value_of(n_vec[i]) == std::numeric_limits<int>::max())
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              alpha,beta);
               
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
@@ -541,28 +578,29 @@ namespace stan {
         const T_partials_return p_dbl = beta_dbl / (1.0 + beta_dbl);
         const T_partials_return d_dbl = 1.0 / ( (1.0 + beta_dbl) 
                                      * (1.0 + beta_dbl) );
-        const T_partials_return Pi = 1.0 - ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
-              
+        const T_partials_return Pi = 1.0 - inc_beta(alpha_dbl, n_dbl + 1.0, p_dbl);
+        const T_partials_return beta_func = exp(lbeta(n_dbl + 1, alpha_dbl));
+
         P += log(Pi);
               
         if (!is_constant_struct<T_shape>::value) {
           T_partials_return g1 = 0;
           T_partials_return g2 = 0;
 
-          stan::math::gradRegIncBeta(g1, g2, alpha_dbl, 
+          stan::math::grad_reg_inc_beta(g1, g2, alpha_dbl, 
                                      n_dbl + 1, p_dbl, 
                                      digammaAlpha_vec[i], 
                                      digammaN_vec[i], 
                                      digammaSum_vec[i], 
-                                     betaFunc_vec[i]);
+                                     beta_func);
           operands_and_partials.d_x1[i] -= g1 / Pi;
         }
         if (!is_constant_struct<T_inv_scale>::value)
-          operands_and_partials.d_x2[i] 
-            -= d_dbl * ibeta_derivative(alpha_dbl, n_dbl + 1, p_dbl) / Pi;
+          operands_and_partials.d_x2[i] -= d_dbl * pow(1-p_dbl,n_dbl) 
+            * pow(p_dbl,alpha_dbl-1) / beta_func / Pi;
       }
           
-      return operands_and_partials.to_var(P,n,alpha,beta);
+      return operands_and_partials.to_var(P,alpha,beta);
     }
       
     template <class RNG>

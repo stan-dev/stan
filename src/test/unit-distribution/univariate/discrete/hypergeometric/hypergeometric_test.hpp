@@ -67,7 +67,7 @@ public:
 
   template <class T_n, class T_N, class T_a, class T_b,
             typename T4, typename T5>
-  var log_prob_function(const T_n& n, const T_N& N, const T_a& a, const T_b& b,
+  double log_prob_function(const T_n& n, const T_N& N, const T_a& a, const T_b& b,
                         const T4&, const T5&) {
     using stan::math::binomial_coefficient_log;
     

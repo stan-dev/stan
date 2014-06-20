@@ -904,7 +904,9 @@ public:
         <T0,T1,T2,T3,T4,T5>
         (p0,p1,p2,p3,p4,p5);
       EXPECT_TRUE(1.0 == cdf_at_upper_bound)
-        << "CDF evaluated at upper bound should equal 1";
+        << "CDF evaluated at upper bound is " 
+        << cdf_at_upper_bound
+        <<" but should equal 1";
     }
   }
 

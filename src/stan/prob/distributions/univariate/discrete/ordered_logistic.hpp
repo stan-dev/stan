@@ -64,7 +64,6 @@ namespace stan {
       using stan::math::inv_logit;
       using stan::math::log1m;
       using stan::math::log1p_exp;
-      typedef typename stan::partials_return_type<T_lambda,T_cut>::type T_partials_return;
 
       static const char* function = "stan::prob::ordered_logistic(%1%)";
       

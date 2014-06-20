@@ -790,7 +790,7 @@ public:
       calculate_gradients_1storder(multiple_gradients3,multiple_lp,x1);
       
 
-      EXPECT_TRUE(N_REPEAT * single_lp == multiple_lp)
+      EXPECT_TRUE(N_REPEAT * single_lp - multiple_lp < 1e-8)
         << "log prob with repeated vector input should match "
         << "a multiple of log prob of single input";
 
