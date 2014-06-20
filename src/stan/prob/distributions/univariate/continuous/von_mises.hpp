@@ -117,6 +117,15 @@ namespace stan {
       return von_mises_log<false>(y, mu, kappa);
     }
 
+    // The algorithm used in von_mises_rng is a modified version of the
+    // algorithm in:
+    //
+    // Efficient Simulation of the von Mises Distribution
+    // D. J. Best and N. I. Fisher
+    // Journal of the Royal Statistical Society. Series C (Applied Statistics), Vol. 28, No. 2 (1979), pp. 152-157
+    // 
+    // See licenses/stan-license.txt for Stan license.
+
     template <class RNG>
     inline double
     von_mises_rng(const double mu,
