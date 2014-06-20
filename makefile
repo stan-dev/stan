@@ -201,9 +201,9 @@ endif
 	@echo '  - test-distributions : Runs unit tests for the distributions'
 	@echo '    Use this target instead: src/test/unit-distribution'
 	@echo '  - test-models    : Runs diagnostic models.'
-	@echo '    Use this target instead: src/test/CmdStan/models'
+	@echo '    Run this from CmdStan: src/test/models'
 	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
-	@echo '    Use this target instead: src/test/CmdStan/models/bugs_examples'
+	@echo '    Run this from CmdStan: src/test/models/bugs_examples'
 	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
