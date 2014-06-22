@@ -17,7 +17,7 @@ namespace stan {
   namespace math {
       
     template<typename T>
-    void gradF32(T* g, T a, T b, T c, T d, T e, T z, T precision = 1e-6) {
+    void grad_F32(T* g, T a, T b, T c, T d, T e, T z, T precision = 1e-6) {
       using std::log;
       using std::fabs;
       using std::exp;

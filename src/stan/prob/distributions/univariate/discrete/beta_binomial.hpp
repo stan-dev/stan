@@ -320,7 +320,7 @@ namespace stan {
              || (!is_constant_struct<T_size2>::value) ) {
           digammaOne = digamma(mu + nu);
           digammaTwo = digamma(alpha_dbl + beta_dbl);
-          stan::math::gradF32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1,
+          stan::math::grad_F32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1,
                               n_dbl + 2,
                               1 - nu, (T_partials_return)1);
         }
@@ -457,7 +457,7 @@ namespace stan {
              || (!is_constant_struct<T_size2>::value) ) {
           digammaOne = digamma(mu + nu);
           digammaTwo = digamma(alpha_dbl + beta_dbl);
-          stan::math::gradF32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1, 
+          stan::math::grad_F32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1, 
                               n_dbl + 2, 1 - nu, (T_partials_return)1);
         }
         if (!is_constant_struct<T_size1>::value) {
@@ -584,7 +584,7 @@ namespace stan {
              || (!is_constant_struct<T_size2>::value) ) {
           digammaOne = digamma(mu + nu);
           digammaTwo = digamma(alpha_dbl + beta_dbl);
-          stan::math::gradF32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1,
+          stan::math::grad_F32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1,
                               n_dbl + 2, 1 - nu, (T_partials_return)1);
         }
         if (!is_constant_struct<T_size1>::value) {
