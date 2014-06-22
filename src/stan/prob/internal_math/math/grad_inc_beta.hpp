@@ -24,7 +24,7 @@ namespace stan {
       double dF1 = 0;
       double dF2 = 0;
           
-      if(C) stan::math::grad2F1(dF1, dF2, a + b, 1.0, a + 1, z);
+      if(C) stan::math::grad_2F1(dF1, dF2, a + b, 1.0, a + 1, z);
 
           
       g1 = (c1 - 1.0 / a) * c3 + C * (dF1 + dF2);

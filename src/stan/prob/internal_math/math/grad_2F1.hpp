@@ -13,7 +13,7 @@ namespace stan {
 
     // Gradient of the hypergeometric function 2F1(a, b | c | z) with respect to a and c
     template<typename T>
-    void grad2F1(T& gradA, T& gradC, T a, T b, T c, T z, T precision = 1e-6)
+    void grad_2F1(T& gradA, T& gradC, T a, T b, T c, T z, T precision = 1e-6)
     {
           
       using stan::agrad::fabs;

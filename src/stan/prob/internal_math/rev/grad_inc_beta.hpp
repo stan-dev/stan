@@ -44,7 +44,7 @@ namespace stan {
       stan::agrad::var dF1 = 0;
       stan::agrad::var dF2 = 0;
           
-      if(value_of(value_of(C))) stan::math::grad2F1(dF1, dF2, a + b, 
+      if(value_of(value_of(C))) stan::math::grad_2F1(dF1, dF2, a + b, 
                                                     (stan::agrad::var)1.0, 
                                                     a + 1, z);
 
