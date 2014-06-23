@@ -96,7 +96,7 @@ namespace stan {
       VectorView<const T_scale> beta_vec(beta);
 
       for (size_t n = 0; n < length(y); n++) {
-        const double y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
         if (y_dbl <= 0)
           return LOG_ZERO;
       }

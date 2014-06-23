@@ -333,16 +333,15 @@ namespace stan {
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return N_dbl = value_of(N_vec[i]);
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
-
+        const T_partials_return betafunc = exp(lbeta(N_dbl-n_dbl,n_dbl+1));
         const T_partials_return Pi = inc_beta(N_dbl - n_dbl, n_dbl + 1, 
-                                              1 - theta_dbl);
+                                              1 - theta_dbl) / betafunc;
           
         P *= Pi;
 
         if (!is_constant_struct<T_prob>::value)
           operands_and_partials.d_x1[i] -= pow(theta_dbl,n_dbl)
-            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) 
-            / Pi;
+            * pow(1-theta_dbl,N_dbl-n_dbl-1) / betafunc / Pi;
       }
           
       if (!is_constant_struct<T_prob>::value) {
@@ -421,15 +420,15 @@ namespace stan {
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return N_dbl = value_of(N_vec[i]);
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
+        const T_partials_return betafunc = exp(lbeta(N_dbl-n_dbl,n_dbl+1));
         const T_partials_return Pi = inc_beta(N_dbl - n_dbl, n_dbl + 1, 
-                                              1 - theta_dbl);
+                                              1 - theta_dbl) / betafunc;
 
         P += log(Pi);
 
         if (!is_constant_struct<T_prob>::value)
           operands_and_partials.d_x1[i] -= pow(theta_dbl,n_dbl)
-            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) 
-            / Pi;
+            * pow(1-theta_dbl,N_dbl-n_dbl-1) / betafunc / Pi;
       }
           
       return operands_and_partials.to_var(P,theta);
@@ -502,15 +501,15 @@ namespace stan {
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return N_dbl = value_of(N_vec[i]);
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
+        const T_partials_return betafunc = exp(lbeta(N_dbl-n_dbl,n_dbl+1));
         const T_partials_return Pi = 1.0 - inc_beta(N_dbl - n_dbl, n_dbl + 1, 
-                                                    1 - theta_dbl);
+                                                    1 - theta_dbl) / betafunc;
 
         P += log(Pi);
 
         if (!is_constant_struct<T_prob>::value)
           operands_and_partials.d_x1[i] += pow(theta_dbl,n_dbl)
-            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) 
-            / Pi;
+            * pow(1-theta_dbl,N_dbl-n_dbl-1) / betafunc / Pi;
       }
           
       return operands_and_partials.to_var(P,theta);

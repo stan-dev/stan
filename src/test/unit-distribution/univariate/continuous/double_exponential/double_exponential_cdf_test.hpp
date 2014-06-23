@@ -21,31 +21,31 @@ public:
     param[1] = 1.0;                  // mu
     param[2] = 1.0;                  // sigma
     parameters.push_back(param);
-    cdf.push_back(0.8160603);   // expected cdf
+    cdf.push_back(0.8160602794142788392022381149192695662770944344841160827460815991512692521275500983214263628270401781);   // expected cdf
     
     param[0] = -3.0;                 // y
     param[1] = 2.0;                  // mu
     param[2] = 1.0;                  // sigma
     parameters.push_back(param);
-    cdf.push_back(0.003368973);   // expected cdf
+    cdf.push_back(0.003368973499542733548318024211574212124424792513677542715152765786341761257802031140724569422104180774);   // expected cdf
     
     param[0] = 1.0;                  // y
     param[1] = 0.0;                  // mu
     param[2] = 2.0;                  // sigma
     parameters.push_back(param);
-    cdf.push_back(0.6967347);   // expected cdf
+    cdf.push_back(0.6967346701436832881981002325044097732790409322564065221585539206324717402931257880006761942460052720);   // expected cdf
 
     param[0] = 1.9;                  // y
     param[1] = 2.3;                  // mu
     param[2] = 0.5;                  // sigma
     parameters.push_back(param);
-    cdf.push_back(0.2246645);        // expected cdf
+    cdf.push_back(0.224664482058610795715051192507781);        // expected cdf
 
     param[0] = 1.9;                  // y
     param[1] = 2.3;                  // mu
     param[2] = 0.25;                  // sigma
     parameters.push_back(param);
-    cdf.push_back(0.10094826);        // expected cdf
+    cdf.push_back(0.10094825899732770424258963382167488);        // expected cdf
   }
  
   void invalid_values(vector<size_t>& index, 

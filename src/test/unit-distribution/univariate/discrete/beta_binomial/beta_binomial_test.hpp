@@ -20,14 +20,14 @@ public:
     param[2] = 10.0;         // alpha
     param[3] = 25.0;         // beta
     parameters.push_back(param);
-    log_prob.push_back(-1.854007); // expected log_prob
+    log_prob.push_back(-2.841249194506688079812507163649265700780449530084815196068507561085203438515319725536812613932656298); // expected log_prob
 
     param[0] = 25;           // n
     param[1] = 100;          // N
     param[2] = 30.0;         // alpha
     param[3] = 50.0;         // beta
     parameters.push_back(param);
-    log_prob.push_back(-4.376696); // expected log_prob
+    log_prob.push_back(-4.376695614336585231351487436303084022673567276132409670500921246688879298950444760118553711096034085); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

@@ -16,7 +16,7 @@ public:
     param[1] = 45;          // Trials
     param[2] = 0.5;         // Probability
     parameters.push_back(param);
-    cdf.push_back(0.067578225422); // expected cdf
+    cdf.push_back(0.06757822542283530020679); // expected cdf
   }
   
   void invalid_values(vector<size_t>& index, 
@@ -61,10 +61,10 @@ public:
     using std::exp;
     using boost::math::binomial_coefficient;
       
-    typename stan::return_type<T_prob>::type cdf(0);
+    typename stan::return_type<T_prob>::type cdf(1);
  
     for (int i = 0; i <= n; i++) {
-      cdf += binomial_coefficient<double>(N, i) * exp(i * log(theta) + (N - i) * log(1 - theta));
+      cdf *= binomial_coefficient<double>(N, i) * exp(i * log(theta) + (N - i) * log(1 - theta));
     }
       
     return cdf;

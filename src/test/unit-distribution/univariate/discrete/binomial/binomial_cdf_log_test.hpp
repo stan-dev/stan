@@ -16,7 +16,7 @@ public:
     param[1] = 45;          // Trials
     param[2] = 0.5;         // Probability
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.067578225422)); // expected cdf_log
+    cdf_log.push_back(std::log(0.06757822542283530020679)); // expected cdf_log
   }
   
   void invalid_values(vector<size_t>& index, 

@@ -166,15 +166,7 @@ namespace stan {
       using boost::math::tools::promote_args;
 
       T_partials_return cdf(1.0);
-      if(!check_not_nan(function, y, "Random variable", &cdf))
-        return cdf;
-      if(!check_finite(function, mu, "Location parameter", &cdf))
-        return cdf;
-      if(!check_finite(function, sigma, "Scale parameter", &cdf))
-        return cdf;
-      if(!check_positive(function, sigma, "Scale parameter", &cdf))
-        return cdf;
-      double cdf(1.0);
+
       check_not_nan(function, y, "Random variable", &cdf);
       check_finite(function, mu, "Location parameter", &cdf);
       check_finite(function, sigma, "Scale parameter", &cdf);

@@ -18,19 +18,19 @@ public:
     param[1] = 0.0;                // mu
     param[2] = 1.0;                // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1.837877); // expected log_prob
+    log_prob.push_back(-1.837877066409345339082); // expected log_prob
 
     param[0] = -1.5;                // y
     param[1] = 0.0;                 // mu
     param[2] = 1.0;                 // sigma
     parameters.push_back(param);
-    log_prob.push_back(-2.323385); // expected log_prob
+    log_prob.push_back(-2.323384882191046330036); // expected log_prob
 
     param[0] = -1.5;                // y
     param[1] = -1.0;                // mu
     param[2] = 1.0;                 // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1.367873); // expected log_prob
+    log_prob.push_back(-1.367873437163609873224); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

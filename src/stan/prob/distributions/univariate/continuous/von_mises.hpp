@@ -34,6 +34,9 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
+      using stan::math::modified_bessel_first_kind;
+      using stan::agrad::modified_bessel_first_kind;
+
       // Result accumulator.
       T_partials_return logp = 0.0;
 
@@ -73,7 +76,7 @@ namespace stan {
       for (size_t i = 0; i < length(kappa); i++) {
         kappa_dbl[i] = value_of(kappa_vec[i]);
         if (include_summand<propto,T_scale>::value)
-          log_bessel0[i] = log(boost::math::cyl_bessel_i(0, value_of(kappa_vec[i])));
+          log_bessel0[i] = log(modified_bessel_first_kind(0, value_of(kappa_vec[i])));
       }
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> oap(y, mu, kappa);
 
@@ -82,20 +85,18 @@ namespace stan {
       for (size_t n = 0; n < N; n++) {
         // Extract argument values.
         const T_partials_return y_ = value_of(y_vec[n]);
-        const T_partials_return y_dbl =  y_ - std::floor(y_ / TWO_PI) * TWO_PI;
+        const T_partials_return y_dbl =  y_ - floor(y_ / TWO_PI) * TWO_PI;
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
         
         // Reusable values.
         T_partials_return bessel0 = 0;
         if (compute_bessel0)
-          bessel0 = boost::math::cyl_bessel_i(0, kappa_dbl[n]);
+          bessel0 = modified_bessel_first_kind(0, kappa_dbl[n]);
         T_partials_return bessel1 = 0;
         if (compute_bessel1)
-          bessel1 = boost::math::cyl_bessel_i(-1, kappa_dbl[n]);
-        const T_partials_return kappa_sin = kappa_dbl[n] * std::sin(mu_dbl
-                                                                    - y_dbl);
-        const T_partials_return kappa_cos = kappa_dbl[n] * std::cos(mu_dbl 
-                                                                    - y_dbl);
+          bessel1 = modified_bessel_first_kind(-1, kappa_dbl[n]);
+        const T_partials_return kappa_sin = kappa_dbl[n] * sin(mu_dbl - y_dbl);
+        const T_partials_return kappa_cos = kappa_dbl[n] * cos(mu_dbl - y_dbl);
         
         // Log probability.
         if (include_summand<propto>::value) 

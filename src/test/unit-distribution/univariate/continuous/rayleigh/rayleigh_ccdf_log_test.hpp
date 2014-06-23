@@ -31,7 +31,7 @@ public:
     param[0] = 3.5;          // y
     param[1] = 7.2;           // sigma
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.111439)); // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.11143902440462770394)); // expected ccdf_log
   }
   
   void invalid_values(vector<size_t>& index, 

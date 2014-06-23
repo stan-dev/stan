@@ -31,7 +31,7 @@ public:
     param[0] = 3.5;          // y
     param[1] = 7.2;           // sigma
     parameters.push_back(param);
-    cdf.push_back(0.111439); // expected cdf
+    cdf.push_back(0.11143902440462770394); // expected cdf
   }
   
   void invalid_values(vector<size_t>& index, 

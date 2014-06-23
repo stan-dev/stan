@@ -324,10 +324,6 @@ namespace stan {
                     !is_constant_struct<T_dof>::value,
                     is_vector<T_dof>::value>
         digammaNuPlusHalf_vec(stan::length(nu));
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_dof>::value,
-                    is_vector<T_dof>::value> 
-        betaNuHalf_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         digammaHalf = digamma(0.5);
@@ -337,7 +333,6 @@ namespace stan {
                   
           digammaNu_vec[i] = digamma(0.5 * nu_dbl);
           digammaNuPlusHalf_vec[i] = digamma(0.5 + 0.5 * nu_dbl);
-          betaNuHalf_vec[i] = exp(lbeta(0.5,0.5*nu_dbl));
         }
       }
           
@@ -357,16 +352,18 @@ namespace stan {
         const T_partials_return q = nu_dbl / (t * t);
         const T_partials_return r = 1.0 / (1.0 + q);
         const T_partials_return J = 2 * r * r * q / t;
+        const T_partials_return betaNuHalf = exp(lbeta(0.5,0.5*nu_dbl));
         double zJacobian = t > 0 ? - 0.5 : 0.5;
                     
         if(q < 2)
           {
 
-            T_partials_return z = inc_beta(0.5 * nu_dbl, 0.5, 1.0 - r)
-              / betaNuHalf_vec[n];
+            T_partials_return z = inc_beta(0.5 * nu_dbl, (T_partials_return)0.5,
+                                           1.0 - r)
+              / betaNuHalf;
             const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
             const T_partials_return d_ibeta = pow(r, -0.5)
-              * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf_vec[n];
+              * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf;
 
             P *= Pn;
 
@@ -382,7 +379,7 @@ namespace stan {
                                             (T_partials_return)0.5, 1.0 - r, 
                                             digammaNu_vec[n], digammaHalf,
                                             digammaNuPlusHalf_vec[n], 
-                                            betaNuHalf_vec[n]);
+                                            betaNuHalf);
                           
               operands_and_partials.d_x2[n] 
                 += zJacobian * ( d_ibeta * (r / t) * (r / t) + 0.5 * g1 ) / Pn;
@@ -398,15 +395,16 @@ namespace stan {
           }
         else {
                   
-          T_partials_return z = 1.0 - inc_beta(0.5, 0.5*nu_dbl, r)
-            / betaNuHalf_vec[n];
+          T_partials_return z = 1.0 - inc_beta((T_partials_return)0.5, 
+                                               0.5*nu_dbl, r)
+            / betaNuHalf;
 
           zJacobian *= -1;
                   
           const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
 
           T_partials_return d_ibeta = pow(1.0-r,0.5*nu_dbl-1) * pow(r,-0.5) 
-            / betaNuHalf_vec[n];
+            / betaNuHalf;
                   
           P *= Pn;
                   
@@ -422,7 +420,7 @@ namespace stan {
                                           0.5 * nu_dbl, r, 
                                           digammaHalf, digammaNu_vec[n], 
                                           digammaNuPlusHalf_vec[n], 
-                                          betaNuHalf_vec[n]);
+                                          betaNuHalf);
                       
             operands_and_partials.d_x2[n] 
               += zJacobian * ( - d_ibeta * (r / t) * (r / t) + 0.5 * g2 ) / Pn;
@@ -525,10 +523,6 @@ namespace stan {
                     !is_constant_struct<T_dof>::value,
                     is_vector<T_dof>::value>
         digammaNuPlusHalf_vec(stan::length(nu));
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_dof>::value,
-                    is_vector<T_dof>::value> 
-        betaNuHalf_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         digammaHalf = digamma(0.5);
@@ -538,7 +532,6 @@ namespace stan {
                   
           digammaNu_vec[i] = digamma(0.5 * nu_dbl);
           digammaNuPlusHalf_vec[i] = digamma(0.5 + 0.5 * nu_dbl);
-          betaNuHalf_vec[i] = exp(lbeta(0.5, 0.5 * nu_dbl));
         }
       }
           
@@ -558,14 +551,15 @@ namespace stan {
         const T_partials_return q = nu_dbl / (t * t);
         const T_partials_return r = 1.0 / (1.0 + q);
         const T_partials_return J = 2 * r * r * q / t;
+        const T_partials_return betaNuHalf = exp(lbeta(0.5, 0.5 * nu_dbl));
         T_partials_return zJacobian = t > 0 ? - 0.5 : 0.5;
                     
         if(q < 2) {
-          T_partials_return z = inc_beta(0.5 * nu_dbl, 0.5, 1.0 - r)
-            / betaNuHalf_vec[n];
+          T_partials_return z = inc_beta(0.5 * nu_dbl, (T_partials_return)0.5, 1.0 - r)
+            / betaNuHalf;
           const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
           const T_partials_return d_ibeta = pow(r, -0.5)
-            * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf_vec[n];    
+            * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf;    
                   
           P += log(Pn);
 
@@ -582,7 +576,7 @@ namespace stan {
                                           (T_partials_return)0.5, 1.0 - r, 
                                           digammaNu_vec[n], digammaHalf,
                                           digammaNuPlusHalf_vec[n], 
-                                          betaNuHalf_vec[n]);
+                                          betaNuHalf);
                           
             operands_and_partials.d_x2[n] 
               += zJacobian * ( d_ibeta * (r / t) * (r / t) + 0.5 * g1 ) / Pn;
@@ -598,14 +592,15 @@ namespace stan {
         }
         else {
                   
-          T_partials_return z = 1.0 - inc_beta(0.5, 0.5*nu_dbl, r)
-            / betaNuHalf_vec[n];
+          T_partials_return z = 1.0 - inc_beta((T_partials_return)0.5, 
+                                               0.5*nu_dbl, r)
+            / betaNuHalf;
           zJacobian *= -1;
                   
           const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
 
           T_partials_return d_ibeta = pow(1.0-r,0.5*nu_dbl-1) * pow(r,-0.5) 
-            / betaNuHalf_vec[n];        
+            / betaNuHalf;        
           
           P += log(Pn);
                   
@@ -622,7 +617,7 @@ namespace stan {
                                           0.5 * nu_dbl, r, 
                                           digammaHalf, digammaNu_vec[n], 
                                           digammaNuPlusHalf_vec[n], 
-                                          betaNuHalf_vec[n]);
+                                          betaNuHalf);
                       
             operands_and_partials.d_x2[n] 
               += zJacobian * ( - d_ibeta * (r / t) * (r / t) + 0.5 * g2 ) / Pn;
@@ -712,10 +707,6 @@ namespace stan {
                     !is_constant_struct<T_dof>::value,
                     is_vector<T_dof>::value>
         digammaNuPlusHalf_vec(stan::length(nu));
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_dof>::value,
-                    is_vector<T_dof>::value> 
-        betaNuHalf_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         digammaHalf = digamma(0.5);
@@ -725,7 +716,6 @@ namespace stan {
                   
           digammaNu_vec[i] = digamma(0.5 * nu_dbl);
           digammaNuPlusHalf_vec[i] = digamma(0.5 + 0.5 * nu_dbl);
-          betaNuHalf_vec[i] = exp(lbeta(0.5, 0.5 * nu_dbl));
         }
       }
           
@@ -746,14 +736,16 @@ namespace stan {
         const T_partials_return q = nu_dbl / (t * t);
         const T_partials_return r = 1.0 / (1.0 + q);
         const T_partials_return J = 2 * r * r * q / t;
+        const T_partials_return betaNuHalf = exp(lbeta(0.5, 0.5 * nu_dbl));
         T_partials_return zJacobian = t > 0 ? - 0.5 : 0.5;
                     
         if(q < 2) {
-          T_partials_return z = inc_beta(0.5 * nu_dbl, 0.5, 1.0 - r)
-            / betaNuHalf_vec[n];
+          T_partials_return z = inc_beta(0.5 * nu_dbl, (T_partials_return)0.5,
+                                         1.0 - r)
+            / betaNuHalf;
           const T_partials_return Pn = t > 0 ? 0.5 * z : 1.0 - 0.5 * z;
           const T_partials_return d_ibeta = pow(r, -0.5)
-            * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf_vec[n];
+            * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf;
                       
           P += log(Pn);
 
@@ -770,7 +762,7 @@ namespace stan {
                                           (T_partials_return)0.5, 1.0 - r, 
                                           digammaNu_vec[n], digammaHalf,
                                           digammaNuPlusHalf_vec[n], 
-                                          betaNuHalf_vec[n]);
+                                          betaNuHalf);
                           
             operands_and_partials.d_x2[n] 
               -= zJacobian * ( d_ibeta * (r / t) * (r / t) + 0.5 * g1 ) / Pn;
@@ -786,14 +778,15 @@ namespace stan {
         }
         else {
                   
-          T_partials_return z = 1.0 - inc_beta(0.5, 0.5*nu_dbl, r)
-            / betaNuHalf_vec[n];
+          T_partials_return z = 1.0 - inc_beta((T_partials_return)0.5,
+                                               0.5*nu_dbl, r)
+            / betaNuHalf;
           zJacobian *= -1;
                   
           const T_partials_return Pn = t > 0 ? 0.5 * z : 1.0 - 0.5 * z;
                   
           T_partials_return d_ibeta = pow(1.0-r,0.5*nu_dbl-1) * pow(r,-0.5) 
-            / betaNuHalf_vec[n];
+            / betaNuHalf;
                   
           P += log(Pn);
                   
@@ -810,7 +803,7 @@ namespace stan {
                                           0.5 * nu_dbl, r, 
                                           digammaHalf, digammaNu_vec[n], 
                                           digammaNuPlusHalf_vec[n], 
-                                          betaNuHalf_vec[n]);
+                                          betaNuHalf);
                       
             operands_and_partials.d_x2[n] 
               -= zJacobian * ( - d_ibeta * (r / t) * (r / t) + 0.5 * g2 ) / Pn;

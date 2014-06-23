@@ -64,6 +64,11 @@ namespace stan {
       if (!include_summand<propto,T_y,T_loc,T_scale,T_inv_scale>::value)
         return 0.0;
       
+      using boost::math::erfc;
+      using std::sqrt;
+      using stan::agrad::erfc;
+      using stan::agrad::sqrt;
+
       // set up template expressions wrapping scalars into vector views
       agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale> 
         operands_and_partials(y, mu, sigma,lambda);
@@ -91,18 +96,18 @@ namespace stan {
         if (include_summand<propto,T_y,T_loc,T_scale,T_inv_scale>::value)
           logp += lambda_dbl
             * (mu_dbl + 0.5 * lambda_dbl * sigma_dbl * sigma_dbl - y_dbl) 
-            + log(boost::math::erfc((mu_dbl + lambda_dbl * sigma_dbl 
+            + log(erfc((mu_dbl + lambda_dbl * sigma_dbl 
                                      * sigma_dbl - y_dbl) 
-                                    / (std::sqrt(2.0) * sigma_dbl)));
+                                    / (sqrt(2.0) * sigma_dbl)));
 
         // gradients
         const T_partials_return deriv_logerfc 
-          = -2.0 / std::sqrt(pi_dbl) 
+          = -2.0 / sqrt(pi_dbl) 
           * exp(-(mu_dbl + lambda_dbl * sigma_dbl * sigma_dbl - y_dbl) 
                 / (std::sqrt(2.0) * sigma_dbl) 
                 * (mu_dbl + lambda_dbl * sigma_dbl * sigma_dbl - y_dbl) 
                 / (sigma_dbl * std::sqrt(2.0))) 
-          / boost::math::erfc((mu_dbl + lambda_dbl * sigma_dbl * sigma_dbl 
+          / erfc((mu_dbl + lambda_dbl * sigma_dbl * sigma_dbl 
                                - y_dbl) / (sigma_dbl * std::sqrt(2.0)));
 
         if (!is_constant_struct<T_y>::value)
@@ -316,7 +321,7 @@ namespace stan {
             return operands_and_partials.to_var(stan::math::negative_infinity(),
                                                 y,mu,sigma,lambda);
           else
-            return operands_and_partials.to_var(0.0);
+            return operands_and_partials.to_var(0.0,y,mu,sigma,lambda);
         }
 
         const T_partials_return y_dbl = value_of(y_vec[n]);
@@ -431,7 +436,7 @@ namespace stan {
             return operands_and_partials.to_var(stan::math::negative_infinity(),
                                                 y,mu,sigma,lambda);
           else
-            return operands_and_partials.to_var(0.0);
+            return operands_and_partials.to_var(0.0,y,mu,sigma,lambda);
         }
 
         const T_partials_return y_dbl = value_of(y_vec[n]);

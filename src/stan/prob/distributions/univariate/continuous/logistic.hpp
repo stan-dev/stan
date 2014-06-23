@@ -135,7 +135,7 @@ namespace stan {
             ((1 - 2 * inv_1p_exp_y_minus_mu_div_sigma)
              *y_minus_mu*inv_sigma[n] - 1) * inv_sigma[n];
       }
-      return operands_and_partials.to_var(logp,y,alpha,beta);
+      return operands_and_partials.to_var(logp,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
@@ -191,7 +191,7 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == -std::numeric_limits<double>::infinity()) 
-          return operands_and_partials.to_var(0.0,y,alpha,beta);
+          return operands_and_partials.to_var(0.0,y,mu,sigma);
       }
           
       // Compute vectorized CDF and its gradients
@@ -239,7 +239,7 @@ namespace stan {
           operands_and_partials.d_x3[n] *= P;
       }
           
-      return operands_and_partials.to_var(P,y,alpha,beta);
+      return operands_and_partials.to_var(P,y,mu,sigma);
           
     }
       
@@ -287,7 +287,7 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == -std::numeric_limits<double>::infinity()) 
-          return operands_and_partials.to_var(-std::numeric_limits<double>::infinity(),y,alpha,beta);
+          return operands_and_partials.to_var(-std::numeric_limits<double>::infinity(),y,mu,sigma);
       }
           
       // Compute vectorized cdf_log and its gradients
@@ -321,7 +321,7 @@ namespace stan {
             * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
       }
           
-      return operands_and_partials.to_var(P,y,alpha,beta);
+      return operands_and_partials.to_var(P,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
@@ -368,7 +368,7 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == -std::numeric_limits<double>::infinity()) 
-          return operands_and_partials.to_var(0.0,y,alpha,beta);
+          return operands_and_partials.to_var(0.0,y,mu,sigma);
       }
           
       // Compute vectorized cdf_log and its gradients
@@ -378,7 +378,7 @@ namespace stan {
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
           return operands_and_partials.to_var(stan::math::negative_infinity(),
-                                              y,alpha,beta);
+                                              y,mu,sigma);
         }
               
         // Pull out values
@@ -403,7 +403,7 @@ namespace stan {
             * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
       }
           
-      return operands_and_partials.to_var(P,y,alpha,beta);
+      return operands_and_partials.to_var(P,y,mu,sigma);
     }
 
     template <class RNG>

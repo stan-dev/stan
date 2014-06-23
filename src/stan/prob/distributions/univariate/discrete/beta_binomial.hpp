@@ -82,6 +82,9 @@ namespace stan {
       if (!include_summand<propto,T_size1,T_size2>::value)
         return 0.0;
 
+      agrad::OperandsAndPartials<T_size1,T_size2> 
+        operands_and_partials(alpha,beta);
+
       VectorView<const T_n> n_vec(n);
       VectorView<const T_N> N_vec(N);
       VectorView<const T_size1> alpha_vec(alpha);
@@ -90,7 +93,7 @@ namespace stan {
       
       for (size_t i = 0; i < size; i++) {
         if (n_vec[i] < 0 || n_vec[i] > N_vec[i])
-          return LOG_ZERO;
+          return operands_and_partials.to_var(LOG_ZERO,alpha,beta);
       }
       
       using stan::math::lbeta;
@@ -99,10 +102,9 @@ namespace stan {
       using stan::agrad::lbeta;
       using stan::agrad::binomial_coefficient_log;
       using stan::agrad::digamma;
-
       VectorBuilder<T_partials_return,
                     include_summand<propto>::value,
-                    is_vector<T_n>::value || is_vector<T_N>::value> 
+                    is_vector<T_n>::value || is_vector<T_N>::value>
         normalizing_constant(max_size(N,n));
       for (size_t i = 0; i < max_size(N,n); i++)
         if (include_summand<propto>::value)
@@ -179,8 +181,6 @@ namespace stan {
         if (!is_constant_struct<T_size2>::value)
           digamma_beta[i] = digamma(value_of(beta_vec[i]));
 
-      agrad::OperandsAndPartials<T_n,T_N,T_size1,T_size2> 
-        operands_and_partials(n,N,alpha,beta);
       for (size_t i = 0; i < size; i++) {
         if (include_summand<propto>::value)
           logp += normalizing_constant[i];
@@ -188,13 +188,13 @@ namespace stan {
           logp += lbeta_numerator[i] - lbeta_denominator[i];
         
         if (!is_constant_struct<T_size1>::value)
-          operands_and_partials.d_x3[i] 
+          operands_and_partials.d_x1[i] 
             += digamma_n_plus_alpha[i]
             - digamma_N_plus_alpha_plus_beta[i]
             + digamma_alpha_plus_beta[i]
             - digamma_alpha[i];
         if (!is_constant_struct<T_size2>::value)
-          operands_and_partials.d_x4[i] 
+          operands_and_partials.d_x2[i] 
             += digamma(value_of(N_vec[i]-n_vec[i]+beta_vec[i]))
             - digamma_N_plus_alpha_plus_beta[i]
             + digamma_alpha_plus_beta[i]

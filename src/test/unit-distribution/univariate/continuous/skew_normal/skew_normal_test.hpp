@@ -92,7 +92,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale, T_shape>::type 
   log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
                     const T_shape& alpha, const T4&, const T5&) {
-    return -0.5 * log(2.0 * boost::math::constants::pi<double>()) 
+    return -0.5 * log(2.0 * stan::math::pi()) 
       - log(sigma) - (y - mu) / sigma * (y - mu) / sigma * 0.5 
       + log(erfc(-alpha * (y - mu) / (sigma * std::sqrt(2.0))));
   }

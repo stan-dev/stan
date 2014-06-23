@@ -57,7 +57,7 @@ public:
 
 
   template <class T_y, class T_dof, class T_scale,
-            typename T3, typename T4, typename T5
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_dof, T_scale>::type 
   log_prob(const T_y& y, const T_dof& nu, const T_scale& s,
            const T3&, const T4&, const T5&) {

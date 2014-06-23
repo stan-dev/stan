@@ -315,7 +315,7 @@ namespace stan {
         const T_partials_return sigma_inv_dbl = 1.0 / value_of(sigma_vec[n]);
         const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
             
-        const double z = (y_dbl - mu_dbl) * sigma_inv_dbl;
+        const T_partials_return z = (y_dbl - mu_dbl) * sigma_inv_dbl;
           
         // Compute
         const T_partials_return Pn = atan(z) / pi() + 0.5;

@@ -32,12 +32,6 @@ public:
     parameters.push_back(param);
     log_prob.push_back(-3.66695430596734551844348822271447899701975756228145); // expected log_prob
 
-    param[0] = -3.5;          // y
-    param[1] = 1.9;           // mu
-    param[2] = 7.2;           // sigma
-    param[3] = 2.9;           // lambda
-    parameters.push_back(param);
-    log_prob.push_back(-3.2116852); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

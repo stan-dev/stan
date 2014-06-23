@@ -16,12 +16,12 @@ public:
     param[0] = 0.5;                 // y
     param[1] = 2.0;                 // nu
     parameters.push_back(param);
-    log_prob.push_back(-0.3068528);  // expected log_prob
+    log_prob.push_back(-0.306852819440054690582767879);  // expected log_prob
 
     param[0] = 3.2;                 // y
     param[1] = 9.1;                 // nu
     parameters.push_back(param);
-    log_prob.push_back(-12.28905);    // expected log_prob
+    log_prob.push_back(-12.289046414913599957162924721);    // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

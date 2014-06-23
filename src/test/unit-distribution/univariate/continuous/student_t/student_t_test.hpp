@@ -109,7 +109,3 @@ public:
   }
 };
 
-TEST(ProbDistributionsStudentTCDF,Values) {
-    EXPECT_FLOAT_EQ(0.75, stan::prob::student_t_cdf(1.0,1.0,0.0,1.0));
-    EXPECT_FLOAT_EQ(0.047732983, stan::prob::student_t_cdf(-3.0,2.0,0.0,1.0));
-}

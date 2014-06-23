@@ -65,6 +65,9 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
         operands_and_partials(y, mu, sigma, alpha);
 
+      using boost::math::erfc;
+      using boost::math::erf;
+
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
@@ -92,7 +95,7 @@ namespace stan {
         // reusable subexpression values
         const T_partials_return y_minus_mu_over_sigma 
           = (y_dbl - mu_dbl) * inv_sigma[n];
-        const double pi_dbl = boost::math::constants::pi<double>();
+        const double pi_dbl = stan::math::pi();
 
         // log probability
         if (include_summand<propto>::value)
@@ -102,7 +105,7 @@ namespace stan {
         if (include_summand<propto,T_y, T_loc, T_scale>::value)
           logp -= y_minus_mu_over_sigma * y_minus_mu_over_sigma / 2.0;
         if (include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
-          logp += log(boost::math::erfc(-alpha_dbl * y_minus_mu_over_sigma 
+          logp += log(erfc(-alpha_dbl * y_minus_mu_over_sigma 
                                         / std::sqrt(2.0)));
 
         // gradients
@@ -110,7 +113,7 @@ namespace stan {
           = 2.0 / std::sqrt(pi_dbl) 
           * exp(-alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0) 
                 * alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0))
-          / (1 + boost::math::erf(alpha_dbl * y_minus_mu_over_sigma 
+          / (1 + erf(alpha_dbl * y_minus_mu_over_sigma 
                                   / std::sqrt(2.0)));
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 

@@ -15,25 +15,25 @@ public:
     param[1] = 1.0;                  // mu
     param[2] = 1.0;                  // sigma
     parameters.push_back(param);
-    log_prob.push_back(-0.6931472);  // expected log_prob
+    log_prob.push_back(-0.6931471805599453094172321214581765680755001343602552541206800094933936219696947156058633269964186875);  // expected log_prob
 
     param[0] = 2.0;                  // y
     param[1] = 1.0;                  // mu
     param[2] = 1.0;                  // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1.693147);   // expected log_prob
+    log_prob.push_back(-1.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863326996418688);   // expected log_prob
     
     param[0] = -3.0;                 // y
     param[1] = 2.0;                  // mu
     param[2] = 1.0;                  // sigma
     parameters.push_back(param);
-    log_prob.push_back(-5.693147);   // expected log_prob
+    log_prob.push_back(-5.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863326996418688);   // expected log_prob
     
     param[0] = 1.0;                  // y
     param[1] = 0.0;                  // mu
     param[2] = 2.0;                  // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1.886294);   // expected log_prob
+    log_prob.push_back(-1.8862943611198906188344642429163531361510002687205105082413600189867872439393894312117266539928373751);   // expected log_prob
 
     param[0] = 1.9;                  // y
     param[1] = 2.3;                  // mu
@@ -45,7 +45,7 @@ public:
     param[1] = 2.3;                  // mu
     param[2] = 0.25;                  // sigma
     parameters.push_back(param);
-    log_prob.push_back(-0.9068528);        // expected log_prob
+    log_prob.push_back(-0.90685281944005469058276788);        // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

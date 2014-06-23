@@ -20,13 +20,13 @@ public:
     param[1] = 20;           // N
     param[2] = 0.4;          // theta
     parameters.push_back(param);
-    log_prob.push_back(-2.144372); // expected log_prob
+    log_prob.push_back(-2.144372241799002765106); // expected log_prob
     
     param[0] = 5;            // n
     param[1] = 15;           // N
     param[2] = 0.8;          // theta
     parameters.push_back(param);
-    log_prob.push_back(-9.20273); // expected log_prob
+    log_prob.push_back(-9.202729812928724939525); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index,

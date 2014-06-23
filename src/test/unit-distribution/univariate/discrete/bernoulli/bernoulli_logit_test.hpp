@@ -97,7 +97,6 @@ public:
       return ntheta;
     else
       return -log(1 + exp(-ntheta));
-    }
     return 0.0;
   }
 };
