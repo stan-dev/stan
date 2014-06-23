@@ -14,6 +14,10 @@
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/agrad/fwd/functions/erfc.hpp>
+#include <stan/agrad/fwd/functions/sqrt.hpp>
+#include <stan/agrad/rev/functions/erfc.hpp>
+#include <stan/agrad/rev/functions/sqrt.hpp>
 
 namespace stan {
 
