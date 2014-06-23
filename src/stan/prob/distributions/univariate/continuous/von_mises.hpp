@@ -7,6 +7,9 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/agrad/fwd/functions/modified_bessel_first_kind.hpp>
+#include <stan/agrad/rev/functions/modified_bessel_first_kind.hpp>
+#include <stan/math/functions/modified_bessel_first_kind.hpp>
 
 namespace stan { 
   
