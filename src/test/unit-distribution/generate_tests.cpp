@@ -7,6 +7,7 @@
 #include <vector>
 #include <iomanip>
 #include <boost/algorithm/string.hpp>
+#include <cmath>
 
 using std::vector;
 using std::string;
@@ -186,7 +187,66 @@ vector<vector<string> > build_argument_sequence(const string& arguments,
   return argument_sequence;
 }
 
-void write_types_typedef(vector<std::ostream *>& outs, string base, size_t& N, vector<vector<string> > argument_sequence, const size_t depth, const int& index) {
+bool check_all_double(string base, string arg) {
+  string arguments = base + arg;
+  bool result = true;
+  bool temp;
+
+  vector<string> tokens;
+  string delimiters = ", ";
+  boost::algorithm::trim(arguments);
+  boost::algorithm::split(tokens, arguments, 
+        boost::is_any_of(delimiters), 
+        boost::token_compress_on);
+
+  for (int i = 0; i < tokens.size(); i++) {
+    if (tokens[i] == "1" || tokens[i] == "Eigen::Dynamic>" 
+        || tokens[i] == "1>" || tokens[i] == "Eigen::Dynamic")
+      result = result && true;
+    else {
+      temp = (tokens[i] == "double") || (tokens[i] == "std::vector<double>")
+        || (tokens[i] == "Eigen::Matrix<double") || (tokens[i] == "int") 
+        || (tokens[i] == "std::vector<int>") || (tokens[i] == "Eigen::Matrix<int");
+      result = result && temp;
+    }
+  }
+  return result;
+}
+
+int num_doubles(string arguments) {
+  vector<string> tokens;
+  string delimiters = ", ";
+  boost::algorithm::trim(arguments);
+  boost::algorithm::split(tokens, arguments, 
+        boost::is_any_of(delimiters), 
+        boost::token_compress_on);
+
+  int num = 0;
+  for (int i = 0; i < tokens.size(); i++) {
+    if (tokens[i] == "Doubles")
+      ++num;
+  }
+  return num;
+}
+int num_ints(string arguments) {
+  vector<string> tokens;
+  string delimiters = ", ";
+  boost::algorithm::trim(arguments);
+  boost::algorithm::split(tokens, arguments, 
+        boost::is_any_of(delimiters), 
+        boost::token_compress_on);
+
+  int num = 0;
+  for (int i = 0; i < tokens.size(); i++) {
+    if (tokens[i] == "Ints")
+      ++num;
+  }
+  return num;
+}
+
+void write_types_typedef(vector<std::ostream *>& outs, string base, size_t& N, 
+                         vector<vector<string> > argument_sequence, 
+                         const size_t depth, const int& index) {
   vector<string> args = argument_sequence.front();
   argument_sequence.erase(argument_sequence.begin());
   if (argument_sequence.size() > 0) {
@@ -200,31 +260,40 @@ void write_types_typedef(vector<std::ostream *>& outs, string base, size_t& N, v
     }
     for (size_t n = 0; n < args.size(); n++) {
       std::ostream* out = outs[int(N / N_TESTS)];
-      *out << "typedef boost::mpl::vector<" << base << args[n] << extra_args;
-      if (extra_args.size() == 0)
-        *out << " ";
-      if (index == 1)
+      if (index == 1) {
+        *out << "typedef boost::mpl::vector<" << base << args[n] << extra_args;
+        if (extra_args.size() == 0)
+          *out << " ";
         *out << "> type_v_" << N << ";" << endl;
-      else if (index == 2)
-        *out << "> type_fd_" << N << ";" << endl;
-      else if (index == 3)
-        *out << "> type_fv_" << N << ";" << endl;
-      else if (index == 4)
-        *out << "> type_ffd_" << N << ";" << endl;
-      else if (index == 5)
-        *out << "> type_ffv_" << N << ";" << endl;
-      N++;
+        N++;
+      } else {
+        if (check_all_double(base,args[n]) == false) {
+          *out << "typedef boost::mpl::vector<" << base << args[n] << extra_args;
+          if (extra_args.size() == 0)
+            *out << " ";
+          else if (index == 2)
+            *out << "> type_fd_" << N << ";" << endl;
+          else if (index == 3)
+            *out << "> type_fv_" << N << ";" << endl;
+          else if (index == 4)
+            *out << "> type_ffd_" << N << ";" << endl;
+          else if (index == 5)
+            *out << "> type_ffv_" << N << ";" << endl;
+          N++;
+        }
+      }
     }
   }
 }
 
-void write_types(vector<std::ostream *>& outs, 
+size_t write_types(vector<std::ostream *>& outs, 
                  const vector<vector<string> >& argument_sequence,
                  const int& index) {
   size_t N = 0;
   write_types_typedef(outs, "", N, argument_sequence, argument_sequence.size(),index);
   for (size_t n = 0; n < outs.size(); n++)
     *outs[n] << endl;
+  return N;
 }
 
 void write_test(vector<std::ostream *>& outs, const string& test_name, 
@@ -270,8 +339,8 @@ void write_test_cases(vector<std::ostream *>& outs, const string& in_name,
   string test_name = name.first;
   string fixture_name = name.second;
   
-  write_types(outs, argument_sequence,index); 
-  write_test(outs, test_name, fixture_name, size(argument_sequence),index);
+  size_t num_tests = write_types(outs, argument_sequence,index); 
+  write_test(outs, test_name, fixture_name, num_tests,index);
 }
 
 int create_files(const int& argc, const char* argv[],const int& index, 
@@ -288,8 +357,15 @@ int create_files(const int& argc, const char* argv[],const int& index,
   string arguments = read_arguments_from_file(in_name);
   vector<vector<string> > argument_sequence = build_argument_sequence(arguments,index);
   
+  int num_tests;
+  if (index == 1)
+    num_tests = size(argument_sequence);
+  else
+    num_tests = size(argument_sequence) - std::pow(4,num_ints(arguments)) 
+      * std::pow(4, num_doubles(arguments));
+
   vector<std::ostream *> outs;
-  for (int n = start+1; n < start+1+int(size(argument_sequence) / N_TESTS) + 1; n++) {
+  for (int n = start+1; n < start+1+int(num_tests / N_TESTS) + 1; n++) {
     stringstream out_name;
     out_name << out_name_base;
     out_name << "_" << std::setw(5) << std::setfill('0') << n;
@@ -307,7 +383,7 @@ int create_files(const int& argc, const char* argv[],const int& index,
   }
   outs.clear();
 
-  return start+int(size(argument_sequence) / N_TESTS);
+  return start+int(num_tests / N_TESTS);
 }
 
 /** 
