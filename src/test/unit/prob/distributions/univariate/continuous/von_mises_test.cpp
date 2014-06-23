@@ -35,7 +35,7 @@ TEST(ProbDistributionsVonMises, chiSquareGoodnessFitTest1) {
     3.661367, 3.690358, 3.720728, 3.752694, 3.786522, 3.822550, 3.861212,
     3.903079, 3.948925, 3.999839, 4.057427, 4.124191, 4.204379, 4.306094, 
     4.448103, 4.694153;
-  for (int i = 0; i < K; i ++)
+  for (int i = 0; i < K-1; i ++)
     loc[i] = loc[i] - stan::math::pi();
 
   int count = 0;
