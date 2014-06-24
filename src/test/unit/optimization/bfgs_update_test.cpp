@@ -33,3 +33,13 @@ TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
     }
   }
 }
+
+TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_update) {
+  FAIL()
+    << "add tests for BFGSUpdate_HInv.update()";
+}
+
+TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_search_direction) {
+  FAIL()
+    << "add tests for BFGSUpdate_HInv.search_direction()";
+}
