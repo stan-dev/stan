@@ -10,6 +10,7 @@
 #include "stan/prob/distributions/univariate/continuous/normal.hpp"
 #include "stan/prob/distributions/univariate/continuous/chi_square.hpp"
 #include <stan/math/functions/lmgamma.hpp>
+#include <stan/math/matrix/crossprod.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
@@ -117,7 +118,7 @@ namespace stan {
 //          const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(
 //                                                                   &W(0), W.size(), 1);
 //        lp -= 0.5 * dot_product(S_inv_vec, W_vec); // trace(S^-1 * W)
-        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Sinv_W(mdivide_left_ldlt(ldlt_S,W));
+        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Sinv_W(mdivide_left_ldlt(ldlt_S, static_cast<Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(W.template selfadjointView<Eigen::Lower>())));
         lp -= 0.5*trace(Sinv_W);
       }
 
@@ -145,23 +146,24 @@ namespace stan {
 
       using stan::math::check_size_match;
       using stan::math::check_positive;
+      using Eigen::MatrixXd;
 
+      typename MatrixXd::size_type k = S.rows();
       check_positive(function,nu,"degrees of freedom",(double*)0);
       check_size_match(function, 
                        S.rows(), "Rows of scale parameter",
                        S.cols(), "columns of scale parameter",
                        (double*)0);
 
-      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(S.rows(), S.cols());
-      B.setZero();
+      MatrixXd B = MatrixXd::Zero(k, k);
 
-      for(int i = 0; i < S.cols(); i++) {
-        B(i,i) = std::sqrt(chi_square_rng(nu - i, rng));
-        for(int j = 0; j < i; j++)
-          B(j,i) = normal_rng(0,1,rng);
+      for (int j = 0; j < k; ++j) {
+        for (int i = 0; i < j; ++i)
+          B(i, j) = normal_rng(0, 1, rng);
+        B(j,j) = std::sqrt(chi_square_rng(nu - j, rng));
       }
-
-      return stan::math::multiply_lower_tri_self_transpose(S.llt().matrixL() * B);
+                
+      return stan::math::crossprod(B * S.llt().matrixU());
     }
   }
 }
