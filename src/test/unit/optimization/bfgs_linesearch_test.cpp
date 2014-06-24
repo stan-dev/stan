@@ -38,6 +38,11 @@ TEST(OptimizationBfgsLinesearch, CubicInterp) {
   }
 }
 
+TEST(OptimizationBfgsLinesearch, CubicInterp_6arg) {
+  FAIL() 
+    << "add tests for the 6 argument version of CubicInterp()";
+}
+
 class linesearch_testfunc {
 public:
   double operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x) {
@@ -50,6 +55,12 @@ public:
     return 0;
   }
 };
+
+TEST(OptimizationBfgsLinesearch, WolfLSZoom) {
+  FAIL()
+    << "add tests for WolfLSZoom()";
+}
+
 
 TEST(OptimizationBfgsLinesearch, wolfeLineSearch) {
   using stan::optimization::WolfeLineSearch;
