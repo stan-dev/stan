@@ -36,3 +36,23 @@ TEST(OptimizationLbfgsUpdate, lbfgs_update_secant) {
     }
   }
 }
+
+TEST(OptimizationLbfgsUpdate, LBFGSUpdate) {
+  FAIL()
+    << "add tests for LBFGSUpdate (construction) -- see above test";
+}
+
+TEST(OptimizationLbfgsUpdate, LBFGSUpdate_set_history_size) {
+  FAIL()
+    << "add tests for LBFGSUpdate.set_history_size()";
+}
+
+TEST(OptimizationLbfgsUpdate, LBFGSUpdate_update) {
+  FAIL()
+    << "add tests for LBFGSUpdate.update()";
+}
+
+TEST(OptimizationLbfgsUpdate, LBFGSUpdate_search_direction) {
+  FAIL()
+    << "add tests for LBFGSUpdate.search_direction()";
+}
