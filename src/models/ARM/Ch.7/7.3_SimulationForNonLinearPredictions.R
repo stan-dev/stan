@@ -56,18 +56,9 @@ incumbency.88 <- inc88[contested88]
 vote.88 <- v88[contested88]
 ok <- !is.na (vote.86+incumbency.88+vote.88)
 
-if (!exists("congress.sm")) {
-    if (file.exists("congress.sm.RData")) {
-        load("congress.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("congress.stan", model_name = "congress")
-        congress.sm <- stan_model(stanc_ret = rt)
-        save(congress.sm, file = "congress.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=length(vote.88[ok]), vote_88=vote.88[ok], vote_86=vote.86[ok],incumbency_88=incumbency.88[ok])
-congress.sf1 <- sampling(congress.sm, dataList.1)
+congress.sf1 <- stan(file='congress.stan', data=dataList.1,
+                     iter=1000, chains=4)
 print(congress.sf1)
 
 fit88.post <- extract(congress.sf1)

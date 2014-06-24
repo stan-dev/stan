@@ -7,5 +7,5 @@ parameters {
   vector[2] beta;
 } 
 model {
-  switc ~ bernoulli_logit(beta[1] + beta[2] * dist);
+  switc ~ bernoulli_logit(beta[1] + beta[2] * dist / 100);
 }

@@ -5,31 +5,22 @@ source("wells.data.R", echo = TRUE)
 ## Logistic regression (wells.stan)
 ## glm (switch ~ dist, family=binomial(link="logit"))
 
-if (!exists("wells.sm")) {
-    if (file.exists("wells.sm.RData")) {
-        load("wells.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells.stan", model_name = "wells")
-        wells.sm <- stan_model(stanc_ret = rt)
-        save(wells.sm, file = "wells.sm.RData")
-    }
-}
-
 dataList.1 <- c("N","dist","switc")
-wells.sf1 <- sampling(wells.sm, dataList.1)
+wells.sf1 <- stan(file='wells.stan', data=dataList.1,
+                  iter=1000, chains=4)
 print(wells.sf1)
 fit1.post <- extract(wells.sf1)
 beta.mean <- colMeans(fit1.post$beta)
 
  # Figure 7.6 (a)
 
-frame1 = data.frame(x1=coef(sim.1)[,1],y1=coef(sim.1)[,2])
-p1 <- ggplot() +
-      geom_point() +
-      theme_bw() +
-      scale_y_continuous(expression(beta[1])) +
-      scale_x_continuous(expression(beta[0]))
-print(p1)
+#frame1 = data.frame(x1=coef(sim.1)[,1],y1=coef(sim.1)[,2])
+#p1 <- ggplot() +
+#      geom_point() +
+#      theme_bw() +
+#      scale_y_continuous(expression(beta[1])) +
+#      scale_x_continuous(expression(beta[0]))
+#print(p1)
 
  # Figure 7.6 (b)
 dev.new()
@@ -81,18 +72,9 @@ y.tilde <- ifelse (z.tilde>0, 1, 0)
 ## glm (earn_pos ~ height + male, family=binomial(link="logit"))
 source("earnings1.data.R", echo = TRUE)
 
-if (!exists("earnings1.sm")) {
-    if (file.exists("earnings1.sm.RData")) {
-        load("earnings1.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("earnings1.stan", model_name = "earnings1")
-        earnings1.sm <- stan_model(stanc_ret = rt)
-        save(earnings1.sm, file = "earnings1.sm.RData")
-    }
-}
-
 dataList.2 <- c("N","earn_pos","height","male")
-earnings1.sf1 <- sampling(earnings1.sm, dataList.2)
+earnings1.sf1 <- stan(file='earnings1.stan', data=dataList.2,
+                      iter=1000, chains=4)
 print(earnings1.sf1)
 fit1a.post <- extract(earnings1.sf1)
 
@@ -100,18 +82,9 @@ fit1a.post <- extract(earnings1.sf1)
 ##model lm (log.earn ~ height + male, subset=earnings>0)
 source("earnings2.data.R", echo = TRUE)
 
-if (!exists("earnings2.sm")) {
-    if (file.exists("earnings2.sm.RData")) {
-        load("earnings2.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("earnings2.stan", model_name = "earnings2")
-        earnings2.sm <- stan_model(stanc_ret = rt)
-        save(earnings2.sm, file = "earnings2.sm.RData")
-    }
-}
-
 dataList.3 <- c("N","earnings","height","sex")
-earnings2.sf1 <- sampling(earnings2.sm, dataList.3)
+earnings2.sf1 <- stan(file='earnings2.stan', data=dataList.3,
+                      iter=1000, chains=4)
 print(earnings2.sf1)
 fit1b.post <- extract(earnings2.sf1)
 
