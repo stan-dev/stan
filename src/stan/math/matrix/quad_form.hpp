@@ -4,9 +4,9 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_square.hpp>
-#include <stan/math/matrix/validate_symmetric.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {
   namespace math {
@@ -18,8 +18,9 @@ namespace stan {
     quad_form(const Eigen::Matrix<double,RA,CA> &A,
               const Eigen::Matrix<double,RB,CB> &B)
     {
-      validate_square(A,"quad_form");
-      validate_multiplicable(A,B,"quad_form");
+      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("quad_form(%1%)",A,"A",
+                                      B,"B",(double*)0);
       return B.transpose()*A*B;
     }
     
@@ -28,8 +29,9 @@ namespace stan {
     quad_form(const Eigen::Matrix<double,RA,CA> &A,
               const Eigen::Matrix<double,RB,1> &B)
     {
-      validate_square(A,"quad_form");
-      validate_multiplicable(A,B,"quad_form");
+      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("quad_form(%1%)",A,"A",
+                                      B,"B",(double*)0);
       return B.dot(A*B);
     }
     
@@ -38,9 +40,10 @@ namespace stan {
     quad_form_sym(const Eigen::Matrix<double,RA,CA> &A,
                   const Eigen::Matrix<double,RB,CB> &B)
     {
-      validate_square(A,"quad_form_sym");
-      validate_multiplicable(A,B,"quad_form_sym");
-      validate_symmetric(A,"quad_form_sym");
+      stan::math::check_square("quad_form_sym(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("quad_form_sym(%1%)",A,"A",
+                                      B,"B",(double*)0);
+      stan::math::check_symmetric("quad_form_sym(%1%)",A,"A",(double*)0);
       Eigen::Matrix<double,CB,CB> ret(B.transpose()*A*B);
       return 0.5*(ret + ret.transpose());
     }
@@ -50,9 +53,10 @@ namespace stan {
     quad_form_sym(const Eigen::Matrix<double,RA,CA> &A,
                   const Eigen::Matrix<double,RB,1> &B)
     {
-      validate_square(A,"quad_form_sym");
-      validate_multiplicable(A,B,"quad_form_sym");
-      validate_symmetric(A,"quad_form_sym");
+      stan::math::check_square("quad_form_sym(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("quad_form_sym(%1%)",A,"A",
+                                      B,"B",(double*)0);    
+      stan::math::check_symmetric("quad_form_sym(%1%)",A,"A",(double*)0);
       return B.dot(A*B);
     }
   }

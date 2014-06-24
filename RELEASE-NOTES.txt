@@ -1,5 +1,129 @@
-STAN RELEASE NOTES
+STAN C++ RELEASE NOTES
 ======================================================================
+
+v.2.3.0 (18 June 2014)
+======================================================================
+
+We had a record number of user-submitted patches this go around.
+Thanks to everyone!
+
+New Features
+------------
+* user-defined function definitions added to Stan language
+* cholesky_corr data type for Cholesky factors of correlation matrices
+* a^b syntax for pow(a,b)  (thanks to Mitzi Morris)
+* reshaping functions: to_matrix(), to_vector(), to_row_vector(), 
+  to_array_1d(), to_array_2d()
+* matrix operations: quad_form_sym() (x' *Sigma * x), QR decompositions
+  qr_Q(), qr_R()
+* densities: Gaussian processes multi_gp_log(), multi_gp(), 
+  and alternative negative binomial parameterization neg_binomial_2()
+* random number generator: multi_normal_cholesky_rng()
+* sorting: sort_indices_*() for returning indexes in sorted order by
+  value
+* added JSON parser to C++ (not exposed through interfaces yet; thanks
+  to Mitzi Morris)
+* many fixes to I/O for data and inits to check consistency and
+  report errors
+* removed some uses of std::cout where they don't belong
+* updated parser for C++11 compatibility (thanks to Rob Goedman)
+
+New Developer
+--------------
+* added Marco Inacio as core developer
+
+Optimizations
+-------------
+* turned off Eigen asserts
+* efficiency improvements to posterior analysis print
+
+Documentation
+-------------
+* Clarified licensing policy for individual code contributions
+* Huge numbers of fixes to the documentation, including many
+  user-contributed patches (thanks!), fixes to parallelization in
+  CmdStan, Windows install instructions, boundaries for Dirichlet and
+  Beta, removed suggestion to use floor and ceiling as indices,
+  vectorized many models, clarified that && doesn't short circuit,
+  clarified von Mises normalization, updated censoring doc (thanks
+  to Alexey Stukalov), negative binomial doc enhanced, new references,
+  new discussion of hierarchical models referencing Betancourt and
+  Girolami paper, 
+* Avraham Aadler was particularly useful in pointing out and fixing
+  documentation errors
+
+Bug Fixes
+------------
+* fixed bug in lkj density
+* fixed bug in Jacobian for corr_matrix data type
+* fix cholesky_cov_matrix test code to allow use as parameter
+* fixed poisson_rng, neg_binomial_rng
+* allow binary operations (e.g., < and >) within range constraints
+* support MS Visual Studio 2008
+* fixed memory leaks in categorical sampling statement, categorical_log
+  function, and softmax functions
+* removed many compiler warnings
+* numerous bug fixes to arithmetic test code conditions and messages,
+  including calls from 
+* fixed model crashes when no parameter specified
+* fixed template name conflicts for some compiler bugs (thanks Kevin
+  S. Van Horn)
+
+Code Reorganizations & Updates
+------------------------------
+* CmdStan is now in its own repository on GitHub: stan-dev/cmdstan
+* consolidate and simplify error handling across modules
+* pulled functionality from CmdStan command class and PyStan and RStan
+  into Stan C++
+* generalized some interfaces to allow std::vector as well as Eigen
+  for compatibility
+* generalize some I/O CSV writer capabilities
+* optimization output text cleaned up
+* integer overflow during I/O now raises informative error messages
+* const correctness for chains (thanks Kevin S. Van Horn)
+
+
+
+v2.3.0 (16 June 2014)
+======================================================================
+Bug Fixes
+------------
+* fixed poisson_rng, neg_binomial_rng
+* integer overflow now throws errors
+* allow < and > within range constraints
+* support MS Visual Studio 2008
+* fixed bug in lkj
+
+
+Features
+------------
+* functions added to Stan language!
+* turned off eigen asserts
+* CmdStan is now in its own repository
+* added quad_form_sym, multi_gp_log, multi_gp, 
+  multi_normal_cholesky_rng, to_matrix, to_vector, to_array, flatten,
+  qr_Q, qr_R
+* added JSON parser to Stan
+* a^b syntax for pow(a,b)
+
+
+v2.2.0 (14 February 2014)
+======================================================================
+Bug Fixes
+-------------
+* increment_log_prob is now vectorized and compiles with vector arguments
+* multinomial random number generator used the wrong size for the return value
+* fixed memory leaks in auto-diff implementation
+* variables can start with the prefix 'inf'
+* fixed parameter output order for arrays when using optimization
+
+Features
+-------------
+* suppress command line output with refresh <= 0
+* added 1 to treedepth to match usual definition of treedepth
+* added distance, squared_distance, diag_pre_multiply, diag_pre_multiply to Stan modeling lnaguage
+* added a 'fixed_param' sampler for use with the generated quantities block
+
 
 
 

@@ -2,8 +2,8 @@
 #define __STAN__MATH__MATRIX__INVERSE_SPD_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_square.hpp>
-#include <stan/math/matrix/validate_symmetric.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {
   namespace math {
@@ -17,8 +17,8 @@ namespace stan {
     inline
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     inverse_spd(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      validate_square(m,"inverse_spd");
-      validate_symmetric(m,"inverse_spd");
+      stan::math::check_square("inverse_spd(%1%)",m,"m",(double*)0);
+      stan::math::check_symmetric("inverse_spd(%1%)",m,"m",(double*)0);
       Eigen::LDLT< Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > ldlt(0.5*(m+m.transpose()));
       if (ldlt.info() != Eigen::Success)
         throw std::domain_error("Error in inverse_spd, LDLT factorization failed");

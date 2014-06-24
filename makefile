@@ -15,12 +15,14 @@ SUFIXES:
 # - CC: The compiler to use. Expecting g++ or clang++.
 # - O: Optimization level. Valid values are {0, 1, 2, 3}.
 # - AR: archiver (must specify for cross-compiling)
-# - OS: {mac, win, linux}. 
+# - OS: {mac, win, linux}
+# - C++11: Compile with C++11 extensions, Valid values: {true, false}. 
 ##
 CC = g++
 O = 3
 O_STANC = 0
 AR = ar
+C++11 = false
 
 ##
 # Library locations
@@ -33,11 +35,12 @@ GTEST ?= lib/gtest_1.7.0
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
+WINE =
 PATH_SEPARATOR = /
 
 
@@ -159,17 +162,28 @@ endif
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
 	@echo '                     (requires doxygen installation)'
-	@echo '  Tests (requires make 3.81 or higher):'
-	@echo '  - test-headers   : Compiles a trivial file after including each '
-	@echo '                     header separately'
-	@echo '  - For any subdirectory directory in *src/test*, all tests within'
-	@echo '    the specified directory and subdirectories can be compiled '
-	@echo '    and executed by using the folder as the target (without a trailing slash).'
-	@echo '    Examples:'
-	@echo '    * all unit tests:            src/test/unit'
-	@echo '    * unit tests for meta:       src/test/unit/meta'
-	@echo '    * normal distribution tests: src/test/unit-distribution/univariate/continuous/normal'
-	@echo '  - test-all       : Runs all tests.'
+	@echo '  TESTS (requires make 3.81 or higher):'
+	@echo ''
+	@echo '    All Tests'
+	@echo '      - test-all'
+	@echo ''
+	@echo '    Header Tests'
+	@echo '      - test-headers'
+	@echo ''
+	@echo '    Unit Tests'
+	@echo '      The unit tests are broken into three targets:'
+	@echo '        - src/test/unit'
+	@echo '        - src/test/unit-agrad-rev'
+	@echo '        - src/test/unit-agrad-fwd'
+	@echo ''
+	@echo '      Subdirectory of Unit Tests'
+	@echo '        For example, to run the unit tests under meta'
+	@echo '          - src/test/unit/meta'
+	@echo ''
+	@echo '      Single Unit Test'
+	@echo '        For example, to run the diag_post_multiply test, make the target'
+	@echo '          - test/unit-agrad-fwd/matrix/diag_post_multiply$(EXE)'
+	@echo ''
 	@echo '  Clean:'
 	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
 	@echo '  - clean-all      : Cleans up all of Stan.'
@@ -180,13 +194,16 @@ endif
 	@echo ''
 	@echo '  Warning: Deprecated test targets'
 	@echo '  - test-unit      : Runs unit tests.'
-	@echo '    Replace with: src/test/unit src/test/unit-agrad-rev src/test/unit-agrad-fwd'
+	@echo '    This has been split into 3 separate targets:'
+	@echo '      src/test/unit'
+	@echo '      src/test/unit-agrad-rev'
+	@echo '      src/test/unit-agrad-fwd'
 	@echo '  - test-distributions : Runs unit tests for the distributions'
-	@echo '    Replace with: src/test/unit-distribution'
+	@echo '    Use this target instead: src/test/unit-distribution'
 	@echo '  - test-models    : Runs diagnostic models.'
-	@echo '    Replace with: src/test/CmdStan/models'
+	@echo '    Run this target from CmdStan: src/test/models'
 	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
-	@echo '    Replace with: src/test/CmdStan/models/bugs_examples'
+	@echo '    Run this target from CmdStan: src/test/models/bugs_examples'
 	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
@@ -197,6 +214,7 @@ endif
 -include make/doxygen  # doxygen
 -include make/manual   # manual: manual, doc/stan-reference.pdf
 -include make/demo     # for building demos
+-include make/local    # for local stuff
 
 ifneq (,$(filter-out runtest/%,$(filter-out clean%,$(MAKECMDGOALS))))
   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))

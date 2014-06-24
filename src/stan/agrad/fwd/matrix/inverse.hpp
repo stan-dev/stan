@@ -11,6 +11,7 @@
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <stan/math/matrix/inverse.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace agrad {
@@ -22,7 +23,7 @@ namespace stan {
       using stan::math::multiply;
       using stan::agrad::multiply;
       using stan::math::inverse;
-      stan::math::validate_square(m, "inverse");
+      stan::math::check_square("inverse(%1%)",m,"m",(double*)0);
       Eigen::Matrix<T,R,C> m_deriv(m.rows(), m.cols());
       Eigen::Matrix<T,R,C> m_inv(m.rows(), m.cols());
 

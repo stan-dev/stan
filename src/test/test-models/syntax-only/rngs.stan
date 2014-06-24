@@ -22,6 +22,8 @@ generated quantities {
   n <- beta_binomial_rng(42, 0.3, 1.9);
   n <- hypergeometric_rng(5,4,9);
   n <- neg_binomial_rng(1.2,3.9);
+  n <- neg_binomial_2_rng(1.2,3.9);
+  n <- neg_binomial_2_log_rng(1.2,3.9);
   n <- ordered_logistic_rng(1.9,theta);
   n <- poisson_rng(2.7);
   // n <- poisson_log_rng(2.7);
@@ -53,7 +55,7 @@ generated quantities {
   theta <- dirichlet_rng(alpha);
   v <- multi_normal_rng(mu,Sigma);
   // v <- multi_normal_prec_rng(mu,Sigma);
-  // v <- multi_normal_cholesky_rng(mu,L);
+  v <- multi_normal_cholesky_rng(mu,L);
   v <- multi_student_t_rng(3.0,mu,Sigma);
   Sigma <- wishart_rng(3.0,Sigma);
   Sigma <- inv_wishart_rng(3.0,Sigma);

@@ -4,21 +4,21 @@ compiler:
   - gcc
 env:
   - RUN_TARGET=build TEST_TARGET=test-unit
-  - RUN_TARGET=docs
+#  - RUN_TARGET=docs
 script: make CC="$CXX" ${RUN_TARGET} ${TEST_TARGET}
 branches:
   only:
     - develop
     - master
-notifications:
-  recipients:
-    - mc.stanislaw@gmail.com
-  email:
-    on_success: change
-    on_failure: always
+#notifications:
+#  recipients:
+#    - mc.stanislaw@gmail.com
+#  email:
+#    on_success: change
+#    on_failure: always
 matrix:
   exclude: # only make docs once:
     - compiler: clang
-      env: RUN_TARGET=docs
+ #     env: RUN_TARGET=docs
       script: make CC="$CXX" "${RUN_TARGET}" "${TEST_TARGET}"
       

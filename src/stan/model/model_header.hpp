@@ -16,7 +16,6 @@
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 
-#include <stan/gm/command.hpp>
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/reader.hpp>
@@ -33,5 +32,7 @@
 
 #include <stan/model/prob_grad.hpp>
 #include <stan/prob/distributions.hpp>
+
+#include <stan/common/command.hpp>
 
 #endif

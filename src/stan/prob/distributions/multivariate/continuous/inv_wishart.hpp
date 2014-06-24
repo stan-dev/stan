@@ -2,8 +2,6 @@
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/rev.hpp>
@@ -12,6 +10,8 @@
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/math/error_handling/check_greater.hpp>
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
 
 namespace stan {
   namespace prob {
@@ -59,24 +59,22 @@ namespace stan {
 
       typename Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if(!check_greater(function, nu, k-1, "Degrees of freedom parameter", 
-                        &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            W.rows(), "Rows of random variable",
-                            W.cols(), "columns of random variable",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            S.rows(), "Rows of scale parameter",
-                            S.cols(), "columns of scale parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            W.rows(), "Rows of random variable",
-                            S.rows(), "columns of scale parameter",
-                            &lp))
-        return lp;
+      
+      check_greater(function, nu, k-1, "Degrees of freedom parameter", 
+                        &lp);
+      check_size_match(function, 
+                       W.rows(), "Rows of random variable",
+                       W.cols(), "columns of random variable",
+                       &lp);
+      check_size_match(function, 
+                       S.rows(), "Rows of scale parameter",
+                       S.cols(), "columns of scale parameter",
+                       &lp);
+      check_size_match(function, 
+                       W.rows(), "Rows of random variable",
+                       S.rows(), "columns of scale parameter",
+                       &lp);
+
       // FIXME: domain checks
         
       using stan::math::lmgamma;
@@ -141,10 +139,12 @@ namespace stan {
       using stan::math::check_size_match;
 
       typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
-      check_greater(function, nu, k-1, "Degrees of freedom parameter");
+      
+      check_greater(function, nu, k-1, "Degrees of freedom parameter", 
+                    (double*)0);
       check_size_match(function, 
                        S.rows(), "Rows of scale parameter",
-                       S.cols(), "columns of scale parameter");
+                       S.cols(), "columns of scale parameter", (double*)0);
 
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S_inv(S.rows(), S.cols());
       S_inv = Eigen::MatrixXd::Identity(S.cols(),S.cols());
