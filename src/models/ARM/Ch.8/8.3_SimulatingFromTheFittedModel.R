@@ -5,18 +5,9 @@ source("lightspeed.data.R", echo = TRUE)
 
 ## Model fit (lightspeed.stan)
 ## lm (y ~ 1)
-if (!exists("lightspeed.sm")) {
-    if (file.exists("lightspeed.sm.RData")) {
-        load("lightspeed.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("lightspeed.stan", model_name = "lightspeed")
-        lightspeed.sm <- stan_model(stanc_ret = rt)
-        save(lightspeed.sm, file = "lightspeed.sm.RData")
-    }
-}
-
 dataList.1 <- c("N","y")
-lightspeed.sf1 <- sampling(lightspeed.sm, dataList.1)
+lightspeed.sf1 <- stan(file='lightspeed.stan', data=dataList.1,
+                       iter=1000, chains=4)
 print(lightspeed.sf1)
 post <- extract(lightspeed.sf1)
 
@@ -90,22 +81,15 @@ dev.new()
 ## Read the cleaned data
 # All data are at http://www.stat.columbia.edu/~gelman/arm/examples/roaches
 # if bad initial values, this model fails
+# NOTE: can't find same exact data set as ARM book uses..
 
 roachdata <- read.csv ("roachdata.csv")
 attach(roachdata)
 
-if (!exists("roaches.sm")) {
-    if (file.exists("roaches.sm.RData")) {
-        load("roaches.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("roaches.stan", model_name = "roaches")
-        roaches.sm <- stan_model(stanc_ret = rt)
-        save(roaches.sm, file = "roaches.sm.RData")
-    }
-}
-
-dataList.1 <- list(N=length(y), y=y,roach1=roach1,treatment=treatment,exposure2=exposure2,senior=senior)
-roaches.sf1 <- sampling(roaches.sm, dataList.1)
+dataList.1 <- list(N=length(roachdata$y), y=roachdata$y,roach1=roachdata$roach1,
+                   treatment=roachdata$treatment,exposure2=roachdata$exposure2,
+                   senior=roachdata$senior)
+roaches.sf1 <- stan(file='roaches.stan', data=dataList.1, iter=5000, chains=4)
 print(roaches.sf1)
 post <- extract(roaches.sf1)
 
@@ -142,18 +126,10 @@ for (s in 1:n.sims){
 print (mean (test.rep > Test(y)))
 
 ## Checking the overdispersed model
-
-if (!exists("roaches_overdispersion.sm")) {
-    if (file.exists("roaches_overdispersion.sm.RData")) {
-        load("roaches_overdispersion.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("roaches_overdispersion.stan", model_name = "roaches_overdispersion")
-        roaches_overdispersion.sm <- stan_model(stanc_ret = rt)
-        save(roaches_overdispersion.sm, file = "roaches_overdispersion.sm.RData")
-    }
-}
-
-roaches_overdispersion.sf1 <- sampling(roaches_overdispersion.sm, dataList.1)
+# NOTE: can't find same exact data set as ARM book uses..
+roaches_overdispersion.sf1 <- stan(file='roaches_overdispersion.stan',
+                                   data=dataList.1,
+                                   iter=1000, chains=4)
 print(roaches_overdispersion.sf1)
 post <- extract(roaches_overdispersion.sf1)
 

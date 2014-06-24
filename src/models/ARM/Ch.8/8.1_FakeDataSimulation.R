@@ -1,3 +1,5 @@
+library(rstan)
+
 ## Fake-data simulation
 a <- 1.4
 b <- 2.3
@@ -10,18 +12,8 @@ y <- a + b*x + rnorm (n, 0, sigma)
 
 # (y_x.stan)
 # lm(y ~ x)
-if (!exists("y_x.sm")) {
-    if (file.exists("y_x.sm.RData")) {
-        load("y_x.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("y_x.stan", model_name = "y_x")
-        y_x.sm <- stan_model(stanc_ret = rt)
-        save(y_x.sm, file = "y_x.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=length(y), y=y, x=x)
-y_x.sf1 <- sampling(y_x.sm, dataList.1)
+y_x.sf1 <- stan(file='y_x.stan', data=dataList.1, iter=1000, chains=4)
 print(y_x.sf1)
 
 post <- extract(y_x.sf1)

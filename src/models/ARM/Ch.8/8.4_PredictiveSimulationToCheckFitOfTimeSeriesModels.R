@@ -16,19 +16,11 @@ print(p1)
 
 ## Fitting a 1st-order autogregression
 ## lm(y ~ y_lag)
-if (!exists("unemployment.sm")) {
-    if (file.exists("unemployment.sm.RData")) {
-        load("unemployment.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("unemployment.stan", model_name = "unemployment")
-        unemployment.sm <- stan_model(stanc_ret = rt)
-        save(unemployment.sm, file = "unemployment.sm.RData")
-    }
-}
 
 source("unemployment.data.R", echo = TRUE)    
 dataList.1 <- c("N","y_lag","y")
-unemployment.sf1 <- sampling(unemployment.sm, dataList.1)
+unemployment.sf1 <- stan(file='unemployment.stan', data=dataList.1,
+                         iter=1000, chains=4)
 print(unemployment.sf1)
 
 ## Simulating replicated datasets

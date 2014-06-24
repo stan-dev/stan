@@ -4,17 +4,8 @@ source("grades.data.R", echo = TRUE)
 
 ## Estimate the model (grades.stan)
 # lm (final ~ midterm)
-if (!exists("grades.sm")) {
-    if (file.exists("grades.sm.RData")) {
-        load("grades.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("grades.stan", model_name = "grades")
-        grades.sm <- stan_model(stanc_ret = rt)
-        save(grades.sm, file = "grades.sm.RData")
-    }
-}
 dataList.1 <- c("N","midterm","final")
-grades.sf1 <- sampling(grades.sm, dataList.1)
+grades.sf1 <- stan(file='grades.stan', data=dataList.1, iter=1000, chains=4)
 print(grades.sf1)
 
 beta.post <- extract(grades.sf1, "beta")$beta

@@ -13,11 +13,19 @@ transformed data {
 }
 parameters {
   vector[4] beta;
-  real<lower=0> omega;
+  vector[N] lambda;
+  real<lower=0> tau;
 } 
+transformed parameters {
+  real<lower=0> sigma;
+
+  sigma <- 1.0 / sqrt(tau);
+}
 model {
-  for (n in 1:N)
-    y[n] ~ neg_binomial(exposure2[n] * exp(beta[1] + beta[2] * roach1[n] 
-                        + beta[3] * treatment[n] + beta[4] * senior[n]) 
-                        / (omega - 1),1.0 / (omega - 1));
+  tau ~ gamma(0.001, 0.001);
+  for (i in 1:N) {
+    lambda[i] ~ normal(0, sigma);
+    y[i] ~ poisson_log(lambda[i] + log_expo[i] + beta[1] + beta[2]*roach1[i] 
+                       + beta[3]*senior[i] + beta[4]*treatment[i]);
+  }
 }
