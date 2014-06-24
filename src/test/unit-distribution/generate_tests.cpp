@@ -15,7 +15,7 @@ using std::stringstream;
 using std::endl;
 using std::pair;
 
-const int N_TESTS = 100;
+const int N_TESTS = 75;
 
 vector<string> lookup_argument(const string& argument, const int& ind) {
   using boost::iequals;
