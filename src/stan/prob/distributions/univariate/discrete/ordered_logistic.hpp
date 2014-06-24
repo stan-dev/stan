@@ -140,11 +140,11 @@ namespace stan {
       check_finite(function, c(0),
                    "Cut points parameter", (double*)0);
 
-      Eigen::VectorXd cut(c.rows());
+      Eigen::VectorXd cut(c.rows()+1);
       cut(0) = 1 - inv_logit(eta - c(0));
-      for(int j = 1; j < c.rows() - 1; j++)
+      for(int j = 1; j < c.rows(); j++)
         cut(j) = inv_logit(eta - c(j - 1)) - inv_logit(eta - c(j));
-      cut(c.rows() - 1) = inv_logit(eta - c(c.rows() - 2));
+      cut(c.rows()) = inv_logit(eta - c(c.rows() - 1));
 
       return stan::prob::categorical_rng(cut, rng);
     }
