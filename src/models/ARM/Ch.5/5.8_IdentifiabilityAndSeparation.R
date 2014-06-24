@@ -11,19 +11,9 @@ library(ggplot2)
 source("separation.data.R", echo = TRUE)
 
 ## Model: y ~ x
-
-if (!exists("separation.sm")) {
-    if (file.exists("separation.sm.RData")) {
-        load("separation.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("separation.stan", model_name = "separation")
-        separation.sm <- stan_model(stanc_ret = rt)
-        save(separation.sm, file = "separation.sm.RData")
-    }
-}
-
 data.list <- c("N", "y", "x")
-separation.sf <- sampling(separation.sm, data.list)
+separation.sf <- stan(file='separation.stan', data=data.list,
+                      iter=1000, chains=4)
 print(separation.sf)
 
 ## Plot

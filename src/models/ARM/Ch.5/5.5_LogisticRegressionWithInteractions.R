@@ -9,18 +9,9 @@ source("wells.data.R", echo = TRUE)
 
 ## Model: switched ~ dist/100 + arsenic + dist/100:arsenic
 
-if (!exists("wells_interaction.sm")) {
-    if (file.exists("wells_interaction.sm.RData")) {
-        load("wells_interaction.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_interaction.stan", model_name = "wells_interaction")
-        wells_interaction.sm <- stan_model(stanc_ret = rt)
-        save(wells_interaction.sm, file = "wells_interaction.sm.RData")
-    }
-}
-
 data.list.1 <- c("N", "switched", "dist", "arsenic")
-wells_interaction.sf <- sampling(wells_interaction.sm, data.list.1)
+wells_interaction.sf <- stan(file='wells_interaction.stan', data=data.list.1,
+                             iter=1000, chains=4)
 print(wells_interaction.sf, pars = c("beta", "lp__"))
 
 ### Centering the input variabiles
@@ -29,17 +20,9 @@ print(wells_interaction.sf, pars = c("beta", "lp__"))
 ## c_dist100 <- dist/100 - mean(dist/100)
 ## c_arsenic <- arsenic - mean(arsenic)
 
-if (!exists("wells_interaction_c.sm")) {
-    if (file.exists("wells_interaction_c.sm.RData")) {
-        load("wells_interaction_c.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_interaction_c.stan", model_name = "wells_interaction_c")
-        wells_interaction_c.sm <- stan_model(stanc_ret = rt)
-        save(wells_interaction_c.sm, file = "wells_interaction_c.sm.RData")
-    }
-}
-
-wells_interaction_c.sf <- sampling(wells_interaction_c.sm, data.list.1)
+wells_interaction_c.sf <- stan(file='wells_interaction_c.stan',
+                               data=data.list.1,
+                               iter=1000, chains=4)
 print(wells_interaction_c.sf)
 
 ## Figure 5.12: graphing the (first) model with interaction
@@ -82,35 +65,17 @@ print(p2)
 ## Model: switched ~ c_dist100 + c_arsenic + c_dist100:c_arsenic + assoc + educ4
 ## educ4 <- educ / 4
 
-if (!exists("wells_daae_c.sm")) {
-    if (file.exists("wells_daae_c.sm.RData")) {
-        load("wells_daae_c.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_daae_c.stan", model_name = "wells_daae_c")
-        wells_daae_c.sm <- stan_model(stanc_ret = rt)
-        save(wells_daae_c.sm, file = "wells_daae_c.sm.RData")
-    }
-}
-
 data.list.2 <- c("N", "switched", "dist", "arsenic", "assoc", "educ")
-wells_daae_c.sf <- sampling(wells_daae_c.sm, data.list.2)
+wells_daae_c.sf <- stan(file='wells_daae_c.stan', data=data.list.2,
+                        iter=1000, chains=4)
 print(wells_daae_c.sf)
 
 ## Without community organization variable
 ## Model: switched ~ c_dist100 + c_arsenic + c_dist100:c_arsenic + educ4
 
-if (!exists("wells_dae_c.sm")) {
-    if (file.exists("wells_dae_c.sm.RData")) {
-        load("wells_dae_c.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_dae_c.stan", model_name = "wells_dae_c")
-        wells_dae_c.sm <- stan_model(stanc_ret = rt)
-        save(wells_dae_c.sm, file = "wells_dae_c.sm.RData")
-    }
-}
-
 data.list.3 <- c("N", "switched", "dist", "arsenic", "educ")
-wells_dae_c.sf <- sampling(wells_dae_c.sm, data.list.3)
+wells_dae_c.sf <- stan(file='wells_dae_c.stan', data=data.list.3,
+                       iter=1000, chains=4)
 print(wells_dae_c.sf)
 
 ## Adding further interactions (centering education variable)
@@ -118,15 +83,6 @@ print(wells_dae_c.sf)
 ##                   + c_dist100:c_educ4 + c_arsenic:c_educ4
 ## c_educ4 <- educ/4 - mean(educ/4)
 
-if (!exists("wells_dae_inter_c.sm")) {
-    if (file.exists("wells_dae_inter_c.sm.RData")) {
-        load("wells_dae_inter_c.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_dae_inter_c.stan", model_name = "wells_dae_inter_c")
-        wells_dae_inter_c.sm <- stan_model(stanc_ret = rt)
-        save(wells_dae_inter_c.sm, file = "wells_dae_inter_c.sm.RData")
-    }
-}
-
-wells_dae_inter_c.sf <- sampling(wells_dae_inter_c.sm, data.list.3)
+wells_dae_inter_c.sf <- stan(file='wells_dae_inter_c.stan', data=data.list.3,
+                             iter=1000, chains=4)
 print(wells_dae_inter_c.sf)

@@ -6,19 +6,9 @@ library(ggplot2)
 source("nes1992_vote.data.R", echo = TRUE)
 
 ### Logistic model: vote ~ income
-
-if (!exists("nes_logit.sm")) {
-    if (file.exists("nes_logit.sm.RData")) {
-        load("nes_logit.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("nes_logit.stan", model_name = "nes_logit")
-        nes_logit.sm <- stan_model(stanc_ret = rt)
-        save(nes_logit.sm, file = "nes_logit.sm.RData")
-    }
-}
-
 data.list <- c("N", "vote", "income")
-nes_logit.sf <- sampling(nes_logit.sm, data.list)
+nes_logit.sf <- stan(file='nes_logit.stan', data=data.list,
+                     iter=1000, chains=4)
 print(nes_logit.sf, pars = c("beta", "lp__"))
 
 ### Figures

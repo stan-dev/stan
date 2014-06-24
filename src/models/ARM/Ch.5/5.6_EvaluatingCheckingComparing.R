@@ -11,18 +11,9 @@ source("wells.data.R", echo = TRUE)
 ### c_arsenic <- arsenic - mean(arsenic)
 ### c_educ4   <- (educ - mean(educ)) / 4
 
-if (!exists("wells_predicted.sm")) {
-    if (file.exists("wells_predicted.sm.RData")) {
-        load("wells_predicted.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_predicted.stan", model_name = "wells_predicted")
-        wells_predicted.sm <- stan_model(stanc_ret = rt)
-        save(wells_predicted.sm, file = "wells_predicted.sm.RData")
-    }
-}
-
 data.list <- c("N", "switched", "dist", "arsenic", "educ")
-wells_predicted.sf <- sampling(wells_predicted.sm, data.list)
+wells_predicted.sf <- stan(file='wells_predicted.stan', data=data.list,
+                           iter=1000, chains=4)
 print(wells_predicted.sf, pars = c("beta", "lp__"))
 
 ## Residual Plot (Figure 5.13 (a))
@@ -109,18 +100,9 @@ print(p4)
 ###                                + c_dist100:c_log_arsenic + c_dist100:c_educ4
 ###                                + c_log_arsenic:c_educ4
 ### c_log_arsenic <- log(arsenic) - mean(log(arsenic))
-
-if (!exists("wells_predicted_log.sm")) {
-    if (file.exists("wells_predicted_log.sm.RData")) {
-        load("wells_predicted_log.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_predicted_log.stan", model_name = "wells_predicted_log")
-        wells_predicted_log.sm <- stan_model(stanc_ret = rt)
-        save(wells_predicted_log.sm, file = "wells_predicted_log.sm.RData")
-    }
-}
-
-wells_predicted_log.sf <- sampling(wells_predicted_log.sm, data.list.1)
+wells_predicted_log.sf <- stan(file='wells_predicted_log.stan',
+                               data=data.list,
+                               iter=1000, chains=4)
 print(wells_predicted_log.sf, pars = c("beta", "lp__"))
 
 beta.post <- extract(wells_predicted_log.sf, "beta")$beta

@@ -13,7 +13,7 @@ transformed data {
   vector[N] de_inter;
   vector[N] ae_inter;
   c_dist100 <- (dist - mean(dist)) / 100.0;
-  c_arsenic <- arsenic - mean(arsenic);
+  c_arsenic <- log(arsenic) - mean(log(arsenic));
   c_educ4   <- (educ - mean(educ)) / 4.0;
   da_inter  <- c_dist100 .* c_arsenic;
   de_inter  <- c_dist100 .* c_educ4;

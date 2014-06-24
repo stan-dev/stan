@@ -6,18 +6,9 @@ source("wells.data.R", echo = TRUE)
 
 ### Model: switched ~ dist/100 + arsenic + educ/4
 
-if (!exists("wells_dae.sm")) {
-    if (file.exists("wells_dae.sm.RData")) {
-        load("wells_dae.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_dae.stan", model_name = "wells_dae")
-        wells_dae.sm <- stan_model(stanc_ret = rt)
-        save(wells_dae.sm, file = "wells_dae.sm.RData")
-    }
-}
-
 data.list <- c("N", "switched", "dist", "arsenic", "educ")
-wells_dae.sf <- sampling(wells_dae.sm, data.list)
+wells_dae.sf <- stan(file='wells_dae.stan', data=data.list,
+                     iter=1000, chains=4)
 print(wells_dae.sf, pars = c("beta", "lp__"))
 
 ## Avg predictive differences
@@ -52,17 +43,8 @@ print(mean(delta))
 ### Avg predictive comparisons with interactions
 ##  switches ~ dist/100 + arsenic + educ/4 + dist/100:arsenic
 
-if (!exists("wells_dae_inter.sm")) {
-    if (file.exists("wells_dae_inter.sm.RData")) {
-        load("wells_dae_inter.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_dae_inter.stan", model_name = "wells_dae_inter")
-        wells_dae_inter.sm <- stan_model(stanc_ret = rt)
-        save(wells_dae_inter.sm, file = "wells_dae_inter.sm.RData")
-    }
-}
-
-wells_dae_inter.sf <- sampling(wells_dae_inter.sm, data.list)
+wells_dae_inter.sf <- stan(file='wells_dae_inter.stan', data=data.list,
+                           iter=1000, chains=4)
 print(wells_dae_inter.sf)
 
 b <- colMeans(extract(wells_dae_inter.sf, "beta")$beta)

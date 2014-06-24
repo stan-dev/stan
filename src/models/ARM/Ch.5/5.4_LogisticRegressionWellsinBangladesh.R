@@ -17,33 +17,15 @@ print(p1)
 
 # First logistic model: switched ~ dist
 
-if (!exists("wells_dist.sm")) {
-    if (file.exists("wells_dist.sm.RData")) {
-        load("wells_dist.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_dist.stan", model_name = "wells_dist")
-        wells_dist.sm <- stan_model(stanc_ret = rt)
-        save(wells_dist.sm, file = "wells_dist.sm.RData")
-    }
-}
-
 data.list.1 <- c("N", "switched", "dist")
-wells_dist.sf <- sampling(wells_dist.sm, data.list.1)
+wells_dist.sf <- stan(file='wells_dist.stan', data=data.list.1,
+                      iter=1000, chains=4)
 print(wells_dist.sf, pars = c("beta", "lp__"))
 
 # More reasonable model: switched ~ dist/100
 
-if (!exists("wells_dist100.sm")) {
-    if (file.exists("wells_dist100.sm.RData")) {
-        load("wells_dist100.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_dist100.stan", model_name = "wells_dist100")
-        wells_dist100.sm <- stan_model(stanc_ret = rt)
-        save(wells_dist100.sm, file = "wells_dist100.sm.RData")
-    }
-}
-
-wells_dist100.sf <- sampling(wells_dist100.sm, data.list.1)
+wells_dist100.sf <- stan(file='wells_dist100.stan', data=data.list.1,
+                         iter=1000, chains=4)
 print(wells_dist100.sf, pars = c("beta", "lp__"))
 
 # Figure 5.9
@@ -74,18 +56,9 @@ print(p3)
 
 # Model: switched ~ dist/100 + arsenic
 
-if (!exists("wells_d100ars.sm")) {
-    if (file.exists("wells_d100ars.sm.RData")) {
-        load("wells_d100ars.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("wells_d100ars.stan", model_name = "wells_d100ars")
-        wells_d100ars.sm <- stan_model(stanc_ret = rt)
-        save(wells_d100ars.sm, file = "wells_d100ars.sm.RData")
-    }
-}
-
 data.list.3 <- c("N", "switched", "dist", "arsenic")
-wells_d100ars.sf <- sampling(wells_d100ars.sm, data.list.3)
+wells_d100ars.sf <- stan(file='wells_d100ars.stan', data=data.list.3,
+                         iter=1000, chains=4)
 print(wells_d100ars.sf, pars = c("beta", "lp__"))
 
 beta.post.3 <- extract(wells_d100ars.sf, "beta")$ beta

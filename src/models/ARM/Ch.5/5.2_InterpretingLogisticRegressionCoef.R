@@ -7,16 +7,6 @@ library(ggplot2)
 
 ### Logistic model: vote ~ income
 
-if (!exists("nes_logit.sm")) {
-    if (file.exists("nes_logit.sm.RData")) {
-        load("nes_logit.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("nes_logit.stan", model_name = "nes_logit")
-        nes_logit.sm <- stan_model(stanc_ret = rt)
-        save(nes_logit.sm, file = "nes_logit.sm.RData")
-    }
-}
-
 ## Sampling over 13 years & building a data frame for Figure 5.4
 
 nes_vote.ggdf <- data.frame(c(), c(), c(), c()) # empty data frame
@@ -24,7 +14,7 @@ years <- seq(1952, 2000, 4)
 for (i in years) {
     source(paste("nes", i, "_vote.data.R", sep = ""))
     data.list <- c("N", "vote", "income")
-    sf <- sampling(nes_logit.sm, data.list)
+    sf <- stan(file='nes_logit.stan', data=data.list, iter=1000, chains=4)
     beta.post <- extract(sf, "beta")$beta
     beta.mean <- colMeans(beta.post)
     beta.sd   <- apply(beta.post, 2, sd)
