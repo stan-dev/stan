@@ -10,9 +10,8 @@ transformed data {
 }
 parameters {
   vector[2] beta;
-  real<lower=0> sigma;
 } 
 model {
   for (n in 1:N)
-    switc[n] ~ normal(inv_logit(beta[1] + beta[2] * dist100[n]),sigma);
+    switc[n] ~ bernoulli(Phi(beta[1] + beta[2] * dist100[n]));
 }
