@@ -6,23 +6,13 @@ library(ggplot2)
 source("kidiq.data.R", echo = TRUE)
 
 ### Model: kid_score ~ mom_hs + mom_iq + mom_hs:mom_iq
-
-if (!exists("kidiq_interaction.sm")) {
-    if (file.exists("kidiq_interaction.sm.RData")) {
-        load("kidiq_interaction.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("kidiq_interaction.stan", model_name = "kidiq_interaction")
-        kidiq_interaction.sm <- stan_model(stanc_ret = rt)
-        save(kidiq_interaction.sm, file = "kidiq_interaction.sm.RData")
-    }
-}
-
 data.list <- c("N", "kid_score", "mom_hs", "mom_iq")
-kidiq_interaction.sf <- sampling(kidiq_interaction.sm, data.list)
-print(kidiq_interaction.sf, pars = c("beta", "sigma", "lp__"))
+kidiq_interaction <- stan(file='kidiq_interaction.stan', data=data.list,
+                          iter=1000, chains=4)
+print(kidiq_interaction, pars = c("beta", "sigma", "lp__"))
 
 ### Figures
-beta.post <- extract(kidiq_interaction.sf, "beta")$beta
+beta.post <- extract(kidiq_interaction, "beta")$beta
 beta.mean <- colMeans(beta.post)
 kidiq.data <- data.frame(kid_score, mom_hs = as.factor(mom_hs), mom_iq)
 levels(kidiq.data$mom_hs) <- c("No", "Yes")

@@ -7,19 +7,9 @@ library(ggplot2)
 source("kidiq.data.R", echo = TRUE)
 
 ### Regression line as a function of one input variable
-
-if (!exists("kidscore_momiq.sm")) {
-    if (file.exists("kidscore_momiq.sm.RData")) {
-        load("kidscore_momiq.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("kidscore_momiq.stan", model_name = "kidscore_momiq")
-        kidscore_momiq.sm <- stan_model(stanc_ret = rt)
-        save(kidscore_momiq.sm, file = "kidscore_momiq.sm.RData")
-    }
-}
-
 data.list.2 <- c("N", "kid_score", "mom_iq")
-stanfit.2 <- sampling(kidscore_momiq.sm, data.list.2)
+stanfit.2 <- stan(file='kidscore_momiq.stan', data=data.list.2,
+                  iter=1000, chains=4)
 print(stanfit.2, pars = c("beta", "sigma", "lp__"))
 
 # Figure 3.2
@@ -37,19 +27,11 @@ print(p2)
 ### Two fitted regression lines
 
 ## Model with no interaction: kid_score ~ mom_hs + mom_iq
-
-if (!exists("kidiq_multi_preds.sm")) {
-    if (file.exists("kidiq_multi_preds.sm.RData")) {
-        load("kidiq_multi_preds.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("kidiq_multi_preds.stan", model_name = "kidiq_multi_preds")
-        kidiq_multi_preds.sm <- stan_model(stanc_ret = rt)
-        save(kidiq_multi_preds.sm, file = "kidiq_multi_preds.sm.RData")
-    }
-}
 data.list.3 <- c("N", "kid_score", "mom_hs", "mom_iq")
-stanfit.3 <- sampling(kidiq_multi_preds.sm, data.list.3)
+stanfit.3 <- stan(file='kidiq_multi_preds.stan', data=data.list.3,
+                  iter=1000, chains=4)
 print(stanfit.3, pars = c("beta", "sigma", "lp__"))
+
 # Figure 3.3
 dev.new()
 beta.post.3 <- extract(stanfit.3, "beta")$beta
@@ -68,18 +50,10 @@ p3 <- ggplot(kidiq.data.3, aes(x = mom_iq, y = kid_score, color = mom_hs)) +
 print(p3)
 
 ## Model with interaction: kid_score ~ mom_hs + mom_iq + mom_hs:mom_iq
-
-if (!exists("kidiq_interaction.sm")) {
-    if (file.exists("kidiq_interaction.sm.RData")) {
-        load("kidiq_interaction.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("kidiq_interaction.stan", model_name = "kidiq_interaction")
-        kidiq_interaction.sm <- stan_model(stanc_ret = rt)
-        save(kidiq_interaction.sm, file = "kidiq_interaction.sm.RData")
-    }
-}
-stanfit.4 <- sampling(kidiq_interaction.sm, data.list.3)
+stanfit.4 <- stan(file='kidiq_interaction.stan', data=data.list.3,
+                  iter=1000, chains=4)
 print(stanfit.4, pars = c("beta", "sigma", "lp__"))
+
 # Figure 3.4 (a)
 dev.new()
 beta.post.4 <- extract(stanfit.4, "beta")$beta
@@ -94,6 +68,7 @@ p4 <- ggplot(kidiq.data.3, aes(x = mom_iq, y = kid_score, color = mom_hs)) +
     theme_bw()
 print(p4 + scale_x_continuous("Mother IQ score", breaks = c(80, 100, 120, 140)) +
     scale_y_continuous("Child test score", breaks = c(20, 60, 100, 140)))
+
 # Figure 3.4 (b)
 dev.new()
 print(p4 +

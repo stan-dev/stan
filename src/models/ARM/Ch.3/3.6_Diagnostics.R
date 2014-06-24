@@ -6,19 +6,9 @@ library(ggplot2)
 source("kidiq.data.R", echo = TRUE)
 
 ### Model: kid_score ~ mom_iq
-
-if (!exists("kidscore_momiq.sm")) {
-    if (file.exists("kidscore_momiq.sm.RData")) {
-        load("kidscore_momiq.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("kidscore_momiq.stan", model_name = "kidscore_momiq")
-        kidscore_momiq.sm <- stan_model(stanc_ret = rt)
-        save(kidscore_momiq.sm, file = "kidscore_momiq.sm.RData")
-    }
-}
-
 data.list.2 <- c("N", "kid_score", "mom_iq")
-kidscore_momiq.sf <- sampling(kidscore_momiq.sm, data.list.2)
+kidscore_momiq.sf <- stan(file='kidscore_momiq.stan', data=data.list.2,
+                          iter=1000, chains=4)
 print(kidscore_momiq.sf, pars = c("beta", "sigma", "lp__"))
 
 ### Figure 3.12

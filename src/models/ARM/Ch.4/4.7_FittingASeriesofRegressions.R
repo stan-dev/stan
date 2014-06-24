@@ -7,16 +7,6 @@ library(ggplot2)
 
 ### Model
 
-if (!exists("nes.sm")) {
-    if (file.exists("nes.sm.RData")) {
-        load("nes.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("nes.stan", model_name = "nes")
-        nes.sm <- stan_model(stanc_ret = rt)
-        save(nes.sm, file = "nes.sm.RData")
-    }
-}
-
 ## Sampling over eight years & building a data frame for Figure 4.6
 
 nes.post <- data.frame(c(), c(), c(), c(), c()) # empty data frame
@@ -28,7 +18,7 @@ for (i in years) {
     source(paste("nes", i, ".data.R", sep=""))
     data.list <- c("N", "partyid7", "real_ideo", "race_adj", "age_discrete",
                    "educ1", "gender", "income")
-    sf <- sampling(nes.sm, data.list)
+    sf <- stan(file='nes.stan', data=data.list, iter=1000, chains=4)
     beta.post <- extract(sf, "beta")$beta
     beta.mean <- colMeans(beta.post)
     beta.sd <- apply(beta.post, 2, sd)

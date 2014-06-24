@@ -6,19 +6,9 @@ library(ggplot2)
 source("earnings.data.R", echo = TRUE)
 
 ### Log transformation
-
-if (!exists("logearn_height.sm")) {
-    if (file.exists("logearn_height.sm.RData")) {
-        load("logearn_height.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("logearn_height.stan", model_name = "logearn_height")
-        logearn_height.sm <- stan_model(stanc_ret = rt)
-        save(logearn_height.sm, file = "logearn_height.sm.RData")
-    }
-}
-
 data.list.1 <- c("N", "earn", "height")
-logearn_height.sf <- sampling(logearn_height.sm, data.list.1)
+logearn_height.sf <- stan(file='logearn_height.stan', data=data.list.1,
+                          iter=1000, chains=4)
 print(logearn_height.sf, pars = c("beta", "sigma", "lp__"))
 
 # Figure 4.3
@@ -65,74 +55,31 @@ p2 <- ggplot(data.frame(height, earn), aes(x = height, y = earn)) +
 print(p2)
 
 ### Log-base-10 transformation
-
-if (!exists("log10earn_height.sm")) {
-    if (file.exists("log10earn_height.sm.RData")) {
-        load("log10earn_height.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("log10earn_height.stan", model_name = "log10earn_height")
-        log10earn_height.sm <- stan_model(stanc_ret = rt)
-        save(log10earn_height.sm, file = "log10earn_height.sm.RData")
-    }
-}
-
-log10earn_height.sf <- sampling(log10earn_height.sm, data.list.1)
+log10earn_height.sf <- stan(file='log10earn_height.stan', data=data.list.1,
+                            iter=1000, chains=4)
 print(log10earn_height.sf, pars = c("beta", "sigma", "lp__"))
 
 ### Log scale regression model
-
-if (!exists("logearn_height_male.sm")) {
-    if (file.exists("logearn_height_male.sm.RData")) {
-        load("logearn_height_male.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("logearn_height_male.stan", model_name = "logearn_height_male")
-        logearn_height_male.sm <- stan_model(stanc_ret = rt)
-        save(logearn_height_male.sm, file = "logearn_height_male.sm.RData")
-    }
-}
-
 data.list.2 <- c("N", "earn", "height", "male")
-logearn_height_male.sf <- sampling(logearn_height_male.sm, data.list.2)
+logearn_height_male.sf <- stan(file='logearn_height_male.stan',
+                               data=data.list.2,
+                               iter=1000, chains=4)
 print(logearn_height_male.sf, pars = c("beta", "sigma", "lp__"))
 
 ### Including interactions
-
-if (!exists("logearn_interaction.sm")) { if
-    (file.exists("logearn_interaction.sm.RData")) {
-    load("logearn_interaction.sm.RData", verbose = TRUE) } else { rt <-
-    stanc("logearn_interaction.stan", model_name = "logearn_interaction")
-    logearn_interaction.sm <- stan_model(stanc_ret = rt)
-    save(logearn_interaction.sm, file = "logearn_interaction.sm.RData") } }
-
-logearn_interaction.sf <- sampling(logearn_interaction.sm, data.list.2)
+logearn_interaction.sf <- stan(file='logearn_interaction.stan',
+                               data=data.list.2,
+                               iter=2000, chains=4)
 print(logearn_interaction.sf, pars = c("beta", "sigma", "lp__"))
 
 ### Linear transformations
-
-if (!exists("logearn_interaction_z.sm")) {
-    if (file.exists("logearn_interaction_z.sm.RData")) {
-        load("logearn_interaction_z.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("logearn_interaction_z.stan", model_name = "logearn_interaction_z")
-        logearn_interaction_z.sm <- stan_model(stanc_ret = rt)
-        save(logearn_interaction_z.sm, file = "logearn_interaction_z.sm.RData")
-    }
-}
-
-logearn_interaction_z.sf <- sampling(logearn_interaction_z.sm, data.list.2)
+logearn_interaction_z.sf <- stan(file='logearn_interaction_z.stan',
+                                 data=data.list.2,
+                                 iter=1000, chains=4)
 print(logearn_interaction_z.sf, pars = c("beta", "sigma", "lp__"))
 
 ### Log-log model
-
-if (!exists("logearn_logheight.sm")) {
-    if (file.exists("logearn_logheight.sm.RData")) {
-        load("logearn_logheight.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("logearn_logheight.stan", model_name = "logearn_logheight")
-        logearn_logheight.sm <- stan_model(stanc_ret = rt)
-        save(logearn_logheight.sm, file = "logearn_logheight.sm.RData")
-    }
-}
-
-logearn_logheight.sf <- sampling(logearn_logheight.sm, data.list.2)
+logearn_logheight.sf <- stan(file='logearn_logheight.stan',
+                             data=data.list.2,
+                             iter=1000, chains=4)
 print(logearn_logheight.sf, pars = c("beta", "sigma", "lp__"))

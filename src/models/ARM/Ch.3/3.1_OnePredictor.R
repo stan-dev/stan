@@ -6,40 +6,20 @@ library(ggplot2)
 source("kidiq.data.R", echo = TRUE)
 
 ### First model: kid_score ~ mom_hs
-
-if (!exists("kidscore_momhs.sm")) {
-    if (file.exists("kidscore_momhs.sm.RData")) {
-        load("kidscore_momhs.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("kidscore_momhs.stan", model_name = "kidscore_momhs")
-        kidscore_momhs.sm <- stan_model(stanc_ret = rt)
-        save(kidscore_momhs.sm, file = "kidscore_momhs.sm.RData")
-    }
-}
-
 data.list.1 <- c("N", "kid_score", "mom_hs")
-kidscore_momhs.sf <- sampling(kidscore_momhs.sm, data.list.1)
-print(kidscore_momhs.sf, pars = c("beta", "sigma", "lp__"))
+kidscore_momhs <- stan(file="kidscore_momhs.stan", data=data.list.1,
+                       iter=1000, chains=4)
+print(kidscore_momhs, pars = c("beta", "sigma", "lp__"))
 
 ### Second model: kid_score ~ mom_iq
-
-if (!exists("kidscore_momiq.sm")) {
-    if (file.exists("kidscore_momiq.sm.RData")) {
-        load("kidscore_momiq.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("kidscore_momiq.stan", model_name = "kidscore_momiq")
-        kidscore_momiq.sm <- stan_model(stanc_ret = rt)
-        save(kidscore_momiq.sm, file = "kidscore_momiq.sm.RData")
-    }
-}
-
 data.list.2 <- c("N", "kid_score", "mom_iq")
-kidscore_momiq.sf <- sampling(kidscore_momiq.sm, data.list.2)
-print(kidscore_momiq.sf, pars = c("beta", "sigma", "lp__"))
+kidscore_momiq <- stan(file='kidscore_momiq.stan', data=data.list.2,
+                       iter=1000, chains=4)
+print(kidscore_momiq, pars = c("beta", "sigma", "lp__"))
 
 # Figure 3.1
 kidiq.data <- data.frame(kid_score, mom_hs, mom_iq)
-beta.post.1 <- extract(kidscore_momhs.sf, "beta")$beta
+beta.post.1 <- extract(kidscore_momhs, "beta")$beta
 beta.mean.1 <- colMeans(beta.post.1)
 p1 <- ggplot(kidiq.data, aes(x = mom_hs, y = kid_score)) +
     geom_jitter(position = position_jitter(width = 0.05, height = 0)) +
@@ -51,7 +31,7 @@ print(p1)
 
 # Figure 3.2
 dev.new()
-beta.post.2 <- extract(kidscore_momiq.sf, "beta")$beta
+beta.post.2 <- extract(kidscore_momiq, "beta")$beta
 beta.mean.2 <- colMeans(beta.post.2)
 p2 <- ggplot(kidiq.data, aes(x = mom_iq, y = kid_score)) +
     geom_point() +

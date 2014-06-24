@@ -7,23 +7,14 @@ source("earnings.data.R", echo = TRUE)
 
 ### First model: earn ~ height
 
-if (!exists("earn_height.sm")) {
-    if (file.exists("earn_height.sm.RData")) {
-        load("earn_height.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("earn_height.stan", model_name = "earn_height")
-        earn_height.sm <- stan_model(stanc_ret = rt)
-        save(earn_height.sm, file = "earn_height.sm.RData")
-    }
-}
-
 data.list <- c("N", "earn", "height")
-earn_height.sf <- sampling(earn_height.sm, data.list)
-print(earn_height.sf, pars = c("beta", "sigma", "lp__"))
+earn_height <- stan(file="earn_height.stan", data=data.list,
+                    iter=1000, chains=4)
+print(earn_height, pars = c("beta", "sigma", "lp__"))
 
 ### Figures
 
-beta.post <- extract(earn_height.sf, "beta")$beta
+beta.post <- extract(earn_height, "beta")$beta
 beta.mean <- colMeans(beta.post)
 n <- 100
 ndx <- sample(nrow(beta.post), n)

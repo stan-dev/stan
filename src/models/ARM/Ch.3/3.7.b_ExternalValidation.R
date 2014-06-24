@@ -6,19 +6,9 @@ library(ggplot2)
 source("kids_before1987.data.R", echo = TRUE)
 
 ### Model: ppvt ~ hs + afqt
-
-if (!exists("kidiq_validation.sm")) {
-    if (file.exists("kidiq_validation.sm.RData")) {
-        load("kidiq_validation.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("kidiq_validation.stan", model_name = "kidiq_validation")
-        kidiq_validation.sm <- stan_model(stanc_ret = rt)
-        save(kidiq_validation.sm, file = "kidiq_validation.sm.RData")
-    }
-}
-
 data.list <- c("N", "ppvt", "hs", "afqt")
-kidiq_pre1987.sf <- sampling(kidiq_validation.sm, data.list)
+kidiq_pre1987.sf <- stan(file='kidiq_validation.stan', data=data.list,
+                         iter=1000, chains=4)
 print(kidiq_pre1987.sf, pars = c("beta", "sigma", "lp__"))
 
 ### External validation
