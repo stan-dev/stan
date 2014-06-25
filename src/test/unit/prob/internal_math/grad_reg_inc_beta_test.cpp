@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
+#include <stan/prob/internal_math/fwd/inc_beta.hpp>
+#include <stan/prob/internal_math/rev/inc_beta.hpp>
 #include <stan/prob/internal_math/math/grad_reg_inc_beta.hpp>
-
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>

@@ -1,16 +1,7 @@
 #ifndef __STAN__PROB__INTERNAL_MATH__MATH__F32_HPP__
 #define __STAN__PROB__INTERNAL_MATH__MATH__F32_HPP__
 
-#include <math.h>
-#include <stan/agrad/fwd/functions/exp.hpp>
-#include <stan/agrad/fwd/functions/log.hpp>
-#include <stan/agrad/fwd/functions/fabs.hpp>
-#include <stan/agrad/fwd/operators.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
-#include <stan/agrad/rev/functions/log.hpp>
-#include <stan/agrad/rev/functions/fabs.hpp>
-#include <stan/agrad/rev/operators.hpp>
+#include <cmath>
 
 namespace stan {
     
@@ -21,9 +12,6 @@ namespace stan {
       using std::exp;
       using std::log;
       using std::fabs;
-      using stan::agrad::exp;
-      using stan::agrad::log;
-      using stan::agrad::fabs;
 
       T F = 1.0;
           

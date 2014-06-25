@@ -1,11 +1,7 @@
 #ifndef __STAN__PROB__INTERNAL_MATH__MATH__GRAD_2F1_HPP__
 #define __STAN__PROB__INTERNAL_MATH__MATH__GRAD_2F1_HPP__
 
-#include <math.h>
-#include <stan/agrad/fwd/functions/fabs.hpp>
-#include <stan/agrad/fwd/operators.hpp>
-#include <stan/agrad/rev/functions/fabs.hpp>
-#include <stan/agrad/rev/operators.hpp>
+#include <cmath>
 
 namespace stan {
     
@@ -16,7 +12,6 @@ namespace stan {
     void grad_2F1(T& gradA, T& gradC, T a, T b, T c, T z, T precision = 1e-6)
     {
           
-      using stan::agrad::fabs;
       using std::fabs;
 
       gradA = 0;

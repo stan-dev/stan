@@ -2,13 +2,9 @@
 #define __STAN__PROB__INTERNAL_MATH__MATH__GRAD_REG_INC_BETA_HPP__
 
 #include <math.h>
-#include <stan/agrad/fwd/operators.hpp>
-#include <stan/agrad/rev/operators.hpp>
 
 #include <stan/prob/internal_math/math/grad_inc_beta.hpp>
 #include <stan/prob/internal_math/math/inc_beta.hpp>
-#include <stan/prob/internal_math/rev/inc_beta.hpp>
-#include <stan/prob/internal_math/fwd/inc_beta.hpp>
 
 namespace stan {
     
@@ -20,7 +16,6 @@ namespace stan {
                            T digammaA, T digammaB, T digammaSum, T betaAB)
     {
       using stan::math::inc_beta;
-      using stan::agrad::inc_beta;
       using stan::math::grad_inc_beta;
 
       T dBda = 0;
