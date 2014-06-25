@@ -14,7 +14,7 @@ transformed parameters {
   vector[N] theta;
 
   theta <- mu_theta + xi * eta;
-  sigma_theta <- abs(xi) / sigma_eta;
+  sigma_theta <- fabs(xi) / sigma_eta;
 }
 model {
   mu_theta ~ normal(0, 100);

@@ -20,23 +20,13 @@ lm.unpooled <- lm (y ~ x + factor(county) - 1)
 summary(lm.unpooled)
 
 ## Call Stan from R
-
-if (!exists("radon.1.sm")) {
-    if (file.exists("radon.1.sm.RData")) {
-        load("radon.1.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon.1.stan", model_name = "radon.1")
-        radon.1.sm <- stan_model(stanc_ret = rt)
-        save(radon.1.sm, file = "radon.1.sm.RData")
-    }
-}
 radon.data <- c("N", "J", "y", "x", "county")
 
 # with 10 iterations
-radon.1.sf <- sampling(radon.1.sm, radon.data, iter = 10)
+radon.1.sf <- stan(file='radon.1.stan', data=radon.data, iter = 10, chains=4)
 
 # with 500 iterations
-radon.1.sf <- sampling(radon.1.sm, radon.data, iter = 500)
+radon.1.sf <- stan(file='radon.1.stan', data=radon.data, iter = 500, chains=4)
 plot(radon.1.sf)   # to get a plot similar to Figure 16.1
 print(radon.1.sf)  # to display the results in the R console
 

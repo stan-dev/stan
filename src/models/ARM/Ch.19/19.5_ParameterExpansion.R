@@ -52,20 +52,12 @@ n.airport <- max(airport)
 n <- length(y)
 
 ## Model fit
-if (!exists("pilots_expansion.sm")) {
-    if (file.exists("pilots_expansion.sm.RData")) {
-        load("pilots_expansion.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("pilots_expansion.stan", model_name = "pilots_expansion")
-        pilots_expansion.sm <- stan_model(stanc_ret = rt)
-        save(pilots_expansion.sm, file = "pilots_expansion.sm.RData")
-    }
-}
 
 dataList.2 <- list(N=n,y=y,n_airport=n.airport,
                    n_treatment=n.treatment,airport=airport,
                    treatment=treatment)
-pilots_expansion.sf1 <- sampling(pilots_expansion.sm, dataList.2)
+pilots_expansion.sf1 <- stan(file='pilots_expansion.stan', data=dataList.2,
+                             iter=1000, chains=4)
 print(pilots_expansion.sf1,pars = c("g","d", "sigma_y", "lp__"))
 
 ## Multilevel logistic regression
@@ -110,34 +102,14 @@ age.edu <- n.edu*(age-1) + edu
 age.edu.ok <- age.edu[ok]
 n.age.edu <- 16
 
-if (!exists("election88_expansion.sm")) {
-    if (file.exists("election88_expansion.sm.RData")) {
-        load("election88_expansion.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("election88_expansion.stan", model_name = "election88_expansion")
-        election88_expansion.sm <- stan_model(stanc_ret = rt)
-        save(election88_expansion.sm, file = "election88_expansion.sm.RData")
-    }
-}
-
 dataList.2 <- list(N=n, n_age=n.age,n_edu=n.edu,n_state=n.state,
                    n_region=n.region, n_age_edu=n.age.edu,
                    y=y,female=female.ok,black=black.ok,
                    age=age.ok,edu=edu.ok, state=state.ok,region=region,
                    v_prev=v.prev,age_edu=age.edu.ok)
-election88_expansion.sf1 <- sampling(election88_expansion.sm, dataList.2)
+election88_expansion.sf1 <- stan(file='election88_expansion.stan',
+                                 data=dataList.2, iter=1000, chains=4)
 print(election88_expansion.sf1, pars = c("beta","b_age", "b_edu","b_state","b_region","b_age_edu", "lp__"))
 
 
 ## item response model -- FIXME: DATA??
-
-
-if (!exists("item_response.sm")) {
-    if (file.exists("item_response.sm.RData")) {
-        load("item_response.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("item_response.stan", model_name = "item_response")
-        item_response.sm <- stan_model(stanc_ret = rt)
-        save(item_response.sm, file = "item_response.sm.RData")
-    }
-}

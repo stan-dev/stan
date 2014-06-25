@@ -31,32 +31,14 @@ cty.sds.sep = sqrt(tapply(y,county,var)/sample.size)
 
 ## Redundant mean parameters for a simple nested model
 # non redundant
-if (!exists("radon.sm")) {
-    if (file.exists("radon.sm.RData")) {
-        load("radon.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon.stan", model_name = "radon")
-        radon.sm <- stan_model(stanc_ret = rt)
-        save(radon.sm, file = "radon.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=n, J=J,y=y,county=county)
-radon.sf1 <- sampling(radon.sm, dataList.1)
+radon.sf1 <- stan(file='radon.stan', data=dataList.1, iter=1000, chains=4)
 print(radon.sf1, pars = c("eta", "sigma_y", "lp__"))
 
 # redudant -- much faster
-if (!exists("radon_redundant.sm")) {
-    if (file.exists("radon_redundant.sm.RData")) {
-        load("radon_redundant.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_redundant.stan", model_name = "radon_redundant")
-        radon_redundant.sm <- stan_model(stanc_ret = rt)
-        save(radon_redundant.sm, file = "radon_redundant.sm.RData")
-    }
-}
 
-radon_redundant.sf1 <- sampling(radon_redundant.sm, dataList.1)
+radon_redundant.sf1 <- stan(file='radon_redundant.stan', data=dataList.1,
+                            iter=1000, chains=4)
 print(radon_redundant.sf1, pars = c("eta", "sigma_y", "lp__"))
 
 #############################################################################################
@@ -110,20 +92,10 @@ n.airport <- max(airport)
 n <- length(y)
 
 ## Model fit
-if (!exists("pilots.sm")) {
-    if (file.exists("pilots.sm.RData")) {
-        load("pilots.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("pilots.stan", model_name = "pilots")
-        pilots.sm <- stan_model(stanc_ret = rt)
-        save(pilots.sm, file = "pilots.sm.RData")
-    }
-}
-
 dataList.2 <- list(N=n,y=y,n_airport=n.airport,
                    n_treatment=n.treatment,airport=airport,
                    treatment=treatment)
-pilots.sf1 <- sampling(pilots.sm, dataList.2)
+pilots.sf1 <- stan(file='pilots.stan', data=dataList.2, iter=1000, chains=4)
 print(pilots.sf1,pars = c("g","d", "sigma_y", "lp__"))
 
 polls.subset <- read.table ("polls.subset.dat")
@@ -166,20 +138,11 @@ age.edu <- n.edu*(age-1) + edu
 age.edu.ok <- age.edu[ok]
 n.age.edu <- 16
 
-if (!exists("election88.sm")) {
-    if (file.exists("election88.sm.RData")) {
-        load("election88.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("election88.stan", model_name = "election88")
-        election88.sm <- stan_model(stanc_ret = rt)
-        save(election88.sm, file = "election88.sm.RData")
-    }
-}
-
 dataList.3 <- list(N=n, n_age=n.age,n_edu=n.edu,n_state=n.state,
                    n_region=n.region, n_age_edu=n.age.edu,
                    y=y,female=female.ok,black=black.ok,
                    age=age.ok,edu=edu.ok, state=state.ok,region=region,
                    v_prev=v.prev,age_edu=age.edu.ok)
-election88.sf1 <- sampling(election88.sm, dataList.3)
+election88.sf1 <- stan(file='election88.stan', data=dataList.3,
+                       iter=1000, chains=4)
 print(election88.sf1, pars = c("beta","b_age", "b_edu","b_state","b_region","b_age_edu", "lp__"))

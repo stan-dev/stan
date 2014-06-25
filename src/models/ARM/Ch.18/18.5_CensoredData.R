@@ -5,17 +5,8 @@ library(ggplot2)
 
 source("weight.data.R", echo = TRUE)
 
-if (!exists("weight.sm")) {
-    if (file.exists("weight.sm.RData")) {
-        load("weight.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("weight.stan", model_name = "weight")
-        weight.sm <- stan_model(stanc_ret = rt)
-        save(weight.sm, file = "weight.sm.RData")
-    }
-}
 weight.data <- c("N", "weight", "height")
-censored.0.sf <- sampling(weight.sm, weight.data)
+censored.0.sf <- stan(file='weight.stan', data=weight.data, iter=1000, chains=4)
 print(censored.0.sf)
 
 ### Censoring
@@ -43,28 +34,21 @@ print(p2)
 
 source("weight_lt200.data.R", echo = TRUE)
 weight.data <- c("N", "weight", "height")
-censored.1.sf <- sampling(weight.sm, weight.data)
+censored.1.sf <- stan(file='weight.stan', data=weight.data, iter=1000, chains=4)
 print(censored.1.sf)
 
 ## Naive regression imputing the censoring points
 
 source("weight_censored.data.R", echo = TRUE)
 weight.data <- c("N", "weight", "height")
-censored.2.sf <- sampling(weight.sm, weight.data)
+censored.2.sf <- stan(file='weight.stan', data=weight.data, iter=1000, chains=4)
 print(censored.2.sf)
 
 ## Fitting the censored-data model
 
 # source("weight_censored.data.R")
-if (!exists("weight_censored.sm")) {
-    if (file.exists("weight_censored.sm.RData")) {
-        load("weight_censored.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("weight_censored.stan", model_name = "weight_censored")
-        weight_censored.sm <- stan_model(stanc_ret = rt)
-        save(weight_censored.sm, file = "weight_censored.sm.RData")
-    }
-}
+
 censoring.data <- c("N", "N_obs", "N_cens", "C", "weight", "height")
-censoring.sf <- sampling(weight_censored.sm, censoring.data)
+censoring.sf <- stan(file='weight_censored.stan', data=censoring.data,
+                     iter=1000, chains=4)
 print(censoring.sf, pars = c("a", "b", "sigma"))

@@ -29,15 +29,15 @@ parameters {
   vector[n_state] b_state_raw;
   real mu;
   real mu_age_edu;
-  real<lower=0,upper=100> sigma_age_raw;
-  real<lower=0,upper=100> sigma_edu_raw;
-  real<lower=0,upper=100> sigma_region_raw;
-  real<lower=0,upper=100> sigma_state_raw;
-  real<lower=0,upper=100> sigma_age_edu_raw;
-  real<lower=0,upper=100> xi_age;
-  real<lower=0,upper=100> xi_edu;
-  real<lower=0,upper=100> xi_age_edu;
-  real<lower=0,upper=100> xi_state;
+  real<lower=0> sigma_age_raw;
+  real<lower=0> sigma_edu_raw;
+  real<lower=0> sigma_region_raw;
+  real<lower=0> sigma_state_raw;
+  real<lower=0> sigma_age_edu_raw;
+  real<lower=0> xi_age;
+  real<lower=0> xi_edu;
+  real<lower=0> xi_age_edu;
+  real<lower=0> xi_state;
 } 
 transformed parameters {
   vector[N] Xbeta;
@@ -48,11 +48,11 @@ transformed parameters {
   vector[n_state] b_state;
   vector[n_state] b_state_hat;
   real mu_adj;
-  real<lower=0,upper=100> sigma_age;
-  real<lower=0,upper=100> sigma_edu;
-  real<lower=0,upper=100> sigma_age_edu;
-  real<lower=0,upper=100> sigma_state;
-  real<lower=0,upper=100> sigma_region;
+  real<lower=0> sigma_age;
+  real<lower=0> sigma_edu;
+  real<lower=0> sigma_age_edu;
+  real<lower=0> sigma_state;
+  real<lower=0> sigma_region;
 
   b_age <- xi_age * (b_age_raw - mean(b_age_raw));
   b_edu <- xi_edu * (b_edu_raw - mean(b_edu_raw));
@@ -79,12 +79,6 @@ transformed parameters {
 model {
   mu ~ normal (0, 100);
   mu_age_edu ~ normal(0, 1);
-  sigma_age_raw ~ uniform(0, 100);
-  sigma_edu_raw ~ uniform(0, 100);
-  sigma_age_edu ~ uniform(0, 100);
-  sigma_state_raw ~ uniform(0, 100);
-  sigma_region_raw ~ uniform(0, 100);
-  sigma_age_edu_raw ~ uniform(0, 100);
 
   b_age_raw ~ normal(0, sigma_age_raw);
   b_edu_raw ~ normal(0, sigma_edu_raw);
@@ -94,11 +88,6 @@ model {
 
   b_v_prev_raw ~ normal(0, 100);
   b_region_raw ~ normal(0, sigma_region_raw);
-
-  xi_age ~ uniform (0, 100);
-  xi_edu ~ uniform (0, 100);
-  xi_age_edu ~ uniform (0, 100);
-  xi_state ~ uniform (0, 100);
 
   y ~ bernoulli_logit(Xbeta);
 }

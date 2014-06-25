@@ -29,18 +29,9 @@ person[newpid==unique.pid[j]] <- j
 
 ## Fit the model
 ## M1 <- lmer (y ~ time + (1 + time | person))
-if (!exists("hiv.sm")) {
-    if (file.exists("hiv.sm.RData")) {
-        load("hiv.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("hiv.stan", model_name = "hiv")
-        hiv.sm <- stan_model(stanc_ret = rt)
-        save(hiv.sm, file = "hiv.sm.RData")
-    }
-}
 
 dataList.1 <- list(N=n, J=84,time=time[ok],person=person[ok],y=y1)
-hiv.sf1 <- sampling(hiv.sm, dataList.1)
+hiv.sf1 <- stan(file='hiv.stan', data=dataList.1, iter=1000, chains=4)
 print(hiv.sf1,pars = c("a","b", "sigma_y", "lp__"))
 post <- extract(hiv.sf1)
 
@@ -65,21 +56,12 @@ CD4.fake <- function(J, K){
   return (data.frame (y=y, time=time, person=person, treatment=treatment1,J=84,N=length(y)))
 }
 ## Fitting the model and checking the power
-if (!exists("hiv_inter.sm")) {
-    if (file.exists("hiv_inter.sm.RData")) {
-        load("hiv_inter.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("hiv_inter.stan", model_name = "hiv_inter")
-        hiv_inter.sm <- stan_model(stanc_ret = rt)
-        save(hiv_inter.sm, file = "hiv_inter.sm.RData")
-    }
-}
 
 CD4.power <- function (J, K, n.sims=1000){
   signif <- rep (NA, n.sims)
   for (s in 1:n.sims){
     fake <- CD4.fake (J,K)
-    hiv.sf2 <- sampling(hiv_inter.sm, fake)
+    hiv.sf2 <- stan(file='hiv_inter.stan', data=fake, iter=1000, chains=4)
     post <- extract(hiv.sf2)
     theta.hat <- colMeans(post$beta)
     theta.se <- sd(post$beta)

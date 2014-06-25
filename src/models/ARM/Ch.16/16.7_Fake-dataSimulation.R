@@ -7,16 +7,7 @@ radon.data <- c("N", "J", "y", "x", "county", "u")
 
 ## Call Stan
 
-if (!exists("radon.2.sm")) {
-    if (file.exists("radon.2.sm.RData")) {
-        load("radon.2.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon.2.stan", model_name = "radon.2")
-        radon.2.sm <- stan_model(stanc_ret = rt)
-        save(radon.2.sm, file = "radon.2.sm.RData")
-    }
-}
-radon.2.sf <- sampling(radon.2.sm, radon.data)
+radon.2.sf <- stan(file='radon.2.stan', data=radon.data, iter=1000, chains=4)
 
 ## Specifying the unmodeled parameters
 
@@ -45,7 +36,8 @@ for (i in 1:N){
 radon.data <- list(N = N, J = J, y = y.fake, county = county, x = x, u = u)
 
 # call Stan
-radon.2.fake.sf <- sampling(radon.2.sm, radon.data)
+radon.2.fake.sf <- stan(file='radon.2.stan', data=radon.data, iter=1000,
+                        chains=4)
 print(radon.2.fake.sf)
 
 ## Checking coverage of 50% intervals

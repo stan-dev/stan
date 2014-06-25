@@ -28,7 +28,7 @@ transformed parameters {
   g <- xi_g * (g_raw - mean(g_raw));
   d <- xi_d * (d_raw - mean(d_raw));
   sigma_g <- xi_g * sigma_g_raw;
-  sigma_d <- abs(xi_d) * sigma_d_raw;
+  sigma_d <- fabs(xi_d) * sigma_d_raw;
   for (i in 1:N)
     y_hat[i] <- mu + g[treatment[i]] + d[airport[i]];
 }
