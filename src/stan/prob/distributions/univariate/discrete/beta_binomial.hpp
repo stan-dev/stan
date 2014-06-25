@@ -8,6 +8,10 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/lbeta.hpp>
+#include <stan/math/functions/digamma.hpp>
+#include <stan/math/functions/lbeta.hpp>
+#include <stan/math/functions/lgamma.hpp>
+#include <stan/math/functions/binomial_coefficient_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
@@ -15,20 +19,6 @@
 
 #include <stan/prob/internal_math/math/F32.hpp>
 #include <stan/prob/internal_math/math/grad_F32.hpp>
-
-#include <stan/agrad/fwd/functions/exp.hpp>
-#include <stan/agrad/fwd/functions/digamma.hpp>
-#include <stan/agrad/fwd/functions/lbeta.hpp>
-#include <stan/agrad/fwd/functions/lgamma.hpp>
-#include <stan/agrad/fwd/functions/binomial_coefficient_log.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
-#include <stan/agrad/rev/functions/pow.hpp>
-#include <stan/agrad/rev/functions/digamma.hpp>
-#include <stan/agrad/rev/functions/lgamma.hpp>
-#include <stan/math/functions/digamma.hpp>
-#include <stan/math/functions/lbeta.hpp>
-#include <stan/math/functions/lgamma.hpp>
-#include <stan/math/functions/binomial_coefficient_log.hpp>
 
 namespace stan {
   
@@ -99,9 +89,7 @@ namespace stan {
       using stan::math::lbeta;
       using stan::math::binomial_coefficient_log;
       using stan::math::digamma;
-      using stan::agrad::lbeta;
-      using stan::agrad::binomial_coefficient_log;
-      using stan::agrad::digamma;
+
       VectorBuilder<T_partials_return,
                     include_summand<propto>::value,
                     is_vector<T_n>::value || is_vector<T_N>::value>
@@ -265,10 +253,6 @@ namespace stan {
       using stan::math::lbeta;
       using stan::math::digamma;
       using std::exp;
-      using stan::agrad::exp;
-      using stan::agrad::lgamma;
-      using stan::agrad::lbeta;
-      using stan::agrad::digamma;
 
       agrad::OperandsAndPartials<T_size1, T_size2> 
         operands_and_partials(alpha, beta);
@@ -400,11 +384,7 @@ namespace stan {
       using stan::math::lgamma;
       using stan::math::digamma;
       using stan::math::lbeta;
-      using stan::agrad::lbeta;
-      using stan::agrad::lgamma;
-      using stan::agrad::digamma;
       using std::exp;
-      using stan::agrad::exp;
 
       agrad::OperandsAndPartials<T_size1, T_size2> 
         operands_and_partials(alpha, beta);
@@ -527,11 +507,7 @@ namespace stan {
       using stan::math::lgamma;
       using stan::math::lbeta;
       using stan::math::digamma;
-      using stan::agrad::lgamma;
-      using stan::agrad::lbeta;
-      using stan::agrad::digamma;
       using std::exp;
-      using stan::agrad::exp;
 
       agrad::OperandsAndPartials<T_size1, T_size2> 
         operands_and_partials(alpha, beta);

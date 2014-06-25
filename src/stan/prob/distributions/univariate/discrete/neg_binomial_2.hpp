@@ -8,26 +8,16 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/functions/log_sum_exp.hpp>
+#include <stan/math/functions/digamma.hpp>
+#include <stan/math/functions/lgamma.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/distributions/univariate/continuous/gamma.hpp>
 #include <stan/prob/distributions/univariate/discrete/poisson.hpp>
 
-#include <stan/math/functions/multiply_log.hpp>
-#include <stan/math/functions/log_sum_exp.hpp>
-#include <stan/math/functions/digamma.hpp>
-#include <stan/math/functions/lgamma.hpp>
-#include <stan/agrad/fwd/functions/multiply_log.hpp>
-#include <stan/agrad/fwd/functions/log_sum_exp.hpp>
-#include <stan/agrad/fwd/functions/digamma.hpp>
-#include <stan/agrad/fwd/functions/lgamma.hpp>
-#include <stan/agrad/fwd/functions/log.hpp>
-#include <stan/agrad/rev/functions/multiply_log.hpp>
-#include <stan/agrad/rev/functions/log_sum_exp.hpp>
-#include <stan/agrad/rev/functions/digamma.hpp>
-#include <stan/agrad/rev/functions/lgamma.hpp>
-#include <stan/agrad/rev/functions/log.hpp>
 
 namespace stan {
 
@@ -81,11 +71,6 @@ namespace stan {
       using stan::math::log_sum_exp;
       using stan::math::digamma;
       using stan::math::lgamma;
-      using stan::agrad::multiply_log;
-      using stan::agrad::log_sum_exp;
-      using stan::agrad::digamma;
-      using stan::agrad::lgamma;
-      using stan::agrad::log;
       using std::log;
 
       // set up template expressions wrapping scalars into vector views
@@ -211,11 +196,6 @@ namespace stan {
       using stan::math::log_sum_exp;
       using stan::math::digamma;
       using stan::math::lgamma;
-      using stan::agrad::multiply_log;
-      using stan::agrad::log_sum_exp;
-      using stan::agrad::digamma;
-      using stan::agrad::lgamma;
-      using stan::agrad::log;
       using std::log;
 
       // set up template expressions wrapping scalars into vector views

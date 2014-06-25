@@ -12,6 +12,8 @@
 #include <stan/math/functions/log_inv_logit.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/binomial_coefficient_log.hpp>
+#include <stan/math/functions/lbeta.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
@@ -20,14 +22,6 @@
 #include <stan/prob/internal_math/rev/inc_beta.hpp>
 #include <stan/prob/internal_math/fwd/inc_beta.hpp>
 
-#include <stan/math/functions/binomial_coefficient_log.hpp>
-#include <stan/math/functions/lbeta.hpp>
-#include <stan/agrad/fwd/functions/binomial_coefficient_log.hpp>
-#include <stan/agrad/fwd/functions/exp.hpp>
-#include <stan/agrad/fwd/functions/pow.hpp>
-#include <stan/agrad/fwd/functions/lbeta.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
-#include <stan/agrad/rev/functions/pow.hpp>
 
 namespace stan {
 
@@ -308,10 +302,6 @@ namespace stan {
       using stan::math::lbeta;
       using std::exp;
       using std::pow;
-      using stan::agrad::inc_beta;
-      using stan::agrad::lbeta;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
           
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
@@ -396,10 +386,6 @@ namespace stan {
       using stan::math::lbeta;
       using std::exp;
       using std::pow;
-      using stan::agrad::inc_beta;
-      using stan::agrad::lbeta;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
           
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
@@ -477,10 +463,6 @@ namespace stan {
       using stan::math::lbeta;
       using std::exp;
       using std::pow;
-      using stan::agrad::inc_beta;
-      using stan::agrad::lbeta;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
           
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
           

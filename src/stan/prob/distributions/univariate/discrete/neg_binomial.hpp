@@ -9,6 +9,12 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/binomial_coefficient_log.hpp>
+#include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/functions/log_sum_exp.hpp>
+#include <stan/math/functions/digamma.hpp>
+#include <stan/math/functions/lgamma.hpp>
+#include <stan/math/functions/lbeta.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
@@ -20,28 +26,6 @@
 #include <stan/prob/internal_math/fwd/inc_beta.hpp>
 #include <stan/prob/internal_math/rev/inc_beta.hpp>
 
-#include <stan/math/functions/binomial_coefficient_log.hpp>
-#include <stan/math/functions/multiply_log.hpp>
-#include <stan/math/functions/log_sum_exp.hpp>
-#include <stan/math/functions/digamma.hpp>
-#include <stan/math/functions/lgamma.hpp>
-#include <stan/math/functions/lbeta.hpp>
-#include <stan/agrad/fwd/functions/binomial_coefficient_log.hpp>
-#include <stan/agrad/fwd/functions/multiply_log.hpp>
-#include <stan/agrad/fwd/functions/log_sum_exp.hpp>
-#include <stan/agrad/fwd/functions/digamma.hpp>
-#include <stan/agrad/fwd/functions/lgamma.hpp>
-#include <stan/agrad/fwd/functions/lbeta.hpp>
-#include <stan/agrad/fwd/functions/log.hpp>
-#include <stan/agrad/fwd/functions/exp.hpp>
-#include <stan/agrad/fwd/functions/pow.hpp>
-#include <stan/agrad/rev/functions/multiply_log.hpp>
-#include <stan/agrad/rev/functions/log_sum_exp.hpp>
-#include <stan/agrad/rev/functions/digamma.hpp>
-#include <stan/agrad/rev/functions/lgamma.hpp>
-#include <stan/agrad/rev/functions/log.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
-#include <stan/agrad/rev/functions/pow.hpp>
 
 namespace stan {
 
@@ -95,11 +79,6 @@ namespace stan {
       using stan::math::digamma;
       using stan::math::lgamma;
       using std::log;
-      using stan::agrad::multiply_log;
-      using stan::agrad::binomial_coefficient_log;
-      using stan::agrad::digamma;
-      using stan::agrad::lgamma;
-      using stan::agrad::log;
       
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
@@ -260,11 +239,6 @@ namespace stan {
       using stan::math::lbeta;
       using std::exp;
       using std::pow;
-      using stan::agrad::inc_beta;
-      using stan::agrad::digamma;
-      using stan::agrad::lbeta;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
 
       agrad::OperandsAndPartials<T_shape, T_inv_scale> 
         operands_and_partials(alpha, beta);
@@ -405,11 +379,6 @@ namespace stan {
       using stan::math::lbeta;
       using std::exp;
       using std::pow;
-      using stan::agrad::inc_beta;
-      using stan::agrad::digamma;
-      using stan::agrad::lbeta;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
 
           
       agrad::OperandsAndPartials<T_shape, T_inv_scale> 
@@ -533,11 +502,6 @@ namespace stan {
       using stan::math::lbeta;
       using std::exp;
       using std::pow;
-      using stan::agrad::inc_beta;
-      using stan::agrad::digamma;
-      using stan::agrad::lbeta;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
           
       agrad::OperandsAndPartials<T_shape, T_inv_scale> 
         operands_and_partials(alpha, beta);

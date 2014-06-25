@@ -16,15 +16,6 @@
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 
-#include <stan/agrad/fwd/functions/gamma_q.hpp>
-#include <stan/agrad/fwd/functions/tgamma.hpp>
-#include <stan/agrad/fwd/functions/exp.hpp>
-#include <stan/agrad/fwd/functions/pow.hpp>
-#include <stan/agrad/rev/functions/gamma_q.hpp>
-#include <stan/agrad/rev/functions/tgamma.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
-#include <stan/agrad/rev/functions/pow.hpp>
-
 namespace stan {
 
   namespace prob {
@@ -237,9 +228,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::gamma_q;
       using boost::math::tgamma;
-      using stan::agrad::gamma_q;
-      using stan::agrad::tgamma;
-      using stan::agrad::pow;
       using std::exp;
       using std::pow;
 
@@ -310,9 +298,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::gamma_q;
       using boost::math::tgamma;
-      using stan::agrad::gamma_q;
-      using stan::agrad::tgamma;
-      using stan::agrad::pow;
       using std::exp;
       using std::pow;
           
@@ -381,9 +366,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::gamma_q;
       using boost::math::tgamma;
-      using stan::agrad::gamma_q;
-      using stan::agrad::tgamma;
-      using stan::agrad::pow;
       using std::exp;
       using std::pow;
           

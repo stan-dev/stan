@@ -9,24 +9,13 @@
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/gamma_p.hpp>
+#include <stan/math/functions/digamma.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 
 #include <stan/prob/internal_math/math/grad_reg_inc_gamma.hpp>
-
-#include <stan/agrad/fwd/functions/gamma_p.hpp>
-#include <stan/agrad/fwd/functions/exp.hpp>
-#include <stan/agrad/fwd/functions/pow.hpp>
-#include <stan/agrad/fwd/functions/tgamma.hpp>
-#include <stan/agrad/fwd/functions/digamma.hpp>
-#include <stan/agrad/rev/functions/gamma_p.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
-#include <stan/agrad/rev/functions/pow.hpp>
-#include <stan/agrad/rev/functions/tgamma.hpp>
-#include <stan/agrad/rev/functions/digamma.hpp>
-#include <stan/math/functions/gamma_p.hpp>
-#include <stan/math/functions/digamma.hpp>
 
 namespace stan {
 
@@ -254,10 +243,6 @@ namespace stan {
       using stan::math::gamma_p;
       using stan::math::digamma;
       using boost::math::tgamma;
-      using stan::agrad::tgamma;
-      using stan::agrad::gamma_p;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
       using std::exp;
       using std::pow;
           
@@ -380,10 +365,6 @@ namespace stan {
       using stan::math::gamma_p;
       using stan::math::digamma;
       using boost::math::tgamma;
-      using stan::agrad::tgamma;
-      using stan::agrad::gamma_p;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
       using std::exp;
       using std::pow;
           
@@ -497,10 +478,6 @@ namespace stan {
       using stan::math::gamma_p;
       using stan::math::digamma;
       using boost::math::tgamma;
-      using stan::agrad::tgamma;
-      using stan::agrad::gamma_p;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
       using std::exp;
       using std::pow;
           

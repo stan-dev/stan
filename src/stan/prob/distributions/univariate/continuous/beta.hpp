@@ -5,24 +5,14 @@
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad/fwd/functions/digamma.hpp>
-#include <stan/agrad/fwd/functions/lgamma.hpp>
-#include <stan/agrad/fwd/functions/lbeta.hpp>
-#include <stan/agrad/fwd/functions/pow.hpp>
-#include <stan/agrad/fwd/functions/exp.hpp>
-#include <stan/agrad/rev/functions/digamma.hpp>
-#include <stan/agrad/rev/functions/lgamma.hpp>
-#include <stan/agrad/rev/functions/pow.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
-#include <stan/math/functions/digamma.hpp>
-#include <stan/math/functions/lgamma.hpp>
-#include <stan/math/functions/lbeta.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/digamma.hpp>
+#include <stan/math/functions/lgamma.hpp>
+#include <stan/math/functions/lbeta.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -70,9 +60,6 @@ namespace stan {
 
       using stan::math::digamma;
       using stan::math::lgamma;
-
-      using stan::agrad::digamma;
-      using stan::agrad::lgamma;
 
       using stan::is_constant_struct;
       using stan::is_vector;
@@ -305,15 +292,10 @@ namespace stan {
       
       // Compute CDF and its gradients
       using stan::math::inc_beta;
-      using stan::agrad::inc_beta;
-      using stan::agrad::digamma;
       using stan::math::digamma;
-      using stan::agrad::exp;
-      using stan::agrad::lbeta;
       using stan::math::lbeta;
       using std::pow;
       using std::exp;
-      using stan::agrad::pow;
       
       // Cache a few expensive function calls if alpha or beta is a parameter
       VectorBuilder<T_partials_return,
@@ -457,15 +439,10 @@ namespace stan {
 
       // Compute CDF and its gradients
       using stan::math::inc_beta;
-      using stan::agrad::inc_beta;
-      using stan::agrad::digamma;
       using stan::math::digamma;
-      using stan::agrad::exp;
-      using stan::agrad::lbeta;
       using stan::math::lbeta;
       using std::pow;
       using std::exp;
-      using stan::agrad::pow;
         
       // Cache a few expensive function calls if alpha or beta is a parameter
       VectorBuilder<T_partials_return,
@@ -589,15 +566,10 @@ namespace stan {
 
       // Compute CDF and its gradients
       using stan::math::inc_beta;
-      using stan::agrad::inc_beta;
-      using stan::agrad::digamma;
       using stan::math::digamma;
-      using stan::agrad::exp;
-      using stan::agrad::lbeta;
       using stan::math::lbeta;
       using std::pow;
       using std::exp;
-      using stan::agrad::pow;
         
       // Cache a few expensive function calls if alpha or beta is a parameter
       VectorBuilder<T_partials_return,

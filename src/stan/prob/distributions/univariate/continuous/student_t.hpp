@@ -9,6 +9,9 @@
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/square.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/lbeta.hpp>
+#include <stan/math/functions/lgamma.hpp>
+#include <stan/math/functions/digamma.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -17,21 +20,6 @@
 #include <stan/prob/internal_math/math/inc_beta.hpp>
 #include <stan/prob/internal_math/fwd/inc_beta.hpp>
 #include <stan/prob/internal_math/rev/inc_beta.hpp>
-
-#include <stan/agrad/fwd/functions/square.hpp>
-#include <stan/agrad/fwd/functions/lbeta.hpp>
-#include <stan/agrad/fwd/functions/lgamma.hpp>
-#include <stan/agrad/fwd/functions/digamma.hpp>
-#include <stan/agrad/fwd/functions/pow.hpp>
-#include <stan/agrad/fwd/functions/exp.hpp>
-#include <stan/agrad/rev/functions/square.hpp>
-#include <stan/agrad/rev/functions/digamma.hpp>
-#include <stan/agrad/rev/functions/lgamma.hpp>
-#include <stan/agrad/rev/functions/pow.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
-#include <stan/math/functions/lbeta.hpp>
-#include <stan/math/functions/lgamma.hpp>
-#include <stan/math/functions/digamma.hpp>
 
 namespace stan {
 
@@ -113,9 +101,6 @@ namespace stan {
       using std::log;
       using stan::math::digamma;
       using stan::math::lgamma;
-      using stan::agrad::digamma;
-      using stan::agrad::lgamma;
-      using stan::agrad::square;
       using stan::math::square;
       using stan::math::value_of;
 
@@ -301,11 +286,6 @@ namespace stan {
       using stan::math::digamma;
       using stan::math::lbeta;
       using stan::math::inc_beta;
-      using stan::agrad::pow;
-      using stan::agrad::exp;
-      using stan::agrad::digamma;
-      using stan::agrad::lbeta;
-      using stan::agrad::inc_beta;
       using std::pow;
       using std::exp;
 
@@ -500,11 +480,6 @@ namespace stan {
       using stan::math::digamma;
       using stan::math::lbeta;
       using stan::math::inc_beta;
-      using stan::agrad::pow;
-      using stan::agrad::exp;
-      using stan::agrad::digamma;
-      using stan::agrad::lbeta;
-      using stan::agrad::inc_beta;
       using std::pow;
       using std::exp;
           
@@ -684,11 +659,6 @@ namespace stan {
       using stan::math::digamma;
       using stan::math::lbeta;
       using stan::math::inc_beta;
-      using stan::agrad::pow;
-      using stan::agrad::exp;
-      using stan::agrad::digamma;
-      using stan::agrad::lbeta;
-      using stan::agrad::inc_beta;
       using std::pow;
       using std::exp;
           

@@ -14,10 +14,6 @@
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/math/functions/value_of.hpp>
-#include <stan/agrad/fwd/functions/erfc.hpp>
-#include <stan/agrad/fwd/functions/sqrt.hpp>
-#include <stan/agrad/rev/functions/erfc.hpp>
-#include <stan/agrad/rev/functions/sqrt.hpp>
 
 namespace stan {
 
@@ -70,8 +66,6 @@ namespace stan {
       
       using boost::math::erfc;
       using std::sqrt;
-      using stan::agrad::erfc;
-      using stan::agrad::sqrt;
 
       // set up template expressions wrapping scalars into vector views
       agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale> 

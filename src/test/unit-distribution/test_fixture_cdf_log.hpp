@@ -5,6 +5,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit-distribution/utility.hpp>
 

@@ -8,27 +8,14 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/lgamma.hpp>
+#include <stan/math/functions/gamma_q.hpp>
+#include <stan/math/functions/digamma.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 
 #include <stan/prob/internal_math/math/grad_reg_inc_gamma.hpp>
-
-#include <stan/agrad/fwd/functions/gamma_q.hpp>
-#include <stan/agrad/fwd/functions/exp.hpp>
-#include <stan/agrad/fwd/functions/pow.hpp>
-#include <stan/agrad/fwd/functions/lgamma.hpp>
-#include <stan/agrad/fwd/functions/tgamma.hpp>
-#include <stan/agrad/fwd/functions/digamma.hpp>
-#include <stan/agrad/rev/functions/gamma_q.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
-#include <stan/agrad/rev/functions/pow.hpp>
-#include <stan/agrad/rev/functions/lgamma.hpp>
-#include <stan/agrad/rev/functions/tgamma.hpp>
-#include <stan/agrad/rev/functions/digamma.hpp>
-#include <stan/math/functions/lgamma.hpp>
-#include <stan/math/functions/gamma_q.hpp>
-#include <stan/math/functions/digamma.hpp>
 
 namespace stan {
 
@@ -106,9 +93,7 @@ namespace stan {
         operands_and_partials(y, alpha, beta);
       
       using stan::math::lgamma;
-      using stan::agrad::lgamma;
       using stan::math::digamma;
-      using stan::agrad::digamma;
 
       VectorBuilder<T_partials_return,
                     include_summand<propto,T_y,T_shape>::value,
@@ -256,10 +241,6 @@ namespace stan {
       using stan::math::gamma_q;
       using stan::math::digamma;
       using boost::math::tgamma;
-      using stan::agrad::tgamma;
-      using stan::agrad::gamma_q;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
       using std::exp;
       using std::pow;
           
@@ -387,10 +368,6 @@ namespace stan {
       using stan::math::gamma_q;
       using stan::math::digamma;
       using boost::math::tgamma;
-      using stan::agrad::tgamma;
-      using stan::agrad::gamma_q;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
       using std::exp;
       using std::pow;
           
@@ -507,10 +484,6 @@ namespace stan {
       using stan::math::gamma_q;
       using stan::math::digamma;
       using boost::math::tgamma;
-      using stan::agrad::tgamma;
-      using stan::agrad::gamma_q;
-      using stan::agrad::exp;
-      using stan::agrad::pow;
       using std::exp;
       using std::pow;
           

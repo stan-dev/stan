@@ -7,8 +7,6 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/agrad/fwd/functions/modified_bessel_first_kind.hpp>
-#include <stan/agrad/rev/functions/modified_bessel_first_kind.hpp>
 #include <stan/math/functions/modified_bessel_first_kind.hpp>
 
 namespace stan { 
@@ -38,7 +36,6 @@ namespace stan {
       using stan::math::value_of;
 
       using stan::math::modified_bessel_first_kind;
-      using stan::agrad::modified_bessel_first_kind;
 
       // Result accumulator.
       T_partials_return logp = 0.0;
