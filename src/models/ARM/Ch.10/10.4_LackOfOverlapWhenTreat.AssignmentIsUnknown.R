@@ -82,22 +82,14 @@ party <- ifelse (dvp<.5, 1, 0)
 
 ## Regression in the area near the discontinuity (ideo_two_pred.stan)
 ## lm (score1 ~ party + x, subset=overlap)
-if (!exists("ideo_two_pred.sm")) {
-    if (file.exists("ideo_two_pred.sm.RData")) {
-        load("ideo_two_pred.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("ideo_two_pred.stan", model_name = "ideo_two_pred")
-        ideo_two_pred.sm <- stan_model(stanc_ret = rt)
-        save(ideo_two_pred.sm, file = "ideo_two_pred.sm.RData")
-    }
-}
 
 overlap <- (deminc.cond | repinc.cond) & dvp>.45 & dvp<.55 & !is.na(score1+party+x)
 sc1 <- score1[overlap]
 p1 <- party[overlap]
 x1 <- x[overlap]
 dataList.1 <- list(N=length(sc1), score1=sc1,party=p1,x=x1)
-ideo_two_pred.sf1 <- sampling(ideo_two_pred.sm, dataList.1)
+ideo_two_pred.sf1 <- stan(file='ideo_two_pred.stan', data=dataList.1,
+                          iter=1000, chains=4)
 print(ideo_two_pred.sf1)
 
 ## Regression fit to all data (ideo_two_pred.stan)
@@ -107,39 +99,24 @@ sc2 <- score1[incs]
 p2 <- party[incs]
 x2 <- x[incs]
 dataList.2 <- list(N=length(sc2), score1=sc2,party=p2,x=x2)
-ideo_two_pred.sf2 <- sampling(ideo_two_pred.sm, dataList.2)
+ideo_two_pred.sf2 <- stan(file='ideo_two_pred.stan', data=dataList.2,
+                          iter=1000, chains=4)
 print(ideo_two_pred.sf2)
 
 ## Regression with interactions (ideo_interactions.stan)
 ## lm (score1 ~ party + x + party:x, subset=incs)
-if (!exists("ideo_interactions.sm")) {
-    if (file.exists("ideo_interactions.sm.RData")) {
-        load("ideo_interactions.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("ideo_interactions.stan", model_name = "ideo_interactions")
-        ideo_interactions.sm <- stan_model(stanc_ret = rt)
-        save(ideo_interactions.sm, file = "ideo_interactions.sm.RData")
-    }
-}
 
-ideo_interactions.sf1 <- sampling(ideo_interactions.sm, dataList.2)
+ideo_interactions.sf1 <- stan(file='ideo_interactions.stan', data=dataList.2,
+                              iter=1000, chains=4)
 print(ideo_interactions.sf1)
 
 ## Reparametrized regression (ideo_reparam.stan)
 ## lm (score1 ~ party + I(z*(party==0)) + I(z*(party==1)), subset=incs)
-if (!exists("ideo_reparam.sm")) {
-    if (file.exists("ideo_reparam.sm.RData")) {
-        load("ideo_reparam.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("ideo_reparam.stan", model_name = "ideo_reparam")
-        ideo_reparam.sm <- stan_model(stanc_ret = rt)
-        save(ideo_reparam.sm, file = "ideo_reparam.sm.RData")
-    }
-}
 
 z <- x2 - 0.5
 z.1 <- I(z*(p2==0))
 z.2 <- I(z*(p2==1))
 dataList.3 <- list(N=length(sc2), score1=sc2,party=p2,z1=z.1,z2=z.2)
-ideo_reparam.sf1 <- sampling(ideo_reparam.sm, dataList.3)
+ideo_reparam.sf1 <- stan(file='ideo_reparam.stan', data=dataList.3,
+                         iter=1000, chains=4)
 print(ideo_reparam.sf1)

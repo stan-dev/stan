@@ -36,19 +36,10 @@ eth.ok <- eth[ok]
 
 ## Regression of log (earnings) on height, age, and ethnicity
 ## M1 <- lmer (y ~ x + (1 + x | eth.ok))
-if (!exists("earnings_vary_si.sm")) {
-    if (file.exists("earnings_vary_si.sm.RData")) {
-        load("earnings_vary_si.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("earnings_vary_si.stan", model_name = "earnings_vary_si")
-        earnings_vary_si.sm <- stan_model(stanc_ret = rt)
-        save(earnings_vary_si.sm, file = "earnings_vary_si.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=n, earn=earn[ok]+1,height=x,eth=eth[ok])
-earnings_vary_si.sf1 <- sampling(earnings_vary_si.sm, dataList.1)
-print(earnings_vary_si.sf1, pars = c("a","b", "sigma_y", "lp__"))
+earnings_vary_si.sf1 <- stan(file='earnings_vary_si.stan', data=dataList.1,
+                             iter=1000, chains=4)
+print(earnings_vary_si.sf1, pars = c("a1","a2", "sigma_y", "lp__"))
 post1 <- extract(earnings_vary_si.sf1)
 
 ## plot on figure 13.3
@@ -101,8 +92,9 @@ print(p3)
 ## M2 <- lmer (y ~ x.centered + (1 + x.centered | eth))
 x.centered <- x - mean(x)
 
-dataList.3 <- list(N=n, earn=earn,height=x.centered,eth=ethn)
-earnings_vary_si.sf2 <- sampling(earnings_vary_si.sm, dataList.3)
+dataList.3 <- list(N=n, earn=earn[ok],height=x.centered,eth=eth[ok])
+earnings_vary_si.sf2 <- stan(file='earnings_vary_si.stan', data=dataList.3,
+                             iter=3000, chains=4)
 print(earnings_vary_si.sf2)
 post2 <- extract(earnings_vary_si.sf2)
 

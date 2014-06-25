@@ -38,21 +38,21 @@ transformed parameters {
 model {
   mu_a1 ~ normal(0, 1);
   mu_a2 ~ normal(0, 1);
-  a1 ~ normal(5 * mu_a1, sigma_a1);
+  a1 ~ normal(10 * mu_a1, sigma_a1);
   a2 ~ normal(mu_a2, sigma_a2);
 
   mu_b1 ~ normal(0, 1);
   mu_b2 ~ normal(0, 1);
-  b1 ~ normal(5 * mu_b1, sigma_b1);
+  b1 ~ normal(10 * mu_b1, sigma_b1);
   b2 ~ normal(0.1 * mu_b2, sigma_b2);
 
   mu_c ~ normal(0, 1);
   for (i in 1:n_eth)
-    c[i] ~ normal(0.1 * mu_c, sigma_c);
+    c[i] ~ normal(10 * mu_c, sigma_c);
 
   mu_d ~ normal(0, 1);
   for (i in 1:n_eth)
-    d[i] ~ normal(0.01 * mu_d, sigma_d);
+    d[i] ~ normal(0.1 * mu_d, sigma_d);
 
   y ~ normal(y_hat, sigma_y);
 }

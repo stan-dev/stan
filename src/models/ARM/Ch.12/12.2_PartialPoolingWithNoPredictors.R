@@ -30,18 +30,9 @@ cty.sds = mean(sqrt(cty.vars[!is.na(cty.vars)]))/sqrt(sample.size)
 cty.sds.sep = sqrt(tapply(y,county,var)/sample.size)
 
  # varying-intercept model, no predictors
-if (!exists("radon_intercept.sm")) {
-    if (file.exists("radon_intercept.sm.RData")) {
-        load("radon_intercept.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_intercept.stan", model_name = "radon_intercept")
-        radon_intercept.sm <- stan_model(stanc_ret = rt)
-        save(radon_intercept.sm, file = "radon_intercept.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=length(y), y=y, county=county)
-radon_intercept.sf1 <- sampling(radon_intercept.sm, dataList.1)
+radon_intercept.sf1 <- stan(file='radon_intercept.stan', data=dataList.1,
+                            iter=1000, chains=4)
 print(radon_intercept.sf1)
 
 post <- extract(radon_intercept.sf1)

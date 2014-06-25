@@ -36,13 +36,15 @@ cty.sds.sep = sqrt(tapply(y,county,var)/sample.size)
 ## Varying-intercept model w/ no predictors
 
 dataList.1 <- list(N=length(y), y=y, county=county)
-radon_intercept.sf1 <- sampling(radon_intercept.sm, dataList.1)
+radon_intercept.sf1 <- stan(file='radon_intercept.stan', data=dataList.1,
+                            iter=1000, chains=4)
 print(radon_intercept.sf1)
 
 ## Including x as a predictor
 
 dataList.2 <- list(N=length(y), y=y,x=x,county=county)
-radon_no_pool.sf1 <- sampling(radon_no_pool.sm, dataList.2)
+radon_no_pool.sf1 <- stan(file='radon_no_pool.stan', data=dataList.2,
+                          iter=1000, chains=4)
 print(radon_no_pool.sf1)
 
 M1 <- extract(radon_no_pool.sf1)

@@ -44,23 +44,15 @@ u <- log (uranium)
 
 ## Varying intercept & slopes w/ no group level predictors
 ## lmer (y ~ x + (1 + x | county))
-if (!exists("radon_vary_si.sm")) {
-    if (file.exists("radon_vary_si.sm.RData")) {
-        load("radon_vary_si.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_vary_si.stan", model_name = "radon_vary_si")
-        radon_vary_si.sm <- stan_model(stanc_ret = rt)
-        save(radon_vary_si.sm, file = "radon_vary_si.sm.RData")
-    }
-}
 
 dataList.3 <- list(N=length(y), y=y,x=x,county=county)
-radon_vary_si.sf1 <- sampling(radon_vary_si.sm, dataList.3)
+radon_vary_si.sf1 <- stan(file='radon_vary_si.stan', data=dataList.3,
+                          iter=1000, chains=4)
 print(radon_vary_si.sf1)
 post1 <- extract(radon_vary_si.sf1)
-post1.ranef <- colMeans(post1$const_coef)
+post1.ranef <- colMeans(post1$a1)
 mean.ranef1 <- mean(post1.ranef)
-post1.beta <- colMeans(post1$beta)
+post1.beta <- colMeans(post1$a2)
 post1.ranef2 <- mean(post1.beta)
 mean.ranef2 <- mean(post1.ranef2)
 
@@ -69,26 +61,18 @@ a.hat.M3 <- mean.ranef1 + post1.ranef
 b.hat.M3 <- mean.ranef2 + post1.ranef2
 
 
-if (!exists("y_x")) {
-    if (file.exists("y_x.sm.RData")) {
-        load("y_x.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("y_x.stan", model_name = "y_x")
-        y_x.sm <- stan_model(stanc_ret = rt)
-        save(y_x.sm, file = "y_x.sm.RData")
-    }
-}
-
 b.hat.unpooled.varying <- array (NA, c(J,2))
 for (j in 1:J){
   dataList.3 <- list(N=length(y[county==j]), y=y[county==j],x=x[county==j])
-  radon_no_pool.sf1 <- sampling(y_x.sm, dataList.3)
+  radon_no_pool.sf1 <- stan(file='y_x.stan', data=dataList.3,
+                            iter=1000, chains=4)
   post <- extract(radon_no_pool.sf1)
   b.hat.unpooled.varying[j,] <- colMeans(post$beta)
 }
 
 dataList.3 <- list(N=length(y), y=y,x=x)
-radon_complete_pool.sf1 <- sampling(y_x.sm, dataList.3)
+radon_complete_pool.sf1 <- stan(file='y_x.stan', data=dataList.3,
+                                iter=1000, chains=4)
 post <- extract(radon_complete_pool.sf1)
 pool.beta <- colMeans(post$beta)
 
@@ -120,18 +104,10 @@ p1 <- ggplot(radon8.data, aes(x.jitter, y)) +
 print(p1)
 
 ## Including group level predictors
-if (!exists("radon_inter_vary.sm")) {
-    if (file.exists("radon_inter_vary.sm.RData")) {
-        load("radon_inter_vary.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_inter_vary.stan", model_name = "radon_inter_vary")
-        radon_inter_vary.sm <- stan_model(stanc_ret = rt)
-        save(radon_inter_vary.sm, file = "radon_inter_vary.sm.RData")
-    }
-}
 
 dataList.4 <- list(N=length(y), y=y,x=x,county=county,u=u)
-radon_inter_vary.sf1 <- sampling(radon_inter_vary.sm, dataList.4)
+radon_inter_vary.sf1 <- stan(file='radon_inter_vary.stan', data=dataList.4,
+                             iter=1000, chains=4)
 print(radon_inter_vary.sf1)
 post <- extract(radon_inter_vary.sf1)
 ranef1 <- colMeans(post$const_coef)

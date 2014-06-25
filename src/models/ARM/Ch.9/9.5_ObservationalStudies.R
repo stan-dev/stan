@@ -7,16 +7,6 @@ library(ggplot2)
 
 ### Model: post_test ~ supp + pretest
 
-if (!exists("electric_supp.sm")) {
-    if (file.exists("electric_supp.sm.RData")) {
-        load("electric_supp.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_supp.stan", model_name = "electric_supp")
-        electric_supp.sm <- stan_model(stanc_ret = rt)
-        save(electric_supp.sm, file = "electric_supp.sm.RData")
-    }
-}
-
 ### Figures
 
 beta1 <- beta2 <- beta3 <- rep(NA, 4)
@@ -28,7 +18,8 @@ prepost.ggdf <- data.frame(c(), c(), c(), c(), c(), c(), c()) # Figure 9.12
 for (i in 1:4) {
     source(paste("electric_grade", i, "_supp.data.R", sep = ""))
     data.list <- c("N", "post_test", "pre_test", "supp")
-    sf <- sampling(electric_supp.sm, data.list)
+    sf <- stan(file='electric_supp.stan', data=data.list,
+               iter=1000, chains=4)
     beta.post <- extract(sf, "beta")$beta
     beta1 <- mean(beta.post[,1])
     beta2 <- mean(beta.post[,2])

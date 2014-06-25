@@ -44,17 +44,9 @@ u <- log (uranium)
 
 ## Varying-intercept model w/ group-level predictors
 u.full <- u[county]
-if (!exists("radon_group.sm")) {
-    if (file.exists("radon_group.sm.RData")) {
-        load("radon_group.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_group.stan", model_name = "radon_group")
-        radon_group.sm <- stan_model(stanc_ret = rt)
-        save(radon_group.sm, file = "radon_group.sm.RData")
-    }
-}
 dataList.3 <- list(N=length(y), y=y,x=x,county=county,u=u.full)
-radon_group.sf1 <- sampling(radon_group.sm, dataList.3)
+radon_group.sf1 <- stan(file='radon_group.stan', data=dataList.3,
+                        iter=1000, chains=4)
 print(radon_group.sf1, pars = c("b","beta", "sigma", "lp__"))
 post1 <- extract(radon_group.sf1)
 post1.ranef <- colMeans(post1$const_coef)
@@ -63,17 +55,9 @@ post1.beta <- colMeans(post1$beta)
 post1.fixef1 <- mean(post1.ranef)
 
 ## Plots on Figure 12.5
-if (!exists("radon_no_pool.sm")) {
-    if (file.exists("radon_no_pool.sm.RData")) {
-        load("radon_no_pool.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_no_pool.stan", model_name = "radon_no_pool")
-        radon_no_pool.sm <- stan_model(stanc_ret = rt)
-        save(radon_group.sm, file = "radon_no_pool.sm.RData")
-    }
-}
 dataList.4 <- list(N=length(y), y=y,x=x,county=county)
-radon_no_pool.sf1 <- sampling(radon_no_pool.sm, dataList.4)
+radon_no_pool.sf1 <- stan(file='radon_no_pool.stan', data=dataList.4,
+                          iter=1000, chains=4)
 print(radon_no_pool.sf1)
 post2 <- extract(radon_no_pool.sf1)
 post2.ranef <- colMeans(post2$factor)

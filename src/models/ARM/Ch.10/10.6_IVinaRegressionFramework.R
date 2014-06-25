@@ -10,18 +10,9 @@ pretest <- prelet
 ## 2 stage least squares (sesame_one_pred_a.stan)
 ## lm (watched ~ encouraged)
 
-if (!exists("sesame_one_pred_a.sm")) {
-    if (file.exists("sesame_one_pred_a.sm.RData")) {
-        load("sesame_one_pred_a.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("sesame_one_pred_a.stan", model_name = "sesame_one_pred_a")
-        sesame_one_pred_a.sm <- stan_model(stanc_ret = rt)
-        save(sesame_one_pred_a.sm, file = "sesame_one_pred_a.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=length(watched), watched=watched,encouraged=encouraged)
-sesame_one_pred_2a.sf1 <- sampling(sesame_one_pred_a.sm, dataList.1)
+sesame_one_pred_2a.sf1 <- stan(file='sesame_one_pred_a.stan', data=dataList.1,
+                               iter=1000, chains=4)
 print(sesame_one_pred_2a.sf1)
 beta.post <- extract(sesame_one_pred_2a.sf1, "beta")$beta
 beta.mean2a <- colMeans(beta.post)
@@ -32,22 +23,17 @@ watched.hat <- beta.mean2a[1] + beta.mean2a[2] * encouraged
 ## lm (y ~ watched.hat)
 
 dataList.2 <- list(N=length(y), watched=y,encouraged=watched.hat)
-sesame_one_pred_2b.sf1 <- sampling(sesame_one_pred_a.sm, dataList.2)
+sesame_one_pred_2b.sf1 <- stan(file='sesame_one_pred_a.stan', data=dataList.2,
+                               iter=1000, chains=4)
 print(sesame_one_pred_2b.sf1)
 
 ## Adjusting for covariates in a IV framework (sesame_multi_preds_3a.stan)
 ## lm (watched ~ encouraged + pretest + as.factor(site) + setting)
-if (!exists("sesame_multi_preds_3a.sm")) {
-    if (file.exists("sesame_multi_preds_3a.sm.RData")) {
-        load("sesame_multi_preds_3a.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("sesame_multi_preds_3a.stan", model_name = "sesame_multi_preds_3a")
-        sesame_multi_preds_3a.sm <- stan_model(stanc_ret = rt)
-        save(sesame_multi_preds_3a.sm, file = "sesame_multi_preds_3a.sm.RData")
-    }
-}
+
 dataList.3 <- list(N=length(watched), watched=watched,encouraged=encouraged,pretest=pretest, site=site,setting=setting)
-sesame_multi_pred_3a.sf1 <- sampling(sesame_multi_preds_3a.sm, dataList.3)
+sesame_multi_pred_3a.sf1 <- stan(file='sesame_multi_preds_3a.stan',
+                                 data=dataList.3,
+                                 iter=1000, chains=4)
 print(sesame_multi_pred_3a.sf1)
 
 beta.post <- extract(sesame_multi_pred_3a.sf1, "beta")$beta
@@ -58,7 +44,9 @@ watched.hat <- beta.mean3a[1] + beta.mean3a[2] * encouraged + beta.mean3a[3] * p
 ## (sesame_multi_preds_3b.stan)
 ## lm (y ~ watched.hat + pretest + as.factor(site) + setting)
 dataList.4 <- list(N=length(watched.hat), watched=y,encouraged=watched.hat,pretest=pretest, site=site,setting=setting)
-sesame_multi_pred_3b.sf1 <- sampling(sesame_multi_preds_3a.sm, dataList.4)
+sesame_multi_pred_3b.sf1 <- stan(file='sesame_multi_preds_3a.stan',
+                                 data=dataList.4,
+                                 iter=1000, chains=4)
 print(sesame_multi_pred_3b.sf1)
 
 ## Se for IV estimates (FIXME)

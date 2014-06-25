@@ -1,4 +1,4 @@
-data <- read.table("~/docs/statistica/GelmanHill/Book_Codes/Ch.9/electric.dat", header=TRUE)
+data <- read.table("electric.dat", header=TRUE)
 electric <- data.frame(post_test = c(data$treated.Posttest, data$control.Posttest),
                        pre_test = c(data$treated.Pretest, data$control.Pretest),
                        grade = rep(data$Grade, 2),
@@ -59,27 +59,6 @@ print(p1)
 #  post_test ~ treatment
 #  post_test ~ treatment + pre_test
 
-if (!exists("electric_tr.sm")) {
-    if (file.exists("electric_tr.sm.RData")) {
-        load("electric_tr.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_tr.stan", model_name = "electric_tr")
-        electric_tr.sm <- stan_model(stanc_ret = rt)
-        save(electric_tr.sm, file = "electric_tr.sm.RData")
-    }
-}
-
-if (!exists("electric_trpre.sm")) {
-    if (file.exists("electric_trpre.sm.RData")) {
-        load("electric_trpre.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_trpre.stan", model_name = "electric_trpre")
-        electric_trpre.sm <- stan_model(stanc_ret = rt)
-        save(electric_trpre.sm, file = "electric_trpre.sm.RData")
-    }
-}
-
-
 ## Plot of the regression results (Figure 9.5)
 
 alpha2 <- theta1 <- theta2 <- beta2 <- rep(NA, 4)
@@ -92,11 +71,13 @@ for (i in 1:4) {
     source(paste("electric_grade", i, ".data.R", sep = ""))
     temp <- data.frame(post_test, pre_test, grade, treatment)
     data.list <- c("N", "post_test", "pre_test", "treatment")
-    sf.1 <- sampling(electric_tr.sm, data.list)
+    sf.1 <- stan(file='electric_tr.stan', data=data.list,
+                 iter=1000, chains=4)
     beta.post <- extract(sf.1, "beta")$beta
     theta1[i] <- mean(beta.post[,2])
     se1[i]    <- sd(beta.post[,2])
-    sf.2 <- sampling(electric_trpre.sm, data.list)
+    sf.2 <- stan(file='electric_trpre.stan', data=data.list,
+                 iter=1000, chains=4)
     beta.post <- extract(sf.2, "beta")$beta
     alpha2[i] <- mean(beta.post[,1])
     theta2[i] <- mean(beta.post[,2])

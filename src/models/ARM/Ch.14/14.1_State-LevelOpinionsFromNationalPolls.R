@@ -75,20 +75,12 @@ v.prev[not.dc] <- v.prev[not.dc] +
 
 ## Multilevel logistic regression (election88.stan)
 ## M1 <- lmer (y ~ black + female + (1 | state), family=binomial(link="logit"))
-if (!exists("election88.sm")) {
-    if (file.exists("election88.sm.RData")) {
-        load("election88.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("election88.stan", model_name = "election88")
-        election88.sm <- stan_model(stanc_ret = rt)
-        save(election88.sm, file = "election88.sm.RData")
-    }
-}
 
 ok <- !is.na(y+black+female+state)
 
 dataList.1 <- list(N=length(y[ok]),y=y[ok],n_state=n.state,black=black[ok],female=female[ok],state=state[ok])
-election88.sf1 <- sampling(election88.sm, dataList.1)
+election88.sf1 <- stan(file='election88.stan', data=dataList.1,
+                       iter=1000, chains=4)
 print(election88.sf1, pars = c("a","b", "lp__"))
 
 ## A fuller model
@@ -104,15 +96,6 @@ ok <- !is.na(y+black+female+state+v.prev.full+age+edu+age.edu+region.full)
 
 # fit the model
 # M2 <- lmer (y ~ black + female + black:female + v.prev.full + (1 | age) + (1 | edu) + (1 | age.edu) + (1 | state) + (1 | region.full), family=binomial(link="logit"))
-if (!exists("election88_full.sm")) {
-    if (file.exists("election88_full.sm.RData")) {
-        load("election88_full.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("election88_full.stan", model_name = "election88_full")
-        election88_full.sm <- stan_model(stanc_ret = rt)
-        save(election88_full.sm, file = "election88_full.sm.RData")
-    }
-}
 
 dataList.2 <- list(N=length(y[ok]),
                    y=y[ok],
@@ -129,7 +112,8 @@ dataList.2 <- list(N=length(y[ok]),
                    n_age_edu=n.age.edu,
                    n_region_full=n.region.full,
                    v_prev_full=v.prev.full[ok])
-election88_full.sf1 <- sampling(election88_full.sm, dataList.2)
+election88_full.sf1 <- stan(file='election88_full.stan', data=dataList.2,
+                            iter=1000, chains=4)
 print(election88_full.sf1, pars = c("beta","a","b", "c","d","e","lp__"))
 post <- extract(election88_full.sf1)
 beta <- colMeans(post$beta)

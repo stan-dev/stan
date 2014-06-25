@@ -37,18 +37,8 @@ scenario.abbr <- c("Nagoya", "B'ham", "Detroit", "Ptsbgh", "Roseln", "Chrlt", "S
 
 ## Model fit
 ## M1 <- lmer (y ~ 1 + (1 | group.id) + (1 | scenario.id))
-if (!exists("pilots.sm")) {
-    if (file.exists("pilots.sm.RData")) {
-        load("pilots.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("pilots.stan", model_name = "pilots")
-        pilots.sm <- stan_model(stanc_ret = rt)
-        save(pilots.sm, file = "pilots.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=length(y),y=y,n_groups=n.group,n_scenarios=n.scenario,group_id=group.id,scenario_id=scenario.id)
-pilots.sf1 <- sampling(pilots.sm, dataList.1)
+pilots.sf1 <- stan(file='pilots.stan', data=dataList.1, iter=20000, chains=4)
 print(pilots.sf1,pars = c("a","b", "sigma_y", "lp__"))
 
 ## Plot figure 13.8
@@ -97,20 +87,11 @@ eth.ok <- eth[ok]
 ##M1 <- lmer (y ~ x.centered + (1 + x.centered | eth) + (1 + x.centered | age) + (1 + x.centered | eth:age))
 x.centered <- x - mean(x)
 
-if (!exists("earnings_latin_square.sm")) {
-    if (file.exists("earnings_latin_square.sm.RData")) {
-        load("earnings_latin_square.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("earnings_latin_square.stan", model_name = "earnings_latin_square")
-        earnings_latin_square.sm <- stan_model(stanc_ret = rt)
-        save(earnings_latin_square.sm, file = "earnings_latin_square.sm.RData")
-    }
-}
-
-dataList.2 <- list(N=length(y),y=y,x_centered=x.centered,n_eth=n.eth,n_age=n.age,eth=eth.ok,age=age[ok])
-earnings_latin_square.sf1 <- sampling(earnings_latin_square.sm, dataList.2)
-print(pilots.sf1,pars = c("a1","a2","b1","b2", "c1","c2","sigma_y", "lp__"))
-post <- extract(pilots.sf1)
+dataList.2 <- list(N=length(y),y=y,x=x.centered,n_eth=n.eth,n_age=n.age,eth=eth.ok,age=age[ok])
+earnings_latin_square.sf1 <- stan(file='earnings_latin_square.stan',
+                                  data=dataList.2, iter=1000, chains=4)
+print(earnings_latin_square.sf1,pars = c("a1","a2","b1","b2", "c","d","sigma_y", "lp__"))
+post <- extract(earnings_latin_square.sf1)
 
  # plot figure 13.10
 age.label <- c("AGE 18-34", "AGE 35-49", "AGE 50-64")

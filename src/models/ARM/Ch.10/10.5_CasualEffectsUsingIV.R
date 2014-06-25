@@ -12,18 +12,10 @@ y <- postlet
 
 ## Instrumental variables estimate (sesame_one_pred_a.stan)
 ## lm (watched ~ encouraged)
-if (!exists("sesame_one_pred_a.sm")) {
-    if (file.exists("sesame_one_pred_a.sm.RData")) {
-        load("sesame_one_pred_a.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("sesame_one_pred_a.stan", model_name = "sesame_one_pred_a")
-        sesame_one_pred_a.sm <- stan_model(stanc_ret = rt)
-        save(sesame_one_pred_a.sm, file = "sesame_one_pred_a.sm.RData")
-    }
-}
 
 dataList.1 <- list(N=length(watched), watched=watched,encouraged=encouraged)
-sesame_one_pred_a.sf1 <- sampling(sesame_one_pred_a.sm, dataList.1)
+sesame_one_pred_a.sf1 <- stan(file='sesame_one_pred_a.stan', data=dataList.1,
+                              iter=1000, chains=4)
 print(sesame_one_pred_a.sf1)
 
 beta.post <- extract(sesame_one_pred_a.sf1, "beta")$beta
@@ -33,7 +25,8 @@ beta.mean1 <- colMeans(beta.post)
 ## lm (y ~ encouraged)
 
 dataList.2 <- list(N=length(y), watched=y,encouraged=encouraged)
-sesame_one_pred_b.sf1 <- sampling(sesame_one_pred_a.sm, dataList.2)
+sesame_one_pred_b.sf1 <- stan(file='sesame_one_pred_a.stan', data=dataList.2,
+                              iter=1000, chains=4)
 print(sesame_one_pred_b.sf1)
 
 beta.post <- extract(sesame_one_pred_b.sf1, "beta")$beta

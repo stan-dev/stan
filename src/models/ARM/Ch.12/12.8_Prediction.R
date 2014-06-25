@@ -10,17 +10,9 @@ source("12.6_Group-LevelPredictors.R") # where variables were defined
 
 ## Prediction for a new observation in a new group (new house in county 26
 ## with x=1)
-if (!exists("radon_group.sm")) {
-    if (file.exists("radon_group.sm.RData")) {
-        load("radon_group.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_group.stan", model_name = "radon_group")
-        radon_group.sm <- stan_model(stanc_ret = rt)
-        save(radon_group.sm, file = "radon_group.sm.RData")
-    }
-}
 dataList.3 <- list(N=length(y), y=y,x=x,county=county,u=u.full)
-radon_group.sf1 <- sampling(radon_group.sm, dataList.3)
+radon_group.sf1 <- stan(file='radon_group.stan', data=dataList.3,
+                        iter=1000, chains=4)
 print(radon_group.sf1)
 post1 <- extract(radon_group.sf1)
 post1.ranef <- colMeans(post1$const_coef)

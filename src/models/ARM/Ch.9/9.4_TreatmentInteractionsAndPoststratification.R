@@ -7,48 +7,21 @@ source("electric_grade4.data.R", echo = TRUE)
 
 ### Model with only treatment indicator: post_test ~ treatment
 
-if (!exists("electric_tr.sm")) {
-    if (file.exists("electric_tr.sm.RData")) {
-        load("electric_tr.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_tr.stan", model_name = "electric_tr")
-        electric_tr.sm <- stan_model(stanc_ret = rt)
-        save(electric_tr.sm, file = "electric_tr.sm.RData")
-    }
-}
-
 data.list <- c("N", "post_test", "pre_test", "treatment")
-electric_tr.sf <- sampling(electric_tr.sm, data.list)
+electric_tr.sf <- stan(file='electric_tr.stan', data=data.list,
+                       iter=1000, chains=4)
 print(electric_tr.sf)
 
 ### Model controlling for pre-test: post_test ~ treatment + pre_test
 
-if (!exists("electric_trpre.sm")) {
-    if (file.exists("electric_trpre.sm.RData")) {
-        load("electric_trpre.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_trpre.stan", model_name = "electric_trpre")
-        electric_trpre.sm <- stan_model(stanc_ret = rt)
-        save(electric_trpre.sm, file = "electric_trpre.sm.RData")
-    }
-}
-
-electric_trpre.sf <- sampling(electric_trpre.sm, data.list)
+electric_trpre.sf <- stan(file='electric_trpre.stan', data=data.list,
+                          iter=1000, chains=4)
 print(electric_trpre.sf)
 
 ### Model with interaction: post_test ~ pre_test + treatment + pre_test:treatment
 
-if (!exists("electric_inter.sm")) {
-    if (file.exists("electric_inter.sm.RData")) {
-        load("electric_inter.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_inter.stan", model_name = "electric_inter")
-        electric_inter.sm <- stan_model(stanc_ret = rt)
-        save(electric_inter.sm, file = "electric_inter.sm.RData")
-    }
-}
-
-electric_inter.sf <- sampling(electric_inter.sm, data.list)
+electric_inter.sf <- stan(file='electric_inter.stan', data=data.list,
+                          iter=1000, chains=4)
 print(electric_inter.sf, pars = c("beta", "lp__"))
 
 ## Figure 9.7
@@ -58,7 +31,8 @@ for (i in 1:4) {
     source(paste("electric_grade", i, ".data.R", sep = ""))
     temp <- data.frame(post_test, pre_test, grade, treatment)
     data.list <- c("N", "post_test", "pre_test", "treatment")
-    sf <- sampling(electric_inter.sm, data.list)
+    sf <- stan(file='electric_inter.stan', data=data.list,
+               iter=1000, chains=4)
     beta.post <- extract(sf, "beta")$beta
     beta.mean <- colMeans(beta.post)
     temp$beta1 <- beta.mean[1]

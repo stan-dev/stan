@@ -1,3 +1,8 @@
+# candidate.effects _ .5 * region effect + home state adv + south effect +
+#                     + Catholic effect + candidate ideology effect
+# adjusted presvote = presvote - candidate.effects
+#
+state 48 52 56 60 64 68 72 76 80 84 88 92
 AL -0.0074 0.0128 -0.0042 -0.0309 -0.1137 -0.0116 -0.0107 0.0601 0.0708 0.0125 0.0033 0.0595
 AK NA NA NA -0.011 0.0073 -0.0007 -0.0069 -0.0331 -0.0463 -0.0144 -0.0144 -0.0085
 AZ -0.006 -0.0035 -0.0029 0.0032 -0.0363 -0.0116 -0.0149 -0.0404 -0.0441 -0.0144 -0.0127 -0.0085

@@ -30,34 +30,19 @@ cty.sds = mean(sqrt(cty.vars[!is.na(cty.vars)]))/sqrt(sample.size)
 cty.sds.sep = sqrt(tapply(y,county,var)/sample.size)
 
 ## Complete pooling regression
-if (!exists("radon_complete_pool.sm")) {
-    if (file.exists("radon_complete_pool.sm.RData")) {
-        load("radon_complete_pool.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_complete_pool.stan", model_name = "radon_complete_pool")
-        radon_complete_pool.sm <- stan_model(stanc_ret = rt)
-        save(radon_complete_pool.sm, file = "radon_complete_pool.sm.RData")
-    }
-}
 dataList.1 <- list(N=length(y), y=y,x=x)
-radon_complete_pool.sf1 <- sampling(radon_complete_pool.sm, dataList.1)
+radon_complete_pool.sf1 <- stan(file='radon_complete_pool.stan',
+                                data=dataList.1,
+                                iter=1000, chains=4)
 print(radon_complete_pool.sf1)
 post.pooled <- extract(radon_complete_pool.sf1)
 pooled <- colMeans(post.pooled$beta)
 
 ## No pooling regression
-if (!exists("radon_no_pool.sm")) {
-    if (file.exists("radon_no_pool.sm.RData")) {
-        load("radon_no_pool.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_no_pool.stan", model_name = "radon_no_pool")
-        radon_no_pool.sm <- stan_model(stanc_ret = rt)
-        save(radon_no_pool.sm, file = "radon_no_pool.sm.RData")
-    }
-}
 
 dataList.2 <- list(N=length(y), y=y,x=x,county=county)
-radon_no_pool.sf1 <- sampling(radon_no_pool.sm, dataList.2)
+radon_no_pool.sf1 <- stan(file='radon_no_pool.stan', data=dataList.2,
+                          iter=1000, chains=4)
 print(radon_no_pool.sf1)
 post.unpooled <- extract(radon_no_pool.sf1)
 unpooled <- colMeans(post.unpooled$factor)
