@@ -1,6 +1,14 @@
 #include <stan/math/matrix/eigenvectors_sym.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <stan/agrad/fwd/operators.hpp>
+#include <stan/agrad/rev/operators.hpp>
+#include <stan/agrad/fwd/functions/abs.hpp>
+#include <stan/agrad/rev/functions/abs.hpp>
+#include <stan/agrad/fwd/functions/sqrt.hpp>
+#include <stan/agrad/rev/functions/sqrt.hpp>
+#include <stan/agrad/fwd/functions/fabs.hpp>
+#include <stan/agrad/rev/functions/fabs.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradFwdMatrixEigenvectorsSym, excepts_fd) {

@@ -7,14 +7,9 @@
 #include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
-#include <stan/agrad/rev/matrix/multiply.hpp>
-#include <stan/agrad/fwd/matrix/multiply.hpp>
-#include <stan/agrad/fwd/matrix/dot_product.hpp>
-#include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/agrad/rev/operators.hpp>
 
 namespace stan {
   namespace math {
@@ -26,7 +21,6 @@ namespace stan {
     quad_form(const Eigen::Matrix<T,RA,CA>& A,
               const Eigen::Matrix<T,RB,CB>& B)
     {
-      using stan::agrad::multiply;
       using stan::math::multiply;
       stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
       stan::math::check_multiplicable("quad_form(%1%)",A,"A",
@@ -39,9 +33,7 @@ namespace stan {
     quad_form(const Eigen::Matrix<T,RA,CA>& A,
               const Eigen::Matrix<T,RB,1>& B)
     {
-      using stan::agrad::multiply;
       using stan::math::multiply;
-      using stan::agrad::dot_product;
       using stan::math::dot_product;
 
       stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
@@ -55,7 +47,6 @@ namespace stan {
     quad_form_sym(const Eigen::Matrix<T,RA,CA>& A,
                   const Eigen::Matrix<T,RB,CB>& B)
     {
-      using stan::agrad::multiply;
       using stan::math::multiply;
       
       stan::math::check_square("quad_form_sym(%1%)",A,"A",(double*)0);
@@ -71,9 +62,7 @@ namespace stan {
     quad_form_sym(const Eigen::Matrix<T,RA,CA>& A,
                   const Eigen::Matrix<T,RB,1>& B)
     {
-      using stan::agrad::multiply;
       using stan::math::multiply;
-      using stan::agrad::dot_product;
       using stan::math::dot_product;
 
       stan::math::check_square("quad_form_sym(%1%)",A,"A",(double*)0);

@@ -3,8 +3,6 @@
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/functions/inv_logit.hpp>
-#include <stan/agrad/fwd/functions/pow.hpp>
-#include <stan/agrad/rev/functions/pow.hpp>
 
 namespace stan {
   namespace math {

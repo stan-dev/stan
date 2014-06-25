@@ -2,6 +2,12 @@
 #include <stan/agrad/fwd/matrix/inverse.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/fwd/operators.hpp>
+#include <stan/agrad/rev/operators.hpp>
+#include <stan/agrad/fwd/functions/abs.hpp>
+#include <stan/agrad/rev/functions/abs.hpp>
+#include <stan/agrad/fwd/functions/fabs.hpp>
+#include <stan/agrad/rev/functions/fabs.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 

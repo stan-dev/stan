@@ -2,6 +2,11 @@
 #include <stan/math/matrix/quad_form.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd.hpp>
+#include <stan/agrad/rev/matrix/multiply.hpp>
+#include <stan/agrad/fwd/matrix/multiply.hpp>
+#include <stan/agrad/fwd/matrix/dot_product.hpp>
+#include <stan/agrad/rev/matrix/dot_product.hpp>
+#include <stan/agrad/rev/operators.hpp>
 #include <test/unit/agrad/util.hpp>
 
 using stan::agrad::fvar;

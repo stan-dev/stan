@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/fwd/matrix/log_softmax.hpp>
+#include <stan/agrad/rev/matrix/log_sum_exp.hpp>
+#include <stan/agrad/fwd/matrix/log_sum_exp.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
