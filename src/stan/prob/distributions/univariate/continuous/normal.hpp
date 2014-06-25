@@ -157,6 +157,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
+      using stan::math::INV_SQRT_2;
 
       double cdf(1.0);
 
@@ -191,11 +192,11 @@ namespace stan {
         const double sigma_dbl = value_of(sigma_vec[n]);
         const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
         double cdf_;
-        if (scaled_diff*SQRT_2 < -37.5)
+        if (scaled_diff < -37.5 * INV_SQRT_2)
           cdf_ = 0.0;
-        else if (scaled_diff*SQRT_2 < -5.0)
+        else if (scaled_diff < -5.0 * INV_SQRT_2)
           cdf_ = 0.5 * erfc(-scaled_diff);
-        else if (scaled_diff*SQRT_2 > 8.25)
+        else if (scaled_diff > 8.25 * INV_SQRT_2)
           cdf_ = 1;
         else
           cdf_ = 0.5 * (1.0 + erf(scaled_diff));
@@ -237,6 +238,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
+      using stan::math::INV_SQRT_2;
 
       double cdf_log(0.0);
       // check if any vectors are zero length
@@ -272,11 +274,11 @@ namespace stan {
         const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
         
         double one_p_erf;
-        if (scaled_diff*SQRT_2 < -37.5)
+        if (scaled_diff < -37.5 * INV_SQRT_2)
           one_p_erf = 0.0;
-        else if (scaled_diff*SQRT_2 < -5.0)
+        else if (scaled_diff < -5.0 * INV_SQRT_2)
           one_p_erf =  erfc(-scaled_diff);
-        else if (scaled_diff*SQRT_2 > 8.25)
+        else if (scaled_diff > 8.25 * INV_SQRT_2)
           one_p_erf = 2.0;
         else
           one_p_erf = 1.0 + erf(scaled_diff);
@@ -308,6 +310,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
+      using stan::math::INV_SQRT_2;
 
       double ccdf_log(0.0);
       // check if any vectors are zero length
@@ -343,11 +346,11 @@ namespace stan {
         const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
         
         double one_m_erf;
-        if (scaled_diff*SQRT_2 < -37.5)
+        if (scaled_diff < -37.5 * INV_SQRT_2)
           one_m_erf = 2.0;
-        else if (scaled_diff*SQRT_2 < -5.0)
+        else if (scaled_diff < -5.0 * INV_SQRT_2)
           one_m_erf =  2.0 - erfc(-scaled_diff);
-        else if (scaled_diff*SQRT_2 > 8.25)
+        else if (scaled_diff > 8.25 * INV_SQRT_2)
           one_m_erf = 0.0;
         else
           one_m_erf = 1.0 - erf(scaled_diff);
