@@ -521,15 +521,22 @@ TEST(gm_parser,function_signatures) {
 
   //CONTINUOUS
   test_parsable("function-signatures/distributions/multivariate/continuous/dirichlet/dirichlet_log");
-
-
+  
   //FUNCTIONS
     test_parsable("function-signatures/math/functions/abs");
+    test_parsable("function-signatures/math/functions/bessel_first_kind");
+    test_parsable("function-signatures/math/functions/bessel_second_kind");
+    test_parsable("function-signatures/math/functions/binary_log_loss");
+    test_parsable("function-signatures/math/functions/falling_factorial");
     test_parsable("function-signatures/math/functions/int_step");
+    test_parsable("function-signatures/math/functions/log_falling_factorial");
     test_parsable("function-signatures/math/functions/max");
     test_parsable("function-signatures/math/functions/min");
+    test_parsable("function-signatures/math/functions/modified_bessel_first_kind");
+    test_parsable("function-signatures/math/functions/modified_bessel_second_kind");
     test_parsable("function-signatures/math/functions/operators_int");
     test_parsable("function-signatures/math/functions/operators_real");
+
 
   // test_parsable("good_inf");
   // test_parsable("function_signatures1");
