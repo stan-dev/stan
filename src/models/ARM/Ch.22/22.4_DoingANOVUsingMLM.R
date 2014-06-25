@@ -35,18 +35,9 @@ cty.vars = tapply(y,county,var)
 cty.sds = mean(sqrt(cty.vars[!is.na(cty.vars)]))/sqrt(sample.size)
 cty.sds.sep = sqrt(tapply(y,county,var)/sample.size)
 
-if (!exists("anova_radon_nopred.sm")) {
-    if (file.exists("anova_radon_nopred.sm.RData")) {
-        load("anova_radon_nopred.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("anova_radon_nopred.stan", model_name = "anova_radon_nopred")
-        anova_radon_nopred.sm <- stan_model(stanc_ret = rt)
-        save(anova_radon_nopred.sm, file = "anova_radon_nopred.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=length(y), y=y, county=county,J=85)
-anova_radon_nopred.sf1 <- sampling(anova_radon_nopred.sm, dataList.1)
+anova_radon_nopred.sf1 <- stan(file='anova_radon_nopred.stan', data=dataList.1,
+                               iter=1000, chains=4)
 print(anova_radon_nopred.sf1,pars = c("a","sigma_y","lp__","s_a","s_y"))
 
 anova.df <- summary(anova_radon_nopred.sf1, c("s_y", "s_a"))$summary

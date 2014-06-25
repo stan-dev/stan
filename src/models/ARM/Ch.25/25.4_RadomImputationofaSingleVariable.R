@@ -107,17 +107,7 @@ sis <- list(N=length(earnings1),earnings=earnings1,
             any_ssi=any.ssi1, any_welfare=any.welfare1,
             any_charity=any.charity1)
 
-if (!exists("earnings.sm")) {
-    if (file.exists("earnings.sm.RData")) {
-        load("earnings.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("earnings.stan", model_name = "earnings")
-        earnings.sm <- stan_model(stanc_ret = rt)
-        save(earnings.sm, file = "earnings.sm.RData")
-    }
-}
-
-earnings.sf1 <- sampling(earnings.sm, sis)
+earnings.sf1 <- stan(file='earnings.stan', data=sis, iter=1000, chains=4)
 print(earnings.sf1)
 post <- extract(earnings.sf1)
 beta <- colMeans(post$beta)
@@ -143,7 +133,7 @@ sis2 <- list(N=length(earnings.sqrt),earnings=earnings.sqrt,
             any_ssi=any.ssi1, any_welfare=any.welfare1,
             any_charity=any.charity1)
 
-earnings.sf2 <- sampling(earnings.sm, sis2)
+earnings.sf2 <- stan(file='earnings.stan', data=sis2, iter=1000, chains=4)
 print(earnings.sf2)
 
 post2 <- extract(earnings.sf2)
@@ -211,17 +201,9 @@ sis <- list(N=length(earnings1[ok]),earnings=earnings1[ok],
             any_ssi=any.ssi1[ok], any_welfare=any.welfare1[ok],
             any_charity=any.charity1[ok])
 
-if (!exists("earnings_pt1.sm")) {
-    if (file.exists("earnings_pt1.sm.RData")) {
-        load("earnings_pt1.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("earnings_pt1.stan", model_name = "earnings_pt1")
-        earnings_pt1.sm <- stan_model(stanc_ret = rt)
-        save(earnings_pt1.sm, file = "earnings_pt1.sm.RData")
-    }
-}
 
-earnings_pt1.sf1 <- sampling(earnings_pt1.sm, sis)
+earnings_pt1.sf1 <- stan(file='earnings_pt1.stan', data=sis, iter=1000,
+                         chains=4)
 print(earnings_pt1.sf1)
 post <- extract(earnings_pt1.sf1)
 beta <- colMeans(post$beta)
@@ -235,16 +217,8 @@ sis <- list(N=length(earnings1[ok]),earnings=earnings1[ok],
             any_ssi=any.ssi1[ok], any_welfare=any.welfare1[ok],
             any_charity=any.charity1[ok])
 
-if (!exists("earnings_pt2.sm")) {
-    if (file.exists("earnings_pt2.sm.RData")) {
-        load("earnings_pt2.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("earnings_pt2.stan", model_name = "earnings_pt2")
-        earnings_pt2.sm <- stan_model(stanc_ret = rt)
-        save(earnings_pt2.sm, file = "earnings_pt2.sm.RData")
-    }
-}
-earnings_pt2.sf1 <- sampling(earnings_pt2.sm, sis)
+earnings_pt2.sf1 <- stan(file='earnings_pt2.stan', data=sis, iter=1000,
+                         chains=4)
 print(earnings_pt2.sf1)
 post2 <- extract(earnings_pt2.sf1)
 beta2 <- colMeans(post2$beta)

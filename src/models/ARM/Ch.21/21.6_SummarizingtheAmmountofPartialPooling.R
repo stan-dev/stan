@@ -44,18 +44,10 @@ u <- log (uranium)
 u.full <- u[county]
 
 ## Fit the model
-if (!exists("radon_vary_intercept_a.sm")) {
-    if (file.exists("radon_vary_intercept_a.sm.RData")) {
-        load("radon_vary_intercept_a.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_vary_intercept_a.stan", model_name = "radon_vary_intercept_a")
-        radon_vary_intercept_a.sm <- stan_model(stanc_ret = rt)
-        save(radon_vary_intercept_a.sm, file = "radon_vary_intercept_a.sm.RData")
-    }
-}
 
 dataList.1 <- list(N=n,J=85,y=y,u=u,x=x,county=county)
-radon_vary_intercept_a.sf1 <- sampling(radon_vary_intercept_a.sm, dataList.1)
+radon_vary_intercept_a.sf1 <- stan(file='radon_vary_intercept_a.stan',
+                                   data=dataList.1, iter=1000, chains=4)
 print(radon_vary_intercept_a.sf1,pars = c("a","b","sigma_y", "lp__"))
 post <- extract(radon_vary_intercept_a.sf1)
 e.a <- colMeans(post$e_a)
@@ -65,18 +57,9 @@ omega <- pmin (omega, 1)
 
 ## Summary pooling factor for each batch of parameters
 
-if (!exists("radon_vary_intercept_b.sm")) {
-    if (file.exists("radon_vary_intercept_b.sm.RData")) {
-        load("radon_vary_intercept_b.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_vary_intercept_b.stan", model_name = "radon_vary_intercept_b")
-        radon_vary_intercept_b.sm <- stan_model(stanc_ret = rt)
-        save(radon_vary_intercept_b.sm, file = "radon_vary_intercept_b.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=n,J=85,y=y,u=u,x=x,county=county)
-radon_vary_intercept_b.sf1 <- sampling(radon_vary_intercept_b.sm, dataList.1)
+radon_vary_intercept_b.sf1 <- stan(file='radon_vary_intercept_b.stan',
+                                   data=dataList.1, iter=1000, chains=4)
 print(radon_vary_intercept_b.sf1,pars = c("a","b","sigma_y", "lp__"))
 post <- extract(radon_vary_intercept_b.sf1)
 

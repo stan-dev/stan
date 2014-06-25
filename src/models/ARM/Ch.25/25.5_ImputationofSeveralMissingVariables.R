@@ -23,16 +23,6 @@ impute <- function (a, a.impute){
    ifelse (is.na(a), a.impute, a)
 }
 
-if (!exists("earnings2.sm")) {
-    if (file.exists("earnings2.sm.RData")) {
-        load("earnings2.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("earnings2.stan", model_name = "earnings2")
-        earnings2.sm <- stan_model(stanc_ret = rt)
-        save(earnings2.sm, file = "earnings2.sm.RData")
-    }
-}
-
 n.sims <- 10
 for (s in 1:n.sims) {
  earnings1 <- random.imp(earnings)
@@ -55,7 +45,7 @@ for (s in 1:n.sims) {
              any_ssi=any.ssi1, any_welfare=any.welfare1,
              any_charity=any.charity1)
 
- earnings2.sf1 <- sampling(earnings2.sm, sis)
+ earnings2.sf1 <- stan(file='earnings2.stan', data=sis, iter=1000, chains=4)
  print(earnings2.sf1)
  post <- extract(earnings.sf1)
  beta <- colMeans(post$beta)
@@ -73,7 +63,7 @@ for (s in 1:n.sims) {
              any_ssi=any.ssi1, any_welfare=any.welfare1,
              any_charity=any.charity1)
  
- earnings2.sf1 <- sampling(earnings2.sm, sis)
+ earnings2.sf1 <- stan(file='earnings2.stan', data=sis, iter=1000, chains=4)
  print(earnings2.sf1)
  post <- extract(earnings.sf1)
  beta <- colMeans(post$beta)

@@ -11,18 +11,9 @@ n.dogs <- nrow(y)
 n.trials <- ncol(y)
 
 ## Calling predictive replications in Bugs
-if (!exists("dogs.sm")) {
-    if (file.exists("dogs.sm.RData")) {
-        load("dogs.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("dogs.stan", model_name = "dogs")
-        dogs.sm <- stan_model(stanc_ret = rt)
-        save(dogs.sm, file = "dogs.sm.RData")
-    }
-}
 
 dataList.1 <- list(n_dogs=n.dogs,n_trials=n.trials,y=y)
-dogs.sf1 <- sampling(dogs.sm, dataList.1)
+dogs.sf1 <- stan(file='dogs.stan', data=dataList.1, iter=1000, chains=4)
 print(dogs.sf1, pars = c("beta","lp__"))
 post <- extract(dogs.sf1)
 beta <- colMeans(post$beta)

@@ -19,33 +19,17 @@ siteset[sesame$site==i & sesame$setting==j]=i+5*(j-1)
 J=9
 
 ## Fit the model for example 1
-if (!exists("sesame_street1.sm")) {
-    if (file.exists("sesame_street1.sm.RData")) {
-        load("sesame_street1.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("sesame_street1.stan", model_name = "sesame_street1")
-        sesame_street1.sm <- stan_model(stanc_ret = rt)
-        save(sesame_street1.sm, file = "sesame_street1.sm.RData")
-    }
-}
 
 dataList.1 <- list(N=n,J=J,z=z,yt=yt,siteset=siteset)
-sesame_street1.sf1 <- sampling(sesame_street1.sm, dataList.1)
+sesame_street1.sf1 <- stan(file='sesame_street1.stan', data=dataList.1,
+                           iter=1000, chains=4)
 print(sesame_street1.sf1, pars = c("a","g","b","d","lp__"))
 
 
 ## Fit the model conditioning on pre-treatment variables
 ## FIXME: MISSING DATA PRETEST VARIABLE
-if (!exists("sesame_street2.sm")) {
-    if (file.exists("sesame_street2.sm.RData")) {
-        load("sesame_street2.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("sesame_street2.stan", model_name = "sesame_street2")
-        sesame_street2.sm <- stan_model(stanc_ret = rt)
-        save(sesame_street2.sm, file = "sesame_street2.sm.RData")
-    }
-}
 
-dataList.2 <- list(N=n,J=J,z=z,yt=yt,siteset=siteset,pretest=pretest)
-sesame_street2.sf1 <- sampling(sesame_street2.sm, dataList.2)
-print(sesame_street2.sf1, pars = c("a","g","b","d","phi_y","phi_t","lp__"))
+##dataList.2 <- list(N=n,J=J,z=z,yt=yt,siteset=siteset,pretest=pretest)
+##sesame_street2.sf1 <- stan(file='sesame_street2.stan', data=dataList.2,
+##                           iter=1000, chains=4)
+##print(sesame_street2.sf1, pars = c("a","g","b","d","phi_y","phi_t","lp__"))

@@ -28,55 +28,28 @@ n.pair <- max(pair)
 
 # fitting all 4 grades at once (without controlling for pretest)
 
-if (!exists("electric_1a.sm")) {
-    if (file.exists("electric_1a.sm.RData")) {
-        load("electric_1a.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_1a.stan", model_name = "electric_1a")
-        electric_1a.sm <- stan_model(stanc_ret = rt)
-        save(electric_1a.sm, file = "electric_1a.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=n,y=y,n_grade=n.grade,grade=grade,grade_pair=grade.pair,
                    treatment=treatment,n_pair=n.pair,pair=pair,n_grade_pair=4)
-electric_1a.sf1 <- sampling(electric_1a.sm, dataList.1)
+electric_1a.sf1 <- stan(file='electric_1a.stan', data=dataList.1, iter=1000,
+                        chains=4)
 print(electric_1a.sf1, pars = c("a","beta","lp__"))
 
 
 # simple model controlling for pre-test
 
-if (!exists("electric_1b.sm")) {
-    if (file.exists("electric_1b.sm.RData")) {
-        load("electric_1b.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_1b.stan", model_name = "electric_1b")
-        electric_1b.sm <- stan_model(stanc_ret = rt)
-        save(electric_1b.sm, file = "electric_1b.sm.RData")
-    }
-}
-
 dataList.2 <- list(N=n,y=y,treatment=treatment,n_pair=n.pair,pair=pair,
                    pre_test=pre.test)
-electric_1b.sf1 <- sampling(electric_1b.sm, dataList.2)
+electric_1b.sf1 <- stan(file='electric_1b.stan', data=dataList.2,
+                        iter=1000, chains=4)
 print(electric_1b.sf1, pars = c("a","beta","lp__"))
 
 # fitting all 4 grades at once (controlling for pretest)
 
-if (!exists("electric_1c.sm")) {
-    if (file.exists("electric_1c.sm.RData")) {
-        load("electric_1c.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_1c.stan", model_name = "electric_1c")
-        electric_1c.sm <- stan_model(stanc_ret = rt)
-        save(electric_1c.sm, file = "electric_1c.sm.RData")
-    }
-}
-
 dataList.3 <- list(N=n,y=y,n_grade=n.grade,grade=grade,grade_pair=grade.pair,
                    treatment=treatment,n_pair=n.pair,pair=pair,pre_test=pre.test,
                    n_grade_pair=4)
-electric_1c.sf1 <- sampling(electric_1c.sm, dataList.3)
+electric_1c.sf1 <- stan(file='electric_1c.stan', data=dataList.3,
+                        iter=1000, chains=4)
 print(electric_1c.sf1, pars = c("a","beta","beta2","lp__"))
 
 
@@ -116,26 +89,6 @@ print(p2, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 
  # define est1, est2, se1, se2 (from models on chapter 9)
 
-if (!exists("electric_one_pred.sm")) {
-    if (file.exists("electric_one_pred.sm.RData")) {
-        load("electric_one_pred.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_one_pred.stan", model_name = "electric_one_pred")
-        electric_one_pred.sm <- stan_model(stanc_ret = rt)
-        save(electric_one_pred.sm, file = "electric_one_pred.sm.RData")
-    }
-}
-
-if (!exists("electric_multi_preds.sm")) {
-    if (file.exists("electric_multi_preds.sm.RData")) {
-        load("electric_multi_preds.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_multi_preds.stan", model_name = "electric_multi_preds")
-        electric_multi_preds.sm <- stan_model(stanc_ret = rt)
-        save(electric_multi_preds.sm, file = "electric_multi_preds.sm.RData")
-    }
-}
-
 est1 <- rep(NA,4)
 est2 <- rep(NA,4)
 se1 <- rep(NA,4)
@@ -152,7 +105,8 @@ pre.test2 <- pre.test1[ok]
 N1 <- length(post.test2)
 
 dataList.1 <- list(N=N1, post_test=post.test2, treatment=treatment2)
-electric_one_pred.sf1 <- sampling(electric_one_pred.sm, dataList.1)
+electric_one_pred.sf1 <- stan(file='electric_one_pred.stan', data=dataList.1,
+                              iter=1000, chains=4)
 print(electric_one_pred.sf1)
 beta.post <- extract(electric_one_pred.sf1, "beta")$beta
 est1[k] <- colMeans(beta.post)[2]
@@ -160,7 +114,8 @@ se1[k] <- sd(beta.post[,2])
 
 dataList.2 <- list(N=N1, post_test=post.test2, treatment=treatment2,
                    pre_test=pre.test2)
-electric_multi_preds.sf1 <- sampling(electric_multi_preds.sm, dataList.2)
+electric_multi_preds.sf1 <- stan(file='electric_multi_preds.stan',
+                                 data=dataList.2, iter=1000, chains=4)
 print(electric_multi_preds.sf1)
 beta.post2 <- extract(electric_one_pred.sf1, "beta")$beta
 est2[k] <- colMeans(beta.post2)[2]

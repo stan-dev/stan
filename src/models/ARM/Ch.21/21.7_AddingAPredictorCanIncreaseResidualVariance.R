@@ -46,35 +46,16 @@ u.full <- u[county]
 
 # varying-intercept model (NO FLOOR!)
 
-if (!exists("radon_vary_intercept_nofloor.sm")) {
-    if (file.exists("radon_vary_intercept_nofloor.sm.RData")) {
-        load("radon_vary_intercept_nofloor.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_vary_intercept_nofloor.stan", model_name = "radon_vary_intercept_nofloor")
-        radon_vary_intercept_nofloor.sm <- stan_model(stanc_ret = rt)
-        save(radon_vary_intercept_nofloor.sm, file = "radon_vary_intercept_nofloor.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=n,J=85,y=y,u=u.full,county=county)
-radon_vary_intercept_nofloor.sf1 <- sampling(radon_vary_intercept_nofloor.sm, dataList.1)
+radon_vary_intercept_nofloor.sf1 <- stan(file='radon_vary_intercept_nofloor.stan', data=dataList.1, iter=1000, chains=4)
 print(radon_vary_intercept_nofloor.sf1,pars = c("a","b","sigma_y", "lp__"))
 
 
 # add floor as an individual-level predictor
 
-if (!exists("radon_vary_intercept_floor.sm")) {
-    if (file.exists("radon_vary_intercept_floor.sm.RData")) {
-        load("radon_vary_intercept_floor.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_vary_intercept_floor.stan", model_name = "radon_vary_intercept_floor")
-        radon_vary_intercept_floor.sm <- stan_model(stanc_ret = rt)
-        save(radon_vary_intercept_floor.sm, file = "radon_vary_intercept_floor.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=n,J=85,y=y,u=u.full,x=x,county=county)
-radon_vary_intercept_floor.sf1 <- sampling(radon_vary_intercept_floor.sm, dataList.1)
+radon_vary_intercept_floor.sf1 <- stan(file'radon_vary_intercept_floor.stan',
+                                       data=dataList.1, iter=1000, chains=4)
 print(radon_vary_intercept_floor.sf1,pars = c("a","b","sigma_y", "lp__"))
 
 
@@ -86,18 +67,9 @@ for (j in 1:J){
 }
 x.mean.full <- x.mean[county]
 
-if (!exists("radon_vary_intercept_floor2.sm")) {
-    if (file.exists("radon_vary_intercept_floor2.sm.RData")) {
-        load("radon_vary_intercept_floor2.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("radon_vary_intercept_floor2.stan", model_name = "radon_vary_intercept_floor2")
-        radon_vary_intercept_floor2.sm <- stan_model(stanc_ret = rt)
-        save(radon_vary_intercept_floor2.sm, file = "radon_vary_intercept_floor2.sm.RData")
-    }
-}
-
 dataList.1 <- list(N=n,J=85,y=y,u=u.full,x=x,county=county,x_mean=x.mean.full)
-radon_vary_intercept_floor2.sf1 <- sampling(radon_vary_intercept_floor2.sm, dataList.1)
+radon_vary_intercept_floor2.sf1 <- stan(file='radon_vary_intercept_floor2.stan',
+                                        data=dataList.1, iter=1000, chains=4)
 print(radon_vary_intercept_floor2.sf1,pars = c("a","b","sigma_y", "lp__"))
 
 # Figure 21.9
