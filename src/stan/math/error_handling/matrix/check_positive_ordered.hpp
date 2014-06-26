@@ -2,8 +2,8 @@
 #define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_POSITIVE_ORDERED_HPP__
 
 #include <sstream>
-#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 
 namespace stan {
   namespace math {
@@ -26,8 +26,7 @@ namespace stan {
                                 const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                                 const char* name,
                                 T_result* result) {
-      using stan::math::policies::raise_domain_error;
-      typedef typename Eigen::Matrix<T_y,Eigen::Dynamic,1>::size_type size_t;
+      typedef typename Eigen::Matrix<T_y,Eigen::Dynamic,1>::size_type size_type;
       if (y.size() == 0) {
         return true;
       }
@@ -40,7 +39,7 @@ namespace stan {
                        msg.c_str(),"",
                        result);
       }
-      for (size_t n = 1; n < y.size(); n++) {
+      for (size_type n = 1; n < y.size(); n++) {
         if (!(y[n] > y[n-1])) {
           std::ostringstream stream;
           stream << name << " is not a valid ordered vector."
@@ -55,13 +54,6 @@ namespace stan {
       }
       return true;
     }                         
-    template <typename T>
-    bool check_positive_ordered(const char* function,
-                                const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
-                                const char* name,
-                                T* result = 0) {
-      return check_positive_ordered<T,T>(function,y,name,result);
-    }
 
   }
 }

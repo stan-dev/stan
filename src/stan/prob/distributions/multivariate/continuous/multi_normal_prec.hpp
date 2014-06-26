@@ -48,19 +48,16 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
       
-      if (!check_size_match(function, 
-                            Sigma.rows(), "Rows of precision parameter",
-                            Sigma.cols(), "columns of precision parameter",
-                            &lp))
-        return lp;
-      if (!check_positive(function, Sigma.rows(), "Precision matrix rows", &lp))
-        return lp;
-      if (!check_symmetric(function, Sigma, "Precision matrix", &lp))
-        return lp;
+      check_size_match(function, 
+                       Sigma.rows(), "Rows of precision parameter",
+                       Sigma.cols(), "columns of precision parameter",
+                       &lp);
+      check_positive(function, Sigma.rows(), "Precision matrix rows", &lp);
+      check_symmetric(function, Sigma, "Precision matrix", &lp);
       
       LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of precision parameter",&lp))
-        return lp;
+      check_ldlt_factor(function,ldlt_Sigma,
+                        "LDLT_Factor of precision parameter",&lp);
 
       using Eigen::Matrix;
       using Eigen::Dynamic;
@@ -79,7 +76,7 @@ namespace stan {
         int size_y_new;
         for (size_t i = 1, size_ = length_mvt(y); i < size_; i++) {
           int size_y_new = y_vec[i].size();
-          if (!check_size_match(function, 
+          check_size_match(function, 
                                 size_y_new, "Size of one of the vectors of the random variable",
                                 size_y_old, "Size of another vector of the random variable",
                                 &lp))
@@ -90,7 +87,7 @@ namespace stan {
         int size_mu_new;
         for (size_t i = 1, size_ = length_mvt(mu); i < size_; i++) {
           int size_mu_new = mu_vec[i].size();
-          if (!check_size_match(function, 
+          check_size_match(function, 
                                 size_mu_new, "Size of one of the vectors of the location variable",
                                 size_mu_old, "Size of another vector of the location variable",
                                 &lp))
@@ -103,26 +100,23 @@ namespace stan {
         (void) size_mu_new;
       }
 
-      if (!check_size_match(function, 
+      check_size_match(function, 
                             size_y, "Size of random variable",
                             size_mu, "size of location parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
+                            &lp);
+      check_size_match(function, 
                             size_y, "Size of random variable",
                             Sigma.rows(), "rows of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
+                            &lp);
+      check_size_match(function, 
                             size_y, "Size of random variable",
                             Sigma.cols(), "columns of covariance parameter",
-                            &lp))
-        return lp;
+                            &lp);
   
       for (size_t i = 0; i < size_vec; i++) {      
-        if (!check_finite(function, mu_vec[i], "Location parameter", &lp))
+        check_finite(function, mu_vec[i], "Location parameter", &lp))
           return lp;
-        if (!check_not_nan(function, y_vec[i], "Random variable", &lp))
+        check_not_nan(function, y_vec[i], "Random variable", &lp))
           return lp;
       } 
       

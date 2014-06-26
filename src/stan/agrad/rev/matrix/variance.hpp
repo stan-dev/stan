@@ -8,6 +8,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/matrix/stored_gradient_vari.hpp>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 
 namespace stan {
 
@@ -48,7 +49,7 @@ namespace stan {
      * @return sample variance of specified vector
      */
     var variance(const std::vector<var>& v) {
-      stan::math::validate_nonzero_size(v,"variance");
+      stan::math::check_nonzero_size("variance(%1%)",v,"v",(double*)0);
       if (v.size() == 1) return 0;
       return calc_variance(v.size(), &v[0]);
     }
@@ -65,7 +66,7 @@ namespace stan {
      */
     template <int R, int C>
     var variance(const Eigen::Matrix<var,R,C>& m) {
-      stan::math::validate_nonzero_size(m,"variance");
+      stan::math::check_nonzero_size("variance(%1%)",m,"m",(double*)0);
       if (m.size() == 1) return 0;
       return calc_variance(m.size(), &m(0));
     }

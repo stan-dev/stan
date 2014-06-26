@@ -156,8 +156,8 @@ TEST_F(McmcChains, add_adapter) {
     }
   }
 
-  EXPECT_EQ(blocker1.samples.rows(), samples.size());
-  EXPECT_EQ(blocker1.samples.cols(), samples[0].size());
+  EXPECT_EQ(blocker1.samples.rows(), static_cast<int>(samples.size()));
+  EXPECT_EQ(blocker1.samples.cols(), static_cast<int>(samples[0].size()));
 
   EXPECT_NO_THROW(chains.add(samples))
     << "adding multiple samples, adds new chain";

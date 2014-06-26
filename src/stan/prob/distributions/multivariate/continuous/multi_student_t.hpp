@@ -6,7 +6,11 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 
+#include <stan/math/matrix.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/matrix/dot_product.hpp>
+#include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -51,12 +55,10 @@ namespace stan {
       lp_type lp(0.0);
       
       // allows infinities
-      if (!check_not_nan(function, nu, 
-                         "Degrees of freedom parameter", &lp))
-        return lp;
-      if (!check_positive(function, nu, 
-                          "Degrees of freedom parameter", &lp))
-        return lp;
+      check_not_nan(function, nu, 
+                    "Degrees of freedom parameter", &lp);
+      check_positive(function, nu, 
+                     "Degrees of freedom parameter", &lp);
       
       using boost::math::isinf;
 
@@ -80,7 +82,7 @@ namespace stan {
         int size_y_new;
         for (size_t i = 1, size_ = length_mvt(y); i < size_; i++) {
           int size_y_new = y_vec[i].size();
-          if (!check_size_match(function, 
+          check_size_match(function, 
                                 size_y_new, "Size of one of the vectors of the random variable",
                                 size_y_old, "Size of another vector of the random variable",
                                 &lp))
@@ -91,7 +93,7 @@ namespace stan {
         int size_mu_new;
         for (size_t i = 1, size_ = length_mvt(mu); i < size_; i++) {
           int size_mu_new = mu_vec[i].size();
-          if (!check_size_match(function, 
+          check_size_match(function, 
                                 size_mu_new, "Size of one of the vectors of the location variable",
                                 size_mu_old, "Size of another vector of the location variable",
                                 &lp))
@@ -105,35 +107,31 @@ namespace stan {
       }
 
       
-      if (!check_size_match(function, 
+      check_size_match(function, 
           size_y, "Size of random variable",
           size_mu, "size of location parameter",
-          &lp))
-        return lp;
-      if (!check_size_match(function, 
+          &lp);
+      check_size_match(function, 
           size_y, "Size of random variable",
           Sigma.rows(), "rows of scale parameter",
-          &lp))
-        return lp;
-      if (!check_size_match(function, 
+          &lp);
+      check_size_match(function, 
           size_y, "Size of random variable",
           Sigma.cols(), "columns of scale parameter",
-          &lp))
-        return lp;
+          &lp);
       
       for (size_t i = 0; i < size_vec; i++) {
-        if (!check_finite(function, mu_vec[i], "Location parameter", &lp))
+        check_finite(function, mu_vec[i], "Location parameter", &lp))
           return lp;
-        if (!check_not_nan(function, y_vec[i], "Random variable", &lp)) 
+        check_not_nan(function, y_vec[i], "Random variable", &lp)) 
           return lp;
       }    
-      if (!check_symmetric(function, Sigma, "Scale parameter", &lp))
-        return lp;
+      check_symmetric(function, Sigma, "Scale parameter", &lp);
 
       
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of scale parameter",&lp))
-        return lp;
+      check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of scale parameter",
+                        &lp);
 
 
       if (include_summand<propto,T_dof>::value) {
@@ -197,12 +195,12 @@ namespace stan {
       using stan::math::check_symmetric;
       using stan::math::check_positive;      
  
-      check_finite(function, mu, "Location parameter");
-      check_symmetric(function, s, "Scale parameter");
+      check_finite(function, mu, "Location parameter", (double*)0);
+      check_symmetric(function, s, "Scale parameter", (double*)0);
       check_not_nan(function, nu, 
-                    "Degrees of freedom parameter");
+                    "Degrees of freedom parameter", (double*)0);
       check_positive(function, nu, 
-                     "Degrees of freedom parameter");
+                     "Degrees of freedom parameter", (double*)0);
 
       Eigen::VectorXd z(s.cols());
       z.setZero();

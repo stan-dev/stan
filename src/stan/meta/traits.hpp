@@ -9,7 +9,7 @@
 #include <boost/type_traits/is_arithmetic.hpp> 
 
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/matrix.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
 
@@ -92,6 +92,12 @@ namespace stan {
     enum { value = 1 };
     typedef T type;
   };
+  template <typename T>
+  struct is_vector<Eigen::Block<T> > {
+    enum { value = 1 };
+    typedef T type;
+  };
+
 
   namespace {
     template <bool is_vec, typename T>
@@ -559,6 +565,5 @@ namespace stan {
   }
 
 }
-
 #endif
 

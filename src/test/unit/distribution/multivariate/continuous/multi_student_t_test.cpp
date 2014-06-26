@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <stan/agrad/rev.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_student_t.hpp>
 
 // UTILITY FUNCTIONS FOR TESTING

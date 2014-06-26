@@ -790,8 +790,29 @@ add_unary("tan");
 add_unary("tanh");
 add("tcrossprod",MATRIX_T,MATRIX_T);
 add_unary("tgamma");
-add("to_vector", VECTOR_T, ROW_VECTOR_T);
+add("to_array_1d", expr_type(DOUBLE_T,1), MATRIX_T);
+add("to_array_1d", expr_type(DOUBLE_T,1), VECTOR_T);
+add("to_array_1d", expr_type(DOUBLE_T,1), ROW_VECTOR_T);
+for (size_t i=1; i < 10; i++) {
+  add("to_array_1d", expr_type(DOUBLE_T,1), expr_type(DOUBLE_T,i));
+  add("to_array_1d", expr_type(INT_T,1), expr_type(INT_T,i));
+}
+add("to_array_2d", expr_type(DOUBLE_T,2), MATRIX_T);
+add("to_matrix", MATRIX_T, MATRIX_T);
+add("to_matrix", MATRIX_T, VECTOR_T);
+add("to_matrix", MATRIX_T, ROW_VECTOR_T);
+add("to_matrix", MATRIX_T, expr_type(DOUBLE_T,2));
+add("to_matrix", MATRIX_T, expr_type(INT_T,2));
+add("to_row_vector", ROW_VECTOR_T, MATRIX_T);
+add("to_row_vector", ROW_VECTOR_T, VECTOR_T);
+add("to_row_vector", ROW_VECTOR_T, ROW_VECTOR_T);
+add("to_row_vector", ROW_VECTOR_T, expr_type(DOUBLE_T,1));
+add("to_row_vector", ROW_VECTOR_T, expr_type(INT_T,1));
 add("to_vector", VECTOR_T, MATRIX_T);
+add("to_vector", VECTOR_T, VECTOR_T);
+add("to_vector", VECTOR_T, ROW_VECTOR_T);
+add("to_vector", VECTOR_T, expr_type(DOUBLE_T,1));
+add("to_vector", VECTOR_T, expr_type(INT_T,1));
 add("trace",DOUBLE_T,MATRIX_T);
 add("trace_gen_quad_form",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T);
 add("trace_quad_form",DOUBLE_T,MATRIX_T,VECTOR_T);
@@ -828,6 +849,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
       add("von_mises_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
+add_binary("von_mises_rng");
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
