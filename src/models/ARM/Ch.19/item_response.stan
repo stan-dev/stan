@@ -29,8 +29,8 @@ transformed parameters {
   real scale;
   real shift;
 
-  shift <- mean(a);
-  scale <- sd(a);
+  shift <- mean(a_raw);
+  scale <- sd(a_raw);
   a <- (a_raw - shift) / scale;
   b_hat_raw <- 100 * b_0_raw + d_raw * x;
   b <- (b_raw - shift) / scale;
