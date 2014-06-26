@@ -369,7 +369,16 @@ int create_files(const int& argc, const char* argv[],const int& index,
     stringstream out_name;
     out_name << out_name_base;
     out_name << "_" << std::setw(5) << std::setfill('0') << n;
-    out_name << "_generated_test.cpp";
+    if (index == 1)
+      out_name << "_generated_v_test.cpp";
+    else if (index == 2)
+      out_name << "_generated_fd_test.cpp";
+    else if (index == 3)
+      out_name << "_generated_fv_test.cpp";
+    else if (index == 4)
+      out_name << "_generated_ffd_test.cpp";
+    else if (index == 5)
+      out_name << "_generated_ffv_test.cpp";
     std::string tmp(out_name.str());
     outs.push_back(new std::ofstream(tmp.c_str()));
   }
