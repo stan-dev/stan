@@ -16,14 +16,14 @@ public:
     param[2] = 3.3;           // mu (Location)
     param[3] = 1.0;           // sigma (Scale)
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.86466887792));  // expected CCDF_log
+    ccdf_log.push_back(std::log(1.0 - 0.8646688779244795508561));  // expected CCDF_log
      
     param[0] = 2.5;           // y
     param[1] = 3.5;           // nu (Degrees of Freedom)
     param[2] = 3.3;           // mu (Location)
     param[3] = 1.0;           // sigma (Scale)
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.23723278834));  // expected CCDF_log
+    ccdf_log.push_back(std::log(1.0 - 0.2372327883473262233327));  // expected CCDF_log
       
   }
   

@@ -19,7 +19,7 @@ public:
     param[2] = 13;         // alpha
     param[3] = 15;         // beta
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.26805232961)); // expected cdf_log
+    cdf_log.push_back(std::log(0.2680523296111902594541368047465042591108987357277389728827508022844102288442195709664943608618480998)); // expected cdf_log
   }
   
   void invalid_values(vector<size_t>& index, 

@@ -24,13 +24,13 @@ public:
     param[1] = 2.9;                 // alpha
     param[2] = 1.8;                 // sigma
     parameters.push_back(param);
-    log_prob.push_back(-3.277094);  // expected log_prob
+    log_prob.push_back(-3.277093769205283724233);  // expected log_prob
 
     param[0] = 3.9;                 // y
     param[1] = 1.7;                 // alpha
     param[2] = 0.25;                // sigma
     parameters.push_back(param);
-    log_prob.push_back(-102.8962);  // expected log_prob
+    log_prob.push_back(-102.8962074392704266756);  // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

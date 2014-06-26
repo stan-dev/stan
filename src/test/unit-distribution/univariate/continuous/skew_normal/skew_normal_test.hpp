@@ -16,28 +16,28 @@ public:
     param[2] = 1.0;           // sigma
     param[3] = 1.0;           // alpha
     parameters.push_back(param);
-    log_prob.push_back(-0.91893852); // expected log_prob
+    log_prob.push_back(-0.9189385332046727805633); // expected log_prob
 
     param[0] = 1.0;           // y
     param[1] = 0.0;           // mu
     param[2] = 1.0;           // sigma
     param[3] = 1.0;           // alpha
     parameters.push_back(param);
-    log_prob.push_back(-0.898545); // expected log_prob
+    log_prob.push_back(-0.8985451316681772881978); // expected log_prob
 
     param[0] = -2.0;          // y
     param[1] = 0.0;           // mu
     param[2] = 1.0;           // sigma
     param[3] = 2.0;           // alpha
     parameters.push_back(param);
-    log_prob.push_back(-12.585893); // expected log_prob
+    log_prob.push_back(-12.58589283917201839813); // expected log_prob
 
     param[0] = -3.5;          // y
     param[1] = 1.9;           // mu
     param[2] = 7.2;           // sigma
     param[3] = 2.9;           // alpha
     parameters.push_back(param);
-    log_prob.push_back(-6.6932335); // expected log_prob
+    log_prob.push_back(-6.693233548678988675817); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

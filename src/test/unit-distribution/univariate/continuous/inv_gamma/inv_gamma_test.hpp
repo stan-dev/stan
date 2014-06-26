@@ -23,7 +23,7 @@ public:
     param[1] = 2.9;                 // alpha
     param[2] = 3.1;                 // beta
     parameters.push_back(param);
-    log_prob.push_back(-0.8185295); // expected log_prob
+    log_prob.push_back(-0.8185294827413338580868); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

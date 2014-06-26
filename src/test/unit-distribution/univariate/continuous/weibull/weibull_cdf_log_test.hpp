@@ -18,13 +18,13 @@ public:
     param[1] = 1.0;                 // alpha
     param[2] = 1.0;                 // sigma
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.86466472));       // expected cdf_log
+    cdf_log.push_back(std::log(0.8646647167633872976822));       // expected cdf_log
 
     param[0] = 0.25;                // y
     param[1] = 2.9;                 // alpha
     param[2] = 1.8;                 // sigma
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.0032585711));  // expected cdf_log
+    cdf_log.push_back(std::log(0.00325857114906742380625));  // expected cdf_log
 
     param[0] = 3.9;                 // y
     param[1] = 1.7;                 // alpha

@@ -15,7 +15,7 @@ public:
     param[1] = 0.5;           // Location
     param[2] = 3.3;           // Scale
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.680827173));  // expected cdf_log
+    cdf_log.push_back(std::log(0.68082717327852959599));  // expected cdf_log
 
   }
   

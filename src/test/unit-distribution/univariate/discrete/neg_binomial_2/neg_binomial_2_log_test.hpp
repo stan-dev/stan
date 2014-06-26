@@ -20,19 +20,19 @@ public:
     param[1] = 2.0;          // eta
     param[2] = 1.5;          // phi
     parameters.push_back(param);
-    log_prob.push_back(-3.208872); // expected log_prob
+    log_prob.push_back(-3.20887218205076511331179862116263121414716429208289234888793); // expected log_prob
 
     param[0] = 100;          // n
     param[1] = -3.0;          // eta
     param[2] = 3.5;          // phi
     parameters.push_back(param);
-    log_prob.push_back(-416.3829); // expected log_prob
+    log_prob.push_back(-416.382927743850187661846671194765967569806334854259547205045); // expected log_prob
 
     param[0] = 100;          // n
     param[1] = -10;          // eta
     param[2] = 200;          // phi
     parameters.push_back(param);
-    log_prob.push_back(-1342.303); // expected log_prob
+    log_prob.push_back(-1342.30278266569972162264049303129841494915365562553058756128); // expected log_prob
   }
 
   void invalid_values(vector<size_t>& index,

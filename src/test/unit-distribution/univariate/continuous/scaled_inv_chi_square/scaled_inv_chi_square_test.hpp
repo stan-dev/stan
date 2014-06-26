@@ -18,13 +18,13 @@ public:
     param[1] = 6.1;           // nu
     param[2] = 3.0;           // s
     parameters.push_back(param);
-    log_prob.push_back(-3.091965); // expected log_prob
+    log_prob.push_back(-3.091965468919148054052190729092); // expected log_prob
 
     param[0] = 1.0;           // y
     param[1] = 1.0;           // nu
     param[2] = 0.5;           // s
     parameters.push_back(param);
-    log_prob.push_back(-1.737086); // expected log_prob
+    log_prob.push_back(-1.737085713764618051197561857864); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

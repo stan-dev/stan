@@ -17,25 +17,25 @@ public:
     param[1] = 0;           // mu
     param[2] = 1;           // sigma
     parameters.push_back(param);
-    cdf_log.push_back(-0.69314718);     // expected cdf_log
+    cdf_log.push_back(-0.6931471805599452862268);     // expected cdf_log
 
     param[0] = 1;           // y
     param[1] = 0;           // mu
     param[2] = 1;           // sigma
     parameters.push_back(param);
-    cdf_log.push_back(-0.17275378); // expected cdf_log
+    cdf_log.push_back(-0.1727537790234499326392); // expected cdf_log
 
     param[0] = -2;          // y
     param[1] = 0;           // mu
     param[2] = 1;           // sigma
     parameters.push_back(param);
-    cdf_log.push_back(-3.7831843); // expected cdf_log
+    cdf_log.push_back(-3.78318433368203166367); // expected cdf_log
 
     param[0] = -3.5;          // y
     param[1] = 1.9;           // mu
     param[2] = 7.2;           // sigma
     parameters.push_back(param);
-    cdf_log.push_back(-1.4844482); // expected cdf_log
+    cdf_log.push_back(-1.484448229919656192521); // expected cdf_log
   }
   
   void invalid_values(vector<size_t>& index, 

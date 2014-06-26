@@ -20,19 +20,19 @@ public:
     param[1] = 2.0;          // alpha
     param[2] = 1.5;          // beta
     parameters.push_back(param);
-    log_prob.push_back(-7.786663); // expected log_prob
+    log_prob.push_back(-7.786663293475162284096); // expected log_prob
 
     param[0] = 100;          // n
     param[1] = 3.0;          // alpha
     param[2] = 3.5;          // beta
     parameters.push_back(param);
-    log_prob.push_back(-142.6147); // expected log_prob
+    log_prob.push_back(-142.6147368129045105434); // expected log_prob
 
     param[0] = 13;
     param[1] = 1e11; // alpha > 1e10, causes redux to Poisson
     param[2] = 1e10; // equiv to Poisson(1e11/1e10) = Poisson(10)
     parameters.push_back(param);
-    log_prob.push_back(-2.618558); // log poisson(13|10)
+    log_prob.push_back(-2.618557437134943821633); // log poisson(13|10)
   }
  
   void invalid_values(vector<size_t>& index, 

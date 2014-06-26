@@ -15,7 +15,7 @@ public:
     param[1] = 0.5;           // y_min (Scale)
     param[2] = 3.3;           // alpha (Shape)
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.7376392612));  // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.7376392612457611797083));  // expected ccdf_log
 
   }
   

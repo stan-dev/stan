@@ -18,7 +18,7 @@ public:
     param[1] = 50;          // Successes/Shape
     param[2] = 3;           // logit(p)/Inverse Scale
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.4240861277)); // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.4240861277740262114122)); // expected ccdf_log
   }
   
   void invalid_values(vector<size_t>& index, 

@@ -16,14 +16,14 @@ public:
     param[2] = 1;           // sigma
     param[3] = 1; //alpha
     parameters.push_back(param);
-    cdf.push_back(0.25);     // expected cdf
+    cdf.push_back(0.2500000000000001110223);     // expected cdf
 
     param[0] = 1;           // y
     param[1] = 0;           // mu
     param[2] = 1;           // sigma
     param[3] = 1; //alpha
     parameters.push_back(param);
-    cdf.push_back(0.707861); // expected cdf
+    cdf.push_back(0.7078609817371410706244); // expected cdf
 
     param[0] = -1;          // y
     param[1] = 0;           // mu
@@ -37,7 +37,7 @@ public:
     param[2] = 1.2;           // sigma
     param[3] = 1.9; //alpha
     parameters.push_back(param);
-    cdf.push_back(0.05529793); // expected cdf
+    cdf.push_back(0.05529792943083011724781); // expected cdf
   }
   
   void invalid_values(vector<size_t>& index, 

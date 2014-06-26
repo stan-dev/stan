@@ -23,7 +23,7 @@ public:
     param[2] = 1.0;           // sigma
     param[3] = 1.0;           // lambda
     parameters.push_back(param);
-    log_prob.push_back(-1.1931471805599453); // expected log_prob
+    log_prob.push_back(-1.193147180559945397249); // expected log_prob
 
     param[0] = -2.0;          // y
     param[1] = 0.0;           // mu

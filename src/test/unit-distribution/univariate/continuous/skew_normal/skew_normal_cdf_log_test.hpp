@@ -16,28 +16,28 @@ public:
     param[2] = 1;           // sigma
     param[3] = 1; //alpha
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.25));     // expected cdf_log
+    cdf_log.push_back(std::log(0.2500000000000001110223));     // expected cdf_log
 
     param[0] = 1;           // y
     param[1] = 0;           // mu
     param[2] = 1;           // sigma
     param[3] = 1; //alpha
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.707861)); // expected cdf_log
+    cdf_log.push_back(std::log(0.7078609817371410706244)); // expected cdf_log
 
     param[0] = -1;          // y
     param[1] = 0;           // mu
     param[2] = 1;           // sigma
     param[3] = 3; //alpha
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.0000562444337118770)); // expected cdf_log
+    cdf_log.push_back(std::log(0.00005624443371187709415635692284235862134252368571012732206706451807484923689534924660749487716440408152)); // expected cdf_log
 
     param[0] = -0.3;          // y
     param[1] = 0.1;           // mu
     param[2] = 1.2;           // sigma
     param[3] = 1.9; //alpha
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.05529793)); // expected cdf_log
+    cdf_log.push_back(std::log(0.05529792943083011724781)); // expected cdf_log
   }
   
   void invalid_values(vector<size_t>& index, 

@@ -16,14 +16,14 @@ public:
     param[2] = 3.3;           // mu (Location)
     param[3] = 1.0;           // sigma (Scale)
     parameters.push_back(param);
-    cdf.push_back(0.86466887792);  // expected CDF
+    cdf.push_back(0.8646688779244795508561);  // expected CDF
      
     param[0] = 2.5;           // y
     param[1] = 3.5;           // nu (Degrees of Freedom)
     param[2] = 3.3;           // mu (Location)
     param[3] = 1.0;           // sigma (Scale)
     parameters.push_back(param);
-    cdf.push_back(0.23723278834);  // expected CDF
+    cdf.push_back(0.2372327883473262233327);  // expected CDF
       
   }
   
