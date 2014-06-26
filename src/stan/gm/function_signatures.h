@@ -828,6 +828,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
       add("von_mises_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
+add_binary("von_mises_rng");
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {

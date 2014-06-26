@@ -46,6 +46,7 @@ generated quantities {
   z <- exponential_rng(2.9);
   z <- gamma_rng(1.0, 3.0);
   z <- inv_gamma_rng(0.1,0.1);
+  z <- von_mises_rng(1.0,2.0);
   z <- weibull_rng(1.0,2.0);
   z <- pareto_rng(0.1, 1.5);
   z <- beta_rng(110.0, 250.1);
