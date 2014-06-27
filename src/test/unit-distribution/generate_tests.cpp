@@ -405,10 +405,10 @@ int create_files(const int& argc, const char* argv[],const int& index,
  */
 int main(int argc, const char* argv[]) {
   int var_num = create_files(argc,argv,1,-1);
-  int fd_num = create_files(argc,argv,2,var_num+1);
-  int fv_num = create_files(argc,argv,3,fd_num+1);
-  int ffd_num = create_files(argc,argv,4,fv_num+1);
-  int ffv_num = create_files(argc,argv,5,ffd_num+1);
+  int fd_num = create_files(argc,argv,2,-1);
+  int fv_num = create_files(argc,argv,3,-1);
+  int ffd_num = create_files(argc,argv,4,-1);
+  int ffv_num = create_files(argc,argv,5,-1);
   
   return 0;
 }
