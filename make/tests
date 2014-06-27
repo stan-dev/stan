@@ -218,12 +218,25 @@ test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generat
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
 
-src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+src/test/unit-distribution/%_00000_generated_v_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
 	@echo "--- Generating tests for $(notdir $<) ---"
 	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
+src/test/unit-distribution/%_00000_generated_fd_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+	@echo "--- Generating tests for $(notdir $<) ---"
+	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
+src/test/unit-distribution/%_00000_generated_fv_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+	@echo "--- Generating tests for $(notdir $<) ---"
+	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
+src/test/unit-distribution/%_00000_generated_ffd_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+	@echo "--- Generating tests for $(notdir $<) ---"
+	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
+
+src/test/unit-distribution/%_00000_generated_ffv_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+	@echo "--- Generating tests for $(notdir $<) ---"
+	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
 ##
 # For src/test/unit-distribution tests, adding
@@ -234,7 +247,7 @@ ifneq ($(filter second-expansion,$(.FEATURES)),)
 
 DISTRIBUTION_TESTS := $(shell find src/test/unit-distribution -type f -name '*.hpp')
 .SECONDEXPANSION:
-$(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_test.cpp,$$(filter $$@$$(PERCENT),$$(DISTRIBUTION_TESTS)))
+$(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_v_test.cpp,$$(filter $$@$$(PERCENT),$$(DISTRIBUTION_TESTS)))
 
 endif
 
@@ -248,7 +261,7 @@ endif
 #        in this current run of make. If this is the stage where
 #        we are generating tests, this number will be less than the
 #        number of tests to generate. (0 if running from a clean state)
-#     The second argument to filter-out is the number of unique
+#     The second through fifth arguments to filter-out is the number of unique
 #        generated distribution tests that should be generated. 
 #        This is determined by the existence of *_test.hpp files in 
 #        the appropriate directory.
@@ -257,7 +270,7 @@ endif
 ##
 $(filter src/test/unit-distribution%,$(TEST_TARGETS)): \
 GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
-                              $(words $(filter $@%_00000_generated_test.cpp,$(ALL_TESTS))))
+                              $(words $(filter $@%_00000_generated_v_test.cpp,$(ALL_TESTS))))
 
 
 .PHONY: test-headers
