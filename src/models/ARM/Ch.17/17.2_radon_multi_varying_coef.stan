@@ -1,7 +1,9 @@
 data {
   int<lower=0> N;
   int<lower=0> J;
+  int<lower=0> L;
   vector[N] y;
+  vector[L] U;
   int<lower=0,upper=1> x[N];
   int county[N];
 }
@@ -13,8 +15,7 @@ parameters {
   matrix[J,K] B_raw;
   matrix[K,K] W;
   matrix[K,K] Tau_b_raw;
-  matrix[N,K] X_0;  
-  vector[K] b_0;      
+  matrix[K,L] G_raw;
 }
 model {
   vector[N] y_hat;
@@ -22,31 +23,40 @@ model {
   matrix[K,K] rho_b;
   matrix[K,K] Sigma_b_raw;
   vector[K] mu_raw;
+  matrix[K,L] G;
 
-  mu_raw ~ normal(0, 100);
   xi ~ uniform(0, 100);
-  b_0 ~ normal(0, 100);
-
-  mu <- xi .* mu_raw;
 
   Tau_b_raw ~ wishart(W, K+1);
   Sigma_b_raw <- inverse(Tau_b_raw);
 
-  for (j in 1:J) {
-    for (k in 1:K)
+  for (k in 1:K)
+    for (j in 1:J)
       B[j,k] <- xi[k] * B_raw[j,k];
-    B_raw[j,] ~ multi_normal(mu_raw, Sigma_b_raw);    
+
+  for (k in 1:K){
+    for (l in 1:L){
+      G_raw[k,l] ~ normal(0, 100);
+      G[k,l] <- xi[k] + G_raw[k,l];
+    }
   }
 
+  for (j in 1:J)
+    for (k in 1:K)
+      B_raw_hat[j,k] <- dot_product(G_raw[k,],U[j,]);
+  
+  for (j in 1:J) 
+    B_raw[j,] ~ multi_normal(B_raw_hat[j,], Sigma_b_raw);    
+
   for (k in 1:K) {
+    sigma_b[k] <- abs(xi[k]) * sqrt(Sigma_b_raw[k,k]);
     for (k_prime in 1:K)
       rho_b[k,k_prime] <- Sigma_b_raw[k,k_prime] 
         / sqrt(Sigma_b_raw[k,k] * Sigma_b_raw[k_prime,k_prime]);
-    sigma_b[k] <- abs(xi[k]) * sqrt(Sigma_b_raw[k,k]);
   }
   
   for (i in 1:N)
-    y_hat[i] <- dot_product(b_0,X_0[i,]) + dot_product(B[county[i],],X[i,]);
+    y_hat[i] <- dot_product(B[county[i],],X[i,]);
 
   y ~ normal(y_hat, sigma);
 }
