@@ -71,38 +71,28 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
 
-      if (!check_size_match(function, 
-                            Sigma.rows(), "Rows of kernel matrix",
-                            Sigma.cols(), "columns of kernel matrix",
-                            &lp))
-        return lp;
-      if (!check_positive(function, Sigma.rows(), "Kernel rows", &lp))
-        return lp;
-      if (!check_finite(function, Sigma, "Kernel", &lp)) 
-        return lp;
-      if (!check_symmetric(function, Sigma, "Kernel", &lp))
-        return lp;
+      check_size_match(function, 
+                       Sigma.rows(), "Rows of kernel matrix",
+                       Sigma.cols(), "columns of kernel matrix",
+                       &lp);
+      check_positive(function, Sigma.rows(), "Kernel rows", &lp);
+      check_finite(function, Sigma, "Kernel", &lp);
+      check_symmetric(function, Sigma, "Kernel", &lp);
       
       LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp))
-        return lp;
+      check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp);
 
-      if (!check_size_match(function, 
-                            y.rows(), "Size of random variable (rows y)",
-                            w.size(), "Size of kernel scales (w)",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.cols(), "Size of random variable",
-                            Sigma.rows(), "rows of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_finite(function, w, "Kernel scales", &lp)) 
-        return lp;
-      if (!check_positive(function, w, "Kernel scales", &lp)) 
-        return lp;
-      if (!check_finite(function, y, "Random variable", &lp)) 
-        return lp;
+      check_size_match(function, 
+                       y.rows(), "Size of random variable (rows y)",
+                       w.size(), "Size of kernel scales (w)",
+                       &lp);
+      check_size_match(function, 
+                       y.cols(), "Size of random variable",
+                       Sigma.rows(), "rows of covariance parameter",
+                       &lp);
+      check_finite(function, w, "Kernel scales", &lp);
+      check_positive(function, w, "Kernel scales", &lp);
+      check_finite(function, y, "Random variable", &lp);
       
       if (y.rows() == 0)
         return lp;

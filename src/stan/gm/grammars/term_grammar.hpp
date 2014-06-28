@@ -46,7 +46,7 @@ namespace stan {
 
       boost::spirit::qi::rule<Iterator, 
                               std::vector<expression>(var_origin), 
-               whitespace_grammar<Iterator> > 
+                              whitespace_grammar<Iterator> > 
       dims_r;
 
 
@@ -91,6 +91,12 @@ namespace stan {
                               expression(var_origin), 
                               whitespace_grammar<Iterator> > 
       negated_factor_r;
+
+
+      boost::spirit::qi::rule<Iterator,
+                              expression(var_origin), 
+                              whitespace_grammar<Iterator> > 
+      exponentiated_factor_r;
 
 
       boost::spirit::qi::rule<Iterator, 

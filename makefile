@@ -35,7 +35,7 @@ GTEST ?= lib/gtest_1.7.0
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
@@ -201,9 +201,9 @@ endif
 	@echo '  - test-distributions : Runs unit tests for the distributions'
 	@echo '    Use this target instead: src/test/unit-distribution'
 	@echo '  - test-models    : Runs diagnostic models.'
-	@echo '    Use this target instead: src/test/CmdStan/models'
+	@echo '    Run this target from CmdStan: src/test/models'
 	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
-	@echo '    Use this target instead: src/test/CmdStan/models/bugs_examples'
+	@echo '    Run this target from CmdStan: src/test/models/bugs_examples'
 	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 

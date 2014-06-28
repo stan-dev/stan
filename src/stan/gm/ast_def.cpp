@@ -399,7 +399,7 @@ namespace stan {
     }
     base_var_decl arg_decl::base_variable_declaration() {
       std::vector<expression> dims;
-      for (int i = 0; i < arg_type_.num_dims_; ++i)
+      for (size_t i = 0; i < arg_type_.num_dims_; ++i)
         dims.push_back(expression(int_literal(0))); // dummy value 0
       return base_var_decl(name_,dims,arg_type_.base_type_);
     }
@@ -648,6 +648,10 @@ namespace stan {
         || name == "sum"
         || name == "tail"
         || name == "to_vector"
+        || name == "to_row_vector"
+        || name == "to_matrix"
+        || name == "to_array_1d"
+        || name == "to_array_2d"
         || name == "transpose"
         ;
     }

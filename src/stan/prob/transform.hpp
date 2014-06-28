@@ -13,11 +13,9 @@
 #include <stan/math.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/sum.hpp>
-#include <stan/math/matrix/validate_less.hpp>
-#include <stan/math/matrix/validate_square.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
-
+#include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 
 namespace stan {
@@ -213,8 +211,6 @@ namespace stan {
      * extended onion method Journal of Multivariate Analysis 100
      * (2009) 1989–2001 </li></ul>
      *
-     * // FIXME: explain which CPCs we're dealing with
-     * 
      * @param CPCs The (K choose 2) canonical partial correlations in
      * (-1,1).
      * @param K Dimensionality of correlation matrix.
@@ -230,30 +226,23 @@ namespace stan {
                 const size_t K,
                 T& log_prob) {
 
-      size_t k = 0; 
-      size_t i = 0;
-      T log_1cpc2;
-      double lead = K - 2.0; 
+      using stan::math::log1m;
+      using stan::math::square;
+      using stan::math::sum;
+
+      Eigen::Matrix<T,Eigen::Dynamic,1> values(CPCs.rows() - 1);
+      size_t pos = 0;
       // no need to abs() because this Jacobian determinant 
       // is strictly positive (and triangular)
-      // skip last row (odd indexing) because it adds nothing by design
-      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      for (size_type j = 0; 
-           j < (CPCs.rows() - 1);
-           ++j) {
-        using stan::math::log1m;
-        using stan::math::square;
-        log_1cpc2 = log1m(square(CPCs[j]));
-        // derivative of correlation wrt CPC
-        log_prob += lead / 2.0 * log_1cpc2; 
-        i++;
-        if (i > K) {
-          k++;
-          i = k + 1;
-          lead = K - k - 1.0;
+      // see inverse of Jacobian in equation 11 of LKJ paper
+      for (size_t k = 1; k <= (K - 2); k++)
+        for (size_t i = k + 1; i <= K; i++) {
+          values(pos) = (K - k - 1) * log1m(square(CPCs(pos)));
+          pos++;
         }
-      }
-      return read_corr_L(CPCs, K);
+
+      log_prob += 0.5 * sum(values);
+      return read_corr_L(CPCs,K);
     }
 
     /**
@@ -507,7 +496,8 @@ namespace stan {
     template <typename T>
     inline
     T positive_free(const T y) {
-      stan::math::check_positive("stan::prob::positive_free(%1%)", y, "Positive variable");
+      stan::math::check_positive("stan::prob::positive_free(%1%)", y, 
+                                 "Positive variable", (double*)0);
       return log(y);
     }
 
@@ -588,7 +578,8 @@ namespace stan {
       if (lb == -std::numeric_limits<double>::infinity())
         return identity_free(y);
       stan::math::check_greater_or_equal("stan::prob::lb_free(%1%)",
-                                         y, lb, "Lower bounded variable");
+                                         y, lb, "Lower bounded variable",
+                                         (double*)0);
       return log(y - lb);
     }
     
@@ -685,7 +676,8 @@ namespace stan {
       if (ub == std::numeric_limits<double>::infinity())
         return identity_free(y);
       stan::math::check_less_or_equal("stan::prob::ub_free(%1%)",
-                                      y, ub, "Upper bounded variable");
+                                      y, ub, "Upper bounded variable",
+                                      (double*)0);
       return log(ub - y);
     }
 
@@ -723,7 +715,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_constrain(const T x, TL lb, TU ub) {
-      stan::math::validate_less(lb,ub,"lb","ub","lub_constrain/3");
+      stan::math::check_less("lub_constrain(%1%)",lb,ub,"lb",(double*)0);
 
       if (lb == -std::numeric_limits<double>::infinity())
         return ub_constrain(x,ub);
@@ -859,8 +851,9 @@ namespace stan {
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_free(const T y, TL lb, TU ub) {
       using stan::math::logit;
-      stan::math::check_bounded("stan::prob::lub_free(%1%)",
-                                y, lb, ub, "Bounded variable");
+      stan::math::check_bounded<T, TL, TU, typename scalar_type<T>::type>
+        ("stan::prob::lub_free(%1%)",
+         y, lb, ub, "Bounded variable", (double*)0);
       if (lb == -std::numeric_limits<double>::infinity())
         return ub_free(y,ub);
       if (ub == std::numeric_limits<double>::infinity())
@@ -940,8 +933,9 @@ namespace stan {
     inline
     T prob_free(const T y) {
       using stan::math::logit;
-      stan::math::check_bounded("stan::prob::prob_free(%1%)",
-                                y, 0, 1, "Probability variable");
+      stan::math::check_bounded<T,double,double,T>
+        ("stan::prob::prob_free(%1%)",
+         y, 0, 1, "Probability variable",(double*)0);
       return logit(y);
     }
     
@@ -1006,8 +1000,9 @@ namespace stan {
     template <typename T>
     inline
     T corr_free(const T y) {
-      stan::math::check_bounded("stan::prob::lub_free(%1%)",
-                                y, -1, 1, "Correlation variable");
+      stan::math::check_bounded<T,double,double,double>
+        ("stan::prob::lub_free(%1%)",
+         y, -1, 1, "Correlation variable", (double*)0);
       return atanh(y);
     }
 
@@ -1071,7 +1066,8 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     unit_vector_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      stan::math::check_unit_vector("stan::prob::unit_vector_free(%1%)", x, "Unit vector variable");
+      stan::math::check_unit_vector("stan::prob::unit_vector_free(%1%)", 
+                                    x, "Unit vector variable", (double*)0);
       int Km1 = x.size() - 1;
       Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
       T sumSq = x(Km1)*x(Km1);
@@ -1176,7 +1172,8 @@ namespace stan {
     simplex_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       using stan::math::logit;
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "Simplex variable");
+      stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "Simplex variable",
+                                (double*)0);
       int Km1 = x.size() - 1;
       Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
       T stick_len(x(Km1));
@@ -1339,7 +1336,7 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     positive_ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
       stan::math::check_positive_ordered("stan::prob::positive_ordered_free(%1%)", 
-                                y, "Positive ordered variable");
+                                         y, "Positive ordered variable", (double*)0);
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       size_type k = y.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> x(k);
@@ -1552,7 +1549,8 @@ namespace stan {
       using Eigen::Dynamic;
       using stan::math::square;
 
-      stan::math::validate_square(x,"cholesky_corr_free");
+      double bad_result; // won't be used
+      stan::math::check_square("cholesky_corr_free",x,"x",&bad_result);
       // should validate lower-triangular, unit lengths
 
       int K = (x.rows() * (x.rows() - 1)) / 2;

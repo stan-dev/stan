@@ -5,7 +5,7 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
@@ -31,8 +31,7 @@ namespace stan {
     inline 
     Eigen::Matrix<fvar<T>, R2, C2> 
     multiply(const Eigen::Matrix<fvar<T>, R2, C2>& m, const double c) {
-      Eigen::Matrix<fvar<T>,R2,C2> 
-        res(m.rows(),m.cols());
+      Eigen::Matrix<fvar<T>,R2,C2> res(m.rows(),m.cols());
       for(int i = 0; i < m.rows(); i++) {
         for(int j = 0; j < m.cols(); j++)
           res(i,j) = c * m(i,j);
@@ -44,8 +43,7 @@ namespace stan {
     inline 
     Eigen::Matrix<fvar<T>,R1,C1> 
     multiply(const Eigen::Matrix<double, R1, C1>& m, const fvar<T>& c) {
-      Eigen::Matrix<fvar<T>,R1,C1> 
-        res(m.rows(),m.cols());
+      Eigen::Matrix<fvar<T>,R1,C1> res(m.rows(),m.cols());
       for(int i = 0; i < m.rows(); i++) {
         for(int j = 0; j < m.cols(); j++)
           res(i,j) = c * m(i,j);
@@ -79,7 +77,8 @@ namespace stan {
     Eigen::Matrix<fvar<T>,R1,C2> 
     multiply(const Eigen::Matrix<fvar<T>,R1,C1>& m1,
              const Eigen::Matrix<fvar<T>,R2,C2>& m2) {
-      stan::math::validate_multiplicable(m1,m2,"multiply");
+      stan::math::check_multiplicable("multiply(%1%)",m1,"m1",
+                                      m2,"m2",(double*)0);
       Eigen::Matrix<fvar<T>,R1,C2> result(m1.rows(),m2.cols());
       for (size_type i = 0; i < m1.rows(); i++) {
         Eigen::Matrix<fvar<T>,1,C1> crow = m1.row(i);
@@ -96,9 +95,9 @@ namespace stan {
     Eigen::Matrix<fvar<T>,R1,C2> 
     multiply(const Eigen::Matrix<fvar<T>,R1,C1>& m1,
              const Eigen::Matrix<double,R2,C2>& m2) {
-      stan::math::validate_multiplicable(m1,m2,"multiply");
-      Eigen::Matrix<fvar<T>,R1,C2>
-        result(m1.rows(),m2.cols());
+      stan::math::check_multiplicable("multiply(%1%)",m1,"m1",
+                                      m2,"m2",(double*)0);
+      Eigen::Matrix<fvar<T>,R1,C2> result(m1.rows(),m2.cols());
       for (size_type i = 0; i < m1.rows(); i++) {
         Eigen::Matrix<fvar<T>,1,C1> crow = m1.row(i);
         for (size_type j = 0; j < m2.cols(); j++) {
@@ -114,9 +113,9 @@ namespace stan {
     Eigen::Matrix<fvar<T>,R1,C2> 
     multiply(const Eigen::Matrix<double,R1,C1>& m1,
              const Eigen::Matrix<fvar<T>,R2,C2>& m2) {
-      stan::math::validate_multiplicable(m1,m2,"multiply");
-      Eigen::Matrix<fvar<T>,R1,C2>
-        result(m1.rows(),m2.cols());
+      stan::math::check_multiplicable("multiply(%1%)",m1,"m1",
+                                      m2,"m2",(double*)0);
+      Eigen::Matrix<fvar<T>,R1,C2> result(m1.rows(),m2.cols());
       for (size_type i = 0; i < m1.rows(); i++) {
         Eigen::Matrix<double,1,C1> crow = m1.row(i);
         for (size_type j = 0; j < m2.cols(); j++) {

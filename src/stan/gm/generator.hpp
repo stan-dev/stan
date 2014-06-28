@@ -798,7 +798,7 @@ namespace stan {
           generate_expression(x.range_.low_.expr_,o_);
           o_ << ",\"";
           generate_loop_var(x.name_,x.dims_.size());
-          o_ << "\");" << EOL;
+          o_ << "\", (double *)0);" << EOL;
         }
         if (x.range_.has_high()) {
           generate_indent(indents_ + 1 + x.dims_.size(),o_);
@@ -808,7 +808,7 @@ namespace stan {
           generate_expression(x.range_.high_.expr_,o_);
           o_ << ",\"";
           generate_loop_var(x.name_,x.dims_.size());
-          o_ << "\");" << EOL;
+          o_ << "\", (double *)0);" << EOL;
         }
         generate_indent(indents_ + x.dims_.size(),o_);
         o_ << "} catch (const std::exception& e) { "
@@ -844,7 +844,7 @@ namespace stan {
         generate_loop_var(x.name_,x.dims_.size());
         o_ << ",\"";
         generate_loop_var(x.name_,x.dims_.size());
-        o_ << "\"); } catch (const std::exception& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
+        o_ << "\", (double *)0); } catch (const std::exception& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(unit_vector_var_decl const& x) const {
@@ -2475,7 +2475,7 @@ namespace stan {
       o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
       o << INDENT << "    std::ostream* pstream__ = 0)"
         << EOL;
-      o << INDENT2 << ": prob_grad::prob_grad(0) {" 
+      o << INDENT2 << ": prob_grad(0) {"
         << EOL; // resize 0 with var_resizing
       o << INDENT2 << "static const char* function__ = \"" 
         << model_name << "_namespace::" << model_name << "(%1%)\";" << EOL;
@@ -4384,7 +4384,7 @@ namespace stan {
         generate_arg_decl(true,true,fun.arg_decls_[i],template_type_i,out);
         if (i + 1 < fun.arg_decls_.size()) {
           out << "," << EOL << INDENT;
-          for (int i = 0; i <= fun.name_.size(); ++i)
+          for (size_t i = 0; i <= fun.name_.size(); ++i)
             out << " ";
         }
       }

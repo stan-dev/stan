@@ -5,6 +5,8 @@
 #include <stan/meta/traits.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/squared_distance.hpp>
+#include <stan/math/error_handling/matrix/check_vector.hpp>
+#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
 
 namespace stan {
   namespace math {
@@ -23,6 +25,10 @@ namespace stan {
     distance(const Eigen::Matrix<T1, R1, C1>& v1,
              const Eigen::Matrix<T2, R2, C2>& v2) {
       using std::sqrt;
+      stan::math::check_vector("distance(%1%)",v1,"v1",(double*)0);
+      stan::math::check_vector("distance(%1%)",v2,"v2",(double*)0);
+      stan::math::check_matching_sizes("distance(%1%)",v1,"v1",
+                                       v2,"v2",(double*)0);
       return sqrt(squared_distance(v1,v2));
     }
   }

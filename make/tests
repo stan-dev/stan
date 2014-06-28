@@ -197,6 +197,9 @@ test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcm
 test/unit/mcmc/hmc/integrators/expl_leapfrog2.o: src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
 
 test/unit/common/command_init.o: src/test/test-models/no-main/common/test_lp.cpp
+test/unit/common/run_markov_chain.o: src/test/test-models/no-main/common/test_lp.cpp
+test/unit/common/sample.o: src/test/test-models/no-main/common/test_lp.cpp
+test/unit/common/warmup.o: src/test/test-models/no-main/common/test_lp.cpp
 test/unit/common/write_iteration.o: src/test/test-models/no-main/common/test_lp.cpp
 
 test/integration/compile_models.o : $(patsubst %.stan,%.cpp-test,$(wildcard src/test/test-models/syntax-only/*stan))
@@ -277,20 +280,20 @@ test-distributions: src/test/unit-distribution
 test-models:
 	@echo ''
 	@echo 'These tests are now in the CmdStan repository. Run this from'
-	@echo 'the CmdStan directory:'
+	@echo 'the CmdStan home directory:'
 	@echo ''
 	@echo '  "> make src/test/models"'
 	@echo ''
-	$(error Tests have moved to the CmdStan repository. Run "> make src/test/models")
+	@exit 1
 
 test-bugs:
 	@echo ''
 	@echo 'These tests are now in the CmdStan repository. Run this from'
-	@echo 'the CmdStan directory:'
+	@echo 'the CmdStan home directory:'
 	@echo ''
 	@echo '  "> make src/test/models/bugs_examples"'
 	@echo ''
-	$(error Tests have moved to the CmdStan repository. Run "> make src/test/models/bugs_examples")
+	@exit 1
 
 
 .PHONY: test-all

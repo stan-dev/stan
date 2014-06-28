@@ -32,16 +32,7 @@ namespace stan {
         const double too_small = A.vectorD().tail(1)(0);
         return dom_err(function,too_small,name,msg.c_str(),"",result);
       }
-
       return true;
-    }
-
-    template <typename T, int R, int C>
-    inline bool check_ldlt_factor(const char* function,
-                                  stan::math::LDLT_factor<T,R,C> &A,
-                                  const char* name,
-                                  T* result = 0) {
-      return check_ldlt_factor<T,R,C,T>(function,A,name,result);
     }
 
   }

@@ -6,6 +6,8 @@
 #include <exception>
 #include <utility>
 #include <fstream>
+#include <vector>
+#include <string>
 
 
 
@@ -130,6 +132,40 @@ TEST_F(McmcChains, add) {
   EXPECT_EQ(3002, chains.num_samples())
     << "validate state is identical to before";
 }
+
+TEST_F(McmcChains, add_adapter) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+
+  // construct with std::string
+  std::vector<std::string> param_names(blocker1.header.size());
+  for (int i = 0; i < blocker1.header.size(); i++) {
+      param_names[i] = blocker1.header[i];
+  }
+
+  stan::mcmc::chains<> chains(param_names);
+  EXPECT_EQ(0, chains.num_chains());
+  EXPECT_EQ(0, chains.num_samples());
+
+  std::vector<std::vector<double> > samples(blocker1.samples.rows());
+  for (int i = 0; i < blocker1.samples.rows(); i++) {
+      samples[i] = std::vector<double>(blocker1.samples.cols());
+  }
+  for (int i = 0; i < blocker1.samples.rows(); i++) {
+    for (int j = 0; j < blocker1.samples.cols(); j++) {
+        samples[i][j] = blocker1.samples(i, j);
+    }
+  }
+
+  EXPECT_EQ(blocker1.samples.rows(), static_cast<int>(samples.size()));
+  EXPECT_EQ(blocker1.samples.cols(), static_cast<int>(samples[0].size()));
+
+  EXPECT_NO_THROW(chains.add(samples))
+    << "adding multiple samples, adds new chain";
+  EXPECT_EQ(1, chains.num_chains());
+  EXPECT_EQ(1000, chains.num_samples(0));
+
+}
+
 
 TEST_F(McmcChains, blocker1_num_chains) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);

@@ -317,6 +317,11 @@ namespace stan {
     public:
       chains(const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& param_names) 
         : param_names_(param_names) { }
+
+      chains(const std::vector<std::string>& param_names) : param_names_(param_names.size()) {
+          for (size_t i = 0; i < param_names.size(); i++)
+              param_names_(i) = param_names[i];
+      }
       
       chains(const stan::io::stan_csv& stan_csv) 
         : param_names_(stan_csv.header) {
@@ -428,6 +433,25 @@ namespace stan {
           throw std::invalid_argument("add(sample): number of columns in"
                                       " sample does not match chains");
         add(num_chains(), sample);
+      }
+
+      void add(const std::vector<std::vector<double> >& sample) {
+        /**
+        * Convert a vector of vector<double> to Eigen::MatrixXd
+        *
+        * This method is added for the benefit of software wrapping
+        * Stan (e.g., PyStan) so that it need not additionally wrap Eigen.
+        *
+        */
+        int n_row = sample.size();
+        if (n_row == 0)
+            return;
+        int n_col = sample[0].size();
+        Eigen::MatrixXd sample_copy(n_row, n_col);
+        for (int i = 0; i < n_row; i++) {
+            sample_copy.row(i) = Eigen::VectorXd::Map(&sample[i][0], sample[0].size());
+        }
+        add(sample_copy);
       }
 
       void add(const stan::io::stan_csv& stan_csv) {

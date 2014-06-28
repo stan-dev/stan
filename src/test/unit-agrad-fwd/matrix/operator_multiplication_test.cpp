@@ -1,7 +1,7 @@
-#include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/typedefs.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/rev.hpp>
