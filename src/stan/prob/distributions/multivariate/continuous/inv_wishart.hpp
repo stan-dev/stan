@@ -110,7 +110,7 @@ namespace stan {
 //          const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(
 //                                                                       &S(0), S.size(), 1);
 //        lp -= 0.5 * dot_product(S_vec, W_inv_vec); // trace(S * W^-1)
-        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Winv_S(mdivide_left_ldlt(ldlt_W,S));
+        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Winv_S(mdivide_left_ldlt(ldlt_W, static_cast<Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(S.template selfadjointView<Eigen::Lower>())));
         lp -= 0.5*trace(Winv_S);
       }
       if (include_summand<propto,T_dof,T_scale>::value)
@@ -137,6 +137,7 @@ namespace stan {
       
       using stan::math::check_greater;
       using stan::math::check_size_match;
+      using Eigen::MatrixXd;
 
       typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
       
@@ -146,8 +147,7 @@ namespace stan {
                        S.rows(), "Rows of scale parameter",
                        S.cols(), "columns of scale parameter", (double*)0);
 
-      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S_inv(S.rows(), S.cols());
-      S_inv = Eigen::MatrixXd::Identity(S.cols(),S.cols());
+      MatrixXd S_inv = MatrixXd::Identity(k, k);
       S_inv = S.ldlt().solve(S_inv);
 
       return wishart_rng(nu, S_inv, rng).inverse();
