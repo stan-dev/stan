@@ -425,11 +425,9 @@ Symmetric, positive-definite matrices have the type
 positive-definite matrices with unit diagonals, have the type
 \code{corr\_matrix}.
 
-For both correlation and covariance matrices, there are corresponding
-Cholesky factor types, \code{cholesky\_corr} and
-\code{cholesky\_cov}.  Using these can be much more efficient than the
-full correlation and covariance matrices because they are easier to
-factor and scale.
+There is also a Cholesky factor type, \code{cholesky\_factor\_cov}.
+Using this type can be much more efficient than the full covariance
+matrices because it is easier to factor and scale.
 
 
 
