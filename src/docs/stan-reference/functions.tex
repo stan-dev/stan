@@ -364,9 +364,9 @@ true and zero values treated as false.  These operators have the usual
 precedences, with negation (not) binding the most tightly, conjunction
 the next and disjunction the weakest; all of the operators bind more
 tightly than the comparisons.  Thus an expression such as
-\Verb|!a~&&~b| is interpreted as \Verb|(!a)~&&~b|, and
-\Verb/a~<~b~||~c~>=~d~&&~e~!=~f/ as
-\Verb/(a~<~b)~||~(((c~>=~d)~&&~(e~!=~f)))/.
+\code{!a~\&\&~b} is interpreted as \code{(!a)~\&\&~b}, and
+\code{a~<~b~||~c~>=~d~\&\&~e~!=~f} as
+\code{(a~<~b)~||~(((c~>=~d)~\&\&~(e~!=~f)))}.
 %
 \begin{description}
 \fitemindex{int}{operator!}{int \farg{x}}{1 if \farg{x} is zero and 0 otherwise}{operator"!}
