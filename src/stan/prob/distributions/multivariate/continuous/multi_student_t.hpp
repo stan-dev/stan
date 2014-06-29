@@ -129,6 +129,8 @@ namespace stan {
       check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of scale parameter",
                         &lp);
 
+      if (size_y == 0) //y_vec[0].size() == 0
+        return lp;
 
       if (include_summand<propto,T_dof>::value) {
         lp += lgamma(0.5 * (nu + size_y)) * size_vec;
