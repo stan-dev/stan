@@ -527,18 +527,29 @@ TEST(gm_parser,function_signatures) {
     test_parsable("function-signatures/math/functions/bessel_first_kind");
     test_parsable("function-signatures/math/functions/bessel_second_kind");
     test_parsable("function-signatures/math/functions/binary_log_loss");
+    test_parsable("function-signatures/math/functions/binomial_coefficient_log");
     test_parsable("function-signatures/math/functions/falling_factorial");
+    test_parsable("function-signatures/math/functions/gamma_p");
+    test_parsable("function-signatures/math/functions/gamma_q");
     test_parsable("function-signatures/math/functions/int_step");
+    test_parsable("function-signatures/math/functions/lbeta");
+    test_parsable("function-signatures/math/functions/log_diff_exp");
     test_parsable("function-signatures/math/functions/log_falling_factorial");
+    test_parsable("function-signatures/math/functions/log_rising_factorial");
+    test_parsable("function-signatures/math/functions/log_sum_exp");
     test_parsable("function-signatures/math/functions/max");
     test_parsable("function-signatures/math/functions/min");
     test_parsable("function-signatures/math/functions/modified_bessel_first_kind");
     test_parsable("function-signatures/math/functions/modified_bessel_second_kind");
+    test_parsable("function-signatures/math/functions/multiply_log");
     test_parsable("function-signatures/math/functions/operators_int");
     test_parsable("function-signatures/math/functions/operators_real");
+    test_parsable("function-signatures/math/functions/owens_t");
+    test_parsable("function-signatures/math/functions/rising_factorial");
+    
 
 
-  // test_parsable("good_inf");
+    // test_parsable("good_inf");
   // test_parsable("function_signatures1");
   // test_parsable("function_signatures6");
   // test_parsable("function_signatures7");
