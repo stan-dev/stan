@@ -80,7 +80,6 @@ namespace stan {
                                 size_mu_new, "Size of one of the vectors of the location variable",
                                 size_mu_old, "Size of another vector of the location variable",
                                 &lp);
-            return lp;          
           size_mu_old = size_mu_new;
         }
         (void) size_y_old;

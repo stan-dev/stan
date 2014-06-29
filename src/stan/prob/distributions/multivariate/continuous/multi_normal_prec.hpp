@@ -79,8 +79,7 @@ namespace stan {
           check_size_match(function, 
                                 size_y_new, "Size of one of the vectors of the random variable",
                                 size_y_old, "Size of another vector of the random variable",
-                                &lp))
-            return lp;          
+                                &lp);
           size_y_old = size_y_new;
         }
         int size_mu_old = size_mu;
@@ -90,8 +89,7 @@ namespace stan {
           check_size_match(function, 
                                 size_mu_new, "Size of one of the vectors of the location variable",
                                 size_mu_old, "Size of another vector of the location variable",
-                                &lp))
-            return lp;          
+                                &lp);
           size_mu_old = size_mu_new;
         }
         (void) size_y_old;
@@ -114,10 +112,8 @@ namespace stan {
                             &lp);
   
       for (size_t i = 0; i < size_vec; i++) {      
-        check_finite(function, mu_vec[i], "Location parameter", &lp))
-          return lp;
-        check_not_nan(function, y_vec[i], "Random variable", &lp))
-          return lp;
+        check_finite(function, mu_vec[i], "Location parameter", &lp);
+        check_not_nan(function, y_vec[i], "Random variable", &lp);
       } 
       
       if (size_y == 0) //y_vec[0].size() == 0
