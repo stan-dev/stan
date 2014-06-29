@@ -245,7 +245,7 @@ src/test/unit-distribution/%_00000_generated_ffv_test.cpp : src/test/unit-distri
 
 ifneq ($(filter second-expansion,$(.FEATURES)),)
 
-DISTRIBUTION_TESTS := $(shell find src/test/unit-distribution -type f -name '*.hpp')
+DISTRIBUTION_TESTS := $(shell find src/test/unit-distribution -type f -name '*_test.hpp')
 .SECONDEXPANSION:
 $(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_v_test.cpp,$$(filter $$@$$(PERCENT),$$(DISTRIBUTION_TESTS)))
 
