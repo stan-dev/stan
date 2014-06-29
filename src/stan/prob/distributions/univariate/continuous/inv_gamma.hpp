@@ -536,7 +536,7 @@ namespace stan {
                                               * y_inv_dbl, gamma_vec[n],
                                               digamma_vec[n]) / Pn;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += - y_inv_dbl 
+          operands_and_partials.d_x3[n] += y_inv_dbl 
             * exp(-beta_dbl * y_inv_dbl) * pow(beta_dbl * y_inv_dbl,alpha_dbl-1)
             / tgamma(alpha_dbl) / Pn;
       }
