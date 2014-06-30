@@ -269,8 +269,8 @@ endif
 #        be generated if they have not yet been generated.
 ##
 $(filter src/test/unit-distribution%,$(TEST_TARGETS)): \
-GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
-                              $(words $(filter $@%_00000_generated_v_test.cpp,$(ALL_TESTS))))
+GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated_v$(EXE) %_00000_generated_fd$(EXE) %_00000_generated_fv$(EXE) %_00000_generated_ffd$(EXE) %_00000_generated_ffv$(EXE),$^)),\
+                              $(words $(filter $@%_00000_generated_v_test.cpp $@%_00000_generated_fd_test.cpp $@%_00000_generated_fv_test.cpp $@%_00000_generated_ffd_test.cpp $@%_00000_generated_ffv_test.cpp,$(ALL_TESTS))))
 
 
 .PHONY: test-headers
