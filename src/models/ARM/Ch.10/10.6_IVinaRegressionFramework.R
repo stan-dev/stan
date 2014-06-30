@@ -44,7 +44,7 @@ watched.hat <- beta.mean3a[1] + beta.mean3a[2] * encouraged + beta.mean3a[3] * p
 ## (sesame_multi_preds_3b.stan)
 ## lm (y ~ watched.hat + pretest + as.factor(site) + setting)
 dataList.4 <- list(N=length(watched.hat), watched=y,encouraged=watched.hat,pretest=pretest, site=site,setting=setting)
-sesame_multi_pred_3b.sf1 <- stan(file='sesame_multi_preds_3a.stan',
+sesame_multi_pred_3b.sf1 <- stan(file='sesame_multi_preds_3b.stan',
                                  data=dataList.4,
                                  iter=1000, chains=4)
 print(sesame_multi_pred_3b.sf1)
