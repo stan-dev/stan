@@ -226,7 +226,7 @@ TEST(ModelUtil, hessian_times_vector) {
 
   // Incorporate once operands and partials has been generalized
   //output.str("");
-  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
   //EXPECT_THROW(stan::model::hessian_times_vector(domain_fail_model, x, v, f, hess_f_dot_v),
   //             std::domain_error);
   //EXPECT_EQ("", output.str());
@@ -257,7 +257,7 @@ TEST(ModelUtil, grad_tr_mat_times_hessian) {
   
   // Incorporate once operands and partials has been generalized
   //output.str("");
-  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
   //EXPECT_THROW(stan::model::grad_tr_mat_times_hessian(domain_fail_model, x, X, grad_tr_X_hess_f),
   //             std::domain_error);
   //EXPECT_EQ("", output.str());

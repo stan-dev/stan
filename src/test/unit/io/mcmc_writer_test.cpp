@@ -21,7 +21,7 @@ TEST(StanIoMcmcWriter, write_sample_names) {
   data_stream.close();
 
   std::stringstream output;
-  io_example_model_namespace::io_example_model model(data_var_context, &std::cout);
+  io_example_model_namespace::io_example_model model(data_var_context, &output);
   
   // Sample
   Eigen::VectorXd real(2);
