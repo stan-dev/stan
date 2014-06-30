@@ -24,5 +24,8 @@ transformed parameters {
 }
 model {
   beta ~ normal(0, 100);
-  y ~ bernoulli_logit(p);
+  for (i in 1:n_dogs) {
+    for (j in 1:n_trials)
+      y[i,j] ~ bernoulli_logit(p[i,j]);
+  }
 }
