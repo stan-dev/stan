@@ -4147,13 +4147,23 @@ namespace stan {
       ss << ">::type";
       return ss.str();
     }
+    
+    bool needs_template_params(const function_decl_def& fun) {
+      for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
+        if (fun.arg_decls_[i].arg_type_.base_type_ != INT_T) {
+          return true;
+        }
+      }
+      return false;
+    }
+
 
     void generate_function_template_parameters(const function_decl_def& fun,
                                                bool is_rng,
                                                bool is_lp,
                                                bool is_log,
                                                std::ostream& out) {
-      if (fun.arg_decls_.size() > 0) {
+      if (needs_template_params(fun)) {
         out << "template <";
         bool continuing_tps = false;
         if (is_log) {
