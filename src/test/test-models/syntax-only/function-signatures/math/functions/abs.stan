@@ -6,8 +6,10 @@ transformed data {
   int transformed_data_int;
   real transformed_data_real;
 
-  transformed_data_int <- abs(d_int);
-  transformed_data_real <- abs(d_real);
+ 
+   transformed_data_int <- abs(d_int);
+   transformed_data_real <- abs(d_real);
+
 }
 parameters {
   real p_real;
