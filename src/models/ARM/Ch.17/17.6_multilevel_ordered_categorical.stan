@@ -4,7 +4,8 @@ data {
   int<lower=0> n_player;
 
   int<lower=0, upper=n_player> player[N];
-  vector y[N];
+  int<lower=0, upper=n_cut> y[N];
+  vector[N] x;
 }
 parameters {
   vector[n_cut] mu_c;
@@ -41,6 +42,6 @@ model {
   }
 
   for (i in 1:N)
-    y[i] ~ categorical(P[i,]);
+    y[i] ~ categorical(transpose(row(P,i)));
 
 }

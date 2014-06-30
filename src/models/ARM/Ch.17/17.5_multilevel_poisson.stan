@@ -5,8 +5,8 @@ data {
 
   int<lower=0, upper=n_precint> precint[N];
   int<lower=0, upper=n_eth> eth[N];
-  vector offeset[N];
-  vector stops[N];
+  vector[N] offeset;
+  int<lower=0> stops[N];
 }
 parameters {
   real mu;
@@ -22,6 +22,7 @@ model {
   real mu_adj;
   vector[n_eth] b_eth_adj;
   vector[n_precint] b_precint_adj;
+  vector[N] lambda;
 
   mu ~ normal(0, 100);
   mu_adj <- mu + mean(b_eth) + mean(b_precint);

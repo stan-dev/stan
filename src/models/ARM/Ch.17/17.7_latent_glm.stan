@@ -9,10 +9,11 @@ data {
   int<lower=0, upper=1> black[N];
   int<lower=0, upper=n_age> age[N];
   int<lower=0, upper=n_edu> edu[N];
-  int<lower=0, upper=n_state> region[N];
+  int<lower=0, upper=n_state> region[n_state];
   int<lower=0, upper=n_state> state[N];
   int<lower=0, upper=1> y[N];
-  vector z[N]
+  vector[n_state] v_prev;
+  vector[N] z;
 }
 parameters {
   real<lower=0> sigma;
@@ -51,8 +52,10 @@ model {
   b_edu ~ normal(0, sigma_edu);
   b_region ~ normal(0, sigma_region);
 
-  for (j in 1:n_age)
-    b_age_edu[j,] ~ normal(0, sigma_age_edu);
+  for (j in 1:n_age) {
+    for (i in 1:n_edu)
+      b_age_edu[j,i] ~ normal(0, sigma_age_edu);
+  }
 
   b_v_prev ~ normal(0, 100);
 
@@ -61,18 +64,19 @@ model {
 
   b_state ~ normal(b_state_hat, sigma_state);
 
-  for (i in 1:N)
+  for (i in 1:N) {
     Xbeta[i] <- b_0 + b_female*female[i] 
       + b_black*black[i] + b_female_black*female[i]*black[i] +
       b_age[age[i]] + b_edu[edu[i]] + b_age_edu[age[i],edu[i]] +
-      b_state[state[i]]
-    p[i] <- max(0, min(1, inv_logit(Xbeta[i])));
-
-  y ~ binomial(1, p);
+      b_state[state[i]];
+    p[i] <- fmax(0, fmin(1, inv_logit(Xbeta[i])));
+  }
+  
+  y ~ bernoulli(p);
 
   for (i in 1:N) {
-    z_lo[i] <- 100 * equals(y[i],0);
-    z_hi[i] <- 100 * equals(y[i],1);
+    z_lo[i] <- 100 * (y[i] == 0);
+    z_hi[i] <- 100 * (y[i] == 1);
     z[i] ~ logistic(Xbeta[i],1) T[z_lo[i],z_hi[i]];  
   }
 
