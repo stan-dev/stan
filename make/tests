@@ -125,7 +125,7 @@ ifeq ($(strip $(findstring test-,$(MAKECMDGOALS))\
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
-.PRECIOUS: test/%.o
+.PRECIOUS: test/%$(EXE)
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
