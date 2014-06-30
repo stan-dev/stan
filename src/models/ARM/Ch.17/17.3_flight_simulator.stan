@@ -4,6 +4,7 @@ data {
   int<lower=0> n_airport;
   int<lower=0,upper=n_treatment> treatment[N];
   int<lower=0,upper=n_airport> airport[N];
+  vector[N] y;
 }
 parameters {
   real<lower=0> sigma;
@@ -11,6 +12,7 @@ parameters {
   real<lower=0> sigma_delta;
   vector[n_treatment] gamma;
   vector[n_airport] delta;
+  real mu;
 }
 model {
   vector[N] y_hat;

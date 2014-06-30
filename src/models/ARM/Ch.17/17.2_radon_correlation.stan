@@ -4,6 +4,7 @@ data {
   vector[N] y;
   int<lower=0,upper=1> x[N];
   int county[N];
+  vector[N] u;
 }
 parameters {
   real<lower=0> sigma;
@@ -14,7 +15,7 @@ parameters {
   real g_b_0;
   real g_b_1;
   real<lower=-1,upper=1> rho;
-  matrix[J,2] B;
+  vector[2] B_temp;
 }
 model {
   vector[N] y_hat;
@@ -22,6 +23,7 @@ model {
   vector[J] b;
   matrix[J,2] B_hat;
   matrix[2,2] Sigma_b;
+  matrix[J,2] B;
 
   g_a_0 ~ normal(0, 100);
   g_a_1 ~ normal(0, 100);
@@ -37,16 +39,15 @@ model {
   for (j in 1:J) {
     B_hat[j,1] <- g_a_0 + g_a_1 * u[j];
     B_hat[j,2] <- g_b_0 + g_b_1 * u[j];
-    B[j,1:2] ~ multi_normal(B_hat[j,],Sigma_b);
-  }
-
-  for (j in 1:J) {
+    B_temp ~ multi_normal(transpose(row(B_hat,j)),Sigma_b);
+    B[j,1] <- B_temp[1];
+    B[j,2] <- B_temp[2];
     a[j] <- B[j,1];
     b[j] <- B[j,2];
   }
 
   for (i in 1:N)
-    y_hat[i] <- a[county[i]] + b[county[i]] * x[i]
+    y_hat[i] <- a[county[i]] + b[county[i]] * x[i];
 
   y ~ normal(y_hat, sigma);
 }

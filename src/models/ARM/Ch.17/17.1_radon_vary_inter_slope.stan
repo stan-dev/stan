@@ -18,7 +18,7 @@ transformed parameters {
   vector[N] y_hat;
 
   for (i in 1:N)
-    y_hat[i] <- a[county[i]] + b[county[i]] * x[i]
+    y_hat[i] <- a[county[i]] + b[county[i]] * x[i];
 }
 model {
   mu_a ~ normal(0, 100);

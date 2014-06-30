@@ -12,14 +12,16 @@ parameters {
   real mu_a;
   real mu_b;
   real<lower=-1,upper=1> rho;
-  matrix[J,2] B;
+  vector[2] B_temp;
 }
 model {
   vector[N] y_hat;
   vector[J] a;
   vector[J] b;
-  matrix[J,2] B_hat;
+  matrix[2,J] B_hat;
   matrix[2,2] Sigma_b;
+  vector[2] B_hat_temp;
+  matrix[2,J] B;
 
   mu_a ~ normal(0, 100);
   mu_b ~ normal(0, 100);
@@ -31,18 +33,22 @@ model {
   Sigma_b[2,1] <- Sigma_b[1,2];
 
   for (j in 1:J) {
-    B_hat[j,1] <- mu_a;
-    B_hat[j,2] <- mu_b;
-    B[j,1:2] ~ multi_normal(B_hat[j,],Sigma_b);
+    B_hat[1,j] <- mu_a;
+    B_hat[2,j] <- mu_b;
+    B_hat_temp[1] <- mu_a;
+    B_hat_temp[2] <- mu_b;
+    B_temp ~ multi_normal(B_hat_temp, Sigma_b);
+    B[1,j] <- B_temp[1];
+    B[2,j] <- B_temp[2];
   }
 
   for (j in 1:J) {
-    a[j] <- B[j,1];
-    b[j] <- B[j,2];
+    a[j] <- B[1,j];
+    b[j] <- B[2,j];
   }
 
   for (i in 1:N)
-    y_hat[i] <- a[county[i]] + b[county[i]] * x[i]
+    y_hat[i] <- a[county[i]] + b[county[i]] * x[i];
 
   y ~ normal(y_hat, sigma);
 }

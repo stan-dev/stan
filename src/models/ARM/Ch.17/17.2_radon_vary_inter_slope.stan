@@ -2,6 +2,7 @@ data {
   int<lower=0> N;
   int<lower=0> J;
   vector[N] y;
+  vector[N] u;
   int<lower=0,upper=1> x[N];
   int county[N];
 }
@@ -15,8 +16,6 @@ parameters {
   real g_b_1;
   vector[J] a;
   vector[J] b;
-  vector[J] a_hat;
-  vector[J] b_hat;
   real mu_a;
   real mu_b;
 }
@@ -24,9 +23,12 @@ transformed parameters {
   vector[N] y_hat;
 
   for (i in 1:N)
-    y_hat[i] <- a[county[i]] + b[county[i]] * x[i]
+    y_hat[i] <- a[county[i]] + b[county[i]] * x[i];
 }
 model {
+  vector[N] a_hat;
+  vector[N] b_hat;
+
   mu_a ~ normal(0, 100);
   mu_b ~ normal(0, 100);
 
