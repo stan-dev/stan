@@ -428,6 +428,10 @@ TEST(gmParserTermGrammar, eltMultiplicationFun) {
   test_parsable("validate_elt_multiplication_good");
 }
 
+TEST(gmParserTermGrammar, eltDivisionFun) {
+  test_parsable("validate_elt_division_good");
+}
+
 TEST(gmParserTermGrammar, negateExprFun) {
   test_parsable("validate_negate_expr_good");
 }
