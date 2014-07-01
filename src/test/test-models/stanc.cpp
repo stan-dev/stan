@@ -12,6 +12,3 @@
 int main(int argc, const char* argv[]) {
   return stanc_helper(argc,argv,&std::cout,&std::cerr);
 }
-
-
-

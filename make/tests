@@ -168,6 +168,15 @@ $(TEST_TARGETS):
 	@echo '------------------------------------------------------------'
 endif
 
+
+##
+# Build the stanc compiler as a test executable
+##
+.PRECIOUS: test/test-models/stanc$(EXE)
+test/test-models/stanc$(EXE) : src/test/test-models/stanc.cpp bin/libstanc.a
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
+
 ##
 # TEST_MODELS is the set of all the test models.
 # Those in the 'no_main' subdirectory are supposed to be compiled without a main function.
@@ -177,8 +186,8 @@ TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 ##
 # Compile these with no main.
 ##
-$(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS))) : %.cpp : %.stan bin/stanc$(EXE)
-	$(WINE) bin$(PATH_SEPARATOR)stanc$(EXE) --o=$@ --no_main $<
+$(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS))) : %.cpp : %.stan test/test-models/stanc$(EXE)
+	$(WINE) test/test-models/stanc$(EXE) --o=$@ --no_main $<
 
 
 ##
@@ -207,7 +216,7 @@ test/integration/compile_models.o : $(patsubst %.stan,%.cpp-test,$(wildcard src/
 ##
 # CmdStan specific targets. Should be removed in the future.
 ##
-$(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/%,$(ALL_TESTS))): test/%.o : src/test/%_test.cpp $(LIBGTEST) bin/print$(EXE)
+$(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/%,$(ALL_TESTS))): test/%.o : src/test/%_test.cpp $(LIBGTEST) 
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
