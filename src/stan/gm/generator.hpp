@@ -4300,8 +4300,7 @@ namespace stan {
 
     void generate_cpp(const program& prog, 
                       const std::string& model_name,
-                      std::ostream& out,
-                      bool /*include_main = true*/) {
+                      std::ostream& out) {
       generate_version_comment(out);
       generate_includes(out);
       generate_start_namespace(model_name,out);

@@ -45,7 +45,7 @@ namespace stan {
       bool parsed_ok = parse(msgs,stan_gm_in,in_file_name,model_name,prog);
       if (!parsed_ok) 
         return false; // syntax error in program
-      generate_cpp(prog,model_name,cpp_out,include_main);
+      generate_cpp(prog,model_name,cpp_out/*,include_main*/);
       return true;
     }
     
