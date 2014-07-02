@@ -109,7 +109,7 @@ namespace stan {
         }
       }
 
-    private:
+    protected:
       boost::circular_buffer<UpdateT> _buf;
       Scalar _gammak;
     };
