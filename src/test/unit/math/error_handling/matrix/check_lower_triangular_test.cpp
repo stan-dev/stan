@@ -53,3 +53,27 @@ TEST(MathErrorHandlingMatrix, checkLowerTriangular) {
                                      &result));
   y(0,2) = 3;
 }
+
+
+TEST(MathErrorHandlingMatrix, checkLowerTriangular_one_indexed_message) {
+  using stan::math::check_lower_triangular;
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
+  double result;
+  std::string message;
+
+  y.resize(2,3);
+  y << 
+    1, 0, 3,
+    4, 5, 0;
+  try {
+    check_lower_triangular("checkLowerTriangular(%1%)", y, "y", &result);
+    FAIL() << "should have thrown";
+  } catch (std::domain_error& e) {
+    message = e.what();
+  } catch (...) {
+    FAIL() << "threw the wrong error";
+  }
+
+  EXPECT_NE(std::string::npos, message.find("[1,3]"))
+    << message;
+}
