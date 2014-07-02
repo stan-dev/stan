@@ -33,7 +33,7 @@ namespace stan {
       for (size_t n = 1; n < y.size(); n++) {
         if (!(y[n] > y[n-1])) {
           std::ostringstream stream;
-          stream << name << " is not a valid ordered vector."
+          stream << " is not a valid ordered vector."
                  << " The element at " << n 
                  << " is %1%, but should be greater than the previous element, "
                  << y[n-1];
