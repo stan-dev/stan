@@ -164,11 +164,6 @@ namespace stan {
                       bool& pass,
                       std::ostream& error_msgs) const {
 
-        //        if (expr1.expression_type().is_vector() 
-        //            && !expr2.expression_type().is_primitive()) {
-        // handle raising each member of a vector to a power?
-        // }
-        print_var_origin(error_msgs,var_origin);
         if (!expr1.expression_type().is_primitive() 
             || !expr2.expression_type().is_primitive()) {
           error_msgs << "arguments to ^ must be primitive (real or int)"
