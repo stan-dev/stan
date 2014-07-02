@@ -35,11 +35,41 @@ TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
 }
 
 TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_update) {
-  FAIL()
-    << "add tests for BFGSUpdate_HInv.update()";
+  typedef stan::optimization::BFGSUpdate_HInv<> QNUpdateT;
+  typedef QNUpdateT::VectorT VectorT;
+
+  const unsigned int nDim = 10;
+  QNUpdateT bfgsUp;
+  VectorT yk(nDim), sk(nDim), sdir(nDim);
+
+  for (unsigned int i = 0; i < nDim; i++) {
+    sk.setZero(nDim);
+    yk.setZero(nDim);
+    sk[i] = 1;
+    yk[i] = 1;
+
+    bfgsUp.update(yk,sk,i==0);
+  }
 }
 
 TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_search_direction) {
-  FAIL()
-    << "add tests for BFGSUpdate_HInv.search_direction()";
+  typedef stan::optimization::BFGSUpdate_HInv<> QNUpdateT;
+  typedef QNUpdateT::VectorT VectorT;
+
+  const unsigned int nDim = 10;
+  QNUpdateT bfgsUp;
+  VectorT yk(nDim), sk(nDim), sdir(nDim);
+
+  for (unsigned int i = 0; i < nDim; i++) {
+
+    for (unsigned int j = 0; j <= i; j++) {
+      sk.setZero(nDim);
+      yk.setZero(nDim);
+      sk[i - j] = 1;
+      yk[i - j] = 1;
+
+      bfgsUp.search_direction(sdir,yk);
+      
+    }
+  }
 }
