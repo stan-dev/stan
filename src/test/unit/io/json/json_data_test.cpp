@@ -384,9 +384,9 @@ TEST(ioJson,jsonData_parse_empty_obj) {
   stan::json::json_data jdata(in);
   std::vector<std::string> var_names;
   jdata.names_r(var_names);
-  EXPECT_EQ(0,var_names.size());
+  EXPECT_EQ(0U,var_names.size());
   jdata.names_i(var_names);
-  EXPECT_EQ(0,var_names.size());
+  EXPECT_EQ(0U,var_names.size());
 }
 
 
@@ -397,7 +397,7 @@ TEST(ioJson,jsonData_parse_mult_objects) {
   stan::json::json_data jdata(in);
   std::vector<std::string> var_names;
   jdata.names_i(var_names);
-  EXPECT_EQ(1,var_names.size());
+  EXPECT_EQ(1U,var_names.size());
   EXPECT_EQ("foo",var_names[0]);
 }
 

@@ -239,6 +239,12 @@ transformed data {
   transformed_data_vector <- d_vector ./ d_vector;
   transformed_data_row_vector <- d_row_vector ./ d_row_vector;
   transformed_data_matrix <- d_matrix ./ d_matrix;
+  transformed_data_vector <- d_vector ./ d_real;
+  transformed_data_row_vector <- d_row_vector ./ d_real;
+  transformed_data_matrix <- d_matrix ./ d_real;
+  transformed_data_vector <- d_real ./ d_vector;
+  transformed_data_row_vector <- d_real ./ d_row_vector;
+  transformed_data_matrix <- d_real ./ d_matrix;
 
   //   elementwise logarithms
   transformed_data_vector <- log(d_vector);

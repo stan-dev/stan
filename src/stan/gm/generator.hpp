@@ -4223,7 +4223,7 @@ namespace stan {
         generate_arg_decl(true,true,fun.arg_decls_[i],template_type_i,out);
         if (i + 1 < fun.arg_decls_.size()) {
           out << "," << EOL << INDENT;
-          for (int i = 0; i <= fun.name_.size(); ++i)
+          for (size_t i = 0; i <= fun.name_.size(); ++i)
             out << " ";
         }
       }
