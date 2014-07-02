@@ -316,8 +316,7 @@ namespace stan {
           _x[i] = x[i];
 
         try {
-          f = - _model.template log_prob<false,false>(_x,_params_i,
-                                                      _msgs);
+          f = - stan::model::log_prob_propto<false>(_model, _x, _params_i, _msgs);
         } catch (const std::exception& e) {
           if (_msgs)
             (*_msgs) << e.what() << std::endl;
