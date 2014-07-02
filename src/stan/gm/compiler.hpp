@@ -41,7 +41,6 @@ namespace stan {
                  const std::string& model_name,
                  bool include_main = true,
                  const std::string& in_file_name = "input") {
-      stan::gm::function_signatures::reset_sigs();
       program prog;
       bool parsed_ok = parse(msgs,stan_gm_in,in_file_name,model_name,prog);
       if (!parsed_ok) 
