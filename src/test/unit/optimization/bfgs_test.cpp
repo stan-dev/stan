@@ -2,14 +2,14 @@
 #include <stan/optimization/bfgs.hpp>
 #include <test/test-models/no-main/optimization/rosenbrock.cpp>
 
+typedef rosenbrock_model_namespace::rosenbrock_model Model;
+typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
+
 TEST(OptimizationBfgs, rosenbrock_bfgs_convergence) {
   // -1,1 is the standard initialization for the Rosenbrock function
   std::vector<double> cont_vector(2);
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
-
-  typedef rosenbrock_model_namespace::rosenbrock_model Model;
-  typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
 
   static const std::string DATA = "";
   std::stringstream data_stream(DATA);
@@ -41,9 +41,6 @@ TEST(OptimizationBfgs, rosenbrock_bfgs_termconds) {
   std::vector<double> cont_vector(2);
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
-
-  typedef rosenbrock_model_namespace::rosenbrock_model Model;
-  typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
 
   static const std::string DATA = "";
   std::stringstream data_stream(DATA);
@@ -104,9 +101,6 @@ TEST(OptimizationBfgs, rosenbrock_lbfgs_convergence) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  typedef rosenbrock_model_namespace::rosenbrock_model Model;
-  typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::LBFGSUpdate<> > Optimizer;
-
   static const std::string DATA = "";
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
@@ -140,9 +134,6 @@ TEST(OptimizationBfgs, rosenbrock_lbfgs_termconds) {
   std::vector<double> cont_vector(2);
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
-
-  typedef rosenbrock_model_namespace::rosenbrock_model Model;
-  typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::LBFGSUpdate<> > Optimizer;
 
   static const std::string DATA = "";
   std::stringstream data_stream(DATA);
@@ -198,193 +189,233 @@ TEST(OptimizationBfgs, rosenbrock_lbfgs_termconds) {
 }
 
 TEST(OptimizationBfgs, ConvergenceOptions) {
-  FAIL() 
-    << "add tests as a means of fixing behavior";
+  stan::optimization::ConvergenceOptions<> a;
+
+  EXPECT_FLOAT_EQ(a.maxIts, 10000);
+  EXPECT_FLOAT_EQ(a.fScale, 1);
+  EXPECT_FLOAT_EQ(a.tolAbsX, 1e-8);
+  EXPECT_FLOAT_EQ(a.tolAbsF, 1e-12);
+  EXPECT_FLOAT_EQ(a.tolAbsGrad, 1e-8);
+  EXPECT_FLOAT_EQ(a.tolRelF, 1e+4);
+  EXPECT_FLOAT_EQ(a.tolRelGrad, 1e+3);
 }
 
 TEST(OptimizationBfgs, LsOptions) {
-  FAIL() 
-    << "add tests as a means of fixing behavior";
+  stan::optimization::LSOptions<> a;
+  
+  EXPECT_FLOAT_EQ(a.c1, 1e-4);
+  EXPECT_FLOAT_EQ(a.c2, 0.9);
+  EXPECT_FLOAT_EQ(a.minAlpha, 1e-12);
+  EXPECT_FLOAT_EQ(a.alpha0, 1e-3);
 }
-
-TEST(OptimizationBfgs, BfgsMinimizer) {
-  FAIL()
-    << "add tests for class BFGSMinimizer (construction)";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer__ls_opts) {
-  FAIL()
-    << "add tests for class BFGSMinimizer._ls_opts";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer__conv_opts) {
-  FAIL()
-    << "add tests for class BFGSMinimizer._conv_opts";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_get_qnupdate) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.get_qnupdate()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_curr_f) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.curr_f()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_curr_x) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.curr_x()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_curr_g) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.curr_g()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_curr_p) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.curr_p()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_prev_f) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.prev_f()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_prev_x) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.prev_x()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_prev_g) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.prev_g()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_prev_p) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.prev_p()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_prev_step_size) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.prev_step_size()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_rel_grad_norm) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.rel_grad_norm()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_rel_obj_decrease) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.rel_grad_norm()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_alpha0) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.alpha0()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_alpha) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.alpha()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_iter_num) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.iter_num()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_note) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.note()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_get_code_string) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.get_code_string()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_initialize) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.initialize()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_step) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.step()";
-}
-
-TEST(OptimizationBfgs, BfgsMinimizer_minimize) {
-  FAIL()
-    << "add tests for class BFGSMinimizer.minimize()";
-}
-
 
 TEST(OptimizationBfgs, lp_no_jacobian) {
-  FAIL()
-    << "add tests for lp_no_jacobian() <- is this not used and should it be removed?";
+  std::vector<double> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+
+  EXPECT_FLOAT_EQ(stan::optimization::lp_no_jacobian(rb_model, cont_vector, 
+                                                     disc_vector), 0);
 }
 
 TEST(OptimizationBfgs, ModelAdaptor) {
-  FAIL() 
-    << "add tests for ModelAdaptor (construction)";
+  Eigen::Matrix<double,Eigen::Dynamic,1> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &std::cout);
 }
 
 TEST(OptimizationBfgs, ModelAdaptor_fevals) {
-  FAIL() 
-    << "add tests for ModelAdaptor.fevals()";
+  Eigen::Matrix<double,Eigen::Dynamic,1> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &std::cout);
+
+  EXPECT_FLOAT_EQ(mod.fevals(), 0);
 }
 
 TEST(OptimizationBfgs, ModelAdaptor_operator_parens__matrix_double) {
-  FAIL() 
-    << "add tests for ModelAdaptor.operator(Eigen::Matrix, double)";
+  Eigen::Matrix<double,Eigen::Dynamic,1> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &std::cout);
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> grad(2);
+  grad[0] = 4;
+  grad[1] = 0;
+  double f;
+
+  EXPECT_FLOAT_EQ(mod(cont_vector,f), 0);
 }
 
 TEST(OptimizationBfgs, ModelAdaptor_operator_parens__matrix_double_matrix) {
-  FAIL() 
-    << "add tests for ModelAdaptor.operator(Eigen::Matrix, double, Eigen::Matrix)";
+  Eigen::Matrix<double,Eigen::Dynamic,1> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &std::cout);
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> grad(2);
+  grad[0] = 4;
+  grad[1] = 0;
+  double f;
+
+  EXPECT_FLOAT_EQ(mod(cont_vector,f, grad), 0);
 }
 
 TEST(OptimizationBfgs, ModelAdaptor_df) {
-  FAIL() 
-    << "add tests for ModelAdaptor.fevals()";
+  Eigen::Matrix<double,Eigen::Dynamic,1> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &std::cout);
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> grad(2);
+  grad[0] = 4;
+  grad[1] = 0;
+  
+  EXPECT_FLOAT_EQ(mod.df(cont_vector, grad), 0);
 }
 
 TEST(OptimizationBfgs, BFGSLineSearch) {
-  FAIL() 
-    << "add tests for BFGSLineSearch (construction) -- see tests above";
+  std::vector<double> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
 }
 
 
 TEST(OptimizationBfgs, BFGSLineSearch_initialize) {
-  FAIL() 
-    << "add tests for BFGSLineSearch.initialize()";
+  std::vector<double> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+
+  bfgs.initialize(cont_vector);
+  EXPECT_FLOAT_EQ(bfgs.curr_f(), 4);
+  EXPECT_FLOAT_EQ(bfgs.curr_x()[0], -1);
+  EXPECT_FLOAT_EQ(bfgs.curr_x()[1], 1);
+  EXPECT_FLOAT_EQ(bfgs.curr_g()[0], -4);
+  EXPECT_FLOAT_EQ(bfgs.curr_g()[1], 0);
+  EXPECT_FLOAT_EQ(bfgs.curr_p()[0], 4);
+  EXPECT_FLOAT_EQ(bfgs.curr_p()[1], 0);
 }
 
 TEST(OptimizationBfgs, BFGSLineSearch_grad_evals) {
-  FAIL() 
-    << "add tests for BFGSLineSearch.grad_evals()";
+  std::vector<double> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+
+  EXPECT_FLOAT_EQ(bfgs.grad_evals(), 1);
 }
 
 TEST(OptimizationBfgs, BFGSLineSearch_logp) {
-  FAIL() 
-    << "add tests for BFGSLineSearch.logp()";
+  std::vector<double> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+
+  EXPECT_FLOAT_EQ(bfgs.logp(), -4);
 }
 
 TEST(OptimizationBfgs, BFGSLineSearch_grad_norm) {
-  FAIL() 
-    << "add tests for BFGSLineSearch.grad_norm()";
+  std::vector<double> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  
+  std::vector<double> grad;
+  
+  bfgs.grad(grad);
+  EXPECT_FLOAT_EQ(bfgs.grad_norm(), 4);
 }
 
 TEST(OptimizationBfgs, BFGSLineSearch_grad) {
-  FAIL() 
-    << "add tests for BFGSLineSearch.grad()";
+  std::vector<double> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::vector<double> grad;
+  
+  bfgs.grad(grad);
+  EXPECT_FLOAT_EQ(grad.size(), 2);
+  EXPECT_FLOAT_EQ(grad[0], 4);
+  EXPECT_FLOAT_EQ(grad[1], 0);
 }
 
 TEST(OptimizationBfgs, BFGSLineSearch_params_r) {
-  FAIL() 
-    << "add tests for BFGSLineSearch.params_r()";
+  std::vector<double> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+  Model rb_model(dummy_context);
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+  std::vector<double> x;
+  
+  bfgs.params_r(x);
+  EXPECT_FLOAT_EQ(x.size(), 2);
+  EXPECT_FLOAT_EQ(x[0], -1);
+  EXPECT_FLOAT_EQ(x[1], 1);
 }
