@@ -267,7 +267,7 @@ TEST(gm, generate_cpp__include_main) {
   stan::gm::program prog;
   std::string model_name = "m";
   std::stringstream output;
-  bool include_main = true;
+  bool include_main = false;
 
   stan::gm::generate_cpp(prog, model_name, output, include_main);
 
@@ -330,5 +330,5 @@ TEST(gm, generate_cpp__include_main) {
     << "generate_model_typedef()";
 
   
-  EXPECT_EQ(1, count_matches("int main", output.str()));
+  EXPECT_EQ(0, count_matches("int main", output.str()));
 }
