@@ -38,9 +38,9 @@ namespace stan {
           VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(y); n++) {
             if (!(stan::get(y,n) < high_vec[n]))
-              return dom_err_vec(n,function,y,name,
-                                 " is %1%, but must be less than ",
-                                 high_vec[n],result);
+              return dom_err_vec<0>(n,function,y,name,
+                                    " is %1%, but must be less than ",
+                                    high_vec[n],result);
           }
           return true;
         }

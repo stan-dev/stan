@@ -36,9 +36,9 @@ namespace stan {
           for (size_t n = 0; n < length(y); n++) {
             if (!boost::is_unsigned<typename T_y::value_type>::value 
                 && !(stan::get(y,n) >= 0)) 
-              return dom_err_vec(n,function,y,name,
-                                 " is %1%, but must be >= 0!","",
-                                 result);
+              return dom_err_vec<0>(n,function,y,name,
+                                    " is %1%, but must be >= 0!","",
+                                    result);
           }
           return true;
         }

@@ -44,9 +44,9 @@ namespace stan {
           VectorView<const T_eq> eq_vec(eq);
           for (size_t n = 0; n < length(y); n++) {
             if (!(get(y,n) == eq_vec[n]))
-              return dom_err_vec(n,function,y,name,
-                                 " is %1%, but must be equal to ",
-                                 eq_vec[n],result);
+              return dom_err_vec<0>(n,function,y,name,
+                                    " is %1%, but must be equal to ",
+                                    eq_vec[n],result);
           }
           return true;
         }

@@ -34,7 +34,7 @@ public:
   template <class T, class T_result, class T_msg>
   void test_throw(T y, T_msg msg2) {
     try {
-      stan::math::dom_err_vec<T, T_result, T_msg>
+      stan::math::dom_err_vec<0, T, T_result, T_msg>
         (index_, function_, y, y_name_, error_message_, msg2, 0);
       FAIL() << "expecting call to dom_err_vec<> to throw a domain_error,"
              << "but threw nothing";
