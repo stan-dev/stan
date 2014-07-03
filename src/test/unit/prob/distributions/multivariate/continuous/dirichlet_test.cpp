@@ -50,33 +50,33 @@ TEST(ProbDistributions,DirichletBounds) {
 
   bad_theta << 0.25, 0.25;
   EXPECT_THROW(stan::prob::dirichlet_log(bad_theta,good_alpha),
-	       std::domain_error)
+               std::domain_error)
     << "sum of theta is not 1";
 
   bad_theta << -0.25, 1.25;
   EXPECT_THROW(stan::prob::dirichlet_log(bad_theta,good_alpha),
-	       std::domain_error)
+               std::domain_error)
     << "theta has element less than 0";
 
   bad_theta << -0.25, 1.25;
   EXPECT_THROW(stan::prob::dirichlet_log(bad_theta,good_alpha),
-	       std::domain_error)
+               std::domain_error)
     << "theta has element less than 0";
 
   bad_alpha << 0.0, 1.0;
   EXPECT_THROW(stan::prob::dirichlet_log(good_theta,bad_alpha),
-	       std::domain_error)
+               std::domain_error)
     << "alpha has element equal to 0";
 
   bad_alpha << -0.5, 1.0;
   EXPECT_THROW(stan::prob::dirichlet_log(good_theta,bad_alpha),
-	       std::domain_error)
+               std::domain_error)
     << "alpha has element less than 0";
 
   bad_alpha = Matrix<double,Dynamic,1>(4,1);
   bad_alpha << 1, 2, 3, 4;
   EXPECT_THROW(stan::prob::dirichlet_log(good_theta,bad_alpha),
-	       std::domain_error)
+               std::domain_error)
     << "size mismatch: theta is a 2-vector, alpha is a 4-vector";
 }
 
