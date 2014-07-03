@@ -4,12 +4,14 @@
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/operators/operator_multiplication.hpp>
 #include <stan/math/matrix/multiply.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/agrad/fwd/operators/operator_multiplication.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
+#include <stan/agrad/rev/matrix/multiply.hpp>
+#include <stan/agrad/rev/operators.hpp>
+#include <stan/agrad/rev/functions/abs.hpp>
 #include <stan/math/matrix/inverse.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
 

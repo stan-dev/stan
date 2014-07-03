@@ -226,6 +226,10 @@ TEST(AgradFwdMatrixRowsDotSelf,ffv_3rdDeriv) {
   m3(0,1).d_ = 1.0;
   m3(1,0).d_ = 1.0;
   m3(1,1).d_ = 1.0;
+  m3(0,0).val_.d_ = 1.0;
+  m3(0,1).val_.d_ = 1.0;
+  m3(1,0).val_.d_ = 1.0;
+  m3(1,1).val_.d_ = 1.0;
   x = rows_dot_self(m3);
 
   AVEC q = createAVEC(m3(0,0).val().val(),m3(0,1).val().val(),m3(1,0).val().val(),m3(1,1).val().val());

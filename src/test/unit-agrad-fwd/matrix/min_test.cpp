@@ -504,6 +504,9 @@ TEST(AgradFwdMatrixMin, ffv_vector_3rdDeriv) {
    v1(0).d_ = 1.0;
    v1(1).d_ = 1.0;
    v1(2).d_ = 1.0;
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
   
   fvar<fvar<var> > output;
   output = min(v1);
@@ -622,6 +625,9 @@ TEST(AgradFwdMatrixMin, ffv_rowvector_3rdDeriv) {
    v1(0).d_ = 1.0;
    v1(1).d_ = 1.0;
    v1(2).d_ = 1.0;
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
   
   fvar<fvar<var> > output;
   output = min(v1);
@@ -736,6 +742,9 @@ TEST(AgradFwdMatrixMin, ffv_matrix_3rdDeriv) {
    v1(0,0).d_ = 1.0;
    v1(0,1).d_ = 1.0;
    v1(0,2).d_ = 1.0;
+   v1(0,0).val_.d_ = 1.0;
+   v1(0,1).val_.d_ = 1.0;
+   v1(0,2).val_.d_ = 1.0;
   
   fvar<fvar<var> > output;
   output = min(v1);

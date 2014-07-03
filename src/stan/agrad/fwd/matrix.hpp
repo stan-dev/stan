@@ -26,6 +26,8 @@
 #include <stan/agrad/fwd/matrix/sort.hpp>
 #include <stan/agrad/fwd/matrix/sum.hpp>
 #include <stan/agrad/fwd/matrix/tcrossprod.hpp>
+#include <stan/agrad/fwd/matrix/trace_quad_form.hpp>
+#include <stan/agrad/fwd/matrix/trace_gen_quad_form.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 

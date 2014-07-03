@@ -330,6 +330,7 @@ TEST(AgradFwdHypot,FvarFvarVar_Double_3rdDeriv) {
   fvar<fvar<var> > x;
   x.val_.val_ = 3.0;
   x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
   double y(6.0);
 
   fvar<fvar<var> > a = hypot(x,y);
@@ -338,7 +339,7 @@ TEST(AgradFwdHypot,FvarFvarVar_Double_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
 
-  EXPECT_FLOAT_EQ(0,g[0]);
+  EXPECT_FLOAT_EQ(-0.02385139175999775676169785246647,g[0]);
 }
 
 TEST(AgradFwdHypot,Double_FvarFvarVar_3rdDeriv) {
@@ -350,11 +351,12 @@ TEST(AgradFwdHypot,Double_FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > y;
   y.val_.val_ = 6.0;
   y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > a = hypot(x,y);
 
   AVEC p = createAVEC(y.val_.val_);
   VEC g;
   a.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0,g[0]);
+  EXPECT_FLOAT_EQ(-0.0119256958799988783808489262332,g[0]);
 }

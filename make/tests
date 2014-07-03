@@ -187,8 +187,7 @@ TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 # Compile these with no main.
 ##
 $(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS))) : %.cpp : %.stan test/test-models/stanc$(EXE)
-	$(WINE) test/test-models/stanc$(EXE) --o=$@ --no_main $<
-
+	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
 ##
 # Tests that also depend on generated models.

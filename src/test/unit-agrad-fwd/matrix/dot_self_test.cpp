@@ -172,6 +172,9 @@ TEST(AgradFwdMatrixDotSelf, vec_ffv_3rdDeriv) {
   fvar<fvar<var> > a(2.0,1.0);
   fvar<fvar<var> > b(3.0,1.0);
   fvar<fvar<var> > c(4.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
 
   Eigen::Matrix<fvar<fvar<var> >,Eigen::Dynamic,1> v3(3);
   v3 << a,b,c;

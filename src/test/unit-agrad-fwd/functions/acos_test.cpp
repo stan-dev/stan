@@ -167,12 +167,13 @@ TEST(AgradFwdAcos,FvarFvarVar_3rdDeriv) {
 
   fvar<fvar<var> > z;
   z.val_.val_ = 0.5;
-  z.val_.d_ = 2.0;
+  z.val_.d_ = 1.0;
+  z.d_.val_ = 1.0;
 
   fvar<fvar<var> > b = acos(z);
 
   AVEC y = createAVEC(z.val_.val_);
   VEC g;
   b.d_.d_.grad(y,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(-3.07920143567800, g[0]);
 }

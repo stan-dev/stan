@@ -209,7 +209,7 @@ TEST(AgradFwdMatrixCumulativeSum, ffd) {
   test_cumulative_sum3<Eigen::Matrix<fvar<fvar<double> >,1,Eigen::Dynamic> >();
 }
 
-TEST(AgradFwdMatrixCumulativeSum, fvv) {
+TEST(AgradFwdMatrixCumulativeSum, ffv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::cumulative_sum;

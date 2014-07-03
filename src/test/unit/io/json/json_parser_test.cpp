@@ -49,8 +49,6 @@ public:
 };
 
 bool hasEnding(std::string const &fullString, std::string const &ending) {
-  // std::cout << "found: " << fullString << std::endl;
-  // std::cout << "expect: " << ending << std::endl;
   if (fullString.length() >= ending.length()) {
     return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
   } else {
@@ -60,11 +58,9 @@ bool hasEnding(std::string const &fullString, std::string const &ending) {
 
 void test_parser(const std::string& input,
                  const std::string& expected_output) {
-  // std::cout << "input string: " << input << std::endl;
   recording_handler handler;
   std::stringstream s(input);
   stan::json::parse(s, handler);
-  //  std::cout << "result: " << handler.os_.str() << std::endl;
   EXPECT_EQ(expected_output, handler.os_.str());
 }
 
