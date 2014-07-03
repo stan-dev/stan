@@ -35,9 +35,9 @@ namespace stan {
           using stan::length;
           for (size_t n = 0; n < length(y); n++) {
             if (!(boost::math::isfinite)(stan::get(y,n)))
-              return dom_err_vec<0>(n,function,y,name,
-                                    " is %1%, but must be finite!","",
-                                    result);
+              return dom_err_vec(n,function,y,name,
+                                 " is %1%, but must be finite!","",
+                                 result);
           }
           return true;
         }

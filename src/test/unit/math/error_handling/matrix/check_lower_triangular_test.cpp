@@ -9,16 +9,16 @@ TEST(MathErrorHandlingMatrix, checkLowerTriangular) {
   y.resize(1,1);
   y << 1;
   EXPECT_TRUE(check_lower_triangular("checkLowerTriangular(%1%)", y, "y",
-                                     &result));
+                                        &result));
 
   y.resize(1,2);
   y << 1, 0;
   EXPECT_TRUE(check_lower_triangular("checkLowerTriangular(%1%)", y, "y", 
-                                     &result));
+                                        &result));
 
   y(0,1) = 1;
   EXPECT_THROW(check_lower_triangular("checkLowerTriangular(%1%)", y, "y", 
-                                      &result), 
+                                         &result), 
                std::domain_error);
   
   
@@ -26,11 +26,11 @@ TEST(MathErrorHandlingMatrix, checkLowerTriangular) {
   y.resize(2,2);
   y << 1, 0, 2, 3;
   EXPECT_TRUE(check_lower_triangular("checkLowerTriangular(%1%)", y, "y", 
-                                     &result));
+                                        &result));
 
   y << 1, 2, 3, 4;
   EXPECT_THROW(check_lower_triangular("checkLowerTriangular(%1%)", y, "y", 
-                                      &result), 
+                                         &result), 
                std::domain_error);
 
   y.resize(3,2);
@@ -38,11 +38,11 @@ TEST(MathErrorHandlingMatrix, checkLowerTriangular) {
     2, 3,
     4, 5;
   EXPECT_TRUE(check_lower_triangular("checkLowerTriangular(%1%)", y, "y", 
-                                     &result));
+                                        &result));
   
   y(0,1) = 1.5;
   EXPECT_THROW(check_lower_triangular("checkLowerTriangular(%1%)", y, "y", 
-                                      &result),
+                                         &result),
                std::domain_error);
   
   y.resize(2,3);
@@ -50,7 +50,7 @@ TEST(MathErrorHandlingMatrix, checkLowerTriangular) {
     1, 0, 0,
     4, 5, 0;
   EXPECT_TRUE(check_lower_triangular("checkLowerTriangular(%1%)", y, "y", 
-                                     &result));
+                                        &result));
   y(0,2) = 3;
 }
 

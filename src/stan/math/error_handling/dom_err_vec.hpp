@@ -23,8 +23,7 @@ namespace stan {
 
 
     // currently ignoring T_result
-    template <int error_index,
-              typename T,
+    template <typename T,
               typename T_result,
               typename T_msg>
     inline bool dom_err_vec(const size_t i,
@@ -35,7 +34,7 @@ namespace stan {
                             const T_msg error_msg2,
                             T_result* result) {
       std::ostringstream msg_o;
-      msg_o << name << "[" << error_index + i << "] " << error_msg << error_msg2;
+      msg_o << name << "[" << stan::error_index::value + i << "] " << error_msg << error_msg2;
 
       std::string msg;
       // FIXME: this is the line to remove in the future.

@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 
 namespace stan {
@@ -31,7 +32,8 @@ namespace stan {
           if (y(m,n) != 0) {
             std::stringstream msg;
             msg << name << " is not lower triangular;"
-                << " " << name << "[" << m << "," << n << "]="
+                << " " << name << "[" << stan::error_index::value + m << "," 
+                << stan::error_index::value + n << "]="
                 << "%1%"; 
             std::string msg_string(msg.str());
             return dom_err(function,y(m,n),"",msg_string.c_str(),"",result);

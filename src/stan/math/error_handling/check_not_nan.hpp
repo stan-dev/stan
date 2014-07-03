@@ -33,9 +33,9 @@ namespace stan {
           // using stan::length;
           for (size_t n = 0; n < stan::length(y); n++) {
             if ((boost::math::isnan)(stan::get(y,n)))
-              return dom_err_vec<0>(n,function,y,name,
-                                    " is %1%, but must not be nan!","",
-                                    result);
+              return dom_err_vec(n,function,y,name,
+                                 " is %1%, but must not be nan!","",
+                                 result);
           }
           return true;
         }

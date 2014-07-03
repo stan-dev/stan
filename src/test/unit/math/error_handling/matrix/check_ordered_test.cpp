@@ -40,20 +40,6 @@ TEST(MathErrorHandlingMatrix, checkOrdered_one_indexed_message) {
   Eigen::Matrix<double, Eigen::Dynamic, 1> y;
   y.resize(3);
   
-  y << -1, 0, 0;
-  try {
-    check_ordered("check_ordered(%1%)", y, "y", &result);
-    FAIL() << "should have thrown";
-  } catch (std::domain_error& e) {
-    message = e.what();
-  } catch (...) {
-    FAIL() << "threw the wrong error";
-  }
-
-  EXPECT_NE(std::string::npos, message.find("element at 1"))
-    << message;
-
-
   y << 0, 5, 1;
   try {
     check_ordered("check_ordered(%1%)", y, "y", &result);

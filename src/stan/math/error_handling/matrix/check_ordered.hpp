@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 
 namespace stan {
@@ -34,7 +35,7 @@ namespace stan {
         if (!(y[n] > y[n-1])) {
           std::ostringstream stream;
           stream << " is not a valid ordered vector."
-                 << " The element at " << n 
+                 << " The element at " << stan::error_index::value + n 
                  << " is %1%, but should be greater than the previous element, "
                  << y[n-1];
           std::string msg(stream.str());
