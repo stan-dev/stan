@@ -336,6 +336,7 @@ TEST(AgradFwdPow, FvarFvarVar_Double_3rdDeriv) {
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
   double y(1.2);
 
   fvar<fvar<var> > a = pow(x,y);
@@ -343,7 +344,7 @@ TEST(AgradFwdPow, FvarFvarVar_Double_3rdDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(-0.668583, g[0]);
 }
 TEST(AgradFwdPow, Double_FvarFvarVar_3rdDeriv) {
   using stan::agrad::fvar;
@@ -355,11 +356,12 @@ TEST(AgradFwdPow, Double_FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > y;
   y.val_.val_ = 1.2;
   y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > a = pow(x,y);
 
   AVEC p = createAVEC(y.val_.val_);
   VEC g;
   a.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(-0.14495739, g[0]);
 }

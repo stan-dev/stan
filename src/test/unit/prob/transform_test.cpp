@@ -550,7 +550,7 @@ TEST(prob_transform,corr_matrix_jacobian) {
   for (Matrix<var,Dynamic,Dynamic>::size_type m = 0; m < K; ++m)
     for (Matrix<var,Dynamic,Dynamic>::size_type n = 0; n < m; ++n)
       y.push_back(Sigma(m,n));
-  std::cout << "y.size()=" << y.size() << std::endl;
+  EXPECT_EQ(K_choose_2, y.size());
 
   std::vector<std::vector<double> > j;
   stan::agrad::jacobian(y,x,j);
@@ -559,8 +559,6 @@ TEST(prob_transform,corr_matrix_jacobian) {
   for (int m = 0; m < J.rows(); ++m)
     for (int n = 0; n < J.cols(); ++n)
       J(m,n) = j[m][n];
-
-  std::cout << "J=" << J << " determinant(J)=" << determinant(J) << std::endl;
 
   double log_abs_jacobian_det = log(fabs(determinant(J)));
   EXPECT_FLOAT_EQ(log_abs_jacobian_det,lp.val());

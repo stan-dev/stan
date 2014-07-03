@@ -2615,7 +2615,13 @@ TEST(AgradFwdMatrixDotProduct, vector_vector_ffv_3rdDeriv) {
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
-  
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
+
   vd_1 << 1, 3, -5;
   vv_1 << a,b,c;
   vd_2 << 4, -2, -1;
@@ -2776,6 +2782,12 @@ TEST(AgradFwdMatrixDotProduct, rowvector_vector_ffv_3rdDeriv) {
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   d1 << 1, 3, -5;
   v1 << a,b,c;
@@ -2939,6 +2951,12 @@ TEST(AgradFwdMatrixDotProduct, vector_rowvector_ffv_3rdDeriv) {
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   d1 << 1, 3, -5;
   v1 << a,b,c;
@@ -3085,6 +3103,12 @@ TEST(AgradFwdMatrixDotProduct, rowvector_rowvector_ffv_2ndDeriv_2) {
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
   
   d1 << 1, 3, -5;
   v1 << a,b,c;
@@ -3223,6 +3247,9 @@ TEST(AgradFwdMatrixDotProduct, stdvector_stdvector_ffv_3rdDeriv) {
   fvar<fvar<var> >  a(1.0,1.0);
   fvar<fvar<var> >  b(3.0,1.0);
   fvar<fvar<var> >  c(5.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
 
   fv1.push_back(a);
   fv1.push_back(b);
@@ -3426,6 +3453,12 @@ TEST(AgradFwdMatrixDotProduct, vector_vector_ffv_length_3rdDeriv) {
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   vd_1 << 1, 3, -5;
   vv_1 << a,b,c;
@@ -3569,6 +3602,12 @@ TEST(AgradFwdMatrixDotProduct, vector_vector_ffv_no_exception_length_3rdDeriv) {
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   d1 << 1, 3, -5;
   v1 << a,b,c;
@@ -3720,6 +3759,12 @@ TEST(AgradFwdMatrixDotProduct, rowvector_vector_ffv_length_3rdDeriv) {
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   d1 << 1, 3, -5;
   v1 << a,b,c;
@@ -3871,6 +3916,12 @@ TEST(AgradFwdMatrixDotProduct, rowvector_vector_ffv_no_exception_length_3rdDeriv
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   d1 << 1, 3, -5;
   v1 << a,b,c;
@@ -4022,6 +4073,12 @@ TEST(AgradFwdMatrixDotProduct, vector_rowvector_ffv_length_3rdDeriv) {
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   d1 << 1, 3, -5;
   v1 << a,b,c;
@@ -4173,6 +4230,12 @@ TEST(AgradFwdMatrixDotProduct, vector_rowvector_ffv_no_exception_length_3rdDeriv
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   d1 << 1, 3, -5;
   v1 << a,b,c;
@@ -4308,6 +4371,12 @@ TEST(AgradFwdMatrixDotProduct, rowvector_rowvector_ffv_length_3rdDeriv) {
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   d1 << 1, 3, -5;
   v1 << a,b,c;
@@ -4443,6 +4512,12 @@ TEST(AgradFwdMatrixDotProduct, rowvector_rowvector_ffv_no_exception_length_3rdDe
   fvar<fvar<var> >  d(4.0,1.0);
   fvar<fvar<var> >  e(-2.0,1.0);
   fvar<fvar<var> >  f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   d1 << 1, 3, -5;
   v1 << a,b,c;
@@ -4582,6 +4657,9 @@ TEST(AgradFwdMatrixDotProduct, stdvector_stdvector_ffv_length_3rdDeriv) {
   fvar<fvar<var> >  a(1.0,1.0);
   fvar<fvar<var> >  b(3.0,1.0);
   fvar<fvar<var> >  c(5.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
 
   fv1.push_back(a);
   fv1.push_back(b);

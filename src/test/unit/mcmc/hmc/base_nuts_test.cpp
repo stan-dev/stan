@@ -103,9 +103,10 @@ TEST(McmcBaseNuts, set_max_depth) {
   q(0) = 5;
   q(1) = 1;
   
+  std::stringstream output, error;
+
   stan::mcmc::mock_model model(q.size());
-  
-  stan::mcmc::mock_nuts sampler(model, base_rng, &std::cout, &std::cerr);
+  stan::mcmc::mock_nuts sampler(model, base_rng, &output, &error);
   
   int old_max_depth = 1;
   sampler.set_max_depth(old_max_depth);
@@ -114,25 +115,28 @@ TEST(McmcBaseNuts, set_max_depth) {
   sampler.set_max_depth(-1);
   EXPECT_EQ(old_max_depth, sampler.get_max_depth());
   
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());
 }
 
 
-TEST(McmcBaseNuts, set_max_delta) {
-  
+TEST(McmcBaseNuts, set_max_delta) {  
   rng_t base_rng(0);
   
   Eigen::VectorXd q(2);
   q(0) = 5;
   q(1) = 1;
   
+  std::stringstream output, error;
   stan::mcmc::mock_model model(q.size());
-  
-  stan::mcmc::mock_nuts sampler(model, base_rng, &std::cout, &std::cerr);
+  stan::mcmc::mock_nuts sampler(model, base_rng, &output, &error);
   
   double old_max_delta = 10;
   sampler.set_max_delta(old_max_delta);
   EXPECT_EQ(old_max_delta, sampler.get_max_delta());
-  
+
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());  
 }
 
 TEST(McmcBaseNuts, build_tree) {
@@ -157,8 +161,9 @@ TEST(McmcBaseNuts, build_tree) {
   util.n_tree = 0;
   util.sum_prob = 0;
   
+  std::stringstream output, error;
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::mock_nuts sampler(model, base_rng, &std::cout, &std::cerr);
+  stan::mcmc::mock_nuts sampler(model, base_rng, &output, &error);
   
   sampler.set_nominal_stepsize(1);
   sampler.set_stepsize_jitter(0);
@@ -179,7 +184,9 @@ TEST(McmcBaseNuts, build_tree) {
   
   EXPECT_EQ(8 * init_momentum, sampler.z().q(0));
   EXPECT_EQ(init_momentum, sampler.z().p(0));
-  
+
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());  
 }
 
 TEST(McmcBaseNuts, slice_criterion) {
@@ -204,8 +211,9 @@ TEST(McmcBaseNuts, slice_criterion) {
   util.n_tree = 0;
   util.sum_prob = 0;
   
+  std::stringstream output, error;
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::divergent_nuts sampler(model, base_rng, &std::cout, &std::cerr);
+  stan::mcmc::divergent_nuts sampler(model, base_rng, &output, &error);
   
   sampler.set_nominal_stepsize(1);
   sampler.set_stepsize_jitter(0);
@@ -231,5 +239,7 @@ TEST(McmcBaseNuts, slice_criterion) {
   
   EXPECT_EQ(0, n_valid);
   EXPECT_EQ(1, sampler._n_divergent);
-  
+
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());  
 }

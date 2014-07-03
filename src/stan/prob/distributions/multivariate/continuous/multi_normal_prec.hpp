@@ -18,6 +18,7 @@
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
+#include <stan/agrad/rev/matrix/trace_quad_form.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>

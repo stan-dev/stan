@@ -114,6 +114,7 @@ TEST(AgradFwdOperatorDivideEqual, FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
 
   x /= 0.3;
 

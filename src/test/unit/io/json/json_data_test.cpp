@@ -7,8 +7,6 @@ void test_int_var(stan::json::json_data& jdata,
                   const std::string& name,
                   const std::vector<int>& expected_vals,
                   const std::vector<size_t>& expected_dims) {
-  // std::cout << "json: " << text << std::endl;
-  // std::cout << "int var name: " << name << std::endl;
   EXPECT_EQ(true,jdata.contains_i(name));
   std::vector<size_t> dims = jdata.dims_i(name);
   EXPECT_EQ(expected_dims.size(),dims.size());
@@ -25,8 +23,6 @@ void test_real_var(stan::json::json_data& jdata,
                   const std::string& name,
                   const std::vector<double>& expected_vals,
                   const std::vector<size_t>& expected_dims) {
-  // std::cout << "json: " << text << std::endl;
-  // std::cout << "real var name: " << name << std::endl;
   EXPECT_EQ(true,jdata.contains_r(name));
   std::vector<size_t> dims = jdata.dims_r(name);
   EXPECT_EQ(expected_dims.size(),dims.size());

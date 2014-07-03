@@ -355,7 +355,8 @@ TEST(AgradFwdMultiplyLog,FvarFvarVar_Double_3rdDeriv) {
 
   fvar<fvar<var> > x;
   x.val_.val_ = 1.5;
-  x.val_.d_ = 1.3;
+  x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
   double y(1.8);
 
   fvar<fvar<var> > a = multiply_log(x,y);
@@ -374,12 +375,13 @@ TEST(AgradFwdMultiplyLog,Double_FvarFvarVar_3rdDeriv) {
   double x(1.5);
   fvar<fvar<var> > y;
   y.val_.val_ = 1.8;
-  y.d_.val_ = 1.1;
+  y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > a = multiply_log(x,y);
 
   AVEC p = createAVEC(y.val_.val_);
   VEC g;
   a.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(0.51440328, g[0]);
 }

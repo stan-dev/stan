@@ -625,9 +625,12 @@ TEST(AgradFwdMatrixMean, ffv_vector_3rdDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+   v1(0).d_.val_ = 1.0;
+   v1(1).d_.val_ = 1.0;
+   v1(2).d_.val_ = 1.0;
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
   
   fvar<fvar<var> > output;
   output = mean(v1);
@@ -745,9 +748,12 @@ TEST(AgradFwdMatrixMean, ffv_rowvector_3rdDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+   v1(0).d_.val_ = 1.0;
+   v1(1).d_.val_ = 1.0;
+   v1(2).d_.val_ = 1.0;
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
   
   fvar<fvar<var> > output;
   output = mean(v1);
@@ -865,9 +871,12 @@ TEST(AgradFwdMatrixMean, ffv_matrix_3rdDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(0,2).d_ = 1.0;
+   v1(0).d_.val_ = 1.0;
+   v1(1).d_.val_ = 1.0;
+   v1(2).d_.val_ = 1.0;
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
   
   fvar<fvar<var> > output;
   output = mean(v1);
@@ -967,9 +976,12 @@ TEST(AgradFwdMatrixMean, ffv_StdVector_3rdDeriv) {
 
   std::vector<fvar<fvar<var> > > y;
   fvar<fvar<var> > a = 1.0;
-  a.d_ = 1.0;
+  a.d_.val_ = 1.0;
+  a.val_.d_ = 1.0;
   fvar<fvar<var> > b = 2.0;
-  b.d_ = 1.0;
+  b.d_.val_ = 1.0;
+  b.val_.d_ = 1.0;
+
   y.push_back(a);
   y.push_back(b);
   fvar<fvar<var> > f = mean(y);

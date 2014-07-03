@@ -155,7 +155,8 @@ TEST(AgradFwdRound, FvarFvarVar_3rdDeriv) {
 
   fvar<fvar<var> > y;
   y.val_.val_ = 1.5;
-  y.d_.val_ = 2.0;
+  y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > b = round(y);
 

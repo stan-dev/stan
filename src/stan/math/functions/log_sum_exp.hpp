@@ -40,17 +40,16 @@ namespace stan {
      * @param[in] x array of specified values
      * @return The log of the sum of the exponentiated vector values.
      */
-    template <typename T>
-    T log_sum_exp(const std::vector<T>& x) {
+    double log_sum_exp(const std::vector<double>& x) {
       using std::numeric_limits;
       using std::log;
       using std::exp;
-      T max = -numeric_limits<T>::infinity();
+      double max = -numeric_limits<double>::infinity();
       for (size_t ii = 0; ii < x.size(); ii++) 
         if (x[ii] > max) 
           max = x[ii];
             
-      T sum = 0.0;
+      double sum = 0.0;
       for (size_t ii = 0; ii < x.size(); ii++) 
         if (x[ii] != -numeric_limits<double>::infinity()) 
           sum += exp(x[ii] - max);
