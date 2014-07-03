@@ -114,7 +114,6 @@ TEST(ModelUtil, finite_diff_grad__true_true) {
 }
 
 TEST(ModelUtil, gradient) {
-  
   int dim = 5;
   
   Eigen::VectorXd x(dim);
@@ -124,17 +123,21 @@ TEST(ModelUtil, gradient) {
   std::fstream data_stream(std::string("").c_str(), std::fstream::in);
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
-  
-  valid_model_namespace::valid_model valid_model(data_var_context, &std::cout);
+
+  std::stringstream output;
+  valid_model_namespace::valid_model valid_model(data_var_context, &output);
   EXPECT_NO_THROW(stan::model::gradient(valid_model, x, f, g));
   
   EXPECT_FLOAT_EQ(dim, x.size());
   EXPECT_FLOAT_EQ(dim, g.size());
+
+  EXPECT_EQ("", output.str());
   
   // Incorporate once operands and partials has been generalized
-  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  //output.str("");
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
   //EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g), std::domain_error);
-  
+  //EXPECT_EQ("", output.str());
 }
 
 TEST(ModelUtil, hessian) {
@@ -150,7 +153,8 @@ TEST(ModelUtil, hessian) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  valid_model_namespace::valid_model valid_model(data_var_context, &std::cout);
+  std::stringstream output;
+  valid_model_namespace::valid_model valid_model(data_var_context, &output);
   EXPECT_NO_THROW(stan::model::hessian(valid_model, x, f, grad_f, hess_f));
   
   EXPECT_FLOAT_EQ(dim, x.size());
@@ -158,10 +162,13 @@ TEST(ModelUtil, hessian) {
   EXPECT_FLOAT_EQ(dim, hess_f.rows());
   EXPECT_FLOAT_EQ(dim, hess_f.cols());
   
+  EXPECT_EQ("", output.str());
+
   // Incorporate once operands and partials has been generalized
-  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  //output.str("");
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
   //EXPECT_THROW(stan::model::hessian(domain_fail_model, x, f, grad_f, hess_f), std::domain_error);
-  
+  //EXPECT_EQ("", output.str());
 }
 
 TEST(ModelUtil, gradient_dot_vector) {
@@ -177,21 +184,25 @@ TEST(ModelUtil, gradient_dot_vector) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  valid_model_namespace::valid_model valid_model(data_var_context, &std::cout);
+
+  std::stringstream output;
+  valid_model_namespace::valid_model valid_model(data_var_context, &output);
   EXPECT_NO_THROW(stan::model::gradient_dot_vector(valid_model, x, v, f, grad_f_dot_v));
   
   EXPECT_FLOAT_EQ(dim, x.size());
   EXPECT_FLOAT_EQ(dim, v.size());
+
+  EXPECT_EQ("", output.str());
   
   // Incorporate once operands and partials has been generalized
-  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  //output.str("");
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
   //EXPECT_THROW(stan::model::gradient_dot_vector(domain_fail_model, x, v, f, grad_f_dot_v),
   //             std::domain_error);
-  
+  //EXPECT_EQ("", output.str());
 }
 
 TEST(ModelUtil, hessian_times_vector) {
-  
   int dim = 5;
   
   Eigen::VectorXd x(dim);
@@ -203,22 +214,25 @@ TEST(ModelUtil, hessian_times_vector) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  valid_model_namespace::valid_model valid_model(data_var_context, &std::cout);
+  std::stringstream output;
+  valid_model_namespace::valid_model valid_model(data_var_context, &output);
   EXPECT_NO_THROW(stan::model::hessian_times_vector(valid_model, x, v, f, hess_f_dot_v));
   
   EXPECT_FLOAT_EQ(dim, x.size());
   EXPECT_FLOAT_EQ(dim, v.size());
   EXPECT_FLOAT_EQ(dim, hess_f_dot_v.size());
   
+  EXPECT_EQ("", output.str());
+
   // Incorporate once operands and partials has been generalized
-  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  //output.str("");
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
   //EXPECT_THROW(stan::model::hessian_times_vector(domain_fail_model, x, v, f, hess_f_dot_v),
   //             std::domain_error);
-  
+  //EXPECT_EQ("", output.str());
 }
 
 TEST(ModelUtil, grad_tr_mat_times_hessian) {
-  
   int dim = 5;
   
   Eigen::VectorXd x(dim);
@@ -229,17 +243,22 @@ TEST(ModelUtil, grad_tr_mat_times_hessian) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  valid_model_namespace::valid_model valid_model(data_var_context, &std::cout);
+  std::stringstream output;
+
+  valid_model_namespace::valid_model valid_model(data_var_context, &output);
   EXPECT_NO_THROW(stan::model::grad_tr_mat_times_hessian(valid_model, x, X, grad_tr_X_hess_f));
   
   EXPECT_FLOAT_EQ(dim, x.size());
   EXPECT_FLOAT_EQ(dim, X.rows());
   EXPECT_FLOAT_EQ(dim, X.cols());
   EXPECT_FLOAT_EQ(dim, grad_tr_X_hess_f.size());
+
+  EXPECT_EQ("", output.str());
   
   // Incorporate once operands and partials has been generalized
-  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  //output.str("");
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
   //EXPECT_THROW(stan::model::grad_tr_mat_times_hessian(domain_fail_model, x, X, grad_tr_X_hess_f),
   //             std::domain_error);
-  
+  //EXPECT_EQ("", output.str());
 }

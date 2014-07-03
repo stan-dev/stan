@@ -7,8 +7,8 @@ typedef boost::ecuyer1988 rng_t;
 
 class mock_sampler : public stan::mcmc::base_mcmc {
 public:
-  mock_sampler()
-    : base_mcmc(&std::cout, &std::cout), n_transition_called(0) { }
+  mock_sampler(std::ostream *output, std::ostream *error)
+    : base_mcmc(output, error), n_transition_called(0) { }
 
   stan::mcmc::sample transition(stan::mcmc::sample& init_sample) {
     n_transition_called++;
@@ -30,23 +30,32 @@ struct mock_callback {
 class StanCommon : public testing::Test {
 public:
   void SetUp() {
-    sampler = new mock_sampler;
+    output.str("");
+    error.str("");
+
+    model_output.str("");
+    sample_output.str("");
+    diagnostic_output.str("");
+    message_output.str("");
+    writer_output.str("");
+
+    sampler = new mock_sampler(&output, &error);
 
     std::fstream empty_data_stream(std::string("").c_str());
     stan::io::dump empty_data_context(empty_data_stream);
     empty_data_stream.close();
     
-    model = new stan_model(empty_data_context, &std::cout);
+    model = new stan_model(empty_data_context, &model_output);
     
-    stan::common::recorder::csv sample_recorder(&std::cout, "# ");
-    stan::common::recorder::csv diagnostic_recorder(&std::cout, "# ");
-    stan::common::recorder::messages message_recorder(&std::cout, "# ");
+    stan::common::recorder::csv sample_recorder(&sample_output, "# ");
+    stan::common::recorder::csv diagnostic_recorder(&diagnostic_output, "# ");
+    stan::common::recorder::messages message_recorder(&message_output, "# ");
 
     writer = new stan::io::mcmc_writer<stan_model,
                                        stan::common::recorder::csv,
                                        stan::common::recorder::csv,
                                        stan::common::recorder::messages>
-      (sample_recorder, diagnostic_recorder, message_recorder, &std::cout);
+      (sample_recorder, diagnostic_recorder, message_recorder, &writer_output);
 
     base_rng.seed(123456);
 
@@ -71,15 +80,17 @@ public:
   Eigen::VectorXd q;
   double log_prob;
   double stat;
+
+  std::stringstream output, error;
+
+  std::stringstream model_output,
+    sample_output, diagnostic_output, message_output,
+    writer_output;
 };
 
 
 TEST_F(StanCommon, warmup) {
-  std::stringstream out;
-  std::stringstream redirect_cout;
-  std::streambuf* old_cout_rdbuf = std::cout.rdbuf(redirect_cout.rdbuf());
-
-  std::string expected_std_cout =  "Iteration:  1 / 80 [  1%]  (Warmup)\nIteration:  4 / 80 [  5%]  (Warmup)\nIteration:  8 / 80 [ 10%]  (Warmup)\nIteration: 12 / 80 [ 15%]  (Warmup)\nIteration: 16 / 80 [ 20%]  (Warmup)\nIteration: 20 / 80 [ 25%]  (Warmup)\nIteration: 24 / 80 [ 30%]  (Warmup)\nIteration: 28 / 80 [ 35%]  (Warmup)\n";
+  std::string expected_warmup_output =  "Iteration:  1 / 80 [  1%]  (Warmup)\nIteration:  4 / 80 [  5%]  (Warmup)\nIteration:  8 / 80 [ 10%]  (Warmup)\nIteration: 12 / 80 [ 15%]  (Warmup)\nIteration: 16 / 80 [ 20%]  (Warmup)\nIteration: 20 / 80 [ 25%]  (Warmup)\nIteration: 24 / 80 [ 30%]  (Warmup)\nIteration: 28 / 80 [ 35%]  (Warmup)\n";
   
   int num_warmup = 30;
   int num_samples = 50;
@@ -102,10 +113,16 @@ TEST_F(StanCommon, warmup) {
   EXPECT_EQ(num_warmup, sampler->n_transition_called);
   EXPECT_EQ(num_warmup, callback.n);
 
-  std::cout.rdbuf(old_cout_rdbuf);
-  EXPECT_EQ(expected_std_cout, ss.str());
-  EXPECT_EQ("", redirect_cout.str())
-    << "There should be no output to std::cout";
+  EXPECT_EQ(expected_warmup_output, ss.str());
+
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());
+
+  EXPECT_EQ("", model_output.str());
+  EXPECT_EQ("", sample_output.str());
+  EXPECT_EQ("", diagnostic_output.str());
+  EXPECT_EQ("", message_output.str());
+  EXPECT_EQ("", writer_output.str());
 }
 
 
