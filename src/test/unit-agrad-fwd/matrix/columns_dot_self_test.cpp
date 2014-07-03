@@ -241,6 +241,10 @@ TEST(AgradFwdMatrixColumnsDotSelf,matrix_ffv_3rdDeriv) {
   fvar<fvar<var> > b(3.0,1.0);
   fvar<fvar<var> > c(4.0,1.0);
   fvar<fvar<var> > d(5.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
   matrix_ffv x;
   matrix_ffv m3(2,2);
   m3 << a,b,c,d;

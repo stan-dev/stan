@@ -210,6 +210,9 @@ TEST(AgradFwdMatrixDiagMatrix,vector_ffv_3rdDeriv) {
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(4.0,1.0);
   fvar<fvar<var> > c(9.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
 
   vector_ffv v(3);
   v << a,b,c;

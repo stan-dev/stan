@@ -204,6 +204,11 @@ TEST(AgradFwdMatrixLogDeterminant,ffv_3rdDeriv) {
   fvar<fvar<var> > b(1.0,2.0);
   fvar<fvar<var> > c(2.0,2.0);
   fvar<fvar<var> > d(3.0,2.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+
   matrix_ffv v(2,2);
   v << a,b,c,d;
   
@@ -213,10 +218,10 @@ TEST(AgradFwdMatrixLogDeterminant,ffv_3rdDeriv) {
   AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val(),d.val().val());
   VEC h;
   det.d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
-  EXPECT_FLOAT_EQ(0,h[1]);
-  EXPECT_FLOAT_EQ(0,h[2]);
-  EXPECT_FLOAT_EQ(0,h[3]);
+  EXPECT_FLOAT_EQ(1.5,h[0]);
+  EXPECT_FLOAT_EQ(-1.25,h[1]);
+  EXPECT_FLOAT_EQ(-1,h[2]);
+  EXPECT_FLOAT_EQ(0.75,h[3]);
 }
 TEST(AgradFwdMatrixLogDeterminant,ffv_exception) {
   using stan::agrad::matrix_ffv;

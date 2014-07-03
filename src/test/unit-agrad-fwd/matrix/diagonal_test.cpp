@@ -209,8 +209,12 @@ TEST(AgradFwdMatrixDiagonal,matrix_ffv_3rdDeriv) {
   using stan::agrad::var;
 
   fvar<fvar<var> >  a(1.0,1.0);
-  fvar<fvar<var> >  b(4.0,2.0);
-  fvar<fvar<var> >  c(9.0,3.0);
+  fvar<fvar<var> >  b(4.0,1.0);
+  fvar<fvar<var> >  c(9.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+
   matrix_ffv v(3,3);
   v << a,b,c,a,b,c,a,b,c;
 
