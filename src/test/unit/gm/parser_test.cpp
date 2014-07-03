@@ -528,13 +528,20 @@ TEST(gm_parser,function_signatures) {
     test_parsable("function-signatures/math/functions/bessel_second_kind");
     test_parsable("function-signatures/math/functions/binary_log_loss");
     test_parsable("function-signatures/math/functions/binomial_coefficient_log");
+    test_parsable("function-signatures/math/functions/dot_self");
     test_parsable("function-signatures/math/functions/digamma");
+    test_parsable("function-signatures/math/functions/exp2"); 
     test_parsable("function-signatures/math/functions/falling_factorial");
+    test_parsable("function-signatures/math/functions/fdim");
     test_parsable("function-signatures/math/functions/fma");
     test_parsable("function-signatures/math/functions/gamma_p");
     test_parsable("function-signatures/math/functions/gamma_q");
-    test_parsable("function-signatures/math/functions/inv_cloglog");
+    test_parsable("function-signatures/math/functions/if_else");
     test_parsable("function-signatures/math/functions/int_step");
+    test_parsable("function-signatures/math/functions/inv");
+    test_parsable("function-signatures/math/functions/inv_cloglog");
+    test_parsable("function-signatures/math/functions/inv_square");
+    test_parsable("function-signatures/math/functions/inv_sqrt");
     test_parsable("function-signatures/math/functions/lbeta");
     test_parsable("function-signatures/math/functions/lgamma");
     test_parsable("function-signatures/math/functions/lmgamma");
@@ -543,6 +550,7 @@ TEST(gm_parser,function_signatures) {
     test_parsable("function-signatures/math/functions/log1m_inv_logit");
     test_parsable("function-signatures/math/functions/log1p");
     test_parsable("function-signatures/math/functions/log1p_exp");
+    test_parsable("function-signatures/math/functions/log2");
     test_parsable("function-signatures/math/functions/log_diff_exp");
     test_parsable("function-signatures/math/functions/log_inv_logit");
     test_parsable("function-signatures/math/functions/logit"); 
@@ -560,6 +568,7 @@ TEST(gm_parser,function_signatures) {
     test_parsable("function-signatures/math/functions/phi");
     test_parsable("function-signatures/math/functions/phi_approx");
     test_parsable("function-signatures/math/functions/rising_factorial");
+    test_parsable("function-signatures/math/functions/sum");
     test_parsable("function-signatures/math/functions/trigamma");
 
 
