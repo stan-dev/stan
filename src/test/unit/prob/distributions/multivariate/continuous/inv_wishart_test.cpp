@@ -174,7 +174,6 @@ TEST(ProbDistributionsInvWishart, SpecialRNGTest) {
     for (int i = 0; i < N; i++)
       Z += stan::prob::inv_wishart_rng(k + 2, sigma, rng);
     Z /= N;
-    //std::cout << Z << std::endl;
     for (int j = 0; j < k; j++) {
       for (int i = 0; i < k; i++) {
         if (j == i)

@@ -357,6 +357,7 @@ TEST(AgradFwdLogDiffExp,FvarFvarVar_Double_3rdDeriv) {
   fvar<fvar<var> > x;
   x.val_.val_ = 9.0;
   x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
 
   double y(6.0);
 
@@ -365,7 +366,7 @@ TEST(AgradFwdLogDiffExp,FvarFvarVar_Double_3rdDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0,g[0]);
+  EXPECT_FLOAT_EQ(0.060919308279076959008006310,g[0]);
 }
 
 TEST(AgradFwdLogDiffExp,Double_FvarFvarVar_3rdDeriv) {
@@ -378,11 +379,12 @@ TEST(AgradFwdLogDiffExp,Double_FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > y;
   y.val_.val_ = 6.0;
   y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > a = log_diff_exp(x,y);
 
   AVEC p = createAVEC(y.val_.val_);
   VEC g;
   a.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0,g[0]);
+  EXPECT_FLOAT_EQ(-0.060919308279076959008006309952,g[0]);
 }

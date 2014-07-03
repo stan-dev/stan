@@ -643,6 +643,10 @@ TEST(AgradFwdMatrixMdivideLeft,ffv_matrix_matrix_3rdDeriv) {
   Av(0,1).d_ = 2.0;
   Av(1,0).d_ = 2.0;
   Av(1,1).d_ = 2.0;
+  Av(0,0).val_.d_ = 2.0;
+  Av(0,1).val_.d_ = 2.0;
+  Av(1,0).val_.d_ = 2.0;
+  Av(1,1).val_.d_ = 2.0;
   Ad << 2.0, 3.0, 
     5.0, 7.0;
 
@@ -789,18 +793,24 @@ TEST(AgradFwdMatrixMdivideLeft,ffv_matrix_vector_3rdDeriv) {
 
   matrix_ffv fv(2,2);
   fv << 1, 2, 3, 4;
-  fv(0,0).d_ = 2.0;
-  fv(0,1).d_ = 2.0;
-  fv(1,0).d_ = 2.0;
-  fv(1,1).d_ = 2.0;
+  fv(0,0).d_ = 1.0;
+  fv(0,1).d_ = 1.0;
+  fv(1,0).d_ = 1.0;
+  fv(1,1).d_ = 1.0;
+  fv(0,0).val_.d_ = 1.0;
+  fv(0,1).val_.d_ = 1.0;
+  fv(1,0).val_.d_ = 1.0;
+  fv(1,1).val_.d_ = 1.0;
 
   matrix_d dv(2,2);
   dv << 1, 2, 3, 4;
 
   vector_ffv vecf(2);
   vecf << 5, 6;
-  vecf(0).d_ = 2.0;
-  vecf(1).d_ = 2.0;
+  vecf(0).d_ = 1.0;
+  vecf(1).d_ = 1.0;
+  vecf(0).val_.d_ = 1.0;
+  vecf(1).val_.d_ = 1.0;
 
   vector_d vecd(2);
   vecd << 5,6;
@@ -811,10 +821,10 @@ TEST(AgradFwdMatrixMdivideLeft,ffv_matrix_vector_3rdDeriv) {
   AVEC q = createAVEC(fv(0,0).val_.val(),fv(0,1).val_.val(),fv(1,0).val_.val(),fv(1,1).val_.val());
   VEC h;
   output(0,0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
-  EXPECT_FLOAT_EQ(0,h[1]);
-  EXPECT_FLOAT_EQ(0,h[2]);
-  EXPECT_FLOAT_EQ(0,h[3]);
+  EXPECT_FLOAT_EQ(-0.5,h[0]);
+  EXPECT_FLOAT_EQ(0.5,h[1]);
+  EXPECT_FLOAT_EQ(0.5,h[2]);
+  EXPECT_FLOAT_EQ(-0.5,h[3]);
 }
 TEST(AgradFwdMatrixMdivideLeft,ffv_exceptions) {
   using stan::math::matrix_d;

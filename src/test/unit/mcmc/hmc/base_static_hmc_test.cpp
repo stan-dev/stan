@@ -39,8 +39,10 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize) {
   std::vector<int> r(2, 2);
   
   stan::mcmc::mock_model model(q.size());
+
+  std::stringstream output, error;
   
-  stan::mcmc::mock_static_hmc sampler(model, base_rng, &std::cout, &std::cout);
+  stan::mcmc::mock_static_hmc sampler(model, base_rng, &output, &error);
   
   double old_epsilon = 1.0;
   
@@ -51,6 +53,8 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize) {
   sampler.set_nominal_stepsize(-0.1);
   EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());
 }
 
 TEST(McmcBaseStaticHMC, set_T) {
@@ -62,7 +66,8 @@ TEST(McmcBaseStaticHMC, set_T) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_static_hmc sampler(model, base_rng, &std::cout, &std::cerr);
+  std::stringstream output, error;
+  stan::mcmc::mock_static_hmc sampler(model, base_rng, &output, &error);
   
   double old_T = 3.0;
   
@@ -73,6 +78,8 @@ TEST(McmcBaseStaticHMC, set_T) {
   sampler.set_T(-0.1);
   EXPECT_EQ(old_T, sampler.get_T());
   
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());
 }
 
 TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_T) {
@@ -84,7 +91,8 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_T) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_static_hmc sampler(model, base_rng, &std::cout, &std::cerr);
+  std::stringstream output, error;
+  stan::mcmc::mock_static_hmc sampler(model, base_rng, &output, &error);
   
   double old_epsilon = 1.0;
   double old_T = 3.0;
@@ -102,6 +110,8 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_T) {
   EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   EXPECT_EQ(old_T, sampler.get_T());
   
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());
 }
 
 TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_L) {
@@ -113,7 +123,8 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_L) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_static_hmc sampler(model, base_rng, &std::cout, &std::cerr);
+  std::stringstream output, error;
+  stan::mcmc::mock_static_hmc sampler(model, base_rng, &output, &error);
   
   double old_epsilon = 1.0;
   int old_L = 10;
@@ -131,4 +142,6 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_L) {
   EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   EXPECT_EQ(old_L, sampler.get_L());
   
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());
 }

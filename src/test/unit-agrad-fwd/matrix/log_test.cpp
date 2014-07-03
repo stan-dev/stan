@@ -455,6 +455,10 @@ TEST(AgradFwdMatrixLog, ffv_matrix_3rdDeriv) {
   fvar<fvar<var> > b(2.0,1.0);
   fvar<fvar<var> > c(3.0,1.0);
   fvar<fvar<var> > d(4.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
 
   matrix_d expected_output(2,2);
   matrix_ffv mv(2,2), output;
@@ -465,7 +469,7 @@ TEST(AgradFwdMatrixLog, ffv_matrix_3rdDeriv) {
   AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val(),d.val().val());
   VEC h;
   output(0,0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(2,h[0]);
   EXPECT_FLOAT_EQ(0.0,h[1]);
   EXPECT_FLOAT_EQ(0.0,h[2]);
   EXPECT_FLOAT_EQ(0.0,h[3]);
@@ -566,6 +570,10 @@ TEST(AgradFwdMatrixLog, ffv_vector_3rdDeriv) {
   fvar<fvar<var> > b(2.0,1.0);
   fvar<fvar<var> > c(3.0,1.0);
   fvar<fvar<var> > d(4.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
 
   vector_ffv mv(4), output;
 
@@ -575,7 +583,7 @@ TEST(AgradFwdMatrixLog, ffv_vector_3rdDeriv) {
   AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val(),d.val().val());
   VEC h;
   output(0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(2,h[0]);
   EXPECT_FLOAT_EQ(0.0,h[1]);
   EXPECT_FLOAT_EQ(0.0,h[2]);
   EXPECT_FLOAT_EQ(0.0,h[3]);
@@ -680,6 +688,10 @@ TEST(AgradFwdMatrixLog, ffv_rowvector_3rdDeriv) {
   fvar<fvar<var> > b(2.0,1.0);
   fvar<fvar<var> > c(3.0,1.0);
   fvar<fvar<var> > d(4.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
 
   row_vector_d expected_output(4);
   row_vector_ffv mv(4), output;
@@ -690,7 +702,7 @@ TEST(AgradFwdMatrixLog, ffv_rowvector_3rdDeriv) {
   AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val(),d.val().val());
   VEC h;
   output(0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(2,h[0]);
   EXPECT_FLOAT_EQ(0.0,h[1]);
   EXPECT_FLOAT_EQ(0.0,h[2]);
   EXPECT_FLOAT_EQ(0.0,h[3]);
