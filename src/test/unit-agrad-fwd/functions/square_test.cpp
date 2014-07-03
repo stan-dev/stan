@@ -166,7 +166,8 @@ TEST(AgradFwdSquare, FvarFvarVar_3rdDeriv) {
 
   fvar<fvar<var> > x;
   x.val_.val_ = 1.5;
-  x.val_.d_ = 2.0;
+  x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
 
   fvar<fvar<var> > a = square(x);
 

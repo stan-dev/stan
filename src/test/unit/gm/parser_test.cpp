@@ -77,9 +77,10 @@ bool is_parsable_folder(const std::string& model_name,
  * @param model_name Name of model to parse
  */
 void test_parsable(const std::string& model_name) {
-  std::cout << "parsing: " << model_name << std::endl;
-  std::cout.flush();
-  EXPECT_TRUE(is_parsable_folder(model_name, "syntax-only"));
+  {
+    SCOPED_TRACE("parsing: " + model_name);
+    EXPECT_TRUE(is_parsable_folder(model_name, "syntax-only"));
+  }
 }
 
 
@@ -96,21 +97,20 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
   } catch (const std::invalid_argument& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos
         && msgs.str().find(error_msg) == std::string::npos) {
-      std::cout << std::endl << "*********************************" << std::endl
-                << "model name=" << model_name << std::endl
-                << "*** EXPECTED: error_msg=" << error_msg << std::endl
-                << "*** FOUND: e.what()=" << e.what() << std::endl
-                << "*** FOUND: msgs.str()=" << msgs.str() << std::endl
-                << "*********************************" << std::endl
-                << std::endl;
-      FAIL();
+      FAIL() << std::endl << "*********************************" << std::endl
+             << "model name=" << model_name << std::endl
+             << "*** EXPECTED: error_msg=" << error_msg << std::endl
+             << "*** FOUND: e.what()=" << e.what() << std::endl
+             << "*** FOUND: msgs.str()=" << msgs.str() << std::endl
+             << "*********************************" << std::endl
+             << std::endl;
     }
     return;
   }
-  std::cout << "model name=" << model_name 
-            << " is parsable and were exepecting msg=" << error_msg
-            << std::endl;
-  FAIL();
+  
+  FAIL() << "model name=" << model_name 
+         << " is parsable and were exepecting msg=" << error_msg
+         << std::endl;
 }
 
 /** test that model with specified name in syntax-only path parses
@@ -333,7 +333,6 @@ TEST(gmParser,declareVarWithSameNameAsModel) {
                std::invalid_argument);
 }
 
-
 TEST(gm_parser,function_signatures) {
   test_parsable("good_inf");
   test_parsable("function_signatures1");
@@ -547,7 +546,14 @@ TEST(parserFunctions, funsGood3) {
 
 TEST(parserFunctions, funsGood4) {
   test_parsable("functions-good-void");
+  test_parsable("functions-good-void"); // test twice to ensure
+                                        // symbols are not saved
 }
+TEST(gmParser, intFun) {
+  test_parsable("int_fun");
+}
+
+
 
 TEST(parserFunctions, funsBad1) {
   test_throws("functions-bad1","Function already declared");

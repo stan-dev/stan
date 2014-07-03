@@ -73,6 +73,8 @@ namespace stan {
       using boost::phoenix::construct;
       using boost::phoenix::val;
 
+      stan::gm::function_signatures::reset_sigs();
+
       std::ostringstream buf;
       buf << input.rdbuf();
       std::string stan_string = buf.str();
