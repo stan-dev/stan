@@ -13,6 +13,10 @@
 
 namespace stan {
 
+  struct error_index {
+    enum { value = 1 };
+  };
+
   /**
    * Metaprogramming struct to detect whether a given type is constant
    * in the mathematical sense (not the C++ <code>const</code>
