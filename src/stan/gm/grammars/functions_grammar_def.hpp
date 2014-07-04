@@ -126,7 +126,7 @@ namespace stan {
       static bool fun_exists(const std::set<std::pair<std::string, 
                                                       function_signature_t> >& existing,
                              const std::pair<std::string,function_signature_t>& name_sig) {
-        for (std::set<std::pair<std::string, function_signature_t> >::iterator it 
+        for (std::set<std::pair<std::string, function_signature_t> >::const_iterator it 
                = existing.begin();
              it != existing.end();
              ++it)
