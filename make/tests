@@ -196,6 +196,13 @@ test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: src/test/test-models/no-main/m
 test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp 
 test/unit/mcmc/hmc/integrators/expl_leapfrog2.o: src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
 
+test/unit/common/do_bfgs_optimize.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
+test/unit/optimization/bfgs_linesearch.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
+test/unit/optimization/bfgs_minimizer.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
+test/unit/optimization/bfgs.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
+test/unit/optimization/bfgs_update.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
+test/unit/optimization/lbfgs_update.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
+
 test/unit/common/command_init.o: src/test/test-models/no-main/common/test_lp.cpp
 test/unit/common/run_markov_chain.o: src/test/test-models/no-main/common/test_lp.cpp
 test/unit/common/sample.o: src/test/test-models/no-main/common/test_lp.cpp
