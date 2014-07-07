@@ -14,7 +14,13 @@
 namespace stan {
 
   struct error_index {
-    enum { value = 1 };
+    enum { value = 
+#ifdef ERROR_INDEX
+ERROR_INDEX
+#else
+1
+#endif
+    };
   };
 
   /**
