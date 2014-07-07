@@ -34,8 +34,8 @@ namespace stan {
      */
     template<typename T>
     void    
-    factor_U(Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
-             const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& U) {
+    factor_U(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& U,
+             Eigen::Array<T,Eigen::Dynamic,1>& CPCs) { 
 
       size_t K = U.rows();
       size_t position = 0;
@@ -101,24 +101,8 @@ namespace stan {
       if (!ldlt.isPositive()) 
         return false;
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> U = ldlt.matrixU();
-      factor_U(CPCs, U);
+      factor_U(U, CPCs);
       return true;
-    }
-
-    /**
-     * This function is intended to make starting values, given a 
-     * lower-triangular matrix L such that LL' is a correlation matrix
-     *   
-     * @param CPCs fill this unbounded
-     * @param L L matrix
-     */
-    template<typename T>
-    void    
-    factor_L(Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
-             const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& L) {
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> newL;
-      newL = L * ( L.diagonal().array().inverse().matrix().asDiagonal() );
-      factor_U(CPCs, newL);
     }
 
     // MATRIX TRANSFORMS +/- JACOBIANS
@@ -1721,9 +1705,8 @@ namespace stan {
         for (size_type n = m + 1; n < K; ++n) 
           L(m,n) = 0.0;
       }
-      // FIXME: return multiply_self_transpose
       using stan::math::multiply_lower_tri_self_transpose;
-      return multiply_lower_tri_self_transpose(L); // equiv to: (L * L.transpose())
+      return multiply_lower_tri_self_transpose(L); 
     }
 
     

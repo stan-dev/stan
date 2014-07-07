@@ -935,18 +935,6 @@ TEST(ProbTransform,choleskyFactorFreeError) {
   EXPECT_THROW(cholesky_factor_free(y),std::domain_error);
 }
 
-TEST(ProbTransform,factorL) {
-  using Eigen::Matrix;
-  using Eigen::Array;
-  using stan::prob::factor_L;
-
-  Eigen::MatrixXd L(2,2);
-  L << 1,0,cos(0.5),sin(0.5);
-  Eigen::ArrayXd CPCs(1);
-  CPCs.setOnes();
-  factor_L(CPCs,L);
-  EXPECT_FLOAT_EQ(CPCs(0),atanh(L(1,0)));
-}
 
 TEST(ProbTransform,CholeskyCorrelation4) {
   using Eigen::Matrix;
@@ -1111,3 +1099,26 @@ TEST(probTransform,choleskyCorrJacobian) {
   test_cholesky_correlation_jacobian(y4,4);
 }
 
+TEST(probTransform,factorU) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using Eigen::Array;
+  using stan::prob::factor_U;
+  int K = 3;
+  // define U so that U' * U is a correlation matrix (rows length one,
+  // diagonal positive);  this will also mean that U' * D * U is one, too
+  Matrix<double,Dynamic,Dynamic> U(K,K);
+  U << 
+    0.2, -0.4,  0.8944272,
+    0.0,  0.7, -0.7141428,
+    0.0,  0.0,  1.0;
+  Eigen::Array<double,Dynamic,1> CPCs(K-1);
+  CPCs << 10, 100;
+  factor_U(U, CPCs);
+  // test that function doesn't resize itself
+  EXPECT_EQ(K - 1, CPCs.size());
+  // for (int i = 0; i < CPCs.size(); ++i) {
+  //   // need tanh to get back to a CPC, which should be in (-1,1)
+  //   EXPECT_LE(std::tanh(std::abs(CPCs(i))), 1.0);
+  // }
+}
