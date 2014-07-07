@@ -41,8 +41,12 @@ m + geom_point() + scale_y_continuous("Percentage Support for the Death Penalty"
 
 # Weighted averages
 
+N <- c(65633200,80523700,59685200) # population sizes FR, DE, IT
+p <- c(0.55,0.61,0.38)  # estimated proportions of Yes responses
+se <- c(0.02,0.03,0.03)
+
 w.avg <- sum(N*p)/sum(N)
-se.w.av <- sqrt (sum ((N*se/sum(N))^2))
+se.w.avg <- sqrt (sum ((N*se/sum(N))^2))
 int.95 <- w.avg + c(-2,2)*se.w.avg
 
 # CI using simulations
