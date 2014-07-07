@@ -160,9 +160,8 @@ namespace stan {
 
       double U3 = uniform_rng(0.0, 1.0, rng) - 0.5;
       double sign = ((U3 >= 0) - (U3 <= 0));
-      const double TWO_PI = 2 * stan::math::pi();
 
-      return sign * std::acos(W) + fmod(fmod(mu,TWO_PI)+TWO_PI,TWO_PI);
+      return sign * std::acos(W) + fmod(fmod(mu,2*stan::math::pi())+2*stan::math::pi(),2*stan::math::pi());
     }
 
   } 
