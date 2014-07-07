@@ -333,7 +333,6 @@ TEST(gmParser,declareVarWithSameNameAsModel) {
                std::invalid_argument);
 }
 
-
 TEST(gm_parser,function_signatures) {
   test_parsable("good_inf");
   test_parsable("function_signatures1");
@@ -547,7 +546,14 @@ TEST(parserFunctions, funsGood3) {
 
 TEST(parserFunctions, funsGood4) {
   test_parsable("functions-good-void");
+  test_parsable("functions-good-void"); // test twice to ensure
+                                        // symbols are not saved
 }
+TEST(gmParser, intFun) {
+  test_parsable("int_fun");
+}
+
+
 
 TEST(parserFunctions, funsBad1) {
   test_throws("functions-bad1","Function already declared");
