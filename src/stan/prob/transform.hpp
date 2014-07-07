@@ -11,11 +11,11 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 #include <stan/math.hpp>
+#include <stan/math/error_handling.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/sum.hpp>
-#include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 
 namespace stan {
@@ -1181,7 +1181,7 @@ namespace stan {
         stick_len += x(k);
         T z_k(x(k) / stick_len);
         y(k) = logit(z_k) + log(Km1 - k); 
-        // log(Km-k) = logit(1.0 / (Km1 + 1 - k));
+        // note: log(Km1 - k) = logit(1.0 / (Km1 + 1 - k));
       }
       return y;
     }
@@ -1567,48 +1567,6 @@ namespace stan {
       return z;
     }
 
-    // template <typename T>
-    // Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    // cholesky_corr_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
-    //                         int K) {
-    //   int k_choose_2 = (K * (K - 1)) / 2;
-    //   if (k_choose_2 != x.size())
-    //     throw std::domain_error("x is not a valid unconstrained cholesky correlation matrix."
-    //                             "Require (K choose 2) elements in x.");
-    //   Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
-    //   for (int i = 0; i < k_choose_2; ++i)
-    //     cpcs(i) = corr_constrain(x(i));
-    //   return read_corr_L(cpcs, K);
-    // }
-
-    // template <typename T>
-    // Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    // cholesky_corr_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
-    //                         int K,
-    //                         T& lp) {
-    //   stan::math::validate_square(x,"cholesky_corr_constrain/3");
-    //   int k_choose_2 = (K * (K - 1)) / 2;
-    //   if (k_choose_2 != x.size())
-    //     throw std::domain_error("x is not a valid unconstrained cholesky correlation matrix.");
-    //   Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
-    //   for (int i = 0; i < k_choose_2; ++i)
-    //     cpcs(i) = corr_constrain(x(i),lp);
-    //   return read_corr_L(cpcs, K, lp);
-    // }
-
-    // template <typename T>
-    // Eigen::Matrix<T,Eigen::Dynamic,1>
-    // cholesky_corr_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& L) {
-    //   stan::math::validate_square(L,"cholesky_corr_free");
-    //   Eigen::Array<T,Eigen::Dynamic,1> cpcs((L.rows() * (L.rows() - 1)) / 2);
-    //   factor_L(cpcs,L);
-    //   for (int i = 0; i < cpcs.size(); ++i)
-    //     cpcs(i) = corr_free(cpcs(i));
-    //   return cpcs;
-    // }
-
-    
-
     // CORRELATION MATRIX
 
     /**
@@ -1764,7 +1722,8 @@ namespace stan {
           L(m,n) = 0.0;
       }
       // FIXME: return multiply_self_transpose
-      return L * L.transpose();
+      using stan::math::multiply_lower_tri_self_transpose;
+      return multiply_lower_tri_self_transpose(L); // equiv to: (L * L.transpose())
     }
 
     
