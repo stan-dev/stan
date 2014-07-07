@@ -3,8 +3,14 @@
 
 #include <vector>
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/math/functions/log_sum_exp.hpp>
+#include <stan/math/matrix/log_sum_exp.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/agrad/rev/operators.hpp>
+#include <stan/agrad/rev/functions/log.hpp>
+#include <stan/agrad/rev/functions/exp.hpp>
+#include <stan/agrad/fwd/functions/log.hpp>
+#include <stan/agrad/fwd/functions/exp.hpp>
+#include <stan/agrad/rev/matrix/log_sum_exp.hpp>
 
 namespace stan{
 
@@ -16,8 +22,13 @@ namespace stan{
     fvar<T>
     log_sum_exp(const Eigen::Matrix<fvar<T>,R,C>& v) {
       using stan::math::log_sum_exp;
+      using stan::agrad::log_sum_exp;
+      using stan::agrad::exp;
       using std::exp;
-      std::vector<T> vals(v.size());
+      using stan::agrad::log;
+      using std::log;
+
+      Eigen::Matrix<T,1,Eigen::Dynamic> vals(v.size());
       for (int i = 0; i < v.size(); ++i)
         vals[i] = v(i).val_;
       T deriv(0.0);

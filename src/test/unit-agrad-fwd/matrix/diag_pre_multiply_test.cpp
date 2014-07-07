@@ -609,12 +609,18 @@ TEST(AgradFwdMatrixDiagPreMultiply, vector_ffv_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
-  fvar<fvar<var> > a(1.0,2.0);
-  fvar<fvar<var> > b(2.0,2.0);
-  fvar<fvar<var> > c(3.0,2.0);
-  fvar<fvar<var> > d(4.0,2.0);
-  fvar<fvar<var> > e(5.0,2.0);
-  fvar<fvar<var> > f(6.0,2.0);
+  fvar<fvar<var> > a(1.0,1.0);
+  fvar<fvar<var> > b(2.0,1.0);
+  fvar<fvar<var> > c(3.0,1.0);
+  fvar<fvar<var> > d(4.0,1.0);
+  fvar<fvar<var> > e(5.0,1.0);
+  fvar<fvar<var> > f(6.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   matrix_ffv Y(3,3);
   Y << a,b,c,b,c,d,d,e,f;
@@ -776,12 +782,18 @@ TEST(AgradFwdMatrixDiagPreMultiply, rowvector_ffv_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
-  fvar<fvar<var> > a(1.0,2.0);
-  fvar<fvar<var> > b(2.0,2.0);
-  fvar<fvar<var> > c(3.0,2.0);
-  fvar<fvar<var> > d(4.0,2.0);
-  fvar<fvar<var> > e(5.0,2.0);
-  fvar<fvar<var> > f(6.0,2.0);
+  fvar<fvar<var> > a(1.0,1.0);
+  fvar<fvar<var> > b(2.0,1.0);
+  fvar<fvar<var> > c(3.0,1.0);
+  fvar<fvar<var> > d(4.0,1.0);
+  fvar<fvar<var> > e(5.0,1.0);
+  fvar<fvar<var> > f(6.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   matrix_ffv Y(3,3);
   Y << a,b,c,b,c,d,d,e,f;

@@ -10,7 +10,6 @@ Thanks to everyone!
 New Features
 ------------
 * user-defined function definitions added to Stan language
-* cholesky_corr data type for Cholesky factors of correlation matrices
 * a^b syntax for pow(a,b)  (thanks to Mitzi Morris)
 * reshaping functions: to_matrix(), to_vector(), to_row_vector(), 
   to_array_1d(), to_array_2d()

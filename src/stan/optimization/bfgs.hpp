@@ -4,233 +4,71 @@
 #include <cmath>
 #include <cstdlib>
 #include <string>
+#include <limits>
 
 #include <boost/math/special_functions/fpclassify.hpp>
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/model/util.hpp>
 
+#include <stan/optimization/bfgs_linesearch.hpp>
+#include <stan/optimization/bfgs_update.hpp>
+#include <stan/optimization/lbfgs_update.hpp>
+
 namespace stan {
   namespace optimization {
-    namespace {
-      template<typename FunctorType, typename Scalar, typename XType>
-      int BTLineSearch(FunctorType &func,
-                       Scalar &alpha, 
-                       XType &x1, Scalar &f1, XType &gradx1,
-                       const XType &p,
-                       const XType &x0, const Scalar &f0, const XType &gradx0,
-                       const Scalar &rho, const Scalar &c,
-                       const Scalar &minAlpha)
-      {
-        const Scalar cdfdp(c*gradx0.dot(p));
-        int ret;
-        
-        while (1) {
-          x1 = x0 + alpha*p;
-          ret = func(x1,f1);
-          if (ret!=0 && f1 <= f0 + alpha*cdfdp)
-            break;
-          else
-            alpha *= rho;
-          
-          if (alpha < minAlpha)
-            return 1;
-        }
-        func.df(x1,gradx1);
-        return 0;
-      }
-      
-      template<typename Scalar>
-      Scalar CubicInterp(const Scalar &df0,
-                         const Scalar &x1, const Scalar &f1, const Scalar &df1,
-                         const Scalar &loX, const Scalar &hiX)
-      {
-        const Scalar c3((-12*f1 + 6*x1*(df0 + df1))/(x1*x1*x1));
-        const Scalar c2(-(4*df0 + 2*df1)/x1 + 6*f1/(x1*x1));
-        const Scalar &c1(df0);
-        
-        const Scalar t_s = std::sqrt(c2*c2 - 2.0*c1*c3);
-        const Scalar s1 = - (c2 + t_s)/c3;
-        const Scalar s2 = - (c2 - t_s)/c3;
-        
-        Scalar tmpF;
-        Scalar minF, minX;
-        
-        // Check value at lower bound
-        minF = loX*(loX*(loX*c3/3.0 + c2)/2.0 + c1);
-        minX = loX;
-        
-        // Check value at upper bound
-        tmpF = hiX*(hiX*(hiX*c3/3.0 + c2)/2.0 + c1);
-        if (tmpF < minF) {
-          minF = tmpF;
-          minX = hiX;
-        }
-        
-        // Check value of first root
-        if (loX < s1 && s1 < hiX) {
-          tmpF = s1*(s1*(s1*c3/3.0 + c2)/2.0 + c1);
-          if (tmpF < minF) {
-            minF = tmpF;
-            minX = s1;
-          }
-        }
-        
-        // Check value of second root
-        if (loX < s2 && s2 < hiX) {
-          tmpF = s2*(s2*(s2*c3/3.0 + c2)/2.0 + c1);
-          if (tmpF < minF) {
-            minF = tmpF;
-            minX = s2;
-          }
-        }
-        
-        return minX;
-      }
-      template<typename Scalar>
-      Scalar CubicInterp(const Scalar &x0, const Scalar &f0, const Scalar &df0,
-                         const Scalar &x1, const Scalar &f1, const Scalar &df1,
-                         const Scalar &loX, const Scalar &hiX)
-      {
-        return x0 + CubicInterp(df0,x1-x0,f1-f0,df1,loX-x0,hiX-x0);
-      }
-      
-      template<typename FunctorType, typename Scalar, typename XType>
-      int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
-                     FunctorType &func,
-                     const XType &x, const Scalar &f, const Scalar &dfp,
-                     const Scalar &c1dfp, const Scalar &c2dfp, const XType &p,
-                     Scalar alo, Scalar aloF, Scalar aloDFp,
-                     Scalar ahi, Scalar ahiF, Scalar ahiDFp,
-                     const Scalar &min_range)
-      {
-        Scalar d1, d2, newDFp;
-        int itNum(0);
-        
-        while (1) {
-          itNum++;
-          
-          if (std::fabs(alo-ahi) < min_range)
-            return 1;
-          
-          if (itNum%5 == 0) {
-            alpha = 0.5*(alo+ahi);
-          }
-          else {
-            // Perform cubic interpolation to determine next point to try
-            d1 = aloDFp + ahiDFp - 3*(aloF-ahiF)/(alo-ahi);
-            d2 = std::sqrt(d1*d1 - aloDFp*ahiDFp);
-            if (ahi < alo)
-              d2 = -d2;
-            alpha = ahi - (ahi - alo)*(ahiDFp + d2 - d1)/(ahiDFp - aloDFp + 2*d2);
-            if (!boost::math::isfinite(alpha) ||
-                alpha < std::min(alo,ahi)+0.01*std::fabs(alo-ahi) ||
-                alpha > std::max(alo,ahi)-0.01*std::fabs(alo-ahi))
-              alpha = 0.5*(alo+ahi);
-          }
+    typedef enum {
+      TERM_SUCCESS = 0,
+      TERM_ABSX = 10,
+      TERM_ABSF = 20,
+      TERM_RELF = 21,
+      TERM_ABSGRAD = 30,
+      TERM_RELGRAD = 31,
+      TERM_MAXIT = 40,
+      TERM_LSFAIL = -1
+    } TerminationCondition;
+    
+    template<typename Scalar = double>
+    class ConvergenceOptions {
+    public:
+      ConvergenceOptions() {
+        maxIts = 10000;
+        fScale = 1.0;
 
-          newX = x + alpha*p;
-          while (func(newX,newF,newDF)) {
-            alpha = 0.5*(alpha+std::min(alo,ahi));
-            if (std::fabs(std::min(alo,ahi)-alpha) < min_range)
-              return 1;
-            newX = x + alpha*p;
-          }
-          newDFp = newDF.dot(p);
-          if (newF > (f + alpha*c1dfp) || newF >= aloF) {
-            ahi = alpha;
-            ahiF = newF;
-            ahiDFp = newDFp;
-          }
-          else {
-            if (std::fabs(newDFp) <= -c2dfp)
-              break;
-            if (newDFp*(ahi-alo) >= 0) {
-              ahi = alo;
-              ahiF = aloF;
-              ahiDFp = aloDFp;
-            }
-            alo = alpha;
-            aloF = newF;
-            aloDFp = newDFp;
-          }
-        }
-        return 0;
-      }
-      
-      template<typename FunctorType, typename Scalar, typename XType>
-      int WolfeLineSearch(FunctorType &func,
-                          Scalar &alpha,
-                          XType &x1, Scalar &f1, XType &gradx1,
-                          const XType &p,
-                          const XType &x0, const Scalar &f0, const XType &gradx0,
-                          const Scalar &c1, const Scalar &c2,
-                          const Scalar &minAlpha)
-      {
-        const Scalar dfp(gradx0.dot(p));
-        const Scalar c1dfp(c1*dfp);
-        const Scalar c2dfp(c2*dfp);
-        
-        Scalar alpha0(minAlpha);
-        Scalar alpha1(alpha);
-        
-        Scalar prevF(f0);
-        XType prevDF(gradx0);
-        Scalar prevDFp(dfp);
-        Scalar newDFp;
-        
-        int retCode = 0, nits = 0, ret;
-        
-        while (1) {
-          x1.noalias() = x0 + alpha1*p;
-          ret = func(x1,f1,gradx1);
-          if (ret!=0) {
-            alpha1 = 0.5*(alpha0+alpha1);
-            continue;
-          }
-          newDFp = gradx1.dot(p);
-          if ((f1 > f0 + alpha*c1dfp) || (f1 >= prevF && nits > 0)) {
-            retCode = WolfLSZoom(alpha, x1, f1, gradx1,
-                                 func,
-                                 x0, f0, dfp,
-                                 c1dfp, c2dfp, p,
-                                 alpha0, prevF, prevDFp,
-                                 alpha1, f1, newDFp,
-                                 1e-16);
-            break;
-          }
-          if (std::fabs(newDFp) <= -c2dfp) {
-            alpha = alpha1;
-            break;
-          }
-          if (newDFp >= 0) {
-            retCode = WolfLSZoom(alpha, x1, f1, gradx1,
-                                 func,
-                                 x0, f0, dfp,
-                                 c1dfp, c2dfp, p,
-                                 alpha1, f1, newDFp,
-                                 alpha0, prevF, prevDFp,
-                                 1e-16);
-            break;
-          }
-          
-          alpha0 = alpha1;
-          prevF = f1;
-          std::swap(prevDF,gradx1);
-          prevDFp = newDFp;
-          
-//          alpha1 = std::min(2.0*alpha0,maxAlpha);
-          alpha1 *= 10.0;
-          
-          nits++;
-        }
-        return retCode;
-      }
+        tolAbsX = 1e-8;
+        tolAbsF = 1e-12;
+        tolAbsGrad = 1e-8;
 
-    }
-    template<typename FunctorType, typename Scalar = double,
-             int DimAtCompile = Eigen::Dynamic,
-             int LineSearchMethod = 1>
+        tolRelF = 1e+4;
+        tolRelGrad = 1e+3;
+      }
+      size_t maxIts;
+      Scalar tolAbsX;
+      Scalar tolAbsF;
+      Scalar tolRelF;
+      Scalar fScale;
+      Scalar tolAbsGrad;
+      Scalar tolRelGrad;
+    };
+
+    template<typename Scalar = double>
+    class LSOptions {
+    public:
+      LSOptions() {
+        c1 = 1e-4;
+        c2 = 0.9;
+        minAlpha = 1e-12;
+        alpha0 = 1e-3;
+      }
+      Scalar c1;
+      Scalar c2;
+      Scalar alpha0;
+      Scalar minAlpha;
+    };
+
+
+    template<typename FunctorType, typename QNUpdateType,
+             typename Scalar = double, int DimAtCompile = Eigen::Dynamic>
     class BFGSMinimizer {
     public:
       typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
@@ -238,24 +76,39 @@ namespace stan {
       
     protected:
       FunctorType &_func;
-      VectorT _gk, _gk_1, _xk_1, _xk, _sk, _sk_1;
+      VectorT _gk, _gk_1, _xk_1, _xk, _pk, _pk_1;
       Scalar _fk, _fk_1, _alphak_1;
       Scalar _alpha, _alpha0;
-      Eigen::LDLT< HessianT > _ldlt;
       size_t _itNum;
       std::string _note;
+      QNUpdateType _qn;
       
     public:
+      LSOptions<Scalar> _ls_opts;
+      ConvergenceOptions<Scalar> _conv_opts;
+
+      QNUpdateType &get_qnupdate() { return _qn; }
+      const QNUpdateType &get_qnupdate() const { return _qn; }
+      
       const Scalar &curr_f() const { return _fk; }
       const VectorT &curr_x() const { return _xk; }
       const VectorT &curr_g() const { return _gk; }
-      const VectorT &curr_s() const { return _sk; }
+      const VectorT &curr_p() const { return _pk; }
       
       const Scalar &prev_f() const { return _fk_1; }
       const VectorT &prev_x() const { return _xk_1; }
       const VectorT &prev_g() const { return _gk_1; }
-      const VectorT &prev_s() const { return _sk_1; }
-      Scalar prev_step_size() const { return _sk_1.norm()*_alphak_1; }
+      const VectorT &prev_p() const { return _pk_1; }
+      Scalar prev_step_size() const { return _pk_1.norm()*_alphak_1; }
+
+      inline Scalar rel_grad_norm() const {
+        return -_pk.dot(_gk) / std::max(std::fabs(_fk),_conv_opts.fScale);
+      }
+      inline Scalar rel_obj_decrease() const { 
+        return std::fabs(_fk_1 - _fk) / std::max(std::fabs(_fk_1),
+                                                 std::max(std::fabs(_fk),
+                                                          _conv_opts.fScale));
+      }
 
       const Scalar &alpha0() const { return _alpha0; }
       const Scalar &alpha() const { return _alpha; }
@@ -265,46 +118,26 @@ namespace stan {
       
       std::string get_code_string(int retCode) {
         switch(retCode) {
-          case 0:
+          case TERM_SUCCESS:
             return std::string("Successful step completed");
-          case 1:
-            return std::string("Convergence detected: change in objective function was below tolerance");
-          case 2:
+          case TERM_ABSF:
+            return std::string("Convergence detected: absolute change in objective function was below tolerance");
+          case TERM_RELF:
+            return std::string("Convergence detected: relative change in objective function was below tolerance");
+          case TERM_ABSGRAD:
             return std::string("Convergence detected: gradient norm is below tolerance");
-          case 3:
-            return std::string("Convergence detected: parameter change was below tolerance");
-          case 4:
+          case TERM_RELGRAD:
+            return std::string("Convergence detected: relative gradient magnitude is below tolerance");
+          case TERM_ABSX:
+            return std::string("Convergence detected: absolute parameter change was below tolerance");
+          case TERM_MAXIT:
             return std::string("Maximum number of iterations hit, may not be at an optima");
-          case -1:
+          case TERM_LSFAIL:
             return std::string("Line search failed to achieve a sufficient decrease, no more progress can be made");
           default:
             return std::string("Unknown termination code");
         }
       }
-
-      struct BFGSOptions {
-        BFGSOptions() {
-          maxIts = 10000;
-          rho = 0.75;
-          c1 = 1e-4;
-          c2 = 0.9;
-          minAlpha = 1e-12;
-          alpha0 = 1e-3;
-          tolX = 1e-8;
-          tolF = 1e-8;
-          tolGrad = 1e-8;
-        }
-        size_t maxIts;
-        Scalar rho;
-        Scalar c1;
-        Scalar c2;
-        Scalar alpha0;
-        Scalar minAlpha;
-        Scalar tolX;
-        Scalar tolF;
-        Scalar tolGrad;
-      } _opts;
-      
       
       BFGSMinimizer(FunctorType &f) : _func(f) { }
       
@@ -315,15 +148,16 @@ namespace stan {
         if (ret) {
           throw std::runtime_error("Error evaluating initial BFGS point.");
         }
+        _pk = -_gk;
         
         _itNum = 0;
         _note = "";
       }
       
       int step() {
-        Scalar gradNorm, thetak, skyk, skBksk;
-        VectorT sk, yk, Bksk, rk;
-        int retCode;
+        Scalar gradNorm, stepNorm;
+        VectorT sk, yk;
+        int retCode(0);
         int resetB(0);
         
         _itNum++;
@@ -331,10 +165,6 @@ namespace stan {
         if (_itNum == 1) {
           resetB = 1;
           _note = "";
-        }
-        else if (!(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all())) {
-          resetB = 1;
-          _note = "LDLT failed, BFGS reset; ";
         }
         else {
           resetB = 0;
@@ -344,44 +174,41 @@ namespace stan {
         while (true) {
           if (resetB) {
             // Reset the Hessian approximation
-            _sk = -_gk;
+            _pk.noalias() = -_gk;
           }
-          else {
-            _sk = -_ldlt.solve(_gk);
-          }
-          
+
+          // Get an initial guess for the step size (alpha)
           if (_itNum > 1 && resetB != 2) {
+            // use cubic interpolation based on the previous step
             _alpha0 = _alpha = std::min(1.0,
-                                        1.01*CubicInterp(_gk_1.dot(_sk_1),
-                                                         _alphak_1, _fk - _fk_1, _gk.dot(_sk_1),
-                                                         _opts.minAlpha, 1.0));
-//              _alpha0 = _alpha = std::min(1.0, 1.01*(2*(_fk - _fk_1)/_gk_1.dot(_sk_1)));
+                                        1.01*CubicInterp(_gk_1.dot(_pk_1),
+                                                         _alphak_1,
+                                                         _fk - _fk_1,
+                                                         _gk.dot(_pk_1),
+                                                         _ls_opts.minAlpha, 1.0));
           }
           else {
-            _alpha0 = _alpha = _opts.alpha0;
+            // On the first step (or, after a reset) use the default step size
+            _alpha0 = _alpha = _ls_opts.alpha0;
           }
-          
-          if (LineSearchMethod == 0) {
-            retCode = BTLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                   _sk, _xk, _fk, _gk, _opts.rho, 
-                                   _opts.c1, _opts.minAlpha);
-          }
-          else if (LineSearchMethod == 1) {
-            retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                      _sk, _xk, _fk, _gk,
-                                      _opts.c1, _opts.c2, 
-                                      _opts.minAlpha);
-          }
+
+          // Perform the line search.  If successful, the results are in the 
+          // variables: _xk_1, _fk_1 and _gk_1.
+          retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
+                                    _pk, _xk, _fk, _gk,
+                                    _ls_opts.c1, _ls_opts.c2, 
+                                    _ls_opts.minAlpha);
           if (retCode) {
+            // Line search failed...
             if (resetB) {
-              // Line-search failed and nothing left to try
-              retCode = -1;
+              // did a Hessian reset and it still failed, and nothing left to try
+              retCode = TERM_LSFAIL;
               return retCode;
             }
             else {
-              // Line-search failed, try ditching the Hessian approximation
+              // try resetting the Hessian approximation
               resetB = 2;
-              _note += "LS failed, BFGS reset; ";
+              _note += "LS failed, Hessian reset";
               continue;
             }
           }
@@ -389,57 +216,58 @@ namespace stan {
             break;
           }
         }
+
+        // Swap things so that k is the most recent iterate
         std::swap(_fk,_fk_1);
         _xk.swap(_xk_1);
         _gk.swap(_gk_1);
-        _sk.swap(_sk_1);
+        _pk.swap(_pk_1);
         
-        gradNorm = _gk.norm();
         sk.noalias() = _xk - _xk_1;
-        // Check for convergence
-        if (std::fabs(_fk - _fk_1) < _opts.tolF) {
-          retCode = 1; // Objective function improvement wasn't sufficient
-        }
-        else if (gradNorm < _opts.tolGrad) {
-          retCode = 2; // Gradient norm was below threshold
-        }
-        else if (sk.norm() < _opts.tolX) {
-          retCode = 3; // Change in x was too small
-        }
-        else if (_itNum >= _opts.maxIts) {
-          retCode = 4; // Max number of iterations hit
-        }
-        else {
-          retCode = 0; // Step was successful more progress to be made
-        }
-        
         yk.noalias() = _gk - _gk_1;
-        skyk = yk.dot(sk);
+
+        gradNorm = _gk.norm();
+        stepNorm = sk.norm();
+
+        // Update QN approximation
         if (resetB) {
-          Scalar B0fact = yk.squaredNorm()/skyk;
-          _ldlt.compute(B0fact*HessianT::Identity(_xk.size(),_xk.size()));
-          Bksk.noalias() = B0fact*sk;
-          _sk_1 = -_gk_1/B0fact;
-          _alphak_1 = B0fact*_alpha;
+          // If the QN approximation was reset, automatically scale it
+          // and update the step-size accordingly
+          Scalar B0fact = _qn.update(yk,sk,true);
+          _pk_1 /= B0fact;
+          _alphak_1 = _alpha*B0fact;
         }
         else {
-          Bksk = _ldlt.transpositionsP().transpose()*(_ldlt.matrixL()*(_ldlt.vectorD().asDiagonal()*(_ldlt.matrixU()*(_ldlt.transpositionsP()*sk))));
+          _qn.update(yk,sk);
           _alphak_1 = _alpha;
         }
-        skBksk = sk.dot(Bksk);
-        if (skyk >= 0.2*skBksk) {
-          // Full update
-          thetak = 1;
-          rk = yk;
+
+
+        // Compute search direction for next step
+        _qn.search_direction(_pk,_gk);
+
+        // Check for convergence
+        if (std::fabs(_fk_1 - _fk) < _conv_opts.tolAbsF) {
+          retCode = TERM_ABSF; // Objective function improvement wasn't sufficient
+        }
+        else if (gradNorm < _conv_opts.tolAbsGrad) {
+          retCode = TERM_ABSGRAD; // Gradient norm was below threshold
+        }
+        else if (stepNorm < _conv_opts.tolAbsX) {
+          retCode = TERM_ABSX; // Change in x was too small
+        }
+        else if (_itNum >= _conv_opts.maxIts) {
+          retCode = TERM_MAXIT; // Max number of iterations hit
+        }
+        else if (rel_obj_decrease() < _conv_opts.tolRelF*std::numeric_limits<Scalar>::epsilon()) {
+          retCode = TERM_RELF; // Relative improvement in objective function wasn't sufficient
+        }
+        else if (rel_grad_norm() < _conv_opts.tolRelGrad*std::numeric_limits<Scalar>::epsilon()) {
+          retCode = TERM_RELGRAD; // Relative gradient norm was below threshold
         }
         else {
-          // Damped update (Procedure 18.2)
-          thetak = 0.8*skBksk/(skBksk - skyk);
-          rk.noalias() = thetak*yk + (1.0 - thetak)*Bksk;
-          _note += "Damped BFGS update";
+          retCode = TERM_SUCCESS; // Step was successful more progress to be made
         }
-        _ldlt.rankUpdate(rk,1.0/sk.dot(rk));
-        _ldlt.rankUpdate(Bksk,-1.0/skBksk);
 
         return retCode;
       }
@@ -488,8 +316,7 @@ namespace stan {
           _x[i] = x[i];
 
         try {
-          f = - _model.template log_prob<false,false>(_x,_params_i,
-                                                      _msgs);
+          f = - stan::model::log_prob_propto<false>(_model, _x, _params_i, _msgs);
         } catch (const std::exception& e) {
           if (_msgs)
             (*_msgs) << e.what() << std::endl;
@@ -552,27 +379,32 @@ namespace stan {
       }
     };
     
-    template <typename M>
-    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M> > {
+    template<typename M, typename QNUpdateType, typename Scalar = double,
+             int DimAtCompile = Eigen::Dynamic>
+    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>,QNUpdateType,Scalar,DimAtCompile> {
     private:
       ModelAdaptor<M> _adaptor;
     public:
-      typedef typename BFGSMinimizer<ModelAdaptor<M> >::VectorT vector_t;
+      typedef BFGSMinimizer<ModelAdaptor<M>,QNUpdateType,Scalar,DimAtCompile> BFGSBase;
+      typedef typename BFGSBase::VectorT vector_t;
       typedef typename vector_t::size_type idx_t;
       
       BFGSLineSearch(M& model,
                      const std::vector<double>& params_r,
                      const std::vector<int>& params_i,
                      std::ostream* msgs = 0)
-        : BFGSMinimizer<ModelAdaptor<M> >(_adaptor),
+        : BFGSBase(_adaptor),
           _adaptor(model,params_i,msgs)
       {
+        initialize(params_r);
+      }
 
+      void initialize(const std::vector<double>& params_r) {
         Eigen::Matrix<double,Eigen::Dynamic,1> x;
         x.resize(params_r.size());
         for (size_t i = 0; i < params_r.size(); i++)
           x[i] = params_r[i];
-        this->initialize(x);
+        BFGSBase::initialize(x);
       }
 
       size_t grad_evals() { return _adaptor.fevals(); }
