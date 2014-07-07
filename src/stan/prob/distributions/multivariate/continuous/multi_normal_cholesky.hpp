@@ -47,9 +47,9 @@ namespace stan {
      */
     template <bool propto,
               typename T_y, typename T_loc, typename T_covar>
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type
+    multi_normal_cholesky_log(const T_y& y,
+                              const T_loc& mu,
                               const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
       static const char* function = "stan::prob::multi_normal_cholesky_log(%1%)";
 
@@ -65,153 +65,104 @@ namespace stan {
       using stan::math::check_cov_matrix;
       using boost::math::tools::promote_args;
 
-      typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
+      typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp_type;
+      lp_type lp(0.0);
 
-      check_size_match(function, 
-                       y.size(), "Size of random variable",
-                       mu.size(), "size of location parameter",
-                       &lp);
-      check_size_match(function, 
-                       y.size(), "Size of random variable",
-                       L.rows(), "rows of covariance parameter",
-                       &lp);
-      check_size_match(function, 
-                       y.size(), "Size of random variable",
-                       L.cols(), "columns of covariance parameter",
-                       &lp);
-      check_finite(function, mu, "Location parameter", &lp);
-      check_not_nan(function, y, "Random variable", &lp);
-      
-      if (y.rows() == 0)
-        return lp;
-      
-      if (include_summand<propto>::value) 
-        lp += NEG_LOG_SQRT_TWO_PI * y.rows();
-      
-      if (include_summand<propto,T_covar>::value) {
-        Eigen::Matrix<T_covar,Eigen::Dynamic,1> L_log_diag = L.diagonal().array().log().matrix();
-        lp -= sum(L_log_diag);
+      VectorViewMvt<const T_y> y_vec(y);
+      VectorViewMvt<const T_loc> mu_vec(mu);
+      //size of std::vector of Eigen vectors
+      size_t size_vec = max_size_mvt(y, mu);
+
+      //Check if every vector of the array has the same size
+      int size_y = y_vec[0].size();
+      int size_mu = mu_vec[0].size();
+      if (size_vec > 1) {
+        int size_y_old = size_y;
+        int size_y_new;
+        for (size_t i = 1, size_ = length_mvt(y); i < size_; i++) {
+          int size_y_new = y_vec[i].size();
+          check_size_match(function, 
+                                size_y_new, "Size of one of the vectors of the random variable",
+                                size_y_old, "Size of another vector of the random variable",
+                                &lp);
+          size_y_old = size_y_new;
+        }
+        int size_mu_old = size_mu;
+        int size_mu_new;
+        for (size_t i = 1, size_ = length_mvt(mu); i < size_; i++) {
+          int size_mu_new = mu_vec[i].size();
+          check_size_match(function, 
+                                size_mu_new, "Size of one of the vectors of the location variable",
+                                size_mu_old, "Size of another vector of the location variable",
+                                &lp);
+          size_mu_old = size_mu_new;
+        }
+        (void) size_y_old;
+        (void) size_y_new;
+        (void) size_mu_old;
+        (void) size_mu_new;
       }
 
-      if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-        Eigen::Matrix<typename 
-          boost::math::tools::promote_args<T_y,T_loc>::type,
-          Eigen::Dynamic, 1> y_minus_mu(y.size());
-        for (int i = 0; i < y.size(); i++)
-          y_minus_mu(i) = y(i)-mu(i);
-        Eigen::Matrix<typename 
-          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-          Eigen::Dynamic, 1> 
-          half(mdivide_left_tri_low(L,y_minus_mu));
-        // FIXME: this code does not compile. revert after fixing subtract()
-        // Eigen::Matrix<typename 
-        //               boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-        //               Eigen::Dynamic, 1> 
-        //   half(mdivide_left_tri_low(L,subtract(y,mu)));
-        lp -= 0.5 * dot_self(half);
-      }
-      return lp;
-    }
-
-    template <typename T_y, typename T_loc, typename T_covar>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
-      return multi_normal_cholesky_log<false>(y,mu,L);
-    }
-
-    /** y can have multiple rows (observations) and columns (on variables)
-     */
-    template <bool propto,
-              typename T_y, typename T_loc, typename T_covar>
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
-      static const char* function = "stan::prob::multi_normal_cholesky_log(%1%)";
-
-      using stan::math::mdivide_left_tri_low;
-      using stan::math::columns_dot_self;
-      using stan::math::multiply;
-      using stan::math::subtract;
-      using stan::math::sum;
-      using stan::math::log;
-      
-      using stan::math::check_size_match;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_cov_matrix;
-      using boost::math::tools::promote_args;
-
-      typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
-
+    
       check_size_match(function, 
-                       y.cols(), "Columns of random variable",
-                       mu.rows(), "rows of location parameter",
-                       &lp);
+                            size_y, "Size of random variable",
+                            size_mu, "size of location parameter",
+                            &lp);
       check_size_match(function, 
-                       y.cols(), "Columns of random variable",
-                       L.rows(), "rows of covariance parameter",
-                       &lp);
+                            size_y, "Size of random variable",
+                            L.rows(), "rows of covariance parameter",
+                            &lp);
       check_size_match(function, 
-                       y.cols(), "Columns of random variable",
-                       L.cols(), "columns of covariance parameter",
-                       &lp);
-      check_finite(function, mu, "Location parameter", &lp);
-      check_not_nan(function, y, "Random variable", &lp);
-
-      if (y.cols() == 0)
-        return lp;
-
-      if (include_summand<propto>::value) 
-        lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();
-
-      if (include_summand<propto,T_covar>::value) {
-        Eigen::Matrix<T_covar,Eigen::Dynamic,1> L_log_diag = L.diagonal().array().log().matrix();
-        lp -= sum(L_log_diag) * y.rows();
-      }
-
-      if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-        Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic> MU(y.rows(),y.cols());
-        for (typename Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic>::size_type i = 0; 
-             i < y.rows(); i++)
-          MU.row(i) = mu;
-  
-        Eigen::Matrix<typename
-          boost::math::tools::promote_args<T_loc,T_y>::type,
-          Eigen::Dynamic,Eigen::Dynamic>
-          y_minus_MU(y.rows(), y.cols());
-        for (int i = 0; i < y.size(); i++)
-          y_minus_MU(i) = y(i)-MU(i);
-
-        Eigen::Matrix<typename 
-          boost::math::tools::promote_args<T_loc,T_y>::type,
-          Eigen::Dynamic,Eigen::Dynamic> 
-          z(y_minus_MU.transpose()); // was = 
+                            size_y, "Size of random variable",
+                            L.cols(), "columns of covariance parameter",
+                            &lp);
         
-        // FIXME: revert this code when subtract() is fixed.
-        // Eigen::Matrix<typename 
-        //               boost::math::tools::promote_args<T_loc,T_y>::type,
-        //               Eigen::Dynamic,Eigen::Dynamic> 
-        //   z(subtract(y,MU).transpose()); // was = 
-                
-        Eigen::Matrix<typename 
-          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-          Eigen::Dynamic,Eigen::Dynamic> 
-          half(mdivide_left_tri_low(L,z));
-          
-        lp -= 0.5 * sum(columns_dot_self(half));
+      for (size_t i = 0; i < size_vec; i++) { 
+        check_finite(function, mu_vec[i], "Location parameter", &lp);
+        check_not_nan(function, y_vec[i], "Random variable", &lp);
+      }
+      
+      if (size_y == 0)
+        return lp;
+
+      
+        if (include_summand<propto>::value) 
+          lp += NEG_LOG_SQRT_TWO_PI * size_y * size_vec;
+        
+        if (include_summand<propto,T_covar>::value) {
+          Eigen::Matrix<T_covar,Eigen::Dynamic,1> L_log_diag = L.diagonal().array().log().matrix();
+          lp -= sum(L_log_diag) * size_vec;
+        }
+        
+      if (include_summand<propto,T_y,T_loc,T_covar>::value) {
+        lp_type sum_lp_vec(0.0);
+        for (size_t i = 0; i < size_vec; i++) {
+          Eigen::Matrix<typename 
+            boost::math::tools::promote_args<typename scalar_type<T_y>::type,typename scalar_type<T_loc>::type>::type,
+            Eigen::Dynamic, 1> y_minus_mu(size_y);
+          for (int j = 0; j < size_y; j++)
+            y_minus_mu(j) = y_vec[i](j)-mu_vec[i](j);
+          Eigen::Matrix<typename 
+            boost::math::tools::promote_args<T_covar,typename scalar_type<T_loc>::type,typename scalar_type<T_y>::type>::type,
+            Eigen::Dynamic, 1> 
+            half(mdivide_left_tri_low(L,y_minus_mu));
+          // FIXME: this code does not compile. revert after fixing subtract()
+          // Eigen::Matrix<typename 
+          //               boost::math::tools::promote_args<T_covar,typename scalar_type<T_loc>::type,typename scalar_type<T_y>::type>::type>::type,
+          //               Eigen::Dynamic, 1> 
+          //   half(mdivide_left_tri_low(L,subtract(y,mu)));
+          sum_lp_vec += dot_self(half);
+        }
+        lp -= 0.5*sum_lp_vec;
       }
       return lp;
     }
 
     template <typename T_y, typename T_loc, typename T_covar>
     inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type
+    multi_normal_cholesky_log(const T_y& y,
+                              const T_loc& mu,
                               const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
       return multi_normal_cholesky_log<false>(y,mu,L);
     }
