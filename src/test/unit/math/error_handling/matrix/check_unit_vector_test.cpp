@@ -8,12 +8,8 @@ TEST(MathErrorHandlingMatrix, checkUnitVector) {
   
   EXPECT_TRUE(stan::math::check_unit_vector("checkUnitVector(%1%)",
                                         y, "y", &result));
-  EXPECT_TRUE(stan::math::check_unit_vector("checkUnitVector(%1%)",
-                                        y, "y"));
-                  
+
   y[1] = 0.55;
   EXPECT_THROW(stan::math::check_unit_vector("checkUnitVector(%1%)", y, "y", &result), 
-               std::domain_error);
-  EXPECT_THROW(stan::math::check_unit_vector("checkUnitVector(%1%)", y, "y"),
                std::domain_error);
 }

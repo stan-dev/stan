@@ -907,6 +907,13 @@ TEST(AgradFwdMatrixRowsDotProduct,ffv_vector_vector_3rdDeriv) {
    vv_2(0).d_ = 1.0;
    vv_2(1).d_ = 1.0;
    vv_2(2).d_ = 1.0;
+
+   vv_1(0).val_.d_ = 1.0;
+   vv_1(1).val_.d_ = 1.0;
+   vv_1(2).val_.d_ = 1.0;
+   vv_2(0).val_.d_ = 1.0;
+   vv_2(1).val_.d_ = 1.0;
+   vv_2(2).val_.d_ = 1.0;
   
   vector_ffv output(3);
 
@@ -1072,6 +1079,13 @@ TEST(AgradFwdMatrixRowsDotProduct,ffv_rowvector_rowvector_3rdDeriv) {
    v2(0).d_ = 1.0;
    v2(1).d_ = 1.0;
    v2(2).d_ = 1.0;
+
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
+   v2(0).val_.d_ = 1.0;
+   v2(1).val_.d_ = 1.0;
+   v2(2).val_.d_ = 1.0;
 
   row_vector_ffv output;
   output = rows_dot_product(v1, v2);
@@ -1250,6 +1264,15 @@ TEST(AgradFwdMatrixRowsDotProduct,ffv_matrix_matrix_3rdDeriv) {
    v1(2,0).d_ = 1.0;
    v1(2,1).d_ = 1.0;
    v1(2,2).d_ = 1.0;
+   v1(0,0).val_.d_ = 1.0;
+   v1(0,1).val_.d_ = 1.0;
+   v1(0,2).val_.d_ = 1.0;
+   v1(1,0).val_.d_ = 1.0;
+   v1(1,1).val_.d_ = 1.0;
+   v1(1,2).val_.d_ = 1.0;
+   v1(2,0).val_.d_ = 1.0;
+   v1(2,1).val_.d_ = 1.0;
+   v1(2,2).val_.d_ = 1.0;
   d2 << 4, -2, -1, 4, -2, -1, 4, -2, -1;
   v2 << 4, -2, -1, 4, -2, -1, 4, -2, -1;
    v2(0,0).d_ = 1.0;
@@ -1261,6 +1284,15 @@ TEST(AgradFwdMatrixRowsDotProduct,ffv_matrix_matrix_3rdDeriv) {
    v2(2,0).d_ = 1.0;
    v2(2,1).d_ = 1.0;
    v2(2,2).d_ = 1.0;
+   v2(0,0).val_.d_ = 1.0;
+   v2(0,1).val_.d_ = 1.0;
+   v2(0,2).val_.d_ = 1.0;
+   v2(1,0).val_.d_ = 1.0;
+   v2(1,1).val_.d_ = 1.0;
+   v2(1,2).val_.d_ = 1.0;
+   v2(2,0).val_.d_ = 1.0;
+   v2(2,1).val_.d_ = 1.0;
+   v2(2,2).val_.d_ = 1.0;
 
   vector_ffv output;
   output = rows_dot_product(v1, v2);

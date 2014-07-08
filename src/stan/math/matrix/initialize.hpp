@@ -7,6 +7,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
+
   namespace math {
 
     // initializations called for local variables generate in Stan
@@ -22,8 +23,8 @@ namespace stan {
     initialize(T& x, V v) {
       x = v;
     }
-    template <typename T, int R, int C>
-    inline void initialize(Eigen::Matrix<T,R,C>& x, const T& v) {
+    template <typename T, int R, int C, typename V>
+    inline void initialize(Eigen::Matrix<T,R,C>& x, const V& v) {
       for (int i = 0; i < x.size(); ++i)
         initialize(x(i),v);
     }

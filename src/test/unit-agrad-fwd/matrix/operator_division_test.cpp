@@ -1201,6 +1201,7 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_scalar_3rdDeriv) {
 
   v1 = 10;
   v1.d_ = 1.0;
+  v1.val_.d_ = 1.0;
   d2 = -2;
   
   AVEC q = createAVEC(v1.val().val());
@@ -1370,15 +1371,19 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_vector_3rdDeriv) {
   v1(0).d_ = 1.0;
   v1(1).d_ = 1.0;
   v1(2).d_ = 1.0;
+  v1(0).val_.d_ = 1.0;
+  v1(1).val_.d_ = 1.0;
+  v1(2).val_.d_ = 1.0;
   v2 = -2;
   v2.d_ = 1.0;
+  v2.val_.d_ = 1.0;
   vector_ffv output;
 
   output = divide(v1, v2);
   AVEC q = createAVEC(v1(0).val().val(),v1(1).val().val(),v1(2).val().val());
   VEC h;
   output(0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(-0.25,h[0]);
   EXPECT_FLOAT_EQ(0,h[1]);
   EXPECT_FLOAT_EQ(0,h[2]);
 }
@@ -1545,8 +1550,12 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_rowvector_3rdDeriv) {
   v1(0).d_ = 1.0;
   v1(1).d_ = 1.0;
   v1(2).d_ = 1.0;
+  v1(0).val_.d_ = 1.0;
+  v1(1).val_.d_ = 1.0;
+  v1(2).val_.d_ = 1.0;
   v2 = -2;
   v2.d_ = 1.0;
+  v2.val_.d_ = 1.0;
 
   row_vector_ffv output;
 
@@ -1554,7 +1563,7 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_rowvector_3rdDeriv) {
   AVEC q = createAVEC(v1(0).val().val(),v1(1).val().val(),v1(2).val().val());
   VEC h;
   output(0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(-0.25,h[0]);
   EXPECT_FLOAT_EQ(0,h[1]);
   EXPECT_FLOAT_EQ(0,h[2]);
 }
@@ -1752,8 +1761,13 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_matrix_3rdDeriv) {
   v1(0,1).d_ = 1.0;
   v1(1,0).d_ = 1.0;
   v1(1,1).d_ = 1.0;
+  v1(0,0).val_.d_ = 1.0;
+  v1(0,1).val_.d_ = 1.0;
+  v1(1,0).val_.d_ = 1.0;
+  v1(1,1).val_.d_ = 1.0;
   v2 = -2;
   v2.d_ = 1.0;
+  v2.val_.d_ = 1.0;
 
   matrix_ffv output;
 
@@ -1761,7 +1775,7 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_matrix_3rdDeriv) {
   AVEC q = createAVEC(v1(0,0).val().val(),v1(0,1).val().val(),v1(1,0).val().val(),v1(1,1).val().val());
   VEC h;
   output(0,0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(-0.25,h[0]);
   EXPECT_FLOAT_EQ(0,h[1]);
   EXPECT_FLOAT_EQ(0,h[2]);
   EXPECT_FLOAT_EQ(0,h[3]);

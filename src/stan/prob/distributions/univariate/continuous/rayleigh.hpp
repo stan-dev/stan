@@ -38,17 +38,13 @@ namespace stan {
       double logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      if (!check_not_nan(function, y, "Random variable", &logp))
-        return logp;
-      if (!check_positive(function, sigma, "Scale parameter", &logp))
-        return logp;
-      if (!check_positive(function, y, "Random variable", &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   y,sigma,
-                                   "Random variable","Scale parameter",
-                                   &logp)))
-        return logp;
+      check_not_nan(function, y, "Random variable", &logp);
+      check_positive(function, sigma, "Scale parameter", &logp);
+      check_positive(function, y, "Random variable", &logp);
+      check_consistent_sizes(function,
+                             y,sigma,
+                             "Random variable","Scale parameter",
+                             &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_scale>::value)
@@ -126,19 +122,14 @@ namespace stan {
       if (!(stan::length(y) && stan::length(sigma)))
         return cdf;
 
-      if (!check_not_nan(function, y, "Random variable", &cdf))
-        return cdf;
-      if (!check_nonnegative(function, y, "Random variable", &cdf))
-        return cdf;
-      if (!check_not_nan(function, sigma, "Scale parameter", &cdf))
-        return cdf;
-      if (!check_positive(function, sigma, "Scale parameter", &cdf))
-        return cdf;
-      if (!(check_consistent_sizes(function,
-                                   y,sigma,
-                                   "Random variable","Scale parameter",
-                                   &cdf)))
-        return cdf;
+      check_not_nan(function, y, "Random variable", &cdf);
+      check_nonnegative(function, y, "Random variable", &cdf);
+      check_not_nan(function, sigma, "Scale parameter", &cdf);
+      check_positive(function, sigma, "Scale parameter", &cdf);
+      check_consistent_sizes(function,
+                             y,sigma,
+                             "Random variable","Scale parameter",
+                             &cdf);
 
 
       // set up template expressions wrapping scalars into vector views
@@ -203,19 +194,14 @@ namespace stan {
       if (!(stan::length(y) && stan::length(sigma)))
         return cdf_log;
 
-      if (!check_not_nan(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if (!check_nonnegative(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if (!check_not_nan(function, sigma, "Scale parameter", &cdf_log))
-        return cdf_log;
-      if (!check_positive(function, sigma, "Scale parameter", &cdf_log))
-        return cdf_log;
-      if (!(check_consistent_sizes(function,
-                                   y,sigma,
-                                   "Random variable","Scale parameter",
-                                   &cdf_log)))
-        return cdf_log;
+      check_not_nan(function, y, "Random variable", &cdf_log);
+      check_nonnegative(function, y, "Random variable", &cdf_log);
+      check_not_nan(function, sigma, "Scale parameter", &cdf_log);
+      check_positive(function, sigma, "Scale parameter", &cdf_log);
+      check_consistent_sizes(function,
+                             y,sigma,
+                             "Random variable","Scale parameter",
+                             &cdf_log);
 
 
       // set up template expressions wrapping scalars into vector views
@@ -272,19 +258,14 @@ namespace stan {
       if (!(stan::length(y) && stan::length(sigma)))
         return ccdf_log;
 
-      if (!check_not_nan(function, y, "Random variable", &ccdf_log))
-        return ccdf_log;
-      if (!check_nonnegative(function, y, "Random variable", &ccdf_log))
-        return ccdf_log;
-      if (!check_not_nan(function, sigma, "Scale parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_positive(function, sigma, "Scale parameter", &ccdf_log))
-        return ccdf_log;
-      if (!(check_consistent_sizes(function,
-                                   y,sigma,
-                                   "Random variable","Scale parameter",
-                                   &ccdf_log)))
-        return ccdf_log;
+      check_not_nan(function, y, "Random variable", &ccdf_log);
+      check_nonnegative(function, y, "Random variable", &ccdf_log);
+      check_not_nan(function, sigma, "Scale parameter", &ccdf_log);
+      check_positive(function, sigma, "Scale parameter", &ccdf_log);
+      check_consistent_sizes(function,
+                             y,sigma,
+                             "Random variable","Scale parameter",
+                             &ccdf_log);
 
 
       // set up template expressions wrapping scalars into vector views
@@ -328,8 +309,7 @@ namespace stan {
 
       using stan::math::check_positive;
 
-      if (!check_positive(function, sigma, "Scale parameter"))
-        return 0;
+      check_positive(function, sigma, "Scale parameter", (double*)0);
 
       variate_generator<RNG&, uniform_real_distribution<> >
         uniform_rng(rng, uniform_real_distribution<>(0.0, 1.0));

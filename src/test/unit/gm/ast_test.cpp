@@ -2,6 +2,8 @@
 #include <sstream>
 #include <cmath>
 #include <vector>
+#include <string>
+#include <set>
 #include "stan/gm/ast_def.cpp"
 
 using stan::gm::function_signatures;
@@ -138,7 +140,7 @@ TEST(gmAst,baseVarDecl) {
   dims.push_back(stan::gm::expression(stan::gm::int_literal(0)));
   stan::gm::base_var_decl bvd("foo", dims, INT_T);
   EXPECT_EQ("foo",bvd.name_);
-  EXPECT_EQ(1, bvd.dims_.size());
+  EXPECT_EQ(1U, bvd.dims_.size());
   EXPECT_EQ(stan::gm::expression(stan::gm::int_literal(0)).expression_type(),
             bvd.dims_[0].expression_type());
   EXPECT_EQ(INT_T, bvd.base_type_);
@@ -150,7 +152,7 @@ TEST(gmAst,argDecl) {
   ad.name_ = "foo";
   stan::gm::base_var_decl bvd = ad.base_variable_declaration();
   EXPECT_EQ("foo", bvd.name_);
-  EXPECT_EQ(0, bvd.dims_.size());
+  EXPECT_EQ(0U, bvd.dims_.size());
   EXPECT_EQ(INT_T, bvd.base_type_);
 }
 
@@ -161,7 +163,7 @@ TEST(gmAst,functionDeclDef) {
                                   stan::gm::statement(stan::gm::no_op_statement()));
   EXPECT_EQ("foo",fdd.name_);
   EXPECT_TRUE(fdd.body_.is_no_op_statement());
-  EXPECT_EQ(0,fdd.arg_decls_.size());
+  EXPECT_EQ(0U,fdd.arg_decls_.size());
   EXPECT_TRUE(fdd.return_type_.is_primitive_int());
 }
 TEST(gmAst,functionDeclDefs) {
@@ -182,7 +184,7 @@ TEST(gmAst,functionDeclDefs) {
   vec_fdds.push_back(fdd1);
   vec_fdds.push_back(fdd2);
   stan::gm::function_decl_defs fdds(vec_fdds);
-  EXPECT_EQ(2,fdds.decl_defs_.size());
+  EXPECT_EQ(2U,fdds.decl_defs_.size());
 }
 
 TEST(gmAst, hasRngSuffix) {
@@ -245,3 +247,25 @@ TEST(gmAst, isUserDefined) {
 
 }
 
+TEST(gmAst, resetSigs) {
+  using std::set;
+  using std::string;
+
+  stan::gm::function_signatures::reset_sigs();
+
+  // test can get, destroy, then get
+  stan::gm::function_signatures& fs1
+    = stan::gm::function_signatures::instance();
+  set<string> ks1 = fs1.key_set();
+  int keyset_size = ks1.size();
+  EXPECT_TRUE(keyset_size > 0);
+  
+  stan::gm::function_signatures::reset_sigs();
+
+  stan::gm::function_signatures& fs2
+    = stan::gm::function_signatures::instance();
+
+  set<string> ks2 = fs2.key_set();
+  EXPECT_EQ(keyset_size,ks2.size());
+
+}

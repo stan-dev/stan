@@ -25,17 +25,17 @@ namespace stan {
      * @param[in] x Matrix of specified values
      * @return The log of the sum of the exponentiated vector values.
      */
-    template <typename T, int R, int C>
-    T log_sum_exp(const Eigen::Matrix<T,R,C>& x) {
+    template <int R, int C>
+    double log_sum_exp(const Eigen::Matrix<double,R,C>& x) {
       using std::numeric_limits;
       using std::log;
       using std::exp;
-      T max = -numeric_limits<T>::infinity();
+      double max = -numeric_limits<double>::infinity();
       for (int i = 0; i < x.size(); i++) 
         if (x(i) > max) 
           max = x(i);
-            
-      T sum = 0.0;
+
+      double sum = 0.0;
       for (int i = 0; i < x.size(); i++) 
         if (x(i) != -numeric_limits<double>::infinity()) 
           sum += exp(x(i) - max);

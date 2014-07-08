@@ -7,8 +7,6 @@ void test_int_var(stan::json::json_data& jdata,
                   const std::string& name,
                   const std::vector<int>& expected_vals,
                   const std::vector<size_t>& expected_dims) {
-  // std::cout << "json: " << text << std::endl;
-  // std::cout << "int var name: " << name << std::endl;
   EXPECT_EQ(true,jdata.contains_i(name));
   std::vector<size_t> dims = jdata.dims_i(name);
   EXPECT_EQ(expected_dims.size(),dims.size());
@@ -25,8 +23,6 @@ void test_real_var(stan::json::json_data& jdata,
                   const std::string& name,
                   const std::vector<double>& expected_vals,
                   const std::vector<size_t>& expected_dims) {
-  // std::cout << "json: " << text << std::endl;
-  // std::cout << "real var name: " << name << std::endl;
   EXPECT_EQ(true,jdata.contains_r(name));
   std::vector<size_t> dims = jdata.dims_r(name);
   EXPECT_EQ(expected_dims.size(),dims.size());
@@ -384,9 +380,9 @@ TEST(ioJson,jsonData_parse_empty_obj) {
   stan::json::json_data jdata(in);
   std::vector<std::string> var_names;
   jdata.names_r(var_names);
-  EXPECT_EQ(0,var_names.size());
+  EXPECT_EQ(0U,var_names.size());
   jdata.names_i(var_names);
-  EXPECT_EQ(0,var_names.size());
+  EXPECT_EQ(0U,var_names.size());
 }
 
 
@@ -397,7 +393,7 @@ TEST(ioJson,jsonData_parse_mult_objects) {
   stan::json::json_data jdata(in);
   std::vector<std::string> var_names;
   jdata.names_i(var_names);
-  EXPECT_EQ(1,var_names.size());
+  EXPECT_EQ(1U,var_names.size());
   EXPECT_EQ("foo",var_names[0]);
 }
 

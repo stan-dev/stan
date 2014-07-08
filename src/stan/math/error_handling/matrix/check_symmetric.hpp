@@ -2,9 +2,8 @@
 #define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SYMMETRIC_HPP__
 
 #include <sstream>
-#include <boost/type_traits/common_type.hpp>
-#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
@@ -24,9 +23,9 @@ namespace stan {
      */
     template <typename T_y, typename T_result>
     inline bool check_symmetric(const char* function,
-                const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                const char* name,
-                T_result* result) {
+                                const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                                const char* name,
+                                T_result* result) {
       typedef 
         typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type 
         size_type;
@@ -49,14 +48,6 @@ namespace stan {
         }
       }
       return true;
-    }
-
-    template <typename T>
-    inline bool check_symmetric(const char* function,
-                const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
-                const char* name,
-                T* result = 0) {
-      return check_symmetric<T,T>(function,y,name,result);
     }
 
   }

@@ -527,6 +527,9 @@ TEST(AgradFwdMatrixMax, ffv_vector_3rdDeriv) {
   fvar<fvar<var> > a(100.0,1.0);
   fvar<fvar<var> > b(0.0,1.0);
   fvar<fvar<var> > c(-3.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
 
   d1 << 100, 0, -3;
   v1 << a,b,c;
@@ -653,6 +656,9 @@ TEST(AgradFwdMatrixMax, ffv_rowvector_2ndDeriv_2) {
   fvar<fvar<var> > a(100.0,1.0);
   fvar<fvar<var> > b(0.0,1.0);
   fvar<fvar<var> > c(-3.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
 
   d1 << 100, 0, -3;
   v1 << a,b,c;
@@ -775,6 +781,9 @@ TEST(AgradFwdMatrixMax, ffv_matrix_3rdDeriv) {
   fvar<fvar<var> > a(100.0,1.0);
   fvar<fvar<var> > b(0.0,1.0);
   fvar<fvar<var> > c(-3.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
 
   d1 << 100, 0, -3;
   v1 << a,b,c;

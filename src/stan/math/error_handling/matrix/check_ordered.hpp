@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/raise_domain_error.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 
 namespace stan {
   namespace math {
@@ -11,7 +11,7 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified vector 
      * is sorted into increasing order.
-     * There may be duplicate values.  Otherwise, raise a domain
+     * There may not be duplicate values.  Otherwise, raise a domain
      * error according to the specified policy.
      *
      * @param function

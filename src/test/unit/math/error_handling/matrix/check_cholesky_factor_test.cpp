@@ -9,9 +9,6 @@ TEST(MathErrorHandlingMatrix, checkCovMatrix) {
   y << 1;
   EXPECT_TRUE(stan::math::check_cholesky_factor("checkCovMatrix(%1%)",
                                            y, "y", &result));
-  EXPECT_TRUE(stan::math::check_cholesky_factor("checkCovMatrix(%1%)",
-                                                y, "y"));
-  
   
   y.resize(3,3);
   y << 
@@ -20,15 +17,11 @@ TEST(MathErrorHandlingMatrix, checkCovMatrix) {
     1, 1, 1;
   EXPECT_TRUE(stan::math::check_cholesky_factor("checkCovMatrix(%1%)",
                                            y, "y", &result));
-  EXPECT_TRUE(stan::math::check_cholesky_factor("checkCovMatrix(%1%)",
-                                                y, "y"));
 
   y.resize(1,1);
   y << -1;
   EXPECT_THROW(stan::math::check_cholesky_factor("checkCovMatrix(%1%)", 
                                               y, "y", &result), 
-               std::domain_error);
-  EXPECT_THROW(stan::math::check_cholesky_factor("checkCovMatrix(%1%)", y, "y"),
                std::domain_error);
 
   y.resize(3,3);
@@ -39,9 +32,6 @@ TEST(MathErrorHandlingMatrix, checkCovMatrix) {
   EXPECT_THROW(stan::math::check_cholesky_factor("checkCovMatrix(%1%)", 
                                                  y, "y", &result), 
                std::domain_error);
-  EXPECT_THROW(stan::math::check_cholesky_factor("checkCovMatrix(%1%)", 
-                                                 y, "y"),
-               std::domain_error);
 
   y.resize(3,3);
   y <<
@@ -51,15 +41,12 @@ TEST(MathErrorHandlingMatrix, checkCovMatrix) {
   EXPECT_THROW(stan::math::check_cholesky_factor("checkCovMatrix(%1%)", 
                                                  y, "y", &result), 
                std::domain_error);
-  EXPECT_THROW(stan::math::check_cholesky_factor("checkCovMatrix(%1%)", 
-                                                 y, "y"),
-               std::domain_error);
 
 
   y.resize(2,3);
   y << 1, 2, 3, 4, 5, 6;
   EXPECT_THROW(stan::math::check_cholesky_factor("checkCovMatrix(%1%)", 
-                                                 y, "y"),
+                                                 y, "y", &result),
                std::domain_error);
 
   y.resize(3,2);
@@ -68,10 +55,10 @@ TEST(MathErrorHandlingMatrix, checkCovMatrix) {
     2, 3,
     4, 5;
   EXPECT_TRUE(stan::math::check_cholesky_factor("checkCovMatrix(%1%)",
-                                                y, "y"));
+                                                y, "y", &result));
   y(0,1) = 1.5;
   EXPECT_THROW(stan::math::check_cholesky_factor("checkCovMatrix(%1%)", 
-                                                 y, "y"),
+                                                 y, "y", &result),
                std::domain_error);
 
   
