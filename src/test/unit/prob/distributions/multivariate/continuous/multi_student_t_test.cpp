@@ -5,10 +5,10 @@
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
-
+using std::vector;
 using stan::prob::multi_student_t_log;
 
-TEST(ProbDistributionsMultiStudentT,MultiT) {
+TEST(ProbDistributionsMultiStudentT,NotVectorized) {
   Matrix<double,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
   Matrix<double,Dynamic,1> mu(3,1);
@@ -22,7 +22,56 @@ TEST(ProbDistributionsMultiStudentT,MultiT) {
   // calc using R's mnormt package's dmt function
   EXPECT_NEAR(-10.1246,lp,0.0001);
 }
+TEST(ProbDistributionsMultiStudentT,Vectorized) {
+  vector< Matrix<double,Dynamic,1> > vec_y(2);
+  vector< Matrix<double,1,Dynamic> > vec_y_t(2);
+  Matrix<double,Dynamic,1> y(3);
+  Matrix<double,1,Dynamic> y_t(3);
+  y << 3.0, -2.0, 10.0;
+  vec_y[0] = y;
+  vec_y_t[0] = y;
+  y << 3.0, -1.0, 5.0;
+  vec_y[1] = y;
+  vec_y_t[1] = y;
+  y_t = y;
+  
+  vector< Matrix<double,Dynamic,1> > vec_mu(2);
+  vector< Matrix<double,1,Dynamic> > vec_mu_t(2);
+  Matrix<double,Dynamic,1> mu(3);
+  Matrix<double,1,Dynamic> mu_t(3);
+  mu << 2.0, -1.0, 4.0;
+  vec_mu[0] = mu;
+  vec_mu_t[0] = mu;
+  mu << 1.0, -3.0, 4.0;
+  vec_mu[1] = mu;
+  vec_mu_t[1] = mu;
+  mu_t = mu;
+  
+  Matrix<double,Dynamic,Dynamic> Sigma(3,3);
+  Sigma << 10.0, -3.0, 0.0,
+    -3.0,  5.0, 0.0,
+    0.0, 0.0, 5.0;
 
+  double nu = 4.0;
+    
+  //y and mu vectorized
+  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::prob::multi_student_t_log(vec_y,nu,vec_mu,Sigma));
+  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::prob::multi_student_t_log(vec_y_t,nu,vec_mu,Sigma));
+  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::prob::multi_student_t_log(vec_y,nu,vec_mu_t,Sigma));
+  EXPECT_FLOAT_EQ(-8.92867-6.81839, stan::prob::multi_student_t_log(vec_y_t,nu,vec_mu_t,Sigma));
+
+  //y vectorized
+  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::prob::multi_student_t_log(vec_y,nu,mu,Sigma));
+  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::prob::multi_student_t_log(vec_y_t,nu,mu,Sigma));
+  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::prob::multi_student_t_log(vec_y,nu,mu_t,Sigma));
+  EXPECT_FLOAT_EQ(-9.167054-6.81839, stan::prob::multi_student_t_log(vec_y_t,nu,mu_t,Sigma));
+
+  //mu vectorized
+  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::prob::multi_student_t_log(y,nu,vec_mu,Sigma));
+  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::prob::multi_student_t_log(y_t,nu,vec_mu,Sigma));
+  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::prob::multi_student_t_log(y,nu,vec_mu_t,Sigma));
+  EXPECT_FLOAT_EQ(-5.528012-6.81839, stan::prob::multi_student_t_log(y_t,nu,vec_mu_t,Sigma));  
+}
 TEST(ProbDistributionsMultiStudentT,Sigma) {
   Matrix<double,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
