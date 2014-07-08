@@ -1117,8 +1117,8 @@ TEST(probTransform,factorU) {
   factor_U(U, CPCs);
   // test that function doesn't resize itself
   EXPECT_EQ(K - 1, CPCs.size());
-  // for (int i = 0; i < CPCs.size(); ++i) {
-  //   // need tanh to get back to a CPC, which should be in (-1,1)
-  //   EXPECT_LE(std::tanh(std::abs(CPCs(i))), 1.0);
-  // }
+  for (int i = 0; i < CPCs.size(); ++i) {
+    // need tanh to get back to a CPC, which should be in (-1,1)
+    EXPECT_LE(std::tanh(std::fabs(CPCs(i))), 1.0);
+  }
 }
