@@ -1478,6 +1478,7 @@ any of the following.
 Variable names will {\it not}\ conflict with the following block identifiers,
 %
 \begin{quote}
+\code{functions},
 \code{model},
 \code{data},
 \code{parameters},
@@ -1493,8 +1494,8 @@ Some variable names are reserved because they are used within
 Stan's \Cpp implementation.  These are
 %
 \begin{quote}
-var
-fvar
+\code{var},
+\code{fvar}
 \end{quote}
 %
 
@@ -4435,7 +4436,7 @@ atomic_statement_body
 ::=  lhs '<-' expression
    | expression '~' identifier '(' expressions ')' ?truncation
    | function_literal '(' expressions ')'
-   | 'increment_log_prob '(' expression ')'
+   | 'increment_log_prob' '(' expression ')'
    | 'print' '(' (expression | string_literal)* ')'
    | 'return' expression
    | ''

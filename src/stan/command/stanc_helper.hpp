@@ -145,9 +145,8 @@ int stanc_helper(int argc, const char* argv[],
       *out_stream << "Input file=" << in_file_name << std::endl;
       *out_stream << "Output file=" << out_file_name << std::endl;
     }
-    bool include_main = !cmd.has_flag("no_main");
     bool valid_model 
-      = stan::gm::compile(err_stream,in,out,model_name,include_main,in_file_name);
+      = stan::gm::compile(err_stream,in,out,model_name,in_file_name);
     out.close();
     if (!valid_model) {
       if (err_stream)

@@ -329,11 +329,12 @@ TEST(AgradFwdOperatorDivision, Double_FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > y;
   y.val_.val_ = 0.5;
   y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > z = x / y;
 
   AVEC p = createAVEC(y.val_.val_);
   VEC g;
   z.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(-48, g[0]);
 }

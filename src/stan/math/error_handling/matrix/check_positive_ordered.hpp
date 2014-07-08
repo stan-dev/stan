@@ -11,7 +11,7 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified vector contains
      * only non-negative values and is sorted into increasing order.
-     * There may be duplicate values.  Otherwise, raise a domain
+     * There may not be duplicate values.  Otherwise, raise a domain
      * error according to the specified policy.
      *
      * @param function

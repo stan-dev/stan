@@ -726,15 +726,15 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 %
 \fitem{real}{normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}}{The cumulative normal distribution of \farg{y}
-  given location \farg{mu} and scale \farg{sigma}}
+  given location \farg{mu} and scale \farg{sigma}; normal\_cdf will underflow to 0 for $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and overflow to 1 for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25}
 %
 \fitem{real}{normal\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}}{The log of the cumulative normal distribution of \farg{y}
-  given location \farg{mu} and scale \farg{sigma}}
+  given location \farg{mu} and scale \farg{sigma}; normal\_cdf\_log will underflow to $-\infty$ for $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and overflow to 0 for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25}
 %
 \fitem{real}{normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}}{The log of the complementary cumulative normal distribution 
-  of \farg{y} given location \farg{mu} and scale \farg{sigma}}
+  of \farg{y} given location \farg{mu} and scale \farg{sigma}; normal\_ccdf\_log will overflow to 0 for $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and underflow to $-\infty$ for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25}
 \end{description}
 %
 \begin{description}
@@ -1805,11 +1805,35 @@ where $|\Sigma|$ is the absolute determinant of $\Sigma$.
 
 \subsubsection{Stan Functions}
 
+The multivariate normal probability function is overloaded to allow
+the variate vector $y$ and location vector $\mu$ to be vectors or row
+vectors (or to mix the two types).  The density function is also
+vectorized, so it allows arrays of row vectors or vectors as
+arguments; see \refsection{prob-vectorization} for a description of
+vectorization.
+
+
 \begin{description}
 %
-\fitem{real}{multi\_normal\_log}{vector \farg{y}, vector \farg{mu},
-  matrix \farg{Sigma}}{The log of the multivariate normal density of vector \farg{y}
- given location \farg{mu} and covariance matrix \farg{Sigma}}
+  \fitem{real}{multi\_normal\_log}{vectors \farg{y}, vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of vector(s) \farg{y} given location vector(s) \farg{mu} and
+    covariance matrix \farg{Sigma}}
+%
+  \fitem{real}{multi\_normal\_log}{vectors \farg{y}, row\_vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of vector(s) \farg{y} given location row vector(s)
+    \farg{mu} and covariance matrix \farg{Sigma}}
+%
+  \fitem{real}{multi\_normal\_log}{row\_vectors \farg{y}, vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of row vector(s) \farg{y} given location vector(s)
+    \farg{mu} and covariance matrix \farg{Sigma}}
+%
+  \fitem{real}{multi\_normal\_log}{row\_vectors \farg{y}, row\_vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of row vector(s) \farg{y} given location row vector(s)
+    \farg{mu} and covariance matrix \farg{Sigma}}
 %
 \end{description}
 %
@@ -1839,9 +1863,24 @@ If $K \in \nats$, $\mu \in \reals^K$, and $\Omega \in \reals^{K \times
 
 \begin{description}
 %
-\fitem{real}{multi\_normal\_prec\_log}{vector \farg{y}, vector
-  \farg{mu}, matrix \farg{Omega}}{The log of the multivariate normal density of vector
-  \farg{y} given location \farg{mu} and positive definite precision
+\fitem{real}{multi\_normal\_prec\_log}{vectors \farg{y}, vectors
+  \farg{mu}, matrix \farg{Omega}}{The log of the multivariate normal density of vector(s)
+  \farg{y} given location vector(s) \farg{mu} and positive definite precision
+  matrix \farg{Omega}}
+%
+\fitem{real}{multi\_normal\_prec\_log}{vectors \farg{y}, row\_vectors
+  \farg{mu}, matrix \farg{Omega}}{The log of the multivariate normal density of vector(s)
+  \farg{y} given location row vector(s) \farg{mu} and positive definite precision
+  matrix \farg{Omega}}
+%
+\fitem{real}{multi\_normal\_prec\_log}{row\_vectors \farg{y}, vectors
+  \farg{mu}, matrix \farg{Omega}}{The log of the multivariate normal density of row vector(s)
+  \farg{y} given location vector(s) \farg{mu} and positive definite precision
+  matrix \farg{Omega}}
+%
+\fitem{real}{multi\_normal\_prec\_log}{row\_vectors \farg{y}, row\_vectors
+  \farg{mu}, matrix \farg{Omega}}{The log of the multivariate normal density of row vector(s)
+  \farg{y} given location row vector(s) \farg{mu} and positive definite precision
   matrix \farg{Omega}}
 %
 \end{description}
@@ -1868,9 +1907,24 @@ triangular and such that $LL^{\top}$ is positive definite, then for $y
 
 \begin{description}
 %
-\fitem{real}{multi\_normal\_cholesky\_log}{vector \farg{y}, vector
-  \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of vector
-  \farg{y} given location \farg{mu} and lower-triangular Cholesky
+\fitem{real}{multi\_normal\_cholesky\_log}{vectors \farg{y}, vectors
+  \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of vector(s)
+  \farg{y} given location vector(s) \farg{mu} and lower-triangular Cholesky
+  factor of the covariance matrix \farg{L}}
+%
+\fitem{real}{multi\_normal\_cholesky\_log}{vectors \farg{y}, row\_vectors
+  \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of vector(s)
+  \farg{y} given location row vector(s) \farg{mu} and lower-triangular Cholesky
+  factor of the covariance matrix \farg{L}}
+%
+\fitem{real}{multi\_normal\_cholesky\_log}{row\_vectors \farg{y}, vectors
+  \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of row vector(s)
+  \farg{y} given location vector(s) \farg{mu} and lower-triangular Cholesky
+  factor of the covariance matrix \farg{L}}
+%
+\fitem{real}{multi\_normal\_cholesky\_log}{row\_vectors \farg{y}, row\_vectors
+  \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of row vector(s)
+  \farg{y} given location row vector(s) \farg{mu} and lower-triangular Cholesky
   factor of the covariance matrix \farg{L}}
 %
 \end{description}
@@ -1953,10 +2007,25 @@ $y \in \reals^K$,
 
 \begin{description}
 %
-\fitem{real}{multi\_student\_t\_log}{vector \farg{y}, real \farg{nu},
-  vector \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate Student-$t$
-  density of vector \farg{y} given degrees of freedom \farg{nu},
-  location \farg{mu}, and scale matrix \farg{Sigma}}
+\fitem{real}{multi\_student\_t\_log}{vectors \farg{y}, real \farg{nu},
+  vectors \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate Student-$t$
+  density of vector(s) \farg{y} given degrees of freedom \farg{nu},
+  location vector(s) \farg{mu}, and scale matrix \farg{Sigma}}
+%
+\fitem{real}{multi\_student\_t\_log}{vectors \farg{y}, real \farg{nu},
+  row\_vectors \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate Student-$t$
+  density of vector(s) \farg{y} given degrees of freedom \farg{nu},
+  location row vector(s) \farg{mu}, and scale matrix \farg{Sigma}}
+%
+\fitem{real}{multi\_student\_t\_log}{row\_vectors \farg{y}, real \farg{nu},
+  vectors \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate Student-$t$
+  density of row vector(s) \farg{y} given degrees of freedom \farg{nu},
+  location vector(s) \farg{mu}, and scale matrix \farg{Sigma}}
+%
+\fitem{real}{multi\_student\_t\_log}{row\_vectors \farg{y}, real \farg{nu},
+  row\_vectors \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate Student-$t$
+  density of row vector(s) \farg{y} given degrees of freedom \farg{nu},
+  location row vector(s) \farg{mu}, and scale matrix \farg{Sigma}}
 %
 \end{description}
 %

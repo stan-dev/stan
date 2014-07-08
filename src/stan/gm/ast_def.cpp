@@ -135,6 +135,11 @@ namespace stan {
       return et1.type() == DOUBLE_T ? et1 : et2;
     }
 
+    void function_signatures::reset_sigs() {
+      if (sigs_ == 0) return;
+      delete sigs_;
+      sigs_ = 0;
+    }
     function_signatures& function_signatures::instance() {
       // FIXME:  for threaded models, requires double-check lock
       if (!sigs_)

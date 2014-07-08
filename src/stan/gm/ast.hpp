@@ -104,6 +104,7 @@ namespace stan {
     class function_signatures {
     public:
       static function_signatures& instance();
+      static void reset_sigs();
       void set_user_defined(const std::pair<std::string,function_signature_t>&
                             name_sig);
       bool is_user_defined(const std::pair<std::string,function_signature_t>&

@@ -285,13 +285,16 @@ TEST(AgradFwdMatrixSoftmax,ffv_3rdDeriv) {
    x3(0).d_ = 2.0;
    x3(1).d_ = 1.0;
    x3(2).d_ = 1.0;
+   x3(0).val_.d_ = 2.0;
+   x3(1).val_.d_ = 1.0;
+   x3(2).val_.d_ = 1.0;
 
   Matrix<fvar<fvar<var> >,Dynamic,1> theta3 = softmax(x3);
 
   AVEC q = createAVEC(x3(0).val().val(),x3(1).val().val(),x3(2).val().val());
   VEC h;
   theta3[0].d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
-  EXPECT_FLOAT_EQ(0,h[1]);
-  EXPECT_FLOAT_EQ(0,h[2]);
+  EXPECT_FLOAT_EQ(1.669741e-05,h[0]);
+  EXPECT_FLOAT_EQ(-2.0603697e-09,h[1]);
+  EXPECT_FLOAT_EQ(-1.6695349e-05,h[2]);
 }

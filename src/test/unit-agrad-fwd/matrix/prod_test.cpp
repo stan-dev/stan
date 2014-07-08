@@ -492,6 +492,8 @@ TEST(AgradFwdMatrixProd,ffv_vector_3rdDeriv) {
   vv << 2.0, 3.0;
    vv(0).d_ = 1.0;
    vv(1).d_ = 1.0;
+   vv(0).val_.d_ = 1.0;
+   vv(1).val_.d_ = 1.0;
 
   fvar<fvar<var> > f = prod(vv);
 
@@ -589,6 +591,8 @@ TEST(AgradFwdMatrixProd,ffv_rowvector_3rdDeriv) {
   vv << 2.0, 3.0;
    vv(0).d_ = 1.0;
    vv(1).d_ = 1.0;
+   vv(0).val_.d_ = 1.0;
+   vv(1).val_.d_ = 1.0;
 
   fvar<fvar<var> > f = prod(vv);
 
@@ -704,14 +708,18 @@ TEST(AgradFwdMatrixProd,ffv_matrix_3rdDeriv) {
    vv(0,1).d_ = 1.0;
    vv(1,0).d_ = 1.0;
    vv(1,1).d_ = 1.0;
+   vv(0,0).val_.d_ = 1.0;
+   vv(0,1).val_.d_ = 1.0;
+   vv(1,0).val_.d_ = 1.0;
+   vv(1,1).val_.d_ = 1.0;
 
   fvar<fvar<var> > f = prod(vv);
 
   AVEC q = createAVEC(vv(0,0).val().val(),vv(0,1).val().val(),vv(1,0).val().val(),vv(1,1).val().val());
   VEC h;
   f.d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
-  EXPECT_FLOAT_EQ(0,h[1]);
-  EXPECT_FLOAT_EQ(0,h[2]);
-  EXPECT_FLOAT_EQ(0,h[3]);
+  EXPECT_FLOAT_EQ(16,h[0]);
+  EXPECT_FLOAT_EQ(14,h[1]);
+  EXPECT_FLOAT_EQ(16,h[2]);
+  EXPECT_FLOAT_EQ(14,h[3]);
 }

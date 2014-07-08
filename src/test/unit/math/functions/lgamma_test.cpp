@@ -32,7 +32,6 @@ TEST(MathsSpecialFunctions, lgammaExplicitBoost) {
 
 // C++ 11 now
 // TEST(MathsSpecialFunctions, lgammaExplicitStd) {
-//    std::cout << "std::lgamma(0.0)=" << std::lgamma(0.0) << std::endl;
 //    EXPECT_NO_THROW(std::lgamma(0.0));
 // } 
 

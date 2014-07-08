@@ -1354,6 +1354,10 @@ TEST(AgradFwdMatrixOperatorAddition,ffv_scalar_matrix_3rdDeriv) {
    v(0,1).d_ = 1.0;
    v(1,0).d_ = 1.0;
    v(1,1).d_ = 1.0;
+   v(0,0).val_.d_ = 1.0;
+   v(0,1).val_.d_ = 1.0;
+   v(1,0).val_.d_ = 1.0;
+   v(1,1).val_.d_ = 1.0;
   matrix_ffv result;
   result = add(v,2.0);
 
@@ -1457,6 +1461,10 @@ TEST(AgradFwdMatrixOperatorAddition,ffv_scalar_vector_3rdDeriv) {
    v(1).d_ = 1.0;
    v(2).d_ = 1.0;
    v(3).d_ = 1.0;
+   v(0).val_.d_ = 1.0;
+   v(1).val_.d_ = 1.0;
+   v(2).val_.d_ = 1.0;
+   v(3).val_.d_ = 1.0;
   vector_ffv result;
   result = add(v,2.0);
 
@@ -1562,6 +1570,10 @@ TEST(AgradFwdMatrixOperatorAddition,ffv_scalar_rowvector_3rdDeriv) {
    v(1).d_ = 1.0;
    v(2).d_ = 1.0;
    v(3).d_ = 1.0;
+   v(0).val_.d_ = 1.0;
+   v(1).val_.d_ = 1.0;
+   v(2).val_.d_ = 1.0;
+   v(3).val_.d_ = 1.0;
   row_vector_ffv result;
 
   result = add(v,2.0);
@@ -1743,6 +1755,11 @@ TEST(AgradFwdMatrixOperatorAddition,ffv_vector_vector_3rdDeriv) {
    vv_1(2).d_ = 1.0;
    vv_1(3).d_ = 1.0;
    vv_1(4).d_ = 1.0;
+   vv_1(0).val_.d_ = 1.0;
+   vv_1(1).val_.d_ = 1.0;
+   vv_1(2).val_.d_ = 1.0;
+   vv_1(3).val_.d_ = 1.0;
+   vv_1(4).val_.d_ = 1.0;
   vd_2 << 2, 3, 4, 5, 6;
   vv_2 << 2, 3, 4, 5, 6;
    vv_2(0).d_ = 1.0;
@@ -1750,6 +1767,11 @@ TEST(AgradFwdMatrixOperatorAddition,ffv_vector_vector_3rdDeriv) {
    vv_2(2).d_ = 1.0;
    vv_2(3).d_ = 1.0;
    vv_2(4).d_ = 1.0;
+   vv_2(0).val_.d_ = 1.0;
+   vv_2(1).val_.d_ = 1.0;
+   vv_2(2).val_.d_ = 1.0;
+   vv_2(3).val_.d_ = 1.0;
+   vv_2(4).val_.d_ = 1.0;
   
   vector_ffv output_v;
   output_v = add(vv_1, vv_2);
@@ -1935,6 +1957,11 @@ TEST(AgradFwdMatrixOperatorAddition,ffv_rowvector_rowvector_3rdDeriv) {
    rvv_1(2).d_ = 1.0;
    rvv_1(3).d_ = 1.0;
    rvv_1(4).d_ = 1.0;
+   rvv_1(0).val_.d_ = 1.0;
+   rvv_1(1).val_.d_ = 1.0;
+   rvv_1(2).val_.d_ = 1.0;
+   rvv_1(3).val_.d_ = 1.0;
+   rvv_1(4).val_.d_ = 1.0;
   rvd_2 << 2, 3, 4, 5, 6;
   rvv_2 << 2, 3, 4, 5, 6;
    rvv_2(0).d_ = 1.0;
@@ -1942,6 +1969,11 @@ TEST(AgradFwdMatrixOperatorAddition,ffv_rowvector_rowvector_3rdDeriv) {
    rvv_2(2).d_ = 1.0;
    rvv_2(3).d_ = 1.0;
    rvv_2(4).d_ = 1.0;
+   rvv_2(0).val_.d_ = 1.0;
+   rvv_2(1).val_.d_ = 1.0;
+   rvv_2(2).val_.d_ = 1.0;
+   rvv_2(3).val_.d_ = 1.0;
+   rvv_2(4).val_.d_ = 1.0;
   
   row_vector_ffv output_v = add(rvv_1, rvd_2);
   output_v = add(rvv_1, rvv_2);
@@ -2114,12 +2146,20 @@ TEST(AgradFwdMatrixOperatorAddition,ffv_matrix_matrix_3rdDeriv) {
    mv_1(0,1).d_ = 1.0;
    mv_1(1,0).d_ = 1.0;
    mv_1(1,1).d_ = 1.0;
+   mv_1(0,0).val_.d_ = 1.0;
+   mv_1(0,1).val_.d_ = 1.0;
+   mv_1(1,0).val_.d_ = 1.0;
+   mv_1(1,1).val_.d_ = 1.0;
   md_2 << 10, -10, 1, 2;
   mv_2 << 10, -10, 1, 2;
    mv_2(0,0).d_ = 1.0;
    mv_2(0,1).d_ = 1.0;
    mv_2(1,0).d_ = 1.0;
    mv_2(1,1).d_ = 1.0;
+   mv_2(0,0).val_.d_ = 1.0;
+   mv_2(0,1).val_.d_ = 1.0;
+   mv_2(1,0).val_.d_ = 1.0;
+   mv_2(1,1).val_.d_ = 1.0;
   
   matrix_ffv output_v = add(mv_1, md_2);
   output_v = add(mv_1, mv_2);

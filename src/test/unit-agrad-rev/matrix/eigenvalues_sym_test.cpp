@@ -1,9 +1,13 @@
 #include <stan/math/matrix/eigenvalues_sym.hpp>
 #include <stan/math/matrix/sum.hpp>
-#include <gtest/gtest.h>
 #include <test/unit/agrad/util.hpp>
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
+#include <stan/agrad/rev/operators.hpp>
+#include <stan/agrad/rev/functions/abs.hpp>
+#include <stan/agrad/rev/functions/fabs.hpp>
+#include <stan/agrad/rev/functions/sqrt.hpp>
+#include <gtest/gtest.h>
 
 TEST(AgradRevMatrix,eigenval_sum) {
   using stan::math::sum;

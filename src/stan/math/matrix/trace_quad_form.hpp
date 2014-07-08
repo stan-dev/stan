@@ -20,8 +20,10 @@ namespace stan {
       stan::math::check_square("trace_quad_form(%1%)",A,"A",(double*)0);
       stan::math::check_multiplicable("trace_quad_form(%1%)",A,"A",
                                       B,"B",(double*)0);
+
       return (B.transpose()*A*B).trace();
     }
+
   }
 }
 
