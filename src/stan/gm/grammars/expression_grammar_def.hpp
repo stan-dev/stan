@@ -44,27 +44,13 @@
 #include <stan/gm/grammars/whitespace_grammar.hpp>
 #include <stan/gm/grammars/term_grammar.hpp>
 #include <stan/gm/grammars/expression_grammar.hpp>
+#include <stan/gm/grammars/expression07_grammar.hpp>
 
 
 namespace stan { 
 
   namespace gm {
 
-    // FIXME: cut and paste from term grammar, having trouble w. includes
-    struct validate_expr_type2 {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
-
-      bool operator()(const expression& expr,
-                      std::ostream& error_msgs) const {
-        if (expr.expression_type().is_ill_formed()) {
-          error_msgs << "expression is ill formed" << std::endl;
-          return false;
-        }
-        return true;
-      }
-    };
-    boost::phoenix::function<validate_expr_type2> validate_expr_type2_f;
 
     // FIXME: cut and paste from term grammar, having trouble w. includes
     struct set_fun_type2 {
@@ -116,62 +102,13 @@ namespace stan {
     boost::phoenix::function<binary_op_expr> binary_op_f;
 
 
-    struct addition_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
-
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
-        if (expr1.expression_type().is_primitive()
-            && expr2.expression_type().is_primitive()) {
-          return expr1 += expr2;
-        }
-        std::vector<expression> args;
-        args.push_back(expr1);
-        args.push_back(expr2);
-        set_fun_type2 sft;
-        fun f("add",args);
-        sft(f,error_msgs);
-        return expression(f);
-        return expr1 += expr2;
-      }
-    };
-    boost::phoenix::function<addition_expr> addition;
-
-
-    struct subtraction_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
-
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
-        if (expr1.expression_type().is_primitive()
-            && expr2.expression_type().is_primitive()) {
-          return expr1 -= expr2;
-        }
-        std::vector<expression> args;
-        args.push_back(expr1);
-        args.push_back(expr2);
-        set_fun_type2 sft;
-        fun f("subtract",args);
-        sft(f,error_msgs);
-        return expression(f);
-      }
-    };
-    boost::phoenix::function<subtraction_expr> subtraction;
-
-
-
     template <typename Iterator>
     expression_grammar<Iterator>::expression_grammar(variable_map& var_map,
-                                                     std::stringstream& error_msgs,
-                                                     bool allow_lte)
-      : expression_grammar::base_type(allow_lte ? expression_r : expression07_r),
+                                                     std::stringstream& error_msgs)
+      : expression_grammar::base_type(expression_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        term_g(var_map,error_msgs,*this)
+        expression07_g(var_map,error_msgs,*this)
     {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
@@ -216,39 +153,23 @@ namespace stan {
 
       expression09_r.name("expression, precedence 9, binary <, <=, >, >=");
       expression09_r 
-        = expression07_r(_r1) [_val = _1]
+        = expression07_g(_r1) [_val = _1]
         > *( ( lit("<=")
-               > expression07_r(_r1)  [_val = binary_op_f(_val,_1,"<","logical_lte",
+               > expression07_g(_r1)  [_val = binary_op_f(_val,_1,"<","logical_lte",
                                                       boost::phoenix::ref(error_msgs))] )
               |
               ( lit("<") 
-                > expression07_r(_r1)  [_val = binary_op_f(_val,_1,"<=","logical_lt",
+                > expression07_g(_r1)  [_val = binary_op_f(_val,_1,"<=","logical_lt",
                                                       boost::phoenix::ref(error_msgs))] ) 
               |
               ( lit(">=") 
-                > expression07_r(_r1)  [_val = binary_op_f(_val,_1,">","logical_gte",
+                > expression07_g(_r1)  [_val = binary_op_f(_val,_1,">","logical_gte",
                                                       boost::phoenix::ref(error_msgs))] ) 
               |
               ( lit(">") 
-                > expression07_r(_r1)  [_val = binary_op_f(_val,_1,">=","logical_gt",
+                > expression07_g(_r1)  [_val = binary_op_f(_val,_1,">=","logical_gt",
                                                       boost::phoenix::ref(error_msgs))] ) 
               );
-      
-      expression07_r.name("expression, precedence 7, binary +, -");
-      expression07_r 
-        =  term_g(_r1)
-            [_val = _1]
-        > *( ( lit('+')
-               > term_g(_r1) // expression07_r       
-                [_val = addition(_val,_1,boost::phoenix::ref(error_msgs))] )
-              |  
-              ( lit('-') 
-                > term_g(_r1) // expression07_r   
-                [_val = subtraction(_val,_1,boost::phoenix::ref(error_msgs))] )
-              )
-        > eps[_pass = validate_expr_type2_f(_val,boost::phoenix::ref(error_msgs_))]
-        ;
-
 
     }
   }

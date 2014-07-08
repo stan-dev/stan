@@ -40,7 +40,7 @@ add_unary("asinh");
 add_unary("atan");
 add_binary("atan2");
 add_unary("atanh");
-for (size_t i = 0; i < int_vector_types.size(); ++i) 
+for (size_t i = 0; i < int_vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j) {
     add("bernoulli_ccdf_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
     add("bernoulli_cdf",DOUBLE_T,int_vector_types[i],vector_types[j]);
@@ -171,6 +171,10 @@ add("cumulative_sum", VECTOR_T, VECTOR_T);
 add("cumulative_sum", ROW_VECTOR_T, ROW_VECTOR_T);
 add("determinant",DOUBLE_T,MATRIX_T);
 add("diag_matrix",MATRIX_T,VECTOR_T);
+add("diag_post_multiply",MATRIX_T, MATRIX_T,VECTOR_T);
+add("diag_post_multiply",MATRIX_T, MATRIX_T,ROW_VECTOR_T);
+add("diag_pre_multiply",MATRIX_T, VECTOR_T,MATRIX_T);
+add("diag_pre_multiply",MATRIX_T, ROW_VECTOR_T,MATRIX_T);
 add("diagonal",VECTOR_T,MATRIX_T);
 add_unary("digamma");
 // dims() is polymorphic by size
@@ -183,10 +187,10 @@ for (size_t i = 0; i < 8; ++i) {
 }
 add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("dirichlet_rng",VECTOR_T,VECTOR_T);
-add("dist",DOUBLE_T,VECTOR_T,VECTOR_T);
-add("dist",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
-add("dist",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
-add("dist",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
+add("distance",DOUBLE_T,VECTOR_T,VECTOR_T);
+add("distance",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("distance",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
+add("distance",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 add("divide",DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("divide",VECTOR_T,VECTOR_T,DOUBLE_T);
 add("divide",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
@@ -218,9 +222,17 @@ add_binary("double_exponential_rng");
 add_nullary("e");
 add("eigenvalues_sym",VECTOR_T,MATRIX_T);
 add("eigenvectors_sym",MATRIX_T,MATRIX_T);
+add("qr_Q",MATRIX_T,MATRIX_T);
+add("qr_R",MATRIX_T,MATRIX_T);
 add("elt_divide",VECTOR_T,VECTOR_T,VECTOR_T);
 add("elt_divide",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("elt_divide",MATRIX_T,MATRIX_T,MATRIX_T);
+add("elt_divide",VECTOR_T,VECTOR_T,DOUBLE_T);
+add("elt_divide",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
+add("elt_divide",MATRIX_T,MATRIX_T,DOUBLE_T);
+add("elt_divide",VECTOR_T,DOUBLE_T,VECTOR_T);
+add("elt_divide",ROW_VECTOR_T,DOUBLE_T,ROW_VECTOR_T);
+add("elt_divide",MATRIX_T,DOUBLE_T,MATRIX_T);
 add("elt_multiply",VECTOR_T,VECTOR_T,VECTOR_T);
 add("elt_multiply",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("elt_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
@@ -232,24 +244,24 @@ add("exp",ROW_VECTOR_T,ROW_VECTOR_T);
 add("exp",MATRIX_T,MATRIX_T);
 add_unary("exp2");
 for (size_t i = 0; i < vector_types.size(); ++i)
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
       for (size_t l = 0; l < vector_types.size(); ++l) {
         add("exp_mod_normal_ccdf_log",
             DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k], 
+            vector_types[i], vector_types[j], vector_types[k],
             vector_types[l]); // args
         add("exp_mod_normal_cdf",
             DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k], 
+            vector_types[i], vector_types[j], vector_types[k],
             vector_types[l]); // args
         add("exp_mod_normal_cdf_log",
             DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k], 
+            vector_types[i], vector_types[j], vector_types[k],
             vector_types[l]); // args
         add("exp_mod_normal_log",
             DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k], 
+            vector_types[i], vector_types[j], vector_types[k],
             vector_types[l]); // args
       }
 add_ternary("exp_mod_normal_rng");
@@ -278,8 +290,8 @@ add_ternary("fma");
 add_binary("fmax");
 add_binary("fmin");
 add_binary("fmod");
-for (size_t i = 0; i < vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
       add("gamma_ccdf_log",
           DOUBLE_T, // result
@@ -299,8 +311,8 @@ add_binary("gamma_q");
 add_binary("gamma_rng");
 add("gaussian_dlm_obs_log",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T,MATRIX_T,MATRIX_T,VECTOR_T,MATRIX_T);
 add("gaussian_dlm_obs_log",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T,VECTOR_T,MATRIX_T,VECTOR_T,MATRIX_T);
-for (size_t i = 0; i < vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
       add("gumbel_ccdf_log",
           DOUBLE_T, // result
@@ -347,8 +359,8 @@ for (size_t i = 0; i < vector_types.size(); ++i)
   }
 add_unary("inv_chi_square_rng");
 add_unary("inv_cloglog");
-for (size_t i = 0; i < vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
       add("inv_gamma_ccdf_log",
           DOUBLE_T, // result
@@ -361,7 +373,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
       add("inv_gamma_log",
           DOUBLE_T, // result
-          vector_types[i], vector_types[j], vector_types[k]); // args 
+          vector_types[i], vector_types[j], vector_types[k]); // args
    }
 add_binary("inv_gamma_rng");
 add_unary("inv_logit");
@@ -423,8 +435,8 @@ for (size_t i = 0; i < primitive_types.size(); ++i) {
     add("logical_gte",INT_T,primitive_types[i], primitive_types[j]);
   }
 }
-for (size_t i = 0; i < vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
       add("logistic_ccdf_log",
           DOUBLE_T, // result
@@ -437,12 +449,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
       add("logistic_log",
           DOUBLE_T, // result
-          vector_types[i], vector_types[j], vector_types[k]); // args    
+          vector_types[i], vector_types[j], vector_types[k]); // args
     }
 add_binary("logistic_rng");
 add_unary("logit");
-for (size_t i = 0; i < vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
       add("lognormal_ccdf_log",
           DOUBLE_T, // result
@@ -489,11 +501,34 @@ add("minus",ROW_VECTOR_T,ROW_VECTOR_T);
 add("minus",MATRIX_T,MATRIX_T);
 add("modified_bessel_first_kind",DOUBLE_T,INT_T,DOUBLE_T);
 add("modified_bessel_second_kind",DOUBLE_T,INT_T,DOUBLE_T);
-add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
-add("multi_normal_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
-add("multi_normal_prec_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
+add("multi_gp_log",DOUBLE_T, MATRIX_T,MATRIX_T,VECTOR_T);
+{
+  std::vector<base_expr_type> eigen_vector_types;
+  eigen_vector_types.push_back(VECTOR_T);
+  eigen_vector_types.push_back(ROW_VECTOR_T);
+  for (size_t i = 0; i < 2; ++i) {
+    for (size_t j = 0; j < 2; ++j) {
+      for (size_t k = 0; k < 2; ++k) {
+        for (size_t l = 0; l < 2; ++l) {
+          add("multi_normal_cholesky_log",DOUBLE_T,
+              expr_type(eigen_vector_types[k],i),
+              expr_type(eigen_vector_types[l],j),MATRIX_T);
+          add("multi_normal_log",DOUBLE_T,
+              expr_type(eigen_vector_types[k],i),
+              expr_type(eigen_vector_types[l],j),MATRIX_T);
+          add("multi_normal_prec_log",DOUBLE_T,
+              expr_type(eigen_vector_types[k],i),
+              expr_type(eigen_vector_types[l],j),MATRIX_T);
+          add("multi_student_t_log",DOUBLE_T,
+              expr_type(eigen_vector_types[k],i),DOUBLE_T,
+              expr_type(eigen_vector_types[l],j),MATRIX_T);
+        }
+      }
+    }
+  }
+}
 add("multi_normal_rng",VECTOR_T,VECTOR_T,MATRIX_T);
-add("multi_student_t_log",DOUBLE_T, VECTOR_T,DOUBLE_T,VECTOR_T,MATRIX_T);
+add("multi_normal_cholesky_rng",VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_student_t_rng",VECTOR_T, DOUBLE_T,VECTOR_T,MATRIX_T);
 add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
 add("multinomial_rng",expr_type(INT_T,1U), VECTOR_T, INT_T);
@@ -502,7 +537,7 @@ add("multiply",VECTOR_T,VECTOR_T,DOUBLE_T);
 add("multiply",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
 add("multiply",MATRIX_T,MATRIX_T,DOUBLE_T);
 add("multiply",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
-add("multiply",MATRIX_T,VECTOR_T,ROW_VECTOR_T);  
+add("multiply",MATRIX_T,VECTOR_T,ROW_VECTOR_T);
 add("multiply",VECTOR_T,MATRIX_T,VECTOR_T);
 add("multiply",ROW_VECTOR_T,ROW_VECTOR_T,MATRIX_T);
 add("multiply",MATRIX_T,MATRIX_T,MATRIX_T);
@@ -511,8 +546,8 @@ add("multiply",ROW_VECTOR_T,DOUBLE_T,ROW_VECTOR_T);
 add("multiply",MATRIX_T,DOUBLE_T,MATRIX_T);
 add_binary("multiply_log");
 add("multiply_lower_tri_self_transpose",MATRIX_T,MATRIX_T);
-for (size_t i = 0; i < int_vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+for (size_t i = 0; i < int_vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
       add("neg_binomial_ccdf_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);
@@ -522,11 +557,17 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
           int_vector_types[i],vector_types[j],vector_types[k]);
       add("neg_binomial_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_log_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
     }
 add("neg_binomial_rng",INT_T,DOUBLE_T,DOUBLE_T);
+add("neg_binomial_2_rng",INT_T,DOUBLE_T,DOUBLE_T);
+add("neg_binomial_2_log_rng",INT_T,DOUBLE_T,DOUBLE_T);
 add_nullary("negative_infinity");
-for (size_t i = 0; i < vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
       add("normal_ccdf_log",
           DOUBLE_T, // result
@@ -546,8 +587,8 @@ add_nullary("not_a_number");
 add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
 add("ordered_logistic_rng",INT_T,DOUBLE_T,VECTOR_T);
 add_binary("owens_t");
-for (size_t i = 0; i < vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
       add("pareto_ccdf_log",
           DOUBLE_T, // result
@@ -584,6 +625,10 @@ add("prod",DOUBLE_T,ROW_VECTOR_T);
 add("prod",DOUBLE_T,MATRIX_T);
 add("quad_form",DOUBLE_T,MATRIX_T,VECTOR_T);
 add("quad_form",MATRIX_T,MATRIX_T,MATRIX_T);
+add("quad_form_sym",DOUBLE_T,MATRIX_T,VECTOR_T);
+add("quad_form_sym",MATRIX_T,MATRIX_T,MATRIX_T);
+add("quad_form_diag",MATRIX_T,MATRIX_T,VECTOR_T);
+add("quad_form_diag",MATRIX_T,MATRIX_T,ROW_VECTOR_T);
 add("rank",INT_T,expr_type(INT_T,1),INT_T);
 add("rank",INT_T,expr_type(DOUBLE_T,1),INT_T);
 add("rank",INT_T,VECTOR_T,INT_T);
@@ -631,8 +676,8 @@ add("rows_dot_product",VECTOR_T,MATRIX_T,MATRIX_T);
 add("rows_dot_self",VECTOR_T,VECTOR_T);
 add("rows_dot_self",VECTOR_T,ROW_VECTOR_T);
 add("rows_dot_self",VECTOR_T,MATRIX_T);
-for (size_t i = 0; i < vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
       add("scaled_inv_chi_square_ccdf_log",
           DOUBLE_T, // result
@@ -670,9 +715,9 @@ for (size_t i = 1; i < 8; ++i) {
   add("size",INT_T,expr_type(ROW_VECTOR_T,i));
   add("size",INT_T,expr_type(MATRIX_T,i));
 }
-for (size_t i = 0; i < vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
-    for (size_t k = 0; k < vector_types.size(); ++k) 
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
       for (size_t l = 0; l < vector_types.size(); ++l) {
         add("skew_normal_ccdf_log",
             DOUBLE_T, // result
@@ -697,13 +742,25 @@ add("sort_desc",expr_type(INT_T,1),expr_type(INT_T,1));
 add("sort_desc",expr_type(DOUBLE_T,1),expr_type(DOUBLE_T,1));
 add("sort_desc",VECTOR_T,VECTOR_T);
 add("sort_desc",ROW_VECTOR_T,ROW_VECTOR_T);
+add("sort_indices_asc",expr_type(INT_T,1),expr_type(INT_T,1));
+add("sort_indices_asc",expr_type(INT_T,1),expr_type(DOUBLE_T,1));
+add("sort_indices_asc",expr_type(INT_T,1),VECTOR_T);
+add("sort_indices_asc",expr_type(INT_T,1),ROW_VECTOR_T);
+add("sort_indices_desc",expr_type(INT_T,1),expr_type(INT_T,1));
+add("sort_indices_desc",expr_type(INT_T,1),expr_type(DOUBLE_T,1));
+add("sort_indices_desc",expr_type(INT_T,1),VECTOR_T);
+add("sort_indices_desc",expr_type(INT_T,1),ROW_VECTOR_T);
+add("squared_distance",DOUBLE_T,VECTOR_T,VECTOR_T);
+add("squared_distance",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("squared_distance",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
+add("squared_distance",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 add_unary("sqrt");
 add_nullary("sqrt2");
 add_unary("square");
 add_unary("step");
-for (size_t i = 0; i < vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
-    for (size_t k = 0; k < vector_types.size(); ++k) 
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
       for (size_t l = 0; l < vector_types.size(); ++l) {
         add("student_t_ccdf_log",
             DOUBLE_T, // result
@@ -746,8 +803,29 @@ add_unary("tan");
 add_unary("tanh");
 add("tcrossprod",MATRIX_T,MATRIX_T);
 add_unary("tgamma");
-add("to_vector", VECTOR_T, ROW_VECTOR_T);
+add("to_array_1d", expr_type(DOUBLE_T,1), MATRIX_T);
+add("to_array_1d", expr_type(DOUBLE_T,1), VECTOR_T);
+add("to_array_1d", expr_type(DOUBLE_T,1), ROW_VECTOR_T);
+for (size_t i=1; i < 10; i++) {
+  add("to_array_1d", expr_type(DOUBLE_T,1), expr_type(DOUBLE_T,i));
+  add("to_array_1d", expr_type(INT_T,1), expr_type(INT_T,i));
+}
+add("to_array_2d", expr_type(DOUBLE_T,2), MATRIX_T);
+add("to_matrix", MATRIX_T, MATRIX_T);
+add("to_matrix", MATRIX_T, VECTOR_T);
+add("to_matrix", MATRIX_T, ROW_VECTOR_T);
+add("to_matrix", MATRIX_T, expr_type(DOUBLE_T,2));
+add("to_matrix", MATRIX_T, expr_type(INT_T,2));
+add("to_row_vector", ROW_VECTOR_T, MATRIX_T);
+add("to_row_vector", ROW_VECTOR_T, VECTOR_T);
+add("to_row_vector", ROW_VECTOR_T, ROW_VECTOR_T);
+add("to_row_vector", ROW_VECTOR_T, expr_type(DOUBLE_T,1));
+add("to_row_vector", ROW_VECTOR_T, expr_type(INT_T,1));
 add("to_vector", VECTOR_T, MATRIX_T);
+add("to_vector", VECTOR_T, VECTOR_T);
+add("to_vector", VECTOR_T, ROW_VECTOR_T);
+add("to_vector", VECTOR_T, expr_type(DOUBLE_T,1));
+add("to_vector", VECTOR_T, expr_type(INT_T,1));
 add("trace",DOUBLE_T,MATRIX_T);
 add("trace_gen_quad_form",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T);
 add("trace_quad_form",DOUBLE_T,MATRIX_T,VECTOR_T);
@@ -757,8 +835,8 @@ add("transpose",VECTOR_T,ROW_VECTOR_T);
 add("transpose",MATRIX_T,MATRIX_T);
 add_unary("trunc");
 add_unary("trigamma");
-for (size_t i = 0; i < vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
         add("uniform_ccdf_log",
             DOUBLE_T, // result
@@ -784,8 +862,9 @@ for (size_t i = 0; i < vector_types.size(); ++i)
       add("von_mises_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
+add_binary("von_mises_rng");
 for (size_t i = 0; i < vector_types.size(); ++i)
-  for (size_t j = 0; j < vector_types.size(); ++j) 
+  for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
         add("weibull_ccdf_log",
             DOUBLE_T, // result

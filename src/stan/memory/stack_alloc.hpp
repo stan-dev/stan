@@ -5,7 +5,11 @@
 #include <cstddef>
 #include <sstream>
 #include <stdexcept>
-#include <stdint.h> // FIXME: replace with cstddef?
+#if defined(_MSC_VER)
+    #include <msinttypes.h>  // Microsoft Visual Studio lacks compliant stdint.h
+#else
+    #include <stdint.h> // FIXME: replace with cstddef?
+#endif
 #include <vector>
 
 #ifdef __GNUC__
@@ -133,7 +137,6 @@ namespace stan {
         cur_block_(0),
         cur_block_end_(blocks_[0] + initial_nbytes),
         next_loc_(blocks_[0]) {
-
         if (!blocks_[0])
           throw std::bad_alloc();  // no msg allowed in bad_alloc ctor
       }
@@ -199,7 +202,25 @@ namespace stan {
         blocks_.resize(1); 
         recover_all();
       }
-  
+
+      /**
+       * Return number of bytes allocated to this instance by the heap.
+       * This is not the same as the number of bytes allocated through
+       * calls to memalloc_.  The latter number is not calculatable
+       * because space is wasted at the end of blocks if the next
+       * alloc request doesn't fit.  (Perhaps we could trim down to 
+       * what is actually used?)
+       *
+       * @return number of bytes allocated to this instance
+       */
+      size_t bytes_allocated() {
+        size_t sum = 0;
+        for (size_t i = 0; i <= cur_block_; ++i) {
+          sum += sizes_[i];
+        }
+        return sum;
+      }
+
     };
 
   }

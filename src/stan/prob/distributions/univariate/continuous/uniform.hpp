@@ -58,22 +58,15 @@ namespace stan {
 
       // set up return value accumulator
       double logp(0.0);
-      if(!check_not_nan(function, y, "Random variable", &logp))
-        return logp;
-      if (!check_finite(function, alpha, "Lower bound parameter", &logp))
-        return logp;
-      if (!check_finite(function, beta, "Upper bound parameter", &logp))
-        return logp;
-      if (!check_greater(function, beta, alpha, "Upper bound parameter",
-                         &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   y,alpha,beta,
-                                   "Random variable","Lower bound parameter",
-                                   "Upper bound parameter",
-                                   &logp)))
-        return logp;
-
+      check_not_nan(function, y, "Random variable", &logp);
+      check_finite(function, alpha, "Lower bound parameter", &logp);
+      check_finite(function, beta, "Upper bound parameter", &logp);
+      check_greater(function, beta, alpha, "Upper bound parameter", &logp);
+      check_consistent_sizes(function,
+                             y,alpha,beta,
+                             "Random variable","Lower bound parameter",
+                             "Upper bound parameter",
+                             &logp);
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_low,T_high>::value)
@@ -146,20 +139,15 @@ namespace stan {
 
       // set up return value accumulator
       double cdf(1.0);
-      if(!check_not_nan(function, y, "Random variable", &cdf))
-        return cdf;
-      if (!check_finite(function, alpha, "Lower bound parameter", &cdf))
-        return cdf;
-      if (!check_finite(function, beta, "Upper bound parameter", &cdf))
-        return cdf;
-      if (!check_greater(function, beta, alpha, "Upper bound parameter", &cdf))
-        return cdf;
-      if (!(check_consistent_sizes(function,
-                                   y,alpha,beta,
-                                   "Random variable","Lower bound parameter",
-                                   "Upper bound parameter",
-                                   &cdf)))
-        return cdf;
+      check_not_nan(function, y, "Random variable", &cdf);
+      check_finite(function, alpha, "Lower bound parameter", &cdf);
+      check_finite(function, beta, "Upper bound parameter", &cdf);
+      check_greater(function, beta, alpha, "Upper bound parameter", &cdf);
+      check_consistent_sizes(function,
+                             y,alpha,beta,
+                             "Random variable","Lower bound parameter",
+                             "Upper bound parameter",
+                             &cdf);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_low> alpha_vec(alpha);
@@ -227,21 +215,15 @@ namespace stan {
 
       // set up return value accumulator
       double cdf_log(0.0);
-      if(!check_not_nan(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if (!check_finite(function, alpha, "Lower bound parameter", &cdf_log))
-        return cdf_log;
-      if (!check_finite(function, beta, "Upper bound parameter", &cdf_log))
-        return cdf_log;
-      if (!check_greater(function, beta, alpha, "Upper bound parameter", 
-                         &cdf_log))
-        return cdf_log;
-      if (!(check_consistent_sizes(function,
-                                   y,alpha,beta,
-                                   "Random variable","Lower bound parameter",
-                                   "Upper bound parameter",
-                                   &cdf_log)))
-        return cdf_log;
+      check_not_nan(function, y, "Random variable", &cdf_log);
+      check_finite(function, alpha, "Lower bound parameter", &cdf_log);
+      check_finite(function, beta, "Upper bound parameter", &cdf_log);
+      check_greater(function, beta, alpha, "Upper bound parameter", &cdf_log);
+      check_consistent_sizes(function,
+                             y,alpha,beta,
+                             "Random variable","Lower bound parameter",
+                             "Upper bound parameter",
+                             &cdf_log);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_low> alpha_vec(alpha);
@@ -302,21 +284,15 @@ namespace stan {
 
       // set up return value accumulator
       double ccdf_log(0.0);
-      if(!check_not_nan(function, y, "Random variable", &ccdf_log))
-        return ccdf_log;
-      if (!check_finite(function, alpha, "Lower bound parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_finite(function, beta, "Upper bound parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_greater(function, beta, alpha, "Upper bound parameter", 
-                         &ccdf_log))
-        return ccdf_log;
-      if (!(check_consistent_sizes(function,
-                                   y,alpha,beta,
-                                   "Random variable","Lower bound parameter",
-                                   "Upper bound parameter",
-                                   &ccdf_log)))
-        return ccdf_log;
+      check_not_nan(function, y, "Random variable", &ccdf_log);
+      check_finite(function, alpha, "Lower bound parameter", &ccdf_log);
+      check_finite(function, beta, "Upper bound parameter", &ccdf_log);
+      check_greater(function, beta, alpha, "Upper bound parameter", &ccdf_log);
+      check_consistent_sizes(function,
+                             y,alpha,beta,
+                             "Random variable","Lower bound parameter",
+                             "Upper bound parameter",
+                             &ccdf_log);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_low> alpha_vec(alpha);
@@ -371,12 +347,9 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_greater;
 
-      if (!check_finite(function, alpha, "Lower bound parameter"))
-        return 0;
-      if (!check_finite(function, beta, "Upper bound parameter"))
-        return 0;
-      if (!check_greater(function, beta, alpha, "Upper bound parameter"))
-        return 0;
+      check_finite(function, alpha, "Lower bound parameter", (double*)0);
+      check_finite(function, beta, "Upper bound parameter", (double*)0);
+      check_greater(function, beta, alpha, "Upper bound parameter", (double*)0);
 
       variate_generator<RNG&, uniform_real_distribution<> >
         uniform_rng(rng, uniform_real_distribution<>(alpha, beta));

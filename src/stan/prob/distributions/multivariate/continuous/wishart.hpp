@@ -10,12 +10,15 @@
 #include "stan/prob/distributions/univariate/continuous/normal.hpp"
 #include "stan/prob/distributions/univariate/continuous/chi_square.hpp"
 #include <stan/math/functions/lmgamma.hpp>
+#include <stan/math/matrix/crossprod.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/trace.hpp>
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
+#include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/mdivide_left_tri_low.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
 
 namespace stan {
 
@@ -65,44 +68,33 @@ namespace stan {
 
       typename Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>::size_type k = W.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if (!check_greater(function, nu, k-1, 
-                         "Degrees of freedom parameter", &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            W.rows(), "Rows of random variable",
-                            W.cols(), "columns of random variable",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            S.rows(), "Rows of scale parameter",
-                            S.cols(), "columns of scale parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            W.rows(), "Rows of random variable",
-                            S.rows(), "columns of scale parameter",
-                            &lp))
-        return lp;
+      check_greater(function, nu, k-1, 
+                    "Degrees of freedom parameter", &lp);
+      check_size_match(function, 
+                       W.rows(), "Rows of random variable",
+                       W.cols(), "columns of random variable",
+                       &lp);
+      check_size_match(function, 
+                       S.rows(), "Rows of scale parameter",
+                       S.cols(), "columns of scale parameter",
+                       &lp);
+      check_size_match(function, 
+                       W.rows(), "Rows of random variable",
+                       S.rows(), "columns of scale parameter",
+                       &lp);
       // FIXME: domain checks
 
       using stan::math::log_determinant_ldlt;
       using stan::math::mdivide_left_ldlt;
       using stan::math::LDLT_factor;
+      using stan::math::check_ldlt_factor;
       
       LDLT_factor<T_y,Eigen::Dynamic,Eigen::Dynamic> ldlt_W(W);
-      if (!ldlt_W.success()) {
-        std::ostringstream message;
-        message << "W is not positive definite (%1%).";
-        std::string str(message.str());
-        stan::math::dom_err(function,W(0,0),"W",str.c_str(),"",&lp);
+      if (!check_ldlt_factor(function,ldlt_W,"LDLT_Factor of random variable",&lp)) {
         return lp;
       }
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_S(S);
-      if (!ldlt_S.success()) {
-        std::ostringstream message;
-        message << "S is not positive definite (%1%).";
-        std::string str(message.str());
-        stan::math::dom_err(function,S(0,0),"S",str.c_str(),"",&lp);
+      if (!check_ldlt_factor(function,ldlt_S,"LDLT_Factor of scale parameter",&lp)) {
         return lp;
       }
       
@@ -126,7 +118,7 @@ namespace stan {
 //          const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(
 //                                                                   &W(0), W.size(), 1);
 //        lp -= 0.5 * dot_product(S_inv_vec, W_vec); // trace(S^-1 * W)
-        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Sinv_W(mdivide_left_ldlt(ldlt_S,W));
+        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Sinv_W(mdivide_left_ldlt(ldlt_S, static_cast<Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(W.template selfadjointView<Eigen::Lower>())));
         lp -= 0.5*trace(Sinv_W);
       }
 
@@ -154,22 +146,24 @@ namespace stan {
 
       using stan::math::check_size_match;
       using stan::math::check_positive;
+      using Eigen::MatrixXd;
 
-      check_positive(function,nu,"degrees of freedom");
+      typename MatrixXd::size_type k = S.rows();
+      check_positive(function,nu,"degrees of freedom",(double*)0);
       check_size_match(function, 
                        S.rows(), "Rows of scale parameter",
-                       S.cols(), "columns of scale parameter");
+                       S.cols(), "columns of scale parameter",
+                       (double*)0);
 
-      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(S.rows(), S.cols());
-      B.setZero();
+      MatrixXd B = MatrixXd::Zero(k, k);
 
-      for(int i = 0; i < S.cols(); i++) {
-        B(i,i) = std::sqrt(chi_square_rng(nu - i, rng));
-        for(int j = 0; j < i; j++)
-          B(j,i) = normal_rng(0,1,rng);
+      for (int j = 0; j < k; ++j) {
+        for (int i = 0; i < j; ++i)
+          B(i, j) = normal_rng(0, 1, rng);
+        B(j,j) = std::sqrt(chi_square_rng(nu - j, rng));
       }
-
-      return stan::math::multiply_lower_tri_self_transpose(S.llt().matrixL() * B);
+                
+      return stan::math::crossprod(B * S.llt().matrixU());
     }
   }
 }

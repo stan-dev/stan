@@ -1,19 +1,18 @@
 #ifndef __STAN__AGRAD__REV__MATRIX__MULTIPLY_HPP__
 #define __STAN__AGRAD__REV__MATRIX__MULTIPLY_HPP__
 
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits.hpp>
-#include <boost/math/tools/promotion.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/matrix/Eigen_NumTraits.hpp>
+#include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_matching_sizes.hpp>
-#include <stan/math/matrix/validate_square.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/agrad/rev/matrix/to_var.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/agrad/rev/operators/operator_multiplication.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/math/tools/promotion.hpp>
 
 namespace stan {
   namespace agrad {
@@ -76,7 +75,8 @@ namespace stan {
                         Eigen::Matrix<var,R1,C2> >::type
     multiply(const Eigen::Matrix<T1,R1,C1>& m1,
              const Eigen::Matrix<T2,R2,C2>& m2) {
-      stan::math::validate_multiplicable(m1,m2,"multiply");
+      stan::math::check_multiplicable("multiply(%1%)",m1,"m1",
+                                      m2,"m2",(double*)0);
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
       for (int i = 0; i < m1.rows(); i++) {
         typename Eigen::Matrix<T1,R1,C1>::ConstRowXpr crow(m1.row(i));

@@ -14,16 +14,19 @@ ifeq (g++,$(CC_TYPE))
   endif
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
-  CFLAGS += -m32
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
-  LDLIBS_STANC += -static-libgcc
-  LDLIBS_STANC += -static-libstdc++
-  LDLIBS += -static-libgcc
-  LDLIBS += -static-libstdc++
+  LDLIBS_STANC += -static
+  LDFLAGS += -static
+  LDFLAGS += -lwinpthread
   EXE = .exe
+  WINE = wine
 endif
 ifeq (clang++,$(CC_TYPE))
 #  CFLAGS += -stdlib=libc++
+  ifeq (true,$(C++11))
+    CFLAGS += -stdlib=libc++ -std=c++11
+    LDFLAGS += -lc++
+  endif
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   CFLAGS_GTEST += -Wno-c++11-long-long
   CFLAGS += -Wno-unused-function

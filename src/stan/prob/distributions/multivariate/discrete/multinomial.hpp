@@ -33,16 +33,13 @@ namespace stan {
       using boost::math::lgamma;
 
       typename promote_args<T_prob>::type lp(0.0);
-      if (!check_nonnegative(function, ns, "Number of trials variable", &lp))
-        return lp;
-      if (!check_simplex(function, theta, "Probabilites parameter", 
-                         &lp))
-        return lp;
-      if (!check_size_match(function, 
-          ns.size(), "Size of number of trials variable",
-          theta.rows(), "rows of probabilities parameter",
-          &lp))
-        return lp;
+      check_nonnegative(function, ns, "Number of trials variable", &lp);
+      check_simplex(function, theta, "Probabilites parameter", 
+                    &lp);
+      check_size_match(function, 
+                       ns.size(), "Size of number of trials variable",
+                       theta.rows(), "rows of probabilities parameter",
+                       &lp);
       using stan::math::multiply_log;
 
       if (include_summand<propto>::value) {     
@@ -75,19 +72,19 @@ namespace stan {
       using stan::math::check_simplex;
       using stan::math::check_positive;
 
-      check_simplex(function, theta, "Probabilites parameter");
-      check_positive(function,N,"number of trials variables");
+      check_simplex(function, theta, "Probabilites parameter", (double*)0);
+      check_positive(function,N,"number of trials variables", (double*)0);
 
-      std::vector<int> result(N,0);
+      std::vector<int> result(theta.size(),0);
       double mass_left = 1.0;
       int n_left = N;
       for (int k = 0; n_left > 0 && k < theta.size(); ++k) {
-        result[k] = binomial_rng(n_left,theta[k] / mass_left,rng);
+        double p = theta[k] / mass_left;
+        if (p > 1.0) p = 1.0;
+        result[k] = binomial_rng(n_left,p,rng);
         n_left -= result[k];
         mass_left -= theta[k];
       }
-      // for (int n = 0; n < N; ++n)
-      //   ++result[categorical_rng(theta,rng) - 1];
       return result;
     }
 

@@ -15,12 +15,14 @@ SUFIXES:
 # - CC: The compiler to use. Expecting g++ or clang++.
 # - O: Optimization level. Valid values are {0, 1, 2, 3}.
 # - AR: archiver (must specify for cross-compiling)
-# - OS: {mac, win, linux}. 
+# - OS: {mac, win, linux}
+# - C++11: Compile with C++11 extensions, Valid values: {true, false}. 
 ##
 CC = g++
 O = 3
 O_STANC = 0
 AR = ar
+C++11 = false
 
 ##
 # Library locations
@@ -33,11 +35,12 @@ GTEST ?= lib/gtest_1.7.0
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
+WINE =
 PATH_SEPARATOR = /
 
 
@@ -58,7 +61,12 @@ PATH_SEPARATOR = /
 #   - CFLAGS_GTEST
 #   - EXE
 ##
--include make/os_detect
+-include make/detect_os
+
+##
+# Get information about the version of make.
+##
+-include make/detect_make
 
 ##
 # Tell make the default way to compile a .o file.
@@ -118,63 +126,67 @@ endif
 	@echo '  - BOOST                    ' $(BOOST)
 	@echo '  - GTEST                    ' $(GTEST)
 	@echo ''
-	@echo 'Build a Stan model:'
-	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
-	@echo '  - foo/bar$(EXE)'
-	@echo ''
-	@echo '  This target will:'
-	@echo '  1. Build the Stan compiler: bin/stanc$(EXE).'
-	@echo '  2. Use the Stan compiler to generate C++ code, foo/bar.cpp.'
-	@echo '  3. Compile the C++ code using $(CC) to generate foo/bar$(EXE)'
-	@echo ''
-	@echo '  Example - Sample from a normal: src/models/basic_distributions/normal.stan'
-	@echo '    1. Build the model:'
-	@echo '       make src/models/basic_distributions/normal$(EXE)'
-	@echo '    2. Run the model:'
-	@echo '       src'$(PATH_SEPARATOR)'models'$(PATH_SEPARATOR)'basic_distributions'$(PATH_SEPARATOR)'normal$(EXE) sample'
-	@echo '    3. Look at the samples:'
-	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) samples.csv'
-	@echo ''
 	@echo 'Common targets:'
 	@echo '  Model related:'
-	@echo '  - bin/stanc$(EXE): Build the Stan compiler.'
-	@echo '  - bin/print$(EXE): Build the print utility.'
 	@echo '  - bin/libstan.a  : Build the Stan static library (used in linking models).'
-	@echo '  - bin/libstanc.a : Build the Stan compiler static library (used in linking'
-	@echo '                     bin/stanc$(EXE))'
-	@echo '  - models/*$(EXE) : If a Stan model exists at src/models/*.stan, this target'
-	@echo '                     will copy the Stan model to models/*.stan, then build the'
-	@echo '                     Stan model.'
-	@echo '  - *$(EXE)        : If a Stan model exists at *.stan, this target will build'
-	@echo '                     the Stan model as an executable.'
-	@echo '  Tests:'
-	@echo '  - test-headers   : Compiles a trivial file after including each header separately'
-	@echo '  - test-unit      : Runs unit tests.'
-	@echo '  - test-distributions : Runs unit tests for the distributions'
-	@echo '  - test-models    : Runs diagnostic models.'
-	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
-	@echo '  - test-all       : Runs all tests.'
+	@echo '  - bin/libstanc.a : Build the Stan compiler static library'
 	@echo '  Documentation:'
 	@echo '  - manual         : Builds the reference manual. Copies built manual to'
 	@echo '                     doc/stan-reference-$(VERSION_STRING).pdf'
+	@echo '                     (requires LaTeX installation)'
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
+	@echo '                     (requires doxygen installation)'
+	@echo '  TESTS (requires make 3.81 or higher):'
+	@echo ''
+	@echo '    All Tests'
+	@echo '      - test-all'
+	@echo ''
+	@echo '    Header Tests'
+	@echo '      - test-headers'
+	@echo ''
+	@echo '    Unit Tests'
+	@echo '      The unit tests are broken into three targets:'
+	@echo '        - src/test/unit'
+	@echo '        - src/test/unit-agrad-rev'
+	@echo '        - src/test/unit-agrad-fwd'
+	@echo ''
+	@echo '      Subdirectory of Unit Tests'
+	@echo '        For example, to run the unit tests under meta'
+	@echo '          - src/test/unit/meta'
+	@echo ''
+	@echo '      Single Unit Test'
+	@echo '        For example, to run the diag_post_multiply test, make the target'
+	@echo '          - test/unit-agrad-fwd/matrix/diag_post_multiply$(EXE)'
+	@echo ''
 	@echo '  Clean:'
 	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
 	@echo '  - clean-all      : Cleans up all of Stan.'
 	@echo '  Higher level targets:'
-	@echo '  - build          : Builds the Stan command line tools.'
 	@echo '  - docs           : Builds all docs.'
-	@echo '  - all            : Calls build and docs'
+	@echo ''
+	@echo '  Warning: Deprecated test targets'
+	@echo '  - test-unit      : Runs unit tests.'
+	@echo '    This has been split into 3 separate targets:'
+	@echo '      src/test/unit'
+	@echo '      src/test/unit-agrad-rev'
+	@echo '      src/test/unit-agrad-fwd'
+	@echo '  - test-distributions : Runs unit tests for the distributions'
+	@echo '    Use this target instead: src/test/unit-distribution'
+	@echo '  - test-models    : Runs diagnostic models.'
+	@echo '    Run this target from CmdStan: src/test/models'
+	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
+	@echo '    Run this target from CmdStan: src/test/models/bugs_examples'
+	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
 -include make/libstan  # libstan.a
 -include make/tests    # tests: test-all, test-unit, test-models
 -include make/models   # models
--include make/command  # bin/stanc, bin/print
 -include make/doxygen  # doxygen
 -include make/manual   # manual: manual, doc/stan-reference.pdf
 -include make/demo     # for building demos
+-include make/local    # for local stuff
 
 ifneq (,$(filter-out runtest/%,$(filter-out clean%,$(MAKECMDGOALS))))
   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
@@ -188,11 +200,8 @@ ifneq (,$(filter runtest_no_fail/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst runtest_no_fail/,,$(MAKECMDGOALS)))
 endif
 
-.PHONY: all build docs
-build: bin/stanc$(EXE)
-	@echo '--- Stan tools built ---'
+.PHONY: docs
 docs: manual doxygen
-all: build docs
 
 ##
 # Clean up.
@@ -214,9 +223,5 @@ clean-models:
 
 clean-all: clean clean-manual clean-models
 	$(RM) -r test/* bin
-	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o')
-	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/multivariate/continuous; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/multivariate/discrete; $(RM) *_generated_test.cpp
+	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f | sed 's#\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
 

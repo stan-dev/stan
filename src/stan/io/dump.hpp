@@ -8,7 +8,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <stdexcept>
 #include <boost/throw_exception.hpp>
+#include <boost/lexical_cast.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/io/var_context.hpp>
 
@@ -317,7 +319,7 @@ namespace stan {
                           std::vector<T> xs) {
         if (xs.size() != product(dims)) 
           BOOST_THROW_EXCEPTION(
-              std::invalid_argument("xs.size() != product(dims)"));
+              std::invalid_argument ("xs.size() != product(dims)"));
         write_structure(xs,dims);
       }
 
@@ -426,6 +428,7 @@ namespace stan {
      */
     class dump_reader {
     private:
+      std::string buf_;
       std::string name_;
       std::vector<int> stack_i_;
       std::vector<double> stack_r_;
@@ -494,6 +497,26 @@ namespace stan {
       }
 
 
+      bool scan_chars(const char *s, bool case_sensitive = true) {
+        for (size_t i = 0; s[i]; ++i) {
+          char c;
+          if (!(in_ >> c)) {
+            for (size_t j = 1; j < i; ++j) 
+              in_.putback(s[i-j]);
+            return false;
+          }
+          // all ASCII, so toupper is OK
+          if ((case_sensitive && c != s[i])
+              || (!case_sensitive && ::toupper(c) != ::toupper(s[i]))) {
+            in_.putback(c);
+            for (size_t j = 1; j < i; ++j) 
+              in_.putback(s[i-j]);
+            return false;
+          }
+        }
+        return true;
+      }
+
       bool scan_chars(std::string s, bool case_sensitive = true) {
         for (size_t i = 0; i < s.size(); ++i) {
           char c;
@@ -514,61 +537,118 @@ namespace stan {
         return true;
       }
 
-      bool scan_number(bool negate_val) {
+      size_t scan_dim() {
+        char c;
+        buf_.clear();
+        while (in_.get(c)) {
+          if (std::isspace(c)) continue;
+          if (std::isdigit(c)) {
+            buf_.push_back(c);
+          } else {
+            in_.putback(c);
+            break;
+          }
+        }
+        scan_optional_long();
+        size_t d = 0;
+        try {
+          d = boost::lexical_cast<size_t>(buf_);
+        }
+        catch ( const boost::bad_lexical_cast &exc ) {
+          std::string msg = "value " + buf_ + " beyond array dimension range";
+          BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+        }
+        return d;
+      }
 
+      int scan_int() {
+        char c;
+        buf_.clear();
+        while (in_.get(c)) {
+          if (std::isspace(c)) continue;
+          if (std::isdigit(c)) {
+            buf_.push_back(c);
+          } else {
+            in_.putback(c);
+            break;
+          }
+        }
+        return(get_int());
+      }
+
+      int get_int() {
+        int n = 0;
+        try {
+          n = boost::lexical_cast<int>(buf_);
+        }
+        catch ( const boost::bad_lexical_cast &exc ) {
+          std::string msg = "value " + buf_ + " beyond int range";
+          BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+        }
+        return n;
+      }
+
+      double scan_double() {
+        double x = 0;
+        try {
+          x = boost::lexical_cast<double>(buf_);
+        }
+        catch ( const boost::bad_lexical_cast &exc ) {
+          std::string msg = "value " + buf_ + " beyond numeric range";
+          BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+        }
+        return x;
+      }
+
+
+
+      // scan number stores number or throws bad lexical cast exception
+      void scan_number(bool negate_val) {
         // must take longest first!
         if (scan_chars("Inf")) { 
           scan_chars("inity"); // read past if there
           stack_r_.push_back(negate_val
                              ? -std::numeric_limits<double>::infinity()
                              : std::numeric_limits<double>::infinity());
-          return true;
+          return;
         }
         if (scan_chars("NaN",false)) {
           stack_r_.push_back(std::numeric_limits<double>::quiet_NaN());
-          return true;
+          return;
         }
 
         char c;
         bool is_double = false;
-        std::string buf;
+        buf_.clear();
         while (in_.get(c)) {
           if (std::isdigit(c)) { // before pre-scan || c == '-' || c == '+') {
-            buf.push_back(c);
+            buf_.push_back(c);
           } else if (c == '.'
                      || c == 'e'
                      || c == 'E'
                      || c == '-'
                      || c == '+') {
             is_double = true;
-            buf.push_back(c);
+            buf_.push_back(c);
           } else {
             in_.putback(c);
             break;
           }
         }
         if (!is_double && stack_r_.size() == 0) {
-          int n;
-          if (!(std::stringstream(buf) >> n))
-            return false;
+          int n = get_int();
           stack_i_.push_back(negate_val ? -n : n);
           scan_optional_long();
         } else {
           for (size_t j = 0; j < stack_i_.size(); ++j)
             stack_r_.push_back(static_cast<double>(stack_i_[j]));
-          // negate_val 
-          // ? -static_cast<double>(stack_i_[j])
-          // : static_cast<double>(stack_i_[j]));
           stack_i_.clear();
-          double x;
-          if (!(std::stringstream(buf) >> x))
-            return false;
+          double x = scan_double();
           stack_r_.push_back(negate_val ? -x : x);
         }
-        return true;
       }
 
-      bool scan_number() {
+      void scan_number() {
         char c;
         while (in_.get(c)) {
           if (std::isspace(c)) continue;
@@ -587,9 +667,9 @@ namespace stan {
           dims_.push_back(0U);
           return true;
         }
-        if (!scan_number()) return false;; // first entry
+        scan_number(); // first entry
         while (scan_char(',')) {
-          if (!scan_number()) return false;
+          scan_number();
         }
         dims_.push_back(stack_r_.size() + stack_i_.size());
         return scan_char(')');
@@ -600,17 +680,15 @@ namespace stan {
         if (scan_char('c')) { 
           scan_seq_value();
         } else {
-          size_t start;
-          in_ >> start;
+          int start = scan_int();
           if (!scan_char(':'))
             return false;
-          size_t end;
-          in_ >> end;
+          int end = scan_int();
           if (start <= end) {
-            for (size_t i = start; i <= end; ++i)
+            for (int i = start; i <= end; ++i)
               stack_i_.push_back(i);
           } else {
-            for (size_t i = start; i >= end; --i)
+            for (int i = start; i >= end; --i)
               stack_i_.push_back(i);
           }
         } 
@@ -621,23 +699,19 @@ namespace stan {
         if (!scan_char('=')) return false;
         if (scan_char('c')) {
           if (!scan_char('(')) return false;
-          size_t dim;
-          in_ >> dim;
-          scan_optional_long(); 
+          size_t dim = scan_dim();
           dims_.push_back(dim);
           while (scan_char(',')) {
-            in_ >> dim;
-            scan_optional_long(); 
+            dim = scan_dim();
             dims_.push_back(dim);
           }
           if (!scan_char(')')) return false;
-        } else {
-          size_t start;
-          in_ >> start;
+        } 
+        else {
+          size_t start = scan_dim();
           if (!scan_char(':'))
             return false;
-          size_t end;
-          in_ >> end;
+          size_t end = scan_dim();
           if (start < end) {
             for (size_t i = start; i <= end; ++i)
               dims_.push_back(i);
@@ -650,21 +724,17 @@ namespace stan {
         return true;
       }
 
-  
-
       bool scan_value() {
         if (scan_char('c'))
           return scan_seq_value();
         if (scan_chars("structure"))
           return scan_struct_value();
-        if (!scan_number()) 
-          return false;
+        scan_number();
         if (!scan_char(':'))
           return true;
         if (stack_i_.size() != 1)
           return false;
-        if (!scan_number())
-          return false; 
+        scan_number();
         if (stack_i_.size() != 2)
           return false;
         int start = stack_i_[0];
@@ -778,6 +848,7 @@ namespace stan {
        * further input may be read.
        *
        * @return Return <code>true</code> if a fresh variable was read.
+       * @throws bad_cast if bad number values encountered.
        */
       bool next() {
         stack_r_.clear();
@@ -790,8 +861,17 @@ namespace stan {
           return false;
         if (!scan_char('-')) 
           return false;
-        if (!scan_value()) // set stack_r_, stack_i_, dims_
-          return false;
+        try {
+          bool okSyntax = scan_value(); // set stack_r_, stack_i_, dims_
+          if (!okSyntax) {
+            std::string msg = "syntax error";
+            BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+          }
+        }
+        catch ( const std::invalid_argument &exc ) {
+          std::string msg = "data " + name_ + " " + exc.what();
+          BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+        }
         return true;
       }
   
