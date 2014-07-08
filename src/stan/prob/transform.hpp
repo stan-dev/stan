@@ -42,7 +42,7 @@ namespace stan {
       size_t pull = K - 1;
 
       if (K == 2) {
-        CPCs(0) = atanh(U(1,0));
+        CPCs(0) = atanh(U(0,1));
         return;
       }
 

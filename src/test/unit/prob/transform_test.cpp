@@ -490,6 +490,21 @@ TEST(prob_transform,corr_matrix_j) {
     EXPECT_FLOAT_EQ(x[i], xrt[i]);
   }
 }
+TEST(prob_transform,corr_matrix_j2x2) {
+  // tests K=2 boundary case, which has a different implementation
+  size_t K = 2;
+  size_t K_choose_2 = 1; 
+  Matrix<double,Dynamic,1> x(K_choose_2);
+  x << -1.3;
+  double lp = -12.9;
+  Matrix<double,Dynamic,Dynamic> y = stan::prob::corr_matrix_constrain(x,K,lp);
+  Matrix<double,Dynamic,1> xrt = stan::prob::corr_matrix_free(y);
+  EXPECT_EQ(x.size(), xrt.size());
+  for (Matrix<double,Dynamic,1>::size_type i = 0; i < x.size(); ++i) {
+    EXPECT_FLOAT_EQ(x[i], xrt[i]);
+  }
+}
+
 TEST(prob_transform,corr_matrix_constrain_exception) {
   unsigned int K = 4;
   unsigned int K_choose_2 = 6; 
@@ -1032,8 +1047,10 @@ TEST(ProbTransform,CholeskyCorrelationRoundTrips) {
 }
 
 
-void test_cholesky_correlation_jacobian(const Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>& y,
-                                        int K) {
+void 
+test_cholesky_correlation_jacobian(const Eigen::Matrix<stan::agrad::var,
+                                                       Eigen::Dynamic,1>& y,
+                                   int K) {
   using std::vector;
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -1115,8 +1132,6 @@ TEST(probTransform,factorU) {
   factor_U(U, CPCs);
   // test that function doesn't resize itself
   EXPECT_EQ(K - 1, CPCs.size());
-  for (int i = 0; i < CPCs.size(); ++i) {
-    // need tanh to get back to a CPC, which should be in (-1,1)
-    EXPECT_LE(std::tanh(std::fabs(CPCs(i))), 1.0);
-  }
+  for (int i = 0; i < CPCs.size(); ++i)
+    EXPECT_LE(std::tanh(std::fabs(CPCs(i))), 1.0) << CPCs(i);
 }
