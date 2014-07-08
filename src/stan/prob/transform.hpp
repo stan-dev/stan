@@ -72,16 +72,16 @@ namespace stan {
      * The transformations are hard coded as log for standard
      * deviations and Fisher transformations (atanh()) of CPCs
      *
-     * @param CPCs fill this unbounded
-     * @param sds fill this unbounded
-     * @param Sigma covariance matrix
+     * @param[in] Sigma covariance matrix
+     * @param[out] CPCs fill this unbounded (does not resize)
+     * @param[out] sds fill this unbounded (does not resize)
      * @return false if any of the diagonals of Sigma are 0
      */
     template<typename T>
     bool
-    factor_cov_matrix(Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
-              Eigen::Array<T,Eigen::Dynamic,1>& sds, 
-              const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+    factor_cov_matrix(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+                      Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
+                      Eigen::Array<T,Eigen::Dynamic,1>& sds) {
 
       size_t K = sds.rows();
 
@@ -1658,7 +1658,7 @@ namespace stan {
       size_type k_choose_2 = (k * (k-1)) / 2;
       Eigen::Array<T,Eigen::Dynamic,1> x(k_choose_2);
       Eigen::Array<T,Eigen::Dynamic,1> sds(k);
-      bool successful = factor_cov_matrix(x,sds,y);
+      bool successful = factor_cov_matrix(y,x,sds);
       if (!successful)
         throw std::runtime_error("factor_cov_matrix failed on y");
       for (size_type i = 0; i < k; ++i) {
@@ -1904,7 +1904,7 @@ namespace stan {
       size_type k_choose_2 = (k * (k-1)) / 2;
       Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       Eigen::Array<T,Eigen::Dynamic,1> sds(k);
-      bool successful = factor_cov_matrix(cpcs,sds,y);
+      bool successful = factor_cov_matrix(y,cpcs,sds);
       if (!successful)
         throw std::runtime_error ("factor_cov_matrix failed on y");
       Eigen::Matrix<T,Eigen::Dynamic,1> x(k_choose_2 + k);

@@ -424,7 +424,7 @@ namespace stan {
         typename matrix_t::size_type k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
         array_vec_t sds(k);
-        bool successful = stan::prob::factor_cov_matrix(cpcs,sds,y);
+        bool successful = stan::prob::factor_cov_matrix(y,cpcs,sds);
         if(!successful)
           BOOST_THROW_EXCEPTION(std::runtime_error ("factor_cov_matrix failed"));
         for (typename matrix_t::size_type i = 0; i < k_choose_2; ++i)
@@ -456,7 +456,7 @@ namespace stan {
         size_t k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
         array_vec_t sds(k);
-        bool successful = stan::prob::factor_cov_matrix(cpcs,sds,y);
+        bool successful = stan::prob::factor_cov_matrix(y,cpcs,sds);
         if (!successful)
           BOOST_THROW_EXCEPTION(std::runtime_error ("y cannot be factorized by factor_cov_matrix"));
         for (size_t i = 0; i < k; ++i) {
