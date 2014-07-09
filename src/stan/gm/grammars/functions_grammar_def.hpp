@@ -46,6 +46,22 @@ namespace stan {
 
   namespace gm {
 
+    struct validate_non_void_arg_function {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
+      void operator()(const expr_type& arg_type,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        if (arg_type.is_void()) {
+          error_msgs << "Functions cannot contain void argument types."
+                     << std::endl;
+          pass = false;
+        }
+        pass = true;
+      }
+    };
+    boost::phoenix::function<validate_non_void_arg_function> validate_non_void_arg_f;
+
     struct set_void_function {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef void type; };
@@ -340,9 +356,10 @@ namespace stan {
 
       arg_decl_r.name("function argument declaration");
       arg_decl_r 
-        %= bare_type_g
-        >> identifier_r
-        >> eps[ add_fun_var_f(_val,_pass,
+        %= bare_type_g [ validate_non_void_arg_f(_1, _pass, 
+                                                boost::phoenix::ref(error_msgs_)) ]
+        > identifier_r
+        > eps[ add_fun_var_f(_val,_pass,
                               boost::phoenix::ref(var_map_),
                               boost::phoenix::ref(error_msgs_)) ]
         ;

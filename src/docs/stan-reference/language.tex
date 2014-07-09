@@ -3290,6 +3290,9 @@ requires a different syntax than for declaring other variables.  The
 choice of language was made so that return types and argument types
 could use the same declaration syntax.
 
+The type \code{void} may not be used as an argument type, only a
+return type for a function with side effects.
+
 
 \subsection{Base Variable Type Declaration}
 
@@ -3514,7 +3517,9 @@ return as its final statement.
 \subsection{Void Functions}
 
 A function can be declared without a return value by using \code{void}
-in place of a return type.
+in place of a return type.  Note that the type \code{void} may only be
+used as a return type---arguments may not be declared to be of type
+\code{void}. 
 
 \subsection{Usage as Statement}
 
@@ -4328,10 +4333,11 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 {
 \small
 \begin{Verbatim}[fontsize=\small]
-funtion_decl ::= unsized_type identifier '(' unsized_types ')' statement
+funtion_decl ::= unsized_return_type identifier '(' unsized_types ')' statement
 
+unsized_return_type ::= 'void' | unsized_type
+unsized_type ::= (basic_type ?unsized_dims)
 unsized_types ::= unsized_type % ','
-unsized_type ::= 'void' | (basic_type ?unsized_dims)
 basic_type ::= 'int' | 'real' | 'vector' | 'row_vector' | 'matrix'
 unsized_dims ::= '['  ','*  ']'
 \end{Verbatim}
