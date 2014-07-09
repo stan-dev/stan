@@ -1597,9 +1597,9 @@ namespace stan {
         generate_indent(indent_,o_);
         o_ << '}' << EOL;
       }
+      // raise_exception:  check enclosing block?
       void operator()(const raise_exception_statement& ps) const {
         generate_indent(indent_,o_);
-        // should throw user-defined-error
         o_ << "throw std::domain_error(std::string(";
         for (size_t i = 0; i < ps.printables_.size(); ++i) {
           generate_printable(ps.printables_[i],o_);
