@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8)
 
 project(Stan C CXX)
 set(Stan_VERSION_MAJOR "2")
-set(Stan_VERSION_MINOR "2")
+set(Stan_VERSION_MINOR "3")
 set(Stan_VERSION_PATCH "0")
 set(Stan_VERSION "${Stan_VERSION_MAJOR}.${Stan_VERSION_MINOR}.${Stan_VERSION_PATCH}")
 
@@ -117,17 +117,17 @@ else()
 endif()
 
 # stanc
-set(STANC_SRCS ${PROJECT_SOURCE_DIR}/src/stan/command/stanc.cpp)
-add_executable(stanc-bin ${STANC_SRCS})
-set_target_properties(stanc-bin PROPERTIES OUTPUT_NAME stanc)
-target_link_libraries(stanc-bin stanc)
-set(STANC_BIN ${CMAKE_CURRENT_BINARY_DIR}/stanc)
+#set(STANC_SRCS ${PROJECT_SOURCE_DIR}/src/stan/command/stanc.cpp)
+#add_executable(stanc-bin ${STANC_SRCS})
+#set_target_properties(stanc-bin PROPERTIES OUTPUT_NAME stanc)
+#target_link_libraries(stanc-bin stanc)
+#set(STANC_BIN ${CMAKE_CURRENT_BINARY_DIR}/stanc)
 
 # print 
-set(PRINT_SRCS ${PROJECT_SOURCE_DIR}/src/stan/command/print.cpp)
-add_executable(print ${PRINT_SRCS})
-target_link_libraries(print stan)
-set(PRINT_BIN ${CMAKE_CURRENT_BINARY_DIR}/print)
+#set(PRINT_SRCS ${PROJECT_SOURCE_DIR}/src/stan/command/print.cpp)
+#add_executable(print ${PRINT_SRCS})
+#target_link_libraries(print stan)
+#set(PRINT_BIN ${CMAKE_CURRENT_BINARY_DIR}/print)
 
 # unit tests
 include(CTest)
