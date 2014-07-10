@@ -5,8 +5,8 @@
 #include <stan/agrad/rev/var.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_square.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/agrad/rev/matrix/trace_inv_quad_form_ldlt.hpp>
 
 namespace stan {
@@ -26,9 +26,12 @@ namespace stan {
                                  const stan::math::LDLT_factor<T2,R2,C2> &A,
                                  const Eigen::Matrix<T3,R3,C3> &B)
     {
-      stan::math::validate_square(D,"trace_gen_inv_quad_form_ldlt");
-      stan::math::validate_multiplicable(A,B,"trace_gen_inv_quad_form_ldlt");
-      stan::math::validate_multiplicable(B,D,"trace_gen_inv_quad_form_ldlt");
+      stan::math::check_square("trace_gen_inv_quad_form_ldlt(%1%)",D,"D",
+                               (double*)0);
+      stan::math::check_multiplicable("trace_gen_inv_quad_form_ldlt(%1%)",A,"A",
+                                      B,"B",(double*)0);
+      stan::math::check_multiplicable("trace_gen_inv_quad_form_ldlt(%1%)",B,"B",
+                                      D,"D",(double*)0);
       
       trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3> *_impl = new trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3>(D,A,B);
       

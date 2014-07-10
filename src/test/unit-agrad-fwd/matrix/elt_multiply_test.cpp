@@ -1,7 +1,9 @@
-#include <stan/math/matrix/elt_multiply.hpp>
 #include <gtest/gtest.h>
+#include <stan/math/matrix/elt_multiply.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
 
@@ -1242,6 +1244,8 @@ TEST(AgradFwdMatrixEltMultiply,ffv_vec_vd_3rdDeriv) {
 
   fvar<fvar<var> > a(2.0,1.0);
   fvar<fvar<var> > b(5.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
 
   vector_ffv x(2);
   x << a,b;
@@ -1338,6 +1342,8 @@ TEST(AgradFwdMatrixEltMultiply,ffv_vec_dv_3rdDeriv) {
 
   fvar<fvar<var> > c(10.0,1.0);
   fvar<fvar<var> > d(100.0,1.0);
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
 
   vector_d x(2);
   x << 2, 5;
@@ -1542,6 +1548,8 @@ TEST(AgradFwdMatrixEltMultiply,ffv_row_vec_vd_3rdDeriv) {
 
   fvar<fvar<var> > a(2.0,1.0);
   fvar<fvar<var> > b(5.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
 
   row_vector_ffv x(2);
   x << a,b;
@@ -1638,6 +1646,8 @@ TEST(AgradFwdMatrixEltMultiply,ffv_row_vec_dv_3rdDeriv) {
 
   fvar<fvar<var> > c(10.0,1.0);
   fvar<fvar<var> > d(100.0,1.0);
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
 
   row_vector_d x(2);
   x << 2, 5;
@@ -1999,6 +2009,12 @@ TEST(AgradFwdMatrixEltMultiply,ffv_matrix_vd_3rdDeriv) {
   fvar<fvar<var> > d(9.0,1.0);
   fvar<fvar<var> > e(13.0,1.0);
   fvar<fvar<var> > f(29.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   matrix_ffv x(2,3);
   x << a,b,c,d,e,f;
@@ -2135,6 +2151,12 @@ TEST(AgradFwdMatrixEltMultiply,ffv_matrix_dv_3rdDeriv) {
   fvar<fvar<var> > j(10000.0,1.0);
   fvar<fvar<var> > k(100000.0,1.0);
   fvar<fvar<var> > l(1000000.0,1.0);
+  g.val_.d_ = 1.0;
+  h.val_.d_ = 1.0;
+  i.val_.d_ = 1.0;
+  j.val_.d_ = 1.0;
+  k.val_.d_ = 1.0;
+  l.val_.d_ = 1.0;
 
   matrix_d x(2,3);
   x << 2, 5, 6, 9, 13, 29;

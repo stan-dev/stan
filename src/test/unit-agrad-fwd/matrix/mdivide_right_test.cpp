@@ -610,10 +610,14 @@ TEST(AgradFwdMatrixMdivideRight,ffv_matrix_matrix_3rdDeriv) {
 
   Av << 2.0, 3.0, 
     5.0, 7.0;
-  Av(0,0).d_ = 2.0;
-  Av(0,1).d_ = 2.0;
-  Av(1,0).d_ = 2.0;
-  Av(1,1).d_ = 2.0;
+  Av(0,0).d_ = 1.0;
+  Av(0,1).d_ = 1.0;
+  Av(1,0).d_ = 1.0;
+  Av(1,1).d_ = 1.0;
+  Av(0,0).val_.d_ = 1.0;
+  Av(0,1).val_.d_ = 1.0;
+  Av(1,0).val_.d_ = 1.0;
+  Av(1,1).val_.d_ = 1.0;
   Ad << 2.0, 3.0, 
     5.0, 7.0;
 
@@ -622,10 +626,10 @@ TEST(AgradFwdMatrixMdivideRight,ffv_matrix_matrix_3rdDeriv) {
   AVEC q = createAVEC(Av(0,0).val().val(),Av(0,1).val().val(),Av(1,0).val().val(),Av(1,1).val().val());
   VEC h;
   I(0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
-  EXPECT_FLOAT_EQ(0,h[1]);
-  EXPECT_FLOAT_EQ(0,h[2]);
-  EXPECT_FLOAT_EQ(0,h[3]);
+  EXPECT_FLOAT_EQ(76,h[0]);
+  EXPECT_FLOAT_EQ(-56,h[1]);
+  EXPECT_FLOAT_EQ(-30,h[2]);
+  EXPECT_FLOAT_EQ(22,h[3]);
 }
 TEST(AgradFwdMatrixMdivideRight,ffv_matrix_rowvector_1stDeriv) {
   using stan::math::matrix_d;
@@ -737,8 +741,10 @@ TEST(AgradFwdMatrixMdivideRight,ffv_matrix_rowvector_3rdDeriv) {
 
   row_vector_ffv vecf(2);
   vecf << 5, 6;
-  vecf(0).d_ = 2.0;
-  vecf(1).d_ = 2.0;
+  vecf(0).d_ = 1.0;
+  vecf(1).d_ = 1.0;
+  vecf(0).val_.d_ = 1.0;
+  vecf(1).val_.d_ = 1.0;
 
   matrix_ffv output;
   output = mdivide_right(vecf,dv);

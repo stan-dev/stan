@@ -156,15 +156,16 @@ TEST(AgradFwdPhi, FvarFvarVar_3rdDeriv) {
   using stan::agrad::var;
 
   fvar<fvar<var> > x;
-  x.val_.val_ = 1.0;
+  x.val_.val_ = 2.0;
   x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
 
   fvar<fvar<var> > a = Phi(x);
 
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(0.1619729, g[0]);
 }
 
 double fun_value_of(double x) { return x; }

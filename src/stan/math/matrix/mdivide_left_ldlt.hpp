@@ -3,7 +3,7 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 
 namespace stan {
   namespace math {
@@ -20,7 +20,8 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2>
     mdivide_left_ldlt(const stan::math::LDLT_factor<double,R1,C1> &A,
                       const Eigen::Matrix<double,R2,C2> &b) {
-      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
+      stan::math::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
+                                      b,"b",(double*)0);
       
       return A.solve(b);
     }

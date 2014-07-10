@@ -3,9 +3,9 @@
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_column_index.hpp>
-#include <stan/math/matrix/validate_row_index.hpp>
-#include <stan/math/matrix/validate_std_vector_index.hpp>
+#include <stan/math/error_handling/matrix/check_column_index.hpp>
+#include <stan/math/error_handling/matrix/check_row_index.hpp>
+#include <stan/math/error_handling/matrix/check_std_vector_index.hpp>
 
 namespace stan {
   namespace math {
@@ -20,7 +20,7 @@ namespace stan {
     tail(const Eigen::Matrix<T,Eigen::Dynamic,1>& v,
          size_t n) {
       if (n != 0)
-        validate_row_index(v, v.size() - n + 1, "tail");
+        stan::math::check_row_index("tail(%1%)",n,v,"n",(double*)0);
       return v.tail(n);
     }
 
@@ -35,7 +35,7 @@ namespace stan {
     tail(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv,
          size_t n) {
       if (n != 0)
-        validate_column_index(rv, rv.size() - n + 1, "tail");
+        stan::math::check_column_index("tail(%1%)",n,rv,"n",(double*)0);
       return rv.tail(n);
     }
 
@@ -43,7 +43,7 @@ namespace stan {
     std::vector<T> tail(const std::vector<T>& sv,
                         size_t n) {
       if (n != 0)
-        validate_std_vector_index(sv, sv.size() - n + 1, "tail");
+        stan::math::check_std_vector_index("tail(%1%)",n,sv,"n",(double*)0);
       std::vector<T> s;
       for (typename std::vector<T>::size_type i = sv.size() - n; i < sv.size(); ++i)
         s.push_back(sv[i]);

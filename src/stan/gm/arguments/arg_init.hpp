@@ -20,7 +20,7 @@ namespace stan {
         _default = "\"2\"";
         _default_value = "2";
         _constrained = false;
-        _good_value = "../src/test/test-models/compiled/CmdStan/test_model.init.R";
+        _good_value = "../src/test/test-models/test_model.init.R";
         _value = _default_value;
       };
       

@@ -3,7 +3,7 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <boost/shared_ptr.hpp>
-#include <stan/math/matrix/validate_square.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace math {
@@ -65,7 +65,7 @@ namespace stan {
       }
       
       inline void compute(const Eigen::Matrix<double,R,C> &A) {
-        stan::math::validate_square(A,"LDLT_factor<double>::compute");
+        stan::math::check_square("LDLT_factor(%1%)",A,"A",(double*)0);
         N_ = A.rows();
         _ldltP->compute(A);
       }
@@ -105,6 +105,7 @@ namespace stan {
       inline size_t cols() const { return N_; }
       
       typedef size_t size_type;
+      typedef double value_type;
 
       size_t N_;
       boost::shared_ptr< Eigen::LDLT< Eigen::Matrix<double,R,C> > > _ldltP;

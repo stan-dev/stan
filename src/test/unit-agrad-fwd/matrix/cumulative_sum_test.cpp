@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
+#include <stan/math/matrix/cumulative_sum.hpp>
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <stan/math/matrix/cumulative_sum.hpp>
 
 template <typename T>
 void test_cumulative_sum() {
@@ -207,7 +209,7 @@ TEST(AgradFwdMatrixCumulativeSum, ffd) {
   test_cumulative_sum3<Eigen::Matrix<fvar<fvar<double> >,1,Eigen::Dynamic> >();
 }
 
-TEST(AgradFwdMatrixCumulativeSum, fvv) {
+TEST(AgradFwdMatrixCumulativeSum, ffv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::cumulative_sum;

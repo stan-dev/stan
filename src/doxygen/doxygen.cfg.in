@@ -196,6 +196,7 @@ TAB_SIZE               = 8
 # You can put \n's in the value part of an alias to insert newlines.
 
 ALIASES                = "error_policy=@par Error Policy: \n See @ref policy_page for details. Conditions: @li All parameters must not be NaN."
+ALIASES               += "sideeffects=@par Side effects: "
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding

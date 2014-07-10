@@ -34,9 +34,5 @@ TEST(ProbAutocovariance,test1) {
    EXPECT_NEAR(1.38, ac[3], 0.01);
    EXPECT_NEAR(1.10, ac[4], 0.01);
    EXPECT_NEAR(0.90, ac[5], 0.01);
-
-   // std::cout << "ac.size()=" << ac.size() << std::endl;
-   // for (size_t n = 0; n < ac.size(); ++n)
-   //     std::cout << "ac[" << n << "]=" << ac[n] << std::endl;
 }
 

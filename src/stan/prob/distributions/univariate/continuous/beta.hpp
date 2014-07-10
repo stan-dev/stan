@@ -72,26 +72,18 @@ namespace stan {
       double logp(0.0);
       
       // validate args (here done over var, which should be OK)
-      if (!check_finite(function, alpha, "First shape parameter", &logp))
-        return logp;
-      if (!check_positive(function, alpha, "First shape parameter", &logp))
-        return logp;
-      if (!check_finite(function, beta, "Second shape parameter", &logp))
-        return logp;
-      if (!check_positive(function, beta, "Second shape parameter", &logp))
-        return logp;
-      if (!check_not_nan(function, y, "Random variable", &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   y,alpha,beta,
-                                   "Random variable","First shape parameter",
-                                   "Second shape parameter",
-                                   &logp)))
-        return logp;
-      if (!check_nonnegative(function, y, "Random variable", &logp))
-        return logp;
-      if (!check_less_or_equal(function, y, 1,"Random variable", &logp))
-        return logp;
+      check_finite(function, alpha, "First shape parameter", &logp);
+      check_positive(function, alpha, "First shape parameter", &logp);
+      check_finite(function, beta, "Second shape parameter", &logp);
+      check_positive(function, beta, "Second shape parameter", &logp);
+      check_not_nan(function, y, "Random variable", &logp);
+      check_consistent_sizes(function,
+                             y,alpha,beta,
+                             "Random variable","First shape parameter",
+                             "Second shape parameter",
+                             &logp);
+      check_nonnegative(function, y, "Random variable", &logp);
+      check_less_or_equal(function, y, 1,"Random variable", &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_scale_succ,T_scale_fail>::value)
@@ -243,24 +235,16 @@ namespace stan {
       
       double P(1.0);
         
-      if (!check_finite(function, alpha, "First shape parameter", &P))
-        return P;
-      if (!check_positive(function, alpha, "First shape parameter", &P))
-        return P;
-      if (!check_finite(function, beta, "Second shape parameter", &P))
-        return P;
-      if (!check_positive(function, beta, "Second shape parameter", &P))
-        return P;
-      if (!check_not_nan(function, y, "Random variable", &P))
-        return P;
-      if (!(check_consistent_sizes(function, y, alpha, beta,
-                                   "Random variable", "Shape parameter", 
-                                   "Scale Parameter", &P)))
-        return P;
-      if (!check_nonnegative(function, y, "Random variable", &P))
-        return P;
-      if (!check_less_or_equal(function, y, 1,"Random variable", &P))
-        return P;
+      check_finite(function, alpha, "First shape parameter", &P);
+      check_positive(function, alpha, "First shape parameter", &P);
+      check_finite(function, beta, "Second shape parameter", &P);
+      check_positive(function, beta, "Second shape parameter", &P);
+      check_not_nan(function, y, "Random variable", &P);
+      check_consistent_sizes(function, y, alpha, beta,
+                             "Random variable", "Shape parameter", 
+                             "Scale Parameter", &P);
+      check_nonnegative(function, y, "Random variable", &P);
+      check_less_or_equal(function, y, 1,"Random variable", &P);
 
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -399,24 +383,16 @@ namespace stan {
       
       double cdf_log(0.0);
         
-      if (!check_finite(function, alpha, "First shape parameter", &cdf_log))
-        return cdf_log;
-      if (!check_positive(function, alpha, "First shape parameter", &cdf_log))
-        return cdf_log;
-      if (!check_finite(function, beta, "Second shape parameter", &cdf_log))
-        return cdf_log;
-      if (!check_positive(function, beta, "Second shape parameter", &cdf_log))
-        return cdf_log;
-      if (!check_not_nan(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if (!check_nonnegative(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if (!check_less_or_equal(function, y, 1,"Random variable", &cdf_log))
-        return cdf_log;
-      if (!(check_consistent_sizes(function, y, alpha, beta,
-                                   "Random variable", "Shape parameter", 
-                                   "Scale Parameter", &cdf_log)))
-        return cdf_log;
+      check_finite(function, alpha, "First shape parameter", &cdf_log);
+      check_positive(function, alpha, "First shape parameter", &cdf_log);
+      check_finite(function, beta, "Second shape parameter", &cdf_log);
+      check_positive(function, beta, "Second shape parameter", &cdf_log);
+      check_not_nan(function, y, "Random variable", &cdf_log);
+      check_nonnegative(function, y, "Random variable", &cdf_log);
+      check_less_or_equal(function, y, 1,"Random variable", &cdf_log);
+      check_consistent_sizes(function, y, alpha, beta,
+                             "Random variable", "Shape parameter", 
+                             "Scale Parameter", &cdf_log);
       
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -528,24 +504,16 @@ namespace stan {
       
       double ccdf_log(0.0);
         
-      if (!check_finite(function, alpha, "First shape parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_positive(function, alpha, "First shape parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_finite(function, beta, "Second shape parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_positive(function, beta, "Second shape parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_not_nan(function, y, "Random variable", &ccdf_log))
-        return ccdf_log;
-      if (!check_nonnegative(function, y, "Random variable", &ccdf_log))
-        return ccdf_log;
-      if (!check_less_or_equal(function, y, 1,"Random variable", &ccdf_log))
-        return ccdf_log;
-      if (!(check_consistent_sizes(function, y, alpha, beta,
-                                   "Random variable", "Shape parameter", 
-                                   "Scale Parameter", &ccdf_log)))
-        return ccdf_log;
+      check_finite(function, alpha, "First shape parameter", &ccdf_log);
+      check_positive(function, alpha, "First shape parameter", &ccdf_log);
+      check_finite(function, beta, "Second shape parameter", &ccdf_log);
+      check_positive(function, beta, "Second shape parameter", &ccdf_log);
+      check_not_nan(function, y, "Random variable", &ccdf_log);
+      check_nonnegative(function, y, "Random variable", &ccdf_log);
+      check_less_or_equal(function, y, 1,"Random variable", &ccdf_log);
+      check_consistent_sizes(function, y, alpha, beta,
+                             "Random variable", "Shape parameter", 
+                             "Scale Parameter", &ccdf_log);
       
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -642,18 +610,11 @@ namespace stan {
 
       using stan::math::check_positive;
       using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less_or_equal;
         
-      if (!check_finite(function, alpha, "First shape parameter"))
-        return 0;
-      if (!check_positive(function, alpha, "First shape parameter"))
-        return 0;
-      if (!check_finite(function, beta, "Second shape parameter"))
-        return 0;
-      if (!check_positive(function, beta, "Second shape parameter"))
-        return 0;
+      check_finite(function, alpha, "First shape parameter", (double*)0);
+      check_positive(function, alpha, "First shape parameter", (double*)0);
+      check_finite(function, beta, "Second shape parameter", (double*)0);
+      check_positive(function, beta, "Second shape parameter", (double*)0);
 
       variate_generator<RNG&, gamma_distribution<> >
         rng_gamma_alpha(rng, gamma_distribution<>(alpha, 1.0));

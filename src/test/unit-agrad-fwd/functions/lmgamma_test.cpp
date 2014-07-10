@@ -140,11 +140,12 @@ TEST(AgradFwdLmgamma,FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > x;
   x.val_.val_ = 3.2;
   x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
 
   fvar<fvar<var> > a = stan::math::lmgamma(3,x);
 
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(-0.65043455, g[0]);
 }

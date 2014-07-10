@@ -60,20 +60,14 @@ namespace stan {
       double logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      if (!check_not_nan(function, y, "Random variable", &logp))
-        return logp;
-      if (!check_finite(function, mu, "Location parameter", 
-                        &logp))
-        return logp;
-      if (!check_positive(function, sigma, "Scale parameter", 
-                          &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   y,mu,sigma,
-                                   "Random variable","Location parameter","Scale parameter",
-                                   &logp)))
-        return logp;
-
+      check_not_nan(function, y, "Random variable", &logp);
+      check_finite(function, mu, "Location parameter", &logp);
+      check_positive(function, sigma, "Scale parameter", &logp);
+      check_consistent_sizes(function,
+                             y,mu,sigma,
+                             "Random variable","Location parameter",
+                             "Scale parameter",
+                             &logp);
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_loc,T_scale>::value)
         return 0.0;
@@ -163,6 +157,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
+      using stan::math::INV_SQRT_2;
 
       double cdf(1.0);
 
@@ -172,22 +167,15 @@ namespace stan {
             && stan::length(sigma)))
         return cdf;
 
-      if (!check_not_nan(function, y, "Random variable", &cdf))
-        return cdf;
-      if (!check_finite(function, mu, "Location parameter", &cdf))
-        return cdf;
-      if (!check_not_nan(function, sigma, "Scale parameter", 
-                         &cdf))
-        return cdf;
-      if (!check_positive(function, sigma, "Scale parameter", 
-                          &cdf))
-        return cdf;
-      if (!(check_consistent_sizes(function,
-                                   y,mu,sigma,
-                                   "Random variable","Location parameter",
-                                   "Scale parameter",
-                                   &cdf)))
-        return cdf;
+      check_not_nan(function, y, "Random variable", &cdf);
+      check_finite(function, mu, "Location parameter", &cdf);
+      check_not_nan(function, sigma, "Scale parameter", &cdf);
+      check_positive(function, sigma, "Scale parameter", &cdf);
+      check_consistent_sizes(function,
+                             y,mu,sigma,
+                             "Random variable","Location parameter",
+                             "Scale parameter",
+                             &cdf);
 
      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
        operands_and_partials(y, mu, sigma);
@@ -203,7 +191,15 @@ namespace stan {
         const double mu_dbl = value_of(mu_vec[n]);
         const double sigma_dbl = value_of(sigma_vec[n]);
         const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
-        const double cdf_ = 0.5 * (1.0 + erf(scaled_diff));
+        double cdf_;
+        if (scaled_diff < -37.5 * INV_SQRT_2)
+          cdf_ = 0.0;
+        else if (scaled_diff < -5.0 * INV_SQRT_2)
+          cdf_ = 0.5 * erfc(-scaled_diff);
+        else if (scaled_diff > 8.25 * INV_SQRT_2)
+          cdf_ = 1;
+        else
+          cdf_ = 0.5 * (1.0 + erf(scaled_diff));
 
         // cdf
         cdf *= cdf_;
@@ -242,6 +238,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
+      using stan::math::INV_SQRT_2;
 
       double cdf_log(0.0);
       // check if any vectors are zero length
@@ -250,21 +247,14 @@ namespace stan {
             && stan::length(sigma)))
         return cdf_log;
 
-      if (!check_not_nan(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if (!check_finite(function, mu, "Location parameter", &cdf_log))
-        return cdf_log;
-      if (!check_not_nan(function, sigma, "Scale parameter", 
-                         &cdf_log))
-        return cdf_log;
-      if (!check_positive(function, sigma, "Scale parameter", 
-                          &cdf_log))
-        return cdf_log;
-      if (!(check_consistent_sizes(function,
-                                   y,mu,sigma,
-                                   "Random variable","Location parameter",
-                                   "Scale parameter", &cdf_log)))
-        return cdf_log;
+      check_not_nan(function, y, "Random variable", &cdf_log);
+      check_finite(function, mu, "Location parameter", &cdf_log);
+      check_not_nan(function, sigma, "Scale parameter", &cdf_log);
+      check_positive(function, sigma, "Scale parameter", &cdf_log);
+      check_consistent_sizes(function,
+                             y,mu,sigma,
+                             "Random variable","Location parameter",
+                             "Scale parameter", &cdf_log);
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
@@ -283,7 +273,16 @@ namespace stan {
 
         const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
         
-        const double one_p_erf = 1.0 + erf(scaled_diff);
+        double one_p_erf;
+        if (scaled_diff < -37.5 * INV_SQRT_2)
+          one_p_erf = 0.0;
+        else if (scaled_diff < -5.0 * INV_SQRT_2)
+          one_p_erf =  erfc(-scaled_diff);
+        else if (scaled_diff > 8.25 * INV_SQRT_2)
+          one_p_erf = 2.0;
+        else
+          one_p_erf = 1.0 + erf(scaled_diff);
+
         // log cdf
         cdf_log += log_half + log(one_p_erf);
 
@@ -311,6 +310,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
+      using stan::math::INV_SQRT_2;
 
       double ccdf_log(0.0);
       // check if any vectors are zero length
@@ -319,21 +319,14 @@ namespace stan {
             && stan::length(sigma)))
         return ccdf_log;
 
-      if (!check_not_nan(function, y, "Random variable", &ccdf_log))
-        return ccdf_log;
-      if (!check_finite(function, mu, "Location parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_not_nan(function, sigma, "Scale parameter", 
-                         &ccdf_log))
-        return ccdf_log;
-      if (!check_positive(function, sigma, "Scale parameter", 
-                          &ccdf_log))
-        return ccdf_log;
-      if (!(check_consistent_sizes(function,
-                                   y,mu,sigma,
-                                   "Random variable","Location parameter",
-                                   "Scale parameter", &ccdf_log)))
-        return ccdf_log;
+      check_not_nan(function, y, "Random variable", &ccdf_log);
+      check_finite(function, mu, "Location parameter", &ccdf_log);
+      check_not_nan(function, sigma, "Scale parameter", &ccdf_log);
+      check_positive(function, sigma, "Scale parameter", &ccdf_log);
+      check_consistent_sizes(function,
+                             y,mu,sigma,
+                             "Random variable","Location parameter",
+                             "Scale parameter", &ccdf_log);
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
@@ -352,7 +345,16 @@ namespace stan {
 
         const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
         
-        const double one_m_erf = 1.0 - erf(scaled_diff);
+        double one_m_erf;
+        if (scaled_diff < -37.5 * INV_SQRT_2)
+          one_m_erf = 2.0;
+        else if (scaled_diff < -5.0 * INV_SQRT_2)
+          one_m_erf =  2.0 - erfc(-scaled_diff);
+        else if (scaled_diff > 8.25 * INV_SQRT_2)
+          one_m_erf = 0.0;
+        else
+          one_m_erf = 1.0 - erf(scaled_diff);
+
         // log ccdf
         ccdf_log += log_half + log(one_m_erf);
 
@@ -383,14 +385,10 @@ namespace stan {
 
       static const char* function = "stan::prob::normal_rng(%1%)";
 
-      if (!check_finite(function, mu, "Location parameter"))
-        return 0;
-      if (!check_not_nan(function, mu, "Location parameter"))
-        return 0;
-      if (!check_positive(function, sigma, "Scale parameter"))
-        return 0;
-       if (!check_not_nan(function, sigma, "Scale parameter"))
-        return 0;
+      check_finite(function, mu, "Location parameter", (double*)0);
+      check_not_nan(function, mu, "Location parameter", (double*)0);
+      check_positive(function, sigma, "Scale parameter", (double*)0);
+      check_not_nan(function, sigma, "Scale parameter", (double*)0);
 
       variate_generator<RNG&, normal_distribution<> >
         norm_rng(rng, normal_distribution<>(mu, sigma));
