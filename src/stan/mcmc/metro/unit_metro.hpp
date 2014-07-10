@@ -21,10 +21,10 @@ namespace stan {
         this->_nom_epsilon = 1;
       }
 
-      void propose(std::vector<double>& q,
-                    BaseRNG& rng) {
+      void propose(Eigen::VectorXd& q,
+                   BaseRNG& rng) {
         for (size_t i = 0; i < q.size(); ++i) 
-          q[i] += this->_nom_epsilon * stan::prob::normal_rng(0.0,1.0,
+          q(i) += this->_nom_epsilon * stan::prob::normal_rng(0.0,1.0,
                                                               this->_rand_int);
       }
 

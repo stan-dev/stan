@@ -24,7 +24,6 @@ namespace stan {
         : base_mcmc(o,e), 
           _model(m),
           _params_r(m.num_params_r()),
-          _params_i(m.num_params_i()),
           _rand_int(rng),
           _rand_uniform(_rand_int),
           _nom_epsilon(0.1),
@@ -33,7 +32,7 @@ namespace stan {
  
       ~base_metro() {};
 
-      virtual void propose(std::vector<double>& q, BaseRNG& rng) = 0;
+      virtual void propose(Eigen::VectorXd& q, BaseRNG& rng) = 0;
       virtual void write_metric(std::ostream* o) = 0;
 
       void write_sampler_state(std::ostream* o) {
@@ -51,9 +50,8 @@ namespace stan {
         this->get_params(values);
       };
 
-      void seed(const std::vector<double>& q, const std::vector<int>& r) {
+      void seed(const Eigen::VectorXd& q) {
         _params_r = q;
-        _params_i = r;
       }     
 
      sample transition(sample& init_sample) {
@@ -84,24 +82,23 @@ namespace stan {
                      accept_prob);
      }
 
-      double log_prob(std::vector<double>& q, std::vector<int>& r) {
+      double log_prob(Eigen::VectorXd& q) {
         try {
-          _model.stan::model::prob_grad_ad::log_prob(q, r, this->_err_stream);
+          _model.template log_prob<false,true>(q, this->_err_stream);
         } catch (std::domain_error e) {
           this->_write_error_msg(this->_err_stream, e);
           return std::numeric_limits<double>::infinity();
         }
-        return _model.stan::model::prob_grad_ad::log_prob(q, r, this->_err_stream);
+        return _model.template log_prob<false,true>(q, this->_err_stream);
       }
 
       void init_stepsize() {
-        std::vector<double> params_r0(this->_params_r);
-        std::vector<int> params_i0(_params_i);
+        Eigen::VectorXd params_r0(this->_params_r);
 
-        double log_p0 = log_prob(this->_params_r,_params_i);
+        double log_p0 = log_prob(this->_params_r);
 
         this->propose(this->_params_r, _rand_int); 
-        double log_p = log_prob(this->_params_r,_params_i);
+        double log_p = log_prob(this->_params_r);
 
         if (boost::math::isnan(log_p)) 
           log_p = std::numeric_limits<double>::infinity();
@@ -113,7 +110,7 @@ namespace stan {
           this->seed(params_r0, params_i0);
           
           this->propose(this->_params_r, _rand_int); 
-          log_p = log_prob(this->_params_r,_params_i);
+          log_p = log_prob(this->_params_r);
                
           delta_log_p = log_p - log_p0;
 
@@ -133,13 +130,13 @@ namespace stan {
         }        
       }      
 
-      virtual void get_params(std::vector<double>& values) {
+      void get_params(std::vector<double>& values) {
         for(size_t i = 0; i < _params_r.size(); ++i)
           values.push_back(_params_r.at(i));
        }
       
-      virtual void get_param_names(std::vector<std::string>& model_names,
-                                   std::vector<std::string>& names) {
+      void get_param_names(std::vector<std::string>& model_names,
+                           std::vector<std::string>& names) {
         for(size_t i = 0; i < _params_r.size(); ++i)
           names.push_back(model_names.at(i));
        }
@@ -160,7 +157,7 @@ namespace stan {
         values.push_back(this->_epsilon);
       }
       
-      virtual void set_nominal_stepsize(const double e) {
+      void set_nominal_stepsize(const double e) {
         if(e > 0) _nom_epsilon = e;
       }
       
@@ -168,7 +165,7 @@ namespace stan {
       
       double get_current_stepsize() { return this->_epsilon; }
       
-      virtual void set_stepsize_jitter(const double j) {
+      void set_stepsize_jitter(const double j) {
         if(j > 0 && j < 1) _epsilon_jitter = j;
       }
       
@@ -179,7 +176,6 @@ namespace stan {
       M _model;
 
       std::vector<double> _params_r;
-      std::vector<int> _params_i;
 
       BaseRNG& _rand_int;
       boost::uniform_01<BaseRNG&> _rand_uniform;                

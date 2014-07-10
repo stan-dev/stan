@@ -24,17 +24,14 @@ namespace stan {
         this->_nom_epsilon = 1;
       }
 
-      void propose(std::vector<double>& q,
+      void propose(Eigen::VectorXd& q,
                    BaseRNG& rng) {
         Eigen::VectorXd prop(q.size());
         
         for(size_t  i = 0; i < q.size(); i++)
           prop(i) = stan::prob::normal_rng(0.0, 1.0, rng);
         
-        prop = _prop_cov.llt().matrixL().solve(prop);
-        
-        for(size_t i = 0; i < q.size(); i++)
-          q[i] += this->_nom_epsilon * prop(i);
+        q += this->_nom_epsilon * _prop_cov.llt().matrixL().solve(prop);
       }                 
                    
       void write_metric(std::ostream* o) {
