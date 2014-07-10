@@ -24,7 +24,7 @@ option(BUILD_DOXYGEN_DOCS
        "Whether the doxygen-based documentation should be generated"
        ON)
 option(BUILD_REFERENCE_MANUAL
-       "Whether the Stan reference manual"
+       "Whether the Stan reference manual should be built"
        ON)
 
 if(BUILD_REFERENCE_MANUAL)
