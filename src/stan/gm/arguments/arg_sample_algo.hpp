@@ -5,6 +5,9 @@
 
 #include <stan/gm/arguments/arg_hmc.hpp>
 #include <stan/gm/arguments/arg_fixed_param.hpp>
+#include <stan/gm/arguments/arg_adapt_unit_metro.hpp>
+#include <stan/gm/arguments/arg_adapt_diag_metro.hpp>
+#include <stan/gm/arguments/arg_adapt_dense_metro.hpp>
 
 namespace stan {
   
@@ -21,6 +24,9 @@ namespace stan {
         
         _values.push_back(new arg_hmc());
         _values.push_back(new arg_fixed_param());
+        _values.push_back(new arg_adapt_unit_metro());
+        _values.push_back(new arg_adapt_diag_metro());
+        _values.push_back(new arg_adapt_dense_metro());
         
         _default_cursor = 0;
         _cursor = _default_cursor;
