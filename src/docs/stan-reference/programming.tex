@@ -94,7 +94,7 @@ It is surprising how often the solution to a debugging or design
 problem occurs when trying to explain enough about the problem to
 someone else to get help.  This can be on a mailing list, but it works
 best person-to-person.  Finding the solution to your own problem when
-explaining it to someone else happens so frquently in software
+explaining it to someone else happens so frequently in software
 development that the listener is called a ``rubber ducky,'' because
 they only have to nod along.%
 %
@@ -585,7 +585,7 @@ for (i in 1:I)
   for (j in 1:J)
     for (n in 1:N)
       for (m in 1:M)
-        ... do someting with b[i,j,m,n] ...
+        ... do something with b[i,j,m,n] ...
 \end{Verbatim}
 \end{quote}
 
@@ -1054,7 +1054,7 @@ unlike R, Stan's for-loops always move forward, so that a loop extent
 of \code{1:N} when \code{N} is equal to zero ensures the loop's body
 will not be executed.  The number of predictors, \code{D}, must be at
 least one in order for \code{beta * x[n]} to produce an
-appropriate agrument for \code{softmax()}.  The categorical outcomes
+appropriate argument for \code{softmax()}.  The categorical outcomes
 \code{y[n]} must be between \code{1} and \code{K} in order for the
 discrete sampling to be well defined.
 
@@ -1582,7 +1582,7 @@ amount of correlation among the parameters $\beta_j$.
 \subsubsection{Group-Level Predictors for Prior Mean}
 
 To complete Gelman and Hill's model, suppose each group $j \in 1{:}J$
-is supplied with an $L$-dimensional row-vector of groupl-level
+is supplied with an $L$-dimensional row-vector of group-level
 predictors $u_j$.  The prior mean for the $\beta_j$ can then itself be
 modeled as a regression, using an $L$-dimensional coefficient vector
 $\gamma$.  The prior for the group-level coefficients then becomes
@@ -2625,7 +2625,7 @@ local so they will not be output.  The variable \code{y\_star} will
 hold the label sequence with the highest probability given the input
 sequence \code{u}.  Unlike the forward algorithm, where the
 intermediate quantities were total probability, here they consist of
-the maximum probabilty \code{best\_logp[t,k]} for the sequence up to
+the maximum probability \code{best\_logp[t,k]} for the sequence up to
 time \code{t} with final output category \code{k} for time \code{t},
 along with a backpointer to the source of the link.  Following the
 backpointers from the best final log probability for the final time
@@ -2643,7 +2643,7 @@ parameters.
 If the outputs \code{u} are not used for semisupervised estimation but
 simply as the basis for prediction, the result is equivalent to what
 is represented in the BUGS modeling language via the cut operation.
-That is, the model is fit independenlty of \code{u}, then those
+That is, the model is fit independently of \code{u}, then those
 parameters used to find the most likely state to have generated
 \code{u}.
 
@@ -2794,7 +2794,7 @@ coded in Stan following their respective probability models.
 
 Truncation in Stan is restricted to univariate distributions for which
 the corresponding log cumulative distribution function (cdf) and log
-completmentary cumulative distribution (ccdf) functions are available.
+complementary cumulative distribution (ccdf) functions are available.
 See the subsection on truncated distributions in
 \refsection{sampling-statements} for more information on truncated
 distributions, cdfs, and ccdfs.
@@ -4317,7 +4317,7 @@ conditioned on their inputs $x$ is Gaussian,
 \[
 y \sim \distro{Normal}(m(x),k(x)),
 \] 
-where $m(x)$ is an $N$-vector and and $k(x)$ is an $N \times N$
+where $m(x)$ is an $N$-vector and $k(x)$ is an $N \times N$
 covariance matrix.  The mean function $m : \reals^{N \times D}
 \rightarrow \reals^{N}$ can be anything, but the covariance function
 $k : \reals^{N \times D} \rightarrow \reals^{N \times N}$ must produce
@@ -4343,7 +4343,7 @@ where $\eta$, $\rho$, and $\sigma$ are hyperparameters defining the
 covariance function and where $\delta_{i,j}$ is the Kronecker delta
 function with value 1 if $i = j$ and value 0 otherwise; note that this
 test is between the indexes $i$ and $j$, not between values $x_i$ and
-$x_j$. The addition of $\sigma^2$ on the diagonal is import
+$x_j$. The addition of $\sigma^2$ on the diagonal is important
 to ensure the positive definiteness of the resulting matrix in the case of
 two identical inputs $x_i = x_j$.  In statistical terms, $\sigma$ is
 the scale of the noise term in the regression.
@@ -6125,7 +6125,7 @@ several ways.
 \subsubsection{Removing Redundant Parameters or Predictors}
 
 In the case of the multiple intercepts, $\lambda_1$ and $\lambda_2$,
-the simplest solution is to remove the redundnat intecept, resulting
+the simplest solution is to remove the redundant intercept, resulting
 in a model with a single intercept parameter $\mu$ and sampling
 distribution $y_n \sim \distro{Normal}(\mu, \sigma)$.  The same
 solution works for solving the problem with collinearity---just remove
@@ -6501,7 +6501,7 @@ for models with parameters correlated in the posterior.
 Hamiltonian Monte Carlo (HMC), as performed by Stan, is much more
 efficient at exploring posteriors in models where parameters are
 correlated in the posterior.  In this particular example, the
-Hamiltonian dynamics (i.e., the motion of a fictitioous particle given
+Hamiltonian dynamics (i.e., the motion of a fictitious particle given
 random momentum in the field defined by the negative log posterior) is
 going to run up and down along the valley defined by the potential
 energy (ridges in log posteriors correspond to valleys in potential
@@ -7344,7 +7344,7 @@ that if $\theta_i$ is equal to the sum of $\beta$ independent squared
 standard normal variates and $\rho_i = \frac{\theta_i}{\sum \theta_i}$, 
 then the $K$-vector $\rho$ is distributed Dirichlet with all shape 
 parameters equal to $\frac{\beta}{2}$. In particular, if $\beta = 2$, 
-then $\rho$ is distributed uniformally on the unit simplex. Thus, we can 
+then $\rho$ is uniformly distributed on the unit simplex. Thus, we can 
 make $\rho$ be a transformed parameter to reduce dependence, as in:
 %
 \begin{quote}
