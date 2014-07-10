@@ -116,13 +116,6 @@ else()
   set(RUNCMD "")
 endif()
 
-# stanc
-#set(STANC_SRCS ${PROJECT_SOURCE_DIR}/src/stan/command/stanc.cpp)
-#add_executable(stanc-bin ${STANC_SRCS})
-#set_target_properties(stanc-bin PROPERTIES OUTPUT_NAME stanc)
-#target_link_libraries(stanc-bin stanc)
-#set(STANC_BIN ${CMAKE_CURRENT_BINARY_DIR}/stanc)
-
 # print 
 #set(PRINT_SRCS ${PROJECT_SOURCE_DIR}/src/stan/command/print.cpp)
 #add_executable(print ${PRINT_SRCS})
