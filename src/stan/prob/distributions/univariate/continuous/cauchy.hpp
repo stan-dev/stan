@@ -4,11 +4,14 @@
 #include <boost/random/cauchy_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/constants.hpp>
+#include <stan/math/functions/log1p.hpp>
 #include <stan/math/functions/square.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/log1p.hpp>
 #include <stan/prob/constants.hpp>
 
 namespace stan {
@@ -56,22 +59,15 @@ namespace stan {
       double logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      if (!check_not_nan(function, y, "Random variable", &logp))
-        return logp;
-      if (!check_finite(function, mu, "Location parameter", 
-                        &logp))
-        return logp;
-      if (!check_positive(function, sigma, "Scale parameter", 
-                          &logp))
-        return logp;
-      if (!check_finite(function, sigma, "Scale parameter", 
-                        &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   y,mu,sigma,
-                                   "Random variable","Location parameter","Scale parameter",
-                                   &logp)))
-        return logp;
+      check_not_nan(function, y, "Random variable", &logp);
+      check_finite(function, mu, "Location parameter", &logp);
+      check_positive(function, sigma, "Scale parameter", &logp);
+      check_finite(function, sigma, "Scale parameter", &logp);
+      check_consistent_sizes(function,
+                             y,mu,sigma,
+                             "Random variable","Location parameter",
+                             "Scale parameter",
+                             &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_loc,T_scale>::value)
@@ -88,7 +84,8 @@ namespace stan {
 
       DoubleVectorView<true, is_vector<T_scale>::value> inv_sigma(length(sigma));
       DoubleVectorView<true, is_vector<T_scale>::value> sigma_squared(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
+      DoubleVectorView<include_summand<propto,T_scale>::value,
+                       is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         const double sigma_dbl = value_of(sigma_vec[i]);
         inv_sigma[i] = 1.0 / sigma_dbl;
@@ -162,7 +159,9 @@ namespace stan {
     cauchy_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
         
       // Size checks
-      if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) ) return 1.0;
+      if ( !( stan::length(y) && stan::length(mu) 
+              && stan::length(sigma) ) ) 
+        return 1.0;
         
       static const char* function = "stan::prob::cauchy_cdf(%1%)";
       
@@ -175,22 +174,14 @@ namespace stan {
 
       double P(1.0);
         
-      if(!check_not_nan(function, y, "Random variable", &P))
-        return P;
-        
-      if(!check_finite(function, mu, "Location parameter", &P))
-        return P;
-        
-      if(!check_finite(function, sigma, "Scale parameter", &P))
-        return P;
-        
-      if(!check_positive(function, sigma, "Scale parameter", &P))
-        return P;
-
-      if (!(check_consistent_sizes(function, y, mu, sigma,
-                                   "Random variable", "Location parameter", "Scale Parameter",
-                                   &P)))
-        return P;
+      check_not_nan(function, y, "Random variable", &P);
+      check_finite(function, mu, "Location parameter", &P);
+      check_finite(function, sigma, "Scale parameter", &P);
+      check_positive(function, sigma, "Scale parameter", &P);
+      check_consistent_sizes(function, y, mu, sigma,
+                             "Random variable", "Location parameter", 
+                             "Scale Parameter",
+                             &P);
         
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -198,10 +189,8 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
         
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
-        
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+        operands_and_partials(y, mu, sigma);
         
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
@@ -238,11 +227,9 @@ namespace stan {
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 
             += sigma_inv_dbl / (pi() * (1.0 + z * z) * Pn);
-            
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] 
             += - sigma_inv_dbl / (pi() * (1.0 + z * z) * Pn);
-            
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] 
             += - z * sigma_inv_dbl / (pi() * (1.0 + z * z) * Pn);
@@ -250,18 +237,154 @@ namespace stan {
       }
         
       if (!is_constant_struct<T_y>::value) {
-        for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+        for(size_t n = 0; n < stan::length(y); ++n) 
+          operands_and_partials.d_x1[n] *= P;
       }
-        
       if (!is_constant_struct<T_loc>::value) {
-        for(size_t n = 0; n < stan::length(mu); ++n) operands_and_partials.d_x2[n] *= P;
+        for(size_t n = 0; n < stan::length(mu); ++n)
+          operands_and_partials.d_x2[n] *= P;
       }
-        
       if (!is_constant_struct<T_scale>::value) {
-        for(size_t n = 0; n < stan::length(sigma); ++n) operands_and_partials.d_x3[n] *= P;
+        for(size_t n = 0; n < stan::length(sigma); ++n) 
+          operands_and_partials.d_x3[n] *= P;
       }
         
       return operands_and_partials.to_var(P);
+    }
+
+    template <typename T_y, typename T_loc, typename T_scale>
+    typename return_type<T_y,T_loc,T_scale>::type
+    cauchy_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+        
+      // Size checks
+      if ( !( stan::length(y) && stan::length(mu) 
+              && stan::length(sigma) ) ) 
+        return 0.0;
+        
+      static const char* function = "stan::prob::cauchy_cdf(%1%)";
+      
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using boost::math::tools::promote_args;
+      using stan::math::value_of;
+
+      double cdf_log(0.0);
+        
+      check_not_nan(function, y, "Random variable", &cdf_log);
+      check_finite(function, mu, "Location parameter", &cdf_log);
+      check_finite(function, sigma, "Scale parameter", &cdf_log);
+      check_positive(function, sigma, "Scale parameter", &cdf_log);
+      check_consistent_sizes(function, y, mu, sigma,
+                             "Random variable", "Location parameter", 
+                             "Scale Parameter", &cdf_log);
+        
+      // Wrap arguments in vectors
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_loc> mu_vec(mu);
+      VectorView<const T_scale> sigma_vec(sigma);
+      size_t N = max_size(y, mu, sigma);
+        
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, sigma);
+        
+      // Compute CDFLog and its gradients
+      using std::atan;
+      using stan::math::pi;
+
+      // Compute vectorized CDF and gradient
+      for (size_t n = 0; n < N; n++) {
+            
+        // Pull out values
+        const double y_dbl = value_of(y_vec[n]);
+        const double mu_dbl = value_of(mu_vec[n]);
+        const double sigma_inv_dbl = 1.0 / value_of(sigma_vec[n]);
+        const double sigma_dbl = value_of(sigma_vec[n]);
+            
+        const double z = (y_dbl - mu_dbl) * sigma_inv_dbl;
+          
+        // Compute
+        const double Pn = atan(z) / pi() + 0.5;
+        cdf_log += log(Pn);
+            
+        const double rep_deriv = 1.0 / (pi() * Pn 
+                                        * (z * z * sigma_dbl + sigma_dbl));
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] += rep_deriv;
+        if (!is_constant_struct<T_loc>::value)
+          operands_and_partials.d_x2[n] -= rep_deriv;
+        if (!is_constant_struct<T_scale>::value)
+          operands_and_partials.d_x3[n] -= rep_deriv * z;
+      }
+      return operands_and_partials.to_var(cdf_log);
+    }
+
+    template <typename T_y, typename T_loc, typename T_scale>
+    typename return_type<T_y,T_loc,T_scale>::type
+    cauchy_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
+        
+      // Size checks
+      if ( !( stan::length(y) && stan::length(mu) 
+              && stan::length(sigma) ) ) 
+        return 0.0;
+        
+      static const char* function = "stan::prob::cauchy_cdf(%1%)";
+      
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using boost::math::tools::promote_args;
+      using stan::math::value_of;
+
+      double ccdf_log(0.0);
+        
+      check_not_nan(function, y, "Random variable", &ccdf_log);
+      check_finite(function, mu, "Location parameter", &ccdf_log);
+      check_finite(function, sigma, "Scale parameter", &ccdf_log);
+      check_positive(function, sigma, "Scale parameter", &ccdf_log);
+      check_consistent_sizes(function, y, mu, sigma,
+                             "Random variable", "Location parameter", 
+                             "Scale Parameter", &ccdf_log);
+        
+      // Wrap arguments in vectors
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_loc> mu_vec(mu);
+      VectorView<const T_scale> sigma_vec(sigma);
+      size_t N = max_size(y, mu, sigma);
+        
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, sigma);
+        
+      // Compute CDFLog and its gradients
+      using std::atan;
+      using stan::math::pi;
+
+      // Compute vectorized CDF and gradient
+      for (size_t n = 0; n < N; n++) {
+            
+        // Pull out values
+        const double y_dbl = value_of(y_vec[n]);
+        const double mu_dbl = value_of(mu_vec[n]);
+        const double sigma_inv_dbl = 1.0 / value_of(sigma_vec[n]);
+        const double sigma_dbl = value_of(sigma_vec[n]);
+        const double z = (y_dbl - mu_dbl) * sigma_inv_dbl;
+          
+        // Compute
+        const double Pn = 0.5 - atan(z) / pi();
+        ccdf_log += log(Pn);
+            
+        const double rep_deriv = 1.0 / (Pn * pi() 
+                                        * (z * z * sigma_dbl + sigma_dbl));
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] -= rep_deriv;
+        if (!is_constant_struct<T_loc>::value)
+          operands_and_partials.d_x2[n] += rep_deriv;
+        if (!is_constant_struct<T_scale>::value)
+          operands_and_partials.d_x3[n] += rep_deriv * z;
+      }
+      return operands_and_partials.to_var(ccdf_log);
     }
 
     template <class RNG>
@@ -271,6 +394,16 @@ namespace stan {
                RNG& rng) {
       using boost::variate_generator;
       using boost::random::cauchy_distribution;
+
+      static const char* function = "stan::prob::cauchy_rng(%1%)";
+
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      
+      check_finite(function, mu, "Location parameter", (double*)0);
+      check_positive(function, sigma, "Scale parameter", (double*)0);
+      check_finite(function, sigma, "Scale parameter", (double*)0);
+
       variate_generator<RNG&, cauchy_distribution<> >
         cauchy_rng(rng, cauchy_distribution<>(mu, sigma));
       return cauchy_rng();

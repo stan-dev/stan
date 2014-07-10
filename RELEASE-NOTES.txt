@@ -1,22 +1,225 @@
-STAN RELEASE NOTES
+STAN C++ RELEASE NOTES
 ======================================================================
 
-HOW TO (developer notes on how to release, last column is ordering)
-----------------------------------------------------------------------
- 1.  Stan C++ M.m.p frozen        (stan/src)                     
- 2.  Stan manual M.m.p frozen     (stan/docs/stan-reference/)
- 3.  RStan M.m.p frozen           (stan/rstan)                   > 1
- 4.  Stan web pages M.m.p frozen  (stan/web)
- 5.  tag release vM.m.p in git, push to Google Code              > 1--4
- 6.  Build Stan tarball and upload to Google Code->Download      > 5
- 7.  Build manual pdf & upload to Google Code->Download          > 5
- 8.  Build Rstan & upload to Google Code->Download, Google URL   > 5
- 9.  Upload web pages to mc-stan.org                             > 1--8
-10.  Announce                                                    > 9
+v.2.3.0 (18 June 2014)
+======================================================================
+
+We had a record number of user-submitted patches this go around.
+Thanks to everyone!
+
+New Features
+------------
+* user-defined function definitions added to Stan language
+* a^b syntax for pow(a,b)  (thanks to Mitzi Morris)
+* reshaping functions: to_matrix(), to_vector(), to_row_vector(), 
+  to_array_1d(), to_array_2d()
+* matrix operations: quad_form_sym() (x' *Sigma * x), QR decompositions
+  qr_Q(), qr_R()
+* densities: Gaussian processes multi_gp_log(), multi_gp(), 
+  and alternative negative binomial parameterization neg_binomial_2()
+* random number generator: multi_normal_cholesky_rng()
+* sorting: sort_indices_*() for returning indexes in sorted order by
+  value
+* added JSON parser to C++ (not exposed through interfaces yet; thanks
+  to Mitzi Morris)
+* many fixes to I/O for data and inits to check consistency and
+  report errors
+* removed some uses of std::cout where they don't belong
+* updated parser for C++11 compatibility (thanks to Rob Goedman)
+
+New Developer
+--------------
+* added Marco Inacio as core developer
+
+Optimizations
+-------------
+* turned off Eigen asserts
+* efficiency improvements to posterior analysis print
+
+Documentation
+-------------
+* Clarified licensing policy for individual code contributions
+* Huge numbers of fixes to the documentation, including many
+  user-contributed patches (thanks!), fixes to parallelization in
+  CmdStan, Windows install instructions, boundaries for Dirichlet and
+  Beta, removed suggestion to use floor and ceiling as indices,
+  vectorized many models, clarified that && doesn't short circuit,
+  clarified von Mises normalization, updated censoring doc (thanks
+  to Alexey Stukalov), negative binomial doc enhanced, new references,
+  new discussion of hierarchical models referencing Betancourt and
+  Girolami paper, 
+* Avraham Aadler was particularly useful in pointing out and fixing
+  documentation errors
+
+Bug Fixes
+------------
+* fixed bug in lkj density
+* fixed bug in Jacobian for corr_matrix data type
+* fix cholesky_cov_matrix test code to allow use as parameter
+* fixed poisson_rng, neg_binomial_rng
+* allow binary operations (e.g., < and >) within range constraints
+* support MS Visual Studio 2008
+* fixed memory leaks in categorical sampling statement, categorical_log
+  function, and softmax functions
+* removed many compiler warnings
+* numerous bug fixes to arithmetic test code conditions and messages,
+  including calls from 
+* fixed model crashes when no parameter specified
+* fixed template name conflicts for some compiler bugs (thanks Kevin
+  S. Van Horn)
+
+Code Reorganizations & Updates
+------------------------------
+* CmdStan is now in its own repository on GitHub: stan-dev/cmdstan
+* consolidate and simplify error handling across modules
+* pulled functionality from CmdStan command class and PyStan and RStan
+  into Stan C++
+* generalized some interfaces to allow std::vector as well as Eigen
+  for compatibility
+* generalize some I/O CSV writer capabilities
+* optimization output text cleaned up
+* integer overflow during I/O now raises informative error messages
+* const correctness for chains (thanks Kevin S. Van Horn)
+
+
+
+v2.3.0 (16 June 2014)
+======================================================================
+Bug Fixes
+------------
+* fixed poisson_rng, neg_binomial_rng
+* integer overflow now throws errors
+* allow < and > within range constraints
+* support MS Visual Studio 2008
+* fixed bug in lkj
+
+
+Features
+------------
+* functions added to Stan language!
+* turned off eigen asserts
+* CmdStan is now in its own repository
+* added quad_form_sym, multi_gp_log, multi_gp, 
+  multi_normal_cholesky_rng, to_matrix, to_vector, to_array, flatten,
+  qr_Q, qr_R
+* added JSON parser to Stan
+* a^b syntax for pow(a,b)
+
+
+v2.2.0 (14 February 2014)
+======================================================================
+Bug Fixes
+-------------
+* increment_log_prob is now vectorized and compiles with vector arguments
+* multinomial random number generator used the wrong size for the return value
+* fixed memory leaks in auto-diff implementation
+* variables can start with the prefix 'inf'
+* fixed parameter output order for arrays when using optimization
+
+Features
+-------------
+* suppress command line output with refresh <= 0
+* added 1 to treedepth to match usual definition of treedepth
+* added distance, squared_distance, diag_pre_multiply, diag_pre_multiply to Stan modeling lnaguage
+* added a 'fixed_param' sampler for use with the generated quantities block
+
+
+
+
+v2.0.1 (24 October 2013)
+======================================================================
+
+Bug Fixes
+----------------------------------
+* fixed multi_normal distribution's gradient calculations
+* fixed diagnose mode from the command line to work for matrices
+* typos in the manual
+
+
+
+v2.0.0 (16 October 2013)
+======================================================================
+
+This list is incomplete.  The 2.0.0 update is a huge fix, and this
+list just represents what was clearly called out in pull requests.
+
+Enhancements
+----------------------------------
+* all new hierarchical command-line interface
+* compiler flags to build with Xcode 5 (which has too-small template-depth)
+* BFGS optimization
+* print variable name when initialization fails
+* reserved function names (breaks backward compatibility)
+* deprecate direct use of lp__ in favor of increment_log_prob()
+* unfolded softmax for more efficiency, optimized and vectorized categorical
+* new Cholesky factor data type
+* upgraded to Boost 1.54 and Eigen 3.2.0
+* added flag to suppress Jacobian adjustment in log prob (for
+  optimizers)
+* added Rayleigh distribution
+* added Bessel (and modified Bessel) functions of first and second
+  kind
+* added Pochhammer functions (rising/falling factorials)
+* completed vectorization of univariate distributions
+* trapped use of "." in variable names and print error
+* moved RStan into its own subproject
+* rewrote writer interface for samples
+* added delete method to chainables to allow exceptions in
+  constructors
+* added sort and rank functions
+* improved doc and coding for GP example models
+* shuffle function signature tests for test speed
+* new gradient functionality for memory allocation and cleaning
+  and to reduce code duplication
+
+Bug Fixes
+----------------------------------
+* remove function signatures from undocumented functions
+* fixed broken abs(real) signature;  deprecated abs(real) in favor
+  of fabs(real)
+* error checking for dirichlet
+* fix bin/print to be row major
+* suppress warnings for unused variables; cleanup truly unused ones
+* fixed pow() boundary conditions with negative base, fractional
+exponent
+* fix model tests and error codes
+* fix command-line return codes to be more compliant
+* fix build parameter names to be more compliant with conventions
+* fix integer vs. real problems in some RNGs
+* fix print so that it prints expression values, not just names
+* fix Newton optimization backtrack to eventually terminate with
+  failure rather than looping infinitely
+* fix CSV output from command for matrices (was transposed)
+* fixes to allow Stan to build under Cygwin 
+* fix double indexing on LHS of assignment
+* fix nested expression prints to allow indexed array sizes in
+  declarations
+* fix parameterization of gamma RNG
+* reserved model's class name as variable
+* added vector size test in assignment
+* fixed mixture examples
+* fixed rep_vector to work with integer value
+* fixed parser error message 
+* fixed use of Boost NaN tests
+* initialze local variables to NaN to prevent segfaults if used
+  before defined
+* remove unused includes from model header
+* fix signed/unsigned warnings in tests and code
+* validate that init=0 is valid starting value and raise error if not
+* fix diag_pre_multiply loop bound
+
+
+Doc
+---------------------------------
+* made all user-suggested cleanups and changes to doc
+* new basic programming section
+* new chapter for new command line
+
 
 
 v1.3.0 (12 April 2013)
 ======================================================================
+
 Enhancements
 ----------------------------------
 

@@ -32,32 +32,25 @@ namespace stan {
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
-      if (!check_size_match(function, 
-          mu.rows(), "Rows of location parameter",
-          sigma.rows(), "columns of scale parameter",
-          &lp))
-        return lp;
-      if (!check_size_match(function, 
-          y.rows(), "Rows of random variable",
-          y.cols(), "columns of random variable",
-          &lp))
-      return lp;
-      if (!check_size_match(function, 
-          y.rows(), "Rows of random variable",
-          mu.rows(), "rows of location parameter",
-          &lp))
-        return lp;
-      if (!check_positive(function, eta, "Shape parameter", &lp))
-        return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp))
-        return lp;
-      if (!check_finite(function, sigma, "Scale parameter", &lp))
-        return lp;
+      check_size_match(function, 
+                       mu.rows(), "Rows of location parameter",
+                       sigma.rows(), "columns of scale parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.rows(), "Rows of random variable",
+                       y.cols(), "columns of random variable",
+                       &lp);
+      check_size_match(function, 
+                       y.rows(), "Rows of random variable",
+                       mu.rows(), "rows of location parameter",
+                       &lp);
+      check_positive(function, eta, "Shape parameter", &lp);
+      check_finite(function, mu, "Location parameter", &lp);
+      check_finite(function, sigma, "Scale parameter", &lp);
       // FIXME: build vectorized versions
       for (int m = 0; m < y.rows(); ++m)
         for (int n = 0; n < y.cols(); ++n)
-          if (!check_finite(function, y(m,n), "Covariance matrix", &lp))
-            return lp;
+          check_finite(function, y(m,n), "Covariance matrix", &lp);
       
       const unsigned int K = y.rows();
       const Eigen::Array<T_y,Eigen::Dynamic,1> sds
@@ -103,13 +96,9 @@ namespace stan {
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
-      if (!check_positive(function, eta, "Shape parameter", &lp))
-        return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp))
-        return lp;
-      if (!check_finite(function, sigma, "Scale parameter", 
-                        &lp))
-        return lp;
+      check_positive(function, eta, "Shape parameter", &lp);
+      check_finite(function, mu, "Location parameter", &lp);
+      check_finite(function, sigma, "Scale parameter", &lp);
       
       const unsigned int K = y.rows();
       const Eigen::Array<T_y,Eigen::Dynamic,1> sds

@@ -10,6 +10,7 @@
 #include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
 #include <stan/gm/grammars/expression_grammar.hpp>
+#include <stan/gm/grammars/expression07_grammar.hpp>
 
 namespace stan {
 
@@ -32,9 +33,14 @@ namespace stan {
       // grammars
       expression_grammar<Iterator> expression_g;      
 
-      expression_grammar<Iterator> expression07_g;      
+      expression07_grammar<Iterator> expression07_g;      
 
       // rules
+
+      boost::spirit::qi::rule<Iterator, 
+                              cholesky_factor_var_decl(var_origin), 
+                              whitespace_grammar<Iterator> > 
+      cholesky_factor_decl_r;
 
       boost::spirit::qi::rule<Iterator, 
                               corr_matrix_var_decl(var_origin), 
@@ -102,11 +108,6 @@ namespace stan {
       range_brackets_int_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              range(var_origin), 
-                              whitespace_grammar<Iterator> > 
-      range_r;
-
-      boost::spirit::qi::rule<Iterator, 
                               row_vector_var_decl(var_origin), 
                               whitespace_grammar<Iterator> > 
       row_vector_decl_r;
@@ -129,13 +130,13 @@ namespace stan {
       boost::spirit::qi::rule<Iterator, 
                               boost::spirit::qi::locals<bool>, 
                               var_decl(bool,var_origin), 
-               whitespace_grammar<Iterator> > 
+                              whitespace_grammar<Iterator> > 
       var_decl_r;
 
       boost::spirit::qi::rule<Iterator, 
                               boost::spirit::qi::locals<bool>, 
                               std::vector<var_decl>(bool,var_origin), 
-               whitespace_grammar<Iterator> > 
+                              whitespace_grammar<Iterator> > 
       var_decls_r;
 
 

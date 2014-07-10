@@ -4,8 +4,8 @@
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_square.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 
@@ -16,10 +16,10 @@ namespace stan {
       template <int TriView,int R1,int C1,int R2,int C2>
       class mdivide_left_tri_vv_vari : public vari {
       public:
-        int _M; // A.rows() = A.cols() = B.rows()
-        int _N; // B.cols()
-        double* _A;
-        double* _C;
+        int M_; // A.rows() = A.cols() = B.rows()
+        int N_; // B.cols()
+        double* A_;
+        double* C_;
         vari** _variRefA;
         vari** _variRefB;
         vari** _variRefC;
@@ -27,11 +27,11 @@ namespace stan {
         mdivide_left_tri_vv_vari(const Eigen::Matrix<var,R1,C1> &A,
                                  const Eigen::Matrix<var,R2,C2> &B)
           : vari(0.0),
-            _M(A.rows()),
-            _N(B.cols()),
-            _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            M_(A.rows()),
+            N_(B.cols()),
+            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
-            _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            C_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * B.rows() * B.cols())),
             _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() 
@@ -46,41 +46,41 @@ namespace stan {
 
           size_t pos = 0;
           if (TriView == Eigen::Lower) {
-            for (size_type j = 0; j < _M; j++)
-              for (size_type i = j; i < _M; i++)
+            for (size_type j = 0; j < M_; j++)
+              for (size_type i = j; i < M_; i++)
                 _variRefA[pos++] = A(i,j).vi_;
           } else if (TriView == Eigen::Upper) {
-            for (size_type j = 0; j < _M; j++)
+            for (size_type j = 0; j < M_; j++)
               for (size_type i = 0; i < j+1; i++)
                 _variRefA[pos++] = A(i,j).vi_;
           }
 
           pos = 0;
-          for (size_type j = 0; j < _M; j++) {
-            for (size_type i = 0; i < _M; i++) {
-              _A[pos++] = A(i,j).val();
+          for (size_type j = 0; j < M_; j++) {
+            for (size_type i = 0; i < M_; i++) {
+              A_[pos++] = A(i,j).val();
             }
           }
   
           pos = 0;
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _M; i++) {
+          for (size_type j = 0; j < N_; j++) {
+            for (size_type i = 0; i < M_; i++) {
               _variRefB[pos] = B(i,j).vi_;
-              _C[pos++] = B(i,j).val();
+              C_[pos++] = B(i,j).val();
             }
           }
         
-          Matrix<double,R1,C2> C(_M,_N);
-          C = Map<Matrix<double,R1,C2> >(_C,_M,_N);
+          Matrix<double,R1,C2> C(M_,N_);
+          C = Map<Matrix<double,R1,C2> >(C_,M_,N_);
 
-          C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          C = Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .template triangularView<TriView>().solve(C);
 
           pos = 0;
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _M; i++) {
-              _C[pos] = C(i,j);
-              _variRefC[pos] = new vari(_C[pos],false);
+          for (size_type j = 0; j < N_; j++) {
+            for (size_type i = 0; i < M_; i++) {
+              C_[pos] = C(i,j);
+              _variRefC[pos] = new vari(C_[pos],false);
               pos++;
             }
           }
@@ -90,19 +90,19 @@ namespace stan {
         virtual void chain() {
           using Eigen::Matrix;
           using Eigen::Map;
-          Matrix<double,R1,C1> adjA(_M,_M);
-          Matrix<double,R2,C2> adjB(_M,_N);
-          Matrix<double,R1,C2> adjC(_M,_N);
+          Matrix<double,R1,C1> adjA(M_,M_);
+          Matrix<double,R2,C2> adjB(M_,N_);
+          Matrix<double,R1,C2> adjC(M_,N_);
 
           size_t pos = 0;
           for (size_type j = 0; j < adjC.cols(); j++)
             for (size_type i = 0; i < adjC.rows(); i++)
               adjC(i,j) = _variRefC[pos++]->adj_;
         
-          adjB = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          adjB = Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .template triangularView<TriView>().transpose().solve(adjC);
           adjA.noalias() = -adjB
-            * Map<Matrix<double,R1,C2> >(_C,_M,_N).transpose();
+            * Map<Matrix<double,R1,C2> >(C_,M_,N_).transpose();
         
           pos = 0;
           if (TriView == Eigen::Lower) {
@@ -125,21 +125,21 @@ namespace stan {
       template <int TriView,int R1,int C1,int R2,int C2>
       class mdivide_left_tri_dv_vari : public vari {
       public:
-        int _M; // A.rows() = A.cols() = B.rows()
-        int _N; // B.cols()
-        double* _A;
-        double* _C;
+        int M_; // A.rows() = A.cols() = B.rows()
+        int N_; // B.cols()
+        double* A_;
+        double* C_;
         vari** _variRefB;
         vari** _variRefC;
       
         mdivide_left_tri_dv_vari(const Eigen::Matrix<double,R1,C1> &A,
                                  const Eigen::Matrix<var,R2,C2> &B)
           : vari(0.0),
-            _M(A.rows()),
-            _N(B.cols()),
-            _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            M_(A.rows()),
+            N_(B.cols()),
+            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
-            _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            C_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * B.rows() * B.cols())),
             _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
@@ -150,31 +150,31 @@ namespace stan {
           using Eigen::Map;
 
           size_t pos = 0;
-          for (size_type j = 0; j < _M; j++) {
-            for (size_type i = 0; i < _M; i++) {
-              _A[pos++] = A(i,j);
+          for (size_type j = 0; j < M_; j++) {
+            for (size_type i = 0; i < M_; i++) {
+              A_[pos++] = A(i,j);
             }
           }
 
           pos = 0;
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _M; i++) {
+          for (size_type j = 0; j < N_; j++) {
+            for (size_type i = 0; i < M_; i++) {
               _variRefB[pos] = B(i,j).vi_;
-              _C[pos++] = B(i,j).val();
+              C_[pos++] = B(i,j).val();
             }
           }
 
-          Matrix<double,R1,C2> C(_M,_N);
-          C = Map<Matrix<double,R1,C2> >(_C,_M,_N);
+          Matrix<double,R1,C2> C(M_,N_);
+          C = Map<Matrix<double,R1,C2> >(C_,M_,N_);
   
-          C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          C = Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .template triangularView<TriView>().solve(C);
 
           pos = 0;
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _M; i++) {
-              _C[pos] = C(i,j);
-              _variRefC[pos] = new vari(_C[pos],false);
+          for (size_type j = 0; j < N_; j++) {
+            for (size_type i = 0; i < M_; i++) {
+              C_[pos] = C(i,j);
+              _variRefC[pos] = new vari(C_[pos],false);
               pos++;
             }
           }
@@ -183,15 +183,15 @@ namespace stan {
         virtual void chain() {
           using Eigen::Matrix;
           using Eigen::Map;
-          Matrix<double,R2,C2> adjB(_M,_N);
-          Matrix<double,R1,C2> adjC(_M,_N);
+          Matrix<double,R2,C2> adjB(M_,N_);
+          Matrix<double,R1,C2> adjC(M_,N_);
 
           size_t pos = 0;
           for (size_type j = 0; j < adjC.cols(); j++)
             for (size_type i = 0; i < adjC.rows(); i++)
               adjC(i,j) = _variRefC[pos++]->adj_;
 
-          adjB = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          adjB = Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .template triangularView<TriView>().transpose().solve(adjC);
   
           pos = 0;
@@ -204,21 +204,21 @@ namespace stan {
       template <int TriView,int R1,int C1,int R2,int C2>
       class mdivide_left_tri_vd_vari : public vari {
       public:
-        int _M; // A.rows() = A.cols() = B.rows()
-        int _N; // B.cols()
-        double* _A;
-        double* _C;
+        int M_; // A.rows() = A.cols() = B.rows()
+        int N_; // B.cols()
+        double* A_;
+        double* C_;
         vari** _variRefA;
         vari** _variRefC;
 
         mdivide_left_tri_vd_vari(const Eigen::Matrix<var,R1,C1> &A,
                                  const Eigen::Matrix<double,R2,C2> &B)
           : vari(0.0),
-            _M(A.rows()),
-            _N(B.cols()),
-            _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            M_(A.rows()),
+            N_(B.cols()),
+            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
-            _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            C_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * B.rows() * B.cols())),
             _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() 
@@ -231,31 +231,31 @@ namespace stan {
 
           size_t pos = 0;
           if (TriView == Eigen::Lower) {
-            for (size_type j = 0; j < _M; j++)
-              for (size_type i = j; i < _M; i++)
+            for (size_type j = 0; j < M_; j++)
+              for (size_type i = j; i < M_; i++)
                 _variRefA[pos++] = A(i,j).vi_;
           } else if (TriView == Eigen::Upper) {
-            for (size_type j = 0; j < _M; j++)
+            for (size_type j = 0; j < M_; j++)
               for (size_type i = 0; i < j+1; i++)
                 _variRefA[pos++] = A(i,j).vi_;
           } 
 
           pos = 0;
-          for (size_type j = 0; j < _M; j++) {
-            for (size_type i = 0; i < _M; i++) {
-              _A[pos++] = A(i,j).val();
+          for (size_type j = 0; j < M_; j++) {
+            for (size_type i = 0; i < M_; i++) {
+              A_[pos++] = A(i,j).val();
             }
           }
 
-          Matrix<double,R1,C2> C(_M,_N);
-          C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          Matrix<double,R1,C2> C(M_,N_);
+          C = Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .template triangularView<TriView>().solve(B);
 
           pos = 0;
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _M; i++) {
-              _C[pos] = C(i,j);
-              _variRefC[pos] = new vari(_C[pos],false);
+          for (size_type j = 0; j < N_; j++) {
+            for (size_type i = 0; i < M_; i++) {
+              C_[pos] = C(i,j);
+              _variRefC[pos] = new vari(C_[pos],false);
               pos++;
             }
           }
@@ -264,17 +264,17 @@ namespace stan {
         virtual void chain() {
           using Eigen::Matrix;
           using Eigen::Map;
-          Matrix<double,R1,C1> adjA(_M,_M);
-          Matrix<double,R1,C2> adjC(_M,_N);
+          Matrix<double,R1,C1> adjA(M_,M_);
+          Matrix<double,R1,C2> adjC(M_,N_);
         
           size_t pos = 0;
           for (size_type j = 0; j < adjC.cols(); j++)
             for (size_type i = 0; i < adjC.rows(); i++)
               adjC(i,j) = _variRefC[pos++]->adj_;
 
-          adjA.noalias() = -Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          adjA.noalias() = -Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .template triangularView<TriView>()
-            .transpose().solve(adjC*Map<Matrix<double,R1,C2> >(_C,_M,_N).transpose());
+            .transpose().solve(adjC*Map<Matrix<double,R1,C2> >(C_,M_,N_).transpose());
   
           pos = 0;
           if (TriView == Eigen::Lower) {
@@ -297,8 +297,9 @@ namespace stan {
                      const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::validate_square(A,"mdivide_left_tri");
-      stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
+      stan::math::check_square("mdivide_left_tri(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("mdivide_left_tri(%1%)",A,"A",
+                                      b,"b",(double*)0);
       
       // NOTE: this is not a memory leak, this vari is used in the 
       // expression graph to evaluate the adjoint, but is not needed
@@ -319,8 +320,9 @@ namespace stan {
                      const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::validate_square(A,"mdivide_left_tri");
-      stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
+      stan::math::check_square("mdivide_left_tri(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("mdivide_left_tri(%1%)",A,"A",
+                                      b,"b",(double*)0);
       
       // NOTE: this is not a memory leak, this vari is used in the 
       // expression graph to evaluate the adjoint, but is not needed
@@ -341,8 +343,9 @@ namespace stan {
                      const Eigen::Matrix<double,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::validate_square(A,"mdivide_left_tri");
-      stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
+      stan::math::check_square("mdivide_left_tri(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("mdivide_left_tri(%1%)",A,"A",
+                                      b,"b",(double*)0);
       
       // NOTE: this is not a memory leak, this vari is used in the 
       // expression graph to evaluate the adjoint, but is not needed

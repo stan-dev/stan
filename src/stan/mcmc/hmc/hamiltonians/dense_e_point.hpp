@@ -13,18 +13,22 @@ namespace stan {
       
     public:
       
-      dense_e_point(int n, int m): ps_point(n, m),
-                                   mInv(Eigen::MatrixXd::Identity(n, n)) 
-      {};
+      dense_e_point(int n): ps_point(n), mInv(n, n) {
+        mInv.setIdentity();
+      };
       
       Eigen::MatrixXd mInv;
+      
+      dense_e_point(const dense_e_point& z): ps_point(z), mInv(z.mInv.rows(), z.mInv.cols()) {
+        _fast_matrix_copy<double>(mInv, z.mInv);
+      }
       
       void write_metric(std::ostream* o) {
         if(!o) return;
         *o << "# Elements of inverse mass matrix:" << std::endl;
-        for(size_t i = 0; i < mInv.rows(); ++i) {
+        for(int i = 0; i < mInv.rows(); ++i) {
           *o << "# " << mInv(i, 0) << std::flush;
-          for(size_t j = 1; j < mInv.cols(); ++j)
+          for(int j = 1; j < mInv.cols(); ++j)
             *o << ", " << mInv(i, j) << std::flush;
           *o << std::endl;
         }

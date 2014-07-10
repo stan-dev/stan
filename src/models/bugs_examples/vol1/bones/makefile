@@ -9,7 +9,7 @@ LIBFLAGS = -L$(STAN_HOME)/bin -lstan
 $(PGM) :
 	$(STAN_HOME)/bin/stanc  --name=$(PGM)  $(PGM).stan
 	$(CXX)   -O3 -Wall $(CPPFLAGS) $(PGM).cpp -o $(PGM) $(LIBFLAGS)
-	./$(PGM) --data=$(PGM).data.R # --iters=2000
+	./$(PGM) data=$(PGM).data.R sample 
 
 clean :
 	rm -rf $(PGM).cpp samples.csv $(PGM) 

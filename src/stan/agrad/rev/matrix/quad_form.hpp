@@ -5,13 +5,13 @@
 #include <boost/type_traits.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/value_of.hpp>
 #include <stan/math/matrix/quad_form.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_square.hpp>
-#include <stan/math/matrix/validate_symmetric.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {
   namespace agrad {
@@ -22,15 +22,15 @@ namespace stan {
         inline void compute(const Eigen::Matrix<double,RA,CA> &A,
                             const Eigen::Matrix<double,RB,CB> &B)
         {
-          size_t i,j;
+          int i,j;
           Eigen::Matrix<double,CB,CB> Cd(B.transpose()*A*B);
-          for (j = 0; j < _C.cols(); j++) {
-            for (i = 0; i < _C.rows(); i++) {
+          for (j = 0; j < C_.cols(); j++) {
+            for (i = 0; i < C_.rows(); i++) {
               if (_sym) {
-                _C(i,j) = var(new vari(0.5*(Cd(i,j) + Cd(j,i)),false));
+                C_(i,j) = var(new vari(0.5*(Cd(i,j) + Cd(j,i)),false));
               }
               else {
-                _C(i,j) = var(new vari(Cd(i,j),false));
+                C_(i,j) = var(new vari(Cd(i,j),false));
               }
             }
           }
@@ -40,14 +40,14 @@ namespace stan {
         quad_form_vari_alloc(const Eigen::Matrix<TA,RA,CA> &A,
                              const Eigen::Matrix<TB,RB,CB> &B,
                              bool symmetric = false)
-        : _A(A), _B(B), _C(_B.cols(),_B.cols()), _sym(symmetric)
+        : A_(A), B_(B), C_(B_.cols(),B_.cols()), _sym(symmetric)
         {
           compute(value_of(A),value_of(B));
         }
         
-        Eigen::Matrix<TA,RA,CA>  _A;
-        Eigen::Matrix<TB,RB,CB>  _B;
-        Eigen::Matrix<var,CB,CB> _C;
+        Eigen::Matrix<TA,RA,CA>  A_;
+        Eigen::Matrix<TB,RB,CB>  B_;
+        Eigen::Matrix<var,CB,CB> C_;
         bool                     _sym;
       };
       
@@ -66,7 +66,7 @@ namespace stan {
                            const Eigen::Matrix<double,RB,CB> &Bd,
                            const Eigen::Matrix<double,CB,CB> &adjC)
         {
-          size_t i,j;
+          int i,j;
           Eigen::Matrix<double,RA,CA>     adjA(Bd*adjC*Bd.transpose());
           for (j = 0; j < A.cols(); j++) {
             for (i = 0; i < A.rows(); i++) {
@@ -79,7 +79,7 @@ namespace stan {
                            const Eigen::Matrix<double,RB,CB> &Bd,
                            const Eigen::Matrix<double,CB,CB> &adjC)
         {
-          size_t i,j;
+          int i,j;
           Eigen::Matrix<double,RA,CA>     adjB(Ad*Bd*adjC.transpose() + Ad.transpose()*Bd*adjC);
           for (j = 0; j < B.cols(); j++)
             for (i = 0; i < B.rows(); i++)
@@ -105,15 +105,15 @@ namespace stan {
         }
         
         virtual void chain() {
-          size_t i,j;
-          Eigen::Matrix<double,CB,CB> adjC(_impl->_C.rows(),_impl->_C.cols());
+          int i,j;
+          Eigen::Matrix<double,CB,CB> adjC(_impl->C_.rows(),_impl->C_.cols());
           
-          for (j = 0; j < _impl->_C.cols(); j++)
-            for (i = 0; i < _impl->_C.rows(); i++)
-              adjC(i,j) = _impl->_C(i,j).vi_->adj_;
+          for (j = 0; j < _impl->C_.cols(); j++)
+            for (i = 0; i < _impl->C_.rows(); i++)
+              adjC(i,j) = _impl->C_(i,j).vi_->adj_;
           
-          chainAB(_impl->_A, _impl->_B,
-                  value_of(_impl->_A), value_of(_impl->_B),
+          chainAB(_impl->A_, _impl->B_,
+                  value_of(_impl->A_), value_of(_impl->B_),
                   adjC);
         };
 
@@ -129,12 +129,13 @@ namespace stan {
     quad_form(const Eigen::Matrix<TA,RA,CA> &A,
               const Eigen::Matrix<TB,RB,CB> &B)
     {
-      stan::math::validate_square(A,"quad_form");
-      stan::math::validate_multiplicable(A,B,"quad_form");
+      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("quad_form(%1%)",A,"A",
+                                      B,"B",(double*)0);
       
       quad_form_vari<TA,RA,CA,TB,RB,CB> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,CB>(A,B);
       
-      return baseVari->_impl->_C;
+      return baseVari->_impl->C_;
     }
     template<typename TA,int RA,int CA,typename TB,int RB>
     inline typename
@@ -144,12 +145,13 @@ namespace stan {
     quad_form(const Eigen::Matrix<TA,RA,CA> &A,
               const Eigen::Matrix<TB,RB,1> &B)
     {
-      stan::math::validate_square(A,"quad_form");
-      stan::math::validate_multiplicable(A,B,"quad_form");
+      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("quad_form(%1%)",A,"A",
+                                      B,"B",(double*)0);
       
       quad_form_vari<TA,RA,CA,TB,RB,1> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,1>(A,B);
       
-      return baseVari->_impl->_C(0,0);
+      return baseVari->_impl->C_(0,0);
     }
     
     template<typename TA,int RA,int CA,typename TB,int RB,int CB>
@@ -160,13 +162,14 @@ namespace stan {
     quad_form_sym(const Eigen::Matrix<TA,RA,CA> &A,
                   const Eigen::Matrix<TB,RB,CB> &B)
     {
-      stan::math::validate_square(A,"quad_form_sym");
-      stan::math::validate_symmetric(A,"quad_form_sym");
-      stan::math::validate_multiplicable(A,B,"quad_form_sym");
+      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
+      stan::math::check_symmetric("quad_form_sym(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("quad_form_sym(%1%)",A,"A",
+                                      B,"B",(double*)0);
       
       quad_form_vari<TA,RA,CA,TB,RB,CB> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,CB>(A,B,true);
       
-      return baseVari->_impl->_C;
+      return baseVari->_impl->C_;
     }
     template<typename TA,int RA,int CA,typename TB,int RB>
     inline typename
@@ -176,13 +179,14 @@ namespace stan {
     quad_form_sym(const Eigen::Matrix<TA,RA,CA> &A,
                   const Eigen::Matrix<TB,RB,1> &B)
     {
-      stan::math::validate_square(A,"quad_form_sym");
-      stan::math::validate_symmetric(A,"quad_form_sym");
-      stan::math::validate_multiplicable(A,B,"quad_form_sym");
+      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
+      stan::math::check_symmetric("quad_form_sym(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("quad_form_sym(%1%)",A,"A",
+                                      B,"B",(double*)0);
       
       quad_form_vari<TA,RA,CA,TB,RB,1> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,1>(A,B,true);
       
-      return baseVari->_impl->_C(0,0);
+      return baseVari->_impl->C_(0,0);
     }
   }
 }

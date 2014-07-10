@@ -21,5 +21,5 @@ model {
   for (k in 1:K)
     mu[k] ~ normal(0,1);  // prior
   for (n in 1:N)
-    lp__ <- lp__ + log_sum_exp(soft_z[n]); // likelihood
+    increment_log_prob(log_sum_exp(soft_z[n])); // likelihood
 }

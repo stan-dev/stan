@@ -2,7 +2,7 @@
 #define __STAN__AGRAD__REV__BOOST_FPCLASSIFY_HPP__
 
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 namespace boost {
 

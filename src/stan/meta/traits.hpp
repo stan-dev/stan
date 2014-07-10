@@ -2,14 +2,14 @@
 #define __STAN__META__TRAITS_HPP__
 
 #include <stan/agrad/fwd/fvar.hpp>
-// #include <stan/agrad.hpp>
+// #include <stan/agrad/partials_vari.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <vector>
 #include <boost/type_traits.hpp>
 #include <boost/type_traits/is_arithmetic.hpp> 
 
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/matrix.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
 
@@ -92,6 +92,12 @@ namespace stan {
     enum { value = 1 };
     typedef T type;
   };
+  template <typename T>
+  struct is_vector<Eigen::Block<T> > {
+    enum { value = 1 };
+    typedef T type;
+  };
+
 
   namespace {
     template <bool is_vec, typename T>
@@ -222,8 +228,34 @@ namespace stan {
   };
 
 
+  /**
+   *  VectorView is a template metaprogram that takes its argument and
+   *  allows it to be used like a vector. There are three template parameters
+   *  - T: Type of the thing to be wrapped. For example, double, var, vector<double>, etc.
+   *  - is_array: Boolean variable indicating whether the underlying type is an array.
+   *  - throw_if_accessed: Boolean variable indicating whether this instance should
+   *       not be used and should throw if operator[] is used.
+   *
+   *  For a scalar value, it broadcasts the single value when using
+   *  operator[].
+   *
+   *  For a vector, operator[] looks into the value passed in.
+   *  Note: this is not safe. It is possible to read past the size of
+   *  an array.
+   *
+   *  Uses: 
+   *    Read arguments to prob functions as vectors, even if scalars, so
+   *    they can be read by common code (and scalars automatically
+   *    broadcast up to behave like vectors) : VectorView of immutable
+   *    const array of double* (no allocation)
+   *
+   *    Build up derivatives into common storage : VectorView of
+   *    mutable shared array (no allocation because allocated on
+   *    auto-diff arena memory)
+   */
   template <typename T,
-            bool is_array = stan::is_vector_like<T>::value>
+            bool is_array = stan::is_vector_like<T>::value,
+            bool throw_if_accessed = false>
   class VectorView {
   public: 
     typedef typename scalar_type<T>::type scalar_t;
@@ -238,15 +270,23 @@ namespace stan {
     VectorView(scalar_t* x) : x_(x) { }
 
     scalar_t& operator[](int i) {
-      if (is_array) return x_[i];
-      else return x_[0];
+      if (throw_if_accessed) 
+        throw std::out_of_range("VectorView: this cannot be accessed");
+      if (is_array) 
+        return x_[i];
+      else 
+        return x_[0];
     }
   private:
     scalar_t* x_;
   };
 
-  template <typename T, bool is_array>
-  class VectorView<const T, is_array> {
+  /**
+   *
+   *  VectorView that has const correctness.
+   */
+  template <typename T, bool is_array, bool throw_if_accessed>
+  class VectorView<const T, is_array, throw_if_accessed> {
   public:
     typedef typename scalar_type<T>::type scalar_t;
 
@@ -259,9 +299,13 @@ namespace stan {
     template <int R, int C>
     VectorView(const Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
 
-    const scalar_t operator[](int i) const {
-      if (is_array) return x_[i];
-      else return x_[0];
+    const scalar_t& operator[](int i) const {
+      if (throw_if_accessed) 
+        throw std::out_of_range("VectorView: this cannot be accessed");
+      if (is_array)
+        return x_[i];
+      else 
+        return x_[0];
     }
   private:
     const scalar_t* x_;
@@ -269,7 +313,7 @@ namespace stan {
 
   // simplify to hold value in common case where it's more efficient
   template <>
-  class VectorView<const double, false> {
+  class VectorView<const double, false, false> {
   public:
     VectorView(double x) : x_(x) { }
     double operator[](int /* i */)  const {
@@ -279,6 +323,21 @@ namespace stan {
     const double x_;
   };
 
+
+  /**
+   *
+   *  DoubleVectorView allocates double values to be used as
+   *  intermediate values. There are 2 template parameters:
+   *  - used: boolean variable indicating whether this instance
+   *      is used. If this is false, there is no storage allocated
+   *      and operator[] throws.
+   *  - is_vec: boolean variable indicating whether this instance
+   *      should allocate a vector, if it is used. If this is false,
+   *      the instance will only allocate a single double value.
+   *      If this is true, it will allocate the number requested.
+   *
+   *  These values are mutable.
+   */
   template<bool used, bool is_vec>
   class DoubleVectorView {
   public:
@@ -394,9 +453,117 @@ namespace stan {
       };
     };
 
+  namespace {
+    template <bool is_vec, typename T, typename T_container>
+    struct scalar_type_helper_pre {
+      typedef T_container type;
+    };
+    
+    template <typename T, typename T_container> 
+    struct scalar_type_helper_pre<true, T, T_container> {
+      typedef typename scalar_type_helper_pre<is_vector<typename T::value_type>::value, typename T::value_type, typename T_container::value_type>::type type;
+    };
+  }
+  
+  /**
+    * Metaprogram structure to determine the type of first container of
+    * the base scalar type of a template argument.
+    *
+    * @tparam T Type of object.
+  */
+  template <typename T>
+  struct scalar_type_pre {
+    typedef typename scalar_type_helper_pre<is_vector<typename T::value_type>::value, typename T::value_type, T>::type type;
+  };
 
 
+  template <typename T,
+            bool is_array = stan::is_vector_like<typename T::value_type>::value,
+            bool throw_if_accessed = false>
+  class VectorViewMvt {
+  public: 
+    typedef typename scalar_type_pre<T>::type matrix_t;
+
+    VectorViewMvt(matrix_t& m) : x_(&m) { }
+
+    VectorViewMvt(std::vector<matrix_t>& vm) : x_(&vm[0]) { }
+
+    matrix_t& operator[](int i) {
+      if (throw_if_accessed) 
+        throw std::out_of_range("VectorViewMvt: this cannot be accessed");
+      if (is_array) 
+        return x_[i];
+      else 
+        return x_[0];
+    }
+  private:
+    matrix_t* x_;
+  };
+
+  /**
+   *
+   *  VectorViewMvt that has const correctness.
+   */
+  template <typename T, bool is_array, bool throw_if_accessed>
+  class VectorViewMvt<const T, is_array, throw_if_accessed> {
+  public: 
+    typedef typename scalar_type_pre<T>::type matrix_t;
+
+    VectorViewMvt(const matrix_t& m) : x_(&m) { }
+
+    VectorViewMvt(const std::vector<matrix_t>& vm) : x_(&vm[0]) { }
+
+    const matrix_t& operator[](int i) const {
+      if (throw_if_accessed) 
+        throw std::out_of_range("VectorViewMvt: this cannot be accessed");
+      if (is_array) 
+        return x_[i];
+      else 
+        return x_[0];
+    }
+  private:
+    const matrix_t* x_;
+  };
+
+  // length_mvt() should only be applied to std vector or Eigen matrix
+  template <typename T>
+  size_t length_mvt(const T& ) {
+    throw std::out_of_range("length_mvt passed to an unrecognized type.");
+    return 1U;
+  }
+  template <typename T, int R, int C>
+  size_t length_mvt(const Eigen::Matrix<T,R,C>& ) {
+    return 1U;
+  }
+  template <typename T, int R, int C>
+  size_t length_mvt(const std::vector<Eigen::Matrix<T,R,C> >& x) {
+    return x.size();
+  }
+
+  template <typename T1, typename T2>
+  size_t max_size_mvt(const T1& x1, const T2& x2) {
+    size_t result = length_mvt(x1);
+    result = result > length_mvt(x2) ? result : length_mvt(x2);
+    return result;
+  }
+
+  template <typename T1, typename T2, typename T3>
+  size_t max_size_mvt(const T1& x1, const T2& x2, const T3& x3) {
+    size_t result = length_mvt(x1);
+    result = result > length_mvt(x2) ? result : length_mvt(x2);
+    result = result > length_mvt(x3) ? result : length_mvt(x3);
+    return result;
+  }
+
+  template <typename T1, typename T2, typename T3, typename T4>
+  size_t max_size_mvt(const T1& x1, const T2& x2, const T3& x3, const T4& x4) {
+    size_t result = length_mvt(x1);
+    result = result > length_mvt(x2) ? result : length_mvt(x2);
+    result = result > length_mvt(x3) ? result : length_mvt(x3);
+    result = result > length_mvt(x4) ? result : length_mvt(x4);
+    return result;
+  }
 
 }
-
 #endif
+

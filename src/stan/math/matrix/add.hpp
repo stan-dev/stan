@@ -3,7 +3,7 @@
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_matching_dims.hpp>
+#include <stan/math/error_handling/matrix/check_matching_dims.hpp>
 
 namespace stan {
   namespace math {
@@ -26,7 +26,8 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>
     add(const Eigen::Matrix<T1,R,C>& m1,
         const Eigen::Matrix<T2,R,C>& m2) {
-      stan::math::validate_matching_dims(m1,m2,"add");
+      stan::math::check_matching_dims("add(%1%)",m1,"m1",
+                                      m2,"m2",(double*)0);
       Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>      
         result(m1.rows(),m1.cols());
       for (int i = 0; i < result.size(); ++i)
@@ -38,7 +39,7 @@ namespace stan {
      * Return the sum of the specified matrix and specified scalar.
      *
      * @tparam T1 Scalar type of matrix.
-     * @param T2 Type of scalar.
+     * @tparam T2 Type of scalar.
      * @param m Matrix.
      * @param c Scalar.
      * @return The matrix plus the scalar.
@@ -58,7 +59,7 @@ namespace stan {
     /**
      * Return the sum of the specified scalar and specified matrix.
      *
-     * @param T1 Type of scalar.
+     * @tparam T1 Type of scalar.
      * @tparam T2 Scalar type of matrix.
      * @param c Scalar.
      * @param m Matrix.

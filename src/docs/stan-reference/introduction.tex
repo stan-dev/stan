@@ -6,14 +6,86 @@
 \noindent
 This document is both a user's guide and a reference manual for
 \Stan's probabilistic modeling language.  This introductory chapter
-provides a high-level overview of \Stan.  The next chapter provides a
-hands-on quick-start guide showing how \Stan works in practice.
-Installation instructions are in \refappendix{install}. The remaining
+provides a high-level overview of \Stan. The remaining
 parts of this document include a practically-oriented user's guide for
 programming models and a detailed reference manual for \Stan's
 modeling language and associated programs and data formats.
 
-\section{\Stan Programs}
+\section{Stan Home Page}
+
+For links to up-to-date code, examples, manuals, bug reports,
+feature requests, and everything else Stan related, see
+the Stan home page:
+%
+\begin{quote}
+\url{http://mc-stan.org/}
+\end{quote}
+
+
+\section{Stan Interfaces}
+
+There are three interfaces for Stan that are supported as part of the
+Stan project.  Models and their use are the same across the three
+interfaces, and this manual is the modeling language manual for all
+three interfaces.  All of the interfaces share initialization,
+sampling and tuning controls, and roughly share posterior analysis
+functionality.   
+
+\subsection{CmdStan}
+
+CmdStan allows Stan to be run from the command line.  In some sense,
+CmdStan is the reference implementation of Stan.  The CmdStan
+documentation used to be part of this document, but is now its own
+standalone document.  The CmdStan home page, with links to download
+and installation instructions and the manual is code and manual is
+%
+\begin{quote}
+\url{http://mc-stan.org/cmdstan.html}
+\end{quote}
+
+\subsection{RStan}
+
+RStan is the R interface to Stan.  RStan interfaces to Stan through
+R's memory rather than just calling Stan from the outside, as in the
+R2WinBUGS and R2jags interfaces on which it was modeled.  The RStan
+home page, with links to download and installation instructions and the 
+manual is
+%
+\begin{quote}
+\url{http://mc-stan.org/rstan.html}
+\end{quote}
+
+\subsection{PyStan}
+
+PyStan is the Python interface to Stan.  Like RStan, it interfaces at
+the Python memory level rather than calling Stan from the outside.
+The PyStan home page, with links to download and installation
+instructions and the manual is
+%
+\begin{quote}
+\url{http://mc-stan.org/pystan.html}
+\end{quote}
+
+
+\subsection{Future Interfaces}
+
+Work is underway to develop interfaces for Stan in:
+%
+\begin{itemize}
+\item MATLAB
+\item Julia
+\item Stata
+\end{itemize}
+%
+For more information, or to get involved in the design or coding, see
+the Stan message groups at
+%
+\begin{quote}
+\url{http://mc-stan.org/groups.html}
+\end{quote}
+
+
+\section{Stan Programs}
 
 A \Stan program defines a statistical model through a conditional
 probability function $p(\theta|y;x)$, where $\theta$ is a sequence of
@@ -66,7 +138,7 @@ the known values $y$ and $x$, then generates a sequence of
 $p(\theta|y;x)$.
 
 
-\section{\Stan's Samplers}
+\section{Sampling}
 
 For continuous parameters, \Stan uses Hamiltonian Monte Carlo (\HMC)
 sampling \citep{Duane:1987, Neal:1994, Neal:2011}, a form of Markov chain Monte
@@ -105,13 +177,14 @@ discretization of the Hamiltonian and the total number of steps taken
 per iteration (with their product determining total simulation time).
 \Stan can be configured with a user-specified step size or it can
 estimate an optimal step size during warmup using dual averaging
-\citep{Nesterov:2009, Hoffman-Gelman:2012}.  In either case,
-additional randomization may be applied to draw the step size from an
-interval of possible step sizes \citep{Neal:2011}.
+\citep{Nesterov:2009, Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  
+In either case, additional randomization may be applied to draw the 
+step size from an interval of possible step sizes \citep{Neal:2011}.
 
 \Stan can be set to use a specified number of steps, or it can
 automatically adapt the number of steps during sampling using the
-No-U-Turn (\NUTS) sampler \citep{Hoffman-Gelman:2012}.  
+No-U-Turn (\NUTS) sampler 
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  
 
 The third tuning parameter is a mass matrix for the fictional
 particle.  \Stan can be configured to estimate a diagonal mass matrix
@@ -129,7 +202,7 @@ accounts for both scaling and rotation,%
 but is more memory and computation intensive per leapfrog step due to
 the underlying matrix operations.
 
-\section{Convergence Monitoring and Effective Sample Size}
+\subsection{Convergence Monitoring and Effective Sample Size}
 
 Samples in a Markov chain are only drawn with the marginal
 distribution $p(\theta|y;x)$ after the chain has converged to its
@@ -150,11 +223,7 @@ to also monitor (an estimate of) the effective sample size of
 parameters of interest in order to estimate the additional estimation
 error due to correlated samples.
 
-
-
-
-
-\section{Bayesian Inference and Monte Carlo Methods}
+\subsection{Bayesian Inference and Monte Carlo Methods}
 
 \Stan was developed to support full Bayesian inference.  Bayesian
 inference is based in part on Bayes's rule,
@@ -181,531 +250,56 @@ posterior such as event outcomes or the values of as yet unobserved
 data.
 
 
+\section{Optimization}
 
-\chapter{Getting Started}
-
-\noindent
-This chapter is designed to help users get acquainted with the overall
-design of the \Stan language and calling \Stan from the command line.
-Later chapters are devoted to expanding on the material in this
-chapter with full reference documentation.  The content is identical
-to that found on the getting-started with the command-line
-documentation on the Stan home page, \url{http://mc-stan.org/}.
-
-\section{For BUGS Users}
-
-\refappendix{stan-for-bugs} describes some similarities
-and important differences between Stan and BUGS (including WinBUGS,
-OpenBUGs, and JAGS).
-
-
-\section{Installation}
-
-For information about supported versions of Windows, Mac and Linux
-platforms along with step-by-step installation instructions, see
-\refappendix{install}.
-
-\section{Building Stan}
-
-Building Stan itself works the same way across platforms.
-To build Stan, first open a command-line terminal application.  Then change
-directories to the directory in which Stan is installed (i.e., the
-directory containing the file named \code{makefile}).
+\Stan also supports optimization-based inference for models.  Given a
+posterior $p(\theta|y)$, Stan can find the posterior mode $\theta^*$,
+which is defined by
 %
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> cd <stan-home>
-\end{Verbatim}
-\end{quote}
+\[
+\theta^{*} = \mbox{argmax}_{\theta} \ p(\theta|y).
+\]
 %
-Then make the library with the following make command
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make bin/libstan.a
-\end{Verbatim}
-\end{quote}
-%
-then make the model parser and code generator with the following call
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make bin/stanc
-\end{Verbatim}
-\end{quote}
-%
-\emph{Warning}: The \code{make} program may take 10+ minutes and
-consume 2+ GB of memory to build \code{libstan.a} and \code{stanc}.
-Compiler warnings, including \code{uname: not found}, may be safely ignored.
- 
-Finally, make the Stan output summary program with the following
-make command
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make bin/print
-\end{Verbatim}
-\end{quote}
-%
+Here the notation $\mbox{argmax}_u \ f(v)$ is used to pick out the value
+of $v$ at which $f(v)$ is maximized.  
 
-Building \code{libstan.a}, \code{bin/stanc}, and \code{bin/print} need only be done once.
-
-\section{Compiling and Executing a Model}
-
-The rest of this quick-start guide explains how to code
-and run a very simple Bayesian model.
-
-\subsection{A Simple Bernoulli Model}
-
-The following simple model is available in the source
-distribution located at \code{<stan-home>} as
-%
-\begin{quote}
-\nolinkurl{src/models/basic_estimators/bernoulli.stan}
-\end{quote}
-%
-The file contains the following model.
-%
-\begin{quote}
-\begin{Verbatim}
-data { 
-  int<lower=0> N; 
-  int<lower=0,upper=1> y[N];
-} 
-parameters {
-  real<lower=0,upper=1> theta;
-} 
-model {
-  theta ~ beta(1,1);
-  for (n in 1:N) 
-    y[n] ~ bernoulli(theta);
-}
-\end{Verbatim}
-\end{quote}
-%
-The model assumes the binary observed data \code{y[1],...,y[N]}
-are i.i.d.\ with Bernoulli chance-of-success \code{theta}.  The
-prior on \code{theta} is \code{beta(1,1)} (i.e., uniform).
-
-\subsubsection{Implicit Uniform Priors}
-
-If no prior is specified for a parameter, it is implicitly given a
-uniform prior on its support.  For parameters such as \code{theta} in
-the example, which are constrained to fall between 0 and 1, this
-produces a proper uniform distribution on the support of \code{theta}.
-Because $\distro{Beta}(1,1)$ is the uniform distribution, the
-following sampling statement can be eliminated from the model without
-changing the log probability calculation.
-%
-\begin{quote}
-\begin{Verbatim}
-  theta ~ beta(1,1);
-\end{Verbatim}
-\end{quote}
-
-For parameters with unbounded support, the implicit uniform prior is
-improper.  Stan allows improper priors to be specified in models, but
-posteriors must be proper in order for sampling to succeed.
+If the prior is uniform, the posterior mode corresponds to the maximum
+likelihood estimate (MLE) of the parameters.  If the prior is not
+uniform, the posterior mode is sometimes called the maximum a
+posterior (MAP) estimate.  If parameters (typically hierarchical) have
+been marginalized out, it's sometimes called a maximum marginal
+likelihood (MML) estimate. 
 
 
-\subsubsection{Constraints on Parameters}
+\subsection{Inference with Point Estimates}
 
-The variable \code{theta} is defined with lower and upper bounds,
-which constrain its value.  Parameters with constrained support should
-always specify appropriate constraints in the parameter declaration;
-if the constraints are absent, sampling will either slow down or stop
-altogether based on whether the initial values satisfy the constraints.
+The estimate $\theta^{*}$ is a so-called ``point estimate,'' meaning
+that it summarizes the posterior distribution by a single point,
+rather than with a distribution.  Of course, a point estimate does
+not, in and of itself, take into account estimation variance.
+Posterior predictive inferences $p(\tilde{y} | y)$ can be made using
+the posterior mode given data $y$ as $p(\tilde{y}|\theta^*)$, but they
+are not Bayesian inferences, even if the model involves a prior,
+because they do not take posterior uncertainty into account.  If the
+posterior variance is low and the posterior mean is near the posterior
+mode, inference with point estimates can be very similar to full
+Bayesian inference.
 
-\subsubsection{Vectorizing Sampling Statements}
+\subsubsection{``Empirical Bayes''}
 
-Iterations of the model will be faster if the loop over sampling
-statements is vectorized, replacing
+Fitting point estimates of priors and then using them for subsequent
+inference is sometimes called ``empirical Bayes'' (see, e.g.,
+\citep{Efron:2012}).%
 %
-\begin{quote}
-\begin{Verbatim}
-  for (n in 1:N) 
-    y[n] ~ bernoulli(theta);
-\end{Verbatim}
-\end{quote}
+\footnote{The scare quotes on ``empirical Bayes'' are because the
+  approach is no more empirical than full Bayes.  Empirical Bayes
+  approaches merely ignore some posterior uncertainty to make
+  inference more efficient computationally.}
 %
-with the equivalent vectorized form,
-%
-\begin{quote}
-\begin{Verbatim}
-  y ~ bernoulli(theta);
-\end{Verbatim}
-\end{quote}
-%
-Performance gains from vectorization are not because loops are slow in
-Stan, but because calls to sampling statements are slow.
-Vectorization allows multiple calls to a sampling statement to be
-replaced with a single call that can share common calculations for the
-log probability function, its gradients, and error checking.  For more
-tips on optimizing the performance of Stan models, see
-\refchapter{optimization}.
+Typically these optimizations will be done using maximum marignal
+likelihood rather than posterior modes of a full model.  Sometimes
+Empirical Bayes point estimates will be obtained using moment matching
+(see, e.g., the rat-tumor example in Chapter 5 of
+\citep{GelmanEtAl:2013}).
 
-
-\subsection{Data Set}
-
-A data set of $\mbox{\code{N}}=10$ observations is available in the file
-%
-\begin{quote}
-\nolinkurl{src/models/basic_estimators/bernoulli.data.R}
-\end{quote}
-%
-The content of the file is as follows.
-%
-\begin{quote}
-\begin{Verbatim}
-N <- 10
-y <- c(0,1,0,0,0,0,0,0,0,1)
-\end{Verbatim}
-\end{quote}
-%
-This defines the contents of two variables, \code{N} and \code{y},
-using an R-like syntax (see \refchapter{dump} for more information).
-
-
-
-\subsection{Generating and Compiling the Model}
-
-A single call to \code{make} will generate the \Cpp code for a
-model with a name ending in \code{.stan} and compile it for
-execution.  This call will also compile the library \code{libstan.a}
-and the parser/code generator \code{stanc} if they have not already
-been compiled.
-
-First, change directories to \code{<stan-home>}, the directory where
-Stan was unpacked that contains the file named \code{makefile} and
-a subdirectory called \code{src/}.
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> cd <stan-home>
-\end{Verbatim}
-\end{quote}
-%
-Then issue the following command:
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make src/models/basic_estimators/bernoulli 
-\end{Verbatim}
-\end{quote}
-And yes, those are forward slashes in the make target for Windows.
-
-The \code{make} command may be applied to files in locations
-that are not subdirectories issued from another directory as follows.
-Just replace the relative path \code{src/models/...} with the
-actual path.
-
-The C++ generated for the model and its compiled executable
-form will be placed in the same directory as the model.
-
-
-\subsection{Executing the Model}
-
-The model can be executed from the directory in which it resides.
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> cd src/models/basic_estimators 
-\end{Verbatim}
-\end{quote}
-%
-To execute the model under Linux or Mac, use
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> ./bernoulli --data=bernoulli.data.R
-\end{Verbatim}
-\end{quote}
-%
-The \code{./} prefix before the executable is only required under
-Linux and the Mac when executing a model from the directory in which
-it resides.
-
-For the Windows DOS terminal, the \code{./} prefix is not needed,
-resulting in the following command.
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> bernoulli --data=bernoulli.data.R
-\end{Verbatim}
-\end{quote}
-%
-Whether the command is run in Windows, Linux, or on the Mac, the
-output is the same.  First, the parameters are echoed to the standard output,
-which shows up on the terminal as follows.
-%
-\begin{quote}
-\begin{Verbatim}
-STAN SAMPLING COMMAND
-data = bernoulli.data.R
-init = random initialization
-init tries = 1
-samples = samples.csv
-append_samples = 0
-save_warmup = 0
-seed = 1845979644 (randomly generated)
-chain_id = 1 (default)
-iter = 2000
-warmup = 1000
-thin = 1 (default)
-equal_step_sizes = 0
-nondiag_mass = 0
-leapfrog_steps = -1
-max_treedepth = 10
-epsilon = -1
-epsilon_pm = 0
-delta = 0.5
-gamma = 0.05
-...
-\end{Verbatim}
-\end{quote}
-%
-The ellipses (\code{...}) indicate that the output continues (as
-described below).
-
-Next, the sampler counts up the iterations in place, reporting
-percentage completed, ending as follows.
-%
-\begin{quote}
-\begin{Verbatim}
-...
-Iteration: 2000 / 2000 [100%]  (Sampling)
-...
-\end{Verbatim}
-\end{quote}
-
-\subsection{Sampler Output}
-
-Each execution of the model results in the samples from a single
-Markov chain being written to a file in comma-separated value (CSV) format.
-The default name of the output file is \nolinkurl{samples.csv}.
-
-The first part of the output file just repeats the parameters
-as comments (i.e., lines beginning with the pound sign (\Verb|#|)).
-%
-\begin{quote}
-\begin{Verbatim}
-...
-# Samples Generated by Stan
-#
-# stan_version_major=1
-# stan_version_minor=2
-# stan_version_patch=0
-# data=bernoulli.data.R
-# init=random initialization
-# append_samples=0
-# save_warmup=0
-# seed=1845979644
-# chain_id=1
-# iter=2000
-# warmup=1000
-# thin=1
-# equal_step_sizes=0
-# leapfrog_steps=-1
-# max_treedepth=10
-# epsilon=-1
-# epsilon_pm=0
-# delta=0.5
-# gamma=0.05
-...
-\end{Verbatim}
-\end{quote}
-%
-This is then followed by a header indicating the
-names of the values sampled.
-%
-\begin{quote}
-\begin{Verbatim}
-...
-lp__,treedepth__,stepsize__,theta
-...
-\end{Verbatim}
-\end{quote}
-%
-The first three names correspond to the log probability function
-value at the sample, the depth of tree evaluated by the NUTS sampler,
-and the step size.  The single model parameter \code{theta} is
-stored in the fourth column.
-
-Next up is the result of adaptation, reported as comments.
-%
-\begin{quote}
-\begin{Verbatim}
-...
-# step size=1.43707
-# parameter step size multipliers:
-# 1
-...
-\end{Verbatim}
-\end{quote}
-%
-This report says that NUTS step-size adaptation during warmup
-settled on a step size of 1.43707.  The next two lines
-indicate the multipliers for scaling individual parameters, here
-just a single multiplier, 1, corresponding to the single
-parameter \code{theta}.
-
-The rest of the file contains lines corresponding to the
-samples from each iteration.%
-%
-\footnote{There are repeated entries due to the Metropolis accept step
-in the No-U-Turn sampling algorithm.}
-%
-%
-\begin{quote}
-\begin{Verbatim}
-...
--7.07769,1,1.43707,0.158674
--7.07769,1,1.43707,0.158674
--7.37289,1,1.43707,0.130089
--7.09254,1,1.43707,0.361906
--7.09254,1,1.43707,0.361906
--7.09254,1,1.43707,0.361906
--6.96213,1,1.43707,0.337061
--6.96213,1,1.43707,0.337061
--6.77689,1,1.43707,0.220795
-...
--6.85235,1,1.43707,0.195994
--6.85235,1,1.43707,0.195994
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
-\end{Verbatim}
-\end{quote}
-%
-This ends the output.  
-
-\subsection{Summarizing Output}
-
-The command-line program \code{bin/print} will display summary
-information about the run (for more information, see
-\refchapter{print-command}). To run \code{print} on the output file
-generated for \code{bernoulli} on Linux or Mac use
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> <stan-home>/bin/print samples.csv
-\end{Verbatim}
-\end{quote}
-%
-For Windows use backslashes for the executable
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> <stan-home>\bin\print samples.csv
-\end{Verbatim}
-\end{quote}
-%
-The output of the command will display information about the run
-followed by information for each parameter and generated quantity. For
-\code{bernoulli}, we ran 1 chain and saved 1000 iterations. The information is
-echoed to the standard output:
-%
-\begin{quote}
-{\small
-\begin{Verbatim}[fontshape=sl]
-Inference for Stan model:
-1 chains: each with iter=(1000); warmup=(0); thin=(1); 
-1000 iterations saved.
-
-       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
-theta   0.2     0.0  0.1  0.1  0.2  0.2  0.3   0.5   478  1.0
-
-Samples were drawn using mcmc::nuts_diag.
-For each parameter, n_eff is a crude measure of effective 
-sample size, and Rhat is the potential scale reduction factor 
-on split chains (at convergence, Rhat=1).
-\end{Verbatim}
-}
-\end{quote}
-%
-In addition to the general information about the runs, \code{print}
-displays summary statistics for each parameter and generated
-quantity.
-
-In the \code{bernoulli} model, there is a single parameter,
-\code{theta}. The mean, standard error of the mean, standard
-deviation, the 2.5\%, 25\%, 50\%, 75\%, and 97.5\% quantiles,
-number of effective samples, and $\hat{R}$ value are displayed
-These quantities and their uses are described in detail in 
-\refchapter{mcmc}.
-
-The command \code{bin/print} can be called with more than one csv file
-by separating filenames with spaces. It will also take wildcards in
-specifying filenames. A typical usage of Stan from the command line
-would first create one or more Markov chains by calling the model
-executable, typically in parallel, writing the output CSV file for
-each into its own directory.  Next, after all of the processes are
-finished, the results would be analyzed using \code{print} to assess
-convergence and inspect the means and quantiles of the fitted
-variables.  Additionally, downstream inferences may be performed using
-the samples (e.g., to make decisions or predictions for unseen data).
-
-\subsection{Configuring Command-Line Options}
-
-The command-line options for running a model are detailed in
-the next chapter. They can also be printed on the command
-line in Linux and on the Mac as follows.
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> ./bernoulli --help
-\end{Verbatim}
-\end{quote}
-%
-and on Windows with
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> bernoulli --help
-\end{Verbatim}
-\end{quote}
-
-\subsection{Testing Stan}
-
-To run the Stan unit tests of basic functionality, run the
-following commands from a shell (where \code{<stan-home>} is replaced
-top-level directory into which Stan was unpacked; it should contain a
-file named \code{makefile}).
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> cd <stan-home>
-> make O=0 test-unit
-> make O=0 test-distributions
-> make O=3 test-models
-\end{Verbatim}
-\end{quote}
-%
-Warnings can be safely ignored if the tests complete without a
-\code{FAIL} error.
-
-Code optimization is specified by the letter `O' followed by an equal
-sign followed by the digit `0' for no optimization and `3' for more
-optimization; optimization slows down compilation of the executable
-but reduces its execution time.
-
-\emph{Warning}: The unit test can take 30+ minutes and consume 3+ GB
-of memory with the default compiler, \code{g++}.  It is faster
-to run the Clang compiler (option \code{CC=clang++}), and to run in
-multiple threads (option \code{-j4} for four threads).
-
-
-% \section{User-Defined Distributions and Functions}
-
-% \Stan allows new distributions to be coded directly in the modeling
-% language.  
-
-%  in one of two ways, either
-% directly in its modeling language (see
-% \refchapter{custom-probability-functions}), or by extending the
-% modeling language using \Cpp (see
-% \refappendix{user-defined-functions}).  The latter is more efficient
-% and also portable across models.
 

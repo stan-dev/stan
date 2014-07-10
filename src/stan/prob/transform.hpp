@@ -3,16 +3,16 @@
 
 #include <cmath>
 #include <cstddef>
+#include <limits>
 #include <stdexcept>
 #include <sstream>
 #include <vector>
-#include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/math.hpp>
 #include <stan/math/matrix.hpp>
-#include <stan/math/matrix/validate_less.hpp>
+#include <stan/math/matrix/sum.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 
@@ -175,8 +175,6 @@ namespace stan {
      * extended onion method Journal of Multivariate Analysis 100
      * (2009) 1989–2001 </li></ul>
      *
-     * // FIXME: explain which CPCs we're dealing with
-     * 
      * @param CPCs The (K choose 2) canonical partial correlations in
      * (-1,1).
      * @param K Dimensionality of correlation matrix.
@@ -192,30 +190,23 @@ namespace stan {
                 const size_t K,
                 T& log_prob) {
 
-      size_t k = 0; 
-      size_t i = 0;
-      T log_1cpc2;
-      double lead = K - 2.0; 
+      using stan::math::log1m;
+      using stan::math::square;
+      using stan::math::sum;
+
+      Eigen::Matrix<T,Eigen::Dynamic,1> values(CPCs.rows() - 1);
+      size_t pos = 0;
       // no need to abs() because this Jacobian determinant 
       // is strictly positive (and triangular)
-      // skip last row (odd indexing) because it adds nothing by design
-      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      for (size_type j = 0; 
-           j < (CPCs.rows() - 1);
-           ++j) {
-        using stan::math::log1m;
-        using stan::math::square;
-        log_1cpc2 = log1m(square(CPCs[j]));
-        // derivative of correlation wrt CPC
-        log_prob += lead / 2.0 * log_1cpc2; 
-        i++;
-        if (i > K) {
-          k++;
-          i = k + 1;
-          lead = K - k - 1.0;
+      // see inverse of Jacobian in equation 11 of LKJ paper
+      for (size_t k = 1; k <= (K - 2); k++)
+        for (size_t i = k + 1; i <= K; i++) {
+          values(pos) = (K - k - 1) * log1m(square(CPCs(pos)));
+          pos++;
         }
-      }
-      return read_corr_L(CPCs, K);
+
+      log_prob += 0.5 * sum(values);
+      return read_corr_L(CPCs,K);
     }
 
     /**
@@ -381,7 +372,7 @@ namespace stan {
      * placeholder in auto-generated code.
      *
      * @param x Free scalar.
-     * @param lp Reference to log probability.
+     * lp Reference to log probability.
      * @return Transformed input.
      * @tparam T Type of scalar.
      */
@@ -469,7 +460,8 @@ namespace stan {
     template <typename T>
     inline
     T positive_free(const T y) {
-      stan::math::check_positive("stan::prob::positive_free(%1%)", y, "Positive variable");
+      stan::math::check_positive("stan::prob::positive_free(%1%)", y, 
+                                 "Positive variable", (double*)0);
       return log(y);
     }
 
@@ -550,7 +542,8 @@ namespace stan {
       if (lb == -std::numeric_limits<double>::infinity())
         return identity_free(y);
       stan::math::check_greater_or_equal("stan::prob::lb_free(%1%)",
-                                         y, lb, "Lower bounded variable");
+                                         y, lb, "Lower bounded variable",
+                                         (double*)0);
       return log(y - lb);
     }
     
@@ -647,7 +640,8 @@ namespace stan {
       if (ub == std::numeric_limits<double>::infinity())
         return identity_free(y);
       stan::math::check_less_or_equal("stan::prob::ub_free(%1%)",
-                                      y, ub, "Upper bounded variable");
+                                      y, ub, "Upper bounded variable",
+                                      (double*)0);
       return log(ub - y);
     }
 
@@ -685,7 +679,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_constrain(const T x, TL lb, TU ub) {
-      stan::math::validate_less(lb,ub,"lb","ub","lub_constrain/3");
+      stan::math::check_less("lub_constrain(%1%)",lb,ub,"lb",(double*)0);
 
       if (lb == -std::numeric_limits<double>::infinity())
         return ub_constrain(x,ub);
@@ -821,8 +815,9 @@ namespace stan {
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_free(const T y, TL lb, TU ub) {
       using stan::math::logit;
-      stan::math::check_bounded("stan::prob::lub_free(%1%)",
-                                y, lb, ub, "Bounded variable");
+      stan::math::check_bounded<T, TL, TU, typename scalar_type<T>::type>
+        ("stan::prob::lub_free(%1%)",
+         y, lb, ub, "Bounded variable", (double*)0);
       if (lb == -std::numeric_limits<double>::infinity())
         return ub_free(y,ub);
       if (ub == std::numeric_limits<double>::infinity())
@@ -902,8 +897,9 @@ namespace stan {
     inline
     T prob_free(const T y) {
       using stan::math::logit;
-      stan::math::check_bounded("stan::prob::prob_free(%1%)",
-                                y, 0, 1, "Probability variable");
+      stan::math::check_bounded<T,double,double,T>
+        ("stan::prob::prob_free(%1%)",
+         y, 0, 1, "Probability variable",(double*)0);
       return logit(y);
     }
     
@@ -968,8 +964,9 @@ namespace stan {
     template <typename T>
     inline
     T corr_free(const T y) {
-      stan::math::check_bounded("stan::prob::lub_free(%1%)",
-                                y, -1, 1, "Correlation variable");
+      stan::math::check_bounded<T,double,double,double>
+        ("stan::prob::lub_free(%1%)",
+         y, -1, 1, "Correlation variable", (double*)0);
       return atanh(y);
     }
 
@@ -980,7 +977,7 @@ namespace stan {
      * Return the unit length vector corresponding to the free vector y.
      * The free vector contains K-1 spherical coordinates.
      *
-     * @param Vector of K - 1 spherical coordinates
+     * @param y of K - 1 spherical coordinates
      * @return Unit length vector of dimension K
      * @tparam T Scalar type.
      **/
@@ -1005,7 +1002,7 @@ namespace stan {
      * Return the unit length vector corresponding to the free vector y.
      * The free vector contains K-1 spherical coordinates.
      *
-     * @param Vector of K - 1 spherical coordinates
+     * @param y of K - 1 spherical coordinates
      * @return Unit length vector of dimension K
      * @param lp Log probability reference to increment.
      * @tparam T Scalar type.
@@ -1033,7 +1030,8 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     unit_vector_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      stan::math::check_unit_vector("stan::prob::unit_vector_free(%1%)", x, "Unit vector variable");
+      stan::math::check_unit_vector("stan::prob::unit_vector_free(%1%)", 
+                                    x, "Unit vector variable", (double*)0);
       int Km1 = x.size() - 1;
       Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
       T sumSq = x(Km1)*x(Km1);
@@ -1138,7 +1136,8 @@ namespace stan {
     simplex_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       using stan::math::logit;
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "Simplex variable");
+      stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "Simplex variable",
+                                (double*)0);
       int Km1 = x.size() - 1;
       Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
       T stick_len(x(Km1));
@@ -1301,7 +1300,7 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     positive_ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
       stan::math::check_positive_ordered("stan::prob::positive_ordered_free(%1%)", 
-                                y, "Positive ordered variable");
+                                         y, "Positive ordered variable", (double*)0);
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       size_type k = y.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> x(k);
@@ -1313,6 +1312,116 @@ namespace stan {
       return x;
     }
     
+
+    // CHOLESKY FACTOR
+
+    /**
+     * Return the Cholesky factor of the specified size read from the
+     * specified vector.  A total of (N choose 2) + N + (M - N) * N
+     * elements are required to read an M by N Cholesky factor.
+     * 
+     * @tparam T Type of scalars in matrix
+     * @param x Vector of unconstrained values
+     * @param M Number of rows
+     * @param N Number of columns
+     * @return Cholesky factor
+     */
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    cholesky_factor_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                              int M,
+                              int N) {
+      using std::exp;
+      if (M < N)
+        throw std::domain_error("cholesky_factor_constrain: num rows must be >= num cols");
+      if (x.size() != ((N * (N + 1)) / 2 + (M - N) * N))
+        throw std::domain_error("cholesky_factor_constrain: x.size() must be (N * (N + 1)) / 2 + (M - N) * N");
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> y(M,N);
+      T zero(0);
+      int pos = 0;
+      // upper square
+      for (int m = 0; m < N; ++m) {
+        for (int n = 0; n < m; ++n)
+          y(m,n) = x(pos++);
+        y(m,m) = exp(x(pos++));
+        for (int n = m + 1; n < N; ++n)
+          y(m,n) = zero;
+      }
+      // lower rectangle
+      for (int m = N; m < M; ++m)
+        for (int n = 0; n < N; ++n)
+          y(m,n) = x(pos++);
+      return y;
+    }
+
+    /**
+     * Return the Cholesky factor of the specified size read from the
+     * specified vector and increment the specified log probability
+     * reference with the log Jacobian adjustment of the transform.  A
+     * total of (N choose 2) + N + N * (M - N) free parameters are required to read
+     * an M by N Cholesky factor.
+     * 
+     * @tparam T Type of scalars in matrix
+     * @param x Vector of unconstrained values
+     * @param M Number of rows
+     * @param N Number of columns
+     * @param lp Log probability that is incremented with the log Jacobian
+     * @return Cholesky factor
+     */
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    cholesky_factor_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                              int M,
+                              int N,
+                              T& lp) {
+      // cut-and-paste from above, so checks twice
+
+      using stan::math::sum;
+      if (x.size() != ((N * (N + 1)) / 2 + (M - N) * N))
+        throw std::domain_error("cholesky_factor_constrain: x.size() must be (k choose 2) + k");
+      int pos = 0;
+      std::vector<T> log_jacobians(N);
+      for (int n = 0; n < N; ++n) {
+        pos += n;
+        log_jacobians[n] = x(pos++);
+      }
+      lp += sum(log_jacobians);  // optimized for autodiff vs. direct lp += 
+      return cholesky_factor_constrain(x,M,N);
+    }
+
+    /**
+     * Return the unconstrained vector of parameters correspdonding to
+     * the specified Cholesky factor.  A Cholesky factor must be lower
+     * triangular and have positive diagonal elements.
+     *
+     * @param y Cholesky factor.
+     * @return Unconstrained parameters for Cholesky factor.
+     * @throw std::domain_error If the matrix is not a Cholesky factor.
+     */
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1>
+    cholesky_factor_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      using std::log;
+      double result;
+      if (!stan::math::check_cholesky_factor("cholesky_factor_free(%1%)",y,"y",&result))
+        throw std::domain_error("cholesky_factor_free: y is not a Cholesky factor");
+      int M = y.rows();
+      int N = y.cols();
+      Eigen::Matrix<T,Eigen::Dynamic,1> x((N * (N + 1)) / 2 + (M - N) * N);
+      int pos = 0;
+      // lower triangle of upper square
+      for (int m = 0; m < N; ++m) {
+        for (int n = 0; n < m; ++n)
+          x(pos++) = y(m,n);
+        // diagonal of upper square
+        x(pos++) = log(y(m,m));
+      }
+      // lower rectangle
+      for (int m = N; m < M; ++m)
+        for (int n = 0; n < N; ++n)
+          x(pos++) = y(m,n);
+      return x;
+    }
 
     // CORRELATION MATRIX
     /**
@@ -1467,7 +1576,7 @@ namespace stan {
         for (size_type n = m + 1; n < K; ++n) 
           L(m,n) = 0.0;
       }
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> M = L * L.transpose();
+      // FIXME: return multiply_self_transpose
       return L * L.transpose();
     }
 
