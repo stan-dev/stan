@@ -29,6 +29,9 @@
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
+#include <stan/mcmc/metro/adapt_unit_metro.hpp>
+#include <stan/mcmc/metro/adapt_diag_metro.hpp>
+#include <stan/mcmc/metro/adapt_dense_metro.hpp>
 
 #include <stan/model/util.hpp>
 
@@ -608,10 +611,20 @@ namespace stan {
             num_warmup = 0;
           }
           
-        } else if (algo->value() == "rwm") {
+        } else if (algo->value() == "adapt_unit_metro") {
           
-          std::cout << algo->arg("rwm")->description() << std::endl;
-          return 0;
+          typedef stan::mcmc::adapt_unit_metro<Model, rng_t> sampler;
+          sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
+        
+        } else if (algo->value() == "adapt_diag_metro") {
+          
+          typedef stan::mcmc::adapt_diag_metro<Model, rng_t> sampler;
+          sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
+        
+        } else if (algo->value() == "adapt_dense_metro") {
+          
+          typedef stan::mcmc::adapt_dense_metro<Model, rng_t> sampler;
+          sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
         
         } else if (algo->value() == "hmc") {
           
