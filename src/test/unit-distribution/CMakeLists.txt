@@ -22,10 +22,10 @@ foreach(curr_hdr ${DIST_TEST_HDRS})
   gen_test_srcs(${curr_hdr} ${numtests} curr_srcs)
 
   # Copy the header file to the build directory if it's different
-#  if (NOT (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR}))
-#    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${curr_hdr}
-#                   ${CMAKE_CURRENT_BINARY_DIR}/${curr_hdr} COPYONLY)
-#  endif()
+  if (NOT (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR}))
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${curr_hdr}
+                   ${CMAKE_CURRENT_BINARY_DIR}/${curr_hdr} COPYONLY)
+  endif()
 
   # Add a custom command to build the test generation program
   add_custom_command(OUTPUT ${curr_srcs}
