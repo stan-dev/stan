@@ -2,10 +2,10 @@
 set(BIBFILES ../bibtex/all.bib)
 
 # All inputed texfiles
-set(INPUT_TEXFILES abstract.tex acknowledgements.tex advanced.tex appendices.tex
-                   commands.tex contributed.tex distributions.tex functions.tex
+set(INPUT_TEXFILES acknowledgements.tex advanced.tex appendices.tex
+                   contributed.tex distributions.tex functions.tex
                    introduction.tex language.tex preface.tex programming.tex
-                   references.tex title.tex)
+                   references.tex stan-reference.tex title.tex)
 set(IMAGE_DIRS R)
 
 # Root tex file
