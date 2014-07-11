@@ -34,7 +34,7 @@ namespace stan {
                             const T_msg error_msg2,
                             T_result* result) {
       std::ostringstream msg_o;
-      msg_o << name << "[" << i << "] " << error_msg << error_msg2;
+      msg_o << name << "[" << stan::error_index::value + i << "] " << error_msg << error_msg2;
 
       std::string msg;
       // FIXME: this is the line to remove in the future.
