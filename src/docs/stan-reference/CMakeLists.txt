@@ -19,5 +19,5 @@ add_latex_document(${MAIN_TEXFILE}
                    INPUTS ${INPUT_TEXFILES}
                    IMAGE_DIRS ${IMAGE_DIRS}
                    CONFIGURE ${CONFIG_TEXFILES}
-                   USE_INDEX DEFAULT_PDF)
+                   USE_INDEX DEFAULT_PDF MANGLE_TARGET_NAMES)
 

@@ -6,7 +6,7 @@ set(Stan_VERSION_MINOR "3")
 set(Stan_VERSION_PATCH "0")
 set(Stan_VERSION "${Stan_VERSION_MAJOR}.${Stan_VERSION_MINOR}.${Stan_VERSION_PATCH}")
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${Stan_SOURCE_DIR}/cmake)
 
 include(CheckCXXCompilerFlag)
 include(CTest)
