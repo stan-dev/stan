@@ -9,6 +9,7 @@ set(Stan_VERSION "${Stan_VERSION_MAJOR}.${Stan_VERSION_MINOR}.${Stan_VERSION_PAT
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 include(CheckCXXCompilerFlag)
+include(CTest)
 include(StanModels)
 
 option(USE_SYSTEM_EIGEN
@@ -44,7 +45,7 @@ if(USE_SYSTEM_EIGEN)
   find_package( Eigen3 REQUIRED )
   include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 else()
-  include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/lib/eigen_3.2.0")
+  include_directories(SYSTEM "${Stan_SOURCE_DIR}/lib/eigen_3.2.0")
 endif()
 
 # Find Boost
@@ -52,7 +53,7 @@ if(USE_SYSTEM_BOOST)
   find_package( Boost 1.54 REQUIRED )
   include_directories(SYSTEM "${Boost_INCLUDE_DIR}")
 else()
-  include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/lib/boost_1.54.0")
+  include_directories(SYSTEM "${Stan_SOURCE_DIR}/lib/boost_1.54.0")
 endif()
 
 # Setup GTest library
@@ -60,7 +61,9 @@ if(USE_SYSTEM_GTEST)
   find_package( GTest REQUIRED )
   set(GTEST_LIBRARIES ${GTEST_BOTH_LIBRARIES})
 else()
-  add_subdirectory(lib/gtest_1.7.0)
+  if(BUILD_TESTING)
+      add_subdirectory(lib/gtest_1.7.0)
+  endif()
 endif()
 
 # Setup compiler flags
@@ -82,7 +85,7 @@ add_definitions(-DBOOST_RESULT_OF_USE_TR1
                 -DBOOST_NO_DECLTYPE
                 -DBOOST_DISABLE_ASSERTS)
 # Top level include
-include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}/src")
+include_directories("${Stan_SOURCE_DIR}/src" "${Stan_BINARY_DIR}/src")
 
 # add src/stan/gm directory to build libstanc.a
 add_subdirectory(src/stan/gm)
@@ -116,13 +119,8 @@ else()
   set(RUNCMD "")
 endif()
 
-# print 
-#set(PRINT_SRCS ${PROJECT_SOURCE_DIR}/src/stan/command/print.cpp)
-#add_executable(print ${PRINT_SRCS})
-#target_link_libraries(print stan)
-#set(PRINT_BIN ${CMAKE_CURRENT_BINARY_DIR}/print)
-
 # unit tests
-include(CTest)
-add_subdirectory(src/test)
+if(BUILD_TESTING)
+  add_subdirectory(src/test)
+endif()
 
