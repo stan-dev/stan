@@ -2157,7 +2157,7 @@ you can recover them in the generated quantities block via
 \begin{Verbatim}
 generated quantities {
   corr_matrix[K] Sigma;
-  Sigma <- multiply_lower_self_transpose(L);
+  Sigma <- multiply_lower_tri_self_transpose(L);
 }
 \end{Verbatim}
 \end{quote}
