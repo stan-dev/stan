@@ -174,7 +174,7 @@ namespace stan {
     protected:
       M _model;
 
-      std::vector<double> _params_r;
+      Eigen::VectorXd _params_r;
 
       BaseRNG& _rand_int;
       boost::uniform_01<BaseRNG&> _rand_uniform;                
