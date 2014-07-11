@@ -5552,6 +5552,8 @@ this is enforced.
 & & \code{corr\_matrix[K]} 
 \\
 & & \code{cholesky\_factor\_cov[K]}
+\\
+& & \code{cholesky\_factor\_corr[K]}
 \end{tabular}
 \end{center}
 \caption{\small\it The leftmost column is a list of the unconstrained
@@ -5563,8 +5565,9 @@ this is enforced.
   corresponding lefthand column basic type.  At runtime, dimensions
   are checked for consistency for all variables; containers of any
   sizes may be assigned to function arguments.  The constrained matrix
-  types \code{cov\_matrix[K]}, \code{corr\_matrix[K]}, and
-  \code{cholesky\_factor\_cov[K]} are only assignable to matrices of
+  types \code{cov\_matrix[K]}, \code{corr\_matrix[K]},
+  \code{cholesky\_factor\_cov[K]}, and
+  \code{cholesky\_factor\_corr[K]} are only assignable to matrices of
   dimensions \code{matrix[K,K]} types. Stan also allows arrays of any
   of these types, with slightly different declarations for function
   arguments and return types and variables.
