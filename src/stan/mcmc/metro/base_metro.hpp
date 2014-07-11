@@ -58,12 +58,12 @@ namespace stan {
 
        this->_sample_stepsize();
 
-       this->seed(init_sample.cont_params(), init_sample.disc_params());
+       this->seed(init_sample.cont_params());
 
-       double logp0 = log_prob(_params_r, _params_i);
+       double logp0 = log_prob(_params_r);
 
        this->propose(_params_r, _rand_int);
-       double log_p = log_prob(_params_r,_params_i);
+       double log_p = log_prob(_params_r);
 
        if (boost::math::isnan(log_p)) 
          log_p = std::numeric_limits<double>::infinity();
@@ -77,7 +77,6 @@ namespace stan {
        }
 
        return sample(_params_r, 
-                     _params_i,
                      log_p,
                      accept_prob);
      }
@@ -107,7 +106,7 @@ namespace stan {
 
         int direction = delta_log_p > std::log(0.5) ? 1 : -1;
         while (1) {    
-          this->seed(params_r0, params_i0);
+          this->seed(params_r0);
           
           this->propose(this->_params_r, _rand_int); 
           log_p = log_prob(this->_params_r);
