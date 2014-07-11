@@ -131,7 +131,7 @@ namespace stan {
 
       void get_params(std::vector<double>& values) {
         for(size_t i = 0; i < _params_r.size(); ++i)
-          values.push_back(_params_r.at(i));
+          values.push_back(_params_r(i));
        }
       
       void get_param_names(std::vector<std::string>& model_names,
