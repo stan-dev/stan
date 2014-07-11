@@ -941,6 +941,8 @@ namespace stan {
         return stan::prob::positive_ordered_constrain(vector(k),lp);
       }
 
+
+
       /**
        * Return the next Cholesky factor with the specified
        * dimensionality, reading it directly without transforms.
@@ -992,6 +994,58 @@ namespace stan {
         return stan::prob::cholesky_factor_constrain(vector((N * (N + 1)) / 2 + (M - N) * N),
                                                      M,N,lp);
       }
+
+
+
+      /**
+       * Return the next Cholesky factor for a correlation matrix with
+       * the specified dimensionality, reading it directly without
+       * transforms.
+       *
+       * @param K Rows and columns of Cholesky factor
+       * @return Next Cholesky factor for a correlation matrix.
+       * @throw std::domain_error if the matrix is not a valid
+       * Cholesky factor for a correlation matrix.
+       */
+      inline matrix_t cholesky_corr(size_t K) {
+        matrix_t y(matrix(K,K));
+        stan::math::check_cholesky_factor_corr("stan::io::cholesky_factor_corr(%1%)", y, "Constrained matrix");
+        return y;
+      }
+
+      /**
+       * Return the next Cholesky factor for a correlation matrix with
+       * the specified dimensionality, reading from an unconstrained
+       * vector of the appropriate size.
+       *
+       * @param K Rows and columns of Cholesky factor.
+       * @return Next Cholesky factor for a correlation matrix.
+       * @throw std::domain_error if the matrix is not a valid
+       *    Cholesky factor for a correlation matrix.
+       */
+      inline matrix_t cholesky_corr_constrain(size_t K) {
+        return stan::prob::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
+                                                          K);
+      }
+
+      /**
+       * Return the next Cholesky factor for a correlation matrix with
+       * the specified dimensionality, reading from an unconstrained
+       * vector of the appropriate size, and increment the log
+       * probability reference with the log Jacobian adjustment for
+       * the transform.
+       *
+       * @param K Rows and columns of Cholesky factor
+       * @return Next Cholesky factor for a correlation matrix.
+       * @throw std::domain_error if the matrix is not a valid
+       *    Cholesky factor for a correlation matrix.
+       */
+      inline matrix_t cholesky_corr_constrain(size_t K, T& lp) {
+        return stan::prob::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
+                                                   K,lp);
+      }
+
+
 
       /**
        * Return the next covariance matrix with the specified 

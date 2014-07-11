@@ -22,7 +22,7 @@ public:
                      << typeid(typename T::value_type).name()
                      << "): "
                      << y_name_
-                     << "[" << index_ << "] "
+                     << "[" << 1 + index_ << "] "
                      << " error_message "
                      << y[index_]
                      << " "
@@ -99,4 +99,23 @@ TEST_F(MathErrorHandling_dom_err_vec, vvar_var_var) {
   T_msg msg2 = 50;
   
   test_throw<T, T_result, T_msg>(y,msg2);
+}
+
+TEST_F(MathErrorHandling_dom_err_vec, one_indexed) {
+  std::string message;
+  int n = 5;
+  std::vector<double> y(20);
+  try {
+    stan::math::dom_err_vec
+      (n, function_, y, y_name_, error_message_, "", (double*)0);
+    FAIL() << "expecting call to dom_err_vec<> to throw a domain_error,"
+           << "but threw nothing";
+  } catch(std::domain_error& e) {
+    message = e.what();
+  } catch(...) {
+    FAIL() << "expecting call to dom_err_vec<> to throw a domain_error,"
+           << "but threw a different type";
+  }
+
+  EXPECT_NE(std::string::npos, message.find("[6]"));
 }

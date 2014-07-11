@@ -3,7 +3,6 @@
 
 #include <stan/gm/arguments/list_argument.hpp>
 
-#include <stan/gm/arguments/arg_nesterov.hpp>
 #include <stan/gm/arguments/arg_bfgs.hpp>
 #include <stan/gm/arguments/arg_lbfgs.hpp>
 #include <stan/gm/arguments/arg_newton.hpp>
@@ -21,7 +20,6 @@ namespace stan {
         _name = "algorithm";
         _description = "Optimization algorithm";
         
-        _values.push_back(new arg_nesterov());
         _values.push_back(new arg_bfgs());
         _values.push_back(new arg_lbfgs());
         _values.push_back(new arg_newton());
