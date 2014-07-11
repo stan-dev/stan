@@ -31,3 +31,37 @@ TEST(MathErrorHandlingMatrix, checkPositiveOrdered) {
                std::domain_error);
 }
 
+
+TEST(MathErrorHandlingMatrix, checkPositiveOrdered_one_indexed_message) {
+  std::string message;
+  double result;
+  Eigen::Matrix<double, Eigen::Dynamic, 1> y;
+  y.resize(3);
+  
+  y << -1, 0, 0;
+  try {
+    check_positive_ordered("check_positive_ordered(%1%)", y, "y", &result);
+    FAIL() << "should have thrown";
+  } catch (std::domain_error& e) {
+    message = e.what();
+  } catch (...) {
+    FAIL() << "threw the wrong error";
+  }
+
+  EXPECT_NE(std::string::npos, message.find("element at 1"))
+    << message;
+
+
+  y << 0, 5, 1;
+  try {
+    check_positive_ordered("check_positive_ordered(%1%)", y, "y", &result);
+    FAIL() << "should have thrown";
+  } catch (std::domain_error& e) {
+    message = e.what();
+  } catch (...) {
+    FAIL() << "threw the wrong error";
+  }
+
+  EXPECT_NE(std::string::npos, message.find("element at 3"))
+    << message;
+}

@@ -88,3 +88,25 @@ TEST(MathErrorHandling,CheckFinite_Matrix) {
     << "check_finite should throw exception on NaN";
 }
 
+
+TEST(MathErrorHandling,CheckFinite_Matrix_one_indexed_message) {
+  const char* function = "check_finite(%1%)";
+  double result;
+  Eigen::Matrix<double,Eigen::Dynamic,1> x;
+  std::string message;
+
+  result = 0;
+  x.resize(3);
+  x << -1, 0, std::numeric_limits<double>::infinity();
+  try {
+    check_finite(function, x, "x", &result);
+    FAIL() << "should have thrown";
+  } catch (std::domain_error& e) {
+    message = e.what();
+  } catch (...) {
+    FAIL() << "threw the wrong error";
+  }
+
+  EXPECT_NE(std::string::npos, message.find("[3]"))
+    << message;
+}
