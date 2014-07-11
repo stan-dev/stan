@@ -29,4 +29,3 @@ Stan's source-code repository is hosted here on GitHub.
 Licensing
 ---------
 The core Stan C++ code and CmdStan are licensed under new BSD.   RStan and PyStan are licensed under GPLv3.
-
