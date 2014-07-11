@@ -1,5 +1,5 @@
 functions {
-  real foo17(voiderama x) {
+  real foo(void x) {
     return 1.0;
   }
 }
