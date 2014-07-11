@@ -160,9 +160,9 @@ namespace stan {
 
       double U3 = uniform_rng(0.0, 1.0, rng) - 0.5;
       double sign = ((U3 >= 0) - (U3 <= 0));
-      double PI = stan::math::pi();
 
-      return sign * std::acos(W) + fmod(fmod(mu,2*PI)+2*PI,2*PI);
+      //  it's really an fmod() with a positivity constraint
+      return sign * std::acos(W) + fmod(fmod(mu,2*stan::math::pi())+2*stan::math::pi(),2*stan::math::pi());
     }
 
   } 
