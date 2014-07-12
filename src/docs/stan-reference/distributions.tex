@@ -1969,6 +1969,39 @@ function does not take into account the mean prediction.
 \end{description}
 
 
+\section{Multivariate Gaussian Process Distribution, Cholesky parameterization}
+
+\subsubsection{Probability Density Function}
+
+If $K,N \in \nats$, $L \in \reals^{N \times N}$ is lower
+triangular and such that $LL^{\top}$ is positive definite kernel matrix
+and $w \in \reals^{K}$ is a vector of positive
+inverse scales, then for $y \in \reals^{K \times N}$,
+\[
+\distro{MultiGPCholesky}(y|L,w)
+=
+\prod_{i=1}^{K} \distro{MultiNormal}(y_i|0,w_i^{-1} LL^{\top}),
+\]
+where $y_i$ is the $i$th row of $y$.  This is used to efficiently handle
+Gaussian Processes with multi-variate outputs where only the output dimensions
+share a kernel function but vary based on their scale.  If the model allows
+parametrization in terms of Cholesky factor of the kernel matrix, this distribution
+is also more efficient than $\distro{MultiGP}()$. Note that this
+function does not take into account the mean prediction.
+
+\pitem{y}{multi\_gp\_cholesky}{L,w}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{multi\_gp\_cholesky\_log}{matrix \farg{y}, matrix \farg{L},
+  vector \farg{w}}{The log of the multivariate GP density of matrix
+  \farg{y} given lower-triangular Cholesky factor of the kernel matrix \farg{L} and inverses scales
+  \farg{w}}
+%
+\end{description}
+
 
 \section{Multivariate Student-$t$ Distribution}
 
