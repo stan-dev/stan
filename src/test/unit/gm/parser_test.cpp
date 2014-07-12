@@ -554,7 +554,7 @@ TEST(gmParser, intFun) {
 }
 
 TEST(parserFunctions, funsBad0) {
-  test_throws("functions-bad0","Functions cannot contain void argument types.");
+  test_throws("functions-bad0","Functions cannot contain void argument types");
 }
 
 TEST(parserFunctions, funsBad1) {

@@ -52,12 +52,11 @@ namespace stan {
       void operator()(const expr_type& arg_type,
                       bool& pass,
                       std::ostream& error_msgs) const {
-        if (arg_type.is_void()) {
-          error_msgs << "Functions cannot contain void argument types."
+        pass = !arg_type.is_void();
+        if (!pass)
+          error_msgs << "Functions cannot contain void argument types; "
+                     << "found void argument."
                      << std::endl;
-          pass = false;
-        }
-        pass = true;
       }
     };
     boost::phoenix::function<validate_non_void_arg_function> validate_non_void_arg_f;
@@ -357,7 +356,7 @@ namespace stan {
       arg_decl_r.name("function argument declaration");
       arg_decl_r 
         %= bare_type_g [ validate_non_void_arg_f(_1, _pass, 
-                                                boost::phoenix::ref(error_msgs_)) ]
+                                                 boost::phoenix::ref(error_msgs_)) ]
         > identifier_r
         > eps[ add_fun_var_f(_val,_pass,
                               boost::phoenix::ref(var_map_),
