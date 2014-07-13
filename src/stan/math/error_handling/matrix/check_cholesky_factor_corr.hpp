@@ -42,7 +42,7 @@ namespace stan {
         if (!check_positive(function, y(i,i), name, result))
           return false;
       for (int i = 0; i < y.rows(); ++i) {
-        Eigen::Matrix<T_y,1,Eigen::Dynamic> y_i = y.row(i);
+        Eigen::Matrix<T_y,Eigen::Dynamic,1> y_i = y.row(i).transpose();
         if (!check_unit_vector(function, y_i, name, result))
           return false;
       }
