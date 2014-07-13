@@ -553,7 +553,9 @@ TEST(gmParser, intFun) {
   test_parsable("int_fun");
 }
 
-
+TEST(parserFunctions, funsBad0) {
+  test_throws("functions-bad0","Functions cannot contain void argument types");
+}
 
 TEST(parserFunctions, funsBad1) {
   test_throws("functions-bad1","Function already declared");
