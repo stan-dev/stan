@@ -544,6 +544,7 @@ TEST(gm_parser,function_signatures) {
   // test_parsable("function-signatures/math/functions/erfc"); 
   // test_parsable("function-signatures/math/functions/exp"); 
   // test_parsable("function-signatures/math/functions/exp2"); 
+  // test_parsable("function-signatures/math/functions/expm1"); 
   // test_parsable("function-signatures/math/functions/fabs");
   // test_parsable("function-signatures/math/functions/falling_factorial");
   // test_parsable("function-signatures/math/functions/fdim");
@@ -604,49 +605,67 @@ TEST(gm_parser,function_signatures) {
   // test_parsable("function-signatures/math/functions/trigamma");
   // test_parsable("function-signatures/math/functions/trunc");
 
+  //MATRIX FUNCTIONS
   test_parsable("function-signatures/math/matrix/broadcast_infix_operators");
+  test_parsable("function-signatures/math/matrix/cholesky_decompose");
   test_parsable("function-signatures/math/matrix/col");
   test_parsable("function-signatures/math/matrix/cols");
   test_parsable("function-signatures/math/matrix/columns_dot_product");
   test_parsable("function-signatures/math/matrix/columns_dot_self");
   test_parsable("function-signatures/math/matrix/cumulative_sum");
+  test_parsable("function-signatures/math/matrix/determinant");
   test_parsable("function-signatures/math/matrix/diag_matrix");
+  test_parsable("function-signatures/math/matrix/diag_post_multiply");
+  test_parsable("function-signatures/math/matrix/diag_pre_multiply");
   test_parsable("function-signatures/math/matrix/diagonal");
+  test_parsable("function-signatures/math/matrix/distance");
   test_parsable("function-signatures/math/matrix/dot_product");
   test_parsable("function-signatures/math/matrix/dot_self");
+  test_parsable("function-signatures/math/matrix/eigenvalues_sym");
+  test_parsable("function-signatures/math/matrix/eigenvectors_sym");
   test_parsable("function-signatures/math/matrix/elementwise_products");
   test_parsable("function-signatures/math/matrix/exp");
   test_parsable("function-signatures/math/matrix/infix_matrix_operators");
+  test_parsable("function-signatures/math/matrix/inverse");
+  test_parsable("function-signatures/math/matrix/inverse_spd");
   test_parsable("function-signatures/math/matrix/log");
+  test_parsable("function-signatures/math/matrix/log_determinant");
   test_parsable("function-signatures/math/matrix/log_sum_exp");
+  test_parsable("function-signatures/math/matrix/matrix_division");
   test_parsable("function-signatures/math/matrix/max");
   test_parsable("function-signatures/math/matrix/mean");
   test_parsable("function-signatures/math/matrix/min");
   test_parsable("function-signatures/math/matrix/negation");
   test_parsable("function-signatures/math/matrix/prod");
+  test_parsable("function-signatures/math/matrix/qr_Q");
+  test_parsable("function-signatures/math/matrix/qr_R");
   test_parsable("function-signatures/math/matrix/quad_form");
+  test_parsable("function-signatures/math/matrix/quad_form_diag");
   test_parsable("function-signatures/math/matrix/rep_matrix");
+  test_parsable("function-signatures/math/matrix/rep_param"); //mostly rep_array with some other rep_ tests
   test_parsable("function-signatures/math/matrix/rep_row_vector");
   test_parsable("function-signatures/math/matrix/rep_vector");
   test_parsable("function-signatures/math/matrix/row");
   test_parsable("function-signatures/math/matrix/rows");
   test_parsable("function-signatures/math/matrix/rows_dot_product");
   test_parsable("function-signatures/math/matrix/rows_dot_self");
+  test_parsable("function-signatures/math/matrix/singular_values");
   test_parsable("function-signatures/math/matrix/sd");
   test_parsable("function-signatures/math/matrix/softmax");
+  test_parsable("function-signatures/math/matrix/squared_distance");
   test_parsable("function-signatures/math/matrix/sum");
   test_parsable("function-signatures/math/matrix/to_array_1d");
   test_parsable("function-signatures/math/matrix/to_array_2d");
   test_parsable("function-signatures/math/matrix/to_matrix");
   test_parsable("function-signatures/math/matrix/to_row_vector");
   test_parsable("function-signatures/math/matrix/to_vector");
+  test_parsable("function-signatures/math/matrix/trace");
   test_parsable("function-signatures/math/matrix/trace_gen_quad_form");
   test_parsable("function-signatures/math/matrix/trace_quad_form");
   test_parsable("function-signatures/math/matrix/transpose");
   test_parsable("function-signatures/math/matrix/variance");
 
     // test_parsable("good_inf");
-  // test_parsable("function_signatures1");
   // test_parsable("function_signatures6");
   // test_parsable("function_signatures7");
 }
