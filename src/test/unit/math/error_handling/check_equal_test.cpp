@@ -65,3 +65,60 @@ TEST(MathErrorHandling,CheckEqualMatrix) {
                std::domain_error) 
     << "check_equal: matrix<3,1>, matrix<3,1>, should fail with infinity";
 }
+
+
+TEST(MathErrorHandling,CheckEqual_Matrix_one_indexed_message) {
+  const char* function = "check_equal(%1%)";
+  double result = 0;
+  double x;
+  double eq;
+  Eigen::Matrix<double,Eigen::Dynamic,1> x_vec(3);
+  Eigen::Matrix<double,Eigen::Dynamic,1> eq_vec(3);
+  std::string message;
+  
+  // x_vec, eq_vec
+  x_vec   <<   0,    0,   1;
+  eq_vec <<    0,    0,   0;
+
+  try {
+    check_equal(function, x_vec, eq_vec, "x", &result);
+    FAIL() << "should have thrown";
+  } catch (std::domain_error& e) {
+    message = e.what();
+  } catch (...) {
+    FAIL() << "threw the wrong error";
+  }
+  
+  EXPECT_NE(std::string::npos, message.find("[3]"))
+    << message;
+
+  // x, eq_vec
+  x = 1;
+  try {
+    check_equal(function, x, eq_vec, "x", &result);
+    FAIL() << "should have thrown";
+  } catch (std::domain_error& e) {
+    message = e.what();
+  } catch (...) {
+    FAIL() << "threw the wrong error";
+  }
+  
+  EXPECT_EQ(std::string::npos, message.find("["))
+    << "no index information" << std::endl
+    << message;
+
+  // x_vec, eq
+  eq = 1;
+  try {
+    check_equal(function, x_vec, eq, "x", &result);
+    FAIL() << "should have thrown";
+  } catch (std::domain_error& e) {
+    message = e.what();
+  } catch (...) {
+    FAIL() << "threw the wrong error";
+  }
+  
+  EXPECT_NE(std::string::npos, message.find("[1]"))
+    << message;
+
+}

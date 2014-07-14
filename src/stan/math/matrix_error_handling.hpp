@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX_ERROR_HANDLING_HPP__
 
 #include <stan/math/error_handling/matrix/check_cholesky_factor.hpp>
+#include <stan/math/error_handling/matrix/check_cholesky_factor_corr.hpp>
 #include <stan/math/error_handling/matrix/check_column_index.hpp>
 #include <stan/math/error_handling/matrix/check_corr_matrix.hpp>
 #include <stan/math/error_handling/matrix/check_cov_matrix.hpp>
