@@ -6,8 +6,8 @@ transformed data {
   int transformed_data_int;
   real transformed_data_real;
 
-  transformed_data_real <- tgamma(d_int);
-  transformed_data_real <- tgamma(d_real);
+  transformed_data_real <- tanh(d_int);
+  transformed_data_real <- tanh(d_real);
 }
 parameters {
   real p_real;
@@ -16,9 +16,9 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- tgamma(d_int);
-  transformed_param_real <- tgamma(d_real);
-  transformed_param_real <- tgamma(p_real);
+  transformed_param_real <- tanh(d_int);
+  transformed_param_real <- tanh(d_real);
+  transformed_param_real <- tanh(p_real);
 }
 model {  
   y_p ~ normal(0,1);
