@@ -21,25 +21,6 @@ transformed data {
   vector[d_int] transformed_data_vector;
   row_vector[d_int] transformed_data_row_vector;
 
-  //*** Array Operations ***
-  transformed_data_real <- sum(d_real_array);
-  transformed_data_int <- sum(d_int_array);
-  transformed_data_real <- prod(d_real_array);
-  transformed_data_int <- prod(d_int_array);
-  transformed_data_real <- min(d_real_array);
-  transformed_data_int <- min(d_int_array);
-  transformed_data_real <- max(d_real_array);
-  transformed_data_int <- max(d_int_array);
-  transformed_data_real <- mean(d_real_array);
-  transformed_data_real <- variance(d_real_array);
-  transformed_data_real <- sd(d_real_array);
-  transformed_data_real <- log_sum_exp(d_real_array);
-  
-  //*** Array to Array, Vec to Vec Operations ***
-  transformed_data_real_array <- cumulative_sum(d_real_array);
-  transformed_data_vector <- cumulative_sum(d_vector);
-  transformed_data_row_vector <- cumulative_sum(d_row_vector);
-  
   //*** Matrix Operations ***
   // Integer-Valued Matrix Size Functions
   transformed_data_int <- rows(d_vector);

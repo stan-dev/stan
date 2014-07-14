@@ -12,10 +12,10 @@ transformed data {
   real transformed_data_real;
 
   transformed_data_real <- sum(d_int_array);
-  transformed_data_real <-  sum(d_real_array);
-  transformed_data_real <-  sum(d_matrix);
-  transformed_data_real <-  sum(d_vector);
-  transformed_data_real <-  sum(d_row_vector);
+  transformed_data_real <- sum(d_real_array);
+  transformed_data_real <- sum(d_matrix);
+  transformed_data_real <- sum(d_vector);
+  transformed_data_real <- sum(d_row_vector);
 }
 parameters {
   real p_real;
@@ -28,15 +28,15 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <-  sum(d_int_array);
-  transformed_param_real <-  sum(d_real_array);
-  transformed_param_real <-  sum(d_matrix);
-  transformed_param_real <-  sum(d_vector);
-  transformed_param_real <-  sum(d_row_vector);
-  transformed_param_real <-  sum(p_real_array);
-  transformed_param_real <-  sum(p_matrix);
-  transformed_param_real <-  sum(p_vector);
-  transformed_param_real <-  sum(p_row_vector);
+  transformed_param_real <- sum(d_int_array);
+  transformed_param_real <- sum(d_real_array);
+  transformed_param_real <- sum(d_matrix);
+  transformed_param_real <- sum(d_vector);
+  transformed_param_real <- sum(d_row_vector);
+  transformed_param_real <- sum(p_real_array);
+  transformed_param_real <- sum(p_matrix);
+  transformed_param_real <- sum(p_vector);
+  transformed_param_real <- sum(p_row_vector);
 }
 model {  
   y_p ~ normal(0,1);
