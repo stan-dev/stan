@@ -7,6 +7,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
 namespace stan { 
   
@@ -115,6 +116,55 @@ namespace stan {
     von_mises_log(T_y const& y, T_loc const& mu, T_scale const& kappa) {
       return von_mises_log<false>(y, mu, kappa);
     }
+
+    // The algorithm used in von_mises_rng is a modified version of the
+    // algorithm in:
+    //
+    // Efficient Simulation of the von Mises Distribution
+    // D. J. Best and N. I. Fisher
+    // Journal of the Royal Statistical Society. Series C (Applied Statistics), Vol. 28, No. 2 (1979), pp. 152-157
+    // 
+    // See licenses/stan-license.txt for Stan license.
+
+    template <class RNG>
+    inline double
+    von_mises_rng(const double mu,
+                  const double kappa,
+                  RNG& rng) {
+      using boost::variate_generator;
+      using stan::prob::uniform_rng;
+
+      static const char* function = "stan::prob::von_mises_rng(%1%)";
+
+      stan::math::check_finite(function,kappa,"inverse of variance",(double*)0);
+      stan::math::check_finite(function,mu,"mean",(double*)0);
+      stan::math::check_positive(function,kappa,"inverse of variance",
+                                 (double*)0);
+
+      double r = 1 + pow((1 + 4 * kappa * kappa), 0.5);
+      double rho = 0.5 * (r - pow(2 * r, 0.5)) / kappa;
+      double s = 0.5 * (1 + rho * rho) / rho;
+
+      bool done = 0;
+      double W;
+      while (!done) {
+        double Z = std::cos(stan::math::pi() * uniform_rng(0.0, 1.0, rng));
+        W = (1 + s * Z) / (s + Z);
+        double Y = kappa * (s - W);
+        double U2 = uniform_rng(0.0, 1.0, rng);
+        done = Y * (2 - Y) - U2 > 0;
+        
+        if(!done)
+          done = log(Y / U2) + 1 - Y >= 0;
+      }
+
+      double U3 = uniform_rng(0.0, 1.0, rng) - 0.5;
+      double sign = ((U3 >= 0) - (U3 <= 0));
+
+      //  it's really an fmod() with a positivity constraint
+      return sign * std::acos(W) + fmod(fmod(mu,2*stan::math::pi())+2*stan::math::pi(),2*stan::math::pi());
+    }
+
   } 
 }
 #endif

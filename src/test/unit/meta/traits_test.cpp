@@ -7,6 +7,10 @@
 
 using stan::length;
 
+TEST(MetaTraits, error_index) {
+  EXPECT_EQ(1, int(stan::error_index::value));
+}
+
 TEST(MetaTraits, isConstant) {
   using stan::is_constant;
   EXPECT_TRUE(is_constant<double>::value);

@@ -6,6 +6,9 @@
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/agrad/rev/matrix/multiply.hpp>
+#include <stan/agrad/rev/matrix/dot_product.hpp>
+#include <stan/agrad/rev/operators.hpp>
 
 TEST(AgradRevMatrix, quad_form_mat) {
   using stan::math::quad_form;

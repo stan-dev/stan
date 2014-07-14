@@ -160,13 +160,14 @@ TEST(AgradFwdAcosh,FvarFvarVar_3rdDeriv) {
 
   fvar<fvar<var> > x;
   x.val_.val_ = 1.5;
-  x.val_.d_ = 2.0;
+  x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
 
   fvar<fvar<var> > a = acosh(x);
 
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(3.14838371231970, g[0]);
 }
 

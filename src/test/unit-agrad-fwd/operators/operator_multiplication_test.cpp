@@ -280,9 +280,11 @@ TEST(AgradFwdOperatorMultiplication, FvarFvarVar_FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
   fvar<fvar<var> > y;
   y.val_.val_ = 0.5;
   y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > z = x * y;
 
@@ -299,6 +301,7 @@ TEST(AgradFwdOperatorMultiplication, FvarFvarVar_Double_3rdDeriv) {
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
   double y(0.5);
 
   fvar<fvar<var> > z = x * y;
@@ -316,6 +319,7 @@ TEST(AgradFwdOperatorMultiplication, Double_FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > y;
   y.val_.val_ = 0.5;
   y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > z = x * y;
 

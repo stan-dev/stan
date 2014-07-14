@@ -134,7 +134,9 @@ TEST(AgradFwdAbs,FvarFvarVar_3rdDeriv) {
   using std::abs;
 
   fvar<fvar<var> > y;
-  y.val_ = fvar<var>(4.0,1.0);
+  y.val_.val_ = 4.0;
+  y.val_.d_ = 1.0;
+  y.d_.val_ = 1.0;
 
   fvar<fvar<var> > b = abs(y);
 

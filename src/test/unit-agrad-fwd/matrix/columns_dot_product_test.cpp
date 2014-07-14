@@ -909,6 +909,12 @@ TEST(AgradFwdMatrixColumnsDotProduct, vector_vector_ffv_3rdDeriv) {
   fvar<fvar<var> > d(4.0,1.0);
   fvar<fvar<var> > e(-2.0,1.0);
   fvar<fvar<var> > f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   vector_d vd_1(3), vd_2(3);
   vector_ffv vv_1(3), vv_2(3);
@@ -1099,6 +1105,12 @@ TEST(AgradFwdMatrixColumnsDotProduct, rowvector_rowvector_ffv_3rdDeriv) {
   fvar<fvar<var> > d(4.0,1.0);
   fvar<fvar<var> > e(-2.0,1.0);
   fvar<fvar<var> > f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   row_vector_d d1(3), d2(3);
   row_vector_ffv v1(3), v2(3);
@@ -1261,6 +1273,12 @@ TEST(AgradFwdMatrixColumnsDotProduct, matrix_matrix_ffv_3rdDeriv) {
   fvar<fvar<var> > d(4.0,1.0);
   fvar<fvar<var> > e(-2.0,1.0);
   fvar<fvar<var> > f(-1.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
 
   matrix_d d1(3,3), d2(3,3);
   matrix_ffv v1(3,3), v2(3,3);

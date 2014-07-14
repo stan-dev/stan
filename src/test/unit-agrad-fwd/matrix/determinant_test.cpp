@@ -191,6 +191,10 @@ TEST(AgradFwdMatrixDeterminant,matrix_ffv_3rdDeriv) {
   fvar<fvar<var> > c(3.0,1.0);
   fvar<fvar<var> > d(5.0,1.0);
   fvar<fvar<var> > e(7.0,1.0);
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
 
   matrix_ffv a(2,2);
   a << b,c,d,e;
@@ -200,8 +204,8 @@ TEST(AgradFwdMatrixDeterminant,matrix_ffv_3rdDeriv) {
   AVEC z = createAVEC(b.val().val(),c.val().val(),d.val().val(),e.val().val());
   VEC h;
   a_det.d_.d_.grad(z,h);
-  EXPECT_FLOAT_EQ(0.0,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0.0,h[3]);
+  EXPECT_NEAR(0.0,h[0],1e-8);
+  EXPECT_NEAR(0.0,h[1],1e-8);
+  EXPECT_NEAR(0.0,h[2],1e-8);
+  EXPECT_NEAR(0.0,h[3],1e-8);
 }

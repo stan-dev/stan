@@ -518,8 +518,8 @@ namespace stan {
 
       /*
         the boost gamma distribution is defined by
-	shape and scale, whereas the stan one is defined
-	by shape and rate
+        shape and scale, whereas the stan one is defined
+        by shape and rate
       */
       variate_generator<RNG&, gamma_distribution<> >
         gamma_rng(rng, gamma_distribution<>(alpha, 1.0 / beta));

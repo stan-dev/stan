@@ -77,9 +77,10 @@ bool is_parsable_folder(const std::string& model_name,
  * @param model_name Name of model to parse
  */
 void test_parsable(const std::string& model_name) {
-  std::cout << "parsing: " << model_name << std::endl;
-  std::cout.flush();
-  EXPECT_TRUE(is_parsable_folder(model_name, "syntax-only"));
+  {
+    SCOPED_TRACE("parsing: " + model_name);
+    EXPECT_TRUE(is_parsable_folder(model_name, "syntax-only"));
+  }
 }
 
 
@@ -96,21 +97,20 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
   } catch (const std::invalid_argument& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos
         && msgs.str().find(error_msg) == std::string::npos) {
-      std::cout << std::endl << "*********************************" << std::endl
-                << "model name=" << model_name << std::endl
-                << "*** EXPECTED: error_msg=" << error_msg << std::endl
-                << "*** FOUND: e.what()=" << e.what() << std::endl
-                << "*** FOUND: msgs.str()=" << msgs.str() << std::endl
-                << "*********************************" << std::endl
-                << std::endl;
-      FAIL();
+      FAIL() << std::endl << "*********************************" << std::endl
+             << "model name=" << model_name << std::endl
+             << "*** EXPECTED: error_msg=" << error_msg << std::endl
+             << "*** FOUND: e.what()=" << e.what() << std::endl
+             << "*** FOUND: msgs.str()=" << msgs.str() << std::endl
+             << "*********************************" << std::endl
+             << std::endl;
     }
     return;
   }
-  std::cout << "model name=" << model_name 
-            << " is parsable and were exepecting msg=" << error_msg
-            << std::endl;
-  FAIL();
+  
+  FAIL() << "model name=" << model_name 
+         << " is parsable and were exepecting msg=" << error_msg
+         << std::endl;
 }
 
 /** test that model with specified name in syntax-only path parses
@@ -332,7 +332,6 @@ TEST(gmParser,declareVarWithSameNameAsModel) {
   EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_model_name_var.stan"),
                std::invalid_argument);
 }
-
 
 TEST(gm_parser,function_signatures) {
   //DISTRIBUTIONS
@@ -636,6 +635,10 @@ TEST(gmParserTermGrammar, eltMultiplicationFun) {
   test_parsable("validate_elt_multiplication_good");
 }
 
+TEST(gmParserTermGrammar, eltDivisionFun) {
+  test_parsable("validate_elt_division_good");
+}
+
 TEST(gmParserTermGrammar, negateExprFun) {
   test_parsable("validate_negate_expr_good");
 }
@@ -751,6 +754,15 @@ TEST(parserFunctions, funsGood3) {
 
 TEST(parserFunctions, funsGood4) {
   test_parsable("functions-good-void");
+  test_parsable("functions-good-void"); // test twice to ensure
+                                        // symbols are not saved
+}
+TEST(gmParser, intFun) {
+  test_parsable("int_fun");
+}
+
+TEST(parserFunctions, funsBad0) {
+  test_throws("functions-bad0","Functions cannot contain void argument types");
 }
 
 TEST(parserFunctions, funsBad1) {

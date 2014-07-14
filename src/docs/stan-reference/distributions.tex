@@ -726,15 +726,15 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 %
 \fitem{real}{normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}}{The cumulative normal distribution of \farg{y}
-  given location \farg{mu} and scale \farg{sigma}}
+  given location \farg{mu} and scale \farg{sigma}; normal\_cdf will underflow to 0 for $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and overflow to 1 for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25}
 %
 \fitem{real}{normal\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}}{The log of the cumulative normal distribution of \farg{y}
-  given location \farg{mu} and scale \farg{sigma}}
+  given location \farg{mu} and scale \farg{sigma}; normal\_cdf\_log will underflow to $-\infty$ for $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and overflow to 0 for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25}
 %
 \fitem{real}{normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}}{The log of the complementary cumulative normal distribution 
-  of \farg{y} given location \farg{mu} and scale \farg{sigma}}
+  of \farg{y} given location \farg{mu} and scale \farg{sigma}; normal\_ccdf\_log will overflow to 0 for $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and underflow to $-\infty$ for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25}
 \end{description}
 %
 \begin{description}
@@ -1689,6 +1689,12 @@ around the mean $\mu$.
     location \farg{mu} and scale \farg{kappa}}
 \end{description}
 
+\begin{description}
+  \fitem{real}{von\_mises\_rng}{reals \farg{mu}, reals
+    \farg{kappa}}{Generate a Von Mises variate with location
+  \farg{mu} and scale \farg{kappa} (i.e. returns values in the interval $[(\mu \mod 2\pi)-\pi,(\mu \mod 2\pi)+\pi]$); may only
+    be used in generated quantities block}
+\end{description}
 \subsubsection{Numerical Stability}
 
 Evaluating the Von Mises distribution for $\kappa > 100$ is
@@ -1799,11 +1805,35 @@ where $|\Sigma|$ is the absolute determinant of $\Sigma$.
 
 \subsubsection{Stan Functions}
 
+The multivariate normal probability function is overloaded to allow
+the variate vector $y$ and location vector $\mu$ to be vectors or row
+vectors (or to mix the two types).  The density function is also
+vectorized, so it allows arrays of row vectors or vectors as
+arguments; see \refsection{prob-vectorization} for a description of
+vectorization.
+
+
 \begin{description}
 %
-\fitem{real}{multi\_normal\_log}{vector \farg{y}, vector \farg{mu},
-  matrix \farg{Sigma}}{The log of the multivariate normal density of vector \farg{y}
- given location \farg{mu} and covariance matrix \farg{Sigma}}
+  \fitem{real}{multi\_normal\_log}{vectors \farg{y}, vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of vector(s) \farg{y} given location vector(s) \farg{mu} and
+    covariance matrix \farg{Sigma}}
+%
+  \fitem{real}{multi\_normal\_log}{vectors \farg{y}, row\_vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of vector(s) \farg{y} given location row vector(s)
+    \farg{mu} and covariance matrix \farg{Sigma}}
+%
+  \fitem{real}{multi\_normal\_log}{row\_vectors \farg{y}, vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of row vector(s) \farg{y} given location vector(s)
+    \farg{mu} and covariance matrix \farg{Sigma}}
+%
+  \fitem{real}{multi\_normal\_log}{row\_vectors \farg{y}, row\_vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of row vector(s) \farg{y} given location row vector(s)
+    \farg{mu} and covariance matrix \farg{Sigma}}
 %
 \end{description}
 %
@@ -1833,9 +1863,24 @@ If $K \in \nats$, $\mu \in \reals^K$, and $\Omega \in \reals^{K \times
 
 \begin{description}
 %
-\fitem{real}{multi\_normal\_prec\_log}{vector \farg{y}, vector
-  \farg{mu}, matrix \farg{Omega}}{The log of the multivariate normal density of vector
-  \farg{y} given location \farg{mu} and positive definite precision
+\fitem{real}{multi\_normal\_prec\_log}{vectors \farg{y}, vectors
+  \farg{mu}, matrix \farg{Omega}}{The log of the multivariate normal density of vector(s)
+  \farg{y} given location vector(s) \farg{mu} and positive definite precision
+  matrix \farg{Omega}}
+%
+\fitem{real}{multi\_normal\_prec\_log}{vectors \farg{y}, row\_vectors
+  \farg{mu}, matrix \farg{Omega}}{The log of the multivariate normal density of vector(s)
+  \farg{y} given location row vector(s) \farg{mu} and positive definite precision
+  matrix \farg{Omega}}
+%
+\fitem{real}{multi\_normal\_prec\_log}{row\_vectors \farg{y}, vectors
+  \farg{mu}, matrix \farg{Omega}}{The log of the multivariate normal density of row vector(s)
+  \farg{y} given location vector(s) \farg{mu} and positive definite precision
+  matrix \farg{Omega}}
+%
+\fitem{real}{multi\_normal\_prec\_log}{row\_vectors \farg{y}, row\_vectors
+  \farg{mu}, matrix \farg{Omega}}{The log of the multivariate normal density of row vector(s)
+  \farg{y} given location row vector(s) \farg{mu} and positive definite precision
   matrix \farg{Omega}}
 %
 \end{description}
@@ -1862,9 +1907,24 @@ triangular and such that $LL^{\top}$ is positive definite, then for $y
 
 \begin{description}
 %
-\fitem{real}{multi\_normal\_cholesky\_log}{vector \farg{y}, vector
-  \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of vector
-  \farg{y} given location \farg{mu} and lower-triangular Cholesky
+\fitem{real}{multi\_normal\_cholesky\_log}{vectors \farg{y}, vectors
+  \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of vector(s)
+  \farg{y} given location vector(s) \farg{mu} and lower-triangular Cholesky
+  factor of the covariance matrix \farg{L}}
+%
+\fitem{real}{multi\_normal\_cholesky\_log}{vectors \farg{y}, row\_vectors
+  \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of vector(s)
+  \farg{y} given location row vector(s) \farg{mu} and lower-triangular Cholesky
+  factor of the covariance matrix \farg{L}}
+%
+\fitem{real}{multi\_normal\_cholesky\_log}{row\_vectors \farg{y}, vectors
+  \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of row vector(s)
+  \farg{y} given location vector(s) \farg{mu} and lower-triangular Cholesky
+  factor of the covariance matrix \farg{L}}
+%
+\fitem{real}{multi\_normal\_cholesky\_log}{row\_vectors \farg{y}, row\_vectors
+  \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of row vector(s)
+  \farg{y} given location row vector(s) \farg{mu} and lower-triangular Cholesky
   factor of the covariance matrix \farg{L}}
 %
 \end{description}
@@ -1947,10 +2007,25 @@ $y \in \reals^K$,
 
 \begin{description}
 %
-\fitem{real}{multi\_student\_t\_log}{vector \farg{y}, real \farg{nu},
-  vector \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate Student-$t$
-  density of vector \farg{y} given degrees of freedom \farg{nu},
-  location \farg{mu}, and scale matrix \farg{Sigma}}
+\fitem{real}{multi\_student\_t\_log}{vectors \farg{y}, real \farg{nu},
+  vectors \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate Student-$t$
+  density of vector(s) \farg{y} given degrees of freedom \farg{nu},
+  location vector(s) \farg{mu}, and scale matrix \farg{Sigma}}
+%
+\fitem{real}{multi\_student\_t\_log}{vectors \farg{y}, real \farg{nu},
+  row\_vectors \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate Student-$t$
+  density of vector(s) \farg{y} given degrees of freedom \farg{nu},
+  location row vector(s) \farg{mu}, and scale matrix \farg{Sigma}}
+%
+\fitem{real}{multi\_student\_t\_log}{row\_vectors \farg{y}, real \farg{nu},
+  vectors \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate Student-$t$
+  density of row vector(s) \farg{y} given degrees of freedom \farg{nu},
+  location vector(s) \farg{mu}, and scale matrix \farg{Sigma}}
+%
+\fitem{real}{multi\_student\_t\_log}{row\_vectors \farg{y}, real \farg{nu},
+  row\_vectors \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate Student-$t$
+  density of row vector(s) \farg{y} given degrees of freedom \farg{nu},
+  location row vector(s) \farg{mu}, and scale matrix \farg{Sigma}}
 %
 \end{description}
 %
@@ -2071,10 +2146,22 @@ may only be used in generated quantities block}
 \noindent
 The correlation matrix distributions have support on the (Cholesky
 factors of) correlation matrices.  A Cholesky factor $L$ for a $K
-\times K$ covariance matrix of dimensions $K$ has rows of unit length
-so that the diagonal of $L L^{\top}$ is the unit $K$-vector.
-
-
+\times K$ correlation matrix $\Sigma$ of dimension $K$ has rows of unit
+length so that the diagonal of $L L^{\top}$ is the unit $K$-vector. Even
+though models are usually conceptualized in terms of correlation matrices,
+it is better to operationalize them in terms of their Cholesky factors.
+If you are interested in the posterior distribution of the correlations,
+you can recover them in the generated quantities block via
+%
+\begin{quote}
+\begin{Verbatim}
+generated quantities {
+  corr_matrix[K] Sigma;
+  Sigma <- multiply_lower_tri_self_transpose(L);
+}
+\end{Verbatim}
+\end{quote}
+%
 \section{LKJ Correlation Distribution}\label{lkj-correlation.section}
 
 \subsubsection{Probability Density Function}
@@ -2087,18 +2174,27 @@ unit diagonal (i.e., a correlation matrix), then
 \propto \det \left( \Sigma \right)^{(\eta - 1)}.
 \]
 %
-The shape parameter $\eta$ can be interpreted like the shape parameter
-of a symmetric beta distribution. 
+The expectation is the identity matrix for any positive value of the 
+shape parameter $\eta$, which can be interpreted like the shape parameter
+of a symmetric beta distribution:
 \begin{itemize}
 \item if $\eta = 1$, then the density is uniform over all correlation
   matrices of a given order;
 \item if $\eta > 1$, the identity matrix is the modal correlation
-  matrix, with sharper peaks in the density around the identity matrix
+  matrix, with a sharper peak in the density at the identity matrix
   for larger $\eta$; and
 \item for $0 < \eta < 1$, the density has a trough at the identity
   matrix.
+\item if $\eta$ were an unknown parameter, the Jeffreys prior is
+  proportional to $\sqrt{2\sum_{k=1}^{K-1}\left(
+  \psi_1\left(\eta+\frac{K-k-1}{2}\right) - 
+  2\psi_1\left(2\eta+K-k-1 \right)\right)}$, where $\psi_1()$ is the
+  trigamma function
 \end{itemize}
-See \citep{LewandowskiKurowickaJoe:2009} for definitions.
+See \citep{LewandowskiKurowickaJoe:2009} for definitions. However, it
+is much better computationally to work directly with the Cholesky factor
+of $\Sigma$, so this distribution should never be explicitly used in 
+practice.
 
 \pitem{y}{lkj\_corr}{eta}
 
@@ -2108,7 +2204,10 @@ See \citep{LewandowskiKurowickaJoe:2009} for definitions.
 %
   \fitem{real}{lkj\_corr\_log}{matrix \farg{y}, real
     \farg{eta}}{The log of the LKJ density for the correlation matrix
-    \farg{y} given nonnegative shape \farg{eta}.}
+    \farg{y} given nonnegative shape \farg{eta}. The only reason to
+    use this density function is if you want the code to run slower
+    and consume more memory with more risk of numerical errors. 
+    Use its Cholesky factor as described in the next section.}
 %
 \end{description}
 \begin{description}
@@ -2118,38 +2217,74 @@ See \citep{LewandowskiKurowickaJoe:2009} for definitions.
 \end{description}
 
 
-% \section{Cholesky LKJ Correlation Distribution}
+\section{Cholesky LKJ Correlation Distribution}
 
-% \subsubsection{Probability Density Function}
+Stan provides an implicit parameterization of the LKJ correlation matrix
+density in terms of its Cholesky factor, which you should use rather
+than the explicit parameterization in the previous section. For example, 
+if \code{L} is a Cholesky factor of a correlation matrix, then
+%
+\begin{quote}
+\begin{Verbatim}
+L ~ lkj_corr_cholesky(2.0);
+# implies L * L' ~ lkj_corr(2.0);
+\end{Verbatim}
+\end{quote}
+%
+Because Stan requires models to have support on all valid constrained
+parameters, \code{L} will almost always
+%
+\footnote{It is possible to build up a valid \code{L} within Stan, but that
+would then require Jacobian adjustments to imply the intended posterior.}
+%
+be a parameter declared with the type of a
+Cholesky factor for a correlation matrix; for example,
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  cholesky_factor_corr[K] L; 
+  # rather than corr_matrix[K] Sigma;
+  ...
+\end{Verbatim}
+\end{quote}
+%
 
-% For $\eta > 0$, if $L$ is the Cholesky factor of a positive-definite
-% matrix with unit diagonal (i.e., a correlation matrix), then
-% \[
-% \distro{LkjCholesky}(L|\eta) 
-% \propto \det(L L^\top)^{(\eta - 1)} 
-% = \det(L)^{(2 \eta - 2)}.
-% \]
-% See the previous section for details on interpreting the shape
-% parameter $\eta$.
 
-% \pitem{L}{lkj\_corr\_cholesky}{eta}
+\subsubsection{Probability Density Function}
 
-% \subsubsection{Stan Functions}
+For $\eta > 0$, if $L$ is the Cholesky factor of a symmetric
+positive-definite matrix with unit diagonal (i.e., a correlation
+matrix), then
+\[
+\distro{LkjCholesky}(L|\eta) 
+\propto \left|J\right|\det(L L^\top)^{(\eta - 1)} 
+= \prod_{k=2}^K L_{kk}^{K-k+2\eta-2}.
+\]
+See the previous section for details on interpreting the shape
+parameter $\eta$. Note that even if $\eta=1$, it is still essential to
+evaluate the density function because the density of $L$ is not
+constant, regardless of the value of $\eta$, even though the density of
+$LL^\top$ is constant iff $\eta=1$.
 
-% \begin{description}
-% %
-%   \fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
-%     \farg{eta}}{The log of the LKJ density for the lower-triangular
-%     Cholesky factor \farg{L} of a correlation matrix given shape
-%     \farg{eta}.}
-% %
-% \end{description}
-% \begin{description}
-% \fitem{matrix}{lkj\_corr\_cholesky\_rng}{int \farg{K}, real \farg{eta}}{
-%   Generate a random Cholesky factor of a LKJ random correlation matrix
-%   of order \farg{K} with shape \farg{eta}; may only be used in 
-%   generated quantities block}
-% \end{description}
+\pitem{L}{lkj\_corr\_cholesky}{eta}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+  \fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
+    \farg{eta}}{The log of the LKJ density for the lower-triangular
+    Cholesky factor \farg{L} of a correlation matrix given shape
+    \farg{eta}.}
+%
+\end{description}
+\begin{description}
+\fitem{matrix}{lkj\_corr\_cholesky\_rng}{int \farg{K}, real \farg{eta}}{
+  Generate a random Cholesky factor of a correlation matrix of order
+  \farg{K} that is distributed LKJ with shape \farg{eta}; may only be 
+  used in generated quantities block}
+\end{description}
 
 
 
@@ -2200,15 +2335,15 @@ the multivariate Gamma function,
 \begin{description}
 %
 \fitem{real}{wishart\_log}{matrix \farg{W}, real \farg{nu}, matrix
- \farg{Sigma}}{The log of the Wishart density for positive-definite matrix
- \farg{W} given degrees of freedom \farg{nu} and scale matrix
+ \farg{Sigma}}{The log of the Wishart density for symmetric and positive-definite matrix
+ \farg{W} given degrees of freedom \farg{nu} and symmetric and positive-definite scale matrix
  \farg{Sigma}}
 %
 \end{description}
 %
 \begin{description}
 \fitem{matrix}{wishart\_rng}{real \farg{nu}, matrix \farg{Sigma}}{Generate a
-  Wishart variate with degrees of freedom \farg{nu} and scale matrix
+  Wishart variate with degrees of freedom \farg{nu} and symmetric and positive-definite scale matrix
  \farg{Sigma}; may only be used in generated quantities block}
 \end{description}
 
@@ -2246,8 +2381,8 @@ positive-definite $W \in \reals^{K \times K}$,
 \begin{description}
 %
 \fitem{real}{inv\_wishart\_log}{matrix \farg{W}, real \farg{nu}, matrix
- \farg{Sigma}}{The log of the inverse Wishart density for positive-definite matrix
- \farg{W} given degrees of freedom \farg{nu} and scale matrix
+ \farg{Sigma}}{The log of the inverse Wishart density for symmetric and positive-definite matrix
+ \farg{W} given degrees of freedom \farg{nu} and symmetric and positive-definite scale matrix
  \farg{Sigma}}
 %
 \end{description}
@@ -2255,7 +2390,7 @@ positive-definite $W \in \reals^{K \times K}$,
 \begin{description}
 \fitem{matrix}{inv\_wishart\_rng}{real \farg{nu}, matrix
   \farg{Sigma}}{Generate an inverse Wishart variate with degrees of 
-freedom \farg{nu} and scale matrix
+freedom \farg{nu} and symmetric and positive-definite scale matrix
  \farg{Sigma}; may only be used in generated quantities block}
 \end{description}
 

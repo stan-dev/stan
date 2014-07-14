@@ -13,16 +13,16 @@
 typedef boost::ecuyer1988 rng_t;
 
 TEST(McmcUnitEMetric, sample_p) {
-  
   rng_t base_rng(0);
   
   Eigen::VectorXd q(2);
   q(0) = 5;
   q(1) = 1;
+
+  std::stringstream metric_output;
   
   stan::mcmc::mock_model model(q.size());
-  
-  stan::mcmc::unit_e_metric<stan::mcmc::mock_model, rng_t> metric(model, &std::cout);
+  stan::mcmc::unit_e_metric<stan::mcmc::mock_model, rng_t> metric(model, &metric_output);
   stan::mcmc::unit_e_point z(q.size());
   
   int n_samples = 1000;
@@ -46,6 +46,7 @@ TEST(McmcUnitEMetric, sample_p) {
   // Variance within 10% of expected value (d / 2)
   EXPECT_EQ(true, fabs(var - 0.5 * q.size()) < 0.1 * q.size());
   
+  EXPECT_EQ("", metric_output.str());
 }
 
 TEST(McmcUnitEMetric, gradients) {
@@ -62,9 +63,11 @@ TEST(McmcUnitEMetric, gradients) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  funnel_model_namespace::funnel_model model(data_var_context, &std::cout);
+  std::stringstream model_output, metric_output;
   
-  stan::mcmc::unit_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model, &std::cout);
+  funnel_model_namespace::funnel_model model(data_var_context, &model_output);
+  
+  stan::mcmc::unit_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model, &metric_output);
   
   double epsilon = 1e-6;
 
@@ -135,5 +138,8 @@ TEST(McmcUnitEMetric, gradients) {
     EXPECT_NEAR(delta, g3(i), epsilon);
     
   }
-  
+
+
+  EXPECT_EQ("", model_output.str());
+  EXPECT_EQ("", metric_output.str());
 }

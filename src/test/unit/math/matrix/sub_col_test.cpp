@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 
-TEST(MathMatrixBlock,SubCol1) {
+TEST(MathMatrixSubCol,SubCol1) {
   using stan::math::sub_col;
   Eigen::MatrixXd m(3,4);
   for (int i = 0; i < 3; ++i)
@@ -11,7 +11,7 @@ TEST(MathMatrixBlock,SubCol1) {
       m(i,j) = (i + 1) * (j + 1);
   EXPECT_EQ(0, sub_col(m,1,1,0).size());
 }
-TEST(MathMatrixBlock,SubCol2) {
+TEST(MathMatrixSubCol,SubCol2) {
   using stan::math::sub_col;
   Eigen::MatrixXd m(3,4);
   for (int i = 0; i < 3; ++i)
@@ -19,7 +19,7 @@ TEST(MathMatrixBlock,SubCol2) {
       m(i,j) = (i + 1) * (j + 1);
   EXPECT_EQ(3, sub_col(m,1,1,3).size());
 }
-TEST(MathMatrixBlock,SubCol3) {
+TEST(MathMatrixSubCol,SubCol3) {
   using stan::math::sub_col;
   Eigen::MatrixXd m(3,4);
   for (int i = 0; i < 3; ++i)
@@ -27,7 +27,7 @@ TEST(MathMatrixBlock,SubCol3) {
       m(i,j) = (i + 1) * (j + 1);
   EXPECT_THROW(sub_col(m,1,1,7), std::domain_error);
 }
-TEST(MathMatrixBlock,SubCol4) {
+TEST(MathMatrixSubCol,SubCol4) {
   using stan::math::sub_col;
   Eigen::MatrixXd m(3,4);
   for (int i = 0; i < 3; ++i)
@@ -35,7 +35,7 @@ TEST(MathMatrixBlock,SubCol4) {
       m(i,j) = (i + 1) * (j + 1);
   EXPECT_THROW(sub_col(m,7,1,1), std::domain_error);
 }
-TEST(MathMatrixBlock,SubCol5) {
+TEST(MathMatrixSubCol,SubCol5) {
   using stan::math::sub_col;
   Eigen::MatrixXd m(3,4);
   for (int i = 0; i < 3; ++i)
@@ -43,7 +43,7 @@ TEST(MathMatrixBlock,SubCol5) {
       m(i,j) = (i + 1) * (j + 1);
   EXPECT_THROW(sub_col(m,1,7,1), std::domain_error);
 }
-TEST(MathMatrixBlock,SubCol6) {
+TEST(MathMatrixSubCol,SubCol6) {
   using stan::math::sub_col;
   Eigen::MatrixXd m(3,4);
   for (int i = 0; i < 3; ++i)
@@ -54,9 +54,3 @@ TEST(MathMatrixBlock,SubCol6) {
   for (int i = 0; i < 2; ++i)
     EXPECT_FLOAT_EQ(m(0+i,1), v(i));
 }
-
-
-
-
-
-

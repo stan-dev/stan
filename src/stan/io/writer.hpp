@@ -386,6 +386,26 @@ namespace stan {
 
 
       /**
+       * Writes the unconstrained Cholesky factor for a correlation
+       * matrix corresponding to the specified constrained matrix.
+       *
+       * <p>The unconstraining operation is the inverse of the
+       * constraining operation in
+       * <code>cov_matrix_constrain(Matrix<T,Dynamic,Dynamic)</code>.
+       *
+       * @param y Constrained covariance matrix.
+       * @throw std::runtime_error if y has no elements or if it is not square
+       */
+      void cholesky_corr_unconstrain(matrix_t& y) {
+        // FIXME:  optimize by unrolling cholesky_factor_free
+        Eigen::Matrix<T,Eigen::Dynamic,1> y_free
+          = stan::prob::cholesky_corr_free(y);
+        for (int i = 0; i < y_free.size(); ++i)
+          data_r_.push_back(y_free[i]);
+      }
+
+
+      /**
        * Writes the unconstrained covariance matrix corresponding
        * to the specified constrained correlation matrix.
        *
@@ -404,7 +424,7 @@ namespace stan {
         typename matrix_t::size_type k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
         array_vec_t sds(k);
-        bool successful = stan::prob::factor_cov_matrix(cpcs,sds,y);
+        bool successful = stan::prob::factor_cov_matrix(y,cpcs,sds);
         if(!successful)
           BOOST_THROW_EXCEPTION(std::runtime_error ("factor_cov_matrix failed"));
         for (typename matrix_t::size_type i = 0; i < k_choose_2; ++i)
@@ -436,7 +456,7 @@ namespace stan {
         size_t k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
         array_vec_t sds(k);
-        bool successful = stan::prob::factor_cov_matrix(cpcs,sds,y);
+        bool successful = stan::prob::factor_cov_matrix(y,cpcs,sds);
         if (!successful)
           BOOST_THROW_EXCEPTION(std::runtime_error ("y cannot be factorized by factor_cov_matrix"));
         for (size_t i = 0; i < k; ++i) {
