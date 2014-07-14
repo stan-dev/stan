@@ -1547,7 +1547,7 @@ and Hill, we decompose our prior into a scale and a matrix, but are
 able to do so in a more natural way based on the actual variable
 scales and a correlation matrix.  Specifically, we define 
 \[
-\Sigma = \mbox{diag\_matrix}(\tau) \Omega \mbox{diag\_matrix}(\tau),
+\Sigma = \mbox{diag\_matrix}(\tau) \, \Omega \, \mbox{diag\_matrix}(\tau),
 \]
 where $\Omega$ is a correlation matrix and $\tau$ is the vector of
 coefficient scales.  
@@ -1626,7 +1626,7 @@ parameters {
 }
 model {
   matrix[K,K] Sigma_beta;
-  Sigma_beta <- diag_matrix(tau) * Omega * diag_matrix(tau);
+  Sigma_beta <- quad_form_diag(Sigma,tau);
 
   tau ~ cauchy(0,2.5);
   Omega ~ lkj_corr(2);
@@ -1646,7 +1646,14 @@ The hyperprior covariance matrix is defined as a local variable in the
 model because the correlation matrix \code{Omega} and scale vector
 \code{tau} are more natural to inspect in the output;  to output
 \code{Sigma}, define it as a transformed parameter.  The function
-\code{diag\_matrix} converts the vector \code{tau} to a diagonal matrix.
+\code{quad\_form\_diag} is defined so that
+\code{quad\_form\_diag(Sigma,tau)} is equivalent to
+\code{diag\_matrix(tau) * Sigma * diag\_matrix(tau)}, where
+\code{diag\_matrix(tau)} returns the matrix with \code{tau} on the
+diagonal and zeroes off diagonal;  the version using
+\code{quad\_form\_diag} should be faster.
+
+
 
 \subsubsection{Optimizations}
 
@@ -1709,6 +1716,90 @@ statement by generating a temporary vector of the linear predictor.
 }
 \end{Verbatim}
 \end{quote}
+
+
+\section{Prediction, Forecasting, and Backcasting}
+
+Stan models can be used for ``predicting'' the values of arbitrary
+model unknowns.  When predictions are about the future, they're called
+``forecasts;'' when they are predictions about the past, as in climate
+reconstruction or cosmology, they are sometimes called ``backcasts''
+(or ``aftcasts'' or ``hindcasts'' or ``antecasts,'' depending on the
+author's feelings about the opposite of ``fore'').
+
+\subsection{Modeling Predictions}
+
+As a simple example, the following linear regression provides the same
+setup for estimating the coefficients \code{beta} as in our very first
+example above, using \code{y} for the \code{N} observations and
+\code{x} for the \code{N} predictor vectors.  The model parameters and
+model for observations are exactly the same as before.
+
+To make predictions, we need to be given the number of predictions,
+\code{N\_new}, and their predictor matrix, \code{x\_new}.  The
+predictions themselves are modeled as a parameter \code{y\_new}.  The
+model statement for the predictions is exactly the same as for the
+observations, with the new outcome vector \code{y\_new} and prediction
+matrix \code{x\_new}.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> K;
+  int<lower=0> N;
+  matrix[N,K] x;       
+  vector[N] y;     
+
+  int<lower=0> N_new;
+  matrix[N_new, K] x_new; 
+}
+parameters {
+  vector[K] beta;
+  real<lower=0> sigma;
+
+  vector[N_new] y_new;                  // predictions
+}
+model {
+  y ~ normal(x * beta, sigma);          // observed model
+
+  y_new ~ normal(x_new * beta, sigma);  // prediction model
+}
+\end{Verbatim}
+\end{quote}
+
+
+\subsection{Predictions as Generated Quantities}
+
+Where possible, the most efficient way to generate predictions is to
+use the generated quantities block.  This provides proper Monte Carlo
+(not Markov chain Monte Carlo) inference, which can have a much higher
+effective sample size per iteration.
+%
+\begin{quote}
+\begin{Verbatim}
+...data as above...
+
+parameters {
+  vector[K] beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(x * beta, sigma);         
+}
+generated quantities {
+  vector[N_new] y_new;  
+  for (n in 1:N_new)
+    y_new[n] <- normal_rng(x_new[n] * beta, sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+Now the data is just as before, but the parameter \code{y\_new} is now
+declared as a generated quantity, and the prediction model is
+removed from the model and replaced by a pseudo-random draw from a
+normal distribution.
+
+  
 
 
 
@@ -2783,6 +2874,54 @@ expensive in terms of memory and gradient-calculation time than a
 simple data variable.  Furthermore, the copy takes up extra space and
 extra time.
 
+\section{Loading matrix for factor analysis}
+
+Rick Farouni, on the Stan users group, inquired as to how to build
+a Cholesky factor for a covariance matrix with a unit diagonal, as
+used in Bayesian factor analysis \cite{aguilar-west:2000}.  This
+can be accomplished by declaring the below-diagonal elements as
+parameters, then filling the full matrix as a transformed parameter.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=2> K;
+}
+transformed data {
+  int<lower=1> K_choose_2;
+  K_choose_2 <- (K * (K - 1)) / 2;
+}
+parameters {
+  vector[K_choose_2] L_lower;  
+}
+transformed parameters {
+  cholesky_factor_cov[K] L;
+  for (k in 1:K)
+    L[k,k] <- 1;
+  { 
+    int i;
+    for (m in 2:K) {
+      for (n in 1:(m - 1)) {
+        L[m,n] <- L_lower[i];
+        L[n,m] <- 0;
+        i <- i + 1;
+      }
+    }
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+It is most convenient to place a prior directly on \code{L\_lower}.
+An alternative would be a prior for the full Cholesky factor \code{L},
+because the transform from \code{L\_lower} to \code{L} is just the
+identity and thus does not require a Jacobian adjustment (despite the
+warning from the parser, which is not smart enough to do the code
+analysis to infer that the transform is linear).  It would not be at
+all convenient to place a prior on the full covariance matrix \code{L
+  * L'}, because that would require a Jacobian adjustment; the exact
+adjustment is provided in the subsection of
+\refsection{change-of-variables} devoted to covariance matrices.
 
 \chapter{Truncated or Censored Data}
 
@@ -3755,7 +3894,9 @@ situation, a hierarchical prior may be used for the covariance matrices.
 
 Two problems make it pretty much impossible to perform full Bayesian
 inference for clustering models, the lack of parameter identifiability
-and the extreme multimodality of the posteriors.
+and the extreme multimodality of the posteriors.  There is additional
+discussion related to the non-identifiability due to label swtiching
+in \refsection{label-switching-problematic}.
 
 \subsection{Non-Identifiability}
 
@@ -3793,6 +3934,17 @@ than sampling-based approaches.
 
 
 \section{Naive Bayes Classification and Clustering}
+
+Naive Bayes is a kind of mixture model that can be used for
+classification or for clustering (or a mix of both), depending on
+which labels for items are observed.%
+%
+\footnote{For clustering, the non-identifiability problems for all
+  mixture models present a problem, whereas there is no such problem
+  for classification.  Despite the difficulties with full Bayesian
+  inference for clustering, researchers continue to use it, often in
+  an explorata data analysis setting rather than for predictive
+  modeling.}
 
 Multinomial mixture models are referred to as ``naive Bayes'' because
 they are often applied to classification problems where the
@@ -5914,7 +6066,7 @@ and ending with \code{*/} to the Stan parser.
 For functions that raise exceptions, these can be documented using
 \code{@throws}.%
 %
-\footnote{As of Stan 2.3.0, the only way a user-defined
+\footnote{As of Stan 2.4.0, the only way a user-defined
 producer will raise an exception is if a function it calls (including
 sampling statements) raises an exception.}
 %
@@ -6182,7 +6334,7 @@ minimizes $\log \distro{Normal}(\lambda_1|0,\tau) + \log
 \includegraphics[height=1.45in]{R/non-identified.png}%
 \includegraphics[height=1.45in]{R/non-identified-plus-prior.png}%
 \includegraphics[height=1.45in]{R/one-param-identified.png}
-\vspace*{-0.25in}
+\vspace*{-.1in}
 \caption{\small\it Posteriors for two intercept parameterization
   without prior, two intercept parameterization with unit normal
   prior, and one intercept reparameterization without prior.  For all
@@ -6230,7 +6382,7 @@ chosen that is either informative or weakly informative based on prior
 knowledge of the problem.
 
 
-\section{Label Switching in Mixture Models}
+\section{Label Switching in Mixture Models}\label{label-switching-problematic.section}
 
 Where collinearity in regression models can lead to infinitely many
 posterior maxima, swapping components in a mixture model leads to
