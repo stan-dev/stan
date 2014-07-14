@@ -553,6 +553,10 @@ TEST(gmParser, intFun) {
   test_parsable("int_fun");
 }
 
+TEST(parserFunctions, funsBad18) {
+  test_throws("functions-bad18","variable identifier (name) may not be reserved word");
+}
+
 TEST(parserFunctions, funsBad0) {
   test_throws("functions-bad0","Functions cannot contain void argument types");
 }
