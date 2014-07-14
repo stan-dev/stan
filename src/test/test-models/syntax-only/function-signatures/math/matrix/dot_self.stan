@@ -5,8 +5,6 @@ data {
 }
 transformed data {
   real transformed_data_real;
-  vector[d_int] transformed_data_vector;
-  row_vector[d_int] transformed_data_row_vector;
 
   transformed_data_real <- dot_self(d_vector);
   transformed_data_real <- dot_self(d_row_vector);
@@ -18,13 +16,11 @@ parameters {
 }
 transformed parameters {
   real transformed_param_real;
-  vector[d_int] transformed_param_vector;
-  row_vector[d_int] transformed_param_row_vector;
 
   transformed_param_real <- dot_self(d_vector);
   transformed_param_real <- dot_self(d_row_vector);
-  transformed_param_real <- dot_self(transformed_param_vector);
-  transformed_param_real <- dot_self(transformed_param_row_vector);
+  transformed_param_real <- dot_self(p_vector);
+  transformed_param_real <- dot_self(p_row_vector);
 }
 model {  
   y_p ~ normal(0,1);
