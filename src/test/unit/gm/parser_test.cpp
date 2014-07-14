@@ -604,13 +604,18 @@ TEST(gm_parser,function_signatures) {
   // test_parsable("function-signatures/math/functions/trigamma");
   // test_parsable("function-signatures/math/functions/trunc");
 
+  test_parsable("function-signatures/math/matrix/broadcast_infix_operators");
+  test_parsable("function-signatures/math/matrix/cols");
   test_parsable("function-signatures/math/matrix/cumulative_sum");
   test_parsable("function-signatures/math/matrix/dot_self");
+  test_parsable("function-signatures/math/matrix/infix_matrix_operators");
   test_parsable("function-signatures/math/matrix/log_sum_exp");
   test_parsable("function-signatures/math/matrix/max");
   test_parsable("function-signatures/math/matrix/mean");
   test_parsable("function-signatures/math/matrix/min");
+  test_parsable("function-signatures/math/matrix/negation");
   test_parsable("function-signatures/math/matrix/prod");
+  test_parsable("function-signatures/math/matrix/rows");
   test_parsable("function-signatures/math/matrix/sd");
   test_parsable("function-signatures/math/matrix/sum");
   test_parsable("function-signatures/math/matrix/variance");

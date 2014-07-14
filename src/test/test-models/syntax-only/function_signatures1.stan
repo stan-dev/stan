@@ -22,52 +22,11 @@ transformed data {
   row_vector[d_int] transformed_data_row_vector;
 
   //*** Matrix Operations ***
-  // Integer-Valued Matrix Size Functions
-  transformed_data_int <- rows(d_vector);
-  transformed_data_int <- rows(d_row_vector);
-  transformed_data_int <- rows(d_matrix);
-  transformed_data_int <- cols(d_vector);
-  transformed_data_int <- cols(d_row_vector);
-  transformed_data_int <- cols(d_matrix);
-
   // Matrix Arithmetic Operators
-  //   negation prefix operators
-  transformed_data_vector <- -d_vector;
-  transformed_data_row_vector <- -d_row_vector;
-  transformed_data_matrix <- -d_matrix;
 
   //   infix matrix operators
-  transformed_data_vector <- d_vector + d_vector;
-  transformed_data_row_vector <- d_row_vector + d_row_vector;
-  transformed_data_matrix <- d_matrix + d_matrix;
-  transformed_data_vector <- d_vector - d_vector;
-  transformed_data_row_vector <- d_row_vector - d_row_vector;
-  transformed_data_matrix <- d_matrix - d_matrix;
-  transformed_data_vector <- d_real * d_vector;
-  transformed_data_row_vector <- d_real * d_row_vector;
-  transformed_data_matrix <- d_real * d_matrix;
-  transformed_data_vector <- d_vector * d_real;
-  transformed_data_row_vector <- d_row_vector * d_real;
-  transformed_data_matrix <- d_matrix * d_real;
-  transformed_data_real <- d_row_vector * d_vector;
-  transformed_data_row_vector <- d_row_vector * d_matrix;
-  transformed_data_matrix <- d_matrix * d_real;
-  transformed_data_vector <- d_matrix * d_vector;
-  transformed_data_matrix <- d_matrix * d_matrix;
 
   //   broadcast infix operators
-  transformed_data_vector <- d_vector + d_real;
-  transformed_data_vector <- d_real + d_vector;
-  transformed_data_row_vector <- d_row_vector + d_real;
-  transformed_data_row_vector <- d_real + d_row_vector;
-  transformed_data_matrix <- d_matrix + d_real;
-  transformed_data_matrix <- d_real + d_matrix;
-  transformed_data_vector <- d_vector - d_real;
-  transformed_data_vector <- d_real - d_vector;
-  transformed_data_row_vector <- d_row_vector - d_real;
-  transformed_data_row_vector <- d_real - d_row_vector;
-  transformed_data_matrix <- d_matrix - d_real;
-  transformed_data_matrix <- d_real - d_matrix;
 
   //   elementwise products
   transformed_data_vector <- d_vector .* d_vector;
