@@ -518,8 +518,18 @@ TEST(gm_parser,function_signatures) {
 
   // test_parsable("function-signatures/distributions/multivariate/discrete/ordered_logistic/ordered_logistic_log");
 
-  // //CONTINUOUS
-  // test_parsable("function-signatures/distributions/multivariate/continuous/dirichlet/dirichlet_log");
+  //CONTINUOUS
+  test_parsable("function-signatures/distributions/multivariate/continuous/dirichlet_log");
+  test_parsable("function-signatures/distributions/multivariate/continuous/inv_wishart_log");
+  test_parsable("function-signatures/distributions/multivariate/continuous/lkj_corr_cholesky_log");
+  test_parsable("function-signatures/distributions/multivariate/continuous/lkj_corr_log");
+  test_parsable("function-signatures/distributions/multivariate/continuous/lkj_cov_log");
+  test_parsable("function-signatures/distributions/multivariate/continuous/multi_normal_cholesky_log");
+  test_parsable("function-signatures/distributions/multivariate/continuous/multi_normal_log");
+  test_parsable("function-signatures/distributions/multivariate/continuous/multi_normal_prec_log");
+  test_parsable("function-signatures/distributions/multivariate/continuous/multi_student_t_log");
+  test_parsable("function-signatures/distributions/multivariate/continuous/wishart_log");
+
   
   //FUNCTIONS
   // test_parsable("function-signatures/math/functions/abs");
