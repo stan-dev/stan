@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 
 namespace stan {
@@ -32,8 +33,9 @@ namespace stan {
       }
       if (y[0] < 0) {
         std::ostringstream stream;
-        stream << name << " is not a valid positive_ordered vector."
-               << " The element at 0 is %1%, but should be postive.";
+        stream << " is not a valid positive_ordered vector."
+               << " The element at " << stan::error_index::value 
+               << " is %1%, but should be postive.";
         std::string msg(stream.str());
         return dom_err(function,y[0],name,
                        msg.c_str(),"",
@@ -42,8 +44,8 @@ namespace stan {
       for (size_type n = 1; n < y.size(); n++) {
         if (!(y[n] > y[n-1])) {
           std::ostringstream stream;
-          stream << name << " is not a valid ordered vector."
-                 << " The element at " << n 
+          stream << " is not a valid ordered vector."
+                 << " The element at " << stan::error_index::value + n 
                  << " is %1%, but should be greater than the previous element, "
                  << y[n-1];
           std::string msg(stream.str());
