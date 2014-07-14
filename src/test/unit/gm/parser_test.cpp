@@ -628,6 +628,7 @@ TEST(gm_parser,function_signatures) {
   test_parsable("function-signatures/math/matrix/diag_post_multiply");
   test_parsable("function-signatures/math/matrix/diag_pre_multiply");
   test_parsable("function-signatures/math/matrix/diagonal");
+  test_parsable("function-signatures/math/matrix/dims");
   test_parsable("function-signatures/math/matrix/distance");
   test_parsable("function-signatures/math/matrix/dot_product");
   test_parsable("function-signatures/math/matrix/dot_self");
@@ -643,6 +644,8 @@ TEST(gm_parser,function_signatures) {
   test_parsable("function-signatures/math/matrix/log_sum_exp");
   test_parsable("function-signatures/math/matrix/matrix_division");
   test_parsable("function-signatures/math/matrix/max");
+  test_parsable("function-signatures/math/matrix/mdivide_left_tri_low");
+  test_parsable("function-signatures/math/matrix/mdivide_right_tri_low");
   test_parsable("function-signatures/math/matrix/mean");
   test_parsable("function-signatures/math/matrix/min");
   test_parsable("function-signatures/math/matrix/negation");
@@ -660,6 +663,7 @@ TEST(gm_parser,function_signatures) {
   test_parsable("function-signatures/math/matrix/rows_dot_product");
   test_parsable("function-signatures/math/matrix/rows_dot_self");
   test_parsable("function-signatures/math/matrix/singular_values");
+  test_parsable("function-signatures/math/matrix/size");
   test_parsable("function-signatures/math/matrix/sd");
   test_parsable("function-signatures/math/matrix/softmax");
   test_parsable("function-signatures/math/matrix/sort_indices_asc");
@@ -678,7 +682,6 @@ TEST(gm_parser,function_signatures) {
   test_parsable("function-signatures/math/matrix/variance");
 
     // test_parsable("good_inf");
-  // test_parsable("function_signatures6");
   // test_parsable("function_signatures7");
 }
 
