@@ -13,8 +13,6 @@ transformed data {
   transformed_data_real <- falling_factorial(d_int, r_real);
   transformed_data_real <- falling_factorial(d_real, d_int);
   transformed_data_real <- falling_factorial(r_int, d_int);
-  
-
 }
 parameters {
   real p_real;
@@ -28,13 +26,11 @@ transformed parameters {
   transformed_param_real <-  falling_factorial(d_real, d_int);
   transformed_param_real <-  falling_factorial(r_int, d_int);
 
-
   transformed_param_real <-  falling_factorial(r_int, p_real);
   transformed_param_real <-  falling_factorial(r_real,p_real);
   transformed_param_real <-  falling_factorial(p_real,p_real);
   transformed_param_real <-  falling_factorial(p_real,r_int);
   transformed_param_real <-  falling_factorial(p_real,r_real);
-  
 }
 model {  
   y_p ~ normal(0,1);

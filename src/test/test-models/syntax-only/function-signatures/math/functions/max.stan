@@ -7,7 +7,6 @@ transformed data {
   real transformed_data_real;
 
   transformed_data_int <- max(d_int, d_int);
-
 }
 parameters {
   real p_real;

@@ -9,10 +9,6 @@ transformed data {
 
   transformed_data_real <- binary_log_loss(d_int, r_int);
   transformed_data_real <- binary_log_loss(d_int, d_real);
-  
-  
-  
-
 }
 parameters {
   real p_real;
@@ -24,7 +20,6 @@ transformed parameters {
   transformed_param_real <- binary_log_loss(d_int, r_int);
   transformed_param_real <- binary_log_loss(d_int, d_real);
   transformed_param_real <- binary_log_loss(d_int, p_real);
-  
 }
 model {  
   y_p ~ normal(0,1);

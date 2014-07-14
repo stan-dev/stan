@@ -6,10 +6,8 @@ transformed data {
   int transformed_data_int;
   real transformed_data_real;
 
- 
-   transformed_data_real <- log1m_inv_logit(d_int);
-   transformed_data_real <- log1m_inv_logit(d_real);
-
+  transformed_data_real <- log1m_inv_logit(d_int);
+  transformed_data_real <- log1m_inv_logit(d_real);
 }
 parameters {
   real p_real;
