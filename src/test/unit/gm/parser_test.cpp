@@ -652,6 +652,8 @@ TEST(gm_parser,function_signatures) {
   test_parsable("function-signatures/math/matrix/singular_values");
   test_parsable("function-signatures/math/matrix/sd");
   test_parsable("function-signatures/math/matrix/softmax");
+  test_parsable("function-signatures/math/matrix/sort_indices_asc");
+  test_parsable("function-signatures/math/matrix/sort_indices_desc");
   test_parsable("function-signatures/math/matrix/squared_distance");
   test_parsable("function-signatures/math/matrix/sum");
   test_parsable("function-signatures/math/matrix/to_array_1d");
