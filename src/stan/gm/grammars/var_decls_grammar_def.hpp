@@ -300,6 +300,7 @@ namespace stan {
 
     struct validate_identifier {
       std::set<std::string> reserved_word_set_;
+      std::set<std::string> const_fun_name_set_;
 
       template <typename T1, typename T2>
       struct result { typedef bool type; };
@@ -308,7 +309,32 @@ namespace stan {
         reserved_word_set_.insert(w);
       }
 
+      template <typename S, typename T>
+      static bool contains(const S& s,
+                           const T& x) {
+        return s.find(x) != s.end();
+      }
+
+      bool identifier_exists(const std::string& identifier) const {
+        return contains(reserved_word_set_, identifier)
+          || ( contains(function_signatures::instance().key_set(), identifier)
+               && !contains(const_fun_name_set_, identifier) );
+      }
+
       validate_identifier() {
+        // Constant functions which can be used as identifiers
+        const_fun_name_set_.insert("pi");
+        const_fun_name_set_.insert("e");
+        const_fun_name_set_.insert("sqrt2");
+        const_fun_name_set_.insert("log2");
+        const_fun_name_set_.insert("log10");
+        const_fun_name_set_.insert("not_a_number");
+        const_fun_name_set_.insert("positive_infinity");
+        const_fun_name_set_.insert("negative_infinity");
+        const_fun_name_set_.insert("epsilon");
+        const_fun_name_set_.insert("negative_epsilon");
+
+        // illegal identifiers
         reserve("for");  
         reserve("in");  
         reserve("while");
@@ -434,22 +460,11 @@ namespace stan {
         using std::set;
         using std::string;
         const function_signatures& sigs = function_signatures::instance();
+
         set<string> fun_names = sigs.key_set();
-        fun_names.erase("pi");
-        fun_names.erase("e");
-        fun_names.erase("sqrt2");
-        fun_names.erase("log2");
-        fun_names.erase("log10");
-        fun_names.erase("not_a_number");
-        fun_names.erase("positive_infinity");
-        fun_names.erase("negative_infinity");
-        fun_names.erase("epsilon");
-        fun_names.erase("negative_epsilon");
-        for (set<string>::iterator it = fun_names.begin();  
-             it != fun_names.end();  
-             ++it)
-          reserve(*it);
-        
+        for (set<string>::iterator it = fun_names.begin();  it != fun_names.end();  ++it)
+          if (!contains(const_fun_name_set_, *it))
+            reserve(*it);
       }
 
       bool operator()(const std::string& identifier,
@@ -473,7 +488,7 @@ namespace stan {
                      << std::endl;
           return false;
         }
-        if (reserved_word_set_.find(identifier) != reserved_word_set_.end()) {
+        if (identifier_exists(identifier)) { 
           error_msgs << "variable identifier (name) may not be reserved word"
                      << std::endl
                      << "    found identifier=" << identifier 
