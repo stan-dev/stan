@@ -333,46 +333,7 @@ TEST(gmParser,declareVarWithSameNameAsModel) {
                std::invalid_argument);
 }
 
-TEST(gm_parser, bernoulli_distribution_function_signatures) {
-  test_parsable("function-signatures/distributions/univariate/discrete/bernoulli/bernoulli_ccdf_log");
-  test_parsable("function-signatures/distributions/univariate/discrete/bernoulli/bernoulli_cdf_log");
-  test_parsable("function-signatures/distributions/univariate/discrete/bernoulli/bernoulli_cdf");
-  test_parsable("function-signatures/distributions/univariate/discrete/bernoulli/bernoulli_log");
-  test_parsable("function-signatures/distributions/univariate/discrete/bernoulli/bernoulli_logit_log");
-}
-
-TEST(gm_parser, beta_binomial_distribution_function_signatures) {
-  test_parsable("function-signatures/distributions/univariate/discrete/beta_binomial/beta_binomial_ccdf_log");
-  test_parsable("function-signatures/distributions/univariate/discrete/beta_binomial/beta_binomial_cdf_log");
-  test_parsable("function-signatures/distributions/univariate/discrete/beta_binomial/beta_binomial_cdf");
-  test_parsable("function-signatures/distributions/univariate/discrete/beta_binomial/beta_binomial_log");
-}
-
-TEST(gm_parser, binomial_distribution_function_signatures) {
-  test_parsable("function-signatures/distributions/univariate/discrete/binomial/binomial_ccdf_log");
-  test_parsable("function-signatures/distributions/univariate/discrete/binomial/binomial_cdf_log");
-  test_parsable("function-signatures/distributions/univariate/discrete/binomial/binomial_cdf");
-  test_parsable("function-signatures/distributions/univariate/discrete/binomial/binomial_log");
-}
-
-TEST(gm_parser, hypergeometric_distribution_function_signatures) {
-  test_parsable("function-signatures/distributions/univariate/discrete/hypergeometric/hypergeometric_log");
-}
-
-TEST(gm_parser, neg_binomial_distribution_function_signatures) {
-  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial/neg_binomial_ccdf_log");
-  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial/neg_binomial_cdf_log");
-  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial/neg_binomial_cdf");
-  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial/neg_binomial_log");
-}
-
-TEST(gm_parser, neg_binomial_2_distribution_function_signatures) {
-  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial_2/neg_binomial_2_log_log");
-  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial_2/neg_binomial_2_log");
-}
-
-TEST(gm_parser, poisson_distribution_function_signatures) {
-  test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_ccdf_log");
+TEST(gm_parser, bernoulli_distribution) {
   test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_cdf_log");
   test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_cdf");
   test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_log_log");
@@ -1195,8 +1156,59 @@ TEST(gm_parser, transpose_matrix_function_signatures) {
 TEST(gm_parser, variance_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/variance");
 }
-    // test_parsable("good_inf");
-  // test_parsable("function_signatures7");
+
+
+TEST(gm_parser, operator_and_function_signatures) {
+  test_parsable("function-signatures/math/operators/and");
+}
+
+TEST(gm_parser, operator_and_or_interaction_function_signatures) {
+  test_parsable("function-signatures/math/operators/and_or_interaction");
+}
+
+TEST(gm_parser, operator_equal_function_signatures) {
+  test_parsable("function-signatures/math/operators/equal");
+}
+
+TEST(gm_parser, operator_greater_than_or_equal_function_signatures) {
+  test_parsable("function-signatures/math/operators/greater_than_or_equal");
+}
+
+TEST(gm_parser, operator_greater_than_function_signatures) {
+  test_parsable("function-signatures/math/operators/greater_than");
+}
+
+TEST(gm_parser, operator_less_than_or_equal_function_signatures) {
+  test_parsable("function-signatures/math/operators/less_than_or_equal");
+}
+
+TEST(gm_parser, operator_less_than_function_signatures) {
+  test_parsable("function-signatures/math/operators/less_than");
+}
+
+TEST(gm_parser, operator_not_equal_function_signatures) {
+  test_parsable("function-signatures/math/operators/not_equal");
+}
+
+TEST(gm_parser, operator_not_function_signatures) {
+  test_parsable("function-signatures/math/operators/not");
+}
+
+TEST(gm_parser, operator_or_function_signatures) {
+  test_parsable("function-signatures/math/operators/or");
+}
+
+TEST(gm_parser, if_else_function_signatures) {
+  test_parsable("function-signatures/math/if_else");
+}
+
+TEST(gm_parser, while_function_signatures) {
+  test_parsable("function-signatures/math/while");
+}
+
+TEST(gm_parser, infVariableName) {
+  test_parsable("good_inf");
+}
 
 TEST(gmParserStatement2Grammar, addConditionalCondition) {
   test_parsable("conditional_condition_good");
