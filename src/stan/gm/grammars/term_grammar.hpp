@@ -68,6 +68,11 @@ namespace stan {
                               whitespace_grammar<Iterator> > 
       fun_r;
 
+      boost::spirit::qi::rule<Iterator, 
+                              solve_ode(var_origin), 
+                              whitespace_grammar<Iterator> > 
+      solve_ode_r;
+
 
       boost::spirit::qi::rule<Iterator, 
                               std::string(), 

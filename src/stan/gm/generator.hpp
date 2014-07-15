@@ -177,6 +177,26 @@ namespace stan {
             indexes.push_back(x.dimss_[i][j]); // wasteful copy, could use refs
         generate_indexed_expr<false>(expr_string,indexes,base_type,e_num_dims,o_);
       }
+      void operator()(const solve_ode& fx) const { 
+        o_ << "solve_ode("
+           << fx.system_function_name_
+           << ", ";
+
+        generate_expression(fx.y0_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.t0_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.ts_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.theta_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.x_, o_);
+        o_ << ')';
+      }
       void operator()(const fun& fx) const { 
         o_ << fx.name_ << '(';
         for (size_t i = 0; i < fx.args_.size(); ++i) {

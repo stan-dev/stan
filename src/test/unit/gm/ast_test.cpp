@@ -242,9 +242,6 @@ TEST(gmAst, isUserDefined) {
   EXPECT_TRUE(is_user_defined_prob_function("bar_log",
                                             expression(int_literal(2)), // first arg
                                             args_pf));                  // remaining args
-  
-
-
 }
 
 TEST(gmAst, resetSigs) {
@@ -268,4 +265,41 @@ TEST(gmAst, resetSigs) {
   set<string> ks2 = fs2.key_set();
   EXPECT_EQ(keyset_size,ks2.size());
 
+}
+
+TEST(gmAst, solveOde) {
+  using stan::gm::solve_ode;
+  using stan::gm::variable;
+  using stan::gm::expr_type;
+  using stan::gm::expression;
+
+  solve_ode so; // null ctor should work and not raise error
+
+  std::string system_function_name = "foo";
+
+  variable y0("y0_var_name");
+  y0.set_type(VECTOR_T, 0);  // plain old vector
+
+  variable t0("t0_var_name");
+  t0.set_type(DOUBLE_T, 0);  // double
+
+  variable ts("ts_var_name");
+  ts.set_type(VECTOR_T, 0); 
+
+  variable theta("theta_var_name");
+  theta.set_type(VECTOR_T, 0);
+  
+  variable x("x_var_name");
+  x.set_type(VECTOR_T, 0);
+
+  // example of instantiation
+  solve_ode so2(system_function_name, y0, t0, ts, theta, x);
+
+  // dumb test to make sure we at least get the right types back
+  EXPECT_EQ(system_function_name, so2.system_function_name_);
+  EXPECT_EQ(y0.type_, so2.y0_.expression_type());
+  EXPECT_EQ(t0.type_, so2.t0_.expression_type());
+  EXPECT_EQ(ts.type_, so2.ts_.expression_type());
+  EXPECT_EQ(theta.type_, so2.theta_.expression_type());
+  EXPECT_EQ(x.type_, so2.x_.expression_type());
 }

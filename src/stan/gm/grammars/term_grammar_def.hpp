@@ -50,6 +50,14 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::index_op,
                           (std::vector<std::vector<stan::gm::expression> >, 
                            dimss_) );
 
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::solve_ode,
+                          (std::string, system_function_name_)
+                          (stan::gm::expression, y0_)
+                          (stan::gm::expression, t0_)
+                          (stan::gm::expression, ts_)
+                          (stan::gm::expression, theta_)
+                          (stan::gm::expression, x_) );
+
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::fun,
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, args_) );
@@ -563,12 +571,31 @@ namespace stan {
                )
         ;
       
-
-
+      solve_ode_r.name("solve o2de");
+      solve_ode_r 
+        %= lit("solve_ode")
+        > lit('(')
+        > identifier_r          // system function name
+        > lit(',')
+        > expression_g(_r1)     // y0
+        > lit(',')
+        > expression_g(_r1)     // t0
+        > lit(',')
+        > expression_g(_r1)     // ts
+        > lit(',')
+        > expression_g(_r1)     // theta
+        > lit(',')
+        > expression_g(_r1)     // x
+        > lit(')');
+      // FIXME:  need big check here to make sure all args correctly
+      // typed
+      // FIXME:  need to reserve solve_ode function
 
       factor_r.name("factor");
       factor_r =
-          fun_r(_r1)          [set_fun_type_named_f(_val,_1,_r1,_pass,
+        solve_ode_r(_r1)
+        | 
+        fun_r(_r1)          [set_fun_type_named_f(_val,_1,_r1,_pass,
                                                     boost::phoenix::ref(error_msgs_))]
         | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
                                                      boost::phoenix::ref(error_msgs_),

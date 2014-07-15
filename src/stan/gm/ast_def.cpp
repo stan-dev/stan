@@ -530,10 +530,6 @@ namespace stan {
     expr_type expression_type_vis::operator()(const nil& /*e*/) const {
       return expr_type();
     }
-    // template <typename T>
-    // expr_type expression_type_vis::operator()(const T& e) const {
-    //   return e.type_;
-    // }
     expr_type expression_type_vis::operator()(const int_literal& e) const {
       return e.type_;
     }
@@ -545,6 +541,9 @@ namespace stan {
     }
     expr_type expression_type_vis::operator()(const variable& e) const {
       return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const solve_ode& e) const {
+      return expr_type(VECTOR_T,1);
     }
     expr_type expression_type_vis::operator()(const fun& e) const {
       return e.type_;
@@ -578,6 +577,7 @@ namespace stan {
     expression::expression(const double_literal& expr) : expr_(expr) { }
     expression::expression(const array_literal& expr) : expr_(expr) { }
     expression::expression(const variable& expr) : expr_(expr) { }
+    expression::expression(const solve_ode& expr) : expr_(expr) { }
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
     expression::expression(const binary_op& expr) : expr_(expr) { }
@@ -620,6 +620,12 @@ namespace stan {
         if (boost::apply_visitor(*this,e.args_[i].expr_))
           return true;
       return false;
+    }
+    bool contains_var::operator()(const solve_ode& e) const {
+      // only init state and params may contain vars
+      return boost::apply_visitor(*this, e.y0_.expr_)
+        || boost::apply_visitor(*this, e.theta_.expr_)
+        ;
     }
     bool contains_var::operator()(const index_op& e) const {
       return boost::apply_visitor(*this,e.expr_.expr_);
@@ -690,6 +696,12 @@ namespace stan {
       return ( vo == transformed_parameter_origin
                || vo == local_origin );
     }
+    bool contains_nonparam_var::operator()(const solve_ode& e) const {
+      // if any vars, return true because integration will be nonlinear
+      return boost::apply_visitor(*this, e.y0_.expr_)
+        || boost::apply_visitor(*this, e.theta_.expr_)
+        ;
+    }
     bool contains_nonparam_var::operator()(const fun& e) const {
       // any function applied to non-linearly transformed var
       for (size_t i = 0; i < e.args_.size(); ++i)
@@ -739,6 +751,7 @@ namespace stan {
     bool is_nil_op::operator()(const double_literal& /* x */) const { return false; }
     bool is_nil_op::operator()(const array_literal& /* x */) const { return false; }
     bool is_nil_op::operator()(const variable& /* x */) const { return false; }
+    bool is_nil_op::operator()(const solve_ode& /* x */) const { return false; }
     bool is_nil_op::operator()(const fun& /* x */) const { return false; }
     bool is_nil_op::operator()(const index_op& /* x */) const { return false; }
     bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
@@ -811,6 +824,22 @@ namespace stan {
     void variable::set_type(const base_expr_type& base_type, 
                             size_t num_dims) {
       type_ = expr_type(base_type, num_dims);
+    }
+
+
+    solve_ode::solve_ode() { }
+    solve_ode::solve_ode(const std::string& system_function_name,
+                         const expression& y0,
+                         const expression& t0,
+                         const expression& ts,
+                         const expression& theta,
+                         const expression& x) 
+      : system_function_name_(system_function_name),
+        y0_(y0),
+        t0_(t0),
+        ts_(ts),
+        theta_(theta),
+        x_(x) {
     }
 
 
