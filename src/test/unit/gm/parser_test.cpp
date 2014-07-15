@@ -938,8 +938,8 @@ TEST(gm_parser, columns_dot_self_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/columns_dot_self");
 }
 
-TEST(gm_parser, crossproduct_matrix_function_signatures) {
-  test_parsable("function-signatures/math/matrix/crossproduct");
+TEST(gm_parser, crossprod_matrix_function_signatures) {
+  test_parsable("function-signatures/math/matrix/crossprod");
 }
 
 TEST(gm_parser, cumulative_sum_matrix_function_signatures) {
@@ -1022,6 +1022,10 @@ TEST(gm_parser, log_determinant_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/log_determinant");
 }
 
+TEST(gm_parser, log_softmax_matrix_function_signatures) {
+  test_parsable("function-signatures/math/matrix/log_softmax");
+}
+
 TEST(gm_parser, log_sum_exp_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/log_sum_exp");
 }
@@ -1056,6 +1060,10 @@ TEST(gm_parser, mean_matrix_function_signatures) {
 
 TEST(gm_parser, min_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/min");
+}
+
+TEST(gm_parser, multiply_lower_tri_self_transpose_matrix_function_signatures) {
+  test_parsable("function-signatures/math/matrix/multiply_lower_tri_self_transpose");
 }
 
 TEST(gm_parser, negation_matrix_function_signatures) {
@@ -1176,6 +1184,10 @@ TEST(gm_parser, sum_matrix_function_signatures) {
 
 TEST(gm_parser, tail_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/tail");
+}
+
+TEST(gm_parser, tcrossprod_matrix_function_signatures) {
+  test_parsable("function-signatures/math/matrix/tcrossprod");
 }
 
 TEST(gm_parser, to_array_1d_matrix_function_signatures) {
