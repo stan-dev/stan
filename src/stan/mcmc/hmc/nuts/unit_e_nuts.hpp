@@ -24,7 +24,7 @@ namespace stan {
       
       unit_e_nuts(M &m, BaseRNG& rng, std::ostream* o = &std::cout, std::ostream* e = 0):
       base_nuts<M, unit_e_point, unit_e_metric, expl_leapfrog, BaseRNG>(m, rng, o, e)
-      { this->_name = "NUTS with a unit Euclidean metric"; }
+      { this->name_ = "NUTS with a unit Euclidean metric"; }
       
       bool compute_criterion(ps_point& start,
                              unit_e_point& finish,

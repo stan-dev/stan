@@ -20,7 +20,7 @@ namespace stan {
       Eigen::MatrixXd mInv;
       
       dense_e_point(const dense_e_point& z): ps_point(z), mInv(z.mInv.rows(), z.mInv.cols()) {
-        _fast_matrix_copy<double>(mInv, z.mInv);
+        fast_matrix_copy_<double>(mInv, z.mInv);
       }
       
       void write_metric(std::ostream* o) {

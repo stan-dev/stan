@@ -25,7 +25,7 @@ namespace stan {
       
       unit_e_static_hmc(M &m, BaseRNG& rng, std::ostream* o = &std::cout, std::ostream* e = 0):
       base_static_hmc<M, unit_e_point, unit_e_metric, expl_leapfrog, BaseRNG>(m, rng, o, e)
-      { this->_name = "Static HMC with a unit Euclidean metric"; }
+      { this->name_ = "Static HMC with a unit Euclidean metric"; }
                         
     };
 

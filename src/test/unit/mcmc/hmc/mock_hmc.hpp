@@ -60,15 +60,15 @@ namespace stan {
       double phi(ps_point& z) { return this->V(z); }
       
       const Eigen::VectorXd dtau_dq(ps_point& z) {
-        return Eigen::VectorXd::Zero(this->_model.num_params_r());
+        return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
       
       const Eigen::VectorXd dtau_dp(ps_point& z) {
-        return Eigen::VectorXd::Zero(this->_model.num_params_r());
+        return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
       
       const Eigen::VectorXd dphi_dq(ps_point& z) {
-        return Eigen::VectorXd::Zero(this->_model.num_params_r());
+        return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
       
       void sample_p(ps_point& z, BaseRNG& rng) {};

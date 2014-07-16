@@ -24,7 +24,7 @@ namespace stan {
       
       diag_e_nuts(M &m, BaseRNG& rng, std::ostream* o = &std::cout, std::ostream* e = 0):
       base_nuts<M, diag_e_point, diag_e_metric, expl_leapfrog, BaseRNG>(m, rng, o, e)
-      { this->_name = "NUTS with a diagonal Euclidean metric"; }
+      { this->name_ = "NUTS with a diagonal Euclidean metric"; }
       
       // Note that the points don't need to be swapped
       // here since start.mInv = finish.mInv

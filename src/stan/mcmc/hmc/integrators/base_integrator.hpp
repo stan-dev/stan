@@ -12,13 +12,13 @@ namespace stan {
       
     public:
       
-      base_integrator(std::ostream* o): _out_stream(o) {};
+      base_integrator(std::ostream* o): out_stream_(o) {};
       
       virtual void evolve(P& z, H& hamiltonian, const double epsilon) = 0;
       
     protected:
       
-      std::ostream* _out_stream;
+      std::ostream* out_stream_;
       
     };
     

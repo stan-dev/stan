@@ -15,12 +15,12 @@ namespace stan {
       stepsize_adapter() {};
       
       stepsize_adaptation& get_stepsize_adaptation() {
-        return _stepsize_adaptation;
+        return stepsize_adaptation_;
       }
       
     protected:
       
-      stepsize_adaptation _stepsize_adaptation;
+      stepsize_adaptation stepsize_adaptation_;
       
     };
     
