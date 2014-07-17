@@ -2,8 +2,8 @@
 #define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_UNIT_VECTOR_HPP__
 
 #include <sstream>
-#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
@@ -23,9 +23,9 @@ namespace stan {
      */
     template <typename T_prob, typename T_result>
     bool check_unit_vector(const char* function,
-                       const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
-                       const char* name,
-                       T_result* result) {
+                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
+                           const char* name,
+                           T_result* result) {
       typedef typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type size_t;
       if (theta.size() == 0) {
         std::string message(name);
@@ -39,7 +39,8 @@ namespace stan {
         std::stringstream msg;
         msg << "in function check_unit_vector(%1%), ";
         msg << name << " is not a valid unit vector.";
-        msg << " The sum of the squares of the elements should be 1, but is " << ssq;
+        msg << " The sum of the squares of the elements should be 1, but is " 
+            << ssq;
         std::string tmp(msg.str());
         return dom_err(function,ssq,name,
                        tmp.c_str(),"",
@@ -48,13 +49,15 @@ namespace stan {
       return true;
     }
 
+
     template <typename T>
     inline bool check_unit_vector(const char* function,
-                              const Eigen::Matrix<T,Eigen::Dynamic,1>& theta,
-                              const char* name,
-                              T* result = 0) {
+                                  const Eigen::Matrix<T,Eigen::Dynamic,1>& theta,
+                                  const char* name,
+                                  T* result = 0) {
       return check_unit_vector<T,T>(function,theta,name,result);
     }
+
 
   }
 }

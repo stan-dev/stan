@@ -695,12 +695,18 @@ TEST(AgradFwdMatrixVariance, ffv_vector_3rdDeriv) {
 
   vector_ffv v1(6);
   v1 << 1, 2, 3, 4, 5, 6;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 2.0;
-   v1(2).d_ = 2.0;
-   v1(3).d_ = 2.0;
-   v1(4).d_ = 2.0;
-   v1(5).d_ = 2.0;
+   v1(0).d_.val_ = 1.0;
+   v1(1).d_.val_ = 1.0;
+   v1(2).d_.val_ = 1.0;
+   v1(3).d_.val_ = 1.0;
+   v1(4).d_.val_ = 1.0;
+   v1(5).d_.val_ = 1.0;
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
+   v1(3).val_.d_ = 1.0;
+   v1(4).val_.d_ = 1.0;
+   v1(5).val_.d_ = 1.0;
 
   AVEC q = createAVEC(v1(0).val().val(),v1(1).val().val(),v1(2).val().val(),v1(3).val().val(),v1(4).val().val(),v1(5).val().val());
   VEC h;
@@ -816,12 +822,18 @@ TEST(AgradFwdMatrixVariance, ffv_rowvector_3rdDeriv) {
   row_vector_ffv v1(6);
   
   v1 << 1, 2, 3, 4, 5, 6;
-   v1(0).d_ = 11.0;
-   v1(1).d_ = 2.0;
-   v1(2).d_ = 2.0;
-   v1(3).d_ = 2.0;
-   v1(4).d_ = 2.0;
-   v1(5).d_ = 2.0;
+   v1(0).d_.val_ = 1.0;
+   v1(1).d_.val_ = 1.0;
+   v1(2).d_.val_ = 1.0;
+   v1(3).d_.val_ = 1.0;
+   v1(4).d_.val_ = 1.0;
+   v1(5).d_.val_ = 1.0;
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
+   v1(3).val_.d_ = 1.0;
+   v1(4).val_.d_ = 1.0;
+   v1(5).val_.d_ = 1.0;
 
   AVEC q = createAVEC(v1(0).val().val(),v1(1).val().val(),v1(2).val().val(),v1(3).val().val(),v1(4).val().val(),v1(5).val().val());
   VEC h;
@@ -934,12 +946,18 @@ TEST(AgradFwdMatrixVariance, ffv_matrix_3rdDeriv) {
   using stan::agrad::matrix_ffv;
   matrix_ffv v1(2, 3);
   v1 << 1, 2, 3, 4, 5, 6;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 2.0;
-   v1(0,2).d_ = 2.0;
-   v1(1,0).d_ = 2.0;
-   v1(1,1).d_ = 2.0;
-   v1(1,2).d_ = 2.0;
+   v1(0).d_.val_ = 1.0;
+   v1(1).d_.val_ = 1.0;
+   v1(2).d_.val_ = 1.0;
+   v1(3).d_.val_ = 1.0;
+   v1(4).d_.val_ = 1.0;
+   v1(5).d_.val_ = 1.0;
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
+   v1(3).val_.d_ = 1.0;
+   v1(4).val_.d_ = 1.0;
+   v1(5).val_.d_ = 1.0;
 
    AVEC q = createAVEC(v1(0,0).val().val(),v1(0,1).val().val(),v1(0,2).val().val(),v1(1,0).val().val(),v1(1,1).val().val(),v1(1,2).val().val());
   VEC h;
@@ -1054,11 +1072,15 @@ TEST(AgradFwdMatrixVariance, ffv_StdVector_3rdDeriv) {
   using stan::agrad::var;
 
   fvar<fvar<var> > x1 = 0.5;
-  x1.d_ = 1.0;
+  x1.d_.val_ = 1.0;
+  x1.val_.d_ = 1.0;
   fvar<fvar<var> > x2 = 2.0;
-  x2.d_ = 2.0;
+  x2.d_.val_ = 1.0;
+  x2.val_.d_ = 1.0;
   fvar<fvar<var> > x3 = 3.5;
-  x3.d_ = 2.0;
+  x3.d_.val_ = 1.0;
+  x3.val_.d_ = 1.0;
+
   std::vector<fvar<fvar<var> > > y1;
   y1.push_back(x1);
   y1.push_back(x2);

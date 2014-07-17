@@ -1217,32 +1217,44 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffv__rowvector_ffv_matrix_ffv_3rdDeriv) {
   Y << 1, 0, 0,
     2, 3, 0,
     4, 5, 6;
-   Y(0,0).d_ = 2.0;
-   Y(0,1).d_ = 2.0;
-   Y(0,2).d_ = 2.0;
-   Y(1,0).d_ = 2.0;
-   Y(1,1).d_ = 2.0;
-   Y(1,2).d_ = 2.0;
-   Y(2,0).d_ = 2.0;
-   Y(2,1).d_ = 2.0;
-   Y(2,2).d_ = 2.0;
+   Y(0,0).d_ = 1.0;
+   Y(0,1).d_ = 1.0;
+   Y(0,2).d_ = 1.0;
+   Y(1,0).d_ = 1.0;
+   Y(1,1).d_ = 1.0;
+   Y(1,2).d_ = 1.0;
+   Y(2,0).d_ = 1.0;
+   Y(2,1).d_ = 1.0;
+   Y(2,2).d_ = 1.0;
+   Y(0,0).val_.d_ = 1.0;
+   Y(0,1).val_.d_ = 1.0;
+   Y(0,2).val_.d_ = 1.0;
+   Y(1,0).val_.d_ = 1.0;
+   Y(1,1).val_.d_ = 1.0;
+   Y(1,2).val_.d_ = 1.0;
+   Y(2,0).val_.d_ = 1.0;
+   Y(2,1).val_.d_ = 1.0;
+   Y(2,2).val_.d_ = 1.0;
 
    row_vector_ffv Z(3);
    Z << 1, 2, 3;
-    Z(0).d_ = 2.0;
-    Z(1).d_ = 2.0;
-    Z(2).d_ = 2.0;
+    Z(0).d_ = 1.0;
+    Z(1).d_ = 1.0;
+    Z(2).d_ = 1.0;
+    Z(0).val_.d_ = 1.0;
+    Z(1).val_.d_ = 1.0;
+    Z(2).val_.d_ = 1.0;
 
   matrix_ffv output = stan::agrad::mdivide_right_tri_low(Z,Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
   output(0,0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(4.7592592,h[0]);
   EXPECT_FLOAT_EQ(0.0,h[1]);
   EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0,h[3]);
-  EXPECT_FLOAT_EQ(0,h[4]);
+  EXPECT_FLOAT_EQ(0.56481481,h[3]);
+  EXPECT_FLOAT_EQ(-0.30864197,h[4]);
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradFwdMatrixMdivideRightTriLow,ffv__rowvector_matrix_ffv_1stDeriv) {
@@ -1359,15 +1371,24 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffv__rowvector_matrix_ffv_3rdDeriv) {
   Y << 1, 0, 0,
     2, 3, 0,
     4, 5, 6;
-   Y(0,0).d_ = 2.0;
-   Y(0,1).d_ = 2.0;
-   Y(0,2).d_ = 2.0;
-   Y(1,0).d_ = 2.0;
-   Y(1,1).d_ = 2.0;
-   Y(1,2).d_ = 2.0;
-   Y(2,0).d_ = 2.0;
-   Y(2,1).d_ = 2.0;
-   Y(2,2).d_ = 2.0;
+   Y(0,0).d_ = 1.0;
+   Y(0,1).d_ = 1.0;
+   Y(0,2).d_ = 1.0;
+   Y(1,0).d_ = 1.0;
+   Y(1,1).d_ = 1.0;
+   Y(1,2).d_ = 1.0;
+   Y(2,0).d_ = 1.0;
+   Y(2,1).d_ = 1.0;
+   Y(2,2).d_ = 1.0;
+   Y(0,0).val_.d_ = 1.0;
+   Y(0,1).val_.d_ = 1.0;
+   Y(0,2).val_.d_ = 1.0;
+   Y(1,0).val_.d_ = 1.0;
+   Y(1,1).val_.d_ = 1.0;
+   Y(1,2).val_.d_ = 1.0;
+   Y(2,0).val_.d_ = 1.0;
+   Y(2,1).val_.d_ = 1.0;
+   Y(2,2).val_.d_ = 1.0;
 
    row_vector_d Z(3);
    Z << 1, 2, 3;
@@ -1377,11 +1398,11 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffv__rowvector_matrix_ffv_3rdDeriv) {
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
   output(0,0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(3.7592592,h[0]);
   EXPECT_FLOAT_EQ(0.0,h[1]);
   EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0,h[3]);
-  EXPECT_FLOAT_EQ(0,h[4]);
+  EXPECT_FLOAT_EQ(0.39814815,h[3]);
+  EXPECT_FLOAT_EQ(-0.20987654,h[4]);
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradFwdMatrixMdivideRightTriLow,ffv__rowvector_ffv_matrix_1stDeriv) {
@@ -1478,9 +1499,12 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffv__rowvector_ffv_matrix_3rdDeriv) {
 
   row_vector_ffv Z(3);
   Z << 1, 2, 3;
-   Z(0).d_ = 2.0;
-   Z(1).d_ = 2.0;
-   Z(2).d_ = 2.0;
+   Z(0).d_ = 1.0;
+   Z(1).d_ = 1.0;
+   Z(2).d_ = 1.0;
+   Z(0).val_.d_ = 1.0;
+   Z(1).val_.d_ = 1.0;
+   Z(2).val_.d_ = 1.0;
 
   matrix_ffv output = stan::agrad::mdivide_right_tri_low(Z,Y);
 
@@ -1650,40 +1674,58 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffv__matrix_ffv_matrix_ffv_3rdDeriv) {
   Y << 1, 0, 0,
     2, 3, 0,
     4, 5, 6;
-   Y(0,0).d_ = 2.0;
-   Y(0,1).d_ = 2.0;
-   Y(0,2).d_ = 2.0;
-   Y(1,0).d_ = 2.0;
-   Y(1,1).d_ = 2.0;
-   Y(1,2).d_ = 2.0;
-   Y(2,0).d_ = 2.0;
-   Y(2,1).d_ = 2.0;
-   Y(2,2).d_ = 2.0;
+   Y(0,0).d_ = 1.0;
+   Y(0,1).d_ = 1.0;
+   Y(0,2).d_ = 1.0;
+   Y(1,0).d_ = 1.0;
+   Y(1,1).d_ = 1.0;
+   Y(1,2).d_ = 1.0;
+   Y(2,0).d_ = 1.0;
+   Y(2,1).d_ = 1.0;
+   Y(2,2).d_ = 1.0;
+   Y(0,0).val_.d_ = 1.0;
+   Y(0,1).val_.d_ = 1.0;
+   Y(0,2).val_.d_ = 1.0;
+   Y(1,0).val_.d_ = 1.0;
+   Y(1,1).val_.d_ = 1.0;
+   Y(1,2).val_.d_ = 1.0;
+   Y(2,0).val_.d_ = 1.0;
+   Y(2,1).val_.d_ = 1.0;
+   Y(2,2).val_.d_ = 1.0;
 
   matrix_ffv Z(3,3);
   Z << 1, 2, 3,
     6, 5, 4,
     7, 8, 9;
-   Z(0,0).d_ = 2.0;
-   Z(0,1).d_ = 2.0;
-   Z(0,2).d_ = 2.0;
-   Z(1,0).d_ = 2.0;
-   Z(1,1).d_ = 2.0;
-   Z(1,2).d_ = 2.0;
-   Z(2,0).d_ = 2.0;
-   Z(2,1).d_ = 2.0;
-   Z(2,2).d_ = 2.0;
+   Z(0,0).d_ = 1.0;
+   Z(0,1).d_ = 1.0;
+   Z(0,2).d_ = 1.0;
+   Z(1,0).d_ = 1.0;
+   Z(1,1).d_ = 1.0;
+   Z(1,2).d_ = 1.0;
+   Z(2,0).d_ = 1.0;
+   Z(2,1).d_ = 1.0;
+   Z(2,2).d_ = 1.0;
+   Z(0,0).val_.d_ = 1.0;
+   Z(0,1).val_.d_ = 1.0;
+   Z(0,2).val_.d_ = 1.0;
+   Z(1,0).val_.d_ = 1.0;
+   Z(1,1).val_.d_ = 1.0;
+   Z(1,2).val_.d_ = 1.0;
+   Z(2,0).val_.d_ = 1.0;
+   Z(2,1).val_.d_ = 1.0;
+   Z(2,2).val_.d_ = 1.0;
 
   matrix_ffv output = stan::agrad::mdivide_right_tri_low(Z,Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
   output(0,0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(4.7592592,h[0]);
   EXPECT_FLOAT_EQ(0.0,h[1]);
   EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0,h[3]);
-  EXPECT_FLOAT_EQ(0,h[4]);
+  EXPECT_FLOAT_EQ(0.56481481,h[3]);
+  EXPECT_FLOAT_EQ(-0.30864197,h[4]);
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradFwdMatrixMdivideRightTriLow,ffv__matrix_ffv_matrix_1stDeriv) {
@@ -1827,15 +1869,24 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffv__matrix_ffv_matrix_3rdDeriv) {
   Z << 1, 2, 3,
     6, 5, 4,
     7, 8, 9;
-   Z(0,0).d_ = 2.0;
-   Z(0,1).d_ = 2.0;
-   Z(0,2).d_ = 2.0;
-   Z(1,0).d_ = 2.0;
-   Z(1,1).d_ = 2.0;
-   Z(1,2).d_ = 2.0;
-   Z(2,0).d_ = 2.0;
-   Z(2,1).d_ = 2.0;
-   Z(2,2).d_ = 2.0;
+   Z(0,0).d_ = 1.0;
+   Z(0,1).d_ = 1.0;
+   Z(0,2).d_ = 1.0;
+   Z(1,0).d_ = 1.0;
+   Z(1,1).d_ = 1.0;
+   Z(1,2).d_ = 1.0;
+   Z(2,0).d_ = 1.0;
+   Z(2,1).d_ = 1.0;
+   Z(2,2).d_ = 1.0;
+   Z(0,0).val_.d_ = 1.0;
+   Z(0,1).val_.d_ = 1.0;
+   Z(0,2).val_.d_ = 1.0;
+   Z(1,0).val_.d_ = 1.0;
+   Z(1,1).val_.d_ = 1.0;
+   Z(1,2).val_.d_ = 1.0;
+   Z(2,0).val_.d_ = 1.0;
+   Z(2,1).val_.d_ = 1.0;
+   Z(2,2).val_.d_ = 1.0;
 
   matrix_ffv output = stan::agrad::mdivide_right_tri_low(Z,Y);
 
@@ -1985,15 +2036,24 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffv__matrix_matrix_ffv_3rdDeriv) {
   Y << 1, 0, 0,
     2, 3, 0,
     4, 5, 6;
-   Y(0,0).d_ = 2.0;
-   Y(0,1).d_ = 2.0;
-   Y(0,2).d_ = 2.0;
-   Y(1,0).d_ = 2.0;
-   Y(1,1).d_ = 2.0;
-   Y(1,2).d_ = 2.0;
-   Y(2,0).d_ = 2.0;
-   Y(2,1).d_ = 2.0;
-   Y(2,2).d_ = 2.0;
+   Y(0,0).d_ = 1.0;
+   Y(0,1).d_ = 1.0;
+   Y(0,2).d_ = 1.0;
+   Y(1,0).d_ = 1.0;
+   Y(1,1).d_ = 1.0;
+   Y(1,2).d_ = 1.0;
+   Y(2,0).d_ = 1.0;
+   Y(2,1).d_ = 1.0;
+   Y(2,2).d_ = 1.0;
+   Y(0,0).val_.d_ = 1.0;
+   Y(0,1).val_.d_ = 1.0;
+   Y(0,2).val_.d_ = 1.0;
+   Y(1,0).val_.d_ = 1.0;
+   Y(1,1).val_.d_ = 1.0;
+   Y(1,2).val_.d_ = 1.0;
+   Y(2,0).val_.d_ = 1.0;
+   Y(2,1).val_.d_ = 1.0;
+   Y(2,2).val_.d_ = 1.0;
 
   matrix_d Z(3,3);
   Z << 1, 2, 3,
@@ -2005,11 +2065,11 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffv__matrix_matrix_ffv_3rdDeriv) {
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
   output(0,0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(3.7592592,h[0]);
   EXPECT_FLOAT_EQ(0.0,h[1]);
   EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0,h[3]);
-  EXPECT_FLOAT_EQ(0,h[4]);
+  EXPECT_FLOAT_EQ(0.39814815,h[3]);
+  EXPECT_FLOAT_EQ(-0.20987654,h[4]);
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradFwdMatrixMdivideRightTriLow,ffv__rowvector_matrix_exceptions) {

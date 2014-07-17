@@ -5,6 +5,7 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/mean.hpp>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 
 namespace stan {
   namespace math {
@@ -21,7 +22,7 @@ namespace stan {
     inline 
     typename boost::math::tools::promote_args<T>::type
     variance(const std::vector<T>& v) {
-      validate_nonzero_size(v,"variance");
+      stan::math::check_nonzero_size("variance(%1%)",v,"v",(double*)0);
       if (v.size() == 1)
         return 0.0;
       T v_mean(mean(v));
@@ -43,7 +44,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T>::type
     variance(const Eigen::Matrix<T,R,C>& m) {
-      validate_nonzero_size(m,"variance");
+      stan::math::check_nonzero_size("variance(%1%)",m,"m",(double*)0);
+
       if (m.size() == 1)
         return 0.0;
       typename boost::math::tools::promote_args<T>::type 

@@ -4,10 +4,9 @@
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_square.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 
 // FIXME: use explicit files
 #include <stan/agrad/rev.hpp> 
@@ -68,7 +67,7 @@ namespace stan {
 
     template <int R, int C>
     inline var log_determinant(const Eigen::Matrix<var,R,C>& m) {
-      stan::math::validate_square(m,"log_determinant");
+      stan::math::check_square("log_determinant(%1%)",m,"m",(double*)0);
       return var(new log_determinant_vari<R,C>(m));
     }
     

@@ -56,62 +56,44 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
       
-      if (!check_size_match(function, 
-                            Sigma.rows(), "Rows of Sigma",
-                            Sigma.cols(), "columns of Sigma",
-                            &lp))
-        return lp;
-      if (!check_positive(function, Sigma.rows(), "Sigma rows", &lp))
-        return lp;
-      if (!check_finite(function, Sigma, "Sigma", &lp)) 
-        return lp;
-      if (!check_symmetric(function, Sigma, "Sigma", &lp))
-        return lp;
+      check_size_match(function, 
+                       Sigma.rows(), "Rows of Sigma",
+                       Sigma.cols(), "columns of Sigma",
+                       &lp);
+      check_positive(function, Sigma.rows(), "Sigma rows", &lp);
+      check_finite(function, Sigma, "Sigma", &lp);
+      check_symmetric(function, Sigma, "Sigma", &lp);
       
       LDLT_factor<T_Sigma,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp))
-        return lp;
-      
-      if (!check_size_match(function, 
-                            D.rows(), "Rows of D",
-                            D.cols(), "Columns of D",
-                            &lp))
-        return lp;
-      if (!check_positive(function, D.rows(), "D rows", &lp))
-        return lp;
-      if (!check_finite(function, D, "D", &lp)) 
-        return lp;
-      if (!check_symmetric(function, D, "Sigma", &lp))
-        return lp;
+      check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp);
+      check_size_match(function, 
+                       D.rows(), "Rows of D",
+                       D.cols(), "Columns of D",
+                       &lp);
+      check_positive(function, D.rows(), "D rows", &lp);
+      check_finite(function, D, "D", &lp);
+      check_symmetric(function, D, "Sigma", &lp);
       
       LDLT_factor<T_D,Eigen::Dynamic,Eigen::Dynamic> ldlt_D(D);
-      if(!check_ldlt_factor(function,ldlt_D,"LDLT_Factor of D",&lp))
-        return lp;
-
-      if (!check_size_match(function, 
-                            y.rows(), "Rows of random variable",
-                            Mu.rows(), "Rows of location parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.cols(), "Columns of random variable",
-                            Mu.cols(), "Columns of location parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.rows(), "Rows of random variable",
-                            Sigma.rows(), "Rows of Sigma",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.cols(), "Columns of random variable",
-                            D.rows(), "Rows of D",
-                            &lp))
-        return lp;
-      if (!check_finite(function, Mu, "Location parameter", &lp)) 
-        return lp;
-      if (!check_finite(function, y, "Random variable", &lp)) 
-        return lp;
+      check_ldlt_factor(function,ldlt_D,"LDLT_Factor of D",&lp);
+      check_size_match(function, 
+                       y.rows(), "Rows of random variable",
+                       Mu.rows(), "Rows of location parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.cols(), "Columns of random variable",
+                       Mu.cols(), "Columns of location parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.rows(), "Rows of random variable",
+                       Sigma.rows(), "Rows of Sigma",
+                       &lp);
+      check_size_match(function, 
+                       y.cols(), "Columns of random variable",
+                       D.rows(), "Rows of D",
+                       &lp);
+      check_finite(function, Mu, "Location parameter", &lp);
+      check_finite(function, y, "Random variable", &lp);
       
       if (include_summand<propto>::value) 
         lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();

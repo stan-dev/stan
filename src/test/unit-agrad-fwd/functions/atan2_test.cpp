@@ -284,18 +284,20 @@ TEST(AgradFwdAtan2,FvarFvarVar_FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > x;
   x.val_.val_ = 1.5;
   x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
 
   fvar<fvar<var> > y;
   y.val_.val_ = 1.5;
   y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > a = atan2(x,y);
 
   AVEC p = createAVEC(x.val_.val_,y.val_.val_);
   VEC h;
   a.d_.d_.grad(p,h);
-  EXPECT_FLOAT_EQ(4.0 / 27.0, h[0]);
-  EXPECT_FLOAT_EQ(-4.0 / 27.0, h[1]);
+  EXPECT_FLOAT_EQ(8.0 / 27.0, h[0]);
+  EXPECT_FLOAT_EQ(-8.0 / 27.0, h[1]);
 }
 
 TEST(AgradFwdAtan2,FvarFvarVar_Double_2ndDeriv) {
@@ -324,6 +326,7 @@ TEST(AgradFwdAtan2,FvarFvarVar_Double_3rdDeriv) {
   fvar<fvar<var> > x;
   x.val_.val_ = 1.5;
   x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
 
   double y (1.5);
 
@@ -332,7 +335,7 @@ TEST(AgradFwdAtan2,FvarFvarVar_Double_3rdDeriv) {
   AVEC q = createAVEC(x.val_.val_);
   VEC g;
   a.d_.d_.grad(q,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(4.0 / 27.0, g[0]);
 }
 
 
@@ -364,12 +367,13 @@ TEST(AgradFwdAtan2,Double_FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > y;
   y.val_.val_ = 1.5;
   y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > a = atan2(x,y);
 
   AVEC q = createAVEC(y.val_.val_);
   VEC g;
   a.d_.d_.grad(q,g);
-  EXPECT_FLOAT_EQ(0,g[0]);
+  EXPECT_FLOAT_EQ(-4.0 / 27.0,g[0]);
 }
 

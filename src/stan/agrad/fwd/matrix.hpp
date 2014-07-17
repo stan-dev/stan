@@ -18,12 +18,16 @@
 #include <stan/agrad/fwd/matrix/mdivide_right_tri_low.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <stan/agrad/fwd/matrix/multiply_lower_tri_self_transpose.hpp>
+#include <stan/agrad/fwd/matrix/qr_Q.hpp>
+#include <stan/agrad/fwd/matrix/qr_R.hpp>
 #include <stan/agrad/fwd/matrix/rows_dot_product.hpp>
 #include <stan/agrad/fwd/matrix/rows_dot_self.hpp>
 #include <stan/agrad/fwd/matrix/softmax.hpp>
 #include <stan/agrad/fwd/matrix/sort.hpp>
 #include <stan/agrad/fwd/matrix/sum.hpp>
 #include <stan/agrad/fwd/matrix/tcrossprod.hpp>
+#include <stan/agrad/fwd/matrix/trace_quad_form.hpp>
+#include <stan/agrad/fwd/matrix/trace_gen_quad_form.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 

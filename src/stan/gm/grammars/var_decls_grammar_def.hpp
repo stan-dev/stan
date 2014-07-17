@@ -74,6 +74,11 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::cholesky_factor_var_decl,
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::cholesky_corr_var_decl,
+                          (stan::gm::expression, K_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::cov_matrix_var_decl,
                           (stan::gm::expression, K_)
                           (std::string, name_)
@@ -145,6 +150,11 @@ namespace stan {
       bool operator()(const cholesky_factor_var_decl& /*x*/) const {
         error_msgs_ << "require unconstrained variable declaration."
                     << " found cholesky_factor." << std::endl;
+        return false;
+      }
+      bool operator()(const cholesky_corr_var_decl& /*x*/) const {
+        error_msgs_ << "require unconstrained variable declaration."
+                    << " found cholesky_factor_corr." << std::endl;
         return false;
       }
       bool operator()(const cov_matrix_var_decl& /*x*/) const {
@@ -290,6 +300,7 @@ namespace stan {
 
     struct validate_identifier {
       std::set<std::string> reserved_word_set_;
+      std::set<std::string> const_fun_name_set_;
 
       template <typename T1, typename T2>
       struct result { typedef bool type; };
@@ -298,7 +309,32 @@ namespace stan {
         reserved_word_set_.insert(w);
       }
 
+      template <typename S, typename T>
+      static bool contains(const S& s,
+                           const T& x) {
+        return s.find(x) != s.end();
+      }
+
+      bool identifier_exists(const std::string& identifier) const {
+        return contains(reserved_word_set_, identifier)
+          || ( contains(function_signatures::instance().key_set(), identifier)
+               && !contains(const_fun_name_set_, identifier) );
+      }
+
       validate_identifier() {
+        // Constant functions which can be used as identifiers
+        const_fun_name_set_.insert("pi");
+        const_fun_name_set_.insert("e");
+        const_fun_name_set_.insert("sqrt2");
+        const_fun_name_set_.insert("log2");
+        const_fun_name_set_.insert("log10");
+        const_fun_name_set_.insert("not_a_number");
+        const_fun_name_set_.insert("positive_infinity");
+        const_fun_name_set_.insert("negative_infinity");
+        const_fun_name_set_.insert("epsilon");
+        const_fun_name_set_.insert("negative_epsilon");
+
+        // illegal identifiers
         reserve("for");  
         reserve("in");  
         reserve("while");
@@ -320,6 +356,7 @@ namespace stan {
         reserve("row_vector"); 
         reserve("matrix"); 
         reserve("cholesky_factor_cov");
+        reserve("cholesky_factor_corr");
         reserve("cov_matrix");
         reserve("corr_matrix"); 
 
@@ -423,22 +460,11 @@ namespace stan {
         using std::set;
         using std::string;
         const function_signatures& sigs = function_signatures::instance();
+
         set<string> fun_names = sigs.key_set();
-        fun_names.erase("pi");
-        fun_names.erase("e");
-        fun_names.erase("sqrt2");
-        fun_names.erase("log2");
-        fun_names.erase("log10");
-        fun_names.erase("not_a_number");
-        fun_names.erase("positive_infinity");
-        fun_names.erase("negative_infinity");
-        fun_names.erase("epsilon");
-        fun_names.erase("negative_epsilon");
-        for (set<string>::iterator it = fun_names.begin();  
-             it != fun_names.end();  
-             ++it)
-          reserve(*it);
-        
+        for (set<string>::iterator it = fun_names.begin();  it != fun_names.end();  ++it)
+          if (!contains(const_fun_name_set_, *it))
+            reserve(*it);
       }
 
       bool operator()(const std::string& identifier,
@@ -462,7 +488,7 @@ namespace stan {
                      << std::endl;
           return false;
         }
-        if (reserved_word_set_.find(identifier) != reserved_word_set_.end()) {
+        if (identifier_exists(identifier)) { 
           error_msgs << "variable identifier (name) may not be reserved word"
                      << std::endl
                      << "    found identifier=" << identifier 
@@ -618,8 +644,10 @@ namespace stan {
       : var_decls_grammar::base_type(var_decls_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
+        // expression_g allows full recursion
         expression_g(var_map,error_msgs),
-        expression07_g(var_map,error_msgs,false)
+        // expression07_g disallows comparisons
+        expression07_g(var_map,error_msgs,expression_g)
     {
 
       using boost::spirit::qi::_1;
@@ -637,7 +665,8 @@ namespace stan {
 
       var_decls_r.name("variable declarations");
       var_decls_r 
-        %= *var_decl_r(_r1,_r2);
+        %= *(var_decl_r(_r1,_r2)) 
+        ;
 
       // _a = error state local, 
       // _r1 constraints allowed inherited,
@@ -674,6 +703,9 @@ namespace stan {
             | cholesky_factor_decl_r(_r2)    
             [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
+            | cholesky_corr_decl_r(_r2)    
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                              boost::phoenix::ref(error_msgs_))]
             | cov_matrix_decl_r(_r2)    
             [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
                        boost::phoenix::ref(error_msgs_))]
@@ -681,7 +713,7 @@ namespace stan {
             [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
                        boost::phoenix::ref(error_msgs_))]
             )
-        > eps
+        > lit(';')
         [_pass 
          = validate_decl_constraints_f(_r1,_a,_val,
                                        boost::phoenix::ref(error_msgs_))]
@@ -692,10 +724,9 @@ namespace stan {
         %= ( lit("int")
              >> no_skip[!char_("a-zA-Z0-9_")] )
         > -range_brackets_int_r(_r1)
-        // >> (lit(' ') | lit('\n') | lit('\t') | lit('\r'))
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       double_decl_r.name("real declaration");
       double_decl_r 
@@ -704,7 +735,7 @@ namespace stan {
         > -range_brackets_double_r(_r1)
         > identifier_r
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       vector_decl_r.name("vector declaration");
       vector_decl_r 
@@ -716,7 +747,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       row_vector_decl_r.name("row vector declaration");
       row_vector_decl_r 
@@ -728,7 +759,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       matrix_decl_r.name("matrix declaration");
       matrix_decl_r 
@@ -743,7 +774,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       unit_vector_decl_r.name("unit_vector declaration");
       unit_vector_decl_r 
@@ -754,7 +785,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';'); 
+        ;
 
       simplex_decl_r.name("simplex declaration");
       simplex_decl_r 
@@ -765,7 +796,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';'); 
+        ;
 
       ordered_decl_r.name("ordered declaration");
       ordered_decl_r 
@@ -776,7 +807,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       positive_ordered_decl_r.name("positive_ordered declaration");
       positive_ordered_decl_r 
@@ -787,11 +818,11 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
-      cholesky_factor_decl_r.name("cholesky factor declaration");
+      cholesky_factor_decl_r.name("cholesky factor for symmetric, positive-def declaration");
       cholesky_factor_decl_r 
-        %= lit("cholesky_factor_cov")
+        %= lit("cholesky_factor_cov") 
         > lit('[')
         > expression_g(_r1)
           [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
@@ -802,9 +833,20 @@ namespace stan {
         > lit(']') 
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';')
         > eps
-        [copy_square_cholesky_dimension_if_necessary_f(_val)];
+        [copy_square_cholesky_dimension_if_necessary_f(_val)]
+        ;
+
+      cholesky_corr_decl_r.name("cholesky factor for correlation matrix declaration");
+      cholesky_corr_decl_r 
+        %= lit("cholesky_factor_corr")
+        > lit('[')
+        > expression_g(_r1)
+          [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
+        > lit(']') 
+        > identifier_r 
+        > opt_dims_r(_r1)
+        ;
 
       cov_matrix_decl_r.name("covariance matrix declaration");
       cov_matrix_decl_r 
@@ -815,7 +857,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       corr_matrix_decl_r.name("correlation matrix declaration");
       corr_matrix_decl_r 
@@ -826,7 +868,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       opt_dims_r.name("array dimensions (optional)");
       opt_dims_r 

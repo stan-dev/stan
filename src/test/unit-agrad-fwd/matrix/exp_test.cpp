@@ -450,10 +450,14 @@ TEST(AgradFwdMatrixExp, ffv_matrix_3rdDeriv) {
   matrix_d expected_output(2,2);
   matrix_ffv mv(2,2), output;
 
-  fvar<fvar<var> > a(1.0,2.0);
-  fvar<fvar<var> > b(2.0,2.0);
-  fvar<fvar<var> > c(3.0,2.0);
-  fvar<fvar<var> > d(4.0,2.0);
+  fvar<fvar<var> > a(1.0,1.0);
+  fvar<fvar<var> > b(2.0,1.0);
+  fvar<fvar<var> > c(3.0,1.0);
+  fvar<fvar<var> > d(4.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
 
   mv << a,b,c,d;
   output = exp(mv);
@@ -461,7 +465,7 @@ TEST(AgradFwdMatrixExp, ffv_matrix_3rdDeriv) {
   AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val(),d.val().val());
   VEC h;
   output(0,0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(std::exp(1.0),h[0]);
   EXPECT_FLOAT_EQ(0,h[1]);
   EXPECT_FLOAT_EQ(0,h[2]);
   EXPECT_FLOAT_EQ(0,h[3]);
@@ -562,10 +566,14 @@ TEST(AgradFwdMatrixExp, ffv_vector_3rdDeriv) {
   vector_d expected_output(4);
   vector_ffv mv(4), output;
 
-  fvar<fvar<var> > a(1.0,2.0);
-  fvar<fvar<var> > b(2.0,2.0);
-  fvar<fvar<var> > c(3.0,2.0);
-  fvar<fvar<var> > d(4.0,2.0);
+  fvar<fvar<var> > a(1.0,1.0);
+  fvar<fvar<var> > b(2.0,1.0);
+  fvar<fvar<var> > c(3.0,1.0);
+  fvar<fvar<var> > d(4.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
 
   mv << a,b,c,d;
   output = exp(mv);
@@ -573,7 +581,7 @@ TEST(AgradFwdMatrixExp, ffv_vector_3rdDeriv) {
   AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val(),d.val().val());
   VEC h;
   output(0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(std::exp(1.0),h[0]);
   EXPECT_FLOAT_EQ(0.0,h[1]);
   EXPECT_FLOAT_EQ(0.0,h[2]);
   EXPECT_FLOAT_EQ(0.0,h[3]);
@@ -674,10 +682,14 @@ TEST(AgradFwdMatrixExp, ffv_rowvector_3rdDeriv) {
   row_vector_d expected_output(4);
   row_vector_ffv mv(4), output;
 
-  fvar<fvar<var> > a(1.0,2.0);
-  fvar<fvar<var> > b(2.0,2.0);
-  fvar<fvar<var> > c(3.0,2.0);
-  fvar<fvar<var> > d(4.0,2.0);
+  fvar<fvar<var> > a(1.0,1.0);
+  fvar<fvar<var> > b(2.0,1.0);
+  fvar<fvar<var> > c(3.0,1.0);
+  fvar<fvar<var> > d(4.0,1.0);
+  a.val_.d_ = 1.0;
+  b.val_.d_ = 1.0;
+  c.val_.d_ = 1.0;
+  d.val_.d_ = 1.0;
 
   mv << a,b,c,d;
   output = exp(mv);
@@ -685,7 +697,7 @@ TEST(AgradFwdMatrixExp, ffv_rowvector_3rdDeriv) {
   AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val(),d.val().val());
   VEC h;
   output(0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
+  EXPECT_FLOAT_EQ(std::exp(1.0),h[0]);
   EXPECT_FLOAT_EQ(0.0,h[1]);
   EXPECT_FLOAT_EQ(0.0,h[2]);
   EXPECT_FLOAT_EQ(0.0,h[3]);

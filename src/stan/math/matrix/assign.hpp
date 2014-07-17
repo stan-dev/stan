@@ -8,8 +8,8 @@
 // #include <boost/utility/enable_if.hpp>
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_matching_sizes.hpp>
-#include <stan/math/matrix/validate_matching_dims.hpp>
+#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/math/error_handling/matrix/check_matching_dims.hpp>
 
 
 #include <iostream>
@@ -95,7 +95,8 @@ namespace stan {
     inline void 
     assign(Eigen::Matrix<LHS,R,C>& x, 
            const Eigen::Matrix<RHS,R,C>& y) {
-      stan::math::validate_matching_dims(x,y,"assign");
+      stan::math::check_matching_dims("assign(%1%)",x,"x",
+                                      y,"y",(double*)0);
       for (int i = 0; i < x.size(); ++i)
         assign(x(i),y(i));
     }
@@ -122,7 +123,8 @@ namespace stan {
     inline void 
     assign(Eigen::Block<LHS> x,
            const Eigen::Matrix<RHS,R,C>& y) {
-      stan::math::validate_matching_sizes(x,y,"assign");
+      stan::math::check_matching_sizes("assign(%1%)",x,"x",
+                                       y,"y",(double*)0);
       for (int n = 0; n < y.cols(); ++n)
         for (int m = 0; m < y.rows(); ++m)
           assign(x(m,n),y(m,n));
@@ -151,7 +153,8 @@ namespace stan {
     template <typename LHS, typename RHS>
     inline void 
     assign(std::vector<LHS>& x, const std::vector<RHS>& y) {
-      stan::math::validate_matching_sizes(x,y,"assign");
+      stan::math::check_matching_sizes("assign(%1%)",x,"x",
+                                       y,"y",(double*)0);
       for (size_t i = 0; i < x.size(); ++i)
         assign(x[i],y[i]);
     }

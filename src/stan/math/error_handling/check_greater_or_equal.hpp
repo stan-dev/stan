@@ -1,8 +1,8 @@
-#ifndef __STAN__MATH__ERROR_HANDLING__CHECK_GREATER_OR_EQUAL_HPP__
-#define __STAN__MATH__ERROR_HANDLING__CHECK_GREATER_OR_EQUAL_HPP__
+#ifndef __STAN__MATH__ERROR_HANDLING_CHECK_GREATER_OR_EQUAL_HPP__
+#define __STAN__MATH__ERROR_HANDLING_CHECK_GREATER_OR_EQUAL_HPP__
 
-#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 
 namespace stan {
   namespace math {
@@ -61,15 +61,6 @@ namespace stan {
       return greater_or_equal<T_y,T_low,T_result,is_vector_like<T_y>::value>
         ::check(function,y,low,name,result);
     }
-   template <typename T_y, typename T_low>
-    inline bool check_greater_or_equal(const char* function,
-                                       const T_y& y,
-                                       const T_low& low,
-                                       const char* name) {
-      return check_greater_or_equal<T_y,T_low,typename scalar_type<T_y>::type *>
-        (function,y,low,name,0);
-    }
-
   }
 }
 #endif

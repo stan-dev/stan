@@ -8,12 +8,9 @@ TEST(MathErrorHandlingMatrix, checkSimplex) {
   
   EXPECT_TRUE(stan::math::check_simplex("checkSimplex(%1%)",
                                         y, "y", &result));
-  EXPECT_TRUE(stan::math::check_simplex("checkSimplex(%1%)",
-                                        y, "y"));
                   
   y[1] = 0.55;
-  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", y, "y", &result), 
-               std::domain_error);
-  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", y, "y"),
+  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", 
+                                         y, "y", &result), 
                std::domain_error);
 }

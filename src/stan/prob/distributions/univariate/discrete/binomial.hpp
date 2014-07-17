@@ -48,29 +48,24 @@ namespace stan {
         return 0.0;
 
       double logp = 0;
-      if (!check_bounded(function, n, 0, N,
-                         "Successes variable",
-                         &logp))
-        return logp;
-      if (!check_nonnegative(function, N,
+      check_bounded(function, n, 0, N,
+                    "Successes variable",
+                    &logp);
+      check_nonnegative(function, N,
+                        "Population size parameter",
+                        &logp);
+      check_finite(function, theta,
+                   "Probability parameter",
+                   &logp);
+      check_bounded(function, theta, 0.0, 1.0,
+                    "Probability parameter",
+                    &logp);
+      check_consistent_sizes(function,
+                             n,N,theta,
+                             "Successes variable",
                              "Population size parameter",
-                             &logp))
-        return logp;
-      if (!check_finite(function, theta,
-                        "Probability parameter",
-                        &logp))
-        return logp;
-      if (!check_bounded(function, theta, 0.0, 1.0,
-                         "Probability parameter",
-                         &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   n,N,theta,
-                                   "Successes variable",
-                                   "Population size parameter",
-                                   "Probability parameter",
-                                   &logp)))
-        return logp;
+                             "Probability parameter",
+                             &logp);
 
 
       // check if no variables are involved and prop-to
@@ -164,25 +159,21 @@ namespace stan {
         return 0.0;
 
       double logp = 0;
-      if (!check_bounded(function, n, 0, N,
-                         "Successes variable",
-                         &logp))
-        return logp;
-      if (!check_nonnegative(function, N,
+      check_bounded(function, n, 0, N,
+                    "Successes variable",
+                    &logp);
+      check_nonnegative(function, N,
+                        "Population size parameter",
+                        &logp);
+      check_finite(function, alpha,
+                   "Probability parameter",
+                   &logp);
+      check_consistent_sizes(function,
+                             n,N,alpha,
+                             "Successes variable",
                              "Population size parameter",
-                             &logp))
-        return logp;
-      if (!check_finite(function, alpha,
-                        "Probability parameter",
-                        &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   n,N,alpha,
-                                   "Successes variable",
-                                   "Population size parameter",
-                                   "Probability parameter",
-                                   &logp)))
-        return logp;
+                             "Probability parameter",
+                             &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_prob>::value)
@@ -273,20 +264,14 @@ namespace stan {
       double P(1.0);
           
       // Validate arguments
-      if (!check_nonnegative(function, N, "Population size parameter", &P))
-        return P;
-          
-      if (!check_finite(function, theta, "Probability parameter", &P))
-        return P;
-          
-      if (!check_bounded(function, theta, 0.0, 1.0, 
-                         "Probability parameter", &P))
-        return P;
-          
-      if (!(check_consistent_sizes(function, n, N, theta, 
-                                   "Successes variable", "Population size parameter", "Probability parameter",
-                                   &P)))
-        return P;
+      check_nonnegative(function, N, "Population size parameter", &P);
+      check_finite(function, theta, "Probability parameter", &P);
+      check_bounded(function, theta, 0.0, 1.0, 
+                    "Probability parameter", &P);
+      check_consistent_sizes(function, n, N, theta, 
+                             "Successes variable", "Population size parameter",
+                             "Probability parameter",
+                             &P);
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -359,17 +344,14 @@ namespace stan {
       double P(0.0);
           
       // Validate arguments
-      if (!check_nonnegative(function, N, "Population size parameter", &P))
-        return P;
-      if (!check_finite(function, theta, "Probability parameter", &P))
-        return P;
-      if (!check_bounded(function, theta, 0.0, 1.0, 
-                         "Probability parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function, n, N, theta, 
-                                   "Successes variable", "Population size parameter", "Probability parameter",
-                                   &P)))
-        return P;
+      check_nonnegative(function, N, "Population size parameter", &P);
+      check_finite(function, theta, "Probability parameter", &P);
+      check_bounded(function, theta, 0.0, 1.0, 
+                    "Probability parameter", &P);
+      check_consistent_sizes(function, n, N, theta, 
+                             "Successes variable", "Population size parameter",
+                             "Probability parameter",
+                             &P);
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -432,17 +414,14 @@ namespace stan {
       double P(0.0);
           
       // Validate arguments
-      if (!check_nonnegative(function, N, "Population size parameter", &P))
-        return P;
-      if (!check_finite(function, theta, "Probability parameter", &P))
-        return P;
-      if (!check_bounded(function, theta, 0.0, 1.0, 
-                         "Probability parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function, n, N, theta, 
-                                   "Successes variable", "Population size parameter", "Probability parameter",
-                                   &P)))
-        return P;
+      check_nonnegative(function, N, "Population size parameter", &P);
+      check_finite(function, theta, "Probability parameter", &P);
+      check_bounded(function, theta, 0.0, 1.0, 
+                    "Probability parameter", &P);
+      check_consistent_sizes(function, n, N, theta, 
+                             "Successes variable", "Population size parameter",
+                             "Probability parameter",
+                             &P);
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -501,18 +480,14 @@ namespace stan {
       using stan::math::check_greater_or_equal;
       using stan::math::check_nonnegative;
 
-      if (!check_nonnegative(function, N,
-                             "Population size parameter"))
-        return 0;
-      if (!check_finite(function, theta,
-                        "Probability parameter"))
-        return 0;
-      if (!check_less_or_equal(function, theta, 1.0,
-                         "Probability parameter"))
-        return 0;
-      if (!check_greater_or_equal(function, theta, 0.0,
-                         "Probability parameter"))
-        return 0;
+      check_nonnegative(function, N,
+                        "Population size parameter", (double*)0);
+      check_finite(function, theta,
+                   "Probability parameter", (double*)0);
+      check_less_or_equal(function, theta, 1.0,
+                          "Probability parameter", (double*)0);
+      check_greater_or_equal(function, theta, 0.0,
+                             "Probability parameter", (double*)0);
 
       variate_generator<RNG&, binomial_distribution<> >
         binomial_rng(rng, binomial_distribution<>(N, theta));
