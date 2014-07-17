@@ -475,24 +475,6 @@ namespace stan {
     boost::phoenix::function<validate_int_expr3> validate_int_expr3_f;
 
 
-    struct validate_expr_type {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
-
-      bool operator()(const expression& expr,
-                      std::ostream& error_msgs) const {
-        if (expr.expression_type().is_ill_formed()) {
-          error_msgs << "expression is ill formed" << std::endl;
-          return false;
-        }
-        return true;
-      }
-    };
-    boost::phoenix::function<validate_expr_type> validate_expr_type_f;
-
-    
-
-
 
     template <typename Iterator>
     term_grammar<Iterator>::term_grammar(variable_map& var_map,
@@ -593,7 +575,7 @@ namespace stan {
 
       factor_r.name("factor");
       factor_r =
-        solve_ode_r(_r1)
+        solve_ode_r(_r1)    [_val = _1]
         | 
         fun_r(_r1)          [set_fun_type_named_f(_val,_1,_r1,_pass,
                                                     boost::phoenix::ref(error_msgs_))]

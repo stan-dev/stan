@@ -302,4 +302,7 @@ TEST(gmAst, solveOde) {
   EXPECT_EQ(ts.type_, so2.ts_.expression_type());
   EXPECT_EQ(theta.type_, so2.theta_.expression_type());
   EXPECT_EQ(x.type_, so2.x_.expression_type());
+
+  expression e2(so2);
+  EXPECT_EQ(expr_type(VECTOR_T,1), e2.expression_type());
 }

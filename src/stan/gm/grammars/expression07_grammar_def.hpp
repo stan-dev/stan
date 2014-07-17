@@ -51,7 +51,6 @@ namespace stan {
 
   namespace gm {
 
-    // FIXME: cut and paste from term grammar, having trouble w. includes
     struct validate_expr_type3 {
       template <typename T1, typename T2>
       struct result { typedef bool type; };

@@ -180,7 +180,7 @@ namespace stan {
       void operator()(const solve_ode& fx) const { 
         o_ << "solve_ode("
            << fx.system_function_name_
-           << ", ";
+           << "<double,double,double,double>, ";
 
         generate_expression(fx.y0_, o_);
         o_ << ", ";
