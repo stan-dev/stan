@@ -23,6 +23,7 @@ namespace stan {
         values(const size_t N,
                const size_t M) 
           : m_(0), N_(N), M_(M) {
+          x_.reserve(N_);
           for (size_t n = 0; n < N_; n++)
             x_.push_back(InternalVector(M_));
         }

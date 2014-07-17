@@ -407,7 +407,7 @@ There are corresponding real-argument versions.
 
 \subsubsection{Boolean Operator Short Circuiting}
 
-{\it Warning:} \ As of Stan 2.3.0, the boolean operators do {\it not}
+{\it Warning:} \ As of Stan 2.4.0, the boolean operators do {\it not}
 short circuit.  This is a known bug and will be fixed in a future
 release.  The intended behavior in the future is as described below.
 
@@ -1734,7 +1734,7 @@ matrices.  The input matrix does not need to be square.}
     the vector \farg{v}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{v})}.}
 %
 \fitem{matrix}{diag\_post\_multiply}{matrix \farg{m}, row\_vector \farg{rv}}{Return the
-  product of the matrix \code{\farg{m}} and the diagonal matrix fromed from
+  product of the matrix \code{\farg{m}} and the diagonal matrix formed from
   the the row vector \code{\farg{rv}}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{rv})}.}
 \end{description}
 
@@ -2192,7 +2192,7 @@ The inverse of \farg{A} where A is symmetric, positive definite}
 %
 \fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
 The vector of eigenvalues of a symmetric matrix \farg{A} 
-in asscending order}
+in ascending order}
 %
 \fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{ The matrix with
   the (column) eigenvectors of symmetric matrix \farg{A} in the same
@@ -2205,7 +2205,7 @@ eigenvectors returned by a decomposition are only identified up to a
 sign change.  In order to compare the eigenvectors produced by Stan's
 eigendecomposition to others, signs may need to be normalized in some
 way, such as by fixing the sign of a component, or doing comparisons
-allowig a multiplication by $-1$.
+allowing a multiplication by $-1$.
 
 The condition number of a symmetric matrix is defined to be the ratio
 of the largest eigenvalue to the smallest eigenvalue.  Large condition

@@ -516,7 +516,7 @@ namespace stan {
         
         stan::common::recorder::csv sample_recorder(output_stream, "# ");
         stan::common::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
-        stan::common::recorder::messages message_recorder(output_stream, "# ");
+        stan::common::recorder::messages message_recorder(&std::cout, "# ");
         
         stan::io::mcmc_writer<Model, 
                               stan::common::recorder::csv, stan::common::recorder::csv,
