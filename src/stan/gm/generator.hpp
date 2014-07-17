@@ -883,7 +883,7 @@ namespace stan {
         nonbasic_validate(x,"cholesky_factor");
       }
       void operator()(cholesky_corr_var_decl const& x) const {
-        nonbasic_validate(x,"choelsky_corr");
+        nonbasic_validate(x,"cholesky_factor_corr");
       }
       void operator()(cov_matrix_var_decl const& x) const {
         nonbasic_validate(x,"cov_matrix");
