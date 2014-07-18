@@ -72,6 +72,8 @@ namespace stan {
         if (out_stream_) *out_stream_ << "vars[0]" << std::endl;
         if (out_stream_) *out_stream_ << vars[0] << std::endl;
 
+	// This is an addition Alp made from cmdstan's stan submodule
+
         // Let's invert that transformation
         // Eigen::Matrix<double,Eigen::Dynamic,1> params_r_out;
         // std::fstream data_stream(char(0), std::fstream::in);
