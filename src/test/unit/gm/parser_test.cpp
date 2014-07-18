@@ -405,7 +405,7 @@ TEST(gmParserStatementGrammar, validateAllowSample) {
 TEST(gmParserTermGrammar, infixExponentiation) {
   test_parsable("validate_exponentiation_good");
   test_throws("validate_exponentiation_bad", 
-              "type mismatch in assignment; left variable=z;");
+              "base type mismatch in assignment; variable name = z");
 }
 
 TEST(gmParserTermGrammar, multiplicationFun) {
