@@ -73,10 +73,10 @@ namespace stan {
         if (out_stream_) *out_stream_ << vars[0] << std::endl;
 
         // Let's invert that transformation
-        Eigen::Matrix<double,Eigen::Dynamic,1> params_r_out;
-        std::fstream data_stream(char(0), std::fstream::in);
-        stan::io::dump data_var_context(data_stream);
-        data_stream.close();
+        // Eigen::Matrix<double,Eigen::Dynamic,1> params_r_out;
+        // std::fstream data_stream(char(0), std::fstream::in);
+        // stan::io::dump data_var_context(data_stream);
+        // data_stream.close();
 
         // model_.transform_inits
 
