@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__ERROR_HANDLING_HPP__
-#define __STAN__MATH__ERROR_HANDLING_HPP__
+#ifndef STAN__MATH__ERROR_HANDLING_HPP
+#define STAN__MATH__ERROR_HANDLING_HPP
 
 #include <algorithm>
 #include <cstddef>

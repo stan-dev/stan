@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__CONTAINERS_CONVERSION_HPP__
-#define __STAN__MATH__MATRIX__CONTAINERS_CONVERSION_HPP__
+#ifndef STAN__MATH__MATRIX__CONTAINERS_CONVERSION_HPP
+#define STAN__MATH__MATRIX__CONTAINERS_CONVERSION_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/meta/traits.hpp> //stan::scalar_type

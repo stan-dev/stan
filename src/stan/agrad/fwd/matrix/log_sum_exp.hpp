@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP__
+#ifndef STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP
+#define STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP
 
 #include <vector>
 #include <stan/agrad/fwd/fvar.hpp>

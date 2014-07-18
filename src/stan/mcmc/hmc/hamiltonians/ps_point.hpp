@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__PS_POINT__BETA__
-#define __STAN__MCMC__PS_POINT__BETA__
+#ifndef STAN__MCMC__PS_POINT__BETA
+#define STAN__MCMC__PS_POINT__BETA
 
 #include <fstream>
 #include <string>

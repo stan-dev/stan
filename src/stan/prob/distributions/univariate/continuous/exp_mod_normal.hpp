@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__MOD__NORMAL__HPP__
-#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__MOD__NORMAL__HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__MOD__NORMAL__HPP
+#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__MOD__NORMAL__HPP
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

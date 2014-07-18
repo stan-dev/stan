@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__FALLING_FACTORIAL_HPP__
-#define __STAN__MATH__FUNCTIONS__FALLING_FACTORIAL_HPP__
+#ifndef STAN__MATH__FUNCTIONS__FALLING_FACTORIAL_HPP
+#define STAN__MATH__FUNCTIONS__FALLING_FACTORIAL_HPP
 
 #include <stan/math/functions/log_falling_factorial.hpp>
 

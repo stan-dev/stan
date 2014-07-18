@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__DIAG__E__METRIC__BETA__
-#define __STAN__MCMC__DIAG__E__METRIC__BETA__
+#ifndef STAN__MCMC__DIAG__E__METRIC__BETA
+#define STAN__MCMC__DIAG__E__METRIC__BETA
 
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>

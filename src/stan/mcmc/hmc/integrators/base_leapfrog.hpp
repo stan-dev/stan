@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__BASE__LEAPFROG__BETA__
-#define __STAN__MCMC__BASE__LEAPFROG__BETA__
+#ifndef STAN__MCMC__BASE__LEAPFROG__BETA
+#define STAN__MCMC__BASE__LEAPFROG__BETA
 
 #include <iostream>
 #include <iomanip>

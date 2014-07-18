@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__HESSIAN_HPP__
-#define __STAN__AGRAD__HESSIAN_HPP__
+#ifndef STAN__AGRAD__HESSIAN_HPP
+#define STAN__AGRAD__HESSIAN_HPP
 
 #include <vector>
 

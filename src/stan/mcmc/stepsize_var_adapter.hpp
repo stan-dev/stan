@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__STEPSIZE__VAR__ADAPTER__BETA__
-#define __STAN__MCMC__STEPSIZE__VAR__ADAPTER__BETA__
+#ifndef STAN__MCMC__STEPSIZE__VAR__ADAPTER__BETA
+#define STAN__MCMC__STEPSIZE__VAR__ADAPTER__BETA
 
 #include <stan/mcmc/base_adapter.hpp>
 #include <stan/mcmc/stepsize_adaptation.hpp>

@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__QUAD_FORM_HPP__
-#define __STAN__MATH__MATRIX__QUAD_FORM_HPP__
+#ifndef STAN__MATH__MATRIX__QUAD_FORM_HPP
+#define STAN__MATH__MATRIX__QUAD_FORM_HPP
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>

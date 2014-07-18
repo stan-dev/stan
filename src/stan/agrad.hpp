@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD_HPP__
-#define __STAN__AGRAD_HPP__
+#ifndef STAN__AGRAD_HPP
+#define STAN__AGRAD_HPP
 
 // This header shouldn't be included directly.
 // For reverse mode autodiff, include:

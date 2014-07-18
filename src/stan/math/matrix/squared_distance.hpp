@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__SQUARED_DISTANCE_HPP__
-#define __STAN__MATH__MATRIX__SQUARED_DISTANCE_HPP__
+#ifndef STAN__MATH__MATRIX__SQUARED_DISTANCE_HPP
+#define STAN__MATH__MATRIX__SQUARED_DISTANCE_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/matrix/check_vector.hpp>

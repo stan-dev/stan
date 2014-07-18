@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__SAMPLE__HPP__
-#define __STAN__MCMC__SAMPLE__HPP__
+#ifndef STAN__MCMC__SAMPLE__HPP
+#define STAN__MCMC__SAMPLE__HPP
 
 #include <vector>
 #include <string>

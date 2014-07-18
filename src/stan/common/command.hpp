@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__COMMAND_HPP__
-#define __STAN__COMMON__COMMAND_HPP__
+#ifndef STAN__COMMON__COMMAND_HPP
+#define STAN__COMMON__COMMAND_HPP
 
 #include <fstream>
 #include <stdexcept>

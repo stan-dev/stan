@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__ERROR_HANDLING_CHECK_LESS_HPP__
-#define __STAN__MATH__ERROR_HANDLING_CHECK_LESS_HPP__
+#ifndef STAN__MATH__ERROR_HANDLING_CHECK_LESS_HPP
+#define STAN__MATH__ERROR_HANDLING_CHECK_LESS_HPP
 
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
