@@ -14,31 +14,29 @@ namespace stan {
     template <typename T_shape>
     T_shape do_lkj_constant(const T_shape& eta, const unsigned int& K) {
 
-      // Lewandowski, Kurowicka, and Joe (2009) equations 15 and 16
-      
-      if (stan::is_constant<typename stan::scalar_type<T_shape> >::value
-          && eta == 1.0) {
-        double sum = 0.0;
-        double constant = 0.0;
-        double beta_arg = 0.0;
-        for (unsigned int k = 1; k < K; k++) { // yes, go from 1 to K - 1
-          beta_arg = 0.5 * (k + 1.0);
-          constant += k * (2.0 * lgamma(beta_arg) - lgamma(2.0 * beta_arg));
-          sum += pow(static_cast<double>(k),2.0);
-        }
-        constant += sum * LOG_TWO;
-        return constant;
+      using stan::math::sum;
+      using stan::math::lgamma;
+
+      // Lewandowski, Kurowicka, and Joe (2009) theorem 5
+      T_shape constant;
+      const int Km1 = K - 1;
+      if (eta == 1.0) {
+        // C++ integer division is appropriate in this block
+        Eigen::VectorXd numerator( Km1 / 2 );
+        for(size_t k = 1; k <= numerator.rows(); k++)
+          numerator(k-1) = lgamma(2 * k);
+        constant = sum(numerator);
+        if ( (K % 2) == 1 ) constant += 0.25 * (K * K - 1) * LOG_PI -
+          0.25 * (Km1 * Km1) * LOG_TWO - Km1 * lgamma( (K + 1) / 2);
+        else constant += 0.25 * K * (K - 2) * LOG_PI +
+          0.25 * (3 * K * K - 4 * K) * LOG_TWO +
+          K * lgamma(K / 2) - Km1 * lgamma(K);
       }
-      T_shape sum = 0.0;
-      T_shape constant = 0.0;
-      T_shape beta_arg;
-      for (unsigned int k = 1; k < K; k++) { // yes, go from 1 to K - 1
-        unsigned int diff = K - k;
-        beta_arg = eta + 0.5 * (diff - 1);
-        constant += diff * (2.0 * lgamma(beta_arg) - lgamma(2.0 * beta_arg));
-        sum += (2.0 * eta - 2.0 + diff) * diff;
+      else {
+        constant = -Km1 * lgamma(eta + 0.5 * Km1);
+        for (size_t k = 1; k <= Km1; k++)
+          constant += 0.5 * k * LOG_PI + lgamma(eta + 0.5 * (Km1 - k));
       }
-      constant += sum * LOG_TWO;
       return constant;
     }
 
@@ -56,21 +54,35 @@ namespace stan {
 
       using boost::math::tools::promote_args;
       using stan::math::check_positive;
+      using stan::math::check_lower_triangular;
+      using stan::math::sum;
       
       typename promote_args<T_covar,T_shape>::type lp(0.0);
-      check_positive(function, eta, "Shape parameter", &lp);
+      if (!check_positive(function, eta, "Shape parameter", &lp))
+        return lp;      
+      if (!check_lower_triangular(function, L, "Random variable", &lp))
+        return lp;
 
       const unsigned int K = L.rows();
       if (K == 0)
         return 0.0;
-      
+            
       if (include_summand<propto,T_shape>::value) 
         lp += do_lkj_constant(eta, K);
       if (include_summand<propto,T_covar,T_shape>::value) {
+        const int Km1 = K - 1;
+        Eigen::Matrix<T_covar,Eigen::Dynamic,1> log_diagonals =
+          L.diagonal().tail(Km1).array().log();
+        Eigen::Matrix<T_covar,Eigen::Dynamic,1> values(Km1);
+        for (size_t k = 0; k < Km1; k++)
+          values(k) = (Km1 - k - 1) * log_diagonals(k);
         if ( (eta == 1.0) &&
-            stan::is_constant<typename stan::scalar_type<T_shape> >::value)
-          return lp;
-        lp += (eta - 1.0) * 2.0 * L.diagonal().array().log().sum();
+            stan::is_constant<typename stan::scalar_type<T_shape> >::value) {
+            lp += sum(values);
+            return(lp);
+        }
+        values += (2.0 * eta - 2.0) * log_diagonals;
+        lp += sum(values);
       }
       
       return lp;
@@ -98,28 +110,41 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_positive;
       using stan::math::check_corr_matrix;
+      using stan::math::sum;
       using boost::math::tools::promote_args;
       
-      typename promote_args<T_y,T_shape>::type lp;
-      check_positive(function, eta, "Shape parameter", &lp);
-      check_size_match(function, 
-                       y.rows(), "Rows of correlation matrix",
-                       y.cols(), "columns of correlation matrix",
-                       &lp);
-      check_not_nan(function, y, "Correlation matrix", &lp);
-      check_corr_matrix(function, y, "Correlation matrix", &lp);
+      typename promote_args<T_y,T_shape>::type lp(0.0);
+      if (!check_positive(function, eta, "Shape parameter", &lp))
+        return lp;      
+      if (!check_size_match(function, 
+          y.rows(), "Rows of correlation matrix",
+          y.cols(), "columns of correlation matrix",
+          &lp))
+        return lp;
+      if (!check_not_nan(function, y, "Correlation matrix", &lp)) 
+        return lp;
+      if (!check_corr_matrix(function, y, "Correlation matrix", &lp)) {
+        return lp;
+      }
       
       const unsigned int K = y.rows();
       if (K == 0)
         return 0.0;
 
-      Eigen::LLT< Eigen::Matrix<T_y, Eigen::Dynamic, Eigen::Dynamic> > Cholesky = y.llt();
-      // FIXME: check_numerical_issue function?
-      if (Cholesky.info() == Eigen::NumericalIssue)
+      if (include_summand<propto,T_shape>::value)
+        lp += do_lkj_constant(eta, K);
+
+      if ( (eta == 1.0) &&
+          stan::is_constant<typename stan::scalar_type<T_shape> >::value )
         return lp;
 
-      Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> L = Cholesky.matrixL();
-      return lkj_corr_cholesky_log<propto>(L, eta);
+      if (!include_summand<propto,T_y,T_shape>::value)
+          return lp;
+
+      Eigen::Matrix<T_y,Eigen::Dynamic,1> values =
+        y.ldlt().vectorD().array().log().matrix();
+      lp += (eta - 1.0) * sum(values);
+      return lp;
     }
 
     template <typename T_y, typename T_shape>

@@ -18,4 +18,13 @@ TEST(MathsSpecialFunctions, square) {
 
   int z = 10; // promoted to double by abs(double)
   EXPECT_FLOAT_EQ(10.0, abs(z));
+
 }
+
+
+TEST( MathsSpecialFunctions, square2){
+  double yy=0;
+  yy=0;
+  EXPECT_FLOAT_EQ(0, stan::math::abs(yy));
+}
+

@@ -43,6 +43,11 @@ namespace stan {
       cholesky_factor_decl_r;
 
       boost::spirit::qi::rule<Iterator, 
+                              cholesky_corr_var_decl(var_origin), 
+                              whitespace_grammar<Iterator> > 
+      cholesky_corr_decl_r;
+
+      boost::spirit::qi::rule<Iterator, 
                               corr_matrix_var_decl(var_origin), 
                               whitespace_grammar<Iterator> >
       corr_matrix_decl_r;
