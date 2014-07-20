@@ -42,7 +42,6 @@ namespace stan {
     struct print_statement;
     struct program;
     struct range;
-    struct raise_exception_statement;
     struct return_statement;
     struct row_vector_var_decl;
     struct sample;
@@ -608,7 +607,6 @@ namespace stan {
                              boost::recursive_wrapper<conditional_statement>,
                              boost::recursive_wrapper<while_statement>,
                              boost::recursive_wrapper<print_statement>,
-                             boost::recursive_wrapper<raise_exception_statement>,
                              boost::recursive_wrapper<return_statement>,
                              boost::recursive_wrapper<no_op_statement> >
       statement_t;
@@ -627,7 +625,6 @@ namespace stan {
       statement(const conditional_statement& st);
       statement(const while_statement& st);
       statement(const print_statement& st);
-      statement(const raise_exception_statement& st);
       statement(const no_op_statement& st);
       statement(const return_statement& st);
 
@@ -645,7 +642,6 @@ namespace stan {
       bool operator()(const conditional_statement& st) const;
       bool operator()(const while_statement& st) const;
       bool operator()(const print_statement& st) const;
-      bool operator()(const raise_exception_statement& st) const;
       bool operator()(const no_op_statement& st) const;
       bool operator()(const return_statement& st) const;
     };
@@ -666,7 +662,6 @@ namespace stan {
       bool operator()(const conditional_statement& st) const;
       bool operator()(const while_statement& st) const;
       bool operator()(const print_statement& st) const;
-      bool operator()(const raise_exception_statement& st) const;
       bool operator()(const no_op_statement& st) const;
       bool operator()(const return_statement& st) const;
     };
@@ -712,12 +707,6 @@ namespace stan {
       std::vector<printable> printables_;
       print_statement();
       print_statement(const std::vector<printable>& printables);
-    };
-
-    struct raise_exception_statement {
-      std::vector<printable> printables_;
-      raise_exception_statement();
-      raise_exception_statement(const std::vector<printable>& printables);
     };
 
     struct return_statement {

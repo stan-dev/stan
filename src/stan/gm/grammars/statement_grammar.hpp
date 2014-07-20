@@ -85,11 +85,6 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       print_statement_r;
 
-      boost::spirit::qi::rule<Iterator,
-                              raise_exception_statement(var_origin),
-                              whitespace_grammar<Iterator> >
-      raise_exception_statement_r;
-
 
       boost::spirit::qi::rule<Iterator,
                               return_statement(var_origin),
