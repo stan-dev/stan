@@ -558,6 +558,10 @@ TEST(gm_parser, lkj_cov_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/multivariate/continuous/lkj_cov_log");
 }
 
+TEST(gm_parser, multi_gp_cholesky_distribution_function_signatures) {
+  test_parsable("function-signatures/distributions/multivariate/continuous/multi_gp_cholesky_log");
+}
+
 TEST(gm_parser, multi_gp_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/multivariate/continuous/multi_gp_log");
 }
