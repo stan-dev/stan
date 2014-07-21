@@ -696,15 +696,24 @@ TEST(AgradFwdMatrixTCrossProd, ffv_3x3_matrix_3rdDeriv) {
   Y << 1, 0, 0,
     2, 3, 0,
     4, 5, 6;
-   Y(0,0).d_ = 2.0;
-   Y(0,1).d_ = 2.0;
-   Y(0,2).d_ = 2.0;
-   Y(1,0).d_ = 2.0;
-   Y(1,1).d_ = 2.0;
-   Y(1,2).d_ = 2.0;
-   Y(2,0).d_ = 2.0;
-   Y(2,1).d_ = 2.0;
-   Y(2,2).d_ = 2.0;
+   Y(0,0).d_ = 1.0;
+   Y(0,1).d_ = 1.0;
+   Y(0,2).d_ = 1.0;
+   Y(1,0).d_ = 1.0;
+   Y(1,1).d_ = 1.0;
+   Y(1,2).d_ = 1.0;
+   Y(2,0).d_ = 1.0;
+   Y(2,1).d_ = 1.0;
+   Y(2,2).d_ = 1.0;
+   Y(0,0).val_.d_ = 1.0;
+   Y(0,1).val_.d_ = 1.0;
+   Y(0,2).val_.d_ = 1.0;
+   Y(1,0).val_.d_ = 1.0;
+   Y(1,1).val_.d_ = 1.0;
+   Y(1,2).val_.d_ = 1.0;
+   Y(2,0).val_.d_ = 1.0;
+   Y(2,1).val_.d_ = 1.0;
+   Y(2,2).val_.d_ = 1.0;
   matrix_ffv output = stan::agrad::tcrossprod(Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val_.val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
@@ -793,10 +802,14 @@ TEST(AgradFwdMatrixTCrossProd, ffv_2x2_matrix_3rdDeriv) {
   matrix_ffv Y(2,2);
   Y << 3, 0,
      4, -3;
-   Y(0,0).d_ = 2.0;
-   Y(0,1).d_ = 2.0;
-   Y(1,0).d_ = 2.0;
-   Y(1,1).d_ = 2.0;
+   Y(0,0).d_ = 1.0;
+   Y(0,1).d_ = 1.0;
+   Y(1,0).d_ = 1.0;
+   Y(1,1).d_ = 1.0;
+   Y(0,0).val_.d_ = 1.0;
+   Y(0,1).val_.d_ = 1.0;
+   Y(1,0).val_.d_ = 1.0;
+   Y(1,1).val_.d_ = 1.0;
   matrix_ffv output = stan::agrad::tcrossprod(Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(1,0).val().val(),Y(1,1).val().val());
@@ -853,7 +866,8 @@ TEST(AgradFwdMatrixTCrossProd, ffv_1x1_matrix_3rdDeriv) {
 
   matrix_ffv Y(1,1);
   Y << 3;
-   Y(0,0).d_ = 2.0;
+   Y(0,0).d_ = 1.0;
+   Y(0,0).val_.d_ = 1.0;
   matrix_ffv output = stan::agrad::tcrossprod(Y);
 
   AVEC q = createAVEC(Y(0,0).val().val());
@@ -921,9 +935,12 @@ TEST(AgradFwdMatrixTCrossProd, ffv_1x3_matrix_3rdDeriv) {
 
   matrix_ffv Y(1,3);
   Y << 1, 2,3;
-   Y(0,0).d_ = 2.0;
-   Y(0,1).d_ = 2.0;
-   Y(0,2).d_ = 2.0;
+   Y(0,0).d_ = 1.0;
+   Y(0,1).d_ = 1.0;
+   Y(0,2).d_ = 1.0;
+   Y(0,0).val_.d_ = 1.0;
+   Y(0,1).val_.d_ = 1.0;
+   Y(0,2).val_.d_ = 1.0;
   matrix_ffv output = stan::agrad::tcrossprod(Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val());
@@ -1024,12 +1041,18 @@ TEST(AgradFwdMatrixTCrossProd, ffv_2x3_matrix_3rdDeriv) {
   matrix_ffv Y(2,3);
   Y << 1, 2,3,
     -1, 4, -9;
-   Y(0,0).d_ = 2.0;
-   Y(0,1).d_ = 2.0;
-   Y(0,2).d_ = 2.0;
-   Y(1,0).d_ = 2.0;
-   Y(1,1).d_ = 2.0;
-   Y(1,2).d_ = 2.0;
+   Y(0,0).d_ = 1.0;
+   Y(0,1).d_ = 1.0;
+   Y(0,2).d_ = 1.0;
+   Y(1,0).d_ = 1.0;
+   Y(1,1).d_ = 1.0;
+   Y(1,2).d_ = 1.0;
+   Y(0,0).val_.d_ = 1.0;
+   Y(0,1).val_.d_ = 1.0;
+   Y(0,2).val_.d_ = 1.0;
+   Y(1,0).val_.d_ = 1.0;
+   Y(1,1).val_.d_ = 1.0;
+   Y(1,2).val_.d_ = 1.0;
   matrix_ffv output = stan::agrad::tcrossprod(Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val_.val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
@@ -1135,12 +1158,18 @@ TEST(AgradFwdMatrixTCrossProd, ffv_3x2_matrix_3rdDeriv) {
   matrix_ffv Y(3,2);
   Y << 1, 2,3,
     -1, 4, -9;
-   Y(0,0).d_ = 2.0;
-   Y(0,1).d_ = 2.0;
-   Y(1,0).d_ = 2.0;
-   Y(1,1).d_ = 2.0;
-   Y(2,0).d_ = 2.0;
-   Y(2,1).d_ = 2.0;
+   Y(0,0).d_ = 1.0;
+   Y(0,1).d_ = 1.0;
+   Y(1,0).d_ = 1.0;
+   Y(1,1).d_ = 1.0;
+   Y(2,0).d_ = 1.0;
+   Y(2,1).d_ = 1.0;
+   Y(0,0).val_.d_ = 1.0;
+   Y(0,1).val_.d_ = 1.0;
+   Y(1,0).val_.d_ = 1.0;
+   Y(1,1).val_.d_ = 1.0;
+   Y(2,0).val_.d_ = 1.0;
+   Y(2,1).val_.d_ = 1.0;
   matrix_ffv output = stan::agrad::tcrossprod(Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(1,0).val_.val(),Y(1,1).val().val(),Y(2,0).val().val(),Y(2,1).val().val());

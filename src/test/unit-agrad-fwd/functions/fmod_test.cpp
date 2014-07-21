@@ -329,6 +329,7 @@ TEST(AgradFwdFmod,FvarFvarVar_Double_3rdDeriv) {
   fvar<fvar<var> > x;
   x.val_.val_ = 3.0;
   x.val_.d_ = 1.0;
+  x.d_.val_ = 1.0;
 
   double y(6.0);
 
@@ -348,6 +349,7 @@ TEST(AgradFwdFmod,Double_FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > y;
   y.val_.val_ = 6.0;
   y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > a = fmod(x,y);
 

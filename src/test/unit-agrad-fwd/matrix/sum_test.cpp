@@ -517,6 +517,12 @@ TEST(AgradFwdMatrixSum, ffv_vector_3rdDeriv) {
    v(3).d_ = 1.0;
    v(4).d_ = 1.0;
    v(5).d_ = 1.0;
+   v(0).val_.d_ = 1.0;
+   v(1).val_.d_ = 1.0;
+   v(2).val_.d_ = 1.0;
+   v(3).val_.d_ = 1.0;
+   v(4).val_.d_ = 1.0;
+   v(5).val_.d_ = 1.0;
   
   fvar<fvar<var> > output;
   output = sum(v);
@@ -641,6 +647,12 @@ TEST(AgradFwdMatrixSum, ffv_rowvector_3rdDeriv) {
    v(3).d_ = 1.0;
    v(4).d_ = 1.0;
    v(5).d_ = 1.0;
+   v(0).val_.d_ = 1.0;
+   v(1).val_.d_ = 1.0;
+   v(2).val_.d_ = 1.0;
+   v(3).val_.d_ = 1.0;
+   v(4).val_.d_ = 1.0;
+   v(5).val_.d_ = 1.0;
   
   fvar<fvar<var> > output;
   output = sum(v);
@@ -767,6 +779,12 @@ TEST(AgradFwdMatrixSum, ffv_matrix_3rdDeriv) {
    v(1,0).d_ = 1.0;
    v(1,1).d_ = 1.0;
    v(1,2).d_ = 1.0;
+   v(0,0).val_.d_ = 1.0;
+   v(0,1).val_.d_ = 1.0;
+   v(0,2).val_.d_ = 1.0;
+   v(1,0).val_.d_ = 1.0;
+   v(1,1).val_.d_ = 1.0;
+   v(1,2).val_.d_ = 1.0;
   
   fvar<fvar<var> > output;
   output = sum(v);

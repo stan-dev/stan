@@ -1,7 +1,95 @@
 STAN C++ RELEASE NOTES
 ======================================================================
 
-v.2.3.0 (18 June 2014)
+v2.4.0 (20 July 2014)
+======================================================================
+
+New Features
+------------
+* L-BFGS optimization (now the default)
+* completed higher-order autodiff (added all probability functions,
+  matrix functions, and matrix operators);  tested up to 3rd order
+* enhanced effective range of normal_cdf to prevent underflow/overflow
+* added von Mises RNG
+* added ability to use scalars in all element-wise operations
+* allow matrix division for mixing scalars and matrices 
+* vectorization of outcome variates in multivariate normal with efficiency boosts
+* generalization of multivariate normal to allow rwo vectors as means
+  and 
+
+Reorganization
+--------------
+* move bin/print and bin/stanc to CmdStan;  no longer generating main
+  when compiling model from Stan C++
+
+New Developer
+-------------
+* Added Jeffrey Arnold as core Stan developer
+
+Bug Fixes
+---------
+* modified error messages so that they're all 1-indexed instead of 0-indexed
+* fixed double print out of times in commands
+* const added to iterators to allow VS2008 compiles
+* fix boundary conditions on ordered tests
+* fix for pow as ^ syntax to catch illegal use of vectors (which
+  aren't supported)
+* allow zero-length inputs to multi_normal and multi_student_t
+  with appropriate log prob (i.e., 0)
+* fixed bug in inverse-Wishart RNG to match MCMCPack results
+  with slightly asymmetric inputs
+* fixed problem with compiling user-defined function twice
+* fixed problem with int-only parameters for user-defined functions
+* fixed NaN init problems for user-defined functions
+* added check that user variable doesn't conflict with user function + doc
+* disallow void argument types in user-defined functions
+
+Code Cleanup and Efficiency Improvements
+----------------------------------------
+* removed main() from models generated from C++ Stan (they are
+  now available only in CmdStan); removed no_main command options
+* reserve vector sizes for saving for sample recorder
+* removing many instances of std::cout from API (more still to go)
+* removed non-functional Nesterov optimization option
+* optimization code refactoring for testing ease
+* better constant handling in von Mises distribution
+* removed tabs from all source files
+* massive re-org of testing to remove redundant files and allow
+  traits-based specializations, plus fixed for 1-indexing
+
+Testing
+-------
+* added tests for log_softmax, multiply_lower_tri_self_transpose, tcrossprod
+* break out function signature tests into individual files, add many
+  more
+* enhanced cholesky factor tests for round trip transforms and
+  derivatives
+* extensive unit testing added for optimization 
+* remove use of std::cout in all tests
+
+Example Models
+--------------
+* lots of cleanup in links and models in ARM examples
+* added BUGS litter example with more stable priors than in the 
+  BUGS version (the original model doesn't fit well in BUGS as is, 
+  either)
+
+Documentation
+-------------
+* add infix operators to manual
+* categorical_logit sampling statement	
+* Cholesky factor with unit diagonal transform example
+* example of using linear regression for prediction/forecasting with
+  notes
+* clarified some relations of naive Bayes to clustering
+  vs. classification and relation to non-identifiability
+* new advice on multivariate priors for quad_form_diag
+* fix typo in multiply_lower_self_transpose (thanks to Alexey Stukalov)
+* fix formatting of reserved names in manual
+* fixed typo and clarified effective sample size doc
+ 
+
+v2.3.0 (18 June 2014)
 ======================================================================
 
 We had a record number of user-submitted patches this go around.
@@ -10,7 +98,6 @@ Thanks to everyone!
 New Features
 ------------
 * user-defined function definitions added to Stan language
-* cholesky_corr data type for Cholesky factors of correlation matrices
 * a^b syntax for pow(a,b)  (thanks to Mitzi Morris)
 * reshaping functions: to_matrix(), to_vector(), to_row_vector(), 
   to_array_1d(), to_array_2d()
@@ -81,30 +168,6 @@ Code Reorganizations & Updates
 * optimization output text cleaned up
 * integer overflow during I/O now raises informative error messages
 * const correctness for chains (thanks Kevin S. Van Horn)
-
-
-
-v2.3.0 (16 June 2014)
-======================================================================
-Bug Fixes
-------------
-* fixed poisson_rng, neg_binomial_rng
-* integer overflow now throws errors
-* allow < and > within range constraints
-* support MS Visual Studio 2008
-* fixed bug in lkj
-
-
-Features
-------------
-* functions added to Stan language!
-* turned off eigen asserts
-* CmdStan is now in its own repository
-* added quad_form_sym, multi_gp_log, multi_gp, 
-  multi_normal_cholesky_rng, to_matrix, to_vector, to_array, flatten,
-  qr_Q, qr_R
-* added JSON parser to Stan
-* a^b syntax for pow(a,b)
 
 
 v2.2.0 (14 February 2014)

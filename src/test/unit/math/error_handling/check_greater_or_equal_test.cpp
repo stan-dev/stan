@@ -149,3 +149,68 @@ TEST(MathErrorHandling,CheckGreaterOrEqualMatrix) {
                std::domain_error) 
     << "check_greater_or_equal: double, matrix<3,1>";
 }
+
+
+TEST(MathErrorHandling,CheckGreaterOrEqual_Matrix_one_indexed_message) {
+  const char* function = "check_greater_or_equal(%1%)";
+  double result;
+  double x;
+  double low;
+  Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
+  Eigen::Matrix<double,Eigen::Dynamic,1> low_vec;
+  x_vec.resize(3);
+  low_vec.resize(3);
+  std::string message;
+
+  // x_vec, low
+  result = 0;
+  x_vec << 10, 10, -1;
+  low = 0;
+
+  try {
+    check_greater_or_equal(function, x_vec, low, "x", &result);
+    FAIL() << "should have thrown";
+  } catch (std::domain_error& e) {
+    message = e.what();
+  } catch (...) {
+    FAIL() << "threw the wrong error";
+  }
+
+  EXPECT_NE(std::string::npos, message.find("[3]"))
+    << message;
+
+  // x_vec, low_vec
+  result = 0;
+  x_vec << 10, -1, 10;
+  low_vec << 0, 0, 0;
+
+  try {
+    check_greater_or_equal(function, x_vec, low_vec, "x", &result);
+    FAIL() << "should have thrown";
+  } catch (std::domain_error& e) {
+    message = e.what();
+  } catch (...) {
+    FAIL() << "threw the wrong error";
+  }
+
+  EXPECT_NE(std::string::npos, message.find("[2]"))
+    << message;
+
+  // x, low_vec
+  result = 0;
+  x = 0;
+  low_vec << -1, 10, 10;
+
+  try {
+    check_greater_or_equal(function, x, low_vec, "x", &result);
+    FAIL() << "should have thrown";
+  } catch (std::domain_error& e) {
+    message = e.what();
+  } catch (...) {
+    FAIL() << "threw the wrong error";
+  }
+
+  EXPECT_EQ(std::string::npos, message.find("["))
+    << "no index provided" << std::endl
+    << message;
+}

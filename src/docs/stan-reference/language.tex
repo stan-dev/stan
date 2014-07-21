@@ -87,7 +87,7 @@ an initial value of 0 for \code{theta} leads to an unconstrained value
 of $-\infty$, whereas a value of 1 leads to an unconstrained value of
 $+\infty$.  While this will be inverse transformed back correctly
 given the behavior of floating point arithmetic, the Jacobian will be
-infinite and the log probability function will faill and raise an
+infinite and the log probability function will fail and raise an
 exception.  
 
 \subsection{Random Initial Values}
@@ -114,7 +114,7 @@ For parameters bounded above and below, the initial value of 0 on the
 unconstrained scale corresponds to a value at the midpoint of the
 constraint interval.  For probability parameters, bounded below by 0
 and above by 1, the transform is the inverse logit, so that an initial
-unconstrained value of 0 corresonds to a constrained value of 0.5, -2
+unconstrained value of 0 corresponds to a constrained value of 0.5, -2
 corresponds to 0.12 and 2 to 0.88.  Bounds other than 0 and 1 are
 just scaled and translated.
 
@@ -127,7 +127,7 @@ on the diagonal and 0 elsewhere;  this is because the diagonal is log
 transformed and the below-diagonal values are unconstrained.
 
 The initial values for other parameters can be determined from the
-transfrom that is applied.  The transforms are all described in full
+transform that is applied.  The transforms are all described in full
 detail in \refchapter{variable-transforms}.
 
 \subsection{Zero Initial Values}
@@ -813,6 +813,30 @@ declares \code{Sigma} to be a $3 \times 3$ correlation matrix.
 Correlation matrices may be assigned to other matrices, including
 unconstrained matrices, if their dimensions match, and vice-versa.
 
+\subsection{Cholesky Factors of Correlation Matrices}
+
+Matrix variables may be constrained to represent the Cholesky factors
+of a correlation matrix.  
+
+A Cholesky factor for a correlation matrix $L$ is a $K \times K$
+lower-triangular matrix with positive diagonal entries and rows that
+are of length 1 (i.e., $\sum_{n=1}^K L_{m,n}^2 = 1$).  If $L$ is a
+Cholesky factor for a correlation matrix, then $L\,L^{\top}$ is a
+correlation matrix (i.e., symmetric postive definite with a unit
+diagonal).
+
+A declaration such as 
+follows.
+%
+\begin{quote}
+\begin{Verbatim}
+cholesky_factor_corr[K] L;
+\end{Verbatim}
+\end{quote}
+%
+declares \code{L} to be a Cholesky factor for a \code{K} by \code{K}
+correlation matrix.  
+
 \subsection{Covariance Matrices}
 
 Matrix variables may be constrained to represent covariance matrices.
@@ -1279,7 +1303,7 @@ vice-versa.
 
 For arguments to functions, constraints are sometimes, but not always
 checked when the function is called.  Exclusions include \Cpp standard
-library functions.  All probabiliy functions and cumulative
+library functions.  All probability functions and cumulative
 distribution functions check that their arguments are appropriate at
 run time as the function is called.  
 
@@ -1414,6 +1438,11 @@ model specification.  For example, if the model is in file
 \code{bin/stanc}.  With user-specified model names, variables cannot
 match the model.
 
+\subsubsection{User-Defined Function Names}
+
+User-defined function names cannot be used as a variable within the
+model. 
+
 \subsubsection{Reserved Words from Stan Language}
 
 The following list contains reserved words for Stan's programming
@@ -1454,6 +1483,7 @@ any of the following.
 Variable names will {\it not}\ conflict with the following block identifiers,
 %
 \begin{quote}
+\code{functions},
 \code{model},
 \code{data},
 \code{parameters},
@@ -1469,8 +1499,8 @@ Some variable names are reserved because they are used within
 Stan's \Cpp implementation.  These are
 %
 \begin{quote}
-var
-fvar
+\code{var},
+\code{fvar}
 \end{quote}
 %
 
@@ -2374,7 +2404,7 @@ increment_log_prob(-0.5 * y * y);
 \end{quote}
 %
 In this example, the unnormalized log probability of a unit normal
-variable $y$ is adeed to the total log probability.  In the general
+variable $y$ is added to the total log probability.  In the general
 case, the argument can be any expression.%
 %
 \footnote{Writing this model with the expression \code{-0.5 * y * y}
@@ -3289,6 +3319,9 @@ requires a different syntax than for declaring other variables.  The
 choice of language was made so that return types and argument types
 could use the same declaration syntax.
 
+The type \code{void} may not be used as an argument type, only a
+return type for a function with side effects.
+
 
 \subsection{Base Variable Type Declaration}
 
@@ -3513,7 +3546,9 @@ return as its final statement.
 \subsection{Void Functions}
 
 A function can be declared without a return value by using \code{void}
-in place of a return type.
+in place of a return type.  Note that the type \code{void} may only be
+used as a return type---arguments may not be declared to be of type
+\code{void}. 
 
 \subsection{Usage as Statement}
 
@@ -4327,10 +4362,11 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 {
 \small
 \begin{Verbatim}[fontsize=\small]
-funtion_decl ::= unsized_type identifier '(' unsized_types ')' statement
+funtion_decl ::= unsized_return_type identifier '(' unsized_types ')' statement
 
+unsized_return_type ::= 'void' | unsized_type
+unsized_type ::= (basic_type ?unsized_dims)
 unsized_types ::= unsized_type % ','
-unsized_type ::= 'void' | (basic_type ?unsized_dims)
 basic_type ::= 'int' | 'real' | 'vector' | 'row_vector' | 'matrix'
 unsized_dims ::= '['  ','*  ']'
 \end{Verbatim}
@@ -4411,7 +4447,7 @@ atomic_statement_body
 ::=  lhs '<-' expression
    | expression '~' identifier '(' expressions ')' ?truncation
    | function_literal '(' expressions ')'
-   | 'increment_log_prob '(' expression ')'
+   | 'increment_log_prob' '(' expression ')'
    | 'print' '(' (expression | string_literal)* ')'
    | 'return' expression
    | ''

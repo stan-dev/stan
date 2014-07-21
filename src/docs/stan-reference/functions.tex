@@ -8,7 +8,11 @@ Stan's scalar log probability functions all support vectorized
 function application, with results defined to be the sum of the
 elementwise application of the function.  In all cases, matrix
 operations are faster than loops and vectorized log probability
-functions are faster than their equivalent form defined with loops. 
+functions are faster than their equivalent form defined with loops.
+
+Stan also overloads the multivariate normal distribution, allowing
+arrays of row vectors or vectors for the variate and location
+parameter.
 
 Stan also overloads some scalar functions, such as \code{log} and
 \code{exp}, to apply to vectors (arrays) and return vectors (arrays).  
@@ -19,10 +23,12 @@ repeated application and assignment in a loop.
 
 \section{Vectorized Function Signatures}\label{prob-vectorization.section}
 
+\subsection{Vectorized Scalar Arguments}
+
 The normal probability function is specified with the signature
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 normal_log(reals,reals,reals);
 \end{Verbatim}
 \end{quote}
@@ -35,6 +41,18 @@ argument, their types can be anything but their size must match.  For
 instance, it is legal to use
 \code{normal\_log(row\_vector,vector,real)} as long as the vector and
 row vector have the same size.  
+
+\subsection{Vectorized Vector and Row Vector Arguments}
+
+The multivariate normal distribution accepting vector or array of
+vector arguments is written as
+\begin{quote}
+\begin{Verbatim}
+multi_normal_log(vectors,vectors,matrix);
+\end{Verbatim}
+\end{quote}
+
+\subsection{Vectorized Integer Arguments}
 
 The pseudo-type \code{ints} is used for vectorized integer arguments.
 
@@ -364,9 +382,9 @@ true and zero values treated as false.  These operators have the usual
 precedences, with negation (not) binding the most tightly, conjunction
 the next and disjunction the weakest; all of the operators bind more
 tightly than the comparisons.  Thus an expression such as
-\Verb|!a~&&~b| is interpreted as \Verb|(!a)~&&~b|, and
-\Verb/a~<~b~||~c~>=~d~&&~e~!=~f/ as
-\Verb/(a~<~b)~||~(((c~>=~d)~&&~(e~!=~f)))/.
+\code{!a~\&\&~b} is interpreted as \code{(!a)~\&\&~b}, and
+\code{a~<~b~||~c~>=~d~\&\&~e~!=~f} as
+\code{(a~<~b)~||~(((c~>=~d)~\&\&~(e~!=~f)))}.
 %
 \begin{description}
 \fitemindex{int}{operator!}{int \farg{x}}{1 if \farg{x} is zero and 0 otherwise}{operator"!}
@@ -389,7 +407,7 @@ There are corresponding real-argument versions.
 
 \subsubsection{Boolean Operator Short Circuiting}
 
-{\it Warning:} \ As of Stan 2.3.0, the boolean operators do {\it not}
+{\it Warning:} \ As of Stan 2.4.0, the boolean operators do {\it not}
 short circuit.  This is a known bug and will be fixed in a future
 release.  The intended behavior in the future is as described below.
 
@@ -924,7 +942,7 @@ The log of the rising factorial of \farg{x} with power \farg{n} defined for posi
 \end{description}
 
 
-\section{Composed Functions}
+\section{Composed Functions}\label{composed-functions.section}
 
 The functions in this section are equivalent in theory to combinations
 of other functions.  In practice, they are implemented to be more
@@ -1492,10 +1510,28 @@ elementwise product of \farg{y} and \farg{x}}
 \fitem{vector}{operator./}{vector \farg{x}, vector \farg{y}}{The
 elementwise quotient of \farg{y} and \farg{x}}
 %
+\fitem{vector}{operator./}{vector \farg{x}, real \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{vector}{operator./}{real \farg{x}, vector \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
 \fitem{row\_vector}{operator./}{row\_vector \farg{x}, row\_vector \farg{y}}{The
 elementwise quotient of \farg{y} and \farg{x}}
 %
+\fitem{row\_vector}{operator./}{row\_vector \farg{x}, real \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{row\_vector}{operator./}{real \farg{x}, row\_vector \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
 \fitem{matrix}{operator./}{matrix \farg{x}, matrix \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{matrix}{operator./}{matrix \farg{x}, real \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{matrix}{operator./}{real \farg{x}, matrix \farg{y}}{The
 elementwise quotient of \farg{y} and \farg{x}}
 %
 \end{description}
@@ -1698,7 +1734,7 @@ matrices.  The input matrix does not need to be square.}
     the vector \farg{v}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{v})}.}
 %
 \fitem{matrix}{diag\_post\_multiply}{matrix \farg{m}, row\_vector \farg{rv}}{Return the
-  product of the matrix \code{\farg{m}} and the diagonal matrix fromed from
+  product of the matrix \code{\farg{m}} and the diagonal matrix formed from
   the the row vector \code{\farg{rv}}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{rv})}.}
 \end{description}
 
@@ -2156,7 +2192,7 @@ The inverse of \farg{A} where A is symmetric, positive definite}
 %
 \fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
 The vector of eigenvalues of a symmetric matrix \farg{A} 
-in asscending order}
+in ascending order}
 %
 \fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{ The matrix with
   the (column) eigenvectors of symmetric matrix \farg{A} in the same
@@ -2169,7 +2205,7 @@ eigenvectors returned by a decomposition are only identified up to a
 sign change.  In order to compare the eigenvectors produced by Stan's
 eigendecomposition to others, signs may need to be normalized in some
 way, such as by fixing the sign of a component, or doing comparisons
-allowig a multiplication by $-1$.
+allowing a multiplication by $-1$.
 
 The condition number of a symmetric matrix is defined to be the ratio
 of the largest eigenvalue to the smallest eigenvalue.  Large condition

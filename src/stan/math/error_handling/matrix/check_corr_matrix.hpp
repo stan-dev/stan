@@ -44,8 +44,9 @@ namespace stan {
              k = 0; k < y.rows(); ++k) {
         if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE) {
           std::ostringstream message;
-          message << name << " is not a valid correlation matrix. " 
-                  << name << "(" << k << "," << k 
+          message << " is not a valid correlation matrix. " 
+                  << name << "(" << stan::error_index::value + k 
+                  << "," << stan::error_index::value + k 
                   << ") is %1%, but should be near 1.0";
           std::string msg(message.str());
           return dom_err(function,y(k,k),name,msg.c_str(),"",result);

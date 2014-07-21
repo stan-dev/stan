@@ -413,6 +413,9 @@ namespace stan {
       void operator()(cholesky_factor_var_decl const& x) const {
         generate_validate_context_size(o_,stage_,x.name_,"matrix_d",x.dims_,x.M_,x.N_);
       }
+      void operator()(cholesky_corr_var_decl const& x) const {
+        generate_validate_context_size(o_,stage_,x.name_,"matrix_d",x.dims_,x.K_,x.K_);
+      }
       void operator()(cov_matrix_var_decl const& x) const {
         generate_validate_context_size(o_,stage_,x.name_,"matrix_d",x.dims_,x.K_,x.K_);
       }
@@ -489,6 +492,9 @@ namespace stan {
       }
       void operator()(cholesky_factor_var_decl const& x) const {
         generate_initialization(o_,x.name_,"matrix_d",x.dims_,x.M_,x.N_);
+      }
+      void operator()(cholesky_corr_var_decl const& x) const {
+        generate_initialization(o_,x.name_,"matrix_d",x.dims_,x.K_,x.K_);
       }
       void operator()(cov_matrix_var_decl const& x) const {
         generate_initialization(o_,x.name_,"matrix_d",x.dims_,x.K_,x.K_);
@@ -589,6 +595,15 @@ namespace stan {
         generate_initialize_array(is_var_?"Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> ":"matrix_d",
                                   "cholesky_factor",read_args,x.name_,x.dims_);
       }
+      void operator()(const cholesky_corr_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array(is_var_
+                                  ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
+                                  : "matrix_d",
+                                  "cholesky_corr",read_args,x.name_,x.dims_);
+      }
+
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
@@ -847,6 +862,9 @@ namespace stan {
       void operator()(cholesky_factor_var_decl const& x) const {
         nonbasic_validate(x,"cholesky_factor");
       }
+      void operator()(cholesky_corr_var_decl const& x) const {
+        nonbasic_validate(x,"cholesky_factor_corr");
+      }
       void operator()(cov_matrix_var_decl const& x) const {
         nonbasic_validate(x,"cov_matrix");
       }
@@ -898,6 +916,9 @@ namespace stan {
         declare_array(("vector_d"), x.name_, x.dims_.size());
       }
       void operator()(cholesky_factor_var_decl const& x) const {
+        declare_array(("matrix_d"), x.name_, x.dims_.size());
+      }
+      void operator()(const cholesky_corr_var_decl& x) const {
         declare_array(("matrix_d"), x.name_, x.dims_.size());
       }
       void operator()(cov_matrix_var_decl const& x) const {
@@ -1037,6 +1058,15 @@ namespace stan {
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " 
                           : "matrix_d" ), 
+                      ctor_args, x.name_, x.dims_);
+      }
+      void operator()(const cholesky_corr_var_decl& x) const {
+        std::vector<expression> ctor_args;
+        ctor_args.push_back(x.K_);
+        ctor_args.push_back(x.K_);
+        declare_array(is_var_ 
+                      ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " 
+                      : "matrix_d", 
                       ctor_args, x.name_, x.dims_);
       }
       void operator()(cov_matrix_var_decl const& x) const {
@@ -1213,6 +1243,9 @@ namespace stan {
       void operator()(const cholesky_factor_var_decl& x) const {
         generate_init(x);
       }
+      void operator()(const cholesky_corr_var_decl& x) const {
+        generate_init(x);
+      }
       void operator()(const cov_matrix_var_decl& x) const {
         generate_init(x);
       }
@@ -1286,6 +1319,10 @@ namespace stan {
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(cholesky_factor_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+      }
+      void operator()(cholesky_corr_var_decl const& x) const {
         generate_indent(indent_,o_);
         o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
@@ -1367,6 +1404,12 @@ namespace stan {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.M_);
         dims.push_back(x.N_);
+        validate_array(x.name_,dims,2);
+      }
+      void operator()(cholesky_corr_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        dims.push_back(x.K_);
         validate_array(x.name_,dims,2);
       }
       void operator()(cov_matrix_var_decl const& x) const {
@@ -2131,6 +2174,51 @@ namespace stan {
         o_ << INDENT3 << "}" << EOL;
         o_ << INDENT2 << "}" << EOL;
       }
+      void operator()(cholesky_corr_var_decl const& x) const {
+        // FIXME: cut and paste of cholesky_factor_var_decl
+        std::vector<expression> dims = x.dims_;
+        var_size_validator_(x);
+        var_resizer_(x);
+        o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos__ = 0;" << EOL;
+
+        o_ << INDENT2 << "size_t " << x.name_ << "_m_mat_lim__ = ";
+        generate_expression(x.K_,o_);
+        o_ << ";" << EOL;
+
+        o_ << INDENT2 << "size_t " << x.name_ << "_n_mat_lim__ = ";
+        generate_expression(x.K_,o_);
+        o_ << ";" << EOL;
+
+        o_ << INDENT2 << "for (size_t " << "n_mat__ = 0; " << "n_mat__ < " << x.name_ << "_n_mat_lim__; ++n_mat__) {" << EOL;
+        o_ << INDENT3 << "for (size_t " << "m_mat__ = 0; " << "m_mat__ < " << x.name_ << "_m_mat_lim__; ++m_mat__) {" << EOL;
+
+        size_t indentation = 3;
+        for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+          size_t dim = dims.size() - dim_up - 1U;
+          ++indentation;
+          generate_indent(indentation,o_);
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          generate_expression(dims[dim],o_);
+          o_ << ";" << EOL;
+          generate_indent(indentation,o_);
+          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {"
+             << EOL;
+        }
+        generate_indent(indentation+1,o_);
+        o_ << x.name_;
+        for (size_t dim = 0; dim < dims.size(); ++dim)
+          o_ << "[i_" << dim << "__]";
+        o_ << "(m_mat__,n_mat__)";
+        o_ << " = vals_r__[pos__++];" << EOL;
+        for (size_t dim = 0; dim < dims.size(); ++dim) {
+          generate_indent(dims.size() + 2 - dim,o_);
+          o_ << "}" << EOL;
+        }
+
+        o_ << INDENT3 << "}" << EOL;
+        o_ << INDENT2 << "}" << EOL;
+      }
       void operator()(cov_matrix_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
         var_size_validator_(x);
@@ -2273,6 +2361,19 @@ namespace stan {
         o_ << ") * ";
         generate_expression(x.N_,o_);
         o_ << ")";
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          o_ << " * ";
+          generate_expression(x.dims_[i],o_);
+        }
+        o_ << ";" << EOL;
+      }
+      void operator()(const cholesky_corr_var_decl& x) const {
+        // FIXME: cut and paste ofcorr_matrix_var_decl
+        o_ << INDENT2 << "num_params_r__ += ((";
+        generate_expression(x.K_,o_);
+        o_ << " * (";
+        generate_expression(x.K_,o_);
+        o_ << " - 1)) / 2)";
         for (size_t i = 0; i < x.dims_.size(); ++i) {
           o_ << " * ";
           generate_expression(x.dims_[i],o_);
@@ -2517,6 +2618,13 @@ namespace stan {
         generate_buffer_loop("r",x.name_,x.dims_,x.M_,x.N_);
         generate_write_loop("cholesky_factor_unconstrain(",x.name_,x.dims_);
       }
+      void operator()(cholesky_corr_var_decl const& x) const {
+        generate_check_double(x.name_,x.dims_.size() + 2);
+        var_size_validator_(x);
+        generate_declaration(x.name_,"matrix_d",x.dims_,x.K_,x.K_);
+        generate_buffer_loop("r",x.name_,x.dims_,x.K_,x.K_);
+        generate_write_loop("cholesky_corr_unconstrain(",x.name_,x.dims_);
+      }
       void operator()(cov_matrix_var_decl const& x) const {
         generate_check_double(x.name_,x.dims_.size() + 2);
         var_size_validator_(x);
@@ -2724,6 +2832,12 @@ namespace stan {
         matrix_args.push_back(x.N_);
         generate_dims_array(matrix_args,x.dims_);
       }
+      void operator()(const cholesky_corr_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        matrix_args.push_back(x.K_);
+        generate_dims_array(matrix_args,x.dims_);
+      }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.K_);
@@ -2819,6 +2933,9 @@ namespace stan {
         generate_param_names(x.name_);
       }
       void operator()(const cholesky_factor_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
+      void operator()(const cholesky_corr_var_decl& x) const {
         generate_param_names(x.name_);
       }
       void operator()(const cov_matrix_var_decl& x) const {
@@ -2917,6 +3034,12 @@ namespace stan {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.M_);
         matrix_args.push_back(x.N_);
+        generate_csv_header_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const cholesky_corr_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        matrix_args.push_back(x.K_);
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
       }
       void operator()(const cov_matrix_var_decl& x) const {
@@ -3078,6 +3201,12 @@ namespace stan {
         matrix_args.push_back(x.N_);
         generate_param_names_array(matrix_args,x.name_,x.dims_);
       }
+      void operator()(const cholesky_corr_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        matrix_args.push_back(x.K_);
+        generate_param_names_array(matrix_args,x.name_,x.dims_);
+      }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.K_);
@@ -3234,6 +3363,19 @@ namespace stan {
                                                             x.N_),
                                                   "*",
                                                   x.N_)));
+        generate_param_names_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const cholesky_corr_var_decl& x) const {
+        // FIXME: cut-and-paste of corr_matrix
+        std::vector<expression> matrix_args;
+        // (K * (K - 1)) / 2
+        matrix_args.push_back(binary_op(binary_op(x.K_,
+                                                  "*",
+                                                  binary_op(x.K_,
+                                                            "-",
+                                                            int_literal(1))),
+                                        "/",
+                                        int_literal(2)));
         generate_param_names_array(matrix_args,x.name_,x.dims_);
       }
       void operator()(const cov_matrix_var_decl& x) const {
@@ -3417,6 +3559,11 @@ namespace stan {
         read_args.push_back(x.N_);
         generate_initialize_array("matrix_d","cholesky_factor",read_args,x.name_,x.dims_);
       }
+      void operator()(const cholesky_corr_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array("matrix_d","cholesky_corr",read_args,x.name_,x.dims_);
+      }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
@@ -3531,6 +3678,9 @@ namespace stan {
         write_array(x.name_,x.dims_);
       }
       void operator()(const cholesky_factor_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void operator()(const cholesky_corr_var_decl& x) const {
         write_array(x.name_,x.dims_);
       }
       void operator()(const cov_matrix_var_decl& x) const {
@@ -3737,6 +3887,11 @@ namespace stan {
         read_args.push_back(x.N_);
         generate_initialize_array("matrix_d","cholesky_factor",read_args,x.name_,x.dims_);
       }
+      void operator()(const cholesky_corr_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array("matrix_d","cholesky_corr",read_args,x.name_,x.dims_);
+      }
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
@@ -3859,6 +4014,12 @@ namespace stan {
         std::vector<expression> matdims;
         matdims.push_back(x.M_);
         matdims.push_back(x.N_);
+        write_array(x.name_,x.dims_,matdims);
+      }
+      void operator()(const cholesky_corr_var_decl& x) const {
+        std::vector<expression> matdims;
+        matdims.push_back(x.K_);
+        matdims.push_back(x.K_);
         write_array(x.name_,x.dims_,matdims);
       }
       void operator()(const cov_matrix_var_decl& x) const {
@@ -4018,27 +4179,7 @@ namespace stan {
       o << INDENT << "}" << EOL2;
 
     }
-
     
-    void generate_main(const std::string& model_name,
-                       std::ostream& out) {
-      out << "int main(int argc, const char* argv[]) {" << EOL;
-      out << INDENT << "try {" << EOL;
-      out << INDENT2 << "return stan::common::command<" << model_name 
-          << "_namespace::" << model_name << ">(argc,argv);" << EOL;
-      out << INDENT << "} catch (const std::exception& e) {" << EOL;
-      out << INDENT2 
-          << "std::cerr << std::endl << \"Exception: \" << e.what() << std::endl;" 
-          << EOL;
-      out << INDENT2
-          << "std::cerr << \"Diagnostic information: \" << std::endl << boost::diagnostic_information(e) << std::endl;" 
-          << EOL;
-      out << INDENT2 << "return -1;" << EOL;
-      out << INDENT << "}" << EOL;
-
-      out << "}" << EOL2;
-    }
-
     void generate_model_name_method(const std::string& model_name,
                                     std::ostream& out) {
       out << INDENT << "static std::string model_name() {" << EOL
@@ -4147,13 +4288,23 @@ namespace stan {
       ss << ">::type";
       return ss.str();
     }
+    
+    bool needs_template_params(const function_decl_def& fun) {
+      for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
+        if (fun.arg_decls_[i].arg_type_.base_type_ != INT_T) {
+          return true;
+        }
+      }
+      return false;
+    }
+
 
     void generate_function_template_parameters(const function_decl_def& fun,
                                                bool is_rng,
                                                bool is_lp,
                                                bool is_log,
                                                std::ostream& out) {
-      if (fun.arg_decls_.size() > 0) {
+      if (needs_template_params(fun)) {
         out << "template <";
         bool continuing_tps = false;
         if (is_log) {
@@ -4320,8 +4471,7 @@ namespace stan {
 
     void generate_cpp(const program& prog, 
                       const std::string& model_name,
-                      std::ostream& out,
-                      bool include_main = true) {
+                      std::ostream& out) {
       generate_version_comment(out);
       generate_includes(out);
       generate_start_namespace(model_name,out);
@@ -4348,8 +4498,6 @@ namespace stan {
       generate_unconstrained_param_names_method(prog,out);
       generate_end_class_decl(out);
       generate_end_namespace(out);
-      if (include_main) 
-        generate_main(model_name,out);
       generate_model_typedef(model_name,out);
     }
 

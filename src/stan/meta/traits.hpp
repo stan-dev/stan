@@ -13,6 +13,16 @@
 
 namespace stan {
 
+  struct error_index {
+    enum { value = 
+#ifdef ERROR_INDEX
+ERROR_INDEX
+#else
+1
+#endif
+    };
+  };
+
   /**
    * Metaprogramming struct to detect whether a given type is constant
    * in the mathematical sense (not the C++ <code>const</code>
@@ -453,5 +463,117 @@ namespace stan {
       };
     };
 
+  namespace {
+    template <bool is_vec, typename T, typename T_container>
+    struct scalar_type_helper_pre {
+      typedef T_container type;
+    };
+    
+    template <typename T, typename T_container> 
+    struct scalar_type_helper_pre<true, T, T_container> {
+      typedef typename scalar_type_helper_pre<is_vector<typename T::value_type>::value, typename T::value_type, typename T_container::value_type>::type type;
+    };
+  }
+  
+  /**
+    * Metaprogram structure to determine the type of first container of
+    * the base scalar type of a template argument.
+    *
+    * @tparam T Type of object.
+  */
+  template <typename T>
+  struct scalar_type_pre {
+    typedef typename scalar_type_helper_pre<is_vector<typename T::value_type>::value, typename T::value_type, T>::type type;
+  };
+
+
+  template <typename T,
+            bool is_array = stan::is_vector_like<typename T::value_type>::value,
+            bool throw_if_accessed = false>
+  class VectorViewMvt {
+  public: 
+    typedef typename scalar_type_pre<T>::type matrix_t;
+
+    VectorViewMvt(matrix_t& m) : x_(&m) { }
+
+    VectorViewMvt(std::vector<matrix_t>& vm) : x_(&vm[0]) { }
+
+    matrix_t& operator[](int i) {
+      if (throw_if_accessed) 
+        throw std::out_of_range("VectorViewMvt: this cannot be accessed");
+      if (is_array) 
+        return x_[i];
+      else 
+        return x_[0];
+    }
+  private:
+    matrix_t* x_;
+  };
+
+  /**
+   *
+   *  VectorViewMvt that has const correctness.
+   */
+  template <typename T, bool is_array, bool throw_if_accessed>
+  class VectorViewMvt<const T, is_array, throw_if_accessed> {
+  public: 
+    typedef typename scalar_type_pre<T>::type matrix_t;
+
+    VectorViewMvt(const matrix_t& m) : x_(&m) { }
+
+    VectorViewMvt(const std::vector<matrix_t>& vm) : x_(&vm[0]) { }
+
+    const matrix_t& operator[](int i) const {
+      if (throw_if_accessed) 
+        throw std::out_of_range("VectorViewMvt: this cannot be accessed");
+      if (is_array) 
+        return x_[i];
+      else 
+        return x_[0];
+    }
+  private:
+    const matrix_t* x_;
+  };
+
+  // length_mvt() should only be applied to std vector or Eigen matrix
+  template <typename T>
+  size_t length_mvt(const T& ) {
+    throw std::out_of_range("length_mvt passed to an unrecognized type.");
+    return 1U;
+  }
+  template <typename T, int R, int C>
+  size_t length_mvt(const Eigen::Matrix<T,R,C>& ) {
+    return 1U;
+  }
+  template <typename T, int R, int C>
+  size_t length_mvt(const std::vector<Eigen::Matrix<T,R,C> >& x) {
+    return x.size();
+  }
+
+  template <typename T1, typename T2>
+  size_t max_size_mvt(const T1& x1, const T2& x2) {
+    size_t result = length_mvt(x1);
+    result = result > length_mvt(x2) ? result : length_mvt(x2);
+    return result;
+  }
+
+  template <typename T1, typename T2, typename T3>
+  size_t max_size_mvt(const T1& x1, const T2& x2, const T3& x3) {
+    size_t result = length_mvt(x1);
+    result = result > length_mvt(x2) ? result : length_mvt(x2);
+    result = result > length_mvt(x3) ? result : length_mvt(x3);
+    return result;
+  }
+
+  template <typename T1, typename T2, typename T3, typename T4>
+  size_t max_size_mvt(const T1& x1, const T2& x2, const T3& x3, const T4& x4) {
+    size_t result = length_mvt(x1);
+    result = result > length_mvt(x2) ? result : length_mvt(x2);
+    result = result > length_mvt(x3) ? result : length_mvt(x3);
+    result = result > length_mvt(x4) ? result : length_mvt(x4);
+    return result;
+  }
+
 }
 #endif
+

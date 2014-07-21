@@ -762,7 +762,7 @@ namespace stan {
        * <p>See <code>stan::math::check_unit_vector</code>.
        *
        * @param k Size of returned unit_vector.
-       * @return Simplex read from the specified size number of scalars.
+       * @return unit_vector read from the specified size number of scalars.
        * @throw std::runtime_error if the k values is not a unit_vector.
        */
       inline vector_t unit_vector(size_t k) {
@@ -780,7 +780,7 @@ namespace stan {
        * <p>See <code>stan::prob::unit_vector_constrain(Eigen::Matrix)</code>.
        *
        * @param k Number of dimensions in resulting unit_vector.
-       * @return Simplex derived from next <code>k-1</code> scalars.
+       * @return unit_vector derived from next <code>k-1</code> scalars.
        */
       inline 
       Eigen::Matrix<T,Eigen::Dynamic,1> unit_vector_constrain(size_t k) {
@@ -941,6 +941,8 @@ namespace stan {
         return stan::prob::positive_ordered_constrain(vector(k),lp);
       }
 
+
+
       /**
        * Return the next Cholesky factor with the specified
        * dimensionality, reading it directly without transforms.
@@ -992,6 +994,58 @@ namespace stan {
         return stan::prob::cholesky_factor_constrain(vector((N * (N + 1)) / 2 + (M - N) * N),
                                                      M,N,lp);
       }
+
+
+
+      /**
+       * Return the next Cholesky factor for a correlation matrix with
+       * the specified dimensionality, reading it directly without
+       * transforms.
+       *
+       * @param K Rows and columns of Cholesky factor
+       * @return Next Cholesky factor for a correlation matrix.
+       * @throw std::domain_error if the matrix is not a valid
+       * Cholesky factor for a correlation matrix.
+       */
+      inline matrix_t cholesky_corr(size_t K) {
+        matrix_t y(matrix(K,K));
+        stan::math::check_cholesky_factor_corr("stan::io::cholesky_factor_corr(%1%)", y, "Constrained matrix");
+        return y;
+      }
+
+      /**
+       * Return the next Cholesky factor for a correlation matrix with
+       * the specified dimensionality, reading from an unconstrained
+       * vector of the appropriate size.
+       *
+       * @param K Rows and columns of Cholesky factor.
+       * @return Next Cholesky factor for a correlation matrix.
+       * @throw std::domain_error if the matrix is not a valid
+       *    Cholesky factor for a correlation matrix.
+       */
+      inline matrix_t cholesky_corr_constrain(size_t K) {
+        return stan::prob::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
+                                                          K);
+      }
+
+      /**
+       * Return the next Cholesky factor for a correlation matrix with
+       * the specified dimensionality, reading from an unconstrained
+       * vector of the appropriate size, and increment the log
+       * probability reference with the log Jacobian adjustment for
+       * the transform.
+       *
+       * @param K Rows and columns of Cholesky factor
+       * @return Next Cholesky factor for a correlation matrix.
+       * @throw std::domain_error if the matrix is not a valid
+       *    Cholesky factor for a correlation matrix.
+       */
+      inline matrix_t cholesky_corr_constrain(size_t K, T& lp) {
+        return stan::prob::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
+                                                   K,lp);
+      }
+
+
 
       /**
        * Return the next covariance matrix with the specified 

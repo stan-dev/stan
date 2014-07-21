@@ -59,7 +59,6 @@ void test_val(std::string name, T val, std::string s) {
 }
 
 void test_exception(const std::string& input) {
-  //  std::cout << "expect failure for: " << input << std::endl;
   try {
     std::stringstream in(input);
     stan::io::dump_reader reader(in);
@@ -68,8 +67,6 @@ void test_exception(const std::string& input) {
       has_next = reader.next();
     }
   } catch (const std::exception& e) {
-    //    std::cout << "failed, msg: " << e.what() << std::endl;
-    //    std::cout.flush();
     return;
   }
   FAIL(); // didn't throw an exception as expected.
