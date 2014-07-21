@@ -59,7 +59,24 @@ TEST(MathMatrix, cbind) {
     for (int j = 2; j < 5; j++)
       EXPECT_EQ(mat(i, j), m33(i, j-2));
   }
-    
+  
+  MatrixXd m23b(2, 3);
+  m23b = m23*1.101; //ensure some different values
+  mat = cbind(m23, m23b);
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 3; j++)
+      EXPECT_EQ(mat(i, j), m23(i, j));
+    for (int j = 3; j < 6; j++)
+      EXPECT_EQ(mat(i, j), m23b(i, j-3));
+  }
+  mat = cbind(m23b, m23);
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 3; j++)
+      EXPECT_EQ(mat(i, j), m23b(i, j));
+    for (int j = 3; j < 6; j++)
+      EXPECT_EQ(mat(i, j), m23(i, j-3));
+  }
+      
   //matrix cbind(matrix, vector)
   //matrix cbind(vector, matrix)
   mat = cbind(m33, v3);

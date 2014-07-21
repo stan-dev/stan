@@ -60,6 +60,24 @@ TEST(MathMatrix, rbind) {
       EXPECT_EQ(mat(j, i), m33(j-2, i));
   }
 
+  
+  MatrixXd m32b(2, 3);
+  m32b = m32*1.101; //ensure some different values
+  mat = rbind(m32, m32b);
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 3; j++)
+      EXPECT_EQ(mat(j, i), m32(j, i));
+    for (int j = 3; j < 6; j++)
+      EXPECT_EQ(mat(j, i), m32b(j-3, i));
+  }
+  mat = rbind(m32b, m32);
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 3; j++)
+      EXPECT_EQ(mat(j, i), m32b(j, i));
+    for (int j = 3; j < 6; j++)
+      EXPECT_EQ(mat(j, i), m32(j-3, i));
+  }
+
   //matrix rbind(matrix, row_vector)
   //matrix rbind(row_vector, matrix)
   mat = rbind(m33, rv3);
