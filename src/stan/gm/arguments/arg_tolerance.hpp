@@ -1,6 +1,8 @@
 #ifndef __STAN__GM__ARGUMENTS__TOLERANCE_HPP__
 #define __STAN__GM__ARGUMENTS__TOLERANCE_HPP__
 
+#include <boost/lexical_cast.hpp>
+
 #include <stan/gm/arguments/singleton_argument.hpp>
 
 namespace stan {
@@ -11,11 +13,11 @@ namespace stan {
       
     public:
       
-      arg_tolerance(const char *name, const char *desc, const char *def_str, double def) : real_argument() {
+      arg_tolerance(const char *name, const char *desc, double def) : real_argument() {
         _name = name;
         _description = desc;
-        _validity = "0 < tol";
-        _default = def_str;
+        _validity = "0 <= tol";
+        _default = boost::lexical_cast<std::string>(def);
         _default_value = def;
         _constrained = true;
         _good_value = 1.0;
@@ -23,7 +25,7 @@ namespace stan {
         _value = _default_value;
       };
       
-      bool is_valid(double value) { return value > 0; }
+      bool is_valid(double value) { return value >= 0; }
 
     };
     

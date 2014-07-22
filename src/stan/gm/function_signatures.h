@@ -495,12 +495,33 @@ add("minus",MATRIX_T,MATRIX_T);
 add("modified_bessel_first_kind",DOUBLE_T,INT_T,DOUBLE_T);
 add("modified_bessel_second_kind",DOUBLE_T,INT_T,DOUBLE_T);
 add("multi_gp_log",DOUBLE_T, MATRIX_T,MATRIX_T,VECTOR_T);
-add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
-add("multi_normal_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
-add("multi_normal_prec_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
-add("multi_normal_cholesky_rng",VECTOR_T,VECTOR_T,MATRIX_T);
+{
+  std::vector<base_expr_type> eigen_vector_types;
+  eigen_vector_types.push_back(VECTOR_T);
+  eigen_vector_types.push_back(ROW_VECTOR_T);
+  for (size_t i = 0; i < 2; ++i) {
+    for (size_t j = 0; j < 2; ++j) {
+      for (size_t k = 0; k < 2; ++k) {
+        for (size_t l = 0; l < 2; ++l) {
+          add("multi_normal_cholesky_log",DOUBLE_T,
+              expr_type(eigen_vector_types[k],i),
+              expr_type(eigen_vector_types[l],j),MATRIX_T);
+          add("multi_normal_log",DOUBLE_T,
+              expr_type(eigen_vector_types[k],i),
+              expr_type(eigen_vector_types[l],j),MATRIX_T);
+          add("multi_normal_prec_log",DOUBLE_T,
+              expr_type(eigen_vector_types[k],i),
+              expr_type(eigen_vector_types[l],j),MATRIX_T);
+          add("multi_student_t_log",DOUBLE_T,
+              expr_type(eigen_vector_types[k],i),DOUBLE_T,
+              expr_type(eigen_vector_types[l],j),MATRIX_T);
+        }
+      }
+    }
+  }
+}
 add("multi_normal_rng",VECTOR_T,VECTOR_T,MATRIX_T);
-add("multi_student_t_log",DOUBLE_T, VECTOR_T,DOUBLE_T,VECTOR_T,MATRIX_T);
+add("multi_normal_cholesky_rng",VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_student_t_rng",VECTOR_T, DOUBLE_T,VECTOR_T,MATRIX_T);
 add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
 add("multinomial_rng",expr_type(INT_T,1U), VECTOR_T, INT_T);

@@ -2,6 +2,8 @@
 #include <sstream>
 #include <cmath>
 #include <vector>
+#include <string>
+#include <set>
 #include "stan/gm/ast_def.cpp"
 
 using stan::gm::function_signatures;
@@ -245,3 +247,25 @@ TEST(gmAst, isUserDefined) {
 
 }
 
+TEST(gmAst, resetSigs) {
+  using std::set;
+  using std::string;
+
+  stan::gm::function_signatures::reset_sigs();
+
+  // test can get, destroy, then get
+  stan::gm::function_signatures& fs1
+    = stan::gm::function_signatures::instance();
+  set<string> ks1 = fs1.key_set();
+  int keyset_size = ks1.size();
+  EXPECT_TRUE(keyset_size > 0);
+  
+  stan::gm::function_signatures::reset_sigs();
+
+  stan::gm::function_signatures& fs2
+    = stan::gm::function_signatures::instance();
+
+  set<string> ks2 = fs2.key_set();
+  EXPECT_EQ(keyset_size,ks2.size());
+
+}

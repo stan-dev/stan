@@ -126,35 +126,10 @@ endif
 	@echo '  - BOOST                    ' $(BOOST)
 	@echo '  - GTEST                    ' $(GTEST)
 	@echo ''
-	@echo 'Build a Stan model:'
-	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
-	@echo '  - foo/bar$(EXE)'
-	@echo ''
-	@echo '  This target will:'
-	@echo '  1. Build the Stan compiler: bin/stanc$(EXE).'
-	@echo '  2. Use the Stan compiler to generate C++ code, foo/bar.cpp.'
-	@echo '  3. Compile the C++ code using $(CC) to generate foo/bar$(EXE)'
-	@echo ''
-	@echo '  Example - Sample from a normal: src/models/basic_distributions/normal.stan'
-	@echo '    1. Build the model:'
-	@echo '       make src/models/basic_distributions/normal$(EXE)'
-	@echo '    2. Run the model:'
-	@echo '       src'$(PATH_SEPARATOR)'models'$(PATH_SEPARATOR)'basic_distributions'$(PATH_SEPARATOR)'normal$(EXE) sample'
-	@echo '    3. Look at the samples:'
-	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) output.csv'
-	@echo ''
 	@echo 'Common targets:'
 	@echo '  Model related:'
-	@echo '  - bin/stanc$(EXE): Build the Stan compiler.'
-	@echo '  - bin/print$(EXE): Build the print utility.'
 	@echo '  - bin/libstan.a  : Build the Stan static library (used in linking models).'
-	@echo '  - bin/libstanc.a : Build the Stan compiler static library (used in linking'
-	@echo '                     bin/stanc$(EXE))'
-	@echo '  - models/*$(EXE) : If a Stan model exists at src/models/*.stan, this target'
-	@echo '                     will copy the Stan model to models/*.stan, then build the'
-	@echo '                     Stan model.'
-	@echo '  - *$(EXE)        : If a Stan model exists at *.stan, this target will build'
-	@echo '                     the Stan model as an executable.'
+	@echo '  - bin/libstanc.a : Build the Stan compiler static library'
 	@echo '  Documentation:'
 	@echo '  - manual         : Builds the reference manual. Copies built manual to'
 	@echo '                     doc/stan-reference-$(VERSION_STRING).pdf'
@@ -188,9 +163,7 @@ endif
 	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
 	@echo '  - clean-all      : Cleans up all of Stan.'
 	@echo '  Higher level targets:'
-	@echo '  - build          : Builds the Stan command line tools.'
 	@echo '  - docs           : Builds all docs.'
-	@echo '  - all            : Calls build and docs'
 	@echo ''
 	@echo '  Warning: Deprecated test targets'
 	@echo '  - test-unit      : Runs unit tests.'
@@ -210,7 +183,6 @@ endif
 -include make/libstan  # libstan.a
 -include make/tests    # tests: test-all, test-unit, test-models
 -include make/models   # models
--include make/command  # bin/stanc, bin/print
 -include make/doxygen  # doxygen
 -include make/manual   # manual: manual, doc/stan-reference.pdf
 -include make/demo     # for building demos
@@ -228,11 +200,8 @@ ifneq (,$(filter runtest_no_fail/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst runtest_no_fail/,,$(MAKECMDGOALS)))
 endif
 
-.PHONY: all build docs
-build: bin/stanc$(EXE)
-	@echo '--- Stan tools built ---'
+.PHONY: docs
 docs: manual doxygen
-all: build docs
 
 ##
 # Clean up.
