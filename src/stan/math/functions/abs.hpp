@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__ABS_HPP__
-#define __STAN__MATH__FUNCTIONS__ABS_HPP__
+#ifndef STAN__MATH__FUNCTIONS__ABS_HPP
+#define STAN__MATH__FUNCTIONS__ABS_HPP
 
 #include <cmath>
 

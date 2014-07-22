@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__PRINT_STACK_HPP__
-#define __STAN__AGRAD__PRINT_STACK_HPP__
+#ifndef STAN__AGRAD__PRINT_STACK_HPP
+#define STAN__AGRAD__PRINT_STACK_HPP
 
 #include <ostream>
 #include <stan/agrad/rev/var_stack.hpp>

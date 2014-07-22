@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP
+#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP
 
 #include <boost/random/cauchy_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

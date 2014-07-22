@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__DO_PRINT_HPP__
-#define __STAN__COMMON__DO_PRINT_HPP__
+#ifndef STAN__COMMON__DO_PRINT_HPP
+#define STAN__COMMON__DO_PRINT_HPP
 
 namespace stan {
 

@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__TRUNC_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__TRUNC_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__TRUNC_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__TRUNC_HPP
 
 #include <boost/math/special_functions/trunc.hpp>
 #include <stan/agrad/fwd/fvar.hpp>

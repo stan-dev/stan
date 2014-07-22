@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__RECORDER__CSV_HPP__
-#define __STAN__COMMON__RECORDER__CSV_HPP__
+#ifndef STAN__COMMON__RECORDER__CSV_HPP
+#define STAN__COMMON__RECORDER__CSV_HPP
 
 #include <ostream>
 #include <string>

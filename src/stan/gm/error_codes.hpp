@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ERROR_CODES_HPP__
-#define __STAN__GM__ERROR_CODES_HPP__
+#ifndef STAN__GM__ERROR_CODES_HPP
+#define STAN__GM__ERROR_CODES_HPP
 
 namespace stan {
   namespace gm {

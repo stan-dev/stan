@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__MULTIPLY_LOG_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__MULTIPLY_LOG_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__MULTIPLY_LOG_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__MULTIPLY_LOG_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>

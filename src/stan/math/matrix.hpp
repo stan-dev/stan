@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX_HPP__
-#define __STAN__MATH__MATRIX_HPP__
+#ifndef STAN__MATH__MATRIX_HPP
+#define STAN__MATH__MATRIX_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/accumulator.hpp>

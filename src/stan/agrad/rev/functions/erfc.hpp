@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__ERFC_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__ERFC_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__ERFC_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__ERFC_HPP
 
 #include <valarray>
 #include <boost/math/special_functions/erf.hpp>

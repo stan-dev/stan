@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__BASE__INTEGRATOR__BETA__
-#define __STAN__MCMC__BASE__INTEGRATOR__BETA__
+#ifndef STAN__MCMC__BASE__INTEGRATOR__BETA
+#define STAN__MCMC__BASE__INTEGRATOR__BETA
 
 #include <ostream>
 
@@ -12,13 +12,13 @@ namespace stan {
       
     public:
       
-      base_integrator(std::ostream* o): _out_stream(o) {};
+      base_integrator(std::ostream* o): out_stream_(o) {};
       
       virtual void evolve(P& z, H& hamiltonian, const double epsilon) = 0;
       
     protected:
       
-      std::ostream* _out_stream;
+      std::ostream* out_stream_;
       
     };
     

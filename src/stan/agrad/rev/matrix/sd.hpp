@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__VARIANCE_HPP__
-#define __STAN__AGRAD__REV__MATRIX__VARIANCE_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__VARIANCE_HPP
+#define STAN__AGRAD__REV__MATRIX__VARIANCE_HPP
 
 #include <cmath>
 #include <vector>
