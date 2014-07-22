@@ -43,7 +43,7 @@ namespace stan {
       return result;
     }
        
-    //matrix rbind(vector, vector)
+    //vector rbind(vector, vector)
     template <typename T1, typename T2, int R1, int R2>
     inline Matrix<typename return_type<T1, T2>::type, Dynamic, 1>
     rbind(const Matrix<T1, R1, 1> & A,
@@ -78,7 +78,7 @@ namespace stan {
       return result;
     }
        
-    //matrix rbind(vector, vector)
+    //vector rbind(vector, vector)
     template <typename T, int R1, int R2>
     inline Matrix<T, Dynamic, 1>
     rbind(const Matrix<T, R1, 1> & A,

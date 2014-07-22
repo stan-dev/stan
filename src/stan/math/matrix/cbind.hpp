@@ -43,7 +43,7 @@ namespace stan {
       return result;
     }
        
-    //matrix cbind(row_vector, row_vector)
+    //row_vector cbind(row_vector, row_vector)
     template <typename T1, typename T2, int C1, int C2>
     inline Matrix<typename return_type<T1, T2>::type, 1, Dynamic>
     cbind(const Matrix<T1, 1, C1> & A,
@@ -79,7 +79,7 @@ namespace stan {
       return result;
     }
        
-    //matrix cbind(row_vector, row_vector)
+    //row_vector cbind(row_vector, row_vector)
     template <typename T, int C1, int C2>
     inline Matrix<T, 1, Dynamic>
     cbind(const Matrix<T, 1, C1> & A,

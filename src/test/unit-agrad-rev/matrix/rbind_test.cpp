@@ -9,12 +9,9 @@
 using stan::math::sum;
 using stan::math::rbind;
 using stan::agrad::matrix_v;
-using Eigen::VectorXd;
+using stan::agrad::vector_v;
 using Eigen::MatrixXd;
-using Eigen::Matrix;
-using Eigen::Dynamic;
-
-typedef Matrix<AVAR, Dynamic, 1> vec_v;
+using Eigen::VectorXd;
 
 TEST(AgradRevMatrix, rbind_matrix) {
   matrix_v a(2,2);
@@ -46,8 +43,8 @@ TEST(AgradRevMatrix, rbind_matrix) {
 }
 
 TEST(AgradRevMatrix, rbind_row_vector) {
-  vec_v a(3);
-  vec_v a_exp(3);
+  vector_v a(3);
+  vector_v a_exp(3);
   VectorXd b(2);
   
   a << 2.0, 3.0, 9.0;
