@@ -125,7 +125,7 @@ ifeq ($(strip $(findstring test-,$(MAKECMDGOALS))\
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
-.PRECIOUS: test/%.o
+.PRECIOUS: test/%$(EXE)
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
@@ -178,7 +178,7 @@ TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 # Compile these with no main.
 ##
 $(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS))) : %.cpp : %.stan bin/stanc$(EXE)
-	$(WINE) bin$(PATH_SEPARATOR)stanc$(EXE) --o=$@ --no_main $<
+	$(WINE) bin$(PATH_SEPARATOR)stanc$(EXE) --o=$@ $<
 
 
 ##
@@ -218,12 +218,25 @@ test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generat
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
 
-src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+src/test/unit-distribution/%_00000_generated_v_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
 	@echo "--- Generating tests for $(notdir $<) ---"
 	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
+src/test/unit-distribution/%_00000_generated_fd_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+	@echo "--- Generating tests for $(notdir $<) ---"
+	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
+src/test/unit-distribution/%_00000_generated_fv_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+	@echo "--- Generating tests for $(notdir $<) ---"
+	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
+src/test/unit-distribution/%_00000_generated_ffd_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+	@echo "--- Generating tests for $(notdir $<) ---"
+	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
+
+src/test/unit-distribution/%_00000_generated_ffv_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+	@echo "--- Generating tests for $(notdir $<) ---"
+	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
 ##
 # For src/test/unit-distribution tests, adding
@@ -232,9 +245,9 @@ src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distributi
 
 ifneq ($(filter second-expansion,$(.FEATURES)),)
 
-DISTRIBUTION_TESTS := $(shell find src/test/unit-distribution -type f -name '*.hpp')
+DISTRIBUTION_TESTS := $(shell find src/test/unit-distribution -type f -name '*_test.hpp')
 .SECONDEXPANSION:
-$(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_test.cpp,$$(filter $$@$$(PERCENT),$$(DISTRIBUTION_TESTS)))
+$(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_v_test.cpp,$$(filter $$@$$(PERCENT),$$(DISTRIBUTION_TESTS)))
 
 endif
 
@@ -248,7 +261,7 @@ endif
 #        in this current run of make. If this is the stage where
 #        we are generating tests, this number will be less than the
 #        number of tests to generate. (0 if running from a clean state)
-#     The second argument to filter-out is the number of unique
+#     The second through fifth arguments to filter-out is the number of unique
 #        generated distribution tests that should be generated. 
 #        This is determined by the existence of *_test.hpp files in 
 #        the appropriate directory.
@@ -256,8 +269,8 @@ endif
 #        be generated if they have not yet been generated.
 ##
 $(filter src/test/unit-distribution%,$(TEST_TARGETS)): \
-GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
-                              $(words $(filter $@%_00000_generated_test.cpp,$(ALL_TESTS))))
+GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated_v$(EXE) %_00000_generated_fd$(EXE) %_00000_generated_fv$(EXE) %_00000_generated_ffd$(EXE) %_00000_generated_ffv$(EXE),$^)),\
+                              $(words $(filter $@%_00000_generated_v_test.cpp $@%_00000_generated_fd_test.cpp $@%_00000_generated_fv_test.cpp $@%_00000_generated_ffd_test.cpp $@%_00000_generated_ffv_test.cpp,$(ALL_TESTS))))
 
 
 .PHONY: test-headers

@@ -6,6 +6,9 @@
 #include <stan/agrad/rev/print_stack.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/sum.hpp>
+#include <stan/agrad/rev/operators.hpp>
+#include <stan/agrad/rev/functions/abs.hpp>
+#include <stan/agrad/rev/functions/fabs.hpp>
 
 TEST(AgradRevMatrix,inverse_spd_val) {
   using stan::math::inverse_spd;

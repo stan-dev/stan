@@ -15,7 +15,7 @@ public:
     param[1] = 0.5;           // alpha (Shape)
     param[2] = 3.3;           // beta (Scale)
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.138010737));  // expected cdf_log
+    cdf_log.push_back(std::log(0.138010737568659559638900550956));  // expected cdf_log
 
   }
   

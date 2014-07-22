@@ -15,7 +15,7 @@ public:
     param[1] = 0.5;           // y_min (Scale)
     param[2] = 3.3;           // alpha (Shape)
     parameters.push_back(param);
-    cdf.push_back(0.7376392612);  // expected CDF
+    cdf.push_back(0.7376392612457611797083);  // expected CDF
 
   }
   

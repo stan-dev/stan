@@ -17,13 +17,13 @@ public:
     param[1] = 2.0;                 // alpha
     param[2] = 2.0;                 // beta
     parameters.push_back(param);
-    log_prob.push_back(-0.6137056); // expected log_prob
+    log_prob.push_back(-0.6137056388801093165242); // expected log_prob
 
     param[0] = 2.0;                 // y
     param[1] = 0.25;                // alpha
     param[2] = 0.75;                // beta
     parameters.push_back(param);
-    log_prob.push_back(-3.379803);  // expected log_prob
+    log_prob.push_back(-3.379803428230981676705);  // expected log_prob
 
     param[0] = 1.0;                 // y
     param[1] = 1.0;                 // alpha

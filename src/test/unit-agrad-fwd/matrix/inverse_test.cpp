@@ -1,9 +1,7 @@
 #include <stan/agrad/fwd/matrix/inverse.hpp>
-#include <gtest/gtest.h>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/rev.hpp>
-#include <stan/agrad/rev/matrix/multiply.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <gtest/gtest.h>
 
 TEST(AgradFwdMatrixInverse,fd) {
   using stan::agrad::matrix_fd;
@@ -228,6 +226,10 @@ TEST(AgradFwdMatrixInverse,ffv_3rDeriv) {
   fvar<fvar<var> > e(3.0,1.0);
   fvar<fvar<var> > f(5.0,1.0);
   fvar<fvar<var> > g(7.0,1.0);
+  d.val_.d_ = 1.0;
+  e.val_.d_ = 1.0;
+  f.val_.d_ = 1.0;
+  g.val_.d_ = 1.0;
 
   matrix_ffv a(2,2);
   a << d,e,f,g;
@@ -237,8 +239,8 @@ TEST(AgradFwdMatrixInverse,ffv_3rDeriv) {
   AVEC q = createAVEC(d.val().val(),e.val().val(),f.val().val(),g.val().val());
   VEC h;
   a_inv(0,0).d_.d_.grad(q,h);
-  EXPECT_FLOAT_EQ(0,h[0]);
-  EXPECT_FLOAT_EQ(0,h[1]);
-  EXPECT_FLOAT_EQ(0,h[2]);
-  EXPECT_FLOAT_EQ(0,h[3]);
+  EXPECT_FLOAT_EQ(-352,h[0]);
+  EXPECT_FLOAT_EQ(260,h[1]);
+  EXPECT_FLOAT_EQ(168,h[2]);
+  EXPECT_FLOAT_EQ(-124,h[3]);
 }

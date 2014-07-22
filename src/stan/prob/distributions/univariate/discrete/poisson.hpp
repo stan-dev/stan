@@ -11,6 +11,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/functions/gamma_q.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>

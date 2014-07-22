@@ -21,19 +21,19 @@ public:
     param[1] = 0;           // mu
     param[2] = 1;           // beta
     parameters.push_back(param);
-    log_prob.push_back(-1.367879); // expected log_prob
+    log_prob.push_back(-1.36787944117144232159552377016146086744581113103176783450783); // expected log_prob
 
     param[0] = -2;          // y
     param[1] = 0;           // mu
     param[2] = 1;           // beta
     parameters.push_back(param);
-    log_prob.push_back(-5.389056); // expected log_prob
+    log_prob.push_back(-5.38905609893065022723042746057500781318031557055184732408712); // expected log_prob
 
     param[0] = -3.5;          // y
     param[1] = 1.9;           // mu
     param[2] = 7.2;           // beta
     parameters.push_back(param);
-    log_prob.push_back(-3.341081); // expected log_prob
+    log_prob.push_back(-3.34108104263468429556956520337231251605487161479989511157723); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

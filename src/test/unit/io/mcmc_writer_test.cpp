@@ -19,8 +19,9 @@ TEST(StanIoMcmcWriter, write_sample_names) {
   std::fstream data_stream("", std::fstream::in);
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
-  
-  io_example_model_namespace::io_example_model model(data_var_context, &std::cout);
+
+  std::stringstream output;
+  io_example_model_namespace::io_example_model model(data_var_context, &output);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -61,6 +62,7 @@ TEST(StanIoMcmcWriter, write_sample_names) {
   
   EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,mu1,mu2", line);
   EXPECT_EQ("", message_stream.str());
+  EXPECT_EQ("", output.str());
 }
 
 TEST(StanIoMcmcWriter, write_sample_params) {
@@ -70,7 +72,8 @@ TEST(StanIoMcmcWriter, write_sample_params) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  io_example_model_namespace::io_example_model model(data_var_context, &std::cout);
+  std::stringstream output;
+  io_example_model_namespace::io_example_model model(data_var_context, &output);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -124,6 +127,7 @@ TEST(StanIoMcmcWriter, write_sample_params) {
   
   EXPECT_EQ(expected_line, line);
   EXPECT_EQ("", message_stream.str());
+  EXPECT_EQ("", output.str());
 }
 
 TEST(StanIoMcmcWriter, write_adapt_finish) {
@@ -133,7 +137,8 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  io_example_model_namespace::io_example_model model(data_var_context, &std::cout);
+  std::stringstream output;
+  io_example_model_namespace::io_example_model model(data_var_context, &output);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -215,6 +220,7 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
   EXPECT_EQ(expected_line, line);
   
   EXPECT_EQ("", message_stream.str());
+  EXPECT_EQ("", output.str());
 }
 
 TEST(StanIoMcmcWriter, write_diagnostic_names) {
@@ -224,7 +230,8 @@ TEST(StanIoMcmcWriter, write_diagnostic_names) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  io_example_model_namespace::io_example_model model(data_var_context, &std::cout);
+  std::stringstream output;
+  io_example_model_namespace::io_example_model model(data_var_context, &output);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -267,6 +274,7 @@ TEST(StanIoMcmcWriter, write_diagnostic_names) {
   EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,mu1,mu2,p_mu1,p_mu2,g_mu1,g_mu2", line);
   
   EXPECT_EQ("", message_stream.str());
+  EXPECT_EQ("", output.str());
 }
 
 TEST(StanIoMcmcWriter, write_diagnostic_params) {
@@ -276,7 +284,8 @@ TEST(StanIoMcmcWriter, write_diagnostic_params) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  io_example_model_namespace::io_example_model model(data_var_context, &std::cout);
+  std::stringstream output;
+  io_example_model_namespace::io_example_model model(data_var_context, &output);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -337,7 +346,7 @@ TEST(StanIoMcmcWriter, write_diagnostic_params) {
   std::getline(expected_stream, expected_line);
   
   EXPECT_EQ(expected_line, line);
-  
+  EXPECT_EQ("", output.str()); 
 }
 
 TEST(StanIoMcmcWriter, write_timing) {
@@ -347,7 +356,8 @@ TEST(StanIoMcmcWriter, write_timing) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  io_example_model_namespace::io_example_model model(data_var_context, &std::cout);
+  std::stringstream output;
+  io_example_model_namespace::io_example_model model(data_var_context, &output);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -442,4 +452,5 @@ TEST(StanIoMcmcWriter, write_timing) {
   EXPECT_EQ(expected_line, line);
   
   EXPECT_EQ("", message_stream.str());
+  EXPECT_EQ("", output.str());
 }

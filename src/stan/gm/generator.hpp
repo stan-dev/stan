@@ -4018,27 +4018,7 @@ namespace stan {
       o << INDENT << "}" << EOL2;
 
     }
-
     
-    void generate_main(const std::string& model_name,
-                       std::ostream& out) {
-      out << "int main(int argc, const char* argv[]) {" << EOL;
-      out << INDENT << "try {" << EOL;
-      out << INDENT2 << "return stan::common::command<" << model_name 
-          << "_namespace::" << model_name << ">(argc,argv);" << EOL;
-      out << INDENT << "} catch (const std::exception& e) {" << EOL;
-      out << INDENT2 
-          << "std::cerr << std::endl << \"Exception: \" << e.what() << std::endl;" 
-          << EOL;
-      out << INDENT2
-          << "std::cerr << \"Diagnostic information: \" << std::endl << boost::diagnostic_information(e) << std::endl;" 
-          << EOL;
-      out << INDENT2 << "return -1;" << EOL;
-      out << INDENT << "}" << EOL;
-
-      out << "}" << EOL2;
-    }
-
     void generate_model_name_method(const std::string& model_name,
                                     std::ostream& out) {
       out << INDENT << "static std::string model_name() {" << EOL
@@ -4320,8 +4300,7 @@ namespace stan {
 
     void generate_cpp(const program& prog, 
                       const std::string& model_name,
-                      std::ostream& out,
-                      bool include_main = true) {
+                      std::ostream& out) {
       generate_version_comment(out);
       generate_includes(out);
       generate_start_namespace(model_name,out);
@@ -4348,8 +4327,6 @@ namespace stan {
       generate_unconstrained_param_names_method(prog,out);
       generate_end_class_decl(out);
       generate_end_namespace(out);
-      if (include_main) 
-        generate_main(model_name,out);
       generate_model_typedef(model_name,out);
     }
 

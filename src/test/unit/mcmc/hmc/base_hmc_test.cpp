@@ -53,13 +53,17 @@ TEST(McmcBaseHMC, point_construction) {
   Eigen::VectorXd q(2);
   q(0) = 5;
   q(1) = 1;
-  
-  stan::mcmc::mock_model model(q.size());
-  
-  stan::mcmc::mock_hmc sampler(model, base_rng, &std::cout, &std::cerr);
+
+  std::stringstream output, error;
+
+  stan::mcmc::mock_model model(q.size());  
+  stan::mcmc::mock_hmc sampler(model, base_rng, &output, &error);
 
   EXPECT_EQ(q.size(), sampler.z().q.size());
   EXPECT_EQ(static_cast<int>(q.size()), sampler.z().g.size());
+
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());
 }
 
 TEST(McmcBaseHMC, seed) {
@@ -70,9 +74,10 @@ TEST(McmcBaseHMC, seed) {
   q(0) = 5;
   q(1) = 1;
   
-  stan::mcmc::mock_model model(q.size());
-  
-  stan::mcmc::mock_hmc sampler(model, base_rng, &std::cout, &std::cerr);
+  std::stringstream output, error;
+
+  stan::mcmc::mock_model model(q.size());  
+  stan::mcmc::mock_hmc sampler(model, base_rng, &output, &error);
 
   sampler.seed(q);
   
@@ -89,9 +94,10 @@ TEST(McmcBaseHMC, set_nominal_stepsize) {
   q(0) = 5;
   q(1) = 1;
   
-  stan::mcmc::mock_model model(q.size());
-  
-  stan::mcmc::mock_hmc sampler(model, base_rng, &std::cout, &std::cerr);
+  std::stringstream output, error;
+
+  stan::mcmc::mock_model model(q.size());  
+  stan::mcmc::mock_hmc sampler(model, base_rng, &output, &error);
   
   double old_epsilon = 1.0;
   sampler.set_nominal_stepsize(old_epsilon);
@@ -100,6 +106,8 @@ TEST(McmcBaseHMC, set_nominal_stepsize) {
   sampler.set_nominal_stepsize(-0.1);
   EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());
 }
 
 TEST(McmcBaseHMC, set_stepsize_jitter) {
@@ -110,9 +118,10 @@ TEST(McmcBaseHMC, set_stepsize_jitter) {
   q(0) = 5;
   q(1) = 1;
   
-  stan::mcmc::mock_model model(q.size());
-  
-  stan::mcmc::mock_hmc sampler(model, base_rng, &std::cout, &std::cerr);
+  std::stringstream output, error;
+
+  stan::mcmc::mock_model model(q.size());  
+  stan::mcmc::mock_hmc sampler(model, base_rng, &output, &error);
   
   double old_jitter = 0.1;
   sampler.set_stepsize_jitter(old_jitter);
@@ -121,5 +130,7 @@ TEST(McmcBaseHMC, set_stepsize_jitter) {
   sampler.set_nominal_stepsize(-0.1);
   EXPECT_EQ(old_jitter, sampler.get_stepsize_jitter());
   
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ("", error.str());
 }
 

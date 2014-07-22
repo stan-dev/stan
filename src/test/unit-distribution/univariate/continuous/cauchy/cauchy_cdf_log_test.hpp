@@ -23,13 +23,13 @@ public:
     param[1] = 0.0;           // mu
     param[2] = 1.0;           // sigma
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.187167));  // expected cdf_log
+    cdf_log.push_back(std::log(0.1871670418109988021094));  // expected cdf_log
 
     param[0] = -2.5;          // y
     param[1] = -1.0;          // mu
     param[2] = 1.0;           // sigma
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.187167));  // expected cdf_log
+    cdf_log.push_back(std::log(0.1871670418109988021094));  // expected cdf_log
   }
   
   void invalid_values(vector<size_t>& index, 

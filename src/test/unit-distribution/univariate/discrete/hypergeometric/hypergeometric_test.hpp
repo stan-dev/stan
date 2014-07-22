@@ -18,14 +18,8 @@ public:
     param[2] = 10;          // a
     param[3] = 10;          // b
     parameters.push_back(param);
-    log_prob.push_back(-4.119424); // expected log_prob
+    log_prob.push_back(-4.119424246619123763935); // expected log_prob
 
-    param[0] = 5;           // n
-    param[1] = 15;          // N
-    param[2] = 10;          // a
-    param[3] = 10;          // b
-    parameters.push_back(param);
-    log_prob.push_back(-4.119424); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

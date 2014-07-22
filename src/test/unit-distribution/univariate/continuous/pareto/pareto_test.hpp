@@ -17,13 +17,13 @@ public:
     param[1] = 0.5;           // y_min
     param[2] = 2.0;           // alpha
     parameters.push_back(param);
-    log_prob.push_back(-1.909543); // expected log_prob
+    log_prob.push_back(-1.909542504884438329782); // expected log_prob
 
     param[0] = 19.5;          // y
     param[1] = 0.15;          // y_min
     param[2] = 5.0;           // alpha
     parameters.push_back(param);
-    log_prob.push_back(-25.69865); // expected log_prob
+    log_prob.push_back(-25.69864880541351226384); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

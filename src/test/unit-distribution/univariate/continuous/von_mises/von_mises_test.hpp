@@ -18,25 +18,25 @@ public:
     param[1] = boost::math::constants::sixth_pi<double>(); // mu
     param[2] = 0.5;                                         // kappa
     parameters.push_back(param);
-    log_prob.push_back(-1.4664141);
+    log_prob.push_back(-1.46641408370260739602);
 
     param[0] = -boost::math::constants::sixth_pi<double>();
     param[1] = -boost::math::constants::three_quarters_pi<double>();
     param[2] = 1.0;
     parameters.push_back(param);
-    log_prob.push_back(-2.33261);
+    log_prob.push_back(-2.332610470019044868195);
 
     param[0] = boost::math::constants::pi<double>() / 4.;
     param[1] = -boost::math::constants::three_quarters_pi<double>();
     param[2] = 1.5;
     parameters.push_back(param);
-    log_prob.push_back(-3.8366644);
+    log_prob.push_back(-3.836664434124961609029);
 
     param[0] = -boost::math::constants::sixth_pi<double>();
     param[1] = boost::math::constants::sixth_pi<double>();
     param[2] = 4.0;
     parameters.push_back(param);
-    log_prob.push_back(-2.26285);
+    log_prob.push_back(-2.262849861924804084623);
   }
  
   void invalid_values(vector<size_t>& index, 

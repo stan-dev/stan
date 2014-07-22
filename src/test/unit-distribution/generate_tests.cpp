@@ -369,7 +369,16 @@ int create_files(const int& argc, const char* argv[],const int& index,
     stringstream out_name;
     out_name << out_name_base;
     out_name << "_" << std::setw(5) << std::setfill('0') << n;
-    out_name << "_generated_test.cpp";
+    if (index == 1)
+      out_name << "_generated_v_test.cpp";
+    else if (index == 2)
+      out_name << "_generated_fd_test.cpp";
+    else if (index == 3)
+      out_name << "_generated_fv_test.cpp";
+    else if (index == 4)
+      out_name << "_generated_ffd_test.cpp";
+    else if (index == 5)
+      out_name << "_generated_ffv_test.cpp";
     std::string tmp(out_name.str());
     outs.push_back(new std::ofstream(tmp.c_str()));
   }
@@ -396,10 +405,10 @@ int create_files(const int& argc, const char* argv[],const int& index,
  */
 int main(int argc, const char* argv[]) {
   int var_num = create_files(argc,argv,1,-1);
-  int fd_num = create_files(argc,argv,2,var_num+1);
-  int fv_num = create_files(argc,argv,3,fd_num+1);
-  int ffd_num = create_files(argc,argv,4,fv_num+1);
-  int ffv_num = create_files(argc,argv,5,ffd_num+1);
+  int fd_num = create_files(argc,argv,2,-1);
+  int fv_num = create_files(argc,argv,3,-1);
+  int ffd_num = create_files(argc,argv,4,-1);
+  int ffv_num = create_files(argc,argv,5,-1);
   
   return 0;
 }
