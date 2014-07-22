@@ -7,6 +7,7 @@
 #include <stan/math/matrix/array_builder.hpp>
 #include <stan/math/matrix/assign.hpp>
 #include <stan/math/matrix/block.hpp>
+#include <stan/math/matrix/cbind.hpp>
 #include <stan/math/matrix/check_range.hpp>
 #include <stan/math/matrix/cholesky_decompose.hpp>
 #include <stan/math/matrix/col.hpp>
@@ -68,6 +69,7 @@
 #include <stan/math/matrix/quad_form.hpp>
 #include <stan/math/matrix/quad_form_diag.hpp>
 #include <stan/math/matrix/rank.hpp>
+#include <stan/math/matrix/rbind.hpp>
 #include <stan/math/matrix/resize.hpp>
 #include <stan/math/matrix/row.hpp>
 #include <stan/math/matrix/rows.hpp>
