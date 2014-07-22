@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__CHECK_RANGE_HPP__
-#define __STAN__MATH__MATRIX__CHECK_RANGE_HPP__
+#ifndef STAN__MATH__MATRIX__CHECK_RANGE_HPP
+#define STAN__MATH__MATRIX__CHECK_RANGE_HPP
 
 #include <sstream> 
 #include <stdexcept>

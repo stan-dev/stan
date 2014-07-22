@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__WRITE_ITERATION_CSV_HPP__
-#define __STAN__COMMON__WRITE_ITERATION_CSV_HPP__
+#ifndef STAN__COMMON__WRITE_ITERATION_CSV_HPP
+#define STAN__COMMON__WRITE_ITERATION_CSV_HPP
 
 #include <ostream>
 #include <vector>

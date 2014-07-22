@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__BASE__ADAPTER__BETA__
-#define __STAN__MCMC__BASE__ADAPTER__BETA__
+#ifndef STAN__MCMC__BASE__ADAPTER__BETA
+#define STAN__MCMC__BASE__ADAPTER__BETA
 
 namespace stan {
   

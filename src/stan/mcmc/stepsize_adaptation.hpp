@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__STEPSIZE__ADAPTATION__BETA__
-#define __STAN__MCMC__STEPSIZE__ADAPTATION__BETA__
+#ifndef STAN__MCMC__STEPSIZE__ADAPTATION__BETA
+#define STAN__MCMC__STEPSIZE__ADAPTATION__BETA
 
 #include <cmath>
 #include <stan/mcmc/base_adaptation.hpp>

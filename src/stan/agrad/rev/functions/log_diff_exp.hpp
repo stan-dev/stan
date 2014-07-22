@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__LOG_DIFF_EXP_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__LOG_DIFF_EXP_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__LOG_DIFF_EXP_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__LOG_DIFF_EXP_HPP
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/calculate_chain.hpp>

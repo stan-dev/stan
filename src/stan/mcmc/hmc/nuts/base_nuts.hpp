@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__BASE__NUTS__BETA__
-#define __STAN__MCMC__BASE__NUTS__BETA__
+#ifndef STAN__MCMC__BASE__NUTS__BETA
+#define STAN__MCMC__BASE__NUTS__BETA
 
 #include <math.h>
 #include <boost/math/special_functions/fpclassify.hpp>

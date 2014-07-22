@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__PARSER__COMMON_ADAPTORS_DEF__HPP__
-#define __STAN__GM__PARSER__COMMON_ADAPTORS_DEF__HPP__
+#ifndef STAN__GM__PARSER__COMMON_ADAPTORS_DEF__HPP
+#define STAN__GM__PARSER__COMMON_ADAPTORS_DEF__HPP
 
 #include <boost/fusion/include/adapt_struct.hpp>
 

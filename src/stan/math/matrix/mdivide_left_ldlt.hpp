@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__MDIVIDE_LEFT_LDLT_HPP__
-#define __STAN__MATH__MATRIX__MDIVIDE_LEFT_LDLT_HPP__
+#ifndef STAN__MATH__MATRIX__MDIVIDE_LEFT_LDLT_HPP
+#define STAN__MATH__MATRIX__MDIVIDE_LEFT_LDLT_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>

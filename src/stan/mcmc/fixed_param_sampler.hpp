@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__FIXED__PARAM__SAMPLER__HPP__
-#define __STAN__MCMC__FIXED__PARAM__SAMPLER__HPP__
+#ifndef STAN__MCMC__FIXED__PARAM__SAMPLER__HPP
+#define STAN__MCMC__FIXED__PARAM__SAMPLER__HPP
 
 #include <iostream>
 #include <string>

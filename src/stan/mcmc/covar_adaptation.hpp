@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__COVAR__ADAPTATION__BETA__
-#define __STAN__MCMC__COVAR__ADAPTATION__BETA__
+#ifndef STAN__MCMC__COVAR__ADAPTATION__BETA
+#define STAN__MCMC__COVAR__ADAPTATION__BETA
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>

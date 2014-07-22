@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__VAR_STACK_HPP__
-#define __STAN__AGRAD__REV__VAR_STACK_HPP__
+#ifndef STAN__AGRAD__REV__VAR_STACK_HPP
+#define STAN__AGRAD__REV__VAR_STACK_HPP
 
 #include <vector>
 #include <stan/memory/stack_alloc.hpp>
