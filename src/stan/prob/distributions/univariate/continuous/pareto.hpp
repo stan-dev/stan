@@ -95,12 +95,6 @@ namespace stan {
         for (size_t n = 0; n < length(alpha); n++)
           log_alpha[n] = log(value_of(alpha_vec[n]));
       
-      DoubleVectorView<!is_constant_struct<T_shape>::value,
-                       is_vector<T_shape>::value> inv_alpha(length(alpha));
-      if (!is_constant_struct<T_shape>::value)
-        for (size_t n = 0; n < length(alpha); n++)
-          inv_alpha[n] = 1 / value_of(alpha_vec[n]);
-      
       using stan::math::multiply_log;
 
       for (size_t n = 0; n < N; n++) {
