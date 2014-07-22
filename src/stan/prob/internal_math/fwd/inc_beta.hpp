@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__INTERNAL_MATH__FWD__INC_BETA_HPP__
-#define __STAN__PROB__INTERNAL_MATH__FWD__INC_BETA_HPP__
+#ifndef STAN__PROB__INTERNAL_MATH__FWD__INC_BETA_HPP
+#define STAN__PROB__INTERNAL_MATH__FWD__INC_BETA_HPP
 
 #include <boost/math/special_functions/beta.hpp>
 #include <stan/prob/internal_math/math/grad_inc_beta.hpp>

@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__PARTIALS_VARI_HPP__
-#define __STAN__AGRAD__PARTIALS_VARI_HPP__
+#ifndef STAN__AGRAD__PARTIALS_VARI_HPP
+#define STAN__AGRAD__PARTIALS_VARI_HPP
 
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/rev/var.hpp>

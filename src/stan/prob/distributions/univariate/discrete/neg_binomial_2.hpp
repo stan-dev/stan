@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_2_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_2_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_2_HPP
+#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_2_HPP
 
 #include <boost/random/negative_binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

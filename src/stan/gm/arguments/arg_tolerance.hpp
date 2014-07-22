@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__TOLERANCE_HPP__
-#define __STAN__GM__ARGUMENTS__TOLERANCE_HPP__
+#ifndef STAN__GM__ARGUMENTS__TOLERANCE_HPP
+#define STAN__GM__ARGUMENTS__TOLERANCE_HPP
 
 #include <boost/lexical_cast.hpp>
 

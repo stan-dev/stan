@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__AUTO_DIFF_HPP__
-#define __STAN__AGRAD__AUTO_DIFF_HPP__
+#ifndef STAN__AGRAD__AUTO_DIFF_HPP
+#define STAN__AGRAD__AUTO_DIFF_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev.hpp>

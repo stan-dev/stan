@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__PROMOTE_COMMON_HPP__
-#define __STAN__MATH__MATRIX__PROMOTE_COMMON_HPP__
+#ifndef STAN__MATH__MATRIX__PROMOTE_COMMON_HPP
+#define STAN__MATH__MATRIX__PROMOTE_COMMON_HPP
 
 #include <stan/math/matrix/common_type.hpp>
 #include <stan/math/matrix/promoter.hpp>

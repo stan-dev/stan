@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__INTERNAL_MATH_HPP__
-#define __STAN__PROB__INTERNAL_MATH_HPP__
+#ifndef STAN__PROB__INTERNAL_MATH_HPP
+#define STAN__PROB__INTERNAL_MATH_HPP
 
 #include <stan/prob/internal_math/fwd/grad_inc_beta.hpp>
 #include <stan/prob/internal_math/fwd/inc_beta.hpp>

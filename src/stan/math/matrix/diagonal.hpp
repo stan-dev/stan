@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__DIAGONAL_HPP__
-#define __STAN__MATH__MATRIX__DIAGONAL_HPP__
+#ifndef STAN__MATH__MATRIX__DIAGONAL_HPP
+#define STAN__MATH__MATRIX__DIAGONAL_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 

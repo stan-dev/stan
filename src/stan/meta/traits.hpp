@@ -1,5 +1,5 @@
-#ifndef __STAN__META__TRAITS_HPP__
-#define __STAN__META__TRAITS_HPP__
+#ifndef STAN__META__TRAITS_HPP
+#define STAN__META__TRAITS_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 // #include <stan/agrad/partials_vari.hpp>

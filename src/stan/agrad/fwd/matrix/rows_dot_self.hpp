@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__ROWS_DOT_SELF_HPP__
-#define __STAN__AGRAD__REV__MATRIX__ROWS_DOT_SELF_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__ROWS_DOT_SELF_HPP
+#define STAN__AGRAD__REV__MATRIX__ROWS_DOT_SELF_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>

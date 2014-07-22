@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__BLOCK_HPP__
-#define __STAN__MATH__MATRIX__BLOCK_HPP__
+#ifndef STAN__MATH__MATRIX__BLOCK_HPP
+#define STAN__MATH__MATRIX__BLOCK_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/matrix/check_row_index.hpp>

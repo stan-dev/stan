@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__ELT_MULTIPLY_HPP__
-#define __STAN__MATH__MATRIX__ELT_MULTIPLY_HPP__
+#ifndef STAN__MATH__MATRIX__ELT_MULTIPLY_HPP
+#define STAN__MATH__MATRIX__ELT_MULTIPLY_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>

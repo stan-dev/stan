@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__ADAPT__TERM__BUFFER__HPP__
-#define __STAN__GM__ARGUMENTS__ADAPT__TERM__BUFFER__HPP__
+#ifndef STAN__GM__ARGUMENTS__ADAPT__TERM__BUFFER__HPP
+#define STAN__GM__ARGUMENTS__ADAPT__TERM__BUFFER__HPP
 
 #include <stan/gm/arguments/singleton_argument.hpp>
 

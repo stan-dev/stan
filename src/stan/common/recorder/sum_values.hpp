@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__RECORDER__SUM_VALUES_HPP__
-#define __STAN__COMMON__RECORDER__SUM_VALUES_HPP__
+#ifndef STAN__COMMON__RECORDER__SUM_VALUES_HPP
+#define STAN__COMMON__RECORDER__SUM_VALUES_HPP
 
 #include <vector>
 #include <stdexcept>

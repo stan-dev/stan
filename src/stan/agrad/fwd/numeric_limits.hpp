@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__NUMERIC__LIMITS__HPP__
-#define __STAN__AGRAD__FWD__NUMERIC__LIMITS__HPP__
+#ifndef STAN__AGRAD__FWD__NUMERIC__LIMITS__HPP
+#define STAN__AGRAD__FWD__NUMERIC__LIMITS__HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>

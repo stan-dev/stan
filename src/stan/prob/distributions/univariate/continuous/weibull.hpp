@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__WEIBULL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__WEIBULL_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__WEIBULL_HPP
+#define STAN__PROB__DISTRIBUTIONS__WEIBULL_HPP
 
 #include <boost/random/weibull_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

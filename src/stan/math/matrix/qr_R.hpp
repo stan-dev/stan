@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__QR_R_HPP__
-#define __STAN__MATH__MATRIX__QR_R_HPP__
+#ifndef STAN__MATH__MATRIX__QR_R_HPP
+#define STAN__MATH__MATRIX__QR_R_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <Eigen/QR>

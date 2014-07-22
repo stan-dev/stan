@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__DOUBLE_EXPONENTIAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__DOUBLE_EXPONENTIAL_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__DOUBLE_EXPONENTIAL_HPP
+#define STAN__PROB__DISTRIBUTIONS__DOUBLE_EXPONENTIAL_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>

@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__FVAR__HPP__
-#define __STAN__AGRAD__FWD__FVAR__HPP__
+#ifndef STAN__AGRAD__FWD__FVAR__HPP
+#define STAN__AGRAD__FWD__FVAR__HPP
 
 #include <ostream>
 

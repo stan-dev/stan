@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD_HPP__
-#define __STAN__AGRAD__FWD_HPP__
+#ifndef STAN__AGRAD__FWD_HPP
+#define STAN__AGRAD__FWD_HPP
 
 //fvar
 #include <stan/agrad/fwd/fvar.hpp>

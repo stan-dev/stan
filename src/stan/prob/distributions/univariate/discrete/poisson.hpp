@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP
+#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP
 
 #include <boost/random/poisson_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
