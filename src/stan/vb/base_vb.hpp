@@ -30,7 +30,7 @@ namespace stan {
                     << "[stan::vb::base_vb.hpp] encountered an error:"
                     << std::endl
                     << e.what() << std::endl << std::endl;
-      }
+      };
 
     };
 

@@ -4,6 +4,9 @@
 #include <vector>
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/mdivide_left_tri_low.hpp>
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 
 namespace stan {
 
@@ -24,9 +27,16 @@ namespace stan {
       mu_(mu), L_(L), dimension_(mu.size())
       {
 
-        if (dimension_ != L_.rows() || dimension_ != L_.cols())
-          throw std::runtime_error("[latent_vars] mu and L "
-                                  "dimensions do not match.");
+        static const char* function = "stan::vb::latent_vars(%1%)";
+
+        double tmp(0.0);
+        stan::math::check_square(function,
+                         L_, "Scale matrix",
+                         &tmp);
+        stan::math::check_size_match(function,
+                         L_.rows(), "Dimension of scale matrix",
+                         dimension_, "Dimension of mean vector",
+                         &tmp);
 
       };
 
@@ -35,37 +45,48 @@ namespace stan {
       int dimension() const
       {
         return dimension_;
-      }
+      };
 
       Eigen::VectorXd const& mu() const
       {
         return mu_;
-      }
+      };
 
       Eigen::MatrixXd const& L() const
       {
         return L_;
-      }
+      };
 
       // Implements g^{-1}(\check{z}) = L\check{z} + \mu
-      Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& x)
+      void to_unconstrained(Eigen::VectorXd& x) const
       {
-        if (mu_.size() != x.size())
-          throw std::runtime_error("[latent_vars::to_unconstrained] input "
-                             "dimension does not match internal dimension.");
+        static const char* function = "stan::vb::latent_vars"
+                                      "::to_unconstrained(%1%)";
 
-        return L_*x + mu_;
-      }
+        double tmp(0.0);
+        stan::math::check_size_match(function,
+                         x.size(), "Dimension of input vector",
+                         dimension_, "Dimension of mean vector",
+                         &tmp);
+
+        x = L_*x + mu_;
+      };
 
       // Implements g(\widetilde{z}) = L^{-1}(\check{z} - \mu)
-      Eigen::VectorXd to_standardized(Eigen::VectorXd const& x)
+      void to_standardized(Eigen::VectorXd& x) const
       {
-        if (mu_.size() != x.size())
-          throw std::runtime_error("[latent_vars::to_standardized] input "
-                             "dimension does not match internal dimension.");
+        static const char* function = "stan::vb::latent_vars"
+                                      "::to_standardized(%1%)";
 
-        return L_.partialPivLu().solve( x - mu_ );
-      }
+        double tmp(0.0);
+        stan::math::check_size_match(function,
+                         x.size(), "Dimension of input vector",
+                         dimension_, "Dimension of mean vector",
+                         &tmp);
+
+        Eigen::MatrixXd x_minus_mu = x-mu_;
+        x = stan::math::mdivide_left_tri_low(L_, x_minus_mu);
+      };
 
     };
 
