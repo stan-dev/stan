@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__CBIND_HPP
-#define STAN__MATH__MATRIX__CBIND_HPP
+#ifndef STAN__MATH__MATRIX__APPEND__COL_HPP
+#define STAN__MATH__MATRIX__APPEND__COL_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/meta/traits.hpp> //stan::return_type
@@ -14,19 +14,19 @@ namespace stan {
     using std::vector;
     using stan::math::check_size_match;
        
-    //matrix cbind(matrix, matrix)
-    //matrix cbind(matrix, vector)
-    //matrix cbind(vector, matrix)
-    //matrix cbind(vector, vector)
+    //matrix append_col(matrix, matrix)
+    //matrix append_col(matrix, vector)
+    //matrix append_col(vector, matrix)
+    //matrix append_col(vector, vector)
     template <typename T1, typename T2, int R1, int C1, int R2, int C2>
     inline Matrix<typename return_type<T1, T2>::type, Dynamic, Dynamic>
-    cbind(const Matrix<T1, R1, C1> & A,
+    append_col(const Matrix<T1, R1, C1> & A,
           const Matrix<T2, R2, C2> & B) {
       int Arows = A.rows();
       int Brows = B.rows();
       int Acols = A.cols();
       int Bcols = B.cols();
-      check_size_match("cbind(%1%)",
+      check_size_match("append_col(%1%)",
                        Arows, "rows of A",
                        Brows, "rows of B",
                        (double*)0);            
@@ -43,10 +43,10 @@ namespace stan {
       return result;
     }
        
-    //row_vector cbind(row_vector, row_vector)
+    //row_vector append_col(row_vector, row_vector)
     template <typename T1, typename T2, int C1, int C2>
     inline Matrix<typename return_type<T1, T2>::type, 1, Dynamic>
-    cbind(const Matrix<T1, 1, C1> & A,
+    append_col(const Matrix<T1, 1, C1> & A,
           const Matrix<T2, 1, C2> & B) {
       int Asize = A.size();
       int Bsize = B.size();
@@ -60,15 +60,15 @@ namespace stan {
     }
     
        
-    //matrix cbind(matrix, matrix)
-    //matrix cbind(matrix, vector)
-    //matrix cbind(vector, matrix)
-    //matrix cbind(vector, vector)
+    //matrix append_col(matrix, matrix)
+    //matrix append_col(matrix, vector)
+    //matrix append_col(vector, matrix)
+    //matrix append_col(vector, vector)
     template <typename T, int R1, int C1, int R2, int C2>
     inline Matrix<T, Dynamic, Dynamic>
-    cbind(const Matrix<T, R1, C1> & A,
+    append_col(const Matrix<T, R1, C1> & A,
           const Matrix<T, R2, C2> & B) {
-      check_size_match("cbind(%1%)",
+      check_size_match("append_col(%1%)",
                        A.rows(), "rows of A",
                        B.rows(), "rows of B",
                        (double*)0);            
@@ -79,10 +79,10 @@ namespace stan {
       return result;
     }
        
-    //row_vector cbind(row_vector, row_vector)
+    //row_vector append_col(row_vector, row_vector)
     template <typename T, int C1, int C2>
     inline Matrix<T, 1, Dynamic>
-    cbind(const Matrix<T, 1, C1> & A,
+    append_col(const Matrix<T, 1, C1> & A,
           const Matrix<T, 1, C2> & B) {          
       Matrix<T, 1, Dynamic>
         result(A.size()+B.size());

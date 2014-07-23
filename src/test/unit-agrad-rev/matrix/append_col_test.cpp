@@ -1,4 +1,4 @@
-#include <stan/math/matrix/cbind.hpp>
+#include <stan/math/matrix/append_col.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/agrad/util.hpp>
 #include <stan/agrad/rev.hpp>
@@ -7,13 +7,13 @@
 #include <stan/agrad/rev/functions/exp.hpp>
 
 using stan::math::sum;
-using stan::math::cbind;
+using stan::math::append_col;
 using stan::agrad::matrix_v;
 using stan::agrad::row_vector_v;
 using Eigen::MatrixXd;
 using Eigen::RowVectorXd;
 
-TEST(AgradRevMatrix, cbind_matrix) {
+TEST(AgradRevMatrix, append_col_matrix) {
   matrix_v a(2,2);
   matrix_v a_exp(2,2);
   MatrixXd b(2,2);
@@ -32,9 +32,9 @@ TEST(AgradRevMatrix, cbind_matrix) {
     }
   }
   
-  AVAR cbind_ab = sum(cbind(a_exp, b));
+  AVAR append_col_ab = sum(append_col(a_exp, b));
 
-  VEC g = cgradvec(cbind_ab, x);
+  VEC g = cgradvec(append_col_ab, x);
   
   size_t idx = 0;
   for (int i = 0; i < 2; i++)
@@ -42,7 +42,7 @@ TEST(AgradRevMatrix, cbind_matrix) {
       EXPECT_FLOAT_EQ(std::exp(a(i, j).val()), g[idx++]);
 }
 
-TEST(AgradRevMatrix, cbind_row_vector) {
+TEST(AgradRevMatrix, append_col_row_vector) {
   row_vector_v a(3);
   row_vector_v a_exp(3);
   RowVectorXd b(2);
@@ -57,9 +57,9 @@ TEST(AgradRevMatrix, cbind_row_vector) {
     a_exp(i) = stan::agrad::exp(a(i));
   }
   
-  AVAR cbind_ab = sum(cbind(a_exp, b));
+  AVAR append_col_ab = sum(append_col(a_exp, b));
 
-  VEC g = cgradvec(cbind_ab, x);
+  VEC g = cgradvec(append_col_ab, x);
   
   size_t idx = 0;
   for (int i = 0; i < 3; i++)

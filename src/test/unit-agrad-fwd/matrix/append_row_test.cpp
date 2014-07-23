@@ -1,10 +1,10 @@
-#include <stan/math/matrix/rbind.hpp>
+#include <stan/math/matrix/append_row.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradFwdMatrixrbind,fd) {
-  using stan::math::rbind;
+TEST(AgradFwdMatrixappend_row,fd) {
+  using stan::math::append_row;
   using stan::agrad::matrix_fd;
   using Eigen::MatrixXd;
 
@@ -26,20 +26,20 @@ TEST(AgradFwdMatrixrbind,fd) {
   a(1,0).d_ = 4.0;
   a(1,1).d_ = 5.0;
 
-  matrix_fd ab_rbind = rbind(a, b);
-  MatrixXd adb_rbind = rbind(ad, b);
+  matrix_fd ab_append_row = append_row(a, b);
+  MatrixXd adb_append_row = append_row(ad, b);
   
   for (int i = 0; i < 2; i++)
     for (int j = 0; j < 2; j++)
-      EXPECT_EQ(a(i, j).d_, ab_rbind(i ,j).d_);
+      EXPECT_EQ(a(i, j).d_, ab_append_row(i ,j).d_);
   
   for (int i = 0; i < 4; i++)
     for (int j = 0; j < 2; j++)
-      EXPECT_EQ(ab_rbind(i, j).val_, adb_rbind(i ,j));
+      EXPECT_EQ(ab_append_row(i, j).val_, adb_append_row(i ,j));
 }
 
-TEST(AgradFwdVectorrbind,fd) {
-  using stan::math::rbind;
+TEST(AgradFwdVectorappend_row,fd) {
+  using stan::math::append_row;
   using stan::agrad::vector_fd;
   using Eigen::VectorXd;
 
@@ -58,12 +58,12 @@ TEST(AgradFwdVectorrbind,fd) {
   a(2).d_ = 4.0;
   a(3).d_ = 5.0;
 
-  vector_fd ab_rbind = rbind(a, b);
-  VectorXd adb_rbind = rbind(ad, b);
+  vector_fd ab_append_row = append_row(a, b);
+  VectorXd adb_append_row = append_row(ad, b);
   
   for (int i = 0; i < 4; i++)
-      EXPECT_EQ(a(i).d_, ab_rbind(i).d_);
+      EXPECT_EQ(a(i).d_, ab_append_row(i).d_);
   
   for (int i = 0; i < 7; i++)
-      EXPECT_EQ(ab_rbind(i).val_, adb_rbind(i));
+      EXPECT_EQ(ab_append_row(i).val_, adb_append_row(i));
 }

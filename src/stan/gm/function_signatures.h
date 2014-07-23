@@ -134,11 +134,11 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
     }
 add_binary("cauchy_rng");
-add("cbind",MATRIX_T,MATRIX_T,MATRIX_T);
-add("cbind",MATRIX_T,VECTOR_T,MATRIX_T);
-add("cbind",MATRIX_T,MATRIX_T,VECTOR_T);
-add("cbind",MATRIX_T,VECTOR_T,VECTOR_T);
-add("cbind",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("append_col",MATRIX_T,MATRIX_T,MATRIX_T);
+add("append_col",MATRIX_T,VECTOR_T,MATRIX_T);
+add("append_col",MATRIX_T,MATRIX_T,VECTOR_T);
+add("append_col",MATRIX_T,VECTOR_T,VECTOR_T);
+add("append_col",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add_unary("cbrt");
 add_unary("ceil");
 for (size_t i = 0; i < vector_types.size(); ++i)
@@ -647,11 +647,11 @@ for (size_t i = 0; i < vector_types.size(); ++i)
         vector_types[i], vector_types[j]); // args
   }
 add_unary("rayleigh_rng");
-add("rbind",MATRIX_T,MATRIX_T,MATRIX_T);
-add("rbind",MATRIX_T,ROW_VECTOR_T,MATRIX_T);
-add("rbind",MATRIX_T,MATRIX_T,ROW_VECTOR_T);
-add("rbind",MATRIX_T,ROW_VECTOR_T,ROW_VECTOR_T);
-add("rbind",VECTOR_T,VECTOR_T,VECTOR_T);
+add("append_row",MATRIX_T,MATRIX_T,MATRIX_T);
+add("append_row",MATRIX_T,ROW_VECTOR_T,MATRIX_T);
+add("append_row",MATRIX_T,MATRIX_T,ROW_VECTOR_T);
+add("append_row",MATRIX_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("append_row",VECTOR_T,VECTOR_T,VECTOR_T);
 for (size_t i = 0; i < base_types.size(); ++i) {
   add("rep_array",expr_type(base_types[i],1), base_types[i], INT_T);
   add("rep_array",expr_type(base_types[i],2), base_types[i], INT_T,INT_T);
