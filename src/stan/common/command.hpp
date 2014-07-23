@@ -763,7 +763,7 @@ namespace stan {
         if (output_stream) {
           std::vector<std::string> names;
           names.push_back("lp__");
-          model.constrained_param_names(names,true,true);
+          model.constrained_param_names(names, true, true);
 
           (*output_stream) << names.at(0);
           for (size_t i = 1; i < names.size(); ++i) {
