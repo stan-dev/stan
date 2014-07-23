@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
-#include <stan/model/util.hpp>
+#include <stan/common/command.hpp>
 #include <stdexcept>
 #include <sstream>
 #include <test/test-models/no-main/gm/raise_exception_model.cpp>
 
 /* to test that stan program throws exception in model block:
-   setup: instantiate model, sampler, 
-   test:  calculate gradient
-   (teardown: delete model, sampler)
+   setup: instantiate model
+   test:  call model's log_prob function
+   (teardown: delete model)
 */
 
 typedef raise_exception_model_model_namespace::raise_exception_model_model Model;
@@ -48,11 +48,14 @@ public:
 
 TEST_F(StanCommon, raise_exception_model) {
   std::string error_msg = "user-specified exception";
-  double init_log_prob;
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model->num_params_r());
-  Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model->num_params_r());
+  std::vector<double> cont_vector(cont_params.size());
+  for (int i = 0; i < cont_params.size(); ++i)
+    cont_vector.at(i) = cont_params(i);
+  std::vector<int> disc_vector;
+  double lp(0);
   try {
-    stan::model::gradient((*model), cont_params, init_log_prob, init_grad, &std::cout);
+    lp = model->log_prob<false, false>(cont_vector, disc_vector, &std::cout);
   } catch (const std::domain_error& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "*********************************" << std::endl
