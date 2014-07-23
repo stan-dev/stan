@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__PS_POINT__BETA__
-#define __STAN__MCMC__PS_POINT__BETA__
+#ifndef STAN__MCMC__PS_POINT__BETA
+#define STAN__MCMC__PS_POINT__BETA
 
 #include <fstream>
 #include <string>
@@ -22,9 +22,9 @@ namespace stan {
   
       ps_point(const ps_point& z): q(z.q.size()), p(z.p.size()), V(z.V), g(z.g.size())
       {
-        _fast_vector_copy<double>(q, z.q);
-        _fast_vector_copy<double>(p, z.p);
-        _fast_vector_copy<double>(g, z.g);
+        fast_vector_copy_<double>(q, z.q);
+        fast_vector_copy_<double>(p, z.p);
+        fast_vector_copy_<double>(g, z.g);
       }
       
       
@@ -33,12 +33,12 @@ namespace stan {
         
         if(this == &z) return *this;
         
-        _fast_vector_copy<double>(q, z.q);
+        fast_vector_copy_<double>(q, z.q);
         
         V = z.V;
         
-        _fast_vector_copy<double>(p, z.p);
-        _fast_vector_copy<double>(g, z.g);
+        fast_vector_copy_<double>(p, z.p);
+        fast_vector_copy_<double>(g, z.g);
         
         return *this;
         
@@ -77,23 +77,20 @@ namespace stan {
     protected:
       
       template <typename T>
-      static inline void _fast_vector_copy(Eigen::Matrix<T, Eigen::Dynamic, 1>& v_to, const Eigen::Matrix<T, Eigen::Dynamic, 1>& v_from) {
+      static inline void fast_vector_copy_(Eigen::Matrix<T, Eigen::Dynamic, 1>& v_to,
+                                           const Eigen::Matrix<T, Eigen::Dynamic, 1>& v_from) {
         int sz = v_from.size();
         v_to.resize(sz);
-        if (sz > 0) {
-          std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
-        }
+        if (sz > 0) std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
       }
 
       template <typename T>
-      static inline void _fast_matrix_copy(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_to,
-                                    const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_from) {
+      static inline void fast_matrix_copy_(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_to,
+                                           const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_from) {
         int nr = v_from.rows();
         int nc = v_from.cols();
         v_to.resize(nr, nc);
-        if (nr > 0 && nc > 0) {
-          std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
-        }
+        if (nr > 0 && nc > 0) std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
       }
       
     };

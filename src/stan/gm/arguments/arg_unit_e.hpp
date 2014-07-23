@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__UNIT_E__HPP__
-#define __STAN__GM__ARGUMENTS__UNIT_E__HPP__
+#ifndef STAN__GM__ARGUMENTS__UNIT_E__HPP
+#define STAN__GM__ARGUMENTS__UNIT_E__HPP
 
 #include <stan/gm/arguments/unvalued_argument.hpp>
 

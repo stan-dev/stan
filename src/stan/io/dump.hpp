@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__DUMP_HPP__
-#define __STAN__IO__DUMP_HPP__
+#ifndef STAN__IO__DUMP_HPP
+#define STAN__IO__DUMP_HPP
 
 #include <cctype>
 #include <iostream>

@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__VARIANCE_HPP__
-#define __STAN__MATH__MATRIX__VARIANCE_HPP__
+#ifndef STAN__MATH__MATRIX__VARIANCE_HPP
+#define STAN__MATH__MATRIX__VARIANCE_HPP
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>

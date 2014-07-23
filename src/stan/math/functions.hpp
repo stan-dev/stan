@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS_HPP__
-#define __STAN__MATH__FUNCTIONS_HPP__
+#ifndef STAN__MATH__FUNCTIONS_HPP
+#define STAN__MATH__FUNCTIONS_HPP
 
 #include <stan/math/functions/Phi.hpp>
 #include <stan/math/functions/Phi_approx.hpp>

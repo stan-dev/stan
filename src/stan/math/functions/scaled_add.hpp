@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__SCALED_ADD_HPP__
-#define __STAN__MATH__FUNCTIONS__SCALED_ADD_HPP__
+#ifndef STAN__MATH__FUNCTIONS__SCALED_ADD_HPP
+#define STAN__MATH__FUNCTIONS__SCALED_ADD_HPP
 
 #include <vector>
 #include <cstddef>

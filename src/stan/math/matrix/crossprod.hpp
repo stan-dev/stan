@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__CROSSPROD_HPP__
-#define __STAN__MATH__MATRIX__CROSSPROD_HPP__
+#ifndef STAN__MATH__MATRIX__CROSSPROD_HPP
+#define STAN__MATH__MATRIX__CROSSPROD_HPP
 
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/tcrossprod.hpp>

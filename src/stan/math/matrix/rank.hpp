@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__RANK_HPP__
-#define __STAN__MATH__MATRIX__RANK_HPP__
+#ifndef STAN__MATH__MATRIX__RANK_HPP
+#define STAN__MATH__MATRIX__RANK_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>

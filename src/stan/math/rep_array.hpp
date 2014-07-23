@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__REP_ARRAY_HPP__
-#define __STAN__MATH__REP_ARRAY_HPP__
+#ifndef STAN__MATH__REP_ARRAY_HPP
+#define STAN__MATH__REP_ARRAY_HPP
 
 #include <vector>
 

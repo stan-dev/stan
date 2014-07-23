@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__TCROSSPROD_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__TCROSSPROD_HPP__
+#ifndef STAN__AGRAD__FWD__MATRIX__TCROSSPROD_HPP
+#define STAN__AGRAD__FWD__MATRIX__TCROSSPROD_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
