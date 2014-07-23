@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__STEPSIZE__ADAPTATION__BETA__
-#define __STAN__MCMC__STEPSIZE__ADAPTATION__BETA__
+#ifndef STAN__MCMC__STEPSIZE__ADAPTATION__BETA
+#define STAN__MCMC__STEPSIZE__ADAPTATION__BETA
 
 #include <cmath>
 #include <stan/mcmc/base_adaptation.hpp>
@@ -12,62 +12,62 @@ namespace stan {
       
     public:
       
-      stepsize_adaptation(): _mu(0.5), _delta(0.5), _gamma(0.05),
-                             _kappa(0.75), _t0(10)
+      stepsize_adaptation(): mu_(0.5), delta_(0.5), gamma_(0.05),
+                             kappa_(0.75), t0_(10)
       { restart(); }
       
-      void set_mu(double m)    { _mu = m; }
-      void set_delta(double d) { if(d > 0 && d < 1) _delta = d; }
-      void set_gamma(double g) { if(g > 0)          _gamma = g; }
-      void set_kappa(double k) { if(k > 0)          _kappa = k; }
-      void set_t0(double t)    { if(t > 0)          _t0 = t; }
+      void set_mu(double m)    { mu_ = m; }
+      void set_delta(double d) { if(d > 0 && d < 1) delta_ = d; }
+      void set_gamma(double g) { if(g > 0)          gamma_ = g; }
+      void set_kappa(double k) { if(k > 0)          kappa_ = k; }
+      void set_t0(double t)    { if(t > 0)          t0_ = t; }
       
-      double get_mu()    { return _mu; }
-      double get_delta() { return _delta; }
-      double get_gamma() { return _gamma; }
-      double get_kappa() { return _kappa; }
-      double get_t0()    { return _t0; }
+      double get_mu()    { return mu_; }
+      double get_delta() { return delta_; }
+      double get_gamma() { return gamma_; }
+      double get_kappa() { return kappa_; }
+      double get_t0()    { return t0_; }
       
       void restart() {
-        _counter = 0;
-        _s_bar = 0;
-        _x_bar = 0;
+        counter_ = 0;
+        s_bar_ = 0;
+        x_bar_ = 0;
       }
       
       void learn_stepsize(double& epsilon, double adapt_stat) {
         
-        ++_counter;
+        ++counter_;
         
         adapt_stat = adapt_stat > 1 ? 1 : adapt_stat;
         
         // Nesterov Dual-Averaging of log(epsilon)
-        const double eta = 1.0 / (_counter + _t0);
+        const double eta = 1.0 / (counter_ + t0_);
         
-        _s_bar = (1.0 - eta) * _s_bar + eta * (_delta - adapt_stat);
+        s_bar_ = (1.0 - eta) * s_bar_ + eta * (delta_ - adapt_stat);
         
-        const double x = _mu - _s_bar * std::sqrt(_counter) / _gamma;
-        const double x_eta = std::pow(_counter, - _kappa);
+        const double x = mu_ - s_bar_ * std::sqrt(counter_) / gamma_;
+        const double x_eta = std::pow(counter_, - kappa_);
         
-        _x_bar = (1.0 - x_eta) * _x_bar + x_eta * x;
+        x_bar_ = (1.0 - x_eta) * x_bar_ + x_eta * x;
         
         epsilon = std::exp(x);
         
       }
       
       void complete_adaptation(double& epsilon) {
-        epsilon = std::exp(_x_bar);
+        epsilon = std::exp(x_bar_);
       }
       
     protected:
       
-      double _counter; // Adaptation iteration
-      double _s_bar;   // Moving average statistic
-      double _x_bar;   // Moving average parameter
-      double _mu;      // Asymptotic mean of parameter
-      double _delta;   // Target value of statistic
-      double _gamma;   // Adaptation scaling
-      double _kappa;   // Adaptation shrinkage
-      double _t0;      // Effective starting iteration
+      double counter_; // Adaptation iteration
+      double s_bar_;   // Moving average statistic
+      double x_bar_;   // Moving average parameter
+      double mu_;      // Asymptotic mean of parameter
+      double delta_;   // Target value of statistic
+      double gamma_;   // Adaptation scaling
+      double kappa_;   // Adaptation shrinkage
+      double t0_;      // Effective starting iteration
       
     };
     

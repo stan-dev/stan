@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__CHAINS_HPP__
-#define __STAN__MCMC__CHAINS_HPP__
+#ifndef STAN__MCMC__CHAINS_HPP
+#define STAN__MCMC__CHAINS_HPP
 
 #include <algorithm>
 #include <cmath>

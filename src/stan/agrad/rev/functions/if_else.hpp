@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__IF_ELSE_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__IF_ELSE_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__IF_ELSE_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__IF_ELSE_HPP
 
 #include <stan/agrad/rev/var.hpp>
 

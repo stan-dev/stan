@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__WRITER_HPP__
-#define __STAN__IO__WRITER_HPP__
+#ifndef STAN__IO__WRITER_HPP
+#define STAN__IO__WRITER_HPP
 
 #include <stdexcept>
 #include <stan/prob/transform.hpp>

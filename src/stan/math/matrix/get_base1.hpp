@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__GET_BASE1_HPP__
-#define __STAN__MATH__MATRIX__GET_BASE1_HPP__
+#ifndef STAN__MATH__MATRIX__GET_BASE1_HPP
+#define STAN__MATH__MATRIX__GET_BASE1_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>

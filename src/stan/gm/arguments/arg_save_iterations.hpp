@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__OUTPUT__SAVE__ITERATIONS__HPP__
-#define __STAN__GM__ARGUMENTS__OUTPUT__SAVE__ITERATIONS__HPP__
+#ifndef STAN__GM__ARGUMENTS__OUTPUT__SAVE__ITERATIONS__HPP
+#define STAN__GM__ARGUMENTS__OUTPUT__SAVE__ITERATIONS__HPP
 
 #include <stan/gm/arguments/singleton_argument.hpp>
 

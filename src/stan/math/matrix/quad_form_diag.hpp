@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP__
-#define __STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP__
+#ifndef STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP
+#define STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <boost/math/tools/promotion.hpp>

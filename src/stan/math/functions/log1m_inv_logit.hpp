@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LOG1M_INV_LOGIT_HPP__
-#define __STAN__MATH__FUNCTIONS__LOG1M_INV_LOGIT_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LOG1M_INV_LOGIT_HPP
+#define STAN__MATH__FUNCTIONS__LOG1M_INV_LOGIT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 
