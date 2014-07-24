@@ -5,7 +5,7 @@
 #include <test/test-models/no-main/gm/raise_ex_func_call_transformed_data.cpp>
 
 /* tests that stan program throws exception in transformed data block
-   this block gets compiled into .cpp model object's constructor
+   this block is part of the generated cpp object's constructor
 */
 
 

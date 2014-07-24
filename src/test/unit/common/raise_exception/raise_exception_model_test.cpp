@@ -5,7 +5,7 @@
 #include <test/test-models/no-main/gm/raise_exception_model.cpp>
 
 /* tests that stan program throws exception in model block
-   this block gets compiled into .cpp model object's constructor
+   this block gets compiled into .cpp model object's log_prob method
 */
 
 TEST(StanCommon, raise_exception_model) {
