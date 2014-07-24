@@ -3,7 +3,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradFwdMatrixCbind,fd) {
+TEST(AgradFwdMatrixAppendCol,fd) {
   using stan::math::append_col;
   using stan::agrad::matrix_fd;
   using Eigen::MatrixXd;
@@ -38,7 +38,7 @@ TEST(AgradFwdMatrixCbind,fd) {
       EXPECT_EQ(ab_append_col(i, j).val_, adb_append_col(i ,j));
 }
 
-TEST(AgradFwdRowVectorCbind,fd) {
+TEST(AgradFwdRowVectorAppendCol,fd) {
   using stan::math::append_col;
   using stan::agrad::row_vector_fd;
   using Eigen::RowVectorXd;
