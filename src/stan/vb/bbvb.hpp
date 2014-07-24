@@ -53,7 +53,7 @@ namespace stan {
           muL.to_unconstrained(z_check);
           elbo += model_.template log_prob<false, true>(z_check, &std::cout);
         }
-        elbo /= static_cast<double>n_monte_carlo_;
+        elbo /= static_cast<double> (n_monte_carlo_);
 
         elbo += 0.5 * (stan::math::log_determinant(LTL));
 
