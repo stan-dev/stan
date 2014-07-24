@@ -1593,19 +1593,26 @@ Note that the Lomax distribution is a Pareto Type 2 distribution with $\mu=0$.
 \begin{description}
   \fitem{real}{pareto\_type\_2\_log}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
     \farg{alpha}}{The log of the Pareto Type 2 density of \farg{y} given
-    location value \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}}
+    location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
 %
   \fitem{real}{pareto\_type\_2\_cdf}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
     \farg{alpha}}{The Pareto Type 2 cumulative distribution function of \farg{y} given
-    location value \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}}
+    location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
 %
   \fitem{real}{pareto\_type\_2\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
     \farg{alpha}}{The log of the Pareto Type 2 cumulative distribution function of \farg{y} given
-    location value \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}}
+    location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
 %
   \fitem{real}{pareto\_type\_2\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
     \farg{alpha}}{The log of the Pareto Type 2 complementary cumulative distribution function
-     of \farg{y} given location value \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}}
+     of \farg{y} given location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{pareto\_type\_2\_rng}{real \farg{mu}, real \farg{lambda}, real
+  \farg{alpha}}{Generate a Pareto Type 2 variate with location 
+  \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}; may only be used in generated 
+  quantities block}
 \end{description}
 
 
