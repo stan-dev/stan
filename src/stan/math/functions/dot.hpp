@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__DOT_HPP__
-#define __STAN__MATH__FUNCTIONS__DOT_HPP__
+#ifndef STAN__MATH__FUNCTIONS__DOT_HPP
+#define STAN__MATH__FUNCTIONS__DOT_HPP
 
 #include <vector>
 #include <cstddef>

@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LBETA_HPP__
-#define __STAN__MATH__FUNCTIONS__LBETA_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LBETA_HPP
+#define STAN__MATH__FUNCTIONS__LBETA_HPP
 
 #include <boost/math/tools/promotion.hpp>
 

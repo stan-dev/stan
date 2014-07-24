@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__MCMC__WRITER__HPP__
-#define __STAN__IO__MCMC__WRITER__HPP__
+#ifndef STAN__IO__MCMC__WRITER__HPP
+#define STAN__IO__MCMC__WRITER__HPP
 
 #include <ostream>
 #include <iomanip>

@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__WELFORD__COVAR__ESTIMATOR__BETA__
-#define __STAN__PROB__WELFORD__COVAR__ESTIMATOR__BETA__
+#ifndef STAN__PROB__WELFORD__COVAR__ESTIMATOR__BETA
+#define STAN__PROB__WELFORD__COVAR__ESTIMATOR__BETA
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>

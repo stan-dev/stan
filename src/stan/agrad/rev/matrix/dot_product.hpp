@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__DOT_PRODUCT_HPP__
-#define __STAN__AGRAD__REV__MATRIX__DOT_PRODUCT_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__DOT_PRODUCT_HPP
+#define STAN__AGRAD__REV__MATRIX__DOT_PRODUCT_HPP
 
 #include <vector>
 #include <boost/utility/enable_if.hpp>

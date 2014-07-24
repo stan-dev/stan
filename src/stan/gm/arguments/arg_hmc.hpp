@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__HMC__HPP__
-#define __STAN__GM__ARGUMENTS__HMC__HPP__
+#ifndef STAN__GM__ARGUMENTS__HMC__HPP
+#define STAN__GM__ARGUMENTS__HMC__HPP
 
 #include <stan/gm/arguments/categorical_argument.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__SEQ_VIEW_HPP__
-#define __STAN__MATH__SEQ_VIEW_HPP__
+#ifndef STAN__MATH__SEQ_VIEW_HPP
+#define STAN__MATH__SEQ_VIEW_HPP
 
 #include <vector>
 

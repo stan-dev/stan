@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__SIZE_HPP__
-#define __STAN__MATH__MATRIX__SIZE_HPP__
+#ifndef STAN__MATH__MATRIX__SIZE_HPP
+#define STAN__MATH__MATRIX__SIZE_HPP
 
 #include <vector>
 

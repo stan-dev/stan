@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP__
-#define __STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP__
+#ifndef STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP
+#define STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP
 
 // global include
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>

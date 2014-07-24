@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__PROB__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
-#define __STAN__AGRAD__FWD__PROB__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
+#ifndef STAN__AGRAD__FWD__PROB__UNIVARIATE__CONTINUOUS__NORMAL_HPP
+#define STAN__AGRAD__FWD__PROB__UNIVARIATE__CONTINUOUS__NORMAL_HPP
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

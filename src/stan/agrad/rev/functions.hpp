@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS_HPP
+#define STAN__AGRAD__REV__FUNCTIONS_HPP
 
 #include <stan/agrad/rev/functions/Phi.hpp>
 #include <stan/agrad/rev/functions/Phi_approx.hpp>

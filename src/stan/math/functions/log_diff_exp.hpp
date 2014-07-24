@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LOG_DIFF_EXP_HPP__
-#define __STAN__MATH__FUNCTIONS__LOG_DIFF_EXP_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LOG_DIFF_EXP_HPP
+#define STAN__MATH__FUNCTIONS__LOG_DIFF_EXP_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stdexcept>

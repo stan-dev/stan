@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__COMPILER_HPP__
-#define __STAN__GM__COMPILER_HPP__
+#ifndef STAN__GM__COMPILER_HPP
+#define STAN__GM__COMPILER_HPP
 
 #include <stan/gm/ast.hpp>
 #include <stan/gm/generator.hpp>

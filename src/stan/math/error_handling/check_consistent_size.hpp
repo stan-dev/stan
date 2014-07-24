@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__ERROR_HANDLING__CHECK_CONSISTENT_SIZE_HPP__
-#define __STAN__MATH__ERROR_HANDLING__CHECK_CONSISTENT_SIZE_HPP__
+#ifndef STAN__MATH__ERROR_HANDLING__CHECK_CONSISTENT_SIZE_HPP
+#define STAN__MATH__ERROR_HANDLING__CHECK_CONSISTENT_SIZE_HPP
 
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/meta/traits.hpp>

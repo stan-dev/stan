@@ -24,12 +24,12 @@ namespace stan {
       mock_hmc(mock_model& m, rng_t& rng, std::ostream* o, std::ostream* e) : 
         base_hmc<mock_model,ps_point,mock_hamiltonian,mock_integrator,rng_t>
         (m, rng, o, e)
-      { this->_name = "Mock HMC"; }
+      { this->name_ = "Mock HMC"; }
       
       
       sample transition(sample& init_sample) {
         this->seed(init_sample.cont_params());
-        return sample(this->_z.q, - this->_hamiltonian.V(this->_z), 0);
+        return sample(this->z_.q, - this->hamiltonian_.V(this->z_), 0);
       }
       
       void write_sampler_param_names(std::ostream& o) {};

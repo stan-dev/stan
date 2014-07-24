@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__DO_BFGS_OPTIMIZE_HPP__
-#define __STAN__COMMON__DO_BFGS_OPTIMIZE_HPP__
+#ifndef STAN__COMMON__DO_BFGS_OPTIMIZE_HPP
+#define STAN__COMMON__DO_BFGS_OPTIMIZE_HPP
 
 #include <fstream>
 #include <iostream>
