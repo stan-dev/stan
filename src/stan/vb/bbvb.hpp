@@ -1,5 +1,5 @@
-#ifndef __STAN__VB__BBVB__HPP__
-#define __STAN__VB__BBVB__HPP__
+#ifndef STAN__VB__BBVB__HPP
+#define STAN__VB__BBVB__HPP
 
 #include <ostream>
 
@@ -17,8 +17,7 @@ namespace stan {
   namespace vb {
 
     template <class M, class BaseRNG>
-    class bbvb : public base_vb
-    {
+    class bbvb : public base_vb {
 
     public:
 
@@ -26,11 +25,11 @@ namespace stan {
            Eigen::VectorXd const& cont_params,
            BaseRNG& rng,
            std::ostream* o, std::ostream* e):
-        base_vb(o, e),
+        base_vb(o, e, "bbvb"),
         model_(m),
         cont_params_(cont_params),
         rng_(rng),
-        num_of_Monte_Carlo_(100) {};
+        n_monte_carlo_(100) {};
 
       virtual ~bbvb() {};
 
@@ -40,33 +39,28 @@ namespace stan {
        *  the sample, and evaluating the log joint, adjusted by the entropy
        *  term of the normal, which is proportional to 0.5*logdet(L^T L)
        **/
-      double calc_ELBO(latent_vars const& muL)
-      {
+      double calc_ELBO(latent_vars const& muL) {
         double elbo(0);
         int dim = muL.dimension();
         Eigen::VectorXd zero_mean = Eigen::VectorXd::Zero(dim);
         Eigen::MatrixXd eye = Eigen::MatrixXd::Identity(dim, dim);
 
-        Eigen::MatrixXd LTL = muL.L().transpose()*muL.L();
+        Eigen::MatrixXd LTL = muL.L().transpose() * muL.L();
 
         Eigen::VectorXd z_check;
-        for (int i = 0; i < num_of_Monte_Carlo_; ++i)
-        {
+        for (int i = 0; i < n_monte_carlo_; ++i) {
           z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);
           muL.to_unconstrained(z_check);
-          elbo += model_.template
-                    log_prob<false, true>(z_check,
-                                          &std::cout);
+          elbo += model_.template log_prob<false, true>(z_check, &std::cout);
         }
-        elbo /= num_of_Monte_Carlo_;
+        elbo /= static_cast<double> (n_monte_carlo_);
 
-        elbo += 0.5*(stan::math::log_determinant(LTL));
+        elbo += 0.5 * (stan::math::log_determinant(LTL));
 
         return elbo;
-      };
+      }
 
-      void test()
-      {
+      void test() {
         if (out_stream_) *out_stream_ << "This is base_vb::bbvb::test()" << std::endl;
 
         // OK, let's use this gradient thing to compute the log_prob
@@ -107,8 +101,8 @@ namespace stan {
 
 
         // Now let's test this latent_vars class we just wrote
-        Eigen::VectorXd mu = Eigen::VectorXd::Constant(model_.num_params_r(),5.0);
-        Eigen::MatrixXd L = Eigen::MatrixXd::Identity(model_.num_params_r(),model_.num_params_r());
+        Eigen::VectorXd mu = Eigen::VectorXd::Constant(model_.num_params_r(), 5.0);
+        Eigen::MatrixXd L = Eigen::MatrixXd::Identity(model_.num_params_r(), model_.num_params_r());
 
         latent_vars muL = latent_vars(mu,L);
 
@@ -139,24 +133,14 @@ namespace stan {
                                       << elbo << std::endl << std::endl;
 
         return;
-      };
+      }
 
     protected:
 
       M& model_;
       Eigen::VectorXd cont_params_;
       BaseRNG& rng_;
-      int num_of_Monte_Carlo_;
-
-      void write_error_msg_(std::ostream* error_msgs, const std::exception& e)
-      {
-        if (!error_msgs) return;
-
-        *error_msgs << std::endl
-                    << "[stan::vb::bbvb.hpp] encountered an error:"
-                    << std::endl
-                    << e.what() << std::endl << std::endl;
-      };
+      int n_monte_carlo_;
 
     };
 

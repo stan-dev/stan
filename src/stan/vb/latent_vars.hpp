@@ -1,5 +1,5 @@
-#ifndef __STAN__VB__LATENT_VARS__HPP__
-#define __STAN__VB__LATENT_VARS__HPP__
+#ifndef STAN__VB__LATENT_VARS__HPP
+#define STAN__VB__LATENT_VARS__HPP
 
 #include <vector>
 
@@ -12,9 +12,8 @@ namespace stan {
 
   namespace vb {
 
-    class latent_vars
-    {
-
+    class latent_vars {
+      
     private:
 
       Eigen::VectorXd mu_; // Mean of location-scale family
@@ -24,15 +23,12 @@ namespace stan {
     public:
 
       latent_vars(Eigen::VectorXd const& mu, Eigen::MatrixXd const& L) :
-      mu_(mu), L_(L), dimension_(mu.size())
-      {
+      mu_(mu), L_(L), dimension_(mu.size()) {
 
         static const char* function = "stan::vb::latent_vars(%1%)";
 
         double tmp(0.0);
-        stan::math::check_square(function,
-                         L_, "Scale matrix",
-                         &tmp);
+        stan::math::check_square(function, L_, "Scale matrix", &tmp);
         stan::math::check_size_match(function,
                          L_.rows(), "Dimension of scale matrix",
                          dimension_, "Dimension of mean vector",
@@ -42,24 +38,14 @@ namespace stan {
 
       virtual ~latent_vars() {}; // No-op
 
-      int dimension() const
-      {
-        return dimension_;
-      };
+      int dimension() const { return dimension_; }
+      
+      Eigen::VectorXd const& mu() const { return mu_; }
 
-      Eigen::VectorXd const& mu() const
-      {
-        return mu_;
-      };
-
-      Eigen::MatrixXd const& L() const
-      {
-        return L_;
-      };
+      Eigen::MatrixXd const& L() const { return L_; }
 
       // Implements g^{-1}(\check{z}) = L\check{z} + \mu
-      void to_unconstrained(Eigen::VectorXd& x) const
-      {
+      void to_unconstrained(Eigen::VectorXd& x) const {
         static const char* function = "stan::vb::latent_vars"
                                       "::to_unconstrained(%1%)";
 
@@ -69,12 +55,11 @@ namespace stan {
                          dimension_, "Dimension of mean vector",
                          &tmp);
 
-        x = L_*x + mu_;
+        x = L_ * x + mu_;
       };
 
       // Implements g(\widetilde{z}) = L^{-1}(\check{z} - \mu)
-      void to_standardized(Eigen::VectorXd& x) const
-      {
+      void to_standardized(Eigen::VectorXd& x) const {
         static const char* function = "stan::vb::latent_vars"
                                       "::to_standardized(%1%)";
 
@@ -84,7 +69,7 @@ namespace stan {
                          dimension_, "Dimension of mean vector",
                          &tmp);
 
-        Eigen::MatrixXd x_minus_mu = x-mu_;
+        Eigen::MatrixXd x_minus_mu = x - mu_;
         x = stan::math::mdivide_left_tri_low(L_, x_minus_mu);
       };
 
