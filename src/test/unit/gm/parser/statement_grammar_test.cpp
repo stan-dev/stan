@@ -57,3 +57,12 @@ TEST(gmParserStatementGrammarDef, comparisonsInBoundsTest) {
   EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_bounds1.stan"),
                std::invalid_argument);
 }
+
+TEST(gmParserStatementGrammar, validateAssignmentTypes) {
+  test_throws("bad_var_assignment_type1",
+              "mismatch in assignment");
+  test_throws("bad_var_assignment_type2",
+              "mismatch in assignment");
+  test_throws("bad_var_assignment_vec_arr",
+              "mismatch in assignment");
+}
