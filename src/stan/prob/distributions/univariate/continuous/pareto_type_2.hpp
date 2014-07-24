@@ -74,7 +74,7 @@ namespace stan {
                        is_vector<T_y>::value> log1p_scaled_diff(N);
       if (include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
         for (size_t n = 0; n < N; n++)
-          log1p_scaled_diff[n] = log(1.0 + (value_of(y_vec[n]) 
+          log1p_scaled_diff[n] = log1p((value_of(y_vec[n]) 
                                             - value_of(mu_vec[n]))
                                        / value_of(lambda_vec[n]));
 
@@ -101,6 +101,10 @@ namespace stan {
         const double mu_dbl = value_of(mu_vec[n]);
         const double lambda_dbl = value_of(lambda_vec[n]);
         const double alpha_dbl = value_of(alpha_vec[n]);
+        const double sum_dbl = lambda_dbl + y_dbl + mu_dbl;
+        const double inv_sum = 1.0 / sum_dbl;
+        const double alpha_div_sum = alpha_dbl / sum_dbl;
+        const double deriv_1_2 = inv_sum + alpha_div_sum;
 
         // // log probability
         if (include_summand<propto,T_shape>::value)
@@ -112,15 +116,12 @@ namespace stan {
   
         // gradients
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] -= (1.0 + alpha_dbl) 
-            / (lambda_dbl + y_dbl + mu_dbl);
+          operands_and_partials.d_x1[n] -= deriv_1_2;
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] += (1.0 + alpha_dbl) 
-            / (lambda_dbl + y_dbl + mu_dbl); 
+          operands_and_partials.d_x2[n] += deriv_1_2;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] -= (alpha_dbl * mu_dbl - alpha_dbl 
-                                            * y_dbl + lambda_dbl) 
-            / (lambda_dbl * (lambda_dbl + y_dbl + mu_dbl));
+          operands_and_partials.d_x3[n] -= alpha_div_sum * (mu_dbl - y_dbl)
+            / lambda_dbl + inv_sum;
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x4[n] += inv_alpha[n] - log1p_scaled_diff[n];
       }
@@ -231,18 +232,20 @@ namespace stan {
         const double alpha_dbl = value_of(alpha_vec[n]);
               
         const double Pn = 1.0 - p1_pow_alpha[n];
+
+        const double grad_1_2 = alpha_dbl * p1_pow_alpha_minus_one[n]
+          / lambda_dbl / Pn;
+
         // Compute
         P *= Pn;
               
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += alpha_dbl * p1_pow_alpha_minus_one[n]
-            / lambda_dbl / Pn;
+          operands_and_partials.d_x1[n] += grad_1_2;
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] -= alpha_dbl * p1_pow_alpha_minus_one[n]
-            / lambda_dbl / Pn;
+          operands_and_partials.d_x2[n] -= grad_1_2;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += alpha_dbl * (mu_dbl - y_dbl)
-            * p1_pow_alpha_minus_one[n] / lambda_dbl / lambda_dbl / Pn;
+          operands_and_partials.d_x3[n] += (mu_dbl - y_dbl)
+            * grad_1_2 / lambda_dbl;
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x4[n] += grad_3[n] / Pn;
       }
@@ -364,20 +367,20 @@ namespace stan {
         const double mu_dbl = value_of(mu_vec[n]);
         const double lambda_dbl = value_of(lambda_vec[n]);
         const double alpha_dbl = value_of(alpha_vec[n]);
+
+        const double grad_1_2 =  alpha_dbl 
+          * inv_p1_pow_alpha_minus_one[n] / (lambda_dbl - mu_dbl + y_dbl);
               
         // Compute
         P += cdf_log[n];
               
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += alpha_dbl 
-            * inv_p1_pow_alpha_minus_one[n] / (lambda_dbl - mu_dbl + y_dbl);
+          operands_and_partials.d_x1[n] += grad_1_2;
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] -= alpha_dbl 
-            * inv_p1_pow_alpha_minus_one[n] / (lambda_dbl - mu_dbl + y_dbl);
+          operands_and_partials.d_x2[n] -= grad_1_2;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += alpha_dbl * (mu_dbl - y_dbl) 
-            * inv_p1_pow_alpha_minus_one[n] / lambda_dbl
-            / (lambda_dbl - mu_dbl + y_dbl);
+          operands_and_partials.d_x3[n] += (mu_dbl - y_dbl) * grad_1_2 
+            / lambda_dbl;
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x4[n] += log_1p_y_over_lambda[n] 
             * inv_p1_pow_alpha_minus_one[n];
@@ -465,8 +468,6 @@ namespace stan {
         const double alpha_dbl = value_of(alpha_vec[i]);
         const double temp = 1.0 + (y_dbl - mu_dbl) / lambda_dbl;
 
-        ccdf_log[i] = log(pow(temp, -alpha_dbl));
-
         if (!is_constant_struct<T_y>::value 
             || !is_constant_struct<T_loc>::value 
             || !is_constant_struct<T_scale>::value 
@@ -475,6 +476,8 @@ namespace stan {
 
         if (!is_constant_struct<T_shape>::value)
           log_1p_y_over_lambda[i] = log(temp);
+
+        ccdf_log[i] = -alpha_dbl * log_1p_y_over_lambda[i];
       }
 
       // Compute vectorized CDF and its gradients
