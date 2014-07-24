@@ -45,8 +45,6 @@ namespace stan {
         Eigen::VectorXd zero_mean = Eigen::VectorXd::Zero(dim);
         Eigen::MatrixXd eye = Eigen::MatrixXd::Identity(dim, dim);
 
-        Eigen::MatrixXd LTL = muL.L().transpose() * muL.L();
-
         Eigen::VectorXd z_check;
         for (int i = 0; i < n_monte_carlo_; ++i) {
           z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);
@@ -55,7 +53,8 @@ namespace stan {
         }
         elbo /= static_cast<double> (n_monte_carlo_);
 
-        elbo += 0.5 * (stan::math::log_determinant(LTL));
+        // 0.5 * log det (L^T L) = 0.5 * 2 * sum(diag(L))
+        elbo += stan::math::sum(stan::math::diagonal(muL.L()));
 
         return elbo;
       }
