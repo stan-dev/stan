@@ -463,23 +463,6 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
     }
 add_binary("lognormal_rng");
-for (size_t i = 0; i < vector_types.size(); ++i)
-  for (size_t j = 0; j < vector_types.size(); ++j)
-    for (size_t k = 0; k < vector_types.size(); ++k) {
-      add("lomax_ccdf_log",
-          DOUBLE_T, // result
-          vector_types[i], vector_types[j], vector_types[k]); // args
-      add("lomax_cdf",
-          DOUBLE_T, // result
-          vector_types[i], vector_types[j], vector_types[k]); // args
-      add("lomax_cdf_log",
-          DOUBLE_T, // result
-          vector_types[i], vector_types[j], vector_types[k]); // args
-      add("lomax_log",
-          DOUBLE_T, // result
-          vector_types[i], vector_types[j], vector_types[k]); // args
-    }
-add_binary("lomax_rng");
 add_nullary("machine_precision");
 add("max",INT_T,expr_type(INT_T,1));
 add("max",DOUBLE_T,expr_type(DOUBLE_T,1));
