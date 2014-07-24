@@ -1,8 +1,8 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__PARETO_TYPE_2_HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__PARETO_TYPE_2_HPP
 
-#include <boost/random/exponential_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
@@ -503,6 +503,23 @@ namespace stan {
       }
           
       return operands_and_partials.to_var(P);
+    }
+
+    template <class RNG>
+    inline double
+    pareto_type_2_rng(const double mu,
+                      const double lambda,
+                      const double alpha,
+                      RNG& rng) {
+      static const char* function = "stan::prob::pareto_type_2_rng(%1%)";
+      
+      stan::math::check_positive(function, lambda, "scale parameter", 
+                                 (double*)0);
+
+      double uniform_01 = stan::prob::uniform_rng(0.0, 1.0, rng);
+
+
+      return (std::pow(1.0 - uniform_01, -1.0 / alpha) - 1.0) * lambda + mu;
     }
   }
 }
