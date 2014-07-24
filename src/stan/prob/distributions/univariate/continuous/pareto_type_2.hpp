@@ -66,11 +66,6 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, mu, lambda, alpha);
 
-      for (size_t n = 0; n < N; n++) {
-        if (y_vec[n] < mu_vec[n])
-          return LOG_ZERO;
-      }
-
       // set up template expressions wrapping scalars into vector views
       agrad::OperandsAndPartials<T_y,T_loc,T_scale,T_shape> 
         operands_and_partials(y, mu, lambda, alpha);
