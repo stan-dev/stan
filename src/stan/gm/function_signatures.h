@@ -614,6 +614,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
             DOUBLE_T, // result
             vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
       }
+add_ternary("pareto_type_2_rng");
 add_unary("Phi");
 add_unary("Phi_approx");
 add_nullary("pi");
