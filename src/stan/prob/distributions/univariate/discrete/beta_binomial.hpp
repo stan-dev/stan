@@ -545,9 +545,8 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
 
       static const char* function = "stan::prob::beta_binomial_rng(%1%)";
 
-      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
-      using stan::math::check_positive;
   
       check_nonnegative(function, N, "Population size parameter", (double*)0);
       check_positive_finite(function, alpha, 
