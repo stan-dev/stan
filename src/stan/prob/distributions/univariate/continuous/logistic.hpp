@@ -6,7 +6,7 @@
 
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling/check_not_nan.hpp>
-#include <stan/math/error_handling/check_positive.hpp>
+#include <stan/math/error_handling/check_positive_finite.hpp>
 #include <stan/math/error_handling/check_finite.hpp>
 #include <stan/math/error_handling/check_consistent_sizes.hpp>
 #include <stan/math/constants.hpp>
