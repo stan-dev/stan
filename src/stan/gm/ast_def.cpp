@@ -1293,7 +1293,7 @@ namespace stan {
     print_statement::print_statement(const std::vector<printable>& printables) 
       : printables_(printables) { 
     }
-    
+
     program::program() { }
     program::program(const std::vector<function_decl_def>& function_decl_defs,
                      const std::vector<var_decl>& data_decl,
