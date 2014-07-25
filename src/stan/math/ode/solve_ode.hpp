@@ -72,7 +72,7 @@ namespace stan {
       double absolute_tolerance = 1e-6;
       double relative_tolerance = 1e-6;
 
-      vector<double> y0_vec(y0.size()*2);
+      std::vector<double> y0_vec(y0.size()*2);
       for (size_t n = 0; n < y0.size(); n++)
         y0_vec[n] = y0[n];
       for (size_t n = y0.size(); n < 2*y0.size(); n++)
@@ -80,7 +80,7 @@ namespace stan {
 
       std::vector<double> ts_vec(ts.size()+1);
       ts_vec[0] = 0.0;
-      for (size_t n = 0; n < t.ssize(); n++)
+      for (size_t n = 0; n < ts.size(); n++)
         ts_vec[n+1] = ts[n];
       
       T step_size = ts_vec[1] - ts_vec[0];
