@@ -2008,6 +2008,40 @@ arbitrary subvector.
 \end{description}
 
 
+\subsection{Concatenation Operations}
+
+\subsubsection{Horizontal concatenation}
+
+\begin{description}
+%
+\fitem{matrix}{append\_col}{matrix \farg{x}, matrix \farg{y}}{Combine matrices \farg{x} and \farg{y} by columns. The matrices must have the same number of rows.}
+%
+\fitem{matrix}{append\_col}{matrix \farg{x}, vector \farg{y}}{Combine matrix \farg{x} and vector \farg{y} by columns. The matrix and the vector must have the same number of rows.}
+%
+\fitem{matrix}{append\_col}{vector \farg{x}, matrix \farg{y}}{Combine vector \farg{x} and matrix \farg{y} by columns. The vector and the matrix must have the same number of rows.}
+%
+\fitem{matrix}{append\_col}{vector \farg{x}, vector \farg{y}}{Combine vectors \farg{x} and \farg{y} by columns. The vectors must have the same number of rows.}
+%
+\fitem{row\_vector}{append\_col}{row\_vector \farg{x}, row\_vector \farg{y}}{Combine row vectors \farg{x} and \farg{y} of any size into another row vector.}
+%
+\end{description}
+
+\subsubsection{Vertical concatenation}
+
+\begin{description}
+%
+\fitem{matrix}{append\_row}{matrix \farg{x}, matrix \farg{y}}{Combine matrices \farg{x} and \farg{y} by columns. The matrices must have the same number of rows.}
+%
+\fitem{matrix}{append\_row}{matrix \farg{x}, row\_vector \farg{y}}{Combine matrix \farg{x} and row vector \farg{y} by columns. The matrix and the row vector must have the same number of rows.}
+%
+\fitem{matrix}{append\_row}{row\_vector \farg{x}, matrix \farg{y}}{Combine row vector \farg{x} and matrix \farg{y} by columns. The row vector and the matrix must have the same number of rows.}
+%
+\fitem{matrix}{append\_row}{row\_vector \farg{x}, row\_vector \farg{y}}{Combine row vectors \farg{x} and \farg{y} by columns. The row vectors must have the same number of rows.}
+%
+\fitem{vector}{append\_row}{vector \farg{x}, vector \farg{y}}{Combine vectors \farg{x} and \farg{y} of any size into another vector.}
+%
+\end{description}
+
 \subsection{Transposition Postfix Operator}
 
 \begin{description}
@@ -2018,7 +2052,7 @@ arbitrary subvector.
 \fitem{row\_vector}{operator'}{vector \farg{x}}{The transpose of the vector
  \farg{x}, written as \code{x'}}
 %
-\fitem{vector}{operator'}{row\_vector \farg{x}}{The transpose of the vector
+\fitem{vector}{operator'}{row\_vector \farg{x}}{The transpose of the row vector
  \farg{x}, written as \code{x'}}
 %
 \end{description}
