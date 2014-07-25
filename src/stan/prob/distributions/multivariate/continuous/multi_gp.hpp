@@ -60,6 +60,7 @@ namespace stan {
       using stan::math::sum;
       using stan::math::check_not_nan;
       using stan::math::check_size_match;
+      using stan::math::check_positive_finite;
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_symmetric;
@@ -90,8 +91,7 @@ namespace stan {
                        y.cols(), "Size of random variable",
                        Sigma.rows(), "rows of covariance parameter",
                        &lp);
-      check_finite(function, w, "Kernel scales", &lp);
-      check_positive(function, w, "Kernel scales", &lp);
+      check_positive_finite(function, w, "Kernel scales", &lp);
       check_finite(function, y, "Random variable", &lp);
       
       if (y.rows() == 0)
