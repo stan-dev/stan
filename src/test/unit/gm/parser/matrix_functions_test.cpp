@@ -7,6 +7,14 @@
 #include <stdexcept>
 #include <test/unit/gm/utility.hpp>
 
+TEST(gm_parser, append_col_matrix_function_signatures) {
+  test_parsable("function-signatures/math/matrix/append_col");
+}
+
+TEST(gm_parser, append_row_matrix_function_signatures) {
+  test_parsable("function-signatures/math/matrix/append_row");
+}
+
 TEST(gm_parser, block_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/block");
 }
