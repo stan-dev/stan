@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__CSV_WRITER_HPP__
-#define __STAN__IO__CSV_WRITER_HPP__
+#ifndef STAN__IO__CSV_WRITER_HPP
+#define STAN__IO__CSV_WRITER_HPP
 
 #include <stan/math/matrix.hpp>
 #include <ostream>

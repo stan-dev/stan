@@ -45,10 +45,10 @@ radon_no_pool.sf1 <- stan(file='radon_no_pool.stan', data=dataList.2,
                           iter=1000, chains=4)
 print(radon_no_pool.sf1)
 post.unpooled <- extract(radon_no_pool.sf1)
-unpooled <- colMeans(post.unpooled$factor)
+unpooled <- colMeans(post.unpooled$a)
 sd.unpooled <- rep(NA,85)
 for (n in 1:85) {
-  sd.unpooled[n] <- sd(post.unpooled$factor[,n]) 
+  sd.unpooled[n] <- sd(post.unpooled$a[,n]) 
 }
 
 ## Comparing-complete pooling & no-pooling (Figure 12.2)

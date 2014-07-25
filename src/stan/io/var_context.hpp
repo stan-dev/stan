@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__VAR_CONTEXT_HPP__
-#define __STAN__IO__VAR_CONTEXT_HPP__
+#ifndef STAN__IO__VAR_CONTEXT_HPP
+#define STAN__IO__VAR_CONTEXT_HPP
 
 #include <sstream>
 #include <stdexcept>

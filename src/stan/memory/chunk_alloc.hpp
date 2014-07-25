@@ -1,5 +1,5 @@
-#ifndef __STAN__MEMORY__CHUNK_ALLOC_HPP__
-#define __STAN__MEMORY__CHUNK_ALLOC_HPP__
+#ifndef STAN__MEMORY__CHUNK_ALLOC_HPP
+#define STAN__MEMORY__CHUNK_ALLOC_HPP
 
 #include <cstdlib>
 #include <cstddef>

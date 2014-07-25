@@ -87,7 +87,7 @@ an initial value of 0 for \code{theta} leads to an unconstrained value
 of $-\infty$, whereas a value of 1 leads to an unconstrained value of
 $+\infty$.  While this will be inverse transformed back correctly
 given the behavior of floating point arithmetic, the Jacobian will be
-infinite and the log probability function will faill and raise an
+infinite and the log probability function will fail and raise an
 exception.  
 
 \subsection{Random Initial Values}
@@ -114,7 +114,7 @@ For parameters bounded above and below, the initial value of 0 on the
 unconstrained scale corresponds to a value at the midpoint of the
 constraint interval.  For probability parameters, bounded below by 0
 and above by 1, the transform is the inverse logit, so that an initial
-unconstrained value of 0 corresonds to a constrained value of 0.5, -2
+unconstrained value of 0 corresponds to a constrained value of 0.5, -2
 corresponds to 0.12 and 2 to 0.88.  Bounds other than 0 and 1 are
 just scaled and translated.
 
@@ -127,7 +127,7 @@ on the diagonal and 0 elsewhere;  this is because the diagonal is log
 transformed and the below-diagonal values are unconstrained.
 
 The initial values for other parameters can be determined from the
-transfrom that is applied.  The transforms are all described in full
+transform that is applied.  The transforms are all described in full
 detail in \refchapter{variable-transforms}.
 
 \subsection{Zero Initial Values}
@@ -1303,7 +1303,7 @@ vice-versa.
 
 For arguments to functions, constraints are sometimes, but not always
 checked when the function is called.  Exclusions include \Cpp standard
-library functions.  All probabiliy functions and cumulative
+library functions.  All probability functions and cumulative
 distribution functions check that their arguments are appropriate at
 run time as the function is called.  
 
@@ -2404,7 +2404,7 @@ increment_log_prob(-0.5 * y * y);
 \end{quote}
 %
 In this example, the unnormalized log probability of a unit normal
-variable $y$ is adeed to the total log probability.  In the general
+variable $y$ is added to the total log probability.  In the general
 case, the argument can be any expression.%
 %
 \footnote{Writing this model with the expression \code{-0.5 * y * y}

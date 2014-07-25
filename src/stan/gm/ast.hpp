@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__AST_HPP__
-#define __STAN__GM__AST_HPP__
+#ifndef STAN__GM__AST_HPP
+#define STAN__GM__AST_HPP
 
 #include <map>
 #include <string>

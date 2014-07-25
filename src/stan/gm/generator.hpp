@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__GENERATOR_HPP__
-#define __STAN__GM__GENERATOR_HPP__
+#ifndef STAN__GM__GENERATOR_HPP
+#define STAN__GM__GENERATOR_HPP
 
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/lexical_cast.hpp>

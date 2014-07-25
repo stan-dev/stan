@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__TRANSFORM_HPP__
-#define __STAN__PROB__TRANSFORM_HPP__
+#ifndef STAN__PROB__TRANSFORM_HPP
+#define STAN__PROB__TRANSFORM_HPP
 
 #include <cmath>
 #include <cstddef>
