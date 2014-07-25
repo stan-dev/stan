@@ -1434,8 +1434,8 @@ quantities block}
 
 \subsubsection{Probability Density Function}
 
-If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
-[0,\infty)$, 
+If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
+\posreals$, 
 \[
 \distro{Weibull}(y|\alpha,\sigma)
 = 
@@ -1476,53 +1476,6 @@ If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
   \farg{alpha} and scale \farg{sigma}; may only be used in generated 
 quantities block}
 \end{description}
-
-\section{Fr\'{e}chet Distribution}
-
-\subsubsection{Probability Density Function}
-
-If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
-\posreals$, 
-\[
-\distro{Frechet}(y|\alpha,\sigma)
-= 
-\frac{\alpha}{\sigma}
-\,
-\left( \frac{y}{\sigma} \right)^{-\alpha - 1}
-\,
-\exp \! \left( \! - \left( \frac{y}{\sigma} \right)^{-\alpha}  \right)
-.
-\]
-\pitem{y}{frechet}{alpha,sigma}
-
-\subsubsection{Stan Functions}
-
-\begin{description}
-\fitem{real}{frechet\_log}{reals \farg{y}, reals \farg{alpha}, reals
-  \farg{sigma}}{The log of the Fr\'{e}chet density of \farg{y} given shape
-  \farg{alpha} and scale \farg{sigma}}
-%
-\fitem{real}{frechet\_cdf}{reals \farg{y}, reals \farg{alpha}, reals
-  \farg{sigma}}{The Fr\'{e}chet cumulative distribution function of \farg{y} given
-  shape \farg{alpha} and scale \farg{sigma}}
-%
-\fitem{real}{frechet\_cdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
-  \farg{sigma}}{The log of the Fr\'{e}chet cumulative distribution function of 
-  \farg{y} given shape \farg{alpha} and scale \farg{sigma}}
-%
-\fitem{real}{frechet\_ccdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
-  \farg{sigma}}{The log of the Fr\'{e}chet complementary cumulative 
-  distribution function of \farg{y} given shape \farg{alpha} and scale 
-  \farg{sigma}}
-\end{description}
-%
-\begin{description}
-\fitem{real}{frechet\_rng}{real \farg{alpha}, real
-  \farg{sigma}}{Generate an Fr\'{e}chet variate with shape
-  \farg{alpha} and scale \farg{sigma}; may only be used in generated 
-quantities block}
-\end{description}
-
 
 \chapter{Non-negative Continuous Distributions}
 \noindent

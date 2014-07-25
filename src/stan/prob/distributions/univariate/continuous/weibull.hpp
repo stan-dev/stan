@@ -16,7 +16,7 @@ namespace stan {
 
   namespace prob {
 
-    // Weibull(y|alpha,sigma)     [y >= 0;  alpha > 0;  sigma > 0]
+    // Weibull(y|sigma,alpha)     [y >= 0;  sigma > 0;  alpha > 0]
     // FIXME: document
     template <bool propto,
               typename T_y, typename T_shape, typename T_scale>
@@ -123,7 +123,8 @@ namespace stan {
             + (1.0 - y_div_sigma_pow_alpha[n]) * (log_y[n] - log_sigma[n]);
         if (!is_constant_struct<T_scale>::value) 
           operands_and_partials.d_x3[n] 
-            += alpha_dbl * inv_sigma[n] * ( y_div_sigma_pow_alpha[n] - 1.0 );
+            += -alpha_dbl * inv_sigma[n]
+            + alpha_dbl * inv_sigma[n] * y_div_sigma_pow_alpha[n];
       }
       return operands_and_partials.to_var(logp);
     }
@@ -239,10 +240,10 @@ namespace stan {
         const double alpha_dbl = value_of(alpha_vec[n]);
         const double pow_ = pow(y_dbl / sigma_dbl, alpha_dbl);
         const double exp_ = exp(-pow_);
-        const double cdf_ = 1.0 - exp_;
+        const double cdf_log_ = 1.0 - exp_;
 
         //cdf_log
-        cdf_log += log(cdf_);
+        cdf_log += log(cdf_log_);
 
         //gradients
         const double rep_deriv = pow_ / (1.0 / exp_ - 1.0);

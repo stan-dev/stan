@@ -7,7 +7,6 @@
 #include <stan/prob/distributions/univariate/continuous/double_exponential.hpp>
 #include <stan/prob/distributions/univariate/continuous/exponential.hpp>
 #include <stan/prob/distributions/univariate/continuous/exp_mod_normal.hpp>
-#include <stan/prob/distributions/univariate/continuous/frechet.hpp>
 #include <stan/prob/distributions/univariate/continuous/gamma.hpp>
 #include <stan/prob/distributions/univariate/continuous/gumbel.hpp>
 #include <stan/prob/distributions/univariate/continuous/inv_chi_square.hpp>

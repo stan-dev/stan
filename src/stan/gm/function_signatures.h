@@ -293,23 +293,6 @@ add_binary("fmod");
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
-        add("frechet_ccdf_log",
-            DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k]); // args
-        add("frechet_cdf",
-            DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k]); // args
-        add("frechet_cdf_log",
-            DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k]); // args
-        add("frechet_log",
-            DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k]); // args
-    }
-add_binary("frechet_rng");
-for (size_t i = 0; i < vector_types.size(); ++i)
-  for (size_t j = 0; j < vector_types.size(); ++j)
-    for (size_t k = 0; k < vector_types.size(); ++k) {
       add("gamma_ccdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args

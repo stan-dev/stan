@@ -68,13 +68,6 @@ TEST(gm_parser, exponential_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/univariate/continuous/exponential/exponential_log");
 }
 
-TEST(gm_parser, frechet_distribution_function_signatures) {
-  test_parsable("function-signatures/distributions/univariate/continuous/frechet/frechet_ccdf_log");
-  test_parsable("function-signatures/distributions/univariate/continuous/frechet/frechet_cdf_log");
-  test_parsable("function-signatures/distributions/univariate/continuous/frechet/frechet_cdf");
-  test_parsable("function-signatures/distributions/univariate/continuous/frechet/frechet_log");
-}
-
 TEST(gm_parser, gamma_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/univariate/continuous/gamma/gamma_ccdf_log");
   test_parsable("function-signatures/distributions/univariate/continuous/gamma/gamma_cdf_log");
