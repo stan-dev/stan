@@ -4,6 +4,9 @@
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/error_handling.hpp>
