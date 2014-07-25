@@ -197,7 +197,7 @@ namespace stan {
                        || is_vector<T_loc>::value
                        || is_vector<T_scale>::value
                        || is_vector<T_shape>::value>
-        p1_pow_alpha_minus_one(N);
+        grad_1_2(N);
 
       DoubleVectorView<!is_constant_struct<T_shape>::value, 
                        is_vector<T_y>::value 
@@ -207,15 +207,17 @@ namespace stan {
         grad_3(N);
 
       for (size_t i = 0; i < N; i++) {
+        const double lambda_dbl = value_of(lambda_vec[i]);
+        const double alpha_dbl = value_of(alpha_vec[i]);
         const double temp = 1 + (value_of(y_vec[i]) 
                                  - value_of(mu_vec[i])) 
-          / value_of(lambda_vec[i]);
-        p1_pow_alpha[i] = pow(temp, -value_of(alpha_vec[i]));
+          / lambda_dbl;
+        p1_pow_alpha[i] = pow(temp, -alpha_dbl);
 
         if (!is_constant_struct<T_y>::value 
             || !is_constant_struct<T_loc>::value
             || !is_constant_struct<T_scale>::value)
-          p1_pow_alpha_minus_one[i] = p1_pow_alpha[i] / temp;
+          grad_1_2[i] = p1_pow_alpha[i] / temp * alpha_dbl / lambda_dbl;
 
         if (!is_constant_struct<T_shape>::value)
           grad_3[i] = log(temp) * p1_pow_alpha[i];
@@ -229,23 +231,19 @@ namespace stan {
         const double y_dbl = value_of(y_vec[n]);
         const double mu_dbl = value_of(mu_vec[n]);
         const double lambda_dbl = value_of(lambda_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
               
         const double Pn = 1.0 - p1_pow_alpha[n];
-
-        const double grad_1_2 = alpha_dbl * p1_pow_alpha_minus_one[n]
-          / lambda_dbl / Pn;
 
         // Compute
         P *= Pn;
               
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += grad_1_2;
+          operands_and_partials.d_x1[n] += grad_1_2[n] / Pn;
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] -= grad_1_2;
+          operands_and_partials.d_x2[n] -= grad_1_2[n] / Pn;
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] += (mu_dbl - y_dbl)
-            * grad_1_2 / lambda_dbl;
+            * grad_1_2[n] / lambda_dbl / Pn;
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x4[n] += grad_3[n] / Pn;
       }
@@ -325,10 +323,7 @@ namespace stan {
                        || is_vector<T_shape>::value>
         cdf_log(N);
 
-      DoubleVectorView<!is_constant_struct<T_y>::value 
-                       || !is_constant_struct<T_loc>::value 
-                       || !is_constant_struct<T_scale>::value 
-                       || !is_constant_struct<T_shape>::value, 
+      DoubleVectorView<true, 
                        is_vector<T_y>::value 
                        || is_vector<T_loc>::value
                        || is_vector<T_scale>::value
@@ -349,11 +344,7 @@ namespace stan {
         const double p1_pow_alpha = pow(temp, value_of(alpha_vec[i]));
         cdf_log[i] = log(1.0 - 1.0 / p1_pow_alpha);
 
-        if (!is_constant_struct<T_y>::value 
-            || !is_constant_struct<T_loc>::value 
-            || !is_constant_struct<T_scale>::value 
-            || !is_constant_struct<T_shape>::value)
-          inv_p1_pow_alpha_minus_one[i] = 1.0 / (p1_pow_alpha - 1.0);
+        inv_p1_pow_alpha_minus_one[i] = 1.0 / (p1_pow_alpha - 1.0);
 
         if (!is_constant_struct<T_shape>::value)
           log_1p_y_over_lambda[i] = log(temp);
@@ -467,6 +458,9 @@ namespace stan {
         const double lambda_dbl = value_of(lambda_vec[i]);
         const double alpha_dbl = value_of(alpha_vec[i]);
         const double temp = 1.0 + (y_dbl - mu_dbl) / lambda_dbl;
+        const double log_temp = log(temp);
+
+        ccdf_log[i] = -alpha_dbl * log_temp;
 
         if (!is_constant_struct<T_y>::value 
             || !is_constant_struct<T_loc>::value 
@@ -475,9 +469,7 @@ namespace stan {
           a_over_lambda_plus_y[i] = alpha_dbl / (y_dbl - mu_dbl + lambda_dbl);
 
         if (!is_constant_struct<T_shape>::value)
-          log_1p_y_over_lambda[i] = log(temp);
-
-        ccdf_log[i] = -alpha_dbl * log_1p_y_over_lambda[i];
+          log_1p_y_over_lambda[i] = log_temp;
       }
 
       // Compute vectorized CDF and its gradients
