@@ -69,13 +69,21 @@ namespace stan {
       using namespace boost::numeric::odeint;  // FIXME: trim to what is used
 
       ode_system<F,T> system(f,theta,x);
-      double absolute_tolerance = 1;
+      double absolute_tolerance = 1e-6;
       double relative_tolerance = 1e-6;
-      std::vector<T> y0_vec;
-      to_std_vector(y0,y0_vec);
-      std::vector<T> ts_vec;
-      to_std_vector(ts,ts_vec);
-      T step_size = 1.0;
+
+      std::vector<double> y0_vec(y0.size()*2);
+      for (size_t n = 0; n < y0.size(); n++)
+        y0_vec[n] = y0[n];
+      for (size_t n = y0.size(); n < 2*y0.size(); n++)
+        y0_vec[n] = 0.0;
+
+      std::vector<double> ts_vec(ts.size()+1);
+      ts_vec[0] = 0.0;
+      for (size_t n = 0; n < ts.size(); n++)
+        ts_vec[n+1] = ts[n];
+      
+      T step_size = ts_vec[1] - ts_vec[0];
       
       observer<T> obs;
       integrate_times(
@@ -87,6 +95,7 @@ namespace stan {
          boost::begin(ts_vec), boost::end(ts_vec), 
          step_size,
          obs);
+
       return obs.ys_;
     }
   }
