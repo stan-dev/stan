@@ -7,13 +7,14 @@
 #include <stan/math/matrix/mdivide_left_tri_low.hpp>
 #include <stan/math/error_handling/matrix/check_size_match.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/error_handling/matrix/check_cholesky_factor.hpp>
 
 namespace stan {
 
   namespace vb {
 
     class latent_vars {
-      
+
     private:
 
       Eigen::VectorXd mu_; // Mean of location-scale family
@@ -28,18 +29,19 @@ namespace stan {
         static const char* function = "stan::vb::latent_vars(%1%)";
 
         double tmp(0.0);
+        stan::math::check_cholesky_factor(function, L_, "Scale matrix", &tmp);
         stan::math::check_square(function, L_, "Scale matrix", &tmp);
         stan::math::check_size_match(function,
-                         L_.rows(), "Dimension of scale matrix",
-                         dimension_, "Dimension of mean vector",
-                         &tmp);
+                                     L_.rows(),  "Dimension of scale matrix",
+                                     dimension_, "Dimension of mean vector",
+                                     &tmp);
 
       };
 
       virtual ~latent_vars() {}; // No-op
 
       int dimension() const { return dimension_; }
-      
+
       Eigen::VectorXd const& mu() const { return mu_; }
 
       Eigen::MatrixXd const& L() const { return L_; }
