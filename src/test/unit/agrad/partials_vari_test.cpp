@@ -161,3 +161,102 @@ TEST(AgradPartialsVari, OperandsAndPartialsFvar) {
   EXPECT_FLOAT_EQ(107,y.d_);
   EXPECT_FLOAT_EQ(-1,y.val_);
 }
+
+TEST(AgradPartialsVari, incr_deriv_double) {
+  using stan::VectorView;
+  using stan::agrad::incr_deriv;
+  using stan::is_vector;
+  using stan::is_constant_struct;
+
+  double a = 1;
+  
+  VectorView<const double,stan::is_vector<double>::value,
+             stan::is_constant_struct<double>::value> d_a(stan::length(a) * 0);
+
+
+  
+  double result = incr_deriv<VectorView<const double,
+                                           is_vector<double>::value,
+                                           is_constant_struct<double>::value>,
+                             double,double>().incr(d_a,a);
+  EXPECT_FLOAT_EQ(0, result);
+}
+
+TEST(AgradPartialsVari, incr_deriv_vec_double) {
+  using stan::VectorView;
+  using stan::agrad::incr_deriv;
+  using stan::is_vector;
+  using stan::is_constant_struct;
+
+  std::vector<double> b;
+  b.push_back(1);
+  b.push_back(1);
+  
+  VectorView<const std::vector<double>,
+             stan::is_vector<std::vector<double> >::value,
+             stan::is_constant_struct<std::vector<double> >::value> 
+    d_b(stan::length(b) * 0);
+
+  double result = incr_deriv<VectorView<const std::vector<double>,
+                                        is_vector<std::vector<double> >::value,
+                                        is_constant_struct<std::vector<double> >::value>,
+                             std::vector<double>,double>().incr(d_b,b);
+
+  EXPECT_FLOAT_EQ(0, result);
+}
+
+
+TEST(AgradPartialsVari, incr_deriv_fvar) {
+  using stan::VectorView;
+  using stan::agrad::incr_deriv;
+  using stan::is_vector;
+  using stan::is_constant_struct;
+  using stan::agrad::fvar;
+
+  fvar<double> c;
+  c.val_ = 1.0;
+  c.d_ = 1.0;
+
+  double c_deriv = 2;
+  VectorView<const double,
+             stan::is_vector<fvar<double> >::value,
+             stan::is_constant_struct<fvar<double> >::value>
+    d_c(c_deriv);
+
+  double result2 = incr_deriv<VectorView<const double,
+                                         is_vector<fvar<double> >::value,
+                                         is_constant_struct<fvar<double> >::value>,
+                              fvar<double>,double>().incr(d_c,c);
+
+  EXPECT_FLOAT_EQ(2, result2);
+}
+
+TEST(AgradPartialsVari, incr_deriv_vec_fvar) {
+  using stan::VectorView;
+  using stan::agrad::incr_deriv;
+  using stan::is_vector;
+  using stan::is_constant_struct;
+  using stan::agrad::fvar;
+
+  fvar<double> c(1,1);
+
+  std::vector<fvar<double> > d;
+  d.push_back(c);
+  d.push_back(c);
+  
+  std::vector<double> d_deriv;
+  d_deriv.push_back(3);
+  d_deriv.push_back(4);
+
+  VectorView<const double,
+             stan::is_vector<std::vector<fvar<double> > >::value,
+             stan::is_constant_struct<std::vector<fvar<double> > >::value>
+    d_d(d_deriv);
+
+  double result3 = incr_deriv<VectorView<const double,
+                                         is_vector<std::vector<fvar<double> > >::value,
+                                         is_constant_struct<std::vector<fvar<double> > >::value>,
+                              std::vector<fvar<double> >,double>().incr(d_d,d);
+
+  EXPECT_FLOAT_EQ(7, result3);
+}

@@ -39,7 +39,7 @@ namespace stan {
       template<typename T1, typename T2, typename T3>
       struct incr_deriv<T1,T2,T3,false,false> {
         inline T3 incr(T1 d_x, const T2& x_d) {
-          return d_x[1]*x_d.d_;
+          return d_x[0]*x_d.d_;
         }
       };
       template<typename T1, typename T2, typename T3>
@@ -302,7 +302,7 @@ namespace stan {
                                                         x1,x2,x3,x4,x5,x6,d_x1,d_x2,
                                                         d_x3,d_x4,d_x5,d_x6);
       }
-};
+    };
    
 
   } 
