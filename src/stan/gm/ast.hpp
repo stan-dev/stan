@@ -335,13 +335,15 @@ namespace stan {
       expression ts_;    // solution times
       expression theta_; // params
       expression x_;     // data
+      expression x_int_;     // integer data
       solve_ode();
       solve_ode(const std::string& system_function_name,
                 const expression& y0,
                 const expression& t0,
                 const expression& ts,
                 const expression& theta,
-                const expression& x);
+                const expression& x,
+                const expression& x_int);
     };
 
     struct fun {

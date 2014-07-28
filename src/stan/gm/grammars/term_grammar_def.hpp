@@ -56,7 +56,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::solve_ode,
                           (stan::gm::expression, t0_)
                           (stan::gm::expression, ts_)
                           (stan::gm::expression, theta_)
-                          (stan::gm::expression, x_) );
+                          (stan::gm::expression, x_)
+                          (stan::gm::expression, x_int_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::fun,
                           (std::string, name_)
@@ -568,6 +569,8 @@ namespace stan {
         > expression_g(_r1)     // theta
         > lit(',')
         > expression_g(_r1)     // x
+        > lit(',')
+        > expression_g(_r1)     // x_int
         > lit(')');
       // FIXME:  need big check here to make sure all args correctly
       // typed

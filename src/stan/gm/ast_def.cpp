@@ -541,7 +541,7 @@ namespace stan {
       return e.type_;
     }
     expr_type expression_type_vis::operator()(const solve_ode& e) const {
-      return expr_type(VECTOR_T,1);
+      return expr_type(DOUBLE_T,2);
     }
     expr_type expression_type_vis::operator()(const fun& e) const {
       return e.type_;
@@ -833,13 +833,15 @@ namespace stan {
                          const expression& t0,
                          const expression& ts,
                          const expression& theta,
-                         const expression& x) 
+                         const expression& x,
+                         const expression& x_int) 
       : system_function_name_(system_function_name),
         y0_(y0),
         t0_(t0),
         ts_(ts),
         theta_(theta),
-        x_(x) {
+        x_(x),
+        x_int_(x_int) {
     }
 
 

@@ -3,69 +3,50 @@
 
 #include <vector>
 #include <boost/numeric/odeint.hpp>
-#include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
   
   namespace math {
     
-    // copy Eigen matrix (or vector or row vector) into std vector, resizing vector
-    template <typename T, int R, int C>
-    inline
-    void to_std_vector(const Eigen::Matrix<T,R,C>& m,
-                       std::vector<T>& v) {
-      v.assign(&m(0), &m(0) + m.size());
-    }
-
-    // return Eigen vector copy of input std vector
-    template <typename T>
-    inline
-    Eigen::Matrix<T,Eigen::Dynamic,1>
-    to_eigen_vector(const std::vector<T>& v) {
-      Eigen::Matrix<T,Eigen::Dynamic,1> m(v.size());
-      for (int i = 0; i < m.size(); ++i)
-        m(i) = v[i];
-      return m;
-    }
-                         
-
     template <typename F, typename T>
     struct ode_system {
       const F& f_;
-      const Eigen::Matrix<T,Eigen::Dynamic,1>& theta_;
-      const Eigen::Matrix<double,Eigen::Dynamic,1>& x_;
+      const std::vector<T>& theta_;
+      const std::vector<double>& x_;
+      const std::vector<int>& x_int_;
       ode_system(const F& f,
-                 const Eigen::Matrix<T,Eigen::Dynamic,1>& theta,
-                 const Eigen::Matrix<double,Eigen::Dynamic,1>& x)
-        : f_(f), theta_(theta), x_(x) {
+                 const std::vector<T>& theta,
+                 const std::vector<double>& x,
+                 const std::vector<int>& x_int)
+        : f_(f), theta_(theta), x_(x), x_int_(x_int) {
       }
       void operator()(const std::vector<T>& y,
                       std::vector<T>& dy_dt,
                       const T t) {
-        to_std_vector(f_(t,to_eigen_vector(y),theta_,x_),
-                      dy_dt);
+        dy_dt = f(t,y,theta_,x_,x_int_);
       }
     };
 
     template <typename T>
     struct observer {
-      std::vector<Eigen::Matrix<T,Eigen::Dynamic,1> > ys_;
+      std::vector<std::vector<T> > ys_;
       observer(size_t num_obs_times) {
         ys_.reserve(num_obs_times);
       }
       void operator()(const std::vector<T>& y, const T time) {
-        ys_.push_back(to_eigen_vector(y));
+        ys_.push_back(y);
       }
     };
 
     template <typename F, typename T>
-    std::vector<Eigen::Matrix<T,Eigen::Dynamic,1> >
+    std::vector<std::vector<T> >
     solve_ode(const F f,
-              const Eigen::Matrix<T,Eigen::Dynamic,1>& y0,
+              const std::vector<T>& y0,
               const T& t0,
-              const Eigen::Matrix<T,Eigen::Dynamic,1>& ts,
-              const Eigen::Matrix<T,Eigen::Dynamic,1>& theta,
-              const Eigen::Matrix<double,Eigen::Dynamic,1>& x) {
+              const std::vector<double>& ts,
+              const std::vector<T>& theta,
+              const std::vector<double>& x,
+              const std::vector<int>& x_int) {
       using namespace boost::numeric::odeint;  // FIXME: trim to what is used
 
       ode_system<F,T> system(f,theta,x);
@@ -75,7 +56,7 @@ namespace stan {
       std::vector<double> y0_vec(y0.size()*2);
       for (size_t n = 0; n < y0.size(); n++)
         y0_vec[n] = y0[n];
-      for (size_t n = y0.size(); n < 2*y0.size(); n++)
+      for (size_t n = y0.size(); n < 2 * y0.size(); n++)
         y0_vec[n] = 0.0;
 
       std::vector<double> ts_vec(ts.size()+1);

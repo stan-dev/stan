@@ -278,22 +278,25 @@ TEST(gmAst, solveOde) {
   std::string system_function_name = "foo";
 
   variable y0("y0_var_name");
-  y0.set_type(VECTOR_T, 0);  // plain old vector
+  y0.set_type(DOUBLE_T, 1);  // plain old vector
 
   variable t0("t0_var_name");
   t0.set_type(DOUBLE_T, 0);  // double
 
   variable ts("ts_var_name");
-  ts.set_type(VECTOR_T, 0); 
+  ts.set_type(DOUBLE_T, 1); 
 
   variable theta("theta_var_name");
-  theta.set_type(VECTOR_T, 0);
+  theta.set_type(DOUBLE_T, 1);
   
   variable x("x_var_name");
-  x.set_type(VECTOR_T, 0);
+  x.set_type(DOUBLE_T, 1);
+
+  variable x_int("x_int_var_name");
+  x.set_type(INT_T, 1);
 
   // example of instantiation
-  solve_ode so2(system_function_name, y0, t0, ts, theta, x);
+  solve_ode so2(system_function_name, y0, t0, ts, theta, x, x_int);
 
   // dumb test to make sure we at least get the right types back
   EXPECT_EQ(system_function_name, so2.system_function_name_);
@@ -302,6 +305,7 @@ TEST(gmAst, solveOde) {
   EXPECT_EQ(ts.type_, so2.ts_.expression_type());
   EXPECT_EQ(theta.type_, so2.theta_.expression_type());
   EXPECT_EQ(x.type_, so2.x_.expression_type());
+  EXPECT_EQ(x_int.type_, so2.x_int_.expression_type());
 
   expression e2(so2);
   EXPECT_EQ(expr_type(VECTOR_T,1), e2.expression_type());

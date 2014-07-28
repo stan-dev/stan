@@ -195,6 +195,9 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.x_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.x_int_, o_);
         o_ << ')';
       }
       void operator()(const fun& fx) const { 
