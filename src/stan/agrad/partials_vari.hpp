@@ -37,13 +37,13 @@ namespace stan {
         }
       };
       template<typename T1, typename T2, typename T3>
-      struct incr_deriv <T1,T2,T3,false,false>{
+      struct incr_deriv<T1,T2,T3,false,false> {
         inline T3 incr(T1 d_x, const T2& x_d) {
           return d_x[1]*x_d.d_;
         }
       };
       template<typename T1, typename T2, typename T3>
-      struct incr_deriv <T1,T2,T3,true,false>{
+      struct incr_deriv<T1,T2,T3,true,false> {
         inline T3 incr(T1 d_x, const T2& x_d) {
           T3 temp = 0;
           for (size_t n = 0; n < length(x_d); n++)
@@ -89,8 +89,8 @@ namespace stan {
         template<typename T_return_type, typename T_partials_return, 
                  typename T1, typename T2, typename T3, typename T4,
                  typename T5, typename T6>
-        struct partials_to_var <T_return_type,T_partials_return,T1,T2,T3,T4,T5,T6,
-                                false,false> {
+        struct partials_to_var<T_return_type,T_partials_return,T1,T2,T3,T4,T5,T6,
+                               false,false> {
           inline T_return_type to_var (T_partials_return logp, size_t nvaris,
                                        agrad::vari** all_varis, 
                                        T_partials_return* all_partials,
@@ -121,8 +121,8 @@ namespace stan {
         template<typename T_return_type, typename T_partials_return, 
                  typename T1, typename T2, typename T3, typename T4,
                  typename T5, typename T6>
-        struct partials_to_var <T_return_type,T_partials_return,T1,T2,T3,T4,T5,T6,
-                                true,false> {
+        struct partials_to_var<T_return_type,T_partials_return,T1,T2,T3,T4,T5,T6,
+                               true,false> {
           inline T_return_type to_var(T_partials_return logp, size_t nvaris,
                                       agrad::vari** all_varis, 
                                       T_partials_return* all_partials,
@@ -185,7 +185,7 @@ namespace stan {
         }
       };
       template<typename T>
-      struct set_varis <T,true,false,false>{
+      struct set_varis<T,true,false,false> {
         inline size_t set(agrad::vari** varis, const T& x) {
           for (size_t n = 0; n < length(x); n++)
             varis[n] = x[n].vi_;
@@ -193,7 +193,7 @@ namespace stan {
         }
       };
       template<typename T>
-      struct set_varis <T,true,false,true>{
+      struct set_varis<T,true,false,true> {
         inline size_t set(agrad::vari** varis, const T& x) {
           for (size_t n = 0; n < length(x); n++)
             varis[n] = 0;
