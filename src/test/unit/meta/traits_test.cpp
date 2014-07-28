@@ -364,16 +364,16 @@ TEST(MetaTraits, VectorBuilder_false_false) {
   Matrix<double,1,Dynamic> a_row_vector(5);
 
   VectorBuilder<double,false,false> dvv1(length(a_double));
-  EXPECT_THROW(dvv1[0], std::runtime_error);
+  EXPECT_THROW(dvv1[0], std::logic_error);
 
   VectorBuilder<double,false,false> dvv2(length(a_std_vector));
-  EXPECT_THROW(dvv2[0], std::runtime_error);
+  EXPECT_THROW(dvv2[0], std::logic_error);
   
   VectorBuilder<double,false,false> dvv3(length(a_vector));
-  EXPECT_THROW(dvv3[0], std::runtime_error);
+  EXPECT_THROW(dvv3[0], std::logic_error);
   
   VectorBuilder<double,false,false> dvv4(length(a_row_vector));
-  EXPECT_THROW(dvv4[0], std::runtime_error);
+  EXPECT_THROW(dvv4[0], std::logic_error);
 }
 
 
@@ -422,16 +422,16 @@ TEST(MetaTraits, VectorBuilder_false_true) {
   Matrix<var,1,Dynamic> a_row_vector(5);
 
   VectorBuilder<double,false,true> dvv1(length(a_var));
-  EXPECT_THROW(dvv1[0], std::runtime_error);
+  EXPECT_THROW(dvv1[0], std::logic_error);
 
   VectorBuilder<double,false,true> dvv2(length(a_std_vector));
-  EXPECT_THROW(dvv2[0], std::runtime_error);
+  EXPECT_THROW(dvv2[0], std::logic_error);
   
   VectorBuilder<double,false,true> dvv3(length(a_vector));
-  EXPECT_THROW(dvv3[0], std::runtime_error);
+  EXPECT_THROW(dvv3[0], std::logic_error);
   
   VectorBuilder<double,false,true> dvv4(length(a_row_vector));
-  EXPECT_THROW(dvv4[0], std::runtime_error);
+  EXPECT_THROW(dvv4[0], std::logic_error);
 }
 
 TEST(MetaTraits, VectorBuilder_true_true) {

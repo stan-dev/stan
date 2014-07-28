@@ -349,33 +349,33 @@ ERROR_INDEX
    *
    *  These values are mutable.
    */
-  template<typename partials_return,bool used, bool is_vec>
+  template<typename T,bool used, bool is_vec>
   class VectorBuilder {
   public:
     VectorBuilder(size_t /* n */) { }
-    partials_return& operator[](size_t /* i */) {
-      throw std::runtime_error("used is false. this should never be called");
+    T& operator[](size_t /* i */) {
+      throw std::logic_error("used is false. this should never be called");
     }
   };
 
-  template<typename partials_return>
-  class VectorBuilder<partials_return,true, false> {
+  template<typename T>
+  class VectorBuilder<T,true, false> {
   private:
-    partials_return x_;
+    T x_;
   public:
     VectorBuilder(size_t /* n */) : x_(0.0) { }
-    partials_return& operator[](size_t /* i */) {
+    T& operator[](size_t /* i */) {
       return x_;
     }
   };
 
-  template<typename partials_return>
-  class VectorBuilder<partials_return,true, true> {
+  template<typename T>
+  class VectorBuilder<T,true, true> {
   private:
-    std::vector<partials_return> x_;
+    std::vector<T> x_;
   public:
     VectorBuilder(size_t n) : x_(n) { }
-    partials_return& operator[](size_t i) {
+    T& operator[](size_t i) {
       return x_[i];
     }
   };
