@@ -8,6 +8,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit-distribution/utility.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 using std::vector;
 using Eigen::Matrix;
@@ -227,133 +228,20 @@ public:
     finite_diff.push_back((cdf_plus - cdf_minus) / e2);
   }
 
-
-  // void add_finite_diff_2ndorder(const vector<double>& params, 
-  //                               vector<double>& finite_diff, 
-  //                               const size_t n) {
-  //   const double e = 1e-6;
-  //   const double e2 = e * e;
-
-  //   vector<double> plus(6);
-  //   vector<double> minus(6);
-  //   vector<double> neutral(6);
-  //   for (size_t i = 0; i < 6; i++) {
-  //     plus[i] = get_param<double>(params, i);
-  //     minus[i] = get_param<double>(params, i);
-  //     neutral[i] = get_param<double>(params, i);
-  //   }
-  //   minus[n] -= e;
-  //   plus[n] += e;
-    
-  //   double cdf_neutral = TestClass.cdf
-  //     (neutral[0],neutral[1],neutral[2],neutral[3],neutral[4],neutral[5]);
-  //   double cdf_plus = TestClass.cdf
-  //     (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
-  //   double cdf_minus = TestClass.cdf
-  //     (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
- 
-  //   finite_diff.push_back((cdf_plus - 2*cdf_neutral + cdf_minus) / e2);
-  // }
-
-  // void add_finite_diff_3rdorder(const vector<double>& params, 
-  //                               vector<double>& finite_diff, 
-  //                               const size_t n) {
-  //   const double e = 1e-6;
-  //   const double e3 = e * e * e;
-
-  //   vector<double> plus2(6);
-  //   vector<double> plus(6);
-  //   vector<double> minus(6);
-  //   vector<double> minus2(6);
-  //   for (size_t i = 0; i < 6; i++) {
-  //     plus[i] = get_param<double>(params, i);
-  //     minus[i] = get_param<double>(params, i);
-  //     minus2[i] = get_param<double>(params, i);
-  //     plus[i] = get_param<double>(params, i);
-  //   }
-  //   plus2[n] += 2*e;
-  //   plus[n] += e;
-  //   minus[n] -= e;
-  //   minus2[n] -= 2*e;
-    
-  //   double cdf_plus2 = TestClass.cdf
-  //     (plus2[0],plus2[1],plus2[2],plus2[3],plus2[4],plus2[5]);
-  //   double cdf_plus = TestClass.cdf
-  //     (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
-  //   double cdf_minus2 = TestClass.cdf
-  //     (minus2[0],minus2[1],minus2[2],minus2[3],minus2[4],minus2[5]);
-  //   double cdf_minus = TestClass.cdf
-  //     (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
-  //   finite_diff.push_back((0.5*cdf_plus2 - cdf_plus + cdf_minus - 0.5*cdf_minus2) / e3);
-  // }
-
    void calculate_finite_diff(const vector<double>& params, 
-                             vector<double>& finite_diff1, 
-                             vector<double>& finite_diff2, 
-                             vector<double>& finite_diff3) {
-    if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value 
-        && !is_fvar_double<Scalar0>::value 
-        && !is_fvar_fvar_double<Scalar0>::value)
-      add_finite_diff_1storder(params, finite_diff1, 0);
-    if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value  
-        && !is_fvar_double<Scalar1>::value 
-        && !is_fvar_fvar_double<Scalar1>::value)
-      add_finite_diff_1storder(params, finite_diff1, 1);
-    if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value 
-        && !is_fvar_double<Scalar2>::value 
-        && !is_fvar_fvar_double<Scalar2>::value)
-      add_finite_diff_1storder(params, finite_diff1, 2);
-    if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value 
-        && !is_fvar_double<Scalar3>::value 
-        && !is_fvar_fvar_double<Scalar3>::value)
-      add_finite_diff_1storder(params, finite_diff1, 3);
-    if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value 
-        && !is_fvar_double<Scalar4>::value 
-        && !is_fvar_fvar_double<Scalar4>::value)
-      add_finite_diff_1storder(params, finite_diff1, 4);
-    if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value 
-        && !is_fvar_double<Scalar5>::value 
-        && !is_fvar_fvar_double<Scalar5>::value)
-      add_finite_diff_1storder(params, finite_diff1, 5);
-
-    // if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value &&
-    //     (is_fvar_var<Scalar0>::value || is_fvar_fvar_var<Scalar0>::value) )
-    //   add_finite_diff_2ndorder(params, finite_diff2, 0);
-    // if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value &&
-    //     (is_fvar_var<Scalar1>::value || is_fvar_fvar_var<Scalar1>::value) )
-    //   add_finite_diff_2ndorder(params, finite_diff2, 1);
-    // if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value &&
-    //     (is_fvar_var<Scalar2>::value || is_fvar_fvar_var<Scalar2>::value) )
-    //   add_finite_diff_2ndorder(params, finite_diff2, 2);
-    // if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value &&
-    //     (is_fvar_var<Scalar3>::value || is_fvar_fvar_var<Scalar3>::value) )
-    //   add_finite_diff_2ndorder(params, finite_diff2, 3);
-    // if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value &&
-    //     (is_fvar_var<Scalar4>::value || is_fvar_fvar_var<Scalar4>::value) )
-    //   add_finite_diff_2ndorder(params, finite_diff2, 4);
-    // if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value &&
-    //     (is_fvar_var<Scalar5>::value || is_fvar_fvar_var<Scalar5>::value) )
-    //   add_finite_diff_2ndorder(params, finite_diff2, 5);
-
-
-    // if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value &&
-    //     is_fvar_fvar_var<Scalar0>::value)
-    //   add_finite_diff_3rdorder(params, finite_diff3, 0);
-    // if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value &&
-    //     is_fvar_fvar_var<Scalar1>::value) 
-    //   add_finite_diff_3rdorder(params, finite_diff3, 1);
-    // if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value &&
-    //     is_fvar_fvar_var<Scalar2>::value)
-    //   add_finite_diff_3rdorder(params, finite_diff3, 2);
-    // if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value &&
-    //     is_fvar_fvar_var<Scalar3>::value) 
-    //   add_finite_diff_3rdorder(params, finite_diff3, 3);
-    // if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value &&
-    //     is_fvar_fvar_var<Scalar4>::value) 
-    //   add_finite_diff_3rdorder(params, finite_diff3, 4);
-    // if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value &&
-    //     is_fvar_fvar_var<Scalar5>::value) 
-    //   add_finite_diff_3rdorder(params, finite_diff3, 5);
+                              vector<double>& finite_diff) {
+    if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value)
+      add_finite_diff_1storder(params, finite_diff, 0);
+    if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value)
+      add_finite_diff_1storder(params, finite_diff, 1);
+    if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value)
+      add_finite_diff_1storder(params, finite_diff, 2);
+    if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value)
+      add_finite_diff_1storder(params, finite_diff, 3);
+    if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value)
+      add_finite_diff_1storder(params, finite_diff, 4);
+    if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value)
+      add_finite_diff_1storder(params, finite_diff, 5);
   }
 
    // works for <double>
@@ -495,28 +383,23 @@ public:
     TestClass.valid_values(parameters, expected_cdf);
     
     for (size_t n = 0; n < parameters.size(); n++) {
-      vector<double> finite_diffs1;
-      vector<double> finite_diffs2;
-      vector<double> finite_diffs3;
-      vector<double> gradients1;
-      vector<double> gradients2;
-      vector<double> gradients3;
+      vector<double> finite_diffs;
+      vector<double> gradients;
 
-      if (!is_fvar_double<Scalar0>::value &&
-          !is_fvar_fvar_double<Scalar0>::value &&
-          !is_fvar_double<Scalar1>::value &&
-          !is_fvar_fvar_double<Scalar1>::value &&
-          !is_fvar_double<Scalar2>::value &&
-          !is_fvar_fvar_double<Scalar2>::value &&
-          !is_fvar_double<Scalar3>::value &&
-          !is_fvar_fvar_double<Scalar3>::value &&
-          !is_fvar_double<Scalar4>::value &&
-          !is_fvar_fvar_double<Scalar4>::value &&
-          !is_fvar_double<Scalar5>::value &&
-          !is_fvar_fvar_double<Scalar5>::value) {
+      if (!boost::is_same<Scalar0, fvar<double> >::value &&
+          !boost::is_same<Scalar0, fvar<fvar<double> > >::value &&
+          !boost::is_same<Scalar1, fvar<double> >::value &&
+          !boost::is_same<Scalar1, fvar<fvar<double> > >::value &&
+          !boost::is_same<Scalar2, fvar<double> >::value &&
+          !boost::is_same<Scalar2, fvar<fvar<double> > >::value &&
+          !boost::is_same<Scalar3, fvar<double> >::value &&
+          !boost::is_same<Scalar3, fvar<fvar<double> > >::value &&
+          !boost::is_same<Scalar4, fvar<double> >::value &&
+          !boost::is_same<Scalar4, fvar<fvar<double> > >::value &&
+          !boost::is_same<Scalar5, fvar<double> >::value &&
+          !boost::is_same<Scalar5, fvar<fvar<double> > >::value) {
 
-        calculate_finite_diff(parameters[n], finite_diffs1, 
-                              finite_diffs2, finite_diffs3);
+        calculate_finite_diff(parameters[n], finite_diffs);
         Scalar0 p0 = get_param<Scalar0>(parameters[n], 0);
         Scalar1 p1 = get_param<Scalar1>(parameters[n], 1);
         Scalar2 p2 = get_param<Scalar2>(parameters[n], 2);
@@ -531,13 +414,9 @@ public:
           <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
           (p0,p1,p2,p3,p4,p5);
 
-        calculate_gradients_1storder(gradients1, cdf, x1);
-        //calculate_gradients_2ndorder(gradients2, cdf, x2);
-        //calculate_gradients_3rdorder(gradients3, cdf, x3);
+        calculate_gradients_1storder(gradients, cdf, x1);
 
-        test_finite_diffs_equal(parameters[n], finite_diffs1, gradients1);
-        //test_finite_diffs_equal(parameters[n], finite_diffs2, gradients2);
-        //test_finite_diffs_equal(parameters[n], finite_diffs3, gradients3);
+        test_finite_diffs_equal(parameters[n], finite_diffs, gradients);
       }
     }
   }
@@ -704,46 +583,47 @@ public:
         << "cdf with repeated vector input should match "
         << "a multiple of cdf of single input";
 
+
       size_t pos_single = 0;
       size_t pos_multiple = 0;
       if (!is_constant_struct<T0>::value && !is_empty<T0>::value &&
-          !is_fvar_double<Scalar0>::value &&
-          !is_fvar_fvar_double<Scalar0>::value)
+          !boost::is_same<Scalar0, fvar<double> >::value &&
+          !boost::is_same<Scalar0, fvar<fvar<double> > >::value)
         test_multiple_gradient_values(is_vector<T0>::value, single_cdf,
                                       single_gradients1, pos_single,
                                       multiple_gradients1, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T1>::value && !is_empty<T1>::value &&
-          !is_fvar_double<Scalar1>::value &&
-          !is_fvar_fvar_double<Scalar1>::value)
+          !boost::is_same<Scalar1, fvar<double> >::value &&
+          !boost::is_same<Scalar1, fvar<fvar<double> > >::value)
         test_multiple_gradient_values(is_vector<T1>::value, single_cdf,
                                       single_gradients1, pos_single,
                                       multiple_gradients1, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T2>::value && !is_empty<T2>::value &&
-          !is_fvar_double<Scalar2>::value &&
-          !is_fvar_fvar_double<Scalar2>::value)
+          !boost::is_same<Scalar2, fvar<double> >::value &&
+          !boost::is_same<Scalar2, fvar<fvar<double> > >::value)
         test_multiple_gradient_values(is_vector<T2>::value, single_cdf,
                                       single_gradients1, pos_single,
                                       multiple_gradients1, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T3>::value && !is_empty<T3>::value &&
-          !is_fvar_double<Scalar3>::value &&
-          !is_fvar_fvar_double<Scalar3>::value)
+          !boost::is_same<Scalar3, fvar<double> >::value &&
+          !boost::is_same<Scalar3, fvar<fvar<double> > >::value)
         test_multiple_gradient_values(is_vector<T3>::value, single_cdf, 
                                       single_gradients1, pos_single,
                                       multiple_gradients1, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T4>::value && !is_empty<T4>::value &&
-          !is_fvar_double<Scalar4>::value &&
-          !is_fvar_fvar_double<Scalar4>::value)
+          !boost::is_same<Scalar4, fvar<double> >::value &&
+          !boost::is_same<Scalar4, fvar<fvar<double> > >::value)
         test_multiple_gradient_values(is_vector<T4>::value, single_cdf, 
                                       single_gradients1, pos_single,
                                       multiple_gradients1, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T5>::value && !is_empty<T5>::value &&
-          !is_fvar_double<Scalar5>::value &&
-          !is_fvar_fvar_double<Scalar5>::value)
+          !boost::is_same<Scalar5, fvar<double> >::value &&
+          !boost::is_same<Scalar5, fvar<fvar<double> > >::value)
         test_multiple_gradient_values(is_vector<T5>::value, single_cdf, 
                                       single_gradients1, pos_single,
                                       multiple_gradients1, pos_multiple,
@@ -752,43 +632,43 @@ public:
       pos_single = 0;
       pos_multiple = 0;
       if (!is_constant_struct<T0>::value && !is_empty<T0>::value &&
-          (stan::is_fvar_var<typename scalar_type<T0>::type>::value ||
-           stan::is_fvar_fvar_var<typename scalar_type<T0>::type>::value) )
+          (boost::is_same<Scalar0, fvar<var> >::value || 
+           boost::is_same<Scalar0, fvar<fvar<var> > >::value) )
         test_multiple_gradient_values(is_vector<T0>::value, single_cdf, 
                                       single_gradients2, pos_single,
                                       multiple_gradients2, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T1>::value && !is_empty<T1>::value &&
-          (stan::is_fvar_var<typename scalar_type<T1>::type>::value ||
-           stan::is_fvar_fvar_var<typename scalar_type<T1>::type>::value) )
+          (boost::is_same<Scalar1, fvar<var> >::value || 
+           boost::is_same<Scalar1, fvar<fvar<var> > >::value) )
         test_multiple_gradient_values(is_vector<T1>::value, single_cdf, 
                                       single_gradients2, pos_single,
                                       multiple_gradients2, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T2>::value && !is_empty<T2>::value &&
-          (stan::is_fvar_var<typename scalar_type<T2>::type>::value ||
-           stan::is_fvar_fvar_var<typename scalar_type<T2>::type>::value) )
+          (boost::is_same<Scalar2, fvar<var> >::value || 
+           boost::is_same<Scalar2, fvar<fvar<var> > >::value) )
         test_multiple_gradient_values(is_vector<T2>::value, single_cdf, 
                                       single_gradients2, pos_single,
                                       multiple_gradients2, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T3>::value && !is_empty<T3>::value&&
-          (stan::is_fvar_var<typename scalar_type<T3>::type>::value ||
-           stan::is_fvar_fvar_var<typename scalar_type<T3>::type>::value) )
+          (boost::is_same<Scalar3, fvar<var> >::value || 
+           boost::is_same<Scalar3, fvar<fvar<var> > >::value) )
         test_multiple_gradient_values(is_vector<T3>::value, single_cdf, 
                                       single_gradients2, pos_single,
                                       multiple_gradients2, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T4>::value && !is_empty<T4>::value &&
-          (stan::is_fvar_var<typename scalar_type<T4>::type>::value ||
-           stan::is_fvar_fvar_var<typename scalar_type<T4>::type>::value) )
+          (boost::is_same<Scalar4, fvar<var> >::value || 
+           boost::is_same<Scalar4, fvar<fvar<var> > >::value) )
         test_multiple_gradient_values(is_vector<T4>::value, single_cdf, 
                                       single_gradients2, pos_single,
                                       multiple_gradients2, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T5>::value && !is_empty<T5>::value &&
-          (stan::is_fvar_var<typename scalar_type<T5>::type>::value ||
-           stan::is_fvar_fvar_var<typename scalar_type<T5>::type>::value) )
+          (boost::is_same<Scalar5, fvar<var> >::value || 
+           boost::is_same<Scalar5, fvar<fvar<var> > >::value) )
         test_multiple_gradient_values(is_vector<T5>::value, single_cdf, 
                                       single_gradients2, pos_single,
                                       multiple_gradients2, pos_multiple,
@@ -797,37 +677,37 @@ public:
       pos_single = 0;
       pos_multiple = 0;
       if (!is_constant_struct<T0>::value && !is_empty<T0>::value &&
-          stan::is_fvar_fvar_var<typename scalar_type<T0>::type>::value)
+          boost::is_same<Scalar0, fvar<fvar<var> > >::value)
         test_multiple_gradient_values(is_vector<T0>::value, single_cdf, 
                                       single_gradients3, pos_single,
                                       multiple_gradients3, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T1>::value && !is_empty<T1>::value &&
-          stan::is_fvar_fvar_var<typename scalar_type<T1>::type>::value)
+          boost::is_same<Scalar1, fvar<fvar<var> > >::value)
         test_multiple_gradient_values(is_vector<T1>::value, single_cdf, 
                                       single_gradients3, pos_single,
                                       multiple_gradients3, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T2>::value && !is_empty<T2>::value &&
-          stan::is_fvar_fvar_var<typename scalar_type<T2>::type>::value)
+          boost::is_same<Scalar2, fvar<fvar<var> > >::value)
         test_multiple_gradient_values(is_vector<T2>::value, single_cdf, 
                                       single_gradients3, pos_single,
                                       multiple_gradients3, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T3>::value && !is_empty<T3>::value &&
-          stan::is_fvar_fvar_var<typename scalar_type<T3>::type>::value)
+          boost::is_same<Scalar3, fvar<fvar<var> > >::value)
         test_multiple_gradient_values(is_vector<T3>::value, single_cdf, 
                                       single_gradients3, pos_single,
                                       multiple_gradients3, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T4>::value && !is_empty<T4>::value &&
-          stan::is_fvar_fvar_var<typename scalar_type<T4>::type>::value)
+          boost::is_same<Scalar4, fvar<fvar<var> > >::value)
         test_multiple_gradient_values(is_vector<T4>::value, single_cdf, 
                                       single_gradients3, pos_single,
                                       multiple_gradients3, pos_multiple,
                                       N_REPEAT);
       if (!is_constant_struct<T5>::value && !is_empty<T5>::value &&
-          stan::is_fvar_fvar_var<typename scalar_type<T5>::type>::value)
+          boost::is_same<Scalar5, fvar<fvar<var> > >::value)
         test_multiple_gradient_values(is_vector<T5>::value, single_cdf, 
                                       single_gradients3, pos_single,
                                       multiple_gradients3, pos_multiple,

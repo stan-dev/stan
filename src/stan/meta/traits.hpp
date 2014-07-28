@@ -424,50 +424,6 @@ ERROR_INDEX
     typedef double type;
   };
 
-  template <typename T>
-  struct is_var {
-    enum { value = false };
-  };
-  template <>
-  struct is_var<stan::agrad::var> {
-    enum { value = true };
-  };
-  template <typename T>
-  struct is_fvar_var {
-    enum { value = false };
-  };
-  template <>
-  struct is_fvar_var<stan::agrad::fvar<stan::agrad::var> > {
-    enum { value = true };
-  };
-  template <typename T>
-  struct is_fvar_double {
-    enum { value = false };
-  };
-  template <>
-  struct is_fvar_double<stan::agrad::fvar<double> > {
-    enum { value = true };
-  };
-  template <typename T>
-  struct is_fvar_fvar_var {
-    enum { value = false };
-  };
-  template <>
-  struct is_fvar_fvar_var<stan::agrad::fvar<stan::agrad::fvar<stan::agrad::var> > > {
-    enum { value = true };
-  };
-
-  template <typename T>
-  struct is_fvar_fvar_double {
-    enum { value = false };
-  };
-  template <>
-  struct is_fvar_fvar_double<stan::agrad::fvar<stan::agrad::fvar<double> > > {
-    enum { value = true };
-  };
-
-
-
   // FIXME:  pull out scalar types
 
   /**
