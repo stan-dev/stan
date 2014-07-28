@@ -162,13 +162,13 @@ namespace stan {
       agrad::OperandsAndPartials<T_log_rate> operands_and_partials(alpha);
 
       // FIXME: cache value_of for alpha_vec?  faster if only one?
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_log_rate>::value,
-                    is_vector<T_log_rate>::value>
+      VectorBuilder<include_summand<propto,T_log_rate>::value,
+                    T_partials_return, T_log_rate>
         exp_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
         if (include_summand<propto,T_log_rate>::value)
           exp_alpha[i] = exp(value_of(alpha_vec[i]));
+
       using stan::math::multiply_log;
       for (size_t i = 0; i < size; i++) {
         if (!(alpha_vec[i] == -std::numeric_limits<double>::infinity() 

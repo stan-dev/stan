@@ -70,25 +70,20 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      VectorBuilder<T_partials_return,
-                    true,is_vector<T_scale>::value> 
-        inv_sigma(length(sigma));
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_scale>::value,
-                    is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
+      VectorBuilder<include_summand<propto,T_scale>::value,
+                    T_partials_return, T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
           log_sigma[i] = log(value_of(sigma_vec[i]));
       }
 
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_loc>::value, 
-                    contains_vector<T_loc,T_scale>::value>
+      VectorBuilder<!is_constant_struct<T_loc>::value, 
+                    T_partials_return, T_loc, T_scale>
         exp_mu_div_sigma(max_size(mu,sigma));
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_loc>::value, 
-                    contains_vector<T_y,T_scale>::value>
+      VectorBuilder<!is_constant_struct<T_loc>::value,
+                    T_partials_return, T_y, T_scale>
         exp_y_div_sigma(max_size(y,sigma));
       if (!is_constant_struct<T_loc>::value) {
         for (size_t n = 0; n < max_size(mu,sigma); n++) 

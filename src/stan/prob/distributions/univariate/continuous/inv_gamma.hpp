@@ -95,14 +95,10 @@ namespace stan {
       using stan::math::lgamma;
       using stan::math::digamma;
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_y,T_shape>::value,
-                    is_vector<T_y>::value>
-        log_y(length(y));
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_y,T_scale>::value,
-                    is_vector<T_y>::value>
-        inv_y(length(y));
+      VectorBuilder<include_summand<propto,T_y,T_shape>::value,
+                    T_partials_return, T_y> log_y(length(y));
+      VectorBuilder<include_summand<propto,T_y,T_scale>::value,
+                    T_partials_return, T_y> inv_y(length(y));
       for(size_t n = 0; n < length(y); n++) {
         if (include_summand<propto,T_y,T_shape>::value)
           if (value_of(y_vec[n]) > 0)
@@ -111,14 +107,10 @@ namespace stan {
           inv_y[n] = 1.0 / value_of(y_vec[n]);
       }
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_shape>::value,
-                    is_vector<T_shape>::value>
-        lgamma_alpha(length(alpha));
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_shape>::value,
-                    is_vector<T_shape>::value>
-        digamma_alpha(length(alpha));
+      VectorBuilder<include_summand<propto,T_shape>::value,
+                    T_partials_return, T_shape> lgamma_alpha(length(alpha));
+      VectorBuilder<!is_constant_struct<T_shape>::value,
+                    T_partials_return, T_shape> digamma_alpha(length(alpha));
       for (size_t n = 0; n < length(alpha); n++) {
         if (include_summand<propto,T_shape>::value)
           lgamma_alpha[n] = lgamma(value_of(alpha_vec[n]));
@@ -126,10 +118,8 @@ namespace stan {
           digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
       }
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_shape,T_scale>::value,
-                    is_vector<T_scale>::value>
-        log_beta(length(beta));
+      VectorBuilder<include_summand<propto,T_shape,T_scale>::value,
+                    T_partials_return, T_scale> log_beta(length(beta));
       if (include_summand<propto,T_shape,T_scale>::value)
         for (size_t n = 0; n < length(beta); n++)
           log_beta[n] = log(value_of(beta_vec[n]));
@@ -245,14 +235,10 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_shape>::value,
-                    is_vector<T_shape>::value> 
-        gamma_vec(stan::length(alpha));
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_shape>::value,
-                    is_vector<T_shape>::value> 
-        digamma_vec(stan::length(alpha));
+      VectorBuilder<!is_constant_struct<T_shape>::value,
+                    T_partials_return, T_shape> gamma_vec(stan::length(alpha));
+      VectorBuilder<!is_constant_struct<T_shape>::value,
+                    T_partials_return,T_shape> digamma_vec(stan::length(alpha));
           
       if (!is_constant_struct<T_shape>::value) {
         for (size_t i = 0; i < stan::length(alpha); i++) {
@@ -372,13 +358,10 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_shape>::value,
-                    is_vector<T_shape>::value> 
-        gamma_vec(stan::length(alpha));
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_shape>::value,
-                    is_vector<T_shape>::value> 
+      VectorBuilder<!is_constant_struct<T_shape>::value,
+                    T_partials_return, T_shape> gamma_vec(stan::length(alpha));
+      VectorBuilder<!is_constant_struct<T_shape>::value,
+                    T_partials_return, T_shape> 
         digamma_vec(stan::length(alpha));
           
       if (!is_constant_struct<T_shape>::value) {
@@ -488,13 +471,10 @@ namespace stan {
       using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_shape>::value,
-                    is_vector<T_shape>::value> 
-        gamma_vec(stan::length(alpha));
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_shape>::value,
-                    is_vector<T_shape>::value> 
+      VectorBuilder<!is_constant_struct<T_shape>::value,
+                    T_partials_return, T_shape> gamma_vec(stan::length(alpha));
+      VectorBuilder<!is_constant_struct<T_shape>::value,
+                    T_partials_return, T_shape> 
         digamma_vec(stan::length(alpha));
           
       if (!is_constant_struct<T_shape>::value) {

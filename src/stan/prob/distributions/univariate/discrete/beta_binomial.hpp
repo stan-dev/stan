@@ -90,45 +90,41 @@ namespace stan {
       using stan::math::binomial_coefficient_log;
       using stan::math::digamma;
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto>::value,
-                    contains_vector<T_n,T_N>::value>
+      VectorBuilder<include_summand<propto>::value,
+                    T_partials_return, T_n, T_N>
         normalizing_constant(max_size(N,n));
       for (size_t i = 0; i < max_size(N,n); i++)
         if (include_summand<propto>::value)
           normalizing_constant[i] 
             = binomial_coefficient_log(N_vec[i],n_vec[i]);
       
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_size1,T_size2>::value,
-                    contains_vector<T_n,T_N,T_size1,T_size2>::value>
+      VectorBuilder<include_summand<propto,T_size1,T_size2>::value,
+                    T_partials_return, T_n, T_N, T_size1, T_size2>
         lbeta_numerator(size);
       for (size_t i = 0; i < size; i++)
         if (include_summand<propto,T_size1,T_size2>::value)
           lbeta_numerator[i] = lbeta(n_vec[i] + value_of(alpha_vec[i]),
                                      N_vec[i] - n_vec[i] 
                                      + value_of(beta_vec[i]));
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_size1,T_size2>::value,
-                    contains_vector<T_size1,T_size2>::value>
+
+      VectorBuilder<include_summand<propto,T_size1,T_size2>::value,
+                    T_partials_return, T_size1, T_size2>
         lbeta_denominator(max_size(alpha,beta));
       for (size_t i = 0; i < max_size(alpha,beta); i++)
         if (include_summand<propto,T_size1,T_size2>::value)
           lbeta_denominator[i] = lbeta(value_of(alpha_vec[i]), 
                                        value_of(beta_vec[i]));
       
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_size1>::value,
-                    contains_vector<T_n,T_size1>::value>
+      VectorBuilder<!is_constant_struct<T_size1>::value,
+                    T_partials_return, T_n, T_size1>
         digamma_n_plus_alpha(max_size(n,alpha));
       for (size_t i = 0; i < max_size(n,alpha); i++)
         if (!is_constant_struct<T_size1>::value)
           digamma_n_plus_alpha[i] 
             = digamma(n_vec[i] + value_of(alpha_vec[i]));
 
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_size1,T_size2>::value,
-                    contains_vector<T_N,T_size1,T_size2>::value>
+      VectorBuilder<contains_nonconstant_struct<T_size1,T_size2>::value,
+                    T_partials_return, T_N, T_size1, T_size2>
         digamma_N_plus_alpha_plus_beta(max_size(N,alpha,beta));
       for (size_t i = 0; i < max_size(N,alpha,beta); i++)
         if (contains_nonconstant_struct<T_size1,T_size2>::value)
@@ -136,26 +132,22 @@ namespace stan {
             = digamma(N_vec[i] + value_of(alpha_vec[i]) 
                       + value_of(beta_vec[i]));
 
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_size1,T_size2>::value,
-                    contains_vector<T_size1,T_size2>::value>
+      VectorBuilder<contains_nonconstant_struct<T_size1,T_size2>::value,
+                    T_partials_return, T_size1, T_size2>
         digamma_alpha_plus_beta(max_size(alpha,beta));
       for (size_t i = 0; i < max_size(alpha,beta); i++)
         if (contains_nonconstant_struct<T_size1,T_size2>::value)
           digamma_alpha_plus_beta[i] 
             = digamma(value_of(alpha_vec[i]) + value_of(beta_vec[i]));
 
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_size1>::value, 
-                    is_vector<T_size1>::value>
-        digamma_alpha(length(alpha));
+      VectorBuilder<!is_constant_struct<T_size1>::value,
+                    T_partials_return, T_size1> digamma_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
         if (!is_constant_struct<T_size1>::value)
           digamma_alpha[i] = digamma(value_of(alpha_vec[i]));
 
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_size2>::value, 
-                    is_vector<T_size2>::value>
+      VectorBuilder<!is_constant_struct<T_size2>::value, 
+                    T_partials_return, T_size2>
         digamma_beta(length(beta));
       for (size_t i = 0; i < length(beta); i++)
         if (!is_constant_struct<T_size2>::value)

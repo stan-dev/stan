@@ -86,17 +86,16 @@ namespace stan {
           return LOG_ZERO;
       }
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_low,T_high>::value,
-                    is_vector<T_low>::value | is_vector<T_high>::value> 
+      VectorBuilder<include_summand<propto,T_low,T_high>::value,
+                    T_partials_return, T_low, T_high>
         inv_beta_minus_alpha(max_size(alpha,beta));
       for (size_t i = 0; i < max_size(alpha,beta); i++) 
         if (include_summand<propto,T_low,T_high>::value)
           inv_beta_minus_alpha[i] 
             = 1.0 / (value_of(beta_vec[i]) - value_of(alpha_vec[i]));
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_low,T_high>::value,
-                    is_vector<T_low>::value | is_vector<T_high>::value> 
+
+      VectorBuilder<include_summand<propto,T_low,T_high>::value,
+                    T_partials_return, T_low, T_high>
         log_beta_minus_alpha(max_size(alpha,beta));
       for (size_t i = 0; i < max_size(alpha,beta); i++)
         if (include_summand<propto,T_low,T_high>::value)

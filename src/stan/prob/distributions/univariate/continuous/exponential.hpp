@@ -74,9 +74,8 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, beta);
       
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_inv_scale>::value,
-                    is_vector<T_inv_scale>::value> log_beta(length(beta));
+      VectorBuilder<include_summand<propto,T_inv_scale>::value,
+                    T_partials_return, T_inv_scale> log_beta(length(beta));
       for (size_t i = 0; i < length(beta); i++)
         if (include_summand<propto,T_inv_scale>::value)
           log_beta[i] = log(value_of(beta_vec[i]));

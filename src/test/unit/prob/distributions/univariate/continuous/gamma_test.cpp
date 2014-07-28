@@ -3,7 +3,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
 
-TEST(ProbDistributionsGamma, error_check) {
+TEST(ProbDistributionGamma, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::gamma_rng(2.0,3.0,rng));
 

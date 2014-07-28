@@ -116,12 +116,12 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail>
         operands_and_partials(y, alpha, beta);
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_y,T_scale_succ>::value,
-                    is_vector<T_y>::value> log_y(length(y));
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_y,T_scale_fail>::value,
-                    is_vector<T_y>::value> log1m_y(length(y));
+      VectorBuilder<include_summand<propto,T_y,T_scale_succ>::value,
+                    T_partials_return, T_y>
+        log_y(length(y));
+      VectorBuilder<include_summand<propto,T_y,T_scale_fail>::value,
+                    T_partials_return, T_y>
+        log1m_y(length(y));
       
       for (size_t n = 0; n < length(y); n++) {
         if (include_summand<propto,T_y,T_scale_succ>::value)
@@ -130,13 +130,11 @@ namespace stan {
           log1m_y[n] = log1m(value_of(y_vec[n]));
       }
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_scale_succ>::value,
-                    is_vector<T_scale_succ>::value> 
+      VectorBuilder<include_summand<propto,T_scale_succ>::value,
+                    T_partials_return, T_scale_succ>
         lgamma_alpha(length(alpha));
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_scale_succ>::value,
-                    is_vector<T_scale_succ>::value> 
+      VectorBuilder<!is_constant_struct<T_scale_succ>::value,
+                    T_partials_return, T_scale_succ> 
         digamma_alpha(length(alpha));
       for (size_t n = 0; n < length(alpha); n++) {
         if (include_summand<propto,T_scale_succ>::value) 
@@ -145,13 +143,11 @@ namespace stan {
           digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
       }
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_scale_fail>::value,
-                    is_vector<T_scale_fail>::value> 
+      VectorBuilder<include_summand<propto,T_scale_fail>::value,
+                    T_partials_return, T_scale_fail> 
         lgamma_beta(length(beta));
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_scale_fail>::value,
-                    is_vector<T_scale_fail>::value> 
+      VectorBuilder<!is_constant_struct<T_scale_fail>::value,
+                    T_partials_return, T_scale_fail> 
         digamma_beta(length(beta));
 
       for (size_t n = 0; n < length(beta); n++) {
@@ -161,15 +157,13 @@ namespace stan {
           digamma_beta[n] = digamma(value_of(beta_vec[n]));
       }
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_scale_succ,T_scale_fail>::value,
-                    contains_vector<T_scale_succ,T_scale_fail>::value>
+      VectorBuilder<include_summand<propto,T_scale_succ,T_scale_fail>::value,
+                    T_partials_return, T_scale_succ, T_scale_fail>
         lgamma_alpha_beta(max_size(alpha,beta));
     
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_scale_succ,
+      VectorBuilder<contains_nonconstant_struct<T_scale_succ,
                                                 T_scale_fail>::value,
-                    contains_vector<T_scale_succ,T_scale_fail>::value>
+                    T_partials_return, T_scale_succ,T_scale_fail>
         digamma_alpha_beta(max_size(alpha,beta));
   
       for (size_t n = 0; n < max_size(alpha,beta); n++) {
@@ -295,22 +289,19 @@ namespace stan {
       using std::exp;
       
       // Cache a few expensive function calls if alpha or beta is a parameter
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_scale_succ,
+      VectorBuilder<contains_nonconstant_struct<T_scale_succ,
                                                 T_scale_fail>::value,
-                    contains_vector<T_scale_succ,T_scale_fail>::value>
+                    T_partials_return, T_scale_succ, T_scale_fail>
         digamma_alpha_vec(max_size(alpha, beta));
         
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_scale_succ,
+      VectorBuilder<contains_nonconstant_struct<T_scale_succ,
                                                 T_scale_fail>::value,
-                    contains_vector<T_scale_succ,T_scale_fail>::value>
+                    T_partials_return, T_scale_succ, T_scale_fail>
         digamma_beta_vec(max_size(alpha, beta));
         
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_scale_succ,
+      VectorBuilder<contains_nonconstant_struct<T_scale_succ,
                                                 T_scale_fail>::value,
-                    contains_vector<T_scale_succ,T_scale_fail>::value>
+                    T_partials_return, T_scale_succ, T_scale_fail>
         digamma_sum_vec(max_size(alpha, beta));
         
       if (contains_nonconstant_struct<T_scale_succ,T_scale_fail>::value) {
@@ -437,22 +428,19 @@ namespace stan {
       using std::exp;
         
       // Cache a few expensive function calls if alpha or beta is a parameter
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_scale_succ,
+      VectorBuilder<contains_nonconstant_struct<T_scale_succ,
                                                 T_scale_fail>::value,
-                    contains_vector<T_scale_succ,T_scale_fail>::value>
+                    T_partials_return, T_scale_succ, T_scale_fail>
         digamma_alpha_vec(max_size(alpha, beta));
         
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_scale_succ,
+      VectorBuilder<contains_nonconstant_struct<T_scale_succ,
                                                 T_scale_fail>::value,
-                    contains_vector<T_scale_succ,T_scale_fail>::value>
+                    T_partials_return, T_scale_succ, T_scale_fail>
         digamma_beta_vec(max_size(alpha, beta));
         
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_scale_succ,
+      VectorBuilder<contains_nonconstant_struct<T_scale_succ,
                                                 T_scale_fail>::value,
-                    contains_vector<T_scale_succ,T_scale_fail>::value>
+                    T_partials_return, T_scale_succ, T_scale_fail>
         digamma_sum_vec(max_size(alpha, beta));
         
       if (contains_nonconstant_struct<T_scale_succ,T_scale_fail>::value) {
@@ -559,20 +547,17 @@ namespace stan {
       using std::exp;
         
       // Cache a few expensive function calls if alpha or beta is a parameter
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_scale_succ,
+      VectorBuilder<contains_nonconstant_struct<T_scale_succ,
                                                 T_scale_fail>::value,
-                    contains_vector<T_scale_succ,T_scale_fail>::value>
+                    T_partials_return, T_scale_succ, T_scale_fail>
         digamma_alpha_vec(max_size(alpha, beta));
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_scale_succ,
+      VectorBuilder<contains_nonconstant_struct<T_scale_succ,
                                                 T_scale_fail>::value,
-                    contains_vector<T_scale_succ,T_scale_fail>::value>
+                    T_partials_return, T_scale_succ, T_scale_fail>
         digamma_beta_vec(max_size(alpha, beta));
-      VectorBuilder<T_partials_return,
-                    contains_nonconstant_struct<T_scale_succ,
+      VectorBuilder<contains_nonconstant_struct<T_scale_succ,
                                                 T_scale_fail>::value,
-                    contains_vector<T_scale_succ,T_scale_fail>::value>
+                    T_partials_return, T_scale_succ, T_scale_fail>
         digamma_sum_vec(max_size(alpha, beta));        
         
       if (contains_nonconstant_struct<T_scale_succ,T_scale_fail>::value) {

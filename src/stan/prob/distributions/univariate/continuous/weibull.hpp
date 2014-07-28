@@ -67,38 +67,32 @@ namespace stan {
           return LOG_ZERO;
       }
       
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_shape>::value,
-                    is_vector<T_shape>::value> log_alpha(length(alpha));
+      VectorBuilder<include_summand<propto,T_shape>::value,
+                    T_partials_return, T_shape> log_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
         if (include_summand<propto,T_shape>::value)
           log_alpha[i] = log(value_of(alpha_vec[i]));
       
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_y,T_shape>::value,
-                    is_vector<T_y>::value> log_y(length(y));
+      VectorBuilder<include_summand<propto,T_y,T_shape>::value,
+                    T_partials_return, T_y> log_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y,T_shape>::value)
           log_y[i] = log(value_of(y_vec[i]));
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_shape,T_scale>::value,
-                    is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<include_summand<propto,T_shape,T_scale>::value,
+                    T_partials_return, T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++)
         if (include_summand<propto,T_shape,T_scale>::value)
           log_sigma[i] = log(value_of(sigma_vec[i]));
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_y,T_shape,T_scale>::value,
-                    is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<include_summand<propto,T_y,T_shape,T_scale>::value,
+                    T_partials_return, T_scale> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++)
         if (include_summand<propto,T_y,T_shape,T_scale>::value)
           inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_y,T_shape,T_scale>::value,
-                    is_vector<T_y>::value | is_vector<T_shape>::value 
-                    | is_vector<T_scale>::value>
+      VectorBuilder<include_summand<propto,T_y,T_shape,T_scale>::value,
+                    T_partials_return, T_y, T_shape, T_scale>
         y_div_sigma_pow_alpha(N);
       for (size_t i = 0; i < N; i++)
         if (include_summand<propto,T_y,T_shape,T_scale>::value) {

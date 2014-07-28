@@ -85,29 +85,24 @@ namespace stan {
       size_t len_ep = max_size(mu, phi);
       size_t len_np = max_size(n, phi);
       
-      VectorBuilder<T_partials_return,true, is_vector<T_location>::value>
-        mu__(length(mu));
+      VectorBuilder<true, T_partials_return, T_location> mu__(length(mu));
       for (size_t i = 0, size = length(mu); i < size; ++i)
         mu__[i] = value_of(mu_vec[i]);
   
-      VectorBuilder<T_partials_return,true, is_vector<T_inv_scale>::value>
-        phi__(length(phi));
+      VectorBuilder<true, T_partials_return, T_inv_scale> phi__(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         phi__[i] = value_of(phi_vec[i]);
       
-      VectorBuilder<T_partials_return,true, is_vector<T_inv_scale>::value>
-        log_phi(length(phi));
+      VectorBuilder<true, T_partials_return, T_inv_scale> log_phi(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         log_phi[i] = log(phi__[i]);
 
-      VectorBuilder<T_partials_return,true, 
-                    contains_vector<T_location,T_inv_scale>::value>
+      VectorBuilder<true, T_partials_return, T_location, T_inv_scale>
         log_mu_plus_phi(len_ep);
       for (size_t i = 0; i < len_ep; ++i)
         log_mu_plus_phi[i] = log(mu__[i] + phi__[i]);
 
-      VectorBuilder<T_partials_return,true, 
-                    contains_vector<T_n,T_inv_scale>::value>
+      VectorBuilder<true, T_partials_return, T_n, T_inv_scale> 
         n_plus_phi(len_np);
       for (size_t i = 0; i < len_np; ++i)
         n_plus_phi[i] = n_vec[i] + phi__[i];
@@ -210,30 +205,26 @@ namespace stan {
       size_t len_ep = max_size(eta, phi);
       size_t len_np = max_size(n, phi);
 
-      VectorBuilder<T_partials_return,true, is_vector<T_log_location>::value>
-        eta__(length(eta));
+      VectorBuilder<true, T_partials_return, T_log_location> eta__(length(eta));
       for (size_t i = 0, size = length(eta); i < size; ++i)
         eta__[i] = value_of(eta_vec[i]);
   
-      VectorBuilder<T_partials_return,true, is_vector<T_inv_scale>::value>
-        phi__(length(phi));
+      VectorBuilder<true, T_partials_return, T_inv_scale> phi__(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         phi__[i] = value_of(phi_vec[i]);  
         
 
-      VectorBuilder<T_partials_return,true, is_vector<T_inv_scale>::value>
+      VectorBuilder<true, T_partials_return, T_inv_scale>
         log_phi(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         log_phi[i] = log(phi__[i]);
 
-      VectorBuilder<T_partials_return,true, 
-                    contains_vector<T_log_location,T_inv_scale>::value>
+      VectorBuilder<true, T_partials_return, T_log_location, T_inv_scale>
         logsumexp_eta_logphi(len_ep);
       for (size_t i = 0; i < len_ep; ++i)
         logsumexp_eta_logphi[i] = log_sum_exp(eta__[i], log_phi[i]);
 
-      VectorBuilder<T_partials_return,true, 
-                    contains_vector<T_n,T_inv_scale>::value>
+      VectorBuilder<true, T_partials_return, T_n, T_inv_scale>
         n_plus_phi(len_np);
       for (size_t i = 0; i < len_np; ++i)
         n_plus_phi[i] = n_vec[i] + phi__[i];

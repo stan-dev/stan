@@ -95,9 +95,7 @@ namespace stan {
         for (size_t i = 0; i < size; ++i)
           logp += binomial_coefficient_log(N_vec[i],n_vec[i]);
 
-      VectorBuilder<T_partials_return,
-                       true,is_vector<T_prob>::value> 
-        log1m_theta(length(theta));
+      VectorBuilder<true, T_partials_return, T_prob> log1m_theta(length(theta));
       for (size_t i = 0; i < length(theta); ++i)
         log1m_theta[i] = log1m(value_of(theta_vec[i]));
 
@@ -206,14 +204,12 @@ namespace stan {
         for (size_t i = 0; i < size; ++i)
           logp += binomial_coefficient_log(N_vec[i],n_vec[i]);
 
-      VectorBuilder<T_partials_return,
-                       true,is_vector<T_prob>::value> 
+      VectorBuilder<true, T_partials_return, T_prob> 
         log_inv_logit_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); ++i)
         log_inv_logit_alpha[i] = log_inv_logit(value_of(alpha_vec[i]));
 
-      VectorBuilder<T_partials_return,
-                       true,is_vector<T_prob>::value> 
+      VectorBuilder<true, T_partials_return, T_prob> 
         log_inv_logit_neg_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); ++i)
         log_inv_logit_neg_alpha[i] = log_inv_logit(-value_of(alpha_vec[i]));

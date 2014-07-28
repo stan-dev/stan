@@ -66,18 +66,13 @@ namespace stan {
       agrad::OperandsAndPartials<T_y,T_loc,T_scale> 
         operands_and_partials(y, mu, sigma);
 
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_y,T_loc,T_scale>::value,
-                    is_vector<T_scale>::value> 
-        inv_sigma(length(sigma));
-      VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_scale>::value,
-                    is_vector<T_scale>::value> 
+      VectorBuilder<include_summand<propto,T_y,T_loc,T_scale>::value,
+                    T_partials_return, T_scale> inv_sigma(length(sigma));
+      VectorBuilder<!is_constant_struct<T_scale>::value,
+                    T_partials_return, T_scale> 
         inv_sigma_squared(length(sigma));
-      VectorBuilder<T_partials_return,
-                    include_summand<propto,T_scale>::value,
-                    is_vector<T_scale>::value> 
-        log_sigma(length(sigma));
+      VectorBuilder<include_summand<propto,T_scale>::value,
+                    T_partials_return, T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         const T_partials_return sigma_dbl = value_of(sigma_vec[i]);
         if (include_summand<propto,T_y,T_loc,T_scale>::value)

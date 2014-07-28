@@ -69,16 +69,15 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> kappa_vec(kappa);
 
-      VectorBuilder<T_partials_return,
-                       true,is_vector<T_scale>::value> kappa_dbl(length(kappa));
-      VectorBuilder<T_partials_return,
-                       include_summand<propto,T_scale>::value,
-                       is_vector<T_scale>::value> log_bessel0(length(kappa));
+      VectorBuilder<true, T_partials_return, T_scale> kappa_dbl(length(kappa));
+      VectorBuilder<include_summand<propto,T_scale>::value,
+                    T_partials_return, T_scale> log_bessel0(length(kappa));
       for (size_t i = 0; i < length(kappa); i++) {
         kappa_dbl[i] = value_of(kappa_vec[i]);
         if (include_summand<propto,T_scale>::value)
           log_bessel0[i] = log(modified_bessel_first_kind(0, value_of(kappa_vec[i])));
       }
+
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> oap(y, mu, kappa);
 
       size_t N = max_size(y, mu, kappa);
