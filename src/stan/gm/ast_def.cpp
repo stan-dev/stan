@@ -635,6 +635,7 @@ namespace stan {
     bool is_linear_function(const std::string& name) {
       return name == "add"
         || name == "block"
+        || name == "append_col"
         || name == "col"
         || name == "cols"
         || name == "diagonal"
@@ -642,6 +643,7 @@ namespace stan {
         || name == "minus"
         || name == "negative_infinity"
         || name == "not_a_number"
+        || name == "append_row"
         || name == "rep_matrix"
         || name == "rep_row_vector"
         || name == "rep_vector"
@@ -1291,7 +1293,7 @@ namespace stan {
     print_statement::print_statement(const std::vector<printable>& printables) 
       : printables_(printables) { 
     }
-    
+
     program::program() { }
     program::program(const std::vector<function_decl_def>& function_decl_defs,
                      const std::vector<var_decl>& data_decl,
