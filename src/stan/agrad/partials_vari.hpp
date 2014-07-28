@@ -65,23 +65,23 @@ namespace stan {
                              const T1& x1, const T2& x2, const T3& x3, const T4& x4, 
                              const T5& x5, const T6& x6,
                              VectorView<T_partials_return, 
-                             is_vector<T1>::value, 
-                             is_constant_struct<T1>::value> d_x1,
+                                        is_vector<T1>::value, 
+                                        is_constant_struct<T1>::value> d_x1,
                              VectorView<T_partials_return, 
-                             is_vector<T2>::value, 
-                             is_constant_struct<T2>::value> d_x2, 
+                                        is_vector<T2>::value, 
+                                        is_constant_struct<T2>::value> d_x2, 
                              VectorView<T_partials_return, 
-                             is_vector<T3>::value, 
-                             is_constant_struct<T3>::value> d_x3, 
+                                        is_vector<T3>::value, 
+                                        is_constant_struct<T3>::value> d_x3, 
                              VectorView<T_partials_return, 
-                             is_vector<T4>::value, 
-                             is_constant_struct<T4>::value> d_x4,
+                                        is_vector<T4>::value, 
+                                        is_constant_struct<T4>::value> d_x4,
                              VectorView<T_partials_return, 
-                             is_vector<T5>::value, 
-                             is_constant_struct<T5>::value> d_x5, 
+                                        is_vector<T5>::value, 
+                                        is_constant_struct<T5>::value> d_x5, 
                              VectorView<T_partials_return, 
-                             is_vector<T6>::value, 
-                             is_constant_struct<T6>::value> d_x6) {
+                                        is_vector<T6>::value, 
+                                        is_constant_struct<T6>::value> d_x6) {
           return logp;
         }
       };
@@ -97,23 +97,23 @@ namespace stan {
                                        const T1& x1, const T2& x2, const T3& x3, 
                                        const T4& x4, const T5& x5, const T6& x6,
                                        VectorView<T_partials_return,
-                                       is_vector<T1>::value,
-                                       is_constant_struct<T1>::value> d_x1,
+                                                  is_vector<T1>::value,
+                                                  is_constant_struct<T1>::value> d_x1,
                                        VectorView<T_partials_return,
-                                       is_vector<T2>::value, 
-                                       is_constant_struct<T2>::value> d_x2, 
+                                                  is_vector<T2>::value, 
+                                                  is_constant_struct<T2>::value> d_x2, 
                                        VectorView<T_partials_return,
-                                       is_vector<T3>::value, 
-                                       is_constant_struct<T3>::value> d_x3, 
+                                                  is_vector<T3>::value, 
+                                                  is_constant_struct<T3>::value> d_x3, 
                                        VectorView<T_partials_return,
-                                       is_vector<T4>::value, 
-                                       is_constant_struct<T4>::value> d_x4,
+                                                  is_vector<T4>::value, 
+                                                  is_constant_struct<T4>::value> d_x4,
                                        VectorView<T_partials_return,
-                                       is_vector<T5>::value, 
-                                       is_constant_struct<T5>::value> d_x5, 
+                                                  is_vector<T5>::value, 
+                                                  is_constant_struct<T5>::value> d_x5, 
                                        VectorView<T_partials_return,
-                                       is_vector<T6>::value, 
-                                       is_constant_struct<T6>::value> d_x6) {
+                                                  is_vector<T6>::value, 
+                                                  is_constant_struct<T6>::value> d_x6) {
           return var(new agrad::partials_vari(logp, nvaris, all_varis, all_partials));
         }
     };
@@ -129,23 +129,23 @@ namespace stan {
                                       const T1& x1, const T2& x2, const T3& x3, 
                                       const T4& x4, const T5& x5, const T6& x6,
                                       VectorView<T_partials_return,
-                                      is_vector<T1>::value,
-                                      is_constant_struct<T1>::value> d_x1,
+                                                 is_vector<T1>::value,
+                                                 is_constant_struct<T1>::value> d_x1,
                                       VectorView<T_partials_return,
-                                      is_vector<T2>::value, 
-                                      is_constant_struct<T2>::value> d_x2, 
+                                                 is_vector<T2>::value, 
+                                                 is_constant_struct<T2>::value> d_x2, 
                                       VectorView<T_partials_return,
-                                      is_vector<T3>::value, 
-                                      is_constant_struct<T3>::value> d_x3, 
+                                                 is_vector<T3>::value, 
+                                                 is_constant_struct<T3>::value> d_x3, 
                                       VectorView<T_partials_return,
-                                      is_vector<T4>::value, 
-                                      is_constant_struct<T4>::value> d_x4,
+                                                 is_vector<T4>::value, 
+                                                 is_constant_struct<T4>::value> d_x4,
                                       VectorView<T_partials_return,
-                                      is_vector<T5>::value, 
-                                      is_constant_struct<T5>::value> d_x5, 
+                                                 is_vector<T5>::value, 
+                                                 is_constant_struct<T5>::value> d_x5, 
                                       VectorView<T_partials_return,
-                                      is_vector<T6>::value, 
-                                      is_constant_struct<T6>::value> d_x6) {
+                                                 is_vector<T6>::value, 
+                                                 is_constant_struct<T6>::value> d_x6) {
         T_partials_return temp_deriv = 0;
         temp_deriv += incr_deriv<VectorView<T_partials_return,
                                             is_vector<T1>::value,
@@ -156,20 +156,20 @@ namespace stan {
                                             is_constant_struct<T2>::value>,
                                  T2,T_partials_return>().incr(d_x2,x2);
         temp_deriv += incr_deriv<VectorView<T_partials_return,
-                                      is_vector<T3>::value,
-                                      is_constant_struct<T3>::value>,
+                                            is_vector<T3>::value,
+                                            is_constant_struct<T3>::value>,
                                  T3,T_partials_return>().incr(d_x3,x3);
         temp_deriv += incr_deriv<VectorView<T_partials_return,
-                                      is_vector<T4>::value,
-                                      is_constant_struct<T4>::value>,
+                                            is_vector<T4>::value,
+                                            is_constant_struct<T4>::value>,
                                  T4,T_partials_return>().incr(d_x4,x4);
         temp_deriv += incr_deriv<VectorView<T_partials_return,
-                                      is_vector<T5>::value,
-                                      is_constant_struct<T5>::value>,
+                                            is_vector<T5>::value,
+                                            is_constant_struct<T5>::value>,
                                  T5,T_partials_return>().incr(d_x5,x5);
         temp_deriv += incr_deriv<VectorView<T_partials_return,
-                                      is_vector<T6>::value,
-                                      is_constant_struct<T6>::value>,
+                                            is_vector<T6>::value,
+                                            is_constant_struct<T6>::value>,
                                  T6,T_partials_return>().incr(d_x6,x6);
         return stan::agrad::fvar<T_partials_return>(logp,temp_deriv);
           }
@@ -213,8 +213,7 @@ namespace stan {
      * A variable implementation that stores operands and
      * derivatives with respect to the variable.
      */
-    template<typename T1=double, typename T2=double, 
-             typename T3=double, 
+    template<typename T1=double, typename T2=double, typename T3=double, 
              typename T4=double, typename T5=double, typename T6=double>
     struct OperandsAndPartials {
       typedef typename stan::partials_return_type<T1,T2,T3,T4,T5,T6>::type T_partials_return;
@@ -252,8 +251,8 @@ namespace stan {
                  !is_constant_struct<T4>::value * length(x4) +
                  !is_constant_struct<T5>::value * length(x5) +
                  !is_constant_struct<T6>::value * length(x6)),
-          all_varis((agrad::vari**)agrad::chainable::operator new(sizeof(agrad::vari*) * nvaris)), 
-          all_partials((T_partials_return*)agrad::chainable::operator new(sizeof(T_partials_return) * nvaris)),
+          all_varis(static_cast<agrad::vari**>(agrad::chainable::operator new(sizeof(agrad::vari*) * nvaris))), 
+          all_partials(static_cast<T_partials_return*>(agrad::chainable::operator new(sizeof(T_partials_return) * nvaris))),
           d_x1(all_partials),
           d_x2(all_partials 
                + (!is_constant_struct<T1>::value) * length(x1)),
