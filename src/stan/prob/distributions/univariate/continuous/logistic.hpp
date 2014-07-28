@@ -84,11 +84,11 @@ namespace stan {
 
       VectorBuilder<T_partials_return,
                     !is_constant_struct<T_loc>::value, 
-                    is_vector<T_loc>::value || is_vector<T_scale>::value> 
+                    contains_vector<T_loc,T_scale>::value>
         exp_mu_div_sigma(max_size(mu,sigma));
       VectorBuilder<T_partials_return,
                     !is_constant_struct<T_loc>::value, 
-                    is_vector<T_y>::value || is_vector<T_scale>::value> 
+                    contains_vector<T_y,T_scale>::value>
         exp_y_div_sigma(max_size(y,sigma));
       if (!is_constant_struct<T_loc>::value) {
         for (size_t n = 0; n < max_size(mu,sigma); n++) 
@@ -111,8 +111,7 @@ namespace stan {
         if (include_summand<propto,T_y,T_loc,T_scale>::value)
           exp_m_y_minus_mu_div_sigma = exp(-y_minus_mu_div_sigma);
         T_partials_return inv_1p_exp_y_minus_mu_div_sigma(0);
-        if (!is_constant_struct<T_y>::value 
-            || !is_constant_struct<T_scale>::value)
+        if (contains_nonconstant_struct<T_y,T_scale>::value)
           inv_1p_exp_y_minus_mu_div_sigma = 1 / (1 + exp(y_minus_mu_div_sigma));
 
         if (include_summand<propto,T_y,T_loc,T_scale>::value)

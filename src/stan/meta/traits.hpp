@@ -71,7 +71,22 @@ ERROR_INDEX
     enum { value = is_constant_struct<T>::value };
   };
 
-
+  template <typename T1, 
+            typename T2 = double, 
+            typename T3 = double, 
+            typename T4 = double, 
+            typename T5 = double, 
+            typename T6 = double>
+  struct contains_nonconstant_struct {
+    enum {
+      value = !is_constant_struct<T1>::value
+      || !is_constant_struct<T2>::value
+      || !is_constant_struct<T3>::value
+      || !is_constant_struct<T4>::value
+      || !is_constant_struct<T5>::value
+      || !is_constant_struct<T6>::value
+    };
+  };
 
 
   // FIXME: use boost::type_traits::remove_all_extents to extend to array/ptr types
@@ -108,6 +123,22 @@ ERROR_INDEX
     typedef T type;
   };
 
+  template <typename T1, 
+            typename T2 = double, 
+            typename T3 = double, 
+            typename T4 = double, 
+            typename T5 = double, 
+            typename T6 = double>
+  struct contains_vector {
+    enum {
+      value = is_vector<T1>::value
+      || is_vector<T2>::value
+      || is_vector<T3>::value
+      || is_vector<T4>::value
+      || is_vector<T5>::value
+      || is_vector<T6>::value
+    };
+  };
 
   namespace {
     template <bool is_vec, typename T>

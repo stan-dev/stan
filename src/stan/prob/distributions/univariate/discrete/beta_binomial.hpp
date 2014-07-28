@@ -92,7 +92,7 @@ namespace stan {
 
       VectorBuilder<T_partials_return,
                     include_summand<propto>::value,
-                    is_vector<T_n>::value || is_vector<T_N>::value>
+                    contains_vector<T_n,T_N>::value>
         normalizing_constant(max_size(N,n));
       for (size_t i = 0; i < max_size(N,n); i++)
         if (include_summand<propto>::value)
@@ -101,8 +101,7 @@ namespace stan {
       
       VectorBuilder<T_partials_return,
                     include_summand<propto,T_size1,T_size2>::value,
-                    is_vector<T_n>::value || is_vector<T_N>::value 
-                    || is_vector<T_size1>::value || is_vector<T_size2>::value>
+                    contains_vector<T_n,T_N,T_size1,T_size2>::value>
         lbeta_numerator(size);
       for (size_t i = 0; i < size; i++)
         if (include_summand<propto,T_size1,T_size2>::value)
@@ -111,7 +110,7 @@ namespace stan {
                                      + value_of(beta_vec[i]));
       VectorBuilder<T_partials_return,
                     include_summand<propto,T_size1,T_size2>::value,
-                    is_vector<T_size1>::value || is_vector<T_size2>::value>
+                    contains_vector<T_size1,T_size2>::value>
         lbeta_denominator(max_size(alpha,beta));
       for (size_t i = 0; i < max_size(alpha,beta); i++)
         if (include_summand<propto,T_size1,T_size2>::value)
@@ -120,7 +119,7 @@ namespace stan {
       
       VectorBuilder<T_partials_return,
                     !is_constant_struct<T_size1>::value,
-                    is_vector<T_n>::value || is_vector<T_size1>::value> 
+                    contains_vector<T_n,T_size1>::value>
         digamma_n_plus_alpha(max_size(n,alpha));
       for (size_t i = 0; i < max_size(n,alpha); i++)
         if (!is_constant_struct<T_size1>::value)
@@ -128,28 +127,21 @@ namespace stan {
             = digamma(n_vec[i] + value_of(alpha_vec[i]));
 
       VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_size1>::value
-                    || !is_constant_struct<T_size2>::value,
-                    is_vector<T_N>::value 
-                    || is_vector<T_size1>::value 
-                    || is_vector<T_size1>::value> 
+                    contains_nonconstant_struct<T_size1,T_size2>::value,
+                    contains_vector<T_N,T_size1,T_size2>::value>
         digamma_N_plus_alpha_plus_beta(max_size(N,alpha,beta));
       for (size_t i = 0; i < max_size(N,alpha,beta); i++)
-        if (!is_constant_struct<T_size1>::value 
-            || !is_constant_struct<T_size2>::value)
+        if (contains_nonconstant_struct<T_size1,T_size2>::value)
           digamma_N_plus_alpha_plus_beta[i] 
             = digamma(N_vec[i] + value_of(alpha_vec[i]) 
                       + value_of(beta_vec[i]));
 
       VectorBuilder<T_partials_return,
-                    !is_constant_struct<T_size1>::value
-                    || !is_constant_struct<T_size2>::value,
-                    is_vector<T_size1>::value
-                    || is_vector<T_size1>::value> 
+                    contains_nonconstant_struct<T_size1,T_size2>::value,
+                    contains_vector<T_size1,T_size2>::value>
         digamma_alpha_plus_beta(max_size(alpha,beta));
       for (size_t i = 0; i < max_size(alpha,beta); i++)
-        if (!is_constant_struct<T_size1>::value 
-            || !is_constant_struct<T_size2>::value)
+        if (contains_nonconstant_struct<T_size1,T_size2>::value)
           digamma_alpha_plus_beta[i] 
             = digamma(value_of(alpha_vec[i]) + value_of(beta_vec[i]));
 
@@ -300,8 +292,7 @@ namespace stan {
         T_partials_return digammaOne = 0;
         T_partials_return digammaTwo = 0;
               
-        if ( (!is_constant_struct<T_size1>::value) 
-             || (!is_constant_struct<T_size2>::value) ) {
+        if (contains_nonconstant_struct<T_size1,T_size2>::value) {
           digammaOne = digamma(mu + nu);
           digammaTwo = digamma(alpha_dbl + beta_dbl);
           stan::math::grad_F32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1,
@@ -433,8 +424,7 @@ namespace stan {
         T_partials_return digammaOne = 0;
         T_partials_return digammaTwo = 0;
               
-        if ( (!is_constant_struct<T_size1>::value) 
-             || (!is_constant_struct<T_size2>::value) ) {
+        if (contains_nonconstant_struct<T_size1,T_size2>::value) {
           digammaOne = digamma(mu + nu);
           digammaTwo = digamma(alpha_dbl + beta_dbl);
           stan::math::grad_F32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1, 
@@ -556,8 +546,7 @@ namespace stan {
         T_partials_return digammaOne = 0;
         T_partials_return digammaTwo = 0;
               
-        if ( (!is_constant_struct<T_size1>::value) 
-             || (!is_constant_struct<T_size2>::value) ) {
+        if (contains_nonconstant_struct<T_size1,T_size2>::value) {
           digammaOne = digamma(mu + nu);
           digammaTwo = digamma(alpha_dbl + beta_dbl);
           stan::math::grad_F32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1,

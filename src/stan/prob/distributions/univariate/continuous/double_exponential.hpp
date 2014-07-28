@@ -67,16 +67,16 @@ namespace stan {
         operands_and_partials(y, mu, sigma);
 
       VectorBuilder<T_partials_return,
-                       include_summand<propto,T_y,T_loc,T_scale>::value,
-                       is_vector<T_scale>::value> 
+                    include_summand<propto,T_y,T_loc,T_scale>::value,
+                    is_vector<T_scale>::value> 
         inv_sigma(length(sigma));
       VectorBuilder<T_partials_return,
-                       !is_constant_struct<T_scale>::value,
-                       is_vector<T_scale>::value> 
+                    !is_constant_struct<T_scale>::value,
+                    is_vector<T_scale>::value> 
         inv_sigma_squared(length(sigma));
       VectorBuilder<T_partials_return,
-                       include_summand<propto,T_scale>::value,
-                       is_vector<T_scale>::value> 
+                    include_summand<propto,T_scale>::value,
+                    is_vector<T_scale>::value> 
         log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         const T_partials_return sigma_dbl = value_of(sigma_vec[i]);
@@ -107,8 +107,7 @@ namespace stan {
   
         // gradients
         T_partials_return sign_y_m_mu_times_inv_sigma(0);
-        if (!is_constant_struct<T_y>::value
-            || !is_constant_struct<T_loc>::value)
+        if (contains_nonconstant_struct<T_y,T_loc>::value)
           sign_y_m_mu_times_inv_sigma = sign(y_m_mu) * inv_sigma[n];
         if (!is_constant_struct<T_y>::value) {
           operands_and_partials.d_x1[n] -= sign_y_m_mu_times_inv_sigma;

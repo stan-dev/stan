@@ -89,25 +89,25 @@ namespace stan {
       using stan::math::multiply_log;
 
       VectorBuilder<T_partials_return,
-                       include_summand<propto,T_y,T_dof>::value,
-                       is_vector<T_y>::value> log_y(length(y));
+                    include_summand<propto,T_y,T_dof>::value,
+                    is_vector<T_y>::value> log_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y,T_dof>::value)
           log_y[i] = log(value_of(y_vec[i]));
 
       VectorBuilder<T_partials_return,
-                       include_summand<propto,T_y>::value,
-                       is_vector<T_y>::value> inv_y(length(y));
+                    include_summand<propto,T_y>::value,
+                    is_vector<T_y>::value> inv_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y>::value)
           inv_y[i] = 1.0 / value_of(y_vec[i]);
 
       VectorBuilder<T_partials_return,
-                       include_summand<propto,T_dof>::value,
-                       is_vector<T_dof>::value> lgamma_half_nu(length(nu));
+                    include_summand<propto,T_dof>::value,
+                    is_vector<T_dof>::value> lgamma_half_nu(length(nu));
       VectorBuilder<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> 
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> 
         digamma_half_nu_over_two(length(nu));
 
       for (size_t i = 0; i < length(nu); i++) {
@@ -213,12 +213,12 @@ namespace stan {
 
       // Cache a few expensive function calls if nu is a parameter
       VectorBuilder<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> 
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> 
         gamma_vec(stan::length(nu));
       VectorBuilder<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> 
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> 
         digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
@@ -419,12 +419,12 @@ namespace stan {
 
       // Cache a few expensive function calls if nu is a parameter
       VectorBuilder<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> 
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> 
         gamma_vec(stan::length(nu));
       VectorBuilder<T_partials_return,
-                       !is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> 
+                    !is_constant_struct<T_dof>::value,
+                    is_vector<T_dof>::value> 
         digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {

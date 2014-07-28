@@ -58,6 +58,44 @@ TEST(MetaTraits, is_vector) {
   EXPECT_FALSE(is_vector<const temp_matrix_d>::value);
 }
 
+TEST(MetaTraits, contains_vector) {
+  using stan::contains_vector;
+  using std::vector;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  EXPECT_FALSE(contains_vector<double>::value);
+  EXPECT_FALSE(contains_vector<int>::value);
+  EXPECT_FALSE(contains_vector<size_t>::value);
+
+  EXPECT_FALSE(contains_vector<const double>::value);
+  EXPECT_FALSE(contains_vector<const int>::value);
+  EXPECT_FALSE(contains_vector<const size_t>::value);
+
+  EXPECT_TRUE(contains_vector<std::vector<double> >::value);
+  EXPECT_TRUE(contains_vector<std::vector<int> >::value);
+  EXPECT_TRUE(contains_vector<std::vector<const double> >::value);
+  EXPECT_TRUE(contains_vector<std::vector<const int> >::value);
+
+  typedef Matrix<double,Dynamic,1> temp_vec_d;
+  EXPECT_TRUE(contains_vector<temp_vec_d>::value);
+  EXPECT_TRUE(contains_vector<const temp_vec_d>::value);
+  
+  typedef Matrix<double,1,Dynamic> temp_rowvec_d;
+  EXPECT_TRUE(contains_vector<temp_rowvec_d>::value);
+  EXPECT_TRUE(contains_vector<const temp_rowvec_d>::value);
+
+  typedef Matrix<double,Dynamic,Dynamic> temp_matrix_d;
+  EXPECT_FALSE(contains_vector<temp_matrix_d>::value);
+  EXPECT_FALSE(contains_vector<const temp_matrix_d>::value);
+
+  bool temp = contains_vector<temp_vec_d, temp_vec_d, 
+                              double, temp_matrix_d>::value;
+  EXPECT_TRUE(temp);
+
+  temp = contains_vector<double, temp_matrix_d, temp_matrix_d>::value;
+  EXPECT_FALSE(temp);
+}
+
 typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> const_t1;
 typedef std::vector<const_t1> const_t2;
 typedef std::vector<const_t2> const_t3;
@@ -119,6 +157,45 @@ TEST(MetaTraits, isConstantStruct) {
   EXPECT_FALSE(is_constant_struct<var_v2>::value);
   EXPECT_FALSE(is_constant_struct<var_v3>::value);
 
+}
+
+TEST(MetaTraits, containsNonconstantStruct) {
+  using stan::contains_nonconstant_struct;
+  using std::vector;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  EXPECT_FALSE(contains_nonconstant_struct<int>::value);
+  EXPECT_FALSE(contains_nonconstant_struct<double>::value);
+  EXPECT_FALSE(contains_nonconstant_struct<float>::value);
+  EXPECT_FALSE(contains_nonconstant_struct<long>::value);
+  EXPECT_FALSE(contains_nonconstant_struct<vector<double> >::value);
+  EXPECT_FALSE(contains_nonconstant_struct<vector<vector<double> > >::value);
+  EXPECT_FALSE(contains_nonconstant_struct<vector<vector<vector<double> > > >::value);
+  EXPECT_FALSE(contains_nonconstant_struct<const_t1>::value);
+  EXPECT_FALSE(contains_nonconstant_struct<const_t3>::value);
+  EXPECT_FALSE(contains_nonconstant_struct<const_u1>::value);
+  EXPECT_FALSE(contains_nonconstant_struct<const_u3>::value);
+  EXPECT_FALSE(contains_nonconstant_struct<const_v2>::value);
+
+  EXPECT_TRUE(contains_nonconstant_struct<stan::agrad::var>::value);
+  EXPECT_TRUE(contains_nonconstant_struct<vector<stan::agrad::var> >::value);
+  EXPECT_TRUE(contains_nonconstant_struct<vector<vector<stan::agrad::var> > >::value);
+  EXPECT_TRUE(contains_nonconstant_struct<vector<vector<vector<stan::agrad::var> > > >::value);
+  EXPECT_TRUE(contains_nonconstant_struct<var_t1>::value);
+  EXPECT_TRUE(contains_nonconstant_struct<var_t2>::value);
+  EXPECT_TRUE(contains_nonconstant_struct<var_t3>::value);
+  EXPECT_TRUE(contains_nonconstant_struct<var_u1>::value);
+  EXPECT_TRUE(contains_nonconstant_struct<var_u2>::value);
+  EXPECT_TRUE(contains_nonconstant_struct<var_u3>::value);
+  EXPECT_TRUE(contains_nonconstant_struct<var_v1>::value);
+  EXPECT_TRUE(contains_nonconstant_struct<var_v2>::value);
+  EXPECT_TRUE(contains_nonconstant_struct<var_v3>::value);
+
+  bool temp = contains_nonconstant_struct<var_v3,var_v2,var_v1,double,int>::value;
+  EXPECT_TRUE(temp);
+
+  temp = contains_nonconstant_struct<const_v3,const_v2,const_v1,double,int>::value;
+  EXPECT_FALSE(temp);
 }
 
 TEST(MetaTraits, length) {

@@ -100,14 +100,14 @@ namespace stan {
       for (size_t i = 0, size = length(phi); i < size; ++i)
         log_phi[i] = log(phi__[i]);
 
-      VectorBuilder<T_partials_return,true, (is_vector<T_location>::value
-                                             || is_vector<T_inv_scale>::value)>
+      VectorBuilder<T_partials_return,true, 
+                    contains_vector<T_location,T_inv_scale>::value>
         log_mu_plus_phi(len_ep);
       for (size_t i = 0; i < len_ep; ++i)
         log_mu_plus_phi[i] = log(mu__[i] + phi__[i]);
 
-      VectorBuilder<T_partials_return,true, (is_vector<T_n>::value
-                                             || is_vector<T_inv_scale>::value)>
+      VectorBuilder<T_partials_return,true, 
+                    contains_vector<T_n,T_inv_scale>::value>
         n_plus_phi(len_np);
       for (size_t i = 0; i < len_np; ++i)
         n_plus_phi[i] = n_vec[i] + phi__[i];
@@ -226,14 +226,14 @@ namespace stan {
       for (size_t i = 0, size = length(phi); i < size; ++i)
         log_phi[i] = log(phi__[i]);
 
-      VectorBuilder<T_partials_return,true, (is_vector<T_log_location>::value
-                                             || is_vector<T_inv_scale>::value)>
+      VectorBuilder<T_partials_return,true, 
+                    contains_vector<T_log_location,T_inv_scale>::value>
         logsumexp_eta_logphi(len_ep);
       for (size_t i = 0; i < len_ep; ++i)
         logsumexp_eta_logphi[i] = log_sum_exp(eta__[i], log_phi[i]);
 
-      VectorBuilder<T_partials_return,true, (is_vector<T_n>::value
-                                             || is_vector<T_inv_scale>::value)>
+      VectorBuilder<T_partials_return,true, 
+                    contains_vector<T_n,T_inv_scale>::value>
         n_plus_phi(len_np);
       for (size_t i = 0; i < len_np; ++i)
         n_plus_phi[i] = n_vec[i] + phi__[i];

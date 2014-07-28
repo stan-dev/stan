@@ -72,38 +72,37 @@ namespace stan {
         operands_and_partials(y, y_min, alpha);
       
       VectorBuilder<T_partials_return,
-                       include_summand<propto,T_y,T_shape>::value,
-                       is_vector<T_y>::value> log_y(length(y));
+                    include_summand<propto,T_y,T_shape>::value,
+                    is_vector<T_y>::value> log_y(length(y));
       if (include_summand<propto,T_y,T_shape>::value)
         for (size_t n = 0; n < length(y); n++)
           log_y[n] = log(value_of(y_vec[n]));
 
       VectorBuilder<T_partials_return,
-                       !is_constant_struct<T_y>::value
-                       ||!is_constant_struct<T_shape>::value,
-                       is_vector<T_y>::value> inv_y(length(y));
-      if (!is_constant_struct<T_y>::value||!is_constant_struct<T_shape>::value)
+                    contains_nonconstant_struct<T_y,T_shape>::value,
+                    is_vector<T_y>::value> inv_y(length(y));
+      if (contains_nonconstant_struct<T_y,T_shape>::value)
         for (size_t n = 0; n < length(y); n++)
           inv_y[n] = 1 / value_of(y_vec[n]);
 
       VectorBuilder<T_partials_return,
-                       include_summand<propto,T_scale,T_shape>::value,
-                       is_vector<T_scale>::value> 
+                    include_summand<propto,T_scale,T_shape>::value,
+                    is_vector<T_scale>::value> 
         log_y_min(length(y_min));
       if (include_summand<propto,T_scale,T_shape>::value)
         for (size_t n = 0; n < length(y_min); n++)
           log_y_min[n] = log(value_of(y_min_vec[n]));
 
       VectorBuilder<T_partials_return,
-                       include_summand<propto,T_shape>::value,
-                       is_vector<T_shape>::value> log_alpha(length(alpha));
+                    include_summand<propto,T_shape>::value,
+                    is_vector<T_shape>::value> log_alpha(length(alpha));
       if (include_summand<propto,T_shape>::value)
         for (size_t n = 0; n < length(alpha); n++)
           log_alpha[n] = log(value_of(alpha_vec[n]));
       
       VectorBuilder<T_partials_return,
-                       !is_constant_struct<T_shape>::value,
-                       is_vector<T_shape>::value> inv_alpha(length(alpha));
+                    !is_constant_struct<T_shape>::value,
+                    is_vector<T_shape>::value> inv_alpha(length(alpha));
       if (!is_constant_struct<T_shape>::value)
         for (size_t n = 0; n < length(alpha); n++)
           inv_alpha[n] = 1 / value_of(alpha_vec[n]);

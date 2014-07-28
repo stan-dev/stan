@@ -113,15 +113,12 @@ namespace stan {
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
 
         T_partials_return logy_m_mu(0);
-        if (include_summand<propto,T_y,T_loc,T_scale>::value ||
-            !is_constant_struct<T_y>::value)
+        if (include_summand<propto,T_y,T_loc,T_scale>::value)
           logy_m_mu = log_y[n] - mu_dbl;
 
         T_partials_return logy_m_mu_sq = logy_m_mu * logy_m_mu;
         T_partials_return logy_m_mu_div_sigma(0);
-        if (!is_constant_struct<T_y>::value ||
-            !is_constant_struct<T_loc>::value ||
-            !is_constant_struct<T_scale>::value)
+        if (contains_nonconstant_struct<T_y,T_loc,T_scale>::value)
           logy_m_mu_div_sigma = logy_m_mu * inv_sigma_sq[n];
   
 

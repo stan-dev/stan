@@ -152,18 +152,12 @@ namespace stan {
 
       VectorBuilder<T_partials_return,
                     include_summand<propto,T_y,T_dof,T_loc,T_scale>::value,
-                    is_vector<T_y>::value 
-                    || is_vector<T_dof>::value 
-                    || is_vector<T_loc>::value 
-                    || is_vector<T_scale>::value> 
+                    contains_vector<T_y,T_dof,T_loc,T_scale>::value>
         square_y_minus_mu_over_sigma__over_nu(N);
 
       VectorBuilder<T_partials_return,
                     include_summand<propto,T_y,T_dof,T_loc,T_scale>::value,
-                    is_vector<T_y>::value 
-                    || is_vector<T_dof>::value
-                    || is_vector<T_loc>::value 
-                    || is_vector<T_scale>::value> 
+                    contains_vector<T_y,T_dof,T_loc,T_scale>::value>
         log1p_exp(N);
 
       for (size_t i = 0; i < N; i++) 

@@ -90,8 +90,8 @@ namespace stan {
         operands_and_partials(alpha,beta);
 
       size_t len_ab = max_size(alpha,beta);
-      VectorBuilder<T_partials_return,true,(is_vector<T_shape>::value 
-                                            || is_vector<T_inv_scale>::value)>
+      VectorBuilder<T_partials_return,true,
+                    contains_vector<T_shape,T_inv_scale>::value>
         lambda(len_ab);
       for (size_t i = 0; i < len_ab; ++i) 
         lambda[i] = value_of(alpha_vec[i]) / value_of(beta_vec[i]);
@@ -106,8 +106,8 @@ namespace stan {
       for (size_t i = 0; i < length(beta); ++i)
         log_beta_m_log1p_beta[i] = log(value_of(beta_vec[i])) - log1p_beta[i];
 
-      VectorBuilder<T_partials_return,true,(is_vector<T_inv_scale>::value
-                                            || is_vector<T_shape>::value)>
+      VectorBuilder<T_partials_return,true,
+                    contains_vector<T_inv_scale,T_shape>::value>
         alpha_times_log_beta_over_1p_beta(len_ab);
       for (size_t i = 0; i < len_ab; ++i)
         alpha_times_log_beta_over_1p_beta[i] 
@@ -131,8 +131,7 @@ namespace stan {
 
       VectorBuilder<T_partials_return,
                     !is_constant_struct<T_inv_scale>::value, 
-                    (is_vector<T_shape>::value
-                     || is_vector<T_inv_scale>::value)>
+                    contains_vector<T_shape,T_inv_scale>::value>
         lambda_m_alpha_over_1p_beta(len_ab);
       if (!is_constant_struct<T_inv_scale>::value)
         for (size_t i = 0; i < len_ab; ++i)
