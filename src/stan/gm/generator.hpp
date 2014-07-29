@@ -1603,6 +1603,7 @@ namespace stan {
         o_ << "throw std::domain_error(std::string(";
         for (size_t i = 0; i < ps.printables_.size(); ++i) {
           generate_printable(ps.printables_[i],o_);
+          if (i < ps.printables_.size()-1) o_ << ",";
         }
         o_ << "));" << EOL;
       }
