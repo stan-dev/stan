@@ -596,9 +596,39 @@ namespace stan {
             metric_index = 2;
           }
           
-          int sampler_select = engine_index 
-            + 10 * metric_index 
-            + 100 * static_cast<int>(adapt_engaged);
+          std::string metric_file
+            = dynamic_cast<stan::gm::string_argument*>(metric->arg("diag_e")->arg("file"))->value();
+          
+          std::fstream metric_stream(metric_file.c_str(), std::fstream::in);
+          stan::io::dump metric_var_context(metric_stream);
+          metric_stream.close();
+
+          if (!(context__.contains_r("metric")))
+            throw std::runtime_error("variable metric not specified in input file");
+          
+          std::vector<double> vals_r__ = context__.vals_r("metric");
+          size_t pos__ = 0U;
+          
+          context__.validate_dims("initialization", "mu", "double", context__.to_vec(N)); // What does this do?
+          
+          Eigen::VectorXd metric = Eigen:VectorXd::Ones(cont_params.size());
+     
+          for (int i0__ = 0U; i0__ < N; ++i0__)
+            metric[i0__] = vals_r__[pos__++];
+          
+          // Check positive values
+          
+          Eigen::MatrixXd metric = Eigen:MatrixXd::Ones(cont_params.size(), cont_params.size());
+          
+          for (int i0__ = 0U; i0__ < N * N; ++i0__)
+            metric[i0__] = vals_r__[pos__++]; // Right ordering for the matrix?
+          
+          // Check positive definite
+          
+          
+          int sampler_select =  engine_index
+                              + 10 * metric_index
+                              + 100 * static_cast<int>(adapt_engaged);
           
           switch (sampler_select) {
               
