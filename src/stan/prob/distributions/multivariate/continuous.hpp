@@ -7,6 +7,7 @@
 #include <stan/prob/distributions/multivariate/continuous/multi_normal_cholesky.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_normal_prec.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_gp.hpp>
+#include <stan/prob/distributions/multivariate/continuous/multi_gp_cholesky.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_student_t.hpp>
 #include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
 #include <stan/prob/distributions/multivariate/continuous/inv_wishart.hpp>
