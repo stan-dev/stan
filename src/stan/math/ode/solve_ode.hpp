@@ -93,7 +93,7 @@ namespace stan {
       //   y0_vec[n] = 0.0;
 
       std::vector<T> ts_vec(ts.size()+1);
-      ts_vec[0] = 0.0;
+      ts_vec[0] = t0;
       for (size_t n = 0; n < ts.size(); n++)
         ts_vec[n+1] = ts[n];
       
