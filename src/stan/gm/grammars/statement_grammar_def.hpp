@@ -160,7 +160,6 @@ namespace stan {
           return false;
         }
             
-        
 
         // validate types
         a.var_type_ = vm.get(name);
@@ -178,28 +177,33 @@ namespace stan {
                      << "; variable array dimensions = " << lhs_var_num_dims;
           return false;
         }
-        if (lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
-          error_msgs << "mismatched dimensions on left- and right-hand side of assignment"
-                     << "; left dims=" << lhs_type.num_dims_
-                     << "; right dims=" << a.expr_.expression_type().num_dims_
-                     << std::endl;
-          return false;
-        }
 
         base_expr_type lhs_base_type = lhs_type.base_type_;
         base_expr_type rhs_base_type = a.expr_.expression_type().base_type_;
-        // int -> double promotion
+        // allow int -> double promotion
         bool types_compatible 
           = lhs_base_type == rhs_base_type
           || ( lhs_base_type == DOUBLE_T && rhs_base_type == INT_T );
         if (!types_compatible) {
           error_msgs << "base type mismatch in assignment"
-                     << "; left variable=" << a.var_dims_.name_
-                     << "; left base type=";
+                     << "; variable name = "
+                     << a.var_dims_.name_
+                     << ", type = ";
           write_base_expr_type(error_msgs,lhs_base_type);
-          error_msgs << "; right base type=";
+          error_msgs << "; right-hand side type=";
           write_base_expr_type(error_msgs,rhs_base_type);
           error_msgs << std::endl;
+          return false;
+        }
+        if (lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
+          error_msgs << "dimension mismatch in assignment"
+                     << "; variable name = "
+                     << a.var_dims_.name_
+                     << ", num dimensions given = "
+                     << lhs_type.num_dims_
+                     << "; right-hand side dimensions = "
+                     << a.expr_.expression_type().num_dims_
+                     << std::endl;
           return false;
         }
         return true;
