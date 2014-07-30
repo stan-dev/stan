@@ -9,8 +9,8 @@ CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
 ##
 # Target to verify header files are coherent
 ##
-HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f)) 
-ifeq ($(OS),win) 
+HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f))
+ifeq ($(OS),win)
   DEV_NULL = nul
 else
   DEV_NULL = /dev/null
@@ -29,7 +29,7 @@ test/dummy.cpp:
 ##
 .PHONY: %.cpp-test
 %.cpp-test : %.cpp
-	$(COMPILE.c) -fsyntax-only -O$O $< 
+	$(COMPILE.c) -fsyntax-only -O$O $<
 
 ##
 # Target to build all tests
@@ -40,7 +40,7 @@ test-all: test-unit test-headers test-distributions test-models
 
 ##
 # Build the google test library.
-## 
+##
 $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: $(GTEST)/src/gtest-all.cc
@@ -65,23 +65,23 @@ test/%.d : src/test/%_test.cpp
 	fi
 
 ifneq (,$(filter test-unit,$(MAKECMDGOALS)))
-  -include $(addsuffix .d, $(UNIT_TESTS)) 
+  -include $(addsuffix .d, $(UNIT_TESTS))
 endif
 ifneq (,$(filter test-all,$(MAKECMDGOALS)))
-  -include $(addsuffix .d, $(UNIT_TESTS)) 
+  -include $(addsuffix .d, $(UNIT_TESTS))
 endif
 
 ##
 # run target which will allow for parallel execution of
 # tests.
-## 
+##
 .PHONY: runtest/%
 runtest/% : %
 	@echo '------------------------------------------------------------'
 	$(WINE) $< --gtest_output="xml:$*.xml";
 
 ##
-# target path_separator for use in some tests that need to 
+# target path_separator for use in some tests that need to
 # call executables.
 ##
 .PHONY: path_separator
@@ -139,7 +139,7 @@ endif
 ####
 ## These make rules apply if SECONDEXPANSION is available
 ## in make.
-#### 
+####
 ifneq ($(filter second-expansion,$(.FEATURES)),)
 ##
 # Defining the test target implicit static rule.
@@ -156,9 +156,9 @@ $(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter $$(patsubst src/$$(
              @echo 'Ran '$(words $(filter runtest/%,$^))' tests for '$@)
 else
 ####
-## Warning for developers that don't have a 
+## Warning for developers that don't have a
 ## current enough version of make (3.81 or higher).
-#### 
+####
 .PHONY: $(TEST_TARGETS)
 $(TEST_TARGETS):
 	@echo ''
@@ -201,7 +201,7 @@ test/unit/mcmc/hmc/hamiltonians/base_hamiltonian.o: src/test/test-models/no-main
 test/unit/mcmc/hmc/hamiltonians/unit_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp 
+test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp
 test/unit/mcmc/hmc/integrators/expl_leapfrog2.o: src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
 
 test/unit/common/do_bfgs_optimize.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
@@ -210,6 +210,8 @@ test/unit/optimization/bfgs_minimizer.o: src/test/test-models/no-main/optimizati
 test/unit/optimization/bfgs.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
 test/unit/optimization/bfgs_update.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
 test/unit/optimization/lbfgs_update.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
+
+test/unit/vb/bbvb.o: src/test/test-models/no-main/vb/univariate_no_constraint.cpp
 
 test/unit/common/command_init.o: src/test/test-models/no-main/common/test_lp.cpp
 test/unit/common/run_markov_chain.o: src/test/test-models/no-main/common/test_lp.cpp
@@ -222,7 +224,7 @@ test/integration/compile_models.o : $(patsubst %.stan,%.cpp-test,$(shell find sr
 ##
 # CmdStan specific targets. Should be removed in the future.
 ##
-$(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/%,$(ALL_TESTS))): test/%.o : src/test/%_test.cpp $(LIBGTEST) 
+$(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/%,$(ALL_TESTS))): test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
@@ -264,8 +266,8 @@ endif
 #        we are generating tests, this number will be less than the
 #        number of tests to generate. (0 if running from a clean state)
 #     The second argument to filter-out is the number of unique
-#        generated distribution tests that should be generated. 
-#        This is determined by the existence of *_test.hpp files in 
+#        generated distribution tests that should be generated.
+#        This is determined by the existence of *_test.hpp files in
 #        the appropriate directory.
 #     The filter-out function returns the total number of tests that should
 #        be generated if they have not yet been generated.
@@ -276,7 +278,7 @@ GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
 
 
 .PHONY: test-headers
-test-headers: $(HEADER_TESTS) 
+test-headers: $(HEADER_TESTS)
 
 ##
 # Deprecated test targets

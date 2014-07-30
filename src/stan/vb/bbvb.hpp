@@ -7,6 +7,9 @@
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/model/util.hpp>
 
+#include <stan/math/functions.hpp>  // I had to add these two lines beceause
+#include <stan/math/matrix.hpp>     // bbvb_test.cpp wouldn't compile...
+
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 
 #include <stan/vb/base_vb.hpp>
@@ -29,12 +32,12 @@ namespace stan {
         model_(m),
         cont_params_(cont_params),
         rng_(rng),
-        n_monte_carlo_(100) {};
+        n_monte_carlo_(1e3) {};
 
       virtual ~bbvb() {};
 
       /**
-       * Calculates the "blackbox" Evidence Lower BOund (ELBO) by samplin
+       * Calculates the "blackbox" Evidence Lower BOund (ELBO) by sampling
        * from the standard multivariate normal (for now), affine transform
        * the sample, and evaluating the log joint, adjusted by the entrop
        * term of the normal, which is proportional to 0.5*logdet(L^T L)
