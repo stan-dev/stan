@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <stan/common/command.hpp>
 #include <stdexcept>
 #include <sstream>
 #include <test/test-models/no-main/gm/raise_exception_mult_args.cpp>
