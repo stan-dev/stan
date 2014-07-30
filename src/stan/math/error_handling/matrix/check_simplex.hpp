@@ -43,9 +43,11 @@ namespace stan {
         std::stringstream msg;
         T_prob sum = theta.sum();
         msg << " is not a valid simplex.";
-        msg << " sum(" << name << ") = %1%, but should be 1";
+        msg.precision(10);
+        msg << " sum(" << name << ") = " << sum
+            << ", but should be %1%";
         std::string tmp(msg.str());
-        return dom_err(function,sum,name,
+        return dom_err(function,1.0,name,
                        tmp.c_str(),"",
                        result);
       }
