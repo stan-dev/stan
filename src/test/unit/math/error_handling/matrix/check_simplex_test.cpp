@@ -3,6 +3,7 @@
 
 TEST(MathErrorHandlingMatrix, checkSimplex) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
+  y.setZero();
   double result;
   y << 0.5, 0.5;
   
@@ -17,6 +18,7 @@ TEST(MathErrorHandlingMatrix, checkSimplex) {
 
 TEST(MathErrorHandlingMatrix, checkSimplex_message_negative_value) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(100);
+  y.setZero();
   std::string message;
   double result;
 
@@ -40,6 +42,7 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_negative_value) {
 
 
 
+  y.setZero();
   y << 0.1, -0.1, 1.0;
   try {
     stan::math::check_simplex("checkSimplex(%1%)",
@@ -60,11 +63,10 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_negative_value) {
 
 TEST(MathErrorHandlingMatrix, checkSimplex_message_sum) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(100);
+  y.setZero();
   std::string message;
   double result;
 
-  for (int n = 0; n < 100; n++)
-    y[n] = 0;
   y[13] = 0.9;
 
   try {
