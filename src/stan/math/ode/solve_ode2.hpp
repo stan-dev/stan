@@ -134,7 +134,7 @@ namespace stan {
     //   for (size_t n = 0; n < ts.size(); n++)
     //     ts_vec[n+1] = ts[n];
       
-    //   T step_size = ts_vec[1] - ts_vec[0];
+    //   T step_size = 0.1;
   
     //   std::vector<std::vector<T> > x_vec;
     //   std::vector<T> t_vec;
