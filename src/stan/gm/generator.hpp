@@ -180,7 +180,7 @@ namespace stan {
       void operator()(const solve_ode& fx) const { 
         o_ << "solve_ode("
            << fx.system_function_name_
-           << "<double,double,double,double>, ";
+           << "_functor__(), ";
 
         generate_expression(fx.y0_, o_);
         o_ << ", ";
@@ -4413,6 +4413,31 @@ namespace stan {
       out << ")";
     }
 
+    void generate_functor_arguments(const function_decl_def& fun,
+                                    bool is_rng,
+                                    bool is_lp,
+                                    bool is_log,
+                                    std::ostream& out) {
+      // arguments
+      out << "(";
+      for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
+        if (i > 0) 
+          out << ", ";
+        out << fun.arg_decls_[i].name_;
+      }
+      if ((is_rng || is_lp) && fun.arg_decls_.size() > 0)
+        out << ", ";
+      if (is_rng)
+        out << "base_rng__";
+      else if (is_lp)
+        out << "lp__, lp_accum__";
+      if (is_rng || is_lp || fun.arg_decls_.size() > 0)
+        out << ", ";
+      out << "pstream__";
+      out << ")";
+    }
+
+
 
     void generate_function_body(const function_decl_def& fun,
                                 const std::string& scalar_t_name,
@@ -4429,6 +4454,7 @@ namespace stan {
       out << INDENT
           << "const static bool propto__ = true;"
           << EOL
+          << INDENT
           << "(void) propto__;" 
           << EOL;
       bool is_var = false;
@@ -4486,10 +4512,53 @@ namespace stan {
       out << EOL;
     }
 
+    void generate_function_functor(const function_decl_def& fun,
+                                   std::ostream& out) {
+      bool is_rng = ends_with("_rng", fun.name_);
+      bool is_lp = ends_with("_lp", fun.name_);
+      bool is_log = ends_with("_log", fun.name_);
+      std::string scalar_t_name 
+        = return_scalar_type(fun, is_lp);
+
+      out << std::endl
+          << "struct ";
+      generate_function_name(fun,out);
+      out << "_functor__ {"
+          << std::endl;
+
+      out << INDENT;
+      generate_function_template_parameters(fun,is_rng,is_lp,is_log,out);
+
+      out << INDENT;
+      generate_function_inline_return_type(fun,scalar_t_name,out);
+
+      out << INDENT << "operator()";
+      generate_function_arguments(fun,is_rng,is_lp,is_log,out);
+      out << " {"
+          << std::endl;
+
+      out << INDENT2
+          << "return ";
+      generate_function_name(fun,out);
+      generate_functor_arguments(fun,is_rng,is_lp,is_log,out);
+      out << ";"
+          << std::endl;
+
+      out << INDENT
+          << "}"
+          << std::endl;
+
+      out << "};"
+          << std::endl;
+    }
+
+
     void generate_functions(const std::vector<function_decl_def>& funs,
                             std::ostream& out) {
-      for (size_t i = 0; i < funs.size(); ++i)
+      for (size_t i = 0; i < funs.size(); ++i) {
         generate_function(funs[i],out);
+        generate_function_functor(funs[i],out);
+      }
     }
 
     void generate_cpp(const program& prog, 
