@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__DIVIDE_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__DIVIDE_HPP__
+#ifndef STAN__AGRAD__FWD__MATRIX__DIVIDE_HPP
+#define STAN__AGRAD__FWD__MATRIX__DIVIDE_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>

@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__ROWS__DOT_PRODUCT_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__ROWS__DOT_PRODUCT_HPP__
+#ifndef STAN__AGRAD__FWD__MATRIX__ROWS__DOT_PRODUCT_HPP
+#define STAN__AGRAD__FWD__MATRIX__ROWS__DOT_PRODUCT_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>

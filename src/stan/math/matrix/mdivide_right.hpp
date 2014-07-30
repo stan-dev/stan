@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__MDIVIDE_RIGHT_HPP__
-#define __STAN__MATH__MATRIX__MDIVIDE_RIGHT_HPP__
+#ifndef STAN__MATH__MATRIX__MDIVIDE_RIGHT_HPP
+#define STAN__MATH__MATRIX__MDIVIDE_RIGHT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>

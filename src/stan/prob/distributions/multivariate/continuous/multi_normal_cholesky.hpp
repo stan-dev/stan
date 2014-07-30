@@ -1,5 +1,11 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_CHOLESKY_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_CHOLESKY_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_CHOLESKY_HPP
+#define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_CHOLESKY_HPP
+
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
 
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
@@ -16,13 +22,9 @@
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
-#include <stan/math/matrix/trace_quad_form.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
 
 namespace stan {
 
@@ -52,6 +54,8 @@ namespace stan {
                               const T_loc& mu,
                               const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
       static const char* function = "stan::prob::multi_normal_cholesky_log(%1%)";
+      typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp_type;
+      lp_type lp(0.0);
 
       using stan::math::mdivide_left_tri_low;
       using stan::math::dot_self;
@@ -62,11 +66,6 @@ namespace stan {
       using stan::math::check_size_match;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
-      using stan::math::check_cov_matrix;
-      using boost::math::tools::promote_args;
-
-      typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp_type;
-      lp_type lp(0.0);
 
       VectorViewMvt<const T_y> y_vec(y);
       VectorViewMvt<const T_loc> mu_vec(mu);
@@ -102,7 +101,6 @@ namespace stan {
         (void) size_mu_old;
         (void) size_mu_new;
       }
-
     
       check_size_match(function, 
                             size_y, "Size of random variable",
@@ -116,8 +114,8 @@ namespace stan {
                             size_y, "Size of random variable",
                             L.cols(), "columns of covariance parameter",
                             &lp);
-        
-      for (size_t i = 0; i < size_vec; i++) { 
+
+      for (size_t i = 0; i < size_vec; i++) {
         check_finite(function, mu_vec[i], "Location parameter", &lp);
         check_not_nan(function, y_vec[i], "Random variable", &lp);
       }
@@ -125,21 +123,18 @@ namespace stan {
       if (size_y == 0)
         return lp;
 
-      
-        if (include_summand<propto>::value) 
-          lp += NEG_LOG_SQRT_TWO_PI * size_y * size_vec;
-        
-        if (include_summand<propto,T_covar>::value) {
-          Eigen::Matrix<T_covar,Eigen::Dynamic,1> L_log_diag = L.diagonal().array().log().matrix();
-          lp -= sum(L_log_diag) * size_vec;
-        }
-        
+      if (include_summand<propto>::value) 
+        lp += NEG_LOG_SQRT_TWO_PI * size_y * size_vec;
+
+      if (include_summand<propto,T_covar>::value)
+        lp -= L.diagonal().array().log().sum() * size_vec;
+
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         lp_type sum_lp_vec(0.0);
         for (size_t i = 0; i < size_vec; i++) {
           Eigen::Matrix<typename 
-            boost::math::tools::promote_args<typename scalar_type<T_y>::type,typename scalar_type<T_loc>::type>::type,
-            Eigen::Dynamic, 1> y_minus_mu(size_y);
+              boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type>::type,
+              Eigen::Dynamic, 1> y_minus_mu(size_y);
           for (int j = 0; j < size_y; j++)
             y_minus_mu(j) = y_vec[i](j)-mu_vec[i](j);
           Eigen::Matrix<typename 
@@ -166,7 +161,7 @@ namespace stan {
                               const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
       return multi_normal_cholesky_log<false>(y,mu,L);
     }
-    
+
     template <class RNG>
     inline Eigen::VectorXd
     multi_normal_cholesky_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& mu,
@@ -190,7 +185,6 @@ namespace stan {
 
       return mu + S * z;
     }
-
   }
 }
 

@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__ADAPT__GAMMA__HPP__
-#define __STAN__GM__ARGUMENTS__ADAPT__GAMMA__HPP__
+#ifndef STAN__GM__ARGUMENTS__ADAPT__GAMMA__HPP
+#define STAN__GM__ARGUMENTS__ADAPT__GAMMA__HPP
 
 #include <stan/gm/arguments/singleton_argument.hpp>
 

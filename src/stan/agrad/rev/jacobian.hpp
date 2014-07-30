@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__JACOBIAN_HPP__
-#define __STAN__AGRAD__REV__JACOBIAN_HPP__
+#ifndef STAN__AGRAD__REV__JACOBIAN_HPP
+#define STAN__AGRAD__REV__JACOBIAN_HPP
 
 #include <vector>
 #include <stan/agrad/rev/var.hpp>

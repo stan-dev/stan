@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__DENSE__E__POINT__BETA__
-#define __STAN__MCMC__DENSE__E__POINT__BETA__
+#ifndef STAN__MCMC__DENSE__E__POINT__BETA
+#define STAN__MCMC__DENSE__E__POINT__BETA
 
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
@@ -20,7 +20,7 @@ namespace stan {
       Eigen::MatrixXd mInv;
       
       dense_e_point(const dense_e_point& z): ps_point(z), mInv(z.mInv.rows(), z.mInv.cols()) {
-        _fast_matrix_copy<double>(mInv, z.mInv);
+        fast_matrix_copy_<double>(mInv, z.mInv);
       }
       
       void write_metric(std::ostream* o) {

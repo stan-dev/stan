@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__ABS_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__ABS_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__ABS_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__ABS_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>

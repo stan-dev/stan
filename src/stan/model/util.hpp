@@ -1,5 +1,5 @@
-#ifndef __STAN__MODEL__UTIL_HPP__
-#define __STAN__MODEL__UTIL_HPP__
+#ifndef STAN__MODEL__UTIL_HPP
+#define STAN__MODEL__UTIL_HPP
 
 #include <cmath>
 #include <iomanip>

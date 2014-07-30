@@ -86,40 +86,24 @@ public:
                      const double gamma,
                      const double kappa,
                      const double t0)  {
-    _counter = counter;
-    _s_bar = s_bar;
-    _x_bar = x_bar;
-    _mu = mu;
-    _delta = delta;
-    _gamma = gamma;
-    _kappa = kappa;
-    _t0 = t0;
+    counter_ = counter;
+    s_bar_ = s_bar;
+    x_bar_ = x_bar;
+    mu_ = mu;
+    delta_ = delta;
+    gamma_ = gamma;
+    kappa_ = kappa;
+    t0_ = t0;
   }
 
-  double counter() const {
-    return _counter;
-  }
-  double s_bar() const {
-    return _s_bar;
-  }
-  double x_bar() const {
-    return _x_bar;
-  }
-  double mu() const {
-    return _mu;
-  }
-  double delta() const {
-    return _delta;
-  }
-  double gamma() const {
-    return _gamma;
-  }
-  double kappa() const {
-    return _kappa;
-  }
-  double t0() const {
-    return _t0;
-  }
+  double counter() const { return counter_; }
+  double s_bar() const { return s_bar_; }
+  double x_bar() const { return x_bar_; }
+  double mu() const { return mu_; }
+  double delta() const { return delta_; }
+  double gamma() const { return gamma_; }
+  double kappa() const { return kappa_;}
+  double t0() const { return t0_; }
 };
 
 

@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__SAMPLE__ALGO__HPP__
-#define __STAN__GM__ARGUMENTS__SAMPLE__ALGO__HPP__
+#ifndef STAN__GM__ARGUMENTS__SAMPLE__ALGO__HPP
+#define STAN__GM__ARGUMENTS__SAMPLE__ALGO__HPP
 
 #include <stan/gm/arguments/list_argument.hpp>
 

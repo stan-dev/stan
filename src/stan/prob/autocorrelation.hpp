@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__AUTOCORRELATION_HPP__
-#define __STAN__PROB__AUTOCORRELATION_HPP__
+#ifndef STAN__PROB__AUTOCORRELATION_HPP
+#define STAN__PROB__AUTOCORRELATION_HPP
 
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/mean.hpp>

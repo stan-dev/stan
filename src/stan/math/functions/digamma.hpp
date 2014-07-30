@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__DIGAMMA_HPP__
-#define __STAN__MATH__FUNCTIONS__DIGAMMA_HPP__
+#ifndef STAN__MATH__FUNCTIONS__DIGAMMA_HPP
+#define STAN__MATH__FUNCTIONS__DIGAMMA_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
 

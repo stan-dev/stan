@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__STEPSIZE__COVAR__ADAPTER__BETA__
-#define __STAN__MCMC__STEPSIZE__COVAR__ADAPTER__BETA__
+#ifndef STAN__MCMC__STEPSIZE__COVAR__ADAPTER__BETA
+#define STAN__MCMC__STEPSIZE__COVAR__ADAPTER__BETA
 
 #include <stan/mcmc/base_adapter.hpp>
 #include <stan/mcmc/stepsize_adaptation.hpp>
@@ -13,15 +13,15 @@ namespace stan {
       
     public:
       
-      stepsize_covar_adapter(int n): _covar_adaptation(n)
+      stepsize_covar_adapter(int n): covar_adaptation_(n)
       {};
       
       stepsize_adaptation& get_stepsize_adaptation() {
-        return _stepsize_adaptation;
+        return stepsize_adaptation_;
       }
       
       covar_adaptation& get_covar_adaptation() {
-        return _covar_adaptation;
+        return covar_adaptation_;
       }
       
       void set_window_params(unsigned int num_warmup,
@@ -29,17 +29,17 @@ namespace stan {
                              unsigned int term_buffer,
                              unsigned int base_window,
                              std::ostream* e = 0) {
-        _covar_adaptation.set_window_params(num_warmup,
-                                             init_buffer,
-                                             term_buffer,
-                                             base_window,
-                                             e);
+        covar_adaptation_.set_window_params(num_warmup,
+                                            init_buffer,
+                                            term_buffer,
+                                            base_window,
+                                            e);
       }
       
     protected:
       
-      stepsize_adaptation _stepsize_adaptation;
-      covar_adaptation _covar_adaptation;
+      stepsize_adaptation stepsize_adaptation_;
+      covar_adaptation covar_adaptation_;
       
     };
     

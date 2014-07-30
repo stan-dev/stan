@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__AGRAD_HPP__
-#define __STAN__AGRAD__AGRAD_HPP__
+#ifndef STAN__AGRAD__AGRAD_HPP
+#define STAN__AGRAD__AGRAD_HPP
 
 #include <stdio.h>
 #include <stdlib.h>
