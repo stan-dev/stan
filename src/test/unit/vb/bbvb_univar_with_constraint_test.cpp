@@ -5,12 +5,12 @@
 
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 
-#include <test/test-models/no-main/vb/univariate_no_constraint.cpp>
+#include <test/test-models/no-main/vb/univariate_with_constraint.cpp>
 
 typedef boost::ecuyer1988 rng_t;
-typedef univariate_no_constraint_model_namespace::univariate_no_constraint_model Model;
+typedef univariate_with_constraint_model_namespace::univariate_with_constraint_model Model;
 
-TEST(bbvb_test, univar_no_constraint_ELBO) {
+TEST(bbvb_test, univar_with_constraint_ELBO) {
 
   // Create mock data_var_context
   static const std::string DATA = "";
@@ -18,7 +18,7 @@ TEST(bbvb_test, univar_no_constraint_ELBO) {
   stan::io::dump dummy_context(data_stream);
 
   // Instantiate model
-  univariate_no_constraint_model_namespace::univariate_no_constraint_model my_model(dummy_context);
+  Model my_model(dummy_context);
 
   // RNG
   rng_t base_rng(0);
@@ -40,15 +40,17 @@ TEST(bbvb_test, univar_no_constraint_ELBO) {
   double elbo = 0.0;
   elbo = test_vb.calc_ELBO(muL);
 
-  // Can calculate ELBO using formula for E_normal[(something - x)^2]
-  // (see Sam Roweis' notes)
+  // Can calculate ELBO using moment generating function of Gaussians
   //
-  // ELBO = -0.5*(3 + (1.6-5.0)**2 + (1.0-5.0)**2 + (1.5-5.0)**2) + 1
+  // ELBO = -0.5 * ( np.exp(5*2+2) - 2*1.5*np.exp(5+0.5) + (1.5)**2 +
+  //                 np.exp(5*2+2) - 2*1.0*np.exp(5+0.5) + (1.0)**2 +
+  //                 np.exp(5*2+2) - 2*1.6*np.exp(5+0.5) + (1.6)**2 )
+  //                 + 5.0 + 1
   //
 
   // FIXME: perhaps make EPSILON depend on stan::vb::bbvb.n_monte_carlo_ ?
-  double const EPSILON = 5.0;
-  EXPECT_NEAR(-20.405, elbo, EPSILON);
+  double const EPSILON = 10000.0;
+  EXPECT_NEAR(-243125.855, elbo, EPSILON);
 
 }
 

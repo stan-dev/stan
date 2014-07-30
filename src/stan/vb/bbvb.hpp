@@ -32,7 +32,7 @@ namespace stan {
         model_(m),
         cont_params_(cont_params),
         rng_(rng),
-        n_monte_carlo_(1e3) {};
+        n_monte_carlo_(1e4) {};
 
       virtual ~bbvb() {};
 
