@@ -45,7 +45,7 @@ TEST(bbvb_test, univar_with_constraint_ELBO) {
   // ELBO = -0.5 * ( np.exp(5*2+2) - 2*1.5*np.exp(5+0.5) + (1.5)**2 +
   //                 np.exp(5*2+2) - 2*1.0*np.exp(5+0.5) + (1.0)**2 +
   //                 np.exp(5*2+2) - 2*1.6*np.exp(5+0.5) + (1.6)**2 )
-  //                 + 5.0 + 1
+  //                 + 5.0
   //
 
   // FIXME: perhaps make EPSILON depend on stan::vb::bbvb.n_monte_carlo_ ?

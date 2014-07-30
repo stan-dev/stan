@@ -91,38 +91,38 @@ namespace stan {
         stan::model::gradient(model_, cont_params_, lp, init_grad, &std::cout);
         std::cout << "stan::model::gradient, lp = " << lp << std::endl;
 
-        std::cout << "DOUBLE" << std::endl;
+        // std::cout << "DOUBLE" << std::endl;
 
-        std::cout << "<true,true> lp = "
-                  << model_.template log_prob<true,true>(cont_params_, &std::cout)
-                  << std::endl;
-        std::cout << "<true,false> lp = "
-                  << model_.template log_prob<true,false>(cont_params_, &std::cout)
-                  << std::endl;
-        std::cout << "<false,true> lp = "
-                  << model_.template log_prob<false,true>(cont_params_, &std::cout)
-                  << std::endl;
-        std::cout << "<false,false> lp = "
-                  << model_.template log_prob<false,false>(cont_params_, &std::cout)
-                  << std::endl;
+        // std::cout << "<true,true> lp = "
+        //           << model_.template log_prob<true,true>(cont_params_, &std::cout)
+        //           << std::endl;
+        // std::cout << "<true,false> lp = "
+        //           << model_.template log_prob<true,false>(cont_params_, &std::cout)
+        //           << std::endl;
+        // std::cout << "<false,true> lp = "
+        //           << model_.template log_prob<false,true>(cont_params_, &std::cout)
+        //           << std::endl;
+        // std::cout << "<false,false> lp = "
+        //           << model_.template log_prob<false,false>(cont_params_, &std::cout)
+        //           << std::endl;
 
-        std::cout << "VAR" << std::endl;
+        // std::cout << "VAR" << std::endl;
 
-        Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> cont_params_var(1);
-        cont_params_var << cont_params_(0);
+        // Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> cont_params_var(1);
+        // cont_params_var << cont_params_(0);
 
-        std::cout << "<true,true> lp = "
-                  << model_.template log_prob<true,true>(cont_params_var, &std::cout)
-                  << std::endl;
-        std::cout << "<true,false> lp = "
-                  << model_.template log_prob<true,false>(cont_params_var, &std::cout)
-                  << std::endl;
-        std::cout << "<false,true> lp = "
-                  << model_.template log_prob<false,true>(cont_params_var, &std::cout)
-                  << std::endl;
-        std::cout << "<false,false> lp = "
-                  << model_.template log_prob<true,true>(cont_params_var, &std::cout)
-                  << std::endl;
+        // std::cout << "<true,true> lp = "
+        //           << model_.template log_prob<true,true>(cont_params_var, &std::cout)
+        //           << std::endl;
+        // std::cout << "<true,false> lp = "
+        //           << model_.template log_prob<true,false>(cont_params_var, &std::cout)
+        //           << std::endl;
+        // std::cout << "<false,true> lp = "
+        //           << model_.template log_prob<false,true>(cont_params_var, &std::cout)
+        //           << std::endl;
+        // std::cout << "<false,false> lp = "
+        //           << model_.template log_prob<true,true>(cont_params_var, &std::cout)
+        //           << std::endl;
 
 
 

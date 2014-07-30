@@ -213,6 +213,8 @@ test/unit/optimization/lbfgs_update.o: src/test/test-models/no-main/optimization
 
 test/unit/vb/bbvb_univar_no_constraint.o: src/test/test-models/no-main/vb/univariate_no_constraint.cpp
 test/unit/vb/bbvb_univar_with_constraint.o: src/test/test-models/no-main/vb/univariate_with_constraint.cpp
+test/unit/vb/bbvb_multivar_no_constraint.o: src/test/test-models/no-main/vb/multivariate_no_constraint.cpp
+test/unit/vb/bbvb_multivar_with_constraint.o: src/test/test-models/no-main/vb/multivariate_with_constraint.cpp
 
 test/unit/common/command_init.o: src/test/test-models/no-main/common/test_lp.cpp
 test/unit/common/run_markov_chain.o: src/test/test-models/no-main/common/test_lp.cpp
