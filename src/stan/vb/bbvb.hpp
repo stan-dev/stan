@@ -8,9 +8,11 @@
 #include <stan/model/util.hpp>
 
 #include <stan/math/functions.hpp>  // I had to add these two lines beceause
-#include <stan/math/matrix.hpp>     // bbvb_test.cpp wouldn't compile...
+#include <stan/math/matrix.hpp>     // the unit tests wouldn't compile...
 
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
+
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
 
 #include <stan/vb/base_vb.hpp>
 #include <stan/vb/latent_vars.hpp>
@@ -78,85 +80,135 @@ namespace stan {
         return elbo;
       }
 
+
+      void calc_mu_grad(latent_vars const& muL, Eigen::VectorXd& mu_grad) {
+        static const char* function = "stan::vb::bbvb.calc_mu_grad(%1%)";
+
+        int dim = muL.dimension();
+        double tmp_lp = 0.0;
+
+        double tmp(0.0);
+        stan::math::check_size_match(function,
+                              mu_grad.size(),  "Dimension of mu grad vector",
+                              dim, "Dimension of mean vector in variational q",
+                              &tmp);
+
+        mu_grad                     = Eigen::VectorXd::Zero(dim);
+        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
+
+        Eigen::VectorXd zero_mean = Eigen::VectorXd::Zero(dim);
+        Eigen::MatrixXd eye       = Eigen::MatrixXd::Identity(dim, dim);
+
+        Eigen::VectorXd z_check;
+        Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_check_var(dim);
+
+        for (int i = 0; i < n_monte_carlo_; ++i) {
+          // Draw from standard normal and transform to unconstrained space
+          z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);
+          muL.to_unconstrained(z_check);
+
+          stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad, &std::cout);
+
+          mu_grad += tmp_mu_grad;
+        }
+        mu_grad /= static_cast<double>(n_monte_carlo_);
+      }
+
+
+
       void test() {
         if (out_stream_) *out_stream_ << "This is base_vb::bbvb::test()" << std::endl;
 
         if (out_stream_) *out_stream_ << "cont_params_ = " << std::endl
                                       << cont_params_ << std::endl << std::endl;
 
-        // OK, let's use this gradient thing to compute the log_prob
-        double lp(0.0);
+
+        // Init print out
+        double lp = 0.0;
+        double elbo = 0.0;
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model_.num_params_r());
 
         stan::model::gradient(model_, cont_params_, lp, init_grad, &std::cout);
         std::cout << "stan::model::gradient, lp = " << lp << std::endl;
-
-        // std::cout << "DOUBLE" << std::endl;
-
-        // std::cout << "<true,true> lp = "
-        //           << model_.template log_prob<true,true>(cont_params_, &std::cout)
-        //           << std::endl;
-        // std::cout << "<true,false> lp = "
-        //           << model_.template log_prob<true,false>(cont_params_, &std::cout)
-        //           << std::endl;
-        // std::cout << "<false,true> lp = "
-        //           << model_.template log_prob<false,true>(cont_params_, &std::cout)
-        //           << std::endl;
-        // std::cout << "<false,false> lp = "
-        //           << model_.template log_prob<false,false>(cont_params_, &std::cout)
-        //           << std::endl;
-
-        // std::cout << "VAR" << std::endl;
-
-        // Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> cont_params_var(1);
-        // cont_params_var << cont_params_(0);
-
-        // std::cout << "<true,true> lp = "
-        //           << model_.template log_prob<true,true>(cont_params_var, &std::cout)
-        //           << std::endl;
-        // std::cout << "<true,false> lp = "
-        //           << model_.template log_prob<true,false>(cont_params_var, &std::cout)
-        //           << std::endl;
-        // std::cout << "<false,true> lp = "
-        //           << model_.template log_prob<false,true>(cont_params_var, &std::cout)
-        //           << std::endl;
-        // std::cout << "<false,false> lp = "
-        //           << model_.template log_prob<true,true>(cont_params_var, &std::cout)
-        //           << std::endl;
+        std::cout << "init_grad = " << init_grad << std::endl;
 
 
-
-        // Now let's test this latent_vars class we just wrote
-        Eigen::VectorXd mu = Eigen::VectorXd::Constant(model_.num_params_r(), 5.0);
+        // mu, L
+        Eigen::VectorXd mu = cont_params_;
         Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(), model_.num_params_r());
 
         latent_vars muL = latent_vars(mu,L);
 
-        if (out_stream_) *out_stream_ << "muL.mu() = " << std::endl
-                                      << muL.mu() << std::endl;
 
-        if (out_stream_) *out_stream_ << "muL.L() = " << std::endl
-                                      << muL.L() << std::endl;
+        // Eigen::VectorXd bla;
 
-        Eigen::VectorXd x = Eigen::VectorXd::Constant(model_.num_params_r(),10.0);
+        // bla = Eigen::VectorXd::Constant(model_.num_params_r(),-10.0);
+        // stan::model::gradient(model_, bla, lp, init_grad, &std::cout);
+        // std::cout << "lp = " << lp << std::endl;
+        // std::cout << "grad = " << init_grad << std::endl;
+        // muL.set_mu(bla);
+        // elbo = calc_ELBO(muL);
+        // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
 
-        if (out_stream_) *out_stream_ << "x = " << std::endl
-                                      << x << std::endl;
+        // bla = Eigen::VectorXd::Constant(model_.num_params_r(),0.0);
+        // stan::model::gradient(model_, bla, lp, init_grad, &std::cout);
+        // std::cout << "lp = " << lp << std::endl;
+        // std::cout << "grad = " << init_grad << std::endl;
+        // muL.set_mu(bla);
+        // elbo = calc_ELBO(muL);
+        // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
 
-        muL.to_unconstrained(x);
-        if (out_stream_) *out_stream_ << "unconstrained x = " << std::endl
-                                      << x << std::endl;
+        // bla = Eigen::VectorXd::Constant(model_.num_params_r(),2.7);
+        // stan::model::gradient(model_, bla, lp, init_grad, &std::cout);
+        // std::cout << "lp = " << lp << std::endl;
+        // std::cout << "grad = " << init_grad << std::endl;
+        // muL.set_mu(bla);
+        // elbo = calc_ELBO(muL);
+        // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
 
-        muL.to_standardized(x);
-        if (out_stream_) *out_stream_ << "standardized x = " << std::endl
-                                      << x << std::endl;
+        // bla = Eigen::VectorXd::Constant(model_.num_params_r(),15.0);
+        // stan::model::gradient(model_, bla, lp, init_grad, &std::cout);
+        // std::cout << "lp = " << lp << std::endl;
+        // std::cout << "grad = " << init_grad << std::endl;
+        // muL.set_mu(bla);
+        // elbo = calc_ELBO(muL);
+        // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
+
+        // bla = Eigen::VectorXd::Constant(model_.num_params_r(),100.0);
+        // stan::model::gradient(model_, bla, lp, init_grad, &std::cout);
+        // std::cout << "lp = " << lp << std::endl;
+        // std::cout << "grad = " << init_grad << std::endl;
+        // muL.set_mu(bla);
+        // elbo = calc_ELBO(muL);
+        // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
 
 
-        // Now let's call this ELBO function
-        double elbo = calc_ELBO(muL);
+        Eigen::VectorXd mu_print;
+        Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(model_.num_params_r());
 
-        if (out_stream_) *out_stream_ << "elbo = " << std::endl
-                                      << elbo << std::endl << std::endl;
+        for (int i = 0; i < 20; ++i)
+        {
+          if (out_stream_) *out_stream_ << "---------------------" << std::endl
+                                        << "  iter " << i << std::endl
+                                        << "---------------------" << std::endl;
+
+          calc_mu_grad(muL, mu_grad);
+
+          if (out_stream_) *out_stream_ << "mu_grad = " << std::endl
+                                        << mu_grad << std::endl;
+
+          muL.set_mu(muL.mu() + 0.25*mu_grad);
+          mu_print = muL.mu();
+
+          if (out_stream_) *out_stream_ << "mu = " << std::endl
+                                        << mu_print << std::endl;
+
+          elbo = calc_ELBO(muL);
+          if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl;
+
+          // model_.template write_csv(rng_, mu_print, std::cout);
+
+        }
 
         return;
       }

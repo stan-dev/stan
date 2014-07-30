@@ -40,11 +40,17 @@ namespace stan {
 
       virtual ~latent_vars() {}; // No-op
 
+      // Accessors
       int dimension() const { return dimension_; }
 
       Eigen::VectorXd const& mu() const { return mu_; }
 
       Eigen::MatrixXd const& L() const { return L_; }
+
+      // Mutators
+      void set_mu(Eigen::MatrixXd const& mu) { mu_ = mu; }
+
+
 
       // Implements g^{-1}(\check{z}) = L\check{z} + \mu
       void to_unconstrained(Eigen::VectorXd& x) const {

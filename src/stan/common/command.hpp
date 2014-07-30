@@ -755,37 +755,11 @@ namespace stan {
       //////////////////////////////////////////////////
 
       if (parser.arg("method")->arg("vb")) {
+
         std::vector<double> cont_vector(cont_params.size());
         for (int i = 0; i < cont_params.size(); ++i)
           cont_vector.at(i) = cont_params(i);
         std::vector<int> disc_vector;
-
-        if (output_stream) {
-          std::vector<std::string> names;
-          names.push_back("lp__");
-          model.constrained_param_names(names, true, true);
-
-          (*output_stream) << names.at(0);
-          for (size_t i = 1; i < names.size(); ++i) {
-            (*output_stream) << "," << names.at(i);
-          }
-          (*output_stream) << std::endl;
-        }
-
-        double lp(0);
-        std::vector<double> gradient;
-        try {
-          lp = model.template log_prob<false, false>(cont_vector, disc_vector, &std::cout);
-        } catch (const std::exception& e) {
-          write_error_msg(&std::cout, e);
-          lp = -std::numeric_limits<double>::infinity();
-        }
-
-        std::cout << "initial log joint probability = " << lp << std::endl;
-        if (output_stream) {
-          write_iteration(*output_stream, model, base_rng,
-                          lp, cont_vector, disc_vector);
-        }
 
         stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, base_rng, &std::cout, &std::cout);
         cmd_vb.test();
