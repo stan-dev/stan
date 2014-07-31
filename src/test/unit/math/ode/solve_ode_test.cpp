@@ -50,6 +50,8 @@ TEST(solve_ode, harm_osc) {
   t0 = 0;
 
   theta.push_back(gamma);
+  theta.push_back(gamma2);
+  theta.push_back(gamma3);
   y0.push_back(1.0);
   y0.push_back(0.0);
 
@@ -68,9 +70,6 @@ TEST(solve_ode, harm_osc) {
   EXPECT_NEAR(-0.421907, ode_res[100][0].val(), 1e-6);
   EXPECT_NEAR(0.246407, ode_res[100][1].val(), 1e-6);
 
-  std::vector<double> grad;
-  ode_res[100][0].grad(theta,grad);
-  std::cout << grad[0] << std::endl;
 }
 
 

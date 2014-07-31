@@ -6,10 +6,8 @@
 #include <boost/numeric/odeint.hpp>
 #include <stan/agrad/rev.hpp>
 
+#include <stan/math/ode/solve_ode.hpp>
 #include <stan/math/ode/solve_ode2.hpp>
-#include <stan/math.hpp>
-
-typedef std::vector< stan::agrad::var > state_type;
 
 template <typename T>
 inline
@@ -69,40 +67,149 @@ TEST(solve_ode2, ode_system2) {
   EXPECT_FLOAT_EQ(-1.8, dy_dt[3]);
 }
 
-// TEST(solve_ode2, harm_osc) {
-//   harm_osc_ode_fun harm_osc;
+template <typename F>
+inline void solve_ode_efficient(const F& f,
+                                const std::vector<double>& y0_dbl,
+                                const double& t0_dbl,
+                                const std::vector<double>& ts_dbl,
+                                const std::vector<double>& theta_dbl,
+                                const std::vector<double>& x,
+                                const std::vector<int>& x_int,
+                                const int& iteration_number,
+                                const int& eqn_number,
+                                double& value,
+                                std::vector<double>& gradients) {
 
-//   std::vector<stan::agrad::var> y0;
-//   std::vector<stan::agrad::var> theta;
-//   stan::agrad::var t0;
-//   std::vector<std::vector<stan::agrad::var> > ode_res;
-//   std::vector<stan::agrad::var> ts;
+  std::vector<stan::agrad::var> y0;
+  for (int i = 0; i < y0_dbl.size(); i++)
+    y0.push_back(y0_dbl[i]);
 
-//   stan::agrad::var gamma(0.15);
-//   t0 = 0;
+  stan::agrad::var t0;
+  t0 = t0_dbl;
 
-//   theta.push_back(gamma);
-//   y0.push_back(1.0);
-//   y0.push_back(0.0);
+  std::vector<stan::agrad::var> ts;
+  for (int i = 0; i < ts_dbl.size(); i++)
+    ts.push_back(ts_dbl[i]);
 
-//   std::vector<double> x;
-//   std::vector<int> x_int;
+  std::vector<stan::agrad::var> theta;
+  for (int i = 0; i < theta_dbl.size(); i++)
+    theta.push_back(theta_dbl[i]);
 
-//   for (int i = 0; i < 100; i++)
-//     ts.push_back(0.1*(i+1));
+  std::vector<std::vector<stan::agrad::var> > ode_res;
 
-//   ode_res = stan::math::solve_ode(harm_osc, y0, t0,
-//                                   ts, theta, x, x_int);
+  ode_res = stan::math::solve_ode2(f, y0, t0,
+                                   ts, theta, x, x_int);
+  value = ode_res[iteration_number][eqn_number].val();
+  
+  ode_res[iteration_number][eqn_number].grad(theta, gradients);
+}
 
-//   EXPECT_NEAR(0.995029, ode_res[1][0].val(), 1e-6);
-//   EXPECT_NEAR(-0.0990884, ode_res[1][1].val(), 1e-6);
+template <typename F>
+inline void solve_ode_diff_integrator(const F& f,
+                                      const std::vector<double>& y0_dbl,
+                                      const double& t0_dbl,
+                                      const std::vector<double>& ts_dbl,
+                                      const std::vector<double>& theta_dbl,
+                                      const std::vector<double>& x,
+                                      const std::vector<int>& x_int,
+                                      const int& iteration_number,
+                                      const int& eqn_number,
+                                      double& value,
+                                      std::vector<double>& gradients) {
 
-//   EXPECT_NEAR(-0.421907, ode_res[100][0].val(), 1e-6);
-//   EXPECT_NEAR(0.246407, ode_res[100][1].val(), 1e-6);
+  std::vector<stan::agrad::var> y0;
+  for (int i = 0; i < y0_dbl.size(); i++)
+    y0.push_back(y0_dbl[i]);
 
-//   std::vector<double> grad;
-//   ode_res[100][0].grad(theta,grad);
-//   std::cout << grad[0] << std::endl;
-// }
+  stan::agrad::var t0;
+  t0 = t0_dbl;
 
+  std::vector<stan::agrad::var> ts;
+  for (int i = 0; i < ts_dbl.size(); i++)
+    ts.push_back(ts_dbl[i]);
 
+  std::vector<stan::agrad::var> theta;
+  for (int i = 0; i < theta_dbl.size(); i++)
+    theta.push_back(theta_dbl[i]);
+
+  std::vector<std::vector<stan::agrad::var> > ode_res;
+
+  ode_res = stan::math::solve_ode(f, y0, t0,
+                                  ts, theta, x, x_int);
+  value = ode_res[iteration_number][eqn_number].val();
+  
+  ode_res[iteration_number][eqn_number].grad(theta, gradients);
+}
+
+TEST(solve_ode2, harm_osc_compare_to_diff_integrator) {
+  harm_osc_ode_fun harm_osc;
+
+  std::vector<double> y0;
+  std::vector<double> theta;
+  double t0;
+  std::vector<double> ts;
+
+  t0 = 0;
+
+  theta.push_back(0.15);
+  y0.push_back(1.0);
+  y0.push_back(0.0);
+
+  std::vector<double> x;
+  std::vector<int> x_int;
+
+  for (int i = 0; i < 100; i++)
+    ts.push_back(0.1*(i+1));
+
+  for (int i = 0; i < ts.size()+1; i++) {
+    for (int j = 0; j < theta.size(); j++) {
+      double val_diff_integrator;
+      std::vector<double> grad_diff_integrator;
+      double val_eff;
+      std::vector<double> grad_eff;
+      solve_ode_diff_integrator(harm_osc, y0, t0, ts, theta, x, x_int, i, j, 
+                                val_diff_integrator, grad_diff_integrator);
+      solve_ode_efficient(harm_osc, y0, t0, ts, theta, x, x_int, i, j, 
+                          val_eff, grad_eff);
+      EXPECT_NEAR(val_diff_integrator, val_eff, 1e-5);
+      
+      for (int k = 0; k < theta.size(); k++)
+        EXPECT_NEAR(grad_diff_integrator[k], grad_eff[k], 1e-5);
+
+      
+    }
+  }
+}
+
+TEST(solve_ode2, harm_osc) {
+  harm_osc_ode_fun harm_osc;
+
+  std::vector<stan::agrad::var> y0;
+  std::vector<stan::agrad::var> theta;
+  stan::agrad::var t0;
+  std::vector<std::vector<stan::agrad::var> > ode_res;
+  std::vector<stan::agrad::var> ts;
+
+  stan::agrad::var gamma(0.15);
+  t0 = 0;
+
+  theta.push_back(gamma);
+  y0.push_back(1.0);
+  y0.push_back(0.0);
+
+  std::vector<double> x;
+  std::vector<int> x_int;
+
+  for (int i = 0; i < 100; i++)
+    ts.push_back(0.1*(i+1));
+
+  ode_res = stan::math::solve_ode2(harm_osc, y0, t0,
+                                  ts, theta, x, x_int);
+
+  EXPECT_NEAR(0.995029, ode_res[1][0].val(), 1e-5);
+  EXPECT_NEAR(-0.0990884, ode_res[1][1].val(), 1e-5);
+
+  EXPECT_NEAR(-0.421907, ode_res[100][0].val(), 1e-5);
+  EXPECT_NEAR(0.246407, ode_res[100][1].val(), 1e-5);
+
+}
