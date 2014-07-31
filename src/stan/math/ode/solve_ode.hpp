@@ -89,15 +89,13 @@ namespace stan {
       std::vector<T> y0_vec(y0.size());
       for (size_t n = 0; n < y0.size(); n++)
         y0_vec[n] = y0[n];
-      // for (size_t n = y0.size(); n < 2 * y0.size(); n++)
-      //   y0_vec[n] = 0.0;
 
       std::vector<T> ts_vec(ts.size()+1);
       ts_vec[0] = t0;
       for (size_t n = 0; n < ts.size(); n++)
         ts_vec[n+1] = ts[n];
       
-      T step_size = ts_vec[1] - ts_vec[0];
+      T step_size = 0.1;
   
       std::vector<std::vector<T> > x_vec;
       std::vector<T> t_vec;
