@@ -48,9 +48,9 @@ namespace stan {
       Eigen::MatrixXd const& L() const { return L_; }
 
       // Mutators
-      void set_mu(Eigen::MatrixXd const& mu) { mu_ = mu; }
+      void set_mu(Eigen::VectorXd const& mu) { mu_ = mu; }
 
-
+      void set_L(Eigen::MatrixXd const& L) { L_ = L; }
 
       // Implements g^{-1}(\check{z}) = L\check{z} + \mu
       void to_unconstrained(Eigen::VectorXd& x) const {

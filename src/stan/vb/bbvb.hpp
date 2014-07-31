@@ -13,6 +13,7 @@
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 
 #include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 
 #include <stan/vb/base_vb.hpp>
 #include <stan/vb/latent_vars.hpp>
@@ -34,7 +35,7 @@ namespace stan {
         model_(m),
         cont_params_(cont_params),
         rng_(rng),
-        n_monte_carlo_(1e4) {};
+        n_monte_carlo_(5e3) {};
 
       virtual ~bbvb() {};
 
@@ -80,7 +81,13 @@ namespace stan {
         return elbo;
       }
 
-
+      /**
+       * Calculates the "blackbox" gradient with respect to the location (mean)
+       * parameter of the variational family.
+       *
+       * @param muL     mean and cholesky factor of affine transform
+       * @param mu_grad gradient of location parameter
+       */
       void calc_mu_grad(latent_vars const& muL, Eigen::VectorXd& mu_grad) {
         static const char* function = "stan::vb::bbvb.calc_mu_grad(%1%)";
 
@@ -96,22 +103,70 @@ namespace stan {
         mu_grad                     = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
 
-        Eigen::VectorXd zero_mean = Eigen::VectorXd::Zero(dim);
-        Eigen::MatrixXd eye       = Eigen::MatrixXd::Identity(dim, dim);
+        Eigen::VectorXd zero_mean   = Eigen::VectorXd::Zero(dim);
+        Eigen::MatrixXd eye         = Eigen::MatrixXd::Identity(dim, dim);
 
         Eigen::VectorXd z_check;
-        Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_check_var(dim);
 
         for (int i = 0; i < n_monte_carlo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
           z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);
           muL.to_unconstrained(z_check);
 
+          // Compute gradient step in unconstrained space
           stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad, &std::cout);
+
+          // stan::model::log_prob_grad<true,true>(model_,
+          //                z_check,
+          //                tmp_mu_grad,
+          //                &std::cout) ;
 
           mu_grad += tmp_mu_grad;
         }
         mu_grad /= static_cast<double>(n_monte_carlo_);
+      }
+
+      /**
+       * Calculates the "blackbox" gradient with respect to the scale
+       * (covariance) matrix parameter of the variational family.
+       *
+       * @param muL     mean and cholesky factor of affine transform
+       * @param L_grad gradient of scale matrix parameter
+       */
+      void calc_L_grad(latent_vars const& muL, Eigen::MatrixXd& L_grad) {
+        static const char* function = "stan::vb::bbvb.calc_L_grad(%1%)";
+
+        int dim = muL.dimension();
+        double tmp_lp = 0.0;
+
+        double tmp(0.0);
+        stan::math::check_square(function, L_grad, "Scale matrix", &tmp);
+        stan::math::check_size_match(function,
+                                     L_grad.rows(), "Dimension of scale matrix",
+                                     dim, "Dimension of mean vector",
+                                     &tmp);
+
+        L_grad                      = Eigen::MatrixXd::Zero(dim,dim);
+        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
+
+        Eigen::VectorXd zero_mean   = Eigen::VectorXd::Zero(dim);
+        Eigen::MatrixXd eye         = Eigen::MatrixXd::Identity(dim, dim);
+
+        Eigen::VectorXd z_check;
+
+        for (int i = 0; i < n_monte_carlo_; ++i) {
+          // Draw from standard normal and transform to unconstrained space
+          z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);
+          muL.to_unconstrained(z_check);
+
+          // Compute gradient step in unconstrained space
+          stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad, &std::cout);
+
+          L_grad += tmp_mu_grad * z_check.transpose();
+          L_grad += stan::math::inverse(muL.L()).transpose();
+
+        }
+        L_grad /= static_cast<double>(n_monte_carlo_);
       }
 
 
@@ -136,6 +191,7 @@ namespace stan {
         // mu, L
         Eigen::VectorXd mu = cont_params_;
         Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(), model_.num_params_r());
+        L = L.array() * 1.0;
 
         latent_vars muL = latent_vars(mu,L);
 
@@ -183,25 +239,26 @@ namespace stan {
         // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
 
 
-        Eigen::VectorXd mu_print;
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(model_.num_params_r());
+        Eigen::MatrixXd L_grad = Eigen::MatrixXd::Zero(model_.num_params_r(),model_.num_params_r());
 
-        for (int i = 0; i < 20; ++i)
+        for (int i = 0; i < 50; ++i)
         {
           if (out_stream_) *out_stream_ << "---------------------" << std::endl
                                         << "  iter " << i << std::endl
                                         << "---------------------" << std::endl;
 
           calc_mu_grad(muL, mu_grad);
-
-          if (out_stream_) *out_stream_ << "mu_grad = " << std::endl
-                                        << mu_grad << std::endl;
-
           muL.set_mu(muL.mu() + 0.25*mu_grad);
-          mu_print = muL.mu();
+
+          calc_L_grad(muL, L_grad);
+          muL.set_L(muL.L() + 0.01*L_grad);
 
           if (out_stream_) *out_stream_ << "mu = " << std::endl
-                                        << mu_print << std::endl;
+                                        << muL.mu() << std::endl;
+
+          if (out_stream_) *out_stream_ << "L = " << std::endl
+                                        << muL.L() << std::endl;
 
           elbo = calc_ELBO(muL);
           if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl;
