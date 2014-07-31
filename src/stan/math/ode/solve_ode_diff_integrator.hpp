@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__ODE__SOLVE_ODE_HPP__
-#define STAN__MATH__ODE__SOLVE_ODE_HPP__
+#ifndef STAN__MATH__ODE__SOLVE_ODE_DIFF_INTEGRATOR_HPP__
+#define STAN__MATH__ODE__SOLVE_ODE_DIFF_INTEGRATOR_HPP__
 
 #include <vector>
 #include <boost/numeric/odeint.hpp>
@@ -11,15 +11,15 @@ namespace stan {
   namespace math {
 
     template <typename F, typename T>
-    struct ode_system {
+    struct ode_system_diff_integrator {
       F f_;
       const std::vector<T>& theta_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
-      ode_system(F f,
-                 const std::vector<T>& theta,
-                 const std::vector<double>& x,
-                 const std::vector<int>& x_int)
+      ode_system_diff_integrator(F f,
+                                 const std::vector<T>& theta,
+                                 const std::vector<double>& x,
+                                 const std::vector<int>& x_int)
         : f_(f), theta_(theta), x_(x), x_int_(x_int) {
       }
       void operator()(const std::vector<T>& y,
@@ -31,17 +31,17 @@ namespace stan {
 
     template <typename F, typename T>
     std::vector<std::vector<T> >
-    solve_ode(F f,
-              const std::vector<T>& y0,
-              const T& t0,
-              const std::vector<T>& ts,
-              const std::vector<T>& theta,
-              const std::vector<double>& x,
-              const std::vector<int>& x_int) {
+    solve_ode_diff_integrator(F f,
+                              const std::vector<T>& y0,
+                              const double& t0,
+                              const std::vector<double>& ts,
+                              const std::vector<T>& theta,
+                              const std::vector<double>& x,
+                              const std::vector<int>& x_int) {
       using namespace boost::numeric::odeint;  // FIXME: trim to what is used
       using namespace std;
 
-      ode_system<F,T> system(f,theta,x,x_int);
+      ode_system_diff_integrator<F,T> system(f,theta,x,x_int);
       double absolute_tolerance = 1e-6;
       double relative_tolerance = 1e-6;
 
