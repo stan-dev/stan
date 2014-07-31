@@ -14,9 +14,6 @@ public:
   template <class T, class T_msg>
   std::string expected_message(T y, T_msg msg) {
     std::stringstream expected_message;
-    // FIXME: remove this piece of the message
-    expected_message << "Error in function ";
-  
     expected_message << "function("
                      << typeid(T).name()
                      << "): "
