@@ -59,12 +59,6 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, alpha, sigma);
 
-      for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        if (y_dbl < 0)
-          return LOG_ZERO;
-      }
-      
       DoubleVectorView<include_summand<propto,T_shape>::value,
         is_vector<T_shape>::value> log_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
