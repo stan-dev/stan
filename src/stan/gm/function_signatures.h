@@ -494,6 +494,7 @@ add("minus",ROW_VECTOR_T,ROW_VECTOR_T);
 add("minus",MATRIX_T,MATRIX_T);
 add("modified_bessel_first_kind",DOUBLE_T,INT_T,DOUBLE_T);
 add("modified_bessel_second_kind",DOUBLE_T,INT_T,DOUBLE_T);
+add("modulus",INT_T,INT_T,INT_T);
 add("multi_gp_log",DOUBLE_T, MATRIX_T,MATRIX_T,VECTOR_T);
 {
   std::vector<base_expr_type> eigen_vector_types;

@@ -152,7 +152,6 @@ namespace stan {
       }
     };
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
-
  
     struct exponentiation_expr {
       template <typename T1, typename T2, typename T3, typename T4, typename T5>
@@ -258,6 +257,39 @@ namespace stan {
       }
     };
     boost::phoenix::function<division_expr> division_f;
+
+    struct modulus_expr {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
+
+      void operator()(expression& expr1,
+                      const expression& expr2,
+                      //                      const var_origin& var_origin,
+                      //                      bool& pass,
+                      std::ostream& error_msgs) const {
+        if (!expr1.expression_type().is_primitive_int() 
+            && !expr2.expression_type().is_primitive_int()) {
+          error_msgs << "both arguments to % must be primitive ints"
+                     << "; cannot exponentiate "
+                     << expr1.expression_type()
+                     << " by " 
+                     << expr2.expression_type();
+          //                     << " in block=";
+          //          print_var_origin(error_msgs,var_origin);
+          error_msgs << std::endl;
+          //          pass = false;
+          return;
+        }
+        std::vector<expression> args;
+        args.push_back(expr1);
+        args.push_back(expr2);
+        set_fun_type sft;
+        fun f("modulus",args);
+        sft(f,error_msgs);
+        expr1 = expression(f);
+      }
+    };
+    boost::phoenix::function<modulus_expr> modulus_f;
 
     struct left_division_expr {
       template <typename T1, typename T2, typename T3>
@@ -517,6 +549,8 @@ namespace stan {
                                                 boost::phoenix::ref(error_msgs_))])
                   | (lit('/') > negated_factor_r(_r1)   
                                 [division_f(_val,_1,boost::phoenix::ref(error_msgs_))])
+                  | (lit('%') > negated_factor_r(_r1)   
+                                [modulus_f(_val,_1,boost::phoenix::ref(error_msgs_))])
                   | (lit('\\') > negated_factor_r(_r1)   
                                  [left_division_f(_val,_1,
                                                    boost::phoenix::ref(error_msgs_))])

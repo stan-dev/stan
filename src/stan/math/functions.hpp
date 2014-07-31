@@ -57,6 +57,7 @@
 #include <stan/math/functions/min.hpp>
 #include <stan/math/functions/modified_bessel_first_kind.hpp>
 #include <stan/math/functions/modified_bessel_second_kind.hpp>
+#include <stan/math/functions/modulus.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/owens_t.hpp>
 #include <stan/math/functions/rising_factorial.hpp>
