@@ -308,5 +308,5 @@ TEST(gmAst, solveOde) {
   EXPECT_EQ(x_int.type_, so2.x_int_.expression_type());
 
   expression e2(so2);
-  EXPECT_EQ(expr_type(VECTOR_T,1), e2.expression_type());
+  EXPECT_EQ(expr_type(DOUBLE_T,2), e2.expression_type());
 }

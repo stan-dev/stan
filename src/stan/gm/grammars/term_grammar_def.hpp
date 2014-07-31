@@ -79,6 +79,18 @@ namespace stan {
   namespace gm {
 
 
+    struct validate_solve_ode {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
+
+      void operator()(const solve_ode& term,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        pass = true;
+      }
+    };
+    boost::phoenix::function<validate_solve_ode> validate_solve_ode_f;
+    
     struct set_fun_type {
       template <typename T1, typename T2>
       struct result { typedef fun type; };
@@ -554,7 +566,7 @@ namespace stan {
                )
         ;
       
-      solve_ode_r.name("solve o2de");
+      solve_ode_r.name("solve ode");
       solve_ode_r 
         %= lit("solve_ode")
         > lit('(')
@@ -571,7 +583,7 @@ namespace stan {
         > expression_g(_r1)     // x
         > lit(',')
         > expression_g(_r1)     // x_int
-        > lit(')');
+        > lit(')') [validate_solve_ode_f(_val, _pass, boost::phoenix::ref(error_msgs_))];
       // FIXME:  need big check here to make sure all args correctly
       // typed
       // FIXME:  need to reserve solve_ode function
