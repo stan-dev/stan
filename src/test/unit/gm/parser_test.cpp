@@ -125,7 +125,6 @@ void test_warning(const std::string& model_name, const std::string& warning_msg)
   EXPECT_TRUE(msgs.str().find_first_of(warning_msg) != std::string::npos);
 }
 
-
 TEST(gm_parser,eight_schools) {
   EXPECT_TRUE(is_parsable("src/models/misc/eight_schools/eight_schools.stan"));
 }
@@ -1330,6 +1329,12 @@ TEST(gmParserTermGrammar, infixExponentiation) {
               "base type mismatch in assignment; variable name = z");
 }
 
+TEST(gmParserTermGrammar, modulusOp) {
+  test_parsable("validate_modulus_good");
+  test_throws("validate_modulus_bad", 
+              "both operands of % must be int; cannot modulo real by real");
+}
+
 TEST(gmParserTermGrammar, multiplicationFun) {
   test_parsable("validate_multiplication");
 }
@@ -1564,6 +1569,3 @@ TEST(parserFunctions,funsBad17) {
   test_throws("functions-bad17",
               "Require real return type for functions ending in _log");
 }
-
-
-

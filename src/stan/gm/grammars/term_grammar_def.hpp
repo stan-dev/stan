@@ -259,25 +259,22 @@ namespace stan {
     boost::phoenix::function<division_expr> division_f;
 
     struct modulus_expr {
-      template <typename T1, typename T2, typename T3>
+      template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef void type; };
 
       void operator()(expression& expr1,
                       const expression& expr2,
-                      //                      const var_origin& var_origin,
-                      //                      bool& pass,
+                      bool& pass,
                       std::ostream& error_msgs) const {
         if (!expr1.expression_type().is_primitive_int() 
             && !expr2.expression_type().is_primitive_int()) {
-          error_msgs << "both arguments to % must be primitive ints"
-                     << "; cannot exponentiate "
+          error_msgs << "both operands of % must be int"
+                     << "; cannot modulo "
                      << expr1.expression_type()
                      << " by " 
                      << expr2.expression_type();
-          //                     << " in block=";
-          //          print_var_origin(error_msgs,var_origin);
           error_msgs << std::endl;
-          //          pass = false;
+          pass = false;
           return;
         }
         std::vector<expression> args;
@@ -372,11 +369,12 @@ namespace stan {
     // so. Phoenix will be switching to BOOST_TYPEOF. In the meantime,
     // we will use a phoenix::function below:
     struct negate_expr {
-      template <typename T1, typename T2, typename T3>
+      template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef void type; };
 
       void operator()(expression& expr_result,
                       const expression& expr,
+                      bool& pass,
                       std::ostream& error_msgs) const {
         if (expr.expression_type().is_primitive()) {
           expr_result = expression(unary_op('-', expr));
@@ -550,7 +548,7 @@ namespace stan {
                   | (lit('/') > negated_factor_r(_r1)   
                                 [division_f(_val,_1,boost::phoenix::ref(error_msgs_))])
                   | (lit('%') > negated_factor_r(_r1)   
-                                [modulus_f(_val,_1,boost::phoenix::ref(error_msgs_))])
+                                [modulus_f(_val,_1,_pass,boost::phoenix::ref(error_msgs_))])
                   | (lit('\\') > negated_factor_r(_r1)   
                                  [left_division_f(_val,_1,
                                                    boost::phoenix::ref(error_msgs_))])
@@ -566,7 +564,7 @@ namespace stan {
 
       negated_factor_r 
         = lit('-') >> negated_factor_r(_r1) 
-                      [negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
+        [negate_expr_f(_val,_1,_pass,boost::phoenix::ref(error_msgs_))]
         | lit('!') >> negated_factor_r(_r1) 
                       [logical_negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)  [_val = _1]
