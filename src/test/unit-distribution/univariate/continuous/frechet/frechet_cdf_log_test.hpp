@@ -62,7 +62,7 @@ public:
   }
     
   double lower_bound() {
-    return 0.0;
+    return 1e-300;
   }
 
   bool has_upper_bound() {

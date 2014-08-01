@@ -14,7 +14,7 @@ public:
                     vector<double>& cdf) {
     vector<double> param(3);
 
-	param[0] = 2.0;                 // y
+    param[0] = 2.0;                 // y
     param[1] = 1.0;                 // alpha
     param[2] = 1.0;                 // sigma
     parameters.push_back(param);
@@ -62,7 +62,7 @@ public:
   }
     
   double lower_bound() {
-    return 0.0;
+    return 1e-300;
   }
 
   bool has_upper_bound() {
