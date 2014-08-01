@@ -21,6 +21,7 @@
 #include <stan/math/functions/gamma_q.hpp>
 #include <stan/math/functions/ibeta.hpp>
 #include <stan/math/functions/if_else.hpp>
+#include <stan/math/functions/int_divide.hpp>
 #include <stan/math/functions/int_step.hpp>
 #include <stan/math/functions/inv.hpp>
 #include <stan/math/functions/inv_cloglog.hpp>

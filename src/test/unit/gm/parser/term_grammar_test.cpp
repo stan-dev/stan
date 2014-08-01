@@ -24,8 +24,6 @@ TEST(gmParserTermGrammar, multiplicationFun) {
 }
 
 TEST(gmParserTermGrammar, divisionFun) {
-  test_warning("validate_division_int_warning", 
-               "integer division implicitly rounds");
   test_parsable("validate_division_good");
 }
 

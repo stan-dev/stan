@@ -220,29 +220,24 @@ namespace stan {
       void operator()(expression& expr1,
                       const expression& expr2,
                       std::ostream& error_msgs) const {
-        if (expr1.expression_type().is_primitive_int() 
-            && expr2.expression_type().is_primitive_int()) {
-          // getting here, but not printing?  only print error if problems?
-          error_msgs << "Warning: integer division implicitly rounds to integer."
-                     << " Found int division: ";
-          generate_expression(expr1.expr_,error_msgs);
-          error_msgs << " / ";
-          generate_expression(expr2.expr_,error_msgs);
-          error_msgs << std::endl
-                     << " Positive values rounded down, negative values rounded up or down"
-                     << " in platform-dependent way."
-                     << std::endl;
-        }
-            
         if (expr1.expression_type().is_primitive()
-            && expr2.expression_type().is_primitive()) {
+            && expr2.expression_type().is_primitive()
+            && (expr1.expression_type().is_primitive_double()
+                || expr2.expression_type().is_primitive_double())) {
           expr1 /= expr2;
           return;
-        }
+        } 
         std::vector<expression> args;
         args.push_back(expr1);
         args.push_back(expr2);
         set_fun_type sft;
+        if (expr1.expression_type().is_primitive_int()
+            && expr2.expression_type().is_primitive_int()) {
+          fun f("int_divide",args);
+          sft(f,error_msgs);
+          expr1 = expression(f);
+          return;
+        }
         if ((expr1.expression_type().type() == MATRIX_T
              || expr1.expression_type().type() == ROW_VECTOR_T)
             && expr2.expression_type().type() == MATRIX_T) {
@@ -254,6 +249,7 @@ namespace stan {
         fun f("divide",args);
         sft(f,error_msgs);
         expr1 = expression(f);
+        return;
       }
     };
     boost::phoenix::function<division_expr> division_f;
@@ -546,9 +542,11 @@ namespace stan {
                               [multiplication_f(_val,_1,
                                                 boost::phoenix::ref(error_msgs_))])
                   | (lit('/') > negated_factor_r(_r1)   
-                                [division_f(_val,_1,boost::phoenix::ref(error_msgs_))])
+                                [division_f(_val,_1,
+                                            boost::phoenix::ref(error_msgs_))])
                   | (lit('%') > negated_factor_r(_r1)   
-                                [modulus_f(_val,_1,_pass,boost::phoenix::ref(error_msgs_))])
+                                [modulus_f(_val,_1,_pass,
+                                           boost::phoenix::ref(error_msgs_))])
                   | (lit('\\') > negated_factor_r(_r1)   
                                  [left_division_f(_val,_1,
                                                    boost::phoenix::ref(error_msgs_))])
