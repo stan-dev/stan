@@ -70,7 +70,9 @@ namespace stan {
          step_size,
          obs);
 
-      return obs.get();
+      std::vector<std::vector<T> > res = obs.get();
+      res.erase(res.begin());
+      return res;
     }
   }
 
