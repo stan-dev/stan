@@ -500,6 +500,7 @@ add("minus",MATRIX_T,MATRIX_T);
 add("modified_bessel_first_kind",DOUBLE_T,INT_T,DOUBLE_T);
 add("modified_bessel_second_kind",DOUBLE_T,INT_T,DOUBLE_T);
 add("multi_gp_log",DOUBLE_T, MATRIX_T,MATRIX_T,VECTOR_T);
+add("multi_gp_cholesky_log",DOUBLE_T, MATRIX_T,MATRIX_T,VECTOR_T);
 {
   std::vector<base_expr_type> eigen_vector_types;
   eigen_vector_types.push_back(VECTOR_T);

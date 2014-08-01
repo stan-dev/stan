@@ -24,7 +24,6 @@ namespace stan {
       using std::log;
       using stan::is_constant_struct;
       using stan::math::check_positive;
-      using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
@@ -108,7 +107,6 @@ namespace stan {
 
       using stan::math::check_nonnegative;
       using stan::math::check_positive;
-      using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
@@ -180,7 +178,6 @@ namespace stan {
 
       using stan::math::check_nonnegative;
       using stan::math::check_positive;
-      using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
@@ -244,7 +241,6 @@ namespace stan {
 
       using stan::math::check_nonnegative;
       using stan::math::check_positive;
-      using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
