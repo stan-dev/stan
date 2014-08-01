@@ -28,7 +28,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::check_finite;
       using stan::math::check_greater_or_equal;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -46,10 +46,8 @@ namespace stan {
       // validate args (here done over var, which should be OK)
       check_greater_or_equal(function, y, mu, "Random variable", &logp);
       check_not_nan(function, y, "Random variable", &logp);
-      check_finite(function, lambda, "Scale parameter", &logp);
-      check_positive(function, lambda, "Scale parameter", &logp);
-      check_finite(function, alpha, "Shape parameter", &logp);
-      check_positive(function, alpha, "Shape parameter", &logp);
+      check_positive_finite(function, lambda, "Scale parameter", &logp);
+      check_positive_finite(function, alpha, "Shape parameter", &logp);
       check_consistent_sizes(function,
                              y,lambda,alpha,
                              "Random variable","Scale parameter",
@@ -154,7 +152,7 @@ namespace stan {
           
       using stan::math::check_greater_or_equal;
       using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_greater_or_equal;
       using stan::math::check_consistent_sizes;
@@ -166,10 +164,8 @@ namespace stan {
       check_greater_or_equal(function, y, mu, "Random variable", &P);
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
-      check_finite(function, lambda, "Scale parameter", &P);
-      check_positive(function, lambda, "Scale parameter", &P);
-      check_finite(function, alpha, "Shape parameter", &P);
-      check_positive(function, alpha, "Shape parameter", &P);
+      check_positive_finite(function, lambda, "Scale parameter", &P);
+      check_positive_finite(function, alpha, "Shape parameter", &P);
       check_consistent_sizes(function, y, lambda, alpha,
                              "Random variable", "Scale parameter", 
                              "Shape parameter", &P);
@@ -286,7 +282,7 @@ namespace stan {
           
       using stan::math::check_greater_or_equal;
       using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_greater_or_equal;
       using stan::math::check_consistent_sizes;
@@ -298,10 +294,8 @@ namespace stan {
       check_greater_or_equal(function, y, mu, "Random variable", &P);
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
-      check_finite(function, lambda, "Scale parameter", &P);
-      check_positive(function, lambda, "Scale parameter", &P);
-      check_finite(function, alpha, "Shape parameter", &P);
-      check_positive(function, alpha, "Shape parameter", &P);
+      check_positive_finite(function, lambda, "Scale parameter", &P);
+      check_positive_finite(function, alpha, "Shape parameter", &P);
       check_consistent_sizes(function, y, lambda, alpha,
                              "Random variable", "Scale parameter", 
                              "Shape parameter", &P);
@@ -410,10 +404,8 @@ namespace stan {
       check_greater_or_equal(function, y, mu, "Random variable", &P);
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
-      check_finite(function, lambda, "Scale parameter", &P);
-      check_positive(function, lambda, "Scale parameter", &P);
-      check_finite(function, alpha, "Shape parameter", &P);
-      check_positive(function, alpha, "Shape parameter", &P);
+      check_positive_finite(function, lambda, "Scale parameter", &P);
+      check_positive_finite(function, alpha, "Shape parameter", &P);
       check_consistent_sizes(function, y, lambda, alpha,
                              "Random variable", "Scale parameter", 
                              "Shape parameter", &P);
