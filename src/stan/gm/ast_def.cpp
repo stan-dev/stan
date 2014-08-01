@@ -309,7 +309,6 @@ namespace stan {
                               function_signature_t& signature) {
 
       std::vector<function_signature_t> signatures = sigs_map_[name];
-      size_t match_index = 0; 
       size_t min_promotions = std::numeric_limits<size_t>::max(); 
       size_t num_matches = 0;
       for (size_t i = 0; i < signatures.size(); ++i) {
@@ -319,7 +318,6 @@ namespace stan {
         size_t promotions_ui = static_cast<size_t>(promotions);
         if (promotions_ui < min_promotions) {
           min_promotions = promotions_ui;
-          match_index = i;
           num_matches = 1;
         } else if (promotions_ui == min_promotions) {
           ++num_matches;
@@ -635,6 +633,7 @@ namespace stan {
     bool is_linear_function(const std::string& name) {
       return name == "add"
         || name == "block"
+        || name == "append_col"
         || name == "col"
         || name == "cols"
         || name == "diagonal"
@@ -642,6 +641,7 @@ namespace stan {
         || name == "minus"
         || name == "negative_infinity"
         || name == "not_a_number"
+        || name == "append_row"
         || name == "rep_matrix"
         || name == "rep_row_vector"
         || name == "rep_vector"
