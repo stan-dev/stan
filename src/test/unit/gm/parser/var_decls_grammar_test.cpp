@@ -1,10 +1,4 @@
 #include <gtest/gtest.h>
-#include <iostream>
-#include <fstream>
-#include <istream>
-#include <sstream>
-#include <exception>
-#include <stdexcept>
 #include <test/unit/gm/utility.hpp>
 
 TEST(gmParserVarDeclsGrammarDef, addVar) {

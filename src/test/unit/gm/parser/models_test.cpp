@@ -1,10 +1,4 @@
 #include <gtest/gtest.h>
-#include <iostream>
-#include <fstream>
-#include <istream>
-#include <sstream>
-#include <exception>
-#include <stdexcept>
 #include <test/unit/gm/utility.hpp>
 
 TEST(gm_parser,eight_schools) {
@@ -69,10 +63,9 @@ TEST(gm_parser,bugs_2_ice) {
   EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol2/ice/ice.stan"));
 }
 
-// why commented out?
-//TEST(gm_parser,bugs_2_stagnant) {
-//  EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol2/stagnant/stagnant.stan"));
-//  }
+TEST(gm_parser,bugs_2_stagnant) {
+  EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol2/stagnant/stagnant.stan"));
+  }
 
 TEST(gm_parser,triangle_lp) {
   EXPECT_TRUE(is_parsable("src/models/basic_distributions/triangle.stan"));
