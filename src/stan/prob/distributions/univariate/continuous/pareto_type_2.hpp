@@ -391,8 +391,7 @@ namespace stan {
       static const char* function = "stan::prob::pareto_type_2_ccdf_log(%1%)";
           
       using stan::math::check_greater_or_equal;
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_greater_or_equal;
       using stan::math::check_consistent_sizes;
