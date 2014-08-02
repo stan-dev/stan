@@ -4,6 +4,7 @@ transformed data {
   matrix[3,3] m;
   row_vector[3] v;
   x <- 2 / 3;
+  u <- 2 / 3;
   u <- 2.1 / 3;
   u <- 2 / 3.1;
   u <- 2.1 / 3.1;
