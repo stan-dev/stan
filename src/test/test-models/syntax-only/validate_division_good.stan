@@ -3,6 +3,13 @@ transformed data {
   real u;
   matrix[3,3] m;
   row_vector[3] v;
+  int i;
+  int j;
+  int k;
+  j <- 2;
+  k <- 3;
+  i <- j / k;
+  u <- j / k;
   x <- 2 / 3;
   u <- 2 / 3;
   u <- 2.1 / 3;
