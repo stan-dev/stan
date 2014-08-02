@@ -165,18 +165,8 @@ namespace stan {
                      << " must be data only and not reference parameters";
           pass = false;
         }
-        if (has_var(ode_fun.ts_, var_map)) {
-          error_msgs << "third argument to solve_ode (solution times)"
-                     << " must be data only and not reference parameters";
-          pass = false;
-        }
         if (has_var(ode_fun.x_, var_map)) {
           error_msgs << "fifth argument to solve_ode (real data)"
-                     << " must be data only and not reference parameters";
-          pass = false;
-        }
-        if (has_var(ode_fun.x_int_, var_map)) {
-          error_msgs << "sixth argument to solve_ode (int data)"
                      << " must be data only and not reference parameters";
           pass = false;
         }
