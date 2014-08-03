@@ -233,7 +233,18 @@ namespace stan {
         set_fun_type sft;
         if (expr1.expression_type().is_primitive_int()
             && expr2.expression_type().is_primitive_int()) {
-          fun f("int_divide",args);
+          // result might be assigned to real - generate warning
+          error_msgs << "Warning: integer division implicitly rounds to integer."
+                     << " Found int division: ";
+          generate_expression(expr1.expr_,error_msgs);
+          error_msgs << " / ";
+          generate_expression(expr2.expr_,error_msgs);
+          error_msgs << std::endl
+                     << " Positive values rounded down, negative values rounded up or down"
+                     << " in platform-dependent way."
+                     << std::endl;
+
+          fun f("divide",args);
           sft(f,error_msgs);
           expr1 = expression(f);
           return;

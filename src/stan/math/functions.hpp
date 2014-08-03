@@ -11,6 +11,7 @@
 #include <stan/math/functions/binomial_coefficient_log.hpp>
 #include <stan/math/functions/digamma.hpp>
 #include <stan/math/functions/dist.hpp>
+#include <stan/math/functions/divide.hpp>
 #include <stan/math/functions/dot.hpp>
 #include <stan/math/functions/dot_self.hpp>
 #include <stan/math/functions/exp2.hpp>
@@ -21,7 +22,6 @@
 #include <stan/math/functions/gamma_q.hpp>
 #include <stan/math/functions/ibeta.hpp>
 #include <stan/math/functions/if_else.hpp>
-#include <stan/math/functions/int_divide.hpp>
 #include <stan/math/functions/int_step.hpp>
 #include <stan/math/functions/inv.hpp>
 #include <stan/math/functions/inv_cloglog.hpp>

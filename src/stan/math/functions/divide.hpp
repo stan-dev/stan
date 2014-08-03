@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__INT_DIVIDE_HPP
-#define STAN__MATH__FUNCTIONS__INT_DIVIDE_HPP
+#ifndef STAN__MATH__FUNCTIONS__DIVIDE_HPP
+#define STAN__MATH__FUNCTIONS__DIVIDE_HPP
 
 #include <vector>
 #include <cstddef>
@@ -8,7 +8,7 @@
 namespace stan {
   namespace math {
 
-    inline int int_divide(const int x, const int y) {
+    inline int divide(const int x, const int y) {
       return std::div(x, y).quot;
     }
 
