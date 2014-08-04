@@ -35,7 +35,7 @@ namespace stan {
         model_(m),
         cont_params_(cont_params),
         rng_(rng),
-        n_monte_carlo_(5e3) {};
+        n_monte_carlo_(1e3) {};
 
       virtual ~bbvb() {};
 
@@ -142,9 +142,9 @@ namespace stan {
         double tmp(0.0);
         stan::math::check_square(function, L_grad, "Scale matrix", &tmp);
         stan::math::check_size_match(function,
-                                     L_grad.rows(), "Dimension of scale matrix",
-                                     dim, "Dimension of mean vector",
-                                     &tmp);
+                              L_grad.rows(), "Dimension of scale matrix",
+                              dim, "Dimension of mean vector in variational q",
+                              &tmp);
 
         L_grad                      = Eigen::MatrixXd::Zero(dim,dim);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
@@ -153,6 +153,7 @@ namespace stan {
         Eigen::MatrixXd eye         = Eigen::MatrixXd::Identity(dim, dim);
 
         Eigen::VectorXd z_check;
+        Eigen::MatrixXd LinvT = stan::math::inverse(muL.L()).transpose();
 
         for (int i = 0; i < n_monte_carlo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
@@ -163,13 +164,65 @@ namespace stan {
           stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad, &std::cout);
 
           L_grad += tmp_mu_grad * z_check.transpose();
-          L_grad += stan::math::inverse(muL.L()).transpose();
+          L_grad += LinvT;
 
         }
         L_grad /= static_cast<double>(n_monte_carlo_);
+        L_grad = L_grad.triangularView<Eigen::UnitLower>();
       }
 
 
+      void calc_combined_grad(
+        latent_vars const& muL,
+        Eigen::VectorXd& mu_grad,
+        Eigen::MatrixXd& L_grad) {
+        static const char* function = "stan::vb::bbvb.calc_combined_grad(%1%)";
+
+        int dim = muL.dimension();
+        double tmp_lp = 0.0;
+
+        double tmp(0.0);
+        stan::math::check_size_match(function,
+                              mu_grad.size(),  "Dimension of mu grad vector",
+                              dim, "Dimension of mean vector in variational q",
+                              &tmp);
+        stan::math::check_square(function, L_grad, "Scale matrix", &tmp);
+        stan::math::check_size_match(function,
+                              L_grad.rows(), "Dimension of scale matrix",
+                              dim, "Dimension of mean vector in variational q",
+                              &tmp);
+
+        L_grad                      = Eigen::MatrixXd::Zero(dim,dim);
+        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
+
+        Eigen::VectorXd zero_mean   = Eigen::VectorXd::Zero(dim);
+        Eigen::MatrixXd eye         = Eigen::MatrixXd::Identity(dim, dim);
+
+        Eigen::VectorXd z_check;
+        Eigen::VectorXd LinvTdiag = 1.0/muL.L().diagonal().array();
+
+        for (int i = 0; i < n_monte_carlo_; ++i) {
+          // Draw from standard normal and transform to unconstrained space
+          z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);
+          muL.to_unconstrained(z_check);
+
+          // Compute gradient step in unconstrained space
+          stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad, &std::cout);
+
+          // Update mu
+          mu_grad += tmp_mu_grad;
+
+          // Update L (lower triangular)    // NOT SURE IF MOST MEMORY AWARE WAY TO DO THIS
+          for (int ii = 0; ii < dim; ++ii) {
+            for (int jj = 0; jj <= ii; ++jj) {
+              L_grad(ii,jj) += tmp_mu_grad(ii) * z_check(jj);
+            }
+          }
+        }
+        mu_grad /= static_cast<double>(n_monte_carlo_);
+        L_grad  /= static_cast<double>(n_monte_carlo_);
+        L_grad.diagonal() += LinvTdiag;
+      }
 
       void test() {
         if (out_stream_) *out_stream_ << "This is base_vb::bbvb::test()" << std::endl;
@@ -191,7 +244,6 @@ namespace stan {
         // mu, L
         Eigen::VectorXd mu = cont_params_;
         Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(), model_.num_params_r());
-        L = L.array() * 1.0;
 
         latent_vars muL = latent_vars(mu,L);
 
@@ -240,25 +292,29 @@ namespace stan {
 
 
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(model_.num_params_r());
-        Eigen::MatrixXd L_grad = Eigen::MatrixXd::Zero(model_.num_params_r(),model_.num_params_r());
+        Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(model_.num_params_r(),model_.num_params_r());
 
-        for (int i = 0; i < 50; ++i)
+        for (int i = 0; i < 25; ++i)
         {
           if (out_stream_) *out_stream_ << "---------------------" << std::endl
                                         << "  iter " << i << std::endl
                                         << "---------------------" << std::endl;
 
-          calc_mu_grad(muL, mu_grad);
-          muL.set_mu(muL.mu() + 0.25*mu_grad);
+          // calc_mu_grad(muL, mu_grad);
+          // calc_L_grad(muL, L_grad);
+          calc_combined_grad(muL, mu_grad, L_grad);
 
-          calc_L_grad(muL, L_grad);
-          muL.set_L(muL.L() + 0.01*L_grad);
+          muL.set_mu(muL.mu() + 0.15 * mu_grad);
+          muL.set_L(muL.L()   + 0.15 * L_grad);
 
           if (out_stream_) *out_stream_ << "mu = " << std::endl
                                         << muL.mu() << std::endl;
 
           if (out_stream_) *out_stream_ << "L = " << std::endl
                                         << muL.L() << std::endl;
+
+          if (out_stream_) *out_stream_ << "Sigma = " << std::endl
+                                        << muL.L() * muL.L().transpose() << std::endl;
 
           elbo = calc_ELBO(muL);
           if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl;
