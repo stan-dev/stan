@@ -1447,6 +1447,9 @@ If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
 .
 \]
 
+Note that if $Y \propto \distro{Weibull}(\alpha,\sigma)$,
+then $Y^{-1} \propto \distro{Frechet}(\alpha,\sigma^{-1})$.
+
 \pitem{y}{weibull}{alpha,sigma}
 
 \subsubsection{Stan Functions}
@@ -1493,6 +1496,10 @@ If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
 \exp \! \left( \! - \left( \frac{y}{\sigma} \right)^{-\alpha}  \right)
 .
 \]
+
+Note that if $Y \propto \distro{Frechet}(\alpha,\sigma)$,
+then $Y^{-1} \propto \distro{Weibull}(\alpha,\sigma^{-1})$.
+
 \pitem{y}{frechet}{alpha,sigma}
 
 \subsubsection{Stan Functions}
