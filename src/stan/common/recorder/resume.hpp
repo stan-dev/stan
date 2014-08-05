@@ -11,12 +11,14 @@ namespace stan {
     namespace recorder {
       
       /**
-       * Writes out a vector as string.
+       * Records and loads sampler resume information.
        */
       class resume {
       private:
-        std::ostream *o_;
-        const bool has_stream_;
+        std::fstream *save_;
+        std::fstream *load_;
+        const bool has_save_stream_;
+        const bool has_load_stream_;
         const std::string prefix_;
       
       public:
@@ -25,27 +27,53 @@ namespace stan {
          *
          * @param o pointer to stream. Will accept 0.
          */
-        resume(std::ostream *o, std::string prefix) 
-          : o_(o), has_stream_(o != 0), prefix_(prefix) { }
+        resume(std::fstream *save_s, std::fstream *load_s, std::string prefix) 
+          : save_(save_s), load_(load_s),
+            has_save_stream_(save_s != 0), 
+            has_load_stream_(load_s != 0),
+            prefix_(prefix) { }
         
         template <class RNG>
         void save_rng(const RNG& base_rng) {
-          if (!has_stream_)
+          if (!has_save_stream_)
             return;
           
           //save rng state
-          *o_ << prefix_ << "rng" << std::endl;
-          *o_ << base_rng;
-          *o_ << std::endl << std::endl;  
+          *save_ << prefix_ << "rng" << std::endl;
+          *save_ << base_rng;
+          *save_ << std::endl << prefix_ << "end" <<  std::endl;  
+        }      
+          
+        template <class RNG>
+        void load_rng(RNG& base_rng) {
+          if (!has_load_stream_)
+            return;
+          
+          //load
+          std::stringstream rng_stream;
+              
+          bool started = false;
+          std::string line;
+          while (std::getline(*load_, line)) {
+            if (started) {
+              if (line == "//end")
+                break;                
+              rng_stream << line;
+            }
+            if (line == "//rng")
+              started = true;
+          }
+                  
+          rng_stream >> base_rng;
         }        
 
       
         template <class Model, class RNG>
         void save_inits(const Model& model, const RNG& base_rng, stan::mcmc::sample s) {
-          if (!has_stream_)
+          if (!has_save_stream_)
             return;
 
-          *o_ << prefix_ << "inits" << std::endl;
+          *save_ << prefix_ << "inits" << std::endl;
           
           std::vector<std::string> pnames;
           model.constrained_param_names(pnames, false, false); 
@@ -76,19 +104,19 @@ namespace stan {
             
             //check if we have a new param name
             if (prev_param_name == cur_param_name)
-               *o_ << ", ";            
+               *save_ << ", ";            
             else {
               
-              *o_ << cur_param_name;
-              *o_ << " <- ";
+              *save_ << cur_param_name;
+              *save_ << " <- ";
               
               if (cur_param_name != pnames.at(i)) //then dim > 1
-                *o_ << "structure(c(";          
+                *save_ << "structure(c(";          
 
             }
             
               
-            *o_ << std::fixed << std::setprecision(std::numeric_limits<double>::digits10) << model_values(i);
+            *save_ << std::fixed << std::setprecision(std::numeric_limits<double>::digits10) << model_values(i);
               
             
             prev_param_name = cur_param_name;
@@ -99,29 +127,35 @@ namespace stan {
             }
             
             if (cur_param_name == pnames.at(i)) //then dim == 1
-              *o_ << std::endl;
+              *save_ << std::endl;
             else {
-              *o_ << "), .Dim = c(";
+              *save_ << "), .Dim = c(";
 
-              *o_ <<
+              *save_ <<
                 boost::regex_replace(boost::regex_replace(
                 pnames.at(i), regexp2, ""), regexp3, ",");
                   
-              *o_ << "))" << std::endl;
+              *save_ << "))" << std::endl;
             }
             
           } //for loop end
 
-          *o_ << std::endl;
+          *save_ << prefix_ << "end" <<  std::endl;
           //save inits end
         }
         
         void save_sampler_specific(stan::mcmc::base_mcmc* sampler) {
-          if (!has_stream_)
+          if (!has_save_stream_)
             return;
           std::stringstream stream;
           sampler->write_sampler_specific_resume_info(&stream);
-          *o_ << stream.str() << std::endl;
+          *save_ << stream.str() << prefix_ << "end" <<  std::endl;
+        }
+        
+        void load_sampler_specific(stan::mcmc::base_mcmc* sampler) {
+          if (!has_load_stream_)
+            return;
+          sampler->load_sampler_specific_resume_info(load_);
         }
 
       
@@ -135,9 +169,9 @@ namespace stan {
          * @param x string to print with prefix in front
          */
         void operator()(const std::string x) {
-          if (!has_stream_)
+          if (!has_save_stream_)
             return;
-          *o_ << prefix_ << x << std::endl;
+          *save_ << prefix_ << x << std::endl;
         }
       
         /**
@@ -145,18 +179,17 @@ namespace stan {
          *
          */
         void operator()() {
-          if (!has_stream_)
+          if (!has_save_stream_)
             return;
-          *o_ << std::endl;
+          *save_ << std::endl;
         }
       
-        /**
-         * Indicator function for whether the instance is recording.
-         *
-         * For this class, returns true if it has a stream.
-         */
-        bool is_recording() const {
-          return has_stream_;
+        bool is_recording_save() const {
+          return has_save_stream_;
+        }
+        
+        bool is_recording_load() const {
+          return has_load_stream_;
         }
       };
 

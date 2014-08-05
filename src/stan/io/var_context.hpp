@@ -29,6 +29,8 @@ namespace stan {
     class var_context {
     public:
 
+      virtual ~var_context() {}
+
       /**
        * Return <code>true</code> if the specified variable name is
        * defined.  This method should return <code>true</code> even

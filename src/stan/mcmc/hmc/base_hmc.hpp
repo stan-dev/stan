@@ -46,6 +46,30 @@ namespace stan {
         //z_.write_metric(o);
       }
       
+      void load_sampler_specific_resume_info(std::fstream* o) {
+        if(!o) return;
+
+        std::stringstream stepsize_stream;
+            
+        bool started = false;
+        std::string line;
+        while (std::getline(*o, line)) {
+          if (started) {
+            if (line == "//end")
+              break;                
+            stepsize_stream << line;
+          }
+          if (line == "//stepsize")
+            started = true;
+        }
+        
+        double stepsize_val;
+        stepsize_stream >> stepsize_val;
+                
+        set_nominal_stepsize(stepsize_val);
+        
+      }
+      
       void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
                                         std::vector<std::string>& names) {
         z_.get_param_names(model_names, names);

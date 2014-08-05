@@ -30,6 +30,14 @@ namespace stan {
                           const std::string& suffix,
                           std::ostream& o,
                           StartTransitionCallback& callback) {
+      if (!warmup) {
+        //load sampler specific information
+        resume_recorder.load_sampler_specific(sampler);
+        
+        //load rng
+        resume_recorder.load_rng(base_rng);   
+      }
+
       for (int m = 0; m < num_iterations; ++m) {
         callback();
         
@@ -45,15 +53,14 @@ namespace stan {
       }
       
       if (!warmup) {
-      
-        //save rng state
-        resume_recorder.save_rng(base_rng);
-          
         //save inits begin
         resume_recorder.save_inits(model, base_rng, init_s);
         
         //save sampler specific information
         resume_recorder.save_sampler_specific(sampler);
+        
+        //save rng state
+        resume_recorder.save_rng(base_rng);        
       }
       
     }

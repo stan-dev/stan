@@ -149,6 +149,8 @@ namespace stan {
                                              std::fstream::out);
       }
       
+      //FIXME: load_resume and save_resume should only be called to
+      //sampler methods
       // Load resume info output
       std::string resume_load_file =
         dynamic_cast<stan::gm::string_argument*>(
@@ -156,7 +158,7 @@ namespace stan {
       std::fstream* resume_load_stream = 0;
       if (resume_load_file != "") {
         resume_load_stream = new std::fstream(resume_load_file.c_str(),
-                                             std::fstream::out);
+                                             std::fstream::in);
       }
       
       // Save resume info output
@@ -195,8 +197,15 @@ namespace stan {
       
       int num_init_tries = -1;
       
+      
       std::string init = dynamic_cast<stan::gm::string_argument*>(
                          parser.arg("init"))->value();
+                         
+      if (resume_load_stream) {
+        //assign some dummy to init to avoid treating init as number
+        //if resume load info is available
+        init = "dummy";
+      }
       
       try {
         
@@ -288,17 +297,39 @@ namespace stan {
       } catch(...) {
       
         try {
-        
-          std::fstream init_stream(init.c_str(), std::fstream::in);
-          if (init_stream.fail()) {
-            std::string msg("ERROR: specified initialization file does not exist: ");
-            msg += init;
-            throw std::invalid_argument(msg);
-          }
           
-          stan::io::dump init_var_context(init_stream);
-          init_stream.close();
-          model.transform_inits(init_var_context, cont_params);
+          
+          if (resume_load_stream) {
+            std::stringstream init_stream;
+            
+            bool started = false;
+            std::string line;
+            while (std::getline(*resume_load_stream, line)) {
+              if (started) {
+                if (line == "//end")
+                  break;                
+                init_stream << line;
+              }
+              if (line == "//inits")
+                started = true;
+            }
+                        
+            stan::io::dump init_var_context(init_stream);
+            model.transform_inits(init_var_context, cont_params);
+          }
+          else {
+            std::fstream init_stream(init.c_str(), std::fstream::in);
+              
+            if (init_stream.fail()) {
+              std::string msg("ERROR: specified initialization file does not exist: ");
+              msg += init;
+              throw std::invalid_argument(msg);
+            }
+            
+            stan::io::dump init_var_context(init_stream);
+            init_stream.close();
+            model.transform_inits(init_var_context, cont_params);
+          }
         
         } catch (const std::exception& e) {
           std::cerr << "Error during user-specified initialization:" << std::endl
@@ -540,7 +571,8 @@ namespace stan {
         stan::common::recorder::csv sample_recorder(output_stream, "# ");
         stan::common::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
         stan::common::recorder::messages message_recorder(&std::cout, "# ");
-        stan::common::recorder::resume resume_recorder(resume_save_stream, "//");
+        stan::common::recorder::resume resume_recorder(resume_save_stream,
+         resume_load_stream, "//");
         
         stan::io::mcmc_writer<Model, 
                               stan::common::recorder::csv, stan::common::recorder::csv,
@@ -786,6 +818,13 @@ namespace stan {
         resume_save_stream->close();
         delete resume_save_stream;
       }
+      
+      if (resume_load_stream) {
+        resume_load_stream->close();
+        delete resume_load_stream;
+      }
+      
+      
       
       for (size_t i = 0; i < valid_arguments.size(); ++i)
         delete valid_arguments.at(i);
