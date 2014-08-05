@@ -39,35 +39,16 @@ namespace stan {
         z_.write_metric(o);
       }
       
-      void write_sampler_specific_resume_info(std::ostream* o) {
-        if(!o) return;
-        *o << "//stepsize" << std::endl;
-        *o << std::fixed << std::setprecision(std::numeric_limits<double>::digits10) << get_nominal_stepsize() << std::endl;
-        //z_.write_metric(o);
+      virtual void save_sampler_specific_resume_info(stan::common::recorder::resume * resume_recorder) {
+        //save stepsize
+        resume_recorder->save_double("stepsize", get_nominal_stepsize());
       }
       
-      void load_sampler_specific_resume_info(std::istream* o) {
-        if(!o) return;
-
-        std::stringstream stepsize_stream;
-            
-        bool started = false;
-        std::string line;
-        while (std::getline(*o, line)) {
-          if (started) {
-            if (line == "//end")
-              break;                
-            stepsize_stream << line;
-          }
-          if (line == "//stepsize")
-            started = true;
-        }
-        
+      virtual void load_sampler_specific_resume_info(stan::common::recorder::resume * resume_recorder) {
+        //load stepsize
         double stepsize_val;
-        stepsize_stream >> stepsize_val;
-                
+        resume_recorder->load_double("stepsize", stepsize_val);
         set_nominal_stepsize(stepsize_val);
-        
       }
       
       void get_sampler_diagnostic_names(std::vector<std::string>& model_names,

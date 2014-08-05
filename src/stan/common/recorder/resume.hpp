@@ -43,6 +43,17 @@ namespace stan {
           *save_ << input_stream.rdbuf();
           *save_ << std::endl << end_ <<  std::endl;  
         }
+        
+        void save_double(const std::string& name, const double input_double) {
+          if (!has_save_stream_)
+            return;          
+          
+          std::stringstream double_stream;
+          
+          double_stream << std::fixed << std::setprecision(std::numeric_limits<double>::digits10) << input_double;
+          
+          save_common(name, double_stream); 
+        }
 
         void load_common(const std::string& name, std::iostream& output_stream) {
           if (!has_load_stream_)
@@ -60,6 +71,12 @@ namespace stan {
             if (line == begin_)
               started = true;
           }
+        }
+        
+        void load_double(const std::string& name, double& output_double) {
+          std::stringstream double_stream;
+          load_common(name, double_stream);
+          double_stream >> output_double;
         }
 
         template <class RNG>
@@ -153,18 +170,18 @@ namespace stan {
           save_common("inits", inits_stream);
         }
         
-        void save_sampler_specific(stan::mcmc::base_mcmc* sampler) {
+        template <class Sampler>
+        void save_sampler_specific(Sampler* sampler) {
           if (!has_save_stream_)
             return;
-          std::stringstream stream;
-          sampler->write_sampler_specific_resume_info(&stream);
-          *save_ << stream.str() << prefix_ << "end" <<  std::endl;
+          sampler->save_sampler_specific_resume_info(this);
         }
         
-        void load_sampler_specific(stan::mcmc::base_mcmc* sampler) {
+        template <class Sampler>        
+        void load_sampler_specific(Sampler* sampler) {
           if (!has_load_stream_)
             return;
-          sampler->load_sampler_specific_resume_info(load_);
+          sampler->load_sampler_specific_resume_info(this);
         }
       
         bool is_recording_save() const {

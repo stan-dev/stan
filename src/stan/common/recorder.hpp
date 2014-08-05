@@ -2,6 +2,7 @@
 #define STAN__COMMON__RECORDER_HPP
 
 #include <stan/common/recorder/csv.hpp>
+#include <stan/common/recorder/resume.hpp>
 #include <stan/common/recorder/filtered_values.hpp>
 #include <stan/common/recorder/messages.hpp>
 #include <stan/common/recorder/no_op.hpp>
