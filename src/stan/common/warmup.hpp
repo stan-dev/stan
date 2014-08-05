@@ -8,8 +8,9 @@
 namespace stan {
   namespace common {
 
-    template <class Model, class RNG, class StartTransitionCallback,
-              class SampleRecorder, class DiagnosticRecorder, class MessageRecorder>
+    template <class Model, class RNG, class StartTransitionCallback, 
+              class SampleRecorder, class DiagnosticRecorder,
+              class MessageRecorder, class ResumeRecorder>
     void warmup(stan::mcmc::base_mcmc* sampler,
                 int num_warmup,
                 int num_samples,
@@ -18,6 +19,7 @@ namespace stan {
                 bool save,
                 stan::io::mcmc_writer
                 <Model, SampleRecorder, DiagnosticRecorder, MessageRecorder>& writer,
+                ResumeRecorder resume_recorder,
                 stan::mcmc::sample& init_s,
                 Model& model,
                 RNG& base_rng,
@@ -29,7 +31,7 @@ namespace stan {
                        SampleRecorder, DiagnosticRecorder, MessageRecorder>
         (sampler, num_warmup, 0, num_warmup + num_samples, num_thin,
          refresh, save, true,
-         writer,
+         writer, resume_recorder,
          init_s, model, base_rng,
          prefix, suffix, o,
          callback);

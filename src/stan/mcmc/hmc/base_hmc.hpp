@@ -39,6 +39,13 @@ namespace stan {
         z_.write_metric(o);
       }
       
+      void write_sampler_specific_resume_info(std::ostream* o) {
+        if(!o) return;
+        *o << "//stepsize" << std::endl;
+        *o << std::fixed << std::setprecision(std::numeric_limits<double>::digits10) << get_nominal_stepsize() << std::endl;
+        //z_.write_metric(o);
+      }
+      
       void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
                                         std::vector<std::string>& names) {
         z_.get_param_names(model_names, names);

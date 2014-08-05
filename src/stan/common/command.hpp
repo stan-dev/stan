@@ -18,6 +18,7 @@
 #include <stan/gm/arguments/argument_parser.hpp>
 #include <stan/gm/arguments/arg_id.hpp>
 #include <stan/gm/arguments/arg_data.hpp>
+#include <stan/gm/arguments/arg_resume.hpp>
 #include <stan/gm/arguments/arg_init.hpp>
 #include <stan/gm/arguments/arg_random.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
@@ -52,6 +53,7 @@
 #include <stan/common/init_windowed_adapt.hpp>
 #include <stan/common/recorder/csv.hpp>
 #include <stan/common/recorder/messages.hpp>
+#include <stan/common/recorder/resume.hpp>
 
 namespace stan {
 
@@ -67,6 +69,7 @@ namespace stan {
       std::vector<stan::gm::argument*> valid_arguments;
       valid_arguments.push_back(new stan::gm::arg_id());
       valid_arguments.push_back(new stan::gm::arg_data());
+      valid_arguments.push_back(new stan::gm::arg_resume());
       valid_arguments.push_back(new stan::gm::arg_init());
       valid_arguments.push_back(new stan::gm::arg_random());
       valid_arguments.push_back(new stan::gm::arg_output());
@@ -143,6 +146,26 @@ namespace stan {
       std::fstream* diagnostic_stream = 0;
       if (diagnostic_file != "") {
         diagnostic_stream = new std::fstream(diagnostic_file.c_str(),
+                                             std::fstream::out);
+      }
+      
+      // Load resume info output
+      std::string resume_load_file =
+        dynamic_cast<stan::gm::string_argument*>(
+        parser.arg("resume")->arg("load_from_file"))->value();
+      std::fstream* resume_load_stream = 0;
+      if (resume_load_file != "") {
+        resume_load_stream = new std::fstream(resume_load_file.c_str(),
+                                             std::fstream::out);
+      }
+      
+      // Save resume info output
+      std::string resume_save_file =
+        dynamic_cast<stan::gm::string_argument*>(
+        parser.arg("resume")->arg("save_to_file"))->value();
+      std::fstream* resume_save_stream = 0;
+      if (resume_save_file != "") {
+        resume_save_stream = new std::fstream(resume_save_file.c_str(),
                                              std::fstream::out);
       }
       
@@ -517,6 +540,7 @@ namespace stan {
         stan::common::recorder::csv sample_recorder(output_stream, "# ");
         stan::common::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
         stan::common::recorder::messages message_recorder(&std::cout, "# ");
+        stan::common::recorder::resume resume_recorder(resume_save_stream, "//");
         
         stan::io::mcmc_writer<Model, 
                               stan::common::recorder::csv, stan::common::recorder::csv,
@@ -716,7 +740,7 @@ namespace stan {
         
         warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
                              refresh, save_warmup,
-                             writer,
+                             writer, resume_recorder,
                              s, model, base_rng,
                              prefix, suffix, std::cout,
                              startTransitionCallback);
@@ -734,7 +758,7 @@ namespace stan {
         
         sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
                              refresh, true,
-                             writer,
+                             writer, resume_recorder,
                              s, model, base_rng,
                              prefix, suffix, std::cout,
                              startTransitionCallback);
@@ -756,6 +780,11 @@ namespace stan {
       if (diagnostic_stream) {
         diagnostic_stream->close();
         delete diagnostic_stream;
+      }
+      
+      if (resume_save_stream) {
+        resume_save_stream->close();
+        delete resume_save_stream;
       }
       
       for (size_t i = 0; i < valid_arguments.size(); ++i)

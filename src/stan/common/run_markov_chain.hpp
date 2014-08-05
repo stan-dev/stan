@@ -9,7 +9,8 @@ namespace stan {
   namespace common {
 
     template <class Model, class RNG, class StartTransitionCallback, 
-              class SampleRecorder, class DiagnosticRecorder, class MessageRecorder>
+              class SampleRecorder, class DiagnosticRecorder,
+              class MessageRecorder, class ResumeRecorder>
     void run_markov_chain(stan::mcmc::base_mcmc* sampler,
                           const int num_iterations,
                           const int start,
@@ -21,6 +22,7 @@ namespace stan {
                           stan::io::mcmc_writer <Model,
                           SampleRecorder, DiagnosticRecorder, MessageRecorder>& 
                           writer,
+                          ResumeRecorder resume_recorder,
                           stan::mcmc::sample& init_s,
                           Model& model,
                           RNG& base_rng,
@@ -40,6 +42,18 @@ namespace stan {
           writer.write_diagnostic_params(init_s, sampler);
         }
 
+      }
+      
+      if (!warmup) {
+      
+        //save rng state
+        resume_recorder.save_rng(base_rng);
+          
+        //save inits begin
+        resume_recorder.save_inits(model, base_rng, init_s);
+        
+        //save sampler specific information
+        resume_recorder.save_sampler_specific(sampler);
       }
       
     }
