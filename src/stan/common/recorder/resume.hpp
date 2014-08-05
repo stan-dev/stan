@@ -15,11 +15,12 @@ namespace stan {
        */
       class resume {
       private:
-        std::fstream *save_;
-        std::fstream *load_;
+        std::ostream *save_;
+        std::istream *load_;
         const bool has_save_stream_;
         const bool has_load_stream_;
         const std::string prefix_;
+        const std::string end_;
       
       public:
         /**
@@ -27,53 +28,67 @@ namespace stan {
          *
          * @param o pointer to stream. Will accept 0.
          */
-        resume(std::fstream *save_s, std::fstream *load_s, std::string prefix) 
+        resume(std::ostream *save_s, std::istream *load_s, std::string prefix) 
           : save_(save_s), load_(load_s),
             has_save_stream_(save_s != 0), 
             has_load_stream_(load_s != 0),
-            prefix_(prefix) { }
+            prefix_(prefix),
+            end_(prefix+"end") { }
         
+        void save_common(const std::string& name, const std::iostream& input_stream) {
+          if (!has_save_stream_)
+            return;            
+
+          *save_ << prefix_ << name << std::endl;
+          *save_ << input_stream.rdbuf();
+          *save_ << std::endl << end_ <<  std::endl;  
+        }
+
+        void load_common(const std::string& name, std::iostream& output_stream) {
+          if (!has_load_stream_)
+            return;            
+              
+          bool started = false;
+          std::string line;
+          std::string begin_ = prefix_+name;
+          while (std::getline(*load_, line)) {
+            if (started) {
+              if (line == end_)
+                break;                
+              output_stream << line;
+            }
+            if (line == begin_)
+              started = true;
+          }
+        }
+
         template <class RNG>
         void save_rng(const RNG& base_rng) {
           if (!has_save_stream_)
             return;
           
-          //save rng state
-          *save_ << prefix_ << "rng" << std::endl;
-          *save_ << base_rng;
-          *save_ << std::endl << prefix_ << "end" <<  std::endl;  
+          std::stringstream rng_stream;
+          rng_stream << base_rng;
+          save_common("rng", rng_stream);  
         }
-          
+        
         template <class RNG>
         void load_rng(RNG& base_rng) {
           if (!has_load_stream_)
             return;
           
-          //load
           std::stringstream rng_stream;
-              
-          bool started = false;
-          std::string line;
-          while (std::getline(*load_, line)) {
-            if (started) {
-              if (line == "//end")
-                break;                
-              rng_stream << line;
-            }
-            if (line == "//rng")
-              started = true;
-          }
-                  
+          load_common("rng", rng_stream);
           rng_stream >> base_rng;
-        }        
+        }
 
       
         template <class Model, class RNG>
         void save_inits(const Model& model, const RNG& base_rng, stan::mcmc::sample s) {
           if (!has_save_stream_)
             return;
-
-          *save_ << prefix_ << "inits" << std::endl;
+          
+          std::stringstream inits_stream;
           
           std::vector<std::string> pnames;
           model.constrained_param_names(pnames, false, false); 
@@ -83,11 +98,6 @@ namespace stan {
                             const_cast<Eigen::VectorXd&>(s.cont_params()),
                             model_values,
                             false, false);
-                            
-          //for (size_t i = 0; i < pnames.size(); i++)
-          //  std::cout << pnames[i] << std::endl;          
-          //for (size_t i = 0; i < model_values.size(); i++)
-          //  std::cout << model_values(i) << std::endl;
           
           std::string prev_param_name;
           std::string cur_param_name;
@@ -104,19 +114,19 @@ namespace stan {
             
             //check if we have a new param name
             if (prev_param_name == cur_param_name)
-               *save_ << ", ";            
+               inits_stream << ", ";            
             else {
               
-              *save_ << cur_param_name;
-              *save_ << " <- ";
+              inits_stream << cur_param_name;
+              inits_stream << " <- ";
               
               if (cur_param_name != pnames.at(i)) //then dim > 1
-                *save_ << "structure(c(";          
+                inits_stream << "structure(c(";          
 
             }
             
               
-            *save_ << std::fixed << std::setprecision(std::numeric_limits<double>::digits10) << model_values(i);
+            inits_stream << std::fixed << std::setprecision(std::numeric_limits<double>::digits10) << model_values(i);
               
             
             prev_param_name = cur_param_name;
@@ -127,21 +137,20 @@ namespace stan {
             }
             
             if (cur_param_name == pnames.at(i)) //then dim == 1
-              *save_ << std::endl;
+              inits_stream << std::endl;
             else {
-              *save_ << "), .Dim = c(";
+              inits_stream << "), .Dim = c(";
 
-              *save_ <<
+              inits_stream <<
                 boost::regex_replace(boost::regex_replace(
                 pnames.at(i), regexp2, ""), regexp3, ",");
                   
-              *save_ << "))" << std::endl;
+              inits_stream << "))" << std::endl;
             }
             
           } //for loop end
 
-          *save_ << prefix_ << "end" <<  std::endl;
-          //save inits end
+          save_common("inits", inits_stream);
         }
         
         void save_sampler_specific(stan::mcmc::base_mcmc* sampler) {

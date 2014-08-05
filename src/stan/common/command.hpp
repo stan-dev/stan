@@ -299,6 +299,7 @@ namespace stan {
         try {
           
           
+          //FIXME: this need to be done in common/recorder/resume.hpp
           if (resume_load_stream) {
             std::stringstream init_stream;
             

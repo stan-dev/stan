@@ -46,7 +46,7 @@ namespace stan {
         //z_.write_metric(o);
       }
       
-      void load_sampler_specific_resume_info(std::fstream* o) {
+      void load_sampler_specific_resume_info(std::istream* o) {
         if(!o) return;
 
         std::stringstream stepsize_stream;

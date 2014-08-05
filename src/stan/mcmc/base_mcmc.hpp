@@ -34,7 +34,7 @@ namespace stan {
       
       virtual void write_sampler_specific_resume_info(std::ostream* o) {};
       
-      virtual void load_sampler_specific_resume_info(std::fstream* o) {};
+      virtual void load_sampler_specific_resume_info(std::istream* o) {};
       
       virtual void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
                                                 std::vector<std::string>& names) {};
