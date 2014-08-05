@@ -425,10 +425,16 @@ Symmetric, positive-definite matrices have the type
 positive-definite matrices with unit diagonals, have the type
 \code{corr\_matrix}.
 
-There is also a Cholesky factor type, \code{cholesky\_factor\_cov}.
-Using this type can be much more efficient than the full covariance
-matrices because it is easier to factor and scale.
-
+There is also a pair of Cholesky factor types.  The first,
+\code{cholesky\_factor\_cov}, is for Cholesky factors of symmetric,
+positive definite matrices, which amounts to being a lower-triangular
+matrix with positive diagonal elements.  The second, and
+\code{cholesky\_factor\_corr}, is for Cholesky factors of correlation
+matrices, which amounts to being a lower-triangular matrix with
+positive diagonal elements, where additionally the length of each row
+is 1.  Using Cholesky factor types can be much more efficient than the
+full correlation or covariance matrices because they are easier to
+factor and scale.
 
 
 
@@ -6117,6 +6123,57 @@ Only functions ending in \code{\_rng} may access the built-in
 pseudo-random number generators.  Such functions may only be used in
 the generated quantities block.
 
+
+\chapter{Solving Differential Equations}
+
+One application of user-defined functions is to define a systemof
+differential equations.   
+%
+\begin{figure}
+\begin{center}
+{\small
+\begin{Verbatim}
+functions {
+  real[] harm_osc_ode(real t,           // time
+                      real[] y,         // state
+                      real[] theta,     // parameters
+                      real[] x,         // data
+                      int[] x_int) {    // integer data
+    real dydt[size(y)];
+    // ... set dydt at state y and time t ...
+    return dydt;
+  }
+}
+data {
+  int<lower=1> K;        // system size
+  int<lower=0> T;        // number of observations
+  int<lower=0> P;        // number of parameters
+  int<lower=0> D;        // size of real data
+  int<lower=0> D_int;    // size of int data
+  
+  real t0;               // initial time
+  real ts[T];            // observation times
+  real x[D];             // real data
+  int x_int[D_int];      // integer data
+  real y[T,K];           // observations
+}
+parameters {
+  real y0[K];            // initial state
+  real theta[P];         // parameters
+  real<lower=0> sigma;   // obserbation noise
+}
+model {
+  real y_hat[T,K];
+  y_hat <- solve_ode(harm_osc_ode,
+                     y0, t0, ts, theta, x, x_int);      
+  for (t in 1:T)
+    y[t] ~ normal(y_hat[t], sigma);  // independent normal noise
+}
+\end{Verbatim}
+}
+\end{center}
+\caption{\small\itshape Skeletal Stan program for using the ODE solver.}\label{ode-solver.figure}
+\end{figure}
 
 
 

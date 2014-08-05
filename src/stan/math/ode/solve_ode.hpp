@@ -5,13 +5,27 @@
 #include <boost/numeric/odeint.hpp>
 #include <stan/math/ode/util.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/operators/operator_addition.hpp>
+#include <stan/agrad/rev/functions/fmax.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/rev/internal/precomputed_gradients.hpp>
 #include <stan/math/functions/value_of.hpp>
 
 namespace stan {
+  namespace agrad {
+     stan::agrad::var max(stan::agrad::var a, stan::agrad::var b) {
+       using std::fmax;
+       return fmax(a, b);
+     }
+   }
+ }
+
+namespace stan {
   
   namespace math {
+
+
+
 
     template <typename F, typename T1, typename T2>
     struct ode_system {

@@ -2,15 +2,16 @@
 #define STAN__MATH__ODE__UTIL_HPP__
 
 #include <vector>
+#include <ostream>
 #include <stan/agrad/rev/var.hpp>
  
-namespace stan {
-  namespace agrad {
-    stan::agrad::var max(stan::agrad::var a, stan::agrad::var b) {
-      return fmax(a, b);
-    }
-  }
-}
+// namespace stan {
+//   namespace agrad {
+//     stan::agrad::var max(stan::agrad::var a, stan::agrad::var b) {
+//       return fmax(a, b);
+//     }
+//   }
+// }
 
 namespace stan {
   
@@ -35,16 +36,16 @@ namespace stan {
         return m_states;
       }
       
-      void print() {
-        std::cout << "time,x_0";
+      void print(std::ostream& out) {
+        out << "time,x_0";
         for (size_t n = 1; n < m_states[0].size(); n++)
-          std::cout << ",x_" << n;
-        std::cout << std::endl;
+          out << ",x_" << n;
+        out << std::endl;
         for (size_t n = 0; n < m_states.size(); n++) {
-          std::cout << m_times[n]
-                    << "," << m_states[n][0]
-                    << "," << m_states[n][1]
-                    << std::endl;
+          out << m_times[n]
+              << "," << m_states[n][0]
+              << "," << m_states[n][1]
+              << std::endl;
         }
       }
     };
