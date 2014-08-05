@@ -24,6 +24,11 @@ namespace stan {
       typedef Eigen::Matrix<typename common_type<T1,T2>::type,R,C> type;
     };
 
+    template <typename T1, typename T2, int R, int C>
+    struct common_type<Eigen::LDLT<Eigen::Matrix<T1,R,C> >, Eigen::LDLT<Eigen::Matrix<T2,R,C> > > {
+      typedef Eigen::LDLT<Eigen::Matrix<typename common_type<T1,T2>::type,R,C> > type;
+    };
+
   }
 }
 

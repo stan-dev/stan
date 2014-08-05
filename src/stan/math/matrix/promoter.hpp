@@ -86,6 +86,37 @@ namespace stan {
       }
     };
 
+
+    // Eigen::LDLT Eigen::Matrix, F != T
+    template <typename F, typename T, int R, int C>
+    struct promoter<Eigen::LDLT<Eigen::Matrix<F,R,C> >, Eigen::LDLT<Eigen::Matrix<T,R,C> > > {
+      inline static void promote(const Eigen::LDLT<Eigen::Matrix<F,R,C> >& u,
+                                 Eigen::LDLT<Eigen::Matrix<T,R,C> >& t) {
+        t.resize(u.rows(), u.cols());
+        for (int i = 0; i < u.size(); ++i)
+          promoter<F,T>::promote(u(i),t(i));
+      }
+      inline static Eigen::LDLT<Eigen::Matrix<T,R,C> >
+      promote_to(const Eigen::LDLT<Eigen::Matrix<F,R,C> >& u) {
+        Eigen::LDLT<Eigen::Matrix<T,R,C> > t;
+        promoter<Eigen::LDLT<Eigen::Matrix<F,R,C> >,Eigen::LDLT<Eigen::Matrix<T,R,C> > >::promote(u,t);
+        return t;
+      }
+    };
+    // Eigen::Matrix, F == T
+    template <typename T, int R, int C>
+    struct promoter<Eigen::LDLT<Eigen::Matrix<T,R,C> >, Eigen::LDLT<Eigen::Matrix<T,R,C> > > {
+      inline static void promote(const Eigen::LDLT<Eigen::Matrix<T,R,C> >& u,
+                                 Eigen::LDLT<Eigen::Matrix<T,R,C> >& t) {
+        t = u;
+      }
+      inline static Eigen::LDLT<Eigen::Matrix<T,R,C> > 
+      promote_to(const Eigen::LDLT<Eigen::Matrix<T,R,C> >& u) {
+        return u;
+      }
+    };
+
+
   }
 }
 
