@@ -60,11 +60,11 @@ TEST(solve_ode_diff_integrator, harm_osc) {
   ode_res = stan::math::solve_ode_diff_integrator(harm_osc, y0, t0,
                                                   ts, theta, x, x_int);
 
-  EXPECT_NEAR(0.995029, ode_res[1][0].val(), 1e-6);
-  EXPECT_NEAR(-0.0990884, ode_res[1][1].val(), 1e-6);
+  EXPECT_NEAR(0.995029, ode_res[0][0].val(), 1e-6);
+  EXPECT_NEAR(-0.0990884, ode_res[0][1].val(), 1e-6);
 
-  EXPECT_NEAR(-0.421907, ode_res[100][0].val(), 1e-6);
-  EXPECT_NEAR(0.246407, ode_res[100][1].val(), 1e-6);
+  EXPECT_NEAR(-0.421907, ode_res[99][0].val(), 1e-6);
+  EXPECT_NEAR(0.246407, ode_res[99][1].val(), 1e-6);
 
 }
 
