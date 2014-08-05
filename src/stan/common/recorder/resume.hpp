@@ -42,7 +42,7 @@ namespace stan {
           *save_ << prefix_ << "rng" << std::endl;
           *save_ << base_rng;
           *save_ << std::endl << prefix_ << "end" <<  std::endl;  
-        }      
+        }
           
         template <class RNG>
         void load_rng(RNG& base_rng) {
@@ -156,32 +156,6 @@ namespace stan {
           if (!has_load_stream_)
             return;
           sampler->load_sampler_specific_resume_info(load_);
-        }
-
-      
-        /**
-         * Print single string with a prefix
-         *
-         * Uses the insertion operator to write out a string
-         * as comma separated values, flushing the buffer after the
-         * line is complete
-         * 
-         * @param x string to print with prefix in front
-         */
-        void operator()(const std::string x) {
-          if (!has_save_stream_)
-            return;
-          *save_ << prefix_ << x << std::endl;
-        }
-      
-        /**
-         * Prints a blank line. No prefix, no nothing.
-         *
-         */
-        void operator()() {
-          if (!has_save_stream_)
-            return;
-          *save_ << std::endl;
         }
       
         bool is_recording_save() const {
