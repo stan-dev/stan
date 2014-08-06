@@ -58,10 +58,8 @@ namespace stan {
       using stan::math::sum;
       
       typename promote_args<T_covar,T_shape>::type lp(0.0);
-      if (!check_positive(function, eta, "Shape parameter", &lp))
-        return lp;      
-      if (!check_lower_triangular(function, L, "Random variable", &lp))
-        return lp;
+      check_positive(function, eta, "Shape parameter", &lp);
+      check_lower_triangular(function, L, "Random variable", &lp);
 
       const unsigned int K = L.rows();
       if (K == 0)
@@ -114,18 +112,13 @@ namespace stan {
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_shape>::type lp(0.0);
-      if (!check_positive(function, eta, "Shape parameter", &lp))
-        return lp;      
-      if (!check_size_match(function, 
-          y.rows(), "Rows of correlation matrix",
-          y.cols(), "columns of correlation matrix",
-          &lp))
-        return lp;
-      if (!check_not_nan(function, y, "Correlation matrix", &lp)) 
-        return lp;
-      if (!check_corr_matrix(function, y, "Correlation matrix", &lp)) {
-        return lp;
-      }
+      check_positive(function, eta, "Shape parameter", &lp);
+      check_size_match(function, 
+                       y.rows(), "Rows of correlation matrix",
+                       y.cols(), "columns of correlation matrix",
+                       &lp);
+      check_not_nan(function, y, "Correlation matrix", &lp);
+      check_corr_matrix(function, y, "Correlation matrix", &lp);
       
       const unsigned int K = y.rows();
       if (K == 0)

@@ -52,6 +52,7 @@ generated quantities {
   z <- beta_rng(110.0, 250.1);
   z <- uniform_rng(-1.0, 1.0);
   z <- rayleigh_rng(1.0);  
+  z <- frechet_rng(2.0, 3.2);
   
   theta <- dirichlet_rng(alpha);
   v <- multi_normal_rng(mu,Sigma);
