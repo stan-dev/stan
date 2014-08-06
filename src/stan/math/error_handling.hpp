@@ -22,6 +22,7 @@
 #include <stan/math/error_handling/check_bounded.hpp>
 #include <stan/math/error_handling/check_nonnegative.hpp>
 #include <stan/math/error_handling/check_positive.hpp>
+#include <stan/math/error_handling/check_positive_finite.hpp>
 #include <stan/math/error_handling/check_consistent_size.hpp>
 #include <stan/math/error_handling/check_consistent_sizes.hpp>
 
