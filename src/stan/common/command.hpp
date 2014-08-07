@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__COMMAND_HPP__
-#define __STAN__COMMON__COMMAND_HPP__
+#ifndef STAN__COMMON__COMMAND_HPP
+#define STAN__COMMON__COMMAND_HPP
 
 #include <fstream>
 #include <stdexcept>
@@ -33,7 +33,6 @@
 #include <stan/model/util.hpp>
 
 #include <stan/optimization/newton.hpp>
-#include <stan/optimization/nesterov_gradient.hpp>
 #include <stan/optimization/bfgs.hpp>
 
 #include <stan/common/write_iteration_csv.hpp>
@@ -395,45 +394,7 @@ namespace stan {
 
         double lp(0);
         int return_code = stan::gm::error_codes::CONFIG;
-        if (algo->value() == "nesterov") {
-          bool epsilon = dynamic_cast<stan::gm::real_argument*>(
-                         algo->arg("nesterov")->arg("stepsize"))->value();
-          
-          
-          stan::optimization::NesterovGradient<Model> ng(model, cont_vector, disc_vector,
-                                                         epsilon, &std::cout);
-          
-          lp = ng.logp();
-          
-          double lastlp = lp - 1;
-          std::cout << "Initial log joint probability = " << lp << std::endl;
-          if (output_stream && save_iterations) {
-            write_iteration(*output_stream, model, base_rng,
-                            lp, cont_vector, disc_vector);
-          }
-
-          int m = 0;
-          for (int i = 0; i < num_iterations; i++) {
-            lastlp = lp;
-            lp = ng.step();
-            ng.params_r(cont_vector);
-            if (do_print(i, refresh)) {
-              std::cout << "Iteration ";
-              std::cout << std::setw(2) << (m + 1) << ". ";
-              std::cout << "Log joint probability = " << std::setw(10) << lp;
-              std::cout << ". Improved by " << (lp - lastlp) << ".";
-              std::cout << std::endl;
-              std::cout.flush();
-            }
-            m++;
-            if (output_stream && save_iterations) {
-              write_iteration(*output_stream, model, base_rng,
-                              lp, cont_vector, disc_vector);
-            }
-
-          }
-          return_code = stan::gm::error_codes::OK;
-        } else if (algo->value() == "newton") {
+        if (algo->value() == "newton") {
           std::vector<double> gradient;
           try {
             lp = model.template log_prob<false, false>(cont_vector, disc_vector, &std::cout);
@@ -555,7 +516,7 @@ namespace stan {
         
         stan::common::recorder::csv sample_recorder(output_stream, "# ");
         stan::common::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
-        stan::common::recorder::messages message_recorder(output_stream, "# ");
+        stan::common::recorder::messages message_recorder(&std::cout, "# ");
         
         stan::io::mcmc_writer<Model, 
                               stan::common::recorder::csv, stan::common::recorder::csv,

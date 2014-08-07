@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__INIT__HPP__
-#define __STAN__GM__ARGUMENTS__INIT__HPP__
+#ifndef STAN__GM__ARGUMENTS__INIT__HPP
+#define STAN__GM__ARGUMENTS__INIT__HPP
 
 #include <stan/gm/arguments/singleton_argument.hpp>
 
@@ -20,7 +20,7 @@ namespace stan {
         _default = "\"2\"";
         _default_value = "2";
         _constrained = false;
-        _good_value = "../src/test/test-models/compiled/CmdStan/test_model.init.R";
+        _good_value = "../src/test/test-models/test_model.init.R";
         _value = _default_value;
       };
       

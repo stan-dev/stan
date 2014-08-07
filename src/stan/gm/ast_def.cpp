@@ -309,7 +309,6 @@ namespace stan {
                               function_signature_t& signature) {
 
       std::vector<function_signature_t> signatures = sigs_map_[name];
-      size_t match_index = 0; 
       size_t min_promotions = std::numeric_limits<size_t>::max(); 
       size_t num_matches = 0;
       for (size_t i = 0; i < signatures.size(); ++i) {
@@ -319,7 +318,6 @@ namespace stan {
         size_t promotions_ui = static_cast<size_t>(promotions);
         if (promotions_ui < min_promotions) {
           min_promotions = promotions_ui;
-          match_index = i;
           num_matches = 1;
         } else if (promotions_ui == min_promotions) {
           ++num_matches;
@@ -640,6 +638,7 @@ namespace stan {
     bool is_linear_function(const std::string& name) {
       return name == "add"
         || name == "block"
+        || name == "append_col"
         || name == "col"
         || name == "cols"
         || name == "diagonal"
@@ -647,6 +646,7 @@ namespace stan {
         || name == "minus"
         || name == "negative_infinity"
         || name == "not_a_number"
+        || name == "append_row"
         || name == "rep_matrix"
         || name == "rep_row_vector"
         || name == "rep_vector"
@@ -1096,6 +1096,16 @@ namespace stan {
         N_(N) {
     }
 
+    cholesky_corr_var_decl::cholesky_corr_var_decl() 
+      : base_var_decl(MATRIX_T) { 
+    }
+    cholesky_corr_var_decl::cholesky_corr_var_decl(expression const& K,
+                                                   std::string const& name,
+                                                   std::vector<expression> const& dims)
+      : base_var_decl(name,dims,MATRIX_T),
+        K_(K) {
+    }
+
     cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(MATRIX_T) { 
     }
     cov_matrix_var_decl::cov_matrix_var_decl(expression const& K,
@@ -1150,6 +1160,9 @@ namespace stan {
     std::string name_vis::operator()(const cholesky_factor_var_decl& x) const {
       return x.name_;
     }
+    std::string name_vis::operator()(const cholesky_corr_var_decl& x) const {
+      return x.name_;
+    }
     std::string name_vis::operator()(const cov_matrix_var_decl& x) const {
       return x.name_;
     }
@@ -1173,6 +1186,7 @@ namespace stan {
     var_decl::var_decl(const ordered_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const positive_ordered_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const cholesky_factor_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const cholesky_corr_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const cov_matrix_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const corr_matrix_var_decl& decl) : decl_(decl) { }
 

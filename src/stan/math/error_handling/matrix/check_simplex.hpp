@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
@@ -28,31 +29,34 @@ namespace stan {
                        const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                        const char* name,
                        T_result* result) {
-      typedef typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type size_type;
+      typedef typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type size_t;
       if (theta.size() == 0) {
-        std::string message(name);
-        message += " is not a valid simplex. %1% elements in the vector.";
+        std::stringstream msg;
+        msg << " is not a valid simplex. " 
+            << "length(" << name << ") = %1%";
+        std::string tmp(msg.str());
         return dom_err(function,0,name,
-                       message.c_str(),"",
+                       tmp.c_str(),"",
                        result);
       }
       if (fabs(1.0 - theta.sum()) > CONSTRAINT_TOLERANCE) {
         std::stringstream msg;
         T_prob sum = theta.sum();
-        msg << "in function check_simplex(%1%), ";
-        msg << name << " is not a valid simplex.";
-        msg << " The sum of the elements should be 1, but is " << sum;
+        msg << " is not a valid simplex.";
+        msg.precision(10);
+        msg << " sum(" << name << ") = " << sum
+            << ", but should be %1%";
         std::string tmp(msg.str());
-        return dom_err(function,sum,name,
+        return dom_err(function,1.0,name,
                        tmp.c_str(),"",
                        result);
       }
-      for (size_type n = 0; n < theta.size(); n++) {
+      for (size_t n = 0; n < theta.size(); n++) {
         if (!(theta[n] >= 0)) {
           std::ostringstream stream;
-          stream << name << " is not a valid simplex."
-                 << " The element at " << n 
-                 << " is %1%, but should be greater than or equal to 0";
+          stream << " is not a valid simplex. "
+                 << name << "[" << n + stan::error_index::value << "]"
+                 << " = %1%, but should be greater than or equal to 0";
           std::string tmp(stream.str());
           return dom_err(function,theta[n],name,
                          tmp.c_str(),"",
@@ -61,7 +65,7 @@ namespace stan {
       }
       return true;
     }                         
-    
+
   }
 }
 #endif

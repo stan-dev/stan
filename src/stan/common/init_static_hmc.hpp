@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__INIT_STATIC_HMC_HPP__
-#define __STAN__COMMON__INIT_STATIC_HMC_HPP__
+#ifndef STAN__COMMON__INIT_STATIC_HMC_HPP
+#define STAN__COMMON__INIT_STATIC_HMC_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/gm/arguments/argument.hpp>

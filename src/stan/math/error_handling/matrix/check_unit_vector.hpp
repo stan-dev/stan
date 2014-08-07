@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_UNIT_VECTOR_HPP__
-#define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_UNIT_VECTOR_HPP__
+#ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_UNIT_VECTOR_HPP
+#define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_UNIT_VECTOR_HPP
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
@@ -39,7 +39,8 @@ namespace stan {
         std::stringstream msg;
         msg << "in function check_unit_vector(%1%), ";
         msg << name << " is not a valid unit vector.";
-        msg << " The sum of the squares of the elements should be 1, but is " << ssq;
+        msg << " The sum of the squares of the elements should be 1, but is " 
+            << ssq;
         std::string tmp(msg.str());
         return dom_err(function,ssq,name,
                        tmp.c_str(),"",
@@ -47,6 +48,16 @@ namespace stan {
       }
       return true;
     }
+
+
+    template <typename T>
+    inline bool check_unit_vector(const char* function,
+                                  const Eigen::Matrix<T,Eigen::Dynamic,1>& theta,
+                                  const char* name,
+                                  T* result = 0) {
+      return check_unit_vector<T,T>(function,theta,name,result);
+    }
+
 
   }
 }

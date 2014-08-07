@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__INV_CLOGLOG_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__INV_CLOGLOG_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__INV_CLOGLOG_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__INV_CLOGLOG_HPP
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/math/functions/inv_cloglog.hpp>

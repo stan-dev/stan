@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__ERROR_HANDLING__DOM_ERR_VEC_HPP__
-#define __STAN__MATH__ERROR_HANDLING__DOM_ERR_VEC_HPP__
+#ifndef STAN__MATH__ERROR_HANDLING__DOM_ERR_VEC_HPP
+#define STAN__MATH__ERROR_HANDLING__DOM_ERR_VEC_HPP
 
 #include <typeinfo>
 #ifdef BOOST_MSVC
@@ -34,11 +34,9 @@ namespace stan {
                             const T_msg error_msg2,
                             T_result* result) {
       std::ostringstream msg_o;
-      msg_o << name << "[" << i << "] " << error_msg << error_msg2;
+      msg_o << name << "[" << stan::error_index::value + i << "] " << error_msg << error_msg2;
 
       std::string msg;
-      // FIXME: this is the line to remove in the future.
-      msg += "Error in function ";
       msg += (boost::format(function) % typeid(typename T::value_type).name()).str();
       msg += ": ";
       msg += msg_o.str();

@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__CHOLESKY_DECOMPOSE_HPP__
-#define __STAN__MATH__MATRIX__CHOLESKY_DECOMPOSE_HPP__
+#ifndef STAN__MATH__MATRIX__CHOLESKY_DECOMPOSE_HPP
+#define STAN__MATH__MATRIX__CHOLESKY_DECOMPOSE_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>

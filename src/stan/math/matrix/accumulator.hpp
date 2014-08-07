@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__ACCUMULATOR_HPP__
-#define __STAN__MATH__MATRIX__ACCUMULATOR_HPP__
+#ifndef STAN__MATH__MATRIX__ACCUMULATOR_HPP
+#define STAN__MATH__MATRIX__ACCUMULATOR_HPP
 
 #include <vector>
 #include <boost/utility/enable_if.hpp>

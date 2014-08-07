@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__RECORDER__NO_OP_HPP__
-#define __STAN__COMMON__RECORDER__NO_OP_HPP__
+#ifndef STAN__COMMON__RECORDER__NO_OP_HPP
+#define STAN__COMMON__RECORDER__NO_OP_HPP
 
 #include <ostream>
 #include <string>

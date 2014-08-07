@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_DECREMENT_HPP__
-#define __STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_DECREMENT_HPP__
+#ifndef STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_DECREMENT_HPP
+#define STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_DECREMENT_HPP
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>

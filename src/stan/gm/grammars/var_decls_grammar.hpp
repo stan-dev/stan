@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__PARSER__VAR_DECLS_GRAMMAR__HPP__
-#define __STAN__GM__PARSER__VAR_DECLS_GRAMMAR__HPP__
+#ifndef STAN__GM__PARSER__VAR_DECLS_GRAMMAR__HPP
+#define STAN__GM__PARSER__VAR_DECLS_GRAMMAR__HPP
 
 #include <string>
 #include <sstream>
@@ -41,6 +41,11 @@ namespace stan {
                               cholesky_factor_var_decl(var_origin), 
                               whitespace_grammar<Iterator> > 
       cholesky_factor_decl_r;
+
+      boost::spirit::qi::rule<Iterator, 
+                              cholesky_corr_var_decl(var_origin), 
+                              whitespace_grammar<Iterator> > 
+      cholesky_corr_decl_r;
 
       boost::spirit::qi::rule<Iterator, 
                               corr_matrix_var_decl(var_origin), 

@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__RECORDER__VALUES_HPP__
-#define __STAN__COMMON__RECORDER__VALUES_HPP__
+#ifndef STAN__COMMON__RECORDER__VALUES_HPP
+#define STAN__COMMON__RECORDER__VALUES_HPP
 
 #include <ostream>
 #include <string>
@@ -23,6 +23,7 @@ namespace stan {
         values(const size_t N,
                const size_t M) 
           : m_(0), N_(N), M_(M) {
+          x_.reserve(N_);
           for (size_t n = 0; n < N_; n++)
             x_.push_back(InternalVector(M_));
         }

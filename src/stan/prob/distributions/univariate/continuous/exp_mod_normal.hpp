@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__MOD__NORMAL__HPP__
-#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__MOD__NORMAL__HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__MOD__NORMAL__HPP
+#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__MOD__NORMAL__HPP
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -28,7 +28,7 @@ namespace stan {
       static const char* function = "stan::prob::exp_mod_normal_log(%1%)";
 
       using stan::is_constant_struct;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -48,9 +48,8 @@ namespace stan {
       // validate args (here done over var, which should be OK)
       check_not_nan(function, y, "Random variable", &logp);
       check_finite(function, mu, "Location parameter", &logp);
-      check_finite(function, lambda, "Inv_scale parameter", &logp);
-      check_positive(function, lambda, "Inv_scale parameter", &logp);
-      check_positive(function, sigma, "Scale parameter", &logp);
+      check_positive_finite(function, lambda, "Inv_scale parameter", &logp);
+      check_positive_finite(function, sigma, "Scale parameter", &logp);
       check_consistent_sizes(function,
                              y,mu,sigma,lambda,
                              "Random variable","Location parameter",
@@ -142,7 +141,7 @@ namespace stan {
                        const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_cdf(%1%)";
 
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -159,10 +158,8 @@ namespace stan {
       check_not_nan(function, y, "Random variable", &cdf);
       check_finite(function, mu, "Location parameter", &cdf);
       check_not_nan(function, sigma, "Scale parameter", &cdf);
-      check_finite(function, sigma, "Scale parameter", &cdf);
-      check_positive(function, sigma, "Scale parameter", &cdf);
-      check_finite(function, lambda, "Inv_scale parameter", &cdf);
-      check_positive(function, lambda, "Inv_scale parameter", &cdf);
+      check_positive_finite(function, sigma, "Scale parameter", &cdf);
+      check_positive_finite(function, lambda, "Inv_scale parameter", &cdf);
       check_not_nan(function, lambda, "Inv_scale parameter", &cdf);
       check_consistent_sizes(function,
                              y,mu,sigma,lambda,
@@ -256,7 +253,7 @@ namespace stan {
                        const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_cdf_log(%1%)";
 
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -273,10 +270,8 @@ namespace stan {
       check_not_nan(function, y, "Random variable", &cdf_log);
       check_finite(function, mu, "Location parameter", &cdf_log);
       check_not_nan(function, sigma, "Scale parameter", &cdf_log);
-      check_finite(function, sigma, "Scale parameter", &cdf_log);
-      check_positive(function, sigma, "Scale parameter", &cdf_log);
-      check_finite(function, lambda, "Inv_scale parameter", &cdf_log);
-      check_positive(function, lambda, "Inv_scale parameter", &cdf_log);
+      check_positive_finite(function, sigma, "Scale parameter", &cdf_log);
+      check_positive_finite(function, lambda, "Inv_scale parameter", &cdf_log);
       check_not_nan(function, lambda, "Inv_scale parameter", &cdf_log);
       check_consistent_sizes(function,
                              y,mu,sigma,lambda,
@@ -362,7 +357,7 @@ namespace stan {
                        const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_ccdf_log(%1%)";
 
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -379,10 +374,8 @@ namespace stan {
       check_not_nan(function, y, "Random variable", &ccdf_log);
       check_finite(function, mu, "Location parameter", &ccdf_log);
       check_not_nan(function, sigma, "Scale parameter", &ccdf_log);
-      check_finite(function, sigma, "Scale parameter", &ccdf_log);
-      check_positive(function, sigma, "Scale parameter", &ccdf_log);
-      check_finite(function, lambda, "Inv_scale parameter", &ccdf_log);
-      check_positive(function, lambda, "Inv_scale parameter", &ccdf_log);
+      check_positive_finite(function, sigma, "Scale parameter", &ccdf_log);
+      check_positive_finite(function, lambda, "Inv_scale parameter", &ccdf_log);
       check_not_nan(function, lambda, "Inv_scale parameter", &ccdf_log);
       check_consistent_sizes(function,
                              y,mu,sigma,lambda,
@@ -469,13 +462,13 @@ namespace stan {
 
       static const char* function = "stan::prob::exp_mod_normal_rng(%1%)";
 
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
 
       check_finite(function, mu, "Location parameter", (double*)0);
-      check_finite(function, lambda, "Inv_scale parameter", (double*)0);
-      check_positive(function, lambda, "Inv_scale parameter", (double*)0);
-      check_positive(function, sigma, "Scale parameter", (double*)0);
+      check_positive_finite(function, lambda, "Inv_scale parameter",
+                            (double*)0);
+      check_positive_finite(function, sigma, "Scale parameter", (double*)0);
 
       return stan::prob::normal_rng(mu, sigma,rng) + stan::prob::exponential_rng(lambda, rng);
     }

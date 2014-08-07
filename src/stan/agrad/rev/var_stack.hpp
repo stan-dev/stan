@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__VAR_STACK_HPP__
-#define __STAN__AGRAD__REV__VAR_STACK_HPP__
+#ifndef STAN__AGRAD__REV__VAR_STACK_HPP
+#define STAN__AGRAD__REV__VAR_STACK_HPP
 
 #include <vector>
 #include <stan/memory/stack_alloc.hpp>
@@ -34,7 +34,7 @@ namespace stan {
     /**
      * Recover memory used for all variables for reuse.
      */
-    static void recover_memory() {
+    static inline void recover_memory() {
       var_stack_.clear();
       var_nochain_stack_.clear();
       for (size_t i = 0; i < var_alloc_stack_.size(); i++)
@@ -46,7 +46,7 @@ namespace stan {
     /**
      * Return all memory used for gradients back to the system.
      */
-    static void free_memory() {
+    static inline void free_memory() {
       memalloc_.free_all();
     }
 

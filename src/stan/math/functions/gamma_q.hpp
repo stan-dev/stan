@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__GAMMA_Q_HPP__
-#define __STAN__MATH__FUNCTIONS__GAMMA_Q_HPP__
+#ifndef STAN__MATH__FUNCTIONS__GAMMA_Q_HPP
+#define STAN__MATH__FUNCTIONS__GAMMA_Q_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 

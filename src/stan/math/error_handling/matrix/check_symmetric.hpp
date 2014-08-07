@@ -1,9 +1,10 @@
-#ifndef __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SYMMETRIC_HPP__
-#define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SYMMETRIC_HPP__
+#ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SYMMETRIC_HPP
+#define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SYMMETRIC_HPP
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
@@ -37,8 +38,10 @@ namespace stan {
           if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE) {
             std::ostringstream message;
             message << name << " is not symmetric. " 
-                    << name << "[" << m << "," << n << "] is %1%, but "
-                    << name << "[" << n << "," << m 
+                    << name << "[" << stan::error_index::value + m << "," 
+                    << stan::error_index::value +n << "] is %1%, but "
+                    << name << "[" << stan::error_index::value +n << "," 
+                    << stan::error_index::value + m 
                     << "] element is " << y(n,m);
             std::string msg(message.str());
             return dom_err(function,y(m,n),name,

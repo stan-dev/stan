@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP
+#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP
 
 #include <boost/random/cauchy_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -43,7 +43,7 @@ namespace stan {
       static const char* function = "stan::prob::cauchy_log(%1%)";
 
       using stan::is_constant_struct;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -61,8 +61,7 @@ namespace stan {
       // validate args (here done over var, which should be OK)
       check_not_nan(function, y, "Random variable", &logp);
       check_finite(function, mu, "Location parameter", &logp);
-      check_positive(function, sigma, "Scale parameter", &logp);
-      check_finite(function, sigma, "Scale parameter", &logp);
+      check_positive_finite(function, sigma, "Scale parameter", &logp);
       check_consistent_sizes(function,
                              y,mu,sigma,
                              "Random variable","Location parameter",
@@ -165,7 +164,7 @@ namespace stan {
         
       static const char* function = "stan::prob::cauchy_cdf(%1%)";
       
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -176,8 +175,7 @@ namespace stan {
         
       check_not_nan(function, y, "Random variable", &P);
       check_finite(function, mu, "Location parameter", &P);
-      check_finite(function, sigma, "Scale parameter", &P);
-      check_positive(function, sigma, "Scale parameter", &P);
+      check_positive_finite(function, sigma, "Scale parameter", &P);
       check_consistent_sizes(function, y, mu, sigma,
                              "Random variable", "Location parameter", 
                              "Scale Parameter",
@@ -263,7 +261,7 @@ namespace stan {
         
       static const char* function = "stan::prob::cauchy_cdf(%1%)";
       
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -274,8 +272,7 @@ namespace stan {
         
       check_not_nan(function, y, "Random variable", &cdf_log);
       check_finite(function, mu, "Location parameter", &cdf_log);
-      check_finite(function, sigma, "Scale parameter", &cdf_log);
-      check_positive(function, sigma, "Scale parameter", &cdf_log);
+      check_positive_finite(function, sigma, "Scale parameter", &cdf_log);
       check_consistent_sizes(function, y, mu, sigma,
                              "Random variable", "Location parameter", 
                              "Scale Parameter", &cdf_log);
@@ -331,7 +328,7 @@ namespace stan {
         
       static const char* function = "stan::prob::cauchy_cdf(%1%)";
       
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -342,8 +339,7 @@ namespace stan {
         
       check_not_nan(function, y, "Random variable", &ccdf_log);
       check_finite(function, mu, "Location parameter", &ccdf_log);
-      check_finite(function, sigma, "Scale parameter", &ccdf_log);
-      check_positive(function, sigma, "Scale parameter", &ccdf_log);
+      check_positive_finite(function, sigma, "Scale parameter", &ccdf_log);
       check_consistent_sizes(function, y, mu, sigma,
                              "Random variable", "Location parameter", 
                              "Scale Parameter", &ccdf_log);
@@ -397,12 +393,11 @@ namespace stan {
 
       static const char* function = "stan::prob::cauchy_rng(%1%)";
 
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       
       check_finite(function, mu, "Location parameter", (double*)0);
-      check_positive(function, sigma, "Scale parameter", (double*)0);
-      check_finite(function, sigma, "Scale parameter", (double*)0);
+      check_positive_finite(function, sigma, "Scale parameter", (double*)0);
 
       variate_generator<RNG&, cauchy_distribution<> >
         cauchy_rng(rng, cauchy_distribution<>(mu, sigma));
