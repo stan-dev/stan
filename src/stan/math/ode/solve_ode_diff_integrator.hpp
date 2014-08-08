@@ -12,11 +12,11 @@ namespace stan {
 
     template <typename F, typename T>
     struct ode_system_diff_integrator {
-      F f_;
+      const F& f_;
       const std::vector<T>& theta_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
-      ode_system_diff_integrator(F f,
+      ode_system_diff_integrator(const F& f,
                                  const std::vector<T>& theta,
                                  const std::vector<double>& x,
                                  const std::vector<int>& x_int)
@@ -31,7 +31,7 @@ namespace stan {
 
     template <typename F, typename T>
     std::vector<std::vector<T> >
-    solve_ode_diff_integrator(F f,
+    solve_ode_diff_integrator(const F& f,
                               const std::vector<T>& y0,
                               const double& t0,
                               const std::vector<double>& ts,
