@@ -13,6 +13,12 @@ TEST(gmParserTermGrammar, infixExponentiation) {
               "base type mismatch in assignment; variable name = z");
 }
 
+TEST(gmParserTermGrammar, modulusOp) {
+  test_parsable("validate_modulus_good");
+  test_throws("validate_modulus_bad", 
+              "both operands of % must be int; cannot modulo real by real");
+}
+
 TEST(gmParserTermGrammar, multiplicationFun) {
   test_parsable("validate_multiplication");
 }
