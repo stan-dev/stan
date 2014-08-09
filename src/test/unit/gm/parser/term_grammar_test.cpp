@@ -9,6 +9,7 @@
 
 TEST(gmParserTermGrammar, infixExponentiation) {
   test_parsable("validate_exponentiation_good");
+  test_parsable("validate_exponentiation_precedence");
   test_throws("validate_exponentiation_bad", 
               "base type mismatch in assignment; variable name = z");
 }

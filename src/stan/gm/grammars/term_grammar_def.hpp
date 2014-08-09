@@ -583,7 +583,7 @@ namespace stan {
 
       exponentiated_factor_r.name("(optionally) exponentiated factor");
       exponentiated_factor_r 
-        = ( factor_r(_r1) [_val = _1] 
+        = ( indexed_factor_r(_r1) [_val = _1] 
             >> lit('^') 
             > negated_factor_r(_r1)
             [exponentiation_f(_val,_1,_r1,_pass,
