@@ -256,7 +256,6 @@ namespace stan {
       }
     };
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
-
  
     struct exponentiation_expr {
       template <typename T1, typename T2, typename T3, typename T4, typename T5>
@@ -325,9 +324,20 @@ namespace stan {
       void operator()(expression& expr1,
                       const expression& expr2,
                       std::ostream& error_msgs) const {
-        if (expr1.expression_type().is_primitive_int() 
+        if (expr1.expression_type().is_primitive()
+            && expr2.expression_type().is_primitive()
+            && (expr1.expression_type().is_primitive_double()
+                || expr2.expression_type().is_primitive_double())) {
+          expr1 /= expr2;
+          return;
+        } 
+        std::vector<expression> args;
+        args.push_back(expr1);
+        args.push_back(expr2);
+        set_fun_type sft;
+        if (expr1.expression_type().is_primitive_int()
             && expr2.expression_type().is_primitive_int()) {
-          // getting here, but not printing?  only print error if problems?
+          // result might be assigned to real - generate warning
           error_msgs << "Warning: integer division implicitly rounds to integer."
                      << " Found int division: ";
           generate_expression(expr1.expr_,error_msgs);
@@ -337,17 +347,12 @@ namespace stan {
                      << " Positive values rounded down, negative values rounded up or down"
                      << " in platform-dependent way."
                      << std::endl;
-        }
-            
-        if (expr1.expression_type().is_primitive()
-            && expr2.expression_type().is_primitive()) {
-          expr1 /= expr2;
+
+          fun f("divide",args);
+          sft(f,error_msgs);
+          expr1 = expression(f);
           return;
         }
-        std::vector<expression> args;
-        args.push_back(expr1);
-        args.push_back(expr2);
-        set_fun_type sft;
         if ((expr1.expression_type().type() == MATRIX_T
              || expr1.expression_type().type() == ROW_VECTOR_T)
             && expr2.expression_type().type() == MATRIX_T) {
@@ -359,9 +364,40 @@ namespace stan {
         fun f("divide",args);
         sft(f,error_msgs);
         expr1 = expression(f);
+        return;
       }
     };
     boost::phoenix::function<division_expr> division_f;
+
+    struct modulus_expr {
+      template <typename T1, typename T2, typename T3, typename T4>
+      struct result { typedef void type; };
+
+      void operator()(expression& expr1,
+                      const expression& expr2,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        if (!expr1.expression_type().is_primitive_int() 
+            && !expr2.expression_type().is_primitive_int()) {
+          error_msgs << "both operands of % must be int"
+                     << "; cannot modulo "
+                     << expr1.expression_type()
+                     << " by " 
+                     << expr2.expression_type();
+          error_msgs << std::endl;
+          pass = false;
+          return;
+        }
+        std::vector<expression> args;
+        args.push_back(expr1);
+        args.push_back(expr2);
+        set_fun_type sft;
+        fun f("modulus",args);
+        sft(f,error_msgs);
+        expr1 = expression(f);
+      }
+    };
+    boost::phoenix::function<modulus_expr> modulus_f;
 
     struct left_division_expr {
       template <typename T1, typename T2, typename T3>
@@ -444,11 +480,12 @@ namespace stan {
     // so. Phoenix will be switching to BOOST_TYPEOF. In the meantime,
     // we will use a phoenix::function below:
     struct negate_expr {
-      template <typename T1, typename T2, typename T3>
+      template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef void type; };
 
       void operator()(expression& expr_result,
                       const expression& expr,
+                      bool& pass,
                       std::ostream& error_msgs) const {
         if (expr.expression_type().is_primitive()) {
           expr_result = expression(unary_op('-', expr));
@@ -602,7 +639,11 @@ namespace stan {
                               [multiplication_f(_val,_1,
                                                 boost::phoenix::ref(error_msgs_))])
                   | (lit('/') > negated_factor_r(_r1)   
-                                [division_f(_val,_1,boost::phoenix::ref(error_msgs_))])
+                                [division_f(_val,_1,
+                                            boost::phoenix::ref(error_msgs_))])
+                  | (lit('%') > negated_factor_r(_r1)   
+                                [modulus_f(_val,_1,_pass,
+                                           boost::phoenix::ref(error_msgs_))])
                   | (lit('\\') > negated_factor_r(_r1)   
                                  [left_division_f(_val,_1,
                                                    boost::phoenix::ref(error_msgs_))])
@@ -618,7 +659,7 @@ namespace stan {
 
       negated_factor_r 
         = lit('-') >> negated_factor_r(_r1) 
-                      [negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
+        [negate_expr_f(_val,_1,_pass,boost::phoenix::ref(error_msgs_))]
         | lit('!') >> negated_factor_r(_r1) 
                       [logical_negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)  [_val = _1]
@@ -628,7 +669,7 @@ namespace stan {
 
       exponentiated_factor_r.name("(optionally) exponentiated factor");
       exponentiated_factor_r 
-        = ( factor_r(_r1) [_val = _1] 
+        = ( indexed_factor_r(_r1) [_val = _1] 
             >> lit('^') 
             > negated_factor_r(_r1)
             [exponentiation_f(_val,_1,_r1,_pass,

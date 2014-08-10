@@ -1666,6 +1666,8 @@ For integer and real-valued expressions, Stan supports the basic
 binary arithmetic operations of addition (\code{+}), subtraction
 (\code{-}), multiplication (\code{*}) and division (\code{/}) in the
 usual ways.  
+For integer expressions, Stan supports the modulus (\code{\%})
+binary arithmetic operation.
 Stan also supports the unary operation of negation for
 integer and real-valued expressions.  For example, assuming \code{n}
 and \code{m} are integer variables and \code{x} and \code{y} real
@@ -1678,7 +1680,8 @@ variables, the following expressions are legal.
 \ \ \code{(x - y) / 2.0},
 \\
 \ \ \code{(n * (n + 1)) / 2},
-\ \ \code{x / n}
+\ \ \code{x / n},
+\ \ \code{m \% n}
 \end{quote}
 %
 The negation, addition, subtraction, and multiplication operations are
@@ -1784,6 +1787,8 @@ tabular form in \reffigure{operator-precedence}.
 \code{*} & 4 & left & binary infix & multiplication
 \\
 \code{/} & 4 & left & binary infix & (right) division
+\\
+\code{\%} & 4 & left & binary infix & modulus
 \\ \hline
 \Verb|\| & 3 & left & binary infix & left division
 \\ \hline
@@ -1797,9 +1802,9 @@ tabular form in \reffigure{operator-precedence}.
 \\ 
 \code{+} & 1 & n/a & unary prefix & promotion (no-op in Stan)
 \\ \hline
+\code{\textasciicircum} & 0.5 & right & binary infix & exponentiation
+\\ \hline
 \code{'} & 0 & n/a & unary postfix & transposition
-\\ 
-\code{\textasciicircum} & 0 & right & binary infix & exponentiation
 \\ \hline \hline
 \code{()} & 0 & n/a & prefix, wrap & function application
 \\
@@ -1826,21 +1831,22 @@ subscripting bind more tightly than any of the arithmetic operations.
 
 The precedence and associativity determine how expressions are
 interpreted.  Because addition is left associative, the expression
-\code{a+b+c} is interpreted as \code{(a+b)+c}.  Similarly,
-\code{a/b*c} is interpreted as \code{(a/b)*c}.  
+\mbox{\code{a+b+c}} is interpreted as \mbox{\code{(a+b)+c}}.  Similarly,
+\mbox{\code{a/b*c}} is interpreted as \mbox{\code{(a/b)*c}}.  
 
 Because multiplication has higher precedence than addition, the
-expression \code{a*b+c} is interpreted as \code{(a*b)+c} and the
-expression \code{a+b*c} is interpreted as \code{a+(b*c)}.  Similarly,
-\code{2*x+3*-y} is interpreted as \code{(2*x)+(3*(-y))}.
+expression \mbox{\code{a*b+c}} is interpreted as \mbox{\code{(a*b)+c}} and the
+expression \mbox{\code{a+b*c}} is interpreted as \mbox{\code{a+(b*c)}}.  Similarly,
+\mbox{\code{2*x+3*-y}} is interpreted as \mbox{\code{(2*x)+(3*(-y))}}.
 
-Transposition and exponentiation tighter than all other operations.
+Transposition and exponentiation bind more tightly
+than any other arithmetic or logical operation.
 For vectors, row vectors, and matrices, 
-\code{-u'} is interpreted as \code{-(u')}, \code{u*v'} as
-\code{u*(v')}, \code{u'*v} as \code{(u')*v}.
+\mbox{\code{-u'}} is interpreted as \mbox{\code{-(u')}}, \mbox{\code{u*v'}} as
+\mbox{\code{u*(v')}}, and \mbox{\code{u'*v}} as \mbox{\code{(u')*v}}.
 For integer and reals,
-\code{-n \textasciicircum\ 3}
-is interpreted as \code{-(n \textasciicircum\ 3)}.
+\mbox{\code{-n \textasciicircum\ 3}}
+is interpreted as \mbox{\code{-(n \textasciicircum\ 3)}}.
 
 
 
