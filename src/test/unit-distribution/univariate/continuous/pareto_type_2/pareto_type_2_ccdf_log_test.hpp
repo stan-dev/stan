@@ -16,7 +16,7 @@ public:
     param[2] = 0.5;           // lambda
     param[3] = 3.0;           // alpha
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.4212962962962961688262));  // expected CCDF_log
+    ccdf_log.push_back(std::log(0.5787037037037038311738));  // expected CCDF_log
 
   }
   

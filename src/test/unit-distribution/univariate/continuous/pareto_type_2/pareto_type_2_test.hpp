@@ -96,7 +96,7 @@ public:
     if (include_summand<true,T_scale>::value)
       logp -= log(lambda);
     if (include_summand<true,T_y,T_loc,T_scale,T_shape>::value)
-      logp -= (alpha + 1.0) * log(1.0 + (y - mu) / lambda);
+      logp -= (alpha + 1.0) * log1p((y - mu) / lambda);
     
     return logp;
   }

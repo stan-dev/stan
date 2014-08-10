@@ -288,7 +288,8 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
-          
+      using stan::math::log1m;
+
       double P(0.0);
 
       check_greater_or_equal(function, y, mu, "Random variable", &P);
@@ -336,7 +337,7 @@ namespace stan {
                                    - value_of(mu_vec[i])) 
           / value_of(lambda_vec[i]);
         const double p1_pow_alpha = pow(temp, value_of(alpha_vec[i]));
-        cdf_log[i] = log(1.0 - 1.0 / p1_pow_alpha);
+        cdf_log[i] = log1m(1.0 / p1_pow_alpha);
 
         inv_p1_pow_alpha_minus_one[i] = 1.0 / (p1_pow_alpha - 1.0);
 

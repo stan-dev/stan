@@ -78,9 +78,9 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale, T_shape>::type 
   cdf_log_function(const T_y& y, const T_loc& mu, const T_scale& lambda, const T_shape& alpha,
          const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-      using std::log;
-      using std::pow;
-      return log(1.0 - pow(1.0 + (y-mu)/lambda,-alpha));
+    using stan::math::log1m;
+    using std::pow;
+    return log1m(pow(1.0 + (y-mu)/lambda,-alpha));
   }
     
 };
