@@ -1663,6 +1663,8 @@ For integer and real-valued expressions, Stan supports the basic
 binary arithmetic operations of addition (\code{+}), subtraction
 (\code{-}), multiplication (\code{*}) and division (\code{/}) in the
 usual ways.  
+For integer expressions, Stan supports the modulus (\code{\%})
+binary arithmetic operation.
 Stan also supports the unary operation of negation for
 integer and real-valued expressions.  For example, assuming \code{n}
 and \code{m} are integer variables and \code{x} and \code{y} real
@@ -1675,7 +1677,8 @@ variables, the following expressions are legal.
 \ \ \code{(x - y) / 2.0},
 \\
 \ \ \code{(n * (n + 1)) / 2},
-\ \ \code{x / n}
+\ \ \code{x / n},
+\ \ \code{m \% n}
 \end{quote}
 %
 The negation, addition, subtraction, and multiplication operations are
@@ -1781,6 +1784,8 @@ tabular form in \reffigure{operator-precedence}.
 \code{*} & 4 & left & binary infix & multiplication
 \\
 \code{/} & 4 & left & binary infix & (right) division
+\\
+\code{\%} & 4 & left & binary infix & modulus
 \\ \hline
 \Verb|\| & 3 & left & binary infix & left division
 \\ \hline
@@ -1794,9 +1799,9 @@ tabular form in \reffigure{operator-precedence}.
 \\ 
 \code{+} & 1 & n/a & unary prefix & promotion (no-op in Stan)
 \\ \hline
+\code{\textasciicircum} & 0.5 & right & binary infix & exponentiation
+\\ \hline
 \code{'} & 0 & n/a & unary postfix & transposition
-\\ 
-\code{\textasciicircum} & 0 & right & binary infix & exponentiation
 \\ \hline \hline
 \code{()} & 0 & n/a & prefix, wrap & function application
 \\
@@ -1823,21 +1828,22 @@ subscripting bind more tightly than any of the arithmetic operations.
 
 The precedence and associativity determine how expressions are
 interpreted.  Because addition is left associative, the expression
-\code{a+b+c} is interpreted as \code{(a+b)+c}.  Similarly,
-\code{a/b*c} is interpreted as \code{(a/b)*c}.  
+\mbox{\code{a+b+c}} is interpreted as \mbox{\code{(a+b)+c}}.  Similarly,
+\mbox{\code{a/b*c}} is interpreted as \mbox{\code{(a/b)*c}}.  
 
 Because multiplication has higher precedence than addition, the
-expression \code{a*b+c} is interpreted as \code{(a*b)+c} and the
-expression \code{a+b*c} is interpreted as \code{a+(b*c)}.  Similarly,
-\code{2*x+3*-y} is interpreted as \code{(2*x)+(3*(-y))}.
+expression \mbox{\code{a*b+c}} is interpreted as \mbox{\code{(a*b)+c}} and the
+expression \mbox{\code{a+b*c}} is interpreted as \mbox{\code{a+(b*c)}}.  Similarly,
+\mbox{\code{2*x+3*-y}} is interpreted as \mbox{\code{(2*x)+(3*(-y))}}.
 
-Transposition and exponentiation tighter than all other operations.
+Transposition and exponentiation bind more tightly
+than any other arithmetic or logical operation.
 For vectors, row vectors, and matrices, 
-\code{-u'} is interpreted as \code{-(u')}, \code{u*v'} as
-\code{u*(v')}, \code{u'*v} as \code{(u')*v}.
+\mbox{\code{-u'}} is interpreted as \mbox{\code{-(u')}}, \mbox{\code{u*v'}} as
+\mbox{\code{u*(v')}}, and \mbox{\code{u'*v}} as \mbox{\code{(u')*v}}.
 For integer and reals,
-\code{-n \textasciicircum\ 3}
-is interpreted as \code{-(n \textasciicircum\ 3)}.
+\mbox{\code{-n \textasciicircum\ 3}}
+is interpreted as \mbox{\code{-(n \textasciicircum\ 3)}}.
 
 
 
@@ -3221,6 +3227,32 @@ variables or expressions at various points in the execution of a
 program.  They are particularly useful for spotting problematic
 not-a-number of infinite values, both of which will be printed.
 
+\section{Raise\_Exception Statements}\label{raise-exception-statements.section}
+
+The Stan raise\_exception statement provides a mechanism to report errors or problematic
+values encountered during program execution.
+It is typically embedded in a conditional statement in order to
+detect bad or illegal outcomes of a processing step.
+This statement accepts any number of quoted string literals or Stan expressions as arguments.
+
+To illustrate, here is an example of a test which raises an exception when
+a value falls below a specified limit.
+%
+\begin{quote}
+\begin{Verbatim}
+if (x < min) 
+  raise_exception("failure, value ",x," below minimum ",y);
+\end{Verbatim}
+\end{quote}
+
+The effect of raising an exception depends on the program block
+from which this statement or a function that contains 
+a \code{raise\_exception} statment occurs.
+In both the transformed data block and generated quantities block this exception
+is fatal.  An exception in the transformed data block blocks model initialization.
+An exception in the generated quantities block will block sampling.
+Exceptions raised in the transformed parameters and model blocks are non-fatal.
+The exception message is reported and processing continues.
 
 
 \chapter{User-Defined Functions}\label{functions.chapter}%
