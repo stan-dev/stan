@@ -49,25 +49,25 @@ TEST(ProbDistributionsMultiNormal,Vectorized) {
   Sigma << 10.0, -3.0, 0.0,
     -3.0,  5.0, 0.0,
     0.0, 0.0, 5.0;
-  Sigma = Sigma.llt().matrixL();
+  Matrix<double,Dynamic,Dynamic> L = Sigma.llt().matrixL();
     
   //y and mu vectorized
-  EXPECT_FLOAT_EQ(-11.928077-6.5378327, stan::prob::multi_normal_cholesky_log(vec_y,vec_mu,Sigma));
-  EXPECT_FLOAT_EQ(-11.928077-6.5378327, stan::prob::multi_normal_cholesky_log(vec_y_t,vec_mu,Sigma));
-  EXPECT_FLOAT_EQ(-11.928077-6.5378327, stan::prob::multi_normal_cholesky_log(vec_y,vec_mu_t,Sigma));
-  EXPECT_FLOAT_EQ(-11.928077-6.5378327, stan::prob::multi_normal_cholesky_log(vec_y_t,vec_mu_t,Sigma));
+  EXPECT_FLOAT_EQ(-11.928077-6.5378327, stan::prob::multi_normal_cholesky_log(vec_y,vec_mu,L));
+  EXPECT_FLOAT_EQ(-11.928077-6.5378327, stan::prob::multi_normal_cholesky_log(vec_y_t,vec_mu,L));
+  EXPECT_FLOAT_EQ(-11.928077-6.5378327, stan::prob::multi_normal_cholesky_log(vec_y,vec_mu_t,L));
+  EXPECT_FLOAT_EQ(-11.928077-6.5378327, stan::prob::multi_normal_cholesky_log(vec_y_t,vec_mu_t,L));
 
   //y vectorized
-  EXPECT_FLOAT_EQ(-10.44027-6.537833, stan::prob::multi_normal_cholesky_log(vec_y,mu,Sigma));
-  EXPECT_FLOAT_EQ(-10.44027-6.537833, stan::prob::multi_normal_cholesky_log(vec_y_t,mu,Sigma));
-  EXPECT_FLOAT_EQ(-10.44027-6.537833, stan::prob::multi_normal_cholesky_log(vec_y,mu_t,Sigma));
-  EXPECT_FLOAT_EQ(-10.44027-6.537833, stan::prob::multi_normal_cholesky_log(vec_y_t,mu_t,Sigma));
+  EXPECT_FLOAT_EQ(-10.44027-6.537833, stan::prob::multi_normal_cholesky_log(vec_y,mu,L));
+  EXPECT_FLOAT_EQ(-10.44027-6.537833, stan::prob::multi_normal_cholesky_log(vec_y_t,mu,L));
+  EXPECT_FLOAT_EQ(-10.44027-6.537833, stan::prob::multi_normal_cholesky_log(vec_y,mu_t,L));
+  EXPECT_FLOAT_EQ(-10.44027-6.537833, stan::prob::multi_normal_cholesky_log(vec_y_t,mu_t,L));
 
   //mu vectorized
-  EXPECT_FLOAT_EQ(-6.26954-6.537833, stan::prob::multi_normal_cholesky_log(y,vec_mu,Sigma));
-  EXPECT_FLOAT_EQ(-6.26954-6.537833, stan::prob::multi_normal_cholesky_log(y_t,vec_mu,Sigma));
-  EXPECT_FLOAT_EQ(-6.26954-6.537833, stan::prob::multi_normal_cholesky_log(y,vec_mu_t,Sigma));
-  EXPECT_FLOAT_EQ(-6.26954-6.537833, stan::prob::multi_normal_cholesky_log(y_t,vec_mu_t,Sigma));
+  EXPECT_FLOAT_EQ(-6.26954-6.537833, stan::prob::multi_normal_cholesky_log(y,vec_mu,L));
+  EXPECT_FLOAT_EQ(-6.26954-6.537833, stan::prob::multi_normal_cholesky_log(y_t,vec_mu,L));
+  EXPECT_FLOAT_EQ(-6.26954-6.537833, stan::prob::multi_normal_cholesky_log(y,vec_mu_t,L));
+  EXPECT_FLOAT_EQ(-6.26954-6.537833, stan::prob::multi_normal_cholesky_log(y_t,vec_mu_t,L));
 }
 TEST(ProbDistributionsMultiNormalCholesky,MultiNormalVar) {
   using stan::agrad::var;
@@ -108,8 +108,8 @@ TEST(ProbDistributionsMultiNormalCholesky, error_check) {
   sigma << 9.0, -3.0, 0.0,
     -3.0,  4.0, 1.0,
     0.0, 1.0, 3.0;
-  sigma = sigma.llt().matrixL();
-  EXPECT_NO_THROW(stan::prob::multi_normal_cholesky_rng(mu, sigma,rng));
+  Matrix<double,Dynamic,Dynamic> L = sigma.llt().matrixL();
+  EXPECT_NO_THROW(stan::prob::multi_normal_cholesky_rng(mu, L, rng));
 
   mu << stan::math::positive_infinity(), 
     -2.0,
@@ -123,7 +123,7 @@ TEST(ProbDistributionsMultiNormalCholesky, marginalOneChiSquareGoodnessFitTest) 
   sigma << 9.0, -3.0, 0.0,
     -3.0,  4.0, 1.0,
     0.0, 1.0, 3.0;
-  sigma = sigma.llt().matrixL();
+  Matrix<double,Dynamic,Dynamic> L = sigma.llt().matrixL();
   Matrix<double,Dynamic,Dynamic> mu(3,1);
   mu << 2.0, 
     -2.0,
@@ -146,7 +146,7 @@ TEST(ProbDistributionsMultiNormalCholesky, marginalOneChiSquareGoodnessFitTest) 
   }
   Eigen::VectorXd a(mu.rows());
   while (count < N) {
-    a = stan::prob::multi_normal_cholesky_rng(mu,sigma,rng);
+    a = stan::prob::multi_normal_cholesky_rng(mu,L,rng);
     int i = 0;
     while (i < K-1 && a(0) > loc[i]) 
       ++i;
@@ -167,7 +167,7 @@ TEST(ProbDistributionsMultiNormalCholesky, marginalTwoChiSquareGoodnessFitTest) 
   sigma << 9.0, -3.0, 0.0,
     -3.0,  4.0, 1.0,
     0.0, 1.0, 3.0;
-  sigma = sigma.llt().matrixL();
+  Matrix<double,Dynamic,Dynamic> L = sigma.llt().matrixL();
   Matrix<double,Dynamic,Dynamic> mu(3,1);
   mu << 2.0, 
     -2.0,
@@ -190,7 +190,7 @@ TEST(ProbDistributionsMultiNormalCholesky, marginalTwoChiSquareGoodnessFitTest) 
   }
   Eigen::VectorXd a(mu.rows());
   while (count < N) {
-    a = stan::prob::multi_normal_cholesky_rng(mu,sigma,rng);
+    a = stan::prob::multi_normal_cholesky_rng(mu,L,rng);
     int i = 0;
     while (i < K-1 && a(1) > loc[i]) 
       ++i;
@@ -211,7 +211,7 @@ TEST(ProbDistributionsMultiNormalCholesky, marginalThreeChiSquareGoodnessFitTest
   sigma << 9.0, -3.0, 0.0,
     -3.0,  4.0, 1.0,
     0.0, 1.0, 16.0;
-  sigma = sigma.llt().matrixL();
+  Matrix<double,Dynamic,Dynamic> L = sigma.llt().matrixL();
   Matrix<double,Dynamic,Dynamic> mu(3,1);
   mu << 2.0, 
     -2.0,
@@ -234,7 +234,7 @@ TEST(ProbDistributionsMultiNormalCholesky, marginalThreeChiSquareGoodnessFitTest
   }
   Eigen::VectorXd a(mu.rows());
   while (count < N) {
-    a = stan::prob::multi_normal_cholesky_rng(mu,sigma,rng);
+    a = stan::prob::multi_normal_cholesky_rng(mu,L,rng);
     int i = 0;
     while (i < K-1 && a(2) > loc[i]) 
       ++i;

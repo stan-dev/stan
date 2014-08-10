@@ -512,9 +512,29 @@ TEST(io_dump, reader_max_ints) {
   vs.push_back(imax);
   vs.push_back(imin);
   std::stringstream se;
-  se << "e <- c(" << imax<< "," << imin << "," << imax << "L," << imin << "L)";
+  se << "e <- c(" << imax << "," << imin << "," << imax << "L," << imin << "L)";
   test_list("e",vs,se.str());
 }
+
+TEST(ioDump, zeroLengthArray) {
+  std::vector<int> expected_vals;
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(0);
+  
+  std::string txt = "y <- c()\n";
+  std::stringstream in(txt);
+  stan::io::dump_reader reader(in);
+
+  test_list2(reader,"y",expected_vals,expected_dims);
+}
+TEST(ioDump, zeroLengthArrayDump) {
+  std::string txt = "M <- 0\ny <- c()\nN <- 0";
+  std::stringstream in(txt);
+  stan::io::dump d(in);
+  EXPECT_TRUE(d.contains_i("N"));
+  EXPECT_TRUE(d.contains_i("y"));
+}
+
 
 
 TEST(io_dump, reader_vec_data_max_dims) {

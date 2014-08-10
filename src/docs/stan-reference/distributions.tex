@@ -1434,8 +1434,8 @@ quantities block}
 
 \subsubsection{Probability Density Function}
 
-If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
-\posreals$, 
+If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
+[0,\infty)$, 
 \[
 \distro{Weibull}(y|\alpha,\sigma)
 = 
@@ -1446,6 +1446,9 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
 \exp \! \left( \! - \left( \frac{y}{\sigma} \right)^{\alpha}  \right)
 .
 \]
+
+Note that if $Y \propto \distro{Weibull}(\alpha,\sigma)$,
+then $Y^{-1} \propto \distro{Frechet}(\alpha,\sigma^{-1})$.
 
 \pitem{y}{weibull}{alpha,sigma}
 
@@ -1476,6 +1479,57 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
   \farg{alpha} and scale \farg{sigma}; may only be used in generated 
 quantities block}
 \end{description}
+
+\section{Fr\'{e}chet Distribution}
+
+\subsubsection{Probability Density Function}
+
+If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
+\posreals$, 
+\[
+\distro{Frechet}(y|\alpha,\sigma)
+= 
+\frac{\alpha}{\sigma}
+\,
+\left( \frac{y}{\sigma} \right)^{-\alpha - 1}
+\,
+\exp \! \left( \! - \left( \frac{y}{\sigma} \right)^{-\alpha}  \right)
+.
+\]
+
+Note that if $Y \propto \distro{Frechet}(\alpha,\sigma)$,
+then $Y^{-1} \propto \distro{Weibull}(\alpha,\sigma^{-1})$.
+
+\pitem{y}{frechet}{alpha,sigma}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+\fitem{real}{frechet\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The log of the Fr\'{e}chet density of \farg{y} given shape
+  \farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{frechet\_cdf}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The Fr\'{e}chet cumulative distribution function of \farg{y} given
+  shape \farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{frechet\_cdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The log of the Fr\'{e}chet cumulative distribution function of 
+  \farg{y} given shape \farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{frechet\_ccdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The log of the Fr\'{e}chet complementary cumulative 
+  distribution function of \farg{y} given shape \farg{alpha} and scale 
+  \farg{sigma}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{frechet\_rng}{real \farg{alpha}, real
+  \farg{sigma}}{Generate an Fr\'{e}chet variate with shape
+  \farg{alpha} and scale \farg{sigma}; may only be used in generated 
+quantities block}
+\end{description}
+
 
 \chapter{Non-negative Continuous Distributions}
 \noindent
@@ -1948,7 +2002,7 @@ inverse scales, then for $y \in \reals^{K \times N}$,
 \[
 \distro{MultiGP}(y|\Sigma,w)
 =
-\prod_{i=1}^{K} \distro{MultiNormal}(y_i|0,w_i^{-1} \Sigma).
+\prod_{i=1}^{K} \distro{MultiNormal}(y_i|0,w_i^{-1} \Sigma),
 \]
 where $y_i$ is the $i$th row of $y$.  This is used to efficiently handle
 Gaussian Processes with multi-variate outputs where only the output dimensions
@@ -1961,13 +2015,46 @@ function does not take into account the mean prediction.
 
 \begin{description}
 %
-\fitem{real}{multi\_gp\_log}{vector \farg{y}, matrix \farg{Sigma},
+\fitem{real}{multi\_gp\_log}{matrix \farg{y}, matrix \farg{Sigma},
   vector \farg{w}}{The log of the multivariate GP density of matrix
   \farg{y} given kernel matrix \farg{Sigma} and inverses scales
   \farg{w}}
 %
 \end{description}
 
+
+\section{Multivariate Gaussian Process Distribution, Cholesky parameterization}
+
+\subsubsection{Probability Density Function}
+
+If $K,N \in \nats$, $L \in \reals^{N \times N}$ is lower
+triangular and such that $LL^{\top}$ is positive definite kernel matrix
+and $w \in \reals^{K}$ is a vector of positive
+inverse scales, then for $y \in \reals^{K \times N}$,
+\[
+\distro{MultiGPCholesky}(y|L,w)
+=
+\prod_{i=1}^{K} \distro{MultiNormal}(y_i|0,w_i^{-1} LL^{\top}),
+\]
+where $y_i$ is the $i$th row of $y$.  This is used to efficiently handle
+Gaussian Processes with multi-variate outputs where only the output dimensions
+share a kernel function but vary based on their scale.  If the model allows
+parametrization in terms of Cholesky factor of the kernel matrix, this distribution
+is also more efficient than $\distro{MultiGP}()$. Note that this
+function does not take into account the mean prediction.
+
+\pitem{y}{multi\_gp\_cholesky}{L,w}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{multi\_gp\_cholesky\_log}{matrix \farg{y}, matrix \farg{L},
+  vector \farg{w}}{The log of the multivariate GP density of matrix
+  \farg{y} given lower-triangular Cholesky factor of the kernel matrix \farg{L} and inverses scales
+  \farg{w}}
+%
+\end{description}
 
 
 \section{Multivariate Student-$t$ Distribution}
