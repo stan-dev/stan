@@ -28,12 +28,14 @@ namespace stan {
     public:
 
       bbvb(M& m,
-           Eigen::VectorXd const& cont_params,
+           Eigen::VectorXd& cont_params,
+           double& elbo,
            BaseRNG& rng,
            std::ostream* o, std::ostream* e):
         base_vb(o, e, "bbvb"),
         model_(m),
         cont_params_(cont_params),
+        elbo_(elbo),
         rng_(rng),
         n_monte_carlo_(1e3) {};
 
@@ -161,7 +163,8 @@ namespace stan {
           muL.to_unconstrained(z_check);
 
           // Compute gradient step in unconstrained space
-          stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad, &std::cout);
+          stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad,
+                                &std::cout);
 
           L_grad += tmp_mu_grad * z_check.transpose();
           L_grad += LinvT;
@@ -171,7 +174,16 @@ namespace stan {
         L_grad = L_grad.triangularView<Eigen::UnitLower>();
       }
 
-
+      /**
+       * Calculates the "blackbox" gradient with respect to BOTH the location
+       * vector (mu) and the cholesky factor of the scale matrix (L) in
+       * parallel. It uses the same gradient computed from a set of Monte Carlo
+       * samples
+       *
+       * @param muL     mean and cholesky factor of affine transform
+       * @param mu_grad gradient of location vector parameter
+       * @param L_grad  gradient of scale matrix parameter
+       */
       void calc_combined_grad(
         latent_vars const& muL,
         Eigen::VectorXd& mu_grad,
@@ -203,16 +215,17 @@ namespace stan {
 
         for (int i = 0; i < n_monte_carlo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
-          z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);
+          z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);               // FOR LOOP THIS
           muL.to_unconstrained(z_check);
 
           // Compute gradient step in unconstrained space
-          stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad, &std::cout);
+          stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad,
+                                &std::cout);
 
           // Update mu
           mu_grad += tmp_mu_grad;
 
-          // Update L (lower triangular)    // NOT SURE IF MOST MEMORY AWARE WAY TO DO THIS
+          // Update L (lower triangular)
           for (int ii = 0; ii < dim; ++ii) {
             for (int jj = 0; jj <= ii; ++jj) {
               L_grad(ii,jj) += tmp_mu_grad(ii) * z_check(jj);
@@ -224,6 +237,12 @@ namespace stan {
         L_grad.diagonal() += LinvTdiag;
       }
 
+
+
+
+
+
+
       void test() {
         if (out_stream_) *out_stream_ << "This is base_vb::bbvb::test()" << std::endl;
 
@@ -233,7 +252,6 @@ namespace stan {
 
         // Init print out
         double lp = 0.0;
-        double elbo = 0.0;
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model_.num_params_r());
 
         stan::model::gradient(model_, cont_params_, lp, init_grad, &std::cout);
@@ -294,7 +312,10 @@ namespace stan {
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(model_.num_params_r(),model_.num_params_r());
 
-        for (int i = 0; i < 25; ++i)
+        Eigen::VectorXd params_r_alp;
+        Eigen::VectorXd vars;
+
+        for (int i = 0; i < 50; ++i)
         {
           if (out_stream_) *out_stream_ << "---------------------" << std::endl
                                         << "  iter " << i << std::endl
@@ -304,8 +325,10 @@ namespace stan {
           // calc_L_grad(muL, L_grad);
           calc_combined_grad(muL, mu_grad, L_grad);
 
-          muL.set_mu(muL.mu() + 0.15 * mu_grad);
-          muL.set_L(muL.L()   + 0.15 * L_grad);
+          muL.set_mu(muL.mu() + 0.001 * mu_grad);
+          muL.set_L(muL.L()   + 0.0001 * L_grad);
+
+          cont_params_ = muL.mu();
 
           if (out_stream_) *out_stream_ << "mu = " << std::endl
                                         << muL.mu() << std::endl;
@@ -316,8 +339,16 @@ namespace stan {
           if (out_stream_) *out_stream_ << "Sigma = " << std::endl
                                         << muL.L() * muL.L().transpose() << std::endl;
 
-          elbo = calc_ELBO(muL);
-          if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl;
+          elbo_ = calc_ELBO(muL);
+          if (out_stream_) *out_stream_ << "elbo_ = " << elbo_ << std::endl;
+
+
+
+          // model_.template write_array(rng_, cont_params_, vars,
+          //                             true, true, &std::cout);
+
+          // if (out_stream_) *out_stream_ << "cont_params_ = " << cont_params_ << std::endl;
+          // if (out_stream_) *out_stream_ << "vars = " << vars << std::endl;
 
           // model_.template write_csv(rng_, mu_print, std::cout);
 
@@ -329,7 +360,8 @@ namespace stan {
     protected:
 
       M& model_;
-      Eigen::VectorXd cont_params_;
+      Eigen::VectorXd& cont_params_;
+      double& elbo_;
       BaseRNG& rng_;
       int n_monte_carlo_;
 

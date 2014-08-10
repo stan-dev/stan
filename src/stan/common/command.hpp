@@ -756,13 +756,39 @@ namespace stan {
 
       if (parser.arg("method")->arg("vb")) {
 
+        double elbo = 0.0;
+
+        if (output_stream) {
+          std::vector<std::string> names;
+          names.push_back("lp");
+          names.push_back("ELBO");
+          model.constrained_param_names(names,true,true);
+
+          (*output_stream) << names.at(0);
+          for (size_t i = 1; i < names.size(); ++i) {
+            (*output_stream) << "," << names.at(i);
+          }
+          (*output_stream) << std::endl;
+          (*output_stream) << 0 << "," ;
+        }
+
+
+        stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo, base_rng,
+                                            &std::cout, &std::cout);
+        cmd_vb.test();
+
+        // cont_params = cmd_vb.cont_params_;
+        // elbo = cmd_vb.elbo_;
+
         std::vector<double> cont_vector(cont_params.size());
         for (int i = 0; i < cont_params.size(); ++i)
           cont_vector.at(i) = cont_params(i);
         std::vector<int> disc_vector;
 
-        stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, base_rng, &std::cout, &std::cout);
-        cmd_vb.test();
+        if (output_stream) {
+          write_iteration(*output_stream, model, base_rng,
+                          elbo, cont_vector, disc_vector);
+        }
 
       }
 
