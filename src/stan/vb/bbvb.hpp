@@ -207,15 +207,18 @@ namespace stan {
         L_grad                      = Eigen::MatrixXd::Zero(dim,dim);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
 
-        Eigen::VectorXd zero_mean   = Eigen::VectorXd::Zero(dim);
-        Eigen::MatrixXd eye         = Eigen::MatrixXd::Identity(dim, dim);
+        // Eigen::VectorXd zero_mean   = Eigen::VectorXd::Zero(dim);
+        // Eigen::MatrixXd eye         = Eigen::MatrixXd::Identity(dim, dim);
 
-        Eigen::VectorXd z_check;
-        Eigen::VectorXd LinvTdiag = 1.0/muL.L().diagonal().array();
+        Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);;
+        Eigen::VectorXd LinvTdiag = muL.L().diagonal().array().inverse();
 
         for (int i = 0; i < n_monte_carlo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
-          z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);               // FOR LOOP THIS
+          for (int d = 0; d < dim; ++d)
+          {
+            z_check(d) = stan::prob::normal_rng(0,1,rng_);
+          }
           muL.to_unconstrained(z_check);
 
           // Compute gradient step in unconstrained space
@@ -315,18 +318,27 @@ namespace stan {
         Eigen::VectorXd params_r_alp;
         Eigen::VectorXd vars;
 
+        // ADAgrad stuff
+        double eta = 1.0;
+        double tau = 1.0;
+        Eigen::VectorXd mu_s = Eigen::VectorXd::Zero(model_.num_params_r());
+        Eigen::MatrixXd L_s  = Eigen::MatrixXd::Zero(model_.num_params_r(),model_.num_params_r());
+
         for (int i = 0; i < 50; ++i)
         {
           if (out_stream_) *out_stream_ << "---------------------" << std::endl
                                         << "  iter " << i << std::endl
                                         << "---------------------" << std::endl;
 
-          // calc_mu_grad(muL, mu_grad);
-          // calc_L_grad(muL, L_grad);
           calc_combined_grad(muL, mu_grad, L_grad);
 
-          muL.set_mu(muL.mu() + 0.001 * mu_grad);
-          muL.set_L(muL.L()   + 0.0001 * L_grad);
+          // Accumulate S vector for ADAgrad
+          mu_s.array() += mu_grad.array().square();
+          L_s.array()  += L_grad.array().square();
+
+          // Take ADAgrad step
+          muL.set_mu( muL.mu().array() + eta * mu_grad.array() / (tau + mu_s.array().sqrt()) );
+          muL.set_L(  muL.L().array()  + eta/2.0 * L_grad.array()  / (tau + L_s.array().sqrt()) );
 
           cont_params_ = muL.mu();
 
