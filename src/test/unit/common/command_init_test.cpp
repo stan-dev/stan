@@ -13,7 +13,6 @@ public:
     stan::io::dump empty_data_context(empty_data_stream);
     empty_data_stream.close();
     
-
     model_output.str("");
     model = new Model(empty_data_context, &model_output);
     base_rng.seed(123456);

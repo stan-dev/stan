@@ -1,6 +1,10 @@
 transformed data {
-  int x;
-  x <- 2 / 3;
+  real u;
+  int j;
+  int k;
+  j <- 2;
+  k <- 3;
+  u <- j / k;
 }
 parameters {
   real y;

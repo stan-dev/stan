@@ -5581,7 +5581,7 @@ is heavily commented.%
   which is why refactoring complex code into understandable units is
   preferable to simply adding comments.}
 
-\section{Basic Functions}
+\section{Basic Functions}\label{basic-functions.section}
 
 Here's an example of a skeletal Stan program with a user-defined
 relative difference function employed in the generated quantities
@@ -5633,6 +5633,38 @@ function, but functions with non-void return types must end in a
 return statement; see \refsection{function-returns} for details on how
 this is enforced.
 
+\subsection{Exceptions}
+
+The Stan raise\_exception statement provides a mechanism to report errors or problematic
+values encountered during program execution.
+It accepts any number of quoted string literals or Stan expressions as arguments.
+This statement is typically embedded in a conditional statement in order to
+detect bad or illegal outcomes of some processing step.
+
+To illustrate the use of this statement, we modify the user-defined
+relative difference function example from Section~\refsection{basic-functions}
+so that it throws an exception if the relative difference is less than
+some limit.
+%
+\begin{quote}
+\begin{Verbatim}
+functions {
+  real relative_diff(real x, real y, real min) {
+    real abs_diff;
+    real avg_scale;
+    abs_diff <- fabs(x - y);
+    avg_scale <- (fabs(x) + fabs(y)) / 2;
+    if (abs_diff / avg_scale < min) 
+      raise_exception("relative_diff below ",min);
+    return abs_diff / avg_scale;
+  }
+}
+\end{Verbatim}
+\end{quote}
+
+The effect of raising an exception depends on the program block
+in which the function was invoked.
+See Section~\refsection{raise-exception-statements} for details.
 
 \subsection{Type Declarations for Functions}
 
@@ -5747,10 +5779,11 @@ real entropy(vector theta) {
 \end{quote}
 %
 Although \code{theta} must be a simplex, only the type \code{vector}
-is used and no error checking is carried out.%
+is used.%
 %
-\footnote{User-invoked exceptions along with a range of built-in
-  validation routines are coming to Stan soon!} 
+\footnote{A range of built-in validation routines is coming to Stan soon!
+Alternatively, the \code{raise\_exception} statement can be used to check
+constraints on the simplex.} 
 %
 Upper or lower bounds on values or constrained types are not allowed
 as return types or argument types in function declarations.  
