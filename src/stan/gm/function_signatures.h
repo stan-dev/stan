@@ -196,6 +196,7 @@ add("distance",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("distance",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("distance",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
 add("distance",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
+add("divide",INT_T,INT_T,INT_T);
 add("divide",DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("divide",VECTOR_T,VECTOR_T,DOUBLE_T);
 add("divide",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
@@ -516,6 +517,7 @@ add("minus",ROW_VECTOR_T,ROW_VECTOR_T);
 add("minus",MATRIX_T,MATRIX_T);
 add("modified_bessel_first_kind",DOUBLE_T,INT_T,DOUBLE_T);
 add("modified_bessel_second_kind",DOUBLE_T,INT_T,DOUBLE_T);
+add("modulus",INT_T,INT_T,INT_T);
 add("multi_gp_log",DOUBLE_T, MATRIX_T,MATRIX_T,VECTOR_T);
 add("multi_gp_cholesky_log",DOUBLE_T, MATRIX_T,MATRIX_T,VECTOR_T);
 {
