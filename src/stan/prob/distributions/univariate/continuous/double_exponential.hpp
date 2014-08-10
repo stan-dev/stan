@@ -30,7 +30,7 @@ namespace stan {
 
       using stan::is_constant_struct;
       using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
@@ -48,8 +48,7 @@ namespace stan {
       T_partials_return logp(0.0);
       check_finite(function, y, "Random variable", &logp);
       check_finite(function, mu, "Location parameter", &logp);
-      check_finite(function, sigma, "Scale parameter", &logp);
-      check_positive(function, sigma, "Scale parameter", &logp);
+      check_positive_finite(function, sigma, "Scale parameter", &logp);
       check_consistent_sizes(function,y,mu,sigma,
                              "Random variable","Location parameter",
                              "Shape parameter",&logp);
@@ -155,7 +154,7 @@ namespace stan {
         
       using stan::math::value_of;
       using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
 
@@ -163,8 +162,7 @@ namespace stan {
 
       check_not_nan(function, y, "Random variable", &cdf);
       check_finite(function, mu, "Location parameter", &cdf);
-      check_finite(function, sigma, "Scale parameter", &cdf);
-      check_positive(function, sigma, "Scale parameter", &cdf);
+      check_positive_finite(function, sigma, "Scale parameter", &cdf);
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
@@ -231,7 +229,7 @@ namespace stan {
 
       using stan::math::check_finite;
       using stan::math::check_not_nan;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
@@ -245,8 +243,7 @@ namespace stan {
 
       check_not_nan(function, y, "Random variable", &cdf_log);
       check_finite(function, mu, "Location parameter", &cdf_log);
-      check_finite(function, sigma, "Scale parameter", &cdf_log);
-      check_positive(function, sigma, "Scale parameter", &cdf_log);
+      check_positive_finite(function, sigma, "Scale parameter", &cdf_log);
       check_consistent_sizes(function, y, mu, sigma,
                              "Random variable", "Location parameter", 
                              "Scale Parameter", &cdf_log);
@@ -311,7 +308,7 @@ namespace stan {
 
       using stan::math::check_finite;
       using stan::math::check_not_nan;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
@@ -325,8 +322,7 @@ namespace stan {
 
       check_not_nan(function, y, "Random variable", &ccdf_log);
       check_finite(function, mu, "Location parameter", &ccdf_log);
-      check_finite(function, sigma, "Scale parameter", &ccdf_log);
-      check_positive(function, sigma, "Scale parameter", &ccdf_log);
+      check_positive_finite(function, sigma, "Scale parameter", &ccdf_log);
       check_consistent_sizes(function, y, mu, sigma,
                              "Random variable", "Location parameter", 
                              "Scale Parameter", &ccdf_log);
@@ -394,11 +390,10 @@ namespace stan {
         = "stan::prob::double_exponential_rng(%1%)";
       
       using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
 
       check_finite(function, mu, "Location parameter", (double*)0);
-      check_finite(function, sigma, "Scale parameter", (double*)0);
-      check_positive(function, sigma, "Scale parameter", (double*)0);
+      check_positive_finite(function, sigma, "Scale parameter", (double*)0);
 
       variate_generator<RNG&, uniform_01<> >
         rng_unit_01(rng, uniform_01<>());

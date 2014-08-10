@@ -6,7 +6,7 @@
 
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling/check_not_nan.hpp>
-#include <stan/math/error_handling/check_positive.hpp>
+#include <stan/math/error_handling/check_positive_finite.hpp>
 #include <stan/math/error_handling/check_finite.hpp>
 #include <stan/math/error_handling/check_consistent_sizes.hpp>
 #include <stan/math/constants.hpp>
@@ -29,7 +29,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
 
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
@@ -41,15 +41,13 @@ namespace stan {
             && stan::length(sigma)))
         return 0.0;
 
-
       // set up return value accumulator
       T_partials_return logp(0.0);
         
       // validate args (here done over var, which should be OK)      
       check_finite(function, y, "Random variable", &logp);
       check_finite(function, mu, "Location parameter", &logp);
-      check_finite(function, sigma, "Scale parameter", &logp);
-      check_positive(function, sigma, "Scale parameter", &logp);
+      check_positive_finite(function, sigma, "Scale parameter", &logp);
       check_consistent_sizes(function,
                              y,mu,sigma,
                              "Random variable","Location parameter",
@@ -155,7 +153,7 @@ namespace stan {
       static const char* function = "stan::prob::logistic_cdf(%1%)";
           
       using stan::math::check_not_nan;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
@@ -165,8 +163,7 @@ namespace stan {
           
       check_not_nan(function, y, "Random variable", &P);
       check_finite(function, mu, "Location parameter", &P);
-      check_finite(function, sigma, "Scale parameter", &P);
-      check_positive(function, sigma, "Scale parameter", &P);
+      check_positive_finite(function, sigma, "Scale parameter", &P);
       check_consistent_sizes(function, y, mu, sigma,
                              "Random variable", "Location parameter", 
                              "Scale parameter", &P);
@@ -251,7 +248,7 @@ namespace stan {
       static const char* function = "stan::prob::logistic_cdf_log(%1%)";
           
       using stan::math::check_not_nan;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
@@ -261,8 +258,7 @@ namespace stan {
           
       check_not_nan(function, y, "Random variable", &P);
       check_finite(function, mu, "Location parameter", &P);
-      check_finite(function, sigma, "Scale parameter", &P);
-      check_positive(function, sigma, "Scale parameter", &P);
+      check_positive_finite(function, sigma, "Scale parameter", &P);
       check_consistent_sizes(function, y, mu, sigma,
                              "Random variable", "Location parameter", 
                              "Scale parameter", &P);
@@ -332,7 +328,7 @@ namespace stan {
       static const char* function = "stan::prob::logistic_cdf_log(%1%)";
           
       using stan::math::check_not_nan;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
@@ -342,8 +338,7 @@ namespace stan {
           
       check_not_nan(function, y, "Random variable", &P);
       check_finite(function, mu, "Location parameter", &P);
-      check_finite(function, sigma, "Scale parameter", &P);
-      check_positive(function, sigma, "Scale parameter", &P);
+      check_positive_finite(function, sigma, "Scale parameter", &P);
       check_consistent_sizes(function, y, mu, sigma,
                              "Random variable", "Location parameter", 
                              "Scale parameter", &P);
@@ -410,12 +405,11 @@ namespace stan {
 
       static const char* function = "stan::prob::logistic_rng(%1%)";
       
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
 
       check_finite(function, mu, "Location parameter", (double*)0);
-      check_finite(function, sigma, "Scale parameter", (double*)0);
-      check_positive(function, sigma, "Scale parameter", (double*)0);
+      check_positive_finite(function, sigma, "Scale parameter", (double*)0);
 
       variate_generator<RNG&, exponential_distribution<> >
         exp_rng(rng, exponential_distribution<>(1));

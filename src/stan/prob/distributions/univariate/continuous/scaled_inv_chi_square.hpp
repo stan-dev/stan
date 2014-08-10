@@ -51,8 +51,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_dof,T_scale>::type
         T_partials_return;
 
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
@@ -65,10 +64,9 @@ namespace stan {
 
       T_partials_return logp(0.0);
       check_not_nan(function, y, "Random variable", &logp);
-      check_finite(function, nu, "Degrees of freedom parameter", &logp);
-      check_positive(function, nu, "Degrees of freedom parameter", &logp);
-      check_finite(function, s, "Scale parameter", &logp);
-      check_positive(function, s, "Scale parameter", &logp);
+      check_positive_finite(function, nu, "Degrees of freedom parameter",
+                            &logp);
+      check_positive_finite(function, s, "Scale parameter", &logp);
       check_consistent_sizes(function,
                              y,nu,s,
                              "Random variable",
@@ -204,8 +202,7 @@ namespace stan {
       static const char* function
         = "stan::prob::scaled_inv_chi_square_cdf(%1%)";
           
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
@@ -215,10 +212,8 @@ namespace stan {
           
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
-      check_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_positive(function, nu, "Degrees of freedom parameter", &P);
-      check_finite(function, s, "Scale parameter", &P);
-      check_positive(function, s, "Scale parameter", &P);
+      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
+      check_positive_finite(function, s, "Scale parameter", &P);
       check_consistent_sizes(function, y, nu, s,
                              "Random variable", 
                              "Degrees of freedom parameter",
@@ -338,8 +333,7 @@ namespace stan {
       static const char* function
         = "stan::prob::scaled_inv_chi_square_cdf_log(%1%)";
           
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
@@ -349,10 +343,8 @@ namespace stan {
           
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
-      check_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_positive(function, nu, "Degrees of freedom parameter", &P);
-      check_finite(function, s, "Scale parameter", &P);
-      check_positive(function, s, "Scale parameter", &P);
+      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
+      check_positive_finite(function, s, "Scale parameter", &P);
       check_consistent_sizes(function, y, nu, s,
                              "Random variable", 
                              "Degrees of freedom parameter",
@@ -456,8 +448,7 @@ namespace stan {
       static const char* function
         = "stan::prob::scaled_inv_chi_square_ccdf_log(%1%)";
           
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
@@ -467,10 +458,8 @@ namespace stan {
           
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
-      check_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_positive(function, nu, "Degrees of freedom parameter", &P);
-      check_finite(function, s, "Scale parameter", &P);
-      check_positive(function, s, "Scale parameter", &P);
+      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
+      check_positive_finite(function, s, "Scale parameter", &P);
       check_consistent_sizes(function, y, nu, s,
                              "Random variable", 
                              "Degrees of freedom parameter",
@@ -572,13 +561,11 @@ namespace stan {
       static const char* function 
         = "stan::prob::scaled_inv_chi_square_rng(%1%)";
       
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
 
-      check_finite(function, nu, "Degrees of freedom parameter", (double*)0);
-      check_positive(function, nu, "Degrees of freedom parameter", (double*)0);
-      check_finite(function, s, "Scale parameter", (double*)0);
-      check_positive(function, s, "Scale parameter", (double*)0);
+      check_positive_finite(function, nu, "Degrees of freedom parameter", 
+                            (double*)0);
+      check_positive_finite(function, s, "Scale parameter", (double*)0);
 
       variate_generator<RNG&, chi_squared_distribution<> >
         chi_square_rng(rng, chi_squared_distribution<>(nu));

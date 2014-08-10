@@ -27,8 +27,7 @@ namespace stan {
         T_partials_return;
 
       using stan::math::value_of;
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
 
@@ -43,10 +42,8 @@ namespace stan {
       
       // validate args (here done over var, which should be OK)
       check_not_nan(function, y, "Random variable", &logp);
-      check_finite(function, y_min, "Scale parameter", &logp);
-      check_positive(function, y_min, "Scale parameter", &logp);
-      check_finite(function, alpha, "Shape parameter", &logp);
-      check_positive(function, alpha, "Shape parameter", &logp);
+      check_positive_finite(function, y_min, "Scale parameter", &logp);
+      check_positive_finite(function, alpha, "Shape parameter", &logp);
       check_consistent_sizes(function,
                              y,y_min,alpha,
                              "Random variable","Scale parameter",
@@ -147,8 +144,7 @@ namespace stan {
       // Check errors
       static const char* function = "stan::prob::pareto_cdf(%1%)";
           
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_greater_or_equal;
       using stan::math::check_consistent_sizes;
@@ -159,10 +155,8 @@ namespace stan {
           
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
-      check_finite(function, y_min, "Scale parameter", &P);
-      check_positive(function, y_min, "Scale parameter", &P);
-      check_finite(function, alpha, "Shape parameter", &P);
-      check_positive(function, alpha, "Shape parameter", &P);
+      check_positive_finite(function, y_min, "Scale parameter", &P);
+      check_positive_finite(function, alpha, "Shape parameter", &P);
       check_consistent_sizes(function, y, y_min, alpha,
                              "Random variable", "Scale parameter", 
                              "Shape parameter", &P);
@@ -246,8 +240,7 @@ namespace stan {
       // Check errors
       static const char* function = "stan::prob::pareto_cdf_log(%1%)";
           
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_greater_or_equal;
       using stan::math::check_consistent_sizes;
@@ -258,10 +251,8 @@ namespace stan {
           
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
-      check_finite(function, y_min, "Scale parameter", &P);
-      check_positive(function, y_min, "Scale parameter", &P);
-      check_finite(function, alpha, "Shape parameter", &P);
-      check_positive(function, alpha, "Shape parameter", &P);
+      check_positive_finite(function, y_min, "Scale parameter", &P);
+      check_positive_finite(function, alpha, "Shape parameter", &P);
       check_consistent_sizes(function, y, y_min, alpha,
                              "Random variable", "Scale parameter", 
                              "Shape parameter", &P);
@@ -333,8 +324,7 @@ namespace stan {
       // Check errors
       static const char* function = "stan::prob::pareto_ccdf_log(%1%)";
           
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_greater_or_equal;
       using stan::math::check_consistent_sizes;
@@ -345,10 +335,8 @@ namespace stan {
           
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
-      check_finite(function, y_min, "Scale parameter", &P);
-      check_positive(function, y_min, "Scale parameter", &P);
-      check_finite(function, alpha, "Shape parameter", &P);
-      check_positive(function, alpha, "Shape parameter", &P);
+      check_positive_finite(function, y_min, "Scale parameter", &P);
+      check_positive_finite(function, alpha, "Shape parameter", &P);
       check_consistent_sizes(function, y, y_min, alpha,
                              "Random variable", "Scale parameter", 
                              "Shape parameter", &P);
@@ -411,13 +399,10 @@ namespace stan {
 
       static const char* function = "stan::prob::pareto_rng(%1%)";
       
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
 
-      check_finite(function, y_min, "Scale parameter", (double*)0);
-      check_positive(function, y_min, "Scale parameter", (double*)0);
-      check_finite(function, alpha, "Shape parameter", (double*)0);
-      check_positive(function, alpha, "Shape parameter", (double*)0);
+      check_positive_finite(function, y_min, "Scale parameter", (double*)0);
+      check_positive_finite(function, alpha, "Shape parameter", (double*)0);
 
       variate_generator<RNG&, exponential_distribution<> >
         exp_rng(rng, exponential_distribution<>(alpha));

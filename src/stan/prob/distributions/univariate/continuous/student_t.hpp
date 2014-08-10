@@ -60,7 +60,7 @@ namespace stan {
                                                   T_scale>::type 
         T_partials_return;
 
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -76,11 +76,10 @@ namespace stan {
 
       // validate args (here done over var, which should be OK)
       check_not_nan(function, y, "Random variable", &logp);
-      check_finite(function, nu, "Degrees of freedom parameter", &logp);
-      check_positive(function, nu, "Degrees of freedom parameter", &logp);
+      check_positive_finite(function, nu, "Degrees of freedom parameter",
+                            &logp);
       check_finite(function, mu, "Location parameter", &logp);
-      check_finite(function, sigma, "Scale parameter", &logp);
-      check_positive(function, sigma, "Scale parameter", &logp);
+      check_positive_finite(function, sigma, "Scale parameter", &logp);
       check_consistent_sizes(function,
                              y,nu,mu,sigma,
                              "Random variable",
@@ -237,7 +236,7 @@ namespace stan {
       
       static const char* function = "stan::prob::student_t_cdf(%1%)";
           
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -246,11 +245,9 @@ namespace stan {
       T_partials_return P(1.0);
           
       check_not_nan(function, y, "Random variable", &P);
-      check_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_positive(function, nu, "Degrees of freedom parameter", &P);
+      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
       check_finite(function, mu, "Location parameter", &P);
-      check_finite(function, sigma, "Scale parameter", &P);
-      check_positive(function, sigma, "Scale parameter", &P);
+      check_positive_finite(function, sigma, "Scale parameter", &P);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -427,7 +424,7 @@ namespace stan {
       
       static const char* function = "stan::prob::student_t_cdf_log(%1%)";
           
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -436,11 +433,9 @@ namespace stan {
       T_partials_return P(0.0);
           
       check_not_nan(function, y, "Random variable", &P);
-      check_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_positive(function, nu, "Degrees of freedom parameter", &P);
+      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
       check_finite(function, mu, "Location parameter", &P);
-      check_finite(function, sigma, "Scale parameter", &P);
-      check_positive(function, sigma, "Scale parameter", &P);
+      check_positive_finite(function, sigma, "Scale parameter", &P);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -604,7 +599,7 @@ namespace stan {
       
       static const char* function = "stan::prob::student_t_ccdf_log(%1%)";
           
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
@@ -613,11 +608,9 @@ namespace stan {
       T_partials_return P(0.0);
           
       check_not_nan(function, y, "Random variable", &P);
-      check_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_positive(function, nu, "Degrees of freedom parameter", &P);
+      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
       check_finite(function, mu, "Location parameter", &P);
-      check_finite(function, sigma, "Scale parameter", &P);
-      check_positive(function, sigma, "Scale parameter", &P);
+      check_positive_finite(function, sigma, "Scale parameter", &P);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -779,14 +772,13 @@ namespace stan {
 
       static const char* function = "stan::prob::student_t_rng(%1%)";
 
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_finite;
 
-      check_finite(function, nu, "Degrees of freedom parameter", (double*)0);
-      check_positive(function, nu, "Degrees of freedom parameter", (double*)0);
+      check_positive_finite(function, nu, "Degrees of freedom parameter",
+                            (double*)0);
       check_finite(function, mu, "Location parameter", (double*)0);
-      check_finite(function, sigma, "Scale parameter", (double*)0); 
-      check_positive(function, sigma, "Scale parameter", (double*)0);
+      check_positive_finite(function, sigma, "Scale parameter", (double*)0); 
 
       variate_generator<RNG&, student_t_distribution<> >
         rng_unit_student_t(rng, student_t_distribution<>(nu));

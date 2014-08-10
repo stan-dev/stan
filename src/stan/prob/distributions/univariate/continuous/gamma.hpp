@@ -54,8 +54,7 @@ namespace stan {
 
       using stan::is_constant_struct;
       using stan::math::check_not_nan;
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
@@ -71,10 +70,8 @@ namespace stan {
 
       // validate args (here done over var, which should be OK)
       check_not_nan(function, y, "Random variable", &logp);
-      check_finite(function, alpha, "Shape parameter", &logp);
-      check_positive(function, alpha, "Shape parameter", &logp); 
-      check_finite(function, beta, "Inverse scale parameter", &logp); 
-      check_positive(function, beta, "Inverse scale parameter", &logp);
+      check_positive_finite(function, alpha, "Shape parameter", &logp);
+      check_positive_finite(function, beta, "Inverse scale parameter", &logp); 
       check_consistent_sizes(function,
                              y,alpha,beta,
                              "Random variable","Shape parameter",
@@ -191,8 +188,7 @@ namespace stan {
       // Error checks
       static const char* function = "stan::prob::gamma_cdf(%1%)";
           
-      using stan::math::check_finite;      
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;      
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_greater_or_equal;
@@ -203,10 +199,8 @@ namespace stan {
           
       T_partials_return P(1.0);
           
-      check_finite(function, alpha, "Shape parameter", &P);
-      check_positive(function, alpha, "Shape parameter", &P); 
-      check_finite(function, beta, "Scale parameter", &P);
-      check_positive(function, beta, "Scale parameter", &P); 
+      check_positive_finite(function, alpha, "Shape parameter", &P);
+      check_positive_finite(function, beta, "Scale parameter", &P);
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P); 
       check_consistent_sizes(function, y, alpha, beta,
@@ -309,8 +303,7 @@ namespace stan {
       // Error checks
       static const char* function = "stan::prob::gamma_cdf_log(%1%)";
           
-      using stan::math::check_finite;      
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;      
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_greater_or_equal;
@@ -321,10 +314,8 @@ namespace stan {
           
       T_partials_return P(0.0);
           
-      check_finite(function, alpha, "Shape parameter", &P);
-      check_positive(function, alpha, "Shape parameter", &P); 
-      check_finite(function, beta, "Scale parameter", &P);
-      check_positive(function, beta, "Scale parameter", &P); 
+      check_positive_finite(function, alpha, "Shape parameter", &P);
+      check_positive_finite(function, beta, "Scale parameter", &P);
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P); 
       check_consistent_sizes(function, y, alpha, beta,
@@ -420,8 +411,7 @@ namespace stan {
       // Error checks
       static const char* function = "stan::prob::gamma_ccdf_log(%1%)";
           
-      using stan::math::check_finite;      
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;      
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_greater_or_equal;
@@ -432,10 +422,8 @@ namespace stan {
           
       T_partials_return P(0.0);
           
-      check_finite(function, alpha, "Shape parameter", &P);
-      check_positive(function, alpha, "Shape parameter", &P); 
-      check_finite(function, beta, "Scale parameter", &P);
-      check_positive(function, beta, "Scale parameter", &P); 
+      check_positive_finite(function, alpha, "Shape parameter", &P);
+      check_positive_finite(function, beta, "Scale parameter", &P);
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P); 
       check_consistent_sizes(function, y, alpha, beta,
@@ -526,13 +514,11 @@ namespace stan {
 
       static const char* function = "stan::prob::gamma_rng(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       
-      check_finite(function, alpha, "Shape parameter", (double*)0);
-      check_positive(function, alpha, "Shape parameter", (double*)0);
-      check_finite(function, beta, "Inverse scale parameter", (double*)0);
-      check_positive(function, beta, "Inverse scale parameter", (double*)0);
+      check_positive_finite(function, alpha, "Shape parameter", (double*)0);
+      check_positive_finite(function, beta, "Inverse scale parameter", 
+                            (double*)0);
 
       /*
         the boost gamma distribution is defined by

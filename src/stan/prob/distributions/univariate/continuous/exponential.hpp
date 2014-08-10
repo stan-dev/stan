@@ -53,16 +53,14 @@ namespace stan {
             && stan::length(beta)))
         return 0.0;
       
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       
       T_partials_return logp(0.0);
       check_not_nan(function, y, "Random variable", &logp);
-      check_finite(function, beta, "Inverse scale parameter", &logp);
-      check_positive(function, beta, "Inverse scale parameter", &logp);
+      check_positive_finite(function, beta, "Inverse scale parameter", &logp);
       check_consistent_sizes(function,
                              y,beta,
                              "Random variable","Inverse scale parameter",
@@ -129,8 +127,7 @@ namespace stan {
 
       static const char* function = "stan::prob::exponential_cdf(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
@@ -144,8 +141,7 @@ namespace stan {
 
       check_not_nan(function, y, "Random variable", &cdf);
       check_nonnegative(function, y, "Random variable", &cdf);
-      check_finite(function, beta, "Inverse scale parameter", &cdf);
-      check_positive(function, beta, "Inverse scale parameter", &cdf);
+      check_positive_finite(function, beta, "Inverse scale parameter", &cdf);
 
       agrad::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
@@ -185,8 +181,7 @@ namespace stan {
 
       static const char* function = "stan::prob::exponential_cdf_log(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
@@ -200,8 +195,8 @@ namespace stan {
 
       check_not_nan(function, y, "Random variable", &cdf_log);
       check_nonnegative(function, y, "Random variable", &cdf_log);
-      check_finite(function, beta, "Inverse scale parameter", &cdf_log);
-      check_positive(function, beta, "Inverse scale parameter", &cdf_log);
+      check_positive_finite(function, beta, "Inverse scale parameter",
+                            &cdf_log);
 
       agrad::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
@@ -234,8 +229,7 @@ namespace stan {
 
       static const char* function = "stan::prob::exponential_ccdf_log(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
@@ -249,8 +243,8 @@ namespace stan {
 
       check_not_nan(function, y, "Random variable", &ccdf_log);
       check_nonnegative(function, y, "Random variable", &ccdf_log);
-      check_finite(function, beta, "Inverse scale parameter", &ccdf_log);
-      check_positive(function, beta, "Inverse scale parameter", &ccdf_log);
+      check_positive_finite(function, beta, "Inverse scale parameter", 
+                            &ccdf_log);
 
       agrad::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
@@ -282,11 +276,10 @@ namespace stan {
 
       static const char* function = "stan::prob::exponential_rng(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
 
-      check_finite(function, beta, "Inverse scale parameter", (double*)0);
-      check_positive(function, beta, "Inverse scale parameter", (double*)0);
+      check_positive_finite(function, beta, "Inverse scale parameter", 
+                            (double*)0);
 
       variate_generator<RNG&, exponential_distribution<> >
         exp_rng(rng, exponential_distribution<>(beta));

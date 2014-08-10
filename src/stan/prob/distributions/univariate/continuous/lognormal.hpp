@@ -29,7 +29,7 @@ namespace stan {
       using stan::is_constant_struct;
       using stan::math::check_not_nan;
       using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;      
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
@@ -49,8 +49,7 @@ namespace stan {
       check_not_nan(function, y, "Random variable", &logp);
       check_nonnegative(function, y, "Random variable", &logp);
       check_finite(function, mu, "Location parameter", &logp);
-      check_finite(function, sigma, "Scale parameter", &logp);
-      check_positive(function, sigma, "Scale parameter", &logp);
+      check_positive_finite(function, sigma, "Scale parameter", &logp);
       check_consistent_sizes(function,
                              y,mu,sigma,
                              "Random variable","Location parameter",
@@ -159,7 +158,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_finite;
       using stan::math::check_nonnegative;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -172,8 +171,7 @@ namespace stan {
       check_not_nan(function, y, "Random variable", &cdf);
       check_nonnegative(function, y, "Random variable", &cdf);
       check_finite(function, mu, "Location parameter", &cdf);
-      check_finite(function, sigma, "Scale parameter", &cdf);
-      check_positive(function, sigma, "Scale parameter", &cdf);
+      check_positive_finite(function, sigma, "Scale parameter", &cdf);
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
@@ -238,7 +236,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_finite;
       using stan::math::check_nonnegative;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -251,8 +249,7 @@ namespace stan {
       check_not_nan(function, y, "Random variable", &cdf_log);
       check_nonnegative(function, y, "Random variable", &cdf_log);
       check_finite(function, mu, "Location parameter", &cdf_log);
-      check_finite(function, sigma, "Scale parameter", &cdf_log);
-      check_positive(function, sigma, "Scale parameter", &cdf_log);
+      check_positive_finite(function, sigma, "Scale parameter", &cdf_log);
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
@@ -310,7 +307,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_finite;
       using stan::math::check_nonnegative;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -323,8 +320,7 @@ namespace stan {
       check_not_nan(function, y, "Random variable", &ccdf_log);
       check_nonnegative(function, y, "Random variable", &ccdf_log);
       check_finite(function, mu, "Location parameter", &ccdf_log);
-      check_finite(function, sigma, "Scale parameter", &ccdf_log);
-      check_positive(function, sigma, "Scale parameter", &ccdf_log);
+      check_positive_finite(function, sigma, "Scale parameter", &ccdf_log);
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
@@ -381,11 +377,10 @@ namespace stan {
       static const char* function = "stan::prob::lognormal_rng(%1%)";
 
       using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
 
       check_finite(function, mu, "Location parameter", (double*)0);
-      check_finite(function, sigma, "Scale parameter", (double*)0);
-      check_positive(function, sigma, "Scale parameter", (double*)0);
+      check_positive_finite(function, sigma, "Scale parameter", (double*)0);
 
       variate_generator<RNG&, lognormal_distribution<> >
         lognorm_rng(rng, lognormal_distribution<>(mu, sigma));

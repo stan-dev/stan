@@ -37,9 +37,8 @@ namespace stan {
       typedef typename stan::partials_return_type<T_size1,T_size2>::type
         T_partials_return;
 
-      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
-      using stan::math::check_positive;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
@@ -53,13 +52,12 @@ namespace stan {
       
       T_partials_return logp(0.0);
       check_nonnegative(function, N, "Population size parameter", &logp);
-      check_finite(function, alpha, "First prior sample size parameter", &logp);
-      check_positive(function, alpha, "First prior sample size parameter", 
-                     &logp);
-      check_finite(function, beta, "Second prior sample size parameter", 
-                   &logp);      
-      check_positive(function, beta, "Second prior sample size parameter",  
-                     &logp);
+      check_positive_finite(function, alpha, 
+                            "First prior sample size parameter", 
+                            &logp);
+      check_positive_finite(function, beta, 
+                            "Second prior sample size parameter",  
+                            &logp);
       check_consistent_sizes(function,
                              n,N,alpha,beta,
                              "Successes variable",
@@ -197,9 +195,8 @@ namespace stan {
                                                   T_size2>::type
         T_partials_return;
 
-      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
-      using stan::math::check_positive;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
@@ -213,10 +210,10 @@ namespace stan {
           
       // Validate arguments
       check_nonnegative(function, N, "Population size parameter", &P);
-      check_finite(function, alpha, "First prior sample size parameter", &P);
-      check_positive(function, alpha, "First prior sample size parameter", &P);
-      check_finite(function, beta, "Second prior sample size parameter", &P);
-      check_positive(function, beta, "Second prior sample size parameter", &P);
+      check_positive_finite(function, alpha, "First prior sample size parameter",
+                            &P);
+      check_positive_finite(function, beta, "Second prior sample size parameter",
+                            &P);
       check_consistent_sizes(function,
                              n, N, alpha, beta,
                              "Successes variable",
@@ -328,9 +325,8 @@ namespace stan {
                                                   T_size2>::type 
         T_partials_return;
 
-      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
-      using stan::math::check_positive;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
@@ -344,10 +340,10 @@ namespace stan {
           
       // Validate arguments
       check_nonnegative(function, N, "Population size parameter", &P);
-      check_finite(function, alpha, "First prior sample size parameter", &P);
-      check_positive(function, alpha, "First prior sample size parameter", &P);
-      check_finite(function, beta, "Second prior sample size parameter", &P);
-      check_positive(function, beta, "Second prior sample size parameter", &P);
+      check_positive_finite(function, alpha, "First prior sample size parameter",
+                            &P);
+      check_positive_finite(function, beta, "Second prior sample size parameter",
+                            &P);
       check_consistent_sizes(function,
                              n, N, alpha, beta,
                              "Successes variable",
@@ -450,9 +446,8 @@ namespace stan {
                                                   T_size2>::type 
         T_partials_return;
 
-      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
-      using stan::math::check_positive;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
@@ -466,10 +461,10 @@ namespace stan {
           
       // Validate arguments
       check_nonnegative(function, N, "Population size parameter", &P);
-      check_finite(function, alpha, "First prior sample size parameter", &P);
-      check_positive(function, alpha, "First prior sample size parameter", &P);
-      check_finite(function, beta, "Second prior sample size parameter", &P);
-      check_positive(function, beta, "Second prior sample size parameter", &P);
+      check_positive_finite(function, alpha, "First prior sample size parameter",
+                            &P);
+      check_positive_finite(function, beta, "Second prior sample size parameter",
+                            &P);
       check_consistent_sizes(function,
                              n, N, alpha, beta,
                              "Successes variable",
@@ -570,19 +565,16 @@ namespace stan {
 
       static const char* function = "stan::prob::beta_binomial_rng(%1%)";
 
-      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
-      using stan::math::check_positive;
   
       check_nonnegative(function, N, "Population size parameter", (double*)0);
-      check_finite(function, alpha, "First prior sample size parameter", 
-                   (double*)0);
-      check_positive(function, alpha, "First prior sample size parameter", 
-                     (double*)0);
-      check_finite(function, beta, "Second prior sample size parameter", 
-                   (double*)0);
-      check_positive(function, beta, "Second prior sample size parameter",
-                     (double*)0);
+      check_positive_finite(function, alpha, 
+                            "First prior sample size parameter", 
+                            (double*)0);
+      check_positive_finite(function, beta, 
+                            "Second prior sample size parameter", 
+                            (double*)0);
 
       double a = stan::prob::beta_rng(alpha, beta, rng);
       while(a > 1 || a < 0) 
