@@ -3296,6 +3296,32 @@ variables or expressions at various points in the execution of a
 program.  They are particularly useful for spotting problematic
 not-a-number of infinite values, both of which will be printed.
 
+\section{Raise\_Exception Statements}\label{raise-exception-statements.section}
+
+The Stan raise\_exception statement provides a mechanism to report errors or problematic
+values encountered during program execution.
+It is typically embedded in a conditional statement in order to
+detect bad or illegal outcomes of a processing step.
+This statement accepts any number of quoted string literals or Stan expressions as arguments.
+
+To illustrate, here is an example of a test which raises an exception when
+a value falls below a specified limit.
+%
+\begin{quote}
+\begin{Verbatim}
+if (x < min) 
+  raise_exception("failure, value ",x," below minimum ",y);
+\end{Verbatim}
+\end{quote}
+
+The effect of raising an exception depends on the program block
+from which this statement or a function that contains 
+a \code{raise\_exception} statment occurs.
+In both the transformed data block and generated quantities block this exception
+is fatal.  An exception in the transformed data block blocks model initialization.
+An exception in the generated quantities block will block sampling.
+Exceptions raised in the transformed parameters and model blocks are non-fatal.
+The exception message is reported and processing continues.
 
 
 \chapter{User-Defined Functions}\label{functions.chapter}%

@@ -8,7 +8,6 @@
 #include <stan/math/matrix/assign.hpp>
 #include <stan/math/matrix/block.hpp>
 #include <stan/math/matrix/append_col.hpp>
-#include <stan/math/matrix/check_range.hpp>
 #include <stan/math/matrix/cholesky_decompose.hpp>
 #include <stan/math/matrix/col.hpp>
 #include <stan/math/matrix/cols.hpp>
