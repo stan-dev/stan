@@ -2,20 +2,14 @@
 #define STAN__PROB__INTERNAL_MATH__REV__GRAD_INC_BETA_HPP
 
 #include <math.h>
-#include <stan/agrad/fwd/functions/exp.hpp>
-#include <stan/agrad/fwd/functions/log.hpp>
-#include <stan/agrad/fwd/functions/fabs.hpp>
-#include <stan/agrad/fwd/operators.hpp>
 #include <stan/agrad/rev/functions/exp.hpp>
 #include <stan/agrad/rev/functions/log.hpp>
+#include <stan/agrad/rev/functions/log1m.hpp>
 #include <stan/agrad/rev/functions/fabs.hpp>
 #include <stan/agrad/rev/operators.hpp>
 #include <stan/agrad/rev/functions/value_of.hpp>
-#include <stan/agrad/fwd/functions/value_of.hpp>
 #include <stan/math/functions/value_of.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
 
-#include <stan/prob/internal_math/fwd/inc_beta.hpp>
 #include <stan/prob/internal_math/rev/inc_beta.hpp>
 #include <stan/prob/internal_math/math/grad_2F1.hpp>
 
@@ -35,8 +29,8 @@ namespace stan {
       using stan::agrad::value_of;
       using stan::math::value_of;
 
-      stan::agrad::var c1 = log(z);
-      stan::agrad::var c2 = log(1 - z);
+      stan::agrad::var c1 = stan::agrad::log(z);
+      stan::agrad::var c2 = stan::agrad::log1m(z);
       stan::agrad::var c3 = stan::agrad::inc_beta(a, b, z);
           
       stan::agrad::var C = exp( a * c1 + b * c2 ) / a;

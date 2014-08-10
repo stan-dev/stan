@@ -2,13 +2,11 @@
 #define STAN__PROB__INTERNAL_MATH__FWD__GRAD_INC_BETA_HPP
 
 #include <math.h>
-#include <stan/agrad/fwd/functions/exp.hpp>
+#include <stan/agrad/fwd/functions/fabs.hpp>
 #include <stan/agrad/fwd/functions/log.hpp>
+#include <stan/agrad/fwd/functions/log1m.hpp>
+#include <stan/agrad/fwd/functions/exp.hpp>
 #include <stan/agrad/fwd/operators.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
-#include <stan/agrad/rev/functions/log.hpp>
-#include <stan/agrad/rev/operators.hpp>
-#include <stan/agrad/rev/functions/value_of.hpp>
 #include <stan/agrad/fwd/functions/value_of.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
@@ -33,9 +31,10 @@ namespace stan {
     {
       using stan::agrad::value_of;
       using stan::math::value_of;
+      using stan::agrad::log1m;
 
       stan::agrad::fvar<T> c1 = log(z);
-      stan::agrad::fvar<T> c2 = log(1 - z);
+      stan::agrad::fvar<T> c2 = log1m(z);
       stan::agrad::fvar<T> c3 = inc_beta(a, b, z);
           
       stan::agrad::fvar<T> C = exp( a * c1 + b * c2 ) / a;

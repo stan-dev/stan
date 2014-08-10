@@ -190,6 +190,7 @@ namespace stan {
       using stan::is_constant_struct;
       using stan::math::square;
       using stan::math::value_of;
+      using stan::math::log1m;
 
       T_partials_return cdf_log(0.0);
 
@@ -227,7 +228,7 @@ namespace stan {
         const T_partials_return exp_div_1m_exp = exp_val / (1.0 - exp_val);
 
         if (include_summand<false,T_y,T_scale>::value)
-          cdf_log += log(1.0 - exp_val);
+          cdf_log += log1m(exp_val);
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += y_dbl * inv_sigma_sqr 

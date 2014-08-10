@@ -7,6 +7,7 @@
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/log1m.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -250,6 +251,7 @@ namespace stan {
       
       using std::log;
       using std::exp;
+      using stan::math::log1m;
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
@@ -280,7 +282,7 @@ namespace stan {
         }
         else {
           //log cdf
-          cdf_log += log(1.0 - 0.5 * exp(-scaled_diff));
+          cdf_log += log1m(0.5 * exp(-scaled_diff));
 
           //gradients
           const T_partials_return rep_deriv = 1.0 
@@ -329,6 +331,7 @@ namespace stan {
       
       using std::log;
       using std::exp;
+      using stan::math::log1m;
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
@@ -347,7 +350,7 @@ namespace stan {
         const T_partials_return inv_sigma = 1.0 / sigma_dbl;
         if(y_dbl < mu_dbl) {
           //log ccdf
-          ccdf_log += log(1.0 - 0.5 * exp(scaled_diff));
+          ccdf_log += log1m(0.5 * exp(scaled_diff));
 
           //gradients
           const T_partials_return rep_deriv = 1.0 
@@ -391,6 +394,7 @@ namespace stan {
       
       using stan::math::check_finite;
       using stan::math::check_positive_finite;
+      using stan::math::log1m;
 
       check_finite(function, mu, "Location parameter", (double*)0);
       check_positive_finite(function, sigma, "Scale parameter", (double*)0);
@@ -403,7 +407,7 @@ namespace stan {
         a = 1.0;
       else if(0.5 - laplaceRN < 0)
         a = -1.0;
-      return mu - sigma * a * log(1 - 2 * abs(0.5 - laplaceRN));
+      return mu - sigma * a * log1m(2 * abs(0.5 - laplaceRN));
     }
   }
 }
