@@ -1,4 +1,5 @@
 #include <stan/agrad/fwd/matrix/trace_gen_quad_form.hpp>
+#include <stan/agrad/rev/operators.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
