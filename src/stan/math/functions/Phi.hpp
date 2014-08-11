@@ -31,7 +31,7 @@ namespace stan {
     Phi(const T x) {
       // overridden in fvar and var, so can hard-code boost versions
       // here for scalars only
-      check_not_nan("Phi(%1%)", x, "x", (double *)0);
+      check_not_nan("Phi(%1%)", x, "x", static_cast<double*>(0));
       if (x < -37.5)
         return 0;
       else if (x < -5.0)
