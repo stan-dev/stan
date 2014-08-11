@@ -173,6 +173,8 @@ namespace stan {
             // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
             // dy1_dt, dy2_dt, dy1_da, dy1_db, dy2_da, dy2_db
             double temp_deriv = grad[num_eqn+j];
+            // if (i == j)
+            //   temp_deriv *= 2.0;
             for (int k = 0; k < num_eqn; k++)
               temp_deriv += y[num_eqn+num_eqn*k+j] * grad[k];
 
@@ -192,6 +194,7 @@ namespace stan {
                     const std::vector<double>& theta) {
       return y;
     }
+
 
     std::vector<std::vector<stan::agrad::var> > 
     compute_results(const std::vector<std::vector<double> >& y,
@@ -306,6 +309,12 @@ namespace stan {
          obs);
 
       std::vector<std::vector<double> > y = obs.get();
+      // for (int i = 0; i < y.size(); i++) {
+      //   std::cout<<i<<": ";
+      //   for (int j = 0; j < y[i].size(); j++)
+      //     std::cout<<y[i][j]<<", ";
+      //   std::cout<<";"<<std::endl;
+      // }
       std::vector<std::vector<typename stan::return_type<T1,T2>::type> > 
         res = compute_results(y, y0, theta);
       res.erase(res.begin());

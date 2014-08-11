@@ -69,6 +69,42 @@ TEST(solve_ode, ode_system) {
   EXPECT_FLOAT_EQ(-1.8, dy_dt[3]);
 }
 
+TEST(solve_ode, ode_system2) {
+  using stan::math::ode_system;
+
+  harm_osc_ode_fun harm_osc;
+
+  std::vector<double> theta;
+  std::vector<double> y0;
+  double t0;
+  std::vector<double> dy_dt;
+
+  double gamma(0.15);
+  t0 = 0;
+
+  theta.push_back(gamma);
+  y0.push_back(1.0);
+  y0.push_back(0.5);
+  y0.push_back(1.0);
+  y0.push_back(2.0);
+  y0.push_back(1.0);
+  y0.push_back(2.0);
+
+  std::vector<double> x;
+  std::vector<int> x_int;
+
+  ode_system<harm_osc_ode_fun, stan::agrad::var, double> system(harm_osc, y0,theta, x, x_int);
+
+  system(y0, dy_dt, t0);
+
+  EXPECT_FLOAT_EQ(0.5, dy_dt[0]);
+  EXPECT_FLOAT_EQ(-1.075, dy_dt[1]);
+  EXPECT_FLOAT_EQ(1, dy_dt[2]);
+  EXPECT_FLOAT_EQ(3, dy_dt[3]);
+  EXPECT_FLOAT_EQ(-2.15, dy_dt[4]);
+  EXPECT_FLOAT_EQ(-2.6, dy_dt[5]);
+}
+
 template <typename F>
 inline void solve_ode_efficient_double_var(const F& f,
                                            const std::vector<double>& y0_dbl,
@@ -217,52 +253,51 @@ TEST(solve_ode, harm_osc_compare_to_diff_integrator_double_var) {
                                 val_diff_integrator, grad_diff_integrator);
       solve_ode_efficient_double_var(harm_osc, y0, t0, ts, theta, x, x_int, i, j, 
                                      val_eff, grad_eff);
-      EXPECT_NEAR(val_diff_integrator, val_eff, 1e-5);
+      EXPECT_NEAR(val_diff_integrator, val_eff, 1e-4);
       
       for (int k = 0; k < theta.size(); k++)
-        EXPECT_NEAR(grad_diff_integrator[k], grad_eff[k], 1e-5);
+        EXPECT_NEAR(grad_diff_integrator[k], grad_eff[k], 1e-4);
     }
   }
 }
 
+TEST(solve_ode, harm_osc_compare_to_diff_integrator_var_double) {
+  harm_osc_ode_fun harm_osc;
 
-// TEST(solve_ode, harm_osc_compare_to_diff_integrator_var_double) {
-//   harm_osc_ode_fun harm_osc;
+  std::vector<double> y0;
+  std::vector<double> theta;
+  double t0;
+  std::vector<double> ts;
 
-//   std::vector<double> y0;
-//   std::vector<double> theta;
-//   double t0;
-//   std::vector<double> ts;
+  t0 = 0;
 
-//   t0 = 0;
+  theta.push_back(0.15);
+  y0.push_back(1.0);
+  y0.push_back(0.0);
 
-//   theta.push_back(0.15);
-//   y0.push_back(1.0);
-//   y0.push_back(0.0);
+  std::vector<double> x;
+  std::vector<int> x_int;
 
-//   std::vector<double> x;
-//   std::vector<int> x_int;
+  for (int i = 0; i < 100; i++)
+    ts.push_back(0.1*(i+1));
 
-//   for (int i = 0; i < 100; i++)
-//     ts.push_back(0.1*(i+1));
-
-//   for (int i = 1; i < ts.size(); i++) {
-//     for (int j = 0; j < y0.size(); j++) {
-//       double val_diff_integrator;
-//       std::vector<double> grad_diff_integrator;
-//       double val_eff;
-//       std::vector<double> grad_eff;
-//       solve_ode_diff_integrator(harm_osc, y0, t0, ts, theta, x, x_int, i, j, 
-//                                 val_diff_integrator, grad_diff_integrator);
-//       solve_ode_efficient_var_double(harm_osc, y0, t0, ts, theta, x, x_int, i, j, 
-//                                      val_eff, grad_eff);
-//       EXPECT_NEAR(val_diff_integrator, val_eff, 1e-5);
+  for (int i = 1; i < ts.size(); i++) {
+    for (int j = 0; j < y0.size(); j++) {
+      double val_diff_integrator;
+      std::vector<double> grad_diff_integrator;
+      double val_eff;
+      std::vector<double> grad_eff;
+      solve_ode_diff_integrator(harm_osc, y0, t0, ts, theta, x, x_int, i, j, 
+                                val_diff_integrator, grad_diff_integrator);
+      solve_ode_efficient_var_double(harm_osc, y0, t0, ts, theta, x, x_int, i, j, 
+                                     val_eff, grad_eff);
+      EXPECT_NEAR(val_diff_integrator, val_eff, 1e-4);
       
-//       for (int k = 0; k < y0.size(); k++)
-//         EXPECT_NEAR(grad_diff_integrator[theta.size()+k], grad_eff[k], 1e-5);
-//     }
-//   }
-// }
+      for (int k = 0; k < y0.size(); k++)
+        EXPECT_NEAR(grad_diff_integrator[theta.size()+k], grad_eff[k], 1e-4);
+    }
+  }
+}
 
 TEST(solve_ode, harm_osc) {
   harm_osc_ode_fun harm_osc;

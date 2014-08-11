@@ -192,6 +192,7 @@ $(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS)))
 ##
 # Tests that also depend on generated models.
 ##
+
 test/unit/io/mcmc_writer.o: src/test/test-models/no-main/io_example.cpp
 test/unit/gm/generator.o: src/test/test-models/no-main/gm/test_lp.cpp
 
@@ -216,6 +217,20 @@ test/unit/common/run_markov_chain.o: src/test/test-models/no-main/common/test_lp
 test/unit/common/sample.o: src/test/test-models/no-main/common/test_lp.cpp
 test/unit/common/warmup.o: src/test/test-models/no-main/common/test_lp.cpp
 test/unit/common/write_iteration.o: src/test/test-models/no-main/common/test_lp.cpp
+
+test/unit/gm/raise_exception/raise_exception_mult_args.o: src/test/test-models/no-main/gm/raise_exception_mult_args.cpp
+
+test/unit/gm/raise_exception/raise_exception_model.o: src/test/test-models/no-main/gm/raise_exception_model.cpp
+test/unit/gm/raise_exception/raise_ex_func_call_model.o: src/test/test-models/no-main/gm/raise_ex_func_call_model.cpp
+
+test/unit/gm/raise_exception/raise_exception_transformed_data.o: src/test/test-models/no-main/gm/raise_exception_transformed_data.cpp
+test/unit/gm/raise_exception/raise_ex_func_call_transformed_data.o: src/test/test-models/no-main/gm/raise_ex_func_call_transformed_data.cpp
+
+test/unit/gm/raise_exception/raise_exception_transformed_parameters.o: src/test/test-models/no-main/gm/raise_exception_transformed_parameters.cpp
+test/unit/gm/raise_exception/raise_ex_func_call_transformed_parameters.o: src/test/test-models/no-main/gm/raise_ex_func_call_transformed_parameters.cpp
+
+test/unit/gm/raise_exception/raise_exception_generated_quantities.o: src/test/test-models/no-main/gm/raise_exception_generated_quantities.cpp
+test/unit/gm/raise_exception/raise_ex_func_call_generated_quantities.o: src/test/test-models/no-main/gm/raise_ex_func_call_generated_quantities.cpp
 
 test/integration/compile_models.o : $(patsubst %.stan,%.cpp-test,$(shell find src/test/test-models/syntax-only -type f -name '*.stan'))
 

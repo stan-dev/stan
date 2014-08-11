@@ -1,10 +1,10 @@
+data {
+  real i;
+  real j;
+}
 transformed data {
-  real u;
-  int j;
-  int k;
-  j <- 2;
-  k <- 3;
-  u <- j / k;
+  real k;
+  k <- i % j;  // real, real
 }
 parameters {
   real y;
@@ -12,3 +12,4 @@ parameters {
 model {
   y ~ normal(0,1);
 }
+
