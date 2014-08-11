@@ -53,50 +53,37 @@ public:
   }
 
   template <typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::frechet_log(y, alpha, sigma);
   }
 
   template <bool propto, 
-      typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T_y, typename T_shape, typename T_scale,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::frechet_log<propto>(y, alpha, sigma);
   }
   
   
   template <typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_y, T_shape, T_scale>::type 
+  log_prob_function(const T_y& y, const T_shape& alpha, 
+                    const T_scale& sigma,
+                    const T3&, const T4&, const T5&) {
     using std::log;
     using std::pow;
     using stan::math::multiply_log;
     using stan::math::value_of;
     using stan::prob::include_summand;
     
-    var logp(0);
-    
-    if (include_summand<true,T_shape>::value)
-      logp += log(alpha);
-    if (include_summand<true,T_shape,T_scale>::value)
-      logp += multiply_log(alpha, sigma);
-    if (include_summand<true,T_y,T_shape>::value)
-      logp -= multiply_log(alpha+1, y);
-    if (include_summand<true,T_y,T_shape,T_scale>::value)
-      logp -= pow(sigma / y, alpha);
-    return logp;
+    return log(alpha) + multiply_log(alpha, sigma) 
+      - multiply_log(alpha+1, y) - pow(sigma / y, alpha);
   }
 };
 

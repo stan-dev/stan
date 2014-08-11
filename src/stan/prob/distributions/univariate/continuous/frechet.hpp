@@ -6,6 +6,7 @@
 
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -23,6 +24,8 @@ namespace stan {
     typename return_type<T_y,T_shape,T_scale>::type
     frechet_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
       static const char* function = "stan::prob::frechet_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+        T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_not_nan;
@@ -38,7 +41,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
       check_positive(function, y, "Random variable", &logp);
       check_positive_finite(function, alpha, "Shape parameter", &logp);
       check_positive_finite(function, sigma, "Scale parameter", &logp);
@@ -57,42 +60,42 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, alpha, sigma);
 
-      DoubleVectorView<include_summand<propto,T_shape>::value,
-        is_vector<T_shape>::value> log_alpha(length(alpha));
+      VectorBuilder<include_summand<propto,T_shape>::value,
+                    T_partials_return, T_shape> log_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
         if (include_summand<propto,T_shape>::value)
           log_alpha[i] = log(value_of(alpha_vec[i]));
       
-      DoubleVectorView<include_summand<propto,T_y,T_shape>::value,
-        is_vector<T_y>::value> log_y(length(y));
+      VectorBuilder<include_summand<propto,T_y,T_shape>::value,
+                    T_partials_return, T_y> log_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y,T_shape>::value)
           log_y[i] = log(value_of(y_vec[i]));
 
-      DoubleVectorView<include_summand<propto,T_shape,T_scale>::value,
-        is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<include_summand<propto,T_shape,T_scale>::value,
+                    T_partials_return, T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++)
         if (include_summand<propto,T_shape,T_scale>::value)
           log_sigma[i] = log(value_of(sigma_vec[i]));
 
-      DoubleVectorView<include_summand<propto,T_y,T_shape,T_scale>::value,
-        is_vector<T_y>::value> inv_y(length(y));
+      VectorBuilder<include_summand<propto,T_y,T_shape,T_scale>::value,
+                    T_partials_return, T_y> inv_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y,T_shape,T_scale>::value)
           inv_y[i] = 1.0 / value_of(y_vec[i]);
       
-      DoubleVectorView<include_summand<propto,T_y,T_shape,T_scale>::value,
-        is_vector<T_y>::value | is_vector<T_shape>::value | is_vector<T_scale>::value>
+      VectorBuilder<include_summand<propto,T_y,T_shape,T_scale>::value,
+                    T_partials_return, T_y, T_shape, T_scale> 
         sigma_div_y_pow_alpha(N);
       for (size_t i = 0; i < N; i++)
         if (include_summand<propto,T_y,T_shape,T_scale>::value) {
-          const double alpha_dbl = value_of(alpha_vec[i]);
-          sigma_div_y_pow_alpha[i] = pow(value_of(inv_y[i]) * value_of(sigma_vec[i]), alpha_dbl);
+          const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
+          sigma_div_y_pow_alpha[i] = pow(inv_y[i] * value_of(sigma_vec[i]), alpha_dbl);
         }
 
       agrad::OperandsAndPartials<T_y,T_shape,T_scale> operands_and_partials(y,alpha,sigma);
       for (size_t n = 0; n < N; n++) {
-        const double alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
         if (include_summand<propto,T_shape>::value)
           logp += log_alpha[n];
         if (include_summand<propto,T_y,T_shape>::value)
@@ -103,7 +106,7 @@ namespace stan {
           logp -= sigma_div_y_pow_alpha[n];
 
         if (!is_constant_struct<T_y>::value) {
-          const double inv_y_dbl = value_of(inv_y[n]);
+          const T_partials_return inv_y_dbl = value_of(inv_y[n]);
           operands_and_partials.d_x1[n] 
             += -(alpha_dbl+1.0) * inv_y_dbl
             + alpha_dbl * sigma_div_y_pow_alpha[n] * inv_y_dbl;
@@ -116,7 +119,7 @@ namespace stan {
           operands_and_partials.d_x3[n] 
             += alpha_dbl / value_of(sigma_vec[n]) * (1 - sigma_div_y_pow_alpha[n]);
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,alpha,sigma);
     }
 
     template <typename T_y, typename T_shape, typename T_scale>
@@ -129,6 +132,8 @@ namespace stan {
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     frechet_cdf(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+        T_partials_return;
 
       static const char* function = "stan::prob::frechet_cdf(%1%)";
 
@@ -144,7 +149,7 @@ namespace stan {
             && stan::length(sigma)))
         return 1.0;
 
-      double cdf(1.0);
+      T_partials_return cdf(1.0);
       check_positive(function, y, "Random variable", &cdf);
       check_positive_finite(function, alpha, "Shape parameter", &cdf);
       check_positive_finite(function, sigma, "Scale parameter", &cdf);
@@ -157,11 +162,11 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, sigma, alpha);
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double pow_ = pow(sigma_dbl / y_dbl, alpha_dbl);
-        const double cdf_ = exp(-pow_);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return pow_ = pow(sigma_dbl / y_dbl, alpha_dbl);
+        const T_partials_return cdf_ = exp(-pow_);
 
         //cdf
         cdf *= cdf_;
@@ -185,12 +190,14 @@ namespace stan {
         for (size_t n = 0; n < stan::length(sigma); ++n) 
           operands_and_partials.d_x3[n] *= cdf;
 
-      return operands_and_partials.to_var(cdf);    
+      return operands_and_partials.to_var(cdf, y, alpha, sigma);    
     }
    
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     frechet_cdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+        T_partials_return;
 
       static const char* function = "stan::prob::frechet_cdf_log(%1%)";
 
@@ -206,7 +213,7 @@ namespace stan {
             && stan::length(sigma)))
         return 0.0;
 
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
       check_positive(function, y, "Random variable", &cdf_log);
       check_positive_finite(function, alpha, "Shape parameter", &cdf_log);
       check_positive_finite(function, sigma, "Scale parameter", &cdf_log);
@@ -219,10 +226,10 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, sigma, alpha);
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double pow_ = pow(sigma_dbl / y_dbl, alpha_dbl);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return pow_ = pow(sigma_dbl / y_dbl, alpha_dbl);
 
         //cdf_log
         cdf_log -= pow_;
@@ -236,12 +243,14 @@ namespace stan {
           operands_and_partials.d_x3[n] -= pow_ * alpha_dbl / sigma_dbl;
       }
 
-      return operands_and_partials.to_var(cdf_log);    
+      return operands_and_partials.to_var(cdf_log, y, alpha, sigma);    
     }
 
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     frechet_ccdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+        T_partials_return;
 
       static const char* function = "stan::prob::frechet_ccdf_log(%1%)";
 
@@ -257,7 +266,7 @@ namespace stan {
             && stan::length(sigma)))
         return 0.0;
 
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
       check_positive(function, y, "Random variable", &ccdf_log);
       check_positive_finite(function, alpha, "Shape parameter", &ccdf_log);
       check_positive_finite(function, sigma, "Scale parameter", &ccdf_log);
@@ -265,22 +274,24 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
         operands_and_partials(y, alpha, sigma);
 
+      using stan::math::log1m;
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, sigma, alpha);
+
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double pow_ = pow(sigma_dbl / y_dbl, alpha_dbl);
-		const double exp_ = exp(-pow_);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return pow_ = pow(sigma_dbl / y_dbl, alpha_dbl);
+        const T_partials_return exp_ = exp(-pow_);
 
         //ccdf_log
-        ccdf_log += log(1 - exp_);
+        ccdf_log += log1m(exp_);
 
         //gradients
-        const double rep_deriv_ = pow_ / ( 1.0 / exp_ - 1 );
+        const T_partials_return rep_deriv_ = pow_ / ( 1.0 / exp_ - 1 );
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= alpha_dbl / y_dbl * rep_deriv_;
         if (!is_constant_struct<T_shape>::value)
@@ -289,7 +300,7 @@ namespace stan {
           operands_and_partials.d_x3[n] += alpha_dbl / sigma_dbl * rep_deriv_;
       }
 
-      return operands_and_partials.to_var(ccdf_log);    
+      return operands_and_partials.to_var(ccdf_log, y, alpha, sigma);    
     }
 
     template <class RNG>
