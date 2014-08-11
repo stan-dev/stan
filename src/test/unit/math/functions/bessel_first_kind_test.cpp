@@ -1,4 +1,5 @@
-#include "stan/math/functions/bessel_first_kind.hpp"
+#include <stan/math/functions/bessel_first_kind.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathFunctions, bessel_first_kind) {
@@ -10,4 +11,11 @@ TEST(MathFunctions, bessel_first_kind) {
                   bessel_first_kind(1,-3.0));
   EXPECT_FLOAT_EQ(0.33905895852593645892551459720647889697308041819800, 
                   bessel_first_kind(-1,-3.0));
+}
+
+TEST(MathFunctions, bessel_first_kind_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::math::bessel_first_kind(1, nan));
 }
