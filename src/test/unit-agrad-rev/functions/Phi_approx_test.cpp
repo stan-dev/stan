@@ -41,3 +41,17 @@ TEST(AgradRev, Phi_approx) {
     EXPECT_FLOAT_EQ(g2[0], g[0]);
   }
 }
+
+TEST(AgradRev, Phi_approx_nan) {
+  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::Phi_approx(nan).val());
+
+  std::vector<double> grads;
+  std::vector<stan::agrad::var> vars;
+  vars.push_back(nan);
+
+  stan::agrad::Phi_approx(nan).grad(vars, grads);
+  EXPECT_PRED1(boost::math::isnan<double>,
+               grads[0]);
+}
