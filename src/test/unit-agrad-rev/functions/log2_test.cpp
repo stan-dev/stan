@@ -18,3 +18,16 @@ TEST(AgradRev,log2) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
                   stan::agrad::log2(a).val());
 }
+
+TEST(AgradRev,log2_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::log2(a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
