@@ -45,3 +45,16 @@ TEST(AgradRev,acos_out_of_bounds) {
   a = -1.0 - stan::math::EPSILON;
   EXPECT_TRUE(std::isnan(acos(a)));
 }
+
+TEST(AgradRev,acos_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::acos(a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
