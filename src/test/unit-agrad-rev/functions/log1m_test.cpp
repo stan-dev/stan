@@ -18,3 +18,16 @@ TEST(AgradRev,log1mErr) {
   AVAR f = log1m(a);
   EXPECT_TRUE(boost::math::isnan(f.val()));
 }
+
+TEST(AgradRev,log1m_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::log1m(a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
