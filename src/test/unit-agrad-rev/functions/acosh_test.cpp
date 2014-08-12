@@ -46,3 +46,16 @@ TEST(AgradRev,acosh_out_of_bounds) {
   AVAR b = std::numeric_limits<double>::infinity();
   EXPECT_TRUE(boost::math::isinf(acosh(b)) && acosh(b) > 0);
 }
+
+TEST(AgradRev,acosh_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::acosh(a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
