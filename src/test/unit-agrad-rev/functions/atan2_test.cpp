@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/functions/atan2.hpp>
 #include <stan/agrad/rev/operators/operator_division.hpp>
 #include <stan/agrad/rev/operators/operator_multiplication.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 
@@ -70,4 +71,45 @@ TEST(AgradRev,atan2_double_var) {
   VEC g;
   f.grad(x,g);
   EXPECT_FLOAT_EQ(-1.2 / (1.2 * 1.2 + 3.9 * 3.9), g[0]);
+}
+
+TEST(AgradRev,atan2_nan_vv) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR b = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::atan2(a,b);
+
+  AVEC x = createAVEC(a,b);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(2U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+  EXPECT_TRUE(boost::math::isnan(g[1]));
+}
+
+TEST(AgradRev,atan2_nan_vd) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::atan2(a,1);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
+
+TEST(AgradRev,atan2_nan_dv) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::atan2(1,a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
 }
