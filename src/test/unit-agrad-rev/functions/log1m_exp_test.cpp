@@ -45,3 +45,16 @@ TEST(AgradRev, log1m_exp_exception) {
   EXPECT_NO_THROW(log1m_exp(AVAR(-3)));
   EXPECT_NO_THROW(log1m_exp(AVAR(3)));
 }
+
+TEST(AgradRev,log1m_exp_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::log1m_exp(a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
