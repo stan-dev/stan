@@ -172,3 +172,45 @@ TEST(AgradRev,log_diff_exp_exception) {
   EXPECT_NO_THROW(log_diff_exp(AVAR(3), 4));
   EXPECT_NO_THROW(log_diff_exp(3, AVAR(4)));
 }
+
+
+TEST(AgradRev,log_diff_exp_nan_vv) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR b = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::log_diff_exp(a,b);
+
+  AVEC x = createAVEC(a,b);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(2U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+  EXPECT_TRUE(boost::math::isnan(g[1]));
+}
+
+TEST(AgradRev,log_diff_exp_nan_vd) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::log_diff_exp(a,1);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
+
+TEST(AgradRev,log_diff_exp_nan_dv) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::log_diff_exp(1,a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
