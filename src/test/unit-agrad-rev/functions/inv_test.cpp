@@ -22,3 +22,16 @@ TEST(AgradRev,inv) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(stan::math::negative_infinity(),grad_f[0]);
 }
+
+TEST(AgradRev,inv_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::inv(a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
