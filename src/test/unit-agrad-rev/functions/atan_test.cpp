@@ -1,4 +1,5 @@
 #include <stan/agrad/rev/functions/atan.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 
@@ -41,4 +42,17 @@ TEST(AgradRev,atan_boundry) {
   VEC h;
   e.grad(y, h);
   EXPECT_FLOAT_EQ(0.0, h[0]);
+}
+
+TEST(AgradRev,atan_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::atan(a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
 }
