@@ -41,7 +41,6 @@ TEST(AgradRev, fabs_NaN) {
   AVAR a = std::numeric_limits<double>::quiet_NaN();
   AVAR f = fabs(a);
 
-  
   AVEC x = createAVEC(a);
   VEC g;
   f.grad(x,g);
