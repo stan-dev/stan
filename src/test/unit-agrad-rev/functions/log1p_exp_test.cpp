@@ -40,3 +40,16 @@ TEST(AgradRev, log1p_exp) {
   test_log1p_exp(32.0);
   test_log1p_exp(64.0);
 }
+
+TEST(AgradRev,log1p_exp_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::log1p_exp(a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
