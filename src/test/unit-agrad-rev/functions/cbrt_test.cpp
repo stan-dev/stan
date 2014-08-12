@@ -12,3 +12,8 @@ TEST(AgradRev,cbrt) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(1.0 / 3.0 / std::pow(27.0,2.0/3.0), grad_f[0]);
 }
+
+TEST(AgradRev,cbrt_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::agrad::cbrt(a), std::domain_error);
+}
