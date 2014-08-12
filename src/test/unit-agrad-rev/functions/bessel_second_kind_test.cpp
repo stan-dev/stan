@@ -30,3 +30,16 @@ TEST(AgradRev,bessel_second_kind_int_var) {
   b = -4.0;
   EXPECT_THROW(stan::agrad::bessel_second_kind(0,b), std::domain_error);
 }
+
+TEST(AgradRev,bessel_second_kind_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::bessel_second_kind(2,a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
