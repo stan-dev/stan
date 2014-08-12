@@ -139,3 +139,9 @@ TEST(AgradRev, PhiTails) {
   EXPECT_FLOAT_EQ(1, 1 / Phi(var(9.5)).val());
   EXPECT_FLOAT_EQ(1, 1 / Phi(var(10)).val());
 }
+
+TEST(AgradRev, Phi_nan) {
+  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::agrad::Phi(nan),
+               std::domain_error);
+}
