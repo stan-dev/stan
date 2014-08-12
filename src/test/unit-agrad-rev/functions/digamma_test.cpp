@@ -14,3 +14,16 @@ TEST(AgradRev,digamma) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(4.9348022005446793094, grad_f[0]);
 }  
+
+TEST(AgradRev,digamma_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::digamma(a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
