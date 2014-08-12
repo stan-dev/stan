@@ -1,5 +1,6 @@
 #include <stan/agrad/rev/functions/hypot.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,hypot_vv) {
@@ -41,3 +42,44 @@ TEST(AgradRev,hypot_dv) {
   // arbitrary, but doc this way
   EXPECT_FLOAT_EQ(4.0/5.0,grad_f[0]);
 }  
+
+TEST(AgradRev,hypot_nan_vv) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR b = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::hypot(a,b);
+
+  AVEC x = createAVEC(a,b);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(2U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+  EXPECT_TRUE(boost::math::isnan(g[1]));
+}
+
+TEST(AgradRev,hypot_nan_vd) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::hypot(a,1);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
+
+TEST(AgradRev,hypot_nan_dv) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::hypot(1,a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
