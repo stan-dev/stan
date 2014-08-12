@@ -37,3 +37,15 @@ TEST(AgradRev,tan_boundry) {
     << "tan(" << b << "): " << tan(b) << " mimics std::tan behavior";
 }
 
+TEST(AgradRev,tan_nan) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = stan::agrad::tan(a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1U,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
+}
