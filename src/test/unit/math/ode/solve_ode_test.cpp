@@ -131,7 +131,7 @@ TEST(solve_ode, harm_osc_finite_diff) {
   test_ode_vd(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8);
 }
 
-TEST(solve_ode, harm_osc) {
+TEST(solve_ode, harm_osc_known_values) {
   harm_osc_ode_fun harm_osc;
 
   std::vector<stan::agrad::var> y0;

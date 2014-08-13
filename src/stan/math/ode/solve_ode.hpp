@@ -153,26 +153,18 @@ namespace stan {
           vars.clear();
 
           for (int j = 0; j < num_eqn; j++) {
-            y_temp.push_back(y[j]);
+            y_temp.push_back(y[j]+y0_[j]);
             vars.push_back(y_temp[j]);
           }
 
-          for (int j = 0; j < num_eqn; j++) {
-            y0_temp.push_back(y0_[j]);
-            vars.push_back(y0_temp[j]);
-          }
-
-          for (int j = 0; j < num_eqn; j++) 
-            y_new.push_back(y0_temp[j] + y_temp[j]);
-
-          dy_dt_temp = f_(t,y_new,theta_,x_,x_int_);
+          dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_);
           dy_dt_temp[i].grad(vars, grad);
 
           for (int j = 0; j < num_eqn; j++) { 
             // orders derivatives by equation (i.e. if there are 2 eqns 
             // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
             // dy1_dt, dy2_dt, dy1_da, dy1_db, dy2_da, dy2_db
-            double temp_deriv = 2*grad[num_eqn+j];
+            double temp_deriv = 2*grad[j];
             for (int k = 0; k < num_eqn; k++) 
               temp_deriv += y[num_eqn+num_eqn*k+j] * grad[k];
 
