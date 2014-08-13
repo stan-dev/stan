@@ -61,44 +61,30 @@ public:
 
 
   template <class T_y, class T_loc, class T_scale, class T_shape, 
-            typename T4, typename T5, 
-            typename T6, typename T7, typename T8, 
-            typename T9>
+            typename T4, typename T5>
   typename stan::return_type<T_y, T_scale, T_shape,T_loc>::type 
-  log_prob(const T_y& y, const T_loc& mu, const T_scale& lambda, const T_shape& alpha,
-     const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+  log_prob(const T_y& y, const T_loc& mu, const T_scale& lambda, 
+           const T_shape& alpha, const T4&, const T5&) {
     return stan::prob::pareto_type_2_log(y, mu, lambda, alpha);
   }
 
   template <bool propto, 
             class T_y, class T_loc, class T_scale, class T_shape,
-            typename T4, typename T5, 
-            typename T6, typename T7, typename T8, 
-            typename T9>
+            typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale, T_shape>::type 
-  log_prob(const T_y& y, const T_loc& mu, const T_scale& lambda, const T_shape& alpha,
-     const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+  log_prob(const T_y& y, const T_loc& mu, const T_scale& lambda,
+           const T_shape& alpha, const T4&, const T5&) {
     return stan::prob::pareto_type_2_log<propto>(y, mu, lambda, alpha);
   }
   
 
   template <class T_y, class T_loc, class T_scale, class T_shape,
-            typename T4, typename T5, 
-            typename T6, typename T7, typename T8, typename T9>
-  var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& lambda, 
-                        const T_shape& alpha, const T4&, const T5&, 
-                        const T6&, const T7&, const T8&, const T9&) {
-    using stan::prob::include_summand;
-    var logp(0.0);
-
-    if (include_summand<true,T_shape>::value)
-      logp += log(alpha);
-    if (include_summand<true,T_scale>::value)
-      logp -= log(lambda);
-    if (include_summand<true,T_y,T_loc,T_scale,T_shape>::value)
-      logp -= (alpha + 1.0) * log1p((y - mu) / lambda);
+            typename T4, typename T5>
+  typename stan::return_type<T_y, T_loc, T_scale, T_shape>::type
+  log_prob_function(const T_y& y, const T_loc& mu, const T_scale& lambda, 
+                    const T_shape& alpha, const T4&, const T5&) {
     
-    return logp;
+    return log(alpha) - log(lambda) - (alpha + 1.0) * log1p((y - mu) / lambda);
   }
 };
 
