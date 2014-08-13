@@ -1,4 +1,5 @@
-#include "stan/math/functions/step.hpp"
+#include <stan/math/functions/step.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathFunctions, step_double) {
@@ -15,4 +16,10 @@ TEST(MathFunctions, step_int) {
   EXPECT_EQ(1, step(int(4)));
   EXPECT_EQ(1, step(int(0)));
   EXPECT_EQ(0, step(int(-3)));
+}
+
+TEST(MathFunctions, step_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_EQ(1, stan::math::step(nan));
 }
