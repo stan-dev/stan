@@ -307,12 +307,6 @@ namespace stan {
          obs);
 
       std::vector<std::vector<double> > y = obs.get();
-      // for (int i = 0; i < y.size(); i++) {
-      //   std::cout<<i<<": ";
-      //   for (int j = 0; j < y[i].size(); j++)
-      //     std::cout<<y[i][j]<<", ";
-      //   std::cout<<";"<<std::endl;
-      // }
       std::vector<std::vector<typename stan::return_type<T1,T2>::type> > 
         res = compute_results(y, y0, theta);
       res.erase(res.begin());
