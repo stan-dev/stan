@@ -1,10 +1,13 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__LOG2_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__LOG2_HPP
 
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
-#include <stan/math/functions/log2.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/math/functions/log2.hpp>
+
+#include "stan/agrad/rev/internal/v_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

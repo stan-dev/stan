@@ -8,6 +8,8 @@ namespace stan {
 
   namespace agrad {
 
+template <typename T> struct fvar;
+
     template <typename T>
     inline  
     bool

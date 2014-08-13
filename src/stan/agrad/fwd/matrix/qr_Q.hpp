@@ -1,14 +1,20 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__QR_Q_HPP
 #define STAN__AGRAD__FWD__MATRIX__QR_Q_HPP
 
+#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/math/error_handling/check_greater_or_equal.hpp>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <Eigen/QR>
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
-#include <stan/math/error_handling/check_greater_or_equal.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/QR/HouseholderQR.h"
 
 namespace stan {
   namespace agrad {
+
+template <typename T> struct fvar;
 
     template <typename T>
     Eigen::Matrix<fvar<T>,Eigen::Dynamic,Eigen::Dynamic>

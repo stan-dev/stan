@@ -2,8 +2,13 @@
 #define STAN__AGRAD__FWD__FUNCTIONS__GAMMA_Q_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/functions/gamma_q.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
+#include <complex>
+
+#include "boost/math/special_functions/gamma.hpp"
+#include "boost/math/special_functions/math_fwd.hpp"
 
 namespace stan{
 

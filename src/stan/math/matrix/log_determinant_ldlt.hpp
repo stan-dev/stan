@@ -7,6 +7,8 @@ namespace stan {
   namespace math {
 
     // Returns log(abs(det(A))) given a LDLT_factor of A
+template <typename T, int R, int C> class LDLT_factor;
+
     template<int R, int C>
     inline double
     log_determinant_ldlt(stan::math::LDLT_factor<double,R,C> &A) {

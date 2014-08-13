@@ -1,10 +1,11 @@
 #ifndef STAN__GM__ARGUMENTS__ARGUMENT__BETA
 #define STAN__GM__ARGUMENTS__ARGUMENT__BETA
 
-#include <vector>
-#include <string>
-#include <sstream>
+#include <stddef.h>
 #include <iomanip>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace gm {

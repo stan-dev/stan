@@ -1,6 +1,36 @@
 #ifndef STAN__GM__PARSER__EXPRESSION_GRAMMAR_DEF__HPP
 #define STAN__GM__PARSER__EXPRESSION_GRAMMAR_DEF__HPP
 
+#include <boost/config/warning_disable.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/std_pair.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/spirit/include/classic_position_iterator.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+// FIXME: get rid of unused include
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_function.hpp>
+#include <boost/spirit/include/phoenix_function.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_object.hpp>
+#include <boost/spirit/include/phoenix_object.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/qi_numeric.hpp>
+#include <boost/spirit/include/support_multi_pass.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/recursive_variant.hpp>
+#include <stan/gm/ast.hpp>
+#include <stan/gm/grammars/expression07_grammar.hpp>
+#include <stan/gm/grammars/expression_grammar.hpp>
+#include <stan/gm/grammars/term_grammar.hpp>
+#include <stan/gm/grammars/whitespace_grammar.hpp>
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -8,43 +38,19 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
-#include <stdexcept>
 
-#include <boost/spirit/include/qi.hpp>
-// FIXME: get rid of unused include
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-
-#include <boost/lexical_cast.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/include/std_pair.hpp>
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/classic_position_iterator.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/spirit/include/support_multi_pass.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/recursive_variant.hpp>
-
-#include <stan/gm/ast.hpp>
-#include <stan/gm/grammars/whitespace_grammar.hpp>
-#include <stan/gm/grammars/term_grammar.hpp>
-#include <stan/gm/grammars/expression_grammar.hpp>
-#include <stan/gm/grammars/expression07_grammar.hpp>
+#include "boost/spirit/home/phoenix/core/actor.hpp"
+#include "boost/spirit/home/phoenix/core/reference.hpp"
+#include "boost/spirit/home/phoenix/function/detail/function_call.hpp"
+#include "boost/spirit/home/phoenix/function/function.hpp"
+#include "boost/spirit/home/phoenix/operator/self.hpp"
+#include "boost/spirit/home/support/argument.hpp"
+#include "boost/spirit/home/support/common_terminals.hpp"
+#include "boost/spirit/home/support/context.hpp"
 
 
 namespace stan { 

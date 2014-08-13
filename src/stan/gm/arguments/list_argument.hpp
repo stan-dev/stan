@@ -1,9 +1,14 @@
 #ifndef STAN__GM__ARGUMENTS__LIST__ARGUMENT__BETA
 #define STAN__GM__ARGUMENTS__LIST__ARGUMENT__BETA
 
-#include <iostream>
-#include <stan/gm/arguments/valued_argument.hpp>
 #include <stan/gm/arguments/arg_fail.hpp>
+#include <stan/gm/arguments/valued_argument.hpp>
+#include <stddef.h>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "stan/gm/arguments/argument.hpp"
 
 namespace stan {
   

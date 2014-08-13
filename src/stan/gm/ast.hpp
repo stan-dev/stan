@@ -1,13 +1,19 @@
 #ifndef STAN__GM__AST_HPP
 #define STAN__GM__AST_HPP
 
+#include <boost/variant/recursive_variant.hpp>
+#include <stddef.h>
+#include <iosfwd>
 #include <map>
-#include <string>
-#include <vector>
 #include <map>
 #include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include <boost/variant/recursive_variant.hpp>
+#include "boost/variant/recursive_wrapper.hpp"
+#include "boost/variant/static_visitor.hpp"
+#include "boost/variant/variant.hpp"
 
 namespace stan {
 
@@ -23,8 +29,8 @@ namespace stan {
     struct binary_op;
     struct conditional_statement;
     struct distribution;
-    struct double_var_decl;
     struct double_literal;
+    struct double_var_decl;
     struct expression;
     struct for_statement;
     struct fun;
@@ -41,20 +47,20 @@ namespace stan {
     struct positive_ordered_var_decl;
     struct print_statement;
     struct program;
-    struct range;
     struct raise_exception_statement;
+    struct range;
     struct return_statement;
     struct row_vector_var_decl;
     struct sample;
     struct simplex_var_decl;
-    struct unit_vector_var_decl;
     struct statement;
     struct statements;
     struct unary_op;
-    struct variable;
-    struct variable_dims;
+    struct unit_vector_var_decl;
     struct var_decl;
     struct var_type;
+    struct variable;
+    struct variable_dims;
     struct vector_var_decl;
     struct while_statement;
 

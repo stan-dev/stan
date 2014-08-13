@@ -1,10 +1,12 @@
 #ifndef STAN__MATH__MATRIX__TRACE_GEN_INV_QUAD_FORM_LDLT_HPP
 #define STAN__MATH__MATRIX__TRACE_GEN_INV_QUAD_FORM_LDLT_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/LDLT_factor.hpp>
 #include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/LDLT_factor.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {
@@ -14,6 +16,8 @@ namespace stan {
      *       trace(D B^T A^-1 B)
      * where D is a square matrix and the LDLT_factor of A is provided.
      */
+template <typename T, int R, int C> class LDLT_factor;
+
     template <int R1,int C1,int R2,int C2,int R3,int C3>
     inline double
     trace_gen_inv_quad_form_ldlt(const Eigen::Matrix<double,R1,C1> &D,

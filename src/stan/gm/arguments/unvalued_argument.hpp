@@ -1,9 +1,9 @@
 #ifndef STAN__GM__ARGUMENTS__UNVALUED__ARGUMENT__BETA
 #define STAN__GM__ARGUMENTS__UNVALUED__ARGUMENT__BETA
-#include <iostream>
-
-#include <vector>
 #include <stan/gm/arguments/argument.hpp>
+#include <iostream>
+#include <string>
+#include <vector>
 
 namespace stan {
   

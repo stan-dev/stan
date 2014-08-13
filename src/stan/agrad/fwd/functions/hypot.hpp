@@ -1,10 +1,12 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__HYPOT_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__HYPOT_HPP
 
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <boost/math/special_functions/hypot.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/functions/inv.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
+#include <complex>
 
 namespace stan {
 

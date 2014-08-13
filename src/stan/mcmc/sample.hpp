@@ -1,10 +1,12 @@
 #ifndef STAN__MCMC__SAMPLE__HPP
 #define STAN__MCMC__SAMPLE__HPP
 
-#include <vector>
-#include <string>
-
 #include <stan/math/matrix/Eigen.hpp>
+#include <string>
+#include <vector>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   

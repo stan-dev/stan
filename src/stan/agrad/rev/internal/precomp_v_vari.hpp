@@ -1,8 +1,10 @@
 #ifndef STAN__AGRAD__REV__INTERNAL__PRECOMP_V_VARI_HPP
 #define STAN__AGRAD__REV__INTERNAL__PRECOMP_V_VARI_HPP
 
-#include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <stan/agrad/rev/vari.hpp>
+
+#include "stan/agrad/rev/internal/v_vari.hpp"
 
 namespace stan {
   namespace agrad {

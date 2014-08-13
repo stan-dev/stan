@@ -1,7 +1,10 @@
 #ifndef STAN__GM__PARSER__VAR_DECLS_GRAMMAR_DEF__HPP
 #define STAN__GM__PARSER__VAR_DECLS_GRAMMAR_DEF__HPP
 
-#include <boost/spirit/include/qi.hpp>
+#include <boost/config/warning_disable.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/std_pair.hpp>
+#include <boost/lexical_cast.hpp>
 // FIXME: get rid of unused include
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
@@ -9,15 +12,38 @@
 #include <boost/spirit/include/phoenix_object.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
-
-#include <boost/lexical_cast.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/include/std_pair.hpp>
-#include <boost/config/warning_disable.hpp>
+#include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
 #include <stan/gm/ast.hpp>
-#include <stan/gm/grammars/var_decls_grammar.hpp>
 #include <stan/gm/grammars/common_adaptors_def.hpp>
+#include <stan/gm/grammars/var_decls_grammar.hpp>
+#include <stddef.h>
+#include <ostream>
+#include <set>
+#include <string>
+#include <vector>
+
+#include "boost/fusion/adapted/struct/adapt_struct.hpp"
+#include "boost/preprocessor/arithmetic/dec.hpp"
+#include "boost/preprocessor/arithmetic/inc.hpp"
+#include "boost/preprocessor/control/expr_iif.hpp"
+#include "boost/preprocessor/control/iif.hpp"
+#include "boost/preprocessor/logical/bool.hpp"
+#include "boost/preprocessor/repetition/detail/for.hpp"
+#include "boost/preprocessor/seq/elem.hpp"
+#include "boost/preprocessor/seq/size.hpp"
+#include "boost/preprocessor/tuple/eat.hpp"
+#include "boost/preprocessor/tuple/elem.hpp"
+#include "boost/proto/extends.hpp"
+#include "boost/proto/operators.hpp"
+#include "boost/spirit/home/phoenix/core/actor.hpp"
+#include "boost/spirit/home/phoenix/core/reference.hpp"
+#include "boost/spirit/home/phoenix/function/function.hpp"
+#include "boost/spirit/home/support/argument.hpp"
+#include "boost/spirit/home/support/common_terminals.hpp"
+#include "boost/spirit/home/support/context.hpp"
+#include "boost/variant/detail/apply_visitor_unary.hpp"
+#include "boost/variant/static_visitor.hpp"
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_var_decl,
                           (stan::gm::range, range_)

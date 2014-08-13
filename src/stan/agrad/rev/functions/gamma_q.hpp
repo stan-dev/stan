@@ -1,15 +1,26 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__GAMMA_Q_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__GAMMA_Q_HPP
 
-#include <valarray>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/internal/vv_vari.hpp>
+#include <boost/math/special_functions/digamma.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 #include <stan/agrad/rev/internal/dv_vari.hpp>
 #include <stan/agrad/rev/internal/vd_vari.hpp>
+#include <stan/agrad/rev/internal/vv_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/functions/gamma_q.hpp>
 #include <stan/prob/internal_math.hpp>
-#include <boost/math/special_functions/gamma.hpp>
-#include <boost/math/special_functions/digamma.hpp>
+#include <cmath>
+#include <ostream>
+#include <valarray>
+
+#include "boost/format/alt_sstream.hpp"
+#include "boost/format/alt_sstream_impl.hpp"
+#include "boost/format/format_implementation.hpp"
+#include "boost/optional/optional.hpp"
+#include "stan/agrad/rev/internal/dv_vari.hpp"
+#include "stan/agrad/rev/internal/vd_vari.hpp"
+#include "stan/agrad/rev/internal/vv_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

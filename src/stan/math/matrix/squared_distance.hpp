@@ -1,9 +1,11 @@
 #ifndef STAN__MATH__MATRIX__SQUARED_DISTANCE_HPP
 #define STAN__MATH__MATRIX__SQUARED_DISTANCE_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_vector.hpp>
 #include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/math/error_handling/matrix/check_vector.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

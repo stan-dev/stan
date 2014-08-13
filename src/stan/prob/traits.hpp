@@ -1,8 +1,8 @@
 #ifndef STAN__PROB__TRAITS_HPP
 #define STAN__PROB__TRAITS_HPP
 
-#include <stan/meta/traits.hpp>
 #include <boost/math/tools/promotion.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
 

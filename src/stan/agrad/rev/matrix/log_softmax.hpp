@@ -1,14 +1,26 @@
 #ifndef STAN__AGRAD__REV__MATRIX__LOG_SOFTMAX_HPP
 #define STAN__AGRAD__REV__MATRIX__LOG_SOFTMAX_HPP
 
-#include <cmath>
-#include <vector>
-#include <stdexcept>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/log_softmax.hpp>
 #include <stan/math/matrix/softmax.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
+#include <cmath>
+#include <new>
+#include <stdexcept>
+#include <vector>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/Redux.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/format/alt_sstream.hpp"
+#include "boost/format/alt_sstream_impl.hpp"
+#include "boost/format/format_implementation.hpp"
+#include "boost/optional/optional.hpp"
+#include "stan/agrad/rev/chainable.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

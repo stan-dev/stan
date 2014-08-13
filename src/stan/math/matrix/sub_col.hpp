@@ -1,9 +1,13 @@
 #ifndef STAN__MATH__MATRIX__SUB_COL_HPP
 #define STAN__MATH__MATRIX__SUB_COL_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_row_index.hpp>
 #include <stan/math/error_handling/matrix/check_column_index.hpp>
+#include <stan/math/error_handling/matrix/check_row_index.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   namespace math {

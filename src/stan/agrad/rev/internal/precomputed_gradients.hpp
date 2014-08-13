@@ -1,11 +1,12 @@
 #ifndef STAN__AGRAD__REV__INTERNAL__PRECOMPUTED_GRADIENTS_HPP
 #define STAN__AGRAD__REV__INTERNAL__PRECOMPUTED_GRADIENTS_HPP
 
-#include <iostream>
-#include <vector>
-#include <stdexcept>
-#include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/vari.hpp>
+#include <stddef.h>
+#include <iostream>
+#include <stdexcept>
+#include <vector>
 
 namespace stan {
   namespace agrad {

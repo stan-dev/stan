@@ -1,9 +1,12 @@
 #ifndef STAN__MATH__SEQ_VIEW_HPP
 #define STAN__MATH__SEQ_VIEW_HPP
 
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
 #include <vector>
 
-#include <stan/math/matrix/Eigen.hpp>
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
 

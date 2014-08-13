@@ -1,11 +1,25 @@
 #ifndef STAN__COMMAND__PRINT_HPP
 #define STAN__COMMAND__PRINT_HPP
 
+#include <math.h>
+#include <stan/mcmc/chains.hpp>
+#include <stddef.h>
 #include <algorithm>
-#include <iostream>
 #include <iomanip>
 #include <ios>
-#include <stan/mcmc/chains.hpp>
+#include <iostream>
+#include <new>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+#include "Eigen/src/Core/../plugins/BlockMethods.h"
+#include "Eigen/src/Core/Block.h"
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/Redux.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Core/util/Memory.h"
 
 void compute_width_and_precision(double value, int sig_figs, int& width, int& precision) {
   

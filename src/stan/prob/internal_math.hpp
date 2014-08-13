@@ -1,10 +1,19 @@
 #ifndef STAN__PROB__INTERNAL_MATH_HPP
 #define STAN__PROB__INTERNAL_MATH_HPP
 
-#include <math.h>
-#include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/beta.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/math/special_functions/gamma.hpp>
+#include <math.h>
+#include <algorithm>
+#include <cmath>
+#include <ostream>
+#include <stdexcept>
+
+#include "boost/format/alt_sstream.hpp"
+#include "boost/format/alt_sstream_impl.hpp"
+#include "boost/format/format_implementation.hpp"
+#include "boost/optional/optional.hpp"
 
 namespace stan {
     

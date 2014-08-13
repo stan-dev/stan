@@ -1,10 +1,13 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__LOG1P_EXP_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__LOG1P_EXP_HPP
 
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/internal/v_vari.hpp>
-#include <stan/math/functions/log1p_exp.hpp>
 #include <stan/agrad/rev/calculate_chain.hpp>
+#include <stan/agrad/rev/internal/v_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/math/functions/log1p_exp.hpp>
+
+#include "stan/agrad/rev/internal/v_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

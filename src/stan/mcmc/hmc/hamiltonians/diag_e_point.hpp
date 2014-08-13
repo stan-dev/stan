@@ -2,6 +2,11 @@
 #define STAN__MCMC__DIAG__E__POINT__BETA
 
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <ostream>
+
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   

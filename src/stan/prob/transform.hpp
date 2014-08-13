@@ -1,22 +1,50 @@
 #ifndef STAN__PROB__TRANSFORM_HPP
 #define STAN__PROB__TRANSFORM_HPP
 
-#include <cmath>
-#include <cstddef>
-#include <limits>
-#include <stdexcept>
-#include <sstream>
-#include <vector>
-#include <boost/throw_exception.hpp>
 #include <boost/math/tools/promotion.hpp>
+#include <boost/throw_exception.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 #include <stan/math.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
+#include <cmath>
+#include <complex>
+#include <cstddef>
+#include <iostream>
+#include <limits>
+#include <sstream>
+#include <stdexcept>
+#include <valarray>
+#include <vector>
+
+#include "Eigen/src/Cholesky/LDLT.h"
+#include "Eigen/src/Cholesky/LLT.h"
+#include "Eigen/src/Core/Array.h"
+#include "Eigen/src/Core/DiagonalMatrix.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "stan/math/constants.hpp"
+#include "stan/math/error_handling/check_bounded.hpp"
+#include "stan/math/error_handling/check_greater_or_equal.hpp"
+#include "stan/math/error_handling/check_less.hpp"
+#include "stan/math/error_handling/check_less_or_equal.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+#include "stan/math/error_handling/matrix/check_cholesky_factor.hpp"
+#include "stan/math/error_handling/matrix/check_ordered.hpp"
+#include "stan/math/error_handling/matrix/check_positive_ordered.hpp"
+#include "stan/math/error_handling/matrix/check_simplex.hpp"
+#include "stan/math/error_handling/matrix/check_unit_vector.hpp"
+#include "stan/math/functions/inv_logit.hpp"
+#include "stan/math/functions/log1m.hpp"
+#include "stan/math/functions/log1p_exp.hpp"
+#include "stan/math/functions/logit.hpp"
+#include "stan/math/functions/square.hpp"
+#include "stan/math/functions/sum.hpp"
+#include "stan/meta/traits.hpp"
 
 namespace stan {
   

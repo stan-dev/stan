@@ -1,57 +1,87 @@
 #ifndef STAN__COMMON__COMMAND_HPP
 #define STAN__COMMON__COMMAND_HPP
 
-#include <fstream>
-#include <stdexcept>
-
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 #include <boost/random/uniform_real_distribution.hpp>
-
-#include <stan/version.hpp>
+#include <stan/common/do_bfgs_optimize.hpp>
+#include <stan/common/do_print.hpp>
+#include <stan/common/init_adapt.hpp>
+#include <stan/common/init_nuts.hpp>
+#include <stan/common/init_static_hmc.hpp>
+#include <stan/common/init_windowed_adapt.hpp>
+#include <stan/common/print_progress.hpp>
+#include <stan/common/recorder/csv.hpp>
+#include <stan/common/recorder/messages.hpp>
+#include <stan/common/run_markov_chain.hpp>
+#include <stan/common/sample.hpp>
+#include <stan/common/warmup.hpp>
+#include <stan/common/write_error_msg.hpp>
+#include <stan/common/write_iteration.hpp>
+#include <stan/common/write_iteration_csv.hpp>
+#include <stan/common/write_model.hpp>
+#include <stan/common/write_stan.hpp>
+#include <stan/gm/arguments/arg_data.hpp>
+#include <stan/gm/arguments/arg_id.hpp>
+#include <stan/gm/arguments/arg_init.hpp>
+#include <stan/gm/arguments/arg_output.hpp>
+#include <stan/gm/arguments/arg_random.hpp>
+#include <stan/gm/arguments/argument_parser.hpp>
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/json.hpp>
 #include <stan/io/mcmc_writer.hpp>
-
-#include <stan/gm/arguments/argument_parser.hpp>
-#include <stan/gm/arguments/arg_id.hpp>
-#include <stan/gm/arguments/arg_data.hpp>
-#include <stan/gm/arguments/arg_init.hpp>
-#include <stan/gm/arguments/arg_random.hpp>
-#include <stan/gm/arguments/arg_output.hpp>
-
 #include <stan/mcmc/fixed_param_sampler.hpp>
-#include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
-#include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
-#include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
-#include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
-#include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
-
+#include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
+#include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/model/util.hpp>
-
-#include <stan/optimization/newton.hpp>
 #include <stan/optimization/bfgs.hpp>
+#include <stan/optimization/newton.hpp>
+#include <stan/version.hpp>
+#include <stddef.h>
+#include <sys/time.h>
+#include <time.h>
+#include <cmath>
+#include <exception>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
-#include <stan/common/write_iteration_csv.hpp>
-#include <stan/common/write_iteration.hpp>
-#include <stan/common/write_stan.hpp>
-#include <stan/common/write_model.hpp>
-#include <stan/common/write_error_msg.hpp>
-#include <stan/common/do_print.hpp>
-#include <stan/common/do_bfgs_optimize.hpp>
-#include <stan/common/print_progress.hpp>
-#include <stan/common/run_markov_chain.hpp>
-#include <stan/common/warmup.hpp>
-#include <stan/common/sample.hpp>
-#include <stan/common/init_static_hmc.hpp>
-#include <stan/common/init_nuts.hpp>
-#include <stan/common/init_adapt.hpp>
-#include <stan/common/init_windowed_adapt.hpp>
-#include <stan/common/recorder/csv.hpp>
-#include <stan/common/recorder/messages.hpp>
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "boost/cstdint.hpp"
+#include "boost/date_time/posix_time/ptime.hpp"
+#include "boost/date_time/special_defs.hpp"
+#include "boost/date_time/time.hpp"
+#include "boost/lexical_cast.hpp"
+#include "boost/random/variate_generator.hpp"
+#include "stan/gm/arguments/argument.hpp"
+#include "stan/gm/arguments/categorical_argument.hpp"
+#include "stan/gm/arguments/list_argument.hpp"
+#include "stan/gm/arguments/singleton_argument.hpp"
+#include "stan/gm/error_codes.hpp"
+#include "stan/mcmc/base_adapter.hpp"
+#include "stan/mcmc/base_mcmc.hpp"
+#include "stan/mcmc/hmc/nuts/dense_e_nuts.hpp"
+#include "stan/mcmc/hmc/nuts/diag_e_nuts.hpp"
+#include "stan/mcmc/hmc/nuts/unit_e_nuts.hpp"
+#include "stan/mcmc/hmc/static/dense_e_static_hmc.hpp"
+#include "stan/mcmc/hmc/static/diag_e_static_hmc.hpp"
+#include "stan/mcmc/hmc/static/unit_e_static_hmc.hpp"
+#include "stan/mcmc/sample.hpp"
+#include "stan/optimization/bfgs_update.hpp"
+#include "stan/optimization/lbfgs_update.hpp"
 
 namespace stan {
 

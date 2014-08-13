@@ -1,9 +1,14 @@
 #ifndef STAN__GM__ARGUMENTS__SINGLETON__ARGUMENT__BETA
 #define STAN__GM__ARGUMENTS__SINGLETON__ARGUMENT__BETA
 
-#include <iostream>
 #include <boost/lexical_cast.hpp>
 #include <stan/gm/arguments/valued_argument.hpp>
+#include <iostream>
+#include <string>
+#include <typeinfo>
+#include <vector>
+
+#include "stan/gm/arguments/argument.hpp"
 
 namespace stan {
   

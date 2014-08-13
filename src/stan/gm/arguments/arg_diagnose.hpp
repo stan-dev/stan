@@ -1,9 +1,10 @@
 #ifndef STAN__GM__ARGUMENTS__DIAGNOSE__HPP
 #define STAN__GM__ARGUMENTS__DIAGNOSE__HPP
 
-#include <stan/gm/arguments/categorical_argument.hpp>
-
 #include <stan/gm/arguments/arg_test.hpp>
+#include <stan/gm/arguments/categorical_argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

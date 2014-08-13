@@ -1,11 +1,12 @@
 #ifndef STAN__GM__ARGUMENTS__OPTIMIZE__ALGO__HPP
 #define STAN__GM__ARGUMENTS__OPTIMIZE__ALGO__HPP
 
-#include <stan/gm/arguments/list_argument.hpp>
-
 #include <stan/gm/arguments/arg_bfgs.hpp>
 #include <stan/gm/arguments/arg_lbfgs.hpp>
 #include <stan/gm/arguments/arg_newton.hpp>
+#include <stan/gm/arguments/list_argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

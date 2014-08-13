@@ -1,25 +1,27 @@
 #ifndef STAN__GM__PARSER__TERM_GRAMMAR__HPP
 #define STAN__GM__PARSER__TERM_GRAMMAR__HPP
 
-#include <string>
+#include <boost/spirit/include/qi.hpp>
+#include <stan/gm/ast.hpp>
+#include <stan/gm/grammars/expression_grammar.hpp>
+#include <stan/gm/grammars/whitespace_grammar.hpp>
 #include <sstream>
+#include <string>
 #include <vector>
 
-#include <boost/spirit/include/qi.hpp>
-
-#include <stan/gm/ast.hpp>
-#include <stan/gm/grammars/whitespace_grammar.hpp>
-#include <stan/gm/grammars/expression_grammar.hpp>
+#include "boost/spirit/home/qi/nonterminal/grammar.hpp"
+#include "boost/spirit/home/qi/nonterminal/rule.hpp"
+#include "boost/spirit/home/support/nonterminal/locals.hpp"
 
 namespace stan { 
 
   namespace gm {
 
-    template <typename Iterator>
-    struct term_grammar;
-
+template <typename Iterator> struct whitespace_grammar;
     template <typename Iterator>
     struct expression_grammar;
+    template <typename Iterator>
+    struct term_grammar;
 
     template <typename Iterator>
     struct term_grammar 

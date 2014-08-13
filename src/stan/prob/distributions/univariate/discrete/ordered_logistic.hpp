@@ -3,17 +3,36 @@
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
-
-#include <stan/prob/traits.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/inv_logit.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/log1m_exp.hpp>
 #include <stan/math/functions/log1p_exp.hpp>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
+#include <stan/prob/traits.hpp>
+#include <cmath>
+#include <complex>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/error_handling/check_bounded.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_greater.hpp"
+#include "stan/math/error_handling/check_less.hpp"
+#include "stan/math/error_handling/check_less_or_equal.hpp"
+#include "stan/math/error_handling/check_nonnegative.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+
+namespace boost {
+namespace random {
+template <class Engine, class Distribution> class variate_generator;
+}  // namespace random
+}  // namespace boost
 
 
 namespace stan {

@@ -1,12 +1,14 @@
 #ifndef STAN__MATH__MATRIX__MDIVIDE_RIGHT_LDLT_HPP
 #define STAN__MATH__MATRIX__MDIVIDE_RIGHT_LDLT_HPP
 
+#include <boost/math/tools/promotion.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <boost/math/tools/promotion.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {
@@ -18,6 +20,8 @@ namespace stan {
      * @return x = A^-1 b, solution of the linear system.
      * @throws std::domain_error if rows of b don't match the size of A.
      */
+
+template <typename T, int R, int C> class LDLT_factor;
 
     template <typename T1, typename T2, int R1, int C1, int R2, int C2>
     inline 

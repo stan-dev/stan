@@ -3,13 +3,24 @@
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
-
+#include <math.h>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/matrix/sum.hpp>
+#include <stan/math/matrix_error_handling.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/error_handling/check_bounded.hpp"
+#include "stan/math/error_handling/matrix/check_simplex.hpp"
+#include "stan/meta/traits.hpp"
 
 namespace stan {
 

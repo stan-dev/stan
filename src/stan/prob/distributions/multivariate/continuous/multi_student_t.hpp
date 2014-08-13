@@ -1,23 +1,44 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTI_STUDENT_T_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTI_STUDENT_T_HPP
 
-#include <cstdlib>
-
-#include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-
-#include <stan/math/matrix.hpp>
+#include <boost/math/special_functions/gamma.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <math.h>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/math/matrix.hpp>
 #include <stan/math/matrix/dot_product.hpp>
+#include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/inv_gamma.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
-#include <boost/random/variate_generator.hpp>
+#include <stan/prob/traits.hpp>
+#include <cstddef>
+#include <cstdlib>
+#include <vector>
+
+#include "Eigen/src/Core/Array.h"
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_not_nan.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+#include "stan/math/error_handling/matrix/check_size_match.hpp"
+#include "stan/math/error_handling/matrix/check_symmetric.hpp"
+#include "stan/math/matrix/LDLT_factor.hpp"
+#include "stan/math/matrix/log_determinant_ldlt.hpp"
+#include "stan/meta/traits.hpp"
+
+namespace stan {
+namespace math {
+template <typename T, int R, int C> class LDLT_factor;
+}  // namespace math
+}  // namespace stan
 
 namespace stan {
 

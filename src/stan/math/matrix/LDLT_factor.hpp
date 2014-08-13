@@ -1,9 +1,20 @@
 #ifndef STAN__MATH__MATRIX__LDLT_FACTOR_HPP
 #define STAN__MATH__MATRIX__LDLT_FACTOR_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
 #include <boost/shared_ptr.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+
+#include "Eigen/src/Cholesky/LDLT.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Core/util/ForwardDeclarations.h"
+#include "boost/smart_ptr/shared_ptr.hpp"
+
+namespace Eigen {
+template <typename Derived> class MatrixBase;
+}  // namespace Eigen
 
 namespace stan {
   namespace math {

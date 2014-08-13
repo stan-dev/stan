@@ -1,14 +1,21 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__FMA_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__FMA_HPP
 
-#include <valarray>
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
-#include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/internal/vd_vari.hpp>
-#include <stan/agrad/rev/internal/vvv_vari.hpp>
 #include <stan/agrad/rev/internal/vdv_vari.hpp>
+#include <stan/agrad/rev/internal/vv_vari.hpp>
+#include <stan/agrad/rev/internal/vvv_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/constants.hpp>
+#include <valarray>
+
+#include "stan/agrad/rev/internal/v_vari.hpp"
+#include "stan/agrad/rev/internal/vd_vari.hpp"
+#include "stan/agrad/rev/internal/vdv_vari.hpp"
+#include "stan/agrad/rev/internal/vv_vari.hpp"
+#include "stan/agrad/rev/internal/vvv_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

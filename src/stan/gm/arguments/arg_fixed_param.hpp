@@ -2,6 +2,7 @@
 #define STAN__GM__ARGUMENTS__FIXED__PARAMS__HPP
 
 #include <stan/gm/arguments/unvalued_argument.hpp>
+#include <string>
 
 namespace stan {
   

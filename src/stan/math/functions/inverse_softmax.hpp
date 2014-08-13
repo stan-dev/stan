@@ -2,8 +2,10 @@
 #define STAN__MATH__FUNCTIONS__INVERSE_SOFTMAX_HPP
 
 #include <boost/math/tools/promotion.hpp>
-#include <stdexcept>
 #include <boost/throw_exception.hpp>
+#include <stddef.h>
+#include <cmath>
+#include <stdexcept>
 
 namespace stan {
   namespace math {

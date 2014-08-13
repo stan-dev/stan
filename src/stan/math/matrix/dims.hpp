@@ -1,8 +1,10 @@
 #ifndef STAN__MATH__MATRIX__DIMS_HPP
 #define STAN__MATH__MATRIX__DIMS_HPP
 
-#include <vector>
 #include <stan/math/matrix/Eigen.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

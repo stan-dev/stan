@@ -1,9 +1,12 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SQUARE_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SQUARE_HPP
 
-#include <sstream>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <sstream>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   namespace math {

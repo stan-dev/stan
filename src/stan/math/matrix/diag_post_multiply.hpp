@@ -1,9 +1,11 @@
 #ifndef STAN__MATH__MATRIX__DIAG_POST_MULTIPLY_HPP
 #define STAN__MATH__MATRIX__DIAG_POST_MULTIPLY_HPP
 
-#include <stdexcept>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stdexcept>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

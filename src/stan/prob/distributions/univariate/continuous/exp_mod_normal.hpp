@@ -1,19 +1,28 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__MOD__NORMAL__HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__MOD__NORMAL__HPP
 
-#include <boost/random/normal_distribution.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <stan/prob/distributions/univariate/continuous/normal.hpp>
-#include <stan/prob/distributions/univariate/continuous/exponential.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/math/error_handling.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/distributions/univariate/continuous/exponential.hpp>
+#include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/math/functions/value_of.hpp>
+#include <cmath>
+#include <complex>
+#include <cstddef>
+
+#include "boost/math/constants/constants.hpp"
+#include "boost/math/special_functions/erf.hpp"
+#include "stan/math/error_handling/check_consistent_sizes.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_not_nan.hpp"
+#include "stan/math/error_handling/check_positive_finite.hpp"
 
 namespace stan {
 

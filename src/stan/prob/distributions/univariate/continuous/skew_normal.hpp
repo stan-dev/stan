@@ -1,17 +1,28 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SKEW__NORMAL__HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SKEW__NORMAL__HPP
 
-#include <boost/random/variate_generator.hpp>
 #include <boost/math/distributions.hpp>
-#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
-
+#include <boost/random/variate_generator.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/owens_t.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/math/functions/value_of.hpp>
+#include <cmath>
+#include <complex>
+#include <cstddef>
+
+#include "boost/math/constants/constants.hpp"
+#include "boost/math/distributions/skew_normal.hpp"
+#include "boost/math/special_functions/erf.hpp"
+#include "stan/math/constants.hpp"
+#include "stan/math/error_handling/check_consistent_sizes.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_not_nan.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
 
 namespace stan {
 

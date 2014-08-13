@@ -1,21 +1,27 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_GP_CHOLESKY_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_GP_CHOLESKY_HPP
 
-#include <stan/math/matrix_error_handling.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
-#include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
-#include <stan/agrad/rev.hpp>
-#include <stan/meta/traits.hpp>
-#include <stan/agrad/rev/matrix.hpp>
-#include <stan/math/matrix/row.hpp>
 #include <stan/math/matrix/dot_self.hpp>
 #include <stan/math/matrix/log.hpp>
-#include <stan/math/matrix/multiply.hpp>
-#include <stan/math/matrix/sum.hpp>
-
 #include <stan/math/matrix/mdivide_left_tri_low.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/matrix/row.hpp>
+#include <stan/math/matrix/sum.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/meta/traits.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+#include "stan/math/error_handling/matrix/check_size_match.hpp"
 
 namespace stan {
   namespace prob {

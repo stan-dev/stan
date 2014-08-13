@@ -1,9 +1,10 @@
 #ifndef STAN__COMMON__RECORDER__VALUES_HPP
 #define STAN__COMMON__RECORDER__VALUES_HPP
 
+#include <stddef.h>
 #include <ostream>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace stan {

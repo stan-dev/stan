@@ -2,6 +2,8 @@
 #define STAN__GM__ARGUMENTS__VALUED__ARGUMENT__BETA
 
 #include <stan/gm/arguments/argument.hpp>
+#include <ostream>
+#include <string>
 
 namespace stan {
   

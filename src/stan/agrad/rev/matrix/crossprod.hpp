@@ -1,8 +1,11 @@
 #ifndef STAN__AGRAD__REV__MATRIX__CROSSPROD_HPP
 #define STAN__AGRAD__REV__MATRIX__CROSSPROD_HPP
 
-#include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/tcrossprod.hpp>
+#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <new>
+
+#include "Eigen/src/Core/Transpose.h"
 
 namespace stan {
   namespace agrad {

@@ -4,6 +4,7 @@
 #include <stan/mcmc/base_adapter.hpp>
 #include <stan/mcmc/stepsize_adaptation.hpp>
 #include <stan/mcmc/var_adaptation.hpp>
+#include <iosfwd>
 
 namespace stan {
   

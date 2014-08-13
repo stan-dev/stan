@@ -1,24 +1,46 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__WISHART_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__WISHART_HPP
 
-#include <stan/prob/constants.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/agrad/rev/matrix.hpp>
-#include <stan/prob/traits.hpp>
 #include <boost/concept_check.hpp>
-#include "stan/prob/distributions/univariate/continuous/normal.hpp"
-#include "stan/prob/distributions/univariate/continuous/chi_square.hpp"
+#include <stan/agrad/rev/matrix.hpp>
+#include <stan/math/error_handling.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
 #include <stan/math/functions/lmgamma.hpp>
-#include <stan/math/matrix/crossprod.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
-#include <stan/math/matrix/trace.hpp>
+#include <stan/math/matrix/crossprod.hpp>
+#include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
-#include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/mdivide_left_tri_low.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/math/matrix/trace.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
+#include <new>
+
+#include "Eigen/src/Cholesky/LLT.h"
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/MatrixBase.h"
+#include "Eigen/src/Core/TriangularMatrix.h"
+#include "Eigen/src/Core/products/TriangularMatrixMatrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Core/util/Memory.h"
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/error_handling/check_greater.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+#include "stan/math/error_handling/matrix/check_size_match.hpp"
+#include "stan/math/matrix/LDLT_factor.hpp"
+#include "stan/prob/distributions/univariate/continuous/chi_square.hpp"
+#include "stan/prob/distributions/univariate/continuous/normal.hpp"
+
+namespace stan {
+namespace math {
+template <typename T, int R, int C> class LDLT_factor;
+}  // namespace math
+}  // namespace stan
 
 namespace stan {
 

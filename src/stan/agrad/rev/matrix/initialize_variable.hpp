@@ -1,9 +1,12 @@
 #ifndef STAN__AGRAD__REV__MATRIX__INITIALIZE_VARIABLE_HPP
 #define STAN__AGRAD__REV__MATRIX__INITIALIZE_VARIABLE_HPP
 
-#include <vector>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace agrad {

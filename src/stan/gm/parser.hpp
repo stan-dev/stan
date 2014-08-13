@@ -1,26 +1,31 @@
 #ifndef STAN__GM__PARSER__PARSER__HPP
 #define STAN__GM__PARSER__PARSER__HPP
 
-#include <boost/lexical_cast.hpp>
+#include <boost/config/warning_disable.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_object.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/qi_numeric.hpp>
 #include <boost/spirit/include/support_multi_pass.hpp>
+#include <boost/spirit/include/version.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
-
-#include <boost/spirit/include/version.hpp>
-#include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
-
+#include <stan/gm/ast.hpp>
+#include <stan/gm/grammars/expression07_grammar.hpp>
+#include <stan/gm/grammars/expression_grammar.hpp>
+#include <stan/gm/grammars/program_grammar.hpp>
+#include <stan/gm/grammars/statement_grammar.hpp>
+#include <stan/gm/grammars/var_decls_grammar.hpp>
+#include <stan/gm/grammars/whitespace_grammar.hpp>
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -28,19 +33,28 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
-#include <stdexcept>
 
-#include <stan/gm/ast.hpp>
+#include "boost/concept/usage.hpp"
+#include "boost/iterator/iterator_facade.hpp"
+#include "boost/spirit/home/phoenix/core/value.hpp"
+#include "boost/spirit/home/phoenix/object/construct.hpp"
+#include "boost/spirit/home/phoenix/object/detail/construct.hpp"
+#include "boost/spirit/home/qi/detail/parse_auto.hpp"
+#include "boost/spirit/home/qi/parse.hpp"
+#include "boost/spirit/home/qi/parse_attr.hpp"
+#include "boost/spirit/home/support/iterators/multi_pass.hpp"
 
-#include <stan/gm/grammars/program_grammar.hpp>
-#include <stan/gm/grammars/whitespace_grammar.hpp>
-#include <stan/gm/grammars/expression_grammar.hpp>
-#include <stan/gm/grammars/expression07_grammar.hpp>
-#include <stan/gm/grammars/statement_grammar.hpp>
-#include <stan/gm/grammars/var_decls_grammar.hpp>
+namespace boost {
+namespace spirit {
+namespace qi {
+template <typename Iterator> struct expectation_failure;
+}  // namespace qi
+}  // namespace spirit
+}  // namespace boost
 
 namespace stan {
 

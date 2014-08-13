@@ -1,19 +1,20 @@
 #ifndef STAN__GM__GENERATOR_HPP
 #define STAN__GM__GENERATOR_HPP
 
-#include <boost/variant/apply_visitor.hpp>
 #include <boost/lexical_cast.hpp>
-
+#include <boost/variant/apply_visitor.hpp>
+#include <stan/gm/ast.hpp>
+#include <stan/version.hpp>
 #include <cstddef>
 #include <iostream>
 #include <ostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include <stan/version.hpp>
-#include <stan/gm/ast.hpp>
+#include "boost/variant/detail/apply_visitor_unary.hpp"
 
 namespace stan {
 

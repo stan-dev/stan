@@ -1,10 +1,14 @@
 #ifndef STAN__MATH__MATRIX__SEGMENT_HPP
 #define STAN__MATH__MATRIX__SEGMENT_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <vector>
 #include <stan/math/error_handling/check_greater.hpp>
 #include <stan/math/error_handling/check_less_or_equal.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 
 namespace stan {

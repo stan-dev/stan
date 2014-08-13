@@ -3,15 +3,34 @@
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/internal/vvv_vari.hpp>
-#include <stan/agrad/rev/internal/vvd_vari.hpp>
-#include <stan/agrad/rev/internal/vdv_vari.hpp>
-#include <stan/agrad/rev/internal/vdd_vari.hpp>
-#include <stan/agrad/rev/internal/dvv_vari.hpp>
-#include <stan/agrad/rev/internal/dvd_vari.hpp>
 #include <stan/agrad/rev/internal/ddv_vari.hpp>
+#include <stan/agrad/rev/internal/dvd_vari.hpp>
+#include <stan/agrad/rev/internal/dvv_vari.hpp>
+#include <stan/agrad/rev/internal/vdd_vari.hpp>
+#include <stan/agrad/rev/internal/vdv_vari.hpp>
+#include <stan/agrad/rev/internal/vvd_vari.hpp>
+#include <stan/agrad/rev/internal/vvv_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/functions/ibeta.hpp>
+#include <algorithm>
+#include <cmath>
+#include <complex>
+#include <ostream>
+
+#include "boost/format/alt_sstream.hpp"
+#include "boost/format/alt_sstream_impl.hpp"
+#include "boost/format/format_implementation.hpp"
+#include "boost/math/constants/constants.hpp"
+#include "boost/math/special_functions/beta.hpp"
+#include "boost/optional/optional.hpp"
+#include "stan/agrad/rev/internal/ddv_vari.hpp"
+#include "stan/agrad/rev/internal/dvd_vari.hpp"
+#include "stan/agrad/rev/internal/dvv_vari.hpp"
+#include "stan/agrad/rev/internal/vdd_vari.hpp"
+#include "stan/agrad/rev/internal/vdv_vari.hpp"
+#include "stan/agrad/rev/internal/vvd_vari.hpp"
+#include "stan/agrad/rev/internal/vvv_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

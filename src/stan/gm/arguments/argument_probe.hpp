@@ -1,11 +1,10 @@
 #ifndef STAN__GM__ARGUMENTS__ARGUMENT__PROBE__HPP
 #define STAN__GM__ARGUMENTS__ARGUMENT__PROBE__HPP
 
+#include <stan/gm/arguments/argument.hpp>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
-
-#include <stan/gm/arguments/argument.hpp>
 
 namespace stan {
   

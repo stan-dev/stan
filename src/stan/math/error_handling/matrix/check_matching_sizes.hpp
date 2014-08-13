@@ -1,11 +1,11 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_MATCHING_SIZES_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_MATCHING_SIZES_HPP
 
-#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/meta/traits.hpp>
 #include <string>
 #include <typeinfo>
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
 
 namespace stan {
   namespace math {

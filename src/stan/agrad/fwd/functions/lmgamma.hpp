@@ -2,9 +2,11 @@
 #define STAN__AGRAD__FWD__FUNCTIONS__LMGAMMA_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/functions/digamma.hpp>
 #include <stan/math/functions/lmgamma.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
+#include <complex>
 
 namespace stan {
 

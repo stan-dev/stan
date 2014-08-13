@@ -1,11 +1,15 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__POW_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__POW_HPP
 
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/agrad/fwd/functions/inv.hpp>
 #include <stan/agrad/fwd/functions/inv_sqrt.hpp>
 #include <stan/agrad/fwd/functions/inv_square.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
+#include <complex>
+
+#include "stan/math/functions/square.hpp"
 
 namespace stan {
 

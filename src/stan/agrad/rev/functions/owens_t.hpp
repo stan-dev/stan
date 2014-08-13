@@ -1,12 +1,19 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__OWENS__T_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__OWENS__T_HPP
 
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/internal/vv_vari.hpp>
-#include <stan/agrad/rev/internal/vd_vari.hpp>
-#include <stan/agrad/rev/internal/dv_vari.hpp>
-#include <stan/math/constants.hpp>
 #include <boost/math/special_functions/owens_t.hpp>
+#include <math.h>
+#include <stan/agrad/rev/internal/dv_vari.hpp>
+#include <stan/agrad/rev/internal/vd_vari.hpp>
+#include <stan/agrad/rev/internal/vv_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/math/constants.hpp>
+
+#include "boost/math/special_functions/erf.hpp"
+#include "stan/agrad/rev/internal/dv_vari.hpp"
+#include "stan/agrad/rev/internal/vd_vari.hpp"
+#include "stan/agrad/rev/internal/vv_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

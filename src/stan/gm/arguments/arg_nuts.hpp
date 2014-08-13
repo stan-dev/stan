@@ -1,9 +1,10 @@
 #ifndef STAN__GM__ARGUMENTS__NUTS__HMC__HPP
 #define STAN__GM__ARGUMENTS__NUTS__HMC__HPP
 
-#include <stan/gm/arguments/categorical_argument.hpp>
-
 #include <stan/gm/arguments/arg_max_depth.hpp>
+#include <stan/gm/arguments/categorical_argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

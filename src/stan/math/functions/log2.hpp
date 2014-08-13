@@ -1,9 +1,11 @@
 #ifndef STAN__MATH__FUNCTIONS__LOG2_HPP
 #define STAN__MATH__FUNCTIONS__LOG2_HPP
 
-#include <stdexcept>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/constants.hpp>
+#include <cmath>
+#include <complex>
+#include <stdexcept>
 
 namespace stan {
 

@@ -1,11 +1,14 @@
 #ifndef STAN__AGRAD__REV__MATRIX__TO_VAR_HPP
 #define STAN__AGRAD__REV__MATRIX__TO_VAR_HPP
 
-#include <vector>
+#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <new>
+#include <vector>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
 
 namespace stan {
   namespace agrad {

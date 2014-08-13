@@ -1,12 +1,14 @@
 #ifndef STAN__AGRAD__REV__MATRIX__DOT_SELF_HPP
 #define STAN__AGRAD__REV__MATRIX__DOT_SELF_HPP
 
-#include <vector>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_vector.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/matrix/dot_product.hpp>
+#include <stan/math/error_handling/matrix/check_vector.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace agrad {

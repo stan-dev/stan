@@ -2,9 +2,11 @@
 #define STAN__AGRAD__FWD__FUNCTIONS__PHI_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
-#include <stan/math/functions/Phi.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/math/functions/Phi.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
+#include <complex>
 
 namespace stan {
 

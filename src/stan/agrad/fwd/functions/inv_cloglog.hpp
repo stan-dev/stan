@@ -2,8 +2,10 @@
 #define STAN__AGRAD__FWD__FUNCTIONS__INV_CLOGLOG_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/functions/inv_cloglog.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
+#include <complex>
 
 namespace stan {
 

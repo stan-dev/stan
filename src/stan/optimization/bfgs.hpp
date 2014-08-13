@@ -1,19 +1,27 @@
 #ifndef STAN__OPTIMIZATION__BFGS_HPP
 #define STAN__OPTIMIZATION__BFGS_HPP
 
-#include <cmath>
-#include <cstdlib>
-#include <string>
-#include <limits>
-
 #include <boost/math/special_functions/fpclassify.hpp>
-
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/model/util.hpp>
-
 #include <stan/optimization/bfgs_linesearch.hpp>
 #include <stan/optimization/bfgs_update.hpp>
 #include <stan/optimization/lbfgs_update.hpp>
+#include <stddef.h>
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <exception>
+#include <limits>
+#include <ostream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "stan/math/matrix/EigenDenseBaseAddons.h"
 
 namespace stan {
   namespace optimization {

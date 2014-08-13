@@ -1,11 +1,15 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__HYPOT_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__HYPOT_HPP
 
-#include <valarray>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/internal/vv_vari.hpp>
-#include <stan/agrad/rev/internal/v_vari.hpp>
 #include <boost/math/special_functions/hypot.hpp>
+#include <stan/agrad/rev/internal/v_vari.hpp>
+#include <stan/agrad/rev/internal/vv_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <valarray>
+
+#include "stan/agrad/rev/internal/v_vari.hpp"
+#include "stan/agrad/rev/internal/vv_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

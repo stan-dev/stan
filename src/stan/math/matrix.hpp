@@ -4,10 +4,11 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/accumulator.hpp>
 #include <stan/math/matrix/add.hpp>
+#include <stan/math/matrix/append_col.hpp>
+#include <stan/math/matrix/append_row.hpp>
 #include <stan/math/matrix/array_builder.hpp>
 #include <stan/math/matrix/assign.hpp>
 #include <stan/math/matrix/block.hpp>
-#include <stan/math/matrix/append_col.hpp>
 #include <stan/math/matrix/cholesky_decompose.hpp>
 #include <stan/math/matrix/col.hpp>
 #include <stan/math/matrix/cols.hpp>
@@ -24,7 +25,6 @@
 #include <stan/math/matrix/diagonal.hpp>
 #include <stan/math/matrix/dims.hpp>
 #include <stan/math/matrix/distance.hpp>
-#include <stan/math/matrix/squared_distance.hpp>
 #include <stan/math/matrix/divide.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/dot_self.hpp>
@@ -68,7 +68,6 @@
 #include <stan/math/matrix/quad_form.hpp>
 #include <stan/math/matrix/quad_form_diag.hpp>
 #include <stan/math/matrix/rank.hpp>
-#include <stan/math/matrix/append_row.hpp>
 #include <stan/math/matrix/resize.hpp>
 #include <stan/math/matrix/row.hpp>
 #include <stan/math/matrix/rows.hpp>
@@ -81,6 +80,7 @@
 #include <stan/math/matrix/softmax.hpp>
 #include <stan/math/matrix/sort.hpp>
 #include <stan/math/matrix/sort_indices.hpp>
+#include <stan/math/matrix/squared_distance.hpp>
 #include <stan/math/matrix/stan_print.hpp>
 #include <stan/math/matrix/sub_col.hpp>
 #include <stan/math/matrix/sub_row.hpp>

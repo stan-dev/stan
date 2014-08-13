@@ -2,9 +2,10 @@
 #define STAN__MATH__FUNCTIONS__LOG_DIFF_EXP_HPP
 
 #include <boost/math/tools/promotion.hpp>
-#include <stdexcept>
 #include <boost/throw_exception.hpp>
 #include <stan/math/functions/log1m_exp.hpp>
+#include <limits>
+#include <stdexcept>
 
 namespace stan {
   namespace math {

@@ -1,14 +1,20 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_LOGIT_LOG_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_LOGIT_LOG_HPP
 
-#include <vector>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/matrix/log_softmax.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
+#include <stan/math/matrix/log_softmax.hpp>
 #include <stan/math/matrix/log_sum_exp.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/prob/traits.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "stan/math/error_handling/check_bounded.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
 
 namespace stan {
 

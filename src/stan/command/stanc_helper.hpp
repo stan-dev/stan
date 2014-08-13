@@ -1,13 +1,16 @@
-#include <stan/version.hpp>
+#include <ctype.h>
 #include <stan/gm/compiler.hpp>
-
+#include <stan/io/cmd_line.hpp>
+#include <stan/version.hpp>
+#include <stddef.h>
+#include <stdio.h>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 
-#include <stan/io/cmd_line.hpp>
+#include "stan/gm/ast.hpp"
 
 void print_version(std::ostream* out_stream) {
   if (!out_stream) return;

@@ -1,37 +1,62 @@
 #ifndef STAN__MCMC__CHAINS_HPP
 #define STAN__MCMC__CHAINS_HPP
 
-#include <algorithm>
-#include <cmath>
-#include <iostream>
-#include <map>
-#include <stdexcept>
-#include <string>
-#include <sstream>
-#include <utility>
-#include <vector>
-#include <fstream>
-#include <cstdlib>
-
 #include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/tail_quantile.hpp>
-#include <boost/accumulators/statistics/p_square_quantile.hpp>
-#include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/covariance.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/p_square_quantile.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/tail_quantile.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/variates/covariate.hpp>
-
-
-#include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/additive_combine.hpp>
-
+#include <boost/random/uniform_int_distribution.hpp>
+#include <stan/io/stan_csv_reader.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/variance.hpp>
 #include <stan/prob/autocorrelation.hpp>
 #include <stan/prob/autocovariance.hpp>
+#include <stddef.h>
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <new>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include <stan/io/stan_csv_reader.hpp>
+#include "Eigen/src/Core/../plugins/ArrayCwiseBinaryOps.h"
+#include "Eigen/src/Core/../plugins/ArrayCwiseUnaryOps.h"
+#include "Eigen/src/Core/../plugins/BlockMethods.h"
+#include "Eigen/src/Core/../plugins/CommonCwiseUnaryOps.h"
+#include "Eigen/src/Core/ArrayBase.h"
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/CwiseUnaryOp.h"
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/Redux.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Core/util/Macros.h"
+#include "boost/accumulators/framework/accumulator_set.hpp"
+#include "boost/accumulators/framework/extractor.hpp"
+#include "boost/accumulators/statistics/parameters/quantile_probability.hpp"
+#include "boost/accumulators/statistics/tail.hpp"
+#include "boost/accumulators/statistics_fwd.hpp"
+#include "boost/parameter/aux_/tagged_argument.hpp"
+#include "boost/parameter/keyword.hpp"
+
+namespace boost {
+namespace accumulators {
+namespace tag {
+template <typename LeftRight> struct tail_quantile;
+}  // namespace tag
+}  // namespace accumulators
+}  // namespace boost
 
 namespace stan {  
 

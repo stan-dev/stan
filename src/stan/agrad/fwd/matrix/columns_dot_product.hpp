@@ -1,16 +1,20 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__COLUMNS__DOT_PRODUCT_HPP
 #define STAN__AGRAD__FWD__MATRIX__COLUMNS__DOT_PRODUCT_HPP
 
-#include <vector>
+#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/agrad/fwd/matrix/dot_product.hpp>
+#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/math/error_handling/matrix/check_matching_dims.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_matching_dims.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/dot_product.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace agrad {
+
+template <typename T> struct fvar;
 
     template<typename T, int R1,int C1,int R2, int C2>
     inline 

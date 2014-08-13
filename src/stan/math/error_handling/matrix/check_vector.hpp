@@ -1,10 +1,13 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_VECTOR_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_VECTOR_HPP
 
-#include <sstream>
-#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/meta/traits.hpp>
+#include <sstream>
+#include <string>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

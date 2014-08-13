@@ -1,10 +1,21 @@
 #ifndef STAN__COMMON__INIT_WINDOWED_ADAPT_HPP
 #define STAN__COMMON__INIT_WINDOWED_ADAPT_HPP
 
-#include <stan/mcmc/base_mcmc.hpp>
+#include <stan/common/init_adapt.hpp>
 #include <stan/gm/arguments/categorical_argument.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/common/init_adapt.hpp>
+#include <stan/mcmc/base_mcmc.hpp>
+#include <iostream>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "stan/gm/arguments/argument.hpp"
+#include "stan/gm/arguments/singleton_argument.hpp"
+
+namespace stan {
+namespace mcmc {
+class base_mcmc;
+}  // namespace mcmc
+}  // namespace stan
 
 namespace stan {
   namespace common {

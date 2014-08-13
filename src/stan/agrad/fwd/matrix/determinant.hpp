@@ -1,16 +1,19 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__DETERMINANT_HPP
 #define STAN__AGRAD__FWD__MATRIX__DETERMINANT_HPP
 
-#include <vector>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/math/matrix/multiply.hpp>
-#include <stan/agrad/fwd/matrix/multiply.hpp>
-#include <stan/math/matrix/inverse.hpp>
 #include <stan/agrad/fwd/matrix/inverse.hpp>
+#include <stan/agrad/fwd/matrix/multiply.hpp>
+#include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/inverse.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "stan/agrad/rev/matrix/typedefs.hpp"
 
 namespace stan {
   namespace agrad {

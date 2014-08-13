@@ -1,10 +1,14 @@
 #ifndef STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP
 #define STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/math/error_handling/check_equal.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stdexcept>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   namespace math {

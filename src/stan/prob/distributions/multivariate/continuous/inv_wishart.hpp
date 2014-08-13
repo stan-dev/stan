@@ -1,17 +1,33 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP
 
-#include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
-#include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
+#include <stan/math/error_handling/check_greater.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
-#include <stan/math/error_handling/check_greater.hpp>
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/meta/traits.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
+#include <stan/prob/traits.hpp>
+
+#include "Eigen/src/Cholesky/LDLT.h"
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/functions/lmgamma.hpp"
+#include "stan/math/matrix/EigenDenseBaseAddons.h"
+#include "stan/math/matrix/LDLT_factor.hpp"
+#include "stan/math/matrix/trace.hpp"
+
+namespace stan {
+namespace math {
+template <typename T, int R, int C> class LDLT_factor;
+}  // namespace math
+}  // namespace stan
 
 namespace stan {
   namespace prob {

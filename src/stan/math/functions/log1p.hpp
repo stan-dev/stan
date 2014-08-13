@@ -1,8 +1,9 @@
 #ifndef STAN__MATH__FUNCTIONS__LOG1P_HPP
 #define STAN__MATH__FUNCTIONS__LOG1P_HPP
 
-#include <limits>
 #include <boost/math/tools/promotion.hpp>
+#include <cmath>
+#include <limits>
 
 namespace stan {
   namespace math {

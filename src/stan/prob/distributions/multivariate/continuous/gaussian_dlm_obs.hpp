@@ -3,17 +3,12 @@
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/math/error_handling/dom_err.hpp>
-#include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
+#include <math.h>
 #include <stan/agrad/rev.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 #include <stan/agrad/rev/matrix/to_var.hpp>
-
+#include <stan/math/error_handling.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/add.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/inverse_spd.hpp>
@@ -25,6 +20,19 @@
 #include <stan/math/matrix/tcrossprod.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
 #include <stan/math/matrix/transpose.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/meta/traits.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_nonnegative.hpp"
+#include "stan/math/error_handling/check_not_nan.hpp"
+#include "stan/math/error_handling/matrix/check_cov_matrix.hpp"
+#include "stan/math/error_handling/matrix/check_size_match.hpp"
+#include "stan/math/error_handling/matrix/check_spsd_matrix.hpp"
 
 /*
   TODO: time-varying system matrices

@@ -5,6 +5,11 @@
 #include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <Eigen/QR>
+#include <cstddef>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/QR/HouseholderQR.h"
 
 namespace stan {
   namespace math {

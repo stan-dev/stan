@@ -3,6 +3,10 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/SVD/JacobiSVD.h"
+
 namespace stan {
   namespace math {
 

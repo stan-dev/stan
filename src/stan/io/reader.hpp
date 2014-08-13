@@ -3,6 +3,25 @@
 
 #include <boost/throw_exception.hpp>
 #include <stan/prob/transform.hpp>
+#include <cstddef>
+#include <stdexcept>
+#include <vector>
+
+#include "Eigen/src/Core/Map.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "stan/math/error_handling/check_bounded.hpp"
+#include "stan/math/error_handling/check_greater_or_equal.hpp"
+#include "stan/math/error_handling/check_less_or_equal.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+#include "stan/math/error_handling/matrix/check_cholesky_factor.hpp"
+#include "stan/math/error_handling/matrix/check_cholesky_factor_corr.hpp"
+#include "stan/math/error_handling/matrix/check_corr_matrix.hpp"
+#include "stan/math/error_handling/matrix/check_cov_matrix.hpp"
+#include "stan/math/error_handling/matrix/check_ordered.hpp"
+#include "stan/math/error_handling/matrix/check_positive_ordered.hpp"
+#include "stan/math/error_handling/matrix/check_simplex.hpp"
+#include "stan/math/error_handling/matrix/check_unit_vector.hpp"
 
 namespace stan {
 

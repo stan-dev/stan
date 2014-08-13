@@ -1,10 +1,14 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__INV_SQRT_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__INV_SQRT_HPP
 
-#include <valarray>
-#include <stan/agrad/rev/var.hpp>
+#include <math.h>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/functions/inv_sqrt.hpp>
+#include <valarray>
+
+#include "stan/agrad/rev/internal/v_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

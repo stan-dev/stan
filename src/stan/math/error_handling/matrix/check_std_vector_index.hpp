@@ -1,9 +1,11 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_STD_VECTOR_INDEX_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_STD_VECTOR_INDEX_HPP
 
-#include <sstream>
-#include <vector>
 #include <stan/math/error_handling/dom_err.hpp>
+#include <stddef.h>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace math {

@@ -2,15 +2,19 @@
 #define STAN__AGRAD__FWD__SORT_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
-#include <vector>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/meta/traits.hpp>
 #include <algorithm>    // std::sort
 #include <functional>   // std::greater
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
 
   namespace agrad {
+
+template <typename T> struct fvar;
 
     template <typename T>
     inline

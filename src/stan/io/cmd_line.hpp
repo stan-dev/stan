@@ -1,11 +1,13 @@
 #ifndef STAN__IO__CMD_LINE_HPP
 #define STAN__IO__CMD_LINE_HPP
 
+#include <stddef.h>
 #include <map>
 #include <ostream>
 #include <set>
-#include <string>
 #include <sstream>
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace stan {

@@ -3,6 +3,11 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/mcmc/hmc/integrators/base_leapfrog.hpp>
+#include <iosfwd>
+
+#include "Eigen/src/Core/Map.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/Stride.h"
 
 namespace stan {
   

@@ -1,10 +1,12 @@
 #ifndef STAN__MATH__FUNCTIONS__LOG_SUM_EXP_HPP
 #define STAN__MATH__FUNCTIONS__LOG_SUM_EXP_HPP
 
-#include <stan/math/functions/log1p_exp.hpp>
-#include <vector>
 #include <boost/math/tools/promotion.hpp>
+#include <stan/math/functions/log1p_exp.hpp>
+#include <stddef.h>
+#include <cmath>
 #include <limits>
+#include <vector>
 
 namespace stan {
   namespace math {

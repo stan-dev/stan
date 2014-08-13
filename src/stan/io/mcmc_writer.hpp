@@ -1,16 +1,17 @@
 #ifndef STAN__IO__MCMC__WRITER__HPP
 #define STAN__IO__MCMC__WRITER__HPP
 
-#include <ostream>
-#include <iomanip>
-#include <string>
-#include <vector>
-
+#include <stan/common/recorder/csv.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
+#include <iomanip>
+#include <ostream>
+#include <string>
+#include <vector>
 
-#include <stan/common/recorder/csv.hpp>
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   

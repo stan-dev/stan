@@ -1,10 +1,17 @@
 #ifndef STAN__MCMC__UNIT__E__NUTS__BETA
 #define STAN__MCMC__UNIT__E__NUTS__BETA
 
-#include <stan/mcmc/hmc/nuts/base_nuts.hpp>
-#include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
+#include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
+#include <stan/mcmc/hmc/nuts/base_nuts.hpp>
+#include <iostream>
+
+#include "Eigen/src/Core/../plugins/CommonCwiseBinaryOps.h"
+#include "Eigen/src/Core/Dot.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/MatrixBase.h"
+#include "stan/mcmc/hmc/hamiltonians/ps_point.hpp"
 
 namespace stan {
 

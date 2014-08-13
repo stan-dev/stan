@@ -2,8 +2,12 @@
 #define STAN__MATH__MATRIX__SOFTMAX_HPP
 
 #include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
-#include <cmath>
 #include <stan/math/matrix/Eigen.hpp>
+#include <cmath>
+#include <complex>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   namespace math {

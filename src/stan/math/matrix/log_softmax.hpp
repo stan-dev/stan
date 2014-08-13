@@ -1,12 +1,16 @@
 #ifndef STAN__MATH__MATRIX__LOG_SOFTMAX_HPP
 #define STAN__MATH__MATRIX__LOG_SOFTMAX_HPP
 
-#include <cmath>
-#include <sstream>
-#include <stdexcept>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/log_sum_exp.hpp>
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
+#include <cmath>
+#include <complex>
+#include <sstream>
+#include <stdexcept>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   namespace math {

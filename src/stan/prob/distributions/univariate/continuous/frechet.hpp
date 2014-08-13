@@ -1,9 +1,9 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__FRECHET_HPP
 #define STAN__PROB__DISTRIBUTIONS__FRECHET_HPP
 
-#include <boost/random/weibull_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
+#include <boost/random/weibull_distribution.hpp>
+#include <math.h>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/multiply_log.hpp>
@@ -11,6 +11,15 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <cstddef>
+
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/error_handling/check_consistent_sizes.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_nonnegative.hpp"
+#include "stan/math/error_handling/check_not_nan.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+#include "stan/math/error_handling/check_positive_finite.hpp"
 
 namespace stan {
 

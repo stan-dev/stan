@@ -5,6 +5,10 @@
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h"
+
 namespace stan {
   namespace math {
 

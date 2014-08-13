@@ -1,11 +1,13 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__FABS_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__FABS_HPP
 
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/internal/precomp_v_vari.hpp>
 #include <stan/agrad/rev/operators/operator_unary_negative.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/vari.hpp>
 #include <stan/math/constants.hpp>
+
+#include "stan/agrad/rev/internal/precomp_v_vari.hpp"
 
 
 namespace stan {

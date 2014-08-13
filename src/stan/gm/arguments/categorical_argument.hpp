@@ -1,8 +1,10 @@
 #ifndef STAN__GM__ARGUMENTS__CATEGORY__ARGUMENT__BETA
 #define STAN__GM__ARGUMENTS__CATEGORY__ARGUMENT__BETA
 
-#include <vector>
 #include <stan/gm/arguments/argument.hpp>
+#include <ostream>
+#include <string>
+#include <vector>
 
 namespace stan {
   

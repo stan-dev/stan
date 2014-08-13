@@ -1,13 +1,25 @@
 #ifndef STAN__AGRAD__REV__MATRIX__TRACE_INV_QUAD_FORM_LDLT_HPP
 #define STAN__AGRAD__REV__MATRIX__TRACE_INV_QUAD_FORM_LDLT_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/matrix/LDLT_alloc.hpp>
-#include <stan/agrad/rev/matrix/LDLT_factor.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <stan/agrad/rev/matrix/LDLT_alloc.hpp>
+#include <stan/agrad/rev/matrix/LDLT_factor.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "stan/agrad/rev/var_stack.hpp"
+#include "stan/agrad/rev/vari.hpp"
+#include "stan/math/matrix/LDLT_factor.hpp"
+
+namespace stan {
+namespace math {
+template <typename T, int R, int C> class LDLT_factor;
+}  // namespace math
+}  // namespace stan
 
 namespace stan {
   namespace agrad {

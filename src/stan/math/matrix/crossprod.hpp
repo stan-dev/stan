@@ -1,8 +1,11 @@
 #ifndef STAN__MATH__MATRIX__CROSSPROD_HPP
 #define STAN__MATH__MATRIX__CROSSPROD_HPP
 
-#include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/tcrossprod.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+#include <new>
+
+#include "Eigen/src/Core/Transpose.h"
 
 namespace stan {
   namespace math {

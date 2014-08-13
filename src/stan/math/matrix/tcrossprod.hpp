@@ -3,6 +3,20 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
+#include <algorithm>
+#include <new>
+
+#include "Eigen/src/Core/Assign.h"
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/GeneralProduct.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/MatrixBase.h"
+#include "Eigen/src/Core/SelfAdjointView.h"
+#include "Eigen/src/Core/Transpose.h"
+#include "Eigen/src/Core/products/GeneralMatrixMatrix.h"
+#include "Eigen/src/Core/products/SelfadjointProduct.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Core/util/Memory.h"
 
 namespace stan {
   namespace math {

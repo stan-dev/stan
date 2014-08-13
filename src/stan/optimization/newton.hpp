@@ -1,11 +1,48 @@
 #ifndef STAN__OPTIMIZATION__NEWTON_HPP
 #define STAN__OPTIMIZATION__NEWTON_HPP
 
-#include <Eigen/Dense>
-#include <Eigen/Cholesky>
-#include <Eigen/Eigenvalues>
-
+#include <math.h>
 #include <stan/model/util.hpp>
+#include <Eigen/Cholesky>
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
+#include <algorithm>
+#include <cstddef>
+#include <exception>
+#include <iosfwd>
+#include <new>
+#include <vector>
+
+#include "Eigen/src/Core/../plugins/BlockMethods.h"
+#include "Eigen/src/Core/../plugins/CommonCwiseBinaryOps.h"
+#include "Eigen/src/Core/../plugins/CommonCwiseUnaryOps.h"
+#include "Eigen/src/Core/../plugins/MatrixCwiseUnaryOps.h"
+#include "Eigen/src/Core/Assign.h"
+#include "Eigen/src/Core/CwiseBinaryOp.h"
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Diagonal.h"
+#include "Eigen/src/Core/Dot.h"
+#include "Eigen/src/Core/GeneralProduct.h"
+#include "Eigen/src/Core/Map.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/MatrixBase.h"
+#include "Eigen/src/Core/NoAlias.h"
+#include "Eigen/src/Core/ProductBase.h"
+#include "Eigen/src/Core/Redux.h"
+#include "Eigen/src/Core/SelfAdjointView.h"
+#include "Eigen/src/Core/SelfCwiseBinaryOp.h"
+#include "Eigen/src/Core/Transpose.h"
+#include "Eigen/src/Core/TriangularMatrix.h"
+#include "Eigen/src/Core/Visitor.h"
+#include "Eigen/src/Core/products/SelfadjointMatrixVector.h"
+#include "Eigen/src/Core/products/SelfadjointRank2Update.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Core/util/Macros.h"
+#include "Eigen/src/Core/util/Memory.h"
+#include "Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h"
+#include "Eigen/src/Householder/Householder.h"
+#include "Eigen/src/Jacobi/Jacobi.h"
 
 namespace stan {
 

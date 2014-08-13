@@ -1,7 +1,9 @@
 #ifndef STAN__MATH__ERROR_HANDLING__DOM_ERR_HPP
 #define STAN__MATH__ERROR_HANDLING__DOM_ERR_HPP
 
+#include <string>
 #include <typeinfo>
+#include <utility>
 #ifdef BOOST_MSVC
 #  pragma warning(push) // Quiet warnings in boost/format.hpp
 #  pragma warning(disable: 4996) // _SCL_SECURE_NO_DEPRECATE
@@ -12,9 +14,12 @@
 // for example when policy macros are used to ignore errors rather than throw.
 #endif
 #include <boost/format.hpp>
-
 #include <sstream>
 #include <stdexcept>
+
+#include "boost/format/format_class.hpp"
+#include "boost/format/format_fwd.hpp"
+#include "boost/format/format_implementation.hpp"
 
 namespace stan {
   namespace math {

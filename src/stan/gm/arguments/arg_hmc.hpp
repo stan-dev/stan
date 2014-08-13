@@ -1,12 +1,13 @@
 #ifndef STAN__GM__ARGUMENTS__HMC__HPP
 #define STAN__GM__ARGUMENTS__HMC__HPP
 
-#include <stan/gm/arguments/categorical_argument.hpp>
-
 #include <stan/gm/arguments/arg_engine.hpp>
 #include <stan/gm/arguments/arg_metric.hpp>
 #include <stan/gm/arguments/arg_stepsize.hpp>
 #include <stan/gm/arguments/arg_stepsize_jitter.hpp>
+#include <stan/gm/arguments/categorical_argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

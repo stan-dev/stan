@@ -1,14 +1,20 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_CORR_MATRIX_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_CORR_MATRIX_HPP
 
-#include <sstream>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/dom_err.hpp>
+#include <math.h>
 #include <stan/math/error_handling/check_positive.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/math/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <sstream>
+#include <string>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "stan/meta/traits.hpp"
 
 namespace stan {
   namespace math {

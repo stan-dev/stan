@@ -1,23 +1,36 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_2_HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_2_HPP
 
+#include <boost/math/special_functions/digamma.hpp>
 #include <boost/random/negative_binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
-#include <boost/math/special_functions/digamma.hpp>
+#include <math.h>
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
-#include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/error_handling.hpp>
+#include <stan/math/functions/binomial_coefficient_log.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
+#include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/internal_math.hpp>
 #include <stan/prob/distributions/univariate/continuous/gamma.hpp>
 #include <stan/prob/distributions/univariate/discrete/poisson.hpp>
-#include <stan/math/functions/binomial_coefficient_log.hpp>
+#include <stan/prob/internal_math.hpp>
+#include <stan/prob/traits.hpp>
+#include <cstddef>
+
+#include "boost/math/special_functions/gamma.hpp"
+#include "stan/math/error_handling/check_consistent_sizes.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_nonnegative.hpp"
+#include "stan/math/error_handling/check_positive_finite.hpp"
+
+namespace boost {
+namespace random {
+template <class Engine, class Distribution> class variate_generator;
+}  // namespace random
+}  // namespace boost
 
 namespace stan {
 

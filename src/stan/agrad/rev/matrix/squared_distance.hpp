@@ -1,15 +1,20 @@
 #ifndef STAN__AGRAD__REV__MATRIX__SQUARED_DISTANCE_HPP
 #define STAN__AGRAD__REV__MATRIX__SQUARED_DISTANCE_HPP
 
-#include <vector>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_vector.hpp>
-#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/functions/sqrt.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/vari.hpp>
+#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/math/error_handling/matrix/check_vector.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "stan/agrad/rev/var_stack.hpp"
+#include "stan/memory/stack_alloc.hpp"
 
 namespace stan {
   namespace agrad {

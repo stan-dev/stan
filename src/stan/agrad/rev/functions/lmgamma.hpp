@@ -1,12 +1,21 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__LMGAMMA_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__LMGAMMA_HPP
 
-#include <valarray>
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/dv_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/constants.hpp>
-#include <stan/math/functions/lmgamma.hpp>
 #include <stan/math/functions/digamma.hpp>
+#include <stan/math/functions/lmgamma.hpp>
+#include <cmath>
+#include <ostream>
+#include <valarray>
+
+#include "boost/format/alt_sstream.hpp"
+#include "boost/format/alt_sstream_impl.hpp"
+#include "boost/format/format_implementation.hpp"
+#include "boost/optional/optional.hpp"
+#include "stan/agrad/rev/internal/dv_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

@@ -1,8 +1,9 @@
 #ifndef STAN__GM__PARSER__PARSER__ITERATOR_TYPEDEFS__HPP
 #define STAN__GM__PARSER__PARSER__ITERATOR_TYPEDEFS__HPP
 
-#include <boost/spirit/include/version.hpp>
 #include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
+#include <boost/spirit/include/version.hpp>
+#include <string>
 
 namespace stan {
   namespace gm {

@@ -3,6 +3,7 @@
 
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/meta/traits.hpp>
+#include <cstddef>
 
 namespace stan {
   namespace math {

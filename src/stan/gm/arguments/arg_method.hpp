@@ -1,11 +1,12 @@
 #ifndef STAN__GM__ARGUMENTS__METHOD__HPP
 #define STAN__GM__ARGUMENTS__METHOD__HPP
 
-#include <stan/gm/arguments/list_argument.hpp>
-
-#include <stan/gm/arguments/arg_sample.hpp>
-#include <stan/gm/arguments/arg_optimize.hpp>
 #include <stan/gm/arguments/arg_diagnose.hpp>
+#include <stan/gm/arguments/arg_optimize.hpp>
+#include <stan/gm/arguments/arg_sample.hpp>
+#include <stan/gm/arguments/list_argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

@@ -1,10 +1,20 @@
 #ifndef STAN__AGRAD__REV__MATRIX__LDLT_FACTOR_HPP
 #define STAN__AGRAD__REV__MATRIX__LDLT_FACTOR_HPP
 
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/LDLT_alloc.hpp>
-#include <stan/math/matrix/LDLT_factor.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/matrix/LDLT_factor.hpp>
+#include <cstddef>
+
+#include "Eigen/src/Cholesky/LDLT.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Core/util/ForwardDeclarations.h"
+
+namespace Eigen {
+template <typename Derived> class MatrixBase;
+}  // namespace Eigen
 
 namespace stan {
   namespace math {
@@ -41,6 +51,8 @@ namespace stan {
      * ~~~
      * 
      **/
+template <typename T, int R, int C> class LDLT_factor;
+
     template<int R, int C>
     class LDLT_factor<stan::agrad::var,R,C> {
     public:

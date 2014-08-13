@@ -1,8 +1,12 @@
 #ifndef STAN__AGRAD__REV__JACOBIAN_HPP
 #define STAN__AGRAD__REV__JACOBIAN_HPP
 
-#include <vector>
 #include <stan/agrad/rev/var.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "stan/agrad/rev/chainable.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

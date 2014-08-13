@@ -2,9 +2,12 @@
 #define STAN__MATH__MATRIX__LOG_DETERMINANT_SPD_HPP
 
 
-#include <cmath>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cmath>
+#include <complex>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

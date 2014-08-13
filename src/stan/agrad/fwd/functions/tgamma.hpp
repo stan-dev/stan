@@ -1,9 +1,11 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__TGAMMA_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__TGAMMA_HPP
 
+#include <boost/math/special_functions/digamma.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
-#include <boost/math/special_functions/digamma.hpp>
+
+#include "boost/math/special_functions/math_fwd.hpp"
 
 namespace stan {
 

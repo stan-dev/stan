@@ -4,12 +4,19 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
-#include <stan/prob/constants.hpp>
-#include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/error_handling/check_consistent_sizes.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+#include "stan/math/error_handling/matrix/check_simplex.hpp"
 
 namespace stan {
 

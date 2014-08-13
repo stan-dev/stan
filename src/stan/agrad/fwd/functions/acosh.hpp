@@ -1,11 +1,13 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__ACOSH_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__ACOSH_HPP
 
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
-#include <stan/math/constants.hpp>
 #include <boost/math/special_functions/acosh.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/math/constants.hpp>
 #include <stan/math/functions/square.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
+#include <complex>
 
 namespace stan {
 

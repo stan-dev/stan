@@ -1,8 +1,12 @@
 #ifndef STAN__MATH__MATRIX__STAN_PRINT_HPP
 #define STAN__MATH__MATRIX__STAN_PRINT_HPP
 
-#include <vector>
 #include <stan/math/matrix/Eigen.hpp>
+#include <ostream>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   namespace math {

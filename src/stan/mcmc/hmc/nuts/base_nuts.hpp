@@ -1,11 +1,22 @@
 #ifndef STAN__MCMC__BASE__NUTS__BETA
 #define STAN__MCMC__BASE__NUTS__BETA
 
-#include <math.h>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <math.h>
 #include <stan/math/functions/min.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <limits>
+#include <ostream>
+#include <string>
+#include <vector>
+
+#include "Eigen/src/Core/../plugins/CommonCwiseBinaryOps.h"
+#include "Eigen/src/Core/CwiseBinaryOp.h"
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/MatrixBase.h"
+#include "stan/mcmc/sample.hpp"
 
 namespace stan {
   

@@ -1,9 +1,13 @@
 #ifndef STAN__MATH__MATRIX__CHOLESKY_DECOMPOSE_HPP
 #define STAN__MATH__MATRIX__CHOLESKY_DECOMPOSE_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+
+#include "Eigen/src/Cholesky/LLT.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   namespace math {

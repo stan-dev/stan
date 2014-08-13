@@ -1,15 +1,17 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__LOG_DETERMINANT_HPP
 #define STAN__AGRAD__FWD__MATRIX__LOG_DETERMINANT_HPP
 
-#include <vector>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/determinant.hpp>
 #include <stan/agrad/fwd/functions/fabs.hpp>
 #include <stan/agrad/fwd/functions/log.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/agrad/fwd/matrix/determinant.hpp>
+#include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace agrad {

@@ -1,9 +1,19 @@
 #ifndef STAN__COMMON__RUN_MARKOV_CHAIN_HPP
 #define STAN__COMMON__RUN_MARKOV_CHAIN_HPP
 
-#include <stan/mcmc/base_mcmc.hpp>
-#include <stan/io/mcmc_writer.hpp>
 #include <stan/common/print_progress.hpp>
+#include <stan/io/mcmc_writer.hpp>
+#include <stan/mcmc/base_mcmc.hpp>
+#include <iosfwd>
+#include <string>
+
+#include "stan/mcmc/sample.hpp"
+
+namespace stan {
+namespace io {
+template <class M, class SampleRecorder, class DiagnosticRecorder, class MessageRecorder> class mcmc_writer;
+}  // namespace io
+}  // namespace stan
 
 namespace stan {
   namespace common {

@@ -1,15 +1,20 @@
 #ifndef STAN__AGRAD__REV__MATRIX__TCROSSPROD_HPP
 #define STAN__AGRAD__REV__MATRIX__TCROSSPROD_HPP
 
-#include <vector>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/Eigen_NumTraits.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/agrad/rev/matrix/dot_self.hpp>
+#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+#include <new>
+#include <vector>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "stan/agrad/rev/var_stack.hpp"
+#include "stan/memory/stack_alloc.hpp"
 
 namespace stan {
   namespace agrad {
@@ -20,6 +25,8 @@ namespace stan {
      * @param M Matrix to multiply.
      * @return M times its transpose.
      */
+class vari;
+
     inline matrix_v
     tcrossprod(const matrix_v& M) {
       if (M.rows() == 0)

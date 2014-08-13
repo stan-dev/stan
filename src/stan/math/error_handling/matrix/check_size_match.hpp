@@ -1,9 +1,10 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SIZE_MATCH_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SIZE_MATCH_HPP
 
-#include <sstream>
 #include <boost/type_traits/common_type.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
+#include <sstream>
+#include <string>
 
 namespace stan {
   namespace math {

@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_NONZERO_SIZE_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_NONZERO_SIZE_HPP
 
-#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
+#include <stan/meta/traits.hpp>
 #include <string>
 #include <typeinfo>
 

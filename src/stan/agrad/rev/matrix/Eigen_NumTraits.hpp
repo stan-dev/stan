@@ -1,9 +1,32 @@
 #ifndef STAN__AGRAD__REV__MATRIX__EIGEN_NUMTRAITS_HPP
 #define STAN__AGRAD__REV__MATRIX__EIGEN_NUMTRAITS_HPP
 
-#include <limits>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cmath>
+#include <complex>
+#include <cstddef>
+#include <limits>
+
+#include "Eigen/src/Core/MathFunctions.h"
+#include "Eigen/src/Core/util/BlasUtil.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Core/util/Macros.h"
+#include "Eigen/src/Core/util/Meta.h"
+#include "stan/agrad/rev/var_stack.hpp"
+#include "stan/agrad/rev/vari.hpp"
+#include "stan/memory/stack_alloc.hpp"
+
+namespace Eigen {
+namespace internal {
+template <typename Index, typename LhsScalar, int LhsStorageOrder, bool ConjugateLhs, typename RhsScalar, bool ConjugateRhs, int Version = Specialized> struct general_matrix_vector_product;
+template <typename Index, typename LhsScalar, int LhsStorageOrder, bool ConjugateLhs, typename RhsScalar, int RhsStorageOrder, bool ConjugateRhs, int ResStorageOrder> struct general_matrix_matrix_product;
+template <typename Index> struct GemmParallelInfo;
+template <typename Scalar, bool IsInteger> struct significant_decimals_default_impl;
+template <typename _LhsScalar, typename _RhsScalar> class level3_blocking;
+}  // namespace internal
+template <typename T> struct NumTraits;
+}  // namespace Eigen
 
 namespace stan {
   namespace agrad {

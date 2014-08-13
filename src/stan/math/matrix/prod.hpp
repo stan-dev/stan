@@ -1,8 +1,11 @@
 #ifndef STAN__MATH__MATRIX__PROD_HPP
 #define STAN__MATH__MATRIX__PROD_HPP
 
-#include <vector>
 #include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

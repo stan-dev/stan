@@ -1,15 +1,19 @@
 #ifndef STAN__MCMC__BASE__HMC__BETA
 #define STAN__MCMC__BASE__HMC__BETA
 
-#include <math.h>
-#include <stdexcept>
-
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
-
+#include <boost/random/variate_generator.hpp>
+#include <math.h>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <limits>
+#include <ostream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
 

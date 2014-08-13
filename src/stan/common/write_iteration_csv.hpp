@@ -1,6 +1,7 @@
 #ifndef STAN__COMMON__WRITE_ITERATION_CSV_HPP
 #define STAN__COMMON__WRITE_ITERATION_CSV_HPP
 
+#include <stddef.h>
 #include <ostream>
 #include <vector>
 

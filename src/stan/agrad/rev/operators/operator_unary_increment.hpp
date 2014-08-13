@@ -1,8 +1,11 @@
 #ifndef STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_INCREMENT_HPP
 #define STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_INCREMENT_HPP
 
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
+
+#include "stan/agrad/rev/internal/v_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

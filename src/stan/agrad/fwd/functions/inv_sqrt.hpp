@@ -1,9 +1,11 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__INV_SQRT_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__INV_SQRT_HPP
 
+#include <boost/math/tools/promotion.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
-#include <boost/math/tools/promotion.hpp>
+#include <cmath>
+#include <complex>
 
 namespace stan {
 

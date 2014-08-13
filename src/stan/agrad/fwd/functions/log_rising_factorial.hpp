@@ -1,10 +1,10 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__LOG_RISING_FACTORIAL_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__LOG_RISING_FACTORIAL_HPP
 
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
-#include <stan/math/functions/log_rising_factorial.hpp>
 #include <boost/math/special_functions/digamma.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/math/functions/log_rising_factorial.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
 

@@ -1,10 +1,11 @@
 #ifndef STAN__GM__ARGUMENTS__BFGS__HPP
 #define STAN__GM__ARGUMENTS__BFGS__HPP
 
-#include <stan/gm/arguments/categorical_argument.hpp>
-
 #include <stan/gm/arguments/arg_init_alpha.hpp>
 #include <stan/gm/arguments/arg_tolerance.hpp>
+#include <stan/gm/arguments/categorical_argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

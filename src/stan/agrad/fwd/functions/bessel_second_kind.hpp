@@ -2,8 +2,8 @@
 #define STAN__AGRAD__FWD__FUNCTIONS__BESSEL_SECOND_KIND_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/functions/bessel_second_kind.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
 

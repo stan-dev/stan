@@ -1,10 +1,13 @@
 #ifndef STAN__MATH__MATRIX__INITIALIZE_HPP
 #define STAN__MATH__MATRIX__INITIALIZE_HPP
 
-#include <vector>
 #include <boost/type_traits/is_arithmetic.hpp> 
 #include <boost/utility/enable_if.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
 

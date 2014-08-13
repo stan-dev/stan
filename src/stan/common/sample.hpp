@@ -1,9 +1,21 @@
 #ifndef STAN__COMMON__SAMPLE_HPP
 #define STAN__COMMON__SAMPLE_HPP
 
-#include <stan/mcmc/base_mcmc.hpp>
-#include <stan/io/mcmc_writer.hpp>
 #include <stan/common/run_markov_chain.hpp>
+#include <stan/io/mcmc_writer.hpp>
+#include <stan/mcmc/base_mcmc.hpp>
+#include <iosfwd>
+#include <string>
+
+namespace stan {
+namespace io {
+template <class M, class SampleRecorder, class DiagnosticRecorder, class MessageRecorder> class mcmc_writer;
+}  // namespace io
+namespace mcmc {
+class base_mcmc;
+class sample;
+}  // namespace mcmc
+}  // namespace stan
 
 namespace stan {
   namespace common {

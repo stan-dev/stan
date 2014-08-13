@@ -1,14 +1,31 @@
 #ifndef STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_LDLT_HPP
 #define STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_LDLT_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/LDLT_alloc.hpp>
 #include <stan/agrad/rev/matrix/LDLT_factor.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+
+#include "Eigen/src/Cholesky/LDLT.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/ForwardDeclarations.h"
+#include "boost/smart_ptr/shared_ptr.hpp"
+#include "stan/agrad/rev/var_stack.hpp"
+#include "stan/agrad/rev/vari.hpp"
+#include "stan/memory/stack_alloc.hpp"
+
+namespace stan {
+namespace math {
+template <typename T, int R, int C> class LDLT_factor;
+}  // namespace math
+}  // namespace stan
 
 namespace stan {
   namespace agrad {
+class var;
+template <int R, int C> class LDLT_alloc;
+
     namespace {
       template <int R1,int C1,int R2,int C2>
       class mdivide_left_ldlt_alloc : public chainable_alloc {

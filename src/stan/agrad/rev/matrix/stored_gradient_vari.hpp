@@ -2,6 +2,7 @@
 #define STAN__AGRAD__REV__MATRIX__STORED_GRADIENT_HPP
 
 #include <stan/agrad/rev/vari.hpp>
+#include <stddef.h>
 
 namespace stan {
 

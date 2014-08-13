@@ -2,6 +2,9 @@
 #define STAN__MATH__MATRIX__COLS_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

@@ -1,11 +1,13 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__ERFC_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__ERFC_HPP
 
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <boost/math/special_functions/erf.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/square.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
+#include <complex>
 
 namespace stan {
 

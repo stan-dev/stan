@@ -1,11 +1,15 @@
 #ifndef STAN__MATH__MATRIX__LOG_SUM_EXP_HPP
 #define STAN__MATH__MATRIX__LOG_SUM_EXP_HPP
 
-#include <limits>
-#include <vector>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/functions/log1p.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <cmath>
+#include <complex>
+#include <limits>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 
 namespace stan {

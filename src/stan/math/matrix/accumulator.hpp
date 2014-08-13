@@ -1,12 +1,20 @@
 #ifndef STAN__MATH__MATRIX__ACCUMULATOR_HPP
 #define STAN__MATH__MATRIX__ACCUMULATOR_HPP
 
-#include <vector>
-#include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/sum.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+
+namespace boost {
+template <typename T, typename U> struct is_same;
+template <typename T> struct is_arithmetic;
+}  // namespace boost
 
 namespace stan {
   namespace math {

@@ -1,8 +1,13 @@
 #ifndef STAN__MCMC__ADAPT__DENSE__E__STATIC__HMC__BETA
 #define STAN__MCMC__ADAPT__DENSE__E__STATIC__HMC__BETA
 
-#include <stan/mcmc/stepsize_covar_adapter.hpp>
+#include <math.h>
 #include <stan/mcmc/hmc/static/dense_e_static_hmc.hpp>
+#include <stan/mcmc/stepsize_covar_adapter.hpp>
+#include <iostream>
+
+#include "stan/mcmc/base_adapter.hpp"
+#include "stan/mcmc/sample.hpp"
 
 namespace stan {
   

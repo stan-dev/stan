@@ -2,6 +2,7 @@
 #define STAN__MATH__FUNCTIONS__EXP2_HPP
 
 #include <boost/math/tools/promotion.hpp>
+#include <cmath>
 
 namespace stan {
 

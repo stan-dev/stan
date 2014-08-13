@@ -1,8 +1,9 @@
 #ifndef STAN__AGRAD__REV__NUMERIC_LIMITS_HPP
 #define STAN__AGRAD__REV__NUMERIC_LIMITS_HPP
 
-#include <limits>
 #include <stan/agrad/rev/var.hpp>
+#include <cmath>
+#include <limits>
 
 namespace std {
 

@@ -3,6 +3,7 @@
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/functions/inv_logit.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {

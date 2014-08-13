@@ -1,16 +1,19 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__MULTIPLY_HPP
 #define STAN__AGRAD__FWD__MATRIX__MULTIPLY_HPP
 
-#include <vector>
 #include <boost/math/tools/promotion.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/agrad/fwd/matrix/dot_product.hpp>
+#include <stan/agrad/fwd/matrix/to_fvar.hpp>
+#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/agrad/fwd/operators/operator_multiplication.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/to_fvar.hpp>
-#include <stan/agrad/fwd/matrix/dot_product.hpp>
-#include <stan/agrad/fwd/operators/operator_multiplication.hpp>
+#include <stdexcept>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace agrad {

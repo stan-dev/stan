@@ -1,10 +1,11 @@
 #ifndef STAN__GM__ARGUMENTS__ENGINE__HPP
 #define STAN__GM__ARGUMENTS__ENGINE__HPP
 
-#include <stan/gm/arguments/list_argument.hpp>
-
-#include <stan/gm/arguments/arg_static.hpp>
 #include <stan/gm/arguments/arg_nuts.hpp>
+#include <stan/gm/arguments/arg_static.hpp>
+#include <stan/gm/arguments/list_argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

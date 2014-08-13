@@ -1,10 +1,12 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__ASINH_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__ASINH_HPP
 
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <boost/math/special_functions/asinh.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/functions/square.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
+#include <complex>
 
 namespace stan {
 

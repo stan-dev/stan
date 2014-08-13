@@ -1,6 +1,7 @@
 #ifndef STAN__AGRAD__REV__CALCULATE_CHAIN_HPP
 #define STAN__AGRAD__REV__CALCULATE_CHAIN_HPP
 
+#include <math.h>
 #include <valarray>
 
 namespace stan {

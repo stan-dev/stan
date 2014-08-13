@@ -1,9 +1,21 @@
 #ifndef STAN__AGRAD__AUTO_DIFF_HPP
 #define STAN__AGRAD__AUTO_DIFF_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev.hpp>
 #include <stan/agrad/fwd.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <exception>
+#include <new>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "stan/agrad/fwd/fvar.hpp"
+#include "stan/agrad/rev/chainable.hpp"
+#include "stan/agrad/rev/operators/operator_plus_equal.hpp"
+#include "stan/agrad/rev/var.hpp"
+#include "stan/agrad/rev/var_stack.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   

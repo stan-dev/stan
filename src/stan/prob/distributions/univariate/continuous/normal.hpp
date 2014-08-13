@@ -4,13 +4,22 @@
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/utility/enable_if.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <cmath>
+#include <complex>
+#include <cstddef>
+
+#include "stan/math/constants.hpp"
+#include "stan/math/error_handling/check_consistent_sizes.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_not_nan.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+#include "stan/math/functions/value_of.hpp"
 
 namespace stan {
 

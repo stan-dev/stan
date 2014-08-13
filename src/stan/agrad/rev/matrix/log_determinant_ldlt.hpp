@@ -1,13 +1,25 @@
 #ifndef STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_LDLT_HPP
 #define STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_LDLT_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/LDLT_alloc.hpp>
 #include <stan/agrad/rev/matrix/LDLT_factor.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "stan/agrad/rev/vari.hpp"
+
+namespace stan {
+namespace math {
+template <typename T, int R, int C> class LDLT_factor;
+}  // namespace math
+}  // namespace stan
 
 namespace stan {
   namespace agrad {
+template <int R, int C> class LDLT_alloc;
+
     namespace {
 
     /**

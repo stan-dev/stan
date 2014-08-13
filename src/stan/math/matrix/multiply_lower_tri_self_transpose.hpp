@@ -2,6 +2,19 @@
 #define STAN__MATH__MATRIX__MULTIPLY_LOWER_TRI_SELF_HPP
 
 #include <stan/math/matrix/typedefs.hpp>
+#include <algorithm>
+#include <new>
+
+#include "Eigen/src/Core/Assign.h"
+#include "Eigen/src/Core/DenseBase.h"
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/MatrixBase.h"
+#include "Eigen/src/Core/Transpose.h"
+#include "Eigen/src/Core/TriangularMatrix.h"
+#include "Eigen/src/Core/products/TriangularMatrixMatrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Core/util/Memory.h"
 
 namespace stan {
   namespace math {

@@ -1,10 +1,13 @@
 #ifndef STAN__MATH__MATRIX__APPEND__COL_HPP
 #define STAN__MATH__MATRIX__APPEND__COL_HPP
 
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/meta/traits.hpp> //stan::return_type
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
 #include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   namespace math {

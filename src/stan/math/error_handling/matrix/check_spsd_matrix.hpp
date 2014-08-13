@@ -1,12 +1,15 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SPSD_MATRIX_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SPSD_MATRIX_HPP
 
-#include <sstream>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/check_positive.hpp>
 #include <stan/math/error_handling/matrix/check_pos_semidefinite.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <sstream>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   namespace math {

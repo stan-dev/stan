@@ -1,11 +1,13 @@
 #ifndef STAN__MATH__MATRIX__TRACE_QUAD_FORM_HPP
 #define STAN__MATH__MATRIX__TRACE_QUAD_FORM_HPP
 
-#include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
-#include <stan/math/matrix/Eigen.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

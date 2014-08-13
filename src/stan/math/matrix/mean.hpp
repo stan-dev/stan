@@ -1,10 +1,13 @@
 #ifndef STAN__MATH__MATRIX__MEAN_HPP
 #define STAN__MATH__MATRIX__MEAN_HPP
 
-#include <vector>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

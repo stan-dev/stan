@@ -3,6 +3,9 @@
 
 #include <boost/spirit/include/qi.hpp>
 
+#include "boost/spirit/home/qi/nonterminal/grammar.hpp"
+#include "boost/spirit/home/qi/nonterminal/rule.hpp"
+
 namespace stan { 
 
   namespace gm {

@@ -3,6 +3,9 @@
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/agrad/rev.hpp>
+#include <cmath>
+
+#include "stan/agrad/rev/var.hpp"
 
 namespace boost {
 

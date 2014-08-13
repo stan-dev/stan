@@ -6,6 +6,9 @@
 #include <stan/math/matrix/mdivide_right_tri.hpp>
 #include <stan/math/matrix/promote_common.hpp>
 
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+
 namespace stan {
   namespace math {
 

@@ -1,8 +1,21 @@
 #ifndef STAN__PROB__WELFORD__VAR__ESTIMATOR__BETA
 #define STAN__PROB__WELFORD__VAR__ESTIMATOR__BETA
 
-#include <vector>
 #include <stan/math/matrix/Eigen.hpp>
+#include <new>
+#include <vector>
+
+#include "Eigen/src/Core/../plugins/CommonCwiseBinaryOps.h"
+#include "Eigen/src/Core/../plugins/CommonCwiseUnaryOps.h"
+#include "Eigen/src/Core/../plugins/MatrixCwiseBinaryOps.h"
+#include "Eigen/src/Core/Assign.h"
+#include "Eigen/src/Core/CwiseBinaryOp.h"
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/CwiseUnaryOp.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/MatrixBase.h"
+#include "Eigen/src/Core/Transpose.h"
+#include "Eigen/src/Core/util/Memory.h"
 
 namespace stan {
   

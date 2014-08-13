@@ -1,18 +1,26 @@
 #ifndef STAN__IO__DUMP_HPP
 #define STAN__IO__DUMP_HPP
 
+#include <boost/lexical_cast.hpp>
+#include <boost/throw_exception.hpp>
+#include <ext/new_allocator.h>
+#include <stan/io/var_context.hpp>
+#include <stan/math/matrix.hpp>
+#include <stddef.h>
 #include <cctype>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <sstream>
-#include <string>
-#include <vector>
 #include <stdexcept>
-#include <boost/throw_exception.hpp>
-#include <boost/lexical_cast.hpp>
-#include <stan/math/matrix.hpp>
-#include <stan/io/var_context.hpp>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Core/util/Macros.h"
 
 namespace stan {
 

@@ -1,9 +1,11 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__SUM_HPP
 #define STAN__AGRAD__FWD__MATRIX__SUM_HPP
 
-#include <vector>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace agrad {

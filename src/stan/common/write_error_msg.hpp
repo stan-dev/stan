@@ -1,6 +1,7 @@
 #ifndef STAN__COMMON__WRITE_ERROR_MSG_HPP
 #define STAN__COMMON__WRITE_ERROR_MSG_HPP
 
+#include <exception>
 #include <ostream>
 #include <stdexcept>
 

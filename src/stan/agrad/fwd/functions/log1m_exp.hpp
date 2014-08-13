@@ -1,11 +1,13 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__LOG1M_EXP_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__LOG1M_EXP_HPP
 
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
-#include <stan/math/functions/log1m_exp.hpp>
 #include <boost/math/special_functions/expm1.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/math/functions/log1m_exp.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
+#include <complex>
 
 namespace stan{
 

@@ -1,11 +1,12 @@
 #ifndef STAN__MATH__FUNCTIONS__LOG1M_EXP_HPP
 #define STAN__MATH__FUNCTIONS__LOG1M_EXP_HPP
 
-#include <boost/math/tools/promotion.hpp>
-#include <stdexcept>
-#include <boost/throw_exception.hpp>
 #include <boost/math/special_functions/expm1.hpp>
+#include <boost/math/tools/promotion.hpp>
+#include <boost/throw_exception.hpp>
 #include <stan/math/functions/log1m.hpp>
+#include <limits>
+#include <stdexcept>
 
 namespace stan {
   namespace math {

@@ -1,12 +1,17 @@
 #ifndef STAN__AGRAD__REV__INTERNAL__MATRIX_VARI_HPP
 #define STAN__AGRAD__REV__INTERNAL__MATRIX_VARI_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace agrad {
+
+class var;
 
     class op_matrix_vari : public vari {
     protected:

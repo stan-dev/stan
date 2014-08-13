@@ -4,6 +4,8 @@
 #include <stan/math/error_handling/check_consistent_size.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/meta/traits.hpp>
+#include <algorithm>
+#include <cstddef>
 
 namespace stan {
   namespace math {

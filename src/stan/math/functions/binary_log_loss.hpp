@@ -2,6 +2,7 @@
 #define STAN__MATH__FUNCTIONS__BINARY_LOG_LOSS_HPP
 
 #include <boost/math/tools/promotion.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {

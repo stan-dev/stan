@@ -2,9 +2,10 @@
 #define STAN__COMMON__RECORDER__FILTERED_VALUES_HPP
 
 #include <stan/common/recorder/values.hpp>
+#include <stddef.h>
 #include <ostream>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace stan {

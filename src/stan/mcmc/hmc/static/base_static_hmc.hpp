@@ -1,10 +1,16 @@
 #ifndef STAN__MCMC__BASE__STATIC__HMC__BETA
 #define STAN__MCMC__BASE__STATIC__HMC__BETA
 
-#include <math.h>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <math.h>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <limits>
+#include <ostream>
+#include <string>
+#include <vector>
+
+#include "stan/mcmc/sample.hpp"
 
 namespace stan {
   

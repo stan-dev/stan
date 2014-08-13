@@ -1,15 +1,18 @@
 #ifndef STAN__AGRAD__REV__SORT_HPP
 #define STAN__AGRAD__REV__SORT_HPP
 
-#include <valarray>
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 #include <stan/agrad/rev/operators/operator_greater_than.hpp>
 #include <stan/agrad/rev/operators/operator_less_than.hpp>
-#include <vector>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <algorithm>    // std::sort
 #include <functional>   // std::greater
+#include <valarray>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "stan/agrad/rev/internal/v_vari.hpp"
 
 namespace stan {
   namespace agrad {

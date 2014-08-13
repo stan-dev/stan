@@ -1,13 +1,15 @@
 #ifndef STAN__AGRAD__REV__MATRIX__DIVIDE_HPP
 #define STAN__AGRAD__REV__MATRIX__DIVIDE_HPP
 
-#include <vector>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/operators/operator_division.hpp>
 #include <stan/agrad/rev/matrix/to_var.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/agrad/rev/operators/operator_division.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace agrad {

@@ -1,11 +1,16 @@
 #ifndef STAN__MCMC__UNIT__E__METRIC__BETA
 #define STAN__MCMC__UNIT__E__METRIC__BETA
 
-#include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
-
+#include <boost/random/variate_generator.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
+#include <iosfwd>
+
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Dot.h"
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   

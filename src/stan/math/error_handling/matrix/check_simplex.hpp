@@ -1,11 +1,16 @@
 #ifndef __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SIMPLEX_HPP__
 #define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SIMPLEX_HPP__
 
-#include <sstream>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/meta/traits.hpp>
+#include <math.h>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/meta/traits.hpp>
+#include <sstream>
+#include <string>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   namespace math {

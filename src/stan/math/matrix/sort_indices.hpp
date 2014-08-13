@@ -2,9 +2,9 @@
 #define STAN__MATH__MATRIX__SORT_INDICES_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <vector>
 #include <algorithm>    // std::sort
 #include <iostream>
+#include <vector>
 
 namespace stan {
   namespace math {

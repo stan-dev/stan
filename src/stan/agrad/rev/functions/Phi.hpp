@@ -1,9 +1,18 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__PHI_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__PHI_HPP
 
+#include <stan/agrad/rev/internal/v_vari.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/math/functions/Phi.hpp>
-#include <stan/agrad/rev/internal/v_vari.hpp>
+#include <cmath>
+
+#include "boost/format/alt_sstream.hpp"
+#include "boost/format/alt_sstream_impl.hpp"
+#include "boost/format/format_implementation.hpp"
+#include "boost/optional/optional.hpp"
+#include "stan/agrad/rev/internal/v_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
+#include "stan/math/constants.hpp"
 
 namespace stan {
   namespace agrad {

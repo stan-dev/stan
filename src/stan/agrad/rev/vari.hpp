@@ -1,10 +1,10 @@
 #ifndef STAN__AGRAD__REV__VARI_HPP
 #define STAN__AGRAD__REV__VARI_HPP
 
-#include <ostream>
-
-#include <stan/agrad/rev/var_stack.hpp>
 #include <stan/agrad/rev/chainable.hpp>
+#include <stan/agrad/rev/var_stack.hpp>
+#include <ostream>
+#include <vector>
 
 namespace stan {
   namespace agrad {

@@ -1,12 +1,29 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_CORR_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_CORR_HPP
 
-#include <stan/prob/constants.hpp>
-#include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/prob/traits.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/prob/constants.hpp>
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
+#include <stan/prob/traits.hpp>
 #include <stan/prob/transform.hpp>
+#include <cstddef>
+
+#include "Eigen/src/Core/Array.h"
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/error_handling/check_not_nan.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+#include "stan/math/error_handling/matrix/check_corr_matrix.hpp"
+#include "stan/math/error_handling/matrix/check_lower_triangular.hpp"
+#include "stan/math/error_handling/matrix/check_size_match.hpp"
+#include "stan/math/functions/lgamma.hpp"
+#include "stan/math/functions/sum.hpp"
+#include "stan/math/matrix/multiply_lower_tri_self_transpose.hpp"
+#include "stan/math/matrix/sum.hpp"
+#include "stan/meta/traits.hpp"
 
 namespace stan {
   namespace prob {

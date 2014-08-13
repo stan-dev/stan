@@ -2,9 +2,13 @@
 #define STAN__IO__CSV_WRITER_HPP
 
 #include <stan/math/matrix.hpp>
-#include <ostream>
-#include <limits>
+#include <stddef.h>
 #include <iomanip>
+#include <limits>
+#include <ostream>
+#include <string>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
 

@@ -3,6 +3,8 @@
 
 #include <stan/math/functions/log_rising_factorial.hpp>
 
+#include "boost/math/tools/promotion.hpp"
+
 namespace stan {
   namespace math {
 

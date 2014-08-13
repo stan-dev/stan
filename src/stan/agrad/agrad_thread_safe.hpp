@@ -3,9 +3,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <vector>
 #include <cmath>
 #include <cstddef>
+#include <vector>
+
 #include "stan/memory/stack_alloc.hpp"
 
 // FIXME:  Should include common defs, not this huge cut-and-paste!

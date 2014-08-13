@@ -1,14 +1,15 @@
 #ifndef STAN__GM__ARGUMENTS__SAMPLE__HPP
 #define STAN__GM__ARGUMENTS__SAMPLE__HPP
 
-#include <stan/gm/arguments/categorical_argument.hpp>
-
+#include <stan/gm/arguments/arg_adapt.hpp>
 #include <stan/gm/arguments/arg_num_samples.hpp>
 #include <stan/gm/arguments/arg_num_warmup.hpp>
+#include <stan/gm/arguments/arg_sample_algo.hpp>
 #include <stan/gm/arguments/arg_save_warmup.hpp>
 #include <stan/gm/arguments/arg_thin.hpp>
-#include <stan/gm/arguments/arg_adapt.hpp>
-#include <stan/gm/arguments/arg_sample_algo.hpp>
+#include <stan/gm/arguments/categorical_argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

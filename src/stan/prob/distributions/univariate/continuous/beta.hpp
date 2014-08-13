@@ -4,7 +4,7 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
+#include <math.h>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/log1m.hpp>
@@ -12,8 +12,18 @@
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/internal_math.hpp>
+#include <stan/prob/traits.hpp>
+#include <cstddef>
+
+#include "boost/math/special_functions/beta.hpp"
+#include "boost/math/special_functions/math_fwd.hpp"
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/error_handling/check_consistent_sizes.hpp"
+#include "stan/math/error_handling/check_less_or_equal.hpp"
+#include "stan/math/error_handling/check_nonnegative.hpp"
+#include "stan/math/error_handling/check_not_nan.hpp"
+#include "stan/math/error_handling/check_positive_finite.hpp"
 
 namespace stan {
 

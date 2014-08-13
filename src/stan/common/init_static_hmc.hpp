@@ -1,10 +1,16 @@
 #ifndef STAN__COMMON__INIT_STATIC_HMC_HPP
 #define STAN__COMMON__INIT_STATIC_HMC_HPP
 
-#include <stan/mcmc/base_mcmc.hpp>
 #include <stan/gm/arguments/argument.hpp>
 #include <stan/gm/arguments/categorical_argument.hpp>
 #include <stan/gm/arguments/singleton_argument.hpp>
+#include <stan/mcmc/base_mcmc.hpp>
+
+namespace stan {
+namespace mcmc {
+class base_mcmc;
+}  // namespace mcmc
+}  // namespace stan
 
 namespace stan {
   namespace common {

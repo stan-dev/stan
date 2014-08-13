@@ -2,6 +2,8 @@
 #define STAN__MATH__CONSTANTS_HPP
 
 #include <boost/math/constants/constants.hpp>
+#include <math.h>
+#include <limits>
 
 namespace stan {
 

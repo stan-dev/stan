@@ -2,6 +2,7 @@
 #define STAN__GM__ARGUMENTS__NEWTON__HPP
 
 #include <stan/gm/arguments/categorical_argument.hpp>
+#include <string>
 
 namespace stan {
   

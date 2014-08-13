@@ -1,9 +1,11 @@
 #ifndef STAN__GM__ARGUMENTS__TEST__GRADIENT__HPP
 #define STAN__GM__ARGUMENTS__TEST__GRADIENT__HPP
 
-#include <stan/gm/arguments/categorical_argument.hpp>
 #include <stan/gm/arguments/arg_test_grad_eps.hpp>
 #include <stan/gm/arguments/arg_test_grad_err.hpp>
+#include <stan/gm/arguments/categorical_argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

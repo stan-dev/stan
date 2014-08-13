@@ -1,20 +1,26 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP
 
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/poisson_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
-#include <limits>
-#include <boost/math/special_functions/fpclassify.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
+#include <cmath>
+#include <complex>
+#include <cstddef>
+#include <limits>
+
+#include "boost/math/special_functions/math_fwd.hpp"
+#include "stan/math/error_handling/check_consistent_sizes.hpp"
+#include "stan/math/error_handling/check_nonnegative.hpp"
+#include "stan/math/error_handling/check_not_nan.hpp"
 
 namespace stan {
 

@@ -1,8 +1,9 @@
 #ifndef STAN__AGRAD__REV__VAR_STACK_HPP
 #define STAN__AGRAD__REV__VAR_STACK_HPP
 
-#include <vector>
 #include <stan/memory/stack_alloc.hpp>
+#include <stddef.h>
+#include <vector>
 
 namespace stan {
   namespace agrad {

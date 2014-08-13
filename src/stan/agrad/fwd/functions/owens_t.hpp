@@ -2,9 +2,13 @@
 #define STAN__AGRAD__FWD__FUNCTIONS__OWENS_T_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/owens_t.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
+#include <complex>
+
+#include "boost/math/special_functions/erf.hpp"
 
 namespace stan {
   namespace agrad {

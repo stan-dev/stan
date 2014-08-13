@@ -1,16 +1,22 @@
 #ifndef STAN__MODEL__UTIL_HPP
 #define STAN__MODEL__UTIL_HPP
 
+#include <stan/agrad/autodiff.hpp>
+#include <stan/agrad/rev/matrix/grad.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stddef.h>
 #include <cmath>
+#include <exception>
 #include <iomanip>
 #include <iostream>
 #include <vector>
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/matrix/grad.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/autodiff.hpp>
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "stan/agrad/rev/var_stack.hpp"
 
 namespace stan {
 

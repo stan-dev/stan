@@ -1,17 +1,28 @@
 #ifndef STAN__META__TRAITS_HPP
 #define STAN__META__TRAITS_HPP
 
+#include <boost/math/tools/promotion.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/type_traits/is_arithmetic.hpp> 
 #include <stan/agrad/fwd/fvar.hpp>
 // #include <stan/agrad/partials_vari.hpp>
 #include <stan/agrad/rev/var.hpp>
-#include <vector>
-#include <boost/type_traits.hpp>
-#include <boost/type_traits/is_arithmetic.hpp> 
-
-#include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+#include <stdexcept>
+#include <vector>
+
+#include "Eigen/src/Core/Block.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/type_traits/is_convertible.hpp"
 
 namespace stan {
+
+namespace agrad {
+class var;
+template <typename T> struct fvar;
+}  // namespace agrad
 
   struct error_index {
     enum { value = 

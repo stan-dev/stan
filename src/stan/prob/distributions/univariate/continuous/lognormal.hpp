@@ -3,15 +3,24 @@
 
 #include <boost/random/lognormal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
-#include <stan/math/functions/value_of.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/math/functions/square.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <cmath>
+#include <complex>
+#include <cstddef>
+
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/error_handling/check_consistent_sizes.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_nonnegative.hpp"
+#include "stan/math/error_handling/check_not_nan.hpp"
+#include "stan/math/error_handling/check_positive_finite.hpp"
 
 namespace stan {
   namespace prob {

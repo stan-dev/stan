@@ -2,8 +2,8 @@
 #define STAN__AGRAD__FWD__FUNCTIONS__BINARY_LOG_LOSS_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/functions/binary_log_loss.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
 

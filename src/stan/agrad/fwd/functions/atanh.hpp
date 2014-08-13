@@ -1,10 +1,10 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__ATANH_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__ATANH_HPP
 
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <boost/math/special_functions/atanh.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/functions/square.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
 

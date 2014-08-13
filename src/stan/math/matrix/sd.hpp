@@ -1,11 +1,14 @@
 #ifndef STAN__MATH__MATRIX__SD_HPP
 #define STAN__MATH__MATRIX__SD_HPP
 
-#include <vector>
 #include <boost/math/tools/promotion.hpp>
+#include <math.h>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/variance.hpp>
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

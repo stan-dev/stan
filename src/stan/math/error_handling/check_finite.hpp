@@ -1,10 +1,11 @@
 #ifndef STAN__MATH__ERROR_HANDLING_CHECK_FINITE_HPP
 #define STAN__MATH__ERROR_HANDLING_CHECK_FINITE_HPP
 
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/meta/traits.hpp>
+#include <cstddef>
 
 namespace stan {
   namespace math {

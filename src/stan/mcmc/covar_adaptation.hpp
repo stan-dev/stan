@@ -1,11 +1,20 @@
 #ifndef STAN__MCMC__COVAR__ADAPTATION__BETA
 #define STAN__MCMC__COVAR__ADAPTATION__BETA
 
-#include <vector>
 #include <stan/math/matrix/Eigen.hpp>
-
-#include <stan/prob/welford_covar_estimator.hpp>
 #include <stan/mcmc/windowed_adaptation.hpp>
+#include <stan/prob/welford_covar_estimator.hpp>
+#include <new>
+#include <string>
+#include <vector>
+
+#include "Eigen/src/Core/../plugins/CommonCwiseBinaryOps.h"
+#include "Eigen/src/Core/../plugins/CommonCwiseUnaryOps.h"
+#include "Eigen/src/Core/CwiseBinaryOp.h"
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/CwiseUnaryOp.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/MatrixBase.h"
 
 namespace stan {
   

@@ -1,8 +1,12 @@
 #ifndef STAN__PROB__AUTOCOVARIANCE_HPP
 #define STAN__PROB__AUTOCOVARIANCE_HPP
 
-#include <stan/prob/autocorrelation.hpp>
 #include <stan/math/matrix/variance.hpp>
+#include <stan/prob/autocorrelation.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "unsupported/Eigen/FFT"
 
 namespace stan {
   

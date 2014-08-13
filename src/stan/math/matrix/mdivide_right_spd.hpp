@@ -2,11 +2,13 @@
 #define STAN__MATH__MATRIX__MDIVIDE_RIGHT_SPD_HPP
 
 #include <boost/math/tools/promotion.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/mdivide_left_spd.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

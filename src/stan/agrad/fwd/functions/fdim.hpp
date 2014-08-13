@@ -2,8 +2,9 @@
 #define STAN__AGRAD__FWD__FUNCTIONS__FDIM_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/functions/fdim.hpp>
+#include <stan/meta/traits.hpp>
+#include <cmath>
 
 namespace stan {
 

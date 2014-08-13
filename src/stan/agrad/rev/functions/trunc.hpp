@@ -4,6 +4,12 @@
 #include <boost/math/special_functions/trunc.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
+#include <ostream>
+
+#include "boost/format/alt_sstream.hpp"
+#include "boost/format/alt_sstream_impl.hpp"
+#include "boost/format/format_implementation.hpp"
+#include "boost/optional/optional.hpp"
 
 namespace stan {
   namespace agrad {

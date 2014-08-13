@@ -1,8 +1,9 @@
 #ifndef STAN__MEMORY__STACK_ALLOC_HPP
 #define STAN__MEMORY__STACK_ALLOC_HPP
 
-#include <cstdlib>
 #include <cstddef>
+#include <cstdlib>
+#include <new>
 #include <sstream>
 #include <stdexcept>
 #if defined(_MSC_VER)

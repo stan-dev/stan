@@ -2,8 +2,9 @@
 #define STAN__GM__ARGUMENTS__LBFGS__HPP
 
 #include <stan/gm/arguments/arg_bfgs.hpp>
-
 #include <stan/gm/arguments/arg_history_size.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

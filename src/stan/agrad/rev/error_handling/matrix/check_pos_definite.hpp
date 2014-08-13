@@ -1,11 +1,14 @@
 #ifndef STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP
 #define STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP
 
+#include <stan/agrad/rev/numeric_limits.hpp>
+#include <stan/agrad/rev/var.hpp>
 // global include
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/numeric_limits.hpp>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "stan/math/matrix/EigenDenseBaseAddons.h"
 
 namespace stan {
   namespace agrad {

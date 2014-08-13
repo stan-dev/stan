@@ -1,11 +1,11 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_MULTIPLICABLE_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_MULTIPLICABLE_HPP
 
-#include <sstream>
-#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/meta/traits.hpp>
+#include <sstream>
 
 namespace stan {
   namespace math {

@@ -1,9 +1,13 @@
 #ifndef STAN__AGRAD__REV__OPERATORS__OPERATOR_ADDITION_HPP
 #define STAN__AGRAD__REV__OPERATORS__OPERATOR_ADDITION_HPP
 
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/internal/vd_vari.hpp>
+#include <stan/agrad/rev/internal/vv_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
+
+#include "stan/agrad/rev/internal/vd_vari.hpp"
+#include "stan/agrad/rev/internal/vv_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

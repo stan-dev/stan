@@ -1,20 +1,23 @@
 #ifndef STAN__IO__JSON__JSON_DATA_HPP
 #define STAN__IO__JSON__JSON_DATA_HPP
 
+#include <boost/lexical_cast.hpp>
+#include <boost/throw_exception.hpp>
+#include <ext/new_allocator.h>
+#include <stan/io/json/json_data_handler.hpp>
+#include <stan/io/json/json_error.hpp>
+#include <stan/io/json/json_parser.hpp>
+#include <stan/io/var_context.hpp>
+#include <stan/math/matrix.hpp>
+#include <stddef.h>
 #include <cctype>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
-#include <boost/throw_exception.hpp>
-#include <boost/lexical_cast.hpp>
-#include <stan/math/matrix.hpp>
-#include <stan/io/var_context.hpp>
-#include <stan/io/json/json_error.hpp>
-#include <stan/io/json/json_parser.hpp>
-#include <stan/io/json/json_data_handler.hpp>
 
 
 namespace stan {

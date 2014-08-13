@@ -1,13 +1,30 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__VON_MISES_HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__VON_MISES_HPP
 
+#include <math.h>
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
 #include <stan/math.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
+#include <stan/prob/traits.hpp>
+#include <cstddef>
+
+#include "boost/math/special_functions/bessel.hpp"
+#include "stan/math/constants.hpp"
+#include "stan/math/error_handling/check_consistent_sizes.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_greater.hpp"
+#include "stan/math/error_handling/check_nonnegative.hpp"
+#include "stan/math/error_handling/check_positive_finite.hpp"
+#include "stan/math/functions/value_of.hpp"
+
+namespace boost {
+namespace random {
+template <class Engine, class Distribution> class variate_generator;
+}  // namespace random
+}  // namespace boost
 
 namespace stan { 
   

@@ -1,19 +1,23 @@
 #ifndef STAN__GM__PARSER__BARE_TYPE_GRAMMAR_HPP__
 #define STAN__GM__PARSER__BARE_TYPE_GRAMMAR_HPP__
 
-#include <string>
+#include <boost/spirit/include/qi.hpp>
+#include <stan/gm/ast.hpp>
+#include <stan/gm/grammars/statement_grammar.hpp>
+#include <stan/gm/grammars/whitespace_grammar.hpp>
+#include <stddef.h>
 #include <sstream>
+#include <string>
 #include <vector>
 
-#include <boost/spirit/include/qi.hpp>
-
-#include <stan/gm/ast.hpp>
-#include <stan/gm/grammars/whitespace_grammar.hpp>
-#include <stan/gm/grammars/statement_grammar.hpp>
+#include "boost/spirit/home/qi/nonterminal/grammar.hpp"
+#include "boost/spirit/home/qi/nonterminal/rule.hpp"
 
 namespace stan { 
 
   namespace gm {
+
+template <typename Iterator> struct whitespace_grammar;
 
     template <typename Iterator>
     struct bare_type_grammar

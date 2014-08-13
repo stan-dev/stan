@@ -1,9 +1,9 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__IS_UNINITIALIZED_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__IS_UNINITIALIZED_HPP
 
+#include <stan/agrad/rev/operators/operator_unary_negative.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
-#include <stan/agrad/rev/operators/operator_unary_negative.hpp>
 #include <stan/math/functions/is_uninitialized.hpp>
 
 namespace stan {

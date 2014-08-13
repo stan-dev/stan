@@ -1,29 +1,51 @@
 #ifndef STAN__GM__PARSER__BARE_TYPE_GRAMMAR_DEF_HPP__
 #define STAN__GM__PARSER__BARE_TYPE_GRAMMAR_DEF_HPP__
 
-#include <boost/spirit/include/qi.hpp>
-#include <boost/lexical_cast.hpp>
+#include <boost/config/warning_disable.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi_numeric.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_object.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/qi_numeric.hpp>
+#include <boost/spirit/include/support_line_pos_iterator.hpp>
 #include <boost/spirit/include/support_multi_pass.hpp>
+#include <boost/spirit/include/version.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
-
-#include <boost/spirit/include/version.hpp>
-#include <boost/spirit/include/support_line_pos_iterator.hpp>
-
 #include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/bare_type_grammar.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
+#include <stddef.h>
+#include <iosfwd>
+
+#include "boost/fusion/adapted/struct/adapt_struct.hpp"
+#include "boost/preprocessor/arithmetic/dec.hpp"
+#include "boost/preprocessor/arithmetic/inc.hpp"
+#include "boost/preprocessor/control/expr_iif.hpp"
+#include "boost/preprocessor/control/iif.hpp"
+#include "boost/preprocessor/logical/bool.hpp"
+#include "boost/preprocessor/repetition/detail/for.hpp"
+#include "boost/preprocessor/seq/elem.hpp"
+#include "boost/preprocessor/seq/size.hpp"
+#include "boost/preprocessor/tuple/eat.hpp"
+#include "boost/preprocessor/tuple/elem.hpp"
+#include "boost/proto/extends.hpp"
+#include "boost/proto/operators.hpp"
+#include "boost/spirit/home/phoenix/core/actor.hpp"
+#include "boost/spirit/home/phoenix/operator/detail/binary_compose.hpp"
+#include "boost/spirit/home/phoenix/operator/self.hpp"
+#include "boost/spirit/home/qi/nonterminal/error_handler.hpp"
+#include "boost/spirit/home/support/argument.hpp"
+#include "boost/spirit/home/support/common_terminals.hpp"
+#include "boost/spirit/home/support/context.hpp"
+#include "boost/spirit/home/support/terminal.hpp"
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::expr_type,
                           (stan::gm::base_expr_type, base_type_)

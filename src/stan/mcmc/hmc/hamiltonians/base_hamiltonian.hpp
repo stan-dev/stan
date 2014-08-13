@@ -1,13 +1,16 @@
 #ifndef STAN__MCMC__BASE__HAMILTONIAN__BETA
 #define STAN__MCMC__BASE__HAMILTONIAN__BETA
 
-#include <stdexcept>
-#include <fstream>
-#include <iostream>
-#include <vector>
-
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/model/util.hpp>
+#include <exception>
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <stdexcept>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
 

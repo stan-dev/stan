@@ -1,9 +1,12 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__PHI_APPROX_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__PHI_APPROX_HPP
 
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/precomp_v_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/functions/inv_logit.hpp>
+
+#include "stan/agrad/rev/internal/precomp_v_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

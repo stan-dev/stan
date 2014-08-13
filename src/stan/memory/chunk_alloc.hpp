@@ -1,8 +1,9 @@
 #ifndef STAN__MEMORY__CHUNK_ALLOC_HPP
 #define STAN__MEMORY__CHUNK_ALLOC_HPP
 
-#include <cstdlib>
 #include <cstddef>
+#include <cstdlib>
+#include <new>
 #include <sstream>
 #include <stdexcept>
 #if defined(_MSC_VER)
@@ -10,8 +11,8 @@
 #else
     #include <stdint.h> // FIXME: replace with cstddef?
 #endif
-#include <vector>
 #include <stan/memory/stack_alloc.hpp>
+#include <vector>
 
 #define DEFAULT_INITIAL_NCHUNKS (1 << 8)
  

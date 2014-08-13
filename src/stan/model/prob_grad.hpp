@@ -1,10 +1,10 @@
 #ifndef STAN__MODEL__PROB_GRAD_HPP
 #define STAN__MODEL__PROB_GRAD_HPP
 
+#include <stan/io/csv_writer.hpp>
+#include <cstddef>
 #include <utility>
 #include <vector>
-
-#include <stan/io/csv_writer.hpp>
 
 namespace stan {
 

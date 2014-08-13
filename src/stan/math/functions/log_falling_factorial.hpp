@@ -3,6 +3,8 @@
 
 #include <boost/math/special_functions/gamma.hpp>
 
+#include "boost/math/tools/promotion.hpp"
+
 namespace stan {
   namespace math {
 

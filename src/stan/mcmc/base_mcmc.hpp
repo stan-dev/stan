@@ -1,10 +1,10 @@
 #ifndef STAN__MCMC__BASE_MCMC__HPP
 #define STAN__MCMC__BASE_MCMC__HPP
 
+#include <stan/mcmc/sample.hpp>
 #include <ostream>
 #include <string>
-
-#include <stan/mcmc/sample.hpp>
+#include <vector>
 
 namespace stan {
 

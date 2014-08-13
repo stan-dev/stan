@@ -2,6 +2,7 @@
 #define STAN__IO__JSON__JSON_ERROR_HPP
 
 #include <stdexcept>
+#include <string>
 
 
 namespace stan {

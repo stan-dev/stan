@@ -1,6 +1,7 @@
 #ifndef STAN__MATH__MATRIX__CHECK_RANGE_HPP
 #define STAN__MATH__MATRIX__CHECK_RANGE_HPP
 
+#include <stddef.h>
 #include <sstream> 
 #include <stdexcept>
 

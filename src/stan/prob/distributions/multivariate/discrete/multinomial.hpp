@@ -4,15 +4,24 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/math/error_handling.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 #include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
+#include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 #include <stan/prob/traits.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/math/tools/promotion.hpp"
+#include "stan/math/error_handling/check_nonnegative.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+#include "stan/math/error_handling/matrix/check_simplex.hpp"
+#include "stan/math/error_handling/matrix/check_size_match.hpp"
 
 namespace stan {
 

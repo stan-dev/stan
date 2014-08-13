@@ -1,16 +1,24 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP
 #define STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP
 
-#include <vector>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/math/matrix/log_sum_exp.hpp>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/operators.hpp>
-#include <stan/agrad/rev/functions/log.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
-#include <stan/agrad/fwd/functions/log.hpp>
 #include <stan/agrad/fwd/functions/exp.hpp>
+#include <stan/agrad/fwd/functions/log.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/agrad/rev/functions/exp.hpp>
+#include <stan/agrad/rev/functions/log.hpp>
 #include <stan/agrad/rev/matrix/log_sum_exp.hpp>
+#include <stan/agrad/rev/operators.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/log_sum_exp.hpp>
+#include <cmath>
+#include <complex>
+#include <cstddef>
+#include <valarray>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "stan/math/functions/log_sum_exp.hpp"
 
 namespace stan{
 

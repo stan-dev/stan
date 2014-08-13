@@ -1,14 +1,18 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__DOT_PRODUCT_HPP
 #define STAN__AGRAD__FWD__MATRIX__DOT_PRODUCT_HPP
 
-#include <vector>
+#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/fwd/matrix/to_fvar.hpp>
+#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/math/error_handling/matrix/check_vector.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_vector.hpp>
-#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
-#include <stan/agrad/fwd.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/to_fvar.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "stan/agrad/fwd/fvar.hpp"
 
 namespace stan {
   namespace agrad {

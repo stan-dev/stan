@@ -2,10 +2,14 @@
 #define STAN__MATH__MATRIX__MDIVIDE_LEFT_TRI_LOW_HPP
 
 #include <boost/math/tools/promotion.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/mdivide_left_tri.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+
 namespace stan {
   namespace math {
 

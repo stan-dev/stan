@@ -1,10 +1,17 @@
 #ifndef STAN__MATH__MATRIX__DOT_PRODUCT_HPP
 #define STAN__MATH__MATRIX__DOT_PRODUCT_HPP
 
-#include <vector>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_vector.hpp>
 #include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/math/error_handling/matrix/check_vector.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "boost/format/alt_sstream.hpp"
+#include "boost/format/alt_sstream_impl.hpp"
+#include "boost/format/format_implementation.hpp"
+#include "boost/optional/optional.hpp"
 
 namespace stan {
   namespace math {

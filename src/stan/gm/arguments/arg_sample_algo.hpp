@@ -1,10 +1,11 @@
 #ifndef STAN__GM__ARGUMENTS__SAMPLE__ALGO__HPP
 #define STAN__GM__ARGUMENTS__SAMPLE__ALGO__HPP
 
-#include <stan/gm/arguments/list_argument.hpp>
-
-#include <stan/gm/arguments/arg_hmc.hpp>
 #include <stan/gm/arguments/arg_fixed_param.hpp>
+#include <stan/gm/arguments/arg_hmc.hpp>
+#include <stan/gm/arguments/list_argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

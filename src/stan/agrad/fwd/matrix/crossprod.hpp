@@ -1,16 +1,20 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__CROSSPROD_HPP
 #define STAN__AGRAD__FWD__MATRIX__CROSSPROD_HPP
 
-#include <vector>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
+#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/transpose.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace agrad {
     
+template <typename T> struct fvar;
+
     template<typename T,int R, int C>
     inline
     Eigen::Matrix<fvar<T>,C,C> 

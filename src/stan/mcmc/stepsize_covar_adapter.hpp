@@ -2,8 +2,9 @@
 #define STAN__MCMC__STEPSIZE__COVAR__ADAPTER__BETA
 
 #include <stan/mcmc/base_adapter.hpp>
-#include <stan/mcmc/stepsize_adaptation.hpp>
 #include <stan/mcmc/covar_adaptation.hpp>
+#include <stan/mcmc/stepsize_adaptation.hpp>
+#include <iosfwd>
 
 namespace stan {
   

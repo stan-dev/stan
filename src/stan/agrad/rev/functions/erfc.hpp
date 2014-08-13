@@ -1,11 +1,15 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__ERFC_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__ERFC_HPP
 
-#include <valarray>
 #include <boost/math/special_functions/erf.hpp>
-#include <stan/agrad/rev/var.hpp>
+#include <math.h>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/constants.hpp>
+#include <valarray>
+
+#include "stan/agrad/rev/internal/v_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

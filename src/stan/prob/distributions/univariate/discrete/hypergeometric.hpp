@@ -2,14 +2,29 @@
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__HYPERGEOMETRIC_HPP
 
 #include <boost/math/distributions.hpp>
-#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
+#include <stan/prob/traits.hpp>
+#include <cstddef>
 #include <vector>
+
+#include "boost/math/distributions/hypergeometric.hpp"
+#include "stan/math/error_handling/check_bounded.hpp"
+#include "stan/math/error_handling/check_consistent_sizes.hpp"
+#include "stan/math/error_handling/check_finite.hpp"
+#include "stan/math/error_handling/check_greater.hpp"
+#include "stan/math/error_handling/check_positive.hpp"
+#include "stan/math/functions/binomial_coefficient_log.hpp"
+
+namespace boost {
+namespace random {
+template <class Engine, class Distribution> class variate_generator;
+}  // namespace random
+}  // namespace boost
 
 namespace stan {
 

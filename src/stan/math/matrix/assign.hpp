@@ -1,18 +1,20 @@
 #ifndef STAN__MATH__MATRIX__ASSIGN_HPP
 #define STAN__MATH__MATRIX__ASSIGN_HPP
 
-#include <vector>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
 
 // #include <boost/utility/enable_if.hpp>
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
 #include <stan/math/error_handling/matrix/check_matching_dims.hpp>
-
-
+#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stddef.h>
 #include <iostream>
+
+#include "Eigen/src/Core/Block.h"
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
 

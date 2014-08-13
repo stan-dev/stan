@@ -1,13 +1,23 @@
 #ifndef STAN__IO__STAN_CSV_READER_HPP
 #define STAN__IO__STAN_CSV_READER_HPP
 
-#include <istream>
-#include <iostream>
-#include <sstream>
-#include <string>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stan/math/matrix.hpp>
+#include <stddef.h>
+#include <algorithm>
+#include <iostream>
+#include <istream>
+#include <new>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/algorithm/string/replace.hpp"
+#include "boost/algorithm/string/trim.hpp"
 
 namespace stan {
   namespace io {

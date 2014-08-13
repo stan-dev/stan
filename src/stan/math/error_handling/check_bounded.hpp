@@ -4,6 +4,8 @@
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
 #include <stan/meta/traits.hpp>
+#include <cstddef>
+#include <utility>
 
 namespace stan {
   namespace math {

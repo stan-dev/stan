@@ -1,9 +1,11 @@
 #ifndef STAN__MATH__MATRIX__COMMON_TYPE_HPP
 #define STAN__MATH__MATRIX__COMMON_TYPE_HPP
 
-#include <vector>
-#include <stan/math/matrix/Eigen.hpp>
 #include <boost/math/tools/promotion.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   

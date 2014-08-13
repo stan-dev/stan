@@ -3,7 +3,13 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/meta/traits.hpp> //stan::scalar_type
+#include <cstddef>
+#include <new>
 #include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "Eigen/src/Core/util/Memory.h"
 
 namespace stan {
   namespace math {

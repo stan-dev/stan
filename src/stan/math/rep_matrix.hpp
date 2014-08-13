@@ -5,6 +5,9 @@
 #include <stan/math/error_handling/check_nonnegative.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+
 namespace stan {
 
   namespace math {

@@ -1,17 +1,21 @@
 #ifndef STAN__AGRAD__REV__MATRIX__TRACE_QUAD_FORM_HPP
 #define STAN__AGRAD__REV__MATRIX__TRACE_QUAD_FORM_HPP
 
-#include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/typedefs.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/value_of.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/math/matrix/trace_quad_form.hpp>
 #include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/trace_quad_form.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "boost/type_traits/is_same.hpp"
+#include "stan/agrad/rev/var_stack.hpp"
 
 namespace stan {
   namespace agrad {

@@ -1,8 +1,10 @@
 #ifndef STAN__AGRAD__REV__MATRIX__VALUE_OF_HPP
 #define STAN__AGRAD__REV__MATRIX__VALUE_OF_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace agrad {
@@ -12,6 +14,8 @@ namespace stan {
      *
      * This is used as a convenience function for implementing varis of matrix operations.
      **/
+class var;
+
     template<int R,int C>
     inline const Eigen::Matrix<double,R,C> &value_of(const Eigen::Matrix<double,R,C> &M) {
       return M;

@@ -1,15 +1,27 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__LOG_SUM_EXP_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__LOG_SUM_EXP_HPP
 
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/calculate_chain.hpp>
-#include <stan/agrad/rev/internal/vv_vari.hpp>
-#include <stan/agrad/rev/internal/vd_vari.hpp>
 #include <stan/agrad/rev/internal/dv_vari.hpp>
+#include <stan/agrad/rev/internal/vd_vari.hpp>
 #include <stan/agrad/rev/internal/vector_vari.hpp>
+#include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/operators/operator_greater_than.hpp>
 #include <stan/agrad/rev/operators/operator_not_equal.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
+#include <cmath>
+#include <complex>
+#include <cstddef>
+#include <limits>
+#include <valarray>
+#include <vector>
+
+#include "stan/agrad/rev/internal/dv_vari.hpp"
+#include "stan/agrad/rev/internal/vd_vari.hpp"
+#include "stan/agrad/rev/internal/vector_vari.hpp"
+#include "stan/agrad/rev/internal/vv_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 namespace stan {
   namespace math {

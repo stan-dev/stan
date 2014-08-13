@@ -1,11 +1,15 @@
 #ifndef STAN__MATH__MATRIX__TAIL_HPP
 #define STAN__MATH__MATRIX__TAIL_HPP
 
-#include <vector>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/matrix/check_column_index.hpp>
 #include <stan/math/error_handling/matrix/check_row_index.hpp>
 #include <stan/math/error_handling/matrix/check_std_vector_index.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   namespace math {

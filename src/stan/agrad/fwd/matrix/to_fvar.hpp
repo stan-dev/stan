@@ -1,12 +1,16 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__TO_FVAR_HPP
 #define STAN__AGRAD__FWD__MATRIX__TO_FVAR_HPP
 
-#include <vector>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/math/error_handling/matrix/check_matching_dims.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+#include <new>
+#include <vector>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace agrad {

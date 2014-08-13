@@ -1,10 +1,11 @@
 #ifndef STAN__MATH__ERROR_HANDLING_CHECK_NONNEGATIVE_HPP
 #define STAN__MATH__ERROR_HANDLING_CHECK_NONNEGATIVE_HPP
 
+#include <boost/type_traits/is_unsigned.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
-#include <boost/type_traits/is_unsigned.hpp>
 #include <stan/meta/traits.hpp>
+#include <cstddef>
 
 namespace stan {
   namespace math {

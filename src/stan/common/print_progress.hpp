@@ -1,11 +1,11 @@
 #ifndef STAN__COMMON__PRINT_PROGRESS_HPP
 #define STAN__COMMON__PRINT_PROGRESS_HPP
 
+#include <stan/common/do_print.hpp>
 #include <cmath>
 #include <iomanip>
-#include <stan/common/do_print.hpp>
-
 #include <iostream>
+#include <string>
 
 namespace stan {
   namespace common {

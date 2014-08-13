@@ -1,18 +1,30 @@
 #ifndef STAN__AGRAD__REV__MATRIX__DOT_PRODUCT_HPP
 #define STAN__AGRAD__REV__MATRIX__DOT_PRODUCT_HPP
 
-#include <vector>
-#include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_vector.hpp>
-#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
-#include <stan/math/functions/value_of.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <stan/agrad/rev/functions/value_of.hpp>
+#include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/rev/functions/value_of.hpp>
+#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/math/error_handling/matrix/check_vector.hpp>
+#include <stan/math/functions/value_of.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Dot.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "boost/type_traits/is_same.hpp"
+#include "stan/agrad/rev/var_stack.hpp"
+#include "stan/memory/stack_alloc.hpp"
+
+namespace Eigen {
+template <typename Derived> class DenseBase;
+}  // namespace Eigen
 
 namespace stan {
   namespace agrad {

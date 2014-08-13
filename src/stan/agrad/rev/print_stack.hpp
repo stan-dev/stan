@@ -1,9 +1,11 @@
 #ifndef STAN__AGRAD__PRINT_STACK_HPP
 #define STAN__AGRAD__PRINT_STACK_HPP
 
-#include <ostream>
 #include <stan/agrad/rev/var_stack.hpp>
 #include <stan/agrad/rev/vari.hpp>
+#include <stddef.h>
+#include <ostream>
+#include <vector>
 
 namespace stan {
   namespace agrad {

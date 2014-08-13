@@ -1,12 +1,16 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__DIVIDE_HPP
 #define STAN__AGRAD__FWD__MATRIX__DIVIDE_HPP
 
-#include <vector>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/fwd.hpp>
-#include <stan/agrad/fwd/operators/operator_division.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/agrad/fwd/operators/operator_division.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "stan/agrad/fwd/fvar.hpp"
+#include "stan/meta/traits.hpp"
 
 namespace stan {
   namespace agrad {

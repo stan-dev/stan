@@ -2,8 +2,9 @@
 #define STAN__GM__ARGUMENTS__TOLERANCE_HPP
 
 #include <boost/lexical_cast.hpp>
-
 #include <stan/gm/arguments/singleton_argument.hpp>
+#include <sstream>
+#include <string>
 
 namespace stan {
   

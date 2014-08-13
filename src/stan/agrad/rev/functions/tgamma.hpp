@@ -2,8 +2,17 @@
 #define STAN__AGRAD__REV__FUNCTIONS__TGAMMA_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <ostream>
+
+#include "boost/format/alt_sstream.hpp"
+#include "boost/format/alt_sstream_impl.hpp"
+#include "boost/format/format_implementation.hpp"
+#include "boost/math/special_functions/math_fwd.hpp"
+#include "boost/optional/optional.hpp"
+#include "stan/agrad/rev/internal/v_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

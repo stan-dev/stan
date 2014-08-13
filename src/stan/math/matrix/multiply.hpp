@@ -3,9 +3,12 @@
 
 #include <boost/type_traits/is_arithmetic.hpp> 
 #include <boost/utility/enable_if.hpp>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
 #include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stdexcept>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

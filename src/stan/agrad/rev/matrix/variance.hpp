@@ -1,14 +1,23 @@
 #ifndef STAN__AGRAD__REV__MATRIX__VARIANCE_HPP
 #define STAN__AGRAD__REV__MATRIX__VARIANCE_HPP
 
-#include <vector>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/mean.hpp>
+#include <stan/agrad/rev/matrix/stored_gradient_vari.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
-#include <stan/agrad/rev/matrix/stored_gradient_vari.hpp>
 #include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/mean.hpp>
+#include <cstddef>
+#include <vector>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "boost/format/alt_sstream.hpp"
+#include "boost/format/alt_sstream_impl.hpp"
+#include "boost/format/format_implementation.hpp"
+#include "boost/optional/optional.hpp"
+#include "stan/agrad/rev/var_stack.hpp"
+#include "stan/memory/stack_alloc.hpp"
 
 namespace stan {
 

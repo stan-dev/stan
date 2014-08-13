@@ -1,14 +1,22 @@
 #ifndef STAN__MCMC__DENSE__E__METRIC__BETA
 #define STAN__MCMC__DENSE__E__METRIC__BETA
 
-#include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
-
+#include <boost/random/variate_generator.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <Eigen/Cholesky>
-
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
+#include <Eigen/Cholesky>
+#include <iosfwd>
+
+#include "Eigen/src/Cholesky/LLT.h"
+#include "Eigen/src/Core/../plugins/CommonCwiseUnaryOps.h"
+#include "Eigen/src/Core/CwiseNullaryOp.h"
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/GeneralProduct.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/MatrixBase.h"
+#include "Eigen/src/Core/Transpose.h"
 
 namespace stan {
   

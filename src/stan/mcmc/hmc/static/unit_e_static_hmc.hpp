@@ -1,10 +1,11 @@
 #ifndef STAN__MCMC__UNIT__E__STATIC__HMC__BETA
 #define STAN__MCMC__UNIT__E__STATIC__HMC__BETA
 
-#include <stan/mcmc/hmc/static/base_static_hmc.hpp>
-#include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
+#include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
+#include <stan/mcmc/hmc/static/base_static_hmc.hpp>
+#include <iostream>
 
 namespace stan {
 
@@ -14,6 +15,8 @@ namespace stan {
     // Euclidean manifold with unit metric
     // and static integration time
     
+class unit_e_point;
+
     template <typename M, class BaseRNG>
     class unit_e_static_hmc: public base_static_hmc<M, 
                                                     unit_e_point,

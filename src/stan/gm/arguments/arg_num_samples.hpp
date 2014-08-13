@@ -2,6 +2,7 @@
 #define STAN__GM__ARGUMENTS__NUM__SAMPLES__HPP
 
 #include <stan/gm/arguments/singleton_argument.hpp>
+#include <string>
 
 namespace stan {
   

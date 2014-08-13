@@ -2,8 +2,10 @@
 #define STAN__GM__PARSER__WHITESPACE_GRAMMAR_DEF__HPP
 
 #include <boost/spirit/include/qi.hpp>
-
 #include <stan/gm/grammars/whitespace_grammar.hpp>
+
+#include "boost/proto/operators.hpp"
+#include "boost/spirit/home/support/common_terminals.hpp"
 
 namespace stan { 
 

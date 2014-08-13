@@ -1,8 +1,11 @@
 #ifndef STAN__AGRAD__REV__CHAINABLE_HPP
 #define STAN__AGRAD__REV__CHAINABLE_HPP
 
-#include <vector>
 #include <stan/agrad/rev/var_stack.hpp>
+#include <stddef.h>
+#include <vector>
+
+#include "stan/memory/stack_alloc.hpp"
 
 namespace stan {
   namespace agrad {

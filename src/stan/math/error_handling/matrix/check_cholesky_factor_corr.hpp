@@ -1,12 +1,15 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_CHOLESKY_FACTOR_CORR_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_CHOLESKY_FACTOR_CORR_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/check_positive.hpp>
 #include <stan/math/error_handling/matrix/check_lower_triangular.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
-#include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 #include <stan/math/error_handling/matrix/check_unit_vector.hpp>
+#include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
 

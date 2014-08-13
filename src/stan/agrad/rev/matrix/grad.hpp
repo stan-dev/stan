@@ -2,9 +2,16 @@
 #define STAN__AGRAD__REV__MATRIX__GRAD_HPP
 
 
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/matrix/Eigen_NumTraits.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "stan/agrad/rev/chainable.hpp"
+#include "stan/agrad/rev/var_stack.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
 

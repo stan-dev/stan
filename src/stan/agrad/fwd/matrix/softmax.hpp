@@ -5,8 +5,13 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/softmax.hpp>
 
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+
 namespace stan {
   namespace agrad {
+
+template <typename T> struct fvar;
 
     template <typename T>
     inline 

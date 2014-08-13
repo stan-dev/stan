@@ -1,10 +1,11 @@
 #ifndef STAN__MCMC__DENSE__E__STATIC__HMC__BETA
 #define STAN__MCMC__DENSE__E__STATIC__HMC__BETA
 
-#include <stan/mcmc/hmc/static/base_static_hmc.hpp>
-#include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_metric.hpp>
+#include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
+#include <stan/mcmc/hmc/static/base_static_hmc.hpp>
+#include <iostream>
 
 namespace stan {
 
@@ -14,6 +15,8 @@ namespace stan {
     // Euclidean manifold with dense metric
     // and static integration time
     
+class dense_e_point;
+
     template <typename M, class BaseRNG>
     class dense_e_static_hmc: public base_static_hmc<M, 
                                                      dense_e_point,

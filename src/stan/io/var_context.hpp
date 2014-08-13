@@ -1,6 +1,7 @@
 #ifndef STAN__IO__VAR_CONTEXT_HPP
 #define STAN__IO__VAR_CONTEXT_HPP
 
+#include <stddef.h>
 #include <sstream>
 #include <stdexcept>
 #include <string>

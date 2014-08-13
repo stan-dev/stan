@@ -1,9 +1,10 @@
 #ifndef STAN__AGRAD__REV__INTERNAL__VECTOR_VARI_HPP
 #define STAN__AGRAD__REV__INTERNAL__VECTOR_VARI_HPP
 
-#include <vector>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
+#include <cstddef>
+#include <vector>
 
 namespace stan {
   namespace agrad {

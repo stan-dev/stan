@@ -1,16 +1,14 @@
 #ifndef STAN__COMMON__DO_BFGS_OPTIMIZE_HPP
 #define STAN__COMMON__DO_BFGS_OPTIMIZE_HPP
 
-#include <fstream>
-#include <iostream>
-#include <iomanip>
-#include <vector>
-
-#include <stan/gm/error_codes.hpp>
-
 #include <stan/common/do_print.hpp>
-#include <stan/common/write_iteration_csv.hpp>
 #include <stan/common/write_iteration.hpp>
+#include <stan/common/write_iteration_csv.hpp>
+#include <stan/gm/error_codes.hpp>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <vector>
 
 namespace stan {
 

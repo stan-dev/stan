@@ -1,15 +1,14 @@
 #ifndef STAN__IO__JSON__JSON_PARSER_HPP
 #define STAN__IO__JSON__JSON_PARSER_HPP
 
-#include <stdexcept>
+#include <boost/lexical_cast.hpp>
+#include <stan/io/json/json_error.hpp>
+#include <stddef.h>
 #include <iostream>
 #include <istream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
-
-#include <boost/lexical_cast.hpp>
-
-#include <stan/io/json/json_error.hpp>
 
 namespace stan {
   

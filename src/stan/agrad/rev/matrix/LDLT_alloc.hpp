@@ -1,8 +1,13 @@
 #ifndef STAN__AGRAD__REV__MATRIX__LDLT_ALLOC_HPP
 #define STAN__AGRAD__REV__MATRIX__LDLT_ALLOC_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
+
+#include "Eigen/src/Cholesky/LDLT.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "stan/agrad/rev/var_stack.hpp"
 
 namespace stan {
   namespace agrad {
@@ -16,6 +21,9 @@ namespace stan {
      * This class should only be instantiated as part of an LDLT_factor object
      * and is only used in *_ldlt functions.
      **/
+class var;
+class vari;
+
     template<int R, int C>
     class LDLT_alloc : public chainable_alloc {
     public:

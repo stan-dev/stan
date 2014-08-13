@@ -1,12 +1,12 @@
 #ifndef STAN__OPTIMIZATION__BFGS_LINESEARCH_HPP
 #define STAN__OPTIMIZATION__BFGS_LINESEARCH_HPP
 
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
-#include <string>
 #include <limits>
-
-#include <boost/math/special_functions/fpclassify.hpp>
+#include <string>
 
 namespace stan {
   namespace optimization {

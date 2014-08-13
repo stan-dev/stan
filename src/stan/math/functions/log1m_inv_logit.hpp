@@ -2,6 +2,7 @@
 #define STAN__MATH__FUNCTIONS__LOG1M_INV_LOGIT_HPP
 
 #include <boost/math/tools/promotion.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {

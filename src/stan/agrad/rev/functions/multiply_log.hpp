@@ -1,13 +1,20 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__MULTIPLY_LOG_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__MULTIPLY_LOG_HPP
 
-#include <limits>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/internal/vv_vari.hpp>
-#include <stan/agrad/rev/internal/vd_vari.hpp>
-#include <stan/agrad/rev/internal/dv_vari.hpp>
 #include <stan/agrad/rev/functions/log.hpp>
+#include <stan/agrad/rev/internal/dv_vari.hpp>
+#include <stan/agrad/rev/internal/vd_vari.hpp>
+#include <stan/agrad/rev/internal/vv_vari.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/functions/multiply_log.hpp>
+#include <cmath>
+#include <complex>
+#include <limits>
+
+#include "stan/agrad/rev/internal/dv_vari.hpp"
+#include "stan/agrad/rev/internal/vd_vari.hpp"
+#include "stan/agrad/rev/internal/vv_vari.hpp"
+#include "stan/agrad/rev/vari.hpp"
 
 namespace stan {
   namespace agrad {

@@ -3,6 +3,7 @@
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/functions/log1p.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {

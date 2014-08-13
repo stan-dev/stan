@@ -1,14 +1,18 @@
 #ifndef STAN__AGRAD__REV__VAR_HPP
 #define STAN__AGRAD__REV__VAR_HPP
 
-#include <ostream>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/vari.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stddef.h>
+#include <ostream>
+#include <vector>
 
 namespace stan {
   namespace agrad {
 
     // forward declare
+class chainable;
+
     static void recover_memory();
     static void grad(chainable* vi);
     

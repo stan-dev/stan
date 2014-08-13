@@ -1,8 +1,13 @@
 #ifndef STAN__MCMC__ADAPT__DENSE__E__NUTS__BETA
 #define STAN__MCMC__ADAPT__DENSE__E__NUTS__BETA
 
-#include <stan/mcmc/stepsize_covar_adapter.hpp>
+#include <math.h>
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
+#include <stan/mcmc/stepsize_covar_adapter.hpp>
+#include <iostream>
+
+#include "stan/mcmc/base_adapter.hpp"
+#include "stan/mcmc/sample.hpp"
 
 namespace stan {
   

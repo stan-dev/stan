@@ -1,9 +1,11 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__EXPM1_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__EXPM1_HPP
 
+#include <boost/math/special_functions/expm1.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
-#include <boost/math/special_functions/expm1.hpp>
+#include <cmath>
+#include <complex>
 
 namespace stan {
 

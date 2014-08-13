@@ -1,12 +1,16 @@
 #ifndef STAN__OPTIMIZATION__LBFGS_UPDATE_HPP
 #define STAN__OPTIMIZATION__LBFGS_UPDATE_HPP
 
+#include <boost/circular_buffer.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <cstddef>
 #include <vector>
 
-#include <boost/tuple/tuple.hpp>
-#include <boost/circular_buffer.hpp>
-
-#include <stan/math/matrix/Eigen.hpp>
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/circular_buffer/base.hpp"
+#include "boost/tuple/detail/tuple_basic.hpp"
 
 namespace stan {
   namespace optimization {

@@ -3,6 +3,8 @@
 
 #include <stan/agrad/rev/var.hpp>
 
+#include "stan/agrad/rev/vari.hpp"
+
 namespace stan {
   namespace agrad {
 

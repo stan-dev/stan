@@ -3,10 +3,10 @@
 
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/mean.hpp>
-
-#include <vector>
 #include <complex>
+#include <cstddef>
 #include <unsupported/Eigen/FFT>
+#include <vector>
 
 
 namespace stan {

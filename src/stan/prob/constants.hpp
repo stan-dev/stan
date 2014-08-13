@@ -2,6 +2,7 @@
 #define STAN__PROB__DISTRIBUTIONS_CONSTANTS_HPP
 
 #include <boost/math/constants/constants.hpp>
+#include <math.h>
 
 namespace stan {
 

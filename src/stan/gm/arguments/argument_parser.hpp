@@ -1,14 +1,17 @@
 #ifndef STAN__GM__ARGUMENTS__ARGUMENT__PARSER__HPP
 #define STAN__GM__ARGUMENTS__ARGUMENT__PARSER__HPP
 
+#include <stan/gm/arguments/arg_method.hpp>
+#include <stan/gm/arguments/argument.hpp>
+#include <stan/gm/error_codes.hpp>
+#include <stddef.h>
+#include <cstring>
+#include <fstream>
+#include <iomanip>
 #include <string>
 #include <vector>
-#include <fstream>
-#include <cstring>
 
-#include <stan/gm/arguments/argument.hpp>
-#include <stan/gm/arguments/arg_method.hpp>
-#include <stan/gm/error_codes.hpp>
+#include "stan/gm/arguments/list_argument.hpp"
 
 namespace stan {
   

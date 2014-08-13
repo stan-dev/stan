@@ -1,8 +1,21 @@
 #ifndef STAN__IO__WRITER_HPP
 #define STAN__IO__WRITER_HPP
 
-#include <stdexcept>
+#include <math.h>
 #include <stan/prob/transform.hpp>
+#include <cstddef>
+#include <stdexcept>
+#include <vector>
+
+#include "Eigen/src/Core/Array.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "boost/throw_exception.hpp"
+#include "stan/math/error_handling/matrix/check_corr_matrix.hpp"
+#include "stan/math/error_handling/matrix/check_ordered.hpp"
+#include "stan/math/error_handling/matrix/check_positive_ordered.hpp"
+#include "stan/math/error_handling/matrix/check_simplex.hpp"
+#include "stan/math/error_handling/matrix/check_unit_vector.hpp"
 
 namespace stan {
 

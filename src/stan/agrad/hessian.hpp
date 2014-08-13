@@ -1,12 +1,13 @@
 #ifndef STAN__AGRAD__HESSIAN_HPP
 #define STAN__AGRAD__HESSIAN_HPP
 
+#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 #include <vector>
 
-#include <stan/agrad/rev.hpp>
-#include <stan/agrad/fwd.hpp>
-
-#include <stan/math/matrix/Eigen.hpp>
+#include "stan/agrad/fwd/fvar.hpp"
+#include "stan/agrad/rev/var.hpp"
 
 namespace stan {
 

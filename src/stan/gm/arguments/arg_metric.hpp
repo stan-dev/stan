@@ -1,11 +1,12 @@
 #ifndef STAN__GM__ARGUMENTS__METRIC__HPP
 #define STAN__GM__ARGUMENTS__METRIC__HPP
 
-#include <stan/gm/arguments/list_argument.hpp>
-
-#include <stan/gm/arguments/arg_unit_e.hpp>
-#include <stan/gm/arguments/arg_diag_e.hpp>
 #include <stan/gm/arguments/arg_dense_e.hpp>
+#include <stan/gm/arguments/arg_diag_e.hpp>
+#include <stan/gm/arguments/arg_unit_e.hpp>
+#include <stan/gm/arguments/list_argument.hpp>
+#include <string>
+#include <vector>
 
 namespace stan {
   

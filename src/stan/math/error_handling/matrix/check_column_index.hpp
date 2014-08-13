@@ -1,9 +1,13 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_COLUMN_INDEX_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_COLUMN_INDEX_HPP
 
-#include <sstream>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stddef.h>
+#include <sstream>
+#include <string>
+
+#include "Eigen/src/Core/Matrix.h"
 
 namespace stan {
   namespace math {

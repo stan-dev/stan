@@ -9,6 +9,8 @@
   //   Volume 27, Number 1, pages 97-99, 1978.
 
 #include <stan/math/constants.hpp>
+#include <cmath>
+#include <complex>
 
 namespace stan {
 

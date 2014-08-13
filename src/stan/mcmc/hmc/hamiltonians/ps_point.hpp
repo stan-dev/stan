@@ -1,12 +1,17 @@
 #ifndef STAN__MCMC__PS_POINT__BETA
 #define STAN__MCMC__PS_POINT__BETA
 
-#include <fstream>
-#include <string>
 #include <boost/lexical_cast.hpp>
-
-#include <vector>
 #include <stan/math/matrix/Eigen.hpp>
+#include <string.h>
+#include <fstream>
+#include <new>
+#include <string>
+#include <vector>
+
+#include "Eigen/src/Core/DenseCoeffsBase.h"
+#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/src/Core/util/Constants.h"
 
 namespace stan {
   

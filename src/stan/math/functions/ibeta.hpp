@@ -2,6 +2,14 @@
 #define STAN__MATH__FUNCTIONS__IBETA_HPP
 
 #include <boost/math/special_functions/beta.hpp>
+#include <algorithm>
+#include <cmath>
+#include <ostream>
+
+#include "boost/format/alt_sstream.hpp"
+#include "boost/format/alt_sstream_impl.hpp"
+#include "boost/format/format_implementation.hpp"
+#include "boost/optional/optional.hpp"
 
 namespace stan {
   namespace math {
