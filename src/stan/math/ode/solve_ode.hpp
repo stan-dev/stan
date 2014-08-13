@@ -137,17 +137,13 @@ namespace stan {
 
         std::vector<double> coupled_sys;
 
-        std::vector<stan::agrad::var> y0_temp;
         std::vector<stan::agrad::var> y_temp;
-        std::vector<stan::agrad::var> y_new;
         std::vector<stan::agrad::var> dy_dt_temp;
         std::vector<double> grad;
         std::vector<stan::agrad::var> vars;
 
         for (int i = 0; i < num_eqn; i++) {
-          y0_temp.clear();
           y_temp.clear();
-          y_new.clear();
           dy_dt_temp.clear();
           grad.clear();
           vars.clear();
