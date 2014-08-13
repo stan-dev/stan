@@ -172,10 +172,8 @@ namespace stan {
             // orders derivatives by equation (i.e. if there are 2 eqns 
             // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
             // dy1_dt, dy2_dt, dy1_da, dy1_db, dy2_da, dy2_db
-            double temp_deriv = grad[num_eqn+j];
-            // if (i == j)
-            //   temp_deriv *= 2.0;
-            for (int k = 0; k < num_eqn; k++)
+            double temp_deriv = 2*grad[num_eqn+j];
+            for (int k = 0; k < num_eqn; k++) 
               temp_deriv += y[num_eqn+num_eqn*k+j] * grad[k];
 
             coupled_sys.push_back(temp_deriv);
