@@ -3,10 +3,6 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
-bool IsNan(double x) {
-  return (boost::math::isnan)(x);
-}
-
 TEST(MathFunctions, Phi_approx) {
   EXPECT_EQ(0.5, stan::math::Phi_approx(0.0));
   EXPECT_NEAR(stan::math::Phi(0.9), stan::math::Phi_approx(0.9), 0.00014);
