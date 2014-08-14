@@ -622,6 +622,24 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
     }
 add_binary("pareto_rng");
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      for (size_t l = 0; l < vector_types.size(); ++l) {
+        add("pareto_type_2_log",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+        add("pareto_type_2_cdf",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+        add("pareto_type_2_cdf_log",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+        add("pareto_type_2_ccdf_log",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+      }
+add_ternary("pareto_type_2_rng");
 add_unary("Phi");
 add_unary("Phi_approx");
 add_nullary("pi");
