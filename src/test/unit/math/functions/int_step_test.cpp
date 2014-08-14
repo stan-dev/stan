@@ -18,8 +18,15 @@ TEST(MathFunctions, int_step_int) {
   EXPECT_EQ(1U, int_step(int(100)));
 }
 
+TEST(MathFunctions, int_step_inf) {
+  using stan::math::int_step;
+
+  EXPECT_EQ(1U, int_step(std::numeric_limits<double>::infinity()));
+  EXPECT_EQ(0U, int_step(-std::numeric_limits<double>::infinity()));
+}
+
 TEST(MathFunctions, int_step_nan) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   
-  EXPECT_EQ(0, stan::math::int_step(nan));
+  EXPECT_EQ(0U, stan::math::int_step(nan));
 }
