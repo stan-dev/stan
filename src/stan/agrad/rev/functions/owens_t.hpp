@@ -1,6 +1,7 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__OWENS__T_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__OWENS__T_HPP
 
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/internal/vd_vari.hpp>
@@ -20,8 +21,12 @@ namespace stan {
           op_vv_vari(boost::math::owens_t(avi->val_, bvi->val_), avi, bvi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * boost::math::erf(bvi_->val_ * avi_->val_ / std::sqrt(2.0)) * std::exp(-avi_->val_ * avi_->val_ / 2.0) * std::sqrt(pi() / 2.0) / (-2.0 * pi());
-          bvi_->adj_ += adj_ * std::exp(-0.5 * avi_->val_ * avi_->val_ * (1.0 + bvi_->val_ * bvi_->val_)) / ((1 + bvi_->val_ * bvi_->val_) * 2.0 * pi());
+          avi_->adj_ += adj_ * ::erf(bvi_->val_ * avi_->val_ / std::sqrt(2.0)) 
+            * std::exp(-avi_->val_ * avi_->val_ / 2.0) 
+            * std::sqrt(pi() / 2.0) / (-2.0 * pi());
+          bvi_->adj_ += adj_ * std::exp(-0.5 * avi_->val_ * avi_->val_ 
+                                        * (1.0 + bvi_->val_ * bvi_->val_)) 
+            / ((1 + bvi_->val_ * bvi_->val_) * 2.0 * pi());
         }
       };
 
@@ -31,7 +36,9 @@ namespace stan {
           op_vd_vari(boost::math::owens_t(avi->val_, b), avi, b) {
         }
         void chain() {
-          avi_->adj_ += adj_ * boost::math::erf(bd_ * avi_->val_ / std::sqrt(2.0)) * std::exp(-avi_->val_ * avi_->val_ / 2.0) * std::sqrt(pi() / 2.0) / (-2.0 * pi());
+          avi_->adj_ += adj_ * ::erf(bd_ * avi_->val_ / std::sqrt(2.0)) 
+            * std::exp(-avi_->val_ * avi_->val_ / 2.0) 
+            * std::sqrt(pi() / 2.0) / (-2.0 * pi());
         }
       };
 
@@ -41,7 +48,9 @@ namespace stan {
           op_dv_vari(boost::math::owens_t(a, bvi->val_), a, bvi) {
         }
         void chain() {
-          bvi_->adj_ += adj_ * std::exp(-0.5 * ad_ * ad_ * (1.0 + bvi_->val_ * bvi_->val_)) / ((1 + bvi_->val_ * bvi_->val_) * 2.0 * pi());
+          bvi_->adj_ += adj_ * std::exp(-0.5 * ad_ * ad_ 
+                                        * (1.0 + bvi_->val_ * bvi_->val_)) 
+            / ((1 + bvi_->val_ * bvi_->val_) * 2.0 * pi());
         }
       };
     }

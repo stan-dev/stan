@@ -1,6 +1,7 @@
 #ifndef STAN__AGRAD__FWD__FUNCTIONS__OWENS_T_HPP
 #define STAN__AGRAD__FWD__FUNCTIONS__OWENS_T_HPP
 
+#include <math.h>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/constants.hpp>
@@ -14,9 +15,9 @@ namespace stan {
     fvar<T>    
     owens_t(const fvar<T>& x1, const fvar<T>& x2) {
       using stan::math::owens_t;
-      using boost::math::erf;
       using stan::math::pi;
       using std::exp;
+      using ::erf;
 
       T neg_x1_sq_div_2 = -x1.val_ * x1.val_ / 2.0;
       T one_p_x2_sq = 1.0 + x2.val_ * x2.val_;
@@ -34,7 +35,6 @@ namespace stan {
     fvar<T>    
     owens_t(const double x1, const fvar<T>& x2) {
       using stan::math::owens_t;
-      using boost::math::erf;
       using stan::math::pi;
       using std::exp;
 
@@ -51,9 +51,9 @@ namespace stan {
     fvar<T>    
     owens_t(const fvar<T>& x1, const double x2) {
       using stan::math::owens_t;
-      using boost::math::erf;
       using stan::math::pi;
       using std::exp;
+      using ::erf;
 
       T neg_x1_sq_div_2 = -x1.val_ * x1.val_ / 2.0;
 
