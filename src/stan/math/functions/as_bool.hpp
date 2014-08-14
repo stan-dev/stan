@@ -12,7 +12,7 @@ namespace stan {
      */
     template <typename T>
     inline bool as_bool(const T x) {
-      return x != 0.0;
+      return x != 0;
     }
 
   }
