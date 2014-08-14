@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/constants.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,asin_var) {
   AVAR a = 0.68;
@@ -56,4 +57,17 @@ TEST(AgradRev,asin_nan) {
   EXPECT_TRUE(boost::math::isnan(f.val()));
   ASSERT_EQ(1U,g.size());
   EXPECT_TRUE(boost::math::isnan(g[0]));
+}
+
+struct asin_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return asin(arg1);
+  }
+};
+
+TEST(AgradRev,asin_NaN) {
+  asin_fun asin_;
+  test_nan(asin_,false);
 }

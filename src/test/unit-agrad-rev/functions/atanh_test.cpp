@@ -2,6 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/constants.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,atanh) {
   AVAR a = 0.3;
@@ -50,16 +51,15 @@ TEST(AgradRev,atanh_out_of_bounds) {
   EXPECT_THROW(atanh(d),std::domain_error);
 }
 
+struct atanh_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return atanh(arg1);
+  }
+};
 
-TEST(AgradRev,atanh_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::atanh(a);
-
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,atanh_NaN) {
+  atanh_fun atanh_;
+  test_nan(atanh_,false);
 }

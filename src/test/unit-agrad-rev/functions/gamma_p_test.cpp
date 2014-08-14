@@ -2,6 +2,8 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,gamma_p_var_var) {
   AVAR a = 0.5;
@@ -56,43 +58,17 @@ TEST(AgradRev,gamma_p_var_double) {
   EXPECT_THROW(gamma_p(a,b), std::domain_error);
 }
 
-TEST(AgradRev,gamma_p_nan_vv) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR b = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::gamma_p(a,b);
+struct gamma_p_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return gamma_p(arg1,arg2);
+  }
+};
 
-  AVEC x = createAVEC(a,b);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(2U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
-  EXPECT_TRUE(boost::math::isnan(g[1]));
-}
-
-TEST(AgradRev,gamma_p_nan_vd) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::gamma_p(a,1);
-
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
-}
-
-TEST(AgradRev,gamma_p_nan_dv) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::gamma_p(1,a);
-
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev, gamma_p_nan) {
+  gamma_p_fun gamma_p_;
+  test_nan(gamma_p_,0.5,1.0,false);
 }

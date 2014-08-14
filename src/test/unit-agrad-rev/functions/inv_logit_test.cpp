@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/functions/inv_logit.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,inv_logit) {
   AVAR a = 2.0;
@@ -15,15 +15,15 @@ TEST(AgradRev,inv_logit) {
                   grad_f[0]);
 }
 
-TEST(AgradRev,inv_logit_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::inv_logit(a);
+struct inv_logit_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return inv_logit(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,inv_logit_NaN) {
+  inv_logit_fun inv_logit_;
+  test_nan(inv_logit_,false);
 }

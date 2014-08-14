@@ -2,6 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/rev/numeric_limits.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,exp2) {
   AVAR a = 1.3;
@@ -18,15 +19,15 @@ TEST(AgradRev,exp2) {
                   stan::agrad::exp2(a).val());
 }
 
-TEST(AgradRev,exp2_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::exp2(a);
+struct exp2_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return exp2(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,exp2_NaN) {
+  exp2_fun exp2_;
+  test_nan(exp2_,false);
 }

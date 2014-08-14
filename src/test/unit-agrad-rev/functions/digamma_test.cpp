@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/zeta.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,digamma) {
   AVAR a = 0.5;
@@ -15,15 +16,15 @@ TEST(AgradRev,digamma) {
   EXPECT_FLOAT_EQ(4.9348022005446793094, grad_f[0]);
 }  
 
-TEST(AgradRev,digamma_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::digamma(a);
+struct digamma_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return digamma(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,digamma_NaN) {
+  digamma_fun digamma_;
+  test_nan(digamma_,false);
 }

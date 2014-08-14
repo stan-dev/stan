@@ -2,6 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/constants.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,inv_square) {
   AVAR a = 7.0;
@@ -23,15 +24,15 @@ TEST(AgradRev,inv_square) {
   EXPECT_FLOAT_EQ(stan::math::negative_infinity(),grad_f[0]);
 }
 
-TEST(AgradRev,inv_square_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::inv_square(a);
+struct inv_square_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return inv_square(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,inv_square_NaN) {
+  inv_square_fun inv_square_;
+  test_nan(inv_square_,false);
 }

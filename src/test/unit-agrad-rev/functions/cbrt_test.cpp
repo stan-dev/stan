@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/functions/cbrt.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,cbrt) {
   AVAR a = 27.0;
@@ -13,7 +14,15 @@ TEST(AgradRev,cbrt) {
   EXPECT_FLOAT_EQ(1.0 / 3.0 / std::pow(27.0,2.0/3.0), grad_f[0]);
 }
 
-TEST(AgradRev,cbrt_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_THROW(stan::agrad::cbrt(a), std::domain_error);
+struct cbrt_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return cbrt(arg1);
+  }
+};
+
+TEST(AgradRev,cbrt_NaN) {
+  cbrt_fun cbrt_;
+  test_nan(cbrt_,true);
 }

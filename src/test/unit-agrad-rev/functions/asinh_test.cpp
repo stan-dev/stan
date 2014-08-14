@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/functions/asinh.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,asinh_val) {
   AVAR a = 0.2;
@@ -43,15 +44,15 @@ TEST(AgradRev,asinh_boundry) {
   EXPECT_FLOAT_EQ(0.0, h[0]); 
 }
 
-TEST(AgradRev,asinh_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::asinh(a);
+struct asinh_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return asinh(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,asinh_NaN) {
+  asinh_fun asinh_;
+  test_nan(asinh_,false);
 }

@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/functions/cosh.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
-#include <boost/math/special_functions/fpclassify.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 #include <cmath>
 
 TEST(AgradRev,cosh_var) {
@@ -50,15 +50,15 @@ TEST(AgradRev,cosh_neg_inf) {
   EXPECT_TRUE(boost::math::isinf(g[0]) && (g[0] < 0));
 }
 
-TEST(AgradRev,cosh_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::cosh(a);
+struct cosh_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return cosh(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,cosh_NaN) {
+  cosh_fun cosh_;
+  test_nan(cosh_,false);
 }
