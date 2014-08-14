@@ -2,6 +2,8 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,log_rising_factorial_var_double) {
   double a(1);
@@ -48,43 +50,17 @@ TEST(AgradRev, log_rising_factorial_var_var) {
   EXPECT_FLOAT_EQ(boost::math::digamma(9), g[1]);
 }
 
-TEST(AgradRev,log_rising_factorial_nan_vv) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR b = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::log_rising_factorial(a,b);
+struct log_rising_factorial_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return log_rising_factorial(arg1,arg2);
+  }
+};
 
-  AVEC x = createAVEC(a,b);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(2U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
-  EXPECT_TRUE(boost::math::isnan(g[1]));
-}
-
-TEST(AgradRev,log_rising_factorial_nan_vd) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::log_rising_factorial(a,1);
-
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
-}
-
-TEST(AgradRev,log_rising_factorial_nan_dv) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::log_rising_factorial(1,a);
-
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev, log_rising_factorial_nan) {
+  log_rising_factorial_fun log_rising_factorial_;
+  test_nan(log_rising_factorial_,3.0,5.0,false);
 }

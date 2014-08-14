@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/math/constants.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,sqrt_a) {
   AVAR a(5.0);
@@ -46,15 +47,16 @@ TEST(AgradRev,sqrt_zero) {
   EXPECT_FLOAT_EQ(inf,g[0]);
 }
 
-TEST(AgradRev,sqrt_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::sqrt(a);
+struct sqrt_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return sqrt(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,sqrt_NaN) {
+  sqrt_fun sqrt_;
+  test_nan(sqrt_,false);
 }
+

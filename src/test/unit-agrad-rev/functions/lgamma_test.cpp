@@ -2,6 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,lgamma) {
   AVAR a = 3.0;
@@ -25,4 +26,17 @@ TEST(AgradRev,lgamma_nan) {
   EXPECT_TRUE(boost::math::isnan(f.val()));
   ASSERT_EQ(1U,g.size());
   EXPECT_TRUE(boost::math::isnan(g[0]));
+}
+
+struct lgamma_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return lgamma(arg1);
+  }
+};
+
+TEST(AgradRev,lgamma_NaN) {
+  lgamma_fun lgamma_;
+  test_nan(lgamma_,false);
 }

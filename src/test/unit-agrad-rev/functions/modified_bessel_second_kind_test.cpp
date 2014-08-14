@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/functions/modified_bessel_second_kind.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,modified_bessel_second_kind_int_var) {
   int a(1);
@@ -22,15 +23,15 @@ TEST(AgradRev,modified_bessel_second_kind_int_var) {
   EXPECT_THROW(stan::agrad::modified_bessel_second_kind(a,b), std::domain_error);
 }
 
-TEST(AgradRev,modified_bessel_second_kind_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::modified_bessel_second_kind(2,a);
+struct modified_bessel_second_kind_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return modified_bessel_second_kind(2,arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,modified_bessel_second_kind_NaN) {
+  modified_bessel_second_kind_fun modified_bessel_second_kind_;
+  test_nan(modified_bessel_second_kind_,false);
 }

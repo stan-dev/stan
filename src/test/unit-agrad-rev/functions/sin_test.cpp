@@ -2,7 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/rev/numeric_limits.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,sin_var) {
   AVAR a = 0.49;
@@ -35,15 +35,15 @@ TEST(AgradRev,sin_boundry) {
   EXPECT_TRUE(std::isnan(sin(b)));
 }
 
-TEST(AgradRev,sin_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::sin(a);
+struct sin_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return sin(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,sin_NaN) {
+  sin_fun sin_;
+  test_nan(sin_,false);
 }

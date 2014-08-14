@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,tgamma) {
   AVAR a = 3.5;
@@ -15,15 +16,15 @@ TEST(AgradRev,tgamma) {
   EXPECT_FLOAT_EQ(boost::math::digamma(3.5) * boost::math::tgamma(3.5),grad_f[0]);
 }  
 
-TEST(AgradRev,tgamma_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::tgamma(a);
+struct tgamma_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return tgamma(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,tgamma_NaN) {
+  tgamma_fun tgamma_;
+  test_nan(tgamma_,false);
 }

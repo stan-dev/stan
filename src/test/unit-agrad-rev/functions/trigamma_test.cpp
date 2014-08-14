@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/functions/trigamma.hpp>
 #include <stan/agrad/rev.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,trigamma) {
   AVAR a = 0.5;
@@ -14,15 +15,15 @@ TEST(AgradRev,trigamma) {
   EXPECT_FLOAT_EQ(-16.8288, grad_f[0]);
 }  
 
-TEST(AgradRev,trigamma_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::math::trigamma(a);
+struct trigamma_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return stan::math::trigamma(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,trigamma_NaN) {
+  trigamma_fun trigamma_;
+  test_nan(trigamma_,false);
 }

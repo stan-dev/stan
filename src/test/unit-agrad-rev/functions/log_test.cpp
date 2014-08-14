@@ -1,12 +1,12 @@
 #include <stan/agrad/rev/functions/log.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/operators/operator_less_than.hpp>
 #include <stan/agrad/rev/operators/operator_equal.hpp>
 #include <stan/agrad/rev/operators/operator_unary_negative.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,log_a) {
   AVAR a(5.0);
@@ -34,15 +34,15 @@ TEST(AgradRev,log_neg){
   EXPECT_TRUE(std::isnan(log(a)));
 }
 
-TEST(AgradRev,log_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::log(a);
+struct log_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return log(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,log_NaN) {
+  log_fun log_;
+  test_nan(log_,false);
 }

@@ -2,6 +2,7 @@
 #include <stan/math.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 void test_log1m_inv_logit(const double x) {
   using stan::agrad::var;
@@ -36,15 +37,16 @@ TEST(AgradRev, log1m_inv_logit) {
   test_log1m_inv_logit(1.9);
 }
 
-TEST(AgradRev,log1m_inv_logit_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::math::log1m_inv_logit(a);
+struct log1m_inv_logit_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return stan::math::log1m_inv_logit(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,log1m_inv_logit_NaN) {
+  log1m_inv_logit_fun log1m_inv_logit_;
+  test_nan(log1m_inv_logit_,false);
 }
+

@@ -2,6 +2,7 @@
 #include <stan/math.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 void test_log_inv_logit(const double x) {
   using stan::agrad::var;

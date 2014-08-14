@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/functions/log10.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,log10_a) {
   AVAR a(5.0);
@@ -12,15 +13,15 @@ TEST(AgradRev,log10_a) {
   EXPECT_FLOAT_EQ(1.0/(log(10.0) * 5.0),g[0]);
 }
 
-TEST(AgradRev,log10_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::log10(a);
+struct log10_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return log10(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,log10_NaN) {
+  log10_fun log10_;
+  test_nan(log10_,false);
 }
