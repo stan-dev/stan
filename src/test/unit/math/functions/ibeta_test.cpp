@@ -21,7 +21,7 @@ TEST(MathFunctions, ibeta_nan) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   
   EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::ibeta(0.5, 0.5, nan));
+               stan::math::ibeta(0.5, 0.0, nan));
 
   EXPECT_PRED1(boost::math::isnan<double>,
                stan::math::ibeta(0.5, nan, 0.0));
@@ -30,10 +30,10 @@ TEST(MathFunctions, ibeta_nan) {
                stan::math::ibeta(0.5, nan, nan));
 
   EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::ibeta(nan, 0.5, 0.0));
+               stan::math::ibeta(nan, 0.0, 0.0));
 
   EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::ibeta(nan, 0.5, nan));
+               stan::math::ibeta(nan, 0.0, nan));
 
   EXPECT_PRED1(boost::math::isnan<double>,
                stan::math::ibeta(nan, nan, 0.0));
