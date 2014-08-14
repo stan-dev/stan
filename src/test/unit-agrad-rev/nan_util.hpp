@@ -12,7 +12,10 @@ void test_nan_vd(const F& f,
   stan::agrad::var res;
   stan::agrad::var arg1_v = arg1;
   if (throws)
-    EXPECT_THROW(f(arg1_v, arg2), std::domain_error);
+    EXPECT_THROW(f(arg1_v, arg2), std::domain_error)
+      << "Failed for var,double version with "
+      << "first argument " << arg1_v 
+      << " and second argument " << arg2;
   else {
     res = f(arg1_v, arg2);
 
@@ -20,9 +23,18 @@ void test_nan_vd(const F& f,
     VEC g;
     res.grad(x,g);
   
-    EXPECT_TRUE(boost::math::isnan(res.val()));
-    ASSERT_EQ(1U,g.size());
-    EXPECT_TRUE(boost::math::isnan(g[0]));
+    EXPECT_TRUE(boost::math::isnan(res.val()))
+      << "Failed for var,double version with "
+      << "first argument " << arg1_v 
+      << " and second argument " << arg2;
+    ASSERT_EQ(1U,g.size())
+      << "Failed for var,double version with "
+      << "first argument " << arg1_v 
+      << " and second argument " << arg2;
+    EXPECT_TRUE(boost::math::isnan(g[0]))
+      << "Failed for var,double version with "
+      << "first argument " << arg1_v 
+      << " and second argument " << arg2;
   }
 }
 template <typename F>
@@ -33,7 +45,10 @@ void test_nan_dv(const F& f,
   stan::agrad::var res;
   stan::agrad::var arg2_v = arg2;
   if (throws)
-    EXPECT_THROW(f(arg1, arg2_v), std::domain_error);
+    EXPECT_THROW(f(arg1, arg2_v), std::domain_error)
+      << "Failed for double,var version with "
+      << "first argument " << arg1 
+      << " and second argument " << arg2_v;
   else {
     res = f(arg1, arg2_v);
 
@@ -41,9 +56,18 @@ void test_nan_dv(const F& f,
     VEC g;
     res.grad(x,g);
   
-    EXPECT_TRUE(boost::math::isnan(res.val()));
-    ASSERT_EQ(1U,g.size());
-    EXPECT_TRUE(boost::math::isnan(g[0]));
+    EXPECT_TRUE(boost::math::isnan(res.val()))
+      << "Failed for double,var version with "
+      << "first argument " << arg1 
+      << " and second argument " << arg2_v;
+    ASSERT_EQ(1U,g.size())
+      << "Failed for double,var version with "
+      << "first argument " << arg1 
+      << " and second argument " << arg2_v;
+    EXPECT_TRUE(boost::math::isnan(g[0]))
+      << "Failed for double,var version with "
+      << "first argument " << arg1 
+      << " and second argument " << arg2_v;
   }
 }
 template <typename F>
@@ -55,7 +79,10 @@ void test_nan_vv(const F& f,
   stan::agrad::var arg1_v = arg1;
   stan::agrad::var arg2_v = arg2;
   if (throws)
-    EXPECT_THROW(f(arg1_v, arg2_v), std::domain_error);
+    EXPECT_THROW(f(arg1_v, arg2_v), std::domain_error)
+      << "Failed for var,var version with "
+      << "first argument " << arg1_v 
+      << " and second argument " << arg2_v;
   else {
     res = f(arg1_v, arg2_v);
 
@@ -63,10 +90,22 @@ void test_nan_vv(const F& f,
     VEC g;
     res.grad(x,g);
   
-    EXPECT_TRUE(boost::math::isnan(res.val()));
-    ASSERT_EQ(2U,g.size());
-    EXPECT_TRUE(boost::math::isnan(g[0]));
-    EXPECT_TRUE(boost::math::isnan(g[1]));
+    EXPECT_TRUE(boost::math::isnan(res.val()))
+      << "Failed for var,var version with "
+      << "first argument " << arg1_v 
+      << " and second argument " << arg2_v;
+    ASSERT_EQ(2U,g.size())
+      << "Failed for var,var version with "
+      << "first argument " << arg1_v 
+      << " and second argument " << arg2_v;
+    EXPECT_TRUE(boost::math::isnan(g[0]))
+      << "Failed for var,var version with "
+      << "first argument " << arg1_v 
+      << " and second argument " << arg2_v;
+    EXPECT_TRUE(boost::math::isnan(g[1]))
+      << "Failed for var,var version with "
+      << "first argument " << arg1_v 
+      << " and second argument " << arg2_v;
   }
 }
 
