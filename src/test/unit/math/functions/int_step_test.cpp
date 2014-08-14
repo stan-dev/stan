@@ -21,6 +21,5 @@ TEST(MathFunctions, int_step_int) {
 TEST(MathFunctions, int_step_nan) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::int_step(nan));
+  EXPECT_EQ(0, stan::math::int_step(nan));
 }
