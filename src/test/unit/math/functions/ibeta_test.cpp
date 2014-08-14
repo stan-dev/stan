@@ -20,24 +20,17 @@ TEST(MathFunctions, ibeta) {
 TEST(MathFunctions, ibeta_nan) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::ibeta(0.5, 0.0, nan));
+  EXPECT_THROW(stan::math::ibeta(0.5, 0.0, nan), std::domain_error);
 
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::ibeta(0.5, nan, 0.0));
+  EXPECT_THROW(stan::math::ibeta(0.5, nan, 0.0), std::domain_error);
 
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::ibeta(0.5, nan, nan));
+  EXPECT_THROW(stan::math::ibeta(0.5, nan, nan), std::domain_error);
 
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::ibeta(nan, 0.0, 0.0));
+  EXPECT_THROW(stan::math::ibeta(nan, 0.0, 0.0), std::domain_error);
 
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::ibeta(nan, 0.0, nan));
+  EXPECT_THROW(stan::math::ibeta(nan, 0.0, nan), std::domain_error);
 
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::ibeta(nan, nan, 0.0));
+  EXPECT_THROW(stan::math::ibeta(nan, nan, 0.0), std::domain_error);
 
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::ibeta(nan, nan, nan));
+  EXPECT_THROW(stan::math::ibeta(nan, nan, nan), std::domain_error);
 }
