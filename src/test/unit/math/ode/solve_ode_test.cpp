@@ -61,7 +61,7 @@ TEST(solve_ode, ode_system_dv) {
   std::vector<double> x;
   std::vector<int> x_int;
 
-  ode_system<harm_osc_ode_fun, double, stan::agrad::var> system(harm_osc, y0,theta, x, x_int);
+  ode_system<harm_osc_ode_fun, double, stan::agrad::var> system(harm_osc, y0,theta, x, x_int,2);
 
   system(y0, dy_dt, t0);
 
@@ -78,6 +78,7 @@ TEST(solve_ode, ode_system_vd) {
 
   std::vector<double> theta;
   std::vector<double> y0;
+  std::vector<double> y0_adj;
   double t0;
   std::vector<double> dy_dt;
 
@@ -95,16 +96,16 @@ TEST(solve_ode, ode_system_vd) {
   std::vector<double> x;
   std::vector<int> x_int;
 
-  ode_system<harm_osc_ode_fun, stan::agrad::var, double> system(harm_osc, y0,theta, x, x_int);
+  ode_system<harm_osc_ode_fun, stan::agrad::var, double> system(harm_osc, y0,theta, x, x_int,2);
 
   system(y0, dy_dt, t0);
 
-  EXPECT_FLOAT_EQ(0.5, dy_dt[0]);
-  EXPECT_FLOAT_EQ(-1.0 - 0.15*0.5, dy_dt[1]);
+  EXPECT_FLOAT_EQ(1.0, dy_dt[0]);
+  EXPECT_FLOAT_EQ(-2.0 - 0.15*1.0, dy_dt[1]);
   EXPECT_FLOAT_EQ(0+1.0*0+3.0*1+0, dy_dt[2]);
-  EXPECT_FLOAT_EQ(1.0+2.0*0+5.0*1.0+1.0, dy_dt[3]);
-  EXPECT_FLOAT_EQ(-1.0-1.0*1.0-0.15*3.0-1.0, dy_dt[4]);
-  EXPECT_FLOAT_EQ(-0.15-1.0*2.0-0.15*5.0-0.15, dy_dt[5]);
+  EXPECT_FLOAT_EQ(1.0+2.0*0+5.0*1.0, dy_dt[3]);
+  EXPECT_FLOAT_EQ(-1.0-1.0*1.0-0.15*3.0, dy_dt[4]);
+  EXPECT_FLOAT_EQ(-0.15-1.0*2.0-0.15*5.0, dy_dt[5]);
 }
 
 TEST(solve_ode, harm_osc_finite_diff) {
