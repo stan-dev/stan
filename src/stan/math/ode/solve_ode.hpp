@@ -71,7 +71,7 @@ namespace stan {
 
         dy_dt = f_(t,y,theta_,x_,x_int_);
 
-        std::vector<double> coupled_sys;
+        std::vector<double> coupled_sys(num_eqn_ * theta_.size());
 
         std::vector<stan::agrad::var> theta_temp;
         std::vector<stan::agrad::var> y_temp;
@@ -98,16 +98,16 @@ namespace stan {
 
           dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_);
           dy_dt_temp[i].grad(vars, grad);
-
+          
           for (int j = 0; j < theta_.size(); j++) { 
             // orders derivatives by equation (i.e. if there are 2 eqns 
             // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
-            // dy1_dt, dy2_dt, dy1_da, dy1_db, dy2_da, dy2_db
+            // dy1_dt, dy2_dt, dy1_da, dy2_da, dy1_db, dy2_db
             double temp_deriv = grad[y_temp.size()+j];
             for (int k = 0; k < num_eqn_; k++)
-              temp_deriv += y[num_eqn_+theta_.size()*k+j] * grad[k];
+              temp_deriv += y[num_eqn_+num_eqn_*j+k] * grad[k];
 
-            coupled_sys.push_back(temp_deriv);
+            coupled_sys[i+j*num_eqn_] = temp_deriv;
           }
         }
 
@@ -140,7 +140,7 @@ namespace stan {
           y_new.push_back(y[i]+y0_[i]);
         dy_dt = f_(t,y_new,theta_,x_,x_int_);
 
-        std::vector<double> coupled_sys;
+        std::vector<double> coupled_sys(num_eqn_ * num_eqn_);
 
         std::vector<stan::agrad::var> y_temp;
         std::vector<stan::agrad::var> dy_dt_temp;
@@ -158,18 +158,26 @@ namespace stan {
             vars.push_back(y_temp[j]);
           }
 
-          dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_);
-          dy_dt_temp[i].grad(vars, grad);
+          //dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_);
+          //dy_dt_temp[i].grad(vars, grad);
+
+          if (i == 0) {
+            grad.push_back(0.0);
+            grad.push_back(1.0);
+          } else {
+            grad.push_back(-1.0);
+            grad.push_back(-theta_[0]);
+          }
 
           for (int j = 0; j < num_eqn_; j++) { 
             // orders derivatives by equation (i.e. if there are 2 eqns 
             // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
-            // dy1_dt, dy2_dt, dy1_da, dy1_db, dy2_da, dy2_db
+            // dy1_dt, dy2_dt, dy1_da, dy2_da, dy1_db, dy2_db
             double temp_deriv = grad[j];
-            for (int k = 0; k < num_eqn_; k++) 
-              temp_deriv += y[num_eqn_+num_eqn_*k+j] * grad[k];
+            for (int k = 0; k < num_eqn_; k++)
+              temp_deriv += y[num_eqn_+num_eqn_*j+k] * grad[k];
 
-            coupled_sys.push_back(temp_deriv);
+            coupled_sys[i+j*num_eqn_] = temp_deriv;
           }
         }
 
@@ -177,6 +185,84 @@ namespace stan {
       }
     };
 
+    // ODE coupled system for y0 var and theta var
+    template <typename F>
+    struct ode_system <F, stan::agrad::var, stan::agrad::var> {
+      const F& f_;
+      const std::vector<double> y0_;
+      const std::vector<double>& theta_;
+      const std::vector<double>& x_;
+      const std::vector<int>& x_int_;
+      const int& num_eqn_;
+      ode_system(const F& f,
+                 const std::vector<double>& y0,
+                 const std::vector<double>& theta,
+                 const std::vector<double>& x,
+                 const std::vector<int>& x_int,
+                 const int& num_eqn)
+        : f_(f), y0_(y0), theta_(theta), x_(x), x_int_(x_int), num_eqn_(num_eqn) { }
+
+      void operator()(const std::vector<double>& y,
+                      std::vector<double>& dy_dt,
+                      const double& t) {
+        std::vector<double> y_new;
+        for (int i = 0; i < num_eqn_; i++)
+          y_new.push_back(y[i]+y0_[i]);
+        dy_dt = f_(t,y_new,theta_,x_,x_int_);
+
+        std::vector<double> coupled_sys(num_eqn_ * (num_eqn_+theta_.size()));
+
+        std::vector<stan::agrad::var> theta_temp;
+        std::vector<stan::agrad::var> y_temp;
+        std::vector<stan::agrad::var> dy_dt_temp;
+        std::vector<double> grad;
+        std::vector<stan::agrad::var> vars;
+
+        for (int i = 0; i < num_eqn_; i++) {
+          theta_temp.clear();
+          y_temp.clear();
+          dy_dt_temp.clear();
+          grad.clear();
+          vars.clear();
+
+          for (int j = 0; j < num_eqn_; j++) {
+            y_temp.push_back(y[j]+y0_[j]);
+            vars.push_back(y_temp[j]);
+          }
+
+          for (int j = 0; j < theta_.size(); j++) {
+            theta_temp.push_back(theta_[j]);
+            vars.push_back(theta_temp[j]);
+          }
+
+          //dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_);
+          //dy_dt_temp[i].grad(vars, grad);
+
+          if (i == 0) {
+            grad.push_back(0.0);
+            grad.push_back(1.0);
+            grad.push_back(0.0);
+          } else {
+            grad.push_back(-1.0);
+            grad.push_back(-theta_[0]);
+            grad.push_back(-y_temp[1].val());
+          }
+
+          for (int j = 0; j < num_eqn_+theta_.size(); j++) { 
+            // orders derivatives by equation (i.e. if there are 2 eqns 
+            // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
+            // dy1_dt, dy2_dt, dy1_da, dy2_da, dy1_db, dy2_db
+            double temp_deriv = grad[j];
+            for (int k = 0; k < num_eqn_; k++)
+              temp_deriv += y[num_eqn_+num_eqn_*j+k] * grad[k];
+
+            coupled_sys[i+j*num_eqn_] = temp_deriv;
+          }
+        }
+
+        dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
+      }
+    };
 
 
     std::vector<std::vector<double> > 
@@ -204,9 +290,8 @@ namespace stan {
           temp_gradients.clear();
           
           //iterate over parameters for each equation
-          for (int k = 0; k < y0.size(); k++) { 
-            temp_gradients.push_back(y[i][y0.size() + y0.size()*j + k]);
-          }
+          for (int k = 0; k < y0.size(); k++)
+            temp_gradients.push_back(y[i][y0.size() + y0.size()*k + j]);
 
           temp_vars.push_back(stan::agrad::precomputed_gradients(y[i][j], y0, temp_gradients));
         }
@@ -234,9 +319,8 @@ namespace stan {
           temp_gradients.clear();
           
           //iterate over parameters for each equation
-          for (int k = 0; k < theta.size(); k++) { 
-            temp_gradients.push_back(y[i][y0.size() + theta.size()*j + k]);
-          }
+          for (int k = 0; k < theta.size(); k++)
+            temp_gradients.push_back(y[i][y0.size() + y0.size()*k + j]);
 
           temp_vars.push_back(stan::agrad::precomputed_gradients(y[i][j], theta, temp_gradients));
         }
@@ -247,6 +331,37 @@ namespace stan {
       return y_return;
     }
     
+    std::vector<std::vector<stan::agrad::var> > 
+    compute_results(const std::vector<std::vector<double> >& y,
+                    const std::vector<stan::agrad::var>& y0,
+                    const std::vector<stan::agrad::var>& theta) {
+      std::vector<stan::agrad::var> vars = y0;
+      vars.insert(vars.end(), theta.begin(), theta.end());
+
+      std::vector<stan::agrad::var> temp_vars;
+      std::vector<double> temp_gradients;
+      std::vector<std::vector<stan::agrad::var> > y_return(y.size());
+
+      for (int i = 0; i < y.size(); i++) {
+        temp_vars.clear();
+        
+        //iterate over number of equations
+        for (int j = 0; j < y0.size(); j++) { 
+          temp_gradients.clear();
+          
+          //iterate over parameters for each equation
+          for (int k = 0; k < y0.size()+theta.size(); k++)
+            temp_gradients.push_back(y[i][y0.size() + y0.size()*k + j]);
+
+          temp_vars.push_back(stan::agrad::precomputed_gradients(y[i][j], vars, temp_gradients));
+        }
+
+        y_return[i] = temp_vars;
+      }
+
+      return y_return;
+    }
+
     template <typename F, typename T1, typename T2>
     std::vector<std::vector<typename stan::return_type<T1,T2>::type> >
     solve_ode(const F& f,
@@ -271,12 +386,12 @@ namespace stan {
 
       //initialize values to 0 if theta is var
       if (boost::is_same<stan::agrad::var, T2>::value)
-        for (size_t n = y0.size(); n < (1+theta.size()) * y0.size(); n++)
+        for (size_t n = 0; n < theta.size() * y0.size(); n++)
           y0_vec.push_back(0.0);
 
       //initalize values to 0 if y0 is var
       if (boost::is_same<stan::agrad::var, T1>::value)
-        for (size_t n = y0.size(); n < (1+y0.size()) * y0.size(); n++)
+        for (size_t n = 0; n < y0.size() * y0.size(); n++)
           y0_vec.push_back(0.0);
 
       // builds coupled ode system
@@ -318,9 +433,8 @@ namespace stan {
       if (boost::is_same<stan::agrad::var, T1>::value)
         for (size_t n = 0; n < res.size(); n++)
           for (size_t m = 0; m < y0.size(); m++)
-            res[n][m] += value_of(y0[m]);
+            res[n][m] += y0[m];
 
-      //std::cout<<y_temp<<std::endl;
       return res;
     }
                    

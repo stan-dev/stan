@@ -89,8 +89,8 @@ TEST(solve_ode, ode_system_vd) {
   y0.push_back(1.0);
   y0.push_back(0.5);
   y0.push_back(1.0);
-  y0.push_back(2.0);
   y0.push_back(3.0);
+  y0.push_back(2.0);
   y0.push_back(5.0);
 
   std::vector<double> x;
@@ -103,8 +103,8 @@ TEST(solve_ode, ode_system_vd) {
   EXPECT_FLOAT_EQ(1.0, dy_dt[0]);
   EXPECT_FLOAT_EQ(-2.0 - 0.15*1.0, dy_dt[1]);
   EXPECT_FLOAT_EQ(0+1.0*0+3.0*1+0, dy_dt[2]);
-  EXPECT_FLOAT_EQ(1.0+2.0*0+5.0*1.0, dy_dt[3]);
-  EXPECT_FLOAT_EQ(-1.0-1.0*1.0-0.15*3.0, dy_dt[4]);
+  EXPECT_FLOAT_EQ(-1.0-1.0*1.0-0.15*3.0, dy_dt[3]);
+  EXPECT_FLOAT_EQ(1.0+2.0*0+5.0*1.0, dy_dt[4]);
   EXPECT_FLOAT_EQ(-0.15-1.0*2.0-0.15*5.0, dy_dt[5]);
 }
 
@@ -128,15 +128,16 @@ TEST(solve_ode, harm_osc_finite_diff) {
   for (int i = 0; i < 100; i++)
     ts.push_back(0.1*(i+1));
 
-  test_ode_dv(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8);
-  test_ode_vd(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8);
+  test_ode_dv(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8,1e-4);
+  test_ode_vd(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8,1e-4);
+  test_ode_vv(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8,1e-4);
 }
 
 TEST(solve_ode, harm_osc_known_values) {
   harm_osc_ode_fun harm_osc;
 
   std::vector<stan::agrad::var> y0;
-  std::vector<double> theta;
+  std::vector<stan::agrad::var> theta;
   double t0;
   std::vector<std::vector<stan::agrad::var> > ode_res;
   std::vector<double> ts;
@@ -164,5 +165,60 @@ TEST(solve_ode, harm_osc_known_values) {
   EXPECT_NEAR(0.246407, ode_res[99][1].val(), 1e-5);
   
   std::vector<double> grads;
-  ode_res[99][1].grad(y0, grads);
+  ode_res[99][1].grad(theta, grads);
+}
+
+template <typename T0, typename T1, typename T2>
+inline
+std::vector<typename stan::return_type<T1,T2>::type> 
+lorenz_ode(const T0& t_in, // initial time
+             const std::vector<T1>& y_in, //initial positions
+             const std::vector<T2>& theta, // parameters
+             const std::vector<double>& x, // double data
+             const std::vector<int>& x_int) { // integer data
+  std::vector<typename stan::return_type<T1,T2>::type> res;
+  res.push_back(theta[0]*(y_in[1] - y_in[0]));
+  res.push_back(theta[1]*y_in[0] - y_in[1] - y_in[0]*y_in[2]);
+  res.push_back(-theta[2]*y_in[2] + y_in[0]*y_in[1]);
+  return res;
+}
+
+struct lorenz_ode_fun {
+  template <typename T0, typename T1, typename T2>
+  inline 
+  std::vector<typename stan::return_type<T1,T2>::type> 
+  operator()(const T0& t_in, // initial time
+             const std::vector<T1>& y_in, //initial positions
+             const std::vector<T2>& theta, // parameters
+             const std::vector<double>& x, // double data
+             const std::vector<int>& x_int) const { // integer data
+    return lorenz_ode(t_in, y_in, theta, x, x_int);
+  }
+};
+
+TEST(solve_ode, lorenz_finite_diff) {
+  lorenz_ode_fun lorenz;
+
+  std::vector<double> y0;
+  std::vector<double> theta;
+  double t0;
+  std::vector<double> ts;
+
+  t0 = 0;
+
+  theta.push_back(10.0);
+  theta.push_back(28.0);
+  theta.push_back(8.0/3.0);
+  y0.push_back(10.0);
+  y0.push_back(1.0);
+  y0.push_back(1.0);
+
+  std::vector<double> x;
+  std::vector<int> x_int;
+
+  for (int i = 0; i < 100; i++)
+    ts.push_back(0.1*(i+1));
+
+  test_ode_dv(lorenz, t0, ts, y0, theta, x, x_int, 1e-8, 1e-1);
+  //test_ode_vd(lorenz, t0, ts, y0, theta, x, x_int, 1e-8, 1e-1);
 }
