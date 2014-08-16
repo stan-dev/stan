@@ -268,11 +268,6 @@ namespace stan {
       generate_using("std::vector",o);
       generate_using("stan::io::dump",o);
       generate_using("stan::model::prob_grad",o);
-      // these should be included by using stan::math
-      // generate_using("stan::math::get_base1",o);
-      // generate_using("stan::math::initialize",o);
-      // generate_using("stan::math::stan_print",o);
-      // generate_using("stan::math::lgamma",o);
       generate_using_namespace("stan::math",o);
       generate_using_namespace("stan::prob",o);
       o << EOL;
