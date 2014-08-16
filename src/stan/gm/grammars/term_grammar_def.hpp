@@ -121,13 +121,15 @@ namespace stan {
         }
 
         if (has_lp_suffix(fun.name_)) {
+          // modified function_argument_origin to add _lp because
+          // that's only viable context
           if (!( var_origin == parameter_origin
                  || var_origin == transformed_parameter_origin
-                 || var_origin == function_argument_origin
+                 || var_origin == function_argument_origin_lp 
                  || var_origin == local_origin )) {
             error_msgs << "lp suffixed functions only allowed in"
                        << " transformed parameter, function argument, or model"
-                       << " blocks;  found function=" << fun.name_ 
+
                        << " in block=";
             print_var_origin(error_msgs,var_origin);
             error_msgs << std::endl;
