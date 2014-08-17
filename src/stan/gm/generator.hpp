@@ -267,6 +267,7 @@ namespace stan {
       generate_using("std::stringstream",o);
       generate_using("std::vector",o);
       generate_using("stan::io::dump",o);
+      generate_using("stan::math::lgamma",o);
       generate_using("stan::model::prob_grad",o);
       generate_using_namespace("stan::math",o);
       generate_using_namespace("stan::prob",o);
