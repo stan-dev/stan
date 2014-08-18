@@ -2,6 +2,12 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/rev.hpp>
+<<<<<<< HEAD
+=======
+#include <stan/math/functions/fdim.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
+>>>>>>> 8f31c4e... added NaN test for fdim
 
 TEST(AgradRev,fdim_vv) {
   using stan::agrad::fdim;
@@ -113,29 +119,17 @@ TEST(AgradRev,fdim_dv_2) {
   EXPECT_FLOAT_EQ(0.0, fdim(a,infinityavar).val());
 }  
 
+struct fdim_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return arg1-arg2;
+  }
+};
+
 TEST(AgradRev, fdim_nan) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  stan::agrad::var nan_v = std::numeric_limits<double>::quiet_NaN();
-  double a = 3.0;
-  stan::agrad::var a_v = 3.0;
-
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::fdim(a_v, nan_v).val());
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::fdim(a, nan_v).val());
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::fdim(a_v, nan).val());
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::fdim(nan_v, a).val());
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::fdim(nan, a_v).val());
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::fdim(nan_v, a_v).val());
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::fdim(nan_v, nan_v).val());
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::fdim(nan_v, nan).val());
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::fdim(nan, nan_v).val());
-
+  fdim_fun fdim_;
+  test_nan(fdim_,3.0,5.0,false, false);
 }
