@@ -1,6 +1,8 @@
 #include <stan/agrad/rev/operators/operator_division.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,a_div_b) {
   AVAR a = 6.0;
@@ -37,4 +39,19 @@ TEST(AgradRev,ad_divide_b) {
   VEC g;
   f.grad(x,g);
   EXPECT_FLOAT_EQ(-6.0/(3.0*3.0),g[0]);
+}
+
+struct divide_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return arg1/arg2;
+  }
+};
+
+TEST(AgradRev, divide_nan) {
+  divide_fun divide_;
+  test_nan(divide_,3.0,5.0,false, false);
 }
