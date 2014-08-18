@@ -1,7 +1,7 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__TRUNC_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__TRUNC_HPP
 
-#include <boost/math/special_functions/trunc.hpp>
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
 
@@ -13,7 +13,7 @@ namespace stan {
       class trunc_vari : public vari {
       public:
         trunc_vari(vari* avi) :
-          vari(boost::math::trunc(avi->val_)) { 
+          vari(::trunc(avi->val_)) { 
         }
       };
     }
