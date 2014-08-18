@@ -30,5 +30,5 @@ struct log2_fun {
 
 TEST(AgradRev,log2_NaN) {
   log2_fun log2_;
-  test_nan(log2_,false);
+  test_nan(log2_,false,true);
 }

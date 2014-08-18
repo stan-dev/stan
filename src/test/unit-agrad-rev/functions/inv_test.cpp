@@ -34,5 +34,5 @@ struct inv_fun {
 
 TEST(AgradRev,inv_NaN) {
   inv_fun inv_;
-  test_nan(inv_,false);
+  test_nan(inv_,false,true);
 }

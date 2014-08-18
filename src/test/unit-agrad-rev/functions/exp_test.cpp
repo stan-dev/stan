@@ -23,5 +23,5 @@ struct exp_fun {
 
 TEST(AgradRev,exp_NaN) {
   exp_fun exp_;
-  test_nan(exp_,false);
+  test_nan(exp_,false,true);
 }

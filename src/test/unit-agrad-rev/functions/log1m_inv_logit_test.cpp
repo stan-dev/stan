@@ -47,6 +47,6 @@ struct log1m_inv_logit_fun {
 
 TEST(AgradRev,log1m_inv_logit_NaN) {
   log1m_inv_logit_fun log1m_inv_logit_;
-  test_nan(log1m_inv_logit_,false);
+  test_nan(log1m_inv_logit_,false,true);
 }
 

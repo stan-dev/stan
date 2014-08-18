@@ -61,6 +61,6 @@ struct falling_factorial_fun {
 
 TEST(AgradRev, falling_factorial_nan) {
   falling_factorial_fun falling_factorial_;
-  test_nan(falling_factorial_,4.0,1.0,false);
+  test_nan(falling_factorial_,4.0,1.0,false,true);
 
 }

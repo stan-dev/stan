@@ -61,5 +61,5 @@ struct atanh_fun {
 
 TEST(AgradRev,atanh_NaN) {
   atanh_fun atanh_;
-  test_nan(atanh_,false);
+  test_nan(atanh_,false,true);
 }

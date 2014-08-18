@@ -24,5 +24,5 @@ struct floor_fun {
 
 TEST(AgradRev,floor_NaN) {
   floor_fun floor_;
-  test_nan(floor_,false);
+  test_nan(floor_,false,true);
 }

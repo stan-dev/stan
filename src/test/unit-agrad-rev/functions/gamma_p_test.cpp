@@ -70,5 +70,5 @@ struct gamma_p_fun {
 
 TEST(AgradRev, gamma_p_nan) {
   gamma_p_fun gamma_p_;
-  test_nan(gamma_p_,0.5,1.0,false);
+  test_nan(gamma_p_,0.5,1.0,false,true);
 }

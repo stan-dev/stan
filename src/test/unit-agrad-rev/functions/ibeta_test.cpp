@@ -218,5 +218,5 @@ struct ibeta_fun {
 
 TEST(AgradRev,ibeta_NaN) {
   ibeta_fun ibeta_;
-  test_nan(ibeta_,0.6,0.3,0.5,true);
+  test_nan(ibeta_,0.6,0.3,0.5,true,false);
 }

@@ -94,6 +94,6 @@ struct binary_log_loss_fun {
 
 TEST(AgradRev,binary_log_loss_NaN) {
   binary_log_loss_fun binary_log_loss_;
-  test_nan(binary_log_loss_,false);
+  test_nan(binary_log_loss_,false,true);
 }
 

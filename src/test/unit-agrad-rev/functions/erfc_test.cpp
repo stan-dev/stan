@@ -24,5 +24,5 @@ struct erfc_fun {
 
 TEST(AgradRev,erfc_NaN) {
   erfc_fun erfc_;
-  test_nan(erfc_,false);
+  test_nan(erfc_,false,true);
 }

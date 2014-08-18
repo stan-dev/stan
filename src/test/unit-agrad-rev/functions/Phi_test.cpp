@@ -151,5 +151,5 @@ struct Phi_fun {
 
 TEST(AgradRev,Phi_NaN) {
   Phi_fun Phi_;
-  test_nan(Phi_,true);
+  test_nan(Phi_,true,false);
 }

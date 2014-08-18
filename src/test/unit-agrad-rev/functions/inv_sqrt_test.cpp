@@ -42,5 +42,5 @@ struct inv_sqrt_fun {
 
 TEST(AgradRev,inv_sqrt_NaN) {
   inv_sqrt_fun inv_sqrt_;
-  test_nan(inv_sqrt_,false);
+  test_nan(inv_sqrt_,false,true);
 }

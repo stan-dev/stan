@@ -56,5 +56,5 @@ struct hypot_fun {
 
 TEST(AgradRev, hypot_nan) {
   hypot_fun hypot_;
-  test_nan(hypot_,3.0,5.0,false);
+  test_nan(hypot_,3.0,5.0,false, true);
 }

@@ -59,6 +59,6 @@ struct tanh_fun {
 
 TEST(AgradRev,tanh_NaN) {
   tanh_fun tanh_;
-  test_nan(tanh_,false);
+  test_nan(tanh_,false,true);
 }
 

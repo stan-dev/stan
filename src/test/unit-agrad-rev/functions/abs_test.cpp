@@ -72,5 +72,5 @@ struct abs_fun {
 
 TEST(AgradRev,abs_NaN) {
   abs_fun abs_;
-  test_nan(abs_,false);
+  test_nan(abs_,false,true);
 }

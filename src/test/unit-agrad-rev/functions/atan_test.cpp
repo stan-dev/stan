@@ -55,5 +55,5 @@ struct atan_fun {
 
 TEST(AgradRev,atan_NaN) {
   atan_fun atan_;
-  test_nan(atan_,false);
+  test_nan(atan_,false,true);
 }

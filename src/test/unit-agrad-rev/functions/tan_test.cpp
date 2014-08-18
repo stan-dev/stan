@@ -48,6 +48,6 @@ struct tan_fun {
 
 TEST(AgradRev,tan_NaN) {
   tan_fun tan_;
-  test_nan(tan_,false);
+  test_nan(tan_,false,true);
 }
 

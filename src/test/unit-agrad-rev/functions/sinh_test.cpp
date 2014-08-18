@@ -59,6 +59,6 @@ struct sinh_fun {
 
 TEST(AgradRev,sinh_NaN) {
   sinh_fun sinh_;
-  test_nan(sinh_,false);
+  test_nan(sinh_,false,true);
 }
 

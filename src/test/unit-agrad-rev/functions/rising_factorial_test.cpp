@@ -65,5 +65,5 @@ struct rising_factorial_fun {
 
 TEST(AgradRev, rising_factorial_nan) {
   rising_factorial_fun rising_factorial_;
-  test_nan(rising_factorial_,3.0,5.0,false);
+  test_nan(rising_factorial_,3.0,5.0,false,true);
 }

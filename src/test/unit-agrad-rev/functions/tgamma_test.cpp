@@ -26,5 +26,5 @@ struct tgamma_fun {
 
 TEST(AgradRev,tgamma_NaN) {
   tgamma_fun tgamma_;
-  test_nan(tgamma_,false);
+  test_nan(tgamma_,false,true);
 }

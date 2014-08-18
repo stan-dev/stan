@@ -25,5 +25,5 @@ struct trigamma_fun {
 
 TEST(AgradRev,trigamma_NaN) {
   trigamma_fun trigamma_;
-  test_nan(trigamma_,false);
+  test_nan(trigamma_,false,true);
 }

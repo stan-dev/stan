@@ -57,5 +57,5 @@ struct acos_fun {
 
 TEST(AgradRev,acos_NaN) {
   acos_fun acos_;
-  test_nan(acos_,false);
+  test_nan(acos_,false,true);
 }

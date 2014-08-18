@@ -24,5 +24,5 @@ struct cbrt_fun {
 
 TEST(AgradRev,cbrt_NaN) {
   cbrt_fun cbrt_;
-  test_nan(cbrt_,true);
+  test_nan(cbrt_,true,false);
 }

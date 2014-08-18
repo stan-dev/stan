@@ -69,5 +69,5 @@ struct asin_fun {
 
 TEST(AgradRev,asin_NaN) {
   asin_fun asin_;
-  test_nan(asin_,false);
+  test_nan(asin_,false,true);
 }

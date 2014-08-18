@@ -47,5 +47,5 @@ struct fabs_fun {
 
 TEST(AgradRev,fabs_NaN) {
   fabs_fun fabs_;
-  test_nan(fabs_,false);
+  test_nan(fabs_,false,true);
 }

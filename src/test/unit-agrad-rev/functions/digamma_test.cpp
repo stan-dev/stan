@@ -26,5 +26,5 @@ struct digamma_fun {
 
 TEST(AgradRev,digamma_NaN) {
   digamma_fun digamma_;
-  test_nan(digamma_,false);
+  test_nan(digamma_,false,true);
 }

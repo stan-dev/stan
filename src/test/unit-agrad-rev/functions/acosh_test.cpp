@@ -58,5 +58,5 @@ struct acosh_fun {
 
 TEST(AgradRev,acosh_NaN) {
   acosh_fun acosh_;
-  test_nan(acosh_,false);
+  test_nan(acosh_,false,true);
 }

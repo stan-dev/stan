@@ -45,5 +45,5 @@ struct cos_fun {
 
 TEST(AgradRev,cos_NaN) {
   cos_fun cos_;
-  test_nan(cos_,false);
+  test_nan(cos_,false,true);
 }

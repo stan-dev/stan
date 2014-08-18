@@ -38,5 +38,5 @@ struct bessel_first_kind_fun {
 
 TEST(AgradRev,bessel_first_kind_NaN) {
   bessel_first_kind_fun bessel_first_kind_;
-  test_nan(bessel_first_kind_,true);
+  test_nan(bessel_first_kind_,true,false);
 }

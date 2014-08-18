@@ -25,5 +25,5 @@ struct inv_logit_fun {
 
 TEST(AgradRev,inv_logit_NaN) {
   inv_logit_fun inv_logit_;
-  test_nan(inv_logit_,false);
+  test_nan(inv_logit_,false,true);
 }

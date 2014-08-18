@@ -38,5 +38,5 @@ struct inv_cloglog_fun {
 
 TEST(AgradRev,inv_cloglog_NaN) {
   inv_cloglog_fun inv_cloglog_;
-  test_nan(inv_cloglog_,false);
+  test_nan(inv_cloglog_,false,true);
 }

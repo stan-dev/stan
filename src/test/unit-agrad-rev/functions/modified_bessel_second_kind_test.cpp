@@ -33,5 +33,5 @@ struct modified_bessel_second_kind_fun {
 
 TEST(AgradRev,modified_bessel_second_kind_NaN) {
   modified_bessel_second_kind_fun modified_bessel_second_kind_;
-  test_nan(modified_bessel_second_kind_,false);
+  test_nan(modified_bessel_second_kind_,false,true);
 }

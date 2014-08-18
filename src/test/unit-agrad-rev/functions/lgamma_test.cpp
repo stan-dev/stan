@@ -15,19 +15,6 @@ TEST(AgradRev,lgamma) {
   EXPECT_FLOAT_EQ(boost::math::digamma(3.0),grad_f[0]);
 }
 
-TEST(AgradRev,lgamma_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::lgamma(a);
-
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
-}
-
 struct lgamma_fun {
   template <typename T0>
   inline T0
@@ -38,5 +25,5 @@ struct lgamma_fun {
 
 TEST(AgradRev,lgamma_NaN) {
   lgamma_fun lgamma_;
-  test_nan(lgamma_,false);
+  test_nan(lgamma_,false,true);
 }

@@ -30,5 +30,5 @@ struct log1m_fun {
 
 TEST(AgradRev,log1m_NaN) {
   log1m_fun log1m_;
-  test_nan(log1m_,false);
+  test_nan(log1m_,false,true);
 }

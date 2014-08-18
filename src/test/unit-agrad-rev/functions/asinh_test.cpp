@@ -54,5 +54,5 @@ struct asinh_fun {
 
 TEST(AgradRev,asinh_NaN) {
   asinh_fun asinh_;
-  test_nan(asinh_,false);
+  test_nan(asinh_,false,true);
 }

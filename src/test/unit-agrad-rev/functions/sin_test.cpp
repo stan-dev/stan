@@ -45,5 +45,5 @@ struct sin_fun {
 
 TEST(AgradRev,sin_NaN) {
   sin_fun sin_;
-  test_nan(sin_,false);
+  test_nan(sin_,false,true);
 }

@@ -187,5 +187,5 @@ struct log_diff_exp_fun {
 
 TEST(AgradRev, log_diff_exp_nan) {
   log_diff_exp_fun log_diff_exp_;
-  test_nan(log_diff_exp_,3.0,5.0,false);
+  test_nan(log_diff_exp_,3.0,5.0,false,true);
 }

@@ -60,5 +60,5 @@ struct cosh_fun {
 
 TEST(AgradRev,cosh_NaN) {
   cosh_fun cosh_;
-  test_nan(cosh_,false);
+  test_nan(cosh_,false,true);
 }

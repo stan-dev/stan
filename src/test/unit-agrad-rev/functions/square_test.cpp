@@ -25,5 +25,5 @@ struct square_fun {
 
 TEST(AgradRev,square_NaN) {
   square_fun square_;
-  test_nan(square_,false);
+  test_nan(square_,false,true);
 }

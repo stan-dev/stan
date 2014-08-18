@@ -90,5 +90,5 @@ struct gamma_q_fun {
 
 TEST(AgradRev, gamma_q_nan) {
   gamma_q_fun gamma_q_;
-  test_nan(gamma_q_,3.0,5.0,false);
+  test_nan(gamma_q_,3.0,5.0,false,true);
 }

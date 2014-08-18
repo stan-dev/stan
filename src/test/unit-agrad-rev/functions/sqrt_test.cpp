@@ -57,6 +57,6 @@ struct sqrt_fun {
 
 TEST(AgradRev,sqrt_NaN) {
   sqrt_fun sqrt_;
-  test_nan(sqrt_,false);
+  test_nan(sqrt_,false,true);
 }
 

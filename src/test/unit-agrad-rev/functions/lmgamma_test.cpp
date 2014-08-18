@@ -26,5 +26,5 @@ struct lmgamma_fun {
 
 TEST(AgradRev,lmgamma_NaN) {
   lmgamma_fun lmgamma_;
-  test_nan(lmgamma_,false);
+  test_nan(lmgamma_,false,true);
 }
