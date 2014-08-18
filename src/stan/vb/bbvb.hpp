@@ -54,14 +54,14 @@ namespace stan {
         double elbo(0.0);
         int dim = muL.dimension();
 
-        Eigen::VectorXd zero_mean = Eigen::VectorXd::Zero(dim);
-        Eigen::MatrixXd eye       = Eigen::MatrixXd::Identity(dim, dim);
-
-        Eigen::VectorXd z_check;
+        Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_check_var(dim);
         for (int i = 0; i < n_monte_carlo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
-          z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);
+          for (int d = 0; d < dim; ++d)
+          {
+            z_check(d) = stan::prob::normal_rng(0,1,rng_);
+          }
           muL.to_unconstrained(z_check);
 
           // FIXME: is this the right way to do this?
@@ -105,14 +105,14 @@ namespace stan {
         mu_grad                     = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
 
-        Eigen::VectorXd zero_mean   = Eigen::VectorXd::Zero(dim);
-        Eigen::MatrixXd eye         = Eigen::MatrixXd::Identity(dim, dim);
-
-        Eigen::VectorXd z_check;
+        Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
 
         for (int i = 0; i < n_monte_carlo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
-          z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);
+          for (int d = 0; d < dim; ++d)
+          {
+            z_check(d) = stan::prob::normal_rng(0,1,rng_);
+          }
           muL.to_unconstrained(z_check);
 
           // Compute gradient step in unconstrained space
@@ -151,15 +151,15 @@ namespace stan {
         L_grad                      = Eigen::MatrixXd::Zero(dim,dim);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
 
-        Eigen::VectorXd zero_mean   = Eigen::VectorXd::Zero(dim);
-        Eigen::MatrixXd eye         = Eigen::MatrixXd::Identity(dim, dim);
-
-        Eigen::VectorXd z_check;
+        Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::MatrixXd LinvT = stan::math::inverse(muL.L()).transpose();
 
         for (int i = 0; i < n_monte_carlo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
-          z_check = stan::prob::multi_normal_rng(zero_mean, eye, rng_);
+          for (int d = 0; d < dim; ++d)
+          {
+            z_check(d) = stan::prob::normal_rng(0,1,rng_);
+          }
           muL.to_unconstrained(z_check);
 
           // Compute gradient step in unconstrained space
@@ -207,10 +207,7 @@ namespace stan {
         L_grad                      = Eigen::MatrixXd::Zero(dim,dim);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
 
-        // Eigen::VectorXd zero_mean   = Eigen::VectorXd::Zero(dim);
-        // Eigen::MatrixXd eye         = Eigen::MatrixXd::Identity(dim, dim);
-
-        Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);;
+        Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd LinvTdiag = muL.L().diagonal().array().inverse();
 
         for (int i = 0; i < n_monte_carlo_; ++i) {
@@ -240,10 +237,58 @@ namespace stan {
         L_grad.diagonal() += LinvTdiag;
       }
 
+      /**
+       * Runs Robbins-Monro Stochastic Gradient for some number of iterations
+       *
+       * @param muL            mean and cholesky factor of affine transform
+       * @param max_iterations number of iterations to run algorithm
+       */
+      void do_robbins_monro_adagrad( latent_vars& muL, int max_iterations ) {
+        Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(model_.num_params_r());
+        Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(model_.num_params_r(),
+                                                        model_.num_params_r());
 
+        // ADAgrad stuff
+        double eta = 1.0;
+        double tau = 1.0;
+        Eigen::VectorXd mu_s = Eigen::VectorXd::Zero(model_.num_params_r());
+        Eigen::MatrixXd L_s  = Eigen::MatrixXd::Zero(model_.num_params_r(),
+                                                     model_.num_params_r());
 
+        for (int i = 0; i < max_iterations; ++i)
+        {
+          if (out_stream_) *out_stream_ << "---------------------" << std::endl
+                                        << "  iter " << i << std::endl
+                                        << "---------------------" << std::endl;
 
+          calc_combined_grad(muL, mu_grad, L_grad);
 
+          // Accumulate S vector for ADAgrad
+          mu_s.array() += mu_grad.array().square();
+          L_s.array()  += L_grad.array().square();
+
+          // Take ADAgrad step
+          muL.set_mu( muL.mu().array() +
+            eta * mu_grad.array() / (tau + mu_s.array().sqrt()) );
+          muL.set_L(  muL.L().array()  +
+            eta/2.0 * L_grad.array()  / (tau + L_s.array().sqrt()) );
+
+          cont_params_ = muL.mu();
+
+          if (out_stream_) *out_stream_ << "mu = " << std::endl
+                                        << muL.mu() << std::endl;
+
+          if (out_stream_) *out_stream_ << "L = " << std::endl
+                                        << muL.L() << std::endl;
+
+          if (out_stream_) *out_stream_ << "Sigma = " << std::endl
+                                        << muL.L() * muL.L().transpose() << std::endl;
+
+          elbo_ = calc_ELBO(muL);
+          if (out_stream_) *out_stream_ << "elbo_ = " << elbo_ << std::endl;
+
+        }
+      }
 
 
       void test() {
@@ -262,12 +307,14 @@ namespace stan {
         std::cout << "init_grad = " << init_grad << std::endl;
 
 
-        // mu, L
+        // Initialize mu, L
         Eigen::VectorXd mu = cont_params_;
         Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(), model_.num_params_r());
 
         latent_vars muL = latent_vars(mu,L);
 
+        // Robbins Monro ADAgrad
+        do_robbins_monro_adagrad(muL, 25);
 
         // Eigen::VectorXd bla;
 
@@ -311,61 +358,6 @@ namespace stan {
         // elbo = calc_ELBO(muL);
         // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
 
-
-        Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(model_.num_params_r());
-        Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(model_.num_params_r(),model_.num_params_r());
-
-        Eigen::VectorXd params_r_alp;
-        Eigen::VectorXd vars;
-
-        // ADAgrad stuff
-        double eta = 1.0;
-        double tau = 1.0;
-        Eigen::VectorXd mu_s = Eigen::VectorXd::Zero(model_.num_params_r());
-        Eigen::MatrixXd L_s  = Eigen::MatrixXd::Zero(model_.num_params_r(),model_.num_params_r());
-
-        for (int i = 0; i < 50; ++i)
-        {
-          if (out_stream_) *out_stream_ << "---------------------" << std::endl
-                                        << "  iter " << i << std::endl
-                                        << "---------------------" << std::endl;
-
-          calc_combined_grad(muL, mu_grad, L_grad);
-
-          // Accumulate S vector for ADAgrad
-          mu_s.array() += mu_grad.array().square();
-          L_s.array()  += L_grad.array().square();
-
-          // Take ADAgrad step
-          muL.set_mu( muL.mu().array() + eta * mu_grad.array() / (tau + mu_s.array().sqrt()) );
-          muL.set_L(  muL.L().array()  + eta/2.0 * L_grad.array()  / (tau + L_s.array().sqrt()) );
-
-          cont_params_ = muL.mu();
-
-          if (out_stream_) *out_stream_ << "mu = " << std::endl
-                                        << muL.mu() << std::endl;
-
-          if (out_stream_) *out_stream_ << "L = " << std::endl
-                                        << muL.L() << std::endl;
-
-          if (out_stream_) *out_stream_ << "Sigma = " << std::endl
-                                        << muL.L() * muL.L().transpose() << std::endl;
-
-          elbo_ = calc_ELBO(muL);
-          if (out_stream_) *out_stream_ << "elbo_ = " << elbo_ << std::endl;
-
-
-
-          // model_.template write_array(rng_, cont_params_, vars,
-          //                             true, true, &std::cout);
-
-          // if (out_stream_) *out_stream_ << "cont_params_ = " << cont_params_ << std::endl;
-          // if (out_stream_) *out_stream_ << "vars = " << vars << std::endl;
-
-          // model_.template write_csv(rng_, mu_print, std::cout);
-
-        }
-
         return;
       }
 
@@ -373,7 +365,7 @@ namespace stan {
 
       M& model_;
       Eigen::VectorXd& cont_params_;
-      double& elbo_;
+      double elbo_;
       BaseRNG& rng_;
       int n_monte_carlo_;
 
