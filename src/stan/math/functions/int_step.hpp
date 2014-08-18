@@ -6,6 +6,8 @@ namespace stan {
     /**
      * The integer step, or Heaviside, function.  
      *
+     * For double NaN input, int_step(NaN) returns 0.
+     *
      * @param y Value to test.
      * @return 1 if value is greater than 0 and 0 otherwise
      * @tparam T Scalar argument type.
