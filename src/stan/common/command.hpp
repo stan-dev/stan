@@ -175,7 +175,10 @@ namespace stan {
       std::string init = dynamic_cast<stan::gm::string_argument*>(
                          parser.arg("init"))->value();
       
-      int return_code = initialize_state<dump_factory>(init, cont_params, model, base_rng, &std::cout);
+      dump_factory var_context_factory;
+      int return_code = initialize_state<dump_factory>
+        (init, cont_params, model, base_rng, &std::cout,
+         var_context_factory);
       if (return_code != stan::gm::error_codes::OK)
         return return_code;
       

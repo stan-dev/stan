@@ -24,7 +24,8 @@ namespace stan {
                          Eigen::VectorXd& cont_params,
                          Model& model,
                          RNG& base_rng,
-                         std::ostream* output) {
+                         std::ostream* output,
+                         ContextFactory& context_factory) {
     
       int num_init_tries = -1;
       
@@ -117,25 +118,9 @@ namespace stan {
         }
         
       } catch(...) {
-          
-        try {
-          
-          ContextFactory context_factory;
-          
-          if (!context_factory.create_var_context(init)) {
-            std::string msg("ERROR: specified initialization file does not exist: ");
-            msg += init;
-            throw std::invalid_argument(msg);
-          }
-          
-          model.transform_inits(*(context_factory.var_context()), cont_params);
-          
-        } catch (const std::exception& e) {
-          if (output)
-            *output << "Error during user-specified initialization:" << std::endl
-                    << e.what() << std::endl;
-          return stan::gm::error_codes::INIT;
-        }
+        stan::io::var_context* context = context_factory(init);
+        model.transform_inits(*context, cont_params);
+        delete context;
         
         double init_log_prob;
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());

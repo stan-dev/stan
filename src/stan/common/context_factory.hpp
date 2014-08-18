@@ -9,33 +9,27 @@ namespace stan {
 
     class var_context_factory {
     public:
-      var_context_factory(): context_(0) {} // C++11 Upgrade to nullptr
-      ~var_context_factory() { if(context_) delete context_; }
-      
-      virtual bool create_var_context(std::string source) = 0;
-      stan::io::var_context* var_context() { return context_; }
-      
-    protected:
-      stan::io::var_context* context_;
+      var_context_factory() {}
+      virtual stan::io::var_context* operator()(const std::string source) = 0;
     };
 
     // This should be defined in cmdstan
     class dump_factory: public var_context_factory {
     public:
-      
-      bool create_var_context(std::string source) {
-        if (context_) delete context_;
-        
+      stan::io::var_context* operator()(const std::string source) {
         std::fstream source_stream(source.c_str(),
                                    std::fstream::in);
-        if (source_stream.fail()) return false;
-        
-        context_ = new stan::io::dump(source_stream);
+        if (source_stream.fail()) {
+          std::string message("ERROR: specified initialization file does not exist: ");
+          message += source;
+          throw std::runtime_error(message);
+        }
+
+        stan::io::var_context* dump = new stan::io::dump(source_stream);
         source_stream.close();
-        
-        return true;
+
+        return dump;
       }
-      
     };
     
   }
