@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/operators/operator_unary_decrement.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,minus_minus_a) {
   AVAR a(5.0);
@@ -44,4 +45,19 @@ TEST(AgradRev,a_minus_minus_2) {
   VEC g;
   f.grad(x,g);
   EXPECT_FLOAT_EQ(0.0,g[0]);
+}
+
+
+struct minus_minus_fun {
+  template <typename T0>
+  inline T0
+  operator()(T0 arg1) const {
+    return (arg1--);
+  }
+};
+
+TEST(AgradRev, minus_minus_nan) {
+  minus_minus_fun minus_minus_;
+
+  test_nan(minus_minus_,false, false);
 }
