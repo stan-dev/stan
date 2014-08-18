@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/rev.hpp>
 #include <stan/math/functions/fdim.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,fdim_vv) {
   AVAR a = 3.0;
@@ -107,3 +109,18 @@ TEST(AgradRev,fdim_dv_2) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(infinitydouble,b).val());
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(a,infinityavar).val());
 }  
+
+struct fdim_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return arg1-arg2;
+  }
+};
+
+TEST(AgradRev, fdim_nan) {
+  fdim_fun fdim_;
+  test_nan(fdim_,3.0,5.0,false, false);
+}
