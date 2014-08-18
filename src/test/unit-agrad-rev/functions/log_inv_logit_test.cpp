@@ -36,3 +36,16 @@ TEST(AgradRev, log_inv_logit) {
   test_log_inv_logit(0.0);
   test_log_inv_logit(1.9);
 }
+
+struct log_inv_logit_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return stan::math::log_inv_logit(arg1);
+  }
+};
+
+TEST(AgradRev,log_inv_logit_NaN) {
+  log_inv_logit_fun log_inv_logit_;
+  test_nan(log_inv_logit_,false);
+}
