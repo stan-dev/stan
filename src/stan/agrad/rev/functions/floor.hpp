@@ -4,15 +4,20 @@
 #include <cmath>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
   namespace agrad {
 
     namespace {
-      class floor_vari : public vari {
+      class floor_vari : public op_v_vari {
       public:
         floor_vari(vari* avi) :
-          vari(std::floor(avi->val_)) {
+          op_v_vari(std::floor(avi->val_),avi) {
+        }
+        void chain() {
+          if (boost::math::isnan(avi_->val_))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
         }
       };
     }

@@ -334,6 +334,7 @@ add_binary("gamma_q");
 add_binary("gamma_rng");
 add("gaussian_dlm_obs_log",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T,MATRIX_T,MATRIX_T,VECTOR_T,MATRIX_T);
 add("gaussian_dlm_obs_log",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T,VECTOR_T,MATRIX_T,VECTOR_T,MATRIX_T);
+add_nullary("get_lp");  // special handling in term_grammar_def
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {
