@@ -20,7 +20,7 @@ namespace stan {
   namespace common {
     
     template <class ContextFactory, class Model, class RNG>
-    int initialize_state(std::string init,
+    bool initialize_state(std::string init,
                          Eigen::VectorXd& cont_params,
                          Model& model,
                          RNG& base_rng,
@@ -46,14 +46,14 @@ namespace stan {
             if (output)
               *output << "Rejecting initialization at zero because of gradient failure."
                       << std::endl << e.what() << std::endl;
-            return stan::gm::error_codes::INIT;
+            return false;
           }
             
           if (!boost::math::isfinite(init_log_prob)) {
             if (output)
               *output << "Rejecting initialization at zero because of vanishing density."
                       << std::endl;
-            return stan::gm::error_codes::INIT;
+            return false;
           }
           
           for (int i = 0; i < init_grad.size(); ++i) {
@@ -61,7 +61,7 @@ namespace stan {
               if (output)
                 *output << "Rejecting initialization at zero because of divergent gradient."
                         << std::endl;
-              return stan::gm::error_codes::INIT;
+              return false;
             }
           }
         
@@ -112,7 +112,7 @@ namespace stan {
                       << " reducing ranges of constrained values,"
                       << " or reparameterizing the model."
                       << std::endl;
-            return stan::gm::error_codes::INIT;
+            return false;
           }
           
         }
@@ -131,14 +131,14 @@ namespace stan {
           if (output)
             *output << "Rejecting user-specified initialization because of gradient failure."
                     << std::endl << e.what() << std::endl;
-          return stan::gm::error_codes::INIT;
+          return false;
         }
         
         if (!boost::math::isfinite(init_log_prob)) {
           if (output)
             *output << "Rejecting user-specified initialization because of vanishing density."
                     << std::endl;
-          return stan::gm::error_codes::INIT;
+          return false;
         }
         
         for (int i = 0; i < init_grad.size(); ++i) {
@@ -146,14 +146,13 @@ namespace stan {
             if (output)
               *output << "Rejecting user-specified initialization because of divergent gradient."
                       << std::endl;
-            return stan::gm::error_codes::INIT;
+            return false;
           }
         }
         
       }
       
-      return stan::gm::error_codes::OK;
-      
+      return true;
     }
     
   } // common

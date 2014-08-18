@@ -176,11 +176,10 @@ namespace stan {
                          parser.arg("init"))->value();
       
       dump_factory var_context_factory;
-      int return_code = initialize_state<dump_factory>
-        (init, cont_params, model, base_rng, &std::cout,
-         var_context_factory);
-      if (return_code != stan::gm::error_codes::OK)
-        return return_code;
+      if (!initialize_state<dump_factory>
+          (init, cont_params, model, base_rng, &std::cout,
+           var_context_factory))
+        return stan::gm::error_codes::SOFTWARE;
       
       //////////////////////////////////////////////////
       //               Model Diagnostics              //
