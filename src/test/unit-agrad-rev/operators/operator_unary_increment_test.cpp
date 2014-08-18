@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/operators/operator_unary_increment.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,plus_plus_a) {
   AVAR a(5.0);
@@ -63,4 +64,18 @@ TEST(AgradRev,a_plus_plus_2) {
   VEC g;
   f.grad(x,g);
   EXPECT_FLOAT_EQ(0.0,g[0]);
+}
+
+struct plus_plus_fun {
+  template <typename T0>
+  inline T0
+  operator()(T0 arg1) const {
+    return (arg1++);
+  }
+};
+
+TEST(AgradRev, plus_plus_nan) {
+  plus_plus_fun plus_plus_;
+
+  test_nan(plus_plus_,false, false);
 }
