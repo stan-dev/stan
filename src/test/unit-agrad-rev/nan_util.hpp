@@ -207,7 +207,7 @@ void test_nan_dvv(const F& f,
     EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg.str();
 
     if (is_grad_nan) {
-      AVEC x = createAVEC(arg1,arg2_v, arg3_v);
+      AVEC x = createAVEC(arg2_v, arg3_v);
       VEC g;
       res.grad(x,g);
   
@@ -241,7 +241,7 @@ void test_nan_vdv(const F& f,
     EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg.str();
 
     if (is_grad_nan) {
-      AVEC x = createAVEC(arg1_v,arg2, arg3_v);
+      AVEC x = createAVEC(arg1_v, arg3_v);
       VEC g;
       res.grad(x,g);
   
@@ -275,7 +275,7 @@ void test_nan_vvd(const F& f,
     EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg.str();
 
     if (is_grad_nan) {
-      AVEC x = createAVEC(arg1_v,arg2_v, arg3);
+      AVEC x = createAVEC(arg1_v,arg2_v);
       VEC g;
       res.grad(x,g);
   
@@ -308,7 +308,7 @@ void test_nan_ddv(const F& f,
     EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg.str();
 
     if (is_grad_nan) {
-      AVEC x = createAVEC(arg1,arg2, arg3_v);
+      AVEC x = createAVEC(arg3_v);
       VEC g;
       res.grad(x,g);
   
@@ -340,7 +340,7 @@ void test_nan_dvd(const F& f,
     EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg.str();
 
     if (is_grad_nan) {
-      AVEC x = createAVEC(arg1,arg2_v, arg3);
+      AVEC x = createAVEC(arg2_v);
       VEC g;
       res.grad(x,g);
   
@@ -372,7 +372,7 @@ void test_nan_vdd(const F& f,
     EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg.str();
 
     if (is_grad_nan) {
-      AVEC x = createAVEC(arg1_v,arg2, arg3);
+      AVEC x = createAVEC(arg1_v);
       VEC g;
       res.grad(x,g);
   
