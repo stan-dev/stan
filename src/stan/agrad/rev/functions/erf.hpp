@@ -2,7 +2,7 @@
 #define STAN__AGRAD__REV__FUNCTIONS__ERF_HPP
 
 #include <valarray>
-#include <boost/math/special_functions/erf.hpp>
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 #include <stan/math/constants.hpp>
@@ -14,7 +14,7 @@ namespace stan {
       class erf_vari : public op_v_vari {
       public:
         erf_vari(vari* avi) :
-          op_v_vari(boost::math::erf(avi->val_),avi) {
+          op_v_vari(::erf(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * stan::math::TWO_OVER_SQRT_PI * std::exp(- avi_->val_ * avi_->val_);
@@ -25,7 +25,7 @@ namespace stan {
     /**
      * The error function for variables (C99).
      *
-     * For non-variable function, see boost::math::erf()
+     * For non-variable function, see ::erf() from math.h
      *
      * The derivative is
      *
