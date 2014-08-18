@@ -7,16 +7,13 @@ namespace stan {
     struct error_codes {
       // defining error codes to follow FreeBSD sysexits conventions
       // http://www.gsp.com/cgi-bin/man.cgi?section=3&topic=sysexits
-      
-      // Stan-specific error codes 100+
       enum {
         OK = 0,
         USAGE = 64,
         DATAERR = 65,
         NOINPUT = 66,
         SOFTWARE = 70,
-        CONFIG = 78,
-        INIT = 100
+        CONFIG = 78
       };
     };
   }
