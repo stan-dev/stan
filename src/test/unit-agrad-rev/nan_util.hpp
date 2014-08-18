@@ -132,4 +132,282 @@ void test_nan(const F& f,
   double nan = std::numeric_limits<double>::quiet_NaN();
   test_nan_v(f, nan, throws);
 }
+
+
+template <typename F>
+void test_nan_vvv(const F& f,
+                 const double& arg1,
+                 const double& arg2,
+                 const double& arg3,
+                 const bool& throws) {
+  stan::agrad::var res;
+  stan::agrad::var arg1_v = arg1;
+  stan::agrad::var arg2_v = arg2;
+  stan::agrad::var arg3_v = arg3;
+
+  std::ostringstream fail_msg;
+  fail_msg << "Failed for var,var,var version with first argument " 
+           << arg1_v << " second argument " << arg2_v
+           << " and third argument " << arg3_v;
+
+  if (throws)
+    EXPECT_THROW(f(arg1_v, arg2_v, arg3_v), std::domain_error) << fail_msg;
+  else {
+    res = f(arg1_v, arg2_v, arg3_v);
+
+    AVEC x = createAVEC(arg1_v,arg2_v, arg3_v);
+    VEC g;
+    res.grad(x,g);
+  
+    EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg;
+    ASSERT_EQ(3U,g.size()) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[0])) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[1])) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[2])) << fail_msg;
+  }
+}
+
+template <typename F>
+void test_nan_dvv(const F& f,
+                 const double& arg1,
+                 const double& arg2,
+                 const double& arg3,
+                 const bool& throws) {
+  stan::agrad::var res;
+  stan::agrad::var arg2_v = arg2;
+  stan::agrad::var arg3_v = arg3;
+
+  std::ostringstream fail_msg;
+  fail_msg << "Failed for double,var,var version with first argument " 
+           << arg1 << " second argument " << arg2_v
+           << " and third argument " << arg3_v;
+
+  if (throws)
+    EXPECT_THROW(f(arg1, arg2_v, arg3_v), std::domain_error) << fail_msg;
+  else {
+    res = f(arg1, arg2_v, arg3_v);
+
+    AVEC x = createAVEC(arg1,arg2_v, arg3_v);
+    VEC g;
+    res.grad(x,g);
+  
+    EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg;
+    ASSERT_EQ(2U,g.size()) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[0])) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[1])) << fail_msg;
+  }
+}
+
+template <typename F>
+void test_nan_vdv(const F& f,
+                 const double& arg1,
+                 const double& arg2,
+                 const double& arg3,
+                 const bool& throws) {
+  stan::agrad::var res;
+  stan::agrad::var arg1_v = arg1;
+  stan::agrad::var arg3_v = arg3;
+
+  std::ostringstream fail_msg;
+  fail_msg << "Failed for var,double,var version with first argument " 
+           << arg1_v << " second argument " << arg2
+           << " and third argument " << arg3_v;
+
+  if (throws)
+    EXPECT_THROW(f(arg1_v, arg2, arg3_v), std::domain_error) << fail_msg;
+  else {
+    res = f(arg1_v, arg2, arg3_v);
+
+    AVEC x = createAVEC(arg1_v,arg2, arg3_v);
+    VEC g;
+    res.grad(x,g);
+  
+    EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg;
+    ASSERT_EQ(2U,g.size()) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[0])) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[1])) << fail_msg;
+  }
+}
+
+template <typename F>
+void test_nan_vvd(const F& f,
+                 const double& arg1,
+                 const double& arg2,
+                 const double& arg3,
+                 const bool& throws) {
+  stan::agrad::var res;
+  stan::agrad::var arg1_v = arg1;
+  stan::agrad::var arg2_v = arg2;
+
+  std::ostringstream fail_msg;
+  fail_msg << "Failed for var,var,var version with first argument " 
+           << arg1_v << " second argument " << arg2_v
+           << " and third argument " << arg3;
+
+  if (throws)
+    EXPECT_THROW(f(arg1_v, arg2_v, arg3), std::domain_error) << fail_msg;
+  else {
+    res = f(arg1_v, arg2_v, arg3);
+
+    AVEC x = createAVEC(arg1_v,arg2_v, arg3);
+    VEC g;
+    res.grad(x,g);
+  
+    EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg;
+    ASSERT_EQ(2U,g.size()) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[0])) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[1])) << fail_msg;
+  }
+}
+
+template <typename F>
+void test_nan_ddv(const F& f,
+                 const double& arg1,
+                 const double& arg2,
+                 const double& arg3,
+                 const bool& throws) {
+  stan::agrad::var res;
+  stan::agrad::var arg3_v = arg3;
+
+  std::ostringstream fail_msg;
+  fail_msg << "Failed for double,double,var version with first argument " 
+           << arg1 << " second argument " << arg2
+           << " and third argument " << arg3_v;
+
+  if (throws)
+    EXPECT_THROW(f(arg1, arg2, arg3_v), std::domain_error) << fail_msg;
+  else {
+    res = f(arg1, arg2, arg3_v);
+
+    AVEC x = createAVEC(arg1,arg2, arg3_v);
+    VEC g;
+    res.grad(x,g);
+  
+    EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg;
+    ASSERT_EQ(1U,g.size()) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[0])) << fail_msg;
+  }
+}
+
+template <typename F>
+void test_nan_dvd(const F& f,
+                 const double& arg1,
+                 const double& arg2,
+                 const double& arg3,
+                 const bool& throws) {
+  stan::agrad::var res;
+  stan::agrad::var arg2_v = arg2;
+
+  std::ostringstream fail_msg;
+  fail_msg << "Failed for double,var,double version with first argument " 
+           << arg1 << " second argument " << arg2_v
+           << " and third argument " << arg3;
+
+  if (throws)
+    EXPECT_THROW(f(arg1, arg2_v, arg3), std::domain_error) << fail_msg;
+  else {
+    res = f(arg1, arg2_v, arg3);
+
+    AVEC x = createAVEC(arg1,arg2_v, arg3);
+    VEC g;
+    res.grad(x,g);
+  
+    EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg;
+    ASSERT_EQ(1U,g.size()) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[0])) << fail_msg;
+  }
+}
+
+template <typename F>
+void test_nan_vdd(const F& f,
+                 const double& arg1,
+                 const double& arg2,
+                 const double& arg3,
+                 const bool& throws) {
+  stan::agrad::var res;
+  stan::agrad::var arg1_v = arg1;
+
+  std::ostringstream fail_msg;
+  fail_msg << "Failed for var,double,double version with first argument " 
+           << arg1_v << " second argument " << arg2
+           << " and third argument " << arg3;
+
+  if (throws)
+    EXPECT_THROW(f(arg1_v, arg2, arg3), std::domain_error) << fail_msg;
+  else {
+    res = f(arg1_v, arg2, arg3);
+
+    AVEC x = createAVEC(arg1_v,arg2, arg3);
+    VEC g;
+    res.grad(x,g);
+  
+    EXPECT_TRUE(boost::math::isnan(res.val())) << fail_msg;
+    ASSERT_EQ(1U,g.size()) << fail_msg;
+    EXPECT_TRUE(boost::math::isnan(g[0])) << fail_msg;
+  }
+}
+template <typename F>
+void test_nan(const F& f,
+              const double& arg1,
+              const double& arg2,
+              const double& arg3,
+              const bool& throws) {
+
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  test_nan_vvv(f, nan, arg2, arg3, throws);
+  test_nan_vvv(f, arg1, nan, arg3, throws);
+  test_nan_vvv(f, arg1, arg2, nan, throws);
+  test_nan_vvv(f, nan, nan, arg3, throws);
+  test_nan_vvv(f, nan, arg2, nan, throws);
+  test_nan_vvv(f, arg1, nan, nan, throws);
+  test_nan_vvv(f, nan, nan, nan, throws);
+
+  test_nan_vvd(f, nan, arg2, arg3, throws);
+  test_nan_vvd(f, arg1, nan, arg3, throws);
+  test_nan_vvd(f, arg1, arg2, nan, throws);
+  test_nan_vvd(f, nan, nan, arg3, throws);
+  test_nan_vvd(f, nan, arg2, nan, throws);
+  test_nan_vvd(f, arg1, nan, nan, throws);
+  test_nan_vvd(f, nan, nan, nan, throws);
+
+  test_nan_vdv(f, nan, arg2, arg3, throws);
+  test_nan_vdv(f, arg1, nan, arg3, throws);
+  test_nan_vdv(f, arg1, arg2, nan, throws);
+  test_nan_vdv(f, nan, nan, arg3, throws);
+  test_nan_vdv(f, nan, arg2, nan, throws);
+  test_nan_vdv(f, arg1, nan, nan, throws);
+  test_nan_vdv(f, nan, nan, nan, throws);
+
+  test_nan_dvv(f, nan, arg2, arg3, throws);
+  test_nan_dvv(f, arg1, nan, arg3, throws);
+  test_nan_dvv(f, arg1, arg2, nan, throws);
+  test_nan_dvv(f, nan, nan, arg3, throws);
+  test_nan_dvv(f, nan, arg2, nan, throws);
+  test_nan_dvv(f, arg1, nan, nan, throws);
+  test_nan_dvv(f, nan, nan, nan, throws);
+
+  test_nan_ddv(f, nan, arg2, arg3, throws);
+  test_nan_ddv(f, arg1, nan, arg3, throws);
+  test_nan_ddv(f, arg1, arg2, nan, throws);
+  test_nan_ddv(f, nan, nan, arg3, throws);
+  test_nan_ddv(f, nan, arg2, nan, throws);
+  test_nan_ddv(f, arg1, nan, nan, throws);
+  test_nan_ddv(f, nan, nan, nan, throws);
+
+  test_nan_dvd(f, nan, arg2, arg3, throws);
+  test_nan_dvd(f, arg1, nan, arg3, throws);
+  test_nan_dvd(f, arg1, arg2, nan, throws);
+  test_nan_dvd(f, nan, nan, arg3, throws);
+  test_nan_dvd(f, nan, arg2, nan, throws);
+  test_nan_dvd(f, arg1, nan, nan, throws);
+  test_nan_dvd(f, nan, nan, nan, throws);
+
+  test_nan_vdd(f, nan, arg2, arg3, throws);
+  test_nan_vdd(f, arg1, nan, arg3, throws);
+  test_nan_vdd(f, arg1, arg2, nan, throws);
+  test_nan_vdd(f, nan, nan, arg3, throws);
+  test_nan_vdd(f, nan, arg2, nan, throws);
+  test_nan_vdd(f, arg1, nan, nan, throws);
+  test_nan_vdd(f, nan, nan, nan, throws);
+}
 #endif
