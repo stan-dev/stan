@@ -107,3 +107,30 @@ TEST(AgradRev,fdim_dv_2) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(infinitydouble,b).val());
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(a,infinityavar).val());
 }  
+
+TEST(AgradRev, fdim_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  stan::agrad::var nan_v = std::numeric_limits<double>::quiet_NaN();
+  double a = 3.0;
+  stan::agrad::var a_v = 3.0;
+
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fdim(a_v, nan_v).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fdim(a, nan_v).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fdim(a_v, nan).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fdim(nan_v, a).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fdim(nan, a_v).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fdim(nan_v, a_v).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fdim(nan_v, nan_v).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fdim(nan_v, nan).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fdim(nan, nan_v).val());
+
+}
