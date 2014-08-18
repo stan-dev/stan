@@ -62,5 +62,5 @@ struct log_rising_factorial_fun {
 
 TEST(AgradRev, log_rising_factorial_nan) {
   log_rising_factorial_fun log_rising_factorial_;
-  test_nan(log_rising_factorial_,3.0,5.0,false);
+  test_nan(log_rising_factorial_,3.0,5.0,false,true);
 }
