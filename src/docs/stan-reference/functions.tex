@@ -325,6 +325,40 @@ arithmetic on the current hardware platform}
 %
 \end{description}
 
+
+\section{Log Probability Function}\label{get-lp.section}
+
+The basic purpose of a Stan program is to compute a log probability
+function and its derivatives.  The log probability function in a Stan
+model outputs the log density on the unconstrained scale.  A log
+probabilty accumulator starts at zero and is then incremented in
+various ways by a Stan program.  The variables are first transformed
+from unconstrained to constrained, and the log Jacobian determinant
+added to the log probability accumulator.  Then the model block is
+executed on the constrained parmeters, with each sampling statement
+(\Verb|~|) and log probability increment statement
+(\code{increment\_log\_prob}) adding to the accumulator.  At the end
+of the model block execution, the value of the log probability
+accumulator is the log probability value returned by the Stan program.
+
+Stan provides a special built-in function \code{get\_lp} that takes no
+arguments and returns the current value of the log probability
+accumulator.  This function is primarily useful for debugging
+purposes, where for instance, it may be used with a print statement to
+display the log probability accumulator at various stages of execution
+to see where it becomes ill defined.
+
+\begin{description}
+\fitem{real}{get\_lp}{}{the current value of the log probability
+accumulator}
+\end{description}
+
+Like user-defined functions that end in \code{\_lp}, the log
+probability get function may only be used in the transformed parameter
+and model blocks, as well as in the bodies of functions with names
+that also end in \code{\_lp}.
+
+
 \section{Logical Functions}
 
 Like C++, BUGS, and R, Stan uses 0 to encode false, and 1 to encode

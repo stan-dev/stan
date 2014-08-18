@@ -262,16 +262,13 @@ namespace stan {
 
 
     void generate_usings(std::ostream& o) {
-      generate_using("std::vector",o);
+      generate_using("std::istream",o);
       generate_using("std::string",o);
       generate_using("std::stringstream",o);
-      generate_using("stan::model::prob_grad",o);
-      generate_using("stan::math::get_base1",o);
-      generate_using("stan::math::initialize",o);
-      generate_using("stan::math::stan_print",o);
-      generate_using("stan::math::lgamma",o);
+      generate_using("std::vector",o);
       generate_using("stan::io::dump",o);
-      generate_using("std::istream",o);
+      generate_using("stan::math::lgamma",o);
+      generate_using("stan::model::prob_grad",o);
       generate_using_namespace("stan::math",o);
       generate_using_namespace("stan::prob",o);
       o << EOL;
@@ -1639,6 +1636,18 @@ namespace stan {
         o_ << "*pstream__ << std::endl;" << EOL;
         generate_indent(indent_,o_);
         o_ << '}' << EOL;
+      }
+      void operator()(const raise_exception_statement& ps) const {
+        generate_indent(indent_,o_);
+        o_ << "std::stringstream errmsg_stream__;" << EOL;
+        for (size_t i = 0; i < ps.printables_.size(); ++i) {
+          generate_indent(indent_,o_);
+          o_ << "errmsg_stream__ << ";
+          generate_printable(ps.printables_[i],o_);
+          o_ << ";" << EOL;
+        }
+        generate_indent(indent_,o_);
+        o_ << "throw std::domain_error(errmsg_stream__.str());" << EOL;
       }
       void operator()(const return_statement& rs) const {
         generate_indent(indent_,o_);

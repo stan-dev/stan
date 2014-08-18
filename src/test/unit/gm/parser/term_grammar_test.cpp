@@ -9,8 +9,15 @@
 
 TEST(gmParserTermGrammar, infixExponentiation) {
   test_parsable("validate_exponentiation_good");
+  test_parsable("validate_exponentiation_precedence");
   test_throws("validate_exponentiation_bad", 
               "base type mismatch in assignment; variable name = z");
+}
+
+TEST(gmParserTermGrammar, modulusOp) {
+  test_parsable("validate_modulus_good");
+  test_throws("validate_modulus_bad", 
+              "both operands of % must be int; cannot modulo real by real");
 }
 
 TEST(gmParserTermGrammar, multiplicationFun) {
