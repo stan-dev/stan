@@ -34,3 +34,8 @@ TEST(AgradRev,step_3) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
+TEST(AgradRev,step_nan) {
+  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_EQ(1U, stan::agrad::step(nan).val());
+}
