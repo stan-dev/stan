@@ -2,6 +2,8 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/rev.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,multiplyLogChainVV) {
   AVAR a = 19.7;
@@ -102,4 +104,19 @@ TEST(AgradRev,multiply_log_double_var) {
   g.resize(0);
   f.grad(x,g);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),g[0]);
+}
+
+struct multiply_log_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return multiply_log(arg1,arg2);
+  }
+};
+
+TEST(AgradRev, multiply_log_nan) {
+  multiply_log_fun multiply_log_;
+  test_nan(multiply_log_,3.0,5.0,false, false);
 }
