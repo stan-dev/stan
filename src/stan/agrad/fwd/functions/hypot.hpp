@@ -27,6 +27,7 @@ namespace stan {
     hypot(const fvar<T>& x1, const double x2) {
       using ::hypot;
       using ::sqrt;
+      using stan::math::inv;
       T u = hypot(x1.val_, x2);
       return fvar<T>(u, (x1.d_ * x1.val_) * inv(u));
     }
