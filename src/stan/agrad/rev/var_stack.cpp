@@ -11,6 +11,7 @@ namespace stan {
     std::vector<chainable*> var_nochain_stack_;
     std::vector<chainable_alloc*> var_alloc_stack_;
     memory::stack_alloc memalloc_;
+    std::vector<std::vector<chainable*>::reverse_iterator> end_chain_stack_;
 
   }
 

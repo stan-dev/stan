@@ -16,6 +16,7 @@ namespace stan {
     extern std::vector<chainable*> var_nochain_stack_; 
     extern std::vector<chainable_alloc*> var_alloc_stack_;
     extern memory::stack_alloc memalloc_;
+    extern std::vector<std::vector<chainable*>::reverse_iterator> end_chain_stack_;
     
     /**
      * A chainable_alloc is an object which is constructed and destructed normally
@@ -41,6 +42,11 @@ namespace stan {
         delete var_alloc_stack_[i];
       var_alloc_stack_.clear();
       memalloc_.recover_all();
+    }
+
+    static inline void recover_memory_local() {
+      // FIXME: define me
+      recover_memory();
     }
 
     /**
