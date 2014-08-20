@@ -13,7 +13,7 @@ namespace stan {
       virtual stan::io::var_context* operator()(const std::string source) = 0;
     };
 
-    // This should be defined in cmdstan
+    // FIXME: Move to CmdStan
     class dump_factory: public var_context_factory {
     public:
       stan::io::var_context* operator()(const std::string source) {
