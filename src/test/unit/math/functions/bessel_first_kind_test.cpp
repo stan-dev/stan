@@ -16,6 +16,5 @@ TEST(MathFunctions, bessel_first_kind) {
 TEST(MathFunctions, bessel_first_kind_nan) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::bessel_first_kind(1, nan));
+  EXPECT_THROW(stan::math::bessel_first_kind(3, nan), std::domain_error);
 }
