@@ -1,7 +1,7 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__ROUND_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__ROUND_HPP
 
-#include <boost/math/special_functions/round.hpp>
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
 
@@ -13,7 +13,7 @@ namespace stan {
       class round_vari : public vari {
       public:
         round_vari(vari* avi) :
-          vari(boost::math::round(avi->val_)) {
+          vari(::round(avi->val_)) {
         }
       };
     }

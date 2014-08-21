@@ -736,7 +736,7 @@ namespace stan {
         // Sampling
         start = clock();
         
-        sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
+        stan::common::sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
                              refresh, true,
                              writer,
                              s, model, base_rng,

@@ -29,7 +29,7 @@ namespace stan {
         message << "underlying matrix is not positive definite. "
                 << name << "last conditional variance is %1%.";
         std::string msg(message.str());
-        const double too_small = A.vectorD().tail(1)(0);
+        const T_result too_small = A.vectorD().tail(1)(0);
         return dom_err(function,too_small,name,msg.c_str(),"",result);
       }
       return true;
