@@ -232,16 +232,15 @@ TEST_F(StanCommon, DISABLED_initialize_state_random_reject_handful) {
   FAIL() << "should check that it can recover after a handful of rejections";
 }
 
-
 TEST_F(StanCommon, initialize_state_string) {
   init = "abcd";
   using stan::common::initialize_state;
-  EXPECT_NO_THROW(initialize_state(init,
-                                   cont_params,
-                                   model,
-                                   rng,
-                                   &output,
-                                   context_factory));
+  EXPECT_TRUE(initialize_state(init,
+                               cont_params,
+                               model,
+                               rng,
+                               &output,
+                               context_factory));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
   EXPECT_FLOAT_EQ(1, cont_params[1]);
@@ -252,4 +251,61 @@ TEST_F(StanCommon, initialize_state_string) {
   EXPECT_EQ("", output.str());
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
+}
+
+TEST_F(StanCommon, initialize_state_source) {
+  init = "abcd";
+  using stan::common::initialize_state_source;
+  EXPECT_TRUE(initialize_state_source(init,
+                                      cont_params,
+                                      model,
+                                      rng,
+                                      &output,
+                                      context_factory));
+  ASSERT_EQ(3, cont_params.size());
+  EXPECT_FLOAT_EQ(0, cont_params[0]);
+  EXPECT_FLOAT_EQ(1, cont_params[1]);
+  EXPECT_FLOAT_EQ(2, cont_params[2]);
+  EXPECT_EQ(1, model.templated_log_prob_calls);
+  EXPECT_EQ(1, model.transform_inits_calls);
+  EXPECT_EQ(0, rng.calls);
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ(1, context_factory.calls);
+  EXPECT_EQ("abcd", context_factory.last_call);
+}
+
+TEST_F(StanCommon, initialize_state_source_neg_infinity) {
+  init = "abcd";
+  using stan::common::initialize_state_source;
+  model.log_prob_return_value 
+    = -std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(initialize_state_source(init,
+                                      cont_params,
+                                      model,
+                                      rng,
+                                      &output,
+                                      context_factory));
+  ASSERT_EQ(3, cont_params.size());
+  EXPECT_FLOAT_EQ(0, cont_params[0]);
+  EXPECT_FLOAT_EQ(1, cont_params[1]);
+  EXPECT_FLOAT_EQ(2, cont_params[2]);
+  EXPECT_EQ(1, model.templated_log_prob_calls);
+  EXPECT_EQ(1, model.transform_inits_calls);
+  EXPECT_EQ(0, rng.calls);
+  EXPECT_NE("", output.str())
+    << "expecting some message here";
+  EXPECT_EQ(1, context_factory.calls);
+  EXPECT_EQ("abcd", context_factory.last_call);
+}
+
+TEST_F(StanCommon, DISABLED_initialize_state_source_gradient_throws) {
+  // FIXME: add this test
+  FAIL() << "it's not easy to force the model to throw when calculating the gradient"
+         << " using this mock. need to add this test";
+}
+
+TEST_F(StanCommon, DISABLED_initialize_state_source_gradient_infinite) {
+  // FIXME: add this test
+  FAIL() << "it's not easy to force the model to set gradients "
+         << " using this mock. need to add this test";
 }
