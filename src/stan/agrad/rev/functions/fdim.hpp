@@ -4,6 +4,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
   namespace agrad {
@@ -67,6 +68,9 @@ namespace stan {
      */
     inline var fdim(const stan::agrad::var& a,
                     const stan::agrad::var& b) {
+      if (boost::math::isnan(a.val()) 
+          || boost::math::isnan(b.val()))
+        return std::numeric_limits<double>::quiet_NaN();
       if (a.vi_->val_ > b.vi_->val_)
         return var(new fdim_vv_vari(a.vi_,b.vi_));
       else
@@ -92,9 +96,13 @@ namespace stan {
      */
     inline var fdim(const double& a,
                     const stan::agrad::var& b) {
-      return a > b.vi_->val_
-        ? var(new fdim_dv_vari(a,b.vi_))
-        : var(new vari(0.0));
+      if (boost::math::isnan(a) 
+          || boost::math::isnan(b.val()))
+        return std::numeric_limits<double>::quiet_NaN();
+      else
+        return a > b.vi_->val_
+          ? var(new fdim_dv_vari(a,b.vi_))
+          : var(new vari(0.0));
     }
 
     /**
@@ -115,9 +123,13 @@ namespace stan {
      */
     inline var fdim(const stan::agrad::var& a,
                     const double& b) {
-      return a.vi_->val_ > b
-        ? var(new fdim_vd_vari(a.vi_,b))
-        : var(new vari(0.0));
+      if (boost::math::isnan(a.val()) 
+          || boost::math::isnan(b))
+        return std::numeric_limits<double>::quiet_NaN();
+      else
+        return a.vi_->val_ > b
+          ? var(new fdim_vd_vari(a.vi_,b))
+          : var(new vari(0.0));
     }
 
   }
