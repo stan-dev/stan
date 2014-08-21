@@ -20,7 +20,55 @@
 namespace stan {
   namespace common {
     
+    
     /**
+     * Sets initial state to zero
+     *
+     * @param[out]    cont_params the initialized state. This should be the 
+     *                            right size and set to 0.
+     * @param[in,out] model       the model. Side effects on model? I'm not
+     *                            quite sure
+     * @param[in,out] output      output stream for messages
+     */
+    template <class Model>
+    bool initialize_state_zero(Eigen::VectorXd& cont_params,
+                               Model& model,
+                               std::ostream* output) {
+      cont_params.setZero();
+      
+      double init_log_prob;
+      Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
+      
+      try {
+        stan::model::gradient(model, cont_params, init_log_prob, init_grad, output);
+      } catch (const std::exception& e) {
+        if (output)
+          *output << "Rejecting initialization at zero because of gradient failure."
+                  << std::endl << e.what() << std::endl;
+        return false;
+      }
+      
+      if (!boost::math::isfinite(init_log_prob)) {
+        if (output)
+          *output << "Rejecting initialization at zero because of vanishing density."
+                  << std::endl;
+        return false;
+      }
+      
+      for (int i = 0; i < init_grad.size(); ++i) {
+        if (!boost::math::isfinite(init_grad[i])) {
+          if (output)
+            *output << "Rejecting initialization at zero because of divergent gradient."
+                    << std::endl;
+          return false;
+        }
+      }
+      return true;
+    }
+    
+
+    /**
+     * Creates the initial state.
      *
      * @param[in]     init        init can either be "0", a number as a string,
      *                            or a filename.
@@ -49,37 +97,7 @@ namespace stan {
         double R = std::fabs(boost::lexical_cast<double>(init));
         
         if (R == 0) {
-          
-          cont_params.setZero();
-          
-          double init_log_prob;
-          Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-          
-          try {
-            stan::model::gradient(model, cont_params, init_log_prob, init_grad, output);
-          } catch (const std::exception& e) {
-            if (output)
-              *output << "Rejecting initialization at zero because of gradient failure."
-                      << std::endl << e.what() << std::endl;
-            return false;
-          }
-          
-          if (!boost::math::isfinite(init_log_prob)) {
-            if (output)
-              *output << "Rejecting initialization at zero because of vanishing density."
-                      << std::endl;
-            return false;
-          }
-          
-          for (int i = 0; i < init_grad.size(); ++i) {
-            if (!boost::math::isfinite(init_grad[i])) {
-              if (output)
-                *output << "Rejecting initialization at zero because of divergent gradient."
-                        << std::endl;
-              return false;
-            }
-          }
-          
+          initialize_state_zero(cont_params, model, output);
         } else {
           
           boost::random::uniform_real_distribution<double>

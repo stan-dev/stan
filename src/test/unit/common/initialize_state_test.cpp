@@ -9,18 +9,20 @@ public:
   mock_model(size_t num_params_r): 
     stan::model::prob_grad(num_params_r),
     templated_log_prob_calls(0),
-    transform_inits_calls(0) { }
+    transform_inits_calls(0),
+    log_prob_return_value(0.0) { }
   
   void reset() {
     templated_log_prob_calls = 0;
     transform_inits_calls = 0;
+    log_prob_return_value = 0.0;
   }
 
   template <bool propto, bool jacobian_adjust_transforms, typename T>
   T log_prob(Eigen::Matrix<T,Eigen::Dynamic,1>& params_r,
              std::ostream* output_stream = 0) const {
     templated_log_prob_calls++;
-    return 0;
+    return log_prob_return_value;
   }
   
   void transform_inits(const stan::io::var_context& context__,
@@ -31,9 +33,9 @@ public:
     }
   }
   
-  
   mutable int templated_log_prob_calls;
   mutable int transform_inits_calls;
+  double log_prob_return_value;
 };
 
 class mock_rng {
@@ -108,6 +110,7 @@ public:
 };
 
 TEST_F(StanCommon, initialize_state_0) {
+  using stan::common::initialize_state;
   init = "0";
   EXPECT_NO_THROW(initialize_state(init,
                                    cont_params,
@@ -125,6 +128,43 @@ TEST_F(StanCommon, initialize_state_0) {
   EXPECT_EQ("", output.str());
   EXPECT_EQ(0, context_factory.calls);
   EXPECT_EQ("", context_factory.last_call);
+}
+
+TEST_F(StanCommon, initialize_state_zero_regular_execution) {
+  using stan::common::initialize_state_zero;
+  EXPECT_NO_THROW(initialize_state_zero(cont_params,
+                                        model,
+                                        &output));
+  ASSERT_EQ(3, cont_params.size());
+  EXPECT_FLOAT_EQ(0, cont_params[0]);
+  EXPECT_FLOAT_EQ(0, cont_params[1]);
+  EXPECT_FLOAT_EQ(0, cont_params[2]);
+  EXPECT_EQ(1, model.templated_log_prob_calls);
+  EXPECT_EQ(0, model.transform_inits_calls);
+  EXPECT_EQ("", output.str());
+}
+
+TEST_F(StanCommon, initialize_state_zero_negative_infinity) {
+  using stan::common::initialize_state_zero;
+  model.log_prob_return_value = 
+    -std::numeric_limits<double>::infinity();
+  
+  EXPECT_NO_THROW(initialize_state_zero(cont_params,
+                                        model,
+                                        &output));
+  ASSERT_EQ(3, cont_params.size());
+  EXPECT_FLOAT_EQ(0, cont_params[0]);
+  EXPECT_FLOAT_EQ(0, cont_params[1]);
+  EXPECT_FLOAT_EQ(0, cont_params[2]);
+  EXPECT_EQ(1, model.templated_log_prob_calls);
+  EXPECT_EQ(0, model.transform_inits_calls);
+  EXPECT_NE("", output.str()) 
+    << "expecting an error message here";
+}
+
+TEST_F(StanCommon, DISABLED_initialize_state_zero_grad_error) {
+  // FIXME: it's really hard to get the derivatives to be off
+  //        through mock objects
 }
 
 TEST_F(StanCommon, initialize_state_number) {
