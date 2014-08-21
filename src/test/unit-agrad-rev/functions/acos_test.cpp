@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/constants.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 
 TEST(AgradRev,acos_var) {
@@ -44,4 +45,17 @@ TEST(AgradRev,acos_out_of_bounds) {
 
   a = -1.0 - stan::math::EPSILON;
   EXPECT_TRUE(std::isnan(acos(a)));
+}
+
+struct acos_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return acos(arg1);
+  }
+};
+
+TEST(AgradRev,acos_NaN) {
+  acos_fun acos_;
+  test_nan(acos_,false,true);
 }

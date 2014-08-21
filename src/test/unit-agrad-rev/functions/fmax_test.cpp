@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/functions/fmax.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 TEST(AgradRev,fmax_vv) {
   AVAR a = 1.3;
@@ -114,3 +115,25 @@ TEST(AgradRev,fmax_dv_3) {
   // arbitrary, but doc this way
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
+TEST(AgradRev,fmax_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  stan::agrad::var nan_v = std::numeric_limits<double>::quiet_NaN();
+  stan::agrad::var a_v = 0.0;
+  double a = 0.0;
+
+  EXPECT_FLOAT_EQ(0.0, stan::agrad::fmax(nan_v, a).val());
+  EXPECT_FLOAT_EQ(0.0, stan::agrad::fmax(nan_v, a_v).val());
+  EXPECT_FLOAT_EQ(0.0, stan::agrad::fmax(nan, a_v).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fmax(a, nan_v).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fmax(a_v, nan_v).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fmax(a_v, nan).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fmax(nan, nan_v).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fmax(nan_v, nan).val());
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::fmax(nan_v, nan_v).val());
+}

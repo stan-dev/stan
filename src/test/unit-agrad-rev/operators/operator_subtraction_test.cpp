@@ -1,6 +1,9 @@
 #include <stan/agrad/rev/operators/operator_subtraction.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
+
 
 TEST(AgradRev,a_minus_b) {
   AVAR a = 5.0;
@@ -44,4 +47,19 @@ TEST(AgradRev,x_minus_a) {
   VEC dx;
   f.grad(x,dx);
   EXPECT_FLOAT_EQ(-1.0,dx[0]);
+}
+
+struct subtract_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return arg1-arg2;
+  }
+};
+
+TEST(AgradRev, subtract_nan) {
+  subtract_fun subtract_;
+  test_nan(subtract_,3.0,5.0,false, false);
 }

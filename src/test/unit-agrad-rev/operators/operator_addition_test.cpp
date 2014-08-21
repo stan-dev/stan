@@ -2,6 +2,8 @@
 #include <stan/agrad/rev/operators/operator_unary_negative.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,a_plus_b) {
   AVAR a = 5.0;
@@ -57,4 +59,19 @@ TEST(AgradRev,x_plus_a) {
   VEC dx;
   f.grad(x,dx);
   EXPECT_FLOAT_EQ(1.0,dx[0]);
+}
+
+struct add_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return arg1+arg2;
+  }
+};
+
+TEST(AgradRev, add_nan) {
+  add_fun add_;
+  test_nan(add_,3.0,5.0,false, false);
 }

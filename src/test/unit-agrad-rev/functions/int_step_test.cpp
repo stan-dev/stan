@@ -15,3 +15,9 @@ TEST(AgradRev,int_step) {
   EXPECT_EQ(0U,int_step(b));
   EXPECT_EQ(0U,int_step(c));
 }
+
+TEST(AgradRev, int_step_nan) {
+  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_EQ(0U, stan::math::int_step(nan));
+}

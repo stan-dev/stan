@@ -20,3 +20,7 @@ TEST(AgradRev,asBool) {
   EXPECT_FALSE(as_bool(var(0.0)));
   EXPECT_FALSE(as_bool(var(0.0f)));
 }
+TEST(AgradRev,as_bool_nan) {
+  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
+EXPECT_TRUE(stan::agrad::as_bool(nan));
+}
