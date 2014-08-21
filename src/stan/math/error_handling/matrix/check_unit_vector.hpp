@@ -35,7 +35,7 @@ namespace stan {
                        result);
       }
       T_prob ssq = theta.squaredNorm();
-      if (fabs(1.0 - ssq) > CONSTRAINT_TOLERANCE) {
+      if (!(fabs(1.0 - ssq) <= CONSTRAINT_TOLERANCE)) {
         std::stringstream msg;
         msg << "in function check_unit_vector(%1%), ";
         msg << name << " is not a valid unit vector.";
