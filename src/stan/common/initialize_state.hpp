@@ -219,49 +219,18 @@ namespace stan {
         double R = std::fabs(boost::lexical_cast<double>(init));
         
         if (R == 0) {
-          initialize_state_zero(cont_params, model, output);
+          return initialize_state_zero(cont_params, model, output);
         } else {
-          initialize_state_random(R, cont_params, model,
-                                  base_rng, output);
+          return initialize_state_random(R, cont_params, model,
+                                         base_rng, output);
         }
       } catch(...) {
-        stan::io::var_context* context = context_factory(init);
-        model.transform_inits(*context, cont_params);
-        delete context;
-        
-        double init_log_prob;
-        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-        
-        try {
-          stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
-        } catch (const std::exception& e) {
-          if (output)
-            *output << "Rejecting user-specified initialization because of gradient failure."
-                    << std::endl << e.what() << std::endl;
-          return false;
-        }
-        
-        if (!boost::math::isfinite(init_log_prob)) {
-          if (output)
-            *output << "Rejecting user-specified initialization because of vanishing density."
-                    << std::endl;
-          return false;
-        }
-        
-        for (int i = 0; i < init_grad.size(); ++i) {
-          if (!boost::math::isfinite(init_grad[i])) {
-            if (output)
-              *output << "Rejecting user-specified initialization because of divergent gradient."
-                      << std::endl;
-            return false;
-          }
-        }
-        
+        return initialize_state_source(init, cont_params, model,
+                                       base_rng, output,
+                                       context_factory);
       }
-      
-      return true;
+      return false;
     }
-    
   } // common
 } // stan
 
