@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__RESIZE_HPP__
-#define __STAN__MATH__MATRIX__RESIZE_HPP__
+#ifndef STAN__MATH__MATRIX__RESIZE_HPP
+#define STAN__MATH__MATRIX__RESIZE_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
@@ -30,8 +30,8 @@ namespace stan {
         x.resize(dims[pos]);
       }
 
-
-      void resize(double /*x*/, 
+      template <typename T>
+      void resize(T /*x*/, 
                   const std::vector<size_t>& /*dims*/, 
                   size_t /*pos*/) {
         // no-op

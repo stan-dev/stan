@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS_HPP__
-#define __STAN__MATH__FUNCTIONS_HPP__
+#ifndef STAN__MATH__FUNCTIONS_HPP
+#define STAN__MATH__FUNCTIONS_HPP
 
 #include <stan/math/functions/Phi.hpp>
 #include <stan/math/functions/Phi_approx.hpp>
@@ -11,6 +11,7 @@
 #include <stan/math/functions/binomial_coefficient_log.hpp>
 #include <stan/math/functions/digamma.hpp>
 #include <stan/math/functions/dist.hpp>
+#include <stan/math/functions/divide.hpp>
 #include <stan/math/functions/dot.hpp>
 #include <stan/math/functions/dot_self.hpp>
 #include <stan/math/functions/exp2.hpp>
@@ -57,6 +58,7 @@
 #include <stan/math/functions/min.hpp>
 #include <stan/math/functions/modified_bessel_first_kind.hpp>
 #include <stan/math/functions/modified_bessel_second_kind.hpp>
+#include <stan/math/functions/modulus.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/owens_t.hpp>
 #include <stan/math/functions/rising_factorial.hpp>

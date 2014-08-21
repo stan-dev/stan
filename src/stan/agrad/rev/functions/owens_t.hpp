@@ -1,11 +1,13 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__OWENS__T_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__OWENS__T_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__OWENS__T_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__OWENS__T_HPP
 
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/internal/vd_vari.hpp>
 #include <stan/agrad/rev/internal/dv_vari.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/math/functions/square.hpp>
 #include <boost/math/special_functions/owens_t.hpp>
 
 namespace stan {
@@ -20,8 +22,15 @@ namespace stan {
           op_vv_vari(boost::math::owens_t(avi->val_, bvi->val_), avi, bvi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * boost::math::erf(bvi_->val_ * avi_->val_ / std::sqrt(2.0)) * std::exp(-avi_->val_ * avi_->val_ / 2.0) * std::sqrt(pi() / 2.0) / (-2.0 * pi());
-          bvi_->adj_ += adj_ * std::exp(-0.5 * avi_->val_ * avi_->val_ * (1.0 + bvi_->val_ * bvi_->val_)) / ((1 + bvi_->val_ * bvi_->val_) * 2.0 * pi());
+          using stan::math::INV_SQRT_TWO_PI;
+          using stan::math::INV_SQRT_2;
+          const double neg_avi_sq_div_2 = -stan::math::square(avi_->val_) * 0.5;
+          const double one_p_bvi_sq = 1.0 + stan::math::square(bvi_->val_);
+
+          avi_->adj_ += adj_ * ::erf(bvi_->val_ * avi_->val_ * INV_SQRT_2)
+            * std::exp(neg_avi_sq_div_2) * INV_SQRT_TWO_PI * -0.5;
+          bvi_->adj_ += adj_ * std::exp(neg_avi_sq_div_2 * one_p_bvi_sq) 
+            / (one_p_bvi_sq * 2.0 * pi());
         }
       };
 
@@ -31,7 +40,13 @@ namespace stan {
           op_vd_vari(boost::math::owens_t(avi->val_, b), avi, b) {
         }
         void chain() {
-          avi_->adj_ += adj_ * boost::math::erf(bd_ * avi_->val_ / std::sqrt(2.0)) * std::exp(-avi_->val_ * avi_->val_ / 2.0) * std::sqrt(pi() / 2.0) / (-2.0 * pi());
+          using stan::math::INV_SQRT_TWO_PI;
+          using stan::math::INV_SQRT_2;
+          using stan::math::square;
+          
+          avi_->adj_ += adj_ * ::erf(bd_ * avi_->val_ * INV_SQRT_2)
+            * std::exp(-square(avi_->val_) * 0.5)
+            * INV_SQRT_TWO_PI * -0.5;
         }
       };
 
@@ -41,7 +56,14 @@ namespace stan {
           op_dv_vari(boost::math::owens_t(a, bvi->val_), a, bvi) {
         }
         void chain() {
-          bvi_->adj_ += adj_ * std::exp(-0.5 * ad_ * ad_ * (1.0 + bvi_->val_ * bvi_->val_)) / ((1 + bvi_->val_ * bvi_->val_) * 2.0 * pi());
+          using stan::math::INV_SQRT_2;
+          using stan::math::INV_SQRT_TWO_PI;
+          using stan::math::square;
+          const double one_p_bvi_sq = 1.0 + stan::math::square(bvi_->val_);
+
+          bvi_->adj_ += adj_ * std::exp(-0.5 * square(ad_)
+                                        * one_p_bvi_sq)
+            / (one_p_bvi_sq * 2.0 * pi());
         }
       };
     }

@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__VON_MISES_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__VON_MISES_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__VON_MISES_HPP
+#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__VON_MISES_HPP
 
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
@@ -27,7 +27,7 @@ namespace stan {
 
       using stan::is_constant_struct;
       using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::check_greater;
       using stan::math::check_nonnegative;
       using stan::math::check_consistent_sizes;
@@ -39,8 +39,7 @@ namespace stan {
       // Validate arguments.
       check_finite(function, y, "Random variable", &logp);
       check_finite(function, mu, "Location paramter", &logp);
-      check_finite(function, kappa, "Scale parameter", &logp);
-      check_positive(function, kappa, "Scale parameter", &logp);
+      check_positive_finite(function, kappa, "Scale parameter", &logp);
       check_consistent_sizes(function, y, mu, kappa, "Random variable",
                              "Location parameter", "Scale parameter",
                              &logp);
@@ -136,9 +135,8 @@ namespace stan {
 
       static const char* function = "stan::prob::von_mises_rng(%1%)";
 
-      stan::math::check_finite(function,kappa,"inverse of variance",(double*)0);
       stan::math::check_finite(function,mu,"mean",(double*)0);
-      stan::math::check_positive(function,kappa,"inverse of variance",
+      stan::math::check_positive_finite(function,kappa,"inverse of variance",
                                  (double*)0);
 
       double r = 1 + pow((1 + 4 * kappa * kappa), 0.5);

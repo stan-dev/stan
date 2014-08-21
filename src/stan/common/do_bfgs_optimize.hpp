@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__DO_BFGS_OPTIMIZE_HPP__
-#define __STAN__COMMON__DO_BFGS_OPTIMIZE_HPP__
+#ifndef STAN__COMMON__DO_BFGS_OPTIMIZE_HPP
+#define STAN__COMMON__DO_BFGS_OPTIMIZE_HPP
 
 #include <fstream>
 #include <iostream>
@@ -16,7 +16,8 @@ namespace stan {
 
   namespace common {
 
-    template<typename ModelT,typename BFGSOptimizerT,typename RNGT>
+    template<typename ModelT,typename BFGSOptimizerT,typename RNGT,
+             typename StartIterationCallback>
     int do_bfgs_optimize(ModelT &model, BFGSOptimizerT &bfgs,
                          RNGT &base_rng,
                          double &lp,
@@ -25,7 +26,8 @@ namespace stan {
                          std::fstream* output_stream,
                          std::ostream* notice_stream,
                          bool save_iterations,
-                         int refresh) {
+                         int refresh,
+                         StartIterationCallback& callback) {
       lp = bfgs.logp();
           
       if (notice_stream) 
@@ -38,6 +40,7 @@ namespace stan {
       int ret = 0;
           
       while (ret == 0) {  
+        callback();
         if (notice_stream && do_print(bfgs.iter_num(), 50*refresh)) {
           (*notice_stream) << "    Iter ";
           (*notice_stream) << "     log prob ";

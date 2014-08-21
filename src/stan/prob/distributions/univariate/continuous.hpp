@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS_HPP
+#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS_HPP
 
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
 #include <stan/prob/distributions/univariate/continuous/cauchy.hpp>
@@ -7,6 +7,7 @@
 #include <stan/prob/distributions/univariate/continuous/double_exponential.hpp>
 #include <stan/prob/distributions/univariate/continuous/exponential.hpp>
 #include <stan/prob/distributions/univariate/continuous/exp_mod_normal.hpp>
+#include <stan/prob/distributions/univariate/continuous/frechet.hpp>
 #include <stan/prob/distributions/univariate/continuous/gamma.hpp>
 #include <stan/prob/distributions/univariate/continuous/gumbel.hpp>
 #include <stan/prob/distributions/univariate/continuous/inv_chi_square.hpp>
@@ -15,6 +16,7 @@
 #include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/pareto.hpp>
+#include <stan/prob/distributions/univariate/continuous/pareto_type_2.hpp>
 #include <stan/prob/distributions/univariate/continuous/rayleigh.hpp>
 #include <stan/prob/distributions/univariate/continuous/scaled_inv_chi_square.hpp>
 #include <stan/prob/distributions/univariate/continuous/skew_normal.hpp>

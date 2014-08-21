@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX_ERROR_HANDLING_HPP__
-#define __STAN__MATH__MATRIX_ERROR_HANDLING_HPP__
+#ifndef STAN__MATH__MATRIX_ERROR_HANDLING_HPP
+#define STAN__MATH__MATRIX_ERROR_HANDLING_HPP
 
 #include <stan/math/error_handling/matrix/check_cholesky_factor.hpp>
 #include <stan/math/error_handling/matrix/check_cholesky_factor_corr.hpp>
@@ -16,6 +16,7 @@
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/error_handling/matrix/check_pos_semidefinite.hpp>
 #include <stan/math/error_handling/matrix/check_positive_ordered.hpp>
+#include <stan/math/error_handling/matrix/check_range.hpp>
 #include <stan/math/error_handling/matrix/check_row_index.hpp>
 #include <stan/math/error_handling/matrix/check_simplex.hpp>
 #include <stan/math/error_handling/matrix/check_size_match.hpp>

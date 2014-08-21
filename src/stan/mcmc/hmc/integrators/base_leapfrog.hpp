@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__BASE__LEAPFROG__BETA__
-#define __STAN__MCMC__BASE__LEAPFROG__BETA__
+#ifndef STAN__MCMC__BASE__LEAPFROG__BETA
+#define STAN__MCMC__BASE__LEAPFROG__BETA
 
 #include <iostream>
 #include <iomanip>
@@ -29,29 +29,29 @@ namespace stan {
       
       void verbose_evolve(P& z, H& hamiltonian, const double epsilon) {
         
-        this->_out_stream->precision(6);
+        this->out_stream_->precision(6);
         int width = 14;
         int nColumn = 4;
         
-        if (this->_out_stream) {
+        if (this->out_stream_) {
         
-          *(this->_out_stream) << "Verbose Hamiltonian Evolution, Step Size = " << epsilon << ":" << std::endl;
-          *(this->_out_stream) << "    " << std::setw(nColumn * width) << std::setfill('-')
+          *(this->out_stream_) << "Verbose Hamiltonian Evolution, Step Size = " << epsilon << ":" << std::endl;
+          *(this->out_stream_) << "    " << std::setw(nColumn * width) << std::setfill('-')
                                << "" << std::setfill(' ') << std::endl;
-          *(this->_out_stream) << "    "
+          *(this->out_stream_) << "    "
                                << std::setw(width) << std::left << "Poisson"
                                << std::setw(width) << std::left << "Initial"
                                << std::setw(width) << std::left << "Current"
                                << std::setw(width) << std::left << "DeltaH"
                                << std::endl;
-          *(this->_out_stream) << "    "
+          *(this->out_stream_) << "    "
                                << std::setw(width) << std::left << "Operator"
                                << std::setw(width) << std::left << "Hamiltonian"
                                << std::setw(width) << std::left << "Hamiltonian"
                                << std::setw(width) << std::left << "/ Stepsize^{2}"
                                << std::endl;
-          *(this->_out_stream) << "    " << std::setw(nColumn * width) << std::setfill('-')
-                       << "" << std::setfill(' ') << std::endl;
+          *(this->out_stream_) << "    " << std::setw(nColumn * width) << std::setfill('-')
+                               << "" << std::setfill(' ') << std::endl;
         
         }
           
@@ -61,9 +61,9 @@ namespace stan {
         
         double H1 = hamiltonian.H(z);
         
-        if (this->_out_stream) {
+        if (this->out_stream_) {
         
-          *(this->_out_stream) << "    "
+          *(this->out_stream_) << "    "
                                << std::setw(width) << std::left << "hat{V}/2"
                                << std::setw(width) << std::left << H0
                                << std::setw(width) << std::left << H1
@@ -77,9 +77,9 @@ namespace stan {
         
         double H2 = hamiltonian.H(z);
         
-        if (this->_out_stream) {
+        if (this->out_stream_) {
         
-          *(this->_out_stream) << "    "
+          *(this->out_stream_) << "    "
                                << std::setw(width) << std::left << "hat{T}"
                                << std::setw(width) << std::left << H0
                                << std::setw(width) << std::left << H2
@@ -92,16 +92,16 @@ namespace stan {
         
         double H3 = hamiltonian.H(z);
         
-        if (this->_out_stream) {
+        if (this->out_stream_) {
         
-          *(this->_out_stream) << "    "
+          *(this->out_stream_) << "    "
                                << std::setw(width) << std::left << "hat{V}/2"
                                << std::setw(width) << std::left << H0
                                << std::setw(width) << std::left << H3
                                << std::setw(width) << std::left << (H3 - H0) / (epsilon * epsilon)
                                << std::endl;
           
-          *(this->_out_stream) << "    " << std::setw(nColumn * width) << std::setfill('-')
+          *(this->out_stream_) << "    " << std::setw(nColumn * width) << std::setfill('-')
                                << "" << std::setfill(' ') << std::endl;
           
         }

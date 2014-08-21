@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP
+#define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP
 
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -85,13 +85,9 @@ namespace stan {
       using stan::math::check_ldlt_factor;
       
       LDLT_factor<T_y,Eigen::Dynamic,Eigen::Dynamic> ldlt_W(W);
-      if (!check_ldlt_factor(function,ldlt_W,"LDLT_Factor of random variable",&lp)) {
-        return lp;
-      }
+      check_ldlt_factor(function,ldlt_W,"LDLT_Factor of random variable",&lp);
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_S(S);
-      if (!check_ldlt_factor(function,ldlt_S,"LDLT_Factor of scale parameter",&lp)) {
-        return lp;
-      }
+      check_ldlt_factor(function,ldlt_S,"LDLT_Factor of scale parameter",&lp);
       
       if (include_summand<propto,T_dof>::value)
         lp -= lmgamma(k, 0.5 * nu);

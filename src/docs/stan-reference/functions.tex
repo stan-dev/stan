@@ -325,6 +325,40 @@ arithmetic on the current hardware platform}
 %
 \end{description}
 
+
+\section{Log Probability Function}\label{get-lp.section}
+
+The basic purpose of a Stan program is to compute a log probability
+function and its derivatives.  The log probability function in a Stan
+model outputs the log density on the unconstrained scale.  A log
+probabilty accumulator starts at zero and is then incremented in
+various ways by a Stan program.  The variables are first transformed
+from unconstrained to constrained, and the log Jacobian determinant
+added to the log probability accumulator.  Then the model block is
+executed on the constrained parmeters, with each sampling statement
+(\Verb|~|) and log probability increment statement
+(\code{increment\_log\_prob}) adding to the accumulator.  At the end
+of the model block execution, the value of the log probability
+accumulator is the log probability value returned by the Stan program.
+
+Stan provides a special built-in function \code{get\_lp} that takes no
+arguments and returns the current value of the log probability
+accumulator.  This function is primarily useful for debugging
+purposes, where for instance, it may be used with a print statement to
+display the log probability accumulator at various stages of execution
+to see where it becomes ill defined.
+
+\begin{description}
+\fitem{real}{get\_lp}{}{the current value of the log probability
+accumulator}
+\end{description}
+
+Like user-defined functions that end in \code{\_lp}, the log
+probability get function may only be used in the transformed parameter
+and model blocks, as well as in the bodies of functions with names
+that also end in \code{\_lp}.
+
+
 \section{Logical Functions}
 
 Like C++, BUGS, and R, Stan uses 0 to encode false, and 1 to encode
@@ -407,7 +441,7 @@ There are corresponding real-argument versions.
 
 \subsubsection{Boolean Operator Short Circuiting}
 
-{\it Warning:} \ As of Stan 2.3.0, the boolean operators do {\it not}
+{\it Warning:} \ As of Stan 2.4.0, the boolean operators do {\it not}
 short circuit.  This is a known bug and will be fixed in a future
 release.  The intended behavior in the future is as described below.
 
@@ -1734,7 +1768,7 @@ matrices.  The input matrix does not need to be square.}
     the vector \farg{v}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{v})}.}
 %
 \fitem{matrix}{diag\_post\_multiply}{matrix \farg{m}, row\_vector \farg{rv}}{Return the
-  product of the matrix \code{\farg{m}} and the diagonal matrix fromed from
+  product of the matrix \code{\farg{m}} and the diagonal matrix formed from
   the the row vector \code{\farg{rv}}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{rv})}.}
 \end{description}
 
@@ -2008,6 +2042,40 @@ arbitrary subvector.
 \end{description}
 
 
+\subsection{Concatenation Operations}
+
+\subsubsection{Horizontal concatenation}
+
+\begin{description}
+%
+\fitem{matrix}{append\_col}{matrix \farg{x}, matrix \farg{y}}{Combine matrices \farg{x} and \farg{y} by columns. The matrices must have the same number of rows.}
+%
+\fitem{matrix}{append\_col}{matrix \farg{x}, vector \farg{y}}{Combine matrix \farg{x} and vector \farg{y} by columns. The matrix and the vector must have the same number of rows.}
+%
+\fitem{matrix}{append\_col}{vector \farg{x}, matrix \farg{y}}{Combine vector \farg{x} and matrix \farg{y} by columns. The vector and the matrix must have the same number of rows.}
+%
+\fitem{matrix}{append\_col}{vector \farg{x}, vector \farg{y}}{Combine vectors \farg{x} and \farg{y} by columns. The vectors must have the same number of rows.}
+%
+\fitem{row\_vector}{append\_col}{row\_vector \farg{x}, row\_vector \farg{y}}{Combine row vectors \farg{x} and \farg{y} of any size into another row vector.}
+%
+\end{description}
+
+\subsubsection{Vertical concatenation}
+
+\begin{description}
+%
+\fitem{matrix}{append\_row}{matrix \farg{x}, matrix \farg{y}}{Combine matrices \farg{x} and \farg{y} by columns. The matrices must have the same number of rows.}
+%
+\fitem{matrix}{append\_row}{matrix \farg{x}, row\_vector \farg{y}}{Combine matrix \farg{x} and row vector \farg{y} by columns. The matrix and the row vector must have the same number of rows.}
+%
+\fitem{matrix}{append\_row}{row\_vector \farg{x}, matrix \farg{y}}{Combine row vector \farg{x} and matrix \farg{y} by columns. The row vector and the matrix must have the same number of rows.}
+%
+\fitem{matrix}{append\_row}{row\_vector \farg{x}, row\_vector \farg{y}}{Combine row vectors \farg{x} and \farg{y} by columns. The row vectors must have the same number of rows.}
+%
+\fitem{vector}{append\_row}{vector \farg{x}, vector \farg{y}}{Combine vectors \farg{x} and \farg{y} of any size into another vector.}
+%
+\end{description}
+
 \subsection{Transposition Postfix Operator}
 
 \begin{description}
@@ -2018,7 +2086,7 @@ arbitrary subvector.
 \fitem{row\_vector}{operator'}{vector \farg{x}}{The transpose of the vector
  \farg{x}, written as \code{x'}}
 %
-\fitem{vector}{operator'}{row\_vector \farg{x}}{The transpose of the vector
+\fitem{vector}{operator'}{row\_vector \farg{x}}{The transpose of the row vector
  \farg{x}, written as \code{x'}}
 %
 \end{description}
@@ -2192,7 +2260,7 @@ The inverse of \farg{A} where A is symmetric, positive definite}
 %
 \fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
 The vector of eigenvalues of a symmetric matrix \farg{A} 
-in asscending order}
+in ascending order}
 %
 \fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{ The matrix with
   the (column) eigenvectors of symmetric matrix \farg{A} in the same
@@ -2205,7 +2273,7 @@ eigenvectors returned by a decomposition are only identified up to a
 sign change.  In order to compare the eigenvectors produced by Stan's
 eigendecomposition to others, signs may need to be normalized in some
 way, such as by fixing the sign of a component, or doing comparisons
-allowig a multiplication by $-1$.
+allowing a multiplication by $-1$.
 
 The condition number of a symmetric matrix is defined to be the ratio
 of the largest eigenvalue to the smallest eigenvalue.  Large condition

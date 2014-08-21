@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__BINOMIAL_COEFFICIENT_LOG_HPP__
-#define __STAN__MATH__FUNCTIONS__BINOMIAL_COEFFICIENT_LOG_HPP__
+#ifndef STAN__MATH__FUNCTIONS__BINOMIAL_COEFFICIENT_LOG_HPP
+#define STAN__MATH__FUNCTIONS__BINOMIAL_COEFFICIENT_LOG_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/tools/promotion.hpp>

@@ -1,10 +1,12 @@
-#ifndef __STAN__MATH__FUNCTIONS__INT_STEP_HPP__
-#define __STAN__MATH__FUNCTIONS__INT_STEP_HPP__
+#ifndef STAN__MATH__FUNCTIONS__INT_STEP_HPP
+#define STAN__MATH__FUNCTIONS__INT_STEP_HPP
 
 namespace stan {
   namespace math {
     /**
      * The integer step, or Heaviside, function.  
+     *
+     * For double NaN input, int_step(NaN) returns 0.
      *
      * @param y Value to test.
      * @return 1 if value is greater than 0 and 0 otherwise

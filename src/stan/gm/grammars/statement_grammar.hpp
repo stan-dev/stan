@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__PARSER__STATEMENT_GRAMMAR__HPP__
-#define __STAN__GM__PARSER__STATEMENT_GRAMMAR__HPP__
+#ifndef STAN__GM__PARSER__STATEMENT_GRAMMAR__HPP
+#define STAN__GM__PARSER__STATEMENT_GRAMMAR__HPP
 
 #include <string>
 #include <sstream>
@@ -84,6 +84,11 @@ namespace stan {
                               print_statement(var_origin),
                               whitespace_grammar<Iterator> >
       print_statement_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              raise_exception_statement(var_origin),
+                              whitespace_grammar<Iterator> >
+      raise_exception_statement_r;
 
 
       boost::spirit::qi::rule<Iterator,

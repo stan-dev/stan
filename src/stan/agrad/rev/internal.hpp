@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__INTERNAL_HPP__
-#define __STAN__AGRAD__REV__INTERNAL_HPP__
+#ifndef STAN__AGRAD__REV__INTERNAL_HPP
+#define STAN__AGRAD__REV__INTERNAL_HPP
 
 #include <stan/agrad/rev/internal/ddv_vari.hpp>
 #include <stan/agrad/rev/internal/dv_vari.hpp>

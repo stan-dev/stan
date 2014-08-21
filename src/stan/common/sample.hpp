@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__SAMPLE_HPP__
-#define __STAN__COMMON__SAMPLE_HPP__
+#ifndef STAN__COMMON__SAMPLE_HPP
+#define STAN__COMMON__SAMPLE_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/io/mcmc_writer.hpp>

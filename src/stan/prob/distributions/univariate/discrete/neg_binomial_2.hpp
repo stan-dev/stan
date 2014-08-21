@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_2_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_2_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_2_HPP
+#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_2_HPP
 
 #include <boost/random/negative_binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -34,9 +34,8 @@ namespace stan {
 
       static const char* function = "stan::prob::neg_binomial_log(%1%)";
 
-      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
-      using stan::math::check_positive;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
@@ -49,10 +48,8 @@ namespace stan {
 
       double logp(0.0);
       check_nonnegative(function, n, "Failures variable", &logp);
-      check_finite(function, mu, "Location parameter", &logp);
-      check_positive(function, mu, "Location parameter", &logp);
-      check_finite(function, phi, "Inverse scale parameter", &logp);
-      check_positive(function, phi, "Inverse scale parameter", &logp);
+      check_positive_finite(function, mu, "Location parameter", &logp);
+      check_positive_finite(function, phi, "Inverse scale parameter", &logp);
       check_consistent_sizes(function,
                              n,mu,phi,
                              "Failures variable",
@@ -158,7 +155,7 @@ namespace stan {
 
       using stan::math::check_finite;
       using stan::math::check_nonnegative;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
@@ -172,8 +169,7 @@ namespace stan {
       double logp(0.0);
       check_nonnegative(function, n, "Failures variable", &logp);
       check_finite(function, eta, "Log location parameter", &logp);
-      check_finite(function, phi, "Inverse scale parameter", &logp);
-      check_positive(function, phi, "Inverse scale parameter", &logp);
+      check_positive_finite(function, phi, "Inverse scale parameter", &logp);
       check_consistent_sizes(function,
                              n,eta,phi,
                              "Failures variable",
@@ -275,13 +271,11 @@ namespace stan {
 
       static const char* function = "stan::prob::neg_binomial_2_rng(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
 
-      check_finite(function, mu, "Location parameter", (double*)0);
-      check_finite(function, phi, "Inverse scale parameter", (double*)0);
-      check_positive(function, mu, "Location parameter", (double*)0);
-      check_positive(function, phi, "Inverse scale parameter", (double*)0);
+      check_positive_finite(function, mu, "Location parameter", (double*)0);
+      check_positive_finite(function, phi, "Inverse scale parameter", 
+                            (double*)0);
 
       return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/mu,
                                                            rng),rng);
@@ -298,11 +292,11 @@ namespace stan {
       static const char* function = "stan::prob::neg_binomial_2_log_rng(%1%)";
 
       using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;
 
       check_finite(function, eta, "Log-location parameter", (double*)0);
-      check_finite(function, phi, "Inverse scale parameter", (double*)0);
-      check_positive(function, phi, "Inverse scale parameter", (double*)0);
+      check_positive_finite(function, phi, "Inverse scale parameter", 
+                            (double*)0);
 
       return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/std::exp(eta),
                                                            rng),rng);

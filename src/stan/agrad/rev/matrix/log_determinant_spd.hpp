@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP__
-#define __STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP
+#define STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP
 
 #include <vector>
 #include <stan/math/error_handling/dom_err.hpp>

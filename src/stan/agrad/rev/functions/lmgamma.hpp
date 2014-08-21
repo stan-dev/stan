@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__LMGAMMA_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__LMGAMMA_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__LMGAMMA_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__LMGAMMA_HPP
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>

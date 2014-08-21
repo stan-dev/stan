@@ -42,6 +42,8 @@ stan.kdev4
 /src/test/test-models/*/*/*.cpp
 /src/test/test-models/*/*/*/*.cpp
 /src/test/test-models/*/*/*/*/*.cpp
+/src/test/test-models/*/*/*/*/*/*.cpp
+/src/test/test-models/*/*/*/*/*/*/*.cpp
 !/src/test/test-models/**/*.stan
 !/src/test/test-models/**/.gitignore
 

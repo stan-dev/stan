@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DIST__UNI__CONTINUOUS__INV_CHI_SQUARE_HPP__
-#define __STAN__PROB__DIST__UNI__CONTINUOUS__INV_CHI_SQUARE_HPP__
+#ifndef STAN__PROB__DIST__UNI__CONTINUOUS__INV_CHI_SQUARE_HPP
+#define STAN__PROB__DIST__UNI__CONTINUOUS__INV_CHI_SQUARE_HPP
 
 #include <boost/random/chi_squared_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -48,15 +48,14 @@ namespace stan {
             && stan::length(nu)))
         return 0.0;
 
-      using stan::math::check_finite;      
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;      
       using stan::math::check_not_nan;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
 
       double logp(0.0);
-      check_finite(function, nu, "Degrees of freedom parameter", &logp);
-      check_positive(function, nu, "Degrees of freedom parameter", &logp);
+      check_positive_finite(function, nu, "Degrees of freedom parameter",
+                            &logp);
       check_not_nan(function, y, "Random variable", &logp);
       check_consistent_sizes(function,
                              y,nu,
@@ -143,8 +142,7 @@ namespace stan {
       // Error checks
       static const char* function = "stan::prob::inv_chi_square_cdf(%1%)";
           
-      using stan::math::check_finite;      
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;      
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
@@ -153,8 +151,7 @@ namespace stan {
           
       double P(1.0);
           
-      check_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_positive(function, nu, "Degrees of freedom parameter", &P);
+      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
       check_consistent_sizes(function, y, nu,
@@ -247,8 +244,7 @@ namespace stan {
       // Error checks
       static const char* function = "stan::prob::inv_chi_square_cdf_log(%1%)";
           
-      using stan::math::check_finite;      
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;      
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
@@ -257,8 +253,7 @@ namespace stan {
           
       double P(0.0);
           
-      check_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_positive(function, nu, "Degrees of freedom parameter", &P);
+      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
       check_consistent_sizes(function, y, nu,
@@ -342,8 +337,7 @@ namespace stan {
       // Error checks
       static const char* function = "stan::prob::inv_chi_square_ccdf_log(%1%)";
           
-      using stan::math::check_finite;      
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;      
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
@@ -352,8 +346,7 @@ namespace stan {
           
       double P(0.0);
           
-      check_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_positive(function, nu, "Degrees of freedom parameter", &P);
+      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
       check_not_nan(function, y, "Random variable", &P);
       check_nonnegative(function, y, "Random variable", &P);
       check_consistent_sizes(function, y, nu,
@@ -436,11 +429,10 @@ namespace stan {
 
       static const char* function = "stan::prob::inv_chi_square_rng(%1%)";
 
-      using stan::math::check_finite;      
-      using stan::math::check_positive;
+      using stan::math::check_positive_finite;      
 
-      check_finite(function, nu, "Degrees of freedom parameter", (double*)0);
-      check_positive(function, nu, "Degrees of freedom parameter", (double*)0);
+      check_positive_finite(function, nu, "Degrees of freedom parameter", 
+                            (double*)0);
 
       variate_generator<RNG&, chi_squared_distribution<> >
         chi_square_rng(rng, chi_squared_distribution<>(nu));

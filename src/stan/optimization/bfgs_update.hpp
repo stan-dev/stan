@@ -1,5 +1,5 @@
-#ifndef __STAN__OPTIMIZATION__BFGS_UPDATE_HPP__
-#define __STAN__OPTIMIZATION__BFGS_UPDATE_HPP__
+#ifndef STAN__OPTIMIZATION__BFGS_UPDATE_HPP
+#define STAN__OPTIMIZATION__BFGS_UPDATE_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__DIGAMMA_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__DIGAMMA_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__DIGAMMA_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__DIGAMMA_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/zeta.hpp>

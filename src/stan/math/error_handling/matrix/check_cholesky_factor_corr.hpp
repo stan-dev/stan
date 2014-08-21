@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_CHOLESKY_FACTOR_CORR_HPP__
-#define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_CHOLESKY_FACTOR_CORR_HPP__
+#ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_CHOLESKY_FACTOR_CORR_HPP
+#define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_CHOLESKY_FACTOR_CORR_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/check_positive.hpp>
@@ -42,7 +42,7 @@ namespace stan {
         if (!check_positive(function, y(i,i), name, result))
           return false;
       for (int i = 0; i < y.rows(); ++i) {
-        Eigen::Matrix<T_y,1,Eigen::Dynamic> y_i = y.row(i);
+        Eigen::Matrix<T_y,Eigen::Dynamic,1> y_i = y.row(i).transpose();
         if (!check_unit_vector(function, y_i, name, result))
           return false;
       }

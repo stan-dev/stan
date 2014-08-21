@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__LOG_SOFTMAX_HPP__
-#define __STAN__MATH__MATRIX__LOG_SOFTMAX_HPP__
+#ifndef STAN__MATH__MATRIX__LOG_SOFTMAX_HPP
+#define STAN__MATH__MATRIX__LOG_SOFTMAX_HPP
 
 #include <cmath>
 #include <sstream>

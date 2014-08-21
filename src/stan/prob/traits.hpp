@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__TRAITS_HPP__
-#define __STAN__PROB__TRAITS_HPP__
+#ifndef STAN__PROB__TRAITS_HPP
+#define STAN__PROB__TRAITS_HPP
 
 #include <stan/meta/traits.hpp>
 #include <boost/math/tools/promotion.hpp>

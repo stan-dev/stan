@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_HPP
+#define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -30,15 +30,12 @@ namespace stan {
 
       int lb = 1;
 
-      double lp = 0.0;
+      T_prob lp = 0.0;
       check_bounded(function, n, lb, theta.size(),
                     "Number of categories",
                     &lp);
       
       if (!stan::is_constant_struct<T_prob>::value) {
-        Eigen::Matrix<double,Eigen::Dynamic,1> theta_dbl(theta.size());
-        for (int i = 0; i < theta_dbl.size(); ++i)
-          theta_dbl(i) = value_of(theta(i));
         if (!check_simplex(function, theta,
                            "Probabilities parameter",
                            &lp))
@@ -80,16 +77,13 @@ namespace stan {
 
       int lb = 1;
 
-      double lp = 0.0;
+      T_prob lp = 0.0;
       for (size_t i = 0; i < ns.size(); ++i)
         check_bounded(function, ns[i], lb, theta.size(),
                       "element of outcome array",
                       &lp);
       
       if (!stan::is_constant_struct<T_prob>::value) {
-        Eigen::Matrix<double,Eigen::Dynamic,1> theta_dbl(theta.size());
-        for (int i = 0; i < theta_dbl.size(); ++i)
-          theta_dbl(i) = value_of(theta(i));
         if (!check_simplex(function, theta,
                            "Probabilities parameter",
                            &lp))

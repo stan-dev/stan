@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__DUMP_HPP__
-#define __STAN__IO__DUMP_HPP__
+#ifndef STAN__IO__DUMP_HPP
+#define STAN__IO__DUMP_HPP
 
 #include <cctype>
 #include <iostream>
@@ -434,7 +434,6 @@ namespace stan {
       std::vector<double> stack_r_;
       std::vector<size_t> dims_;
       std::istream& in_;
-      // stan::io::buffered_stream in_;
 
       bool scan_single_char(char c_expected) {
         int c = in_.peek();
@@ -818,7 +817,8 @@ namespace stan {
        * they are floating point.
        */
       bool is_int() {
-        return stack_i_.size() > 0;
+        // return stack_i_.size() > 0;
+        return stack_r_.size() == 0;
       }
 
       /**
@@ -868,8 +868,8 @@ namespace stan {
             BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
           }
         }
-        catch ( const std::invalid_argument &exc ) {
-          std::string msg = "data " + name_ + " " + exc.what();
+        catch (const std::invalid_argument &e) {
+          std::string msg = "data " + name_ + " " + e.what();
           BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
         }
         return true;
@@ -933,13 +933,13 @@ namespace stan {
             vars_i_[reader.name()] 
               = std::pair<std::vector<int>, 
                           std::vector<size_t> >(reader.int_values(), 
-                                                      reader.dims());
+                                                reader.dims());
             
           } else {
             vars_r_[reader.name()] 
               = std::pair<std::vector<double>, 
                           std::vector<size_t> >(reader.double_values(), 
-                                                      reader.dims());
+                                                reader.dims());
           }
         }
       }

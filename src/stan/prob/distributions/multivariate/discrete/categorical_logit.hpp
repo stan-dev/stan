@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_LOGIT_LOG_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_LOGIT_LOG_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_LOGIT_LOG_HPP
+#define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_LOGIT_LOG_HPP
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
@@ -35,7 +35,7 @@ namespace stan {
       
       if (!include_summand<propto,T_prob>::value)
         return 0.0;
-        
+
       // FIXME:  wasteful vs. creating term (n-1) if not vectorized
       return beta(n-1) - log_sum_exp(beta); // == log_softmax(beta)(n-1);
     }
