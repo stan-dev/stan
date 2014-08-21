@@ -39,7 +39,7 @@ namespace stan {
                        tmp.c_str(),"",
                        result);
       }
-      if (fabs(1.0 - theta.sum()) > CONSTRAINT_TOLERANCE) {
+      if (!(fabs(1.0 - theta.sum()) <= CONSTRAINT_TOLERANCE)) {
         std::stringstream msg;
         T_prob sum = theta.sum();
         msg << " is not a valid simplex.";
