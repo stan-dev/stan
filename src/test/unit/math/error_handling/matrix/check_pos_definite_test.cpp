@@ -28,5 +28,10 @@ TEST(MathErrorHandlingMatrix, checkPosDefiniteMatrix_nan) {
                                         y, "y", &result), 
                      std::domain_error);
     }
+
+  y << 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0;
+  EXPECT_THROW(check_pos_definite("checkPosDefiniteMatrix(%1%)", 
+                                              y, "y", &result), 
+               std::domain_error);
 }
 
