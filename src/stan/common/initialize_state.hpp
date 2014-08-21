@@ -5,27 +5,42 @@
 #include <iostream>
 #include <math.h>
 
-#include <Eigen/Core>
+#include <stan/math/matrix/Eigen.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 #include <boost/random/uniform_real_distribution.hpp>
-
+#include <boost/random/variate_generator.hpp>
 
 #include <stan/model/util.hpp>
 #include <stan/gm/error_codes.hpp>
 #include <stan/common/context_factory.hpp>
+#include <stan/common/write_error_msg.hpp>
 
 namespace stan {
   namespace common {
     
+    /**
+     *
+     * @param[in]     init        init can either be "0", a number as a string,
+     *                            or a filename.
+     * @param[out]    cont_params the initialized state. This should be the 
+     *                            right size and set to 0.
+     * @param[in,out] model       the model. Side effects on model? I'm not
+     *                            quite sure
+     * @param[in,out] base_rng    the random number generator. State may change.
+     * @param[in,out] output      output stream for messages
+     * @param[in,out] context_factory  an instantiated factory that implements
+     *                            the concept of a context_factory. This has
+     *                            one method that takes a string.
+     */
     template <class ContextFactory, class Model, class RNG>
-    bool initialize_state(std::string init,
-                         Eigen::VectorXd& cont_params,
-                         Model& model,
-                         RNG& base_rng,
-                         std::ostream* output,
-                         ContextFactory& context_factory) {
+    bool initialize_state(const std::string init,
+                          Eigen::VectorXd& cont_params,
+                          Model& model,
+                          RNG& base_rng,
+                          std::ostream* output,
+                          ContextFactory& context_factory) {
     
       int num_init_tries = -1;
       
@@ -48,7 +63,7 @@ namespace stan {
                       << std::endl << e.what() << std::endl;
             return false;
           }
-            
+          
           if (!boost::math::isfinite(init_log_prob)) {
             if (output)
               *output << "Rejecting initialization at zero because of vanishing density."
@@ -64,7 +79,7 @@ namespace stan {
               return false;
             }
           }
-        
+          
         } else {
           
           boost::random::uniform_real_distribution<double>
