@@ -2,7 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/agrad/rev/matrix.hpp>
-#include <stan/agrad/rev/jacobian.hpp>
+#include <test/unit-agrad-rev/jacobian.hpp>
 
 TEST(AgradRevMatrix, dot_product_vv) {
   AVEC a, b;

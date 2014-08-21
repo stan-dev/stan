@@ -94,33 +94,27 @@ namespace stan {
     /**
      * Compute the gradient for all variables starting from the
      * specified root variable implementation.  Does not recover
-     * memory.  This chainable variable's adjoint is initialized
-     * using the method <code>init_dependent()</code> and then the
-     * chain rule is applied working down the stack from this
-     * chainable and calling each chainable's <code>chain()</code>
-     * method in turn.
+     * memory.  This chainable variable's adjoint is initialized using
+     * the method <code>init_dependent()</code> and then the chain
+     * rule is applied working down the stack from this chainable and
+     * calling each chainable's <code>chain()</code> method in turn.
      *
+     * This function does not recover any memory from the computation.
+     * 
      * @param vi Variable implementation for root of partial
      * derivative propagation.
      */
     static void grad(chainable* vi) {
       vi->init_dependent(); 
 
-
       std::vector<chainable*>::reverse_iterator end
-        = end_chain_stack_.empty()
-        ? var_stack_.rend()
-        : end_chain_stack_.back();
+        = var_stack_.rend();
 
       // propagate derivates for vars
       for (std::vector<chainable*>::reverse_iterator it = var_stack_.rbegin(); 
            it < end;
            ++it)
         (*it)->chain();
-    }
-
-    static void start_nested_gradient() {
-      end_chain_stack_.push_back(var_stack_.rbegin());
     }
 
   }
