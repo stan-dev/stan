@@ -233,8 +233,6 @@ TEST_F(StanCommon, DISABLED_initialize_state_random_reject_handful) {
 }
 
 
-
-
 TEST_F(StanCommon, initialize_state_string) {
   init = "abcd";
   using stan::common::initialize_state;
