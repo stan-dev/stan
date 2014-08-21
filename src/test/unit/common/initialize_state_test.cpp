@@ -51,15 +51,15 @@ public:
 
   result_type operator()() {
     calls++;
-    return calls;
+    return calls / 10000.0;
   }
 
   static result_type max() {
-    return 5;
+    return 1.0;
   }
 
   static result_type min() {
-    return -5;
+    return -1.0;
   }
 
   int calls;
@@ -112,12 +112,12 @@ public:
 TEST_F(StanCommon, initialize_state_0) {
   using stan::common::initialize_state;
   init = "0";
-  EXPECT_NO_THROW(initialize_state(init,
-                                   cont_params,
-                                   model,
-                                   rng,
-                                   &output,
-                                   context_factory));
+  EXPECT_TRUE(initialize_state(init,
+                               cont_params,
+                               model,
+                               rng,
+                               &output,
+                               context_factory));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
   EXPECT_FLOAT_EQ(0, cont_params[1]);
@@ -130,11 +130,11 @@ TEST_F(StanCommon, initialize_state_0) {
   EXPECT_EQ("", context_factory.last_call);
 }
 
-TEST_F(StanCommon, initialize_state_zero_regular_execution) {
+TEST_F(StanCommon, initialize_state_zero) {
   using stan::common::initialize_state_zero;
-  EXPECT_NO_THROW(initialize_state_zero(cont_params,
-                                        model,
-                                        &output));
+  EXPECT_TRUE(initialize_state_zero(cont_params,
+                                    model,
+                                    &output));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
   EXPECT_FLOAT_EQ(0, cont_params[1]);
@@ -149,9 +149,9 @@ TEST_F(StanCommon, initialize_state_zero_negative_infinity) {
   model.log_prob_return_value = 
     -std::numeric_limits<double>::infinity();
   
-  EXPECT_NO_THROW(initialize_state_zero(cont_params,
-                                        model,
-                                        &output));
+  EXPECT_FALSE(initialize_state_zero(cont_params,
+                                     model,
+                                     &output));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(0, cont_params[0]);
   EXPECT_FLOAT_EQ(0, cont_params[1]);
@@ -165,20 +165,22 @@ TEST_F(StanCommon, initialize_state_zero_negative_infinity) {
 TEST_F(StanCommon, DISABLED_initialize_state_zero_grad_error) {
   // FIXME: it's really hard to get the derivatives to be off
   //        through mock objects
+  FAIL() << "need to add a test here";
 }
 
 TEST_F(StanCommon, initialize_state_number) {
   init = "1.5";
-  EXPECT_NO_THROW(initialize_state(init,
-                                   cont_params,
-                                   model,
-                                   rng,
-                                   &output,
-                                   context_factory));
+  using stan::common::initialize_state;
+  EXPECT_TRUE(initialize_state(init,
+                               cont_params,
+                               model,
+                               rng,
+                               &output,
+                               context_factory));
   ASSERT_EQ(3, cont_params.size());
-  EXPECT_FLOAT_EQ((1.0 / 10) * 3, cont_params[0]);
-  EXPECT_FLOAT_EQ((2.0 / 10) * 3, cont_params[1]);
-  EXPECT_FLOAT_EQ((3.0 / 10) * 3, cont_params[2]);
+  EXPECT_FLOAT_EQ((1.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[0]);
+  EXPECT_FLOAT_EQ((2.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[1]);
+  EXPECT_FLOAT_EQ((3.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[2]);
   EXPECT_EQ(1, model.templated_log_prob_calls);
   EXPECT_EQ(0, model.transform_inits_calls);
   EXPECT_EQ(3, rng.calls);
@@ -187,8 +189,55 @@ TEST_F(StanCommon, initialize_state_number) {
   EXPECT_EQ("", context_factory.last_call);
 }
 
+TEST_F(StanCommon, initialize_state_random) {
+  using stan::common::initialize_state_random;
+
+  EXPECT_TRUE(initialize_state_random(1.5,
+                                      cont_params,
+                                      model,
+                                      rng,
+                                      &output));
+  ASSERT_EQ(3, cont_params.size());
+  EXPECT_FLOAT_EQ((1.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[0]);
+  EXPECT_FLOAT_EQ((2.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[1]);
+  EXPECT_FLOAT_EQ((3.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[2]);
+  EXPECT_EQ(1, model.templated_log_prob_calls);
+  EXPECT_EQ(0, model.transform_inits_calls);
+  EXPECT_EQ(3, rng.calls);
+  EXPECT_EQ("", output.str());
+}
+
+
+TEST_F(StanCommon, initialize_state_random_reject_all) {
+  using stan::common::initialize_state_random;
+  model.log_prob_return_value = -std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(initialize_state_random(1.5,
+                                       cont_params,
+                                       model,
+                                       rng,
+                                       &output));
+  ASSERT_EQ(3, cont_params.size());
+  EXPECT_FLOAT_EQ((298.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[0]);
+  EXPECT_FLOAT_EQ((299.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[1]);
+  EXPECT_FLOAT_EQ((300.0 / 10000.0 / (rng.max() - rng.min())) * 3, cont_params[2]);
+  EXPECT_EQ(100, model.templated_log_prob_calls);
+  EXPECT_EQ(0, model.transform_inits_calls);
+  EXPECT_EQ(300, rng.calls);
+  EXPECT_NE("", output.str()) << "expecting error message";
+}
+
+
+TEST_F(StanCommon, DISABLED_initialize_state_random_reject_handful) {
+  // FIXME: write this test. Need to extend the mock model.
+  FAIL() << "should check that it can recover after a handful of rejections";
+}
+
+
+
+
 TEST_F(StanCommon, initialize_state_string) {
   init = "abcd";
+  using stan::common::initialize_state;
   EXPECT_NO_THROW(initialize_state(init,
                                    cont_params,
                                    model,
