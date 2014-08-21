@@ -30,8 +30,8 @@ namespace stan {
         x.resize(dims[pos]);
       }
 
-
-      void resize(double /*x*/, 
+      template <typename T>
+      void resize(T /*x*/, 
                   const std::vector<size_t>& /*dims*/, 
                   size_t /*pos*/) {
         // no-op
