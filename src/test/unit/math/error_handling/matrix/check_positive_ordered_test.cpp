@@ -65,3 +65,25 @@ TEST(MathErrorHandlingMatrix, checkPositiveOrdered_one_indexed_message) {
   EXPECT_NE(std::string::npos, message.find("element at 3"))
     << message;
 }
+
+TEST(MathErrorHandlingMatrix, checkPositiveOrdered_nan) {
+  double result;
+  Eigen::Matrix<double, Eigen::Dynamic, 1> y;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  y.resize(3);
+
+  y << 0, 1, 2;
+  for (int i = 0; i < y.size(); i++) {
+    y[i] = nan;
+    EXPECT_THROW(check_positive_ordered("check_positive_ordered(%1%)", y, "y", &result),
+                 std::domain_error);
+    y[i] = i;
+  }
+  for (int i = 0; i < y.size(); i++) {
+    y << 0, 10, std::numeric_limits<double>::infinity();
+    y[i] = nan;
+    EXPECT_THROW(check_positive_ordered("check_positive_ordered(%1%)", y, "y", &result),
+                 std::domain_error);
+    y[i] = i;
+  }
+}
