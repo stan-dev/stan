@@ -10,7 +10,7 @@ foreach(flag_var
   string(REGEX REPLACE "/O[^0]" "/O0" ${flag_var} "${${flag_var}}")
 endforeach(flag_var)
 
-set(TEST_DIRS test-models integration math unit
+set(TEST_DIRS test-models integration unit
               unit-agrad-fwd  unit-agrad-rev
               unit-distribution)
 
