@@ -125,7 +125,7 @@ struct fdim_fun {
   typename stan::return_type<T0,T1>::type
   operator()(const T0& arg1,
              const T1& arg2) const {
-    return arg1-arg2;
+    return fdim(arg1,arg2);
   }
 };
 
