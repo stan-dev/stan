@@ -1,4 +1,4 @@
-# stan_model(TARGET STANFILE [NOMAIN] [NOBUILD])
+# stan_model(TARGET STANFILE [NOMAIN] [NOBUILD] [CMDSTAN])
 #
 # Parse (and potentially build) a Stan model file.
 #
@@ -11,9 +11,12 @@
 # name TARGET is created which will compile the model.
 #
 # If NOMAIN is passed, stanc is called with --no_main option.
+#
+# If CMDSTAN is passed, then use the cmdstan binary instead.
 function(stan_model target stanfile)
   set(no_main OFF)
   set(do_build ON)
+  set(use_cmdstan OFF)
   string(REPLACE ".stan" ".cpp" srcfile ${stanfile})
 
   # Parse any extra keyword arguments
@@ -22,6 +25,8 @@ function(stan_model target stanfile)
       set(no_main ON)
     elseif("${word}" STREQUAL NOBUILD)
       set(do_build OFF)
+    elseif("${word}" STREQUAL CMDSTAN)
+      set(use_cmdstan ON)
     else()
       message(ERROR "Unrecognized stanmodel option: \"${word}\"")
     endif()
@@ -40,13 +45,23 @@ function(stan_model target stanfile)
   endif()
 
   # Add custom command to build the source file
-  add_custom_command(OUTPUT ${srcfile}
-     COMMAND ${RUNCMD} ${STANC_BIN} ${stanc_args}
-     DEPENDS stanc-bin)
+  set(BUILD_SOURCES "${srcfile}")
+  if (use_cmdstan)
+    add_custom_command(OUTPUT ${srcfile}
+       COMMAND ${RUNCMD} ${CMDSTANC_BIN} ${stanc_args}
+       DEPENDS cmdstan-stanc)
+    if (NOT no_main)
+      set(BUILD_SOURCES "${BUILD_SOURCES}" "${CMDSTAN_MAIN_FILE}")
+    endif()
+  else()
+    add_custom_command(OUTPUT ${srcfile}
+       COMMAND ${RUNCMD} ${STANC_BIN} ${stanc_args}
+       DEPENDS stanc-bin)
+  endif()
 
   if(do_build)
     # Add the model executable
-    add_executable(${target} ${srcfile})
+    add_executable(${target} ${BUILD_SOURCES})
     target_link_libraries(${target} stan)
   else()
     set(${target} "${srcfile}" PARENT_SCOPE)
