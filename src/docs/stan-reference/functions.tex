@@ -813,6 +813,16 @@ The cumulative unit normal density function of \farg{x}, defined as $\Phi(x) \eq
 \[
 \textrm{Phi}(x) = 
 \begin{cases}
+  0 & : x < -37.5,\, x = -\inf \\
+  \Phi(x) & : -37.5 \leq x \leq 8.25 \\
+  1 & : x > 8.25,\, x = \inf \\
+  \textrm{throws exception} & : x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\textrm{Phi}(x) = 
+\begin{cases}
   0 & : x = -\inf \\
   0 & : x < -37.5 \\
   \Phi(x) & : -37.5 \leq x \leq 8.25 \\
