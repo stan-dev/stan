@@ -4,6 +4,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,acosh_val) {
   AVAR a = 1.3;
@@ -47,15 +48,15 @@ TEST(AgradRev,acosh_out_of_bounds) {
   EXPECT_TRUE(boost::math::isinf(acosh(b)) && acosh(b) > 0);
 }
 
-TEST(AgradRev,acosh_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::acosh(a);
+struct acosh_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return acosh(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,acosh_NaN) {
+  acosh_fun acosh_;
+  test_nan(acosh_,false,true);
 }
