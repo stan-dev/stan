@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/rev.hpp>
 #include <stan/math/functions/Phi_approx.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev, Phi_approx) {
   using stan::agrad::var;
@@ -42,16 +43,15 @@ TEST(AgradRev, Phi_approx) {
   }
 }
 
-TEST(AgradRev, Phi_approx_nan) {
-  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::Phi_approx(nan).val());
+struct Phi_approx_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return Phi_approx(arg1);
+  }
+};
 
-  std::vector<double> grads;
-  std::vector<stan::agrad::var> vars;
-  vars.push_back(nan);
-
-  stan::agrad::Phi_approx(nan).grad(vars, grads);
-  EXPECT_PRED1(boost::math::isnan<double>,
-               grads[0]);
+TEST(AgradRev,Phi_approx_NaN) {
+  Phi_approx_fun Phi_approx_;
+  test_nan(Phi_approx_,false,true);
 }
