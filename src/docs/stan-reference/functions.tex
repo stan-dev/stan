@@ -798,9 +798,19 @@ The error function of \farg{x}}
 The complementary error function of \farg{x}}
 %
 \fitemindexsort{real}{Phi}{real \farg{x}}{
-The cumulative unit normal density function of \farg{x};
-\code{Phi(\farg{x})} will underflow to 0 for \farg{x} below -37.5 and overflow
-to 1 for \farg{x} above 8.25;  derivatives will underflow to 0 below
+The cumulative unit normal density function of \farg{x}, defined as $\Phi(x) \equiv \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt$.
+%
+\[
+\textrm{Phi}(x) = 
+\begin{cases}
+  \Phi(x) & : -37.5 \leq x \leq 8.25 \\
+  0 & : x < -37.5 \\
+  1 & : x > 8.25 \\
+  \textrm{throws exception} & : x = \textrm{NaN}
+\end{cases}
+\]
+%
+\code{Phi(\farg{x})} derivatives will underflow to 0 below
 -27.5 and overflow to 1 above 27.5.
 }{Phi}{phi}
 %
