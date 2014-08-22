@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/constants.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 
 TEST(AgradRev,acos_var) {
@@ -46,15 +47,15 @@ TEST(AgradRev,acos_out_of_bounds) {
   EXPECT_TRUE(std::isnan(acos(a)));
 }
 
-TEST(AgradRev,acos_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::acos(a);
+struct acos_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return acos(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,acos_NaN) {
+  acos_fun acos_;
+  test_nan(acos_,false,true);
 }
