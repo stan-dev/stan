@@ -158,3 +158,9 @@ TEST(AgradFwdTrunc, FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
+
+TEST(AgradFwdTrunc,nan) {
+  stan::agrad::fvar<double> nan = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::trunc(nan).val());
+}

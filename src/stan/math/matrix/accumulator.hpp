@@ -110,7 +110,7 @@ namespace stan {
        *
        * @return Sum of accumulated values.
        */
-      T sum() {
+      T sum() const {
         using math::sum;
         return sum(buf_);
       }

@@ -165,3 +165,9 @@ TEST(AgradFwdRound, FvarFvarVar_3rdDeriv) {
   b.d_.d_.grad(q,r);
   EXPECT_FLOAT_EQ(0, r[0]);
 }
+
+TEST(AgradFwdRound,round_nan) {
+  stan::agrad::fvar<double> nan = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::agrad::round(nan).val());
+}
