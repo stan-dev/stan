@@ -801,34 +801,14 @@ The complementary error function of \farg{x}}
 The cumulative unit normal density function of \farg{x}, defined as $\Phi(x) \equiv \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt$.
 %
 \[
-\textrm{Phi}(x) = 
+\texttt{Phi(x)} = 
 \begin{cases}
-  \Phi(x) & : -37.5 \leq x \leq 8.25 \\
-  0 & : x < -37.5 \\
-  1 & : x > 8.25 \\
-  \textrm{throws exception} & : x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\textrm{Phi}(x) = 
-\begin{cases}
-  0 & : x < -37.5,\, x = -\inf \\
-  \Phi(x) & : -37.5 \leq x \leq 8.25 \\
-  1 & : x > 8.25,\, x = \inf \\
-  \textrm{throws exception} & : x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\textrm{Phi}(x) = 
-\begin{cases}
-  0 & : x = -\inf \\
-  0 & : x < -37.5 \\
-  \Phi(x) & : -37.5 \leq x \leq 8.25 \\
-  1 & : x > 8.25 \\
-  1 & : x = \inf \\
-  \textrm{throws exception} & : x = \textrm{NaN}
+  \Phi(x) & : \; -37.5 \leq x \leq 8.25 \\
+  0 & : \; x < -37.5 \\
+  1 & : \; x > 8.25 \\[6pt]
+  0 & : \; x = -\inf \\
+  1 & : \; x = \inf \\[6pt]
+  \textrm{throws exception} & : \; x = \textrm{NaN}
 \end{cases}
 \]
 %
