@@ -33,7 +33,7 @@ foreach(curr_hdr ${DIST_TEST_HDRS})
                      DEPENDS generate_tests ${curr_hdr})
 
   foreach(curr_src ${curr_srcs})
-    add_stan_gtest(UnitDistributionTests "${curr_src}")
+    add_stan_gtest(Stan_Test_UnitDistribution "${curr_src}")
   endforeach()
 endforeach()
 

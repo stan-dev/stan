@@ -13,7 +13,8 @@ add_compile_options( -Wall -Wno-unused-function -Wno-tautological-compare
                      -Wno-c++11-long-long )
 
 # This is used for the syntax-only test compiles
-check_cxx_compiler_flag("-fsyntax-only" HAVE_SYNTAXONLY_FLAG)
+#check_cxx_compiler_flag("-fsyntax-only" HAVE_SYNTAXONLY_FLAG)
+set(HAVE_SYNTAXONLY_FLAG ON)
 
 # Setup boost defines
 add_definitions(-DBOOST_RESULT_OF_USE_TR1

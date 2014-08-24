@@ -10,11 +10,16 @@ foreach(flag_var
   string(REGEX REPLACE "/O[^0]" "/O0" ${flag_var} "${${flag_var}}")
 endforeach(flag_var)
 
-set(TEST_DIRS test-models integration unit
-              unit-agrad-fwd  unit-agrad-rev
-              unit-distribution)
+if (BUILD_STAN_UNIT_TESTS)
+  add_subdirectory(test-models)
+  add_subdirectory(integration)
+  add_subdirectory(unit)
+  add_subdirectory(unit-agrad-fwd)
+  add_subdirectory(unit-agrad-rev)
+endif()
 
-foreach(dir ${TEST_DIRS})
-  add_subdirectory(${dir})
-endforeach()
+if (BUILD_STAN_DIST_TESTS)
+  add_subdirectory(unit-distribution)
+endif()
+
 

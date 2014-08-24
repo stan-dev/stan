@@ -49,6 +49,6 @@ function(add_stan_gtest groupname source)
   set(executable ${groupname_l}_${executable})
   add_executable(${executable} ${source})
   target_link_libraries(${executable} stan stanc ${GTEST_LIBRARIES})
-  add_test(${groupname}
-           ${RUNCMD} ${CMAKE_CURRENT_BINARY_DIR}/${executable} --gtest_output=xml:${executable}.xml)
+  add_test(NAME ${executable}
+           COMMAND ${RUNCMD} ${CMAKE_CURRENT_BINARY_DIR}/${executable} --gtest_output=xml:${executable}.xml)
 endfunction(add_stan_gtest)

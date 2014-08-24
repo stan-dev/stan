@@ -2,14 +2,13 @@ cmake_minimum_required (VERSION 2.8)
 
 project(Stan C CXX)
 set(Stan_VERSION_MAJOR "2")
-set(Stan_VERSION_MINOR "3")
+set(Stan_VERSION_MINOR "4")
 set(Stan_VERSION_PATCH "0")
 set(Stan_VERSION "${Stan_VERSION_MAJOR}.${Stan_VERSION_MINOR}.${Stan_VERSION_PATCH}")
 
 set(CMAKE_MODULE_PATH ${Stan_SOURCE_DIR}/cmake)
 set(STAN_PATH ${Stan_SOURCE_DIR})
 include(CheckCXXCompilerFlag)
-include(CTest)
 include(StanModels)
 
 option(BUILD_DOXYGEN_DOCS
@@ -18,11 +17,16 @@ option(BUILD_DOXYGEN_DOCS
 option(BUILD_REFERENCE_MANUAL
        "Whether the Stan reference manual should be built"
        ON)
-option(BUILD_STAN_TESTS
-       "Should the core Stan tests be built"
+option(BUILD_STAN_UNIT_TESTS
+       "Should the core Stan unit tests be built"
+       ON)
+option(BUILD_STAN_DIST_TESTS
+       "Should the core Stan distribution tests be built"
        ON)
 
-if(BUILD_STAN_TESTS)
+
+if(BUILD_STAN_UNIT_TESTS OR BUILD_STAN_DIST_TESTS)
+  include(CTest)
   set(NEED_GTEST ON)
 endif()
 
@@ -76,7 +80,7 @@ else()
 endif()
 
 # unit tests
-if(BUILD_STAN_TESTS)
+if(BUILD_STAN_UNIT_TESTS OR BUILD_STAN_DIST_TESTS)
   add_subdirectory(src/test)
 endif()
 

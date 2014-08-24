@@ -9,11 +9,12 @@ foreach(source ${TEST_SRCS})
   string(REPLACE ".cpp" "${empty_string}" executable ${source})
   string(REPLACE "/"  "_" executable ${executable})
   string(REPLACE "\\"  "_" executable ${executable})
-  set(executable integration_${executable})
+  set(executable stan_test_integration_${executable})
+
   add_executable(${executable} ${source})
   add_dependencies(${executable} Test_SyntaxOnly_Models)
   target_link_libraries(${executable} stan stanc ${GTEST_LIBRARIES})
-  add_test(IntegrationTests
-           ${RUNCMD} ${CMAKE_CURRENT_BINARY_DIR}/${executable} --gtest_output="xml:${executable}.xml")
+  add_test(NAME ${executable} 
+           COMMAND ${RUNCMD} ${CMAKE_CURRENT_BINARY_DIR}/${executable} --gtest_output="xml:${executable}.xml")
 endforeach()
 

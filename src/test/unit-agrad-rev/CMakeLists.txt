@@ -2,6 +2,6 @@ file( GLOB_RECURSE TEST_SRCS
       RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
       *_test.cpp )
 foreach(source ${TEST_SRCS})
-  add_stan_gtest(UnitAgradRevTests "${source}")
+  add_stan_gtest(Stan_Test_UnitAgradRev "${source}")
 endforeach()
 

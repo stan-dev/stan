@@ -66,7 +66,8 @@ bool is_parsable(const std::string& file_name,
 bool is_parsable_folder(const std::string& model_name,
                         const std::string folder = "syntax-only",
                         std::ostream* msgs = 0) {
-  std::string path("src/test/test-models/");
+//  std::string path("src/test/test-models/");
+  std::string path("../test-models/");
   path += folder;
   path += "/";
   path += model_name;
