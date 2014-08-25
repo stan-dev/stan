@@ -44,10 +44,10 @@ TEST(AgradRev, minus_eq_nan) {
   minus_eq_fun minus_eq_;
   double nan = std::numeric_limits<double>::quiet_NaN();
 
-  test_nan_vv(minus_eq_,3.0,nan,false, false);
-  test_nan_vv(minus_eq_,nan,5.0,false, false);
-  test_nan_vv(minus_eq_,nan,nan,false, false);
-  test_nan_vd(minus_eq_,3.0,nan,false, false);
-  test_nan_vd(minus_eq_,nan,5.0,false, false);
-  test_nan_vd(minus_eq_,nan,nan,false, false);
+  test_nan_vv(minus_eq_,3.0,nan,false, true);
+  test_nan_vv(minus_eq_,nan,5.0,false, true);
+  test_nan_vv(minus_eq_,nan,nan,false, true);
+  test_nan_vd(minus_eq_,3.0,nan,false, true);
+  test_nan_vd(minus_eq_,nan,5.0,false, true);
+  test_nan_vd(minus_eq_,nan,nan,false, true);
 }
