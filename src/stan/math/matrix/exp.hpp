@@ -13,8 +13,11 @@ namespace stan {
      * @return ret(i,j) = exp(m(i,j))
      */
     template<typename T, int Rows, int Cols>
-    inline Eigen::Matrix<T,Rows,Cols> exp(const Eigen::Matrix<T,Rows,Cols>& m) {
-      return m.array().exp().matrix();
+    inline Eigen::Matrix<T,Rows,Cols> exp(Eigen::Matrix<T,Rows,Cols> mat) {
+      T * mat_ = mat.data();
+      for (int i = 0, size_ = mat.size(); i < size_; i++)
+        mat_[i] = std::exp(mat_[i]);
+      return mat;
     }
     
   }
