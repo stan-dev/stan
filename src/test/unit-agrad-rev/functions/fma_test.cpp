@@ -107,5 +107,5 @@ struct fma_fun {
 
 TEST(AgradRev,fma_NaN) {
   fma_fun fma_;
-  test_nan(fma_,0.6,0.3,0.5,false,false);
+  test_nan(fma_,0.6,0.3,0.5,false,true);
 }
