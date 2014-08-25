@@ -26,5 +26,5 @@ struct pos_fun {
 TEST(AgradRev, pos_nan) {
   pos_fun pos_;
 
-  test_nan(pos_,false, false);
+  test_nan(pos_,false, true);
 }
