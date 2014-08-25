@@ -64,5 +64,5 @@ struct multiply_fun {
 
 TEST(AgradRev, multiply_nan) {
   multiply_fun multiply_;
-  test_nan(multiply_,3.0,5.0,false, false);
+  test_nan(multiply_,3.0,5.0,false, true);
 }
