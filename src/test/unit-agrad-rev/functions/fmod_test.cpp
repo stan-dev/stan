@@ -53,5 +53,5 @@ struct fmod_fun {
 
 TEST(AgradRev, fmod_nan) {
   fmod_fun fmod_;
-  test_nan(fmod_,3.0,5.0,false, false);
+  test_nan(fmod_,3.0,5.0,false, true);
 }
