@@ -74,5 +74,6 @@ struct pow_fun {
 
 TEST(AgradRev, pow_nan) {
   pow_fun pow_;
-  test_nan(pow_,3.0,5.0,false, false);
+  test_nan(pow_,3.0,5.0,false, true);
+  test_nan(pow_,0.0,5.0,false, true);
 }
