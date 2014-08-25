@@ -59,5 +59,5 @@ struct minus_minus_fun {
 TEST(AgradRev, minus_minus_nan) {
   minus_minus_fun minus_minus_;
 
-  test_nan(minus_minus_,false, false);
+  test_nan(minus_minus_,false, true);
 }
