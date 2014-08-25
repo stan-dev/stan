@@ -118,5 +118,5 @@ struct multiply_log_fun {
 
 TEST(AgradRev, multiply_log_nan) {
   multiply_log_fun multiply_log_;
-  test_nan(multiply_log_,3.0,5.0,false, false);
+  test_nan(multiply_log_,3.0,5.0,false, true);
 }
