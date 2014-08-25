@@ -14,9 +14,8 @@ namespace stan {
      */
     template<typename T, int Rows, int Cols>
     inline Eigen::Matrix<T,Rows,Cols> exp(Eigen::Matrix<T,Rows,Cols> mat) {
-      T * mat_ = mat.data();
-      for (int i = 0, size_ = mat.size(); i < size_; i++)
-        mat_[i] = std::exp(mat_[i]);
+      for (T * it = mat.data(), * end_ = it + mat.size(); it != end_; it++)
+        *it = std::exp(*it);
       return mat;
     }
     
