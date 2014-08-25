@@ -44,10 +44,10 @@ TEST(AgradRev, multiply_eq_nan) {
   multiply_eq_fun multiply_eq_;
   double nan = std::numeric_limits<double>::quiet_NaN();
 
-  test_nan_vv(multiply_eq_,3.0,nan,false, false);
-  test_nan_vv(multiply_eq_,nan,5.0,false, false);
+  test_nan_vv(multiply_eq_,3.0,nan,false, true);
+  test_nan_vv(multiply_eq_,nan,5.0,false, true);
   test_nan_vv(multiply_eq_,nan,nan,false, true);
   test_nan_vd(multiply_eq_,3.0,nan,false, true);
-  test_nan_vd(multiply_eq_,nan,5.0,false, false);
+  test_nan_vd(multiply_eq_,nan,5.0,false, true);
   test_nan_vd(multiply_eq_,nan,nan,false, true);
 }
