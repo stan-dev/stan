@@ -77,5 +77,5 @@ struct plus_plus_fun {
 TEST(AgradRev, plus_plus_nan) {
   plus_plus_fun plus_plus_;
 
-  test_nan(plus_plus_,false, false);
+  test_nan(plus_plus_,false, true);
 }
