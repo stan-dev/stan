@@ -24,5 +24,5 @@ struct neg_fun {
 TEST(AgradRev, neg_nan) {
   neg_fun neg_;
 
-  test_nan(neg_,false, false);
+  test_nan(neg_,false, true);
 }
