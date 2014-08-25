@@ -73,5 +73,5 @@ struct add_fun {
 
 TEST(AgradRev, add_nan) {
   add_fun add_;
-  test_nan(add_,3.0,5.0,false, false);
+  test_nan(add_,3.0,5.0,false, true);
 }
