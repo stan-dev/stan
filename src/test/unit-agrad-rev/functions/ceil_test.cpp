@@ -24,5 +24,5 @@ struct ceil_fun {
 
 TEST(AgradRev,ceil_NaN) {
   ceil_fun ceil_;
-  test_nan(ceil_,false,false);
+  test_nan(ceil_,false,true);
 }
