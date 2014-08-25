@@ -53,5 +53,5 @@ struct divide_fun {
 
 TEST(AgradRev, divide_nan) {
   divide_fun divide_;
-  test_nan(divide_,3.0,5.0,false, false);
+  test_nan(divide_,3.0,5.0,false, true);
 }
