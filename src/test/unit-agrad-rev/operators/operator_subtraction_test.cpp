@@ -61,5 +61,5 @@ struct subtract_fun {
 
 TEST(AgradRev, subtract_nan) {
   subtract_fun subtract_;
-  test_nan(subtract_,3.0,5.0,false, false);
+  test_nan(subtract_,3.0,5.0,false, true);
 }
