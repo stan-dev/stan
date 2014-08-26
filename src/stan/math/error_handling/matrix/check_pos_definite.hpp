@@ -19,6 +19,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the matrix is positive definite.
+     * @return throws if any element in lower triangular of matrix is nan.
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings (message has (0,0) item)
