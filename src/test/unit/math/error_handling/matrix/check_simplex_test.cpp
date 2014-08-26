@@ -23,7 +23,8 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_negative_value) {
   double result;
 
 
-  y << -0.1, 1.1;
+  y[0] = -0.1;
+  y[1] = 1.1;
   try {
     stan::math::check_simplex("checkSimplex(%1%)",
                               y, "y", &result);
@@ -43,7 +44,9 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_negative_value) {
 
 
   y.setZero();
-  y << 0.1, -0.1, 1.0;
+  y[0] = 0.1;
+  y[1] = -0.1;
+  y[2] = 1.0;
   try {
     stan::math::check_simplex("checkSimplex(%1%)",
                               y, "y", &result);
