@@ -35,7 +35,7 @@ namespace stan {
         return true;
       for (size_type m = 0; m < k; ++m) {
         for (size_type n = m + 1; n < k; ++n) {
-          if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE) {
+          if (!(fabs(y(m,n) - y(n,m)) <= CONSTRAINT_TOLERANCE)) {
             std::ostringstream message;
             message << name << " is not symmetric. " 
                     << name << "[" << stan::error_index::value + m << "," 
