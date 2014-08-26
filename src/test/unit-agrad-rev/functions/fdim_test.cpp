@@ -2,12 +2,9 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/rev.hpp>
-<<<<<<< HEAD
-=======
 #include <stan/math/functions/fdim.hpp>
 #include <test/unit-agrad-rev/nan_util.hpp>
 #include <stan/meta/traits.hpp>
->>>>>>> 8f31c4e... added NaN test for fdim
 
 TEST(AgradRev,fdim_vv) {
   using stan::agrad::fdim;
@@ -131,5 +128,5 @@ struct fdim_fun {
 
 TEST(AgradRev, fdim_nan) {
   fdim_fun fdim_;
-  test_nan(fdim_,3.0,5.0,false, false);
+  test_nan(fdim_,3.0,5.0,false, true);
 }
