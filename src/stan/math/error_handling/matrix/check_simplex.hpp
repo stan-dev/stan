@@ -23,6 +23,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the vector is a simplex.
+     * @return throws if any element is nan.
      */
     template <typename T_prob, typename T_result>
     bool check_simplex(const char* function,
