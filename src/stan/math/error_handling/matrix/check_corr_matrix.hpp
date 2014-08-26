@@ -26,6 +26,7 @@ namespace stan {
      * 
      * @return <code>true</code> if the specified matrix is a valid
      * correlation matrix.
+     * @return throw if any element in matrix is nan
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings
