@@ -1,3 +1,6 @@
+#include <stan/agrad/rev/matrix/multiply.hpp>
+#include <stan/agrad/rev/operators.hpp>
+#include <stan/agrad/rev/functions/abs.hpp>
 #include <stan/agrad/fwd/matrix/inverse.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <test/unit/agrad/util.hpp>

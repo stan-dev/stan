@@ -1,5 +1,6 @@
 #include <stan/math/matrix/inverse_spd.hpp>
 #include <stan/agrad/fwd/matrix/inverse.hpp>
+#include <stan/agrad/rev/matrix/multiply.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/fwd/operators.hpp>
