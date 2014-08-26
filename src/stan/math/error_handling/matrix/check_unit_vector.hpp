@@ -20,6 +20,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the vector is a unit vector.
+     * @return throws if any element in theta is nan
      */
     template <typename T_prob, typename T_result>
     bool check_unit_vector(const char* function,
