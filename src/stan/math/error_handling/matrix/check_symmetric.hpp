@@ -20,6 +20,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the matrix is symmetric.
+     * @return throws if any element not on the main diagonal is NaN
      * @tparam T Type of scalar.
      */
     template <typename T_y, typename T_result>
