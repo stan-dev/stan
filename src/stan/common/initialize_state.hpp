@@ -230,7 +230,7 @@ namespace stan {
           return initialize_state_random(R, cont_params, model,
                                          base_rng, output);
         }
-      } catch(...) {
+      } catch(const boost::bad_lexical_cast& e) {
         return initialize_state_source(init, cont_params, model,
                                        base_rng, output,
                                        context_factory);
