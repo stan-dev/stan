@@ -11,8 +11,6 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified matrix is square.
      *
-     * NOTE: this will not throw if any elements in y are nan.
-     *
      * @param function
      * @param y Matrix to test.
      * @param name
