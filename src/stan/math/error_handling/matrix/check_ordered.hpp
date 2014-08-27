@@ -20,6 +20,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the vector has positive, ordered
+     * @return throws if any element in y is nan
      * values.
      */
     template <typename T_y, typename T_result>
