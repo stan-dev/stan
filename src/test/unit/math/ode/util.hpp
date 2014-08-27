@@ -221,7 +221,6 @@ void test_ode_vv(const F& f,
 
   ode_res = stan::math::solve_ode(f, y_in_v, t_in,
                                  ts, theta_v, x, x_int);
-  
 
   for (int i = 0; i < ts.size(); i++) {
     for (int j = 0; j < y_in.size(); j++) {
@@ -245,49 +244,3 @@ void test_ode_vv(const F& f,
     }
   }
 }
-
-
-
-// template <typename F>
-// inline void solve_ode_diff_integrator(const F& f,
-//                                       const std::vector<double>& y0_dbl,
-//                                       const double& t0_dbl,
-//                                       const std::vector<double>& ts_dbl,
-//                                       const std::vector<double>& theta_dbl,
-//                                       const std::vector<double>& x,
-//                                       const std::vector<int>& x_int,
-//                                       const int& iteration_number,
-//                                       const int& eqn_number,
-//                                       double& value,
-//                                       std::vector<double>& gradients) {
-
-//   std::vector<stan::agrad::var> y0;
-//   for (int i = 0; i < y0_dbl.size(); i++)
-//     y0.push_back(y0_dbl[i]);
-
-//   double t0;
-//   t0 = t0_dbl;
-
-//   std::vector<double> ts;
-//   for (int i = 0; i < ts_dbl.size(); i++)
-//     ts.push_back(ts_dbl[i]);
-
-//   std::vector<stan::agrad::var> theta;
-//   for (int i = 0; i < theta_dbl.size(); i++)
-//     theta.push_back(theta_dbl[i]);
-  
-//   std::vector<stan::agrad::var> vars;
-//   for (int i = 0; i < theta.size(); i++)
-//     vars.push_back(theta[i]);
-
-//   for (int i = 0; i < y0.size(); i++)
-//     vars.push_back(y0[i]);
-
-//   std::vector<std::vector<stan::agrad::var> > ode_res;
-
-//   ode_res = stan::math::solve_ode_diff_integrator(f, y0, t0,
-//                                   ts, theta, x, x_int);
-//   value = ode_res[iteration_number][eqn_number].val();
-  
-//   ode_res[iteration_number][eqn_number].grad(vars, gradients);
-// }
