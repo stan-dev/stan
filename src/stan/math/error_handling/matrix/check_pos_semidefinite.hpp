@@ -32,7 +32,7 @@ namespace stan {
       typedef 
         typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type 
         size_type;
-      if (y.rows() == 1 && y(0,0) < 0.0) {
+      if (y.rows() == 1 && !(y(0,0) >= 0.0)) {
         std::ostringstream message;
         message << name << " is not positive semi-definite. " 
                 << name << "(0,0) is %1%.";
