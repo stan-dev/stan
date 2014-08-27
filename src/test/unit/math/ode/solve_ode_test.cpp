@@ -128,9 +128,7 @@ TEST(solve_ode, harm_osc_finite_diff) {
   for (int i = 0; i < 100; i++)
     ts.push_back(0.1*(i+1));
 
-  //test_ode_dv(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8,1e-4);
-  test_ode_vd(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8,1e-4);
-  test_ode_vv(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8,1e-4);
+  test_ode(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8,1e-4);
 }
 
 TEST(solve_ode, harm_osc_known_values) {
@@ -219,6 +217,5 @@ TEST(solve_ode, lorenz_finite_diff) {
   for (int i = 0; i < 100; i++)
     ts.push_back(0.1*(i+1));
 
-  //test_ode_dv(lorenz, t0, ts, y0, theta, x, x_int, 1e-8, 1e-1);
-  //test_ode_vd(lorenz, t0, ts, y0, theta, x, x_int, 1e-8, 1e-1);
+  test_ode(lorenz, t0, ts, y0, theta, x, x_int, 1e-8, 1e-1);
 }
