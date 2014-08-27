@@ -46,6 +46,7 @@ namespace stan {
     
     /**
      * Checks if the variable y is finite.
+     * NOTE: throws if any element in y is nan.
      */
     template <typename T_y, typename T_result>
     inline bool check_finite(const char* function,
