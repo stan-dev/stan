@@ -246,6 +246,111 @@ void test_ode_finite_diff_vv(const F& f,
   }
 }
 
+template <typename F, typename T1, typename T2>
+void test_ode_exceptions(const F& f,
+                         const double& t_in,
+                         const std::vector<double>& ts,
+                         const std::vector<T1>& y_in,
+                         const std::vector<T2>& theta,
+                         const std::vector<double>& x,
+                         const std::vector<int>& x_int) {
+  std::vector<T1> y_ = y_in;
+  std::vector<T2> theta_ = theta;
+  double t_ = t_in;
+  std::vector<double> ts_ = ts;
+
+  // y0.size() == 0 should throw
+  y_.clear();
+  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int),
+               std::domain_error);
+  y_ = y_in;
+
+  // y0.size() =/= dy_dt.size() should throw
+  y_.clear();
+  for (int i = 0; i < y_in.size() - 1; i++)
+    y_.push_back(y_in[i]);
+  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int),
+               std::domain_error);
+  y_.clear();
+  y_ = y_in;
+
+  // ts.size() == 0 should throw  
+  ts_.clear();
+  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int),
+               std::domain_error);
+
+  // repeated values should throw
+  ts_.clear();
+  for (int i = 0; i < ts.size(); i++)
+    ts_.push_back(t_in+1.0);
+  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int),
+               std::domain_error);
+
+  // elements in ts need to be ordered
+  ts_.clear();
+  for (int i = 0; i < ts.size(); i++)
+    ts_.push_back(ts[ts.size()-i]);
+  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int),
+               std::domain_error);
+
+  // test t_in > ts (should throw)
+  ts_.clear();
+  ts_ = ts;
+  t_ = ts[0] + 1.0;
+  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int),
+               std::domain_error);
+
+  // test negative time values
+  ts_.clear();
+  for (int i = 1; i < 4; i++)
+    ts_.push_back(-0.1*(6-i));
+  t_ = ts_[0] - 1.0;
+  EXPECT_NO_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int));
+}
+
+template <typename F>
+void test_ode_exceptions_vd(const F& f,
+                            const double& t_in,
+                            const std::vector<double>& ts,
+                            const std::vector<double>& y_in,
+                            const std::vector<double>& theta,
+                            const std::vector<double>& x,
+                            const std::vector<int>& x_int) {
+  std::vector<stan::agrad::var> y_var;
+  for (int i = 0; i < y_in.size(); i++) 
+    y_var.push_back(y_in[i]);
+  test_ode_exceptions(f, t_in, ts, y_var, theta, x, x_int);
+}
+template <typename F>
+void test_ode_exceptions_dv(const F& f,
+                            const double& t_in,
+                            const std::vector<double>& ts,
+                            const std::vector<double>& y_in,
+                            const std::vector<double>& theta,
+                            const std::vector<double>& x,
+                            const std::vector<int>& x_int) {
+  std::vector<stan::agrad::var> theta_var;
+  for (int i = 0; i < theta.size(); i++) 
+    theta_var.push_back(theta[i]);
+  test_ode_exceptions(f, t_in, ts, y_in, theta_var, x, x_int);
+}
+template <typename F>
+void test_ode_exceptions_vv(const F& f,
+                            const double& t_in,
+                            const std::vector<double>& ts,
+                            const std::vector<double>& y_in,
+                            const std::vector<double>& theta,
+                            const std::vector<double>& x,
+                            const std::vector<int>& x_int) {
+  std::vector<stan::agrad::var> y_var;
+  for (int i = 0; i < y_in.size(); i++) 
+    y_var.push_back(y_in[i]); 
+  std::vector<stan::agrad::var> theta_var;
+  for (int i = 0; i < theta.size(); i++) 
+    theta_var.push_back(theta[i]);
+  test_ode_exceptions(f, t_in, ts, y_var, theta_var, x, x_int);
+}
+
 template <typename F>
 void test_ode(const F& f,
               const double& t_in,
@@ -259,4 +364,8 @@ void test_ode(const F& f,
   test_ode_finite_diff_vd(f, t_in, ts, y_in, theta, x, x_int, diff, diff2);
   test_ode_finite_diff_dv(f, t_in, ts, y_in, theta, x, x_int, diff, diff2);
   test_ode_finite_diff_vv(f, t_in, ts, y_in, theta, x, x_int, diff, diff2);
+
+  test_ode_exceptions_vd(f, t_in, ts, y_in, theta, x, x_int);
+  test_ode_exceptions_dv(f, t_in, ts, y_in, theta, x, x_int);
+  test_ode_exceptions_vv(f, t_in, ts, y_in, theta, x, x_int);
 }
