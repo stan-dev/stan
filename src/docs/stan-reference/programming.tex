@@ -4941,7 +4941,7 @@ transformed data {
         K[i,j] <- exp(-pow(x1[i] - x2[j],2));
     
     K_transpose_div_Sigma <- K' / Sigma;
-    mu <- K_transpose_div_Sigma * y1; 
+<    mu <- K_transpose_div_Sigma * y1; 
     Tau <- Omega - K_transpose_div_Sigma * K;
     for (i in 1:(N2-1))
       for (j in (i+1):N2)
@@ -5102,6 +5102,12 @@ This simple prediction model could be extended in the same way as
 previous models by declaring the hyperparameters as parameters and
 defining the covariance matrix in the model block as a local variable.
 
+
+\chapter{Solving Differential Equations}\label{ode-solver.chapter}
+
+Stan provides a built-in mechanism for solving systems of ordinary
+different equations (ODEs).  The full specification can be found in
+\refsection{language-ode-solver}.  
 
 
 \chapter{Reparameterization \& Change of Variables}

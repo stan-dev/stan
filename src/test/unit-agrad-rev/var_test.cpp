@@ -90,3 +90,34 @@ TEST(AgradRev, print) {
   str = output.str();
   EXPECT_STREQ("uninitialized", output.str().c_str());
 }
+
+
+TEST(AgradAutoDiff, nestedGradient) {
+  // this isn't a unit test of any individual function.
+  //    chainable.hpp : grad (function)
+  //    var_stack.hpp : recover_memory_nested, start_nested (functions)
+  //    var.hpp:      : var (class)
+
+  using stan::agrad::var;
+  using stan::agrad::start_nested;
+  using stan::agrad::recover_memory_nested;
+  using stan::agrad::grad;
+  start_nested();
+  var a = 4;
+  var b = 7;
+  var c = a * b;
+  start_nested();
+  var d = 3;
+  var e = 15;
+  var f = e * d;
+  grad(f.vi_);
+  EXPECT_FLOAT_EQ(15.0, d.vi_->adj_);
+  EXPECT_FLOAT_EQ(3.0, e.vi_->adj_);
+  recover_memory_nested();
+
+  grad(c.vi_);
+  EXPECT_FLOAT_EQ(7.0, a.vi_->adj_);
+  EXPECT_FLOAT_EQ(4.0, b.vi_->adj_);
+  recover_memory_nested();
+}
+

@@ -99,21 +99,28 @@ namespace stan {
      * rule is applied working down the stack from this chainable and
      * calling each chainable's <code>chain()</code> method in turn.
      *
-     * This function does not recover any memory from the computation.
+     * <p>This function computes a nested gradient only going back as far
+     * as the last nesting.
+     *
+     * <p>This function does not recover any memory from the computation.
      * 
      * @param vi Variable implementation for root of partial
      * derivative propagation.
      */
     static void grad(chainable* vi) {
+
+      // simple reference implementation (intended as doc):
+      //   vi->init_dependent(); 
+      //   size_t end = var_stack_.size();
+      //   size_t begin = empty_nested() ? 0 : end - nested_size();
+      //   for (size_t i = end; --i > begin; )  
+      //     var_stack_[i]->chain();
+      
+      typedef std::vector<chainable*>::reverse_iterator it_t;
       vi->init_dependent(); 
-
-      std::vector<chainable*>::reverse_iterator end
-        = var_stack_.rend();
-
-      // propagate derivates for vars
-      for (std::vector<chainable*>::reverse_iterator it = var_stack_.rbegin(); 
-           it < end;
-           ++it)
+      it_t begin = var_stack_.rbegin();
+      it_t end = empty_nested() ? var_stack_.rend() : begin + nested_size();
+      for (it_t it = begin; it < end; ++it)
         (*it)->chain();
     }
 
