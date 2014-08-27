@@ -157,9 +157,15 @@ namespace stan {
                                  RNG& base_rng,
                                  std::ostream* output,
                                  ContextFactory& context_factory) {
-      stan::io::var_context* context = context_factory(source);
-      model.transform_inits(*context, cont_params);
-      delete context;
+      try {
+        typename ContextFactory::var_context_t context = context_factory(source);
+        model.transform_inits(context, cont_params);
+      } catch(const std::exception& e) {
+        if (output)
+          *output << "Initialization from source failed."
+                  << std::endl << e.what() << std::endl;
+        return false;
+      }
       
       double init_log_prob;
       Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
