@@ -85,7 +85,7 @@ namespace stan {
           dy_dt_temp.clear();
           grad.clear();
           vars.clear();
-
+          //stan::agrad::start_nested();
           for (int j = 0; j < num_eqn_; j++) {
             y_temp.push_back(y[j]);
             vars.push_back(y_temp[j]);
@@ -109,6 +109,8 @@ namespace stan {
 
             coupled_sys[i+j*num_eqn_] = temp_deriv;
           }
+
+          //stan::agrad::recover_memory_nested();
         }
 
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
