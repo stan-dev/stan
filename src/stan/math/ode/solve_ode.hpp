@@ -85,7 +85,8 @@ namespace stan {
           dy_dt_temp.clear();
           grad.clear();
           vars.clear();
-          //stan::agrad::start_nested();
+          stan::agrad::start_nested();
+
           for (int j = 0; j < num_eqn_; j++) {
             y_temp.push_back(y[j]);
             vars.push_back(y_temp[j]);
@@ -110,7 +111,7 @@ namespace stan {
             coupled_sys[i+j*num_eqn_] = temp_deriv;
           }
 
-          //stan::agrad::recover_memory_nested();
+          stan::agrad::recover_memory_nested();
         }
 
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
@@ -154,22 +155,15 @@ namespace stan {
           dy_dt_temp.clear();
           grad.clear();
           vars.clear();
+          stan::agrad::start_nested();
 
           for (int j = 0; j < num_eqn_; j++) {
             y_temp.push_back(y[j]+y0_[j]);
             vars.push_back(y_temp[j]);
           }
 
-          //dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_);
-          //dy_dt_temp[i].grad(vars, grad);
-
-          if (i == 0) {
-            grad.push_back(0.0);
-            grad.push_back(1.0);
-          } else {
-            grad.push_back(-1.0);
-            grad.push_back(-theta_[0]);
-          }
+          dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_);
+          dy_dt_temp[i].grad(vars, grad);
 
           for (int j = 0; j < num_eqn_; j++) { 
             // orders derivatives by equation (i.e. if there are 2 eqns 
@@ -181,6 +175,8 @@ namespace stan {
 
             coupled_sys[i+j*num_eqn_] = temp_deriv;
           }
+
+          stan::agrad::recover_memory_nested();
         }
 
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
@@ -197,7 +193,7 @@ namespace stan {
       const std::vector<int>& x_int_;
       const int& num_eqn_;
       ode_system(const F& f,
-                 const std::vector<double>& y0,
+                 const std::vector<double> y0,
                  const std::vector<double>& theta,
                  const std::vector<double>& x,
                  const std::vector<int>& x_int,
@@ -226,6 +222,7 @@ namespace stan {
           dy_dt_temp.clear();
           grad.clear();
           vars.clear();
+          stan::agrad::start_nested();
 
           for (int j = 0; j < num_eqn_; j++) {
             y_temp.push_back(y[j]+y0_[j]);
@@ -237,18 +234,8 @@ namespace stan {
             vars.push_back(theta_temp[j]);
           }
 
-          //dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_);
-          //dy_dt_temp[i].grad(vars, grad);
-
-          if (i == 0) {
-            grad.push_back(0.0);
-            grad.push_back(1.0);
-            grad.push_back(0.0);
-          } else {
-            grad.push_back(-1.0);
-            grad.push_back(-theta_[0]);
-            grad.push_back(-y_temp[1].val());
-          }
+          dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_);
+          dy_dt_temp[i].grad(vars, grad);
 
           for (int j = 0; j < num_eqn_+theta_.size(); j++) { 
             // orders derivatives by equation (i.e. if there are 2 eqns 
@@ -260,6 +247,8 @@ namespace stan {
 
             coupled_sys[i+j*num_eqn_] = temp_deriv;
           }
+
+          stan::agrad::recover_memory_nested();
         }
 
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
