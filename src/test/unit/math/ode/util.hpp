@@ -49,32 +49,6 @@ std::vector<std::vector<double> > finite_diff_params(const F& f,
   return results;
 }
  
-
-//calls solve_ode with initial positions as doubles and parameters as vars                
-template <typename F>
-inline std::vector<double> solve_ode_efficient_dv(const F& f,
-                                                  const double& t_in,
-                                                  const std::vector<double>& ts,
-                                                  const std::vector<double>& y_in,
-                                                  const std::vector<double>& theta,
-                                                  const std::vector<double>& x,
-                                                  const std::vector<int>& x_int,
-                                                  const int& iteration_number,
-                                                  const int& eqn_number) {
-  std::vector<stan::agrad::var> theta_v;
-  for (int i = 0; i < theta.size(); i++)
-    theta_v.push_back(theta[i]);
-
-  std::vector<std::vector<stan::agrad::var> > ode_res;
-
-  ode_res = stan::math::solve_ode(f, y_in, t_in,
-                                  ts, theta_v, x, x_int);
-  
-  std::vector<double> grads;
-  ode_res[iteration_number][eqn_number].grad(theta_v, grads);
-  return grads;
-}                      
-
 //test solve_ode with initial positions as doubles and parameters as vars 
 //against finite differences
 template <typename F>
@@ -94,10 +68,19 @@ void test_ode_dv(const F& f,
 
   std::vector<double> grads_eff;
 
+  std::vector<stan::agrad::var> theta_v;
+  for (int i = 0; i < theta.size(); i++)
+    theta_v.push_back(theta[i]);
+
+  std::vector<std::vector<stan::agrad::var> > ode_res;
+
+  ode_res = stan::math::solve_ode(f, y_in, t_in,
+                                  ts, theta_v, x, x_int);
+  
   for (int i = 0; i < ts.size(); i++) {
     for (int j = 0; j < y_in.size(); j++) {
       grads_eff.clear();
-      grads_eff = solve_ode_efficient_dv(f, t_in, ts, y_in, theta, x, x_int, i, j);
+      ode_res[i][j].grad(theta_v, grads_eff);
 
       for (int k = 0; k < theta.size(); k++)
         EXPECT_NEAR(grads_eff[k], finite_diff_res[k][i][j], diff2)
@@ -105,6 +88,8 @@ void test_ode_dv(const F& f,
           << " known and parameters unknown at time index " << i
           << ", equation index " << j 
           << ", and parameter index: " << k;
+
+      stan::agrad::set_zero_all_adjoints();
     }
   }
 }
@@ -148,33 +133,6 @@ finite_diff_initial_position(const F& f,
       results[i].push_back((ode_res_ub[i][j] - ode_res_lb[i][j]) / (2*diff));
   return results;
 }
- 
-
-//calls solve_ode with initial positions as vars and parameters as doubles                
-template <typename F>
-inline std::vector<double> solve_ode_efficient_vd(const F& f,
-                                                  const double& t_in,
-                                                  const std::vector<double>& ts,
-                                                  const std::vector<double>& y_in,
-                                                  const std::vector<double>& theta,
-                                                  const std::vector<double>& x,
-                                                  const std::vector<int>& x_int,
-                                                  const int& iteration_number,
-                                                  const int& eqn_number) {
-  std::vector<stan::agrad::var> y_in_v;
-  for (int i = 0; i < y_in.size(); i++)
-    y_in_v.push_back(y_in[i]);
-
-  std::vector<std::vector<stan::agrad::var> > ode_res;
-
-  ode_res = stan::math::solve_ode(f, y_in_v, t_in,
-                                  ts, theta, x, x_int);
-  
-  std::vector<double> grads;
-  ode_res[iteration_number][eqn_number].grad(y_in_v, grads);
-  return grads;
-}                      
-
 
 //test solve_ode with initial positions as vars and parameters as doubles 
 //against finite differences
@@ -195,10 +153,19 @@ void test_ode_vd(const F& f,
 
   std::vector<double> grads_eff;
 
+  std::vector<stan::agrad::var> y_in_v;
+  for (int k = 0; k < y_in.size(); k++)
+    y_in_v.push_back(y_in[k]);
+
+  std::vector<std::vector<stan::agrad::var> > ode_res;
+
+  ode_res = stan::math::solve_ode(f, y_in_v, t_in,
+                                  ts, theta, x, x_int);
+
   for (int i = 0; i < ts.size(); i++) {
     for (int j = 0; j < y_in.size(); j++) {
       grads_eff.clear();
-      grads_eff = solve_ode_efficient_vd(f, t_in, ts, y_in, theta, x, x_int, i, j);
+      ode_res[i][j].grad(y_in_v, grads_eff);
 
       for (int k = 0; k < y_in.size(); k++)
         EXPECT_NEAR(grads_eff[k], finite_diff_res[k][i][j], diff2)
@@ -206,43 +173,11 @@ void test_ode_vd(const F& f,
           << " unknown and parameters known at time index " << i
           << ", equation index " << j 
           << ", and parameter index: " << k;
+
+      stan::agrad::set_zero_all_adjoints();
     }
   }
 }
-
-//calls solve_ode with initial positions as vars and parameters as vars                
-template <typename F>
-inline std::vector<double> solve_ode_efficient_vv(const F& f,
-                                                  const double& t_in,
-                                                  const std::vector<double>& ts,
-                                                  const std::vector<double>& y_in,
-                                                  const std::vector<double>& theta,
-                                                  const std::vector<double>& x,
-                                                  const std::vector<int>& x_int,
-                                                  const int& iteration_number,
-                                                  const int& eqn_number) {
-  std::vector<stan::agrad::var> y_in_v;
-  for (int i = 0; i < y_in.size(); i++)
-    y_in_v.push_back(y_in[i]);
-
-  std::vector<stan::agrad::var> vars = y_in_v;
-
-  std::vector<stan::agrad::var> theta_v;
-  for (int i = 0; i < theta.size(); i++)
-    theta_v.push_back(theta[i]);
-
-  for (int i = 0; i < theta_v.size(); i++)
-    vars.push_back(theta_v[i]);
-
-  std::vector<std::vector<stan::agrad::var> > ode_res;
-
-  ode_res = stan::math::solve_ode(f, y_in_v, t_in,
-                                 ts, theta_v, x, x_int);
-  
-  std::vector<double> grads;
-  ode_res[iteration_number][eqn_number].grad(vars, grads);
-  return grads;
-}           
 
 //test solve_ode with initial positions as vars and parameters as vars 
 //against finite differences
@@ -269,11 +204,29 @@ void test_ode_vv(const F& f,
 
 
   std::vector<double> grads_eff;
+  std::vector<stan::agrad::var> y_in_v;
+  for (int i = 0; i < y_in.size(); i++)
+    y_in_v.push_back(y_in[i]);
+
+  std::vector<stan::agrad::var> vars = y_in_v;
+
+  std::vector<stan::agrad::var> theta_v;
+  for (int i = 0; i < theta.size(); i++)
+    theta_v.push_back(theta[i]);
+
+  for (int i = 0; i < theta_v.size(); i++)
+    vars.push_back(theta_v[i]);
+
+  std::vector<std::vector<stan::agrad::var> > ode_res;
+
+  ode_res = stan::math::solve_ode(f, y_in_v, t_in,
+                                 ts, theta_v, x, x_int);
+  
 
   for (int i = 0; i < ts.size(); i++) {
     for (int j = 0; j < y_in.size(); j++) {
       grads_eff.clear();
-      grads_eff = solve_ode_efficient_vv(f, t_in, ts, y_in, theta, x, x_int, i, j);
+      ode_res[i][j].grad(vars, grads_eff);
 
       for (int k = 0; k < theta.size(); k++)
         EXPECT_NEAR(grads_eff[k+y_in.size()], finite_diff_res_p[k][i][j], diff2)
@@ -287,6 +240,8 @@ void test_ode_vv(const F& f,
           << " unknown and parameters known for initial position at time index " << i
           << ", equation index " << j 
           << ", and parameter index: " << k;
+
+      stan::agrad::set_zero_all_adjoints();
     }
   }
 }
