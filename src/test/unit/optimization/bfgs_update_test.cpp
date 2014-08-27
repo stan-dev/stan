@@ -61,17 +61,19 @@ TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_search_direction) {
 
   QNUpdateT bfgsUp;
   VectorT yk(nDim), sk(nDim), sdir(nDim);
+  sk.setZero(nDim);
+  yk.setZero(nDim);
+  sk[0] = 1;
+  yk[0] = 1;
+  bfgsUp.update(yk,sk,true);
 
   for (unsigned int i = 0; i < nDim; i++) {
 
     for (unsigned int j = 0; j <= i; j++) {
-      sk.setZero(nDim);
       yk.setZero(nDim);
-      sk[i - j] = 1;
       yk[i - j] = 1;
-
-      bfgsUp.search_direction(sdir,yk);
       
+      bfgsUp.search_direction(sdir,yk);
     }
   }
 }
