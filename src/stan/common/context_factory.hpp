@@ -10,6 +10,7 @@ namespace stan {
     class var_context_factory {
     public:
       var_context_factory() {}
+      virtual ~var_context_factory() {}
       virtual stan::io::var_context* operator()(const std::string source) = 0;
     };
 
