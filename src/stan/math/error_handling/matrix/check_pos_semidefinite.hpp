@@ -5,6 +5,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
   namespace math {
@@ -19,6 +20,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the matrix is positive semi-definite.
+     * @return throws if any element in y is nan
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings (message has (0,0) item)
@@ -46,6 +48,14 @@ namespace stan {
         std::string msg(message.str());
         return dom_err(function,y(0,0),name,msg.c_str(),"",result);
       }
+      for (int i = 0; i < y.size(); i++)
+        if (boost::math::isnan(y(i))) {
+          std::ostringstream message;
+          message << name << " is not positive semi-definite. " 
+                  << name << "(0,0) is %1%.";
+          std::string msg(message.str());
+          return dom_err(function,y(0,0),name,msg.c_str(),"",result);
+        }
       return true;
     }
 
