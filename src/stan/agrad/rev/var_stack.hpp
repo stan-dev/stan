@@ -12,8 +12,6 @@ namespace stan {
     class chainable;
     class chainable_alloc;
     
-    // FIXME: manage all this in a thread-local singleton to be
-    // grabbed once
     extern std::vector<chainable*> var_stack_; 
     extern std::vector<chainable*> var_nochain_stack_; 
     extern std::vector<chainable_alloc*> var_alloc_stack_;
@@ -39,6 +37,13 @@ namespace stan {
     };
     
     /**
+     * Return true if there is no nested autodiff being executed.
+     */
+    static inline bool empty_nested() {
+      return nested_var_stack_sizes_.empty();
+    }
+
+    /**
      * Recover memory used for all variables for reuse.
      */
     static inline void recover_memory() {
@@ -49,12 +54,13 @@ namespace stan {
       var_alloc_stack_.clear();
       memalloc_.recover_all();
     }
-
+    
     /**
      * Recover only the memory used for the top nested call.
      */
+
     static inline void recover_memory_nested() {
-      if (nested_var_stack_sizes_.empty())
+      if (empty_nested())
         recover_memory();
 
       var_stack_.resize(nested_var_stack_sizes_.back());
@@ -81,6 +87,10 @@ namespace stan {
       nested_var_nochain_stack_sizes_.push_back(var_nochain_stack_.size());
       nested_var_alloc_stack_starts_.push_back(var_alloc_stack_.size());
       memalloc_.start_nested();
+    }
+
+    static inline size_t nested_size() {
+      return var_stack_.size() - nested_var_stack_sizes_.back();
     }
 
   }

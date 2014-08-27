@@ -95,6 +95,7 @@ namespace stan {
              double& fx,
              Eigen::Matrix<double,Eigen::Dynamic,1>& grad_fx) {
       using stan::agrad::var;
+      start_nested();
       try {
         Eigen::Matrix<var,Eigen::Dynamic,1> x_var(x.size());
         for (int i = 0; i < x.size(); ++i)
@@ -106,10 +107,10 @@ namespace stan {
         for (int i = 0; i < x.size(); ++i)
           grad_fx(i) = x_var(i).adj();
       } catch (const std::exception& /*e*/) {
-        stan::agrad::recover_memory();
+        stan::agrad::recover_memory_nested();
         throw;
       }
-      stan::agrad::recover_memory();
+      stan::agrad::recover_memory_nested();
     }
     template <typename T, typename F>
     void
@@ -137,6 +138,7 @@ namespace stan {
              Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& J) {
       using Eigen::Matrix;  using Eigen::Dynamic;
       using stan::agrad::var;
+      start_nested();
       try {
         Matrix<var,Dynamic,1> x_var(x.size());
         for (int k = 0; k < x.size(); ++k)
@@ -154,10 +156,10 @@ namespace stan {
             J(k,i) = x_var(k).adj();
         }
       } catch (const std::exception& e) {
-        stan::agrad::recover_memory();
+        stan::agrad::recover_memory_nested();
         throw;
       }
-      stan::agrad::recover_memory();
+      stan::agrad::recover_memory_nested();
     }
     template <typename T, typename F>
     void
@@ -194,6 +196,7 @@ namespace stan {
             double& fx,
             Eigen::Matrix<double,Eigen::Dynamic,1>& grad,
             Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& H) {
+      start_nested();
       try {
         H.resize(x.size(), x.size());
         grad.resize(x.size());
@@ -209,10 +212,10 @@ namespace stan {
             H(i,j) = x_fvar(j).val_.adj();
         }
       } catch (const std::exception& e) {
-        stan::agrad::recover_memory();
+        stan::agrad::recover_memory_nested();
         throw;
       }
-      stan::agrad::recover_memory();
+      stan::agrad::recover_memory_nested();
     }
     // time O(N^3);  space O(N^2)
     template <typename T, typename F>
@@ -277,6 +280,7 @@ namespace stan {
       using stan::agrad::var;
       using Eigen::Matrix; 
       using Eigen::Dynamic;
+      start_nested();
       try {
         Matrix<var,Dynamic,1> x_var(x.size());
         for (int i = 0; i < x_var.size(); ++i)
@@ -290,10 +294,10 @@ namespace stan {
         for (int i = 0; i < x.size(); ++i) 
           Hv(i) = x_var(i).adj();
       } catch (const std::exception& e) {
-        stan::agrad::recover_memory();
+        stan::agrad::recover_memory_nested();
         throw;
       }
-      stan::agrad::recover_memory();
+      stan::agrad::recover_memory_nested();
     }
     template <typename T, typename F>
     void
@@ -321,6 +325,7 @@ namespace stan {
                  Eigen::Matrix<double,Eigen::Dynamic,1>& grad_tr_MH) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
+      start_nested();
       try {
       
         grad_tr_MH.resize(x.size());
@@ -348,10 +353,10 @@ namespace stan {
         for (int i = 0; i < x.size(); ++i)
           grad_tr_MH(i) = x_var(i).adj();
       } catch (const std::exception& e) {
-        stan::agrad::recover_memory();
+        stan::agrad::recover_memory_nested();
         throw;
       }
-      stan::agrad::recover_memory();
+      stan::agrad::recover_memory_nested();
     }
 
   }

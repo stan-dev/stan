@@ -2040,7 +2040,7 @@ the actual data in order to assess the suitability of the model; see
 \citep[Chapter~6]{GelmanEtAl:2013} for more information on
 posterior predictive checks.
 
-\section{ODE Solver}
+\section{ODE Solver}\label{language-ode-solver.section}
 
 Stan provides a built-in ordinary differential equation solver.
 Although it looks like a function application, it is special in two
@@ -2110,6 +2110,8 @@ of the original system state and derivatives of the original system
 with respect to the parameters and initial state.  The additional derivatives required
 for the coupled system are calculated by automatically differentiating
 the system with respect to the parameters.
+
+
 
 \section{Type Inference}
 
