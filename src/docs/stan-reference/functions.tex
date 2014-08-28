@@ -745,7 +745,27 @@ The hyperbolic tangent of \farg{x} (in radians)}
 The inverse hyperbolic cosine (in radians) of \farg{x}}
 %
 \fitem{real}{asinh}{real \farg{x}}{
-The inverse hyperbolic sine (in radians) of \farg{x}}
+The inverse hyperbolic cosine (in radians) of \farg{x}
+%
+\[
+\mbox{asinh}(x) = 
+\begin{cases}
+  \sinh^{-1}(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{asinh}(x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, \sinh^{-1}(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{asinh-appendix} for definition of 
+$\sinh^{-1}(x)$ and $\frac{\partial\,\sinh^{-1}(x)}{\partial x}$.
+}
 %
 \fitem{real}{atanh}{real \farg{x}}{
 The inverse hyperbolic tangent (in radians) of \farg{x}}
