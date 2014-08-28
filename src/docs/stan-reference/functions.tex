@@ -716,7 +716,30 @@ The tangent of the angle \farg{x} (in radians)}
 The principal arc (inverse) cosine (in radians) of \farg{x}}
 %
 \fitem{real}{asin}{real \farg{x}}{
-The principal arc (inverse) sine (in radians) of \farg{x}}
+The principal arc (inverse) sine (in radians) of \farg{x}
+\[
+\mbox{asin}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \arcsin(x) & \mbox{if } -1\leq x\leq 1 \\
+  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{asin}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \frac{\partial\,\arcsin(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
+ \textrm{NaN} & \mbox{if } x < -1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{asin-appendix} for definition of
+$\frac{\partial\,\arcsin(x)}{\partial x}$.
+}
 %
 \fitem{real}{atan}{real \farg{x}}{
 The principal arc (inverse) tangent (in radians) of \farg{x}}
