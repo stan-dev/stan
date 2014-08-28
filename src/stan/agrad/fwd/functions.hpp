@@ -72,5 +72,6 @@
 #include <stan/agrad/fwd/functions/tanh.hpp>
 #include <stan/agrad/fwd/functions/tgamma.hpp>
 #include <stan/agrad/fwd/functions/trunc.hpp>
+#include <stan/agrad/fwd/functions/value_of.hpp>
 
 #endif
