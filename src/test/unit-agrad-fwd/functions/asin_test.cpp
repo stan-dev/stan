@@ -39,6 +39,16 @@ TEST(AgradFwdAsin,Fvar) {
   fvar<double> f = asin(z);
   EXPECT_FLOAT_EQ(asin(1.0), f.val_);
   EXPECT_FLOAT_EQ(INFTY, f.d_);
+
+  fvar<double> z2(1.0+stan::math::EPSILON,1.0);
+  fvar<double> f2 = asin(z2);
+  EXPECT_TRUE(boost::math::isnan(f2.val_));
+  EXPECT_TRUE(boost::math::isnan(f2.d_));
+
+  fvar<double> z3(-1.0-stan::math::EPSILON,1.0);
+  fvar<double> f3 = asin(z3);
+  EXPECT_TRUE(boost::math::isnan(f3.val_));
+  EXPECT_TRUE(boost::math::isnan(f3.d_));
 }
 
 TEST(AgradFwdAsin,FvarVar_1stDeriv) {

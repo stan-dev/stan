@@ -38,12 +38,25 @@ TEST(AgradRev,asin_neg_1) {
   EXPECT_FLOAT_EQ(1.0/sqrt(1.0 - (-1*-1)),g[0]);
 }
 
-TEST(AgradRev,asin_out_of_bounds) {
+TEST(AgradRev,asin_out_of_bounds1) {
   AVAR a = 1.0 + stan::math::EPSILON;
+  AVAR f = asin(a);
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
   EXPECT_TRUE(std::isnan(asin(a)));
-
-  a = -1.0 - stan::math::EPSILON;
+  EXPECT_TRUE(g.size() == 1);
+  EXPECT_TRUE(std::isnan(g[0]));
+}
+TEST(AgradRev,asin_out_of_bounds2) {
+  AVAR a = -1.0 - stan::math::EPSILON;
+  AVAR f = asin(a);
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
   EXPECT_TRUE(std::isnan(asin(a)));
+  EXPECT_TRUE(g.size() == 1);
+  EXPECT_TRUE(std::isnan(g[0]));
 }
 
 struct asin_fun {
