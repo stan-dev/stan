@@ -12,9 +12,11 @@ namespace stan {
       
       // implemented using structs because there is no partial specialization
       // for templated functions
-      
+      //
       // default implementation works for scalar T_y. T_low and T_high can
       // be either scalar or vector
+      //
+      // throws if y, low, or high is nan
       template <typename T_y, typename T_low, typename T_high, typename T_result,
                 bool y_is_vec>
       struct bounded {

@@ -19,6 +19,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the matrix is positive definite.
+     * @return throws if any element in lower triangular of matrix is nan.
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings (message has (0,0) item)
@@ -27,7 +28,7 @@ namespace stan {
                                    const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                                    const char* name,
                                    T_result* result) {
-      if (y.rows() == 1 && y(0,0) <= CONSTRAINT_TOLERANCE) {
+      if (y.rows() == 1 && !(y(0,0) > CONSTRAINT_TOLERANCE)) {
         std::ostringstream message;
         message << name << " is not positive definite. " 
                 << name << "(0,0) is %1%.";
@@ -37,7 +38,7 @@ namespace stan {
       Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
         = y.ldlt();
       if(cholesky.info() != Eigen::Success || 
-         cholesky.isNegative() ||
+         !cholesky.isPositive() ||
          (cholesky.vectorD().array() <= CONSTRAINT_TOLERANCE).any()) {
         std::ostringstream message;
         message << name << " is not positive definite. " 

@@ -122,3 +122,38 @@ TEST(MathErrorHandling,CheckEqual_Matrix_one_indexed_message) {
     << message;
 
 }
+
+TEST(MathErrorHandling,CheckEqual_nan) {
+  const char* function = "check_equal(%1%)";
+  double x = 0.0;
+  double eq = 0.0;
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  EXPECT_THROW(check_equal(function, x, nan, "x", &result),
+               std::domain_error);
+  EXPECT_THROW(check_equal(function, nan, eq, "x", &result),
+               std::domain_error);
+  EXPECT_THROW(check_equal(function, nan, nan, "x", &result),
+               std::domain_error);
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
+  Eigen::Matrix<double,Eigen::Dynamic,1> eq_vec;
+  x_vec.resize(3);
+  eq_vec.resize(3);
+
+  // x_vec, low_vec
+  result = 0;
+  x_vec   << nan, 0, 1;
+  eq_vec << -1, 0, 1;
+  EXPECT_THROW(check_equal(function, x_vec, eq_vec, "x", &result),
+               std::domain_error);
+
+  eq_vec << nan, 0, 1;
+  EXPECT_THROW(check_equal(function, x_vec, eq_vec, "x", &result),
+               std::domain_error);
+
+  x_vec << -1, 0, 1;
+  EXPECT_THROW(check_equal(function, x_vec, eq_vec, "x", &result),
+               std::domain_error);
+}
