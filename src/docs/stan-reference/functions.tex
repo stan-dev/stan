@@ -719,7 +719,25 @@ The principal arc (inverse) cosine (in radians) of \farg{x}}
 The principal arc (inverse) sine (in radians) of \farg{x}}
 %
 \fitem{real}{atan}{real \farg{x}}{
-The principal arc (inverse) tangent (in radians) of \farg{x}}
+The principal arc (inverse) tangent (in radians) of \farg{x}
+\[
+\mbox{atan}(x) = 
+\begin{cases}
+  \arctan(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{atan}(x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, \arctan(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{atan-appendix} for definition of $\frac{\partial\,\arctan(x)}{\partial x}$.
+}
 %
 \fitem{real}{atan2}{real \farg{x}, real \farg{y}}{
 The principal arc (inverse) tangent (in radians) of \farg{x} divided
