@@ -1072,6 +1072,18 @@ followed by a line-feed (LF) character.
 
 \chapter{Mathematical Functions}\label{math-functions.appendix}
 
+\section{bessel\_first\_kind}\label{bessel-first-kind-appendix.section}
+$J_v(x)$ is the bessel function of the first kind of order $v$.
+%
+\[
+J_v(x)=\left(\frac{1}{2}x\right)^v
+	\sum_{k=0}^\infty \frac{\left(-\frac{1}{4}x^2\right)^k}{k!\, \Gamma(v+k+1)}
+\]
+%
+\[
+\frac{\partial \, J_v(x)}{\partial x} = \frac{v}{x}J_v(x)-J_{v+1}(x)
+\]
+
 \section{Phi}\label{Phi-appendix.section}
 $\Phi(x)$ is the unit normal cumulative distribution function.
 %

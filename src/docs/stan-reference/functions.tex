@@ -954,11 +954,27 @@ $\Gamma$ function, defining
 \]
 }
 %
-\fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{x}}{
+The Bessel function of the first kind with order \farg{v} applied to \farg{x}.
+
 \[
-{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
-\frac{\left(-\frac{1}{4}z^2\right)^k}{k!\, \Gamma(v+k+1)}
+\mbox{bessel\_first\_kind}(v,x) = 
+\begin{cases}
+  J_v(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{error} & \mbox{if } x = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{bessel\_first\_kind}(v,x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, J_v(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{error} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{bessel-first-kind-appendix} for definition of 
+$J_v(x)$ and $\frac{\partial\,J_v(x)}{\partial x}$.
 }
 %
 \fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
