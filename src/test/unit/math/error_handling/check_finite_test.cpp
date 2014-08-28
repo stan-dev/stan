@@ -110,3 +110,38 @@ TEST(MathErrorHandling,CheckFinite_Matrix_one_indexed_message) {
   EXPECT_NE(std::string::npos, message.find("[3]"))
     << message;
 }
+
+TEST(MathErrorHandling,CheckFinite_nan) {
+  const char* function = "check_finite(%1%)";
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  EXPECT_THROW(check_finite(function, nan, "x", &result), std::domain_error);
+
+  std::vector<double> x;
+  x.push_back (nan);
+  x.push_back (0);
+  x.push_back (1);
+  EXPECT_THROW(check_finite(function, x, "x", &result), std::domain_error);
+
+  x[0] = 1.0;
+  x[1] = nan;
+  EXPECT_THROW(check_finite(function, x, "x", &result), std::domain_error);
+
+  x[1] = 0.0;
+  x[2] = nan;
+  EXPECT_THROW(check_finite(function, x, "x", &result), std::domain_error);
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> x_mat(3);
+  x_mat << nan, 0, 1;
+  EXPECT_THROW(check_finite(function, x_mat, "x_mat", &result), 
+               std::domain_error);
+
+  x_mat << 1, nan, 1;
+  EXPECT_THROW(check_finite(function, x_mat, "x_mat", &result), 
+               std::domain_error);
+
+  x_mat << 1, 0, nan;
+  EXPECT_THROW(check_finite(function, x_mat, "x_mat", &result), 
+               std::domain_error);
+}

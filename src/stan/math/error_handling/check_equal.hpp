@@ -30,6 +30,7 @@ namespace stan {
         }
       };
       
+      // throws if y or eq is nan
       template <typename T_y,
                 typename T_eq,
                 typename T_result>

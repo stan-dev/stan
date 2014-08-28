@@ -109,3 +109,31 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_length) {
   EXPECT_TRUE(std::string::npos != message.find("length(y) = 0"))
     << message;
 }
+
+TEST(MathErrorHandlingMatrix, checkSimplex_nan) {
+  Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
+  y.setZero();
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  y << nan, 0.5;
+  
+  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)",
+                                         y, "y", &result),
+               std::domain_error);
+                  
+  y[1] = 0.55;
+  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", 
+                                         y, "y", &result), 
+               std::domain_error);
+
+  y[0] = 0.5;
+  y[1] = nan;
+  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", 
+                                         y, "y", &result), 
+               std::domain_error);
+
+  y[0] = nan;
+  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", 
+                                         y, "y", &result), 
+               std::domain_error);
+}
