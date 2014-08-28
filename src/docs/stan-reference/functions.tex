@@ -961,13 +961,29 @@ $\Gamma$ function, defining
 \]
 }
 %
-\fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
-The Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
+\fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{x}}{
+The Bessel function of the second kind with order \farg{v} applied to \farg{x} defined for  positive \farg{x} and \farg{v}.
+
 \[
-{Y_v}(z)
-=
-\frac{J_v(z)\cos(v\pi) - J_{-v}(z)}{\sin(v\pi)}
+\mbox{bessel\_second\_kind}(v,x) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0 \\
+  Y_v(x) & \mbox{if } x > 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{bessel\_second\_kind}(v,x)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0 \\
+  \frac{\partial\, Y_v(x)}{\partial x} & \mbox{if } x > 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{bessel-second-kind-appendix} for definition of 
+$Y_v(x)$ and $\frac{\partial\,Y_v(x)}{\partial x}$.
 }
 %
 \fitem{real}{modified\_bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
