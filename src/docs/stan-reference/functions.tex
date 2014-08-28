@@ -704,7 +704,24 @@ The length of the hypotenuse of a right triangle with sides of
 length \farg{x} and \farg{y}}
 %
 \fitem{real}{cos}{real \farg{x}}{
-The cosine of the angle \farg{x} (in radians)}
+The cosine of the angle \farg{x} (in radians)
+\[
+\mbox{cos}(x) = 
+\begin{cases}
+  \cos(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{cos}(x)}{\partial x} = 
+\begin{cases}
+  -\sin(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{sin}{real \farg{x}}{
 The sine of the angle \farg{x} (in radians)}
