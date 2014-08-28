@@ -13,3 +13,19 @@ TEST(MathErrorHandlingMatrix, checkUnitVector) {
   EXPECT_THROW(stan::math::check_unit_vector("checkUnitVector(%1%)", y, "y", &result), 
                std::domain_error);
 }
+
+TEST(MathErrorHandlingMatrix, checkUnitVector_nan) {
+  Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  y << nan, sqrt(0.5);
+  EXPECT_THROW(stan::math::check_unit_vector("checkUnitVector(%1%)", y, "y", &result), 
+               std::domain_error);
+  y << sqrt(0.5), nan;
+  EXPECT_THROW(stan::math::check_unit_vector("checkUnitVector(%1%)", y, "y", &result), 
+               std::domain_error);
+  y << nan, nan;
+  EXPECT_THROW(stan::math::check_unit_vector("checkUnitVector(%1%)", y, "y", &result), 
+               std::domain_error);
+}
