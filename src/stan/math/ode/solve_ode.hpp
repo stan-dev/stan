@@ -10,6 +10,11 @@
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/rev/internal/precomputed_gradients.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
+#include <stan/math/error_handling/check_less.hpp>
+#include <stan/math/error_handling/check_equal.hpp>
+#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/math/error_handling/matrix/check_ordered.hpp>
 
 namespace stan {
   namespace agrad {
@@ -45,6 +50,8 @@ namespace stan {
                       std::vector<double>& dy_dt,
                       const double& t) {
         dy_dt = f_(t,y,theta_,x_,x_int_);
+        stan::math::check_matching_sizes("ode_system(%1%)",y,"y",dy_dt,"dy_dt",
+                                         static_cast<double*>(0));
       }
     };
 
@@ -70,6 +77,8 @@ namespace stan {
                       const double& t) {
 
         dy_dt = f_(t,y,theta_,x_,x_int_);
+        stan::math::check_equal("ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
+                                static_cast<double*>(0));
 
         std::vector<double> coupled_sys(num_eqn_ * theta_.size());
 
@@ -85,6 +94,7 @@ namespace stan {
           dy_dt_temp.clear();
           grad.clear();
           vars.clear();
+          stan::agrad::start_nested();
 
           for (int j = 0; j < num_eqn_; j++) {
             y_temp.push_back(y[j]);
@@ -109,6 +119,8 @@ namespace stan {
 
             coupled_sys[i+j*num_eqn_] = temp_deriv;
           }
+
+          stan::agrad::recover_memory_nested();
         }
 
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
@@ -139,6 +151,8 @@ namespace stan {
         for (int i = 0; i < num_eqn_; i++)
           y_new.push_back(y[i]+y0_[i]);
         dy_dt = f_(t,y_new,theta_,x_,x_int_);
+        stan::math::check_equal("ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
+                                static_cast<double*>(0));
 
         std::vector<double> coupled_sys(num_eqn_ * num_eqn_);
 
@@ -152,22 +166,15 @@ namespace stan {
           dy_dt_temp.clear();
           grad.clear();
           vars.clear();
+          stan::agrad::start_nested();
 
           for (int j = 0; j < num_eqn_; j++) {
             y_temp.push_back(y[j]+y0_[j]);
             vars.push_back(y_temp[j]);
           }
 
-          //dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_);
-          //dy_dt_temp[i].grad(vars, grad);
-
-          if (i == 0) {
-            grad.push_back(0.0);
-            grad.push_back(1.0);
-          } else {
-            grad.push_back(-1.0);
-            grad.push_back(-theta_[0]);
-          }
+          dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_);
+          dy_dt_temp[i].grad(vars, grad);
 
           for (int j = 0; j < num_eqn_; j++) { 
             // orders derivatives by equation (i.e. if there are 2 eqns 
@@ -179,6 +186,8 @@ namespace stan {
 
             coupled_sys[i+j*num_eqn_] = temp_deriv;
           }
+
+          stan::agrad::recover_memory_nested();
         }
 
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
@@ -195,7 +204,7 @@ namespace stan {
       const std::vector<int>& x_int_;
       const int& num_eqn_;
       ode_system(const F& f,
-                 const std::vector<double>& y0,
+                 const std::vector<double> y0,
                  const std::vector<double>& theta,
                  const std::vector<double>& x,
                  const std::vector<int>& x_int,
@@ -209,6 +218,8 @@ namespace stan {
         for (int i = 0; i < num_eqn_; i++)
           y_new.push_back(y[i]+y0_[i]);
         dy_dt = f_(t,y_new,theta_,x_,x_int_);
+        stan::math::check_equal("ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
+                                static_cast<double*>(0));
 
         std::vector<double> coupled_sys(num_eqn_ * (num_eqn_+theta_.size()));
 
@@ -224,6 +235,7 @@ namespace stan {
           dy_dt_temp.clear();
           grad.clear();
           vars.clear();
+          stan::agrad::start_nested();
 
           for (int j = 0; j < num_eqn_; j++) {
             y_temp.push_back(y[j]+y0_[j]);
@@ -235,18 +247,8 @@ namespace stan {
             vars.push_back(theta_temp[j]);
           }
 
-          //dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_);
-          //dy_dt_temp[i].grad(vars, grad);
-
-          if (i == 0) {
-            grad.push_back(0.0);
-            grad.push_back(1.0);
-            grad.push_back(0.0);
-          } else {
-            grad.push_back(-1.0);
-            grad.push_back(-theta_[0]);
-            grad.push_back(-y_temp[1].val());
-          }
+          dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_);
+          dy_dt_temp[i].grad(vars, grad);
 
           for (int j = 0; j < num_eqn_+theta_.size(); j++) { 
             // orders derivatives by equation (i.e. if there are 2 eqns 
@@ -258,6 +260,8 @@ namespace stan {
 
             coupled_sys[i+j*num_eqn_] = temp_deriv;
           }
+
+          stan::agrad::recover_memory_nested();
         }
 
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
@@ -372,6 +376,14 @@ namespace stan {
               const std::vector<double>& x, // double data values
               const std::vector<int>& x_int) { // int data values.
       using namespace boost::numeric::odeint;  // FIXME: trim to what is used
+      stan::math::check_nonzero_size("solve_ode(%1%)",ts,"time_vec",
+                                     static_cast<double*>(0));
+      stan::math::check_nonzero_size("solve_ode(%1%)",y0,"y0_vec",
+                                     static_cast<double*>(0));
+      stan::math::check_ordered("solve_ode(%1%)", ts, "times", 
+                                static_cast<double*>(0));
+      stan::math::check_less("solve_ode(%1%)",t0,ts[0],"initial time",
+                             static_cast<double*>(0));
 
       double absolute_tolerance = 1e-6;
       double relative_tolerance = 1e-6;
