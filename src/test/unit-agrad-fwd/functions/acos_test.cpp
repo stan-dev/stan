@@ -3,6 +3,7 @@
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <stan/math/constants.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdAcos,Fvar) {
   using stan::agrad::fvar;
@@ -176,4 +177,17 @@ TEST(AgradFwdAcos,FvarFvarVar_3rdDeriv) {
   VEC g;
   b.d_.d_.grad(y,g);
   EXPECT_FLOAT_EQ(-3.07920143567800, g[0]);
+}
+
+struct acos_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return acos(arg1);
+  }
+};
+
+TEST(AgradFwdAcos,acos_NaN) {
+  acos_fun acos_;
+  test_nan(acos_,false);
 }
