@@ -42,7 +42,14 @@ TEST(AgradRev,acosh_inf) {
 
 TEST(AgradRev,acosh_out_of_bounds) {
   AVAR a = 1.0 - stan::math::EPSILON;
-  EXPECT_THROW(acosh(a), std::domain_error);
+  AVAR f = acosh(a);
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+
+  EXPECT_TRUE(std::isnan(acosh(a)));
+  EXPECT_TRUE(g.size() == 1);
+  EXPECT_TRUE(std::isnan(g[0]));
 
   AVAR b = std::numeric_limits<double>::infinity();
   EXPECT_TRUE(boost::math::isinf(acosh(b)) && acosh(b) > 0);
