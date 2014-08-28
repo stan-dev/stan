@@ -90,4 +90,28 @@ TEST(MathErrorHandling,CheckBounded_High) {
   EXPECT_THROW(check_bounded(function, x, low, high, name, &result), std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
+TEST(MathErrorHandling,CheckBounded_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
 
+  const char* function = "check_bounded(%1%)";
+  const char* name = "x";
+  double x = 0;
+  double low = -1;
+  double high = 1;
+  double result;
+
+  EXPECT_THROW(check_bounded(function, nan, low, high, name, &result), 
+               std::domain_error);
+  EXPECT_THROW(check_bounded(function, x, nan, high, name, &result), 
+               std::domain_error);
+  EXPECT_THROW(check_bounded(function, x, low, nan, name, &result), 
+               std::domain_error);
+  EXPECT_THROW(check_bounded(function, nan, nan, high, name, &result), 
+               std::domain_error);
+  EXPECT_THROW(check_bounded(function, nan, low, nan, name, &result), 
+               std::domain_error);
+  EXPECT_THROW(check_bounded(function, x, nan, nan, name, &result), 
+               std::domain_error);
+  EXPECT_THROW(check_bounded(function, nan, nan, nan, name, &result), 
+               std::domain_error);
+}
