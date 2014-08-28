@@ -115,13 +115,14 @@ namespace stan {
       //   size_t begin = empty_nested() ? 0 : end - nested_size();
       //   for (size_t i = end; --i > begin; )  
       //     var_stack_[i]->chain();
-      
+
       typedef std::vector<chainable*>::reverse_iterator it_t;
       vi->init_dependent(); 
       it_t begin = var_stack_.rbegin();
       it_t end = empty_nested() ? var_stack_.rend() : begin + nested_size();
-      for (it_t it = begin; it < end; ++it)
+      for (it_t it = begin; it < end; ++it) {
         (*it)->chain();
+      }
     }
 
   }
