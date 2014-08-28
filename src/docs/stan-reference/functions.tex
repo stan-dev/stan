@@ -742,7 +742,29 @@ The hyperbolic sine of \farg{x} (in radians)}
 The hyperbolic tangent of \farg{x} (in radians)}
 %
 \fitem{real}{acosh}{real \farg{x}}{
-The inverse hyperbolic cosine (in radians) of \farg{x}}
+The inverse hyperbolic cosine (in radians) of \farg{x}
+%
+\[
+\mbox{acosh}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 1 \\
+  \cosh^{-1}(x) & \mbox{if } x \geq 1 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{acosh}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 1 \\
+  \frac{\partial\, \cosh^{-1}(x)}{\partial x} & \mbox{if } x \geq 1 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{acosh-appendix} for definition of 
+$\cosh^{-1}(x)$ and $\frac{\partial\,\cosh^{-1}(x)}{\partial x}$.
+}
 %
 \fitem{real}{asinh}{real \farg{x}}{
 The inverse hyperbolic sine (in radians) of \farg{x}}
