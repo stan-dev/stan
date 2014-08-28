@@ -36,3 +36,23 @@ TEST(MathErrorHandlingMatrix, checkSymmetric_one_indexed_message) {
   EXPECT_NE(std::string::npos, message.find("[2,1]"))
     << message;
 }
+
+TEST(MathErrorHandlingMatrix, checkSymmetric_nan) {
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  y.resize(2,2);
+  y << 1, nan, 3, 1;
+  EXPECT_THROW(stan::math::check_symmetric("checkSymmetric(%1%)",
+                                           y, "y", &result),
+               std::domain_error);
+  y << nan, 3, 3, 1;
+  EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric(%1%)",
+                                          y, "y", &result));
+
+  y.resize(1,1);
+  y << nan;
+  EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric(%1%)",
+                                          y, "y", &result));
+}
