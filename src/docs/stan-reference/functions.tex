@@ -660,7 +660,24 @@ see warning at start of \refsection{step-functions}}
 The square root of \farg{x}}
 %
 \fitem{real}{cbrt}{real \farg{x}}{
-The cube root of \farg{x}}
+The cube root of \farg{x}
+\[
+\mbox{cbrt}(x) = 
+\begin{cases}
+  \sqrt[3]{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{cbrt}(x)}{\partial x} = 
+\begin{cases}
+  \frac{x^{2/3}}{3} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{square}{real \farg{x}}{
 The square of \farg{x}}
