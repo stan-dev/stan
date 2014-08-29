@@ -657,7 +657,26 @@ see warning at start of \refsection{step-functions}}
 \begin{description}
 %
 \fitem{real}{sqrt}{real \farg{x}}{
-The square root of \farg{x}}
+The square root of \farg{x}.
+\[
+\mbox{sqrt}(x) = 
+\begin{cases}
+  \textrm{NaN} & x < 0 \\
+  \sqrt{x} & \mbox{if } x\geq 0\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{sqrt}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & x < 0 \\
+  \frac{1}{2\sqrt{x}} & x\geq 0\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{cbrt}{real \farg{x}}{
 The cube root of \farg{x}}
