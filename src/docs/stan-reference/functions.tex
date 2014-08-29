@@ -770,10 +770,25 @@ $
 }
 %
 \fitem{real}{inv\_logit}{real \farg{y}}{
-The logistic sigmoid function applied to \farg{y}, defined by
-$
-\mbox{logit}^{-1}(y) = \frac{1}{1 + \exp(-y)}.
-$
+The logistic sigmoid function applied to \farg{y}.
+\[
+\mbox{inv\_logit}(y) = 
+\begin{cases}
+  \mbox{logit}^{-1}(y) & \mbox{if } -\infty\leq y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{inv\_logit}(y)}{\partial y} = 
+\begin{cases}
+  \frac{\partial\, \mbox{logit}^{-1}(y)}{\partial y} & \mbox{if } -\infty\leq y\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } y = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{inv-logit-appendix} for definition of 
+$\mbox{logit}^{-1}(y)$ and $\frac{\partial\,\mbox{logit}^{-1}(y)}{\partial y}$.
 }
 %
 \fitem{real}{inv\_cloglog}{real \farg{y}}{

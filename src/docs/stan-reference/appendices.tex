@@ -1072,6 +1072,17 @@ followed by a line-feed (LF) character.
 
 \chapter{Mathematical Functions}\label{math-functions.appendix}
 
+\section{inv\_logit}\label{inv-logit-appendix.section}
+$\mbox{logit}^{-1}(y)$ is the logistic sigmoid function.
+%
+\[
+\mbox{logit}^{-1}(y) = \frac{1}{1 + \exp(-y)}
+\]
+%
+\[
+\frac{\partial \, \mbox{logit}^{-1}(y)}{\partial y} = \frac{\exp(y)}{(\exp(y)+1)^2}
+\]
+
 \section{Phi}\label{Phi-appendix.section}
 $\Phi(x)$ is the unit normal cumulative distribution function.
 %
