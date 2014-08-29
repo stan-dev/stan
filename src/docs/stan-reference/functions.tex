@@ -1046,7 +1046,26 @@ The natural logarithm of one plus the natural exponentiation of
 %
 \fitem{real}{log1m\_exp}{real \farg{x}}{ 
 The natural logarithm of one minus the natural exponentiation of
-\farg{x}.}
+\farg{x}.
+\[
+\mbox{log1m\_exp}(x) = 
+\begin{cases}
+  \ln(1-\exp(x)) & \mbox{if } x < 0 \\
+  \textrm{NaN} & \mbox{if } x \geq 0\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{asinh}(x)}{\partial x} = 
+\begin{cases}
+  -\frac{\exp(x)}{1-\exp(x)} & \mbox{if } x < 0 \\
+  \textrm{NaN} & \mbox{if } x \geq 0\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log\_diff\_exp}{real \farg{x}, real \farg{y}}{ 
 The natural logarithm of the difference of the natural exponentiation
