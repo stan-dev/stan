@@ -1038,7 +1038,26 @@ both \farg{x} and \farg{y} are 0, the return value is 0}
 The natural logarithm of 1 plus \farg{x}}
 %
 \fitem{real}{log1m}{real \farg{x}}{
-The natural logarithm of 1 minus \farg{x}}
+The natural logarithm of 1 minus \farg{x}.
+\[
+\mbox{log1m}(x) = 
+\begin{cases}
+  \ln(1-x) & \mbox{if } x \leq 1 \\
+  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log1m}(x)}{\partial x} = 
+\begin{cases}
+  -\frac{1}{1-x} & \mbox{if } x \leq 1 \\
+  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log1p\_exp}{real \farg{x}}{ 
 The natural logarithm of one plus the natural exponentiation of
