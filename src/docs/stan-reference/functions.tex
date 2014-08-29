@@ -1035,7 +1035,26 @@ The product of \farg{x} and the natural logarithm of \farg{y}\,;  if
 both \farg{x} and \farg{y} are 0, the return value is 0}
 %
 \fitem{real}{log1p}{real \farg{x}}{
-The natural logarithm of 1 plus \farg{x}}
+The natural logarithm of 1 plus \farg{x}.
+\[
+\mbox{log1p}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \log(1+x)& \mbox{if } x\geq -1 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log1p}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \frac{1}{1+x} & \mbox{if } x\geq -1 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log1m}{real \farg{x}}{
 The natural logarithm of 1 minus \farg{x}}
