@@ -1054,7 +1054,32 @@ of \farg{x} and the natural exponentiation of \farg{y}}
 %
 \fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{ 
 The natural logarithm of the sum of the natural exponentiation
-of \farg{x} and the natural exponentiation of \farg{y}}
+of \farg{x} and the natural exponentiation of \farg{y}.
+\[
+\mbox{log\_sum\_exp}(x,y) = 
+\begin{cases}
+  \ln(\exp(x)+\exp(y)) & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log\_sum\_exp}(x,y)}{\partial x} = 
+\begin{cases}
+  \frac{\exp(x)}{\exp(x)+\exp(y)} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log\_sum\_exp}(x,y)}{\partial y} = 
+\begin{cases}
+  \frac{\exp(y)}{\exp(x)+\exp(y)} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log\_inv\_logit}{real \farg{x}}{
 The natural logarithm of the inverse logit function of \farg{x}}
