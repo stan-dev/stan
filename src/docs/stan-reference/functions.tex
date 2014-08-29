@@ -736,7 +736,23 @@ by \farg{y}}
 The hyperbolic cosine of \farg{x} (in radians)}
 %
 \fitem{real}{sinh}{real \farg{x}}{
-The hyperbolic sine of \farg{x} (in radians)}
+The hyperbolic sine of \farg{x} (in radians).
+\[
+\mbox{sinh}(x) = 
+\begin{cases}
+  \sinh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{sinh}(x)}{\partial x} = 
+\begin{cases}
+  \cosh(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{tanh}{real \farg{x}}{
 The hyperbolic tangent of \farg{x} (in radians)}
