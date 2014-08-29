@@ -792,7 +792,26 @@ $
 \begin{description}
 %
 \fitem{real}{erf}{real \farg{x}}{
-The error function of \farg{x}}
+The error function of \farg{x}.
+\[
+\mbox{erf}(x) = 
+\begin{cases}
+  \erf(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{erf}(x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, \erf(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{erf-appendix} for definition of 
+$\erf(x)$ and $\frac{\partial\,\erf(x)}{\partial x}$.
+}
 %
 \fitem{real}{erfc}{real \farg{x}}{
 The complementary error function of \farg{x}}
