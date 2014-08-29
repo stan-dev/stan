@@ -3,6 +3,7 @@
 #include <stan/math/functions/log1p.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdLog1p,Fvar) {
   using stan::agrad::fvar;
@@ -160,4 +161,17 @@ TEST(AgradFwdLog1p,FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(2 / (1.5*1.5*1.5), g[0]);
+}
+
+struct log1p_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return log1p(arg1);
+  }
+};
+
+TEST(AgradFwdLog1p,log1p_NaN) {
+  log1p_fun log1p_;
+  test_nan(log1p_,false);
 }
