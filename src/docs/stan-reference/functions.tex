@@ -1023,7 +1023,24 @@ using more basic \Stan functions.
 \begin{description}
 %
 \fitem{real}{expm1}{real \farg{x}}{
-The natural exponential of \farg{x} minus 1}
+The natural exponential of \farg{x} minus 1.
+\[
+\mbox{expm1}(x) = 
+\begin{cases}
+  e^x-1 & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{expm1}(x)}{\partial x} = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{fma}{real \farg{x}, 
                real \farg{y},
