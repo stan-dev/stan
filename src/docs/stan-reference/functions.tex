@@ -739,7 +739,23 @@ The hyperbolic cosine of \farg{x} (in radians)}
 The hyperbolic sine of \farg{x} (in radians)}
 %
 \fitem{real}{tanh}{real \farg{x}}{
-The hyperbolic tangent of \farg{x} (in radians)}
+The hyperbolic tangent of \farg{x} (in radians).
+\[
+\mbox{tanh}(x) = 
+\begin{cases}
+  \tanh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{tanh}(x)}{\partial x} = 
+\begin{cases}
+  \sech^2(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{acosh}{real \farg{x}}{
 The inverse hyperbolic cosine (in radians) of \farg{x}}
