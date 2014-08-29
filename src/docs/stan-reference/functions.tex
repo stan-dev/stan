@@ -684,7 +684,24 @@ The base-10 logarithm of \farg{x}}
 \farg{x} raised to the power of \farg{y}}
 %
 \fitem{real}{inv}{real \farg{x}}{
-The inverse of \farg{x}}
+The inverse of \farg{x}.
+\[
+\mbox{inv}(x) = 
+\begin{cases}
+  \frac{1}{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{inv}(x)}{\partial x} = 
+\begin{cases}
+  -\frac{1}{x^2} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{inv\_sqrt}{real \farg{x}}{
 The inverse of the square root of \farg{x}}
