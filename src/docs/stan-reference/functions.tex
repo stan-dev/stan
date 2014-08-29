@@ -584,7 +584,35 @@ see warning at start of \refsection{step-functions}}
 The positive difference between \farg{x} and \farg{y}, which is
 \farg{x} - \farg{y} if \farg{x} is greater than \farg{y} and 0
 otherwise;
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[
+\mbox{fdim}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x < y\\
+  x-y & \mbox{if } x \geq y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fdim}(x,y)}{\partial x} = 
+\begin{cases}
+  0 & \mbox{if } x < y \\
+  1 & \mbox{if } x \geq y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fdim}(x,y)}{\partial y} = 
+\begin{cases}
+  0 & \mbox{if } x < y \\
+  -\lfloor\frac{x}{y}\rfloor & \mbox{if } x \geq y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \end{description}
 
