@@ -723,7 +723,32 @@ The principal arc (inverse) tangent (in radians) of \farg{x}}
 %
 \fitem{real}{atan2}{real \farg{x}, real \farg{y}}{
 The principal arc (inverse) tangent (in radians) of \farg{x} divided
-by \farg{y}}
+by \farg{y}
+\[
+\mbox{atan2}(x,y) = 
+\begin{cases}
+  \arctan\left(\frac{x}{y}\right) & \mbox{if } -\infty\leq x \leq \infty, -\infty\leq y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{atan2}(x,y)}{\partial x} = 
+\begin{cases}
+  \frac{y}{x^2+y^2} & \mbox{if } -\infty\leq x\leq \infty, -\infty\leq y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{atan2}(x,y)}{\partial y} = 
+\begin{cases}
+  -\frac{x}{x^2+y^2} & \mbox{if } -\infty\leq x\leq \infty, -\infty\leq y \leq \infty \\[6pt]
+   \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \end{description}
 
