@@ -1072,6 +1072,18 @@ followed by a line-feed (LF) character.
 
 \chapter{Mathematical Functions}\label{math-functions.appendix}
 
+\section{inv\_cloglog}\label{inv-cloglog-appendix.section}
+$\mbox{cloglog}^{-1}(y)$ is 
+the inverse of the complementary log-log function.
+%
+\[
+\mbox{cloglog}^{-1}(y)= 1 - \exp \left( - \exp(y) \right)
+\]
+%
+\[
+\frac{\partial \, \mbox{cloglog}^{-1}(y)}{\partial y} = \exp(y-\exp(y))
+\]
+
 \section{Phi}\label{Phi-appendix.section}
 $\Phi(x)$ is the unit normal cumulative distribution function.
 %

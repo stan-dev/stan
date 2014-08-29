@@ -777,11 +777,25 @@ $
 }
 %
 \fitem{real}{inv\_cloglog}{real \farg{y}}{
-The inverse of the complementary log-log function applied to \farg{y},
-defined by
-$
-\mbox{cloglog}^{-1}(y) = 1 - \exp \left( - \exp(y) \right).
-$
+The inverse of the complementary log-log function applied to \farg{y}.
+\[
+\mbox{inv\_cloglog}(y) = 
+\begin{cases}
+  \mbox{cloglog}^{-1}(y) & \mbox{if } -\infty\leq y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{inv\_cloglog}(y)}{\partial y} = 
+\begin{cases}
+  \frac{\partial\, \mbox{cloglog}^{-1}(y)}{\partial y} & \mbox{if } -\infty\leq y\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } y = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{inv-cloglog-appendix} for definition of 
+$\mbox{cloglog}^{-1}(y)$ and $\frac{\partial\,\mbox{cloglog}^{-1}(y)}{\partial y}$.
 }
 %
 \end{description}
