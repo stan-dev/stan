@@ -1028,7 +1028,40 @@ The natural exponential of \farg{x} minus 1}
 \fitem{real}{fma}{real \farg{x}, 
                real \farg{y},
                real \farg{z}}{
-\farg{z} plus the result of \farg{x} multiplied by \farg{y}}
+\farg{z} plus the result of \farg{x} multiplied by \farg{y}.
+\[
+\mbox{fma}(x,y,z) = 
+\begin{cases}
+  x\cdot y+z & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fma}(x,y,z)}{\partial x} = 
+\begin{cases}
+  y & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fma}(x,y,z)}{\partial y} = 
+\begin{cases}
+  x & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fma}(x,y,z)}{\partial z} = 
+\begin{cases}
+  1 & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
 The product of \farg{x} and the natural logarithm of \farg{y}\,;  if
