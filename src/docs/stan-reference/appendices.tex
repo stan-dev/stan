@@ -1072,6 +1072,22 @@ followed by a line-feed (LF) character.
 
 \chapter{Mathematical Functions}\label{math-functions.appendix}
 
+\section{gamma\_p}\label{gamma-p-appendix.section}
+$P(a,z)$ is the normalised lower incomplete gamma function of $a$ and $z$.
+%
+\[
+P(a,z)=\frac{1}{\Gamma(a)}\int_0^zt^{a-1}e^{-t}dt
+\]
+%
+\[
+\frac{\partial \, P(a,z)}{\partial a} = -\frac{\Psi(a)}{\Gamma^2(a)}\int_0^zt^{a-1}e^{-t}dt 
+	+ \frac{1}{\Gamma(a)}\int_0^z (a-1)t^{a-2}e^{-t}dt
+\]
+%
+\[
+\frac{\partial \, P(a,z)}{\partial z} = \frac{z^{a-1}e^{-z}}{\Gamma(a)}
+\]
+
 \section{Phi}\label{Phi-appendix.section}
 $\Phi(x)$ is the unit normal cumulative distribution function.
 %
