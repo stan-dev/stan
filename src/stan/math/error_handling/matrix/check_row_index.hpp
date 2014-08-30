@@ -11,6 +11,8 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified index is a valid row of the matrix
      *
+     * NOTE: this will not throw if y contains nan values.
+     *
      * @param function
      * @param i is index
      * @param y Matrix to test against

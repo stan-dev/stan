@@ -45,7 +45,7 @@ TEST(AgradRevMatrix, append_row_matrix) {
 TEST(AgradRevMatrix, append_row_row_vector) {
   vector_v a(3);
   vector_v a_exp(3);
-  VectorXd b(2);
+  VectorXd b(3);
   
   a << 2.0, 3.0, 9.0;
        
