@@ -2,10 +2,11 @@
 #include <stan/optimization/bfgs_update.hpp>
 
 TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
-  typedef stan::optimization::BFGSUpdate_HInv<> QNUpdateT;
+  const unsigned int nDim = 10;
+
+  typedef stan::optimization::BFGSUpdate_HInv<double,nDim> QNUpdateT;
   typedef QNUpdateT::VectorT VectorT;
 
-  const unsigned int nDim = 10;
   QNUpdateT bfgsUp;
   VectorT yk(nDim), sk(nDim), sdir(nDim);
 
@@ -35,10 +36,11 @@ TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
 }
 
 TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_update) {
-  typedef stan::optimization::BFGSUpdate_HInv<> QNUpdateT;
+  const unsigned int nDim = 10;
+
+  typedef stan::optimization::BFGSUpdate_HInv<double,nDim> QNUpdateT;
   typedef QNUpdateT::VectorT VectorT;
 
-  const unsigned int nDim = 10;
   QNUpdateT bfgsUp;
   VectorT yk(nDim), sk(nDim), sdir(nDim);
 
@@ -53,23 +55,25 @@ TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_update) {
 }
 
 TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_search_direction) {
-  typedef stan::optimization::BFGSUpdate_HInv<> QNUpdateT;
+  const unsigned int nDim = 10;
+  typedef stan::optimization::BFGSUpdate_HInv<double,nDim> QNUpdateT;
   typedef QNUpdateT::VectorT VectorT;
 
-  const unsigned int nDim = 10;
   QNUpdateT bfgsUp;
   VectorT yk(nDim), sk(nDim), sdir(nDim);
+  sk.setZero(nDim);
+  yk.setZero(nDim);
+  sk[0] = 1;
+  yk[0] = 1;
+  bfgsUp.update(yk,sk,true);
 
   for (unsigned int i = 0; i < nDim; i++) {
 
     for (unsigned int j = 0; j <= i; j++) {
-      sk.setZero(nDim);
       yk.setZero(nDim);
-      sk[i - j] = 1;
       yk[i - j] = 1;
-
-      bfgsUp.search_direction(sdir,yk);
       
+      bfgsUp.search_direction(sdir,yk);
     }
   }
 }
