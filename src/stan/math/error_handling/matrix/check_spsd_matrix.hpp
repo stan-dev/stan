@@ -21,6 +21,7 @@ namespace stan {
      * @param result
      * @return <code>true</code> if the matrix is a square, symmetric,
      * and positive semi-definite.
+     * @return throws if any element in matrix is nan.
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings
