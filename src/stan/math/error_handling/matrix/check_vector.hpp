@@ -9,6 +9,7 @@
 namespace stan {
   namespace math {
 
+    // NOTE: this will not throw if x contains nan values.
     template <typename T, int R, int C, typename T_result>
     inline bool check_vector(const char* function,
                              const Eigen::Matrix<T,R,C>& x,
