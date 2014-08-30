@@ -1,5 +1,6 @@
 #include <stan/common/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 // Mock Model
@@ -65,7 +66,8 @@ public:
   int calls;
 };
 
-class mock_context_factory : public stan::common::var_context_factory {
+class mock_context_factory 
+  : public stan::common::var_context_factory<stan::io::dump> {
 public:
   mock_context_factory() 
     : calls(0),
@@ -76,12 +78,12 @@ public:
     last_call = "";
   }
   
-  stan::io::var_context* operator()(const std::string source) {
+  stan::io::dump operator()(const std::string source) {
     calls++;
     last_call = source;
     std::string txt = "a <- 0\nb <- 1\nc <- 2";
     std::stringstream in(txt);
-    return new stan::io::dump(in);
+    return stan::io::dump(in);
   }
   
   int calls;
@@ -308,4 +310,30 @@ TEST_F(StanCommon, DISABLED_initialize_state_source_gradient_infinite) {
   // FIXME: add this test
   FAIL() << "it's not easy to force the model to set gradients "
          << " using this mock. need to add this test";
+}
+
+TEST_F(StanCommon, get_double_from_string) {
+  using stan::common::get_double_from_string;
+  double val;
+
+  EXPECT_TRUE(get_double_from_string("0", val));
+  EXPECT_FLOAT_EQ(0.0, val);
+
+  EXPECT_TRUE(get_double_from_string("0.0", val));
+  EXPECT_FLOAT_EQ(0.0, val);
+
+  EXPECT_TRUE(get_double_from_string("123", val));
+  EXPECT_FLOAT_EQ(123.0, val);
+
+  EXPECT_FALSE(get_double_from_string("foo", val));
+  EXPECT_PRED1(boost::math::isnan<double>,
+               val);
+
+  EXPECT_FALSE(get_double_from_string("0.0.0", val));
+  EXPECT_PRED1(boost::math::isnan<double>,
+               val);
+
+  EXPECT_FALSE(get_double_from_string("", val));
+  EXPECT_PRED1(boost::math::isnan<double>,
+               val);
 }

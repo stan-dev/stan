@@ -198,6 +198,24 @@ namespace stan {
     }
     
     /**
+     * Converts string to double. Returns true if it is able to convert
+     * the number, false otherwise.
+     *
+     * @param[in]  s     string input
+     * @param[out] val   the double value of the string if it is parsable
+     *                   as a double; else NaN
+     */
+    bool get_double_from_string(const std::string& s, double& val) {
+      try {
+        val = boost::lexical_cast<double>(s);
+      } catch (const boost::bad_lexical_cast& e) {
+        val = std::numeric_limits<double>::quiet_NaN();
+        return false;
+      }
+      return true;
+    }
+
+    /**
      * Creates the initial state.
      *
      * @param[in]     init        init can either be "0", a number as a string,
@@ -219,18 +237,15 @@ namespace stan {
                           RNG& base_rng,
                           std::ostream* output,
                           ContextFactory& context_factory) {
-    
-      try {
-        
-        double R = std::fabs(boost::lexical_cast<double>(init));
-        
+      double R;
+      if (get_double_from_string(init, R)) {
         if (R == 0) {
           return initialize_state_zero(cont_params, model, output);
         } else {
           return initialize_state_random(R, cont_params, model,
                                          base_rng, output);
         }
-      } catch(const boost::bad_lexical_cast& e) {
+      } else {
         return initialize_state_source(init, cont_params, model,
                                        base_rng, output,
                                        context_factory);

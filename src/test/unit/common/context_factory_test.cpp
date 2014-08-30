@@ -12,19 +12,15 @@ TEST(CmdStan, dump_factory_constructor) {
 TEST(CmdStan, dump_factory_source) {
   stan::common::dump_factory f;
   
-  stan::io::var_context* context;
-  EXPECT_THROW(context = f(""),
+  EXPECT_THROW(f(""),
                std::runtime_error);
   
-  EXPECT_NO_THROW(context = f("src/test/unit/common/context_factory.data.R"));
-  ASSERT_NE(static_cast<stan::io::var_context*>(0), context);
+  stan::io::dump context = f("src/test/unit/common/context_factory.data.R");
   
-  EXPECT_TRUE(context->contains_r("a"));
-  EXPECT_TRUE(context->contains_r("b"));
-  EXPECT_TRUE(context->contains_r("c"));
-  EXPECT_FALSE(context->contains_r("d"));
-  
-  delete(context);
+  EXPECT_TRUE(context.contains_r("a"));
+  EXPECT_TRUE(context.contains_r("b"));
+  EXPECT_TRUE(context.contains_r("c"));
+  EXPECT_FALSE(context.contains_r("d"));
 }
 
 TEST(StanCommon, var_context_factory) {
