@@ -32,3 +32,31 @@ TEST(MathErrorHandlingMatrix, checkSpsdNotSquare) {
   EXPECT_THROW(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result), 
                std::domain_error);
 }
+
+TEST(MathErrorHandlingMatrix, checkSpsdMatrixPosDef_nan) {
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  y.resize(3,3);
+  y << 2, -1, 0, -1, 2, -1, 0, -1, 2;
+  EXPECT_TRUE(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)",
+                                           y, "y", &result));
+
+  y.setZero();
+  EXPECT_TRUE(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result));
+
+  for (int i = 0; i < y.size(); i++) {
+    y << 2, -1, 0, -1, 2, -1, 0, -1, 2;
+    y(i) = nan;
+    EXPECT_THROW(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)",
+                                               y, "y", &result),
+                 std::domain_error);
+
+    y.setZero();
+    y(i) = nan;
+    EXPECT_THROW(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)",
+                                               y, "y", &result),
+                 std::domain_error);
+  }
+}
