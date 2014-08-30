@@ -798,10 +798,31 @@ The error function of \farg{x}}
 The complementary error function of \farg{x}}
 %
 \fitemindexsort{real}{Phi}{real \farg{x}}{
-The cumulative unit normal density function of \farg{x};
-\code{Phi(\farg{x})} will underflow to 0 for \farg{x} below -37.5 and overflow
-to 1 for \farg{x} above 8.25;  derivatives will underflow to 0 below
--27.5 and overflow to 1 above 27.5.
+The unit normal cumulative distribution function of \farg{x}.
+%
+\[
+\mbox{Phi}(x) = 
+\begin{cases}
+  0 & \mbox{if } x < -37.5 \\
+  \Phi(x) & \mbox{if } -37.5 \leq x \leq 8.25 \\
+  1 & \mbox{if } x > 8.25 \\[6pt]
+  \textrm{error} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{Phi}(x)}{\partial x} = 
+\begin{cases}
+  0 & \mbox{if } x < -27.5 \\
+  \frac{\partial\,\Phi(x)}{\partial x} & \mbox{if } -27.5 \leq x \leq 27.5 \\
+  0 & \mbox{if } x > 27.5 \\[6pt]
+  \textrm{error} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{Phi-appendix} for definition of $\Phi(x)$ and
+$\frac{\partial\,\Phi(x)}{\partial x}$.
+%
 }{Phi}{phi}
 %
 \fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
