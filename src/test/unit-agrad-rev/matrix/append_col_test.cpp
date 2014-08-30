@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stan/math/matrix/append_col.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/agrad/util.hpp>
@@ -40,12 +41,13 @@ TEST(AgradRevMatrix, append_col_matrix) {
   for (int i = 0; i < 2; i++)
     for (int j = 0; j < 2; j++)
       EXPECT_FLOAT_EQ(std::exp(a(i, j).val()), g[idx++]);
+  stan::agrad::recover_memory();
 }
 
 TEST(AgradRevMatrix, append_col_row_vector) {
   row_vector_v a(3);
   row_vector_v a_exp(3);
-  RowVectorXd b(2);
+  RowVectorXd b(3);
   
   a << 2.0, 3.0, 9.0;
        
@@ -64,4 +66,5 @@ TEST(AgradRevMatrix, append_col_row_vector) {
   size_t idx = 0;
   for (int i = 0; i < 3; i++)
     EXPECT_FLOAT_EQ(std::exp(a(i).val()), g[idx++]);
+  stan::agrad::recover_memory();
 }
