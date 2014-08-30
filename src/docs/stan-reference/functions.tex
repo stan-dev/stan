@@ -598,7 +598,41 @@ see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{fmax}{real \farg{x}, real \farg{y}}{
 The maximum of \farg{x} and \farg{y}\,;
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[
+\mbox{fmax}(x,y) = 
+\begin{cases}
+  x & \mbox{if } x \geq y \\
+  y & \mbox{if } x < y \\[6pt]
+  x & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+  y & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+  \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fmax}(x,y)}{\partial x} = 
+\begin{cases}
+  1 & \mbox{if } x \geq y \\
+  0 & \mbox{if } x < y \\[6pt]
+  1 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+  0 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+  \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fmax}(x,y)}{\partial y} = 
+\begin{cases}
+  0 & \mbox{if } x \geq y \\
+  1 & \mbox{if } x < y \\[6pt]
+  0 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+  1 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+  \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \end{description}
 
