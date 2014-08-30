@@ -30,4 +30,21 @@ TEST(AgradFwdFvar,Fvar) {
 
   EXPECT_FLOAT_EQ(5.07, (++d).val_);
   EXPECT_FLOAT_EQ(5.07, d.val_);
+
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  fvar<double> f(nan);
+  EXPECT_TRUE(boost::math::isnan(f.val_));
+  EXPECT_TRUE(boost::math::isnan(f.d_));
+  
+  fvar<double> g(nan, 1);
+  EXPECT_TRUE(boost::math::isnan(g.val_));
+  EXPECT_TRUE(boost::math::isnan(g.d_));
+
+  fvar<double> h(nan, nan);
+  EXPECT_TRUE(boost::math::isnan(h.val_));
+  EXPECT_TRUE(boost::math::isnan(h.d_));
+
+  fvar<double> i(4, nan);
+  EXPECT_FLOAT_EQ(4, i.val_);
+  EXPECT_TRUE(boost::math::isnan(i.d_));
 }
