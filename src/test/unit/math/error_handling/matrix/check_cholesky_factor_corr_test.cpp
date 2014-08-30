@@ -81,3 +81,40 @@ TEST(MathErrorHandlingMatrix, checkCorrCholeskyMatrix) {
 }
 
 
+
+TEST(MathErrorHandlingMatrix, checkCorrCholeskyMatrix_nan) {
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  using stan::math::check_cholesky_factor_corr;
+  using std::sqrt;
+
+  y.resize(1,1);
+  y << nan;
+  EXPECT_THROW(check_cholesky_factor_corr("checkCorrCholeskyMatrix(%1%)",
+                                          y, "y", &result),
+               std::domain_error);
+  
+  y.resize(3,3);
+  y << 
+    1, 0, 0,
+    sqrt(0.5), sqrt(0.5), 0,
+    sqrt(0.25), sqrt(0.25), sqrt(0.5);
+  EXPECT_TRUE(check_cholesky_factor_corr("checkCorrCholeskyMatrix(%1%)",
+                                           y, "y", &result));
+
+  for (int i = 0 ; i < y.size(); i++) {
+    y(i) = nan;
+    EXPECT_THROW(check_cholesky_factor_corr("checkCorrCholeskyMatrix(%1%)",
+                                            y, "y", &result),
+                 std::domain_error);
+    y << 
+      1, 0, 0,
+      sqrt(0.5), sqrt(0.5), 0,
+      sqrt(0.25), sqrt(0.25), sqrt(0.5);
+  }
+
+}
+
+
