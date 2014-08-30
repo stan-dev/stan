@@ -9,6 +9,7 @@
 namespace stan {
   namespace math {
 
+    // NOTE: this will not throw  if y1 or y2 contains nan values.
     template <typename T1, typename T2, int R1, int C1, int R2, int C2,
               typename T_result>
     inline bool check_matching_dims(const char* function,
