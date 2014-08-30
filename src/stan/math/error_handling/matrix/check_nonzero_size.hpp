@@ -12,6 +12,8 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified matrix/vector is of non-zero size
      *
+     * NOTE: this will not throw if y contains nan values.
+     *
      * @param function
      * @param y matrix/vector to test against
      * @param name
