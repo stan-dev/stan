@@ -25,3 +25,35 @@ TEST(MathErrorHandlingMatrix, checkMultiplicableMatrix) {
                                                y, "y",&result), 
                std::domain_error);
 }
+
+TEST(MathErrorHandlingMatrix, checkMultiplicableMatrix_nan) {
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> x;
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+    
+  y.resize(3,3);
+  x.resize(3,3);
+  y << nan, nan, nan,nan, nan, nan,nan, nan, nan;
+  x << nan, nan, nan,nan, nan, nan,nan, nan, nan;
+  EXPECT_TRUE(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+                                              y, "y", &result));
+  x.resize(3,2);
+  y.resize(2,4);
+  y << nan, nan, nan,nan, nan, nan,nan, nan;
+  x << nan, nan, nan,nan, nan, nan;
+  EXPECT_TRUE(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+                                             y, "y", &result));
+
+  y.resize(1,2);
+  y << nan, nan;
+  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+                                               y, "y",&result), 
+               std::domain_error);
+
+  x.resize(2,2);
+  x << nan, nan, nan, nan;
+  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+                                               y, "y",&result), 
+               std::domain_error);
+}
