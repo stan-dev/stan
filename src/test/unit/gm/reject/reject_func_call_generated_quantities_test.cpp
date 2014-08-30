@@ -1,13 +1,15 @@
 #include <gtest/gtest.h>
+#include <stan/common/write_iteration.hpp>
+
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/no-main/gm/raise_exception_mult_args.cpp>
+#include <test/test-models/no-main/gm/reject_func_call_generated_quantities.cpp>
 
-/* tests that stan program throws exception in model block
-   this block gets compiled into .cpp model object's log_prob method
+/* tests that stan program throws exception in generated quantities block
+   this is compiled into cpp model object's method write_array
 */
 
-TEST(StanCommon, raise_exception_mult_args) {
+TEST(StanCommon, reject_func_call_generated_quantities) {
   std::string error_msg = "user-specified exception";
 
   std::fstream empty_data_stream(std::string("").c_str());
@@ -17,8 +19,8 @@ TEST(StanCommon, raise_exception_mult_args) {
   model_output.str("");
 
   // instantiate model
-  raise_exception_mult_args_model_namespace::raise_exception_mult_args_model* model 
-       = new raise_exception_mult_args_model_namespace::raise_exception_mult_args_model(empty_data_context, &model_output);
+  reject_func_call_generated_quantities_model_namespace::reject_func_call_generated_quantities_model* model 
+       = new reject_func_call_generated_quantities_model_namespace::reject_func_call_generated_quantities_model(empty_data_context, &model_output);
 
   // instantiate args to log_prob function
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model->num_params_r());
@@ -28,9 +30,13 @@ TEST(StanCommon, raise_exception_mult_args) {
   std::vector<int> disc_vector;
   double lp(0);
 
-  // call model's log_prob function, check that exception is thrown
+  boost::ecuyer1988 base_rng;
+  base_rng.seed(123456);
+
+  lp = model->log_prob<false, false>(cont_vector, disc_vector, &std::cout);
   try {
-    lp = model->log_prob<false, false>(cont_vector, disc_vector, &std::cout);
+    stan::common::write_iteration(model_output, *model, base_rng,
+                    lp, cont_vector, disc_vector);
   } catch (const std::domain_error& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "*********************************" << std::endl
@@ -41,6 +47,6 @@ TEST(StanCommon, raise_exception_mult_args) {
     }
     return;
   }
-  FAIL() << "model failed to raise exception" << std::endl;
+  FAIL() << "model failed to do reject" << std::endl;
 }
 

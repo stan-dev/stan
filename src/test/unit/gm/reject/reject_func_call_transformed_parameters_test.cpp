@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/no-main/gm/raise_exception_transformed_parameters.cpp>
+#include <test/test-models/no-main/gm/reject_func_call_transformed_parameters.cpp>
 
 /* tests that stan program throws exception in transformed parameters block
    which is part of the log_prob method of the generated cpp object
 */
 
-TEST(StanCommon, raise_exception_transformed_parameters) {
+TEST(StanCommon, reject_func_call_transformed_parameters) {
   std::string error_msg = "user-specified exception";
 
   std::fstream empty_data_stream(std::string("").c_str());
@@ -17,8 +17,8 @@ TEST(StanCommon, raise_exception_transformed_parameters) {
   model_output.str("");
 
   // instantiate model
-  raise_exception_transformed_parameters_model_namespace::raise_exception_transformed_parameters_model* model 
-       = new raise_exception_transformed_parameters_model_namespace::raise_exception_transformed_parameters_model(empty_data_context, &model_output);
+  reject_func_call_transformed_parameters_model_namespace::reject_func_call_transformed_parameters_model* model 
+       = new reject_func_call_transformed_parameters_model_namespace::reject_func_call_transformed_parameters_model(empty_data_context, &model_output);
 
   // instantiate args to log_prob function
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model->num_params_r());
@@ -41,6 +41,6 @@ TEST(StanCommon, raise_exception_transformed_parameters) {
     }
     return;
   }
-  FAIL() << "model failed to raise exception" << std::endl;
+  FAIL() << "model failed to do reject" << std::endl;
 }
 

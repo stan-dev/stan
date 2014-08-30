@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/no-main/gm/raise_ex_func_call_transformed_data.cpp>
+#include <test/test-models/no-main/gm/reject_func_call_transformed_data.cpp>
 
 /* tests that stan program throws exception in transformed data block
    this block is part of the generated cpp object's constructor
 */
 
 
-TEST(StanCommon, raise_ex_func_call_transformed_data) {
+TEST(StanCommon, reject_func_call_transformed_data) {
   std::string error_msg = "user-specified exception";
 
   std::fstream empty_data_stream(std::string("").c_str());
@@ -19,8 +19,8 @@ TEST(StanCommon, raise_ex_func_call_transformed_data) {
 
   // instantiate model
   try {
-     raise_ex_func_call_transformed_data_model_namespace::raise_ex_func_call_transformed_data_model* model 
-       = new raise_ex_func_call_transformed_data_model_namespace::raise_ex_func_call_transformed_data_model(empty_data_context, &model_output);
+     reject_func_call_transformed_data_model_namespace::reject_func_call_transformed_data_model* model 
+       = new reject_func_call_transformed_data_model_namespace::reject_func_call_transformed_data_model(empty_data_context, &model_output);
   } catch (const std::domain_error& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "*********************************" << std::endl
@@ -31,7 +31,7 @@ TEST(StanCommon, raise_ex_func_call_transformed_data) {
     }
     return;
   }
-  FAIL() << "model failed to raise exception" << std::endl;
+  FAIL() << "model failed to do reject" << std::endl;
 
 }
 
