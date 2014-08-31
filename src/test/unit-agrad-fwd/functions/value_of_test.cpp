@@ -1,7 +1,8 @@
-#include <stan/agrad/rev/functions/value_of.hpp>
+#include <stan/agrad/fwd/functions/value_of.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/functions/value_of.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 TEST(AgradFwd,value_of) {
   using stan::agrad::fvar;
