@@ -18,3 +18,25 @@ TEST(MathErrorHandlingMatrix, checkVectorMatrix) {
   x.resize(5,1);
   EXPECT_TRUE(stan::math::check_vector("checkVector(%1%)",x,"x", &result));
 }
+
+TEST(MathErrorHandlingMatrix, checkVectorMatrix_nan) {
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> x;
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  
+  x.resize(3,3);
+  x << nan, nan, nan,nan, nan, nan,nan, nan, nan;
+  EXPECT_THROW(stan::math::check_vector("checkVector(%1%)",x,"x", &result),
+               std::domain_error);
+  x.resize(0,0);
+  EXPECT_THROW(stan::math::check_vector("checkVector(%1%)",x,"x", &result),
+               std::domain_error);
+
+  x.resize(1,5);
+  x << nan, nan, nan,nan, nan;
+  EXPECT_TRUE(stan::math::check_vector("checkVector(%1%)",x,"x", &result));
+
+  x.resize(5,1);
+  x << nan, nan, nan,nan, nan;
+  EXPECT_TRUE(stan::math::check_vector("checkVector(%1%)",x,"x", &result));
+}
