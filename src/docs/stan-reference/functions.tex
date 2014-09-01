@@ -1027,6 +1027,32 @@ The falling factorial of \farg{x} with power \farg{n} defined for positive \farg
 %
 \fitem{real}{log\_falling\_factorial}{real \farg{x}, real \farg{n}}{
 The log of the falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}.
+\[
+\mbox{log\_falling\_factorial}(x,n) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \ln (x)_n & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log\_falling\_factorial}(x,n)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+ \Psi(x) & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log\_falling\_factorial}(x,n)}{\partial n} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  -\Psi(n) & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
 }
 %
 \fitem{real}{rising\_factorial}{real \farg{x}, real \farg{n}}{
