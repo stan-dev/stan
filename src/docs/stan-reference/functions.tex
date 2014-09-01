@@ -467,7 +467,16 @@ are primarily provided for compatibility with BUGS and JAGS.
 \fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
 \farg{x} if \farg{cond} is non-zero, and \farg{y} otherwise; unlike
 the ternary operator in \Cpp, Stan's \code{if\_else} function always
-evaluates both arguments \farg{x} and \farg{y}}
+evaluates both arguments \farg{x} and \farg{y}.
+\[
+\mbox{if\_else}(cond,x,y) = 
+\begin{cases}
+  x & \mbox{if } cond = 1\\
+  y & \mbox{if } cond = 0\\
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{step}{real \farg{x}}{
 1 if \farg{x} is positive and 0 otherwise; equivalent to \code{x > 0.0}}
