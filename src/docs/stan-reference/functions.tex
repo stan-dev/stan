@@ -577,13 +577,85 @@ The sum of the addends \farg{x} and \farg{y}.
 }
 %
 \fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
-The difference between the minuend \farg{x} and subtrahend \farg{y}}
+The difference between the minuend \farg{x} and subtrahend \farg{y}.
+\[
+\mbox{opreator-}(x,y) = 
+\begin{cases}
+  x-y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{opreator-}(x,y)}{\partial x} = 
+\begin{cases}
+  1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{opreator-}(x,y)}{\partial y} = 
+\begin{cases}
+  -1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{operator*}{real \farg{x}, real \farg{y}}{
-The product of the factors \farg{x} and \farg{y}}
+The product of the factors \farg{x} and \farg{y}.
+\[
+\mbox{opreator*}(x,y) = 
+\begin{cases}
+  xy & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{opreator*}(x,y)}{\partial x} = 
+\begin{cases}
+  y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{opreator*}(x,y)}{\partial y} = 
+\begin{cases}
+  x & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
-The quotient of the dividend \farg{x} and divisor \farg{y}}
+The quotient of the dividend \farg{x} and divisor \farg{y}.
+\[
+\mbox{opreator/}(x,y) = 
+\begin{cases}
+  \frac{x}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{opreator/}(x,y)}{\partial x} = 
+\begin{cases}
+  \frac{1}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{opreator/}(x,y)}{\partial y} = 
+\begin{cases}
+  -\frac{x}{y^2} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \end{description}
 

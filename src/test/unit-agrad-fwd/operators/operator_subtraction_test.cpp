@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdOperatorSubtraction, Fvar) {
   using stan::agrad::fvar;
@@ -338,3 +339,17 @@ TEST(AgradFwdOperatorSubtraction, Double_FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 
+struct subtract_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return arg1-arg2;
+  }
+};
+
+TEST(AgradFwdOperatorSubtraction, subtract_nan) {
+  subtract_fun subtract_;
+  test_nan(subtract_,3.0,5.0,false);
+}
