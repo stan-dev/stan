@@ -10,6 +10,7 @@
 namespace stan {
   namespace math {
 
+    // NOTE: this will not throw if y1 or y2 contains nan values.
     template <typename T1, typename T2, typename T_result>
     inline bool check_multiplicable(const char* function,
                                     const T1& y1,
