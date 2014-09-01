@@ -858,11 +858,25 @@ The log loss of predicting probability \farg{y\_hat} for
 binary outcome \farg{y}\,;
 
 The log loss function for predicting $\hat{y} \in [0,1]$ for 
-boolean outcome $y \in \setlist{0,1}$ is defined by
+boolean outcome $y \in \setlist{0,1}$.
 \[
-\mbox{\code{binary\_log\_loss}}(y,\hat{y})
-= y \log \hat{y} + (1 - y) \log (1 - \hat{y}).
+\mbox{binary\_log\_loss}(y,\hat{y}) = 
+\begin{cases}
+  y \log \hat{y} + (1 - y) \log (1 - \hat{y}) & \mbox{if } 0\leq \hat{y}\leq 1, 
+  	y\in\setlist{0,1}\\[6pt]
+  \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{binary\_log\_loss}(y,\hat{y})}{\partial \hat{y}} = 
+\begin{cases}
+  \frac{y}{\hat{y}}-\frac{1-y}{1-\hat{y}} & \mbox{if } 0\leq \hat{y}\leq 1, 
+  	y\in\setlist{0,1}\\[6pt]
+  \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN}
+\end{cases}
+\]
+%
 }
 %
 
