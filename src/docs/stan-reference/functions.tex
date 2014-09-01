@@ -1129,10 +1129,25 @@ The Bessel function of the second kind with order \farg{v} applied to \farg{z} d
 \]
 }
 %
-\fitem{real}{modified\_bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\fitem{real}{modified\_bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v}.
 \[
-{I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
+\mbox{modified\_bessel\_first\_kind}(v,z) = 
+\begin{cases}
+  I_v(z) & \mbox{if } -\infty\leq z \leq \infty \\[6pt]
+  \textrm{error} & \mbox{if } z = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{modified\_bessel\_first\_kind}(v,z)}{\partial z} = 
+\begin{cases}
+  \frac{\partial\, I_v(z)}{\partial z} & \mbox{if } -\infty\leq z\leq \infty \\[6pt]
+  \textrm{error} & \mbox{if } z = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{modified-bessel-first-kind-appendix} for definition of 
+$I_v(z)$ and $\frac{\partial\,I_v(z)}{\partial z}$.
 }
 %
 \fitem{real}{modified\_bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
