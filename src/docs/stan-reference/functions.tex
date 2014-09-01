@@ -777,7 +777,23 @@ see warning at start of \refsection{step-functions}.
 \fitem{real}{trunc}{real \farg{x}}{
 The integer nearest to but no larger in magnitude than \farg{x},
 converted to a double value;
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[
+\mbox{trunc}(x) = 
+\begin{cases}
+  \lfloor x \rfloor & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{trunc}(x)}{\partial x} = 
+\begin{cases}
+  0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \end{description}
 
