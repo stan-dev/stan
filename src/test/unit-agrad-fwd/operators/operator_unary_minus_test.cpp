@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdOperatorUnaryMinus, Fvar) {
   using stan::agrad::fvar;
@@ -103,3 +104,17 @@ TEST(AgradFwdOperatorUnaryMinus, FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 
+
+struct neg_fun {
+  template <typename T0>
+  inline T0
+  operator()(T0 arg1) const {
+    return (-arg1);
+  }
+};
+
+TEST(AgradFwdOperatorUnaryMinus, neg_nan) {
+  neg_fun neg_;
+
+  test_nan(neg_,false);
+}
