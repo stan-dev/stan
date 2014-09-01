@@ -1272,8 +1272,34 @@ The natural exponential of \farg{x} minus 1}
 \farg{z} plus the result of \farg{x} multiplied by \farg{y}}
 %
 \fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
-The product of \farg{x} and the natural logarithm of \farg{y}\,;  if
-both \farg{x} and \farg{y} are 0, the return value is 0}
+The product of \farg{x} and the natural logarithm of \farg{y}.
+\[
+\mbox{multiply\_log}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x=y=0\\
+  x\ln y & \mbox{if } x,y\neq0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{multiply\_log}(x,y)}{\partial x} = 
+\begin{cases}
+  \infty & \mbox{if } x=y=0\\
+  \ln y & \mbox{if } x,y\neq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{multiply\_log}(x,y)}{\partial y} = 
+\begin{cases}
+  \infty & \mbox{if } x=y=0\\
+  \frac{x}{y} & \mbox{if } x,y\neq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{log1p}{real \farg{x}}{
 The natural logarithm of 1 plus \farg{x}}
