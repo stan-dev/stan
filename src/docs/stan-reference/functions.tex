@@ -487,7 +487,16 @@ evaluates both arguments \farg{x} and \farg{y}.
 }
 %
 \fitem{real}{step}{real \farg{x}}{
-1 if \farg{x} is positive and 0 otherwise; equivalent to \code{x > 0.0}}
+1 if \farg{x} is positive and 0 otherwise; equivalent to \code{x > 0.0}.
+\[
+\mbox{step}(x) = 
+\begin{cases}
+  0 & \mbox{if } x \leq 0 \\
+  1 & \mbox{if } x > 0  \\[6pt]
+  0 & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \end{description}
 
