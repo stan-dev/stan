@@ -918,11 +918,29 @@ boolean outcome $y \in \setlist{0,1}$.
     natural logarithm of the beta function applied to \farg{alpha} and
     \farg{beta}.  The beta function, $\mbox{B}(\alpha,\beta)$,
     computes the normalizing constant for the beta distribution, and
-    is defined for $\alpha > 0$ and $\beta > 0$ by
+    is defined for $\alpha > 0$ and $\beta > 0$.
 \[
-\mbox{B}(\alpha,\beta)
-= 
-\int_0^1 u^{\alpha - 1} (1 - u)^{\beta - 1} \, du.
+\mbox{lbeta}(\alpha,\beta) = 
+\begin{cases}
+  \ln\int_0^1 u^{\alpha - 1} (1 - u)^{\beta - 1} \, du & \mbox{if } \alpha,\beta>0 \\[6pt]
+  \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{lbeta}(\alpha,\beta)}{\partial \alpha} = 
+\begin{cases}
+  \Psi(\alpha)-\Psi(\alpha+\beta) & \mbox{if } \alpha,\beta>0 \\[6pt]
+  \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{lbeta}(\alpha,\beta)}{\partial \beta} = 
+\begin{cases}
+  \Psi(\beta)-\Psi(\alpha+\beta) & \mbox{if } \alpha,\beta>0 \\[6pt]
+  \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN}
+\end{cases}
 \]
 }
 \fitem{real}{tgamma}{real \farg{x}}{
