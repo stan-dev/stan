@@ -77,3 +77,24 @@ TEST(MathErrorHandling, CheckNonnegativeVectorized_one_indexed_message) {
 
   EXPECT_NE(std::string::npos, message.find("[3]"));
 }
+
+TEST(MathErrorHandling,CheckNonnegative_nan) {
+  const char* function = "check_nonnegative(%1%)";
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  EXPECT_THROW(check_nonnegative(function, nan, "x", &result),
+               std::domain_error);
+
+  std::vector<double> x;
+  x.push_back(1.0);
+  x.push_back(2.0);
+  x.push_back(3.0);
+
+  for (int i = 0; i < x.size(); i++) {
+    x[i] = nan;
+    EXPECT_THROW(check_nonnegative(function, x, "x", &result),
+                 std::domain_error);
+    x[i] = i;
+  }
+}
