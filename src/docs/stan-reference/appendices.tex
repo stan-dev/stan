@@ -1079,7 +1079,20 @@ $I_v(z)$ is the modified Bessel function of the first kind with order \farg{v} a
 \]
 %
 \[
-\frac{\partial \, I_v(z)}{\partial z} = 
+\frac{\partial \, I_v(z)}{\partial z} = I_{v-1}(z)-\frac{v}{z}I_v(z)
+\]
+
+\section{modified\_bessel\_second\_kind}\label{modified-bessel-second-kind-appendix.section}
+$K_v(z)$ is the bessel function of the second kind of order $v$ for positive $z$.
+%
+\[
+{K_v}(z)
+=
+\frac{\pi}{2}\cdot\frac{I_{-v}(z) - I_{v}(z)}{\sin(v\pi)}
+\]
+%
+\[
+\frac{\partial \, K_v(z)}{\partial z} = -\frac{v}{z}K_v(z)-K_{v-1}(z)
 \]
 
 \section{Phi}\label{Phi-appendix.section}

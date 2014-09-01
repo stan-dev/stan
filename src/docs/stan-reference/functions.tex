@@ -1151,12 +1151,27 @@ $I_v(z)$ and $\frac{\partial\,I_v(z)}{\partial z}$.
 }
 %
 \fitem{real}{modified\_bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
-The modified Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
+The modified Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v}.
 \[
-{K_v}(z)
-=
-\frac{\pi}{2}\cdot\frac{I_{-v}(z) - I_{v}(z)}{\sin(v\pi)}
+\mbox{modified\_bessel\_second\_kind}(v,z) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } z \leq 0 \\
+  K_v(z) & \mbox{if } z > 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } z = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{modified\_bessel\_second\_kind}(v,z)}{\partial z} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } z \leq 0 \\
+  \frac{\partial\, K_v(z)}{\partial z} & \mbox{if } z > 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } z = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{modified-bessel-second-kind-appendix} for definition of 
+$K_v(z)$ and $\frac{\partial\,K_v(z)}{\partial z}$.
 }
 %
 \fitem{real}{falling\_factorial}{real \farg{x}, real \farg{n}}{
