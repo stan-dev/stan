@@ -17,6 +17,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the matrix is positive definite.
+     * @return throws if any element in lower triangular of matrix is nan
      * @tparam T Type of scalar.
      */
     template <typename T, int R, int C, typename T_result>
