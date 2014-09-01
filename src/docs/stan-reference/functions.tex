@@ -794,7 +794,31 @@ The base-2 logarithm of \farg{x}}
 The base-10 logarithm of \farg{x}}
 %
 \fitem{real}{pow}{real \farg{x}, real \farg{y}}{
-\farg{x} raised to the power of \farg{y}}
+\farg{x} raised to the power of \farg{y}.
+\[
+\mbox{pow}(x,y) = 
+\begin{cases}
+  x^y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{pow}(x,y)}{\partial x} = 
+\begin{cases}
+  yx^{y-1} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{pow}(x,y)}{\partial y} = 
+\begin{cases}
+  x^y\ln x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{inv}{real \farg{x}}{
 The inverse of \farg{x}}
