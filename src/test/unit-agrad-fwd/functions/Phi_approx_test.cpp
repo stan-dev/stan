@@ -4,6 +4,7 @@
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdPhi_approx,Fvar) {
   using stan::agrad::fvar;
@@ -164,4 +165,17 @@ TEST(AgradFwdPhi_approx, FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(0.1590839, g[0]);
+}
+
+struct Phi_approx_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return stan::math::Phi_approx(arg1);
+  }
+};
+
+TEST(AgradFwdPhi_approx,Phi_approx_NaN) {
+  Phi_approx_fun Phi_approx_;
+  test_nan(Phi_approx_,false);
 }

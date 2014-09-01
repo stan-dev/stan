@@ -1082,3 +1082,19 @@ $\Phi(x)$ is the unit normal cumulative distribution function.
 \[
 \frac{\partial \, \Phi(x)}{\partial x} = \frac{e^{-x^2/2}}{\sqrt{2\pi}}
 \]
+
+\section{Phi\_approx}\label{Phi-approx-appendix.section}
+$\Phi_{\mbox{\footnotesize approx}}(x)$ is the fast approximation of the 
+unit normal cumulative distribution function.
+%
+\[
+\Phi_{\mbox{\footnotesize approx}}(x) = \mbox{logit}^{-1}(0.07056 \,
+x^3 + 1.5976 \, x)
+\]
+%
+\[
+\frac{\partial \, \Phi_{\mbox{\footnotesize approx}}(x)}{\partial x}
+	= -\Phi_{\mbox{\footnotesize approx}}^2(x)
+		e^{-0.07056x^3 - 1.5976x}(-0.21168x^2-1.5976)
+\]
+

@@ -826,15 +826,31 @@ $\frac{\partial\,\Phi(x)}{\partial x}$.
 }{Phi}{phi}
 %
 \fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
-Fast approximation of the cumulative unit normal density
-function of \farg{x}, defined by
-\[
-\Phi_{\mbox{\footnotesize approx}}(x) = \mbox{logit}^{-1}(0.07056 \,
-x^3 + 1.5976 \, x).
-\]
+Fast approximation of the unit normal cumulative distribution function of \farg{x}. 
 This approximation has a maximum absolute error of 0.00014 and may
 be used instead of \code{Phi} for probit regression.  See
 \citep{BowlingEtAl:2009} for details.  
+
+\[
+\mbox{Phi\_approx}(x) = 
+\begin{cases}
+  \Phi_{\mbox{\footnotesize approx}}(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{Phi\_approx}(x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\,\Phi_{\mbox{\footnotesize approx}}(x)}{\partial x} 
+  	& \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{Phi-approx-appendix} for definition of 
+$\Phi_{\mbox{\footnotesize approx}}(x)$ and
+$\frac{\partial\,\Phi_{\mbox{\footnotesize approx}}(x)}{\partial x}$.
 }{Phi\_approx}{phi\_approx}
 
 \fitem{real}{binary\_log\_loss}{int \farg{y}, real \farg{y\_hat}}{
