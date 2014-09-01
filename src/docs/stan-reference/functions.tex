@@ -1066,6 +1066,32 @@ The rising factorial of \farg{x} with power \farg{n} defined for positive \farg{
 %
 \fitem{real}{log\_rising\_factorial}{real \farg{x}, real \farg{n}}{
 The log of the rising factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}.
+\[
+\mbox{log\_rising\_factorial}(x,n) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \ln x^{(n)} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log\_rising\_factorial}(x,n)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \Psi(x+n) - \Psi(x) & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log\_rising\_factorial}(x,n)}{\partial n} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \Psi(x+n) & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
 }
 \end{description}
 
