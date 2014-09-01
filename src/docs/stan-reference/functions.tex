@@ -257,6 +257,14 @@ The absolute value of \farg{x}}
 %
 \fitem{int}{int\_step}{real \farg{x}}
 1 if \farg{x} is strictly greater than 0, and 0 otherwise
+\[
+\mbox{int\_step}(x) = 
+\begin{cases}
+  0 & \mbox{if } x \leq 0 \\
+  1 & \mbox{if } x > 0  \\[6pt]
+  0 & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
 %
 \end{description}
 %
