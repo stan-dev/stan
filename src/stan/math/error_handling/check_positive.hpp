@@ -44,6 +44,8 @@ namespace stan {
         }
       };
     }
+
+    // throws if any element in y is nan
     template <typename T_y, typename T_result>
     inline bool check_positive(const char* function,
                                const T_y& y,

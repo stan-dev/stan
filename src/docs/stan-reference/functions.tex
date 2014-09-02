@@ -713,7 +713,31 @@ The sine of the angle \farg{x} (in radians)}
 The tangent of the angle \farg{x} (in radians)}
 %
 \fitem{real}{acos}{real \farg{x}}{
-The principal arc (inverse) cosine (in radians) of \farg{x}}
+The principal arc (inverse) cosine (in radians) of \farg{x}
+\[
+\mbox{acos}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \arccos(x) & \mbox{if } -1\leq x\leq 1 \\
+    \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{acos}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \frac{\partial\,\arccos(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
+ \textrm{NaN} & \mbox{if } x < -1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{acos-appendix} for definition of
+$\frac{\partial\,\arccos(x)}{\partial x}$.
+
+}
 %
 \fitem{real}{asin}{real \farg{x}}{
 The principal arc (inverse) sine (in radians) of \farg{x}
