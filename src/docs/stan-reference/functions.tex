@@ -757,7 +757,26 @@ The base-2 exponential of \farg{x}.
 }
 %
 \fitem{real}{log}{real \farg{x}}{
-The natural logarithm of \farg{x}}
+The natural logarithm of \farg{x}.
+\[
+\mbox{log}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0\\
+  \ln(x) & \mbox{if } x \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0\\
+  \frac{1}{x} & \mbox{if } x\geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log2}{real \farg{x}}{
 The base-2 logarithm of \farg{x}}
