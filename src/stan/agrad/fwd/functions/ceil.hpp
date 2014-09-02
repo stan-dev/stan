@@ -3,6 +3,7 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <math.h>
 
 namespace stan {
 
@@ -12,7 +13,7 @@ namespace stan {
     inline
     fvar<T>
     ceil(const fvar<T>& x) {
-      using std::ceil;
+      using ::ceil;
         return fvar<T>(ceil(x.val_), 0);
     }
   }
