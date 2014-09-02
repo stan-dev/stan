@@ -17,7 +17,8 @@ namespace stan {
           op_v_vari(::erf(avi->val_),avi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * stan::math::TWO_OVER_SQRT_PI * std::exp(- avi_->val_ * avi_->val_);
+          avi_->adj_ += adj_ * stan::math::TWO_OVER_SQRT_PI 
+            * ::exp(- avi_->val_ * avi_->val_);
         }
       };
     }
