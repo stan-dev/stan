@@ -1,7 +1,7 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__FLOOR_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__FLOOR_HPP
 
-#include <cmath>
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -13,10 +13,10 @@ namespace stan {
       class floor_vari : public op_v_vari {
       public:
         floor_vari(vari* avi) :
-          op_v_vari(std::floor(avi->val_),avi) {
+          op_v_vari(::floor(avi->val_),avi) {
         }
         void chain() {
-          if (boost::math::isnan(avi_->val_))
+          if (unlikely(boost::math::isnan(avi_->val_)))
             avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
         }
       };
