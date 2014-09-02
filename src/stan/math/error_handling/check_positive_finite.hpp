@@ -7,6 +7,7 @@
 namespace stan {
   namespace math {
 
+    // throws if any element in y is nan
     template <typename T_y, typename T_result>
     inline bool check_positive_finite(const char* function,
                                       const T_y& y,
