@@ -26,6 +26,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the matrix is a valid Cholesky factor.
+     * @return throws if any element in y is nan.
      * @tparam T_y Type of elements of Cholesky factor
      * @tparam T_result Type of result.
      */
@@ -66,6 +67,7 @@ namespace stan {
      * @param y Matrix to test.
      * @param result Pointer into which to write result.
      * @return <code>true</code> if the matrix is a valid Cholesky factor.
+     * @return throws if any element in matrix is nan
      * @tparam T_y Type of elements of Cholesky factor
      * @tparam T_result Type of result.
      */
