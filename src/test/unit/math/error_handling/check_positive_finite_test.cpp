@@ -186,3 +186,32 @@ TEST(MathErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message_3) {
     << message;
 }
 
+TEST(MathErrorHandling,CheckPositiveFinite_nan) {
+  const char* function = "check_positive_finite(%1%)";
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  EXPECT_THROW(check_positive_finite(function, nan, "x", &result),
+               std::domain_error);
+
+  std::vector<double> x;
+  x.push_back(1.0);
+  x.push_back(2.0);
+  x.push_back(3.0);
+
+  for (int i = 0; i < x.size(); i++) {
+    x[i] = nan;
+    EXPECT_THROW(check_positive_finite(function, x, "x", &result),
+                 std::domain_error);
+    x[i] = i;
+  }
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> x_mat(3);
+  x_mat   << 1, 2, 3;
+  for (int i = 0; i < x_mat.size(); i++) {
+    x_mat(i) = nan;
+    EXPECT_THROW(check_positive_finite(function, x_mat, "x", &result),
+                 std::domain_error);
+    x_mat(i) = i;
+  }
+}

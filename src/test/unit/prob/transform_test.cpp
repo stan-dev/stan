@@ -1120,18 +1120,16 @@ TEST(probTransform,factorU) {
   using Eigen::Array;
   using stan::prob::factor_U;
   int K = 3;
-  // define U so that U' * U is a correlation matrix (rows length one,
-  // diagonal positive);  this will also mean that U' * D * U is one, too
   Matrix<double,Dynamic,Dynamic> U(K,K);
   U << 
-    0.2, -0.4,  0.8944272,
-    0.0,  0.7, -0.7141428,
+    1.0, -0.25, 0.75,
+    0.0,  1.0,  0.487950036474267,
     0.0,  0.0,  1.0;
-  Eigen::Array<double,Dynamic,1> CPCs(K-1);
-  CPCs << 10, 100;
+  Eigen::Array<double,Dynamic,1> CPCs( (K * (K - 1)) / 2);
+  CPCs << 10, 100, 1000;
   factor_U(U, CPCs);
   // test that function doesn't resize itself
-  EXPECT_EQ(K - 1, CPCs.size());
+  EXPECT_EQ( (K * (K - 1)) / 2, CPCs.size());
   for (int i = 0; i < CPCs.size(); ++i)
     EXPECT_LE(std::tanh(std::fabs(CPCs(i))), 1.0) << CPCs(i);
 }
