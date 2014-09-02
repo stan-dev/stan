@@ -782,7 +782,26 @@ The natural logarithm of \farg{x}.
 The base-2 logarithm of \farg{x}}
 %
 \fitem{real}{log10}{real \farg{x}}{
-The base-10 logarithm of \farg{x}}
+The base-10 logarithm of \farg{x}.
+\[
+\mbox{log10}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0\\
+  \log_{10}(x) & \mbox{if } x \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log10}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0\\
+  \frac{1}{x \ln10} & \mbox{if } x\geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{pow}{real \farg{x}, real \farg{y}}{
 \farg{x} raised to the power of \farg{y}}
