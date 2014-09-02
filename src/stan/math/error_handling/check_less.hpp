@@ -46,6 +46,8 @@ namespace stan {
         }
       };
     }
+
+    // throws if any element of y or high is nan
     template <typename T_y, typename T_high, typename T_result>
     inline bool check_less(const char* function,
                            const T_y& y,
