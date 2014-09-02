@@ -198,7 +198,7 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.x_int_, o_);
-        o_ << ')';
+        o_ << ", pstream__)";
       }
       void operator()(const fun& fx) const { 
         o_ << fx.name_ << '(';
@@ -4543,7 +4543,7 @@ namespace stan {
 
       out << INDENT << "operator()";
       generate_function_arguments(fun,is_rng,is_lp,is_log,out);
-      out << " {"
+      out << " const {"
           << std::endl;
 
       out << INDENT2
@@ -4558,6 +4558,7 @@ namespace stan {
           << std::endl;
 
       out << "};"
+          << std::endl 
           << std::endl;
     }
 
