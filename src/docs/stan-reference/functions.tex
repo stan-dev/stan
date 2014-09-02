@@ -789,7 +789,24 @@ The inverse of \farg{x}.
 }
 %
 \fitem{real}{inv\_sqrt}{real \farg{x}}{
-The inverse of the square root of \farg{x}}
+The inverse of the square root of \farg{x}.
+\[
+\mbox{inv\_sqrt}(x) = 
+\begin{cases}
+  \frac{1}{\sqrt{x}} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{inv\_sqrt}(x)}{\partial x} = 
+\begin{cases}
+  -\frac{1}{2\sqrt{x^3}} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{inv\_square}{real \farg{x}}{
 The inverse of the square of \farg{x}.
