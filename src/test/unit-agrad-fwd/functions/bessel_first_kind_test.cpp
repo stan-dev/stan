@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdBesselFirstKind,Fvar) {
   using stan::agrad::fvar;
@@ -156,3 +157,15 @@ TEST(AgradFwdBesselFirstKind,FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(0.32406084039059405127, g[0]);
 }
 
+struct bessel_first_kind_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return bessel_first_kind(1,arg1);
+  }
+};
+
+TEST(AgradFwdBesselFirstKind,bessel_first_kind_NaN) {
+  bessel_first_kind_fun bessel_first_kind_;
+  test_nan(bessel_first_kind_,true);
+}
