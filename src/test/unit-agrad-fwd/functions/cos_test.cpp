@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdCos,Fvar) {
   using stan::agrad::fvar;
@@ -182,3 +183,15 @@ TEST(AgradFwdCos,FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(0.99749498660405443094172337114149, g[0]);
 }
 
+struct cos_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return cos(arg1);
+  }
+};
+
+TEST(AgradFwdCos,cos_NaN) {
+  cos_fun cos_;
+  test_nan(cos_,false);
+}
