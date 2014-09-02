@@ -11,6 +11,8 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified index is valid in std vector
      *
+     * NOTE: this will not throw if y contains nan values.
+     *
      * @param function
      * @param i is index
      * @param y std vector to test against
