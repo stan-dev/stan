@@ -700,10 +700,44 @@ The cube root of \farg{x}
 The square of \farg{x}}
 %
 \fitem{real}{exp}{real \farg{x}}{
-The natural exponential of \farg{x}}
+The natural exponential of \farg{x}.
+\[
+\mbox{exp}(x) = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{exp}(x)}{\partial x} = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{exp2}{real \farg{x}}{
-The base-2 exponential of \farg{x}}
+The base-2 exponential of \farg{x}.
+\[
+\mbox{exp2}(x) = 
+\begin{cases}
+  2^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{exp2}(x)}{\partial x} = 
+\begin{cases}
+  2^x\ln2 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log}{real \farg{x}}{
 The natural logarithm of \farg{x}}
@@ -883,7 +917,26 @@ $
 \begin{description}
 %
 \fitem{real}{erf}{real \farg{x}}{
-The error function of \farg{x}}
+The error function of \farg{x}.
+\[
+\mbox{erf}(x) = 
+\begin{cases}
+  \erf(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{erf}(x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, \erf(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{erf-appendix} for definition of 
+$\erf(x)$ and $\frac{\partial\,\erf(x)}{\partial x}$.
+}
 %
 \fitem{real}{erfc}{real \farg{x}}{
 The complementary error function of \farg{x}.
@@ -1064,20 +1117,52 @@ $\Gamma$ function, defining
 \]
 }
 %
-\fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{x}}{
+The Bessel function of the first kind with order \farg{v} applied to \farg{x}.
+
 \[
-{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
-\frac{\left(-\frac{1}{4}z^2\right)^k}{k!\, \Gamma(v+k+1)}
+\mbox{bessel\_first\_kind}(v,x) = 
+\begin{cases}
+  J_v(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{error} & \mbox{if } x = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{bessel\_first\_kind}(v,x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, J_v(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{error} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{bessel-first-kind-appendix} for definition of 
+$J_v(x)$ and $\frac{\partial\,J_v(x)}{\partial x}$.
 }
 %
-\fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
-The Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
+\fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{x}}{
+The Bessel function of the second kind with order \farg{v} applied to \farg{x} defined for  positive \farg{x} and \farg{v}.
+
 \[
-{Y_v}(z)
-=
-\frac{J_v(z)\cos(v\pi) - J_{-v}(z)}{\sin(v\pi)}
+\mbox{bessel\_second\_kind}(v,x) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0 \\
+  Y_v(x) & \mbox{if } x > 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{bessel\_second\_kind}(v,x)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0 \\
+  \frac{\partial\, Y_v(x)}{\partial x} & \mbox{if } x > 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{bessel-second-kind-appendix} for definition of 
+$Y_v(x)$ and $\frac{\partial\,Y_v(x)}{\partial x}$.
 }
 %
 \fitem{real}{modified\_bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
@@ -1133,7 +1218,24 @@ using more basic \Stan functions.
 \begin{description}
 %
 \fitem{real}{expm1}{real \farg{x}}{
-The natural exponential of \farg{x} minus 1}
+The natural exponential of \farg{x} minus 1.
+\[
+\mbox{expm1}(x) = 
+\begin{cases}
+  e^x-1 & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{expm1}(x)}{\partial x} = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{fma}{real \farg{x}, 
                real \farg{y},
