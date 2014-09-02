@@ -1101,11 +1101,36 @@ The natural logarithm of the multinomial gamma function with \farg{n}
 dimensions applied to \farg{x}.}
 %
 \fitem{real}{gamma\_p}{real \farg{a}, real \farg{z}}{
-The normalised lower incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
+The normalised lower incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z}.
 \[
-P(a,z) =
-\frac{1}{\Gamma(a)}\int_0^z t^{a-1}e^{-t}dt
+\mbox{gamma\_p}(a,z) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  P(a,z) & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{gamma\_p}(a,z)}{\partial a} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  \frac{\partial\, P(a,z)}{\partial a} & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{gamma\_p}(a,z)}{\partial z} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  \frac{\partial\, P(a,z)}{\partial z} & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{gamma-p-appendix} for definition of 
+$P(a,z)$, $\frac{\partial\,P(a,z)}{\partial a}$, and $\frac{\partial\,P(a,z)}{\partial z}$.
 }
 %
 \fitem{real}{gamma\_q}{real \farg{a}, real \farg{z}}{
