@@ -638,7 +638,24 @@ see warning at start of \refsection{step-functions}}
 \fitem{real}{ceil}{real \farg{x}}{
 The ceiling of \farg{x}, which is the smallest integer greater
 than or equal to \farg{x}, converted to a real value;
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[
+\mbox{ceil}(x) = 
+\begin{cases}
+  \lceil x\rceil & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{ceil}(x)}{\partial x} = 
+\begin{cases}
+  0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{round}{real \farg{x}}{
 The nearest integer to \farg{x}, converted to a real value;
@@ -660,16 +677,67 @@ see warning at start of \refsection{step-functions}}
 The square root of \farg{x}}
 %
 \fitem{real}{cbrt}{real \farg{x}}{
-The cube root of \farg{x}}
+The cube root of \farg{x}
+\[
+\mbox{cbrt}(x) = 
+\begin{cases}
+  \sqrt[3]{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{cbrt}(x)}{\partial x} = 
+\begin{cases}
+  \frac{1}{3x^{2/3}} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{square}{real \farg{x}}{
 The square of \farg{x}}
 %
 \fitem{real}{exp}{real \farg{x}}{
-The natural exponential of \farg{x}}
+The natural exponential of \farg{x}.
+\[
+\mbox{exp}(x) = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{exp}(x)}{\partial x} = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{exp2}{real \farg{x}}{
-The base-2 exponential of \farg{x}}
+The base-2 exponential of \farg{x}.
+\[
+\mbox{exp2}(x) = 
+\begin{cases}
+  2^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{exp2}(x)}{\partial x} = 
+\begin{cases}
+  2^x\ln2 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log}{real \farg{x}}{
 The natural logarithm of \farg{x}}
@@ -704,7 +772,24 @@ The length of the hypotenuse of a right triangle with sides of
 length \farg{x} and \farg{y}}
 %
 \fitem{real}{cos}{real \farg{x}}{
-The cosine of the angle \farg{x} (in radians)}
+The cosine of the angle \farg{x} (in radians)
+\[
+\mbox{cos}(x) = 
+\begin{cases}
+  \cos(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{cos}(x)}{\partial x} = 
+\begin{cases}
+  -\sin(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{sin}{real \farg{x}}{
 The sine of the angle \farg{x} (in radians)}
@@ -757,7 +842,23 @@ by \farg{y}}
 \begin{description}
 %
 \fitem{real}{cosh}{real \farg{x}}{
-The hyperbolic cosine of \farg{x} (in radians)}
+The hyperbolic cosine of \farg{x} (in radians)
+\[
+\mbox{cosh}(x) = 
+\begin{cases}
+  \cosh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{cosh}(x)}{\partial x} = 
+\begin{cases}
+  \sinh(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{sinh}{real \farg{x}}{
 The hyperbolic sine of \farg{x} (in radians)}
@@ -978,11 +1079,27 @@ $\Gamma$ function, defining
 \]
 }
 %
-\fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{x}}{
+The Bessel function of the first kind with order \farg{v} applied to \farg{x}.
+
 \[
-{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
-\frac{\left(-\frac{1}{4}z^2\right)^k}{k!\, \Gamma(v+k+1)}
+\mbox{bessel\_first\_kind}(v,x) = 
+\begin{cases}
+  J_v(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{error} & \mbox{if } x = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{bessel\_first\_kind}(v,x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, J_v(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{error} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{bessel-first-kind-appendix} for definition of 
+$J_v(x)$ and $\frac{\partial\,J_v(x)}{\partial x}$.
 }
 %
 \fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{x}}{
@@ -1063,7 +1180,24 @@ using more basic \Stan functions.
 \begin{description}
 %
 \fitem{real}{expm1}{real \farg{x}}{
-The natural exponential of \farg{x} minus 1}
+The natural exponential of \farg{x} minus 1.
+\[
+\mbox{expm1}(x) = 
+\begin{cases}
+  e^x-1 & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{expm1}(x)}{\partial x} = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{fma}{real \farg{x}, 
                real \farg{y},
