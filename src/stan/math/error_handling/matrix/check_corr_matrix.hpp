@@ -26,6 +26,7 @@ namespace stan {
      * 
      * @return <code>true</code> if the specified matrix is a valid
      * correlation matrix.
+     * @return throw if any element in matrix is nan
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings
@@ -42,7 +43,7 @@ namespace stan {
       stan::math::check_symmetric(function, y, "y", result);
       for (typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type
              k = 0; k < y.rows(); ++k) {
-        if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE) {
+        if (!(fabs(y(k,k) - 1.0) <= CONSTRAINT_TOLERANCE)) {
           std::ostringstream message;
           message << " is not a valid correlation matrix. " 
                   << name << "(" << stan::error_index::value + k 
