@@ -3,6 +3,7 @@
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <stan/math/functions/bessel_second_kind.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdBesselSecondKind,Fvar) {
   using stan::agrad::fvar;
@@ -158,4 +159,17 @@ TEST(AgradFwdBesselSecondKind,FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(-0.1069335956566158198, g[0]);
+}
+
+struct bessel_second_kind_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return bessel_second_kind(1,arg1);
+  }
+};
+
+TEST(AgradFwdBesselSecondKind,bessel_second_kind_NaN) {
+  bessel_second_kind_fun bessel_second_kind_;
+  test_nan(bessel_second_kind_,false);
 }
