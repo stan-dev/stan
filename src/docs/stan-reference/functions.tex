@@ -939,7 +939,26 @@ $\erf(x)$ and $\frac{\partial\,\erf(x)}{\partial x}$.
 }
 %
 \fitem{real}{erfc}{real \farg{x}}{
-The complementary error function of \farg{x}}
+The complementary error function of \farg{x}.
+\[
+\mbox{erfc}(x) = 
+\begin{cases}
+  \erfc(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{erfc}(x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, \erfc(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{erfc-appendix} for definition of 
+$\erfc(x)$ and $\frac{\partial\,\erfc(x)}{\partial x}$.
+}
 %
 \fitemindexsort{real}{Phi}{real \farg{x}}{
 The unit normal cumulative distribution function of \farg{x}.
