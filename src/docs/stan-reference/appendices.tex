@@ -1124,6 +1124,22 @@ $\erfc(x)$ is the complementary error function (also known as the Gauss compleme
 \frac{\partial \, \erfc(x)}{\partial x} = -\frac{2}{\sqrt{\pi}} e^{-x^2}
 \]
 
+\section{gamma\_q}\label{gamma-q-appendix.section}
+$Q(a,z)$ is the normalised upper incomplete gamma function of $a$ and $z$.
+%
+\[
+Q(a,z)=\frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt
+\]
+%
+\[
+\frac{\partial \, Q(a,z)}{\partial a} = -\frac{\Psi(a)}{\Gamma^2(a)}\int_z^\infty t^{a-1}e^{-t}dt 
+	+ \frac{1}{\Gamma(a)}\int_z^\infty (a-1)t^{a-2}e^{-t}dt
+\]
+%
+\[
+\frac{\partial \, Q(a,z)}{\partial z} = -\frac{z^{a-1}e^{-z}}{\Gamma(a)}
+\]
+
 \section{Phi}\label{Phi-appendix.section}
 $\Phi(x)$ is the unit normal cumulative distribution function.
 %

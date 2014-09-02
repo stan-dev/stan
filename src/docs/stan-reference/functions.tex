@@ -1109,11 +1109,35 @@ P(a,z) =
 }
 %
 \fitem{real}{gamma\_q}{real \farg{a}, real \farg{z}}{
-The normalised upper incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
-\[
-Q(a,z) =
-\frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt
+The normalised upper incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z}.\[
+\mbox{gamma\_q}(a,z) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  Q(a,z) & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{gamma\_q}(a,z)}{\partial a} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  \frac{\partial\, Q(a,z)}{\partial a} & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{gamma\_q}(a,z)}{\partial z} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  \frac{\partial\, Q(a,z)}{\partial z} & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{gamma-q-appendix} for definition of 
+$Q(a,z)$, $\frac{\partial\,Q(a,z)}{\partial a}$, and $\frac{\partial\,Q(a,z)}{\partial z}$.
 }
 %
 \fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real
