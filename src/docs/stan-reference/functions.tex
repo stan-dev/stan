@@ -758,7 +758,25 @@ This is a no-op.
 %
 \fitem{real}{fabs}{real \farg{x}}{
 The absolute value of \farg{x};  
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[		
+\mbox{fabs}(x) = 
+\begin{cases}
+  |x| & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fabs}(x)}{\partial x} = 
+\begin{cases}
+  -1 & \mbox{if } x < 0 \\
+    0 & \mbox{if } x = 0 \\
+    1 & \mbox{if } x > 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{fdim}{real \farg{x}, 
                  real \farg{y}}{
