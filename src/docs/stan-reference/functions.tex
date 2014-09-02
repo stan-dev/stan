@@ -808,7 +808,23 @@ by \farg{y}}
 \begin{description}
 %
 \fitem{real}{cosh}{real \farg{x}}{
-The hyperbolic cosine of \farg{x} (in radians)}
+The hyperbolic cosine of \farg{x} (in radians)
+\[
+\mbox{cosh}(x) = 
+\begin{cases}
+  \cosh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{cosh}(x)}{\partial x} = 
+\begin{cases}
+  \sinh(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{sinh}{real \farg{x}}{
 The hyperbolic sine of \farg{x} (in radians)}
