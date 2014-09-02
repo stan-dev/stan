@@ -1095,6 +1095,26 @@ $K_v(z)$ is the bessel function of the second kind of order $v$ for positive $z$
 \frac{\partial \, K_v(z)}{\partial z} = -\frac{v}{z}K_v(z)-K_{v-1}(z)
 \]
 
+\section{owens\_t}\label{owens-t-appendix.section}
+$\mbox{owens\_t}(h,a)$ is the Owen's T
+  function for the probability of the event $X > h$ and $0<Y<aX$
+  where \farg{X} and \farg{Y} are independent standard normal random
+  variables.
+%
+\[
+\mbox{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx
+\]
+%
+\[
+\frac{\partial \, \mbox{owens\_t}(h,a)}{\partial h} = -\frac{1}{2\sqrt{2\pi}}
+	\erf\left(\frac{ha}{\sqrt{2}}\right)
+	\exp\left(-\frac{h^2}{2}\right)
+\]
+%
+\[
+\frac{\partial \, \mbox{owens\_t}(h,a)}{\partial a} = \frac{\exp\left(-\frac{1}{2}h^2(1+a^2)\right)}{2\pi (1+a^2)}
+\]
+
 \section{Phi}\label{Phi-appendix.section}
 $\Phi(x)$ is the unit normal cumulative distribution function.
 %

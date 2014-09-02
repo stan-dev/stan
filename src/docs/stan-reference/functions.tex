@@ -1149,12 +1149,36 @@ boolean outcome $y \in \setlist{0,1}$.
 %
 
 \fitem{real}{owens\_t}{real \farg{h}, real \farg{a}}{The Owen's T
-  function for the probability of the event $X > a$ and $0<Y<aX$
+  function for the probability of the event $X > h$ and $0<Y<aX$
   where \farg{X} and \farg{Y} are independent standard normal random
-  variables, defined by
+  variables.
 \[
-\mbox{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx
+\mbox{owens\_t}(h,a) = 
+\begin{cases}
+  \mbox{owens\_t}(h,a) & \mbox{if } -\infty\leq h,a \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } h = \textrm{NaN or } a = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{owens\_t}(h,a)}{\partial h} = 
+\begin{cases}
+  \frac{\partial\, \mbox{owens\_t}(h,a)}{\partial h} & \mbox{if } -\infty\leq h,a\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } h = \textrm{NaN or } a = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{owens\_t}(h,a)}{\partial a} = 
+\begin{cases}
+  \frac{\partial\, \mbox{owens\_t}(h,a)}{\partial a} & \mbox{if } -\infty\leq h,a\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } h = \textrm{NaN or } a = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{owens-t-appendix} for definition of 
+$\mbox{owens\_t}(h,a)$, $\frac{\partial\,\mbox{owens\_t}(h,a)}{\partial h}$,
+ and $\frac{\partial\,\mbox{owens\_t}(h,a)}{\partial a}$.
 }
 \end{description}
 
