@@ -4,11 +4,11 @@
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
-#include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/operators/operator_equal.hpp>
 #include <stan/agrad/rev/operators/operator_unary_negative.hpp>
+#include <math.h>
 
 namespace stan {
   namespace agrad {
@@ -38,9 +38,9 @@ namespace stan {
      * @return Inverse hyperbolic sine of the variable.
      */
     inline var asinh(const stan::agrad::var& a) {
-      if (boost::math::isinf(a))
+      if (boost::math::isinf(a.val()))
         return var(new asinh_vari(a.val(), a.vi_));
-      return var(new asinh_vari(boost::math::asinh(a.val()),a.vi_));
+      return var(new asinh_vari(::asinh(a.val()),a.vi_));
     }
 
   }
