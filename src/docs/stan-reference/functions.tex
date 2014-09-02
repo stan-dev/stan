@@ -441,18 +441,36 @@ There are corresponding real-argument versions.
 \begin{description}
 \fitemindex{int}{operator!}{real \farg{x}}{1 if \farg{x} is zero and 0 otherwise.
 \[
-\mbox{operator!}(x,y) = 
+\mbox{operator!}(x) = 
 \begin{cases}
   0 & \mbox{if } x \neq 0 \\
   1 & \mbox{if } x = 0 \\[6pt]
-  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+  0 & \mbox{if } x = \textrm{NaN} 
 \end{cases}
 \]
 }{operator"!}
 \fitem{int}{operator{\&\&}}{real \farg{x}, real \farg{y}}{1 if \farg{x}
-  is unequal to 0 and \farg{y} is unequal to 0}
+  is unequal to 0 and \farg{y} is unequal to 0.
+\[
+\mbox{operator\&\&}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x = 0 \textrm{ or } y=0 \\
+  1 & \mbox{if } x,y \neq 0 \\[6pt]
+  1 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+}
 \fitemindex{int}{operator||}{real \farg{x}, real \farg{y}}{1 if \farg{x}
-  is unequal to 0 or \farg{y} is unequal to 0}{operator"|"|}
+  is unequal to 0 or \farg{y} is unequal to 0.
+\[
+\mbox{operator||}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x,y=0 \\
+  1 & \mbox{if } x \neq 0 \textrm{ or } y\neq0\\[6pt]
+  1 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+}{operator"|"|}
 \end{description}
 
 
