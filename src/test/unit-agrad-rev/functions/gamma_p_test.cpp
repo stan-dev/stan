@@ -2,6 +2,8 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,gamma_p_var_var) {
   AVAR a = 0.5;
@@ -54,4 +56,19 @@ TEST(AgradRev,gamma_p_var_double) {
 
   b = -1.0;
   EXPECT_THROW(gamma_p(a,b), std::domain_error);
+}
+
+struct gamma_p_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return gamma_p(arg1,arg2);
+  }
+};
+
+TEST(AgradRev, gamma_p_nan) {
+  gamma_p_fun gamma_p_;
+  test_nan(gamma_p_,0.5,1.0,false,true);
 }
