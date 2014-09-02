@@ -651,12 +651,46 @@ of these in the future, but as of now, there is no good workaround.
 \fitem{real}{floor}{real \farg{x}}{
 The floor of \farg{x}, which is the largest integer less
 than or equal to \farg{x}, converted to a real value;
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[
+\mbox{floor}(x) = 
+\begin{cases}
+  \lfloor x \rfloor & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{floor}(x)}{\partial x} = 
+\begin{cases}
+  0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{ceil}{real \farg{x}}{
 The ceiling of \farg{x}, which is the smallest integer greater
 than or equal to \farg{x}, converted to a real value;
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[
+\mbox{ceil}(x) = 
+\begin{cases}
+  \lceil x\rceil & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{ceil}(x)}{\partial x} = 
+\begin{cases}
+  0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{round}{real \farg{x}}{
 The nearest integer to \farg{x}, converted to a real value;
@@ -678,16 +712,67 @@ see warning at start of \refsection{step-functions}}
 The square root of \farg{x}}
 %
 \fitem{real}{cbrt}{real \farg{x}}{
-The cube root of \farg{x}}
+The cube root of \farg{x}
+\[
+\mbox{cbrt}(x) = 
+\begin{cases}
+  \sqrt[3]{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{cbrt}(x)}{\partial x} = 
+\begin{cases}
+  \frac{1}{3x^{2/3}} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{square}{real \farg{x}}{
 The square of \farg{x}}
 %
 \fitem{real}{exp}{real \farg{x}}{
-The natural exponential of \farg{x}}
+The natural exponential of \farg{x}.
+\[
+\mbox{exp}(x) = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{exp}(x)}{\partial x} = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{exp2}{real \farg{x}}{
-The base-2 exponential of \farg{x}}
+The base-2 exponential of \farg{x}.
+\[
+\mbox{exp2}(x) = 
+\begin{cases}
+  2^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{exp2}(x)}{\partial x} = 
+\begin{cases}
+  2^x\ln2 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log}{real \farg{x}}{
 The natural logarithm of \farg{x}}
@@ -702,7 +787,24 @@ The base-10 logarithm of \farg{x}}
 \farg{x} raised to the power of \farg{y}}
 %
 \fitem{real}{inv}{real \farg{x}}{
-The inverse of \farg{x}}
+The inverse of \farg{x}.
+\[
+\mbox{inv}(x) = 
+\begin{cases}
+  \frac{1}{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{inv}(x)}{\partial x} = 
+\begin{cases}
+  -\frac{1}{x^2} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{inv\_sqrt}{real \farg{x}}{
 The inverse of the square root of \farg{x}}
@@ -722,7 +824,24 @@ The length of the hypotenuse of a right triangle with sides of
 length \farg{x} and \farg{y}}
 %
 \fitem{real}{cos}{real \farg{x}}{
-The cosine of the angle \farg{x} (in radians)}
+The cosine of the angle \farg{x} (in radians)
+\[
+\mbox{cos}(x) = 
+\begin{cases}
+  \cos(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{cos}(x)}{\partial x} = 
+\begin{cases}
+  -\sin(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{sin}{real \farg{x}}{
 The sine of the angle \farg{x} (in radians)}
@@ -731,13 +850,78 @@ The sine of the angle \farg{x} (in radians)}
 The tangent of the angle \farg{x} (in radians)}
 %
 \fitem{real}{acos}{real \farg{x}}{
-The principal arc (inverse) cosine (in radians) of \farg{x}}
+The principal arc (inverse) cosine (in radians) of \farg{x}
+\[
+\mbox{acos}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \arccos(x) & \mbox{if } -1\leq x\leq 1 \\
+    \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{acos}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \frac{\partial\,\arccos(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
+ \textrm{NaN} & \mbox{if } x < -1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{acos-appendix} for definition of
+$\frac{\partial\,\arccos(x)}{\partial x}$.
+
+}
 %
 \fitem{real}{asin}{real \farg{x}}{
-The principal arc (inverse) sine (in radians) of \farg{x}}
+The principal arc (inverse) sine (in radians) of \farg{x}
+\[
+\mbox{asin}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \arcsin(x) & \mbox{if } -1\leq x\leq 1 \\
+  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{asin}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \frac{\partial\,\arcsin(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
+ \textrm{NaN} & \mbox{if } x < -1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{asin-appendix} for definition of
+$\frac{\partial\,\arcsin(x)}{\partial x}$.
+}
 %
 \fitem{real}{atan}{real \farg{x}}{
-The principal arc (inverse) tangent (in radians) of \farg{x}}
+The principal arc (inverse) tangent (in radians) of \farg{x}
+\[
+\mbox{atan}(x) = 
+\begin{cases}
+  \arctan(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{atan}(x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, \arctan(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{atan-appendix} for definition of $\frac{\partial\,\arctan(x)}{\partial x}$.
+}
 %
 \fitem{real}{atan2}{real \farg{x}, real \farg{y}}{
 The principal arc (inverse) tangent (in radians) of \farg{x} divided
@@ -751,7 +935,23 @@ by \farg{y}}
 \begin{description}
 %
 \fitem{real}{cosh}{real \farg{x}}{
-The hyperbolic cosine of \farg{x} (in radians)}
+The hyperbolic cosine of \farg{x} (in radians)
+\[
+\mbox{cosh}(x) = 
+\begin{cases}
+  \cosh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{cosh}(x)}{\partial x} = 
+\begin{cases}
+  \sinh(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{sinh}{real \farg{x}}{
 The hyperbolic sine of \farg{x} (in radians)}
@@ -760,13 +960,78 @@ The hyperbolic sine of \farg{x} (in radians)}
 The hyperbolic tangent of \farg{x} (in radians)}
 %
 \fitem{real}{acosh}{real \farg{x}}{
-The inverse hyperbolic cosine (in radians) of \farg{x}}
+The inverse hyperbolic cosine (in radians) of \farg{x}
+%
+\[
+\mbox{acosh}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 1 \\
+  \cosh^{-1}(x) & \mbox{if } x \geq 1 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{acosh}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 1 \\
+  \frac{\partial\, \cosh^{-1}(x)}{\partial x} & \mbox{if } x \geq 1 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{acosh-appendix} for definition of 
+$\cosh^{-1}(x)$ and $\frac{\partial\,\cosh^{-1}(x)}{\partial x}$.
+}
 %
 \fitem{real}{asinh}{real \farg{x}}{
-The inverse hyperbolic sine (in radians) of \farg{x}}
+The inverse hyperbolic cosine (in radians) of \farg{x}
+%
+\[
+\mbox{asinh}(x) = 
+\begin{cases}
+  \sinh^{-1}(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{asinh}(x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, \sinh^{-1}(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{asinh-appendix} for definition of 
+$\sinh^{-1}(x)$ and $\frac{\partial\,\sinh^{-1}(x)}{\partial x}$.
+}
 %
 \fitem{real}{atanh}{real \farg{x}}{
-The inverse hyperbolic tangent (in radians) of \farg{x}}
+The inverse hyperbolic tangent (in radians) of \farg{x}
+\[
+\mbox{atanh}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \tanh^{-1}(x) & \mbox{if } -1\leq x \leq 1 \\
+  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{atanh}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \frac{\partial\, \tanh^{-1}(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
+  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{atanh-appendix} for definition of 
+$\tanh^{-1}(x)$ and $\frac{\partial\,\tanh^{-1}(x)}{\partial x}$.
+}
 %
 \end{description}
 
@@ -810,10 +1075,48 @@ $
 \begin{description}
 %
 \fitem{real}{erf}{real \farg{x}}{
-The error function of \farg{x}}
+The error function of \farg{x}.
+\[
+\mbox{erf}(x) = 
+\begin{cases}
+  \erf(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{erf}(x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, \erf(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{erf-appendix} for definition of 
+$\erf(x)$ and $\frac{\partial\,\erf(x)}{\partial x}$.
+}
 %
 \fitem{real}{erfc}{real \farg{x}}{
-The complementary error function of \farg{x}}
+The complementary error function of \farg{x}.
+\[
+\mbox{erfc}(x) = 
+\begin{cases}
+  \erfc(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{erfc}(x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, \erfc(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{erfc-appendix} for definition of 
+$\erfc(x)$ and $\frac{\partial\,\erfc(x)}{\partial x}$.
+}
 %
 \fitemindexsort{real}{Phi}{real \farg{x}}{
 The unit normal cumulative distribution function of \farg{x}.
@@ -939,19 +1242,68 @@ The natural logarithm of the multinomial gamma function with \farg{n}
 dimensions applied to \farg{x}.}
 %
 \fitem{real}{gamma\_p}{real \farg{a}, real \farg{z}}{
-The normalised lower incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
+The normalised lower incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z}.
 \[
-P(a,z) =
-\frac{1}{\Gamma(a)}\int_0^z t^{a-1}e^{-t}dt
+\mbox{gamma\_p}(a,z) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  P(a,z) & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{gamma\_p}(a,z)}{\partial a} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  \frac{\partial\, P(a,z)}{\partial a} & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{gamma\_p}(a,z)}{\partial z} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  \frac{\partial\, P(a,z)}{\partial z} & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{gamma-p-appendix} for definition of 
+$P(a,z)$, $\frac{\partial\,P(a,z)}{\partial a}$, and $\frac{\partial\,P(a,z)}{\partial z}$.
 }
 %
 \fitem{real}{gamma\_q}{real \farg{a}, real \farg{z}}{
-The normalised upper incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
-\[
-Q(a,z) =
-\frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt
+The normalised upper incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z}.\[
+\mbox{gamma\_q}(a,z) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  Q(a,z) & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{gamma\_q}(a,z)}{\partial a} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  \frac{\partial\, Q(a,z)}{\partial a} & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{gamma\_q}(a,z)}{\partial z} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\
+  \frac{\partial\, Q(a,z)}{\partial z} & \mbox{if } a > 0, z \geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{gamma-q-appendix} for definition of 
+$Q(a,z)$, $\frac{\partial\,Q(a,z)}{\partial a}$, and $\frac{\partial\,Q(a,z)}{\partial z}$.
 }
 %
 \fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real
@@ -972,20 +1324,52 @@ $\Gamma$ function, defining
 \]
 }
 %
-\fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{x}}{
+The Bessel function of the first kind with order \farg{v} applied to \farg{x}.
+
 \[
-{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
-\frac{\left(-\frac{1}{4}z^2\right)^k}{k!\, \Gamma(v+k+1)}
+\mbox{bessel\_first\_kind}(v,x) = 
+\begin{cases}
+  J_v(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{error} & \mbox{if } x = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{bessel\_first\_kind}(v,x)}{\partial x} = 
+\begin{cases}
+  \frac{\partial\, J_v(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{error} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{bessel-first-kind-appendix} for definition of 
+$J_v(x)$ and $\frac{\partial\,J_v(x)}{\partial x}$.
 }
 %
-\fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
-The Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
+\fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{x}}{
+The Bessel function of the second kind with order \farg{v} applied to \farg{x} defined for  positive \farg{x} and \farg{v}.
+
 \[
-{Y_v}(z)
-=
-\frac{J_v(z)\cos(v\pi) - J_{-v}(z)}{\sin(v\pi)}
+\mbox{bessel\_second\_kind}(v,x) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0 \\
+  Y_v(x) & \mbox{if } x > 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{bessel\_second\_kind}(v,x)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0 \\
+  \frac{\partial\, Y_v(x)}{\partial x} & \mbox{if } x > 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{bessel-second-kind-appendix} for definition of 
+$Y_v(x)$ and $\frac{\partial\,Y_v(x)}{\partial x}$.
 }
 %
 \fitem{real}{modified\_bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
@@ -1004,12 +1388,7 @@ The modified Bessel function of the second kind with order \farg{v} applied to \
 }
 %
 \fitem{real}{falling\_factorial}{real \farg{x}, real \farg{n}}{
-The falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n} by
-\[
-\mbox{falling\_factorial}(x,n)
-=
-\frac{x!}{n!}
-\]
+The falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}. 
 }
 %
 \fitem{real}{log\_falling\_factorial}{real \farg{x}, real \farg{n}}{
@@ -1017,12 +1396,36 @@ The log of the falling factorial of \farg{x} with power \farg{n} defined for pos
 }
 %
 \fitem{real}{rising\_factorial}{real \farg{x}, real \farg{n}}{
-The rising factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n} by
+The rising factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}
 \[
-\mbox{rising\_factorial}(x,n)
-=
-\frac{(x+n-1)!}{(x-1)!}
+\mbox{rising\_factorial}(x,n) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  x^{(n)} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{rising\_factorial}(x,n)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \frac{\partial\, x^{(n)}}{\partial x} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{rising\_factorial}(x,n)}{\partial n} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \frac{\partial\, x^{(n)}}{\partial n} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{rising-factorial-appendix} for definition of 
+$x^{(n)}$, $\frac{\partial\,x^{(n)}}{\partial x}$, and $\frac{\partial\,x^{(n)}}{\partial n}$.
 }
 %
 \fitem{real}{log\_rising\_factorial}{real \farg{x}, real \farg{n}}{
@@ -1041,12 +1444,62 @@ using more basic \Stan functions.
 \begin{description}
 %
 \fitem{real}{expm1}{real \farg{x}}{
-The natural exponential of \farg{x} minus 1}
+The natural exponential of \farg{x} minus 1.
+\[
+\mbox{expm1}(x) = 
+\begin{cases}
+  e^x-1 & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{expm1}(x)}{\partial x} = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{fma}{real \farg{x}, 
                real \farg{y},
                real \farg{z}}{
-\farg{z} plus the result of \farg{x} multiplied by \farg{y}}
+\farg{z} plus the result of \farg{x} multiplied by \farg{y}.
+\[
+\mbox{fma}(x,y,z) = 
+\begin{cases}
+  x\cdot y+z & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fma}(x,y,z)}{\partial x} = 
+\begin{cases}
+  y & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fma}(x,y,z)}{\partial y} = 
+\begin{cases}
+  x & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fma}(x,y,z)}{\partial z} = 
+\begin{cases}
+  1 & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
 The product of \farg{x} and the natural logarithm of \farg{y}\,;  if
