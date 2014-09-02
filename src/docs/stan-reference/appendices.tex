@@ -1086,6 +1086,93 @@ $\arccos(x)$ is the principal arc (inverse) cosine (in radians) function.
 \frac{\partial \, \arccos(x)}{\partial x} = -\frac{1}{\sqrt{1-x^2}}
 \]
 
+\section{acosh}\label{acosh-appendix.section}
+$\cosh^{-1}(x)$ is the inverse hyperbolic cosine (in radians) function.
+%
+\[
+\cosh^{-1}(x)=\ln\left(x+\sqrt{x^2-1}\right)
+\]
+%
+\[
+\frac{\partial \, \cosh^{-1}(x)}{\partial x} = \frac{1}{\sqrt{x^2-1}}
+\]
+
+\section{bessel\_first\_kind}\label{bessel-first-kind-appendix.section}
+$J_v(x)$ is the bessel function of the first kind of order $v$.
+%
+\[
+J_v(x)=\left(\frac{1}{2}x\right)^v
+	\sum_{k=0}^\infty \frac{\left(-\frac{1}{4}x^2\right)^k}{k!\, \Gamma(v+k+1)}
+\]
+%
+\[
+\frac{\partial \, J_v(x)}{\partial x} = \frac{v}{x}J_v(x)-J_{v+1}(x)
+\]
+
+\section{bessel\_second\_kind}\label{bessel-second-kind-appendix.section}
+$Y_v(x)$ is the bessel function of the second kind of order $v$ for positive $x$.
+%
+\[
+Y_v(x)=\frac{J_v(x)\cos(v\pi)-J_{-v}(x)}{\sin(v\pi)}
+\]
+%
+\[
+\frac{\partial \, Y_v(x)}{\partial x} = \frac{v}{x}Y_v(x)-Y_{v+1}(x)
+\]
+
+\section{erf}\label{erf-appendix.section}
+$\erf(x)$ is the error function (also known as the Gauss error function).
+%
+\[
+\erf(x)=\frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt
+\]
+%
+\[
+\frac{\partial \, \erf(x)}{\partial x} = \frac{2}{\sqrt{\pi}} e^{-x^2}
+\]
+
+\section{erfc}\label{erfc-appendix.section}
+$\erfc(x)$ is the complementary error function (also known as the Gauss complementary error function).
+%
+\[
+\erfc(x)=\frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
+\]
+%
+\[
+\frac{\partial \, \erfc(x)}{\partial x} = -\frac{2}{\sqrt{\pi}} e^{-x^2}
+\]
+
+\section{gamma\_p}\label{gamma-p-appendix.section}
+$P(a,z)$ is the normalised lower incomplete gamma function of $a$ and $z$.
+%
+\[
+P(a,z)=\frac{1}{\Gamma(a)}\int_0^zt^{a-1}e^{-t}dt
+\]
+%
+\[
+\frac{\partial \, P(a,z)}{\partial a} = -\frac{\Psi(a)}{\Gamma^2(a)}\int_0^zt^{a-1}e^{-t}dt 
+	+ \frac{1}{\Gamma(a)}\int_0^z (a-1)t^{a-2}e^{-t}dt
+\]
+%
+\[
+\frac{\partial \, P(a,z)}{\partial z} = \frac{z^{a-1}e^{-z}}{\Gamma(a)}
+\]
+
+\section{gamma\_q}\label{gamma-q-appendix.section}
+$Q(a,z)$ is the normalised upper incomplete gamma function of $a$ and $z$.
+%
+\[
+Q(a,z)=\frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt
+\]
+%
+\[
+\frac{\partial \, Q(a,z)}{\partial a} = -\frac{\Psi(a)}{\Gamma^2(a)}\int_z^\infty t^{a-1}e^{-t}dt 
+	+ \frac{1}{\Gamma(a)}\int_z^\infty (a-1)t^{a-2}e^{-t}dt
+\]
+%
+\[
+\frac{\partial \, Q(a,z)}{\partial z} = -\frac{z^{a-1}e^{-z}}{\Gamma(a)}
+\]
 
 \section{Phi}\label{Phi-appendix.section}
 $\Phi(x)$ is the unit normal cumulative distribution function.
@@ -1111,5 +1198,20 @@ x^3 + 1.5976 \, x)
 \frac{\partial \, \Phi_{\mbox{\footnotesize approx}}(x)}{\partial x}
 	= -\Phi_{\mbox{\footnotesize approx}}^2(x)
 		e^{-0.07056x^3 - 1.5976x}(-0.21168x^2-1.5976)
+\]
+
+\section{rising\_factorial}\label{rising-factorial-appendix.section}
+$x^{(n)}$ is the rising factorial function for positive $x$ and real $n$.
+%
+\[
+x^{(n)}=\frac{\Gamma(x+n)}{\Gamma(x)}
+\]
+%
+\[
+\frac{\partial \, x^{(n)}}{\partial x} = x^{(n)}(\Psi(x+n)-\Psi(x))
+\]
+%
+\[
+\frac{\partial \, x^{(n)}}{\partial n} = (x)_n\Psi(x+n)
 \]
 
