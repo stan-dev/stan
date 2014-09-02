@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdLog,Fvar) {
   using stan::agrad::fvar;
@@ -172,3 +173,16 @@ TEST(AgradFwdLog,FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(16, g[0]);
 }
 
+
+struct log_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return log(arg1);
+  }
+};
+
+TEST(AgradFwdLog,log_NaN) {
+  log_fun log_;
+  test_nan(log_,false);
+}
