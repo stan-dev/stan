@@ -1242,7 +1242,26 @@ positive numbers and non-integral negative numbers by
 }
 %
 \fitem{real}{lgamma}{real \farg{x}}{
-The natural logarithm of the gamma function applied to \farg{x}}
+The natural logarithm of the gamma function applied to \farg{x}.
+\[
+\mbox{lgamma}(x) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+  \ln\Gamma(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{lgamma}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+  \Psi(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{digamma}{real \farg{x}}{
 The digamma function applied to \farg{x}.  The digamma function is the
