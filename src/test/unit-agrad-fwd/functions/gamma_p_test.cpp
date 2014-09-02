@@ -4,8 +4,9 @@
 #include <stan/agrad/rev/functions/gamma_p.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
-TEST(AgradFvar, gamma_p){
+TEST(AgradFwdGammaP, gamma_p){
   using stan::agrad::fvar;
   using stan::agrad::gamma_p;
   using boost::math::gamma_p;
@@ -387,4 +388,19 @@ TEST(AgradFwdGammaP, FvarFvarVar_Double_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(0.5462361, g[0]);
+}
+
+struct gamma_p_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename boost::math::tools::promote_args<T0,T1>::type
+  operator()(const T0 arg1,
+             const T1 arg2) const {
+    return gamma_p(arg1,arg2);
+  }
+};
+
+TEST(AgradFwdGammaP, nan) {
+  gamma_p_fun gamma_p_;
+  test_nan(gamma_p_,3.0,5.0,false);
 }
