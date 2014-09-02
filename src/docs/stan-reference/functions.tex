@@ -1181,12 +1181,7 @@ The modified Bessel function of the second kind with order \farg{v} applied to \
 }
 %
 \fitem{real}{falling\_factorial}{real \farg{x}, real \farg{n}}{
-The falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n} by
-\[
-\mbox{falling\_factorial}(x,n)
-=
-\frac{x!}{n!}
-\]
+The falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}. 
 }
 %
 \fitem{real}{log\_falling\_factorial}{real \farg{x}, real \farg{n}}{
@@ -1194,12 +1189,36 @@ The log of the falling factorial of \farg{x} with power \farg{n} defined for pos
 }
 %
 \fitem{real}{rising\_factorial}{real \farg{x}, real \farg{n}}{
-The rising factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n} by
+The rising factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}
 \[
-\mbox{rising\_factorial}(x,n)
-=
-\frac{(x+n-1)!}{(x-1)!}
+\mbox{rising\_factorial}(x,n) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  x^{(n)} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{rising\_factorial}(x,n)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \frac{\partial\, x^{(n)}}{\partial x} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{rising\_factorial}(x,n)}{\partial n} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \frac{\partial\, x^{(n)}}{\partial n} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{rising-factorial-appendix} for definition of 
+$x^{(n)}$, $\frac{\partial\,x^{(n)}}{\partial x}$, and $\frac{\partial\,x^{(n)}}{\partial n}$.
 }
 %
 \fitem{real}{log\_rising\_factorial}{real \farg{x}, real \farg{n}}{
