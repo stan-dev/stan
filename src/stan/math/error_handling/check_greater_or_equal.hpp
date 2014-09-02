@@ -52,6 +52,8 @@ namespace stan {
         }
       };
     }
+    
+    // throws if any element in y or low is nan
     template <typename T_y, typename T_low, typename T_result>
     inline bool check_greater_or_equal(const char* function,
                                        const T_y& y,
