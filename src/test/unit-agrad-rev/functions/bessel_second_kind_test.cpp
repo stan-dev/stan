@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/functions/bessel_second_kind.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,bessel_second_kind_int_var) {
   int a(0);
@@ -29,4 +30,17 @@ TEST(AgradRev,bessel_second_kind_int_var) {
 
   b = -4.0;
   EXPECT_THROW(stan::agrad::bessel_second_kind(0,b), std::domain_error);
+}
+
+struct bessel_second_kind_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return bessel_second_kind(2,arg1);
+  }
+};
+
+TEST(AgradRev,bessel_second_kind_NaN) {
+  bessel_second_kind_fun bessel_second_kind_;
+  test_nan(bessel_second_kind_,false,true);
 }
