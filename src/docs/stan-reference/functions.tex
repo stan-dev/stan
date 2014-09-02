@@ -633,7 +633,24 @@ of these in the future, but as of now, there is no good workaround.
 \fitem{real}{floor}{real \farg{x}}{
 The floor of \farg{x}, which is the largest integer less
 than or equal to \farg{x}, converted to a real value;
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[
+\mbox{floor}(x) = 
+\begin{cases}
+  \lfloor x \rfloor & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{floor}(x)}{\partial x} = 
+\begin{cases}
+  0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{ceil}{real \farg{x}}{
 The ceiling of \farg{x}, which is the smallest integer greater
