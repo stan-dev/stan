@@ -700,7 +700,24 @@ The cube root of \farg{x}
 The square of \farg{x}}
 %
 \fitem{real}{exp}{real \farg{x}}{
-The natural exponential of \farg{x}}
+The natural exponential of \farg{x}.
+\[
+\mbox{exp}(x) = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{exp}(x)}{\partial x} = 
+\begin{cases}
+  e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{exp2}{real \farg{x}}{
 The base-2 exponential of \farg{x}}
