@@ -3,6 +3,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdRisingFactorial, Fvar) {
   using stan::agrad::fvar;
@@ -356,4 +357,19 @@ TEST(AgradFwdRisingFactorial, Double_FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(7540.293, g[0]);
+}
+
+struct rising_factorial_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename boost::math::tools::promote_args<T0,T1>::type
+  operator()(const T0 arg1,
+             const T1 arg2) const {
+    return rising_factorial(arg1,arg2);
+  }
+};
+
+TEST(AgradFwdRisingFactorial, nan) {
+  rising_factorial_fun rising_factorial_;
+  test_nan(rising_factorial_,3.0,5.0,false);
 }
