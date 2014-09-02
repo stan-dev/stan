@@ -16,8 +16,8 @@ namespace stan {
     fvar<T>
     erfc(const fvar<T>& x) {
       using ::erfc;
-      using std::sqrt;
-      using std::exp;
+      using ::sqrt;
+      using ::exp;
       using stan::math::square;
       return fvar<T>(erfc(x.val_), -x.d_ * exp(-square(x.val_)) 
                                     * stan::math::TWO_OVER_SQRT_PI);
