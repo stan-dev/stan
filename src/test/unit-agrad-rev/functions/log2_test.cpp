@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <valarray>
 #include <stan/agrad/rev/numeric_limits.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,log2) {
   AVAR a = 3.0;
@@ -17,4 +18,17 @@ TEST(AgradRev,log2) {
   a = std::numeric_limits<AVAR>::infinity();
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
                   stan::agrad::log2(a).val());
+}
+
+struct log2_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return log2(arg1);
+  }
+};
+
+TEST(AgradRev,log2_NaN) {
+  log2_fun log2_;
+  test_nan(log2_,false,true);
 }

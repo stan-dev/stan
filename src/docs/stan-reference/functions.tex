@@ -779,7 +779,26 @@ The natural logarithm of \farg{x}.
 }
 %
 \fitem{real}{log2}{real \farg{x}}{
-The base-2 logarithm of \farg{x}}
+The base-2 logarithm of \farg{x}.
+\[
+\mbox{log2}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0 \\
+  \log_2(x) & \mbox{if } x\geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log2}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0 \\
+  \frac{1}{x\ln2} & \mbox{if } x\geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log10}{real \farg{x}}{
 The base-10 logarithm of \farg{x}.
