@@ -1302,18 +1302,38 @@ Q(a,z) =
   \farg{y}}{ The natural logarithm of the binomial coefficient of
   \farg{x} and \farg{y}.  For non-negative integer inputs, this is
   pronounced ``\farg{x} choose \farg{y},'' written as
-  $\binom{x}{y}$, and defined by
+  $\binom{x}{y}$.
 \[
-\binom{x}{y} = \frac{x!}{(x - y)! \, y!}.
+\mbox{binomial\_coefficient\_log}(x,y) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } y > x \textrm{ or } y < 0\\
+  \ln\Gamma(x+1) & \mbox{if } 0\leq y \leq x \\
+  \quad -\ln\Gamma(y+1)& \\
+  \quad -\ln\Gamma(x-y+1)& \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
 \]
-This Stan function extends the domain to continuous quantities through the
-$\Gamma$ function, defining
+%
 \[
-\mbox{binomial\_coefficient\_log}(x,y)
-= 
-\log
-\frac{\Gamma(x + 1)}{\Gamma(x-y+1) \, \Gamma(y+1)}.
+\frac{\partial\,\mbox{binomial\_coefficient\_log}(x,y)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } y > x \textrm{ or } y < 0\\
+  \Psi(x+1) & \mbox{if } 0\leq y \leq x \\
+  \quad -\Psi(x-y+1)& \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
 \]
+%
+\[
+\frac{\partial\,\mbox{binomial\_coefficient\_log}(x,y)}{\partial y} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } y > x \textrm{ or } y < 0\\
+  -\Psi(y+1) & \mbox{if } 0\leq y \leq x \\
+  \quad +\Psi(x-y+1)& \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
 }
 %
 \fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
