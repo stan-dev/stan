@@ -990,7 +990,30 @@ $\sinh^{-1}(x)$ and $\frac{\partial\,\sinh^{-1}(x)}{\partial x}$.
 }
 %
 \fitem{real}{atanh}{real \farg{x}}{
-The inverse hyperbolic tangent (in radians) of \farg{x}}
+The inverse hyperbolic tangent (in radians) of \farg{x}
+\[
+\mbox{atanh}(x) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \tanh^{-1}(x) & \mbox{if } -1\leq x \leq 1 \\
+  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{atanh}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < -1\\
+  \frac{\partial\, \tanh^{-1}(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
+  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{atanh-appendix} for definition of 
+$\tanh^{-1}(x)$ and $\frac{\partial\,\tanh^{-1}(x)}{\partial x}$.
+}
 %
 \end{description}
 
