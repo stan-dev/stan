@@ -15,8 +15,8 @@ namespace stan {
     inline
     fvar<T>
     erf(const fvar<T>& x) {
-      using std::sqrt;
-      using std::exp;
+      using ::sqrt;
+      using ::exp;
       using ::erf;
       using stan::math::square;
       return fvar<T>(erf(x.val_), x.d_ * exp(-square(x.val_)) 
