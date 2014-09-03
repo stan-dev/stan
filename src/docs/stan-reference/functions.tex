@@ -1893,7 +1893,35 @@ The natural logarithm of one minus the natural exponentiation of
 %
 \fitem{real}{log\_diff\_exp}{real \farg{x}, real \farg{y}}{ 
 The natural logarithm of the difference of the natural exponentiation
-of \farg{x} and the natural exponentiation of \farg{y}}
+of \farg{x} and the natural exponentiation of \farg{y}.
+\[
+\mbox{log\_diff\_exp}(x,y) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x \leq y\\
+  \ln(\exp(x)-\exp(y)) & \mbox{if } x > y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x \leq y\\
+  \frac{\exp(x)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial y} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x \leq y\\
+  -\frac{\exp(y)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{ 
 The natural logarithm of the sum of the natural exponentiation
