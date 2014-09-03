@@ -754,7 +754,25 @@ This is a no-op.
 %
   \fitem{real}{abs}{real \farg{x}}{ The absolute value of \farg{x}.
     This function is deprecated and will be removed in the future;
-    please use \code{fabs} instead.}
+    please use \code{fabs} instead.
+\[		
+\mbox{abs}(x) = 
+\begin{cases}
+  |x| & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{abs}(x)}{\partial x} = 
+\begin{cases}
+  -1 & \mbox{if } x < 0 \\
+    0 & \mbox{if } x = 0 \\
+    1 & \mbox{if } x > 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{fabs}{real \farg{x}}{
 The absolute value of \farg{x};  
@@ -783,7 +801,35 @@ see warning at start of \refsection{step-functions}.
 The positive difference between \farg{x} and \farg{y}, which is
 \farg{x} - \farg{y} if \farg{x} is greater than \farg{y} and 0
 otherwise;
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[
+\mbox{fdim}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x < y\\
+  x-y & \mbox{if } x \geq y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fdim}(x,y)}{\partial x} = 
+\begin{cases}
+  0 & \mbox{if } x < y \\
+  1 & \mbox{if } x \geq y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fdim}(x,y)}{\partial y} = 
+\begin{cases}
+  0 & \mbox{if } x < y \\
+  -\lfloor\frac{x}{y}\rfloor & \mbox{if } x \geq y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \end{description}
 
@@ -793,7 +839,41 @@ see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{fmin}{real \farg{x}, real \farg{y}}{
 The minimum of \farg{x} and \farg{y}\,; 
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[
+\mbox{fmin}(x,y) = 
+\begin{cases}
+  x & \mbox{if } x \leq y \\
+  y & \mbox{if } x > y \\[6pt]
+  x & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+  y & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+  \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fmin}(x,y)}{\partial x} = 
+\begin{cases}
+  1 & \mbox{if } x \leq y \\
+  0 & \mbox{if } x > y \\[6pt]
+  1 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+  0 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+  \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fmin}(x,y)}{\partial y} = 
+\begin{cases}
+  0 & \mbox{if } x \leq y \\
+  1 & \mbox{if } x > y \\[6pt]
+  0 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+  1 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+  \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{fmax}{real \farg{x}, real \farg{y}}{
 The maximum of \farg{x} and \farg{y}\,;
@@ -923,7 +1003,26 @@ see warning at start of \refsection{step-functions}.
 \begin{description}
 %
 \fitem{real}{sqrt}{real \farg{x}}{
-The square root of \farg{x}}
+The square root of \farg{x}.
+\[
+\mbox{sqrt}(x) = 
+\begin{cases}
+  \textrm{NaN} & x < 0 \\
+  \sqrt{x} & \mbox{if } x\geq 0\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{sqrt}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & x < 0 \\
+  \frac{1}{2\sqrt{x}} & x\geq 0\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{cbrt}{real \farg{x}}{
 The cube root of \farg{x}
@@ -946,7 +1045,24 @@ The cube root of \farg{x}
 }
 %
 \fitem{real}{square}{real \farg{x}}{
-The square of \farg{x}}
+The square of \farg{x}.
+\[
+\mbox{square}(x) = 
+\begin{cases}
+  x^2 & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{square}(x)}{\partial x} = 
+\begin{cases}
+  2x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{exp}{real \farg{x}}{
 The natural exponential of \farg{x}.
@@ -1173,7 +1289,24 @@ The cosine of the angle \farg{x} (in radians)
 }
 %
 \fitem{real}{sin}{real \farg{x}}{
-The sine of the angle \farg{x} (in radians)}
+The sine of the angle \farg{x} (in radians).
+\[
+\mbox{sin}(x) = 
+\begin{cases}
+  \sin(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{sin}(x)}{\partial x} = 
+\begin{cases}
+  \cos(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{tan}{real \farg{x}}{
 The tangent of the angle \farg{x} (in radians).
@@ -1270,7 +1403,32 @@ See \refsection{atan-appendix} for definition of $\frac{\partial\,\arctan(x)}{\p
 %
 \fitem{real}{atan2}{real \farg{x}, real \farg{y}}{
 The principal arc (inverse) tangent (in radians) of \farg{x} divided
-by \farg{y}}
+by \farg{y}
+\[
+\mbox{atan2}(x,y) = 
+\begin{cases}
+  \arctan\left(\frac{x}{y}\right) & \mbox{if } -\infty\leq x \leq \infty, -\infty\leq y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{atan2}(x,y)}{\partial x} = 
+\begin{cases}
+  \frac{y}{x^2+y^2} & \mbox{if } -\infty\leq x\leq \infty, -\infty\leq y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{atan2}(x,y)}{\partial y} = 
+\begin{cases}
+  -\frac{x}{x^2+y^2} & \mbox{if } -\infty\leq x\leq \infty, -\infty\leq y \leq \infty \\[6pt]
+   \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \end{description}
 
@@ -1299,10 +1457,42 @@ The hyperbolic cosine of \farg{x} (in radians)
 }
 %
 \fitem{real}{sinh}{real \farg{x}}{
-The hyperbolic sine of \farg{x} (in radians)}
+The hyperbolic sine of \farg{x} (in radians).
+\[
+\mbox{sinh}(x) = 
+\begin{cases}
+  \sinh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{sinh}(x)}{\partial x} = 
+\begin{cases}
+  \cosh(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{tanh}{real \farg{x}}{
-The hyperbolic tangent of \farg{x} (in radians)}
+The hyperbolic tangent of \farg{x} (in radians).
+\[
+\mbox{tanh}(x) = 
+\begin{cases}
+  \tanh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{tanh}(x)}{\partial x} = 
+\begin{cases}
+  \sech^2(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+}
 %
 \fitem{real}{acosh}{real \farg{x}}{
 The inverse hyperbolic cosine (in radians) of \farg{x}
@@ -1412,18 +1602,47 @@ The log odds, or logit, function applied to \farg{x}.
 }
 %
 \fitem{real}{inv\_logit}{real \farg{y}}{
-The logistic sigmoid function applied to \farg{y}, defined by
-$
-\mbox{logit}^{-1}(y) = \frac{1}{1 + \exp(-y)}.
-$
+The logistic sigmoid function applied to \farg{y}.
+\[
+\mbox{inv\_logit}(y) = 
+\begin{cases}
+  \mbox{logit}^{-1}(y) & \mbox{if } -\infty\leq y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{inv\_logit}(y)}{\partial y} = 
+\begin{cases}
+  \frac{\partial\, \mbox{logit}^{-1}(y)}{\partial y} & \mbox{if } -\infty\leq y\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } y = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{inv-logit-appendix} for definition of 
+$\mbox{logit}^{-1}(y)$ and $\frac{\partial\,\mbox{logit}^{-1}(y)}{\partial y}$.
 }
 %
 \fitem{real}{inv\_cloglog}{real \farg{y}}{
-The inverse of the complementary log-log function applied to \farg{y},
-defined by
-$
-\mbox{cloglog}^{-1}(y) = 1 - \exp \left( - \exp(y) \right).
-$
+The inverse of the complementary log-log function applied to \farg{y}.
+\[
+\mbox{inv\_cloglog}(y) = 
+\begin{cases}
+  \mbox{cloglog}^{-1}(y) & \mbox{if } -\infty\leq y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{inv\_cloglog}(y)}{\partial y} = 
+\begin{cases}
+  \frac{\partial\, \mbox{cloglog}^{-1}(y)}{\partial y} & \mbox{if } -\infty\leq y\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } y = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{inv-cloglog-appendix} for definition of 
+$\mbox{cloglog}^{-1}(y)$ and $\frac{\partial\,\mbox{cloglog}^{-1}(y)}{\partial y}$.
 }
 %
 \end{description}
@@ -1682,7 +1901,28 @@ The natural logarithm of the gamma function applied to \farg{x}.
 \fitem{real}{digamma}{real \farg{x}}{
 The digamma function applied to \farg{x}.  The digamma function is the
 derivative of the natural logarithm of the Gamma function.  The function is defined for
-positive numbers and non-integral negative numbers.}
+positive numbers and non-integral negative numbers.
+\[
+\mbox{digamma}(x) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+  \Psi(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{digamma}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+  \frac{\partial\, \Psi(x)}{\partial x} & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{digamma-appendix} for definition of 
+$\Psi(x)$ and $\frac{\partial\,\Psi(x)}{\partial x}$.
+}
 %
 \fitem{real}{trigamma}{real \farg{x}}{
 The trigamma function applied to \farg{x}.  The trigamma function is the
@@ -1931,7 +2171,36 @@ $K_v(z)$ and $\frac{\partial\,K_v(z)}{\partial z}$.
 }
 %
 \fitem{real}{falling\_factorial}{real \farg{x}, real \farg{n}}{
-The falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}. 
+The falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}.
+\[
+\mbox{falling\_factorial}(x,n) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  (x)_n & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{falling\_factorial}(x,n)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \frac{\partial\, (x)_n}{\partial x} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{falling\_factorial}(x,n)}{\partial n} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \frac{\partial\, (x)_n}{\partial n} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{falling-factorial-appendix} for definition of 
+$(x)_n$, $\frac{\partial\,(x)_n}{\partial x}$, and $\frac{\partial\,(x)_n}{\partial n}$.
 }
 %
 \fitem{real}{log\_falling\_factorial}{real \farg{x}, real \farg{n}}{
@@ -2149,7 +2418,26 @@ The natural logarithm of 1 plus \farg{x}.
 }
 %
 \fitem{real}{log1m}{real \farg{x}}{
-The natural logarithm of 1 minus \farg{x}}
+The natural logarithm of 1 minus \farg{x}.
+\[
+\mbox{log1m}(x) = 
+\begin{cases}
+  \ln(1-x) & \mbox{if } x \leq 1 \\
+  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log1m}(x)}{\partial x} = 
+\begin{cases}
+  -\frac{1}{1-x} & \mbox{if } x \leq 1 \\
+  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log1p\_exp}{real \farg{x}}{ 
 The natural logarithm of one plus the natural exponentiation of
@@ -2174,11 +2462,58 @@ The natural logarithm of one plus the natural exponentiation of
 %
 \fitem{real}{log1m\_exp}{real \farg{x}}{ 
 The natural logarithm of one minus the natural exponentiation of
-\farg{x}.}
+\farg{x}.
+\[
+\mbox{log1m\_exp}(x) = 
+\begin{cases}
+  \ln(1-\exp(x)) & \mbox{if } x < 0 \\
+  \textrm{NaN} & \mbox{if } x \geq 0\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{asinh}(x)}{\partial x} = 
+\begin{cases}
+  -\frac{\exp(x)}{1-\exp(x)} & \mbox{if } x < 0 \\
+  \textrm{NaN} & \mbox{if } x \geq 0\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log\_diff\_exp}{real \farg{x}, real \farg{y}}{ 
 The natural logarithm of the difference of the natural exponentiation
-of \farg{x} and the natural exponentiation of \farg{y}}
+of \farg{x} and the natural exponentiation of \farg{y}.
+\[
+\mbox{log\_diff\_exp}(x,y) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x \leq y\\
+  \ln(\exp(x)-\exp(y)) & \mbox{if } x > y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x \leq y\\
+  \frac{\exp(x)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial y} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x \leq y\\
+  -\frac{\exp(y)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{ 
 The natural logarithm of the sum of the natural exponentiation
@@ -2210,10 +2545,44 @@ of \farg{x} and the natural exponentiation of \farg{y}.
 }
 %
 \fitem{real}{log\_inv\_logit}{real \farg{x}}{
-The natural logarithm of the inverse logit function of \farg{x}}
+The natural logarithm of the inverse logit function of \farg{x}.
+\[
+\mbox{log\_inv\_logit}(x) = 
+\begin{cases}
+  \ln\left(\frac{1}{1+\exp(-x)}\right)& \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log\_inv\_logit}(x)}{\partial x} = 
+\begin{cases}
+  \frac{1}{1+\exp(x)} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{log1m\_inv\_logit}{real \farg{x}}{
-The natural logarithm of 1 minus the inverse logit function of \farg{x}}
+The natural logarithm of 1 minus the inverse logit function of \farg{x}.
+\[
+\mbox{log1m\_inv\_logit}(x) = 
+\begin{cases}
+  -\ln(\exp(x)+1) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{log1m\_inv\_logit}(x)}{\partial x} = 
+\begin{cases}
+  -\frac{\exp(x)}{\exp(x)+1} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 \end{description}
 
 
