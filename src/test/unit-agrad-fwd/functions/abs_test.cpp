@@ -4,6 +4,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdAbs,Fvar) {
   using stan::agrad::fvar;
@@ -144,4 +145,17 @@ TEST(AgradFwdAbs,FvarFvarVar_3rdDeriv) {
   VEC h;
   b.d_.d_.grad(z,h);
   EXPECT_FLOAT_EQ(0.0, h[0]);
+}
+
+struct abs_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return abs(arg1);
+  }
+};
+
+TEST(AgradFwdAbs,abs_NaN) {
+  abs_fun abs_;
+  test_nan(abs_,false);
 }

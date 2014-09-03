@@ -1,12 +1,8 @@
 #include <stan/math/matrix/cholesky_decompose.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <test/unit/agrad/util.hpp>
-#include <stan/agrad/fwd/operators.hpp>
-#include <stan/agrad/rev/operators.hpp>
-#include <stan/agrad/fwd/functions/sqrt.hpp>
-#include <stan/agrad/rev/functions/sqrt.hpp>
-#include <stan/agrad/fwd/functions/fabs.hpp>
-#include <stan/agrad/rev/functions/fabs.hpp>
+#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/rev.hpp>
 #include <gtest/gtest.h>
 
 
