@@ -17,16 +17,19 @@ namespace stan {
 
     private:
 
-      Eigen::VectorXd mu_; // Mean of location-scale family
-      Eigen::MatrixXd L_;  // Lower-triangular decomposition of scale matrix
+      Eigen::VectorXd mu_;    // Mean of location-scale family
+      Eigen::MatrixXd L_;     // Lower-triangular decomposition of scale matrix
+      Eigen::MatrixXd L_bar_; // Unique lower-triangular decomposition of scale matrix
       int dimension_;
 
     public:
 
       latent_vars(Eigen::VectorXd const& mu, Eigen::MatrixXd const& L) :
-      mu_(mu), L_(L), dimension_(mu.size()) {
+      mu_(mu), dimension_(mu.size()) {
 
         static const char* function = "stan::vb::latent_vars(%1%)";
+
+        set_L_bar(L);
 
         double tmp(0.0);
         stan::math::check_cholesky_factor(function, L_, "Scale matrix", &tmp);
@@ -44,10 +47,20 @@ namespace stan {
       int dimension() const { return dimension_; }
       Eigen::VectorXd const& mu() const { return mu_; }
       Eigen::MatrixXd const& L() const { return L_; }
+      Eigen::MatrixXd const& L_bar() const { return L_bar_; }
 
       // Mutators
       void set_mu(Eigen::VectorXd const& mu) { mu_ = mu; }
-      void set_L(Eigen::MatrixXd const& L) { L_ = L; }
+      void set_L_bar(Eigen::MatrixXd const& L_bar)
+      {
+        L_bar_ = L_bar;
+        L_     = L_bar_;
+        for (int d = 0; d < dimension_; ++d)
+        {
+          L_(d,d) = log(1+exp(L_bar_(d,d)));
+        }
+      }
+
 
       // Implements g^{-1}(\check{z}) = L\check{z} + \mu
       Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& x) const {
