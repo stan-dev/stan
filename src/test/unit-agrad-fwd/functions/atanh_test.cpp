@@ -3,6 +3,7 @@
 #include <boost/math/special_functions/atanh.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdAtanh,Fvar) {
   using stan::agrad::fvar;
@@ -166,4 +167,17 @@ TEST(AgradFwdAtanh,FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(8.29629629629629629629629629630, g[0]);
+}
+
+struct atanh_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return atanh(arg1);
+  }
+};
+
+TEST(AgradFwdAtanh,atanh_NaN) {
+  atanh_fun atanh_;
+  test_nan(atanh_,false);
 }
