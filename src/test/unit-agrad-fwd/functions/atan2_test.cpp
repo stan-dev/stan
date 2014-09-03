@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdAtan2,Fvar) {
   using stan::agrad::fvar;
@@ -377,3 +378,18 @@ TEST(AgradFwdAtan2,Double_FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(-4.0 / 27.0,g[0]);
 }
 
+
+struct atan2_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename boost::math::tools::promote_args<T0,T1>::type
+  operator()(const T0 arg1,
+             const T1 arg2) const {
+    return atan2(arg1,arg2);
+  }
+};
+
+TEST(AgradFwdAtan2, nan) {
+  atan2_fun atan2_;
+  test_nan(atan2_,3.0,5.0,false);
+}

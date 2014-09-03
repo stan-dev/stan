@@ -1,4 +1,5 @@
-#include "stan/math/functions/bessel_first_kind.hpp"
+#include <stan/math/functions/bessel_first_kind.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathFunctions, bessel_first_kind) {
