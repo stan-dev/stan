@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdSqrt, Fvar) {
   using stan::agrad::fvar;
@@ -176,4 +177,17 @@ TEST(AgradFwdSqrt, FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(0.1360827634879543387887380041503, g[0]);
+}
+
+struct sqrt_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return sqrt(arg1);
+  }
+};
+
+TEST(AgradFwdSqrt,sqrt_NaN) {
+  sqrt_fun sqrt_;
+  test_nan(sqrt_,false);
 }

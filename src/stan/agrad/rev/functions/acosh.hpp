@@ -1,9 +1,9 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__ACOSH_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__ACOSH_HPP
 
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
-#include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/operators/operator_greater_than.hpp>
@@ -38,9 +38,9 @@ namespace stan {
      * @return Inverse hyperbolic cosine of the variable.
      */
     inline var acosh(const stan::agrad::var& a) {
-      if (boost::math::isinf(a) && a > 0.0)
+      if (boost::math::isinf(a.val()) && a > 0.0)
         return var(new acosh_vari(a.val(),a.vi_));
-      return var(new acosh_vari(boost::math::acosh(a.val()),a.vi_));
+      return var(new acosh_vari(::acosh(a.val()),a.vi_));
     }
 
   }

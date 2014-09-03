@@ -2,6 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <boost/math/special_functions/erf.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,erf) {
   AVAR a = 1.3;
@@ -13,15 +14,15 @@ TEST(AgradRev,erf) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(2.0 / std::sqrt(boost::math::constants::pi<double>()) * std::exp(- 1.3 * 1.3), grad_f[0]);
 }
-TEST(AgradRev,erf_nan) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = stan::agrad::erf(a);
+struct erf_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return erf(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,erf_NaN) {
+  erf_fun erf_;
+  test_nan(erf_,false,true);
 }

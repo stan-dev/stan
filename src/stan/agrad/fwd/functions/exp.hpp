@@ -3,6 +3,7 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <math.h>
 
 namespace stan {
 
@@ -13,7 +14,7 @@ namespace stan {
     inline
     fvar<T>
     exp(const fvar<T>& x) {
-      using std::exp;
+      using ::exp;
       return fvar<T>(exp(x.val_), x.d_ * exp(x.val_));
     }
   }
