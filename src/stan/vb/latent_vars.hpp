@@ -42,18 +42,15 @@ namespace stan {
 
       // Accessors
       int dimension() const { return dimension_; }
-
       Eigen::VectorXd const& mu() const { return mu_; }
-
       Eigen::MatrixXd const& L() const { return L_; }
 
       // Mutators
       void set_mu(Eigen::VectorXd const& mu) { mu_ = mu; }
-
       void set_L(Eigen::MatrixXd const& L) { L_ = L; }
 
       // Implements g^{-1}(\check{z}) = L\check{z} + \mu
-      void to_unconstrained(Eigen::VectorXd& x) const {
+      Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& x) const {
         static const char* function = "stan::vb::latent_vars"
                                       "::to_unconstrained(%1%)";
 
@@ -63,23 +60,25 @@ namespace stan {
                          dimension_, "Dimension of mean vector",
                          &tmp);
 
-        x = L_ * x + mu_;
+        Eigen::VectorXd result = L_*x + mu_;
+
+        return result;
       };
 
-      // Implements g(\widetilde{z}) = L^{-1}(\check{z} - \mu)
-      void to_standardized(Eigen::VectorXd& x) const {
-        static const char* function = "stan::vb::latent_vars"
-                                      "::to_standardized(%1%)";
+      // // Implements g(\widetilde{z}) = L^{-1}(\check{z} - \mu)
+      // void to_standardized(Eigen::VectorXd& x) const {
+      //   static const char* function = "stan::vb::latent_vars"
+      //                                 "::to_standardized(%1%)";
 
-        double tmp(0.0);
-        stan::math::check_size_match(function,
-                         x.size(), "Dimension of input vector",
-                         dimension_, "Dimension of mean vector",
-                         &tmp);
+      //   double tmp(0.0);
+      //   stan::math::check_size_match(function,
+      //                    x.size(), "Dimension of input vector",
+      //                    dimension_, "Dimension of mean vector",
+      //                    &tmp);
 
-        Eigen::MatrixXd x_minus_mu = x - mu_;
-        x = stan::math::mdivide_left_tri_low(L_, x_minus_mu);
-      };
+      //   Eigen::VectorXd x_minus_mu = x - mu_;
+      //   x = stan::math::mdivide_left_tri_low(L_, x_minus_mu);
+      // };
 
     };
 

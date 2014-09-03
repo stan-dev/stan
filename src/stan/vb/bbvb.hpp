@@ -37,7 +37,7 @@ namespace stan {
         cont_params_(cont_params),
         elbo_(elbo),
         rng_(rng),
-        n_monte_carlo_(5e3) {};
+        n_monte_carlo_(1e6) {};
 
       virtual ~bbvb() {};
 
@@ -210,16 +210,21 @@ namespace stan {
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd LinvTdiag = muL.L().diagonal().array().inverse();
 
+        Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
+
+        std::cout << "muL.L(): " << muL.L() << std::endl;
+        std::cout << "LinvTdiag" << LinvTdiag << std::endl;
+
         for (int i = 0; i < n_monte_carlo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d)
           {
             z_check(d) = stan::prob::normal_rng(0,1,rng_);
           }
-          muL.to_unconstrained(z_check);
+          z_tilde = muL.to_unconstrained(z_check);
 
           // Compute gradient step in unconstrained space
-          stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad,
+          stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,
                                 &std::cout);
 
           // Update mu
@@ -234,7 +239,14 @@ namespace stan {
         }
         mu_grad /= static_cast<double>(n_monte_carlo_);
         L_grad  /= static_cast<double>(n_monte_carlo_);
-        L_grad.diagonal() += LinvTdiag;
+
+        std::cout << "L_grad:" << L_grad << std::endl;
+
+        L_grad.diagonal().array() += LinvTdiag.array();
+
+        std::cout << "L_grad:" << L_grad << std::endl;
+
+
       }
 
       /**
@@ -255,6 +267,9 @@ namespace stan {
         Eigen::MatrixXd L_s  = Eigen::MatrixXd::Zero(model_.num_params_r(),
                                                      model_.num_params_r());
 
+        // rmsprop stuff
+        double window_size = 10.0;
+
         for (int i = 0; i < max_iterations; ++i)
         {
           if (out_stream_) *out_stream_ << "---------------------" << std::endl
@@ -263,11 +278,18 @@ namespace stan {
 
           calc_combined_grad(muL, mu_grad, L_grad);
 
-          // Accumulate S vector for ADAgrad
+          // // Accumulate S vector for ADAgrad
           mu_s.array() += mu_grad.array().square();
           L_s.array()  += L_grad.array().square();
 
-          // Take ADAgrad step
+          // // Moving average for rmsprop
+          // mu_s.array() = ( 1 - 1.0/window_size ) * mu_s.array()
+          //                 + 1.0/window_size * mu_grad.array().square();
+          // L_s.array()  = ( 1 - 1.0/window_size ) * L_s.array()
+          //                 + 1.0/window_size * L_grad.array().square();
+
+
+          // Take ADAgrad or rmsprop step
           muL.set_mu( muL.mu().array() +
             eta * mu_grad.array() / (tau + mu_s.array().sqrt()) );
           muL.set_L(  muL.L().array()  +
@@ -308,15 +330,21 @@ namespace stan {
 
 
         // Initialize mu, L
-        Eigen::VectorXd mu = cont_params_;
-        Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(), model_.num_params_r());
+        // Eigen::VectorXd mu = cont_params_;
+        // Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(), model_.num_params_r());
+
+        Eigen::VectorXd mu = Eigen::VectorXd::Constant( model_.num_params_r(), 150.0);
+        Eigen::MatrixXd L  = Eigen::MatrixXd::Constant( model_.num_params_r(),
+                                                        model_.num_params_r(),
+                                                        sqrt(2.0) );
+
 
         // L = stan::math::multiply(L,10.0);
 
         latent_vars muL = latent_vars(mu,L);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(muL, 100);
+        do_robbins_monro_adagrad(muL, 3);
 
         // Eigen::VectorXd bla;
 
