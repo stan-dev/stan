@@ -27,7 +27,6 @@ C++11 = false
 ##
 # Library locations
 ##
-STAN_HOME := $(dir $(firstword $(MAKEFILE_LIST)))
 EIGEN ?= lib/eigen_3.2.0
 BOOST ?= lib/boost_1.54.0
 GTEST ?= lib/gtest_1.7.0
@@ -74,17 +73,12 @@ PATH_SEPARATOR = /
 %.o : %.cpp
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
-##
-# Tell make the default way to compile a .o file.
-##
 bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
 ##
 # Rule for generating dependencies.
-# Applies to all *.cpp files in src.
-# Test cpp files are handled slightly differently.
 ##
 bin/%.d : src/%.cpp
 	@if test -d $(dir $@); \
