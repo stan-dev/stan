@@ -1,4 +1,4 @@
-.PHONY: manual $(STANAPI_HOME)src/docs/stan-reference/stan-reference.tex
+.PHONY: manual
 
 MAJOR_VERSION := $(shell grep MAJOR_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 MINOR_VERSION := $(shell grep MINOR_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
