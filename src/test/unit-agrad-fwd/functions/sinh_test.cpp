@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdSinh, Fvar) {
   using stan::agrad::fvar;
@@ -165,4 +166,17 @@ TEST(AgradFwdSinh, FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(2.352409615243247325767667965442, g[0]);
+}
+
+struct sinh_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return sinh(arg1);
+  }
+};
+
+TEST(AgradFwdSinh,sinh_NaN) {
+  sinh_fun sinh_;
+  test_nan(sinh_,false);
 }
