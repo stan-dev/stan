@@ -1323,7 +1323,28 @@ The natural logarithm of the gamma function applied to \farg{x}.
 \fitem{real}{digamma}{real \farg{x}}{
 The digamma function applied to \farg{x}.  The digamma function is the
 derivative of the natural logarithm of the Gamma function.  The function is defined for
-positive numbers and non-integral negative numbers.}
+positive numbers and non-integral negative numbers.
+\[
+\mbox{digamma}(x) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+  \Psi(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{digamma}(x)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+  \frac{\partial\, \Psi(x)}{\partial x} & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{digamma-appendix} for definition of 
+$\Psi(x)$ and $\frac{\partial\,\Psi(x)}{\partial x}$.
+}
 %
 \fitem{real}{trigamma}{real \farg{x}}{
 The trigamma function applied to \farg{x}.  The trigamma function is the
