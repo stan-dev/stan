@@ -3,6 +3,7 @@
 #include <boost/math/special_functions/expm1.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdExpm1,Fvar) {
   using stan::agrad::fvar;
@@ -180,4 +181,16 @@ TEST(AgradFwdExpm1,FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(exp(0.5), g[0]);
 }
 
+struct expm1_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return expm1(arg1);
+  }
+};
+
+TEST(AgradFwdExpm1,expm1_NaN) {
+  expm1_fun expm1_;
+  test_nan(expm1_,false);
+}
 
