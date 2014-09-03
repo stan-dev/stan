@@ -2,6 +2,7 @@
 #include <stan/math.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 void test_log1m_inv_logit(const double x) {
   using stan::agrad::var;
@@ -34,4 +35,17 @@ TEST(AgradRev, log1m_inv_logit) {
   test_log1m_inv_logit(-7.2);
   test_log1m_inv_logit(0.0);
   test_log1m_inv_logit(1.9);
+}
+
+struct log1m_inv_logit_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return stan::math::log1m_inv_logit(arg1);
+  }
+};
+
+TEST(AgradRev,log1m_inv_logit_NaN) {
+  log1m_inv_logit_fun log1m_inv_logit_;
+  test_nan(log1m_inv_logit_,false,true);
 }

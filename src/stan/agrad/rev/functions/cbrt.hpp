@@ -1,7 +1,7 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__CBRT_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__CBRT_HPP
 
-#include <boost/math/special_functions/cbrt.hpp>
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 
@@ -12,7 +12,7 @@ namespace stan {
       class cbrt_vari : public op_v_vari {
       public:
         cbrt_vari(vari* avi) :
-          op_v_vari(boost::math::cbrt(avi->val_),avi) {
+          op_v_vari(::cbrt(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (3.0 * val_ * val_);

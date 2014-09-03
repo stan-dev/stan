@@ -2,6 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/constants.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,inv_square) {
   AVAR a = 7.0;
@@ -21,4 +22,17 @@ TEST(AgradRev,inv_square) {
 
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(stan::math::negative_infinity(),grad_f[0]);
+}
+
+struct inv_square_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return inv_square(arg1);
+  }
+};
+
+TEST(AgradRev,inv_square_NaN) {
+  inv_square_fun inv_square_;
+  test_nan(inv_square_,false,true);
 }
