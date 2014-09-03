@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdFdim,Fvar) {
   using stan::agrad::fvar;
@@ -413,4 +414,19 @@ TEST(AgradFwdFdim,Double_FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(0.0, g[0]);
+}
+
+struct fdim_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename boost::math::tools::promote_args<T0,T1>::type
+  operator()(const T0 arg1,
+             const T1 arg2) const {
+    return fdim(arg1,arg2);
+  }
+};
+
+TEST(AgradFwdFdim, nan) {
+  fdim_fun fdim_;
+  test_nan(fdim_,3.0,5.0,false);
 }
