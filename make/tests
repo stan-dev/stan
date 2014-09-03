@@ -72,32 +72,10 @@ ifneq (,$(filter test-all,$(MAKECMDGOALS)))
 endif
 
 ##
-# run target which will allow for parallel execution of
-# tests.
-## 
-.PHONY: runtest/%
-runtest/% : %
-	@echo '------------------------------------------------------------'
-	$(WINE) $< --gtest_output="xml:$*.xml";
-
-##
-# target path_separator for use in some tests that need to 
-# call executables.
-##
-.PHONY: path_separator
-path_separator :
-	@echo $(PATH_SEPARATOR)
-
-##
 # PERCENT used for secondary expansion
 # $$(PERCENT) turns into %.
 ##
 PERCENT = %
-
-##
-# TEST_TARGETS is the set of all src/test subdirectories excluding src/test.
-##
-TEST_TARGETS := $(shell find src/test ! -path src/test -type d)
 
 ##
 # ALL_TESTS is the set of all test files
@@ -119,54 +97,12 @@ GRAMMAR_TESTS = $(foreach dir,\
 $(GRAMMAR_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
-ifeq ($(strip $(findstring test-,$(MAKECMDGOALS))\
-              $(findstring runtest/,$(MAKECMDGOALS))\
-              $(findstring src/test/,$(MAKECMDGOALS))),)
-	$@ --gtest_output="xml:$(basename $@).xml"
-endif
 
 .PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
-ifeq ($(strip $(findstring test-,$(MAKECMDGOALS))\
-              $(findstring runtest/,$(MAKECMDGOALS))\
-              $(findstring src/test/,$(MAKECMDGOALS))),)
-	$@ --gtest_output="xml:$(basename $@).xml"
-endif
 
-
-####
-## These make rules apply if SECONDEXPANSION is available
-## in make.
-#### 
-ifneq ($(filter second-expansion,$(.FEATURES)),)
-##
-# Defining the test target implicit static rule.
-#
-# Each src/test/* depends on each executable that's generated
-# by the test file.
-##
-.SECONDEXPANSION:
-.PHONY: $(TEST_TARGETS)
-$(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter $$(patsubst src/$$(PERCENT),$$(PERCENT),$$@)/$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
-	@echo ''
-	$(if $(GENERATE_TESTS),\
-             $(MAKE) $@ $(if $(J),-j$(J)), \
-             @echo 'Ran '$(words $(filter runtest/%,$^))' tests for '$@)
-else
-####
-## Warning for developers that don't have a 
-## current enough version of make (3.81 or higher).
-#### 
-.PHONY: $(TEST_TARGETS)
-$(TEST_TARGETS):
-	@echo ''
-	@echo '------------------------------------------------------------'
-	@echo 'The current version of make does not satisfy the developer  '
-	@echo 'requirements. Please install make 3.81 or higher.           '
-	@echo '------------------------------------------------------------'
-endif
 
 
 ##
@@ -235,13 +171,6 @@ test/unit/gm/raise_exception/raise_ex_func_call_generated_quantities.o: src/test
 test/integration/compile_models.o : $(patsubst %.stan,%.cpp-test,$(shell find src/test/test-models/syntax-only -type f -name '*.stan'))
 
 ##
-# CmdStan specific targets. Should be removed in the future.
-##
-$(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/%,$(ALL_TESTS))): test/%.o : src/test/%_test.cpp $(LIBGTEST) 
-	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
-
-##
 # Agrad distributions test generator
 ##
 test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generate_tests.cpp
@@ -292,39 +221,6 @@ GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
 
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS) 
-
-##
-# Deprecated test targets
-##
-.PHONY: test-unit test-distributions test-models test-bugs
-test-unit test-distributions test-all:
-	@echo ''
-	@echo ''
-	@echo '  The '$@' target is deprecated. Please use these make targets instead:'
-	@echo '      '$^
-
-test-unit: src/test/unit src/test/unit-agrad-rev src/test/unit-agrad-fwd
-
-test-distributions: src/test/unit-distribution
-
-test-models:
-	@echo ''
-	@echo 'These tests are now in the CmdStan repository. Run this from'
-	@echo 'the CmdStan home directory:'
-	@echo ''
-	@echo '  "> make src/test/models"'
-	@echo ''
-	@exit 1
-
-test-bugs:
-	@echo ''
-	@echo 'These tests are now in the CmdStan repository. Run this from'
-	@echo 'the CmdStan home directory:'
-	@echo ''
-	@echo '  "> make src/test/models/bugs_examples"'
-	@echo ''
-	@exit 1
-
 
 .PHONY: test-all
 test-all: test-headers $(TEST_TARGETS)

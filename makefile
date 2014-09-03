@@ -40,7 +40,6 @@ LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 WINE =
-PATH_SEPARATOR = /
 
 
 ##
@@ -159,19 +158,6 @@ endif
 	@echo '  Higher level targets:'
 	@echo '  - docs           : Builds all docs.'
 	@echo ''
-	@echo '  Warning: Deprecated test targets'
-	@echo '  - test-unit      : Runs unit tests.'
-	@echo '    This has been split into 3 separate targets:'
-	@echo '      src/test/unit'
-	@echo '      src/test/unit-agrad-rev'
-	@echo '      src/test/unit-agrad-fwd'
-	@echo '  - test-distributions : Runs unit tests for the distributions'
-	@echo '    Use this target instead: src/test/unit-distribution'
-	@echo '  - test-models    : Runs diagnostic models.'
-	@echo '    Run this target from CmdStan: src/test/models'
-	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
-	@echo '    Run this target from CmdStan: src/test/models/bugs_examples'
-	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
 -include make/libstan  # libstan.a
@@ -182,16 +168,8 @@ endif
 -include make/demo     # for building demos
 -include make/local    # for local stuff
 
-ifneq (,$(filter-out runtest/%,$(filter-out clean%,$(MAKECMDGOALS))))
+ifneq (,$(filter-out clean%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
-endif
-
-ifneq (,$(filter runtest/%,$(MAKECMDGOALS)))
-  -include $(addsuffix .d,$(subst runtest/,,$(MAKECMDGOALS)))
-endif
-
-ifneq (,$(filter runtest_no_fail/%,$(MAKECMDGOALS)))
-  -include $(addsuffix .d,$(subst runtest_no_fail/,,$(MAKECMDGOALS)))
 endif
 
 .PHONY: docs
