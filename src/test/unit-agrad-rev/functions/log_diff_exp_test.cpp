@@ -2,6 +2,8 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/rev.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,log_diff_exp_vv) {
   AVAR a = 5.0;
@@ -171,4 +173,19 @@ TEST(AgradRev,log_diff_exp_exception) {
   EXPECT_NO_THROW(log_diff_exp(AVAR(3), AVAR(4)));
   EXPECT_NO_THROW(log_diff_exp(AVAR(3), 4));
   EXPECT_NO_THROW(log_diff_exp(3, AVAR(4)));
+}
+
+struct log_diff_exp_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return log_diff_exp(arg1,arg2);
+  }
+};
+
+TEST(AgradRev, log_diff_exp_nan) {
+  log_diff_exp_fun log_diff_exp_;
+  test_nan(log_diff_exp_,3.0,5.0,false,true);
 }
