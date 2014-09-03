@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import argparse
 import os
 import os.path
 import re
@@ -12,71 +13,97 @@ replacement for runtest target in Makefile
 arg 1:  test dir or test file
 """
 
+testsfx = "_test.cpp"
+
 def stop_err( msg ):
     sys.stderr.write( '%s\n' % msg )
     sys.stderr.write( 'exit now ( %s)\n' % time.strftime('%x %X %Z'))
     sys.exit()
 
+def doCommand(command):
+    p1 = subprocess.Popen(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    (sout,serr) = p1.communicate()
+    if (sout != None):
+        sys.stdout.write(sout.decode())
+    if (serr != None):
+        sys.stderr.write(serr.decode())
+    if (not(p1.returncode == None) and not(p1.returncode == 0)):
+        stop_err('%s failed' % command)
+        
+def makeTest( name, j ):
+    name = name.replace("src/","",1)
+    name = name.replace(testsfx,"");
+    command = 'make -j%d %s' % (j,name)
+    print(command)
+    doCommand(command)
+    
+def makeTests( dirname, filenames, j ):
+    dirname = dirname.replace("src/","",1)
+    targets = list()
+    for name in filenames:
+        if (name.endswith(testsfx)):
+            target = name.replace(testsfx,"");
+            targets.append(os.sep.join([dirname,target]))
+    command = 'make -j%d %s' % (j,' '.join(targets))
+    print(command)
+    doCommand(command)
 
-#       p1 = subprocess.Popen(command,shell=True)
-#,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-#    (sout,serr) = p1.communicate()
-#    if (sout != None):
-#        sys.stdout.write(sout)
-#    if (serr != None):
-#        sys.stderr.write(serr)
-#                
-#    if(not(p1.returncode == None) and not(p1.returncode == 0)):
-#        stop_err("annotation GUI error")
-def domake( target ):
-    print("make",target)
     
-def dotest( target ):
-    print("do",target)
-    
+def runTest( name ):
+    name = name.replace("src/","",1)
+    name = name.replace(testsfx,"");
+    print(name)
+    doCommand(name)
 
-    
 
-#test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generate_tests.cpp
-#	@mkdir -p $(dir $@)
-#	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
-#
-#src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
-#	@echo "--- Generating tests for $(notdir $<) ---"
-#	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
-def gentests( filename ):    
-    print("gentests:",filename)
-    # a. make test generator 
-    # b. generate tests
-    # c. call run1test on each generated test
-    
-def run1test( filename ):
-    target = re.sub("_test.cpp","",filename)
-    print("run1test",target)
-    domake(target)
-    dotest(target)
     
 def main():
-    testsfx = "_test.cpp"
-    pathsep = '/'
+    if (len(sys.argv) < 2):
+        useage()
 
-    for i in range(1,len(sys.argv)):
-        testpath = sys.argv[i]
-        print("arg:",testpath)
-        if (not(os.path.exists(testpath))):
-            stop_err( '%s: no such file or directory' % testpath)
-        if (not(os.path.isdir(testpath))):
-            if (not(testpath.endswith(testsfx))):
-                stop_err( '%s: not a testfile' % testpath)
-            run1test(testpath)
+    j = 1
+    start = 1
+    if (sys.argv[1].startswith("-j")):
+        start = 2
+        if (len(sys.argv) < 3):
+            useage()
         else:
-            for root, dirs, files in os.walk(testpath):
-                if ("unit-distribution" in root):
-                    gentests(root)
-                else:
-                    for name in files:
+            j = sys.argv[1].replace("-j","")
+            try:
+                jprime = int(j)
+                if (jprime < 1 or jprime > 16):
+                    stop_err("bad value for -j flag")                    
+                j = jprime
+            except ValueError:
+                stop_err("bad value for -j flag")
+            
+    print("j:",j,"start",start)
+                
+    # pass 1:  call make to compile test targets
+    for i in range(start,len(sys.argv)):
+        testname = sys.argv[i]
+        if (not(os.path.exists(testname))):
+            stop_err( '%s: no such file or directory' % testname)
+        if (not(os.path.isdir(testname))):
+            if (not(testname.endswith(testsfx))):
+                stop_err( '%s: not a testfile' % testname)
+            makeTest(testname,j)
+        else:
+            for root, dirs, files in os.walk(testname):
+                makeTests(root,files,j)
+
+    # pass 2:  run test targets
+    for i in range(start,len(sys.argv)):
+        testname = sys.argv[i]
+        if (not(os.path.isdir(testname))):
+            testexe = testname.replace(testsfx,"");
+            runTest(testexe)
+        else:
+            for root, dirs, files in os.walk(testname):
+                for name in files:
                         if (name.endswith(testsfx)):
-                            run1test(pathsep.join([root,name]))
+                            testexe = name.replace(testsfx,"");
+                            runTest(os.sep.join([root,testexe]))
 
 
     
