@@ -2,6 +2,8 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/rev.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,log_sum_exp_vv) {
   AVAR a = 5.0;
@@ -305,4 +307,19 @@ TEST(AgradRev, log_sum_exp_vec_3) {
   EXPECT_FLOAT_EQ(g[0],g2[0]);
   EXPECT_FLOAT_EQ(g[1],g2[1]);
   EXPECT_FLOAT_EQ(g[2],g2[2]);
+}
+
+struct log_sum_exp_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return log_sum_exp(arg1,arg2);
+  }
+};
+
+TEST(AgradRev, log_sum_exp_nan) {
+  log_sum_exp_fun log_sum_exp_;
+  test_nan(log_sum_exp_,3.0,5.0,false,true);
 }

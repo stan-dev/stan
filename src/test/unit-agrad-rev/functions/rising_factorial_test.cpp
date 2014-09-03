@@ -2,6 +2,8 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,rising_factorial_var_double) {
   using boost::math::digamma;
@@ -49,4 +51,19 @@ TEST(AgradRev, rising_factorial_var_var) {
   f.grad(x,g);
   EXPECT_FLOAT_EQ(4.0*5.0*6.0*7.0 * (digamma(8.0) - digamma(4.0)), g[0]);
   EXPECT_FLOAT_EQ(4.0*5.0*6.0*7.0 * digamma(8), g[1]);
+}
+
+struct rising_factorial_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return rising_factorial(arg1,arg2);
+  }
+};
+
+TEST(AgradRev, rising_factorial_nan) {
+  rising_factorial_fun rising_factorial_;
+  test_nan(rising_factorial_,3.0,5.0,false,true);
 }
