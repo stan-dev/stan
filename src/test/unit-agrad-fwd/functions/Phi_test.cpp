@@ -4,6 +4,7 @@
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdPhi,Fvar) {
   using stan::agrad::fvar;
@@ -281,8 +282,21 @@ void test_tails() {
   EXPECT_FLOAT_EQ(1, 1 / fun_value_of(Phi(T(9.5))));
   EXPECT_FLOAT_EQ(1, 1 / fun_value_of(Phi(T(10))));
 }
-TEST(AgradRev, PhiTails) {
+TEST(AgradFwdPhi, PhiTails) {
   using stan::agrad::fvar;
   test_tails<fvar<double> >();
   test_tails<fvar<fvar<double> > >();
+}
+
+struct Phi_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return Phi(arg1);
+  }
+};
+
+TEST(AgradFwdPhi,Phi_NaN) {
+  Phi_fun Phi_;
+  test_nan(Phi_,true);
 }
