@@ -264,7 +264,7 @@ void test_nan_vvd(const F& f,
   stan::agrad::var arg2_v = arg2;
 
   std::ostringstream fail_msg;
-  fail_msg << "Failed for var,var,var version with first argument " 
+  fail_msg << "Failed for var,var,double version with first argument " 
            << arg1_v << " second argument " << arg2_v
            << " and third argument " << arg3;
 

@@ -2,6 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/constants.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,inv_sqrt) {
   AVAR a = 49.0;
@@ -29,4 +30,17 @@ TEST(AgradRev,inv_sqrt) {
 
   f.grad(x,grad_f);
   std::isnan(grad_f[0]);
+}
+
+struct inv_sqrt_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return inv_sqrt(arg1);
+  }
+};
+
+TEST(AgradRev,inv_sqrt_NaN) {
+  inv_sqrt_fun inv_sqrt_;
+  test_nan(inv_sqrt_,false,true);
 }

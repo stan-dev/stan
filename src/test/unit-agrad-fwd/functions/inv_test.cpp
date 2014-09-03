@@ -4,6 +4,7 @@
 #include <stan/math/constants.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdInv,Fvar) {
   using stan::agrad::fvar;
@@ -151,3 +152,15 @@ TEST(AgradFwdInv,FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(-96, g[0]);
 }
 
+struct inv_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return inv(arg1);
+  }
+};
+
+TEST(AgradFwdInv,inv_NaN) {
+  inv_fun inv_;
+  test_nan(inv_,false);
+}
