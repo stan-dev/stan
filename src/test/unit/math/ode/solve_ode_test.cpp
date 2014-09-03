@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 #include <boost/numeric/odeint.hpp>
@@ -34,12 +35,15 @@ struct harm_osc_ode_fun {
              const std::vector<T1>& y_in, //initial positions
              const std::vector<T2>& theta, // parameters
              const std::vector<double>& x, // double data
-             const std::vector<int>& x_int) const { // integer data
+             const std::vector<int>& x_int,
+             std::ostream* msgs) const { // integer data
     return harm_osc_ode(t_in, y_in, theta, x, x_int);
   }
 };
 
 TEST(solve_ode, ode_system_dv) {
+  std::stringstream msgs;
+  
   using stan::math::ode_system;
 
   harm_osc_ode_fun harm_osc;
@@ -61,7 +65,8 @@ TEST(solve_ode, ode_system_dv) {
   std::vector<double> x;
   std::vector<int> x_int;
 
-  ode_system<harm_osc_ode_fun, double, stan::agrad::var> system(harm_osc, y0,theta, x, x_int,2);
+  ode_system<harm_osc_ode_fun, double, stan::agrad::var> 
+    system(harm_osc, y0,theta, x, x_int,2,&msgs);
 
   system(y0, dy_dt, t0);
 
@@ -72,6 +77,8 @@ TEST(solve_ode, ode_system_dv) {
 }
 
 TEST(solve_ode, ode_system_vd) {
+  std::stringstream msgs;
+
   using stan::math::ode_system;
 
   harm_osc_ode_fun harm_osc;
@@ -96,7 +103,8 @@ TEST(solve_ode, ode_system_vd) {
   std::vector<double> x;
   std::vector<int> x_int;
 
-  ode_system<harm_osc_ode_fun, stan::agrad::var, double> system(harm_osc, y0,theta, x, x_int,2);
+  ode_system<harm_osc_ode_fun, stan::agrad::var, double> 
+    system(harm_osc, y0,theta, x, x_int,2,&msgs);
 
   system(y0, dy_dt, t0);
 
@@ -132,6 +140,8 @@ TEST(solve_ode, harm_osc_finite_diff) {
 }
 
 TEST(solve_ode, harm_osc_known_values) {
+  std::stringstream msgs;
+
   harm_osc_ode_fun harm_osc;
 
   std::vector<stan::agrad::var> y0;
@@ -154,7 +164,7 @@ TEST(solve_ode, harm_osc_known_values) {
     ts.push_back(0.1*(i+1));
 
   ode_res = stan::math::solve_ode(harm_osc, y0, t0,
-                                  ts, theta, x, x_int);
+                                  ts, theta, x, x_int, &msgs);
 
   EXPECT_NEAR(0.995029, ode_res[0][0].val(), 1e-5);
   EXPECT_NEAR(-0.0990884, ode_res[0][1].val(), 1e-5);
@@ -189,7 +199,8 @@ struct lorenz_ode_fun {
              const std::vector<T1>& y_in, //initial positions
              const std::vector<T2>& theta, // parameters
              const std::vector<double>& x, // double data
-             const std::vector<int>& x_int) const { // integer data
+             const std::vector<int>& x_int,
+             std::ostream* msgs) const { // integer data
     return lorenz_ode(t_in, y_in, theta, x, x_int);
   }
 };

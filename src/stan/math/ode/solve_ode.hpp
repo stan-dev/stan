@@ -1,6 +1,7 @@
 #ifndef STAN__MATH__ODE__SOLVE_ODE_HPP__
 #define STAN__MATH__ODE__SOLVE_ODE_HPP__
 
+#include <ostream>
 #include <vector>
 #include <boost/numeric/odeint.hpp>
 #include <stan/math/ode/util.hpp>
@@ -38,18 +39,27 @@ namespace stan {
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       const int& num_eqn_;
+      std::ostream* pstream_;
       ode_system(const F& f,
                  const std::vector<double>& y0,
                  const std::vector<double>& theta,
                  const std::vector<double>& x,
                  const std::vector<int>& x_int,
-                 const int& num_eqn)
-        : f_(f), y0_(y0), theta_(theta), x_(x), x_int_(x_int), num_eqn_(num_eqn) { }
+                 const int& num_eqn,
+                 std::ostream* pstream)
+        : f_(f), 
+          y0_(y0), 
+          theta_(theta),
+          x_(x), 
+          x_int_(x_int), 
+          num_eqn_(num_eqn),
+          pstream_(pstream) { 
+      }
 
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double& t) {
-        dy_dt = f_(t,y,theta_,x_,x_int_);
+        dy_dt = f_(t,y,theta_,x_,x_int_,pstream_);
         stan::math::check_matching_sizes("ode_system(%1%)",y,"y",dy_dt,"dy_dt",
                                          static_cast<double*>(0));
       }
@@ -64,19 +74,28 @@ namespace stan {
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       const int& num_eqn_;
+      std::ostream* pstream_;
       ode_system(const F& f,
                  const std::vector<double>& y0,
                  const std::vector<double>& theta,
                  const std::vector<double>& x,
                  const std::vector<int>& x_int,
-                 const int& num_eqn)
-        : f_(f), y0_(y0), theta_(theta), x_(x), x_int_(x_int), num_eqn_(num_eqn) { }
+                 const int& num_eqn,
+                 std::ostream* pstream)
+        : f_(f), 
+          y0_(y0), 
+          theta_(theta), 
+          x_(x),
+          x_int_(x_int), 
+          num_eqn_(num_eqn),
+          pstream_(pstream) { 
+      }
 
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double& t) {
 
-        dy_dt = f_(t,y,theta_,x_,x_int_);
+        dy_dt = f_(t,y,theta_,x_,x_int_,pstream_);
         stan::math::check_equal("ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
                                 static_cast<double*>(0));
 
@@ -106,7 +125,7 @@ namespace stan {
             vars.push_back(theta_temp[j]);
           }
 
-          dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_);
+          dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_,pstream_);
           dy_dt_temp[i].grad(vars, grad);
           
           for (int j = 0; j < theta_.size(); j++) { 
@@ -136,13 +155,22 @@ namespace stan {
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       const int& num_eqn_;
+      std::ostream* pstream_;
       ode_system(const F& f,
                  const std::vector<double>& y0,
                  const std::vector<double>& theta,
                  const std::vector<double>& x,
                  const std::vector<int>& x_int,
-                 const int& num_eqn)
-        : f_(f), y0_(y0), theta_(theta), x_(x), x_int_(x_int), num_eqn_(num_eqn) { }
+                 const int& num_eqn,
+                 std::ostream* pstream)
+        : f_(f), 
+          y0_(y0), 
+          theta_(theta), 
+          x_(x), 
+          x_int_(x_int), 
+          num_eqn_(num_eqn),
+          pstream_(pstream) { 
+      }
 
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
@@ -150,7 +178,7 @@ namespace stan {
         std::vector<double> y_new;
         for (int i = 0; i < num_eqn_; i++)
           y_new.push_back(y[i]+y0_[i]);
-        dy_dt = f_(t,y_new,theta_,x_,x_int_);
+        dy_dt = f_(t,y_new,theta_,x_,x_int_,pstream_);
         stan::math::check_equal("ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
                                 static_cast<double*>(0));
 
@@ -173,7 +201,7 @@ namespace stan {
             vars.push_back(y_temp[j]);
           }
 
-          dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_);
+          dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_,pstream_);
           dy_dt_temp[i].grad(vars, grad);
 
           for (int j = 0; j < num_eqn_; j++) { 
@@ -203,13 +231,22 @@ namespace stan {
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       const int& num_eqn_;
+      std::ostream* pstream_;
       ode_system(const F& f,
                  const std::vector<double> y0,
                  const std::vector<double>& theta,
                  const std::vector<double>& x,
                  const std::vector<int>& x_int,
-                 const int& num_eqn)
-        : f_(f), y0_(y0), theta_(theta), x_(x), x_int_(x_int), num_eqn_(num_eqn) { }
+                 const int& num_eqn,
+                 std::ostream* pstream)
+        : f_(f), 
+          y0_(y0), 
+          theta_(theta), 
+          x_(x), 
+          x_int_(x_int), 
+          num_eqn_(num_eqn),
+          pstream_(pstream) { 
+      }
 
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
@@ -217,7 +254,7 @@ namespace stan {
         std::vector<double> y_new;
         for (int i = 0; i < num_eqn_; i++)
           y_new.push_back(y[i]+y0_[i]);
-        dy_dt = f_(t,y_new,theta_,x_,x_int_);
+        dy_dt = f_(t,y_new,theta_,x_,x_int_,pstream_);
         stan::math::check_equal("ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
                                 static_cast<double*>(0));
 
@@ -247,7 +284,7 @@ namespace stan {
             vars.push_back(theta_temp[j]);
           }
 
-          dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_);
+          dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_,pstream_);
           dy_dt_temp[i].grad(vars, grad);
 
           for (int j = 0; j < num_eqn_+theta_.size(); j++) { 
@@ -374,7 +411,8 @@ namespace stan {
               const std::vector<double>& ts, // times at desired solutions
               const std::vector<T2>& theta, // parameters
               const std::vector<double>& x, // double data values
-              const std::vector<int>& x_int) { // int data values.
+              const std::vector<int>& x_int,
+              std::ostream* pstream) { // int data values.
       using namespace boost::numeric::odeint;  // FIXME: trim to what is used
       stan::math::check_nonzero_size("solve_ode(%1%)",ts,"time_vec",
                                      static_cast<double*>(0));
@@ -407,7 +445,7 @@ namespace stan {
           y0_vec.push_back(0.0);
 
       // builds coupled ode system
-      ode_system<F, T1, T2> system(f,y0_vec,theta_dbl,x,x_int, y0.size());
+      ode_system<F, T1, T2> system(f,y0_vec,theta_dbl,x,x_int, y0.size(),pstream);
 
       // sets initial positions to 0 if y0 is var
       if (boost::is_same<stan::agrad::var, T1>::value)
