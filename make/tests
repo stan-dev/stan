@@ -7,38 +7,6 @@ GTEST_MAIN = $(GTEST)/src/gtest_main.cc
 CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
 
 ##
-# Target to verify header files are coherent
-##
-HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f)) 
-ifeq ($(OS),win) 
-  DEV_NULL = nul
-else
-  DEV_NULL = /dev/null
-endif
-
-test/dummy.cpp:
-	@mkdir -p test
-	@touch $@
-	@echo "int main() {return 0;}" >> $@
-
-%.hpp-test : %.hpp test/dummy.cpp
-	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
-
-##
-# Target to verify compiled models are valid
-##
-.PHONY: %.cpp-test
-%.cpp-test : %.cpp
-	$(COMPILE.c) -fsyntax-only -O$O $< 
-
-##
-# Target to build all tests
-##
-.PHONY: test-all
-test-all: test-unit test-headers test-distributions test-models
-
-
-##
 # Build the google test library.
 ## 
 $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
@@ -47,6 +15,10 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
+
+##
+# Rule for building a test
+##
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
@@ -64,12 +36,34 @@ test/%.d : src/test/%_test.cpp
 	rm -f $@.$$$$ ); \
 	fi
 
-ifneq (,$(filter test-unit,$(MAKECMDGOALS)))
-  -include $(addsuffix .d, $(UNIT_TESTS)) 
+
+############################################################
+##
+# Target to verify header files within Stan has
+# enough include calls
+##
+HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f)) 
+
+ifeq ($(OS),win) 
+  DEV_NULL = nul
+else
+  DEV_NULL = /dev/null
 endif
-ifneq (,$(filter test-all,$(MAKECMDGOALS)))
-  -include $(addsuffix .d, $(UNIT_TESTS)) 
-endif
+
+.PHONY: HEADER_TESTS
+%.hpp-test : %.hpp test/dummy.cpp
+	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
+
+test/dummy.cpp:
+	@mkdir -p test
+	@touch $@
+	@echo "int main() {return 0;}" >> $@
+
+.PHONY: test-headers
+test-headers: $(HEADER_TESTS)
+
+############################################################
+
 
 ##
 # PERCENT used for secondary expansion
@@ -98,7 +92,6 @@ $(GRAMMAR_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 
-.PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
@@ -120,13 +113,13 @@ test/test-models/stanc$(EXE) : src/test/test-models/stanc.cpp bin/libstanc.a
 TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 
 ##
-# Compile these with no main.
+# Use the stanc compiler to generate C++ from Stan programs
 ##
-$(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS))) : %.cpp : %.stan test/test-models/stanc$(EXE)
+$(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$(EXE)
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
 ##
-# Tests that also depend on generated models.
+# Tests that also depend on the generated C++ of Stan programs.
 ##
 
 test/unit/io/mcmc_writer.o: src/test/test-models/no-main/io_example.cpp
@@ -168,7 +161,15 @@ test/unit/gm/raise_exception/raise_ex_func_call_transformed_parameters.o: src/te
 test/unit/gm/raise_exception/raise_exception_generated_quantities.o: src/test/test-models/no-main/gm/raise_exception_generated_quantities.cpp
 test/unit/gm/raise_exception/raise_ex_func_call_generated_quantities.o: src/test/test-models/no-main/gm/raise_ex_func_call_generated_quantities.cpp
 
-test/integration/compile_models.o : $(patsubst %.stan,%.cpp-test,$(shell find src/test/test-models/syntax-only -type f -name '*.stan'))
+##
+# Target to verify code generated Stan programs
+# (.stan -> .cpp) are compilable
+##
+.PHONY: %.cpp-test
+%.cpp-test : %.cpp
+	$(COMPILE.c) -fsyntax-only -O$O $< 
+
+test/integration/compile_models$(EXE) : $(patsubst %.stan,%.cpp-test,$(shell find src/test/test-models/syntax-only -type f -name '*.stan'))
 
 ##
 # Agrad distributions test generator
@@ -219,8 +220,4 @@ GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
                               $(words $(filter $@%_00000_generated_test.cpp,$(ALL_TESTS))))
 
 
-.PHONY: test-headers
-test-headers: $(HEADER_TESTS) 
 
-.PHONY: test-all
-test-all: test-headers $(TEST_TARGETS)

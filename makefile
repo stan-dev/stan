@@ -127,24 +127,11 @@ endif
 	@echo '                     (requires doxygen installation)'
 	@echo '  TESTS (requires make 3.81 or higher):'
 	@echo ''
-	@echo '    All Tests'
-	@echo '      - test-all'
-	@echo ''
 	@echo '    Header Tests'
 	@echo '      - test-headers'
 	@echo ''
-	@echo '    Unit Tests'
-	@echo '      The unit tests are broken into three targets:'
-	@echo '        - src/test/unit'
-	@echo '        - src/test/unit-agrad-rev'
-	@echo '        - src/test/unit-agrad-fwd'
-	@echo ''
-	@echo '      Subdirectory of Unit Tests'
-	@echo '        For example, to run the unit tests under meta'
-	@echo '          - src/test/unit/meta'
-	@echo ''
 	@echo '      Single Unit Test'
-	@echo '        For example, to run the diag_post_multiply test, make the target'
+	@echo '        For example, to make the diag_post_multiply test, make the target'
 	@echo '          - test/unit-agrad-fwd/matrix/diag_post_multiply$(EXE)'
 	@echo ''
 	@echo '  Clean:'
@@ -157,13 +144,11 @@ endif
 
 -include make/libstan  # libstan.a
 -include make/tests    # tests: test-all, test-unit, test-models
--include make/models   # models
 -include make/doxygen  # doxygen
 -include make/manual   # manual: manual, doc/stan-reference.pdf
--include make/demo     # for building demos
 -include make/local    # for local stuff
 
-ifneq (,$(filter-out clean%,$(MAKECMDGOALS)))
+ifneq (,$(filter-out test-headers,$(filter-out clean%,$(MAKECMDGOALS))))
   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
 endif
 
