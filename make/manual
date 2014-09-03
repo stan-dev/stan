@@ -1,12 +1,12 @@
-.PHONY: manual $(STAN_HOME)src/docs/stan-reference/stan-reference.tex
+.PHONY: manual $(STANAPI_HOME)src/docs/stan-reference/stan-reference.tex
 
-MAJOR_VERSION := $(shell grep MAJOR_VERSION $(STAN_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
-MINOR_VERSION := $(shell grep MINOR_VERSION $(STAN_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
-PATCH_VERSION := $(shell grep PATCH_VERSION $(STAN_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
+MAJOR_VERSION := $(shell grep MAJOR_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
+MINOR_VERSION := $(shell grep MINOR_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
+PATCH_VERSION := $(shell grep PATCH_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 VERSION_STRING := $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 
 
-manual: $(STAN_HOME)src/docs/stan-reference/stan-reference.pdf
+manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
 	mkdir -p doc/
 	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING).pdf;)
 
