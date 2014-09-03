@@ -3,6 +3,7 @@
 #include <stan/math/functions/fma.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdFma,Fvar) { 
   using stan::agrad::fvar;
@@ -900,4 +901,20 @@ TEST(AgradFwdFma,Double_FvarFvarVar_Double_3rdDeriv) {
   VEC r;
   a.d_.d_.grad(q,r);
   EXPECT_FLOAT_EQ(0, r[0]);
+}
+
+struct fma_fun {
+  template <typename T0, typename T1, typename T2>
+  inline
+  typename stan::return_type<T0,T1,T2>::type
+  operator()(const T0& arg1,
+             const T1& arg2,
+             const T2& arg3) const {
+    return fma(arg1,arg2,arg3);
+  }
+};
+
+TEST(AgradFwdFma,fma_NaN) {
+  fma_fun fma_;
+  test_nan(fma_,0.6,0.3,0.5,false);
 }

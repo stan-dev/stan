@@ -3,6 +3,7 @@
 #include <stan/math/functions/log_sum_exp.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdLogSumExp,Fvar) {
   using stan::agrad::fvar;
@@ -376,4 +377,19 @@ TEST(AgradFwdLogSumExp,Double_FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(-0.040891574660943478616430308,g[0]);
+}
+
+struct log_sum_exp_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename boost::math::tools::promote_args<T0,T1>::type
+  operator()(const T0 arg1,
+             const T1 arg2) const {
+    return log_sum_exp(arg1,arg2);
+  }
+};
+
+TEST(AgradFwdLogSumExp, nan) {
+  log_sum_exp_fun log_sum_exp_;
+  test_nan(log_sum_exp_,3.0,5.0,false);
 }
