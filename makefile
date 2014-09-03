@@ -1,6 +1,4 @@
 # Makefile for Stan.
-# This makefile relies heavily on the make defaults for
-# make 3.81.
 ##
 
 
@@ -61,12 +59,6 @@ WINE =
 ##
 -include make/detect_os
 
-##
-# Tell make the default way to compile a .o file.
-##
-%.o : %.cpp
-	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
-
 bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
@@ -83,17 +75,6 @@ bin/%.d : src/%.cpp
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
-
-%.d : %.cpp
-	@if test -d $(dir $@); \
-	then \
-	(set -e; \
-	rm -f $@; \
-	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$);\
-	fi
-
 
 .PHONY: help
 help:
@@ -143,7 +124,7 @@ endif
 	@echo '--------------------------------------------------------------------------------'
 
 -include make/libstan  # libstan.a
--include make/tests    # tests: test-all, test-unit, test-models
+-include make/tests    # tests
 -include make/doxygen  # doxygen
 -include make/manual   # manual: manual, doc/stan-reference.pdf
 -include make/local    # for local stuff
