@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/rev/functions/exp.hpp>
 #include <stan/agrad/rev.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 void test_log1p_exp(double val) {
   using stan::math::log1p_exp;
@@ -39,4 +40,17 @@ TEST(AgradRev, log1p_exp) {
   test_log1p_exp(2.0);
   test_log1p_exp(32.0);
   test_log1p_exp(64.0);
+}
+
+struct log1p_exp_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return log1p_exp(arg1);
+  }
+};
+
+TEST(AgradRev,log1p_exp_NaN) {
+  log1p_exp_fun log1p_exp_;
+  test_nan(log1p_exp_,false,true);
 }
