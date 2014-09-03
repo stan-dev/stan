@@ -59,27 +59,24 @@ def run1test( filename ):
 def main():
     testsfx = "_test.cpp"
     pathsep = '/'
-    print("cwd: ",os.getcwd())
 
-    name = sys.argv[1]
-    print("testing",name)
-    testpath = pathsep.join(["src","test",name])
-    print(testpath)
-    if (not(os.path.exists(testpath))):
-        stop_err( '%s: no such file or directory' % testpath)
-    if (not(os.path.isdir(testpath))):
-        if (not(testpath.endswith(testsfx))):
-            stop_err( '%s: not a testfile' % testpath)
-        run1test(testpath)
-    else:
-        for root, dirs, files in os.walk(testpath):
-            if ("unit-distribution" in root):
-                gentests(root)
-            else:
-                print(root)
-                for name in files:
-                    if (name.endswith(testsfx)):
-                        run1test(pathsep.join([root,name]))
+    for i in range(1,len(sys.argv)):
+        testpath = sys.argv[i]
+        print("arg:",testpath)
+        if (not(os.path.exists(testpath))):
+            stop_err( '%s: no such file or directory' % testpath)
+        if (not(os.path.isdir(testpath))):
+            if (not(testpath.endswith(testsfx))):
+                stop_err( '%s: not a testfile' % testpath)
+            run1test(testpath)
+        else:
+            for root, dirs, files in os.walk(testpath):
+                if ("unit-distribution" in root):
+                    gentests(root)
+                else:
+                    for name in files:
+                        if (name.endswith(testsfx)):
+                            run1test(pathsep.join([root,name]))
 
 
     
