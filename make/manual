@@ -11,6 +11,8 @@ manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
 	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING).pdf;)
 
 MANUAL_FLAGS=
+
+## is there a way to get latex to output which files it depends on?
 %.pdf: %.tex
 	cd $(dir $@); pdflatex $(MANUAL_FLAGS) $(notdir $^); bibtex $(notdir $(basename $@)); makeindex -s stan-reference.ist $(notdir $(basename $@)); pdflatex $(MANUAL_FLAGS) $(notdir $^); pdflatex $(MANUAL_FLAGS) $(notdir $^);  pdflatex $(MANUAL_FLAGS) $(notdir $^);
 
