@@ -37,7 +37,7 @@ namespace stan {
         cont_params_(cont_params),
         elbo_(elbo),
         rng_(rng),
-        n_monte_carlo_(1e3) {};
+        n_monte_carlo_(5e3) {};
 
       virtual ~bbvb() {};
 
@@ -271,7 +271,7 @@ namespace stan {
           muL.set_mu( muL.mu().array() +
             eta * mu_grad.array() / (tau + mu_s.array().sqrt()) );
           muL.set_L(  muL.L().array()  +
-            eta/2.0 * L_grad.array()  / (tau + L_s.array().sqrt()) );
+            eta * L_grad.array()  / (tau + L_s.array().sqrt()) );
 
           cont_params_ = muL.mu();
 
@@ -311,10 +311,12 @@ namespace stan {
         Eigen::VectorXd mu = cont_params_;
         Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(), model_.num_params_r());
 
+        // L = stan::math::multiply(L,10.0);
+
         latent_vars muL = latent_vars(mu,L);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(muL, 25);
+        do_robbins_monro_adagrad(muL, 100);
 
         // Eigen::VectorXd bla;
 
