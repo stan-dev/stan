@@ -1,8 +1,11 @@
 #include <stan/agrad/rev/functions/atan2.hpp>
 #include <stan/agrad/rev/operators/operator_division.hpp>
 #include <stan/agrad/rev/operators/operator_multiplication.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,atan2_var_var) {
   AVAR a = 1.2;
@@ -70,4 +73,20 @@ TEST(AgradRev,atan2_double_var) {
   VEC g;
   f.grad(x,g);
   EXPECT_FLOAT_EQ(-1.2 / (1.2 * 1.2 + 3.9 * 3.9), g[0]);
+}
+
+struct atan2_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return atan2(arg1,arg2);
+  }
+};
+
+TEST(AgradRev, atan2_nan) {
+  atan2_fun atan2_;
+  test_nan(atan2_,3.0,5.0,false,true);
+
 }
