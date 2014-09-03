@@ -1547,7 +1547,36 @@ The modified Bessel function of the second kind with order \farg{v} applied to \
 }
 %
 \fitem{real}{falling\_factorial}{real \farg{x}, real \farg{n}}{
-The falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}. 
+The falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}.
+\[
+\mbox{falling\_factorial}(x,n) = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  (x)_n & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{falling\_factorial}(x,n)}{\partial x} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \frac{\partial\, (x)_n}{\partial x} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{falling\_factorial}(x,n)}{\partial n} = 
+\begin{cases}
+  \textrm{error} & \mbox{if } x \leq 0\\
+  \frac{\partial\, (x)_n}{\partial n} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN}
+\end{cases}
+\]
+%
+See \refsection{falling-factorial-appendix} for definition of 
+$(x)_n$, $\frac{\partial\,(x)_n}{\partial x}$, and $\frac{\partial\,(x)_n}{\partial n}$.
 }
 %
 \fitem{real}{log\_falling\_factorial}{real \farg{x}, real \farg{n}}{
