@@ -3,6 +3,7 @@
 #include <stan/math/functions/log_diff_exp.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdLogDiffExp,Fvar) {
   using stan::agrad::fvar;
@@ -387,4 +388,19 @@ TEST(AgradFwdLogDiffExp,Double_FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(-0.060919308279076959008006309952,g[0]);
+}
+
+struct log_diff_exp_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename boost::math::tools::promote_args<T0,T1>::type
+  operator()(const T0 arg1,
+             const T1 arg2) const {
+    return log_diff_exp(arg1,arg2);
+  }
+};
+
+TEST(AgradFwdLogDiffExp, nan) {
+  log_diff_exp_fun log_diff_exp_;
+  test_nan(log_diff_exp_,3.0,5.0,false);
 }

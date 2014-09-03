@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdCosh,Fvar) {
   using stan::agrad::fvar;
@@ -178,4 +179,17 @@ TEST(AgradFwdCosh,FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(2.1292794550948174968343874946776, g[0]);
+}
+
+struct cosh_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return cosh(arg1);
+  }
+};
+
+TEST(AgradFwdCosh,cosh_NaN) {
+  cosh_fun cosh_;
+  test_nan(cosh_,false);
 }
