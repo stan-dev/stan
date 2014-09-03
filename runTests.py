@@ -15,10 +15,10 @@ arg 1:  test dir or test file
 
 testsfx = "_test.cpp"
 
-def stop_err( msg ):
+def stop_err( msg, returncode ):
     sys.stderr.write( '%s\n' % msg )
     sys.stderr.write( 'exit now ( %s)\n' % time.strftime('%x %X %Z'))
-    sys.exit()
+    sys.exit(returncode)
 
 def doCommand(command):
     p1 = subprocess.Popen(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -28,7 +28,7 @@ def doCommand(command):
     if (serr != None):
         sys.stderr.write(serr.decode())
     if (not(p1.returncode == None) and not(p1.returncode == 0)):
-        stop_err('%s failed' % command)
+        stop_err('%s failed' % command, p1.returncode)
         
 def makeTest( name, j ):
     name = name.replace("src/","",1)
@@ -72,10 +72,10 @@ def main():
             try:
                 jprime = int(j)
                 if (jprime < 1 or jprime > 16):
-                    stop_err("bad value for -j flag")                    
+                    stop_err("bad value for -j flag",-1)                    
                 j = jprime
             except ValueError:
-                stop_err("bad value for -j flag")
+                stop_err("bad value for -j flag"-1)
             
     print("j:",j,"start",start)
                 
@@ -83,10 +83,10 @@ def main():
     for i in range(start,len(sys.argv)):
         testname = sys.argv[i]
         if (not(os.path.exists(testname))):
-            stop_err( '%s: no such file or directory' % testname)
+            stop_err( '%s: no such file or directory' % testname,-1)
         if (not(os.path.isdir(testname))):
             if (not(testname.endswith(testsfx))):
-                stop_err( '%s: not a testfile' % testname)
+                stop_err( '%s: not a testfile' % testname,-1)
             makeTest(testname,j)
         else:
             for root, dirs, files in os.walk(testname):
