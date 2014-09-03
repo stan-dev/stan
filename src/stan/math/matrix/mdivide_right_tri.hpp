@@ -27,7 +27,7 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_right_tri(const Eigen::Matrix<T1,R1,C1> &b,
                       const Eigen::Matrix<T2,R2,C2> &A) {
-      stan::math::check_square("mdivide_left_tri(%1%)",A,"A",(double*)0);
+      stan::math::check_square("mdivide_right_tri(%1%)",A,"A",(double*)0);
       stan::math::check_multiplicable("mdivide_right_tri(%1%)",b,"b",
                                       A,"A",(double*)0);
       // FIXME: This is nice and general but requires some extra memory and copying.
