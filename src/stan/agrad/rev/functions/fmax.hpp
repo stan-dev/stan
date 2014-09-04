@@ -2,6 +2,10 @@
 #define STAN__AGRAD__REV__FUNCTIONS__FMAX_HPP
 
 #include <stan/agrad/rev/var.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/agrad/rev/internal/precomp_v_vari.hpp>
+#include <stan/agrad/rev/internal/precomputed_gradients.hpp>
+#include <stan/math/constants.hpp>
 
 namespace stan {
   namespace agrad {
@@ -25,7 +29,23 @@ namespace stan {
      */
     inline var fmax(const stan::agrad::var& a,
                     const stan::agrad::var& b) {
-      return a.vi_->val_ > b.vi_->val_ ? a : b;
+      if (unlikely(boost::math::isnan(a.vi_->val_))) {
+        if(boost::math::isnan(b.vi_->val_)) {
+          std::vector<stan::agrad::var> vars;
+          std::vector<double> grads;
+          vars.push_back(a);
+          vars.push_back(b);
+          grads.push_back(stan::math::NOT_A_NUMBER);
+          grads.push_back(stan::math::NOT_A_NUMBER);
+          return var(precomputed_gradients(stan::math::NOT_A_NUMBER,
+                                           vars, grads));
+        }
+        else
+          return b;
+      } else if (unlikely(boost::math::isnan(b.vi_->val_)))
+        return a;
+      else
+        return a.vi_->val_ > b.vi_->val_ ? a : b;
     }
 
     /**
@@ -46,7 +66,17 @@ namespace stan {
      */
     inline var fmax(const stan::agrad::var& a,
                     const double& b) {
-      return a.vi_->val_ >= b ? a : var(b);
+      if (unlikely(boost::math::isnan(a.vi_->val_))) {
+        if(boost::math::isnan(b))
+          return var(new precomp_v_vari(stan::math::NOT_A_NUMBER,
+                                        a.vi_,
+                                        stan::math::NOT_A_NUMBER));
+        else
+          return var(b);
+      } else if (unlikely(boost::math::isnan(b)))
+        return a;
+      else
+        return a.vi_->val_ >= b ? a : var(b);
     }
 
     /**
@@ -67,7 +97,17 @@ namespace stan {
      */
     inline var fmax(const double& a,
                     const stan::agrad::var& b) {
-      return a > b.vi_->val_ ? var(a) : b;
+      if (unlikely(boost::math::isnan(b.vi_->val_))) {
+        if(boost::math::isnan(a))
+          return var(new precomp_v_vari(stan::math::NOT_A_NUMBER,
+                                        b.vi_,
+                                        stan::math::NOT_A_NUMBER));
+        else
+          return var(a);
+      } else if (unlikely(boost::math::isnan(a)))
+        return b;
+      else
+        return a > b.vi_->val_ ? var(a) : b;
     }
 
   }
