@@ -10,7 +10,7 @@
 */
 
 TEST(StanCommon, reject_func_call_generated_quantities) {
-  std::string error_msg = "user-specified exception";
+  std::string error_msg = "user-specified rejection";
 
   std::fstream empty_data_stream(std::string("").c_str());
   stan::io::dump empty_data_context(empty_data_stream);
@@ -39,10 +39,10 @@ TEST(StanCommon, reject_func_call_generated_quantities) {
                     lp, cont_vector, disc_vector);
   } catch (const std::domain_error& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
-      FAIL() << std::endl << "*********************************" << std::endl
-             << "*** EXPECTED: error_msg=" << error_msg << std::endl
-             << "*** FOUND: e.what()=" << e.what() << std::endl
-             << "*********************************" << std::endl
+      FAIL() << std::endl << "---------------------------------" << std::endl
+             << "--- EXPECTED: error_msg=" << error_msg << std::endl
+             << "--- FOUND: e.what()=" << e.what() << std::endl
+             << "--------------------------------*" << std::endl
              << std::endl;
     }
     return;
