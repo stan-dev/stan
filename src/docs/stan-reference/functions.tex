@@ -400,7 +400,17 @@ argument type.
 \fitem{int}{operator>}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
   greater than \farg{y} and 0 otherwise}
 \fitem{int}{operator>=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  greater than or equal to \farg{y} and 0 otherwise}
+  greater than or equal to \farg{y} and 0 otherwise.
+\[
+\mbox{operator\textgreater=}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x < y\\
+  1 & \mbox{if } x \geq y \\[6pt]
+  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 \fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
   equal to \farg{y} and 0 otherwise}
 \fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
