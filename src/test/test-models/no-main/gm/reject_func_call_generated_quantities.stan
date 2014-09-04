@@ -1,6 +1,6 @@
 functions {
   void foo(real x) {
-    raise_exception("user-specified exception");
+    reject("user-specified rejection");
   }
 }
 parameters {

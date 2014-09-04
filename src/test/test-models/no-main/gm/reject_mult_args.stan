@@ -5,9 +5,9 @@ functions {
     abs_diff <- fabs(x - y);
     avg_scale <- (fabs(x) + fabs(y)) / 2;
     if ((abs_diff / avg_scale) > max)
-      raise_exception("user-specified exception, difference above ",max," x:",x," y:",y);
+      reject("user-specified rejection, difference above ",max," x:",x," y:",y);
     if ((abs_diff / avg_scale) < min)
-      raise_exception("user-specified exception, difference below ",min," x:",x," y:",y);
+      reject("user-specified rejection, difference below ",min," x:",x," y:",y);
     return abs_diff / avg_scale;
   }    
 }

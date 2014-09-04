@@ -6,5 +6,5 @@ model {
 }
 generated quantities {
   real<lower=0> x;
-  raise_exception("user-specified exception");
+  reject("user-specified rejection");
 }

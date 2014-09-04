@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/no-main/gm/raise_exception_transformed_parameters.cpp>
+#include <test/test-models/no-main/gm/reject_transformed_parameters.cpp>
 
 /* tests that stan program throws exception in transformed parameters block
    which is part of the log_prob method of the generated cpp object
 */
 
-TEST(StanCommon, raise_exception_transformed_parameters) {
-  std::string error_msg = "user-specified exception";
+TEST(StanCommon, reject_transformed_parameters) {
+  std::string error_msg = "user-specified rejection";
 
   std::fstream empty_data_stream(std::string("").c_str());
   stan::io::dump empty_data_context(empty_data_stream);
@@ -17,8 +17,8 @@ TEST(StanCommon, raise_exception_transformed_parameters) {
   model_output.str("");
 
   // instantiate model
-  raise_exception_transformed_parameters_model_namespace::raise_exception_transformed_parameters_model* model 
-       = new raise_exception_transformed_parameters_model_namespace::raise_exception_transformed_parameters_model(empty_data_context, &model_output);
+  reject_transformed_parameters_model_namespace::reject_transformed_parameters_model* model 
+       = new reject_transformed_parameters_model_namespace::reject_transformed_parameters_model(empty_data_context, &model_output);
 
   // instantiate args to log_prob function
   Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model->num_params_r());
@@ -33,14 +33,14 @@ TEST(StanCommon, raise_exception_transformed_parameters) {
     lp = model->log_prob<false, false>(cont_vector, disc_vector, &std::cout);
   } catch (const std::domain_error& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
-      FAIL() << std::endl << "*********************************" << std::endl
-             << "*** EXPECTED: error_msg=" << error_msg << std::endl
-             << "*** FOUND: e.what()=" << e.what() << std::endl
-             << "*********************************" << std::endl
+      FAIL() << std::endl << "---------------------------------" << std::endl
+             << "--- EXPECTED: error_msg=" << error_msg << std::endl
+             << "--- FOUND: e.what()=" << e.what() << std::endl
+             << "---------------------------------" << std::endl
              << std::endl;
     }
     return;
   }
-  FAIL() << "model failed to raise exception" << std::endl;
+  FAIL() << "model failed to do reject" << std::endl;
 }
 

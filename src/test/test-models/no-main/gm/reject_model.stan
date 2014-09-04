@@ -10,6 +10,6 @@ transformed parameters {
 }
 model {
   y ~ normal(0,1);
-  raise_exception("user-specified exception");
+  reject("user-specified rejection");
 }
 

@@ -3,7 +3,7 @@ parameters {
 }
 transformed parameters {
   real<lower=0> x;
-  raise_exception("user-specified exception");
+  reject("user-specified rejection");
 }
 model {
   y ~ normal(0,1);
