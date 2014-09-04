@@ -1265,6 +1265,49 @@ dimensions.
 \frac{\partial \, \ln\Gamma_n(x)}{\partial x} = \sum_{j=1}^n \Psi(x + (1 - j) / 2)
 \]
 
+\section{modified\_bessel\_first\_kind}\label{modified-bessel-first-kind-appendix.section}
+$I_v(z)$ is the modified Bessel function of the first kind with order \farg{v} applied to \farg{z}.
+\[
+{I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
+\]
+%
+\[
+\frac{\partial \, I_v(z)}{\partial z} = I_{v-1}(z)-\frac{v}{z}I_v(z)
+\]
+
+\section{modified\_bessel\_second\_kind}\label{modified-bessel-second-kind-appendix.section}
+$K_v(z)$ is the bessel function of the second kind of order $v$ for positive $z$.
+%
+\[
+{K_v}(z)
+=
+\frac{\pi}{2}\cdot\frac{I_{-v}(z) - I_{v}(z)}{\sin(v\pi)}
+\]
+%
+\[
+\frac{\partial \, K_v(z)}{\partial z} = -\frac{v}{z}K_v(z)-K_{v-1}(z)
+\]
+
+\section{owens\_t}\label{owens-t-appendix.section}
+$\mbox{owens\_t}(h,a)$ is the Owen's T
+  function for the probability of the event $X > h$ and $0<Y<aX$
+  where \farg{X} and \farg{Y} are independent standard normal random
+  variables.
+%
+\[
+\mbox{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx
+\]
+%
+\[
+\frac{\partial \, \mbox{owens\_t}(h,a)}{\partial h} = -\frac{1}{2\sqrt{2\pi}}
+	\erf\left(\frac{ha}{\sqrt{2}}\right)
+	\exp\left(-\frac{h^2}{2}\right)
+\]
+%
+\[
+\frac{\partial \, \mbox{owens\_t}(h,a)}{\partial a} = \frac{\exp\left(-\frac{1}{2}h^2(1+a^2)\right)}{2\pi (1+a^2)}
+\]
+
 \section{Phi}\label{Phi-appendix.section}
 $\Phi(x)$ is the unit normal cumulative distribution function.
 %
@@ -1306,3 +1349,24 @@ x^{(n)}=\frac{\Gamma(x+n)}{\Gamma(x)}
 \frac{\partial \, x^{(n)}}{\partial n} = (x)_n\Psi(x+n)
 \]
 
+\section{tgamma}\label{gamma-appendix.section}
+$\Gamma(x)$ is the gamma function.
+%
+\[
+\Gamma(x)=\int_0^{\infty} u^{x - 1} \exp(-u) \, du
+\]
+%
+\[
+\frac{\partial \, \Gamma(x)}{\partial x} = \Gamma(x)\Psi(x)
+\]
+
+\section{trigamma}\label{trigamma-appendix.section}
+$\Psi_1(x)$ is the trigamma function.
+%
+\[
+\Psi_1(x)=\sum_{n=0}^\infty \frac{1}{(x+n)^2}
+\]
+%
+\[
+\frac{\partial \, \Psi_1(x)}{\partial x} = -2\sum_{n=0}^\infty \frac{1}{(x+n)^3}
+\]
