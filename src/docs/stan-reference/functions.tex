@@ -506,7 +506,7 @@ evaluates both arguments \farg{x} and \farg{y}.
 \[
 \mbox{if\_else}(cond,x,y) = 
 \begin{cases}
-  x & \mbox{if } cond = 1\\
+  x & \mbox{if } cond \neq 1\\
   y & \mbox{if } cond = 0\\
 \end{cases}
 \]
