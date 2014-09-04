@@ -31,3 +31,18 @@ TEST(AgradRev,a_eq_y) {
   EXPECT_FALSE(a == z);
   EXPECT_FALSE(z == a);
 }
+
+TEST(AgradRev, logical_eq_nan) {
+  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
+  stan::agrad::var a = 1.0;
+  stan::agrad::var b = 2.0;
+  double nan_dbl = std::numeric_limits<double>::quiet_NaN();
+
+  EXPECT_FALSE(1.0 == nan);
+  EXPECT_FALSE(nan == 2.0);
+  EXPECT_FALSE(nan == nan);
+  EXPECT_FALSE(a == nan);
+  EXPECT_FALSE(nan == b);
+  EXPECT_FALSE(a == nan_dbl);
+  EXPECT_FALSE(nan_dbl == b);
+}
