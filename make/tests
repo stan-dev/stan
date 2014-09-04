@@ -27,7 +27,7 @@ test/%.o : src/test/%_test.cpp $(LIBGTEST)
 # Rule for generating dependencies.
 ##
 test/%.d : src/test/%_test.cpp
-	if test -d $(dir $@); \
+	@if test -d $(dir $@); \
 	then \
 	(set -e; \
 	rm -f $@; \
@@ -35,7 +35,6 @@ test/%.d : src/test/%_test.cpp
 	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$ ); \
 	fi
-
 
 ############################################################
 ##
@@ -79,25 +78,16 @@ test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
 
-
-##
-# Build the stanc compiler as a test executable
-##
 .PRECIOUS: test/test-models/stanc$(EXE)
 test/test-models/stanc$(EXE) : src/test/test-models/stanc.cpp bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
 ##
-# TEST_MODELS is the set of all the test models.
-# Those in the 'no_main' subdirectory are supposed to be compiled without a main function.
-##
-TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
-
-##
 # Use the stanc compiler to generate C++ from Stan programs
 ##
-$(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$(EXE)
+#$(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$(EXE)
+src/test/test-models/%.cpp : src/test/test-models/%.stan test/test-models/stanc$(EXE)
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
 ##
@@ -151,6 +141,13 @@ test/unit/gm/raise_exception/raise_ex_func_call_generated_quantities.o: src/test
 %.cpp-test : %.cpp
 	$(COMPILE.c) -fsyntax-only -O$O $< 
 
+
+##
+# Compile models depends on every model within
+# src/test/test-models/syntax-only/*.stan being able to
+# be code-generated to a *.cpp, then passed through
+# the compiler using the -fsyntax-only flag
+##
 test/integration/compile_models$(EXE) : $(patsubst %.stan,%.cpp-test,$(shell find src/test/test-models/syntax-only -type f -name '*.stan'))
 
 

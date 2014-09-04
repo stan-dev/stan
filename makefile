@@ -123,15 +123,26 @@ endif
 	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
--include make/libstan  # libstan.a
+-include make/libstan  # bin/libstan.a bin/libstanc.a
 -include make/tests    # tests
 -include make/doxygen  # doxygen
 -include make/manual   # manual: manual, doc/stan-reference.pdf
 -include make/local    # for local stuff
 
-ifneq (,$(filter-out test-headers,$(filter-out clean%,$(MAKECMDGOALS))))
-  -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
+##
+# Dependencies
+##
+ifneq (,$(filter-out test-headers clean% %-test %.d,$(MAKECMDGOALS)))
+  ifeq (,$(filter-out %.cpp,$(MAKECMDGOALS)))
+    -include $(subst .cpp,.d,$(MAKECMDGOALS))
+  else
+    -include $(subst $(EXE),.d,$(MAKECMDGOALS))
+  endif
 endif
+
+##
+# Documentation
+##
 
 .PHONY: docs
 docs: manual doxygen
