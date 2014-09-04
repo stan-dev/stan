@@ -801,7 +801,32 @@ see warning at start of \refsection{step-functions}.
 \begin{description}
 \fitem{real}{fmod}{real \farg{x}, real \farg{y}}{
 The real value remainder after dividing \farg{x} by \farg{y}\,;
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[
+\mbox{fmod}(x,y) = 
+\begin{cases}
+  x - \lfloor \frac{x}{y}\rfloor y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fmod}(x,y)}{\partial x} = 
+\begin{cases}
+  1 & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fmod}(x,y)}{\partial y} = 
+\begin{cases}
+  -\lfloor \frac{x}{y}\rfloor & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \end{description}
 
