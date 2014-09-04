@@ -1,8 +1,12 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/fwd/functions/inv.hpp>
+#include <stan/agrad/rev/functions/inv.hpp>
+#include <stan/math/functions/inv.hpp>
+#include <stan/agrad/fwd/functions/hypot.hpp>
+#include <stan/agrad/rev/functions/hypot.hpp>
 #include <boost/math/special_functions/hypot.hpp>
-#include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdHypot,Fvar) {
   using stan::agrad::fvar;
@@ -359,4 +363,19 @@ TEST(AgradFwdHypot,Double_FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(-0.0119256958799988783808489262332,g[0]);
+}
+
+struct hypot_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename boost::math::tools::promote_args<T0,T1>::type
+  operator()(const T0 arg1,
+             const T1 arg2) const {
+    return hypot(arg1,arg2);
+  }
+};
+
+TEST(AgradFwdHypot, nan) {
+  hypot_fun hypot_;
+  test_nan(hypot_,3.0,5.0,false);
 }

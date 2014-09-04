@@ -1062,7 +1062,35 @@ The inverse of the square of \farg{x}.
 %
 \fitem{real}{hypot}{real \farg{x}, real \farg{y}}{
 The length of the hypotenuse of a right triangle with sides of
-length \farg{x} and \farg{y}}
+length \farg{x} and \farg{y}.
+\[
+\mbox{hypot}(x,y) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
+  \sqrt{x^2+y^2} & \mbox{if } x,y\geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{hypot}(x,y)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
+  \frac{x}{\sqrt{x^2+y^2}} & \mbox{if } x,y\geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{hypot}(x,y)}{\partial y} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
+  \frac{y}{\sqrt{x^2+y^2}} & \mbox{if } x,y\geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{cos}{real \farg{x}}{
 The cosine of the angle \farg{x} (in radians)
