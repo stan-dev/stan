@@ -162,80 +162,9 @@ test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generat
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
 
-src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+
+test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
+.SECONDEXPANSION:
+src/test/unit-distribution/%_generated_test.cpp : src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
 	@echo "--- Generating tests for $(notdir $<) ---"
 	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
-
-#src/test/unit-distribution/%_generated_test.cpp : $(shell echo $* | sed -e 's,_[0-9]\{5\},_test.hpp,g') test/unit-distribution/generate_tests$(EXE)
-# src/test/unit-distribution/%_generated_test.cpp : $(patsubst %_00000,%_test.hpp,src/test/unit-distribution/%) test/unit-distribution/generate_tests$(EXE)
-# 	@echo "--- Generating tests for $(notdir $<) ---"
-# 	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
-
-
-
-# ############################################################
-# ## Goal: remove this section of the makefile
-
-# ##
-# # PERCENT used for secondary expansion
-# # $$(PERCENT) turns into %.
-# ##
-# PERCENT = %
-
-
-# ##
-# # Test generator for distribution tests
-# ##
-# test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generate_tests.cpp
-# 	@mkdir -p $(dir $@)
-# 	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
-
-# src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
-# 	@echo "--- Generating tests for $(notdir $<) ---"
-# 	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
-
-
-# ##
-# # For src/test/unit-distribution tests, adding
-# # dependency on generated tests.
-# ##
-
-# ##
-# # ALL_TESTS is the set of all test files
-# #   This needs to be an '=' assignment and not a ':='.
-# ##
-# ALL_TESTS = $(shell find src/test -type f -name '*_test.cpp')
-
-# ALL_TEST_EXECUTABLES = $(patsubst src/%_test.cpp,%$(EXE),$(ALL_TESTS))
-
-# ifneq ($(filter second-expansion,$(.FEATURES)),)
-
-# DISTRIBUTION_TESTS := $(shell find src/test/unit-distribution -type f -name '*.hpp')
-# .SECONDEXPANSION:
-# $(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_test.cpp,$$(filter $$@$$(PERCENT),$$(DISTRIBUTION_TESTS)))
-
-# endif
-
-# # Set the variable GENERATE_TESTS to non-empty string
-# # when the target is generating distribution tests.
-# # This indicates whether make should be rerun.
-# #
-# #   Notes:
-# #     The first argument to filter-out is the number of unique
-# #        generated distribution tests that have already been generated
-# #        in this current run of make. If this is the stage where
-# #        we are generating tests, this number will be less than the
-# #        number of tests to generate. (0 if running from a clean state)
-# #     The second argument to filter-out is the number of unique
-# #        generated distribution tests that should be generated. 
-# #        This is determined by the existence of *_test.hpp files in 
-# #        the appropriate directory.
-# #     The filter-out function returns the total number of tests that should
-# #        be generated if they have not yet been generated.
-# ##
-# $(filter src/test/unit-distribution%,$(TEST_TARGETS)): \
-# GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
-#                               $(words $(filter $@%_00000_generated_test.cpp,$(ALL_TESTS))))
-
-
-
