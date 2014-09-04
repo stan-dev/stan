@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdFmax,Fvar) {
   using stan::agrad::fvar;
@@ -352,4 +353,33 @@ TEST(AgradFwdFmax,Double_FvarFvarVar_3rdDeriv) {
   VEC r;
   a.d_.d_.grad(q,r);
   EXPECT_FLOAT_EQ(0.0, r[0]);
+}
+
+struct fmax_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename boost::math::tools::promote_args<T0,T1>::type
+  operator()(const T0 arg1,
+             const T1 arg2) const {
+    return fmax(arg1,arg2);
+  }
+};
+
+TEST(AgradFwdFmax, nan) {
+  fmax_fun fmax_;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  test_nan_fd(fmax_,nan,nan,false);
+  test_nan_ffd(fmax_,nan,nan,false);
+  test_nan_fv_fv1(fmax_,nan,nan,false);
+  test_nan_fv_fv2(fmax_,nan,nan,false);
+  test_nan_d_fv1(fmax_,nan,nan,false);
+  test_nan_d_fv2(fmax_,nan,nan,false);
+  test_nan_fv_d1(fmax_,nan,nan,false);
+  test_nan_fv_d2(fmax_,nan,nan,false);
+  test_nan_ffv_ffv1(fmax_,nan,nan,false);
+  test_nan_ffv_ffv2(fmax_,nan,nan,false);
+  test_nan_d_ffv1(fmax_,nan,nan,false);
+  test_nan_d_ffv2(fmax_,nan,nan,false);
+  test_nan_ffv_d1(fmax_,nan,nan,false);
+  test_nan_ffv_d2(fmax_,nan,nan,false);
 }
