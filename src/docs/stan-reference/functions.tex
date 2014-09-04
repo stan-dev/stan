@@ -394,7 +394,17 @@ carried out by first promoting the integer value.
 \fitem{int}{operator{==}}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
   equal to \farg{y} and 0 otherwise}
 \fitemindex{int}{operator!=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
-  not equal to \farg{y} and 0 otherwise}{operator"!"=}
+  not equal to \farg{y} and 0 otherwise.
+\[
+\mbox{operator!=}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x = y\\
+  1 & \mbox{if } x \neq y \\[6pt]
+  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}{operator"!"=}
 \end{description}
 %
 The real-valued argument versions are identical other than for
@@ -402,15 +412,65 @@ argument type.
 %
 \begin{description}
 \fitem{int}{operator<}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  less than \farg{y} and 0 otherwise}
+  less than \farg{y} and 0 otherwise.
+\[
+\mbox{operator\textless}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x \geq y\\
+  1 & \mbox{if } x < y \\[6pt]
+  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 \fitem{int}{operator<=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  less than or equal to \farg{y} and 0 otherwise}
+  less than or equal to \farg{y} and 0 otherwise.
+\[
+\mbox{operator\textless=}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x > y\\
+  1 & \mbox{if } x \leq y \\[6pt]
+  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 \fitem{int}{operator>}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  greater than \farg{y} and 0 otherwise}
+  greater than \farg{y} and 0 otherwise.
+\[
+\mbox{operator\textgreater}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x \leq y\\
+  1 & \mbox{if } x > y \\[6pt]
+  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 \fitem{int}{operator>=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  greater than or equal to \farg{y} and 0 otherwise}
+  greater than or equal to \farg{y} and 0 otherwise.
+\[
+\mbox{operator\textgreater=}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x < y\\
+  1 & \mbox{if } x \geq y \\[6pt]
+  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 \fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  equal to \farg{y} and 0 otherwise}
+  equal to \farg{y} and 0 otherwise.
+\[
+\mbox{operator==}(x,y) = 
+\begin{cases}
+  0 & \mbox{if } x \neq y\\
+  1 & \mbox{if } x = y \\[6pt]
+  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 \fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
   not equal to \farg{y} and 0 otherwise}{operator"!"=}
 \end{description}
@@ -877,7 +937,41 @@ see warning at start of \refsection{step-functions}.
 %
 \fitem{real}{fmax}{real \farg{x}, real \farg{y}}{
 The maximum of \farg{x} and \farg{y}\,;
-see warning at start of \refsection{step-functions}}
+see warning at start of \refsection{step-functions}.
+\[
+\mbox{fmax}(x,y) = 
+\begin{cases}
+  x & \mbox{if } x \geq y \\
+  y & \mbox{if } x < y \\[6pt]
+  x & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+  y & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+  \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fmax}(x,y)}{\partial x} = 
+\begin{cases}
+  1 & \mbox{if } x \geq y \\
+  0 & \mbox{if } x < y \\[6pt]
+  1 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+  0 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+  \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{fmax}(x,y)}{\partial y} = 
+\begin{cases}
+  0 & \mbox{if } x \geq y \\
+  1 & \mbox{if } x < y \\[6pt]
+  0 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+  1 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+  \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \end{description}
 
@@ -1266,7 +1360,35 @@ The inverse of the square of \farg{x}.
 %
 \fitem{real}{hypot}{real \farg{x}, real \farg{y}}{
 The length of the hypotenuse of a right triangle with sides of
-length \farg{x} and \farg{y}}
+length \farg{x} and \farg{y}.
+\[
+\mbox{hypot}(x,y) = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
+  \sqrt{x^2+y^2} & \mbox{if } x,y\geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{hypot}(x,y)}{\partial x} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
+  \frac{x}{\sqrt{x^2+y^2}} & \mbox{if } x,y\geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+\[
+\frac{\partial\,\mbox{hypot}(x,y)}{\partial y} = 
+\begin{cases}
+  \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
+  \frac{y}{\sqrt{x^2+y^2}} & \mbox{if } x,y\geq 0 \\[6pt]
+  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+\end{cases}
+\]
+%
+}
 %
 \fitem{real}{cos}{real \farg{x}}{
 The cosine of the angle \farg{x} (in radians)
