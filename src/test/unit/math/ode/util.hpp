@@ -7,11 +7,11 @@
 #include <boost/numeric/odeint.hpp>
 #include <stan/agrad/rev.hpp>
 
-#include <stan/math/ode/solve_ode_diff_integrator.hpp>
-#include <stan/math/ode/solve_ode.hpp>
+#include <stan/math/ode/integrate_ode_diff_integrator.hpp>
+#include <stan/math/ode/integrate_ode.hpp>
 
 
-//calculates finite diffs for solve_ode with varying parameters
+//calculates finite diffs for integrate_ode with varying parameters
 template <typename F>
 std::vector<std::vector<double> > finite_diff_params(const F& f,
                                                      const double& t_in,
@@ -38,9 +38,9 @@ std::vector<std::vector<double> > finite_diff_params(const F& f,
   std::vector<std::vector<double> > ode_res_ub;
   std::vector<std::vector<double> > ode_res_lb;
 
-  ode_res_ub = stan::math::solve_ode(f, y_in, t_in,
+  ode_res_ub = stan::math::integrate_ode(f, y_in, t_in,
                                      ts, theta_ub, x, x_int, &msgs);
-  ode_res_lb = stan::math::solve_ode(f, y_in, t_in,
+  ode_res_lb = stan::math::integrate_ode(f, y_in, t_in,
                                      ts, theta_lb, x, x_int, &msgs);
 
   std::vector<std::vector<double> > results(ts.size());
@@ -51,7 +51,7 @@ std::vector<std::vector<double> > finite_diff_params(const F& f,
   return results;
 }
 
-//calculates finite diffs for solve_ode with varying initial positions
+//calculates finite diffs for integrate_ode with varying initial positions
 template <typename F>
 std::vector<std::vector<double> > 
 finite_diff_initial_position(const F& f,
@@ -79,9 +79,9 @@ finite_diff_initial_position(const F& f,
   std::vector<std::vector<double> > ode_res_ub;
   std::vector<std::vector<double> > ode_res_lb;
 
-  ode_res_ub = stan::math::solve_ode(f, y_in_ub, t_in,
+  ode_res_ub = stan::math::integrate_ode(f, y_in_ub, t_in,
                                      ts, theta, x, x_int, &msgs);
-  ode_res_lb = stan::math::solve_ode(f, y_in_lb, t_in,
+  ode_res_lb = stan::math::integrate_ode(f, y_in_lb, t_in,
                                      ts, theta, x, x_int, &msgs);
 
   std::vector<std::vector<double> > results(ts.size());
@@ -93,7 +93,7 @@ finite_diff_initial_position(const F& f,
 }
 
  
-//test solve_ode with initial positions as doubles and parameters as vars 
+//test integrate_ode with initial positions as doubles and parameters as vars 
 //against finite differences
 template <typename F>
 void test_ode_finite_diff_dv(const F& f,
@@ -119,7 +119,7 @@ void test_ode_finite_diff_dv(const F& f,
 
   std::vector<std::vector<stan::agrad::var> > ode_res;
 
-  ode_res = stan::math::solve_ode(f, y_in, t_in,
+  ode_res = stan::math::integrate_ode(f, y_in, t_in,
                                   ts, theta_v, x, x_int, &msgs);
   
   for (int i = 0; i < ts.size(); i++) {
@@ -129,7 +129,7 @@ void test_ode_finite_diff_dv(const F& f,
 
       for (int k = 0; k < theta.size(); k++)
         EXPECT_NEAR(grads_eff[k], finite_diff_res[k][i][j], diff2)
-          << "Gradient of solve_ode failed with initial positions"
+          << "Gradient of integrate_ode failed with initial positions"
           << " known and parameters unknown at time index " << i
           << ", equation index " << j 
           << ", and parameter index: " << k;
@@ -139,7 +139,7 @@ void test_ode_finite_diff_dv(const F& f,
   }
 }
 
-//test solve_ode with initial positions as vars and parameters as doubles 
+//test integrate_ode with initial positions as vars and parameters as doubles 
 //against finite differences
 template <typename F>
 void test_ode_finite_diff_vd(const F& f,
@@ -165,7 +165,7 @@ void test_ode_finite_diff_vd(const F& f,
 
   std::vector<std::vector<stan::agrad::var> > ode_res;
 
-  ode_res = stan::math::solve_ode(f, y_in_v, t_in,
+  ode_res = stan::math::integrate_ode(f, y_in_v, t_in,
                                   ts, theta, x, x_int, &msgs);
 
   for (int i = 0; i < ts.size(); i++) {
@@ -175,7 +175,7 @@ void test_ode_finite_diff_vd(const F& f,
 
       for (int k = 0; k < y_in.size(); k++)
         EXPECT_NEAR(grads_eff[k], finite_diff_res[k][i][j], diff2)
-          << "Gradient of solve_ode failed with initial positions"
+          << "Gradient of integrate_ode failed with initial positions"
           << " unknown and parameters known at time index " << i
           << ", equation index " << j 
           << ", and parameter index: " << k;
@@ -185,7 +185,7 @@ void test_ode_finite_diff_vd(const F& f,
   }
 }
 
-//test solve_ode with initial positions as vars and parameters as vars 
+//test integrate_ode with initial positions as vars and parameters as vars 
 //against finite differences
 template <typename F>
 void test_ode_finite_diff_vv(const F& f,
@@ -227,7 +227,7 @@ void test_ode_finite_diff_vv(const F& f,
 
   std::vector<std::vector<stan::agrad::var> > ode_res;
 
-  ode_res = stan::math::solve_ode(f, y_in_v, t_in,
+  ode_res = stan::math::integrate_ode(f, y_in_v, t_in,
                                   ts, theta_v, x, x_int, &msgs);
 
   for (int i = 0; i < ts.size(); i++) {
@@ -237,13 +237,13 @@ void test_ode_finite_diff_vv(const F& f,
 
       for (int k = 0; k < theta.size(); k++)
         EXPECT_NEAR(grads_eff[k+y_in.size()], finite_diff_res_p[k][i][j], diff2)
-          << "Gradient of solve_ode failed with initial positions"
+          << "Gradient of integrate_ode failed with initial positions"
           << " unknown and parameters unknown for param at time index " << i
           << ", equation index " << j 
           << ", and parameter index: " << k;
       for (int k = 0; k < y_in.size(); k++)
         EXPECT_NEAR(grads_eff[k], finite_diff_res_y[k][i][j], diff2)
-          << "Gradient of solve_ode failed with initial positions"
+          << "Gradient of integrate_ode failed with initial positions"
           << " unknown and parameters known for initial position at time index " << i
           << ", equation index " << j 
           << ", and parameter index: " << k;
@@ -270,7 +270,7 @@ void test_ode_exceptions(const F& f,
 
   // y0.size() == 0 should throw
   y_.clear();
-  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
+  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
                std::domain_error);
   y_ = y_in;
 
@@ -278,35 +278,35 @@ void test_ode_exceptions(const F& f,
   y_.clear();
   for (int i = 0; i < y_in.size() - 1; i++)
     y_.push_back(y_in[i]);
-  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
+  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
                std::domain_error);
   y_.clear();
   y_ = y_in;
 
   // ts.size() == 0 should throw  
   ts_.clear();
-  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
+  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
                std::domain_error);
 
   // repeated values should throw
   ts_.clear();
   for (int i = 0; i < ts.size(); i++)
     ts_.push_back(t_in+1.0);
-  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
+  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
                std::domain_error);
 
   // elements in ts need to be ordered
   ts_.clear();
   for (int i = 0; i < ts.size(); i++)
     ts_.push_back(ts[ts.size()-i]);
-  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
+  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
                std::domain_error);
 
   // test t_in > ts (should throw)
   ts_.clear();
   ts_ = ts;
   t_ = ts[0] + 1.0;
-  EXPECT_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
+  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
                std::domain_error);
 
   // test negative time values
@@ -314,7 +314,7 @@ void test_ode_exceptions(const F& f,
   for (int i = 1; i < 4; i++)
     ts_.push_back(-0.1*(6-i));
   t_ = ts_[0] - 1.0;
-  EXPECT_NO_THROW(stan::math::solve_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs));
+  EXPECT_NO_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs));
 }
 
 template <typename F>

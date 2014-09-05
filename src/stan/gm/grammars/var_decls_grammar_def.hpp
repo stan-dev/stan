@@ -207,7 +207,7 @@ namespace stan {
         }
         return is_data;
       }
-      bool operator()(const solve_ode& x) const {
+      bool operator()(const integrate_ode& x) const {
         return boost::apply_visitor(*this, x.y0_.expr_)
           && boost::apply_visitor(*this, x.theta_.expr_);
       }

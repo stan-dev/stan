@@ -177,8 +177,8 @@ namespace stan {
             indexes.push_back(x.dimss_[i][j]); // wasteful copy, could use refs
         generate_indexed_expr<false>(expr_string,indexes,base_type,e_num_dims,o_);
       }
-      void operator()(const solve_ode& fx) const { 
-        o_ << "solve_ode("
+      void operator()(const integrate_ode& fx) const { 
+        o_ << "integrate_ode("
            << fx.system_function_name_
            << "_functor__(), ";
 

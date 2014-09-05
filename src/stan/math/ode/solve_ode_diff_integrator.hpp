@@ -31,7 +31,7 @@
 
 //     template <typename F, typename T>
 //     std::vector<std::vector<T> >
-//     solve_ode_diff_integrator(const F& f,
+//     integrate_ode_diff_integrator(const F& f,
 //                               const std::vector<T>& y0,
 //                               const double& t0,
 //                               const std::vector<double>& ts,

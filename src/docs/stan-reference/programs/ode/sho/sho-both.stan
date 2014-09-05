@@ -30,7 +30,7 @@ model {
   sigma ~ cauchy(0,2.5);
   theta ~ normal(0,1);
   y0 ~ normal(0,1);
-  y_hat <- solve_ode(sho, y0, t0, ts, theta, x, x_int);
+  y_hat <- integrate_ode(sho, y0, t0, ts, theta, x, x_int);
   for (t in 1:T)
     y[t] ~ normal(y_hat[t], sigma);
 }

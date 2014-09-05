@@ -25,7 +25,7 @@ model {
 }
 generated quantities {
   real y_hat[T,2];
-  y_hat <- solve_ode(sho, y0, t0, ts, theta, x, x_int );
+  y_hat <- integrate_ode(sho, y0, t0, ts, theta, x, x_int );
 
   // add measurement error
   for (t in 1:T) {

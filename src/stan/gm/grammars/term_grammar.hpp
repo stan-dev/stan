@@ -69,9 +69,9 @@ namespace stan {
       fun_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              solve_ode(var_origin), 
+                              integrate_ode(var_origin), 
                               whitespace_grammar<Iterator> > 
-      solve_ode_r;
+      integrate_ode_r;
 
 
       boost::spirit::qi::rule<Iterator, 

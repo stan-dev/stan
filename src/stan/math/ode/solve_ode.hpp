@@ -405,7 +405,7 @@ namespace stan {
 
     template <typename F, typename T1, typename T2>
     std::vector<std::vector<typename stan::return_type<T1,T2>::type> >
-    solve_ode(const F& f,
+    integrate_ode(const F& f,
               const std::vector<T1> y0, 
               const double& t0, // initial time
               const std::vector<double>& ts, // times at desired solutions
@@ -414,13 +414,13 @@ namespace stan {
               const std::vector<int>& x_int,
               std::ostream* pstream) { // int data values.
       using namespace boost::numeric::odeint;  // FIXME: trim to what is used
-      stan::math::check_nonzero_size("solve_ode(%1%)",ts,"time_vec",
+      stan::math::check_nonzero_size("integrate_ode(%1%)",ts,"time_vec",
                                      static_cast<double*>(0));
-      stan::math::check_nonzero_size("solve_ode(%1%)",y0,"y0_vec",
+      stan::math::check_nonzero_size("integrate_ode(%1%)",y0,"y0_vec",
                                      static_cast<double*>(0));
-      stan::math::check_ordered("solve_ode(%1%)", ts, "times", 
+      stan::math::check_ordered("integrate_ode(%1%)", ts, "times", 
                                 static_cast<double*>(0));
-      stan::math::check_less("solve_ode(%1%)",t0,ts[0],"initial time",
+      stan::math::check_less("integrate_ode(%1%)",t0,ts[0],"initial time",
                              static_cast<double*>(0));
 
       double absolute_tolerance = 1e-6;

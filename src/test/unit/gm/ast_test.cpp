@@ -268,12 +268,12 @@ TEST(gmAst, resetSigs) {
 }
 
 TEST(gmAst, solveOde) {
-  using stan::gm::solve_ode;
+  using stan::gm::integrate_ode;
   using stan::gm::variable;
   using stan::gm::expr_type;
   using stan::gm::expression;
 
-  solve_ode so; // null ctor should work and not raise error
+  integrate_ode so; // null ctor should work and not raise error
 
   std::string system_function_name = "foo";
 
@@ -296,7 +296,7 @@ TEST(gmAst, solveOde) {
   x.set_type(INT_T, 1);
 
   // example of instantiation
-  solve_ode so2(system_function_name, y0, t0, ts, theta, x, x_int);
+  integrate_ode so2(system_function_name, y0, t0, ts, theta, x, x_int);
 
   // dumb test to make sure we at least get the right types back
   EXPECT_EQ(system_function_name, so2.system_function_name_);

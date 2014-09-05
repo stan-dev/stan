@@ -7,8 +7,8 @@
 #include <boost/numeric/odeint.hpp>
 #include <stan/agrad/rev.hpp>
 
-#include <stan/math/ode/solve_ode_diff_integrator.hpp>
-#include <stan/math/ode/solve_ode.hpp>
+#include <stan/math/ode/integrate_ode_diff_integrator.hpp>
+#include <stan/math/ode/integrate_ode.hpp>
 
 #include <test/unit/math/ode/util.hpp>
 
@@ -41,7 +41,7 @@ struct harm_osc_ode_fun {
   }
 };
 
-TEST(solve_ode, ode_system_dv) {
+TEST(integrate_ode, ode_system_dv) {
   std::stringstream msgs;
   
   using stan::math::ode_system;
@@ -76,7 +76,7 @@ TEST(solve_ode, ode_system_dv) {
   EXPECT_FLOAT_EQ(-1.8, dy_dt[3]);
 }
 
-TEST(solve_ode, ode_system_vd) {
+TEST(integrate_ode, ode_system_vd) {
   std::stringstream msgs;
 
   using stan::math::ode_system;
@@ -116,7 +116,7 @@ TEST(solve_ode, ode_system_vd) {
   EXPECT_FLOAT_EQ(-0.15-1.0*2.0-0.15*5.0, dy_dt[5]);
 }
 
-TEST(solve_ode, harm_osc_finite_diff) {
+TEST(integrate_ode, harm_osc_finite_diff) {
   harm_osc_ode_fun harm_osc;
 
   std::vector<double> y0;
@@ -139,7 +139,7 @@ TEST(solve_ode, harm_osc_finite_diff) {
   test_ode(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8,1e-4);
 }
 
-TEST(solve_ode, harm_osc_known_values) {
+TEST(integrate_ode, harm_osc_known_values) {
   std::stringstream msgs;
 
   harm_osc_ode_fun harm_osc;
@@ -163,7 +163,7 @@ TEST(solve_ode, harm_osc_known_values) {
   for (int i = 0; i < 100; i++)
     ts.push_back(0.1*(i+1));
 
-  ode_res = stan::math::solve_ode(harm_osc, y0, t0,
+  ode_res = stan::math::integrate_ode(harm_osc, y0, t0,
                                   ts, theta, x, x_int, &msgs);
 
   EXPECT_NEAR(0.995029, ode_res[0][0].val(), 1e-5);
@@ -205,7 +205,7 @@ struct lorenz_ode_fun {
   }
 };
 
-TEST(solve_ode, lorenz_finite_diff) {
+TEST(integrate_ode, lorenz_finite_diff) {
   lorenz_ode_fun lorenz;
 
   std::vector<double> y0;
