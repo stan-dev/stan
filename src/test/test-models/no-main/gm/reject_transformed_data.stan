@@ -1,6 +1,6 @@
 transformed data {
   real<lower=0> x;
-  raise_exception("user-specified exception");
+  reject("user-specified rejection");
 }
 parameters {
   real y;

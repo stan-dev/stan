@@ -1,6 +1,6 @@
 functions {
   void foo_bar() {
-    raise_exception("user-specified exception");
+    reject("user-specified rejection");
   }
 }
 parameters {

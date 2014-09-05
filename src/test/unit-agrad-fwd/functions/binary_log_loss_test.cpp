@@ -3,6 +3,7 @@
 #include <stan/math/functions/binary_log_loss.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 double deriv(const int y, const double y_hat) {
   if (y == 0)
@@ -255,3 +256,15 @@ TEST(AgradFwdBinaryLogLoss,FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(9.2592592, g[0]);
 }
 
+struct binary_log_loss_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return binary_log_loss(0,arg1);
+  }
+};
+
+TEST(AgradFwdBinaryLogLoss,binary_log_loss_NaN) {
+  binary_log_loss_fun binary_log_loss_;
+  test_nan(binary_log_loss_,false);
+}

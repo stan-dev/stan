@@ -4,6 +4,7 @@
 #include <stan/math/functions/binomial_coefficient_log.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdBinomialCoefficientLog,Fvar) {
   using stan::agrad::fvar;
@@ -406,4 +407,19 @@ TEST(AgradFwdBinomialCoefficientLog,FvarFvarVar_Double_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(7.4613968e-07, g[0]);
+}
+
+struct binomial_coefficient_log_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename boost::math::tools::promote_args<T0,T1>::type
+  operator()(const T0 arg1,
+             const T1 arg2) const {
+    return binomial_coefficient_log(arg1,arg2);
+  }
+};
+
+TEST(AgradFwdBinomialCoefficientLog, nan) {
+  binomial_coefficient_log_fun binomial_coefficient_log_;
+  test_nan(binomial_coefficient_log_,3.0,5.0,false);
 }

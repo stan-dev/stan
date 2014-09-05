@@ -461,8 +461,8 @@ namespace stan {
                  << std::endl;
       return false;
     }
-    bool returns_type_vis::operator()(const raise_exception_statement& st) const  {
-      error_msgs_ << "Expecting return, found raise_exception statement." 
+    bool returns_type_vis::operator()(const reject_statement& st) const  {
+      error_msgs_ << "Expecting return, found reject statement." 
                  << std::endl;
       return false;
     }
@@ -1238,7 +1238,7 @@ namespace stan {
     statement::statement(const while_statement& st) : statement_(st) { }
     statement::statement(const conditional_statement& st) : statement_(st) { }
     statement::statement(const print_statement& st) : statement_(st) { }
-    statement::statement(const raise_exception_statement& st) : statement_(st) { }
+    statement::statement(const reject_statement& st) : statement_(st) { }
     statement::statement(const return_statement& st) : statement_(st) { }
     statement::statement(const no_op_statement& st) : statement_(st) { }
 
@@ -1273,7 +1273,7 @@ namespace stan {
     bool is_no_op_statement_vis::operator()(const print_statement& st) const {
       return false; 
     }
-    bool is_no_op_statement_vis::operator()(const raise_exception_statement& st) const {
+    bool is_no_op_statement_vis::operator()(const reject_statement& st) const {
       return false; 
     }
     bool is_no_op_statement_vis::operator()(const no_op_statement& st) const { 
@@ -1332,9 +1332,9 @@ namespace stan {
       : printables_(printables) { 
     }
 
-    raise_exception_statement::raise_exception_statement() { }
+    reject_statement::reject_statement() { }
 
-    raise_exception_statement::raise_exception_statement(const std::vector<printable>& printables) 
+    reject_statement::reject_statement(const std::vector<printable>& printables) 
       : printables_(printables) { 
     }
     
