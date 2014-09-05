@@ -165,3 +165,9 @@ test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
 src/test/unit-distribution/%_generated_test.cpp : src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
 	@echo "--- Generating tests for $(notdir $<) ---"
 	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
+
+
+LIST_OF_GENERATED_TESTS := $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_test.cpp,g')
+
+.PHONY: generate-tests
+generate-tests: $(LIST_OF_GENERATED_TESTS)
