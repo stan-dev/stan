@@ -3733,7 +3733,286 @@ directly in a regression model for the per-trial treatment effects
 $\theta_j$.
 
 
-\chapter{Clustering Models}
+\chapter{Models with Latent Discrete Parameters}
+
+\noindent
+Stan does not support sampling discrete parameters.  So it is not
+possible to directly translate BUGS or JAGS models with discrete
+parameters (i.e., discrete stochastic nodes).  Nevertheless, it is
+possible to code many models that involve bounded discrete
+parameters by marginalizing out the discrete parameters.%
+%
+\footnote{The computations are similar to those involved in
+  expectation maximization (EM) algorithms
+  \citep{dempster-et-al:1977}.}
+%
+This chapter shows how to code several widely-used models involving
+latent discrete parameters.  The next chapter,
+\refchapter{clustering}, on clustering models, considers further
+models involving latent discrete parameters.
+
+\section{The Benefits of Marginalization}\label{rao-blackwell.section}
+
+Although it requires some algebra on the joint probability function,
+a pleasant byproduct of the required calculations is the posterior
+expectation of the marginalized variable, which is often the quantity
+of interest for a model.  This allows far greater exploration of the
+tails of the distribution as well as more efficient sampling on an
+iteration-by-iteration basis because the expectation at all possible
+values is being used rather than itself being estimated through
+sampling a discrete parameter.
+ 
+\section{Change Point Models}
+
+The first example is a model of coal mining disasters in the the U.K.\
+for the years 1851--1962.%
+%
+\footnote{The original source of the data is \citep{Jarret:1979},
+  which itself is a note correcting an earlier data collection.}
+%
+
+\subsection{Model with Latent Discrete Parameter}
+
+\citep[Section 3.1]{PyMC:2014} provide a Poisson model of accident
+rate $D_t$ in year $t$ with two rate parameters, an early rate ($e$)
+and late rate ($l$), that change at a given point in time $s$.  The
+full model expressed using a latent discrete parameter $s$ is
+%
+\begin{eqnarray*}
+e & \sim & \distro{Exponential}(r_e)
+\\
+l & \sim & \distro{Exponential}(r_l)
+\\
+s & \sim & \distro{Uniform}(1,T)
+\\
+D_t & \sim & \distro{Poisson}(t < s \ ? \ e \ : \ l)
+\end{eqnarray*}
+%
+The ternary operator notation is borrowed from C, where the expression
+$(c \ ? \ x_1 \ : \ x_2)$ evalutes to $x_1$ if $c$ is true and $x_2$ otherwise.
+
+\subsection{Marginalizing out the Discrete Parameter}
+
+To code this model in Stan, the discrete parameter $s$ must be
+marginalized out to produce a model defining the log of the probability
+function $p(e,l,D_t)$.  The full joint probability function is
+%
+\[
+\begin{array}{l}
+p(e,l,s,D_t)
+\\[3pt]
+\mbox{ } \ \ =
+\distro{Exp}(e|r_e)
+\, \distro{Exp}(l|r_l)
+\, \distro{Unif}(s|1,T)
+\, \prod_{t=1}^T \distro{Pois}(D_t | t < s \ ? \ e \ : \ l),
+\end{array}
+\]
+with names of distributions shortened.  The required marginalization
+involves noting
+%
+\[
+p(e,l,D_t) = p(e,l) \, p(D_t | e,l)
+\]
+%
+and then reducing
+%
+\[
+p(D_t | e,l) = 
+\sum_{s=1}^T \distro{Unif}(s | 1,T) 
+\, \prod_{t=1}^T \distro{Pois}(D_t | t < s \ ? \ e \ : \ l).
+\]
+
+
+Because Stan specifies models on the log scale, the final form of the
+marginalization needed for the model is
+%
+\[
+\begin{array}{l}
+\log p(D_t | e,l)
+\\[3pt]
+\mbox{ } \ \ = \
+\mbox{log\_sum\_exp}_{s=1}^T \log \distro{Unif}(s | 1,T) 
++ \sum_{t=1}^T \log \distro{Pois}(D_t | t < s \ ? \ e \ : \ l),
+\end{array}
+\]
+%
+where the notation
+\[
+\mbox{log\_sum\_exp}_{n=1}^N \alpha_n
+=
+\log \sum_{n=1}^N \mbox{exp}(\alpha_n)
+\]
+%
+allows the model to be coded directly using the function of the same
+name in Stan, which provides an arithmetically robust approach to the
+arithmetic required to marginalize discrete parameters.
+
+\subsection{Coding the Model in Stan}
+
+The Stan program for the change point model is shown in
+\reffigure{change-point-model}.  The transformed parameter
+\code{lp[s]} stores the quantity $log p(s,C_t|e,l)$.
+%
+\begin{figure}
+\begin{quote}\small
+\begin{Verbatim}
+data {
+  real<lower=0> r_e;  // before change disaster rate prior
+  real<lower=0> r_l;  // after change disaster rate prior
+
+  int<lower=1> T;     // years
+  int<lower=0> D[T];  // disasters per year
+}
+transformed data {
+  real log_unif;
+  log_unif <- -log(T);  // log p(s)
+}
+parameters {
+  real<lower=0> e;    // before change disaster rate
+  real<lower=0> l;    // after change disaster rate
+}
+transformed parameters {
+  vector[T] lp;
+  lp <- rep_vector(log_unif, T);
+  for (s in 1:T)
+    for (t in 1:T)
+      lp[s] <- lp[s] + poisson_log(D[t], if_else(t < s, e, l));
+}
+model {
+  // prior
+  e ~ exponential(r_e);
+  l ~ exponential(r_l);
+
+  // likelihood
+  increment_log_prob(log_sum_exp(lp));
+}    
+\end{Verbatim}
+\end{quote}
+\vspace*{-6pt}
+\caption{\small\it A change point model in which accident rates
+  \code{D[t]} have one rate, \code{e}, before the change point and a
+  different rate, \code{l}, after the change point.  The change point
+  itself, \code{s}, is marginalized out as described in the
+  text.}\label{change-point-model.figure}
+\end{figure}
+
+\subsection{Fitting the Model with MCMC}
+
+This model is easy to fit using MCMC with NUTS in its default
+configuration.  Convergence is very fast and sampling produces roughly
+one effective sample every two iterations.  Because it is a relatively
+small model (the inner double loop over time is roughly 20,000 steps),
+it is very fast.
+
+The value of \code{lp} for each iteration for each change point is
+available because it is declared as a transformed parameter.  If the
+value of \code{lp} were not of interest, it could be coded as a local
+variable in the model block and thus avoid the I/O overhead of saving
+values every iteration.
+
+\subsection{Posterior Distribution of the Discrete Change Point}
+
+The value of \code{lp[s]} in a given iteration is given by $log
+p(s,D|e,l)$ for the values of the early and late rates, $e$ and $l$,
+in the iteration.  By Bayes's law,
+\[ 
+p(s|D,e,l) \propto p(s,D|e,l).
+\]
+In each iteration after convergence, the early and late disaster
+rates, $e$ and $l$, are drawn from the posterior $p(e,l|D)$ by MCMC
+sampling.  Thus the value of \code{lp} may be used to calculate
+$p(s|D,e,l)$ in each iteration, based on on the current values of
+$e$ and $l$.  Averaging over iterations provides an unnormalized
+probability estimate of the change point being $s$,
+%
+\[
+p(s | D)
+\propto
+\frac{1}{M} \sum_{m=1}^{M} \exp(\code{lp}[m,s])
+= q(t),
+\]
+%
+where $\mbox{\code{lp}}[m,s]$ represents the value of \code{lp} in
+sample $m$ for change point $s$.  By averaging over samples, $e$ and
+$l$ are themselves marginalized out, and the result has no dependence
+on a given iteration's value for $e$ and $l$.  A final normalization
+then produces the quantity of interest, the posterior probability of
+the change point being $s$ conditioned on
+the data $D$,
+%
+\[
+p(s | D)
+=
+\frac{q(t)}{\sum_{t'=1}^T q(t')}.
+\]
+%
+A plot of the values of $\log p(s|D)$ computed using Stan 2.4's
+default MCMC implementation is shown in
+\reffigure{change-point-posterior.figure}.  
+%
+\begin{figure}
+\begin{center}
+\includegraphics[height=2in]{/Users/carp/temp2/mining-disasters/change-point-posterior.pdf}
+\ \ \ \ \
+\includegraphics[height=2in]{/Users/carp/temp2/mining-disasters/s-discrete-posterior.pdf}
+\end{center}
+\vspace*{-12pt}
+\caption{\small\it The posterior estimates for the change point.  \
+  {\rm Left)} log probability of change point being in year,
+  calculated analytically using \code{lp}; \ {\rm Right)}\ frequency
+  of change point draws in the posterior generated using
+  \code{lp}. The plot on the left is on the log scale and the plot on
+  the right on the linear scale; note the narrower range of years in
+  the right-hand plot. The posterior mean of $s$ is roughly 1891.}%
+\label{change-point-posterior.figure}
+\end{figure}
+%
+
+\subsection{Posterior Covariance}
+
+Although this only plots the posterior marginal probability of $s$,
+the quantity \code{lp} is calculated at every iteration, thus allowing
+it to be used to calculate covariance with other posterior quantities
+of interest.  Such calculations are done in expectation by averaging
+over the posterior probabilities.
+
+\subsection{Discrete Sampling}
+
+Although not computationally advantageous compared to working in
+expectation using \code{lp}, it is possible to use Stan to sample the
+value of \code{s} at every iteration.
+%
+\begin{quote}
+\begin{Verbatim}
+generated quantities {
+  int<lower=1,upper=T> s;
+  s <- categorical_rng(softmax(lp));
+}
+\end{Verbatim}
+\end{quote}
+%
+A posterior histogram of draws for $s$ is shown on the right side of \reffigure{change-point-posterior.figure}
+
+
+
+
+
+
+posterior.  These expectations are computed in the variable \code{lp}
+at every iteration, so even their correlation with the rates in the
+posterior can be evaluated.
+
+
+\section{Capture-Recapture Models}
+
+
+\section{Rating Models}
+
+
+
+
+\chapter{Clustering Models}\label{clustering.chapter}
 
 \noindent
 Unsupervised methods for organizing data into groups are collectively
