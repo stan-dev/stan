@@ -2,6 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,round) {
   AVAR a = 1.2;
@@ -48,8 +49,15 @@ TEST(AgradRev,round_4) {
   EXPECT_FLOAT_EQ(0.0, grad_f[0]);
 }
 
-TEST(AgradRev,round_nan) {
-  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::round(nan).val());
+struct round_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return round(arg1);
+  }
+};
+
+TEST(AgradRev,round_NaN) {
+  round_fun round_;
+  test_nan(round_,false,true);
 }

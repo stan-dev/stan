@@ -23,6 +23,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the vector is a simplex.
+     * @return throws if any element is nan.
      */
     template <typename T_prob, typename T_result>
     bool check_simplex(const char* function,
@@ -39,7 +40,7 @@ namespace stan {
                        tmp.c_str(),"",
                        result);
       }
-      if (fabs(1.0 - theta.sum()) > CONSTRAINT_TOLERANCE) {
+      if (!(fabs(1.0 - theta.sum()) <= CONSTRAINT_TOLERANCE)) {
         std::stringstream msg;
         T_prob sum = theta.sum();
         msg << " is not a valid simplex.";

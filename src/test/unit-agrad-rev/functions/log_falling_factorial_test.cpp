@@ -2,6 +2,9 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
+
 
 TEST(AgradRev,log_falling_factorial_var_double) {
   double a(1);
@@ -46,4 +49,19 @@ TEST(AgradRev, log_falling_factorial_var_var) {
   f.grad(x,g);
   EXPECT_FLOAT_EQ(boost::math::digamma(5), g[0]);
   EXPECT_FLOAT_EQ(-boost::math::digamma(5), g[1]);
+}
+
+struct log_falling_factorial_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return log_falling_factorial(arg1,arg2);
+  }
+};
+
+TEST(AgradRev, log_falling_factorial_nan) {
+  log_falling_factorial_fun log_falling_factorial_;
+  test_nan(log_falling_factorial_,4.0,4.0,false,true);
 }

@@ -8,7 +8,7 @@ namespace stan {
      * Return 1 if the argument is unequal to zero and 0 otherwise.
      *
      * @param x Value.
-     * @return 1 if argument is equal to zero and 0 otherwise.
+     * @return 1 if argument is equal to zero (or NaN) and 0 otherwise.
      */
     template <typename T>
     inline bool as_bool(const T x) {
