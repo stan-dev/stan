@@ -3798,61 +3798,61 @@ marginalized out to produce a model defining the log of the probability
 function $p(e,l,D_t)$.  The full joint probability function is
 %
 \[
-\begin{array}{l}
 p(e,l,s,D_t)
-\\[3pt]
 \mbox{ } \ \ =
-\distro{Exp}(e|r_e)
-\, \distro{Exp}(l|r_l)
-\, \distro{Unif}(s|1,T)
-\, \prod_{t=1}^T \distro{Pois}(D_t | t < s \ ? \ e \ : \ l),
+\begin{array}[t]{l}
+\distro{Exponential}(e|r_e) \, \distro{Exponential}(l|r_l) \, \distro{Uniform}(s|1,T)
+\\[3pt]
+\prod_{t=1}^T \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l),
 \end{array}
 \]
-with names of distributions shortened.  The required marginalization
-involves noting
+with names of distributions shortened.  To marginalize, apply the
+chain rule
 %
 \[
-p(e,l,D_t) = p(e,l) \, p(D_t | e,l)
+p(e,l,D_t) = p(e,l) \, p(D_t | e,l),
 \]
 %
-and then reducing
+then reduce
 %
 \[
 p(D_t | e,l) = 
-\sum_{s=1}^T \distro{Unif}(s | 1,T) 
-\, \prod_{t=1}^T \distro{Pois}(D_t | t < s \ ? \ e \ : \ l).
+\sum_{s=1}^T \distro{Uniform}(s | 1,T) 
+\, \prod_{t=1}^T \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l).
 \]
-
 
 Because Stan specifies models on the log scale, the final form of the
 marginalization needed for the model is
 %
 \[
-\begin{array}{l}
 \log p(D_t | e,l)
 \\[3pt]
 \mbox{ } \ \ = \
-\mbox{log\_sum\_exp}_{s=1}^T \log \distro{Unif}(s | 1,T) 
-+ \sum_{t=1}^T \log \distro{Pois}(D_t | t < s \ ? \ e \ : \ l),
+\begin{array}[t]{l}
+\mbox{log\_sum\_exp}_{s=1}^T \log \distro{Uniform}(s | 1,T) 
+\\[3pt]
+{} + \sum_{t=1}^T \log \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l),
 \end{array}
 \]
 %
-where the notation
+where the log sum of exponents function is defined by
 \[
 \mbox{log\_sum\_exp}_{n=1}^N \alpha_n
 =
-\log \sum_{n=1}^N \mbox{exp}(\alpha_n)
+\log \sum_{n=1}^N \mbox{exp}(\alpha_n).
 \]
 %
-allows the model to be coded directly using the function of the same
-name in Stan, which provides an arithmetically robust approach to the
-arithmetic required to marginalize discrete parameters.
+The log sum of exponents function allows the model to be coded
+directly in Stan using the built-in function \code{log\_sum\_exp},
+which provides both arithmetic stability and efficiency for mixture
+model calculations.
+
 
 \subsection{Coding the Model in Stan}
 
 The Stan program for the change point model is shown in
 \reffigure{change-point-model}.  The transformed parameter
-\code{lp[s]} stores the quantity $log p(s,C_t|e,l)$.
+\code{lp[s]} stores the quantity $\log p(s,C_t|e,l)$.
 %
 \begin{figure}
 \begin{quote}\small
@@ -3949,7 +3949,7 @@ p(s | D)
 %
 A plot of the values of $\log p(s|D)$ computed using Stan 2.4's
 default MCMC implementation is shown in
-\reffigure{change-point-posterior.figure}.  
+\reffigure{change-point-posterior}.
 %
 \begin{figure}
 \begin{center}
@@ -3969,13 +3969,7 @@ default MCMC implementation is shown in
 \end{figure}
 %
 
-\subsection{Posterior Covariance}
 
-Although this only plots the posterior marginal probability of $s$,
-the quantity \code{lp} is calculated at every iteration, thus allowing
-it to be used to calculate covariance with other posterior quantities
-of interest.  Such calculations are done in expectation by averaging
-over the posterior probabilities.
 
 \subsection{Discrete Sampling}
 
@@ -3992,22 +3986,538 @@ generated quantities {
 \end{Verbatim}
 \end{quote}
 %
-A posterior histogram of draws for $s$ is shown on the right side of \reffigure{change-point-posterior.figure}
+A posterior histogram of draws for $s$ is shown on the right side of
+\reffigure{change-point-posterior}.
+
+
+\subsection{Posterior Covariance}
+
+Although this only plots the posterior marginal probability of $s$,
+the quantity \code{lp} is calculated at every iteration, thus allowing
+it to be used to calculate covariance with other posterior quantities
+of interest.  Such calculations are done in expectation by averaging
+over the posterior probabilities.
+
+Alternatively, the discrete samples can be used to calculate
+covariance with other parameters.  Although less efficient
+statistically (in the sense of requiring more iterations for the same
+degree of accuracy), it is conceptually simpler to use the samples.
 
 
 
 
+\section{Mark-Recapture Models}
+
+A widely applied field method in ecology is to capture (or sight)
+animals, mark them (e.g., by tagging), then release them.  Later,
+another round of captures is carried out, with potentially additional
+tagging and releasing.  The resulting data may be used to estimate
+population size.
+
+The first subsection describes a very simple mark-recapture model that does
+not involve any latent discrete parameters.  The following subsection
+describes the Cormack-Jolly-Seber model, which involves latent
+discrete parameters for animal death.
+
+\subsection{Simple Mark-Recapture Model}
+
+In the simplest case, a one-stage mark-recapture study produces the
+following data
+%
+\begin{itemize}
+\item $M$ : number of animals marked in first capture,
+\item $C$ : number animals in second capture, and
+\item $R$ : number of marked animals in second capture.
+\end{itemize}
+%
+The estimand of interest is
+%
+\begin{itemize}
+\item $N$ : number of animals in the population.
+\end{itemize}
+%
+The Lincoln-Petersen \citep{Lincoln:1930,Petersen:1896} method for
+estimating population size is
+%
+\[
+\hat{N} = \frac{M C}{R}.
+\]
+%
+This population estimate would arise from a probabilistic model in
+which the number of recaptured animals is distributed binomially,
+\[
+R \sim \distro{Binomial}(C, M / N)
+\]
+given the total number of animals captured in the second round ($C$)
+with a recapture probability of $M/N$.  
+
+%
+\begin{figure}
+\begin{quote}\small
+\begin{Verbatim}
+data {
+  int<lower=0> M;                  // marked
+  int<lower=0> C;                  // captured
+  int<lower=0,upper=min(M,C)> R;   // recaptured
+}
+parameters {
+  real<lower=(C - R + M)> N;       // population
+}
+model {
+  // N has improper default prior
+  R ~ binomial(C, M / N);
+}
+\end{Verbatim}
+\end{quote}
+\vspace*{-6pt}
+\caption{\small\it A probabilistic formulation of the Lincoln-Petersen
+population estimator for pulation size based on data from a one-step
+mark-recapture study.  The lower bound on $N$ is necessary to
+efficiently eliminate impossible values.}%
+\label{lincoln-petersen-model.figure}
+\end{figure}
+%
+The probabilistic variant of the Lincoln-Petersen estimator can be
+directly coded in Stan as shown in \reffigure{lincoln-petersen-model}.
+The Lincoln-Petersen estimate is the maximum likelihood estimate (MLE)
+for this model.
+
+To enusre the MLE is the Lincoln-Petersen estimate, an improper
+uniform prior for $N$ is used; this could (and should) be replaced
+with a more informative prior if possible based on knowledge of the
+population under study.
+
+The one tricky part of the model is the lower bound $C - R + M$ placed
+on the population size $N$.  Values below this bound are impossible
+because it is otherwise not possible to draw $R$ samples out of the
+$C$ animals recaptured.  Implementing this lower bound is not strictly
+necessary in that values for $N$ below this will cause the binomial
+evaluation in the model to reject a sample, but having the lower bound
+is more efficient computationally for both MCMC and optimization.
+
+\subsection{Cormack-Jolly-Seber with Discrete Parameter}
+
+The Cormack-Jolly-Seber (CJS) model
+\citep{Cormack:1964,Jolly:1965,Seber:1965} is an open-population model
+in which the population may change over time due to death; the
+presentation here draws heavily on \citep{Schofield:2007}.  
+
+The basic data is
+%
+\begin{itemize}
+\item $I$ : number of individuals, 
+\item $T$ : number of capture periods, and
+\item $y_{i,t}$ : boolean indicating if individual $i$ was captured at
+  time $t$.
+\end{itemize}
+%
+Each individual is assumed to have been captured at least once because
+an individual only contributes information conditionally after they
+have been captured the first time.
+
+There are two Bernoulli parameters in the model,
+%
+\begin{itemize}
+\item $\phi_t$ : probability that animal alive at time $t$ survives
+  until $t + 1$ and
+\item $p_t$ : probability that animal alive at time $t$ is captured at
+  time $t$.
+\end{itemize}
+%
+These parameters will both be given uniform priors, but information
+should be used to tighten these priors in practice.
+
+The CJS model also employs a latent discrete parameter $z_{i,t}$
+indicating for each individual $i$ whether it is alive at time $t$,
+distributed as
+%
+\[
+z_{i,t} \sim \distro{Bernoulli}(\ternary{z_{i,t-1}}{0}{\phi_{t-1}}).
+\]
+%
+The conditional prevents the model positing zombies; once an animal is
+dead, it stays dead.  The data distribution is then simple to express
+conditional on $z$ as
+%
+\[
+y_{i,t} \sim \distro{Bernoulli}(\ternary{z_{i,t}}{0}{p_t})
+\]
+%
+The conditional enforces the constraint that dead animals cannot be captured.
 
 
-posterior.  These expectations are computed in the variable \code{lp}
-at every iteration, so even their correlation with the rates in the
-posterior can be evaluated.
+\subsection{Collective Cormack-Jolly-Seber Model}
 
 
-\section{Capture-Recapture Models}
+ This
+subsection presents an implementation of the model in terms of counts
+for different history profiles for individuals over three capture
+times. It assumes exchangeability of the animals in the sense thateach
+is assigned the same capture and survival probabilities.
+
+In order to ease the marginalization of the latent discrete parameter
+$z_{i,t}$, the Stan models rely on a derivated quantity $\chi_t$ for
+the probability that an individual is never captured again if it is
+alive at time $t$ (if it is dead, the recapture probability is zero).
+this quantity is defined recursively by
+\[
+\chi_t 
+= 
+\begin{cases}
+1 
+& \mbox{if } t = T
+\\[3pt]
+(1 - \phi_t) + \phi_t (1 - p_{t+1}) \chi_{t+1}
+& \mbox{ if } t < T
+\end{cases}
+\]
+%
+The base case arises because if an animal was captured in the last
+time period, the probability it is never captured again is 1 because
+there are no more capture periods.  The recursive case defining
+$\chi_{t}$ in terms of $\chi_{t+1}$ involves two possibiliites: (1)
+not surviving to the next time period, with probability $(1 -
+\phi_t)$, or (2) suriviving to the next time period with probability
+$\phi_t$, not being captured in the next time period with probabilty
+$(1 - p_{t+1})$, and not being captured again after being alive in
+period $t+1$ with probability $\chi_{t+1}$.  
+
+By defining $\chi$ directly, there is no need for a latent binary
+parameter indicating whether an animal is alive at time $t$ or not.
+
+With three capture times, there are three captured/not-captured
+profiles an individual may have.  These may be naturally coded as
+binary numbers as follows.
+%
+\begin{center}
+\begin{tabular}{c|ccc|c}
+& \multicolumn{3}{|c|}{{\it captures}}
+\\
+{\it profile} & 1 & 2 & 3 & {\it probability}
+\\ \hline
+{0} & - & - & - & n/a
+\\
+{1} & - & - & + & n/a
+\\ \hline
+{2} & - & + & - & $\chi_2$
+\\
+{3} & - & + & + & $\phi_2 \, \phi_3$
+\\ \hline
+{4} & + & - & - & $\chi_1$
+\\
+{5} & + & - & + & $\phi_1 \, (1 - p_2) \, \phi_2 \, p_3$
+\\ \hline
+{6} & + & + & - & $ \phi_1 \, p_2 \, \chi_2$
+\\ 
+{7} & + & + & + & $\phi_1 \, p_2 \, \phi_2 \, p_3$
+\end{tabular}
+\end{center}
+%
+History 0, for animals that are never captured, is unobservable
+because only animals that are captured are observed. History 1, for
+animals that are only captured in the last round, provides no
+information for the CJS model, because capture/non-capture status is
+only informative when conditioned on earlier captures.  For the
+remaining cases, the contribution to the likelihood is provided in the
+final column.
+
+The Stan model defines $\chi$ as a transformed parameter based on
+parameters $\phi$ and $p$.  In the model block, the log probability is
+incremented for each history based on its count.  This second step is
+similar to collecting Bernoulli observations into a binomial or
+categorical observations into a multinomial, only it is coded directly
+in the Stan program using \code{increment\_log\_prob} rather than
+being part of a built-in probability function.
+%
+\begin{figure}
+\begin{quote}\small
+\begin{Verbatim}
+data {
+  int<lower=0> history[7];
+}
+parameters {
+  real<lower=0,upper=1> phi[2];
+  real<lower=0,upper=1> p[3];
+}
+transformed parameters {
+  real<lower=0,upper=1> chi[2];  
+  chi[2] <- (1 - phi[2]) + phi[2] * (1 - p[3]);
+  chi[1] <- (1 - phi[1]) + phi[1] * (1 - p[2]) * chi[2];
+}
+model {
+  increment_log_prob(history[2] * log(chi[2]));
+  increment_log_prob(history[3] * (log(phi[2]) + log(p[3])));
+  increment_log_prob(history[4] * (log(chi[1])));
+  increment_log_prob(history[5] 
+                     * (log(phi[1]) + log1m(p[2])
+                        + log(phi[2]) + log(p[3])));
+  increment_log_prob(history[6] 
+                     * (log(phi[1]) + log(p[2]) 
+                        + log(chi[2])));
+  increment_log_prob(history[7] 
+                     * (log(phi[1]) + log(p[2]) 
+                        + log(phi[2]) + log(p[3])));
+}
+generated quantities {
+  real<lower=0,upper=1> beta3;
+  beta3 <- phi[2] * p[3];
+}
+\end{Verbatim}
+\end{quote}
+\vspace*{-12pt}
+\caption{\small\it A Stan program for the Cormack-Jolly-Seber
+  mark-recapture model that considers counts of individuals with
+  observation histories of being observed or not in three capture
+  periods.}\label{cjs-history.figure}
+\end{figure}
+%
+
+The parameters \code{phi[2]} and \code{p[3]} are not identifiable, but
+their product \code{beta3} is, so \code{beta3} is defined as a
+generated quantity.  The use of unidentified parameters is actually a
+problem for Stan's samplers' adaptation.  Although the problem posed
+for adaptation is mild here because the parameters are bounded and
+thus have proper uniform priors, it would be better to replace
+parameters \code{phi[2]} and \code{p[3]} with a parameter
+\code{beta3}.
+
+\subsection{Individual Cormack-Jolly-Seber Model}
+
+This section presents a version of the Cormack-Jolly-Seber (CJS) model
+cast at the individual level rather than collectively as in the
+previous subsection.  It also extends the model to allow an arbitrary
+number of time periods.  Thus the data will consist of the number $T$
+of capture events, the number $I$ of individuals, and a boolean flag
+$y_{i,t}$ indicating if individual $i$ was observed at time $t$.  In Stan,
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=2> T;
+  int<lower=0> I;
+  int<lower=0,upper=1> y[I,T];
+}
+\end{Verbatim}
+\end{quote}
+
+The advantages to the individual-level model is that it becomes
+possible to add individual ``random effects'' that affect survival or
+capture probability, as well as to avoid the combinatorics involved in
+unfolding $2^T$ observation histories for $T$ capture times.
+
+\subsubsection{Utility Functions}
+
+The individual CJS model is written relying on several function
+definitions.  The first two are used in the transformed data block to
+comput the first and last time period in which an animal was
+captured. 
+\begin{quote}
+\begin{Verbatim}
+functions {
+  int first_capture(int[] y_i) {
+    for (k in 1:size(y_i))
+      if (y_i[k])
+        return k;
+    return 0;  // never captured
+  }
+  int last_capture(int[] y_i) { 
+    for (k_rev in 0:(size(y_i) - 1)) {
+      int k;
+      k <- size(y_i) - k_rev;
+      if (y_i[k]) 
+        return k;
+    }
+    return 0;  // never captured
+  }
+  ...
+}
+\end{Verbatim}
+\end{quote}
+%
+These two functions are used to define the first and last capture time
+for each individual in the transformed data block.%
+%
+\footnote{Both functions return 0 if the individual represented by the
+  input array was never captured.  Individuals with no captures are
+  not relevant for estimating the model because all probability
+  statements are conditional on earlier captures.  Typically they
+  would be removed from the data, but the program allows them, but
+  they have no impact on the log probability function.}
+%
+\begin{quote}
+\begin{Verbatim}
+transformed data {
+  int<lower=0,upper=T> first[I];
+  int<lower=0,upper=T> last[I];
+  vector<lower=0,upper=I>[T] n_captured;
+  for (i in 1:I)
+    first[i] <- first_capture(y[i]);
+  for (i in 1:I)
+    last[i] <- last_capture(y[i]);
+  n_captured <- rep_vector(0,T);
+  for (t in 1:T)
+    for (i in 1:I)
+      if (y[i,t]) 
+        n_captured[t] <- n_captured[t] + 1;
+}
+\end{Verbatim}
+\end{quote}
+%
+The transformed data block also defines \code{n\_captured[t]}, which is
+the total number of captures at time \code{t}.  The only readon
+\code{n\_captured} is defined as a vector instead of an integer array
+is that it is used in an elementwise vector operation in the generated
+quantities block to model the population estimates at each time point.
+
+The parameters and transformed parameters are as before, but now there
+is a function definition for computing the value of \code{chi[t]}, the
+probability that if an individual is alive at \code{t} that it will
+never be observed again.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  vector<lower=0,upper=1>[T-1] phi;
+  vector<lower=0,upper=1>[T] p;
+}
+transformed parameters {
+  vector<lower=0,upper=1>[T] chi;
+  chi <- prob_uncaptured(T,p,phi);
+}
+\end{Verbatim}
+\end{quote}
+%
+The definition of \code{prob\_uncaptured}, from the functions block,
+is
+%
+\begin{quote}
+\begin{Verbatim}
+funtions {
+  ...
+  vector prob_uncaptured(int T, vector p, vector phi) {
+    vector[T] chi;
+    chi[T] <- 1.0;              
+    for (t in 1:(T - 1)) {
+      int t_curr;
+      int t_next;
+      t_curr <- T - t;
+      t_next <- t_curr + 1;
+      chi[t_curr] <- (1 - phi[t_curr]) 
+                     + phi[t_curr] 
+                       * (1 - p[t_next]) 
+                       * chi[t_next]; 
+    }
+    return chi;
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+The function definition directly follows the mathematical definition
+of $\chi_t$, unrolling the recursion into an iterative algorithm
+updating the elemnts of \code{chi} from \code{T} down to 1.
+
+\subsubsection{The Model}
+
+Given a long buildup computation, the model block directly encodes the
+CJS model.  All parameters are left with their default uniform priors
+and the model simply encodes the log probability of the observations
+\code{q} given the parameters \code{p} and \code{phi} as well as the
+transformed parameter \code{chi} defined in terms of \code{p} and \code{phi}.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  for (i in 1:I) {
+    if (first[i] > 0) {
+      for (t in (first[i]+1):last[i]) {
+        1 ~ bernoulli(phi[t-1]);
+        y[i,t] ~ bernoulli(p[t]);
+      }
+      1 ~ bernoulli(chi[last[i]]);
+    }
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+The outer loop is over individuals, with the conditional the
+conditional skipping individuals \code{i} which are never captured;
+this check depends on the convention of returning 0 for \code{first}
+if an individual is never captured.
+
+The inner loop for individual \code{i} first increments the Bernoulli
+survival, with an outcome of 1 being fixed because the individual must
+survive every time between the first and last capture (i.e., no
+zombies).  Note that the loop starts after the first capture, because
+all information in the CJS model is conditional on the first capture.
+
+Also in the inner loop, the observed capture status \code{y[i,t]} for
+individual \code{i} at time \code{t} has a Bernoulli distribution
+based on the capture probabilty \code{p[t]} at time \code{t}.
+
+After the inner loop, the probability of an animal never being seen
+again after being observed at time \code{last[i]} is included, because
+\code{last[i]} was defined to be the last time period in which animal
+\code{i} was observed.
+
+\subsubsection{Identified Parameters}
+
+As with the collective model described in the previous subsection,
+this model does not identify \code{phi[T-1]} and \code{phi[T]}, but
+does identify their product, \code{beta}.  Thus \code{beta} is defined
+as a generated quantity to monitor convergence and report.
+%
+\begin{quote}
+\begin{Verbatim}
+generated quantities {
+  real beta;
+  ...
+
+  beta <- phi[T-1] * p[T];
+  ...
+}
+\end{Verbatim}
+\end{quote}
+%
+
+The parameter \code{p[1]} is also not modeled and will just be uniform
+between 0 and 1.  A more finely articulated model might have a
+time-series component, in which case \code{p[1]} would be an unknown
+intial condition.
+
+\subsubsection{Population Size Estimates}
+
+The generated quantities block in the previous subsubsection here also
+include a calculation of the population at each time \code{t}, which
+is estimated as in the simple mark-recapture model as the number of
+individuals captured at time \code{t} divided by the probability of
+capture at time \code{t}.  This is done with the elementwise division
+operation for vectors (\code{./}) in the generated quantities block.
+%
+\begin{quote}
+\begin{Verbatim}
+generated quantities {
+  ...
+  vector<lower=0>[T] pop;
+  ...
+  pop <- n_captured ./ p;
+  pop[1] <- -1; // p[1] not estimated
+}
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Generalizing to Individual Effects}
+
+All individuals are modeled as having the same capture probability,
+but this model could be easily generalized to use a logistic
+regression here based on individual-level inputs to be used as
+predictors.
+
 
 
 \section{Rating Models}
+%
 
 
 
