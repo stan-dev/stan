@@ -3778,7 +3778,7 @@ for the years 1851--1962.%
 
 \subsection{Model with Latent Discrete Parameter}
 
-\citep[Section 3.1]{PyMC:2014} provide a Poisson model of accident
+\citep[Section 3.1]{PyMC:2014} provide a Poisson model of disaster
 rate $D_t$ in year $t$ with two rate parameters, an early rate ($e$)
 and late rate ($l$), that change at a given point in time $s$.  The
 full model expressed using a latent discrete parameter $s$ is
@@ -3799,38 +3799,48 @@ $(c \ ? \ x_1 \ : \ x_2)$ evalutes to $x_1$ if $c$ is true and $x_2$ otherwise.
 \subsection{Marginalizing out the Discrete Parameter}
 
 To code this model in Stan, the discrete parameter $s$ must be
-marginalized out to produce a model defining the log of the probability
-function $p(e,l,D_t)$.  The full joint probability function is
+marginalized out to produce a model defining the log of the
+probability function $p(e,l,D_t)$.  The full joint probability factors
+as 
 %
-\[
-p(e,l,s,D_t)
-\mbox{ } \ \ =
+\begin{eqnarray*}
+p(e,l,s,D)
+& = & p(e) \, p(l) \, p(s) \, p(D | s, e, l)
+\\[3pt]
+& = & 
 \begin{array}[t]{l}
-\distro{Exponential}(e|r_e) \, \distro{Exponential}(l|r_l) \, \distro{Uniform}(s|1,T)
+\distro{Exponential}(e|r_e) \ \distro{Exponential}(l|r_l) \ \distro{Uniform}(s|1,T)
 \\[3pt]
 \prod_{t=1}^T \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l),
 \end{array}
-\]
-with names of distributions shortened.  To marginalize, apply the
-chain rule
+\end{eqnarray*}
 %
-\[
-p(e,l,D_t) = p(e,l) \, p(D_t | e,l),
-\]
+To marginalize, an alternative factorization into prior and likelihood
+is used,
 %
-then reduce
+\begin{eqnarray*}
+p(e,l,D) & = & p(e,l) \, p(D|e,l),
+\end{eqnarray*}
 %
-\[
-p(D_t | e,l) = 
+where the likelihood is defined by marginalizing $s$ as
+%
+\begin{eqnarray*}
+p(D | e,l) 
+& = &
+\sum_{s=1}^T p(s, D | e,l)
+\\[3pt]
+& = &
+\sum_{s=1}^T p(s) p(D | s,e,l)
+\\[3pt]
+& = &
 \sum_{s=1}^T \distro{Uniform}(s | 1,T) 
-\, \prod_{t=1}^T \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l).
-\]
-
-Because Stan specifies models on the log scale, the final form of the
-marginalization needed for the model is
+\, \prod_{t=1}^T \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l)
+\end{eqnarray*}
+%
+Stan operates on the log scale and thus requires the log likelihood,
 %
 \[
-\log p(D_t | e,l)
+\log p(D | e,l)
 \\[3pt]
 \mbox{ } \ \ = \
 \begin{array}[t]{l}
@@ -3857,25 +3867,25 @@ model calculations.
 
 The Stan program for the change point model is shown in
 \reffigure{change-point-model}.  The transformed parameter
-\code{lp[s]} stores the quantity $\log p(s,C_t|e,l)$.
+\code{lp[s]} stores the quantity $\log p(s,D|e,l)$.
 %
 \begin{figure}
 \begin{quote}\small
 \begin{Verbatim}
 data {
-  real<lower=0> r_e;  // before change disaster rate prior
-  real<lower=0> r_l;  // after change disaster rate prior
+  real<lower=0> r_e;
+  real<lower=0> r_l;
 
-  int<lower=1> T;     // years
-  int<lower=0> D[T];  // disasters per year
+  int<lower=1> T;
+  int<lower=0> D[T];
 }
 transformed data {
   real log_unif;
-  log_unif <- -log(T);  // log p(s)
+  log_unif <- -log(T);
 }
 parameters {
-  real<lower=0> e;    // before change disaster rate
-  real<lower=0> l;    // after change disaster rate
+  real<lower=0> e;
+  real<lower=0> l;
 }
 transformed parameters {
   vector[T] lp;
@@ -3885,17 +3895,14 @@ transformed parameters {
       lp[s] <- lp[s] + poisson_log(D[t], if_else(t < s, e, l));
 }
 model {
-  // prior
   e ~ exponential(r_e);
   l ~ exponential(r_l);
-
-  // likelihood
   increment_log_prob(log_sum_exp(lp));
 }    
 \end{Verbatim}
 \end{quote}
 \vspace*{-6pt}
-\caption{\small\it A change point model in which accident rates
+\caption{\small\it A change point model in which disaster rates
   \code{D[t]} have one rate, \code{e}, before the change point and a
   different rate, \code{l}, after the change point.  The change point
   itself, \code{s}, is marginalized out as described in the
@@ -3918,38 +3925,36 @@ values every iteration.
 
 \subsection{Posterior Distribution of the Discrete Change Point}
 
-The value of \code{lp[s]} in a given iteration is given by $log
+The value of \code{lp[s]} in a given iteration is given by $\log
 p(s,D|e,l)$ for the values of the early and late rates, $e$ and $l$,
-in the iteration.  By Bayes's law,
-\[ 
-p(s|D,e,l) \propto p(s,D|e,l).
-\]
-In each iteration after convergence, the early and late disaster
-rates, $e$ and $l$, are drawn from the posterior $p(e,l|D)$ by MCMC
-sampling.  Thus the value of \code{lp} may be used to calculate
-$p(s|D,e,l)$ in each iteration, based on on the current values of
-$e$ and $l$.  Averaging over iterations provides an unnormalized
-probability estimate of the change point being $s$,
+in the iteration.  In each iteration after convergence, the early and
+late disaster rates, $e$ and $l$, are drawn from the posterior
+$p(e,l|D)$ by MCMC sampling and the associated \code{lp} calculated.
+The value of \code{lp} may be normalized to calculate $p(s|e,l,D)$ in
+each iteration, based on on the current values of $e$ and $l$.
+Averaging over iterations provides an unnormalized probability
+estimate of the change point being $s$,
 %
-\[
+\begin{eqnarray*}
 p(s | D)
-\propto
-\frac{1}{M} \sum_{m=1}^{M} \exp(\code{lp}[m,s])
-= q(t),
-\]
+& \propto &
+q(s | D)
+\\[3pt]
+& = & 
+\frac{1}{M} \sum_{m=1}^{M} \exp(\code{lp}[m,s]).
+\end{eqnarray*}
 %
 where $\mbox{\code{lp}}[m,s]$ represents the value of \code{lp} in
-sample $m$ for change point $s$.  By averaging over samples, $e$ and
-$l$ are themselves marginalized out, and the result has no dependence
-on a given iteration's value for $e$ and $l$.  A final normalization
-then produces the quantity of interest, the posterior probability of
-the change point being $s$ conditioned on
-the data $D$,
+posterior draw $m$ for change point $s$.  By averaging over draws,
+$e$ and $l$ are themselves marginalized out, and the result has no
+dependence on a given iteration's value for $e$ and $l$.  A final
+normalization then produces the quantity of interest, the posterior
+probability of the change point being $s$ conditioned on the data $D$,
 %
 \[
 p(s | D)
 =
-\frac{q(t)}{\sum_{t'=1}^T q(t')}.
+\frac{q(s|D)}{\sum_{s'=1}^T q(s' | D)}.
 \]
 %
 A plot of the values of $\log p(s|D)$ computed using Stan 2.4's
@@ -3969,7 +3974,8 @@ default MCMC implementation is shown in
   of change point draws in the posterior generated using
   \code{lp}. The plot on the left is on the log scale and the plot on
   the right on the linear scale; note the narrower range of years in
-  the right-hand plot. The posterior mean of $s$ is roughly 1891.}%
+  the right-hand plot resulting from sampling. The posterior mean of
+  $s$ is roughly 1891.}%
 \label{change-point-posterior.figure}
 \end{figure}
 %
@@ -3997,16 +4003,11 @@ A posterior histogram of draws for $s$ is shown on the right side of
 
 \subsection{Posterior Covariance}
 
-Although this only plots the posterior marginal probability of $s$,
-the quantity \code{lp} is calculated at every iteration, thus allowing
-it to be used to calculate covariance with other posterior quantities
-of interest.  Such calculations are done in expectation by averaging
-over the posterior probabilities.
-
-Alternatively, the discrete samples can be used to calculate
-covariance with other parameters.  Although less efficient
-statistically (in the sense of requiring more iterations for the same
-degree of accuracy), it is conceptually simpler to use the samples.
+The discrete sample generated for $s$ can be used to calculate
+covariance with other parameters.  Although the sampling approach is
+straightforward, it is more statistically efficient (in the sense of
+requiring far fewer iterations for the same degree of accuracy) to
+calculate these covariances in expectation using \code{lp}.
 
 
 
@@ -4014,13 +4015,13 @@ degree of accuracy), it is conceptually simpler to use the samples.
 \section{Mark-Recapture Models}
 
 A widely applied field method in ecology is to capture (or sight)
-animals, mark them (e.g., by tagging), then release them.  Later,
-another round of captures is carried out, with potentially additional
-tagging and releasing.  The resulting data may be used to estimate
-population size.
+animals, mark them (e.g., by tagging), then release them.  This
+process is then repeated one or more times, and is often done for
+populations on an ongoing basis.  The resulting data may be used to
+estimate population size.
 
 The first subsection describes a very simple mark-recapture model that does
-not involve any latent discrete parameters.  The following subsection
+not involve any latent discrete parameters.  The following subsections
 describes the Cormack-Jolly-Seber model, which involves latent
 discrete parameters for animal death.
 
@@ -4041,6 +4042,11 @@ The estimand of interest is
 \item $N$ : number of animals in the population.
 \end{itemize}
 %
+Despite the notation, the model will take $N$ to be a continuous
+parameter; just because the population must be finite doesn't mean the
+parameter representing it must be.  The parameter will be used to
+produce a real-valued estimate of the population size.
+
 The Lincoln-Petersen \citep{Lincoln:1930,Petersen:1896} method for
 estimating population size is
 %
@@ -4054,22 +4060,22 @@ which the number of recaptured animals is distributed binomially,
 R \sim \distro{Binomial}(C, M / N)
 \]
 given the total number of animals captured in the second round ($C$)
-with a recapture probability of $M/N$.  
+with a recapture probability of $M/N$, the fraction of the total
+population $N$ marked in the first round.
 
 %
 \begin{figure}
 \begin{quote}\small
 \begin{Verbatim}
 data {
-  int<lower=0> M;                  // marked
-  int<lower=0> C;                  // captured
-  int<lower=0,upper=min(M,C)> R;   // recaptured
+  int<lower=0> M;
+  int<lower=0> C;
+  int<lower=0,upper=min(M,C)> R;
 }
 parameters {
-  real<lower=(C - R + M)> N;       // population
+  real<lower=(C - R + M)> N;
 }
 model {
-  // N has improper default prior
   R ~ binomial(C, M / N);
 }
 \end{Verbatim}
@@ -4095,10 +4101,14 @@ population under study.
 The one tricky part of the model is the lower bound $C - R + M$ placed
 on the population size $N$.  Values below this bound are impossible
 because it is otherwise not possible to draw $R$ samples out of the
-$C$ animals recaptured.  Implementing this lower bound is not strictly
-necessary in that values for $N$ below this will cause the binomial
-evaluation in the model to reject a sample, but having the lower bound
-is more efficient computationally for both MCMC and optimization.
+$C$ animals recaptured.  Implementing this lower bound is necessary to
+ensure sampling and optimization can be carried out in an
+unconstrained manner with unbounded support for parameters on the
+transformed (unconstrained) space.  The lower bound in the declaration
+for $C$ implies a variable transform $f : (C-R+M,\infty) \rightarrow
+(-\infty,+\infty)$ defined by $f(N) = \log(N - (C - R + M))$; see
+\refsection{lower-bound-transform} for more information on the
+transform used for variables declared with a lower bound.
 
 \subsection{Cormack-Jolly-Seber with Discrete Parameter}
 
@@ -4153,15 +4163,13 @@ The conditional enforces the constraint that dead animals cannot be captured.
 
 \subsection{Collective Cormack-Jolly-Seber Model}
 
-
- This
-subsection presents an implementation of the model in terms of counts
-for different history profiles for individuals over three capture
-times. It assumes exchangeability of the animals in the sense thateach
+This subsection presents an implementation of the model in terms of
+counts for different history profiles for individuals over three
+capture times. It assumes exchangeability of the animals in that each
 is assigned the same capture and survival probabilities.
 
 In order to ease the marginalization of the latent discrete parameter
-$z_{i,t}$, the Stan models rely on a derivated quantity $\chi_t$ for
+$z_{i,t}$, the Stan models rely on a derived quantity $\chi_t$ for
 the probability that an individual is never captured again if it is
 alive at time $t$ (if it is dead, the recapture probability is zero).
 this quantity is defined recursively by
@@ -4185,10 +4193,7 @@ not surviving to the next time period, with probability $(1 -
 \phi_t)$, or (2) suriviving to the next time period with probability
 $\phi_t$, not being captured in the next time period with probabilty
 $(1 - p_{t+1})$, and not being captured again after being alive in
-period $t+1$ with probability $\chi_{t+1}$.  
-
-By defining $\chi$ directly, there is no need for a latent binary
-parameter indicating whether an animal is alive at time $t$ or not.
+period $t+1$ with probability $\chi_{t+1}$. 
 
 With three capture times, there are three captured/not-captured
 profiles an individual may have.  These may be naturally coded as
@@ -4225,6 +4230,12 @@ information for the CJS model, because capture/non-capture status is
 only informative when conditioned on earlier captures.  For the
 remaining cases, the contribution to the likelihood is provided in the
 final column.
+
+By defining these probabilities in terms of $\chi$ directly, there is
+no need for a latent binary parameter indicating whether an animal is
+alive at time $t$ or not.  The definition of $\chi$ is typically used
+to define the likelihood (i.e., marginalize out the latent discrete
+parameter) for the CJS model \citep[page 9]{Schofield:2007}.
 
 The Stan model defines $\chi$ as a transformed parameter based on
 parameters $\phi$ and $p$.  In the model block, the log probability is
@@ -4277,23 +4288,28 @@ generated quantities {
 \end{figure}
 %
 
-The parameters \code{phi[2]} and \code{p[3]} are not identifiable, but
-their product \code{beta3} is, so \code{beta3} is defined as a
-generated quantity.  The use of unidentified parameters is actually a
+\subsubsection{Identifiability}
+
+The parameters $\phi_2$ and $p_3$, the probability of death at time 2
+and probabilty of capture at time 3 are not identifiable, because both
+may be used to account for lack of capture at time 3.  Their product,
+$\beta_3 = \phi_2 \, p_3$, is identified.  The Stan model defines
+\code{beta3} as a generated quantity.  Unidentified parameters pose a
 problem for Stan's samplers' adaptation.  Although the problem posed
 for adaptation is mild here because the parameters are bounded and
-thus have proper uniform priors, it would be better to replace
-parameters \code{phi[2]} and \code{p[3]} with a parameter
-\code{beta3}.
+thus have proper uniform priors, it would be better to formulate an
+identified parameterization.  One way to do this would be to formulate
+a hierarchical model for the $p$ and $\phi$ parameters.
 
 \subsection{Individual Cormack-Jolly-Seber Model}
 
 This section presents a version of the Cormack-Jolly-Seber (CJS) model
 cast at the individual level rather than collectively as in the
 previous subsection.  It also extends the model to allow an arbitrary
-number of time periods.  Thus the data will consist of the number $T$
-of capture events, the number $I$ of individuals, and a boolean flag
-$y_{i,t}$ indicating if individual $i$ was observed at time $t$.  In Stan,
+number of time periods.  The data will consist of the number $T$ of
+capture events, the number $I$ of individuals, and a boolean flag
+$y_{i,t}$ indicating if individual $i$ was observed at time $t$.  In
+Stan,
 %
 \begin{quote}
 \begin{Verbatim}
@@ -4312,10 +4328,17 @@ unfolding $2^T$ observation histories for $T$ capture times.
 
 \subsubsection{Utility Functions}
 
-The individual CJS model is written relying on several function
+The individual CJS model is written involves several function
 definitions.  The first two are used in the transformed data block to
-comput the first and last time period in which an animal was
-captured. 
+compute the first and last time period in which an animal was
+captured.%
+%
+\footnote{An alternative would be to compute this on the outside and
+feed it into the Stan model as preprocessed data.  Yet another
+alternative encoding would be a sparse one recording only the
+capture events along with their time and identifying the individual
+captured.} 
+%
 \begin{quote}
 \begin{Verbatim}
 functions {
@@ -4323,7 +4346,7 @@ functions {
     for (k in 1:size(y_i))
       if (y_i[k])
         return k;
-    return 0;  // never captured
+    return 0;
   }
   int last_capture(int[] y_i) { 
     for (k_rev in 0:(size(y_i) - 1)) {
@@ -4332,7 +4355,7 @@ functions {
       if (y_i[k]) 
         return k;
     }
-    return 0;  // never captured
+    return 0;
   }
   ...
 }
@@ -4346,8 +4369,9 @@ for each individual in the transformed data block.%
   input array was never captured.  Individuals with no captures are
   not relevant for estimating the model because all probability
   statements are conditional on earlier captures.  Typically they
-  would be removed from the data, but the program allows them, but
-  they have no impact on the log probability function.}
+  would be removed from the data, but the program allows them to be
+  included even though they make not contribution to the log
+  probability function.}
 %
 \begin{quote}
 \begin{Verbatim}
@@ -4369,15 +4393,15 @@ transformed data {
 \end{quote}
 %
 The transformed data block also defines \code{n\_captured[t]}, which is
-the total number of captures at time \code{t}.  The only readon
+the total number of captures at time \code{t}.  The variable
 \code{n\_captured} is defined as a vector instead of an integer array
-is that it is used in an elementwise vector operation in the generated
+so that it can be used in an elementwise vector operation in the generated
 quantities block to model the population estimates at each time point.
 
 The parameters and transformed parameters are as before, but now there
-is a function definition for computing the value of \code{chi[t]}, the
+is a function definition for computing the entire vector \code{chi}, the
 probability that if an individual is alive at \code{t} that it will
-never be observed again.
+never be captured again.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -4419,16 +4443,17 @@ funtions {
 \end{quote}
 %
 The function definition directly follows the mathematical definition
-of $\chi_t$, unrolling the recursion into an iterative algorithm
-updating the elemnts of \code{chi} from \code{T} down to 1.
+of $\chi_t$, unrolling the recursion into an iteration and
+defining the elements of \code{chi} from \code{T} down to 1.
 
 \subsubsection{The Model}
 
-Given a long buildup computation, the model block directly encodes the
-CJS model.  All parameters are left with their default uniform priors
-and the model simply encodes the log probability of the observations
-\code{q} given the parameters \code{p} and \code{phi} as well as the
-transformed parameter \code{chi} defined in terms of \code{p} and \code{phi}.
+Given the precomputed quantities, the model block directly encodes the
+CJS model's log likelihood function.  All parameters are left with
+their default uniform priors and the model simply encodes the log
+probability of the observations \code{q} given the parameters \code{p}
+and \code{phi} as well as the transformed parameter \code{chi} defined
+in terms of \code{p} and \code{phi}.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -4446,18 +4471,19 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-The outer loop is over individuals, with the conditional the
-conditional skipping individuals \code{i} which are never captured;
-this check depends on the convention of returning 0 for \code{first}
-if an individual is never captured.
+The outer loop is over individuals, conditional skipping individuals
+\code{i} which are never captured.  The never-captured check depends
+on the convention of the first-capture and last-capture functions
+returning 0 for \code{first} if an individual is never captured.
 
-The inner loop for individual \code{i} first increments the Bernoulli
-survival, with an outcome of 1 being fixed because the individual must
-survive every time between the first and last capture (i.e., no
-zombies).  Note that the loop starts after the first capture, because
-all information in the CJS model is conditional on the first capture.
+The inner loop for individual \code{i} first increments the log
+probability based on the survival of the individual with proability
+\code{phi[t-1]}.  The outcome of 1 is fixed because the individual
+must survive between the first and last capture (i.e., no zombies).
+Note that the loop starts after the first capture, because all
+information in the CJS model is conditional on the first capture.
 
-Also in the inner loop, the observed capture status \code{y[i,t]} for
+In the inner loop, the observed capture status \code{y[i,t]} for
 individual \code{i} at time \code{t} has a Bernoulli distribution
 based on the capture probabilty \code{p[t]} at time \code{t}.
 
@@ -4469,7 +4495,7 @@ again after being observed at time \code{last[i]} is included, because
 \subsubsection{Identified Parameters}
 
 As with the collective model described in the previous subsection,
-this model does not identify \code{phi[T-1]} and \code{phi[T]}, but
+this model does not identify \code{phi[T-1]} and \code{p[T]}, but
 does identify their product, \code{beta}.  Thus \code{beta} is defined
 as a generated quantity to monitor convergence and report.
 %
@@ -4488,18 +4514,18 @@ generated quantities {
 
 The parameter \code{p[1]} is also not modeled and will just be uniform
 between 0 and 1.  A more finely articulated model might have a
-time-series component, in which case \code{p[1]} would be an unknown
-intial condition and both \code{phi[T-1]} and \code{p[T]} could be
-identified. 
+hierarchical or time-series component, in which case \code{p[1]} would
+be an unknown intial condition and both \code{phi[T-1]} and
+\code{p[T]} could be identified.
 
 \subsubsection{Population Size Estimates}
 
-The generated quantities block in the previous subsubsection here also
-include a calculation of the population at each time \code{t}, which
-is estimated as in the simple mark-recapture model as the number of
-individuals captured at time \code{t} divided by the probability of
-capture at time \code{t}.  This is done with the elementwise division
-operation for vectors (\code{./}) in the generated quantities block.
+The generated quantities also calculates an estimate of the population
+mean at each time \code{t} in the same way as in the simple
+mark-recapture model as the number of individuals captured at time
+\code{t} divided by the probability of capture at time \code{t}.  This
+is done with the elementwise division operation for vectors
+(\code{./}) in the generated quantities block.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -4508,7 +4534,7 @@ generated quantities {
   vector<lower=0>[T] pop;
   ...
   pop <- n_captured ./ p;
-  pop[1] <- -1; // p[1] not estimated
+  pop[1] <- -1;
 }
 \end{Verbatim}
 \end{quote}
@@ -4525,59 +4551,68 @@ predictors.
 \section{Data Coding and Diagnostic Accuracy Models}
 
 Although seemingly disparate tasks, the rating/coding/annotation of
-items with categories and diagnostic testing share several
-characteristics which allow their statistical properties to modeled
-similarly. 
+items with categories and diagnostic testing for disease or other
+conditions share several characteristics which allow their statistical
+properties to modeled similarly.
 
-\subsection{Diagnostic Accuracy and Data Coding}
+\subsection{Diagnostic Accuracy}
 
-Suppose you have diagnostic tests of varying sensitivity and
-specificity.  Sensitivity is the probability a test returns positive
-when the patient has the condition and specificity is the probability
-that a test returns negative when the patient does not have the
-condition.  For example, mammograms and puncture biopsy tests both
-test for the presence of breast cancer.  Mammograms have high
+Suppose you have diagnostic tests for a condition of varying
+sensitivity and specificity.  Sensitivity is the probability a test
+returns positive when the patient has the condition and specificity is
+the probability that a test returns negative when the patient does not
+have the condition.  For example, mammograms and puncture biopsy tests
+both test for the presence of breast cancer.  Mammograms have high
 sensitivity and low specificity, meaning lots of false positives,
 whereas puncture biopsies are the opposite, with low sensitivity and
-high specificity, meaning lots of false negatives.  
+high specificity, meaning lots of false negatives.
 
 There are several estimands of interest in such studies.  An
 epidemiological study may be interested in the prevalence of a kind of
-infection, such as AIDS, in a population.  A test development study
-might be interested in the diagnostic accuracy of a new test.  And a
-doctor performing tests might be interested in the disease status of a
-patient.  
+infection, such as malaria, in a population.  A test development study
+might be interested in the diagnostic accuracy of a new test. A health
+care worker performing tests might be interested in the disease status
+of a particular patient.
+
+\subsection{Data Coding}
 
 Humans are often given the task of coding (equivalently rating or
 annotating) data.  For example, journal or grant reviewers rate
 submissions, a political study may code campaign commercials as to
 whether they are attack ads or not, a natural language processing
 study might annotate Tweets as to whehter they are positive or
-negative in overall sentiment, or a dentist looking at an X-ray rates
-a patient as having a cavity or not.  In all of these cases, the data
-coders play the role of the diagnostic tests and all of the same
-estimands are in play --- data coder accuracy and bias, true
-categories of items being coded, or the prevalence of various
+negative in overall sentiment, or a dentist looking at an X-ray
+classifies a patient as having a cavity or not.  In all of these
+cases, the data coders play the role of the diagnostic tests and all
+of the same estimands are in play --- data coder accuracy and bias,
+true categories of items being coded, or the prevalence of various
 categories of items in the data.
+
+\subsection{Noisy Categorical Measurement Model}
 
 In this section, only categorical ratings are considered, and the
 challenge in the modeling for Stan is to marginalize out the discrete
 parameters.  
 
-\subsection{Noisy Measurement Model}
-
-\cite{DawidSkene:1979} introduce a noisy-measruement style model for
+\cite{DawidSkene:1979} introduce a noisy-measurement model for
 data coding and apply in the epidemiological setting of coding what
 doctor notes say about patient histories;  the same model can be used
 for diagnostic procedures.
 
 \subsubsection{Data}
 
-The data for the model consists of $J$ raters, $I$ items, and $K$
-categories to annotate, with $y_{i,j} \in 1{:}K$ being the rating
-provided by rater $j$ for item $i$.  In a diagnostic test setting for
-a particular condition, the raters are diagnostic procedures and there
-are $K=2$ categories, either the condition is present or it isn't.
+The data for the model consists of $J$ raters (diagnostic tests), $I$
+items (patients), and $K$ categories (condition statuses) to annotate,
+with $y_{i,j} \in 1{:}K$ being the rating provided by rater $j$ for
+item $i$.  In a diagnostic test setting for a particular condition,
+the raters are diagnostic procedures and often $K=2$, with values
+signaling the presense or absence of the condition.%
+%
+\footnote{Diagnostic procedures are often ordinal, as in stages of
+  cancer in oncological diagnosis or the severity of a cavity in
+  dental diagnosis.  Dawid and Skene's model may be used as is or
+  naturally generalized for ordinal ratings using a latent continuous
+  rating and cutpoints as in ordinal logistic regression.}
 
 It is relatively straightforward to extend Dawid and Skene's model to
 deal with the situation where not every rater rates each item exactly
@@ -4585,14 +4620,14 @@ once.
 
 \subsection{Model Parameters}
 
-The model is based on three parameters, one of which is discrete:
+The model is based on three parameters, the first of which is discrete:
 %
 \begin{itemize}
 \item $z_i$ : a value in $1{:}K$ indicating the true category of item $i$,
 \item $\pi$ : a $K$-simplex for the prevalence of the $K$
-  categories in the data, and
+  categories in the population, and
 \item $\theta_{j,k}$ : a $K$-simplex for the response of annotator $j$
-  to an item of true category $k$
+  to an item of true category $k$.
 \end{itemize}
 
 \subsection{Noisy Measurement Model}
@@ -4615,10 +4650,13 @@ y_{i,j} \sim \distro{Categorical}(\theta_{j,\pi_{z[i]}}).
 
 \subsubsection{Priors and Hierarchical Modeling}
 
-Dawid and Skene provided maximum likelihood estimates.  The parameters
+Dawid and Skene provided maximum likelihood estimates for $\theta$ and
+$\pi$, which allows them to generate probabilty estimates for each $z_i$.
+
+To mimic Dawid and Skene's maximum likelihood model, the parameters
 $\theta_{j,k}$ and $\pi$ can be given uniform priors over
 $K$-simplexes.  It is straightforward to generalize to Dirichlet
-priors, 
+priors,
 \[
 \pi \sim \distro{Dirichlet}(\alpha)
 \]
@@ -4639,11 +4677,12 @@ estimates of coder accuracy and bias.
 
 Because the true category parameter $z$ is discrete, it must be
 marginalized out of the joint posterior in order to carry out sampling
-in Stan. The joint posterior factors as 
+or maximum likelihood estimation in Stan. The joint posterior factors
+as
 \[
 p(y, \theta, \pi) = p(y | \theta,\pi) \, p(\pi) \, p(\theta),
 \]
-where $p(y | \theta,\pi)$ is derived by marginalizing
+where $p(y | \theta,\pi)$ is derived by marginalizing $z$ out of
 %
 \[
 p(z, y | \theta, \pi)
@@ -4665,6 +4704,9 @@ p(y | \theta, \pi)
   \right).
 \]            
 %
+In the missing data model, only the observed labels would be used in
+the inner product.
+
 \cite{DawidSkene:1979} derive exactly the same equation in their
 Equation~(2.7), required for the E-step in their expectation
 maximization (EM) algorithm.  Stan requires the marginalized
@@ -4681,7 +4723,8 @@ probability function on the log scale,
   \right) \right),
 \end{array}
 \]                            
-which can be directly coded as above using \code{log\_sum\_exp}.
+which can be directly coded using Stan's built-in \code{log\_sum\_exp}
+function.
 
 
 \subsection{Stan Implementation}
