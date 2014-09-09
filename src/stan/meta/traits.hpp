@@ -459,6 +459,15 @@ ERROR_INDEX
   };
 
   template <typename T>
+  struct is_var {
+    enum { value = false };
+  };
+  template <>
+  struct is_var<stan::agrad::var> {
+    enum { value = true };
+  };
+
+  template <typename T>
   struct partials_type {
     typedef T type;
   };
