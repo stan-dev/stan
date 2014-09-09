@@ -13,7 +13,7 @@ SUFIXES:
 # - CC: The compiler to use. Expecting g++ or clang++.
 # - O: Optimization level. Valid values are {0, 1, 2, 3}.
 # - AR: archiver (must specify for cross-compiling)
-# - OS: {mac, win, linux}
+# - OS_TYPE: {mac, win, linux}
 # - C++11: Compile with C++11 extensions, Valid values: {true, false}. 
 ##
 CC = g++
@@ -49,7 +49,7 @@ WINE =
 -include make/detect_cc
 # FIXME: verify compiler
 
-# OS is set automatically by this script
+# OS_TYPE is set automatically by this script
 ##
 # These includes should update the following variables
 # based on the OS:
@@ -81,19 +81,19 @@ help:
 	@echo '--------------------------------------------------------------------------------'
 	@echo 'Stan makefile:'
 	@echo '  Current configuration:'
-	@echo '  - OS (Operating System):   ' $(OS)
-	@echo '  - CC (Compiler):           ' $(CC)
-	@echo '  - Compiler version:        ' $(CC_MAJOR).$(CC_MINOR)
-	@echo '  - O (Optimization Level):  ' $(O)
-	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
+	@echo '  - OS_TYPE (Operating System): ' $(OS_TYPE)
+	@echo '  - CC (Compiler):              ' $(CC)
+	@echo '  - Compiler version:           ' $(CC_MAJOR).$(CC_MINOR)
+	@echo '  - O (Optimization Level):     ' $(O)
+	@echo '  - O_STANC (Opt for stanc):    ' $(O_STANC)
 ifdef TEMPLATE_DEPTH
-	@echo '  - TEMPLATE_DEPTH:          ' $(TEMPLATE_DEPTH)
+	@echo '  - TEMPLATE_DEPTH:             ' $(TEMPLATE_DEPTH)
 endif
-	@echo '  - STAN_HOME                ' $(STAN_HOME)
+	@echo '  - STAN_HOME                   ' $(STAN_HOME)
 	@echo '  Library configuration:'
-	@echo '  - EIGEN                    ' $(EIGEN)
-	@echo '  - BOOST                    ' $(BOOST)
-	@echo '  - GTEST                    ' $(GTEST)
+	@echo '  - EIGEN                       ' $(EIGEN)
+	@echo '  - BOOST                       ' $(BOOST)
+	@echo '  - GTEST                       ' $(GTEST)
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Model related:'

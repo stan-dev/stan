@@ -43,7 +43,7 @@ test/%.d : src/test/%_test.cpp
 ##
 HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f)) 
 
-ifeq ($(OS),win) 
+ifeq ($(OS_TYPE),win) 
   DEV_NULL = nul
 else
   DEV_NULL = /dev/null
