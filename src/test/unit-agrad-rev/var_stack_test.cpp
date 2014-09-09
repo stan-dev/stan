@@ -3,7 +3,8 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,free_memory) {
+// just test basic autodiff;  no more free_memory operation
+TEST(AgradRev,varStack) { 
   AVAR a = 2.0;
   AVAR b = -3.0;
   AVAR f = a * b;
@@ -14,7 +15,6 @@ TEST(AgradRev,free_memory) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(-3.0,grad_f[0]);
   EXPECT_FLOAT_EQ(2.0,grad_f[1]);
-  stan::agrad::free_memory();
 
   AVAR aa = 2.0;
   AVAR bb = -3.0;

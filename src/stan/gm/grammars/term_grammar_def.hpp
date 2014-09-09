@@ -50,7 +50,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::index_op,
                           (std::vector<std::vector<stan::gm::expression> >, 
                            dimss_) );
 
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::solve_ode,
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::integrate_ode,
                           (std::string, system_function_name_)
                           (stan::gm::expression, y0_)
                           (stan::gm::expression, t0_)
@@ -77,12 +77,12 @@ namespace stan {
   namespace gm {
 
 
-    struct validate_solve_ode {
+    struct validate_integrate_ode {
 
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef void type; };
 
-      void operator()(const solve_ode& ode_fun,
+      void operator()(const integrate_ode& ode_fun,
                       const variable_map& var_map,
                       bool& pass,
                       std::ostream& error_msgs) const {
@@ -99,14 +99,14 @@ namespace stan {
         function_signature_t system_signature(sys_result_type, sys_arg_types);
         if (!function_signatures::instance()
             .is_defined(ode_fun.system_function_name_,system_signature)) {
-          error_msgs << "first argument to solve_ode must be a function with signature"
+          error_msgs << "first argument to integrate_ode must be a function with signature"
                      << " (real, real[], real[], real[], int[]) : real[] ";
           pass = false;
         }
 
         // test regular argument types
         if (ode_fun.y0_.expression_type() != expr_type(DOUBLE_T,1)) {
-          error_msgs << "second argument to solve_ode must be type real[]"
+          error_msgs << "second argument to integrate_ode must be type real[]"
                      << " for intial system state"
                      << "; found type=" 
                      << ode_fun.y0_.expression_type()
@@ -114,7 +114,7 @@ namespace stan {
           pass = false;
         } 
         if (!ode_fun.t0_.expression_type().is_primitive()) {
-          error_msgs << "third argument to solve_ode must be type real or int"
+          error_msgs << "third argument to integrate_ode must be type real or int"
                      << " for initial time"
                      << "; found type=" 
                      << ode_fun.t0_.expression_type()
@@ -122,7 +122,7 @@ namespace stan {
           pass = false;
         }
         if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T,1)) {
-          error_msgs << "fourth argument to solve_ode must be type real[]"
+          error_msgs << "fourth argument to integrate_ode must be type real[]"
                      << " for requested solution times"
                      << "; found type=" 
                      << ode_fun.ts_.expression_type()
@@ -130,7 +130,7 @@ namespace stan {
           pass = false;
         }
         if (ode_fun.theta_.expression_type() != expr_type(DOUBLE_T,1)) {
-          error_msgs << "fifth argument to solve_ode must be type real[]"
+          error_msgs << "fifth argument to integrate_ode must be type real[]"
                      << " for parameters"
                      << "; found type=" 
                      << ode_fun.theta_.expression_type()
@@ -138,7 +138,7 @@ namespace stan {
           pass = false;
         }
         if (ode_fun.x_.expression_type() != expr_type(DOUBLE_T,1)) {
-          error_msgs << "sixth argument to solve_ode must be type real[]"
+          error_msgs << "sixth argument to integrate_ode must be type real[]"
                      << " for real data;"
                      << " found type=" 
                      << ode_fun.x_.expression_type()
@@ -146,7 +146,7 @@ namespace stan {
           pass = false;
         }
         if (ode_fun.x_int_.expression_type() != expr_type(INT_T,1)) {
-          error_msgs << "seventh argument to solve_ode must be type int[]"
+          error_msgs << "seventh argument to integrate_ode must be type int[]"
                      << " for integer data;"
                      << " found type=" 
                      << ode_fun.x_int_.expression_type()
@@ -156,23 +156,23 @@ namespace stan {
 
         // test data-only variables do not have parameters
         if (has_var(ode_fun.t0_, var_map)) {
-          error_msgs << "third argument to solve_ode (initial times)"
+          error_msgs << "third argument to integrate_ode (initial times)"
                      << " must be data only and not reference parameters";
           pass = false;
         }
         if (has_var(ode_fun.ts_, var_map)) {
-          error_msgs << "fourth argument to solve_ode (solution times)"
+          error_msgs << "fourth argument to integrate_ode (solution times)"
                      << " must be data only and not reference parameters";
           pass = false;
         }
         if (has_var(ode_fun.x_, var_map)) {
-          error_msgs << "fifth argument to solve_ode (real data)"
+          error_msgs << "fifth argument to integrate_ode (real data)"
                      << " must be data only and not reference parameters";
           pass = false;
         }
       }
     };
-    boost::phoenix::function<validate_solve_ode> validate_solve_ode_f;
+    boost::phoenix::function<validate_integrate_ode> validate_integrate_ode_f;
     
     struct set_fun_type {
       template <typename T1, typename T2>
@@ -692,9 +692,9 @@ namespace stan {
                )
         ;
       
-      solve_ode_r.name("solve ode");
-      solve_ode_r 
-        %= lit("solve_ode")
+      integrate_ode_r.name("solve ode");
+      integrate_ode_r 
+        %= lit("integrate_ode")
         > lit('(')
         > identifier_r          // system function name (function only)
         > lit(',')
@@ -709,14 +709,14 @@ namespace stan {
         > expression_g(_r1)     // x (data only)
         > lit(',')
         > expression_g(_r1)     // x_int (data only)
-        > lit(')') [validate_solve_ode_f(_val, 
+        > lit(')') [validate_integrate_ode_f(_val, 
                                          boost::phoenix::ref(var_map_),
                                          _pass,
                                          boost::phoenix::ref(error_msgs_))];
 
       factor_r.name("factor");
       factor_r =
-        solve_ode_r(_r1)    [_val = _1]
+        integrate_ode_r(_r1)    [_val = _1]
         | 
         fun_r(_r1)          [set_fun_type_named_f(_val,_1,_r1,_pass,
                                                     boost::phoenix::ref(error_msgs_))]

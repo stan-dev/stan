@@ -177,8 +177,8 @@ namespace stan {
             indexes.push_back(x.dimss_[i][j]); // wasteful copy, could use refs
         generate_indexed_expr<false>(expr_string,indexes,base_type,e_num_dims,o_);
       }
-      void operator()(const solve_ode& fx) const { 
-        o_ << "solve_ode("
+      void operator()(const integrate_ode& fx) const { 
+        o_ << "integrate_ode("
            << fx.system_function_name_
            << "_functor__(), ";
 
@@ -198,7 +198,7 @@ namespace stan {
         o_ << ", ";
 
         generate_expression(fx.x_int_, o_);
-        o_ << ')';
+        o_ << ", pstream__)";
       }
       void operator()(const fun& fx) const { 
         o_ << fx.name_ << '(';
@@ -4543,7 +4543,7 @@ namespace stan {
 
       out << INDENT << "operator()";
       generate_function_arguments(fun,is_rng,is_lp,is_log,out);
-      out << " {"
+      out << " const {"
           << std::endl;
 
       out << INDENT2
@@ -4558,6 +4558,7 @@ namespace stan {
           << std::endl;
 
       out << "};"
+          << std::endl 
           << std::endl;
     }
 
