@@ -132,12 +132,8 @@ endif
 ##
 # Dependencies
 ##
-ifneq (,$(filter-out test-headers clean% %-test %.d,$(MAKECMDGOALS)))
-  ifeq (,$(filter-out %.cpp,$(MAKECMDGOALS)))
-    -include $(subst .cpp,.d,$(MAKECMDGOALS))
-  else
-    -include $(subst $(EXE),.d,$(MAKECMDGOALS))
-  endif
+ifneq (,$(filter-out test-headers,$(filter-out clean%,$(MAKECMDGOALS))))
+ -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
 endif
 
 ##
