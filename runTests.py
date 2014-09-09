@@ -29,7 +29,12 @@ def doCommand(command):
         sys.stderr.write(serr.decode())
     if (not(p1.returncode == None) and not(p1.returncode == 0)):
         stop_err('%s failed' % command, p1.returncode)
-        
+
+def generateTests(j):
+    command = 'make -j%d generate-tests -s' % j
+    print(command)
+    doCommand(command)
+
 def makeTest( name, j ):
     name = name.replace("src/","",1)
     name = name.replace(testsfx,"");
@@ -78,7 +83,10 @@ def main():
                 stop_err("bad value for -j flag"-1)
             
     print("j:",j,"start",start)
-                
+
+    # pass 0: generate all auto-generated tests
+    generateTests(j)
+
     # pass 1:  call make to compile test targets
     for i in range(start,len(sys.argv)):
         testname = sys.argv[i]
