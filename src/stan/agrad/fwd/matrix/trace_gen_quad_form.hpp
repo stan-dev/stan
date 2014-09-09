@@ -4,11 +4,9 @@
 #include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
-#include <stan/agrad/rev/matrix/multiply.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/agrad/rev/operators.hpp>
 
 namespace stan {
   namespace agrad {

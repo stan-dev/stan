@@ -52,6 +52,8 @@
 #include <stan/common/init_windowed_adapt.hpp>
 #include <stan/common/recorder/csv.hpp>
 #include <stan/common/recorder/messages.hpp>
+#include <stan/common/initialize_state.hpp>
+#include <stan/common/context_factory.hpp>
 
 namespace stan {
 
@@ -170,149 +172,14 @@ namespace stan {
         parser.print(diagnostic_stream, "#");
       }
       
-      int num_init_tries = -1;
-      
       std::string init = dynamic_cast<stan::gm::string_argument*>(
                          parser.arg("init"))->value();
       
-      try {
-        
-        double R = std::fabs(boost::lexical_cast<double>(init));
-        
-        if (R == 0) {
-          
-          cont_params.setZero();
-          
-          double init_log_prob;
-          Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-          
-          try {
-            stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
-          } catch (const std::exception& e) {
-            std::cout << "Rejecting initialization at zero because of gradient failure."
-                      << std::endl 
-                      << e.what() << std::endl;
-            return stan::gm::error_codes::OK;
-          }
-          
-          if (!boost::math::isfinite(init_log_prob)) {
-            std::cout << "Rejecting initialization at zero because of vanishing density." 
-                      << std::endl;
-            return 0;
-          }
-          
-          for (int i = 0; i < init_grad.size(); ++i) {
-            if (!boost::math::isfinite(init_grad[i])) {
-              std::cout << "Rejecting initialization at zero because of divergent gradient."
-                        << std::endl;
-              return 0;
-            }
-          }
-
-        } else {
-          
-          boost::random::uniform_real_distribution<double>
-          init_range_distribution(-R, R);
-          
-          boost::variate_generator<rng_t&,
-          boost::random::uniform_real_distribution<double> >
-          init_rng(base_rng, init_range_distribution);
-          
-          cont_params.setZero();
-          
-          // Random initializations until log_prob is finite
-          Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-          static int MAX_INIT_TRIES = 100;
-          
-          for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
-            
-            for (int i = 0; i < cont_params.size(); ++i)
-              cont_params(i) = init_rng();
-            
-            // FIXME: allow config vs. std::cout
-            double init_log_prob;
-            try {
-              stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
-            } catch (const std::exception& e) {
-              write_error_msg(&std::cout, e);
-              std::cout << "Rejecting proposed initial value with zero density." 
-                        << std::endl;
-              init_log_prob = -std::numeric_limits<double>::infinity();
-            }
-            
-            if (!boost::math::isfinite(init_log_prob))
-              continue;
-            for (int i = 0; i < init_grad.size(); ++i)
-              if (!boost::math::isfinite(init_grad(i)))
-                continue;
-            break;
-            
-          }
-          
-          if (num_init_tries > MAX_INIT_TRIES) {
-            std::cout << std::endl << std::endl
-                      << "Initialization between (" << -R << ", " << R << ") failed after "
-                      << MAX_INIT_TRIES << " attempts. " << std::endl;
-            std::cout << " Try specifying initial values,"
-                      << " reducing ranges of constrained values,"
-                      << " or reparameterizing the model."
-                      << std::endl;
-            return -1;
-          }
-          
-        }
-        
-      } catch(...) {
-      
-        try {
-        
-          std::fstream init_stream(init.c_str(), std::fstream::in);
-          if (init_stream.fail()) {
-            std::string msg("ERROR: specified initialization file does not exist: ");
-            msg += init;
-            throw std::invalid_argument(msg);
-          }
-          
-          stan::io::dump init_var_context(init_stream);
-          init_stream.close();
-          model.transform_inits(init_var_context, cont_params);
-        
-        } catch (const std::exception& e) {
-          std::cerr << "Error during user-specified initialization:" << std::endl
-                    << e.what() << std::endl;
-          return -5;
-        }
-        
-        double init_log_prob;
-        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-        
-        try {
-          stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
-        } catch (const std::exception& e) {
-          std::cout 
-            << "Rejecting user-specified initialization because of gradient failure."
-            << std::endl
-            << e.what() << std::endl;
-          return 0;
-        }
-        
-        if (!boost::math::isfinite(init_log_prob)) {
-          std::cout 
-            << "Rejecting user-specified initialization because of vanishing density."
-            << std::endl;
-          return 0;
-        }
-        
-        for (int i = 0; i < init_grad.size(); ++i) {
-          if (!boost::math::isfinite(init_grad[i])) {
-            std::cout 
-              << "Rejecting user-specified initialization because of divergent gradient."
-              << std::endl;
-            return 0;
-          }
-        }
-        
-      }
+      dump_factory var_context_factory;
+      if (!initialize_state<dump_factory>
+          (init, cont_params, model, base_rng, &std::cout,
+           var_context_factory))
+        return stan::gm::error_codes::SOFTWARE;
       
       //////////////////////////////////////////////////
       //               Model Diagnostics              //
@@ -736,7 +603,7 @@ namespace stan {
         // Sampling
         start = clock();
         
-        sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
+        stan::common::sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
                              refresh, true,
                              writer,
                              s, model, base_rng,

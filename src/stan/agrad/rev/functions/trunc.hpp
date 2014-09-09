@@ -1,19 +1,23 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__TRUNC_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__TRUNC_HPP
 
-#include <boost/math/special_functions/trunc.hpp>
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
+#include <stan/agrad/rev/internal/v_vari.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
   namespace agrad {
 
     namespace {
-      // derivative 0 almost everywhere
-      class trunc_vari : public vari {
+      class trunc_vari : public op_v_vari {
       public:
         trunc_vari(vari* avi) :
-          vari(boost::math::trunc(avi->val_)) { 
+          op_v_vari(::trunc(avi->val_),avi) {
+        }
+        void chain() {
+          if (unlikely(boost::math::isnan(avi_->val_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
         }
       };
     }

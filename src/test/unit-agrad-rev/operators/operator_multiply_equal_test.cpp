@@ -1,6 +1,8 @@
 #include <stan/agrad/rev/operators/operator_multiply_equal.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,a_timeseq_b) {
   AVAR a(5.0);
@@ -26,4 +28,26 @@ TEST(AgradRev,a_timeseq_bd) {
   VEC g;
   f.grad(x,g);
   EXPECT_FLOAT_EQ(-1.0,g[0]);
+}
+
+struct multiply_eq_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(T0 arg1,
+             T1 arg2) const {
+    return (arg1 *= arg2);
+  }
+};
+
+TEST(AgradRev, multiply_eq_nan) {
+  multiply_eq_fun multiply_eq_;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  test_nan_vv(multiply_eq_,3.0,nan,false, true);
+  test_nan_vv(multiply_eq_,nan,5.0,false, true);
+  test_nan_vv(multiply_eq_,nan,nan,false, true);
+  test_nan_vd(multiply_eq_,3.0,nan,false, true);
+  test_nan_vd(multiply_eq_,nan,5.0,false, true);
+  test_nan_vd(multiply_eq_,nan,nan,false, true);
 }

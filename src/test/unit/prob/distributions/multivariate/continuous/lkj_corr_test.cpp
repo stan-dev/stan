@@ -3,6 +3,10 @@
 #include "stan/prob/distributions/univariate/continuous/uniform.hpp"
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
+#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/fwd/matrix.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 
 TEST(ProbDistributionsLkjCorr,testIdentity) {
   boost::random::mt19937 rng;
@@ -129,4 +133,160 @@ TEST(ProbDistributionsLkjCorrCholesky,testHalf) {
   f = stan::prob::do_lkj_constant(eta, K);
   EXPECT_FLOAT_EQ(f - 0.4904146,
                   stan::prob::lkj_corr_cholesky_log(L, eta));
+}
+
+TEST(ProbDistributionsLkjCorr,fvar_double) {
+  using stan::agrad::fvar;
+  boost::random::mt19937 rng;
+  unsigned int K = 4;
+  Eigen::Matrix<fvar<double>,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);
+  Sigma.setZero();
+  Sigma.diagonal().setOnes();
+  for (int i = 0; i < K*K; i++)
+    Sigma(i).d_ = 1.0;
+  fvar<double> eta = stan::prob::uniform_rng(0,2,rng);
+  fvar<double> f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_, stan::prob::lkj_corr_log(Sigma, eta).val_);
+  EXPECT_FLOAT_EQ(2.5177896, stan::prob::lkj_corr_log(Sigma, eta).d_);
+  eta = 1.0;
+  f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_, stan::prob::lkj_corr_log(Sigma, eta).val_);
+  EXPECT_FLOAT_EQ(f.d_, stan::prob::lkj_corr_log(Sigma, eta).d_);
+}
+
+TEST(ProbDistributionsLkjCorrCholesky,fvar_double) {
+  using stan::agrad::fvar;
+  boost::random::mt19937 rng;
+  unsigned int K = 4;
+  Eigen::Matrix<fvar<double>,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);
+  Sigma.setZero();
+  Sigma.diagonal().setOnes();
+  for (int i = 0; i < K*K; i++)
+    Sigma(i).d_ = 1.0;
+  fvar<double> eta = stan::prob::uniform_rng(0,2,rng);
+  fvar<double> f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_, stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_);
+  EXPECT_FLOAT_EQ(6.7766843, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_);
+  eta = 1.0;
+  f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_, stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_);
+  EXPECT_FLOAT_EQ(3, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_);
+}
+
+TEST(ProbDistributionsLkjCorr,fvar_var) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  boost::random::mt19937 rng;
+  unsigned int K = 4;
+  Eigen::Matrix<fvar<var>,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);
+  Sigma.setZero();
+  Sigma.diagonal().setOnes();
+  for (int i = 0; i < K*K; i++)
+    Sigma(i).d_ = 1.0;
+  fvar<var> eta = stan::prob::uniform_rng(0,2,rng);
+  fvar<var> f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val(), stan::prob::lkj_corr_log(Sigma, eta).val_.val());
+  EXPECT_FLOAT_EQ(2.5177896, stan::prob::lkj_corr_log(Sigma, eta).d_.val());
+  eta = 1.0;
+  f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val(), stan::prob::lkj_corr_log(Sigma, eta).val_.val());
+  EXPECT_FLOAT_EQ(f.d_.val(), stan::prob::lkj_corr_log(Sigma, eta).d_.val());
+}
+
+TEST(ProbDistributionsLkjCorrCholesky,fvar_var) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  boost::random::mt19937 rng;
+  unsigned int K = 4;
+  Eigen::Matrix<fvar<var>,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);
+  Sigma.setZero();
+  Sigma.diagonal().setOnes();
+  for (int i = 0; i < K*K; i++)
+    Sigma(i).d_ = 1.0;
+  fvar<var> eta = stan::prob::uniform_rng(0,2,rng);
+  fvar<var> f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val(), stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_.val());
+  EXPECT_FLOAT_EQ(6.7766843, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_.val());
+  eta = 1.0;
+  f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val(), stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_.val());
+  EXPECT_FLOAT_EQ(3, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_.val());
+}
+
+TEST(ProbDistributionsLkjCorr,fvar_fvar_double) {
+  using stan::agrad::fvar;
+  boost::random::mt19937 rng;
+  unsigned int K = 4;
+  Eigen::Matrix<fvar<fvar<double> >,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);
+  Sigma.setZero();
+  Sigma.diagonal().setOnes();
+  for (int i = 0; i < K*K; i++)
+    Sigma(i).d_.val_ = 1.0;
+  fvar<fvar<double> > eta = stan::prob::uniform_rng(0,2,rng);
+  fvar<fvar<double> > f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_, stan::prob::lkj_corr_log(Sigma, eta).val_.val_);
+  EXPECT_FLOAT_EQ(2.5177896, stan::prob::lkj_corr_log(Sigma, eta).d_.val_);
+  eta = 1.0;
+  f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_, stan::prob::lkj_corr_log(Sigma, eta).val_.val_);
+  EXPECT_FLOAT_EQ(f.d_.val_, stan::prob::lkj_corr_log(Sigma, eta).d_.val_);
+}
+
+TEST(ProbDistributionsLkjCorrCholesky,fvar_fvar_double) {
+  using stan::agrad::fvar;
+  boost::random::mt19937 rng;
+  unsigned int K = 4;
+  Eigen::Matrix<fvar<fvar<double> >,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);
+  Sigma.setZero();
+  Sigma.diagonal().setOnes();
+  for (int i = 0; i < K*K; i++)
+    Sigma(i).d_.val_ = 1.0;
+  fvar<fvar<double> > eta = stan::prob::uniform_rng(0,2,rng);
+  fvar<fvar<double> > f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_, stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_.val_);
+  EXPECT_FLOAT_EQ(6.7766843, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_.val_);
+  eta = 1.0;
+  f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_, stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_.val_);
+  EXPECT_FLOAT_EQ(3, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_.val_);
+}
+
+TEST(ProbDistributionsLkjCorr,fvar_fvar_var) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  boost::random::mt19937 rng;
+  unsigned int K = 4;
+  Eigen::Matrix<fvar<fvar<var> >,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);
+  Sigma.setZero();
+  Sigma.diagonal().setOnes();
+  for (int i = 0; i < K*K; i++)
+    Sigma(i).d_.val_ = 1.0;
+  fvar<fvar<var> > eta = stan::prob::uniform_rng(0,2,rng);
+  fvar<fvar<var> > f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::prob::lkj_corr_log(Sigma, eta).val_.val_.val());
+  EXPECT_FLOAT_EQ(2.5177896, stan::prob::lkj_corr_log(Sigma, eta).d_.val_.val());
+  eta = 1.0;
+  f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::prob::lkj_corr_log(Sigma, eta).val_.val_.val());
+  EXPECT_FLOAT_EQ(f.d_.val_.val(), stan::prob::lkj_corr_log(Sigma, eta).d_.val_.val());
+}
+
+TEST(ProbDistributionsLkjCorrCholesky,fvar_fvar_var) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  boost::random::mt19937 rng;
+  unsigned int K = 4;
+  Eigen::Matrix<fvar<fvar<var> >,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);
+  Sigma.setZero();
+  Sigma.diagonal().setOnes();
+  for (int i = 0; i < K*K; i++)
+    Sigma(i).d_.val_ = 1.0;
+  fvar<fvar<var> > eta = stan::prob::uniform_rng(0,2,rng);
+  fvar<fvar<var> > f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_.val_.val());
+  EXPECT_FLOAT_EQ(6.7766843, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_.val_.val());
+  eta = 1.0;
+  f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_.val_.val());
+  EXPECT_FLOAT_EQ(3, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_.val_.val());
 }

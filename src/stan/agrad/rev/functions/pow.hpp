@@ -8,6 +8,7 @@
 #include <stan/agrad/rev/internal/dv_vari.hpp>
 #include <stan/agrad/rev/functions/sqrt.hpp>
 #include <stan/agrad/rev/operators/operator_multiplication.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
   namespace agrad {
@@ -19,9 +20,15 @@ namespace stan {
           op_vv_vari(std::pow(avi->val_,bvi->val_),avi,bvi) {
         }
         void chain() {
-          if (avi_->val_ == 0.0) return; // partials zero, avoids 0 & log(0)
-          avi_->adj_ += adj_ * bvi_->val_ * val_ / avi_->val_;
-          bvi_->adj_ += adj_ * std::log(avi_->val_) * val_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bvi_->val_))) {
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+            bvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          } else {
+            if (avi_->val_ == 0.0) return; // partials zero, avoids 0 & log(0)
+            avi_->adj_ += adj_ * bvi_->val_ * val_ / avi_->val_;
+            bvi_->adj_ += adj_ * std::log(avi_->val_) * val_;
+          }
         }
       };
 
@@ -31,8 +38,13 @@ namespace stan {
           op_vd_vari(std::pow(avi->val_,b),avi,b) {
         }
         void chain() {
-          if (avi_->val_ == 0.0) return; // partials zero, avoids 0 & log(0)
-          avi_->adj_ += adj_ * bd_ * val_ / avi_->val_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bd_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else {
+            if (avi_->val_ == 0.0) return; // partials zero, avoids 0 & log(0)
+            avi_->adj_ += adj_ * bd_ * val_ / avi_->val_;
+          }
         }
       };
 
@@ -42,8 +54,13 @@ namespace stan {
           op_dv_vari(std::pow(a,bvi->val_),a,bvi) {
         }
         void chain() {
-          if (ad_ == 0.0) return; // partials zero, avoids 0 & log(0)
-          bvi_->adj_ += adj_ * std::log(ad_) * val_;
+          if (unlikely(boost::math::isnan(bvi_->val_)
+                       || boost::math::isnan(ad_)))
+            bvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else {
+            if (ad_ == 0.0) return; // partials zero, avoids 0 & log(0)
+            bvi_->adj_ += adj_ * std::log(ad_) * val_;
+          }
         }
       };
     }

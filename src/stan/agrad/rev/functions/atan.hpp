@@ -4,6 +4,7 @@
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <math.h>
 
 namespace stan {
   namespace agrad {
@@ -12,7 +13,7 @@ namespace stan {
       class atan_vari : public op_v_vari {
       public:
         atan_vari(vari* avi) :
-          op_v_vari(std::atan(avi->val_),avi) {
+          op_v_vari(::atan(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (1.0 + (avi_->val_ * avi_->val_));

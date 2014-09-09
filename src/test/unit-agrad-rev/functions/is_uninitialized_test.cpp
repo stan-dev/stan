@@ -7,3 +7,9 @@ TEST(AgradRev,undefined) {
   a = 5;
   EXPECT_FALSE(a.is_uninitialized());
 }
+
+TEST(AgradRev, is_uninitialized_nan) {
+  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_FALSE(stan::agrad::is_uninitialized(nan));
+}

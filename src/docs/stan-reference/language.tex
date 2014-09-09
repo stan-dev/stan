@@ -2495,6 +2495,9 @@ will be removed altogether in a future release, but until that time,
 programs still work with \code{lp\_\_}.  A deprecation warning is now
 printed every time \code{lp\_\_} is used.
 
+To access the value of \code{lp\_\_} for printing, use the
+\code{get\_lp} function (see \refsection{get-lp}).
+
 
 \section{Sampling Statements}\label{sampling-statements.section}
 
@@ -3227,32 +3230,91 @@ variables or expressions at various points in the execution of a
 program.  They are particularly useful for spotting problematic
 not-a-number of infinite values, both of which will be printed.
 
-\section{Raise\_Exception Statements}\label{raise-exception-statements.section}
-
-The Stan raise\_exception statement provides a mechanism to report errors or problematic
-values encountered during program execution.
-It is typically embedded in a conditional statement in order to
-detect bad or illegal outcomes of a processing step.
-This statement accepts any number of quoted string literals or Stan expressions as arguments.
-
-To illustrate, here is an example of a test which raises an exception when
-a value falls below a specified limit.
+It is particularly useful to print the value of the log probability
+accumulator (see \refsection{get-lp}), as in the following example.
 %
 \begin{quote}
 \begin{Verbatim}
-if (x < min) 
-  raise_exception("failure, value ",x," below minimum ",y);
+vector[2] y;
+y[1] <- 1;
+print("lp before =",get_lp());
+y ~ normal(0,1); // bug!  y[2] not defined
+print("lp after =",get_lp());
+\end{Verbatim}
+\end{quote}
+%
+The example has a bug in that \code{y[2]} is not defined before the
+vector \code{y} is used in the sampling statement.  By printing the
+value of the log probability accumulator before and after each
+sampling statement, it's possible to isolate where the log probability
+becomes ill-defined (i.e., becomes not-a-number).
+
+\section{Reject Statements}\label{reject-statements.section}
+
+The Stan \code{reject} statement provides a mechanism to
+report errors or problematic values encountered during program
+execution and either halt processing or reject samples or optimization
+iterations.  
+
+Like the \code{print} statement, the reject statement accepts
+any number of quoted string literals or Stan expressions as arguments.
+
+Reject statements are typically embedded in a conditional
+statement in order to detect variables in illegal states.  For
+example, the following code handles the case where a variable \code{x}'s
+value is negative.
+%
+\begin{quote}
+\begin{Verbatim}
+if (x < 0) 
+  reject("x must not be negative; found x=", x);
 \end{Verbatim}
 \end{quote}
 
-The effect of raising an exception depends on the program block
-from which this statement or a function that contains 
-a \code{raise\_exception} statment occurs.
-In both the transformed data block and generated quantities block this exception
-is fatal.  An exception in the transformed data block blocks model initialization.
-An exception in the generated quantities block will block sampling.
-Exceptions raised in the transformed parameters and model blocks are non-fatal.
-The exception message is reported and processing continues.
+\subsection{Behavior of Reject Statements}
+
+Reject statements have the same behavior as exceptions thrown by
+built-in Stan functions.  For example, the \code{normal\_log} function
+raises an exception if the input scale is not positive and finite.
+The effect of a reject statement depends on the program block in which
+the rejection occurs.
+
+In all cases of rejection, the interface accessing the Stan
+program should print the arguments to the reject statement.
+
+\subsubsection{Rejections in Functions}
+
+Rejections in user-defined functions are just passed to the
+calling function or program block.  Reject statements can be used in 
+functions to validate the function arguments, allowing user-defined
+functions to fully emulate built-in function behavior.  It is better
+to find out earlier rather than later when there is a problem.
+
+\subsubsection{Fatal Exception Contexts}
+
+In both the transformed data block and generated quantities block,
+rejections are fatal.  This is because if initialization fails or if
+generating output fails, there is no way to recover values.
+
+Reject statements placed in the transformed data block can be used
+to validate both the data and transformed data (if any).  This allows
+more complicated constraints to be enforced that can be specified with
+Stan's constrained variable declarations.
+
+
+\subsubsection{Recoverable Rejection Contexts}
+
+Rejections in the transformed parameters and model blocks are
+not in and of themselves instantly fatal.  The result has the same
+effect as assigning a $-\infty$ log probability, which causes
+rejection of the current proposal in MCMC samplers and adjustment of
+search parameters in optimization.
+
+If the log probability function results in a rejection every time it is
+called, the containing application (MCMC sampler or optimization)
+should diagnose this problem and terminate with an appropriate error
+message.  To aid in diagnosing problems, the message for each
+reject statement will be printed as a result of executing it.
 
 
 \chapter{User-Defined Functions}\label{functions.chapter}%
@@ -4394,7 +4456,8 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 {
 \small
 \begin{Verbatim}[fontsize=\small]
-funtion_decl ::= unsized_return_type identifier '(' unsized_types ')' statement
+funtion_decl ::= unsized_return_type identifier '(' unsized_types ')' 
+                 statement
 
 unsized_return_type ::= 'void' | unsized_type
 unsized_type ::= (basic_type ?unsized_dims)
@@ -4481,6 +4544,7 @@ atomic_statement_body
    | function_literal '(' expressions ')'
    | 'increment_log_prob' '(' expression ')'
    | 'print' '(' (expression | string_literal)* ')'
+   | 'reject' '(' (expression | string_literal)* ')'
    | 'return' expression
    | ''
 

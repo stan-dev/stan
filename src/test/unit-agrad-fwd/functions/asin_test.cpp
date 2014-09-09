@@ -3,6 +3,7 @@
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <stan/math/constants.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdAsin,Fvar) {
   using stan::agrad::fvar;
@@ -38,6 +39,16 @@ TEST(AgradFwdAsin,Fvar) {
   fvar<double> f = asin(z);
   EXPECT_FLOAT_EQ(asin(1.0), f.val_);
   EXPECT_FLOAT_EQ(INFTY, f.d_);
+
+  fvar<double> z2(1.0+stan::math::EPSILON,1.0);
+  fvar<double> f2 = asin(z2);
+  EXPECT_TRUE(boost::math::isnan(f2.val_));
+  EXPECT_TRUE(boost::math::isnan(f2.d_));
+
+  fvar<double> z3(-1.0-stan::math::EPSILON,1.0);
+  fvar<double> f3 = asin(z3);
+  EXPECT_TRUE(boost::math::isnan(f3.val_));
+  EXPECT_TRUE(boost::math::isnan(f3.d_));
 }
 
 TEST(AgradFwdAsin,FvarVar_1stDeriv) {
@@ -181,4 +192,15 @@ TEST(AgradFwdAsin,FvarFvarVar_3rdDeriv) {
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(3.07920143567800, g[0]);
 }
+struct asin_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return asin(arg1);
+  }
+};
 
+TEST(AgradFwdAsin,asin_NaN) {
+  asin_fun asin_;
+  test_nan(asin_,false);
+}
