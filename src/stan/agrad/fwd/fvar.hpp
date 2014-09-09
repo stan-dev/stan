@@ -3,6 +3,7 @@
 
 #include <ostream>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
 

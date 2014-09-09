@@ -7,6 +7,7 @@
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/abs.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
 
