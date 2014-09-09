@@ -32,7 +32,7 @@ test/%.d : src/test/%_test.cpp
 	(set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$ ); \
 	fi
 

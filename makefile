@@ -72,7 +72,7 @@ bin/%.d : src/%.cpp
 	(set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
 
