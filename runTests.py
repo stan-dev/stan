@@ -15,6 +15,12 @@ arg 1:  test dir or test file
 
 testsfx = "_test.cpp"
 
+def usage():
+    sys.stdout.write('usage: %s <path/test/dir(/files)>\n' % sys.argv[0])
+    sys.stdout.write('or\n')
+    sys.stdout.write('       %s -j<#cores> <path/test/dir(/files)>\n' % sys.argv[0])
+    sys.exit(0)
+
 def stop_err( msg, returncode ):
     sys.stderr.write( '%s\n' % msg )
     sys.stderr.write( 'exit now ( %s)\n' % time.strftime('%x %X %Z'))
@@ -39,7 +45,6 @@ def makeTest( name, j ):
     name = name.replace("src/","",1)
     name = name.replace(testsfx,"");
     command = 'make -j%d %s' % (j,name)
-    print(command)
     doCommand(command)
     
 def makeTests( dirname, filenames, j ):
@@ -49,10 +54,10 @@ def makeTests( dirname, filenames, j ):
         if (name.endswith(testsfx)):
             target = name.replace(testsfx,"");
             targets.append(os.sep.join([dirname,target]))
-    command = 'make -j%d %s' % (j,' '.join(targets))
-    print(command)
-    doCommand(command)
-
+    if (len(targets) > 0):
+        command = 'make -j%d %s' % (j,' '.join(targets))
+        print(command)
+        doCommand(command)
     
 def runTest( name ):
     name = name.replace("src/","",1)
@@ -64,14 +69,14 @@ def runTest( name ):
     
 def main():
     if (len(sys.argv) < 2):
-        useage()
+        usage()
 
     j = 1
     start = 1
     if (sys.argv[1].startswith("-j")):
         start = 2
         if (len(sys.argv) < 3):
-            useage()
+            usage()
         else:
             j = sys.argv[1].replace("-j","")
             try:
