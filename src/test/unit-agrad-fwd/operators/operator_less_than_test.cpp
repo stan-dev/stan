@@ -78,3 +78,58 @@ TEST(AgradFwdOperatorLessThan, FvarFvarVar) {
   EXPECT_TRUE(z < x);
   EXPECT_FALSE(y < z);
 }
+
+TEST(AgradFwdOperatorLessThan, lt_nan) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  double a = 3.0;
+  fvar<double> nan_fd = std::numeric_limits<double>::quiet_NaN();
+  fvar<double> a_fd = 3.0;
+  fvar<var> nan_fv = std::numeric_limits<double>::quiet_NaN();
+  fvar<var> a_fv = 3.0;
+  fvar<fvar<double> > nan_ffd = std::numeric_limits<double>::quiet_NaN();
+  fvar<fvar<double> > a_ffd = 3.0;
+  fvar<fvar<var> > nan_ffv = std::numeric_limits<double>::quiet_NaN();
+  fvar<fvar<var> > a_ffv = 3.0;
+
+  EXPECT_FALSE(a < nan_fd);
+  EXPECT_FALSE(a_fd < nan_fd);
+  EXPECT_FALSE(nan < nan_fd);
+  EXPECT_FALSE(nan_fd < nan_fd);
+  EXPECT_FALSE(a_fd < nan);
+  EXPECT_FALSE(nan_fd < nan);
+  EXPECT_FALSE(nan_fd < a);
+  EXPECT_FALSE(nan_fd < a_fd);
+  EXPECT_FALSE(nan < a_fd);
+
+  EXPECT_FALSE(a < nan_fv);
+  EXPECT_FALSE(a_fv < nan_fv);
+  EXPECT_FALSE(nan < nan_fv);
+  EXPECT_FALSE(nan_fv < nan_fv);
+  EXPECT_FALSE(a_fv < nan);
+  EXPECT_FALSE(nan_fv < nan);
+  EXPECT_FALSE(nan_fv < a);
+  EXPECT_FALSE(nan_fv < a_fv);
+  EXPECT_FALSE(nan < a_fv);
+
+  EXPECT_FALSE(a < nan_ffd);
+  EXPECT_FALSE(a_ffd < nan_ffd);
+  EXPECT_FALSE(nan < nan_ffd);
+  EXPECT_FALSE(nan_ffd < nan_ffd);
+  EXPECT_FALSE(a_ffd < nan);
+  EXPECT_FALSE(nan_ffd < nan);
+  EXPECT_FALSE(nan_ffd < a);
+  EXPECT_FALSE(nan_ffd < a_ffd);
+  EXPECT_FALSE(nan < a_ffd);
+
+  EXPECT_FALSE(a < nan_ffv);
+  EXPECT_FALSE(a_ffv < nan_ffv);
+  EXPECT_FALSE(nan < nan_ffv);
+  EXPECT_FALSE(nan_ffv < nan_ffv);
+  EXPECT_FALSE(a_ffv < nan);
+  EXPECT_FALSE(nan_ffv < nan);
+  EXPECT_FALSE(nan_ffv < a);
+  EXPECT_FALSE(nan_ffv < a_ffv);
+  EXPECT_FALSE(nan < a_ffv);
+}

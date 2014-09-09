@@ -2,6 +2,7 @@
 #include <stan/math/matrix/quad_form.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <stan/agrad/fwd/matrix/dot_product.hpp>

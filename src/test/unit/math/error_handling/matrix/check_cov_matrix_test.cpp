@@ -14,3 +14,21 @@ TEST(MathErrorHandlingMatrix, checkCovMatrix) {
   EXPECT_THROW(stan::math::check_cov_matrix("checkCovMatrix(%1%)", y, "y", &result), 
                std::domain_error);
 }
+
+TEST(MathErrorHandlingMatrix, checkCovMatrix_nan) {
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  y.resize(3,3);
+  y << 2, -1, 0, -1, 2, -1, 0, -1, 2;
+  EXPECT_TRUE(stan::math::check_cov_matrix("checkCovMatrix(%1%)",
+                                           y, "y", &result));
+  
+  for (int i = 0; i < y.size(); i++) {
+    y(i) = nan;
+    EXPECT_THROW(stan::math::check_cov_matrix("checkCovMatrix(%1%)", y, "y", &result), 
+                 std::domain_error);
+    y << 2, -1, 0, -1, 2, -1, 0, -1, 2;
+  }
+}

@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/functions/ibeta.hpp>
 #include <boost/math/special_functions/beta.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,ibeta_vvv) {
   using stan::agrad::var;
@@ -202,4 +203,20 @@ TEST(AgradRev,ibeta_ddv) {
   x = createAVEC(c);
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(ibeta_derivative(a, b, c.val()),grad_f[0]);
+}
+
+struct ibeta_fun {
+  template <typename T0, typename T1, typename T2>
+  inline
+  typename stan::return_type<T0,T1,T2>::type
+  operator()(const T0& arg1,
+             const T1& arg2,
+             const T2& arg3) const {
+    return ibeta(arg1,arg2,arg3);
+  }
+};
+
+TEST(AgradRev,ibeta_NaN) {
+  ibeta_fun ibeta_;
+  test_nan(ibeta_,0.6,0.3,0.5,true,false);
 }

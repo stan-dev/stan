@@ -2,6 +2,9 @@
 #define STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_PLUS_HPP
 
 #include <stan/agrad/rev/var.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/agrad/rev/internal/precomp_v_vari.hpp>
+#include <stan/math/constants.hpp>
 
 namespace stan {
   namespace agrad {
@@ -22,6 +25,10 @@ namespace stan {
      * @return The input reference.
      */
     inline var operator+(const var& a) {
+      if (unlikely(boost::math::isnan(a.vi_->val_)))
+        return var(new precomp_v_vari(stan::math::NOT_A_NUMBER,
+                                      a.vi_,
+                                      stan::math::NOT_A_NUMBER));
       return a;
     }
 

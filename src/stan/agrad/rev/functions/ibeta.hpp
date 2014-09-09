@@ -218,6 +218,7 @@ namespace stan {
      * @param x Random variate.
      * 
      * @return The normalized incomplete beta function.
+     * @throws if any argument is NaN.
      */
     inline var ibeta(const var& a,
                      const var& b,

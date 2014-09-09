@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdTrunc, Fvar) {
   using stan::agrad::fvar;
@@ -157,4 +158,17 @@ TEST(AgradFwdTrunc, FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.val_.d_);
   EXPECT_FLOAT_EQ(0, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
+}
+
+struct trunc_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return trunc(arg1);
+  }
+};
+
+TEST(AgradFwdTrunc,trunc_NaN) {
+  trunc_fun trunc_;
+  test_nan(trunc_,false);
 }

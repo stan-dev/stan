@@ -1,8 +1,8 @@
 #include <limits>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/agrad/rev/functions/fabs.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,fabs_var) {
   AVAR a = 0.68;
@@ -37,15 +37,15 @@ TEST(AgradRev,fabs_var_3) {
   EXPECT_FLOAT_EQ(0.0, g[0]);
 }
 
-TEST(AgradRev, fabs_NaN) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = fabs(a);
+struct fabs_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return fabs(arg1);
+  }
+};
 
-  
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  EXPECT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,fabs_NaN) {
+  fabs_fun fabs_;
+  test_nan(fabs_,false,true);
 }

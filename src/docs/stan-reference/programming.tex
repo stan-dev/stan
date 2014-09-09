@@ -1337,7 +1337,7 @@ Stan for more flexibility.
 The 1PL item-response model, also known as the Rasch model, has one
 parameter (1P) for questions and uses the logistic link function (L).
 This model is distributed with Stan in the file
-\url{src/models/misc/irt/irt.stan}.
+\url{example-models/misc/irt/irt.stan}.
 
 The model parameters are declared as follows.
 %
@@ -2304,7 +2304,7 @@ h_t \sim \distro{Normal}(\mu + \phi(h_t - \mu), \sigma).
 \]
 This formulation can be directly encoded, as shown in the following
 Stan model, which is also available in the file
-\nolinkurl{<stan>/src/models/misc/moving-avg/stochastic-volatility.stan}
+\nolinkurl{<stan>/example-models/misc/moving-avg/stochastic-volatility.stan}
 along with R code to simulate data from the model for testing.
 %
 \begin{quote}
@@ -2440,7 +2440,7 @@ component indicators form a latent Markov chain.
 In the situation where the hidden states are known, the following
 naive model can be used to fit the parameters $\theta$ and $\phi$.
 (This model is distributed with Stan on the path
-\nolinkurl{<stan>/src/models/misc/hmm/hmm.stan}.)
+\nolinkurl{<stan>/example-models/misc/hmm/hmm.stan}.)
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -2500,7 +2500,7 @@ The naive HMM estimation model presented above can be sped up
 dramatically by replacing the loops over categorical distributions
 with a single multinomial distribution.  A complete implementation is
 available in the Stan source distribution at path
-\nolinkurl{<stan>/src/models/misc/hmm/hmm-sufficient.stan}.  The data
+\nolinkurl{<stan>/example-models/misc/hmm/hmm-sufficient.stan}.  The data
 is declared as before, but now a transformed data blocks computes the
 sufficient statistics for estimating the transition and emission
 matrices.
@@ -2547,7 +2547,7 @@ up in the same way by computing sufficient statistics.
 With the Dirichlet-multinomial HMM, the posterior can be computed
 analytically because the Dirichlet is the conjugate prior to the
 multinomial.  The following example, available in
-\nolinkurl{<stan>/src/models/hmm/hmm-analytic.stan}, illustrates how a
+\nolinkurl{<stan>/example-models/hmm/hmm-analytic.stan}, illustrates how a
 Stan model can define the posterior analytically.  This is possible in
 the Stan language because the model only needs to define the
 conditional probability of the parameters given the data up to a
@@ -2603,7 +2603,7 @@ problem, and for HMMs, it is computed with the so-called forward
 algorithm.  
 
 In Stan, the forward algorithm is coded as follows (the full model
-is in \nolinkurl{<stan>/src/models/misc/hmm/hmm-semisup.stan}).  First,
+is in \nolinkurl{<stan>/example-models/misc/hmm/hmm-semisup.stan}).  First,
 two additional data variable are declared for the unsupervised data.
 %
 \begin{quote}
@@ -3723,7 +3723,7 @@ eight schools based on the sample treatment effect and standard error
 in each school.  The model provided for this data in
 \citep[Section~5.5]{GelmanEtAl:2013} is included with the
 data in the Stan distribution in directory
-\nolinkurl{src/models/misc/eight-schools/}.
+\nolinkurl{example-models/misc/eight-schools/}.
 
 \subsubsection{Extensions and Alternatives}
 
@@ -3828,7 +3828,7 @@ mean $\mu_k$ to the data point $y_n$.
 
 The following model is available in the Stan distribution (along with
 an R program to randomly generate data sets and a sample data set) in
-the directory \nolinkurl{stan/src/models/misc/soft-k-means}.
+the directory \nolinkurl{stan/example-models/misc/soft-k-means}.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -4027,7 +4027,7 @@ document identity array \code{doc}.
 
 The naive Bayes models along with R programs to simulate data for them
 and a sample data set are available in the distribution in the
-directory \nolinkurl{src/models/misc/clustering/naive-bayes}.
+directory \nolinkurl{example-models/misc/clustering/naive-bayes}.
 
 A naive Bayes model for estimating the simplex parameters given
 training data with documents of known categories can be coded in Stan
@@ -4540,7 +4540,7 @@ will be used with hyperparameters set to $\eta^2 = 1$, $\rho^2 = 1$,
 and $\sigma^2 = 0.1$, and the mean function $m$ is defined to always
 return the zero vector, $m(x) = {\bf 0}$.  The following model is
 included in the Stan distribution in file
-\nolinkurl{src/models/misc/gaussian-process/gp-sim.stan}.
+\nolinkurl{example-models/misc/gaussian-process/gp-sim.stan}.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -4579,7 +4579,7 @@ Section~\refsection{fit-gp} for a better approach.
 Only the covariance function's distance computation needs to change in
 moving from a univariate model to a multivariate model.  A
 multivariate sampling model is available in the source distribution at
-\nolinkurl{src/models/misc/gaussian-process/gp-multi-sim.stan}.  The
+\nolinkurl{example-models/misc/gaussian-process/gp-multi-sim.stan}.  The
 only lines that change from the univariate model above are as follows.
 %
 \begin{quote}
@@ -4629,7 +4629,7 @@ target distribution,
 
 This transform can be applied directly to Gaussian process simulation,
 as shown in the model
-\nolinkurl{src/models/misc/gaussian-process/gp-sim-cholesky.stan} in
+\nolinkurl{example-models/misc/gaussian-process/gp-sim-cholesky.stan} in
 the distribution.  This model has the same data declarations for
 \code{N} and \code{x}, and the same transformed data definitions of
 \code{mu} and \code{Sigma} as the previous model, with the addition of
@@ -4682,7 +4682,7 @@ which distances are measured among inputs ($1/\rho$).
 
 A Stan model to fit the hyperparameters of the general squared
 exponential covariance function is provided in the distribution in
-\nolinkurl{src/models/misc/gaussian-process/gp-fit.stan}.  The Stan
+\nolinkurl{example-models/misc/gaussian-process/gp-fit.stan}.  The Stan
 code is very similar to the simulation models in terms of the
 computations, but the blocks in which variables are declared and
 statements are executed has changed to accommodate the hyperparameter
@@ -4790,7 +4790,7 @@ Although Stan does not support mixed vectors of parameters and data
 directly, such a vector may be synthesized as a local variable in the
 model block.  The following model, which takes this approach, is
 available in the distribution as
-\nolinkurl{src/models/misc/gaussian-process/gp-predict.stan}.  
+\nolinkurl{example-models/misc/gaussian-process/gp-predict.stan}.  
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -4910,7 +4910,7 @@ posterior, the posterior may be coded directly.  An example that uses
 the analytic form of the posterior and provides sampling of the
 resulting multivariate normal through the Cholesky decomposition is
 provided in
-\nolinkurl{src/models/misc/gaussian-process/gp-predict-analytic.stan}.  
+\nolinkurl{example-models/misc/gaussian-process/gp-predict-analytic.stan}.  
 The data declaration is the same as for the standard example.  The
 calculation of the predictive mean \code{mu} and covariance Cholesky
 factor \code{L} is done in the transformed data block.
@@ -5027,7 +5027,7 @@ as for the previous regression models.
 
 The following full model for prediction using logistic Gaussian
 process regression is available in the distribution at
-\nolinkurl{src/models/misc/gaussian-process/gp-logit-predict.stan}.
+\nolinkurl{example-models/misc/gaussian-process/gp-logit-predict.stan}.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -5472,7 +5472,7 @@ If $\alpha = -1$, $\beta = 1$, and $y \in (-1,1)$, this reduces to
 \[
 \distro{Triangle}(y|-1,1) = 1 - |y|.
 \]
-The file \url{src/models/basic_distributions/triangle.stan} contains
+The file \url{example-models/basic_distributions/triangle.stan} contains
 the following \Stan implementation of a sampler from 
 $\distro{Triangle}(-1,1)$.
 %
@@ -5639,9 +5639,9 @@ function, but functions with non-void return types must end in a
 return statement; see \refsection{function-returns} for details on how
 this is enforced.
 
-\subsection{Exceptions}
+\subsection{Reject Statements}
 
-The Stan raise\_exception statement provides a mechanism to report errors or problematic
+The Stan reject statement provides a mechanism to report errors or problematic
 values encountered during program execution.
 It accepts any number of quoted string literals or Stan expressions as arguments.
 This statement is typically embedded in a conditional statement in order to
@@ -5649,7 +5649,7 @@ detect bad or illegal outcomes of some processing step.
 
 To illustrate the use of this statement, we modify the user-defined
 relative difference function example from Section~\refsection{basic-functions}
-so that it throws an exception if the relative difference is less than
+so that rejection happens if the relative difference is less than
 some limit.
 %
 \begin{quote}
@@ -5661,16 +5661,16 @@ functions {
     abs_diff <- fabs(x - y);
     avg_scale <- (fabs(x) + fabs(y)) / 2;
     if (abs_diff / avg_scale < min) 
-      raise_exception("relative_diff below ",min);
+      reject("relative_diff below ",min);
     return abs_diff / avg_scale;
   }
 }
 \end{Verbatim}
 \end{quote}
 
-The effect of raising an exception depends on the program block
+The effect of rejection depends on the program block
 in which the function was invoked.
-See Section~\refsection{raise-exception-statements} for details.
+See Section~\refsection{reject-statements} for details.
 
 \subsection{Type Declarations for Functions}
 
@@ -5788,7 +5788,7 @@ Although \code{theta} must be a simplex, only the type \code{vector}
 is used.%
 %
 \footnote{A range of built-in validation routines is coming to Stan soon!
-Alternatively, the \code{raise\_exception} statement can be used to check
+Alternatively, the \code{reject} statement can be used to check
 constraints on the simplex.} 
 %
 Upper or lower bounds on values or constrained types are not allowed
@@ -6102,12 +6102,12 @@ the argument's identifier to document a function argument.  The tag
 Doxygen, so this just looks like a big comment starting with \code{/*}
 and ending with \code{*/} to the Stan parser.
 
-For functions that raise exceptions, these can be documented using
+For functions that raise exceptions, exceptions can be documented using
 \code{@throws}.%
 %
 \footnote{As of Stan 2.4.0, the only way a user-defined
 producer will raise an exception is if a function it calls (including
-sampling statements) raises an exception.}
+sampling statements) raises an exception via the reject statement.}
 %
 For example,
 %
