@@ -3,6 +3,7 @@
 import argparse
 import os
 import os.path
+import platform
 import re
 import sys
 import subprocess
@@ -13,6 +14,7 @@ replacement for runtest target in Makefile
 arg 1:  test dir or test file
 """
 
+winsfx = ".exe"
 testsfx = "_test.cpp"
 
 def usage():
@@ -53,6 +55,9 @@ def makeTests( dirname, filenames, j ):
     for name in filenames:
         if (name.endswith(testsfx)):
             target = name.replace(testsfx,"");
+            if (isWin()):
+                target += winsfx
+                sys.out.println('windows target name: %s' % os.sep.join([dirname,target]))
             targets.append(os.sep.join([dirname,target]))
     if (len(targets) > 0):
         command = 'make -j%d %s' % (j,' '.join(targets))
@@ -65,8 +70,13 @@ def runTest( name ):
     print(name)
     doCommand(name)
 
+def isWin():
+    if (platform.system().lower().startswith("windows")
+        or os.name.lower().startswith("windows")):
+        return True
+    return False
 
-    
+
 def main():
     if (len(sys.argv) < 2):
         usage()
