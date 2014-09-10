@@ -435,6 +435,25 @@ namespace stan {
         add(num_chains(), sample);
       }
 
+      void add(const std::vector<std::vector<double> >& sample) {
+        /**
+        * Convert a vector of vector<double> to Eigen::MatrixXd
+        *
+        * This method is added for the benefit of software wrapping
+        * Stan (e.g., PyStan) so that it need not additionally wrap Eigen.
+        *
+        */
+        int n_row = sample.size();
+        if (n_row == 0)
+            return;
+        int n_col = sample[0].size();
+        Eigen::MatrixXd sample_copy(n_row, n_col);
+        for (int i = 0; i < n_row; i++) {
+            sample_copy.row(i) = Eigen::VectorXd::Map(&sample[i][0], sample[0].size());
+        }
+        add(sample_copy);
+      }
+
       void add(const stan::io::stan_csv& stan_csv) {
         if (stan_csv.header.size() != num_params())
           throw std::invalid_argument("add(stan_csv): number of columns in"
