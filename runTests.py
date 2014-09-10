@@ -49,6 +49,7 @@ def generateTests(j):
     print(command)
     doCommand(command)
 
+# set up good makefile target name    
 def mungename( name ):
     if (name.startswith("src")):
         name = name.replace("src/","",1)
@@ -56,6 +57,7 @@ def mungename( name ):
         name = name.replace(testsfx,"");
         if (isWin()):
             name += winsfx
+            name = name.replace("\\","/")
     return name
 
 def makeTest( name, j ):
@@ -64,16 +66,19 @@ def makeTest( name, j ):
     doCommand(command)
     
 def makeTests( dirname, filenames, j ):
-    dirname = dirname.replace("src/","",1).replace("\\","/")
     targets = list()
     for name in filenames:
-        target = mungename(name)
-        targets.append("/".join([dirname,target]))
+        if (not name.endswith(testsfx)):
+            continue
+        target = "/".join([dirname,target])
+        mungename(target)
+        targets.append(target)
     if (len(targets) > 0):
         command = 'make -j%d %s' % (j,' '.join(targets))
         print(command)
         doCommand(command)
     
+# set up executable command    
 def runTest( name ):
     target = mungename(name)
     target = target.replace("/",os.sep)
