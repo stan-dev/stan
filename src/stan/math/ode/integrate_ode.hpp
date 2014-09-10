@@ -20,8 +20,7 @@
 namespace stan {
   namespace agrad {
      stan::agrad::var max(stan::agrad::var a, stan::agrad::var b) {
-       using std::fmax;
-       return fmax(a, b);
+       return stan::agrad::fmax(a, b);
      }
    }
  }
