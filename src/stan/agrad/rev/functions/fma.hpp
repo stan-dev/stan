@@ -10,6 +10,7 @@
 #include <stan/agrad/rev/internal/vdv_vari.hpp>
 #include <stan/math/constants.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace agrad {

@@ -6,6 +6,7 @@
 #include <stan/agrad/rev/internal/precomp_v_vari.hpp>
 #include <stan/agrad/rev/internal/precomputed_gradients.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace agrad {

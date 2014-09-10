@@ -5,6 +5,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace agrad {
