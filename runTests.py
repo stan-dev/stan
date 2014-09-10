@@ -68,7 +68,7 @@ def makeTests( dirname, filenames, j ):
     targets = list()
     for name in filenames:
         target = mungename(name)
-        targets.append(os.sep.join([dirname,target]))
+        targets.append("/".join([dirname,target]))
     if (len(targets) > 0):
         command = 'make -j%d %s' % (j,' '.join(targets))
         print(command)
