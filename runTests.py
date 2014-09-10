@@ -79,10 +79,10 @@ def makeTests( dirname, filenames, j ):
         doCommand(command)
     
 def runTest( name ):
-    name = name.replace("src/","",1)
-    name = name.replace(testsfx,"");
-    print(name)
-    doCommand(name)
+    target = mungename(name)
+    target = target.replace("/",os.sep)
+    print(target)
+    doCommand(target)
 
 def main():
     if (len(sys.argv) < 2):
@@ -126,14 +126,12 @@ def main():
     for i in range(start,len(sys.argv)):
         testname = sys.argv[i]
         if (not(os.path.isdir(testname))):
-            testexe = testname.replace(testsfx,"");
-            runTest(testexe)
+            runTest(testname)
         else:
             for root, dirs, files in os.walk(testname):
                 for name in files:
                         if (name.endswith(testsfx)):
-                            testexe = name.replace(testsfx,"");
-                            runTest(os.sep.join([root,testexe]))
+                            runTest(os.sep.join([root,name]))
 
 
     
