@@ -28,6 +28,15 @@ def stop_err( msg, returncode ):
     sys.stderr.write( 'exit now ( %s)\n' % time.strftime('%x %X %Z'))
     sys.exit(returncode)
 
+def isWin():
+    sys.stdout.write('platform: %s\n' % platform.system())
+    sys.stdout.write('os: %s\n' % os.name)
+    if (platform.system().lower().startswith("windows")
+        or os.name.lower().startswith("windows")):
+        sys.stdout.write('isTrue\n')
+        return True
+    return False
+
 def doCommand(command):
     p1 = subprocess.Popen(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     (sout,serr) = p1.communicate()
@@ -57,7 +66,7 @@ def makeTests( dirname, filenames, j ):
             target = name.replace(testsfx,"");
             if (isWin()):
                 target += winsfx
-                sys.out.println('windows target name: %s' % os.sep.join([dirname,target]))
+                sys.stdout.write('windows target name: %s' % os.sep.join([dirname,target]))
             targets.append(os.sep.join([dirname,target]))
     if (len(targets) > 0):
         command = 'make -j%d %s' % (j,' '.join(targets))
@@ -69,13 +78,6 @@ def runTest( name ):
     name = name.replace(testsfx,"");
     print(name)
     doCommand(name)
-
-def isWin():
-    if (platform.system().lower().startswith("windows")
-        or os.name.lower().startswith("windows")):
-        return True
-    return False
-
 
 def main():
     if (len(sys.argv) < 2):
