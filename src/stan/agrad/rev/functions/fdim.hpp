@@ -3,7 +3,10 @@
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/vv_vari.hpp>
-#include <stan/agrad/rev/internal/v_vari.hpp>
+#include <stan/agrad/rev/internal/vd_vari.hpp>
+#include <stan/agrad/rev/internal/dv_vari.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace agrad {
@@ -15,29 +18,42 @@ namespace stan {
           op_vv_vari(avi->val_ - bvi->val_, avi, bvi) {
         }
         void chain() {
-          avi_->adj_ += adj_;
-          bvi_->adj_ -= adj_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bvi_->val_))) {
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+            bvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          } else {
+            avi_->adj_ += adj_;
+            bvi_->adj_ -= adj_;
+          }
         }
       };
 
-      class fdim_vd_vari : public op_v_vari {
+      class fdim_vd_vari : public op_vd_vari {
       public:
         fdim_vd_vari(vari* avi, double b) :
-          op_v_vari(avi->val_ - b, avi) {
+          op_vd_vari(avi->val_ - b, avi,b) {
         }
         void chain() {
-          avi_->adj_ += adj_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bd_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else
+            avi_->adj_ += adj_;
         }
       };
 
-      class fdim_dv_vari : public op_v_vari {
+      class fdim_dv_vari : public op_dv_vari {
       public:
         fdim_dv_vari(double a, vari* bvi) :
-          op_v_vari(a - bvi->val_, bvi) {
+          op_dv_vari(a - bvi->val_, a,bvi) {
         }
         void chain() {
-          // avi_ is bvi argument to constructor
-          avi_->adj_ -= adj_;
+          if (unlikely(boost::math::isnan(bvi_->val_)
+                       || boost::math::isnan(ad_)))
+            bvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else
+            bvi_->adj_ -= adj_;
         }
       };
     }
@@ -67,7 +83,7 @@ namespace stan {
      */
     inline var fdim(const stan::agrad::var& a,
                     const stan::agrad::var& b) {
-      if (a.vi_->val_ > b.vi_->val_)
+      if (!(a.vi_->val_ <= b.vi_->val_))
         return var(new fdim_vv_vari(a.vi_,b.vi_));
       else
         return var(new vari(0.0));
@@ -92,9 +108,9 @@ namespace stan {
      */
     inline var fdim(const double& a,
                     const stan::agrad::var& b) {
-      return a > b.vi_->val_
-        ? var(new fdim_dv_vari(a,b.vi_))
-        : var(new vari(0.0));
+      return a <= b.vi_->val_
+        ? var(new vari(0.0))
+        : var(new fdim_dv_vari(a,b.vi_));
     }
 
     /**
@@ -115,9 +131,9 @@ namespace stan {
      */
     inline var fdim(const stan::agrad::var& a,
                     const double& b) {
-      return a.vi_->val_ > b
-        ? var(new fdim_vd_vari(a.vi_,b))
-        : var(new vari(0.0));
+      return a.vi_->val_ <= b
+        ? var(new vari(0.0))
+        : var(new fdim_vd_vari(a.vi_,b));
     }
 
   }

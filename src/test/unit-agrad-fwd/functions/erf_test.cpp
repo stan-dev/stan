@@ -3,6 +3,7 @@
 #include <boost/math/special_functions/erf.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdErf,Fvar) {
   using stan::agrad::fvar;
@@ -195,3 +196,15 @@ TEST(AgradFwdErf,FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(-0.878782578935444794093723954824, g[0]);
 }
 
+struct erf_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return erf(arg1);
+  }
+};
+
+TEST(AgradFwdErf,erf_NaN) {
+  erf_fun erf_;
+  test_nan(erf_,false);
+}

@@ -5,7 +5,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
-#include <boost/math/special_functions/hypot.hpp>
+#include <math.h>
 
 namespace stan {
   namespace agrad {
@@ -14,7 +14,7 @@ namespace stan {
       class hypot_vv_vari : public op_vv_vari {
       public:
         hypot_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(boost::math::hypot(avi->val_,bvi->val_),
+          op_vv_vari(::hypot(avi->val_,bvi->val_),
                      avi,bvi) {
         }
         void chain() {
@@ -26,7 +26,7 @@ namespace stan {
       class hypot_vd_vari : public op_v_vari {
       public:
         hypot_vd_vari(vari* avi, double b) :
-          op_v_vari(boost::math::hypot(avi->val_,b),
+          op_v_vari(::hypot(avi->val_,b),
                     avi) {
         }
         void chain() {

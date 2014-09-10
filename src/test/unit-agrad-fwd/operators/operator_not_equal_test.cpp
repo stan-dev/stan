@@ -81,3 +81,58 @@ TEST(AgradFwdOperatorNotEqual, FvarFvarVar) {
   EXPECT_FALSE(z != y);
 }
 
+
+TEST(AgradFwdOperatorNotEqual, ne_nan) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  double a = 3.0;
+  fvar<double> nan_fd = std::numeric_limits<double>::quiet_NaN();
+  fvar<double> a_fd = 3.0;
+  fvar<var> nan_fv = std::numeric_limits<double>::quiet_NaN();
+  fvar<var> a_fv = 3.0;
+  fvar<fvar<double> > nan_ffd = std::numeric_limits<double>::quiet_NaN();
+  fvar<fvar<double> > a_ffd = 3.0;
+  fvar<fvar<var> > nan_ffv = std::numeric_limits<double>::quiet_NaN();
+  fvar<fvar<var> > a_ffv = 3.0;
+
+  EXPECT_TRUE(a != nan_fd);
+  EXPECT_TRUE(a_fd != nan_fd);
+  EXPECT_TRUE(nan != nan_fd);
+  EXPECT_TRUE(nan_fd != nan_fd);
+  EXPECT_TRUE(a_fd != nan);
+  EXPECT_TRUE(nan_fd != nan);
+  EXPECT_TRUE(nan_fd != a);
+  EXPECT_TRUE(nan_fd != a_fd);
+  EXPECT_TRUE(nan != a_fd);
+
+  EXPECT_TRUE(a != nan_fv);
+  EXPECT_TRUE(a_fv != nan_fv);
+  EXPECT_TRUE(nan != nan_fv);
+  EXPECT_TRUE(nan_fv != nan_fv);
+  EXPECT_TRUE(a_fv != nan);
+  EXPECT_TRUE(nan_fv != nan);
+  EXPECT_TRUE(nan_fv != a);
+  EXPECT_TRUE(nan_fv != a_fv);
+  EXPECT_TRUE(nan != a_fv);
+
+  EXPECT_TRUE(a != nan_ffd);
+  EXPECT_TRUE(a_ffd != nan_ffd);
+  EXPECT_TRUE(nan != nan_ffd);
+  EXPECT_TRUE(nan_ffd != nan_ffd);
+  EXPECT_TRUE(a_ffd != nan);
+  EXPECT_TRUE(nan_ffd != nan);
+  EXPECT_TRUE(nan_ffd != a);
+  EXPECT_TRUE(nan_ffd != a_ffd);
+  EXPECT_TRUE(nan != a_ffd);
+
+  EXPECT_TRUE(a != nan_ffv);
+  EXPECT_TRUE(a_ffv != nan_ffv);
+  EXPECT_TRUE(nan != nan_ffv);
+  EXPECT_TRUE(nan_ffv != nan_ffv);
+  EXPECT_TRUE(a_ffv != nan);
+  EXPECT_TRUE(nan_ffv != nan);
+  EXPECT_TRUE(nan_ffv != a);
+  EXPECT_TRUE(nan_ffv != a_ffv);
+  EXPECT_TRUE(nan != a_ffv);
+}

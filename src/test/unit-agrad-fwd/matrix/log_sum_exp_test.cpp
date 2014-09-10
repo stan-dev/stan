@@ -3,7 +3,10 @@
 #include <stan/agrad/fwd/matrix/log_sum_exp.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/log_sum_exp.hpp>
+#include <stan/agrad/rev/functions/exp.hpp>
+#include <stan/agrad/rev/operators.hpp>
 #include <test/unit/agrad/util.hpp>
+
 using stan::agrad::fvar;
 using stan::agrad::var;
 using stan::agrad::log_sum_exp;

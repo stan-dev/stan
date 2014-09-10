@@ -3,6 +3,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdTgamma, Fvar) {
   using stan::agrad::fvar;
@@ -155,4 +156,17 @@ TEST(AgradFwdTgamma, FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(-94.768602309214783224297691187, g[0]);
+}
+
+struct tgamma_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return tgamma(arg1);
+  }
+};
+
+TEST(AgradFwdTgamma,tgamma_NaN) {
+  tgamma_fun tgamma_;
+  test_nan(tgamma_,false);
 }

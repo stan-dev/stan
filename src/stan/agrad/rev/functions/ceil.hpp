@@ -1,18 +1,24 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__CEIL_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__CEIL_HPP
 
-#include <cmath>
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace agrad {
 
     namespace {
-      class ceil_vari : public vari {
+      class ceil_vari : public op_v_vari {
       public:
         ceil_vari(vari* avi) :
-          vari(std::ceil(avi->val_)) {
+          op_v_vari(::ceil(avi->val_),avi) {
+        }
+        void chain() {
+          if (unlikely(boost::math::isnan(avi_->val_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
         }
       };
     }
