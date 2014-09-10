@@ -323,15 +323,15 @@ namespace stan {
       std::vector<double> temp_gradients;
       std::vector<std::vector<stan::agrad::var> > y_return(y.size());
 
-      for (int i = 0; i < y.size(); i++) {
+      for (size_t i = 0; i < y.size(); i++) {
         temp_vars.clear();
         
         //iterate over number of equations
-        for (int j = 0; j < y0.size(); j++) { 
+        for (size_t j = 0; j < y0.size(); j++) { 
           temp_gradients.clear();
           
           //iterate over parameters for each equation
-          for (int k = 0; k < y0.size(); k++)
+          for (size_t k = 0; k < y0.size(); k++)
             temp_gradients.push_back(y[i][y0.size() + y0.size()*k + j]);
 
           temp_vars.push_back(stan::agrad::precomputed_gradients(y[i][j], y0, temp_gradients));
@@ -352,15 +352,15 @@ namespace stan {
       std::vector<double> temp_gradients;
       std::vector<std::vector<stan::agrad::var> > y_return(y.size());
 
-      for (int i = 0; i < y.size(); i++) {
+      for (size_t i = 0; i < y.size(); i++) {
         temp_vars.clear();
         
         //iterate over number of equations
-        for (int j = 0; j < y0.size(); j++) { 
+        for (size_t j = 0; j < y0.size(); j++) { 
           temp_gradients.clear();
           
           //iterate over parameters for each equation
-          for (int k = 0; k < theta.size(); k++)
+          for (size_t k = 0; k < theta.size(); k++)
             temp_gradients.push_back(y[i][y0.size() + y0.size()*k + j]);
 
           temp_vars.push_back(stan::agrad::precomputed_gradients(y[i][j], theta, temp_gradients));
@@ -383,15 +383,15 @@ namespace stan {
       std::vector<double> temp_gradients;
       std::vector<std::vector<stan::agrad::var> > y_return(y.size());
 
-      for (int i = 0; i < y.size(); i++) {
+      for (size_t i = 0; i < y.size(); i++) {
         temp_vars.clear();
         
         //iterate over number of equations
-        for (int j = 0; j < y0.size(); j++) { 
+        for (size_t j = 0; j < y0.size(); j++) { 
           temp_gradients.clear();
           
           //iterate over parameters for each equation
-          for (int k = 0; k < y0.size()+theta.size(); k++)
+          for (size_t k = 0; k < y0.size()+theta.size(); k++)
             temp_gradients.push_back(y[i][y0.size() + y0.size()*k + j]);
 
           temp_vars.push_back(stan::agrad::precomputed_gradients(y[i][j], vars, temp_gradients));
