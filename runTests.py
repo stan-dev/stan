@@ -52,22 +52,27 @@ def generateTests(j):
     print(command)
     doCommand(command)
 
+def mungename( name ):
+    if (name.startswith("src")):
+        name = name.replace("src/","",1)
+    if (name.endswith(testsfx)):
+        name = name.replace(testsfx,"");
+        if (isWin()):
+            name += winsfx
+    sys.stdout.write('munged name: %s\n' % name)
+    return name
+
 def makeTest( name, j ):
-    name = name.replace("src/","",1)
-    name = name.replace(testsfx,"");
-    command = 'make -j%d %s' % (j,name)
+    target = mungename(name)
+    command = 'make -j%d %s' % (j,target)
     doCommand(command)
     
 def makeTests( dirname, filenames, j ):
     dirname = dirname.replace("src/","",1)
     targets = list()
     for name in filenames:
-        if (name.endswith(testsfx)):
-            target = name.replace(testsfx,"");
-            if (isWin()):
-                target += winsfx
-                sys.stdout.write('windows target name: %s' % os.sep.join([dirname,target]))
-            targets.append(os.sep.join([dirname,target]))
+        target = mungename(name)
+        targets.append(os.sep.join([dirname,target]))
     if (len(targets) > 0):
         command = 'make -j%d %s' % (j,' '.join(targets))
         print(command)
