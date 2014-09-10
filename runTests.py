@@ -64,7 +64,7 @@ def makeTest( name, j ):
     doCommand(command)
     
 def makeTests( dirname, filenames, j ):
-    dirname = dirname.replace("src/","",1)
+    dirname = dirname.replace("src/","",1).replace("\\","/")
     targets = list()
     for name in filenames:
         target = mungename(name)
