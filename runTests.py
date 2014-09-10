@@ -29,11 +29,8 @@ def stop_err( msg, returncode ):
     sys.exit(returncode)
 
 def isWin():
-    sys.stdout.write('platform: %s\n' % platform.system())
-    sys.stdout.write('os: %s\n' % os.name)
     if (platform.system().lower().startswith("windows")
         or os.name.lower().startswith("windows")):
-        sys.stdout.write('isTrue\n')
         return True
     return False
 
@@ -59,7 +56,6 @@ def mungename( name ):
         name = name.replace(testsfx,"");
         if (isWin()):
             name += winsfx
-    sys.stdout.write('munged name: %s\n' % name)
     return name
 
 def makeTest( name, j ):
