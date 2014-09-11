@@ -532,42 +532,33 @@ evaluating \code{a~\&\&~b} first evaluates \code{a}, and if the result
 is zero, returns 0 without evaluating \code{b}.
 
 
-
-
-
 \subsection{Logical Functions}
 
 The logical functions introduce conditional behavior functionally and
 are primarily provided for compatibility with BUGS and JAGS.
 %
 \begin{description}
-%
-\fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
-\farg{x} if \farg{cond} is non-zero, and \farg{y} otherwise; unlike
-the ternary operator in \Cpp, Stan's \code{if\_else} function always
-evaluates both arguments \farg{x} and \farg{y}.
-\[
-\mbox{if\_else}(cond,x,y) = 
-\begin{cases}
-  x & \mbox{if } cond \neq 1\\
-  y & \mbox{if } cond = 0\\
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{step}{real \farg{x}}{
-1 if \farg{x} is positive and 0 otherwise; equivalent to \code{x > 0.0}.
-\[
-\mbox{step}(x) = 
-\begin{cases}
-  0 & \mbox{if } x \leq 0 \\
-  1 & \mbox{if } x > 0  \\[6pt]
-  0 & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-}
-%
+  \fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
+    Returns \farg{x} if \farg{cond} is non-zero and \farg{y} otherwise.
+    Unlike the ternary operator in \Cpp, Stan's \code{if\_else} function 
+    always evaluates both arguments \farg{x} and \farg{y}.
+    \[
+    \mbox{if\_else}(cond,x,y) = 
+    \begin{cases}
+      x & \mbox{if } cond \neq 0\\
+      y & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{step}{real \farg{x}}{
+    Returns 1 if \farg{x} is positive and 0 otherwise.
+    \[
+    \mbox{step}(x) = 
+    \begin{cases}
+      1 & \mbox{if } x > 0   \\
+      0 & \mbox{otherwise}
+    \end{cases}
+    \]}
 \end{description}
 
 The log probability function and gradient evaluations are more
