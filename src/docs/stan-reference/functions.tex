@@ -272,10 +272,22 @@ This is a no-op.}
 %
 \begin{description}
 \fitem{int}{min}{int \farg{x}, int \farg{y}}{
-The minimum of \farg{x} and \farg{y}}
+  \[
+  \mbox{min}(x, y) = 
+  \begin{cases}
+    x & \mbox{if } x < y\\
+    y & \mbox{otherwise}
+  \end{cases}
+  \]}
 %
 \fitem{int}{max}{int \farg{x}, int \farg{y}}{
-The maximum of \farg{x} and \farg{y}}
+  \[
+  \mbox{max}(x, y) = 
+  \begin{cases}
+    x & \mbox{if } x > y\\
+    y & \mbox{otherwise}
+  \end{cases}
+  \]}
 %
 \end{description}
 
