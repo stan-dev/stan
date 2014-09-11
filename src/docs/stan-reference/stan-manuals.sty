@@ -120,7 +120,10 @@
 
 % \textwidth = 5in
 \newcommand{\fitem}[4]{\item[\begin{minipage}{4.9in}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
- \\[-10pt] #4\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
+  \\[-10pt] #4\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
+
+\newcommand{\fitemnobody}[3]{\item[\begin{minipage}{4.9in}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
+ \\[-30pt]\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
 
 \newcommand{\fitemtwolines}[5]{\item[\begin{minipage}{4.9in}{\tt
       #1 {\bfseries #2}(#3, \\ \hspace*{132pt}#4\vspace*{8pt})}\end{minipage}]\mbox{ }
