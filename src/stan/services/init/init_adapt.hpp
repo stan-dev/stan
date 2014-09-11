@@ -3,8 +3,8 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
-#include <stan/gm/arguments/categorical_argument.hpp>
-#include <stan/gm/arguments/singleton_argument.hpp>
+#include <stan/services/arguments/categorical_argument.hpp>
+#include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
   namespace services {
@@ -41,13 +41,13 @@ namespace stan {
 
       template<class Sampler>
       bool init_adapt(stan::mcmc::base_mcmc* sampler, 
-                      stan::gm::categorical_argument* adapt,
+                      stan::services::categorical_argument* adapt,
                       const Eigen::VectorXd& cont_params) {
         
-        double delta = dynamic_cast<stan::gm::real_argument*>(adapt->arg("delta"))->value();
-        double gamma = dynamic_cast<stan::gm::real_argument*>(adapt->arg("gamma"))->value();
-        double kappa = dynamic_cast<stan::gm::real_argument*>(adapt->arg("kappa"))->value();
-        double t0    = dynamic_cast<stan::gm::real_argument*>(adapt->arg("t0"))->value();
+        double delta = dynamic_cast<stan::services::real_argument*>(adapt->arg("delta"))->value();
+        double gamma = dynamic_cast<stan::services::real_argument*>(adapt->arg("gamma"))->value();
+        double kappa = dynamic_cast<stan::services::real_argument*>(adapt->arg("kappa"))->value();
+        double t0    = dynamic_cast<stan::services::real_argument*>(adapt->arg("t0"))->value();
         
         Sampler* s = dynamic_cast<Sampler*>(sampler);
 

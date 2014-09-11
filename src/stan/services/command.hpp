@@ -15,12 +15,7 @@
 #include <stan/io/json.hpp>
 #include <stan/io/mcmc_writer.hpp>
 
-#include <stan/gm/arguments/argument_parser.hpp>
-#include <stan/gm/arguments/arg_id.hpp>
-#include <stan/gm/arguments/arg_data.hpp>
-#include <stan/gm/arguments/arg_init.hpp>
-#include <stan/gm/arguments/arg_random.hpp>
-#include <stan/gm/arguments/arg_output.hpp>
+#include <stan/services/arguments.hpp>
 
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
@@ -52,14 +47,14 @@ namespace stan {
     template <class Model>
     int command(int argc, const char* argv[]) {
 
-      std::vector<stan::gm::argument*> valid_arguments;
-      valid_arguments.push_back(new stan::gm::arg_id());
-      valid_arguments.push_back(new stan::gm::arg_data());
-      valid_arguments.push_back(new stan::gm::arg_init());
-      valid_arguments.push_back(new stan::gm::arg_random());
-      valid_arguments.push_back(new stan::gm::arg_output());
+      std::vector<stan::services::argument*> valid_arguments;
+      valid_arguments.push_back(new stan::services::arg_id());
+      valid_arguments.push_back(new stan::services::arg_data());
+      valid_arguments.push_back(new stan::services::arg_init());
+      valid_arguments.push_back(new stan::services::arg_random());
+      valid_arguments.push_back(new stan::services::arg_output());
       
-      stan::gm::argument_parser parser(valid_arguments);
+      stan::services::argument_parser parser(valid_arguments);
       int err_code = parser.parse_args(argc, argv, &std::cout, &std::cout);
 
       if (err_code != 0) {
@@ -74,15 +69,15 @@ namespace stan {
       std::cout << std::endl;
       
       // Identification
-      unsigned int id = dynamic_cast<stan::gm::int_argument*>(parser.arg("id"))->value();
+      unsigned int id = dynamic_cast<stan::services::int_argument*>(parser.arg("id"))->value();
       
       //////////////////////////////////////////////////
       //            Random number generator           //
       //////////////////////////////////////////////////
       
       unsigned int random_seed = 0;
-      stan::gm::u_int_argument* random_arg 
-        = dynamic_cast<stan::gm::u_int_argument*>(parser.arg("random")->arg("seed"));
+      stan::services::u_int_argument* random_arg 
+        = dynamic_cast<stan::services::u_int_argument*>(parser.arg("random")->arg("seed"));
       
       if (random_arg->is_default()) {
         random_seed = (boost::posix_time::microsec_clock::universal_time() -
@@ -108,7 +103,7 @@ namespace stan {
       
       // Data input
       std::string data_file 
-        = dynamic_cast<stan::gm::string_argument*>(parser.arg("data")->arg("file"))->value();
+        = dynamic_cast<stan::services::string_argument*>(parser.arg("data")->arg("file"))->value();
       
       std::fstream data_stream(data_file.c_str(),
                                std::fstream::in);
@@ -116,7 +111,7 @@ namespace stan {
       data_stream.close();
       
       // Sample output
-      std::string output_file = dynamic_cast<stan::gm::string_argument*>(
+      std::string output_file = dynamic_cast<stan::services::string_argument*>(
                                 parser.arg("output")->arg("file"))->value();
       std::fstream* output_stream = 0;
       if (output_file != "") {
@@ -125,7 +120,7 @@ namespace stan {
       }
       
       // Diagnostic output
-      std::string diagnostic_file = dynamic_cast<stan::gm::string_argument*>(
+      std::string diagnostic_file = dynamic_cast<stan::services::string_argument*>(
                                     parser.arg("output")->arg("diagnostic_file"))->value();
       
       std::fstream* diagnostic_stream = 0;
@@ -135,7 +130,7 @@ namespace stan {
       }
       
       // Refresh rate
-      int refresh = dynamic_cast<stan::gm::int_argument*>(
+      int refresh = dynamic_cast<stan::services::int_argument*>(
                     parser.arg("output")->arg("refresh"))->value();
       
       //////////////////////////////////////////////////
@@ -158,14 +153,14 @@ namespace stan {
         parser.print(diagnostic_stream, "#");
       }
       
-      std::string init = dynamic_cast<stan::gm::string_argument*>(
+      std::string init = dynamic_cast<stan::services::string_argument*>(
                          parser.arg("init"))->value();
       
       interface::var_context_factory::dump_factory var_context_factory;
       if (!init::initialize_state<interface::var_context_factory::dump_factory>
           (init, cont_params, model, base_rng, &std::cout,
            var_context_factory))
-        return stan::gm::error_codes::SOFTWARE;
+        return stan::services::error_codes::SOFTWARE;
       
       //////////////////////////////////////////////////
       //               Model Diagnostics              //
@@ -178,16 +173,16 @@ namespace stan {
           cont_vector.at(i) = cont_params(i);
         std::vector<int> disc_vector;
         
-        stan::gm::list_argument* test = dynamic_cast<stan::gm::list_argument*>
+        stan::services::list_argument* test = dynamic_cast<stan::services::list_argument*>
                               (parser.arg("method")->arg("diagnose")->arg("test"));
         
         if (test->value() == "gradient") {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
 
-          double epsilon = dynamic_cast<stan::gm::real_argument*>
+          double epsilon = dynamic_cast<stan::services::real_argument*>
                            (test->arg("gradient")->arg("epsilon"))->value();
           
-          double error = dynamic_cast<stan::gm::real_argument*>
+          double error = dynamic_cast<stan::services::real_argument*>
                          (test->arg("gradient")->arg("error"))->value();
           
           int num_failed
@@ -208,7 +203,7 @@ namespace stan {
           
           (void) num_failed; // FIXME: do something with the number failed
           
-          return stan::gm::error_codes::OK;
+          return stan::services::error_codes::OK;
         }
         
       }
@@ -223,14 +218,14 @@ namespace stan {
           cont_vector.at(i) = cont_params(i);
         std::vector<int> disc_vector;
         
-        stan::gm::list_argument* algo = dynamic_cast<stan::gm::list_argument*>
+        stan::services::list_argument* algo = dynamic_cast<stan::services::list_argument*>
                               (parser.arg("method")->arg("optimize")->arg("algorithm"));
 
-        int num_iterations = dynamic_cast<stan::gm::int_argument*>(
+        int num_iterations = dynamic_cast<stan::services::int_argument*>(
                              parser.arg("method")->arg("optimize")->arg("iter"))->value();
 
         bool save_iterations 
-          = dynamic_cast<stan::gm::bool_argument*>(parser.arg("method")
+          = dynamic_cast<stan::services::bool_argument*>(parser.arg("method")
                                          ->arg("optimize")
                                          ->arg("save_iterations"))->value();
         if (output_stream) {
@@ -246,7 +241,7 @@ namespace stan {
         }
 
         double lp(0);
-        int return_code = stan::gm::error_codes::CONFIG;
+        int return_code = stan::services::error_codes::CONFIG;
         if (algo->value() == "newton") {
           std::vector<double> gradient;
           try {
@@ -283,23 +278,23 @@ namespace stan {
             }
             
           }
-          return_code = stan::gm::error_codes::OK;
+          return_code = stan::services::error_codes::OK;
         } else if (algo->value() == "bfgs") {
           interface::callback::noop_callback callback;
           typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
           Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
 
-          bfgs._ls_opts.alpha0 = dynamic_cast<stan::gm::real_argument*>(
+          bfgs._ls_opts.alpha0 = dynamic_cast<stan::services::real_argument*>(
                          algo->arg("bfgs")->arg("init_alpha"))->value();
-          bfgs._conv_opts.tolAbsF = dynamic_cast<stan::gm::real_argument*>(
+          bfgs._conv_opts.tolAbsF = dynamic_cast<stan::services::real_argument*>(
                          algo->arg("bfgs")->arg("tol_obj"))->value();
-          bfgs._conv_opts.tolRelF = dynamic_cast<stan::gm::real_argument*>(
+          bfgs._conv_opts.tolRelF = dynamic_cast<stan::services::real_argument*>(
                          algo->arg("bfgs")->arg("tol_rel_obj"))->value();
-          bfgs._conv_opts.tolAbsGrad = dynamic_cast<stan::gm::real_argument*>(
+          bfgs._conv_opts.tolAbsGrad = dynamic_cast<stan::services::real_argument*>(
                          algo->arg("bfgs")->arg("tol_grad"))->value();
-          bfgs._conv_opts.tolRelGrad = dynamic_cast<stan::gm::real_argument*>(
+          bfgs._conv_opts.tolRelGrad = dynamic_cast<stan::services::real_argument*>(
                          algo->arg("bfgs")->arg("tol_rel_grad"))->value();
-          bfgs._conv_opts.tolAbsX = dynamic_cast<stan::gm::real_argument*>(
+          bfgs._conv_opts.tolAbsX = dynamic_cast<stan::services::real_argument*>(
                          algo->arg("bfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
           
@@ -313,19 +308,19 @@ namespace stan {
           typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::LBFGSUpdate<> > Optimizer;
           Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
 
-          bfgs.get_qnupdate().set_history_size(dynamic_cast<gm::int_argument*>(
+          bfgs.get_qnupdate().set_history_size(dynamic_cast<services::int_argument*>(
                          algo->arg("lbfgs")->arg("history_size"))->value());
-          bfgs._ls_opts.alpha0 = dynamic_cast<gm::real_argument*>(
+          bfgs._ls_opts.alpha0 = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("init_alpha"))->value();
-          bfgs._conv_opts.tolAbsF = dynamic_cast<gm::real_argument*>(
+          bfgs._conv_opts.tolAbsF = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_obj"))->value();
-          bfgs._conv_opts.tolRelF = dynamic_cast<gm::real_argument*>(
+          bfgs._conv_opts.tolRelF = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_rel_obj"))->value();
-          bfgs._conv_opts.tolAbsGrad = dynamic_cast<gm::real_argument*>(
+          bfgs._conv_opts.tolAbsGrad = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_grad"))->value();
-          bfgs._conv_opts.tolRelGrad = dynamic_cast<gm::real_argument*>(
+          bfgs._conv_opts.tolRelGrad = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_rel_grad"))->value();
-          bfgs._conv_opts.tolAbsX = dynamic_cast<gm::real_argument*>(
+          bfgs._conv_opts.tolAbsX = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
 
@@ -335,7 +330,7 @@ namespace stan {
                                          save_iterations, refresh,
                                          callback);
         } else {
-          return_code = stan::gm::error_codes::CONFIG;
+          return_code = stan::services::error_codes::CONFIG;
         }
 
         if (output_stream) {
@@ -381,16 +376,16 @@ namespace stan {
           writer(sample_recorder, diagnostic_recorder, message_recorder, &std::cout);
         
         // Sampling parameters
-        int num_warmup = dynamic_cast<stan::gm::int_argument*>(
+        int num_warmup = dynamic_cast<stan::services::int_argument*>(
                           parser.arg("method")->arg("sample")->arg("num_warmup"))->value();
         
-        int num_samples = dynamic_cast<stan::gm::int_argument*>(
+        int num_samples = dynamic_cast<stan::services::int_argument*>(
                           parser.arg("method")->arg("sample")->arg("num_samples"))->value();
         
-        int num_thin = dynamic_cast<stan::gm::int_argument*>(
+        int num_thin = dynamic_cast<stan::services::int_argument*>(
                        parser.arg("method")->arg("sample")->arg("thin"))->value();
         
-        bool save_warmup = dynamic_cast<stan::gm::bool_argument*>(
+        bool save_warmup = dynamic_cast<stan::services::bool_argument*>(
                            parser.arg("method")->arg("sample")->arg("save_warmup"))->value();
         
         stan::mcmc::sample s(cont_params, 0, 0);
@@ -401,12 +396,12 @@ namespace stan {
         // Sampler
         stan::mcmc::base_mcmc* sampler_ptr = 0;
         
-        stan::gm::list_argument* algo = dynamic_cast<stan::gm::list_argument*>
+        stan::services::list_argument* algo = dynamic_cast<stan::services::list_argument*>
                               (parser.arg("method")->arg("sample")->arg("algorithm"));
         
-        stan::gm::categorical_argument* adapt = dynamic_cast<stan::gm::categorical_argument*>(
+        stan::services::categorical_argument* adapt = dynamic_cast<stan::services::categorical_argument*>(
                                       parser.arg("method")->arg("sample")->arg("adapt"));
-        bool adapt_engaged = dynamic_cast<stan::gm::bool_argument*>(adapt->arg("engaged"))->value();
+        bool adapt_engaged = dynamic_cast<stan::services::bool_argument*>(adapt->arg("engaged"))->value();
         
         if (model.num_params_r() == 0 && algo->value() != "fixed_param") {
           std::cout
@@ -434,8 +429,8 @@ namespace stan {
         } else if (algo->value() == "hmc") {
           
           int engine_index = 0;
-          stan::gm::list_argument* engine 
-            = dynamic_cast<stan::gm::list_argument*>(algo->arg("hmc")->arg("engine"));
+          stan::services::list_argument* engine 
+            = dynamic_cast<stan::services::list_argument*>(algo->arg("hmc")->arg("engine"));
           if (engine->value() == "static") {
             engine_index = 0;
           } else if (engine->value() == "nuts") {
@@ -443,8 +438,8 @@ namespace stan {
           }
           
           int metric_index = 0;
-          stan::gm::list_argument* metric 
-            = dynamic_cast<stan::gm::list_argument*>(algo->arg("hmc")->arg("metric"));
+          stan::services::list_argument* metric 
+            = dynamic_cast<stan::services::list_argument*>(algo->arg("hmc")->arg("metric"));
           if (metric->value() == "unit_e") {
             metric_index = 0;
           } else if (metric->value() == "diag_e") {

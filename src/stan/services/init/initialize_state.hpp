@@ -13,7 +13,7 @@
 #include <boost/random/variate_generator.hpp>
 
 #include <stan/model/util.hpp>
-#include <stan/gm/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/services/io/write_error_msg.hpp>
 
 namespace stan {

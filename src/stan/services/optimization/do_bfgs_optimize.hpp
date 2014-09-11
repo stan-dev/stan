@@ -6,8 +6,7 @@
 #include <iomanip>
 #include <vector>
 
-#include <stan/gm/error_codes.hpp>
-
+#include <stan/services/error_codes.hpp>
 #include <stan/services/io.hpp>
 
 namespace stan {
@@ -82,11 +81,11 @@ namespace stan {
         if (ret >= 0) {
           if (notice_stream)
             (*notice_stream) << "Optimization terminated normally: " << std::endl;
-          return_code = stan::gm::error_codes::OK;
+          return_code = stan::services::error_codes::OK;
         } else {
           if (notice_stream)
             (*notice_stream) << "Optimization terminated with error: " << std::endl;
-          return_code = stan::gm::error_codes::SOFTWARE;
+          return_code = stan::services::error_codes::SOFTWARE;
         }
         if (notice_stream)
           (*notice_stream) << "  " << bfgs.get_code_string(ret) << std::endl;
