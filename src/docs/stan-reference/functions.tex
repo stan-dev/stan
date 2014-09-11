@@ -481,48 +481,39 @@ tightly than the comparisons.  Thus an expression such as
 \code{(a~<~b)~||~(((c~>=~d)~\&\&~(e~!=~f)))}.
 %
 \begin{description}
-\fitemindex{int}{operator!}{int \farg{x}}{1 if \farg{x} is zero and 0 otherwise}{operator"!}
-\fitem{int}{operator{\&\&}}{int \farg{x}, int \farg{y}}{1 if \farg{x}
-  is unequal to 0 and \farg{y} is unequal to 0}
-\fitemindex{int}{operator||}{int \farg{x}, int \farg{y}}{1 if \farg{x}
-  is unequal to 0 or \farg{y} is unequal to 0}{operator"|"|}
-\end{description}
-%
-There are corresponding real-argument versions.
-%
-\begin{description}
-\fitemindex{int}{operator!}{real \farg{x}}{1 if \farg{x} is zero and 0 otherwise.
-\[
-\mbox{operator!}(x) = 
-\begin{cases}
-  0 & \mbox{if } x \neq 0 \\
-  1 & \mbox{if } x = 0 \\[6pt]
-  0 & \mbox{if } x = \textrm{NaN} 
-\end{cases}
-\]
-}{operator"!}
-\fitem{int}{operator{\&\&}}{real \farg{x}, real \farg{y}}{1 if \farg{x}
-  is unequal to 0 and \farg{y} is unequal to 0.
-\[
-\mbox{operator\&\&}(x,y) = 
-\begin{cases}
-  0 & \mbox{if } x = 0 \textrm{ or } y=0 \\
-  1 & \mbox{if } x,y \neq 0 \\[6pt]
-  1 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-}
-\fitemindex{int}{operator||}{real \farg{x}, real \farg{y}}{1 if \farg{x}
-  is unequal to 0 or \farg{y} is unequal to 0.
-\[
-\mbox{operator||}(x,y) = 
-\begin{cases}
-  0 & \mbox{if } x,y=0 \\
-  1 & \mbox{if } x \neq 0 \textrm{ or } y\neq0\\[6pt]
-  1 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-}{operator"|"|}
+  \fitemindexnobody{int}{operator!}{int \farg{x}}{operator"!}
+  \fitemindex{int}{operator!}{real \farg{x}}{
+    Returns 1 if \farg{x} is zero and 0 otherwise.
+    \[
+    \mbox{operator!}(x) = 
+    \begin{cases}
+      0 & \mbox{if } x \neq 0 \\
+      1 & \mbox{if } x = 0
+    \end{cases}
+    \]}{operator"!}
+  %
+  \fitemnobody{int}{operator{\&\&}}{int \farg{x}, int \farg{y}}    
+  \fitem{int}{operator{\&\&}}{real \farg{x}, real \farg{y}}{
+    Returns 1 if \farg{x} is unequal to 0 and \farg{y} is unequal to 0.
+    \[
+    \mbox{operator\&\&}(x,y) = 
+    \begin{cases}
+      1 & \mbox{if } x,y \neq 0 \\
+      0 & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemindexnobody{int}{operator||}{int \farg{x}, int \farg{y}}{operator"|"|}
+  \fitemindex{int}{operator||}{real \farg{x}, real \farg{y}}{
+    Returns 1 if \farg{x} is unequal to 0 or \farg{y} is unequal to 0.
+    \[
+    \mbox{operator||}(x,y) = 
+    \begin{cases}
+      1 & \mbox{if } x \neq 0 \textrm{ or } y \neq 0\\
+      0 & \mbox{otherwise}
+    \end{cases}
+    \]
+  }{operator"|"|}
 \end{description}
 
 
