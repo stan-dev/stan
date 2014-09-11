@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/common/write_iteration.hpp>
+#include <stan/services/io/write_iteration.hpp>
 
 #include <stdexcept>
 #include <sstream>
@@ -35,7 +35,7 @@ TEST(StanCommon, reject_generated_quantities) {
   
   lp = model->log_prob<false, false>(cont_vector, disc_vector, &std::cout);
   try {
-    stan::common::write_iteration(model_output, *model, base_rng,
+    stan::services::io::write_iteration(model_output, *model, base_rng,
                     lp, cont_vector, disc_vector);
   } catch (const std::domain_error& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {

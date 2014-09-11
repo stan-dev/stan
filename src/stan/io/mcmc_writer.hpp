@@ -10,7 +10,7 @@
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
 
-#include <stan/common/recorder/csv.hpp>
+#include <stan/interface/recorder/csv.hpp>
 
 namespace stan {
   
