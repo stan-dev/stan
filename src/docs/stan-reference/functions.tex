@@ -271,24 +271,26 @@ This is a no-op.}
 \section{Bound Functions}
 %
 \begin{description}
-\fitem{int}{min}{int \farg{x}, int \farg{y}}{
-  \[
-  \mbox{min}(x, y) = 
-  \begin{cases}
-    x & \mbox{if } x < y\\
-    y & \mbox{otherwise}
-  \end{cases}
-  \]}
-%
-\fitem{int}{max}{int \farg{x}, int \farg{y}}{
-  \[
-  \mbox{max}(x, y) = 
-  \begin{cases}
-    x & \mbox{if } x > y\\
-    y & \mbox{otherwise}
-  \end{cases}
-  \]}
-%
+  \fitem{int}{min}{int \farg{x}, int \farg{y}}{
+    The minimum of two arguments.
+    \[
+    \mbox{min}(x, y) = 
+    \begin{cases}
+      x & \mbox{if } x < y\\
+      y & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{int}{max}{int \farg{x}, int \farg{y}}{
+    The maximum of two arguments.
+    \[
+    \mbox{max}(x, y) = 
+    \begin{cases}
+      x & \mbox{if } x > y\\
+      y & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
 \end{description}
 
 
@@ -386,6 +388,7 @@ boolean operators.  These all have the same syntax and precedence as
 in \Cpp; for the full list of operators and precedences, see
 \reffigure{operator-precedence}.  
 
+
 \subsection{Comparison Operators}
 
 All comparison operators return boolean values, either 0 or 1.  Each
@@ -394,96 +397,72 @@ floating-point comparisons.  Comparing an integer and real value is
 carried out by first promoting the integer value.
 %
 \begin{description}
-\fitem{int}{operator<}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
-  less than \farg{y} and 0 otherwise}
-\fitem{int}{operator<=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
-  less than or equal to \farg{y} and 0 otherwise}
-\fitem{int}{operator>}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
-  greater than \farg{y} and 0 otherwise}
-\fitem{int}{operator>=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
-  greater than or equal to \farg{y} and 0 otherwise}
-\fitem{int}{operator{==}}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
-  equal to \farg{y} and 0 otherwise}
-\fitemindex{int}{operator!=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
-  not equal to \farg{y} and 0 otherwise.
-\[
-\mbox{operator!=}(x,y) = 
-\begin{cases}
-  0 & \mbox{if } x = y\\
-  1 & \mbox{if } x \neq y \\[6pt]
-  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-}{operator"!"=}
-\end{description}
-%
-The real-valued argument versions are identical other than for
-argument type.
-%
-\begin{description}
-\fitem{int}{operator<}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  less than \farg{y} and 0 otherwise.
-\[
-\mbox{operator\textless}(x,y) = 
-\begin{cases}
-  0 & \mbox{if } x \geq y\\
-  1 & \mbox{if } x < y \\[6pt]
-  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-\fitem{int}{operator<=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  less than or equal to \farg{y} and 0 otherwise.
-\[
-\mbox{operator\textless=}(x,y) = 
-\begin{cases}
-  0 & \mbox{if } x > y\\
-  1 & \mbox{if } x \leq y \\[6pt]
-  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-\fitem{int}{operator>}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  greater than \farg{y} and 0 otherwise.
-\[
-\mbox{operator\textgreater}(x,y) = 
-\begin{cases}
-  0 & \mbox{if } x \leq y\\
-  1 & \mbox{if } x > y \\[6pt]
-  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-\fitem{int}{operator>=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  greater than or equal to \farg{y} and 0 otherwise.
-\[
-\mbox{operator\textgreater=}(x,y) = 
-\begin{cases}
-  0 & \mbox{if } x < y\\
-  1 & \mbox{if } x \geq y \\[6pt]
-  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-\fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  equal to \farg{y} and 0 otherwise.
-\[
-\mbox{operator==}(x,y) = 
-\begin{cases}
-  0 & \mbox{if } x \neq y\\
-  1 & \mbox{if } x = y \\[6pt]
-  0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-\fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  not equal to \farg{y} and 0 otherwise}{operator"!"=}
+  \fitemnobody{int}{operator<}{int \farg{x}, int \farg{y}}
+  \fitem{int}{operator<}{real \farg{x}, real \farg{y}}{
+    Less than comparison operator.
+    \[
+    \mbox{operator\textless}(x,y) =
+    \begin{cases}
+      1 & \mbox{if } x < y\\
+      0 & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemnobody{int}{operator<=}{int \farg{x}, int \farg{y}}
+  \fitem{int}{operator<=}{real \farg{x}, real \farg{y}}{
+    Less than or equal comparison operator.
+    \[
+    \mbox{operator\textless=}(x,y) = 
+    \begin{cases}
+      1 & \mbox{if } x \leq y\\
+      0 & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemnobody{int}{operator>}{int \farg{x}, int \farg{y}}
+  \fitem{int}{operator>}{real \farg{x}, real \farg{y}}{
+    Greater than comparison operator.
+    \[
+    \mbox{operator\textgreater}(x,y) = 
+    \begin{cases}
+      1 & \mbox{if } x > y\\
+      0 & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemnobody{int}{operator>=}{int \farg{x}, int \farg{y}}
+  \fitem{int}{operator>=}{real \farg{x}, real \farg{y}}{
+    Greater than or equal comparison operator.
+    \[
+    \mbox{operator\textgreater=}(x,y) = 
+    \begin{cases}
+      1 & \mbox{if } x \geq y \\
+      0 & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemnobody{int}{operator{==}}{int \farg{x}, int \farg{y}}
+  \fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{
+    Equal to comparison operator.
+    \[
+    \mbox{operator==}(x,y) = 
+    \begin{cases}
+      1 & \mbox{if } x = y \\
+      0 & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemindexnobody{int}{operator!=}{int \farg{x}, int \farg{y}}{operator"!"=}
+  \fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{
+    Not equal to comparison operator.
+    \[
+    \mbox{operator!=}(x,y) = 
+    \begin{cases}
+      1 & \mbox{if } x \neq y \\
+      0 & \mbox{otherwise}
+    \end{cases}
+    \]}{operator"!"=}
+  %
 \end{description}
 
 
