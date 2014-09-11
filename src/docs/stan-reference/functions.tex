@@ -250,13 +250,13 @@ This is a no-op.}
 \begin{description}
 %
 \fitem{int}{abs}{int \farg{x}}{
-  The absolute value of \farg{x}. 
+  Returns the absolute value of \farg{x}. 
   \[\mbox{abs}(x) = |x|\]}
 %
 \fitemnobody{int}{int\_step}{int \farg{x}}
 %
 \fitem{int}{int\_step}{real \farg{x}}{
-  The integer step, or Heaviside, function.
+  Returns the integer step, or Heaviside, function of \farg{x}.
   \[
   \mbox{int\_step}(x) = 
   \begin{cases}
@@ -272,7 +272,7 @@ This is a no-op.}
 %
 \begin{description}
   \fitem{int}{min}{int \farg{x}, int \farg{y}}{
-    The minimum of two arguments.
+    Returns the minimum of \farg{x} and \farg{y}.
     \[
     \mbox{min}(x, y) = 
     \begin{cases}
@@ -282,7 +282,7 @@ This is a no-op.}
     \]}
   %
   \fitem{int}{max}{int \farg{x}, int \farg{y}}{
-    The maximum of two arguments.
+    Returns the maximum of \farg{x} and \farg{y}.
     \[
     \mbox{max}(x, y) = 
     \begin{cases}
@@ -370,8 +370,9 @@ display the log probability accumulator at various stages of execution
 to see where it becomes ill defined.
 
 \begin{description}
-\fitem{real}{get\_lp}{}{the current value of the log probability
-accumulator}
+  \fitem{real}{get\_lp}{}{
+    Returns the current value of the log probability
+    accumulator.}
 \end{description}
 
 Like user-defined functions that end in \code{\_lp}, the log
@@ -399,7 +400,7 @@ carried out by first promoting the integer value.
 \begin{description}
   \fitemnobody{int}{operator<}{int \farg{x}, int \farg{y}}
   \fitem{int}{operator<}{real \farg{x}, real \farg{y}}{
-    Less than comparison operator.
+    Returns 1 if \farg{x} is less than \farg{y} and 0 otherwise.
     \[
     \mbox{operator\textless}(x,y) =
     \begin{cases}
@@ -410,7 +411,7 @@ carried out by first promoting the integer value.
   %
   \fitemnobody{int}{operator<=}{int \farg{x}, int \farg{y}}
   \fitem{int}{operator<=}{real \farg{x}, real \farg{y}}{
-    Less than or equal comparison operator.
+    Returns 1 if \farg{x} is less than or equal \farg{y} and 0 otherwise.
     \[
     \mbox{operator\textless=}(x,y) = 
     \begin{cases}
@@ -421,7 +422,7 @@ carried out by first promoting the integer value.
   %
   \fitemnobody{int}{operator>}{int \farg{x}, int \farg{y}}
   \fitem{int}{operator>}{real \farg{x}, real \farg{y}}{
-    Greater than comparison operator.
+    Returns 1 if \farg{x} is greater than \farg{y} and 0 otherwise.
     \[
     \mbox{operator\textgreater}(x,y) = 
     \begin{cases}
@@ -432,7 +433,8 @@ carried out by first promoting the integer value.
   %
   \fitemnobody{int}{operator>=}{int \farg{x}, int \farg{y}}
   \fitem{int}{operator>=}{real \farg{x}, real \farg{y}}{
-    Greater than or equal comparison operator.
+    Returns 1 if \farg{x} is greater than or equal to \farg{y}
+    and 0 otherwise.
     \[
     \mbox{operator\textgreater=}(x,y) = 
     \begin{cases}
@@ -443,7 +445,7 @@ carried out by first promoting the integer value.
   %
   \fitemnobody{int}{operator{==}}{int \farg{x}, int \farg{y}}
   \fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{
-    Equal to comparison operator.
+    Returns 1 if \farg{x} is equal to \farg{y} and 0 otherwise.
     \[
     \mbox{operator==}(x,y) = 
     \begin{cases}
@@ -454,7 +456,7 @@ carried out by first promoting the integer value.
   %
   \fitemindexnobody{int}{operator!=}{int \farg{x}, int \farg{y}}{operator"!"=}
   \fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{
-    Not equal to comparison operator.
+    Returns 1 if \farg{x} is not equal to \farg{y} and 0 otherwise.
     \[
     \mbox{operator!=}(x,y) = 
     \begin{cases}
