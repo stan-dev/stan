@@ -5,7 +5,7 @@
 void read_file(const std::string& path,
                std::string& contents) {
   std::stringstream s;
-  std::fstream f(path);
+  std::fstream f(path.c_str());
   while (f.good())
     s << static_cast<char>(f.get());
   contents = s.str();
