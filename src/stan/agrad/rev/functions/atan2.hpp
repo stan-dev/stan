@@ -89,6 +89,31 @@ namespace stan {
      *
      * $\f$ \frac{\partial}{\partial y} \arctan \frac{c}{y} = \frac{-c}{c^2 + y^2}\f$.
      *
+     *
+       \f[
+       \mbox{atan2}(x,y) = 
+       \begin{cases}
+         \arctan\left(\frac{x}{y}\right) & \mbox{if } -\infty\leq x \leq \infty, -\infty\leq y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{atan2}(x,y)}{\partial x} = 
+       \begin{cases}
+         \frac{y}{x^2+y^2} & \mbox{if } -\infty\leq x\leq \infty, -\infty\leq y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{atan2}(x,y)}{\partial y} = 
+       \begin{cases}
+         -\frac{x}{x^2+y^2} & \mbox{if } -\infty\leq x\leq \infty, -\infty\leq y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Numerator scalar.
      * @param b Denominator variable.
      * @return The arc tangent of the fraction, in radians.
