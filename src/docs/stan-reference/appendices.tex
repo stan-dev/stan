@@ -1069,176 +1069,25 @@ Mac OS X with a single line-feed (LF) character (ASCII code point
 a carriage return (CR) character (ASCII code point \code{0x0D})
 followed by a line-feed (LF) character.
 
-
 \chapter{Mathematical Functions}\label{math-functions.appendix}
 
+\section{Beta}\label{beta-appendix.section}
+The beta function, $\mbox{B}(\alpha,\beta)$,
+computes the normalizing constant for the beta distribution, and
+is defined for $\alpha > 0$ and $\beta > 0$.
 
+\begin{align*}
+\mbox{B}(\alpha, \beta) 
+&= \int_0^1 u^{\alpha - 1} (1 - u)^{\beta - 1} \, du
+&= \frac{\Gamma(a) \Gamma(b)}{\Gamma(a+b)}
+\end{align*}
 
+\section{Gamma}\label{gamma-appendix.section}
+The gamma function, $\Gamma(x)$, is the generalization of the
+factorial function to continuous variables, defined so that
+$\Gamma(n+1) = n!$.  The function is defined for positive numbers and
+non-integral negative numbers.
 
-\section{bessel\_first\_kind}\label{bessel-first-kind-appendix.section}
-$J_v(x)$ is the bessel function of the first kind of order $v$.
-%
 \[
-J_v(x)=\left(\frac{1}{2}x\right)^v
-	\sum_{k=0}^\infty \frac{\left(-\frac{1}{4}x^2\right)^k}{k!\, \Gamma(v+k+1)}
-\]
-%
-\[
-\frac{\partial \, J_v(x)}{\partial x} = \frac{v}{x}J_v(x)-J_{v+1}(x)
-\]
-
-\section{bessel\_second\_kind}\label{bessel-second-kind-appendix.section}
-$Y_v(x)$ is the bessel function of the second kind of order $v$ for positive $x$.
-%
-\[
-Y_v(x)=\frac{J_v(x)\cos(v\pi)-J_{-v}(x)}{\sin(v\pi)}
-\]
-%
-\[
-\frac{\partial \, Y_v(x)}{\partial x} = \frac{v}{x}Y_v(x)-Y_{v+1}(x)
-\]
-
-\section{digamma}\label{digamma-appendix.section}
-$\Psi(x)$ is the digamma function.
-%
-\[
-\Psi(x)=\frac{\Gamma'(x)}{\Gamma(x)}
-\]
-%
-\[
-\frac{\partial \, \Psi(x)}{\partial x} = \frac{\Gamma''(x)\Gamma(x)-(\Gamma'(x))^2}{\Gamma^2(x)}
-\]
-
-
-\section{erfc}\label{erfc-appendix.section}
-$\erfc(x)$ is the complementary error function (also known as the Gauss complementary error function).
-%
-\[
-\erfc(x)=\frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
-\]
-%
-\[
-\frac{\partial \, \erfc(x)}{\partial x} = -\frac{2}{\sqrt{\pi}} e^{-x^2}
-\]
-
-\section{falling\_factorial}\label{falling-factorial-appendix.section}
-$(x)_n$ is the falling factorial function.
-%
-\[
-(x)_n=\frac{\Gamma(x+1)}{\Gamma(x-n+1)}
-\]
-%
-\[
-\frac{\partial \, (x)_n}{\partial x} = (x)_n\Psi(x+1)
-\]
-%
-\[
-\frac{\partial \, (x)_n}{\partial n} = -(x)_n\Psi(n+1)
-\]
-
-\section{gamma\_p}\label{gamma-p-appendix.section}
-$P(a,z)$ is the normalised lower incomplete gamma function of $a$ and $z$.
-%
-\[
-P(a,z)=\frac{1}{\Gamma(a)}\int_0^zt^{a-1}e^{-t}dt
-\]
-%
-\[
-\frac{\partial \, P(a,z)}{\partial a} = -\frac{\Psi(a)}{\Gamma^2(a)}\int_0^zt^{a-1}e^{-t}dt 
-	+ \frac{1}{\Gamma(a)}\int_0^z (a-1)t^{a-2}e^{-t}dt
-\]
-%
-\[
-\frac{\partial \, P(a,z)}{\partial z} = \frac{z^{a-1}e^{-z}}{\Gamma(a)}
-\]
-
-\section{gamma\_q}\label{gamma-q-appendix.section}
-$Q(a,z)$ is the normalised upper incomplete gamma function of $a$ and $z$.
-%
-\[
-Q(a,z)=\frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt
-\]
-%
-\[
-\frac{\partial \, Q(a,z)}{\partial a} = -\frac{\Psi(a)}{\Gamma^2(a)}\int_z^\infty t^{a-1}e^{-t}dt 
-	+ \frac{1}{\Gamma(a)}\int_z^\infty (a-1)t^{a-2}e^{-t}dt
-\]
-%
-\[
-\frac{\partial \, Q(a,z)}{\partial z} = -\frac{z^{a-1}e^{-z}}{\Gamma(a)}
-\]
-
-
-\section{lmgamma}\label{lmgamma-appendix.section}
-$\ln\Gamma_n(x)$ is the natural logarithm of the multinomial gamma function with \farg{n}
-dimensions.
-%
-\[
-\ln\Gamma_n(x) = \pi^{n(n-1)/4} \, \prod_{j=1}^n \Gamma(x + (1 - j)/2)
-\]
-%
-\[
-\frac{\partial \, \ln\Gamma_n(x)}{\partial x} = \sum_{j=1}^n \Psi(x + (1 - j) / 2)
-\]
-
-\section{modified\_bessel\_first\_kind}\label{modified-bessel-first-kind-appendix.section}
-$I_v(z)$ is the modified Bessel function of the first kind with order \farg{v} applied to \farg{z}.
-\[
-{I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
-\]
-%
-\[
-\frac{\partial \, I_v(z)}{\partial z} = I_{v-1}(z)-\frac{v}{z}I_v(z)
-\]
-
-\section{modified\_bessel\_second\_kind}\label{modified-bessel-second-kind-appendix.section}
-$K_v(z)$ is the bessel function of the second kind of order $v$ for positive $z$.
-%
-\[
-{K_v}(z)
-=
-\frac{\pi}{2}\cdot\frac{I_{-v}(z) - I_{v}(z)}{\sin(v\pi)}
-\]
-%
-\[
-\frac{\partial \, K_v(z)}{\partial z} = -\frac{v}{z}K_v(z)-K_{v-1}(z)
-\]
-
-
-
-\section{rising\_factorial}\label{rising-factorial-appendix.section}
-$x^{(n)}$ is the rising factorial function for positive $x$ and real $n$.
-%
-\[
-x^{(n)}=\frac{\Gamma(x+n)}{\Gamma(x)}
-\]
-%
-\[
-\frac{\partial \, x^{(n)}}{\partial x} = x^{(n)}(\Psi(x+n)-\Psi(x))
-\]
-%
-\[
-\frac{\partial \, x^{(n)}}{\partial n} = (x)_n\Psi(x+n)
-\]
-
-\section{tgamma}\label{gamma-appendix.section}
-$\Gamma(x)$ is the gamma function.
-%
-\[
-\Gamma(x)=\int_0^{\infty} u^{x - 1} \exp(-u) \, du
-\]
-%
-\[
-\frac{\partial \, \Gamma(x)}{\partial x} = \Gamma(x)\Psi(x)
-\]
-
-\section{trigamma}\label{trigamma-appendix.section}
-$\Psi_1(x)$ is the trigamma function.
-%
-\[
-\Psi_1(x)=\sum_{n=0}^\infty \frac{1}{(x+n)^2}
-\]
-%
-\[
-\frac{\partial \, \Psi_1(x)}{\partial x} = -2\sum_{n=0}^\infty \frac{1}{(x+n)^3}
+\Gamma(x) = \int_0^{\infty} u^{x - 1} \exp(-u) \, du
 \]
