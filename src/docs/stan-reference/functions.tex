@@ -683,23 +683,24 @@ as \code{x~+~y} and \code{-x}, respectively.
 \begin{description}
 %
   \fitem{real}{abs}{real \farg{x}}{     
-    Returns the absolute value of \farg{x}. 
-    {\it This function is deprecated and will be removed in the future;
-      please use \code{fabs} instead.}
-    \[\mbox{abs}(x) = |x|\]}
+    Returns the absolute value of \farg{x}\,;
+    this function is deprecated and will be removed in the future;
+    please use \code{fabs} instead.
+    \[
+    \mbox{abs}(x) = |x|
+    \]}
   %
   \fitem{real}{fabs}{real \farg{x}}{
-    The absolute value of \farg{x};  
+    Returns the absolute value of \farg{x};  
     see warning at start of \refsection{step-functions}.
     \[
     \mbox{fabs}(x) = |x|
     \]}
   %
-  \fitem{real}{fdim}{real \farg{x}, 
-    real \farg{y}}{
-    The positive difference between \farg{x} and \farg{y}, which is
-    \farg{x} - \farg{y} if \farg{x} is greater than \farg{y} and 0
-    otherwise;
+  \fitem{real}{fdim}{real \farg{x}, real \farg{y}}{
+    Returns the positive difference between \farg{x} and \farg{y}, 
+    which is \farg{x} - \farg{y} if \farg{x} is greater than \farg{y} 
+    and 0 otherwise;
     see warning at start of \refsection{step-functions}.
     \[
     \mbox{fdim}(x,y) = 
@@ -716,117 +717,41 @@ as \code{x~+~y} and \code{-x}, respectively.
 \begin{description}
   %
   \fitem{real}{fmin}{real \farg{x}, real \farg{y}}{
-    The minimum of \farg{x} and \farg{y}\,; 
+    Returns the minimum of \farg{x} and \farg{y}\,; 
     see warning at start of \refsection{step-functions}.
     \[
     \mbox{fmin}(x,y) = 
     \begin{cases}
       x & \mbox{if } x \leq y \\
-      y & \mbox{if } x > y \\[6pt]
-      x & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
-      y & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
-      \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+      y & \mbox{otherwise}
     \end{cases}
-    \]
-    %
-    \[
-    \frac{\partial\,\mbox{fmin}(x,y)}{\partial x} = 
-    \begin{cases}
-      1 & \mbox{if } x \leq y \\
-      0 & \mbox{if } x > y \\[6pt]
-      1 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
-      0 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
-      \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
-    \end{cases}
-    \]
-    %
-    \[
-    \frac{\partial\,\mbox{fmin}(x,y)}{\partial y} = 
-    \begin{cases}
-      0 & \mbox{if } x \leq y \\
-      1 & \mbox{if } x > y \\[6pt]
-      0 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
-      1 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
-      \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
-    \end{cases}
-    \]
-    %
-  }
+    \]}
   %
   \fitem{real}{fmax}{real \farg{x}, real \farg{y}}{
-    The maximum of \farg{x} and \farg{y}\,;
+    Returns the maximum of \farg{x} and \farg{y}\,;
     see warning at start of \refsection{step-functions}.
     \[
     \mbox{fmax}(x,y) = 
     \begin{cases}
       x & \mbox{if } x \geq y \\
-      y & \mbox{if } x < y \\[6pt]
-      x & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
-      y & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
-      \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+      y & \mbox{otherwise}
     \end{cases}
-    \]
-    %
-    \[
-    \frac{\partial\,\mbox{fmax}(x,y)}{\partial x} = 
-    \begin{cases}
-      1 & \mbox{if } x \geq y \\
-      0 & \mbox{if } x < y \\[6pt]
-      1 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
-      0 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
-      \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
-    \end{cases}
-    \]
-    %
-    \[
-    \frac{\partial\,\mbox{fmax}(x,y)}{\partial y} = 
-    \begin{cases}
-      0 & \mbox{if } x \geq y \\
-      1 & \mbox{if } x < y \\[6pt]
-      0 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
-      1 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
-      \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
-    \end{cases}
-    \]
-    %
-  }
+    \]}
   %
 \end{description}
 
 
 \subsection{Arithmetic Functions}
-
 %
 \begin{description}
-\fitem{real}{fmod}{real \farg{x}, real \farg{y}}{
-The real value remainder after dividing \farg{x} by \farg{y}\,;
-see warning at start of \refsection{step-functions}.
-\[
-\mbox{fmod}(x,y) = 
-\begin{cases}
-  x - \lfloor \frac{x}{y}\rfloor y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{fmod}(x,y)}{\partial x} = 
-\begin{cases}
-  1 & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{fmod}(x,y)}{\partial y} = 
-\begin{cases}
-  -\lfloor \frac{x}{y}\rfloor & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
+  %
+  \fitem{real}{fmod}{real \farg{x}, real \farg{y}}{
+    Returns the real value remainder after dividing \farg{x} by \farg{y}\,;
+    see warning at start of \refsection{step-functions}.
+    \[
+    \mbox{fmod}(x,y) = x - \lfloor \frac{x}{y}\rfloor \, y
+    \]}
+  %
 \end{description}
 
 
@@ -845,93 +770,42 @@ they return real values.  Stan may introduce integer-valued versions
 of these in the future, but as of now, there is no good workaround.
 
 \begin{description}
-%
-\fitem{real}{floor}{real \farg{x}}{
-The floor of \farg{x}, which is the largest integer less
-than or equal to \farg{x}, converted to a real value;
-see warning at start of \refsection{step-functions}.
-\[
-\mbox{floor}(x) = 
-\begin{cases}
-  \lfloor x \rfloor & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{floor}(x)}{\partial x} = 
-\begin{cases}
-  0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{ceil}{real \farg{x}}{
-The ceiling of \farg{x}, which is the smallest integer greater
-than or equal to \farg{x}, converted to a real value;
-see warning at start of \refsection{step-functions}.
-\[
-\mbox{ceil}(x) = 
-\begin{cases}
-  \lceil x\rceil & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{ceil}(x)}{\partial x} = 
-\begin{cases}
-  0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{round}{real \farg{x}}{
-The nearest integer to \farg{x}, converted to a real value;
-see warning at start of \refsection{step-functions}.
-\[
-\mbox{round}(x) = 
-\begin{cases}
-  \lceil x \rceil & \mbox{if } x-\lfloor x\rfloor \geq 0.5 \\
-  \lfloor x \rfloor & \mbox{if } x-\lfloor x\rfloor < 0.5 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{round}(x)}{\partial x} = 
-\begin{cases}
-  0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-}
-%
-\fitem{real}{trunc}{real \farg{x}}{
-The integer nearest to but no larger in magnitude than \farg{x},
-converted to a double value;
-see warning at start of \refsection{step-functions}.
-\[
-\mbox{trunc}(x) = 
-\begin{cases}
-  \lfloor x \rfloor & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{trunc}(x)}{\partial x} = 
-\begin{cases}
-  0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-}
-%
+  %
+  \fitem{real}{floor}{real \farg{x}}{
+    Returns the floor of \farg{x}, which is the largest integer less
+    than or equal to \farg{x}, converted to a real value;
+    see warning at start of \refsection{step-functions}.
+    \[
+    \mbox{floor}(x) = \lfloor x \rfloor
+    \]}
+  %
+  \fitem{real}{ceil}{real \farg{x}}{
+    Returns the ceiling of \farg{x}, which is the smallest integer greater
+    than or equal to \farg{x}, converted to a real value;
+    see warning at start of \refsection{step-functions}.
+    \[
+    \mbox{ceil}(x) = \lceil x\rceil
+    \]}
+  %
+  \fitem{real}{round}{real \farg{x}}{
+    Returns the nearest integer to \farg{x}, converted to a real value;
+    see warning at start of \refsection{step-functions}.
+    \[
+    \mbox{round}(x) = 
+    \begin{cases}
+      \lceil x \rceil & \mbox{if } x-\lfloor x\rfloor \geq 0.5 \\
+      \lfloor x \rfloor & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{trunc}{real \farg{x}}{
+    Returns the integer nearest to but no larger in magnitude than \farg{x},
+    converted to a double value;
+    see warning at start of \refsection{step-functions}.
+    \[
+    \mbox{trunc}(x) = \lfloor x \rfloor
+    \]}
+  %
 \end{description}
 
 
