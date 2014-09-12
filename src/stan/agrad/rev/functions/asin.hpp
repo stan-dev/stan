@@ -51,7 +51,7 @@ namespace stan {
        \f]
        
        \f[
-       \frac{\partial \, \arcsin(x)}{\partial x} = \frac{1}{\sqrt{1-x^2}}>
+       \frac{\partial \, \arcsin(x)}{\partial x} = \frac{1}{\sqrt{1-x^2}}
        \f]
 
      *

@@ -53,9 +53,9 @@ namespace stan {
      *
      * The partial derivatives are defined by
      *
-     * $\f$ \frac{\partial}{\partial x} \arctan \frac{x}{y} = \frac{y}{x^2 + y^2}\f$, and
+     * \f$ \frac{\partial}{\partial x} \arctan \frac{x}{y} = \frac{y}{x^2 + y^2}\f$, and
      * 
-     * $\f$ \frac{\partial}{\partial y} \arctan \frac{x}{y} = \frac{-x}{x^2 + y^2}\f$.
+     * \f$ \frac{\partial}{\partial y} \arctan \frac{x}{y} = \frac{-x}{x^2 + y^2}\f$.
      *
      * @param a Numerator variable.
      * @param b Denominator variable.
@@ -71,7 +71,7 @@ namespace stan {
      *
      * The derivative with respect to the variable is
      *
-     * $\f$ \frac{d}{d x} \arctan \frac{x}{c} = \frac{c}{x^2 + c^2}\f$.
+     * \f$ \frac{d}{d x} \arctan \frac{x}{c} = \frac{c}{x^2 + c^2}\f$.
      *
      * @param a Numerator variable.
      * @param b Denominator scalar.
@@ -87,7 +87,7 @@ namespace stan {
      *
      * The derivative with respect to the variable is
      *
-     * $\f$ \frac{\partial}{\partial y} \arctan \frac{c}{y} = \frac{-c}{c^2 + y^2}\f$.
+     * \f$ \frac{\partial}{\partial y} \arctan \frac{c}{y} = \frac{-c}{c^2 + y^2}\f$.
      *
      *
        \f[
