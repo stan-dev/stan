@@ -53,7 +53,6 @@ namespace stan {
        \f[
        \frac{\partial \, \arcsin(x)}{\partial x} = \frac{1}{\sqrt{1-x^2}}
        \f]
-
      *
      * @param a Variable in range [-1,1].
      * @return Arc sine of variable, in radians. 
