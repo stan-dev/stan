@@ -1357,283 +1357,97 @@ efficient and more numerically stable than defining them directly
 using more basic \Stan functions.
 %
 \begin{description}
-%
-\fitem{real}{expm1}{real \farg{x}}{
-The natural exponential of \farg{x} minus 1.
-\[
-\mbox{expm1}(x) = 
-\begin{cases}
-  e^x-1 & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{expm1}(x)}{\partial x} = 
-\begin{cases}
-  e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{fma}{real \farg{x}, 
-               real \farg{y},
-               real \farg{z}}{
-\farg{z} plus the result of \farg{x} multiplied by \farg{y}.
-\[
-\mbox{fma}(x,y,z) = 
-\begin{cases}
-  x\cdot y+z & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{fma}(x,y,z)}{\partial x} = 
-\begin{cases}
-  y & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{fma}(x,y,z)}{\partial y} = 
-\begin{cases}
-  x & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{fma}(x,y,z)}{\partial z} = 
-\begin{cases}
-  1 & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
-The product of \farg{x} and the natural logarithm of \farg{y}.
-\[
-\mbox{multiply\_log}(x,y) = 
-\begin{cases}
-  0 & \mbox{if } x=y=0\\
-  x\ln y & \mbox{if } x,y\neq0 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{multiply\_log}(x,y)}{\partial x} = 
-\begin{cases}
-  \infty & \mbox{if } x=y=0\\
-  \ln y & \mbox{if } x,y\neq 0 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{multiply\_log}(x,y)}{\partial y} = 
-\begin{cases}
-  \infty & \mbox{if } x=y=0\\
-  \frac{x}{y} & \mbox{if } x,y\neq 0 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-}
-%
-\fitem{real}{log1p}{real \farg{x}}{
-The natural logarithm of 1 plus \farg{x}.
-\[
-\mbox{log1p}(x) = 
-\begin{cases}
-  \textrm{NaN} & \mbox{if } x < -1\\
-  \ln(1+x)& \mbox{if } x\geq -1 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log1p}(x)}{\partial x} = 
-\begin{cases}
-  \textrm{NaN} & \mbox{if } x < -1\\
-  \frac{1}{1+x} & \mbox{if } x\geq -1 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{log1m}{real \farg{x}}{
-The natural logarithm of 1 minus \farg{x}.
-\[
-\mbox{log1m}(x) = 
-\begin{cases}
-  \ln(1-x) & \mbox{if } x \leq 1 \\
-  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log1m}(x)}{\partial x} = 
-\begin{cases}
-  -\frac{1}{1-x} & \mbox{if } x \leq 1 \\
-  \textrm{NaN} & \mbox{if } x > 1\\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{log1p\_exp}{real \farg{x}}{ 
-The natural logarithm of one plus the natural exponentiation of
-\farg{x}.
-\[
-\mbox{log1p\_exp}(x) = 
-\begin{cases}
-  \ln(1+\exp(x)) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log1p\_exp}(x)}{\partial x} = 
-\begin{cases}
-  \frac{\exp(x)}{1+\exp(x)} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{log1m\_exp}{real \farg{x}}{ 
-The natural logarithm of one minus the natural exponentiation of
-\farg{x}.
-\[
-\mbox{log1m\_exp}(x) = 
-\begin{cases}
-  \ln(1-\exp(x)) & \mbox{if } x < 0 \\
-  \textrm{NaN} & \mbox{if } x \geq 0\\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{asinh}(x)}{\partial x} = 
-\begin{cases}
-  -\frac{\exp(x)}{1-\exp(x)} & \mbox{if } x < 0 \\
-  \textrm{NaN} & \mbox{if } x \geq 0\\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{log\_diff\_exp}{real \farg{x}, real \farg{y}}{ 
-The natural logarithm of the difference of the natural exponentiation
-of \farg{x} and the natural exponentiation of \farg{y}.
-\[
-\mbox{log\_diff\_exp}(x,y) = 
-\begin{cases}
-  \textrm{NaN} & \mbox{if } x \leq y\\
-  \ln(\exp(x)-\exp(y)) & \mbox{if } x > y \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial x} = 
-\begin{cases}
-  \textrm{NaN} & \mbox{if } x \leq y\\
-  \frac{\exp(x)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial y} = 
-\begin{cases}
-  \textrm{NaN} & \mbox{if } x \leq y\\
-  -\frac{\exp(y)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{ 
-The natural logarithm of the sum of the natural exponentiation
-of \farg{x} and the natural exponentiation of \farg{y}.
-\[
-\mbox{log\_sum\_exp}(x,y) = 
-\begin{cases}
-  \ln(\exp(x)+\exp(y)) & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log\_sum\_exp}(x,y)}{\partial x} = 
-\begin{cases}
-  \frac{\exp(x)}{\exp(x)+\exp(y)} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log\_sum\_exp}(x,y)}{\partial y} = 
-\begin{cases}
-  \frac{\exp(y)}{\exp(x)+\exp(y)} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{log\_inv\_logit}{real \farg{x}}{
-The natural logarithm of the inverse logit function of \farg{x}.
-\[
-\mbox{log\_inv\_logit}(x) = 
-\begin{cases}
-  \ln\left(\frac{1}{1+\exp(-x)}\right)& \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log\_inv\_logit}(x)}{\partial x} = 
-\begin{cases}
-  \frac{1}{1+\exp(x)} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{log1m\_inv\_logit}{real \farg{x}}{
-The natural logarithm of 1 minus the inverse logit function of \farg{x}.
-\[
-\mbox{log1m\_inv\_logit}(x) = 
-\begin{cases}
-  -\ln(\exp(x)+1) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log1m\_inv\_logit}(x)}{\partial x} = 
-\begin{cases}
-  -\frac{\exp(x)}{\exp(x)+1} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
+  %
+  \fitem{real}{expm1}{real \farg{x}}{
+    Returns the natural exponential of \farg{x} minus 1.
+    \[
+    \mbox{expm1}(x) = e^x-1
+    \]}
+  %
+  \fitem{real}{fma}{real \farg{x}, real \farg{y}, real \farg{z}}{
+    Returns \farg{z} plus the result of \farg{x} multiplied by \farg{y}.
+    \[
+    \mbox{fma}(x,y,z) = x\cdot y+z
+    \]}
+  %
+  \fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
+    Returns the product of \farg{x} and the natural logarithm of \farg{y}.
+    \[
+    \mbox{multiply\_log}(x,y) = 
+    \begin{cases}
+      0 & \mbox{if } x=y=0 \\
+      x\ln y & \mbox{if } x,y \neq 0 
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{log1p}{real \farg{x}}{
+    Returns the natural logarithm of 1 plus \farg{x}.
+    \[
+    \mbox{log1p}(x) = 
+    \begin{cases}
+      \ln(1+x)& \mbox{if } x\geq -1 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{log1m}{real \farg{x}}{
+    Returns the natural logarithm of 1 minus \farg{x}.
+    \[
+    \mbox{log1m}(x) = 
+    \begin{cases}
+      \ln(1-x) & \mbox{if } x \leq 1 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{log1p\_exp}{real \farg{x}}{ 
+    Returns the natural logarithm of one plus the natural exponentiation 
+    of \farg{x}.
+    \[
+    \mbox{log1p\_exp}(x) = \ln(1+\exp(x))
+    \]}
+  %
+  \fitem{real}{log1m\_exp}{real \farg{x}}{ 
+    Returns the natural logarithm of one minus the natural exponentiation of
+    \farg{x}.
+    \[
+    \mbox{log1m\_exp}(x) = 
+    \begin{cases}
+      \ln(1-\exp(x)) & \mbox{if } x < 0 \\
+      \textrm{NaN} & \mbox{if } x \geq 0 
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{log\_diff\_exp}{real \farg{x}, real \farg{y}}{ 
+    Returns the natural logarithm of the difference of the natural exponentiation
+    of \farg{x} and the natural exponentiation of \farg{y}.
+    \[
+    \mbox{log\_diff\_exp}(x,y) = 
+    \begin{cases}
+      \ln(\exp(x)-\exp(y)) & \mbox{if } x > y \\[6pt]
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{ 
+    Returns the natural logarithm of the sum of the natural exponentiation
+    of \farg{x} and the natural exponentiation of \farg{y}.
+    \[
+    \mbox{log\_sum\_exp}(x,y) = \ln(\exp(x)+\exp(y)) 
+    \]}
+  %
+  \fitem{real}{log\_inv\_logit}{real \farg{x}}{
+    Returns the natural logarithm of the inverse logit function of \farg{x}.
+    \[
+    \mbox{log\_inv\_logit}(x) = \ln\left(\frac{1}{1+\exp(-x)}\right)
+    \]}
+  %
+  \fitem{real}{log1m\_inv\_logit}{real \farg{x}}{
+    Returns the natural logarithm of 1 minus the inverse logit function of \farg{x}.
+    \[
+    \mbox{log1m\_inv\_logit}(x) = -\ln(\exp(x)+1)
+    \]}
+  %
 \end{description}
 
 
