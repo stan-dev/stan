@@ -28,6 +28,23 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \cosh x = \sinh x\f$.
      *
+     *
+       \f[
+       \mbox{cosh}(x) = 
+       \begin{cases}
+         \cosh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{cosh}(x)}{\partial x} = 
+       \begin{cases}
+         \sinh(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Variable.
      * @return Hyperbolic cosine of variable.
      */

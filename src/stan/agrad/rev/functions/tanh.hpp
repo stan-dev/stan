@@ -28,6 +28,23 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \tanh x = \frac{1}{\cosh^2 x}\f$.
      *
+     *
+       \f[
+       \mbox{tanh}(x) = 
+       \begin{cases}
+         \tanh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{tanh}(x)}{\partial x} = 
+       \begin{cases}
+         \mbox{sech}^2(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Variable.
      * @return Hyperbolic tangent of variable.
      */
