@@ -1179,29 +1179,6 @@ Q(a,z)=\frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt
 \]
 
 
-\section{inv\_cloglog}\label{inv-cloglog-appendix.section}
-$\mbox{cloglog}^{-1}(y)$ is 
-the inverse of the complementary log-log function.
-%
-\[
-\mbox{cloglog}^{-1}(y)= 1 - \exp \left( - \exp(y) \right)
-\]
-%
-\[
-\frac{\partial \, \mbox{cloglog}^{-1}(y)}{\partial y} = \exp(y-\exp(y))
-\]
-
-\section{inv\_logit}\label{inv-logit-appendix.section}
-$\mbox{logit}^{-1}(y)$ is the logistic sigmoid function.
-%
-\[
-\mbox{logit}^{-1}(y) = \frac{1}{1 + \exp(-y)}
-\]
-%
-\[
-\frac{\partial \, \mbox{logit}^{-1}(y)}{\partial y} = \frac{\exp(y)}{(\exp(y)+1)^2}
-\]
-
 \section{lmgamma}\label{lmgamma-appendix.section}
 $\ln\Gamma_n(x)$ is the natural logarithm of the multinomial gamma function with \farg{n}
 dimensions.
