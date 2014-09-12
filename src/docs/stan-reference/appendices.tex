@@ -1109,16 +1109,6 @@ $\Psi(x)$ is the digamma function.
 \frac{\partial \, \Psi(x)}{\partial x} = \frac{\Gamma''(x)\Gamma(x)-(\Gamma'(x))^2}{\Gamma^2(x)}
 \]
 
-\section{erf}\label{erf-appendix.section}
-$\erf(x)$ is the error function (also known as the Gauss error function).
-%
-\[
-\erf(x)=\frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt
-\]
-%
-\[
-\frac{\partial \, \erf(x)}{\partial x} = \frac{2}{\sqrt{\pi}} e^{-x^2}
-\]
 
 \section{erfc}\label{erfc-appendix.section}
 $\erfc(x)$ is the complementary error function (also known as the Gauss complementary error function).
@@ -1214,51 +1204,7 @@ $K_v(z)$ is the bessel function of the second kind of order $v$ for positive $z$
 \frac{\partial \, K_v(z)}{\partial z} = -\frac{v}{z}K_v(z)-K_{v-1}(z)
 \]
 
-\section{owens\_t}\label{owens-t-appendix.section}
-$\mbox{owens\_t}(h,a)$ is the Owen's T
-  function for the probability of the event $X > h$ and $0<Y<aX$
-  where \farg{X} and \farg{Y} are independent standard normal random
-  variables.
-%
-\[
-\mbox{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx
-\]
-%
-\[
-\frac{\partial \, \mbox{owens\_t}(h,a)}{\partial h} = -\frac{1}{2\sqrt{2\pi}}
-	\erf\left(\frac{ha}{\sqrt{2}}\right)
-	\exp\left(-\frac{h^2}{2}\right)
-\]
-%
-\[
-\frac{\partial \, \mbox{owens\_t}(h,a)}{\partial a} = \frac{\exp\left(-\frac{1}{2}h^2(1+a^2)\right)}{2\pi (1+a^2)}
-\]
 
-\section{Phi}\label{Phi-appendix.section}
-$\Phi(x)$ is the unit normal cumulative distribution function.
-%
-\[
-\Phi(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
-\]
-%
-\[
-\frac{\partial \, \Phi(x)}{\partial x} = \frac{e^{-x^2/2}}{\sqrt{2\pi}}
-\]
-
-\section{Phi\_approx}\label{Phi-approx-appendix.section}
-$\Phi_{\mbox{\footnotesize approx}}(x)$ is the fast approximation of the 
-unit normal cumulative distribution function.
-%
-\[
-\Phi_{\mbox{\footnotesize approx}}(x) = \mbox{logit}^{-1}(0.07056 \,
-x^3 + 1.5976 \, x)
-\]
-%
-\[
-\frac{\partial \, \Phi_{\mbox{\footnotesize approx}}(x)}{\partial x}
-	= -\Phi_{\mbox{\footnotesize approx}}^2(x)
-		e^{-0.07056x^3 - 1.5976x}(-0.21168x^2-1.5976)
-\]
 
 \section{rising\_factorial}\label{rising-factorial-appendix.section}
 $x^{(n)}$ is the rising factorial function for positive $x$ and real $n$.

@@ -1069,166 +1069,54 @@ commonly used as a link function (see \refsection{Phi-function}).
 \section{Probability-Related Functions}\label{Phi-function.section}
 %
 \begin{description}
-%
-\fitem{real}{erf}{real \farg{x}}{
-The error function of \farg{x}.
-\[
-\mbox{erf}(x) = 
-\begin{cases}
-  \erf(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{erf}(x)}{\partial x} = 
-\begin{cases}
-  \frac{\partial\, \erf(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-See \refsection{erf-appendix} for definition of 
-$\erf(x)$ and $\frac{\partial\,\erf(x)}{\partial x}$.
-}
-%
-\fitem{real}{erfc}{real \farg{x}}{
-The complementary error function of \farg{x}.
-\[
-\mbox{erfc}(x) = 
-\begin{cases}
-  \erfc(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{erfc}(x)}{\partial x} = 
-\begin{cases}
-  \frac{\partial\, \erfc(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-See \refsection{erfc-appendix} for definition of 
-$\erfc(x)$ and $\frac{\partial\,\erfc(x)}{\partial x}$.
-}
-%
-\fitemindexsort{real}{Phi}{real \farg{x}}{
-The unit normal cumulative distribution function of \farg{x}.
-%
-\[
-\mbox{Phi}(x) = 
-\begin{cases}
-  0 & \mbox{if } x < -37.5 \\
-  \Phi(x) & \mbox{if } -37.5 \leq x \leq 8.25 \\
-  1 & \mbox{if } x > 8.25 \\[6pt]
-  \textrm{error} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{Phi}(x)}{\partial x} = 
-\begin{cases}
-  0 & \mbox{if } x < -27.5 \\
-  \frac{\partial\,\Phi(x)}{\partial x} & \mbox{if } -27.5 \leq x \leq 27.5 \\
-  0 & \mbox{if } x > 27.5 \\[6pt]
-  \textrm{error} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-See \refsection{Phi-appendix} for definition of $\Phi(x)$ and
-$\frac{\partial\,\Phi(x)}{\partial x}$.
-%
-}{Phi}{phi}
-%
-\fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
-Fast approximation of the unit normal cumulative distribution function of \farg{x}. 
-This approximation has a maximum absolute error of 0.00014 and may
-be used instead of \code{Phi} for probit regression.  See
-\citep{BowlingEtAl:2009} for details.  
+  %
+  \fitem{real}{erf}{real \farg{x}}{
+    Returns the error function, also known as the Gauss error function, of \farg{x}.
+    \[
+    \mbox{erf}(x) = \frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt
+    \]}
+  %
+  \fitem{real}{erfc}{real \farg{x}}{
+    Returns the complementary error function of \farg{x}.
+    \[
+    \mbox{erfc}(x) = \frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
+    \]}
+  %
+  \fitemindexsort{real}{Phi}{real \farg{x}}{
+    Returns the unit normal cumulative distribution function of \farg{x}.
+    \[
+    \mbox{Phi}(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
+    \]}{Phi}{phi}
+  %
+  \fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
+    Returns a fast approximation of the unit normal cumulative distribution 
+    function of \farg{x}. This approximation has a maximum absolute error 
+    of 0.00014 and may be used instead of \code{Phi} for probit regression.  See
+    \citep{BowlingEtAl:2009} for details.  
 
-\[
-\mbox{Phi\_approx}(x) = 
-\begin{cases}
-  \Phi_{\mbox{\footnotesize approx}}(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{Phi\_approx}(x)}{\partial x} = 
-\begin{cases}
-  \frac{\partial\,\Phi_{\mbox{\footnotesize approx}}(x)}{\partial x} 
-  	& \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-See \refsection{Phi-approx-appendix} for definition of 
-$\Phi_{\mbox{\footnotesize approx}}(x)$ and
-$\frac{\partial\,\Phi_{\mbox{\footnotesize approx}}(x)}{\partial x}$.
-}{Phi\_approx}{phi\_approx}
-
-\fitem{real}{binary\_log\_loss}{int \farg{y}, real \farg{y\_hat}}{
-The log loss of predicting probability \farg{y\_hat} for 
-binary outcome \farg{y}\,;
-
-The log loss function for predicting $\hat{y} \in [0,1]$ for 
-boolean outcome $y \in \setlist{0,1}$.
-\[
-\mbox{binary\_log\_loss}(y,\hat{y}) = 
-\begin{cases}
-  y \log \hat{y} + (1 - y) \log (1 - \hat{y}) & \mbox{if } 0\leq \hat{y}\leq 1, 
-  	y\in\setlist{0,1}\\[6pt]
-  \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{binary\_log\_loss}(y,\hat{y})}{\partial \hat{y}} = 
-\begin{cases}
-  \frac{y}{\hat{y}}-\frac{1-y}{1-\hat{y}} & \mbox{if } 0\leq \hat{y}\leq 1, 
-  	y\in\setlist{0,1}\\[6pt]
-  \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-
-\fitem{real}{owens\_t}{real \farg{h}, real \farg{a}}{The Owen's T
-  function for the probability of the event $X > h$ and $0<Y<aX$
-  where \farg{X} and \farg{Y} are independent standard normal random
-  variables.
-\[
-\mbox{owens\_t}(h,a) = 
-\begin{cases}
-  \mbox{owens\_t}(h,a) & \mbox{if } -\infty\leq h,a \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } h = \textrm{NaN or } a = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{owens\_t}(h,a)}{\partial h} = 
-\begin{cases}
-  \frac{\partial\, \mbox{owens\_t}(h,a)}{\partial h} & \mbox{if } -\infty\leq h,a\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } h = \textrm{NaN or } a = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{owens\_t}(h,a)}{\partial a} = 
-\begin{cases}
-  \frac{\partial\, \mbox{owens\_t}(h,a)}{\partial a} & \mbox{if } -\infty\leq h,a\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } h = \textrm{NaN or } a = \textrm{NaN}
-\end{cases}
-\]
-%
-See \refsection{owens-t-appendix} for definition of 
-$\mbox{owens\_t}(h,a)$, $\frac{\partial\,\mbox{owens\_t}(h,a)}{\partial h}$,
- and $\frac{\partial\,\mbox{owens\_t}(h,a)}{\partial a}$.
-}
+    \[
+    \mbox{Phi\_approx}(x) = \mbox{logit}^{-1}(0.07056 \, x^3 + 1.5976 \, x)
+    \]}{Phi\_approx}{phi\_approx}
+  %
+  \fitem{real}{binary\_log\_loss}{int \farg{y}, real \farg{y\_hat}}{
+    Returns the log loss function for for predicting $\hat{y} \in [0,1]$ for 
+    boolean outcome $y \in \setlist{0,1}$.
+    \[
+    \mbox{binary\_log\_loss}(y,\hat{y}) = 
+    \begin{cases}
+      -\log \hat{y}       & \mbox{if } y = 0\\
+      -\log (1 - \hat{y}) & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{owens\_t}{real \farg{h}, real \farg{a}}{
+    Returns the Owen's T function for the probability of the event $X > h$ 
+    and $0<Y<aX$ where \farg{X} and \farg{Y} are independent standard 
+    normal random variables.
+    \[
+    \mbox{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx
+    \]}
+  %
 \end{description}
 
 
