@@ -812,262 +812,100 @@ of these in the future, but as of now, there is no good workaround.
 \section{Power and Logarithm Functions}
 %
 \begin{description}
-%
-\fitem{real}{sqrt}{real \farg{x}}{
-The square root of \farg{x}.
-\[
-\mbox{sqrt}(x) = 
-\begin{cases}
-  \textrm{NaN} & x < 0 \\
-  \sqrt{x} & \mbox{if } x\geq 0\\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{sqrt}(x)}{\partial x} = 
-\begin{cases}
-  \textrm{NaN} & x < 0 \\
-  \frac{1}{2\sqrt{x}} & x\geq 0\\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{cbrt}{real \farg{x}}{
-The cube root of \farg{x}
-\[
-\mbox{cbrt}(x) = 
-\begin{cases}
-  \sqrt[3]{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{cbrt}(x)}{\partial x} = 
-\begin{cases}
-  \frac{1}{3x^{2/3}} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{square}{real \farg{x}}{
-The square of \farg{x}.
-\[
-\mbox{square}(x) = 
-\begin{cases}
-  x^2 & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{square}(x)}{\partial x} = 
-\begin{cases}
-  2x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{exp}{real \farg{x}}{
-The natural exponential of \farg{x}.
-\[
-\mbox{exp}(x) = 
-\begin{cases}
-  e^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{exp}(x)}{\partial x} = 
-\begin{cases}
-  e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{exp2}{real \farg{x}}{
-The base-2 exponential of \farg{x}.
-\[
-\mbox{exp2}(x) = 
-\begin{cases}
-  2^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{exp2}(x)}{\partial x} = 
-\begin{cases}
-  2^x\ln2 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{log}{real \farg{x}}{
-The natural logarithm of \farg{x}.
-\[
-\mbox{log}(x) = 
-\begin{cases}
-  \textrm{NaN} & \mbox{if } x < 0\\
-  \ln(x) & \mbox{if } x \geq 0 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log}(x)}{\partial x} = 
-\begin{cases}
-  \textrm{NaN} & \mbox{if } x < 0\\
-  \frac{1}{x} & \mbox{if } x\geq 0 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{log2}{real \farg{x}}{
-The base-2 logarithm of \farg{x}.
-\[
-\mbox{log2}(x) = 
-\begin{cases}
-  \textrm{NaN} & \mbox{if } x < 0 \\
-  \log_2(x) & \mbox{if } x\geq 0 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log2}(x)}{\partial x} = 
-\begin{cases}
-  \textrm{NaN} & \mbox{if } x < 0 \\
-  \frac{1}{x\ln2} & \mbox{if } x\geq 0 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{log10}{real \farg{x}}{
-The base-10 logarithm of \farg{x}.
-\[
-\mbox{log10}(x) = 
-\begin{cases}
-  \textrm{NaN} & \mbox{if } x < 0\\
-  \log_{10}(x) & \mbox{if } x \geq 0 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{log10}(x)}{\partial x} = 
-\begin{cases}
-  \textrm{NaN} & \mbox{if } x < 0\\
-  \frac{1}{x \ln10} & \mbox{if } x\geq 0 \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{pow}{real \farg{x}, real \farg{y}}{
-\farg{x} raised to the power of \farg{y}.
-\[
-\mbox{pow}(x,y) = 
-\begin{cases}
-  x^y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{pow}(x,y)}{\partial x} = 
-\begin{cases}
-  yx^{y-1} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{pow}(x,y)}{\partial y} = 
-\begin{cases}
-  x^y\ln x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-}
-%
-\fitem{real}{inv}{real \farg{x}}{
-The inverse of \farg{x}.
-\[
-\mbox{inv}(x) = 
-\begin{cases}
-  \frac{1}{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{inv}(x)}{\partial x} = 
-\begin{cases}
-  -\frac{1}{x^2} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{inv\_sqrt}{real \farg{x}}{
-The inverse of the square root of \farg{x}.
-\[
-\mbox{inv\_sqrt}(x) = 
-\begin{cases}
-  \frac{1}{\sqrt{x}} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{inv\_sqrt}(x)}{\partial x} = 
-\begin{cases}
-  -\frac{1}{2\sqrt{x^3}} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
-\fitem{real}{inv\_square}{real \farg{x}}{
-The inverse of the square of \farg{x}.
-\[
-\mbox{inv\_square}(x) = 
-\begin{cases}
-  \frac{1}{x^2} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{inv\_square}(x)}{\partial x} = 
-\begin{cases}
-  -\frac{2}{x^3} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-}
-%
+  %
+  \fitem{real}{sqrt}{real \farg{x}}{
+    Returns the square root of \farg{x}.
+    \[
+    \mbox{sqrt}(x) = 
+    \begin{cases}
+      \sqrt{x} & \mbox{if } x\geq 0\\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{cbrt}{real \farg{x}}{
+    Returns the cube root of \farg{x}
+    \[
+    \mbox{cbrt}(x) = \sqrt[3]{x}
+    \]}
+  %
+  \fitem{real}{square}{real \farg{x}}{
+    Returns the square of \farg{x}.
+    \[
+    \mbox{square}(x) = x^2
+    \]}
+  %
+  \fitem{real}{exp}{real \farg{x}}{
+    Returns the natural exponential of \farg{x}.
+    \[
+    \mbox{exp}(x) = 
+    e^x
+    \]}
+  %
+  \fitem{real}{exp2}{real \farg{x}}{
+    Returns the base-2 exponential of \farg{x}.
+    \[
+    \mbox{exp2}(x) = 2^x
+    \]}
+  %
+  \fitem{real}{log}{real \farg{x}}{
+    Returns the natural logarithm of \farg{x}.
+    \[
+    \mbox{log}(x) = 
+    \begin{cases}
+      \ln(x) & \mbox{if } x \geq 0 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{log2}{real \farg{x}}{
+    Returns the base-2 logarithm of \farg{x}.
+    \[
+    \mbox{log2}(x) = 
+    \begin{cases}
+      \log_2(x) & \mbox{if } x\geq 0 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{log10}{real \farg{x}}{
+    Returns the base-10 logarithm of \farg{x}.
+    \[
+    \mbox{log10}(x) = 
+    \begin{cases}
+      \log_{10}(x) & \mbox{if } x \geq 0 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{pow}{real \farg{x}, real \farg{y}}{
+    Returns \farg{x} raised to the power of \farg{y}.
+    \[
+    \mbox{pow}(x,y) = x^y
+    \]}
+  %
+  \fitem{real}{inv}{real \farg{x}}{
+    Returns the inverse of \farg{x}.
+    \[
+    \mbox{inv}(x) = \frac{1}{x}
+    \]}    
+  %
+  \fitem{real}{inv\_sqrt}{real \farg{x}}{
+    Returns the inverse of the square root of \farg{x}.
+    \[
+    \mbox{inv\_sqrt}(x) = 
+    \begin{cases}
+      \frac{1}{\sqrt{x}} & \mbox{if } x \geq 0 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{inv\_square}{real \farg{x}}{
+    Returns the inverse of the square of \farg{x}.
+    \[
+    \mbox{inv\_square}(x) = \frac{1}{x^2}
+    \]}
+  %
 \end{description}
 
 
