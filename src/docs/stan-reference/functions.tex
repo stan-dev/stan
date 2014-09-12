@@ -398,6 +398,7 @@ floating-point comparisons.  Comparing an integer and real value is
 carried out by first promoting the integer value.
 %
 \begin{description}
+  %
   \fitemnobody{int}{operator<}{int \farg{x}, int \farg{y}}
   \fitem{int}{operator<}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is less than \farg{y} and 0 otherwise.
@@ -481,6 +482,7 @@ tightly than the comparisons.  Thus an expression such as
 \code{(a~<~b)~||~(((c~>=~d)~\&\&~(e~!=~f)))}.
 %
 \begin{description}
+  %
   \fitemindexnobody{int}{operator!}{int \farg{x}}{operator"!}
   \fitemindex{int}{operator!}{real \farg{x}}{
     Returns 1 if \farg{x} is zero and 0 otherwise.
@@ -514,6 +516,7 @@ tightly than the comparisons.  Thus an expression such as
     \end{cases}
     \]
   }{operator"|"|}
+  %
 \end{description}
 
 
@@ -538,6 +541,7 @@ The logical functions introduce conditional behavior functionally and
 are primarily provided for compatibility with BUGS and JAGS.
 %
 \begin{description}
+  %
   \fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
     Returns \farg{x} if \farg{cond} is non-zero and \farg{y} otherwise.
     Unlike the ternary operator in \Cpp, Stan's \code{if\_else} function 
@@ -559,6 +563,7 @@ are primarily provided for compatibility with BUGS and JAGS.
       0 & \mbox{otherwise}
     \end{cases}
     \]}
+  %
 \end{description}
 
 The log probability function and gradient evaluations are more
@@ -618,157 +623,48 @@ as \code{x~+~y} and \code{-x}, respectively.
 \subsection{Binary Infix Operators}
 
 \begin{description}
-%
-\fitem{real}{operator+}{real \farg{x}, real \farg{y}}{
-The sum of the addends \farg{x} and \farg{y}.
-\[
-\mbox{opreator+}(x,y) = 
-\begin{cases}
-  x+y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{opreator+}(x,y)}{\partial x} = 
-\begin{cases}
-  1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{opreator+}(x,y)}{\partial y} = 
-\begin{cases}
-  1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-}
-%
-\fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
-The difference between the minuend \farg{x} and subtrahend \farg{y}.
-\[
-\mbox{opreator-}(x,y) = 
-\begin{cases}
-  x-y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{opreator-}(x,y)}{\partial x} = 
-\begin{cases}
-  1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{opreator-}(x,y)}{\partial y} = 
-\begin{cases}
-  -1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-}
-%
-\fitem{real}{operator*}{real \farg{x}, real \farg{y}}{
-The product of the factors \farg{x} and \farg{y}.
-\[
-\mbox{opreator*}(x,y) = 
-\begin{cases}
-  xy & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{opreator*}(x,y)}{\partial x} = 
-\begin{cases}
-  y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{opreator*}(x,y)}{\partial y} = 
-\begin{cases}
-  x & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-}
-%
-\fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
-The quotient of the dividend \farg{x} and divisor \farg{y}.
-\[
-\mbox{opreator/}(x,y) = 
-\begin{cases}
-  \frac{x}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{opreator/}(x,y)}{\partial x} = 
-\begin{cases}
-  \frac{1}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{opreator/}(x,y)}{\partial y} = 
-\begin{cases}
-  -\frac{x}{y^2} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
-\end{cases}
-\]
-}
-%
+  %
+  \fitem{real}{operator+}{real \farg{x}, real \farg{y}}{
+    Returns the sum of \farg{x} and \farg{y}.
+    \[
+    \mbox{operator+}(x,y) = x+y
+    \]}
+  %
+  \fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
+    Returns the difference between \farg{x} and \farg{y}.
+    \[
+    \mbox{operator-}(x,y) = x - y
+    \]}
+  %
+  \fitem{real}{operator*}{real \farg{x}, real \farg{y}}{
+    Returns the product of \farg{x} and \farg{y}.
+    \[
+    \mbox{operator*}(x,y) = xy
+    \]}
+  %
+  \fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
+    Returns the quotient of \farg{x} and \farg{y}.
+    \[
+    \mbox{operator/}(x,y) = \frac{x}{y}
+    \]}
+  %
 \end{description}
 
 \subsection{Unary Prefix Operators}
 
 \begin{description}
-\fitem{real}{operator-}{real \farg{x}}{
-The negation of the subtrahend \farg{x}.
-\[
-\mbox{operator-}(x) = 
-\begin{cases}
-  -x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{operator-}(x)}{\partial x} = 
-\begin{cases}
-  -1 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-}
-
-\fitem{real}{operator+}{real \farg{x}}{
-This is a no-op.
-\[
-\mbox{operator+}(x) = 
-\begin{cases}
-  x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-%
-\[
-\frac{\partial\,\mbox{operator+}(x)}{\partial x} = 
-\begin{cases}
-  1 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
-  \textrm{NaN} & \mbox{if } x = \textrm{NaN}
-\end{cases}
-\]
-}
+  %
+  \fitem{real}{operator-}{real \farg{x}}{
+    Returns the negation of the subtrahend \farg{x}.
+    \[
+    \mbox{operator-}(x) = -x
+    \]}
+  %
+  \fitem{real}{operator+}{real \farg{x}}{
+    Returns the value of \farg{x}.
+    \[
+    \mbox{operator+}(x) = x
+    \]}
 \end{description}
 
 
