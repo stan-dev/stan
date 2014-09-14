@@ -267,6 +267,8 @@ This is a no-op.}
 %
 \end{description}
 %
+See the warning in \refsection{step-functions} about the dangers of
+step functions applied to anything other than data.
 
 \section{Bound Functions}
 %
@@ -500,7 +502,7 @@ tightly than the comparisons.  Thus an expression such as
     \[
     \mbox{operator\&\&}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x,y \neq 0 \\
+      1 & \mbox{if } x \neq 0 \mbox{ and } y \neq 0\\
       0 & \mbox{otherwise}
     \end{cases}
     \]}
@@ -522,17 +524,19 @@ tightly than the comparisons.  Thus an expression such as
 
 \subsubsection{Boolean Operator Short Circuiting}
 
-{\it Warning:} \ As of Stan 2.4.0, the boolean operators do {\it not}
+{\it Warning:} As of Stan 2.5.0, the boolean operators do {\it not}
 short circuit.  This is a known bug and will be fixed in a future
-release.  The intended behavior in the future is as described below.
+release.
 
-Like in \Cpp, the boolean operators are implemented to short circuit
-directly to a return value after evaluating the first argument if it
-is sufficient to resolve the result.  In evaluating \code{a~||~b}, if
-\code{a} evaluates to a value other than zero, the expression returns
-the value 1 without evaluating the expression \code{b}.  Similarly,
-evaluating \code{a~\&\&~b} first evaluates \code{a}, and if the result
-is zero, returns 0 without evaluating \code{b}.
+% Here's the text to use in the future:
+% The intended behavior in the future is as described below.
+% Like in \Cpp, the boolean operators are implemented to short circuit
+% directly to a return value after evaluating the first argument if it
+% is sufficient to resolve the result.  In evaluating \code{a~||~b}, if
+% \code{a} evaluates to a value other than zero, the expression returns
+% the value 1 without evaluating the expression \code{b}.  Similarly,
+% evaluating \code{a~\&\&~b} first evaluates \code{a}, and if the result
+% is zero, returns 0 without evaluating \code{b}.
 
 
 \subsection{Logical Functions}
@@ -544,7 +548,7 @@ are primarily provided for compatibility with BUGS and JAGS.
   %
   \fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
     Returns \farg{x} if \farg{cond} is non-zero and \farg{y} otherwise.
-    Unlike the ternary operator in \Cpp, Stan's \code{if\_else} function 
+    Stan's \code{if\_else} function does not short circuit---it
     always evaluates both arguments \farg{x} and \farg{y}.
     \[
     \mbox{if\_else}(cond,x,y) = 
@@ -565,6 +569,10 @@ are primarily provided for compatibility with BUGS and JAGS.
     \]}
   %
 \end{description}
+
+
+See the warning in \refsection{step-functions} about step-like
+functions applied to expressions dependent on parameters.
 
 The log probability function and gradient evaluations are more
 efficient in Stan when implemented using conditional statements.  If
@@ -749,8 +757,9 @@ as \code{x~+~y} and \code{-x}, respectively.
     Returns the real value remainder after dividing \farg{x} by \farg{y}\,;
     see warning at start of \refsection{step-functions}.
     \[
-    \mbox{fmod}(x,y) = x - \lfloor \frac{x}{y}\rfloor \, y
-    \]}
+    \mbox{fmod}(x,y) = x - \left\lfloor \frac{x}{y} \right\rfloor \, y
+    \]
+  The operator $\lfloor u \rfloor$ is the floor operation; see below.}
   %
 \end{description}
 
@@ -804,7 +813,8 @@ of these in the future, but as of now, there is no good workaround.
     see warning at start of \refsection{step-functions}.
     \[
     \mbox{trunc}(x) = \lfloor x \rfloor
-    \]}
+    \]
+  Note that this function is redundant with \code{floor}.}
   %
 \end{description}
 
@@ -853,7 +863,7 @@ of these in the future, but as of now, there is no good workaround.
     \[
     \mbox{log}(x) = 
     \begin{cases}
-      \ln(x) & \mbox{if } x \geq 0 \\
+      \log_{e}(x) & \mbox{if } x \geq 0 \\
       \textrm{NaN} & \mbox{otherwise}
     \end{cases}
     \]}
@@ -1031,7 +1041,7 @@ of these in the future, but as of now, there is no good workaround.
 \end{description}
 
 
-\section{Link Functions}
+\section{Link Functions}\label{link-functions.section}
 
 The following functions are commonly used as link functions in
 generalized linear models (see
@@ -1045,7 +1055,7 @@ commonly used as a link function (see \refsection{Phi-function}).
     \[
     \mbox{logit}(x) = 
     \begin{cases}
-      \ln\frac{x}{1-x} & \mbox{if } 0\leq x \leq 1 \\
+      \log\frac{x}{1-x} & \mbox{if } 0\leq x \leq 1 \\
       \textrm{NaN}& \mbox{otherwise}
     \end{cases}
     \]}
@@ -1060,13 +1070,20 @@ commonly used as a link function (see \refsection{Phi-function}).
     Returns the inverse of the complementary log-log function 
     applied to \farg{y}.
     \[
-    \mbox{inv\_cloglog}(y) = 1 - \exp \left( - \exp(y) \right)
+    \mbox{inv\_cloglog}(y) = 1 - \exp \! \left( - \exp(y) \right)
     \]}
   %
 \end{description}
 
 
 \section{Probability-Related Functions}\label{Phi-function.section}
+
+\subsection{Normal Cumulative Distribution Functions}
+
+The error function erf is related to the unit normal cumulative
+distribution function $\Phi$ by scaling.  See
+\refsection{normal-distribution} for the general normal cumulative
+distribution function (and its complement).
 %
 \begin{description}
   %
@@ -1097,6 +1114,11 @@ commonly used as a link function (see \refsection{Phi-function}).
     \[
     \mbox{Phi\_approx}(x) = \mbox{logit}^{-1}(0.07056 \, x^3 + 1.5976 \, x)
     \]}{Phi\_approx}{phi\_approx}
+\end{description}
+
+\subsection{Other Probability-Related Functions}
+
+\begin{description}
   %
   \fitem{real}{binary\_log\_loss}{int \farg{y}, real \farg{y\_hat}}{
     Returns the log loss function for for predicting $\hat{y} \in [0,1]$ for 
@@ -1158,7 +1180,7 @@ commonly used as a link function (see \refsection{Phi-function}).
     \[
     \mbox{lgamma}(x) = 
     \begin{cases}
-      \ln\Gamma(x)   & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
+      \log\Gamma(x)   & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
       \textrm{error} & \mbox{otherwise}
     \end{cases}
     \]
@@ -1225,12 +1247,13 @@ commonly used as a link function (see \refsection{Phi-function}).
     Returns the natural logarithm of the binomial coefficient of
     \farg{x} and \farg{y}. For non-negative integer inputs, the 
     binomial coefficient function is written as
-    $\binom{x}{y}$ and pronounced ``\farg{x} choose \farg{y}.''
+    $\binom{x}{y}$ and pronounced ``\farg{x} choose \farg{y}.''  This
+    function generalizes to real numbers using the gamma function.
 
     For $0 \leq y \leq x$,
     \[
     \mbox{binomial\_coefficient\_log}(x,y)
-    = \ln\Gamma(x+1) - \ln\Gamma(y+1) - \ln\Gamma(x-y+1)
+    = \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1)
     \]}
   %
   \fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{x}}{
@@ -1315,7 +1338,7 @@ commonly used as a link function (see \refsection{Phi-function}).
     \[
     \mbox{log\_falling\_factorial}(x,n) = 
     \begin{cases}
-      \ln (x)_n      & \mbox{if } x > 0 \\
+      \log (x)_n      & \mbox{if } x > 0 \\
       \textrm{error} & \mbox{if } x \leq 0
     \end{cases}
     \]}
@@ -1341,7 +1364,7 @@ commonly used as a link function (see \refsection{Phi-function}).
     \[
     \mbox{log\_rising\_factorial}(x,n) = 
     \begin{cases}
-      \ln x^{(n)}     & \mbox{if } x > 0 \\
+      \log x^{(n)}     & \mbox{if } x > 0 \\
       \textrm{error} & \mbox{if } x \leq 0
     \end{cases}
     \]}
@@ -1376,7 +1399,8 @@ using more basic \Stan functions.
     \mbox{multiply\_log}(x,y) = 
     \begin{cases}
       0 & \mbox{if } x=y=0 \\
-      x\ln y & \mbox{if } x,y \neq 0 
+      x\log y & \mbox{if } x, y \neq 0 \\
+      \mbox{NaN} & \mbox{otherwise}
     \end{cases}
     \]}
   %
@@ -1385,7 +1409,7 @@ using more basic \Stan functions.
     \[
     \mbox{log1p}(x) = 
     \begin{cases}
-      \ln(1+x)& \mbox{if } x\geq -1 \\
+      \log(1+x)& \mbox{if } x\geq -1 \\
       \textrm{NaN} & \mbox{otherwise}
     \end{cases}
     \]}
@@ -1395,7 +1419,7 @@ using more basic \Stan functions.
     \[
     \mbox{log1m}(x) = 
     \begin{cases}
-      \ln(1-x) & \mbox{if } x \leq 1 \\
+      \log(1-x) & \mbox{if } x \leq 1 \\
       \textrm{NaN} & \mbox{otherwise}
     \end{cases}
     \]}
@@ -1404,7 +1428,7 @@ using more basic \Stan functions.
     Returns the natural logarithm of one plus the natural exponentiation 
     of \farg{x}.
     \[
-    \mbox{log1p\_exp}(x) = \ln(1+\exp(x))
+    \mbox{log1p\_exp}(x) = \log(1+\exp(x))
     \]}
   %
   \fitem{real}{log1m\_exp}{real \farg{x}}{ 
@@ -1413,7 +1437,7 @@ using more basic \Stan functions.
     \[
     \mbox{log1m\_exp}(x) = 
     \begin{cases}
-      \ln(1-\exp(x)) & \mbox{if } x < 0 \\
+      \log(1-\exp(x)) & \mbox{if } x < 0 \\
       \textrm{NaN} & \mbox{if } x \geq 0 
     \end{cases}
     \]}
@@ -1424,7 +1448,7 @@ using more basic \Stan functions.
     \[
     \mbox{log\_diff\_exp}(x,y) = 
     \begin{cases}
-      \ln(\exp(x)-\exp(y)) & \mbox{if } x > y \\[6pt]
+      \log(\exp(x)-\exp(y)) & \mbox{if } x > y \\[6pt]
       \textrm{NaN} & \mbox{otherwise}
     \end{cases}
     \]}
@@ -1433,20 +1457,22 @@ using more basic \Stan functions.
     Returns the natural logarithm of the sum of the natural exponentiation
     of \farg{x} and the natural exponentiation of \farg{y}.
     \[
-    \mbox{log\_sum\_exp}(x,y) = \ln(\exp(x)+\exp(y)) 
+    \mbox{log\_sum\_exp}(x,y) = \log(\exp(x)+\exp(y)) 
     \]}
   %
   \fitem{real}{log\_inv\_logit}{real \farg{x}}{
     Returns the natural logarithm of the inverse logit function of \farg{x}.
     \[
-    \mbox{log\_inv\_logit}(x) = \ln\left(\frac{1}{1+\exp(-x)}\right)
-    \]}
+    \mbox{log\_inv\_logit}(x) = \log \, \mbox{logit}^{-1}(x)
+    \]
+  See \refsection{link-functions} for a definition of inverse logit.}
   %
   \fitem{real}{log1m\_inv\_logit}{real \farg{x}}{
     Returns the natural logarithm of 1 minus the inverse logit function of \farg{x}.
     \[
-    \mbox{log1m\_inv\_logit}(x) = -\ln(\exp(x)+1)
-    \]}
+    \mbox{log1m\_inv\_logit}(x) = \log(1 - \mbox{logit}^{-1}(x))
+    \]
+  See \refsection{link-functions} for a definition of inverse logit.}
   %
 \end{description}
 
@@ -1458,7 +1484,8 @@ using more basic \Stan functions.
 \section{Reductions}\label{array-reductions.section}
 
 The following operations take arrays as input and produce single
-output values.
+output values.  The boundary values for size 0 arrays are the unit
+with respect to the combination operation (min, max, sum, or product).
 %
 
 \subsection{Minimum and Maximum}
@@ -1495,7 +1522,8 @@ The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
 The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
 %
 \fitem{real}{log\_sum\_exp}{real \farg{x}[]}{
-The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+The natural logarithm of the sum of the exponentials of the elements
+in \farg{x}, or $-\infty$ if the array is empty.}
 \end{description}
 
 
@@ -1627,8 +1655,10 @@ reals, matrices, vectors, and row vectors.
   \farg{T} can be any Stan type with up to 8 array dimensions.}
 %
 \fitem{int}{size}{\farg{T}[] \farg{x}}{Returns the number of elements
-  in the array \farg{x};  the type of the array \farg{T} can be 
-  anything type.}
+  in the array \farg{x}; the type of the array \farg{T} can be any
+  type, but the size is just the size of the top level array, not the
+  total number of elements contained.  For example, if \code{x} is of
+  type \code{real[4,3]} then \code{size(x)} is 4.}
 \end{description}
 
 
@@ -2534,38 +2564,6 @@ Softmax is usually calculated on the log scale,
  \ = \ y - \mbox{log\_sum\_exp}(y).
 \]
 %
-The entries in the Jacobian of the softmax function are given by
-\[
-\begin{array}{l}
-\displaystyle
-\frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
-\\[8pt]
-\displaystyle
-\mbox{ } \ \ \ = \left\{ 
-\begin{array}{ll}
-\mbox{softmax}(y)[k] - \mbox{softmax}(y)[k] \times \mbox{softmax}(y)[m]
-& \mbox{ if } m = k, \mbox{ and}
-\\[6pt]
-\mbox{softmax}(y)[k] * \mbox{softmax}(y)[m]
-& \mbox{ if } m \neq k.
-\end{array}
-\right.
-\end{array}
-\]
-For the log softmax function, the entries are
-\[
-\frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
-= \left\{ 
-\begin{array}{ll}
-1 - \mbox{softmax}(y)[m]
-& \mbox{ if } m = k, \mbox{ and}
-\\[6pt]
-\mbox{softmax}(y)[m]
-& \mbox{ if } m \neq k.
-\end{array}
-\right.
-\]
-%
 Stan provides the following functions for softmax and its log.
 %
 \begin{description}
@@ -2589,24 +2587,25 @@ The natural logarithm of the softmax of \farg{x}}
 The right division of \farg{b} by \farg{A}; equivalently
 \code{\farg{b} * inverse(\farg{A})}}
 %
-\fitem{matrix}{operator/}{matrix \farg{b}, matrix \farg{A}}{
-The right division of \farg{b} by \farg{A}; equivalently
-\code{\farg{b} * inverse(\farg{A})}}
+\fitem{matrix}{operator/}{matrix \farg{B}, matrix \farg{A}}{
+The right division of \farg{B} by \farg{A}; equivalently
+\code{\farg{B} * inverse(\farg{A})}}
 %
 \fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
 The left division of \farg{b} by \farg{A}; equivalently
 \code{inverse(\farg{A}) * \farg{b}}
 %
-\fitem{matrix}{operator\textbackslash}{matrix \farg{A}, matrix \farg{b}}
-The left division of \farg{b} by \farg{A}; equivalently
-\code{inverse(\farg{A}) * \farg{b}}
+\fitem{matrix}{operator\textbackslash}{matrix \farg{A}, matrix \farg{B}}
+The left division of \farg{B} by \farg{A}; equivalently
+\code{inverse(\farg{A}) * \farg{B}}
 %
 \end{description}
 
 \subsection{Lower-Triangular Matrix-Division Functions}
 
 There are four division functions which use lower triangular views of
-a matrix.  The lower triangular view of a matrix $\mbox{tri}(A)$ is defined by
+a matrix.  The lower triangular view of a matrix $\mbox{tri}(A)$ is
+used in the definitions and defined by
 \[
 \mbox{tri}(A)[m,n] = 
 \left\{
@@ -2617,28 +2616,30 @@ A[m,n] & \mbox{if } m \geq n, \mbox{ and}
 \end{array}
 \right.
 \]
-
+When a lower triangular view of a matrix is used, the elements above
+the diagonal are ignored.
 
 \begin{description}
 %
-\fitem{row\_vector}{mdivide\_right\_tri\_low}{row\_vector \farg{b}, matrix \farg{a}}{
-The right division of \farg{b} by \code{tri(\farg{a})}, a lower triangular
-view of \farg{a}; equivalently \code{\farg{b} * inverse(tri(\farg{a}))}}
+\fitem{row\_vector}{mdivide\_right\_tri\_low}{row\_vector \farg{B}, 
+  matrix \farg{A}}{
+The right division of \farg{B} by \code{tri(\farg{A})}, a lower triangular
+view of \farg{A}; equivalently \code{\farg{B} * inverse(tri(\farg{A}))}}
 %
 %
-\fitem{matrix}{mdivide\_right\_tri\_low}{matrix \farg{b}, matrix \farg{a}}{
-The right division of \farg{b} by \code{tri(\farg{a})}, a lower triangular
-view of \farg{a}; equivalently \code{\farg{b} * inverse(tri(\farg{a}))}}
+\fitem{matrix}{mdivide\_right\_tri\_low}{matrix \farg{B}, matrix \farg{A}}{
+The right division of \farg{B} by \code{tri(\farg{A})}, a lower triangular
+view of \farg{A}; equivalently \code{\farg{B} * inverse(tri(\farg{A}))}}
 %
-\fitem{vector}{mdivide\_left\_tri\_low}{matrix \farg{a}, vector \farg{b}}
-The left division of \farg{b} by a triangular view of
-\code{tri(\farg{a})}, a lower triangular view of \farg{a}; equivalently
-\code{inverse(tri(\farg{a})) * \farg{b}}
+\fitem{vector}{mdivide\_left\_tri\_low}{matrix \farg{A}, vector \farg{B}}
+The left division of \farg{B} by a triangular view of
+\code{tri(\farg{A})}, a lower triangular view of \farg{A}; equivalently
+\code{inverse(tri(\farg{A})) * \farg{B}}
 %
-\fitem{matrix}{mdivide\_left\_tri\_low}{matrix \farg{a}, matrix \farg{b}}
-The left division of \farg{b} by a triangular view of
-\code{tri(\farg{a})}, a lower triangular view of \farg{a}; equivalently
-\code{inverse(tri(\farg{a})) * \farg{b}}
+\fitem{matrix}{mdivide\_left\_tri\_low}{matrix \farg{A}, matrix \farg{B}}
+The left division of \farg{B} by a triangular view of
+\code{tri(\farg{A})}, a lower triangular view of \farg{A}; equivalently
+\code{inverse(tri(\farg{A})) * \farg{B}}
 %
 \end{description}
 
@@ -2674,7 +2675,9 @@ The log of the absolute value of the determinant of \farg{A}}
 The inverse of \farg{A}}
 %
 \fitem{matrix}{inverse\_spd}{matrix \farg{A}}{
-The inverse of \farg{A} where A is symmetric, positive definite}
+The inverse of \farg{A} where A is symmetric, positive definite.  This
+version is faster and more arithmetically stable when the input is
+symmetric and positive definite.}
 %
 \end{description}
 
