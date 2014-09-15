@@ -5,6 +5,7 @@
 #include <stan/agrad/fwd/functions/fabs.hpp>
 #include <stan/agrad/fwd/functions/log.hpp>
 #include <stan/agrad/fwd/functions/log1m.hpp>
+#include <stan/agrad/fwd/functions/lbeta.hpp>
 #include <stan/agrad/fwd/functions/exp.hpp>
 #include <stan/agrad/fwd/operators.hpp>
 #include <stan/agrad/fwd/functions/value_of.hpp>
@@ -35,7 +36,7 @@ namespace stan {
 
       stan::agrad::fvar<T> c1 = log(z);
       stan::agrad::fvar<T> c2 = log1m(z);
-      stan::agrad::fvar<T> c3 = inc_beta(a, b, z);
+      stan::agrad::fvar<T> c3 = exp(lbeta(a,b)) * inc_beta(a, b, z);
           
       stan::agrad::fvar<T> C = exp( a * c1 + b * c2 ) / a;
           

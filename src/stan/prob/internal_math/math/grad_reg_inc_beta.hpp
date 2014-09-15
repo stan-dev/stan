@@ -5,6 +5,7 @@
 
 #include <stan/prob/internal_math/math/grad_inc_beta.hpp>
 #include <stan/prob/internal_math/math/inc_beta.hpp>
+#include <stan/math/functions/lbeta.hpp>
 
 namespace stan {
     
@@ -17,13 +18,15 @@ namespace stan {
     {
       using stan::math::inc_beta;
       using stan::math::grad_inc_beta;
+      using std::exp;
+      using stan::math::lbeta;
 
       T dBda = 0;
       T dBdb = 0;
           
       grad_inc_beta(dBda, dBdb, a, b, z);
           
-      T b1 = inc_beta(a, b, z);
+      T b1 = exp(lbeta(a,b)) * inc_beta(a, b, z);
           
       g1 = ( dBda - b1 * (digammaA - digammaSum) ) / betaAB;
       g2 = ( dBdb - b1 * (digammaB - digammaSum) ) / betaAB;

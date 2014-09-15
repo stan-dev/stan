@@ -2,6 +2,7 @@
 #define STAN__PROB__INTERNAL_MATH__MATH__GRAD_INC_BETA_HPP
 
 #include <math.h>
+#include <stan/math/functions/lbeta.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/prob/internal_math/math/inc_beta.hpp>
 #include <stan/prob/internal_math/math/grad_2F1.hpp>
@@ -18,7 +19,8 @@ namespace stan {
     {
       double c1 = std::log(z);
       double c2 = stan::math::log1m(z);
-      double c3 = stan::math::inc_beta(a, b, z);
+      double c3 = std::exp(stan::math::lbeta(a,b)) 
+        * stan::math::inc_beta(a, b, z);
           
       double C = std::exp( a * c1 + b * c2 ) / a;
           
@@ -26,7 +28,6 @@ namespace stan {
       double dF2 = 0;
           
       if(C) stan::math::grad_2F1(dF1, dF2, a + b, 1.0, a + 1, z);
-
           
       g1 = (c1 - 1.0 / a) * c3 + C * (dF1 + dF2);
       g2 = c2 * c3 + C * dF1;

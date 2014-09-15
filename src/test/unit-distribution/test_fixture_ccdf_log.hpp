@@ -135,12 +135,9 @@ public:
       EXPECT_TRUE(ccdf_log <= 0)
         << "ccdf_log value must be less than or equal to 0. ccdf_log value: " 
         << ccdf_log;
-      EXPECT_TRUE(ccdf_log <= 0)
-        << "ccdf_log value must be less than or equal to 0. ccdf_log value: "
-        << ccdf_log;
 
       if (all_scalar<T0,T1,T2,T3,T4,T5>::value) {
-        EXPECT_TRUE(expected_ccdf_log[n] - ccdf_log < 1e-8)
+        EXPECT_TRUE(abs(expected_ccdf_log[n] - ccdf_log) < 1e-8)
           << "For all scalar inputs ccdf_log should match the provided value. Failed at index: " << n;
       }
     }
@@ -218,10 +215,12 @@ public:
     }
     plus[n] += e;
     minus[n] -= e;
-    
-    double ccdf_log_plus = TestClass.ccdf_log
+
+    double ccdf_log_plus = TestClass.template ccdf_log
+      <double, double, double, double, double, double>
       (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
-    double ccdf_log_minus = TestClass.ccdf_log
+    double ccdf_log_minus = TestClass.template ccdf_log
+      <double, double, double, double, double, double>
       (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
 
     finite_diff.push_back((ccdf_log_plus - ccdf_log_minus) / e2);

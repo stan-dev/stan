@@ -2,7 +2,9 @@
 #define STAN__PROB__INTERNAL_MATH__REV__GRAD_INC_BETA_HPP
 
 #include <math.h>
+#include <stan/math/functions/lbeta.hpp>
 #include <stan/agrad/rev/functions/exp.hpp>
+#include <stan/agrad/rev/functions/lgamma.hpp>
 #include <stan/agrad/rev/functions/log.hpp>
 #include <stan/agrad/rev/functions/log1m.hpp>
 #include <stan/agrad/rev/functions/fabs.hpp>
@@ -31,7 +33,8 @@ namespace stan {
 
       stan::agrad::var c1 = stan::agrad::log(z);
       stan::agrad::var c2 = stan::agrad::log1m(z);
-      stan::agrad::var c3 = stan::agrad::inc_beta(a, b, z);
+      stan::agrad::var c3 = stan::agrad::exp(stan::math::lbeta(a,b)) 
+        * stan::agrad::inc_beta(a, b, z);
           
       stan::agrad::var C = exp( a * c1 + b * c2 ) / a;
           

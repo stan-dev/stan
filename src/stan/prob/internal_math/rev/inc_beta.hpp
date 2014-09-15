@@ -12,11 +12,11 @@
 #include <stan/agrad/rev/internal/ddv_vari.hpp>
 #include <stan/math/constants.hpp>
 
-#include <stan/prob/internal_math/math/grad_inc_beta.hpp>
-#include <stan/prob/internal_math/math/inc_beta.hpp>
+#include <stan/prob/internal_math/math/grad_reg_inc_beta.hpp>
 
-#include <stan/agrad/fwd/functions/pow.hpp>
 #include <stan/agrad/rev/functions/pow.hpp>
+#include <stan/math/functions/lbeta.hpp>
+#include <stan/math/functions/digamma.hpp>
 
 namespace stan {
   namespace agrad {
@@ -30,13 +30,21 @@ namespace stan {
                       avi,bvi,cvi) {
         }
         void chain() {
+          using stan::math::digamma;
+          using stan::math::lbeta;
+
           double d_a; double d_b;
-          stan::math::grad_inc_beta(d_a,d_b,avi_->val_,bvi_->val_,cvi_->val_);
+          stan::math::grad_reg_inc_beta(d_a,d_b,avi_->val_,bvi_->val_,
+                                        cvi_->val_,digamma(avi_->val_),
+                                        digamma(bvi_->val_),
+                                        digamma(avi_->val_ + bvi_->val_),
+                                        std::exp(lbeta(avi_->val_, bvi_->val_)));
 
           avi_->adj_ += adj_ * d_a;
           bvi_->adj_ += adj_ * d_b;
           cvi_->adj_ += adj_ * std::pow((1-cvi_->val_),bvi_->val_-1)
-            * std::pow(cvi_->val_,avi_->val_-1);
+            * std::pow(cvi_->val_,avi_->val_-1)
+            / std::exp(stan::math::lbeta(avi_->val_,bvi_->val_));
         }
       };
 

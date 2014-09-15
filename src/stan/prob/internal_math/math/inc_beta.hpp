@@ -10,8 +10,8 @@ namespace stan {
     inline double inc_beta(const double& a,
                            const double& b,
                            const double& x) {
-      using boost::math::beta;
-      return beta(a,b,x);
+      using boost::math::ibeta;
+      return ibeta(a,b,x);
     }
   }
 }
