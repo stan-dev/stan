@@ -20,6 +20,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the matrix is symmetric.
+     * @return throws if any element not on the main diagonal is NaN
      * @tparam T Type of scalar.
      */
     template <typename T_y, typename T_result>
@@ -35,7 +36,7 @@ namespace stan {
         return true;
       for (size_type m = 0; m < k; ++m) {
         for (size_type n = m + 1; n < k; ++n) {
-          if (fabs(y(m,n) - y(n,m)) > CONSTRAINT_TOLERANCE) {
+          if (!(fabs(y(m,n) - y(n,m)) <= CONSTRAINT_TOLERANCE)) {
             std::ostringstream message;
             message << name << " is not symmetric. " 
                     << name << "[" << stan::error_index::value + m << "," 

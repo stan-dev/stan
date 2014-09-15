@@ -2,6 +2,7 @@
 #include <stan/agrad/rev/functions/log1m.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,log1m) {
   AVAR a = 0.1;
@@ -17,4 +18,17 @@ TEST(AgradRev,log1mErr) {
   AVAR a = 10;
   AVAR f = log1m(a);
   EXPECT_TRUE(boost::math::isnan(f.val()));
+}
+
+struct log1m_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return log1m(arg1);
+  }
+};
+
+TEST(AgradRev,log1m_NaN) {
+  log1m_fun log1m_;
+  test_nan(log1m_,false,true);
 }

@@ -38,3 +38,21 @@ TEST(MathErrorHandlingMatrix, CheckCorrMatrix_one_indexed_message) {
   EXPECT_EQ(std::string::npos, message.find("(0,0)"))
     << message;
 }
+
+TEST(MathErrorHandlingMatrix, CheckCorrMatrix_nan) {
+  double result;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y;
+  y.resize(2,2);
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  for (int i = 0; i < y.size(); i++) {
+    y << 1, 0, 0, 1;
+    y(i) = nan;
+    EXPECT_THROW(check_corr_matrix("test(%1%)", y, "y", &result), std::domain_error);
+
+    y << 10, 0, 0, 10;
+    y(i) = nan;
+    EXPECT_THROW(check_corr_matrix("test(%1%)", y, "y", &result), 
+                 std::domain_error);
+  }
+}

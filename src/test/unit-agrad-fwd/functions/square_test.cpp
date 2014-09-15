@@ -3,6 +3,7 @@
 #include <stan/math/functions/square.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdSquare, Fvar) {
   using stan::agrad::fvar;
@@ -175,4 +176,17 @@ TEST(AgradFwdSquare, FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(0, g[0]);
+}
+
+struct square_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return square(arg1);
+  }
+};
+
+TEST(AgradFwdSquare,square_NaN) {
+  square_fun square_;
+  test_nan(square_,false);
 }

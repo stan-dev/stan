@@ -2,6 +2,8 @@
 #define STAN__AGRAD__FWD__FVAR__HPP
 
 #include <ostream>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
 
@@ -20,11 +22,17 @@ namespace stan {
 
       // TV and TD must be assignable to T
       template <typename TV, typename TD>
-      fvar(const TV& val, const TD& deriv) : val_(val), d_(deriv) {  }
+      fvar(const TV& val, const TD& deriv) : val_(val), d_(deriv) { 
+        if (unlikely(boost::math::isnan(val)))
+          d_ = val;
+      }
 
       // TV must be assignable to T
       template <typename TV>
-      fvar(const TV& val) : val_(val), d_(0.0) {  }
+      fvar(const TV& val) : val_(val), d_(0.0) {
+        if (unlikely(boost::math::isnan(val)))
+          d_ = val;
+      }
       
       fvar() : val_(0.0), d_(0.0) { }
 

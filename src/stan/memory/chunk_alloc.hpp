@@ -12,6 +12,7 @@
 #endif
 #include <vector>
 #include <stan/memory/stack_alloc.hpp>
+#include <stan/meta/likely.hpp>
 
 #define DEFAULT_INITIAL_NCHUNKS (1 << 8)
  
