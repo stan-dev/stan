@@ -27,6 +27,23 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \cos x = - \sin x\f$.
      *
+     *
+       \f[
+       \mbox{cos}(x) = 
+       \begin{cases}
+         \cos(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{cos}(x)}{\partial x} = 
+       \begin{cases}
+         -\sin(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Variable for radians of angle.
      * @return Cosine of variable. 
      */

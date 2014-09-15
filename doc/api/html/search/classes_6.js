@@ -1,9 +1,0 @@
-var searchData=
-[
-  ['general_5fmatrix_5fmatrix_5fproduct_3c_20index_2c_20stan_3a_3aagrad_3a_3avar_2c_20lhsstorageorder_2c_20conjugatelhs_2c_20stan_3a_3aagrad_3a_3avar_2c_20rhsstorageorder_2c_20conjugaterhs_2c_20colmajor_20_3e',['general_matrix_matrix_product&lt; Index, stan::agrad::var, LhsStorageOrder, ConjugateLhs, stan::agrad::var, RhsStorageOrder, ConjugateRhs, ColMajor &gt;',['../struct_eigen_1_1internal_1_1general__matrix__matrix__product_3_01_index_00_01stan_1_1agrad_1_1va9b485de9571b6e46d7a64aff43a6d9d3.html',1,'Eigen::internal']]],
-  ['general_5fmatrix_5fvector_5fproduct_3c_20index_2c_20stan_3a_3aagrad_3a_3avar_2c_20colmajor_2c_20conjugatelhs_2c_20stan_3a_3aagrad_3a_3avar_2c_20conjugaterhs_20_3e',['general_matrix_vector_product&lt; Index, stan::agrad::var, ColMajor, ConjugateLhs, stan::agrad::var, ConjugateRhs &gt;',['../struct_eigen_1_1internal_1_1general__matrix__vector__product_3_01_index_00_01stan_1_1agrad_1_1va44da5f98e1caea9523bacbd5bdc025fe.html',1,'Eigen::internal']]],
-  ['general_5fmatrix_5fvector_5fproduct_3c_20index_2c_20stan_3a_3aagrad_3a_3avar_2c_20rowmajor_2c_20conjugatelhs_2c_20stan_3a_3aagrad_3a_3avar_2c_20conjugaterhs_20_3e',['general_matrix_vector_product&lt; Index, stan::agrad::var, RowMajor, ConjugateLhs, stan::agrad::var, ConjugateRhs &gt;',['../struct_eigen_1_1internal_1_1general__matrix__vector__product_3_01_index_00_01stan_1_1agrad_1_1vacd54cabc78c49ca719650381b68b105e.html',1,'Eigen::internal']]],
-  ['generate_5finit_5fvars_5fvisgen',['generate_init_vars_visgen',['../structstan_1_1gm_1_1generate__init__vars__visgen.html',1,'stan::gm']]],
-  ['generate_5finit_5fvisgen',['generate_init_visgen',['../structstan_1_1gm_1_1generate__init__visgen.html',1,'stan::gm']]],
-  ['generate_5flocal_5fvar_5finit_5fnan_5fvisgen',['generate_local_var_init_nan_visgen',['../structstan_1_1gm_1_1generate__local__var__init__nan__visgen.html',1,'stan::gm']]]
-];
