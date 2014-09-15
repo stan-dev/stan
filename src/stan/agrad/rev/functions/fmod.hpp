@@ -72,6 +72,31 @@ namespace stan {
      *
      * \f$\frac{\partial}{\partial y} \mbox{fmod}(x,y) = -\lfloor \frac{x}{y} \rfloor\f$.
      *
+     *
+       \f[
+       \mbox{fmod}(x,y) = 
+       \begin{cases}
+         x - \lfloor \frac{x}{y}\rfloor y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \frac{\partial\,\mbox{fmod}(x,y)}{\partial x} = 
+       \begin{cases}
+         1 & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \frac{\partial\,\mbox{fmod}(x,y)}{\partial y} = 
+       \begin{cases}
+         -\lfloor \frac{x}{y}\rfloor & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a First variable.
      * @param b Second variable.
      * @return Floating pointer remainder of dividing the first variable

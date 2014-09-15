@@ -11,6 +11,15 @@ namespace stan {
      *
      * <code>step(y) = (y < 0.0) ? 0 : 1</code>.
      *
+       \f[
+       \mbox{step}(x) = 
+       \begin{cases}
+         0 & \mbox{if } x \leq 0 \\
+         1 & \mbox{if } x > 0  \\[6pt]
+         0 & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param y Scalar argument.
      *
      * @return 1 if the specified argument is greater than or equal to
