@@ -11,6 +11,32 @@ namespace stan {
    /**
      * Return the softmax of the specified vector.
      *
+     * <p>
+     * \f$
+     * \mbox{softmax}(y)
+     * = \frac{\exp(y)}
+     * {\sum_{k=1}^K \exp(y_k)},
+     * \f$
+     *
+     * <p>The entries in the Jacobian of the softmax function are given by
+     * \f$
+     * \begin{array}{l}
+     * \displaystyle
+     * \frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
+     * \\[8pt]
+     * \displaystyle
+     * \mbox{ } \ \ \ = \left\{ 
+     * \begin{array}{ll}
+     * \mbox{softmax}(y)[k] - \mbox{softmax}(y)[k] \times \mbox{softmax}(y)[m]
+     * & \mbox{ if } m = k, \mbox{ and}
+     * \\[6pt]
+     * \mbox{softmax}(y)[k] * \mbox{softmax}(y)[m]
+     * & \mbox{ if } m \neq k.
+     * \end{array}
+     * \right.
+     * \end{array}
+     * \f$
+     *
      * @tparam T Scalar type of values in vector.
      * @param[in] v Vector to transform.
      * @return Unit simplex result of the softmax transform of the vector.

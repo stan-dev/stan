@@ -120,15 +120,20 @@
 
 % \textwidth = 5in
 \newcommand{\fitem}[4]{\item[\begin{minipage}{4.9in}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
- \\[-10pt] #4\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
+  \\[-10pt] #4\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
+
+\newcommand{\fitemnobody}[3]{\item[\begin{minipage}{4.9in}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
+ \\[-30pt]\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
 
 \newcommand{\fitemtwolines}[5]{\item[\begin{minipage}{4.9in}{\tt
       #1 {\bfseries #2}(#3, \\ \hspace*{132pt}#4\vspace*{8pt})}\end{minipage}]\mbox{ }
  \\[-10pt] #5\index{{\tt\bfseries #2 }!{\tt (#3 #4):\,#1}|hyperpage}}
 
-% need special command for items requiring escapes in index
-\newcommand{\fitemindex}[5]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
-  \\[2pt] #4\index{{\tt\bfseries #5 }!{\tt (#3):\,#1}|hyperpage}}
+\newcommand{\fitemindex}[5]{\item[\begin{minipage}{4.9in}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
+  \\[-10pt] #4\index{{\tt\bfseries #5 }!{\tt (#3):\,#1}|hyperpage}}
+\newcommand{\fitemindexnobody}[4]{\item[\begin{minipage}{4.9in}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
+  \\[-30pt] \index{{\tt\bfseries #4 }!{\tt (#3):\,#1}|hyperpage}}
+
 
 \newcommand{\fitemindexsort}[6]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
   \\[2pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt
