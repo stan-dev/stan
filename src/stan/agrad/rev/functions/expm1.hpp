@@ -31,6 +31,23 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \exp(a) - 1 = \exp(a)\f$.
      * 
+     *
+       \f[
+       \mbox{expm1}(x) = 
+       \begin{cases}
+         e^x-1 & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{expm1}(x)}{\partial x} = 
+       \begin{cases}
+         e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a The variable.
      * @return Two to the power of the specified variable.
      */

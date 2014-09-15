@@ -23,6 +23,39 @@ namespace stan {
      *
      * <code>fmax(a,b) = b</code> if b's value is greater than or equal to a's.
      * 
+       \f[
+       \mbox{fmax}(x,y) = 
+       \begin{cases}
+         x & \mbox{if } x \geq y \\
+         y & \mbox{if } x < y \\[6pt]
+         x & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+         y & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{fmax}(x,y)}{\partial x} = 
+       \begin{cases}
+         1 & \mbox{if } x \geq y \\
+         0 & \mbox{if } x < y \\[6pt]
+         1 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+         0 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{fmax}(x,y)}{\partial y} = 
+       \begin{cases}
+         0 & \mbox{if } x \geq y \\
+         1 & \mbox{if } x < y \\[6pt]
+         0 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+         1 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a First variable.
      * @param b Second variable.
      * @return If the first variable's value is larger than the
