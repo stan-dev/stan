@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/agrad/util.hpp>
 #include <stan/agrad/rev.hpp>
-#include <stan/agrad/rev/jacobian.hpp>
+#include <test/unit-agrad-rev/jacobian.hpp>
 
 
 void test_mult_LLT(const stan::agrad::matrix_v& L) {
