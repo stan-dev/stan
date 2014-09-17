@@ -6,7 +6,8 @@
 #include <stan/agrad/rev.hpp>
 #include <stan/prob/transform.hpp>
 #include <stan/math/matrix/determinant.hpp>
-#include <test/unit-agrad-rev/jacobian.hpp>
+
+#include <test/unit/agrad/util.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
