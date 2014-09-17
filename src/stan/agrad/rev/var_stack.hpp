@@ -45,8 +45,14 @@ namespace stan {
 
     /**
      * Recover memory used for all variables for reuse.
+     * 
+     * @throw std::logic_error if <code>empty_nested()</code> returns
+     * <code>false</code> 
      */
     static inline void recover_memory() {
+      if (!empty_nested())
+        throw std::logic_error("empty_nested() must be true"
+                               " before calling recover_memory()");
       var_stack_.clear();
       var_nochain_stack_.clear();
       for (size_t i = 0; i < var_alloc_stack_.size(); i++)
@@ -56,12 +62,17 @@ namespace stan {
     }
     
     /**
-     * Recover only the memory used for the top nested call.
+     * Recover only the memory used for the top nested call.  If there
+     * is nothing on the nested stack, then a
+     * <code>std::logic_error</code> exception is thrown.
+     *
+     * @throw std::logic_error if <code>empty_nested()</code> returns
+     * <code>true</code> 
      */
-
     static inline void recover_memory_nested() {
       if (empty_nested())
-        recover_memory();
+        throw std::logic_error("empty_nested() must be false"
+                               " before calling recover_memory_nested()");
 
       var_stack_.resize(nested_var_stack_sizes_.back());
       nested_var_stack_sizes_.pop_back();
