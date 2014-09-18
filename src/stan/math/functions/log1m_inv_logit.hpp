@@ -10,6 +10,23 @@ namespace stan {
      * Returns the natural logarithm of 1 minus the inverse logit
      * of the specified argument.
      *
+     *
+       \f[
+       \mbox{log1m\_inv\_logit}(x) = 
+       \begin{cases}
+         -\ln(\exp(x)+1) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{log1m\_inv\_logit}(x)}{\partial x} = 
+       \begin{cases}
+         -\frac{\exp(x)}{\exp(x)+1} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @tparam T Scalar type
      * @param u Input.
      * @return log of 1 minus the inverse logit of the input.

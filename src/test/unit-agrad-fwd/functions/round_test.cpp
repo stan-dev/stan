@@ -3,6 +3,7 @@
 #include <boost/math/special_functions/round.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdRound, Fvar) {
   using stan::agrad::fvar;
@@ -166,8 +167,15 @@ TEST(AgradFwdRound, FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(0, r[0]);
 }
 
-TEST(AgradFwdRound,round_nan) {
-  stan::agrad::fvar<double> nan = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_PRED1(boost::math::isnan<double>,
-               stan::agrad::round(nan).val());
+struct round_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return round(arg1);
+  }
+};
+
+TEST(AgradFwdRound,round_NaN) {
+  round_fun round_;
+  test_nan(round_,false);
 }

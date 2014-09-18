@@ -10,6 +10,15 @@ namespace stan {
      * Greater than or equal operator comparing two variables' values
      * (C++).
      *
+       \f[
+       \mbox{operator\textgreater=}(x,y) = 
+       \begin{cases}
+         0 & \mbox{if } x < y\\
+         1 & \mbox{if } x \geq y \\[6pt]
+         0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a First variable.
      * @param b Second variable.
      * @return True if first variable's value is greater than or equal

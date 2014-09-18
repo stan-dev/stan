@@ -29,6 +29,31 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \arcsin x = \frac{1}{\sqrt{1 - x^2}}\f$.
      *
+     *
+       \f[
+       \mbox{asin}(x) = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < -1\\
+         \arcsin(x) & \mbox{if } -1\leq x\leq 1 \\
+         \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{asin}(x)}{\partial x} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < -1\\
+         \frac{\partial\,\arcsin(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
+         \textrm{NaN} & \mbox{if } x < -1\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial \, \arcsin(x)}{\partial x} = \frac{1}{\sqrt{1-x^2}}
+       \f]
+     *
      * @param a Variable in range [-1,1].
      * @return Arc sine of variable, in radians. 
      */

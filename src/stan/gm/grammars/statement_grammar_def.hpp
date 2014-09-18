@@ -64,7 +64,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::return_statement,
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::print_statement,
                           (std::vector<stan::gm::printable>, printables_) );
 
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::raise_exception_statement,
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::reject_statement,
                           (std::vector<stan::gm::printable>, printables_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::increment_log_prob_statement,
@@ -556,8 +556,8 @@ namespace stan {
         | while_statement_r(_r1,_r2,_r3)            // key "while"
         | statement_2_g(_r1,_r2,_r3)                // key "if"
         | print_statement_r(_r2)                    // key "print"
-        | raise_exception_statement_r(_r2)         // key "raise_exception"
-        | return_statement_r(_r2)               // key "return"
+        | reject_statement_r(_r2)                   // key "reject"
+        | return_statement_r(_r2)                   // key "return"
         | void_return_statement_r(_r2)              // key "return"
         | assignment_r(_r2)                         // lvalue "<-"
         | sample_r(_r1,_r2)                         // expression "~"
@@ -629,10 +629,10 @@ namespace stan {
         > (printable_r(_r1) % ',')
         > lit(')');
 
-      // raise_exception
-      raise_exception_statement_r.name("raise_exception statement");
-      raise_exception_statement_r
-        %= lit("raise_exception")
+      // reject
+      reject_statement_r.name("reject statement");
+      reject_statement_r
+        %= lit("reject")
         > lit('(')
         > (printable_r(_r1) % ',')
         > lit(')');

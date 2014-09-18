@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdOperatorAddition,Fvar) {
   using stan::agrad::fvar;
@@ -334,4 +335,19 @@ TEST(AgradFwdOperatorAddition,Double_FvarFvarVar_3rdDeriv) {
   VEC g;
   z.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(0, g[0]);
+}
+
+struct add_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return arg1+arg2;
+  }
+};
+
+TEST(AgradFwdOperatorAddition, add_nan) {
+  add_fun add_;
+  test_nan(add_,3.0,5.0,false);
 }

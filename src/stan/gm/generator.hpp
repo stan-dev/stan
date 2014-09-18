@@ -1637,7 +1637,7 @@ namespace stan {
         generate_indent(indent_,o_);
         o_ << '}' << EOL;
       }
-      void operator()(const raise_exception_statement& ps) const {
+      void operator()(const reject_statement& ps) const {
         generate_indent(indent_,o_);
         o_ << "std::stringstream errmsg_stream__;" << EOL;
         for (size_t i = 0; i < ps.printables_.size(); ++i) {

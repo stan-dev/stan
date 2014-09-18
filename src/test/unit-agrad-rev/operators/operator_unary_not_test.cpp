@@ -8,3 +8,8 @@ TEST(AgradRev,not_a) {
   AVAR b(0.0);
   EXPECT_EQ(1, !b);
 }
+
+TEST(AgradRev,not_nan) {
+  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_FALSE(!nan);
+}

@@ -22,6 +22,38 @@ namespace stan {
      *
      * \f$ \log {N \choose n} = \log \ \Gamma(N+1) - \log \Gamma(n+1) - \log \Gamma(N-n+1)\f$.
      *
+     *
+       \f[
+       \mbox{binomial\_coefficient\_log}(x,y) = 
+       \begin{cases}
+         \textrm{error} & \mbox{if } y > x \textrm{ or } y < 0\\
+         \ln\Gamma(x+1) & \mbox{if } 0\leq y \leq x \\
+         \quad -\ln\Gamma(y+1)& \\
+         \quad -\ln\Gamma(x-y+1)& \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{binomial\_coefficient\_log}(x,y)}{\partial x} = 
+       \begin{cases}
+         \textrm{error} & \mbox{if } y > x \textrm{ or } y < 0\\
+         \Psi(x+1) & \mbox{if } 0\leq y \leq x \\
+         \quad -\Psi(x-y+1)& \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{binomial\_coefficient\_log}(x,y)}{\partial y} = 
+       \begin{cases}
+         \textrm{error} & \mbox{if } y > x \textrm{ or } y < 0\\
+         -\Psi(y+1) & \mbox{if } 0\leq y \leq x \\
+         \quad +\Psi(x-y+1)& \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param N total number of objects.
      * @param n number of objects chosen.
      * @return log (N choose n).
