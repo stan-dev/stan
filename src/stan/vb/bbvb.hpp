@@ -37,7 +37,7 @@ namespace stan {
         cont_params_(cont_params),
         elbo_(elbo),
         rng_(rng),
-        n_monte_carlo_(5e2) {};
+        n_monte_carlo_(5e1) {};
 
       virtual ~bbvb() {};
 
@@ -55,14 +55,16 @@ namespace stan {
         int dim = muL.dimension();
 
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
-        Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_check_var(dim);
+        Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
+        Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tilde_var(dim);
+
         for (int i = 0; i < n_monte_carlo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d)
           {
             z_check(d) = stan::prob::normal_rng(0,1,rng_);
           }
-          muL.to_unconstrained(z_check);
+          z_tilde = muL.to_unconstrained(z_check);
 
           // FIXME: is this the right way to do this?
           //
@@ -70,108 +72,17 @@ namespace stan {
           // to get the correct proportionality and Jacobian terms
           for (int var_index = 0; var_index < dim; ++var_index)
           {
-            z_check_var(var_index) = stan::agrad::var(z_check(var_index));
+            z_tilde_var(var_index) = stan::agrad::var(z_tilde(var_index));
           }
-          elbo += (model_.template log_prob<true,true>(z_check_var, &std::cout)).val();
+          elbo += (model_.template log_prob<true,true>(z_tilde_var, &std::cout)).val();
           // END of FIXME
         }
         elbo /= static_cast<double>(n_monte_carlo_);
 
         // Entropy of normal: 0.5 * log det (L^T L) = 0.5 * 2 * sum(diag(L))
-        elbo += stan::math::sum(stan::math::diagonal(muL.L()));
+        elbo += stan::math::sum(stan::math::diagonal(muL.L_chol()));
 
         return elbo;
-      }
-
-      /**
-       * Calculates the "blackbox" gradient with respect to the location (mean)
-       * parameter of the variational family.
-       *
-       * @param muL     mean and cholesky factor of affine transform
-       * @param mu_grad gradient of location parameter
-       */
-      void calc_mu_grad(latent_vars const& muL, Eigen::VectorXd& mu_grad) {
-        static const char* function = "stan::vb::bbvb.calc_mu_grad(%1%)";
-
-        int dim = muL.dimension();
-        double tmp_lp = 0.0;
-
-        double tmp(0.0);
-        stan::math::check_size_match(function,
-                              mu_grad.size(),  "Dimension of mu grad vector",
-                              dim, "Dimension of mean vector in variational q",
-                              &tmp);
-
-        mu_grad                     = Eigen::VectorXd::Zero(dim);
-        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
-
-        Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
-
-        for (int i = 0; i < n_monte_carlo_; ++i) {
-          // Draw from standard normal and transform to unconstrained space
-          for (int d = 0; d < dim; ++d)
-          {
-            z_check(d) = stan::prob::normal_rng(0,1,rng_);
-          }
-          muL.to_unconstrained(z_check);
-
-          // Compute gradient step in unconstrained space
-          stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad, &std::cout);
-
-          // stan::model::log_prob_grad<true,true>(model_,
-          //                z_check,
-          //                tmp_mu_grad,
-          //                &std::cout) ;
-
-          mu_grad += tmp_mu_grad;
-        }
-        mu_grad /= static_cast<double>(n_monte_carlo_);
-      }
-
-      /**
-       * Calculates the "blackbox" gradient with respect to the scale
-       * (covariance) matrix parameter of the variational family.
-       *
-       * @param muL     mean and cholesky factor of affine transform
-       * @param L_grad gradient of scale matrix parameter
-       */
-      void calc_L_grad(latent_vars const& muL, Eigen::MatrixXd& L_grad) {
-        static const char* function = "stan::vb::bbvb.calc_L_grad(%1%)";
-
-        int dim = muL.dimension();
-        double tmp_lp = 0.0;
-
-        double tmp(0.0);
-        stan::math::check_square(function, L_grad, "Scale matrix", &tmp);
-        stan::math::check_size_match(function,
-                              L_grad.rows(), "Dimension of scale matrix",
-                              dim, "Dimension of mean vector in variational q",
-                              &tmp);
-
-        L_grad                      = Eigen::MatrixXd::Zero(dim,dim);
-        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
-
-        Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
-        Eigen::MatrixXd LinvT = stan::math::inverse(muL.L()).transpose();
-
-        for (int i = 0; i < n_monte_carlo_; ++i) {
-          // Draw from standard normal and transform to unconstrained space
-          for (int d = 0; d < dim; ++d)
-          {
-            z_check(d) = stan::prob::normal_rng(0,1,rng_);
-          }
-          muL.to_unconstrained(z_check);
-
-          // Compute gradient step in unconstrained space
-          stan::model::gradient(model_, z_check, tmp_lp, tmp_mu_grad,
-                                &std::cout);
-
-          L_grad += tmp_mu_grad * z_check.transpose();
-          L_grad += LinvT;
-
-        }
-        L_grad /= static_cast<double>(n_monte_carlo_);
-        L_grad = L_grad.triangularView<Eigen::UnitLower>();
       }
 
       /**
@@ -210,7 +121,6 @@ namespace stan {
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
 
-        Eigen::VectorXd LinvTdiag = muL.L().diagonal().array().inverse();
 
         for (int i = 0; i < n_monte_carlo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
@@ -236,11 +146,9 @@ namespace stan {
         }
         mu_grad /= static_cast<double>(n_monte_carlo_);
         L_grad  /= static_cast<double>(n_monte_carlo_);
-        L_grad.diagonal().array() += LinvTdiag.array();
 
-        L_grad.diagonal().array() *=
-            muL.L_bar().diagonal().array().exp() /
-            (1 + muL.L_bar().diagonal().array().exp());
+        // Add gradient of entropy term
+        L_grad.diagonal().array() += muL.L_chol().diagonal().array().inverse();
       }
 
       /**
@@ -254,51 +162,51 @@ namespace stan {
         Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(model_.num_params_r(),
                                                         model_.num_params_r());
 
-        // ADAgrad stuff
+        // ADAgrad parameters
         double eta = 1.0;
         double tau = 1.0;
         Eigen::VectorXd mu_s = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::MatrixXd L_s  = Eigen::MatrixXd::Zero(model_.num_params_r(),
                                                      model_.num_params_r());
 
-        // rmsprop stuff
-        double window_size = 10.0;
+        // // rmsprop parameters
+        // double window_size = 100.0;
 
         for (int i = 0; i < max_iterations; ++i)
         {
-          if (out_stream_) *out_stream_ << "---------------------" << std::endl
+          if (out_stream_) *out_stream_ << "----------------" << std::endl
                                         << "  iter " << i << std::endl
-                                        << "---------------------" << std::endl;
+                                        << "----------------" << std::endl;
 
+          // Compute gradient using Monte Carlo integration
           calc_combined_grad(muL, mu_grad, L_grad);
 
-          // // Accumulate S vector for ADAgrad
-          // mu_s.array() += mu_grad.array().square();
-          // L_s.array()  += L_grad.array().square();
+          // Accumulate S vector for ADAgrad
+          mu_s.array() += mu_grad.array().square();
+          L_s.array()  += L_grad.array().square();
 
-          // Moving average for rmsprop
-          mu_s.array() = ( 1 - 1.0/window_size ) * mu_s.array()
-                          + 1.0/window_size * mu_grad.array().square();
-          L_s.array()  = ( 1 - 1.0/window_size ) * L_s.array()
-                          + 1.0/window_size * L_grad.array().square();
+          // // Moving average for rmsprop
+          // mu_s.array() = ( 1 - 1.0/window_size ) * mu_s.array()
+          //                 + 1.0/window_size * mu_grad.array().square();
+          // L_s.array()  = ( 1 - 1.0/window_size ) * L_s.array()
+          //                 + 1.0/window_size * L_grad.array().square();
 
 
           // Take ADAgrad or rmsprop step
           muL.set_mu( muL.mu().array() +
             eta * mu_grad.array() / (tau + mu_s.array().sqrt()) );
-          muL.set_L_bar(  muL.L_bar().array()  +
+          muL.set_L_chol(  muL.L_chol().array()  +
             eta * L_grad.array()  / (tau + L_s.array().sqrt()) );
 
           cont_params_ = muL.mu();
-
           if (out_stream_) *out_stream_ << "mu = " << std::endl
                                         << muL.mu() << std::endl;
 
-          if (out_stream_) *out_stream_ << "L = " << std::endl
-                                        << muL.L() << std::endl;
+          // if (out_stream_) *out_stream_ << "L_chol = " << std::endl
+          //                               << muL.L_chol() << std::endl;
 
-          if (out_stream_) *out_stream_ << "Sigma = " << std::endl
-                                        << muL.L() * muL.L().transpose() << std::endl;
+          // if (out_stream_) *out_stream_ << "Sigma = " << std::endl
+          //                               << muL.L_chol() * muL.L_chol().transpose() << std::endl;
 
           elbo_ = calc_ELBO(muL);
           if (out_stream_) *out_stream_ << "elbo_ = " << elbo_ << std::endl;
@@ -313,70 +221,14 @@ namespace stan {
         if (out_stream_) *out_stream_ << "cont_params_ = " << std::endl
                                       << cont_params_ << std::endl << std::endl;
 
-
-        // Init print out
-        double lp = 0.0;
-        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model_.num_params_r());
-
-        stan::model::gradient(model_, cont_params_, lp, init_grad, &std::cout);
-        std::cout << "stan::model::gradient, lp = " << lp << std::endl;
-        std::cout << "init_grad = " << init_grad << std::endl;
-
-
-        // Initialize mu, L
+        // Initialize variational parameters: mu, L
         Eigen::VectorXd mu = cont_params_;
-        Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(), model_.num_params_r());
-
-        latent_vars muL = latent_vars(mu,L);
+        Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(),
+                                                       model_.num_params_r());
+        latent_vars muL    = latent_vars(mu,L);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(muL, 250);
-
-
-
-
-
-        // Eigen::VectorXd bla;
-
-        // bla = Eigen::VectorXd::Constant(model_.num_params_r(),-10.0);
-        // stan::model::gradient(model_, bla, lp, init_grad, &std::cout);
-        // std::cout << "lp = " << lp << std::endl;
-        // std::cout << "grad = " << init_grad << std::endl;
-        // muL.set_mu(bla);
-        // elbo = calc_ELBO(muL);
-        // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
-
-        // bla = Eigen::VectorXd::Constant(model_.num_params_r(),0.0);
-        // stan::model::gradient(model_, bla, lp, init_grad, &std::cout);
-        // std::cout << "lp = " << lp << std::endl;
-        // std::cout << "grad = " << init_grad << std::endl;
-        // muL.set_mu(bla);
-        // elbo = calc_ELBO(muL);
-        // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
-
-        // bla = Eigen::VectorXd::Constant(model_.num_params_r(),2.7);
-        // stan::model::gradient(model_, bla, lp, init_grad, &std::cout);
-        // std::cout << "lp = " << lp << std::endl;
-        // std::cout << "grad = " << init_grad << std::endl;
-        // muL.set_mu(bla);
-        // elbo = calc_ELBO(muL);
-        // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
-
-        // bla = Eigen::VectorXd::Constant(model_.num_params_r(),15.0);
-        // stan::model::gradient(model_, bla, lp, init_grad, &std::cout);
-        // std::cout << "lp = " << lp << std::endl;
-        // std::cout << "grad = " << init_grad << std::endl;
-        // muL.set_mu(bla);
-        // elbo = calc_ELBO(muL);
-        // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
-
-        // bla = Eigen::VectorXd::Constant(model_.num_params_r(),100.0);
-        // stan::model::gradient(model_, bla, lp, init_grad, &std::cout);
-        // std::cout << "lp = " << lp << std::endl;
-        // std::cout << "grad = " << init_grad << std::endl;
-        // muL.set_mu(bla);
-        // elbo = calc_ELBO(muL);
-        // if (out_stream_) *out_stream_ << "elbo = " << elbo << std::endl << std::endl;
+        do_robbins_monro_adagrad(muL, 1000);
 
         return;
       }
