@@ -47,7 +47,6 @@ WINE =
 # - CC_MINOR: minor version of CC
 ##
 -include make/detect_cc
-# FIXME: verify compiler
 
 # OS_TYPE is set automatically by this script
 ##
@@ -123,11 +122,11 @@ endif
 	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
--include make/libstan  # bin/libstan.a bin/libstanc.a
--include make/tests    # tests
--include make/doxygen  # doxygen
--include make/manual   # manual: manual, doc/stan-reference.pdf
--include make/local    # for local stuff
+include make/libstan  # bin/libstan.a bin/libstanc.a
+include make/tests    # tests
+include make/doxygen  # doxygen
+include make/manual   # manual: manual, doc/stan-reference.pdf
+include make/local    # for local stuff
 
 ##
 # Dependencies
