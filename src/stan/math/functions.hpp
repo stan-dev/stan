@@ -29,6 +29,8 @@
 #include <stan/math/functions/inv_sqrt.hpp>
 #include <stan/math/functions/inv_square.hpp>
 #include <stan/math/functions/inverse_softmax.hpp>
+#include <stan/math/functions/is_inf.hpp>
+#include <stan/math/functions/is_nan.hpp>
 #include <stan/math/functions/is_uninitialized.hpp>
 #include <stan/math/functions/lbeta.hpp>
 #include <stan/math/functions/lgamma.hpp>
