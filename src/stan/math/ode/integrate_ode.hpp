@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__ODE__SOLVE_ODE_HPP__
-#define STAN__MATH__ODE__SOLVE_ODE_HPP__
+#ifndef STAN__MATH__ODE__INTEGRATE_ODE_HPP
+#define STAN__MATH__ODE__INTEGRATE_ODE_HPP
 
 #include <ostream>
 #include <vector>
@@ -16,14 +16,6 @@
 #include <stan/math/error_handling/check_equal.hpp>
 #include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
 #include <stan/math/error_handling/matrix/check_ordered.hpp>
-
-namespace stan {
-  namespace agrad {
-     stan::agrad::var max(stan::agrad::var a, stan::agrad::var b) {
-       return stan::agrad::fmax(a, b);
-     }
-   }
- }
 
 namespace stan {
   

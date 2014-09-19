@@ -7,7 +7,6 @@
 #include <boost/numeric/odeint.hpp>
 #include <stan/agrad/rev.hpp>
 
-#include <stan/math/ode/integrate_ode_diff_integrator.hpp>
 #include <stan/math/ode/integrate_ode.hpp>
 
 #include <test/unit/math/ode/util.hpp>
