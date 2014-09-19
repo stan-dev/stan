@@ -1654,6 +1654,12 @@ reals, matrices, vectors, and row vectors.
   containing the dimensions of \farg{x}; the type of the argument
   \farg{T} can be any Stan type with up to 8 array dimensions.}
 %
+\fitem{int}{num\_elements}{\farg{T}[] \farg{x}}{Returns the total
+  number of elements in the array \farg{x};
+  the type of the array \farg{T} can be any
+  type.  For example, if \code{x} is of
+  type \code{real[4,3]} then \code{num\_elements(x)} is 12.}
+%
 \fitem{int}{size}{\farg{T}[] \farg{x}}{Returns the number of elements
   in the array \farg{x}; the type of the array \farg{T} can be any
   type, but the size is just the size of the top level array, not the
@@ -1806,6 +1812,19 @@ Number of components of \farg{v} less than \farg{v[s]}}
 \section{Integer-Valued Matrix Size Functions}
 %
 \begin{description}
+%
+\fitem{int}{num\_elements}{vector \farg{x}}{The total
+  number of elements in the vector
+  \farg{x} (same as function \code{rows})}
+%
+\fitem{int}{num\_elements}{row\_vector \farg{x}}{The total
+  number of elements in the vector
+  \farg{x} (same as function \code{cols})}
+%
+\fitem{int}{num\_elements}{matrix \farg{x}}{The total
+  number of elements in the matrix \farg{x}.
+  For example, if \code{x} is a 5 x 3 matrix,
+  then \code{num\_elements(x)} is 15}
 %
 \fitem{int}{rows}{vector \farg{x}}{The number of
 rows in the vector \farg{x}}

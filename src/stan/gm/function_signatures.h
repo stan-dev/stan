@@ -603,6 +603,16 @@ for (size_t i = 0; i < vector_types.size(); ++i)
     }
 add_binary("normal_rng");
 add_nullary("not_a_number");
+add("num_elements", INT_T, MATRIX_T);
+add("num_elements", INT_T, VECTOR_T);
+add("num_elements", INT_T, ROW_VECTOR_T);
+for (size_t i=1; i < 10; i++) {
+  add("num_elements", INT_T, expr_type(INT_T,i));
+  add("num_elements", INT_T, expr_type(DOUBLE_T,i));
+  add("num_elements", INT_T, expr_type(MATRIX_T,i));
+  add("num_elements", INT_T, expr_type(ROW_VECTOR_T,i));
+  add("num_elements", INT_T, expr_type(VECTOR_T,i));
+}
 add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
 add("ordered_logistic_rng",INT_T,DOUBLE_T,VECTOR_T);
 add_binary("owens_t");
