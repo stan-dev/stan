@@ -2,4 +2,6 @@
 # Can put stuff that is specific to your computer here, e.g.
 # CFLAGS += -march=native
 ##
+CC=clang++
+O=0
 
