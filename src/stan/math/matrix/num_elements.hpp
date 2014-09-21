@@ -5,47 +5,47 @@
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
-  namespace math {
-    namespace {
-          
-      template <typename T>
-      inline int
-      num_elements_helper(const std::vector<T>& x, int n) {
-        return x.size()*n;
-      }
-      
-      template <typename T, int R, int C>
-      inline int
-      num_elements_helper(const std::vector<Eigen::Matrix<T,R,C> >& x, int n) {
-        size_t size_ = x.size();
-        if (size_ == 0)
-          return 0;
-        else  
-          return x[0].size() * size_ * n;
-      }
 
-      template <typename T>
-      inline int
-      num_elements_helper(const std::vector<std::vector<T> >& x, int n) {
-        size_t size_ = x.size();
-        if (size_ == 0)
-          return 0;
-        else  
-          return num_elements_helper(x[0], size_*n);
-      }
-    
-    }
-    
+  namespace math {
+
+    /**
+     * Returns 1, the number of elements in a primitive type.
+     *
+     * @param x Argument of primitive type.
+     * @return 1
+     */
     template <typename T>
     inline int
-    num_elements(const std::vector<T>& x) {
-      return num_elements_helper(x, 1);
+    num_elements(const T& x) {
+      return 1;
     }
 
+    /**
+     * Returns the size of the specified matrix.
+     *
+     * @param m argument matrix
+     * @return size of matrix
+     */
     template <typename T, int R, int C>
     inline int 
     num_elements(const Eigen::Matrix<T,R,C>& m) {
       return m.size();
+    }
+
+    /**
+     * Returns the number of elements in the specified vector.
+     * This assumes it is not ragged and that each of its contained
+     * elements has the same number of elements.
+     *
+     * @param m argument vector
+     * @return number of contained arguments
+     */
+    template <typename T>
+    inline int
+    num_elements(const std::vector<T>& v) {
+      if (v.size() == 0) 
+        return 0;
+      return v.size() * num_elements(v[0]);
     }
 
   }
