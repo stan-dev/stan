@@ -1,7 +1,10 @@
-#ifndef STAN_AGRAD_REV_FUNCTIONS_IS_INF_HPP
-#define STAN_AGRAD_REV_FUNCTIONS_IS_INF_HPP
+#ifndef STAN__AGRAD__REV__FUNCTIONS__IS_INF_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__IS_INF_HPP
 
-#include <stan/math/funtions/is_inf.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/internal/v_vari.hpp>
+#include <stan/math/functions/is_inf.hpp>
+#include <stan/math/constants.hpp>
 
 namespace stan {
 

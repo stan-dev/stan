@@ -1,6 +1,7 @@
 #ifndef STAN_AGRAD_FWD_FUNCTIONS_IS_NAN_HPP
 #define STAN_AGRAD_FWD_FUNCTIONS_IS_NAN_HPP
 
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/functions/is_nan.hpp>
 
 namespace stan {

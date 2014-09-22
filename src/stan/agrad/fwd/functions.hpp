@@ -40,6 +40,8 @@
 #include <stan/agrad/fwd/functions/inv_logit.hpp>
 #include <stan/agrad/fwd/functions/inv_sqrt.hpp>
 #include <stan/agrad/fwd/functions/inv_square.hpp>
+#include <stan/agrad/fwd/functions/is_inf.hpp>
+#include <stan/agrad/fwd/functions/is_nan.hpp>
 #include <stan/agrad/fwd/functions/lbeta.hpp>
 #include <stan/agrad/fwd/functions/lgamma.hpp>
 #include <stan/agrad/fwd/functions/lmgamma.hpp>

@@ -1,6 +1,7 @@
-#ifndef STAN_AGRAD_FWD_FUNCTIONS_IS_INF_HPP
-#define STAN_AGRAD_FWD_FUNCTIONS_IS_INF_HPP
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__IS_INF_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__IS_INF_HPP
 
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/functions/is_inf.hpp>
 
 namespace stan {

@@ -1,7 +1,10 @@
 #ifndef STAN_AGRAD_REV_FUNCTIONS_IS_NAN_HPP
 #define STAN_AGRAD_REV_FUNCTIONS_IS_NAN_HPP
 
-#include <stan/math/funtions/is_nan.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/internal/v_vari.hpp>
+#include <stan/math/functions/is_nan.hpp>
+#include <stan/math/constants.hpp>
 
 namespace stan {
 
