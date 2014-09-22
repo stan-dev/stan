@@ -319,8 +319,7 @@ namespace stan {
           {
 
             T_partials_return z = inc_beta(0.5 * nu_dbl, (T_partials_return)0.5,
-                                           1.0 - r)
-              / betaNuHalf;
+                                           1.0 - r);
             const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
             const T_partials_return d_ibeta = pow(r, -0.5)
               * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf;
@@ -356,8 +355,7 @@ namespace stan {
         else {
                   
           T_partials_return z = 1.0 - inc_beta((T_partials_return)0.5, 
-                                               0.5*nu_dbl, r)
-            / betaNuHalf;
+                                               0.5*nu_dbl, r);
 
           zJacobian *= -1;
                   
@@ -505,8 +503,7 @@ namespace stan {
         T_partials_return zJacobian = t > 0 ? - 0.5 : 0.5;
                     
         if(q < 2) {
-          T_partials_return z = inc_beta(0.5 * nu_dbl, (T_partials_return)0.5, 1.0 - r)
-            / betaNuHalf;
+          T_partials_return z = inc_beta(0.5 * nu_dbl, (T_partials_return)0.5, 1.0 - r);
           const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
           const T_partials_return d_ibeta = pow(r, -0.5)
             * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf;    
@@ -543,8 +540,7 @@ namespace stan {
         else {
                   
           T_partials_return z = 1.0 - inc_beta((T_partials_return)0.5, 
-                                               0.5*nu_dbl, r)
-            / betaNuHalf;
+                                               0.5*nu_dbl, r);
           zJacobian *= -1;
                   
           const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
@@ -681,8 +677,7 @@ namespace stan {
                     
         if(q < 2) {
           T_partials_return z = inc_beta(0.5 * nu_dbl, (T_partials_return)0.5,
-                                         1.0 - r)
-            / betaNuHalf;
+                                         1.0 - r);
           const T_partials_return Pn = t > 0 ? 0.5 * z : 1.0 - 0.5 * z;
           const T_partials_return d_ibeta = pow(r, -0.5)
             * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf;
@@ -719,8 +714,7 @@ namespace stan {
         else {
                   
           T_partials_return z = 1.0 - inc_beta((T_partials_return)0.5,
-                                               0.5*nu_dbl, r)
-            / betaNuHalf;
+                                               0.5*nu_dbl, r);
           zJacobian *= -1;
                   
           const T_partials_return Pn = t > 0 ? 0.5 * z : 1.0 - 0.5 * z;

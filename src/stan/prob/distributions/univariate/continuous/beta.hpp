@@ -326,8 +326,7 @@ namespace stan {
         const T_partials_return betafunc_dbl = exp(lbeta(alpha_dbl,beta_dbl));
                   
         // Compute
-        const T_partials_return Pn = inc_beta(alpha_dbl, beta_dbl, y_dbl)
-          / betafunc_dbl;
+        const T_partials_return Pn = inc_beta(alpha_dbl, beta_dbl, y_dbl);
 
         P *= Pn;
                   
@@ -456,8 +455,7 @@ namespace stan {
         const T_partials_return beta_dbl = value_of(beta_vec[n]);
         const T_partials_return betafunc_dbl = exp(lbeta(alpha_dbl,beta_dbl));
         // Compute
-        const T_partials_return Pn = inc_beta(alpha_dbl, beta_dbl, y_dbl) 
-          / betafunc_dbl;
+        const T_partials_return Pn = inc_beta(alpha_dbl, beta_dbl, y_dbl);
 
         cdf_log += log(Pn);
                   
@@ -573,8 +571,7 @@ namespace stan {
         const T_partials_return betafunc_dbl = exp(lbeta(alpha_dbl,beta_dbl));
 
         // Compute
-        const T_partials_return Pn = 1.0 - inc_beta(alpha_dbl, beta_dbl, y_dbl) 
-          / betafunc_dbl;
+        const T_partials_return Pn = 1.0 - inc_beta(alpha_dbl, beta_dbl, y_dbl);
 
         ccdf_log += log(Pn);
                   
