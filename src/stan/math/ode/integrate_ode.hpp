@@ -21,9 +21,17 @@ namespace stan {
   
   namespace math {
 
-    // ODE coupled system for y0 double and theta double
+
+    // struct ode_system isn't broken out into a base class because it requires
+    // this-> shenanigans and clunky constructor reuse everywhere
     template <typename F, typename T1, typename T2>
     struct ode_system {
+    };
+
+    
+    // ODE coupled system for y0 double and theta double
+    template <typename F>
+    struct ode_system<F, double, double> {
       const F& f_;
       const std::vector<double>& y0_;
       const std::vector<double>& theta_;
