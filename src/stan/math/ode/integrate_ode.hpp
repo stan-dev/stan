@@ -4,7 +4,6 @@
 #include <ostream>
 #include <vector>
 #include <boost/numeric/odeint.hpp>
-#include <stan/math/ode/util.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/value_of.hpp>
@@ -14,6 +13,7 @@
 
 #include <stan/math/ode/ode_system.hpp>
 #include <stan/math/ode/compute_results.hpp>
+#include <stan/math/ode/push_back_state_and_time.hpp>
 
 namespace stan {
   
