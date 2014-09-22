@@ -6,15 +6,10 @@
 #include <boost/numeric/odeint.hpp>
 #include <stan/math/ode/util.hpp>
 #include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/operators/operator_addition.hpp>
-#include <stan/agrad/rev/functions/fmax.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/rev/internal/precomputed_gradients.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/error_handling/check_less.hpp>
-#include <stan/math/error_handling/check_equal.hpp>
-#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
 #include <stan/math/error_handling/matrix/check_ordered.hpp>
 
 #include <stan/math/ode/ode_system.hpp>
@@ -24,19 +19,20 @@ namespace stan {
   
   namespace math {
 
-
-
     template <typename F, typename T1, typename T2>
     std::vector<std::vector<typename stan::return_type<T1,T2>::type> >
     integrate_ode(const F& f,
-              const std::vector<T1> y0, 
-              const double& t0, // initial time
-              const std::vector<double>& ts, // times at desired solutions
-              const std::vector<T2>& theta, // parameters
-              const std::vector<double>& x, // double data values
-              const std::vector<int>& x_int,
-              std::ostream* pstream) { // int data values.
-      using namespace boost::numeric::odeint;  // FIXME: trim to what is used
+                  const std::vector<T1> y0, 
+                  const double& t0, // initial time
+                  const std::vector<double>& ts, // times at desired solutions
+                  const std::vector<T2>& theta, // parameters
+                  const std::vector<double>& x, // double data values
+                  const std::vector<int>& x_int, // int data values
+                  std::ostream* pstream) { 
+      using boost::numeric::odeint::integrate_times;  
+      using boost::numeric::odeint::make_dense_output;  
+      using boost::numeric::odeint::runge_kutta_dopri5;
+      
       stan::math::check_nonzero_size("integrate_ode(%1%)",ts,"time_vec",
                                      static_cast<double*>(0));
       stan::math::check_nonzero_size("integrate_ode(%1%)",y0,"y0_vec",
@@ -85,16 +81,15 @@ namespace stan {
       std::vector<std::vector<double> > x_vec;
       std::vector<double> t_vec;
       push_back_state_and_time<double> obs(x_vec, t_vec);
-      integrate_times(
-         make_dense_output(absolute_tolerance,
-                           relative_tolerance,
-                           runge_kutta_dopri5<std::vector<double>,
-                                              double,std::vector<double>,double>()),
-         system,
-         y0_vec,
-         boost::begin(ts_vec), boost::end(ts_vec), 
-         step_size,
-         obs);
+      integrate_times(make_dense_output(absolute_tolerance,
+                                        relative_tolerance,
+                                        runge_kutta_dopri5<std::vector<double>,
+                                        double,std::vector<double>,double>()),
+                      system,
+                      y0_vec,
+                      boost::begin(ts_vec), boost::end(ts_vec), 
+                      step_size,
+                      obs);
 
       std::vector<std::vector<double> > y = obs.get();
       std::vector<std::vector<typename stan::return_type<T1,T2>::type> > 

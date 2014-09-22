@@ -102,8 +102,6 @@ namespace stan {
       return y_return;
     }
 
-
-
   }
 }
 
