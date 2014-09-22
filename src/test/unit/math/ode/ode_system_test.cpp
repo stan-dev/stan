@@ -3,7 +3,7 @@
 #include <stan/agrad/rev.hpp>
 #include <stan/math/ode/ode_system.hpp>
 
-TEST(integrate_ode, ode_system_dv) {
+TEST(StanMathOde, ode_system_dv) {
   std::stringstream msgs;
   
   using stan::math::ode_system;
@@ -38,7 +38,7 @@ TEST(integrate_ode, ode_system_dv) {
   EXPECT_FLOAT_EQ(-1.8, dy_dt[3]);
 }
 
-TEST(integrate_ode, ode_system_vd) {
+TEST(StanMathOde, ode_system_vd) {
   std::stringstream msgs;
 
   using stan::math::ode_system;

@@ -3,18 +3,14 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-
 #include <boost/numeric/odeint.hpp>
 #include <stan/agrad/rev.hpp>
-
 #include <stan/math/ode/integrate_ode.hpp>
-
 #include <test/unit/math/ode/util.hpp>
-
 #include <test/unit/math/ode/harmonic_oscillator.hpp>
+#include <test/unit/math/ode/lorenz.hpp>
 
-
-TEST(integrate_ode, harm_osc_finite_diff) {
+TEST(StanMathOde_integrate_ode, harmonic_oscillator_finite_diff) {
   harm_osc_ode_fun harm_osc;
 
   std::vector<double> y0;
@@ -37,7 +33,7 @@ TEST(integrate_ode, harm_osc_finite_diff) {
   test_ode(harm_osc, t0, ts, y0, theta, x, x_int, 1e-8,1e-4);
 }
 
-TEST(integrate_ode, harm_osc_known_values_dd) {
+TEST(StanMathOde_integrate_ode, harmonic_oscillator_known_values_dd) {
   std::stringstream msgs;
 
   harm_osc_ode_fun harm_osc;
@@ -71,7 +67,7 @@ TEST(integrate_ode, harm_osc_known_values_dd) {
   EXPECT_NEAR(0.246407, ode_res[99][1], 1e-5);
 }
 
-TEST(integrate_ode, harm_osc_known_values_dv) {
+TEST(StanMathOde_integrate_ode, harmonic_oscillator_known_values_dv) {
   std::stringstream msgs;
 
   harm_osc_ode_fun harm_osc;
@@ -108,7 +104,7 @@ TEST(integrate_ode, harm_osc_known_values_dv) {
   ode_res[99][1].grad(theta, grads);
 }
 
-TEST(integrate_ode, harm_osc_known_values_vd) {
+TEST(StanMathOde_integrate_ode, harmonic_oscillator_known_values_vd) {
   std::stringstream msgs;
 
   harm_osc_ode_fun harm_osc;
@@ -145,7 +141,7 @@ TEST(integrate_ode, harm_osc_known_values_vd) {
   ode_res[99][1].grad(y0, grads);
 }
 
-TEST(integrate_ode, harm_osc_known_values_vv) {
+TEST(StanMathOde_integrate_ode, harmonic_oscillator_known_values_vv) {
   std::stringstream msgs;
 
   harm_osc_ode_fun harm_osc;
@@ -185,36 +181,7 @@ TEST(integrate_ode, harm_osc_known_values_vv) {
   ode_res[99][1].grad(variables, grads);
 }
 
-template <typename T0, typename T1, typename T2>
-inline
-std::vector<typename stan::return_type<T1,T2>::type> 
-lorenz_ode(const T0& t_in, // initial time
-             const std::vector<T1>& y_in, //initial positions
-             const std::vector<T2>& theta, // parameters
-             const std::vector<double>& x, // double data
-             const std::vector<int>& x_int) { // integer data
-  std::vector<typename stan::return_type<T1,T2>::type> res;
-  res.push_back(theta[0]*(y_in[1] - y_in[0]));
-  res.push_back(theta[1]*y_in[0] - y_in[1] - y_in[0]*y_in[2]);
-  res.push_back(-theta[2]*y_in[2] + y_in[0]*y_in[1]);
-  return res;
-}
-
-struct lorenz_ode_fun {
-  template <typename T0, typename T1, typename T2>
-  inline 
-  std::vector<typename stan::return_type<T1,T2>::type> 
-  operator()(const T0& t_in, // initial time
-             const std::vector<T1>& y_in, //initial positions
-             const std::vector<T2>& theta, // parameters
-             const std::vector<double>& x, // double data
-             const std::vector<int>& x_int,
-             std::ostream* msgs) const { // integer data
-    return lorenz_ode(t_in, y_in, theta, x, x_int);
-  }
-};
-
-TEST(integrate_ode, lorenz_finite_diff) {
+TEST(StanMathOde_integrate_ode, lorenz_finite_diff) {
   lorenz_ode_fun lorenz;
 
   std::vector<double> y0;

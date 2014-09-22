@@ -1,10 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <iostream>
 #include <sstream>
 #include <vector>
 
-#include <boost/numeric/odeint.hpp>
 #include <stan/agrad/rev.hpp>
 
 #include <stan/math/ode/integrate_ode.hpp>
@@ -38,9 +36,9 @@ std::vector<std::vector<double> > finite_diff_params(const F& f,
   std::vector<std::vector<double> > ode_res_lb;
 
   ode_res_ub = stan::math::integrate_ode(f, y_in, t_in,
-                                     ts, theta_ub, x, x_int, &msgs);
+                                         ts, theta_ub, x, x_int, &msgs);
   ode_res_lb = stan::math::integrate_ode(f, y_in, t_in,
-                                     ts, theta_lb, x, x_int, &msgs);
+                                         ts, theta_lb, x, x_int, &msgs);
 
   std::vector<std::vector<double> > results(ts.size());
 
@@ -79,9 +77,9 @@ finite_diff_initial_position(const F& f,
   std::vector<std::vector<double> > ode_res_lb;
 
   ode_res_ub = stan::math::integrate_ode(f, y_in_ub, t_in,
-                                     ts, theta, x, x_int, &msgs);
+                                         ts, theta, x, x_int, &msgs);
   ode_res_lb = stan::math::integrate_ode(f, y_in_lb, t_in,
-                                     ts, theta, x, x_int, &msgs);
+                                         ts, theta, x, x_int, &msgs);
 
   std::vector<std::vector<double> > results(ts.size());
 
@@ -119,7 +117,7 @@ void test_ode_finite_diff_dv(const F& f,
   std::vector<std::vector<stan::agrad::var> > ode_res;
 
   ode_res = stan::math::integrate_ode(f, y_in, t_in,
-                                  ts, theta_v, x, x_int, &msgs);
+                                      ts, theta_v, x, x_int, &msgs);
   
   for (int i = 0; i < ts.size(); i++) {
     for (int j = 0; j < y_in.size(); j++) {
@@ -165,7 +163,7 @@ void test_ode_finite_diff_vd(const F& f,
   std::vector<std::vector<stan::agrad::var> > ode_res;
 
   ode_res = stan::math::integrate_ode(f, y_in_v, t_in,
-                                  ts, theta, x, x_int, &msgs);
+                                      ts, theta, x, x_int, &msgs);
 
   for (int i = 0; i < ts.size(); i++) {
     for (int j = 0; j < y_in.size(); j++) {
@@ -227,7 +225,7 @@ void test_ode_finite_diff_vv(const F& f,
   std::vector<std::vector<stan::agrad::var> > ode_res;
 
   ode_res = stan::math::integrate_ode(f, y_in_v, t_in,
-                                  ts, theta_v, x, x_int, &msgs);
+                                      ts, theta_v, x, x_int, &msgs);
 
   for (int i = 0; i < ts.size(); i++) {
     for (int j = 0; j < y_in.size(); j++) {
