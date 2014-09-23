@@ -1,13 +1,15 @@
 #ifndef STAN__MATH__FUNCTIONS__FMA_HPP
 #define STAN__MATH__FUNCTIONS__FMA_HPP
 
-#include <boost/math/tools/promotion.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {
 
     /**
-     * The fused multiply-add operation (C99).  
+     * The fused multiply-add operation (C99).   
+     *
+     * This double-based operation delegates to <code>std::fma</code>.
      *
      * The function is defined by
      *
@@ -51,10 +53,9 @@ namespace stan {
      * @param c Third value.
      * @return Product of the first two values plust the third.
      */
-    template <typename T1, typename T2, typename T3>
-    inline typename boost::math::tools::promote_args<T1,T2,T3>::type
-    fma(const T1 a, const T2 b, const T3 c) {
-      return (a * b) + c;
+    double
+    fma(double a, double b, double c) {
+      return std::fma(a,b,c);
     }
 
   }

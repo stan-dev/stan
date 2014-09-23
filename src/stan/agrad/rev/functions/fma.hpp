@@ -1,6 +1,7 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__FMA_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__FMA_HPP
 
+#include <cmath>
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/ddv_vari.hpp>
@@ -19,7 +20,7 @@ namespace stan {
       class fma_vvv_vari : public op_vvv_vari {
       public:
         fma_vvv_vari(vari* avi, vari* bvi, vari* cvi) :
-          op_vvv_vari(avi->val_ * bvi->val_ + cvi->val_,
+          op_vvv_vari(std::fma(avi->val_, bvi->val_, cvi->val_),
                       avi,bvi,cvi) {
         }
         void chain() {
@@ -40,7 +41,7 @@ namespace stan {
       class fma_vvd_vari : public op_vvd_vari {
       public:
         fma_vvd_vari(vari* avi, vari* bvi, double c) :
-          op_vvd_vari(avi->val_ * bvi->val_ + c,
+          op_vvd_vari(std::fma(avi->val_, bvi->val_, c),
                       avi,bvi,c) {
         }
         void chain() {
@@ -59,7 +60,7 @@ namespace stan {
       class fma_vdv_vari : public op_vdv_vari {
       public:
         fma_vdv_vari(vari* avi, double b, vari* cvi) :
-          op_vdv_vari(avi->val_ * b + cvi->val_,
+          op_vdv_vari(std::fma(avi->val_ , b, cvi->val_),
                       avi,b,cvi) {
         }
         void chain() {
@@ -78,7 +79,7 @@ namespace stan {
       class fma_vdd_vari : public op_vdd_vari {
       public:
         fma_vdd_vari(vari* avi, double b, double c) : 
-          op_vdd_vari(avi->val_ * b + c,
+          op_vdd_vari(std::fma(avi->val_ , b, c),
                       avi,b,c) {
         }
         void chain() {
@@ -94,7 +95,7 @@ namespace stan {
       class fma_ddv_vari : public op_ddv_vari {
       public:
         fma_ddv_vari(double a, double b, vari* cvi) :
-          op_ddv_vari(a * b + cvi->val_, 
+          op_ddv_vari(std::fma(a, b, cvi->val_), 
                       a,b,cvi) {
         }
         void chain() {
