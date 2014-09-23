@@ -2,7 +2,9 @@
 #include <test/unit/agrad/util.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/agrad/rev/matrix.hpp>
-#include <test/unit-agrad-rev/jacobian.hpp>
+
+// this didn't need to be external, so it's here now:
+
 
 TEST(AgradRevMatrix, dot_product_vv) {
   AVEC a, b;
@@ -1091,4 +1093,6 @@ TEST(AgradRevMatrix, promoter) {
 
 
 }
+
+
 

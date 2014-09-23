@@ -27,3 +27,13 @@ TEST(AgradRev,varStack) {
   EXPECT_FLOAT_EQ(-3.0,grad_ff[0]);
   EXPECT_FLOAT_EQ(2.0,grad_ff[1]);
 }
+
+TEST(AgradRev, recoverMemoryLogicError) {
+  stan::agrad::start_nested();
+  EXPECT_THROW(stan::agrad::recover_memory(), std::logic_error);
+  stan::agrad::recover_memory_nested(); // clean up for next test
+}
+
+TEST(AgradRev, recoverMemoryNestedLogicError) {
+  EXPECT_THROW(stan::agrad::recover_memory_nested(), std::logic_error);
+}

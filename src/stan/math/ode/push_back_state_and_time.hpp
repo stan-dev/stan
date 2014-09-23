@@ -5,14 +5,6 @@
 #include <ostream>
 #include <stan/agrad/rev/var.hpp>
  
-// namespace stan {
-//   namespace agrad {
-//     stan::agrad::var max(stan::agrad::var a, stan::agrad::var b) {
-//       return fmax(a, b);
-//     }
-//   }
-// }
-
 namespace stan {
   
   namespace math {
