@@ -4,12 +4,13 @@
 #include <cmath>
 
 namespace stan {
+
   namespace math {
 
     /**
      * The fused multiply-add operation (C99).   
      *
-     * This double-based operation delegates to <code>std::fma</code>.
+     * This double-based operation delegates to <code>fma</code>.
      *
      * The function is defined by
      *
@@ -55,7 +56,7 @@ namespace stan {
      */
     double
     fma(double a, double b, double c) {
-      return std::fma(a,b,c);
+      return ::fma(a,b,c);
     }
 
   }
