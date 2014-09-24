@@ -4452,6 +4452,17 @@ namespace stan {
       generate_propto_default_function_body(fun,out);
     }
 
+    /**
+     * Generate the specified function and optionally its default for
+     * propto=false for functions ending in _log.
+     *
+     * Exact behavior differs for unmarked functions, and functions
+     * ending in one of "_rng", "_lp", or "_log".
+     *
+     * @param[in] fun function AST object
+     * @param[in,out] out output stream to which function definition
+     * is written
+     */
     void generate_function(const function_decl_def& fun,
                            std::ostream& out) {
       bool is_rng = ends_with("_rng", fun.name_);
