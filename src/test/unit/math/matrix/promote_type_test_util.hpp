@@ -1,12 +1,13 @@
-#ifndef TEST__MATH__FUNCTIONS__UTIL_HPP
-#define TEST__MATH__FUNCTIONS__UTIL_HPP
+#ifndef TEST__MATH__UNIT__MATRIX__PROMOTE_TYPE_TEST_UTIL_HPP
+#define TEST__MATH__UNIT__MATRIX__PROMOTE_TYPE_TEST_UTIL_HPP
 
 #include <gtest/gtest.h>
 
 #include <boost/typeof/typeof.hpp>
 #include <boost/type_traits/is_same.hpp>
 
-#include <stan/math/functions/promote_scalar.hpp>
+#include <stan/math/matrix/promote_scalar_type.hpp>
+#include <stan/math/matrix/promote_scalar.hpp>
 
 template <typename T, typename S>
 void expect_type(S s) {
@@ -22,4 +23,14 @@ void expect_same_type() {
   EXPECT_TRUE(( boost::is_same<S, T>::value ));
 }
 
+// E is expected value of promote_scalar_type<T,S>::type
+template <typename E, typename T, typename S>
+void expect_promote_type() {
+  using stan::math::promote_scalar_type;
+  return expect_same_type<E,typename promote_scalar_type<T,S>::type>();
+}
+
+
+
 #endif
+
