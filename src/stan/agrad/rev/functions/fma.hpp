@@ -115,7 +115,8 @@ namespace stan {
      * This function returns the product of the first two arguments
      * plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -141,7 +142,8 @@ namespace stan {
      * (C99).  This function returns the product of the first two
      * arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -165,7 +167,8 @@ namespace stan {
      * variable (C99).  This function returns the product of the first
      * two arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -189,7 +192,8 @@ namespace stan {
      * (C99).  This function returns the product of the first two
      * arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -211,7 +215,8 @@ namespace stan {
      * value (C99).  This function returns the product of the first
      * two arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -233,7 +238,8 @@ namespace stan {
      * and value (C99).  This function returns the product of the
      * first two arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -255,7 +261,8 @@ namespace stan {
      * (C99).  This function returns the product of the first two
      * arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivaties are
      *
