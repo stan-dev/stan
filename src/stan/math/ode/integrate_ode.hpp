@@ -19,6 +19,38 @@ namespace stan {
   
   namespace math {
     
+    namespace {
+      /**
+       * Observer for the coupled states.
+       */
+      struct coupled_ode_observer {
+        std::vector<std::vector<double> >& y_coupled_;
+        int n;
+        
+        /**
+         * Constructor.
+         *
+         * @param y_coupled is a reference to a vector of vector of
+         *   doubles. The outer vector must have the right number
+         *   of elements allocated.
+         */
+        coupled_ode_observer(std::vector<std::vector<double> >& y_coupled)
+          : y_coupled_(y_coupled), n(0) {
+        }
+
+        /**
+         * operator(). This is what boost's ode solver uses to
+         * record values.
+         *
+         * @param coupled_state the coupled state for the time in t
+         * @param t the time
+         */
+        void operator()(const std::vector<double>& coupled_state, const double t) {
+          y_coupled_[n] = coupled_state;
+          n++;
+        }
+      };
+    }
 
     /**
      * integrate_ode numerically solves the ordinary differential
@@ -111,6 +143,8 @@ namespace stan {
         for (int n = 0; n < N; n++)
           coupled_state[n] = value_of(y0[n]);
       
+      // boost expects the first time in the vector to be the 
+      // time of the initial state
       std::vector<double> ts_vec(ts.size()+1);
       ts_vec[0] = t0;
       for (size_t n = 0; n < ts.size(); n++)
@@ -118,12 +152,9 @@ namespace stan {
       
       double step_size = 0.1;
 
-      std::vector<std::vector<double> > x_vec;
-      std::vector<double> t_vec;
-      push_back_state_and_time<double> obs(x_vec, t_vec);
+      std::vector<std::vector<double> > y_coupled(ts_vec.size());
+      coupled_ode_observer observer(y_coupled);
 
-      
-      
       integrate_times(make_dense_output(absolute_tolerance,
                                         relative_tolerance,
                                         runge_kutta_dopri5<std::vector<double>,
@@ -132,22 +163,15 @@ namespace stan {
                       coupled_state, 
                       boost::begin(ts_vec), boost::end(ts_vec), 
                       step_size,
-                      obs);
+                      observer);
 
-      std::vector<std::vector<double> > y = obs.get();
-      
+      // remove the state corresponding to the initial value
+      y_coupled.erase(y_coupled.begin());
+
       std::vector<std::vector<typename stan::return_type<T1,T2>::type> > 
-        res = compute_results(y, y0, theta);
+        y_vec = compute_results(y_coupled, y0, theta);
 
-      res.erase(res.begin());
-
-      // add back initial positions if y0 is var
-      if (boost::is_same<stan::agrad::var, T1>::value)
-        for (size_t n = 0; n < res.size(); n++)
-          for (size_t m = 0; m < y0.size(); m++)
-            res[n][m] += y0[m];
-
-      return res;
+      return y_vec;
     }
                    
   }

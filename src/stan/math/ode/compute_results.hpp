@@ -8,6 +8,20 @@ namespace stan {
   namespace math {
 
     /**
+     * add back initial states if y0 is var
+     *
+     * @param[in,out] y the states of the base system
+     * @param[in] y0 the initial values for the base system
+     */
+    void add_initial_values(std::vector<std::vector<stan::agrad::var> >& y,
+                            const std::vector<stan::agrad::var>& y0) {
+      for (size_t n = 0; n < y.size(); n++)
+        for (size_t m = 0; m < y0.size(); m++)
+          y[n][m] += y0[m];
+    }
+
+
+    /**
      * Takes the coupled system and converts the result back to the
      * base ode system.
      *
@@ -64,6 +78,8 @@ namespace stan {
 
         y_return[i] = temp_vars;
       }
+
+      add_initial_values(y_return, y0);
 
       return y_return;
     }
@@ -150,6 +166,8 @@ namespace stan {
 
         y_return[i] = temp_vars;
       }
+
+      add_initial_values(y_return, y0);
 
       return y_return;
     }
