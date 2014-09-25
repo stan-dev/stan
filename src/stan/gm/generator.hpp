@@ -1652,9 +1652,13 @@ namespace stan {
       void operator()(const return_statement& rs) const {
         generate_indent(indent_,o_);
         o_ << "return ";
+        if (is_var_)
+          o_ << "stan::math::promote_scalar<T__>(";
         if (!rs.return_value_.expression_type().is_ill_formed()
             && !rs.return_value_.expression_type().is_void())
           generate_expression(rs.return_value_, o_);
+        if (is_var_)
+          o_ << ")";
         o_ << ";" << EOL;
       }
       void operator()(const for_statement& x) const {
@@ -4465,6 +4469,9 @@ namespace stan {
      */
     void generate_function(const function_decl_def& fun,
                            std::ostream& out) {
+
+      fun.propagate_return_scalar_type();
+
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_log = ends_with("_log", fun.name_);

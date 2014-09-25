@@ -760,6 +760,7 @@ namespace stan {
       std::string name_;
       std::vector<arg_decl> arg_decls_;
       statement body_;
+      void propagate_return_scalar_type();
     };
 
     struct function_decl_defs {
