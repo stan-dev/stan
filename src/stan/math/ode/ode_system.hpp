@@ -76,7 +76,7 @@ namespace stan {
      * The coupled ode system for double initial values and 
      * stan::agrad::var theta. If the original ode has N
      * states and M thetas, the new coupled system has
-     * N * M states.
+     * N + N * M states.
      *
      * @tparam F the functor for the base ode system
      */
@@ -163,7 +163,7 @@ namespace stan {
     /**
      * The coupled ode system for stan::agrad::var initial values and
      * double theta. If the original ode has N states and M thetas,
-     * the new coupled system has N * N states. (derivatives
+     * the new coupled system has N + N * N states. (derivatives
      * of each state with respect to each initial value)
      *
      * @tparam F the functor for the base ode system
@@ -246,7 +246,7 @@ namespace stan {
     /**
      * The coupled ode system for stan::agrad::var initial values and
      * stan::agrad::var theta. If the original ode has N states and M thetas,
-     * the new coupled system has N * (N + M) states. (derivatives
+     * the new coupled system has N + N * (N + M) states. (derivatives
      * of each state with respect to each initial value and each theta)
      *
      * @tparam F the functor for the base ode system

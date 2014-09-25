@@ -57,12 +57,19 @@ namespace stan {
                   const std::vector<T2>& theta,   // parameters
                   const std::vector<double>& x,   // double data values
                   const std::vector<int>& x_int,   // int data values
-                  std::ostream* pstream) { 
+                  std::ostream* pstream) {            
       using boost::numeric::odeint::integrate_times;  
       using boost::numeric::odeint::make_dense_output;  
       using boost::numeric::odeint::runge_kutta_dopri5;
+      using boost::is_same;
+      using stan::agrad::var;
       
-      stan::math::check_nonzero_size("integrate_ode(%1%)",ts,"time_vec",
+      const double absolute_tolerance = 1e-6;
+      const double relative_tolerance = 1e-6;
+
+      
+      // validate inputs
+      stan::math::check_nonzero_size("integrate_ode(%1%)",ts,"time_vec", 
                                      static_cast<double*>(0));
       stan::math::check_nonzero_size("integrate_ode(%1%)",y0,"y0_vec",
                                      static_cast<double*>(0));
@@ -71,35 +78,39 @@ namespace stan {
       stan::math::check_less("integrate_ode(%1%)",t0,ts[0],"initial time",
                              static_cast<double*>(0));
 
-      double absolute_tolerance = 1e-6;
-      double relative_tolerance = 1e-6;
+      
+      const int N = y0.size();
+      const int M = theta.size();
+      // setup y0
+      std::vector<double> y0_dbl(N);
+      for (int n = 0; n < N; n++)
+        y0_dbl[n] = value_of(y0[n]);
 
-      std::vector<double> theta_dbl;
-      for (int i = 0; i < theta.size(); i++)
-        theta_dbl.push_back(value_of(theta[i]));
-
-      std::vector<double> y0_vec; 
-      for (size_t n = 0; n < y0.size(); n++)
-        y0_vec.push_back(value_of(y0[n]));
-
-      //initialize values to 0 if theta is var
-      if (boost::is_same<stan::agrad::var, T2>::value)
-        for (size_t n = 0; n < theta.size() * y0.size(); n++)
-          y0_vec.push_back(0.0);
-
-      //initalize values to 0 if y0 is var
-      if (boost::is_same<stan::agrad::var, T1>::value)
-        for (size_t n = 0; n < y0.size() * y0.size(); n++)
-          y0_vec.push_back(0.0);
+      // setup theta
+      std::vector<double> theta_dbl(M);
+      for (int m = 0; m < M; m++)
+        theta_dbl[m] = value_of(theta[m]);
 
       // builds coupled ode system
-      ode_system<F, T1, T2> system(f,y0_vec,theta_dbl,x,x_int, y0.size(),pstream);
+      ode_system<F, T1, T2> system(f, y0_dbl, theta_dbl, x, x_int, N, pstream);
 
-      // sets initial positions to 0 if y0 is var
-      if (boost::is_same<stan::agrad::var, T1>::value)
-        for (size_t n = 0; n < y0.size(); n++)
-          y0_vec[n] = 0;
-
+      // set up the coupled state. base system has size N.
+      // y0,     theta,  size
+      // double, double, N
+      // double, var,    N + N * M
+      // var,    double, N + N * N
+      // var,    var,    N + N * (M + N)
+      int coupled_state_size 
+        = N + N * (is_same<var,T1>::value * N
+                   + is_same<var,T2>::value * M);
+      std::vector<double> coupled_state(coupled_state_size, 0.0);
+      
+      // set the initial coupled_state values to y0 if 
+      // we don't need the sensitivities of the y0.
+      if (is_same<double, T1>::value)
+        for (int n = 0; n < N; n++)
+          coupled_state[n] = value_of(y0[n]);
+      
       std::vector<double> ts_vec(ts.size()+1);
       ts_vec[0] = t0;
       for (size_t n = 0; n < ts.size(); n++)
@@ -110,17 +121,21 @@ namespace stan {
       std::vector<std::vector<double> > x_vec;
       std::vector<double> t_vec;
       push_back_state_and_time<double> obs(x_vec, t_vec);
+
+      
+      
       integrate_times(make_dense_output(absolute_tolerance,
                                         relative_tolerance,
                                         runge_kutta_dopri5<std::vector<double>,
                                         double,std::vector<double>,double>()),
                       system,
-                      y0_vec,
+                      coupled_state, 
                       boost::begin(ts_vec), boost::end(ts_vec), 
                       step_size,
                       obs);
 
       std::vector<std::vector<double> > y = obs.get();
+      
       std::vector<std::vector<typename stan::return_type<T1,T2>::type> > 
         res = compute_results(y, y0, theta);
 
