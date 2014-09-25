@@ -9,14 +9,35 @@
 namespace stan {
   namespace math {
 
-    // struct ode_system isn't broken out into a base class because it requires
-    // this-> shenanigans and clunky constructor reuse everywhere
+    /**
+     * Structure for the coupled ordinary differential equation
+     * system.  The coupled ode system is the a new system consisting
+     * of the base system coupled with the sensitivities.
+     * 
+     * Implementation notes:
+     * - struct ode_system isn't broken out into a base class because 
+     *   it requires this-> shenanigans and clunky constructor reuse 
+     *   everywhere
+     * - The default templated structure does nothing. This will prevent
+     *   the T1 and T2 types from being instantiated as something other
+     *   than double and stan::agrad::var.
+     * 
+     * @tparam F the functor for the base ode system
+     * @tparam T1 type of the initial state
+     * @tparam T2 type of the parameters
+     */
     template <typename F, typename T1, typename T2>
     struct ode_system {
     };
 
     
-    // ODE coupled system for y0 double and theta double
+    /**
+     * The coupled ode system for double initial values and 
+     * double theta. This coupled system is identical to the
+     * the base system.
+     *
+     * @tparam F the functor for the base ode system
+     */
     template <typename F>
     struct ode_system<F, double, double> {
       const F& f_;
@@ -51,7 +72,14 @@ namespace stan {
       }
     };
 
-    // ODE coupled system for y0 double and theta var
+    /**
+     * The coupled ode system for double initial values and 
+     * stan::agrad::var theta. If the original ode has N
+     * states and M thetas, the new coupled system has
+     * N * M states.
+     *
+     * @tparam F the functor for the base ode system
+     */
     template <typename F>
     struct ode_system <F, double, stan::agrad::var> {
       const F& f_;
@@ -80,7 +108,7 @@ namespace stan {
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double& t) {
-
+        
         dy_dt = f_(t,y,theta_,x_,x_int_,pstream_);
         stan::math::check_equal("ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
                                 static_cast<double*>(0));
@@ -132,7 +160,14 @@ namespace stan {
       }
     };
     
-    // ODE coupled system for y0 var and theta double
+    /**
+     * The coupled ode system for stan::agrad::var initial values and
+     * double theta. If the original ode has N states and M thetas,
+     * the new coupled system has N * N states. (derivatives
+     * of each state with respect to each initial value)
+     *
+     * @tparam F the functor for the base ode system
+     */
     template <typename F>
     struct ode_system <F, stan::agrad::var, double> {
       const F& f_;
@@ -207,8 +242,15 @@ namespace stan {
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
       }
     };
-
-    // ODE coupled system for y0 var and theta var
+    
+    /**
+     * The coupled ode system for stan::agrad::var initial values and
+     * stan::agrad::var theta. If the original ode has N states and M thetas,
+     * the new coupled system has N * (N + M) states. (derivatives
+     * of each state with respect to each initial value and each theta)
+     *
+     * @tparam F the functor for the base ode system
+     */
     template <typename F>
     struct ode_system <F, stan::agrad::var, stan::agrad::var> {
       const F& f_;

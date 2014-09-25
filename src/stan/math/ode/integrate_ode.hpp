@@ -18,16 +18,45 @@
 namespace stan {
   
   namespace math {
+    
 
+    /**
+     * integrate_ode numerically solves the ordinary differential
+     * equation specified for the times provided.
+     *
+     * This function is templated to allow the initial times to be
+     * either data or autodiff variables and the parameters to be data
+     * or autodiff variables.
+     *
+     * This version of integrate_ode uses boost odeint's
+     * runge_kutta_dopri5 solver.
+     *
+     * @tparam F ode system function concept
+     * @tparam T1 type of the initial values
+     * @tparam T2 type of the parameters
+     * 
+     * @param[in] f a functor for the ordinary differential equation.
+     * @param[in] y0 the initial state. The size of the initial state must
+     *    be greater than 0.
+     * @param[in] t0 the time of the initial state.
+     * @param[in] ts the times of the desired solutions.
+     * @param[in] theta the parameters of the ode
+     * @param[in] x double data values that can be used by the ode
+     * @param[in] x_int integer data values that can be used by the ode
+     * @param[in,out] pstream the print stream for messages
+     *
+     * @returns a vector of states, each state corresponding to a time
+     *   in ts.
+     */
     template <typename F, typename T1, typename T2>
     std::vector<std::vector<typename stan::return_type<T1,T2>::type> >
     integrate_ode(const F& f,
                   const std::vector<T1> y0, 
-                  const double& t0, // initial time
-                  const std::vector<double>& ts, // times at desired solutions
-                  const std::vector<T2>& theta, // parameters
-                  const std::vector<double>& x, // double data values
-                  const std::vector<int>& x_int, // int data values
+                  const double& t0,               // initial time
+                  const std::vector<double>& ts,  // times at desired solutions
+                  const std::vector<T2>& theta,   // parameters
+                  const std::vector<double>& x,   // double data values
+                  const std::vector<int>& x_int,   // int data values
                   std::ostream* pstream) { 
       using boost::numeric::odeint::integrate_times;  
       using boost::numeric::odeint::make_dense_output;  

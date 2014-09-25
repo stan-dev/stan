@@ -6,6 +6,19 @@
 
 namespace stan {
   namespace math {
+
+    /**
+     * Takes the coupled system and converts the result back to the
+     * base ode system.
+     *
+     * This is the function for double initial values and double
+     * theta. In this case, the coupled system is identical to the
+     * base system.
+     *
+     * @param y the vector of the coupled states after solving the ode 
+     * @param y0 initial state vector
+     * @param theta parameter vector
+     */
     std::vector<std::vector<double> > 
     compute_results(const std::vector<std::vector<double> >& y,
                     const std::vector<double>& y0,
@@ -13,6 +26,19 @@ namespace stan {
       return y;
     }
 
+    /**
+     * Takes the coupled system and converts the result back to the
+     * base ode system.
+     *
+     * This is the function for stan::agrad::var initial values and
+     * double theta. If N is the number of states of the base ode and
+     * M is the number of parameters (theta), this coupled system has
+     * N * N states.
+     *
+     * @param y the vector of the coupled states after solving the ode 
+     * @param y0 initial state vector
+     * @param theta parameter vector
+     */
     std::vector<std::vector<stan::agrad::var> > 
     compute_results(const std::vector<std::vector<double> >& y,
                     const std::vector<stan::agrad::var>& y0,
@@ -42,6 +68,19 @@ namespace stan {
       return y_return;
     }
 
+    /**
+     * Takes the coupled system and converts the result back to the
+     * base ode system.
+     *
+     * This is the function for double initial values and
+     * double theta. If N is the number of states of the base ode and
+     * M is the number of parameters (theta), this coupled system has
+     * N * M states.
+     *
+     * @param y the vector of the coupled states after solving the ode 
+     * @param y0 initial state vector
+     * @param theta parameter vector
+     */
     std::vector<std::vector<stan::agrad::var> > 
     compute_results(const std::vector<std::vector<double> >& y,
                     const std::vector<double>& y0,
@@ -70,7 +109,20 @@ namespace stan {
 
       return y_return;
     }
-    
+
+    /**
+     * Takes the coupled system and converts the result back to the
+     * base ode system.
+     *
+     * This is the function for double initial values and
+     * double theta. If N is the number of states of the base ode and
+     * M is the number of parameters (theta), this coupled system has
+     * N * (N+M) states.
+     *
+     * @param y the vector of the coupled states after solving the ode 
+     * @param y0 initial state vector
+     * @param theta parameter vector
+     */    
     std::vector<std::vector<stan::agrad::var> > 
     compute_results(const std::vector<std::vector<double> >& y,
                     const std::vector<stan::agrad::var>& y0,
