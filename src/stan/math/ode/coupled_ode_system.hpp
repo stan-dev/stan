@@ -138,12 +138,12 @@ namespace stan {
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double t) {
-        
-        dy_dt = f_(t,y,theta_dbl_,x_,x_int_,pstream_);
+        std::vector<double> y_base(y.begin(), y.begin()+N_);
+        dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,pstream_);
         stan::math::check_equal("coupled_ode_system(%1%)",dy_dt.size(),N_,"dy_dt",
                                 static_cast<double*>(0));
 
-        std::vector<double> coupled_sys(N_ * theta_.size());
+        std::vector<double> coupled_sys(N_ * M_);
 
         std::vector<stan::agrad::var> theta_temp;
         std::vector<stan::agrad::var> y_temp;
@@ -164,7 +164,7 @@ namespace stan {
             vars.push_back(y_temp[j]);
           }
 
-          for (int j = 0; j < theta_.size(); j++) {
+          for (int j = 0; j < M_; j++) {
             theta_temp.push_back(theta_dbl_[j]);
             vars.push_back(theta_temp[j]);
           }
@@ -172,7 +172,7 @@ namespace stan {
           dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_,pstream_);
           dy_dt_temp[i].grad(vars, grad);
           
-          for (int j = 0; j < theta_.size(); j++) { 
+          for (int j = 0; j < M_; j++) { 
             // orders derivatives by equation (i.e. if there are 2 eqns 
             // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
             // dy1_dt, dy2_dt, dy1_da, dy2_da, dy1_db, dy2_db
@@ -250,10 +250,11 @@ namespace stan {
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double t) {
-        std::vector<double> y_new;
-        for (int i = 0; i < N_; i++)
-          y_new.push_back(y[i]+y0_dbl_[i]);
-        dy_dt = f_(t,y_new,theta_,x_,x_int_,pstream_);
+        std::vector<double> y_base(y.begin(), y.begin()+N_);
+        for (int n = 0; n < N_; n++)
+          y_base[n] += y0_dbl_[n];
+
+        dy_dt = f_(t,y_base,theta_,x_,x_int_,pstream_);
         stan::math::check_equal("coupled_ode_system(%1%)",dy_dt.size(),N_,"dy_dt",
                                 static_cast<double*>(0));
 
@@ -363,15 +364,16 @@ namespace stan {
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double t) {
-        std::vector<double> y_new;
-        for (int i = 0; i < N_; i++)
-          y_new.push_back(y[i]+y0_dbl_[i]);
-        dy_dt = f_(t,y_new,theta_dbl_,x_,x_int_,pstream_);
+        std::vector<double> y_base(y.begin(), y.begin()+N_);
+        for (int n = 0; n < N_; n++)
+          y_base[n] += y0_dbl_[n];
+
+        dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,pstream_);
         stan::math::check_equal("coupled_ode_system(%1%)",dy_dt.size(),N_,"dy_dt",
                                 static_cast<double*>(0));
 
-        std::vector<double> coupled_sys(N_ * (N_+theta_.size()));
-
+        std::vector<double> coupled_sys(N_ * (N_+M_));
+        
         std::vector<stan::agrad::var> theta_temp;
         std::vector<stan::agrad::var> y_temp;
         std::vector<stan::agrad::var> dy_dt_temp;
@@ -391,7 +393,7 @@ namespace stan {
             vars.push_back(y_temp[j]);
           }
 
-          for (int j = 0; j < theta_.size(); j++) {
+          for (int j = 0; j < M_; j++) {
             theta_temp.push_back(theta_dbl_[j]);
             vars.push_back(theta_temp[j]);
           }
@@ -399,7 +401,7 @@ namespace stan {
           dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_,pstream_);
           dy_dt_temp[i].grad(vars, grad);
 
-          for (int j = 0; j < N_+theta_.size(); j++) { 
+          for (int j = 0; j < N_+M_; j++) { 
             // orders derivatives by equation (i.e. if there are 2 eqns 
             // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
             // dy1_dt, dy2_dt, dy1_da, dy2_da, dy1_db, dy2_db

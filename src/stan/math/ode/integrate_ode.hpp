@@ -67,9 +67,6 @@ namespace stan {
       const double relative_tolerance = 1e-6;
       const double step_size = 0.1;
 
-      typedef typename stan::return_type<T1,T2>::type base_ode_system_type;
-      
-      
       // validate inputs
       stan::math::check_nonzero_size("integrate_ode(%1%)", ts, "time", 
                                      static_cast<double*>(0));
@@ -83,7 +80,6 @@ namespace stan {
       coupled_ode_system<F, T1, T2>
         coupled_system(f, y0, theta, x, x_int, pstream);
       std::vector<double> coupled_state = coupled_system.initial_state();
-      
       
       // boost expects the first time in the vector to be the 
       // time of the initial state
@@ -108,7 +104,7 @@ namespace stan {
       // remove the first state; this state corresponds to the initial value
       y_coupled.erase(y_coupled.begin());
 
-      std::vector<std::vector<base_ode_system_type> >
+      std::vector<std::vector<typename stan::return_type<T1,T2>::type> >
         y_vec = compute_results(y_coupled, y0, theta);
 
       return y_vec;
