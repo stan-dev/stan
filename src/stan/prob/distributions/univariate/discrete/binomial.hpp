@@ -321,7 +321,7 @@ namespace stan {
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
         const T_partials_return betafunc = exp(lbeta(N_dbl-n_dbl,n_dbl+1));
         const T_partials_return Pi = inc_beta(N_dbl - n_dbl, n_dbl + 1, 
-                                              1 - theta_dbl) / betafunc;
+                                              1 - theta_dbl);
           
         P *= Pi;
 
@@ -404,7 +404,7 @@ namespace stan {
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
         const T_partials_return betafunc = exp(lbeta(N_dbl-n_dbl,n_dbl+1));
         const T_partials_return Pi = inc_beta(N_dbl - n_dbl, n_dbl + 1, 
-                                              1 - theta_dbl) / betafunc;
+                                              1 - theta_dbl);
 
         P += log(Pi);
 
@@ -481,7 +481,7 @@ namespace stan {
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
         const T_partials_return betafunc = exp(lbeta(N_dbl-n_dbl,n_dbl+1));
         const T_partials_return Pi = 1.0 - inc_beta(N_dbl - n_dbl, n_dbl + 1, 
-                                                    1 - theta_dbl) / betafunc;
+                                                    1 - theta_dbl);
 
         P += log(Pi);
 
