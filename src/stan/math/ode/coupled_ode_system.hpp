@@ -5,6 +5,7 @@
 #include <vector>
 #include <stan/math/error_handling/check_equal.hpp>
 #include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace math {
@@ -47,6 +48,7 @@ namespace stan {
       const std::vector<int>& x_int_;
       const int& num_eqn_;
       std::ostream* pstream_;
+
       coupled_ode_system(const F& f,
                          const std::vector<double>& y0,
                          const std::vector<double>& theta,
@@ -65,11 +67,12 @@ namespace stan {
 
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
-                      const double& t) {
+                      const double t) {
         dy_dt = f_(t,y,theta_,x_,x_int_,pstream_);
         stan::math::check_matching_sizes("coupled_ode_system(%1%)",y,"y",dy_dt,"dy_dt",
                                          static_cast<double*>(0));
       }
+      
     };
 
     /**
@@ -107,7 +110,7 @@ namespace stan {
 
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
-                      const double& t) {
+                      const double t) {
         
         dy_dt = f_(t,y,theta_,x_,x_int_,pstream_);
         stan::math::check_equal("coupled_ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
@@ -159,6 +162,7 @@ namespace stan {
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
       }
     };
+
     
     /**
      * The coupled ode system for stan::agrad::var initial values and
@@ -195,7 +199,7 @@ namespace stan {
 
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
-                      const double& t) {
+                      const double t) {
         std::vector<double> y_new;
         for (int i = 0; i < num_eqn_; i++)
           y_new.push_back(y[i]+y0_[i]);
@@ -242,6 +246,7 @@ namespace stan {
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
       }
     };
+
     
     /**
      * The coupled ode system for stan::agrad::var initial values and
@@ -278,7 +283,7 @@ namespace stan {
 
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
-                      const double& t) {
+                      const double t) {
         std::vector<double> y_new;
         for (int i = 0; i < num_eqn_; i++)
           y_new.push_back(y[i]+y0_[i]);

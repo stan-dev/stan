@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <stan/agrad/rev/internal/precomputed_gradients.hpp>
-
+#include <stan/agrad/rev/operators/operator_plus_equal.hpp>
 namespace stan {
   namespace math {
 
