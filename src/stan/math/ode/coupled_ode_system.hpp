@@ -46,7 +46,7 @@ namespace stan {
       const std::vector<double>& theta_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
-      const int& num_eqn_;
+      const int num_eqn_;
       std::ostream* pstream_;
 
       coupled_ode_system(const F& f,
@@ -54,7 +54,7 @@ namespace stan {
                          const std::vector<double>& theta,
                          const std::vector<double>& x,
                          const std::vector<int>& x_int,
-                         const int& num_eqn,
+                         const int num_eqn,
                          std::ostream* pstream)
         : f_(f), 
           y0_(y0), 
@@ -62,7 +62,7 @@ namespace stan {
           x_(x), 
           x_int_(x_int), 
           num_eqn_(num_eqn),
-          pstream_(pstream) { 
+          pstream_(pstream) {
       }
 
       void operator()(const std::vector<double>& y,
@@ -87,32 +87,37 @@ namespace stan {
     struct coupled_ode_system <F, double, stan::agrad::var> {
       const F& f_;
       const std::vector<double>& y0_;
-      const std::vector<double>& theta_;
+      const std::vector<stan::agrad::var>& theta_;
+      std::vector<double> theta_dbl_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
-      const int& num_eqn_;
+      const int num_eqn_;
       std::ostream* pstream_;
       coupled_ode_system(const F& f,
                          const std::vector<double>& y0,
-                         const std::vector<double>& theta,
+                         const std::vector<stan::agrad::var>& theta,
                          const std::vector<double>& x,
                          const std::vector<int>& x_int,
-                         const int& num_eqn,
+                         const int num_eqn,
                          std::ostream* pstream)
         : f_(f), 
           y0_(y0), 
-          theta_(theta), 
+          theta_(theta),
+          theta_dbl_(theta.size(), 0.0),
           x_(x),
           x_int_(x_int), 
           num_eqn_(num_eqn),
-          pstream_(pstream) { 
+          pstream_(pstream) {
+        // setup theta
+        for (int m = 0; m < theta.size(); m++)
+          theta_dbl_[m] = value_of(theta[m]);
       }
 
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double t) {
         
-        dy_dt = f_(t,y,theta_,x_,x_int_,pstream_);
+        dy_dt = f_(t,y,theta_dbl_,x_,x_int_,pstream_);
         stan::math::check_equal("coupled_ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
                                 static_cast<double*>(0));
 
@@ -138,7 +143,7 @@ namespace stan {
           }
 
           for (int j = 0; j < theta_.size(); j++) {
-            theta_temp.push_back(theta_[j]);
+            theta_temp.push_back(theta_dbl_[j]);
             vars.push_back(theta_temp[j]);
           }
 
@@ -175,26 +180,31 @@ namespace stan {
     template <typename F>
     struct coupled_ode_system <F, stan::agrad::var, double> {
       const F& f_;
-      const std::vector<double> y0_;
+      const std::vector<stan::agrad::var>& y0_;
+      std::vector<double> y0_dbl_;
       const std::vector<double>& theta_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
-      const int& num_eqn_;
+      const int num_eqn_;
       std::ostream* pstream_;
       coupled_ode_system(const F& f,
-                         const std::vector<double>& y0,
+                         const std::vector<stan::agrad::var>& y0,
                          const std::vector<double>& theta,
                          const std::vector<double>& x,
                          const std::vector<int>& x_int,
-                         const int& num_eqn,
+                         const int num_eqn,
                          std::ostream* pstream)
         : f_(f), 
-          y0_(y0), 
+          y0_(y0),
+          y0_dbl_(y0.size(), 0.0),
           theta_(theta), 
           x_(x), 
           x_int_(x_int), 
           num_eqn_(num_eqn),
-          pstream_(pstream) { 
+          pstream_(pstream) {
+
+        for (int n = 0; n < y0.size(); n++)
+          y0_dbl_[n] = value_of(y0_[n]);
       }
 
       void operator()(const std::vector<double>& y,
@@ -202,7 +212,7 @@ namespace stan {
                       const double t) {
         std::vector<double> y_new;
         for (int i = 0; i < num_eqn_; i++)
-          y_new.push_back(y[i]+y0_[i]);
+          y_new.push_back(y[i]+y0_dbl_[i]);
         dy_dt = f_(t,y_new,theta_,x_,x_int_,pstream_);
         stan::math::check_equal("coupled_ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
                                 static_cast<double*>(0));
@@ -222,7 +232,7 @@ namespace stan {
           stan::agrad::start_nested();
 
           for (int j = 0; j < num_eqn_; j++) {
-            y_temp.push_back(y[j]+y0_[j]);
+            y_temp.push_back(y[j]+y0_dbl_[j]);
             vars.push_back(y_temp[j]);
           }
 
@@ -259,26 +269,38 @@ namespace stan {
     template <typename F>
     struct coupled_ode_system <F, stan::agrad::var, stan::agrad::var> {
       const F& f_;
-      const std::vector<double> y0_;
-      const std::vector<double>& theta_;
+      const std::vector<stan::agrad::var>& y0_;
+      std::vector<double> y0_dbl_;
+      const std::vector<stan::agrad::var>& theta_;
+      std::vector<double> theta_dbl_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
-      const int& num_eqn_;
+      const int num_eqn_;
       std::ostream* pstream_;
       coupled_ode_system(const F& f,
-                         const std::vector<double> y0,
-                         const std::vector<double>& theta,
+                         const std::vector<stan::agrad::var>& y0,
+                         const std::vector<stan::agrad::var>& theta,
                          const std::vector<double>& x,
                          const std::vector<int>& x_int,
-                         const int& num_eqn,
+                         const int num_eqn,
                          std::ostream* pstream)
         : f_(f), 
-          y0_(y0), 
+          y0_(y0),
+          y0_dbl_(y0.size(), 0.0),
           theta_(theta), 
+          theta_dbl_(theta.size(), 0.0), 
           x_(x), 
           x_int_(x_int), 
           num_eqn_(num_eqn),
-          pstream_(pstream) { 
+          pstream_(pstream) {
+        // setup y0
+        for (int n = 0; n < y0.size(); n++)
+          y0_dbl_[n] = value_of(y0[n]);
+
+        // setup theta
+        for (int m = 0; m < theta.size(); m++)
+          theta_dbl_[m] = value_of(theta[m]);
+
       }
 
       void operator()(const std::vector<double>& y,
@@ -286,8 +308,8 @@ namespace stan {
                       const double t) {
         std::vector<double> y_new;
         for (int i = 0; i < num_eqn_; i++)
-          y_new.push_back(y[i]+y0_[i]);
-        dy_dt = f_(t,y_new,theta_,x_,x_int_,pstream_);
+          y_new.push_back(y[i]+y0_dbl_[i]);
+        dy_dt = f_(t,y_new,theta_dbl_,x_,x_int_,pstream_);
         stan::math::check_equal("coupled_ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
                                 static_cast<double*>(0));
 
@@ -308,12 +330,12 @@ namespace stan {
           stan::agrad::start_nested();
 
           for (int j = 0; j < num_eqn_; j++) {
-            y_temp.push_back(y[j]+y0_[j]);
+            y_temp.push_back(y[j]+y0_dbl_[j]);
             vars.push_back(y_temp[j]);
           }
 
           for (int j = 0; j < theta_.size(); j++) {
-            theta_temp.push_back(theta_[j]);
+            theta_temp.push_back(theta_dbl_[j]);
             vars.push_back(theta_temp[j]);
           }
 

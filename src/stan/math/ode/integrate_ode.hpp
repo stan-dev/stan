@@ -84,19 +84,11 @@ namespace stan {
       const int N = y0.size();
       const int M = theta.size();
       
-      // setup y0
-      std::vector<double> y0_dbl(N);
-      for (int n = 0; n < N; n++)
-        y0_dbl[n] = value_of(y0[n]);
+      // set up coupled ode system coupled_ode_system<F, T1, T2>
+      //coupled_system(f, y0_dbl, theta_dbl, x, x_int, N, pstream);
 
-      // setup theta
-      std::vector<double> theta_dbl(M);
-      for (int m = 0; m < M; m++)
-        theta_dbl[m] = value_of(theta[m]);
-
-      // set up coupled ode system
       coupled_ode_system<F, T1, T2>
-        coupled_system(f, y0_dbl, theta_dbl, x, x_int, N, pstream);
+        coupled_system(f, y0, theta, x, x_int, N, pstream);
       
       // set up the coupled state. base system has size N.
       // y0,     theta,  size
