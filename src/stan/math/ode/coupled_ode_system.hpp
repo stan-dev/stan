@@ -42,8 +42,8 @@ namespace stan {
     template <typename F>
     struct coupled_ode_system<F, double, double> {
       const F& f_;
-      const std::vector<double>& y0_;
-      const std::vector<double>& theta_;
+      const std::vector<double>& y0_dbl_;
+      const std::vector<double>& theta_dbl_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       std::ostream* pstream_;
@@ -58,8 +58,8 @@ namespace stan {
                          const std::vector<int>& x_int,
                          std::ostream* pstream)
         : f_(f), 
-          y0_(y0),
-          theta_(theta),
+          y0_dbl_(y0),
+          theta_dbl_(theta),
           x_(x), 
           x_int_(x_int), 
           pstream_(pstream),
@@ -71,7 +71,7 @@ namespace stan {
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double t) {
-        dy_dt = f_(t,y,theta_,x_,x_int_,pstream_);
+        dy_dt = f_(t,y,theta_dbl_,x_,x_int_,pstream_);
         stan::math::check_matching_sizes("coupled_ode_system(%1%)",y,"y",dy_dt,"dy_dt",
                                          static_cast<double*>(0));
       }
@@ -85,7 +85,7 @@ namespace stan {
         // initial values to y0 because we don't need the
         // sensitivies of y0.
         for (int n = 0; n < N_; n++)
-          state[n] = y0_[n];
+          state[n] = y0_dbl_[n];
         return state;
       }
       
@@ -218,7 +218,7 @@ namespace stan {
       const F& f_;
       const std::vector<stan::agrad::var>& y0_;
       std::vector<double> y0_dbl_;
-      const std::vector<double>& theta_;
+      const std::vector<double>& theta_dbl_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       std::ostream* pstream_;
@@ -235,7 +235,7 @@ namespace stan {
         : f_(f), 
           y0_(y0),
           y0_dbl_(y0.size(), 0.0),
-          theta_(theta), 
+          theta_dbl_(theta), 
           x_(x), 
           x_int_(x_int), 
           pstream_(pstream),
@@ -254,7 +254,7 @@ namespace stan {
         for (int n = 0; n < N_; n++)
           y_base[n] += y0_dbl_[n];
 
-        dy_dt = f_(t,y_base,theta_,x_,x_int_,pstream_);
+        dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,pstream_);
         stan::math::check_equal("coupled_ode_system(%1%)",dy_dt.size(),N_,"dy_dt",
                                 static_cast<double*>(0));
 
@@ -277,7 +277,7 @@ namespace stan {
             vars.push_back(y_temp[j]);
           }
 
-          dy_dt_temp = f_(t,y_temp,theta_,x_,x_int_,pstream_);
+          dy_dt_temp = f_(t,y_temp,theta_dbl_,x_,x_int_,pstream_);
           dy_dt_temp[i].grad(vars, grad);
 
           for (int j = 0; j < N_; j++) { 
