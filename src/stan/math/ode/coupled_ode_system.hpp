@@ -42,13 +42,13 @@ namespace stan {
     template <typename F>
     struct coupled_ode_system<F, double, double> {
       const F& f_;
-      const int N_;
       const std::vector<double>& y0_;
-      const int M_;
       const std::vector<double>& theta_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       std::ostream* pstream_;
+      const int N_;
+      const int M_;
       const int size_;
 
       coupled_ode_system(const F& f,
@@ -58,13 +58,13 @@ namespace stan {
                          const std::vector<int>& x_int,
                          std::ostream* pstream)
         : f_(f), 
-          N_(y0.size()),
           y0_(y0),
-          M_(theta.size()),
           theta_(theta),
           x_(x), 
           x_int_(x_int), 
           pstream_(pstream),
+          N_(y0.size()),
+          M_(theta.size()),
           size_(N_) {
       }
 
@@ -79,6 +79,16 @@ namespace stan {
       const int size() const {
         return size_;
       }
+
+      std::vector<double> initial_state() {
+        std::vector<double> state(size_, 0.0);
+        // initial values to y0 because we don't need the
+        // sensitivies of y0.
+        for (int n = 0; n < N_; n++)
+          state[n] = y0_[n];
+        return state;
+      }
+      
     };
 
     /**
@@ -94,14 +104,14 @@ namespace stan {
     template <typename F>
     struct coupled_ode_system <F, double, stan::agrad::var> {
       const F& f_;
-      const int N_;
       const std::vector<double>& y0_;
-      const int M_;
       const std::vector<stan::agrad::var>& theta_;
       std::vector<double> theta_dbl_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       std::ostream* pstream_;
+      const int N_;
+      const int M_;
       const int size_;
 
       coupled_ode_system(const F& f,
@@ -111,14 +121,14 @@ namespace stan {
                          const std::vector<int>& x_int,
                          std::ostream* pstream)
         : f_(f), 
-          N_(y0.size()),
           y0_(y0),
-          M_(theta.size()),
           theta_(theta),
-          theta_dbl_(M_, 0.0),
+          theta_dbl_(theta.size(), 0.0),
           x_(x),
           x_int_(x_int), 
           pstream_(pstream),
+          N_(y0.size()),
+          M_(theta.size()),
           size_(N_ + N_ * M_) {
         // setup theta
         for (int m = 0; m < M_; m++)
@@ -183,6 +193,15 @@ namespace stan {
         return size_;
       }
 
+      std::vector<double> initial_state() {
+        std::vector<double> state(size_, 0.0);
+        // initial values to y0 because we don't need the
+        // sensitivies of y0.
+        for (int n = 0; n < N_; n++)
+          state[n] = y0_[n];
+        return state;
+      }
+
     };
 
     
@@ -197,14 +216,14 @@ namespace stan {
     template <typename F>
     struct coupled_ode_system <F, stan::agrad::var, double> {
       const F& f_;
-      const int N_;
       const std::vector<stan::agrad::var>& y0_;
       std::vector<double> y0_dbl_;
-      const int M_;
       const std::vector<double>& theta_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       std::ostream* pstream_;
+      const int N_;
+      const int M_;
       const int size_;
 
       coupled_ode_system(const F& f,
@@ -214,14 +233,14 @@ namespace stan {
                          const std::vector<int>& x_int,
                          std::ostream* pstream)
         : f_(f), 
-          N_(y0.size()),
           y0_(y0),
-          y0_dbl_(N_, 0.0),
-          M_(theta.size()),
+          y0_dbl_(y0.size(), 0.0),
           theta_(theta), 
           x_(x), 
           x_int_(x_int), 
           pstream_(pstream),
+          N_(y0.size()),
+          M_(theta.size()),
           size_(N_ + N_ * N_) {
 
         for (int n = 0; n < N_; n++)
@@ -281,6 +300,14 @@ namespace stan {
         return size_;
       }
 
+
+      std::vector<double> initial_state() {
+        std::vector<double> state(size_, 0.0);
+        // initial values are all 0 because we're getting sensitivities
+        // of y0
+        return state;
+      }
+
     };
 
     
@@ -295,15 +322,15 @@ namespace stan {
     template <typename F>
     struct coupled_ode_system <F, stan::agrad::var, stan::agrad::var> {
       const F& f_;
-      const int N_;
       const std::vector<stan::agrad::var>& y0_;
       std::vector<double> y0_dbl_;
-      const int M_;      
       const std::vector<stan::agrad::var>& theta_;
       std::vector<double> theta_dbl_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       std::ostream* pstream_;
+      const int N_;
+      const int M_;
       const int size_;
 
       coupled_ode_system(const F& f,
@@ -313,15 +340,15 @@ namespace stan {
                          const std::vector<int>& x_int,
                          std::ostream* pstream)
         : f_(f), 
-          N_(y0.size()),
           y0_(y0),
-          y0_dbl_(N_, 0.0),
-          M_(theta.size()),          
+          y0_dbl_(y0.size(), 0.0),
           theta_(theta), 
-          theta_dbl_(M_, 0.0), 
+          theta_dbl_(theta.size(), 0.0), 
           x_(x), 
           x_int_(x_int), 
           pstream_(pstream),
+          N_(y0.size()),
+          M_(theta.size()),          
           size_(N_ + N_ * (N_ + M_)) {
         // setup y0
         for (int n = 0; n < N_; n++)
@@ -391,6 +418,13 @@ namespace stan {
 
       const int size() const {
         return size_;
+      }
+
+      std::vector<double> initial_state() {
+        std::vector<double> state(size_, 0.0);
+        // initial values are all 0 because we're getting sensitivities
+        // of y0
+        return state;
       }
 
     };

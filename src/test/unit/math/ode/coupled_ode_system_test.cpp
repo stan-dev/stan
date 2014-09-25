@@ -85,7 +85,7 @@ TEST_F(StanMathOde, coupled_ode_system_vd) {
 }
 
 
-TEST_F(StanMathOde, coupled_size) {
+TEST_F(StanMathOde, size) {
   using stan::math::coupled_ode_system;
   using stan::agrad::var;
   mock_ode_functor base_ode;
@@ -112,4 +112,66 @@ TEST_F(StanMathOde, coupled_size) {
   EXPECT_EQ(N + N*M, coupled_system_dv.size());
   EXPECT_EQ(N + N*N, coupled_system_vd.size());
   EXPECT_EQ(N + N*N + N*M, coupled_system_vv.size());
+}
+
+TEST_F(StanMathOde, initial_state) {
+  using stan::math::coupled_ode_system;
+  using stan::agrad::var;
+  mock_ode_functor base_ode;
+
+  const int N = 3;
+  const int M = 4;
+
+  std::vector<double> y0_d(N, 0.0);
+  std::vector<var> y0_v(N, 0.0);
+  std::vector<double> theta_d(M, 0.0);
+  std::vector<var> theta_v(M, 0.0);
+
+  for (int n = 0; n < N; n++) {
+    y0_d[n] = n+1;
+    y0_v[n] = n+1;
+  }
+  for (int m = 0; m < M; m++) {
+    theta_d[m] = 10 * (m+1);
+    theta_v[m] = 10 * (m+1);
+  }
+     
+  coupled_ode_system<mock_ode_functor, double, double>
+    coupled_system_dd(base_ode, y0_d, theta_d, x, x_int, &msgs);
+  coupled_ode_system<mock_ode_functor, double, var>
+    coupled_system_dv(base_ode, y0_d, theta_v, x, x_int, &msgs);
+  coupled_ode_system<mock_ode_functor, var, double>
+    coupled_system_vd(base_ode, y0_v, theta_d, x, x_int, &msgs);
+  coupled_ode_system<mock_ode_functor, var, var>
+    coupled_system_vv(base_ode, y0_v, theta_v, x, x_int, &msgs);
+
+  std::vector<double> state;
+
+  state = coupled_system_dd.initial_state();
+  for (int n = 0; n < N; n++) 
+    EXPECT_FLOAT_EQ(y0_d[n], state[n])
+      << "we don't need derivatives of y0; initial state gets the initial values";
+  for (int n = N; n < state.size(); n++)
+    EXPECT_FLOAT_EQ(0.0, state[n]);
+
+  state = coupled_system_dv.initial_state();
+  for (int n = 0; n < N; n++) 
+    EXPECT_FLOAT_EQ(y0_d[n], state[n])
+      << "we don't need derivatives of y0; initial state gets the initial values";
+  for (int n = N; n < state.size(); n++)
+    EXPECT_FLOAT_EQ(0.0, state[n]);
+
+  state = coupled_system_vd.initial_state();
+  for (int n = 0; n < N; n++) 
+    EXPECT_FLOAT_EQ(0.0, state[n])
+      << "we need derivatives of y0; initial state gets set to 0";
+  for (int n = N; n < state.size(); n++)
+    EXPECT_FLOAT_EQ(0.0, state[n]);
+
+  state = coupled_system_vv.initial_state();
+  for (int n = 0; n < N; n++) 
+    EXPECT_FLOAT_EQ(0.0, state[n])
+      << "we need derivatives of y0; initial state gets set to 0";
+  for (int n = N; n < state.size(); n++)
+    EXPECT_FLOAT_EQ(0.0, state[n]);
 }

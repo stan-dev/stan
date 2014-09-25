@@ -80,19 +80,10 @@ namespace stan {
       stan::math::check_less("integrate_ode(%1%)",t0, ts[0], "initial time",
                              static_cast<double*>(0));
 
-     
-      const int N = y0.size();
-      
       coupled_ode_system<F, T1, T2>
         coupled_system(f, y0, theta, x, x_int, pstream);
+      std::vector<double> coupled_state = coupled_system.initial_state();
       
-      std::vector<double> coupled_y0(coupled_system.size(), 0.0);
-      
-      // set the initial coupled_y0 values to y0 if 
-      // we don't need the sensitivities of the y0.
-      if (is_same<double, T1>::value)
-        for (int n = 0; n < N; n++)
-          coupled_y0[n] = value_of(y0[n]);
       
       // boost expects the first time in the vector to be the 
       // time of the initial state
@@ -109,7 +100,7 @@ namespace stan {
                                         runge_kutta_dopri5<std::vector<double>,
                                         double,std::vector<double>,double>()),
                       coupled_system,
-                      coupled_y0, 
+                      coupled_state, 
                       boost::begin(ts_vec), boost::end(ts_vec), 
                       step_size,
                       observer);
