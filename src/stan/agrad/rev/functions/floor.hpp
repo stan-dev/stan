@@ -5,6 +5,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace agrad {
@@ -37,6 +38,22 @@ namespace stan {
      * discontinuous at integral values, its gradient is returned as
      * zero everywhere.
      * 
+       \f[
+       \mbox{floor}(x) = 
+       \begin{cases}
+         \lfloor x \rfloor & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{floor}(x)}{\partial x} = 
+       \begin{cases}
+         0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Input variable.
      * @return Floor of the variable.
      */

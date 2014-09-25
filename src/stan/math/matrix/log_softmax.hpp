@@ -12,7 +12,28 @@ namespace stan {
   namespace math {
 
    /**
-     * Return the natural logarithm of the softmax of the specified vector.
+     * Return the natural logarithm of the softmax of the specified
+     * vector.
+     *
+     * \f$
+     * \log \mbox{softmax}(y)
+     * \ = \ y - \log \sum_{k=1}^K \exp(y_k)
+     * \ = \ y - \mbox{log\_sum\_exp}(y).
+     * \f$
+     *
+     * For the log softmax function, the entries in the Jacobian are
+     * \f$
+     * \frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
+     * = \left\{ 
+     * \begin{array}{ll}
+     * 1 - \mbox{softmax}(y)[m]
+     * & \mbox{ if } m = k, \mbox{ and}
+     * \\[6pt]
+     * \mbox{softmax}(y)[m]
+     * & \mbox{ if } m \neq k.
+     * \end{array}
+     * \right.
+     * \f$
      *
      * @tparam T Scalar type of values in vector.
      * @param[in] v Vector to transform.

@@ -3,7 +3,7 @@
 
 #include <ostream>
 #include <boost/math/special_functions/fpclassify.hpp>
-#define unlikely(x) (x)
+#include <stan/meta/likely.hpp>
 
 namespace stan {
 

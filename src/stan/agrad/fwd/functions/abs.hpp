@@ -7,6 +7,7 @@
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/abs.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
 
@@ -24,9 +25,8 @@ namespace stan {
         return fvar<T>(-x.val_, -x.d_);
       else if (x.val_ == 0.0)
         return fvar<T>(0, 0);
-      else if (unlikely(boost::math::isnan(value_of(x.val_)))) {
+      else // if (unlikely(boost::math::isnan(value_of(x.val_)))) 
         return fvar<T>(abs(x.val_),stan::math::NOT_A_NUMBER);
-      }
     }
   }
 }

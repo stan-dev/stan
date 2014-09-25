@@ -34,6 +34,31 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \mbox{asinh}(x) = \frac{x}{x^2 + 1}\f$.
      *
+     *
+       \f[
+       \mbox{asinh}(x) = 
+       \begin{cases}
+         \sinh^{-1}(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{asinh}(x)}{\partial x} = 
+       \begin{cases}
+         \frac{\partial\, \sinh^{-1}(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \sinh^{-1}(x)=\ln\left(x+\sqrt{x^2+1}\right)
+       \f]
+       
+       \f[
+       \frac{\partial \, \sinh^{-1}(x)}{\partial x} = \frac{1}{\sqrt{x^2+1}}
+       \f]
+     *
      * @param a The variable.
      * @return Inverse hyperbolic sine of the variable.
      */
