@@ -82,21 +82,11 @@ namespace stan {
 
      
       const int N = y0.size();
-      const int M = theta.size();
       
       coupled_ode_system<F, T1, T2>
         coupled_system(f, y0, theta, x, x_int, pstream);
       
-      // set up the coupled state. base system has size N.
-      // y0,     theta,  size
-      // double, double, N
-      // double, var,    N + N * M
-      // var,    double, N + N * N
-      // var,    var,    N + N * (M + N)
-      int coupled_state_size
-        = N + N * (is_same<var,T1>::value * N + is_same<var,T2>::value * M);
-      
-      std::vector<double> coupled_y0(coupled_state_size, 0.0);
+      std::vector<double> coupled_y0(coupled_system.size(), 0.0);
       
       // set the initial coupled_y0 values to y0 if 
       // we don't need the sensitivities of the y0.

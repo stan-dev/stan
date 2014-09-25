@@ -44,10 +44,12 @@ namespace stan {
       const F& f_;
       const int N_;
       const std::vector<double>& y0_;
+      const int M_;
       const std::vector<double>& theta_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       std::ostream* pstream_;
+      const int size_;
 
       coupled_ode_system(const F& f,
                          const std::vector<double>& y0,
@@ -57,11 +59,13 @@ namespace stan {
                          std::ostream* pstream)
         : f_(f), 
           N_(y0.size()),
-          y0_(y0), 
+          y0_(y0),
+          M_(theta.size()),
           theta_(theta),
           x_(x), 
           x_int_(x_int), 
-          pstream_(pstream) {
+          pstream_(pstream),
+          size_(N_) {
       }
 
       void operator()(const std::vector<double>& y,
@@ -71,7 +75,10 @@ namespace stan {
         stan::math::check_matching_sizes("coupled_ode_system(%1%)",y,"y",dy_dt,"dy_dt",
                                          static_cast<double*>(0));
       }
-      
+
+      const int size() const {
+        return size_;
+      }
     };
 
     /**
@@ -80,6 +87,8 @@ namespace stan {
      * states and M thetas, the new coupled system has
      * N + N * M states.
      *
+     *
+     *
      * @tparam F the functor for the base ode system
      */
     template <typename F>
@@ -87,11 +96,14 @@ namespace stan {
       const F& f_;
       const int N_;
       const std::vector<double>& y0_;
+      const int M_;
       const std::vector<stan::agrad::var>& theta_;
       std::vector<double> theta_dbl_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       std::ostream* pstream_;
+      const int size_;
+
       coupled_ode_system(const F& f,
                          const std::vector<double>& y0,
                          const std::vector<stan::agrad::var>& theta,
@@ -100,14 +112,16 @@ namespace stan {
                          std::ostream* pstream)
         : f_(f), 
           N_(y0.size()),
-          y0_(y0), 
+          y0_(y0),
+          M_(theta.size()),
           theta_(theta),
-          theta_dbl_(theta.size(), 0.0),
+          theta_dbl_(M_, 0.0),
           x_(x),
           x_int_(x_int), 
-          pstream_(pstream) {
+          pstream_(pstream),
+          size_(N_ + N_ * M_) {
         // setup theta
-        for (int m = 0; m < theta.size(); m++)
+        for (int m = 0; m < M_; m++)
           theta_dbl_[m] = value_of(theta[m]);
       }
 
@@ -164,6 +178,11 @@ namespace stan {
 
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
       }
+      
+      const int size() const {
+        return size_;
+      }
+
     };
 
     
@@ -181,10 +200,13 @@ namespace stan {
       const int N_;
       const std::vector<stan::agrad::var>& y0_;
       std::vector<double> y0_dbl_;
+      const int M_;
       const std::vector<double>& theta_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       std::ostream* pstream_;
+      const int size_;
+
       coupled_ode_system(const F& f,
                          const std::vector<stan::agrad::var>& y0,
                          const std::vector<double>& theta,
@@ -195,10 +217,12 @@ namespace stan {
           N_(y0.size()),
           y0_(y0),
           y0_dbl_(N_, 0.0),
+          M_(theta.size()),
           theta_(theta), 
           x_(x), 
           x_int_(x_int), 
-          pstream_(pstream) {
+          pstream_(pstream),
+          size_(N_ + N_ * N_) {
 
         for (int n = 0; n < N_; n++)
           y0_dbl_[n] = value_of(y0_[n]);
@@ -252,6 +276,11 @@ namespace stan {
 
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
       }
+
+      const int size() const {
+        return size_;
+      }
+
     };
 
     
@@ -269,11 +298,14 @@ namespace stan {
       const int N_;
       const std::vector<stan::agrad::var>& y0_;
       std::vector<double> y0_dbl_;
+      const int M_;      
       const std::vector<stan::agrad::var>& theta_;
       std::vector<double> theta_dbl_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       std::ostream* pstream_;
+      const int size_;
+
       coupled_ode_system(const F& f,
                          const std::vector<stan::agrad::var>& y0,
                          const std::vector<stan::agrad::var>& theta,
@@ -284,17 +316,19 @@ namespace stan {
           N_(y0.size()),
           y0_(y0),
           y0_dbl_(N_, 0.0),
+          M_(theta.size()),          
           theta_(theta), 
-          theta_dbl_(theta.size(), 0.0), 
+          theta_dbl_(M_, 0.0), 
           x_(x), 
           x_int_(x_int), 
-          pstream_(pstream) {
+          pstream_(pstream),
+          size_(N_ + N_ * (N_ + M_)) {
         // setup y0
         for (int n = 0; n < N_; n++)
           y0_dbl_[n] = value_of(y0[n]);
 
         // setup theta
-        for (int m = 0; m < theta.size(); m++)
+        for (int m = 0; m < M_; m++)
           theta_dbl_[m] = value_of(theta[m]);
 
       }
@@ -354,6 +388,11 @@ namespace stan {
 
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
       }
+
+      const int size() const {
+        return size_;
+      }
+
     };
 
   }
