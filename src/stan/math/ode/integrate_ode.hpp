@@ -13,45 +13,12 @@
 
 #include <stan/math/ode/ode_system.hpp>
 #include <stan/math/ode/compute_results.hpp>
-#include <stan/math/ode/push_back_state_and_time.hpp>
+#include <stan/math/ode/coupled_ode_observer.hpp>
 
 namespace stan {
   
   namespace math {
     
-    namespace {
-      /**
-       * Observer for the coupled states.
-       */
-      struct coupled_ode_observer {
-        std::vector<std::vector<double> >& y_coupled_;
-        int n;
-        
-        /**
-         * Constructor.
-         *
-         * @param y_coupled is a reference to a vector of vector of
-         *   doubles. The outer vector must have the right number
-         *   of elements allocated.
-         */
-        coupled_ode_observer(std::vector<std::vector<double> >& y_coupled)
-          : y_coupled_(y_coupled), n(0) {
-        }
-
-        /**
-         * operator(). This is what boost's ode solver uses to
-         * record values.
-         *
-         * @param coupled_state the coupled state for the time in t
-         * @param t the time
-         */
-        void operator()(const std::vector<double>& coupled_state, const double t) {
-          y_coupled_[n] = coupled_state;
-          n++;
-        }
-      };
-    }
-
     /**
      * integrate_ode numerically solves the ordinary differential
      * equation specified for the times provided.
@@ -98,6 +65,7 @@ namespace stan {
       
       const double absolute_tolerance = 1e-6;
       const double relative_tolerance = 1e-6;
+      const double step_size = 0.1;
 
       
       // validate inputs
@@ -150,8 +118,6 @@ namespace stan {
       for (size_t n = 0; n < ts.size(); n++)
         ts_vec[n+1] = ts[n];
       
-      double step_size = 0.1;
-
       std::vector<std::vector<double> > y_coupled(ts_vec.size());
       coupled_ode_observer observer(y_coupled);
 
