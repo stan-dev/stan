@@ -1,26 +1,8 @@
 #include <gtest/gtest.h>
 #include <stan/math/matrix/promote_scalar_type.hpp>
-#include <test/unit/math/matrix/promote_type_test_util.hpp>
+#include <test/unit/math/functions/promote_type_test_util.hpp>
 
-TEST(MathFunctions,PromoteScalarType) {
-  using std::vector;
-  expect_promote_type<double,
-                      double, double>();
-  expect_promote_type<double,
-                      double, int>();
-  expect_promote_type<vector<double>,
-                      double, vector<int> >();
-}
-
-TEST(MathFunctions,PromoteScalarTypeStdVector) {
-  using std::vector;
-  expect_promote_type<vector<vector<double> >, 
-                    double, vector<vector<int> > >();
-  expect_promote_type<vector<vector<double> >, 
-                    double, vector<vector<double> > >();
-}
-
-TEST(MathFunctions,PromoteScalarTypeMatrix) {
+TEST(MathFunctionsPromoteScalar,TypeMatrix) {
   using std::vector;
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -34,7 +16,7 @@ TEST(MathFunctions,PromoteScalarTypeMatrix) {
                       double,  vector<Matrix<int,Dynamic,Dynamic> > >();
 }
 
-TEST(MathFunctions,PromoteScalarTypeVector) {
+TEST(MathFunctionsPromoteScalar,TypeVector) {
   using std::vector;
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -48,7 +30,7 @@ TEST(MathFunctions,PromoteScalarTypeVector) {
                       double,  vector<Matrix<int,Dynamic,1> > >();
 }
 
-TEST(MathFunctions,PromoteScalarTypeRowVector) {
+TEST(MathFunctionsPromoteScalar,TypeRowVector) {
   using std::vector;
   using Eigen::Matrix;
   using Eigen::Dynamic;

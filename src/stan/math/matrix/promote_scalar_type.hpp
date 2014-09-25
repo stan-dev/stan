@@ -2,29 +2,12 @@
 #define STAN__MATH__MATRIX__PROMOTE_SCALAR_TYPE_HPP
 
 #include <vector>
+#include <stan/math/functions/promote_scalar_type.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
   
   namespace math {
-
-
-    /**
-     * Template metaprogram to calculate a type for converting a
-     * convertible type.  This is the base case.
-     *
-     * @tparam T result scalar type.
-     * @tparam S input type
-     */
-    template <typename T, typename S>
-    struct promote_scalar_type {
-
-      /**
-       * The promoted type.
-       */
-      typedef T type;
-
-    };
 
 
     /**
@@ -51,6 +34,7 @@ namespace stan {
 
 
     /**
+
      * Template metaprogram to calculate a type for a vector whose
      * underlying scalar is converted from the second template
      * parameter type to the first. 
@@ -90,27 +74,6 @@ namespace stan {
         type;
 
     };
-
-    /**
-     * Template metaprogram to calculate a type for a container whose
-     * underlying scalar is converted from the second template
-     * parameter type to the first. 
-     *
-     * @tparam T result scalar type.
-     * @tparam S input type
-     */
-    template <typename T, typename S>
-    struct promote_scalar_type<T, std::vector<S> > {
-
-      /**
-       * The promoted type.
-       */
-      typedef std::vector<typename promote_scalar_type<T,S>::type> type;
-
-    };
-
-
-
 
   }
 }

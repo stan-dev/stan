@@ -1,13 +1,13 @@
-#ifndef TEST__MATH__UNIT__MATRIX__PROMOTE_TYPE_TEST_UTIL_HPP
-#define TEST__MATH__UNIT__MATRIX__PROMOTE_TYPE_TEST_UTIL_HPP
+#ifndef TEST__MATH__UNIT__FUNCTIONS__PROMOTE_TYPE_TEST_UTIL_HPP
+#define TEST__MATH__UNIT__FUNCTIONS__PROMOTE_TYPE_TEST_UTIL_HPP
 
 #include <gtest/gtest.h>
 
 #include <boost/typeof/typeof.hpp>
 #include <boost/type_traits/is_same.hpp>
 
-#include <stan/math/matrix/promote_scalar_type.hpp>
-#include <stan/math/matrix/promote_scalar.hpp>
+#include <stan/math/functions/promote_scalar_type.hpp>
+#include <stan/math/functions/promote_scalar.hpp>
 
 template <typename T, typename S>
 void expect_type(S s) {
