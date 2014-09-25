@@ -32,7 +32,7 @@ TEST(StanMathOde, coupled_ode_system_dv) {
   std::vector<int> x_int;
 
   coupled_ode_system<harm_osc_ode_fun, double, stan::agrad::var> 
-    system(harm_osc, y0, theta, x, x_int, 2, &msgs);
+    system(harm_osc, y0, theta, x, x_int, &msgs);
 
   system(coupled_y0, dy_dt, t0);
 
@@ -75,7 +75,7 @@ TEST(StanMathOde, coupled_ode_system_vd) {
   std::vector<int> x_int;
 
   coupled_ode_system<harm_osc_ode_fun, stan::agrad::var, double> 
-    system(harm_osc, y0_var, theta, x, x_int,2,&msgs);
+    system(harm_osc, y0_var, theta, x, x_int, &msgs);
 
   system(coupled_y0, dy_dt, t0);
 

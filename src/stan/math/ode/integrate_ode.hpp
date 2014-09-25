@@ -84,11 +84,8 @@ namespace stan {
       const int N = y0.size();
       const int M = theta.size();
       
-      // set up coupled ode system coupled_ode_system<F, T1, T2>
-      //coupled_system(f, y0_dbl, theta_dbl, x, x_int, N, pstream);
-
       coupled_ode_system<F, T1, T2>
-        coupled_system(f, y0, theta, x, x_int, N, pstream);
+        coupled_system(f, y0, theta, x, x_int, pstream);
       
       // set up the coupled state. base system has size N.
       // y0,     theta,  size
