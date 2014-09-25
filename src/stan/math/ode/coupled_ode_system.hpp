@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__ODE__ODE_SYSTEM_HPP
-#define STAN__MATH__ODE__ODE_SYSTEM_HPP
+#ifndef STAN__MATH__ODE__COUPLED_ODE_SYSTEM_HPP
+#define STAN__MATH__ODE__COUPLED_ODE_SYSTEM_HPP
 
 #include <ostream>
 #include <vector>
@@ -15,7 +15,7 @@ namespace stan {
      * of the base system coupled with the sensitivities.
      * 
      * Implementation notes:
-     * - struct ode_system isn't broken out into a base class because 
+     * - struct coupled_ode_system isn't broken out into a base class because 
      *   it requires this-> shenanigans and clunky constructor reuse 
      *   everywhere
      * - The default templated structure does nothing. This will prevent
@@ -27,7 +27,7 @@ namespace stan {
      * @tparam T2 type of the parameters
      */
     template <typename F, typename T1, typename T2>
-    struct ode_system {
+    struct coupled_ode_system {
     };
 
     
@@ -39,7 +39,7 @@ namespace stan {
      * @tparam F the functor for the base ode system
      */
     template <typename F>
-    struct ode_system<F, double, double> {
+    struct coupled_ode_system<F, double, double> {
       const F& f_;
       const std::vector<double>& y0_;
       const std::vector<double>& theta_;
@@ -47,13 +47,13 @@ namespace stan {
       const std::vector<int>& x_int_;
       const int& num_eqn_;
       std::ostream* pstream_;
-      ode_system(const F& f,
-                 const std::vector<double>& y0,
-                 const std::vector<double>& theta,
-                 const std::vector<double>& x,
-                 const std::vector<int>& x_int,
-                 const int& num_eqn,
-                 std::ostream* pstream)
+      coupled_ode_system(const F& f,
+                         const std::vector<double>& y0,
+                         const std::vector<double>& theta,
+                         const std::vector<double>& x,
+                         const std::vector<int>& x_int,
+                         const int& num_eqn,
+                         std::ostream* pstream)
         : f_(f), 
           y0_(y0), 
           theta_(theta),
@@ -67,7 +67,7 @@ namespace stan {
                       std::vector<double>& dy_dt,
                       const double& t) {
         dy_dt = f_(t,y,theta_,x_,x_int_,pstream_);
-        stan::math::check_matching_sizes("ode_system(%1%)",y,"y",dy_dt,"dy_dt",
+        stan::math::check_matching_sizes("coupled_ode_system(%1%)",y,"y",dy_dt,"dy_dt",
                                          static_cast<double*>(0));
       }
     };
@@ -81,7 +81,7 @@ namespace stan {
      * @tparam F the functor for the base ode system
      */
     template <typename F>
-    struct ode_system <F, double, stan::agrad::var> {
+    struct coupled_ode_system <F, double, stan::agrad::var> {
       const F& f_;
       const std::vector<double>& y0_;
       const std::vector<double>& theta_;
@@ -89,13 +89,13 @@ namespace stan {
       const std::vector<int>& x_int_;
       const int& num_eqn_;
       std::ostream* pstream_;
-      ode_system(const F& f,
-                 const std::vector<double>& y0,
-                 const std::vector<double>& theta,
-                 const std::vector<double>& x,
-                 const std::vector<int>& x_int,
-                 const int& num_eqn,
-                 std::ostream* pstream)
+      coupled_ode_system(const F& f,
+                         const std::vector<double>& y0,
+                         const std::vector<double>& theta,
+                         const std::vector<double>& x,
+                         const std::vector<int>& x_int,
+                         const int& num_eqn,
+                         std::ostream* pstream)
         : f_(f), 
           y0_(y0), 
           theta_(theta), 
@@ -110,7 +110,7 @@ namespace stan {
                       const double& t) {
         
         dy_dt = f_(t,y,theta_,x_,x_int_,pstream_);
-        stan::math::check_equal("ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
+        stan::math::check_equal("coupled_ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
                                 static_cast<double*>(0));
 
         std::vector<double> coupled_sys(num_eqn_ * theta_.size());
@@ -169,7 +169,7 @@ namespace stan {
      * @tparam F the functor for the base ode system
      */
     template <typename F>
-    struct ode_system <F, stan::agrad::var, double> {
+    struct coupled_ode_system <F, stan::agrad::var, double> {
       const F& f_;
       const std::vector<double> y0_;
       const std::vector<double>& theta_;
@@ -177,13 +177,13 @@ namespace stan {
       const std::vector<int>& x_int_;
       const int& num_eqn_;
       std::ostream* pstream_;
-      ode_system(const F& f,
-                 const std::vector<double>& y0,
-                 const std::vector<double>& theta,
-                 const std::vector<double>& x,
-                 const std::vector<int>& x_int,
-                 const int& num_eqn,
-                 std::ostream* pstream)
+      coupled_ode_system(const F& f,
+                         const std::vector<double>& y0,
+                         const std::vector<double>& theta,
+                         const std::vector<double>& x,
+                         const std::vector<int>& x_int,
+                         const int& num_eqn,
+                         std::ostream* pstream)
         : f_(f), 
           y0_(y0), 
           theta_(theta), 
@@ -200,7 +200,7 @@ namespace stan {
         for (int i = 0; i < num_eqn_; i++)
           y_new.push_back(y[i]+y0_[i]);
         dy_dt = f_(t,y_new,theta_,x_,x_int_,pstream_);
-        stan::math::check_equal("ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
+        stan::math::check_equal("coupled_ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
                                 static_cast<double*>(0));
 
         std::vector<double> coupled_sys(num_eqn_ * num_eqn_);
@@ -252,7 +252,7 @@ namespace stan {
      * @tparam F the functor for the base ode system
      */
     template <typename F>
-    struct ode_system <F, stan::agrad::var, stan::agrad::var> {
+    struct coupled_ode_system <F, stan::agrad::var, stan::agrad::var> {
       const F& f_;
       const std::vector<double> y0_;
       const std::vector<double>& theta_;
@@ -260,13 +260,13 @@ namespace stan {
       const std::vector<int>& x_int_;
       const int& num_eqn_;
       std::ostream* pstream_;
-      ode_system(const F& f,
-                 const std::vector<double> y0,
-                 const std::vector<double>& theta,
-                 const std::vector<double>& x,
-                 const std::vector<int>& x_int,
-                 const int& num_eqn,
-                 std::ostream* pstream)
+      coupled_ode_system(const F& f,
+                         const std::vector<double> y0,
+                         const std::vector<double>& theta,
+                         const std::vector<double>& x,
+                         const std::vector<int>& x_int,
+                         const int& num_eqn,
+                         std::ostream* pstream)
         : f_(f), 
           y0_(y0), 
           theta_(theta), 
@@ -283,7 +283,7 @@ namespace stan {
         for (int i = 0; i < num_eqn_; i++)
           y_new.push_back(y[i]+y0_[i]);
         dy_dt = f_(t,y_new,theta_,x_,x_int_,pstream_);
-        stan::math::check_equal("ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
+        stan::math::check_equal("coupled_ode_system(%1%)",dy_dt.size(),num_eqn_,"dy_dt",
                                 static_cast<double*>(0));
 
         std::vector<double> coupled_sys(num_eqn_ * (num_eqn_+theta_.size()));

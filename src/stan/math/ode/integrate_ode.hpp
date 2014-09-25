@@ -11,7 +11,7 @@
 #include <stan/math/error_handling/check_less.hpp>
 #include <stan/math/error_handling/matrix/check_ordered.hpp>
 
-#include <stan/math/ode/ode_system.hpp>
+#include <stan/math/ode/coupled_ode_system.hpp>
 #include <stan/math/ode/compute_results.hpp>
 #include <stan/math/ode/coupled_ode_observer.hpp>
 
@@ -34,7 +34,7 @@ namespace stan {
      * @tparam T1 type of the initial values
      * @tparam T2 type of the parameters
      * 
-     * @param[in] f a functor for the ordinary differential equation.
+     * @param[in] f a functor for the base ordinary differential equation.
      * @param[in] y0 the initial state. The size of the initial state must
      *    be greater than 0.
      * @param[in] t0 the time of the initial state.
@@ -92,7 +92,7 @@ namespace stan {
         theta_dbl[m] = value_of(theta[m]);
 
       // builds coupled ode system
-      ode_system<F, T1, T2> system(f, y0_dbl, theta_dbl, x, x_int, N, pstream);
+      coupled_ode_system<F, T1, T2> system(f, y0_dbl, theta_dbl, x, x_int, N, pstream);
 
       // set up the coupled state. base system has size N.
       // y0,     theta,  size

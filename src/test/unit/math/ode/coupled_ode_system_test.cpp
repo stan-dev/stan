@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/ode/harmonic_oscillator.hpp>
 #include <stan/agrad/rev.hpp>
-#include <stan/math/ode/ode_system.hpp>
+#include <stan/math/ode/coupled_ode_system.hpp>
 
-TEST(StanMathOde, ode_system_dv) {
+TEST(StanMathOde, coupled_ode_system_dv) {
   std::stringstream msgs;
   
-  using stan::math::ode_system;
+  using stan::math::coupled_ode_system;
 
   harm_osc_ode_fun harm_osc;
 
@@ -27,7 +27,7 @@ TEST(StanMathOde, ode_system_dv) {
   std::vector<double> x;
   std::vector<int> x_int;
 
-  ode_system<harm_osc_ode_fun, double, stan::agrad::var> 
+  coupled_ode_system<harm_osc_ode_fun, double, stan::agrad::var> 
     system(harm_osc, y0,theta, x, x_int,2,&msgs);
 
   system(y0, dy_dt, t0);
@@ -38,10 +38,10 @@ TEST(StanMathOde, ode_system_dv) {
   EXPECT_FLOAT_EQ(-1.8, dy_dt[3]);
 }
 
-TEST(StanMathOde, ode_system_vd) {
+TEST(StanMathOde, coupled_ode_system_vd) {
   std::stringstream msgs;
 
-  using stan::math::ode_system;
+  using stan::math::coupled_ode_system;
 
   harm_osc_ode_fun harm_osc;
 
@@ -65,7 +65,7 @@ TEST(StanMathOde, ode_system_vd) {
   std::vector<double> x;
   std::vector<int> x_int;
 
-  ode_system<harm_osc_ode_fun, stan::agrad::var, double> 
+  coupled_ode_system<harm_osc_ode_fun, stan::agrad::var, double> 
     system(harm_osc, y0,theta, x, x_int,2,&msgs);
 
   system(y0, dy_dt, t0);
