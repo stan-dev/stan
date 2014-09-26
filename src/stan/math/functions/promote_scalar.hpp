@@ -8,7 +8,7 @@ namespace stan {
 
   namespace math {
 
-        /**
+    /**
      * Return the value of the input argument promoted to the type
      * specified by the template parameter.  
      *
@@ -24,7 +24,7 @@ namespace stan {
      * @param x input.
      * @return input promoted to return type.
      */
-    template <typename S, typename T>
+    template <typename T, typename S>
     struct promote_scalar_struct {
       static T apply(S x) {
         return T(x);

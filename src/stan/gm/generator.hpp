@@ -1650,16 +1650,15 @@ namespace stan {
         o_ << "throw std::domain_error(errmsg_stream__.str());" << EOL;
       }
       void operator()(const return_statement& rs) const {
+        std::cout << std::endl << " ******************** WTF? *****************" << std::endl << std::endl;
         generate_indent(indent_,o_);
         o_ << "return ";
-        // FIXME:  for function return covariance
-        // if (is_var_)
-        // o_ << "stan::math::promote_scalar<T__>(";
         if (!rs.return_value_.expression_type().is_ill_formed()
-            && !rs.return_value_.expression_type().is_void())
+            && !rs.return_value_.expression_type().is_void()) {
+          o_ << "stan::math::promote_scalar<return_t__>(";
           generate_expression(rs.return_value_, o_);
-        // if (is_var_)
-        //   o_ << ")";
+          o_ << ")";
+        }
         o_ << ";" << EOL;
       }
       void operator()(const for_statement& x) const {
