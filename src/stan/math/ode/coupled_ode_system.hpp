@@ -3,6 +3,7 @@
 
 #include <ostream>
 #include <vector>
+#include <stan/agrad/rev/functions/value_of.hpp>
 #include <stan/agrad/rev/internal/precomputed_gradients.hpp>
 #include <stan/agrad/rev/operators/operator_plus_equal.hpp>
 #include <stan/math/error_handling/check_equal.hpp>
@@ -221,7 +222,7 @@ namespace stan {
         size_(N_ + N_ * M_) {
         // setup theta
         for (int m = 0; m < M_; m++)
-          theta_dbl_[m] = value_of(theta[m]);
+          theta_dbl_[m] = stan::agrad::value_of(theta[m]);
       }
 
       /**
@@ -422,7 +423,7 @@ namespace stan {
         size_(N_ + N_ * N_) {
 
         for (int n = 0; n < N_; n++)
-          y0_dbl_[n] = value_of(y0_[n]);
+          y0_dbl_[n] = stan::agrad::value_of(y0_[n]);
       }
 
       /**
@@ -622,11 +623,11 @@ namespace stan {
         size_(N_ + N_ * (N_ + M_)) {
         // setup y0
         for (int n = 0; n < N_; n++)
-          y0_dbl_[n] = value_of(y0[n]);
+          y0_dbl_[n] = stan::agrad::value_of(y0[n]);
 
         // setup theta
         for (int m = 0; m < M_; m++)
-          theta_dbl_[m] = value_of(theta[m]);
+          theta_dbl_[m] = stan::agrad::value_of(theta[m]);
 
       }
 
