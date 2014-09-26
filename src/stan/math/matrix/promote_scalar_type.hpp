@@ -9,7 +9,6 @@ namespace stan {
   
   namespace math {
 
-
     /**
      * Template metaprogram to calculate a type for a matrix whose
      * underlying scalar is converted from the second template
@@ -34,7 +33,6 @@ namespace stan {
 
 
     /**
-
      * Template metaprogram to calculate a type for a vector whose
      * underlying scalar is converted from the second template
      * parameter type to the first. 
@@ -75,7 +73,9 @@ namespace stan {
 
     };
 
+
   }
+
 }
 
 #endif

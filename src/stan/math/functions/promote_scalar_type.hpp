@@ -7,7 +7,7 @@ namespace stan {
   
   namespace math {
 
-    
+
     /**
      * Template metaprogram to calculate a type for converting a
      * convertible type.  This is the base case.
@@ -24,6 +24,7 @@ namespace stan {
       typedef T type;
 
     };
+
 
     /**
      * Template metaprogram to calculate a type for a container whose
@@ -42,6 +43,7 @@ namespace stan {
       typedef std::vector<typename promote_scalar_type<T,S>::type> type;
 
     };
+
 
   }
 
