@@ -78,8 +78,9 @@ namespace stan {
        */
       static std::vector<typename promote_scalar_type<T,S>::type>
       apply(const std::vector<S>& x) {
-        std::vector<typename promote_scalar_type<T,S>::type> y(x.size());
-        for (size_t i = 0; i < x.size(); ++i)
+        typedef std::vector<typename promote_scalar_type<T,S>::type> return_t; 
+        return_t y(x.size());
+        for (typename return_t::size_type i = 0; i < x.size(); ++i)
           y[i] = promote_scalar_struct<T,S>::apply(x[i]);
         return y;
       }
