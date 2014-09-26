@@ -1650,7 +1650,6 @@ namespace stan {
         o_ << "throw std::domain_error(errmsg_stream__.str());" << EOL;
       }
       void operator()(const return_statement& rs) const {
-        std::cout << std::endl << " ******************** WTF? *****************" << std::endl << std::endl;
         generate_indent(indent_,o_);
         o_ << "return ";
         if (!rs.return_value_.expression_type().is_ill_formed()
