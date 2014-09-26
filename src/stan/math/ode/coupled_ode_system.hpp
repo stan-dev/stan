@@ -24,7 +24,7 @@ namespace stan {
         for (size_t m = 0; m < y0.size(); m++)
           y[n][m] += y0[m];
     }
-
+    
     /**
      * Structure for the coupled ordinary differential equation
      * system.  The coupled ode system is the a new system consisting
@@ -461,7 +461,7 @@ namespace stan {
           theta_dbl_(theta.size(), 0.0), 
           x_(x), 
           x_int_(x_int), 
-          pstream_(pstream),
+        pstream_(pstream),
         N_(y0.size()),
         M_(theta.size()),          
         size_(N_ + N_ * (N_ + M_)) {

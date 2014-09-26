@@ -49,7 +49,7 @@ namespace stan {
     template <typename F, typename T1, typename T2>
     std::vector<std::vector<typename stan::return_type<T1,T2>::type> >
     integrate_ode(const F& f,
-                  const std::vector<T1> y0, 
+                  const std::vector<T1> y0,
                   const double t0,
                   const std::vector<double>& ts,
                   const std::vector<T2>& theta,
@@ -75,9 +75,12 @@ namespace stan {
                                 static_cast<double*>(0));
       stan::math::check_less("integrate_ode(%1%)",t0, ts[0], "initial time",
                              static_cast<double*>(0));
+      
 
+      // create coupled ode system
       coupled_ode_system<F, T1, T2>
         coupled_system(f, y0, theta, x, x_int, pstream);
+      
       std::vector<double> coupled_state = coupled_system.initial_state();
       
       // boost expects the first time in the vector to be the 
@@ -102,11 +105,8 @@ namespace stan {
 
       // remove the first state; this state corresponds to the initial value
       y_coupled.erase(y_coupled.begin());
-
-      std::vector<std::vector<typename stan::return_type<T1,T2>::type> >
-        y_vec = coupled_system.decouple_states(y_coupled);
-
-      return y_vec;
+      
+      return coupled_system.decouple_states(y_coupled);
     }
                    
   }
