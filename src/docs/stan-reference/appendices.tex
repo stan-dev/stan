@@ -1069,4 +1069,25 @@ Mac OS X with a single line-feed (LF) character (ASCII code point
 a carriage return (CR) character (ASCII code point \code{0x0D})
 followed by a line-feed (LF) character.
 
+\chapter{Mathematical Functions}\label{math-functions.appendix}
 
+\section{Beta}\label{beta-appendix.section}
+The beta function, $\mbox{B}(\alpha,\beta)$,
+computes the normalizing constant for the beta distribution, and
+is defined for $\alpha > 0$ and $\beta > 0$.
+
+\begin{align*}
+\mbox{B}(\alpha, \beta) 
+&= \int_0^1 u^{\alpha - 1} (1 - u)^{\beta - 1} \, du
+&= \frac{\Gamma(a) \Gamma(b)}{\Gamma(a+b)}
+\end{align*}
+
+\section{Gamma}\label{gamma-appendix.section}
+The gamma function, $\Gamma(x)$, is the generalization of the
+factorial function to continuous variables, defined so that
+$\Gamma(n+1) = n!$.  The function is defined for positive numbers and
+non-integral negative numbers.
+
+\[
+\Gamma(x) = \int_0^{\infty} u^{x - 1} \exp(-u) \, du
+\]

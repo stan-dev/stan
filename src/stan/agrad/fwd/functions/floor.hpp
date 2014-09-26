@@ -3,6 +3,7 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <math.h>
 
 namespace stan {
 
@@ -12,7 +13,7 @@ namespace stan {
     inline
     fvar<T>
     floor(const fvar<T>& x) {
-      using std::floor;
+      using ::floor;
         return fvar<T>(floor(x.val_), 0);
     }
   }

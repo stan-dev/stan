@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/functions/bessel_first_kind.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev,bessel_first_kind_int_var) {
   int a(0);
@@ -25,4 +26,17 @@ TEST(AgradRev,bessel_first_kind_int_var) {
   f.grad(x,g);
   EXPECT_FLOAT_EQ(0,g[0]);
   EXPECT_FLOAT_EQ(0.5 * -0.7461432154878245145319857900923154716212709191545920,g[1]);
+}
+
+struct bessel_first_kind_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return bessel_first_kind(1,arg1);
+  }
+};
+
+TEST(AgradRev,bessel_first_kind_NaN) {
+  bessel_first_kind_fun bessel_first_kind_;
+  test_nan(bessel_first_kind_,true,false);
 }

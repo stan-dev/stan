@@ -10,6 +10,7 @@
 namespace stan {
   namespace math {
 
+    // NOTE: this will not throw if y1 or y2 contains nan values.
     template <typename T_y1, typename T_y2, typename T_result>
     inline bool check_matching_sizes(const char* function,
                                      const T_y1& y1,

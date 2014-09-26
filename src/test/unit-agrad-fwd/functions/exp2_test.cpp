@@ -3,8 +3,16 @@
 #include <stan/math/functions/exp2.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
-TEST(AgradFwdExp2,Fvar) {
+class AgradFwdExp2 : public testing::Test {
+  void SetUp() {
+    stan::agrad::recover_memory();
+  }
+};
+
+
+TEST_F(AgradFwdExp2,Fvar) {
   using stan::agrad::fvar;
   using stan::math::exp2;
   using std::log;
@@ -38,7 +46,7 @@ TEST(AgradFwdExp2,Fvar) {
   EXPECT_FLOAT_EQ(exp2(0.0) * log(2), f.d_);
 }
 
-TEST(AgradFwdExp2,FvarVar_1stDeriv) {
+TEST_F(AgradFwdExp2,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::exp2;
@@ -56,7 +64,7 @@ TEST(AgradFwdExp2,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(exp2(0.5) * log(2), g[0]);
 }
 
-TEST(AgradFwdExp2,FvarVar_2ndDeriv) {
+TEST_F(AgradFwdExp2,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::exp2;
@@ -70,7 +78,7 @@ TEST(AgradFwdExp2,FvarVar_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(1.3 * exp2(0.5) * log(2) * log(2), g[0]);
 }
-TEST(AgradFwdExp2,FvarFvarDouble) {
+TEST_F(AgradFwdExp2,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::exp2;
   using std::log;
@@ -97,7 +105,7 @@ TEST(AgradFwdExp2,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
 
-TEST(AgradFwdExp2,FvarFvarVar_1stDeriv) {
+TEST_F(AgradFwdExp2,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::exp2;
@@ -117,6 +125,7 @@ TEST(AgradFwdExp2,FvarFvarVar_1stDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.val_.grad(p,g);
+  stan::agrad::recover_memory();
   EXPECT_FLOAT_EQ(exp2(0.5) * log(2), g[0]);
 
   fvar<fvar<var> > y;
@@ -135,7 +144,7 @@ TEST(AgradFwdExp2,FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(exp2(0.5) * log(2), r[0]);
 }
 
-TEST(AgradFwdExp2,FvarFvarVar_2ndDeriv) {
+TEST_F(AgradFwdExp2,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::exp2;
@@ -155,7 +164,10 @@ TEST(AgradFwdExp2,FvarFvarVar_2ndDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.d_.grad(p,g);
+  stan::agrad::recover_memory();
+
   EXPECT_FLOAT_EQ(exp2(0.5) * log(2) * log(2), g[0]);
+
 
   fvar<fvar<var> > y;
   y.val_.val_ = 0.5;
@@ -172,7 +184,7 @@ TEST(AgradFwdExp2,FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(exp2(0.5) * log(2) * log(2), r[0]);
 }
-TEST(AgradFwdExp2,FvarFvarVar_3rdDeriv) {
+TEST_F(AgradFwdExp2,FvarFvarVar_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::exp;
@@ -190,3 +202,15 @@ TEST(AgradFwdExp2,FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(log(2)*log(2)*log(2)*exp2(0.5), g[0]);
 }
 
+struct exp2_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return exp2(arg1);
+  }
+};
+
+TEST_F(AgradFwdExp2,exp2_NaN) {
+  exp2_fun exp2_;
+  test_nan(exp2_,false);
+}

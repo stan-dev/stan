@@ -2,6 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/functions/binary_log_loss.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 double inf = std::numeric_limits<double>::infinity();
 
@@ -81,4 +82,17 @@ TEST(AgradRev,binary_log_loss) {
   EXPECT_FLOAT_EQ(-std::log(0.75), f.val());
   EXPECT_FLOAT_EQ(deriv(1, 0.75), grad_f[0]);
   EXPECT_NEAR(finite_diff(1, 0.75), grad_f[0], 1e-5);
+}
+
+struct binary_log_loss_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return binary_log_loss(1,arg1);
+  }
+};
+
+TEST(AgradRev,binary_log_loss_NaN) {
+  binary_log_loss_fun binary_log_loss_;
+  test_nan(binary_log_loss_,false,true);
 }

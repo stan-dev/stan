@@ -24,7 +24,6 @@
 #include <stan/math/matrix/diagonal.hpp>
 #include <stan/math/matrix/dims.hpp>
 #include <stan/math/matrix/distance.hpp>
-#include <stan/math/matrix/squared_distance.hpp>
 #include <stan/math/matrix/divide.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/dot_self.hpp>
@@ -34,6 +33,7 @@
 #include <stan/math/matrix/elt_multiply.hpp>
 #include <stan/math/matrix/exp.hpp>
 #include <stan/math/matrix/fill.hpp>
+#include <stan/math/matrix/get_lp.hpp>
 #include <stan/math/matrix/get_base1.hpp>
 #include <stan/math/matrix/get_base1_lhs.hpp>
 #include <stan/math/matrix/head.hpp>
@@ -81,6 +81,7 @@
 #include <stan/math/matrix/softmax.hpp>
 #include <stan/math/matrix/sort.hpp>
 #include <stan/math/matrix/sort_indices.hpp>
+#include <stan/math/matrix/squared_distance.hpp>
 #include <stan/math/matrix/stan_print.hpp>
 #include <stan/math/matrix/sub_col.hpp>
 #include <stan/math/matrix/sub_row.hpp>

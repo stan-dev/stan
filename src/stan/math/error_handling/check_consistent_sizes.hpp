@@ -8,6 +8,7 @@
 namespace stan {
   namespace math {
 
+    // NOTE: this will not throw if nan is passed in.
     template <typename T1, typename T2, typename T_result>
     inline bool check_consistent_sizes(const char* function,
                                        const T1& x1, 

@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdOwensT,Fvar) {
   using stan::agrad::fvar;
@@ -345,4 +346,19 @@ TEST(AgradFwdOwensT,Double_FvarFvarVar_3rdDeriv) {
   VEC g;
   f.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(0.018498953, g[0]);
+}
+
+struct owens_t_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename boost::math::tools::promote_args<T0,T1>::type
+  operator()(const T0 arg1,
+             const T1 arg2) const {
+    return owens_t(arg1,arg2);
+  }
+};
+
+TEST(AgradFwdOwensT, nan) {
+  owens_t_fun owens_t_;
+  test_nan(owens_t_,3.0,5.0,false);
 }

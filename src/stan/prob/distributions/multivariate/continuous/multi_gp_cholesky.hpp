@@ -14,7 +14,6 @@
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/sum.hpp>
-
 #include <stan/math/matrix/mdivide_left_tri_low.hpp>
 
 namespace stan {

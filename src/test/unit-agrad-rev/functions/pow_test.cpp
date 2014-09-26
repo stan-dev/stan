@@ -1,6 +1,8 @@
 #include <stan/agrad/rev/functions/pow.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,pow_var_var) {
   AVAR a(3.0);
@@ -58,4 +60,20 @@ TEST(AgradRev,pow_boundry) {
 
   AVAR j = pow(b,c);
   EXPECT_FLOAT_EQ( 0.0 ,j.val());
+}
+
+struct pow_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return pow(arg1,arg2);
+  }
+};
+
+TEST(AgradRev, pow_nan) {
+  pow_fun pow_;
+  test_nan(pow_,3.0,5.0,false, true);
+  test_nan(pow_,0.0,5.0,false, true);
 }
