@@ -117,9 +117,9 @@ namespace stan {
        * @param theta parameter vector
        */
       std::vector<std::vector<double> > 
-      compute_results(const std::vector<std::vector<double> >& y,
-                      const std::vector<double>& y0,
-                      const std::vector<double>& theta) {
+      decoupled_states(const std::vector<std::vector<double> >& y,
+                       const std::vector<double>& y0,
+                       const std::vector<double>& theta) {
         return y;
       }
       
@@ -251,9 +251,9 @@ namespace stan {
        * @param theta parameter vector
        */
       std::vector<std::vector<stan::agrad::var> > 
-      compute_results(const std::vector<std::vector<double> >& y,
-                      const std::vector<double>& y0,
-                      const std::vector<stan::agrad::var>& theta) {
+      decoupled_states(const std::vector<std::vector<double> >& y,
+                       const std::vector<double>& y0,
+                       const std::vector<stan::agrad::var>& theta) {
         
         std::vector<stan::agrad::var> temp_vars;
         std::vector<double> temp_gradients;
@@ -400,9 +400,9 @@ namespace stan {
        * @param theta parameter vector
        */
       std::vector<std::vector<stan::agrad::var> > 
-      compute_results(const std::vector<std::vector<double> >& y,
-                      const std::vector<stan::agrad::var>& y0,
-                      const std::vector<double>& theta) {
+      decoupled_states(const std::vector<std::vector<double> >& y,
+                       const std::vector<stan::agrad::var>& y0,
+                       const std::vector<double>& theta) {
 
         std::vector<stan::agrad::var> temp_vars;
         std::vector<double> temp_gradients;
@@ -468,7 +468,7 @@ namespace stan {
           theta_dbl_(theta.size(), 0.0), 
           x_(x), 
           x_int_(x_int), 
-        pstream_(pstream),
+          pstream_(pstream),
         N_(y0.size()),
         M_(theta.size()),          
         size_(N_ + N_ * (N_ + M_)) {
@@ -564,9 +564,9 @@ namespace stan {
        * @param theta parameter vector
        */    
       std::vector<std::vector<stan::agrad::var> > 
-      compute_results(const std::vector<std::vector<double> >& y,
-                      const std::vector<stan::agrad::var>& y0,
-                      const std::vector<stan::agrad::var>& theta) {
+      decoupled_states(const std::vector<std::vector<double> >& y,
+                       const std::vector<stan::agrad::var>& y0,
+                       const std::vector<stan::agrad::var>& theta) {
         std::vector<stan::agrad::var> vars = y0;
         vars.insert(vars.end(), theta.begin(), theta.end());
 
