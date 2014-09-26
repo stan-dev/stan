@@ -117,9 +117,7 @@ namespace stan {
        * @param theta parameter vector
        */
       std::vector<std::vector<double> > 
-      decoupled_states(const std::vector<std::vector<double> >& y,
-                       const std::vector<double>& y0,
-                       const std::vector<double>& theta) {
+      decouple_states(const std::vector<std::vector<double> >& y) {
         return y;
       }
       
@@ -138,7 +136,7 @@ namespace stan {
     template <typename F>
     struct coupled_ode_system <F, double, stan::agrad::var> {
       const F& f_;
-      const std::vector<double>& y0_;
+      const std::vector<double>& y0_dbl_;
       const std::vector<stan::agrad::var>& theta_;
       std::vector<double> theta_dbl_;
       const std::vector<double>& x_;
@@ -155,7 +153,7 @@ namespace stan {
                          const std::vector<int>& x_int,
                          std::ostream* pstream)
         : f_(f), 
-          y0_(y0),
+          y0_dbl_(y0),
           theta_(theta),
           theta_dbl_(theta.size(), 0.0),
           x_(x),
@@ -232,7 +230,7 @@ namespace stan {
         // initial values to y0 because we don't need the
         // sensitivies of y0.
         for (int n = 0; n < N_; n++)
-          state[n] = y0_[n];
+          state[n] = y0_dbl_[n];
         return state;
       }
 
@@ -251,10 +249,7 @@ namespace stan {
        * @param theta parameter vector
        */
       std::vector<std::vector<stan::agrad::var> > 
-      decoupled_states(const std::vector<std::vector<double> >& y,
-                       const std::vector<double>& y0,
-                       const std::vector<stan::agrad::var>& theta) {
-        
+      decouple_states(const std::vector<std::vector<double> >& y) {
         std::vector<stan::agrad::var> temp_vars;
         std::vector<double> temp_gradients;
         std::vector<std::vector<stan::agrad::var> > y_return(y.size());
@@ -263,14 +258,14 @@ namespace stan {
           temp_vars.clear();
         
           //iterate over number of equations
-          for (size_t j = 0; j < y0.size(); j++) { 
+          for (size_t j = 0; j < N_; j++) { 
             temp_gradients.clear();
           
             //iterate over parameters for each equation
-            for (size_t k = 0; k < theta.size(); k++)
-              temp_gradients.push_back(y[i][y0.size() + y0.size()*k + j]);
+            for (size_t k = 0; k < M_; k++)
+              temp_gradients.push_back(y[i][y0_dbl_.size() + y0_dbl_.size()*k + j]);
 
-            temp_vars.push_back(stan::agrad::precomputed_gradients(y[i][j], theta, temp_gradients));
+            temp_vars.push_back(stan::agrad::precomputed_gradients(y[i][j], theta_, temp_gradients));
           }
 
           y_return[i] = temp_vars;
@@ -400,9 +395,7 @@ namespace stan {
        * @param theta parameter vector
        */
       std::vector<std::vector<stan::agrad::var> > 
-      decoupled_states(const std::vector<std::vector<double> >& y,
-                       const std::vector<stan::agrad::var>& y0,
-                       const std::vector<double>& theta) {
+      decouple_states(const std::vector<std::vector<double> >& y) {
 
         std::vector<stan::agrad::var> temp_vars;
         std::vector<double> temp_gradients;
@@ -412,20 +405,20 @@ namespace stan {
           temp_vars.clear();
         
           //iterate over number of equations
-          for (size_t j = 0; j < y0.size(); j++) { 
+          for (size_t j = 0; j < N_; j++) { 
             temp_gradients.clear();
           
             //iterate over parameters for each equation
-            for (size_t k = 0; k < y0.size(); k++)
-              temp_gradients.push_back(y[i][y0.size() + y0.size()*k + j]);
+            for (size_t k = 0; k < N_; k++)
+              temp_gradients.push_back(y[i][y0_.size() + y0_.size()*k + j]);
 
-            temp_vars.push_back(stan::agrad::precomputed_gradients(y[i][j], y0, temp_gradients));
+            temp_vars.push_back(stan::agrad::precomputed_gradients(y[i][j], y0_, temp_gradients));
           }
 
           y_return[i] = temp_vars;
         }
 
-        add_initial_values(y_return, y0);
+        add_initial_values(y_return, y0_);
 
         return y_return;
       }
@@ -564,11 +557,9 @@ namespace stan {
        * @param theta parameter vector
        */    
       std::vector<std::vector<stan::agrad::var> > 
-      decoupled_states(const std::vector<std::vector<double> >& y,
-                       const std::vector<stan::agrad::var>& y0,
-                       const std::vector<stan::agrad::var>& theta) {
-        std::vector<stan::agrad::var> vars = y0;
-        vars.insert(vars.end(), theta.begin(), theta.end());
+      decouple_states(const std::vector<std::vector<double> >& y) {
+        std::vector<stan::agrad::var> vars = y0_;
+        vars.insert(vars.end(), theta_.begin(), theta_.end());
 
         std::vector<stan::agrad::var> temp_vars;
         std::vector<double> temp_gradients;
@@ -578,12 +569,12 @@ namespace stan {
           temp_vars.clear();
         
           //iterate over number of equations
-          for (size_t j = 0; j < y0.size(); j++) { 
+          for (size_t j = 0; j < N_; j++) { 
             temp_gradients.clear();
           
             //iterate over parameters for each equation
-            for (size_t k = 0; k < y0.size()+theta.size(); k++)
-              temp_gradients.push_back(y[i][y0.size() + y0.size()*k + j]);
+            for (size_t k = 0; k < N_ + M_; k++)
+              temp_gradients.push_back(y[i][N_ + N_*k + j]);
 
             temp_vars.push_back(stan::agrad::precomputed_gradients(y[i][j], vars, temp_gradients));
           }
@@ -591,7 +582,7 @@ namespace stan {
           y_return[i] = temp_vars;
         }
 
-        add_initial_values(y_return, y0);
+        add_initial_values(y_return, y0_);
 
         return y_return;
       }

@@ -104,7 +104,7 @@ namespace stan {
       y_coupled.erase(y_coupled.begin());
 
       std::vector<std::vector<typename stan::return_type<T1,T2>::type> >
-        y_vec = coupled_system.decoupled_states(y_coupled, y0, theta);
+        y_vec = coupled_system.decouple_states(y_coupled);
 
       return y_vec;
     }
