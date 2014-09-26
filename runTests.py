@@ -16,6 +16,7 @@ arg 1:  test dir or test file
 
 winsfx = ".exe"
 testsfx = "_test.cpp"
+debug = False
 
 def usage():
     sys.stdout.write('usage: %s <path/test/dir(/files)>\n' % sys.argv[0])
@@ -46,7 +47,8 @@ def mungeName( name ):
     return name
 
 def doCommand(command):
-    print("execute command: %s" % command)
+    print("------------------------------------------------------------")
+    print("%s" % command)
     p1 = subprocess.Popen(command,shell=True)
     p1.wait()
     if (not(p1.returncode == None) and not(p1.returncode == 0)):
@@ -71,14 +73,15 @@ def makeTests( dirname, filenames, j ):
         targets.append(target)
     if (len(targets) > 0):
         command = 'make -j%d %s' % (j,' '.join(targets))
-        print(command)
+        if (debug):
+            print(command)
         doCommand(command)
 
 def runTest(name):
-    name = mungeName(name)
-    name = name.replace("/",os.sep)
-    doCommand(name)
-
+    executable = mungeName(name).replace("/",os.sep)
+    xml = mungeName(name).replace(winsfx, "")
+    command = '%s --gtest_output="xml:%s.xml"' % (executable, xml)
+    doCommand(command)
 
 def main():
     if (len(sys.argv) < 2):
@@ -111,26 +114,29 @@ def main():
         if (not(os.path.isdir(testname))):
             if (not(testname.endswith(testsfx))):
                 stopErr( '%s: not a testfile' % testname,-1)
-            print("make single test: %s" % testname)
+            if (debug):
+                print("make single test: %s" % testname)
             makeTest(testname,j)
         else:
             for root, dirs, files in os.walk(testname):
-                print("make root: %s" % root)
+                if (debug):
+                    print("make root: %s" % root)
                 makeTests(root,files,j)
 
     # pass 2:  run test targets
     for i in range(argsIdx,len(sys.argv)):
         testname = sys.argv[i]
         if (not(os.path.isdir(testname))):
-            print("run single test: %s" % testname)
+            if (debug):
+                print("run single test: %s" % testname)
             runTest(testname)
         else:
             for root, dirs, files in os.walk(testname):
                 for name in files:
                         if (name.endswith(testsfx)):
-                            print("run dir,test: %s,%s" % (root,name))
+                            if (debug):
+                                print("run dir,test: %s,%s" % (root,name))
                             runTest(os.sep.join([root,name]))
-
 
     
 if __name__ == "__main__":
