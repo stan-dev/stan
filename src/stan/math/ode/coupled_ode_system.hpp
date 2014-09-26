@@ -46,7 +46,6 @@ namespace stan {
     struct coupled_ode_system {
     };
 
-    
     /**
      * The coupled ode system for double initial values and 
      * double theta. This coupled system is identical to the
@@ -65,14 +64,25 @@ namespace stan {
       const int N_;
       const int M_;
       const int size_;
-
+      
+      /**
+       * Constructor. The coupled system is the same as the base
+       * system when y0 and theta are both double vectors.
+       *
+       * @param[in]     f       the base ode system functor.
+       * @param[in]     y0      the initial state of the base ode.
+       * @param[in]     theta   parameters of the base ode.
+       * @param[in]     x       real data.
+       * @param[in]     x_int   integer data.
+       * @param[in,out] pstream print stream.
+       */
       coupled_ode_system(const F& f,
                          const std::vector<double>& y0,
                          const std::vector<double>& theta,
                          const std::vector<double>& x,
                          const std::vector<int>& x_int,
                          std::ostream* pstream)
-        : f_(f), 
+        : f_(f),  
           y0_dbl_(y0),
           theta_dbl_(theta),
           x_(x), 
@@ -83,6 +93,17 @@ namespace stan {
           size_(N_) {
       }
 
+      /**
+       * Calculates the derivative of the coupled ode system
+       * with respect to the state y at time t.
+       *
+       * @param[in]  y     the current state of the coupled ode system. This is a 
+       *                   a vector of double of length size().
+       * @param[out] dy_dt a vector of length size() with the derivatives of the
+       *                   coupled system evaluated with state y and time t.
+       * @param[in]  t     time
+       * @returns nothing  
+       */
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double t) {
@@ -91,14 +112,29 @@ namespace stan {
                                          static_cast<double*>(0));
       }
 
+      /**
+       * Returns the size of the coupled system.
+       *
+       * @returns size of the coupled system.
+       */
       const int size() const {
         return size_;
       }
-
+      
+      /**
+       * Returns the initial state of the coupled system.
+       * Since y0 is not an autodiff parameter, the initial state
+       * of the coupled system for the corresponding y0 is set
+       * to the initial state of the base ode system.
+       *
+       * @returns the initial condition of the coupled system.
+       *   This is a vector of length size() where the first
+       *   N (base ode system size) parameters are the initial
+       *   conditions of the base ode system and the rest of the
+       *   initial conditions is 0.
+       */
       std::vector<double> initial_state() {
         std::vector<double> state(size_, 0.0);
-        // initial values to y0 because we don't need the
-        // sensitivies of y0.
         for (int n = 0; n < N_; n++)
           state[n] = y0_dbl_[n];
         return state;
@@ -113,23 +149,19 @@ namespace stan {
        * base system.
        *
        * @param y the vector of the coupled states after solving the ode 
-       * @param y0 initial state vector
-       * @param theta parameter vector
        */
       std::vector<std::vector<double> > 
       decouple_states(const std::vector<std::vector<double> >& y) {
         return y;
       }
-      
     };
+
 
     /**
      * The coupled ode system for double initial values and 
      * stan::agrad::var theta. If the original ode has N
      * states and M thetas, the new coupled system has
      * N + N * M states.
-     *
-     *
      *
      * @tparam F the functor for the base ode system
      */
@@ -146,6 +178,31 @@ namespace stan {
       const int M_;
       const int size_;
 
+      /**
+       * Constructor. 
+       * 
+       * Constructs a coupled system where the initial conditions are
+       * a double vector and the theta vector is a stan::agrad::var
+       * vector.
+       *
+       * The coupled system has N + N * M states, where N is the number
+       * of states in the base system and M is the size of theta.
+       *
+       * - The first N states correspond to the base system's N states:
+       *   \f$ \frac{d x_n}{dt} \f$
+       * - The next M states correspond to the sensitivities of the 
+       *   parameters with respect to the first base system equation:
+       *   \f[ \frac{d x_{N+m}}{dt}  = \frac{d}{dt} \frac{\partial x_1}{\partial \theta_m} \f]
+       * - The next M states correspond to the sensitivities with respect
+       *   to the second base system equation, etc.
+       *
+       * @param[in]     f       the base ode system functor.
+       * @param[in]     y0      the initial state of the base ode.
+       * @param[in]     theta   parameters of the base ode.
+       * @param[in]     x       real data.
+       * @param[in]     x_int   integer data.
+       * @param[in,out] pstream print stream.
+       */
       coupled_ode_system(const F& f,
                          const std::vector<double>& y0,
                          const std::vector<stan::agrad::var>& theta,
@@ -167,6 +224,17 @@ namespace stan {
           theta_dbl_[m] = value_of(theta[m]);
       }
 
+      /**
+       * Calculates the derivative of the coupled ode system
+       * with respect to the state y at time t.
+       *
+       * @param[in]  y     the current state of the coupled ode system. This is a 
+       *                   a vector of double of length size().
+       * @param[out] dy_dt a vector of length size() with the derivatives of the
+       *                   coupled system evaluated with state y and time t.
+       * @param[in]  t     time
+       * @returns nothing  
+       */
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double t) {
@@ -176,7 +244,7 @@ namespace stan {
                                 static_cast<double*>(0));
 
         std::vector<double> coupled_sys(N_ * M_);
-
+        
         std::vector<stan::agrad::var> theta_temp;
         std::vector<stan::agrad::var> y_temp;
         std::vector<stan::agrad::var> dy_dt_temp;
@@ -221,14 +289,29 @@ namespace stan {
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
       }
       
+      /**
+       * Returns the size of the coupled system.
+       *
+       * @returns size of the coupled system.
+       */
       const int size() const {
         return size_;
       }
 
+      /**
+       * Returns the initial state of the coupled system.
+       * Since y0 is not an autodiff parameter, the initial state
+       * of the coupled system for the corresponding y0 is set
+       * to the initial state of the base ode system.
+       *
+       * @returns the initial condition of the coupled system.
+       *   This is a vector of length size() where the first
+       *   N (base ode system size) parameters are the initial
+       *   conditions of the base ode system and the rest of the
+       *   initial conditions is 0.
+       */
       std::vector<double> initial_state() {
         std::vector<double> state(size_, 0.0);
-        // initial values to y0 because we don't need the
-        // sensitivies of y0.
         for (int n = 0; n < N_; n++)
           state[n] = y0_dbl_[n];
         return state;
@@ -245,8 +328,6 @@ namespace stan {
        * N * M states.
        *
        * @param y the vector of the coupled states after solving the ode 
-       * @param y0 initial state vector
-       * @param theta parameter vector
        */
       std::vector<std::vector<stan::agrad::var> > 
       decouple_states(const std::vector<std::vector<double> >& y) {
@@ -298,6 +379,31 @@ namespace stan {
       const int M_;
       const int size_;
 
+      /**
+       * Constructor. 
+       * 
+       * Constructs a coupled system where the initial conditions is 
+       * a stan::agrad::var vector and the theta vector is a double
+       * vector.
+       *
+       * The coupled system has N + N * N states, where N is the number
+       * of states in the base system and M is the size of theta.
+       *
+       * - The first N states correspond to the base system's N states:
+       *   \f$ \frac{d x_n}{dt} \f$
+       * - The next N states correspond to the sensitivities of the initial
+       *   conditions with respect to the to the first base system equation:
+       *   \f[ \frac{d x_{N+n}}{dt}  = \frac{d}{dt} \frac{\partial x_1}{\partial y0_n}\f]
+       * - The next N states correspond to the sensitivities with respect
+       *   to the second base system equation, etc.
+       *
+       * @param[in]     f       the base ode system functor.
+       * @param[in]     y0      the initial state of the base ode.
+       * @param[in]     theta   parameters of the base ode.
+       * @param[in]     x       real data.
+       * @param[in]     x_int   integer data.
+       * @param[in,out] pstream print stream.
+       */
       coupled_ode_system(const F& f,
                          const std::vector<stan::agrad::var>& y0,
                          const std::vector<double>& theta,
@@ -319,6 +425,17 @@ namespace stan {
           y0_dbl_[n] = value_of(y0_[n]);
       }
 
+      /**
+       * Calculates the derivative of the coupled ode system
+       * with respect to the state y at time t.
+       *
+       * @param[in]  y     the current state of the coupled ode system. This is a 
+       *                   a vector of double of length size().
+       * @param[out] dy_dt a vector of length size() with the derivatives of the
+       *                   coupled system evaluated with state y and time t.
+       * @param[in]  t     time
+       * @returns nothing  
+       */
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double t) {
@@ -369,16 +486,29 @@ namespace stan {
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
       }
 
+      /**
+       * Returns the size of the coupled system.
+       *
+       * @returns size of the coupled system.
+       */
       const int size() const {
         return size_;
       }
 
 
+      /**
+       * Returns the initial state of the coupled system.
+       * Since y0 is an autodiff parameter, the coupled system
+       * incorporates the initial conditions as parameters.
+       * The initial conditions for y0 in the coupled system is
+       * set to 0, along with the rest of the initial state.
+       *
+       * @returns the initial condition of the coupled system.
+       *   This is a vector of length size() where all elements 
+       *   are 0.
+       */
       std::vector<double> initial_state() {
-        std::vector<double> state(size_, 0.0);
-        // initial values are all 0 because we're getting sensitivities
-        // of y0
-        return state;
+        return std::vector<double>(size_, 0.0);
       }
 
       /**
@@ -391,8 +521,6 @@ namespace stan {
        * N * N states.
        *
        * @param y the vector of the coupled states after solving the ode 
-       * @param y0 initial state vector
-       * @param theta parameter vector
        */
       std::vector<std::vector<stan::agrad::var> > 
       decouple_states(const std::vector<std::vector<double> >& y) {
@@ -448,6 +576,33 @@ namespace stan {
       const int M_;
       const int size_;
 
+      /**
+       * Constructor. 
+       * 
+       * Constructs a coupled system where the initial conditions is 
+       * a stan::agrad::var vector and the theta vector is a double
+       * vector.
+       *
+       * The coupled system has N + N * (N + M) states, where N is the number
+       * of states in the base system and M is the size of theta.
+       *
+       * - The first N states correspond to the base system's N states:
+       *   \f$ \frac{d x_n}{dt} \f$
+       * - The next N+M states correspond to the sensitivities of the initial
+       *   conditions, then to the parameters with respect to the to the 
+       *   first base system equation:
+       *   \f[ \frac{d x_{N+n}}{dt}  = \frac{d}{dt} \frac{\partial x_1}{\partial y0_n}\f]
+       *   \f[ \frac{d x_{N+N+m}}{dt}  = \frac{d}{dt} \frac{\partial x_1}{\partial \theta_m}\f]
+       * - The next N+M states correspond to the sensitivities with respect
+       *   to the second base system equation, etc.
+       *
+       * @param[in]     f       the base ode system functor.
+       * @param[in]     y0      the initial state of the base ode.
+       * @param[in]     theta   parameters of the base ode.
+       * @param[in]     x       real data.
+       * @param[in]     x_int   integer data.
+       * @param[in,out] pstream print stream.
+       */
       coupled_ode_system(const F& f,
                          const std::vector<stan::agrad::var>& y0,
                          const std::vector<stan::agrad::var>& theta,
@@ -475,6 +630,17 @@ namespace stan {
 
       }
 
+      /**
+       * Calculates the derivative of the coupled ode system
+       * with respect to the state y at time t.
+       *
+       * @param[in]  y     the current state of the coupled ode system. This is a 
+       *                   a vector of double of length size().
+       * @param[out] dy_dt a vector of length size() with the derivatives of the
+       *                   coupled system evaluated with state y and time t.
+       * @param[in]  t     time
+       * @returns nothing  
+       */
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       const double t) {
@@ -532,15 +698,28 @@ namespace stan {
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
       }
 
+      /**
+       * Returns the size of the coupled system.
+       *
+       * @returns size of the coupled system.
+       */
       const int size() const {
         return size_;
       }
 
+      /**
+       * Returns the initial state of the coupled system.
+       * Since y0 is an autodiff parameter, the coupled system
+       * incorporates the initial conditions as parameters.
+       * The initial conditions for y0 in the coupled system is
+       * set to 0, along with the rest of the initial state.
+       *
+       * @returns the initial condition of the coupled system.
+       *   This is a vector of length size() where all elements 
+       *   are 0.
+       */
       std::vector<double> initial_state() {
-        std::vector<double> state(size_, 0.0);
-        // initial values are all 0 because we're getting sensitivities
-        // of y0
-        return state;
+        return std::vector<double>(size_, 0.0);
       }
 
       /**
@@ -553,25 +732,23 @@ namespace stan {
        * N * (N+M) states.
        *
        * @param y the vector of the coupled states after solving the ode 
-       * @param y0 initial state vector
-       * @param theta parameter vector
        */    
       std::vector<std::vector<stan::agrad::var> > 
       decouple_states(const std::vector<std::vector<double> >& y) {
         std::vector<stan::agrad::var> vars = y0_;
         vars.insert(vars.end(), theta_.begin(), theta_.end());
-
+        
         std::vector<stan::agrad::var> temp_vars;
         std::vector<double> temp_gradients;
         std::vector<std::vector<stan::agrad::var> > y_return(y.size());
-
+        
         for (size_t i = 0; i < y.size(); i++) {
           temp_vars.clear();
-        
+          
           //iterate over number of equations
           for (size_t j = 0; j < N_; j++) { 
             temp_gradients.clear();
-          
+            
             //iterate over parameters for each equation
             for (size_t k = 0; k < N_ + M_; k++)
               temp_gradients.push_back(y[i][N_ + N_*k + j]);
