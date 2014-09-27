@@ -162,7 +162,6 @@ test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generat
 test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
 .SECONDEXPANSION:
 src/test/unit-distribution/%_generated_test.cpp : src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
-	@echo "--- Generating tests for $(notdir $<) ---"
 	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
 
