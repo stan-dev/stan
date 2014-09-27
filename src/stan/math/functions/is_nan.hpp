@@ -16,7 +16,7 @@ namespace stan {
      * @return <code>1</code> if the value is NaN.
      */
     inline int
-    is_nan(double x) {
+    is_nan(const double x) {
       return boost::math::isnan(x);
     }
 

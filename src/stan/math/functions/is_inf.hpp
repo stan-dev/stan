@@ -16,7 +16,7 @@ namespace stan {
      * @return <code>1</code> if the value is infinite.
      */
     inline int
-    is_inf(double x) {
+    is_inf(const double x) {
       return boost::math::isinf(x);
     }
 
