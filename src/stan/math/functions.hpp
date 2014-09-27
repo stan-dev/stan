@@ -60,6 +60,7 @@
 #include <stan/math/functions/modulus.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/owens_t.hpp>
+#include <stan/math/functions/primitive_value.hpp>
 #include <stan/math/functions/rising_factorial.hpp>
 #include <stan/math/functions/scaled_add.hpp>
 #include <stan/math/functions/square.hpp>
