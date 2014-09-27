@@ -524,19 +524,14 @@ tightly than the comparisons.  Thus an expression such as
 
 \subsubsection{Boolean Operator Short Circuiting}
 
-{\it Warning:} As of Stan 2.5.0, the boolean operators do {\it not}
-short circuit.  This is a known bug and will be fixed in a future
-release.
-
-% Here's the text to use in the future:
-% The intended behavior in the future is as described below.
-% Like in \Cpp, the boolean operators are implemented to short circuit
-% directly to a return value after evaluating the first argument if it
-% is sufficient to resolve the result.  In evaluating \code{a~||~b}, if
-% \code{a} evaluates to a value other than zero, the expression returns
-% the value 1 without evaluating the expression \code{b}.  Similarly,
-% evaluating \code{a~\&\&~b} first evaluates \code{a}, and if the result
-% is zero, returns 0 without evaluating \code{b}.
+Like in \Cpp, the boolean operators \Verb/&&/ and \Verb/||/ and are
+implemented to short circuit directly to a return value after
+evaluating the first argument if it is sufficient to resolve the
+result.  In evaluating \code{a~||~b}, if \code{a} evaluates to a value
+other than zero, the expression returns the value 1 without evaluating
+the expression \code{b}.  Similarly, evaluating \code{a~\&\&~b} first
+evaluates \code{a}, and if the result is zero, returns 0 without
+evaluating \code{b}.
 
 
 \subsection{Logical Functions}
