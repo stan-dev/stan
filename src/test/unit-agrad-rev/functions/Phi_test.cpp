@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/functions/Phi.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
 
 TEST(AgradRev, Phi) {
   using stan::agrad::var;
@@ -139,3 +140,17 @@ TEST(AgradRev, PhiTails) {
   EXPECT_FLOAT_EQ(1, 1 / Phi(var(9.5)).val());
   EXPECT_FLOAT_EQ(1, 1 / Phi(var(10)).val());
 }
+
+struct Phi_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return Phi(arg1);
+  }
+};
+
+TEST(AgradRev,Phi_NaN) {
+  Phi_fun Phi_;
+  test_nan(Phi_,true,false);
+}
+

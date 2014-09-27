@@ -4,6 +4,7 @@
 #include <stan/math/functions/lbeta.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdLbeta,Fvar) {
   using stan::agrad::fvar;
@@ -403,3 +404,18 @@ TEST(AgradFwdLbeta,Double_FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(-0.0189964130493467228161105712126, g[0]);
 }
 
+
+struct lbeta_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename boost::math::tools::promote_args<T0,T1>::type
+  operator()(const T0 arg1,
+             const T1 arg2) const {
+    return lbeta(arg1,arg2);
+  }
+};
+
+TEST(AgradFwdLbeta, nan) {
+  lbeta_fun lbeta_;
+  test_nan(lbeta_,3.0,5.0,false);
+}

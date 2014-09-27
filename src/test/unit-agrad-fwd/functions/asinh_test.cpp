@@ -3,8 +3,15 @@
 #include <boost/math/special_functions/asinh.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
-TEST(AgradFwdAsinh,Fvar) {
+class AgradFwdAsinh : public testing::Test {
+  void SetUp() {
+    stan::agrad::recover_memory();
+  }
+};
+
+TEST_F(AgradFwdAsinh,Fvar) {
   using stan::agrad::fvar;
   using boost::math::asinh;
   using std::sqrt;
@@ -26,7 +33,7 @@ TEST(AgradFwdAsinh,Fvar) {
   EXPECT_FLOAT_EQ(-1 / sqrt(1 + (-0.5) * (-0.5)), c.d_);
 }
 
-TEST(AgradFwdAsinh,FvarVar_1stDeriv) {
+TEST_F(AgradFwdAsinh,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::asinh;
@@ -43,7 +50,7 @@ TEST(AgradFwdAsinh,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.0 / sqrt(1.0 + 1.5 * 1.5), g[0]);
 }
 
-TEST(AgradFwdAsinh,FvarVar_2ndDeriv) {
+TEST_F(AgradFwdAsinh,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::asinh;
@@ -60,7 +67,7 @@ TEST(AgradFwdAsinh,FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(1.3 * -0.25601548, g[0]);
 }
 
-TEST(AgradFwdAsinh,FvarFvarDouble) {
+TEST_F(AgradFwdAsinh,FvarFvarDouble) {
   using stan::agrad::fvar;
   using boost::math::asinh;
 
@@ -86,10 +93,12 @@ TEST(AgradFwdAsinh,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
 
-TEST(AgradFwdAsinh,FvarFvarVar_1stDeriv) {
+TEST_F(AgradFwdAsinh,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::asinh;
+
+  stan::agrad::recover_memory();
 
   fvar<fvar<var> > x;
   x.val_.val_ = 1.5;
@@ -105,6 +114,7 @@ TEST(AgradFwdAsinh,FvarFvarVar_1stDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.val_.grad(p,g);
+  stan::agrad::recover_memory();
   EXPECT_FLOAT_EQ(1.0 / sqrt(1.0 + 1.5 * 1.5), g[0]);
 
   fvar<fvar<var> > y;
@@ -120,10 +130,11 @@ TEST(AgradFwdAsinh,FvarFvarVar_1stDeriv) {
   AVEC q = createAVEC(y.val_.val_);
   VEC r;
   b.val_.val_.grad(q,r);
+  stan::agrad::recover_memory();
   EXPECT_FLOAT_EQ(1.0 / sqrt(1.0 + 1.5 * 1.5), r[0]);
 }
 
-TEST(AgradFwdAsinh,FvarFvarVar_2ndDeriv) {
+TEST_F(AgradFwdAsinh,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::asinh;
@@ -150,7 +161,7 @@ TEST(AgradFwdAsinh,FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(2.0 * -0.25601548, r[0]);
 }
-TEST(AgradFwdAsinh,FvarFvarVar_3rdDeriv) {
+TEST_F(AgradFwdAsinh,FvarFvarVar_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::asinh;
@@ -166,4 +177,16 @@ TEST(AgradFwdAsinh,FvarFvarVar_3rdDeriv) {
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(0.183805982181141, g[0]);
+}
+struct asinh_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return asinh(arg1);
+  }
+};
+
+TEST_F(AgradFwdAsinh,asinh_NaN) {
+  asinh_fun asinh_;
+  test_nan(asinh_,false);
 }

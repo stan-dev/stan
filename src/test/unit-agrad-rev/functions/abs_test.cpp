@@ -1,7 +1,7 @@
 #include <limits>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/agrad/rev/functions/abs.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-rev/nan_util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,abs_var) {
@@ -62,15 +62,15 @@ TEST(AgradRev,abs_neg_inf) {
   EXPECT_FLOAT_EQ(-1.0,g[0]);
 }
 
-TEST(AgradRev,abs_NaN) {
-  AVAR a = std::numeric_limits<double>::quiet_NaN();
-  AVAR f = abs(a);
+struct abs_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return abs(arg1);
+  }
+};
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  
-  EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1U,g.size());
-  EXPECT_TRUE(boost::math::isnan(g[0]));
+TEST(AgradRev,abs_NaN) {
+  abs_fun abs_;
+  test_nan(abs_,false,true);
 }

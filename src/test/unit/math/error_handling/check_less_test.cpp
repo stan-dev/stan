@@ -202,3 +202,54 @@ TEST(MathErrorHandling,CheckLess_Matrix_one_indexed_message) {
     << "no index provided" << std::endl
     << message;
 }
+
+TEST(MathErrorHandling,CheckGreaterOrEqual_nan) {
+  const char* function = "check_less(%1%)";
+  double x = 10.0;
+  double lb = 0.0;
+  double result;
+  double nan = std::numeric_limits<double>::quiet_NaN();
+
+  EXPECT_THROW(check_less(function, nan, lb, "x", &result),
+               std::domain_error);
+  EXPECT_THROW(check_less(function, x, nan, "x", &result),
+               std::domain_error);
+  EXPECT_THROW(check_less(function, nan, nan, "x", &result),
+               std::domain_error);
+
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> x_vec(3);
+  Eigen::Matrix<double,Eigen::Dynamic,1> low_vec(3);
+
+  // x_vec, low_vec
+  x_vec   << -1, 0, 1;
+  low_vec << -2, -1, 0;
+  EXPECT_THROW(check_less(function, x_vec, nan, "x", &result),
+               std::domain_error);
+
+  for (int i = 0; i < x_vec.size(); i++) {
+    x_vec   << -1, 0, 1;
+    x_vec(i) = nan;
+    EXPECT_THROW(check_less(function, x_vec, low_vec, "x", &result),
+                 std::domain_error);
+  }
+
+  x_vec   << -1, 0, 1;
+  for (int i = 0; i < low_vec.size(); i++) {
+    low_vec   << -1, 0, 1;
+    low_vec(i) = nan;
+    EXPECT_THROW(check_less(function, x_vec, low_vec, "x", &result),
+                 std::domain_error);
+  }
+
+  for (int i = 0; i < x_vec.size(); i++) {
+    x_vec   << -1, 0, 1;
+    low_vec << -2, -1, 0;
+    x_vec(i) = nan;
+    for (int j = 0; j < low_vec.size(); j++) {
+      low_vec(i) = nan;
+      EXPECT_THROW(check_less(function, x_vec, low_vec, "x", &result),
+                   std::domain_error);
+    }
+  }
+}

@@ -2,11 +2,15 @@
 #include <stan/prob/distributions/multivariate/discrete/multinomial.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
+#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/fwd/matrix.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
 
-TEST(ProbDistributions,MultinomialRNGSize) {
+TEST(ProbDistributionsMultinomial,RNGSize) {
   boost::random::mt19937 rng;
   Matrix<double,Dynamic,1> theta(5);
   // error in 2.1.0 due to overflow in binomial call due to division
@@ -16,7 +20,7 @@ TEST(ProbDistributions,MultinomialRNGSize) {
   EXPECT_EQ(5U, sample.size());  
 }
 
-TEST(ProbDistributions,Multinomial) {
+TEST(ProbDistributionsMultinomial,Multinomial) {
   std::vector<int> ns;
   ns.push_back(1);
   ns.push_back(2);
@@ -25,7 +29,7 @@ TEST(ProbDistributions,Multinomial) {
   theta << 0.2, 0.3, 0.5;
   EXPECT_FLOAT_EQ(-2.002481, stan::prob::multinomial_log(ns,theta));
 }
-TEST(ProbDistributions,MultinomialPropto) {
+TEST(ProbDistributionsMultinomial,Propto) {
   std::vector<int> ns;
   ns.push_back(1);
   ns.push_back(2);
@@ -141,3 +145,62 @@ TEST(ProbDistributionsMultinomial, chiSquareGoodnessFitTest) {
   EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }
 
+TEST(ProbDistributionsMultinomial,fvar_double) {
+  using stan::agrad::fvar;
+  std::vector<int> ns;
+  ns.push_back(1);
+  ns.push_back(2);
+  ns.push_back(3);
+  Matrix<fvar<double>,Dynamic,1> theta(3,1);
+  theta << 0.2, 0.3, 0.5;
+  for (int i = 0; i < 3; i++)
+    theta(i).d_ = 1.0;
+
+  EXPECT_FLOAT_EQ(-2.002481, stan::prob::multinomial_log(ns,theta).val_);
+  EXPECT_FLOAT_EQ(17.666666, stan::prob::multinomial_log(ns,theta).d_);
+}
+TEST(ProbDistributionsMultinomial,fvar_var) {
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  std::vector<int> ns;
+  ns.push_back(1);
+  ns.push_back(2);
+  ns.push_back(3);
+  Matrix<fvar<var>,Dynamic,1> theta(3,1);
+  theta << 0.2, 0.3, 0.5;
+  for (int i = 0; i < 3; i++)
+    theta(i).d_ = 1.0;
+
+  EXPECT_FLOAT_EQ(-2.002481, stan::prob::multinomial_log(ns,theta).val_.val());
+  EXPECT_FLOAT_EQ(17.666666, stan::prob::multinomial_log(ns,theta).d_.val());
+}
+
+TEST(ProbDistributionsMultinomial,fvar_fvar_double) {
+  using stan::agrad::fvar;
+  std::vector<int> ns;
+  ns.push_back(1);
+  ns.push_back(2);
+  ns.push_back(3);
+  Matrix<fvar<fvar<double> >,Dynamic,1> theta(3,1);
+  theta << 0.2, 0.3, 0.5;
+  for (int i = 0; i < 3; i++)
+    theta(i).d_.val_ = 1.0;
+
+  EXPECT_FLOAT_EQ(-2.002481, stan::prob::multinomial_log(ns,theta).val_.val_);
+  EXPECT_FLOAT_EQ(17.666666, stan::prob::multinomial_log(ns,theta).d_.val_);
+}
+TEST(ProbDistributionsMultinomial,fvar_fvar_var) {
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  std::vector<int> ns;
+  ns.push_back(1);
+  ns.push_back(2);
+  ns.push_back(3);
+  Matrix<fvar<fvar<var> >,Dynamic,1> theta(3,1);
+  theta << 0.2, 0.3, 0.5;
+  for (int i = 0; i < 3; i++)
+    theta(i).d_.val_ = 1.0;
+
+  EXPECT_FLOAT_EQ(-2.002481, stan::prob::multinomial_log(ns,theta).val_.val_.val());
+  EXPECT_FLOAT_EQ(17.666666, stan::prob::multinomial_log(ns,theta).d_.val_.val());
+}

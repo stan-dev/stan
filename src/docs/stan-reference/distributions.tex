@@ -700,7 +700,7 @@ The unbounded univariate continuous probability distributions have
 support on all real numbers.
 
 
-\section{Normal Distribution}
+\section{Normal Distribution}\label{normal-distribution.section}
 
 \subsubsection{Probability Density Function}
 
@@ -1434,8 +1434,8 @@ quantities block}
 
 \subsubsection{Probability Density Function}
 
-If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
-\posreals$, 
+If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
+[0,\infty)$, 
 \[
 \distro{Weibull}(y|\alpha,\sigma)
 = 
@@ -1446,6 +1446,9 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
 \exp \! \left( \! - \left( \frac{y}{\sigma} \right)^{\alpha}  \right)
 .
 \]
+
+Note that if $Y \propto \distro{Weibull}(\alpha,\sigma)$,
+then $Y^{-1} \propto \distro{Frechet}(\alpha,\sigma^{-1})$.
 
 \pitem{y}{weibull}{alpha,sigma}
 
@@ -1476,6 +1479,57 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
   \farg{alpha} and scale \farg{sigma}; may only be used in generated 
 quantities block}
 \end{description}
+
+\section{Fr\'{e}chet Distribution}
+
+\subsubsection{Probability Density Function}
+
+If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
+\posreals$, 
+\[
+\distro{Frechet}(y|\alpha,\sigma)
+= 
+\frac{\alpha}{\sigma}
+\,
+\left( \frac{y}{\sigma} \right)^{-\alpha - 1}
+\,
+\exp \! \left( \! - \left( \frac{y}{\sigma} \right)^{-\alpha}  \right)
+.
+\]
+
+Note that if $Y \propto \distro{Frechet}(\alpha,\sigma)$,
+then $Y^{-1} \propto \distro{Weibull}(\alpha,\sigma^{-1})$.
+
+\pitem{y}{frechet}{alpha,sigma}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+\fitem{real}{frechet\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The log of the Fr\'{e}chet density of \farg{y} given shape
+  \farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{frechet\_cdf}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The Fr\'{e}chet cumulative distribution function of \farg{y} given
+  shape \farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{frechet\_cdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The log of the Fr\'{e}chet cumulative distribution function of 
+  \farg{y} given shape \farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{frechet\_ccdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The log of the Fr\'{e}chet complementary cumulative 
+  distribution function of \farg{y} given shape \farg{alpha} and scale 
+  \farg{sigma}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{frechet\_rng}{real \farg{alpha}, real
+  \farg{sigma}}{Generate an Fr\'{e}chet variate with shape
+  \farg{alpha} and scale \farg{sigma}; may only be used in generated 
+quantities block}
+\end{description}
+
 
 \chapter{Non-negative Continuous Distributions}
 \noindent
@@ -1567,6 +1621,51 @@ $y \in \posreals$,
 \fitem{real}{pareto\_rng}{real \farg{y\_min}, real
   \farg{alpha}}{Generate a Pareto variate with positive minimum value 
   \farg{y\_min} and shape \farg{alpha}; may only be used in generated 
+  quantities block}
+\end{description}
+
+\section{Pareto Type 2 Distribution}
+
+\subsubsection{Probability Density Function}
+
+If $\mu \in \reals$, $\lambda \in \posreals$, and $\alpha \in \posreals$, then for
+$y \geq \mu$,
+\[
+\distro{Pareto\_Type\_2}(y|\mu,\lambda,\alpha)
+= 
+\ \frac{\alpha}{\lambda}
+\, \left( 1+\frac{y-\mu}{\lambda} \right)^{-(\alpha+1)}
+\! .
+\]
+
+Note that the Lomax distribution is a Pareto Type 2 distribution with $\mu=0$.
+
+\pitem{y}{pareto\_type\_2}{mu,lambda,alpha}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+  \fitem{real}{pareto\_type\_2\_log}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
+    \farg{alpha}}{The log of the Pareto Type 2 density of \farg{y} given
+    location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
+%
+  \fitem{real}{pareto\_type\_2\_cdf}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
+    \farg{alpha}}{The Pareto Type 2 cumulative distribution function of \farg{y} given
+    location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
+%
+  \fitem{real}{pareto\_type\_2\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
+    \farg{alpha}}{The log of the Pareto Type 2 cumulative distribution function of \farg{y} given
+    location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
+%
+  \fitem{real}{pareto\_type\_2\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
+    \farg{alpha}}{The log of the Pareto Type 2 complementary cumulative distribution function
+     of \farg{y} given location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{pareto\_type\_2\_rng}{real \farg{mu}, real \farg{lambda}, real
+  \farg{alpha}}{Generate a Pareto Type 2 variate with location 
+  \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}; may only be used in generated 
   quantities block}
 \end{description}
 

@@ -1,5 +1,6 @@
 #include "stan/math/functions/Phi.hpp"
 #include <gtest/gtest.h>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 TEST(MathFunctions, Phi) {
   EXPECT_EQ(0.5 + 0.5 * boost::math::erf(0.0), stan::math::Phi(0.0));
@@ -109,4 +110,10 @@ TEST(MathFunctions, PhiTails) {
   EXPECT_FLOAT_EQ(1, 1 / Phi(9));
   EXPECT_FLOAT_EQ(1, 1 / Phi(9.5));
   EXPECT_FLOAT_EQ(1, 1 / Phi(10));
+}
+
+TEST(MathFunctions, Phi_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  EXPECT_THROW(stan::math::Phi(nan),
+               std::domain_error);
 }

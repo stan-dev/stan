@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdOperatorDivision, Fvar) {
   using stan::agrad::fvar;
@@ -337,4 +338,19 @@ TEST(AgradFwdOperatorDivision, Double_FvarFvarVar_3rdDeriv) {
   VEC g;
   z.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(-48, g[0]);
+}
+
+struct divide_fun {
+  template <typename T0, typename T1>
+  inline 
+  typename stan::return_type<T0,T1>::type
+  operator()(const T0& arg1,
+             const T1& arg2) const {
+    return arg1/arg2;
+  }
+};
+
+TEST(AgradFwdOperatorDivision, divide_nan) {
+  divide_fun divide_;
+  test_nan(divide_,3.0,5.0,false);
 }

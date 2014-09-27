@@ -37,8 +37,6 @@ namespace stan {
       msg_o << name << "[" << stan::error_index::value + i << "] " << error_msg << error_msg2;
 
       std::string msg;
-      // FIXME: this is the line to remove in the future.
-      msg += "Error in function ";
       msg += (boost::format(function) % typeid(typename T::value_type).name()).str();
       msg += ": ";
       msg += msg_o.str();

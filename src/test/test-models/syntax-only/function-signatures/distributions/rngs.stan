@@ -49,9 +49,11 @@ generated quantities {
   z <- von_mises_rng(1.0,2.0);
   z <- weibull_rng(1.0,2.0);
   z <- pareto_rng(0.1, 1.5);
+  z <- pareto_type_2_rng(3.0, 2.0, 1.5);
   z <- beta_rng(110.0, 250.1);
   z <- uniform_rng(-1.0, 1.0);
   z <- rayleigh_rng(1.0);  
+  z <- frechet_rng(2.0, 3.2);
   
   theta <- dirichlet_rng(alpha);
   v <- multi_normal_rng(mu,Sigma);

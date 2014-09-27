@@ -17,9 +17,10 @@ namespace stan {
      * @throw std::domain_error If the vectors are not the same
      * size or if they are both not vector dimensioned.
      */
-    template<int R1,int C1,int R2, int C2>
-    inline double squared_distance(const Eigen::Matrix<double, R1, C1>& v1, 
-                                   const Eigen::Matrix<double, R2, C2>& v2) {
+    template<int R1,int C1,int R2, int C2, typename T1, typename T2>
+    inline typename boost::math::tools::promote_args<T1,T2>::type
+    squared_distance(const Eigen::Matrix<T1, R1, C1>& v1, 
+                     const Eigen::Matrix<T2, R2, C2>& v2) {
       stan::math::check_vector("squared_distance(%1%)",v1,"v1",(double*)0);
       stan::math::check_vector("squared_distance(%1%)",v2,"v2",(double*)0);
       stan::math::check_matching_sizes("squared_distance(%1%)",v1,"v1",

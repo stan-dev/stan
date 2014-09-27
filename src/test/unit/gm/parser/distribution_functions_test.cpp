@@ -68,6 +68,13 @@ TEST(gm_parser, exponential_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/univariate/continuous/exponential/exponential_log");
 }
 
+TEST(gm_parser, frechet_distribution_function_signatures) {
+  test_parsable("function-signatures/distributions/univariate/continuous/frechet/frechet_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/frechet/frechet_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/frechet/frechet_cdf");
+  test_parsable("function-signatures/distributions/univariate/continuous/frechet/frechet_log");
+}
+
 TEST(gm_parser, gamma_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/univariate/continuous/gamma/gamma_ccdf_log");
   test_parsable("function-signatures/distributions/univariate/continuous/gamma/gamma_cdf_log");
@@ -122,6 +129,25 @@ TEST(gm_parser, pareto_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/univariate/continuous/pareto/pareto_cdf_log");
   test_parsable("function-signatures/distributions/univariate/continuous/pareto/pareto_cdf");
   test_parsable("function-signatures/distributions/univariate/continuous/pareto/pareto_log");
+}
+
+TEST(gm_parser, pareto_type_2_distribution_function_signatures) {
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_ccdf_log_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_ccdf_log_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_ccdf_log_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_ccdf_log_4");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_cdf_log_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_cdf_log_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_cdf_log_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_cdf_log_4");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_cdf_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_cdf_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_cdf_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_cdf_4");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_log_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_log_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_log_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto_type_2/pareto_type_2_log_4");
 }
 
 TEST(gm_parser, rayleigh_distribution_function_signatures) {
