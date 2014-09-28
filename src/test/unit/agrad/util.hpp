@@ -1,6 +1,7 @@
 #include <vector>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <test/unit-agrad-rev/jacobian.hpp>
 
 typedef stan::agrad::var AVAR;
 typedef std::vector<AVAR> AVEC;
@@ -84,3 +85,6 @@ VEC cgradvec(AVAR f, AVEC x) {
   f.grad(x,g);
   return g;
 }
+
+
+

@@ -2,6 +2,11 @@
 #define STAN__AGRAD__REV__FUNCTIONS__FMIN_HPP
 
 #include <stan/agrad/rev/var.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/agrad/rev/internal/precomp_v_vari.hpp>
+#include <stan/agrad/rev/internal/precomputed_gradients.hpp>
+#include <stan/math/constants.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace agrad {
@@ -14,6 +19,39 @@ namespace stan {
      * For <code>fmin(a,b)</code>, if a's value is less than b's,
      * then a is returned, otherwise b is returned.
      * 
+       \f[
+       \mbox{fmin}(x,y) = 
+       \begin{cases}
+         x & \mbox{if } x \leq y \\
+         y & \mbox{if } x > y \\[6pt]
+         x & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+         y & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{fmin}(x,y)}{\partial x} = 
+       \begin{cases}
+         1 & \mbox{if } x \leq y \\
+         0 & \mbox{if } x > y \\[6pt]
+         1 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+         0 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{fmin}(x,y)}{\partial y} = 
+       \begin{cases}
+         0 & \mbox{if } x \leq y \\
+         1 & \mbox{if } x > y \\[6pt]
+         0 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+         1 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a First variable.
      * @param b Second variable.
      * @return If the first variable's value is smaller than the
@@ -21,7 +59,23 @@ namespace stan {
      */
     inline var fmin(const stan::agrad::var& a,
                     const stan::agrad::var& b) {
-      return a.vi_->val_ < b.vi_->val_ ? a : b;
+      if (unlikely(boost::math::isnan(a.vi_->val_))) {
+        if(boost::math::isnan(b.vi_->val_)) {
+          std::vector<stan::agrad::var> vars;
+          std::vector<double> grads;
+          vars.push_back(a);
+          vars.push_back(b);
+          grads.push_back(stan::math::NOT_A_NUMBER);
+          grads.push_back(stan::math::NOT_A_NUMBER);
+          return var(precomputed_gradients(stan::math::NOT_A_NUMBER,
+                                           vars, grads));
+        }
+        else
+          return b;
+      } else if (unlikely(boost::math::isnan(b.vi_->val_)))
+        return a;
+      else
+        return a.vi_->val_ < b.vi_->val_ ? a : b;
     }
 
     /**
@@ -40,7 +94,17 @@ namespace stan {
      */
     inline var fmin(const stan::agrad::var& a,
                     const double& b) {
-      return a.vi_->val_ <= b ? a : var(b);
+      if (unlikely(boost::math::isnan(a.vi_->val_))) {
+        if(boost::math::isnan(b))
+          return var(new precomp_v_vari(stan::math::NOT_A_NUMBER,
+                                        a.vi_,
+                                        stan::math::NOT_A_NUMBER));
+        else
+          return var(b);
+      } else if (unlikely(boost::math::isnan(b)))
+        return a;
+      else
+        return a.vi_->val_ <= b ? a : var(b);
     }
 
     /**
@@ -61,7 +125,17 @@ namespace stan {
      */
     inline var fmin(const double& a,
                     const stan::agrad::var& b) {
-      return a < b.vi_->val_ ? var(a) : b;
+      if (unlikely(boost::math::isnan(b.vi_->val_))) {
+        if(boost::math::isnan(a))
+          return var(new precomp_v_vari(stan::math::NOT_A_NUMBER,
+                                        b.vi_,
+                                        stan::math::NOT_A_NUMBER));
+        else
+          return var(a);
+      } else if (unlikely(boost::math::isnan(a)))
+        return b;
+      else
+        return a < b.vi_->val_ ? var(a) : b;
     }
 
   }

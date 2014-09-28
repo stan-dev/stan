@@ -7,17 +7,23 @@ TEST(AgradRevMatrix, LDLT_alloc_default_constructor) {
   
   LDLT_alloc<-1,-1> *alloc = new LDLT_alloc<-1,-1>(); // DO NOT DELETE, allocated on the vari stack
   EXPECT_EQ(0U, alloc->N_);
+#ifdef EIGEN_NO_DEBUG
   EXPECT_NO_THROW(alloc->log_abs_det());
   EXPECT_NO_THROW(alloc->_ldlt.info());
-  /*
-    // Note: If -DEIGEN_NO_DEBUG is not included in the compilation flags
-    //       asserts will force these calls to die instead of the above
-    //       behavior
-    EXPECT_DEATH(alloc->log_abs_det(),
-                 "m_isInitialized && \"LDLT is not initialized.\"");
-    EXPECT_DEATH(alloc->_ldlt.info(), 
-                 "m_isInitialized && \"LDLT is not initialized.\"");
-  */
+#else
+  // Note: If -DEIGEN_NO_DEBUG is not included in the compilation flags
+  //       asserts will force these calls to die instead of the above
+  //       behavior
+
+#ifndef _WIN32
+  // Google test under Windows is having trouble with these tests.
+  EXPECT_DEATH(alloc->log_abs_det(),
+               "m_isInitialized && \"LDLT is not initialized.\"");
+  EXPECT_DEATH(alloc->_ldlt.info(), 
+               "m_isInitialized && \"LDLT is not initialized.\"");
+#endif
+
+#endif
 }
 
 TEST(AgradRevMatrix,LDLT_alloc_constructor) {

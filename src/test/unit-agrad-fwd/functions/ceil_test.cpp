@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdCeil,Fvar) {
   using stan::agrad::fvar;
@@ -171,3 +172,15 @@ TEST(AgradFwdCeil,FvarFvarVar_3rdDeriv) {
   EXPECT_FLOAT_EQ(0.0, g[0]);
 }
 
+struct ceil_fun {
+  template <typename T0>
+  inline T0
+  operator()(const T0& arg1) const {
+    return ceil(arg1);
+  }
+};
+
+TEST(AgradFwdCeil,ceil_NaN) {
+  ceil_fun ceil_;
+  test_nan(ceil_,false);
+}

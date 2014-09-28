@@ -1,12 +1,13 @@
+#include <cmath>
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd.hpp>
-#include <stan/math/functions/fma.hpp>
+#include <stan/agrad/fwd/functions/fma.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit-agrad-fwd/nan_util.hpp>
 
 TEST(AgradFwdFma,Fvar) { 
   using stan::agrad::fvar;
-  using stan::math::fma;
   fvar<double> x(0.5);
   fvar<double> y(1.2);
   fvar<double> z(1.8);
@@ -49,7 +50,6 @@ TEST(AgradFwdFma,Fvar) {
 TEST(AgradFwdFma,FvarVar_FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   fvar<var> x(2.5,1.3);
   fvar<var> y(1.7,1.5);
@@ -69,7 +69,6 @@ TEST(AgradFwdFma,FvarVar_FvarVar_FvarVar_1stDeriv) {
 TEST(AgradFwdFma,FvarVar_FvarVar_double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   fvar<var> x(2.5,1.3);
   fvar<var> y(1.7,1.5);
@@ -88,7 +87,6 @@ TEST(AgradFwdFma,FvarVar_FvarVar_double_1stDeriv) {
 TEST(AgradFwdFma,FvarVar_double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   fvar<var> x(2.5,1.3);
   double y(1.7);
@@ -107,7 +105,6 @@ TEST(AgradFwdFma,FvarVar_double_FvarVar_1stDeriv) {
 TEST(AgradFwdFma,FvarVar_double_double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   fvar<var> x(2.5,1.3);
   double y(1.7);
@@ -125,7 +122,6 @@ TEST(AgradFwdFma,FvarVar_double_double_1stDeriv) {
 TEST(AgradFwdFma,Double_FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   double x(2.5);
   fvar<var> y(1.7,1.5);
@@ -144,7 +140,6 @@ TEST(AgradFwdFma,Double_FvarVar_FvarVar_1stDeriv) {
 TEST(AgradFwdFma,Double_Double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   double x(2.5); 
   double y(1.7);
@@ -162,7 +157,6 @@ TEST(AgradFwdFma,Double_Double_FvarVar_1stDeriv) {
 TEST(AgradFwdFma,Double_FvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   double x(2.5);
   fvar<var> y(1.7,1.5);
@@ -181,7 +175,6 @@ TEST(AgradFwdFma,Double_FvarVar_Double_1stDeriv) {
 TEST(AgradFwdFma,FvarVar_FvarVar_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   fvar<var> x(2.5,1.3);
   fvar<var> y(1.7,1.5);
@@ -201,7 +194,6 @@ TEST(AgradFwdFma,FvarVar_FvarVar_FvarVar_2ndDeriv) {
 TEST(AgradFwdFma,FvarVar_FvarVar_double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   fvar<var> x(2.5,1.3);
   fvar<var> y(1.7,1.5);
@@ -220,7 +212,6 @@ TEST(AgradFwdFma,FvarVar_FvarVar_double_2ndDeriv) {
 TEST(AgradFwdFma,FvarVar_double_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   fvar<var> x(2.5,1.3);
   double y(1.7);
@@ -239,7 +230,6 @@ TEST(AgradFwdFma,FvarVar_double_FvarVar_2ndDeriv) {
 TEST(AgradFwdFma,FvarVar_double_double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   fvar<var> x(2.5,1.3);
   double y(1.7);
@@ -257,7 +247,6 @@ TEST(AgradFwdFma,FvarVar_double_double_2ndDeriv) {
 TEST(AgradFwdFma,Double_FvarVar_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   double x(2.5);
   fvar<var> y(1.7,1.5);
@@ -276,7 +265,6 @@ TEST(AgradFwdFma,Double_FvarVar_FvarVar_2ndDeriv) {
 TEST(AgradFwdFma,Double_Double_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   double x(2.5); 
   double y(1.7);
@@ -294,7 +282,6 @@ TEST(AgradFwdFma,Double_Double_FvarVar_2ndDeriv) {
 TEST(AgradFwdFma,Double_FvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;  
-  using stan::math::fma;
 
   double x(2.5);
   fvar<var> y(1.7,1.5);
@@ -311,7 +298,6 @@ TEST(AgradFwdFma,Double_FvarVar_Double_2ndDeriv) {
 }
 TEST(AgradFwdFma,FvarFvarDouble) {
   using stan::agrad::fvar;
-  using stan::math::fma;
 
   fvar<fvar<double> > x;
   x.val_.val_ = 2.5;
@@ -335,7 +321,6 @@ TEST(AgradFwdFma,FvarFvarDouble) {
 TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -366,7 +351,6 @@ TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_FvarFvarVar_1stDeriv) {
 TEST(AgradFwdFma,FvarFvarVar_Double_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -394,7 +378,6 @@ TEST(AgradFwdFma,FvarFvarVar_Double_FvarFvarVar_1stDeriv) {
 TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -423,7 +406,6 @@ TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_Double_1stDeriv) {
 TEST(AgradFwdFma,FvarFvarVar_double_double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -448,7 +430,6 @@ TEST(AgradFwdFma,FvarFvarVar_double_double_1stDeriv) {
 TEST(AgradFwdFma,Double_FvarFvarVar_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   double x(2.5);
 
@@ -476,7 +457,6 @@ TEST(AgradFwdFma,Double_FvarFvarVar_FvarFvarVar_1stDeriv) {
 TEST(AgradFwdFma,Double_Double_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   double x(2.5);
   double y(1.5);
@@ -500,7 +480,6 @@ TEST(AgradFwdFma,Double_Double_FvarFvarVar_1stDeriv) {
 TEST(AgradFwdFma,Double_FvarFvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   double x(2.5);
   double z(1.7);
@@ -525,7 +504,6 @@ TEST(AgradFwdFma,Double_FvarFvarVar_Double_1stDeriv) {
 TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -556,7 +534,6 @@ TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
 TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -586,7 +563,6 @@ TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
 TEST(AgradFwdFma,FvarFvarVar_Double_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -614,7 +590,6 @@ TEST(AgradFwdFma,FvarFvarVar_Double_FvarFvarVar_2ndDeriv) {
 TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_Double_2ndDeriv_x) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -642,7 +617,6 @@ TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_Double_2ndDeriv_x) {
 TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_Double_2ndDeriv_y) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -670,7 +644,6 @@ TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_Double_2ndDeriv_y) {
 TEST(AgradFwdFma,FvarFvarVar_double_double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -695,7 +668,6 @@ TEST(AgradFwdFma,FvarFvarVar_double_double_2ndDeriv) {
 TEST(AgradFwdFma,Double_FvarFvarVar_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   double x(2.5);
 
@@ -723,7 +695,6 @@ TEST(AgradFwdFma,Double_FvarFvarVar_FvarFvarVar_2ndDeriv) {
 TEST(AgradFwdFma,Double_Double_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   double x(2.5);
   double y(1.5);
@@ -746,7 +717,6 @@ TEST(AgradFwdFma,Double_Double_FvarFvarVar_2ndDeriv) {
 TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_FvarFvarVar_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -771,7 +741,6 @@ TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_FvarFvarVar_3rdDeriv) {
 TEST(AgradFwdFma,FvarFvarVar_Double_FvarFvarVar_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -793,7 +762,6 @@ TEST(AgradFwdFma,FvarFvarVar_Double_FvarFvarVar_3rdDeriv) {
 TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_Double_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -816,7 +784,6 @@ TEST(AgradFwdFma,FvarFvarVar_FvarFvarVar_Double_3rdDeriv) {
 TEST(AgradFwdFma,FvarFvarVar_double_double_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.5;
@@ -837,7 +804,6 @@ TEST(AgradFwdFma,FvarFvarVar_double_double_3rdDeriv) {
 TEST(AgradFwdFma,Double_FvarFvarVar_FvarFvarVar_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   double x(2.5);
 
@@ -863,7 +829,6 @@ TEST(AgradFwdFma,Double_FvarFvarVar_FvarFvarVar_3rdDeriv) {
 TEST(AgradFwdFma,Double_Double_FvarFvarVar_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   double x(2.5);
   double y(1.5);
@@ -884,7 +849,6 @@ TEST(AgradFwdFma,Double_Double_FvarFvarVar_3rdDeriv) {
 TEST(AgradFwdFma,Double_FvarFvarVar_Double_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::math::fma;
 
   double x(2.5);
   double z(1.7);
@@ -900,4 +864,20 @@ TEST(AgradFwdFma,Double_FvarFvarVar_Double_3rdDeriv) {
   VEC r;
   a.d_.d_.grad(q,r);
   EXPECT_FLOAT_EQ(0, r[0]);
+}
+
+struct fma_fun {
+  template <typename T0, typename T1, typename T2>
+  inline
+  typename stan::return_type<T0,T1,T2>::type
+  operator()(const T0& arg1,
+             const T1& arg2,
+             const T2& arg3) const {
+    return fma(arg1,arg2,arg3);
+  }
+};
+
+TEST(AgradFwdFma,fma_NaN) {
+  fma_fun fma_;
+  test_nan(fma_,0.6,0.3,0.5,false);
 }

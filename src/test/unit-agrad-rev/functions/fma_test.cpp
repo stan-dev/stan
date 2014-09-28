@@ -1,6 +1,9 @@
+#include <cmath>
 #include <stan/agrad/rev/functions/fma.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <test/unit-agrad-rev/nan_util.hpp>
+#include <stan/meta/traits.hpp>
 
 TEST(AgradRev,fma_vvv) {
   AVAR a = 3.0;
@@ -91,3 +94,19 @@ TEST(AgradRev,fma_ddv) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
+
+struct fma_fun {
+  template <typename T0, typename T1, typename T2>
+  inline
+  typename stan::return_type<T0,T1,T2>::type
+  operator()(const T0& arg1,
+             const T1& arg2,
+             const T2& arg3) const {
+    return fma(arg1,arg2,arg3);
+  }
+};
+
+TEST(AgradRev,fma_NaN) {
+  fma_fun fma_;
+  test_nan(fma_,0.6,0.3,0.5,false,true);
+}

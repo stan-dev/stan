@@ -3249,43 +3249,43 @@ value of the log probability accumulator before and after each
 sampling statement, it's possible to isolate where the log probability
 becomes ill-defined (i.e., becomes not-a-number).
 
-\section{Raise-Exception Statements}\label{raise-exception-statements.section}
+\section{Reject Statements}\label{reject-statements.section}
 
-The Stan \code{raise\_exception} statement provides a mechanism to
+The Stan \code{reject} statement provides a mechanism to
 report errors or problematic values encountered during program
 execution and either halt processing or reject samples or optimization
 iterations.  
 
-Like the \code{print} statement, the raise-exception statement accepts
+Like the \code{print} statement, the reject statement accepts
 any number of quoted string literals or Stan expressions as arguments.
 
-Raise-exception statements are typically embedded in a conditional
+Reject statements are typically embedded in a conditional
 statement in order to detect variables in illegal states.  For
-example, the following code raises an exception if variable \code{x}'s
+example, the following code handles the case where a variable \code{x}'s
 value is negative.
 %
 \begin{quote}
 \begin{Verbatim}
 if (x < 0) 
-  raise_exception("x must not be negative; found x=", x);
+  reject("x must not be negative; found x=", x);
 \end{Verbatim}
 \end{quote}
 
-\subsection{Behavior of Exceptions}
+\subsection{Behavior of Reject Statements}
 
-User-defined exceptions have the same behavior as exceptions thrown by
+Reject statements have the same behavior as exceptions thrown by
 built-in Stan functions.  For example, the \code{normal\_log} function
 raises an exception if the input scale is not positive and finite.
-The effect of an exception depends on the program block in which it is
-raised.
+The effect of a reject statement depends on the program block in which
+the rejection occurs.
 
-In all cases of raised exceptions, the interface accessing the Stan
-program should print the arguments to the raise-exception statement.
+In all cases of rejection, the interface accessing the Stan
+program should print the arguments to the reject statement.
 
-\subsubsection{Exceptions Raised in Functions}
+\subsubsection{Rejections in Functions}
 
-Exceptions raised in user-defined functions are just passed to the
-calling function or program block.  Exceptions can be raised in
+Rejections in user-defined functions are just passed to the
+calling function or program block.  Reject statements can be used in 
 functions to validate the function arguments, allowing user-defined
 functions to fully emulate built-in function behavior.  It is better
 to find out earlier rather than later when there is a problem.
@@ -3293,28 +3293,28 @@ to find out earlier rather than later when there is a problem.
 \subsubsection{Fatal Exception Contexts}
 
 In both the transformed data block and generated quantities block,
-exceptions are fatal.  This is because if initialization fails or if
+rejections are fatal.  This is because if initialization fails or if
 generating output fails, there is no way to recover values.
 
-Exception statements placed in the transformed data block can be used
+Reject statements placed in the transformed data block can be used
 to validate both the data and transformed data (if any).  This allows
 more complicated constraints to be enforced that can be specified with
 Stan's constrained variable declarations.
 
 
-\subsubsection{Recoverable Exception Contexts}
+\subsubsection{Recoverable Rejection Contexts}
 
-Exceptions raised in the transformed parameters and model blocks are
+Rejections in the transformed parameters and model blocks are
 not in and of themselves instantly fatal.  The result has the same
 effect as assigning a $-\infty$ log probability, which causes
 rejection of the current proposal in MCMC samplers and adjustment of
 search parameters in optimization.
 
-If the log probability function raises an exception every time it is
+If the log probability function results in a rejection every time it is
 called, the containing application (MCMC sampler or optimization)
 should diagnose this problem and terminate with an appropriate error
 message.  To aid in diagnosing problems, the message for each
-raise-exception statement will be printed as a result of executing it.
+reject statement will be printed as a result of executing it.
 
 
 \chapter{User-Defined Functions}\label{functions.chapter}%
@@ -4544,7 +4544,7 @@ atomic_statement_body
    | function_literal '(' expressions ')'
    | 'increment_log_prob' '(' expression ')'
    | 'print' '(' (expression | string_literal)* ')'
-   | 'raise_exception' '(' (expression | string_literal)* ')'
+   | 'reject' '(' (expression | string_literal)* ')'
    | 'return' expression
    | ''
 

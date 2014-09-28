@@ -21,6 +21,7 @@ namespace stan {
      * @param name
      * @param result
      * @return <code>true</code> if the matrix is a valid covariance matrix.
+     * @return throws if any element in matrix is nan
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings

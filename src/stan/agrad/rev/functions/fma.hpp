@@ -1,14 +1,17 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__FMA_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__FMA_HPP
 
+#include <cmath>
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/internal/v_vari.hpp>
-#include <stan/agrad/rev/internal/vv_vari.hpp>
-#include <stan/agrad/rev/internal/vd_vari.hpp>
+#include <stan/agrad/rev/internal/ddv_vari.hpp>
+#include <stan/agrad/rev/internal/vdd_vari.hpp>
 #include <stan/agrad/rev/internal/vvv_vari.hpp>
+#include <stan/agrad/rev/internal/vvd_vari.hpp>
 #include <stan/agrad/rev/internal/vdv_vari.hpp>
 #include <stan/math/constants.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace agrad {
@@ -17,60 +20,92 @@ namespace stan {
       class fma_vvv_vari : public op_vvv_vari {
       public:
         fma_vvv_vari(vari* avi, vari* bvi, vari* cvi) :
-          op_vvv_vari(avi->val_ * bvi->val_ + cvi->val_,
+          op_vvv_vari(::fma(avi->val_, bvi->val_, cvi->val_),
                       avi,bvi,cvi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * bvi_->val_;
-          bvi_->adj_ += adj_ * avi_->val_;
-          cvi_->adj_ += adj_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bvi_->val_)
+                       || boost::math::isnan(cvi_->val_))) {
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+            bvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+            cvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          } else {
+            avi_->adj_ += adj_ * bvi_->val_;
+            bvi_->adj_ += adj_ * avi_->val_;
+            cvi_->adj_ += adj_;
+          }
         }
       };
 
-      class fma_vvd_vari : public op_vv_vari {
+      class fma_vvd_vari : public op_vvd_vari {
       public:
         fma_vvd_vari(vari* avi, vari* bvi, double c) :
-          op_vv_vari(avi->val_ * bvi->val_ + c,
-                     avi,bvi) {
+          op_vvd_vari(::fma(avi->val_, bvi->val_, c),
+                      avi,bvi,c) {
         }
         void chain() {
-          avi_->adj_ += adj_ * bvi_->val_;
-          bvi_->adj_ += adj_ * avi_->val_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bvi_->val_)
+                       || boost::math::isnan(cd_))) {
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+            bvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          } else {
+            avi_->adj_ += adj_ * bvi_->val_;
+            bvi_->adj_ += adj_ * avi_->val_;
+          }
         }
       };
 
       class fma_vdv_vari : public op_vdv_vari {
       public:
         fma_vdv_vari(vari* avi, double b, vari* cvi) :
-          op_vdv_vari(avi->val_ * b + cvi->val_,
+          op_vdv_vari(::fma(avi->val_ , b, cvi->val_),
                       avi,b,cvi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * bd_;
-          cvi_->adj_ += adj_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(cvi_->val_)
+                       || boost::math::isnan(bd_))) {
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+            cvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          } else {
+            avi_->adj_ += adj_ * bd_;
+            cvi_->adj_ += adj_;
+          }
         }
       };
 
-      class fma_vdd_vari : public op_vd_vari {
+      class fma_vdd_vari : public op_vdd_vari {
       public:
         fma_vdd_vari(vari* avi, double b, double c) : 
-          op_vd_vari(avi->val_ * b + c,
-                     avi,b) {
+          op_vdd_vari(::fma(avi->val_ , b, c),
+                      avi,b,c) {
         }
         void chain() {
-          avi_->adj_ += adj_ * bd_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bd_)
+                       || boost::math::isnan(cd_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else
+            avi_->adj_ += adj_ * bd_;
         }
       };
 
-      class fma_ddv_vari : public op_v_vari {
+      class fma_ddv_vari : public op_ddv_vari {
       public:
         fma_ddv_vari(double a, double b, vari* cvi) :
-          op_v_vari(a * b + cvi->val_, 
-                    cvi) {
+          op_ddv_vari(::fma(a, b, cvi->val_), 
+                      a,b,cvi) {
         }
         void chain() {
-          // avi_ is cvi from constructor
-          avi_->adj_ += adj_;
+
+          if (unlikely(boost::math::isnan(cvi_->val_)
+                       || boost::math::isnan(ad_)
+                       || boost::math::isnan(bd_)))
+            cvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else
+            cvi_->adj_ += adj_;
         }
       };
     }
@@ -80,7 +115,8 @@ namespace stan {
      * This function returns the product of the first two arguments
      * plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -106,7 +142,8 @@ namespace stan {
      * (C99).  This function returns the product of the first two
      * arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -130,7 +167,8 @@ namespace stan {
      * variable (C99).  This function returns the product of the first
      * two arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -154,7 +192,8 @@ namespace stan {
      * (C99).  This function returns the product of the first two
      * arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -176,7 +215,8 @@ namespace stan {
      * value (C99).  This function returns the product of the first
      * two arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -198,7 +238,8 @@ namespace stan {
      * and value (C99).  This function returns the product of the
      * first two arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -220,7 +261,8 @@ namespace stan {
      * (C99).  This function returns the product of the first two
      * arguments plus the third argument.
      *
-     * See boost::math::fma() for the double-based version.
+     * The double-based version
+     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivaties are
      *

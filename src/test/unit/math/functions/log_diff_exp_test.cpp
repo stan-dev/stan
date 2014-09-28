@@ -1,4 +1,5 @@
-#include "stan/math/functions/log_diff_exp.hpp"
+#include <stan/math/functions/log_diff_exp.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 void test_log_diff_exp(double a, double b) {
@@ -28,4 +29,17 @@ TEST(MathFunctions, log_diff_exp) {
   // exp(10000.0) overflows
   EXPECT_FLOAT_EQ(10000.0,log_diff_exp(10000.0,0.0));
   EXPECT_FLOAT_EQ(0.0,log_diff_exp(0.0,-10000.0));
+}
+
+TEST(MathFunctions, log_diff_exp_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::math::log_diff_exp(3.0, nan));
+
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::math::log_diff_exp(nan, 2.0));
+
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::math::log_diff_exp(nan, nan));
 }
