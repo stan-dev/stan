@@ -22,8 +22,10 @@ namespace stan {
         }
         void chain() {
 
+          if (std::fabs(bvi_->val_ / avi_->val_) > 10 ) return;
+          
           double u = stan::math::gamma_p(avi_->val_, bvi_->val_);
-      
+          
           double S = 0.0;
           double s = 1.0;
           double l = std::log(bvi_->val_);
@@ -54,6 +56,8 @@ namespace stan {
         }
         void chain() {
 
+          if (std::fabs(b / avi_->val_) > 10 ) return;
+          
           double u = stan::math::gamma_p(avi_->val_, bd_);
       
           double S = 0.0;
@@ -83,7 +87,8 @@ namespace stan {
                      a,bvi) {
         }
         void chain() {
-          bvi_->adj_ += adj_ * (std::exp(-bvi_->val_) * std::pow(bvi_->val_, ad_ - 1.0) / boost::math::tgamma(ad_));     
+          if (std::fabs(bvi_->val_ / a) > 10 ) return;
+          bvi_->adj_ += adj_ * (std::exp(-bvi_->val_) * std::pow(bvi_->val_, ad_ - 1.0) / boost::math::tgamma(ad_));
         }
       };
     }
