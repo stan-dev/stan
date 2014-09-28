@@ -7,38 +7,6 @@ GTEST_MAIN = $(GTEST)/src/gtest_main.cc
 CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
 
 ##
-# Target to verify header files are coherent
-##
-HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f)) 
-ifeq ($(OS),win) 
-  DEV_NULL = nul
-else
-  DEV_NULL = /dev/null
-endif
-
-test/dummy.cpp:
-	@mkdir -p test
-	@touch $@
-	@echo "int main() {return 0;}" >> $@
-
-%.hpp-test : %.hpp test/dummy.cpp
-	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
-
-##
-# Target to verify compiled models are valid
-##
-.PHONY: %.cpp-test
-%.cpp-test : %.cpp
-	$(COMPILE.c) -fsyntax-only -O$O $< 
-
-##
-# Target to build all tests
-##
-.PHONY: test-all
-test-all: test-unit test-headers test-distributions test-models
-
-
-##
 # Build the google test library.
 ## 
 $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
@@ -47,6 +15,10 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
+
+##
+# Rule for building a test
+##
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
@@ -60,139 +32,67 @@ test/%.d : src/test/%_test.cpp
 	(set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$ ); \
 	fi
 
-ifneq (,$(filter test-unit,$(MAKECMDGOALS)))
-  -include $(addsuffix .d, $(UNIT_TESTS)) 
+############################################################
+##
+# Target to verify header files within Stan has
+# enough include calls
+##
+HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f)) 
+
+ifeq ($(OS_TYPE),win) 
+  DEV_NULL = nul
+else
+  DEV_NULL = /dev/null
 endif
-ifneq (,$(filter test-all,$(MAKECMDGOALS)))
-  -include $(addsuffix .d, $(UNIT_TESTS)) 
-endif
 
-##
-# run target which will allow for parallel execution of
-# tests.
-## 
-.PHONY: runtest/%
-runtest/% : %
-	@echo '------------------------------------------------------------'
-	$(WINE) $< --gtest_output="xml:$*.xml";
+.PHONY: HEADER_TESTS
+%.hpp-test : %.hpp test/dummy.cpp
+	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
 
-##
-# target path_separator for use in some tests that need to 
-# call executables.
-##
-.PHONY: path_separator
-path_separator :
-	@echo $(PATH_SEPARATOR)
+test/dummy.cpp:
+	@mkdir -p test
+	@touch $@
+	@echo "int main() {return 0;}" >> $@
 
-##
-# PERCENT used for secondary expansion
-# $$(PERCENT) turns into %.
-##
-PERCENT = %
+.PHONY: test-headers
+test-headers: $(HEADER_TESTS)
 
+############################################################
 ##
-# TEST_TARGETS is the set of all src/test subdirectories excluding src/test.
+# static rule to link in libstan.a libstanc.
+# needed by subset of unit tests that test stan compiler
+# all these tests are under stan/test/unit/gm
 ##
-TEST_TARGETS := $(shell find src/test ! -path src/test -type d)
-
-##
-# ALL_TESTS is the set of all test files
-#   This needs to be an '=' assignment and not a ':='.
-##
-ALL_TESTS = $(shell find src/test -type f -name '*_test.cpp')
-
-ALL_TEST_EXECUTABLES = $(patsubst src/%_test.cpp,%$(EXE),$(ALL_TESTS))
-
-GRAMMAR_TESTS = $(foreach dir,\
-                          $(patsubst src/%,%,$(shell find src/test -type d -name 'gm')),\
-                          $(filter $(dir)/%,$(ALL_TEST_EXECUTABLES)))
-
-##
-# Generate autodependencies for test files.
-# Adapted from the gnu make manual.
-# http://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html#Automatic-Prerequisites
-##
-$(GRAMMAR_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
+STANC_TESTS := $(patsubst src/%_test.cpp,%$(EXE),$(shell find src/test/unit/gm -type f -name '*_test.cpp'))
+$(STANC_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
-ifeq ($(strip $(findstring test-,$(MAKECMDGOALS))\
-              $(findstring runtest/,$(MAKECMDGOALS))\
-              $(findstring src/test/,$(MAKECMDGOALS))),)
-	$@ --gtest_output="xml:$(basename $@).xml"
-endif
 
-.PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
-ifeq ($(strip $(findstring test-,$(MAKECMDGOALS))\
-              $(findstring runtest/,$(MAKECMDGOALS))\
-              $(findstring src/test/,$(MAKECMDGOALS))),)
-	$@ --gtest_output="xml:$(basename $@).xml"
-endif
 
+############################################################
+##
+# Use the stanc compiler to generate C++ from Stan programs
+##
 
-####
-## These make rules apply if SECONDEXPANSION is available
-## in make.
-#### 
-ifneq ($(filter second-expansion,$(.FEATURES)),)
-##
-# Defining the test target implicit static rule.
-#
-# Each src/test/* depends on each executable that's generated
-# by the test file.
-##
-.SECONDEXPANSION:
-.PHONY: $(TEST_TARGETS)
-$(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter $$(patsubst src/$$(PERCENT),$$(PERCENT),$$@)/$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
-	@echo ''
-	$(if $(GENERATE_TESTS),\
-             $(MAKE) $@ $(if $(J),-j$(J)), \
-             @echo 'Ran '$(words $(filter runtest/%,$^))' tests for '$@)
-else
-####
-## Warning for developers that don't have a 
-## current enough version of make (3.81 or higher).
-#### 
-.PHONY: $(TEST_TARGETS)
-$(TEST_TARGETS):
-	@echo ''
-	@echo '------------------------------------------------------------'
-	@echo 'The current version of make does not satisfy the developer  '
-	@echo 'requirements. Please install make 3.81 or higher.           '
-	@echo '------------------------------------------------------------'
-endif
-
-
-##
-# Build the stanc compiler as a test executable
-##
 .PRECIOUS: test/test-models/stanc$(EXE)
 test/test-models/stanc$(EXE) : src/test/test-models/stanc.cpp bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
-##
-# TEST_MODELS is the set of all the test models.
-# Those in the 'no_main' subdirectory are supposed to be compiled without a main function.
-##
 TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
-
-##
-# Compile these with no main.
-##
-$(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS))) : %.cpp : %.stan test/test-models/stanc$(EXE)
+$(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$(EXE)
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
 ##
-# Tests that also depend on generated models.
+# Explicitly specify dependencies for tests that depend on the generated C++ of Stan programs.
 ##
-
 test/unit/io/mcmc_writer.o: src/test/test-models/no-main/io_example.cpp
 test/unit/gm/generator.o: src/test/test-models/no-main/gm/test_lp.cpp
 
@@ -232,99 +132,40 @@ test/unit/gm/reject/reject_func_call_transformed_parameters.o: src/test/test-mod
 test/unit/gm/reject/reject_generated_quantities.o: src/test/test-models/no-main/gm/reject_generated_quantities.cpp
 test/unit/gm/reject/reject_func_call_generated_quantities.o: src/test/test-models/no-main/gm/reject_func_call_generated_quantities.cpp
 
-test/integration/compile_models.o : $(patsubst %.stan,%.cpp-test,$(shell find src/test/test-models/syntax-only -type f -name '*.stan'))
+##
+# Target to verify code generated Stan programs
+# (.stan -> .cpp) are compilable
+##
+.PHONY: %.cpp-test
+%.cpp-test : %.cpp
+	$(COMPILE.c) -fsyntax-only -O$O $< 
+
 
 ##
-# CmdStan specific targets. Should be removed in the future.
+# Compile models depends on every model within
+# src/test/test-models/syntax-only/*.stan being able to
+# be code-generated to a *.cpp, then passed through
+# the compiler using the -fsyntax-only flag
 ##
-$(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/%,$(ALL_TESTS))): test/%.o : src/test/%_test.cpp $(LIBGTEST) 
-	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+test/integration/compile_models$(EXE) : $(patsubst %.stan,%.cpp-test,$(shell find src/test/test-models/syntax-only -type f -name '*.stan'))
 
+
+############################################################
 ##
-# Agrad distributions test generator
+# Test generator for distribution tests
 ##
 test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generate_tests.cpp
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
 
-src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
-	@echo "--- Generating tests for $(notdir $<) ---"
+
+test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
+.SECONDEXPANSION:
+src/test/unit-distribution/%_generated_test.cpp : src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
 	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
 
+LIST_OF_GENERATED_TESTS := $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_test.cpp,g')
 
-
-##
-# For src/test/unit-distribution tests, adding
-# dependency on generated tests.
-##
-
-ifneq ($(filter second-expansion,$(.FEATURES)),)
-
-DISTRIBUTION_TESTS := $(shell find src/test/unit-distribution -type f -name '*.hpp')
-.SECONDEXPANSION:
-$(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_test.cpp,$$(filter $$@$$(PERCENT),$$(DISTRIBUTION_TESTS)))
-
-endif
-
-# Set the variable GENERATE_TESTS to non-empty string
-# when the target is generating distribution tests.
-# This indicates whether make should be rerun.
-#
-#   Notes:
-#     The first argument to filter-out is the number of unique
-#        generated distribution tests that have already been generated
-#        in this current run of make. If this is the stage where
-#        we are generating tests, this number will be less than the
-#        number of tests to generate. (0 if running from a clean state)
-#     The second argument to filter-out is the number of unique
-#        generated distribution tests that should be generated. 
-#        This is determined by the existence of *_test.hpp files in 
-#        the appropriate directory.
-#     The filter-out function returns the total number of tests that should
-#        be generated if they have not yet been generated.
-##
-$(filter src/test/unit-distribution%,$(TEST_TARGETS)): \
-GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
-                              $(words $(filter $@%_00000_generated_test.cpp,$(ALL_TESTS))))
-
-
-.PHONY: test-headers
-test-headers: $(HEADER_TESTS) 
-
-##
-# Deprecated test targets
-##
-.PHONY: test-unit test-distributions test-models test-bugs
-test-unit test-distributions test-all:
-	@echo ''
-	@echo ''
-	@echo '  The '$@' target is deprecated. Please use these make targets instead:'
-	@echo '      '$^
-
-test-unit: src/test/unit src/test/unit-agrad-rev src/test/unit-agrad-fwd
-
-test-distributions: src/test/unit-distribution
-
-test-models:
-	@echo ''
-	@echo 'These tests are now in the CmdStan repository. Run this from'
-	@echo 'the CmdStan home directory:'
-	@echo ''
-	@echo '  "> make src/test/models"'
-	@echo ''
-	@exit 1
-
-test-bugs:
-	@echo ''
-	@echo 'These tests are now in the CmdStan repository. Run this from'
-	@echo 'the CmdStan home directory:'
-	@echo ''
-	@echo '  "> make src/test/models/bugs_examples"'
-	@echo ''
-	@exit 1
-
-
-.PHONY: test-all
-test-all: test-headers $(TEST_TARGETS)
+.PHONY: generate-tests
+generate-tests: $(LIST_OF_GENERATED_TESTS)
