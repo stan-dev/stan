@@ -4303,21 +4303,30 @@ namespace stan {
       // need template metaprogram to construct return
       std::stringstream ss;
       ss << "typename boost::math::tools::promote_args<";
-      bool continuing_tps = false;
+      int num_open_brackets = 1;
+      int num_generated_params = 0; 
       for (size_t i = 0; i < num_args; ++i) {
         if (fun.arg_decls_[i].arg_type_.base_type_ != INT_T) {
-          if (continuing_tps)
+          // two conditionals cut and pasted below
+          if (num_generated_params > 0)
             ss << ", ";
+          if (num_generated_params == 4) {
+            ss << "typename boost::math::tools::promote_args<";
+            num_generated_params = 0;
+            ++num_open_brackets;
+          }
           ss << "T" << i << "__";
-          continuing_tps = true;
+          ++num_generated_params;
         }
       }
       if (is_lp) {
-        if (continuing_tps > 0)
+        if (num_generated_params > 0)
           ss << ", ";
+        // set threshold at 4 so always room for one more param at end
         ss << "T_lp__";
       }
-      ss << ">::type";
+      for (int i = 0; i < num_open_brackets; ++i)
+        ss << ">::type";
       return ss.str();
     }
     
