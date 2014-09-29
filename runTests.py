@@ -16,7 +16,8 @@ arg 1:  test dir or test file
 
 winsfx = ".exe"
 testsfx = "_test.cpp"
-debug = True
+debug = False
+batchSize = 25
 
 def usage():
     sys.stdout.write('usage: %s <path/test/dir(/files)>\n' % sys.argv[0])
@@ -75,15 +76,15 @@ def makeTests( dirname, filenames, j ):
         if (debug):
             print('# targets: %d' % len(targets))
         startIdx = 0
-        endIdx = 25
+        endIdx = batchSize
         while (startIdx < len(targets)):
-            print('start %d, end %d' % (startIdx,endIdx))
             command = 'make -j%d %s' % (j,' '.join(targets[startIdx:endIdx]))
             if (debug):
+                print('start %d, end %d' % (startIdx,endIdx))
                 print(command)
             doCommand(command)
             startIdx = endIdx
-            endIdx = startIdx + 25
+            endIdx = startIdx + batchSize
             if (endIdx > len(targets)):
                 endIdx = len(targets)
          
