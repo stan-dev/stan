@@ -72,10 +72,24 @@ def makeTests( dirname, filenames, j ):
         target = mungeName(target)
         targets.append(target)
     if (len(targets) > 0):
-        command = 'make -j%d %s' % (j,' '.join(targets))
-        if (debug):
-            print(command)
-        doCommand(command)
+        targets = ' '.join(targets)
+
+        ## split the joined targets into strings of
+        ## maximum length: 100,000
+        max_length = 100000
+        start = 0
+        end = str.rfind(targets, ' ', start, start+max_length)
+        if (end == -1):
+            end = len(targets)
+        while end != len(targets):
+            command = 'make -j%d %s' % (j,targets[start:end])
+            if (debug):
+                print(command)
+            doCommand(command)
+            start = end
+            end = str.rfind(targets, ' ', start, start+max_length)
+            if (end == -1):
+                end = len(targets)
 
 def runTest(name):
     executable = mungeName(name).replace("/",os.sep)
