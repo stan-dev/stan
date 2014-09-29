@@ -208,8 +208,8 @@ namespace stan {
           // if (out_stream_) *out_stream_ << "Sigma = " << std::endl
           //                               << muL.L_chol() * muL.L_chol().transpose() << std::endl;
 
-          elbo_ = calc_ELBO(muL);
-          if (out_stream_) *out_stream_ << "elbo_ = " << elbo_ << std::endl;
+          // elbo_ = calc_ELBO(muL);
+          // if (out_stream_) *out_stream_ << "elbo_ = " << elbo_ << std::endl;
 
         }
       }
