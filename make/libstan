@@ -14,12 +14,10 @@ $(TEMPLATE_INSTANTIATION) : bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$(O_STANC) $(OUTPUT_OPTION) $<
 
-
-
 ##
 # Generate dependencies for libraries
 ##
-ifneq (,$(filter-out clean%,$(MAKECMDGOALS)))
+ifneq (,$(filter-out test-headers clean% %-test %.d,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(basename $(LIBSTAN_OFILES)))
   -include $(addsuffix .d,$(basename $(TEMPLATE_INSTANTIATION)))
 endif

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <stan/agrad/rev/functions/fma.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>

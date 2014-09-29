@@ -6,6 +6,7 @@
 #include <stan/agrad/rev/internal/precomp_v_vari.hpp>
 #include <stan/agrad/rev/internal/precomputed_gradients.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace agrad {
@@ -18,6 +19,39 @@ namespace stan {
      * For <code>fmin(a,b)</code>, if a's value is less than b's,
      * then a is returned, otherwise b is returned.
      * 
+       \f[
+       \mbox{fmin}(x,y) = 
+       \begin{cases}
+         x & \mbox{if } x \leq y \\
+         y & \mbox{if } x > y \\[6pt]
+         x & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+         y & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{fmin}(x,y)}{\partial x} = 
+       \begin{cases}
+         1 & \mbox{if } x \leq y \\
+         0 & \mbox{if } x > y \\[6pt]
+         1 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+         0 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{fmin}(x,y)}{\partial y} = 
+       \begin{cases}
+         0 & \mbox{if } x \leq y \\
+         1 & \mbox{if } x > y \\[6pt]
+         0 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
+         1 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
+         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a First variable.
      * @param b Second variable.
      * @return If the first variable's value is smaller than the

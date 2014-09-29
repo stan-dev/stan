@@ -16,6 +16,31 @@ namespace stan {
      *
      * where \f$m = max(a,b)\f$.
      * 
+     *
+       \f[
+       \mbox{log\_sum\_exp}(x,y) = 
+       \begin{cases}
+         \ln(\exp(x)+\exp(y)) & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{log\_sum\_exp}(x,y)}{\partial x} = 
+       \begin{cases}
+         \frac{\exp(x)}{\exp(x)+\exp(y)} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{log\_sum\_exp}(x,y)}{\partial y} = 
+       \begin{cases}
+         \frac{\exp(y)}{\exp(x)+\exp(y)} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a the first variable
      * @param b the second variable
      */

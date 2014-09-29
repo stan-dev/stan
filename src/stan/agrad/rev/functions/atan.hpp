@@ -29,6 +29,27 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \arctan x = \frac{1}{1 + x^2}\f$.
      *
+     *
+       \f[
+       \mbox{atan}(x) = 
+       \begin{cases}
+         \arctan(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{atan}(x)}{\partial x} = 
+       \begin{cases}
+         \frac{\partial\, \arctan(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial \, \arctan(x)}{\partial x} = \frac{1}{x^2+1}
+       \f]
+     *
      * @param a Variable in range [-1,1].
      * @return Arc tangent of variable, in radians. 
      */

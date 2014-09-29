@@ -17,6 +17,6 @@ ifneq (,$(findstring g++,$(CC)))
   CC_TYPE ?= g++
 endif
 CC_TYPE ?= other
-CC_MAJOR = $(shell $(CC) -dumpversion 2>&1 | cut -d'.' -f1)
-CC_MINOR = $(shell $(CC) -dumpversion 2>&1 | cut -d'.' -f2)
+CC_MAJOR := $(shell $(CC) -dumpversion 2>&1 | cut -d'.' -f1)
+CC_MINOR := $(shell $(CC) -dumpversion 2>&1 | cut -d'.' -f2)
 
