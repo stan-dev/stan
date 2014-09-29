@@ -81,7 +81,7 @@ def makeTests( dirname, filenames, j ):
             command = 'make -j%d %s' % (j,' '.join(targets[startIdx:endIdx]))
             if (debug):
                 print(command)
-            # doCommand(command)
+            doCommand(command)
             startIdx = endIdx
             endIdx = startIdx + 25
             if (endIdx > len(targets)):
