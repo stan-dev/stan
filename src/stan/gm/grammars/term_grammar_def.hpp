@@ -151,7 +151,7 @@ namespace stan {
         
         if (fun.name_ == "lkj_cov_log") {
           error_msgs << "Warning: the lkj_cov_log() function"
-                     << " is deprecated."
+                     << " is deprecated.  It will be removed in Stan 3."
                      << std::endl
                      << "Code LKJ covariance in terms of an lkj_corr()"
                      << " distribution on a correlation matrix"

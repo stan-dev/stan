@@ -246,7 +246,7 @@ namespace stan {
 
         if (function_name == "lkj_cov_log") {
           error_msgs << "Warning: the lkj_cov_log() sampling distribution"
-                     << " is deprecated."
+                     << " is deprecated.  It will be removed in Stan 3."
                      << std::endl
                      << "Code LKJ covariance in terms of an lkj_corr()"
                      << " distribution on a correlation matrix"
