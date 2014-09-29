@@ -16,7 +16,7 @@ arg 1:  test dir or test file
 
 winsfx = ".exe"
 testsfx = "_test.cpp"
-debug = False
+debug = True
 
 def usage():
     sys.stdout.write('usage: %s <path/test/dir(/files)>\n' % sys.argv[0])
@@ -72,10 +72,21 @@ def makeTests( dirname, filenames, j ):
         target = mungeName(target)
         targets.append(target)
     if (len(targets) > 0):
-        command = 'make -j%d %s' % (j,' '.join(targets))
         if (debug):
-            print(command)
-        doCommand(command)
+            print('# targets: %d' % len(targets))
+        startIdx = 0
+        endIdx = 25
+        while (startIdx < len(targets)):
+            print('start %d, end %d' % (startIdx,endIdx))
+            command = 'make -j%d %s' % (j,' '.join(targets[startIdx:endIdx]))
+            if (debug):
+                print(command)
+            # doCommand(command)
+            startIdx = endIdx
+            endIdx = startIdx + 25
+            if (endIdx > len(targets)):
+                endIdx = len(targets)
+         
 
 def runTest(name):
     executable = mungeName(name).replace("/",os.sep)
