@@ -11,99 +11,102 @@
 #include <stan/math/error_handling/check_less.hpp>
 #include <stan/math/error_handling/matrix/check_ordered.hpp>
 
-#include <stan/math/ode/ode_system.hpp>
-#include <stan/math/ode/compute_results.hpp>
-#include <stan/math/ode/push_back_state_and_time.hpp>
+#include <stan/math/ode/coupled_ode_system.hpp>
+#include <stan/math/ode/coupled_ode_observer.hpp>
 
 namespace stan {
   
   namespace math {
-
+    
+    /**
+     * integrate_ode numerically solves the ordinary differential
+     * equation specified for the times provided.
+     *
+     * This function is templated to allow the initial times to be
+     * either data or autodiff variables and the parameters to be data
+     * or autodiff variables.
+     *
+     * This version of integrate_ode uses boost odeint's
+     * runge_kutta_dopri5 solver.
+     *
+     * @tparam F ode system function concept
+     * @tparam T1 type of the initial values
+     * @tparam T2 type of the parameters
+     * 
+     * @param[in] f a functor for the base ordinary differential equation.
+     * @param[in] y0 the initial state. The size of the initial state must
+     *    be greater than 0.
+     * @param[in] t0 the time of the initial state.
+     * @param[in] ts the times of the desired solutions.
+     * @param[in] theta the parameters of the ode
+     * @param[in] x double data values that can be used by the ode
+     * @param[in] x_int integer data values that can be used by the ode
+     * @param[in,out] pstream the print stream for messages
+     *
+     * @returns a vector of states, each state corresponding to a time
+     *   in ts.
+     */
     template <typename F, typename T1, typename T2>
     std::vector<std::vector<typename stan::return_type<T1,T2>::type> >
     integrate_ode(const F& f,
-                  const std::vector<T1> y0, 
-                  const double& t0, // initial time
-                  const std::vector<double>& ts, // times at desired solutions
-                  const std::vector<T2>& theta, // parameters
-                  const std::vector<double>& x, // double data values
-                  const std::vector<int>& x_int, // int data values
-                  std::ostream* pstream) { 
+                  const std::vector<T1> y0,
+                  const double t0,
+                  const std::vector<double>& ts,
+                  const std::vector<T2>& theta,
+                  const std::vector<double>& x,
+                  const std::vector<int>& x_int,
+                  std::ostream* pstream) {            
       using boost::numeric::odeint::integrate_times;  
       using boost::numeric::odeint::make_dense_output;  
       using boost::numeric::odeint::runge_kutta_dopri5;
+      using boost::is_same;
+      using stan::agrad::var;
       
-      stan::math::check_nonzero_size("integrate_ode(%1%)",ts,"time_vec",
+      const double absolute_tolerance = 1e-6;
+      const double relative_tolerance = 1e-6;
+      const double step_size = 0.1;
+
+      // validate inputs
+      stan::math::check_nonzero_size("integrate_ode(%1%)", ts, "time", 
                                      static_cast<double*>(0));
-      stan::math::check_nonzero_size("integrate_ode(%1%)",y0,"y0_vec",
+      stan::math::check_nonzero_size("integrate_ode(%1%)", y0, "initial state",
                                      static_cast<double*>(0));
       stan::math::check_ordered("integrate_ode(%1%)", ts, "times", 
                                 static_cast<double*>(0));
-      stan::math::check_less("integrate_ode(%1%)",t0,ts[0],"initial time",
+      stan::math::check_less("integrate_ode(%1%)",t0, ts[0], "initial time",
                              static_cast<double*>(0));
+      
 
-      double absolute_tolerance = 1e-6;
-      double relative_tolerance = 1e-6;
-
-      std::vector<double> theta_dbl;
-      for (int i = 0; i < theta.size(); i++)
-        theta_dbl.push_back(value_of(theta[i]));
-
-      std::vector<double> y0_vec; 
-      for (size_t n = 0; n < y0.size(); n++)
-        y0_vec.push_back(value_of(y0[n]));
-
-      //initialize values to 0 if theta is var
-      if (boost::is_same<stan::agrad::var, T2>::value)
-        for (size_t n = 0; n < theta.size() * y0.size(); n++)
-          y0_vec.push_back(0.0);
-
-      //initalize values to 0 if y0 is var
-      if (boost::is_same<stan::agrad::var, T1>::value)
-        for (size_t n = 0; n < y0.size() * y0.size(); n++)
-          y0_vec.push_back(0.0);
-
-      // builds coupled ode system
-      ode_system<F, T1, T2> system(f,y0_vec,theta_dbl,x,x_int, y0.size(),pstream);
-
-      // sets initial positions to 0 if y0 is var
-      if (boost::is_same<stan::agrad::var, T1>::value)
-        for (size_t n = 0; n < y0.size(); n++)
-          y0_vec[n] = 0;
-
+      // create coupled ode system
+      coupled_ode_system<F, T1, T2>
+        coupled_system(f, y0, theta, x, x_int, pstream);
+      
+      std::vector<double> coupled_state = coupled_system.initial_state();
+      
+      // boost expects the first time in the vector to be the 
+      // time of the initial state
       std::vector<double> ts_vec(ts.size()+1);
       ts_vec[0] = t0;
       for (size_t n = 0; n < ts.size(); n++)
         ts_vec[n+1] = ts[n];
       
-      double step_size = 0.1;
+      std::vector<std::vector<double> > y_coupled(ts_vec.size());
+      coupled_ode_observer observer(y_coupled);
 
-      std::vector<std::vector<double> > x_vec;
-      std::vector<double> t_vec;
-      push_back_state_and_time<double> obs(x_vec, t_vec);
       integrate_times(make_dense_output(absolute_tolerance,
                                         relative_tolerance,
                                         runge_kutta_dopri5<std::vector<double>,
                                         double,std::vector<double>,double>()),
-                      system,
-                      y0_vec,
+                      coupled_system,
+                      coupled_state, 
                       boost::begin(ts_vec), boost::end(ts_vec), 
                       step_size,
-                      obs);
+                      observer);
 
-      std::vector<std::vector<double> > y = obs.get();
-      std::vector<std::vector<typename stan::return_type<T1,T2>::type> > 
-        res = compute_results(y, y0, theta);
-
-      res.erase(res.begin());
-
-      // add back initial positions if y0 is var
-      if (boost::is_same<stan::agrad::var, T1>::value)
-        for (size_t n = 0; n < res.size(); n++)
-          for (size_t m = 0; m < y0.size(); m++)
-            res[n][m] += y0[m];
-
-      return res;
+      // remove the first state; this state corresponds to the initial value
+      y_coupled.erase(y_coupled.begin());
+      
+      return coupled_system.decouple_states(y_coupled);
     }
                    
   }

@@ -2,6 +2,7 @@
 #define TEST__UNIT__MATH__ODE__HARMONIC_OSCILLATOR
 
 #include <stan/meta/traits.hpp>
+#include <stdexcept>
 
 template <typename T0, typename T1, typename T2>
 inline
@@ -15,6 +16,9 @@ harm_osc_ode(const T0& t_in, // initial time
   res.push_back(y_in[1]);
   res.push_back(-y_in[0] - theta[0]*y_in[1]);
 
+  if (y_in.size() != 2)
+    throw std::domain_error("this function was called with inconsistent state");
+  
   return res;
 }
 
