@@ -243,6 +243,18 @@ namespace stan {
           error_msgs << "unknown distribution=" << s.dist_.family_ << std::endl;
           return false;
         }
+
+        if (function_name == "lkj_cov_log") {
+          error_msgs << "Warning: the lkj_cov_log() sampling distribution"
+                     << " is deprecated."
+                     << std::endl
+                     << "Code LKJ covariance in terms of an lkj_corr()"
+                     << " distribution on a correlation matrix"
+                     << " and independent lognormals on the scales."
+                     << std::endl << std::endl;
+
+        }
+
         // test for LHS not being purely a variable
         if (has_non_param_var(s.expr_,var_map)) {
           // FIXME:  really want to get line numbers in here too
