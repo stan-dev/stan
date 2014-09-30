@@ -66,14 +66,12 @@ bin/%.o : src/%.cpp
 # Rule for generating dependencies.
 ##
 bin/%.d : src/%.cpp
-	@if test -d $(dir $@); \
-	then \
-	(set -e; \
+	@mkdir -p $(dir $@)
+	@set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$);\
-	fi
+	rm -f $@.$$$$
 
 .PHONY: help
 help:
@@ -131,8 +129,8 @@ include make/local    # for local stuff
 ##
 # Dependencies
 ##
-ifneq (,$(filter-out test-headers,$(filter-out clean%,$(MAKECMDGOALS))))
- -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
+ifneq (,$(filter-out test-headers generate-tests %.d,$(filter-out clean%,$(MAKECMDGOALS))))
+  include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
 endif
 
 ##

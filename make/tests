@@ -26,15 +26,14 @@ test/%.o : src/test/%_test.cpp $(LIBGTEST)
 ##
 # Rule for generating dependencies.
 ##
+.PRECIOUS: test/%.d
 test/%.d : src/test/%_test.cpp
-	@if test -d $(dir $@); \
-	then \
-	(set -e; \
+	@mkdir -p $(dir $@)
+	@set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$ ); \
-	fi
+	rm -f $@.$$$$
 
 ############################################################
 ##
