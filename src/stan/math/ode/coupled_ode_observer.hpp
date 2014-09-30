@@ -36,7 +36,7 @@ namespace stan {
       void operator()(const std::vector<double>& coupled_state, 
                       const double t) {
         y_coupled_[n_] = coupled_state;
-        n++;
+        n_++;
       }
 
     };
