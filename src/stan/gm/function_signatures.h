@@ -407,6 +407,8 @@ add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inv_wishart_rng",MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inverse",MATRIX_T,MATRIX_T);
 add("inverse_spd",MATRIX_T,MATRIX_T);
+add("is_inf",INT_T,DOUBLE_T);
+add("is_nan",INT_T,DOUBLE_T);
 add_binary("lbeta");
 add_unary("lgamma");
 add("lkj_corr_cholesky_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
