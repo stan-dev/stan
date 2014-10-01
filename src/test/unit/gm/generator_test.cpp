@@ -318,3 +318,16 @@ TEST(gmGenerator,funArgs5lp) {
                  "foo_lp(");
 }
 
+TEST(gmGenerator,shortCircuit1) {
+  expect_matches(1,
+                 "transformed data { int a; a <- 1 || 2; }"
+                 "model { }",
+                 "(primitive_value(1) || primitive_value(2))");
+  expect_matches(1,
+                 "transformed data { int a; a <- 1 && 2; }"
+                 "model { }",
+                 "(primitive_value(1) && primitive_value(2))");
+
+
+}
+
