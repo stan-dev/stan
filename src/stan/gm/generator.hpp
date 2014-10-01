@@ -178,6 +178,16 @@ namespace stan {
         generate_indexed_expr<false>(expr_string,indexes,base_type,e_num_dims,o_);
       }
       void operator()(const fun& fx) const { 
+        // first test if short-circuit op (binary && and || applied to
+        // primitives; overloads are eager, not short-circuiting)
+        if (fx.name_ == "logical_or" || fx.name_ == "logical_and") {
+          o_ << "(primitive_value(";
+          boost::apply_visitor(*this, fx.args_[0].expr_);
+          o_ << ") " << ((fx.name_ == "logical_or") ? "||" : "&&") << " primitive_value(";
+          boost::apply_visitor(*this, fx.args_[1].expr_);
+          o_ << "))";
+          return;
+        }
         o_ << fx.name_ << '(';
         for (size_t i = 0; i < fx.args_.size(); ++i) {
           if (i > 0) o_ << ',';

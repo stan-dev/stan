@@ -64,6 +64,7 @@
 #include <stan/agrad/fwd/functions/multiply_log.hpp>
 #include <stan/agrad/fwd/functions/owens_t.hpp>
 #include <stan/agrad/fwd/functions/pow.hpp>
+#include <stan/agrad/fwd/functions/primitive_value.hpp>
 #include <stan/agrad/fwd/functions/rising_factorial.hpp>
 #include <stan/agrad/fwd/functions/round.hpp>
 #include <stan/agrad/fwd/functions/sin.hpp>
