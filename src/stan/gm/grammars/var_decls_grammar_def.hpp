@@ -739,7 +739,8 @@ namespace stan {
 
       vector_decl_r.name("vector declaration");
       vector_decl_r 
-        %= lit("vector")
+        %= ( lit("vector")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > -range_brackets_double_r(_r1)
         > lit('[')
         > expression_g(_r1)
@@ -751,7 +752,8 @@ namespace stan {
 
       row_vector_decl_r.name("row vector declaration");
       row_vector_decl_r 
-        %= lit("row_vector")
+        %= ( lit("row_vector")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > -range_brackets_double_r(_r1)
         > lit('[')
         > expression_g(_r1)
@@ -763,7 +765,8 @@ namespace stan {
 
       matrix_decl_r.name("matrix declaration");
       matrix_decl_r 
-        %= lit("matrix")
+        %= ( lit("matrix")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > -range_brackets_double_r(_r1)
         > lit('[')
         > expression_g(_r1)
@@ -778,7 +781,8 @@ namespace stan {
 
       unit_vector_decl_r.name("unit_vector declaration");
       unit_vector_decl_r 
-        %= lit("unit_vector")
+        %= ( lit("unit_vector")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
           [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
@@ -789,7 +793,8 @@ namespace stan {
 
       simplex_decl_r.name("simplex declaration");
       simplex_decl_r 
-        %= lit("simplex")
+        %= ( lit("simplex")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
           [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
@@ -800,7 +805,8 @@ namespace stan {
 
       ordered_decl_r.name("ordered declaration");
       ordered_decl_r 
-        %= lit("ordered")
+        %= ( lit("ordered")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
           [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
@@ -811,7 +817,8 @@ namespace stan {
 
       positive_ordered_decl_r.name("positive_ordered declaration");
       positive_ordered_decl_r 
-        %= lit("positive_ordered")
+        %= ( lit("positive_ordered")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
           [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
@@ -822,7 +829,8 @@ namespace stan {
 
       cholesky_factor_decl_r.name("cholesky factor for symmetric, positive-def declaration");
       cholesky_factor_decl_r 
-        %= lit("cholesky_factor_cov") 
+        %= ( lit("cholesky_factor_cov") 
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
           [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
@@ -839,7 +847,8 @@ namespace stan {
 
       cholesky_corr_decl_r.name("cholesky factor for correlation matrix declaration");
       cholesky_corr_decl_r 
-        %= lit("cholesky_factor_corr")
+        %= ( lit("cholesky_factor_corr")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
           [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
@@ -850,7 +859,8 @@ namespace stan {
 
       cov_matrix_decl_r.name("covariance matrix declaration");
       cov_matrix_decl_r 
-        %= lit("cov_matrix")
+        %= ( lit("cov_matrix")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
           [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
@@ -861,7 +871,8 @@ namespace stan {
 
       corr_matrix_decl_r.name("correlation matrix declaration");
       corr_matrix_decl_r 
-        %= lit("corr_matrix")
+        %= ( lit("corr_matrix")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > lit('[')
         > expression_g(_r1)
           [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
