@@ -130,7 +130,7 @@ include make/local    # for local stuff
 # Dependencies
 ##
 ifneq (,$(filter-out test-headers generate-tests %.d,$(filter-out clean%,$(MAKECMDGOALS))))
-  include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
+  -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
 endif
 
 ##
