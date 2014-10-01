@@ -1653,8 +1653,11 @@ namespace stan {
         generate_indent(indent_,o_);
         o_ << "return ";
         if (!rs.return_value_.expression_type().is_ill_formed()
-            && !rs.return_value_.expression_type().is_void())
+            && !rs.return_value_.expression_type().is_void()) {
+          o_ << "stan::math::promote_scalar<return_t__>(";
           generate_expression(rs.return_value_, o_);
+          o_ << ")";
+        }
         o_ << ";" << EOL;
       }
       void operator()(const for_statement& x) const {
@@ -4461,8 +4464,20 @@ namespace stan {
       generate_propto_default_function_body(fun,out);
     }
 
+    /**
+     * Generate the specified function and optionally its default for
+     * propto=false for functions ending in _log.
+     *
+     * Exact behavior differs for unmarked functions, and functions
+     * ending in one of "_rng", "_lp", or "_log".
+     *
+     * @param[in] fun function AST object
+     * @param[in,out] out output stream to which function definition
+     * is written
+     */
     void generate_function(const function_decl_def& fun,
                            std::ostream& out) {
+
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_log = ends_with("_log", fun.name_);
