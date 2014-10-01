@@ -105,56 +105,6 @@ namespace stan {
     };
 
 
-    // // Eigen vector
-
-    // template <typename S, typename T>
-    // struct indexed_type<Eigen::Matrix<S,Eigen:Dynamic,1>, 
-    //                     typelist<true, null_typelist> > {
-    //   typedef S type;
-    // };
-
-    // template <typename S, typename T>
-    // struct indexed_type<Eigen::Matrix<S,Eigen:Dynamic,1>, 
-    //                     typelist<false, null_typelist> > {
-    //   typedef Eigen::Matrix<S,Eigen::Dynamic,1> type;
-    // };
-
-
-    // // Eigen row vector
-
-    // template <typename S>
-    // struct indexed_type<Eigen::Matrix<S,1,Eigen:Dynamic>, 
-    //                     typelist<true, null_typelist> > {
-    //   typedef S type;
-    // };
-
-    // template <typename S>
-    // struct indexed_type<Eigen::Matrix<S,1,Eigen:Dynamic>, 
-    //                     typelist<false, null_typelist> > {
-    //   typedef Eigen::Matrix<S,1,Eigen::Dynamic> type;
-    // };
-
-    // // Eigen matrix
-
-    // template <typename S, typename T>
-    // struct indexed_type<Eigen::Matrix<S,Eigen::Dynamic,Eigen::Dynamic>,
-    //                     typelist<true, T> > {
-    //   typedef indexed_type<Eigen::Matrix<S,1,Eigen::Dynamic>, T>::type type;
-    // };
-
-    // template <typename S, typename T>
-    // struct indexed_type<Eigen::Matrix<S,Eigen::Dynamic,Eigen::Dynamic>,
-    //                     typelist<false, typelist<false, null_typelist> > > {
-    //   typedef Eigen::Matrix<S,Eigen::Dynamic,Eigen::Dynamic> type;
-    // };
-
-    // template <typename S, typename T>
-    // struct indexed_type<Eigen::Matrix<S,Eigen::Dynamic,Eigen::Dynamic>,
-    //                     typelist<false, typelist<true, null_typelist> > > {
-    //   typedef Eigen::Matrix<S,Eigen::Dynamic,1> type;
-    // };
-
-
   }
 
 }

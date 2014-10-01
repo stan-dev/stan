@@ -2,15 +2,11 @@
 #include <stan/meta/indexed_type.hpp>
 #include <stan/meta/typelist.hpp>
 
-#include <boost/type_traits/is_same.hpp> 
+#include <test/unit/meta/util.hpp>
+
 #include <gtest/gtest.h>
 
-template <typename T, typename I>
-void expect_eq_indexed() {
-  EXPECT_TRUE(( boost::is_same<T,typename I::type>::value ));
-}
-
-TEST(MetaTypelist, testDouble) {
+TEST(MetaIndexedType, testDouble) {
   using stan::meta::nil;
   using stan::meta::indexed_type;
 
@@ -19,7 +15,7 @@ TEST(MetaTypelist, testDouble) {
                     indexed_type<double,nil> >();
 }
 
-TEST(MetaTypelist, testVec) {
+TEST(MetaIndexedType, testVec) {
   using stan::meta::nil;
   using stan::meta::cons;
   using stan::meta::indexed_type;
@@ -49,7 +45,7 @@ TEST(MetaTypelist, testVec) {
                                  typelist<>::type> >();
 }
 
-TEST(MetaTypelist, testVecVec) {
+TEST(MetaIndexedType, testVecVec) {
   using stan::meta::nil;
   using stan::meta::cons;
   using stan::meta::indexed_type;
@@ -64,7 +60,6 @@ TEST(MetaTypelist, testVecVec) {
                     indexed_type<vector<vector<double> >,
                                  typelist<>::type> >();
 
-  
   // double[,] -- (uni)
   expect_eq_indexed<vector<double>,
                     indexed_type<vector<vector<double> >,
@@ -75,7 +70,6 @@ TEST(MetaTypelist, testVecVec) {
                     indexed_type<vector<vector<double> >,
                                  typelist<multi_index>::type > >();
 
-
   // double[,] -- (uni,uni)
   expect_eq_indexed<double,
                     indexed_type<vector<vector<double> >,
@@ -85,7 +79,6 @@ TEST(MetaTypelist, testVecVec) {
   expect_eq_indexed<vector<double>,
                     indexed_type<vector<vector<double> >,
                                  typelist<uni_index,multi_index>::type > >();
-
 
   // double[,] -- (multi,uni)
   expect_eq_indexed<vector<double>,
