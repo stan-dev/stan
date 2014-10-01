@@ -114,6 +114,9 @@ endif
 	@echo ''
 	@echo '  Clean:'
 	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
+	@echo '  - clean-manual   : Cleans temporary files from building the manual.'
+	@echo '  - clean-deps     : Removes dependency files for tests. If tests stop building,'
+	@echo '                     run this target.'
 	@echo '  - clean-all      : Cleans up all of Stan.'
 	@echo '  Higher level targets:'
 	@echo '  - docs           : Builds all docs.'
@@ -155,10 +158,10 @@ clean-dox:
 clean-manual:
 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
-clean-models:
-	$(RM) -r models $(MODEL_HEADER).d
+clean-deps:
+	$(RM) $(shell find test -type f -name '*.d')
 
-clean-all: clean clean-manual clean-models
+clean-all: clean clean-manual clean-deps
 	$(RM) -r test/* bin
 	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f | sed 's#\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
 
