@@ -1,12 +1,15 @@
-LIBSTAN_OFILES = bin/stan/agrad/rev/var_stack.o
-bin/libstan.a : $(LIBSTAN_OFILES)
+LIBSTAN_HEADERS := src/stan/agrad/rev/var_stack.hpp
+LIBSTAN_OFILES := bin/stan/agrad/rev/var_stack.o
+bin/libstan.a : $(LIBSTAN_OFILES) $(LIBSTAN_HEADERS)
 	@mkdir -p $(dir $@)
 	$(AR) -rs bin/libstan.a $(LIBSTAN_OFILES)
 
-TEMPLATE_INSTANTIATION := $(shell find src/stan/gm -type f -name '*_inst.cpp')
-TEMPLATE_INSTANTIATION += $(shell find src/stan/gm -type f -name '*_def.cpp')
+
+LIBSTANC_HEADERS := $(shell find src/stan/gm/grammars -name '*.hpp') src/stan/gm/ast.hpp
+TEMPLATE_INSTANTIATION := $(shell find src/stan/gm -type f -name '*_inst.cpp') $(shell find src/stan/gm -type f -name '*_def.cpp')
 TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:src/%.cpp=bin/%.o)
-bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
+
+bin/libstanc.a : $(TEMPLATE_INSTANTIATION) $(LIBSTANC_HEADERS)
 	@mkdir -p $(dir $@)
 	$(AR) -rs bin/libstanc.a $(TEMPLATE_INSTANTIATION)
 
