@@ -22,7 +22,9 @@ void test_pg(const std::string& program_name,
   read_file(path, cpp_code);
   // std::cout << "cpp_code=" << cpp_code << std::endl;
   
-  EXPECT_TRUE(cpp_code.find(expected_substring) != std::string::npos);
+  EXPECT_TRUE(cpp_code.find(expected_substring) != std::string::npos)
+    << "program_name: " << program_name << std::endl
+    << "expected_substring: " << expected_substring;
 }
 
 int count_occurrences(const std::string target,
