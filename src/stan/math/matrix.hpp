@@ -61,6 +61,7 @@
 #include <stan/math/matrix/minus.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
+#include <stan/math/matrix/num_elements.hpp>
 #include <stan/math/matrix/prod.hpp>
 #include <stan/math/matrix/promote_common.hpp>
 #include <stan/math/matrix/promoter.hpp>
