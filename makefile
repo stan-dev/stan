@@ -70,7 +70,7 @@ bin/%.d : src/%.cpp
 	@set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
+	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1\.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
 .PHONY: help
@@ -136,7 +136,7 @@ include make/local    # for local stuff
 ##
 # Dependencies
 ##
-ifneq (,$(filter-out test-headers generate-tests %.d,$(filter-out clean%,$(MAKECMDGOALS))))
+ifneq (,$(filter-out test-headers generate-tests clean% %-test %.d,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
 endif
 
@@ -163,9 +163,8 @@ clean-manual:
 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 clean-deps:
-	$(RM) $(shell find test -type f -name '*.d')
+	$(RM) $(shell find . -type f -name '*.d')
 
 clean-all: clean clean-manual clean-deps
 	$(RM) -r test/* bin
-	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f | sed 's#\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
-
+	$(RM) $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f | sed 's#\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
