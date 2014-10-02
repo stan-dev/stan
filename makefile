@@ -103,18 +103,25 @@ endif
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
 	@echo '                     (requires doxygen installation)'
-	@echo '  TESTS (requires make 3.81 or higher):'
+	@echo ' TESTS:'
 	@echo ''
-	@echo '    Header Tests'
-	@echo '      - test-headers'
+	@echo '   Unit tests are built through make by specifying the executable as the target'
+	@echo '   to make. For a test in src/test/*_test.cpp, the executable is test/*$(EXE).'
 	@echo ''
-	@echo '      Single Unit Test'
-	@echo '        For example, to make the diag_post_multiply test, make the target'
-	@echo '          - test/unit-agrad-fwd/matrix/diag_post_multiply$(EXE)'
+	@echo '   Header tests'
+	@echo '   - test-headers  : tests all source headers to ensure they are compilable and'
+	@echo '                     include enough header files.'
+	@echo ''
+	@echo '   To run a single header test, add "-test" to the end of the file name.'
+	@echo '   Example: make src/stan/math/constants.hpp-test'
 	@echo ''
 	@echo '  Clean:'
 	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
+	@echo '  - clean-manual   : Cleans temporary files from building the manual.'
+	@echo '  - clean-deps     : Removes dependency files for tests. If tests stop building,'
+	@echo '                     run this target.'
 	@echo '  - clean-all      : Cleans up all of Stan.'
+	@echo ''
 	@echo '  Higher level targets:'
 	@echo '  - docs           : Builds all docs.'
 	@echo ''
@@ -155,10 +162,10 @@ clean-dox:
 clean-manual:
 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
-clean-models:
-	$(RM) -r models $(MODEL_HEADER).d
+clean-deps:
+	$(RM) $(shell find test -type f -name '*.d')
 
-clean-all: clean clean-manual clean-models
+clean-all: clean clean-manual clean-deps
 	$(RM) -r test/* bin
 	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f | sed 's#\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
 
