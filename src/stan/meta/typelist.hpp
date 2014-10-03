@@ -5,18 +5,20 @@ namespace stan {
 
   namespace meta {
 
+    // See Alexandrescu's C++ template book for details or
+    // his Dr. Dobbs article, "Generic Programming:Typelists and Applications", 
+    // http://www.drdobbs.com/generic-programmingtypelists-and-applica/184403813
+
+
     /**
      * An empty type list.  Used to terminate non-empty type lists,
      * which are encoded with the class <code>typelist</code>.
      *
      * <p>This struct is the analogue of the "nil" constant in LISP.
-     *
-     * <p>See Alexandrescu's C++ template book for details or
-     * his Dr. Dobbs article, "Generic Programming:Typelists and Applications", 
-     * http://www.drdobbs.com/generic-programmingtypelists-and-applica/184403813
      */
     struct nil {
     }; 
+
 
     /**
      * A non-empty type list composed of a type and a type list.
@@ -27,10 +29,6 @@ namespace stan {
      * the "car" operation would return in LISP) and <code>tail</code>
      * providing the tail type (what the "cdr" operation would
      * return in LISP).
-     *
-     * <p>See Alexandrescu's C++ template book for details or
-     * his Dr. Dobbs article, "Generic Programming:Typelists and Applications", 
-     * http://www.drdobbs.com/generic-programmingtypelists-and-applica/184403813
      *
      * @tparam T first type in list.
      * @tparam L rest of type list.
@@ -49,12 +47,17 @@ namespace stan {
       typedef L tail;
     };
 
+
     /**
      * A no-op struct to use as a default in typelists to suppress the
      * not-enough template arguments gripe that occurs otherwise.
      */
     struct dummy {
+      // dummy() { 
+      //   throw std::exception("dummy not constructible"); 
+      // }
     };
+
 
     /**
      * A utility template class to simplify writing down type lists
@@ -106,7 +109,6 @@ namespace stan {
       typedef cons<T1,cons<T2,cons<T3,cons<T4,nil> > > > type;
 
     };
-
 
 
     /**
@@ -164,6 +166,7 @@ namespace stan {
       typedef cons<T1,nil> type;
 
     };
+
 
     /**
      * Utility template specialization to simplify writing down empty
