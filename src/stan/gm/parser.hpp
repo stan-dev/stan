@@ -108,7 +108,7 @@ namespace stan {
         std::stringstream msg;
         std::string diagnostics = prog_grammar.error_msgs_.str();
         if (output_stream && is_nonempty(diagnostics)) {
-          msg << "EXPECTATION FAILURE - DIAGNOSTIC(S) FROM PARSER:"
+          msg << "SYNTAX ERROR - DIAGNOSTIC(S) FROM PARSER:"
               << std::endl
               << std::endl
               << diagnostics
@@ -118,7 +118,7 @@ namespace stan {
 
       } catch (const std::runtime_error& e) {
         std::stringstream msg;
-        msg << "NON EXPECTATION FAILURE - DIAGNOSTICS FROM PARSER:"
+        msg << "ERROR - DIAGNOSTICS FROM PARSER:"
             << std::endl
             << std::endl
             << prog_grammar.error_msgs_.str()
@@ -133,13 +133,20 @@ namespace stan {
       if (!success) {      
         std::stringstream msg;
         if (!parse_succeeded)
-          msg << "PARSE DID NOT SUCCEED." << std::endl; 
-        if (!consumed_all_input)
-          msg << "DIAGNOSTICS FROM PARSER:"
+          msg << "PARSE FAILED." << std::endl; 
+        if (!consumed_all_input) {
+          // get rest of program
+          std::basic_stringstream<char> unparsed_non_ws;
+          unparsed_non_ws << boost::make_iterator_range(fwd_begin, fwd_end);
+          msg << "PARSING HALTED AT LINE "
+              << get_line(fwd_begin)
               << std::endl
-              << "ERROR: non-whitespace beyond end of program."
+              << std::endl
+              << "REMAINING TEXT: "
+              << std::endl
+              << unparsed_non_ws.str()
               << std::endl;
-
+        }
         msg << std::endl << prog_grammar.error_msgs_.str() << std::endl;
         throw std::invalid_argument(msg.str());
       }
