@@ -8,6 +8,10 @@ TEST(ProbDistributionsPoisson, error_check) {
   EXPECT_NO_THROW(stan::prob::poisson_rng(6, rng));
 
   EXPECT_THROW(stan::prob::poisson_rng(-6, rng),std::domain_error);
+
+  EXPECT_NO_THROW(stan::prob::poisson_rng(1e9, rng));
+
+  EXPECT_THROW(stan::prob::poisson_rng(pow(2.0,31), rng),std::domain_error);
 }
 
 TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest) {
