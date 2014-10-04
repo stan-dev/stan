@@ -25,6 +25,22 @@ namespace stan {
      * <p>Using <code>square(x)</code> is more efficient
      * than using <code>x * x</code>.
      *
+       \f[
+       \mbox{square}(x) = 
+       \begin{cases}
+         x^2 & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \frac{\partial\,\mbox{square}(x)}{\partial x} = 
+       \begin{cases}
+         2x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param x Variable to square.
      * @return Square of variable.
      */

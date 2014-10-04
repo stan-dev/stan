@@ -17,7 +17,6 @@
 #include <stan/math/functions/exp2.hpp>
 #include <stan/math/functions/falling_factorial.hpp>
 #include <stan/math/functions/fdim.hpp>
-#include <stan/math/functions/fma.hpp>
 #include <stan/math/functions/gamma_p.hpp>
 #include <stan/math/functions/gamma_q.hpp>
 #include <stan/math/functions/ibeta.hpp>
