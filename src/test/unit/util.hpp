@@ -3,6 +3,17 @@
 
 #include <string>
 
+#define EXPECT_THROW_MSG(expr, E, msg) \
+  EXPECT_THROW(expr, T_exception);     \
+  try {                                \
+    (expr);                                     \
+  } catch(const E& e) {                         \
+    EXPECT_EQ(1, count_matches(msg, e.what()))  \
+    << "expected message: " << msg << std::endl \
+    << "found message:    " << e.what();        \
+    return;                                     \
+  }
+
 int count_matches(const std::string& target,
                   const std::string& s) {
   if (target.size() == 0) return -1;  // error
