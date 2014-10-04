@@ -4,6 +4,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/accumulator.hpp>
 #include <stan/math/matrix/add.hpp>
+#include <stan/math/matrix/append_row.hpp>
 #include <stan/math/matrix/array_builder.hpp>
 #include <stan/math/matrix/assign.hpp>
 #include <stan/math/matrix/block.hpp>
@@ -60,15 +61,17 @@
 #include <stan/math/matrix/minus.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
+#include <stan/math/matrix/num_elements.hpp>
 #include <stan/math/matrix/prod.hpp>
 #include <stan/math/matrix/promote_common.hpp>
 #include <stan/math/matrix/promoter.hpp>
+#include <stan/math/matrix/promote_scalar.hpp>
+#include <stan/math/matrix/promote_scalar_type.hpp>
 #include <stan/math/matrix/qr_Q.hpp>
 #include <stan/math/matrix/qr_R.hpp>
 #include <stan/math/matrix/quad_form.hpp>
 #include <stan/math/matrix/quad_form_diag.hpp>
 #include <stan/math/matrix/rank.hpp>
-#include <stan/math/matrix/append_row.hpp>
 #include <stan/math/matrix/resize.hpp>
 #include <stan/math/matrix/row.hpp>
 #include <stan/math/matrix/rows.hpp>
