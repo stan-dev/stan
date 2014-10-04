@@ -178,6 +178,16 @@ namespace stan {
         generate_indexed_expr<false>(expr_string,indexes,base_type,e_num_dims,o_);
       }
       void operator()(const fun& fx) const { 
+        // first test if short-circuit op (binary && and || applied to
+        // primitives; overloads are eager, not short-circuiting)
+        if (fx.name_ == "logical_or" || fx.name_ == "logical_and") {
+          o_ << "(primitive_value(";
+          boost::apply_visitor(*this, fx.args_[0].expr_);
+          o_ << ") " << ((fx.name_ == "logical_or") ? "||" : "&&") << " primitive_value(";
+          boost::apply_visitor(*this, fx.args_[1].expr_);
+          o_ << "))";
+          return;
+        }
         o_ << fx.name_ << '(';
         for (size_t i = 0; i < fx.args_.size(); ++i) {
           if (i > 0) o_ << ',';
@@ -1653,8 +1663,11 @@ namespace stan {
         generate_indent(indent_,o_);
         o_ << "return ";
         if (!rs.return_value_.expression_type().is_ill_formed()
-            && !rs.return_value_.expression_type().is_void())
+            && !rs.return_value_.expression_type().is_void()) {
+          o_ << "stan::math::promote_scalar<return_t__>(";
           generate_expression(rs.return_value_, o_);
+          o_ << ")";
+        }
         o_ << ";" << EOL;
       }
       void operator()(const for_statement& x) const {
@@ -4280,21 +4293,30 @@ namespace stan {
       // need template metaprogram to construct return
       std::stringstream ss;
       ss << "typename boost::math::tools::promote_args<";
-      bool continuing_tps = false;
+      int num_open_brackets = 1;
+      int num_generated_params = 0; 
       for (size_t i = 0; i < num_args; ++i) {
         if (fun.arg_decls_[i].arg_type_.base_type_ != INT_T) {
-          if (continuing_tps)
+          // two conditionals cut and pasted below
+          if (num_generated_params > 0)
             ss << ", ";
+          if (num_generated_params == 4) {
+            ss << "typename boost::math::tools::promote_args<";
+            num_generated_params = 0;
+            ++num_open_brackets;
+          }
           ss << "T" << i << "__";
-          continuing_tps = true;
+          ++num_generated_params;
         }
       }
       if (is_lp) {
-        if (continuing_tps > 0)
+        if (num_generated_params > 0)
           ss << ", ";
+        // set threshold at 4 so always room for one more param at end
         ss << "T_lp__";
       }
-      ss << ">::type";
+      for (int i = 0; i < num_open_brackets; ++i)
+        ss << ">::type";
       return ss.str();
     }
     
@@ -4452,8 +4474,20 @@ namespace stan {
       generate_propto_default_function_body(fun,out);
     }
 
+    /**
+     * Generate the specified function and optionally its default for
+     * propto=false for functions ending in _log.
+     *
+     * Exact behavior differs for unmarked functions, and functions
+     * ending in one of "_rng", "_lp", or "_log".
+     *
+     * @param[in] fun function AST object
+     * @param[in,out] out output stream to which function definition
+     * is written
+     */
     void generate_function(const function_decl_def& fun,
                            std::ostream& out) {
+
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_log = ends_with("_log", fun.name_);

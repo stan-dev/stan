@@ -128,4 +128,41 @@ void test_warning(const std::string& model_name, const std::string& warning_msg)
   EXPECT_TRUE(msgs.str().find_first_of(warning_msg) != std::string::npos);
 }
 
+std::string model_to_cpp(const std::string& model_text) {
+  std::string model_name = "foo";
+  std::string file_name = "dummy";
+  std::stringstream ss(model_text);
+  std::stringstream msgs;
+  stan::gm::program prog;
+  bool parsable = stan::gm::parse(&msgs, ss, file_name, model_name, prog);
+  EXPECT_TRUE(parsable);
+
+  std::stringstream output;
+  stan::gm::generate_cpp(prog, model_name, output);
+  return output.str();
+}
+
+int count_matches(const std::string& target,
+                  const std::string& s) {
+  if (target.size() == 0) return -1;  // error
+  int count = 0;
+  for (size_t pos = 0; (pos = s.find(target,pos)) != std::string::npos; pos += target.size())
+    ++count;
+  return count;
+}
+
+void expect_matches(int n,
+                    const std::string& stan_code,
+                    const std::string& target,
+                    bool print_model = false) {
+  std::string model_cpp = model_to_cpp(stan_code);
+  if (print_model)
+    std::cout << model_cpp << std::endl;
+  EXPECT_EQ(n, count_matches(target,model_cpp));
+}
+
+
+
+
+
 #endif
