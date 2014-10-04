@@ -4,7 +4,7 @@
 #include <string>
 
 #define EXPECT_THROW_MSG(expr, E, msg) \
-  EXPECT_THROW(expr, T_exception);     \
+  EXPECT_THROW(expr, E);               \
   try {                                \
     (expr);                                     \
   } catch(const E& e) {                         \
