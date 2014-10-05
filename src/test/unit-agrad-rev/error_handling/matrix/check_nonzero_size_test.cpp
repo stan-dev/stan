@@ -1,11 +1,13 @@
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
-TEST(MathErrorHandlingMatrix, checkNonzeroSizeMatrix) {
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
+TEST(AgradRevErrorHandlingMatrix, checkNonzeroSizeMatrix) {
+  using stan::agrad::var;
+  Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> y;
   using stan::math::check_nonzero_size;
-  double result;
+  var result;
   
   y.resize(3,3);
   EXPECT_TRUE(check_nonzero_size("checkNonzeroSize(%1%)",
@@ -17,9 +19,9 @@ TEST(MathErrorHandlingMatrix, checkNonzeroSizeMatrix) {
   y.resize(0,0);
   EXPECT_THROW_MSG(check_nonzero_size("checkNonzeroSize(%1%)",
                                       y, "y", &result),
-                   std::domain_error, "has size 0");
+                   std::domain_error, "y has size 0");
 
-  std::vector<double> a;
+  std::vector<var> a;
   a.push_back(3.0);
   a.push_back(3.0);
   a.push_back(3.0);
@@ -37,13 +39,14 @@ TEST(MathErrorHandlingMatrix, checkNonzeroSizeMatrix) {
   EXPECT_THROW_MSG(stan::math::check_nonzero_size("checkNonzeroSize(%1%)", a, "a", 
                                                   &result), 
                    std::domain_error,
-                   "has size 0");
+                   "a has size 0");
 }
 
-TEST(MathErrorHandlingMatrix, checkNonzeroSizeMatrix_nan) {
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
-  double result;
-  double nan = std::numeric_limits<double>::quiet_NaN();
+TEST(AgradRevErrorHandlingMatrix, checkNonzeroSizeMatrix_nan) {
+  using stan::agrad::var;
+  Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> y;
+  var result;
+  var nan = std::numeric_limits<var>::quiet_NaN();
 
   y.resize(3,3);
   y << nan, nan, nan,nan, nan, nan,nan, nan, nan;
@@ -60,7 +63,7 @@ TEST(MathErrorHandlingMatrix, checkNonzeroSizeMatrix_nan) {
                    std::domain_error,
                    "has size 0");
 
-  std::vector<double> a;
+  std::vector<var> a;
   a.push_back(nan);
   a.push_back(nan);
   a.push_back(nan);
@@ -77,5 +80,5 @@ TEST(MathErrorHandlingMatrix, checkNonzeroSizeMatrix_nan) {
   EXPECT_THROW_MSG(stan::math::check_nonzero_size("checkNonzeroSize(%1%)",a, "a", 
                                                   &result), 
                    std::domain_error,
-                   "has size 0");
+                   "a has size 0");
 }
