@@ -10,9 +10,9 @@ lorenz_ode(const T0& t_in, // initial time
              const std::vector<double>& x, // double data
              const std::vector<int>& x_int) { // integer data
   std::vector<typename stan::return_type<T1,T2>::type> res;
-  res.push_back(theta[0]*(y_in[1] - y_in[0]));
-  res.push_back(theta[1]*y_in[0] - y_in[1] - y_in[0]*y_in[2]);
-  res.push_back(-theta[2]*y_in[2] + y_in[0]*y_in[1]);
+  res.push_back(theta.at(0)*(y_in.at(1) - y_in.at(0)));
+  res.push_back(theta.at(1)*y_in.at(0) - y_in.at(1) - y_in.at(0)*y_in.at(2));
+  res.push_back(-theta.at(2)*y_in.at(2) + y_in.at(0)*y_in.at(1));
   return res;
 }
 

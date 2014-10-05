@@ -69,7 +69,7 @@ namespace stan {
       using boost::numeric::odeint::make_dense_output;  
       using boost::numeric::odeint::runge_kutta_dopri5;
       
-      stan::math::check_nonzero_size("integrate_ode(%1%)", ts, "time", 
+      stan::math::check_nonzero_size("integrate_ode(%1%)", ts, "times", 
                                      static_cast<double*>(0));
       stan::math::check_nonzero_size("integrate_ode(%1%)", y0, "initial state",
                                      static_cast<double*>(0));

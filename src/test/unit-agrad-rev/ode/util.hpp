@@ -6,6 +6,29 @@
 #include <stan/agrad/rev.hpp>
 
 #include <stan/math/ode/integrate_ode.hpp>
+#include <test/unit/util.hpp>
+
+template <typename E, typename F,
+          typename T_y0, typename T_theta>
+void exception_test(F ode,
+                    const std::vector<T_y0>& y0,
+                    double t0,
+                    const std::vector<double>& ts,
+                    const std::vector<T_theta>& theta,
+                    const std::vector<double>& x,
+                    const std::vector<int>& x_int,
+                    const std::string& expected_message) {
+  try {
+    stan::math::integrate_ode(ode, y0, t0,
+                              ts, theta, x, x_int,0);
+  } catch (const E& e) {
+    EXPECT_EQ(1, count_matches(expected_message, e.what()))
+      << "expected message: " << expected_message << std::endl
+      << "found message:    " << e.what();
+    return;
+  }
+  FAIL() << "didn't throw an exception of the correct type";
+}
 
 //calculates finite diffs for integrate_ode with varying parameters
 template <typename F>
@@ -251,67 +274,75 @@ void test_ode_finite_diff_vv(const F& f,
 }
 
 template <typename F, typename T1, typename T2>
-void test_ode_exceptions(const F& f,
-                         const double& t_in,
+void test_ode_exceptions(F& f,
+                         const double& t0,
                          const std::vector<double>& ts,
-                         const std::vector<T1>& y_in,
+                         const std::vector<T1>& y0,
                          const std::vector<T2>& theta,
                          const std::vector<double>& x,
                          const std::vector<int>& x_int) {
+  using stan::math::integrate_ode;
   std::stringstream msgs;
+    
+  ASSERT_NO_THROW(integrate_ode(f, y0, t0, ts, theta, x, x_int, 0));
+  ASSERT_EQ("", msgs.str());
 
-  std::vector<T1> y_ = y_in;
-  std::vector<T2> theta_ = theta;
-  double t_ = t_in;
-  std::vector<double> ts_ = ts;
+  msgs.clear();
+  std::vector<T1> y0_bad;
+  EXPECT_THROW_MSG(integrate_ode(f, y0_bad, t0, ts, theta, x, x_int, &msgs),
+                   std::domain_error,
+                   "initial state has size 0");
+  EXPECT_EQ("", msgs.str());
+  
+  msgs.clear();
+  double t0_bad = ts[0] + 0.1;
+  std::stringstream expected_msg;
+  expected_msg << "initial time is " << t0_bad
+               << ", but must be less than " << ts[0];
+  EXPECT_THROW_MSG(integrate_ode(f, y0, t0_bad, ts, theta, x, x_int, &msgs),
+                   std::domain_error,
+                   expected_msg.str());
+  EXPECT_EQ("", msgs.str());
 
-  // y0.size() == 0 should throw
-  y_.clear();
-  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
-               std::domain_error);
-  y_ = y_in;
+  msgs.clear();
+  std::vector<double> ts_bad;
+  EXPECT_THROW_MSG(integrate_ode(f, y0, t0, ts_bad, theta, x, x_int, &msgs),
+                   std::domain_error,
+                   "times has size 0");
+  EXPECT_EQ("", msgs.str());
 
-  // y0.size() =/= dy_dt.size() should throw
-  y_.clear();
-  for (int i = 0; i < y_in.size() - 1; i++)
-    y_.push_back(y_in[i]);
-  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
-               std::domain_error);
-  y_.clear();
-  y_ = y_in;
+  msgs.clear();
+  ts_bad.push_back(3);
+  ts_bad.push_back(1);
+  EXPECT_THROW_MSG(integrate_ode(f, y0, t0, ts_bad, theta, x, x_int, &msgs),
+                   std::domain_error,
+                   "times is not a valid ordered vector");
+  EXPECT_EQ("", msgs.str());
 
-  // ts.size() == 0 should throw  
-  ts_.clear();
-  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
-               std::domain_error);
+  msgs.clear();
+  std::vector<T2> theta_bad;
+  EXPECT_THROW_MSG(integrate_ode(f, y0, t0, ts, theta_bad, x, x_int, &msgs),
+                   std::out_of_range,
+                   "vector");
+  EXPECT_EQ("", msgs.str());
 
-  // repeated values should throw
-  ts_.clear();
-  for (int i = 0; i < ts.size(); i++)
-    ts_.push_back(t_in+1.0);
-  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
-               std::domain_error);
+  if (x.size() > 0) {
+    msgs.clear();
+    std::vector<double> x_bad;
+    EXPECT_THROW_MSG(integrate_ode(f, y0, t0, ts, theta, x_bad, x_int, &msgs),
+                     std::out_of_range,
+                     "vector");
+    EXPECT_EQ("", msgs.str());
+  }
 
-  // elements in ts need to be ordered
-  ts_.clear();
-  for (int i = 0; i < ts.size(); i++)
-    ts_.push_back(ts[ts.size()-i]);
-  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
-               std::domain_error);
-
-  // test t_in > ts (should throw)
-  ts_.clear();
-  ts_ = ts;
-  t_ = ts[0] + 1.0;
-  EXPECT_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs),
-               std::domain_error);
-
-  // test negative time values
-  ts_.clear();
-  for (int i = 1; i < 4; i++)
-    ts_.push_back(-0.1*(6-i));
-  t_ = ts_[0] - 1.0;
-  EXPECT_NO_THROW(stan::math::integrate_ode(f, y_, t_, ts_, theta_, x, x_int, &msgs));
+  if (x_int.size() > 0) {
+    msgs.clear();
+    std::vector<int> x_int_bad;
+    EXPECT_THROW_MSG(integrate_ode(f, y0, t0, ts, theta, x, x_int_bad, &msgs),
+                     std::out_of_range,
+                     "vector");
+    EXPECT_EQ("", msgs.str());
+  }
 }
 
 template <typename F>
