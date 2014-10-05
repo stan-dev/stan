@@ -135,13 +135,3 @@ TEST(StanAgradRevOde_integrate_ode, lorenz_finite_diff) {
 
   test_ode(lorenz, t0, ts, y0, theta, x, x_int, 1e-8, 1e-1);
 }
-
-
-
-
-
-
-
-
-
-

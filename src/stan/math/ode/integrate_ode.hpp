@@ -6,8 +6,9 @@
 #include <boost/numeric/odeint.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/value_of.hpp>
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/error_handling/check_less.hpp>
+#include <stan/math/error_handling/check_finite.hpp>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/error_handling/matrix/check_ordered.hpp>
 
 #include <stan/math/ode/coupled_ode_system.hpp>
@@ -69,6 +70,17 @@ namespace stan {
       using boost::numeric::odeint::make_dense_output;  
       using boost::numeric::odeint::runge_kutta_dopri5;
       
+      stan::math::check_finite("integrate_ode(%1%)", y0, "initial state",
+                                static_cast<double*>(0));
+      stan::math::check_finite("integrate_ode(%1%)", t0, "initial time",
+                                static_cast<double*>(0));
+      stan::math::check_finite("integrate_ode(%1%)", ts, "times",
+                                static_cast<double*>(0));
+      stan::math::check_finite("integrate_ode(%1%)", theta, "parameter vector",
+                                static_cast<double*>(0));
+      stan::math::check_finite("integrate_ode(%1%)", x, "continuous data",
+                               static_cast<double*>(0));
+
       stan::math::check_nonzero_size("integrate_ode(%1%)", ts, "times", 
                                      static_cast<double*>(0));
       stan::math::check_nonzero_size("integrate_ode(%1%)", y0, "initial state",
