@@ -19,7 +19,7 @@ TEST(AgradRevErrorHandlingMatrix, checkNonzeroSizeMatrix) {
   y.resize(0,0);
   EXPECT_THROW_MSG(check_nonzero_size("checkNonzeroSize(%1%)",
                                       y, "y", &result),
-                   std::domain_error, "has size 0");
+                   std::domain_error, "y has size 0");
 
   std::vector<var> a;
   a.push_back(3.0);
@@ -39,7 +39,7 @@ TEST(AgradRevErrorHandlingMatrix, checkNonzeroSizeMatrix) {
   EXPECT_THROW_MSG(stan::math::check_nonzero_size("checkNonzeroSize(%1%)", a, "a", 
                                                   &result), 
                    std::domain_error,
-                   "has size 0");
+                   "a has size 0");
 }
 
 TEST(AgradRevErrorHandlingMatrix, checkNonzeroSizeMatrix_nan) {
@@ -80,5 +80,5 @@ TEST(AgradRevErrorHandlingMatrix, checkNonzeroSizeMatrix_nan) {
   EXPECT_THROW_MSG(stan::math::check_nonzero_size("checkNonzeroSize(%1%)",a, "a", 
                                                   &result), 
                    std::domain_error,
-                   "has size 0");
+                   "a has size 0");
 }
