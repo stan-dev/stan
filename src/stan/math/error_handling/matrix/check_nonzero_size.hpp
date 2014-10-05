@@ -33,7 +33,7 @@ namespace stan {
       msg += "(";
       msg += typeid(T_y).name();
       msg += ") has size %1%, but must have a non-zero size";
-      return dom_err(function,typename T_y::value_type(),
+      return dom_err(function,typename T_y::size_type(),
                      name,msg.c_str(),"",
                      result);
     }
