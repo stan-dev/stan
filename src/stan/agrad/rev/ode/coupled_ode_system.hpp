@@ -341,7 +341,7 @@ namespace stan {
       void operator()(const std::vector<double>& y,
                       std::vector<double>& dy_dt,
                       double t) {
-        std::vector<double> y_base(y.begin(), y.begin()+N_);
+        std::vector<double> y_base(y.begin(), y.begin() + N_);
         for (int n = 0; n < N_; n++)
           y_base[n] += y0_dbl_[n];
 

@@ -35,7 +35,7 @@ TEST_F(StanAgradRevOde, coupled_ode_system_dv) {
   theta.push_back(gamma);
   y0.push_back(1.0);
   y0.push_back(0.5);
-  
+
   coupled_y0.push_back(1.0);
   coupled_y0.push_back(0.5);
   coupled_y0.push_back(1.0);
@@ -223,11 +223,11 @@ TEST_F(StanAgradRevOde, coupled_ode_system_vd) {
   system(coupled_y0, dy_dt, t0);
 
   EXPECT_FLOAT_EQ(1.0, dy_dt[0]);
-  EXPECT_FLOAT_EQ(-2.0 - 0.15*1.0, dy_dt[1]);
-  EXPECT_FLOAT_EQ(0+1.0*0+3.0*1+0, dy_dt[2]);
-  EXPECT_FLOAT_EQ(-1.0-1.0*1.0-0.15*3.0, dy_dt[3]);
-  EXPECT_FLOAT_EQ(1.0+2.0*0+5.0*1.0, dy_dt[4]);
-  EXPECT_FLOAT_EQ(-0.15-1.0*2.0-0.15*5.0, dy_dt[5]);
+  EXPECT_FLOAT_EQ(-2.0 - 0.15 * 1.0, dy_dt[1]);
+  EXPECT_FLOAT_EQ(0 + 1.0 * 0 + 3.0 * 1 + 0, dy_dt[2]);
+  EXPECT_FLOAT_EQ(-1.0 - 1.0 * 1.0 - 0.15 * 3.0, dy_dt[3]);
+  EXPECT_FLOAT_EQ(1.0 + 2.0 * 0 + 5.0 * 1.0, dy_dt[4]);
+  EXPECT_FLOAT_EQ(-0.15 - 1.0 * 2.0 - 0.15 * 5.0, dy_dt[5]);
 }
 TEST_F(StanAgradRevOde, decouple_states_vd) {
   using stan::math::coupled_ode_system;
@@ -373,7 +373,45 @@ TEST_F(StanAgradRevOde, memory_recovery_exception_vd) {
 // ******************** VV ****************************
 
 TEST_F(StanAgradRevOde, coupled_ode_system_vv) {
-  // FIXME: no tests in here at all?
+  using stan::math::coupled_ode_system;
+
+  std::vector<stan::agrad::var> y0_var;
+  y0_var.push_back(1.0);
+  y0_var.push_back(0.5);
+
+  std::vector<stan::agrad::var> theta_var;
+  theta_var.push_back(0.15);
+
+  harm_osc_ode_fun harm_osc;
+  coupled_ode_system<harm_osc_ode_fun, stan::agrad::var, stan::agrad::var> 
+    system(harm_osc, y0_var, theta_var, x, x_int, &msgs);
+  
+  std::vector<double> coupled_y0(8, 0);
+  
+  double t0; 
+  t0 = 0;
+
+  std::vector<double> dy_dt;
+  system(coupled_y0, dy_dt, t0);
+
+  std::vector<double> y0_double(2);
+  y0_double[0] = 1.0;
+  y0_double[1] = 0.5;
+
+  std::vector<double> theta_double(1);
+  theta_double[0] = 0.15;
+
+  std::vector<double>
+    dy_dt_base = harm_osc(0.0, y0_double, theta_double, x, x_int, &msgs);
+  
+  EXPECT_FLOAT_EQ(dy_dt_base[0], dy_dt[0]);
+  EXPECT_FLOAT_EQ(dy_dt_base[1], dy_dt[1]);
+  EXPECT_FLOAT_EQ(0, dy_dt[2]);
+  EXPECT_FLOAT_EQ(-1, dy_dt[3]);
+  EXPECT_FLOAT_EQ(1, dy_dt[4]);
+  EXPECT_FLOAT_EQ(-0.15, dy_dt[5]);
+  EXPECT_FLOAT_EQ(0, dy_dt[6]);
+  EXPECT_FLOAT_EQ(-0.5, dy_dt[7]);
 }
 TEST_F(StanAgradRevOde, decouple_states_vv) {
   using stan::math::coupled_ode_system;
