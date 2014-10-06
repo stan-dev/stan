@@ -387,7 +387,6 @@ namespace stan {
       using boost::random::poisson_distribution;
 
       static const char* function = "stan::prob::poisson_rng(%1%)";
-      double lambda_high = pow(2.0, 30.0); 
       
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
@@ -397,8 +396,10 @@ namespace stan {
                     "Rate parameter", (double*)0);
       check_nonnegative(function, lambda,
                         "Rate parameter", (double*)0);
+
+      double upper_bound = pow(2.0, 31.0) - 1.0 - 10.0 * sqrt(lambda); 
       check_less(function, lambda,
-                  lambda_high, "Rate parameter", (double*)0);
+                  upper_bound, "Rate parameter", (double*)0);
 
       variate_generator<RNG&, poisson_distribution<> >
         poisson_rng(rng, poisson_distribution<>(lambda));
