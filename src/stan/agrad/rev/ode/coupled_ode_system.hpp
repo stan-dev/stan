@@ -147,7 +147,6 @@ namespace stan {
           vars.clear();
           try {
             stan::agrad::start_nested();
-
             for (int j = 0; j < N_; j++) {
               y_temp.push_back(y[j]);
               vars.push_back(y_temp[j]);
@@ -157,7 +156,6 @@ namespace stan {
               theta_temp.push_back(theta_dbl_[j]);
               vars.push_back(theta_temp[j]);
             }
-
             dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_,msgs_);
             dy_dt_temp[i].grad(vars, grad);
           

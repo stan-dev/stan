@@ -67,7 +67,6 @@ void sho_finite_diff_test(double t0) {
   sho_value_test<harm_osc_ode_fun,double,var>(harm_osc, y0, t0, ts, theta, x, x_int);
   sho_value_test<harm_osc_ode_fun,var,double>(harm_osc, y0, t0, ts, theta, x, x_int);
   sho_value_test<harm_osc_ode_fun,var,var>(harm_osc, y0, t0, ts, theta, x, x_int);
-  
 }
 
 void sho_data_finite_diff_test(double t0) {

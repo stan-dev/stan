@@ -8,28 +8,6 @@
 #include <stan/math/ode/integrate_ode.hpp>
 #include <test/unit/util.hpp>
 
-template <typename E, typename F,
-          typename T_y0, typename T_theta>
-void exception_test(F ode,
-                    const std::vector<T_y0>& y0,
-                    double t0,
-                    const std::vector<double>& ts,
-                    const std::vector<T_theta>& theta,
-                    const std::vector<double>& x,
-                    const std::vector<int>& x_int,
-                    const std::string& expected_message) {
-  try {
-    stan::math::integrate_ode(ode, y0, t0,
-                              ts, theta, x, x_int,0);
-  } catch (const E& e) {
-    EXPECT_EQ(1, count_matches(expected_message, e.what()))
-      << "expected message: " << expected_message << std::endl
-      << "found message:    " << e.what();
-    return;
-  }
-  FAIL() << "didn't throw an exception of the correct type";
-}
-
 //calculates finite diffs for integrate_ode with varying parameters
 template <typename F>
 std::vector<std::vector<double> > 

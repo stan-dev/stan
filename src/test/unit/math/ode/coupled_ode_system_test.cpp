@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 #include <stan/math/ode/coupled_ode_system.hpp>
+#include <test/unit/util.hpp>
 #include <test/unit/math/ode/harmonic_oscillator.hpp>
 #include <test/unit/math/ode/mock_ode_functor.hpp>
+#include <test/unit/math/ode/mock_throwing_ode_functor.hpp>
 
 struct StanMathOde : public ::testing::Test {
   std::stringstream msgs;
@@ -92,6 +94,27 @@ TEST_F(StanMathOde, size) {
 }
 
 
+TEST_F(StanMathOde, recover_exception) {
+  using stan::math::coupled_ode_system;
+  std::string message = "ode throws";
 
-
-
+  const int N = 3;
+  const int M = 4;
+  
+  mock_throwing_ode_functor<std::logic_error> throwing_ode(message);
+  
+  std::vector<double> y0_d(N, 0.0);
+  std::vector<double> theta_v(M, 0.0);
+  
+  coupled_ode_system<mock_throwing_ode_functor<std::logic_error>, double, double>
+    coupled_system_dv(throwing_ode, y0_d, theta_v, x, x_int, &msgs);
+    
+  std::vector<double> y(3,0);
+  std::vector<double> dy_dt(3,0);
+  
+  double t = 10;
+  
+  EXPECT_THROW_MSG(coupled_system_dv(y, dy_dt, t),
+                   std::logic_error,
+                   message);
+}

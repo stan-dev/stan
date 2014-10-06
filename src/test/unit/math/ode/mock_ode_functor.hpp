@@ -9,6 +9,7 @@ struct mock_ode_functor {
              const std::vector<int>& x_int,
              std::ostream* msgs) const { 
     std::vector<typename stan::return_type<T1,T2>::type> states;
+    states = y_in;
     return states;
   }
 };

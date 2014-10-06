@@ -2,10 +2,15 @@
 #include <stan/agrad/rev.hpp>
 //#include <stan/math/ode/coupled_ode_system.hpp>
 #include <stan/agrad/rev/ode/coupled_ode_system.hpp>
+#include <test/unit/util.hpp>
 #include <test/unit/math/ode/harmonic_oscillator.hpp>
 #include <test/unit/math/ode/mock_ode_functor.hpp>
+#include <test/unit/math/ode/mock_throwing_ode_functor.hpp>
 
 struct StanAgradRevOde : public ::testing::Test {
+  void SetUp() {
+    stan::agrad::recover_memory();
+  }
   std::stringstream msgs;
   std::vector<double> x;
   std::vector<int> x_int;
@@ -129,14 +134,59 @@ TEST_F(StanAgradRevOde, size_dv) {
   EXPECT_EQ(N + N*M, coupled_system_dv.size());
 }
 
+TEST_F(StanAgradRevOde, memory_recovery_dv) {
+  using stan::math::coupled_ode_system;
+  using stan::agrad::var;
+  mock_ode_functor base_ode;
 
+  const int N = 3;
+  const int M = 4;
 
+  std::vector<double> y0_d(N, 0.0);
+  std::vector<var> theta_v(M, 0.0);
 
+  coupled_ode_system<mock_ode_functor, double, var>
+    coupled_system_dv(base_ode, y0_d, theta_v, x, x_int, &msgs);
 
+  std::vector<double> y(3,0);
+  std::vector<double> dy_dt(3,0);
+  double t = 10;
+  
+  EXPECT_TRUE(stan::agrad::empty_nested());
+  EXPECT_NO_THROW(coupled_system_dv(y, dy_dt, t));
+  EXPECT_TRUE(stan::agrad::empty_nested());
+}
 
+TEST_F(StanAgradRevOde, memory_recovery_exception_dv) {
+  using stan::math::coupled_ode_system;
+  using stan::agrad::var;
+  std::string message = "ode throws";
 
-
-
+  const int N = 3;
+  const int M = 4;
+  for (int n = 0; n < N+1; n++) {
+    std::stringstream scoped_message;
+    scoped_message << "iteration " << n;
+    SCOPED_TRACE(scoped_message.str());
+    mock_throwing_ode_functor<std::logic_error> throwing_ode(message, n+1);
+    
+    std::vector<double> y0_d(N, 0.0);
+    std::vector<var> theta_v(M, 0.0);
+    
+    coupled_ode_system<mock_throwing_ode_functor<std::logic_error>, double, var>
+      coupled_system_dv(throwing_ode, y0_d, theta_v, x, x_int, &msgs);
+    
+    std::vector<double> y(3,0);
+    std::vector<double> dy_dt(3,0);
+    double t = 10;
+    
+    EXPECT_TRUE(stan::agrad::empty_nested());
+    EXPECT_THROW_MSG(coupled_system_dv(y, dy_dt, t),
+                     std::logic_error,
+                     message);
+    EXPECT_TRUE(stan::agrad::empty_nested());
+  }
+}
 
 // ******************** VD ****************************
 
@@ -265,10 +315,59 @@ TEST_F(StanAgradRevOde, size_vd) {
   EXPECT_EQ(N + N*N, coupled_system_vd.size());
 }
 
+TEST_F(StanAgradRevOde, memory_recovery_vd) {
+  using stan::math::coupled_ode_system;
+  using stan::agrad::var;
+  mock_ode_functor base_ode;
 
+  const int N = 3;
+  const int M = 4;
 
+  std::vector<var> y0_v(N, 0.0);
+  std::vector<double> theta_d(M, 0.0);
 
+  coupled_ode_system<mock_ode_functor, var, double>
+    coupled_system_vd(base_ode, y0_v, theta_d, x, x_int, &msgs);
 
+  std::vector<double> y(3,0);
+  std::vector<double> dy_dt(3,0);
+  double t = 10;
+  
+  EXPECT_TRUE(stan::agrad::empty_nested());
+  EXPECT_NO_THROW(coupled_system_vd(y, dy_dt, t));
+  EXPECT_TRUE(stan::agrad::empty_nested());
+}
+
+TEST_F(StanAgradRevOde, memory_recovery_exception_vd) {
+  using stan::math::coupled_ode_system;
+  using stan::agrad::var;
+  std::string message = "ode throws";
+
+  const int N = 3;
+  const int M = 4;
+  for (int n = 0; n < N+1; n++) {
+    std::stringstream scoped_message;
+    scoped_message << "iteration " << n;
+    SCOPED_TRACE(scoped_message.str());
+    mock_throwing_ode_functor<std::logic_error> throwing_ode(message, n+1);
+    
+    std::vector<var> y0_v(N, 0.0);
+    std::vector<double> theta_d(M, 0.0);
+    
+    coupled_ode_system<mock_throwing_ode_functor<std::logic_error>, var, double>
+      coupled_system_vd(throwing_ode, y0_v, theta_d, x, x_int, &msgs);
+    
+    std::vector<double> y(3,0);
+    std::vector<double> dy_dt(3,0);
+    double t = 10;
+    
+    EXPECT_TRUE(stan::agrad::empty_nested());
+    EXPECT_THROW_MSG(coupled_system_vd(y, dy_dt, t),
+                     std::logic_error,
+                     message);
+    EXPECT_TRUE(stan::agrad::empty_nested());
+  }
+}
 
 
 // ******************** VV ****************************
@@ -359,20 +458,57 @@ TEST_F(StanAgradRevOde, size_vv) {
   EXPECT_EQ(N + N*N + N*M, coupled_system_vv.size());
 }
 
+TEST_F(StanAgradRevOde, memory_recovery_vv) {
+  using stan::math::coupled_ode_system;
+  using stan::agrad::var;
+  mock_ode_functor base_ode;
 
+  const int N = 3;
+  const int M = 4;
 
+  std::vector<var> y0_v(N, 0.0);
+  std::vector<var> theta_v(M, 0.0);
 
+  coupled_ode_system<mock_ode_functor, var, var>
+    coupled_system_vv(base_ode, y0_v, theta_v, x, x_int, &msgs);
 
+  std::vector<double> y(3,0);
+  std::vector<double> dy_dt(3,0);
+  double t = 10;
+  
+  EXPECT_TRUE(stan::agrad::empty_nested());
+  EXPECT_NO_THROW(coupled_system_vv(y, dy_dt, t));
+  EXPECT_TRUE(stan::agrad::empty_nested());
+}
 
+TEST_F(StanAgradRevOde, memory_recovery_exception_vv) {
+  using stan::math::coupled_ode_system;
+  using stan::agrad::var;
+  std::string message = "ode throws";
 
-
-
-
-
-
-
-
-
-
-
+  const int N = 3;
+  const int M = 4;
+  for (int n = 0; n < N+1; n++) {
+    std::stringstream scoped_message;
+    scoped_message << "iteration " << n;
+    SCOPED_TRACE(scoped_message.str());
+    mock_throwing_ode_functor<std::logic_error> throwing_ode(message, n+1);
+    
+    std::vector<var> y0_v(N, 0.0);
+    std::vector<var> theta_v(M, 0.0);
+    
+    coupled_ode_system<mock_throwing_ode_functor<std::logic_error>, var, var>
+      coupled_system_vv(throwing_ode, y0_v, theta_v, x, x_int, &msgs);
+    
+    std::vector<double> y(3,0);
+    std::vector<double> dy_dt(3,0);
+    double t = 10;
+    
+    EXPECT_TRUE(stan::agrad::empty_nested());
+    EXPECT_THROW_MSG(coupled_system_vv(y, dy_dt, t),
+                     std::logic_error,
+                     message);
+    EXPECT_TRUE(stan::agrad::empty_nested());
+  }
+}
 
