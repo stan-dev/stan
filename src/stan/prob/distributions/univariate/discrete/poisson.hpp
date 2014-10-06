@@ -397,7 +397,7 @@ namespace stan {
       check_nonnegative(function, lambda,
                         "Rate parameter", (double*)0);
 
-      double upper_bound = pow(2.0, 31.0) - 1.0 - 10.0 * sqrt(lambda); 
+      double upper_bound = pow(2.0, 30.0); 
       check_less(function, lambda,
                   upper_bound, "Rate parameter", (double*)0);
 
