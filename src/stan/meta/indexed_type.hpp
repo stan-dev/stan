@@ -1,8 +1,6 @@
 #ifndef STAN__META__INDEXED_TYPE_HPP
 #define STAN__META__INDEXED_TYPE_HPP
 
-// #include <stan/math/matrix/Eigen.hpp>
-
 #include <vector>
 
 #include <stan/meta/typelist.hpp>

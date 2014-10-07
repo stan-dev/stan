@@ -7,5 +7,6 @@
 #include <stan/math/rep_matrix.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions.hpp>
+#include <stan/math/indexing.hpp>
 
 #endif
