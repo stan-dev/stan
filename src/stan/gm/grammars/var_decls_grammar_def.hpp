@@ -207,6 +207,10 @@ namespace stan {
         }
         return is_data;
       }
+      bool operator()(const integrate_ode& x) const {
+        return boost::apply_visitor(*this, x.y0_.expr_)
+          && boost::apply_visitor(*this, x.theta_.expr_);
+      }
       bool operator()(const fun& x) const {
         for (size_t i = 0; i < x.args_.size(); ++i)
           if (!boost::apply_visitor(*this,x.args_[i].expr_))
@@ -571,10 +575,12 @@ namespace stan {
 
 
     struct validate_int_data_expr {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef bool type; };
+      template <typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result { typedef void type; };
 
-      bool operator()(const expression& expr,
+      void operator()(const expression& expr,
+                      int var_origin,
+                      bool& pass,
                       variable_map& var_map,
                       std::stringstream& error_msgs) const {
         if (!expr.expression_type().is_primitive_int()) {
@@ -582,11 +588,16 @@ namespace stan {
                      << " found type=" 
                      << expr.expression_type() 
                      << std::endl;
-          return false;
+          pass = false;
+        } else if (var_origin != local_origin) {
+          data_only_expression vis(error_msgs,var_map);
+          bool only_data_dimensions = boost::apply_visitor(vis,expr.expr_);
+          pass = only_data_dimensions;
+        } else {
+          // don't need to check data vs. parameter in dimensions for
+          // local variable declarations
+          pass = true;
         }
-        data_only_expression vis(error_msgs,var_map);
-        bool only_data_dimensions = boost::apply_visitor(vis,expr.expr_);
-        return only_data_dimensions;
       }
     };
     boost::phoenix::function<validate_int_data_expr> validate_int_data_expr_f;
@@ -889,9 +900,9 @@ namespace stan {
       dims_r 
         %= lit('[') 
         > (expression_g(_r1)
-           [_pass = validate_int_data_expr_f(_1,
-                                             boost::phoenix::ref(var_map_),
-                                             boost::phoenix::ref(error_msgs_))]
+           [validate_int_data_expr_f(_1,_r1,_pass,
+                                     boost::phoenix::ref(var_map_),
+                                     boost::phoenix::ref(error_msgs_))]
            % ',')
         > lit(']')
         ;
