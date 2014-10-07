@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/rev.hpp>
-//#include <stan/math/ode/coupled_ode_system.hpp>
 #include <stan/agrad/rev/ode/coupled_ode_system.hpp>
 #include <test/unit/util.hpp>
 #include <test/unit/math/ode/harmonic_oscillator.hpp>
@@ -55,20 +54,21 @@ TEST_F(StanAgradRevOde, decouple_states_dv) {
   using stan::math::coupled_ode_system;
   using stan::agrad::var;
 
-  harm_osc_ode_fun harm_osc;
-
-
-  std::vector<double> y0(2);
-  std::vector<var> theta(1);
+  mock_ode_functor mock_ode;
   
+  int T = 10;
+
+      
+  std::vector<double> y0(2);
   y0[0] = 1.0;
   y0[1] = 0.5;
+
+  std::vector<var> theta(1);
   theta[0] = 0.15;
   
-  coupled_ode_system<harm_osc_ode_fun, double, var> 
-    coupled_system(harm_osc, y0, theta, x, x_int, &msgs);
+  coupled_ode_system<mock_ode_functor, double, var> 
+    coupled_system(mock_ode, y0, theta, x, x_int, &msgs);
 
-  int T = 10;
   int k = 0;
   std::vector<std::vector<double> > ys_coupled(T);
   for (int t = 0; t < T; t++) {
@@ -89,7 +89,10 @@ TEST_F(StanAgradRevOde, decouple_states_dv) {
     for (int n = 0; n < 2; n++)
       EXPECT_FLOAT_EQ(ys_coupled[t][n], ys[t][n].val());
 
-  // FIXME: add tests for derivatives
+  std::vector<double> dy_dt;
+  ys[i][j].grad(theta, dy_dt);
+
+  EXPECT_FLOAT_EQ(ys_coupled[i][2+j], dy_dt[0]);
 }
 TEST_F(StanAgradRevOde, initial_state_dv) {
   using stan::math::coupled_ode_system;
@@ -233,20 +236,19 @@ TEST_F(StanAgradRevOde, decouple_states_vd) {
   using stan::math::coupled_ode_system;
   using stan::agrad::var;
 
-  harm_osc_ode_fun harm_osc;
-
+  mock_ode_functor mock_ode;
+  int T = 10;
 
   std::vector<var> y0(2);
   std::vector<double> theta(1);
-  
+      
   y0[0] = 1.0;
   y0[1] = 0.5;
   theta[0] = 0.15;
-  
-  coupled_ode_system<harm_osc_ode_fun, var, double>
-    coupled_system(harm_osc, y0, theta, x, x_int, &msgs);
-
-  int T = 10;
+      
+  coupled_ode_system<mock_ode_functor, var, double>
+    coupled_system(mock_ode, y0, theta, x, x_int, &msgs);
+      
   int k = 0;
   std::vector<std::vector<double> > ys_coupled(T);
   for (int t = 0; t < T; t++) {
@@ -255,10 +257,10 @@ TEST_F(StanAgradRevOde, decouple_states_vd) {
       coupled_state[n] = ++k;
     ys_coupled[t] = coupled_state;
   }
-
+      
   std::vector<std::vector<var> > ys;
   ys = coupled_system.decouple_states(ys_coupled);
-
+      
   ASSERT_EQ(T, ys.size());
   for (int t = 0; t < T; t++)
     ASSERT_EQ(2, ys[t].size());
@@ -268,7 +270,10 @@ TEST_F(StanAgradRevOde, decouple_states_vd) {
       EXPECT_FLOAT_EQ(ys_coupled[t][n] + y0[n].val(), 
                       ys[t][n].val());
 
-  // FIXME: add tests for derivatives
+  std::vector<double> dy_dy0;
+  ys[i][j].grad(y0, dy_dy0);
+  EXPECT_FLOAT_EQ(ys_coupled[i][2 + 0], dy_dy0[0]);
+  EXPECT_FLOAT_EQ(ys_coupled[i][3 + 1], dy_dy0[1]);
 }
 TEST_F(StanAgradRevOde, initial_state_vd) {
   using stan::math::coupled_ode_system;
@@ -450,8 +455,6 @@ TEST_F(StanAgradRevOde, decouple_states_vv) {
     for (int n = 0; n < 2; n++)
       EXPECT_FLOAT_EQ(ys_coupled[t][n] + y0[n].val(), 
                       ys[t][n].val());
-
-  // FIXME: add tests for derivatives
 }
 TEST_F(StanAgradRevOde, initial_state_vv) {
   using stan::math::coupled_ode_system;
