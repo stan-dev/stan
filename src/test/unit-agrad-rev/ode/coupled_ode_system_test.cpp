@@ -88,11 +88,6 @@ TEST_F(StanAgradRevOde, decouple_states_dv) {
   for (int t = 0; t < T; t++)
     for (int n = 0; n < 2; n++)
       EXPECT_FLOAT_EQ(ys_coupled[t][n], ys[t][n].val());
-
-  std::vector<double> dy_dt;
-  ys[i][j].grad(theta, dy_dt);
-
-  EXPECT_FLOAT_EQ(ys_coupled[i][2+j], dy_dt[0]);
 }
 TEST_F(StanAgradRevOde, initial_state_dv) {
   using stan::math::coupled_ode_system;
@@ -269,11 +264,6 @@ TEST_F(StanAgradRevOde, decouple_states_vd) {
     for (int n = 0; n < 2; n++)
       EXPECT_FLOAT_EQ(ys_coupled[t][n] + y0[n].val(), 
                       ys[t][n].val());
-
-  std::vector<double> dy_dy0;
-  ys[i][j].grad(y0, dy_dy0);
-  EXPECT_FLOAT_EQ(ys_coupled[i][2 + 0], dy_dy0[0]);
-  EXPECT_FLOAT_EQ(ys_coupled[i][3 + 1], dy_dy0[1]);
 }
 TEST_F(StanAgradRevOde, initial_state_vd) {
   using stan::math::coupled_ode_system;
