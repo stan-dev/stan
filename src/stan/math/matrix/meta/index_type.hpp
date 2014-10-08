@@ -2,7 +2,7 @@
 #define STAN__MATH__MATRIX__META__INDEX_TYPE_HPP
 
 #include <stan/math/meta/index_type.hpp>
-#include <stan/math/matrix/Eigen.hpp>
+#include <Eigen/Core>
 
 namespace stan {
 
