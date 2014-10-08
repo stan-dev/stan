@@ -425,10 +425,16 @@ Symmetric, positive-definite matrices have the type
 positive-definite matrices with unit diagonals, have the type
 \code{corr\_matrix}.
 
-There is also a Cholesky factor type, \code{cholesky\_factor\_cov}.
-Using this type can be much more efficient than the full covariance
-matrices because it is easier to factor and scale.
-
+There is also a pair of Cholesky factor types.  The first,
+\code{cholesky\_factor\_cov}, is for Cholesky factors of symmetric,
+positive definite matrices, which amounts to being a lower-triangular
+matrix with positive diagonal elements.  The second, and
+\code{cholesky\_factor\_corr}, is for Cholesky factors of correlation
+matrices, which amounts to being a lower-triangular matrix with
+positive diagonal elements, where additionally the length of each row
+is 1.  Using Cholesky factor types can be much more efficient than the
+full correlation or covariance matrices because they are easier to
+factor and scale.
 
 
 
@@ -4935,7 +4941,7 @@ transformed data {
         K[i,j] <- exp(-pow(x1[i] - x2[j],2));
     
     K_transpose_div_Sigma <- K' / Sigma;
-    mu <- K_transpose_div_Sigma * y1; 
+<    mu <- K_transpose_div_Sigma * y1; 
     Tau <- Omega - K_transpose_div_Sigma * K;
     for (i in 1:(N2-1))
       for (j in (i+1):N2)
@@ -5095,6 +5101,8 @@ subsituting the probit link for the logit.%
 This simple prediction model could be extended in the same way as
 previous models by declaring the hyperparameters as parameters and
 defining the covariance matrix in the model block as a local variable.
+
+
 
 
 
@@ -6151,6 +6159,300 @@ pseudo-random number generators.  Such functions may only be used in
 the generated quantities block.
 
 
+\chapter{Solving Differential Equations}\label{ode-solver.chapter}
+
+\noindent
+Stan provides a built-in mechanism for solving systems of ordinary
+different equations (ODEs).  The full specification can be found in
+\refsection{language-ode-solver}.  
+
+
+\section{Simple Harmonic Oscillator Example}
+
+This section details the simple harmonic oscillator, which is
+characterized by the following pair of 
+differential equations.
+%
+\begin{equation}\label{ode-sho.equation}
+\frac{d}{dt} y_1 = -y_2 
+\hspace*{0.5in}
+\frac{d}{dt} y_2 = -y_1 - \theta y_2
+\end{equation}
+%
+The values of $y = (y_1,y_2)$ are a function of both time ($t$) and the
+value of the system parameter ($\theta$.
+
+\subsection{Solutions Given Initial Conditions}
+
+Given a value of the parameter $\theta$ and an initial state $y(t_0)$
+at time $t_0$, it is possible to solve the equations numerically to
+calculate $y(t)$ for any given time $t$.  The rest of this chapter
+shows how Stan is able to provide the functionalty to specify and
+solve a system of ODEs.
+
+
+
+\section{Coding an ODE System}
+
+A system of ODEs is coded directly in Stan as a function.  For
+example, the simple harmonic oscillator given in
+\refequation{ode-sho}, can be coded using the following function in
+Stan (see \refchapter{functions-programming} for more information on
+coding user-defined functions).
+%
+\begin{quote}
+\begin{Verbatim}
+real[] sho(real t,
+           real[] y, 
+           real[] theta,
+           real[] x_r,
+           int[] x_i) {
+  real dydt[2];
+  dydt[1] <- y[2];
+  dydt[2] <- -y[1] - theta[1] * y[2];
+  return dydt;
+}
+\end{Verbatim}
+\end{quote}
+%
+The function takes in a time \code{t}, system state \code{y}, system
+parameters \code{theta}, along with real data in variable
+\code{x\_r} and integer data in variable \code{x\_i}.  It
+returns an array of derivatives of the system state with respect to
+time, evaluated at time \code{t} and state \code{y}.
+
+\subsection{Strict Signature}
+
+All of the arguments to such a function must be provided in exactly
+the order shown above.  This may require passing in zero-length
+arrays for data or parameters if the system does not involve data or
+parameters.  A full example for the simple harmonic oscillator, which
+does not depend on any constant data variables, is provided in
+in \reffigure{sho-trajectory}.
+
+\subsection{Data versus Parameters}
+
+Unlike other functions, a function describing a system of ODEs is
+limited as to the origins of variables its arguments.  In particular,
+the time \code{t}, real data \code{x}, and integer data \code{x\_int}
+must be expressions that only involve data or transformed data
+variables.  The initial state \code{y} or the parameters \code{theta}
+are the only arguments which may involve parameters.
+
+
+\section{Measurement Error Models}
+
+The point of doing statistical estimation for differential equations
+is to estimate the parameters and/or initial state given noisy
+measurements of the system variables at a finite number of time
+points.
+
+For instance, suppose the simple harmonic oscillator has a parameter
+value of $\theta = 0.15$ and initial state $y(t=0) = (1,0)$.  Now
+suppose the system is observed at 10 time points, say $t=1, 2, ...,
+10$, where each measurement of $y(t)$ has independent
+$\distro{Normal}(0, 0.1)$ error in both dimensions ($y_1(t)$ and
+$y_2(t)$).  A plot of such measurements is shown in
+\reffigure{sho-trajectory}.
+%
+\begin{figure}
+\begin{center}
+\includegraphics[height=2in]{img/sho-ode-trajectory.pdf}%
+\end{center}
+\vspace*{-0.25in}
+\caption{\small\it Trajectory of the simple harmonic oscillator given
+  parameter $\theta=0.15$ and initial condition $y(t=0) = (1,0)$ with
+  additional independent\ $\distro{Normal}(0,0.1)$ measurement error
+  in both dimensions.}%
+\label{sho-trajectory.figure}
+\end{figure}
+
+
+
+\subsection{Simulating Noisy Measurements}
+
+The data used to make this plot is derived from the Stan model to
+simulate noisy observations given in \reffigure{sho-sim}.
+%
+\begin{figure}
+\begin{quote}\small
+\begin{Verbatim}
+functions {
+  real[] sho(real t,
+             real[] y, 
+             real[] theta,
+             real[] x_r,
+             int[] x_i) {
+    real dydt[2];
+    dydt[1] <- y[2];
+    dydt[2] <- -y[1] - theta[1] * y[2];
+    return dydt;
+  }
+}
+data {
+  int<lower=1> T;
+  real y0[2];
+  real t0;
+  real ts[T];
+  real theta[1];
+}
+transformed data {
+  real x_r[0];
+  int x_i[0];
+}
+model {
+}
+generated quantities {
+  real y_hat[T,2];
+  y_hat <- integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+
+  // add measurement error
+  for (t in 1:T) {
+    y_hat[t,1] <- y_hat[t,1] + normal_rng(0,0.1);
+    y_hat[t,2] <- y_hat[t,2] + normal_rng(0,0.1);
+  }
+}
+\end{Verbatim}
+\end{quote}
+\vspace*{-0.2in}
+\caption{\small\it Stan program to simulate noisy measurements from a
+  simple harmonic oscillator.  The system of differential equations is
+  coded as a function.  The system parameters \code{theta} and initial
+  state \code{y0} are read in as data along with the initial time
+  \code{t0} and observation times \code{ts}. The generated quantities
+  block is used to solve the ODE for the specified times and then add
+  random measurement error, producing observations \code{y\_hat}.}\label{sho-sim.figure}
+\end{figure}
+
+This program illustrates the way in which the ODE solver is called in
+a Stan program,
+%
+\begin{quote}
+\begin{Verbatim}
+y_hat <- integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+\end{Verbatim}
+\end{quote}
+%
+This assigns the solutions to the system defined by function
+\code{sho}, given initial state \code{y0}, initial time \code{t0},
+requested solution times \code{ts}, parameters \code{theta}, real data
+\code{x}, and integer data \code{x\_int}.
+
+Here, the ODE solver is called in the generated quantities block to
+provide a $10 \times 2$ array of solutions \code{y\_hat} to
+which measurement error is added using the normal pseudo-random number
+generating function \code{normal\_rng}.  The number of rows in the
+solution array is the same as the size of \code{ts}, the requested
+solution times.
+
+\subsection{Estimating System Parameters and Initial State}
+
+Stan provides statistical inference for unknown initial states and/or
+parameters.  The ODE solver will be used deterministically to produce
+predictions, much like the linear predictor does in a generalized
+linear model.  These states will then be observed with measurement error.
+
+%
+\begin{figure}
+\begin{quote}\small
+\begin{Verbatim}
+functions {
+  real[] sho(real t,
+             real[] y, 
+             real[] theta,
+             real[] x_r,
+             int[] x_i) {
+    real dydt[2];
+    dydt[1] <- y[2];
+    dydt[2] <- -y[1] - theta[1] * y[2];
+    return dydt;
+  }
+}
+data {
+  int<lower=1> T;
+  real y[T,2];
+  real t0;
+  real ts[T];
+}
+transformed data {
+  real x_r[0];
+  int x_i[0];
+}
+parameters {
+  real y0[2];
+  vector<lower=0>[2] sigma;
+  real theta[1];
+}
+model {
+  real y_hat[T,2];
+  sigma ~ cauchy(0,2.5);
+  theta ~ normal(0,1);
+  y0 ~ normal(0,1);
+  y_hat <- integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+  for (t in 1:T)
+    y[t] ~ normal(y_hat[t], sigma);
+}
+\end{Verbatim}
+\end{quote}
+\vspace*{-0.2in}
+\caption{\small\it Stan program to estimate unknown initial conditions
+  \code{y0} and system parameter \code{theta} for the simple harmonic
+  oscillator with independent normal measurement
+  error.}\label{sho-both.figure}
+\end{figure}
+%
+A Stan program that can be used to estimate both the initial state and
+parameter value for the simple harmonic oscillator given noisy
+observations is given in \reffigure{sho-both}.  Compared to the
+simulation model in \reffigure{sho-sim}, the model to estimate
+parameters uses the \code{integrate\_ode} function in the model block
+rather than the generated quantities block.  There are Cauchy priors on the
+measurement error scales \code{sigma} and unit normal priors on the
+components of parameter array \code{theta} and initial state parameter
+array \code{y0}.  The solutions to the ODE are then assigned to an
+array \code{y\_hat}, which is then used as the location in the
+observation noise model as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+y_hat <- integrate_ode(sho, y0, t0, ts, theta, x_r, x_i);
+for (t in 1:T)
+  y[t] ~ normal(y_hat[t], sigma);
+\end{Verbatim}
+\end{quote}
+%
+As with other regression-like models, it's easy to change the noise
+model to be robust (e.g., Student-t distributed), to be correlated in
+the state variables (e.g., with a multivariate normal distribution),
+or both (e.g., with a multivariate Student-t distribution).
+
+In this simple model with independent noise scales of 0.10, 10
+observed data points for times $t = 1, ..., 10$ is sufficient to
+reliably estimate the ODE parameter, initial state, and noise scales.
+
+
+
+\section{Stiff ODEs}
+
+Stan's approach will not be efficient for stiff systems of ODEs,
+roughly characterized as systems presenting numerical difficulties for
+gradient-based stepwise solvers.  Stiffness typically arises due to high
+curvature in the solution space.%
+%
+\footnote{Not coincidentally, high curvature in the posterior of a
+  general Stan model poses the same kind of problem for Euclidean
+  Hamiltonian Monte Carlo (HMC) sampling.  The reason is that HMC is
+  based on the leapfrog algorithm, a gradient-based, stepwise
+  numerical differential equation solver specialized for Hamiltonian
+  systems with separable potential and kinetic energy terms.}
+%
+It will work, but can be slow enough to be impractical because the
+stepwise integrator used for the solutions will have to take very
+small steps to ensure adequate solution accuracy.  In the future, we hope to
+roll out a more efficient approach to stiff ODEs in which automatic
+differentiation can be applied to compute the Jacobian of the final
+coupled system of state variables and partials with respect to
+parameters.
 
 
 \chapter{Problematic Posteriors}\label{problematic-posteriors.chapter}%
@@ -6364,9 +6666,9 @@ minimizes $\log \distro{Normal}(\lambda_1|0,\tau) + \log
   prior density.}
 %
 \begin{figure}
-\includegraphics[height=1.45in]{R/non-identified.png}%
-\includegraphics[height=1.45in]{R/non-identified-plus-prior.png}%
-\includegraphics[height=1.45in]{R/one-param-identified.png}
+\includegraphics[height=1.45in]{img/non-identified.png}%
+\includegraphics[height=1.45in]{img/non-identified-plus-prior.png}%
+\includegraphics[height=1.45in]{img/one-param-identified.png}
 \vspace*{-.1in}
 \caption{\small\it Posteriors for two intercept parameterization
   without prior, two intercept parameterization with unit normal
@@ -6918,8 +7220,8 @@ hierarchical parameters and lower-level parameters in the prior.
 \begin{figure}
 \vspace*{-6pt}
 \begin{center}
-\includegraphics[height=2in]{R/funnel.png}
-\includegraphics[height=2in]{R/funnel-fit.png}
+\includegraphics[height=2in]{img/funnel.png}
+\includegraphics[height=2in]{img/funnel-fit.png}
 \end{center}
 \vspace*{-18pt}
 \caption{\small\it Neal's Funnel.  (Left) The marginal density of

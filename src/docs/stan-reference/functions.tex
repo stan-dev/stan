@@ -524,19 +524,14 @@ tightly than the comparisons.  Thus an expression such as
 
 \subsubsection{Boolean Operator Short Circuiting}
 
-{\it Warning:} As of Stan 2.5.0, the boolean operators do {\it not}
-short circuit.  This is a known bug and will be fixed in a future
-release.
-
-% Here's the text to use in the future:
-% The intended behavior in the future is as described below.
-% Like in \Cpp, the boolean operators are implemented to short circuit
-% directly to a return value after evaluating the first argument if it
-% is sufficient to resolve the result.  In evaluating \code{a~||~b}, if
-% \code{a} evaluates to a value other than zero, the expression returns
-% the value 1 without evaluating the expression \code{b}.  Similarly,
-% evaluating \code{a~\&\&~b} first evaluates \code{a}, and if the result
-% is zero, returns 0 without evaluating \code{b}.
+Like in \Cpp, the boolean operators \Verb/&&/ and \Verb/||/ and are
+implemented to short circuit directly to a return value after
+evaluating the first argument if it is sufficient to resolve the
+result.  In evaluating \code{a~||~b}, if \code{a} evaluates to a value
+other than zero, the expression returns the value 1 without evaluating
+the expression \code{b}.  Similarly, evaluating \code{a~\&\&~b} first
+evaluates \code{a}, and if the result is zero, returns 0 without
+evaluating \code{b}.
 
 
 \subsection{Logical Functions}
@@ -618,6 +613,24 @@ parameters and local variables in model blocks) and any of \code{c},
 \code{x1}, or \code{x2} is a parameter, then all of the above
 approaches introduce the same discontinuities into the derivative of
 \code{y} with respect to the parameter arguments.
+
+%
+\begin{description}
+  %
+  \fitem{int}{is\_inf}{real \farg{x}}{
+    Returns \farg{1} if \farg{x} is infinite (positive or negative) and \farg{0} otherwise.
+  }
+  %
+\end{description}
+
+%
+\begin{description}
+  %
+  \fitem{int}{is\_nan}{real \farg{x}}{
+    Returns \farg{1} if \farg{x} is NaN and \farg{0} otherwise.
+  }
+  %
+\end{description}
 
 
 \section{Real-Valued Arithmetic Operators}\label{real-valued-arithmetic-operators.section}
@@ -1654,6 +1667,14 @@ reals, matrices, vectors, and row vectors.
   containing the dimensions of \farg{x}; the type of the argument
   \farg{T} can be any Stan type with up to 8 array dimensions.}
 %
+\fitem{int}{num\_elements}{\farg{T}[] \farg{x}}{Returns the total
+  number of elements in the array \farg{x} including all elements
+  in contained arrays, vectors, and matrices.
+  \farg{T} can be any array type.  For example, if \code{x} is of
+  type \code{real[4,3]} then \code{num\_elements(x)} is 12, and if
+  \code{y} is declared as \code{matrix[3,4]~y[5]}, then \code{size(y)}
+  evaluates to 60.}
+%
 \fitem{int}{size}{\farg{T}[] \farg{x}}{Returns the number of elements
   in the array \farg{x}; the type of the array \farg{T} can be any
   type, but the size is just the size of the top level array, not the
@@ -1806,6 +1827,19 @@ Number of components of \farg{v} less than \farg{v[s]}}
 \section{Integer-Valued Matrix Size Functions}
 %
 \begin{description}
+%
+\fitem{int}{num\_elements}{vector \farg{x}}{The total
+  number of elements in the vector
+  \farg{x} (same as function \code{rows})}
+%
+\fitem{int}{num\_elements}{row\_vector \farg{x}}{The total
+  number of elements in the vector
+  \farg{x} (same as function \code{cols})}
+%
+\fitem{int}{num\_elements}{matrix \farg{x}}{The total
+  number of elements in the matrix \farg{x}.
+  For example, if \code{x} is a $5 \times 3$ matrix,
+  then \code{num\_elements(x)} is 15}
 %
 \fitem{int}{rows}{vector \farg{x}}{The number of
 rows in the vector \farg{x}}
