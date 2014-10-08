@@ -10,6 +10,12 @@ TEST(MathMeta, index_type) {
   expect_same_type<vector<double>::size_type,
                    index_type<vector<double> >::type>();
 
+  expect_same_type<vector<double>::size_type,
+                   index_type<const vector<double> >::type>();
+
   expect_same_type<vector<vector<int> >::size_type,
                    index_type<vector<vector<int> > >::type>();
+
+  expect_same_type<vector<vector<int> >::size_type,
+                   index_type<const vector<vector<int> > >::type>();
 }

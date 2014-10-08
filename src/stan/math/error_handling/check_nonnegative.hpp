@@ -5,8 +5,10 @@
 #include <stan/math/error_handling/dom_err_vec.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/math/meta/value_type.hpp>
 
 namespace stan {
+
   namespace math {
 
     namespace {
@@ -34,7 +36,7 @@ namespace stan {
                           T_result* result) {
           using stan::length;
           for (size_t n = 0; n < length(y); n++) {
-            if (!boost::is_unsigned<typename T_y::value_type>::value 
+            if (!boost::is_unsigned<typename value_type<T_y>::type>::value 
                 && !(stan::get(y,n) >= 0)) 
               return dom_err_vec(n,function,y,name,
                                  " is %1%, but must be >= 0!","",

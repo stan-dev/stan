@@ -10,6 +10,12 @@ TEST(MathMeta, value_type) {
   expect_same_type<vector<double>::value_type,
                    value_type<vector<double> >::type>();
 
+  expect_same_type<vector<double>::value_type,
+                   value_type<const vector<double> >::type>();
+
   expect_same_type<vector<vector<int> >::value_type,
                    value_type<vector<vector<int> > >::type>();
+
+  expect_same_type<vector<vector<int> >::value_type,
+                   value_type<const vector<vector<int> > >::type>();
 }

@@ -23,6 +23,18 @@ namespace stan {
 
 
     /**
+     * Template class for metaprogram to compute the type of values
+     * stored in a constant container.
+     *
+     * @tparam T type of container without const modifier.
+     */
+    template <typename T>
+    struct value_type<const T> {
+      typedef typename value_type<T>::type type;
+    };
+
+
+    /**
      * Template metaprogram class to compute the type of values stored
      * in a standard vector.
      *

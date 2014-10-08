@@ -23,6 +23,20 @@ namespace stan {
 
 
     /**
+     * Template class for metaprogram to compute the type of indexes
+     * used in a constant container type. 
+     *
+     * @tparam T type of container without const modifier.
+     */
+    template <typename T>
+    struct index_type<const T> {
+      typedef typename index_type<T>::type type;
+    };
+
+
+
+
+    /**
      * Template metaprogram class to compute the type of index for a
      * standard vector.
      *
