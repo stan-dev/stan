@@ -5,7 +5,6 @@ MINOR_VERSION := $(shell grep MINOR_VERSION $(STANAPI_HOME)src/stan/version.hpp 
 PATCH_VERSION := $(shell grep PATCH_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 VERSION_STRING := $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 
-
 manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
 	mkdir -p doc/
 	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING).pdf;)
@@ -13,6 +12,7 @@ manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
 MANUAL_FLAGS=
 
 ## is there a way to get latex to output which files it depends on?
+.PHONY: %.tex
 %.pdf: %.tex
 	cd $(dir $@); pdflatex $(MANUAL_FLAGS) $(notdir $^); bibtex $(notdir $(basename $@)); makeindex -s stan-reference.ist $(notdir $(basename $@)); pdflatex $(MANUAL_FLAGS) $(notdir $^); pdflatex $(MANUAL_FLAGS) $(notdir $^);  pdflatex $(MANUAL_FLAGS) $(notdir $^);
 
