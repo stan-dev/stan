@@ -7,6 +7,7 @@
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
+
   namespace math {
 
     /**
@@ -27,7 +28,6 @@ namespace stan {
                            const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                            const char* name,
                            T_result* result) {
-      typedef typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type size_t;
       if (theta.size() == 0) {
         std::string message(name);
         message += " is not a valid unit vector. %1% elements in the vector.";

@@ -9,6 +9,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/model/util.hpp>
 
 #include <stan/optimization/bfgs_linesearch.hpp>
@@ -310,13 +311,18 @@ namespace stan {
       size_t fevals() const { return _fevals; }
       int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
                      double &f) {
+        using Eigen::Matrix;
+        using Eigen::Dynamic;
+        using stan::math::index_type;
+        using stan::model::log_prob_propto;
+        typedef typename index_type<Matrix<double,Dynamic,1> >::type idx_t;
+
         _x.resize(x.size());
-        for (Eigen::Matrix<double,Eigen::Dynamic,1>::size_type i = 0; 
-             i < x.size(); i++)
+        for (idx_t i = 0; i < x.size(); i++)
           _x[i] = x[i];
 
         try {
-          f = - stan::model::log_prob_propto<false>(_model, _x, _params_i, _msgs);
+          f = - log_prob_propto<false>(_model, _x, _params_i, _msgs);
         } catch (const std::exception& e) {
           if (_msgs)
             (*_msgs) << e.what() << std::endl;
@@ -333,18 +339,22 @@ namespace stan {
         }
       }
       int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
-                     double &f, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
+                     double &f, 
+                     Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
+        using Eigen::Matrix;
+        using Eigen::Dynamic;
+        using stan::math::index_type;
+        using stan::model::log_prob_grad;
+        typedef typename index_type<Matrix<double,Dynamic,1> >::type idx_t;
+
         _x.resize(x.size());
-        for (Eigen::Matrix<double,Eigen::Dynamic,1>::size_type i = 0; 
-             i < x.size(); i++)
+        for (idx_t i = 0; i < x.size(); i++)
           _x[i] = x[i];
         
         _fevals++;
 
         try {
-          f = - stan::model::log_prob_grad<true,false>(_model,
-                                                       _x, _params_i,
-                                                       _g, _msgs);
+          f = - log_prob_grad<true,false>(_model, _x, _params_i, _g, _msgs);
         } catch (const std::exception& e) {
           if (_msgs)
             (*_msgs) << e.what() << std::endl;
@@ -387,7 +397,7 @@ namespace stan {
     public:
       typedef BFGSMinimizer<ModelAdaptor<M>,QNUpdateType,Scalar,DimAtCompile> BFGSBase;
       typedef typename BFGSBase::VectorT vector_t;
-      typedef typename vector_t::size_type idx_t;
+      typedef typename stan::math::index_type<vector_t>::type idx_t;
       
       BFGSLineSearch(M& model,
                      const std::vector<double>& params_r,

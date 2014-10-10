@@ -8,6 +8,7 @@
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/matrix/sum.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 
@@ -55,8 +56,11 @@ namespace stan {
     template <typename T_prob>
     inline
     typename boost::math::tools::promote_args<T_prob>::type
-    categorical_log(const typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type n, 
+    categorical_log(const typename 
+                    math::index_type<Eigen::Matrix<T_prob,
+                                                   Eigen::Dynamic,1> >::type n, 
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
+
       return categorical_log<false>(n,theta);
     }
 

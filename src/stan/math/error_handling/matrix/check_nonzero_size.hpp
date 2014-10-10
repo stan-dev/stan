@@ -1,12 +1,15 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_NONZERO_SIZE_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_NONZERO_SIZE_HPP
 
-#include <stan/meta/traits.hpp>
-#include <stan/math/error_handling/dom_err.hpp>
 #include <string>
 #include <typeinfo>
 
+#include <stan/math/error_handling/dom_err.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/meta/traits.hpp>
+
 namespace stan {
+
   namespace math {
 
     /**
@@ -31,10 +34,11 @@ namespace stan {
                                    const T_y& y,
                                    const char* name,
                                    T_result* result) {
+      typedef typename index_type<T_y>::type size_t;
       if (y.size() > 0) 
         return true;
 
-      return dom_err(function,typename T_y::size_type(),
+      return dom_err(function, size_t(), 
                      name, " has size %1%, but must have a non-zero size","",
                      result);
     }
