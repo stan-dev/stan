@@ -1,10 +1,4 @@
 #include <gtest/gtest.h>
-#include <iostream>
-#include <fstream>
-#include <istream>
-#include <sstream>
-#include <exception>
-#include <stdexcept>
 #include <test/unit/gm/utility.hpp>
 
 TEST(gmParserVarDeclsGrammarDef, addVar) {
@@ -57,4 +51,10 @@ TEST(gmParserVarDeclsGrammarDef, setDoubleRangeUpper) {
               "expression denoting real required");
   test_throws("validate_set_double_range_upper_bad2",
               "expression denoting real required");
+}
+
+TEST(gmParserVarDeclsGrammarDef, parametersInLocals) {
+  // test_parsable("var-decls-in-functions");
+   test_throws("var-decl-bad-1",
+               "non-data variables not allowed in dimension declarations");
 }
