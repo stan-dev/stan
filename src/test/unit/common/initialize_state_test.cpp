@@ -33,6 +33,24 @@ public:
       params_r__[n] = n;
     }
   }
+ 
+  void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
+    dimss__.resize(0);
+  }
+
+  void constrained_param_names(std::vector<std::string>& param_names__,
+                               bool include_tparams__ = true,
+                               bool include_gqs__ = true) const {
+  }
+
+  template <typename RNG>
+  void write_array(RNG& base_rng__,
+                   std::vector<double>& params_r__,
+                   std::vector<int>& params_i__,
+                   std::vector<double>& vars__,
+                   bool include_tparams__ = true,
+                   bool include_gqs__ = true,
+                   std::ostream* pstream__ = 0) const { }
   
   mutable int templated_log_prob_calls;
   mutable int transform_inits_calls;
@@ -115,6 +133,7 @@ TEST_F(StanCommon, initialize_state_0) {
   using stan::common::initialize_state;
   init = "0";
   EXPECT_TRUE(initialize_state(init,
+                               2,
                                cont_params,
                                model,
                                rng,
@@ -174,6 +193,7 @@ TEST_F(StanCommon, initialize_state_number) {
   init = "1.5";
   using stan::common::initialize_state;
   EXPECT_TRUE(initialize_state(init,
+                               2,
                                cont_params,
                                model,
                                rng,
@@ -238,6 +258,7 @@ TEST_F(StanCommon, initialize_state_string) {
   init = "abcd";
   using stan::common::initialize_state;
   EXPECT_TRUE(initialize_state(init,
+                               2,
                                cont_params,
                                model,
                                rng,
@@ -259,6 +280,7 @@ TEST_F(StanCommon, initialize_state_source) {
   init = "abcd";
   using stan::common::initialize_state_source;
   EXPECT_TRUE(initialize_state_source(init,
+                                      2,
                                       cont_params,
                                       model,
                                       rng,
@@ -282,6 +304,7 @@ TEST_F(StanCommon, initialize_state_source_neg_infinity) {
   model.log_prob_return_value 
     = -std::numeric_limits<double>::infinity();
   EXPECT_FALSE(initialize_state_source(init,
+                                      2,
                                       cont_params,
                                       model,
                                       rng,

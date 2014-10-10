@@ -25,6 +25,7 @@ namespace stan {
      * <p>If a variable has integer variables, it should return
      * those integer values cast to floating point values when
      * accessed through the floating-point methods.
+ 
      */
     class var_context {
     public:

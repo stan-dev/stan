@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <algorithm>
 #include <math.h>
 
 #include <stan/math/matrix/Eigen.hpp>
@@ -15,10 +16,65 @@
 #include <stan/model/util.hpp>
 #include <stan/gm/error_codes.hpp>
 #include <stan/common/context_factory.hpp>
+#include <stan/io/array_var_context.hpp>
+#include <stan/io/var_context_combined.hpp>
 #include <stan/common/write_error_msg.hpp>
 
 namespace stan {
   namespace common {    
+  
+    namespace {
+      /**
+       * Remove indices from a parameter name. Specifically, if a parameter
+       * is an array (or similar), the names return from
+       * constrained_param_names of a model are like alpha.1, alpha.2. This
+       * function removes everything after the first occurrence of a dot.
+       * 
+       * If we can get the parameter names of a model (excluding transformed
+       * parameters and generated quantities), this function would not be
+       * necessary.
+       * 
+       * @param[in,out]  name  parameter name 
+       */
+      void rm_indices_from_name(std::string& name) {
+        size_t x = name.find_first_of(".");
+        if (std::string::npos == x) return;
+        name.erase(x);
+      }
+
+      /**
+       * Remove indices from parameter names and make names unique.
+       *
+       * @param[in,out]  names  parameter names 
+       */
+      void rm_indices_from_name(std::vector<std::string>& names) {
+        for (size_t i = 0; i < names.size(); i++)
+          rm_indices_from_name(names[i]);
+        std::vector<std::string>::iterator it;
+        it = std::unique(names.begin(), names.end());
+        names.resize(std::distance(names.begin(), it));
+      }
+    }
+    /**
+     * Check if all the parameters are contained in the
+     * user-provided var_context to specify inits
+     * 
+     * @param[in] model   the model. 
+     * @param[in] context the context of inits provided by user
+     * @return            true if all are contained, 
+                          false if anyone is not
+     */
+
+    template <class Model>
+    bool are_all_pars_initialized(const Model& model, 
+                                  const stan::io::var_context& context) {
+      std::vector<std::string> names;
+      model.constrained_param_names(names, false, false);
+      rm_indices_from_name(names);
+      for (size_t i = 0; i < names.size(); i++) 
+        if (!context.contains_r(names[i])) return false;
+      return true;
+    }
     
     /**
      * Sets initial state to zero
@@ -134,6 +190,103 @@ namespace stan {
       return true;
     }
 
+    /**
+     * Creates the initial state.
+     *
+     * @param[in]     source      a string that the context_factory can 
+     *                            interpret and provide a valid var_context
+     * @param[out]    cont_params the initialized state. This should be the 
+     *                            right size and set to 0.
+     * @param[in,out] model       the model. Side effects on model? I'm not
+     *                            quite sure
+     * @param[in,out] base_rng    the random number generator. State may change.
+     * @param[in,out] output      output stream for messages
+     * @param[in,out] context_factory  an instantiated factory that implements
+     *                            the concept of a context_factory. This has
+     *                            one method that takes a string.
+     * @param[in]     enable_random_init if true, it allows partially specifying
+                                  inits, otherwise not
+     */
+
+    template <class ContextFactory, class Model, class RNG>
+    bool initialize_state_source_and_random(const std::string source,
+                                            double R,
+                                            Eigen::VectorXd& cont_params,
+                                            Model& model,
+                                            RNG& base_rng,
+                                            std::ostream* output,
+                                            ContextFactory& context_factory) {
+      try {
+        typename ContextFactory::var_context_t context = context_factory(source);
+  
+        boost::random::uniform_real_distribution<double>
+          init_range_distribution(-R, R);
+        boost::variate_generator<RNG&, boost::random::uniform_real_distribution<double> >
+          init_rng(base_rng, init_range_distribution);
+            
+        cont_params.setZero();
+            
+        // Random initializations until log_prob is finite
+        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
+        static int MAX_INIT_TRIES = 100;
+  
+        int num_init_tries;
+        std::vector<std::string> cont_names;
+        model.constrained_param_names(cont_names, false, false);
+        rm_indices_from_name(cont_names);
+        for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
+          std::vector<double> cont_vecs(cont_params.size());
+          for (int i = 0; i < cont_params.size(); ++i) 
+            cont_vecs[i] = init_rng();
+          std::vector<double> cont_vecs_constrained;
+          std::vector<int> int_vecs;
+          model.write_array(base_rng, cont_vecs, int_vecs, cont_vecs_constrained, false, false, output);
+          std::vector<std::vector<size_t> > dims;
+          model.get_dims(dims);
+          stan::io::array_var_context random_context(cont_names, 
+                                                     cont_vecs_constrained,
+                                                     dims);
+          stan::io::var_context_combined vcc(context, random_context);
+          model.transform_inits(vcc, cont_params);
+          double init_log_prob;
+          try {
+            stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
+          } catch (const std::exception& e) {
+            write_error_msg(output, e);
+            if (output)
+              *output << "Rejecting proposed initial value with zero density." << std::endl;
+            init_log_prob = -std::numeric_limits<double>::infinity();
+          }
+          if (!boost::math::isfinite(init_log_prob))
+            continue;
+          for (int i = 0; i < init_grad.size(); ++i)
+            if (!boost::math::isfinite(init_grad(i)))
+              continue;
+          break;
+              
+        }
+            
+        if (num_init_tries > MAX_INIT_TRIES) {
+          if (output)
+            *output << std::endl << std::endl
+                    << "Initialization between (" << -R << ", " << R << ") failed after "
+                    << MAX_INIT_TRIES << " attempts. " << std::endl
+                    << " Try specifying initial values,"
+                    << " reducing ranges of constrained values,"
+                    << " or reparameterizing the model."
+                    << std::endl;
+          return false;
+        }
+  
+      } catch(const std::exception& e) {
+        if (output)
+          *output << "Initialization from source failed."
+                  << std::endl << e.what() << std::endl;
+        return false;
+      }
+
+      return true;
+    }
 
     /**
      * Creates the initial state using the source parameter
@@ -149,16 +302,29 @@ namespace stan {
      * @param[in,out] context_factory  an instantiated factory that implements
      *                            the concept of a context_factory. This has
      *                            one method that takes a string.
+     * @param[in]     enable_random_init if true, it allows partially specifying
+                                  inits from source, otherwise not
      */
     template <class ContextFactory, class Model, class RNG>
     bool initialize_state_source(const std::string source,
+                                 double R,
                                  Eigen::VectorXd& cont_params,
                                  Model& model,
                                  RNG& base_rng,
                                  std::ostream* output,
-                                 ContextFactory& context_factory) {
+                                 ContextFactory& context_factory, 
+                                 bool enable_random_init = true) {
       try {
         typename ContextFactory::var_context_t context = context_factory(source);
+        if (enable_random_init && !are_all_pars_initialized(model, context)) {
+          return initialize_state_source_and_random(source, 
+                                                    R,
+                                                    cont_params, 
+                                                    model, 
+                                                    base_rng,
+                                                    output,
+                                                    context_factory);
+        }
         model.transform_inits(context, cont_params);
       } catch(const std::exception& e) {
         if (output)
@@ -172,7 +338,7 @@ namespace stan {
       
       try {
         stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
-        } catch (const std::exception& e) {
+      } catch (const std::exception& e) {
         if (output)
           *output << "Rejecting user-specified initialization because of gradient failure."
                   << std::endl << e.what() << std::endl;
@@ -229,28 +395,28 @@ namespace stan {
      * @param[in,out] context_factory  an instantiated factory that implements
      *                            the concept of a context_factory. This has
      *                            one method that takes a string.
+     * @param[in]     enable_random_init if true, it allows partially specifying
+                                  inits, otherwise not
      */
     template <class ContextFactory, class Model, class RNG>
     bool initialize_state(const std::string init,
+                          double R,
                           Eigen::VectorXd& cont_params,
                           Model& model,
                           RNG& base_rng,
                           std::ostream* output,
-                          ContextFactory& context_factory) {
-      double R;
-      if (get_double_from_string(init, R)) {
-        if (R == 0) {
-          return initialize_state_zero(cont_params, model, output);
-        } else {
-          return initialize_state_random(R, cont_params, model,
-                                         base_rng, output);
-        }
-      } else {
-        return initialize_state_source(init, cont_params, model,
+                          ContextFactory& context_factory,
+                          bool enable_random_init = true) {
+      double init_d;
+      if (!get_double_from_string(init, init_d)) {
+        return initialize_state_source(init, R, cont_params, model,
                                        base_rng, output,
-                                       context_factory);
+                                       context_factory, enable_random_init);
       }
-      return false;
+      if (0 == init_d)
+          return initialize_state_zero(cont_params, model, output);
+      return initialize_state_random(init_d, cont_params, model,
+                                     base_rng, output);
     }
   } // common
 } // stan
