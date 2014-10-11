@@ -18,14 +18,6 @@ namespace stan {
 
   namespace io {
 
-    namespace {
-      size_t product(std::vector<size_t> dims) {
-         size_t y = 1U;
-         for (size_t i = 0; i < dims.size(); ++i)
-           y *= dims[i];
-         return y;
-       }
-    }
 
     /**
      * Writes data into the S-plus dump format.

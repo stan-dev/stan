@@ -6,6 +6,10 @@
 
 namespace stan { 
   namespace io { 
+    /**
+     * A var_context_combined object represents two objects of var_context
+     * as one. 
+     */ 
     class var_context_combined : public  var_context {
     private:
       const var_context& vc1;

@@ -24,7 +24,7 @@ TEST(var_context_combined, ctor) {
   stan::io::array_var_context avc(names, v, dims);
 
   std::vector<double> v2;
-  for (size_t i = 0; i < 20; i++) v2.push_back(1.0 * i);
+  for (size_t i = 1; i < 21; i++) v2.push_back(10 * i);
   std::vector<std::vector<size_t> > dims2;
   std::vector<size_t> vec_dim2;
   vec_dim2.push_back(4);
@@ -36,12 +36,20 @@ TEST(var_context_combined, ctor) {
   dims2.push_back(array_dim2); // 14 
   dims2.push_back(scalar_dim); // 1
   std::vector<std::string> names2;
-  names2.push_back("a");
+  names2.push_back("alpha");
   names2.push_back("b");
   names2.push_back("c");
   names2.push_back("d");
   stan::io::array_var_context avc2(names2, v2, dims2);
   stan::io::var_context_combined vcc(avc, avc2);
   EXPECT_TRUE(avc2.contains_r("d"));
+  EXPECT_TRUE(vcc.contains_r("alpha"));
+  EXPECT_TRUE(vcc.contains_r("beta"));
+  EXPECT_TRUE(vcc.contains_r("gamma"));
+  EXPECT_TRUE(vcc.contains_r("b"));
+  EXPECT_TRUE(vcc.contains_r("c"));
   EXPECT_TRUE(vcc.contains_r("d"));
+
+  std::vector<double> alpha(1, 0);
+  EXPECT_EQ(alpha, vcc.vals_r("alpha"));
 }
