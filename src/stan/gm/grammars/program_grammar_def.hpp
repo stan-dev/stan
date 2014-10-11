@@ -104,102 +104,54 @@ namespace stan {
 
         using boost::phoenix::construct;
         using boost::phoenix::val;
-
-        std::basic_stringstream<char> pre_error_section;
-        pre_error_section << boost::make_iterator_range (_begin, _where);
-        char last_char;
-        std::string correct_section = "";
-        while (!pre_error_section.eof()) {
-          last_char = (char)pre_error_section.get();
-          correct_section += last_char;
-        }
-
-        size_t indx = correct_section.size();
-        correct_section = correct_section.erase(indx-1, indx);
-
-        //
-        //  Clean up whatever is before the error occurred
-        //
-        //  Would be better to use the parser to select which 
-        //  section in the stan file contains the parsing error.
-        //
-
-        std::vector<std::string> sections;
-        sections.push_back("generated");
-        sections.push_back("model");
-        sections.push_back("transformed");
-        sections.push_back("parameter");
-        sections.push_back("data");
-
-        //bool found_section = false; // FIXME: do something with found_section
-        indx = 0;
-
-        for (size_t i = 0; i < sections.size(); ++i) {
-          std::string section = sections[i];
-          indx = correct_section.find(section);
-          if (!(indx == std::string::npos)) {
-            if (i == 2) {
-              // Check which transformed block we're dealing with.
-              // If there is another transformed section, it must be
-              // a 'transformed parameters' section
-              size_t indx2 = correct_section.find("transformed", indx + 5);
-              if (!(indx2 == std::string::npos)) {
-                indx = indx2;
-              } else {
-                // No second transformed section, but maybe there
-                // is a parameter block?
-                indx2 = correct_section.find("parameters", indx2);
-                if (!(indx2 == std::string::npos)) {
-                  indx = indx2;
-                }
-                // Ok, we found a 'transformed data' block.
-                // indx is pointing at it.
-              }
-            }
-            //found_section = true;
-            correct_section = correct_section.erase(0, indx);
-            break;
-          }
-        }
-
-        //
-        //  Clean up whatever comes after the error occurred
-        //
-        std::basic_stringstream<char> error_section;
-        error_section << boost::make_iterator_range (_where, _end);
-        last_char = ' ';
-        std::string rest_of_section = "";
-        while (!error_section.eof() && !(last_char == '}')) {
-          last_char = (char)error_section.get();
-          rest_of_section += last_char;
-          //std::cout << rest_of_section.size() << std::endl;
-          if (error_section.eof() && rest_of_section.size() == 1) {
-            rest_of_section = "'end of file'";
-          }
-        }
+        using boost::spirit::get_line;
+        using std::setw;
 
         if (!(get_line(_where) == std::string::npos)) {
-          error_msgs
-            << std::endl
-            << "LOCATION OF PARSING ERROR (line = "
-            << get_line(_where)
-            << ", position = "
-            << get_column(_begin, _where) - 1
-            <<  "):"
-            << std::endl
-            << std::endl
-            << "PARSED:"
-            << std::endl
-            << std::endl
-            << correct_section
-            << std::endl
-            << std::endl
-            << "EXPECTED: " << _info
-            << " BUT FOUND: " 
-            << std::endl
-            << std::endl
-            << rest_of_section
-            << std::endl;
+          size_t wline = get_line(_where);
+          size_t wcol = get_column(_begin, _where) - 1;
+
+          error_msgs << "ERROR at line " << wline << std::endl;
+
+          // get prev line and rest of current line, (if possible)
+          if (wline > 0) {
+            char last_char;
+            std::basic_stringstream<char> parsed;
+            parsed << boost::make_iterator_range (_begin, _where);
+            std::string sfrag = "";
+            while (!parsed.eof()) {
+              last_char = (char)parsed.get();
+              sfrag += last_char;
+            }
+            size_t idx = sfrag.size();
+            if (idx > 0) {
+              sfrag = sfrag.erase(idx-1,idx);
+              int skip = (wline > 3) ? wline - 3 : 0;
+              idx = 0;  
+              while (skip-- > 0) {
+                size_t eol = sfrag.find('\n',idx);
+                idx = eol + 1;
+              }
+              sfrag = sfrag.erase(0,idx);
+            }
+            std::basic_stringstream<char> unparsed;
+            unparsed << boost::make_iterator_range (_where, _end);
+            std::string sfrag2 = "";
+            while (!unparsed.eof()) {
+              last_char = (char)unparsed.get();
+              sfrag2 += last_char;
+            }
+            idx = sfrag2.size();
+            size_t eol = sfrag2.find('\n');
+            sfrag2 = sfrag2.erase(eol,idx);
+            error_msgs 
+              << sfrag
+              << sfrag2
+              << std::endl
+              << setw(wcol) << "^" 
+              << std::endl
+              << std::endl;
+          }
         }
       }
     };
