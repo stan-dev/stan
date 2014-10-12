@@ -280,7 +280,7 @@ namespace stan {
   
       } catch(const std::exception& e) {
         if (output)
-          *output << "Initialization from source failed."
+          *output << "Initialization partially from source failed."
                   << std::endl << e.what() << std::endl;
         return false;
       }
