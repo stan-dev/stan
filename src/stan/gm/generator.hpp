@@ -4557,6 +4557,9 @@ namespace stan {
 
     void generate_function_functor(const function_decl_def& fun,
                                    std::ostream& out) {
+      if (fun.body_.is_no_op_statement())
+        return; // forward declaration, so no functor needed
+
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_log = ends_with("_log", fun.name_);
