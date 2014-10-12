@@ -164,7 +164,8 @@ namespace stan {
         } catch (const std::exception& e) {
           write_error_msg(output, e);
           if (output)
-            *output << "Rejecting proposed initial value with zero density." << std::endl;
+            *output << "Rejecting proposed initial value because of gradient failure."
+                    << std::endl << e.what() << std::endl;
           init_log_prob = -std::numeric_limits<double>::infinity();
         }
         if (!boost::math::isfinite(init_log_prob))
@@ -173,7 +174,6 @@ namespace stan {
           if (!boost::math::isfinite(init_grad(i)))
             continue;
         break;
-            
       }
           
       if (num_init_tries > MAX_INIT_TRIES) {
@@ -254,7 +254,8 @@ namespace stan {
           } catch (const std::exception& e) {
             write_error_msg(output, e);
             if (output)
-              *output << "Rejecting proposed initial value with zero density." << std::endl;
+              *output << "Rejecting proposed initial value because of gradient failure."
+                      << std::endl << e.what() << std::endl;
             init_log_prob = -std::numeric_limits<double>::infinity();
           }
           if (!boost::math::isfinite(init_log_prob))
@@ -263,7 +264,6 @@ namespace stan {
             if (!boost::math::isfinite(init_grad(i)))
               continue;
           break;
-              
         }
             
         if (num_init_tries > MAX_INIT_TRIES) {
