@@ -159,7 +159,8 @@ namespace stan {
             || lhs_origin == void_function_argument_origin_rng) {
           error_msgs << "Illegal to assign to function argument variables."
                      << std::endl
-                     << "Use local variables instead.";
+                     << "Use local variables instead."
+                     << std::endl;
           return false;
         }
             
@@ -177,7 +178,8 @@ namespace stan {
           error_msgs << "too many indexes for variable " 
                      << "; variable name = " << name
                      << "; num dimensions given = " << num_index_dims
-                     << "; variable array dimensions = " << lhs_var_num_dims;
+                     << "; variable array dimensions = " << lhs_var_num_dims
+                     << std::endl;
           return false;
         }
 
@@ -492,16 +494,6 @@ namespace stan {
       }
     };
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
-
-    // // REMOVE ME
-    // namespace stan { 
-    //   namespace gm {
-    //     void generate_statement(const statement& s,
-    //                             int indent,
-    //                             std::ostream& os,
-    //                             bool is_var, bool is_fun_return, bool include_sampling);
-    //   }
-    // }
 
     struct validate_non_void_expression {
       template <typename T1, typename T2, typename T3>

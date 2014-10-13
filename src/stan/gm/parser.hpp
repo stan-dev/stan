@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <iostream>
 #include <istream>
+#include <iterator>
 #include <map>
 #include <set>
 #include <sstream>
@@ -108,17 +109,18 @@ namespace stan {
         std::stringstream msg;
         std::string diagnostics = prog_grammar.error_msgs_.str();
         if (output_stream && is_nonempty(diagnostics)) {
-          msg << "SYNTAX ERROR - DIAGNOSTIC(S) FROM PARSER:"
+          msg << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
               << std::endl
               << std::endl
               << diagnostics
               << std::endl;
         }
+
         throw std::invalid_argument(msg.str());
 
       } catch (const std::runtime_error& e) {
         std::stringstream msg;
-        msg << "ERROR - DIAGNOSTICS FROM PARSER:"
+        msg << "PROGRAM ERROR, MESSAGE(S) FROM PARSER:"
             << std::endl
             << std::endl
             << prog_grammar.error_msgs_.str()
@@ -131,6 +133,7 @@ namespace stan {
       bool success = parse_succeeded && consumed_all_input;
 
       if (!success) {      
+
         std::stringstream msg;
         if (!parse_succeeded)
           msg << "PARSE FAILED." << std::endl; 
@@ -138,11 +141,11 @@ namespace stan {
           // get rest of program
           std::basic_stringstream<char> unparsed_non_ws;
           unparsed_non_ws << boost::make_iterator_range(fwd_begin, fwd_end);
+          // get next two lines (if possible)
           msg << "PARSING HALTED AT LINE "
               << get_line(fwd_begin)
               << std::endl
-              << std::endl
-              << "REMAINING TEXT: "
+              << "UNPARSED STAN PROGRAM: "
               << std::endl
               << unparsed_non_ws.str()
               << std::endl;

@@ -13,6 +13,7 @@
 #include <vector>
 #include <stdexcept>
 
+#include <boost/format.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -99,60 +100,63 @@ namespace stan {
         variable_map& vm,
         std::stringstream& error_msgs) const {
 
-        error_msgs << msg
-                   << std::endl;
-
         using boost::phoenix::construct;
         using boost::phoenix::val;
         using boost::spirit::get_line;
+        using boost::format;
         using std::setw;
 
-        if (!(get_line(_where) == std::string::npos)) {
-          size_t wline = get_line(_where);
-          size_t wcol = get_column(_begin, _where) - 1;
-
+        size_t wline = 0;
+        wline = get_line(_where);
+        if (wline > 0) {
           error_msgs << "ERROR at line " << wline << std::endl;
+        }
 
-          // get prev line and rest of current line, (if possible)
-          if (wline > 0) {
-            char last_char;
-            std::basic_stringstream<char> parsed;
-            parsed << boost::make_iterator_range (_begin, _where);
-            std::string sfrag = "";
-            while (!parsed.eof()) {
-              last_char = (char)parsed.get();
-              sfrag += last_char;
+        error_msgs << msg
+                   << std::endl;
+
+        // get error in context:  lines before, at, and after error
+        if (wline > 0) {
+          size_t wcol = get_column(_begin,_where)-1;
+          std::basic_stringstream<char> sprogram;
+          sprogram << boost::make_iterator_range (_begin, _end);
+
+          format fmt_lineno("line % 3d: ");
+          std::string lineno = "";
+          std::string line_1before = "";
+          size_t idx_line = 0;
+          size_t idx_1before = wline - 1;
+          if (idx_1before > 0) {
+            while (idx_1before > idx_line) {
+              idx_line++;
+              std::getline(sprogram,line_1before);
             }
-            size_t idx = sfrag.size();
-            if (idx > 0) {
-              sfrag = sfrag.erase(idx-1,idx);
-              int skip = (wline > 3) ? wline - 3 : 0;
-              idx = 0;  
-              while (skip-- > 0) {
-                size_t eol = sfrag.find('\n',idx);
-                idx = eol + 1;
-              }
-              sfrag = sfrag.erase(0,idx);
-            }
-            std::basic_stringstream<char> unparsed;
-            unparsed << boost::make_iterator_range (_where, _end);
-            std::string sfrag2 = "";
-            while (!unparsed.eof()) {
-              last_char = (char)unparsed.get();
-              sfrag2 += last_char;
-            }
-            idx = sfrag2.size();
-            size_t eol = sfrag2.find('\n');
-            sfrag2 = sfrag2.erase(eol,idx);
-            error_msgs 
-              << sfrag
-              << sfrag2
-              << std::endl
-              << setw(wcol) << "^" 
-              << std::endl
-              << std::endl;
+            lineno = str(fmt_lineno % idx_1before);
+            error_msgs << lineno
+                       << line_1before 
+                       << std::endl;
+          }
+
+          std::string line_at = "";
+          std::getline(sprogram,line_at);
+          lineno = str(fmt_lineno % wline);
+          error_msgs << lineno
+                     << line_at 
+                     << std::endl
+                     << setw(wcol + lineno.length()) << "^" 
+                     << std::endl;
+
+            
+          std::string line_1after = "";            
+          if (!sprogram.eof()) {
+            std::getline(sprogram,line_1after);
+            lineno = str(fmt_lineno % (wline+1));
+            error_msgs << lineno
+                       << line_1after
+                       << std::endl;
           }
         }
+        error_msgs << std::endl;
       }
     };
     boost::phoenix::function<program_error> program_error_f;
