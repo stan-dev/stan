@@ -2529,21 +2529,6 @@ freedom \farg{nu} and symmetric and positive-definite scale matrix
  \farg{Sigma}; may only be used in generated quantities block}
 \end{description}
 
-\section{LKJ Covariance Distribution}
-
-\pitem{W}{lkj\_cov\_log}{mu,sigma,eta}
-
-\subsubsection{Stan Functions}
-
-\begin{description}
-  \fitem{real}{lkj\_cov\_log}{matrix \farg{W}, vector \farg{mu},
-    vector \farg{sigma}, real \farg{eta}}{The log of the LKJ density
-    for covariance matrix \farg{W} is the sum of log of the lognormal
-    density of the standard deviations given location vector \farg{mu}
-    and scale vector \farg{sigma} and the log of the lkj\_corr density
-    of the correlation matrix given shape \farg{eta}.  See the next
-    section for details on the lkj\_corr density.}
-\end{description}
 
 
 

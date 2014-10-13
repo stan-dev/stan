@@ -15,26 +15,54 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
-
 ##
 # Rule for building a test
 ##
-test/%.o : src/test/%_test.cpp $(LIBGTEST)
+test/%.o : src/test/%_test.cpp $(LIBGTEST) bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
+# Rule for building a test executable
+##
+test/%$(EXE) : test/%.o bin/libstan.a
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
+
+
+##
+# static rule to link in libstanc.
+# needed by subset of unit tests that test stan compiler
+# all these tests are under stan/test/unit/gm
+##
+STANC_TESTS_HEADERS := $(shell find src/test/unit/gm -type f -name '*_test.cpp')
+STANC_TESTS_O := $(patsubst src/%_test.cpp,%.o,$(STANC_TESTS_HEADERS))
+STANC_TESTS := $(patsubst src/%_test.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
+
+# $(STANC_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
+# 	@mkdir -p $(dir $@)
+# 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+
+# add additional dependency to libstanc.a
+##$(patsubst src/%_test.cpp,%.o,$(STANC_TEST_HEADERS)) : test/%.o : bin/libstanc.a
+$(STANC_TESTS_O) : bin/libstanc.a
+$(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
+
+
+
+
+
+##
 # Rule for generating dependencies.
 ##
+.PRECIOUS: test/%.d
 test/%.d : src/test/%_test.cpp
-	@if test -d $(dir $@); \
-	then \
-	(set -e; \
+	@mkdir -p $(dir $@)
+	@set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$ ); \
-	fi
+	rm -f $@.$$$$
 
 ############################################################
 ##
@@ -63,21 +91,6 @@ test-headers: $(HEADER_TESTS)
 
 ############################################################
 ##
-# static rule to link in libstan.a libstanc.
-# needed by subset of unit tests that test stan compiler
-# all these tests are under stan/test/unit/gm
-##
-STANC_TESTS := $(patsubst src/%_test.cpp,%$(EXE),$(shell find src/test/unit/gm -type f -name '*_test.cpp'))
-$(STANC_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
-
-test/%$(EXE) : test/%.o bin/libstan.a
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
-
-############################################################
-##
 # Use the stanc compiler to generate C++ from Stan programs
 ##
 
@@ -93,44 +106,45 @@ $(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$
 ##
 # Explicitly specify dependencies for tests that depend on the generated C++ of Stan programs.
 ##
-test/unit/io/mcmc_writer.o: src/test/test-models/no-main/io_example.cpp
-test/unit/gm/generator.o: src/test/test-models/no-main/gm/test_lp.cpp
+src/test/unit/io/mcmc_writer_test.cpp: src/test/test-models/no-main/io_example.cpp
+src/test/unit/gm/generator_test.cpp: src/test/test-models/no-main/gm/test_lp.cpp
+src/test/unit/gm/parser_generator_test.cpp: $(patsubst %.stan,%.cpp,$(shell find src/test/test-models/syntax-only/parser-generator -type f -name '*.stan'))
 
-test/unit/model/util.o: src/test/test-models/no-main/model/valid.cpp src/test/test-models/no-main/model/domain_fail.cpp
+src/test/unit/model/util_test.cpp: src/test/test-models/no-main/model/valid.cpp src/test/test-models/no-main/model/domain_fail.cpp
 
-test/unit/mcmc/hmc/hamiltonians/base_hamiltonian.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-test/unit/mcmc/hmc/hamiltonians/unit_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp 
-test/unit/mcmc/hmc/integrators/expl_leapfrog2.o: src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
+src/test/unit/mcmc/hmc/hamiltonians/base_hamiltonian_test.cpp: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
+src/test/unit/mcmc/hmc/hamiltonians/unit_e_metric_test.cpp: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
+src/test/unit/mcmc/hmc/hamiltonians/diag_e_metric_test.cpp: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
+src/test/unit/mcmc/hmc/hamiltonians/dense_e_metric_test.cpp: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
+src/test/unit/mcmc/hmc/integrators/expl_leapfrog_test.cpp: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp 
+src/test/unit/mcmc/hmc/integrators/expl_leapfrog2_test.cpp: src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
 
-test/unit/common/do_bfgs_optimize.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
-test/unit/optimization/bfgs_linesearch.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
-test/unit/optimization/bfgs_minimizer.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
-test/unit/optimization/bfgs.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
-test/unit/optimization/bfgs_update.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
-test/unit/optimization/lbfgs_update.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
+src/test/unit/common/do_bfgs_optimize_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
+src/test/unit/optimization/bfgs_linesearch_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
+src/test/unit/optimization/bfgs_minimizer_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
+src/test/unit/optimization/bfgs_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
+src/test/unit/optimization/bfgs_update_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
+src/test/unit/optimization/lbfgs_update_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
 
-test/unit/common/command_init.o: src/test/test-models/no-main/common/test_lp.cpp
-test/unit/common/run_markov_chain.o: src/test/test-models/no-main/common/test_lp.cpp
-test/unit/common/sample.o: src/test/test-models/no-main/common/test_lp.cpp
-test/unit/common/warmup.o: src/test/test-models/no-main/common/test_lp.cpp
-test/unit/common/write_iteration.o: src/test/test-models/no-main/common/test_lp.cpp
+src/test/unit/common/command_init_test.cpp: src/test/test-models/no-main/common/test_lp.cpp
+src/test/unit/common/run_markov_chain_test.cpp: src/test/test-models/no-main/common/test_lp.cpp
+src/test/unit/common/sample_test.cpp: src/test/test-models/no-main/common/test_lp.cpp
+src/test/unit/common/warmup_test.cpp: src/test/test-models/no-main/common/test_lp.cpp
+src/test/unit/common/write_iteration_test.cpp: src/test/test-models/no-main/common/test_lp.cpp
 
-test/unit/gm/reject/reject_mult_args.o: src/test/test-models/no-main/gm/reject_mult_args.cpp
+src/test/unit/gm/reject/reject_mult_args_test.cpp: src/test/test-models/no-main/gm/reject_mult_args.cpp
 
-test/unit/gm/reject/reject_model.o: src/test/test-models/no-main/gm/reject_model.cpp
-test/unit/gm/reject/reject_func_call_model.o: src/test/test-models/no-main/gm/reject_func_call_model.cpp
+src/test/unit/gm/reject/reject_model_test.cpp: src/test/test-models/no-main/gm/reject_model.cpp
+src/test/unit/gm/reject/reject_func_call_model_test.cpp: src/test/test-models/no-main/gm/reject_func_call_model.cpp
 
-test/unit/gm/reject/reject_transformed_data.o: src/test/test-models/no-main/gm/reject_transformed_data.cpp
-test/unit/gm/reject/reject_func_call_transformed_data.o: src/test/test-models/no-main/gm/reject_func_call_transformed_data.cpp
+src/test/unit/gm/reject/reject_transformed_data_test.cpp: src/test/test-models/no-main/gm/reject_transformed_data.cpp
+src/test/unit/gm/reject/reject_func_call_transformed_data_test.cpp: src/test/test-models/no-main/gm/reject_func_call_transformed_data.cpp
 
-test/unit/gm/reject/reject_transformed_parameters.o: src/test/test-models/no-main/gm/reject_transformed_parameters.cpp
-test/unit/gm/reject/reject_func_call_transformed_parameters.o: src/test/test-models/no-main/gm/reject_func_call_transformed_parameters.cpp
+src/test/unit/gm/reject/reject_transformed_parameters_test.cpp: src/test/test-models/no-main/gm/reject_transformed_parameters.cpp
+src/test/unit/gm/reject/reject_func_call_transformed_parameters_test.cpp: src/test/test-models/no-main/gm/reject_func_call_transformed_parameters.cpp
 
-test/unit/gm/reject/reject_generated_quantities.o: src/test/test-models/no-main/gm/reject_generated_quantities.cpp
-test/unit/gm/reject/reject_func_call_generated_quantities.o: src/test/test-models/no-main/gm/reject_func_call_generated_quantities.cpp
+src/test/unit/gm/reject/reject_generated_quantities_test.cpp: src/test/test-models/no-main/gm/reject_generated_quantities.cpp
+src/test/unit/gm/reject/reject_func_call_generated_quantities_test.cpp: src/test/test-models/no-main/gm/reject_func_call_generated_quantities.cpp
 
 ##
 # Target to verify code generated Stan programs

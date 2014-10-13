@@ -1,5 +1,4 @@
 #include <vector>
-#include <stan/agrad/rev/var.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <test/unit-agrad-rev/jacobian.hpp>
 

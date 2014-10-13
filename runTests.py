@@ -17,6 +17,7 @@ arg 1:  test dir or test file
 winsfx = ".exe"
 testsfx = "_test.cpp"
 debug = False
+batchSize = 25
 
 def usage():
     sys.stdout.write('usage: %s <path/test/dir(/files)>\n' % sys.argv[0])
@@ -72,24 +73,21 @@ def makeTests( dirname, filenames, j ):
         target = mungeName(target)
         targets.append(target)
     if (len(targets) > 0):
-        targets = ' '.join(targets)
-
-        ## split the joined targets into strings of
-        ## maximum length: 100,000
-        max_length = 100000
-        start = 0
-        end = str.rfind(targets, ' ', start, start+max_length)
-        if (end == -1):
-            end = len(targets)
-        while end != len(targets):
-            command = 'make -j%d %s' % (j,targets[start:end])
+        if (debug):
+            print('# targets: %d' % len(targets))
+        startIdx = 0
+        endIdx = batchSize
+        while (startIdx < len(targets)):
+            command = 'make -j%d %s' % (j,' '.join(targets[startIdx:endIdx]))
             if (debug):
+                print('start %d, end %d' % (startIdx,endIdx))
                 print(command)
             doCommand(command)
-            start = end
-            end = str.rfind(targets, ' ', start, start+max_length)
-            if (end == -1):
-                end = len(targets)
+            startIdx = endIdx
+            endIdx = startIdx + batchSize
+            if (endIdx > len(targets)):
+                endIdx = len(targets)
+         
 
 def runTest(name):
     executable = mungeName(name).replace("/",os.sep)
