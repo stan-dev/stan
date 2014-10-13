@@ -1020,6 +1020,108 @@ near unity.  In this case, splitting each chain into two parts leads
 to $\hat{R}$ values substantially greater than 1 because the first
 half of each chain has not mixed with the second half.  
 
+
+\subsection{Converence is Global}
+
+A question that often arises is whether it is acceptable to monitor
+convergence of only a subset of the parameters or generated
+quantities.  The short answer is ``no,'' but this is elaborated
+further in this section.
+
+For example, consider the value \code{lp\_\_}, which is the log
+posterior density (up to a constant) It is a mistake to declare
+convergence in any practical sense if \code{lp\_\_} has not converged,
+because different chains are really in different parts of the space.
+Yet measuring convergence for \code{lp\_\_} is particularly tricky, as
+noted below.
+
+\subsubsection{Asymptotics and transience vs.\ equilibrium}
+
+Markov chain convergence is a global property in the sense that it
+does not depend on the choice of function of the parameters that is
+monitored.  There is no hard cutoff between pre-convergence
+``transience'' and post-convergence ``equilibrium.''  What happens is
+that as the number of states in the chain approaches infinity, the
+distribution of possible states in the chain approaches the target
+distribution and in that limit the expected value of the Monte Carlo
+estimator of any integrable function converges to the true
+expectation. There is nothing like warmup here, because in the limit,
+the effects of initial state are completely washed out.
+
+\subsubsection{Multivariate convergence of functions}
+
+The $\hat{R}$ statistic considers the composition of a Markov chain
+and a function, and if the Markov chain has converged then each Markov
+chain and function composition will have converged. Multivariate
+functions converge when all of their margins have converged by the
+Cramer-Wold theorem.  
+
+The transformation from unconstrained space to constrained space is
+just another function, so does not effect convergence.
+
+Different functions may have different autocorrelations, but if the
+Markov chain has equilibrated then all Markov chain plus function
+compositions should be consistent with convergence. Formally, any
+function that appears inconsistent is of concern and although it would
+be unreasonable to test every function, \code{lp\_\_} and other
+measured quantities should at least be consistent.
+
+The obvious difference in \code{lp\_\_} is that it tends to vary
+quickly with position and is consequently susceptible to outliers. 
+
+\subsubsection{Finite numbers of states}
+
+The question is what happens for finite numbers of states? If we can
+prove a strong geometric ergodicity property (which depends on the
+sampler and the target distribution), then one can show that there
+exists a finite time after which the chain forgets its initial state
+with a large probability. This is both the autocorrelation time and
+the warmup time.  But even if you can show it exists and is finite
+(which is nigh impossible) you can't compute an actual value
+analytically.
+
+So what we do in practice is hope that the finite number of draws is
+large enough for the expectations to be reasonably accurate. Removing
+warmup iterations improves the accuracy of the expectations but there
+is no guarantee that removing any finite number of samples will be
+enough.
+
+\subsubsection{Why inconsistent $\hat{R}$?}
+
+There are two things to worry about here.
+
+Firstly, as noted above, for any finite number of draws, there will
+always be some residual effect of the initial state, which typically
+manifests as some small (or large if the autocorrelation time is huge)
+probability of having a large outlier. Functions robust to such
+outliers (say, quantiles) will appear more stable and have better
+$\hat{R}$. Functions vulnerable to such outliers may show fragility.
+
+Secondly, use of the $\hat{R}$ statistic makes very strong
+assumptions. In particular, it assumes that the functions being
+considered are Gaussian or it only uses the first two moments and
+assumes some kind of independence.  The point is that strong
+assumptions are made that do not always hold. In particular, the
+distribution for the log posterior density (\code{lp\_\_}) almost
+never looks Gaussian, instead it features long tails that can lead to
+large $\hat{R}$ even in the large $N$ limit.  Tweaks to $\hat{R}$,
+such as using quantiles in place of raw values, have the flavor of
+making the samples of interest more Gaussian and hence the $\hat{R}$
+statistic more accurate.
+
+\subsubsection{Final words on convergence monitoring}
+
+``Convergence'' is a global property and holds for all integrable
+functions at once, but employing the $\hat{R}$ statistic requires
+additional assumptions and thus may not work for all functions equally
+well.
+
+Note that if you just compare the expectations between chains then we
+can rely on the Markov chain asymptotics for Gaussian distributions
+and can apply the standard tests.
+
+
+
 \section{Effective Sample Size}\label{effective-sample-size.section}
 
 The second technical difficulty posed by \MCMC methods is that the
@@ -1587,7 +1689,7 @@ p_Y(y)
 \]
 
 
-\section{Unit Simplex}
+\section{Unit Simplex}\label{simplex-transform.section}
 
 Variables constrained to the unit simplex show up in multivariate
 discrete models as both parameters (categorical and multinomial) and

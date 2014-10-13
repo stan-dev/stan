@@ -656,6 +656,12 @@ as \code{x~+~y} and \code{-x}, respectively.
     \mbox{operator/}(x,y) = \frac{x}{y}
     \]}
   %
+  \fitem{real}{operator\textasciicircum}{real \farg{x}, real \farg{y}}{
+    Return \farg{x} raised to the power of \farg{y}.
+    \[
+    \mbox{operator\textasciicircum}(x,y) = x^y
+    \]}
+  % 
 \end{description}
 
 \subsection{Unary Prefix Operators}
@@ -1829,7 +1835,7 @@ in the matrix \farg{x}}
 
 
 
-\section{Matrix Arithmetic Operators}
+\section{Matrix Arithmetic Operators}\label{matrix-arithmetic-operators.section}
 
 \Stan supports the basic matrix operations using infix, prefix and
 postfix operations.  This section lists the operations supported by
@@ -2133,7 +2139,7 @@ The dot product of the rows of \farg{x} with themselves}
 %
 \end{description}
 
-\subsection{Specialized Products}\label{specialized-products.section}
+\subsection{Specialized Products}
 
 
 \begin{description}

@@ -43,6 +43,9 @@ Scripts can be written for the shell, R, or Python.  Whatever language
 a script is in, it should be self contained and not depend on global
 variables having been set, other data being read in, etc.  
 
+See \refchapter{reproducibility} for complete information on
+reproducibility in Stan and its interfaces.
+
 \subsection{Scripts are Good Documentation}
 
 It may seem like overkill if running the project is only a single line
@@ -663,8 +666,7 @@ Only arrays in Stan are allowed to store integer values.
 
 \noindent
 \Stan supports regression models from simple linear regressions to
-multilevel generalized linear models.  Coding regression models in
-\Stan is very much like coding them in \BUGS.
+multilevel generalized linear models.  
 
 \section{Linear Regression}
 
@@ -674,18 +676,18 @@ distributed noise.  This model can be written using standard
 regression notation as
 %
 \[
-Y_n = \alpha + \beta x_n + \epsilon_n
+y_n = \alpha + \beta x_n + \epsilon_n
 \ \ \ \mbox{where} \ \ \ 
 \epsilon_n \sim \distro{Normal}(0,\sigma).
 \]
 This is equivalent to the following sampling involving the
 residual,
 \[
-Y_n - (\alpha + \beta X_n) \sim \distro{Normal}(0,\sigma),
+y_n - (\alpha + \beta X_n) \sim \distro{Normal}(0,\sigma),
 \]
 and reducing still further, to
 \[
-Y_n \sim \distro{Normal}(\alpha + \beta X_n, \, \sigma).
+y_n \sim \distro{Normal}(\alpha + \beta X_n, \, \sigma).
 \]
 %
 This latter form of the model is coded in \Stan as follows.
@@ -762,7 +764,7 @@ data {
 parameters {
   real alpha;           // intercept
   vector[K] beta;       // coefficients for predictors
-  real<lower=0,upper=10> sigma;  // error scale
+  real<lower=0> sigma;  // error scale
 }
 model {
   y ~ normal(x * beta, sigma);  // likelihood
@@ -770,13 +772,28 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-The constraint on \code{sigma} gives it a uniform prior on $(0,10)$.
-The sampling statement in the model above is equivalent to
+The constraint \code{lower=0} in the declaration of \code{sigma}
+constrains the value to be greater than or equal to 0.  With no prior
+in the model block, the effect is an improper prior on non-negative
+real numbers.  Althogh a more informative prior may be added, improper
+priors are acceptable as long as they lead to proper posteriors.
+
+In the model above, \code{x} is an $N \times K$ matrix of predictors
+and \code{beta} a $K$-vector of coefficients, so \code{x * beta} is an
+$N$-vector of predictions, one for each of the $N$ data items.  These
+predictions line up with the outcomes in the $N$-vector \code{y}, so
+the entire model may be written using matrix arithmetic as shown.
+
+The sampling statement in the model above is just a more efficient,
+vector-based approach to coding the model with a loop, as in the
+following statistically equivalent model.
 %
 \begin{quote}
 \begin{Verbatim}
+model {
   for (n in 1:N)
-    y ~ normal(x[n] * beta, sigma);
+    y[n] ~ normal(x[n] * beta, sigma);
+}
 \end{Verbatim}
 \end{quote}
 %
@@ -794,13 +811,13 @@ In the model formulation
 \end{Verbatim}
 \end{quote}
 %
-there is no longer an intercept \code{alpha}.  Instead, we have
-assumed that the first column of the input matrix \code{x} is a column
-of 1 values.  This way, \code{beta[1]} plays the role of the
+there is no longer an intercept coefficient \code{alpha}.  Instead, we
+have assumed that the first column of the input matrix \code{x} is a
+column of 1 values.  This way, \code{beta[1]} plays the role of the
 intercept.  If the intercept gets a different prior than the the slope
 terms, then it would be clearer to break it out.  It is also slightly
 more efficient in its explicit form with the intercept variable
-singled out because there's one fewer multiplications;  it should not
+singled out because there's one fewer multiplications; it should not
 make that much of a difference to speed, though, so the choice should
 be based on clarity.
 
@@ -1125,8 +1142,9 @@ the probability is needed only up to a proportion.
 
 \subsubsection{Ordered Probit}
 
-An ordered probit model could be coded in a manner similar to the
-\BUGS encoding of an ordered logistic model.
+An ordered probit model could be coded in exactly the same way by
+swapping the cumultive logistic (\code{inv\_logit}) for the cumulative
+normal (\code{Phi}).
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -1377,7 +1395,7 @@ This model uses the logit-parameterized Bernoulli distribution, where
 The key to understanding it is the term inside the
 \code{bernoulli\_logit} distribution, from which it follows that
 \[
-\mbox{Pr}[Y_n = 1] = \mbox{logit}^{-1}(\alpha_{jj[n]} - \beta_{kk[n]}
+\mbox{Pr}[y_n = 1] = \mbox{logit}^{-1}(\alpha_{jj[n]} - \beta_{kk[n]}
 + \delta).
 \]
 %
@@ -1618,20 +1636,19 @@ data {
   vector[N] y;                 // outcomes
 }
 parameters {
-  corr_matrix[K] Omega;     // prior correlation
-  vector<lower=0>[K] tau;   // prior scale
-  matrix[L,K] gamma;        // group coeffs
-  vector[K] beta[J];        // indiv coeffs by group
-  real<lower=0> sigma;      // prediction error scale
+  corr_matrix[K] Omega;        // prior correlation
+  vector<lower=0>[K] tau;      // prior scale
+  matrix[L,K] gamma;           // group coeffs
+  vector[K] beta[J];           // indiv coeffs by group
+  real<lower=0> sigma;         // prediction error scale
 }
 model {
   matrix[K,K] Sigma_beta;
-  Sigma_beta <- quad_form_diag(Sigma,tau);
+  Sigma_beta <- quad_form_diag(Omega,tau);
 
   tau ~ cauchy(0,2.5);
   Omega ~ lkj_corr(2);
-  for (l in 1:L)
-    gamma[l] ~ normal(0,5);
+  to_vector(gamma) ~ normal(0,5);
 
   for (j in 1:J)
     beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
@@ -1644,64 +1661,22 @@ model {
 %
 The hyperprior covariance matrix is defined as a local variable in the
 model because the correlation matrix \code{Omega} and scale vector
-\code{tau} are more natural to inspect in the output;  to output
+\code{tau} are more natural to inspect in the output; to output
 \code{Sigma}, define it as a transformed parameter.  The function
 \code{quad\_form\_diag} is defined so that
 \code{quad\_form\_diag(Sigma,tau)} is equivalent to
 \code{diag\_matrix(tau) * Sigma * diag\_matrix(tau)}, where
 \code{diag\_matrix(tau)} returns the matrix with \code{tau} on the
-diagonal and zeroes off diagonal;  the version using
-\code{quad\_form\_diag} should be faster.
+diagonal and zeroes off diagonal; the version using
+\code{quad\_form\_diag} should be faster.  See
+\refsection{matrix-arithmetic-operators} for more information on
+specialized matrix operations.
 
+This is not the most optimal way to define this model;  it can be sped
+up through vectorization and through reparameterization in terms of
+Cholesky factors.
 
-
-\subsubsection{Optimizations}
-
-This model could be made more efficient in a several ways.  First, the
-covariance matrix \code{Sigma\_beta} can be defined using the
-specialized diagonal pre- and post-multiply functions (see
-\refsection{specialized-products} for definitions).
-%
-\begin{quote}
-\begin{Verbatim}
-Sigma_beta 
-  <- diag_pre_multiply(tau, diag_post_multiply(Sigma, tau));
-\end{Verbatim}
-\end{quote}
-
-If there are a large number of groups $J$, a further optimization
-would be to use the Cholesky factorization of \code{Sigma\_beta} in
-the Cholesky parameterization of the multivariate normal.
-%
-\begin{quote}
-\begin{Verbatim}
-{ 
-  matrix[K,K] L_beta;
-  L_beta <- cholesky_decompose(Sigma_beta);
-  for (j in 1:J)
-    beta[j] ~ multi_normal_cholesky((u[j] * gamma)', L_beta);
-}
-\end{Verbatim}
-\end{quote}
-%
-The brackets introduce a block in which the local variable
-\code{L\_beta} may be defined.
-
-An additional speedup could be achieved by defining \code{L\_beta} by
-Cholesky decomposing the correlation matrix \code{Omega} and scaling
-that rather than using the diagonal pre- and post-multiplies.
-%
-\begin{quote}
-\begin{Verbatim}
-{
-  matrix[K,K] L_beta;
-  L_beta <- cholesky_decompose(Omega);
-  for (k1 in 1:K)
-    for (k2 in 1:k1)
-      L_beta[k1,k2] <- tau[k1] * L_beta[k1,k2];
-}
-\end{Verbatim}
-\end{quote}
+\subsubsection{Optimization through Vectorization}
 
 Another optimization would be to vectorize the likelihood sampling
 statement by generating a temporary vector of the linear predictor.
@@ -1716,6 +1691,153 @@ statement by generating a temporary vector of the linear predictor.
 }
 \end{Verbatim}
 \end{quote}
+%
+The outer brackets provide a local scope in which to define
+\code{x\_beta\_jj}.  
+
+The multi-normal prior on \code{beta} can also be optimized through
+vectorization with a bit more work.  
+%
+\begin{quote}
+\begin{Verbatim}
+{
+   vector[K] u_gamma_t[J];
+   for (j in 1:J)
+     u_gamma_t[j] <- (u[j] * gamma)';
+   beta ~ multi_normal(u_gamma_t, Sigma_beta);
+}
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Optimization through Cholesky Factorization}
+
+The multivariate normal density and LKJ prior on correlation matrices
+both require their matrix parameters to be factored.  Vectorizing, as
+in the previous section, ensures this is only done once for each
+density.  An even better solution, both in terms of efficiency and
+numerical stability, is to parameterize the model directly in terms of
+Cholesky factors of correlation matrices using the multivariate
+version of the non-centered parameterization.  For the model in the
+previous section, the program fragment to replace the full matrix
+prior with an equivalent Cholesky factorized prior is as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  matrix[K,J] z;
+  cholesky_factor_corr[K] L_Omega;
+  ...
+transformed parameters {
+  matrix[J,K] beta;
+  beta <- u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
+}
+model {
+  to_vector(z) ~ normal(0,1); 
+  L_Omega ~ lkj_corr_cholesky(2);
+  ...
+\end{Verbatim}  
+\end{quote}
+%
+This new parameter \code{L\_Omega} is the Cholesky factor of
+the original correlation matrix \code{Omega}, so that 
+%
+\begin{quote}
+\begin{Verbatim}
+Omega = L_Omega * L_Omega'
+\end{Verbatim}
+\end{quote}
+%
+The prior scale vector \code{tau} is unchanged, and furthermore,
+Pre-multiplying the Cholesky factor by the scale produces the Cholesky
+factor of the final covariance matrix,
+%
+\begin{Verbatim}
+  Sigma_beta 
+  = quad_form_diag(Omega,tau)
+  = diag_pre_multiply(tau,L_Omega) * diag_pre_multiply(tau,L_Omega)'
+\end{Verbatim}
+%
+where the diagonal pre-multiply compound operation is defined by 
+%
+\begin{quote}
+\begin{Verbatim}
+diag_pre_multiply(a,b) = diag_matrix(a) * b
+\end{Verbatim}
+\end{quote}
+%
+The new variable \code{z} is declared as a matrix, the entries of
+which are given independent unit normal priors; the \code{to\_vector}
+operation turns the matrix into a vector so that it can be used as a
+vectorized argument to the univariate normal density.  Multiplying the
+Cholesky factor of the covariance matrix by \code{z} and adding the
+mean \code{(u\,*\,gamma)'} produces a \code{beta} distributed as in
+the original model.
+
+Omitting the data declarations, which are the same as before, the
+optimized model is as follows.
+%
+\begin{quote}\small
+\begin{Verbatim}
+parameters {
+  matrix[K,J] z;
+  cholesky_factor_corr[K] L_Omega;  
+  vector<lower=0>[K] tau;      // prior scale
+  matrix[L,K] gamma;           // group coeffs
+  real<lower=0> sigma;         // prediction error scale
+}
+transformed parameters {
+  matrix[J,K] beta;
+  beta <- u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
+}
+model {
+  vector[N] x_beta_jj;
+  for (n in 1:N)
+    x_beta_jj[n] <- x[n] * beta[jj[n]]';
+  y ~ normal(x_beta_jj, sigma);
+
+  tau ~ cauchy(0,2.5);
+  to_vector(z) ~ normal(0,1); 
+  L_Omega ~ lkj_corr_cholesky(2);
+  to_vector(gamma) ~ normal(0,5);
+}
+\end{Verbatim}
+\end{quote}
+
+% \begin{quote}
+% \begin{Verbatim}
+% parameters {
+%   vector[3] mu;
+%   matrix[3,M] z;
+%   cholesky_factor_corr[3] L_Sigma;
+%   vector<lower=0>[3] sigma_Sigma;
+%   ...
+% transformed parameters {
+%   matrix[M,3] alpha;
+%   alpha 
+%     <- transpose(rep_matrix(mu,M)
+%                  + diag_pre_multiply(sigma_Sigma,L_Sigma) * z);
+%   ...
+% model {
+%   to_vector(z) ~ normal(0,1); 
+%   gamma ~ normal(0, 5);
+%   sigma_Sigma ~ cauchy(0, 2.5);
+%   L_Sigma ~ lkj_corr_cholesky(3);
+%   ...
+% \end{Verbatim}
+% \end{quote}
+% %
+% Taken together, this Stan program amounts to 
+% %
+% \begin{eqnarray*}
+% \sigma & \sim & \mbox{Cauchy}(0, 2.5)
+% \\[3pt]
+% \Omega & \sim & \mbox{Lkj}(3)
+% \\[3pt]
+% \Sigma & = & \mbox{diag}(\sigma) \times \Omega \times \mbox{diag}(\sigma)
+% \\[3pt]
+% \alpha_m & \sim & \mbox{MultiNormal}(\mu, \Sigma)
+% \end{eqnarray*}
+
 
 
 \section{Prediction, Forecasting, and Backcasting}
@@ -1727,7 +1849,7 @@ reconstruction or cosmology, they are sometimes called ``backcasts''
 (or ``aftcasts'' or ``hindcasts'' or ``antecasts,'' depending on the
 author's feelings about the opposite of ``fore'').
 
-\subsection{Modeling Predictions}
+\subsection{Programming Predictions}
 
 As a simple example, the following linear regression provides the same
 setup for estimating the coefficients \code{beta} as in our very first
@@ -1811,6 +1933,14 @@ Times series data come arranged in temporal order.  This chapter
 presents two kinds of time series models, regression-like models such
 as autogression and moving average models, and hidden Markov models. 
 
+In later chapters, we discuss two alternative models which may be
+applied to time-series data, 
+%
+\begin{itemize}
+\item Gaussian processes (GP) in \refchapter{gaussian-processes} and 
+\item hidden Markov models (HMM) in \refsection{hmms}.
+\end{itemize}
+
 
 \section{Autoregressive Models}
 
@@ -1834,7 +1964,7 @@ the \Stan program for the AR(1) model is as follows.
 \begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;
-  real y[N];
+  vector[N] y;
 }
 parameters {
   real alpha;
@@ -1843,12 +1973,39 @@ parameters {
 }
 model {
   for (n in 2:N)
-    y[n] ~ normal(alpha + beta*y[n-1], sigma);
+    y[n] ~ normal(alpha + beta * y[n-1], sigma);
 }
 \end{Verbatim}
 \end{quote}
 %
-The first observed data point, \code{y[1]}, is not modeled here.  
+The first observed data point, \code{y[1]}, is not modeled here
+because there is nothing to condition on; instead, it acts to
+condition \code{y[2]}.  This model also uses an improper prior for
+\code{sigma}, but there is no obstacle to adding an informative prior
+if information is available on the scale of the changes in \code{y}
+over time, or a weakly informative prior to help guide inference if
+rough knowledge of the scale of \code{y} is available.
+
+\subsubsection{Slicing for Efficiency}
+
+Although perhaps a bit more difficult to read, a much more efficient
+way to write the above model is by slicing the vectors, with the model
+above being replaced with the one-liner
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  tail(y, N - 1) ~ normal(alpha + beta * head(y, N - 1), sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The tail operation pulls out the last \code{N\,-\,1} elements of
+\code{y} and the head operation pulls out the first \code{N\,-\,1};
+vector arithmetic is used to multiply the head elements by
+\code{beta}.  
+
+
 
 \subsection{Extensions to the AR(1) Model} 
 
@@ -1952,7 +2109,8 @@ constrained to to be less than one, $\alpha_1 < 1$.%
 %
 \footnote{In practice, it can be useful to remove the constraint to
   test whether a non-stationary set of coefficients provides a better
-  fit to the data.}
+  fit to the data.  It can also be useful to add a trend term to the
+  model, because an unfitted trend will manifest as non-stationarity.}
 %
 The ARCH(1) model may be coded directly in Stan as follows.
 %
@@ -2404,7 +2562,7 @@ improved, which results in higher effective sample sizes per
 iteration.  Finally, each iteration runs in roughly a quarter of the
 time of the original iterations.
 
-\section{Hidden Markov Models}
+\section{Hidden Markov Models}\label{hmms.section}
 
 A hidden Markov model (HMM) generates a sequence of $T$ output
 variables $y_t$ conditioned on a parallel sequence of latent
@@ -2418,16 +2576,20 @@ probability of transitioning to state $z_t$ from state $z_{t-1}$ is
 z_t \sim \distro{Categorical}(\theta_{z[t-1]}).
 \]
 The output $y_t$ at time $t$ is generated conditionally independently
-based on the latent state $z_t$.  This section describes HMMs with a
-simple categorical model for outputs $y_t \in \{1,\ldots,V\}$.  The
-categorical distribution for latent state $k$ is parameterized by a
-$V$-simplex $\phi_k$.  The observed output $y_t$ at time $t$ is
-generated based on the hidden state indicator $z_t$ at time $t$,
+based on the latent state $z_t$.  
+
+This section describes HMMs with a simple categorical model for
+outputs $y_t \in \{1,\ldots,V\}$.  The categorical distribution for
+latent state $k$ is parameterized by a $V$-simplex $\phi_k$.  The
+observed output $y_t$ at time $t$ is generated based on the hidden
+state indicator $z_t$ at time $t$,
 \[
 y_t \sim \distro{Categorical}(\phi_{z[t]}).
 \]
 In short, HMMs form a discrete mixture model where the mixture
 component indicators form a latent Markov chain.
+
+
 
 \subsection{Supervised Parameter Estimation}
 
@@ -2740,27 +2902,32 @@ parameters used to find the most likely state to have generated
 
 
 
-
-
 \chapter{Missing Data \& Partially Known Parameters}
 
 \noindent
-\BUGS and \R support mixed arrays of known and missing data.  In
-\BUGS, known and unknown values may be mixed as long as every unknown
-variable appears on the left-hand side of either an assignment or
-sampling statement.  
+Bayesian inference supports a very general approach to missing data in
+which any missing data item is represented as a parameter that is
+estimated in the posterior \citep{GelmanEtAl:2013}.  If the missing
+data is not explicitly modeled, as in the predictors for most
+regression models, then the result is an improper prior on the
+parameter representing the missing predictor.
+
+Mixing arrays of observed and missing data can be difficult to
+include in Stan, partly because it can be tricky to model discrete
+unknowns in Stan and partly because unlike some other statistical
+languages (for example, R and Bugs), Stan requires observed and
+unknown quantities to be defined in separate places in the model. Thus
+it can be necessary to include code in a Stan program to splice
+together observed and missing parts of a data structure.  Examples are
+provided later in the chapter.
 
 \section{Missing Data}
-
 
 \Stan treats variables declared in the \code{data} and
 \code{transformed data} blocks as known and the variables in the
 \code{parameters} block as unknown.
 
-The next section shows how to create a mixed array of known and
-unknown values as in \BUGS.  The recommended approach to missing data
-in \Stan is slightly different than in \BUGS.  An example involving
-missing normal observations%
+An example involving missing normal observations%
 %
 \footnote{A more meaningful estimation example would involve a
   regression of the observed and missing observations using predictors
@@ -2772,27 +2939,27 @@ could be coded as follows.
 \begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N_obs;
-  int<lower=0> N_miss;
+  int<lower=0> N_mis;
   real y_obs[N_obs];
 }
 parameters {
   real mu;
   real<lower=0> sigma;
-  real y_miss[N_miss];
+  real y_mis[N_mis];
 }
 model {
   for (n in 1:N_obs)
     y_obs[n] ~ normal(mu,sigma);
-  for (n in 1:N_miss)
-    y_miss[n] ~ normal(mu,sigma);
+  for (n in 1:N_mis)
+    y_mis[n] ~ normal(mu,sigma);
 }
 \end{Verbatim}
 \end{quote}
 %
 The number of observed and missing data points are coded as data with
-non-negative integer variables \code{N\_obs} and \code{N\_miss}.  The
+non-negative integer variables \code{N\_obs} and \code{N\_mis}.  The
 observed data is provided as an array data variable \code{y\_obs}.
-The missing data is coded as an array parameter, \code{y\_miss}.  The
+The missing data is coded as an array parameter, \code{y\_mis}.  The
 ordinary parameters being estimated, the location \code{mu} and scale
 \code{sigma}, are also coded as parameters.  A better way to write the
 model would be to vectorize, so the body would be
@@ -2800,7 +2967,7 @@ model would be to vectorize, so the body would be
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
    y_obs ~ normal(mu,sigma);
-   y_miss ~ normal(mu,sigma);
+   y_mis ~ normal(mu,sigma);
 \end{Verbatim}
 \end{quote}
 
@@ -3197,15 +3364,15 @@ model {
 \end{quote}
 %
 
-\chapter{Mixture Modeling}\label{mixture-modeling.chapter}
+\chapter{Finite Mixtures}\label{mixture-modeling.chapter}
 
 \noindent
-Mixture models of an outcome assume that the outcome is drawn from one
-of several distributions, the identity of which is controlled by a
-categorical mixing distribution. Mixture models typically have
+Finite mixture models of an outcome assume that the outcome is drawn
+from one of several distributions, the identity of which is controlled
+by a categorical mixing distribution. Mixture models typically have
 multimodal densities with modes near the modes of the mixture
-components.  Mixture models may be parameterized in several ways,
-as described in the following sections.
+components.  Mixture models may be parameterized in several ways, as
+described in the following sections.
 
 
 \section{Latent Discrete Parameterization}
@@ -3266,21 +3433,16 @@ model {
 %
 The log probability term is derived by taking
 \begin{eqnarray*}
-\log p_Y(y) & = & \log \, \left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
+\log p_Y(y) & = & \log\!\left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
   0.7 \times
   \distro{Normal}(y|3,1) \, \right)
 \\[2pt]
-& = & \log(\! \begin{array}[t]{l}
+& = & \log(\hspace*{-5pt} \begin{array}[t]{l}
                  \exp(\log(0.3 \times \distro{Normal}(y|-1,2))) \\
                  + \exp(\log(0.7 \times \distro{Normal}(y|3,1))) \ )
               \end{array}
-% \\[4pt]
-% & = & \log( \! \begin{array}[t]{l}\exp(\log(0.3) + \log \distro{Normal}(y|-1,2))
-%             \\
-%            + \exp(\log(0.7) + \log \distro{Normal}(y|3,1)) \ )
-%             \end{array}
 \\[2pt]
-& = & \mbox{log\_sum\_exp}(\! \begin{array}[t]{l}
+& = & \mbox{log\_sum\_exp}(\hspace*{-5pt}\begin{array}[t]{l}
                          \log(0.3) + \log \distro{Normal}(y|-1,2),
                          \\                  
                          \log(0.7) + \log \distro{Normal}(y|3,1) \ ).
@@ -3302,13 +3464,12 @@ data {
 parameters {
   simplex[K] theta;        // mixing proportions
   real mu[K];              // locations of mixture components
-  real<lower=0,upper=10> sigma[K];  // scales of mixture components
+  real<lower=0> sigma[K];  // scales of mixture components
 }
 model {
   real ps[K];              // temp for log component densities
-  for (k in 1:K) {
-    mu[k] ~ normal(0,10);
-  }
+  sigma ~ cauchy(0,2.5);
+  mu ~ normal(0,10);
   for (n in 1:N) {
     for (k in 1:K) {
       ps[k] <- log(theta[k]) 
@@ -3325,11 +3486,10 @@ points. The mixing proportion parameter \code{theta} is declared to be
 a unit $K$-simplex, whereas the component location parameter \code{mu}
 and scale parameter \code{sigma} are both defined to be arrays of size
 \code{K}. The values in the scale array \code{sigma} are constrained
-to be non-negative, and have an upper bound of 10. Since no prior is
-explicitly defined for the \code{sigma} parameters, their implicit
-prior distributions are uniform over their ranges. The model declares
-a local array variable \code{ps} to be size \code{K} and uses it to
-accumulate the contributions from the mixture components.
+to be non-negative, and have a weakly informative prior given in the
+model. The model declares a local array variable \code{ps} to be size
+\code{K} and uses it to accumulate the contributions from the mixture
+components.
 
 The locations and scales are drawn from simple priors for the sake of
 this example, but could be anything supported by \Stan.  The mixture
@@ -3506,10 +3666,13 @@ data {
 }
 parameters {
   real x[N];          // unknown true value   
+  real mu_x;          // prior location
+  real sigma_x        // prior scale
   ...
 }
 model {
-  x_meas ~ normal(x, tau);   // measurement model
+  x ~ normal(mu_x, sigma_x);  // prior
+  x_meas ~ normal(x, tau);    // measurement model
   y ~ normal(alpha + beta * x, sigma);
   ... 
 }
@@ -3522,34 +3685,16 @@ regression noise scale \code{sigma} are the same as before, but now
 now \code{x\_meas}, which is a measurement of the true \code{x} value
 with noise scale \code{tau}.  The model then specifies that the
 measurement error for \code{x\_meas[n]} given true value \code{x[n]}
-is normal with deviation \code{tau}.
+is normal with deviation \code{tau}.  Furthermore, the true values
+\code{x} are given a hierarchical prior;  without 
 
-A simple generalization of the above model is to allow the measurement
-noise term \code{tau} to vary with item.  This only requires changing
-its declaration in the data block to
-%
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
-  real<lower=0> tau[N];  // measurement noise for case n
-\end{Verbatim}
-\end{quote}
-%
 In cases where the measurement errors are not normal, richer
-measurement error models may be specified.  
-
-\subsection{Modeling the True Values}
-
-Although no prior is specified for the true value \code{x}, the
-posterior will be proper for the above model because
-\[
-\distro{Normal}(x|\mu,\Sigma) = \distro{Normal}(\mu|x,\Sigma).
-\]
-Nevertheless, it is common to provide some model of the true value $x$
-in terms of other covariates.  For instance, \citep{Clayton:1992}
+measurement error models may be specified.  The prior on the true
+values may also be enriched.  For instance, \citep{Clayton:1992}
 introduces an exposure model for the unknown (but noisily measured)
 risk factors $x$ in terms of known (without measurement error) risk
-factors $c$.  A simple model would regress $x_n$ on the covariates $c_n$
-with noise term $\upsilon$,
+factors $c$.  A simple model would regress $x_n$ on the covariates
+$c_n$ with noise term $\upsilon$,
 \[
 x_n \sim \distro{Normal}(\gamma^{\top}c, \upsilon).
 \]
@@ -5805,6 +5950,12 @@ data points in seconds.
 
 \subsection{Automatic Relevance Determination}
 
+``Automatic relevance determination'' is the term used in machine
+learning corresponding to the term ``hierarchical modeling'' in
+statistics.  In either case, the idea is that hyperparameters are
+estimated from data (in Bayesian inference, via the joint posteiror
+distribution) rather than being preset.
+
 For multivariate inputs $x \in \reals^D$, the squared exponential
 covariance function can be further generalized by fitting a precision
 parameter $\rho_d^2$ for each dimension $d$,
@@ -6332,7 +6483,7 @@ parameters {
   ...
 model {
   log(y) ~ normal(mu,sigma);
-  increment_log_prob(- log(y));
+  increment_log_prob(-log(y));
   ...
 \end{Verbatim}
 \end{quote}
@@ -6349,7 +6500,7 @@ model {
   real log_y;
   log_y <- log(y);
   log_y ~ normal(mu,sigma);
-  increment_log_prob(- log_y);
+  increment_log_prob(-log_y);
   ...
 \end{Verbatim}
 \end{quote}
@@ -6830,10 +6981,11 @@ They also may not contain any constraints;  see
 
 Unlike type declarations for variables, function type declarations for
 matrix and vector types are not declared with their sizes.  Like local
-variable declarations, function argument type declarations
+variable declarations, function argument type declarations may not be
+declared with constraints (either lower or upper bounds or structured
+constraints like forming a simplex or correlation matrix).
 
-For
-example, here's a function to compute the entropy of a categorical
+For example, here's a function to compute the entropy of a categorical
 distribution with simplex parameter \code{theta}.
 %
 \begin{quote}
@@ -7217,6 +7369,54 @@ pseudo-random number generators.  Such functions may only be used in
 the generated quantities block.
 
 
+\section{Recursive Functions}
+
+Stan supports recursive function definitions, which can be useful for
+some applications.  For instance, consider the matrix power operation,
+$A^n$, which is defined for a square matrix $A$ and positive integer
+$n$ by
+\[
+A^n 
+=
+\begin{cases}
+\ \mbox{I} & \mbox{if } n = 0, \mbox{ and}
+\\[3pt]
+\ A \, A^{n-1} & \mbox{if } n > 0.
+\end{cases}
+\]
+%
+where $\mbox{I}$ is the identity matrix.  This definition can be
+directly translated to a recursive function definition.
+%
+\begin{quote}
+\begin{Verbatim}
+  matrix matrix_pow(matrix a, int n);
+
+  matrix matrix_pow(matrix a, int n) {
+    if (n == 0)
+      return diag_matrix(rep_vector(1, rows(a)));
+    else 
+      return a *  matrix_pow(a, n - 1);
+  }
+\end{Verbatim}
+\end{quote}
+%
+The forward declaration of the function signature before it is defined
+is necessary so that the embedded use of \code{matrix\_pow} is
+well-defined when it is encountered.%
+%
+\footnote{A future version of Stan will allow self-recursive functions
+  to skip the forward declaration.}
+%
+It would be more efficient to not allow the recursion to go all the
+way to the base case, adding the following conditional clause.
+%
+\begin{quote}
+\begin{Verbatim}
+    else if (n == 1)
+      return a;
+\end{Verbatim}
+\end{quote}
 
 
 \chapter{Problematic Posteriors}\label{problematic-posteriors.chapter}%
@@ -7369,6 +7569,32 @@ If $c < 0$, this switches the signs of every component in $\alpha$,
 $\beta$, and $\delta$ without changing the density.
 
 
+\subsubsection{Softmax with $K$ vs. $K-1$ Parameters}
+
+In order to parameterize a $K$-simplex (i.e., a $K$-vector with
+non-negative values that sum to one), only $K - 1$ parameters are
+necessary because the $K$th is just one minus the sum of the first $K
+- 1$ parameters, so that if $\theta$ is a $K$-simplex,
+%
+\[
+\theta_K = 1 - \sum_{k=1}^K \theta_k.
+\]
+%
+The softmax function (see \refsection{softmax}) maps a $K$-vector
+$\alpha$ of linear predictors to a $K$-simplex $\theta =
+\mbox{softmax}(\alpha)$ by defining
+%
+\[
+\theta_k = \frac{\exp(\alpha_k)}{\sum_{k'=1}^K \exp(\alpha_k')}.
+\]
+%
+The softmax function is many-to-one, which leads to a lack of
+identifiability of the unconstrained parameters $\alpha$.  In
+particular, adding or subtracting a constant from each $\alpha_k$
+produces the same simplex $\theta$. 
+
+
+
 \subsection{Mitigating the Invariances}
 
 All of the examples discussed in the previous section allow
@@ -7402,6 +7628,29 @@ multiplicative and not an additive invariance, it must be constrained
 to a non-zero value, with 1 being a convenient choice.  Now all of the
 discrimination parameters may be interpreted relative to item 1's
 discrimination.
+
+The many-to-one nature of $\mbox{softmax}(\alpha)$ is typically
+mitigated by pinning a component of $\alpha$, for instance fixing
+$\alpha_K = 0$.  The resulting mapping is one-to-one from $K-1$
+unconstrained parameters to a $K$-simplex.  This is roughly how
+simplex-constrained parameters are defined in Stan; see
+\refsection{simplex-transform} for a precise definition.  The Stan
+code for creating a simplex from a $K-1$-vector can be written as
+%
+\begin{quote}
+\begin{Verbatim}
+vector softmax_id(vector alpha) {
+  vector[num_elements(alpha) + 1] alphac1;
+  for (k in 1:num_elements(alpha))
+    alphac1[k] <- alpha[k];
+  alpha[num_elements(alphac)] <- 0;
+  return softmax(alphac);
+}
+\end{Verbatim}
+\end{quote}
+
+
+
 
 \subsubsection{Adding Priors}
 
@@ -7450,6 +7699,18 @@ The addition of a prior to the two intercepts model is shown in the
 middle plot in \reffigure{non-identifiable-density}.  The plot on
 the right of \reffigure{non-identifiable-density} shows the result of
 reparameterizing to a single intercept.
+
+An alternative strategy for identifying a $K$-simplex parameterization
+$\theta = \mbox{softmax}(\alpha)$ in terms of an unconstrained
+$K$-vector $\alpha$ is to place a prior on the components of $\alpha$
+with a fixed location (that is, specifically avoid hierarchical priors
+with varying location).  Unlike the approaching of pinning $\alpha_K =
+0$, the prior-based approach models the $K$ outcomes symmetrically
+rather than modeling $K-1$ outcomes relative to the $K$-th.  The
+pinned parameterization, on the other hand, is usually more efficient
+statisticaly because it does not have the extra degree of (prior
+constrained) wiggle room.
+
 
 \subsubsection{Vague, Strongly Informative, and Weakly Informative Priors}
 
@@ -8474,6 +8735,7 @@ A Wishart distribution can also be reparameterized in terms of standard
 normal variates and chi-squared variates. Let $L$ be the Cholesky factor
 of a $K \times K$ positive definite scale matrix $S$ and let $\nu$ be
 the degrees of freedom. If
+%
 \begin{equation*}
 A = \left( \begin{array}{cccc}
 \sqrt{c_{1}} & 0 & \cdots & 0\\
@@ -8482,6 +8744,7 @@ z_{21} & \sqrt{c_{2}} & \ddots & \vdots\\
 z_{K1} & \cdots & z_{K\left(K-1\right)} & \sqrt{c_{K}}
  \end{array} \right),
 \end{equation*}
+%
 where each $c_i$ is distributed chi-squared with $\nu - i + 1$ degrees
 of freedom and each $z_{ij}$ is distributed standard normal, then
 $W = LAA^{\top}L^{\top}$ is distributed Wishart with scale matrix
@@ -9125,31 +9388,54 @@ the transformed model, to
 
 
 
+\chapter{Reproducibility}\label{reproducibility.chapter}
 
+\noindent
+Floating point operations on modern computers are notoriously
+difficult to replicate because the fundamental arithmetic operations,
+right down to the IEEE 754 encoding level, are not fully specified.
+The primary problem is that the precision of operations varies across
+different hardware platforms and software implementations.
 
+Stan is designed to allow full reproducibility.  However, this is only
+possible up to the external constraints imposed by floating point
+arithmetic.
 
-% \section{Using Forward Sampling}
+Stan results will only be exactly reproducible if {\it all}\, of the following
+components are {\it identical}\,:
+%
+\begin{itemize}
+\item Stan version
+\item Stan interface (RStan, PyStan, CmdStan) and version, plus version
+  of interface language (R, Python, shell)
+\item versions of included libraries (Boost and Eigen)
+\item operating system version
+\item computer hardware including CPU, motherboard and memory
+\item \Cpp compiler, including version, compiler flags, and linked libraries
+\item same configuration of call to Stan, including random seed, chain
+  ID, initialization and data
+\end{itemize}
+%
+It doesn't matter if you use a stable release version of Stan or the
+version with a particular Git hash tag.  The same goes for all of the
+interfaces, compilers, and so on on.  The point is that if any of
+these moving parts changes in some way, floating point results may
+change.
 
-% In fact, at this point, simple (non Markov chain) Monte Carlo may be
-% used because the parameters to the beta distribution are specified and
-% there are no variables that depend on \code{theta}.  Thus this model
-% could be even further optimized by replacing the declaration of
-% \code{theta} as a parameter with a declaration as a generated quantity
-% and then generating the quantity directly.
-% %
-% \begin{quote}
-% \begin{Verbatim}
-% generated quantities {
-%     real<lower=0,upper=1> theta;
-%     theta ~ random_beta(alpha + sum(y), beta + N - sum(y));
-% }
-% \end{Verbatim}
-% \end{quote}
-% %
-% When used in the generated quantities block, sampling statements such
-% as that for \code{theta} are executed by taking a sample from the
-% specified distribution directly. The result is a Monte Carlo estimate
-% of \code{theta} in which every sample is independent (up to the limits
-% of the pseudorandom number generator, of course).  Thus the effective
-% sample size should be estimated as being roughly equal to the sample
-% size.
+Concretely, if you compile a single Stan program using the same
+CmdStan code base, but changed the optimization flag (\code{-O3} vs.\
+\code{-O2} or \code{-O0}), the two programs may not return the identical
+stream of results.  Thus it is very hard to guarantee reproducibility
+on externally managed hardware, like in a cluster or even a desktop
+managed by an IT department or with automatic updates turned on.
+
+If, however, you compiled a Stan program today using one set of flags,
+took the computer away from the internet and didn't allow it to update
+anything, then came back in a decade and recompiled the Stan program
+in the same way, you should get the same results.
+
+The data needs to be the same down to the bit level. For example, if
+you are running in RStan, Rcpp handles the conversion between R's
+floating point numbers and C++ doubles. If Rcpp changes the conversion
+process or use different types, the results are not guaranteed to be
+the same down to the bit level.  

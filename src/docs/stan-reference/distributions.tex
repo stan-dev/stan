@@ -330,8 +330,9 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 
 \subsubsection{Probability Mass Functions}
 
-If $N \in \nats$, $N > 0$, and $\theta \in \mbox{$N$-simplex}$, then for $y \in
-\setlist{1,\ldots,N}$, 
+If $N \in \nats$, $N > 0$, and if $\theta \in \reals^N$ forms an
+$N$-simplex (i.e., has nonnegative entries summing to one), then for
+$y \in \setlist{1,\ldots,N}$,
 %
 \[
 \distro{Categorical}(y|\theta) = \theta_y.
@@ -355,12 +356,16 @@ See \refsection{softmax} for the definition of the softmax function.
 
 All of the categorical distributions are vectorized so that the
 outcome \farg{y} can be a single integer (type \code{int}) or an array
-of integers (type \code{int[]}).
+of integers (type \code{int[]}).  
+
 
 \begin{description}
-\fitem{real}{categorical\_log}{ints \farg{y}, vector \farg{theta}}{The
-  log categorical probability mass function with outcome(s) \farg{y} in 
-$1:N$ given $N$-simplex distribution parameter \farg{theta}.}
+  \fitem{real}{categorical\_log}{ints \farg{y}, vector
+    \farg{theta}}{The log categorical probability mass function with
+    outcome(s) \farg{y} in $1:N$ given $N$-vector of outcome
+    probabilities \farg{theta}.  The parameter \farg{theta} must have
+    non-negative entries that sum to one, but it need not be a
+    variable declared as a simplex.}
 %
 \fitem{real}{categorical\_logit\_log}{ints \farg{y}, vector
   \farg{beta}}{The log categorical probability mass function with
@@ -1583,15 +1588,12 @@ above some positive minimum value.
 
 \subsubsection{Probability Density Function}
 
-If $y_0 \in \posreals$ and $\alpha \in \posreals$, then for
-$y \in \posreals$,
+If $y_{\mbox{\footnotesize\rm min}} \in \posreals$ and $\alpha \in \posreals$, then for
+$y \in \posreals$ with $y \geq y_{\mbox{\footnotesize\rm min}}$, 
 \[
-\distro{Pareto}(y|y_0,\alpha)
+\distro{Pareto}(y|y_{\mbox{\footnotesize\rm min}},\alpha)
 =
-\alpha 
-\ y_0
-\, \left( \frac{1}{y} \right)^{\!\alpha+1}
-\! .
+\frac{\displaystyle \alpha\,y_{\mbox{\footnotesize\rm min}}^\alpha}{\displaystyle y^{\alpha+1}}.
 \]
 
 \pitem{y}{pareto}{y\_min,alpha}
@@ -2195,14 +2197,14 @@ matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
 \subsubsection{Stan Functions}
 
 The following two functions differ in the type of their \farg{V}, the
-first taking a full observation covariance matrix \farg{V} and the
-second a vector \farg{V} representing the diagonal of the observation
+first taking a full observation covariance matrix \farg{V}\ and the
+second a vector \farg{V}\ representing the diagonal of the observation
 covariance matrix.  The sampling statement defined in the previous
 section works with either type of observation \farg{V}.
 
 \begin{description}
 %
-\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{matrix \farg{y}, matrix \farg{F},
   matrix \farg{G}, matrix \farg{V}}{matrix \farg{W}, vector
   \farg{m0}, matrix \farg{C0}}{The log of the density of the
   Gaussian Dynamic Linear model with observation matrix \farg{y} in
@@ -2213,7 +2215,7 @@ section works with either type of observation \farg{V}.
   covariance \farg{C0}.}
 % 
 %
-\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{matrix \farg{y}, matrix \farg{F},
   matrix \farg{G}, vector \farg{V}}{matrix \farg{W}, vector \farg{m0},
   matrix \farg{C0}} {The log of the density of the Gaussian Dynamic
   Linear model with observation matrix \farg{y} in which rows are
