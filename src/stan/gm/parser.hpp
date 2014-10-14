@@ -100,7 +100,6 @@ namespace stan {
         if (output_stream && is_nonempty(diagnostics)) {
           *output_stream << "DIAGNOSTIC(S) FROM PARSER:" 
                          << std::endl
-                         << std::endl
                          << diagnostics 
                          << std::endl;
         }
@@ -111,7 +110,6 @@ namespace stan {
         if (output_stream && is_nonempty(diagnostics)) {
           msg << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
               << std::endl
-              << std::endl
               << diagnostics
               << std::endl;
         }
@@ -121,7 +119,6 @@ namespace stan {
       } catch (const std::runtime_error& e) {
         std::stringstream msg;
         msg << "PROGRAM ERROR, MESSAGE(S) FROM PARSER:"
-            << std::endl
             << std::endl
             << prog_grammar.error_msgs_.str()
             << std::endl;

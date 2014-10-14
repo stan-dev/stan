@@ -106,54 +106,55 @@ namespace stan {
         using boost::format;
         using std::setw;
 
-        size_t wline = 0;
-        wline = get_line(_where);
-        if (wline > 0) {
-          error_msgs << "ERROR at line " << wline << std::endl;
-        }
+        error_msgs << msg << std::endl;
 
-        error_msgs << msg
-                   << std::endl;
+        size_t idx_errline = 0;
+        idx_errline = get_line(_where);
 
-        // get error in context:  lines before, at, and after error
-        if (wline > 0) {
-          size_t wcol = get_column(_begin,_where)-1;
+        if (idx_errline > 0) {
+          error_msgs << "ERROR at line " << idx_errline << std::endl;
+
           std::basic_stringstream<char> sprogram;
           sprogram << boost::make_iterator_range (_begin, _end);
 
-          format fmt_lineno("line % 3d: ");
+          // show error in context 2 lines before, 1 lines after
+          size_t idx_errcol = 0;
+          idx_errcol = get_column(_begin,_where) - 1;
+
           std::string lineno = "";
-          std::string line_1before = "";
+          format fmt_lineno("line % 3d: ");
+
+          std::string line_2before = "";
+          std::string line_before = "";
+          std::string line_err = "";
+          std::string line_after = "";            
+
           size_t idx_line = 0;
-          size_t idx_1before = wline - 1;
-          if (idx_1before > 0) {
-            while (idx_1before > idx_line) {
-              idx_line++;
-              std::getline(sprogram,line_1before);
-            }
-            lineno = str(fmt_lineno % idx_1before);
-            error_msgs << lineno
-                       << line_1before 
-                       << std::endl;
+          size_t idx_before = idx_errline - 1;
+          if (idx_before > 0) {
+              // read lines up to error line, save 2 most recently read
+              while (idx_before > idx_line) {
+                line_2before = line_before;
+                std::getline(sprogram,line_before);  
+                idx_line++;
+              }
+              if (line_2before.length() > 0) {
+                lineno = str(fmt_lineno % (idx_before - 1) );
+                error_msgs << lineno << line_2before << std::endl;
+              }
+              lineno = str(fmt_lineno % idx_before);
+              error_msgs << lineno << line_before << std::endl;
           }
 
-          std::string line_at = "";
-          std::getline(sprogram,line_at);
-          lineno = str(fmt_lineno % wline);
-          error_msgs << lineno
-                     << line_at 
-                     << std::endl
-                     << setw(wcol + lineno.length()) << "^" 
-                     << std::endl;
-
+          std::getline(sprogram,line_err);
+          lineno = str(fmt_lineno % idx_errline);
+          error_msgs << lineno << line_err << std::endl
+                     << setw(idx_errcol + lineno.length()) << "^" << std::endl;
             
-          std::string line_1after = "";            
           if (!sprogram.eof()) {
-            std::getline(sprogram,line_1after);
-            lineno = str(fmt_lineno % (wline+1));
-            error_msgs << lineno
-                       << line_1after
-                       << std::endl;
+            std::getline(sprogram,line_after);
+            lineno = str(fmt_lineno % (idx_errline+1));
+            error_msgs << lineno << line_after << std::endl;
           }
         }
         error_msgs << std::endl;
