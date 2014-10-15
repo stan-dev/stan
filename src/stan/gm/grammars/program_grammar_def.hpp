@@ -122,7 +122,7 @@ namespace stan {
           idx_errcol = get_column(_begin,_where) - 1;
 
           std::string lineno = "";
-          format fmt_lineno("line % 3d: ");
+          format fmt_lineno("% 3d:    ");
 
           std::string line_2before = "";
           std::string line_before = "";
