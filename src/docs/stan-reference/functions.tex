@@ -405,6 +405,7 @@ carried out by first promoting the integer value.
   \fitem{int}{operator<}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is less than \farg{y} and 0 otherwise.
     \[
+    (x \mbox{<} y) = 
     \mbox{operator\textless}(x,y) =
     \begin{cases}
       1 & \mbox{if } x < y\\
@@ -416,17 +417,19 @@ carried out by first promoting the integer value.
   \fitem{int}{operator<=}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is less than or equal \farg{y} and 0 otherwise.
     \[
-    \mbox{operator\textless=}(x,y) = 
-    \begin{cases}
-      1 & \mbox{if } x \leq y\\
-      0 & \mbox{otherwise}
-    \end{cases}
+    (x \mbox{<=} y)
+    = \mbox{operator\textless=}(x,y)
+    = \begin{cases}
+        1 & \mbox{if } x \leq y\\
+        0 & \mbox{otherwise}
+      \end{cases}
     \]}
   %
   \fitemnobody{int}{operator>}{int \farg{x}, int \farg{y}}
   \fitem{int}{operator>}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is greater than \farg{y} and 0 otherwise.
     \[
+    (x \mbox{>} y) = 
     \mbox{operator\textgreater}(x,y) = 
     \begin{cases}
       1 & \mbox{if } x > y\\
@@ -439,6 +442,7 @@ carried out by first promoting the integer value.
     Returns 1 if \farg{x} is greater than or equal to \farg{y}
     and 0 otherwise.
     \[
+    (x \mbox{>=} y) =
     \mbox{operator\textgreater=}(x,y) = 
     \begin{cases}
       1 & \mbox{if } x \geq y \\
@@ -450,6 +454,7 @@ carried out by first promoting the integer value.
   \fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is equal to \farg{y} and 0 otherwise.
     \[
+    (x \mbox{==} y) = 
     \mbox{operator==}(x,y) = 
     \begin{cases}
       1 & \mbox{if } x = y \\
@@ -461,6 +466,7 @@ carried out by first promoting the integer value.
   \fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is not equal to \farg{y} and 0 otherwise.
     \[
+    (x \mbox{!=} y) = 
     \mbox{operator!=}(x,y) = 
     \begin{cases}
       1 & \mbox{if } x \neq y \\
@@ -489,6 +495,7 @@ tightly than the comparisons.  Thus an expression such as
   \fitemindex{int}{operator!}{real \farg{x}}{
     Returns 1 if \farg{x} is zero and 0 otherwise.
     \[
+    (\mbox{!}x) =
     \mbox{operator!}(x) = 
     \begin{cases}
       0 & \mbox{if } x \neq 0 \\
@@ -500,6 +507,7 @@ tightly than the comparisons.  Thus an expression such as
   \fitem{int}{operator{\&\&}}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is unequal to 0 and \farg{y} is unequal to 0.
     \[
+    (x \mbox{\&\&} y) =
     \mbox{operator\&\&}(x,y) = 
     \begin{cases}
       1 & \mbox{if } x \neq 0 \mbox{ and } y \neq 0\\
@@ -511,6 +519,7 @@ tightly than the comparisons.  Thus an expression such as
   \fitemindex{int}{operator||}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is unequal to 0 or \farg{y} is unequal to 0.
     \[
+    (x \mbox{||} y) = 
     \mbox{operator||}(x,y) = 
     \begin{cases}
       1 & \mbox{if } x \neq 0 \textrm{ or } y \neq 0\\
@@ -548,7 +557,7 @@ are primarily provided for compatibility with BUGS and JAGS.
     \[
     \mbox{if\_else}(cond,x,y) = 
     \begin{cases}
-      x & \mbox{if } cond \neq 0\\
+      x & \mbox{if } cond \neq 0 \\
       y & \mbox{otherwise}
     \end{cases}
     \]}
@@ -564,16 +573,23 @@ are primarily provided for compatibility with BUGS and JAGS.
     \]}
   %
 \end{description}
+%
+Both of these are step-like functions; see the warning in
+\refsection{step-functions} applied to expressions dependent on
+parameters. 
 
-
-See the warning in \refsection{step-functions} about step-like
-functions applied to expressions dependent on parameters.
+The step function is often used in BUGS to perform conditional
+operations.  For instance, \code{step(a\,-\,b)} evaluates to 1 if
+\code{a} is greater than {b} and evaluates to 0 otherwise.  In Stan,
+the expression \code{step(a\,-\,b)} is more naturally coded directly
+in terms of the comparison operator, \code{(a\,>\,b)}.  
 
 The log probability function and gradient evaluations are more
-efficient in Stan when implemented using conditional statements.  If
-\code{y} is a \code{real} variable, and \code{c}, \code{x1}, and
-\code{x2} are scalar expressions (type \code{real} or \code{int}),
-then the assignment statements
+efficient in Stan when implemented using conditional statements than
+with mulitplications by step functions.  For example, if \code{y} is a
+\code{real} variable, and \code{c}, \code{x1}, and \code{x2} are
+scalar expressions (type \code{real} or \code{int}), then the
+assignment statements
 %
 \begin{quote}
 \begin{Verbatim}
@@ -607,13 +623,6 @@ be more noticeable if \code{c}, \code{x1} or \code{x2}
 are parameters (including transformed parameters and local variables
 that depend on parameters) or if \code{x1} and \code{x2} are
 complicated expressions rather than constants or simple variables.  
-
-\emph{Warning: } \ If \code{y} is a parameter (including transformed
-parameters and local variables in model blocks) and any of \code{c},
-\code{x1}, or \code{x2} is a parameter, then all of the above
-approaches introduce the same discontinuities into the derivative of
-\code{y} with respect to the parameter arguments.
-
 %
 \begin{description}
   %
@@ -622,7 +631,6 @@ approaches introduce the same discontinuities into the derivative of
   }
   %
 \end{description}
-
 %
 \begin{description}
   %
@@ -631,7 +639,10 @@ approaches introduce the same discontinuities into the derivative of
   }
   %
 \end{description}
-
+%
+Care must be taken because both of these indicator functions are
+step-like and thus can cause discontinuities in gradients when applied
+to parameters; see \refsection{step-functions} for details.
 
 \section{Real-Valued Arithmetic Operators}\label{real-valued-arithmetic-operators.section}
 
@@ -648,31 +659,32 @@ as \code{x~+~y} and \code{-x}, respectively.
   \fitem{real}{operator+}{real \farg{x}, real \farg{y}}{
     Returns the sum of \farg{x} and \farg{y}.
     \[
-    \mbox{operator+}(x,y) = x+y
+    (x + y) = \mbox{operator+}(x,y) = x+y
     \]}
   %
   \fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
     Returns the difference between \farg{x} and \farg{y}.
     \[
-    \mbox{operator-}(x,y) = x - y
+    (x - y) = \mbox{operator-}(x,y) = x - y
     \]}
   %
   \fitem{real}{operator*}{real \farg{x}, real \farg{y}}{
     Returns the product of \farg{x} and \farg{y}.
     \[
-    \mbox{operator*}(x,y) = xy
+    (x * y) = \mbox{operator*}(x,y) = xy
     \]}
   %
   \fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
     Returns the quotient of \farg{x} and \farg{y}.
     \[
-    \mbox{operator/}(x,y) = \frac{x}{y}
+    (x / y) = \mbox{operator/}(x,y) = \frac{x}{y}
     \]}
   %
   \fitem{real}{operator\textasciicircum}{real \farg{x}, real \farg{y}}{
     Return \farg{x} raised to the power of \farg{y}.
     \[
-    \mbox{operator\textasciicircum}(x,y) = x^y
+    (x\mbox{\textasciicircum}y) 
+    = \mbox{operator\textasciicircum}(x,y) = x^y
     \]}
   % 
 \end{description}
@@ -684,13 +696,13 @@ as \code{x~+~y} and \code{-x}, respectively.
   \fitem{real}{operator-}{real \farg{x}}{
     Returns the negation of the subtrahend \farg{x}.
     \[
-    \mbox{operator-}(x) = -x
+    (-x) = \mbox{operator-}(x) = -x
     \]}
   %
   \fitem{real}{operator+}{real \farg{x}}{
     Returns the value of \farg{x}.
     \[
-    \mbox{operator+}(x) = x
+    (+x) = \mbox{operator+}(x) = x
     \]}
 \end{description}
 
@@ -2443,7 +2455,7 @@ matrix with diagonal \farg{x}}
 \end{description}
 
 \subsection{Columns and Rows}
-%
+
 \begin{description}
 %
 \fitem{vector}{col}{matrix \farg{x}, int \farg{n}}{The \farg{n}-th column
@@ -2453,6 +2465,14 @@ of matrix \farg{x}}
 of matrix \farg{x}}
 %
 \end{description}
+
+The \code{row} function is special in that it may be used as an lvalue
+in an assignment statement; for more information on assignment, see
+\refsection{assignment-statement}.  The row function is also special
+in that the indexing notation \code{x[m]} is just an alternative way
+of writing \code{row(x,m)}.  The \code{col} function may {\it not}\, be
+used as an lvalue, nor is there an indexing based shorthand for it.
+
 
 \subsection{Block Operations}
 

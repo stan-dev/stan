@@ -828,52 +828,225 @@ make that much of a difference to speed, though, so the choice should
 be based on clarity.
 
 
-\section{Coefficient and Noise Priors}
+\section{Priors for Coefficients and Scales}\label{regression-priors.section}
 
-There are several ways in which the model in the previous section can
-be generalized.  For example, weak priors can be assigned to the
-coefficients as follows.
+This section describes the choices available for modeling priors for
+regression coefficients and scales.  Priors for univariate parameters
+in hierarchical models are discussed in
+\refsection{hierarchical-priors} and multivariate parameters in
+\refsection{multivariate-hierarchical-priors}. There is also a
+discussion of priors used to identify models in
+\refsection{priors-for-identification}.
+
+\subsection{Background Reading}
+
+See \citep{Gelman:2006} for more an overview of choices for priors for
+scale parameters, \citep{ChungEtAl:2013} for an overview of choices
+for scale priors in penalized maximum likelihood estimates, and
+\cite{GelmanJakulinPittauEtAl:2008} for a discussion of prior choice
+for regression coefficients.
+
+\subsection{Improper Uniform Priors}
+
+The default in Stan is to provide uniform (or ``flat'') priors on
+parameters over their legal values as determined by their declared
+constraints.  A parameter declared without constraints is thus given a
+uniform prior on $(-\infty,\infty)$ by default, whereas a scale
+parameter declared with a lower bound of zero gets an improper uniform
+prior on $(0,\infty)$.  Both of these priors are improper in the sense
+that there is no way formulate a density function for them that
+integrates to 1 over its support.
+
+Stan allows models to be formulated with improper priors, but in order
+for sampling or optimization to work, the data provided must ensure a
+proper posterior.  This usually requires a minimum quantity of data,
+but can be useful as a starting point for inference and as a baseline
+for sensitivity analysis (i.e., considering the effect the prior
+has on the posterior).
+
+\subsection{Uniform Priors and Transforms}
+
+Uniform priors are specific to the scale on which they are formulated.
+For instance, we could give a scale parameter $\sigma > 0$ a uniform
+prior on $(0,\infty)$, $q(\sigma) = c$ (we use $q$ because the
+``density'' is not only unnormalized, but unnormalizable), or we could
+work on the log scale and provide $\log \sigma$ a uniform prior on
+$(-\infty,\infty)$, $q(\log \sigma) = c$.  These work out to be
+different priors on $\sigma$ due to the Jacobian adjustment necessary
+for the log transform; see \refsection{change-of-variables} for more
+information on changes of variables and their requisite Jacobian
+adjustments.
+
+Stan automatically applies the necessary Jacobian adjustment for
+variables declared with constraints to ensure a uniform density on the
+legal constrained values.  This Jacobian adjustment is turned off when
+optimization is being applied in order to produce appropriate maximum
+likelihood estimates.
+
+\subsection{``Uninformative'' Proper Priors}
+
+It is not uncommon to see models with priors on regression
+coefficients such as $\distro{Normal}(0,1000)$.%
+%
+\footnote{The practice was common in BUGS and can be seen in most of
+  their examples \cite{LunnEtAl:2012}.}
+%
+If the prior scale, such as 1000, is several orders of magnitude
+larger than the estimated coefficients, then such a prior is
+effectively providing no effect whatsoever.  
+
+We actively discourage users from using the default scale priors
+suggested through the BUGS examples \citep{LunnEtAl:2012}, such as
+\[
+\sigma^2 \sim \distro{InvGamma}(0.001, 0.001).
+\]
+%
+Such priors concentrate too much probability mass outside of
+reasonable posterior values, and unlike the symmetric wide normal
+priors, can have the profound effect of skewing posteriors; see
+\citep{Gelman:2006} for examples and discussion.
+
+\subsection{Truncated Priors}
+
+If a variable is declared with a lower bound of zero, then assigning
+it a normal prior in a Stan model produces the same effect as
+providing a properly truncated half-normal prior.  The truncation at
+zero need not be specified as Stan only requires the density up to a
+proportion.  So a variable declared with
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
-alpha ~ normal(0,100);
-beta ~ normal(0,100);
+\begin{Verbatim}
+real<lower=0> sigma;
 \end{Verbatim}
 \end{quote}
 %
-And an upper bound to \code{sigma} can be given in order to implicitly
-give it a uniform prior.
+and given a prior
 \begin{quote}
-\begin{verbatim}
-real<lower=0,upper=100> sigma;
-\end{verbatim}
-\end{quote}
-
-%
-More informative priors based the (half) Cauchy distribution are coded
-as follows.
-%
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
-alpha ~ cauchy(0,2.5);
-beta ~ cauchy(0,2.5);
-sigma ~ cauchy(0,2.5);
+\begin{Verbatim}
+sigma ~ normal(0,1000);
 \end{Verbatim}
 \end{quote}
 %
-The regression coefficients \code{alpha} and \code{beta} are
-unconstrained, but \code{sigma} must be positive and properly
-requires the half-Cauchy distribution.  Although Stan supports
-truncated distributions with half distributions being a special case,
-it is not necessary here because the full distribution is proportional
-when the parameters are constant.%
+gives \code{sigma} a half-normal prior, technically
 %
-\footnote{Stan does not (yet) support truncated Cauchy distributions.
-  The distributions which may be truncated are listed for discrete
-  distributions in \refpart{discrete-prob-functions} and for
-  continuous distributions in \refpart{continuous-prob-functions}.
-  Available truncated distributions may be found in the index by
-  looking for suffix \code{\_cdf}.}
+\[
+p(\sigma) 
+\ = \
+\frac{\distro{Normal}(\sigma|0,1000)}
+     {1 - \distro{NormalCDF}(0|0,1000)}
+\ \propto \
+\distro{Normal}(\sigma|0,1000),
+\]
+%
+but Stan is able to avoid the calculation of the normal cumulative
+distribution (CDF) function required to normalize the half-normal density.
+If either the prior location or scale is a parameter or if the
+truncation point is a parameter, the truncation cannot be dropped,
+because the normal CDF term will not be a constant.
+
+
+\subsection{Weakly Informative Priors}
+
+Typically a researcher will have some knowledge of the scale of the
+variables being estimated.  For instance, if we're estimating an
+intercept-only model for the mean population height for adult women,
+then we know the answer is going to be somewhere in the one to three
+meter range.  That gives us information around which to form a weakly
+informative prior.
+
+Similarly, logistic regression with predictors on the standard scale
+(roughly zero mean, unit variance), then it is unlikely to have a
+coefficient that's larger than five in absolute value.  In these
+cases, it makes sense to provide a weakly informative prior such as
+$\distro{Normal}(0,5)$ for such a coefficient.
+
+Weakly informative priors help control inference computationally and
+statistically.  Computationally, a prior increases the curvature
+around the volume where the solution is expected to lie, which in turn
+guides both gradient-based like L-BFGS and Hamiltonian Monte Carlo
+sampling by not allowing them to stray too far from the location of a
+surface.  Statistically, a weakly informative prior is more sensible
+for a problem like women's mean height, because a very diffuse prior
+like $\distro{Normal}(0,1000)$ will ensure that the vast majority of
+the prior probability mass is outside the range of the expected
+answer, which can overwhelm the inferences available from a small data
+set.
+
+\subsection{Bounded Priors}
+
+Consider the women's height example again.  One way to formulate a
+proper prior is to impose a uniform prior on a bounded scale.  For
+example, we could declare the parameter for mean women's height to
+have a lower bound of one meter and an upper bound of three meters.
+Surely the answer has to lie in that range.  
+
+Similarly, it is not uncommon to see priors for scale parameters that
+impose lower bounds of zero and upper bounds of very large numbers,
+such as 10,000.%
+%
+\footnote{This was also a popular strategy in the BUGS example models
+  \citep{LunnEtAl:2012}, which often went one step further and set the
+  lower bounds to a small number like 0.001 to discourage numerical
+  underflow to zero.}
+%
+This provides roughly the same problem for estimation as a very
+diffuse inverse gamma prior on variance.  We prefer to leave
+parameters which are not absolutely physically constrained to float
+and provide them informative priors.  In the case of women's height,
+such a prior might be $\distro{Normal}(2,0.5)$ on the scale of meters;
+it concentrates 95\% of its mass in the interval $(1,3)$, but still
+allows values outside of that region.
+
+In cases where bounded priors are used, the posterior fits should be
+checked to make sure the parameter is not estimated at or very close
+to a boundary.  This will not only cause computational problems, it
+indicates a problem with the way the model is formulated.  In such
+cases, the interval should be widened to see where the parameter fits
+without such constraints, or boundary-avoid priors should be used (see
+\refsection{hierarchical-priors}.)
+
+\subsection{Fat-Tailed Priors and ``Default'' Priors}
+
+A reasonable alternative if we want to accomodate outliers is to use a
+prior that concentrates most of mass around the area where values are
+expected to be, but still leaves a lot of mass in its tails.  The
+usual choice in such a situation is to use a Cauchy distribution for a
+prior, which can concentrate its mass around its median, but has tails
+that are so fat that the variance is infinite.  
+
+Without specific information, the Cauchy prior is a very good default
+parameter choice for regression coefficients
+\citep{GelmanJakulinPittauEtAl:2008} and the half-Cauchy (coded
+implicitly in Stan) a good default choice for scale parameters
+\citep{Gelman:2006}.
+
+
+
+\subsection{Informative Priors}
+
+Ideally, there will be substantive information about a problem that
+can be included in an even tighter prior than a weakly informative
+prior.  This may come from actual prior experiments and thus be the
+posterior of other data, it may come from meta-analysis, or it may
+come simply by soliciting it from domain experts.  All the goodness of
+weakly informative priors applies, only with more strength.
+
+\subsection{Conjugacy}
+
+Unlike in Gibbs sampling, there is no computational advantage to
+providing conjugate priors (i.e., priors that produce posteriors in
+the same family) in a Stan program.%
+%
+\footnote{BUGS and JAGS both support conjugate sampling through Gibbs
+  sampling.  JAGS extended the range of conjugacy that could be
+  exploited with its GLM module.  Unlike Stan, both BUGS and JAGS are
+  restricted to conjugate priors for constrained multivariate
+  quantities such as covariance matrices or simplexes.}
+%
+Neither the Hamiltonian Monte Carlo samplers or the optimizers make
+use of conjugacy, working only on the log density and its derivatives.
+
+
 
 \section{Robust Noise Models}
 
@@ -1186,6 +1359,7 @@ on the softmax transform is more efficient and more numerically
 stable.  A small efficiency gain could be achieved by computing the
 values \code{Phi(eta - c[k])} once and storing them for re-use.
 
+
 \section{Hierarchical Logistic Regression}
 
 The simplest multilevel model is a hierarchical model in which the
@@ -1308,6 +1482,54 @@ to models that are less readable.  The recommended practice in such
 cases is to first develop and debug the more transparent version of
 the model and only work on optimizations when the simpler formulation
 has been debugged.
+
+
+\section{Hierarchical Priors}\label{hierarchical-priors.section}
+
+Priors on priors, also known as ``hyperpriors,'' should be treated the
+same way as priors on lower-level parameters in that as much prior
+information as is available should be brought to bear.  Because
+hyperpriors often apply to only a handful of lower-level parameters,
+care must be taken to ensure the posterior is both proper and not
+overly sensitive either statistically or computationally to wide tails
+in the priors.
+
+\subsection{Boundary-Avoiding Priors for MLE in Hierarchical Models}
+
+The fundamental problem with maximum likelihood estimation (MLE) in
+the hierarchical model setting is that as the hierarchical variance
+drops and the values cluster around the hierarchical mean, the overall
+density grows without bound.  As an illustration, consider a simple
+hierarchical linear regression (with fixed prior mean) of $y_n \in
+\reals$ on $x_n \in \reals^K$, formulated as
+%
+\begin{eqnarray*}
+y_n & \sim & \distro{Normal}(x_n \beta, \sigma)
+\\[3pt]
+\beta_k & \sim & \distro{Normal}(0,\tau)
+\\[3pt]
+\tau & \sim & \distro{Cauchy}(0,2.5)
+\end{eqnarray*}
+%
+In this case, as $\tau \rightarrow 0$ and $\beta_k \rightarrow 0$, the
+posterior density
+\[
+p(\beta,\tau,\sigma|y,x) \propto p(y|x,\beta,\tau,\sigma)
+\]
+grows without bound.  There is a plot of a Neal's funnel density in
+\reffigure{funnel}, which has similar behavior.
+
+There is obviously no MLE estimate for $\beta,\tau,\sigma$ in such a
+case, and therefore the model must be modified if posterior modes are
+to be used for inference.  The approach recommended by
+\cite{ChungEtAl:2013} is to use a gamma distribution as a prior, such
+as
+%
+\[
+\sigma \sim \distro{Gamma}(2, 1/A),
+\]
+%
+for a reasonably large value of $A$, such as $A = 10$.
 
 
 \section{Item-Response Theory Models}
@@ -1495,7 +1717,58 @@ necessary because the log probability need only be calculated up to a
 proportion and the scale variables are constrained to $(0,\infty)$ by 
 their declarations.
 
-\section{Multivariate Priors for Hierarchical Models}
+\section{Priors for Identifiabilty}\label{priors-for-identification.section}
+
+\subsection{Location and Scale Invariance}
+
+One application of (hierarchical) priors is to identify the scale
+and/or location of a group of parameters. For example, in the IRT
+models discussed in the previous section, there is both a location and
+scale non-identifiability.  With uniform priors, the posteriors will
+float in terms of both scale and location.  See
+\refsection{collinearity} for a simple example of the problems this
+poses for estimation.
+
+The non-identifiability is resolved by providing a unit normal (i.e.,
+$\distro{Normal}(0,1)$) prior on one group of coefficients, such as
+the student abilities.  With a unit normal prior on the student
+abilities, the IRT model is identified in that the posterior will
+produce a group of estimates for student ability parameters that have
+a sample mean of close to zero and a sample variance of close to one.
+The difficulty and discrimination parameters for the questions should
+then be given a diffuse, or ideally a hierarchical prior, which will
+identify these parameters by scaling and locating relative to the
+student ability parameters.
+
+\subsection{Collinearity}
+
+Another case in which priors can help provide identifiability is in
+the case of collinearity in a linear regression.  In linear
+regression, if two predictors are collinear (i.e, one is a linear
+function of the other), then their coefficients will have a
+correlation of 1 (or -1) in the posterior.  This leads to
+non-identifiability.  By placing normal priors on the coefficients,
+the maximum likelihood solution of two duplicated preditors (trivially
+collinear) will be half the value than would be obtained by only
+including one.
+
+\subsection{Separability}
+
+In a logistic regression, if a predictor is positive in cases of 1
+outcomes and negative in cases of 0 outcomes, then the maximum
+likelihood estimate for the coefficient for that predictor diverges to
+infinity.  This divergence can be controlled by providing a prior for
+the coefficient, which will ``shrink'' the estimate back toward zero
+and thus identify the model in the posterior.  
+
+Similar problems arise for sampling with improper flat priors.  The
+sampler will try to draw very large values.  By providing a prior,
+the posterior will be concentrated around finite values, leading to
+well-behaved sampling.
+
+
+
+\section{Multivariate Priors for Hierarchical Models}\label{multivariate-hierarchical-priors.section}
 
 In hierarchical regression models (and other situations), several
 individual-level variables may be assigned hierarchical priors.  For
@@ -2461,9 +2734,7 @@ scaling and sampling of $\delta_t$ to yield the sampling distribution
 h_t \sim \distro{Normal}(\mu + \phi(h_t - \mu), \sigma).
 \]
 This formulation can be directly encoded, as shown in the following
-Stan model, which is also available in the file
-\nolinkurl{<stan>/example-models/misc/moving-avg/stochastic-volatility.stan}
-along with R code to simulate data from the model for testing.
+Stan model.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -2536,12 +2807,13 @@ parameters {
 %
 The original value of \code{h} is then defined in a transformed
 parameter block.
+%
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 transformed parameters {
-  vector[T] h;                 // log volatility at time t
-  h <- h_std * sigma;
-  h[1] <- h[1] / sqrt(1 - phi * phi);
+  vector[T] h;            // log volatility at time t
+  h <- h_std * sigma;     // now h ~ normal(0,sigma)
+  h[1] <- h[1] / sqrt(1 - phi * phi);  // rescale h[1]
   h <- h + mu;
   for (t in 2:T)
     h[t] <- h[t] + phi * (h[t-1] - mu);
@@ -2549,9 +2821,20 @@ transformed parameters {
 \end{Verbatim}
 \end{quote}
 %
-Finally, the sampling statement for \code{h[1]} and loop for sampling
-\code{h[2]} to \code{h[T]} are replaced with a single vectorized unit normal
-sampling statement.
+The first assignment rescales \code{h\_std} to have a
+$\distro{Normal}(0,\sigma)$ distribution and temporarily assigns it to
+\code{h}.  The second assignment rescales \code{h[1]} so that its
+prior differs from that of \code{h[2]} through \code{h[T]}.  The next
+assignment supplies a \code{mu} offset, so that \code{h[2]} throgh
+\code{h[T]} are now distributed $\distro{Normal}(\mu,\sigma)$; note
+that this shift must be done after the rescaling of \code{h[1]}.  The
+final loop adds in the moving average so that \code{h[2]} through
+\code{h[T]} are appropriately modeled relative to \code{phi} and
+\code{mu}.
+
+As a final improvement, the sampling statement for \code{h[1]} and
+loop for sampling \code{h[2]} to \code{h[T]} are replaced with a
+single vectorized unit normal sampling statement.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -3416,8 +3699,34 @@ model. If $Y$ is a mixture of $K$ normal distributions with
 locations $\mu_k$ and scales $\sigma_k$ with mixing proportions
 $\theta$ in the unit $K$-simplex, then 
 \[
-p_Y(y) = \sum_{k=1}^K \theta_k \, \distro{Normal}(\mu_k,\sigma_k).
+p_Y(y\theta,\mu,\sigma) = \sum_{k=1}^K \theta_k \, \distro{Normal}(\mu_k,\sigma_k).
 \]
+
+\section{Log Sum of Exponentials: Linear Sums on the Log Scale}
+
+The log sum of exponentials function is used to define mixtures on the
+log scale.  It is defined for two inputs by
+%
+\[
+\mbox{log\_sum\_exp}(a,b) = \log (\exp(a) + \exp(b)).
+\]
+%
+If $a$ and $b$ are probabilities on the log scale, then $\exp(a) +
+\exp(b)$ is their sum on the linear scale, and the outer log converts
+the result back to the log scale; to summarize, log\_sum\_exp does
+linear addition on the log scale.   The reason to use Stan's built-in
+log\_sum\_exp function is that it can prevent underflow and overflow
+in the exponentiation, by calculating the result as
+%
+\[
+\log(\exp(a) + \exp(b))
+= \max(a,b) + \log(\exp(a - \max(a,b)), \exp(b - \max(a,b))).
+\]
+%
+In this evaluation, one of the terms $a - \max(a,b)$ or $b -
+\max(a,b)$ is zero and the other is negative, thus eliminating the
+possibility of overflow or underflow in the leading term and eking the
+most arithmetic precision possible out of the operation.
 
 For example, the mixture of $\code{Normal}(-1,2)$ and
 $\code{Normal}(3,1)$ with mixing proportion $\theta =
@@ -3437,9 +3746,10 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-The log probability term is derived by taking
+The log probabilty term is derived by taking
+%
 \begin{eqnarray*}
-\log p_Y(y) & = & \log\!\left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
+\log p_Y(y|\theta,\mu,\sigma) & = & \log\!\left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
   0.7 \times
   \distro{Normal}(y|3,1) \, \right)
 \\[2pt]
@@ -3454,6 +3764,9 @@ The log probability term is derived by taking
                          \log(0.7) + \log \distro{Normal}(y|3,1) \ ).
                        \end{array}
 \end{eqnarray*}
+%
+
+\subsection{Estimating Parameters of a Mixture}
 
 Given the scheme for representing mixtures, it may be moved to an
 estimation setting, where the locations, scales, and mixture
@@ -3508,11 +3821,16 @@ array \code{ps}.  Then the log probability is incremented with the log
 sum of exponentials of those values.
 
 
-\section{Zero-Inflated Models}\label{zero-inflated.section}
+\section{Zero-Inflated and Hurdle Models}\label{zero-inflated.section}
 
-Zero-inflated models, as defined by \citet{Lambert:1992}, add
-additional probability mass to the outcome of zero.  These can be
-defined in Stan directly as mixture models. 
+Zero-inflated and hurdle models both provide mixtures of a Poisson and
+Bernoulli probabilty mass function to allow more flexiblity in
+modeling the probability of a zero outcome.  Zero-inflated models, as
+defined by \citet{Lambert:1992}, add additional probability mass to
+the outcome of zero.  Hurdle models, on the other hand, are formulated
+as pure mixtures of zero and non-zero outcomes.  
+
+\subsection{Zero Inflation}
 
 Consider the following example for zero-inflated Poisson
 distributions.  It uses a parameter \code{theta} here there is a
@@ -3566,43 +3884,43 @@ within the \code{increment\_log\_prob} function, it is not recommended
 because \code{if\_else(c,e1,e2)} evaluates both \code{e1} and
 \code{e2} no matter what the value of \code{c} is.
 
-Other distributions than the Poisson can also be inflated in this
-way.  Similarly, the boundary conditions can be reorganized so that
-\code{theta} represents the probability that $y > 0$, and the Poisson
-is only used for values greater than zero.  For example, the following
-model is properly normalized.
+\subsection{Hurdle Models}
+
+The hurdle model is similar to the zero-inflated model, but more
+flexible in that the zero outcomes can be deflated as well as
+inflated.  The probability mass function for the hurdle model is
+defined by 
+%
+\[
+p(y|\theta,\lambda)
+= 
+\begin{cases}
+\ \theta & \mbox{if } y = 0, \mbox{ and}
+\\
+\ (1 - \theta)
+  \
+   \frac{\displaystyle \distro{Poisson}(y | \lambda)}
+        {\displaystyle \vspace*{8pt} 1 - \distro{PoissonCDF}(0 | \lambda)}
+& \mbox{if } y > 0,
+\end{cases}
+\]
+%
+where \distro{PoissonCDF} is the cumulative distribution function for
+the Poisson distribution.  The hurdle model is even more straightforward to
+program in Stan, as it does not require an explicit mixture.  
 %
 \begin{quote}
 \begin{Verbatim}
-   (y[n] == 0) ~ bernoulli(1,theta);
-   if (y[n] > 0)
-     y[n] - 1 ~ poisson(lambda);
+y[n] ~ bernoulli(theta);
+if (y[n] > 0)
+  y[n] ~ poisson(lambda) T[1,];
 \end{Verbatim}
 \end{quote}
 %
-A little algebra shows that this will produce the same posterior as
-the following, which is coded more directly as a mixture.
-%
-\begin{quote}
-\begin{Verbatim}
-    if (y[n] == 0)
-      increment_log_prob(bernoulli_log(1,theta));
-    else
-      increment_log_prob(bernoulli_log(0,theta)
-                         + poisson_log(y[n],lambda));
-\end{Verbatim}
-\end{quote}
-
-
-\subsection{No Zero-Inflated Parameters}
-
-Note that the outcome array \code{y} is declared as data in this
-model.  Zero-inflated parameters, such as one might want to use for
-regression coefficients to carry out variable selection, will not work
-if coded this way in Stan.  The problem is that they introduce a
-discontinuity in the posterior that messes up the ability of
-Stan's gradient-based MCMC and optimization routines to follow
-gradients smoothly.
+The \code{[1,]} after the Poisson indicates that it is truncated below
+at 1; see \refsection{poisson}.  Although the variable 
+\code{y[n]} is being ``sampled'' twice, the effect on the log
+probability fucntion follows the definition (on the log scale).  
 
 
 \chapter{Measurement Error and Meta-Analysis}
@@ -3884,7 +4202,7 @@ directly in a regression model for the per-trial treatment effects
 $\theta_j$.
 
 
-\chapter{Models with Latent Discrete Parameters}
+\chapter{Latent Discrete Parameters}\label{latent-discrete.chapter}
 
 \noindent
 Stan does not support sampling discrete parameters.  So it is not
@@ -3944,8 +4262,25 @@ s & \sim & \distro{Uniform}(1,T)
 D_t & \sim & \distro{Poisson}(t < s \ ? \ e \ : \ l)
 \end{eqnarray*}
 %
-The ternary operator notation is borrowed from C, where the expression
-$(c \ ? \ x_1 \ : \ x_2)$ evalutes to $x_1$ if $c$ is true and $x_2$ otherwise.
+The last line uses the conditional operator (also known as the ternary
+operator), which is borrowed from C and related languages.  The
+conditional operator has the same behavior as the \code{ifelse}
+function in R, but uses a more compact notation involving separating
+its three arguments by a question mark (\code{?})  and colon
+(\code{:}).  The conditional operator is defined by
+%
+\[
+c \ ? \ x_1 \ : \ x_2
+=
+\begin{cases}
+\ x_1 & \mbox{if } c \mbox{ is true (i.e., non-zero), and}
+\\
+\ x_2 & \mbox{if } c \mbox{ is false (i.e., zero).}
+\end{cases}
+\]
+Although Stan itself does not currently support the conditional
+operator, it will in the future.
+
 
 \subsection{Marginalizing out the Discrete Parameter}
 
@@ -6222,8 +6557,10 @@ or in other words,
 Simulation from a Gaussian process logistic regression is
 straightforward; just simulate from a Gaussian process and then
 simulate the $z_n$ from the $y_n$ using the sampling distribution
-above.  This cannot be done directly in Stan because Stan does not (yet)
-support discrete parameters or forward discrete sampling.
+above.  Simulation of the $z_n$ must be done in the generated
+quantities block, where it is possible to draw random variates from
+specified distributions.
+
 
 \subsection{Hyperparameter Estimation and Predictive Inference}
 
@@ -6323,8 +6660,7 @@ defining the covariance matrix in the model block as a local variable.
 
 
 
-\chapter{Reparameterization \& Change of Variables}
-\label{change-of-variables.chapter}
+\chapter{Reparameterization \& Change of Variables}\label{change-of-variables.chapter}
 
 \noindent
 As with BUGS, Stan supports a direct encoding of reparameterizations.
@@ -8743,34 +9079,37 @@ Student-t distributed variable $\beta$,
 \[
 \beta \sim \mbox{\sf Student-t}(\nu, 0, 1),
 \]
-by first generating a gamma-distributed $\tau$,
+by first generating a gamma-distributed precision (inverse variance)
+$\tau$ according to
 \[
 \tau \sim \mbox{\sf Gamma}(\nu/2, \nu/2),
 \]
-and then generating $\beta$ from the normal distribution with
-precision $\tau$, which using our parameterization of the normal in
-terms of scale, is
+and then generating $\beta$ from the normal distribution,
 \[
-\beta \sim \mbox{\sf Normal}(0,\tau^{-2}).
+\beta \sim \mbox{\sf Normal}(0,\tau^{-\frac{1}{2}}).
 \]
 %
-That is, the marginal distribution of $\beta$ when you integrate out
-$\tau$ is $\mbox{\sf Student-t}(\nu, 0, 1)$, i.e.,
+Because $\tau$ is precision, $\tau^{-\frac{1}{2}}$ is the scale
+(standard deviation), which is the parameterization used by Stan.
+
+The marginal distribution of $\beta$ when you integrate out $\tau$ is
+$\mbox{\sf Student-t}(\nu, 0, 1)$, i.e.,
 \[
 \mbox{\sf Student-t}(\beta | \nu,0,1).
 = 
 \int_0^{\infty} 
 \,
-\mbox{\sf Normal}(\beta | 0, 1 / \tau^{2}) 
+\mbox{\sf Normal}(\beta | 0, 1 / \tau^{-\frac{1}{2}})
 \times
 \mbox{\sf Gamma}(\tau | \nu/2, \nu/2)
 \
 d\tau.
 \]
 %
-You can go a step further and instead of defining a $\beta$ drawn from
-a normal with precision $\tau$, define $\alpha$ to be drawn from a
-unit normal,
+
+To go one step further, instead of defining a $\beta$ drawn from a
+normal with precision $\tau$, define $\alpha$ to be drawn from a unit
+normal,
 %
 \[
 \alpha \sim \mbox{\sf Normal}(0,1)
@@ -8779,12 +9118,13 @@ unit normal,
 and rescale by defining
 %
 \[
-\beta = \alpha / \tau^{2}.
+\beta = \alpha \, \tau^{-\frac{1}{2}}.
 \]
 %
+
 Now suppose $\mu = \beta x$ is the product of $\beta$ with a
 regression predictor $x$.  Then the reparameterization $\mu = \alpha
-\tau^{-2} x$ has the same distribution, but in the original, direct
+\tau^{-\frac{1}{2}} x$ has the same distribution, but in the original, direct
 parameterization, $\beta$ has (potentially) heavy tails, whereas in
 the second, neither $\tau$ nor $\alpha$ have heavy tails.
 
@@ -8812,7 +9152,7 @@ parameters {
   ...
 transformed parameters {
   real beta;
-  beta <- alpha / pow(tau,2);
+  beta <- alpha / sqrt(tau);
   ...
 model {
   real half_nu;
@@ -8823,11 +9163,12 @@ model {
 \end{Verbatim}
 \end{quote}  
 %
-In most cases, the lower bound for \code{nu} can be set to \code{1} or
+Although set to \code{0} here, in most cases, the lower bound for the
+degrees of freedom parameter \code{nu} can be set to \code{1} or
 higher; when \code{nu} is 1, the result is a Cauchy distribution with
-very fat tails and as \code{nu} approaches infinity, the distribution
-approaches a normal distribution.   So the model for \code{nu}
-effectively parameterizes the heaviness of the tails of the model.
+very fat tails and as \code{nu} approaches infinity, the Student-t
+distribution approaches a normal distribution.  Thus the parameter
+\code{nu} characterizes the heaviness of the tails of the model.
 
 \subsection{Hierarchical Models}
 

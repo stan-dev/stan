@@ -141,16 +141,10 @@ $p(\theta|y,x)$.
 \section{Sampling}
 
 For continuous parameters, \Stan uses Hamiltonian Monte Carlo (\HMC)
-sampling \citep{Duane:1987, Neal:1994, Neal:2011}, a form of Markov chain Monte
-Carlo (\MCMC) sampling \citep{Metropolis:1953}.  \Stan 1.0 does not do
-discrete sampling.%
-%
-\footnote{Plans are in place to add full discrete sampling in \Stan
-  2.0.  An intermediate step will be to allow forward sampling of
-  discrete variables in the generated quantities block for predictive
-  modeling and model checking.}
-%
-\refchapter{mixture-modeling} discusses how finite discrete parameters
+sampling \citep{Duane:1987, Neal:1994, Neal:2011}, a form of Markov
+chain Monte Carlo (\MCMC) sampling \citep{Metropolis:1953}.  \Stan 1.0
+does not do discrete sampling. \refchapter{mixture-modeling} and
+\refchapter{latent-discrete} discuss how finite discrete parameters
 can be summed out of models.
 
 \HMC accelerates both convergence to the stationary distribution and
