@@ -185,6 +185,9 @@ TEST(StanMathOde_integrate_ode, error_conditions_nan) {
   ASSERT_NO_THROW(integrate_ode(harm_osc, y0, t0, ts, theta, x, x_int, 0));
   
   double nan = std::numeric_limits<double>::quiet_NaN();
+  std::stringstream expected_is_nan;
+  expected_is_nan << "is " << nan;
+  
   std::vector<double> y0_bad = y0;
   y0_bad[0] = nan;
   EXPECT_THROW_MSG(integrate_ode(harm_osc, y0_bad, t0, ts, theta, x, x_int, 0),
@@ -192,7 +195,7 @@ TEST(StanMathOde_integrate_ode, error_conditions_nan) {
                    "initial state");
   EXPECT_THROW_MSG(integrate_ode(harm_osc, y0_bad, t0, ts, theta, x, x_int, 0),
                    std::domain_error,
-                   "is nan");
+                   expected_is_nan.str());
   
   double t0_bad = nan;
   EXPECT_THROW_MSG(integrate_ode(harm_osc, y0, t0_bad, ts, theta, x, x_int, 0),
@@ -200,7 +203,7 @@ TEST(StanMathOde_integrate_ode, error_conditions_nan) {
                    "initial time");
   EXPECT_THROW_MSG(integrate_ode(harm_osc, y0, t0_bad, ts, theta, x, x_int, 0),
                    std::domain_error,
-                   "is nan");
+                   expected_is_nan.str());
 
   std::vector<double> ts_bad = ts;
   ts_bad[0] = nan;
@@ -209,7 +212,7 @@ TEST(StanMathOde_integrate_ode, error_conditions_nan) {
                    "times");
   EXPECT_THROW_MSG(integrate_ode(harm_osc, y0, t0, ts_bad, theta, x, x_int, 0),
                    std::domain_error,
-                   "is nan");
+                   expected_is_nan.str());
   
   std::vector<double> theta_bad = theta;
   theta_bad[0] = nan;
@@ -218,7 +221,7 @@ TEST(StanMathOde_integrate_ode, error_conditions_nan) {
                    "parameter vector");
   EXPECT_THROW_MSG(integrate_ode(harm_osc, y0, t0, ts, theta_bad, x, x_int, 0),
                    std::domain_error,
-                   "is nan");
+                   expected_is_nan.str());
   
   if (x.size() > 0) {
     std::vector<double> x_bad = x;
@@ -228,7 +231,7 @@ TEST(StanMathOde_integrate_ode, error_conditions_nan) {
                      "continuous data");
     EXPECT_THROW_MSG(integrate_ode(harm_osc, y0, t0, ts, theta, x_bad, x_int, 0),
                      std::domain_error,
-                     "is nan");
+                     expected_is_nan.str());
   }
 }
 

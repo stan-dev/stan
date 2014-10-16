@@ -334,6 +334,8 @@ void test_ode_error_conditions_nan(F& f,
   using stan::math::integrate_ode;
   std::stringstream msgs;
   double nan = std::numeric_limits<double>::quiet_NaN();
+  std::stringstream expected_is_nan;
+  expected_is_nan << "is " << nan;
   
   ASSERT_NO_THROW(integrate_ode(f, y0, t0, ts, theta, x, x_int, 0));
   ASSERT_EQ("", msgs.str());
@@ -346,7 +348,7 @@ void test_ode_error_conditions_nan(F& f,
                    "initial state");
   EXPECT_THROW_MSG(integrate_ode(f, y0_bad, t0, ts, theta, x, x_int, &msgs),
                    std::domain_error,
-                   "is nan");
+                   expected_is_nan.str());
   EXPECT_EQ("", msgs.str());
   
   msgs.clear();
@@ -356,7 +358,7 @@ void test_ode_error_conditions_nan(F& f,
                    "initial time");
   EXPECT_THROW_MSG(integrate_ode(f, y0, t0_bad, ts, theta, x, x_int, &msgs),
                    std::domain_error,
-                   "is nan");
+                   expected_is_nan.str());
   EXPECT_EQ("", msgs.str());
 
   msgs.clear();
@@ -367,7 +369,7 @@ void test_ode_error_conditions_nan(F& f,
                    "times");
   EXPECT_THROW_MSG(integrate_ode(f, y0, t0, ts_bad, theta, x, x_int, &msgs),
                    std::domain_error,
-                   "is nan");
+                   expected_is_nan.str());
   EXPECT_EQ("", msgs.str());
 
   msgs.clear();
@@ -378,7 +380,7 @@ void test_ode_error_conditions_nan(F& f,
                    "parameter vector");
   EXPECT_THROW_MSG(integrate_ode(f, y0, t0, ts, theta_bad, x, x_int, &msgs),
                    std::domain_error,
-                   "is nan");
+                   expected_is_nan.str());
   EXPECT_EQ("", msgs.str());
 
   if (x.size() > 0) {
@@ -390,7 +392,7 @@ void test_ode_error_conditions_nan(F& f,
                      "continuous data");
     EXPECT_THROW_MSG(integrate_ode(f, y0, t0, ts, theta, x_bad, x_int, &msgs),
                      std::domain_error,
-                     "is nan");
+                     expected_is_nan.str());
     EXPECT_EQ("", msgs.str());
   }
 }
