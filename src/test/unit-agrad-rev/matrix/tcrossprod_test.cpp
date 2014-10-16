@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/matrix/tcrossprod.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/agrad/util.hpp>
-#include <stan/agrad/rev/jacobian.hpp>
+#include <test/unit-agrad-rev/jacobian.hpp>
 #include <stan/agrad/rev.hpp>
 
 void test_tcrossprod(const stan::agrad::matrix_v& L) {

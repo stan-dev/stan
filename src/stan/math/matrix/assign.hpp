@@ -5,8 +5,6 @@
 #include <sstream>
 #include <stdexcept>
 
-// #include <boost/utility/enable_if.hpp>
-
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
 #include <stan/math/error_handling/matrix/check_matching_dims.hpp>

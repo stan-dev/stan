@@ -1,6 +1,9 @@
 #ifndef STAN__AGRAD__REV__JACOBIAN_HPP
 #define STAN__AGRAD__REV__JACOBIAN_HPP
 
+// ********* here because it's only used for testing **********
+// ********* superseded by version in autodiff.hpp for API ****
+
 #include <vector>
 #include <stan/agrad/rev/var.hpp>
 

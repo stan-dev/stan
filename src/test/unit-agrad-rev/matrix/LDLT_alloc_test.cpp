@@ -11,13 +11,18 @@ TEST(AgradRevMatrix, LDLT_alloc_default_constructor) {
   EXPECT_NO_THROW(alloc->log_abs_det());
   EXPECT_NO_THROW(alloc->_ldlt.info());
 #else
-    // Note: If -DEIGEN_NO_DEBUG is not included in the compilation flags
-    //       asserts will force these calls to die instead of the above
-    //       behavior
-    EXPECT_DEATH(alloc->log_abs_det(),
-                 "m_isInitialized && \"LDLT is not initialized.\"");
-    EXPECT_DEATH(alloc->_ldlt.info(), 
-                 "m_isInitialized && \"LDLT is not initialized.\"");
+  // Note: If -DEIGEN_NO_DEBUG is not included in the compilation flags
+  //       asserts will force these calls to die instead of the above
+  //       behavior
+
+#ifndef _WIN32
+  // Google test under Windows is having trouble with these tests.
+  EXPECT_DEATH(alloc->log_abs_det(),
+               "m_isInitialized && \"LDLT is not initialized.\"");
+  EXPECT_DEATH(alloc->_ldlt.info(), 
+               "m_isInitialized && \"LDLT is not initialized.\"");
+#endif
+
 #endif
 }
 

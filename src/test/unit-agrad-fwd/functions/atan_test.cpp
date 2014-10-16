@@ -4,7 +4,14 @@
 #include <test/unit/agrad/util.hpp>
 #include <test/unit-agrad-fwd/nan_util.hpp>
 
-TEST(AgradFwdAtan,Fvar) {
+class AgradFwdAtan : public testing::Test {
+  void SetUp() {
+    stan::agrad::recover_memory();
+  }
+};
+
+
+TEST_F(AgradFwdAtan,Fvar) {
   using stan::agrad::fvar;
   using std::atan;
 
@@ -27,7 +34,7 @@ TEST(AgradFwdAtan,Fvar) {
   EXPECT_FLOAT_EQ(-3 / (1 + 0.5 * 0.5) + 5, d.d_);
 }
 
-TEST(AgradFwdAtan,FvarVar_1stDeriv) {
+TEST_F(AgradFwdAtan,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan;
@@ -44,7 +51,7 @@ TEST(AgradFwdAtan,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.0 / (1.0 + 1.5 * 1.5), g[0]);
 }
 
-TEST(AgradFwdAtan,FvarVar_2ndDeriv) {
+TEST_F(AgradFwdAtan,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan;
@@ -61,7 +68,7 @@ TEST(AgradFwdAtan,FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(1.3 * -0.28402368, g[0]);
 }
 
-TEST(AgradFwdAtan,FvarFvarDouble) {
+TEST_F(AgradFwdAtan,FvarFvarDouble) {
   using stan::agrad::fvar;
   using std::atan;
 
@@ -87,7 +94,7 @@ TEST(AgradFwdAtan,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
 
-TEST(AgradFwdAtan,FvarFvarVar_1stDeriv) {
+TEST_F(AgradFwdAtan,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan;
@@ -106,6 +113,8 @@ TEST(AgradFwdAtan,FvarFvarVar_1stDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.val_.grad(p,g);
+
+  stan::agrad::recover_memory();
   EXPECT_FLOAT_EQ(1.0 / (1.0 + 1.5 * 1.5), g[0]);
 
   fvar<fvar<var> > y;
@@ -124,7 +133,7 @@ TEST(AgradFwdAtan,FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.0 / (1.0 + 1.5 * 1.5), r[0]);
 }
 
-TEST(AgradFwdAtan,FvarFvarVar_2ndDeriv) {
+TEST_F(AgradFwdAtan,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan;
@@ -151,7 +160,7 @@ TEST(AgradFwdAtan,FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(2.0 * -0.28402368, r[0]);
 }
-TEST(AgradFwdAtan,FvarFvarVar_3rdDeriv) {
+TEST_F(AgradFwdAtan,FvarFvarVar_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan;
@@ -177,7 +186,7 @@ struct atan_fun {
   }
 };
 
-TEST(AgradFwdAtan,atan_NaN) {
+TEST_F(AgradFwdAtan,atan_NaN) {
   atan_fun atan_;
   test_nan(atan_,false);
 }

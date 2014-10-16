@@ -43,6 +43,8 @@
 #include <stan/agrad/rev/functions/inv_logit.hpp>
 #include <stan/agrad/rev/functions/inv_sqrt.hpp>
 #include <stan/agrad/rev/functions/inv_square.hpp>
+#include <stan/agrad/rev/functions/is_inf.hpp>
+#include <stan/agrad/rev/functions/is_nan.hpp>
 #include <stan/agrad/rev/functions/is_uninitialized.hpp>
 #include <stan/agrad/rev/functions/lgamma.hpp>
 #include <stan/agrad/rev/functions/lmgamma.hpp>
@@ -62,6 +64,7 @@
 #include <stan/agrad/rev/functions/multiply_log.hpp>
 #include <stan/agrad/rev/functions/owens_t.hpp>
 #include <stan/agrad/rev/functions/pow.hpp>
+#include <stan/agrad/rev/functions/primitive_value.hpp>
 #include <stan/agrad/rev/functions/rising_factorial.hpp>
 #include <stan/agrad/rev/functions/round.hpp>
 #include <stan/agrad/rev/functions/sin.hpp>
