@@ -2,12 +2,15 @@
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SYMMETRIC_HPP
 
 #include <sstream>
-#include <stan/math/matrix/Eigen.hpp>
+
 #include <stan/math/error_handling/dom_err.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
+
   namespace math {
 
     /**
@@ -24,13 +27,15 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T_y, typename T_result>
-    inline bool check_symmetric(const char* function,
-                                const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                const char* name,
-                                T_result* result) {
-      typedef 
-        typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type 
-        size_type;
+    inline bool 
+    check_symmetric(const char* function,
+                    const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                    const char* name,
+                    T_result* result) {
+      using Eigen::Dynamic;
+      using Eigen::Matrix;
+      typedef typename index_type<Matrix<T_y,Dynamic,Dynamic> >::type size_type;
+
       size_type k = y.rows();
       if (k == 1)
         return true;

@@ -1,4 +1,5 @@
 #include <stan/math/error_handling/check_positive.hpp>
+#include <stan/math/matrix/meta/value_type.hpp>  
 #include <gtest/gtest.h>
 
 TEST(MathErrorHandling,CheckPositive_nan) {
