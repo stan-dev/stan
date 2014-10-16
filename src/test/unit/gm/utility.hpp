@@ -19,7 +19,7 @@
 #include <stan/gm/grammars/expression_grammar.hpp>
 #include <stan/gm/grammars/statement_grammar.hpp>
 #include <stan/gm/grammars/var_decls_grammar.hpp>
-
+#include <test/unit/util.hpp>
 
 /** extract model name from filepath name
  * @param file_name  Name off model file
@@ -126,6 +126,31 @@ void test_warning(const std::string& model_name, const std::string& warning_msg)
   std::stringstream msgs;
   EXPECT_TRUE(is_parsable_folder(model_name, "syntax-only", &msgs));
   EXPECT_TRUE(msgs.str().find_first_of(warning_msg) != std::string::npos);
+}
+
+std::string model_to_cpp(const std::string& model_text) {
+  std::string model_name = "foo";
+  std::string file_name = "dummy";
+  std::stringstream ss(model_text);
+  std::stringstream msgs;
+  stan::gm::program prog;
+  bool parsable = stan::gm::parse(&msgs, ss, file_name, model_name, prog);
+  EXPECT_TRUE(parsable);
+
+  std::stringstream output;
+  stan::gm::generate_cpp(prog, model_name, output);
+  return output.str();
+}
+
+
+void expect_matches(int n,
+                    const std::string& stan_code,
+                    const std::string& target,
+                    bool print_model = false) {
+  std::string model_cpp = model_to_cpp(stan_code);
+  if (print_model)
+    std::cout << model_cpp << std::endl;
+  EXPECT_EQ(n, count_matches(target,model_cpp));
 }
 
 #endif

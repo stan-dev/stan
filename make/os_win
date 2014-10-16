@@ -34,7 +34,3 @@ endif
 ifeq (clang++,$(CC_TYPE))
 endif
 
-## adding target that maps targets without extensions
-## to targets with .exe at the end.
-%: %.exe %.stan
-	@# this is an intentional blank line

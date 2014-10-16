@@ -5,7 +5,14 @@
 #include <test/unit/agrad/util.hpp>
 #include <test/unit-agrad-fwd/nan_util.hpp>
 
-TEST(AgradFwdLogit,Fvar) {
+class AgradFwdLogit : public testing::Test {
+  void SetUp() {
+    stan::agrad::recover_memory();
+  }
+};
+
+
+TEST_F(AgradFwdLogit,Fvar) {
   using stan::agrad::fvar;
   using stan::math::logit;
   using std::isnan;
@@ -29,7 +36,7 @@ TEST(AgradFwdLogit,Fvar) {
   isnan(c.d_);
 }
 
-TEST(AgradFwdLogit,FvarVar_1stDeriv) {
+TEST_F(AgradFwdLogit,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::logit;
@@ -45,7 +52,7 @@ TEST(AgradFwdLogit,FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(1 / (0.5 - 0.25), g[0]);
 }
-TEST(AgradFwdLogit,FvarVar_2ndDeriv) {
+TEST_F(AgradFwdLogit,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::logit;
@@ -58,7 +65,7 @@ TEST(AgradFwdLogit,FvarVar_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(0, g[0]);
 }
-TEST(AgradFwdLogit,FvarFvarDouble) {
+TEST_F(AgradFwdLogit,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::logit;
 
@@ -83,7 +90,7 @@ TEST(AgradFwdLogit,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(1 / (0.5 - 0.25), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-TEST(AgradFwdLogit,FvarFvarVar_1stDeriv) {
+TEST_F(AgradFwdLogit,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::logit;
@@ -102,6 +109,7 @@ TEST(AgradFwdLogit,FvarFvarVar_1stDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.val_.grad(p,g);
+  stan::agrad::recover_memory();
   EXPECT_FLOAT_EQ(1 / (0.5 - 0.25), g[0]);
 
   fvar<fvar<var> > y;
@@ -119,7 +127,7 @@ TEST(AgradFwdLogit,FvarFvarVar_1stDeriv) {
   b.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(1 / (0.5 - 0.25), r[0]);
 }
-TEST(AgradFwdLogit,FvarFvarVar_2ndDeriv) {
+TEST_F(AgradFwdLogit,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::logit;
@@ -133,6 +141,7 @@ TEST(AgradFwdLogit,FvarFvarVar_2ndDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.d_.grad(p,g);
+  stan::agrad::recover_memory();
   EXPECT_FLOAT_EQ(0, g[0]);
 
   fvar<fvar<var> > y;
@@ -146,7 +155,7 @@ TEST(AgradFwdLogit,FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(0, r[0]);
 }
-TEST(AgradFwdLogit,FvarFvarVar_3rdDeriv) {
+TEST_F(AgradFwdLogit,FvarFvarVar_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -171,7 +180,7 @@ struct logit_fun {
   }
 };
 
-TEST(AgradFwdLogit,logit_NaN) {
+TEST_F(AgradFwdLogit,logit_NaN) {
   logit_fun logit_;
   test_nan(logit_,false);
 }

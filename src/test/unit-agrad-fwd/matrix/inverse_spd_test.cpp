@@ -14,7 +14,15 @@
 
 using stan::agrad::var;
 
-TEST(AgradFwdMatrixInverseSPD, exception_fd) {
+class AgradFwdMatrixInverseSPD : public testing::Test {
+  void SetUp() {
+    stan::agrad::recover_memory();
+  }
+};
+
+
+
+TEST_F(AgradFwdMatrixInverseSPD, exception_fd) {
   using stan::math::inverse_spd;
 
   stan::agrad::matrix_fd m1(2,3);
@@ -36,7 +44,7 @@ TEST(AgradFwdMatrixInverseSPD, exception_fd) {
   EXPECT_THROW(inverse_spd(m1),std::domain_error);
 }
 
-TEST(AgradFwdMatrixInverseSPD, exception_ffd) {
+TEST_F(AgradFwdMatrixInverseSPD, exception_ffd) {
   using stan::math::inverse_spd;
 
   stan::agrad::matrix_ffd m1(2,3);
@@ -57,7 +65,7 @@ TEST(AgradFwdMatrixInverseSPD, exception_ffd) {
         3, 5, 6;
   EXPECT_THROW(inverse_spd(m1),std::domain_error);
 }
-TEST(AgradFwdMatrixInverseSPD, exception_fv) {
+TEST_F(AgradFwdMatrixInverseSPD, exception_fv) {
   using stan::math::inverse_spd;
 
   stan::agrad::matrix_fv m1(2,3);
@@ -78,7 +86,7 @@ TEST(AgradFwdMatrixInverseSPD, exception_fv) {
         3, 5, 6;
   EXPECT_THROW(inverse_spd(m1),std::domain_error);
 }
-TEST(AgradFwdMatrixInverseSPD, exception_ffv) {
+TEST_F(AgradFwdMatrixInverseSPD, exception_ffv) {
   using stan::math::inverse_spd;
 
   stan::agrad::matrix_ffv m1(2,3);
@@ -100,7 +108,7 @@ TEST(AgradFwdMatrixInverseSPD, exception_ffv) {
   EXPECT_THROW(inverse_spd(m1),std::domain_error);
 }
 
-TEST(AgradFwdMatrixInverseSPD, matrix_fd) {
+TEST_F(AgradFwdMatrixInverseSPD, matrix_fd) {
   using stan::math::inverse_spd;
 
   stan::agrad::matrix_fd m1(3,3);
@@ -128,7 +136,7 @@ TEST(AgradFwdMatrixInverseSPD, matrix_fd) {
   }
 }
 
-TEST(AgradFwdMatrixInverseSPD, matrix_ffd) {
+TEST_F(AgradFwdMatrixInverseSPD, matrix_ffd) {
   using stan::math::inverse_spd;
 
   stan::agrad::matrix_ffd m1(3,3);
@@ -156,7 +164,7 @@ TEST(AgradFwdMatrixInverseSPD, matrix_ffd) {
   }
 }
 
-TEST(AgradFwdMatrixInverseSPD, matrix_fv_1st_deriv) {
+TEST_F(AgradFwdMatrixInverseSPD, matrix_fv_1st_deriv) {
   using stan::math::inverse_spd;
 
   stan::agrad::matrix_fv m1(3,3);
@@ -199,14 +207,16 @@ TEST(AgradFwdMatrixInverseSPD, matrix_fv_1st_deriv) {
       VEC h1;
       VEC h2;
       m2(i,j).val_.grad(z1,h1);
+      stan::agrad::recover_memory();
       m3(i,j).val_.grad(z1,h2);
+      stan::agrad::recover_memory();
       for (int k = 0; k < 9; k++)
         EXPECT_FLOAT_EQ(h1[k], h2[k]);
     }
   }
 }
 
-TEST(AgradFwdMatrixInverseSPD, matrix_fv_2nd_deriv) {
+TEST_F(AgradFwdMatrixInverseSPD, matrix_fv_2nd_deriv) {
   using stan::math::inverse_spd;
 
   stan::agrad::matrix_fv m1(3,3);
@@ -249,14 +259,16 @@ TEST(AgradFwdMatrixInverseSPD, matrix_fv_2nd_deriv) {
       VEC h1;
       VEC h2;
       m2(i,j).d_.grad(z1,h1);
+      stan::agrad::recover_memory();
       m3(i,j).d_.grad(z1,h2);
+      stan::agrad::recover_memory();
       for (int k = 0; k < 9; k++)
         EXPECT_FLOAT_EQ(h1[k], h2[k]);
     }
   }
 }
 
-TEST(AgradFwdMatrixInverseSPD, matrix_ffv_1st_deriv) {
+TEST_F(AgradFwdMatrixInverseSPD, matrix_ffv_1st_deriv) {
   using stan::math::inverse_spd;
 
   stan::agrad::matrix_ffv m1(3,3);
@@ -299,14 +311,16 @@ TEST(AgradFwdMatrixInverseSPD, matrix_ffv_1st_deriv) {
       VEC h1;
       VEC h2;
       m2(i,j).val_.val_.grad(z1,h1);
+      stan::agrad::recover_memory();
       m3(i,j).val_.val_.grad(z1,h2);
+      stan::agrad::recover_memory();
       for (int k = 0; k < 9; k++)
         EXPECT_FLOAT_EQ(h1[k], h2[k]);
     }
   }
 }
 
-TEST(AgradFwdMatrixInverseSPD, matrix_ffv_2nd_deriv) {
+TEST_F(AgradFwdMatrixInverseSPD, matrix_ffv_2nd_deriv) {
   using stan::math::inverse_spd;
 
   stan::agrad::matrix_ffv m1(3,3);
@@ -349,14 +363,16 @@ TEST(AgradFwdMatrixInverseSPD, matrix_ffv_2nd_deriv) {
       VEC h1;
       VEC h2;
       m2(i,j).d_.val_.grad(z1,h1);
+      stan::agrad::recover_memory();
       m3(i,j).d_.val_.grad(z1,h2);
+      stan::agrad::recover_memory();
       for (int k = 0; k < 9; k++)
         EXPECT_FLOAT_EQ(h1[k], h2[k]);
     }
   }
 }
 
-TEST(AgradFwdMatrixInverseSPD, matrix_ffv_3rd_deriv) {
+TEST_F(AgradFwdMatrixInverseSPD, matrix_ffv_3rd_deriv) {
   using stan::math::inverse_spd;
 
   stan::agrad::matrix_ffv m1(3,3);
@@ -408,7 +424,9 @@ TEST(AgradFwdMatrixInverseSPD, matrix_ffv_3rd_deriv) {
       VEC h1;
       VEC h2;
       m2(i,j).d_.d_.grad(z1,h1);
+      stan::agrad::recover_memory();
       m3(i,j).d_.d_.grad(z1,h2);
+      stan::agrad::recover_memory();
       for (int k = 0; k < 9; k++)
         EXPECT_FLOAT_EQ(h1[k], h2[k]);
     }

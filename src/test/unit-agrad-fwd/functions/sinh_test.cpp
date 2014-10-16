@@ -4,7 +4,15 @@
 #include <test/unit/agrad/util.hpp>
 #include <test/unit-agrad-fwd/nan_util.hpp>
 
-TEST(AgradFwdSinh, Fvar) {
+class AgradFwdSinh : public testing::Test {
+  void SetUp() {
+    stan::agrad::recover_memory();
+  }
+};
+
+
+
+TEST_F(AgradFwdSinh, Fvar) {
   using stan::agrad::fvar;
   using std::sinh;
   using std::cosh;
@@ -26,7 +34,7 @@ TEST(AgradFwdSinh, Fvar) {
   EXPECT_FLOAT_EQ(-cosh(-0.5), c.d_);
 }
 
-TEST(AgradFwdSinh, FvarVar_1stDeriv) {
+TEST_F(AgradFwdSinh, FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::sinh;
@@ -43,7 +51,7 @@ TEST(AgradFwdSinh, FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(cosh(1.5), g[0]);
 }
-TEST(AgradFwdSinh, FvarVar_2ndDeriv) {
+TEST_F(AgradFwdSinh, FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::sinh;
@@ -58,7 +66,7 @@ TEST(AgradFwdSinh, FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(1.3 * sinh(1.5), g[0]);
 }
 
-TEST(AgradFwdSinh, FvarFvarDouble) {
+TEST_F(AgradFwdSinh, FvarFvarDouble) {
   using stan::agrad::fvar;
   using std::sinh;
   using std::cosh;
@@ -84,7 +92,7 @@ TEST(AgradFwdSinh, FvarFvarDouble) {
   EXPECT_FLOAT_EQ(2.0 * cosh(1.5), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-TEST(AgradFwdSinh, FvarFvarVar_1stDeriv) {
+TEST_F(AgradFwdSinh, FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::sinh;
@@ -104,6 +112,7 @@ TEST(AgradFwdSinh, FvarFvarVar_1stDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.val_.grad(p,g);
+  stan::agrad::recover_memory();
   EXPECT_FLOAT_EQ(cosh(1.5), g[0]);
 
   fvar<fvar<var> > y;
@@ -121,7 +130,7 @@ TEST(AgradFwdSinh, FvarFvarVar_1stDeriv) {
   b.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(cosh(1.5), r[0]);
 }
-TEST(AgradFwdSinh, FvarFvarVar_2ndDeriv) {
+TEST_F(AgradFwdSinh, FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::sinh;
@@ -136,6 +145,7 @@ TEST(AgradFwdSinh, FvarFvarVar_2ndDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.d_.grad(p,g);
+  stan::agrad::recover_memory();
   EXPECT_FLOAT_EQ(2.0 * sinh(1.5), g[0]);
 
   fvar<fvar<var> > y;
@@ -149,7 +159,7 @@ TEST(AgradFwdSinh, FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(2.0 * sinh(1.5), r[0]);
 }
-TEST(AgradFwdSinh, FvarFvarVar_3rdDeriv) {
+TEST_F(AgradFwdSinh, FvarFvarVar_3rdDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::sinh;
@@ -176,7 +186,7 @@ struct sinh_fun {
   }
 };
 
-TEST(AgradFwdSinh,sinh_NaN) {
+TEST_F(AgradFwdSinh,sinh_NaN) {
   sinh_fun sinh_;
   test_nan(sinh_,false);
 }

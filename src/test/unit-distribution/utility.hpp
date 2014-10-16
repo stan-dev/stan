@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stan/agrad/rev/matrix.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
 
 using std::vector;
 using stan::agrad::var;
@@ -10,7 +11,7 @@ using stan::is_vector;
 using stan::is_constant_struct;
 using stan::scalar_type;
 
-typedef Eigen::Matrix<double,1,1>::size_type size_type;
+typedef stan::math::index_type<Eigen::Matrix<double,1,1> >::type size_type;
 
 //------------------------------------------------------------
 
