@@ -1014,7 +1014,7 @@ namespace stan {
       void operator()(double_var_decl const& x) const {
         std::vector<expression> ctor_args;
         declare_array(is_fun_return_ 
-                      ? "return_t__"
+                      ? "fun_scalar_t__"
                       : ( is_var_ ? "T__" : "double" ),
                       ctor_args,x.name_,x.dims_);
       }
@@ -1022,7 +1022,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.M_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1030,7 +1030,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,1,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,1,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,1,Eigen::Dynamic> "
                           : "row_vector_d" ),
@@ -1041,7 +1041,7 @@ namespace stan {
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
                           : "matrix_d" ), 
@@ -1051,7 +1051,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1059,7 +1059,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1067,7 +1067,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1075,7 +1075,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1084,7 +1084,7 @@ namespace stan {
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " 
                           : "matrix_d" ), 
@@ -1104,7 +1104,7 @@ namespace stan {
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
                           : "matrix_d" ),
@@ -1115,7 +1115,7 @@ namespace stan {
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " 
                           : "matrix_d" ), 
@@ -1687,7 +1687,7 @@ namespace stan {
         o_ << "return ";
         if (!rs.return_value_.expression_type().is_ill_formed()
             && !rs.return_value_.expression_type().is_void()) {
-          o_ << "stan::math::promote_scalar<return_t__>(";
+          o_ << "stan::math::promote_scalar<fun_return_scalar_t__>(";
           generate_expression(rs.return_value_, o_);
           o_ << ")";
         }
@@ -4306,8 +4306,8 @@ namespace stan {
       return true;
     }
 
-    std::string return_scalar_type(const function_decl_def& fun,
-                                   bool is_lp) {
+    std::string fun_scalar_type(const function_decl_def& fun,
+                                bool is_lp) {
       size_t num_args = fun.arg_decls_.size();
       // nullary, non-lp
       if (has_only_int_args(fun) && !is_lp)
@@ -4480,7 +4480,13 @@ namespace stan {
       } 
       out << " {" << EOL;
       out << INDENT
-          << "typedef " << scalar_t_name << " return_t__;"
+          << "typedef " << scalar_t_name << " fun_scalar_t__;"
+          << EOL;
+      out << INDENT
+          << "typedef " 
+          << ((fun.return_type_.base_type_ == INT_T) 
+              ? "int" : "fun_scalar_t__")
+          << " fun_return_scalar_t__;"
           << EOL;
       out << INDENT
           << "const static bool propto__ = true;"
@@ -4541,7 +4547,7 @@ namespace stan {
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_log = ends_with("_log", fun.name_);
       std::string scalar_t_name 
-        = return_scalar_type(fun, is_lp);
+        = fun_scalar_type(fun, is_lp);
 
       generate_function_template_parameters(fun,is_rng,is_lp,is_log,out);
       generate_function_inline_return_type(fun,scalar_t_name,out);
@@ -4557,11 +4563,14 @@ namespace stan {
 
     void generate_function_functor(const function_decl_def& fun,
                                    std::ostream& out) {
+      if (fun.body_.is_no_op_statement())
+        return; // forward declaration, so no functor needed
+
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_log = ends_with("_log", fun.name_);
       std::string scalar_t_name 
-        = return_scalar_type(fun, is_lp);
+        = fun_scalar_type(fun, is_lp);
 
       out << std::endl
           << "struct ";
@@ -4569,26 +4578,23 @@ namespace stan {
       out << "_functor__ {"
           << std::endl;
 
-      out << INDENT;
       generate_function_template_parameters(fun,is_rng,is_lp,is_log,out);
 
-      out << INDENT;
       generate_function_inline_return_type(fun,scalar_t_name,out);
 
-      out << INDENT << "operator()";
+      out <<  "operator()";
       generate_function_arguments(fun,is_rng,is_lp,is_log,out);
       out << " const {"
           << std::endl;
 
-      out << INDENT2
+      out << INDENT
           << "return ";
       generate_function_name(fun,out);
       generate_functor_arguments(fun,is_rng,is_lp,is_log,out);
       out << ";"
           << std::endl;
 
-      out << INDENT
-          << "}"
+      out << "}"
           << std::endl;
 
       out << "};"
