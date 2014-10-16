@@ -151,7 +151,7 @@ docs: manual doxygen
 # Clean up.
 ##
 MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
-.PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
+.PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all clean-deps
 clean:
 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o) $(MODEL_SPECS:%.stan=%.d))
@@ -163,7 +163,8 @@ clean-manual:
 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 clean-deps:
-	$(RM) $(shell find . -type f -name '*.d')
+	@echo '  removing dependency files'
+	$(shell find . -type f -name '*.d' -exec rm {} +)
 
 clean-all: clean clean-manual clean-deps
 	$(RM) -r test/* bin
