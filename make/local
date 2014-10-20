@@ -3,3 +3,5 @@
 # CFLAGS += -march=native
 ##
 
+CC=clang++
+O=0

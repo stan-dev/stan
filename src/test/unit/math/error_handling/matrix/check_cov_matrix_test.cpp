@@ -26,6 +26,8 @@ TEST(MathErrorHandlingMatrix, checkCovMatrix_nan) {
                                            y, "y", &result));
   
   for (int i = 0; i < y.size(); i++) {
+    y.resize(3,3);
+    y << 2, -1, 0, -1, 2, -1, 0, -1, 2;
     y(i) = nan;
     EXPECT_THROW(stan::math::check_cov_matrix("checkCovMatrix(%1%)", y, "y", &result), 
                  std::domain_error);
