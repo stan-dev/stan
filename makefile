@@ -25,7 +25,7 @@ C++11 = false
 ##
 # Library locations
 ##
-EIGEN ?= lib/eigen_3.2.0
+EIGEN ?= lib/eigen_3.2.2
 BOOST ?= lib/boost_1.54.0
 GTEST ?= lib/gtest_1.7.0
 
