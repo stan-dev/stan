@@ -38,7 +38,9 @@ Enhancements
 * worked around unused function warnings from gcc (#796)
 * fixed error messages in vector to array conversion (#579, thanks
   Kevin S. Van Horn)
-* fixed gp-fit.stan example to be as efficient as manual version (#782)
+* fixed gp-fit.stan example to be as efficient as manual 
+  version (#782)
+* update to Eigen version 3.2.2 (#1087)
 
 Builds
 ----------------------------------------
