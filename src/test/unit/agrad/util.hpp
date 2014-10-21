@@ -1,6 +1,6 @@
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
-#include <test/unit-agrad-rev/jacobian.hpp>
+#include <test/unit/agrad/rev/jacobian.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 
 typedef stan::agrad::var AVAR;
