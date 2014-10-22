@@ -43,6 +43,9 @@ Scripts can be written for the shell, R, or Python.  Whatever language
 a script is in, it should be self contained and not depend on global
 variables having been set, other data being read in, etc.  
 
+See \refchapter{reproducibility} for complete information on
+reproducibility in Stan and its interfaces.
+
 \subsection{Scripts are Good Documentation}
 
 It may seem like overkill if running the project is only a single line
@@ -669,8 +672,7 @@ Only arrays in Stan are allowed to store integer values.
 
 \noindent
 \Stan supports regression models from simple linear regressions to
-multilevel generalized linear models.  Coding regression models in
-\Stan is very much like coding them in \BUGS.
+multilevel generalized linear models.  
 
 \section{Linear Regression}
 
@@ -680,18 +682,18 @@ distributed noise.  This model can be written using standard
 regression notation as
 %
 \[
-Y_n = \alpha + \beta x_n + \epsilon_n
+y_n = \alpha + \beta x_n + \epsilon_n
 \ \ \ \mbox{where} \ \ \ 
 \epsilon_n \sim \distro{Normal}(0,\sigma).
 \]
 This is equivalent to the following sampling involving the
 residual,
 \[
-Y_n - (\alpha + \beta X_n) \sim \distro{Normal}(0,\sigma),
+y_n - (\alpha + \beta X_n) \sim \distro{Normal}(0,\sigma),
 \]
 and reducing still further, to
 \[
-Y_n \sim \distro{Normal}(\alpha + \beta X_n, \, \sigma).
+y_n \sim \distro{Normal}(\alpha + \beta X_n, \, \sigma).
 \]
 %
 This latter form of the model is coded in \Stan as follows.
@@ -768,7 +770,7 @@ data {
 parameters {
   real alpha;           // intercept
   vector[K] beta;       // coefficients for predictors
-  real<lower=0,upper=10> sigma;  // error scale
+  real<lower=0> sigma;  // error scale
 }
 model {
   y ~ normal(x * beta, sigma);  // likelihood
@@ -776,13 +778,28 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-The constraint on \code{sigma} gives it a uniform prior on $(0,10)$.
-The sampling statement in the model above is equivalent to
+The constraint \code{lower=0} in the declaration of \code{sigma}
+constrains the value to be greater than or equal to 0.  With no prior
+in the model block, the effect is an improper prior on non-negative
+real numbers.  Althogh a more informative prior may be added, improper
+priors are acceptable as long as they lead to proper posteriors.
+
+In the model above, \code{x} is an $N \times K$ matrix of predictors
+and \code{beta} a $K$-vector of coefficients, so \code{x * beta} is an
+$N$-vector of predictions, one for each of the $N$ data items.  These
+predictions line up with the outcomes in the $N$-vector \code{y}, so
+the entire model may be written using matrix arithmetic as shown.
+
+The sampling statement in the model above is just a more efficient,
+vector-based approach to coding the model with a loop, as in the
+following statistically equivalent model.
 %
 \begin{quote}
 \begin{Verbatim}
+model {
   for (n in 1:N)
-    y ~ normal(x[n] * beta, sigma);
+    y[n] ~ normal(x[n] * beta, sigma);
+}
 \end{Verbatim}
 \end{quote}
 %
@@ -800,63 +817,236 @@ In the model formulation
 \end{Verbatim}
 \end{quote}
 %
-there is no longer an intercept \code{alpha}.  Instead, we have
-assumed that the first column of the input matrix \code{x} is a column
-of 1 values.  This way, \code{beta[1]} plays the role of the
+there is no longer an intercept coefficient \code{alpha}.  Instead, we
+have assumed that the first column of the input matrix \code{x} is a
+column of 1 values.  This way, \code{beta[1]} plays the role of the
 intercept.  If the intercept gets a different prior than the the slope
 terms, then it would be clearer to break it out.  It is also slightly
 more efficient in its explicit form with the intercept variable
-singled out because there's one fewer multiplications;  it should not
+singled out because there's one fewer multiplications; it should not
 make that much of a difference to speed, though, so the choice should
 be based on clarity.
 
 
-\section{Coefficient and Noise Priors}
+\section{Priors for Coefficients and Scales}\label{regression-priors.section}
 
-There are several ways in which the model in the previous section can
-be generalized.  For example, weak priors can be assigned to the
-coefficients as follows.
+This section describes the choices available for modeling priors for
+regression coefficients and scales.  Priors for univariate parameters
+in hierarchical models are discussed in
+\refsection{hierarchical-priors} and multivariate parameters in
+\refsection{multivariate-hierarchical-priors}. There is also a
+discussion of priors used to identify models in
+\refsection{priors-for-identification}.
+
+\subsection{Background Reading}
+
+See \citep{Gelman:2006} for more an overview of choices for priors for
+scale parameters, \citep{ChungEtAl:2013} for an overview of choices
+for scale priors in penalized maximum likelihood estimates, and
+\cite{GelmanJakulinPittauEtAl:2008} for a discussion of prior choice
+for regression coefficients.
+
+\subsection{Improper Uniform Priors}
+
+The default in Stan is to provide uniform (or ``flat'') priors on
+parameters over their legal values as determined by their declared
+constraints.  A parameter declared without constraints is thus given a
+uniform prior on $(-\infty,\infty)$ by default, whereas a scale
+parameter declared with a lower bound of zero gets an improper uniform
+prior on $(0,\infty)$.  Both of these priors are improper in the sense
+that there is no way formulate a density function for them that
+integrates to 1 over its support.
+
+Stan allows models to be formulated with improper priors, but in order
+for sampling or optimization to work, the data provided must ensure a
+proper posterior.  This usually requires a minimum quantity of data,
+but can be useful as a starting point for inference and as a baseline
+for sensitivity analysis (i.e., considering the effect the prior
+has on the posterior).
+
+\subsection{Uniform Priors and Transforms}
+
+Uniform priors are specific to the scale on which they are formulated.
+For instance, we could give a scale parameter $\sigma > 0$ a uniform
+prior on $(0,\infty)$, $q(\sigma) = c$ (we use $q$ because the
+``density'' is not only unnormalized, but unnormalizable), or we could
+work on the log scale and provide $\log \sigma$ a uniform prior on
+$(-\infty,\infty)$, $q(\log \sigma) = c$.  These work out to be
+different priors on $\sigma$ due to the Jacobian adjustment necessary
+for the log transform; see \refsection{change-of-variables} for more
+information on changes of variables and their requisite Jacobian
+adjustments.
+
+Stan automatically applies the necessary Jacobian adjustment for
+variables declared with constraints to ensure a uniform density on the
+legal constrained values.  This Jacobian adjustment is turned off when
+optimization is being applied in order to produce appropriate maximum
+likelihood estimates.
+
+\subsection{``Uninformative'' Proper Priors}
+
+It is not uncommon to see models with priors on regression
+coefficients such as $\distro{Normal}(0,1000)$.%
+%
+\footnote{The practice was common in BUGS and can be seen in most of
+  their examples \cite{LunnEtAl:2012}.}
+%
+If the prior scale, such as 1000, is several orders of magnitude
+larger than the estimated coefficients, then such a prior is
+effectively providing no effect whatsoever.  
+
+We actively discourage users from using the default scale priors
+suggested through the BUGS examples \citep{LunnEtAl:2012}, such as
+\[
+\sigma^2 \sim \distro{InvGamma}(0.001, 0.001).
+\]
+%
+Such priors concentrate too much probability mass outside of
+reasonable posterior values, and unlike the symmetric wide normal
+priors, can have the profound effect of skewing posteriors; see
+\citep{Gelman:2006} for examples and discussion.
+
+\subsection{Truncated Priors}
+
+If a variable is declared with a lower bound of zero, then assigning
+it a normal prior in a Stan model produces the same effect as
+providing a properly truncated half-normal prior.  The truncation at
+zero need not be specified as Stan only requires the density up to a
+proportion.  So a variable declared with
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
-alpha ~ normal(0,100);
-beta ~ normal(0,100);
+\begin{Verbatim}
+real<lower=0> sigma;
 \end{Verbatim}
 \end{quote}
 %
-And an upper bound to \code{sigma} can be given in order to implicitly
-give it a uniform prior.
+and given a prior
 \begin{quote}
-\begin{verbatim}
-real<lower=0,upper=100> sigma;
-\end{verbatim}
-\end{quote}
-
-%
-More informative priors based the (half) Cauchy distribution are coded
-as follows.
-%
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
-alpha ~ cauchy(0,2.5);
-beta ~ cauchy(0,2.5);
-sigma ~ cauchy(0,2.5);
+\begin{Verbatim}
+sigma ~ normal(0,1000);
 \end{Verbatim}
 \end{quote}
 %
-The regression coefficients \code{alpha} and \code{beta} are
-unconstrained, but \code{sigma} must be positive and properly
-requires the half-Cauchy distribution.  Although Stan supports
-truncated distributions with half distributions being a special case,
-it is not necessary here because the full distribution is proportional
-when the parameters are constant.%
+gives \code{sigma} a half-normal prior, technically
 %
-\footnote{Stan does not (yet) support truncated Cauchy distributions.
-  The distributions which may be truncated are listed for discrete
-  distributions in \refpart{discrete-prob-functions} and for
-  continuous distributions in \refpart{continuous-prob-functions}.
-  Available truncated distributions may be found in the index by
-  looking for suffix \code{\_cdf}.}
+\[
+p(\sigma) 
+\ = \
+\frac{\distro{Normal}(\sigma|0,1000)}
+     {1 - \distro{NormalCDF}(0|0,1000)}
+\ \propto \
+\distro{Normal}(\sigma|0,1000),
+\]
+%
+but Stan is able to avoid the calculation of the normal cumulative
+distribution (CDF) function required to normalize the half-normal density.
+If either the prior location or scale is a parameter or if the
+truncation point is a parameter, the truncation cannot be dropped,
+because the normal CDF term will not be a constant.
+
+
+\subsection{Weakly Informative Priors}
+
+Typically a researcher will have some knowledge of the scale of the
+variables being estimated.  For instance, if we're estimating an
+intercept-only model for the mean population height for adult women,
+then we know the answer is going to be somewhere in the one to three
+meter range.  That gives us information around which to form a weakly
+informative prior.
+
+Similarly, logistic regression with predictors on the standard scale
+(roughly zero mean, unit variance), then it is unlikely to have a
+coefficient that's larger than five in absolute value.  In these
+cases, it makes sense to provide a weakly informative prior such as
+$\distro{Normal}(0,5)$ for such a coefficient.
+
+Weakly informative priors help control inference computationally and
+statistically.  Computationally, a prior increases the curvature
+around the volume where the solution is expected to lie, which in turn
+guides both gradient-based like L-BFGS and Hamiltonian Monte Carlo
+sampling by not allowing them to stray too far from the location of a
+surface.  Statistically, a weakly informative prior is more sensible
+for a problem like women's mean height, because a very diffuse prior
+like $\distro{Normal}(0,1000)$ will ensure that the vast majority of
+the prior probability mass is outside the range of the expected
+answer, which can overwhelm the inferences available from a small data
+set.
+
+\subsection{Bounded Priors}
+
+Consider the women's height example again.  One way to formulate a
+proper prior is to impose a uniform prior on a bounded scale.  For
+example, we could declare the parameter for mean women's height to
+have a lower bound of one meter and an upper bound of three meters.
+Surely the answer has to lie in that range.  
+
+Similarly, it is not uncommon to see priors for scale parameters that
+impose lower bounds of zero and upper bounds of very large numbers,
+such as 10,000.%
+%
+\footnote{This was also a popular strategy in the BUGS example models
+  \citep{LunnEtAl:2012}, which often went one step further and set the
+  lower bounds to a small number like 0.001 to discourage numerical
+  underflow to zero.}
+%
+This provides roughly the same problem for estimation as a very
+diffuse inverse gamma prior on variance.  We prefer to leave
+parameters which are not absolutely physically constrained to float
+and provide them informative priors.  In the case of women's height,
+such a prior might be $\distro{Normal}(2,0.5)$ on the scale of meters;
+it concentrates 95\% of its mass in the interval $(1,3)$, but still
+allows values outside of that region.
+
+In cases where bounded priors are used, the posterior fits should be
+checked to make sure the parameter is not estimated at or very close
+to a boundary.  This will not only cause computational problems, it
+indicates a problem with the way the model is formulated.  In such
+cases, the interval should be widened to see where the parameter fits
+without such constraints, or boundary-avoid priors should be used (see
+\refsection{hierarchical-priors}.)
+
+\subsection{Fat-Tailed Priors and ``Default'' Priors}
+
+A reasonable alternative if we want to accomodate outliers is to use a
+prior that concentrates most of mass around the area where values are
+expected to be, but still leaves a lot of mass in its tails.  The
+usual choice in such a situation is to use a Cauchy distribution for a
+prior, which can concentrate its mass around its median, but has tails
+that are so fat that the variance is infinite.  
+
+Without specific information, the Cauchy prior is a very good default
+parameter choice for regression coefficients
+\citep{GelmanJakulinPittauEtAl:2008} and the half-Cauchy (coded
+implicitly in Stan) a good default choice for scale parameters
+\citep{Gelman:2006}.
+
+
+
+\subsection{Informative Priors}
+
+Ideally, there will be substantive information about a problem that
+can be included in an even tighter prior than a weakly informative
+prior.  This may come from actual prior experiments and thus be the
+posterior of other data, it may come from meta-analysis, or it may
+come simply by soliciting it from domain experts.  All the goodness of
+weakly informative priors applies, only with more strength.
+
+\subsection{Conjugacy}
+
+Unlike in Gibbs sampling, there is no computational advantage to
+providing conjugate priors (i.e., priors that produce posteriors in
+the same family) in a Stan program.%
+%
+\footnote{BUGS and JAGS both support conjugate sampling through Gibbs
+  sampling.  JAGS extended the range of conjugacy that could be
+  exploited with its GLM module.  Unlike Stan, both BUGS and JAGS are
+  restricted to conjugate priors for constrained multivariate
+  quantities such as covariance matrices or simplexes.}
+%
+Neither the Hamiltonian Monte Carlo samplers or the optimizers make
+use of conjugacy, working only on the log density and its derivatives.
+
+
 
 \section{Robust Noise Models}
 
@@ -1131,8 +1321,9 @@ the probability is needed only up to a proportion.
 
 \subsubsection{Ordered Probit}
 
-An ordered probit model could be coded in a manner similar to the
-\BUGS encoding of an ordered logistic model.
+An ordered probit model could be coded in exactly the same way by
+swapping the cumultive logistic (\code{inv\_logit}) for the cumulative
+normal (\code{Phi}).
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -1167,6 +1358,7 @@ The logistic model could also be coded this way by replacing
 on the softmax transform is more efficient and more numerically
 stable.  A small efficiency gain could be achieved by computing the
 values \code{Phi(eta - c[k])} once and storing them for re-use.
+
 
 \section{Hierarchical Logistic Regression}
 
@@ -1292,6 +1484,54 @@ the model and only work on optimizations when the simpler formulation
 has been debugged.
 
 
+\section{Hierarchical Priors}\label{hierarchical-priors.section}
+
+Priors on priors, also known as ``hyperpriors,'' should be treated the
+same way as priors on lower-level parameters in that as much prior
+information as is available should be brought to bear.  Because
+hyperpriors often apply to only a handful of lower-level parameters,
+care must be taken to ensure the posterior is both proper and not
+overly sensitive either statistically or computationally to wide tails
+in the priors.
+
+\subsection{Boundary-Avoiding Priors for MLE in Hierarchical Models}
+
+The fundamental problem with maximum likelihood estimation (MLE) in
+the hierarchical model setting is that as the hierarchical variance
+drops and the values cluster around the hierarchical mean, the overall
+density grows without bound.  As an illustration, consider a simple
+hierarchical linear regression (with fixed prior mean) of $y_n \in
+\reals$ on $x_n \in \reals^K$, formulated as
+%
+\begin{eqnarray*}
+y_n & \sim & \distro{Normal}(x_n \beta, \sigma)
+\\[3pt]
+\beta_k & \sim & \distro{Normal}(0,\tau)
+\\[3pt]
+\tau & \sim & \distro{Cauchy}(0,2.5)
+\end{eqnarray*}
+%
+In this case, as $\tau \rightarrow 0$ and $\beta_k \rightarrow 0$, the
+posterior density
+\[
+p(\beta,\tau,\sigma|y,x) \propto p(y|x,\beta,\tau,\sigma)
+\]
+grows without bound.  There is a plot of a Neal's funnel density in
+\reffigure{funnel}, which has similar behavior.
+
+There is obviously no MLE estimate for $\beta,\tau,\sigma$ in such a
+case, and therefore the model must be modified if posterior modes are
+to be used for inference.  The approach recommended by
+\cite{ChungEtAl:2013} is to use a gamma distribution as a prior, such
+as
+%
+\[
+\sigma \sim \distro{Gamma}(2, 1/A),
+\]
+%
+for a reasonably large value of $A$, such as $A = 10$.
+
+
 \section{Item-Response Theory Models}
 
 Item-response theory (IRT) models the situation in which a number of
@@ -1383,7 +1623,7 @@ This model uses the logit-parameterized Bernoulli distribution, where
 The key to understanding it is the term inside the
 \code{bernoulli\_logit} distribution, from which it follows that
 \[
-\mbox{Pr}[Y_n = 1] = \mbox{logit}^{-1}(\alpha_{jj[n]} - \beta_{kk[n]}
+\mbox{Pr}[y_n = 1] = \mbox{logit}^{-1}(\alpha_{jj[n]} - \beta_{kk[n]}
 + \delta).
 \]
 %
@@ -1477,7 +1717,58 @@ necessary because the log probability need only be calculated up to a
 proportion and the scale variables are constrained to $(0,\infty)$ by 
 their declarations.
 
-\section{Multivariate Priors for Hierarchical Models}
+\section{Priors for Identifiabilty}\label{priors-for-identification.section}
+
+\subsection{Location and Scale Invariance}
+
+One application of (hierarchical) priors is to identify the scale
+and/or location of a group of parameters. For example, in the IRT
+models discussed in the previous section, there is both a location and
+scale non-identifiability.  With uniform priors, the posteriors will
+float in terms of both scale and location.  See
+\refsection{collinearity} for a simple example of the problems this
+poses for estimation.
+
+The non-identifiability is resolved by providing a unit normal (i.e.,
+$\distro{Normal}(0,1)$) prior on one group of coefficients, such as
+the student abilities.  With a unit normal prior on the student
+abilities, the IRT model is identified in that the posterior will
+produce a group of estimates for student ability parameters that have
+a sample mean of close to zero and a sample variance of close to one.
+The difficulty and discrimination parameters for the questions should
+then be given a diffuse, or ideally a hierarchical prior, which will
+identify these parameters by scaling and locating relative to the
+student ability parameters.
+
+\subsection{Collinearity}
+
+Another case in which priors can help provide identifiability is in
+the case of collinearity in a linear regression.  In linear
+regression, if two predictors are collinear (i.e, one is a linear
+function of the other), then their coefficients will have a
+correlation of 1 (or -1) in the posterior.  This leads to
+non-identifiability.  By placing normal priors on the coefficients,
+the maximum likelihood solution of two duplicated preditors (trivially
+collinear) will be half the value than would be obtained by only
+including one.
+
+\subsection{Separability}
+
+In a logistic regression, if a predictor is positive in cases of 1
+outcomes and negative in cases of 0 outcomes, then the maximum
+likelihood estimate for the coefficient for that predictor diverges to
+infinity.  This divergence can be controlled by providing a prior for
+the coefficient, which will ``shrink'' the estimate back toward zero
+and thus identify the model in the posterior.  
+
+Similar problems arise for sampling with improper flat priors.  The
+sampler will try to draw very large values.  By providing a prior,
+the posterior will be concentrated around finite values, leading to
+well-behaved sampling.
+
+
+
+\section{Multivariate Priors for Hierarchical Models}\label{multivariate-hierarchical-priors.section}
 
 In hierarchical regression models (and other situations), several
 individual-level variables may be assigned hierarchical priors.  For
@@ -1624,20 +1915,19 @@ data {
   vector[N] y;                 // outcomes
 }
 parameters {
-  corr_matrix[K] Omega;     // prior correlation
-  vector<lower=0>[K] tau;   // prior scale
-  matrix[L,K] gamma;        // group coeffs
-  vector[K] beta[J];        // indiv coeffs by group
-  real<lower=0> sigma;      // prediction error scale
+  corr_matrix[K] Omega;        // prior correlation
+  vector<lower=0>[K] tau;      // prior scale
+  matrix[L,K] gamma;           // group coeffs
+  vector[K] beta[J];           // indiv coeffs by group
+  real<lower=0> sigma;         // prediction error scale
 }
 model {
   matrix[K,K] Sigma_beta;
-  Sigma_beta <- quad_form_diag(Sigma,tau);
+  Sigma_beta <- quad_form_diag(Omega,tau);
 
   tau ~ cauchy(0,2.5);
   Omega ~ lkj_corr(2);
-  for (l in 1:L)
-    gamma[l] ~ normal(0,5);
+  to_vector(gamma) ~ normal(0,5);
 
   for (j in 1:J)
     beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
@@ -1650,64 +1940,22 @@ model {
 %
 The hyperprior covariance matrix is defined as a local variable in the
 model because the correlation matrix \code{Omega} and scale vector
-\code{tau} are more natural to inspect in the output;  to output
+\code{tau} are more natural to inspect in the output; to output
 \code{Sigma}, define it as a transformed parameter.  The function
 \code{quad\_form\_diag} is defined so that
 \code{quad\_form\_diag(Sigma,tau)} is equivalent to
 \code{diag\_matrix(tau) * Sigma * diag\_matrix(tau)}, where
 \code{diag\_matrix(tau)} returns the matrix with \code{tau} on the
-diagonal and zeroes off diagonal;  the version using
-\code{quad\_form\_diag} should be faster.
+diagonal and zeroes off diagonal; the version using
+\code{quad\_form\_diag} should be faster.  See
+\refsection{matrix-arithmetic-operators} for more information on
+specialized matrix operations.
 
+This is not the most optimal way to define this model;  it can be sped
+up through vectorization and through reparameterization in terms of
+Cholesky factors.
 
-
-\subsubsection{Optimizations}
-
-This model could be made more efficient in a several ways.  First, the
-covariance matrix \code{Sigma\_beta} can be defined using the
-specialized diagonal pre- and post-multiply functions (see
-\refsection{specialized-products} for definitions).
-%
-\begin{quote}
-\begin{Verbatim}
-Sigma_beta 
-  <- diag_pre_multiply(tau, diag_post_multiply(Sigma, tau));
-\end{Verbatim}
-\end{quote}
-
-If there are a large number of groups $J$, a further optimization
-would be to use the Cholesky factorization of \code{Sigma\_beta} in
-the Cholesky parameterization of the multivariate normal.
-%
-\begin{quote}
-\begin{Verbatim}
-{ 
-  matrix[K,K] L_beta;
-  L_beta <- cholesky_decompose(Sigma_beta);
-  for (j in 1:J)
-    beta[j] ~ multi_normal_cholesky((u[j] * gamma)', L_beta);
-}
-\end{Verbatim}
-\end{quote}
-%
-The brackets introduce a block in which the local variable
-\code{L\_beta} may be defined.
-
-An additional speedup could be achieved by defining \code{L\_beta} by
-Cholesky decomposing the correlation matrix \code{Omega} and scaling
-that rather than using the diagonal pre- and post-multiplies.
-%
-\begin{quote}
-\begin{Verbatim}
-{
-  matrix[K,K] L_beta;
-  L_beta <- cholesky_decompose(Omega);
-  for (k1 in 1:K)
-    for (k2 in 1:k1)
-      L_beta[k1,k2] <- tau[k1] * L_beta[k1,k2];
-}
-\end{Verbatim}
-\end{quote}
+\subsubsection{Optimization through Vectorization}
 
 Another optimization would be to vectorize the likelihood sampling
 statement by generating a temporary vector of the linear predictor.
@@ -1722,6 +1970,153 @@ statement by generating a temporary vector of the linear predictor.
 }
 \end{Verbatim}
 \end{quote}
+%
+The outer brackets provide a local scope in which to define
+\code{x\_beta\_jj}.  
+
+The multi-normal prior on \code{beta} can also be optimized through
+vectorization with a bit more work.  
+%
+\begin{quote}
+\begin{Verbatim}
+{
+   vector[K] u_gamma_t[J];
+   for (j in 1:J)
+     u_gamma_t[j] <- (u[j] * gamma)';
+   beta ~ multi_normal(u_gamma_t, Sigma_beta);
+}
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Optimization through Cholesky Factorization}
+
+The multivariate normal density and LKJ prior on correlation matrices
+both require their matrix parameters to be factored.  Vectorizing, as
+in the previous section, ensures this is only done once for each
+density.  An even better solution, both in terms of efficiency and
+numerical stability, is to parameterize the model directly in terms of
+Cholesky factors of correlation matrices using the multivariate
+version of the non-centered parameterization.  For the model in the
+previous section, the program fragment to replace the full matrix
+prior with an equivalent Cholesky factorized prior is as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  matrix[K,J] z;
+  cholesky_factor_corr[K] L_Omega;
+  ...
+transformed parameters {
+  matrix[J,K] beta;
+  beta <- u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
+}
+model {
+  to_vector(z) ~ normal(0,1); 
+  L_Omega ~ lkj_corr_cholesky(2);
+  ...
+\end{Verbatim}  
+\end{quote}
+%
+This new parameter \code{L\_Omega} is the Cholesky factor of
+the original correlation matrix \code{Omega}, so that 
+%
+\begin{quote}
+\begin{Verbatim}
+Omega = L_Omega * L_Omega'
+\end{Verbatim}
+\end{quote}
+%
+The prior scale vector \code{tau} is unchanged, and furthermore,
+Pre-multiplying the Cholesky factor by the scale produces the Cholesky
+factor of the final covariance matrix,
+%
+\begin{Verbatim}
+  Sigma_beta 
+  = quad_form_diag(Omega,tau)
+  = diag_pre_multiply(tau,L_Omega) * diag_pre_multiply(tau,L_Omega)'
+\end{Verbatim}
+%
+where the diagonal pre-multiply compound operation is defined by 
+%
+\begin{quote}
+\begin{Verbatim}
+diag_pre_multiply(a,b) = diag_matrix(a) * b
+\end{Verbatim}
+\end{quote}
+%
+The new variable \code{z} is declared as a matrix, the entries of
+which are given independent unit normal priors; the \code{to\_vector}
+operation turns the matrix into a vector so that it can be used as a
+vectorized argument to the univariate normal density.  Multiplying the
+Cholesky factor of the covariance matrix by \code{z} and adding the
+mean \code{(u\,*\,gamma)'} produces a \code{beta} distributed as in
+the original model.
+
+Omitting the data declarations, which are the same as before, the
+optimized model is as follows.
+%
+\begin{quote}\small
+\begin{Verbatim}
+parameters {
+  matrix[K,J] z;
+  cholesky_factor_corr[K] L_Omega;  
+  vector<lower=0>[K] tau;      // prior scale
+  matrix[L,K] gamma;           // group coeffs
+  real<lower=0> sigma;         // prediction error scale
+}
+transformed parameters {
+  matrix[J,K] beta;
+  beta <- u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
+}
+model {
+  vector[N] x_beta_jj;
+  for (n in 1:N)
+    x_beta_jj[n] <- x[n] * beta[jj[n]]';
+  y ~ normal(x_beta_jj, sigma);
+
+  tau ~ cauchy(0,2.5);
+  to_vector(z) ~ normal(0,1); 
+  L_Omega ~ lkj_corr_cholesky(2);
+  to_vector(gamma) ~ normal(0,5);
+}
+\end{Verbatim}
+\end{quote}
+
+% \begin{quote}
+% \begin{Verbatim}
+% parameters {
+%   vector[3] mu;
+%   matrix[3,M] z;
+%   cholesky_factor_corr[3] L_Sigma;
+%   vector<lower=0>[3] sigma_Sigma;
+%   ...
+% transformed parameters {
+%   matrix[M,3] alpha;
+%   alpha 
+%     <- transpose(rep_matrix(mu,M)
+%                  + diag_pre_multiply(sigma_Sigma,L_Sigma) * z);
+%   ...
+% model {
+%   to_vector(z) ~ normal(0,1); 
+%   gamma ~ normal(0, 5);
+%   sigma_Sigma ~ cauchy(0, 2.5);
+%   L_Sigma ~ lkj_corr_cholesky(3);
+%   ...
+% \end{Verbatim}
+% \end{quote}
+% %
+% Taken together, this Stan program amounts to 
+% %
+% \begin{eqnarray*}
+% \sigma & \sim & \mbox{Cauchy}(0, 2.5)
+% \\[3pt]
+% \Omega & \sim & \mbox{Lkj}(3)
+% \\[3pt]
+% \Sigma & = & \mbox{diag}(\sigma) \times \Omega \times \mbox{diag}(\sigma)
+% \\[3pt]
+% \alpha_m & \sim & \mbox{MultiNormal}(\mu, \Sigma)
+% \end{eqnarray*}
+
 
 
 \section{Prediction, Forecasting, and Backcasting}
@@ -1733,7 +2128,7 @@ reconstruction or cosmology, they are sometimes called ``backcasts''
 (or ``aftcasts'' or ``hindcasts'' or ``antecasts,'' depending on the
 author's feelings about the opposite of ``fore'').
 
-\subsection{Modeling Predictions}
+\subsection{Programming Predictions}
 
 As a simple example, the following linear regression provides the same
 setup for estimating the coefficients \code{beta} as in our very first
@@ -1817,6 +2212,14 @@ Times series data come arranged in temporal order.  This chapter
 presents two kinds of time series models, regression-like models such
 as autogression and moving average models, and hidden Markov models. 
 
+In later chapters, we discuss two alternative models which may be
+applied to time-series data, 
+%
+\begin{itemize}
+\item Gaussian processes (GP) in \refchapter{gaussian-processes} and 
+\item hidden Markov models (HMM) in \refsection{hmms}.
+\end{itemize}
+
 
 \section{Autoregressive Models}
 
@@ -1840,7 +2243,7 @@ the \Stan program for the AR(1) model is as follows.
 \begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;
-  real y[N];
+  vector[N] y;
 }
 parameters {
   real alpha;
@@ -1849,12 +2252,39 @@ parameters {
 }
 model {
   for (n in 2:N)
-    y[n] ~ normal(alpha + beta*y[n-1], sigma);
+    y[n] ~ normal(alpha + beta * y[n-1], sigma);
 }
 \end{Verbatim}
 \end{quote}
 %
-The first observed data point, \code{y[1]}, is not modeled here.  
+The first observed data point, \code{y[1]}, is not modeled here
+because there is nothing to condition on; instead, it acts to
+condition \code{y[2]}.  This model also uses an improper prior for
+\code{sigma}, but there is no obstacle to adding an informative prior
+if information is available on the scale of the changes in \code{y}
+over time, or a weakly informative prior to help guide inference if
+rough knowledge of the scale of \code{y} is available.
+
+\subsubsection{Slicing for Efficiency}
+
+Although perhaps a bit more difficult to read, a much more efficient
+way to write the above model is by slicing the vectors, with the model
+above being replaced with the one-liner
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  tail(y, N - 1) ~ normal(alpha + beta * head(y, N - 1), sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The tail operation pulls out the last \code{N\,-\,1} elements of
+\code{y} and the head operation pulls out the first \code{N\,-\,1};
+vector arithmetic is used to multiply the head elements by
+\code{beta}.  
+
+
 
 \subsection{Extensions to the AR(1) Model} 
 
@@ -1958,7 +2388,8 @@ constrained to to be less than one, $\alpha_1 < 1$.%
 %
 \footnote{In practice, it can be useful to remove the constraint to
   test whether a non-stationary set of coefficients provides a better
-  fit to the data.}
+  fit to the data.  It can also be useful to add a trend term to the
+  model, because an unfitted trend will manifest as non-stationarity.}
 %
 The ARCH(1) model may be coded directly in Stan as follows.
 %
@@ -2303,9 +2734,7 @@ scaling and sampling of $\delta_t$ to yield the sampling distribution
 h_t \sim \distro{Normal}(\mu + \phi(h_t - \mu), \sigma).
 \]
 This formulation can be directly encoded, as shown in the following
-Stan model, which is also available in the file
-\nolinkurl{<stan>/example-models/misc/moving-avg/stochastic-volatility.stan}
-along with R code to simulate data from the model for testing.
+Stan model.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -2378,12 +2807,13 @@ parameters {
 %
 The original value of \code{h} is then defined in a transformed
 parameter block.
+%
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 transformed parameters {
-  vector[T] h;                 // log volatility at time t
-  h <- h_std * sigma;
-  h[1] <- h[1] / sqrt(1 - phi * phi);
+  vector[T] h;            // log volatility at time t
+  h <- h_std * sigma;     // now h ~ normal(0,sigma)
+  h[1] <- h[1] / sqrt(1 - phi * phi);  // rescale h[1]
   h <- h + mu;
   for (t in 2:T)
     h[t] <- h[t] + phi * (h[t-1] - mu);
@@ -2391,9 +2821,20 @@ transformed parameters {
 \end{Verbatim}
 \end{quote}
 %
-Finally, the sampling statement for \code{h[1]} and loop for sampling
-\code{h[2]} to \code{h[T]} are replaced with a single vectorized unit normal
-sampling statement.
+The first assignment rescales \code{h\_std} to have a
+$\distro{Normal}(0,\sigma)$ distribution and temporarily assigns it to
+\code{h}.  The second assignment rescales \code{h[1]} so that its
+prior differs from that of \code{h[2]} through \code{h[T]}.  The next
+assignment supplies a \code{mu} offset, so that \code{h[2]} throgh
+\code{h[T]} are now distributed $\distro{Normal}(\mu,\sigma)$; note
+that this shift must be done after the rescaling of \code{h[1]}.  The
+final loop adds in the moving average so that \code{h[2]} through
+\code{h[T]} are appropriately modeled relative to \code{phi} and
+\code{mu}.
+
+As a final improvement, the sampling statement for \code{h[1]} and
+loop for sampling \code{h[2]} to \code{h[T]} are replaced with a
+single vectorized unit normal sampling statement.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -2410,7 +2851,7 @@ improved, which results in higher effective sample sizes per
 iteration.  Finally, each iteration runs in roughly a quarter of the
 time of the original iterations.
 
-\section{Hidden Markov Models}
+\section{Hidden Markov Models}\label{hmms.section}
 
 A hidden Markov model (HMM) generates a sequence of $T$ output
 variables $y_t$ conditioned on a parallel sequence of latent
@@ -2424,16 +2865,20 @@ probability of transitioning to state $z_t$ from state $z_{t-1}$ is
 z_t \sim \distro{Categorical}(\theta_{z[t-1]}).
 \]
 The output $y_t$ at time $t$ is generated conditionally independently
-based on the latent state $z_t$.  This section describes HMMs with a
-simple categorical model for outputs $y_t \in \{1,\ldots,V\}$.  The
-categorical distribution for latent state $k$ is parameterized by a
-$V$-simplex $\phi_k$.  The observed output $y_t$ at time $t$ is
-generated based on the hidden state indicator $z_t$ at time $t$,
+based on the latent state $z_t$.  
+
+This section describes HMMs with a simple categorical model for
+outputs $y_t \in \{1,\ldots,V\}$.  The categorical distribution for
+latent state $k$ is parameterized by a $V$-simplex $\phi_k$.  The
+observed output $y_t$ at time $t$ is generated based on the hidden
+state indicator $z_t$ at time $t$,
 \[
 y_t \sim \distro{Categorical}(\phi_{z[t]}).
 \]
 In short, HMMs form a discrete mixture model where the mixture
 component indicators form a latent Markov chain.
+
+
 
 \subsection{Supervised Parameter Estimation}
 
@@ -2746,27 +3191,32 @@ parameters used to find the most likely state to have generated
 
 
 
-
-
 \chapter{Missing Data \& Partially Known Parameters}
 
 \noindent
-\BUGS and \R support mixed arrays of known and missing data.  In
-\BUGS, known and unknown values may be mixed as long as every unknown
-variable appears on the left-hand side of either an assignment or
-sampling statement.  
+Bayesian inference supports a very general approach to missing data in
+which any missing data item is represented as a parameter that is
+estimated in the posterior \citep{GelmanEtAl:2013}.  If the missing
+data is not explicitly modeled, as in the predictors for most
+regression models, then the result is an improper prior on the
+parameter representing the missing predictor.
+
+Mixing arrays of observed and missing data can be difficult to
+include in Stan, partly because it can be tricky to model discrete
+unknowns in Stan and partly because unlike some other statistical
+languages (for example, R and Bugs), Stan requires observed and
+unknown quantities to be defined in separate places in the model. Thus
+it can be necessary to include code in a Stan program to splice
+together observed and missing parts of a data structure.  Examples are
+provided later in the chapter.
 
 \section{Missing Data}
-
 
 \Stan treats variables declared in the \code{data} and
 \code{transformed data} blocks as known and the variables in the
 \code{parameters} block as unknown.
 
-The next section shows how to create a mixed array of known and
-unknown values as in \BUGS.  The recommended approach to missing data
-in \Stan is slightly different than in \BUGS.  An example involving
-missing normal observations%
+An example involving missing normal observations%
 %
 \footnote{A more meaningful estimation example would involve a
   regression of the observed and missing observations using predictors
@@ -2778,27 +3228,27 @@ could be coded as follows.
 \begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N_obs;
-  int<lower=0> N_miss;
+  int<lower=0> N_mis;
   real y_obs[N_obs];
 }
 parameters {
   real mu;
   real<lower=0> sigma;
-  real y_miss[N_miss];
+  real y_mis[N_mis];
 }
 model {
   for (n in 1:N_obs)
     y_obs[n] ~ normal(mu,sigma);
-  for (n in 1:N_miss)
-    y_miss[n] ~ normal(mu,sigma);
+  for (n in 1:N_mis)
+    y_mis[n] ~ normal(mu,sigma);
 }
 \end{Verbatim}
 \end{quote}
 %
 The number of observed and missing data points are coded as data with
-non-negative integer variables \code{N\_obs} and \code{N\_miss}.  The
+non-negative integer variables \code{N\_obs} and \code{N\_mis}.  The
 observed data is provided as an array data variable \code{y\_obs}.
-The missing data is coded as an array parameter, \code{y\_miss}.  The
+The missing data is coded as an array parameter, \code{y\_mis}.  The
 ordinary parameters being estimated, the location \code{mu} and scale
 \code{sigma}, are also coded as parameters.  A better way to write the
 model would be to vectorize, so the body would be
@@ -2806,7 +3256,7 @@ model would be to vectorize, so the body would be
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
    y_obs ~ normal(mu,sigma);
-   y_miss ~ normal(mu,sigma);
+   y_mis ~ normal(mu,sigma);
 \end{Verbatim}
 \end{quote}
 
@@ -3203,15 +3653,15 @@ model {
 \end{quote}
 %
 
-\chapter{Mixture Modeling}\label{mixture-modeling.chapter}
+\chapter{Finite Mixtures}\label{mixture-modeling.chapter}
 
 \noindent
-Mixture models of an outcome assume that the outcome is drawn from one
-of several distributions, the identity of which is controlled by a
-categorical mixing distribution. Mixture models typically have
+Finite mixture models of an outcome assume that the outcome is drawn
+from one of several distributions, the identity of which is controlled
+by a categorical mixing distribution. Mixture models typically have
 multimodal densities with modes near the modes of the mixture
-components.  Mixture models may be parameterized in several ways,
-as described in the following sections.
+components.  Mixture models may be parameterized in several ways, as
+described in the following sections.
 
 
 \section{Latent Discrete Parameterization}
@@ -3249,8 +3699,34 @@ model. If $Y$ is a mixture of $K$ normal distributions with
 locations $\mu_k$ and scales $\sigma_k$ with mixing proportions
 $\theta$ in the unit $K$-simplex, then 
 \[
-p_Y(y) = \sum_{k=1}^K \theta_k \, \distro{Normal}(\mu_k,\sigma_k).
+p_Y(y\theta,\mu,\sigma) = \sum_{k=1}^K \theta_k \, \distro{Normal}(\mu_k,\sigma_k).
 \]
+
+\section{Log Sum of Exponentials: Linear Sums on the Log Scale}
+
+The log sum of exponentials function is used to define mixtures on the
+log scale.  It is defined for two inputs by
+%
+\[
+\mbox{log\_sum\_exp}(a,b) = \log (\exp(a) + \exp(b)).
+\]
+%
+If $a$ and $b$ are probabilities on the log scale, then $\exp(a) +
+\exp(b)$ is their sum on the linear scale, and the outer log converts
+the result back to the log scale; to summarize, log\_sum\_exp does
+linear addition on the log scale.   The reason to use Stan's built-in
+log\_sum\_exp function is that it can prevent underflow and overflow
+in the exponentiation, by calculating the result as
+%
+\[
+\log(\exp(a) + \exp(b))
+= \max(a,b) + \log(\exp(a - \max(a,b)), \exp(b - \max(a,b))).
+\]
+%
+In this evaluation, one of the terms $a - \max(a,b)$ or $b -
+\max(a,b)$ is zero and the other is negative, thus eliminating the
+possibility of overflow or underflow in the leading term and eking the
+most arithmetic precision possible out of the operation.
 
 For example, the mixture of $\code{Normal}(-1,2)$ and
 $\code{Normal}(3,1)$ with mixing proportion $\theta =
@@ -3270,28 +3746,27 @@ model {
 \end{Verbatim}
 \end{quote}
 %
-The log probability term is derived by taking
+The log probabilty term is derived by taking
+%
 \begin{eqnarray*}
-\log p_Y(y) & = & \log \, \left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
+\log p_Y(y|\theta,\mu,\sigma) & = & \log\!\left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
   0.7 \times
   \distro{Normal}(y|3,1) \, \right)
 \\[2pt]
-& = & \log(\! \begin{array}[t]{l}
+& = & \log(\hspace*{-5pt} \begin{array}[t]{l}
                  \exp(\log(0.3 \times \distro{Normal}(y|-1,2))) \\
                  + \exp(\log(0.7 \times \distro{Normal}(y|3,1))) \ )
               \end{array}
-% \\[4pt]
-% & = & \log( \! \begin{array}[t]{l}\exp(\log(0.3) + \log \distro{Normal}(y|-1,2))
-%             \\
-%            + \exp(\log(0.7) + \log \distro{Normal}(y|3,1)) \ )
-%             \end{array}
 \\[2pt]
-& = & \mbox{log\_sum\_exp}(\! \begin{array}[t]{l}
+& = & \mbox{log\_sum\_exp}(\hspace*{-5pt}\begin{array}[t]{l}
                          \log(0.3) + \log \distro{Normal}(y|-1,2),
                          \\                  
                          \log(0.7) + \log \distro{Normal}(y|3,1) \ ).
                        \end{array}
 \end{eqnarray*}
+%
+
+\subsection{Estimating Parameters of a Mixture}
 
 Given the scheme for representing mixtures, it may be moved to an
 estimation setting, where the locations, scales, and mixture
@@ -3308,13 +3783,12 @@ data {
 parameters {
   simplex[K] theta;        // mixing proportions
   real mu[K];              // locations of mixture components
-  real<lower=0,upper=10> sigma[K];  // scales of mixture components
+  real<lower=0> sigma[K];  // scales of mixture components
 }
 model {
   real ps[K];              // temp for log component densities
-  for (k in 1:K) {
-    mu[k] ~ normal(0,10);
-  }
+  sigma ~ cauchy(0,2.5);
+  mu ~ normal(0,10);
   for (n in 1:N) {
     for (k in 1:K) {
       ps[k] <- log(theta[k]) 
@@ -3331,11 +3805,10 @@ points. The mixing proportion parameter \code{theta} is declared to be
 a unit $K$-simplex, whereas the component location parameter \code{mu}
 and scale parameter \code{sigma} are both defined to be arrays of size
 \code{K}. The values in the scale array \code{sigma} are constrained
-to be non-negative, and have an upper bound of 10. Since no prior is
-explicitly defined for the \code{sigma} parameters, their implicit
-prior distributions are uniform over their ranges. The model declares
-a local array variable \code{ps} to be size \code{K} and uses it to
-accumulate the contributions from the mixture components.
+to be non-negative, and have a weakly informative prior given in the
+model. The model declares a local array variable \code{ps} to be size
+\code{K} and uses it to accumulate the contributions from the mixture
+components.
 
 The locations and scales are drawn from simple priors for the sake of
 this example, but could be anything supported by \Stan.  The mixture
@@ -3348,11 +3821,16 @@ array \code{ps}.  Then the log probability is incremented with the log
 sum of exponentials of those values.
 
 
-\section{Zero-Inflated Models}\label{zero-inflated.section}
+\section{Zero-Inflated and Hurdle Models}\label{zero-inflated.section}
 
-Zero-inflated models, as defined by \citet{Lambert:1992}, add
-additional probability mass to the outcome of zero.  These can be
-defined in Stan directly as mixture models. 
+Zero-inflated and hurdle models both provide mixtures of a Poisson and
+Bernoulli probabilty mass function to allow more flexiblity in
+modeling the probability of a zero outcome.  Zero-inflated models, as
+defined by \citet{Lambert:1992}, add additional probability mass to
+the outcome of zero.  Hurdle models, on the other hand, are formulated
+as pure mixtures of zero and non-zero outcomes.  
+
+\subsection{Zero Inflation}
 
 Consider the following example for zero-inflated Poisson
 distributions.  It uses a parameter \code{theta} here there is a
@@ -3406,43 +3884,43 @@ within the \code{increment\_log\_prob} function, it is not recommended
 because \code{if\_else(c,e1,e2)} evaluates both \code{e1} and
 \code{e2} no matter what the value of \code{c} is.
 
-Other distributions than the Poisson can also be inflated in this
-way.  Similarly, the boundary conditions can be reorganized so that
-\code{theta} represents the probability that $y > 0$, and the Poisson
-is only used for values greater than zero.  For example, the following
-model is properly normalized.
+\subsection{Hurdle Models}
+
+The hurdle model is similar to the zero-inflated model, but more
+flexible in that the zero outcomes can be deflated as well as
+inflated.  The probability mass function for the hurdle model is
+defined by 
+%
+\[
+p(y|\theta,\lambda)
+= 
+\begin{cases}
+\ \theta & \mbox{if } y = 0, \mbox{ and}
+\\
+\ (1 - \theta)
+  \
+   \frac{\displaystyle \distro{Poisson}(y | \lambda)}
+        {\displaystyle \vspace*{8pt} 1 - \distro{PoissonCDF}(0 | \lambda)}
+& \mbox{if } y > 0,
+\end{cases}
+\]
+%
+where \distro{PoissonCDF} is the cumulative distribution function for
+the Poisson distribution.  The hurdle model is even more straightforward to
+program in Stan, as it does not require an explicit mixture.  
 %
 \begin{quote}
 \begin{Verbatim}
-   (y[n] == 0) ~ bernoulli(1,theta);
-   if (y[n] > 0)
-     y[n] - 1 ~ poisson(lambda);
+y[n] ~ bernoulli(theta);
+if (y[n] > 0)
+  y[n] ~ poisson(lambda) T[1,];
 \end{Verbatim}
 \end{quote}
 %
-A little algebra shows that this will produce the same posterior as
-the following, which is coded more directly as a mixture.
-%
-\begin{quote}
-\begin{Verbatim}
-    if (y[n] == 0)
-      increment_log_prob(bernoulli_log(1,theta));
-    else
-      increment_log_prob(bernoulli_log(0,theta)
-                         + poisson_log(y[n],lambda));
-\end{Verbatim}
-\end{quote}
-
-
-\subsection{No Zero-Inflated Parameters}
-
-Note that the outcome array \code{y} is declared as data in this
-model.  Zero-inflated parameters, such as one might want to use for
-regression coefficients to carry out variable selection, will not work
-if coded this way in Stan.  The problem is that they introduce a
-discontinuity in the posterior that messes up the ability of
-Stan's gradient-based MCMC and optimization routines to follow
-gradients smoothly.
+The \code{[1,]} after the Poisson indicates that it is truncated below
+at 1; see \refsection{poisson}.  Although the variable 
+\code{y[n]} is being ``sampled'' twice, the effect on the log
+probability fucntion follows the definition (on the log scale).  
 
 
 \chapter{Measurement Error and Meta-Analysis}
@@ -3512,10 +3990,13 @@ data {
 }
 parameters {
   real x[N];          // unknown true value   
+  real mu_x;          // prior location
+  real sigma_x        // prior scale
   ...
 }
 model {
-  x_meas ~ normal(x, tau);   // measurement model
+  x ~ normal(mu_x, sigma_x);  // prior
+  x_meas ~ normal(x, tau);    // measurement model
   y ~ normal(alpha + beta * x, sigma);
   ... 
 }
@@ -3528,34 +4009,16 @@ regression noise scale \code{sigma} are the same as before, but now
 now \code{x\_meas}, which is a measurement of the true \code{x} value
 with noise scale \code{tau}.  The model then specifies that the
 measurement error for \code{x\_meas[n]} given true value \code{x[n]}
-is normal with deviation \code{tau}.
+is normal with deviation \code{tau}.  Furthermore, the true values
+\code{x} are given a hierarchical prior;  without 
 
-A simple generalization of the above model is to allow the measurement
-noise term \code{tau} to vary with item.  This only requires changing
-its declaration in the data block to
-%
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
-  real<lower=0> tau[N];  // measurement noise for case n
-\end{Verbatim}
-\end{quote}
-%
 In cases where the measurement errors are not normal, richer
-measurement error models may be specified.  
-
-\subsection{Modeling the True Values}
-
-Although no prior is specified for the true value \code{x}, the
-posterior will be proper for the above model because
-\[
-\distro{Normal}(x|\mu,\Sigma) = \distro{Normal}(\mu|x,\Sigma).
-\]
-Nevertheless, it is common to provide some model of the true value $x$
-in terms of other covariates.  For instance, \citep{Clayton:1992}
+measurement error models may be specified.  The prior on the true
+values may also be enriched.  For instance, \citep{Clayton:1992}
 introduces an exposure model for the unknown (but noisily measured)
 risk factors $x$ in terms of known (without measurement error) risk
-factors $c$.  A simple model would regress $x_n$ on the covariates $c_n$
-with noise term $\upsilon$,
+factors $c$.  A simple model would regress $x_n$ on the covariates
+$c_n$ with noise term $\upsilon$,
 \[
 x_n \sim \distro{Normal}(\gamma^{\top}c, \upsilon).
 \]
@@ -3739,7 +4202,1090 @@ directly in a regression model for the per-trial treatment effects
 $\theta_j$.
 
 
-\chapter{Clustering Models}
+\chapter{Latent Discrete Parameters}\label{latent-discrete.chapter}
+
+\noindent
+Stan does not support sampling discrete parameters.  So it is not
+possible to directly translate BUGS or JAGS models with discrete
+parameters (i.e., discrete stochastic nodes).  Nevertheless, it is
+possible to code many models that involve bounded discrete
+parameters by marginalizing out the discrete parameters.%
+%
+\footnote{The computations are similar to those involved in
+  expectation maximization (EM) algorithms
+  \citep{dempster-et-al:1977}.}
+%
+This chapter shows how to code several widely-used models involving
+latent discrete parameters.  The next chapter,
+\refchapter{clustering}, on clustering models, considers further
+models involving latent discrete parameters.
+
+\section{The Benefits of Marginalization}\label{rao-blackwell.section}
+
+Although it requires some algebra on the joint probability function,
+a pleasant byproduct of the required calculations is the posterior
+expectation of the marginalized variable, which is often the quantity
+of interest for a model.  This allows far greater exploration of the
+tails of the distribution as well as more efficient sampling on an
+iteration-by-iteration basis because the expectation at all possible
+values is being used rather than itself being estimated through
+sampling a discrete parameter.
+
+Standard optimization algorithms, including expectation maximization
+(EM), are often provided in applied statistics papers to describe
+maximum likelihood estimation algorithms.  Such derivations provide
+exactly the marginalization needed for coding the model in Stan.
+ 
+\section{Change Point Models}
+
+The first example is a model of coal mining disasters in the the U.K.\
+for the years 1851--1962.%
+%
+\footnote{The original source of the data is \citep{Jarret:1979},
+  which itself is a note correcting an earlier data collection.}
+%
+
+\subsection{Model with Latent Discrete Parameter}
+
+\citep[Section 3.1]{PyMC:2014} provide a Poisson model of disaster
+rate $D_t$ in year $t$ with two rate parameters, an early rate ($e$)
+and late rate ($l$), that change at a given point in time $s$.  The
+full model expressed using a latent discrete parameter $s$ is
+%
+\begin{eqnarray*}
+e & \sim & \distro{Exponential}(r_e)
+\\
+l & \sim & \distro{Exponential}(r_l)
+\\
+s & \sim & \distro{Uniform}(1,T)
+\\
+D_t & \sim & \distro{Poisson}(t < s \ ? \ e \ : \ l)
+\end{eqnarray*}
+%
+The last line uses the conditional operator (also known as the ternary
+operator), which is borrowed from C and related languages.  The
+conditional operator has the same behavior as the \code{ifelse}
+function in R, but uses a more compact notation involving separating
+its three arguments by a question mark (\code{?})  and colon
+(\code{:}).  The conditional operator is defined by
+%
+\[
+c \ ? \ x_1 \ : \ x_2
+=
+\begin{cases}
+\ x_1 & \mbox{if } c \mbox{ is true (i.e., non-zero), and}
+\\
+\ x_2 & \mbox{if } c \mbox{ is false (i.e., zero).}
+\end{cases}
+\]
+Although Stan itself does not currently support the conditional
+operator, it will in the future.
+
+
+\subsection{Marginalizing out the Discrete Parameter}
+
+To code this model in Stan, the discrete parameter $s$ must be
+marginalized out to produce a model defining the log of the
+probability function $p(e,l,D_t)$.  The full joint probability factors
+as 
+%
+\begin{eqnarray*}
+p(e,l,s,D)
+& = & p(e) \, p(l) \, p(s) \, p(D | s, e, l)
+\\[3pt]
+& = & 
+\begin{array}[t]{l}
+\distro{Exponential}(e|r_e) \ \distro{Exponential}(l|r_l) \ \distro{Uniform}(s|1,T)
+\\[3pt]
+\prod_{t=1}^T \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l),
+\end{array}
+\end{eqnarray*}
+%
+To marginalize, an alternative factorization into prior and likelihood
+is used,
+%
+\begin{eqnarray*}
+p(e,l,D) & = & p(e,l) \, p(D|e,l),
+\end{eqnarray*}
+%
+where the likelihood is defined by marginalizing $s$ as
+%
+\begin{eqnarray*}
+p(D | e,l) 
+& = &
+\sum_{s=1}^T p(s, D | e,l)
+\\[3pt]
+& = &
+\sum_{s=1}^T p(s) p(D | s,e,l)
+\\[3pt]
+& = &
+\sum_{s=1}^T \distro{Uniform}(s | 1,T) 
+\, \prod_{t=1}^T \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l)
+\end{eqnarray*}
+%
+Stan operates on the log scale and thus requires the log likelihood,
+%
+\[
+\log p(D | e,l)
+\\[3pt]
+\mbox{ } \ \ = \
+\begin{array}[t]{l}
+\mbox{log\_sum\_exp}_{s=1}^T \log \distro{Uniform}(s | 1,T) 
+\\[3pt]
+{} + \sum_{t=1}^T \log \distro{Poisson}(D_t | t < s \ ? \ e \ : \ l),
+\end{array}
+\]
+%
+where the log sum of exponents function is defined by
+\[
+\mbox{log\_sum\_exp}_{n=1}^N \alpha_n
+=
+\log \sum_{n=1}^N \mbox{exp}(\alpha_n).
+\]
+%
+The log sum of exponents function allows the model to be coded
+directly in Stan using the built-in function \code{log\_sum\_exp},
+which provides both arithmetic stability and efficiency for mixture
+model calculations.
+
+
+\subsection{Coding the Model in Stan}
+
+The Stan program for the change point model is shown in
+\reffigure{change-point-model}.  The transformed parameter
+\code{lp[s]} stores the quantity $\log p(s,D|e,l)$.
+%
+\begin{figure}
+\begin{quote}\small
+\begin{Verbatim}
+data {
+  real<lower=0> r_e;
+  real<lower=0> r_l;
+
+  int<lower=1> T;
+  int<lower=0> D[T];
+}
+transformed data {
+  real log_unif;
+  log_unif <- -log(T);
+}
+parameters {
+  real<lower=0> e;
+  real<lower=0> l;
+}
+transformed parameters {
+  vector[T] lp;
+  lp <- rep_vector(log_unif, T);
+  for (s in 1:T)
+    for (t in 1:T)
+      lp[s] <- lp[s] + poisson_log(D[t], if_else(t < s, e, l));
+}
+model {
+  e ~ exponential(r_e);
+  l ~ exponential(r_l);
+  increment_log_prob(log_sum_exp(lp));
+}    
+\end{Verbatim}
+\end{quote}
+\vspace*{-6pt}
+\caption{\small\it A change point model in which disaster rates
+  \code{D[t]} have one rate, \code{e}, before the change point and a
+  different rate, \code{l}, after the change point.  The change point
+  itself, \code{s}, is marginalized out as described in the
+  text.}\label{change-point-model.figure}
+\end{figure}
+
+\subsection{Fitting the Model with MCMC}
+
+This model is easy to fit using MCMC with NUTS in its default
+configuration.  Convergence is very fast and sampling produces roughly
+one effective sample every two iterations.  Because it is a relatively
+small model (the inner double loop over time is roughly 20,000 steps),
+it is very fast.
+
+The value of \code{lp} for each iteration for each change point is
+available because it is declared as a transformed parameter.  If the
+value of \code{lp} were not of interest, it could be coded as a local
+variable in the model block and thus avoid the I/O overhead of saving
+values every iteration.
+
+\subsection{Posterior Distribution of the Discrete Change Point}
+
+The value of \code{lp[s]} in a given iteration is given by $\log
+p(s,D|e,l)$ for the values of the early and late rates, $e$ and $l$,
+in the iteration.  In each iteration after convergence, the early and
+late disaster rates, $e$ and $l$, are drawn from the posterior
+$p(e,l|D)$ by MCMC sampling and the associated \code{lp} calculated.
+The value of \code{lp} may be normalized to calculate $p(s|e,l,D)$ in
+each iteration, based on on the current values of $e$ and $l$.
+Averaging over iterations provides an unnormalized probability
+estimate of the change point being $s$,
+%
+\begin{eqnarray*}
+p(s | D)
+& \propto &
+q(s | D)
+\\[3pt]
+& = & 
+\frac{1}{M} \sum_{m=1}^{M} \exp(\code{lp}[m,s]).
+\end{eqnarray*}
+%
+where $\mbox{\code{lp}}[m,s]$ represents the value of \code{lp} in
+posterior draw $m$ for change point $s$.  By averaging over draws,
+$e$ and $l$ are themselves marginalized out, and the result has no
+dependence on a given iteration's value for $e$ and $l$.  A final
+normalization then produces the quantity of interest, the posterior
+probability of the change point being $s$ conditioned on the data $D$,
+%
+\[
+p(s | D)
+=
+\frac{q(s|D)}{\sum_{s'=1}^T q(s' | D)}.
+\]
+%
+A plot of the values of $\log p(s|D)$ computed using Stan 2.4's
+default MCMC implementation is shown in
+\reffigure{change-point-posterior}.
+%
+\begin{figure}
+\begin{center}
+\includegraphics[height=2in]{img/change-point-posterior.pdf}
+\ \ \ \ \
+\includegraphics[height=2in]{img/s-discrete-posterior.pdf}
+\end{center}
+\vspace*{-12pt}
+\caption{\small\it The posterior estimates for the change point.  \
+  {\rm Left)} log probability of change point being in year,
+  calculated analytically using \code{lp}; \ {\rm Right)}\ frequency
+  of change point draws in the posterior generated using
+  \code{lp}. The plot on the left is on the log scale and the plot on
+  the right on the linear scale; note the narrower range of years in
+  the right-hand plot resulting from sampling. The posterior mean of
+  $s$ is roughly 1891.}%
+\label{change-point-posterior.figure}
+\end{figure}
+%
+
+
+
+\subsection{Discrete Sampling}
+
+Although not computationally advantageous compared to working in
+expectation using \code{lp}, it is possible to use Stan to sample the
+value of \code{s} at every iteration.
+%
+\begin{quote}
+\begin{Verbatim}
+generated quantities {
+  int<lower=1,upper=T> s;
+  s <- categorical_rng(softmax(lp));
+}
+\end{Verbatim}
+\end{quote}
+%
+A posterior histogram of draws for $s$ is shown on the right side of
+\reffigure{change-point-posterior}.
+
+
+\subsection{Posterior Covariance}
+
+The discrete sample generated for $s$ can be used to calculate
+covariance with other parameters.  Although the sampling approach is
+straightforward, it is more statistically efficient (in the sense of
+requiring far fewer iterations for the same degree of accuracy) to
+calculate these covariances in expectation using \code{lp}.
+
+
+
+
+\section{Mark-Recapture Models}
+
+A widely applied field method in ecology is to capture (or sight)
+animals, mark them (e.g., by tagging), then release them.  This
+process is then repeated one or more times, and is often done for
+populations on an ongoing basis.  The resulting data may be used to
+estimate population size.
+
+The first subsection describes a very simple mark-recapture model that does
+not involve any latent discrete parameters.  The following subsections
+describes the Cormack-Jolly-Seber model, which involves latent
+discrete parameters for animal death.
+
+\subsection{Simple Mark-Recapture Model}
+
+In the simplest case, a one-stage mark-recapture study produces the
+following data
+%
+\begin{itemize}
+\item $M$ : number of animals marked in first capture,
+\item $C$ : number animals in second capture, and
+\item $R$ : number of marked animals in second capture.
+\end{itemize}
+%
+The estimand of interest is
+%
+\begin{itemize}
+\item $N$ : number of animals in the population.
+\end{itemize}
+%
+Despite the notation, the model will take $N$ to be a continuous
+parameter; just because the population must be finite doesn't mean the
+parameter representing it must be.  The parameter will be used to
+produce a real-valued estimate of the population size.
+
+The Lincoln-Petersen \citep{Lincoln:1930,Petersen:1896} method for
+estimating population size is
+%
+\[
+\hat{N} = \frac{M C}{R}.
+\]
+%
+This population estimate would arise from a probabilistic model in
+which the number of recaptured animals is distributed binomially,
+\[
+R \sim \distro{Binomial}(C, M / N)
+\]
+given the total number of animals captured in the second round ($C$)
+with a recapture probability of $M/N$, the fraction of the total
+population $N$ marked in the first round.
+
+%
+\begin{figure}
+\begin{quote}\small
+\begin{Verbatim}
+data {
+  int<lower=0> M;
+  int<lower=0> C;
+  int<lower=0,upper=min(M,C)> R;
+}
+parameters {
+  real<lower=(C - R + M)> N;
+}
+model {
+  R ~ binomial(C, M / N);
+}
+\end{Verbatim}
+\end{quote}
+\vspace*{-6pt}
+\caption{\small\it A probabilistic formulation of the Lincoln-Petersen
+population estimator for pulation size based on data from a one-step
+mark-recapture study.  The lower bound on $N$ is necessary to
+efficiently eliminate impossible values.}%
+\label{lincoln-petersen-model.figure}
+\end{figure}
+%
+The probabilistic variant of the Lincoln-Petersen estimator can be
+directly coded in Stan as shown in \reffigure{lincoln-petersen-model}.
+The Lincoln-Petersen estimate is the maximum likelihood estimate (MLE)
+for this model.
+
+To enusre the MLE is the Lincoln-Petersen estimate, an improper
+uniform prior for $N$ is used; this could (and should) be replaced
+with a more informative prior if possible based on knowledge of the
+population under study.
+
+The one tricky part of the model is the lower bound $C - R + M$ placed
+on the population size $N$.  Values below this bound are impossible
+because it is otherwise not possible to draw $R$ samples out of the
+$C$ animals recaptured.  Implementing this lower bound is necessary to
+ensure sampling and optimization can be carried out in an
+unconstrained manner with unbounded support for parameters on the
+transformed (unconstrained) space.  The lower bound in the declaration
+for $C$ implies a variable transform $f : (C-R+M,\infty) \rightarrow
+(-\infty,+\infty)$ defined by $f(N) = \log(N - (C - R + M))$; see
+\refsection{lower-bound-transform} for more information on the
+transform used for variables declared with a lower bound.
+
+\subsection{Cormack-Jolly-Seber with Discrete Parameter}
+
+The Cormack-Jolly-Seber (CJS) model
+\citep{Cormack:1964,Jolly:1965,Seber:1965} is an open-population model
+in which the population may change over time due to death; the
+presentation here draws heavily on \citep{Schofield:2007}.  
+
+The basic data is
+%
+\begin{itemize}
+\item $I$ : number of individuals, 
+\item $T$ : number of capture periods, and
+\item $y_{i,t}$ : boolean indicating if individual $i$ was captured at
+  time $t$.
+\end{itemize}
+%
+Each individual is assumed to have been captured at least once because
+an individual only contributes information conditionally after they
+have been captured the first time.
+
+There are two Bernoulli parameters in the model,
+%
+\begin{itemize}
+\item $\phi_t$ : probability that animal alive at time $t$ survives
+  until $t + 1$ and
+\item $p_t$ : probability that animal alive at time $t$ is captured at
+  time $t$.
+\end{itemize}
+%
+These parameters will both be given uniform priors, but information
+should be used to tighten these priors in practice.
+
+The CJS model also employs a latent discrete parameter $z_{i,t}$
+indicating for each individual $i$ whether it is alive at time $t$,
+distributed as
+%
+\[
+z_{i,t} \sim \distro{Bernoulli}(\ternary{z_{i,t-1}}{0}{\phi_{t-1}}).
+\]
+%
+The conditional prevents the model positing zombies; once an animal is
+dead, it stays dead.  The data distribution is then simple to express
+conditional on $z$ as
+%
+\[
+y_{i,t} \sim \distro{Bernoulli}(\ternary{z_{i,t}}{0}{p_t})
+\]
+%
+The conditional enforces the constraint that dead animals cannot be captured.
+
+
+\subsection{Collective Cormack-Jolly-Seber Model}
+
+This subsection presents an implementation of the model in terms of
+counts for different history profiles for individuals over three
+capture times. It assumes exchangeability of the animals in that each
+is assigned the same capture and survival probabilities.
+
+In order to ease the marginalization of the latent discrete parameter
+$z_{i,t}$, the Stan models rely on a derived quantity $\chi_t$ for
+the probability that an individual is never captured again if it is
+alive at time $t$ (if it is dead, the recapture probability is zero).
+this quantity is defined recursively by
+\[
+\chi_t 
+= 
+\begin{cases}
+1 
+& \mbox{if } t = T
+\\[3pt]
+(1 - \phi_t) + \phi_t (1 - p_{t+1}) \chi_{t+1}
+& \mbox{ if } t < T
+\end{cases}
+\]
+%
+The base case arises because if an animal was captured in the last
+time period, the probability it is never captured again is 1 because
+there are no more capture periods.  The recursive case defining
+$\chi_{t}$ in terms of $\chi_{t+1}$ involves two possibiliites: (1)
+not surviving to the next time period, with probability $(1 -
+\phi_t)$, or (2) suriviving to the next time period with probability
+$\phi_t$, not being captured in the next time period with probabilty
+$(1 - p_{t+1})$, and not being captured again after being alive in
+period $t+1$ with probability $\chi_{t+1}$. 
+
+With three capture times, there are three captured/not-captured
+profiles an individual may have.  These may be naturally coded as
+binary numbers as follows.
+%
+\begin{center}
+\begin{tabular}{c|ccc|c}
+& \multicolumn{3}{|c|}{{\it captures}}
+\\
+{\it profile} & 1 & 2 & 3 & {\it probability}
+\\ \hline
+{0} & - & - & - & n/a
+\\
+{1} & - & - & + & n/a
+\\ \hline
+{2} & - & + & - & $\chi_2$
+\\
+{3} & - & + & + & $\phi_2 \, \phi_3$
+\\ \hline
+{4} & + & - & - & $\chi_1$
+\\
+{5} & + & - & + & $\phi_1 \, (1 - p_2) \, \phi_2 \, p_3$
+\\ \hline
+{6} & + & + & - & $ \phi_1 \, p_2 \, \chi_2$
+\\ 
+{7} & + & + & + & $\phi_1 \, p_2 \, \phi_2 \, p_3$
+\end{tabular}
+\end{center}
+%
+History 0, for animals that are never captured, is unobservable
+because only animals that are captured are observed. History 1, for
+animals that are only captured in the last round, provides no
+information for the CJS model, because capture/non-capture status is
+only informative when conditioned on earlier captures.  For the
+remaining cases, the contribution to the likelihood is provided in the
+final column.
+
+By defining these probabilities in terms of $\chi$ directly, there is
+no need for a latent binary parameter indicating whether an animal is
+alive at time $t$ or not.  The definition of $\chi$ is typically used
+to define the likelihood (i.e., marginalize out the latent discrete
+parameter) for the CJS model \citep[page 9]{Schofield:2007}.
+
+The Stan model defines $\chi$ as a transformed parameter based on
+parameters $\phi$ and $p$.  In the model block, the log probability is
+incremented for each history based on its count.  This second step is
+similar to collecting Bernoulli observations into a binomial or
+categorical observations into a multinomial, only it is coded directly
+in the Stan program using \code{increment\_log\_prob} rather than
+being part of a built-in probability function.
+%
+\begin{figure}
+\begin{quote}\small
+\begin{Verbatim}
+data {
+  int<lower=0> history[7];
+}
+parameters {
+  real<lower=0,upper=1> phi[2];
+  real<lower=0,upper=1> p[3];
+}
+transformed parameters {
+  real<lower=0,upper=1> chi[2];  
+  chi[2] <- (1 - phi[2]) + phi[2] * (1 - p[3]);
+  chi[1] <- (1 - phi[1]) + phi[1] * (1 - p[2]) * chi[2];
+}
+model {
+  increment_log_prob(history[2] * log(chi[2]));
+  increment_log_prob(history[3] * (log(phi[2]) + log(p[3])));
+  increment_log_prob(history[4] * (log(chi[1])));
+  increment_log_prob(history[5] 
+                     * (log(phi[1]) + log1m(p[2])
+                        + log(phi[2]) + log(p[3])));
+  increment_log_prob(history[6] 
+                     * (log(phi[1]) + log(p[2]) 
+                        + log(chi[2])));
+  increment_log_prob(history[7] 
+                     * (log(phi[1]) + log(p[2]) 
+                        + log(phi[2]) + log(p[3])));
+}
+generated quantities {
+  real<lower=0,upper=1> beta3;
+  beta3 <- phi[2] * p[3];
+}
+\end{Verbatim}
+\end{quote}
+\vspace*{-12pt}
+\caption{\small\it A Stan program for the Cormack-Jolly-Seber
+  mark-recapture model that considers counts of individuals with
+  observation histories of being observed or not in three capture
+  periods.}\label{cjs-history.figure}
+\end{figure}
+%
+
+\subsubsection{Identifiability}
+
+The parameters $\phi_2$ and $p_3$, the probability of death at time 2
+and probabilty of capture at time 3 are not identifiable, because both
+may be used to account for lack of capture at time 3.  Their product,
+$\beta_3 = \phi_2 \, p_3$, is identified.  The Stan model defines
+\code{beta3} as a generated quantity.  Unidentified parameters pose a
+problem for Stan's samplers' adaptation.  Although the problem posed
+for adaptation is mild here because the parameters are bounded and
+thus have proper uniform priors, it would be better to formulate an
+identified parameterization.  One way to do this would be to formulate
+a hierarchical model for the $p$ and $\phi$ parameters.
+
+\subsection{Individual Cormack-Jolly-Seber Model}
+
+This section presents a version of the Cormack-Jolly-Seber (CJS) model
+cast at the individual level rather than collectively as in the
+previous subsection.  It also extends the model to allow an arbitrary
+number of time periods.  The data will consist of the number $T$ of
+capture events, the number $I$ of individuals, and a boolean flag
+$y_{i,t}$ indicating if individual $i$ was observed at time $t$.  In
+Stan,
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=2> T;
+  int<lower=0> I;
+  int<lower=0,upper=1> y[I,T];
+}
+\end{Verbatim}
+\end{quote}
+
+The advantages to the individual-level model is that it becomes
+possible to add individual ``random effects'' that affect survival or
+capture probability, as well as to avoid the combinatorics involved in
+unfolding $2^T$ observation histories for $T$ capture times.
+
+\subsubsection{Utility Functions}
+
+The individual CJS model is written involves several function
+definitions.  The first two are used in the transformed data block to
+compute the first and last time period in which an animal was
+captured.%
+%
+\footnote{An alternative would be to compute this on the outside and
+feed it into the Stan model as preprocessed data.  Yet another
+alternative encoding would be a sparse one recording only the
+capture events along with their time and identifying the individual
+captured.} 
+%
+\begin{quote}
+\begin{Verbatim}
+functions {
+  int first_capture(int[] y_i) {
+    for (k in 1:size(y_i))
+      if (y_i[k])
+        return k;
+    return 0;
+  }
+  int last_capture(int[] y_i) { 
+    for (k_rev in 0:(size(y_i) - 1)) {
+      int k;
+      k <- size(y_i) - k_rev;
+      if (y_i[k]) 
+        return k;
+    }
+    return 0;
+  }
+  ...
+}
+\end{Verbatim}
+\end{quote}
+%
+These two functions are used to define the first and last capture time
+for each individual in the transformed data block.%
+%
+\footnote{Both functions return 0 if the individual represented by the
+  input array was never captured.  Individuals with no captures are
+  not relevant for estimating the model because all probability
+  statements are conditional on earlier captures.  Typically they
+  would be removed from the data, but the program allows them to be
+  included even though they make not contribution to the log
+  probability function.}
+%
+\begin{quote}
+\begin{Verbatim}
+transformed data {
+  int<lower=0,upper=T> first[I];
+  int<lower=0,upper=T> last[I];
+  vector<lower=0,upper=I>[T] n_captured;
+  for (i in 1:I)
+    first[i] <- first_capture(y[i]);
+  for (i in 1:I)
+    last[i] <- last_capture(y[i]);
+  n_captured <- rep_vector(0,T);
+  for (t in 1:T)
+    for (i in 1:I)
+      if (y[i,t]) 
+        n_captured[t] <- n_captured[t] + 1;
+}
+\end{Verbatim}
+\end{quote}
+%
+The transformed data block also defines \code{n\_captured[t]}, which is
+the total number of captures at time \code{t}.  The variable
+\code{n\_captured} is defined as a vector instead of an integer array
+so that it can be used in an elementwise vector operation in the generated
+quantities block to model the population estimates at each time point.
+
+The parameters and transformed parameters are as before, but now there
+is a function definition for computing the entire vector \code{chi}, the
+probability that if an individual is alive at \code{t} that it will
+never be captured again.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  vector<lower=0,upper=1>[T-1] phi;
+  vector<lower=0,upper=1>[T] p;
+}
+transformed parameters {
+  vector<lower=0,upper=1>[T] chi;
+  chi <- prob_uncaptured(T,p,phi);
+}
+\end{Verbatim}
+\end{quote}
+%
+The definition of \code{prob\_uncaptured}, from the functions block,
+is
+%
+\begin{quote}
+\begin{Verbatim}
+funtions {
+  ...
+  vector prob_uncaptured(int T, vector p, vector phi) {
+    vector[T] chi;
+    chi[T] <- 1.0;              
+    for (t in 1:(T - 1)) {
+      int t_curr;
+      int t_next;
+      t_curr <- T - t;
+      t_next <- t_curr + 1;
+      chi[t_curr] <- (1 - phi[t_curr]) 
+                     + phi[t_curr] 
+                       * (1 - p[t_next]) 
+                       * chi[t_next]; 
+    }
+    return chi;
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+The function definition directly follows the mathematical definition
+of $\chi_t$, unrolling the recursion into an iteration and
+defining the elements of \code{chi} from \code{T} down to 1.
+
+\subsubsection{The Model}
+
+Given the precomputed quantities, the model block directly encodes the
+CJS model's log likelihood function.  All parameters are left with
+their default uniform priors and the model simply encodes the log
+probability of the observations \code{q} given the parameters \code{p}
+and \code{phi} as well as the transformed parameter \code{chi} defined
+in terms of \code{p} and \code{phi}.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  for (i in 1:I) {
+    if (first[i] > 0) {
+      for (t in (first[i]+1):last[i]) {
+        1 ~ bernoulli(phi[t-1]);
+        y[i,t] ~ bernoulli(p[t]);
+      }
+      1 ~ bernoulli(chi[last[i]]);
+    }
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+The outer loop is over individuals, conditional skipping individuals
+\code{i} which are never captured.  The never-captured check depends
+on the convention of the first-capture and last-capture functions
+returning 0 for \code{first} if an individual is never captured.
+
+The inner loop for individual \code{i} first increments the log
+probability based on the survival of the individual with proability
+\code{phi[t-1]}.  The outcome of 1 is fixed because the individual
+must survive between the first and last capture (i.e., no zombies).
+Note that the loop starts after the first capture, because all
+information in the CJS model is conditional on the first capture.
+
+In the inner loop, the observed capture status \code{y[i,t]} for
+individual \code{i} at time \code{t} has a Bernoulli distribution
+based on the capture probabilty \code{p[t]} at time \code{t}.
+
+After the inner loop, the probability of an animal never being seen
+again after being observed at time \code{last[i]} is included, because
+\code{last[i]} was defined to be the last time period in which animal
+\code{i} was observed.
+
+\subsubsection{Identified Parameters}
+
+As with the collective model described in the previous subsection,
+this model does not identify \code{phi[T-1]} and \code{p[T]}, but
+does identify their product, \code{beta}.  Thus \code{beta} is defined
+as a generated quantity to monitor convergence and report.
+%
+\begin{quote}
+\begin{Verbatim}
+generated quantities {
+  real beta;
+  ...
+
+  beta <- phi[T-1] * p[T];
+  ...
+}
+\end{Verbatim}
+\end{quote}
+%
+
+The parameter \code{p[1]} is also not modeled and will just be uniform
+between 0 and 1.  A more finely articulated model might have a
+hierarchical or time-series component, in which case \code{p[1]} would
+be an unknown intial condition and both \code{phi[T-1]} and
+\code{p[T]} could be identified.
+
+\subsubsection{Population Size Estimates}
+
+The generated quantities also calculates an estimate of the population
+mean at each time \code{t} in the same way as in the simple
+mark-recapture model as the number of individuals captured at time
+\code{t} divided by the probability of capture at time \code{t}.  This
+is done with the elementwise division operation for vectors
+(\code{./}) in the generated quantities block.
+%
+\begin{quote}
+\begin{Verbatim}
+generated quantities {
+  ...
+  vector<lower=0>[T] pop;
+  ...
+  pop <- n_captured ./ p;
+  pop[1] <- -1;
+}
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Generalizing to Individual Effects}
+
+All individuals are modeled as having the same capture probability,
+but this model could be easily generalized to use a logistic
+regression here based on individual-level inputs to be used as
+predictors.
+
+
+
+\section{Data Coding and Diagnostic Accuracy Models}
+
+Although seemingly disparate tasks, the rating/coding/annotation of
+items with categories and diagnostic testing for disease or other
+conditions share several characteristics which allow their statistical
+properties to modeled similarly.
+
+\subsection{Diagnostic Accuracy}
+
+Suppose you have diagnostic tests for a condition of varying
+sensitivity and specificity.  Sensitivity is the probability a test
+returns positive when the patient has the condition and specificity is
+the probability that a test returns negative when the patient does not
+have the condition.  For example, mammograms and puncture biopsy tests
+both test for the presence of breast cancer.  Mammograms have high
+sensitivity and low specificity, meaning lots of false positives,
+whereas puncture biopsies are the opposite, with low sensitivity and
+high specificity, meaning lots of false negatives.
+
+There are several estimands of interest in such studies.  An
+epidemiological study may be interested in the prevalence of a kind of
+infection, such as malaria, in a population.  A test development study
+might be interested in the diagnostic accuracy of a new test. A health
+care worker performing tests might be interested in the disease status
+of a particular patient.
+
+\subsection{Data Coding}
+
+Humans are often given the task of coding (equivalently rating or
+annotating) data.  For example, journal or grant reviewers rate
+submissions, a political study may code campaign commercials as to
+whether they are attack ads or not, a natural language processing
+study might annotate Tweets as to whehter they are positive or
+negative in overall sentiment, or a dentist looking at an X-ray
+classifies a patient as having a cavity or not.  In all of these
+cases, the data coders play the role of the diagnostic tests and all
+of the same estimands are in play --- data coder accuracy and bias,
+true categories of items being coded, or the prevalence of various
+categories of items in the data.
+
+\subsection{Noisy Categorical Measurement Model}
+
+In this section, only categorical ratings are considered, and the
+challenge in the modeling for Stan is to marginalize out the discrete
+parameters.  
+
+\cite{DawidSkene:1979} introduce a noisy-measurement model for
+data coding and apply in the epidemiological setting of coding what
+doctor notes say about patient histories;  the same model can be used
+for diagnostic procedures.
+
+\subsubsection{Data}
+
+The data for the model consists of $J$ raters (diagnostic tests), $I$
+items (patients), and $K$ categories (condition statuses) to annotate,
+with $y_{i,j} \in 1{:}K$ being the rating provided by rater $j$ for
+item $i$.  In a diagnostic test setting for a particular condition,
+the raters are diagnostic procedures and often $K=2$, with values
+signaling the presense or absence of the condition.%
+%
+\footnote{Diagnostic procedures are often ordinal, as in stages of
+  cancer in oncological diagnosis or the severity of a cavity in
+  dental diagnosis.  Dawid and Skene's model may be used as is or
+  naturally generalized for ordinal ratings using a latent continuous
+  rating and cutpoints as in ordinal logistic regression.}
+
+It is relatively straightforward to extend Dawid and Skene's model to
+deal with the situation where not every rater rates each item exactly
+once.
+
+\subsection{Model Parameters}
+
+The model is based on three parameters, the first of which is discrete:
+%
+\begin{itemize}
+\item $z_i$ : a value in $1{:}K$ indicating the true category of item $i$,
+\item $\pi$ : a $K$-simplex for the prevalence of the $K$
+  categories in the population, and
+\item $\theta_{j,k}$ : a $K$-simplex for the response of annotator $j$
+  to an item of true category $k$.
+\end{itemize}
+
+\subsection{Noisy Measurement Model}
+
+The true category of an item is assumed to be generated by a simple
+categorical distribution based on item prevalence,
+\[
+z_i \sim \distro{Categorical}(\pi).
+\]
+%
+The rating $y_{i,j}$ provided for item $i$ by rater $j$ is modeled as
+a categorical response of rater $i$ to an item of category $z_i$,%
+%
+\footnote{In the subscript, $z[i]$ is written as $z_i$ to
+  improve legibility.}
+%
+\[
+y_{i,j} \sim \distro{Categorical}(\theta_{j,\pi_{z[i]}}).
+\]
+
+\subsubsection{Priors and Hierarchical Modeling}
+
+Dawid and Skene provided maximum likelihood estimates for $\theta$ and
+$\pi$, which allows them to generate probabilty estimates for each $z_i$.
+
+To mimic Dawid and Skene's maximum likelihood model, the parameters
+$\theta_{j,k}$ and $\pi$ can be given uniform priors over
+$K$-simplexes.  It is straightforward to generalize to Dirichlet
+priors,
+\[
+\pi \sim \distro{Dirichlet}(\alpha)
+\]
+and
+\[
+\theta_{j,k} \sim \distro{Dirichlet}(\beta_k)
+\]
+with fixed hyperparameters $\alpha$ and $\beta$.  The prior for
+$\theta_{j,k}$ must be allowed to vary in $k$, so that, for instance,
+$\beta_{k,k}$ is large enough to allow the prior to favor
+better-than-chance annotators over random or adversarial ones.
+
+Because there are $J$ coders, it would be natural to extend the model
+to include a hierarchical prior for $\beta$ and to partially pool the
+estimates of coder accuracy and bias.
+
+\subsubsection{Marginalizing out the True Category}
+
+Because the true category parameter $z$ is discrete, it must be
+marginalized out of the joint posterior in order to carry out sampling
+or maximum likelihood estimation in Stan. The joint posterior factors
+as
+\[
+p(y, \theta, \pi) = p(y | \theta,\pi) \, p(\pi) \, p(\theta),
+\]
+where $p(y | \theta,\pi)$ is derived by marginalizing $z$ out of
+%
+\[
+p(z, y | \theta, \pi)
+\ = \
+\prod_{i=1}^I \left( \distro{Categorical}(z_i | \pi)
+                     \prod_{j=1}^J
+                     \distro{Categorical}(y_{i,j}|\theta_{j,z[i]})
+              \right).
+\]
+%
+This can be done item by item, with
+\[
+p(y | \theta, \pi)
+\ = \
+\prod_{i=1}^I \sum_{k=1}^K  
+  \left( \distro{Categorical}(z_i | \pi)
+         \prod_{j=1}^J
+         \distro{Categorical}(y_{i,j}|\theta_{j,z[i]})
+  \right).
+\]            
+%
+In the missing data model, only the observed labels would be used in
+the inner product.
+
+\cite{DawidSkene:1979} derive exactly the same equation in their
+Equation~(2.7), required for the E-step in their expectation
+maximization (EM) algorithm.  Stan requires the marginalized
+probability function on the log scale,
+\[
+\begin{array}{l}
+\mbox{ } \ \log p(y | \theta, \pi)
+\\[3pt]
+\mbox{ } \ \ \ = \
+\sum_{i=1}^I \log \left( \sum_{k=1}^K \exp
+  \left( \log \distro{Categorical}(z_i | \pi)
+         + \sum_{j=1}^J
+         \log \distro{Categorical}(y_{i,j}|\theta_{j,z[i]})
+  \right) \right),
+\end{array}
+\]                            
+which can be directly coded using Stan's built-in \code{log\_sum\_exp}
+function.
+
+
+\subsection{Stan Implementation}
+
+The Stan program for the Dawid and Skene model is provided in
+\reffigure{dawid-skene-model}.
+%
+\begin{figure}
+\begin{quote}\small
+\begin{Verbatim}
+data {
+  int<lower=2> K;
+  int<lower=1> I;
+  int<lower=1> J;
+
+  int<lower=1,upper=K> y[I,J];
+
+  vector<lower=0>[K] alpha;
+  vector<lower=0>[K] beta[K];
+}
+parameters {
+  simplex[K] pi;
+  simplex[K] theta[J,K];
+}
+transformed parameters {
+  vector[K] log_q_z[I];
+  for (i in 1:I) {
+    log_q_z[i] <- log(pi);
+    for (j in 1:J)
+      for (k in 1:K)
+        log_q_z[i,k] <- log_q_z[i,k] 
+                        + log(theta[j,k,y[i,j]]);
+  }
+}
+model {
+  pi ~ dirichlet(alpha);
+  for (j in 1:J)
+    for (k in 1:K)
+      theta[j,k] ~ dirichlet(beta[k]);
+
+  for (i in 1:I)
+    increment_log_prob(log_sum_exp(log_q_z[i]));
+}
+\end{Verbatim}
+\end{quote}
+\vspace*{-12pt}
+\caption{\small\it Stan program for the rating (or diagnostic
+  accuracy) model of \cite{DawidSkene:1979}. The model marginalizes
+  out the discrete parameter $z$, storing the unnormalized conditional
+  probability $\log q(z_i=k|\theta,\pi)$ in\ \code{log\_q\_z[i,k]}.}%
+\label{dawid-skene-model.figure}
+\end{figure}
+%
+The Stan model converges quickly and mixes well using NUTS starting at
+diffuse initial points, unlike the equivalent model implemented with
+Gibbs sampling over the discrete parameter.  Reasonable weakly
+informative priors are $\alpha_k = 3$ and $\beta_{k,k} = 2.5 K$ and
+$\beta_{k,k'} = 1$ if $k \neq k'$.  Taking $\alpha$ and $\beta_k$ to
+be unit vectors and applying optimization will produce the same answer
+as the expectation maximization (EM) algorithm of
+\cite{DawidSkene:1979}.  
+
+\subsubsection{Inference for the True Category}
+
+The quantity \code{log\_q\_z[i]} is defined as a transformed
+parameter.  It encodes the (unnormalized) log of $p(z_i | \theta,
+\pi)$.  Each iteration provides a value conditioned on that
+iteration's values for $\theta$ and $\pi$.  Applying the softmax
+function to \code{log\_q\_z[i]} provides a simplex corresponding to
+the probability mass function of $z_i$ in the posterior.   These may
+be averaged across the iterations to provide the posterior probability
+distribution over each $z_i$.
+
+
+\chapter{Clustering Models}\label{clustering.chapter}
 
 \noindent
 Unsupervised methods for organizing data into groups are collectively
@@ -4745,6 +6291,12 @@ data points in seconds.
 
 \subsection{Automatic Relevance Determination}
 
+``Automatic relevance determination'' is the term used in machine
+learning corresponding to the term ``hierarchical modeling'' in
+statistics.  In either case, the idea is that hyperparameters are
+estimated from data (in Bayesian inference, via the joint posteiror
+distribution) rather than being preset.
+
 For multivariate inputs $x \in \reals^D$, the squared exponential
 covariance function can be further generalized by fitting a precision
 parameter $\rho_d^2$ for each dimension $d$,
@@ -5005,8 +6557,10 @@ or in other words,
 Simulation from a Gaussian process logistic regression is
 straightforward; just simulate from a Gaussian process and then
 simulate the $z_n$ from the $y_n$ using the sampling distribution
-above.  This cannot be done directly in Stan because Stan does not (yet)
-support discrete parameters or forward discrete sampling.
+above.  Simulation of the $z_n$ must be done in the generated
+quantities block, where it is possible to draw random variates from
+specified distributions.
+
 
 \subsection{Hyperparameter Estimation and Predictive Inference}
 
@@ -5106,8 +6660,7 @@ defining the covariance matrix in the model block as a local variable.
 
 
 
-\chapter{Reparameterization \& Change of Variables}
-\label{change-of-variables.chapter}
+\chapter{Reparameterization \& Change of Variables}\label{change-of-variables.chapter}
 
 \noindent
 As with BUGS, Stan supports a direct encoding of reparameterizations.
@@ -5274,7 +6827,7 @@ parameters {
   ...
 model {
   log(y) ~ normal(mu,sigma);
-  increment_log_prob(- log(y));
+  increment_log_prob(-log(y));
   ...
 \end{Verbatim}
 \end{quote}
@@ -5291,7 +6844,7 @@ model {
   real log_y;
   log_y <- log(y);
   log_y ~ normal(mu,sigma);
-  increment_log_prob(- log_y);
+  increment_log_prob(-log_y);
   ...
 \end{Verbatim}
 \end{quote}
@@ -5772,10 +7325,11 @@ They also may not contain any constraints;  see
 
 Unlike type declarations for variables, function type declarations for
 matrix and vector types are not declared with their sizes.  Like local
-variable declarations, function argument type declarations
+variable declarations, function argument type declarations may not be
+declared with constraints (either lower or upper bounds or structured
+constraints like forming a simplex or correlation matrix).
 
-For
-example, here's a function to compute the entropy of a categorical
+For example, here's a function to compute the entropy of a categorical
 distribution with simplex parameter \code{theta}.
 %
 \begin{quote}
@@ -6107,7 +7661,7 @@ and ending with \code{*/} to the Stan parser.
 For functions that raise exceptions, exceptions can be documented using
 \code{@throws}.%
 %
-\footnote{As of Stan 2.4.0, the only way a user-defined
+\footnote{As of Stan 2.5.0, the only way a user-defined
 producer will raise an exception is if a function it calls (including
 sampling statements) raises an exception via the reject statement.}
 %
@@ -6158,6 +7712,56 @@ Only functions ending in \code{\_rng} may access the built-in
 pseudo-random number generators.  Such functions may only be used in
 the generated quantities block.
 
+
+<<<<<<< HEAD
+\section{Recursive Functions}
+
+Stan supports recursive function definitions, which can be useful for
+some applications.  For instance, consider the matrix power operation,
+$A^n$, which is defined for a square matrix $A$ and positive integer
+$n$ by
+\[
+A^n 
+=
+\begin{cases}
+\ \mbox{I} & \mbox{if } n = 0, \mbox{ and}
+\\[3pt]
+\ A \, A^{n-1} & \mbox{if } n > 0.
+\end{cases}
+\]
+%
+where $\mbox{I}$ is the identity matrix.  This definition can be
+directly translated to a recursive function definition.
+%
+\begin{quote}
+\begin{Verbatim}
+  matrix matrix_pow(matrix a, int n);
+
+  matrix matrix_pow(matrix a, int n) {
+    if (n == 0)
+      return diag_matrix(rep_vector(1, rows(a)));
+    else 
+      return a *  matrix_pow(a, n - 1);
+  }
+\end{Verbatim}
+\end{quote}
+%
+The forward declaration of the function signature before it is defined
+is necessary so that the embedded use of \code{matrix\_pow} is
+well-defined when it is encountered.%
+%
+\footnote{A future version of Stan will allow self-recursive functions
+  to skip the forward declaration.}
+%
+It would be more efficient to not allow the recursion to go all the
+way to the base case, adding the following conditional clause.
+%
+\begin{quote}
+\begin{Verbatim}
+    else if (n == 1)
+      return a;
+\end{Verbatim}
+\end{quote}
 
 \chapter{Solving Differential Equations}\label{ode-solver.chapter}
 
@@ -6605,6 +8209,32 @@ If $c < 0$, this switches the signs of every component in $\alpha$,
 $\beta$, and $\delta$ without changing the density.
 
 
+\subsubsection{Softmax with $K$ vs. $K-1$ Parameters}
+
+In order to parameterize a $K$-simplex (i.e., a $K$-vector with
+non-negative values that sum to one), only $K - 1$ parameters are
+necessary because the $K$th is just one minus the sum of the first $K
+- 1$ parameters, so that if $\theta$ is a $K$-simplex,
+%
+\[
+\theta_K = 1 - \sum_{k=1}^K \theta_k.
+\]
+%
+The softmax function (see \refsection{softmax}) maps a $K$-vector
+$\alpha$ of linear predictors to a $K$-simplex $\theta =
+\mbox{softmax}(\alpha)$ by defining
+%
+\[
+\theta_k = \frac{\exp(\alpha_k)}{\sum_{k'=1}^K \exp(\alpha_k')}.
+\]
+%
+The softmax function is many-to-one, which leads to a lack of
+identifiability of the unconstrained parameters $\alpha$.  In
+particular, adding or subtracting a constant from each $\alpha_k$
+produces the same simplex $\theta$. 
+
+
+
 \subsection{Mitigating the Invariances}
 
 All of the examples discussed in the previous section allow
@@ -6638,6 +8268,29 @@ multiplicative and not an additive invariance, it must be constrained
 to a non-zero value, with 1 being a convenient choice.  Now all of the
 discrimination parameters may be interpreted relative to item 1's
 discrimination.
+
+The many-to-one nature of $\mbox{softmax}(\alpha)$ is typically
+mitigated by pinning a component of $\alpha$, for instance fixing
+$\alpha_K = 0$.  The resulting mapping is one-to-one from $K-1$
+unconstrained parameters to a $K$-simplex.  This is roughly how
+simplex-constrained parameters are defined in Stan; see
+\refsection{simplex-transform} for a precise definition.  The Stan
+code for creating a simplex from a $K-1$-vector can be written as
+%
+\begin{quote}
+\begin{Verbatim}
+vector softmax_id(vector alpha) {
+  vector[num_elements(alpha) + 1] alphac1;
+  for (k in 1:num_elements(alpha))
+    alphac1[k] <- alpha[k];
+  alpha[num_elements(alphac)] <- 0;
+  return softmax(alphac);
+}
+\end{Verbatim}
+\end{quote}
+
+
+
 
 \subsubsection{Adding Priors}
 
@@ -6686,6 +8339,18 @@ The addition of a prior to the two intercepts model is shown in the
 middle plot in \reffigure{non-identifiable-density}.  The plot on
 the right of \reffigure{non-identifiable-density} shows the result of
 reparameterizing to a single intercept.
+
+An alternative strategy for identifying a $K$-simplex parameterization
+$\theta = \mbox{softmax}(\alpha)$ in terms of an unconstrained
+$K$-vector $\alpha$ is to place a prior on the components of $\alpha$
+with a fixed location (that is, specifically avoid hierarchical priors
+with varying location).  Unlike the approaching of pinning $\alpha_K =
+0$, the prior-based approach models the $K$ outcomes symmetrically
+rather than modeling $K-1$ outcomes relative to the $K$-th.  The
+pinned parameterization, on the other hand, is usually more efficient
+statisticaly because it does not have the extra degree of (prior
+constrained) wiggle room.
+
 
 \subsubsection{Vague, Strongly Informative, and Weakly Informative Priors}
 
@@ -7217,7 +8882,7 @@ non-centered parameterization \cite{papa-et-al:2007}.%
 This reparameterization is helpful because it separates the
 hierarchical parameters and lower-level parameters in the prior.
 %
-\begin{figure}
+\begin{figure}[t]
 \vspace*{-6pt}
 \begin{center}
 \includegraphics[height=2in]{img/funnel.png}
@@ -7414,34 +9079,37 @@ Student-t distributed variable $\beta$,
 \[
 \beta \sim \mbox{\sf Student-t}(\nu, 0, 1),
 \]
-by first generating a gamma-distributed $\tau$,
+by first generating a gamma-distributed precision (inverse variance)
+$\tau$ according to
 \[
 \tau \sim \mbox{\sf Gamma}(\nu/2, \nu/2),
 \]
-and then generating $\beta$ from the normal distribution with
-precision $\tau$, which using our parameterization of the normal in
-terms of scale, is
+and then generating $\beta$ from the normal distribution,
 \[
-\beta \sim \mbox{\sf Normal}(0,\tau^{-2}).
+\beta \sim \mbox{\sf Normal}(0,\tau^{-\frac{1}{2}}).
 \]
 %
-That is, the marginal distribution of $\beta$ when you integrate out
-$\tau$ is $\mbox{\sf Student-t}(\nu, 0, 1)$, i.e.,
+Because $\tau$ is precision, $\tau^{-\frac{1}{2}}$ is the scale
+(standard deviation), which is the parameterization used by Stan.
+
+The marginal distribution of $\beta$ when you integrate out $\tau$ is
+$\mbox{\sf Student-t}(\nu, 0, 1)$, i.e.,
 \[
 \mbox{\sf Student-t}(\beta | \nu,0,1).
 = 
 \int_0^{\infty} 
 \,
-\mbox{\sf Normal}(\beta | 0, 1 / \tau^{2}) 
+\mbox{\sf Normal}(\beta | 0, 1 / \tau^{-\frac{1}{2}})
 \times
 \mbox{\sf Gamma}(\tau | \nu/2, \nu/2)
 \
 d\tau.
 \]
 %
-You can go a step further and instead of defining a $\beta$ drawn from
-a normal with precision $\tau$, define $\alpha$ to be drawn from a
-unit normal,
+
+To go one step further, instead of defining a $\beta$ drawn from a
+normal with precision $\tau$, define $\alpha$ to be drawn from a unit
+normal,
 %
 \[
 \alpha \sim \mbox{\sf Normal}(0,1)
@@ -7450,12 +9118,13 @@ unit normal,
 and rescale by defining
 %
 \[
-\beta = \alpha / \tau^{2}.
+\beta = \alpha \, \tau^{-\frac{1}{2}}.
 \]
 %
+
 Now suppose $\mu = \beta x$ is the product of $\beta$ with a
 regression predictor $x$.  Then the reparameterization $\mu = \alpha
-\tau^{-2} x$ has the same distribution, but in the original, direct
+\tau^{-\frac{1}{2}} x$ has the same distribution, but in the original, direct
 parameterization, $\beta$ has (potentially) heavy tails, whereas in
 the second, neither $\tau$ nor $\alpha$ have heavy tails.
 
@@ -7483,7 +9152,7 @@ parameters {
   ...
 transformed parameters {
   real beta;
-  beta <- alpha / pow(tau,2);
+  beta <- alpha / sqrt(tau);
   ...
 model {
   real half_nu;
@@ -7494,11 +9163,12 @@ model {
 \end{Verbatim}
 \end{quote}  
 %
-In most cases, the lower bound for \code{nu} can be set to \code{1} or
+Although set to \code{0} here, in most cases, the lower bound for the
+degrees of freedom parameter \code{nu} can be set to \code{1} or
 higher; when \code{nu} is 1, the result is a Cauchy distribution with
-very fat tails and as \code{nu} approaches infinity, the distribution
-approaches a normal distribution.   So the model for \code{nu}
-effectively parameterizes the heaviness of the tails of the model.
+very fat tails and as \code{nu} approaches infinity, the Student-t
+distribution approaches a normal distribution.  Thus the parameter
+\code{nu} characterizes the heaviness of the tails of the model.
 
 \subsection{Hierarchical Models}
 
@@ -7710,6 +9380,7 @@ A Wishart distribution can also be reparameterized in terms of standard
 normal variates and chi-squared variates. Let $L$ be the Cholesky factor
 of a $K \times K$ positive definite scale matrix $S$ and let $\nu$ be
 the degrees of freedom. If
+%
 \begin{equation*}
 A = \left( \begin{array}{cccc}
 \sqrt{c_{1}} & 0 & \cdots & 0\\
@@ -7718,6 +9389,7 @@ z_{21} & \sqrt{c_{2}} & \ddots & \vdots\\
 z_{K1} & \cdots & z_{K\left(K-1\right)} & \sqrt{c_{K}}
  \end{array} \right),
 \end{equation*}
+%
 where each $c_i$ is distributed chi-squared with $\nu - i + 1$ degrees
 of freedom and each $z_{ij}$ is distributed standard normal, then
 $W = LAA^{\top}L^{\top}$ is distributed Wishart with scale matrix
@@ -8361,31 +10033,54 @@ the transformed model, to
 
 
 
+\chapter{Reproducibility}\label{reproducibility.chapter}
 
+\noindent
+Floating point operations on modern computers are notoriously
+difficult to replicate because the fundamental arithmetic operations,
+right down to the IEEE 754 encoding level, are not fully specified.
+The primary problem is that the precision of operations varies across
+different hardware platforms and software implementations.
 
+Stan is designed to allow full reproducibility.  However, this is only
+possible up to the external constraints imposed by floating point
+arithmetic.
 
-% \section{Using Forward Sampling}
+Stan results will only be exactly reproducible if {\it all}\, of the following
+components are {\it identical}\,:
+%
+\begin{itemize}
+\item Stan version
+\item Stan interface (RStan, PyStan, CmdStan) and version, plus version
+  of interface language (R, Python, shell)
+\item versions of included libraries (Boost and Eigen)
+\item operating system version
+\item computer hardware including CPU, motherboard and memory
+\item \Cpp compiler, including version, compiler flags, and linked libraries
+\item same configuration of call to Stan, including random seed, chain
+  ID, initialization and data
+\end{itemize}
+%
+It doesn't matter if you use a stable release version of Stan or the
+version with a particular Git hash tag.  The same goes for all of the
+interfaces, compilers, and so on on.  The point is that if any of
+these moving parts changes in some way, floating point results may
+change.
 
-% In fact, at this point, simple (non Markov chain) Monte Carlo may be
-% used because the parameters to the beta distribution are specified and
-% there are no variables that depend on \code{theta}.  Thus this model
-% could be even further optimized by replacing the declaration of
-% \code{theta} as a parameter with a declaration as a generated quantity
-% and then generating the quantity directly.
-% %
-% \begin{quote}
-% \begin{Verbatim}
-% generated quantities {
-%     real<lower=0,upper=1> theta;
-%     theta ~ random_beta(alpha + sum(y), beta + N - sum(y));
-% }
-% \end{Verbatim}
-% \end{quote}
-% %
-% When used in the generated quantities block, sampling statements such
-% as that for \code{theta} are executed by taking a sample from the
-% specified distribution directly. The result is a Monte Carlo estimate
-% of \code{theta} in which every sample is independent (up to the limits
-% of the pseudorandom number generator, of course).  Thus the effective
-% sample size should be estimated as being roughly equal to the sample
-% size.
+Concretely, if you compile a single Stan program using the same
+CmdStan code base, but changed the optimization flag (\code{-O3} vs.\
+\code{-O2} or \code{-O0}), the two programs may not return the identical
+stream of results.  Thus it is very hard to guarantee reproducibility
+on externally managed hardware, like in a cluster or even a desktop
+managed by an IT department or with automatic updates turned on.
+
+If, however, you compiled a Stan program today using one set of flags,
+took the computer away from the internet and didn't allow it to update
+anything, then came back in a decade and recompiled the Stan program
+in the same way, you should get the same results.
+
+The data needs to be the same down to the bit level. For example, if
+you are running in RStan, Rcpp handles the conversion between R's
+floating point numbers and C++ doubles. If Rcpp changes the conversion
+process or use different types, the results are not guaranteed to be
+the same down to the bit level.  
