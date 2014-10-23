@@ -406,6 +406,34 @@ namespace stan {
       return poisson_rng();
     }
       
+    template <class RNG>
+    inline int
+    poisson_log_rng(const double alpha,
+                RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::poisson_distribution;
+
+      static const char* function = "stan::prob::poisson_log_rng(%1%)";
+      
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less;
+      using std::exp;
+ 
+      check_not_nan(function, exp(alpha),
+                    "Log rate parameter", (double*)0);
+      // Do we need this check given exp(x) >= 0?
+      check_nonnegative(function, exp(alpha), 
+                        "Log rate parameter", (double*)0);
+
+      double upper_bound = pow(2.0, 30.0); 
+      check_less(function, exp(alpha),
+                  upper_bound, "Log rate parameter", (double*)0);
+
+      variate_generator<RNG&, poisson_distribution<> >
+        poisson_rng(rng, poisson_distribution<>(exp(alpha)));
+      return poisson_rng();
+    }
   }
 }
 #endif
