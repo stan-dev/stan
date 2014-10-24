@@ -330,8 +330,9 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 
 \subsubsection{Probability Mass Functions}
 
-If $N \in \nats$, $N > 0$, and $\theta \in \mbox{$N$-simplex}$, then for $y \in
-\setlist{1,\ldots,N}$, 
+If $N \in \nats$, $N > 0$, and if $\theta \in \reals^N$ forms an
+$N$-simplex (i.e., has nonnegative entries summing to one), then for
+$y \in \setlist{1,\ldots,N}$,
 %
 \[
 \distro{Categorical}(y|\theta) = \theta_y.
@@ -355,12 +356,16 @@ See \refsection{softmax} for the definition of the softmax function.
 
 All of the categorical distributions are vectorized so that the
 outcome \farg{y} can be a single integer (type \code{int}) or an array
-of integers (type \code{int[]}).
+of integers (type \code{int[]}).  
+
 
 \begin{description}
-\fitem{real}{categorical\_log}{ints \farg{y}, vector \farg{theta}}{The
-  log categorical probability mass function with outcome(s) \farg{y} in 
-$1:N$ given $N$-simplex distribution parameter \farg{theta}.}
+  \fitem{real}{categorical\_log}{ints \farg{y}, vector
+    \farg{theta}}{The log categorical probability mass function with
+    outcome(s) \farg{y} in $1:N$ given $N$-vector of outcome
+    probabilities \farg{theta}.  The parameter \farg{theta} must have
+    non-negative entries that sum to one, but it need not be a
+    variable declared as a simplex.}
 %
 \fitem{real}{categorical\_logit\_log}{ints \farg{y}, vector
   \farg{beta}}{The log categorical probability mass function with
@@ -438,47 +443,51 @@ For an alternative parametrization, see section \ref{sec:nbalt}
 
 \subsubsection{Probability Mass Function}
 
-If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
+If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
 \nats$,
 \[
-\distro{NegativeBinomial}(n|\alpha,\beta)
+\distro{NegativeBinomial}(y|\alpha,\beta)
  = 
-\binom{n + \alpha - 1}{\alpha - 1}
+\binom{y + \alpha - 1}{\alpha - 1}
 \,
 \left( \frac{\beta}{\beta+1} \right)^{\!\alpha}
 \,
-\left( \frac{1}{\beta + 1} \right)^{\!n} \!.
+\left( \frac{1}{\beta + 1} \right)^{\!y} \!.
 \]
-\begin{eqnarray*}
-\log \distro{NegativeBinomial}(n|\alpha,\beta)
-& = & \log \Gamma(n + \alpha) 
-  - \log \Gamma(n + 1)
-  - \log \Gamma(\alpha)
-\\[4pt]
-& & 
-  {} + \alpha \left(\log \beta - \log (\beta + 1) \right)
-  - n \log (\beta + 1)
-\end{eqnarray*}
+
+% DON'T REMOVE --- WE MAY INCLUDE ALL THESE IN THE FUTURE ELSEWHERE
+% \begin{eqnarray*}
+% \log \distro{NegativeBinomial}(y|\alpha,\beta)
+% & = & \log \Gamma(y + \alpha) 
+%   - \log \Gamma(y + 1)
+%   - \log \Gamma(\alpha)
+% \\[4pt]
+% & & 
+%   {} + \alpha \left(\log \beta - \log (\beta + 1) \right)
+%   - y \log (\beta + 1)
+% \end{eqnarray*}
+% \[
+% \frac{\partial}{\partial \alpha} 
+% \log \distro{NegativeBinomial}(y|\alpha,\beta)
+% = \Psi(y + \alpha)
+% - \Psi(\alpha)
+% + \log \beta
+% - \log (\beta + 1)
+% \]
+% \[
+% \frac{\partial}{\partial \beta} 
+% \log \distro{NegativeBinomial}(y|\alpha,\beta)
+% = \frac{\alpha}{\beta} - \frac{\alpha + y}{\beta + 1}
+% \]
+% where $\Psi$ is the digamma function (see
+% \refsection{digamma-appendix} for a definition).
+
+The mean and variance of a random variable $y \sim
+\distro{NegativeBinomial}(\alpha,\beta)$ are given by
 \[
-\frac{\partial}{\partial \alpha} 
-\log \distro{NegativeBinomial}(n|\alpha,\beta)
-= \Psi(n + \alpha)
-- \Psi(\alpha)
-+ \log \beta
-- \log (\beta + 1)
-\]
-\[
-\frac{\partial}{\partial \beta} 
-\log \distro{NegativeBinomial}(n|\alpha,\beta)
-= \frac{\alpha}{\beta} - \frac{\alpha + n}{\beta + 1}
-\]
-where $\Psi$ is the digamma function, defined as
-\[
-\Psi(x) = \frac{\partial}{\partial x} \log \Gamma(x).
-\]
-\[
-\mbox{With mean } E[Y] = \frac{\alpha}{\beta} \mbox{ and variance } Var[Y] =
-\frac{\alpha}{\beta^2} (\beta + 1)
+\mathbb{E}[y] = \frac{\alpha}{\beta} 
+\ \ \mbox{ and } \ \ 
+\mbox{Var}[Y] = \frac{\alpha}{\beta^2} (\beta + 1).
 \]
 
 \pitem{n}{neg\_binomial}{alpha,beta}
@@ -522,8 +531,8 @@ binomial distribution using the mean and inverse scale
 
 \subsubsection{Probability Mass Function}
 
-If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$, then for $y \in
-\nats$,
+If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$,
+then for $y \in \nats$,
 \[
 \distro{NegativeBinomial2}(y|\mu,\phi)
  =
@@ -533,10 +542,15 @@ If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$, then for $y 
 \,
 \left( \frac{\phi}{\mu+\phi} \right)^{\!\phi} \!.
 \]
+The mean and variance of a random variable $y \sim
+\distro{NegativeBinomial2}(y|\mu,\phi)$ are
 \[
-\mbox{With mean } E[Y] = \mu = e^\eta \mbox{ and variance } Var[Y] =
-\mu + \frac{\mu^2}{\phi}
+\mathbb{E}[Y] = \mu = e^\eta 
+\ \ \ \mbox{ and } \ \ \
+\mbox{Var}[Y] = \mu + \frac{\mu^2}{\phi}.
 \]
+The parameter $\phi$ represents precision, whereas its inverse,
+$\phi^{-1}$, represents overdispersion.
 
 \pitem{y}{neg\_binomial\_2}{mu, phi}
 
@@ -548,37 +562,26 @@ If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$, then for $y 
 %
  \fitem{real}{neg\_binomial\_2\_log}{ints \farg{y}, reals
    \farg{mu}, reals \farg{phi}}{The negative binomial probability
-   mass of \farg{n} given location \farg{mu} and inverse scale
+   mass of \farg{n} given location \farg{mu} and precision
    \farg{phi}.}
 %
  \fitem{real}{neg\_binomial\_2\_log\_log}{ints \farg{y}, reals
    \farg{eta}, reals \farg{phi}}{The log negative binomial probability
-   mass of \farg{n} given log-location \farg{eta} and inverse scale
+   mass of \farg{n} given log-location \farg{eta} and precision
    \farg{phi}. This is useful for log-linear negative
    binomial regressions.}
 %
 \fitem{int}{neg\_binomial\_2\_rng}{real \farg{mu}, real \farg{phi}}{Generate a
-  negative binomial variate with location \farg{mu} and inverse scale
+  negative binomial variate with location \farg{mu} and precision
   \farg{phi}; may only be used in generated quantities block}
 %
 \fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{Generate a
-  negative binomial variate with log-location \farg{eta} and inverse scale
+  negative binomial variate with log-location \farg{eta} and precision
   \farg{phi}; may only be used in generated quantities block}
 \end{description}
 
 
-
-
-
-
-
-
-
-
-
-
-
-\section{Poisson Distribution}
+\section{Poisson Distribution}\label{poisson.section}
 
 \subsubsection{Probability Mass Function}
 
@@ -684,7 +687,7 @@ where the multinomial coefficient is defined by
 %
 \fitem{vector}{multinomial\_rng}{vector \farg{theta}, int \farg{N}}{Generate a
   multinomial variate with simplex distribution parameter \farg{theta} and 
-  (implicit) total count $N$; may only be used in generated quantities block}
+  total count \farg{N}; may only be used in generated quantities block}
 \end{description}
 
 
@@ -1583,15 +1586,12 @@ above some positive minimum value.
 
 \subsubsection{Probability Density Function}
 
-If $y_0 \in \posreals$ and $\alpha \in \posreals$, then for
-$y \in \posreals$,
+If $y_{\mbox{\footnotesize\rm min}} \in \posreals$ and $\alpha \in \posreals$, then for
+$y \in \posreals$ with $y \geq y_{\mbox{\footnotesize\rm min}}$, 
 \[
-\distro{Pareto}(y|y_0,\alpha)
+\distro{Pareto}(y|y_{\mbox{\footnotesize\rm min}},\alpha)
 =
-\alpha 
-\ y_0
-\, \left( \frac{1}{y} \right)^{\!\alpha+1}
-\! .
+\frac{\displaystyle \alpha\,y_{\mbox{\footnotesize\rm min}}^\alpha}{\displaystyle y^{\alpha+1}}.
 \]
 
 \pitem{y}{pareto}{y\_min,alpha}
@@ -2195,14 +2195,14 @@ matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
 \subsubsection{Stan Functions}
 
 The following two functions differ in the type of their \farg{V}, the
-first taking a full observation covariance matrix \farg{V} and the
-second a vector \farg{V} representing the diagonal of the observation
+first taking a full observation covariance matrix \farg{V}\ and the
+second a vector \farg{V}\ representing the diagonal of the observation
 covariance matrix.  The sampling statement defined in the previous
 section works with either type of observation \farg{V}.
 
 \begin{description}
 %
-\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{matrix \farg{y}, matrix \farg{F},
   matrix \farg{G}, matrix \farg{V}}{matrix \farg{W}, vector
   \farg{m0}, matrix \farg{C0}}{The log of the density of the
   Gaussian Dynamic Linear model with observation matrix \farg{y} in
@@ -2213,7 +2213,7 @@ section works with either type of observation \farg{V}.
   covariance \farg{C0}.}
 % 
 %
-\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{matrix \farg{y}, matrix \farg{F},
   matrix \farg{G}, vector \farg{V}}{matrix \farg{W}, vector \farg{m0},
   matrix \farg{C0}} {The log of the density of the Gaussian Dynamic
   Linear model with observation matrix \farg{y} in which rows are
@@ -2527,21 +2527,6 @@ freedom \farg{nu} and symmetric and positive-definite scale matrix
  \farg{Sigma}; may only be used in generated quantities block}
 \end{description}
 
-\section{LKJ Covariance Distribution}
-
-\pitem{W}{lkj\_cov\_log}{mu,sigma,eta}
-
-\subsubsection{Stan Functions}
-
-\begin{description}
-  \fitem{real}{lkj\_cov\_log}{matrix \farg{W}, vector \farg{mu},
-    vector \farg{sigma}, real \farg{eta}}{The log of the LKJ density
-    for covariance matrix \farg{W} is the sum of log of the lognormal
-    density of the standard deviations given location vector \farg{mu}
-    and scale vector \farg{sigma} and the log of the lkj\_corr density
-    of the correlation matrix given shape \farg{eta}.  See the next
-    section for details on the lkj\_corr density.}
-\end{description}
 
 
 

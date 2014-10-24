@@ -363,7 +363,9 @@ There are specialized matrix data types \code{corr\_matrix} and
 definite, unit diagonal) and covariance matrices (symmetric, positive
 definite).  The type \code{cholesky\_factor\_cov} is for Cholesky
 factors of covariance matrices (lower triangular, positive diagonal,
-product with own transpose is a covariance matrix).
+product with own transpose is a covariance matrix).  The type
+\code{cholesky\_factor\_corr} is for Cholesky factors of correlation
+matrices (lower triangular, positive diagonal, unit-length rows).
 
 \subsection{Arrays}
 
@@ -1475,6 +1477,7 @@ any of the following.
 \code{positive\_ordered},
 \code{row\_vector},
 \code{matrix},
+\code{cholesky\_factor\_corr},
 \code{cholesky\_factor\_cov},
 \code{corr\_matrix},
 \code{cov\_matrix}.
@@ -1663,12 +1666,12 @@ For integer and real-valued expressions, Stan supports the basic
 binary arithmetic operations of addition (\code{+}), subtraction
 (\code{-}), multiplication (\code{*}) and division (\code{/}) in the
 usual ways.  
-For integer expressions, Stan supports the modulus (\code{\%})
-binary arithmetic operation.
-Stan also supports the unary operation of negation for
-integer and real-valued expressions.  For example, assuming \code{n}
-and \code{m} are integer variables and \code{x} and \code{y} real
-variables, the following expressions are legal.
+
+For integer expressions, Stan supports the modulus (\code{\%}) binary
+arithmetic operation.  Stan also supports the unary operation of
+negation for integer and real-valued expressions.  For example,
+assuming \code{n} and \code{m} are integer variables and \code{x} and
+\code{y} real variables, the following expressions are legal.
 %
 \begin{quote}
 \code{3.0 + 0.14}, 
@@ -1717,11 +1720,42 @@ The type of subexpression \code{(y - mu)' * Sigma} is inferred to be
 matrix.  The whole expression's type is thus the type of a row vector
 multiplied by a (column) vector, which produces a \code{real} value.
 
-Stan supports exponentiation (\code{\textasciicircum}) of integer and real-valued expressions.
-The return type of exponentiation is always a real-value.
-For example, assuming \code{n}
-and \code{m} are integer variables and \code{x} and \code{y} real
-variables, the following expressions are legal.
+Stan provides elementwise matrix division and multiplication
+operations, \code{a~.*~b} and \code{a~./b}.  These provide a shorthand
+to replace loops, but are not intrinsicially more efficient than a
+version programmed with an elementwise calculations and assignments in
+a loop.  For example, given declarations
+%
+\begin{quote}
+\begin{Verbatim}
+vector[N] a;
+vector[N] b;
+vector[N] c;
+\end{Verbatim}
+\end{quote},
+%
+the assignment
+%
+\begin{quote}
+\begin{Verbatim}
+c <- a .* b;
+\end{Verbatim}
+\end{quote}
+%
+produces the same result with roughly the same efficiency as the loop
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N)
+  c[n] <- a[n] * b[n];
+\end{Verbatim}
+\end{quote}
+
+Stan supports exponentiation (\code{\textasciicircum}) of integer and
+real-valued expressions.  The return type of exponentiation is always
+a real-value.  For example, assuming \code{n} and \code{m} are integer
+variables and \code{x} and \code{y} real variables, the following
+expressions are legal.
 %
 \begin{quote}
 \code{3 \textasciicircum\ 2},
@@ -1894,7 +1928,7 @@ row and second column of the array \code{m}.
 
 \section{Function Application}\label{function-application.section}
 
-Stan provides a broad-range of built in mathematical and statistical
+Stan provides a range of built in mathematical and statistical
 functions, which are documented in \refpart{built-in-functions}.
 
 Expressions in Stan may consist of the name of function followed by a
@@ -2037,6 +2071,82 @@ the actual data in order to assess the suitability of the model; see
 \citep[Chapter~6]{GelmanEtAl:2013} for more information on
 posterior predictive checks.
 
+\section{ODE Solver}\label{language-ode-solver.section}
+
+Stan provides a built-in ordinary differential equation solver.
+Although it looks like a function application, it is special in two
+ways.  
+
+First, like PKBugs \citep{LunnEtAl:1999}, Stan's ODE solver takes a
+function specifying the system of equations as an argument.  Ordinary
+Stan functions do not allow functions as arguments.
+
+Second, the ODE solver expression restricts certain of its arguments
+to be data only expressions (i.e., they must not contain variables other
+than those declared in the data or transformed data block).  Ordinary
+Stan functions place no restriction on the origin of variables in
+their argument expressions.
+
+\subsection{Arguments}
+
+The arguments to the ODE solver function \code{integrate\_ode} are as
+follows:
+%
+\begin{enumerate}
+\item Function literal referring to a function specifying the system
+  of differential equations with signature 
+\begin{quote}
+(real,real[],real[],real[],int[]):real[]
+\end{quote}
+The arguments represent (1) time, (2) system state, (3) parameters,
+(4) real data, and (5) integer data, and the return value contains the
+derivatives with respect to time of the state,
+\item initial state, type \code{real[]},
+\item initial time, type \code{int} or \code{real}, data only,
+\item solution times, type \code{real[]}, data only,
+\item parameters, type \code{real[]},
+\item real data, type \code{real[]}, data only, and
+\item integer data, type \code{int[]}, data only.
+\end{enumerate}
+%
+
+\subsection{Return Values}
+
+The return value for the ODE solver is an array of type
+\code{real[,]}, with values consisting of solutions at the specified
+times. 
+
+\subsection{Sizes and Parallel Arrays}
+
+The sizes must match, and in particular, the following groups are of
+the same size:
+%
+\begin{itemize}
+\item state variables passed into the system function,
+  derivatives returned by the system function, initial state passed
+  into the solver, and rows of the return value of the solver,
+\item solution times and number of rows of the return value of the solver,
+\item parameters, real data and integer data passed to the solver will
+  be passed to the system function
+\end{itemize}
+%
+
+\subsection{Example}
+
+An example of a complete Stan program with a system definition and
+solver call is shown for data simulation in \reffigure{sho-sim} and
+estimation in \reffigure{sho-both}.
+
+\subsection{Gradients}
+
+Gradients are calculated by integrating the coupled system consisting
+of the original system state and derivatives of the original system
+with respect to the parameters and initial state.  The additional derivatives required
+for the coupled system are calculated by automatically differentiating
+the system with respect to the parameters.
+
+
+
 \section{Type Inference}
 
 Stan is strongly statically typed, meaning that the implementation
@@ -2066,6 +2176,7 @@ primitive types.
 \code{cov\_matrix} & \code{matrix} \\
 \code{corr\_matrix} & \code{matrix} \\
 \code{cholesky\_factor\_cov} & \code{matrix} \\
+\code{cholesky\_factor\_corr} & \code{matrix} \\
 \end{tabular}
 \hspace{0.4in}
 \begin{tabular}{c|c}
@@ -2287,7 +2398,7 @@ be grouped into sequences and into for-each loops.  In addition, Stan
 allows local variables to be declared in blocks and also allows an
 empty statement consisting only of a semicolon.
 
-\section{Assignment Statement}
+\section{Assignment Statement}\label{assignment-statement.section}
 
 An assignment statement consists of a variable (possibly multivariate
 with indexing information) and an expression.  Executing an
@@ -2356,8 +2467,8 @@ Sigma
 This example also illustrates the preferred form of splitting a
 complex assignment statement and its expression across lines.
 
-Assignments to slices of larger multi-variate data structures are
-supported by Stan.  For example, \code{a} is an array of type
+Assignments to subcomponents of larger multi-variate data structures
+are supported by Stan.  For example, \code{a} is an array of type
 \code{real[~,~]} and \code{b} is an array of type \code{real[]}, then
 the following two statements are both well-formed.
 %
@@ -2382,13 +2493,29 @@ Y[2] <- x;
 \end{quote}
 %
 
-In \R, if \code{x} is a matrix or two-dimensional array, its first row
-is \code{x[1,]} and its first column is \code{x[,1]}.  As of version
-2.0, this notation is not supported by Stan.  There are functions to
-access rows and columns of matrices, but general array slicing is not
-supported.  Similarly, Stan 2.0 does not support providing an array of
-indices as an argument to create a piecemeal subarray of a larger
-array.
+\subsection{Lvalue Summary}
+
+The expressions that are legal left-hand sides of assignment
+statements are known as ``lvalues.''  In Stan, there are only two
+kinds of legal lvalues,
+%
+\begin{itemize}
+\item a variable, or
+\item a variable with one or more indices.
+\end{itemize}
+%
+To be used as an lvalue, an indexed variable must have at least as
+many dimensions as the number of indices provided.  An array of real
+or integer types has as many dimensions as it is declared for.  A
+matrix has two dimensions and a vector or row vector one dimension;
+this also holds for the constrained types, covariance and correlation
+matrices and their Cholesky factors and ordered, positive ordered, and
+simplex vectors.  An array of matrices has two more dimensions than
+the array and an array of vectors or row vectors has one more
+dimension than the array.  Note that the number of indices can be less
+than the number of dimensions of the variable, meaning that the right
+hand side must itself be multidimensional to match the remaining
+dimensions. 
 
 \section{Log Probability Increment Statement}\label{increment-log-prob.section}
 
@@ -3753,36 +3880,23 @@ defined.
 
 \subsection{Recursive Functions}
 
-Forward declarations allow the definition of mutually recursive
-functions.  For instance, consider the following code to sum the
-application of \code{foo} to each element of a vector.
+Forward declarations allow the definition of self-recursive or
+mutually recursive functions.  For instance, consider the following
+code to compute Fibonacci numbers.
 %
 \begin{quote}
 \begin{Verbatim}
-real foo(real z) {
-  return 2 * log(z);
-}
+int fib(int n);
 
-real sum_foo_2(vector x1, vector x2);
-
-real sum_foo(vector x) {
-  if (x.size() == 0) return 0;
-  else if (x.size() == 1) return foo(x);
-  else return sum_foo_2(x.first(x.size() / 2), 
-                        x.last(x.size() - x.size() / 2));
-}
-
-real sum_foo_2(vector x, vector y) {
-  return sum_foo(x) + sum_foo(y);
+int fib(int n) {
+  if (n < 2) return n; 
+  else return fib(n-1) + fib(n-2);
 }
 \end{Verbatim}
 \end{quote}
 %
-Without the forward declaration of \code{sum\_foo\_2}, the body of the
-definition of \code{sum\_foo} would fail to compile, because the
-identifier \code{sum\_foo\_2} would not be the name of a known
-function with appropriate argument and return types.
-
+Without the forward declaration in the first line, the body of the
+definition would not compile.
 
 
 
@@ -4429,7 +4543,9 @@ A prefix question mark (\code{?A}) indicates optionality of \code{A}.
 A postfixed Kleene star (\code{A*}) indicates zero or more occurrences
 of \code{A}.  The notation \code{A \% B}, following the Boost Spirit
 parser library's notation, is shorthand for \code{?(A (B A)*)}, i.e.,
-any number of \code{A} (including zero), separated by \code{B}.
+any number of \code{A} (including zero), separated by \code{B}.  A
+postfixed, curly-braced number indicates a fixed number of repetions;
+e.g., \code{A\{6\}} is equivalent to a sequence of six copies of \code{A}.
 
 \subsection{Programs}
 
@@ -4483,6 +4599,7 @@ var_type ::= 'int' range_constraint
            | 'unit_vector' '[' expression ']'
            | 'row_vector' range_constraint '[' expression ']'
            | 'matrix' range_constraint '[' expression ',' expression ']'
+           | 'cholesky_factor_corr' '[' expression ']'
            | 'cholesky_factor_cov' '[' expression ?(',' expression) ']'
            | 'corr_matrix' '[' expression ']'
            | 'cov_matrix' '[' expression ']'
@@ -4514,6 +4631,7 @@ expression ::= numeric_literal
              | expression postfixOp
              | expression '[' expressions ']'
              | function_literal '(' ?expressions ')'
+             | ode_solve '(' function_literal (',' expression){6} ')'
              | '(' expression ')'
 
 expressions ::= expression % ','
@@ -4571,14 +4689,13 @@ nested_statement
 
 \subsection{Type Constraints}
 
-A well-formed Stan program
-must satisfy the type constraints imposed by functions and
-distributions.  For example, the binomial distribution requires an
-integer total count parameter and integer variate and when truncated
-would require integer truncation points.  If these constraints are
-violated, the program will be rejected during parsing with an error
-message indicating the location of the problem.  For information on
-argument types, see \refpart{built-in-functions}.
+A well-formed Stan program must satisfy the type constraints imposed
+by functions and distributions.  For example, the binomial
+distribution requires an integer total count parameter and integer
+variate and when truncated would require integer truncation points.
+If these constraints are violated, the program will be rejected during
+parsing with an error message indicating the location of the problem.
+For information on argument types, see \refpart{built-in-functions}.
 
 \subsection{Operator Precedence and Associativity}
 
@@ -4598,3 +4715,23 @@ literals cannot consist of only a period or only an exponent.
 Both the conditional if-then-else statement and while-loop statement
 require the expression denoting the condition to be a primitive type,
 integer or real.
+
+\subsection{ODE Solver Argument Types and Origins}
+
+The \code{integrate\_ode} expression requires 
+%
+\begin{itemize}
+\item its first argument to refer to a function with signature
+\begin{quote}
+ \code{(real,real[],real[],real[],int[]):real[]}, 
+\end{quote}
+\item the remaining six arguments must assignable to types
+\begin{quote}
+  \code{real[]}, \code{real}, \code{real[]}, \code{real[]},
+\code{real[]}, and \code{int[]}
+\end{quote}
+ respectively, and
+\item the third, fourth, and sixth arguments must be expressions not
+  containing any variables not originating in the data or transformed
+  data blocks.
+\end{itemize}

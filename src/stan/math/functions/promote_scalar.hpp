@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stan/math/functions/promote_scalar_type.hpp>
+#include <stan/math/meta/index_type.hpp>
 
 namespace stan {
 
@@ -79,8 +80,9 @@ namespace stan {
       static std::vector<typename promote_scalar_type<T,S>::type>
       apply(const std::vector<S>& x) {
         typedef std::vector<typename promote_scalar_type<T,S>::type> return_t; 
+        typedef typename index_type<return_t>::type idx_t;
         return_t y(x.size());
-        for (typename return_t::size_type i = 0; i < x.size(); ++i)
+        for (idx_t i = 0; i < x.size(); ++i)
           y[i] = promote_scalar_struct<T,S>::apply(x[i]);
         return y;
       }

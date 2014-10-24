@@ -177,6 +177,29 @@ namespace stan {
             indexes.push_back(x.dimss_[i][j]); // wasteful copy, could use refs
         generate_indexed_expr<false>(expr_string,indexes,base_type,e_num_dims,o_);
       }
+      void operator()(const integrate_ode& fx) const { 
+        o_ << "integrate_ode("
+           << fx.system_function_name_
+           << "_functor__(), ";
+
+        generate_expression(fx.y0_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.t0_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.ts_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.theta_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.x_, o_);
+        o_ << ", ";
+
+        generate_expression(fx.x_int_, o_);
+        o_ << ", pstream__)";
+      }
       void operator()(const fun& fx) const { 
         // first test if short-circuit op (binary && and || applied to
         // primitives; overloads are eager, not short-circuiting)
@@ -991,7 +1014,7 @@ namespace stan {
       void operator()(double_var_decl const& x) const {
         std::vector<expression> ctor_args;
         declare_array(is_fun_return_ 
-                      ? "return_t__"
+                      ? "fun_scalar_t__"
                       : ( is_var_ ? "T__" : "double" ),
                       ctor_args,x.name_,x.dims_);
       }
@@ -999,7 +1022,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.M_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1007,7 +1030,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,1,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,1,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,1,Eigen::Dynamic> "
                           : "row_vector_d" ),
@@ -1018,7 +1041,7 @@ namespace stan {
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
                           : "matrix_d" ), 
@@ -1028,7 +1051,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1036,7 +1059,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1044,7 +1067,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1052,7 +1075,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1061,7 +1084,7 @@ namespace stan {
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " 
                           : "matrix_d" ), 
@@ -1081,7 +1104,7 @@ namespace stan {
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
                           : "matrix_d" ),
@@ -1092,7 +1115,7 @@ namespace stan {
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " 
                           : "matrix_d" ), 
@@ -1664,7 +1687,7 @@ namespace stan {
         o_ << "return ";
         if (!rs.return_value_.expression_type().is_ill_formed()
             && !rs.return_value_.expression_type().is_void()) {
-          o_ << "stan::math::promote_scalar<return_t__>(";
+          o_ << "stan::math::promote_scalar<fun_return_scalar_t__>(";
           generate_expression(rs.return_value_, o_);
           o_ << ")";
         }
@@ -4283,8 +4306,8 @@ namespace stan {
       return true;
     }
 
-    std::string return_scalar_type(const function_decl_def& fun,
-                                   bool is_lp) {
+    std::string fun_scalar_type(const function_decl_def& fun,
+                                bool is_lp) {
       size_t num_args = fun.arg_decls_.size();
       // nullary, non-lp
       if (has_only_int_args(fun) && !is_lp)
@@ -4421,6 +4444,31 @@ namespace stan {
       out << ")";
     }
 
+    void generate_functor_arguments(const function_decl_def& fun,
+                                    bool is_rng,
+                                    bool is_lp,
+                                    bool is_log,
+                                    std::ostream& out) {
+      // arguments
+      out << "(";
+      for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
+        if (i > 0) 
+          out << ", ";
+        out << fun.arg_decls_[i].name_;
+      }
+      if ((is_rng || is_lp) && fun.arg_decls_.size() > 0)
+        out << ", ";
+      if (is_rng)
+        out << "base_rng__";
+      else if (is_lp)
+        out << "lp__, lp_accum__";
+      if (is_rng || is_lp || fun.arg_decls_.size() > 0)
+        out << ", ";
+      out << "pstream__";
+      out << ")";
+    }
+
+
 
     void generate_function_body(const function_decl_def& fun,
                                 const std::string& scalar_t_name,
@@ -4432,11 +4480,18 @@ namespace stan {
       } 
       out << " {" << EOL;
       out << INDENT
-          << "typedef " << scalar_t_name << " return_t__;"
+          << "typedef " << scalar_t_name << " fun_scalar_t__;"
+          << EOL;
+      out << INDENT
+          << "typedef " 
+          << ((fun.return_type_.base_type_ == INT_T) 
+              ? "int" : "fun_scalar_t__")
+          << " fun_return_scalar_t__;"
           << EOL;
       out << INDENT
           << "const static bool propto__ = true;"
           << EOL
+          << INDENT
           << "(void) propto__;" 
           << EOL;
       bool is_var = false;
@@ -4492,7 +4547,7 @@ namespace stan {
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_log = ends_with("_log", fun.name_);
       std::string scalar_t_name 
-        = return_scalar_type(fun, is_lp);
+        = fun_scalar_type(fun, is_lp);
 
       generate_function_template_parameters(fun,is_rng,is_lp,is_log,out);
       generate_function_inline_return_type(fun,scalar_t_name,out);
@@ -4506,10 +4561,54 @@ namespace stan {
       out << EOL;
     }
 
+    void generate_function_functor(const function_decl_def& fun,
+                                   std::ostream& out) {
+      if (fun.body_.is_no_op_statement())
+        return; // forward declaration, so no functor needed
+
+      bool is_rng = ends_with("_rng", fun.name_);
+      bool is_lp = ends_with("_lp", fun.name_);
+      bool is_log = ends_with("_log", fun.name_);
+      std::string scalar_t_name 
+        = fun_scalar_type(fun, is_lp);
+
+      out << std::endl
+          << "struct ";
+      generate_function_name(fun,out);
+      out << "_functor__ {"
+          << std::endl;
+
+      generate_function_template_parameters(fun,is_rng,is_lp,is_log,out);
+
+      generate_function_inline_return_type(fun,scalar_t_name,out);
+
+      out <<  "operator()";
+      generate_function_arguments(fun,is_rng,is_lp,is_log,out);
+      out << " const {"
+          << std::endl;
+
+      out << INDENT
+          << "return ";
+      generate_function_name(fun,out);
+      generate_functor_arguments(fun,is_rng,is_lp,is_log,out);
+      out << ";"
+          << std::endl;
+
+      out << "}"
+          << std::endl;
+
+      out << "};"
+          << std::endl 
+          << std::endl;
+    }
+
+
     void generate_functions(const std::vector<function_decl_def>& funs,
                             std::ostream& out) {
-      for (size_t i = 0; i < funs.size(); ++i)
+      for (size_t i = 0; i < funs.size(); ++i) {
         generate_function(funs[i],out);
+        generate_function_functor(funs[i],out);
+      }
     }
 
     void generate_cpp(const program& prog, 

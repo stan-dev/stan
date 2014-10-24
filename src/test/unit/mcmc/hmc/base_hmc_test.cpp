@@ -81,7 +81,7 @@ TEST(McmcBaseHMC, seed) {
 
   sampler.seed(q);
   
-  for (Eigen::VectorXd::size_type i = 0; i < q.size(); ++i)
+  for (int i = 0; i < q.size(); ++i)
     EXPECT_EQ(q(i), sampler.z().q(i));
   
 }
