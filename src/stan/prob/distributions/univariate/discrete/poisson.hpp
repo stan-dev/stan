@@ -21,8 +21,7 @@ namespace stan {
   namespace prob {
 
     // Poisson(n|lambda)  [lambda > 0;  n >= 0]
-    template <bool propto,
-              typename T_n, typename T_rate>
+    template <bool propto, typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_log(const T_n& n, const T_rate& lambda) {
 
@@ -379,6 +378,8 @@ namespace stan {
       return operands_and_partials.to_var(P);
     }
 
+    static const double POISSON_MAX_RATE = pow(2,30);
+
     template <class RNG>
     inline int
     poisson_rng(const double lambda,
@@ -393,19 +394,20 @@ namespace stan {
       using stan::math::check_less;
  
       check_not_nan(function, lambda,
-                    "Rate parameter", (double*)0);
+                    "Rate parameter", static_cast<double*>(0));
       check_nonnegative(function, lambda,
-                        "Rate parameter", (double*)0);
+                        "Rate parameter", static_cast<double*>(0));
 
-      double upper_bound = pow(2.0, 30.0); 
-      check_less(function, lambda,
-                  upper_bound, "Rate parameter", (double*)0);
+      check_less(function, lambda,POISSON_MAX_RATE, 
+                 "Rate parameter", static_cast<double*>(0));
 
       variate_generator<RNG&, poisson_distribution<> >
         poisson_rng(rng, poisson_distribution<>(lambda));
       return poisson_rng();
     }
       
+    static const double POISSON_MAX_LOG_RATE = 30 * log(2);
+
     template <class RNG>
     inline int
     poisson_log_rng(const double alpha,
@@ -420,15 +422,11 @@ namespace stan {
       using stan::math::check_less;
       using std::exp;
  
-      check_not_nan(function, exp(alpha),
-                    "Log rate parameter", (double*)0);
-      // Do we need this check given exp(x) >= 0?
-      check_nonnegative(function, exp(alpha), 
-                        "Log rate parameter", (double*)0);
+      check_not_nan(function, alpha,
+                    "Log rate parameter", static_cast<double*>(0));
 
-      double upper_bound = pow(2.0, 30.0); 
-      check_less(function, exp(alpha),
-                  upper_bound, "Log rate parameter", (double*)0);
+      check_less(function, alpha, POISSON_MAX_LOG_RATE, 
+                 "Log rate parameter", static_cast<double*>(0));
 
       variate_generator<RNG&, poisson_distribution<> >
         poisson_rng(rng, poisson_distribution<>(exp(alpha)));
