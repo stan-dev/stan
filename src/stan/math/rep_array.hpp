@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <stan/math/error_handling/check_nonnegative.hpp>
+#include <stan/error_handling/check_nonnegative.hpp>
 
 namespace stan {
 

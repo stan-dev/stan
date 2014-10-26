@@ -4,7 +4,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/LDLT_alloc.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace math {

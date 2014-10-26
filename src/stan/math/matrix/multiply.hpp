@@ -4,8 +4,8 @@
 #include <boost/type_traits/is_arithmetic.hpp> 
 #include <boost/utility/enable_if.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
 
 namespace stan {
   namespace math {

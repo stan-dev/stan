@@ -4,7 +4,7 @@
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_vector.hpp>
+#include <stan/error_handling/matrix/check_vector.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/matrix/dot_product.hpp>
 

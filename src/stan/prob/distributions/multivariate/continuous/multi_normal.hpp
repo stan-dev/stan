@@ -6,16 +6,16 @@
 
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/matrix/trace_inv_quad_form_ldlt.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
-#include <stan/math/error_handling/check_finite.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/check_finite.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {
 

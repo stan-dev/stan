@@ -5,8 +5,8 @@
 #include <stan/meta/traits.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/squared_distance.hpp>
-#include <stan/math/error_handling/matrix/check_vector.hpp>
-#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/error_handling/matrix/check_vector.hpp>
+#include <stan/error_handling/matrix/check_matching_sizes.hpp>
 
 namespace stan {
   namespace math {

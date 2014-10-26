@@ -5,7 +5,7 @@
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/functions/log1m.hpp>

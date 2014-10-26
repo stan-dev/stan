@@ -2,8 +2,8 @@
 #define STAN__MATH__MATRIX__ROW_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/check_greater_or_equal.hpp>
-#include <stan/math/error_handling/check_less_or_equal.hpp>
+#include <stan/error_handling/check_greater_or_equal.hpp>
+#include <stan/error_handling/check_less_or_equal.hpp>
 
 namespace stan {
   namespace math {

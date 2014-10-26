@@ -3,7 +3,7 @@
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_matching_dims.hpp>
+#include <stan/error_handling/matrix/check_matching_dims.hpp>
 
 namespace stan {
   namespace math {

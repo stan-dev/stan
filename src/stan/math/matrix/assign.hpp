@@ -6,8 +6,8 @@
 #include <stdexcept>
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
-#include <stan/math/error_handling/matrix/check_matching_dims.hpp>
+#include <stan/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/error_handling/matrix/check_matching_dims.hpp>
 
 
 #include <iostream>

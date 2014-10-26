@@ -9,7 +9,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/matrix/stored_gradient_vari.hpp>
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
+#include <stan/error_handling/matrix/check_nonzero_size.hpp>
 
 namespace stan {
 

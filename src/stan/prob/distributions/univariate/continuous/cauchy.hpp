@@ -6,7 +6,7 @@
 
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/log1p.hpp>
 #include <stan/math/functions/square.hpp>

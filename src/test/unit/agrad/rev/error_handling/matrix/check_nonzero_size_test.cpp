@@ -1,5 +1,5 @@
 #include <stan/agrad/rev/var.hpp>
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
+#include <stan/error_handling/matrix/check_nonzero_size.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 

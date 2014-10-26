@@ -14,12 +14,12 @@
 #include <stan/agrad/rev/matrix.hpp>
 
 #include <stan/math.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 #include <stan/math/matrix.hpp>
 
 #include <stan/math/matrix/sum.hpp>
-#include <stan/math/matrix_error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 

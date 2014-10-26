@@ -6,8 +6,8 @@
 #include <boost/random/variate_generator.hpp>
 
 #include <stan/prob/constants.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 

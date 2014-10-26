@@ -7,7 +7,7 @@
 
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>

@@ -4,7 +4,7 @@
 #include <boost/math/tools/promotion.hpp>
 #include <boost/math/special_functions/erf.hpp>
 #include <stan/math/constants.hpp>
-#include <stan/math/error_handling/check_not_nan.hpp>
+#include <stan/error_handling/check_not_nan.hpp>
 
 namespace stan {
   namespace math {

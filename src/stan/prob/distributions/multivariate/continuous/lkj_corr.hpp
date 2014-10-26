@@ -2,8 +2,8 @@
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_CORR_HPP
 
 #include <stan/prob/constants.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
 #include <stan/prob/transform.hpp>

@@ -2,8 +2,8 @@
 #define STAN__MATH__MATRIX__SUB_COL_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_row_index.hpp>
-#include <stan/math/error_handling/matrix/check_column_index.hpp>
+#include <stan/error_handling/matrix/check_row_index.hpp>
+#include <stan/error_handling/matrix/check_column_index.hpp>
 
 namespace stan {
   namespace math {

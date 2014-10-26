@@ -2,9 +2,9 @@
 #define STAN__MATH__MATRIX__TAIL_HPP
 
 #include <vector>
-#include <stan/math/error_handling/matrix/check_column_index.hpp>
-#include <stan/math/error_handling/matrix/check_row_index.hpp>
-#include <stan/math/error_handling/matrix/check_std_vector_index.hpp>
+#include <stan/error_handling/matrix/check_column_index.hpp>
+#include <stan/error_handling/matrix/check_row_index.hpp>
+#include <stan/error_handling/matrix/check_std_vector_index.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_range.hpp>
+#include <stan/error_handling/matrix/check_range.hpp>
 
 namespace stan {
   namespace math {

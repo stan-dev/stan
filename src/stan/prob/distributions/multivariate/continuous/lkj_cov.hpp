@@ -3,8 +3,8 @@
 
 #include <stan/prob/constants.hpp>
 #include <stan/math/matrix.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 

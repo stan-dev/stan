@@ -5,7 +5,7 @@
 #include <boost/random/variate_generator.hpp>
 
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/square.hpp>
 #include <stan/math/functions/multiply_log.hpp>

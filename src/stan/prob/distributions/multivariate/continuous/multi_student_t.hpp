@@ -7,16 +7,16 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 
 #include <stan/math/matrix.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/subtract.hpp>
-#include <stan/math/matrix_error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/inv_gamma.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
 #include <boost/random/variate_generator.hpp>
 
 namespace stan {

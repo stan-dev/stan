@@ -5,8 +5,8 @@
 #include <stan/agrad/rev/var.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 #include <stan/agrad/rev/matrix/trace_inv_quad_form_ldlt.hpp>
 
 namespace stan {

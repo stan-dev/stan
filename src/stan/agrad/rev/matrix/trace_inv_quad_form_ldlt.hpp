@@ -7,7 +7,7 @@
 #include <stan/agrad/rev/matrix/LDLT_factor.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
 
 namespace stan {
   namespace agrad {

@@ -9,7 +9,7 @@
 #include <stan/agrad/fwd/matrix/determinant.hpp>
 #include <stan/agrad/fwd/functions/fabs.hpp>
 #include <stan/agrad/fwd/functions/log.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace agrad {

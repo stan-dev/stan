@@ -2,8 +2,8 @@
 #define STAN__MATH__MATRIX__INVERSE_SPD_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {
   namespace math {

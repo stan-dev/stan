@@ -3,7 +3,7 @@
 
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/var.hpp>
-#include <stan/math/error_handling/matrix/check_pos_definite.hpp>
+#include <stan/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 

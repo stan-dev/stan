@@ -8,7 +8,7 @@
 #include <stan/prob/distributions/univariate/continuous/exponential.hpp>
 
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>

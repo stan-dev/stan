@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__MATRIX__EIGENVECTORS_SYM_HPP
 #define STAN__MATH__MATRIX__EIGENVECTORS_SYM_HPP
 
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/matrix/check_nonzero_size.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {

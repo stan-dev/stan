@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/math/matrix_error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
 #include <stan/agrad/rev.hpp>
 
 TEST(AgradRevErrorHandlingMatrix,CheckCovMatrix) {

@@ -3,12 +3,12 @@
 
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/columns_dot_self.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/dot_self.hpp>
-#include <stan/math/matrix_error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
@@ -22,7 +22,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
 
 namespace stan {
 

@@ -4,9 +4,9 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/transpose.hpp>

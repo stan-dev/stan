@@ -5,10 +5,10 @@
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/math/error_handling.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/functions/multiply_log.hpp>
-#include <stan/math/matrix_error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 #include <stan/prob/distributions/multivariate/discrete/categorical.hpp>

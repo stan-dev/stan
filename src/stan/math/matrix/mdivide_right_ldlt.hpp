@@ -5,7 +5,7 @@
 #include <stan/math/matrix/LDLT_factor.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
 #include <boost/math/tools/promotion.hpp>
 
 namespace stan {

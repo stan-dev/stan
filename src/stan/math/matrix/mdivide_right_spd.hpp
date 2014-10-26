@@ -5,10 +5,10 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/mdivide_left_spd.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/math/error_handling/matrix/check_pos_definite.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_pos_definite.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace math {

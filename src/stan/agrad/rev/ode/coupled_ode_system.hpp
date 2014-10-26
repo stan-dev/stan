@@ -6,8 +6,8 @@
 #include <stan/agrad/rev/functions/value_of.hpp>
 #include <stan/agrad/rev/internal/precomputed_gradients.hpp>
 #include <stan/agrad/rev/operators/operator_plus_equal.hpp>
-#include <stan/math/error_handling/check_equal.hpp>
-#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/error_handling/check_equal.hpp>
+#include <stan/error_handling/matrix/check_matching_sizes.hpp>
 #include <stan/math/ode/coupled_ode_system.hpp>
 #include <stan/meta/traits.hpp>
 

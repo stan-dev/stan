@@ -4,7 +4,7 @@
 #include <ostream>
 #include <vector>
 
-#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/error_handling/matrix/check_matching_sizes.hpp>
 
 namespace stan {
 

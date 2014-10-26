@@ -1,4 +1,4 @@
-#include <stan/math/error_handling/check_bounded.hpp>
+#include <stan/error_handling/check_bounded.hpp>
 #include <stan/agrad/rev.hpp>
 #include <gtest/gtest.h>
 

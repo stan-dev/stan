@@ -1,8 +1,8 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MATRIX_NORMAL_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MATRIX_NORMAL_HPP
 
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/agrad/rev.hpp>
@@ -12,7 +12,7 @@
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 
 namespace stan {

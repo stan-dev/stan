@@ -4,7 +4,7 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/matrix/promote_common.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>

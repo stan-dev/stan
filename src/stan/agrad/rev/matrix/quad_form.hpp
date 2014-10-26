@@ -9,9 +9,9 @@
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/value_of.hpp>
 #include <stan/math/matrix/quad_form.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {
   namespace agrad {

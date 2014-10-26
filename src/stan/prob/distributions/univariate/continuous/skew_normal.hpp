@@ -6,7 +6,7 @@
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/functions/owens_t.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>

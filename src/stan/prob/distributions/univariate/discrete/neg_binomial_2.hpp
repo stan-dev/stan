@@ -6,7 +6,7 @@
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>

@@ -1,9 +1,9 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_GP_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_GP_HPP
 
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/math/error_handling/dom_err.hpp>
+#include <stan/error_handling/matrix.hpp>
+#include <stan/error_handling.hpp>
+#include <stan/error_handling/dom_err.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/agrad/rev.hpp>
@@ -15,7 +15,7 @@
 
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/trace_gen_inv_quad_form_ldlt.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
 
 namespace stan {
   namespace prob {
