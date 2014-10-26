@@ -1,10 +1,4 @@
 #include <gtest/gtest.h>
-#include <iostream>
-#include <fstream>
-#include <istream>
-#include <sstream>
-#include <exception>
-#include <stdexcept>
 #include <test/unit/gm/utility.hpp>
 
 TEST(parserFunctions, funsGood0) {
@@ -46,7 +40,7 @@ TEST(parserFunctions, funsBad2) {
 }
 
 TEST(parserFunctions, funsBad3) {
-  test_throws("functions-bad3","EXPECTED: \"(\" BUT FOUND");
+  test_throws("functions-bad3","SYNTAX ERROR, MESSAGE(S) FROM PARSER:");
 }
 
 TEST(parserFunctions,funsBad4) {

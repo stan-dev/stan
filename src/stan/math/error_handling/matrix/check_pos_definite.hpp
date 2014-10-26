@@ -4,9 +4,11 @@
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
+#include <stan/math/error_handling/check_not_nan.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
+
   namespace math {
 
     /**
@@ -35,11 +37,14 @@ namespace stan {
         std::string msg(message.str());
         return dom_err(function,y(0,0),name,msg.c_str(),"",result);
       }
+      for (int i = 0; i < y.size(); ++i)
+        check_not_nan(function, y(i), "", result);
+
       Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
         = y.ldlt();
-      if(cholesky.info() != Eigen::Success || 
-         !cholesky.isPositive() ||
-         (cholesky.vectorD().array() <= CONSTRAINT_TOLERANCE).any()) {
+      if (cholesky.info() != Eigen::Success
+          || !cholesky.isPositive()
+          || (cholesky.vectorD().array() <= CONSTRAINT_TOLERANCE).any()) {
         std::ostringstream message;
         message << name << " is not positive definite. " 
                 << name << "(0,0) is %1%.";

@@ -83,6 +83,8 @@ TEST(AgradAutoDiff,gradient) {
   EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx2(0));
   EXPECT_FLOAT_EQ(x(0) * x(0) + 3 * 2 * x(1), grad_fx2(1));
 }
+
+
 TEST(AgradAutoDiff,gradientDotVector) {
   using Eigen::Matrix;  using Eigen::Dynamic;
   using stan::agrad::var;

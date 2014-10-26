@@ -5,8 +5,12 @@
 #include <stan/agrad/rev/var.hpp>
 
 namespace stan {
+
   namespace agrad {
-    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+
+    typedef 
+    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Index 
+    size_type;
 
     /**
      * The type of a matrix holding <code>stan::agrad::var</code>
