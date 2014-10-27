@@ -5,7 +5,7 @@
 
 #include <boost/math/special_functions/fpclassify.hpp>
 
-#include <stan/error_handling/dom_err.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>

@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__MATRIX__QR_Q_HPP
 #define STAN__MATH__MATRIX__QR_Q_HPP
 
-#include <stan/error_handling/check_greater_or_equal.hpp>
+#include <stan/error_handling/scalar/check_greater_or_equal.hpp>
 #include <stan/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <Eigen/QR>

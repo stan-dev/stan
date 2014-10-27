@@ -5,7 +5,7 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/error_handling/matrix/check_square.hpp>
 #include <stan/error_handling/matrix/check_vector.hpp>
-#include <stan/error_handling/check_equal.hpp>
+#include <stan/error_handling/scalar/check_equal.hpp>
 
 namespace stan {
   namespace math {

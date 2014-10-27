@@ -1,4 +1,4 @@
-#include <stan/error_handling/check_positive_finite.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <gtest/gtest.h>
 
 using stan::math::check_positive_finite;

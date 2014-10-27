@@ -1,4 +1,4 @@
-#include <stan/error_handling/check_bounded.hpp>
+#include <stan/error_handling/scalar/check_bounded.hpp>
 #include <gtest/gtest.h>
 
 using stan::math::check_bounded;

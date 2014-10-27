@@ -3,8 +3,8 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/dom_err.hpp>
-#include <stan/error_handling/check_not_nan.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {

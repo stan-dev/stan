@@ -1,4 +1,4 @@
-#include <stan/error_handling/check_consistent_size.hpp>
+#include <stan/error_handling/scalar/check_consistent_size.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathMatrixErrorHandling, checkConsistentSize) {

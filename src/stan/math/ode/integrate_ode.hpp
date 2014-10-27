@@ -6,8 +6,8 @@
 #include <boost/numeric/odeint.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/value_of.hpp>
-#include <stan/error_handling/check_less.hpp>
-#include <stan/error_handling/check_finite.hpp>
+#include <stan/error_handling/scalar/check_less.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
 #include <stan/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/error_handling/matrix/check_ordered.hpp>
 

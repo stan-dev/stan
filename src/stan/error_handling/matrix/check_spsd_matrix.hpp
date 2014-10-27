@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/check_positive.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/error_handling/matrix/check_pos_semidefinite.hpp>
 #include <stan/error_handling/matrix/check_symmetric.hpp>
 #include <stan/error_handling/matrix/check_square.hpp>

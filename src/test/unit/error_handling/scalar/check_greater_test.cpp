@@ -1,4 +1,4 @@
-#include <stan/error_handling/check_greater.hpp>
+#include <stan/error_handling/scalar/check_greater.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/Eigen.hpp>
 

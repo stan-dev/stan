@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING__DOM_ERR_VEC_HPP
-#define STAN__ERROR_HANDLING__DOM_ERR_VEC_HPP
+#ifndef STAN__ERROR_HANDLING__SCALAR__DOM_ERR_VEC_HPP
+#define STAN__ERROR_HANDLING__SCALAR__DOM_ERR_VEC_HPP
 
 #include <typeinfo>
 #ifdef BOOST_MSVC
@@ -17,7 +17,7 @@
 
 #include <boost/format.hpp>
 
-#include <stan/error_handling/dom_err.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/math/meta/value_type.hpp>
 #include <stan/meta/traits.hpp>
 

@@ -6,7 +6,7 @@
 
 #include <stan/error_handling/matrix.hpp>
 #include <stan/error_handling.hpp>
-#include <stan/error_handling/dom_err.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/agrad/rev.hpp>

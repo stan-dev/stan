@@ -1,8 +1,8 @@
-#ifndef STAN__ERROR_HANDLING__CHECK_CONSISTENT_SIZES_HPP
-#define STAN__ERROR_HANDLING__CHECK_CONSISTENT_SIZES_HPP
+#ifndef STAN__ERROR_HANDLING__SCALAR__CHECK_CONSISTENT_SIZES_HPP
+#define STAN__ERROR_HANDLING__SCALAR__CHECK_CONSISTENT_SIZES_HPP
 
-#include <stan/error_handling/check_consistent_size.hpp>
-#include <stan/error_handling/dom_err.hpp>
+#include <stan/error_handling/scalar/check_consistent_size.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/meta/traits.hpp>
 
 namespace stan {

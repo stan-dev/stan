@@ -4,7 +4,7 @@
 #include <string>
 #include <typeinfo>
 
-#include <stan/error_handling/dom_err.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/meta/traits.hpp>
 

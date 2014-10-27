@@ -2,7 +2,7 @@
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_CHOLESKY_FACTOR_CORR_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/check_positive.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/error_handling/matrix/check_lower_triangular.hpp>
 #include <stan/error_handling/matrix/check_square.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>

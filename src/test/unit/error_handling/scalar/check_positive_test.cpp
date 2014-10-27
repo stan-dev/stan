@@ -1,4 +1,4 @@
-#include <stan/error_handling/check_positive.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/math/matrix/meta/value_type.hpp>  
 #include <gtest/gtest.h>
 

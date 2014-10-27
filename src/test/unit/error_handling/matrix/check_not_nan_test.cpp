@@ -1,4 +1,4 @@
-#include <stan/error_handling/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stdexcept>

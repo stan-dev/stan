@@ -2,7 +2,7 @@
 #define STAN__MATH__REP_MATRIX_HPP
 
 #include <boost/math/tools/promotion.hpp>
-#include <stan/error_handling/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {

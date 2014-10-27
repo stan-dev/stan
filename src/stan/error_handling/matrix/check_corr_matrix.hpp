@@ -3,8 +3,8 @@
 
 #include <sstream>
 
-#include <stan/error_handling/dom_err.hpp>
-#include <stan/error_handling/check_positive.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/error_handling/matrix/check_symmetric.hpp>
 #include <stan/error_handling/matrix/check_size_match.hpp>

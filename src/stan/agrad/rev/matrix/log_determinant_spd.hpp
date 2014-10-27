@@ -2,7 +2,7 @@
 #define STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP
 
 #include <vector>
-#include <stan/error_handling/dom_err.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/var.hpp>

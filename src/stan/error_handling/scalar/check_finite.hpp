@@ -1,8 +1,8 @@
 #ifndef STAN__ERROR_HANDLING_CHECK_FINITE_HPP
 #define STAN__ERROR_HANDLING_CHECK_FINITE_HPP
 
-#include <stan/error_handling/dom_err.hpp>
-#include <stan/error_handling/dom_err_vec.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/scalar/dom_err_vec.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/meta/traits.hpp>
 

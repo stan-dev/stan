@@ -1,15 +1,15 @@
-#ifndef STAN__ERROR_HANDLING_CHECK_LESS_HPP
-#define STAN__ERROR_HANDLING_CHECK_LESS_HPP
+#ifndef STAN__ERROR_HANDLING_CHECK_LESS_OR_EQUAL_HPP
+#define STAN__ERROR_HANDLING_CHECK_LESS_OR_EQUAL_HPP
 
-#include <stan/error_handling/dom_err.hpp>
-#include <stan/error_handling/dom_err_vec.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/scalar/dom_err_vec.hpp>
 
 namespace stan {
   namespace math {
 
     namespace {
       template <typename T_y, typename T_high, typename T_result, bool is_vec>
-      struct less {
+      struct less_or_equal {
         static bool check(const char* function,
                           const T_y& y,
                           const T_high& high,
@@ -18,9 +18,9 @@ namespace stan {
           using stan::length;
           VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(high); n++) {
-            if (!(y < high_vec[n]))
+            if (!(y <= high_vec[n]))
               return dom_err(function,y,name,
-                             " is %1%, but must be less than ",
+                             " is %1%, but must be less than or equal to ",
                              high_vec[n],result);
           }
           return true;
@@ -28,7 +28,7 @@ namespace stan {
       };
     
       template <typename T_y, typename T_high, typename T_result>
-      struct less<T_y, T_high, T_result, true> {
+      struct less_or_equal<T_y, T_high, T_result, true> {
         static bool check(const char* function,
                           const T_y& y,
                           const T_high& high,
@@ -37,9 +37,9 @@ namespace stan {
           using stan::length;
           VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(y); n++) {
-            if (!(stan::get(y,n) < high_vec[n]))
+            if (!(stan::get(y,n) <= high_vec[n]))
               return dom_err_vec(n,function,y,name,
-                                 " is %1%, but must be less than ",
+                                 " is %1%, but must be less than or equal to ",
                                  high_vec[n],result);
           }
           return true;
@@ -49,14 +49,15 @@ namespace stan {
 
     // throws if any element of y or high is nan
     template <typename T_y, typename T_high, typename T_result>
-    inline bool check_less(const char* function,
-                           const T_y& y,
-                           const T_high& high,
-                           const char* name,  
-                           T_result* result) {
-      return less<T_y,T_high,T_result,is_vector_like<T_y>::value>
+    inline bool check_less_or_equal(const char* function,
+                                    const T_y& y,
+                                    const T_high& high,
+                                    const char* name,  
+                                    T_result* result) {
+      return less_or_equal<T_y,T_high,T_result,is_vector_like<T_y>::value>
         ::check(function,y,high,name,result);
     }
+
   }
 }
 #endif

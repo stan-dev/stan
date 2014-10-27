@@ -14,7 +14,7 @@
 #include <stan/prob/traits.hpp>
 #include <stan/error_handling/matrix/check_ldlt_factor.hpp>
 #include <stan/error_handling/matrix/check_size_match.hpp>
-#include <stan/error_handling/check_finite.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
 #include <stan/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {

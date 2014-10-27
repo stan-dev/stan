@@ -3,7 +3,7 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <Eigen/QR>
-#include <stan/error_handling/check_greater_or_equal.hpp>
+#include <stan/error_handling/scalar/check_greater_or_equal.hpp>
 #include <stan/error_handling/matrix/check_nonzero_size.hpp>
 
 namespace stan {

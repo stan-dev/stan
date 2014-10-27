@@ -1,4 +1,4 @@
-#include <stan/error_handling/check_less.hpp>
+#include <stan/error_handling/scalar/check_less.hpp>
 #include <gtest/gtest.h>
 
 using stan::math::check_less;

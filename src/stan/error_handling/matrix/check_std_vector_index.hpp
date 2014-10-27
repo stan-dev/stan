@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <vector>
-#include <stan/error_handling/dom_err.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
 
 namespace stan {
   namespace math {

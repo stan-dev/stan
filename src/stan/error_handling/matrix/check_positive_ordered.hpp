@@ -2,7 +2,7 @@
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_POSITIVE_ORDERED_HPP
 
 #include <sstream>
-#include <stan/error_handling/dom_err.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/meta/traits.hpp>

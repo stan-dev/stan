@@ -1,8 +1,8 @@
 #ifndef STAN__ERROR_HANDLING_CHECK_POSITIVE_FINITE_HPP
 #define STAN__ERROR_HANDLING_CHECK_POSITIVE_FINITE_HPP
 
-#include <stan/error_handling/check_positive.hpp>
-#include <stan/error_handling/check_finite.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
 
 namespace stan {
   namespace math {

@@ -2,7 +2,7 @@
 #define STAN__MATH__FUNCTIONS__MODIFIED_BESSEL_FIRST_KIND_HPP
 
 #include <boost/math/special_functions/bessel.hpp>
-#include <stan/error_handling/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
 
 namespace stan {
   namespace math {

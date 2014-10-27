@@ -2,8 +2,8 @@
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_CHOLESKY_FACTOR_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/check_positive.hpp>
-#include <stan/error_handling/check_less_or_equal.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
+#include <stan/error_handling/scalar/check_less_or_equal.hpp>
 #include <stan/error_handling/matrix/check_lower_triangular.hpp>
 
 

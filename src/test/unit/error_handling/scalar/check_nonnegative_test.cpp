@@ -1,4 +1,4 @@
-#include <stan/error_handling/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <gtest/gtest.h>
 
 using stan::math::check_nonnegative;
