@@ -5,7 +5,7 @@
 #include <stan/error_handling/scalar/dom_err_vec.hpp>
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     namespace {
       template <typename T_y, typename T_high, typename T_result, bool is_vec>

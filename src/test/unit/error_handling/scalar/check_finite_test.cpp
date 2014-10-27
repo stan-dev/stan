@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_finite.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::check_finite;
+using stan::error_handling::check_finite;
 
 TEST(MathErrorHandling,CheckFinite) {
   const char* function = "check_finite(%1%)";

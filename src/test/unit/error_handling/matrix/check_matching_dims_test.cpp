@@ -8,20 +8,20 @@ TEST(MathErrorHandlingMatrix, checkMatchingDimsMatrix) {
   
   y.resize(3,3);
   x.resize(3,3);
-  EXPECT_TRUE(stan::math::check_matching_dims("checkMatchingDims(%1%)",x,"x",
+  EXPECT_TRUE(stan::error_handling::check_matching_dims("checkMatchingDims(%1%)",x,"x",
                                              y, "y", &result));
   x.resize(0,0);
   y.resize(0,0);
-  EXPECT_TRUE(stan::math::check_matching_dims("checkMatchingDims(%1%)",x,"x",
+  EXPECT_TRUE(stan::error_handling::check_matching_dims("checkMatchingDims(%1%)",x,"x",
                                              y, "y", &result));
 
   y.resize(1,2);
-  EXPECT_THROW(stan::math::check_matching_dims("checkMatchingDims(%1%)",x,"x",
+  EXPECT_THROW(stan::error_handling::check_matching_dims("checkMatchingDims(%1%)",x,"x",
                                                y, "y",&result), 
                std::domain_error);
 
   x.resize(2,1);
-  EXPECT_THROW(stan::math::check_matching_dims("checkMatchingDims(%1%)",x,"x",
+  EXPECT_THROW(stan::error_handling::check_matching_dims("checkMatchingDims(%1%)",x,"x",
                                                y, "y",&result), 
                std::domain_error);
 }
@@ -36,22 +36,22 @@ TEST(MathErrorHandlingMatrix, checkMatchingDimsMatrix_nan) {
   x.resize(3,3);
   y << nan, nan, nan,nan, nan, nan,nan, nan, nan;
   x << nan, nan, nan,nan, nan, nan,nan, nan, nan;
-  EXPECT_TRUE(stan::math::check_matching_dims("checkMatchingDims(%1%)",x,"x",
+  EXPECT_TRUE(stan::error_handling::check_matching_dims("checkMatchingDims(%1%)",x,"x",
                                              y, "y", &result));
   x.resize(0,0);
   y.resize(0,0);
-  EXPECT_TRUE(stan::math::check_matching_dims("checkMatchingDims(%1%)",x,"x",
+  EXPECT_TRUE(stan::error_handling::check_matching_dims("checkMatchingDims(%1%)",x,"x",
                                              y, "y", &result));
 
   y.resize(1,2);
   y << nan, nan;
-  EXPECT_THROW(stan::math::check_matching_dims("checkMatchingDims(%1%)",x,"x",
+  EXPECT_THROW(stan::error_handling::check_matching_dims("checkMatchingDims(%1%)",x,"x",
                                                y, "y",&result), 
                std::domain_error);
 
   x.resize(2,1);
   x << nan, nan;
-  EXPECT_THROW(stan::math::check_matching_dims("checkMatchingDims(%1%)",x,"x",
+  EXPECT_THROW(stan::error_handling::check_matching_dims("checkMatchingDims(%1%)",x,"x",
                                                y, "y",&result), 
                std::domain_error);
 }

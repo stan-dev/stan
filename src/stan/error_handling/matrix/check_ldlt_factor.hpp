@@ -7,7 +7,7 @@
 #include <stan/math/matrix/LDLT_factor.hpp>
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     /**
      * Return <code>true</code> if the underlying matrix is positive definite

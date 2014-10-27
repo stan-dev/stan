@@ -17,8 +17,8 @@ namespace stan {
     inline
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     inverse_spd(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      stan::math::check_square("inverse_spd(%1%)",m,"m",(double*)0);
-      stan::math::check_symmetric("inverse_spd(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("inverse_spd(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_symmetric("inverse_spd(%1%)",m,"m",(double*)0);
       Eigen::LDLT< Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > ldlt(0.5*(m+m.transpose()));
       if (ldlt.info() != Eigen::Success)
         throw std::domain_error("Error in inverse_spd, LDLT factorization failed");

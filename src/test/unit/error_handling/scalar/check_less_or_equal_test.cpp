@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_less_or_equal.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::check_less_or_equal;
+using stan::error_handling::check_less_or_equal;
 
 TEST(MathErrorHandling,CheckLessOrEqual) {
   const char* function = "check_less_or_equal(%1%)";

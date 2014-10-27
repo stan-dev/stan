@@ -68,9 +68,9 @@ namespace stan {
       using Eigen::Dynamic;
       using Eigen::Lower;
       using Eigen::Matrix;
-      using stan::math::check_greater;
-      using stan::math::check_ldlt_factor;
-      using stan::math::check_size_match;
+      using stan::error_handling::check_greater;
+      using stan::error_handling::check_ldlt_factor;
+      using stan::error_handling::check_size_match;
       using stan::math::index_type;
       using stan::math::LDLT_factor;
       using stan::math::log_determinant_ldlt;
@@ -146,8 +146,8 @@ namespace stan {
 
       using Eigen::MatrixXd;
       using stan::math::index_type;
-      using stan::math::check_size_match;
-      using stan::math::check_positive;
+      using stan::error_handling::check_size_match;
+      using stan::error_handling::check_positive;
 
       static const char* function = "stan::prob::wishart_rng(%1%)";
 

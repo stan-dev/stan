@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_bounded.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::check_bounded;
+using stan::error_handling::check_bounded;
 
 TEST(MathErrorHandling,CheckBounded_x) {
   const char* function = "check_bounded(%1%)";

@@ -26,7 +26,7 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>
     add(const Eigen::Matrix<T1,R,C>& m1,
         const Eigen::Matrix<T2,R,C>& m2) {
-      stan::math::check_matching_dims("add(%1%)",m1,"m1",
+      stan::error_handling::check_matching_dims("add(%1%)",m1,"m1",
                                       m2,"m2",(double*)0);
       Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>      
         result(m1.rows(),m1.cols());

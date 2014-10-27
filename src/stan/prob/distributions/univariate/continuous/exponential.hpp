@@ -51,9 +51,9 @@ namespace stan {
             && stan::length(beta)))
         return 0.0;
       
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       
       double logp(0.0);
@@ -123,9 +123,9 @@ namespace stan {
 
       static const char* function = "stan::prob::exponential_cdf(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_not_nan;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_not_nan;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -176,9 +176,9 @@ namespace stan {
 
       static const char* function = "stan::prob::exponential_cdf_log(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_not_nan;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_not_nan;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -222,9 +222,9 @@ namespace stan {
 
       static const char* function = "stan::prob::exponential_ccdf_log(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_not_nan;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_not_nan;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -269,7 +269,7 @@ namespace stan {
 
       static const char* function = "stan::prob::exponential_rng(%1%)";
 
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_positive_finite;
 
       check_positive_finite(function, beta, "Inverse scale parameter", 
                             (double*)0);

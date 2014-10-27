@@ -21,9 +21,9 @@ namespace stan {
     template<int R1,int C1,int R2, int C2>
     inline double dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                               const Eigen::Matrix<double, R2, C2>& v2) {
-      stan::math::check_vector("dot_product(%1%)",v1,"v1",(double*)0);
-      stan::math::check_vector("dot_product(%1%)",v2,"v2",(double*)0);
-      stan::math::check_matching_sizes("dot_product(%1%)",v1,"v1",
+      stan::error_handling::check_vector("dot_product(%1%)",v1,"v1",(double*)0);
+      stan::error_handling::check_vector("dot_product(%1%)",v2,"v2",(double*)0);
+      stan::error_handling::check_matching_sizes("dot_product(%1%)",v1,"v1",
                                        v2,"v2",(double*)0);
       return v1.dot(v2);
     }
@@ -48,7 +48,7 @@ namespace stan {
      */
     inline double dot_product(const std::vector<double>& v1,
                               const std::vector<double>& v2) {
-      stan::math::check_matching_sizes("dot_product(%1%)",v1,"v1",
+      stan::error_handling::check_matching_sizes("dot_product(%1%)",v1,"v1",
                                        v2,"v2",(double*)0);
       return dot_product(&v1[0], &v2[0], v1.size());
     }

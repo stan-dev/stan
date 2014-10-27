@@ -15,7 +15,7 @@
 
 namespace stan {
 
-  namespace math {
+  namespace error_handling {
 
     /**
      * Return <code>true</code> if the specified matrix is a valid
@@ -43,14 +43,14 @@ namespace stan {
       using Eigen::Matrix;
       typedef typename index_type<Matrix<T_y,Dynamic,Dynamic> >::type size_t;
 
-      stan::math::check_size_match(function, 
+      stan::error_handling::check_size_match(function, 
                                    y.rows(), "Rows of correlation matrix",
                                    y.cols(), "columns of correlation matrix",
                                    result);
 
-      stan::math::check_positive(function, y.rows(), "rows", result);
+      stan::error_handling::check_positive(function, y.rows(), "rows", result);
 
-      stan::math::check_symmetric(function, y, "y", result);
+      stan::error_handling::check_symmetric(function, y, "y", result);
       
       for (size_t k = 0; k < y.rows(); ++k) {
         if (!(fabs(y(k,k) - 1.0) <= CONSTRAINT_TOLERANCE)) {
@@ -63,7 +63,7 @@ namespace stan {
           return dom_err(function,y(k,k),name,msg.c_str(),"",result);
         }
       }
-      stan::math::check_pos_definite(function, y, "y", result);
+      stan::error_handling::check_pos_definite(function, y, "y", result);
       return true;
     }
 

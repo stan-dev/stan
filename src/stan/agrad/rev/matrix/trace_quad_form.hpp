@@ -99,8 +99,8 @@ namespace stan {
     trace_quad_form(const Eigen::Matrix<TA,RA,CA> &A,
                     const Eigen::Matrix<TB,RB,CB> &B)
     {
-      stan::math::check_square("trace_quad_form(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("trace_quad_form(%1%)",A,"A",
+      stan::error_handling::check_square("trace_quad_form(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_multiplicable("trace_quad_form(%1%)",A,"A",
                                       B,"B",(double*)0);
       
       trace_quad_form_vari_alloc<TA,RA,CA,TB,RB,CB> *baseVari = new trace_quad_form_vari_alloc<TA,RA,CA,TB,RB,CB>(A,B);

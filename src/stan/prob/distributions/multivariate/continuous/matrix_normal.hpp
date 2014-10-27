@@ -45,16 +45,16 @@ namespace stan {
       static const char* function = "stan::prob::matrix_normal_prec_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_Mu,T_Sigma,T_D>::type lp(0.0);
       
-      using stan::math::check_not_nan;
-      using stan::math::check_symmetric;
-      using stan::math::check_size_match;
-      using stan::math::check_positive;
-      using stan::math::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_symmetric;
+      using stan::error_handling::check_size_match;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
       using stan::math::trace_gen_quad_form;
       using stan::math::log_determinant_ldlt;
       using stan::math::subtract;
       using stan::math::LDLT_factor;
-      using stan::math::check_ldlt_factor;
+      using stan::error_handling::check_ldlt_factor;
       
       check_size_match(function, 
                        Sigma.rows(), "Rows of Sigma",

@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 TEST(MathErrorHandling,CheckPositive_nan) {
-  using stan::math::check_positive;
+  using stan::error_handling::check_positive;
   const char* function = "check_positive(%1%)";
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

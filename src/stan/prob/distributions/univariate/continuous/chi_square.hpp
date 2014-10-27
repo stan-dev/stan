@@ -48,10 +48,10 @@ namespace stan {
             && stan::length(nu)))
         return 0.0;
       
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       
       double logp(0.0);
@@ -154,10 +154,10 @@ namespace stan {
     chi_square_cdf(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::chi_square_cdf(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
 
       double cdf(1.0);
@@ -254,10 +254,10 @@ namespace stan {
     chi_square_cdf_log(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::chi_square_cdf_log(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
 
       double cdf_log(0.0);
@@ -348,10 +348,10 @@ namespace stan {
     chi_square_ccdf_log(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::chi_square_ccdf_log(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
 
       double ccdf_log(0.0);
@@ -446,7 +446,7 @@ namespace stan {
 
       static const char* function = "stan::prob::chi_square_rng(%1%)";
 
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_positive_finite;
       
       check_positive_finite(function, nu, "Degrees of freedom parameter", 
                             (double*)0);

@@ -50,10 +50,10 @@ namespace stan {
                   const T_scale& sigma) {
       static const char* function = "stan::prob::student_t_log(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -226,10 +226,10 @@ namespace stan {
       
       static const char* function = "stan::prob::student_t_cdf(%1%)";
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
           
       double P(1.0);
@@ -400,10 +400,10 @@ namespace stan {
       
       static const char* function = "stan::prob::student_t_cdf_log(%1%)";
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
           
       double P(0.0);
@@ -562,10 +562,10 @@ namespace stan {
       
       static const char* function = "stan::prob::student_t_ccdf_log(%1%)";
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
           
       double P(0.0);
@@ -723,8 +723,8 @@ namespace stan {
 
       static const char* function = "stan::prob::student_t_rng(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
 
       check_positive_finite(function, nu, "Degrees of freedom parameter",
                             (double*)0);

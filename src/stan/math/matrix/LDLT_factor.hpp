@@ -65,7 +65,7 @@ namespace stan {
       }
       
       inline void compute(const Eigen::Matrix<T,R,C> &A) {
-        stan::math::check_square("LDLT_factor(%1%)",A,"A",(T*)0);
+        stan::error_handling::check_square("LDLT_factor(%1%)",A,"A",(T*)0);
         N_ = A.rows();
         _ldltP->compute(A);
       }

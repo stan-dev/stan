@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/matrix/Eigen.hpp>
 
-using stan::math::check_greater;
+using stan::error_handling::check_greater;
 
 TEST(MathErrorHandling,CheckGreater) {
   const char* function = "check_greater(%1%)";

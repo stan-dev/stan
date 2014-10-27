@@ -45,7 +45,7 @@ namespace stan {
       using std::exp;
       using std::log;
       using stan::math::log_sum_exp;
-      stan::math::check_nonzero_size("log_softmax(%1%)",v,"v", (double*)0);
+      stan::error_handling::check_nonzero_size("log_softmax(%1%)",v,"v", (double*)0);
       Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
       T z = log_sum_exp(v);
       for (int i = 0; i < v.size(); ++i)

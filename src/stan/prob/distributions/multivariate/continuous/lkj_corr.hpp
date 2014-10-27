@@ -53,8 +53,8 @@ namespace stan {
         = "stan::prob::lkj_corr_cholesky_log(%1%)";
 
       using boost::math::tools::promote_args;
-      using stan::math::check_positive;
-      using stan::math::check_lower_triangular;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_lower_triangular;
       using stan::math::sum;
       
       typename promote_args<T_covar,T_shape>::type lp(0.0);
@@ -104,10 +104,10 @@ namespace stan {
                  const T_shape& eta) {
       static const char* function = "stan::prob::lkj_corr_log(%1%)";
 
-      using stan::math::check_size_match;
-      using stan::math::check_not_nan;
-      using stan::math::check_positive;
-      using stan::math::check_corr_matrix;
+      using stan::error_handling::check_size_match;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_corr_matrix;
       using stan::math::sum;
       using boost::math::tools::promote_args;
       
@@ -156,7 +156,7 @@ namespace stan {
       static const char* function 
         = "stan::prob::lkj_corr_cholesky_rng(%1%)";
 
-      using stan::math::check_positive;
+      using stan::error_handling::check_positive;
       
       check_positive(function, eta, "Shape parameter", (double*)0);
 
@@ -182,7 +182,7 @@ namespace stan {
       static const char* function 
         = "stan::prob::lkj_corr_rng(%1%)";
 
-      using stan::math::check_positive;
+      using stan::error_handling::check_positive;
       
       check_positive(function, eta, "Shape parameter", (double*)0);
 

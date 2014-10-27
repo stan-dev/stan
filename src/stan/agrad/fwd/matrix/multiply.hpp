@@ -77,7 +77,7 @@ namespace stan {
     Eigen::Matrix<fvar<T>,R1,C2> 
     multiply(const Eigen::Matrix<fvar<T>,R1,C1>& m1,
              const Eigen::Matrix<fvar<T>,R2,C2>& m2) {
-      stan::math::check_multiplicable("multiply(%1%)",m1,"m1",
+      stan::error_handling::check_multiplicable("multiply(%1%)",m1,"m1",
                                       m2,"m2",(double*)0);
       Eigen::Matrix<fvar<T>,R1,C2> result(m1.rows(),m2.cols());
       for (size_type i = 0; i < m1.rows(); i++) {
@@ -95,7 +95,7 @@ namespace stan {
     Eigen::Matrix<fvar<T>,R1,C2> 
     multiply(const Eigen::Matrix<fvar<T>,R1,C1>& m1,
              const Eigen::Matrix<double,R2,C2>& m2) {
-      stan::math::check_multiplicable("multiply(%1%)",m1,"m1",
+      stan::error_handling::check_multiplicable("multiply(%1%)",m1,"m1",
                                       m2,"m2",(double*)0);
       Eigen::Matrix<fvar<T>,R1,C2> result(m1.rows(),m2.cols());
       for (size_type i = 0; i < m1.rows(); i++) {
@@ -113,7 +113,7 @@ namespace stan {
     Eigen::Matrix<fvar<T>,R1,C2> 
     multiply(const Eigen::Matrix<double,R1,C1>& m1,
              const Eigen::Matrix<fvar<T>,R2,C2>& m2) {
-      stan::math::check_multiplicable("multiply(%1%)",m1,"m1",
+      stan::error_handling::check_multiplicable("multiply(%1%)",m1,"m1",
                                       m2,"m2",(double*)0);
       Eigen::Matrix<fvar<T>,R1,C2> result(m1.rows(),m2.cols());
       for (size_type i = 0; i < m1.rows(); i++) {

@@ -14,7 +14,7 @@ namespace stan {
     template<typename T, int R, int C>
     inline fvar<T>
     dot_self(const Eigen::Matrix<fvar<T>, R, C>& v) {
-      stan::math::check_vector("dot_self(%1%)",v,"v",(double*)0);
+      stan::error_handling::check_vector("dot_self(%1%)",v,"v",(double*)0);
       return dot_product(v, v);
     }
   }

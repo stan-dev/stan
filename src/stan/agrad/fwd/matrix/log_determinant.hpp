@@ -18,7 +18,7 @@ namespace stan {
     inline 
     fvar<T>
     log_determinant(const Eigen::Matrix<fvar<T>, R, C>& m) {
-      stan::math::check_square("log_determinant(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("log_determinant(%1%)",m,"m",(double*)0);
 
       return stan::agrad::log(stan::agrad::fabs(stan::agrad::determinant(m)));
     }

@@ -4,7 +4,7 @@
 
 TEST(AgradErrorHandling,CheckNotNan) {
   using stan::agrad::var;
-  using stan::math::check_not_nan;
+  using stan::error_handling::check_not_nan;
   const char* function = "check_not_nan(%1%)";
   var x = 0;
   double x_d = 0;

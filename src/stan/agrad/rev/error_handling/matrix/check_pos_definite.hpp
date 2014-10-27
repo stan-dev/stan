@@ -25,7 +25,7 @@ namespace stan {
       for (size_type i = 0; i < y_d.rows(); i++) 
         for (size_type j = 0; j < y_d.cols(); j++)
           y_d(i,j) = y(i,j).val();
-      return stan::math::check_pos_definite(function,y_d,name,result,Policy());
+      return stan::error_handling::check_pos_definite(function,y_d,name,result,Policy());
     }
     
   }

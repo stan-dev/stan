@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_equal.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::check_equal;
+using stan::error_handling::check_equal;
 
 TEST(MathErrorHandling,CheckEqual) {
   const char* function = "check_equal(%1%)";

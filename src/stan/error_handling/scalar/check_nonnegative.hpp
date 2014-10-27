@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace math {
+  namespace error_handling {
 
     namespace {
       template <typename T_y, typename T_result, bool is_vec>

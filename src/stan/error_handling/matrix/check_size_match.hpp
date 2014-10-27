@@ -6,7 +6,7 @@
 #include <stan/error_handling/scalar/dom_err.hpp>
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     // FIXME: update warnings
     template <typename T_size1, typename T_size2, typename T_result>

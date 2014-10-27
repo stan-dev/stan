@@ -31,10 +31,10 @@ namespace stan {
                       const T_size2& beta) {
       static const char* function = "stan::prob::beta_binomial_log(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
@@ -193,10 +193,10 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
           
     static const char* function = "stan::prob::beta_binomial_cdf(%1%)";
           
-    using stan::math::check_positive_finite;
-    using stan::math::check_nonnegative;
+    using stan::error_handling::check_positive_finite;
+    using stan::error_handling::check_nonnegative;
     using stan::math::value_of;
-    using stan::math::check_consistent_sizes;
+    using stan::error_handling::check_consistent_sizes;
     using stan::prob::include_summand;
           
     // Ensure non-zero argument lengths
@@ -316,10 +316,10 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
           
     static const char* function = "stan::prob::beta_binomial_cdf_log(%1%)";
           
-    using stan::math::check_positive_finite;
-    using stan::math::check_nonnegative;
+    using stan::error_handling::check_positive_finite;
+    using stan::error_handling::check_nonnegative;
     using stan::math::value_of;
-    using stan::math::check_consistent_sizes;
+    using stan::error_handling::check_consistent_sizes;
     using stan::prob::include_summand;
           
     // Ensure non-zero argument lengths
@@ -430,10 +430,10 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
           
     static const char* function = "stan::prob::beta_binomial_ccdf_log(%1%)";
           
-    using stan::math::check_positive_finite;
-    using stan::math::check_nonnegative;
+    using stan::error_handling::check_positive_finite;
+    using stan::error_handling::check_nonnegative;
     using stan::math::value_of;
-    using stan::math::check_consistent_sizes;
+    using stan::error_handling::check_consistent_sizes;
     using stan::prob::include_summand;
           
     // Ensure non-zero argument lengths
@@ -545,8 +545,8 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
 
       static const char* function = "stan::prob::beta_binomial_rng(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
   
       check_nonnegative(function, N, "Population size parameter", (double*)0);
       check_positive_finite(function, alpha, 

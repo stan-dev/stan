@@ -25,8 +25,8 @@ namespace stan {
     Eigen::Matrix<T,1,Eigen::Dynamic>
     row(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m, 
         size_t i) {
-      stan::math::check_greater_or_equal("row(%1%)",i,1U,"i",(double*)0);
-      stan::math::check_less_or_equal("row(%1%)",i,static_cast<size_t>(m.rows()),"i",(double*)0);     
+      stan::error_handling::check_greater_or_equal("row(%1%)",i,1U,"i",(double*)0);
+      stan::error_handling::check_less_or_equal("row(%1%)",i,static_cast<size_t>(m.rows()),"i",(double*)0);     
       return m.row(i - 1);
     }
 

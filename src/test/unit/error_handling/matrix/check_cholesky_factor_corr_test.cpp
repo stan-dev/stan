@@ -6,7 +6,7 @@ TEST(MathErrorHandlingMatrix, checkCorrCholeskyMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
 
-  using stan::math::check_cholesky_factor_corr;
+  using stan::error_handling::check_cholesky_factor_corr;
   using std::sqrt;
 
   y.resize(1,1);
@@ -87,7 +87,7 @@ TEST(MathErrorHandlingMatrix, checkCorrCholeskyMatrix_nan) {
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();
 
-  using stan::math::check_cholesky_factor_corr;
+  using stan::error_handling::check_cholesky_factor_corr;
   using std::sqrt;
 
   y.resize(1,1);

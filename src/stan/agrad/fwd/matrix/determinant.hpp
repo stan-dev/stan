@@ -21,7 +21,7 @@ namespace stan {
     determinant(const Eigen::Matrix<fvar<T>, R, C>& m) {
       using stan::math::multiply;
 
-      stan::math::check_square("determinant(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("determinant(%1%)",m,"m",(double*)0);
       Eigen::Matrix<T,R,C> m_deriv(m.rows(), m.cols());
       Eigen::Matrix<T,R,C> m_val(m.rows(), m.cols());
       Eigen::Matrix<T,R,C> m_inv(m.rows(), m.cols());

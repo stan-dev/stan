@@ -26,11 +26,11 @@ namespace stan {
                   const T_prob& theta) {
       static const char* function = "stan::prob::bernoulli_log(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_bounded;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_bounded;
       using stan::math::log1m;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       
       // check if any vectors are zero length
@@ -129,10 +129,10 @@ namespace stan {
       static const char* function = "stan::prob::bernoulli_logit_log(%1%)";
 
       using stan::is_constant_struct;
-      using stan::math::check_not_nan;
-      using stan::math::check_bounded;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_bounded;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::math::log1p;
       using stan::math::inv_logit;
@@ -212,9 +212,9 @@ namespace stan {
     bernoulli_cdf(const T_n& n, const T_prob& theta) {
       static const char* function = "stan::prob::bernoulli_cdf(%1%)";
       
-      using stan::math::check_finite;
-      using stan::math::check_bounded;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_bounded;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lenghts
@@ -274,9 +274,9 @@ namespace stan {
     bernoulli_cdf_log(const T_n& n, const T_prob& theta) {
       static const char* function = "stan::prob::bernoulli_cdf_log(%1%)";
       
-      using stan::math::check_finite;
-      using stan::math::check_bounded;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_bounded;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lenghts
@@ -333,9 +333,9 @@ namespace stan {
     bernoulli_ccdf_log(const T_n& n, const T_prob& theta) {
       static const char* function = "stan::prob::bernoulli_ccdf_log(%1%)";
       
-      using stan::math::check_finite;
-      using stan::math::check_bounded;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_bounded;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lenghts
@@ -398,8 +398,8 @@ namespace stan {
 
       static const char* function = "stan::prob::bernoulli_rng(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_bounded;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_bounded;
  
       check_finite(function, theta, "Probability parameter", (double*)0);
       check_bounded(function, theta, 0, 1,

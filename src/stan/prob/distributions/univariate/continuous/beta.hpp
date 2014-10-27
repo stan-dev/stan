@@ -51,15 +51,15 @@ namespace stan {
       using boost::math::lgamma;
       using stan::is_constant_struct;
       using stan::is_vector;
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::math::log1m;
       using stan::math::multiply_log;
       using stan::math::value_of;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less_or_equal;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_less_or_equal;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -221,13 +221,13 @@ namespace stan {
       // Error checks
       static const char* function = "stan::prob::beta_cdf(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
       using boost::math::tools::promote_args;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less_or_equal;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_less_or_equal;
       
       double P(1.0);
         
@@ -366,12 +366,12 @@ namespace stan {
       // Error checks
       static const char* function = "stan::prob::beta_cdf(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less_or_equal;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_less_or_equal;
       using boost::math::tools::promote_args;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       
       double cdf_log(0.0);
@@ -484,12 +484,12 @@ namespace stan {
       // Error checks
       static const char* function = "stan::prob::beta_cdf(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less_or_equal;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_less_or_equal;
       using boost::math::tools::promote_args;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       
       double ccdf_log(0.0);
@@ -598,7 +598,7 @@ namespace stan {
       // Error checks
       static const char* function = "stan::prob::beta_rng(%1%)";
 
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_positive_finite;
         
       check_positive_finite(function, alpha, "First shape parameter", 
                             (double*)0);

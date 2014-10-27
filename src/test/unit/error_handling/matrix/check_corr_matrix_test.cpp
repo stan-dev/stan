@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_corr_matrix.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::check_corr_matrix;
+using stan::error_handling::check_corr_matrix;
 
 TEST(MathErrorHandlingMatrix, CheckCorrMatrix) {
   double result;

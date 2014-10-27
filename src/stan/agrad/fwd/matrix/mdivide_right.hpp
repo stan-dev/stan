@@ -28,8 +28,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_right;
-      stan::math::check_square("mdivide_right(%1%)",b,"b",(double*)0);
-      stan::math::check_multiplicable("mdivide_right(%1%)",A,"A",
+      stan::error_handling::check_square("mdivide_right(%1%)",b,"b",(double*)0);
+      stan::error_handling::check_multiplicable("mdivide_right(%1%)",A,"A",
                                       b,"b",(double*)0);
 
       Eigen::Matrix<T,R1,C2> A_mult_inv_b(A.rows(),b.cols());
@@ -72,8 +72,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_right;
-      stan::math::check_square("mdivide_right(%1%)",b,"b",(double*)0);
-      stan::math::check_multiplicable("mdivide_right(%1%)",A,"A",
+      stan::error_handling::check_square("mdivide_right(%1%)",b,"b",(double*)0);
+      stan::error_handling::check_multiplicable("mdivide_right(%1%)",A,"A",
                                       b,"b",(double*)0);
 
       Eigen::Matrix<T,R2,C2> deriv_b_mult_inv_b(b.rows(),b.cols());
@@ -99,8 +99,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_right;
-      stan::math::check_square("mdivide_right(%1%)",b,"b",(double*)0);
-      stan::math::check_multiplicable("mdivide_right(%1%)",A,"A",
+      stan::error_handling::check_square("mdivide_right(%1%)",b,"b",(double*)0);
+      stan::error_handling::check_multiplicable("mdivide_right(%1%)",A,"A",
                                       b,"b",(double*)0);
       Eigen::Matrix<T,R1,C2> 
         A_mult_inv_b(A.rows(),b.cols());

@@ -128,7 +128,7 @@ namespace stan {
 
         vector<double> y_base(y.begin(), y.begin()+N_);
         dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,msgs_);
-        stan::math::check_equal("coupled_ode_system(%1%)",
+        stan::error_handling::check_equal("coupled_ode_system(%1%)",
                                 dy_dt.size(),N_,"dy_dt",
                                 static_cast<double*>(0));
 
@@ -346,7 +346,7 @@ namespace stan {
           y_base[n] += y0_dbl_[n];
 
         dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,msgs_);
-        stan::math::check_equal("coupled_ode_system(%1%)",
+        stan::error_handling::check_equal("coupled_ode_system(%1%)",
                                 dy_dt.size(),N_,"dy_dt",
                                 static_cast<double*>(0));
 
@@ -578,7 +578,7 @@ namespace stan {
           y_base[n] += y0_dbl_[n];
 
         dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,msgs_);
-        stan::math::check_equal("coupled_ode_system(%1%)",
+        stan::error_handling::check_equal("coupled_ode_system(%1%)",
                                 dy_dt.size(),N_,"dy_dt",
                                 static_cast<double*>(0));
 

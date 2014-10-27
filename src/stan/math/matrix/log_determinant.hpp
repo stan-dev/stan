@@ -16,7 +16,7 @@ namespace stan {
      */
     template <typename T,int R, int C>
     inline T log_determinant(const Eigen::Matrix<T,R,C>& m) {
-      stan::math::check_square("log_determinant(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("log_determinant(%1%)",m,"m",(double*)0);
       return m.colPivHouseholderQr().logAbsDeterminant();
     }
     

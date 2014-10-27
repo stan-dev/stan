@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_less.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::check_less;
+using stan::error_handling::check_less;
 
 TEST(MathErrorHandling,CheckLess) {
   const char* function = "check_less(%1%)";

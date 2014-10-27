@@ -9,7 +9,7 @@
 #include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     /**
      * Return <code>true</code> if the specified matrix is a 

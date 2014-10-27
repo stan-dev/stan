@@ -67,13 +67,13 @@ namespace stan {
 
       static const char* function = "stan::prob::ordered_logistic(%1%)";
       
-      using stan::math::check_finite;
-      using stan::math::check_positive;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less;
-      using stan::math::check_less_or_equal;
-      using stan::math::check_greater;
-      using stan::math::check_bounded;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_less;
+      using stan::error_handling::check_less_or_equal;
+      using stan::error_handling::check_greater;
+      using stan::error_handling::check_bounded;
 
       int K = c.size() + 1;
 
@@ -120,13 +120,13 @@ namespace stan {
 
       static const char* function = "stan::prob::ordered_logistic(%1%)";
       
-      using stan::math::check_finite;
-      using stan::math::check_positive;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less;
-      using stan::math::check_less_or_equal;
-      using stan::math::check_greater;
-      using stan::math::check_bounded;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_less;
+      using stan::error_handling::check_less_or_equal;
+      using stan::error_handling::check_greater;
+      using stan::error_handling::check_bounded;
 
       check_finite(function, eta, "Location parameter", (double*)0);
       check_greater(function, c.size(), 0, "Size of cut points parameter", 

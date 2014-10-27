@@ -67,7 +67,7 @@ namespace stan {
 
     template <int R, int C>
     inline var log_determinant(const Eigen::Matrix<var,R,C>& m) {
-      stan::math::check_square("log_determinant(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("log_determinant(%1%)",m,"m",(double*)0);
       return var(new log_determinant_vari<R,C>(m));
     }
     

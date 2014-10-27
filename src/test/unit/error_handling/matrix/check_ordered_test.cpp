@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_ordered.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::check_ordered;
+using stan::error_handling::check_ordered;
 
 TEST(MathErrorHandlingMatrix, checkOrdered) {
   double result;

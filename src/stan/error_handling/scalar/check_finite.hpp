@@ -7,7 +7,7 @@
 #include <stan/meta/traits.hpp>
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     namespace {
       template <typename T_y,

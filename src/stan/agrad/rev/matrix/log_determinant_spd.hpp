@@ -114,7 +114,7 @@ namespace stan {
 
     template <int R, int C>
     inline var log_determinant_spd(const Eigen::Matrix<var,R,C>& m) {
-      stan::math::check_square("log_determinant_spd(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("log_determinant_spd(%1%)",m,"m",(double*)0);
       return var(new log_determinant_spd_vari<R,C>(m));
     }
     

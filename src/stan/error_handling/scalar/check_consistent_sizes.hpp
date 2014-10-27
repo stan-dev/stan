@@ -6,7 +6,7 @@
 #include <stan/meta/traits.hpp>
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     // NOTE: this will not throw if nan is passed in.
     template <typename T1, typename T2, typename T_result>

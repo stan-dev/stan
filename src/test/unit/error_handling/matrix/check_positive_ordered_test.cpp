@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_positive_ordered.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::check_positive_ordered;
+using stan::error_handling::check_positive_ordered;
 
 TEST(MathErrorHandlingMatrix, checkPositiveOrdered) {
   double result;

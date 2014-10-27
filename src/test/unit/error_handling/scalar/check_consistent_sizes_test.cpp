@@ -4,7 +4,7 @@
 TEST(MathMatrixErrorHandling, checkConsistentSizes) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::math::check_consistent_sizes;
+  using stan::error_handling::check_consistent_sizes;
   using stan::size_of;
 
   const char* function = "testConsSizes(%1%)";
@@ -64,7 +64,7 @@ TEST(MathMatrixErrorHandling, checkConsistentSizes) {
 TEST(MathMatrixErrorHandling, checkConsistentSizes_nan) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::math::check_consistent_sizes;
+  using stan::error_handling::check_consistent_sizes;
   using stan::size_of;
 
   const char* function = "testConsSizes(%1%)";

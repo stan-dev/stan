@@ -7,11 +7,11 @@ TEST(MathErrorHandlingMatrix, checkSymmetric) {
   
   y.resize(2,2);
   y << 1, 3, 3, 1;
-  EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric(%1%)",
+  EXPECT_TRUE(stan::error_handling::check_symmetric("checkSymmetric(%1%)",
                                           y, "y", &result));
 
   y(0,1) = 3.5;
-  EXPECT_THROW(stan::math::check_symmetric("checkSymmetric(%1%)", y, "y", &result), 
+  EXPECT_THROW(stan::error_handling::check_symmetric("checkSymmetric(%1%)", y, "y", &result), 
                std::domain_error);
 }
 
@@ -23,7 +23,7 @@ TEST(MathErrorHandlingMatrix, checkSymmetric_one_indexed_message) {
   y.resize(2,2);
   y << 1, 0, 3, 1;
   try {
-    stan::math::check_symmetric("checkSymmetric(%1%)", y, "y", &result);
+    stan::error_handling::check_symmetric("checkSymmetric(%1%)", y, "y", &result);
     FAIL() << "should have thrown";
   } catch (std::domain_error& e) {
     message = e.what();
@@ -44,15 +44,15 @@ TEST(MathErrorHandlingMatrix, checkSymmetric_nan) {
 
   y.resize(2,2);
   y << 1, nan, 3, 1;
-  EXPECT_THROW(stan::math::check_symmetric("checkSymmetric(%1%)",
+  EXPECT_THROW(stan::error_handling::check_symmetric("checkSymmetric(%1%)",
                                            y, "y", &result),
                std::domain_error);
   y << nan, 3, 3, 1;
-  EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric(%1%)",
+  EXPECT_TRUE(stan::error_handling::check_symmetric("checkSymmetric(%1%)",
                                           y, "y", &result));
 
   y.resize(1,1);
   y << nan;
-  EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric(%1%)",
+  EXPECT_TRUE(stan::error_handling::check_symmetric("checkSymmetric(%1%)",
                                           y, "y", &result));
 }

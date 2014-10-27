@@ -7,7 +7,7 @@ TEST(AgradRevErrorHandlingMatrix,CheckCovMatrix) {
   using Eigen::Dynamic;
   using Eigen::Matrix;
   
-  using stan::math::check_cov_matrix;
+  using stan::error_handling::check_cov_matrix;
   
   const char* function = "check_cov_matrix(%1%)";
   var result = 0;

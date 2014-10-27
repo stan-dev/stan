@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::check_nonnegative;
+using stan::error_handling::check_nonnegative;
 
 TEST(MathErrorHandling,CheckNonnegative) {
   const char* function = "check_nonnegative(%1%)";

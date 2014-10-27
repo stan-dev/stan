@@ -12,19 +12,19 @@ TEST(MathErrorHandlingMatrix, checkStdVectorIndexMatrix) {
   
   i=2;
   y.resize(3);
-  EXPECT_TRUE(stan::math::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",
+  EXPECT_TRUE(stan::error_handling::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",
                                           i,y, "i", &result));
   i=3;
-  EXPECT_TRUE(stan::math::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",
+  EXPECT_TRUE(stan::error_handling::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",
                                           i,y, "i", &result));
 
   y.resize(2);
-  EXPECT_THROW(stan::math::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",i, y, "i", 
+  EXPECT_THROW(stan::error_handling::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",i, y, "i", 
                                            &result), 
                std::domain_error);
 
   i=0;
-  EXPECT_THROW(stan::math::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",i, y, "i", 
+  EXPECT_THROW(stan::error_handling::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",i, y, "i", 
                                               &result), 
                std::domain_error);
 }
@@ -41,19 +41,19 @@ TEST(MathErrorHandlingMatrix, checkStdVectorIndexMatrix_nan) {
   
   i=2;
   y.resize(3);
-  EXPECT_TRUE(stan::math::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",
+  EXPECT_TRUE(stan::error_handling::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",
                                           i,y, "i", &result));
   i=3;
-  EXPECT_TRUE(stan::math::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",
+  EXPECT_TRUE(stan::error_handling::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",
                                           i,y, "i", &result));
 
   y.resize(2);
-  EXPECT_THROW(stan::math::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",i, y, "i", 
+  EXPECT_THROW(stan::error_handling::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",i, y, "i", 
                                            &result), 
                std::domain_error);
 
   i=0;
-  EXPECT_THROW(stan::math::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",i, y, "i", 
+  EXPECT_THROW(stan::error_handling::check_std_vector_index("checkStdVectorIndexMatrix(%1%)",i, y, "i", 
                                               &result), 
                std::domain_error);
 }

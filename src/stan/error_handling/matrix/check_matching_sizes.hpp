@@ -8,7 +8,7 @@
 #include <stan/error_handling/matrix/check_size_match.hpp>
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     // NOTE: this will not throw if y1 or y2 contains nan values.
     template <typename T_y1, typename T_y2, typename T_result>
@@ -18,7 +18,7 @@ namespace stan {
                                      const T_y2& y2,
                                      const char* name2,
                                      T_result* result) {
-      stan::math::check_size_match(function,y1.size(), "size of y1",
+      stan::error_handling::check_size_match(function,y1.size(), "size of y1",
                                    y2.size(), "size of y2",result);
       return true;
     }

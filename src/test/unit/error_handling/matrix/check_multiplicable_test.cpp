@@ -8,20 +8,20 @@ TEST(MathErrorHandlingMatrix, checkMultiplicableMatrix) {
   
   y.resize(3,3);
   x.resize(3,3);
-  EXPECT_TRUE(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+  EXPECT_TRUE(stan::error_handling::check_multiplicable("checkMultiplicable(%1%)",x,"x",
                                              y, "y", &result));
   x.resize(3,2);
   y.resize(2,4);
-  EXPECT_TRUE(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+  EXPECT_TRUE(stan::error_handling::check_multiplicable("checkMultiplicable(%1%)",x,"x",
                                              y, "y", &result));
 
   y.resize(1,2);
-  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+  EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable(%1%)",x,"x",
                                                y, "y",&result), 
                std::domain_error);
 
   x.resize(2,2);
-  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+  EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable(%1%)",x,"x",
                                                y, "y",&result), 
                std::domain_error);
 }
@@ -36,24 +36,24 @@ TEST(MathErrorHandlingMatrix, checkMultiplicableMatrix_nan) {
   x.resize(3,3);
   y << nan, nan, nan,nan, nan, nan,nan, nan, nan;
   x << nan, nan, nan,nan, nan, nan,nan, nan, nan;
-  EXPECT_TRUE(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+  EXPECT_TRUE(stan::error_handling::check_multiplicable("checkMultiplicable(%1%)",x,"x",
                                               y, "y", &result));
   x.resize(3,2);
   y.resize(2,4);
   y << nan, nan, nan,nan, nan, nan,nan, nan;
   x << nan, nan, nan,nan, nan, nan;
-  EXPECT_TRUE(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+  EXPECT_TRUE(stan::error_handling::check_multiplicable("checkMultiplicable(%1%)",x,"x",
                                              y, "y", &result));
 
   y.resize(1,2);
   y << nan, nan;
-  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+  EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable(%1%)",x,"x",
                                                y, "y",&result), 
                std::domain_error);
 
   x.resize(2,2);
   x << nan, nan, nan, nan;
-  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable(%1%)",x,"x",
+  EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable(%1%)",x,"x",
                                                y, "y",&result), 
                std::domain_error);
 }

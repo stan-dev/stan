@@ -23,7 +23,7 @@
 
 namespace stan {
 
-  namespace math {
+  namespace error_handling {
 
 
     // currently ignoring T_result

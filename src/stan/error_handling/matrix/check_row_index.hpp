@@ -6,7 +6,7 @@
 #include <stan/error_handling/scalar/dom_err.hpp>
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     /**
      * Return <code>true</code> if the specified index is a valid row of the matrix

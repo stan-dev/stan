@@ -23,8 +23,8 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_left(const Eigen::Matrix<T1,R1,C1> &A,
                  const Eigen::Matrix<T2,R2,C2> &b) {
-      stan::math::check_square("mdivide_left(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("mdivide_left(%1%)",A,"A",
+      stan::error_handling::check_square("mdivide_left(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_multiplicable("mdivide_left(%1%)",A,"A",
                                       b,"b",(double*)0);
       return promote_common<Eigen::Matrix<T1,R1,C1>,
                             Eigen::Matrix<T2,R1,C1> >(A)

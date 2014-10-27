@@ -45,7 +45,7 @@ namespace stan {
     inline Eigen::Matrix<T,Eigen::Dynamic,1>
     softmax(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
       using std::exp;
-      stan::math::check_nonzero_size("softmax(%1%)",v,"v",(double*)0);
+      stan::error_handling::check_nonzero_size("softmax(%1%)",v,"v",(double*)0);
       Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
       T sum(0.0);
       T max_v = v.maxCoeff();

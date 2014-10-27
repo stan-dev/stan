@@ -5,7 +5,7 @@
 #include <stan/error_handling/scalar/check_finite.hpp>
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     // throws if any element in y is nan
     template <typename T_y, typename T_result>
@@ -13,8 +13,8 @@ namespace stan {
                                       const T_y& y,
                                       const char* name,
                                       T_result* result) {
-      stan::math::check_positive(function, y, name, result);
-      stan::math::check_finite(function, y, name, result);
+      stan::error_handling::check_positive(function, y, name, result);
+      stan::error_handling::check_finite(function, y, name, result);
 
       return true;
     }

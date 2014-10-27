@@ -17,7 +17,7 @@ namespace stan {
     
     inline matrix_v 
     multiply_lower_tri_self_transpose(const matrix_v& L) {
-      //stan::math::check_square("multiply_lower_tri_self_transpose(%1%)",
+      //stan::error_handling::check_square("multiply_lower_tri_self_transpose(%1%)",
       //L,"L",(double*)0);
       int K = L.rows();
       int J = L.cols();

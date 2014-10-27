@@ -8,7 +8,7 @@
 
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     /**
      * Return <code>true</code> if the specified matrix is a valid

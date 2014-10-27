@@ -6,7 +6,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     /**
      * Return <code>true</code> if the specified index is a valid column of the matrix

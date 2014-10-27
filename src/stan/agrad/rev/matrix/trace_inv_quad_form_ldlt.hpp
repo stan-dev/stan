@@ -162,7 +162,7 @@ namespace stan {
       trace_inv_quad_form_ldlt(const stan::math::LDLT_factor<T2,R2,C2> &A,
                                const Eigen::Matrix<T3,R3,C3> &B)
     {
-      stan::math::check_multiplicable("trace_inv_quad_form_ldlt(%1%)",A,"A",
+      stan::error_handling::check_multiplicable("trace_inv_quad_form_ldlt(%1%)",A,"A",
                                       B,"B",(double*)0);
       
       trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3> *_impl = new trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3>(A,B);

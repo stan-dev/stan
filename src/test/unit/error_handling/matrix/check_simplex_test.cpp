@@ -7,11 +7,11 @@ TEST(MathErrorHandlingMatrix, checkSimplex) {
   double result;
   y << 0.5, 0.5;
   
-  EXPECT_TRUE(stan::math::check_simplex("checkSimplex(%1%)",
+  EXPECT_TRUE(stan::error_handling::check_simplex("checkSimplex(%1%)",
                                         y, "y", &result));
                   
   y[1] = 0.55;
-  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", 
+  EXPECT_THROW(stan::error_handling::check_simplex("checkSimplex(%1%)", 
                                          y, "y", &result), 
                std::domain_error);
 }
@@ -26,7 +26,7 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_negative_value) {
   y[0] = -0.1;
   y[1] = 1.1;
   try {
-    stan::math::check_simplex("checkSimplex(%1%)",
+    stan::error_handling::check_simplex("checkSimplex(%1%)",
                               y, "y", &result);
     FAIL() << "should have thrown";
   } catch (std::domain_error& e) {
@@ -48,7 +48,7 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_negative_value) {
   y[1] = -0.1;
   y[2] = 1.0;
   try {
-    stan::math::check_simplex("checkSimplex(%1%)",
+    stan::error_handling::check_simplex("checkSimplex(%1%)",
                               y, "y", &result);
     FAIL() << "should have thrown";
   } catch (std::domain_error& e) {
@@ -73,7 +73,7 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_sum) {
   y[13] = 0.9;
 
   try {
-    stan::math::check_simplex("checkSimplex(%1%)",
+    stan::error_handling::check_simplex("checkSimplex(%1%)",
                               y, "y", &result);
     FAIL() << "should have thrown";
   } catch (std::domain_error& e) {
@@ -97,7 +97,7 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_length) {
   y.resize(0);
 
   try {
-    stan::math::check_simplex("checkSimplex(%1%)",
+    stan::error_handling::check_simplex("checkSimplex(%1%)",
                               y, "y", &result);
     FAIL() << "should have thrown";
   } catch (std::domain_error& e) {
@@ -120,23 +120,23 @@ TEST(MathErrorHandlingMatrix, checkSimplex_nan) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   y << nan, 0.5;
   
-  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)",
+  EXPECT_THROW(stan::error_handling::check_simplex("checkSimplex(%1%)",
                                          y, "y", &result),
                std::domain_error);
                   
   y[1] = 0.55;
-  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", 
+  EXPECT_THROW(stan::error_handling::check_simplex("checkSimplex(%1%)", 
                                          y, "y", &result), 
                std::domain_error);
 
   y[0] = 0.5;
   y[1] = nan;
-  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", 
+  EXPECT_THROW(stan::error_handling::check_simplex("checkSimplex(%1%)", 
                                          y, "y", &result), 
                std::domain_error);
 
   y[0] = nan;
-  EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", 
+  EXPECT_THROW(stan::error_handling::check_simplex("checkSimplex(%1%)", 
                                          y, "y", &result), 
                std::domain_error);
 }

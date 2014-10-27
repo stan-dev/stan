@@ -7,29 +7,29 @@ TEST(MathErrorHandlingMatrix, checkSpsdMatrixPosDef) {
   
   y.resize(3,3);
   y << 2, -1, 0, -1, 2, -1, 0, -1, 2;
-  EXPECT_TRUE(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)",
+  EXPECT_TRUE(stan::error_handling::check_spsd_matrix("checkSpsdMatrix(%1%)",
                                            y, "y", &result));
 
   y << 1, 2, 3, 2, 1, 2, 3, 2, 1;
-  EXPECT_THROW(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result), 
+  EXPECT_THROW(stan::error_handling::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result), 
                std::domain_error);
 
   y.setZero();
-  EXPECT_TRUE(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result));
+  EXPECT_TRUE(stan::error_handling::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result));
 }
 
 TEST(MathErrorHandlingMatrix, checkSpsdMatrixZero) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = 
     Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Zero(3,3);
   double result;
-  EXPECT_TRUE(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result));
+  EXPECT_TRUE(stan::error_handling::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result));
 }
 
 TEST(MathErrorHandlingMatrix, checkSpsdNotSquare) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = 
     Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Zero(3,2);
   double result;
-  EXPECT_THROW(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result), 
+  EXPECT_THROW(stan::error_handling::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result), 
                std::domain_error);
 }
 
@@ -40,22 +40,22 @@ TEST(MathErrorHandlingMatrix, checkSpsdMatrixPosDef_nan) {
 
   y.resize(3,3);
   y << 2, -1, 0, -1, 2, -1, 0, -1, 2;
-  EXPECT_TRUE(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)",
+  EXPECT_TRUE(stan::error_handling::check_spsd_matrix("checkSpsdMatrix(%1%)",
                                            y, "y", &result));
 
   y.setZero();
-  EXPECT_TRUE(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result));
+  EXPECT_TRUE(stan::error_handling::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result));
 
   for (int i = 0; i < y.size(); i++) {
     y << 2, -1, 0, -1, 2, -1, 0, -1, 2;
     y(i) = nan;
-    EXPECT_THROW(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)",
+    EXPECT_THROW(stan::error_handling::check_spsd_matrix("checkSpsdMatrix(%1%)",
                                                y, "y", &result),
                  std::domain_error);
 
     y.setZero();
     y(i) = nan;
-    EXPECT_THROW(stan::math::check_spsd_matrix("checkSpsdMatrix(%1%)",
+    EXPECT_THROW(stan::error_handling::check_spsd_matrix("checkSpsdMatrix(%1%)",
                                                y, "y", &result),
                  std::domain_error);
   }

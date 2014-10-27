@@ -8,14 +8,14 @@ TEST(MathErrorHandlingMatrix, checkNotNanEigenRow) {
   double result;
   y.resize(3);
   
-  EXPECT_TRUE(stan::math::check_not_nan("checkNotNanEigenRow(%1)",
+  EXPECT_TRUE(stan::error_handling::check_not_nan("checkNotNanEigenRow(%1)",
                                         y, "y", &result));
-  EXPECT_TRUE(stan::math::check_not_nan("checkNotNanEigenRow(%1)",
+  EXPECT_TRUE(stan::error_handling::check_not_nan("checkNotNanEigenRow(%1)",
                                         y, "y", &result));
   
   y(1) = std::numeric_limits<double>::quiet_NaN();
-  EXPECT_THROW(stan::math::check_not_nan("checkNotNanEigenRow(%1%)", y, "y", &result), 
+  EXPECT_THROW(stan::error_handling::check_not_nan("checkNotNanEigenRow(%1%)", y, "y", &result), 
                std::domain_error);
-  EXPECT_THROW(stan::math::check_not_nan("checkNotNanEigenRow(%1%)", y, "y", &result), 
+  EXPECT_THROW(stan::error_handling::check_not_nan("checkNotNanEigenRow(%1%)", y, "y", &result), 
                std::domain_error);
 }

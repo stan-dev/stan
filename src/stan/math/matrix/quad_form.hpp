@@ -22,8 +22,8 @@ namespace stan {
               const Eigen::Matrix<T,RB,CB>& B)
     {
       using stan::math::multiply;
-      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("quad_form(%1%)",A,"A",
+      stan::error_handling::check_square("quad_form(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_multiplicable("quad_form(%1%)",A,"A",
                                       B,"B",(double*)0);
       return multiply(stan::math::transpose(B),multiply(A,B));
     }
@@ -36,8 +36,8 @@ namespace stan {
       using stan::math::multiply;
       using stan::math::dot_product;
 
-      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("quad_form(%1%)",A,"A",
+      stan::error_handling::check_square("quad_form(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_multiplicable("quad_form(%1%)",A,"A",
                                       B,"B",(double*)0);
       return dot_product(B,multiply(A,B));
     }
@@ -49,10 +49,10 @@ namespace stan {
     {
       using stan::math::multiply;
       
-      stan::math::check_square("quad_form_sym(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("quad_form_sym(%1%)",A,"A",
+      stan::error_handling::check_square("quad_form_sym(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_multiplicable("quad_form_sym(%1%)",A,"A",
                                       B,"B",(double*)0);
-      stan::math::check_symmetric("quad_form_sym(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_symmetric("quad_form_sym(%1%)",A,"A",(double*)0);
       Eigen::Matrix<T,CB,CB> ret(multiply(stan::math::transpose(B),multiply(A,B)));
       return 0.5*(ret + stan::math::transpose(ret));
     }
@@ -65,10 +65,10 @@ namespace stan {
       using stan::math::multiply;
       using stan::math::dot_product;
 
-      stan::math::check_square("quad_form_sym(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("quad_form_sym(%1%)",A,"A",
+      stan::error_handling::check_square("quad_form_sym(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_multiplicable("quad_form_sym(%1%)",A,"A",
                                       B,"B",(double*)0);    
-      stan::math::check_symmetric("quad_form_sym(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_symmetric("quad_form_sym(%1%)",A,"A",(double*)0);
       return dot_product(B,multiply(A,B));
     }
   }

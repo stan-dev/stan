@@ -25,11 +25,11 @@ namespace stan {
       static const char* function = "stan::prob::lognormal_log(%1%)";
 
       using stan::is_constant_struct;
-      using stan::math::check_not_nan;
-      using stan::math::check_finite;
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;      
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;      
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -152,10 +152,10 @@ namespace stan {
       
       double cdf = 1.0;
       
-      using stan::math::check_not_nan;
-      using stan::math::check_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -227,10 +227,10 @@ namespace stan {
       
       double cdf_log = 0.0;
       
-      using stan::math::check_not_nan;
-      using stan::math::check_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -294,10 +294,10 @@ namespace stan {
       
       double ccdf_log = 0.0;
       
-      using stan::math::check_not_nan;
-      using stan::math::check_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -365,8 +365,8 @@ namespace stan {
 
       static const char* function = "stan::prob::lognormal_rng(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive_finite;
 
       check_finite(function, mu, "Location parameter", (double*)0);
       check_positive_finite(function, sigma, "Scale parameter", (double*)0);

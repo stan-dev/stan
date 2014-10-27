@@ -24,7 +24,7 @@ namespace stan {
     inline Eigen::Matrix<fvar<T2>,R1,C2>
     mdivide_left_ldlt(const stan::math::LDLT_factor<double,R1,C1> &A,
                       const Eigen::Matrix<fvar<T2>,R2,C2> &b) {
-      stan::math::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
+      stan::error_handling::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
                                       b,"b",(double*)0);
 
       Eigen::Matrix<T2,R2,C2> b_val(b.rows(), b.cols());

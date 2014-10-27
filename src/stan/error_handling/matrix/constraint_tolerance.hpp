@@ -2,7 +2,7 @@
 #define STAN__ERROR_HANDLING__MATRIX__CONSTRAINT_TOLERANCE_HPP
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     /**
      * The tolerance for checking arithmetic bounds In rank and in

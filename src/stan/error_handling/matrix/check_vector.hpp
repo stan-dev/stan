@@ -7,7 +7,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
-  namespace math {
+  namespace error_handling {
 
     // NOTE: this will not throw if x contains nan values.
     template <typename T, int R, int C, typename T_result>

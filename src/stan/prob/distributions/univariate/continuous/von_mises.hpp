@@ -26,11 +26,11 @@ namespace stan {
         return 0.0;
 
       using stan::is_constant_struct;
-      using stan::math::check_finite;
-      using stan::math::check_positive_finite;
-      using stan::math::check_greater;
-      using stan::math::check_nonnegative;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_greater;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
 
       // Result accumulator.
@@ -135,8 +135,8 @@ namespace stan {
 
       static const char* function = "stan::prob::von_mises_rng(%1%)";
 
-      stan::math::check_finite(function,mu,"mean",(double*)0);
-      stan::math::check_positive_finite(function,kappa,"inverse of variance",
+      stan::error_handling::check_finite(function,mu,"mean",(double*)0);
+      stan::error_handling::check_positive_finite(function,kappa,"inverse of variance",
                                  (double*)0);
 
       double r = 1 + pow((1 + 4 * kappa * kappa), 0.5);

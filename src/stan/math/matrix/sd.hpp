@@ -20,7 +20,7 @@ namespace stan {
     inline 
     typename boost::math::tools::promote_args<T>::type
     sd(const std::vector<T>& v) {
-      stan::math::check_nonzero_size("sd(%1%)",v,"v",(double*)0);    
+      stan::error_handling::check_nonzero_size("sd(%1%)",v,"v",(double*)0);    
       if (v.size() == 1) return 0.0;
       return sqrt(variance(v));
     }
@@ -36,7 +36,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T>::type
     sd(const Eigen::Matrix<T,R,C>& m) {
       // FIXME: redundant with test in variance; second line saves sqrt
-      stan::math::check_nonzero_size("sd(%1%)",m,"m",(double*)0);    
+      stan::error_handling::check_nonzero_size("sd(%1%)",m,"m",(double*)0);    
       if (m.size() == 1) return 0.0;
       return sqrt(variance(m));
     }    
