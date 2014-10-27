@@ -38,6 +38,8 @@ namespace stan {
                            T_result* result) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
+      using stan::math::index_type;
+
       typedef typename index_type<Matrix<T_y,Dynamic,Dynamic> >::type size_type;
 
       if (y.rows() == 1 && !(y(0,0) >= 0.0)) {

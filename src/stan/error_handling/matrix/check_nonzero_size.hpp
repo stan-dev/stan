@@ -34,6 +34,8 @@ namespace stan {
                                    const T_y& y,
                                    const char* name,
                                    T_result* result) {
+      using stan::math::index_type;
+
       typedef typename index_type<T_y>::type size_t;
       if (y.size() > 0) 
         return true;

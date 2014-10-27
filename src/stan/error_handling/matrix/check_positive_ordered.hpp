@@ -32,6 +32,8 @@ namespace stan {
                                 T_result* result) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
+      using stan::math::index_type;
+
       typedef typename index_type<Matrix<T_y,Dynamic,1> >::type size_type;
       if (y.size() == 0) {
         return true;

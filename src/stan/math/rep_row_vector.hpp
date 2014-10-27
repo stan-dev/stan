@@ -13,6 +13,7 @@ namespace stan {
     inline Eigen::Matrix<typename boost::math::tools::promote_args<T>::type,
                          1,Eigen::Dynamic>
     rep_row_vector(const T& x, int m) {
+      using stan::error_handling::check_nonnegative;
       check_nonnegative("rep_row_vector(%1%)", m,"m", (double*)0);
       return Eigen::Matrix<typename boost::math::tools::promote_args<T>::type,
                            1,Eigen::Dynamic>::Constant(m,x);

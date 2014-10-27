@@ -303,6 +303,7 @@ namespace stan {
       generate_using("stan::math::lgamma",o);
       generate_using("stan::model::prob_grad",o);
       generate_using_namespace("stan::math",o);
+      generate_using_namespace("stan::error_handling",o);
       generate_using_namespace("stan::prob",o);
       o << EOL;
     }
@@ -459,7 +460,7 @@ namespace stan {
                                     const expression& expr,
                                     std::ostream& o) {
       o << INDENT2;
-      o << "stan::math::validate_non_negative_index(\"" << var_name << "\", ";
+      o << "validate_non_negative_index(\"" << var_name << "\", ";
       print_quoted_expression(o,expr);
       o << ", ";
       generate_expression(expr,o);

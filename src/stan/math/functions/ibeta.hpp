@@ -23,6 +23,8 @@ namespace stan {
     inline double ibeta(const double a,
                         const double b,
                         const double x) {
+      using stan::error_handling::check_not_nan;
+
       check_not_nan("ibeta(%1%)", a, "a", static_cast<double*>(0));
       check_not_nan("ibeta(%1%)", b, "b", static_cast<double*>(0));
       check_not_nan("ibeta(%1%)", x, "x", static_cast<double*>(0));

@@ -51,7 +51,7 @@ namespace stan {
         double log_determinant_spd_vari_calc(const Eigen::Matrix<var,R,C> &A,
                                              log_determinant_spd_alloc<R,C> **alloc)
         {
-          using stan::math::dom_err;
+          using stan::error_handling::dom_err;
 
           // allocate space for information needed in chain
           *alloc = new log_determinant_spd_alloc<R,C>();

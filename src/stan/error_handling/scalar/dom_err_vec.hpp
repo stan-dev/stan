@@ -37,6 +37,8 @@ namespace stan {
                             const char* error_msg,
                             const T_msg error_msg2,
                             T_result* result) {
+      using stan::math::value_type;
+
       std::ostringstream msg_o;
       msg_o << name << "[" << stan::error_index::value + i << "] " 
             << error_msg << error_msg2;

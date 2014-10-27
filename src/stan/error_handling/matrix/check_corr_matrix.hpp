@@ -41,6 +41,8 @@ namespace stan {
                                   T_result* result) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
+      using stan::math::index_type;
+
       typedef typename index_type<Matrix<T_y,Dynamic,Dynamic> >::type size_t;
 
       stan::error_handling::check_size_match(function, 

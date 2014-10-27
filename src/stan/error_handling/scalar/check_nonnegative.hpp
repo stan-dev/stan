@@ -35,6 +35,8 @@ namespace stan {
                           const char* name,
                           T_result* result) {
           using stan::length;
+          using stan::math::value_type;
+
           for (size_t n = 0; n < length(y); n++) {
             if (!boost::is_unsigned<typename value_type<T_y>::type>::value 
                 && !(stan::get(y,n) >= 0)) 

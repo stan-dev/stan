@@ -35,6 +35,8 @@ namespace stan {
                        T_result* result) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
+      using stan::math::index_type;
+
       typedef typename index_type<Matrix<T_prob,Dynamic,1> >::type size_t;
 
       if (theta.size() == 0) {
