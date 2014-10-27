@@ -1,15 +1,18 @@
 #ifndef STAN__MATH__ERROR_HANDLING_CHECK_POSITIVE_HPP
 #define STAN__MATH__ERROR_HANDLING_CHECK_POSITIVE_HPP
 
+#include <boost/type_traits/is_unsigned.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
-#include <boost/type_traits/is_unsigned.hpp>
+#include <stan/math/meta/value_type.hpp>
 #include <stan/meta/traits.hpp>
 
 namespace stan {
+
   namespace math {
 
     namespace {
+
       template <typename T_y, typename T_result, bool is_vec>
       struct positive {
         static bool check(const char* function,
@@ -34,7 +37,7 @@ namespace stan {
                           T_result* result) {
           using stan::length;
           for (size_t n = 0; n < length(y); n++) {
-            if (!boost::is_unsigned<typename T_y::value_type>::value
+            if (!boost::is_unsigned<typename value_type<T_y>::type>::value
                 && !(stan::get(y,n) > 0)) 
               return dom_err_vec(n,function,y,name,
                                  " is %1%, but must be > 0!","",
@@ -43,6 +46,7 @@ namespace stan {
           return true;
         }
       };
+
     }
 
     // throws if any element in y is nan

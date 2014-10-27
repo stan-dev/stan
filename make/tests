@@ -15,13 +15,42 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
-
 ##
 # Rule for building a test
 ##
-test/%.o : src/test/%_test.cpp $(LIBGTEST)
+test/%.o : src/test/%_test.cpp $(LIBGTEST) bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+
+##
+# Rule for building a test executable
+##
+test/%$(EXE) : test/%.o bin/libstan.a
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
+
+
+##
+# static rule to link in libstanc.
+# needed by subset of unit tests that test stan compiler
+# all these tests are under stan/test/unit/gm
+##
+STANC_TESTS_HEADERS := $(shell find src/test/unit/gm -type f -name '*_test.cpp')
+STANC_TESTS_O := $(patsubst src/%_test.cpp,%.o,$(STANC_TESTS_HEADERS))
+STANC_TESTS := $(patsubst src/%_test.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
+
+# $(STANC_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
+# 	@mkdir -p $(dir $@)
+# 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+
+# add additional dependency to libstanc.a
+##$(patsubst src/%_test.cpp,%.o,$(STANC_TEST_HEADERS)) : test/%.o : bin/libstanc.a
+$(STANC_TESTS_O) : bin/libstanc.a
+$(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
+
+
+
+
 
 ##
 # Rule for generating dependencies.
@@ -62,21 +91,6 @@ test-headers: $(HEADER_TESTS)
 
 ############################################################
 ##
-# static rule to link in libstan.a libstanc.
-# needed by subset of unit tests that test stan compiler
-# all these tests are under stan/test/unit/gm
-##
-STANC_TESTS := $(patsubst src/%_test.cpp,%$(EXE),$(shell find src/test/unit/gm -type f -name '*_test.cpp'))
-$(STANC_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
-
-test/%$(EXE) : test/%.o bin/libstan.a
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
-
-############################################################
-##
 # Use the stanc compiler to generate C++ from Stan programs
 ##
 
@@ -94,6 +108,7 @@ $(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$
 ##
 src/test/unit/io/mcmc_writer_test.cpp: src/test/test-models/no-main/io_example.cpp
 src/test/unit/gm/generator_test.cpp: src/test/test-models/no-main/gm/test_lp.cpp
+src/test/unit/gm/parser_generator_test.cpp: $(patsubst %.stan,%.cpp,$(shell find src/test/test-models/syntax-only/parser-generator -type f -name '*.stan'))
 
 src/test/unit/model/util_test.cpp: src/test/test-models/no-main/model/valid.cpp src/test/test-models/no-main/model/domain_fail.cpp
 

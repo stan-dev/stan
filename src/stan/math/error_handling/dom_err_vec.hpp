@@ -11,14 +11,18 @@
 // Note that this only occurs when the compiler can deduce code is unreachable,
 // for example when policy macros are used to ignore errors rather than throw.
 #endif
-#include <boost/format.hpp>
 
-#include <stan/meta/traits.hpp>
 #include <sstream>
 #include <stdexcept>
+
+#include <boost/format.hpp>
+
 #include <stan/math/error_handling/dom_err.hpp>
+#include <stan/math/meta/value_type.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
+
   namespace math {
 
 
@@ -34,14 +38,17 @@ namespace stan {
                             const T_msg error_msg2,
                             T_result* result) {
       std::ostringstream msg_o;
-      msg_o << name << "[" << stan::error_index::value + i << "] " << error_msg << error_msg2;
+      msg_o << name << "[" << stan::error_index::value + i << "] " 
+            << error_msg << error_msg2;
 
       std::string msg;
-      msg += (boost::format(function) % typeid(typename T::value_type).name()).str();
+      msg += (boost::format(function) 
+              % typeid(typename value_type<T>::type).name()).str();
       msg += ": ";
       msg += msg_o.str();
       
-      throw std::domain_error((boost::format(msg) % stan::get(y,i)).str());
+      throw std::domain_error((boost::format(msg) 
+                               % stan::get(y,i)).str());
       return false;
     }
     
