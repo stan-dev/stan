@@ -517,7 +517,8 @@ The mean and variance of a random variable $y \sim
 %
 \fitem{int}{neg\_binomial\_rng}{real \farg{alpha}, real \farg{beta}}{Generate a
   negative binomial variate with shape \farg{alpha} and inverse scale
-  \farg{beta}; may only be used in generated quantities block}
+\farg{beta}; may only be used in generated quantities block. \farg{alpha} $/$ \farg{beta} 
+must be less than $2 ^ {29}$}
 \end{description}
 
 
@@ -573,11 +574,12 @@ $\phi^{-1}$, represents overdispersion.
 %
 \fitem{int}{neg\_binomial\_2\_rng}{real \farg{mu}, real \farg{phi}}{Generate a
   negative binomial variate with location \farg{mu} and precision
-  \farg{phi}; may only be used in generated quantities block}
+\farg{phi}; may only be used in generated quantities block. \farg{mu} 
+must be less than $2 ^ {29}$}
 %
 \fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{Generate a
   negative binomial variate with log-location \farg{eta} and precision
-  \farg{phi}; may only be used in generated quantities block}
+\farg{phi}; may only be used in generated quantities block. \farg{eta} must be less than $29 \log 2$}
 \end{description}
 
 
@@ -614,7 +616,8 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
   Poisson complementary cumulative distribution function of \farg{n} given rate \farg{lambda}}
 %
 \fitem{int}{poisson\_rng}{real \farg{lambda}}{Generate a Poisson variate with 
- rate \farg{lambda}; may only be used in generated quantities block}
+  rate \farg{lambda}; may only be used in generated quantities block. \farg{lambda} must be 
+less than $2^{30}$.}
 \end{description}
 
 
@@ -647,7 +650,8 @@ If $\alpha \in \reals$, then for $n \in \nats$,
   log Poisson probability mass of \farg{n} given log rate \farg{alpha}}
 %
 \fitem{int}{poisson\_log\_rng}{real \farg{alpha}}{Generate a Poisson variate with 
- log rate \farg{alpha}; may only be used in generated quantities block}
+log rate \farg{alpha}; may only be used in generated quantities block. \farg{alpha} must
+be less than $30 \log 2$}
 \end{description}
 
 
