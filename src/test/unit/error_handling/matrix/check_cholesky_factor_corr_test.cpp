@@ -2,7 +2,7 @@
 #include <stan/error_handling/matrix/check_cholesky_factor_corr.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkCorrCholeskyMatrix) {
+TEST(ErrorHandlingMatrix, checkCorrCholeskyMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
 
@@ -82,7 +82,7 @@ TEST(MathErrorHandlingMatrix, checkCorrCholeskyMatrix) {
 
 
 
-TEST(MathErrorHandlingMatrix, checkCorrCholeskyMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkCorrCholeskyMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

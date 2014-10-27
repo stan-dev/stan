@@ -4,7 +4,7 @@
 
 using stan::error_handling::check_greater;
 
-TEST(MathErrorHandling,CheckGreater) {
+TEST(ErrorHandling,CheckGreater) {
   const char* function = "check_greater(%1%)";
   double x = 10.0;
   double lb = 0.0;
@@ -36,7 +36,7 @@ TEST(MathErrorHandling,CheckGreater) {
     << "check_greater should throw an exception with x == Inf and lb == Inf";
 }
 
-TEST(MathErrorHandling,CheckGreater_Matrix) {
+TEST(ErrorHandling,CheckGreater_Matrix) {
   const char* function = "check_greater(%1%)";
   double result;
   double x;
@@ -144,7 +144,7 @@ TEST(MathErrorHandling,CheckGreater_Matrix) {
     << "check_greater: double, matrix<3,1>";
 }
 
-TEST(MathErrorHandling,CheckGreater_Matrix_one_indexed_message) {
+TEST(ErrorHandling,CheckGreater_Matrix_one_indexed_message) {
   const char* function = "check_greater(%1%)";
   double result;
   double x;
@@ -208,7 +208,7 @@ TEST(MathErrorHandling,CheckGreater_Matrix_one_indexed_message) {
     << message;
 }
 
-TEST(MathErrorHandling,CheckGreater_nan) {
+TEST(ErrorHandling,CheckGreater_nan) {
   const char* function = "check_greater(%1%)";
   double x = 10.0;
   double lb = 0.0;

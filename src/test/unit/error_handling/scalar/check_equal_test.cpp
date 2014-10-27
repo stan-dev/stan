@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_equal;
 
-TEST(MathErrorHandling,CheckEqual) {
+TEST(ErrorHandling,CheckEqual) {
   const char* function = "check_equal(%1%)";
   double x = 0.0;
   double eq = 0.0;
@@ -38,7 +38,7 @@ TEST(MathErrorHandling,CheckEqual) {
     << "check_equal should not throw an exception with x == Inf and eq == Inf";
 }
 
-TEST(MathErrorHandling,CheckEqualMatrix) {
+TEST(ErrorHandling,CheckEqualMatrix) {
   const char* function = "check_equal(%1%)";
   double result;
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
@@ -67,7 +67,7 @@ TEST(MathErrorHandling,CheckEqualMatrix) {
 }
 
 
-TEST(MathErrorHandling,CheckEqual_Matrix_one_indexed_message) {
+TEST(ErrorHandling,CheckEqual_Matrix_one_indexed_message) {
   const char* function = "check_equal(%1%)";
   double result = 0;
   double x;
@@ -123,7 +123,7 @@ TEST(MathErrorHandling,CheckEqual_Matrix_one_indexed_message) {
 
 }
 
-TEST(MathErrorHandling,CheckEqual_nan) {
+TEST(ErrorHandling,CheckEqual_nan) {
   const char* function = "check_equal(%1%)";
   double x = 0.0;
   double eq = 0.0;

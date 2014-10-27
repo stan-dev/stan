@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_row_index.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkRowIndexMatrix) {
+TEST(ErrorHandlingMatrix, checkRowIndexMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   size_t i;
@@ -25,7 +25,7 @@ TEST(MathErrorHandlingMatrix, checkRowIndexMatrix) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkRowIndexMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkRowIndexMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   size_t i;

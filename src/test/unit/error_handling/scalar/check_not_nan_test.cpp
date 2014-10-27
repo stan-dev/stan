@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_not_nan;
 
-TEST(MathErrorHandling,CheckNotNan) {
+TEST(ErrorHandling,CheckNotNan) {
   const char* function = "check_not_nan(%1%)";
   double x = 0;
   double result;
@@ -25,7 +25,7 @@ TEST(MathErrorHandling,CheckNotNan) {
 }
 
 
-TEST(MathErrorHandling,CheckNotNanVectorized) {
+TEST(ErrorHandling,CheckNotNanVectorized) {
   int N = 5;
   const char* function = "check_not_nan(%1%)";
   std::vector<double> x(N);
@@ -48,7 +48,7 @@ TEST(MathErrorHandling,CheckNotNanVectorized) {
     << "check_not_nan(vector) should throw exception on NaN: " << x[0];
 }
 
-TEST(MathErrorHandling, CheckNotNanVectorized_one_indexed_message) {
+TEST(ErrorHandling, CheckNotNanVectorized_one_indexed_message) {
   int N = 5;
   const char* function = "check_not_nan(%1%)";
   std::vector<double> x(N);

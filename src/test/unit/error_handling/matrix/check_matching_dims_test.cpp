@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_matching_dims.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkMatchingDimsMatrix) {
+TEST(ErrorHandlingMatrix, checkMatchingDimsMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> x;
   double result;
@@ -26,7 +26,7 @@ TEST(MathErrorHandlingMatrix, checkMatchingDimsMatrix) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkMatchingDimsMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkMatchingDimsMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> x;
   double result;

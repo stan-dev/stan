@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_spsd_matrix.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkSpsdMatrixPosDef) {
+TEST(ErrorHandlingMatrix, checkSpsdMatrixPosDef) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   
@@ -18,14 +18,14 @@ TEST(MathErrorHandlingMatrix, checkSpsdMatrixPosDef) {
   EXPECT_TRUE(stan::error_handling::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result));
 }
 
-TEST(MathErrorHandlingMatrix, checkSpsdMatrixZero) {
+TEST(ErrorHandlingMatrix, checkSpsdMatrixZero) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = 
     Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Zero(3,3);
   double result;
   EXPECT_TRUE(stan::error_handling::check_spsd_matrix("checkSpsdMatrix(%1%)", y, "y", &result));
 }
 
-TEST(MathErrorHandlingMatrix, checkSpsdNotSquare) {
+TEST(ErrorHandlingMatrix, checkSpsdNotSquare) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = 
     Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Zero(3,2);
   double result;
@@ -33,7 +33,7 @@ TEST(MathErrorHandlingMatrix, checkSpsdNotSquare) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkSpsdMatrixPosDef_nan) {
+TEST(ErrorHandlingMatrix, checkSpsdMatrixPosDef_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

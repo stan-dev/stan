@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_bounded;
 
-TEST(MathErrorHandling,CheckBounded_x) {
+TEST(ErrorHandling,CheckBounded_x) {
   const char* function = "check_bounded(%1%)";
   const char* name = "x";
   double x = 0;
@@ -43,7 +43,7 @@ TEST(MathErrorHandling,CheckBounded_x) {
   EXPECT_THROW(check_bounded(function, x, low, high, name, &result), std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;  
 }
-TEST(MathErrorHandling,CheckBounded_Low) {
+TEST(ErrorHandling,CheckBounded_Low) {
   const char* function = "check_bounded(%1%)";
   const char* name = "x";
   double x = 0;
@@ -67,7 +67,7 @@ TEST(MathErrorHandling,CheckBounded_Low) {
   EXPECT_THROW(check_bounded(function, x, low, high, name, &result), std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
-TEST(MathErrorHandling,CheckBounded_High) {
+TEST(ErrorHandling,CheckBounded_High) {
   const char* function = "check_bounded(%1%)";
   const char* name = "x";
   double x = 0;
@@ -90,7 +90,7 @@ TEST(MathErrorHandling,CheckBounded_High) {
   EXPECT_THROW(check_bounded(function, x, low, high, name, &result), std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
-TEST(MathErrorHandling,CheckBounded_nan) {
+TEST(ErrorHandling,CheckBounded_nan) {
   double nan = std::numeric_limits<double>::quiet_NaN();
 
   const char* function = "check_bounded(%1%)";

@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_corr_matrix;
 
-TEST(MathErrorHandlingMatrix, CheckCorrMatrix) {
+TEST(ErrorHandlingMatrix, CheckCorrMatrix) {
   double result;
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y;
   y.resize(2,2);
@@ -16,7 +16,7 @@ TEST(MathErrorHandlingMatrix, CheckCorrMatrix) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, CheckCorrMatrix_one_indexed_message) {
+TEST(ErrorHandlingMatrix, CheckCorrMatrix_one_indexed_message) {
   std::string message;
   double result;
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y;
@@ -39,7 +39,7 @@ TEST(MathErrorHandlingMatrix, CheckCorrMatrix_one_indexed_message) {
     << message;
 }
 
-TEST(MathErrorHandlingMatrix, CheckCorrMatrix_nan) {
+TEST(ErrorHandlingMatrix, CheckCorrMatrix_nan) {
   double result;
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y;
   y.resize(2,2);

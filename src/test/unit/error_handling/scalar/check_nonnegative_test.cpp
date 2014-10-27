@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_nonnegative;
 
-TEST(MathErrorHandling,CheckNonnegative) {
+TEST(ErrorHandling,CheckNonnegative) {
   const char* function = "check_nonnegative(%1%)";
   double x = 0;
   double result;
@@ -29,7 +29,7 @@ TEST(MathErrorHandling,CheckNonnegative) {
 }
 
 
-TEST(MathErrorHandling,CheckNonnegativeVectorized) {
+TEST(ErrorHandling,CheckNonnegativeVectorized) {
   int N = 5;
   const char* function = "check_nonnegative(%1%)";
   std::vector<double> x(N);
@@ -57,7 +57,7 @@ TEST(MathErrorHandling,CheckNonnegativeVectorized) {
     << "check_nonnegative(vector) should throw exception on NaN: " << x[0];
 }
 
-TEST(MathErrorHandling, CheckNonnegativeVectorized_one_indexed_message) {
+TEST(ErrorHandling, CheckNonnegativeVectorized_one_indexed_message) {
   int N = 5;
   const char* function = "check_nonnegative(%1%)";
   std::vector<double> x(N);
@@ -78,7 +78,7 @@ TEST(MathErrorHandling, CheckNonnegativeVectorized_one_indexed_message) {
   EXPECT_NE(std::string::npos, message.find("[3]"));
 }
 
-TEST(MathErrorHandling,CheckNonnegative_nan) {
+TEST(ErrorHandling,CheckNonnegative_nan) {
   const char* function = "check_nonnegative(%1%)";
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

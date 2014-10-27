@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_column_index.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkColumnIndexMatrix) {
+TEST(ErrorHandlingMatrix, checkColumnIndexMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   size_t i;
@@ -25,7 +25,7 @@ TEST(MathErrorHandlingMatrix, checkColumnIndexMatrix) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkColumnIndexMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkColumnIndexMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double nan = std::numeric_limits<double>::quiet_NaN();
   double result;

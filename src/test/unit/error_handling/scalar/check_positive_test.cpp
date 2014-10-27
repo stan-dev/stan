@@ -2,7 +2,7 @@
 #include <stan/math/matrix/meta/value_type.hpp>  
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandling,CheckPositive_nan) {
+TEST(ErrorHandling,CheckPositive_nan) {
   using stan::error_handling::check_positive;
   const char* function = "check_positive(%1%)";
   double result;

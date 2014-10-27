@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_pos_definite.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkPosDefiniteMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkPosDefiniteMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

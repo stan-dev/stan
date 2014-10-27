@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_matching_sizes.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkMatchingSizesMatrix) {
+TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> x;
   double result;
@@ -58,7 +58,7 @@ TEST(MathErrorHandlingMatrix, checkMatchingSizesMatrix) {
                                                b, "b", &result));
 }
 
-TEST(MathErrorHandlingMatrix, checkMatchingSizesMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> x;
   double result;

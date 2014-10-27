@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_unit_vector.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkUnitVector) {
+TEST(ErrorHandlingMatrix, checkUnitVector) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
   double result;
   y << sqrt(0.5), sqrt(0.5);
@@ -14,7 +14,7 @@ TEST(MathErrorHandlingMatrix, checkUnitVector) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkUnitVector_nan) {
+TEST(ErrorHandlingMatrix, checkUnitVector_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

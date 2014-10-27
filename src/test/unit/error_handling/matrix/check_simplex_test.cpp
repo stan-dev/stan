@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_simplex.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkSimplex) {
+TEST(ErrorHandlingMatrix, checkSimplex) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
   y.setZero();
   double result;
@@ -16,7 +16,7 @@ TEST(MathErrorHandlingMatrix, checkSimplex) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkSimplex_message_negative_value) {
+TEST(ErrorHandlingMatrix, checkSimplex_message_negative_value) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(100);
   y.setZero();
   std::string message;
@@ -64,7 +64,7 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_negative_value) {
     << message;
 }
 
-TEST(MathErrorHandlingMatrix, checkSimplex_message_sum) {
+TEST(ErrorHandlingMatrix, checkSimplex_message_sum) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(100);
   y.setZero();
   std::string message;
@@ -90,7 +90,7 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_sum) {
 }
 
 
-TEST(MathErrorHandlingMatrix, checkSimplex_message_length) {
+TEST(ErrorHandlingMatrix, checkSimplex_message_length) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y;
   std::string message;
   double result;
@@ -113,7 +113,7 @@ TEST(MathErrorHandlingMatrix, checkSimplex_message_length) {
     << message;
 }
 
-TEST(MathErrorHandlingMatrix, checkSimplex_nan) {
+TEST(ErrorHandlingMatrix, checkSimplex_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
   y.setZero();
   double result;

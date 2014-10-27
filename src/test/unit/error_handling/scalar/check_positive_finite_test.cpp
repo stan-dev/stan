@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_positive_finite;
 
-TEST(MathErrorHandling,CheckPositiveFinite) {
+TEST(ErrorHandling,CheckPositiveFinite) {
   const char* function = "check_positive_finite(%1%)";
   double x = 1;
   double result;
@@ -29,7 +29,7 @@ TEST(MathErrorHandling,CheckPositiveFinite) {
 }
 
 // ---------- check_positive_finite: vector tests ----------
-TEST(MathErrorHandling,CheckPositiveFinite_Vector) {
+TEST(ErrorHandling,CheckPositiveFinite_Vector) {
   const char* function = "check_positive_finite(%1%)";
   double result;
   std::vector<double> x;
@@ -78,7 +78,7 @@ TEST(MathErrorHandling,CheckPositiveFinite_Vector) {
 }
 
 // ---------- check_positive_finite: matrix tests ----------
-TEST(MathErrorHandling,CheckPositiveFinite_Matrix) {
+TEST(ErrorHandling,CheckPositiveFinite_Matrix) {
   const char* function = "check_positive_finite(%1%)";
   double result;
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
@@ -121,7 +121,7 @@ TEST(MathErrorHandling,CheckPositiveFinite_Matrix) {
 }
 
 
-TEST(MathErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message) {
+TEST(ErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message) {
   const char* function = "check_positive_finite(%1%)";
   double result;
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
@@ -142,7 +142,7 @@ TEST(MathErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message) {
   EXPECT_NE(std::string::npos, message.find("[3]"))
     << message;
 }
-TEST(MathErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message_2) {
+TEST(ErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message_2) {
   const char* function = "check_positive_finite(%1%)";
   double result;
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
@@ -164,7 +164,7 @@ TEST(MathErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message_2) {
     << message;
 }
 
-TEST(MathErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message_3) {
+TEST(ErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message_3) {
   const char* function = "check_positive_finite(%1%)";
   double result;
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
@@ -186,7 +186,7 @@ TEST(MathErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message_3) {
     << message;
 }
 
-TEST(MathErrorHandling,CheckPositiveFinite_nan) {
+TEST(ErrorHandling,CheckPositiveFinite_nan) {
   const char* function = "check_positive_finite(%1%)";
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

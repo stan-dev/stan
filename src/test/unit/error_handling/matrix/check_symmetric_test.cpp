@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_symmetric.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkSymmetric) {
+TEST(ErrorHandlingMatrix, checkSymmetric) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   
@@ -15,7 +15,7 @@ TEST(MathErrorHandlingMatrix, checkSymmetric) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkSymmetric_one_indexed_message) {
+TEST(ErrorHandlingMatrix, checkSymmetric_one_indexed_message) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   std::string message;
@@ -37,7 +37,7 @@ TEST(MathErrorHandlingMatrix, checkSymmetric_one_indexed_message) {
     << message;
 }
 
-TEST(MathErrorHandlingMatrix, checkSymmetric_nan) {
+TEST(ErrorHandlingMatrix, checkSymmetric_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

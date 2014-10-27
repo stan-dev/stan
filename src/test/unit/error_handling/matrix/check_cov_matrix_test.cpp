@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_cov_matrix.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkCovMatrix) {
+TEST(ErrorHandlingMatrix, checkCovMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   
@@ -15,7 +15,7 @@ TEST(MathErrorHandlingMatrix, checkCovMatrix) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkCovMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkCovMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

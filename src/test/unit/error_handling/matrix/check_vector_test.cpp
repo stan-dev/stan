@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_vector.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkVectorMatrix) {
+TEST(ErrorHandlingMatrix, checkVectorMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> x;
   double result;
   
@@ -19,7 +19,7 @@ TEST(MathErrorHandlingMatrix, checkVectorMatrix) {
   EXPECT_TRUE(stan::error_handling::check_vector("checkVector(%1%)",x,"x", &result));
 }
 
-TEST(MathErrorHandlingMatrix, checkVectorMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkVectorMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> x;
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

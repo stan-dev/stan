@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 
-TEST(MathErrorHandlingMatrix, checkPosSemidefiniteMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkPosSemidefiniteMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

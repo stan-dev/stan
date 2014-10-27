@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_square.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkSquareMatrix) {
+TEST(ErrorHandlingMatrix, checkSquareMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   
@@ -14,7 +14,7 @@ TEST(MathErrorHandlingMatrix, checkSquareMatrix) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkSquareMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkSquareMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

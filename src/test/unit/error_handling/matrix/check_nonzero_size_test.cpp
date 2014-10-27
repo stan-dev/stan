@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
-TEST(MathErrorHandlingMatrix, checkNonzeroSizeMatrix) {
+TEST(ErrorHandlingMatrix, checkNonzeroSizeMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   using stan::error_handling::check_nonzero_size;
   double result;
@@ -40,7 +40,7 @@ TEST(MathErrorHandlingMatrix, checkNonzeroSizeMatrix) {
                    "has size 0");
 }
 
-TEST(MathErrorHandlingMatrix, checkNonzeroSizeMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkNonzeroSizeMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

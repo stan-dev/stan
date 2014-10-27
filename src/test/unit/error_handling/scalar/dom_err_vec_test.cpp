@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-class MathErrorHandling_dom_err_vec : public ::testing::Test {
+class ErrorHandling_dom_err_vec : public ::testing::Test {
 public:
   void SetUp() {
     function_ = "function(%1%)";
@@ -54,7 +54,7 @@ public:
   size_t index_;
 };
 
-TEST_F(MathErrorHandling_dom_err_vec, vdouble_double_double) {
+TEST_F(ErrorHandling_dom_err_vec, vdouble_double_double) {
   typedef std::vector<double> T;
   typedef double T_result;
   typedef double T_msg;
@@ -66,7 +66,7 @@ TEST_F(MathErrorHandling_dom_err_vec, vdouble_double_double) {
   test_throw<T, T_result, T_msg>(y,msg2);
 }
 
-TEST_F(MathErrorHandling_dom_err_vec, vdouble_double_string) {
+TEST_F(ErrorHandling_dom_err_vec, vdouble_double_string) {
   typedef std::vector<double> T;
   typedef double T_result;
   typedef std::string T_msg;
@@ -78,7 +78,7 @@ TEST_F(MathErrorHandling_dom_err_vec, vdouble_double_string) {
   test_throw<T, T_result, T_msg>(y,msg2);
 }
 
-TEST_F(MathErrorHandling_dom_err_vec, vint_double_double) {
+TEST_F(ErrorHandling_dom_err_vec, vint_double_double) {
   typedef std::vector<int> T;
   typedef double T_result;
   typedef double T_msg;
@@ -91,7 +91,7 @@ TEST_F(MathErrorHandling_dom_err_vec, vint_double_double) {
 }
 
 
-TEST_F(MathErrorHandling_dom_err_vec, vvar_var_var) {
+TEST_F(ErrorHandling_dom_err_vec, vvar_var_var) {
   typedef std::vector<stan::agrad::var> T;
   typedef stan::agrad::var T_result;
   typedef double T_msg;
@@ -103,7 +103,7 @@ TEST_F(MathErrorHandling_dom_err_vec, vvar_var_var) {
   test_throw<T, T_result, T_msg>(y,msg2);
 }
 
-TEST_F(MathErrorHandling_dom_err_vec, one_indexed) {
+TEST_F(ErrorHandling_dom_err_vec, one_indexed) {
   std::string message;
   int n = 5;
   std::vector<double> y(20);

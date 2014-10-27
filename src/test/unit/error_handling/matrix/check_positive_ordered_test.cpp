@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_positive_ordered;
 
-TEST(MathErrorHandlingMatrix, checkPositiveOrdered) {
+TEST(ErrorHandlingMatrix, checkPositiveOrdered) {
   double result;
   Eigen::Matrix<double, Eigen::Dynamic, 1> y;
   y.resize(3);
@@ -32,7 +32,7 @@ TEST(MathErrorHandlingMatrix, checkPositiveOrdered) {
 }
 
 
-TEST(MathErrorHandlingMatrix, checkPositiveOrdered_one_indexed_message) {
+TEST(ErrorHandlingMatrix, checkPositiveOrdered_one_indexed_message) {
   std::string message;
   double result;
   Eigen::Matrix<double, Eigen::Dynamic, 1> y;
@@ -66,7 +66,7 @@ TEST(MathErrorHandlingMatrix, checkPositiveOrdered_one_indexed_message) {
     << message;
 }
 
-TEST(MathErrorHandlingMatrix, checkPositiveOrdered_nan) {
+TEST(ErrorHandlingMatrix, checkPositiveOrdered_nan) {
   double result;
   Eigen::Matrix<double, Eigen::Dynamic, 1> y;
   double nan = std::numeric_limits<double>::quiet_NaN();

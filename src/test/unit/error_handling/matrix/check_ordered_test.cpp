@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_ordered;
 
-TEST(MathErrorHandlingMatrix, checkOrdered) {
+TEST(ErrorHandlingMatrix, checkOrdered) {
   double result;
   Eigen::Matrix<double, Eigen::Dynamic, 1> y;
   y.resize(3);
@@ -60,7 +60,7 @@ TEST(MathErrorHandlingMatrix, checkOrdered) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkOrdered_one_indexed_message) {
+TEST(ErrorHandlingMatrix, checkOrdered_one_indexed_message) {
   std::string message;
   double result;
   Eigen::Matrix<double, Eigen::Dynamic, 1> y;
@@ -80,7 +80,7 @@ TEST(MathErrorHandlingMatrix, checkOrdered_one_indexed_message) {
     << message;
 }
 
-TEST(MathErrorHandlingMatrix, checkOrdered_nan) {
+TEST(ErrorHandlingMatrix, checkOrdered_nan) {
   double result;
   Eigen::Matrix<double, Eigen::Dynamic, 1> y;
   std::vector<double> y_;

@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_greater_or_equal;
 
-TEST(MathErrorHandling,CheckGreaterOrEqual) {
+TEST(ErrorHandling,CheckGreaterOrEqual) {
   const char* function = "check_greater_or_equal(%1%)";
   double x = 10.0;
   double lb = 0.0;
@@ -37,7 +37,7 @@ TEST(MathErrorHandling,CheckGreaterOrEqual) {
     << "check_greater should not throw an exception with x == Inf and lb == Inf";
 }
 
-TEST(MathErrorHandling,CheckGreaterOrEqualMatrix) {
+TEST(ErrorHandling,CheckGreaterOrEqualMatrix) {
   const char* function = "check_greater_or_equal(%1%)";
   double result;
   double x;
@@ -151,7 +151,7 @@ TEST(MathErrorHandling,CheckGreaterOrEqualMatrix) {
 }
 
 
-TEST(MathErrorHandling,CheckGreaterOrEqual_Matrix_one_indexed_message) {
+TEST(ErrorHandling,CheckGreaterOrEqual_Matrix_one_indexed_message) {
   const char* function = "check_greater_or_equal(%1%)";
   double result;
   double x;
@@ -215,7 +215,7 @@ TEST(MathErrorHandling,CheckGreaterOrEqual_Matrix_one_indexed_message) {
     << message;
 }
 
-TEST(MathErrorHandling,CheckGreaterOrEqual_nan) {
+TEST(ErrorHandling,CheckGreaterOrEqual_nan) {
   const char* function = "check_greater_or_equal(%1%)";
   double x = 10.0;
   double lb = 0.0;

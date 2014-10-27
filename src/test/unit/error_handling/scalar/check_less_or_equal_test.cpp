@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_less_or_equal;
 
-TEST(MathErrorHandling,CheckLessOrEqual) {
+TEST(ErrorHandling,CheckLessOrEqual) {
   const char* function = "check_less_or_equal(%1%)";
   double x = -10.0;
   double lb = 0.0;
@@ -37,7 +37,7 @@ TEST(MathErrorHandling,CheckLessOrEqual) {
     << "check_less should not throw an exception with x == -Inf and lb == -Inf";
 }
 
-TEST(MathErrorHandling,CheckLessOrEqual_Matrix) {
+TEST(ErrorHandling,CheckLessOrEqual_Matrix) {
   const char* function = "check_less_or_equal(%1%)";
   double result;
   double x;
@@ -133,7 +133,7 @@ TEST(MathErrorHandling,CheckLessOrEqual_Matrix) {
   EXPECT_TRUE(check_less_or_equal(function, x, high_vec, "x", &result));
 }
 
-TEST(MathErrorHandling,CheckLessOrEqual_Matrix_one_indexed_message) {
+TEST(ErrorHandling,CheckLessOrEqual_Matrix_one_indexed_message) {
   const char* function = "check_less(%1%)";
   double result;
   double x;
@@ -198,7 +198,7 @@ TEST(MathErrorHandling,CheckLessOrEqual_Matrix_one_indexed_message) {
     << message;
 }
 
-TEST(MathErrorHandling,CheckLessOrEqual_nan) {
+TEST(ErrorHandling,CheckLessOrEqual_nan) {
   const char* function = "check_less_or_equal(%1%)";
   double x = 10.0;
   double lb = 0.0;

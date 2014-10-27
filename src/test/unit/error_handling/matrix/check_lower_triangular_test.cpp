@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_lower_triangular.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkLowerTriangular) {
+TEST(ErrorHandlingMatrix, checkLowerTriangular) {
   using stan::error_handling::check_lower_triangular;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
@@ -55,7 +55,7 @@ TEST(MathErrorHandlingMatrix, checkLowerTriangular) {
 }
 
 
-TEST(MathErrorHandlingMatrix, checkLowerTriangular_one_indexed_message) {
+TEST(ErrorHandlingMatrix, checkLowerTriangular_one_indexed_message) {
   using stan::error_handling::check_lower_triangular;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
@@ -78,7 +78,7 @@ TEST(MathErrorHandlingMatrix, checkLowerTriangular_one_indexed_message) {
     << message;
 }
 
-TEST(MathErrorHandlingMatrix, checkLowerTriangular_nan) {
+TEST(ErrorHandlingMatrix, checkLowerTriangular_nan) {
   using stan::error_handling::check_lower_triangular;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;

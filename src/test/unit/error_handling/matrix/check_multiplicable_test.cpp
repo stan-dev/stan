@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_multiplicable.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkMultiplicableMatrix) {
+TEST(ErrorHandlingMatrix, checkMultiplicableMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> x;
   double result;
@@ -26,7 +26,7 @@ TEST(MathErrorHandlingMatrix, checkMultiplicableMatrix) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkMultiplicableMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkMultiplicableMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> x;
   double result;

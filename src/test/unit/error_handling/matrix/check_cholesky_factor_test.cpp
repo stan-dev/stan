@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_cholesky_factor.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkCovCholeskyMatrix) {
+TEST(ErrorHandlingMatrix, checkCovCholeskyMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
 
@@ -66,7 +66,7 @@ TEST(MathErrorHandlingMatrix, checkCovCholeskyMatrix) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkCovCholeskyMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkCovCholeskyMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   double nan = std::numeric_limits<double>::quiet_NaN();

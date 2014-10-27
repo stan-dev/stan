@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_std_vector_index.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathErrorHandlingMatrix, checkStdVectorIndexMatrix) {
+TEST(ErrorHandlingMatrix, checkStdVectorIndexMatrix) {
   std::vector<double> y;
   y.push_back(5);
   y.push_back(5);
@@ -29,7 +29,7 @@ TEST(MathErrorHandlingMatrix, checkStdVectorIndexMatrix) {
                std::domain_error);
 }
 
-TEST(MathErrorHandlingMatrix, checkStdVectorIndexMatrix_nan) {
+TEST(ErrorHandlingMatrix, checkStdVectorIndexMatrix_nan) {
   std::vector<double> y;
   double nan = std::numeric_limits<double>::quiet_NaN();
   y.push_back(nan);

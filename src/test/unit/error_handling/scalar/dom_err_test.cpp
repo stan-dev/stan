@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/rev.hpp>
 
-class MathErrorHandling_dom_err : public ::testing::Test {
+class ErrorHandling_dom_err : public ::testing::Test {
 public:
   void SetUp() {
     function_ = "function(%1%)";
@@ -46,7 +46,7 @@ public:
   const char* error_message_;
 };
 
-TEST_F(MathErrorHandling_dom_err, double_double_double) {
+TEST_F(ErrorHandling_dom_err, double_double_double) {
   typedef double T;
   typedef double T_result;
   typedef double T_msg;
@@ -57,7 +57,7 @@ TEST_F(MathErrorHandling_dom_err, double_double_double) {
   test_throw<T, T_result, T_msg>(y,msg2);
 }
 
-TEST_F(MathErrorHandling_dom_err, double_double_string) {
+TEST_F(ErrorHandling_dom_err, double_double_string) {
   typedef double T;
   typedef double T_result;
   typedef std::string T_msg;
@@ -68,7 +68,7 @@ TEST_F(MathErrorHandling_dom_err, double_double_string) {
   test_throw<T, T_result, T_msg>(y,msg2);
 }
 
-TEST_F(MathErrorHandling_dom_err, int_double_double) {
+TEST_F(ErrorHandling_dom_err, int_double_double) {
   typedef int T;
   typedef double T_result;
   typedef double T_msg;
@@ -80,7 +80,7 @@ TEST_F(MathErrorHandling_dom_err, int_double_double) {
 }
 
 
-TEST_F(MathErrorHandling_dom_err, var_var_var) {
+TEST_F(ErrorHandling_dom_err, var_var_var) {
   typedef stan::agrad::var T;
   typedef stan::agrad::var T_result;
   typedef stan::agrad::var T_msg;
