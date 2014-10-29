@@ -1,18 +1,19 @@
 #include <stan/error_handling/scalar/dom_err.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/var.hpp>
 
 class ErrorHandling_dom_err : public ::testing::Test {
 public:
   void SetUp() {
-    function_ = "function(%1%)";
+    function_ = "function";
     y_name_ = "y";
-    error_message_ = " error_message %1% ";
+    msg1_ = "error_message ";
+    msg2_ = " after y";
   }
 
 
-  template <class T, class T_msg>
-  std::string expected_message(T y, T_msg msg) {
+  template <class T>
+  std::string expected_message_with_message(T y) {
     std::stringstream expected_message;
     expected_message << "function("
                      << typeid(T).name()
@@ -20,73 +21,65 @@ public:
                      << y_name_
                      << " error_message "
                      << y
-                     << " "
-                     << msg;
+                     << " after y";
+    return expected_message.str();
+  }
+
+  template <class T>
+  std::string expected_message_without_message(T y) {
+    std::stringstream expected_message;
+    expected_message << "function("
+                     << typeid(T).name()
+                     << "): "
+                     << y_name_
+                     << " error_message "
+                     << y;
     return expected_message.str();
   }
 
 
-  template <class T, class T_result, class T_msg>
-  void test_throw(T y, T_msg msg2) {
+  template <class T>
+  void test_throw(T y) {
     try {
-      stan::error_handling::dom_err<T, T_result, T_msg>
-        (function_, y, y_name_, error_message_, msg2, 0);
+      stan::error_handling::dom_err<T>
+        (function_, y_name_, y, msg1_, msg2_);
       FAIL() << "expecting call to dom_err<> to throw a domain_error,"
              << "but threw nothing";
     } catch(std::domain_error& e) {
-      EXPECT_EQ(expected_message(y, msg2), e.what());
+      EXPECT_EQ(expected_message_with_message(y), e.what());
     } catch(...) {
       FAIL() << "expecting call to dom_err<> to throw a domain_error,"
              << "but threw a different type";
     }
+
+    try {
+      stan::error_handling::dom_err<T>
+        (function_, y_name_, y, msg1_);
+      FAIL() << "expecting call to dom_err<> to throw a domain_error,"
+             << "but threw nothing";
+    } catch(std::domain_error& e) {
+      EXPECT_EQ(expected_message_without_message(y), e.what());
+    } catch(...) {
+      FAIL() << "expecting call to dom_err<> to throw a domain_error,"
+             << "but threw a different type";
+    }
+
   }
 
   const char* function_;
   const char* y_name_;
-  const char* error_message_;
+  const char* msg1_;
+  const char* msg2_;
 };
 
-TEST_F(ErrorHandling_dom_err, double_double_double) {
-  typedef double T;
-  typedef double T_result;
-  typedef double T_msg;
+TEST_F(ErrorHandling_dom_err, double) {
+  double y = 10;
   
-  T y = 10;
-  T_msg msg2 = 50;
-  
-  test_throw<T, T_result, T_msg>(y,msg2);
+  test_throw<double>(y);
 }
 
-TEST_F(ErrorHandling_dom_err, double_double_string) {
-  typedef double T;
-  typedef double T_result;
-  typedef std::string T_msg;
+TEST_F(ErrorHandling_dom_err, var) {
+  stan::agrad::var y = 10;
   
-  T y = 10;
-  T_msg msg2 = "abcd";
-  
-  test_throw<T, T_result, T_msg>(y,msg2);
-}
-
-TEST_F(ErrorHandling_dom_err, int_double_double) {
-  typedef int T;
-  typedef double T_result;
-  typedef double T_msg;
-  
-  T y = 10;
-  T_msg msg2 = 50;
-  
-  test_throw<T, T_result, T_msg>(y,msg2);
-}
-
-
-TEST_F(ErrorHandling_dom_err, var_var_var) {
-  typedef stan::agrad::var T;
-  typedef stan::agrad::var T_result;
-  typedef stan::agrad::var T_msg;
-  
-  T y = 10;
-  T_msg msg2 = 50;
-  
-  test_throw<T, T_result, T_msg>(y,msg2);
+  test_throw<stan::agrad::var>(y);
 }

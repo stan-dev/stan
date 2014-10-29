@@ -29,29 +29,67 @@ namespace stan {
       }
     }
 
-    // currently ignoring T_result
-    template <typename T,
-              typename T_result,
-              typename T_msg>
-    inline bool dom_err(const char* function,
-                        const T& y,
-                        const char* name,
-                        const char* error_msg,
-                        const T_msg error_msg2,
-                        T_result* result) {
-      std::ostringstream msg_o;
-      msg_o << name << error_msg << error_msg2;
-      
-      std::string msg;
-      msg += (boost::format(function) % typeid(T).name()).str();
-      msg += ": ";
-      msg += msg_o.str();
-      
-      throw std::domain_error((boost::format(msg) % y).str());
 
-      return false;
+    // dom_err("function", "name", y, msg1, msg2);
+    /**
+     * Throw a domain error with a consistently formatted message.
+     * 
+     * This is an abstraction for all Stan functions to use when throwing
+     * domain errors. This will allow us to change the behavior for all
+     * functions at once. (We've already changed behavior mulitple times up
+     * to Stan v2.5.0.)
+     *
+     * The message is:
+     * "<function>(<typeid(T)>.name()>): <name> <msg1><y><msg2>"
+     *
+     * @tparam T Type of variable
+     * @param function Name of the function
+     * @param name Name of the variable
+     * @param y Variable
+     * @param msg1 Message to print before the variable
+     * @param msg2 Message to print after the variable
+     */
+    template <typename T>
+    inline void dom_err(const char* function,
+                        const char* name,
+                        const T& y,
+                        const char* msg1,
+                        const char* msg2) {
+      std::ostringstream message;
+      
+      message << function << "(" << typeid(T).name() << "): "
+              << name << " "
+              << msg1
+              << y
+              << msg2;
+
+      throw std::domain_error(message.str());
     }
-    
+
+    /**
+     * Throw a domain error with a consistently formatted message.
+     * 
+     * This is an abstraction for all Stan functions to use when throwing
+     * domain errors. This will allow us to change the behavior for all
+     * functions at once. (We've already changed behavior mulitple times up
+     * to Stan v2.5.0.)
+     *
+     * The message is:
+     * "<function>(<typeid(T)>.name()>): <name> <msg1><y>"
+     *
+     * @tparam T Type of variable
+     * @param function Name of the function
+     * @param name Name of the variable
+     * @param y Variable
+     * @param msg1 Message to print before the variable
+     */
+    template <typename T>
+    inline void dom_err(const char* function,
+                        const char* name,
+                        const T& y,
+                        const char* msg1) {
+      dom_err(function, name, y, msg1, "");
+    }
 
   }
 }
