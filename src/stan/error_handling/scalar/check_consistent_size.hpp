@@ -9,12 +9,11 @@ namespace stan {
   namespace error_handling {
 
     // NOTE: this will not throw if nan is passed in.
-    template <typename T, typename T_result>
-    inline bool check_consistent_size(size_t max_size,
-                                      const char* function,
-                                      const T& x,
+    template <typename T>
+    inline bool check_consistent_size(const char* function,
                                       const char* name,
-                                      T_result* result) {
+                                      const T& x,
+                                      size_t max_size) {
       size_t x_size = stan::size_of(x);
       if (is_vector<T>::value && x_size == max_size)
         return true;
@@ -22,18 +21,19 @@ namespace stan {
         return true;
       
       std::stringstream msg;
-      msg << " dimension=%1%, expecting dimension of either 1 or "
+      msg << ", expecting dimension of either 1 or "
           << "max_size=" << max_size
           << "; a vectorized function was called with arguments of different "
           << "scalar, array, vector, or matrix types, and they were not "
           << "consistently sized;  all arguments must be scalars or "
           << "multidimensional values of the same shape.";
+      std::string message(msg.str());
 
-      std::string tmp(msg.str());
-
-      return dom_err(function,x_size,name,
-                     tmp.c_str(), "",                     
-                     result);
+      dom_err(function, name, x_size,
+              "dimension=",
+              message.c_str());
+      
+      return false;
     }
 
   }

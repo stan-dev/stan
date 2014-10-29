@@ -9,52 +9,49 @@ namespace stan {
   namespace error_handling {
 
     // NOTE: this will not throw if nan is passed in.
-    template <typename T1, typename T2, typename T_result>
+    template <typename T1, typename T2>
     inline bool check_consistent_sizes(const char* function,
-                                       const T1& x1, 
-                                       const T2& x2, 
                                        const char* name1,
+                                       const T1& x1, 
                                        const char* name2,
-                                       T_result* result) {
+                                       const T2& x2) {
       size_t max_size = std::max(size_of(x1),
                                  size_of(x2));
-      return check_consistent_size(max_size,function,x1,name1,result)
-        && check_consistent_size(max_size,function,x2,name2,result);
+      return check_consistent_size(function, name1, x1, max_size)
+        && check_consistent_size(function, name2, x2, max_size);
     }
 
-    template <typename T1, typename T2, typename T3, typename T_result>
+    template <typename T1, typename T2, typename T3>
     inline bool check_consistent_sizes(const char* function,
-                                       const T1& x1, 
-                                       const T2& x2, 
-                                       const T3& x3,
                                        const char* name1,
-                                       const char* name2,
-                                       const char* name3,
-                                       T_result* result) {
+                                       const T1& x1, 
+                                       const char* name2, 
+                                       const T2& x2, 
+                                       const char* name3, 
+                                       const T3& x3) {
       size_t max_size = std::max(size_of(x1),
                                  std::max(size_of(x2),size_of(x3)));
-      return check_consistent_size(max_size,function,x1,name1,result)
-        && check_consistent_size(max_size,function,x2,name2,result)
-        && check_consistent_size(max_size,function,x3,name3,result);
+      return check_consistent_size(function, name1, x1, max_size)
+        && check_consistent_size(function, name2, x2, max_size)
+        && check_consistent_size(function, name3, x3, max_size);
     }
-    template <typename T1, typename T2, typename T3, typename T4, typename T_result>
+    template <typename T1, typename T2, typename T3, typename T4>
     inline bool check_consistent_sizes(const char* function,
+                                       const char* name1, 
                                        const T1& x1, 
+                                       const char* name2, 
                                        const T2& x2, 
-                                       const T3& x3,
-                                       const T4& x4,
-                                       const char* name1,
-                                       const char* name2,
-                                       const char* name3,
+                                       const char* name3, 
+                                       const T3& x3, 
                                        const char* name4,
-                                       T_result* result) {
+                                       const T4& x4) {
       size_t max_size = std::max(size_of(x1),
                                  std::max(size_of(x2),
                                           std::max(size_of(x3), size_of(x4))));
-      return check_consistent_size(max_size,function,x1,name1,result)
-        && check_consistent_size(max_size,function,x2,name2,result)
-        && check_consistent_size(max_size,function,x3,name3,result)
-        && check_consistent_size(max_size,function,x4,name4,result);
+      return check_consistent_size(function, name1, x1, max_size)
+        && check_consistent_size(function, name2, x2, max_size)
+        && check_consistent_size(function, name3, x3, max_size)
+        && check_consistent_size(function, name4, x4, max_size);
     }
 
   }

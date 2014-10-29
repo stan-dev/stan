@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING_CHECK_GREATER_OR_EQUAL_HPP
-#define STAN__ERROR_HANDLING_CHECK_GREATER_OR_EQUAL_HPP
+#ifndef STAN__ERROR_HANDLING__SCALAR__CHECK_GREATER_OR_EQUAL_HPP
+#define STAN__ERROR_HANDLING__SCALAR__CHECK_GREATER_OR_EQUAL_HPP
 
 #include <stan/error_handling/scalar/dom_err_vec.hpp>
 #include <stan/error_handling/scalar/dom_err.hpp>
@@ -10,43 +10,45 @@ namespace stan {
     namespace {
       template <typename T_y,
                 typename T_low,
-                typename T_result,
                 bool is_vec>
       struct greater_or_equal {
         static bool check(const char* function,
+                          const char* name,
                           const T_y& y,
-                          const T_low& low,
-                          const char* name,  
-                          T_result* result) {
+                          const T_low& low) {
           using stan::length;
           VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(low); n++) {
-            if (!(y >= low_vec[n]))
-              return dom_err(function,y,name,
-                             " is %1%, but must be greater than ",
-                             low_vec[n],result);
+            if (!(y >= low_vec[n])) {
+              std::stringstream msg(", but must be greater than or equal to ");
+              msg << low_vec[n];
+              std::string message(msg.str());
+              dom_err(function, name, y,
+                      "is ", message.c_str());
+            }
           }
           return true;
         }
       };
       
       template <typename T_y,
-                typename T_low,
-                typename T_result>
-      struct greater_or_equal<T_y, T_low, T_result, true> {
+                typename T_low>
+      struct greater_or_equal<T_y, T_low, true> {
         static bool check(const char* function,
-                          const T_y& y,
-                          const T_low& low,
                           const char* name,
-                          T_result* result) {
+                          const T_y& y,
+                          const T_low& low) {
           using stan::length;
           using stan::get;
           VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(y); n++) {
-            if (!(get(y,n) >= low_vec[n]))
-              return dom_err_vec(n,function,y,name,
-                                 " is %1%, but must be greater than or equal to ",
-                                 low_vec[n],result);
+            if (!(get(y,n) >= low_vec[n])) {
+              std::stringstream msg(", but must be greater than or equal to ");
+              msg << low_vec[n];
+              std::string message(msg.str());
+              dom_err_vec(function, name, y, n,
+                          "is ", message.c_str());
+            }
           }
           return true;
         }
@@ -54,14 +56,13 @@ namespace stan {
     }
     
     // throws if any element in y or low is nan
-    template <typename T_y, typename T_low, typename T_result>
+    template <typename T_y, typename T_low>
     inline bool check_greater_or_equal(const char* function,
+                                       const char* name,
                                        const T_y& y,
-                                       const T_low& low,
-                                       const char* name,  
-                                       T_result* result) {
-      return greater_or_equal<T_y,T_low,T_result,is_vector_like<T_y>::value>
-        ::check(function,y,low,name,result);
+                                       const T_low& low) {
+      return greater_or_equal<T_y, T_low, is_vector_like<T_y>::value>
+        ::check(function, name, y, low);
     }
   }
 }
