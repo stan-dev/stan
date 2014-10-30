@@ -151,7 +151,7 @@ namespace stan {
               typename T_y, typename T_s, typename T_n, typename T_loc, typename T_scale>
     typename boost::enable_if_c<is_var_or_arithmetic<T_y,T_s,T_loc,T_scale>::value,
                                 typename return_type<T_y,T_s,T_loc,T_scale>::type>::type
-    normal_ss_log(const T_y& y_bar, const T_s& s_squared, const T_n& n_obs, const T_loc& mu, const T_scale& sigma) {
+    normal_sufficient_log(const T_y& y_bar, const T_s& s_squared, const T_n& n_obs, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_log(%1%)";
 
       using std::log;
@@ -247,8 +247,8 @@ namespace stan {
     template <typename T_y, typename T_s, typename T_n, typename T_loc, typename T_scale>
     inline
     typename return_type<T_y,T_s,T_loc,T_scale>::type
-    normal_ss_log(const T_y& y_bar, const T_s& s_squared, const T_n& n_obs, const T_loc& mu, const T_scale& sigma) {
-      return normal_ss_log<false>(y_bar,s_squared,n_obs,mu,sigma);    
+    normal_sufficient_log(const T_y& y_bar, const T_s& s_squared, const T_n& n_obs, const T_loc& mu, const T_scale& sigma) {
+      return normal_sufficient_log<false>(y_bar,s_squared,n_obs,mu,sigma);    
     }
        /**
      * Calculates the normal cumulative distribution function for the given

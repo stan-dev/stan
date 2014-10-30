@@ -8,7 +8,7 @@ using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
 
-class AgradDistributionNormalSS : public AgradDistributionTest {
+class AgradDistributionNormalSufficient : public AgradDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_prob) {
@@ -82,7 +82,7 @@ public:
   log_prob(const T_y& y_bar, const T_s& s_squared, const T_n& n_obs,
      const T_loc& mu, const T_scale& sigma,
      const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::normal_ss_log(y_bar, s_squared, n_obs, mu, sigma);
+    return stan::prob::normal_sufficient_log(y_bar, s_squared, n_obs, mu, sigma);
   }
 
   template <bool propto,
@@ -94,7 +94,7 @@ public:
   log_prob(const T_y& y_bar, const T_s& s_squared, const T_n& n_obs,
      const T_loc& mu, const T_scale& sigma,
      const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::normal_ss_log<propto>(y_bar, s_squared, n_obs, mu, sigma);
+    return stan::prob::normal_sufficient_log<propto>(y_bar, s_squared, n_obs, mu, sigma);
   }
 
 
