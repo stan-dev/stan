@@ -20,16 +20,14 @@ namespace stan {
      * @param function
      * @param y Vector to test.
      * @param name
-     * @param result
      * @return <code>true</code> if the vector has positive, ordered
      * @return throws if any element in y is nan
      * values.
      */
-    template <typename T_y, typename T_result>
-    bool check_positive_ordered(const char* function,
-                                const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+    template <typename T_y>
+    bool check_positive_ordered(const char* function, 
                                 const char* name,
-                                T_result* result) {
+                                const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
       using stan::math::index_type;
@@ -39,26 +37,29 @@ namespace stan {
         return true;
       }
       if (y[0] < 0) {
-        std::ostringstream stream;
-        stream << " is not a valid positive_ordered vector."
-               << " The element at " << stan::error_index::value 
-               << " is %1%, but should be postive.";
-        std::string msg(stream.str());
-        return dom_err(function,y[0],name,
-                       msg.c_str(),"",
-                       result);
+        std::ostringstream msg;
+        msg << "is not a valid positive_ordered vector."
+            << " The element at " << stan::error_index::value 
+            << " is ";
+
+        std::string message(msg.str());
+        dom_err(function, name, y[0],
+                message.c_str(), ", but should be postive.");
       }
       for (size_type n = 1; n < y.size(); n++) {
         if (!(y[n] > y[n-1])) {
-          std::ostringstream stream;
-          stream << " is not a valid ordered vector."
-                 << " The element at " << stan::error_index::value + n 
-                 << " is %1%, but should be greater than the previous element, "
-                 << y[n-1];
-          std::string msg(stream.str());
-          return dom_err(function,y[n],name,
-                         msg.c_str(),"",
-                         result);
+          std::ostringstream msg1;
+          msg1 << "is not a valid ordered vector."
+              << " The element at " << stan::error_index::value + n 
+               << " is ";
+          std::ostringstream msg2;
+          msg2 << ", but should be greater than the previous element, "
+               << y[n-1];
+          std::string message1(msg1.str());
+          std::string message2(msg2.str());
+          dom_err(function, name, y[n],
+                  message1.c_str(), message2.c_str());
+          return false;
         }
       }
       return true;

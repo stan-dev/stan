@@ -10,23 +10,23 @@ namespace stan {
   namespace error_handling {
 
     // NOTE: this will not throw if x contains nan values.
-    template <typename T, int R, int C, typename T_result>
+    template <typename T, int R, int C>
     inline bool check_vector(const char* function,
-                             const Eigen::Matrix<T,R,C>& x,
                              const char* name,
-                             T_result* result) {
+                             const Eigen::Matrix<T,R,C>& x) {
       if (x.rows() == 1 || x.cols() == 1)
         return true;
-
+      
       std::ostringstream msg;
-      msg << name << " (%1%) has " << x.rows() << " rows and " 
-          << x.cols() << " columns but it should be a vector so it should either have 1 row or 1 column";
-      std::string tmp(msg.str());
-      return dom_err(function, 
-                     typename scalar_type<T>::type(),
-                     name,
-                     tmp.c_str(),"",
-                     result);
+      msg << ") has " << x.rows() << " rows and " 
+          << x.cols() << " columns but it should be a vector so it should "
+          << "either have 1 row or 1 column";
+      std::string message(msg.str());
+      dom_err(function,
+              name,
+              typename scalar_type<T>::type(),
+              "(", message.c_str());
+      return false;
     }
 
   }

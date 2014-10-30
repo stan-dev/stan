@@ -14,21 +14,18 @@ namespace stan {
      * NOTE: this will not throw if any elements in y are nan.
      *
      * @param function
-     * @param y Matrix to test.
      * @param name
-     * @param result
+     * @param y Matrix to test.
      * @return <code>true</code> if the matrix is a square matrix.
      * @tparam T Type of scalar.
      */
-    template <typename T_y, typename T_result>
+    template <typename T_y>
     inline bool check_square(const char* function,
-                 const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                 const char* name,
-                 T_result* result) {
+                             const char* name,
+                             const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       check_size_match(function, 
-                       y.rows(), "Rows of matrix",
-                       y.cols(), "columns of matrix",
-                       result);
+                       "Rows of matrix", y.rows(), 
+                       "columns of matrix", y.cols());
       return true;
     }
 

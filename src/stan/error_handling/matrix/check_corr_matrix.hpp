@@ -26,7 +26,6 @@ namespace stan {
      * @param function 
      * @param y Matrix to test.
      * @param name 
-     * @param result 
      * 
      * @return <code>true</code> if the specified matrix is a valid
      * correlation matrix.
@@ -34,38 +33,39 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings
-    template <typename T_y, typename T_result>
+    template <typename T_y>
     inline bool check_corr_matrix(const char* function,
-                                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                                   const char* name,
-                                  T_result* result) {
+                                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
       using stan::math::index_type;
 
       typedef typename index_type<Matrix<T_y,Dynamic,Dynamic> >::type size_t;
 
-      stan::error_handling::check_size_match(function, 
-                                   y.rows(), "Rows of correlation matrix",
-                                   y.cols(), "columns of correlation matrix",
-                                   result);
+      check_size_match(function, 
+                       "Rows of correlation matrix", y.rows(), 
+                       "columns of correlation matrix", y.cols());
+      
+      check_positive(function, "rows", y.rows());
 
-      stan::error_handling::check_positive(function, y.rows(), "rows", result);
-
-      stan::error_handling::check_symmetric(function, y, "y", result);
+      check_symmetric(function, "y", y);
       
       for (size_t k = 0; k < y.rows(); ++k) {
         if (!(fabs(y(k,k) - 1.0) <= CONSTRAINT_TOLERANCE)) {
-          std::ostringstream message;
-          message << " is not a valid correlation matrix. " 
-                  << name << "(" << stan::error_index::value + k 
-                  << "," << stan::error_index::value + k 
-                  << ") is %1%, but should be near 1.0";
-          std::string msg(message.str());
-          return dom_err(function,y(k,k),name,msg.c_str(),"",result);
+          std::ostringstream msg;
+          msg << "is not a valid correlation matrix. " 
+              << name << "(" << stan::error_index::value + k 
+              << "," << stan::error_index::value + k 
+              << ") is "; ;
+          std::string message(msg.str());
+          dom_err(function, name, y(k,k),
+                  message.c_str(),
+                  ", but should be near 1.0");
+          return false;
         }
       }
-      stan::error_handling::check_pos_definite(function, y, "y", result);
+      stan::error_handling::check_pos_definite(function, "y", y);
       return true;
     }
 

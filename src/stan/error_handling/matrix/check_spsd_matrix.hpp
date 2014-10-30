@@ -16,24 +16,22 @@ namespace stan {
      * square, symmetric, and positive semi-definite.
      *
      * @param function
-     * @param y Matrix to test.
      * @param name
-     * @param result
+     * @param y Matrix to test.
      * @return <code>true</code> if the matrix is a square, symmetric,
      * and positive semi-definite.
      * @return throws if any element in matrix is nan.
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings
-    template <typename T_y, typename T_result>
-    inline bool check_spsd_matrix(const char* function,
-                 const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                 const char* name,
-                 T_result* result) {
-      check_square(function, y, name, result);
-      check_positive(function, y.rows(), "rows", result);
-      check_symmetric(function, y, name, result);
-      check_pos_semidefinite(function, y, name, result);
+    template <typename T_y>
+    inline bool check_spsd_matrix(const char* function, 
+                                  const char* name,
+                                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      check_square(function, name, y);
+      check_positive(function, "rows", y.rows());
+      check_symmetric(function, name, y);
+      check_pos_semidefinite(function, name, y);
       return true;
     }
 

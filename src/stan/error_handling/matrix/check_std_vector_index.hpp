@@ -17,26 +17,24 @@ namespace stan {
      * @param i is index
      * @param y std vector to test against
      * @param name
-     * @param result
      * @return <code>true</code> if the index is a valid in std vector.
      * @tparam T Type of scalar.
      */
-    template <typename T_y, typename T_result>
+    template <typename T_y>
     inline bool check_std_vector_index(const char* function,
-                                       size_t i,
-                                       const std::vector<T_y>& y,
                                        const char* name,
-                                       T_result* result) {
+                                       const std::vector<T_y>& y,
+                                       size_t i) {
       if ((i > 0) && (i <= static_cast<size_t>(y.size())))
         return true;
 
       std::ostringstream msg;
-      msg << name << " (%1%) must be greater than 0 and less than " 
+      msg << ") must be greater than 0 and less than " 
           << y.size();
-      std::string tmp(msg.str());
-      return dom_err(function,i,name,
-                     tmp.c_str(),"",
-                     result);
+      std::string message(msg.str());
+      dom_err(function, name, i,
+              "(", message.c_str());
+      return false;
     }
 
   }
