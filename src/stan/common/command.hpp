@@ -161,7 +161,7 @@ namespace stan {
 
       parser.print(&std::cout);
       std::cout << std::endl;
-      
+
       if (output_stream) {
         write_stan(output_stream, "#");
         write_model(output_stream, model.model_name(), "#");
@@ -173,7 +173,7 @@ namespace stan {
         write_model(diagnostic_stream, model.model_name(), "#");
         parser.print(diagnostic_stream, "#");
       }
-      
+
       std::string init = dynamic_cast<stan::gm::string_argument*>(
                          parser.arg("init"))->value();
       dump_factory var_context_factory;
@@ -645,7 +645,7 @@ namespace stan {
 
         stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo, base_rng,
                                             &std::cout, &std::cout);
-        cmd_vb.test();
+        cmd_vb.run_robbins_monro_fullrank();
 
         // cont_params = cmd_vb.cont_params_;
         // elbo = cmd_vb.elbo_;

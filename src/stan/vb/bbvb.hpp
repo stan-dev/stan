@@ -16,7 +16,7 @@
 #include <stan/math/error_handling/matrix/check_square.hpp>
 
 #include <stan/vb/base_vb.hpp>
-#include <stan/vb/latent_vars.hpp>
+#include <stan/vb/vb_params_fullrank.hpp>
 
 namespace stan {
 
@@ -41,6 +41,7 @@ namespace stan {
 
       virtual ~bbvb() {};
 
+
       /**
        * Calculates the "blackbox" Evidence Lower BOund (ELBO) by sampling
        * from the standard multivariate normal (for now), affine transform
@@ -50,7 +51,7 @@ namespace stan {
        * @param   muL   mean and cholesky factor of affine transform
        * @return        evidence lower bound (elbo)
        */
-      double calc_ELBO(latent_vars const& muL) {
+      double calc_ELBO(vb_params_fullrank const& muL) {
         double elbo(0.0);
         int dim = muL.dimension();
 
@@ -74,7 +75,8 @@ namespace stan {
           {
             z_tilde_var(var_index) = stan::agrad::var(z_tilde(var_index));
           }
-          elbo += (model_.template log_prob<true,true>(z_tilde_var, &std::cout)).val();
+          elbo += (model_.template
+                   log_prob<true,true>(z_tilde_var, &std::cout)).val();
           // END of FIXME
         }
         elbo /= static_cast<double>(n_monte_carlo_);
@@ -84,6 +86,7 @@ namespace stan {
 
         return elbo;
       }
+
 
       /**
        * Calculates the "blackbox" gradient with respect to BOTH the location
@@ -96,12 +99,12 @@ namespace stan {
        * @param L_grad  gradient of scale matrix parameter
        */
       void calc_combined_grad(
-        latent_vars const& muL,
+        vb_params_fullrank const& muL,
         Eigen::VectorXd& mu_grad,
         Eigen::MatrixXd& L_grad) {
         static const char* function = "stan::vb::bbvb.calc_combined_grad(%1%)";
 
-        int dim = muL.dimension();
+        int dim       = muL.dimension();
         double tmp_lp = 0.0;
 
         double tmp(0.0);
@@ -115,14 +118,16 @@ namespace stan {
                               dim, "Dimension of mean vector in variational q",
                               &tmp);
 
-        L_grad                      = Eigen::MatrixXd::Zero(dim,dim);
+        // Initialize everything to zero
+        mu_grad = Eigen::VectorXd::Zero(dim);
+        L_grad  = Eigen::MatrixXd::Zero(dim,dim);
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
+        Eigen::VectorXd z_check = Eigen::VectorXd::Zero(dim);
+        Eigen::VectorXd z_tilde = Eigen::VectorXd::Zero(dim);
 
-        Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
-        Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
-
-
+        // Naive Monte Carlo integration
         for (int i = 0; i < n_monte_carlo_; ++i) {
+
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d)
           {
@@ -143,6 +148,7 @@ namespace stan {
               L_grad(ii,jj) += tmp_mu_grad(ii) * z_check(jj);
             }
           }
+
         }
         mu_grad /= static_cast<double>(n_monte_carlo_);
         L_grad  /= static_cast<double>(n_monte_carlo_);
@@ -151,13 +157,15 @@ namespace stan {
         L_grad.diagonal().array() += muL.L_chol().diagonal().array().inverse();
       }
 
+
       /**
        * Runs Robbins-Monro Stochastic Gradient for some number of iterations
        *
        * @param muL            mean and cholesky factor of affine transform
        * @param max_iterations number of iterations to run algorithm
        */
-      void do_robbins_monro_adagrad( latent_vars& muL, int max_iterations ) {
+      void do_robbins_monro_adagrad( vb_params_fullrank& muL,
+                                     int max_iterations ) {
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(model_.num_params_r(),
                                                         model_.num_params_r());
@@ -215,23 +223,25 @@ namespace stan {
       }
 
 
-      void test() {
-        if (out_stream_) *out_stream_ << "This is base_vb::bbvb::test()" << std::endl;
-
-        if (out_stream_) *out_stream_ << "cont_params_ = " << std::endl
-                                      << cont_params_ << std::endl << std::endl;
+      void run_robbins_monro_fullrank() {
+        if (out_stream_) *out_stream_
+          << "This is base_vb::bbvb::run_robbins_monro_fullrank()" << std::endl;
+        if (out_stream_) *out_stream_
+          << "cont_params_ = " << std::endl
+          << cont_params_ << std::endl << std::endl;
 
         // Initialize variational parameters: mu, L
         Eigen::VectorXd mu = cont_params_;
         Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(),
                                                        model_.num_params_r());
-        latent_vars muL    = latent_vars(mu,L);
+        vb_params_fullrank muL = vb_params_fullrank(mu,L);
 
         // Robbins Monro ADAgrad
         do_robbins_monro_adagrad(muL, 1000);
 
         return;
       }
+
 
     protected:
 
