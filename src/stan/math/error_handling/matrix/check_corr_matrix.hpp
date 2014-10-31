@@ -2,15 +2,19 @@
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_CORR_MATRIX_HPP
 
 #include <sstream>
-#include <stan/math/matrix/Eigen.hpp>
+
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/check_positive.hpp>
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/error_handling/matrix/check_size_match.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
+
 
 namespace stan {
+
   namespace math {
 
     /**
@@ -35,14 +39,20 @@ namespace stan {
                                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                                   const char* name,
                                   T_result* result) {
+      using Eigen::Dynamic;
+      using Eigen::Matrix;
+      typedef typename index_type<Matrix<T_y,Dynamic,Dynamic> >::type size_t;
+
       stan::math::check_size_match(function, 
                                    y.rows(), "Rows of correlation matrix",
                                    y.cols(), "columns of correlation matrix",
                                    result);
+
       stan::math::check_positive(function, y.rows(), "rows", result);
+
       stan::math::check_symmetric(function, y, "y", result);
-      for (typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type
-             k = 0; k < y.rows(); ++k) {
+      
+      for (size_t k = 0; k < y.rows(); ++k) {
         if (!(fabs(y(k,k) - 1.0) <= CONSTRAINT_TOLERANCE)) {
           std::ostringstream message;
           message << " is not a valid correlation matrix. " 

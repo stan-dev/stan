@@ -7,6 +7,7 @@ TEST(ProbDistributionsNegBinomial, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::neg_binomial_rng(6, 2, rng));
   EXPECT_NO_THROW(stan::prob::neg_binomial_rng(0.5,1,rng));
+  EXPECT_NO_THROW(stan::prob::neg_binomial_rng(1e9,1,rng));
 
   EXPECT_THROW(stan::prob::neg_binomial_rng(0, 2, rng),std::domain_error);
   EXPECT_THROW(stan::prob::neg_binomial_rng(-6, 2, rng),std::domain_error);
@@ -14,6 +15,8 @@ TEST(ProbDistributionsNegBinomial, error_check) {
   EXPECT_THROW(stan::prob::neg_binomial_rng(stan::math::positive_infinity(), 2, 
                                             rng),
                std::domain_error);
+  EXPECT_THROW(stan::prob::neg_binomial_rng(1e10,1,rng),std::domain_error);
+
   EXPECT_THROW(stan::prob::neg_binomial_rng(6,stan::math::positive_infinity(), 
                                             rng),
                std::domain_error);

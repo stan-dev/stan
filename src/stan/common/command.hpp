@@ -86,9 +86,6 @@ namespace stan {
       if (parser.help_printed())
         return err_code;
 
-      parser.print(&std::cout);
-      std::cout << std::endl;
-
       // Identification
       unsigned int id = dynamic_cast<stan::gm::int_argument*>(parser.arg("id"))->value();
 
@@ -162,6 +159,9 @@ namespace stan {
 
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
+      parser.print(&std::cout);
+      std::cout << std::endl;
+      
       if (output_stream) {
         write_stan(output_stream, "#");
         write_model(output_stream, model.model_name(), "#");

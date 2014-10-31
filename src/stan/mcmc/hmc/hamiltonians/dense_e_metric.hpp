@@ -7,6 +7,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <Eigen/Cholesky>
 
+#include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 
@@ -44,13 +45,13 @@ namespace stan {
       }
       
       void sample_p(dense_e_point& z, BaseRNG& rng) {
-        
+        typedef typename stan::math::index_type<Eigen::VectorXd>::type idx_t;
         boost::variate_generator<BaseRNG&, boost::normal_distribution<> > 
           rand_dense_gaus(rng, boost::normal_distribution<>());
         
         Eigen::VectorXd u(z.p.size());
         
-        for (Eigen::VectorXd::size_type i = 0; i < u.size(); ++i) 
+        for (idx_t i = 0; i < u.size(); ++i) 
           u(i) = rand_dense_gaus();
 
         z.p = z.mInv.llt().matrixL().solve(u);

@@ -28,6 +28,8 @@
 #include <stan/math/functions/inv_sqrt.hpp>
 #include <stan/math/functions/inv_square.hpp>
 #include <stan/math/functions/inverse_softmax.hpp>
+#include <stan/math/functions/is_inf.hpp>
+#include <stan/math/functions/is_nan.hpp>
 #include <stan/math/functions/is_uninitialized.hpp>
 #include <stan/math/functions/lbeta.hpp>
 #include <stan/math/functions/lgamma.hpp>
@@ -60,6 +62,7 @@
 #include <stan/math/functions/modulus.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/owens_t.hpp>
+#include <stan/math/functions/primitive_value.hpp>
 #include <stan/math/functions/rising_factorial.hpp>
 #include <stan/math/functions/scaled_add.hpp>
 #include <stan/math/functions/square.hpp>

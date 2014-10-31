@@ -2,11 +2,13 @@
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_POSITIVE_ORDERED_HPP
 
 #include <sstream>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
+
   namespace math {
 
     /**
@@ -28,7 +30,9 @@ namespace stan {
                                 const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                                 const char* name,
                                 T_result* result) {
-      typedef typename Eigen::Matrix<T_y,Eigen::Dynamic,1>::size_type size_type;
+      using Eigen::Dynamic;
+      using Eigen::Matrix;
+      typedef typename index_type<Matrix<T_y,Dynamic,1> >::type size_type;
       if (y.size() == 0) {
         return true;
       }

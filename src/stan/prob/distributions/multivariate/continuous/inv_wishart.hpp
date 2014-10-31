@@ -1,17 +1,18 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP
 
-#include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
-#include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
-#include <stan/math/matrix/log_determinant_ldlt.hpp>
-#include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
 #include <stan/math/error_handling/check_greater.hpp>
 #include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
+#include <stan/math/matrix/mdivide_left_ldlt.hpp>
+#include <stan/meta/traits.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
+#include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
 
 namespace stan {
   namespace prob {
@@ -53,11 +54,15 @@ namespace stan {
                     const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
       static const char* function = "stan::prob::inv_wishart_log(%1%)";
       
+      using boost::math::tools::promote_args;
+      using Eigen::Dynamic;
+      using Eigen::Matrix;
       using stan::math::check_greater;
       using stan::math::check_size_match;
-      using boost::math::tools::promote_args;
+      using stan::math::index_type;
 
-      typename Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
+      typename index_type<Matrix<T_scale,Dynamic,Dynamic> >::type k 
+        = S.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       
       check_greater(function, nu, k-1, "Degrees of freedom parameter", 
@@ -134,8 +139,9 @@ namespace stan {
       using stan::math::check_greater;
       using stan::math::check_size_match;
       using Eigen::MatrixXd;
+      using stan::math::index_type;
 
-      typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
+      typename index_type<MatrixXd>::type k = S.rows();
       
       check_greater(function, nu, k-1, "Degrees of freedom parameter", 
                     (double*)0);

@@ -1,16 +1,21 @@
 #ifndef STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_NONZERO_SIZE_HPP
 #define STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_NONZERO_SIZE_HPP
 
-#include <stan/meta/traits.hpp>
-#include <stan/math/error_handling/dom_err.hpp>
 #include <string>
 #include <typeinfo>
 
+#include <stan/math/error_handling/dom_err.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/meta/traits.hpp>
+
 namespace stan {
+
   namespace math {
 
     /**
-     * Return <code>true</code> if the specified matrix/vector is of non-zero size
+     * Return <code>true</code> if the specified matrix/vector is of
+     * non-zero size. Throws a std:domain_error otherwise. The message
+     * will indicate that the variable name "has size 0".
      *
      * NOTE: this will not throw if y contains nan values.
      *
@@ -18,7 +23,10 @@ namespace stan {
      * @param y matrix/vector to test against
      * @param name
      * @param result
-     * @return <code>true</code> if the the specified matrix/vector is of non-zero size
+     * @return <code>true</code> if the the specified matrix/vector is 
+     * of non-zero size
+     * @throw std::domain_error if the specified matrix/vector is of
+     * non-zero size
      * @tparam T Type of scalar.
      */
     template <typename T_y, typename T_result>
@@ -26,15 +34,12 @@ namespace stan {
                                    const T_y& y,
                                    const char* name,
                                    T_result* result) {
+      typedef typename index_type<T_y>::type size_t;
       if (y.size() > 0) 
         return true;
 
-      std::string msg;
-      msg += "(";
-      msg += typeid(T_y).name();
-      msg += ") has size %1%, but must have a non-zero size";
-      return dom_err(function,typename T_y::value_type(),
-                     name,msg.c_str(),"",
+      return dom_err(function, size_t(), 
+                     name, " has size %1%, but must have a non-zero size","",
                      result);
     }
 
