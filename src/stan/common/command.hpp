@@ -645,7 +645,8 @@ namespace stan {
 
         stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo, base_rng,
                                             &std::cout, &std::cout);
-        cmd_vb.run_robbins_monro_fullrank();
+        // cmd_vb.run_robbins_monro_fullrank();
+        cmd_vb.run_robbins_monro_meanfield();
 
         // cont_params = cmd_vb.cont_params_;
         // elbo = cmd_vb.elbo_;

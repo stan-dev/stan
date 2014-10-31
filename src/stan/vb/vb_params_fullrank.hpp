@@ -32,8 +32,8 @@ namespace stan {
         double tmp(0.0);
         stan::math::check_square(function, L_chol_, "Cholesky factor", &tmp);
         stan::math::check_size_match(function,
-                                 L_chol_.rows(), "Dimension of Cholesky factor",
                                  dimension_,     "Dimension of mean vector",
+                                 L_chol_.rows(), "Dimension of Cholesky factor",
                                  &tmp);
         stan::math::check_cholesky_factor(function,
                                  L_chol_, "Cholesky factor", &tmp);
