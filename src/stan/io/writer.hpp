@@ -2,7 +2,11 @@
 #define STAN__IO__WRITER_HPP
 
 #include <stdexcept>
+
+#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/math/meta/index_type.hpp>
 #include <stan/prob/transform.hpp>
+
 
 namespace stan {
 
@@ -208,10 +212,12 @@ namespace stan {
        * @throw std::runtime_error if vector is not in ascending order.
        */
       void ordered_unconstrain(vector_t& y) {
+        typedef typename stan::math::index_type<vector_t>::type idx_t;
         if (y.size() == 0) return;
-        stan::math::check_ordered("stan::io::ordered_unconstrain(%1%)", y, "Vector");
+        stan::math::check_ordered("stan::io::ordered_unconstrain(%1%)",
+                                  y, "Vector");
         data_r_.push_back(y[0]);
-        for (typename vector_t::size_type i = 1; i < y.size(); ++i) {
+        for (idx_t i = 1; i < y.size(); ++i) {
           data_r_.push_back(log(y[i] - y[i-1]));
         }
       }
@@ -220,24 +226,27 @@ namespace stan {
        * Write the unconstrained vector that corresponds to the specified
        * postiive ascendingly ordered vector.
        * 
-       * <p>The unconstraining transform is defined for input vector <code>y</code>
-       * to produce an output vector <code>x</code> of the same size, defined
-       * by <code>x[0] = log(y[0])</code> and by
-       * <code>x[k] = log(y[k] - y[k-1])</code> for <code>k > 0</code>.  This
-       * unconstraining transform inverts the constraining transform specified
-       * in <code>positive_ordered_constrain(size_t)</code>.
+       * <p>The unconstraining transform is defined for input vector
+       * <code>y</code> to produce an output vector <code>x</code> of
+       * the same size, defined by <code>x[0] = log(y[0])</code> and
+       * by <code>x[k] = log(y[k] - y[k-1])</code> for <code>k >
+       * 0</code>.  This unconstraining transform inverts the
+       * constraining transform specified in
+       * <code>positive_ordered_constrain(size_t)</code>.
        *
        * @param y Positive ascendingly ordered vector.
        * @return Unconstrained vector corresponding to the specified vector.
        * @throw std::runtime_error if vector is not in ascending order.
        */
       void positive_ordered_unconstrain(vector_t& y) {
+        typedef typename stan::math::index_type<vector_t>::type idx_t;
+
         // reimplements pos_ordered_free in prob to avoid malloc
         if (y.size() == 0) return;
         stan::math::check_positive_ordered("stan::io::positive_ordered_unconstrain(%1%)", 
                                            y, "Vector", (double*)0);
         data_r_.push_back(log(y[0]));
-        for (typename vector_t::size_type i = 1; i < y.size(); ++i) {
+        for (idx_t i = 1; i < y.size(); ++i) {
           data_r_.push_back(log(y[i] - y[i-1]));
         }
       }
@@ -249,7 +258,8 @@ namespace stan {
        * @param y Vector to write.
        */
       void vector_unconstrain(const vector_t& y) {
-        for (typename vector_t::size_type i = 0; i < y.size(); ++i)
+        typedef typename stan::math::index_type<vector_t>::type idx_t;
+        for (idx_t i = 0; i < y.size(); ++i)
           data_r_.push_back(y[i]);
       }
 
@@ -259,7 +269,8 @@ namespace stan {
        * @param y Vector to write.
        */
       void row_vector_unconstrain(const vector_t& y) {
-        for (typename vector_t::size_type i = 0; i < y.size(); ++i)
+        typedef typename stan::math::index_type<vector_t>::type idx_t;
+        for (idx_t i = 0; i < y.size(); ++i)
           data_r_.push_back(y[i]);
       }
 
@@ -269,60 +280,71 @@ namespace stan {
        * @param y Matrix to write.
        */
       void matrix_unconstrain(const matrix_t& y) {
-        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
-          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
+        typedef typename stan::math::index_type<matrix_t>::type idx_t;
+        for (idx_t j = 0; j < y.cols(); ++j) 
+          for (idx_t i = 0; i < y.rows(); ++i)
             data_r_.push_back(y(i,j));
       }
 
       void vector_lb_unconstrain(double lb, vector_t& y) {
-        for (int i = 0; i < y.size(); ++i)
+        typedef typename stan::math::index_type<vector_t>::type idx_t;
+        for (idx_t i = 0; i < y.size(); ++i)
           scalar_lb_unconstrain(lb,y(i));
       }
       void row_vector_lb_unconstrain(double lb, row_vector_t& y) {
-        for (int i = 0; i < y.size(); ++i)
+        typedef typename stan::math::index_type<row_vector_t>::type idx_t;
+        for (idx_t i = 0; i < y.size(); ++i)
           scalar_lb_unconstrain(lb,y(i));
       }
       void matrix_lb_unconstrain(double lb, matrix_t& y) {
-        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
-          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
+        typedef typename stan::math::index_type<matrix_t>::type idx_t;
+        for (idx_t j = 0; j < y.cols(); ++j) 
+          for (idx_t i = 0; i < y.rows(); ++i)
             scalar_lb_unconstrain(lb,y(i,j));
       }
 
       void vector_ub_unconstrain(double ub, vector_t& y) {
-        for (int i = 0; i < y.size(); ++i)
+        typedef typename stan::math::index_type<vector_t>::type idx_t;
+        for (idx_t i = 0; i < y.size(); ++i)
           scalar_ub_unconstrain(ub,y(i));
       }
       void row_vector_ub_unconstrain(double ub, row_vector_t& y) {
-        for (int i = 0; i < y.size(); ++i)
+        typedef typename stan::math::index_type<row_vector_t>::type idx_t;
+        for (idx_t i = 0; i < y.size(); ++i)
           scalar_ub_unconstrain(ub,y(i));
       }
       void matrix_ub_unconstrain(double ub, matrix_t& y) {
-        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
-          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
+        typedef typename stan::math::index_type<matrix_t>::type idx_t;
+        for (idx_t j = 0; j < y.cols(); ++j) 
+          for (idx_t i = 0; i < y.rows(); ++i)
             scalar_ub_unconstrain(ub,y(i,j));
       }
 
 
       void vector_lub_unconstrain(double lb, double ub, vector_t& y) {
-        for (int i = 0; i < y.size(); ++i)
+        typedef typename stan::math::index_type<vector_t>::type idx_t;
+        for (idx_t i = 0; i < y.size(); ++i)
           scalar_lub_unconstrain(lb,ub,y(i));
       }
       void row_vector_lub_unconstrain(double lb, double ub, row_vector_t& y) {
-        for (int i = 0; i < y.size(); ++i)
+        typedef typename stan::math::index_type<row_vector_t>::type idx_t;
+        for (idx_t i = 0; i < y.size(); ++i)
           scalar_lub_unconstrain(lb,ub,y(i));
       }
       void matrix_lub_unconstrain(double lb, double ub, matrix_t& y) {
-        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
-          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
+        typedef typename stan::math::index_type<matrix_t>::type idx_t;
+        for (idx_t j = 0; j < y.cols(); ++j) 
+          for (idx_t i = 0; i < y.rows(); ++i)
             scalar_lub_unconstrain(lb,ub,y(i,j));
       }
 
       
 
       /**
-       * Write the unconstrained vector corresponding to the specified unit_vector 
-       * value.  If the specified constrained unit_vector is of size <code>K</code>,
-       * the returned unconstrained vector is of size <code>K-1</code>.
+       * Write the unconstrained vector corresponding to the specified
+       * unit_vector value.  If the specified constrained unit_vector
+       * is of size <code>K</code>, the returned unconstrained vector
+       * is of size <code>K-1</code>.
        *
        * <p>The transform takes <code>y = y[1],...,y[K]</code> and
        * produces the unconstrained vector. This inverts
@@ -336,8 +358,9 @@ namespace stan {
       void unit_vector_unconstrain(vector_t& y) {
         stan::math::check_unit_vector("stan::io::unit_vector_unconstrain(%1%)", 
                                       y, "Vector", (double*)0);
+        typedef typename stan::math::index_type<vector_t>::type idx_t;
         vector_t uy = stan::prob::unit_vector_free(y);
-        for (typename vector_t::size_type i = 0; i < uy.size(); ++i) 
+        for (idx_t i = 0; i < uy.size(); ++i) 
           data_r_.push_back(uy[i]);
       }
  
@@ -357,11 +380,13 @@ namespace stan {
        * @throw std::runtime_error if the vector is not a simplex.
        */
       void simplex_unconstrain(vector_t& y) {
+        typedef typename stan::math::index_type<vector_t>::type idx_t;
+
         stan::math::check_simplex("stan::io::simplex_unconstrain(%1%)", 
                                   y, "Vector",
                                   (double*)0);
         vector_t uy = stan::prob::simplex_free(y);
-        for (typename vector_t::size_type i = 0; i < uy.size(); ++i) 
+        for (idx_t i = 0; i < uy.size(); ++i) 
           data_r_.push_back(uy[i]);
       }
 
@@ -377,10 +402,12 @@ namespace stan {
        * @throw std::runtime_error if y has no elements or if it is not square
        */
       void cholesky_factor_unconstrain(matrix_t& y) {
+        typedef typename stan::math::index_type<matrix_t>::type idx_t;
+
         // FIXME:  optimize by unrolling cholesky_factor_free
         Eigen::Matrix<T,Eigen::Dynamic,1> y_free
           = stan::prob::cholesky_factor_free(y);
-        for (int i = 0; i < y_free.size(); ++i)
+        for (idx_t i = 0; i < y_free.size(); ++i)
           data_r_.push_back(y_free[i]);
       }
 
@@ -397,10 +424,12 @@ namespace stan {
        * @throw std::runtime_error if y has no elements or if it is not square
        */
       void cholesky_corr_unconstrain(matrix_t& y) {
+        typedef typename stan::math::index_type<matrix_t>::type idx_t;
+
         // FIXME:  optimize by unrolling cholesky_factor_free
         Eigen::Matrix<T,Eigen::Dynamic,1> y_free
           = stan::prob::cholesky_corr_free(y);
-        for (int i = 0; i < y_free.size(); ++i)
+        for (idx_t i = 0; i < y_free.size(); ++i)
           data_r_.push_back(y_free[i]);
       }
 
@@ -417,19 +446,22 @@ namespace stan {
        * @throw std::runtime_error if y has no elements or if it is not square
        */
       void cov_matrix_unconstrain(matrix_t& y) {
-        typename matrix_t::size_type k = y.rows();
+        typedef typename stan::math::index_type<matrix_t>::type idx_t;
+        idx_t k = y.rows();
         if (k == 0 || y.cols() != k)
           BOOST_THROW_EXCEPTION(
-              std::runtime_error ("y must have elements and y must be a square matrix"));
-        typename matrix_t::size_type k_choose_2 = (k * (k-1)) / 2;
+              std::runtime_error("y must have elements and"
+                                 " y must be a square matrix"));
+        idx_t k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
         array_vec_t sds(k);
         bool successful = stan::prob::factor_cov_matrix(y,cpcs,sds);
-        if(!successful)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("factor_cov_matrix failed"));
-        for (typename matrix_t::size_type i = 0; i < k_choose_2; ++i)
+        if (!successful)
+          BOOST_THROW_EXCEPTION(
+              std::runtime_error ("factor_cov_matrix failed"));
+        for (idx_t i = 0; i < k_choose_2; ++i)
           data_r_.push_back(cpcs[i]);
-        for (typename matrix_t::size_type i = 0; i < k; ++i)
+        for (idx_t i = 0; i < k; ++i)
           data_r_.push_back(sds[i]);
       }
 
@@ -449,22 +481,26 @@ namespace stan {
        *    on log scale are unconstrained.
        */
       void corr_matrix_unconstrain(matrix_t& y) {
+        typedef typename stan::math::index_type<matrix_t>::type idx_t;
+
         stan::math::check_corr_matrix("stan::io::corr_matrix_unconstrain(%1%)", 
                                       y, "Matrix",
                                       (double*)0);
-        size_t k = y.rows();
-        size_t k_choose_2 = (k * (k-1)) / 2;
+        idx_t k = y.rows();
+        idx_t k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);
         array_vec_t sds(k);
         bool successful = stan::prob::factor_cov_matrix(y,cpcs,sds);
         if (!successful)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y cannot be factorized by factor_cov_matrix"));
-        for (size_t i = 0; i < k; ++i) {
+          BOOST_THROW_EXCEPTION(
+            std::runtime_error ("y cannot be factorized by factor_cov_matrix"));
+        for (idx_t i = 0; i < k; ++i) {
           // sds on log scale unconstrained
           if (fabs(sds[i] - 0.0) >= CONSTRAINT_TOLERANCE)
-            BOOST_THROW_EXCEPTION(std::runtime_error ("sds on log scale are unconstrained"));
+            BOOST_THROW_EXCEPTION(
+              std::runtime_error ("sds on log scale are unconstrained"));
         }
-        for (size_t i = 0; i < k_choose_2; ++i)
+        for (idx_t i = 0; i < k_choose_2; ++i)
           data_r_.push_back(cpcs[i]);
       }
 

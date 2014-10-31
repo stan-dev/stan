@@ -2,12 +2,15 @@
 #define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SIMPLEX_HPP__
 
 #include <sstream>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/meta/traits.hpp>
+
 
 namespace stan {
+
   namespace math {
 
     /**
@@ -30,7 +33,10 @@ namespace stan {
                        const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                        const char* name,
                        T_result* result) {
-      typedef typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type size_t;
+      using Eigen::Dynamic;
+      using Eigen::Matrix;
+      typedef typename index_type<Matrix<T_prob,Dynamic,1> >::type size_t;
+
       if (theta.size() == 0) {
         std::stringstream msg;
         msg << " is not a valid simplex. " 

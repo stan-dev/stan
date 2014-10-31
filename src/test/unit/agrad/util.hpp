@@ -1,11 +1,12 @@
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
-#include <test/unit-agrad-rev/jacobian.hpp>
+#include <test/unit/agrad/rev/jacobian.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
 
 typedef stan::agrad::var AVAR;
 typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
-typedef Eigen::Matrix<double,-1,-1>::size_type size_type;
+typedef stan::math::index_type<Eigen::Matrix<double,-1,-1> >::type size_type;
 
 AVEC createAVEC(AVAR x) {
   AVEC v;

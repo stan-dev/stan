@@ -1,12 +1,16 @@
 #ifndef STAN__MATH__MATRIX__SORT_INDICES_HPP
 #define STAN__MATH__MATRIX__SORT_INDICES_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
+
 #include <vector>
 #include <algorithm>    // std::sort
 #include <iostream>
 
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
+
 namespace stan {
+
   namespace math {
     
     /**
@@ -58,10 +62,11 @@ namespace stan {
        */
       template <bool ascending, typename C>
       std::vector<int> sort_indices(const C& xs) {
-        typename C::size_type size = xs.size();
+        typedef typename index_type<C>::type idx_t;
+        idx_t size = xs.size();
         std::vector<int> idxs;
         idxs.resize(size);
-        for (typename C::size_type i = 0; i < size; ++i)
+        for (idx_t i = 0; i < size; ++i)
           idxs[i] = i + 1;
         index_comparator<ascending,C> comparator(xs);
         std::sort(idxs.begin(), idxs.end(), comparator);

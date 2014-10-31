@@ -1,15 +1,18 @@
 #ifndef STAN__META__TRAITS_HPP
 #define STAN__META__TRAITS_HPP
 
-#include <stan/agrad/fwd/fvar.hpp>
-// #include <stan/agrad/partials_vari.hpp>
-#include <stan/agrad/rev/var.hpp>
+
 #include <vector>
 #include <boost/type_traits.hpp>
 #include <boost/type_traits/is_arithmetic.hpp> 
-
 #include <boost/math/tools/promotion.hpp>
+
+#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/agrad/rev/var.hpp>
+
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/meta/value_type.hpp>
+#include <stan/math/meta/value_type.hpp>
 
 namespace stan {
 
@@ -117,7 +120,10 @@ ERROR_INDEX
     
     template <typename T> 
     struct scalar_type_helper<true, T> {
-      typedef typename scalar_type_helper<is_vector<typename T::value_type>::value, typename T::value_type>::type type;
+      typedef typename 
+      scalar_type_helper<is_vector<typename stan::math::value_type<T>::type>::value, 
+                         typename stan::math::value_type<T>::type>::type 
+      type;
     };
   }
   /**
@@ -454,12 +460,19 @@ ERROR_INDEX
               typename T6 = double>
     struct is_var_or_arithmetic {
       enum {
-        value = (is_var<typename scalar_type<T1>::type>::value || boost::is_arithmetic<typename scalar_type<T1>::type>::value)
-        && (is_var<typename scalar_type<T2>::type>::value || boost::is_arithmetic<typename scalar_type<T2>::type>::value)
-        && (is_var<typename scalar_type<T3>::type>::value || boost::is_arithmetic<typename scalar_type<T3>::type>::value)
-        && (is_var<typename scalar_type<T4>::type>::value || boost::is_arithmetic<typename scalar_type<T4>::type>::value)
-        && (is_var<typename scalar_type<T5>::type>::value || boost::is_arithmetic<typename scalar_type<T5>::type>::value)
-        && (is_var<typename scalar_type<T6>::type>::value || boost::is_arithmetic<typename scalar_type<T6>::type>::value)
+        value 
+        = (is_var<typename scalar_type<T1>::type>::value 
+           || boost::is_arithmetic<typename scalar_type<T1>::type>::value)
+        && (is_var<typename scalar_type<T2>::type>::value 
+            || boost::is_arithmetic<typename scalar_type<T2>::type>::value)
+        && (is_var<typename scalar_type<T3>::type>::value 
+            || boost::is_arithmetic<typename scalar_type<T3>::type>::value)
+        && (is_var<typename scalar_type<T4>::type>::value
+            || boost::is_arithmetic<typename scalar_type<T4>::type>::value)
+        && (is_var<typename scalar_type<T5>::type>::value 
+            || boost::is_arithmetic<typename scalar_type<T5>::type>::value)
+        && (is_var<typename scalar_type<T6>::type>::value
+            || boost::is_arithmetic<typename scalar_type<T6>::type>::value)
       };
     };
 
@@ -471,7 +484,11 @@ ERROR_INDEX
     
     template <typename T, typename T_container> 
     struct scalar_type_helper_pre<true, T, T_container> {
-      typedef typename scalar_type_helper_pre<is_vector<typename T::value_type>::value, typename T::value_type, typename T_container::value_type>::type type;
+      typedef typename 
+      scalar_type_helper_pre<is_vector<typename stan::math::value_type<T>::type>::value, 
+                             typename stan::math::value_type<T>::type, 
+                             typename stan::math::value_type<T_container>::type>::type 
+      type;
     };
   }
   
@@ -483,12 +500,16 @@ ERROR_INDEX
   */
   template <typename T>
   struct scalar_type_pre {
-    typedef typename scalar_type_helper_pre<is_vector<typename T::value_type>::value, typename T::value_type, T>::type type;
+    typedef typename 
+    scalar_type_helper_pre<is_vector<typename stan::math::value_type<T>::type>::value,
+                           typename stan::math::value_type<T>::type, T>::type 
+    type;
   };
 
 
   template <typename T,
-            bool is_array = stan::is_vector_like<typename T::value_type>::value,
+            bool is_array 
+              = stan::is_vector_like<typename stan::math::value_type<T>::type>::value,
             bool throw_if_accessed = false>
   class VectorViewMvt {
   public: 

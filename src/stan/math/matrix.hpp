@@ -57,6 +57,7 @@
 #include <stan/math/matrix/mdivide_right_tri.hpp>
 #include <stan/math/matrix/mdivide_right_tri_low.hpp>
 #include <stan/math/matrix/mean.hpp>
+#include <stan/math/matrix/meta.hpp>
 #include <stan/math/matrix/min.hpp>
 #include <stan/math/matrix/minus.hpp>
 #include <stan/math/matrix/multiply.hpp>
