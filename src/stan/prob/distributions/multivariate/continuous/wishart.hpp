@@ -62,7 +62,7 @@ namespace stan {
     wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
                 const T_dof& nu,
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
-      static const char* function = "stan::prob::wishart_log(%1%)";
+      static const char* function = "stan::prob::wishart_log";
 
       using boost::math::tools::promote_args;
       using Eigen::Dynamic;
@@ -80,30 +80,24 @@ namespace stan {
       typename index_type<Matrix<T_scale,Dynamic,Dynamic> >::type k 
         = W.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      check_greater(function, nu, k-1, 
-                    "Degrees of freedom parameter", &lp);
+      check_greater(function, "Degrees of freedom parameter", nu, k-1);
       check_size_match(function, 
-                       W.rows(), "Rows of random variable",
-                       W.cols(), "columns of random variable",
-                       &lp);
+                       "Rows of random variable", W.rows(), 
+                       "columns of random variable", W.cols());
       check_size_match(function, 
-                       S.rows(), "Rows of scale parameter",
-                       S.cols(), "columns of scale parameter",
-                       &lp);
+                       "Rows of scale parameter", S.rows(),
+                       "columns of scale parameter", S.cols());
       check_size_match(function, 
-                       W.rows(), "Rows of random variable",
-                       S.rows(), "columns of scale parameter",
-                       &lp);
+                       "Rows of random variable", W.rows(), 
+                       "columns of scale parameter", S.rows());
       // FIXME: domain checks
 
       LDLT_factor<T_y,Eigen::Dynamic,Eigen::Dynamic> ldlt_W(W);
-      if (!check_ldlt_factor(function,ldlt_W,
-                             "LDLT_Factor of random variable",&lp))
+      if (!check_ldlt_factor(function, "LDLT_Factor of random variable", ldlt_W))
         return lp;
 
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_S(S);
-      if (!check_ldlt_factor(function,ldlt_S,
-                             "LDLT_Factor of scale parameter",&lp))
+      if (!check_ldlt_factor(function, "LDLT_Factor of scale parameter", ldlt_S))
         return lp;
       
       using stan::math::trace;
@@ -149,15 +143,14 @@ namespace stan {
       using stan::error_handling::check_size_match;
       using stan::error_handling::check_positive;
 
-      static const char* function = "stan::prob::wishart_rng(%1%)";
+      static const char* function = "stan::prob::wishart_rng";
 
       typename index_type<MatrixXd>::type k = S.rows();
 
-      check_positive(function,nu,"degrees of freedom",(double*)0);
+      check_positive(function, "degrees of freedom", nu);
       check_size_match(function, 
-                       S.rows(), "Rows of scale parameter",
-                       S.cols(), "columns of scale parameter",
-                       (double*)0);
+                       "Rows of scale parameter", S.rows(), 
+                       "columns of scale parameter", S.cols());
 
       MatrixXd B = MatrixXd::Zero(k, k);
 

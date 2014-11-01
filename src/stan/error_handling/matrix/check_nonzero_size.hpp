@@ -39,7 +39,7 @@ namespace stan {
         return true;
 
       dom_err(function, name, size_t(), 
-              " has size ", 
+              "has size ", 
               ", but must have a non-zero size");
       return false;
     }

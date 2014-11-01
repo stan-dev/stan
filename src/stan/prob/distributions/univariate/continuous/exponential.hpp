@@ -44,7 +44,7 @@ namespace stan {
     template <bool propto, typename T_y, typename T_inv_scale>
     typename return_type<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta) {
-      static const char* function = "stan::prob::exponential_log(%1%)";
+      static const char* function = "stan::prob::exponential_log";
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -57,12 +57,11 @@ namespace stan {
       using stan::math::value_of;
       
       double logp(0.0);
-      check_not_nan(function, y, "Random variable", &logp);
-      check_positive_finite(function, beta, "Inverse scale parameter", &logp);
+      check_not_nan(function, "Random variable", y);
+      check_positive_finite(function, "Inverse scale parameter", beta);
       check_consistent_sizes(function,
-                             y,beta,
-                             "Random variable","Inverse scale parameter",
-                             &logp);
+                             "Random variable", y,
+                             "Inverse scale parameter", beta);
       
       
       // set up template expressions wrapping scalars into vector views
@@ -121,7 +120,7 @@ namespace stan {
     typename return_type<T_y,T_inv_scale>::type
     exponential_cdf(const T_y& y, const T_inv_scale& beta) {
 
-      static const char* function = "stan::prob::exponential_cdf(%1%)";
+      static const char* function = "stan::prob::exponential_cdf";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -135,9 +134,9 @@ namespace stan {
             && stan::length(beta)))
         return cdf;
 
-      check_not_nan(function, y, "Random variable", &cdf);
-      check_nonnegative(function, y, "Random variable", &cdf);
-      check_positive_finite(function, beta, "Inverse scale parameter", &cdf);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_positive_finite(function, "Inverse scale parameter", beta);
 
       agrad::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
@@ -174,7 +173,7 @@ namespace stan {
     typename return_type<T_y,T_inv_scale>::type
     exponential_cdf_log(const T_y& y, const T_inv_scale& beta) {
 
-      static const char* function = "stan::prob::exponential_cdf_log(%1%)";
+      static const char* function = "stan::prob::exponential_cdf_log";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -188,10 +187,9 @@ namespace stan {
             && stan::length(beta)))
         return cdf_log;
 
-      check_not_nan(function, y, "Random variable", &cdf_log);
-      check_nonnegative(function, y, "Random variable", &cdf_log);
-      check_positive_finite(function, beta, "Inverse scale parameter",
-                            &cdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_positive_finite(function, "Inverse scale parameter", beta);
 
       agrad::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
@@ -220,7 +218,7 @@ namespace stan {
     typename return_type<T_y,T_inv_scale>::type
     exponential_ccdf_log(const T_y& y, const T_inv_scale& beta) {
 
-      static const char* function = "stan::prob::exponential_ccdf_log(%1%)";
+      static const char* function = "stan::prob::exponential_ccdf_log";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -234,10 +232,9 @@ namespace stan {
             && stan::length(beta)))
         return ccdf_log;
 
-      check_not_nan(function, y, "Random variable", &ccdf_log);
-      check_nonnegative(function, y, "Random variable", &ccdf_log);
-      check_positive_finite(function, beta, "Inverse scale parameter", 
-                            &ccdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_positive_finite(function, "Inverse scale parameter", beta);
 
       agrad::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
@@ -267,12 +264,11 @@ namespace stan {
       using boost::variate_generator;
       using boost::exponential_distribution;
 
-      static const char* function = "stan::prob::exponential_rng(%1%)";
+      static const char* function = "stan::prob::exponential_rng";
 
       using stan::error_handling::check_positive_finite;
 
-      check_positive_finite(function, beta, "Inverse scale parameter", 
-                            (double*)0);
+      check_positive_finite(function, "Inverse scale parameter", beta);
 
       variate_generator<RNG&, exponential_distribution<> >
         exp_rng(rng, exponential_distribution<>(beta));

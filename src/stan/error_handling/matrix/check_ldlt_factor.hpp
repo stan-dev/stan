@@ -26,11 +26,11 @@ namespace stan {
       if (!A.success()) {
         std::ostringstream msg;
         msg << "is not positive definite. "
-            << "last conditional variance is %1%.";
+            << "last conditional variance is ";
         std::string message(msg.str());
         const T too_small = A.vectorD().tail(1)(0);
         dom_err(function, name, too_small,
-                message.c_str());
+                message.c_str(), ".");
         return false;
       }
       return true;

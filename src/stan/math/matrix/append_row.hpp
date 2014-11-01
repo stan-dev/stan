@@ -26,10 +26,9 @@ namespace stan {
       int Brows = B.rows();
       int Acols = A.cols();
       int Bcols = B.cols();
-      check_size_match("append_row(%1%)",
-                       Acols, "columns of A",
-                       Bcols, "columns of B",
-                       (double*)0);            
+      check_size_match("append_row",
+                       "columns of A", Acols, 
+                       "columns of B", Bcols);
       
       Matrix<typename return_type<T1, T2>::type, Dynamic, Dynamic>
         result(Arows + Brows, Acols);
@@ -67,10 +66,9 @@ namespace stan {
     inline Matrix<T, Dynamic, Dynamic>
     append_row(const Matrix<T, R1, C1> & A,
           const Matrix<T, R2, C2> & B) {
-      check_size_match("append_row(%1%)",
-                       A.cols(), "columns of A",
-                       B.cols(), "columns of B",
-                       (double*)0);            
+      check_size_match("append_row",
+                       "columns of A", A.cols(), 
+                       "columns of B", B.cols());
       
       Matrix<T, Dynamic, Dynamic>
         result(A.rows() + B.rows(), A.cols());

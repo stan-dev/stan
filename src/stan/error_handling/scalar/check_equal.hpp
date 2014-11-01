@@ -20,7 +20,8 @@ namespace stan {
           VectorView<const T_eq> eq_vec(eq);
           for (size_t n = 0; n < length(eq); n++) {
             if (!(y == eq_vec[n])) {
-              std::stringstream msg(", but must be equal to ");
+              std::stringstream msg;
+              msg << ", but must be equal to ";
               msg << eq_vec[n];
               std::string message(msg.str());
               dom_err(function, name, y,
@@ -44,7 +45,8 @@ namespace stan {
           VectorView<const T_eq> eq_vec(eq);
           for (size_t n = 0; n < length(y); n++) {
             if (!(get(y,n) == eq_vec[n])) {
-              std::stringstream msg(", but must be equal to ");
+              std::stringstream msg;
+              msg << ", but must be equal to ";
               msg << eq_vec[n];
               std::string message(msg.str());
               dom_err_vec(function, name, y, n,

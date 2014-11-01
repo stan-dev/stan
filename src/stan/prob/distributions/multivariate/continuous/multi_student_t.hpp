@@ -38,7 +38,7 @@ namespace stan {
                         const 
                         Eigen::Matrix<T_scale,
                                       Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      static const char* function = "stan::prob::multi_student_t(%1%)";
+      static const char* function = "stan::prob::multi_student_t";
 
       using stan::error_handling::check_size_match;
       using stan::error_handling::check_finite;
@@ -55,10 +55,8 @@ namespace stan {
       lp_type lp(0.0);
       
       // allows infinities
-      check_not_nan(function, nu, 
-                    "Degrees of freedom parameter", &lp);
-      check_positive(function, nu, 
-                     "Degrees of freedom parameter", &lp);
+      check_not_nan(function, "Degrees of freedom parameter", nu);
+      check_positive(function, "Degrees of freedom parameter", nu);
       
       using boost::math::isinf;
 
@@ -83,9 +81,8 @@ namespace stan {
         for (size_t i = 1, size_ = length_mvt(y); i < size_; i++) {
           int size_y_new = y_vec[i].size();
           check_size_match(function, 
-                                size_y_new, "Size of one of the vectors of the random variable",
-                                size_y_old, "Size of another vector of the random variable",
-                                &lp);
+                           "Size of one of the vectors of the random variable", size_y_new,
+                           "Size of another vector of the random variable", size_y_old);
           size_y_old = size_y_new;
         }
         int size_mu_old = size_mu;
@@ -93,9 +90,8 @@ namespace stan {
         for (size_t i = 1, size_ = length_mvt(mu); i < size_; i++) {
           int size_mu_new = mu_vec[i].size();
           check_size_match(function, 
-                                size_mu_new, "Size of one of the vectors of the location variable",
-                                size_mu_old, "Size of another vector of the location variable",
-                                &lp);
+                           "Size of one of the vectors of the location variable", size_mu_new, 
+                           "Size of another vector of the location variable", size_mu_old);
           size_mu_old = size_mu_new;
         }
         (void) size_y_old;
@@ -106,28 +102,24 @@ namespace stan {
 
       
       check_size_match(function, 
-          size_y, "Size of random variable",
-          size_mu, "size of location parameter",
-          &lp);
+                       "Size of random variable", size_y, 
+                       "size of location parameter", size_mu);
       check_size_match(function, 
-          size_y, "Size of random variable",
-          Sigma.rows(), "rows of scale parameter",
-          &lp);
+                       "Size of random variable", size_y,
+                       "rows of scale parameter", Sigma.rows());
       check_size_match(function, 
-          size_y, "Size of random variable",
-          Sigma.cols(), "columns of scale parameter",
-          &lp);
+                       "Size of random variable", size_y,
+                       "columns of scale parameter", Sigma.cols());
       
       for (size_t i = 0; i < size_vec; i++) {
-        check_finite(function, mu_vec[i], "Location parameter", &lp);
-        check_not_nan(function, y_vec[i], "Random variable", &lp);
+        check_finite(function, "Location parameter", mu_vec[i]);
+        check_not_nan(function, "Random variable", y_vec[i]);
       }    
-      check_symmetric(function, Sigma, "Scale parameter", &lp);
+      check_symmetric(function, "Scale parameter", Sigma);
 
       
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of scale parameter",
-                        &lp);
+      check_ldlt_factor(function, "LDLT_Factor of scale parameter", ldlt_Sigma);
 
       if (size_y == 0) //y_vec[0].size() == 0
         return lp;
@@ -186,19 +178,17 @@ namespace stan {
                         const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& s,
                      RNG& rng) {
 
-      static const char* function = "stan::prob::multi_student_t_rng(%1%)";
+      static const char* function = "stan::prob::multi_student_t_rng";
 
       using stan::error_handling::check_finite;
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_symmetric;
       using stan::error_handling::check_positive;      
  
-      check_finite(function, mu, "Location parameter", (double*)0);
-      check_symmetric(function, s, "Scale parameter", (double*)0);
-      check_not_nan(function, nu, 
-                    "Degrees of freedom parameter", (double*)0);
-      check_positive(function, nu, 
-                     "Degrees of freedom parameter", (double*)0);
+      check_finite(function, "Location parameter", mu);
+      check_symmetric(function, "Scale parameter", s);
+      check_not_nan(function, "Degrees of freedom parameter", nu);
+      check_positive(function, "Degrees of freedom parameter", nu);
 
       Eigen::VectorXd z(s.cols());
       z.setZero();

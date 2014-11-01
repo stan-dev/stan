@@ -20,7 +20,8 @@ namespace stan {
           VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(low); n++) {
             if (!(y >= low_vec[n])) {
-              std::stringstream msg(", but must be greater than or equal to ");
+              std::stringstream msg;
+              msg << ", but must be greater than or equal to ";
               msg << low_vec[n];
               std::string message(msg.str());
               dom_err(function, name, y,
@@ -43,7 +44,8 @@ namespace stan {
           VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(y); n++) {
             if (!(get(y,n) >= low_vec[n])) {
-              std::stringstream msg(", but must be greater than or equal to ");
+              std::stringstream msg;
+              msg << ", but must be greater than or equal to ";
               msg << low_vec[n];
               std::string message(msg.str());
               dom_err_vec(function, name, y, n,

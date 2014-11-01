@@ -45,7 +45,7 @@ namespace stan {
     multi_gp_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
                  const Eigen::Matrix<T_w,Eigen::Dynamic,1>& w) {
-      static const char* function = "stan::prob::multi_gp_cholesky_log(%1%)";
+      static const char* function = "stan::prob::multi_gp_cholesky_log";
       typedef typename boost::math::tools::promote_args<T_y,T_covar,T_w>::type T_lp;
       T_lp lp(0.0);
 
@@ -59,16 +59,14 @@ namespace stan {
       using stan::error_handling::check_positive;
 
       check_size_match(function, 
-                       y.rows(), "Size of random variable (rows y)",
-                       w.size(), "Size of kernel scales (w)",
-                       &lp);
+                       "Size of random variable (rows y)", y.rows(), 
+                       "Size of kernel scales (w)", w.size());
       check_size_match(function, 
-                       y.cols(), "Size of random variable",
-                       L.rows(), "rows of covariance parameter",
-                       &lp);
-      check_finite(function, w, "Kernel scales", &lp);
-      check_positive(function, w, "Kernel scales", &lp);
-      check_finite(function, y, "Random variable", &lp);
+                       "Size of random variable", y.cols(),
+                       "rows of covariance parameter", L.rows());
+      check_finite(function, "Kernel scales", w);
+      check_positive(function, "Kernel scales", w);
+      check_finite(function, "Random variable", y);
       
       if (y.rows() == 0)
         return lp;

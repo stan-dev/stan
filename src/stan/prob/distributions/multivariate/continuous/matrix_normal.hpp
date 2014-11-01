@@ -42,7 +42,7 @@ namespace stan {
                            const Eigen::Matrix<T_Mu,Eigen::Dynamic,Eigen::Dynamic>& Mu,
                            const Eigen::Matrix<T_Sigma,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                            const Eigen::Matrix<T_D,Eigen::Dynamic,Eigen::Dynamic>& D) {
-      static const char* function = "stan::prob::matrix_normal_prec_log(%1%)";
+      static const char* function = "stan::prob::matrix_normal_prec_log";
       typename boost::math::tools::promote_args<T_y,T_Mu,T_Sigma,T_D>::type lp(0.0);
       
       using stan::error_handling::check_not_nan;
@@ -57,43 +57,37 @@ namespace stan {
       using stan::error_handling::check_ldlt_factor;
       
       check_size_match(function, 
-                       Sigma.rows(), "Rows of Sigma",
-                       Sigma.cols(), "columns of Sigma",
-                       &lp);
-      check_positive(function, Sigma.rows(), "Sigma rows", &lp);
-      check_finite(function, Sigma, "Sigma", &lp);
-      check_symmetric(function, Sigma, "Sigma", &lp);
+                       "Rows of Sigma", Sigma.rows(), 
+                       "columns of Sigma", Sigma.cols());
+      check_positive(function, "Sigma rows", Sigma.rows());
+      check_finite(function, "Sigma", Sigma);
+      check_symmetric(function, "Sigma", Sigma);
       
       LDLT_factor<T_Sigma,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp);
+      check_ldlt_factor(function, "LDLT_Factor of Sigma", ldlt_Sigma);
       check_size_match(function, 
-                       D.rows(), "Rows of D",
-                       D.cols(), "Columns of D",
-                       &lp);
-      check_positive(function, D.rows(), "D rows", &lp);
-      check_finite(function, D, "D", &lp);
-      check_symmetric(function, D, "Sigma", &lp);
+                       "Rows of D", D.rows(), 
+                       "Columns of D", D.cols());
+      check_positive(function, "D rows", D.rows());
+      check_finite(function, "D", D);
+      check_symmetric(function, "Sigma", D);
       
       LDLT_factor<T_D,Eigen::Dynamic,Eigen::Dynamic> ldlt_D(D);
-      check_ldlt_factor(function,ldlt_D,"LDLT_Factor of D",&lp);
+      check_ldlt_factor(function, "LDLT_Factor of D", ldlt_D);
       check_size_match(function, 
-                       y.rows(), "Rows of random variable",
-                       Mu.rows(), "Rows of location parameter",
-                       &lp);
+                       "Rows of random variable", y.rows(),
+                       "Rows of location parameter", Mu.rows());
       check_size_match(function, 
-                       y.cols(), "Columns of random variable",
-                       Mu.cols(), "Columns of location parameter",
-                       &lp);
+                       "Columns of random variable", y.cols(),
+                       "Columns of location parameter", Mu.cols());
       check_size_match(function, 
-                       y.rows(), "Rows of random variable",
-                       Sigma.rows(), "Rows of Sigma",
-                       &lp);
+                       "Rows of random variable", y.rows(),
+                       "Rows of Sigma", Sigma.rows());
       check_size_match(function, 
-                       y.cols(), "Columns of random variable",
-                       D.rows(), "Rows of D",
-                       &lp);
-      check_finite(function, Mu, "Location parameter", &lp);
-      check_finite(function, y, "Random variable", &lp);
+                       "Columns of random variable", y.cols(),
+                       "Rows of D", D.rows());
+      check_finite(function, "Location parameter", Mu);
+      check_finite(function, "Random variable", y);
       
       if (include_summand<propto>::value) 
         lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();

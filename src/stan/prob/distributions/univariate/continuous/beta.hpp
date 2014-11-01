@@ -45,7 +45,7 @@ namespace stan {
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_log(const T_y& y, 
              const T_scale_succ& alpha, const T_scale_fail& beta) {
-      static const char* function = "stan::prob::beta_log(%1%)";
+      static const char* function = "stan::prob::beta_log";
 
       using boost::math::digamma;
       using boost::math::lgamma;
@@ -71,16 +71,15 @@ namespace stan {
       double logp(0.0);
       
       // validate args (here done over var, which should be OK)
-      check_positive_finite(function, alpha, "First shape parameter", &logp);
-      check_positive_finite(function, beta, "Second shape parameter", &logp);
-      check_not_nan(function, y, "Random variable", &logp);
+      check_positive_finite(function, "First shape parameter", alpha);
+      check_positive_finite(function, "Second shape parameter", beta);
+      check_not_nan(function, "Random variable", y);
       check_consistent_sizes(function,
-                             y,alpha,beta,
-                             "Random variable","First shape parameter",
-                             "Second shape parameter",
-                             &logp);
-      check_nonnegative(function, y, "Random variable", &logp);
-      check_less_or_equal(function, y, 1,"Random variable", &logp);
+                             "Random variable", y,
+                             "First shape parameter", alpha,
+                             "Second shape parameter", beta);
+      check_nonnegative(function, "Random variable", y);
+      check_less_or_equal(function, "Random variable", y, 1);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_scale_succ,T_scale_fail>::value)
@@ -219,7 +218,7 @@ namespace stan {
         return 1.0;
       
       // Error checks
-      static const char* function = "stan::prob::beta_cdf(%1%)";
+      static const char* function = "stan::prob::beta_cdf";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -231,14 +230,15 @@ namespace stan {
       
       double P(1.0);
         
-      check_positive_finite(function, alpha, "First shape parameter", &P);
-      check_positive_finite(function, beta, "Second shape parameter", &P);
-      check_not_nan(function, y, "Random variable", &P);
-      check_consistent_sizes(function, y, alpha, beta,
-                             "Random variable", "Shape parameter", 
-                             "Scale Parameter", &P);
-      check_nonnegative(function, y, "Random variable", &P);
-      check_less_or_equal(function, y, 1,"Random variable", &P);
+      check_positive_finite(function, "First shape parameter", alpha);
+      check_positive_finite(function, "Second shape parameter", beta);
+      check_not_nan(function, "Random variable", y);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Shape parameter", alpha, 
+                             "Scale Parameter", beta);
+      check_nonnegative(function, "Random variable", y);
+      check_less_or_equal(function, "Random variable", y, 1);
 
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -364,7 +364,7 @@ namespace stan {
         return 0.0;
       
       // Error checks
-      static const char* function = "stan::prob::beta_cdf(%1%)";
+      static const char* function = "stan::prob::beta_cdf";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -376,14 +376,15 @@ namespace stan {
       
       double cdf_log(0.0);
         
-      check_positive_finite(function, alpha, "First shape parameter", &cdf_log);
-      check_positive_finite(function, beta, "Second shape parameter", &cdf_log);
-      check_not_nan(function, y, "Random variable", &cdf_log);
-      check_nonnegative(function, y, "Random variable", &cdf_log);
-      check_less_or_equal(function, y, 1,"Random variable", &cdf_log);
-      check_consistent_sizes(function, y, alpha, beta,
-                             "Random variable", "Shape parameter", 
-                             "Scale Parameter", &cdf_log);
+      check_positive_finite(function, "First shape parameter", alpha);
+      check_positive_finite(function, "Second shape parameter", beta);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_less_or_equal(function, "Random variable", y, 1);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Shape parameter", alpha, 
+                             "Scale Parameter", beta);
       
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -482,7 +483,7 @@ namespace stan {
         return 0.0;
       
       // Error checks
-      static const char* function = "stan::prob::beta_cdf(%1%)";
+      static const char* function = "stan::prob::beta_cdf";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -494,16 +495,15 @@ namespace stan {
       
       double ccdf_log(0.0);
         
-      check_positive_finite(function, alpha, "First shape parameter",
-                            &ccdf_log);
-      check_positive_finite(function, beta, "Second shape parameter", 
-                            &ccdf_log);
-      check_not_nan(function, y, "Random variable", &ccdf_log);
-      check_nonnegative(function, y, "Random variable", &ccdf_log);
-      check_less_or_equal(function, y, 1,"Random variable", &ccdf_log);
-      check_consistent_sizes(function, y, alpha, beta,
-                             "Random variable", "Shape parameter", 
-                             "Scale Parameter", &ccdf_log);
+      check_positive_finite(function, "First shape parameter", alpha);
+      check_positive_finite(function, "Second shape parameter", beta);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_less_or_equal(function, "Random variable", y, 1);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Shape parameter", alpha, 
+                             "Scale Parameter", beta);
       
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -596,14 +596,12 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::gamma_distribution;
       // Error checks
-      static const char* function = "stan::prob::beta_rng(%1%)";
+      static const char* function = "stan::prob::beta_rng";
 
       using stan::error_handling::check_positive_finite;
         
-      check_positive_finite(function, alpha, "First shape parameter", 
-                            (double*)0);
-      check_positive_finite(function, beta, "Second shape parameter", 
-                            (double*)0);
+      check_positive_finite(function, "First shape parameter", alpha);
+      check_positive_finite(function, "Second shape parameter", beta);
 
       variate_generator<RNG&, gamma_distribution<> >
         rng_gamma_alpha(rng, gamma_distribution<>(alpha, 1.0));

@@ -18,12 +18,14 @@ namespace stan {
                         const Eigen::Matrix<double,RA,CA> &A,
                         const Eigen::Matrix<double,RB,CB> &B)
     {
-      stan::error_handling::check_square("trace_gen_quad_form(%1%)",A,"A",(double*)0);
-      stan::error_handling::check_square("trace_gen_quad_form(%1%)",D,"D",(double*)0);
-      stan::error_handling::check_multiplicable("trace_gen_quad_form(%1%)",A,"A",
-                                      B,"B",(double*)0);
-      stan::error_handling::check_multiplicable("trace_gen_quad_form(%1%)",B,"B",
-                                      D,"D",(double*)0);
+      stan::error_handling::check_square("trace_gen_quad_form", "A", A);
+      stan::error_handling::check_square("trace_gen_quad_form", "D", D);
+      stan::error_handling::check_multiplicable("trace_gen_quad_form",
+                                                "A", A,
+                                                "B", B);
+      stan::error_handling::check_multiplicable("trace_gen_quad_form",
+                                                "B", B,
+                                                "D", D);
       return (D*B.transpose()*A*B).trace();
     }
   }

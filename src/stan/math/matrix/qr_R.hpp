@@ -13,10 +13,11 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     qr_R(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
       typedef Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> matrix_t;
-      stan::error_handling::check_nonzero_size("qr_R(%1%)",m,"m",(double*)0);
-      stan::error_handling::check_greater_or_equal("qr_R(%1%)",static_cast<size_t>(m.rows()),
-                                         static_cast<size_t>(m.cols()),"m.rows()",
-                                         (double*)0);
+      stan::error_handling::check_nonzero_size("qr_R", "m", m);
+      stan::error_handling::check_greater_or_equal("qr_R",
+                                                   "m.rows()",
+                                                   static_cast<size_t>(m.rows()),
+                                                   static_cast<size_t>(m.cols()));
       Eigen::HouseholderQR<matrix_t> qr(m.rows(), m.cols());
       qr.compute(m);
       matrix_t R = qr.matrixQR().topLeftCorner(m.rows(),m.cols());

@@ -3,7 +3,6 @@
 
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling.hpp>
-#include <stan/math.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -17,7 +16,7 @@ namespace stan {
              typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     von_mises_log(T_y const& y, T_loc const& mu, T_scale const& kappa) {
-      static char const* const function = "stan::prob::von_mises_log(%1%)";
+      static char const* const function = "stan::prob::von_mises_log";
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -37,12 +36,14 @@ namespace stan {
       double logp = 0.0;
 
       // Validate arguments.
-      check_finite(function, y, "Random variable", &logp);
-      check_finite(function, mu, "Location paramter", &logp);
-      check_positive_finite(function, kappa, "Scale parameter", &logp);
-      check_consistent_sizes(function, y, mu, kappa, "Random variable",
-                             "Location parameter", "Scale parameter",
-                             &logp);
+      check_finite(function, "Random variable", y);
+      check_finite(function, "Location paramter", mu);
+      check_positive_finite(function, "Scale parameter", kappa);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Location parameter", mu, 
+                             "Scale parameter", kappa);
+
  
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_loc,T_scale>::value) 
@@ -133,11 +134,10 @@ namespace stan {
       using boost::variate_generator;
       using stan::prob::uniform_rng;
 
-      static const char* function = "stan::prob::von_mises_rng(%1%)";
+      static const char* function = "stan::prob::von_mises_rng";
 
-      stan::error_handling::check_finite(function,mu,"mean",(double*)0);
-      stan::error_handling::check_positive_finite(function,kappa,"inverse of variance",
-                                 (double*)0);
+      stan::error_handling::check_finite(function, "mean", mu);
+      stan::error_handling::check_positive_finite(function, "inverse of variance", kappa);
 
       double r = 1 + pow((1 + 4 * kappa * kappa), 0.5);
       double rho = 0.5 * (r - pow(2 * r, 0.5)) / kappa;

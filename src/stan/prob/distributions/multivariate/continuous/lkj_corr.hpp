@@ -50,7 +50,7 @@ namespace stan {
              const T_shape& eta) {
 
       static const char* function 
-        = "stan::prob::lkj_corr_cholesky_log(%1%)";
+        = "stan::prob::lkj_corr_cholesky_log";
 
       using boost::math::tools::promote_args;
       using stan::error_handling::check_positive;
@@ -58,8 +58,8 @@ namespace stan {
       using stan::math::sum;
       
       typename promote_args<T_covar,T_shape>::type lp(0.0);
-      check_positive(function, eta, "Shape parameter", &lp);
-      check_lower_triangular(function, L, "Random variable", &lp);
+      check_positive(function, "Shape parameter", eta);
+      check_lower_triangular(function, "Random variable", L);
 
       const unsigned int K = L.rows();
       if (K == 0)
@@ -102,7 +102,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y, T_shape>::type
     lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
                  const T_shape& eta) {
-      static const char* function = "stan::prob::lkj_corr_log(%1%)";
+      static const char* function = "stan::prob::lkj_corr_log";
 
       using stan::error_handling::check_size_match;
       using stan::error_handling::check_not_nan;
@@ -112,13 +112,12 @@ namespace stan {
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_shape>::type lp(0.0);
-      check_positive(function, eta, "Shape parameter", &lp);
+      check_positive(function, "Shape parameter", eta);
       check_size_match(function, 
-                       y.rows(), "Rows of correlation matrix",
-                       y.cols(), "columns of correlation matrix",
-                       &lp);
-      check_not_nan(function, y, "Correlation matrix", &lp);
-      check_corr_matrix(function, y, "Correlation matrix", &lp);
+                       "Rows of correlation matrix", y.rows(), 
+                       "columns of correlation matrix", y.cols());
+      check_not_nan(function, "Correlation matrix", y);
+      check_corr_matrix(function, "Correlation matrix", y);
       
       const unsigned int K = y.rows();
       if (K == 0)
@@ -154,11 +153,11 @@ namespace stan {
                           const double eta,
                           RNG& rng) {
       static const char* function 
-        = "stan::prob::lkj_corr_cholesky_rng(%1%)";
+        = "stan::prob::lkj_corr_cholesky_rng";
 
       using stan::error_handling::check_positive;
       
-      check_positive(function, eta, "Shape parameter", (double*)0);
+      check_positive(function, "Shape parameter", eta);
 
       Eigen::ArrayXd CPCs( (K * (K - 1)) / 2 );
       double alpha = eta + 0.5 * (K - 1);
@@ -180,11 +179,11 @@ namespace stan {
                  RNG& rng) {
 
       static const char* function 
-        = "stan::prob::lkj_corr_rng(%1%)";
+        = "stan::prob::lkj_corr_rng";
 
       using stan::error_handling::check_positive;
       
-      check_positive(function, eta, "Shape parameter", (double*)0);
+      check_positive(function, "Shape parameter", eta);
 
       using stan::math::multiply_lower_tri_self_transpose;
       return multiply_lower_tri_self_transpose(

@@ -26,9 +26,10 @@ namespace stan {
                   R1,C2>
     mdivide_left_tri(const Eigen::Matrix<T1,R1,C1> &A,
                      const Eigen::Matrix<T2,R2,C2> &b) {
-      stan::error_handling::check_square("mdivide_left_tri(%1%)",A,"A",(double*)0);
-      stan::error_handling::check_multiplicable("mdivide_left_tri(%1%)",A,"A",
-                                      b,"b",(double*)0);
+      stan::error_handling::check_square("mdivide_left_tri", "A", A);
+      stan::error_handling::check_multiplicable("mdivide_left_tri",
+                                                "A", A,
+                                                "b", b);
       return promote_common<Eigen::Matrix<T1,R1,C1>,Eigen::Matrix<T2,R1,C1> >(A)
         .template triangularView<TriView>()
         .solve( promote_common<Eigen::Matrix<T1,R2,C2>,
@@ -46,7 +47,7 @@ namespace stan {
     inline 
     Eigen::Matrix<T,R1,C1> 
     mdivide_left_tri(const Eigen::Matrix<T,R1,C1> &A) {
-      stan::error_handling::check_square("mdivide_left_tri(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_square("mdivide_left_tri", "A", A);
       int n = A.rows();
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> b;
       b.setIdentity(n,n);

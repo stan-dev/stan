@@ -70,25 +70,16 @@ namespace stan {
       using boost::numeric::odeint::make_dense_output;  
       using boost::numeric::odeint::runge_kutta_dopri5;
       
-      stan::error_handling::check_finite("integrate_ode(%1%)", y0, "initial state",
-                                static_cast<double*>(0));
-      stan::error_handling::check_finite("integrate_ode(%1%)", t0, "initial time",
-                                static_cast<double*>(0));
-      stan::error_handling::check_finite("integrate_ode(%1%)", ts, "times",
-                                static_cast<double*>(0));
-      stan::error_handling::check_finite("integrate_ode(%1%)", theta, "parameter vector",
-                                static_cast<double*>(0));
-      stan::error_handling::check_finite("integrate_ode(%1%)", x, "continuous data",
-                               static_cast<double*>(0));
+      stan::error_handling::check_finite("integrate_ode", "initial state", y0);
+      stan::error_handling::check_finite("integrate_ode", "initial time", t0);
+      stan::error_handling::check_finite("integrate_ode", "times", ts);
+      stan::error_handling::check_finite("integrate_ode", "parameter vector", theta);
+      stan::error_handling::check_finite("integrate_ode", "continuous data", x);
 
-      stan::error_handling::check_nonzero_size("integrate_ode(%1%)", ts, "times", 
-                                     static_cast<double*>(0));
-      stan::error_handling::check_nonzero_size("integrate_ode(%1%)", y0, "initial state",
-                                     static_cast<double*>(0));
-      stan::error_handling::check_ordered("integrate_ode(%1%)", ts, "times", 
-                                static_cast<double*>(0));
-      stan::error_handling::check_less("integrate_ode(%1%)",t0, ts[0], "initial time",
-                             static_cast<double*>(0));
+      stan::error_handling::check_nonzero_size("integrate_ode", "times", ts);
+      stan::error_handling::check_nonzero_size("integrate_ode", "initial state", y0);
+      stan::error_handling::check_ordered("integrate_ode", "times", ts);
+      stan::error_handling::check_less("integrate_ode", "initial time", t0, ts[0]);
       
       const double absolute_tolerance = 1e-6;
       const double relative_tolerance = 1e-6;

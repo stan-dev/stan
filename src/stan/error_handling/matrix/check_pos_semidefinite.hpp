@@ -62,10 +62,10 @@ namespace stan {
         if (boost::math::isnan(y(i))) {
           std::ostringstream msg;
           msg << "is not positive semi-definite. " 
-                  << name << "(0,0) is %1%.";
+                  << name << "(0,0) is ";
           std::string message(msg.str());
           dom_err(function, name, y(0,0), 
-                  message.c_str());
+                  message.c_str(), "");
         }
       return true;
     }

@@ -20,18 +20,14 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_logit_log(int n, 
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
-      static const char* function = "stan::prob::categorical_logit_log(%1%)";
+      static const char* function = "stan::prob::categorical_logit_log";
 
       using stan::error_handling::check_bounded;
       using stan::error_handling::check_finite;
       using stan::math::log_sum_exp;
 
-      double lp = 0.0;
-      check_bounded(function, n, 1, beta.size(),
-                    "categorical outcome out of support",
-                    &lp);
-      
-      check_finite(function, beta, "log odds parameter", &lp);
+      check_bounded(function, "categorical outcome out of support", n, 1, beta.size());
+      check_finite(function, "log odds parameter", beta);
       
       if (!include_summand<propto,T_prob>::value)
         return 0.0;
@@ -53,20 +49,16 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_logit_log(const std::vector<int>& ns, 
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
-      static const char* function = "stan::prob::categorical_logit_log(%1%)";
+      static const char* function = "stan::prob::categorical_logit_log";
 
       using stan::error_handling::check_bounded;
       using stan::error_handling::check_finite;
       using stan::math::log_softmax;
       using stan::math::sum;
 
-      double lp = 0.0;
       for (size_t k = 0; k < ns.size(); ++k)
-        check_bounded(function, ns[k], 1, beta.size(),
-                      "categorical outcome out of support",
-                      &lp);
-      
-      check_finite(function, beta, "log odds parameter", &lp);
+        check_bounded(function, "categorical outcome out of support", ns[k], 1, beta.size());
+      check_finite(function, "log odds parameter", beta);
 
       if (!include_summand<propto,T_prob>::value)
         return 0.0;
