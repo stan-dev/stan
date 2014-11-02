@@ -1,9 +1,9 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_GP_CHOLESKY_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_GP_CHOLESKY_HPP
 
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/math/error_handling/dom_err.hpp>
+#include <stan/error_handling/matrix.hpp>
+#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/agrad/rev.hpp>
@@ -54,9 +54,9 @@ namespace stan {
       using stan::math::sum;
       using stan::math::log;
 
-      using stan::math::check_size_match;
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::error_handling::check_size_match;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive;
 
       check_size_match(function, 
                        y.rows(), "Size of random variable (rows y)",

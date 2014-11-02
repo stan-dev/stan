@@ -14,12 +14,12 @@
 #include <stan/agrad/rev/matrix.hpp>
 
 #include <stan/math.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 #include <stan/math/matrix.hpp>
 
 #include <stan/math/matrix/sum.hpp>
-#include <stan/math/matrix_error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 
@@ -479,7 +479,7 @@ namespace stan {
      *
      * <p>\f$f^{-1}(x) = \log(x)\f$.
      * 
-     * <p>The input is validated using <code>stan::math::check_positive()</code>.
+     * <p>The input is validated using <code>stan::error_handling::check_positive()</code>.
      * 
      * @param y Input scalar.
      * @return Unconstrained value that produces the input when constrained.
@@ -489,7 +489,7 @@ namespace stan {
     template <typename T>
     inline
     T positive_free(const T y) {
-      stan::math::check_positive("stan::prob::positive_free(%1%)", y, 
+      stan::error_handling::check_positive("stan::prob::positive_free(%1%)", y, 
                                  "Positive variable", (double*)0);
       return log(y);
     }
@@ -570,7 +570,7 @@ namespace stan {
     lb_free(const T y, const TL lb) {
       if (lb == -std::numeric_limits<double>::infinity())
         return identity_free(y);
-      stan::math::check_greater_or_equal("stan::prob::lb_free(%1%)",
+      stan::error_handling::check_greater_or_equal("stan::prob::lb_free(%1%)",
                                          y, lb, "Lower bounded variable",
                                          (double*)0);
       return log(y - lb);
@@ -668,7 +668,7 @@ namespace stan {
     ub_free(const T y, const TU ub) {
       if (ub == std::numeric_limits<double>::infinity())
         return identity_free(y);
-      stan::math::check_less_or_equal("stan::prob::ub_free(%1%)",
+      stan::error_handling::check_less_or_equal("stan::prob::ub_free(%1%)",
                                       y, ub, "Upper bounded variable",
                                       (double*)0);
       return log(ub - y);
@@ -708,7 +708,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_constrain(const T x, TL lb, TU ub) {
-      stan::math::check_less("lub_constrain(%1%)",lb,ub,"lb",(double*)0);
+      stan::error_handling::check_less("lub_constrain(%1%)",lb,ub,"lb",(double*)0);
 
       if (lb == -std::numeric_limits<double>::infinity())
         return ub_constrain(x,ub);
@@ -844,7 +844,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_free(const T y, TL lb, TU ub) {
       using stan::math::logit;
-      stan::math::check_bounded<T, TL, TU, typename scalar_type<T>::type>
+      stan::error_handling::check_bounded<T, TL, TU, typename scalar_type<T>::type>
         ("stan::prob::lub_free(%1%)",
          y, lb, ub, "Bounded variable", (double*)0);
       if (lb == -std::numeric_limits<double>::infinity())
@@ -926,7 +926,7 @@ namespace stan {
     inline
     T prob_free(const T y) {
       using stan::math::logit;
-      stan::math::check_bounded<T,double,double,T>
+      stan::error_handling::check_bounded<T,double,double,T>
         ("stan::prob::prob_free(%1%)",
          y, 0, 1, "Probability variable",(double*)0);
       return logit(y);
@@ -993,7 +993,7 @@ namespace stan {
     template <typename T>
     inline
     T corr_free(const T y) {
-      stan::math::check_bounded<T,double,double,double>
+      stan::error_handling::check_bounded<T,double,double,double>
         ("stan::prob::lub_free(%1%)",
          y, -1, 1, "Correlation variable", (double*)0);
       return atanh(y);
@@ -1070,7 +1070,7 @@ namespace stan {
       using stan::math::index_type;
       typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
 
-      stan::math::check_unit_vector("stan::prob::unit_vector_free(%1%)", 
+      stan::error_handling::check_unit_vector("stan::prob::unit_vector_free(%1%)", 
                                     x, "Unit vector variable", (double*)0);
       int Km1 = x.size() - 1;
       Matrix<T,Dynamic,1> y(Km1);
@@ -1193,7 +1193,7 @@ namespace stan {
 
       typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
 
-      stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "Simplex variable",
+      stan::error_handling::check_simplex("stan::prob::simplex_free(%1%)", x, "Simplex variable",
                                 (double*)0);
       int Km1 = x.size() - 1;
       Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
@@ -1283,7 +1283,7 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
-      stan::math::check_ordered("stan::prob::ordered_free(%1%)", 
+      stan::error_handling::check_ordered("stan::prob::ordered_free(%1%)", 
                                 y, "Ordered variable");
       using Eigen::Matrix;
       using Eigen::Dynamic;
@@ -1380,7 +1380,7 @@ namespace stan {
 
       typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
 
-      stan::math::check_positive_ordered("stan::prob::positive_ordered_free(%1%)", 
+      stan::error_handling::check_positive_ordered("stan::prob::positive_ordered_free(%1%)", 
                                          y, "Positive ordered variable", (double*)0);
 
       size_type k = y.size();
@@ -1485,7 +1485,7 @@ namespace stan {
     cholesky_factor_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
       using std::log;
       double result;
-      if (!stan::math::check_cholesky_factor("cholesky_factor_free(%1%)",y,"y",&result))
+      if (!stan::error_handling::check_cholesky_factor("cholesky_factor_free(%1%)",y,"y",&result))
         throw std::domain_error("cholesky_factor_free: y is not a Cholesky factor");
       int M = y.rows();
       int N = y.cols();
@@ -1596,7 +1596,7 @@ namespace stan {
       using stan::math::square;
 
       double bad_result; // won't be used
-      stan::math::check_square("cholesky_corr_free",x,"x",&bad_result);
+      stan::error_handling::check_square("cholesky_corr_free",x,"x",&bad_result);
       // should validate lower-triangular, unit lengths
 
       int K = (x.rows() * (x.rows() - 1)) / 2;

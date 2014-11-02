@@ -214,7 +214,7 @@ namespace stan {
       void ordered_unconstrain(vector_t& y) {
         typedef typename stan::math::index_type<vector_t>::type idx_t;
         if (y.size() == 0) return;
-        stan::math::check_ordered("stan::io::ordered_unconstrain(%1%)",
+        stan::error_handling::check_ordered("stan::io::ordered_unconstrain(%1%)",
                                   y, "Vector");
         data_r_.push_back(y[0]);
         for (idx_t i = 1; i < y.size(); ++i) {
@@ -243,7 +243,7 @@ namespace stan {
 
         // reimplements pos_ordered_free in prob to avoid malloc
         if (y.size() == 0) return;
-        stan::math::check_positive_ordered("stan::io::positive_ordered_unconstrain(%1%)", 
+        stan::error_handling::check_positive_ordered("stan::io::positive_ordered_unconstrain(%1%)", 
                                            y, "Vector", (double*)0);
         data_r_.push_back(log(y[0]));
         for (idx_t i = 1; i < y.size(); ++i) {
@@ -356,7 +356,7 @@ namespace stan {
        * @throw std::runtime_error if the vector is not a unit_vector.
        */
       void unit_vector_unconstrain(vector_t& y) {
-        stan::math::check_unit_vector("stan::io::unit_vector_unconstrain(%1%)", 
+        stan::error_handling::check_unit_vector("stan::io::unit_vector_unconstrain(%1%)", 
                                       y, "Vector", (double*)0);
         typedef typename stan::math::index_type<vector_t>::type idx_t;
         vector_t uy = stan::prob::unit_vector_free(y);
@@ -382,7 +382,7 @@ namespace stan {
       void simplex_unconstrain(vector_t& y) {
         typedef typename stan::math::index_type<vector_t>::type idx_t;
 
-        stan::math::check_simplex("stan::io::simplex_unconstrain(%1%)", 
+        stan::error_handling::check_simplex("stan::io::simplex_unconstrain(%1%)", 
                                   y, "Vector",
                                   (double*)0);
         vector_t uy = stan::prob::simplex_free(y);
@@ -483,7 +483,7 @@ namespace stan {
       void corr_matrix_unconstrain(matrix_t& y) {
         typedef typename stan::math::index_type<matrix_t>::type idx_t;
 
-        stan::math::check_corr_matrix("stan::io::corr_matrix_unconstrain(%1%)", 
+        stan::error_handling::check_corr_matrix("stan::io::corr_matrix_unconstrain(%1%)", 
                                       y, "Matrix",
                                       (double*)0);
         idx_t k = y.rows();

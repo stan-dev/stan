@@ -5,7 +5,7 @@
 #include <boost/random/variate_generator.hpp>
 
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
@@ -25,9 +25,9 @@ namespace stan {
       static const char* function = "stan::prob::pareto_log(%1%)";
       
       using stan::math::value_of;
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -135,11 +135,11 @@ namespace stan {
       // Check errors
       static const char* function = "stan::prob::pareto_cdf(%1%)";
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
           
       double P(1.0);
@@ -229,11 +229,11 @@ namespace stan {
       // Check errors
       static const char* function = "stan::prob::pareto_cdf_log(%1%)";
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
           
       double P(0.0);
@@ -310,11 +310,11 @@ namespace stan {
       // Check errors
       static const char* function = "stan::prob::pareto_ccdf_log(%1%)";
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
           
       double P(0.0);
@@ -384,7 +384,7 @@ namespace stan {
 
       static const char* function = "stan::prob::pareto_rng(%1%)";
       
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_positive_finite;
 
       check_positive_finite(function, y_min, "Scale parameter", (double*)0);
       check_positive_finite(function, alpha, "Shape parameter", (double*)0);

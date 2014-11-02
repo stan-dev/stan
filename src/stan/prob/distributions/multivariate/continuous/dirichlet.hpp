@@ -6,8 +6,8 @@
 #include <boost/random/variate_generator.hpp>
 
 #include <stan/prob/constants.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 
@@ -48,9 +48,9 @@ namespace stan {
       static const char* function = "stan::prob::dirichlet_log(%1%)";
       using boost::math::lgamma;
       using boost::math::tools::promote_args;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_positive;
-      using stan::math::check_simplex;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_simplex;
       using stan::math::multiply_log;
       
       typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);      

@@ -3,7 +3,7 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/meta/traits.hpp> //stan::return_type
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
 #include <vector>
 
 namespace stan {
@@ -12,7 +12,7 @@ namespace stan {
     using Eigen::Dynamic;
     using Eigen::Matrix; 
     using std::vector;
-    using stan::math::check_size_match;
+    using stan::error_handling::check_size_match;
        
     //matrix append_col(matrix, matrix)
     //matrix append_col(matrix, vector)

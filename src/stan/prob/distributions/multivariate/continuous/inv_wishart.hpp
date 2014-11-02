@@ -3,9 +3,9 @@
 
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
-#include <stan/math/error_handling/check_greater.hpp>
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/scalar/check_greater.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
@@ -57,8 +57,8 @@ namespace stan {
       using boost::math::tools::promote_args;
       using Eigen::Dynamic;
       using Eigen::Matrix;
-      using stan::math::check_greater;
-      using stan::math::check_size_match;
+      using stan::error_handling::check_greater;
+      using stan::error_handling::check_size_match;
       using stan::math::index_type;
 
       typename index_type<Matrix<T_scale,Dynamic,Dynamic> >::type k 
@@ -87,7 +87,7 @@ namespace stan {
       using stan::math::mdivide_left_ldlt;
       using stan::math::trace;
       using stan::math::LDLT_factor;
-      using stan::math::check_ldlt_factor;
+      using stan::error_handling::check_ldlt_factor;
       
       LDLT_factor<T_y,Eigen::Dynamic,Eigen::Dynamic> ldlt_W(W);
       check_ldlt_factor(function,ldlt_W,"LDLT_Factor of random variable",&lp);
@@ -136,8 +136,8 @@ namespace stan {
 
       static const char* function = "stan::prob::inv_wishart_rng(%1%)";
       
-      using stan::math::check_greater;
-      using stan::math::check_size_match;
+      using stan::error_handling::check_greater;
+      using stan::error_handling::check_size_match;
       using Eigen::MatrixXd;
       using stan::math::index_type;
 

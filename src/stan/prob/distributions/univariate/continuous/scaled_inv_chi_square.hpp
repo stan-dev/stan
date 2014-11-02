@@ -5,7 +5,7 @@
 #include <boost/random/variate_generator.hpp>
 
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/square.hpp>
 #include <stan/math/functions/multiply_log.hpp>
@@ -45,9 +45,9 @@ namespace stan {
       static const char* function 
         = "stan::prob::scaled_inv_chi_square_log(%1%)";
       
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
 
       // check if any vectors are zero length
@@ -193,10 +193,10 @@ namespace stan {
       static const char* function
         = "stan::prob::scaled_inv_chi_square_cdf(%1%)";
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
           
       double P(1.0);
@@ -316,10 +316,10 @@ namespace stan {
       static const char* function
         = "stan::prob::scaled_inv_chi_square_cdf_log(%1%)";
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
           
       double P(0.0);
@@ -425,10 +425,10 @@ namespace stan {
       static const char* function
         = "stan::prob::scaled_inv_chi_square_ccdf_log(%1%)";
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
           
       double P(0.0);
@@ -534,7 +534,7 @@ namespace stan {
       static const char* function 
         = "stan::prob::scaled_inv_chi_square_rng(%1%)";
       
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_positive_finite;
 
       check_positive_finite(function, nu, "Degrees of freedom parameter", 
                             (double*)0);
