@@ -109,6 +109,13 @@ TEST(OptimizationLbfgsUpdate, search_direction) {
 
   for (unsigned int rank = 1; rank <= maxRank; rank++) {
     QNUpdateT bfgsUp(rank);
+
+    sk.setZero(nDim);
+    yk.setZero(nDim);
+    sk[0] = 1;
+    yk[0] = 1;
+    bfgsUp.update(yk,sk,true);
+
     for (unsigned int i = 0; i < nDim; i++) {
       for (unsigned int j = 0; j <= std::min(rank,i); j++) {
         sk.setZero(nDim);
@@ -117,7 +124,6 @@ TEST(OptimizationLbfgsUpdate, search_direction) {
         yk[i - j] = 1;
 
         bfgsUp.search_direction(sdir,yk);
-      
       }
     }
   }
