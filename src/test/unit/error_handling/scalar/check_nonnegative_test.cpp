@@ -4,7 +4,7 @@
 using stan::error_handling::check_nonnegative;
 
 TEST(ErrorHandling,CheckNonnegative) {
-  const char* function = "check_nonnegative";
+  const std::string function = "check_nonnegative";
   double x = 0;
 
   EXPECT_TRUE(check_nonnegative(function, "x", x)) 
@@ -30,7 +30,7 @@ TEST(ErrorHandling,CheckNonnegative) {
 
 TEST(ErrorHandling,CheckNonnegativeVectorized) {
   int N = 5;
-  const char* function = "check_nonnegative";
+  const std::string function = "check_nonnegative";
   std::vector<double> x(N);
 
   x.assign(N, 0);
@@ -57,7 +57,7 @@ TEST(ErrorHandling,CheckNonnegativeVectorized) {
 
 TEST(ErrorHandling, CheckNonnegativeVectorized_one_indexed_message) {
   int N = 5;
-  const char* function = "check_nonnegative";
+  const std::string function = "check_nonnegative";
   std::vector<double> x(N);
   std::string message;
 
@@ -76,7 +76,7 @@ TEST(ErrorHandling, CheckNonnegativeVectorized_one_indexed_message) {
 }
 
 TEST(ErrorHandling,CheckNonnegative_nan) {
-  const char* function = "check_nonnegative";
+  const std::string function = "check_nonnegative";
   double nan = std::numeric_limits<double>::quiet_NaN();
 
   EXPECT_THROW(check_nonnegative(function, "x", nan),

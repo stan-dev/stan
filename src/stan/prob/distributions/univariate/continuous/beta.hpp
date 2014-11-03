@@ -45,7 +45,7 @@ namespace stan {
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_log(const T_y& y, 
              const T_scale_succ& alpha, const T_scale_fail& beta) {
-      static const char* function = "stan::prob::beta_log";
+      static const std::string function = "stan::prob::beta_log";
 
       using boost::math::digamma;
       using boost::math::lgamma;
@@ -218,7 +218,7 @@ namespace stan {
         return 1.0;
       
       // Error checks
-      static const char* function = "stan::prob::beta_cdf";
+      static const std::string function = "stan::prob::beta_cdf";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -364,7 +364,7 @@ namespace stan {
         return 0.0;
       
       // Error checks
-      static const char* function = "stan::prob::beta_cdf";
+      static const std::string function = "stan::prob::beta_cdf";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -483,7 +483,7 @@ namespace stan {
         return 0.0;
       
       // Error checks
-      static const char* function = "stan::prob::beta_cdf";
+      static const std::string function = "stan::prob::beta_cdf";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -596,7 +596,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::gamma_distribution;
       // Error checks
-      static const char* function = "stan::prob::beta_rng";
+      static const std::string function = "stan::prob::beta_rng";
 
       using stan::error_handling::check_positive_finite;
         

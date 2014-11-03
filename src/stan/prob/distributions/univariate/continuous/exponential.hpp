@@ -44,7 +44,7 @@ namespace stan {
     template <bool propto, typename T_y, typename T_inv_scale>
     typename return_type<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta) {
-      static const char* function = "stan::prob::exponential_log";
+      static const std::string function = "stan::prob::exponential_log";
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -120,7 +120,7 @@ namespace stan {
     typename return_type<T_y,T_inv_scale>::type
     exponential_cdf(const T_y& y, const T_inv_scale& beta) {
 
-      static const char* function = "stan::prob::exponential_cdf";
+      static const std::string function = "stan::prob::exponential_cdf";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -173,7 +173,7 @@ namespace stan {
     typename return_type<T_y,T_inv_scale>::type
     exponential_cdf_log(const T_y& y, const T_inv_scale& beta) {
 
-      static const char* function = "stan::prob::exponential_cdf_log";
+      static const std::string function = "stan::prob::exponential_cdf_log";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -218,7 +218,7 @@ namespace stan {
     typename return_type<T_y,T_inv_scale>::type
     exponential_ccdf_log(const T_y& y, const T_inv_scale& beta) {
 
-      static const char* function = "stan::prob::exponential_ccdf_log";
+      static const std::string function = "stan::prob::exponential_ccdf_log";
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -264,7 +264,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::exponential_distribution;
 
-      static const char* function = "stan::prob::exponential_rng";
+      static const std::string function = "stan::prob::exponential_rng";
 
       using stan::error_handling::check_positive_finite;
 

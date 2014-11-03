@@ -4,7 +4,7 @@
 using stan::error_handling::check_greater_or_equal;
 
 TEST(ErrorHandling,CheckGreaterOrEqual) {
-  const char* function = "check_greater_or_equal";
+  const std::string function = "check_greater_or_equal";
   double x = 10.0;
   double lb = 0.0;
  
@@ -37,7 +37,7 @@ TEST(ErrorHandling,CheckGreaterOrEqual) {
 }
 
 TEST(ErrorHandling,CheckGreaterOrEqualMatrix) {
-  const char* function = "check_greater_or_equal";
+  const std::string function = "check_greater_or_equal";
   double x;
   double low;
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
@@ -147,7 +147,7 @@ TEST(ErrorHandling,CheckGreaterOrEqualMatrix) {
 
 
 TEST(ErrorHandling,CheckGreaterOrEqual_Matrix_one_indexed_message) {
-  const char* function = "check_greater_or_equal";
+  const std::string function = "check_greater_or_equal";
   double x;
   double low;
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
@@ -207,7 +207,7 @@ TEST(ErrorHandling,CheckGreaterOrEqual_Matrix_one_indexed_message) {
 }
 
 TEST(ErrorHandling,CheckGreaterOrEqual_nan) {
-  const char* function = "check_greater_or_equal";
+  const std::string function = "check_greater_or_equal";
   double x = 10.0;
   double lb = 0.0;
   double nan = std::numeric_limits<double>::quiet_NaN();

@@ -44,7 +44,7 @@ namespace stan {
     multi_gp_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
                  const Eigen::Matrix<T_w,Eigen::Dynamic,1>& w) {
-      static const char* function = "stan::prob::multi_gp_cholesky_log";
+      static const std::string function = "stan::prob::multi_gp_cholesky_log";
       typedef typename boost::math::tools::promote_args<T_y,T_covar,T_w>::type T_lp;
       T_lp lp(0.0);
 

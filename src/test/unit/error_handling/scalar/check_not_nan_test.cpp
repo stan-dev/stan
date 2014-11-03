@@ -4,7 +4,7 @@
 using stan::error_handling::check_not_nan;
 
 TEST(ErrorHandling,CheckNotNan) {
-  const char* function = "check_not_nan";
+  const std::string function = "check_not_nan";
   double x = 0;
 
   EXPECT_TRUE(check_not_nan(function, "x", x))
@@ -26,7 +26,7 @@ TEST(ErrorHandling,CheckNotNan) {
 
 TEST(ErrorHandling,CheckNotNanVectorized) {
   int N = 5;
-  const char* function = "check_not_nan";
+  const std::string function = "check_not_nan";
   std::vector<double> x(N);
 
   x.assign(N, 0);
@@ -48,7 +48,7 @@ TEST(ErrorHandling,CheckNotNanVectorized) {
 
 TEST(ErrorHandling, CheckNotNanVectorized_one_indexed_message) {
   int N = 5;
-  const char* function = "check_not_nan";
+  const std::string function = "check_not_nan";
   std::vector<double> x(N);
   std::string message;
 

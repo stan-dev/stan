@@ -44,7 +44,7 @@ namespace stan {
               typename T_y, typename T_shape, typename T_inv_scale>
     typename return_type<T_y,T_shape,T_inv_scale>::type
     gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
-      static const char* function = "stan::prob::gamma_log";
+      static const std::string function = "stan::prob::gamma_log";
 
       using stan::is_constant_struct;
       using stan::error_handling::check_not_nan;
@@ -174,7 +174,7 @@ namespace stan {
         return 1.0;
           
       // Error checks
-      static const char* function = "stan::prob::gamma_cdf";
+      static const std::string function = "stan::prob::gamma_cdf";
           
       using stan::error_handling::check_positive_finite;      
       using stan::error_handling::check_not_nan;
@@ -287,7 +287,7 @@ namespace stan {
         return 0.0;
           
       // Error checks
-      static const char* function = "stan::prob::gamma_cdf_log";
+      static const std::string function = "stan::prob::gamma_cdf_log";
           
       using stan::error_handling::check_positive_finite;      
       using stan::error_handling::check_not_nan;
@@ -390,7 +390,7 @@ namespace stan {
         return 0.0;
           
       // Error checks
-      static const char* function = "stan::prob::gamma_ccdf_log";
+      static const std::string function = "stan::prob::gamma_ccdf_log";
           
       using stan::error_handling::check_positive_finite;      
       using stan::error_handling::check_not_nan;
@@ -493,7 +493,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::gamma_distribution;
 
-      static const char* function = "stan::prob::gamma_rng";
+      static const std::string function = "stan::prob::gamma_rng";
 
       using stan::error_handling::check_positive_finite;
       

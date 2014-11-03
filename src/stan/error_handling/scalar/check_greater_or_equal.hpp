@@ -12,8 +12,8 @@ namespace stan {
                 typename T_low,
                 bool is_vec>
       struct greater_or_equal {
-        static bool check(const char* function,
-                          const char* name,
+        static bool check(const std::string& function,
+                          const std::string& name,
                           const T_y& y,
                           const T_low& low) {
           using stan::length;
@@ -34,8 +34,8 @@ namespace stan {
       template <typename T_y,
                 typename T_low>
       struct greater_or_equal<T_y, T_low, true> {
-        static bool check(const char* function,
-                          const char* name,
+        static bool check(const std::string& function,
+                          const std::string& name,
                           const T_y& y,
                           const T_low& low) {
           using stan::length;
@@ -57,8 +57,8 @@ namespace stan {
     
     // throws if any element in y or low is nan
     template <typename T_y, typename T_low>
-    inline bool check_greater_or_equal(const char* function,
-                                       const char* name,
+    inline bool check_greater_or_equal(const std::string& function,
+                                       const std::string& name,
                                        const T_y& y,
                                        const T_low& low) {
       return greater_or_equal<T_y, T_low, is_vector_like<T_y>::value>

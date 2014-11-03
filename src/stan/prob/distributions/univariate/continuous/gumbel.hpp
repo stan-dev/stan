@@ -19,7 +19,7 @@ namespace stan {
     template <bool propto, typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     gumbel_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
-      static const char* function = "stan::prob::gumbel_log";
+      static const std::string function = "stan::prob::gumbel_log";
 
       using std::log;
       using std::exp;
@@ -110,7 +110,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta) {
-      static const char* function = "stan::prob::gumbel_cdf";
+      static const std::string function = "stan::prob::gumbel_cdf";
 
       using stan::error_handling::check_positive;
       using stan::error_handling::check_finite;
@@ -179,7 +179,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     gumbel_cdf_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
-      static const char* function = "stan::prob::gumbel_cdf_log";
+      static const std::string function = "stan::prob::gumbel_cdf_log";
 
       using stan::error_handling::check_positive;
       using stan::error_handling::check_finite;
@@ -233,7 +233,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     gumbel_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
-      static const char* function = "stan::prob::gumbel_ccdf_log";
+      static const std::string function = "stan::prob::gumbel_ccdf_log";
 
       using stan::error_handling::check_positive;
       using stan::error_handling::check_finite;
@@ -294,7 +294,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::uniform_01;
 
-      static const char* function = "stan::prob::gumbel_rng";
+      static const std::string function = "stan::prob::gumbel_rng";
 
       using stan::error_handling::check_positive;
       using stan::error_handling::check_finite;

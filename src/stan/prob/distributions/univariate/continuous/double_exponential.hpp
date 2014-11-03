@@ -23,7 +23,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_log(const T_y& y, 
                            const T_loc& mu, const T_scale& sigma) {
-      static const char* function
+      static const std::string function
         = "stan::prob::double_exponential_log";
       
       using stan::is_constant_struct;
@@ -138,7 +138,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_cdf(const T_y& y, 
                            const T_loc& mu, const T_scale& sigma) {
-      static const char* function
+      static const std::string function
         = "stan::prob::double_exponential_cdf";
       
       // Size checks
@@ -215,7 +215,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_cdf_log(const T_y& y, const T_loc& mu, 
                                const T_scale& sigma) {
-      static const char* function
+      static const std::string function
         = "stan::prob::double_exponential_cdf_log";
       
       using stan::error_handling::check_finite;
@@ -292,7 +292,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_ccdf_log(const T_y& y, const T_loc& mu, 
                                const T_scale& sigma) {
-      static const char* function
+      static const std::string function
         = "stan::prob::double_exponential_ccdf_log";
       
       using stan::error_handling::check_finite;
@@ -375,7 +375,7 @@ namespace stan {
       using std::log;
       using std::abs;
 
-      static const char* function
+      static const std::string function
         = "stan::prob::double_exponential_rng";
       
       using stan::error_handling::check_finite;

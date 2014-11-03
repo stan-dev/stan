@@ -4,7 +4,7 @@
 using stan::error_handling::check_less_or_equal;
 
 TEST(ErrorHandling,CheckLessOrEqual) {
-  const char* function = "check_less_or_equal";
+  const std::string function = "check_less_or_equal";
   double x = -10.0;
   double lb = 0.0;
  
@@ -37,7 +37,7 @@ TEST(ErrorHandling,CheckLessOrEqual) {
 }
 
 TEST(ErrorHandling,CheckLessOrEqual_Matrix) {
-  const char* function = "check_less_or_equal";
+  const std::string function = "check_less_or_equal";
   double x;
   double high;
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
@@ -117,7 +117,7 @@ TEST(ErrorHandling,CheckLessOrEqual_Matrix) {
 }
 
 TEST(ErrorHandling,CheckLessOrEqual_Matrix_one_indexed_message) {
-  const char* function = "check_less";
+  const std::string function = "check_less";
   double x;
   double high;
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
@@ -178,7 +178,7 @@ TEST(ErrorHandling,CheckLessOrEqual_Matrix_one_indexed_message) {
 }
 
 TEST(ErrorHandling,CheckLessOrEqual_nan) {
-  const char* function = "check_less_or_equal";
+  const std::string function = "check_less_or_equal";
   double x = 10.0;
   double lb = 0.0;
   double nan = std::numeric_limits<double>::quiet_NaN();

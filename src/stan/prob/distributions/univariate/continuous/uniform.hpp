@@ -42,7 +42,7 @@ namespace stan {
               typename T_y, typename T_low, typename T_high>
     typename return_type<T_y,T_low,T_high>::type
     uniform_log(const T_y& y, const T_low& alpha, const T_high& beta) {
-      static const char* function = "stan::prob::uniform_log";
+      static const std::string function = "stan::prob::uniform_log";
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
@@ -122,7 +122,7 @@ namespace stan {
     template <typename T_y, typename T_low, typename T_high>
     typename return_type<T_y,T_low,T_high>::type
     uniform_cdf(const T_y& y, const T_low& alpha, const T_high& beta) {
-      static const char* function = "stan::prob::uniform_cdf";
+      static const std::string function = "stan::prob::uniform_cdf";
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
@@ -197,7 +197,7 @@ namespace stan {
     template <typename T_y, typename T_low, typename T_high>
     typename return_type<T_y,T_low,T_high>::type
     uniform_cdf_log(const T_y& y, const T_low& alpha, const T_high& beta) {
-      static const char* function = "stan::prob::uniform_cdf_log";
+      static const std::string function = "stan::prob::uniform_cdf_log";
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
@@ -265,7 +265,7 @@ namespace stan {
   template <typename T_y, typename T_low, typename T_high>
     typename return_type<T_y,T_low,T_high>::type
     uniform_ccdf_log(const T_y& y, const T_low& alpha, const T_high& beta) {
-      static const char* function = "stan::prob::uniform_ccdf_log";
+      static const std::string function = "stan::prob::uniform_ccdf_log";
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
@@ -338,7 +338,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::uniform_real_distribution;
 
-      static const char* function = "stan::prob::uniform_rng";
+      static const std::string function = "stan::prob::uniform_rng";
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_greater;

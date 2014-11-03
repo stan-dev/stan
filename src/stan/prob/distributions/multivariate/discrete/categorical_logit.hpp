@@ -20,7 +20,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_logit_log(int n, 
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
-      static const char* function = "stan::prob::categorical_logit_log";
+      static const std::string function = "stan::prob::categorical_logit_log";
 
       using stan::error_handling::check_bounded;
       using stan::error_handling::check_finite;
@@ -49,7 +49,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_logit_log(const std::vector<int>& ns, 
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
-      static const char* function = "stan::prob::categorical_logit_log";
+      static const std::string function = "stan::prob::categorical_logit_log";
 
       using stan::error_handling::check_bounded;
       using stan::error_handling::check_finite;

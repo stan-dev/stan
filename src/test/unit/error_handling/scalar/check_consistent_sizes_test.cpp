@@ -7,11 +7,11 @@ TEST(MathMatrixErrorHandling, checkConsistentSizes) {
   using stan::error_handling::check_consistent_sizes;
   using stan::size_of;
 
-  const char* function = "testConsSizes";
-  const char* name1 = "name1";
-  const char* name2 = "name2";
-  const char* name3 = "name3";
-  const char* name4 = "name4";
+  const std::string function = "testConsSizes";
+  const std::string name1 = "name1";
+  const std::string name2 = "name2";
+  const std::string name3 = "name3";
+  const std::string name4 = "name4";
   
 
   Matrix<double,Dynamic,1> v1(4);
@@ -29,7 +29,7 @@ TEST(MathMatrixErrorHandling, checkConsistentSizes) {
   Matrix<double,Dynamic,1> v(3);
   
   ASSERT_EQ(3U, size_of(v));
-  const char* name = "inconsistent";
+  const std::string name = "inconsistent";
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2),
                std::domain_error);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name, v),
@@ -57,11 +57,11 @@ TEST(MathMatrixErrorHandling, checkConsistentSizes_nan) {
   using stan::error_handling::check_consistent_sizes;
   using stan::size_of;
 
-  const char* function = "testConsSizes";
-  const char* name1 = "name1";
-  const char* name2 = "name2";
-  const char* name3 = "name3";
-  const char* name4 = "name4";
+  const std::string function = "testConsSizes";
+  const std::string name1 = "name1";
+  const std::string name2 = "name2";
+  const std::string name3 = "name3";
+  const std::string name4 = "name4";
   
   double nan = std::numeric_limits<double>::quiet_NaN();
 
@@ -85,7 +85,7 @@ TEST(MathMatrixErrorHandling, checkConsistentSizes_nan) {
   Matrix<double,Dynamic,1> v(3);
   v << nan,1,2;
   ASSERT_EQ(3U, size_of(v));
-  const char* name = "inconsistent";
+  const std::string name = "inconsistent";
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2),
                std::domain_error);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name, v),
