@@ -1,18 +1,6 @@
 #ifndef STAN__ERROR_HANDLING__SCALAR__DOM_ERR_HPP
 #define STAN__ERROR_HANDLING__SCALAR__DOM_ERR_HPP
 
-#include <typeinfo>
-#ifdef BOOST_MSVC
-#  pragma warning(push) // Quiet warnings in boost/format.hpp
-#  pragma warning(disable: 4996) // _SCL_SECURE_NO_DEPRECATE
-#  pragma warning(disable: 4512) // assignment operator could not be generated.
-// And warnings in error handling:
-#  pragma warning(disable: 4702) // unreachable code
-// Note that this only occurs when the compiler can deduce code is unreachable,
-// for example when policy macros are used to ignore errors rather than throw.
-#endif
-#include <boost/format.hpp>
-
 #include <string>
 #include <sstream>
 #include <stdexcept>
