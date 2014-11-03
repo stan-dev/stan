@@ -4,7 +4,7 @@
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/inverse.hpp>
@@ -14,7 +14,7 @@
 #include <stan/math/matrix/inverse.hpp>
 #include <stan/agrad/fwd/matrix/inverse.hpp>
 #include <stan/math/matrix/mdivide_left.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace agrad {
@@ -27,8 +27,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_left;
-      stan::math::check_square("mdivide_left(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("mdivide_left(%1%)",A,"A",
+      stan::error_handling::check_square("mdivide_left(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_multiplicable("mdivide_left(%1%)",A,"A",
                                       b,"b",(double*)0);
 
       Eigen::Matrix<T,R1,C2> inv_A_mult_b(A.rows(),b.cols());
@@ -71,8 +71,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_left;
-      stan::math::check_square("mdivide_left(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("mdivide_left(%1%)",A,"A",
+      stan::error_handling::check_square("mdivide_left(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_multiplicable("mdivide_left(%1%)",A,"A",
                                       b,"b",(double*)0);
 
       Eigen::Matrix<T,R2,C2> val_b(b.rows(),b.cols()); 
@@ -97,8 +97,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_left;
-      stan::math::check_square("mdivide_left(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("mdivide_left(%1%)",A,"A",
+      stan::error_handling::check_square("mdivide_left(%1%)",A,"A",(double*)0);
+      stan::error_handling::check_multiplicable("mdivide_left(%1%)",A,"A",
                                       b,"b",(double*)0);
 
       Eigen::Matrix<T,R1,C2> 

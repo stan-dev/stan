@@ -6,7 +6,7 @@
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
@@ -34,10 +34,10 @@ namespace stan {
 
       static const char* function = "stan::prob::neg_binomial_log(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
@@ -153,11 +153,11 @@ namespace stan {
 
       static const char* function = "stan::prob::neg_binomial_log(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
@@ -271,7 +271,7 @@ namespace stan {
 
       static const char* function = "stan::prob::neg_binomial_2_rng(%1%)";
 
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_positive_finite;
 
       check_positive_finite(function, mu, "Location parameter", (double*)0);
       check_positive_finite(function, phi, "Inverse scale parameter", 
@@ -291,8 +291,8 @@ namespace stan {
 
       static const char* function = "stan::prob::neg_binomial_2_log_rng(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive_finite;
 
       check_finite(function, eta, "Log-location parameter", (double*)0);
       check_positive_finite(function, phi, "Inverse scale parameter", 

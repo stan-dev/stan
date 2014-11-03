@@ -1,0 +1,34 @@
+#ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_VECTOR_HPP
+#define STAN__ERROR_HANDLING__MATRIX__CHECK_VECTOR_HPP
+
+#include <sstream>
+#include <stan/meta/traits.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+
+namespace stan {
+  namespace error_handling {
+
+    // NOTE: this will not throw if x contains nan values.
+    template <typename T, int R, int C, typename T_result>
+    inline bool check_vector(const char* function,
+                             const Eigen::Matrix<T,R,C>& x,
+                             const char* name,
+                             T_result* result) {
+      if (x.rows() == 1 || x.cols() == 1)
+        return true;
+
+      std::ostringstream msg;
+      msg << name << " (%1%) has " << x.rows() << " rows and " 
+          << x.cols() << " columns but it should be a vector so it should either have 1 row or 1 column";
+      std::string tmp(msg.str());
+      return dom_err(function, 
+                     typename scalar_type<T>::type(),
+                     name,
+                     tmp.c_str(),"",
+                     result);
+    }
+
+  }
+}
+#endif

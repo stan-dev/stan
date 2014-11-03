@@ -4,8 +4,8 @@
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/math/error_handling.hpp>
-#include <stan/math/matrix_error_handling.hpp>
+#include <stan/error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
@@ -24,8 +24,8 @@ namespace stan {
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
       static const char* function = "stan::prob::categorical_log(%1%)";
 
-      using stan::math::check_bounded;
-      using stan::math::check_simplex;
+      using stan::error_handling::check_bounded;
+      using stan::error_handling::check_simplex;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -74,8 +74,8 @@ namespace stan {
       static const char* function = "stan::prob::categorical_log(%1%)";
 
       using boost::math::tools::promote_args;
-      using stan::math::check_bounded;
-      using stan::math::check_simplex;
+      using stan::error_handling::check_bounded;
+      using stan::error_handling::check_simplex;
       using stan::math::sum;
       using stan::math::value_of;
 
@@ -132,7 +132,7 @@ namespace stan {
                     RNG& rng) {
       using boost::variate_generator;
       using boost::uniform_01;
-      using stan::math::check_simplex;
+      using stan::error_handling::check_simplex;
 
       static const char* function = "stan::prob::categorical_rng(%1%)";
 

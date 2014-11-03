@@ -5,7 +5,7 @@
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
@@ -26,10 +26,10 @@ namespace stan {
                        const T_a& a, const T_b& b) {
       static const char* function = "stan::prob::hypergeometric_log(%1%)";
 
-      using stan::math::check_finite;      
-      using stan::math::check_bounded;
-      using stan::math::check_greater;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_finite;      
+      using stan::error_handling::check_bounded;
+      using stan::error_handling::check_greater;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
@@ -97,8 +97,8 @@ namespace stan {
       
       static const char* function = "stan::prob::hypergeometric_rng(%1%)";
 
-      using stan::math::check_bounded;
-      using stan::math::check_positive;
+      using stan::error_handling::check_bounded;
+      using stan::error_handling::check_positive;
 
       check_bounded(function, N, 0, a+b, "Draws parameter", (int*)0);
       check_positive(function,N,"Draws parameter", (int*)0);

@@ -6,7 +6,7 @@
 
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/log1p.hpp>
 #include <stan/math/functions/square.hpp>
@@ -43,10 +43,10 @@ namespace stan {
       static const char* function = "stan::prob::cauchy_log(%1%)";
 
       using stan::is_constant_struct;
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
 
       // check if any vectors are zero length
@@ -164,10 +164,10 @@ namespace stan {
         
       static const char* function = "stan::prob::cauchy_cdf(%1%)";
       
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -261,10 +261,10 @@ namespace stan {
         
       static const char* function = "stan::prob::cauchy_cdf(%1%)";
       
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -328,10 +328,10 @@ namespace stan {
         
       static const char* function = "stan::prob::cauchy_cdf(%1%)";
       
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -393,8 +393,8 @@ namespace stan {
 
       static const char* function = "stan::prob::cauchy_rng(%1%)";
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
       
       check_finite(function, mu, "Location parameter", (double*)0);
       check_positive_finite(function, sigma, "Scale parameter", (double*)0);

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/matrix/log_softmax.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
 #include <stan/math/matrix/log_sum_exp.hpp>
@@ -22,8 +22,8 @@ namespace stan {
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
       static const char* function = "stan::prob::categorical_logit_log(%1%)";
 
-      using stan::math::check_bounded;
-      using stan::math::check_finite;
+      using stan::error_handling::check_bounded;
+      using stan::error_handling::check_finite;
       using stan::math::log_sum_exp;
 
       double lp = 0.0;
@@ -55,8 +55,8 @@ namespace stan {
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
       static const char* function = "stan::prob::categorical_logit_log(%1%)";
 
-      using stan::math::check_bounded;
-      using stan::math::check_finite;
+      using stan::error_handling::check_bounded;
+      using stan::error_handling::check_finite;
       using stan::math::log_softmax;
       using stan::math::sum;
 

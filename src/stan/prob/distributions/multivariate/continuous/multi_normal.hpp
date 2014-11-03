@@ -6,16 +6,16 @@
 
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/matrix/trace_inv_quad_form_ldlt.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
-#include <stan/math/error_handling/check_finite.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {
 
@@ -31,12 +31,12 @@ namespace stan {
       typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp_type;
       lp_type lp(0.0);
       
-      using stan::math::check_size_match;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_positive;
-      using stan::math::check_symmetric;
-      using stan::math::check_ldlt_factor;
+      using stan::error_handling::check_size_match;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_symmetric;
+      using stan::error_handling::check_ldlt_factor;
 
       check_size_match(function,
                             Sigma.rows(), "Rows of covariance parameter",
@@ -144,9 +144,9 @@ namespace stan {
 
       static const char* function = "stan::prob::multi_normal_rng(%1%)";
 
-      using stan::math::check_finite;
-      using stan::math::check_positive;
-      using stan::math::check_symmetric;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_symmetric;
  
       check_positive(function, S.rows(), "Covariance matrix rows", (double*)0);
       check_symmetric(function, S, "Covariance matrix", (double*)0);
