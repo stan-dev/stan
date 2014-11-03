@@ -8,7 +8,6 @@
 #include <stan/prob/traits.hpp>
 #include <stan/agrad/rev.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/matrix/row.hpp>
 #include <stan/math/matrix/dot_self.hpp>
 #include <stan/math/matrix/log.hpp>

@@ -9,10 +9,7 @@
 #include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/agrad/rev.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/rev/matrix.hpp>
-#include <stan/agrad/rev/matrix/to_var.hpp>
 
 #include <stan/math/matrix/add.hpp>
 #include <stan/math/matrix/dot_product.hpp>

@@ -3,9 +3,8 @@
 
 #include <boost/concept_check.hpp>
 
-#include <stan/agrad/rev/matrix.hpp>
-#include <stan/error_handling.hpp>
-#include <stan/error_handling/matrix.hpp>
+#include <stan/error_handling/scalar/check_greater.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
 #include <stan/error_handling/matrix/check_ldlt_factor.hpp>
 #include <stan/math/functions/lmgamma.hpp>
 #include <stan/math/matrix/crossprod.hpp>

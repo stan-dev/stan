@@ -12,7 +12,7 @@
 #include <stan/agrad/rev/internal.hpp>
 #include <stan/agrad/rev/operators.hpp>
 #include <stan/agrad/rev/functions.hpp>
-#include <stan/agrad/rev/error_handling.hpp>
+//#include <stan/agrad/rev/error_handling.hpp>
 #include <stan/agrad/rev/ode.hpp>
 
 #endif

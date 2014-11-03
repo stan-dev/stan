@@ -11,8 +11,6 @@
 #include <boost/throw_exception.hpp>
 #include <boost/math/tools/promotion.hpp>
 
-#include <stan/agrad/rev/matrix.hpp>
-
 #include <stan/math.hpp>
 #include <stan/error_handling/scalar/check_bounded.hpp>
 #include <stan/error_handling/scalar/check_greater_or_equal.hpp>

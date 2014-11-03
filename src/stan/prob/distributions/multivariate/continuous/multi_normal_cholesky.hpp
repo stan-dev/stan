@@ -3,13 +3,9 @@
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
-
-#include <stan/agrad/rev.hpp>
-#include <stan/agrad/rev/matrix.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/columns_dot_self.hpp>
 #include <stan/math/matrix/dot_product.hpp>

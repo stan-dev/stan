@@ -16,8 +16,8 @@
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 
-#include <stan/agrad/fwd.hpp>
-#include <stan/agrad/fwd/matrix.hpp>
+//#include <stan/agrad/fwd.hpp>
+//#include <stan/agrad/fwd/matrix.hpp>
 
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>

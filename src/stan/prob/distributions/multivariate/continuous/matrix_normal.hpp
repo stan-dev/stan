@@ -5,9 +5,7 @@
 #include <stan/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/agrad/rev.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/math/matrix/subtract.hpp>

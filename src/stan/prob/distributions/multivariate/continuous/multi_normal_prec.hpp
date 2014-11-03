@@ -1,8 +1,6 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_PREC_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_PREC_HPP
 
-#include <stan/agrad/rev.hpp>
-#include <stan/agrad/rev/matrix.hpp>
 #include <stan/error_handling.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/columns_dot_self.hpp>
@@ -18,7 +16,6 @@
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
-#include <stan/agrad/rev/matrix/trace_quad_form.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
