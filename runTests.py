@@ -1,22 +1,20 @@
 #!/usr/bin/python
 
-import argparse
-import os
-import os.path
-import platform
-import re
-import sys
-import subprocess
-import time
-
 """
 replacement for runtest target in Makefile
 arg 1:  test dir or test file
 """
 
+import os
+import os.path
+import platform
+import sys
+import subprocess
+import time
+
 winsfx = ".exe"
 testsfx = "_test.cpp"
-debug = False
+debug = True
 batchSize = 25
 
 def usage():
@@ -25,9 +23,9 @@ def usage():
     sys.stdout.write('       %s -j<#cores> <path/test/dir(/files)>\n' % sys.argv[0])
     sys.exit(0)
 
-def stopErr( msg, returncode ):
-    sys.stderr.write( '%s\n' % msg )
-    sys.stderr.write( 'exit now ( %s)\n' % time.strftime('%x %X %Z'))
+def stopErr(msg, returncode):
+    sys.stderr.write('%s\n' % msg)
+    sys.stderr.write('exit now (%s)\n' % time.strftime('%x %X %Z'))
     sys.exit(returncode)
 
 def isWin():
@@ -37,11 +35,11 @@ def isWin():
     return False
 
 # set up good makefile target name    
-def mungeName( name ):
+def mungeName(name):
     if (name.startswith("src")):
         name = name.replace("src/","",1)
     if (name.endswith(testsfx)):
-        name = name.replace(testsfx,"");
+        name = name.replace(testsfx,"")
         if (isWin()):
             name += winsfx
             name = name.replace("\\","/")
@@ -56,15 +54,21 @@ def doCommand(command):
         stopErr('%s failed' % command, p1.returncode)
 
 def generateTests(j):
-    command = 'make -j%d generate-tests -s' % j
+    if (j == None):
+        command = 'make generate-tests -s'
+    else:
+        command = 'make -j%d generate-tests -s' % j
     doCommand(command)
 
-def makeTest( name, j ):
+def makeTest(name, j):
     target = mungeName(name)
-    command = 'make -j%d %s' % (j,target)
+    if (j == None):
+        command = 'make %s' % target
+    else:
+        command = 'make -j%d %s' % (j,target)
     doCommand(command)
     
-def makeTests( dirname, filenames, j ):
+def makeTests(dirname, filenames, j):
     targets = list()
     for name in filenames:
         if (not name.endswith(testsfx)):
@@ -78,7 +82,10 @@ def makeTests( dirname, filenames, j ):
         startIdx = 0
         endIdx = batchSize
         while (startIdx < len(targets)):
-            command = 'make -j%d %s' % (j,' '.join(targets[startIdx:endIdx]))
+            if (j == None):
+                command = 'make %s' % ' '.join(targets[startIdx:endIdx])
+            else:
+                command = 'make -j%d %s' % (j,' '.join(targets[startIdx:endIdx]))
             if (debug):
                 print('start %d, end %d' % (startIdx,endIdx))
                 print(command)
@@ -100,7 +107,7 @@ def main():
         usage()
 
     argsIdx = 1
-    j = 1
+    j = None
     if (sys.argv[1].startswith("-j")):
         argsIdx = 2
         if (len(sys.argv) < 3):
@@ -113,7 +120,7 @@ def main():
                     stopErr("bad value for -j flag",-1)                    
                 j = jprime
             except ValueError:
-                stopErr("bad value for -j flag"-1)
+                stopErr("bad value for -j flag",-1)
             
     # pass 0: generate all auto-generated tests
     generateTests(j)
@@ -122,10 +129,10 @@ def main():
     for i in range(argsIdx,len(sys.argv)):
         testname = sys.argv[i]
         if (not(os.path.exists(testname))):
-            stopErr( '%s: no such file or directory' % testname,-1)
+            stopErr('%s: no such file or directory' % testname,-1)
         if (not(os.path.isdir(testname))):
             if (not(testname.endswith(testsfx))):
-                stopErr( '%s: not a testfile' % testname,-1)
+                stopErr('%s: not a testfile' % testname,-1)
             if (debug):
                 print("make single test: %s" % testname)
             makeTest(testname,j)
@@ -145,10 +152,10 @@ def main():
         else:
             for root, dirs, files in os.walk(testname):
                 for name in files:
-                        if (name.endswith(testsfx)):
-                            if (debug):
-                                print("run dir,test: %s,%s" % (root,name))
-                            runTest(os.sep.join([root,name]))
+                    if (name.endswith(testsfx)):
+                        if (debug):
+                            print("run dir,test: %s,%s" % (root,name))
+                        runTest(os.sep.join([root,name]))
 
     
 if __name__ == "__main__":
