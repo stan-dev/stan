@@ -20,8 +20,8 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T_y>
-    inline bool check_square(const char* function,
-                             const char* name,
+    inline bool check_square(const std::string& function,
+                             const std::string& name,
                              const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       check_size_match(function, 
                        "Rows of matrix", y.rows(), 

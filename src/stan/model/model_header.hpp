@@ -1,6 +1,7 @@
 #ifndef STAN__MODEL__MODEL__HEADER_HPP__
 #define STAN__MODEL__MODEL__HEADER_HPP__
 
+
 #include <cmath>
 #include <cstddef>
 #include <fstream>
@@ -12,6 +13,8 @@
 
 #include <boost/exception/all.hpp>
 #include <boost/random/linear_congruential.hpp>
+
+#include <stan/agrad/rev/matrix/Eigen_NumTraits.hpp>
 
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
@@ -25,8 +28,8 @@
 #include <stan/io/writer.hpp>
 #include <stan/io/csv_writer.hpp>
 
-#include <stan/math/matrix.hpp>
 #include <stan/math.hpp>
+#include <stan/math/matrix.hpp>
 
 #include <stan/math/rep_array.hpp>
 #include <stan/math/rep_vector.hpp>

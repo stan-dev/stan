@@ -25,8 +25,8 @@ namespace stan {
      * @return throws if any element in y is nan
      */
     template <typename T_y>
-    bool check_ordered(const char* function,
-                       const char* name,
+    bool check_ordered(const std::string& function,
+                       const std::string& name,
                        const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
@@ -46,10 +46,8 @@ namespace stan {
           std::ostringstream msg2;
           msg2 << ", but should be greater than the previous element, "
                << y[n-1];
-          std::string message1(msg1.str());
-          std::string message2(msg2.str());
           dom_err(function, name, y[n],
-                  message1.c_str(), message2.c_str());
+                  msg1.str(), msg2.str());
           return false;
         }
       }
@@ -57,8 +55,8 @@ namespace stan {
     }  
     
     template <typename T_y>
-    bool check_ordered(const char* function,
-                       const char* name,
+    bool check_ordered(const std::string& function,
+                       const std::string& name,
                        const std::vector<T_y>& y) {
       if (y.size() == 0) {
         return true;
@@ -72,10 +70,8 @@ namespace stan {
           std::ostringstream msg2;
           msg2 << ", but should be greater than the previous element, "
                << y[n-1];
-          std::string message1(msg1.str());
-          std::string message2(msg2.str());
           dom_err(function, name, y[n],
-                  message1.c_str(), message2.c_str());
+                  msg1.str(), msg2.str());
           return false;
         }
       }

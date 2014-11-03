@@ -10,6 +10,7 @@
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
+#include <stan/math/matrix/trace_gen_quad_form.hpp>
 #include <stan/error_handling/matrix/check_ldlt_factor.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 

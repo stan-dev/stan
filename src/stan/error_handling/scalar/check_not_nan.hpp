@@ -12,8 +12,8 @@ namespace stan {
     namespace {
       template <typename T_y, bool is_vec>
       struct not_nan {
-        static bool check(const char* function,
-                          const char* name,
+        static bool check(const std::string& function,
+                          const std::string& name,
                           const T_y& y) {
           if ((boost::math::isnan)(y)) 
             dom_err(function, name, y,
@@ -24,8 +24,8 @@ namespace stan {
     
       template <typename T_y>
       struct not_nan<T_y, true> {
-        static bool check(const char* function,
-                          const char* name,
+        static bool check(const std::string& function,
+                          const std::string& name,
                           const T_y& y) {
           // using stan::length;
           for (size_t n = 0; n < stan::length(y); n++) {
@@ -47,8 +47,8 @@ namespace stan {
      * @tparam T_y Type of variable being tested.
      */
     template <typename T_y>
-    inline bool check_not_nan(const char* function,
-                              const char* name,
+    inline bool check_not_nan(const std::string& function,
+                              const std::string& name,
                               const T_y& y) {
       return not_nan<T_y, is_vector_like<T_y>::value>
         ::check(function, name, y);

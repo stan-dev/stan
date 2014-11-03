@@ -27,8 +27,8 @@ namespace stan {
      */
     template <typename T_y>
     inline bool 
-    check_symmetric(const char* function,
-                    const char* name,
+    check_symmetric(const std::string& function,
+                    const std::string& name,
                     const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
@@ -51,10 +51,8 @@ namespace stan {
                  << name << "[" << stan::error_index::value +n << "," 
                  << stan::error_index::value + m 
                  << "] element is " << y(n,m);
-            std::string message1(msg1.str());
-            std::string message2(msg2.str());
             dom_err(function, name, y(m,n), 
-                    message1.c_str(), message2.c_str());
+                    msg1.str(), msg2.str());
             return false;
           }
         }

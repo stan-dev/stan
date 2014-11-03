@@ -9,8 +9,8 @@ namespace stan {
 
     // throws if any element in y is nan
     template <typename T_y>
-    inline bool check_positive_finite(const char* function,
-                                      const char* name,
+    inline bool check_positive_finite(const std::string& function,
+                                      const std::string& name,
                                       const T_y& y) {
       stan::error_handling::check_positive(function, name, y);
       stan::error_handling::check_finite(function, name, y);

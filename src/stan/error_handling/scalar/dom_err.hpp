@@ -13,24 +13,13 @@
 #endif
 #include <boost/format.hpp>
 
+#include <string>
 #include <sstream>
 #include <stdexcept>
 
 namespace stan {
   namespace error_handling {
 
-    namespace {
-      // local output stream for pairs
-      template <typename T1, typename T2>
-      std::ostream& operator<<(std::ostream& o,
-                               std::pair<T1,T2> xs) {
-        o << '(' << xs.first << ", " << xs.second << ')';
-        return o;
-      }
-    }
-
-
-    // dom_err("function", "name", y, msg1, msg2);
     /**
      * Throw a domain error with a consistently formatted message.
      * 
@@ -50,11 +39,11 @@ namespace stan {
      * @param msg2 Message to print after the variable
      */
     template <typename T>
-    inline void dom_err(const char* function,
-                        const char* name,
+    inline void dom_err(const std::string& function,
+                        const std::string& name,
                         const T& y,
-                        const char* msg1,
-                        const char* msg2) {
+                        const std::string& msg1,
+                        const std::string& msg2) {
       std::ostringstream message;
       
       message << function << "(" << typeid(T).name() << "): "
@@ -84,10 +73,10 @@ namespace stan {
      * @param msg1 Message to print before the variable
      */
     template <typename T>
-    inline void dom_err(const char* function,
-                        const char* name,
+    inline void dom_err(const std::string& function,
+                        const std::string& name,
                         const T& y,
-                        const char* msg1) {
+                        const std::string& msg1) {
       dom_err(function, name, y, msg1, "");
     }
 

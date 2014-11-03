@@ -25,8 +25,8 @@ namespace stan {
      * values.
      */
     template <typename T_y>
-    bool check_positive_ordered(const char* function, 
-                                const char* name,
+    bool check_positive_ordered(const std::string& function, 
+                                const std::string& name,
                                 const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
@@ -42,9 +42,8 @@ namespace stan {
             << " The element at " << stan::error_index::value 
             << " is ";
 
-        std::string message(msg.str());
         dom_err(function, name, y[0],
-                message.c_str(), ", but should be postive.");
+                msg.str(), ", but should be postive.");
       }
       for (size_type n = 1; n < y.size(); n++) {
         if (!(y[n] > y[n-1])) {
@@ -55,10 +54,8 @@ namespace stan {
           std::ostringstream msg2;
           msg2 << ", but should be greater than the previous element, "
                << y[n-1];
-          std::string message1(msg1.str());
-          std::string message2(msg2.str());
           dom_err(function, name, y[n],
-                  message1.c_str(), message2.c_str());
+                  msg1.str(), msg2.str());
           return false;
         }
       }

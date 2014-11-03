@@ -66,10 +66,10 @@ public:
 
   }
 
-  const char* function_;
-  const char* y_name_;
-  const char* msg1_;
-  const char* msg2_;
+  std::string function_;
+  std::string y_name_;
+  std::string msg1_;
+  std::string msg2_;
 };
 
 TEST_F(ErrorHandling_dom_err, double) {

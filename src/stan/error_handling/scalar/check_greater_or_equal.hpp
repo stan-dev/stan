@@ -23,9 +23,8 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be greater than or equal to ";
               msg << low_vec[n];
-              std::string message(msg.str());
               dom_err(function, name, y,
-                      "is ", message.c_str());
+                      "is ", msg.str());
             }
           }
           return true;
@@ -47,9 +46,8 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be greater than or equal to ";
               msg << low_vec[n];
-              std::string message(msg.str());
               dom_err_vec(function, name, y, n,
-                          "is ", message.c_str());
+                          "is ", msg.str());
             }
           }
           return true;

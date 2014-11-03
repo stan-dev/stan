@@ -29,8 +29,8 @@ namespace stan {
     // FIXME: update warnings (message has (0,0) item)
     template <typename T_y>
     inline bool 
-    check_pos_semidefinite(const char* function,
-                           const char* name,
+    check_pos_semidefinite(const std::string& function,
+                           const std::string& name,
                            const Eigen::Matrix<T_y,
                                                Eigen::Dynamic,
                                                Eigen::Dynamic>& y) {
@@ -44,9 +44,8 @@ namespace stan {
         std::ostringstream msg;
         msg << "is not positive semi-definite. " 
             << name << "(0,0) is ";
-        std::string message(msg.str());
         dom_err(function, name, y(0,0),
-                message.c_str());
+                msg.str());
       }
       Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
         = y.ldlt();
@@ -54,18 +53,16 @@ namespace stan {
         std::ostringstream msg;
         msg << "is not positive semi-definite. " 
             << name << "(0,0) is ";
-        std::string message(msg.str());
         dom_err(function, name, y(0,0),
-                message.c_str());
+                msg.str());
       }
       for (int i = 0; i < y.size(); i++)
         if (boost::math::isnan(y(i))) {
           std::ostringstream msg;
           msg << "is not positive semi-definite. " 
                   << name << "(0,0) is ";
-          std::string message(msg.str());
           dom_err(function, name, y(0,0), 
-                  message.c_str(), "");
+                  msg.str(), "");
         }
       return true;
     }

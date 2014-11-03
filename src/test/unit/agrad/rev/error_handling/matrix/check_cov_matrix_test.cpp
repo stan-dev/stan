@@ -10,7 +10,6 @@ TEST(AgradRevErrorHandlingMatrix,CheckCovMatrix) {
   using stan::error_handling::check_cov_matrix;
   
   const char* function = "check_cov_matrix";
-  var result = 0;
   Matrix<var,Dynamic,Dynamic> Sigma;
   Sigma.resize(1,1);
   Sigma << 1;

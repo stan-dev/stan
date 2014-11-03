@@ -20,17 +20,16 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T, int R, int C>
-    inline bool check_ldlt_factor(const char* function,
-                                  const char* name,
+    inline bool check_ldlt_factor(const std::string& function,
+                                  const std::string& name,
                                   stan::math::LDLT_factor<T,R,C> &A) {
       if (!A.success()) {
         std::ostringstream msg;
         msg << "is not positive definite. "
             << "last conditional variance is ";
-        std::string message(msg.str());
         const T too_small = A.vectorD().tail(1)(0);
         dom_err(function, name, too_small,
-                message.c_str(), ".");
+                msg.str(), ".");
         return false;
       }
       return true;

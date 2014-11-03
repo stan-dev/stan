@@ -10,10 +10,10 @@ namespace stan {
 
     // FIXME: update warnings
     template <typename T_size1, typename T_size2>
-    inline bool check_size_match(const char* function,
-                                 const char* name_i,
+    inline bool check_size_match(const std::string& function,
+                                 const std::string& name_i,
                                  T_size1 i,
-                                 const char* name_j, 
+                                 const std::string& name_j, 
                                  T_size2 j) {
       typedef typename boost::common_type<T_size1,T_size2>::type common_type;
       if (static_cast<common_type>(i) == static_cast<common_type>(j))
@@ -22,9 +22,8 @@ namespace stan {
       std::ostringstream msg;
       msg << ") and " 
           << name_j << " (" << j << ") must match in size";
-      std::string message(msg.str());
       dom_err(function, name_i, i,
-              "(", message.c_str());
+              "(", msg.str());
       return false;
     }
 

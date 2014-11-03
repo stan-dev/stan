@@ -23,8 +23,8 @@ namespace stan {
      * @return throws if any element in theta is nan
      */
     template <typename T_prob>
-    bool check_unit_vector(const char* function,
-                           const char* name,
+    bool check_unit_vector(const std::string& function,
+                           const std::string& name,
                            const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
       if (theta.size() == 0) {
         dom_err(function, name, 0,
@@ -36,9 +36,8 @@ namespace stan {
         std::stringstream msg;
         msg << "is not a valid unit vector."
             << " The sum of the squares of the elements should be 1, but is ";
-        std::string message(msg.str());
         dom_err(function, name, ssq,
-                message.c_str());
+                msg.str());
       }
       return true;
     }

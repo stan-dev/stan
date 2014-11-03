@@ -25,16 +25,15 @@ namespace stan {
      */
     // FIXME: update warnings (message has (0,0) item)
     template <typename T_y>
-    inline bool check_pos_definite(const char* function,
-                                   const char* name,
+    inline bool check_pos_definite(const std::string& function,
+                                   const std::string& name,
                                    const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       if (y.rows() == 1 && !(y(0,0) > CONSTRAINT_TOLERANCE)) {
         std::ostringstream msg;
         msg << "is not positive definite. " 
                 << name << "(0,0) is ";
-        std::string message(msg.str());
         dom_err(function, name, y(0,0), 
-                message.c_str());
+                msg.str());
       }
       for (int i = 0; i < y.size(); ++i)
         check_not_nan(function, name, y(i));
@@ -47,9 +46,8 @@ namespace stan {
         std::ostringstream msg;
         msg << "is not positive definite. " 
                 << name << "(0,0) is ";
-        std::string message(msg.str());
         dom_err(function, name, y(0,0),
-                message.c_str());
+                msg.str());
       }
       return true;
     }

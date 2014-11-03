@@ -10,10 +10,10 @@ namespace stan {
 
     // NOTE: this will not throw if nan is passed in.
     template <typename T1, typename T2>
-    inline bool check_consistent_sizes(const char* function,
-                                       const char* name1,
+    inline bool check_consistent_sizes(const std::string& function,
+                                       const std::string& name1,
                                        const T1& x1, 
-                                       const char* name2,
+                                       const std::string& name2,
                                        const T2& x2) {
       size_t max_size = std::max(size_of(x1),
                                  size_of(x2));
@@ -22,12 +22,12 @@ namespace stan {
     }
 
     template <typename T1, typename T2, typename T3>
-    inline bool check_consistent_sizes(const char* function,
-                                       const char* name1,
+    inline bool check_consistent_sizes(const std::string& function,
+                                       const std::string& name1,
                                        const T1& x1, 
-                                       const char* name2, 
+                                       const std::string& name2, 
                                        const T2& x2, 
-                                       const char* name3, 
+                                       const std::string& name3, 
                                        const T3& x3) {
       size_t max_size = std::max(size_of(x1),
                                  std::max(size_of(x2),size_of(x3)));
@@ -36,14 +36,14 @@ namespace stan {
         && check_consistent_size(function, name3, x3, max_size);
     }
     template <typename T1, typename T2, typename T3, typename T4>
-    inline bool check_consistent_sizes(const char* function,
-                                       const char* name1, 
+    inline bool check_consistent_sizes(const std::string& function,
+                                       const std::string& name1, 
                                        const T1& x1, 
-                                       const char* name2, 
+                                       const std::string& name2, 
                                        const T2& x2, 
-                                       const char* name3, 
+                                       const std::string& name3, 
                                        const T3& x3, 
-                                       const char* name4,
+                                       const std::string& name4,
                                        const T4& x4) {
       size_t max_size = std::max(size_of(x1),
                                  std::max(size_of(x2),

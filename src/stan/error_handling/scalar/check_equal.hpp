@@ -12,8 +12,8 @@ namespace stan {
                 typename T_eq,
                 bool is_vec>
       struct equal {
-        static bool check(const char* function,
-                          const char* name,
+        static bool check(const std::string& function,
+                          const std::string& name,
                           const T_y& y,
                           const T_eq& eq) {
           using stan::length;
@@ -23,9 +23,8 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be equal to ";
               msg << eq_vec[n];
-              std::string message(msg.str());
               dom_err(function, name, y,
-                      "is ", message.c_str());
+                      "is ", msg.str());
             }
           }
           return true;
@@ -36,8 +35,8 @@ namespace stan {
       template <typename T_y,
                 typename T_eq>
       struct equal<T_y, T_eq, true> {
-        static bool check(const char* function,
-                          const char* name,
+        static bool check(const std::string& function,
+                          const std::string& name,
                           const T_y& y,
                           const T_eq& eq) {
           using stan::length;
@@ -48,9 +47,8 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be equal to ";
               msg << eq_vec[n];
-              std::string message(msg.str());
               dom_err_vec(function, name, y, n,
-                          "is ", message.c_str());
+                          "is ", msg.str());
             }
           }
           return true;
@@ -58,8 +56,8 @@ namespace stan {
       };
     }
     template <typename T_y, typename T_eq>
-    inline bool check_equal(const char* function,
-                            const char* name,
+    inline bool check_equal(const std::string& function,
+                            const std::string& name,
                             const T_y& y,
                             const T_eq& eq) {
       return equal<T_y, T_eq, is_vector_like<T_y>::value>

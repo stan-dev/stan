@@ -1,6 +1,8 @@
 #ifndef STAN__ERROR_HANDLING__SCALAR__DOM_ERR_VEC_HPP
 #define STAN__ERROR_HANDLING__SCALAR__DOM_ERR_VEC_HPP
 
+#include <sstream>
+#include <string>
 #include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/math/meta/value_type.hpp>
 #include <stan/meta/traits.hpp>
@@ -30,12 +32,12 @@ namespace stan {
      * @param msg2 Message to print after the variable
      */
     template <typename T>
-    inline void dom_err_vec(const char* function,
-                            const char* name,
+    inline void dom_err_vec(const std::string& function,
+                            const std::string& name,
                             const T& y,
                             const size_t i,
-                            const char* msg1,
-                            const char* msg2) {
+                            const std::string& msg1,
+                            const std::string& msg2) {
       std::ostringstream vec_name_stream;
       vec_name_stream << name
                       << "[" << stan::error_index::value + i << "]";
@@ -63,11 +65,11 @@ namespace stan {
      * @param msg Message to print before the variable
      */
     template <typename T>
-    inline void dom_err_vec(const char* function,
-                            const char* name,
+    inline void dom_err_vec(const std::string& function,
+                            const std::string& name,
                             const T& y,
                             const size_t i,
-                            const char* msg) {
+                            const std::string& msg) {
       dom_err_vec(function, name, y, i, msg, "");
     }
     

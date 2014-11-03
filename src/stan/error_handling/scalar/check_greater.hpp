@@ -12,8 +12,8 @@ namespace stan {
                 typename T_low,
                 bool is_vec>
       struct greater {
-        static bool check(const char* function,
-                          const char* name,  
+        static bool check(const std::string& function,
+                          const std::string& name,  
                           const T_y& y,
                           const T_low& low) {
           using stan::length;
@@ -23,10 +23,9 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be greater than ";
               msg << low_vec[n];
-              std::string message(msg.str());
 
               dom_err(function, name, y,
-                      "is ", message.c_str());
+                      "is ", msg.str());
             }
           }
           return true;
@@ -36,8 +35,8 @@ namespace stan {
       template <typename T_y,
                 typename T_low>
       struct greater<T_y, T_low, true> {
-        static bool check(const char* function,
-                          const char* name,
+        static bool check(const std::string& function,
+                          const std::string& name,
                           const T_y& y,
                           const T_low& low) {
           using stan::length;
@@ -47,9 +46,8 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be greater than ";
               msg << low_vec[n];
-              std::string message(msg.str());
               dom_err_vec(function, name, y, n,
-                          "is ", message.c_str());
+                          "is ", msg.str());
             }
           }
           return true;
@@ -59,8 +57,8 @@ namespace stan {
     
     // throws if any element in y or low is nan
     template <typename T_y, typename T_low>
-    inline bool check_greater(const char* function,
-                              const char* name,  
+    inline bool check_greater(const std::string& function,
+                              const std::string& name,  
                               const T_y& y,
                               const T_low& low) {
       return greater<T_y, T_low, is_vector_like<T_y>::value>

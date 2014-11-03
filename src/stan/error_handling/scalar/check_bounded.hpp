@@ -20,8 +20,8 @@ namespace stan {
       template <typename T_y, typename T_low, typename T_high,
                 bool y_is_vec>
       struct bounded {
-        static bool check(const char* function,
-                          const char* name,
+        static bool check(const std::string& function,
+                          const std::string& name,
                           const T_y& y,
                           const T_low& low,
                           const T_high& high) {
@@ -34,10 +34,9 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be between ";
               msg << "(" << low_vec[n] << ", " << high_vec[n] << ")";
-              std::string message(msg.str());
 
               dom_err(function, name, y,
-                      "is ", message.c_str());
+                      "is ", msg.str());
             }
           }
           return true;
@@ -46,8 +45,8 @@ namespace stan {
     
       template <typename T_y, typename T_low, typename T_high>
       struct bounded<T_y, T_low, T_high, true> {
-        static bool check(const char* function,
-                          const char* name,
+        static bool check(const std::string& function,
+                          const std::string& name,
                           const T_y& y,
                           const T_low& low,
                           const T_high& high) {
@@ -61,9 +60,8 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be between ";
               msg << "(" << low_vec[n] << ", " << high_vec[n] << ")";
-              std::string message(msg.str());
               dom_err_vec(function, name, y, n,
-                          "is ", message.c_str());
+                          "is ", msg.str());
             }
           }
           return true;
@@ -73,8 +71,8 @@ namespace stan {
 
     // public check_bounded function
     template <typename T_y, typename T_low, typename T_high>
-    inline bool check_bounded(const char* function,
-                              const char* name,  
+    inline bool check_bounded(const std::string& function,
+                              const std::string& name,  
                               const T_y& y,
                               const T_low& low,
                               const T_high& high) {

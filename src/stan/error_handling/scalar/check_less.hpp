@@ -10,8 +10,8 @@ namespace stan {
     namespace {
       template <typename T_y, typename T_high, bool is_vec>
       struct less {
-        static bool check(const char* function,
-                          const char* name,  
+        static bool check(const std::string& function,
+                          const std::string& name,  
                           const T_y& y,
                           const T_high& high) {
           using stan::length;
@@ -21,9 +21,8 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be less than ";
               msg << high_vec[n];
-              std::string message(msg.str());
               dom_err(function, name, y,
-                      "is ", message.c_str());
+                      "is ", msg.str());
             }
           }
           return true;
@@ -32,8 +31,8 @@ namespace stan {
     
       template <typename T_y, typename T_high>
       struct less<T_y, T_high, true> {
-        static bool check(const char* function,
-                          const char* name,
+        static bool check(const std::string& function,
+                          const std::string& name,
                           const T_y& y,
                           const T_high& high) {
           using stan::length;
@@ -43,9 +42,8 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be less than ";
               msg << high_vec[n];
-              std::string message(msg.str());
               dom_err_vec(function, name, y, n,
-                          "is ", message.c_str());
+                          "is ", msg.str());
             }
           }
           return true;
@@ -55,8 +53,8 @@ namespace stan {
 
     // throws if any element of y or high is nan
     template <typename T_y, typename T_high>
-    inline bool check_less(const char* function,
-                           const char* name,  
+    inline bool check_less(const std::string& function,
+                           const std::string& name,  
                            const T_y& y,
                            const T_high& high) {
       return less<T_y, T_high, is_vector_like<T_y>::value>
