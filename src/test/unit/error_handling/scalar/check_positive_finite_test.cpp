@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_positive_finite;
 
-TEST(ErrorHandling,CheckPositiveFinite) {
+TEST(ErrorHandlingScalar,CheckPositiveFinite) {
   const std::string function = "check_positive_finite";
   double x = 1;
  
@@ -28,7 +28,7 @@ TEST(ErrorHandling,CheckPositiveFinite) {
 }
 
 // ---------- check_positive_finite: vector tests ----------
-TEST(ErrorHandling,CheckPositiveFinite_Vector) {
+TEST(ErrorHandlingScalar,CheckPositiveFinite_Vector) {
   const std::string function = "check_positive_finite";
   std::vector<double> x;
   
@@ -76,7 +76,7 @@ TEST(ErrorHandling,CheckPositiveFinite_Vector) {
 }
 
 // ---------- check_positive_finite: matrix tests ----------
-TEST(ErrorHandling,CheckPositiveFinite_Matrix) {
+TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix) {
   const std::string function = "check_positive_finite";
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
   
@@ -112,7 +112,7 @@ TEST(ErrorHandling,CheckPositiveFinite_Matrix) {
 }
 
 
-TEST(ErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message) {
+TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix_one_indexed_message) {
   const std::string function = "check_positive_finite";
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
   std::string message;
@@ -131,7 +131,7 @@ TEST(ErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message) {
   EXPECT_NE(std::string::npos, message.find("[3]"))
     << message;
 }
-TEST(ErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message_2) {
+TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix_one_indexed_message_2) {
   const std::string function = "check_positive_finite";
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
   std::string message;
@@ -151,7 +151,7 @@ TEST(ErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message_2) {
     << message;
 }
 
-TEST(ErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message_3) {
+TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix_one_indexed_message_3) {
   const std::string function = "check_positive_finite";
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
   std::string message;
@@ -171,7 +171,7 @@ TEST(ErrorHandling,CheckPositiveFinite_Matrix_one_indexed_message_3) {
     << message;
 }
 
-TEST(ErrorHandling,CheckPositiveFinite_nan) {
+TEST(ErrorHandlingScalar,CheckPositiveFinite_nan) {
   const std::string function = "check_positive_finite";
   double nan = std::numeric_limits<double>::quiet_NaN();
 

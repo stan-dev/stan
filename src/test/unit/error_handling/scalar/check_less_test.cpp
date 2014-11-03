@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_less;
 
-TEST(ErrorHandling,CheckLess) {
+TEST(ErrorHandlingScalar,CheckLess) {
   const std::string function = "check_less";
   double x = -10.0;
   double lb = 0.0;
@@ -34,7 +34,7 @@ TEST(ErrorHandling,CheckLess) {
     << "check_less should throw an exception with x == -Inf and lb == -Inf";
 }
 
-TEST(ErrorHandling,CheckLess_Matrix) {
+TEST(ErrorHandlingScalar,CheckLess_Matrix) {
   const std::string function = "check_less";
   double x;
   double high;
@@ -121,7 +121,7 @@ TEST(ErrorHandling,CheckLess_Matrix) {
 }
 
 
-TEST(ErrorHandling,CheckLess_Matrix_one_indexed_message) {
+TEST(ErrorHandlingScalar,CheckLess_Matrix_one_indexed_message) {
   const std::string function = "check_less";
   double x;
   double high;
@@ -182,7 +182,7 @@ TEST(ErrorHandling,CheckLess_Matrix_one_indexed_message) {
     << message;
 }
 
-TEST(ErrorHandling,CheckGreaterOrEqual_nan) {
+TEST(ErrorHandlingScalar,CheckGreaterOrEqual_nan) {
   const std::string function = "check_less";
   double x = 10.0;
   double lb = 0.0;

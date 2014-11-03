@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_finite;
 
-TEST(ErrorHandling,CheckFinite) {
+TEST(ErrorHandlingScalar,CheckFinite) {
   const std::string function = "check_finite";
   double x = 0;
  
@@ -22,7 +22,7 @@ TEST(ErrorHandling,CheckFinite) {
 }
 
 // ---------- check_finite: vector tests ----------
-TEST(ErrorHandling,CheckFinite_Vector) {
+TEST(ErrorHandlingScalar,CheckFinite_Vector) {
   const std::string function = "check_finite";
   std::vector<double> x;
   
@@ -56,7 +56,7 @@ TEST(ErrorHandling,CheckFinite_Vector) {
 }
 
 // ---------- check_finite: matrix tests ----------
-TEST(ErrorHandling,CheckFinite_Matrix) {
+TEST(ErrorHandlingScalar,CheckFinite_Matrix) {
   const std::string function = "check_finite";
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
   
@@ -82,7 +82,7 @@ TEST(ErrorHandling,CheckFinite_Matrix) {
 }
 
 
-TEST(ErrorHandling,CheckFinite_Matrix_one_indexed_message) {
+TEST(ErrorHandlingScalar,CheckFinite_Matrix_one_indexed_message) {
   const std::string function = "check_finite";
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
   std::string message;
@@ -102,7 +102,7 @@ TEST(ErrorHandling,CheckFinite_Matrix_one_indexed_message) {
     << message;
 }
 
-TEST(ErrorHandling,CheckFinite_nan) {
+TEST(ErrorHandlingScalar,CheckFinite_nan) {
   const std::string function = "check_finite";
   double nan = std::numeric_limits<double>::quiet_NaN();
 

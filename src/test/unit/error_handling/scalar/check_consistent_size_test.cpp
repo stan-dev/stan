@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_consistent_size.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathMatrixErrorHandling, checkConsistentSize) {
+TEST(ErrorHandlingScalar, checkConsistentSize) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::error_handling::check_consistent_size;
@@ -17,7 +17,7 @@ TEST(MathMatrixErrorHandling, checkConsistentSize) {
   EXPECT_THROW(check_consistent_size(function, name1, v1, 2U), std::domain_error);
 }
 
-TEST(MathMatrixErrorHandling, checkConsistentSize_nan) {
+TEST(ErrorHandlingScalar, checkConsistentSize_nan) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::error_handling::check_consistent_size;

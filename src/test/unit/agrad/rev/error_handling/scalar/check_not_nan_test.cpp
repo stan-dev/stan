@@ -2,7 +2,7 @@
 #include <stan/agrad/rev.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradErrorHandling,CheckNotNan) {
+TEST(AgradRevErrorHandlingScalar,CheckNotNan) {
   using stan::agrad::var;
   using stan::error_handling::check_not_nan;
   const std::string function = "check_not_nan";

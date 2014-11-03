@@ -2,7 +2,7 @@
 #include <stan/math/matrix/meta/value_type.hpp>  
 #include <gtest/gtest.h>
 
-TEST(ErrorHandling,CheckPositive_nan) {
+TEST(ErrorHandlingScalar,CheckPositive_nan) {
   using stan::error_handling::check_positive;
   const std::string function = "check_positive";
   double nan = std::numeric_limits<double>::quiet_NaN();

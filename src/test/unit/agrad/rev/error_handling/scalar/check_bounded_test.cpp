@@ -2,7 +2,7 @@
 #include <stan/agrad/rev.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradErrorHandling,CheckBounded_X) {
+TEST(AgradRevErrorHandlingScalar,CheckBounded_X) {
   using stan::agrad::var;
   using stan::error_handling::check_bounded;
  
@@ -46,7 +46,7 @@ TEST(AgradErrorHandling,CheckBounded_X) {
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
 }
 
-TEST(AgradErrorHandling,CheckBounded_Low) {
+TEST(AgradRevErrorHandlingScalar,CheckBounded_Low) {
   using stan::agrad::var;
   using stan::error_handling::check_bounded;
 
@@ -71,7 +71,7 @@ TEST(AgradErrorHandling,CheckBounded_Low) {
   EXPECT_THROW(check_bounded(function, name, x, low, high), std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
-TEST(AgradErrorHandling,CheckBounded_High) {
+TEST(AgradRevErrorHandlingScalar,CheckBounded_High) {
   using stan::agrad::var;
   using stan::error_handling::check_bounded;
 

@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-class ErrorHandling_dom_err_vec : public ::testing::Test {
+class ErrorHandlingScalar_dom_err_vec : public ::testing::Test {
 public:
   void SetUp() {
     function_ = "function";
@@ -80,14 +80,14 @@ public:
   size_t index_;
 };
 
-TEST_F(ErrorHandling_dom_err_vec, vdouble) {
+TEST_F(ErrorHandlingScalar_dom_err_vec, vdouble) {
   std::vector<double> y;
   y.push_back(10);
   
   test_throw<std::vector<double> >(y);
 }
 
-TEST_F(ErrorHandling_dom_err_vec, vint) {
+TEST_F(ErrorHandlingScalar_dom_err_vec, vint) {
   std::vector<int> y;
   y.push_back(10);
   
@@ -95,14 +95,14 @@ TEST_F(ErrorHandling_dom_err_vec, vint) {
 }
 
 
-TEST_F(ErrorHandling_dom_err_vec, vvar) {
+TEST_F(ErrorHandlingScalar_dom_err_vec, vvar) {
   std::vector<stan::agrad::var> y;
   y.push_back(10);
   
   test_throw<std::vector<stan::agrad::var> >(y);
 }
 
-TEST_F(ErrorHandling_dom_err_vec, one_indexed) {
+TEST_F(ErrorHandlingScalar_dom_err_vec, one_indexed) {
   std::string message;
   int n = 5;
   std::vector<double> y(20);

@@ -3,7 +3,7 @@
 
 using stan::error_handling::check_nonnegative;
 
-TEST(ErrorHandling,CheckNonnegative) {
+TEST(ErrorHandlingScalar,CheckNonnegative) {
   const std::string function = "check_nonnegative";
   double x = 0;
 
@@ -28,7 +28,7 @@ TEST(ErrorHandling,CheckNonnegative) {
 }
 
 
-TEST(ErrorHandling,CheckNonnegativeVectorized) {
+TEST(ErrorHandlingScalar,CheckNonnegativeVectorized) {
   int N = 5;
   const std::string function = "check_nonnegative";
   std::vector<double> x(N);
@@ -55,7 +55,7 @@ TEST(ErrorHandling,CheckNonnegativeVectorized) {
     << "check_nonnegative(vector) should throw exception on NaN: " << x[0];
 }
 
-TEST(ErrorHandling, CheckNonnegativeVectorized_one_indexed_message) {
+TEST(ErrorHandlingScalar, CheckNonnegativeVectorized_one_indexed_message) {
   int N = 5;
   const std::string function = "check_nonnegative";
   std::vector<double> x(N);
@@ -75,7 +75,7 @@ TEST(ErrorHandling, CheckNonnegativeVectorized_one_indexed_message) {
   EXPECT_NE(std::string::npos, message.find("[3]"));
 }
 
-TEST(ErrorHandling,CheckNonnegative_nan) {
+TEST(ErrorHandlingScalar,CheckNonnegative_nan) {
   const std::string function = "check_nonnegative";
   double nan = std::numeric_limits<double>::quiet_NaN();
 

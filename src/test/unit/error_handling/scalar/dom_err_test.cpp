@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/rev/var.hpp>
 
-class ErrorHandling_dom_err : public ::testing::Test {
+class ErrorHandlingScalar_dom_err : public ::testing::Test {
 public:
   void SetUp() {
     function_ = "function";
@@ -72,13 +72,13 @@ public:
   std::string msg2_;
 };
 
-TEST_F(ErrorHandling_dom_err, double) {
+TEST_F(ErrorHandlingScalar_dom_err, double) {
   double y = 10;
   
   test_throw<double>(y);
 }
 
-TEST_F(ErrorHandling_dom_err, var) {
+TEST_F(ErrorHandlingScalar_dom_err, var) {
   stan::agrad::var y = 10;
   
   test_throw<stan::agrad::var>(y);
