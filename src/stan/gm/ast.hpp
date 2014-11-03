@@ -47,6 +47,7 @@ namespace stan {
     struct row_vector_var_decl;
     struct sample;
     struct simplex_var_decl;
+    struct integrate_ode;
     struct unit_vector_var_decl;
     struct statement;
     struct statements;
@@ -202,6 +203,7 @@ namespace stan {
       expr_type operator()(const array_literal& e) const;
       expr_type operator()(const variable& e) const;
       expr_type operator()(const fun& e) const;
+      expr_type operator()(const integrate_ode& e) const;
       expr_type operator()(const index_op& e) const;
       expr_type operator()(const binary_op& e) const;
       expr_type operator()(const unary_op& e) const;
@@ -217,6 +219,7 @@ namespace stan {
                              boost::recursive_wrapper<double_literal>,
                              boost::recursive_wrapper<array_literal>,
                              boost::recursive_wrapper<variable>,
+                             boost::recursive_wrapper<integrate_ode>,
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
                              boost::recursive_wrapper<binary_op>,
@@ -233,6 +236,7 @@ namespace stan {
       expression(const array_literal& expr);
       expression(const variable& expr);
       expression(const fun& expr);
+      expression(const integrate_ode& expr);
       expression(const index_op& expr);
       expression(const binary_op& expr);
       expression(const unary_op& expr);
@@ -269,6 +273,7 @@ namespace stan {
       bool operator()(const double_literal& x) const;
       bool operator()(const array_literal& x) const;
       bool operator()(const variable& x) const;
+      bool operator()(const integrate_ode& x) const;
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;
       bool operator()(const binary_op& x) const;
@@ -322,6 +327,24 @@ namespace stan {
       variable(std::string name);
       void set_type(const base_expr_type& base_type, 
                     size_t num_dims);
+    };
+
+    struct integrate_ode {
+      std::string system_function_name_;
+      expression y0_;    // initial state
+      expression t0_;    // initial time
+      expression ts_;    // solution times
+      expression theta_; // params
+      expression x_;     // data
+      expression x_int_;     // integer data
+      integrate_ode();
+      integrate_ode(const std::string& system_function_name,
+                const expression& y0,
+                const expression& t0,
+                const expression& ts,
+                const expression& theta,
+                const expression& x,
+                const expression& x_int);
     };
 
     struct fun {
@@ -832,6 +855,7 @@ namespace stan {
       bool operator()(const double_literal& e) const;
       bool operator()(const array_literal& e) const;
       bool operator()(const variable& e) const;
+      bool operator()(const integrate_ode& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const binary_op& e) const;
@@ -850,6 +874,7 @@ namespace stan {
       bool operator()(const double_literal& e) const;
       bool operator()(const array_literal& e) const;
       bool operator()(const variable& e) const;
+      bool operator()(const integrate_ode& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const binary_op& e) const;

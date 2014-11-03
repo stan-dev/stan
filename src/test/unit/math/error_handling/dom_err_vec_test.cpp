@@ -1,7 +1,12 @@
-#include <stan/math/error_handling/dom_err_vec.hpp>
-#include <gtest/gtest.h>
-#include <stan/agrad/rev.hpp>
+
 #include <vector>
+
+#include <stan/agrad/rev.hpp>
+#include <stan/math/error_handling/dom_err_vec.hpp>
+#include <stan/math/matrix/meta/value_type.hpp>
+#include <stan/math/meta/value_type.hpp>
+
+#include <gtest/gtest.h>
 
 class MathErrorHandling_dom_err_vec : public ::testing::Test {
 public:
@@ -14,9 +19,10 @@ public:
 
   template <class T, class T_msg>
   std::string expected_message(T y, T_msg msg) {
+    using stan::math::value_type;
     std::stringstream expected_message;
     expected_message << "function("
-                     << typeid(typename T::value_type).name()
+                     << typeid(typename value_type<T>::type).name()
                      << "): "
                      << y_name_
                      << "[" << 1 + index_ << "] "

@@ -118,10 +118,19 @@ namespace stan {
     };
 
 
-    // /**
-    //  * @tparam C type of container.
-    //  * @tparam I type of index list.
-    //  */
+    /**
+     * Return the result of indexing the specified container
+     * with the specified index list.
+     *
+     * <p>The return type reduces dimensions where the index
+     * provides a single index.
+     *
+     * @tparam C type of container.
+     * @tparam I type of index list.
+     * @param[in] c container.
+     * @param[in] idx index.
+     * @return slice of container picked out by index.
+     */
     template <typename C, typename I>
     inline
     typename meta::indexed_type<C, typename I::typelist>::type

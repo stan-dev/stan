@@ -50,6 +50,15 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::index_op,
                           (std::vector<std::vector<stan::gm::expression> >, 
                            dimss_) );
 
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::integrate_ode,
+                          (std::string, system_function_name_)
+                          (stan::gm::expression, y0_)
+                          (stan::gm::expression, t0_)
+                          (stan::gm::expression, ts_)
+                          (stan::gm::expression, theta_)
+                          (stan::gm::expression, x_)
+                          (stan::gm::expression, x_int_) );
+
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::fun,
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, args_) );
@@ -63,13 +72,108 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
                           (stan::gm::expr_type,type_) );
 
 
-
-
 namespace stan { 
 
   namespace gm {
 
 
+    struct validate_integrate_ode {
+
+      template <typename T1, typename T2, typename T3, typename T4>
+      struct result { typedef void type; };
+
+      void operator()(const integrate_ode& ode_fun,
+                      const variable_map& var_map,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        pass = true;
+
+        // test function argument type
+        expr_type sys_result_type(DOUBLE_T,1);
+        std::vector<expr_type> sys_arg_types;
+        sys_arg_types.push_back(expr_type(DOUBLE_T,0));
+        sys_arg_types.push_back(expr_type(DOUBLE_T,1));
+        sys_arg_types.push_back(expr_type(DOUBLE_T,1));
+        sys_arg_types.push_back(expr_type(DOUBLE_T,1));
+        sys_arg_types.push_back(expr_type(INT_T,1));
+        function_signature_t system_signature(sys_result_type, sys_arg_types);
+        if (!function_signatures::instance()
+            .is_defined(ode_fun.system_function_name_,system_signature)) {
+          error_msgs << "first argument to integrate_ode must be a function with signature"
+                     << " (real, real[], real[], real[], int[]) : real[] ";
+          pass = false;
+        }
+
+        // test regular argument types
+        if (ode_fun.y0_.expression_type() != expr_type(DOUBLE_T,1)) {
+          error_msgs << "second argument to integrate_ode must be type real[]"
+                     << " for intial system state"
+                     << "; found type=" 
+                     << ode_fun.y0_.expression_type()
+                     << ". ";
+          pass = false;
+        } 
+        if (!ode_fun.t0_.expression_type().is_primitive()) {
+          error_msgs << "third argument to integrate_ode must be type real or int"
+                     << " for initial time"
+                     << "; found type=" 
+                     << ode_fun.t0_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T,1)) {
+          error_msgs << "fourth argument to integrate_ode must be type real[]"
+                     << " for requested solution times"
+                     << "; found type=" 
+                     << ode_fun.ts_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (ode_fun.theta_.expression_type() != expr_type(DOUBLE_T,1)) {
+          error_msgs << "fifth argument to integrate_ode must be type real[]"
+                     << " for parameters"
+                     << "; found type=" 
+                     << ode_fun.theta_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (ode_fun.x_.expression_type() != expr_type(DOUBLE_T,1)) {
+          error_msgs << "sixth argument to integrate_ode must be type real[]"
+                     << " for real data;"
+                     << " found type=" 
+                     << ode_fun.x_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+        if (ode_fun.x_int_.expression_type() != expr_type(INT_T,1)) {
+          error_msgs << "seventh argument to integrate_ode must be type int[]"
+                     << " for integer data;"
+                     << " found type=" 
+                     << ode_fun.x_int_.expression_type()
+                     << ". ";
+          pass = false;
+        }
+
+        // test data-only variables do not have parameters
+        if (has_var(ode_fun.t0_, var_map)) {
+          error_msgs << "third argument to integrate_ode (initial times)"
+                     << " must be data only and not reference parameters";
+          pass = false;
+        }
+        if (has_var(ode_fun.ts_, var_map)) {
+          error_msgs << "fourth argument to integrate_ode (solution times)"
+                     << " must be data only and not reference parameters";
+          pass = false;
+        }
+        if (has_var(ode_fun.x_, var_map)) {
+          error_msgs << "fifth argument to integrate_ode (real data)"
+                     << " must be data only and not reference parameters";
+          pass = false;
+        }
+      }
+    };
+    boost::phoenix::function<validate_integrate_ode> validate_integrate_ode_f;
+    
     struct set_fun_type {
       template <typename T1, typename T2>
       struct result { typedef fun type; };
@@ -516,24 +620,6 @@ namespace stan {
     boost::phoenix::function<validate_int_expr3> validate_int_expr3_f;
 
 
-    struct validate_expr_type {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
-
-      bool operator()(const expression& expr,
-                      std::ostream& error_msgs) const {
-        if (expr.expression_type().is_ill_formed()) {
-          error_msgs << "expression is ill formed" << std::endl;
-          return false;
-        }
-        return true;
-      }
-    };
-    boost::phoenix::function<validate_expr_type> validate_expr_type_f;
-
-    
-
-
 
     template <typename Iterator>
     term_grammar<Iterator>::term_grammar(variable_map& var_map,
@@ -616,12 +702,33 @@ namespace stan {
                )
         ;
       
-
-
+      integrate_ode_r.name("solve ode");
+      integrate_ode_r 
+        %= lit("integrate_ode")
+        > lit('(')
+        > identifier_r          // system function name (function only)
+        > lit(',')
+        > expression_g(_r1)     // y0
+        > lit(',')
+        > expression_g(_r1)     // t0 (data only)
+        > lit(',')
+        > expression_g(_r1)     // ts (data only)
+        > lit(',')
+        > expression_g(_r1)     // theta
+        > lit(',')
+        > expression_g(_r1)     // x (data only)
+        > lit(',')
+        > expression_g(_r1)     // x_int (data only)
+        > lit(')') [validate_integrate_ode_f(_val, 
+                                         boost::phoenix::ref(var_map_),
+                                         _pass,
+                                         boost::phoenix::ref(error_msgs_))];
 
       factor_r.name("factor");
       factor_r =
-          fun_r(_r1)          [set_fun_type_named_f(_val,_1,_r1,_pass,
+        integrate_ode_r(_r1)    [_val = _1]
+        | 
+        fun_r(_r1)          [set_fun_type_named_f(_val,_1,_r1,_pass,
                                                     boost::phoenix::ref(error_msgs_))]
         | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
                                                      boost::phoenix::ref(error_msgs_),

@@ -19,7 +19,7 @@
 #include <stan/gm/grammars/expression_grammar.hpp>
 #include <stan/gm/grammars/statement_grammar.hpp>
 #include <stan/gm/grammars/var_decls_grammar.hpp>
-
+#include <test/unit/util.hpp>
 
 /** extract model name from filepath name
  * @param file_name  Name off model file
@@ -142,14 +142,6 @@ std::string model_to_cpp(const std::string& model_text) {
   return output.str();
 }
 
-int count_matches(const std::string& target,
-                  const std::string& s) {
-  if (target.size() == 0) return -1;  // error
-  int count = 0;
-  for (size_t pos = 0; (pos = s.find(target,pos)) != std::string::npos; pos += target.size())
-    ++count;
-  return count;
-}
 
 void expect_matches(int n,
                     const std::string& stan_code,
@@ -160,9 +152,5 @@ void expect_matches(int n,
     std::cout << model_cpp << std::endl;
   EXPECT_EQ(n, count_matches(target,model_cpp));
 }
-
-
-
-
 
 #endif
