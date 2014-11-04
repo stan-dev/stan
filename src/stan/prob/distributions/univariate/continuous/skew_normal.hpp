@@ -24,7 +24,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                     const T_shape& alpha) {
-      static const std::string function = "stan::prob::skew_normal_log";
+      static const std::string function("stan::prob::skew_normal_log");
 
       using std::log;
       using stan::is_constant_struct;
@@ -142,7 +142,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                     const T_shape& alpha) {
-      static const std::string function = "stan::prob::skew_normal_cdf";
+      static const std::string function("stan::prob::skew_normal_cdf");
 
       using stan::error_handling::check_positive;
       using stan::error_handling::check_finite;
@@ -238,7 +238,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                     const T_shape& alpha) {
-      static const std::string function = "stan::prob::skew_normal_cdf_log";
+      static const std::string function("stan::prob::skew_normal_cdf_log");
 
       using stan::error_handling::check_positive;
       using stan::error_handling::check_finite;
@@ -322,7 +322,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                          const T_shape& alpha) {
-      static const std::string function = "stan::prob::skew_normal_ccdf_log";
+      static const std::string function("stan::prob::skew_normal_ccdf_log");
 
       using stan::error_handling::check_positive;
       using stan::error_handling::check_finite;
@@ -409,7 +409,7 @@ namespace stan {
                     RNG& rng) {
       boost::math::skew_normal_distribution<>dist (mu, sigma, alpha);
 
-      static const std::string function = "stan::prob::skew_normal_rng";
+      static const std::string function("stan::prob::skew_normal_rng");
 
       using stan::error_handling::check_positive;
       using stan::error_handling::check_finite;

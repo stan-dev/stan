@@ -33,7 +33,7 @@ namespace stan {
                      const T_location& mu,
                      const T_inv_scale& phi) {
 
-      static const std::string function = "stan::prob::neg_binomial_log";
+      static const std::string function("stan::prob::neg_binomial_log");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -150,7 +150,7 @@ namespace stan {
                      const T_log_location& eta,
                      const T_inv_scale& phi) {
 
-      static const std::string function = "stan::prob::neg_binomial_log";
+      static const std::string function("stan::prob::neg_binomial_log");
 
       using stan::error_handling::check_finite;
       using stan::error_handling::check_nonnegative;
@@ -266,7 +266,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
 
-      static const std::string function = "stan::prob::neg_binomial_2_rng";
+      static const std::string function("stan::prob::neg_binomial_2_rng");
 
       using stan::error_handling::check_positive_finite;
 
@@ -286,7 +286,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
 
-      static const std::string function = "stan::prob::neg_binomial_2_log_rng";
+      static const std::string function("stan::prob::neg_binomial_2_log_rng");
 
       using stan::error_handling::check_finite;
       using stan::error_handling::check_positive_finite;

@@ -42,7 +42,7 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const std::string function = "stan::prob::cauchy_log";
+      static const std::string function("stan::prob::cauchy_log");
 
       using stan::is_constant_struct;
       using stan::error_handling::check_positive_finite;
@@ -163,7 +163,7 @@ namespace stan {
               && stan::length(sigma) ) ) 
         return 1.0;
         
-      static const std::string function = "stan::prob::cauchy_cdf";
+      static const std::string function("stan::prob::cauchy_cdf");
       
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_finite;
@@ -260,7 +260,7 @@ namespace stan {
               && stan::length(sigma) ) ) 
         return 0.0;
         
-      static const std::string function = "stan::prob::cauchy_cdf";
+      static const std::string function("stan::prob::cauchy_cdf");
       
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_finite;
@@ -328,7 +328,7 @@ namespace stan {
               && stan::length(sigma) ) ) 
         return 0.0;
         
-      static const std::string function = "stan::prob::cauchy_cdf";
+      static const std::string function("stan::prob::cauchy_cdf");
       
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_finite;
@@ -394,7 +394,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::cauchy_distribution;
 
-      static const std::string function = "stan::prob::cauchy_rng";
+      static const std::string function("stan::prob::cauchy_rng");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_finite;

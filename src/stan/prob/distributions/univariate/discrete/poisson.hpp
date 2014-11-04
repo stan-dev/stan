@@ -26,7 +26,7 @@ namespace stan {
     typename return_type<T_rate>::type
     poisson_log(const T_n& n, const T_rate& lambda) {
 
-      static const std::string function = "stan::prob::poisson_log";
+      static const std::string function("stan::prob::poisson_log");
       
       using boost::math::lgamma;
       using stan::error_handling::check_consistent_sizes;
@@ -105,7 +105,7 @@ namespace stan {
     typename return_type<T_log_rate>::type
     poisson_log_log(const T_n& n, const T_log_rate& alpha) {
 
-      static const std::string function = "stan::prob::poisson_log_log";
+      static const std::string function("stan::prob::poisson_log_log");
       
       using boost::math::lgamma;
       using stan::error_handling::check_not_nan;
@@ -187,7 +187,7 @@ namespace stan {
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_cdf(const T_n& n, const T_rate& lambda) {
-      static const std::string function = "stan::prob::poisson_cdf";
+      static const std::string function("stan::prob::poisson_cdf");
           
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_nonnegative;
@@ -253,7 +253,7 @@ namespace stan {
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_cdf_log(const T_n& n, const T_rate& lambda) {
-      static const std::string function = "stan::prob::poisson_cdf_log";
+      static const std::string function("stan::prob::poisson_cdf_log");
           
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_nonnegative;
@@ -315,7 +315,7 @@ namespace stan {
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_ccdf_log(const T_n& n, const T_rate& lambda) {
-      static const std::string function = "stan::prob::poisson_ccdf_log";
+      static const std::string function("stan::prob::poisson_ccdf_log");
           
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_nonnegative;
@@ -383,7 +383,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::poisson_distribution;
 
-      static const std::string function = "stan::prob::poisson_rng";
+      static const std::string function("stan::prob::poisson_rng");
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_nonnegative;
@@ -407,7 +407,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::poisson_distribution;
 
-      static const std::string function = "stan::prob::poisson_log_rng";
+      static const std::string function("stan::prob::poisson_log_rng");
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_nonnegative;

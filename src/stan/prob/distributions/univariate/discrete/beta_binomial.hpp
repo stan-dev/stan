@@ -30,7 +30,7 @@ namespace stan {
                       const T_N& N, 
                       const T_size1& alpha, 
                       const T_size2& beta) {
-      static const std::string function = "stan::prob::beta_binomial_log";
+      static const std::string function("stan::prob::beta_binomial_log");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -186,7 +186,7 @@ namespace stan {
     beta_binomial_cdf(const T_n& n, const T_N& N, const T_size1& alpha, 
                       const T_size2& beta) {
           
-      static const std::string function = "stan::prob::beta_binomial_cdf";
+      static const std::string function("stan::prob::beta_binomial_cdf");
           
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -305,7 +305,7 @@ namespace stan {
     beta_binomial_cdf_log(const T_n& n, const T_N& N, const T_size1& alpha, 
                           const T_size2& beta) {
           
-      static const std::string function = "stan::prob::beta_binomial_cdf_log";
+      static const std::string function("stan::prob::beta_binomial_cdf_log");
           
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -415,7 +415,7 @@ namespace stan {
     beta_binomial_ccdf_log(const T_n& n, const T_N& N, const T_size1& alpha, 
                            const T_size2& beta) {
           
-      static const std::string function = "stan::prob::beta_binomial_ccdf_log";
+      static const std::string function("stan::prob::beta_binomial_ccdf_log");
           
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -526,7 +526,7 @@ namespace stan {
                       const double beta,
                       RNG& rng) {
 
-      static const std::string function = "stan::prob::beta_binomial_rng";
+      static const std::string function("stan::prob::beta_binomial_rng");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;

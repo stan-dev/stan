@@ -26,7 +26,7 @@ namespace stan {
     typename return_type<T_prob>::type
     bernoulli_log(const T_n& n,
                   const T_prob& theta) {
-      static const std::string function = "stan::prob::bernoulli_log";
+      static const std::string function("stan::prob::bernoulli_log");
 
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
@@ -126,7 +126,7 @@ namespace stan {
     template <bool propto, typename T_n, typename T_prob>
     typename return_type<T_prob>::type
     bernoulli_logit_log(const T_n& n, const T_prob& theta) {
-      static const std::string function = "stan::prob::bernoulli_logit_log";
+      static const std::string function("stan::prob::bernoulli_logit_log");
 
       using stan::is_constant_struct;
       using stan::error_handling::check_not_nan;
@@ -208,7 +208,7 @@ namespace stan {
     template <typename T_n, typename T_prob>
     typename return_type<T_prob>::type
     bernoulli_cdf(const T_n& n, const T_prob& theta) {
-      static const std::string function = "stan::prob::bernoulli_cdf";
+      static const std::string function("stan::prob::bernoulli_cdf");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
@@ -268,7 +268,7 @@ namespace stan {
     template <typename T_n, typename T_prob>
     typename return_type<T_prob>::type
     bernoulli_cdf_log(const T_n& n, const T_prob& theta) {
-      static const std::string function = "stan::prob::bernoulli_cdf_log";
+      static const std::string function("stan::prob::bernoulli_cdf_log");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
@@ -325,7 +325,7 @@ namespace stan {
     template <typename T_n, typename T_prob>
     typename return_type<T_prob>::type
     bernoulli_ccdf_log(const T_n& n, const T_prob& theta) {
-      static const std::string function = "stan::prob::bernoulli_ccdf_log";
+      static const std::string function("stan::prob::bernoulli_ccdf_log");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
@@ -388,7 +388,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::bernoulli_distribution;
 
-      static const std::string function = "stan::prob::bernoulli_rng";
+      static const std::string function("stan::prob::bernoulli_rng");
 
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;

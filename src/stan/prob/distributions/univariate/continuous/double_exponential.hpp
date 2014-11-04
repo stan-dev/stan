@@ -25,8 +25,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_log(const T_y& y, 
                            const T_loc& mu, const T_scale& sigma) {
-      static const std::string function
-        = "stan::prob::double_exponential_log";
+      static const std::string function("stan::prob::double_exponential_log");
       
       using stan::is_constant_struct;
       using stan::error_handling::check_finite;
@@ -140,8 +139,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_cdf(const T_y& y, 
                            const T_loc& mu, const T_scale& sigma) {
-      static const std::string function
-        = "stan::prob::double_exponential_cdf";
+      static const std::string function("stan::prob::double_exponential_cdf");
       
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) 
@@ -217,8 +215,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_cdf_log(const T_y& y, const T_loc& mu, 
                                const T_scale& sigma) {
-      static const std::string function
-        = "stan::prob::double_exponential_cdf_log";
+      static const std::string function("stan::prob::double_exponential_cdf_log");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_not_nan;
@@ -294,8 +291,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_ccdf_log(const T_y& y, const T_loc& mu, 
                                const T_scale& sigma) {
-      static const std::string function
-        = "stan::prob::double_exponential_ccdf_log";
+      static const std::string function("stan::prob::double_exponential_ccdf_log");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_not_nan;
@@ -377,8 +373,7 @@ namespace stan {
       using std::log;
       using std::abs;
 
-      static const std::string function
-        = "stan::prob::double_exponential_rng";
+      static const std::string function("stan::prob::double_exponential_rng");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_positive_finite;

@@ -2526,8 +2526,8 @@ namespace stan {
         << EOL;
       o << INDENT2 << ": prob_grad(0) {"
         << EOL; // resize 0 with var_resizing
-      o << INDENT2 << "static const std::string function__ = \"" 
-        << model_name << "_namespace::" << model_name << "\";" << EOL;
+      o << INDENT2 << "static const std::string function__(\"" 
+        << model_name << "_namespace::" << model_name << "\");" << EOL;
       suppress_warning(INDENT2, "function__", o);
       o << INDENT2 << "size_t pos__;" << EOL;
       suppress_warning(INDENT2, "pos__", o);
@@ -3784,8 +3784,8 @@ namespace stan {
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" 
         << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
-      o << INDENT2 << "static const std::string function__ = \""
-        << model_name << "_namespace::write_csv\";" << EOL;
+      o << INDENT2 << "static const std::string function__(\""
+        << model_name << "_namespace::write_csv\");" << EOL;
       suppress_warning(INDENT2, "function__", o);
 
       // declares, reads, and writes parameters
@@ -4145,8 +4145,8 @@ namespace stan {
       o << INDENT << "                 std::ostream* pstream__ = 0) const {" << EOL;
       o << INDENT2 << "vars__.resize(0);" << EOL;
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
-      o << INDENT2 << "static const std::string function__ = \""
-        << model_name << "_namespace::write_array\";" << EOL;
+      o << INDENT2 << "static const std::string function__(\""
+        << model_name << "_namespace::write_array\");" << EOL;
       suppress_warning(INDENT2, "function__", o);
 
       // declares, reads, and sets parameters

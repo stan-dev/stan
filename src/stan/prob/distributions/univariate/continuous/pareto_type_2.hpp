@@ -27,7 +27,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     pareto_type_2_log(const T_y& y, const T_loc& mu, const T_scale& lambda, 
               const T_shape& alpha) {
-      static const std::string function = "stan::prob::pareto_type_2_log";
+      static const std::string function("stan::prob::pareto_type_2_log");
       
       using std::log;
       using stan::math::value_of;
@@ -153,7 +153,7 @@ namespace stan {
         return 1.0;
           
       // Check errors
-      static const std::string function = "stan::prob::pareto_type_2_cdf";
+      static const std::string function("stan::prob::pareto_type_2_cdf");
           
       using stan::error_handling::check_greater_or_equal;
       using stan::error_handling::check_finite;
@@ -284,7 +284,7 @@ namespace stan {
         return 0.0;
           
       // Check errors
-      static const std::string function = "stan::prob::pareto_type_2_cdf_log";
+      static const std::string function("stan::prob::pareto_type_2_cdf_log");
           
       using stan::error_handling::check_greater_or_equal;
       using stan::error_handling::check_finite;
@@ -396,7 +396,7 @@ namespace stan {
         return 0.0;
           
       // Check errors
-      static const std::string function = "stan::prob::pareto_type_2_ccdf_log";
+      static const std::string function("stan::prob::pareto_type_2_ccdf_log");
           
       using stan::error_handling::check_greater_or_equal;
       using stan::error_handling::check_positive_finite;
@@ -503,7 +503,7 @@ namespace stan {
                       const double lambda,
                       const double alpha,
                       RNG& rng) {
-      static const std::string function = "stan::prob::pareto_type_2_rng";
+      static const std::string function("stan::prob::pareto_type_2_rng");
       
       stan::error_handling::check_positive(function, "scale parameter", lambda);
 

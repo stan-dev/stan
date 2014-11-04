@@ -38,7 +38,7 @@ namespace stan {
                         const 
                         Eigen::Matrix<T_scale,
                                       Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      static const std::string function = "stan::prob::multi_student_t";
+      static const std::string function("stan::prob::multi_student_t");
 
       using stan::error_handling::check_size_match;
       using stan::error_handling::check_finite;
@@ -178,7 +178,7 @@ namespace stan {
                         const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& s,
                      RNG& rng) {
 
-      static const std::string function = "stan::prob::multi_student_t_rng";
+      static const std::string function("stan::prob::multi_student_t_rng");
 
       using stan::error_handling::check_finite;
       using stan::error_handling::check_not_nan;

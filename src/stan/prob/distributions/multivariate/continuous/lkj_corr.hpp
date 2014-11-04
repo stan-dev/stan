@@ -50,8 +50,7 @@ namespace stan {
              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
              const T_shape& eta) {
 
-      static const std::string function 
-        = "stan::prob::lkj_corr_cholesky_log";
+      static const std::string function("stan::prob::lkj_corr_cholesky_log");
 
       using boost::math::tools::promote_args;
       using stan::error_handling::check_positive;
@@ -103,7 +102,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y, T_shape>::type
     lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
                  const T_shape& eta) {
-      static const std::string function = "stan::prob::lkj_corr_log";
+      static const std::string function("stan::prob::lkj_corr_log");
 
       using stan::error_handling::check_size_match;
       using stan::error_handling::check_not_nan;
@@ -153,8 +152,7 @@ namespace stan {
     lkj_corr_cholesky_rng(const size_t K,
                           const double eta,
                           RNG& rng) {
-      static const std::string function 
-        = "stan::prob::lkj_corr_cholesky_rng";
+      static const std::string function("stan::prob::lkj_corr_cholesky_rng");
 
       using stan::error_handling::check_positive;
       
@@ -179,8 +177,7 @@ namespace stan {
                  const double eta,
                  RNG& rng) {
 
-      static const std::string function 
-        = "stan::prob::lkj_corr_rng";
+      static const std::string function("stan::prob::lkj_corr_rng");
 
       using stan::error_handling::check_positive;
       

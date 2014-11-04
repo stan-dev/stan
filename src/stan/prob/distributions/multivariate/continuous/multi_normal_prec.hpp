@@ -34,7 +34,7 @@ namespace stan {
     multi_normal_prec_log(const T_y& y,
                           const T_loc& mu,
                           const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      static const std::string function = "stan::prob::multi_normal_prec_log";
+      static const std::string function("stan::prob::multi_normal_prec_log");
       typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp_type;
       lp_type lp(0.0);
       

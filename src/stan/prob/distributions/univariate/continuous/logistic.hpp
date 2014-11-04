@@ -24,7 +24,7 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     logistic_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const std::string function = "stan::prob::logistic_log";
+      static const std::string function("stan::prob::logistic_log");
       
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_finite;
@@ -146,7 +146,7 @@ namespace stan {
         return 1.0;
           
       // Error checks
-      static const std::string function = "stan::prob::logistic_cdf";
+      static const std::string function("stan::prob::logistic_cdf");
           
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_positive_finite;
@@ -240,7 +240,7 @@ namespace stan {
         return 0.0;
           
       // Error checks
-      static const std::string function = "stan::prob::logistic_cdf_log";
+      static const std::string function("stan::prob::logistic_cdf_log");
           
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_positive_finite;
@@ -319,7 +319,7 @@ namespace stan {
         return 0.0;
           
       // Error checks
-      static const std::string function = "stan::prob::logistic_cdf_log";
+      static const std::string function("stan::prob::logistic_cdf_log");
           
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_positive_finite;
@@ -397,7 +397,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::exponential_distribution;
 
-      static const std::string function = "stan::prob::logistic_rng";
+      static const std::string function("stan::prob::logistic_rng");
       
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_finite;

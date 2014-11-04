@@ -25,7 +25,7 @@ namespace stan {
               typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
-      static const std::string function = "stan::prob::weibull_log";
+      static const std::string function("stan::prob::weibull_log");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_finite;
@@ -139,7 +139,7 @@ namespace stan {
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_cdf(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
 
-      static const std::string function = "stan::prob::weibull_cdf";
+      static const std::string function("stan::prob::weibull_cdf");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -202,7 +202,7 @@ namespace stan {
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_cdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
 
-      static const std::string function = "stan::prob::weibull_cdf_log";
+      static const std::string function("stan::prob::weibull_cdf_log");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -255,7 +255,7 @@ namespace stan {
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_ccdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
 
-      static const std::string function = "stan::prob::weibull_ccdf_log";
+      static const std::string function("stan::prob::weibull_ccdf_log");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -309,7 +309,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::weibull_distribution;
 
-      static const std::string function = "stan::prob::weibull_rng";
+      static const std::string function("stan::prob::weibull_rng");
 
       using stan::error_handling::check_positive_finite;
   
