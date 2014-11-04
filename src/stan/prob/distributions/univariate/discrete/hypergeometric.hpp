@@ -114,7 +114,7 @@ namespace stan {
       int min = 0;
       int max = a - 1;
       int mid = 0;
-      while(min < max) {
+      while (min < max) {
         mid = (min + max) / 2;
         if(index[mid] > c)
           max = mid;

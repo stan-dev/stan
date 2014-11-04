@@ -138,7 +138,7 @@ namespace stan {
 
       double c = uniform01_rng();
       int b = 0;
-      while(c > index(b,0))
+      while (c > index(b,0))
         b++;
       return b + 1;
     }
