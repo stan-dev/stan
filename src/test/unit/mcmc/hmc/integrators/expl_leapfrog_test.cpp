@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include <test/test-models/no-main/mcmc/hmc/integrators/command.cpp>
+#include <test/test-models/good/mcmc/hmc/integrators/command.cpp>
 
 #include <stan/io/dump.hpp>
 
