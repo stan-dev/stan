@@ -820,7 +820,7 @@ In the model formulation
 there is no longer an intercept coefficient \code{alpha}.  Instead, we
 have assumed that the first column of the input matrix \code{x} is a
 column of 1 values.  This way, \code{beta[1]} plays the role of the
-intercept.  If the intercept gets a different prior than the the slope
+intercept.  If the intercept gets a different prior than the slope
 terms, then it would be clearer to break it out.  It is also slightly
 more efficient in its explicit form with the intercept variable
 singled out because there's one fewer multiplications; it should not
@@ -4238,7 +4238,7 @@ exactly the marginalization needed for coding the model in Stan.
  
 \section{Change Point Models}
 
-The first example is a model of coal mining disasters in the the U.K.\
+The first example is a model of coal mining disasters in the U.K.\
 for the years 1851--1962.%
 %
 \footnote{The original source of the data is \citep{Jarret:1979},
@@ -5458,7 +5458,7 @@ instance, permuting the first two indexes in \code{mu} and the first
 two indexes in each \code{soft\_z[n]} leads to an identical likelihood
 (and prior).
 
-The lack of identifiability means that the the cluster parameters
+The lack of identifiability means that the cluster parameters
 cannot be compared across multiple Markov chains.  In fact, the only
 parameter in soft $K$-means is not identified, leading to problems in
 monitoring convergence.  Clusters can even fail to be identified
@@ -6165,7 +6165,7 @@ normal variate.  Suppose $z$ is an an isotropic unit normal variate
 z \sim \distro{Normal}({\bf 0}, {\bf 1}),
 \]
 where ${\bf 0}$ is an $N$-vector of 0 values and ${\bf 1}$ is the $N
-\times N$ unit matrix.  Let $L$ be the the Cholesky decomposition of
+\times N$ unit matrix.  Let $L$ be the Cholesky decomposition of
 $k(x)$, i.e., the lower-triangular matrix $L$ such that $LL^{\top} =
 k(x)$.  Then the transformed variable $\mu + Lz$ has the intended
 target distribution,
@@ -6336,7 +6336,7 @@ p(\tilde{y}|\tilde{x},x,y)
 p(\tilde{y}, y|\tilde{x},x).
 \]
 
-A direct implementation in Stan defines a model in terms of the the
+A direct implementation in Stan defines a model in terms of the
 joint distribution of the observed $y$ and unobserved $\tilde{y}$.
 Although Stan does not support mixed vectors of parameters and data
 directly, such a vector may be synthesized as a local variable in the
@@ -8463,7 +8463,7 @@ identifies the components.  For instance, we might consider
 constraining $\mu_1 < \mu_2$ in the two-component normal mixture model
 discussed above.  A problem that can arise from such an approach is
 when there is substantial probabilty mass for the opposite ordering
-$\mu_1 > \mu_2$.  In these cases, the the posteriors are affected by
+$\mu_1 > \mu_2$.  In these cases, the posteriors are affected by
 the constraint and true posterior uncertainty in $\mu_1$ and $\mu_2$
 is not captured by the model with the constraint.  In addition,
 standard approaches to posterior inference for event probabilities is
