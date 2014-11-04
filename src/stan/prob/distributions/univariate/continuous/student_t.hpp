@@ -3,16 +3,18 @@
 
 #include <boost/random/student_t_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/square.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/internal_math.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 

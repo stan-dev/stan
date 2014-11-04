@@ -1,20 +1,21 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BETA_BINOMIAL_HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BETA_BINOMIAL_HPP
 
-#include <stan/prob/distributions/univariate/discrete/binomial.hpp>
-#include <stan/prob/distributions/univariate/continuous/beta.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/math/functions/binomial_coefficient_log.hpp>
 #include <stan/math/functions/lbeta.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/distributions/univariate/discrete/binomial.hpp>
+#include <stan/prob/distributions/univariate/continuous/beta.hpp>
 #include <stan/prob/internal_math.hpp>
 
-#include <stan/math/functions/binomial_coefficient_log.hpp>
 
 namespace stan {
   

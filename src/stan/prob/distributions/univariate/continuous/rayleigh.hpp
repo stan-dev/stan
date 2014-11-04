@@ -3,11 +3,13 @@
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/functions/square.hpp>
-#include <stan/error_handling.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>

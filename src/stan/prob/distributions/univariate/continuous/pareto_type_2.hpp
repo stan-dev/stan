@@ -2,15 +2,19 @@
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__PARETO_TYPE_2_HPP
 
 #include <boost/random/variate_generator.hpp>
-#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_greater_or_equal.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 #include <stan/prob/traits.hpp>
 
 

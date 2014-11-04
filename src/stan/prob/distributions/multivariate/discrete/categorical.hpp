@@ -3,9 +3,8 @@
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
-
-#include <stan/error_handling.hpp>
-#include <stan/error_handling/matrix.hpp>
+#include <stan/error_handling/matrix/check_simplex.hpp>
+#include <stan/error_handling/scalar/check_bounded.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>

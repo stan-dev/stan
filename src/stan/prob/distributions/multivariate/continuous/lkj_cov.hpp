@@ -1,15 +1,15 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_COV_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_COV_HPP
 
-#include <stan/prob/constants.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/math/matrix.hpp>
-#include <stan/error_handling/matrix.hpp>
-#include <stan/error_handling.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/prob/traits.hpp>
-
+#include <stan/prob/constants.hpp>
 #include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
 #include <stan/prob/distributions/multivariate/continuous/lkj_corr.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 

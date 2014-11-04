@@ -3,9 +3,12 @@
 
 #include <boost/random/weibull_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>

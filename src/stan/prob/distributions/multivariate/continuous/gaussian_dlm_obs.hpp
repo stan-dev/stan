@@ -1,17 +1,14 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__GAUSSIAN_DLM_OBS_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__GAUSSIAN_DLM_OBS_HPP
 
-
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
-#include <stan/error_handling/matrix.hpp>
-#include <stan/error_handling.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
-#include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
-#include <stan/meta/traits.hpp>
-
+#include <stan/error_handling/matrix/check_cov_matrix.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/matrix/check_spsd_matrix.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/math/matrix/add.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/inverse_spd.hpp>
@@ -23,6 +20,9 @@
 #include <stan/math/matrix/tcrossprod.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
 #include <stan/math/matrix/transpose.hpp>
+#include <stan/meta/traits.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
 
 /*
   TODO: time-varying system matrices

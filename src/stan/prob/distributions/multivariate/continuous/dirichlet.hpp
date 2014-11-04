@@ -4,12 +4,12 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
-#include <stan/prob/constants.hpp>
-#include <stan/error_handling/matrix.hpp>
-#include <stan/error_handling.hpp>
-#include <stan/prob/traits.hpp>
+#include <stan/error_handling/matrix/check_simplex.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/math/functions/multiply_log.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 

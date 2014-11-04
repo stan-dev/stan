@@ -1,12 +1,16 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_PREC_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_PREC_HPP
 
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/columns_dot_self.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/dot_self.hpp>
-#include <stan/error_handling/matrix.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
@@ -19,7 +23,6 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
 
 namespace stan {
 

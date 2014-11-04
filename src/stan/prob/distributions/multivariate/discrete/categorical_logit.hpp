@@ -3,9 +3,10 @@
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/error_handling.hpp>
-#include <stan/math/matrix/log_softmax.hpp>
+#include <stan/error_handling/scalar/check_bounded.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
+#include <stan/math/matrix/log_softmax.hpp>
 #include <stan/math/matrix/log_sum_exp.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/prob/traits.hpp>

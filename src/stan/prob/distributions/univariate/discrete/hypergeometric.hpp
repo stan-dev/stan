@@ -1,15 +1,18 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__HYPERGEOMETRIC_HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__HYPERGEOMETRIC_HPP
 
+#include <vector>
 #include <boost/math/distributions.hpp>
-#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
-#include <stan/agrad/partials_vari.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_bounded.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_greater.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/math/functions/binomial_coefficient_log.hpp>
-#include <stan/error_handling.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <vector>
+#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
 namespace stan {
 

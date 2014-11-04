@@ -3,9 +3,13 @@
 
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_greater_or_equal.hpp>
+#include <stan/error_handling/scalar/check_less_or_equal.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>

@@ -4,9 +4,9 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
-
-#include <stan/error_handling.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/matrix/check_simplex.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/error_handling/matrix.hpp>
 #include <stan/prob/constants.hpp>

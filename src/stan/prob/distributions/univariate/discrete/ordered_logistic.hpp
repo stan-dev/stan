@@ -3,18 +3,21 @@
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
-
-#include <stan/prob/traits.hpp>
 #include <stan/error_handling.hpp>
 #include <stan/math/functions/inv_logit.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/log1m_exp.hpp>
 #include <stan/math/functions/log1p_exp.hpp>
-#include <stan/error_handling/matrix.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/check_bounded.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_greater.hpp>
+#include <stan/error_handling/scalar/check_less.hpp>
+#include <stan/error_handling/scalar/check_less_or_equal.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/prob/constants.hpp>
-
+#include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 

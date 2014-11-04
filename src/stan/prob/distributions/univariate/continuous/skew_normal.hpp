@@ -3,15 +3,17 @@
 
 #include <boost/random/variate_generator.hpp>
 #include <boost/math/distributions.hpp>
-#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/math/functions/owens_t.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/math/functions/value_of.hpp>
 
 namespace stan {
 

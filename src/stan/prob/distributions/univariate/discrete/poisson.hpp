@@ -1,14 +1,15 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP
 
-#include <boost/random/poisson_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
-
 #include <limits>
 #include <boost/math/special_functions/fpclassify.hpp>
-
+#include <boost/random/poisson_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_less.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>

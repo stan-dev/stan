@@ -1,19 +1,21 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_GP_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_GP_HPP
 
-#include <stan/error_handling/matrix.hpp>
-#include <stan/error_handling.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
-#include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
+#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/matrix/log.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/sum.hpp>
-
-#include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/trace_gen_inv_quad_form_ldlt.hpp>
-#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
   namespace prob {

@@ -1,11 +1,9 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__WISHART_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__WISHART_HPP
 
-#include <boost/concept_check.hpp>
-
-#include <stan/error_handling/scalar/check_greater.hpp>
 #include <stan/error_handling/matrix/check_size_match.hpp>
 #include <stan/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/scalar/check_greater.hpp>
 #include <stan/math/functions/lmgamma.hpp>
 #include <stan/math/matrix/crossprod.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
@@ -17,9 +15,9 @@
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/chi_square.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 

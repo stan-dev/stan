@@ -1,19 +1,18 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_GP_CHOLESKY_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_GP_CHOLESKY_HPP
 
-#include <stan/error_handling/matrix.hpp>
-#include <stan/error_handling.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/agrad/rev.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/math/matrix/row.hpp>
 #include <stan/math/matrix/dot_self.hpp>
 #include <stan/math/matrix/log.hpp>
-#include <stan/math/matrix/multiply.hpp>
-#include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/mdivide_left_tri_low.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/matrix/row.hpp>
+#include <stan/math/matrix/sum.hpp>
 
 namespace stan {
   namespace prob {
