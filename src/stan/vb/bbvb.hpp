@@ -86,9 +86,16 @@ namespace stan {
         elbo /= static_cast<double>(n_monte_carlo_);
 
         // Entropy of normal: 0.5 * log det (L^T L) = 0.5 * 2 * sum(log(diag(L)))
-        elbo += stan::math::sum(stan::math::log(
-                                stan::math::diagonal(muL.L_chol()))
-                                               );
+        // elbo += stan::math::sum(stan::math::log(
+        //                         stan::math::diagonal(muL.L_chol()))
+        //                                        );
+        double tmp = 0.0;
+        for (int d = 0; d < dim; ++d) {
+          tmp = muL.L_chol()(d,d);
+          if (tmp != 0.0) {
+            elbo += log(tmp);
+          }
+        }
 
         return elbo;
       }
@@ -455,7 +462,7 @@ namespace stan {
         vb_params_fullrank muL = vb_params_fullrank(mu,L);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(muL, 5000);
+        do_robbins_monro_adagrad(muL, 1000);
 
         cont_params_ = muL.mu();
 
@@ -479,7 +486,7 @@ namespace stan {
         vb_params_meanfield musigmatilde = vb_params_meanfield(mu,sigma_tilde);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(musigmatilde, 5000);
+        do_robbins_monro_adagrad(musigmatilde, 1000);
 
         cont_params_ = musigmatilde.mu();
 
