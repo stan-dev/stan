@@ -101,12 +101,12 @@ namespace stan {
        * the sample, and evaluating the log joint, adjusted by the entropy
        * term of the normal, which is proportional to 0.5*logdet(L^T L)
        *
-       * @param   musigma2   mean and variance vector of affine transform
-       * @return             evidence lower bound (elbo)
+       * @param   musigmatilde   mean and log-std vector of affine transform
+       * @return                 evidence lower bound (elbo)
        */
-      double calc_ELBO(vb_params_meanfield const& musigma2) {
+      double calc_ELBO(vb_params_meanfield const& musigmatilde) {
         double elbo(0.0);
-        int dim = musigma2.dimension();
+        int dim = musigmatilde.dimension();
 
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
@@ -117,7 +117,7 @@ namespace stan {
           for (int d = 0; d < dim; ++d) {
             z_check(d) = stan::prob::normal_rng(0,1,rng_);
           }
-          z_tilde = musigma2.to_unconstrained(z_check);
+          z_tilde = musigmatilde.to_unconstrained(z_check);
 
           // FIXME: is this the right way to do this?
           //
@@ -132,8 +132,9 @@ namespace stan {
         }
         elbo /= static_cast<double>(n_monte_carlo_);
 
-        // Entropy of normal: 0.5 * log det diag(sigma^2) = 0.5 * sum(log(sigma^2))
-        elbo += 0.5 * stan::math::sum( stan::math::log(musigma2.sigma2()) );
+        // Entropy of normal: 0.5 * log det diag(sigma^2) = sum(log(sigma))
+        //                                                = sum(sigma_tilde)
+        elbo += stan::math::sum( musigmatilde.sigma_tilde() );
 
         return elbo;
       }
@@ -218,17 +219,17 @@ namespace stan {
        * It uses the same gradient computed from a set of Monte Carlo
        * samples
        *
-       * @param musigma2     mean and cholesky factor of affine transform
-       * @param mu_grad      gradient of location vector parameter
-       * @param sigma2_grad  gradient of variance vector parameter
+       * @param musigmatilde      mean and log-std vector of affine transform
+       * @param mu_grad           gradient of mean vector parameter
+       * @param sigma_tilde_grad  gradient of log-std vector parameter
        */
       void calc_combined_grad(
-        vb_params_meanfield const& musigma2,
+        vb_params_meanfield const& musigmatilde,
         Eigen::VectorXd& mu_grad,
-        Eigen::VectorXd& sigma2_grad) {
+        Eigen::VectorXd& sigma_tilde_grad) {
         static const char* function = "stan::vb::bbvb.calc_combined_grad(%1%)";
 
-        int dim       = musigma2.dimension();
+        int dim       = musigmatilde.dimension();
         double tmp_lp = 0.0;
 
         double tmp(0.0);
@@ -238,8 +239,8 @@ namespace stan {
                               &tmp);
 
         // Initialize everything to zero
-        mu_grad      = Eigen::VectorXd::Zero(dim);
-        sigma2_grad  = Eigen::VectorXd::Zero(dim);
+        mu_grad          = Eigen::VectorXd::Zero(dim);
+        sigma_tilde_grad = Eigen::VectorXd::Zero(dim);
 
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dim);
 
@@ -253,7 +254,7 @@ namespace stan {
           for (int d = 0; d < dim; ++d) {
             z_check(d) = stan::prob::normal_rng(0,1,rng_);
           }
-          z_tilde = musigma2.to_unconstrained(z_check);
+          z_tilde = musigmatilde.to_unconstrained(z_check);
 
           stan::math::check_not_nan(function,
             z_tilde,  "z_tilde",
@@ -266,23 +267,23 @@ namespace stan {
           // Update mu
           mu_grad.array() = mu_grad.array() + tmp_mu_grad.array();
 
-          // Update sigma2
-          for (int d = 0; d < dim; ++d) {
-            sigma2_grad(d) += tmp_mu_grad(d) * z_check(d);
-          }
-          // sigma2_grad.array() = sigma2_grad.array() + tmp_mu_grad.dot(z_check);
+          // Update sigma_tilde
+          // for (int d = 0; d < dim; ++d) {
+          //   sigma_tilde_grad(d) += tmp_mu_grad(d) * z_check(d);
+          // }
+          sigma_tilde_grad.array() = sigma_tilde_grad.array() + tmp_mu_grad.dot(z_check);
 
         }
-        mu_grad      /= static_cast<double>(n_monte_carlo_);
-        sigma2_grad  /= static_cast<double>(n_monte_carlo_);
+        mu_grad           /= static_cast<double>(n_monte_carlo_);
+        sigma_tilde_grad  /= static_cast<double>(n_monte_carlo_);
 
-        sigma2_grad.array() = sigma2_grad.array().cwiseProduct(musigma2.sigma2().array().exp());
+        // multiply by exp(sigma_tilde)
+        sigma_tilde_grad.array() =
+          sigma_tilde_grad.array().cwiseProduct(
+                                      musigmatilde.sigma_tilde().array().exp());
 
-        // Add gradient of entropy term
-        sigma2_grad.array() += static_cast<double>(dim);
-        // sigma2_grad.array() += (
-        //                         musigma2.sigma2().array()
-        //                         ).inverse();
+        // Add gradient of entropy term (just equal to dim here)
+        sigma_tilde_grad.array() += static_cast<double>(dim);
       }
 
 
@@ -358,20 +359,22 @@ namespace stan {
        *
        * Runs Robbins-Monro Stochastic Gradient for some number of iterations
        *
-       * @param musigma2        mean and variance vector of affine transform
+       * @param musigmatilde    mean and log-std vector of affine transform
        * @param max_iterations  number of iterations to run algorithm
        */
-      void do_robbins_monro_adagrad( vb_params_meanfield& musigma2,
+      void do_robbins_monro_adagrad( vb_params_meanfield& musigmatilde,
                                      int max_iterations ) {
-        Eigen::VectorXd mu_grad      = Eigen::VectorXd::Zero(model_.num_params_r());
-        Eigen::VectorXd sigma2_grad  = Eigen::VectorXd::Zero(model_.num_params_r());
+
+        Eigen::VectorXd mu_grad           = Eigen::VectorXd::Zero(model_.num_params_r());
+        Eigen::VectorXd sigma_tilde_grad  = Eigen::VectorXd::Zero(model_.num_params_r());
 
         // ADAgrad parameters
         double eta = 1.0;
         double tau = 1.0;
-        Eigen::VectorXd mu_s     = Eigen::VectorXd::Zero(model_.num_params_r());
-        Eigen::VectorXd sigma2_s = Eigen::VectorXd::Zero(model_.num_params_r());
+        Eigen::VectorXd mu_s          = Eigen::VectorXd::Zero(model_.num_params_r());
+        Eigen::VectorXd sigma_tilde_s = Eigen::VectorXd::Zero(model_.num_params_r());
 
+        // RMSprop window_size
         double window_size = 100.0;
 
         for (int i = 0; i < max_iterations; ++i)
@@ -381,28 +384,32 @@ namespace stan {
                                         << "----------------" << std::endl;
 
           // Compute gradient using Monte Carlo integration
-          calc_combined_grad(musigma2, mu_grad, sigma2_grad);
+          calc_combined_grad(musigmatilde, mu_grad, sigma_tilde_grad);
 
           // Accumulate S vector for ADAgrad
-          mu_s.array()      += mu_grad.array().square();
-          sigma2_s.array()  += sigma2_grad.array().square();
+          mu_s.array()           += mu_grad.array().square();
+          sigma_tilde_s.array()  += sigma_tilde_grad.array().square();
 
           mu_s.array() = ( 1.0 - 1.0/window_size ) * mu_s.array()
                           + 1.0/window_size * mu_grad.array().square();
-          sigma2_s.array()  = ( 1.0 - 1.0/window_size ) * sigma2_s.array()
-                          + 1.0/window_size * sigma2_grad.array().square();
+          sigma_tilde_s.array()  = ( 1.0 - 1.0/window_size ) * sigma_tilde_s.array()
+                          + 1.0/window_size * sigma_tilde_grad.array().square();
 
           // Take ADAgrad or rmsprop step
-          musigma2.set_mu( musigma2.mu().array() +
-            eta * mu_grad.array() / (tau + mu_s.array().sqrt()) );
-          musigma2.set_sigma2(  musigma2.sigma2().array()  +
-            eta * sigma2_grad.array()  / (tau + sigma2_s.array().sqrt()) );
+          musigmatilde.set_mu(
+            musigmatilde.mu().array() +
+            eta * mu_grad.array() / (tau + mu_s.array().sqrt())
+            );
+          musigmatilde.set_sigma_tilde(
+            musigmatilde.sigma_tilde().array()  +
+            eta * sigma_tilde_grad.array()  / (tau + sigma_tilde_s.array().sqrt())
+            );
 
           if (out_stream_) *out_stream_ << "mu = " << std::endl
-                                        << musigma2.mu() << std::endl;
+                                        << musigmatilde.mu() << std::endl;
 
-          // if (out_stream_) *out_stream_ << "sigma2 = " << std::endl
-          //                               << musigma2.sigma2() << std::endl;
+          // if (out_stream_) *out_stream_ << "sigma_tilde = " << std::endl
+          //                               << musigmatilde.sigma_tilde() << std::endl;
 
           // elbo_ = calc_ELBO(muL);
           // if (out_stream_) *out_stream_ << "elbo_ = " << elbo_ << std::endl;
@@ -437,18 +444,18 @@ namespace stan {
           << cont_params_ << std::endl << std::endl;
 
         // Initialize variational parameters: mu, L
-        Eigen::VectorXd mu      = cont_params_;
-        Eigen::MatrixXd sigma2  = Eigen::VectorXd::Constant(
-                                    model_.num_params_r(),
-                                    1.0
-                                    );
+        Eigen::VectorXd mu           = cont_params_;
+        Eigen::MatrixXd sigma_tilde  = Eigen::VectorXd::Constant(
+                                                model_.num_params_r(),
+                                                1.0
+                                                );
 
-        vb_params_meanfield mu_sigma2 = vb_params_meanfield(mu,sigma2);
+        vb_params_meanfield musigmatilde = vb_params_meanfield(mu,sigma_tilde);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(mu_sigma2, 10000);
+        do_robbins_monro_adagrad(musigmatilde, 10000);
 
-        cont_params_ = mu_sigma2.mu();
+        cont_params_ = musigmatilde.mu();
 
         return;
       }
