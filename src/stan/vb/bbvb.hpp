@@ -58,6 +58,8 @@ namespace stan {
        * @return        evidence lower bound (elbo)
        */
       double calc_ELBO(vb_params_fullrank const& muL) {
+        static const char* function = "stan::vb::bbvb.calc_ELBO(%1%)";
+        double error_tmp(0.0);
         double elbo(0.0);
         int dim = muL.dimension();
 
@@ -85,13 +87,10 @@ namespace stan {
         }
         elbo /= static_cast<double>(n_monte_carlo_);
 
-        // Entropy of normal: 0.5 * log det (L^T L) = 0.5 * 2 * sum(log(diag(L)))
-        // elbo += stan::math::sum(stan::math::log(
-        //                         stan::math::diagonal(muL.L_chol()))
-        //                                        );
+        // Entropy of normal: 0.5 * log det (L^T L) = sum(log(abs(diag(L))))
         double tmp = 0.0;
         for (int d = 0; d < dim; ++d) {
-          tmp = muL.L_chol()(d,d);
+          tmp = abs(muL.L_chol()(d,d));
           if (tmp != 0.0) {
             elbo += log(tmp);
           }
@@ -307,7 +306,7 @@ namespace stan {
                                                         model_.num_params_r());
 
         // ADAgrad parameters
-        double eta = 1.0;
+        double eta = 0.1;
         double tau = 1.0;
         Eigen::VectorXd mu_s = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::MatrixXd L_s  = Eigen::MatrixXd::Zero(model_.num_params_r(),
@@ -348,9 +347,13 @@ namespace stan {
             eta * L_grad.array()  / (tau + L_s.array().sqrt()) );
 
           // print out to std::cout for now
-          std::cout
-          << "mu = " << std::endl
-          << muL.mu() << std::endl;
+          // std::cout
+          // << "mu = "  << std::endl
+          // << muL.mu() << std::endl;
+
+          // std::cout
+          // << "L_chol = "  << std::endl
+          // << muL.L_chol() << std::endl;
 
           // write elbo and parameters to "error stream"
           if (err_stream_){
@@ -361,8 +364,7 @@ namespace stan {
               *err_stream_, calc_ELBO(muL), mu_print);
           }
 
-          // std::cout << "L_chol = " << std::endl
-          //                               << muL.L_chol() << std::endl;
+
 
           // std::cout << "Sigma = " << std::endl
           //                               << muL.L_chol() * muL.L_chol().transpose() << std::endl;
@@ -429,9 +431,9 @@ namespace stan {
             );
 
           // print out to std::cout for now
-          std::cout
-          << "mu = " << std::endl
-          << musigmatilde.mu() << std::endl;
+          // std::cout
+          // << "mu = " << std::endl
+          // << musigmatilde.mu() << std::endl;
 
           // write elbo and parameters to "error stream"
           if (err_stream_){
@@ -462,7 +464,7 @@ namespace stan {
         vb_params_fullrank muL = vb_params_fullrank(mu,L);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(muL, 1000);
+        do_robbins_monro_adagrad(muL, 10000);
 
         cont_params_ = muL.mu();
 
@@ -486,7 +488,7 @@ namespace stan {
         vb_params_meanfield musigmatilde = vb_params_meanfield(mu,sigma_tilde);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(musigmatilde, 1000);
+        do_robbins_monro_adagrad(musigmatilde, 10000);
 
         cont_params_ = musigmatilde.mu();
 
