@@ -4,8 +4,11 @@
 #include <vector>
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/functions/max.hpp>
+
 #include <stan/math/error_handling/matrix/check_size_match.hpp>
 #include <stan/math/error_handling/check_not_nan.hpp>
+#include <stan/math/error_handling/check_positive_finite.hpp>
 
 namespace stan {
 
@@ -15,15 +18,17 @@ namespace stan {
 
     private:
 
-      Eigen::VectorXd mu_;     // Mean of location-scale family
-      Eigen::VectorXd sigma2_; // Variances of location-scale family
+      Eigen::VectorXd mu_;         // Mean of location-scale family
+      Eigen::VectorXd sigma2_; // Log standard deviations
       int dimension_;
 
     public:
 
       vb_params_meanfield(Eigen::VectorXd const& mu,
                           Eigen::VectorXd const& sigma2) :
-      mu_(mu), sigma2_(sigma2), dimension_(mu.size()) {
+      mu_(mu),
+      sigma2_(sigma2),
+      dimension_(mu.size()) {
 
         static const char* function = "stan::vb::vb_params_meanfield(%1%)";
 
@@ -44,7 +49,9 @@ namespace stan {
 
       // Mutators
       void set_mu(Eigen::VectorXd const& mu)         { mu_ = mu; }
-      void set_sigma2(Eigen::VectorXd const& sigma2) { sigma2_ = sigma2; }
+      void set_sigma2(Eigen::VectorXd const& sigma2) {
+        sigma2_ = sigma2;
+      }
 
       // Implements f^{-1}(\check{z}) = sigma * \check{z} + \mu
       Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& z_check) const {
@@ -57,17 +64,13 @@ namespace stan {
                          z_check.size(), "Dimension of input vector",
                          &tmp);
 
-        stan::math::check_not_nan(function,                                         /////////////////////// FIXME
-            sigma2_,  "sigma2_",
-            &tmp);
-        stan::math::check_not_nan(function,
-            mu_,  "mu_",
-            &tmp);
-        stan::math::check_not_nan(function,
-            z_check,  "z_check",
-            &tmp);
 
-        return sigma2_.cwiseSqrt().cwiseProduct(z_check) + mu_;
+        // stan::math::check_positive_finite(function,
+        //     sigma2_,  "sigma2_",
+        //     &tmp);
+
+        // return sigma2_.array().exp().cwiseProduct(z_check) + mu_;
+        return z_check.array().cwiseProduct(sigma2_.array().exp()) + mu_.array();
       };
 
     };

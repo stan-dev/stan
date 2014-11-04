@@ -648,7 +648,7 @@ namespace stan {
         // cmd_vb.run_robbins_monro_fullrank();
         cmd_vb.run_robbins_monro_meanfield();
 
-        // cont_params = cmd_vb.cont_params_;
+        cont_params = cmd_vb.cont_params();
         // elbo = cmd_vb.elbo_;
 
         std::vector<double> cont_vector(cont_params.size());

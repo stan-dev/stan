@@ -267,16 +267,22 @@ namespace stan {
           mu_grad.array() = mu_grad.array() + tmp_mu_grad.array();
 
           // Update sigma2
-          sigma2_grad.array() = sigma2_grad.array() + tmp_mu_grad.dot(z_check);
+          for (int d = 0; d < dim; ++d) {
+            sigma2_grad(d) += tmp_mu_grad(d) * z_check(d);
+          }
+          // sigma2_grad.array() = sigma2_grad.array() + tmp_mu_grad.dot(z_check);
 
         }
         mu_grad      /= static_cast<double>(n_monte_carlo_);
         sigma2_grad  /= static_cast<double>(n_monte_carlo_);
 
+        sigma2_grad.array() = sigma2_grad.array().cwiseProduct(musigma2.sigma2().array().exp());
+
         // Add gradient of entropy term
-        sigma2_grad.array() += (
-                                musigma2.sigma2().array()
-                                ).inverse();
+        sigma2_grad.array() += static_cast<double>(dim);
+        // sigma2_grad.array() += (
+        //                         musigma2.sigma2().array()
+        //                         ).inverse();
       }
 
 
@@ -366,6 +372,7 @@ namespace stan {
         Eigen::VectorXd mu_s     = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::VectorXd sigma2_s = Eigen::VectorXd::Zero(model_.num_params_r());
 
+        double window_size = 100.0;
 
         for (int i = 0; i < max_iterations; ++i)
         {
@@ -380,7 +387,10 @@ namespace stan {
           mu_s.array()      += mu_grad.array().square();
           sigma2_s.array()  += sigma2_grad.array().square();
 
-
+          mu_s.array() = ( 1.0 - 1.0/window_size ) * mu_s.array()
+                          + 1.0/window_size * mu_grad.array().square();
+          sigma2_s.array()  = ( 1.0 - 1.0/window_size ) * sigma2_s.array()
+                          + 1.0/window_size * sigma2_grad.array().square();
 
           // Take ADAgrad or rmsprop step
           musigma2.set_mu( musigma2.mu().array() +
@@ -388,7 +398,6 @@ namespace stan {
           musigma2.set_sigma2(  musigma2.sigma2().array()  +
             eta * sigma2_grad.array()  / (tau + sigma2_s.array().sqrt()) );
 
-          cont_params_ = musigma2.mu();
           if (out_stream_) *out_stream_ << "mu = " << std::endl
                                         << musigma2.mu() << std::endl;
 
@@ -428,15 +437,24 @@ namespace stan {
           << cont_params_ << std::endl << std::endl;
 
         // Initialize variational parameters: mu, L
-        Eigen::VectorXd mu = cont_params_;
-        Eigen::MatrixXd sigma2  = Eigen::VectorXd::Ones(model_.num_params_r());
+        Eigen::VectorXd mu      = cont_params_;
+        Eigen::MatrixXd sigma2  = Eigen::VectorXd::Constant(
+                                    model_.num_params_r(),
+                                    1.0
+                                    );
 
         vb_params_meanfield mu_sigma2 = vb_params_meanfield(mu,sigma2);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(mu_sigma2, 1500);
+        do_robbins_monro_adagrad(mu_sigma2, 10000);
+
+        cont_params_ = mu_sigma2.mu();
 
         return;
+      }
+
+      Eigen::VectorXd const& cont_params() {
+        return cont_params_;
       }
 
     protected:
