@@ -14,13 +14,8 @@
 #include <boost/exception/all.hpp>
 #include <boost/random/linear_congruential.hpp>
 
-#include <stan/agrad/rev/matrix/Eigen_NumTraits.hpp>
-
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
-
-//#include <stan/agrad/fwd.hpp>
-//#include <stan/agrad/fwd/matrix.hpp>
 
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
