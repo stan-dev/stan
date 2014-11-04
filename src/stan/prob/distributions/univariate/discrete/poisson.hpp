@@ -8,7 +8,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
@@ -21,17 +21,16 @@ namespace stan {
   namespace prob {
 
     // Poisson(n|lambda)  [lambda > 0;  n >= 0]
-    template <bool propto,
-              typename T_n, typename T_rate>
+    template <bool propto, typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_log(const T_n& n, const T_rate& lambda) {
 
       static const char* function = "stan::prob::poisson_log(%1%)";
       
       using boost::math::lgamma;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
       using stan::prob::include_summand;
       using stan::math::value_of;
       
@@ -111,10 +110,10 @@ namespace stan {
       static const char* function = "stan::prob::poisson_log_log(%1%)";
       
       using boost::math::lgamma;
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using std::exp;
       
@@ -194,10 +193,10 @@ namespace stan {
     poisson_cdf(const T_n& n, const T_rate& lambda) {
       static const char* function = "stan::prob::poisson_cdf(%1%)";
           
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
           
       // Ensure non-zero argument slengths
       if (!(stan::length(n) && stan::length(lambda))) 
@@ -260,10 +259,10 @@ namespace stan {
     poisson_cdf_log(const T_n& n, const T_rate& lambda) {
       static const char* function = "stan::prob::poisson_cdf_log(%1%)";
           
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
           
       // Ensure non-zero argument slengths
       if (!(stan::length(n) && stan::length(lambda))) 
@@ -322,10 +321,10 @@ namespace stan {
     poisson_ccdf_log(const T_n& n, const T_rate& lambda) {
       static const char* function = "stan::prob::poisson_ccdf_log(%1%)";
           
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
           
       // Ensure non-zero argument slengths
       if (!(stan::length(n) && stan::length(lambda))) 
@@ -379,6 +378,8 @@ namespace stan {
       return operands_and_partials.to_var(P);
     }
 
+    static const double POISSON_MAX_RATE = pow(2,30);
+
     template <class RNG>
     inline int
     poisson_rng(const double lambda,
@@ -388,19 +389,49 @@ namespace stan {
 
       static const char* function = "stan::prob::poisson_rng(%1%)";
       
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_less;
  
       check_not_nan(function, lambda,
-                    "Rate parameter", (double*)0);
+                    "Rate parameter", static_cast<double*>(0));
       check_nonnegative(function, lambda,
-                        "Rate parameter", (double*)0);
+                        "Rate parameter", static_cast<double*>(0));
+
+      check_less(function, lambda,POISSON_MAX_RATE, 
+                 "Rate parameter", static_cast<double*>(0));
 
       variate_generator<RNG&, poisson_distribution<> >
         poisson_rng(rng, poisson_distribution<>(lambda));
       return poisson_rng();
     }
       
+    static const double POISSON_MAX_LOG_RATE = 30 * log(2);
+
+    template <class RNG>
+    inline int
+    poisson_log_rng(const double alpha,
+                RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::poisson_distribution;
+
+      static const char* function = "stan::prob::poisson_log_rng(%1%)";
+      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_less;
+      using std::exp;
+ 
+      check_not_nan(function, alpha,
+                    "Log rate parameter", static_cast<double*>(0));
+
+      check_less(function, alpha, POISSON_MAX_LOG_RATE, 
+                 "Log rate parameter", static_cast<double*>(0));
+
+      variate_generator<RNG&, poisson_distribution<> >
+        poisson_rng(rng, poisson_distribution<>(exp(alpha)));
+      return poisson_rng();
+    }
   }
 }
 #endif

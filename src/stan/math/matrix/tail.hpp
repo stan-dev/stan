@@ -2,9 +2,9 @@
 #define STAN__MATH__MATRIX__TAIL_HPP
 
 #include <vector>
-#include <stan/math/error_handling/matrix/check_column_index.hpp>
-#include <stan/math/error_handling/matrix/check_row_index.hpp>
-#include <stan/math/error_handling/matrix/check_std_vector_index.hpp>
+#include <stan/error_handling/matrix/check_column_index.hpp>
+#include <stan/error_handling/matrix/check_row_index.hpp>
+#include <stan/error_handling/matrix/check_std_vector_index.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 
@@ -22,7 +22,7 @@ namespace stan {
     tail(const Eigen::Matrix<T,Eigen::Dynamic,1>& v,
          size_t n) {
       if (n != 0)
-        stan::math::check_row_index("tail(%1%)",n,v,"n",(double*)0);
+        stan::error_handling::check_row_index("tail(%1%)",n,v,"n",(double*)0);
       return v.tail(n);
     }
 
@@ -37,7 +37,7 @@ namespace stan {
     tail(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv,
          size_t n) {
       if (n != 0)
-        stan::math::check_column_index("tail(%1%)",n,rv,"n",(double*)0);
+        stan::error_handling::check_column_index("tail(%1%)",n,rv,"n",(double*)0);
       return rv.tail(n);
     }
 
@@ -46,7 +46,7 @@ namespace stan {
                         size_t n) {
       typedef typename index_type<std::vector<T> >::type idx_t;
       if (n != 0)
-        stan::math::check_std_vector_index("tail(%1%)",n,sv,"n",(double*)0);
+        stan::error_handling::check_std_vector_index("tail(%1%)",n,sv,"n",(double*)0);
       std::vector<T> s;
       for (idx_t i = sv.size() - n; i < sv.size(); ++i)
         s.push_back(sv[i]);

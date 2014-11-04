@@ -9,12 +9,12 @@
 
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/columns_dot_self.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/dot_self.hpp>
-#include <stan/math/matrix_error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/math/matrix/mdivide_left_spd.hpp>
@@ -63,9 +63,9 @@ namespace stan {
       using stan::math::subtract;
       using stan::math::sum;
       
-      using stan::math::check_size_match;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
+      using stan::error_handling::check_size_match;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
 
       VectorViewMvt<const T_y> y_vec(y);
       VectorViewMvt<const T_loc> mu_vec(mu);
@@ -172,7 +172,7 @@ namespace stan {
 
       static const char* function = "stan::prob::multi_normal_cholesky_rng(%1%)";
 
-      using stan::math::check_finite;
+      using stan::error_handling::check_finite;
  
       check_finite(function, mu, "Location parameter", (double*)0);
 

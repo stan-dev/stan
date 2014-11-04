@@ -4,9 +4,9 @@
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/math/error_handling/dom_err.hpp>
+#include <stan/error_handling/matrix.hpp>
+#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/agrad/rev.hpp>
@@ -91,11 +91,11 @@ namespace stan {
       T_lp lp(0.0);
 
       using stan::math::add;
-      using stan::math::check_cov_matrix;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_size_match;
-      using stan::math::check_spsd_matrix;
+      using stan::error_handling::check_cov_matrix;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_size_match;
+      using stan::error_handling::check_spsd_matrix;
       using stan::math::inverse_spd;
       using stan::math::log_determinant_spd;
       using stan::math::multiply;
@@ -299,12 +299,12 @@ namespace stan {
       T_lp lp(0.0);
 
       using stan::math::add;
-      using stan::math::check_cov_matrix;
-      using stan::math::check_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_not_nan;
-      using stan::math::check_size_match;
-      using stan::math::check_spsd_matrix;
+      using stan::error_handling::check_cov_matrix;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_size_match;
+      using stan::error_handling::check_spsd_matrix;
       using stan::math::dot_product;
       using stan::math::multiply;
       using stan::math::quad_form_sym;

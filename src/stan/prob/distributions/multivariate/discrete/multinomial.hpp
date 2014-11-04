@@ -5,10 +5,10 @@
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/math/error_handling.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/functions/multiply_log.hpp>
-#include <stan/math/matrix_error_handling.hpp>
+#include <stan/error_handling/matrix.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 #include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
@@ -26,9 +26,9 @@ namespace stan {
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
       static const char* function = "stan::prob::multinomial_log(%1%)";
 
-      using stan::math::check_nonnegative;
-      using stan::math::check_simplex;
-      using stan::math::check_size_match;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_simplex;
+      using stan::error_handling::check_size_match;
       using boost::math::tools::promote_args;
       using boost::math::lgamma;
 
@@ -69,8 +69,8 @@ namespace stan {
                     const int N,
                     RNG& rng) {
       static const char* function = "stan::prob::multinomial_rng(%1%)";
-      using stan::math::check_simplex;
-      using stan::math::check_positive;
+      using stan::error_handling::check_simplex;
+      using stan::error_handling::check_positive;
 
       check_simplex(function, theta, "Probabilites parameter", (double*)0);
       check_positive(function,N,"number of trials variables", (double*)0);

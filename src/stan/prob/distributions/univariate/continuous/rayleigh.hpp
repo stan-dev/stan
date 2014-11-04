@@ -6,7 +6,7 @@
 
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -23,9 +23,9 @@ namespace stan {
 
       using std::log;
       using stan::is_constant_struct;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -105,10 +105,10 @@ namespace stan {
     rayleigh_cdf(const T_y& y, const T_scale& sigma) {
       static const char* function = "stan::prob::rayleigh_cdf(%1%)";
 
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::is_constant_struct;
       using stan::math::square;
@@ -176,10 +176,10 @@ namespace stan {
     rayleigh_cdf_log(const T_y& y, const T_scale& sigma) {
       static const char* function = "stan::prob::rayleigh_cdf_log(%1%)";
 
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::is_constant_struct;
       using stan::math::square;
@@ -239,10 +239,10 @@ namespace stan {
     rayleigh_ccdf_log(const T_y& y, const T_scale& sigma) {
       static const char* function = "stan::prob::rayleigh_ccdf_log(%1%)";
 
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::is_constant_struct;
       using stan::math::square;
@@ -303,7 +303,7 @@ namespace stan {
 
       static const char* function = "stan::prob::rayleigh_rng(%1%)";
 
-      using stan::math::check_positive;
+      using stan::error_handling::check_positive;
 
       check_positive(function, sigma, "Scale parameter", (double*)0);
 

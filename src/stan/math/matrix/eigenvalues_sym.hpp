@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__MATRIX__EIGENVALUES_SYM_HPP
 #define STAN__MATH__MATRIX__EIGENVALUES_SYM_HPP
 
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/matrix/check_nonzero_size.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
@@ -20,9 +20,9 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,1>
     eigenvalues_sym(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      stan::math::check_nonzero_size("eigenvalues_sym(%1%)",m,
+      stan::error_handling::check_nonzero_size("eigenvalues_sym(%1%)",m,
                                      "m",(double*)0);
-      stan::math::check_symmetric("eigenvalues_sym(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_symmetric("eigenvalues_sym(%1%)",m,"m",(double*)0);
 
       Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
         solver(m,Eigen::EigenvaluesOnly);

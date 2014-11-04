@@ -2,12 +2,12 @@
 #define STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP
 
 #include <vector>
-#include <stan/math/error_handling/dom_err.hpp>
+#include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 // FIXME: use explicit files
 #include <stan/agrad/rev.hpp> 
@@ -51,7 +51,7 @@ namespace stan {
         double log_determinant_spd_vari_calc(const Eigen::Matrix<var,R,C> &A,
                                              log_determinant_spd_alloc<R,C> **alloc)
         {
-          using stan::math::dom_err;
+          using stan::error_handling::dom_err;
 
           // allocate space for information needed in chain
           *alloc = new log_determinant_spd_alloc<R,C>();
@@ -114,7 +114,7 @@ namespace stan {
 
     template <int R, int C>
     inline var log_determinant_spd(const Eigen::Matrix<var,R,C>& m) {
-      stan::math::check_square("log_determinant_spd(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("log_determinant_spd(%1%)",m,"m",(double*)0);
       return var(new log_determinant_spd_vari<R,C>(m));
     }
     

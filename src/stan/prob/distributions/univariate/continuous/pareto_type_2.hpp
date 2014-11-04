@@ -5,7 +5,7 @@
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/functions/log1m.hpp>
@@ -27,12 +27,12 @@ namespace stan {
       
       using std::log;
       using stan::math::value_of;
-      using stan::math::check_finite;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -151,13 +151,13 @@ namespace stan {
       // Check errors
       static const char* function = "stan::prob::pareto_type_2_cdf(%1%)";
           
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_finite;
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
           
       double P(1.0);
@@ -281,13 +281,13 @@ namespace stan {
       // Check errors
       static const char* function = "stan::prob::pareto_type_2_cdf_log(%1%)";
           
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_finite;
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
       using stan::math::log1m;
 
@@ -392,12 +392,12 @@ namespace stan {
       // Check errors
       static const char* function = "stan::prob::pareto_type_2_ccdf_log(%1%)";
           
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
           
       double P(0.0);
@@ -498,7 +498,7 @@ namespace stan {
                       RNG& rng) {
       static const char* function = "stan::prob::pareto_type_2_rng(%1%)";
       
-      stan::math::check_positive(function, lambda, "scale parameter", 
+      stan::error_handling::check_positive(function, lambda, "scale parameter", 
                                  (double*)0);
 
       double uniform_01 = stan::prob::uniform_rng(0.0, 1.0, rng);

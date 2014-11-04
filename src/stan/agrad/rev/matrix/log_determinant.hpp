@@ -6,7 +6,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 // FIXME: use explicit files
 #include <stan/agrad/rev.hpp> 
@@ -67,7 +67,7 @@ namespace stan {
 
     template <int R, int C>
     inline var log_determinant(const Eigen::Matrix<var,R,C>& m) {
-      stan::math::check_square("log_determinant(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("log_determinant(%1%)",m,"m",(double*)0);
       return var(new log_determinant_vari<R,C>(m));
     }
     

@@ -4,8 +4,8 @@
 #include <boost/type_traits/is_arithmetic.hpp> 
 #include <boost/utility/enable_if.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_matching_sizes.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
 
 namespace stan {
   namespace math {
@@ -61,7 +61,7 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2> multiply(const Eigen::Matrix<double,R1,C1>& m1,
                                                 const Eigen::Matrix<double,R2,C2>& m2) {
       
-      stan::math::check_multiplicable("multiply(%1%)",m1,"m1",
+      stan::error_handling::check_multiplicable("multiply(%1%)",m1,"m1",
                                       m2,"m2",(double*)0);
       return m1*m2;
     }
@@ -78,7 +78,7 @@ namespace stan {
     template<int C1,int R2>
     inline double multiply(const Eigen::Matrix<double,1,C1>& rv,
                            const Eigen::Matrix<double,R2,1>& v) {
-      stan::math::check_matching_sizes("multiply(%1%)",rv,"rv",
+      stan::error_handling::check_matching_sizes("multiply(%1%)",rv,"rv",
                                        v,"v",(double*)0);
       if (rv.size() != v.size()) 
         throw std::domain_error("rv.size() != v.size()");

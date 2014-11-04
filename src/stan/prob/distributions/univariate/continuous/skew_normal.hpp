@@ -6,7 +6,7 @@
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/functions/owens_t.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
@@ -26,10 +26,10 @@ namespace stan {
 
       using std::log;
       using stan::is_constant_struct;
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -142,10 +142,10 @@ namespace stan {
                     const T_shape& alpha) {
       static const char* function = "stan::prob::skew_normal_cdf(%1%)";
 
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::owens_t;
       using stan::math::value_of;
 
@@ -238,11 +238,11 @@ namespace stan {
                     const T_shape& alpha) {
       static const char* function = "stan::prob::skew_normal_cdf_log(%1%)";
 
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::owens_t;
 
       double cdf_log(0.0);
@@ -321,10 +321,10 @@ namespace stan {
                          const T_shape& alpha) {
       static const char* function = "stan::prob::skew_normal_ccdf_log(%1%)";
 
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::owens_t;
       using stan::math::value_of;
 
@@ -408,8 +408,8 @@ namespace stan {
 
       static const char* function = "stan::prob::skew_normal_rng(%1%)";
 
-      using stan::math::check_positive;
-      using stan::math::check_finite;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
 
       check_finite(function, mu, "Location parameter", (double*)0);
       check_finite(function, alpha, "Shape parameter", (double*)0);

@@ -4,7 +4,7 @@
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_matching_dims.hpp>
+#include <stan/error_handling/matrix/check_matching_dims.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/dot_product.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
@@ -18,7 +18,7 @@ namespace stan {
     Eigen::Matrix<fvar<T>, R1, 1>
     rows_dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
                      const Eigen::Matrix<fvar<T>, R2, C2>& v2) {
-      stan::math::check_matching_dims("rows_dot_product(%1%)",v1,"v1",
+      stan::error_handling::check_matching_dims("rows_dot_product(%1%)",v1,"v1",
                                       v2,"v2",(double*)0);
       Eigen::Matrix<fvar<T>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
@@ -34,7 +34,7 @@ namespace stan {
     Eigen::Matrix<fvar<T>, R1, 1>
     rows_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                      const Eigen::Matrix<fvar<T>, R2, C2>& v2) {
-      stan::math::check_matching_dims("rows_dot_product(%1%)",v1,"v1",
+      stan::error_handling::check_matching_dims("rows_dot_product(%1%)",v1,"v1",
                                       v2,"v2",(double*)0);
       Eigen::Matrix<fvar<T>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
@@ -50,7 +50,7 @@ namespace stan {
     Eigen::Matrix<fvar<T>, R1, 1>
     rows_dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
                      const Eigen::Matrix<double, R2, C2>& v2) {
-      stan::math::check_matching_dims("rows_dot_product(%1%)",v1,"v1",
+      stan::error_handling::check_matching_dims("rows_dot_product(%1%)",v1,"v1",
                                       v2,"v2",(double*)0);
       Eigen::Matrix<fvar<T>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
