@@ -1,9 +1,11 @@
 #ifndef STAN__VB__BBVB__HPP
 #define STAN__VB__BBVB__HPP
 
-#include <ostream>
-
 #include <stan/math/matrix/Eigen.hpp>
+
+#include <ostream>
+#include <stan/common/write_iteration_csv.hpp>
+
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/model/util.hpp>
 
@@ -14,7 +16,6 @@
 
 #include <stan/math/error_handling/matrix/check_size_match.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
-
 #include <stan/math/error_handling/check_not_nan.hpp>
 
 #include <stan/vb/base_vb.hpp>
@@ -268,9 +269,6 @@ namespace stan {
           mu_grad.array() = mu_grad.array() + tmp_mu_grad.array();
 
           // Update sigma_tilde
-          // for (int d = 0; d < dim; ++d) {
-          //   sigma_tilde_grad(d) += tmp_mu_grad(d) * z_check(d);
-          // }
           sigma_tilde_grad.array() = sigma_tilde_grad.array() + tmp_mu_grad.dot(z_check);
 
         }
@@ -308,14 +306,19 @@ namespace stan {
         Eigen::MatrixXd L_s  = Eigen::MatrixXd::Zero(model_.num_params_r(),
                                                      model_.num_params_r());
 
-        // // rmsprop parameters
-        // double window_size = 100.0;
+        // rmsprop parameters
+        double window_size = 100.0;
+
+        std::vector<double> mu_print;
 
         for (int i = 0; i < max_iterations; ++i)
         {
-          if (out_stream_) *out_stream_ << "----------------" << std::endl
-                                        << "  iter " << i << std::endl
-                                        << "----------------" << std::endl;
+          mu_print.clear();
+
+          std::cout
+          << "----------------" << std::endl
+          << "  iter " << i     << std::endl
+          << "----------------" << std::endl;
 
           // Compute gradient using Monte Carlo integration
           calc_combined_grad(muL, mu_grad, L_grad);
@@ -324,11 +327,11 @@ namespace stan {
           mu_s.array() += mu_grad.array().square();
           L_s.array()  += L_grad.array().square();
 
-          // // Moving average for rmsprop
-          // mu_s.array() = ( 1 - 1.0/window_size ) * mu_s.array()
-          //                 + 1.0/window_size * mu_grad.array().square();
-          // L_s.array()  = ( 1 - 1.0/window_size ) * L_s.array()
-          //                 + 1.0/window_size * L_grad.array().square();
+          // Moving average for rmsprop
+          mu_s.array() = ( 1 - 1.0/window_size ) * mu_s.array()
+                          + 1.0/window_size * mu_grad.array().square();
+          L_s.array()  = ( 1 - 1.0/window_size ) * L_s.array()
+                          + 1.0/window_size * L_grad.array().square();
 
 
           // Take ADAgrad or rmsprop step
@@ -337,18 +340,26 @@ namespace stan {
           muL.set_L_chol(  muL.L_chol().array()  +
             eta * L_grad.array()  / (tau + L_s.array().sqrt()) );
 
-          cont_params_ = muL.mu();
-          if (out_stream_) *out_stream_ << "mu = " << std::endl
-                                        << muL.mu() << std::endl;
+          // print out to std::cout for now
+          std::cout
+          << "mu = " << std::endl
+          << muL.mu() << std::endl;
 
-          // if (out_stream_) *out_stream_ << "L_chol = " << std::endl
+          // write elbo and parameters to "error stream"
+          if (err_stream_){
+            for (int d = 0; d < muL.dimension(); ++d) {
+              mu_print.push_back(muL.mu()(d));
+            }
+            stan::common::write_iteration_csv(
+              *err_stream_, calc_ELBO(muL), mu_print);
+          }
+
+          // std::cout << "L_chol = " << std::endl
           //                               << muL.L_chol() << std::endl;
 
-          // if (out_stream_) *out_stream_ << "Sigma = " << std::endl
+          // std::cout << "Sigma = " << std::endl
           //                               << muL.L_chol() * muL.L_chol().transpose() << std::endl;
 
-          // elbo_ = calc_ELBO(muL);
-          // if (out_stream_) *out_stream_ << "elbo_ = " << elbo_ << std::endl;
 
         }
       }
@@ -377,11 +388,16 @@ namespace stan {
         // RMSprop window_size
         double window_size = 100.0;
 
+        std::vector<double> mu_print;
+
         for (int i = 0; i < max_iterations; ++i)
         {
-          if (out_stream_) *out_stream_ << "----------------" << std::endl
-                                        << "  iter " << i << std::endl
-                                        << "----------------" << std::endl;
+          mu_print.clear();
+
+          std::cout
+          << "----------------" << std::endl
+          << "  iter " << i     << std::endl
+          << "----------------" << std::endl;
 
           // Compute gradient using Monte Carlo integration
           calc_combined_grad(musigmatilde, mu_grad, sigma_tilde_grad);
@@ -405,24 +421,32 @@ namespace stan {
             eta * sigma_tilde_grad.array()  / (tau + sigma_tilde_s.array().sqrt())
             );
 
-          if (out_stream_) *out_stream_ << "mu = " << std::endl
-                                        << musigmatilde.mu() << std::endl;
+          // print out to std::cout for now
+          std::cout
+          << "mu = " << std::endl
+          << musigmatilde.mu() << std::endl;
 
-          // if (out_stream_) *out_stream_ << "sigma_tilde = " << std::endl
+          // write elbo and parameters to "error stream"
+          if (err_stream_){
+            for (int d = 0; d < musigmatilde.dimension(); ++d) {
+              mu_print.push_back(musigmatilde.mu()(d));
+            }
+            stan::common::write_iteration_csv(
+              *err_stream_, calc_ELBO(musigmatilde), mu_print);
+          }
+
+          // std::cout << "sigma_tilde = " << std::endl
           //                               << musigmatilde.sigma_tilde() << std::endl;
-
-          // elbo_ = calc_ELBO(muL);
-          // if (out_stream_) *out_stream_ << "elbo_ = " << elbo_ << std::endl;
 
         }
       }
 
       void run_robbins_monro_fullrank() {
-        if (out_stream_) *out_stream_
-          << "This is base_vb::bbvb::run_robbins_monro_fullrank()" << std::endl;
-        if (out_stream_) *out_stream_
-          << "cont_params_ = " << std::endl
-          << cont_params_ << std::endl << std::endl;
+        std::cout
+        << "This is base_vb::bbvb::run_robbins_monro_fullrank()" << std::endl;
+        std::cout
+        << "cont_params_ = " << std::endl
+        << cont_params_ << std::endl << std::endl;
 
         // Initialize variational parameters: mu, L
         Eigen::VectorXd mu = cont_params_;
@@ -431,19 +455,21 @@ namespace stan {
         vb_params_fullrank muL = vb_params_fullrank(mu,L);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(muL, 1000);
+        do_robbins_monro_adagrad(muL, 5000);
+
+        cont_params_ = muL.mu();
 
         return;
       }
 
       void run_robbins_monro_meanfield() {
-        if (out_stream_) *out_stream_
-          << "This is base_vb::bbvb::run_robbins_monro_meanfield()" << std::endl;
-        if (out_stream_) *out_stream_
-          << "cont_params_ = " << std::endl
-          << cont_params_ << std::endl << std::endl;
+        std::cout
+        << "This is base_vb::bbvb::run_robbins_monro_meanfield()" << std::endl;
+        std::cout
+        << "cont_params_ = " << std::endl
+        << cont_params_ << std::endl << std::endl;
 
-        // Initialize variational parameters: mu, L
+        // Initialize variational parameters: mu, sigma_tilde
         Eigen::VectorXd mu           = cont_params_;
         Eigen::MatrixXd sigma_tilde  = Eigen::VectorXd::Constant(
                                                 model_.num_params_r(),
@@ -453,7 +479,7 @@ namespace stan {
         vb_params_meanfield musigmatilde = vb_params_meanfield(mu,sigma_tilde);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(musigmatilde, 10000);
+        do_robbins_monro_adagrad(musigmatilde, 5000);
 
         cont_params_ = musigmatilde.mu();
 

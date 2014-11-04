@@ -14,7 +14,7 @@ namespace stan {
 
     private:
 
-      Eigen::VectorXd mu_;     // Mean vector
+      Eigen::VectorXd mu_;          // Mean vector
       Eigen::VectorXd sigma_tilde_; // Log standard deviation vector
       int dimension_;
 
