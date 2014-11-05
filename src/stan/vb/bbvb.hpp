@@ -41,7 +41,7 @@ namespace stan {
         cont_params_(cont_params),
         elbo_(elbo),
         rng_(rng),
-        n_monte_carlo_(5e1) {};
+        n_monte_carlo_(5) {};
 
       virtual ~bbvb() {};
 
@@ -58,16 +58,18 @@ namespace stan {
        * @return        evidence lower bound (elbo)
        */
       double calc_ELBO(vb_params_fullrank const& muL) {
-        static const char* function = "stan::vb::bbvb.calc_ELBO(%1%)";
-        double error_tmp(0.0);
+        // static const char* function = "stan::vb::bbvb.calc_ELBO(%1%)";
+        // double error_tmp(0.0);
         double elbo(0.0);
         int dim = muL.dimension();
+
+        int elbo_n_monte_carlo(1000);
 
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
         Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tilde_var(dim);
 
-        for (int i = 0; i < n_monte_carlo_; ++i) {
+        for (int i = 0; i < elbo_n_monte_carlo; ++i) {
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d) {
             z_check(d) = stan::prob::normal_rng(0,1,rng_);
@@ -85,10 +87,10 @@ namespace stan {
                    log_prob<true,true>(z_tilde_var, &std::cout)).val();
           // END of FIXME
         }
-        elbo /= static_cast<double>(n_monte_carlo_);
+        elbo /= static_cast<double>(elbo_n_monte_carlo);
 
         // Entropy of normal: 0.5 * log det (L^T L) = sum(log(abs(diag(L))))
-        double tmp = 0.0;
+        double tmp(0.0);
         for (int d = 0; d < dim; ++d) {
           tmp = abs(muL.L_chol()(d,d));
           if (tmp != 0.0) {
@@ -115,11 +117,13 @@ namespace stan {
         double elbo(0.0);
         int dim = musigmatilde.dimension();
 
+        int elbo_n_monte_carlo(1000);
+
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
         Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tilde_var(dim);
 
-        for (int i = 0; i < n_monte_carlo_; ++i) {
+        for (int i = 0; i < elbo_n_monte_carlo; ++i) {
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d) {
             z_check(d) = stan::prob::normal_rng(0,1,rng_);
@@ -137,7 +141,7 @@ namespace stan {
                    log_prob<true,true>(z_tilde_var, &std::cout)).val();
           // END of FIXME
         }
-        elbo /= static_cast<double>(n_monte_carlo_);
+        elbo /= static_cast<double>(elbo_n_monte_carlo);
 
         // Entropy of normal: 0.5 * log det diag(sigma^2) = sum(log(sigma))
         //                                                = sum(sigma_tilde)
@@ -275,7 +279,8 @@ namespace stan {
           mu_grad.array() = mu_grad.array() + tmp_mu_grad.array();
 
           // Update sigma_tilde
-          sigma_tilde_grad.array() = sigma_tilde_grad.array() + tmp_mu_grad.dot(z_check);
+          sigma_tilde_grad.array() = sigma_tilde_grad.array()
+            + tmp_mu_grad.array().cwiseProduct(z_check.array());
 
         }
         mu_grad           /= static_cast<double>(n_monte_carlo_);
@@ -286,8 +291,8 @@ namespace stan {
           sigma_tilde_grad.array().cwiseProduct(
                                       musigmatilde.sigma_tilde().array().exp());
 
-        // Add gradient of entropy term (just equal to dim here)
-        sigma_tilde_grad.array() += static_cast<double>(dim);
+        // Add gradient of entropy term (just equal to element-wise 1 here)
+        sigma_tilde_grad.array() += 1.0;
       }
 
 
@@ -315,16 +320,16 @@ namespace stan {
         // rmsprop parameters
         double window_size = 100.0;
 
-        std::vector<double> mu_print;
+        std::vector<double> print_vector;
 
         for (int i = 0; i < max_iterations; ++i)
         {
-          mu_print.clear();
+          print_vector.clear();
 
           std::cout
-          << "----------------" << std::endl
-          << "  iter " << i     << std::endl
-          << "----------------" << std::endl;
+          // << "----------------" << std::endl
+          << "  iter " << i     << std::endl;
+          // << "----------------" << std::endl;
 
           // Compute gradient using Monte Carlo integration
           calc_combined_grad(muL, mu_grad, L_grad);
@@ -356,14 +361,17 @@ namespace stan {
           // << muL.L_chol() << std::endl;
 
           // write elbo and parameters to "error stream"
-          if (err_stream_){
-            for (int d = 0; d < muL.dimension(); ++d) {
-              mu_print.push_back(muL.mu()(d));
-            }
-            stan::common::write_iteration_csv(
-              *err_stream_, calc_ELBO(muL), mu_print);
+          // if (err_stream_){
+          //   for (int d = 0; d < muL.dimension(); ++d) {
+          //     print_vector.push_back(muL.mu()(d));
+          //   }
+          //   stan::common::write_iteration_csv(
+          //     *err_stream_, calc_ELBO(muL), print_vector);
+          // }
+          if ((i < 10 || (i<100 && i%10==0) || i%100==0) && err_stream_){
+            print_vector.push_back(calc_ELBO(muL));
+            stan::common::write_iteration_csv(*err_stream_, i , print_vector);
           }
-
 
 
           // std::cout << "Sigma = " << std::endl
@@ -389,7 +397,7 @@ namespace stan {
         Eigen::VectorXd sigma_tilde_grad  = Eigen::VectorXd::Zero(model_.num_params_r());
 
         // ADAgrad parameters
-        double eta = 1.0;
+        double eta = 0.1;
         double tau = 1.0;
         Eigen::VectorXd mu_s          = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::VectorXd sigma_tilde_s = Eigen::VectorXd::Zero(model_.num_params_r());
@@ -397,16 +405,16 @@ namespace stan {
         // RMSprop window_size
         double window_size = 100.0;
 
-        std::vector<double> mu_print;
+        std::vector<double> print_vector;
 
         for (int i = 0; i < max_iterations; ++i)
         {
-          mu_print.clear();
+          print_vector.clear();
 
           std::cout
-          << "----------------" << std::endl
-          << "  iter " << i     << std::endl
-          << "----------------" << std::endl;
+          // << "----------------" << std::endl
+          << "  iter " << i     << std::endl;
+          // << "----------------" << std::endl;
 
           // Compute gradient using Monte Carlo integration
           calc_combined_grad(musigmatilde, mu_grad, sigma_tilde_grad);
@@ -436,12 +444,10 @@ namespace stan {
           // << musigmatilde.mu() << std::endl;
 
           // write elbo and parameters to "error stream"
-          if (err_stream_){
-            for (int d = 0; d < musigmatilde.dimension(); ++d) {
-              mu_print.push_back(musigmatilde.mu()(d));
-            }
-            stan::common::write_iteration_csv(
-              *err_stream_, calc_ELBO(musigmatilde), mu_print);
+          // if ((i < 100 || i % 100 == 0) && err_stream_){
+          if ((i < 10 || (i<100 && i%10==0) || i%100==0) && err_stream_){
+            print_vector.push_back(calc_ELBO(musigmatilde));
+            stan::common::write_iteration_csv(*err_stream_, i , print_vector);
           }
 
           // std::cout << "sigma_tilde = " << std::endl
@@ -468,6 +474,14 @@ namespace stan {
 
         cont_params_ = muL.mu();
 
+        std::cout
+        << "mu = " << std::endl
+        << muL.mu() << std::endl;
+
+        std::cout
+        << "L_chol = " << std::endl
+        << muL.L_chol() << std::endl;
+
         return;
       }
 
@@ -491,6 +505,14 @@ namespace stan {
         do_robbins_monro_adagrad(musigmatilde, 10000);
 
         cont_params_ = musigmatilde.mu();
+
+        std::cout
+        << "mu = " << std::endl
+        << musigmatilde.mu() << std::endl;
+
+        std::cout
+        << "sigma_tilde = " << std::endl
+        << musigmatilde.sigma_tilde() << std::endl;
 
         return;
       }

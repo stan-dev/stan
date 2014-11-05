@@ -627,6 +627,7 @@ namespace stan {
       if (parser.arg("method")->arg("vbfr")) {
 
         double elbo = 0.0;
+        // cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
         if (output_stream) {
           std::vector<std::string> names;
@@ -663,6 +664,7 @@ namespace stan {
       if (parser.arg("method")->arg("vbmf")) {
 
         double elbo = 0.0;
+        // cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
         if (output_stream) {
           std::vector<std::string> names;

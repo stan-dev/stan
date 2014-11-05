@@ -40,7 +40,7 @@ namespace stan {
 
       // Accessors
       int dimension() const { return dimension_; }
-      Eigen::VectorXd const& mu()     const { return mu_; }
+      Eigen::VectorXd const& mu()          const { return mu_; }
       Eigen::VectorXd const& sigma_tilde() const { return sigma_tilde_; }
 
       // Mutators
