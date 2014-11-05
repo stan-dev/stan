@@ -189,10 +189,10 @@ namespace stan {
                                                   T_size2>::type
         T_partials_return;
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lengths
@@ -314,10 +314,10 @@ namespace stan {
                                                   T_size2>::type 
         T_partials_return;
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lengths
@@ -434,10 +434,10 @@ namespace stan {
                                                   T_size2>::type 
         T_partials_return;
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lengths
