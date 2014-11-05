@@ -57,14 +57,14 @@ bool is_parsable(const std::string& file_name,
 }
 
 
-/** test whether model with specified name in path syntax-only parses successfully
+/** test whether model with specified name in path good parses successfully
  *
  * @param model_name Name of model to parse
- * @param folder Path to folder under src/test/test-models (default "syntax-only")
+ * @param folder Path to folder under src/test/test-models (default "good")
  * @param msgs Warning message
  */
 bool is_parsable_folder(const std::string& model_name,
-                        const std::string folder = "syntax-only",
+                        const std::string folder = "good",
                         std::ostream* msgs = 0) {
   std::string path("src/test/test-models/");
   path += folder;
@@ -74,7 +74,7 @@ bool is_parsable_folder(const std::string& model_name,
   return is_parsable(path,msgs);
 }
 
-/** test that model with specified name in folder "syntax-only"
+/** test that model with specified name in folder "good"
  *  parses without throwing an exception
  *
  * @param model_name Name of model to parse
@@ -82,12 +82,12 @@ bool is_parsable_folder(const std::string& model_name,
 void test_parsable(const std::string& model_name) {
   {
     SCOPED_TRACE("parsing: " + model_name);
-    EXPECT_TRUE(is_parsable_folder(model_name, "syntax-only"));
+    EXPECT_TRUE(is_parsable_folder(model_name, "good"));
   }
 }
 
 
-/** test that model with specified name in folder "reference" throws
+/** test that model with specified name in folder "bad" throws
  * an exception containing the second arg as a substring
  *
  * @param model_name Name of model to parse
@@ -96,7 +96,7 @@ void test_parsable(const std::string& model_name) {
 void test_throws(const std::string& model_name, const std::string& error_msg) {
   std::stringstream msgs;
   try {
-    is_parsable_folder(model_name, "reference", &msgs);
+    is_parsable_folder(model_name, "bad", &msgs);
   } catch (const std::invalid_argument& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos
         && msgs.str().find(error_msg) == std::string::npos) {
@@ -116,7 +116,7 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
          << std::endl;
 }
 
-/** test that model with specified name in syntax-only path parses
+/** test that model with specified name in good path parses
  * and returns a warning containing the second arg as a substring
  *
  * @param model_name Name of model to parse
@@ -124,7 +124,7 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
  */
 void test_warning(const std::string& model_name, const std::string& warning_msg) {
   std::stringstream msgs;
-  EXPECT_TRUE(is_parsable_folder(model_name, "syntax-only", &msgs));
+  EXPECT_TRUE(is_parsable_folder(model_name, "good", &msgs));
   EXPECT_TRUE(msgs.str().find_first_of(warning_msg) != std::string::npos);
 }
 

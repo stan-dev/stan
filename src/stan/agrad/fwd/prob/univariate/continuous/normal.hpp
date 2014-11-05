@@ -6,7 +6,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -20,7 +20,7 @@ namespace stan {
     typename boost::enable_if_c<contains_fvar<T_y,T_loc,T_scale>::value,
                                 typename return_type<T_y,T_loc,T_scale>::type>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      // static const char* function = "stan::prob::normal_log(%1%)";
+      // static const std::string& function("stan::prob::normal_log");
       // FIXME: add input checks
 
       using std::log;
