@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
 #include <sstream>
 #include <cmath>
 #include <vector>
 #include <string>
 #include <set>
-#include "stan/gm/ast_def.cpp"
+#include <stan/gm/ast_def.cpp>
+#include <gtest/gtest.h>
 
 using stan::gm::function_signatures;
 using stan::gm::expr_type;

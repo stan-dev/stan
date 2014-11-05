@@ -4,7 +4,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/LDLT_alloc.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace math {
@@ -65,7 +65,7 @@ namespace stan {
        * @param A A symmetric positive definite matrix to factorize
        **/
       inline void compute(const Eigen::Matrix<stan::agrad::var,R,C> &A) {
-        stan::math::check_square("comute(%1%)",A,"A",(double*)0);
+        stan::error_handling::check_square("comute", "A", A);
         _alloc->compute(A);
       }
       

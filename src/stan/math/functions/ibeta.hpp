@@ -2,7 +2,7 @@
 #define STAN__MATH__FUNCTIONS__IBETA_HPP
 
 #include <boost/math/special_functions/beta.hpp>
-#include <stan/math/error_handling/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
 
 namespace stan {
   namespace math {
@@ -23,9 +23,11 @@ namespace stan {
     inline double ibeta(const double a,
                         const double b,
                         const double x) {
-      check_not_nan("ibeta(%1%)", a, "a", static_cast<double*>(0));
-      check_not_nan("ibeta(%1%)", b, "b", static_cast<double*>(0));
-      check_not_nan("ibeta(%1%)", x, "x", static_cast<double*>(0));
+      using stan::error_handling::check_not_nan;
+
+      check_not_nan("ibeta", "a", a);
+      check_not_nan("ibeta", "b", b);
+      check_not_nan("ibeta", "x", x);
       return boost::math::ibeta(a, b, x);
     }
 

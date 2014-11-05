@@ -3,9 +3,11 @@
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_greater.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -42,15 +44,15 @@ namespace stan {
               typename T_y, typename T_low, typename T_high>
     typename return_type<T_y,T_low,T_high>::type
     uniform_log(const T_y& y, const T_low& alpha, const T_high& beta) {
-      static const char* function = "stan::prob::uniform_log(%1%)";
+      static const std::string function("stan::prob::uniform_log");
       typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
         T_partials_return;
-
-      using stan::math::check_not_nan;
-      using stan::math::check_finite;
-      using stan::math::check_greater;
+      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_greater;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -60,15 +62,14 @@ namespace stan {
 
       // set up return value accumulator
       T_partials_return logp(0.0);
-      check_not_nan(function, y, "Random variable", &logp);
-      check_finite(function, alpha, "Lower bound parameter", &logp);
-      check_finite(function, beta, "Upper bound parameter", &logp);
-      check_greater(function, beta, alpha, "Upper bound parameter", &logp);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Lower bound parameter", alpha);
+      check_finite(function, "Upper bound parameter", beta);
+      check_greater(function, "Upper bound parameter", beta, alpha);
       check_consistent_sizes(function,
-                             y,alpha,beta,
-                             "Random variable","Lower bound parameter",
-                             "Upper bound parameter",
-                             &logp);
+                             "Random variable", y,
+                             "Lower bound parameter", alpha,
+                             "Upper bound parameter", beta);
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_low,T_high>::value)
@@ -126,15 +127,15 @@ namespace stan {
     template <typename T_y, typename T_low, typename T_high>
     typename return_type<T_y,T_low,T_high>::type
     uniform_cdf(const T_y& y, const T_low& alpha, const T_high& beta) {
-      static const char* function = "stan::prob::uniform_cdf(%1%)";
+      static const std::string function("stan::prob::uniform_cdf");
       typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
         T_partials_return;
-
-      using stan::math::check_not_nan;
-      using stan::math::check_finite;
-      using stan::math::check_greater;
+      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_greater;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -144,15 +145,14 @@ namespace stan {
 
       // set up return value accumulator
       T_partials_return cdf(1.0);
-      check_not_nan(function, y, "Random variable", &cdf);
-      check_finite(function, alpha, "Lower bound parameter", &cdf);
-      check_finite(function, beta, "Upper bound parameter", &cdf);
-      check_greater(function, beta, alpha, "Upper bound parameter", &cdf);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Lower bound parameter", alpha);
+      check_finite(function, "Upper bound parameter", beta);
+      check_greater(function, "Upper bound parameter", beta, alpha);
       check_consistent_sizes(function,
-                             y,alpha,beta,
-                             "Random variable","Lower bound parameter",
-                             "Upper bound parameter",
-                             &cdf);
+                             "Random variable", y,
+                             "Lower bound parameter", alpha,
+                             "Upper bound parameter", beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_low> alpha_vec(alpha);
@@ -204,15 +204,15 @@ namespace stan {
     template <typename T_y, typename T_low, typename T_high>
     typename return_type<T_y,T_low,T_high>::type
     uniform_cdf_log(const T_y& y, const T_low& alpha, const T_high& beta) {
-      static const char* function = "stan::prob::uniform_cdf_log(%1%)";
+      static const std::string function("stan::prob::uniform_cdf_log");
       typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
         T_partials_return;
-
-      using stan::math::check_not_nan;
-      using stan::math::check_finite;
-      using stan::math::check_greater;
+      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_greater;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -222,15 +222,14 @@ namespace stan {
 
       // set up return value accumulator
       T_partials_return cdf_log(0.0);
-      check_not_nan(function, y, "Random variable", &cdf_log);
-      check_finite(function, alpha, "Lower bound parameter", &cdf_log);
-      check_finite(function, beta, "Upper bound parameter", &cdf_log);
-      check_greater(function, beta, alpha, "Upper bound parameter", &cdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Lower bound parameter", alpha);
+      check_finite(function, "Upper bound parameter", beta);
+      check_greater(function, "Upper bound parameter", beta, alpha);
       check_consistent_sizes(function,
-                             y,alpha,beta,
-                             "Random variable","Lower bound parameter",
-                             "Upper bound parameter",
-                             &cdf_log);
+                             "Random variable", y,
+                             "Lower bound parameter", alpha,
+                             "Upper bound parameter", beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_low> alpha_vec(alpha);
@@ -275,15 +274,15 @@ namespace stan {
     template <typename T_y, typename T_low, typename T_high>
     typename return_type<T_y,T_low,T_high>::type
     uniform_ccdf_log(const T_y& y, const T_low& alpha, const T_high& beta) {
-      static const char* function = "stan::prob::uniform_ccdf_log(%1%)";
+      static const std::string function("stan::prob::uniform_ccdf_log");
       typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
         T_partials_return;
- 
-      using stan::math::check_not_nan;
-      using stan::math::check_finite;
-      using stan::math::check_greater;
+      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_greater;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -293,15 +292,14 @@ namespace stan {
 
       // set up return value accumulator
       T_partials_return ccdf_log(0.0);
-      check_not_nan(function, y, "Random variable", &ccdf_log);
-      check_finite(function, alpha, "Lower bound parameter", &ccdf_log);
-      check_finite(function, beta, "Upper bound parameter", &ccdf_log);
-      check_greater(function, beta, alpha, "Upper bound parameter", &ccdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Lower bound parameter", alpha);
+      check_finite(function, "Upper bound parameter", beta);
+      check_greater(function, "Upper bound parameter", beta, alpha);
       check_consistent_sizes(function,
-                             y,alpha,beta,
-                             "Random variable","Lower bound parameter",
-                             "Upper bound parameter",
-                             &ccdf_log);
+                             "Random variable", y,
+                             "Lower bound parameter", alpha,
+                             "Upper bound parameter", beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_low> alpha_vec(alpha);
@@ -351,14 +349,14 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::uniform_real_distribution;
 
-      static const char* function = "stan::prob::uniform_rng(%1%)";
+      static const std::string function("stan::prob::uniform_rng");
       
-      using stan::math::check_finite;
-      using stan::math::check_greater;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_greater;
 
-      check_finite(function, alpha, "Lower bound parameter", (double*)0);
-      check_finite(function, beta, "Upper bound parameter", (double*)0);
-      check_greater(function, beta, alpha, "Upper bound parameter", (double*)0);
+      check_finite(function, "Lower bound parameter", alpha);
+      check_finite(function, "Upper bound parameter", beta);
+      check_greater(function, "Upper bound parameter", beta, alpha);
 
       variate_generator<RNG&, uniform_real_distribution<> >
         uniform_rng(rng, uniform_real_distribution<>(alpha, beta));

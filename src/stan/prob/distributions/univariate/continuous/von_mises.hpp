@@ -2,13 +2,16 @@
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__VON_MISES_HPP
 
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/math.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_greater.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/math/functions/modified_bessel_first_kind.hpp>
+#include <stan/prob/constants.hpp>
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan { 
   
@@ -18,7 +21,7 @@ namespace stan {
              typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     von_mises_log(T_y const& y, T_loc const& mu, T_scale const& kappa) {
-      static char const* const function = "stan::prob::von_mises_log(%1%)";
+      static char const* const function = "stan::prob::von_mises_log";
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
 
@@ -29,11 +32,11 @@ namespace stan {
         return 0.0;
 
       using stan::is_constant_struct;
-      using stan::math::check_finite;
-      using stan::math::check_positive_finite;
-      using stan::math::check_greater;
-      using stan::math::check_nonnegative;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_greater;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
 
       using stan::math::modified_bessel_first_kind;
@@ -42,12 +45,14 @@ namespace stan {
       T_partials_return logp = 0.0;
 
       // Validate arguments.
-      check_finite(function, y, "Random variable", &logp);
-      check_finite(function, mu, "Location paramter", &logp);
-      check_positive_finite(function, kappa, "Scale parameter", &logp);
-      check_consistent_sizes(function, y, mu, kappa, "Random variable",
-                             "Location parameter", "Scale parameter",
-                             &logp);
+      check_finite(function, "Random variable", y);
+      check_finite(function, "Location paramter", mu);
+      check_positive_finite(function, "Scale parameter", kappa);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Location parameter", mu, 
+                             "Scale parameter", kappa);
+
  
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_loc,T_scale>::value) 
@@ -140,11 +145,10 @@ namespace stan {
       using boost::variate_generator;
       using stan::prob::uniform_rng;
 
-      static const char* function = "stan::prob::von_mises_rng(%1%)";
+      static const std::string function("stan::prob::von_mises_rng");
 
-      stan::math::check_finite(function,mu,"mean",(double*)0);
-      stan::math::check_positive_finite(function,kappa,"inverse of variance",
-                                 (double*)0);
+      stan::error_handling::check_finite(function, "mean", mu);
+      stan::error_handling::check_positive_finite(function, "inverse of variance", kappa);
 
       double r = 1 + pow((1 + 4 * kappa * kappa), 0.5);
       double rho = 0.5 * (r - pow(2 * r, 0.5)) / kappa;

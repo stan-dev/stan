@@ -1,12 +1,12 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BETA_BINOMIAL_HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BETA_BINOMIAL_HPP
 
-#include <stan/prob/distributions/univariate/discrete/binomial.hpp>
-#include <stan/prob/distributions/univariate/continuous/beta.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/math/functions/binomial_coefficient_log.hpp>
 #include <stan/math/functions/lbeta.hpp>
 #include <stan/math/functions/digamma.hpp>
 #include <stan/math/functions/lbeta.hpp>
@@ -16,7 +16,8 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
-
+#include <stan/prob/distributions/univariate/discrete/binomial.hpp>
+#include <stan/prob/distributions/univariate/continuous/beta.hpp>
 #include <stan/prob/internal_math/math/F32.hpp>
 #include <stan/prob/internal_math/math/grad_F32.hpp>
 
@@ -33,14 +34,14 @@ namespace stan {
                       const T_N& N, 
                       const T_size1& alpha, 
                       const T_size2& beta) {
-      static const char* function = "stan::prob::beta_binomial_log(%1%)";
+      static const std::string function("stan::prob::beta_binomial_log");
       typedef typename stan::partials_return_type<T_size1,T_size2>::type
         T_partials_return;
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
@@ -51,20 +52,14 @@ namespace stan {
         return 0.0;
       
       T_partials_return logp(0.0);
-      check_nonnegative(function, N, "Population size parameter", &logp);
-      check_positive_finite(function, alpha, 
-                            "First prior sample size parameter", 
-                            &logp);
-      check_positive_finite(function, beta, 
-                            "Second prior sample size parameter",  
-                            &logp);
+      check_nonnegative(function, "Population size parameter", N);
+      check_positive_finite(function, "First prior sample size parameter", alpha);
+      check_positive_finite(function, "Second prior sample size parameter", beta);
       check_consistent_sizes(function,
-                             n,N,alpha,beta,
-                             "Successes variable",
-                             "Population size parameter",
-                             "First prior sample size parameter",
-                             "Second prior sample size parameter",
-                             &logp);
+                             "Successes variable", n,
+                             "Population size parameter", N,
+                             "First prior sample size parameter", alpha,
+                             "Second prior sample size parameter", beta);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_size1,T_size2>::value)
@@ -189,8 +184,7 @@ namespace stan {
     typename return_type<T_size1,T_size2>::type
     beta_binomial_cdf(const T_n& n, const T_N& N, const T_size1& alpha, 
                       const T_size2& beta) {
-          
-      static const char* function = "stan::prob::beta_binomial_cdf(%1%)";
+      static const std::string function("stan::prob::beta_binomial_cdf");
       typedef typename stan::partials_return_type<T_n,T_N,T_size1,
                                                   T_size2>::type
         T_partials_return;
@@ -209,18 +203,14 @@ namespace stan {
       T_partials_return P(1.0);
           
       // Validate arguments
-      check_nonnegative(function, N, "Population size parameter", &P);
-      check_positive_finite(function, alpha, "First prior sample size parameter",
-                            &P);
-      check_positive_finite(function, beta, "Second prior sample size parameter",
-                            &P);
-      check_consistent_sizes(function,
-                             n, N, alpha, beta,
-                             "Successes variable",
-                             "Population size parameter",
-                             "First prior sample size parameter",
-                             "Second prior sample size parameter",
-                             &P);
+      check_nonnegative(function, "Population size parameter", N);
+      check_positive_finite(function, "First prior sample size parameter", alpha);
+      check_positive_finite(function, "Second prior sample size parameter", beta);
+      check_consistent_sizes(function,                           
+                             "Successes variable", n, 
+                             "Population size parameter", N, 
+                             "First prior sample size parameter", alpha, 
+                             "Second prior sample size parameter", beta);
 
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -319,8 +309,7 @@ namespace stan {
     typename return_type<T_size1,T_size2>::type
     beta_binomial_cdf_log(const T_n& n, const T_N& N, const T_size1& alpha, 
                           const T_size2& beta) {
-          
-      static const char* function = "stan::prob::beta_binomial_cdf_log(%1%)";
+      static const std::string function("stan::prob::beta_binomial_cdf_log");
       typedef typename stan::partials_return_type<T_n,T_N,T_size1,
                                                   T_size2>::type 
         T_partials_return;
@@ -440,8 +429,7 @@ namespace stan {
     typename return_type<T_size1,T_size2>::type
     beta_binomial_ccdf_log(const T_n& n, const T_N& N, const T_size1& alpha, 
                            const T_size2& beta) {
-          
-      static const char* function = "stan::prob::beta_binomial_ccdf_log(%1%)";
+      static const std::string function("stan::prob::beta_binomial_ccdf_log");
       typedef typename stan::partials_return_type<T_n,T_N,T_size1,
                                                   T_size2>::type 
         T_partials_return;
@@ -460,18 +448,14 @@ namespace stan {
       T_partials_return P(0.0);
           
       // Validate arguments
-      check_nonnegative(function, N, "Population size parameter", &P);
-      check_positive_finite(function, alpha, "First prior sample size parameter",
-                            &P);
-      check_positive_finite(function, beta, "Second prior sample size parameter",
-                            &P);
+      check_nonnegative(function, "Population size parameter", N);
+      check_positive_finite(function, "First prior sample size parameter", alpha);
+      check_positive_finite(function, "Second prior sample size parameter", beta);
       check_consistent_sizes(function,
-                             n, N, alpha, beta,
-                             "Successes variable",
-                             "Population size parameter",
-                             "First prior sample size parameter",
-                             "Second prior sample size parameter",
-                             &P);
+                             "Successes variable", n, 
+                             "Population size parameter", N, 
+                             "First prior sample size parameter", alpha, 
+                             "Second prior sample size parameter", beta);
 
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -563,18 +547,14 @@ namespace stan {
                       const double beta,
                       RNG& rng) {
 
-      static const char* function = "stan::prob::beta_binomial_rng(%1%)";
+      static const std::string function("stan::prob::beta_binomial_rng");
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_nonnegative;
   
-      check_nonnegative(function, N, "Population size parameter", (double*)0);
-      check_positive_finite(function, alpha, 
-                            "First prior sample size parameter", 
-                            (double*)0);
-      check_positive_finite(function, beta, 
-                            "Second prior sample size parameter", 
-                            (double*)0);
+      check_nonnegative(function, "Population size parameter", N);
+      check_positive_finite(function, "First prior sample size parameter", alpha);
+      check_positive_finite(function, "Second prior sample size parameter", beta);
 
       double a = stan::prob::beta_rng(alpha, beta, rng);
       while(a > 1 || a < 0) 

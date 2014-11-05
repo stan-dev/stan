@@ -2,7 +2,7 @@
 #define TEST__UNIT_DISTRIBUTION__TEST_FIXTURE_CDF_LOG_HPP
 
 #include <stdexcept>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/agrad/fwd.hpp>

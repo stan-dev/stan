@@ -3,16 +3,18 @@
 
 #include <boost/random/cauchy_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/prob/traits.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/log1p.hpp>
 #include <stan/math/functions/square.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/functions/log1p.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 
@@ -40,15 +42,15 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const char* function = "stan::prob::cauchy_log(%1%)";
+      static const std::string function("stan::prob::cauchy_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
 
       using stan::is_constant_struct;
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
 
       // check if any vectors are zero length
@@ -61,14 +63,13 @@ namespace stan {
       T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      check_not_nan(function, y, "Random variable", &logp);
-      check_finite(function, mu, "Location parameter", &logp);
-      check_positive_finite(function, sigma, "Scale parameter", &logp);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_positive_finite(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,mu,sigma,
-                             "Random variable","Location parameter",
-                             "Scale parameter",
-                             &logp);
+                             "Random variable", y,
+                             "Location parameter", mu,
+                             "Scale parameter", sigma);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_loc,T_scale>::value)
@@ -172,24 +173,24 @@ namespace stan {
               && stan::length(sigma) ) ) 
         return 1.0;
         
-      static const char* function = "stan::prob::cauchy_cdf(%1%)";
+      static const std::string function("stan::prob::cauchy_cdf");
       
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
       T_partials_return P(1.0);
         
-      check_not_nan(function, y, "Random variable", &P);
-      check_finite(function, mu, "Location parameter", &P);
-      check_positive_finite(function, sigma, "Scale parameter", &P);
-      check_consistent_sizes(function, y, mu, sigma,
-                             "Random variable", "Location parameter", 
-                             "Scale Parameter",
-                             &P);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_positive_finite(function, "Scale parameter", sigma);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Location parameter", mu, 
+                             "Scale Parameter", sigma);
         
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -271,23 +272,24 @@ namespace stan {
               && stan::length(sigma) ) ) 
         return 0.0;
         
-      static const char* function = "stan::prob::cauchy_cdf(%1%)";
+      static const std::string function("stan::prob::cauchy_cdf");
       
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
       T_partials_return cdf_log(0.0);
         
-      check_not_nan(function, y, "Random variable", &cdf_log);
-      check_finite(function, mu, "Location parameter", &cdf_log);
-      check_positive_finite(function, sigma, "Scale parameter", &cdf_log);
-      check_consistent_sizes(function, y, mu, sigma,
-                             "Random variable", "Location parameter", 
-                             "Scale Parameter", &cdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_positive_finite(function, "Scale parameter", sigma);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Location parameter", mu, 
+                             "Scale Parameter", sigma);
         
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -340,23 +342,24 @@ namespace stan {
               && stan::length(sigma) ) ) 
         return 0.0;
         
-      static const char* function = "stan::prob::cauchy_cdf(%1%)";
+      static const std::string function("stan::prob::cauchy_cdf");
       
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
       T_partials_return ccdf_log(0.0);
         
-      check_not_nan(function, y, "Random variable", &ccdf_log);
-      check_finite(function, mu, "Location parameter", &ccdf_log);
-      check_positive_finite(function, sigma, "Scale parameter", &ccdf_log);
-      check_consistent_sizes(function, y, mu, sigma,
-                             "Random variable", "Location parameter", 
-                             "Scale Parameter", &ccdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_positive_finite(function, "Scale parameter", sigma);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Location parameter", mu, 
+                             "Scale Parameter", sigma);
         
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -406,13 +409,13 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::cauchy_distribution;
 
-      static const char* function = "stan::prob::cauchy_rng(%1%)";
+      static const std::string function("stan::prob::cauchy_rng");
 
-      using stan::math::check_positive_finite;
-      using stan::math::check_finite;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_finite;
       
-      check_finite(function, mu, "Location parameter", (double*)0);
-      check_positive_finite(function, sigma, "Scale parameter", (double*)0);
+      check_finite(function, "Location parameter", mu);
+      check_positive_finite(function, "Scale parameter", sigma);
 
       variate_generator<RNG&, cauchy_distribution<> >
         cauchy_rng(rng, cauchy_distribution<>(mu, sigma));
