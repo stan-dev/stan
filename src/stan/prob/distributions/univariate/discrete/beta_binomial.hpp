@@ -328,18 +328,14 @@ namespace stan {
       T_partials_return P(0.0);
           
       // Validate arguments
-      check_nonnegative(function, N, "Population size parameter", &P);
-      check_positive_finite(function, alpha, "First prior sample size parameter",
-                            &P);
-      check_positive_finite(function, beta, "Second prior sample size parameter",
-                            &P);
+      check_nonnegative(function, "Population size parameter", N);
+      check_positive_finite(function, "First prior sample size parameter", alpha);
+      check_positive_finite(function, "Second prior sample size parameter", beta);
       check_consistent_sizes(function,
-                             n, N, alpha, beta,
-                             "Successes variable",
-                             "Population size parameter",
-                             "First prior sample size parameter",
-                             "Second prior sample size parameter",
-                             &P);
+                             "Successes variable", n, 
+                             "Population size parameter", N, 
+                             "First prior sample size parameter", alpha, 
+                             "Second prior sample size parameter", beta);
 
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
