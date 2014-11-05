@@ -471,8 +471,7 @@ namespace stan {
        */
       inline T scalar_pos() {
         T x(scalar());
-        stan::error_handling::check_positive("stan::io::scalar_pos(%1%)", x, 
-                                   "Constrained scalar", (double*)0);
+        stan::error_handling::check_positive("stan::io::scalar_pos", "Constrained scalar", x);
         return x;
       }
 
@@ -516,9 +515,7 @@ namespace stan {
       template <typename TL>
       inline T scalar_lb(const TL lb) {
         T x(scalar());
-        stan::error_handling::check_greater_or_equal("stan::io::scalar_lb(%1%)",
-                                           x, lb, "Constrained scalar", 
-                                           (double*)0);
+        stan::error_handling::check_greater_or_equal("stan::io::scalar_lb", "Constrained scalar", x, lb);
         return x;
       }
 
@@ -571,8 +568,7 @@ namespace stan {
       template <typename TU>
       inline T scalar_ub(TU ub) {
         T x(scalar());
-        stan::error_handling::check_less_or_equal("stan::io::scalar_ub(%1%)", x, ub, 
-                                        "Constrained scalar", (double*)0);
+        stan::error_handling::check_less_or_equal("stan::io::scalar_ub", "Constrained scalar", x, ub);
         return x;
       }
 
@@ -625,8 +621,7 @@ namespace stan {
       template <typename TL, typename TU>
       inline T scalar_lub(const TL lb, const TU ub) {
         T x(scalar());
-        stan::error_handling::check_bounded<T,TL,TU,T>
-          ("stan::io::scalar_lub(%1%)", x, lb, ub, "Constrained scalar",0);
+        stan::error_handling::check_bounded<T,TL,TU>("stan::io::scalar_lub", "Constrained scalar", x, lb, ub);
         return x;
       }
 
@@ -676,8 +671,7 @@ namespace stan {
        */
       inline T prob() {
         T x(scalar());
-        stan::error_handling::check_bounded<T,double,double,double>
-          ("stan::io::prob(%1%)", x, 0, 1, "Constrained probability", 0);
+        stan::error_handling::check_bounded<T,double,double>("stan::io::prob", "Constrained probability", x, 0, 1);
         return x;
       }
 
@@ -723,8 +717,7 @@ namespace stan {
        */
       inline T corr() {
         T x(scalar());
-        stan::error_handling::check_bounded<T,double,double,double>
-          ("stan::io::corr(%1%)", x, -1, 1, "Correlation value",0);
+        stan::error_handling::check_bounded<T,double,double>("stan::io::corr", "Correlation value", x, -1, 1);
         return x;
       }
 
@@ -767,8 +760,7 @@ namespace stan {
        */
       inline vector_t unit_vector(size_t k) {
         vector_t theta(vector(k));
-        stan::error_handling::check_unit_vector("stan::io::unit_vector(%1%)", theta, "Constrained vector",
-                                      (double*)0);
+        stan::error_handling::check_unit_vector("stan::io::unit_vector", "Constrained vector", theta);
         return theta;
       }
 
@@ -815,8 +807,7 @@ namespace stan {
        */
       inline vector_t simplex(size_t k) {
         vector_t theta(vector(k));
-        stan::error_handling::check_simplex("stan::io::simplex(%1%)", theta, "Constrained vector",
-                                  (double*)0);
+        stan::error_handling::check_simplex("stan::io::simplex", "Constrained vector", theta);
         return theta;
       }
 
@@ -863,7 +854,7 @@ namespace stan {
        */
       inline vector_t ordered(size_t k) {
         vector_t x(vector(k));
-        stan::error_handling::check_ordered("stan::io::ordered(%1%)", x, "Constrained vector");
+        stan::error_handling::check_ordered("stan::io::ordered", "Constrained vector", x);
         return x;
       }
 
@@ -907,9 +898,7 @@ namespace stan {
        */
       inline vector_t positive_ordered(size_t k) {
         vector_t x(vector(k));
-        stan::error_handling::check_positive_ordered("stan::io::positive_ordered(%1%)", 
-                                           x, "Constrained vector",
-                                           (double*)0);
+        stan::error_handling::check_positive_ordered("stan::io::positive_ordered", "Constrained vector", x);
         return x;
       }
 
@@ -955,9 +944,7 @@ namespace stan {
        */
       inline matrix_t cholesky_factor(size_t M, size_t N) {
         matrix_t y(matrix(M,N));
-        stan::error_handling::check_cholesky_factor("stan::io::cholesky_factor(%1%)", 
-                                          y, "Constrained matrix",
-                                          (double*)0);
+        stan::error_handling::check_cholesky_factor("stan::io::cholesky_factor", "Constrained matrix", y);
         return y;
       }
 
@@ -1009,7 +996,7 @@ namespace stan {
        */
       inline matrix_t cholesky_corr(size_t K) {
         matrix_t y(matrix(K,K));
-        stan::error_handling::check_cholesky_factor_corr("stan::io::cholesky_factor_corr(%1%)", y, "Constrained matrix");
+        stan::error_handling::check_cholesky_factor_corr("stan::io::cholesky_factor_corr", y, "Constrained matrix");
         return y;
       }
 
@@ -1060,8 +1047,7 @@ namespace stan {
        */
       inline matrix_t cov_matrix(size_t k) {
         matrix_t y(matrix(k,k));
-        stan::error_handling::check_cov_matrix("stan::io::cov_matrix(%1%)", y, "Constrained matrix",
-                                     (double*)0);
+        stan::error_handling::check_cov_matrix("stan::io::cov_matrix", "Constrained matrix", y);
         return y;
       }
 
@@ -1106,9 +1092,7 @@ namespace stan {
        */
       inline matrix_t corr_matrix(size_t k) {
         matrix_t x(matrix(k,k));
-        stan::error_handling::check_corr_matrix("stan::math::corr_matrix(%1%)", 
-                                      x, "Constrained matrix",
-                                      (double*)0);
+        stan::error_handling::check_corr_matrix("stan::math::corr_matrix", "Constrained matrix", x);
         return x;
       }
 

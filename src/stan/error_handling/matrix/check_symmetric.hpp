@@ -21,17 +21,15 @@ namespace stan {
      * @param function 
      * @param y Matrix to test.
      * @param name
-     * @param result
      * @return <code>true</code> if the matrix is symmetric.
      * @return throws if any element not on the main diagonal is NaN
      * @tparam T Type of scalar.
      */
-    template <typename T_y, typename T_result>
+    template <typename T_y>
     inline bool 
-    check_symmetric(const char* function,
-                    const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                    const char* name,
-                    T_result* result) {
+    check_symmetric(const std::string& function,
+                    const std::string& name,
+                    const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
       using stan::math::index_type;
@@ -44,17 +42,18 @@ namespace stan {
       for (size_type m = 0; m < k; ++m) {
         for (size_type n = m + 1; n < k; ++n) {
           if (!(fabs(y(m,n) - y(n,m)) <= CONSTRAINT_TOLERANCE)) {
-            std::ostringstream message;
-            message << name << " is not symmetric. " 
+            std::ostringstream msg1;
+            msg1 << "is not symmetric. " 
                     << name << "[" << stan::error_index::value + m << "," 
-                    << stan::error_index::value +n << "] is %1%, but "
-                    << name << "[" << stan::error_index::value +n << "," 
-                    << stan::error_index::value + m 
-                    << "] element is " << y(n,m);
-            std::string msg(message.str());
-            return dom_err(function,y(m,n),name,
-                           msg.c_str(),"",
-                           result);
+                    << stan::error_index::value +n << "] is ";
+            std::ostringstream msg2;
+            msg2 << ", but "
+                 << name << "[" << stan::error_index::value +n << "," 
+                 << stan::error_index::value + m 
+                 << "] element is " << y(n,m);
+            dom_err(function, name, y(m,n), 
+                    msg1.str(), msg2.str());
+            return false;
           }
         }
       }

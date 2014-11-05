@@ -26,7 +26,7 @@ namespace stan {
     inline const T& 
     get_base1(const std::vector<T>& x, 
               size_t i, 
-              const char* error_msg,
+              const std::string& error_msg,
               size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.size(),i,error_msg,idx);
@@ -53,7 +53,7 @@ namespace stan {
     get_base1(const std::vector<std::vector<T> >& x, 
               size_t i1, 
               size_t i2,
-              const char* error_msg,
+              const std::string& error_msg,
               size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.size(),i1,error_msg,idx);
@@ -82,7 +82,7 @@ namespace stan {
               size_t i1, 
               size_t i2,
               size_t i3,
-              const char* error_msg,
+              const std::string& error_msg,
               size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.size(),i1,error_msg,idx);
@@ -113,7 +113,7 @@ namespace stan {
               size_t i2,
               size_t i3,
               size_t i4,
-              const char* error_msg,
+              const std::string& error_msg,
               size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.size(),i1,error_msg,idx);
@@ -146,7 +146,7 @@ namespace stan {
               size_t i3,
               size_t i4,
               size_t i5,
-              const char* error_msg,
+              const std::string& error_msg,
               size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.size(),i1,error_msg,idx);
@@ -181,7 +181,7 @@ namespace stan {
               size_t i4,
               size_t i5,
               size_t i6,
-              const char* error_msg,
+              const std::string& error_msg,
               size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.size(),i1,error_msg,idx);
@@ -219,7 +219,7 @@ namespace stan {
               size_t i5,
               size_t i6,
               size_t i7,
-              const char* error_msg,
+              const std::string& error_msg,
               size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.size(),i1,error_msg,idx);
@@ -259,7 +259,7 @@ namespace stan {
                  size_t i6,
                  size_t i7,
                  size_t i8,
-                 const char* error_msg,
+                 const std::string& error_msg,
                  size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.size(),i1,error_msg,idx);
@@ -291,7 +291,7 @@ namespace stan {
     inline Eigen::Matrix<T,1,Eigen::Dynamic>
     get_base1(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
               size_t m,
-              const char* error_msg,
+              const std::string& error_msg,
               size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.rows(),m,error_msg,idx);
@@ -319,7 +319,7 @@ namespace stan {
     get_base1(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
               size_t m,
               size_t n,
-              const char* error_msg,
+              const std::string& error_msg,
               size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.rows(),m,error_msg,idx);
@@ -345,7 +345,7 @@ namespace stan {
     inline
     const T& get_base1(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
                        size_t m,
-                       const char* error_msg,
+                       const std::string& error_msg,
                        size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.size(),m,error_msg,idx);
@@ -370,7 +370,7 @@ namespace stan {
     inline const T& 
     get_base1(const Eigen::Matrix<T,1,Eigen::Dynamic>& x,
               size_t n,
-              const char* error_msg,
+              const std::string& error_msg,
               size_t idx) {
       using stan::error_handling::check_range;
       check_range(x.size(),n,error_msg,idx);

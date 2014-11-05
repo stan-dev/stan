@@ -111,28 +111,31 @@ namespace stan {
     template<int R1,int C1,int R2, int C2>
     inline var squared_distance(const Eigen::Matrix<var, R1, C1>& v1, 
                                 const Eigen::Matrix<var, R2, C2>& v2) {
-      stan::error_handling::check_vector("squared_distance(%1%)",v1,"v1",(double*)0);
-      stan::error_handling::check_vector("squared_distance(%1%)",v2,"v2",(double*)0);
-      stan::error_handling::check_matching_sizes("squared_distance(%1%)",v1,"v1",
-                                       v2,"v2",(double*)0);
+      stan::error_handling::check_vector("squared_distance", "v1", v1);
+      stan::error_handling::check_vector("squared_distance", "v2", v2);
+      stan::error_handling::check_matching_sizes("squared_distance",
+                                                 "v1", v1,
+                                                 "v2", v2);
       return var(new squared_distance_vv_vari(v1,v2));
     }
     template<int R1,int C1,int R2, int C2>
     inline var squared_distance(const Eigen::Matrix<var, R1, C1>& v1, 
                                 const Eigen::Matrix<double, R2, C2>& v2) {
-      stan::error_handling::check_vector("squared_distance(%1%)",v1,"v1",(double*)0);
-      stan::error_handling::check_vector("squared_distance(%1%)",v2,"v2",(double*)0);
-      stan::error_handling::check_matching_sizes("squared_distance(%1%)",v1,"v1",
-                                       v2,"v2",(double*)0);
+      stan::error_handling::check_vector("squared_distance", "v1", v1);
+      stan::error_handling::check_vector("squared_distance", "v2", v2);
+      stan::error_handling::check_matching_sizes("squared_distance", 
+                                                 "v1", v1,
+                                                 "v2", v2);
       return var(new squared_distance_vd_vari(v1,v2));
     }
     template<int R1,int C1,int R2, int C2>
     inline var squared_distance(const Eigen::Matrix<double, R1, C1>& v1, 
                                 const Eigen::Matrix<var, R2, C2>& v2) {
-      stan::error_handling::check_vector("squared_distance(%1%)",v1,"v1",(double*)0);
-      stan::error_handling::check_vector("squared_distance(%1%)",v2,"v2",(double*)0);
-      stan::error_handling::check_matching_sizes("squared_distance(%1%)",v1,"v1",
-                                       v2,"v2",(double*)0);
+      stan::error_handling::check_vector("squared_distance", "v1", v1);
+      stan::error_handling::check_vector("squared_distance", "v2", v2);
+      stan::error_handling::check_matching_sizes("squared_distance",
+                                                 "v1", v1,
+                                                 "v2", v2);
       return var(new squared_distance_vd_vari(v2,v1));
     }
   }

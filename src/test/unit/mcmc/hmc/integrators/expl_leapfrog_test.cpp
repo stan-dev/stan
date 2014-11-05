@@ -21,7 +21,7 @@ class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
 public:
   
   void SetUp() {
-    static const std::string DATA = "mu <- 0.0\ny <- 0\n";
+    static const std::string DATA("mu <- 0.0\ny <- 0\n");
     std::stringstream data_stream(DATA);
     // setup hamiltonian
     stan::io::dump data_var_context(data_stream);

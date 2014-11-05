@@ -1,6 +1,6 @@
+#include <stan/agrad/rev/matrix.hpp>
+#include <stan/agrad/fwd/matrix.hpp>
 #include <stan/math/matrix/size.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/rev/var.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradFwdMatrixSize,fvar_double) {

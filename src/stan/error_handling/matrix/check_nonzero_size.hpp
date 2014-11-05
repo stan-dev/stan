@@ -22,27 +22,26 @@ namespace stan {
      * @param function
      * @param y matrix/vector to test against
      * @param name
-     * @param result
      * @return <code>true</code> if the the specified matrix/vector is 
      * of non-zero size
      * @throw std::domain_error if the specified matrix/vector is of
      * non-zero size
      * @tparam T Type of scalar.
      */
-    template <typename T_y, typename T_result>
-    inline bool check_nonzero_size(const char* function,
-                                   const T_y& y,
-                                   const char* name,
-                                   T_result* result) {
+    template <typename T_y>
+    inline bool check_nonzero_size(const std::string& function,
+                                   const std::string& name,
+                                   const T_y& y) {
       using stan::math::index_type;
 
       typedef typename index_type<T_y>::type size_t;
       if (y.size() > 0) 
         return true;
 
-      return dom_err(function, size_t(), 
-                     name, " has size %1%, but must have a non-zero size","",
-                     result);
+      dom_err(function, name, size_t(), 
+              "has size ", 
+              ", but must have a non-zero size");
+      return false;
     }
 
   }

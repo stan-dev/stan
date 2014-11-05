@@ -3,9 +3,13 @@
 
 #include <boost/random/binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_bounded.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_greater_or_equal.hpp>
+#include <stan/error_handling/scalar/check_less_or_equal.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/inv_logit.hpp>
 #include <stan/math/functions/log1m.hpp>
@@ -32,7 +36,7 @@ namespace stan {
                  const T_N& N, 
                  const T_prob& theta) {
 
-      static const char* function = "stan::prob::binomial_log(%1%)";
+      static const std::string function("stan::prob::binomial_log");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
@@ -48,24 +52,14 @@ namespace stan {
         return 0.0;
 
       double logp = 0;
-      check_bounded(function, n, 0, N,
-                    "Successes variable",
-                    &logp);
-      check_nonnegative(function, N,
-                        "Population size parameter",
-                        &logp);
-      check_finite(function, theta,
-                   "Probability parameter",
-                   &logp);
-      check_bounded(function, theta, 0.0, 1.0,
-                    "Probability parameter",
-                    &logp);
+      check_bounded(function, "Successes variable", n, 0, N);
+      check_nonnegative(function, "Population size parameter", N);
+      check_finite(function, "Probability parameter", theta);
+      check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
       check_consistent_sizes(function,
-                             n,N,theta,
-                             "Successes variable",
-                             "Population size parameter",
-                             "Probability parameter",
-                             &logp);
+                             "Successes variable", n,
+                             "Population size parameter", N,
+                             "Probability parameter", theta);
 
 
       // check if no variables are involved and prop-to
@@ -143,7 +137,7 @@ namespace stan {
                        const T_N& N, 
                        const T_prob& alpha) {
 
-      static const char* function = "stan::prob::binomial_logit_log(%1%)";
+      static const std::string function("stan::prob::binomial_logit_log");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
@@ -159,21 +153,13 @@ namespace stan {
         return 0.0;
 
       double logp = 0;
-      check_bounded(function, n, 0, N,
-                    "Successes variable",
-                    &logp);
-      check_nonnegative(function, N,
-                        "Population size parameter",
-                        &logp);
-      check_finite(function, alpha,
-                   "Probability parameter",
-                   &logp);
+      check_bounded(function, "Successes variable", n, 0, N);
+      check_nonnegative(function, "Population size parameter", N);
+      check_finite(function, "Probability parameter", alpha);
       check_consistent_sizes(function,
-                             n,N,alpha,
-                             "Successes variable",
-                             "Population size parameter",
-                             "Probability parameter",
-                             &logp);
+                             "Successes variable", n,
+                             "Population size parameter", N,
+                             "Probability parameter", alpha);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_prob>::value)
@@ -248,7 +234,7 @@ namespace stan {
     typename return_type<T_prob>::type
     binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta) {
           
-      static const char* function = "stan::prob::binomial_cdf(%1%)";
+      static const std::string function("stan::prob::binomial_cdf");
           
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
@@ -264,14 +250,14 @@ namespace stan {
       double P(1.0);
           
       // Validate arguments
-      check_nonnegative(function, N, "Population size parameter", &P);
-      check_finite(function, theta, "Probability parameter", &P);
-      check_bounded(function, theta, 0.0, 1.0, 
-                    "Probability parameter", &P);
-      check_consistent_sizes(function, n, N, theta, 
-                             "Successes variable", "Population size parameter",
-                             "Probability parameter",
-                             &P);
+      check_nonnegative(function, "Population size parameter", N);
+      check_finite(function, "Probability parameter", theta);
+      check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
+      check_consistent_sizes(function, 
+                             "Successes variable", n,
+                             "Population size parameter", N, 
+                             "Probability parameter", theta);
+                             
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -328,7 +314,7 @@ namespace stan {
     typename return_type<T_prob>::type
     binomial_cdf_log(const T_n& n, const T_N& N, const T_prob& theta) {
           
-      static const char* function = "stan::prob::binomial_cdf_log(%1%)";
+      static const std::string function("stan::prob::binomial_cdf_log");
           
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
@@ -344,14 +330,13 @@ namespace stan {
       double P(0.0);
           
       // Validate arguments
-      check_nonnegative(function, N, "Population size parameter", &P);
-      check_finite(function, theta, "Probability parameter", &P);
-      check_bounded(function, theta, 0.0, 1.0, 
-                    "Probability parameter", &P);
-      check_consistent_sizes(function, n, N, theta, 
-                             "Successes variable", "Population size parameter",
-                             "Probability parameter",
-                             &P);
+      check_nonnegative(function, "Population size parameter", N);
+      check_finite(function, "Probability parameter", theta);
+      check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
+      check_consistent_sizes(function, 
+                             "Successes variable", n, 
+                             "Population size parameter", N, 
+                             "Probability parameter", theta);
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -398,7 +383,7 @@ namespace stan {
     typename return_type<T_prob>::type
     binomial_ccdf_log(const T_n& n, const T_N& N, const T_prob& theta) {
           
-      static const char* function = "stan::prob::binomial_ccdf_log(%1%)";
+      static const std::string function("stan::prob::binomial_ccdf_log");
           
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
@@ -414,14 +399,13 @@ namespace stan {
       double P(0.0);
           
       // Validate arguments
-      check_nonnegative(function, N, "Population size parameter", &P);
-      check_finite(function, theta, "Probability parameter", &P);
-      check_bounded(function, theta, 0.0, 1.0, 
-                    "Probability parameter", &P);
-      check_consistent_sizes(function, n, N, theta, 
-                             "Successes variable", "Population size parameter",
-                             "Probability parameter",
-                             &P);
+      check_nonnegative(function, "Population size parameter", N);
+      check_finite(function, "Probability parameter", theta);
+      check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
+      check_consistent_sizes(function,
+                             "Successes variable", n,
+                             "Population size parameter", N,
+                             "Probability parameter", theta);
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -473,21 +457,17 @@ namespace stan {
       using boost::variate_generator;
       using boost::binomial_distribution;
 
-      static const char* function = "stan::prob::binomial_rng(%1%)";
+      static const std::string function("stan::prob::binomial_rng");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_less_or_equal;
       using stan::error_handling::check_greater_or_equal;
       using stan::error_handling::check_nonnegative;
 
-      check_nonnegative(function, N,
-                        "Population size parameter", (double*)0);
-      check_finite(function, theta,
-                   "Probability parameter", (double*)0);
-      check_less_or_equal(function, theta, 1.0,
-                          "Probability parameter", (double*)0);
-      check_greater_or_equal(function, theta, 0.0,
-                             "Probability parameter", (double*)0);
+      check_nonnegative(function, "Population size parameter", N);
+      check_finite(function, "Probability parameter", theta);
+      check_less_or_equal(function, "Probability parameter", theta, 1.0);
+      check_greater_or_equal(function, "Probability parameter", theta, 0.0);
 
       variate_generator<RNG&, binomial_distribution<> >
         binomial_rng(rng, binomial_distribution<>(N, theta));

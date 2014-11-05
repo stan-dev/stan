@@ -1,12 +1,10 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/multivariate/continuous/lkj_corr.hpp"
-#include "stan/prob/distributions/univariate/continuous/uniform.hpp"
+#include <stan/agrad/rev/matrix.hpp>
+#include <stan/agrad/fwd/matrix.hpp>
+#include <stan/prob/distributions/multivariate/continuous/lkj_corr.hpp>
+#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
-#include <stan/agrad/fwd.hpp>
-#include <stan/agrad/fwd/matrix.hpp>
-#include <stan/agrad/rev.hpp>
-#include <stan/agrad/rev/matrix.hpp>
 
 TEST(ProbDistributionsLkjCorr,testIdentity) {
   boost::random::mt19937 rng;

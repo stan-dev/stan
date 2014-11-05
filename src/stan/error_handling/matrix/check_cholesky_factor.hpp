@@ -20,26 +20,21 @@ namespace stan {
      * @param function
      * @param y Matrix to test.
      * @param name
-     * @param result
      * @return <code>true</code> if the matrix is a valid Cholesky factor.
      * @return throws if any element in matrix is nan
      * @tparam T_y Type of elements of Cholesky factor
-     * @tparam T_result Type of result.
      */
-    template <typename T_y, typename T_result>
-    inline bool check_cholesky_factor(const char* function,
-                 const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                 const char* name,
-                 T_result* result) {
-      check_less_or_equal(function,y.cols(),y.rows(),
-                          "columns and rows of Cholesky factor",
-                          result);
-      check_positive(function, y.cols(), "columns of Cholesky factor", 
-                     result);
+    template <typename T_y>
+    inline bool check_cholesky_factor(const std::string& function,
+                                      const std::string& name,
+                                      const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      check_less_or_equal(function, "columns and rows of Cholesky factor",
+                          y.cols(), y.rows());
+      check_positive(function, "columns of Cholesky factor", y.cols());
       // FIXME:  should report row i
-      check_lower_triangular(function, y, name, result);
+      check_lower_triangular(function, name, y);
       for (int i = 0; i < y.cols(); ++i)
-        check_positive(function, y(i,i), name, result);
+        check_positive(function, name, y(i,i));
       return true;
     }
 

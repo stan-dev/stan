@@ -23,7 +23,7 @@ TEST(Common, do_bfgs_optimize__bfgs) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model model(dummy_context);
@@ -54,7 +54,7 @@ TEST(Common, do_bfgs_optimize__lbfgs) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model model(dummy_context);

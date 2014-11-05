@@ -9,12 +9,11 @@ TEST(AgradRevErrorHandlingMatrix,CheckCovMatrix) {
   
   using stan::error_handling::check_cov_matrix;
   
-  const char* function = "check_cov_matrix(%1%)";
-  var result = 0;
+  const std::string function = "check_cov_matrix";
   Matrix<var,Dynamic,Dynamic> Sigma;
   Sigma.resize(1,1);
   Sigma << 1;
 
-  EXPECT_NO_THROW(check_cov_matrix(function, Sigma,"Sigma", &result))
+  EXPECT_NO_THROW(check_cov_matrix(function, "Sigma", Sigma))
     << "check_cov_matrix should not throw exception with Sigma";
 }

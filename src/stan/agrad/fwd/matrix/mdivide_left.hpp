@@ -27,9 +27,10 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_left;
-      stan::error_handling::check_square("mdivide_left(%1%)",A,"A",(double*)0);
-      stan::error_handling::check_multiplicable("mdivide_left(%1%)",A,"A",
-                                      b,"b",(double*)0);
+      stan::error_handling::check_square("mdivide_left", "A", A);
+      stan::error_handling::check_multiplicable("mdivide_left",
+                                                "A", A,
+                                                "b", b);
 
       Eigen::Matrix<T,R1,C2> inv_A_mult_b(A.rows(),b.cols());
       Eigen::Matrix<T,R1,C2> inv_A_mult_deriv_b(A.rows(),b.cols());
@@ -71,9 +72,10 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_left;
-      stan::error_handling::check_square("mdivide_left(%1%)",A,"A",(double*)0);
-      stan::error_handling::check_multiplicable("mdivide_left(%1%)",A,"A",
-                                      b,"b",(double*)0);
+      stan::error_handling::check_square("mdivide_left", "A", A);
+      stan::error_handling::check_multiplicable("mdivide_left",
+                                                "A", A,
+                                                "b", b);
 
       Eigen::Matrix<T,R2,C2> val_b(b.rows(),b.cols()); 
       Eigen::Matrix<T,R2,C2> deriv_b(b.rows(),b.cols()); 
@@ -97,9 +99,10 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_left;
-      stan::error_handling::check_square("mdivide_left(%1%)",A,"A",(double*)0);
-      stan::error_handling::check_multiplicable("mdivide_left(%1%)",A,"A",
-                                      b,"b",(double*)0);
+      stan::error_handling::check_square("mdivide_left", "A", A);
+      stan::error_handling::check_multiplicable("mdivide_left",
+                                                "A", A,
+                                                "b", b);
 
       Eigen::Matrix<T,R1,C2> 
         inv_A_mult_b(A.rows(),b.cols());
