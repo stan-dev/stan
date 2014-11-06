@@ -4,12 +4,12 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
-#include <stan/prob/constants.hpp>
-#include <stan/error_handling/matrix.hpp>
-#include <stan/error_handling.hpp>
-#include <stan/prob/traits.hpp>
+#include <stan/error_handling/matrix/check_simplex.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/math/functions/multiply_log.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 
@@ -45,7 +45,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
     dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                   const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
-      static const char* function = "stan::prob::dirichlet_log(%1%)";
+      static const std::string function("stan::prob::dirichlet_log");
       using boost::math::lgamma;
       using boost::math::tools::promote_args;
       using stan::error_handling::check_consistent_sizes;
@@ -54,11 +54,11 @@ namespace stan {
       using stan::math::multiply_log;
       
       typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);      
-      check_consistent_sizes(function, theta, alpha,
-                             "probabilities", "prior sample sizes",
-                             &lp);
-      check_positive(function, alpha, "prior sample sizes", &lp);
-      check_simplex(function, theta, "probabilities", &lp);
+      check_consistent_sizes(function, 
+                             "probabilities", theta, 
+                             "prior sample sizes", alpha);
+      check_positive(function, "prior sample sizes", alpha);
+      check_simplex(function, "probabilities", theta);
 
       if (include_summand<propto,T_prior_sample_size>::value) {
         lp += lgamma(alpha.sum());

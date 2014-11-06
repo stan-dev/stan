@@ -4,27 +4,25 @@
 using stan::error_handling::check_corr_matrix;
 
 TEST(ErrorHandlingMatrix, CheckCorrMatrix) {
-  double result;
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y;
   y.resize(2,2);
   
   y << 1, 0, 0, 1;
-  EXPECT_TRUE(check_corr_matrix("test(%1%)", y, "y", &result));
+  EXPECT_TRUE(check_corr_matrix("test", "y", y));
 
   y << 10, 0, 0, 10;
-  EXPECT_THROW(check_corr_matrix("test(%1%)", y, "y", &result), 
+  EXPECT_THROW(check_corr_matrix("test", "y", y), 
                std::domain_error);
 }
 
 TEST(ErrorHandlingMatrix, CheckCorrMatrix_one_indexed_message) {
   std::string message;
-  double result;
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y;
   y.resize(2,2);
   
   y << 10, 0, 0, 1;
   try {
-    check_corr_matrix("test(%1%)", y, "y", &result);
+    check_corr_matrix("test", "y", y);
     FAIL() << "should have thrown";
   } catch (std::domain_error& e) {
     message = e.what();
@@ -40,7 +38,6 @@ TEST(ErrorHandlingMatrix, CheckCorrMatrix_one_indexed_message) {
 }
 
 TEST(ErrorHandlingMatrix, CheckCorrMatrix_nan) {
-  double result;
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y;
   y.resize(2,2);
   double nan = std::numeric_limits<double>::quiet_NaN();
@@ -48,11 +45,11 @@ TEST(ErrorHandlingMatrix, CheckCorrMatrix_nan) {
   for (int i = 0; i < y.size(); i++) {
     y << 1, 0, 0, 1;
     y(i) = nan;
-    EXPECT_THROW(check_corr_matrix("test(%1%)", y, "y", &result), std::domain_error);
+    EXPECT_THROW(check_corr_matrix("test", "y", y), std::domain_error);
 
     y << 10, 0, 0, 10;
     y(i) = nan;
-    EXPECT_THROW(check_corr_matrix("test(%1%)", y, "y", &result), 
+    EXPECT_THROW(check_corr_matrix("test", "y", y), 
                  std::domain_error);
   }
 }

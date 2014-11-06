@@ -19,37 +19,35 @@ namespace stan {
      * @param function
      * @param y Matrix to test.
      * @param name
-     * @param result
      * @return <code>true</code> if the matrix is positive definite.
      * @return throws if any element in lower triangular of matrix is nan.
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings (message has (0,0) item)
-    template <typename T_y, typename T_result>
-    inline bool check_pos_definite(const char* function,
-                                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                   const char* name,
-                                   T_result* result) {
+    template <typename T_y>
+    inline bool check_pos_definite(const std::string& function,
+                                   const std::string& name,
+                                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       if (y.rows() == 1 && !(y(0,0) > CONSTRAINT_TOLERANCE)) {
-        std::ostringstream message;
-        message << name << " is not positive definite. " 
-                << name << "(0,0) is %1%.";
-        std::string msg(message.str());
-        return dom_err(function,y(0,0),name,msg.c_str(),"",result);
+        std::ostringstream msg;
+        msg << "is not positive definite. " 
+                << name << "(0,0) is ";
+        dom_err(function, name, y(0,0), 
+                msg.str());
       }
       for (int i = 0; i < y.size(); ++i)
-        check_not_nan(function, y(i), "", result);
+        check_not_nan(function, name, y(i));
 
       Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
         = y.ldlt();
       if (cholesky.info() != Eigen::Success
           || !cholesky.isPositive()
           || (cholesky.vectorD().array() <= CONSTRAINT_TOLERANCE).any()) {
-        std::ostringstream message;
-        message << name << " is not positive definite. " 
-                << name << "(0,0) is %1%.";
-        std::string msg(message.str());
-        return dom_err(function,y(0,0),name,msg.c_str(),"",result);
+        std::ostringstream msg;
+        msg << "is not positive definite. " 
+                << name << "(0,0) is ";
+        dom_err(function, name, y(0,0),
+                msg.str());
       }
       return true;
     }

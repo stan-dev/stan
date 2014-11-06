@@ -3,18 +3,21 @@
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
-
-#include <stan/prob/traits.hpp>
 #include <stan/error_handling.hpp>
 #include <stan/math/functions/inv_logit.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/log1m_exp.hpp>
 #include <stan/math/functions/log1p_exp.hpp>
-#include <stan/error_handling/matrix.hpp>
-#include <stan/error_handling.hpp>
+#include <stan/error_handling/scalar/check_bounded.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_greater.hpp>
+#include <stan/error_handling/scalar/check_less.hpp>
+#include <stan/error_handling/scalar/check_less_or_equal.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/prob/constants.hpp>
-
+#include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 
@@ -65,7 +68,7 @@ namespace stan {
       using stan::math::log1m;
       using stan::math::log1p_exp;
 
-      static const char* function = "stan::prob::ordered_logistic(%1%)";
+      static const std::string function("stan::prob::ordered_logistic");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_positive;
@@ -77,15 +80,14 @@ namespace stan {
 
       int K = c.size() + 1;
 
-      typename boost::math::tools::promote_args<T_lambda,T_cut>::type lp(0.0);
-      check_bounded(function, y, 1, K, "Random variable", &lp);
-      check_finite(function, lambda, "Location parameter", &lp);
-      check_greater(function, c.size(), 0, "Size of cut points parameter", &lp);
+      check_bounded(function, "Random variable", y, 1, K);
+      check_finite(function, "Location parameter", lambda);
+      check_greater(function, "Size of cut points parameter", c.size(), 0);
       for (int i = 1; i < c.size(); ++i)
-        check_greater(function, c(i), c(i - 1), "Cut points parameter", &lp);
+        check_greater(function, "Cut points parameter", c(i), c(i - 1));
 
-      check_finite(function, c(c.size()-1), "Cut points parameter", &lp);
-      check_finite(function, c(0), "Cut points parameter", &lp);
+      check_finite(function, "Cut points parameter", c(c.size()-1));
+      check_finite(function, "Cut points parameter", c(0));
 
       // log(1 - inv_logit(lambda))
       if (y == 1)
@@ -118,7 +120,7 @@ namespace stan {
       using boost::variate_generator;
       using stan::math::inv_logit;
 
-      static const char* function = "stan::prob::ordered_logistic(%1%)";
+      static const std::string function("stan::prob::ordered_logistic");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_positive;
@@ -128,17 +130,13 @@ namespace stan {
       using stan::error_handling::check_greater;
       using stan::error_handling::check_bounded;
 
-      check_finite(function, eta, "Location parameter", (double*)0);
-      check_greater(function, c.size(), 0, "Size of cut points parameter", 
-                    (double*)0);
+      check_finite(function, "Location parameter", eta);
+      check_greater(function, "Size of cut points parameter", c.size(), 0);
       for (int i = 1; i < c.size(); ++i) {
-        check_greater(function, c(i), c(i - 1),
-                      "Cut points parameter", (double*)0);
+        check_greater(function, "Cut points parameter", c(i), c(i - 1));
       }
-      check_finite(function, c(c.size()-1), 
-                   "Cut points parameter", (double*)0);
-      check_finite(function, c(0),
-                   "Cut points parameter", (double*)0);
+      check_finite(function, "Cut points parameter", c(c.size()-1));
+      check_finite(function, "Cut points parameter", c(0));
 
       Eigen::VectorXd cut(c.rows()+1);
       cut(0) = 1 - inv_logit(eta - c(0));

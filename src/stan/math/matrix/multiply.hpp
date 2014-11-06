@@ -61,8 +61,9 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2> multiply(const Eigen::Matrix<double,R1,C1>& m1,
                                                 const Eigen::Matrix<double,R2,C2>& m2) {
       
-      stan::error_handling::check_multiplicable("multiply(%1%)",m1,"m1",
-                                      m2,"m2",(double*)0);
+      stan::error_handling::check_multiplicable("multiply",
+                                                "m1", m1,
+                                                "m2", m2);
       return m1*m2;
     }
 
@@ -78,8 +79,9 @@ namespace stan {
     template<int C1,int R2>
     inline double multiply(const Eigen::Matrix<double,1,C1>& rv,
                            const Eigen::Matrix<double,R2,1>& v) {
-      stan::error_handling::check_matching_sizes("multiply(%1%)",rv,"rv",
-                                       v,"v",(double*)0);
+      stan::error_handling::check_matching_sizes("multiply",
+                                                 "rv", rv,
+                                                 "v", v);
       if (rv.size() != v.size()) 
         throw std::domain_error("rv.size() != v.size()");
       return rv.dot(v);

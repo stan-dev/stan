@@ -13,7 +13,7 @@ namespace stan {
     inline std::vector<T>
     rep_array(const T& x, int n) {
       using stan::error_handling::check_nonnegative;
-      check_nonnegative("rep_array(%1%)", n,"n", (double*)0);
+      check_nonnegative("rep_array", "n", n);
       return std::vector<T>(n,x);
     }
 
@@ -22,8 +22,8 @@ namespace stan {
     rep_array(const T& x, int m, int n) {
       using std::vector;
       using stan::error_handling::check_nonnegative;
-      check_nonnegative("rep_array(%1%)", m,"rows", (double*)0);
-      check_nonnegative("rep_array(%1%)", n,"cols", (double*)0);
+      check_nonnegative("rep_array", "rows", m);
+      check_nonnegative("rep_array", "cols", n);
       return vector<vector<T> >(m, vector<T>(n, x));
     }
 
@@ -32,9 +32,9 @@ namespace stan {
     rep_array(const T& x, int k, int m, int n) {
       using std::vector;
       using stan::error_handling::check_nonnegative;
-      check_nonnegative("rep_array(%1%)", k,"shelfs", (double*)0);
-      check_nonnegative("rep_array(%1%)", m,"rows", (double*)0);
-      check_nonnegative("rep_array(%1%)", n,"cols", (double*)0);
+      check_nonnegative("rep_array", "shelfs", k);
+      check_nonnegative("rep_array", "rows", m);
+      check_nonnegative("rep_array", "cols", n);
       return vector<vector<vector<T> > >(k,
                                          vector<vector<T> >(m,
                                                             vector<T>(n, x)));
