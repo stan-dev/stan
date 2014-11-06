@@ -2,7 +2,6 @@
 #define STAN__AGRAD__REV__VAR_HPP
 
 #include <ostream>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/vari.hpp>
 
 namespace stan {

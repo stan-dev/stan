@@ -19,11 +19,10 @@ namespace stan {
     <typename promote_args<T1,T2>::type, Dynamic, Dynamic>
     quad_form_diag(const Matrix<T1, Dynamic, Dynamic>& mat,
                    const Matrix<T2, R, C>& vec) {
-      stan::error_handling::check_vector("quad_form_diag(%1%)", vec, "vec", (double*)0);
-      stan::error_handling::check_square("quad_form_diag(%1%)",mat,"mat",(double*)0);
+      stan::error_handling::check_vector("quad_form_diag", "vec", vec);
+      stan::error_handling::check_square("quad_form_diag", "mat", mat);
       int size = vec.size();
-      stan::error_handling::check_equal("quad_form_diag(%1%)",mat.rows(), size, "matrix size",
-                              (double*)0);
+      stan::error_handling::check_equal("quad_form_diag", "matrix size", mat.rows(), size);
       Matrix<typename promote_args<T1,T2>::type, Dynamic, Dynamic>
         result(size, size);
       for (int i = 0; i < size; i++) {

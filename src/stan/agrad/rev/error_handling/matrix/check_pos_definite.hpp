@@ -12,9 +12,9 @@ namespace stan {
   namespace agrad {
 
     template <typename T_result, class Policy>
-    inline bool check_pos_definite(const char* function,
+    inline bool check_pos_definite(const std::string& function,
                                    const Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                   const char* name,
+                                   const std::string& name,
                                    T_result* result,
                                    const Policy&) {
       using Eigen::Matrix;

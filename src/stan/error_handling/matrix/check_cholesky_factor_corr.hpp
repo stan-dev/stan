@@ -24,38 +24,28 @@ namespace stan {
      * @param function
      * @param y Matrix to test.
      * @param name
-     * @param result
      * @return <code>true</code> if the matrix is a valid Cholesky factor.
      * @return throws if any element in y is nan.
      * @tparam T_y Type of elements of Cholesky factor
-     * @tparam T_result Type of result.
      */
-    template <typename T_y, typename T_result>
-    bool check_cholesky_factor_corr(const char* function,
-                    const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                    const char* name,
-                    T_result* result) {
-      if (!check_square(function,y,name,result))
+    template <typename T_y>
+    bool check_cholesky_factor_corr(const std::string& function,
+                                    const std::string& name,
+                                    const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      if (!check_square(function, name, y))
         return false;
-      if (!check_lower_triangular(function,y,name,result))
+      if (!check_lower_triangular(function, name, y))
         return false;
       for (int i = 0; i < y.rows(); ++i)
-        if (!check_positive(function, y(i,i), name, result))
+        if (!check_positive(function, name, y(i,i)))
           return false;
       for (int i = 0; i < y.rows(); ++i) {
-        Eigen::Matrix<T_y,Eigen::Dynamic,1> y_i = y.row(i).transpose();
-        if (!check_unit_vector(function, y_i, name, result))
+        Eigen::Matrix<T_y,Eigen::Dynamic,1> 
+          y_i = y.row(i).transpose();
+        if (!check_unit_vector(function, name, y_i))
           return false;
       }
       return true;
-    }
-
-    template <typename T>
-    inline bool check_cholesky_factor_corr(const char* function,
-                      const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
-                      const char* name,
-                      T* result = 0) {
-      return check_cholesky_factor_corr<T,T>(function,y,name,result);
     }
 
 
@@ -65,25 +55,15 @@ namespace stan {
      *
      * @param function Name of function.
      * @param y Matrix to test.
-     * @param result Pointer into which to write result.
      * @return <code>true</code> if the matrix is a valid Cholesky factor.
      * @return throws if any element in matrix is nan
      * @tparam T_y Type of elements of Cholesky factor
      * @tparam T_result Type of result.
      */
-    template <typename T_y, typename T_result>
-    inline bool check_cholesky_factor_corr(const char* function,
-                    const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                    T_result* result) {
-      return check_cholesky_factor_corr(function,y,"(internal variable)",
-                                        result);
-    }
-
-    template <typename T>
-    inline bool check_cholesky_factor_corr(const char* function,
-                    const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
-                    T* result = 0) {
-      return check_cholesky_factor_corr<T,T>(function,y,result);
+    template <typename T_y>
+    inline bool check_cholesky_factor_corr(const std::string& function,
+                                           const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      return check_cholesky_factor_corr(function, "(internal variable)", y);
     }
 
   }

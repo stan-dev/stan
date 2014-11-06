@@ -66,12 +66,9 @@ namespace stan {
             // Handle this better.
             (*alloc)->_invA.setZero(A.rows(),A.cols());
             double y = 0;
-            double result = -std::numeric_limits<double>::infinity();
-            return dom_err("log_determinant_spd(%1%)",
-                           y,
-                           "matrix argument",
-                           "failed LDLT factorization","",
-                           &result);
+            dom_err("log_determinant_spd",
+                    "matrix argument", y,
+                    "failed LDLT factorization");
           }
 
           // compute the inverse of A (needed for the derivative)
@@ -80,23 +77,17 @@ namespace stan {
           
           if (ldlt.isNegative() || (ldlt.vectorD().array() <= 1e-16).any()) {
             double y = 0;
-            double result = -std::numeric_limits<double>::infinity();
-            return dom_err("log_determinant_spd(%1%)",
-                           y,
-                           "matrix argument",
-                           "matrix is negative definite","",
-                           &result);
+            dom_err("log_determinant_spd",
+                    "matrix argument", y,
+                    "matrix is negative definite");
           }
 
           double ret = ldlt.vectorD().array().log().sum();
           if (!boost::math::isfinite(ret)) {
             double y = 0;
-            double result = -std::numeric_limits<double>::infinity();
-            return dom_err("log_determinant_spd(%1%)",
-                           y,
-                           "matrix argument",
-                           "log determininant is infinite","",
-                           &result);
+            dom_err("log_determinant_spd",
+                    "matrix argument", y,
+                    "log determininant is infinite");
           }
           return ret;
         }
@@ -114,7 +105,8 @@ namespace stan {
 
     template <int R, int C>
     inline var log_determinant_spd(const Eigen::Matrix<var,R,C>& m) {
-      stan::error_handling::check_square("log_determinant_spd(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("log_determinant_spd", "m", m);
+
       return var(new log_determinant_spd_vari<R,C>(m));
     }
     

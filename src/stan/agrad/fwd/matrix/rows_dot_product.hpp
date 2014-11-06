@@ -18,8 +18,9 @@ namespace stan {
     Eigen::Matrix<fvar<T>, R1, 1>
     rows_dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
                      const Eigen::Matrix<fvar<T>, R2, C2>& v2) {
-      stan::error_handling::check_matching_dims("rows_dot_product(%1%)",v1,"v1",
-                                      v2,"v2",(double*)0);
+      stan::error_handling::check_matching_dims("rows_dot_product",
+                                                "v1", v1,
+                                                "v2", v2);
       Eigen::Matrix<fvar<T>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
         Eigen::Matrix<fvar<T>,R1,C1> crow1 = v1.row(j);
@@ -34,8 +35,9 @@ namespace stan {
     Eigen::Matrix<fvar<T>, R1, 1>
     rows_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                      const Eigen::Matrix<fvar<T>, R2, C2>& v2) {
-      stan::error_handling::check_matching_dims("rows_dot_product(%1%)",v1,"v1",
-                                      v2,"v2",(double*)0);
+      stan::error_handling::check_matching_dims("rows_dot_product",
+                                                "v1", v1,
+                                                "v2", v2);
       Eigen::Matrix<fvar<T>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
         Eigen::Matrix<double,R1,C1> crow = v1.row(j);
@@ -50,8 +52,9 @@ namespace stan {
     Eigen::Matrix<fvar<T>, R1, 1>
     rows_dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
                      const Eigen::Matrix<double, R2, C2>& v2) {
-      stan::error_handling::check_matching_dims("rows_dot_product(%1%)",v1,"v1",
-                                      v2,"v2",(double*)0);
+      stan::error_handling::check_matching_dims("rows_dot_product",
+                                                "v1", v1,
+                                                "v2", v2);
       Eigen::Matrix<fvar<T>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
         Eigen::Matrix<fvar<T>,R1,C1> crow1 = v1.row(j);

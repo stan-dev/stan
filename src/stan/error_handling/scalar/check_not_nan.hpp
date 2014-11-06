@@ -10,32 +10,28 @@ namespace stan {
   namespace error_handling {
 
     namespace {
-      template <typename T_y, typename T_result, bool is_vec>
+      template <typename T_y, bool is_vec>
       struct not_nan {
-        static bool check(const char* function,
-                          const T_y& y,
-                          const char* name,
-                          T_result* result) {
+        static bool check(const std::string& function,
+                          const std::string& name,
+                          const T_y& y) {
           if ((boost::math::isnan)(y)) 
-            return dom_err(function,y,name,
-                           " is %1%, but must not be nan!","",
-                           result);
+            dom_err(function, name, y,
+                    "is ", ", but must not be nan!");
           return true;
         }
       };
     
-      template <typename T_y, typename T_result>
-      struct not_nan<T_y, T_result, true> {
-        static bool check(const char* function,
-                          const T_y& y,
-                          const char* name,
-                          T_result* result) {
+      template <typename T_y>
+      struct not_nan<T_y, true> {
+        static bool check(const std::string& function,
+                          const std::string& name,
+                          const T_y& y) {
           // using stan::length;
           for (size_t n = 0; n < stan::length(y); n++) {
             if ((boost::math::isnan)(stan::get(y,n)))
-              return dom_err_vec(n,function,y,name,
-                                 " is %1%, but must not be nan!","",
-                                 result);
+              dom_err_vec(function, name, y, n,
+                          "is ", ", but must not be nan!");
           }
           return true;
         }
@@ -46,19 +42,16 @@ namespace stan {
      * Checks if the variable y is nan.
      *
      * @param function Name of function being invoked.
-     * @param y Reference to variable being tested.
      * @param name Name of variable being tested.
-     * @param result Pointer to resulting value after test.
+     * @param y Reference to variable being tested.
      * @tparam T_y Type of variable being tested.
-     * @tparam T_result Type of result returned.
      */
-    template <typename T_y, typename T_result>
-    inline bool check_not_nan(const char* function,
-                              const T_y& y,
-                              const char* name,
-                              T_result* result) {
-      return not_nan<T_y,T_result,is_vector_like<T_y>::value>
-        ::check(function, y, name, result);
+    template <typename T_y>
+    inline bool check_not_nan(const std::string& function,
+                              const std::string& name,
+                              const T_y& y) {
+      return not_nan<T_y, is_vector_like<T_y>::value>
+        ::check(function, name, y);
     }
 
   }

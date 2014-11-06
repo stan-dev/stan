@@ -11,15 +11,15 @@ namespace stan {
   namespace error_handling {
 
     // NOTE: this will not throw if y1 or y2 contains nan values.
-    template <typename T1, typename T2, typename T_result>
-    inline bool check_multiplicable(const char* function,
+    template <typename T1, typename T2>
+    inline bool check_multiplicable(const std::string& function,
+                                    const std::string& name1,
                                     const T1& y1,
-                                    const char* name1,
-                                    const T2& y2,
-                                    const char* name2,
-                                    T_result* result) {
-      stan::error_handling::check_size_match(function,y1.cols(), "Columns of matrix 1",
-                                   y2.rows(), "Rows of matrix 2", result);
+                                    const std::string& name2,
+                                    const T2& y2) {
+      check_size_match(function, 
+                       "Columns of matrix 1", y1.cols(), 
+                       "Rows of matrix 2", y2.rows());
       return true;
     }
   }
