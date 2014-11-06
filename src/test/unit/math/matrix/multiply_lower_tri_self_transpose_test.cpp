@@ -33,8 +33,7 @@ matrix_d old_multiply_lower_tri_self_transpose(const matrix_d& x){
   matrix_d Lt = x.transpose().triangularView<Eigen::Upper>();
   matrix_d LLt = x.triangularView<Eigen::Lower>() * Lt; 
 
-  check_symmetric(function, LLt,
-                  "LLt", static_cast<double*>(0));
+  check_symmetric(function, "LLt", LLt);
   return LLt;
 }
 
@@ -100,7 +99,7 @@ TEST(MathMatrix, multiply_lower_tri_self_transpose) {
 
   x = generate_large_L_tri_mat();
   EXPECT_NO_THROW(check_symmetric(function, 
-                                  multiply_lower_tri_self_transpose(x),
-                                  "Symmetric matrix",static_cast<double*>(0)));
+                                  "Symmetric matrix", 
+                                  multiply_lower_tri_self_transpose(x)));
   EXPECT_THROW(old_multiply_lower_tri_self_transpose(x),std::domain_error);
 }
