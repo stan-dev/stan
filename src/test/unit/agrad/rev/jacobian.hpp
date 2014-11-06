@@ -5,9 +5,10 @@
 // ********* superseded by version in autodiff.hpp for API ****
 
 #include <vector>
-#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev.hpp>
 
 namespace stan {
+
   namespace agrad {
 
     /**
@@ -36,7 +37,7 @@ namespace stan {
      * @param[in] independents Indepent (input) variables.
      * @param[out] jacobian Jacobian of the transform.
      */
-    inline void jacobian(std::vector<var>& dependents,
+    inline void jacobian(std::vector<stan::agrad::var>& dependents,
                          std::vector<var>& independents,
                          std::vector<std::vector<double> >& jacobian) {
       jacobian.resize(dependents.size());

@@ -4,6 +4,7 @@
 #include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
+
   namespace agrad {
     
     class op_vvv_vari : public vari {

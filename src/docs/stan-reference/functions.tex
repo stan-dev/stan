@@ -1505,6 +1505,20 @@ using more basic \Stan functions.
     \]
   See \refsection{link-functions} for a definition of inverse logit.}
   %
+  \fitem{real}{log\_mix}{real \farg{theta}, real \farg{lambda1}, real
+    \farg{lambda2}}{
+    Returns the log mixture of the log densities \farg{lambda1} and
+    \farg{lambda2} with mixing proportion \farg{theta},
+    \begin{eqnarray*}
+    \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) 
+    & = & \log \!\left( \theta \lambda_1 + \left( 1 - \theta \right) \lambda_2
+    \right)
+    \\[3pt]
+    & = & \mbox{log\_sum\_exp}\!\left(\log(\theta) + \lambda1, \
+                               \mbox{log1m}(\theta) + \lambda2\right).
+    \end{eqnarray*}
+}
+    
 \end{description}
 
 
