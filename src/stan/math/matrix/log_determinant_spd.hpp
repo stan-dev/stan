@@ -19,7 +19,7 @@ namespace stan {
     template <typename T,int R, int C>
     inline T log_determinant_spd(const Eigen::Matrix<T,R,C>& m) {
       using std::log;
-      stan::error_handling::check_square("log_determinant_spd(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("log_determinant_spd", "m", m);
 //      Eigen::TriangularView< Eigen::Matrix<T,R,C>, Eigen::Lower > L(m.llt().matrixL());
 //      T ret(0.0);
 //      for (size_t i = 0; i < L.rows(); i++)

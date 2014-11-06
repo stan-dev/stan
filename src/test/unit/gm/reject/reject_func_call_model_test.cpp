@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/no-main/gm/reject_func_call_model.cpp>
+#include <test/test-models/good/gm/reject_func_call_model.cpp>
 
 /* tests function that throws exception, fn called from model block
    which is the log_prob method in the generated cpp object

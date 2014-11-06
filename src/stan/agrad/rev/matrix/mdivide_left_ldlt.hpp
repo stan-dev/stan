@@ -244,8 +244,9 @@ namespace stan {
                       const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
 
-      stan::error_handling::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
-                                      b,"b",(double*)0);     
+      stan::error_handling::check_multiplicable("mdivide_left_ldlt",
+                                                "A", A,
+                                                "b", b);
      
       mdivide_left_ldlt_vv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vv_vari<R1,C1,R2,C2>(A,b);
       
@@ -270,8 +271,9 @@ namespace stan {
                       const Eigen::Matrix<double,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::error_handling::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
-                                      b,"b",(double*)0);     
+      stan::error_handling::check_multiplicable("mdivide_left_ldlt",
+                                                "A", A,
+                                                "b", b);
 
       mdivide_left_ldlt_vd_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vd_vari<R1,C1,R2,C2>(A,b);
       
@@ -296,8 +298,9 @@ namespace stan {
                       const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::error_handling::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
-                                      b,"b",(double*)0);     
+      stan::error_handling::check_multiplicable("mdivide_left_ldlt",
+                                                "A", A,
+                                                "b", b);
       
       mdivide_left_ldlt_dv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_dv_vari<R1,C1,R2,C2>(A,b);
       

@@ -128,9 +128,8 @@ namespace stan {
 
         vector<double> y_base(y.begin(), y.begin()+N_);
         dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,msgs_);
-        stan::error_handling::check_equal("coupled_ode_system(%1%)",
-                                dy_dt.size(),N_,"dy_dt",
-                                static_cast<double*>(0));
+        stan::error_handling::check_equal("coupled_ode_system",
+                                          "dy_dt", dy_dt.size(), N_);
 
         vector<double> coupled_sys(N_ * M_);
         vector<var> theta_temp;
@@ -346,9 +345,8 @@ namespace stan {
           y_base[n] += y0_dbl_[n];
 
         dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,msgs_);
-        stan::error_handling::check_equal("coupled_ode_system(%1%)",
-                                dy_dt.size(),N_,"dy_dt",
-                                static_cast<double*>(0));
+        stan::error_handling::check_equal("coupled_ode_system",
+                                          "dy_dt", dy_dt.size(), N_);
 
         std::vector<double> coupled_sys(N_ * N_);
 
@@ -578,9 +576,8 @@ namespace stan {
           y_base[n] += y0_dbl_[n];
 
         dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,msgs_);
-        stan::error_handling::check_equal("coupled_ode_system(%1%)",
-                                dy_dt.size(),N_,"dy_dt",
-                                static_cast<double*>(0));
+        stan::error_handling::check_equal("coupled_ode_system",
+                                          "dy_dt", dy_dt.size(), N_);
 
         vector<double> coupled_sys(N_ * (N_ + M_));
         vector<var> theta_temp;

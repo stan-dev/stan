@@ -16,7 +16,7 @@ namespace stan {
      */
     template <int R, int C>
     inline double dot_self(const Eigen::Matrix<double, R, C>& v) {
-      stan::error_handling::check_vector("dot_self(%1%)",v,"v",(double*)0);
+      stan::error_handling::check_vector("dot_self", "v", v);
       return v.squaredNorm();
     }    
     

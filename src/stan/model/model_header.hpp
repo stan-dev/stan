@@ -1,6 +1,7 @@
 #ifndef STAN__MODEL__MODEL__HEADER_HPP__
 #define STAN__MODEL__MODEL__HEADER_HPP__
 
+
 #include <cmath>
 #include <cstddef>
 #include <fstream>
@@ -16,17 +17,14 @@
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 
-#include <stan/agrad/fwd.hpp>
-#include <stan/agrad/fwd/matrix.hpp>
-
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/reader.hpp>
 #include <stan/io/writer.hpp>
 #include <stan/io/csv_writer.hpp>
 
-#include <stan/math/matrix.hpp>
 #include <stan/math.hpp>
+#include <stan/math/matrix.hpp>
 
 #include <stan/math/rep_array.hpp>
 #include <stan/math/rep_vector.hpp>

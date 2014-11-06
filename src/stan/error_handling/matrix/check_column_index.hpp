@@ -17,26 +17,23 @@ namespace stan {
      * @param i is index
      * @param y Matrix to test against
      * @param name
-     * @param result
      * @return <code>true</code> if the index is a valid column index of the matrix.
      * @tparam T Type of scalar.
      */
-    template <typename T_y, typename T_result, int R, int C>
-    inline bool check_column_index(const char* function,
-                                   size_t i,
+    template <typename T_y, int R, int C>
+    inline bool check_column_index(const std::string& function,
+                                   const std::string& name,
                                    const Eigen::Matrix<T_y,R,C>& y,
-                                   const char* name,
-                                   T_result* result) {
+                                   size_t i) {
       if ((i > 0) && (i <= static_cast<size_t>(y.cols())))
         return true;
 
       std::ostringstream msg;
-      msg << name << " (%1%) must be greater than 0 and less than " 
+      msg << ") must be greater than 0 and less than " 
           << y.cols();
-      std::string tmp(msg.str());
-      return dom_err(function,i,name,
-                     tmp.c_str(),"",
-                     result);
+      dom_err(function, name, i,
+              "(", msg.str());
+      return false;
     }
 
   }

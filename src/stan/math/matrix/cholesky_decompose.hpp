@@ -21,8 +21,8 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     cholesky_decompose(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      stan::error_handling::check_square("cholesky_decompose(%1%)",m,"m",(double*)0);
-      stan::error_handling::check_symmetric("cholesky_decompose(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("cholesky_decompose", "m", m);
+      stan::error_handling::check_symmetric("cholesky_decompose", "m", m);
       Eigen::LLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >llt(m.rows());
       llt.compute(m);
       return llt.matrixL();

@@ -24,7 +24,7 @@ namespace stan {
           
           int k = 0;
           
-          while( (fabs(tNew) > precision) || (k == 0) )
+          while ( (fabs(tNew) > precision) || (k == 0) )
           {
               
               double p = (a + k) * (b + k) * (c + k) / ( (d + k) * (e + k) * (k + 1) );
@@ -64,7 +64,7 @@ namespace stan {
           
           int k = 0;
           
-          while( (fabs(tNew) > precision) || (k == 0) )
+          while ( (fabs(tNew) > precision) || (k == 0) )
           {
               
               double C = (a + k) / (d + k);
@@ -111,7 +111,7 @@ namespace stan {
           int k = 0;
           double tDak = 1.0 / (a - 1);
           
-          while( (fabs(tDak * (a + (k - 1)) ) > precision) || (k == 0) )
+          while ( (fabs(tDak * (a + (k - 1)) ) > precision) || (k == 0) )
           {
               
               const double r = ( (a + k) / (c + k) ) * ( (b + k) / (double)(k + 1) ) * z;

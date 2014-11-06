@@ -1,10 +1,8 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/multivariate/continuous/multi_normal.hpp"
-#include "stan/prob/distributions/multivariate/continuous/multi_gp.hpp"
-#include <stan/agrad/fwd.hpp>
-#include <stan/agrad/fwd/matrix.hpp>
-#include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
+#include <stan/agrad/fwd/matrix.hpp>
+#include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
+#include <stan/prob/distributions/multivariate/continuous/multi_gp.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

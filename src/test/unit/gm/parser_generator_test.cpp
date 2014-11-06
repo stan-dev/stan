@@ -13,7 +13,7 @@ void read_file(const std::string& path,
 
 void test_pg(const std::string& program_name,
              const std::string& expected_substring) {
-  std::string path = "src/test/test-models/syntax-only/parser-generator";
+  std::string path = "src/test/test-models/good/parser-generator";
   path += "/";
   path += program_name;
   path += ".cpp";
@@ -43,7 +43,7 @@ int count_occurrences(const std::string target,
 void test_pg_count(const std::string& program_name,
                    const std::string& expected_substring,
                    const int expected_count) {
-  std::string path = "src/test/test-models/syntax-only/parser-generator";
+  std::string path = "src/test/test-models/good/parser-generator";
   path += "/";
   path += program_name;
   path += ".cpp";

@@ -38,7 +38,7 @@ namespace stan {
     inline T2 
     modified_bessel_first_kind(const int v, const T2 z) { 
       using stan::error_handling::check_not_nan;
-      check_not_nan("modified_bessel_first_kind(%1%)", z, "z", static_cast<double*>(0));
+      check_not_nan("modified_bessel_first_kind", "z", z);
 
       return boost::math::cyl_bessel_i(v,z); 
     }

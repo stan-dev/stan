@@ -3,51 +3,49 @@
 
 TEST(ErrorHandlingMatrix, checkColumnIndexMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
-  double result;
   size_t i;
   
   i=2;
   y.resize(3,3);
-  EXPECT_TRUE(stan::error_handling::check_column_index("checkColumnIndexMatrix(%1%)",
-                                          i,y, "i", &result));
+  EXPECT_TRUE(stan::error_handling::check_column_index("checkColumnIndexMatrix",
+                                                       "i", y, i));
   i=3;
-  EXPECT_TRUE(stan::error_handling::check_column_index("checkColumnIndexMatrix(%1%)",
-                                          i,y, "i", &result));
+  EXPECT_TRUE(stan::error_handling::check_column_index("checkColumnIndexMatrix",
+                                                       "i", y, i));
 
   y.resize(3, 2);
-  EXPECT_THROW(stan::error_handling::check_column_index("checkColumnIndexMatrix(%1%)",i, y, "i", 
-                                           &result), 
+  EXPECT_THROW(stan::error_handling::check_column_index("checkColumnIndexMatrix",
+                                                        "i", y, i), 
                std::domain_error);
 
   i=0;
-  EXPECT_THROW(stan::error_handling::check_column_index("checkColumnIndexMatrix(%1%)",i, y, "i", 
-                                              &result), 
+  EXPECT_THROW(stan::error_handling::check_column_index("checkColumnIndexMatrix",
+                                                        "i", y, i), 
                std::domain_error);
 }
 
 TEST(ErrorHandlingMatrix, checkColumnIndexMatrix_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double nan = std::numeric_limits<double>::quiet_NaN();
-  double result;
   size_t i;
   
   i=2;
   y.resize(3,3);
   y << nan, nan, nan, nan, nan, nan, nan, nan, nan;
-  EXPECT_TRUE(stan::error_handling::check_column_index("checkColumnIndexMatrix(%1%)",
-                                          i,y, "i", &result));
+  EXPECT_TRUE(stan::error_handling::check_column_index("checkColumnIndexMatrix",
+                                                       "i", y, i));
   i=3;
-  EXPECT_TRUE(stan::error_handling::check_column_index("checkColumnIndexMatrix(%1%)",
-                                          i,y, "i", &result));
+  EXPECT_TRUE(stan::error_handling::check_column_index("checkColumnIndexMatrix",
+                                                       "i", y, i));
 
   y.resize(3, 2);
   y << nan, nan, nan, nan, nan, nan;
-  EXPECT_THROW(stan::error_handling::check_column_index("checkColumnIndexMatrix(%1%)",i, y, "i", 
-                                           &result), 
+  EXPECT_THROW(stan::error_handling::check_column_index("checkColumnIndexMatrix",
+                                                        "i", y, i), 
                std::domain_error);
 
   i=0;
-  EXPECT_THROW(stan::error_handling::check_column_index("checkColumnIndexMatrix(%1%)",i, y, "i", 
-                                              &result), 
+  EXPECT_THROW(stan::error_handling::check_column_index("checkColumnIndexMatrix",
+                                                        "i", y, i), 
                std::domain_error);
 }

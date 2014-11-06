@@ -1,23 +1,23 @@
 #include <vector>
-
-#include <stan/agrad/rev.hpp>
 #include <stan/error_handling/scalar/dom_err_vec.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <stan/math/matrix/meta/value_type.hpp>
 #include <stan/math/meta/value_type.hpp>
 
 #include <gtest/gtest.h>
 
-class ErrorHandling_dom_err_vec : public ::testing::Test {
+class ErrorHandlingScalar_dom_err_vec : public ::testing::Test {
 public:
   void SetUp() {
-    function_ = "function(%1%)";
+    function_ = "function";
     y_name_ = "y";
-    error_message_ = " error_message %1% ";
+    msg1_ = "error_message ";
+    msg2_ = " second message";
     index_ = 0;
   }
 
-  template <class T, class T_msg>
-  std::string expected_message(T y, T_msg msg) {
+  template <class T>
+  std::string expected_message_with_message(T y) {
     using stan::math::value_type;
     std::stringstream expected_message;
     expected_message << "function("
@@ -25,91 +25,90 @@ public:
                      << "): "
                      << y_name_
                      << "[" << 1 + index_ << "] "
-                     << " error_message "
+                     << "error_message "
                      << y[index_]
-                     << " "
-                     << msg;
+                     << " second message";
+    return expected_message.str();
+  }
+
+  template <class T>
+  std::string expected_message_without_message(T y) {
+    using stan::math::value_type;
+    std::stringstream expected_message;
+    expected_message << "function("
+                     << typeid(typename value_type<T>::type).name()
+                     << "): "
+                     << y_name_
+                     << "[" << 1 + index_ << "] "
+                     << "error_message "
+                     << y[index_];
     return expected_message.str();
   }
 
 
-  template <class T, class T_result, class T_msg>
-  void test_throw(T y, T_msg msg2) {
+  template <class T>
+  void test_throw(T y) {
     try {
-      stan::error_handling::dom_err_vec<T, T_result, T_msg>
-        (index_, function_, y, y_name_, error_message_, msg2, 0);
+      stan::error_handling::dom_err_vec<T>
+        (function_, y_name_, y, index_, msg1_, msg2_);
       FAIL() << "expecting call to dom_err_vec<> to throw a domain_error,"
              << "but threw nothing";
     } catch(std::domain_error& e) {
-      EXPECT_EQ(expected_message(y, msg2), e.what());
+      EXPECT_EQ(expected_message_with_message(y), e.what());
+    } catch(...) {
+      FAIL() << "expecting call to dom_err_vec<> to throw a domain_error,"
+             << "but threw a different type";
+    }
+
+    try {
+      stan::error_handling::dom_err_vec<T>
+        (function_, y_name_, y, index_, msg1_);
+      FAIL() << "expecting call to dom_err_vec<> to throw a domain_error,"
+             << "but threw nothing";
+    } catch(std::domain_error& e) {
+      EXPECT_EQ(expected_message_without_message(y), e.what());
     } catch(...) {
       FAIL() << "expecting call to dom_err_vec<> to throw a domain_error,"
              << "but threw a different type";
     }
   }
 
-  const char* function_;
-  const char* y_name_;
-  const char* error_message_;
+  std::string function_;
+  std::string y_name_;
+  std::string msg1_;
+  std::string msg2_;
   size_t index_;
 };
 
-TEST_F(ErrorHandling_dom_err_vec, vdouble_double_double) {
-  typedef std::vector<double> T;
-  typedef double T_result;
-  typedef double T_msg;
-  
-  T y;
+TEST_F(ErrorHandlingScalar_dom_err_vec, vdouble) {
+  std::vector<double> y;
   y.push_back(10);
-  T_msg msg2 = 50;
   
-  test_throw<T, T_result, T_msg>(y,msg2);
+  test_throw<std::vector<double> >(y);
 }
 
-TEST_F(ErrorHandling_dom_err_vec, vdouble_double_string) {
-  typedef std::vector<double> T;
-  typedef double T_result;
-  typedef std::string T_msg;
-  
-  T y;
+TEST_F(ErrorHandlingScalar_dom_err_vec, vint) {
+  std::vector<int> y;
   y.push_back(10);
-  T_msg msg2 = "abcd";
   
-  test_throw<T, T_result, T_msg>(y,msg2);
-}
-
-TEST_F(ErrorHandling_dom_err_vec, vint_double_double) {
-  typedef std::vector<int> T;
-  typedef double T_result;
-  typedef double T_msg;
-  
-  T y;
-  y.push_back(10);
-  T_msg msg2 = 50;
-  
-  test_throw<T, T_result, T_msg>(y,msg2);
+  test_throw<std::vector<int> >(y);
 }
 
 
-TEST_F(ErrorHandling_dom_err_vec, vvar_var_var) {
-  typedef std::vector<stan::agrad::var> T;
-  typedef stan::agrad::var T_result;
-  typedef double T_msg;
-  
-  T y;
+TEST_F(ErrorHandlingScalar_dom_err_vec, vvar) {
+  std::vector<stan::agrad::var> y;
   y.push_back(10);
-  T_msg msg2 = 50;
   
-  test_throw<T, T_result, T_msg>(y,msg2);
+  test_throw<std::vector<stan::agrad::var> >(y);
 }
 
-TEST_F(ErrorHandling_dom_err_vec, one_indexed) {
+TEST_F(ErrorHandlingScalar_dom_err_vec, one_indexed) {
   std::string message;
   int n = 5;
   std::vector<double> y(20);
   try {
     stan::error_handling::dom_err_vec
-      (n, function_, y, y_name_, error_message_, "", (double*)0);
+      (function_, y_name_, y, n, msg1_, msg2_);
     FAIL() << "expecting call to dom_err_vec<> to throw a domain_error,"
            << "but threw nothing";
   } catch(std::domain_error& e) {
