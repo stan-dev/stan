@@ -3,7 +3,6 @@
 
 #include <cmath>
 #include <stan/agrad/rev.hpp>
-// #include <stan/agrad/rev/internal/precomp_vvv_vari.hpp>
 #include <stan/math/functions/log_mix.hpp>
 
 namespace stan {
@@ -32,7 +31,6 @@ namespace stan {
         d_theta 
           = one_m_exp_lam2_m_lam1 
           / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-        std::cout << "d_theta=" << d_theta << std::endl;
         d_lambda1
           = theta_d
           / t_plus_one_m_t_prod_exp_lam2_m_lam1;
@@ -40,13 +38,27 @@ namespace stan {
           = one_m_t_prod_exp_lam2_m_lam1
           / t_plus_one_m_t_prod_exp_lam2_m_lam1;
       } else {
-        
+        double lam1_m_lam2 = lambda1_d - lambda2_d;
+        double exp_lam1_m_lam2 = exp(lam1_m_lam2);
+        double exp_lam1_m_lam2_m_1 = exp_lam1_m_lam2 - 1;
+        double one_m_t = 1 - theta_d;
+        double t_prod_exp_lam1_m_lam2 = theta_d * exp_lam1_m_lam2;
+        double one_m_t_plus_t_prod_exp_lam1_m_lam2 
+          = one_m_t + t_prod_exp_lam1_m_lam2;
+        d_theta 
+          = exp_lam1_m_lam2_m_1
+          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
+        d_lambda1
+          = t_prod_exp_lam1_m_lam2
+          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
+        d_lambda2
+          = one_m_t
+          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
       }
       return var(new precomp_vvv_vari(result, 
                                       theta.vi_, lambda1.vi_, lambda2.vi_,
                                       d_theta, d_lambda1, d_lambda2));
     }
-
 
   }
 

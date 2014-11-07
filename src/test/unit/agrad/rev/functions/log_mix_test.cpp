@@ -49,4 +49,5 @@ void test_log_mix_vvv(double theta, double lambda1, double lambda2) {
 TEST(AgradRev,log_mix) {
 
   test_log_mix_vvv(0.3, 10.4, -10.9);
+  test_log_mix_vvv(0.7, -4.7, 10.1);
 }

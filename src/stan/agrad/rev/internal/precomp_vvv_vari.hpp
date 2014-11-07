@@ -22,7 +22,6 @@ namespace stan {
           da_(da),
           db_(db),
           dc_(dc) { 
-        std::cout << "da_=" << da_ << std::endl;
       }
       void chain() {
         avi_->adj_ += adj_ * da_;
