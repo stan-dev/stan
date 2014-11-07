@@ -8,33 +8,16 @@ using stan::math::matrix_d;
 
 matrix_d generate_large_L_tri_mat(){
   matrix_d x;
-  srand(1);
+  double vals[10000];
 
-  x = Eigen::MatrixXd::Random(100,100);
+  vals[0] = 0.1;
+  for (int i = 1; i < 10000; ++i)
+    vals[i] = vals[i- 1] + 0.1123456;
+  
+  x = Eigen::Map< Eigen::Matrix<double,100,100> >(vals);
   x *= 1e10;
 
   return x;
-}
-
-matrix_d old_multiply_lower_tri_self_transpose(const matrix_d& x){
-  using stan::error_handling::check_symmetric;
-
-  int K = x.rows();
-  static const char* function = "old_multiply_lower_tri_self_transpose(%1%)";
-
-  if (K == 0)
-    return matrix_d(0,0);
-  if (K == 1) {
-    matrix_d result(1,1);
-    result(0,0) = x(0,0) * x(0,0);
-    return result;
-  }
-
-  matrix_d Lt = x.transpose().triangularView<Eigen::Upper>();
-  matrix_d LLt = x.triangularView<Eigen::Lower>() * Lt; 
-
-  check_symmetric(function, "LLt", LLt);
-  return LLt;
 }
 
 void test_multiply_lower_tri_self_transpose(const matrix_d& x) {
@@ -101,5 +84,4 @@ TEST(MathMatrix, multiply_lower_tri_self_transpose) {
   EXPECT_NO_THROW(check_symmetric(function, 
                                   "Symmetric matrix", 
                                   multiply_lower_tri_self_transpose(x)));
-  EXPECT_THROW(old_multiply_lower_tri_self_transpose(x),std::domain_error);
 }
