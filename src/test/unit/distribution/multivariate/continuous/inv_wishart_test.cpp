@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
-#include <test/unit/distribution/expect_eq_diffs.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/prob/distributions/multivariate/continuous/inv_wishart.hpp>
+#include <test/unit/distribution/expect_eq_diffs.hpp>
 
 
 template <typename T_y, typename T_dof, typename T_scale>

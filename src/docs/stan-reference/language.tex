@@ -1666,12 +1666,12 @@ For integer and real-valued expressions, Stan supports the basic
 binary arithmetic operations of addition (\code{+}), subtraction
 (\code{-}), multiplication (\code{*}) and division (\code{/}) in the
 usual ways.  
-For integer expressions, Stan supports the modulus (\code{\%})
-binary arithmetic operation.
-Stan also supports the unary operation of negation for
-integer and real-valued expressions.  For example, assuming \code{n}
-and \code{m} are integer variables and \code{x} and \code{y} real
-variables, the following expressions are legal.
+
+For integer expressions, Stan supports the modulus (\code{\%}) binary
+arithmetic operation.  Stan also supports the unary operation of
+negation for integer and real-valued expressions.  For example,
+assuming \code{n} and \code{m} are integer variables and \code{x} and
+\code{y} real variables, the following expressions are legal.
 %
 \begin{quote}
 \code{3.0 + 0.14}, 
@@ -1720,11 +1720,42 @@ The type of subexpression \code{(y - mu)' * Sigma} is inferred to be
 matrix.  The whole expression's type is thus the type of a row vector
 multiplied by a (column) vector, which produces a \code{real} value.
 
-Stan supports exponentiation (\code{\textasciicircum}) of integer and real-valued expressions.
-The return type of exponentiation is always a real-value.
-For example, assuming \code{n}
-and \code{m} are integer variables and \code{x} and \code{y} real
-variables, the following expressions are legal.
+Stan provides elementwise matrix division and multiplication
+operations, \code{a~.*~b} and \code{a~./b}.  These provide a shorthand
+to replace loops, but are not intrinsicially more efficient than a
+version programmed with an elementwise calculations and assignments in
+a loop.  For example, given declarations
+%
+\begin{quote}
+\begin{Verbatim}
+vector[N] a;
+vector[N] b;
+vector[N] c;
+\end{Verbatim}
+\end{quote},
+%
+the assignment
+%
+\begin{quote}
+\begin{Verbatim}
+c <- a .* b;
+\end{Verbatim}
+\end{quote}
+%
+produces the same result with roughly the same efficiency as the loop
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N)
+  c[n] <- a[n] * b[n];
+\end{Verbatim}
+\end{quote}
+
+Stan supports exponentiation (\code{\textasciicircum}) of integer and
+real-valued expressions.  The return type of exponentiation is always
+a real-value.  For example, assuming \code{n} and \code{m} are integer
+variables and \code{x} and \code{y} real variables, the following
+expressions are legal.
 %
 \begin{quote}
 \code{3 \textasciicircum\ 2},
@@ -2367,7 +2398,7 @@ be grouped into sequences and into for-each loops.  In addition, Stan
 allows local variables to be declared in blocks and also allows an
 empty statement consisting only of a semicolon.
 
-\section{Assignment Statement}
+\section{Assignment Statement}\label{assignment-statement.section}
 
 An assignment statement consists of a variable (possibly multivariate
 with indexing information) and an expression.  Executing an
@@ -2436,8 +2467,8 @@ Sigma
 This example also illustrates the preferred form of splitting a
 complex assignment statement and its expression across lines.
 
-Assignments to slices of larger multi-variate data structures are
-supported by Stan.  For example, \code{a} is an array of type
+Assignments to subcomponents of larger multi-variate data structures
+are supported by Stan.  For example, \code{a} is an array of type
 \code{real[~,~]} and \code{b} is an array of type \code{real[]}, then
 the following two statements are both well-formed.
 %
@@ -2462,13 +2493,29 @@ Y[2] <- x;
 \end{quote}
 %
 
-In \R, if \code{x} is a matrix or two-dimensional array, its first row
-is \code{x[1,]} and its first column is \code{x[,1]}.  As of version
-2.0, this notation is not supported by Stan.  There are functions to
-access rows and columns of matrices, but general array slicing is not
-supported.  Similarly, Stan 2.0 does not support providing an array of
-indices as an argument to create a piecemeal subarray of a larger
-array.
+\subsection{Lvalue Summary}
+
+The expressions that are legal left-hand sides of assignment
+statements are known as ``lvalues.''  In Stan, there are only two
+kinds of legal lvalues,
+%
+\begin{itemize}
+\item a variable, or
+\item a variable with one or more indices.
+\end{itemize}
+%
+To be used as an lvalue, an indexed variable must have at least as
+many dimensions as the number of indices provided.  An array of real
+or integer types has as many dimensions as it is declared for.  A
+matrix has two dimensions and a vector or row vector one dimension;
+this also holds for the constrained types, covariance and correlation
+matrices and their Cholesky factors and ordered, positive ordered, and
+simplex vectors.  An array of matrices has two more dimensions than
+the array and an array of vectors or row vectors has one more
+dimension than the array.  Note that the number of indices can be less
+than the number of dimensions of the variable, meaning that the right
+hand side must itself be multidimensional to match the remaining
+dimensions. 
 
 \section{Log Probability Increment Statement}\label{increment-log-prob.section}
 
@@ -3833,36 +3880,23 @@ defined.
 
 \subsection{Recursive Functions}
 
-Forward declarations allow the definition of mutually recursive
-functions.  For instance, consider the following code to sum the
-application of \code{foo} to each element of a vector.
+Forward declarations allow the definition of self-recursive or
+mutually recursive functions.  For instance, consider the following
+code to compute Fibonacci numbers.
 %
 \begin{quote}
 \begin{Verbatim}
-real foo(real z) {
-  return 2 * log(z);
-}
+int fib(int n);
 
-real sum_foo_2(vector x1, vector x2);
-
-real sum_foo(vector x) {
-  if (x.size() == 0) return 0;
-  else if (x.size() == 1) return foo(x);
-  else return sum_foo_2(x.first(x.size() / 2), 
-                        x.last(x.size() - x.size() / 2));
-}
-
-real sum_foo_2(vector x, vector y) {
-  return sum_foo(x) + sum_foo(y);
+int fib(int n) {
+  if (n < 2) return n; 
+  else return fib(n-1) + fib(n-2);
 }
 \end{Verbatim}
 \end{quote}
 %
-Without the forward declaration of \code{sum\_foo\_2}, the body of the
-definition of \code{sum\_foo} would fail to compile, because the
-identifier \code{sum\_foo\_2} would not be the name of a known
-function with appropriate argument and return types.
-
+Without the forward declaration in the first line, the body of the
+definition would not compile.
 
 
 

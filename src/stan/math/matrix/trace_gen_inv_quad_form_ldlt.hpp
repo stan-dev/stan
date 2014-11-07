@@ -3,8 +3,8 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/transpose.hpp>
@@ -29,12 +29,13 @@ namespace stan {
                                  const stan::math::LDLT_factor<T2,R2,C2> &A,
                                  const Eigen::Matrix<T3,R3,C3> &B) {
     
-      stan::math::check_square("trace_gen_inv_quad_form_ldlt(%1%)",D,"D",
-                               (double*)0);
-      stan::math::check_multiplicable("trace_gen_inv_quad_form_ldlt(%1%)",A,"A",
-                                      B,"B",(double*)0);
-      stan::math::check_multiplicable("trace_gen_inv_quad_form_ldlt(%1%)",B,"B",
-                                      D,"D",(double*)0);
+      stan::error_handling::check_square("trace_gen_inv_quad_form_ldlt", "D", D);
+      stan::error_handling::check_multiplicable("trace_gen_inv_quad_form_ldlt", 
+                                                "A", A,
+                                                "B", B);
+      stan::error_handling::check_multiplicable("trace_gen_inv_quad_form_ldlt",
+                                                "B", B,
+                                                "D", D);
       
       return trace(multiply(multiply(D,transpose(B)),mdivide_left_ldlt(A,B)));
     }

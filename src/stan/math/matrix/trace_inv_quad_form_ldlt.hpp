@@ -3,7 +3,7 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/transpose.hpp>
@@ -24,8 +24,9 @@ namespace stan {
                        typename boost::math::tools::promote_args<T1,T2>::type>::type
     trace_inv_quad_form_ldlt(const stan::math::LDLT_factor<T1,R2,C2> &A,
                              const Eigen::Matrix<T2,R3,C3> &B) {
-      stan::math::check_multiplicable("trace_inv_quad_form_ldlt(%1%)",A,"A",
-                                      B,"B",(double*)0);
+      stan::error_handling::check_multiplicable("trace_inv_quad_form_ldlt",
+                                                "A", A,
+                                                "B", B);
       
       return trace(multiply(transpose(B),mdivide_left_ldlt(A,B)));
     }

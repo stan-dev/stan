@@ -110,6 +110,8 @@
 \newcommand{\erf}[1]{\operatorname{erf}#1}
 \newcommand{\sech}[1]{\operatorname{sech}#1}
 
+\newcommand{\ternary}[3]{#1 \ ? \ #2 \ : \ #3}
+
 \newcommand{\refappendix}[1]{Appendix~\ref{#1.appendix}}
 \newcommand{\refpart}[1]{Part~\ref{#1.part}}
 \newcommand{\refchapter}[1]{Chapter~\ref{#1.chapter}}
@@ -178,6 +180,11 @@
 \setlength{\evensidemargin}{-0.5in}
 \setlength{\topmargin}{-0.875in}
 \setlength{\headsep}{18pt}
+
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\floatpagefraction}{0.75}
+\renewcommand{\textfraction}{0.07}
 
 \raggedbottom
 

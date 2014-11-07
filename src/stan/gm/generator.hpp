@@ -303,6 +303,7 @@ namespace stan {
       generate_using("stan::math::lgamma",o);
       generate_using("stan::model::prob_grad",o);
       generate_using_namespace("stan::math",o);
+      generate_using_namespace("stan::error_handling",o);
       generate_using_namespace("stan::prob",o);
       o << EOL;
     }
@@ -459,7 +460,7 @@ namespace stan {
                                     const expression& expr,
                                     std::ostream& o) {
       o << INDENT2;
-      o << "stan::math::validate_non_negative_index(\"" << var_name << "\", ";
+      o << "validate_non_negative_index(\"" << var_name << "\", ";
       print_quoted_expression(o,expr);
       o << ", ";
       generate_expression(expr,o);
@@ -823,22 +824,24 @@ namespace stan {
         if (x.range_.has_low()) {
           generate_indent(indents_ + 1 + x.dims_.size(),o_);
           o_ << "check_greater_or_equal(function__,";
+          o_ << "\"";
+          generate_loop_var(x.name_,x.dims_.size());
+          o_ << "\"," ;
           generate_loop_var(x.name_,x.dims_.size());
           o_ << ",";
           generate_expression(x.range_.low_.expr_,o_);
-          o_ << ",\"";
-          generate_loop_var(x.name_,x.dims_.size());
-          o_ << "\", (double *)0);" << EOL;
+          o_ << ");" << EOL;
         }
         if (x.range_.has_high()) {
           generate_indent(indents_ + 1 + x.dims_.size(),o_);
           o_ << "check_less_or_equal(function__,";
+          o_ << "\"";
+          generate_loop_var(x.name_,x.dims_.size());
+          o_ << "\",";
           generate_loop_var(x.name_,x.dims_.size());
           o_ << ",";
           generate_expression(x.range_.high_.expr_,o_);
-          o_ << ",\"";
-          generate_loop_var(x.name_,x.dims_.size());
-          o_ << "\", (double *)0);" << EOL;
+          o_ << ");" << EOL;
         }
         generate_indent(indents_ + x.dims_.size(),o_);
         o_ << "} catch (const std::exception& e) { "
@@ -870,11 +873,12 @@ namespace stan {
                              const std::string& type_name) const {
         generate_begin_for_dims(x.dims_);
         generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "try { stan::math::check_" << type_name << "(function__,";
+        o_ << "try { stan::error_handling::check_" << type_name << "(function__,";
+        o_ << "\"";
         generate_loop_var(x.name_,x.dims_.size());
-        o_ << ",\"";
+        o_ << "\",";
         generate_loop_var(x.name_,x.dims_.size());
-        o_ << "\", (double *)0); } catch (const std::exception& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
+        o_ << "); } catch (const std::exception& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(unit_vector_var_decl const& x) const {
@@ -1014,7 +1018,7 @@ namespace stan {
       void operator()(double_var_decl const& x) const {
         std::vector<expression> ctor_args;
         declare_array(is_fun_return_ 
-                      ? "return_t__"
+                      ? "fun_scalar_t__"
                       : ( is_var_ ? "T__" : "double" ),
                       ctor_args,x.name_,x.dims_);
       }
@@ -1022,7 +1026,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.M_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ),
                       ctor_args, x.name_, x.dims_);
       }
@@ -1030,7 +1034,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,1,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,1,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,1,Eigen::Dynamic> "
                           : "row_vector_d" ),
@@ -1041,7 +1045,7 @@ namespace stan {
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
                           : "matrix_d" ), 
@@ -1051,7 +1055,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1059,7 +1063,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d"), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1067,7 +1071,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1075,7 +1079,7 @@ namespace stan {
         std::vector<expression> ctor_args;
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,1> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,1> "
                       : ( is_var_ ? "Eigen::Matrix<T__,Eigen::Dynamic,1> " : "vector_d" ), 
                       ctor_args, x.name_, x.dims_);
       }
@@ -1084,7 +1088,7 @@ namespace stan {
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " 
                           : "matrix_d" ), 
@@ -1104,7 +1108,7 @@ namespace stan {
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
                           : "matrix_d" ),
@@ -1115,7 +1119,7 @@ namespace stan {
         ctor_args.push_back(x.K_);
         ctor_args.push_back(x.K_);
         declare_array(is_fun_return_
-                      ? "Eigen::Matrix<return_t__,Eigen::Dynamic,Eigen::Dynamic> "
+                      ? "Eigen::Matrix<fun_scalar_t__,Eigen::Dynamic,Eigen::Dynamic> "
                       : ( is_var_ 
                           ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> " 
                           : "matrix_d" ), 
@@ -1687,7 +1691,7 @@ namespace stan {
         o_ << "return ";
         if (!rs.return_value_.expression_type().is_ill_formed()
             && !rs.return_value_.expression_type().is_void()) {
-          o_ << "stan::math::promote_scalar<return_t__>(";
+          o_ << "stan::math::promote_scalar<fun_return_scalar_t__>(";
           generate_expression(rs.return_value_, o_);
           o_ << ")";
         }
@@ -1801,7 +1805,7 @@ namespace stan {
       
       generate_validate_transformed_params(p.derived_decl_.first,2,o);
       o << INDENT2
-        << "const char* function__ = \"validate transformed params %1%\";" 
+        << "const std::string function__ = \"validate transformed params\";" 
         << EOL;
       o << INDENT2
         << "(void) function__; // dummy to suppress unused var warning" 
@@ -2522,8 +2526,8 @@ namespace stan {
         << EOL;
       o << INDENT2 << ": prob_grad(0) {"
         << EOL; // resize 0 with var_resizing
-      o << INDENT2 << "static const char* function__ = \"" 
-        << model_name << "_namespace::" << model_name << "(%1%)\";" << EOL;
+      o << INDENT2 << "static const std::string function__(\"" 
+        << model_name << "_namespace::" << model_name << "\");" << EOL;
       suppress_warning(INDENT2, "function__", o);
       o << INDENT2 << "size_t pos__;" << EOL;
       suppress_warning(INDENT2, "pos__", o);
@@ -3780,8 +3784,8 @@ namespace stan {
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" 
         << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
-      o << INDENT2 << "static const char* function__ = \""
-        << model_name << "_namespace::write_csv(%1%)\";" << EOL;
+      o << INDENT2 << "static const std::string function__(\""
+        << model_name << "_namespace::write_csv\");" << EOL;
       suppress_warning(INDENT2, "function__", o);
 
       // declares, reads, and writes parameters
@@ -4141,8 +4145,8 @@ namespace stan {
       o << INDENT << "                 std::ostream* pstream__ = 0) const {" << EOL;
       o << INDENT2 << "vars__.resize(0);" << EOL;
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
-      o << INDENT2 << "static const char* function__ = \""
-        << model_name << "_namespace::write_array(%1%)\";" << EOL;
+      o << INDENT2 << "static const std::string function__(\""
+        << model_name << "_namespace::write_array\");" << EOL;
       suppress_warning(INDENT2, "function__", o);
 
       // declares, reads, and sets parameters
@@ -4306,8 +4310,8 @@ namespace stan {
       return true;
     }
 
-    std::string return_scalar_type(const function_decl_def& fun,
-                                   bool is_lp) {
+    std::string fun_scalar_type(const function_decl_def& fun,
+                                bool is_lp) {
       size_t num_args = fun.arg_decls_.size();
       // nullary, non-lp
       if (has_only_int_args(fun) && !is_lp)
@@ -4480,7 +4484,13 @@ namespace stan {
       } 
       out << " {" << EOL;
       out << INDENT
-          << "typedef " << scalar_t_name << " return_t__;"
+          << "typedef " << scalar_t_name << " fun_scalar_t__;"
+          << EOL;
+      out << INDENT
+          << "typedef " 
+          << ((fun.return_type_.base_type_ == INT_T) 
+              ? "int" : "fun_scalar_t__")
+          << " fun_return_scalar_t__;"
           << EOL;
       out << INDENT
           << "const static bool propto__ = true;"
@@ -4541,7 +4551,7 @@ namespace stan {
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_log = ends_with("_log", fun.name_);
       std::string scalar_t_name 
-        = return_scalar_type(fun, is_lp);
+        = fun_scalar_type(fun, is_lp);
 
       generate_function_template_parameters(fun,is_rng,is_lp,is_log,out);
       generate_function_inline_return_type(fun,scalar_t_name,out);
@@ -4557,11 +4567,14 @@ namespace stan {
 
     void generate_function_functor(const function_decl_def& fun,
                                    std::ostream& out) {
+      if (fun.body_.is_no_op_statement())
+        return; // forward declaration, so no functor needed
+
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_log = ends_with("_log", fun.name_);
       std::string scalar_t_name 
-        = return_scalar_type(fun, is_lp);
+        = fun_scalar_type(fun, is_lp);
 
       out << std::endl
           << "struct ";
@@ -4569,26 +4582,23 @@ namespace stan {
       out << "_functor__ {"
           << std::endl;
 
-      out << INDENT;
       generate_function_template_parameters(fun,is_rng,is_lp,is_log,out);
 
-      out << INDENT;
       generate_function_inline_return_type(fun,scalar_t_name,out);
 
-      out << INDENT << "operator()";
+      out <<  "operator()";
       generate_function_arguments(fun,is_rng,is_lp,is_log,out);
       out << " const {"
           << std::endl;
 
-      out << INDENT2
+      out << INDENT
           << "return ";
       generate_function_name(fun,out);
       generate_functor_arguments(fun,is_rng,is_lp,is_log,out);
       out << ";"
           << std::endl;
 
-      out << INDENT
-          << "}"
+      out << "}"
           << std::endl;
 
       out << "};"

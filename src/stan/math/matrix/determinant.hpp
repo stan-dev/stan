@@ -2,7 +2,7 @@
 #define STAN__MATH__MATRIX__DETERMINANT_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace math {
@@ -16,7 +16,7 @@ namespace stan {
      */
     template <typename T,int R, int C>
     inline T determinant(const Eigen::Matrix<T,R,C>& m) {
-      stan::math::check_square("determinant(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("determinant", "m", m);
       return m.determinant();
     }    
     

@@ -49,7 +49,7 @@ TEST(gmParserStatementGrammarDef, jacobianAdjustmentWarning) {
 
 TEST(gmParserStatementGrammarDef, comparisonsInBoundsTest) {
   test_parsable("validate_bounds_comparison");
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_bounds1.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad_bounds1.stan"),
                std::invalid_argument);
 }
 
