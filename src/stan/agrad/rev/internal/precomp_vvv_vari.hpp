@@ -1,7 +1,6 @@
 #ifndef STAN__AGRAD__REV__INTERNAL__PRECOMP_VVV_VARI_HPP
 #define STAN__AGRAD__REV__INTERNAL__PRECOMP_VVV_VARI_HPP
 
-#include <iostream>
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/internal/vvv_vari.hpp>
 
