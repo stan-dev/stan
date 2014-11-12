@@ -303,6 +303,7 @@ namespace stan {
       generate_using("stan::math::lgamma",o);
       generate_using("stan::model::prob_grad",o);
       generate_using_namespace("stan::math",o);
+      generate_using_namespace("stan::error_handling",o);
       generate_using_namespace("stan::prob",o);
       o << EOL;
     }
@@ -459,7 +460,7 @@ namespace stan {
                                     const expression& expr,
                                     std::ostream& o) {
       o << INDENT2;
-      o << "stan::math::validate_non_negative_index(\"" << var_name << "\", ";
+      o << "validate_non_negative_index(\"" << var_name << "\", ";
       print_quoted_expression(o,expr);
       o << ", ";
       generate_expression(expr,o);
@@ -823,22 +824,24 @@ namespace stan {
         if (x.range_.has_low()) {
           generate_indent(indents_ + 1 + x.dims_.size(),o_);
           o_ << "check_greater_or_equal(function__,";
+          o_ << "\"";
+          generate_loop_var(x.name_,x.dims_.size());
+          o_ << "\"," ;
           generate_loop_var(x.name_,x.dims_.size());
           o_ << ",";
           generate_expression(x.range_.low_.expr_,o_);
-          o_ << ",\"";
-          generate_loop_var(x.name_,x.dims_.size());
-          o_ << "\", (double *)0);" << EOL;
+          o_ << ");" << EOL;
         }
         if (x.range_.has_high()) {
           generate_indent(indents_ + 1 + x.dims_.size(),o_);
           o_ << "check_less_or_equal(function__,";
+          o_ << "\"";
+          generate_loop_var(x.name_,x.dims_.size());
+          o_ << "\",";
           generate_loop_var(x.name_,x.dims_.size());
           o_ << ",";
           generate_expression(x.range_.high_.expr_,o_);
-          o_ << ",\"";
-          generate_loop_var(x.name_,x.dims_.size());
-          o_ << "\", (double *)0);" << EOL;
+          o_ << ");" << EOL;
         }
         generate_indent(indents_ + x.dims_.size(),o_);
         o_ << "} catch (const std::exception& e) { "
@@ -870,11 +873,12 @@ namespace stan {
                              const std::string& type_name) const {
         generate_begin_for_dims(x.dims_);
         generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "try { stan::math::check_" << type_name << "(function__,";
+        o_ << "try { stan::error_handling::check_" << type_name << "(function__,";
+        o_ << "\"";
         generate_loop_var(x.name_,x.dims_.size());
-        o_ << ",\"";
+        o_ << "\",";
         generate_loop_var(x.name_,x.dims_.size());
-        o_ << "\", (double *)0); } catch (const std::exception& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
+        o_ << "); } catch (const std::exception& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(unit_vector_var_decl const& x) const {
@@ -1801,7 +1805,7 @@ namespace stan {
       
       generate_validate_transformed_params(p.derived_decl_.first,2,o);
       o << INDENT2
-        << "const char* function__ = \"validate transformed params %1%\";" 
+        << "const std::string function__ = \"validate transformed params\";" 
         << EOL;
       o << INDENT2
         << "(void) function__; // dummy to suppress unused var warning" 
@@ -2522,8 +2526,8 @@ namespace stan {
         << EOL;
       o << INDENT2 << ": prob_grad(0) {"
         << EOL; // resize 0 with var_resizing
-      o << INDENT2 << "static const char* function__ = \"" 
-        << model_name << "_namespace::" << model_name << "(%1%)\";" << EOL;
+      o << INDENT2 << "static const std::string function__(\"" 
+        << model_name << "_namespace::" << model_name << "\");" << EOL;
       suppress_warning(INDENT2, "function__", o);
       o << INDENT2 << "size_t pos__;" << EOL;
       suppress_warning(INDENT2, "pos__", o);
@@ -3780,8 +3784,8 @@ namespace stan {
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" 
         << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
-      o << INDENT2 << "static const char* function__ = \""
-        << model_name << "_namespace::write_csv(%1%)\";" << EOL;
+      o << INDENT2 << "static const std::string function__(\""
+        << model_name << "_namespace::write_csv\");" << EOL;
       suppress_warning(INDENT2, "function__", o);
 
       // declares, reads, and writes parameters
@@ -4141,8 +4145,8 @@ namespace stan {
       o << INDENT << "                 std::ostream* pstream__ = 0) const {" << EOL;
       o << INDENT2 << "vars__.resize(0);" << EOL;
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
-      o << INDENT2 << "static const char* function__ = \""
-        << model_name << "_namespace::write_array(%1%)\";" << EOL;
+      o << INDENT2 << "static const std::string function__(\""
+        << model_name << "_namespace::write_array\");" << EOL;
       suppress_warning(INDENT2, "function__", o);
 
       // declares, reads, and sets parameters

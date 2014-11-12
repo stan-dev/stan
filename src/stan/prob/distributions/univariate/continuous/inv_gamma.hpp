@@ -3,16 +3,20 @@
 
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_greater_or_equal.hpp>
+#include <stan/error_handling/scalar/check_less_or_equal.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/internal_math.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 
@@ -38,13 +42,13 @@ namespace stan {
               typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta) {
-      static const char* function = "stan::prob::inv_gamma_log(%1%)";
+      static const std::string function("stan::prob::inv_gamma_log");
 
       using stan::is_constant_struct;
-      using stan::math::check_not_nan;
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_positive_finite;
       using boost::math::tools::promote_args;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
 
       // check if any vectors are zero length
@@ -56,14 +60,13 @@ namespace stan {
       // set up return value accumulator
       double logp(0.0);
 
-      check_not_nan(function, y, "Random variable", &logp);
-      check_positive_finite(function, alpha, "Shape parameter", &logp);
-      check_positive_finite(function, beta, "Scale parameter", &logp);
+      check_not_nan(function, "Random variable", y);
+      check_positive_finite(function, "Shape parameter", alpha);
+      check_positive_finite(function, "Scale parameter", beta);
       check_consistent_sizes(function,
-                             y,alpha,beta,
-                             "Random variable","Shape parameter",
-                             "Scale parameter",
-                             &logp);
+                             "Random variable", y,
+                             "Shape parameter", alpha,
+                             "Scale parameter", beta);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_shape,T_scale>::value)
@@ -181,27 +184,27 @@ namespace stan {
         return 1.0;
           
       // Error checks
-      static const char* function = "stan::prob::inv_gamma_cdf(%1%)";
+      static const std::string function("stan::prob::inv_gamma_cdf");
           
-      using stan::math::check_positive_finite;      
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_less_or_equal;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_less_or_equal;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
       double P(1.0);
           
-      check_positive_finite(function, alpha, "Shape parameter", &P);
-      check_positive_finite(function, beta, "Scale parameter", &P);
-      check_not_nan(function, y, "Random variable", &P);
-      check_nonnegative(function, y, "Random variable", &P); 
-      check_consistent_sizes(function, y, alpha, beta,
-                             "Random variable", "Shape parameter", 
-                             "Scale Parameter",
-                             &P);
+      check_positive_finite(function, "Shape parameter", alpha);
+      check_positive_finite(function, "Scale parameter", beta);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y); 
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Shape parameter", alpha, 
+                             "Scale Parameter", beta);
 
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -298,27 +301,27 @@ namespace stan {
         return 0.0;
           
       // Error checks
-      static const char* function = "stan::prob::inv_gamma_cdf_log(%1%)";
+      static const std::string function("stan::prob::inv_gamma_cdf_log");
           
-      using stan::math::check_positive_finite;      
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_less_or_equal;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_less_or_equal;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
       double P(0.0);
           
-      check_positive_finite(function, alpha, "Shape parameter", &P);
-      check_positive_finite(function, beta, "Scale parameter", &P);
-      check_not_nan(function, y, "Random variable", &P);
-      check_nonnegative(function, y, "Random variable", &P);
-      check_consistent_sizes(function, y, alpha, beta,
-                             "Random variable", "Shape parameter", 
-                             "Scale Parameter",
-                             &P);
+      check_positive_finite(function, "Shape parameter", alpha);
+      check_positive_finite(function, "Scale parameter", beta);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_consistent_sizes(function,
+                             "Random variable", y, 
+                             "Shape parameter", alpha, 
+                             "Scale Parameter", beta);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -405,27 +408,27 @@ namespace stan {
         return 0.0;
           
       // Error checks
-      static const char* function = "stan::prob::inv_gamma_ccdf_log(%1%)";
+      static const std::string function("stan::prob::inv_gamma_ccdf_log");
           
-      using stan::math::check_positive_finite;      
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_less_or_equal;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_less_or_equal;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
       double P(0.0);
           
-      check_positive_finite(function, alpha, "Shape parameter", &P);
-      check_positive_finite(function, beta, "Scale parameter", &P);
-      check_not_nan(function, y, "Random variable", &P);
-      check_nonnegative(function, y, "Random variable", &P);
-      check_consistent_sizes(function, y, alpha, beta,
-                             "Random variable", "Shape parameter", 
-                             "Scale Parameter",
-                             &P);
+      check_positive_finite(function, "Shape parameter", alpha);
+      check_positive_finite(function, "Scale parameter", beta);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Shape parameter", alpha, 
+                             "Scale Parameter", beta);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -511,12 +514,12 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::gamma_distribution;
 
-      static const char* function = "stan::prob::inv_gamma_rng(%1%)";
+      static const std::string function("stan::prob::inv_gamma_rng");
 
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_positive_finite;
  
-      check_positive_finite(function, alpha, "Shape parameter", (double*)0);
-      check_positive_finite(function, beta, "Scale parameter", (double*)0);
+      check_positive_finite(function, "Shape parameter", alpha);
+      check_positive_finite(function, "Scale parameter", beta);
 
       variate_generator<RNG&, gamma_distribution<> >
         gamma_rng(rng, gamma_distribution<>(alpha, 1 / beta));

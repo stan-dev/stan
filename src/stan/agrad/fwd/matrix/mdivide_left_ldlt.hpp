@@ -4,7 +4,7 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/matrix/promote_common.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
@@ -24,8 +24,9 @@ namespace stan {
     inline Eigen::Matrix<fvar<T2>,R1,C2>
     mdivide_left_ldlt(const stan::math::LDLT_factor<double,R1,C1> &A,
                       const Eigen::Matrix<fvar<T2>,R2,C2> &b) {
-      stan::math::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
-                                      b,"b",(double*)0);
+      stan::error_handling::check_multiplicable("mdivide_left_ldlt",
+                                                "A", A,
+                                                "b", b);
 
       Eigen::Matrix<T2,R2,C2> b_val(b.rows(), b.cols());
       Eigen::Matrix<T2,R2,C2> b_der(b.rows(), b.cols());

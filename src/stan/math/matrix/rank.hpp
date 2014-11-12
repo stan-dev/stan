@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_range.hpp>
+#include <stan/error_handling/matrix/check_range.hpp>
 
 namespace stan {
   namespace math {
@@ -17,6 +17,7 @@ namespace stan {
     template <typename T>
     inline size_t rank(const std::vector<T> & v, int s) {
       size_t size = v.size();
+      using stan::error_handling::check_range;
       check_range(size,s,"in the function rank(v,s)",s);
       s--;
       size_t count(0U);
@@ -35,6 +36,7 @@ namespace stan {
     template <typename T, int R, int C>
     inline size_t rank(const Eigen::Matrix<T,R,C> & v, int s) {
       size_t size = v.size();
+      using stan::error_handling::check_range;
       check_range(size,s,"in the function rank(v,s)",s);
       s--;
       const T * vv = v.data();

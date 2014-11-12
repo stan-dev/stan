@@ -6,7 +6,7 @@
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/agrad/rev/matrix/to_var.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/agrad/rev/operators/operator_multiplication.hpp>
@@ -75,8 +75,9 @@ namespace stan {
                         Eigen::Matrix<var,R1,C2> >::type
     multiply(const Eigen::Matrix<T1,R1,C1>& m1,
              const Eigen::Matrix<T2,R2,C2>& m2) {
-      stan::math::check_multiplicable("multiply(%1%)",m1,"m1",
-                                      m2,"m2",(double*)0);
+      stan::error_handling::check_multiplicable("multiply",
+                                                "m1", m1,
+                                                "m2", m2);
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());
       for (int i = 0; i < m1.rows(); i++) {
         typename Eigen::Matrix<T1,R1,C1>::ConstRowXpr crow(m1.row(i));

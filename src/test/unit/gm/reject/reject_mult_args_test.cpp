@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/no-main/gm/reject_mult_args.cpp>
+#include <test/test-models/good/gm/reject_mult_args.cpp>
 
 /* tests that stan program throws exception in model block
    this block gets compiled into .cpp model object's log_prob method

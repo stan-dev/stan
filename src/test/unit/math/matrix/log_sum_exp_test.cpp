@@ -1,4 +1,4 @@
-#include "stan/math/matrix/log_sum_exp.hpp"
+#include <stan/math/matrix/log_sum_exp.hpp>
 #include <gtest/gtest.h>
 
 template <int R, int C>

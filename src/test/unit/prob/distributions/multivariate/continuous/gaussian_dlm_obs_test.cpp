@@ -1,9 +1,7 @@
 #include <gtest/gtest.h>
-#include <stan/prob/distributions/multivariate/continuous/gaussian_dlm_obs.hpp>
-#include <stan/agrad/fwd.hpp>
-#include <stan/agrad/fwd/matrix.hpp>
-#include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
+#include <stan/agrad/fwd/matrix.hpp>
+#include <stan/prob/distributions/multivariate/continuous/gaussian_dlm_obs.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
