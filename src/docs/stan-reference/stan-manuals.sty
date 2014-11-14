@@ -20,6 +20,7 @@
 % \usepackage{index}
 % \newindex{funs}{fdx}{fns}{Functions}
 
+
 \usepackage{amsmath}
 \usepackage{xspace}
 \usepackage{fancyvrb}
@@ -28,11 +29,15 @@
 \usepackage{graphicx}
 \usepackage{natbib}
 \usepackage{url}
-\usepackage{changebar}
+% \usepackage{changebar} % conflicts with minted
 \usepackage{upquote}
 \usepackage{alltt}
 \usepackage{lscape}
 \usepackage{relsize} % defines \mathlarger
+
+\usepackage{minted}
+\usemintedstyle{emacs}
+\setminted{fontsize=\small}
 
 \usepackage[titles]{tocloft}
 \setlength{\cftbeforechapskip}{1ex}
@@ -67,7 +72,7 @@
 % BG: Stuff for changed text
 \usepackage[final,author=]{fixme}
 \fxuselayouts{pdfcmargin}
-\fxusetargetlayout{changebar}
+%\fxusetargetlayout{changebar}
 \newcommand{\A}[1]{\cbstart#1\cbend}
 \newcounter{FXNOTE}[page]
 \newcommand{\FXA}[1][\value{FXNOTE}]{\ifnum#1=0\fxnote{Addition to section \thesection}\stepcounter{FXNOTE}\fi}
@@ -185,6 +190,8 @@
 \renewcommand{\bottomfraction}{0.8}
 \renewcommand{\floatpagefraction}{0.75}
 \renewcommand{\textfraction}{0.07}
+
+
 
 \raggedbottom
 
