@@ -219,6 +219,7 @@ binary operator of addition, written \code{X + Y}, would have the
 \Stan signature \code{int operator+(int,int)} indicating it takes
 two real arguments and returns a real value.
 
+
 \begin{description}
 %
 \fitem{int}{operator+}{int \farg{x}, int \farg{y}}{
@@ -272,7 +273,7 @@ step functions applied to anything other than data.
 
 \section{Bound Functions}
 %
-\begin{description}
+\begin{edscription}
   \fitem{int}{min}{int \farg{x}, int \farg{y}}{
     Returns the minimum of \farg{x} and \farg{y}.
     \[
@@ -282,7 +283,7 @@ step functions applied to anything other than data.
       y & \mbox{otherwise}
     \end{cases}
     \]}
-  %
+  % fitem stop
   \fitem{int}{max}{int \farg{x}, int \farg{y}}{
     Returns the maximum of \farg{x} and \farg{y}.
     \[

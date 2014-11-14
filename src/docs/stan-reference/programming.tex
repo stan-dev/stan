@@ -170,9 +170,9 @@ For instance, to print the value of variables \code{y} and
 \code{z}, use the following statement.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{minted}{stan}
 print("y=", y, " z=", z);
-\end{Verbatim}
+\end{minted}
 \end{quote}
 %
 This print statement prints the string ``y='' followed by the value of
@@ -1187,7 +1187,7 @@ vector $x_n$ of predictors for $y_n$.  The multi-logit model with
 $\distro{Normal}(0,5)$ priors on the coefficients is coded as follows.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{minted}{stan}
 data {
   int K;
   int N;
@@ -1205,7 +1205,7 @@ model {
   for (n in 1:N)
     y[n] ~ categorical(softmax(beta * x[n]));
 }
-\end{Verbatim}
+\end{minted}
 \end{quote}
 %
 
