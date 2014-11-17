@@ -1,13 +1,11 @@
-#include <gtest/gtest.h>
+#include <stan/agrad/rev/matrix.hpp>
+#include <stan/agrad/fwd/matrix.hpp>
 #include <stan/prob/distributions/multivariate/continuous/inv_wishart.hpp>
+#include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/matrix/determinant.hpp>
-#include <stan/agrad/fwd.hpp>
-#include <stan/agrad/fwd/matrix.hpp>
-#include <stan/agrad/rev.hpp>
-#include <stan/agrad/rev/matrix.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

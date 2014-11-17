@@ -1,0 +1,787 @@
+\part{Algorithms \& Implementations}
+
+\chapter{Hamiltonian Monte Carlo Sampling}\label{hmc.chapter}
+
+\noindent
+This part of the manual details the algorithm implementations used by
+Stan and how to configure them. This chapter presents the Hamiltonian
+Monte Carlo (HMC) algorithm and its adaptive variant the no-U-turn
+sampler (NUTS) along with details of their implementation and
+configuration in Stan; the next two chapters present Stan's optimizers
+and diagnostics.
+
+
+\section{Hamiltonian Monte Carlo}
+
+Hamiltonian Monte Carlo (HMC) is a Markov chain Monte Carlo (MCMC)
+method that uses the derivatives of the density function being sampled
+to generate efficient transitions spanning the posterior (see, e.g.,
+\citep{Betancourt-Girolami:2013,Neal:2011} for more details). It uses
+an approximate Hamiltonian dynamics simulation based on numerical
+integration which is then corrected by performing a
+Metropolis acceptance step.
+
+This section translates the presentation of HMC by
+\cite{Betancourt-Girolami:2013} into the notation of
+\cite{GelmanEtAl:2013}.
+
+\subsection{Target Density}
+
+The goal of sampling is to draw from a density $p(\theta)$ for
+parameters $\theta$.  This is typically a Bayesian posterior
+$p(\theta|y)$ given data $y$, and in particular, a Bayesian posterior
+coded as a Stan program.
+
+
+
+\subsection{Auxiliary Momentum Variable}
+
+HMC introduces auxiliary momentum variables $\rho$ and draws from a
+joint density
+%
+\[
+p(\rho,\theta) = p(\rho|\theta) p(\theta).
+\]
+%
+In most applications of HMC, including Stan, the auxiliary density is
+a multivariate normal that does not depend on the parameters $\theta$,
+\[
+\rho \sim \distro{MultiNormal}(0, \Sigma).
+\]
+The covariance matrix $\Sigma$ acts as a Euclidean metric to rotate
+and scale the target distribution; see \citep{Betancourt-Stein:2011}
+for details of the geometry.
+
+In Stan, this matrix may be set to the identity matrix (i.e., unit
+diagonal) or estimated from warmup samples and optionally restricted
+to a diagonal matrix. The inverse $\Sigma^{-1}$ is known as the mass
+matrix, and will be a unit, diagonal, or dense if $\Sigma$ is.
+
+\subsection{The Hamiltonian}
+
+The joint desnity $p(\rho,\theta)$ defines a Hamiltonian
+%
+\begin{eqnarray*}
+H(\rho,\theta) & = & - \log p(\rho,\theta)
+\\[3pt]
+& = & - \log p(\rho|\theta) - \log p(\theta).
+\\[3pt]
+& = & T(\rho|\theta) + V(\theta),
+\end{eqnarray*}
+%
+where the term
+\[
+T(\rho|\theta) = - \log p(\rho | \theta)
+\]
+is called the ``kinetic energy'' and the term
+\[
+V(\theta) = - \log p(\theta)
+\]
+is called the ``potential energy.''  The potential energy is specified
+by the Stan program through its definition of a log density. 
+
+\subsection{Generating Transitions}
+
+Starting from the current value of the parameters $\theta$, a
+transition to a new state is generated in two stages before being
+subjected to a Metropolis accept step.  
+
+First, a value for the momentum is drawn independently of the current
+parameter values,
+%
+\[
+\rho \sim \distro{MultiNormal}(0,\Sigma).
+\]
+%
+Thus momentum does not persist across iterations. 
+
+Next, the joint system $(\theta,\rho)$ made up of the current
+parameter values $\theta$ and new momentum $\rho$ is evolved
+via Hamilton's equations,
+%
+\[
+\begin{array}{rcccl}
+\displaystyle
+\frac{d\theta}{dt} 
+& = &
+\displaystyle
++ \frac{\partial H}{\partial \rho} 
+& = &
+\displaystyle
++ \frac{\partial T}{\partial \rho}
+\\[12pt]
+\displaystyle
+\frac{d\rho}{dt} 
+& = & 
+\displaystyle
+- \frac{\partial H}{\partial \theta } 
+& = & 
+\displaystyle
+- \frac{\partial T}{\partial \theta}
+- \frac{\partial V}{\partial \theta}.
+\end{array}
+\]
+%
+With the momentum density being independent of the target density,
+i.e., $p(\rho|\theta) = p(\rho)$, the first term in the
+momentum time derivative, ${\partial T} / {\partial \theta}$ is
+zero, yielding the pair time derivatives
+%
+\begin{eqnarray*}
+\frac{d \theta}{d t} & = & +\frac{\partial T}{\partial \rho}
+\\[2pt]
+\frac{d \rho}{d t} & = & -\frac{\partial V}{\partial \theta}.
+\end{eqnarray*}
+
+\subsection{Leapfrog Integrator}
+
+The last section leaves a two-state differential equation to solve.
+Stan, like most other HMC implementations, uses the leapfrog
+integrator, which is a numerical integration algorithm that's
+specifically adapted to provide stable results for Hamiltonian systems
+of equations.
+
+Like most numerical integrators, the leapfrog algorithm takes discrete
+steps of some small time interval $\epsilon$. The leapfrog algorithm
+begins by drawing a fresh momentum term independently of the parameter
+values $\theta$ or previous momentum value.
+%
+\[
+\rho \sim \distro{MultiNormal}(0,\Sigma).
+\]
+It then alternates half-step updates of the momentum and full-step
+updates of the position.
+%
+\vspace*{-6pt}
+\begin{eqnarray*}
+\rho & \leftarrow 
+     & \rho \, - \, \frac{\epsilon}{2} \frac{\partial V}{\partial \theta}
+\\[6pt]
+\theta & \leftarrow
+       & \theta \, + \, \epsilon \, \Sigma \, \rho
+\\[6pt]
+\rho & \leftarrow 
+     & \rho \, - \, \frac{\epsilon}{2} \frac{\partial V}{\partial \theta}.
+\end{eqnarray*}
+%
+By applying $L$ leapfrog steps, a total of $L \, \epsilon$ time is
+simulated. The resulting state at the end of the simulation ($L$
+repetitions of the above three steps) will be denoted
+$(\rho^{*},\theta^{*})$.
+
+The leapgrog integrator's error is on the order of $\epsilon^3$ per
+step and $\epsilon^2$ globally, where $\epsilon$ is the time interval
+(also known as the step size);  \cite{LeimkuhlerReich:2004} provide a
+detailed analysis of numerical integration for Hamiltonian systems,
+including a derivation of the error bound for the leapforg
+integrator.
+
+
+\subsection{Metropolis Accept Step}
+
+If the leapfrog integrator were perfect numerically, there would no
+need to do any more randomization per transition than generating a
+random momentum vector. Instead, what is done in practice to account
+for numerical errors during integration is to apply a Metropolis
+acceptance step, where the probability of keeping the proposal 
+$(\rho^{*},\theta^{*})$ generated by transitioning from $(\rho,\theta)$ is
+%
+\[
+\min\!\left(1, \ \exp\!\left( H(\rho,\theta) - H(\rho^{*},\theta^{*})\right)\right).
+\]
+%
+If the proposal is not accepted, the previous parameter value is
+returned for the next draw and used to initialize the next iteration.
+
+
+\subsection{Algorithm Summary}
+
+The Hamiltonian Monte Carlo algorithm starts at a specified initial
+set of parameters $\theta$; in Stan, this value is either
+user-specified or generated randomly. Then, for a given number of
+iterations, a new momentum vector is sampled and the current value of
+the parameter $\theta$ is updated using the leapfrog integrator with
+discretization time $\epsilon$ and number of steps $L$ according to
+the Hamiltonian dynamics. Then a Metropolis acceptance step is
+applied, and a decision is made whether to update to the new state
+$(\theta^{*},\rho^{*})$ or keep the existing state.
+
+
+\section{HMC Algorithm Parameters}
+
+The Hamiltonian Monte Carlo algorithm has three parameters which must
+be set,
+%
+\begin{itemize}
+\item discretization time $\epsilon$, 
+\item mass matrix $\Sigma^{-1}$, and
+\item number of steps taken $L$.
+\end{itemize}
+%
+In practice, sampling efficiency, both in terms of iteration speed and
+iterations per effective sample, is highly sensitive to these three
+tuning parameters \citep{Neal:2011,Hoffman-Gelman:2014}.
+
+If $\epsilon$ is too large, the leapfrog integrator will be inaccurate
+and too many proposals will be rejected. If $\epsilon$ is too small,
+too many small steps will be taken by the leapfrog integrator leading
+to long simulation times per interval. Thus the goal is to balance the
+acceptance rate between these extremes. 
+
+If $L$ is too small, the trajectory traced out in each iteration will
+be too short and sampling will devolve to a random walk.  If $L$ is
+too large, the algorithm will do too much work on each iteration.
+
+If the mass matrix $\Sigma$ is poorly suited to the covariance of the
+posterior, the step size $\epsilon$ will have to be decreased to
+maintain arithmetic precision while at the same time, the number of
+steps $L$ is increased in order to maintain simulation time to ensure
+statistical efficiency.
+
+\subsection{Automatic Parameter Tuning}
+
+Stan is able to automatically optimize $\epsilon$ to match an
+acceptance-rate target, able to estimate $\Sigma$ based on warmup
+sample iterations, and able to dynamically adapt $L$ on the fly during
+sampling (and during warmup) using the no-U-turn sampling (NUTS)
+algorithm \citep{Hoffman-Gelman:2014}.
+
+\begin{figure}
+\setlength{\unitlength}{0.005in} 
+\centering
+\begin{picture}(1000, 200)
+%
+\footnotesize
+\put(25, 20) { \framebox(75, 200)[c]{I} }
+\put(100, 20) { \framebox(25, 200)[c]{II} }
+\put(125, 20) { \framebox(50, 200)[c]{II} }
+\put(175, 20) { \framebox(100, 200)[c]{II} }
+\put(275, 20) { \framebox(200, 200)[c]{II} }
+\put(475, 20) { \framebox(400, 200)[c]{II} }
+\put(875, 20) { \framebox(50, 200)[c]{III} }
+\put(25, 20) { \vector(1, 0){950} }
+\put(800, -10) { \makebox(200, 20)[l]{{\small Iteration}} }
+%
+\end{picture}
+\caption{ \small\it Adaptation during warmup occurs in three stages:
+  an initial fast adaptation interval (I), 
+  a series of expanding slow adaptation intervals (II), 
+  and a final fast adaptation interval (III).  
+  For HMC, both the fast and slow intervals are used for adapting the
+  step size, while the slow intervals are used for learning the 
+  (co)variance necessitated by the metric.  Iteration numbering starts
+  at 1 on the left side of the figure and increases to the right.}%
+\label{adaptation.figure}
+\end{figure}
+
+When adaptation is engaged (it may be turned off by fixing a step size
+and mass matrix), the warmup period is split into three stages, as
+illustrated in \reffigure{adaptation}, with two \textit{fast}
+intervals surrounding a series of growing \textit{slow} intervals.
+Here fast and slow refer to parameters that adapt using local and
+global information, respectively; the Hamiltonian Monte Carlo
+samplers, for example, define the step size as a fast parameter and
+the (co)variance as a slow parameter. The size of the the initial and
+final fast intervals and the initial size of the slow interval are all
+customizable, although user-specified values may be modified slightly
+in order to ensure alignment with the warmup period.
+
+The motivation behind this partitioning of the warmup period is to
+allow for more robust adaptation.  The stages are as follows.
+
+\begin{enumerate}
+\item[I.]
+In the initial fast interval the chain is allowed to converge
+towards the typical set,%
+%
+\footnote{The typical set is a concept borrowed from information
+  theory and refers to the neighborhood (or neighborhoods in
+  multimodal models) of substantial posterior probability mass through
+  which the Markov chain will travel in equilibrium.}
+%
+with only parameters that can learn from local information adapted.
+\item[II.]
+After this initial stage parameters that require global
+information, for example (co)variances, are estimated in a series of
+expanding, memoryless windows; often fast parameters will be adapted
+here as well. 
+\item[III.]
+Lastly, the fast parameters are allowed to adapt to the
+final update of the slow parameters.
+\end{enumerate}
+
+These intervals may be controlled through the following
+configuration parameters, all of which must be positive integers:
+%
+\begin{center}
+\begin{tabular}{l|lc}
+{\it parameter} & {\it description} & {\it default} 
+\\ \hline
+{\it initial buffer} & width of initial fast adaptation interval
+                     & 75
+\\
+{\it term buffer} & width of final fast adaptation interval
+                  &  50
+\\
+{\it window}  & initial width of slow adaptation interval
+              & 25
+\end{tabular}
+\end{center}
+
+\subsection{Discretization-Interval Adaptation Parameters}
+
+Stan's HMC algorithms utilize dual averaging \citep{Nesterov:2009} to
+optimize the step size.%
+%
+\footnote{This optimization of step size during
+adaptation of the sampler should not be confused with running Stan's
+optimization method.}
+%
+This warmup optimization procedure is extremely flexible and for
+completeness, Stan exposes each tuning option for dual averaging,
+using the notation of \cite{Hoffman-Gelman:2014}. In practice, the
+efficacy of the optimization is sensitive to the value of these
+parameters, but we do not recommend changing the defaults without
+experience with the dual-averaging algorithm. For more information,
+see the discussion of dual averaging in \citep{Hoffman-Gelman:2011,
+ Hoffman-Gelman:2014}.
+
+The full set of dual-averaging parameters are
+%
+\begin{center}
+\begin{tabular}{c|lcc}
+{\it parameter} & {\it description} & {\it constraint} & {\it default}
+\\ \hline
+$\delta$ & target Metropolis acceptance rate 
+         & $\delta \in [0,1]$ 
+         & 0.80
+\\
+$\gamma$ & adaptation regularization scale
+         & $\gamma > 0$
+         & 0.05
+\\
+$\kappa$ & adaptation relaxation exponent
+         & $\kappa > 0$
+         & 0.75
+\\
+$t_0$    & adaptation iteration offset
+         & $t_0 > 0$
+         & 10
+\end{tabular}
+\end{center}
+%
+By setting the target acceptance parameter $\delta$ to a value closer
+to 1 (its value must be strictly less than 1 and its default value is
+0.8), adaptation will be forced to use smaller step sizes. This can
+improve sampling efficiency (effective samples per iteration) at the
+cost of increased iteration times. Raising the value of $\delta$ will
+also allow some models that would otherwise get stuck to overcome
+their blockages.
+
+\subsection{Step-Size Jitter}
+
+All implementations of HMC use numerical integrators requiring a step
+size (equivalently, discretization time interval). Stan allows the
+step size to be adapted or set explicitly. Stan also allows the step
+size to be ``jittered'' randomly during sampling to avoid any poor
+interactions with a fixed step size and regions of high curvature. The
+jitter is a proportion that may be added or subtracted, so the maximum
+amount of jitter is 1, which will cause step sizes to be selected in
+the range of 0 to twice the adapted step size. The default value is 0,
+producing no jitter.
+
+Small step sizes can get HMC samplers unstuck that would otherwise get
+stuck with higher step sizes. The downside is that jittering below the
+adapted value will increase the number of leapfrog steps required and
+thus slow down iterations, whereas jittering above the adapted value
+can cause premature rejection due to simulation error in the
+Hamiltonian dynamics calculation. See \citep{Neal:2011} for further
+discussion of step-size jittering.
+
+
+\subsection{Euclidean Metric}
+
+All HMC implementations in \Stan utilize quadratic kinetic energy
+functions which are specified up to the choice of a symmetric,
+positive-definite matrix known as a \textit{mass matrix} or, more
+formally, a \textit{metric} \citep{Betancourt-Stein:2011}.
+
+If the metric is constant then the resulting implementation is known
+as \textit{Euclidean} HMC.  \Stan allows for three Euclidean HMC
+implementations,
+%
+\begin{itemize}
+\item a unit metric (diagonal matrix of ones),
+\item a diagonal metric (diagonal matrix with positive diagonal
+  entries), and
+\item a dense metric (a dense, symmetric positive definite matrix)
+\end{itemize}
+%
+The user may configure the form of the metric.
+
+If the mass matrix is specified to be diagonal, then regularized
+variances are estimated based on the iterations in each slow-stage
+block (labeled II in \reffigure{adaptation}).  Each of these estimates
+is based only on the iterations in that block.  This allows early
+estimates to be used to help guide warmup and then be forgotten later 
+so that they do not influence the final covariance estimate.
+
+If the mass matrix is specified to be dense, then regularized
+covariance estimates will be carried out, regularizing the estimate to 
+a diagonal matrix, whihc is itself regularized toward a unit matrix.
+
+Variances or covariances are estimated using Welford accumulators
+to avoid a loss of precision over many floating point operations.
+
+
+\subsection{NUTS and its Configuration}
+
+The no-U-turn sampler (NUTS) automatically selects an appropriate
+number of leapfrog steps in each iteration in order to allow the
+proposals to traverse the posterior without doing unnecessary work.
+The motivation is to maximize the expected squared jump distance (see,
+e.g., \citep{RobertsEtAl:1997}) at each step and avoid the random-walk behavior
+that arises in random-walk Metropolis or Gibbs samplers when there is
+correlation in the posterior. For a precise definition of the NUTS
+algorithm and a proof of detailed balance, see
+\citep{Hoffman-Gelman:2011,
+  Hoffman-Gelman:2014}.
+
+NUTS generates a proposal by starting at an initial position
+determined by the parameters drawn in the last iteration. It then
+generates an independent unit-normal random momentum vector. It then
+evolves the initial system both forwards and backwards in time to form
+a balanced binary tree. At each iteration of the NUTS algorithm the
+tree depth is increased by one, doubling the number of leapfrog steps
+and effectively doubles the computation time. The algorithm terminates
+in one of two ways, either
+%
+\begin{itemize}
+\item the NUTS criterion (i.e., a U-turn in Euclidean space on a
+  subtree) is satisfied for a new subtree or the completed tree, or
+\item the depth of the completed tree hits the maximum depth allowed.
+\end{itemize}
+%
+Rather than using a standard Metropolis step, the final parameter
+value is selected with slice sampling along the final evolution step
+(i.e., the second half of iterations generated).
+
+Configuring the no-U-turn sample involves putting a cap on the depth
+of the trees that it evaluates during each iteration.   This is
+controlled through a maximum depth parameter.   The number of leapfrog
+steps taken is then bounded by 2 to the power of the maximum depth minus 1. 
+
+Both the tree depth and the actual number of leapfrog steps computed
+are reported along with the parameters in the output as
+\code{treedepth\_\_} and \code{n\_leapfrog\_\_}, respectively. Because
+the final subtree may only be partially constructed, these two will
+always satisfy
+%
+\[
+2^{\mathrm{treedepth} - 1} - 1 < N_{\mathrm{leapfrog}} \le 2^{\mathrm{treedepth} } - 1.
+\]
+
+Tree depth is an important diagnostic tool for NUTS. For example, a
+tree depth of zero occurs when the first leapfrog step is immediately
+rejected and the initial state returned, indicating extreme curvature
+and poorly-chosen step size (at least relative to the current
+position). On the other hand, a tree depth equal to the maximum depth
+indicates that NUTS is taking many leapfrog steps and being terminated
+prematurely to avoid excessively long execution time. Taking very many
+steps may be a sign of poor adaptation, may be due to targeting a very
+high acceptance rate, or may simply indicate a difficult posterior
+from which to sample. In the latter case, reparameterization may help
+with efficiency. But in the rare cases where the model is correctly
+specified and a large number of steps is necessary, the maximum depth
+should be increased to ensure that that the NUTS tree can grow as
+large as necessary. 
+
+
+\subsection{Sampling without Parameters}
+
+In some situations, such as pure forward data simulation in a directed
+graphical model (e.g., where you can work down generatively from known
+hyperpriors to simulate parameters and data), there is no need to
+declare any parameters in Stan, the model block will be empty, and all
+output quantities will be produced in the generated quantities block.
+In this situation, the sampler must be configured to use the
+fixed-parameters setting.  Without parameters there is no need for
+adaptation and the number of warmup iterations should be set to zero.
+
+
+\section{General Configuration Options}\label{general-config.section}
+
+Stan's interfaces provide a number of configuration options that are
+shared among the MCMC algorithms (this chapter), the optimization
+algorithms (\refchapter{optimization-algorithms}), and the diagnostics
+(\refchapter{diagnostic-algorithms}). 
+
+\subsection{Random Number Generator}
+
+The random-number generator's behavior is fully determined by the
+unsigned seed (positive integer) it is started with. If a seed is not
+specified, or a seed of 0 or less is specified, the system time is
+used to generate a seed. The seed is recorded and included with Stan's
+output regardless of whether it was specified or generated randomly
+from the system time.
+
+Stan also allows a chain identifier to be specified, which is useful
+when running multiple Markov chains for sampling. The chain identifier
+is used to advance the random number generator a very large number of
+random variates so that two chains with different identifiers draw
+from non-overlapping subsequences of the random-number sequence
+determined by the seed.  When running multiple chains from a single
+command, Stan's interfaces will manage the chain identifiers.
+
+\subsubsection{Replication}
+
+Together, the seed and chain identifier determine the behavior of the
+underlying random number generator. See \refchapter{reproducibility} for a
+list of requirements for replication.
+
+\subsection{Initialization}
+
+The initial parameter values for Stan's algorithms (MCMC,
+optimization, or diagnostic) may be either specified by the user or
+generated randomly. If user-specified values are provided, all
+parameters must be given initial values or Stan will abort with an
+error message.
+
+\subsubsection{User-Defined Initialization}
+
+If the user specifies initial values, they must satisfy the
+constraints declared in the model (i.e., they are on the constrained
+scale).
+
+\subsubsection{System Constant Zero Initialization}
+
+It is also possible to provide an initialization of 0, which causes
+all variables to be initialized with zero values on the unconstrained
+scale. The transforms are arranged in such a way that zero
+initialization provides reasonable variable initializations for most
+parameters, such as 0 for unconstrained parameters, 1 for parameters
+constrained to be positive, 0.5 for variables to constrained to lie
+between 0 and 1, a symmetric (uniform) vector for simplexes, unit
+matrices for both correlation and covariance matrices, and so on. See
+\refchapter{variable-transforms} for full details of the
+transformations.
+
+
+\subsubsection{System Random Initialization}
+
+Random initialization by default initializes the parameter values with
+values drawn at random from a $\distro{Uniform}(-2,2)$ distribution.
+Alternatively, a value other than 2 may be specified for the absolute
+bounds. These values are on the unconstrained scale, and are inverse
+transformed back to satisfy the constraints declared for parameters.
+See \refchapter{variable-transforms} for a complete description of the
+transforms used.  
+
+Because zero is chosen to be a reasonable default initial value for
+most parameters, the interval around zero provides a fairly diffuse
+starting point. For instance, unconstrained variables are initialized
+randomly in $(-2,2)$, variables constrained to be positive are
+initialized rougly in $(0.14,7.4)$, variables constrained to fall
+between 0 and 1 are initialized with values roughly in $(0.12,0.88)$.
+
+
+\chapter{Optimization  Algorithms}%
+\label{optimization-algorithms.chapter}
+
+\noindent
+Stan provides optimization algorithms which find modes of the density
+specified by a Stan program. Such modes may be used as parameter
+estimates or as the basis of approximations to a Bayesian posterior;
+see \refchapter{mle} for background on point estimation.
+
+Stan provides three different optimizers, a Newton optimizer, and two
+related quasi-Newton algorithms, BFGS and L-BFGS; see
+\citep{NocedalWright:2006} for thorough description and analysis of
+all of these algorithms. The L-BFGS algorithm is the default
+optimizer. Newton's method is the least efficient of the three, but
+has the advantage of setting its own stepsize.
+
+\section{General Configuration}
+
+All of the optimizers are iterative and allow the maximum number of
+iterations to be specified;  the default maximum number of iterations
+is 2000.  
+
+All of the optimizers are able to stream intermediate output reporting
+on their progress.  Whether or not to save the intermediate iterations
+and stream progress is configurable.
+
+\section{BFGS and L-BFGS Configuration}
+
+\subsection{Convergence Monitoring}
+
+Convergence monitoring in (L-)BFGS is controlled by a number of
+tolerance values, any one of which being satisified causes the
+algorithm to terminate with a solution. Any of the convergence tests
+can be disabled by setting its corresponding tolerance parameter to
+zero.  The tests for convergence are as follows.
+
+\subsubsection{Parameter Convergence}
+
+The parameters $\theta_i$ in iteration $i$ are considered to have
+converged with respect to tolerance \code{tol\_param} if
+%
+\[
+|| \theta_{i} - \theta_{i-1} || < \mbox{\code{tol\_param}}.
+\]
+
+
+\subsubsection{Density Convergence}
+%
+The (unnormalized) log density 
+$\log p(\theta_{i}|y)$ for the parameters $\theta_i$ in iteration $i$
+given data $y$ is considered to have converged with
+respect to tolerance \code{tol\_obj} if
+%
+\[
+\left| \log p(\theta_{i}|y) - \log p(\theta_{i-1}|y) \right| <
+\mbox{\code{tol\_obj}}.
+\]
+%
+The log density is considered to have converged to within
+relative tolerance \code{tol\_rel\_obj} if
+%
+\[
+\frac{\left| \log p(\theta_{i}|y) - \log p(\theta_{i-1}|y) \right|}{\
+  \max\left(\left| \log p(\theta_{i}|y)\right|,\left| \log
+      p(\theta_{i-1}|y)\right|,1.0\right)}
+ < \mbox{\code{tol\_rel\_obj}} * \epsilon.
+\]
+%
+
+
+\subsubsection{Gradient Convergence}
+
+The gradient is considered to have converged to 0 relative to a
+specified tolerance \code{tol\_grad} if 
+%
+\[
+|| g_{i} || < \mbox{\code{tol\_grad}},
+\]
+where $\nabla_{\theta}$ is the gradient operator with respect to
+$\theta$ and $g_{i} = \nabla_{\theta} \log p(\theta_{i}|y)$ is the gradient at
+iteration $i$.  
+
+The gradient is considered to have converged to 0 relative to a
+specified relative tolerance
+\code{tol\_rel\_grad} if
+%
+\[
+\frac{g_{i}^T \hat{H}_{i}^{-1} g_{i} }{ \max\left(\left|\log p(\theta_{i}|y)\right|,1.0\right) } < \mbox{\code{tol\_rel\_grad}} * \epsilon,
+\]
+%
+where $\hat{H}_{i}$ is the estimate of the Hessian at iteration $i$,
+$|u|$ is the absolute value (L1 norm) of $u$, $||u||$ is the vector
+length (L2 norm) of $u$, and $\epsilon \approx 2e-16$ is machine
+precision.
+
+
+\subsection{Initial Step Size}
+
+The initial step size parameter $\alpha$ for BFGS-style optimizers may
+be specified. If the first iteration takes a long time (and requires a
+lot of function evaluations) initialize $\alpha$ to be the roughly
+equal to the $\alpha$ used in that first iteration. The default value
+is intentionally small, 0.001, which is reasonable for many problems
+but might be too large or too small depending on the objective
+function and initialization. Being too big or too small just means
+that the first iteration will take longer (i.e., require more gradient
+evaluations) before the line search finds a good step length. It's not
+a critical parameter, but for optimizing the same model multiple times
+(as you tweak things or with different data), being able to tune
+$\alpha$ can save some real time.
+
+\subsection{L-BFGS History Size}
+
+L-BFGS has a command-line argument which controls the size of the
+history it uses to approximate the Hessian. The value should be less than
+the dimensionality of the parameter space and, in general, relatively
+small values (5--10) are sufficient; the default value is 5.
+
+If L-BFGS performs poorly but BFGS performs well, consider increasing
+the history size. Increasing history size will increase the
+memory usage, although this is unlikely to be an issue for typical
+Stan models.
+
+
+\section{General Configuration Options}
+
+The general configuration options for optimization are the same as
+those for MCMC;  see \refsection{general-config} for details.
+
+
+\chapter{Diagnostic Mode}\label{diagnostic-algorithms.chapter}
+
+\noindent
+Stan's diagnostic mode runs a Stan program with data, initializing
+parameters either randomly or with user-specified initial values, and
+then evaluates the log probability and its gradients. The gradients
+computed by the Stan program are compared to values calculated by
+finite differences.
+
+Diagnostic mode may be configured with two parameters.
+%
+\begin{center}
+\begin{tabular}{c|lcc}
+{\it parameter} & {\it description} & {\it constraints} & {\it
+  default}
+\\ \hline
+{\it $\epsilon$} & finite difference size & $\epsilon > 0$ & 1e--6
+\\
+{\it error} & error threshold for matching & $\mbox{error} > 0$ & 1e--6
+\end{tabular}
+\end{center}
+%
+If the difference between the Stan program's gradient value and that
+calculated by finite difference is higher than the specified
+threshold, the argument will be flagged.
+
+\section{Output}
+
+Diagnostic mode prints the log posterior density (up to a proportion)
+calculated by the Stan program for the specified initial values. For
+each parameter, it prints the gradient at the initial parameter values
+calculated by Stan's program and by finite differences over Stan's
+program for the log probability.  
+
+\subsection{Unconstrained Scale}
+
+The output is for the variable values and their gradients are on the
+unconstrained scale, which means each variable is a vector of size
+corresponding to the number of unconstrained variables required to
+define it. For example, an $N \times N$ correlation matrix, requires
+${N \choose 2}$ unconstrained parameters. The
+transformations from constrained to unconstrained parameters are based
+on the constraints in the parameter declarations and described in
+detail in \refchapter{variable-transforms}.
+
+\subsection{Includes Jacobian}
+
+The log density includes the Jacobian adjustment implied by the
+constraints declared on variables; see
+\refchapter{variable-transforms} for full details. The Jacobian
+adjustment will be turned off if optimization is used in practice, but
+there is as of yet no way to turn it off in diagnostic mode.
+
+\section{Configuration Options}
+
+The general configuration options for diagnostics are the same as
+those for MCMC; see \refsection{general-config} for details. Initial
+values may be specified, or they may be drawn at random. Setting the
+random number generator will only have an effect if a random
+initialization is specified.
+
+\section{Speed Warning and Data Trimming}
+
+Due to the application of finite differences, the computation time
+grows linearly with the number of parameters. This can be require a
+very long time, especially in models with latent parameters that grow
+with the data size. It can be helpful to diagnose a model with smaller
+data sizes in such cases.
+
+

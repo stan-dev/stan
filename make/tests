@@ -1,42 +1,10 @@
-#
+##
 # LIBGTEST is the google test library
 # GTEST_MAIN is the file that contains the google test
 ##
 LIBGTEST = test/libgtest.a
 GTEST_MAIN = $(GTEST)/src/gtest_main.cc
 CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
-
-##
-# Target to verify header files are coherent
-##
-HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f)) 
-ifeq ($(OS),win) 
-  DEV_NULL = nul
-else
-  DEV_NULL = /dev/null
-endif
-
-test/dummy.cpp:
-	@mkdir -p test
-	@touch $@
-	@echo "int main() {return 0;}" >> $@
-
-%.hpp-test : %.hpp test/dummy.cpp
-	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
-
-##
-# Target to verify compiled models are valid
-##
-.PHONY: %.cpp-test
-%.cpp-test : %.cpp
-	$(COMPILE.c) -fsyntax-only -O$O $< 
-
-##
-# Target to build all tests
-##
-.PHONY: test-all
-test-all: test-unit test-headers test-distributions test-models
-
 
 ##
 # Build the google test library.
@@ -47,284 +15,171 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
-test/%.o : src/test/%_test.cpp $(LIBGTEST)
+##
+# Rule for building a test
+##
+test/%.o : src/test/%_test.cpp $(LIBGTEST) bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
-# Rule for generating dependencies.
+# Rule for building a test executable
 ##
-test/%.d : src/test/%_test.cpp
-	@if test -d $(dir $@); \
-	then \
-	(set -e; \
-	rm -f $@; \
-	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$ ); \
-	fi
-
-ifneq (,$(filter test-unit,$(MAKECMDGOALS)))
-  -include $(addsuffix .d, $(UNIT_TESTS)) 
-endif
-ifneq (,$(filter test-all,$(MAKECMDGOALS)))
-  -include $(addsuffix .d, $(UNIT_TESTS)) 
-endif
-
-##
-# run target which will allow for parallel execution of
-# tests.
-## 
-.PHONY: runtest/%
-runtest/% : %
-	@echo '------------------------------------------------------------'
-	$(WINE) $< --gtest_output="xml:$*.xml";
-
-##
-# target path_separator for use in some tests that need to 
-# call executables.
-##
-.PHONY: path_separator
-path_separator :
-	@echo $(PATH_SEPARATOR)
-
-##
-# PERCENT used for secondary expansion
-# $$(PERCENT) turns into %.
-##
-PERCENT = %
-
-##
-# TEST_TARGETS is the set of all src/test subdirectories excluding src/test.
-##
-TEST_TARGETS := $(shell find src/test ! -path src/test -type d)
-
-##
-# ALL_TESTS is the set of all test files
-#   This needs to be an '=' assignment and not a ':='.
-##
-ALL_TESTS = $(shell find src/test -type f -name '*_test.cpp')
-
-ALL_TEST_EXECUTABLES = $(patsubst src/%_test.cpp,%$(EXE),$(ALL_TESTS))
-
-GRAMMAR_TESTS = $(foreach dir,\
-                          $(patsubst src/%,%,$(shell find src/test -type d -name 'gm')),\
-                          $(filter $(dir)/%,$(ALL_TEST_EXECUTABLES)))
-
-##
-# Generate autodependencies for test files.
-# Adapted from the gnu make manual.
-# http://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html#Automatic-Prerequisites
-##
-$(GRAMMAR_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
-ifeq ($(strip $(findstring test-,$(MAKECMDGOALS))\
-              $(findstring runtest/,$(MAKECMDGOALS))\
-              $(findstring src/test/,$(MAKECMDGOALS))),)
-	$@ --gtest_output="xml:$(basename $@).xml"
-endif
-
-.PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
-ifeq ($(strip $(findstring test-,$(MAKECMDGOALS))\
-              $(findstring runtest/,$(MAKECMDGOALS))\
-              $(findstring src/test/,$(MAKECMDGOALS))),)
-	$@ --gtest_output="xml:$(basename $@).xml"
-endif
 
 
-####
-## These make rules apply if SECONDEXPANSION is available
-## in make.
-#### 
-ifneq ($(filter second-expansion,$(.FEATURES)),)
 ##
-# Defining the test target implicit static rule.
-#
-# Each src/test/* depends on each executable that's generated
-# by the test file.
+# static rule to link in libstanc.
+# needed by subset of unit tests that test stan compiler
+# all these tests are under stan/test/unit/gm
 ##
-.SECONDEXPANSION:
-.PHONY: $(TEST_TARGETS)
-$(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter $$(patsubst src/$$(PERCENT),$$(PERCENT),$$@)/$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
-	@echo ''
-	$(if $(GENERATE_TESTS),\
-             $(MAKE) $@ $(if $(J),-j$(J)), \
-             @echo 'Ran '$(words $(filter runtest/%,$^))' tests for '$@)
+STANC_TESTS_HEADERS := $(shell find src/test/unit/gm -type f -name '*_test.cpp')
+STANC_TESTS_O := $(patsubst src/%_test.cpp,%.o,$(STANC_TESTS_HEADERS))
+STANC_TESTS := $(patsubst src/%_test.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
+
+# $(STANC_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
+# 	@mkdir -p $(dir $@)
+# 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+
+# add additional dependency to libstanc.a
+##$(patsubst src/%_test.cpp,%.o,$(STANC_TEST_HEADERS)) : test/%.o : bin/libstanc.a
+$(STANC_TESTS_O) : bin/libstanc.a
+$(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
+
+
+
+
+
+##
+# Rule for generating dependencies.
+##
+.PRECIOUS: test/%.d
+test/%.d : src/test/%_test.cpp
+	@mkdir -p $(dir $@)
+	@set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+############################################################
+##
+# Target to verify header files within Stan has
+# enough include calls
+##
+HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f)) 
+
+ifeq ($(OS_TYPE),win) 
+  DEV_NULL = nul
 else
-####
-## Warning for developers that don't have a 
-## current enough version of make (3.81 or higher).
-#### 
-.PHONY: $(TEST_TARGETS)
-$(TEST_TARGETS):
-	@echo ''
-	@echo '------------------------------------------------------------'
-	@echo 'The current version of make does not satisfy the developer  '
-	@echo 'requirements. Please install make 3.81 or higher.           '
-	@echo '------------------------------------------------------------'
+  DEV_NULL = /dev/null
 endif
 
+.PHONY: HEADER_TESTS
+%.hpp-test : %.hpp test/dummy.cpp
+	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
 
+test/dummy.cpp:
+	@mkdir -p test
+	@touch $@
+	@echo "int main() {return 0;}" >> $@
+
+.PHONY: test-headers
+test-headers: $(HEADER_TESTS)
+
+############################################################
 ##
-# Build the stanc compiler as a test executable
+# Use the stanc compiler to generate C++ from Stan programs
 ##
+
 .PRECIOUS: test/test-models/stanc$(EXE)
 test/test-models/stanc$(EXE) : src/test/test-models/stanc.cpp bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
-##
-# TEST_MODELS is the set of all the test models.
-# Those in the 'no_main' subdirectory are supposed to be compiled without a main function.
-##
 TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
-
-##
-# Compile these with no main.
-##
-$(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS))) : %.cpp : %.stan test/test-models/stanc$(EXE)
+$(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$(EXE)
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
 ##
-# Tests that also depend on generated models.
+# Explicitly specify dependencies for tests that depend on the generated C++ of Stan programs.
 ##
+src/test/unit/io/mcmc_writer_test.cpp: src/test/test-models/good/io_example.cpp
+src/test/unit/gm/generator_test.cpp: src/test/test-models/good/gm/test_lp.cpp
+src/test/unit/gm/parser_generator_test.cpp: $(patsubst %.stan,%.cpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
 
-test/unit/io/mcmc_writer.o: src/test/test-models/no-main/io_example.cpp
-test/unit/gm/generator.o: src/test/test-models/no-main/gm/test_lp.cpp
+src/test/unit/model/util_test.cpp: src/test/test-models/good/model/valid.cpp src/test/test-models/good/model/domain_fail.cpp
 
-test/unit/model/util.o: src/test/test-models/no-main/model/valid.cpp src/test/test-models/no-main/model/domain_fail.cpp
+src/test/unit/mcmc/hmc/hamiltonians/base_hamiltonian_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.cpp
+src/test/unit/mcmc/hmc/hamiltonians/unit_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.cpp
+src/test/unit/mcmc/hmc/hamiltonians/diag_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.cpp
+src/test/unit/mcmc/hmc/hamiltonians/dense_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.cpp
+src/test/unit/mcmc/hmc/integrators/expl_leapfrog_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/command.cpp 
+src/test/unit/mcmc/hmc/integrators/expl_leapfrog2_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/gauss.cpp
 
-test/unit/mcmc/hmc/hamiltonians/base_hamiltonian.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-test/unit/mcmc/hmc/hamiltonians/unit_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp 
-test/unit/mcmc/hmc/integrators/expl_leapfrog2.o: src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
+src/test/unit/common/do_bfgs_optimize_test.cpp: src/test/test-models/good/optimization/rosenbrock.cpp
+src/test/unit/optimization/bfgs_linesearch_test.cpp: src/test/test-models/good/optimization/rosenbrock.cpp
+src/test/unit/optimization/bfgs_minimizer_test.cpp: src/test/test-models/good/optimization/rosenbrock.cpp
+src/test/unit/optimization/bfgs_test.cpp: src/test/test-models/good/optimization/rosenbrock.cpp
+src/test/unit/optimization/bfgs_update_test.cpp: src/test/test-models/good/optimization/rosenbrock.cpp
+src/test/unit/optimization/lbfgs_update_test.cpp: src/test/test-models/good/optimization/rosenbrock.cpp
 
-test/unit/common/do_bfgs_optimize.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
-test/unit/optimization/bfgs_linesearch.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
-test/unit/optimization/bfgs_minimizer.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
-test/unit/optimization/bfgs.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
-test/unit/optimization/bfgs_update.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
-test/unit/optimization/lbfgs_update.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
+src/test/unit/common/command_init_test.cpp: src/test/test-models/good/common/test_lp.cpp
+src/test/unit/common/run_markov_chain_test.cpp: src/test/test-models/good/common/test_lp.cpp
+src/test/unit/common/sample_test.cpp: src/test/test-models/good/common/test_lp.cpp
+src/test/unit/common/warmup_test.cpp: src/test/test-models/good/common/test_lp.cpp
+src/test/unit/common/write_iteration_test.cpp: src/test/test-models/good/common/test_lp.cpp
 
-test/unit/common/command_init.o: src/test/test-models/no-main/common/test_lp.cpp
-test/unit/common/run_markov_chain.o: src/test/test-models/no-main/common/test_lp.cpp
-test/unit/common/sample.o: src/test/test-models/no-main/common/test_lp.cpp
-test/unit/common/warmup.o: src/test/test-models/no-main/common/test_lp.cpp
-test/unit/common/write_iteration.o: src/test/test-models/no-main/common/test_lp.cpp
+src/test/unit/gm/reject/reject_mult_args_test.cpp: src/test/test-models/good/gm/reject_mult_args.cpp
 
-test/unit/gm/reject/reject_mult_args.o: src/test/test-models/no-main/gm/reject_mult_args.cpp
+src/test/unit/gm/reject/reject_model_test.cpp: src/test/test-models/good/gm/reject_model.cpp
+src/test/unit/gm/reject/reject_func_call_model_test.cpp: src/test/test-models/good/gm/reject_func_call_model.cpp
 
-test/unit/gm/reject/reject_model.o: src/test/test-models/no-main/gm/reject_model.cpp
-test/unit/gm/reject/reject_func_call_model.o: src/test/test-models/no-main/gm/reject_func_call_model.cpp
+src/test/unit/gm/reject/reject_transformed_data_test.cpp: src/test/test-models/good/gm/reject_transformed_data.cpp
+src/test/unit/gm/reject/reject_func_call_transformed_data_test.cpp: src/test/test-models/good/gm/reject_func_call_transformed_data.cpp
 
-test/unit/gm/reject/reject_transformed_data.o: src/test/test-models/no-main/gm/reject_transformed_data.cpp
-test/unit/gm/reject/reject_func_call_transformed_data.o: src/test/test-models/no-main/gm/reject_func_call_transformed_data.cpp
+src/test/unit/gm/reject/reject_transformed_parameters_test.cpp: src/test/test-models/good/gm/reject_transformed_parameters.cpp
+src/test/unit/gm/reject/reject_func_call_transformed_parameters_test.cpp: src/test/test-models/good/gm/reject_func_call_transformed_parameters.cpp
 
-test/unit/gm/reject/reject_transformed_parameters.o: src/test/test-models/no-main/gm/reject_transformed_parameters.cpp
-test/unit/gm/reject/reject_func_call_transformed_parameters.o: src/test/test-models/no-main/gm/reject_func_call_transformed_parameters.cpp
-
-test/unit/gm/reject/reject_generated_quantities.o: src/test/test-models/no-main/gm/reject_generated_quantities.cpp
-test/unit/gm/reject/reject_func_call_generated_quantities.o: src/test/test-models/no-main/gm/reject_func_call_generated_quantities.cpp
-
-test/integration/compile_models.o : $(patsubst %.stan,%.cpp-test,$(shell find src/test/test-models/syntax-only -type f -name '*.stan'))
+src/test/unit/gm/reject/reject_generated_quantities_test.cpp: src/test/test-models/good/gm/reject_generated_quantities.cpp
+src/test/unit/gm/reject/reject_func_call_generated_quantities_test.cpp: src/test/test-models/good/gm/reject_func_call_generated_quantities.cpp
 
 ##
-# CmdStan specific targets. Should be removed in the future.
+# Target to verify code generated Stan programs
+# (.stan -> .cpp) are compilable
 ##
-$(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/%,$(ALL_TESTS))): test/%.o : src/test/%_test.cpp $(LIBGTEST) 
-	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+.PHONY: %.cpp-test
+%.cpp-test : %.cpp
+	$(COMPILE.c) -fsyntax-only -O$O $< 
+
 
 ##
-# Agrad distributions test generator
+# Compile models depends on every model within
+# src/test/test-models/good/*.stan being able to
+# be code-generated to a *.cpp, then passed through
+# the compiler using the -fsyntax-only flag
+##
+test/integration/compile_models$(EXE) : $(patsubst %.stan,%.cpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
+
+
+############################################################
+##
+# Test generator for distribution tests
 ##
 test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generate_tests.cpp
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
 
-src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
-	@echo "--- Generating tests for $(notdir $<) ---"
+
+test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
+.SECONDEXPANSION:
+src/test/unit-distribution/%_generated_test.cpp : src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
 	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
 
+LIST_OF_GENERATED_TESTS := $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_test.cpp,g')
 
-
-##
-# For src/test/unit-distribution tests, adding
-# dependency on generated tests.
-##
-
-ifneq ($(filter second-expansion,$(.FEATURES)),)
-
-DISTRIBUTION_TESTS := $(shell find src/test/unit-distribution -type f -name '*.hpp')
-.SECONDEXPANSION:
-$(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_test.cpp,$$(filter $$@$$(PERCENT),$$(DISTRIBUTION_TESTS)))
-
-endif
-
-# Set the variable GENERATE_TESTS to non-empty string
-# when the target is generating distribution tests.
-# This indicates whether make should be rerun.
-#
-#   Notes:
-#     The first argument to filter-out is the number of unique
-#        generated distribution tests that have already been generated
-#        in this current run of make. If this is the stage where
-#        we are generating tests, this number will be less than the
-#        number of tests to generate. (0 if running from a clean state)
-#     The second argument to filter-out is the number of unique
-#        generated distribution tests that should be generated. 
-#        This is determined by the existence of *_test.hpp files in 
-#        the appropriate directory.
-#     The filter-out function returns the total number of tests that should
-#        be generated if they have not yet been generated.
-##
-$(filter src/test/unit-distribution%,$(TEST_TARGETS)): \
-GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
-                              $(words $(filter $@%_00000_generated_test.cpp,$(ALL_TESTS))))
-
-
-.PHONY: test-headers
-test-headers: $(HEADER_TESTS) 
-
-##
-# Deprecated test targets
-##
-.PHONY: test-unit test-distributions test-models test-bugs
-test-unit test-distributions test-all:
-	@echo ''
-	@echo ''
-	@echo '  The '$@' target is deprecated. Please use these make targets instead:'
-	@echo '      '$^
-
-test-unit: src/test/unit src/test/unit-agrad-rev src/test/unit-agrad-fwd
-
-test-distributions: src/test/unit-distribution
-
-test-models:
-	@echo ''
-	@echo 'These tests are now in the CmdStan repository. Run this from'
-	@echo 'the CmdStan home directory:'
-	@echo ''
-	@echo '  "> make src/test/models"'
-	@echo ''
-	@exit 1
-
-test-bugs:
-	@echo ''
-	@echo 'These tests are now in the CmdStan repository. Run this from'
-	@echo 'the CmdStan home directory:'
-	@echo ''
-	@echo '  "> make src/test/models/bugs_examples"'
-	@echo ''
-	@exit 1
-
-
-.PHONY: test-all
-test-all: test-headers $(TEST_TARGETS)
+.PHONY: generate-tests
+generate-tests: $(LIST_OF_GENERATED_TESTS)

@@ -5,7 +5,7 @@
 #include <stan/gm/ast.hpp>
 #include <stan/gm/generator.hpp>
 #include <stan/io/dump.hpp>
-#include <test/test-models/no-main/gm/test_lp.cpp>
+#include <test/test-models/good/gm/test_lp.cpp>
 #include <test/unit/gm/utility.hpp>
 #include <gtest/gtest.h>
 
@@ -316,5 +316,18 @@ TEST(gmGenerator,funArgs5lp) {
                  "functions { real foo_lp(real x1, real x2, real x3, real x4, real x5) { return x1; } } model { }",
                  "typename boost::math::tools::promote_args<T0__, T1__, T2__, T3__, typename boost::math::tools::promote_args<T4__, T_lp__>::type>::type\n"
                  "foo_lp(");
+}
+
+TEST(gmGenerator,shortCircuit1) {
+  expect_matches(1,
+                 "transformed data { int a; a <- 1 || 2; }"
+                 "model { }",
+                 "(primitive_value(1) || primitive_value(2))");
+  expect_matches(1,
+                 "transformed data { int a; a <- 1 && 2; }"
+                 "model { }",
+                 "(primitive_value(1) && primitive_value(2))");
+
+
 }
 

@@ -1,11 +1,12 @@
-LIBSTAN_OFILES = bin/stan/agrad/rev/var_stack.o
+LIBSTAN_OFILES := bin/stan/agrad/rev/var_stack.o
 bin/libstan.a : $(LIBSTAN_OFILES)
 	@mkdir -p $(dir $@)
 	$(AR) -rs bin/libstan.a $(LIBSTAN_OFILES)
 
-TEMPLATE_INSTANTIATION := $(shell find src/stan/gm -type f -name '*_inst.cpp')
-TEMPLATE_INSTANTIATION += $(shell find src/stan/gm -type f -name '*_def.cpp')
+
+TEMPLATE_INSTANTIATION := $(shell find src/stan/gm -type f -name '*_inst.cpp') $(shell find src/stan/gm -type f -name '*_def.cpp')
 TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:src/%.cpp=bin/%.o)
+
 bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
 	@mkdir -p $(dir $@)
 	$(AR) -rs bin/libstanc.a $(TEMPLATE_INSTANTIATION)
@@ -14,12 +15,10 @@ $(TEMPLATE_INSTANTIATION) : bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$(O_STANC) $(OUTPUT_OPTION) $<
 
-
-
 ##
 # Generate dependencies for libraries
 ##
-ifneq (,$(filter-out clean%,$(MAKECMDGOALS)))
+ifneq (,$(filter-out test-headers clean% %-test %.d,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(basename $(LIBSTAN_OFILES)))
   -include $(addsuffix .d,$(basename $(TEMPLATE_INSTANTIATION)))
 endif

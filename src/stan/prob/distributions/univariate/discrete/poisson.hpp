@@ -1,14 +1,15 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP
 
-#include <boost/random/poisson_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
-
 #include <limits>
 #include <boost/math/special_functions/fpclassify.hpp>
-
+#include <boost/random/poisson_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_less.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
@@ -21,17 +22,16 @@ namespace stan {
   namespace prob {
 
     // Poisson(n|lambda)  [lambda > 0;  n >= 0]
-    template <bool propto,
-              typename T_n, typename T_rate>
+    template <bool propto, typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_log(const T_n& n, const T_rate& lambda) {
 
-      static const char* function = "stan::prob::poisson_log(%1%)";
+      static const std::string function("stan::prob::poisson_log");
       
       using boost::math::lgamma;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
       using stan::prob::include_summand;
       using stan::math::value_of;
       
@@ -44,15 +44,12 @@ namespace stan {
       double logp(0.0);
 
       // validate args
-      check_nonnegative(function, n, "Random variable", &logp);
-      check_not_nan(function, lambda,
-                    "Rate parameter", &logp);
-      check_nonnegative(function, lambda,
-                        "Rate parameter", &logp);
+      check_nonnegative(function, "Random variable", n);
+      check_not_nan(function, "Rate parameter", lambda);
+      check_nonnegative(function, "Rate parameter", lambda);
       check_consistent_sizes(function,
-                             n,lambda,
-                             "Random variable","Rate parameter",
-                             &logp);
+                             "Random variable", n, 
+                             "Rate parameter", lambda);
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_rate>::value)
@@ -108,13 +105,13 @@ namespace stan {
     typename return_type<T_log_rate>::type
     poisson_log_log(const T_n& n, const T_log_rate& alpha) {
 
-      static const char* function = "stan::prob::poisson_log_log(%1%)";
+      static const std::string function("stan::prob::poisson_log_log");
       
       using boost::math::lgamma;
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using std::exp;
       
@@ -127,13 +124,11 @@ namespace stan {
       double logp(0.0);
 
       // validate args
-      check_nonnegative(function, n, "Random variable", &logp);
-      check_not_nan(function, alpha,
-                    "Log rate parameter", &logp);
+      check_nonnegative(function, "Random variable", n);
+      check_not_nan(function, "Log rate parameter", alpha);
       check_consistent_sizes(function,
-                             n,alpha,
-                             "Random variable","Log rate parameter",
-                             &logp);
+                             "Random variable", n, 
+                             "Log rate parameter", alpha);
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_log_rate>::value)
@@ -192,12 +187,12 @@ namespace stan {
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_cdf(const T_n& n, const T_rate& lambda) {
-      static const char* function = "stan::prob::poisson_cdf(%1%)";
+      static const std::string function("stan::prob::poisson_cdf");
           
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
           
       // Ensure non-zero argument slengths
       if (!(stan::length(n) && stan::length(lambda))) 
@@ -206,11 +201,11 @@ namespace stan {
       double P(1.0);
           
       // Validate arguments
-      check_not_nan(function, lambda, "Rate parameter", &P);
-      check_nonnegative(function, lambda, "Rate parameter", &P);
-      check_consistent_sizes(function, n,lambda,
-                             "Random variable","Rate parameter",
-                             &P);
+      check_not_nan(function, "Rate parameter", lambda);
+      check_nonnegative(function, "Rate parameter", lambda);
+      check_consistent_sizes(function, 
+                             "Random variable", n,
+                             "Rate parameter", lambda);
           
       // Wrap arguments into vector views
       VectorView<const T_n> n_vec(n);
@@ -258,12 +253,12 @@ namespace stan {
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_cdf_log(const T_n& n, const T_rate& lambda) {
-      static const char* function = "stan::prob::poisson_cdf_log(%1%)";
+      static const std::string function("stan::prob::poisson_cdf_log");
           
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
           
       // Ensure non-zero argument slengths
       if (!(stan::length(n) && stan::length(lambda))) 
@@ -272,11 +267,11 @@ namespace stan {
       double P(0.0);
           
       // Validate arguments
-      check_not_nan(function, lambda, "Rate parameter", &P);
-      check_nonnegative(function, lambda, "Rate parameter", &P);
-      check_consistent_sizes(function, n,lambda,
-                             "Random variable","Rate parameter",
-                             &P);
+      check_not_nan(function, "Rate parameter", lambda);
+      check_nonnegative(function, "Rate parameter", lambda);
+      check_consistent_sizes(function, 
+                             "Random variable", n, 
+                             "Rate parameter", lambda);
           
       // Wrap arguments into vector views
       VectorView<const T_n> n_vec(n);
@@ -320,12 +315,12 @@ namespace stan {
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_ccdf_log(const T_n& n, const T_rate& lambda) {
-      static const char* function = "stan::prob::poisson_ccdf_log(%1%)";
+      static const std::string function("stan::prob::poisson_ccdf_log");
           
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
           
       // Ensure non-zero argument slengths
       if (!(stan::length(n) && stan::length(lambda))) 
@@ -334,11 +329,11 @@ namespace stan {
       double P(0.0);
           
       // Validate arguments
-      check_not_nan(function, lambda, "Rate parameter", &P);
-      check_nonnegative(function, lambda, "Rate parameter", &P);
-      check_consistent_sizes(function, n,lambda,
-                             "Random variable","Rate parameter",
-                             &P);
+      check_not_nan(function, "Rate parameter", lambda);
+      check_nonnegative(function, "Rate parameter", lambda);
+      check_consistent_sizes(function, 
+                             "Random variable", n,
+                             "Rate parameter", lambda);
           
       // Wrap arguments into vector views
       VectorView<const T_n> n_vec(n);
@@ -379,6 +374,8 @@ namespace stan {
       return operands_and_partials.to_var(P);
     }
 
+    static const double POISSON_MAX_RATE = pow(2,30);
+
     template <class RNG>
     inline int
     poisson_rng(const double lambda,
@@ -386,21 +383,44 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::poisson_distribution;
 
-      static const char* function = "stan::prob::poisson_rng(%1%)";
+      static const std::string function("stan::prob::poisson_rng");
       
-      using stan::math::check_not_nan;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_less;
  
-      check_not_nan(function, lambda,
-                    "Rate parameter", (double*)0);
-      check_nonnegative(function, lambda,
-                        "Rate parameter", (double*)0);
+      check_not_nan(function, "Rate parameter", lambda);
+      check_nonnegative(function, "Rate parameter", lambda);
+      check_less(function, "Rate parameter", lambda, POISSON_MAX_RATE);
 
       variate_generator<RNG&, poisson_distribution<> >
         poisson_rng(rng, poisson_distribution<>(lambda));
       return poisson_rng();
     }
       
+    static const double POISSON_MAX_LOG_RATE = 30 * log(2);
+
+    template <class RNG>
+    inline int
+    poisson_log_rng(const double alpha,
+                RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::poisson_distribution;
+
+      static const std::string function("stan::prob::poisson_log_rng");
+      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_less;
+      using std::exp;
+ 
+      check_not_nan(function, "Log rate parameter", alpha);
+      check_less(function, "Log rate parameter", alpha, POISSON_MAX_LOG_RATE);
+
+      variate_generator<RNG&, poisson_distribution<> >
+        poisson_rng(rng, poisson_distribution<>(exp(alpha)));
+      return poisson_rng();
+    }
   }
 }
 #endif

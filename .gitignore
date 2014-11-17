@@ -18,6 +18,8 @@
 *.idx
 *.ilg
 *.ind
+*.fdb_latexmk
+*.fls
 
 # depedencies files
 *.d

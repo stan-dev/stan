@@ -1,19 +1,21 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MATRIX_NORMAL_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MATRIX_NORMAL_HPP
 
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
-#include <stan/agrad/rev.hpp>
+#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
-#include <stan/math/matrix/log_determinant_ldlt.hpp>
+#include <stan/math/matrix/trace_gen_quad_form.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
   namespace prob {
@@ -42,58 +44,52 @@ namespace stan {
                            const Eigen::Matrix<T_Mu,Eigen::Dynamic,Eigen::Dynamic>& Mu,
                            const Eigen::Matrix<T_Sigma,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                            const Eigen::Matrix<T_D,Eigen::Dynamic,Eigen::Dynamic>& D) {
-      static const char* function = "stan::prob::matrix_normal_prec_log(%1%)";
+      static const std::string function("stan::prob::matrix_normal_prec_log");
       typename boost::math::tools::promote_args<T_y,T_Mu,T_Sigma,T_D>::type lp(0.0);
       
-      using stan::math::check_not_nan;
-      using stan::math::check_symmetric;
-      using stan::math::check_size_match;
-      using stan::math::check_positive;
-      using stan::math::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_symmetric;
+      using stan::error_handling::check_size_match;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
       using stan::math::trace_gen_quad_form;
       using stan::math::log_determinant_ldlt;
       using stan::math::subtract;
       using stan::math::LDLT_factor;
-      using stan::math::check_ldlt_factor;
+      using stan::error_handling::check_ldlt_factor;
       
       check_size_match(function, 
-                       Sigma.rows(), "Rows of Sigma",
-                       Sigma.cols(), "columns of Sigma",
-                       &lp);
-      check_positive(function, Sigma.rows(), "Sigma rows", &lp);
-      check_finite(function, Sigma, "Sigma", &lp);
-      check_symmetric(function, Sigma, "Sigma", &lp);
+                       "Rows of Sigma", Sigma.rows(), 
+                       "columns of Sigma", Sigma.cols());
+      check_positive(function, "Sigma rows", Sigma.rows());
+      check_finite(function, "Sigma", Sigma);
+      check_symmetric(function, "Sigma", Sigma);
       
       LDLT_factor<T_Sigma,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp);
+      check_ldlt_factor(function, "LDLT_Factor of Sigma", ldlt_Sigma);
       check_size_match(function, 
-                       D.rows(), "Rows of D",
-                       D.cols(), "Columns of D",
-                       &lp);
-      check_positive(function, D.rows(), "D rows", &lp);
-      check_finite(function, D, "D", &lp);
-      check_symmetric(function, D, "Sigma", &lp);
+                       "Rows of D", D.rows(), 
+                       "Columns of D", D.cols());
+      check_positive(function, "D rows", D.rows());
+      check_finite(function, "D", D);
+      check_symmetric(function, "Sigma", D);
       
       LDLT_factor<T_D,Eigen::Dynamic,Eigen::Dynamic> ldlt_D(D);
-      check_ldlt_factor(function,ldlt_D,"LDLT_Factor of D",&lp);
+      check_ldlt_factor(function, "LDLT_Factor of D", ldlt_D);
       check_size_match(function, 
-                       y.rows(), "Rows of random variable",
-                       Mu.rows(), "Rows of location parameter",
-                       &lp);
+                       "Rows of random variable", y.rows(),
+                       "Rows of location parameter", Mu.rows());
       check_size_match(function, 
-                       y.cols(), "Columns of random variable",
-                       Mu.cols(), "Columns of location parameter",
-                       &lp);
+                       "Columns of random variable", y.cols(),
+                       "Columns of location parameter", Mu.cols());
       check_size_match(function, 
-                       y.rows(), "Rows of random variable",
-                       Sigma.rows(), "Rows of Sigma",
-                       &lp);
+                       "Rows of random variable", y.rows(),
+                       "Rows of Sigma", Sigma.rows());
       check_size_match(function, 
-                       y.cols(), "Columns of random variable",
-                       D.rows(), "Rows of D",
-                       &lp);
-      check_finite(function, Mu, "Location parameter", &lp);
-      check_finite(function, y, "Random variable", &lp);
+                       "Columns of random variable", y.cols(),
+                       "Rows of D", D.rows());
+      check_finite(function, "Location parameter", Mu);
+      check_finite(function, "Random variable", y);
       
       if (include_summand<propto>::value) 
         lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();

@@ -2,8 +2,8 @@
 #define STAN__AGRAD__REV__MATRIX__EIGEN_NUMTRAITS_HPP
 
 #include <limits>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
   namespace agrad {
