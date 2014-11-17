@@ -22,6 +22,7 @@ namespace stan {
         }
         void chain() {
 
+          // return zero derivative as gamma_p is flat to machine precision for b / a > 10
           if (std::fabs(bvi_->val_ / avi_->val_) > 10 ) return;
           
           double u = stan::math::gamma_p(avi_->val_, bvi_->val_);
@@ -56,6 +57,7 @@ namespace stan {
         }
         void chain() {
 
+          // return zero derivative as gamma_p is flat to machine precision for b / a > 10
           if (std::fabs(b / avi_->val_) > 10 ) return;
           
           double u = stan::math::gamma_p(avi_->val_, bd_);
@@ -87,6 +89,7 @@ namespace stan {
                      a,bvi) {
         }
         void chain() {
+          // return zero derivative as gamma_p is flat to machine precision for b / a > 10
           if (std::fabs(bvi_->val_ / a) > 10 ) return;
           bvi_->adj_ += adj_ * (std::exp(-bvi_->val_) * std::pow(bvi_->val_, ad_ - 1.0) / boost::math::tgamma(ad_));
         }
