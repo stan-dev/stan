@@ -323,6 +323,69 @@ namespace stan {
       }
     }             
     
+    template <typename T_n, typename T_location, 
+              typename T_precision>
+    typename return_type<T_location, T_precision>::type
+    neg_binomial_2_cdf_log(const T_n& n,
+                       const T_location& mu,
+                       const T_precision& phi) {
+                         
+      // Size checks
+      if ( !( stan::length(n) && stan::length(mu) 
+              && stan::length(phi) ) ) 
+        return 0.0;
+        
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_less;
+      
+      static const std::string function("stan::prob::neg_binomial_2_cdf");
+      check_positive_finite(function, "Location parameter", mu);
+      check_positive_finite(function, "Precision parameter", phi);
+      check_not_nan(function, "Random variable", n);
+      //check_nonnegative(function, "Random variable", n);
+      check_consistent_sizes(function, 
+                             "Random variable", n, 
+                             "Location parameter", mu, 
+                             "Precision Parameter", phi);
+      
+      VectorView<const T_n> n_vec(n);
+      VectorView<const T_location> mu_vec(mu);
+      VectorView<const T_precision> phi_vec(phi);
+      
+      size_t size_phi_mu = max_size(mu, phi);
+      size_t size_n = length(n);
+      
+      std::vector<typename return_type<T_location, T_precision>::type> phi_mu(size_phi_mu);
+      std::vector<typename return_type<T_n>::type> np1(size_n);
+
+      for (size_t i = 0; i < size_phi_mu; i++)
+        phi_mu[i] = phi_vec[i]/(phi_vec[i]+mu_vec[i]);
+
+      for (size_t i = 0; i < size_n; i++)
+        if (n_vec[i] < 0)
+          return log(0.0);         
+        else if (n_vec[i] + 1 < 0) //avoid int "overflow"
+          np1[i] = n_vec[i];
+        else
+          np1[i] = n_vec[i] + 1;
+      
+      if (size_n == 1) {
+        if (size_phi_mu == 1)
+          return beta_cdf_log(phi_mu[0], phi, np1[0]);                       
+        else
+          return beta_cdf_log(phi_mu, phi, np1[0]);                                 
+      }
+      else {
+        if (size_phi_mu == 1)
+          return beta_cdf_log(phi_mu[0], phi, np1);                       
+        else
+          return beta_cdf_log(phi_mu, phi, np1);                                 
+      }
+    }             
+    
     template <class RNG>
     inline int
     neg_binomial_2_rng(const double mu,
