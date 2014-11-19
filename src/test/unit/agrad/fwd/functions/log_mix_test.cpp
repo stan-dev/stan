@@ -123,63 +123,6 @@ void test_log_mix_f_lam_2(double theta, double lambda1, double lambda2,
   EXPECT_FLOAT_EQ(f.d_,f2.d_);
 }
 
-TEST(AgradFwdLogMix,Fvar) {
-  test_log_mix_fff(0.7, 1.5, -2.0, 1, 0, 0);
-  test_log_mix_fff(0.7, 1.5, -2.0, 0, 1, 0);
-  test_log_mix_fff(0.7, 1.5, -2.0, 0, 0, 1);
-
-  test_log_mix_fff(0.7, -1.5, 2.0, 1, 0, 0);
-  test_log_mix_fff(0.7, -1.5, 2.0, 0, 1, 0);
-  test_log_mix_fff(0.7, -1.5, 2.0, 0, 0, 1);
-
-  test_log_mix_ff_ex_lam_2(0.7, 1.5, -2.0, 1, 0);
-  test_log_mix_ff_ex_lam_2(0.7, 1.5, -2.0, 0, 1);
-  test_log_mix_ff_ex_lam_2(0.7, 1.5, -2.0, 0, 0);
-
-  test_log_mix_ff_ex_lam_2(0.7, -1.5, 2.0, 1, 0);
-  test_log_mix_ff_ex_lam_2(0.7, -1.5, 2.0, 0, 1);
-  test_log_mix_ff_ex_lam_2(0.7, -1.5, 2.0, 0, 0);
-
-  test_log_mix_ff_ex_lam_1(0.7, 1.5, -2.0, 1, 0);
-  test_log_mix_ff_ex_lam_1(0.7, 1.5, -2.0, 0, 1);
-  test_log_mix_ff_ex_lam_1(0.7, 1.5, -2.0, 0, 0);
-
-  test_log_mix_ff_ex_lam_1(0.7, -1.5, 2.0, 1, 0);
-  test_log_mix_ff_ex_lam_1(0.7, -1.5, 2.0, 0, 1);
-  test_log_mix_ff_ex_lam_1(0.7, -1.5, 2.0, 0, 0);
-
-  test_log_mix_ff_ex_theta(0.7, 1.5, -2.0, 1, 0);
-  test_log_mix_ff_ex_theta(0.7, 1.5, -2.0, 0, 1);
-  test_log_mix_ff_ex_theta(0.7, 1.5, -2.0, 0, 0);
-
-  test_log_mix_ff_ex_theta(0.7, -1.5, 2.0, 1, 0);
-  test_log_mix_ff_ex_theta(0.7, -1.5, 2.0, 0, 1);
-  test_log_mix_ff_ex_theta(0.7, -1.5, 2.0, 0, 0);
-
-  test_log_mix_f_theta(0.7, 1.5, -2.0, 1);
-  test_log_mix_f_theta(0.7, 1.5, -2.0, 0);
-
-  test_log_mix_f_theta(0.7, -1.5, 2.0, 1);
-  test_log_mix_f_theta(0.7, -1.5, 2.0, 0);
-
-  test_log_mix_f_lam_1(0.7, 1.5, -2.0, 1);
-  test_log_mix_f_lam_1(0.7, 1.5, -2.0, 0);
-
-  test_log_mix_f_lam_1(0.7, -1.5, 2.0, 1);
-  test_log_mix_f_lam_1(0.7, -1.5, 2.0, 0);
-
-  test_log_mix_f_lam_2(0.7, 1.5, -2.0, 1);
-  test_log_mix_f_lam_2(0.7, 1.5, -2.0, 0);
-
-  test_log_mix_f_lam_2(0.7, -1.5, 2.0, 1);
-  test_log_mix_f_lam_2(0.7, -1.5, 2.0, 0);
-
-  test_log_mix_f_explicit(0.7, 1.5, 5);
-  test_log_mix_f_explicit(0.7, 0.1, 5);
-  test_log_mix_f_explicit(0.999, 0.1, 5);
-  test_log_mix_f_explicit(0.0001, 0.1, 5);
-}  
-
 void test_log_mix_3xfvar_var_D1(double theta,
     double lambda1, double lambda2, double theta_d, 
     double lambda1_d, double lambda2_d){
@@ -226,7 +169,7 @@ void test_log_mix_3xfvar_var_D1(double theta,
   EXPECT_FLOAT_EQ(lambda2_deriv,g[2]);
 }
 
-VEC log_mix_D2(double theta, double lambda1, double lambda2,
+VEC log_mix_D3(double theta, double lambda1, double lambda2,
                double theta_d, double lambda1_d, double lambda2_d,
                double theta_d2, double lambda1_d2, double lambda2_d2){
   using stan::math::log_mix;
@@ -372,10 +315,6 @@ VEC log_mix_D2(double theta, double lambda1, double lambda2,
       = d2_theta * theta_d2 + d2_lambda1 * lambda1_d2
       + d2_lambda2 * lambda2_d2;
           
-    var deriv_v 
-      = d_theta_v * theta_d + d_lambda2_v * lambda2_d 
-               + d_lambda1_v * lambda1_d;
-
     var deriv_2_v 
       = d2_theta_v * theta_d2 + d2_lambda1_v * lambda1_d2
       + d2_lambda2_v * lambda2_d2;
@@ -438,12 +377,12 @@ void test_log_mix_3xfvar_var_D2(double theta,
   VEC g2_func = cgrad(res.d_,theta_fv.val_, lambda1_fv.val_,
      lambda2_fv.val_);
 
-  VEC auto_calc = log_mix_D2(theta, lambda1, lambda2,
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
                              theta_d, lambda1_d, lambda2_d, 0, 0, 0);
 
   size_t k = 5;
   for (size_t i = 0; i < 3; ++i){
-    EXPECT_NEAR(auto_calc[k],g2_func[i],stan::error_handling::CONSTRAINT_TOLERANCE) << "failed on " << k << std::endl;
+    EXPECT_NEAR(auto_calc[k],g2_func[i],8e-13) << "failed on " << k << std::endl;
     ++k;
   }
 
@@ -486,21 +425,20 @@ void test_log_mix_3xfvar_fvar_var_D3(double theta,
   VEC g2_func = cgrad(res.d_.d_,theta_ffv.val_.val_, lambda1_ffv.val_.val_,
      lambda2_ffv.val_.val_);
 
-  VEC auto_calc = log_mix_D2(theta, lambda1, lambda2,
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
                              theta_d, lambda1_d, lambda2_d,
                              theta_d2, lambda1_d2, lambda2_d2);
 
   size_t k = 8;
   for (size_t i = 0; i < 3; ++i){
-    EXPECT_NEAR(auto_calc[k],g2_func[i],stan::error_handling::CONSTRAINT_TOLERANCE) 
+    EXPECT_NEAR(auto_calc[k],g2_func[i],8e-13) 
      << "failed on " << k << std::endl;
     ++k;
   }
 
-
-  EXPECT_NEAR(auto_calc[1],res.d_.d_.val(),stan::error_handling::CONSTRAINT_TOLERANCE);
+  EXPECT_NEAR(auto_calc[1],res.d_.d_.val(),8e-13);
   EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
-  EXPECT_NEAR(result, res.val_.val_.val(),stan::error_handling::CONSTRAINT_TOLERANCE);
+  EXPECT_NEAR(result, res.val_.val_.val(),8e-13);
 }
 
 void test_log_mix_3xfvar_fvar_var_D2(double theta,
@@ -536,16 +474,15 @@ void test_log_mix_3xfvar_fvar_var_D2(double theta,
   VEC g2_func = cgrad(res.d_.val_,theta_ffv.val_.val_, lambda1_ffv.val_.val_,
      lambda2_ffv.val_.val_);
 
-  VEC auto_calc = log_mix_D2(theta, lambda1, lambda2,
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
                              theta_d, lambda1_d, lambda2_d,
                              0, 0, 0);
 
   size_t k = 5;
   for (size_t i = 0; i < 3; ++i){
-    EXPECT_NEAR(auto_calc[k],g2_func[i],stan::error_handling::CONSTRAINT_TOLERANCE) << "failed on " << k << std::endl;
+    EXPECT_NEAR(auto_calc[k],g2_func[i],8e-13) << "failed on " << k << std::endl;
     ++k;
   }
-
 
   EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
   EXPECT_FLOAT_EQ(result, res.val_.val_.val());
@@ -701,6 +638,7 @@ void test_log_mix_2xdouble_lam_1_fvar_var(double theta,
   EXPECT_FLOAT_EQ(deriv, res.d_.val());
   EXPECT_FLOAT_EQ(lambda1_deriv,g[0]);
 }
+
 
 void test_log_mix_2xdouble_lam_2_fvar_var(double theta,
     double lambda1, double lambda2, double lambda2_d){
@@ -883,3 +821,60 @@ TEST(AgradFwdLogMix, FvarVar_Double_Double){
   test_log_mix_2xdouble_lam_2_fvar_var(0.2, -2.0, 6.0, 1);
   test_log_mix_2xdouble_lam_2_fvar_var(0.2, -2.0, 6.0, 0);
 }
+
+TEST(AgradFwdLogMix,Fvar) {
+  test_log_mix_fff(0.7, 1.5, -2.0, 1, 0, 0);
+  test_log_mix_fff(0.7, 1.5, -2.0, 0, 1, 0);
+  test_log_mix_fff(0.7, 1.5, -2.0, 0, 0, 1);
+
+  test_log_mix_fff(0.7, -1.5, 2.0, 1, 0, 0);
+  test_log_mix_fff(0.7, -1.5, 2.0, 0, 1, 0);
+  test_log_mix_fff(0.7, -1.5, 2.0, 0, 0, 1);
+
+  test_log_mix_ff_ex_lam_2(0.7, 1.5, -2.0, 1, 0);
+  test_log_mix_ff_ex_lam_2(0.7, 1.5, -2.0, 0, 1);
+  test_log_mix_ff_ex_lam_2(0.7, 1.5, -2.0, 0, 0);
+
+  test_log_mix_ff_ex_lam_2(0.7, -1.5, 2.0, 1, 0);
+  test_log_mix_ff_ex_lam_2(0.7, -1.5, 2.0, 0, 1);
+  test_log_mix_ff_ex_lam_2(0.7, -1.5, 2.0, 0, 0);
+
+  test_log_mix_ff_ex_lam_1(0.7, 1.5, -2.0, 1, 0);
+  test_log_mix_ff_ex_lam_1(0.7, 1.5, -2.0, 0, 1);
+  test_log_mix_ff_ex_lam_1(0.7, 1.5, -2.0, 0, 0);
+
+  test_log_mix_ff_ex_lam_1(0.7, -1.5, 2.0, 1, 0);
+  test_log_mix_ff_ex_lam_1(0.7, -1.5, 2.0, 0, 1);
+  test_log_mix_ff_ex_lam_1(0.7, -1.5, 2.0, 0, 0);
+
+  test_log_mix_ff_ex_theta(0.7, 1.5, -2.0, 1, 0);
+  test_log_mix_ff_ex_theta(0.7, 1.5, -2.0, 0, 1);
+  test_log_mix_ff_ex_theta(0.7, 1.5, -2.0, 0, 0);
+
+  test_log_mix_ff_ex_theta(0.7, -1.5, 2.0, 1, 0);
+  test_log_mix_ff_ex_theta(0.7, -1.5, 2.0, 0, 1);
+  test_log_mix_ff_ex_theta(0.7, -1.5, 2.0, 0, 0);
+
+  test_log_mix_f_theta(0.7, 1.5, -2.0, 1);
+  test_log_mix_f_theta(0.7, 1.5, -2.0, 0);
+
+  test_log_mix_f_theta(0.7, -1.5, 2.0, 1);
+  test_log_mix_f_theta(0.7, -1.5, 2.0, 0);
+
+  test_log_mix_f_lam_1(0.7, 1.5, -2.0, 1);
+  test_log_mix_f_lam_1(0.7, 1.5, -2.0, 0);
+
+  test_log_mix_f_lam_1(0.7, -1.5, 2.0, 1);
+  test_log_mix_f_lam_1(0.7, -1.5, 2.0, 0);
+
+  test_log_mix_f_lam_2(0.7, 1.5, -2.0, 1);
+  test_log_mix_f_lam_2(0.7, 1.5, -2.0, 0);
+
+  test_log_mix_f_lam_2(0.7, -1.5, 2.0, 1);
+  test_log_mix_f_lam_2(0.7, -1.5, 2.0, 0);
+
+  test_log_mix_f_explicit(0.7, 1.5, 5);
+  test_log_mix_f_explicit(0.7, 0.1, 5);
+  test_log_mix_f_explicit(0.999, 0.1, 5);
+  test_log_mix_f_explicit(0.0001, 0.1, 5);
+}  
