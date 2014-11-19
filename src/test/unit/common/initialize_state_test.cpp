@@ -388,6 +388,8 @@ TEST_F(StanCommon, get_double_from_string) {
 TEST(initialize_state, rm_indices_from_name) {
   std::string name1("alpha.1");
   std::vector<std::string> v;
+  stan::common::rm_indices_from_name(v);
+  EXPECT_EQ(0L, v.size());
   v.push_back(name1);
   stan::common::rm_indices_from_name(name1);
   EXPECT_STREQ("alpha", name1.c_str());
@@ -396,6 +398,12 @@ TEST(initialize_state, rm_indices_from_name) {
   v.push_back("beta.3");
   stan::common::rm_indices_from_name(v);
   EXPECT_EQ(2L, v.size());
+
+  std::string name2("gamma");
+  stan::common::rm_indices_from_name(name2);
+  EXPECT_STREQ("gamma", name1.c_str());
+
+
 }
 
 // Another complicated mock model with parameters as follows
