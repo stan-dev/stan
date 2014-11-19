@@ -35,9 +35,6 @@
 \usepackage{lscape}
 \usepackage{relsize} % defines \mathlarger
 
-\usepackage{minted}
-\usemintedstyle{emacs}
-\setminted{fontsize=\small}
 
 \usepackage[titles]{tocloft}
 \setlength{\cftbeforechapskip}{1ex}
@@ -191,12 +188,14 @@
 \renewcommand{\floatpagefraction}{0.75}
 \renewcommand{\textfraction}{0.07}
 
-<<<<<<< HEAD
+\usepackage{xcolor}
+\usepackage{minted}
 
-=======
+\newminted[stancode]{stan}{xleftmargin=2em,fontsize=small,}
+
+
 % environment for Stan code
-\DefineVerbatimEnvironment{stancode}{Verbatim}{fontsize=\small,xleftmargin=2em}
->>>>>>> origin/develop
+% \DefineVerbatimEnvironment{stancode}{Verbatim}{fontsize=\small,xleftmargin=2em}
 
 \raggedbottom
 
