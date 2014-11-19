@@ -238,8 +238,8 @@ namespace stan {
       check_not_nan(function, "Random variable", y);
       check_consistent_sizes(function, 
                              "Random variable", y, 
-                             "Shape parameter", alpha, 
-                             "Scale Parameter", beta);
+                             "First shape parameter", alpha, 
+                             "Second shape parameter", beta);
       check_nonnegative(function, "Random variable", y);
       check_less_or_equal(function, "Random variable", y, 1);
 
@@ -386,8 +386,8 @@ namespace stan {
       check_less_or_equal(function, "Random variable", y, 1);
       check_consistent_sizes(function, 
                              "Random variable", y, 
-                             "Shape parameter", alpha, 
-                             "Scale Parameter", beta);
+                             "First shape parameter", alpha, 
+                             "Second shape parameter", beta);
       
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -505,8 +505,8 @@ namespace stan {
       check_less_or_equal(function, "Random variable", y, 1);
       check_consistent_sizes(function, 
                              "Random variable", y, 
-                             "Shape parameter", alpha, 
-                             "Scale Parameter", beta);
+                             "First shape parameter", alpha, 
+                             "Second shape parameter", beta);
       
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
