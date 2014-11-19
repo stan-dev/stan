@@ -113,8 +113,7 @@ just the square root of the average squared residual,
 The squared error approach to linear regression can be directly coded
 in Stan with the following model.
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
   int<lower=0> N;
   int<lower=1> K;
@@ -135,8 +134,7 @@ generated quantities {
   real<lower=0> sigma_squared;
   sigma_squared <- squared_error / N;
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 Running Stan's optimizer on this model produces the MLE for the linear
 regression by directly minimizing the sum of squared errors and using
@@ -224,19 +222,17 @@ maximum likelihood estimate.
 In Stan, adding the ridge penalty involves adding its magnitude as a
 data variable and the penalty itself to the model block,
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
-  ...
+  // ...
   real<lower=0> lambda;
 }
-...
+// ...
 model {
-  ...
+  // ...
   increment_log_prob(- lambda * dot_self(beta));
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The noise term calculation remains the same.
 
@@ -269,20 +265,18 @@ The lasso can be implemented in Stan just as easily as ridge
 regression, with the magnitude declared as data and the penalty added
 to the model block,
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
-  ...
+  // ...
   real<lower=0> lambda;
 }
-...
+// ...
 model {
-  ...
+  // ...
   for (k in 1:K)
     increment_log_prob(- lambda * abs(beta[k]));
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 \subsubsection{The Elastic Net}
 
@@ -298,22 +292,20 @@ the lasso, providing both identification and variable selection.
 The naive elastic net can be implemented directly in Stan by combining
 implementations of ridge regression and the lasso, as
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
   real<lower=0> lambda1;
   real<lower=0> lambda2;
-  ...
+  // ...
 }
-...
+// ...
 model {
-  ...
+  // ...
   increment_log_prob(lambda2 * dot_self(beta));
   for (k in 1:K)
     increment_log_prob(lambda1 * abs(beta[k]));
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 
 The elastic net \citep{ZouHastie:2005} involves adjusting the final estimate for
@@ -328,15 +320,13 @@ To implement the elastic net in Stan, the data, parameter, and model
 blocks are the same as for the naive elastic net.  In addition, the
 elastic net estimate is calculated in the generated quantities block.
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 generated quantities {
   vector[K] beta_elastic_net;
-  ...
+  // ...
   beta_elastic_net <- (1 + lambda2) * beta;
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The error scale also needs to be calculated in the generated
 quantities block based on the elastic net coefficients

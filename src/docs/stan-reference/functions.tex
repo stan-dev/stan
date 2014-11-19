@@ -27,11 +27,9 @@ repeated application and assignment in a loop.
 
 The normal probability function is specified with the signature
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 normal_log(reals,reals,reals);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The pseudo-type \code{reals} is used to indicate that an argument
 position may be vectorized.  Argument positions declared as
@@ -46,11 +44,9 @@ row vector have the same size.
 
 The multivariate normal distribution accepting vector or array of
 vector arguments is written as
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 multi_normal_log(vectors,vectors,matrix);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 \subsection{Vectorized Integer Arguments}
 
@@ -65,38 +61,30 @@ namely \code{real} or \code{int}, is repeated.  For instance, if
 \code{y} is a vector of size \code{N}, \code{mu} is a vector of size
 \code{N}, and \code{sigma} is a scalar, then
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 ll <- normal_log(y, mu, sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 is just a more efficient way to write
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 ll <- 0;
 for (n in 1:N)
   ll <- ll + normal_log(y[n], mu[n], sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 With the same arguments, the vectorized sampling statement
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 y ~ normal(mu, sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 has the same effect on the total log probability as
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 for (n in 1:N)
   y[n] ~ normal(mu[n], sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 
 
@@ -591,30 +579,24 @@ with mulitplications by step functions.  For example, if \code{y} is a
 scalar expressions (type \code{real} or \code{int}), then the
 assignment statements
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 y <- x1 * step(c) + x2 * (1 - step(c));
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 and
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 y <- if_else(c > 0, x1, x2);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 are more efficiently written with the conditional statement
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 if (c > 0)
   y <- x1;
 else
   y <- x2;
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The reason the functional versions are slower is that they evaluate
 all of their arguments; the step function approach is particularly
@@ -1666,12 +1648,10 @@ function.  The \code{dims()} function is defined to take an argument
 consisting of any variable with up to 8 array dimensions (and up to 2
 additional matrix dimensions) and returns an array of integers with
 the dimensions.  For example, if two variables are declared as follows,
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real x[7,8,9];
 matrix[8,9] y[7];
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 then calling \code{dims(x)} or \code{dims(y)} returns an integer 
 array of size 3 containing the elements 7, 8, and 9 in that order. 
@@ -1730,8 +1710,7 @@ important because it is not possible to assign an integer array to a
 real array.  For example, the following example contrasts legal with
 illegal array creation and assignment
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real y[5];
 int x[5];
 
@@ -1743,37 +1722,32 @@ y <- rep_array(1,5);     // illegal
 
 x <- y;                  // illegal
 y <- x;                  // illegal
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 If the value being repeated \code{v} is a vector (i.e., \code{T} is
 \code{vector}), then \code{rep\_array(v,27)} is a size 27 array
 consisting of 27 copies of the vector \code{v}.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 vector[5] v;
 vector[5] a[3];
-...
+// ...
 a <- rep_array(v,3);  // fill a with copies of v
 a[2,4] <- 9.0;        // v[4], a[1,4], a[2,4] unchanged
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 If the type \farg{T} of \farg{x} is itself an array type, then the
 result will be an array with one, two, or three added dimensions,
 depending on which of the \code{rep\_array} functions is called.  For
 instance, consider the following legal code snippet.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real a[5,6];
 real b[3,4,5,6];
-...
+// ...
 b <- rep_array(a,3,4); //  make (3 x 4) copies of a
 b[1,1,1,1] <- 27.9;    //  a[1,1] unchanged
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 After the assignment to \code{b}, the value for \code{b[j,k,m,n]} is
 equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
@@ -2429,13 +2403,11 @@ distinction between integer and real arguments, the following two
 statements produce the same result for vector broadcasting;  row vector
 and matrix broadcasting behave similarly.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 vector[3] x;
 x <- rep_vector(1, 3);
 x <- rep_vector(1.0, 3);  
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 There are no integer vector or matrix types, so integer values are
 automatically promoted.
