@@ -162,8 +162,8 @@ clean:
 clean-dox:
 	$(RM) -r doc/api
 
-clean-manual:
-	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
+# clean-manual:
+# 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 clean-deps:
 	@echo '  removing dependency files'

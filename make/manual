@@ -11,5 +11,8 @@ manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
 
 MANUAL_FLAGS=
 
+clean-manual:
+	cd $(dir $@); latexmk -C $(notdir $^)
+
 %.pdf: %.tex
-	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex --shell-escape -interaction nonstopmode -file-line-error" -use-make $(notdir $^)
+	cd $(dir $@); latexmk -pdf -bibtex -pdflatex="pdflatex --shell-escape -interaction nonstopmode -file-line-error" $(notdir $^)
