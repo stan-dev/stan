@@ -1815,14 +1815,12 @@ based on the fact that as $\kappa \rightarrow \infty$,
 %
 The workaround is to replace \Verb|y ~ von_mises(mu,kappa)| with
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 if (kappa < 100)
   y ~ von_mises(mu, kappa);
 else 
   y ~ normal(mu, sqrt(1 / kappa));
-\end{Verbatim}
-\end{quote} 
+\end{stancode} 
 
 
 \chapter{Bounded Continuous Probabilities}
@@ -2293,14 +2291,12 @@ it is better to operationalize them in terms of their Cholesky factors.
 If you are interested in the posterior distribution of the correlations,
 you can recover them in the generated quantities block via
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 generated quantities {
   corr_matrix[K] Sigma;
   Sigma <- multiply_lower_tri_self_transpose(L);
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 \section{LKJ Correlation Distribution}\label{lkj-correlation.section}
 
@@ -2364,12 +2360,10 @@ density in terms of its Cholesky factor, which you should use rather
 than the explicit parameterization in the previous section. For example, 
 if \code{L} is a Cholesky factor of a correlation matrix, then
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 L ~ lkj_corr_cholesky(2.0);
 # implies L * L' ~ lkj_corr(2.0);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 Because Stan requires models to have support on all valid constrained
 parameters, \code{L} will almost always
@@ -2380,14 +2374,12 @@ would then require Jacobian adjustments to imply the intended posterior.}
 be a parameter declared with the type of a
 Cholesky factor for a correlation matrix; for example,
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 parameters {
   cholesky_factor_corr[K] L; 
   # rather than corr_matrix[K] Sigma;
-  ...
-\end{Verbatim}
-\end{quote}
+  // ...
+\end{stancode}
 %
 
 
