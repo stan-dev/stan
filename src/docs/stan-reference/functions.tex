@@ -393,11 +393,11 @@ carried out by first promoting the integer value.
   \fitem{int}{operator<}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is less than \farg{y} and 0 otherwise.
     \[
-    (x \mbox{<} y) = 
-    \mbox{operator\textless}(x,y) =
+    (x \text{\textless} y) = 
+    \text{operator\textless}(x,y) =
     \begin{cases}
-      1 & \mbox{if } x < y\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x < y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -405,11 +405,11 @@ carried out by first promoting the integer value.
   \fitem{int}{operator<=}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is less than or equal \farg{y} and 0 otherwise.
     \[
-    (x \mbox{<=} y)
-    = \mbox{operator\textless=}(x,y)
+    (x \text{\textless=} y)
+    = \text{operator\textless=}(x,y)
     = \begin{cases}
-        1 & \mbox{if } x \leq y\\
-        0 & \mbox{otherwise}
+        1 & \text{if $x \leq y$} \\
+        0 & \text{otherwise}
       \end{cases}
     \]}
   %
@@ -417,11 +417,11 @@ carried out by first promoting the integer value.
   \fitem{int}{operator>}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is greater than \farg{y} and 0 otherwise.
     \[
-    (x \mbox{>} y) = 
-    \mbox{operator\textgreater}(x,y) = 
+    (x \text{\textgreater} y) = 
+    \text{operator\textgreater}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x > y\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x > y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -430,11 +430,11 @@ carried out by first promoting the integer value.
     Returns 1 if \farg{x} is greater than or equal to \farg{y}
     and 0 otherwise.
     \[
-    (x \mbox{>=} y) =
-    \mbox{operator\textgreater=}(x,y) = 
+    (x \text{\textgreater=} y) =
+    \text{operator\textgreater=}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x \geq y \\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \geq y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -442,11 +442,11 @@ carried out by first promoting the integer value.
   \fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is equal to \farg{y} and 0 otherwise.
     \[
-    (x \mbox{==} y) = 
-    \mbox{operator==}(x,y) = 
+    (x \text{==} y) = 
+    \text{operator==}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x = y \\
-      0 & \mbox{otherwise}
+      1 & \text{if $x = y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -454,11 +454,11 @@ carried out by first promoting the integer value.
   \fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is not equal to \farg{y} and 0 otherwise.
     \[
-    (x \mbox{!=} y) = 
-    \mbox{operator!=}(x,y) = 
+    (x \text{!=} y) = 
+    \text{operator!=}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x \neq y \\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \neq y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}{operator"!"=}
   %
@@ -483,11 +483,11 @@ tightly than the comparisons.  Thus an expression such as
   \fitemindex{int}{operator!}{real \farg{x}}{
     Returns 1 if \farg{x} is zero and 0 otherwise.
     \[
-    (\mbox{!}x) =
-    \mbox{operator!}(x) = 
+    (\text{!}x) =
+    \text{operator!}(x) = 
     \begin{cases}
-      0 & \mbox{if } x \neq 0 \\
-      1 & \mbox{if } x = 0
+      0 & \text{if $x \neq 0$} \\
+      1 & \text{if $x = 0$}
     \end{cases}
     \]}{operator"!}
   %
@@ -495,11 +495,11 @@ tightly than the comparisons.  Thus an expression such as
   \fitem{int}{operator{\&\&}}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is unequal to 0 and \farg{y} is unequal to 0.
     \[
-    (x \mbox{\&\&} y) =
-    \mbox{operator\&\&}(x,y) = 
+    (x \text{\&\&} y) =
+    \text{operator\&\&}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x \neq 0 \mbox{ and } y \neq 0\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \neq 0$} \text{ and } y \neq 0\\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -507,11 +507,14 @@ tightly than the comparisons.  Thus an expression such as
   \fitemindex{int}{operator||}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is unequal to 0 or \farg{y} is unequal to 0.
     \[
-    (x \mbox{||} y) = 
-    \mbox{operator||}(x,y) = 
+    (x \vert\vert y) = 
+    % \textpipe from tipa package causes errors elsewhere
+    % | does not render correctly, instead rendering as a horizonal bar
+    % using math \vert seems the only option
+    \text{operator||}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x \neq 0 \textrm{ or } y \neq 0\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \neq 0$} \textrm{ or } y \neq 0\\
+      0 & \text{otherwise}
     \end{cases}
     \]
   }{operator"|"|}
