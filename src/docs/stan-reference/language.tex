@@ -4405,7 +4405,7 @@ expression ::= numeric_literal
              | expression postfixOp
              | expression '[' expressions ']'
              | function_literal '(' ?expressions ')'
-             | ode_solve '(' function_literal (',' expression){6} ')'
+             | integrate_ode '(' function_literal (',' expression){6} ')'
              | '(' expression ')'
 
 expressions ::= expression % ','
