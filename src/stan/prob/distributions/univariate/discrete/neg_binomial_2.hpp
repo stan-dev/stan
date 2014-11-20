@@ -282,7 +282,6 @@ namespace stan {
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);
-      //check_nonnegative(function, "Random variable", n);
       check_consistent_sizes(function, 
                              "Random variable", n, 
                              "Location parameter", mu, 
@@ -304,10 +303,8 @@ namespace stan {
       for (size_t i = 0; i < size_n; i++)
         if (n_vec[i] < 0)
           return 0.0;         
-        else if (n_vec[i] + 1 < 0) //avoid int "overflow"
-          np1[i] = n_vec[i];
         else
-          np1[i] = n_vec[i] + 1;
+          np1[i] = n_vec[i] + 1.0;
       
       if (size_n == 1) {
         if (size_phi_mu == 1)
@@ -345,7 +342,6 @@ namespace stan {
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);
-      //check_nonnegative(function, "Random variable", n);
       check_consistent_sizes(function, 
                              "Random variable", n, 
                              "Location parameter", mu, 
@@ -366,11 +362,9 @@ namespace stan {
 
       for (size_t i = 0; i < size_n; i++)
         if (n_vec[i] < 0)
-          return log(0.0);         
-        else if (n_vec[i] + 1 < 0) //avoid int "overflow"
-          np1[i] = n_vec[i];
+          return log(0.0);
         else
-          np1[i] = n_vec[i] + 1;
+          np1[i] = n_vec[i] + 1.0;
       
       if (size_n == 1) {
         if (size_phi_mu == 1)
@@ -385,6 +379,108 @@ namespace stan {
           return beta_cdf_log(phi_mu, phi, np1);                                 
       }
     }             
+
+    namespace {
+      
+      //modified version of beta_ccdf_log
+      //used in neg_binomial_2_ccdf_log
+      //modifications made: remove unnecessary validations and include:
+      //if (beta_dbl < 1)
+      //  continue;
+      template <typename T_y, typename T_scale_succ, typename T_scale_fail>
+      typename return_type<T_y,T_scale_succ,T_scale_fail>::type
+      beta_ccdf_log_modified(const T_y& y, const T_scale_succ& alpha, 
+                    const T_scale_fail& beta) {
+        
+        double ccdf_log(0.0);
+        
+        // Wrap arguments in vectors
+        VectorView<const T_y> y_vec(y);
+        VectorView<const T_scale_succ> alpha_vec(alpha);
+        VectorView<const T_scale_fail> beta_vec(beta);
+        size_t N = max_size(y, alpha, beta);
+
+        agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
+          operands_and_partials(y, alpha, beta);
+
+        // Compute CDF and its gradients
+        using boost::math::ibeta;
+        using boost::math::ibeta_derivative;
+        using boost::math::digamma;
+          
+        // Cache a few expensive function calls if alpha or beta is a parameter
+        DoubleVectorView<!is_constant_struct<T_scale_succ>::value 
+                         || !is_constant_struct<T_scale_fail>::value,
+          is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+          digamma_alpha_vec(max_size(alpha, beta));
+        DoubleVectorView<!is_constant_struct<T_scale_succ>::value 
+                         || !is_constant_struct<T_scale_fail>::value,
+          is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+          digamma_beta_vec(max_size(alpha, beta));
+        DoubleVectorView<!is_constant_struct<T_scale_succ>::value
+                         || !is_constant_struct<T_scale_fail>::value,
+          is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+          digamma_sum_vec(max_size(alpha, beta));        
+        DoubleVectorView<!is_constant_struct<T_scale_succ>::value
+                         || !is_constant_struct<T_scale_fail>::value,
+          is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+          betafunc_vec(max_size(alpha, beta));
+          
+        if (!is_constant_struct<T_scale_succ>::value 
+            || !is_constant_struct<T_scale_fail>::value) {
+              
+          for (size_t i = 0; i < N; i++) {
+
+            const double alpha_dbl = value_of(alpha_vec[i]);
+            const double beta_dbl = value_of(beta_vec[i]);
+                  
+            digamma_alpha_vec[i] = digamma(alpha_dbl);
+            digamma_beta_vec[i] = digamma(beta_dbl);
+            digamma_sum_vec[i] = digamma(alpha_dbl + beta_dbl);
+            betafunc_vec[i] = boost::math::beta(alpha_dbl, beta_dbl);
+          }
+        }
+          
+        // Compute vectorized CDFLog and gradient
+        for (size_t n = 0; n < N; n++) {
+                
+          // Pull out values
+          const double y_dbl = value_of(y_vec[n]);
+          const double alpha_dbl = value_of(alpha_vec[n]);
+          const double beta_dbl = value_of(beta_vec[n]);
+          
+          if (beta_dbl < 1)
+            continue;
+                    
+          // Compute
+          const double Pn = 1.0 - ibeta(alpha_dbl, beta_dbl, y_dbl);
+
+          ccdf_log += log(Pn);
+                    
+          if (!is_constant_struct<T_y>::value)
+            operands_and_partials.d_x1[n] -= 
+              ibeta_derivative(alpha_dbl, beta_dbl, y_dbl) / Pn;
+
+          double g1 = 0;
+          double g2 = 0;
+                
+          if (!is_constant_struct<T_scale_succ>::value
+              || !is_constant_struct<T_scale_fail>::value) {
+            stan::math::gradRegIncBeta(g1, g2, alpha_dbl, beta_dbl, y_dbl, 
+                                       digamma_alpha_vec[n], 
+                                       digamma_beta_vec[n], digamma_sum_vec[n], 
+                                       betafunc_vec[n]);
+          }
+          if (!is_constant_struct<T_scale_succ>::value)
+            operands_and_partials.d_x2[n] -= g1 / Pn;
+          if (!is_constant_struct<T_scale_fail>::value)
+            operands_and_partials.d_x3[n] -= g2 / Pn;
+        }
+          
+        return operands_and_partials.to_var(ccdf_log);
+      }      
+      
+    }
     
     template <typename T_n, typename T_location, 
               typename T_precision>
@@ -408,7 +504,6 @@ namespace stan {
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);
-      //check_nonnegative(function, "Random variable", n);
       check_consistent_sizes(function, 
                              "Random variable", n, 
                              "Location parameter", mu, 
@@ -423,30 +518,30 @@ namespace stan {
       
       std::vector<typename return_type<T_location, T_precision>::type> phi_mu(size_phi_mu);
       std::vector<typename return_type<T_n>::type> np1(size_n);
+      std::vector<size_t> np_zeros;
 
       for (size_t i = 0; i < size_phi_mu; i++)
         phi_mu[i] = phi_vec[i]/(phi_vec[i]+mu_vec[i]);
 
       for (size_t i = 0; i < size_n; i++)
         if (n_vec[i] < 0)
-          return 0.0; //log(1.0)        
-        else if (n_vec[i] + 1 < 0) //avoid int "overflow"
-          np1[i] = n_vec[i];
+          np1[i] = 0.9;        
         else
-          np1[i] = n_vec[i] + 1;
-      
+          np1[i] = n_vec[i] + 1.0;
+              
       if (size_n == 1) {
         if (size_phi_mu == 1)
-          return beta_ccdf_log(phi_mu[0], phi, np1[0]);                       
+          return beta_ccdf_log_modified(phi_mu[0], phi, np1[0]);                       
         else
-          return beta_ccdf_log(phi_mu, phi, np1[0]);                                 
+          return beta_ccdf_log_modified(phi_mu, phi, np1[0]);                   
       }
       else {
         if (size_phi_mu == 1)
-          return beta_ccdf_log(phi_mu[0], phi, np1);                       
+          return beta_ccdf_log_modified(phi_mu[0], phi, np1);                       
         else
-          return beta_ccdf_log(phi_mu, phi, np1);                                 
+          return beta_ccdf_log_modified(phi_mu, phi, np1);                                 
       }
+    
     }             
     
     template <class RNG>
