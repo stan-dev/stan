@@ -391,7 +391,9 @@ namespace stan {
       typename return_type<T_y,T_scale_succ,T_scale_fail>::type
       beta_ccdf_log_modified(const T_y& y, const T_scale_succ& alpha, 
                     const T_scale_fail& beta) {
-        
+
+        using stan::math::value_of;
+
         double ccdf_log(0.0);
         
         // Wrap arguments in vectors
