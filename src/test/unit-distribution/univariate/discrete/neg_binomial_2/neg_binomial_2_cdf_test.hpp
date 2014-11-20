@@ -26,6 +26,36 @@ public:
     param[2] = 10;           // phi
     parameters.push_back(param);
     cdf.push_back(0.09189925); // expected cdf
+    
+    param[0] = 0;          // n
+    param[1] = 15;          // mu
+    param[2] = 10;           // phi
+    parameters.push_back(param);
+    cdf.push_back(0.0001048576); // expected ccdf
+    
+    param[0] = 1;          // n
+    param[1] = 15;          // mu
+    param[2] = 10;           // phi
+    parameters.push_back(param);
+    cdf.push_back(0.0007340032); // expected ccdf
+    
+    param[0] = 0;          // n
+    param[1] = 10;          // mu
+    param[2] = 1;           // phi
+    parameters.push_back(param);
+    cdf.push_back(0.09090909); // expected ccdf
+    
+    param[0] = -1;          // n
+    param[1] = 10;          // mu
+    param[2] = 1;           // phi
+    parameters.push_back(param);
+    cdf.push_back(0); // expected ccdf
+    
+    param[0] = -89;          // n
+    param[1] = 10;          // mu
+    param[2] = 1;           // phi
+    parameters.push_back(param);
+    cdf.push_back(0); // expected ccdf
   }
   
   void invalid_values(vector<size_t>& index, 
