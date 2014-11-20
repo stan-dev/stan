@@ -14,12 +14,17 @@
 /doc/*.pdf
 
 # temporary latex files
-*~
 *.idx
 *.ilg
 *.ind
 *.fdb_latexmk
 *.fls
+
+# temporary emacs files
+*~
+\#*#
+auto/
+
 
 # depedencies files
 *.d
