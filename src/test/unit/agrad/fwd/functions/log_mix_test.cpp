@@ -5,12 +5,14 @@
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <cmath>
-
+#include <typeinfo>
 
 void test_log_mix_fff(double theta, double lambda1, double lambda2,
                       double theta_d, double lambda1_d, double lambda2_d){
   using stan::agrad::fvar;
   using stan::math::log_mix;
+  using ::exp;
+  using ::log;
 
   fvar<double> theta_f(theta,theta_d);
   fvar<double> lambda1_f(lambda1,lambda1_d);
@@ -46,12 +48,14 @@ void test_log_mix_ff_ex_lam_2(double theta, double lambda1, double lambda2,
                               double theta_d, double lambda1_d){
   using stan::agrad::fvar;
   using stan::math::log_mix;
+  using ::exp;
 
   fvar<double> theta_f(theta,theta_d);
   fvar<double> lambda1_f(lambda1,lambda1_d);
 
   fvar<double> f = log_mix(theta_f, lambda1_f, lambda2);
   fvar<double> f2 = log(theta_f * exp(lambda1_f) + (1 - theta_f) * exp(lambda2));
+
   EXPECT_FLOAT_EQ(f.val_,f2.val_);
   EXPECT_FLOAT_EQ(f.d_,f2.d_);
 }
@@ -391,6 +395,447 @@ void test_log_mix_3xfvar_var_D2(double theta,
   EXPECT_FLOAT_EQ(deriv, res.d_.val());
 }
 
+void test_log_mix_2xdouble_fvar_fvar_var_theta_D3(double theta,
+    double lambda1, double lambda2, 
+    double theta_d,double theta_d2){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > theta_ffv;
+  theta_ffv.val_.val_ = theta;
+  theta_ffv.val_.d_ = theta_d2;
+  theta_ffv.d_.val_ = theta_d;
+
+  fvar<fvar<var> > res = log_mix(theta_ffv, lambda1, lambda2);
+  double result = log_mix(theta_ffv.val_.val_.val(), 
+                          lambda1, 
+                          lambda2);
+
+  VEC g2_func = cgrad(res.d_.d_,theta_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             theta_d, 0, 0,
+                             theta_d2, 0, 0);
+
+  EXPECT_NEAR(auto_calc[8],g2_func[0],8e-13); 
+
+  EXPECT_NEAR(auto_calc[1],res.d_.d_.val(),8e-13);
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_NEAR(result, res.val_.val_.val(),8e-13);
+}
+
+void test_log_mix_2xdouble_fvar_fvar_var_lam_1_D3(double theta,
+    double lambda1, double lambda2, double lambda1_d, 
+    double lambda1_d2){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > lambda1_ffv;
+  lambda1_ffv.val_.val_ = lambda1;
+  lambda1_ffv.val_.d_ = lambda1_d2;
+  lambda1_ffv.d_.val_ = lambda1_d;
+
+  fvar<fvar<var> > res = log_mix(theta, lambda1_ffv, lambda2);
+  double result = log_mix(theta, 
+                          lambda1_ffv.val_.val_.val(), 
+                          lambda2);
+
+  VEC g2_func = cgrad(res.d_.d_,lambda1_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             0, lambda1_d, 0,
+                             0, lambda1_d2, 0);
+
+  EXPECT_NEAR(auto_calc[9],g2_func[0],8e-13); 
+
+  EXPECT_NEAR(auto_calc[1],res.d_.d_.val(),8e-13);
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_NEAR(result, res.val_.val_.val(),8e-13);
+}
+
+void test_log_mix_2xdouble_fvar_fvar_var_lam_2_D3(double theta,
+    double lambda1, double lambda2,double lambda2_d, 
+    double lambda2_d2){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > lambda2_ffv;
+  lambda2_ffv.val_.val_ = lambda2;
+  lambda2_ffv.val_.d_ = lambda2_d2;
+  lambda2_ffv.d_.val_ = lambda2_d;
+
+  fvar<fvar<var> > res = log_mix(theta, lambda1, lambda2_ffv);
+  double result = log_mix(theta, 
+                          lambda1, 
+                          lambda2_ffv.val_.val_.val());
+
+  VEC g2_func = cgrad(res.d_.d_,lambda2_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             0, 0, lambda2_d,
+                             0, 0, lambda2_d2);
+
+  EXPECT_NEAR(auto_calc[10],g2_func[0],8e-13); 
+
+  EXPECT_NEAR(auto_calc[1],res.d_.d_.val(),8e-13);
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_NEAR(result, res.val_.val_.val(),8e-13);
+}
+
+void test_log_mix_2xfvar_fvar_var_ex_theta_D3(double theta,
+    double lambda1, double lambda2,  
+    double lambda1_d, double lambda2_d,
+    double lambda1_d2, double lambda2_d2){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > lambda1_ffv;
+  fvar<fvar<var> > lambda2_ffv;
+
+  lambda1_ffv.val_.val_ = lambda1;
+  lambda2_ffv.val_.val_ = lambda2;
+
+  lambda1_ffv.val_.d_ = lambda1_d2;
+  lambda2_ffv.val_.d_ = lambda2_d2;
+
+  lambda1_ffv.d_.val_ = lambda1_d;
+  lambda2_ffv.d_.val_ = lambda2_d;
+
+  fvar<fvar<var> > res = log_mix(theta, lambda1_ffv, lambda2_ffv);
+  double result = log_mix(theta, 
+                          lambda1_ffv.val_.val_.val(), 
+                          lambda2_ffv.val_.val_.val());
+
+  VEC g2_func = cgrad(res.d_.d_,lambda1_ffv.val_.val_,
+     lambda2_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             0, lambda1_d, lambda2_d,
+                             0, lambda1_d2, lambda2_d2);
+
+  size_t k = 9;
+  for (size_t i = 0; i < 2; ++i){
+    EXPECT_NEAR(auto_calc[k],g2_func[i],8e-13) 
+     << "failed on " << k << std::endl;
+    ++k;
+  }
+
+  EXPECT_NEAR(auto_calc[1],res.d_.d_.val(),8e-13);
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_NEAR(result, res.val_.val_.val(),8e-13);
+}
+
+void test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(double theta,
+    double lambda1, double lambda2, double theta_d, 
+    double lambda2_d, double lambda2_d2, double theta_d2){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > theta_ffv;
+  fvar<fvar<var> > lambda2_ffv;
+
+  theta_ffv.val_.val_ = theta;
+  lambda2_ffv.val_.val_ = lambda2;
+
+  theta_ffv.val_.d_ = theta_d2;
+  lambda2_ffv.val_.d_ = lambda2_d2;
+
+  theta_ffv.d_.val_ = theta_d;
+  lambda2_ffv.d_.val_ = lambda2_d;
+
+  fvar<fvar<var> > res = log_mix(theta_ffv, lambda1, lambda2_ffv);
+  double result = log_mix(theta_ffv.val_.val_.val(), 
+                          lambda1, 
+                          lambda2_ffv.val_.val_.val());
+
+  VEC g2_func = cgrad(res.d_.d_,theta_ffv.val_.val_,
+     lambda2_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             theta_d, 0, lambda2_d,
+                             theta_d2, 0, lambda2_d2);
+
+  EXPECT_NEAR(auto_calc[8],g2_func[0],8e-13);
+  EXPECT_NEAR(auto_calc[10],g2_func[1],8e-13);
+
+  EXPECT_NEAR(auto_calc[1],res.d_.d_.val(),8e-13);
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_NEAR(result, res.val_.val_.val(),8e-13);
+}
+
+void test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(double theta,
+    double lambda1, double lambda2, double theta_d, 
+    double lambda1_d, double lambda1_d2, double theta_d2){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > theta_ffv;
+  fvar<fvar<var> > lambda1_ffv;
+
+  theta_ffv.val_.val_ = theta;
+  lambda1_ffv.val_.val_ = lambda1;
+
+  theta_ffv.val_.d_ = theta_d2;
+  lambda1_ffv.val_.d_ = lambda1_d2;
+
+  theta_ffv.d_.val_ = theta_d;
+  lambda1_ffv.d_.val_ = lambda1_d;
+
+  fvar<fvar<var> > res = log_mix(theta_ffv, lambda1_ffv, lambda2);
+  double result = log_mix(theta_ffv.val_.val_.val(), 
+                          lambda1_ffv.val_.val_.val(), 
+                          lambda2);
+
+  VEC g2_func = cgrad(res.d_.d_,theta_ffv.val_.val_, lambda1_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             theta_d, lambda1_d, 0,
+                             theta_d2, lambda1_d2, 0);
+
+  size_t k = 8;
+  for (size_t i = 0; i < 2; ++i){
+    EXPECT_NEAR(auto_calc[k],g2_func[i],8e-13) 
+     << "failed on " << k << std::endl;
+    ++k;
+  }
+
+  EXPECT_NEAR(auto_calc[1],res.d_.d_.val(),8e-13);
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_NEAR(result, res.val_.val_.val(),8e-13);
+}
+
+void test_log_mix_2xdouble_fvar_fvar_var_theta_D2(double theta,
+    double lambda1, double lambda2, double theta_d){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > theta_ffv;
+  theta_ffv.val_.val_ = theta;
+  theta_ffv.val_.d_ = theta_d;
+  theta_ffv.d_.val_ = theta_d;
+
+  fvar<fvar<var> > res = log_mix(theta_ffv, lambda1, lambda2);
+  double result = log_mix(theta_ffv.val_.val_.val(), 
+                          lambda1, 
+                          lambda2);
+
+  VEC g2_func = cgrad(res.d_.val_,theta_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             theta_d, 0, 0,
+                             0, 0, 0);
+
+  EXPECT_NEAR(auto_calc[5],g2_func[0],8e-13);
+
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_FLOAT_EQ(result, res.val_.val_.val());
+}
+
+void test_log_mix_2xdouble_fvar_fvar_var_lam_1_D2(double theta,
+    double lambda1, double lambda2, double lambda1_d){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > lambda1_ffv;
+  lambda1_ffv.val_.val_ = lambda1;
+  lambda1_ffv.val_.d_ = lambda1_d;
+  lambda1_ffv.d_.val_ = lambda1_d;
+
+  fvar<fvar<var> > res = log_mix(theta, lambda1_ffv, lambda2);
+  double result = log_mix(theta, 
+                          lambda1_ffv.val_.val_.val(), 
+                          lambda2);
+
+  VEC g2_func = cgrad(res.d_.val_,lambda1_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             0, lambda1_d, 0,
+                             0, 0, 0);
+
+  EXPECT_NEAR(auto_calc[6],g2_func[0],8e-13);
+
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_FLOAT_EQ(result, res.val_.val_.val());
+}
+
+void test_log_mix_2xdouble_fvar_fvar_var_lam_2_D2(double theta,
+    double lambda1, double lambda2, double lambda2_d){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > lambda2_ffv;
+  lambda2_ffv.val_.val_ = lambda2;
+  lambda2_ffv.val_.d_ = lambda2_d;
+  lambda2_ffv.d_.val_ = lambda2_d;
+
+  fvar<fvar<var> > res = log_mix(theta, lambda1, lambda2_ffv);
+  double result = log_mix(theta, 
+                          lambda1, 
+                          lambda2_ffv.val_.val_.val());
+
+  VEC g2_func = cgrad(res.d_.val_,lambda2_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             0, 0, lambda2_d,
+                             0, 0, 0);
+
+  EXPECT_NEAR(auto_calc[7],g2_func[0],8e-13);
+
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_FLOAT_EQ(result, res.val_.val_.val());
+}
+
+void test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(double theta,
+    double lambda1, double lambda2, double theta_d, 
+    double lambda2_d){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > theta_ffv;
+  fvar<fvar<var> > lambda2_ffv;
+
+  theta_ffv.val_.val_ = theta;
+  lambda2_ffv.val_.val_ = lambda2;
+
+  theta_ffv.val_.d_ = theta_d;
+  lambda2_ffv.val_.d_ = lambda2_d;
+
+  theta_ffv.d_.val_ = theta_d;
+  lambda2_ffv.d_.val_ = lambda2_d;
+
+  fvar<fvar<var> > res = log_mix(theta_ffv, lambda1, lambda2_ffv);
+  double result = log_mix(theta_ffv.val_.val_.val(), 
+                          lambda1, 
+                          lambda2_ffv.val_.val_.val());
+
+  VEC g2_func = cgrad(res.d_.val_,theta_ffv.val_.val_,lambda2_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             theta_d, 0, lambda2_d,
+                             0, 0, 0);
+
+  EXPECT_NEAR(auto_calc[5],g2_func[0],8e-13); 
+  EXPECT_NEAR(auto_calc[7],g2_func[1],8e-13);
+
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_FLOAT_EQ(result, res.val_.val_.val());
+}
+
+void test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(double theta,
+    double lambda1, double lambda2, double theta_d, 
+    double lambda1_d){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > theta_ffv;
+  fvar<fvar<var> > lambda1_ffv;
+
+  theta_ffv.val_.val_ = theta;
+  lambda1_ffv.val_.val_ = lambda1;
+
+  theta_ffv.val_.d_ = theta_d;
+  lambda1_ffv.val_.d_ = lambda1_d;
+
+  theta_ffv.d_.val_ = theta_d;
+  lambda1_ffv.d_.val_ = lambda1_d;
+
+  fvar<fvar<var> > res = log_mix(theta_ffv, lambda1_ffv, lambda2);
+  double result = log_mix(theta_ffv.val_.val_.val(), 
+                          lambda1_ffv.val_.val_.val(), 
+                          lambda2);
+
+  VEC g2_func = cgrad(res.d_.val_,theta_ffv.val_.val_, lambda1_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             theta_d, lambda1_d, 0,
+                             0, 0, 0);
+
+  size_t k = 5;
+  for (size_t i = 0; i < 2; ++i){
+    EXPECT_NEAR(auto_calc[k],g2_func[i],8e-13) << "failed on " << k << std::endl;
+    ++k;
+  }
+
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_FLOAT_EQ(result, res.val_.val_.val());
+}
+
+void test_log_mix_2xfvar_fvar_var_ex_theta_D2(double theta,
+    double lambda1, double lambda2, 
+    double lambda1_d, double lambda2_d){
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using std::exp;
+  using std::pow;
+  using stan::math::log_mix;
+
+  fvar<fvar<var> > lambda1_ffv;
+  fvar<fvar<var> > lambda2_ffv;
+
+  lambda1_ffv.val_.val_ = lambda1;
+  lambda2_ffv.val_.val_ = lambda2;
+
+  lambda1_ffv.val_.d_ = lambda1_d;
+  lambda2_ffv.val_.d_ = lambda2_d;
+
+  lambda1_ffv.d_.val_ = lambda1_d;
+  lambda2_ffv.d_.val_ = lambda2_d;
+
+  fvar<fvar<var> > res = log_mix(theta, lambda1_ffv, lambda2_ffv);
+  double result = log_mix(theta, 
+                          lambda1_ffv.val_.val_.val(), 
+                          lambda2_ffv.val_.val_.val());
+
+  VEC g2_func = cgrad(res.d_.val_,lambda1_ffv.val_.val_,
+     lambda2_ffv.val_.val_);
+
+  VEC auto_calc = log_mix_D3(theta, lambda1, lambda2,
+                             0, lambda1_d, lambda2_d,
+                             0, 0, 0);
+
+  size_t k = 6;
+  for (size_t i = 0; i < 2; ++i){
+    EXPECT_NEAR(auto_calc[k],g2_func[i],8e-13) << "failed on " << k << std::endl;
+    ++k;
+  }
+
+  EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
+  EXPECT_FLOAT_EQ(result, res.val_.val_.val());
+}
+
 void test_log_mix_3xfvar_fvar_var_D3(double theta,
     double lambda1, double lambda2, double theta_d, 
     double lambda1_d, double lambda2_d,
@@ -440,6 +885,7 @@ void test_log_mix_3xfvar_fvar_var_D3(double theta,
   EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
   EXPECT_NEAR(result, res.val_.val_.val(),8e-13);
 }
+
 
 void test_log_mix_3xfvar_fvar_var_D2(double theta,
     double lambda1, double lambda2, double theta_d, 
@@ -666,6 +1112,66 @@ void test_log_mix_2xdouble_lam_2_fvar_var(double theta,
   EXPECT_FLOAT_EQ(lambda2_deriv,g[0]);
 }
 
+TEST(AgradFwdLogMix, FvarFvarVar_Double_Double_D3){
+
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D3(0.7, 2.0, 6.0, 1.3, 5.0);
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D3(0.7, 2.0, 6.0, 1, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D3(0.3, 2.0, 6.0, 0, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D3(0.3, 1.0, 2.0, 0, 1);
+
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D3(0.7, 2.0, -6.0, 1.3, 5.0);
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D3(0.7, 2.0, -6.0, 1, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D3(0.3, 2.0, -6.0, 0, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D3(0.3, 1.0, -2.0, 0, 1);
+
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D3(0.7, 2.0, 6.0, 1.3, 5.0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D3(0.7, 2.0, 6.0, 1, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D3(0.3, 2.0, 6.0, 0, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D3(0.3, 1.0, 2.0, 0, 1);
+
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D3(0.7, 2.0, -6.0, 1.3, 5.0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D3(0.7, 2.0, -6.0, 1, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D3(0.3, 2.0, -6.0, 0, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D3(0.3, 1.0, -2.0, 0, 1);
+
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D3(0.7, 2.0, 6.0, 1.3, 5.0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D3(0.7, 2.0, 6.0, 1, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D3(0.3, 2.0, 6.0, 0, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D3(0.3, 1.0, 2.0, 0, 1);
+
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D3(0.7, 2.0, -6.0, 1.3, 5.0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D3(0.7, 2.0, -6.0, 1, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D3(0.3, 2.0, -6.0, 0, 0);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D3(0.3, 1.0, -2.0, 0, 1);
+}
+
+TEST(AgradFwdLogMix, FvarFvarVar_Double_Double_D2){
+
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D2(0.7, 2.0, 6.0, 1.3);
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D2(0.7, 2.0, 6.0, 1);
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D2(0.7, 2.0, 6.0, 0);
+
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D2(0.3, 2.0, -6.0, 1.3);
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D2(0.3, 2.0, -6.0, 1);
+  test_log_mix_2xdouble_fvar_fvar_var_theta_D2(0.3, 2.0, -6.0, 0);
+
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D2(0.7, 2.0, 6.0, 1.3);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D2(0.7, 2.0, 6.0, 1);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D2(0.7, 2.0, 6.0, 0);
+
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D2(0.3, 2.0, -6.0, 1.3);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D2(0.3, 2.0, -6.0, 1);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_1_D2(0.3, 2.0, -6.0, 0);
+
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D2(0.7, 2.0, 6.0, 1.3);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D2(0.7, 2.0, 6.0, 1);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D2(0.7, 2.0, 6.0, 0);
+
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D2(0.3, 2.0, -6.0, 1.3);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D2(0.3, 2.0, -6.0, 1);
+  test_log_mix_2xdouble_fvar_fvar_var_lam_2_D2(0.3, 2.0, -6.0, 0);
+}
+
 TEST(AgradFwdLogMix, FvarVar_FvarVar_FvarVar_D1){
 
   test_log_mix_3xfvar_var_D1(0.7, 2.0, 6.0, 1.3, 5.0, 3.0);
@@ -685,6 +1191,84 @@ TEST(AgradFwdLogMix, FvarVar_FvarVar_FvarVar_D1){
   test_log_mix_3xfvar_var_D1(0.2, 2.0, -6.0, 0, 1, 1);
   test_log_mix_3xfvar_var_D1(0.2, 2.0, -6.0, 1, 1, 0);
   test_log_mix_3xfvar_var_D1(0.2, 2.0, -6.0, 1, 1, 1);
+}
+
+TEST(AgradFwdLogMix, FvarFvarVar_FvarFvarVar_Double_D3){
+
+  test_log_mix_2xfvar_fvar_var_ex_theta_D3(0.7, 2.0, 6.0, 5.0, 3.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D3(0.7, 2.0, 6.0, 1, 1, 1, 1);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D3(0.7, 2.0, 6.0, 1, 1, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D3(0.7, 2.0, 6.0, 1, 0, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D3(0.7, 2.0, 6.0, 1, 0, 1, 1);
+
+  test_log_mix_2xfvar_fvar_var_ex_theta_D3(0.7, 2.0, -6.0, 5.0, 3.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D3(0.7, 2.0, -6.0, 1, 1, 1, 1);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D3(0.7, 2.0, -6.0, 1, 1, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D3(0.7, 2.0, -6.0, 1, 0, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D3(0.7, 2.0, -6.0, 1, 0, 1, 1);
+
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(0.7, 2.0, 6.0, 5.0, 3.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(0.7, 2.0, 6.0, 1, 1, 1, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(0.7, 2.0, 6.0, 1, 1, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(0.7, 2.0, 6.0, 1, 0, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(0.7, 2.0, 6.0, 1, 0, 1, 1);
+
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(0.7, 2.0, -6.0, 5.0, 3.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(0.7, 2.0, -6.0, 1, 1, 1, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(0.7, 2.0, -6.0, 1, 1, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(0.7, 2.0, -6.0, 1, 0, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(0.7, 2.0, -6.0, 1, 0, 1, 1); 
+
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(0.7, 2.0, 6.0, 5.0, 3.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(0.7, 2.0, 6.0, 1, 1, 1, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(0.7, 2.0, 6.0, 1, 1, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(0.7, 2.0, 6.0, 1, 0, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(0.7, 2.0, 6.0, 1, 0, 1, 1);
+
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(0.7, 2.0, -6.0, 5.0, 3.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(0.7, 2.0, -6.0, 1, 1, 1, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(0.7, 2.0, -6.0, 1, 1, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(0.7, 2.0, -6.0, 1, 0, 0, 1);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(0.7, 2.0, -6.0, 1, 0, 1, 1);
+}
+
+TEST(AgradFwdLogMix, FvarFvarVar_FvarFvarVar_Double_D2){
+
+  test_log_mix_2xfvar_fvar_var_ex_theta_D2(0.7, 2.0, 6.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D2(0.7, 2.0, 6.0, 1.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D2(0.7, 2.0, 6.0, 1.0, 1.0);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D2(0.7, 2.0, 6.0, 0.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D2(0.7, 2.0, 6.0, 0.0, 1.0);
+
+  test_log_mix_2xfvar_fvar_var_ex_theta_D2(0.7, 2.0, -6.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D2(0.7, 2.0, -6.0, 1.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D2(0.7, 2.0, -6.0, 1.0, 1.0);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D2(0.7, 2.0, -6.0, 0.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_theta_D2(0.7, 2.0, -6.0, 0.0, 1.0);
+
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(0.7, 2.0, 6.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(0.7, 2.0, 6.0, 1.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(0.7, 2.0, 6.0, 1.0, 1.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(0.7, 2.0, 6.0, 0.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(0.7, 2.0, 6.0, 0.0, 1.0);
+
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(0.7, 2.0, -6.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(0.7, 2.0, -6.0, 1.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(0.7, 2.0, -6.0, 1.0, 1.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(0.7, 2.0, -6.0, 0.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(0.7, 2.0, -6.0, 0.0, 1.0);
+
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(0.7, 2.0, 6.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(0.7, 2.0, 6.0, 1.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(0.7, 2.0, 6.0, 1.0, 1.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(0.7, 2.0, 6.0, 0.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(0.7, 2.0, 6.0, 0.0, 1.0);
+
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(0.7, 2.0, -6.0, 5.0, 3.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(0.7, 2.0, -6.0, 1.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(0.7, 2.0, -6.0, 1.0, 1.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(0.7, 2.0, -6.0, 0.0, 0.0);
+  test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(0.7, 2.0, -6.0, 0.0, 1.0);
 }
 
 TEST(AgradFwdLogMix, FvarVar_FvarVar_FvarVar_D2){
@@ -807,7 +1391,7 @@ TEST(AgradFwdLogMix, FvarVar_Double_Double){
   test_log_mix_2xdouble_theta_fvar_var(0.2, -2.0, 6.0, 1);
   test_log_mix_2xdouble_theta_fvar_var(0.2, -2.0, 6.0, 0);
 
-  test_log_mix_2xdouble_lam_1_fvar_var(0.7, 2.0, 6.0, 1.3);
+  test_log_mix_2xdouble_lam_1_fvar_var(0.7, 2.0, 6.0, 0.3);
   test_log_mix_2xdouble_lam_1_fvar_var(0.7, 2.0, 6.0, 1);
   test_log_mix_2xdouble_lam_1_fvar_var(0.7, 2.0, 6.0, 0);
 
@@ -819,8 +1403,8 @@ TEST(AgradFwdLogMix, FvarVar_Double_Double){
   test_log_mix_2xdouble_lam_2_fvar_var(0.7, 2.0, 6.0, 0);
 
   test_log_mix_2xdouble_lam_2_fvar_var(0.2, -2.0, 6.0, 1);
-  test_log_mix_2xdouble_lam_2_fvar_var(0.2, -2.0, 6.0, 0);
-}
+  test_log_mix_2xdouble_lam_2_fvar_var(0.2, -2.0, 6.0, 0); 
+} 
 
 TEST(AgradFwdLogMix,Fvar) {
   test_log_mix_fff(0.7, 1.5, -2.0, 1, 0, 0);
@@ -876,5 +1460,5 @@ TEST(AgradFwdLogMix,Fvar) {
   test_log_mix_f_explicit(0.7, 1.5, 5);
   test_log_mix_f_explicit(0.7, 0.1, 5);
   test_log_mix_f_explicit(0.999, 0.1, 5);
-  test_log_mix_f_explicit(0.0001, 0.1, 5);
+  test_log_mix_f_explicit(0.0001, 0.1, 5); 
 }  
