@@ -579,6 +579,12 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
           int_vector_types[i],vector_types[j],vector_types[k]);
       add("neg_binomial_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_ccdf_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_cdf",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_cdf_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
       add("neg_binomial_2_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);
       add("neg_binomial_2_log_log",DOUBLE_T,
