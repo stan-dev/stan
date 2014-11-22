@@ -80,7 +80,7 @@ TEST(ProbDistributionsInvWishart,Propto) {
   
   EXPECT_FLOAT_EQ(0.0, stan::prob::inv_wishart_log<true>(Y,dof,Sigma));
 }
-TEST(ProbDistributionsInvWishart,DefaultPolicy) {
+TEST(ProbDistributionsInvWishart, Error) {
   Matrix<double,Dynamic,Dynamic> Sigma;
   Matrix<double,Dynamic,Dynamic> Y;
   double nu;
