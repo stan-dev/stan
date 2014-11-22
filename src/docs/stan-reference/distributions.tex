@@ -569,17 +569,34 @@ $\phi^{-1}$, represents overdispersion.
  \fitem{real}{neg\_binomial\_2\_log\_log}{ints \farg{y}, reals
    \farg{eta}, reals \farg{phi}}{The log negative binomial probability
    mass of \farg{n} given log-location \farg{eta} and precision
-   \farg{phi}. This is useful for log-linear negative
+   \farg{phi}. This is especially useful for log-linear negative
    binomial regressions.}
 %
-\fitem{int}{neg\_binomial\_2\_rng}{real \farg{mu}, real \farg{phi}}{Generate a
-  negative binomial variate with location \farg{mu} and precision
-\farg{phi}; may only be used in generated quantities block. \farg{mu} 
-must be less than $2 ^ {29}$}
+ \fitem{real}{neg\_binomial\_2\_cdf}{ints \farg{n}, reals
+   \farg{mu}, reals \farg{phi}}{The negative binomial cumulative
+   distribution function of \farg{n}
+   given location \farg{mu} and precision \farg{phi}.}
 %
-\fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{Generate a
-  negative binomial variate with log-location \farg{eta} and precision
-\farg{phi}; may only be used in generated quantities block. \farg{eta} must be less than $29 \log 2$}
+ \fitem{real}{neg\_binomial\_2\_cdf\_log}{ints \farg{n}, reals
+   \farg{mu}, reals \farg{phi}}{The log of the negative binomial
+   cumulative distribution function of \farg{n}
+   given location \farg{mu} and precision  \farg{phi}.}
+%
+ \fitem{real}{neg\_binomial\_2\_ccdf\_log}{ints \farg{n}, reals
+   \farg{mu}, reals \farg{phi}}{The log of the negative binomial 
+   complementary cumulative distribution function of \farg{n}
+   given location \farg{mu} and precision \farg{phi}.}
+%
+\fitem{int}{neg\_binomial\_2\_rng}{real \farg{mu}, real \farg{phi}}{
+  Generate a negative binomial variate with location
+  \farg{mu} and precision \farg{phi}; may only be used in
+  generated quantities block.
+  \farg{mu} must be less than $2 ^ {29}$.}
+%
+\fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{
+  Generate a negative binomial variate with log-location \farg{eta}
+  and precision \farg{phi}; may only be used in generated
+  quantities block. \farg{eta} must be less than $29 \log 2$.}
 \end{description}
 
 
