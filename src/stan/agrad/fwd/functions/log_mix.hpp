@@ -14,27 +14,30 @@ namespace stan {
   namespace agrad {
     using boost::math::tools::promote_args;
     template <typename T1, typename T2>
-    struct is_same {
-      template <typename T3, typename T4>
+    struct mult_wrapper {
+      template <typename T3, typename T4, int N>
       static void mult(const T3& num1, const T4& num2, 
-                       std::vector<typename promote_args<T3, T4>::type>& vec_inp){
+                       typename promote_args<T3, T4>::type (&vec_inp)[N],
+                       unsigned int& offset){
       } 
     };
     template <typename T1>
-    struct is_same<T1, T1> {
-      template <typename T3, typename T4>
+    struct mult_wrapper<T1, T1> {
+      template <typename T3, typename T4, int N>
       static void mult(const T3& num1, const T4& num2, 
-                       std::vector<typename promote_args<T3, T4>::type>& vec_inp){
-        return vec_inp.push_back(num1 * num2);
+                       typename promote_args<T3, T4>::type (&vec_inp)[N],
+                       unsigned int& offset){
+        vec_inp[offset] = num1 * num2;
+        ++offset;
       }
     };
 
-    template <typename t_T, typename l1_T, typename l2_T>
+    template <typename t_T, typename l1_T, typename l2_T, int N>
     inline void
     log_mix_calc(const t_T& theta_d, 
                  const l1_T& lambda1_d, 
                  const l2_T& lambda2_d,
-                 std::vector<typename promote_args<t_T,l1_T,l2_T>::type>& ret_vec){
+                 typename promote_args<t_T,l1_T,l2_T>::type (&ret_vec)[N]){
         typedef typename promote_args<t_T,l1_T,l2_T>::type dom_arg_type;
         using std::exp;
 
@@ -48,15 +51,16 @@ namespace stan {
         dom_arg_type one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1
           = 1.0 / t_plus_one_m_t_prod_exp_lam2_m_lam1;
         
-        is_same<t_T, dom_arg_type>::mult(one_m_exp_lam2_m_lam1,
+        unsigned int offset = 0;
+        mult_wrapper<t_T, dom_arg_type>::mult(one_m_exp_lam2_m_lam1,
                                          one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1,
-                                         ret_vec);
-        is_same<l1_T, dom_arg_type>::mult(theta_d,
+                                         ret_vec, offset);
+        mult_wrapper<l1_T, dom_arg_type>::mult(theta_d,
                                           one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1,
-                                          ret_vec);
-        is_same<l2_T, dom_arg_type>::mult(one_m_t_prod_exp_lam2_m_lam1,
+                                          ret_vec, offset);
+        mult_wrapper<l2_T, dom_arg_type>::mult(one_m_t_prod_exp_lam2_m_lam1,
                                           one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1,
-                                          ret_vec);
+                                          ret_vec, offset);
     }
 
 
@@ -68,13 +72,13 @@ namespace stan {
       using stan::math::value_of;
 
       if (lambda1.val_ > lambda2.val_) {
-        std::vector<fvar<T> > vec_T;
-        log_mix_calc(theta, lambda1, lambda2,vec_T);
+        fvar<T> vec_T[3];
+        log_mix_calc(theta, lambda1, lambda2, vec_T);
         return fvar<T>(log_mix(theta.val_, lambda1.val_, lambda2.val_),
                        theta.d_ * value_of(vec_T[0]) + lambda1.d_ * value_of(vec_T[1]) 
                        + lambda2.d_ * value_of(vec_T[2]));
       } else {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[3];
         log_mix_calc(1.0 - theta, lambda2, lambda1, vec_T);
         return fvar<T>(log_mix(theta.val_, lambda1.val_, lambda2.val_),
                        theta.d_ * -1.0 * value_of(vec_T[0]) 
@@ -91,13 +95,13 @@ namespace stan {
       using stan::math::value_of;
 
       if (lambda1.val_ > lambda2) {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[2];
         log_mix_calc(theta, lambda1, lambda2, vec_T);
         return fvar<T>(log_mix(theta.val_, lambda1.val_, lambda2),
                        theta.d_ * value_of(vec_T[0]) 
                        + lambda1.d_ * value_of(vec_T[1]));
       } else {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[2];
         log_mix_calc(1.0 - theta, lambda2, lambda1, vec_T);
         return fvar<T>(log_mix(theta.val_, lambda1.val_, lambda2),
                        -1.0 * theta.d_ * value_of(vec_T[0]) 
@@ -113,13 +117,13 @@ namespace stan {
       using stan::math::value_of;
 
       if (lambda1 > lambda2.val_) {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[2];
         log_mix_calc(theta, lambda1, lambda2,vec_T);
         return fvar<T>(log_mix(theta.val_, lambda1, lambda2.val_),
                        theta.d_ * value_of(vec_T[0]) 
                        + lambda2.d_ * value_of(vec_T[1]));
       } else {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[2];
         log_mix_calc(1.0 - theta, lambda2, lambda1,vec_T);
         return fvar<T>(log_mix(theta.val_, lambda1, lambda2.val_),
                        -1.0 * theta.d_ * value_of(vec_T[0]) 
@@ -135,13 +139,13 @@ namespace stan {
       using stan::math::value_of;
 
       if (lambda1.val_ > lambda2.val_) {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[2];
         log_mix_calc(theta, lambda1, lambda2, vec_T);
         return fvar<T>(log_mix(theta, lambda1.val_, lambda2.val_),
                        lambda1.d_ * value_of(vec_T[0]) 
                        + lambda2.d_ * value_of(vec_T[1]));
       } else {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[2];
         log_mix_calc(1.0 - theta, lambda2, lambda1,vec_T);
         return fvar<T>(log_mix(theta, lambda1.val_, lambda2.val_),
                        lambda1.d_ * value_of(vec_T[1]) 
@@ -157,12 +161,12 @@ namespace stan {
       using stan::math::value_of;
 
       if (lambda1 > lambda2) {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[1];
         log_mix_calc(theta, lambda1, lambda2, vec_T);
         return fvar<T>(log_mix(theta.val_, lambda1, lambda2),
                        theta.d_ * value_of(vec_T[0]));
       } else {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[1];
         log_mix_calc(1.0 - theta, lambda2, lambda1,vec_T);
         return fvar<T>(log_mix(theta.val_, lambda1, lambda2),
                        -1.0 * theta.d_ * value_of(vec_T[0]));
@@ -177,12 +181,12 @@ namespace stan {
       using stan::math::value_of;
       
       if (lambda1.val_ > lambda2) {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[1];
         log_mix_calc(theta, lambda1, lambda2, vec_T);
         return fvar<T>(log_mix(theta, lambda1.val_, lambda2),
                        lambda1.d_ * value_of(vec_T[0]));
       } else {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[1];
         log_mix_calc(1.0 - theta, lambda2, lambda1, vec_T);
         return fvar<T>(log_mix(theta, lambda1.val_, lambda2),
                        lambda1.d_ * value_of(vec_T[0]));
@@ -197,12 +201,12 @@ namespace stan {
       using stan::math::value_of;
 
       if (lambda1 > lambda2.val_) {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[1];
         log_mix_calc(theta, lambda1, lambda2, vec_T);
         return fvar<T>(log_mix(theta, lambda1, lambda2.val_),
                        lambda2.d_ * value_of(vec_T[0]));
       } else {
-        std::vector<fvar<T> > vec_T;
+        fvar<T> vec_T[1];
         log_mix_calc(1.0 - theta, lambda2, lambda1,vec_T);
         return fvar<T>(log_mix(theta, lambda1, lambda2.val_),
                        lambda2.d_ * value_of(vec_T[0]));
