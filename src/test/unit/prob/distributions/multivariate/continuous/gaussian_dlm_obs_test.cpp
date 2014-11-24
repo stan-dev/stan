@@ -6,6 +6,7 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 using Eigen::MatrixXd;
+using stan::prob::gaussian_dlm_obs_log;
 
 /*
    The log-likelihoods are compared with results from R package dlm
