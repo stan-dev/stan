@@ -1,1 +1,1 @@
-#include <stan/agrad/rev/var_stack_def.hpp>
+// #include <stan/agrad/rev/var_stack_def.hpp>

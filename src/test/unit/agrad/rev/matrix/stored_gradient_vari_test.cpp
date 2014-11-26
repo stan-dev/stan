@@ -10,14 +10,14 @@ TEST(StoredGradientVari, propagate3) {
   using stan::agrad::var;
   using stan::agrad::vari;
   vari** xs
-    = (vari**) stan::agrad::memalloc_.alloc(3 * sizeof(vari*));
+    = (vari**) stan::agrad::ChainableStack::memalloc_.alloc(3 * sizeof(vari*));
   var xs1 = 1; // value not used here
   var xs2 = 4; // value not used here
   var xs3 = 9; // value not used here
   xs[0] = xs1.vi_;
   xs[1] = xs2.vi_;
   xs[2] = xs3.vi_;
-  double* partials = (double*) stan::agrad::memalloc_.alloc(3 * sizeof(double));
+  double* partials = (double*) stan::agrad::ChainableStack::memalloc_.alloc(3 * sizeof(double));
   partials[0] = 10;
   partials[1] = 100;
   partials[2] = 1000;

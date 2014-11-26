@@ -18,7 +18,7 @@ namespace stan {
 
       var calc_variance(size_t size,
                         const var* dtrs) {
-        vari** varis = (vari**) memalloc_.alloc(size * sizeof(vari*));
+        vari** varis = (vari**) ChainableStack::memalloc_.alloc(size * sizeof(vari*));
         for (size_t i = 0; i < size; ++i)
           varis[i] = dtrs[i].vi_;
         double sum = 0.0;
@@ -31,7 +31,7 @@ namespace stan {
           sum_of_squares += diff * diff;
         }
         double variance = sum_of_squares / (size - 1);
-        double* partials = (double*) memalloc_.alloc(size * sizeof(double));
+        double* partials = (double*) ChainableStack::memalloc_.alloc(size * sizeof(double));
         double two_over_size_m1 = 2 / (size - 1);
         for (size_t i = 0; i < size; ++i)
           partials[i] = two_over_size_m1 * (dtrs[i].vi_->val_ - mean);
