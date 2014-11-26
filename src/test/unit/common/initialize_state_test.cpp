@@ -394,16 +394,30 @@ TEST(initialize_state, rm_indices_from_name) {
   stan::common::rm_indices_from_name(name1);
   EXPECT_STREQ("alpha", name1.c_str());
   v.push_back("alpha.2");
+  v.push_back("delta");
   v.push_back("beta.2");
   v.push_back("beta.3");
   stan::common::rm_indices_from_name(v);
-  EXPECT_EQ(2L, v.size());
+  EXPECT_EQ(3L, v.size());
+  EXPECT_STREQ("alpha", v.at(0).c_str());
+  EXPECT_STREQ("delta", v.at(1).c_str());
+  EXPECT_STREQ("beta", v.at(2).c_str());
 
   std::string name2("gamma");
   stan::common::rm_indices_from_name(name2);
-  EXPECT_STREQ("gamma", name1.c_str());
+  EXPECT_STREQ("gamma", name2.c_str());
 
+  std::string name3("");
+  stan::common::rm_indices_from_name(name3);
+  EXPECT_STREQ("", name3.c_str());
 
+  std::string name4(".");
+  stan::common::rm_indices_from_name(name4);
+  EXPECT_STREQ("", name4.c_str());
+
+  std::string name5("..");
+  stan::common::rm_indices_from_name(name5);
+  EXPECT_STREQ("", name5.c_str());
 }
 
 // Another complicated mock model with parameters as follows
