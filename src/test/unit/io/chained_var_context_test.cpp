@@ -1,10 +1,8 @@
-
-#include <stan/io/var_context_combined.hpp>
+#include <stan/io/chained_var_context.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <gtest/gtest.h>
 
-TEST(var_context_combined, ctor) {
-
+TEST(chained_var_context, ctor) {
   std::vector<double> v;
   for (size_t i = 0; i < 16; i++) v.push_back(1.0 * i);
   std::vector<std::vector<size_t> > dims;
@@ -41,7 +39,7 @@ TEST(var_context_combined, ctor) {
   names2.push_back("c");
   names2.push_back("d");
   stan::io::array_var_context avc2(names2, v2, dims2);
-  stan::io::var_context_combined vcc(avc, avc2);
+  stan::io::chained_var_context vcc(avc, avc2);
   EXPECT_TRUE(avc2.contains_r("d"));
   EXPECT_TRUE(vcc.contains_r("alpha"));
   EXPECT_TRUE(vcc.contains_r("beta"));
