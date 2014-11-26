@@ -3,293 +3,103 @@
 
 #include <cmath>
 #include <stan/agrad/rev.hpp>
-#include <stan/math/functions/log_mix.hpp>
+#include <stan/error_handling/scalar/check_bounded.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/math/functions/log_sum_exp.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/value_of.hpp>
+#include <stan/agrad/rev/functions/value_of.hpp>
+#include <stan/meta/traits.hpp>
+#include <stan/agrad/partials_vari.hpp>
+
 
 namespace stan {
 
   namespace agrad {
 
-    var log_mix(var theta, var lambda1, var lambda2) {
-      using stan::math::log_mix;
-      using std::exp;
-      double theta_d = theta.val();
-      double lambda1_d = lambda1.val();
-      double lambda2_d = lambda2.val();
-      double result = stan::math::log_mix(theta_d, lambda1_d, lambda2_d);
-
-      double d_theta(0);
-      double d_lambda1(0);
-      double d_lambda2(0);
-      if (lambda1_d > lambda2_d) {
-        double lam2_m_lam1 = lambda2_d - lambda1_d;
+    inline 
+    void log_mix_deriv_inter_helper(const double& theta_val,
+                                    const double& lambda1_val,
+                                    const double& lambda2_val,
+                                    double& one_m_exp_lam2_m_lam1,
+                                    double& one_m_t_prod_exp_lam2_m_lam1,
+                                    double& one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1){
+        using ::exp;
+        double lam2_m_lam1 = lambda2_val - lambda1_val;
         double exp_lam2_m_lam1 = exp(lam2_m_lam1);
-        double one_m_exp_lam2_m_lam1 = 1 - exp_lam2_m_lam1;
-        double one_m_t = 1 - theta_d;
-        double one_m_t_prod_exp_lam2_m_lam1 = one_m_t * exp_lam2_m_lam1;
-        double t_plus_one_m_t_prod_exp_lam2_m_lam1 
-          = theta_d + one_m_t_prod_exp_lam2_m_lam1;
-        d_theta 
-          = one_m_exp_lam2_m_lam1 
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-        d_lambda1
-          = theta_d
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-        d_lambda2
-          = one_m_t_prod_exp_lam2_m_lam1
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-      } else {
-        double lam1_m_lam2 = lambda1_d - lambda2_d;
-        double exp_lam1_m_lam2 = exp(lam1_m_lam2);
-        double exp_lam1_m_lam2_m_1 = exp_lam1_m_lam2 - 1;
-        double one_m_t = 1 - theta_d;
-        double t_prod_exp_lam1_m_lam2 = theta_d * exp_lam1_m_lam2;
-        double one_m_t_plus_t_prod_exp_lam1_m_lam2 
-          = one_m_t + t_prod_exp_lam1_m_lam2;
-        d_theta 
-          = exp_lam1_m_lam2_m_1
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
-        d_lambda1
-          = t_prod_exp_lam1_m_lam2
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
-        d_lambda2
-          = one_m_t
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
-      }
-      return var(new precomp_vvv_vari(result, 
-                                      theta.vi_, lambda1.vi_, lambda2.vi_,
-                                      d_theta, d_lambda1, d_lambda2));
+        one_m_exp_lam2_m_lam1 = 1 - exp_lam2_m_lam1;
+        double one_m_t = 1 - theta_val;
+        one_m_t_prod_exp_lam2_m_lam1 = one_m_t * exp_lam2_m_lam1;
+        one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1 
+          = 1 / (theta_val + one_m_t_prod_exp_lam2_m_lam1);
     }
 
-    var log_mix(var theta, var lambda1, double lambda2) {
-      using stan::math::log_mix;
-      using std::exp;
-      double theta_d = theta.val();
-      double lambda1_d = lambda1.val();
-      double result = stan::math::log_mix(theta_d, lambda1_d, lambda2);
+    template <typename T_theta,
+              typename T_lambda1,
+              typename T_lambda2>
+    inline 
+    typename return_type<T_theta, T_lambda1, T_lambda2>::type
+    log_mix(const T_theta& theta,
+            const T_lambda1& lambda1,
+            const T_lambda2& lambda2){
+      using ::log;
+      using stan::math::log_sum_exp;
+      using stan::math::log1m;
+      using stan::is_constant_struct;
 
-      double d_theta(0);
-      double d_lambda1(0);
-      if (lambda1_d > lambda2) {
-        double lam2_m_lam1 = lambda2 - lambda1_d;
-        double exp_lam2_m_lam1 = exp(lam2_m_lam1);
-        double one_m_exp_lam2_m_lam1 = 1 - exp_lam2_m_lam1;
-        double one_m_t = 1 - theta_d;
-        double one_m_t_prod_exp_lam2_m_lam1 = one_m_t * exp_lam2_m_lam1;
-        double t_plus_one_m_t_prod_exp_lam2_m_lam1 
-          = theta_d + one_m_t_prod_exp_lam2_m_lam1;
-        d_theta 
-          = one_m_exp_lam2_m_lam1 
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-        d_lambda1
-          = theta_d
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-      } else {
-        double lam1_m_lam2 = lambda1_d - lambda2;
-        double exp_lam1_m_lam2 = exp(lam1_m_lam2);
-        double exp_lam1_m_lam2_m_1 = exp_lam1_m_lam2 - 1;
-        double one_m_t = 1 - theta_d;
-        double t_prod_exp_lam1_m_lam2 = theta_d * exp_lam1_m_lam2;
-        double one_m_t_plus_t_prod_exp_lam1_m_lam2 
-          = one_m_t + t_prod_exp_lam1_m_lam2;
-        d_theta 
-          = exp_lam1_m_lam2_m_1
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
-        d_lambda1
-          = t_prod_exp_lam1_m_lam2
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
+      stan::error_handling::check_bounded("log_mix","theta",theta,0,1);
+      stan::error_handling::check_not_nan("log_mix","lambda1",lambda1);
+      stan::error_handling::check_not_nan("log_mix","lambda2",lambda2);
+
+      OperandsAndPartials<T_theta, T_lambda1, T_lambda2> 
+        operands_and_partials(theta, lambda1, lambda2);
+
+      double theta_double = value_of(theta);
+      const double lambda1_double = value_of(lambda1);
+      const double lambda2_double = value_of(lambda2);
+
+      double log_mix_function_value 
+        = log_sum_exp(log(theta_double) + lambda1_double,
+                         log1m(theta_double) + lambda2_double);
+
+      double one_m_exp_lam2_m_lam1(0.0); 
+      double one_m_t_prod_exp_lam2_m_lam1(0.0);
+      double one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1(0.0);
+
+      if (lambda1 > lambda2)
+        log_mix_deriv_inter_helper(theta_double, 
+                                   lambda1_double, 
+                                   lambda2_double,
+                                   one_m_exp_lam2_m_lam1,
+                                   one_m_t_prod_exp_lam2_m_lam1,
+                                   one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1);
+      else {
+        log_mix_deriv_inter_helper(1.0 - theta_double, 
+                                   lambda2_double, 
+                                   lambda1_double,
+                                   one_m_exp_lam2_m_lam1,
+                                   one_m_t_prod_exp_lam2_m_lam1,
+                                   one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1);
+        one_m_exp_lam2_m_lam1 *= -1.0;
+        theta_double = one_m_t_prod_exp_lam2_m_lam1;
+        one_m_t_prod_exp_lam2_m_lam1 = value_of(1.0 - theta);
       }
-      return var(new precomp_vv_vari(result, 
-                                      theta.vi_, lambda1.vi_, 
-                                      d_theta, d_lambda1));
+
+      if (!is_constant_struct<T_theta>::value)
+        operands_and_partials.d_x1[0] 
+          = one_m_exp_lam2_m_lam1
+          * one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
+      if (!is_constant_struct<T_lambda1>::value)
+        operands_and_partials.d_x2[0] 
+          = theta_double 
+          * one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
+      if (!is_constant_struct<T_lambda2>::value)
+        operands_and_partials.d_x3[0] 
+          = one_m_t_prod_exp_lam2_m_lam1 
+          * one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
+
+      return operands_and_partials.to_var(log_mix_function_value);
     }
-
-    var log_mix(var theta, double lambda1, var lambda2) {
-      using stan::math::log_mix;
-      using std::exp;
-      double theta_d = theta.val();
-      double lambda1_d = lambda1;
-      double lambda2_d = lambda2.val();
-      double result = stan::math::log_mix(theta_d, lambda1_d, lambda2_d);
-
-      double d_theta(0);
-      double d_lambda2(0);
-      if (lambda1_d > lambda2_d) {
-        double lam2_m_lam1 = lambda2_d - lambda1_d;
-        double exp_lam2_m_lam1 = exp(lam2_m_lam1);
-        double one_m_exp_lam2_m_lam1 = 1 - exp_lam2_m_lam1;
-        double one_m_t = 1 - theta_d;
-        double one_m_t_prod_exp_lam2_m_lam1 = one_m_t * exp_lam2_m_lam1;
-        double t_plus_one_m_t_prod_exp_lam2_m_lam1 
-          = theta_d + one_m_t_prod_exp_lam2_m_lam1;
-        d_theta 
-          = one_m_exp_lam2_m_lam1 
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-        d_lambda2
-          = one_m_t_prod_exp_lam2_m_lam1
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-      } else {
-        double lam1_m_lam2 = lambda1_d - lambda2_d;
-        double exp_lam1_m_lam2 = exp(lam1_m_lam2);
-        double exp_lam1_m_lam2_m_1 = exp_lam1_m_lam2 - 1;
-        double one_m_t = 1 - theta_d;
-        double t_prod_exp_lam1_m_lam2 = theta_d * exp_lam1_m_lam2;
-        double one_m_t_plus_t_prod_exp_lam1_m_lam2 
-          = one_m_t + t_prod_exp_lam1_m_lam2;
-        d_theta 
-          = exp_lam1_m_lam2_m_1
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
-        d_lambda2
-          = one_m_t
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
-      }
-      return var(new precomp_vv_vari(result, 
-                                      theta.vi_, lambda2.vi_,
-                                      d_theta, d_lambda2));
-    }
-
-    var log_mix(double theta, var lambda1, var lambda2) {
-      using stan::math::log_mix;
-      using std::exp;
-      double theta_d = theta;
-      double lambda1_d = lambda1.val();
-      double lambda2_d = lambda2.val();
-      double result = stan::math::log_mix(theta_d, lambda1_d, lambda2_d);
-
-      double d_lambda1(0);
-      double d_lambda2(0);
-      if (lambda1_d > lambda2_d) {
-        double lam2_m_lam1 = lambda2_d - lambda1_d;
-        double exp_lam2_m_lam1 = exp(lam2_m_lam1);
-        double one_m_t = 1 - theta_d;
-        double one_m_t_prod_exp_lam2_m_lam1 = one_m_t * exp_lam2_m_lam1;
-        double t_plus_one_m_t_prod_exp_lam2_m_lam1 
-          = theta_d + one_m_t_prod_exp_lam2_m_lam1;
-        d_lambda1
-          = theta_d
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-        d_lambda2
-          = one_m_t_prod_exp_lam2_m_lam1
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-      } else {
-        double lam1_m_lam2 = lambda1_d - lambda2_d;
-        double exp_lam1_m_lam2 = exp(lam1_m_lam2);
-        double one_m_t = 1 - theta_d;
-        double t_prod_exp_lam1_m_lam2 = theta_d * exp_lam1_m_lam2;
-        double one_m_t_plus_t_prod_exp_lam1_m_lam2 
-          = one_m_t + t_prod_exp_lam1_m_lam2;
-        d_lambda1
-          = t_prod_exp_lam1_m_lam2
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
-        d_lambda2
-          = one_m_t
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
-      }
-      return var(new precomp_vv_vari(result, 
-                                      lambda1.vi_, lambda2.vi_,
-                                      d_lambda1, d_lambda2));
-    }
-
-    var log_mix(var theta, double lambda1, double lambda2) {
-      using stan::math::log_mix;
-      using std::exp;
-      double theta_d = theta.val();
-      double lambda1_d = lambda1;
-      double lambda2_d = lambda2;
-      double result = stan::math::log_mix(theta_d, lambda1_d, lambda2_d);
-
-      double d_theta(0);
-      if (lambda1_d > lambda2_d) {
-        double lam2_m_lam1 = lambda2_d - lambda1_d;
-        double exp_lam2_m_lam1 = exp(lam2_m_lam1);
-        double one_m_exp_lam2_m_lam1 = 1 - exp_lam2_m_lam1;
-        double one_m_t = 1 - theta_d;
-        double one_m_t_prod_exp_lam2_m_lam1 = one_m_t * exp_lam2_m_lam1;
-        double t_plus_one_m_t_prod_exp_lam2_m_lam1 
-          = theta_d + one_m_t_prod_exp_lam2_m_lam1;
-        d_theta 
-          = one_m_exp_lam2_m_lam1 
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-      } else {
-        double lam1_m_lam2 = lambda1_d - lambda2_d;
-        double exp_lam1_m_lam2 = exp(lam1_m_lam2);
-        double exp_lam1_m_lam2_m_1 = exp_lam1_m_lam2 - 1;
-        double one_m_t = 1 - theta_d;
-        double t_prod_exp_lam1_m_lam2 = theta_d * exp_lam1_m_lam2;
-        double one_m_t_plus_t_prod_exp_lam1_m_lam2 
-          = one_m_t + t_prod_exp_lam1_m_lam2;
-        d_theta 
-          = exp_lam1_m_lam2_m_1
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
-      }
-      return var(new precomp_v_vari(result, theta.vi_, d_theta));
-    }
-
-    var log_mix(double theta, var lambda1, double lambda2) {
-      using stan::math::log_mix;
-      using std::exp;
-      double theta_d = theta;
-      double lambda1_d = lambda1.val();
-      double lambda2_d = lambda2;
-      double result = stan::math::log_mix(theta_d, lambda1_d, lambda2_d);
-
-      double d_lambda1(0);
-      if (lambda1_d > lambda2_d) {
-        double lam2_m_lam1 = lambda2_d - lambda1_d;
-        double exp_lam2_m_lam1 = exp(lam2_m_lam1);
-        double one_m_t = 1 - theta_d;
-        double one_m_t_prod_exp_lam2_m_lam1 = one_m_t * exp_lam2_m_lam1;
-        double t_plus_one_m_t_prod_exp_lam2_m_lam1 
-          = theta_d + one_m_t_prod_exp_lam2_m_lam1;
-        d_lambda1
-          = theta_d
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-      } else {
-        double lam1_m_lam2 = lambda1_d - lambda2_d;
-        double exp_lam1_m_lam2 = exp(lam1_m_lam2);
-        double one_m_t = 1 - theta_d;
-        double t_prod_exp_lam1_m_lam2 = theta_d * exp_lam1_m_lam2;
-        double one_m_t_plus_t_prod_exp_lam1_m_lam2 
-          = one_m_t + t_prod_exp_lam1_m_lam2;
-        d_lambda1
-          = t_prod_exp_lam1_m_lam2
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
-      }
-      return var(new precomp_v_vari(result, lambda1.vi_, d_lambda1));
-    }
-
-    var log_mix(double theta, double lambda1, var lambda2) {
-      using stan::math::log_mix;
-      using std::exp;
-      double theta_d = theta;
-      double lambda1_d = lambda1;
-      double lambda2_d = lambda2.val();
-      double result = stan::math::log_mix(theta_d, lambda1_d, lambda2_d);
-
-      double d_lambda2(0);
-      if (lambda1_d > lambda2_d) {
-        double lam2_m_lam1 = lambda2_d - lambda1_d;
-        double exp_lam2_m_lam1 = exp(lam2_m_lam1);
-        double one_m_t = 1 - theta_d;
-        double one_m_t_prod_exp_lam2_m_lam1 = one_m_t * exp_lam2_m_lam1;
-        double t_plus_one_m_t_prod_exp_lam2_m_lam1 
-          = theta_d + one_m_t_prod_exp_lam2_m_lam1;
-        d_lambda2
-          = one_m_t_prod_exp_lam2_m_lam1
-          / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-      } else {
-        double lam1_m_lam2 = lambda1_d - lambda2_d;
-        double exp_lam1_m_lam2 = exp(lam1_m_lam2);
-        double one_m_t = 1 - theta_d;
-        double t_prod_exp_lam1_m_lam2 = theta_d * exp_lam1_m_lam2;
-        double one_m_t_plus_t_prod_exp_lam1_m_lam2 
-          = one_m_t + t_prod_exp_lam1_m_lam2;
-        d_lambda2
-          = one_m_t
-          / one_m_t_plus_t_prod_exp_lam1_m_lam2;
-      }
-      return var(new precomp_v_vari(result, lambda2.vi_, d_lambda2));
-    }
-
 
   } // namespace agrad
 

@@ -13,24 +13,7 @@ namespace stan {
 
   namespace agrad {
     using boost::math::tools::promote_args;
-    template <typename T1, typename T2>
-    struct mult_wrapper {
-      template <typename T3, typename T4, int N>
-      static void mult(const T3& num1, const T4& num2, 
-                       typename promote_args<T3, T4>::type (&vec_inp)[N],
-                       unsigned int& offset){
-      } 
-    };
-    template <typename T1>
-    struct mult_wrapper<T1, T1> {
-      template <typename T3, typename T4, int N>
-      static void mult(const T3& num1, const T4& num2, 
-                       typename promote_args<T3, T4>::type (&vec_inp)[N],
-                       unsigned int& offset){
-        vec_inp[offset] = num1 * num2;
-        ++offset;
-      }
-    };
+		using boost::is_same;
 
     template <typename t_T, typename l1_T, typename l2_T, int N>
     inline void
@@ -52,15 +35,22 @@ namespace stan {
           = 1.0 / t_plus_one_m_t_prod_exp_lam2_m_lam1;
         
         unsigned int offset = 0;
-        mult_wrapper<t_T, dom_arg_type>::mult(one_m_exp_lam2_m_lam1,
-                                         one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1,
-                                         ret_vec, offset);
-        mult_wrapper<l1_T, dom_arg_type>::mult(theta_d,
-                                          one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1,
-                                          ret_vec, offset);
-        mult_wrapper<l2_T, dom_arg_type>::mult(one_m_t_prod_exp_lam2_m_lam1,
-                                          one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1,
-                                          ret_vec, offset);
+        if (is_same<t_T, dom_arg_type>::value){
+					ret_vec[offset] 
+						= one_m_exp_lam2_m_lam1 
+						* one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
+					 ++offset;
+				}
+				if (is_same<l1_T, dom_arg_type>::value){
+					ret_vec[offset] 
+						= theta_d * one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
+           ++offset;
+				}
+				if (is_same<l2_T, dom_arg_type>::value){
+					ret_vec[offset] 
+						= one_m_t_prod_exp_lam2_m_lam1 
+						* one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
+				} 
     }
 
 
