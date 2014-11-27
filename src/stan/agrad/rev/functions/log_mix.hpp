@@ -82,7 +82,7 @@ namespace stan {
                                    one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1);
         one_m_exp_lam2_m_lam1 *= -1.0;
         theta_double = one_m_t_prod_exp_lam2_m_lam1;
-        one_m_t_prod_exp_lam2_m_lam1 = value_of(1.0 - theta);
+        one_m_t_prod_exp_lam2_m_lam1 = 1.0 - value_of(theta);
       }
 
       if (!is_constant_struct<T_theta>::value)
