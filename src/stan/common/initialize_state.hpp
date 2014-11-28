@@ -17,7 +17,7 @@
 #include <stan/gm/error_codes.hpp>
 #include <stan/common/context_factory.hpp>
 #include <stan/io/array_var_context.hpp>
-#include <stan/io/var_context_combined.hpp>
+#include <stan/io/chained_var_context.hpp>
 #include <stan/common/write_error_msg.hpp>
 
 namespace stan {
@@ -246,7 +246,7 @@ namespace stan {
           stan::io::array_var_context random_context(cont_names, 
                                                      cont_vecs_constrained,
                                                      dims);
-          stan::io::var_context_combined vcc(context, random_context);
+          stan::io::chained_var_context vcc(context, random_context);
           model.transform_inits(vcc, cont_params);
           double init_log_prob;
           try {
