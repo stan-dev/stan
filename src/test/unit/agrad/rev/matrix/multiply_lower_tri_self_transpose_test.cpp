@@ -4,6 +4,27 @@
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/rev/jacobian.hpp>
 
+stan::agrad::matrix_v generate_large_L_tri_mat(){
+  using stan::agrad::matrix_v;
+  using stan::math::matrix_d;
+
+  matrix_v ret_mat(100,100);
+  matrix_d x;
+  double vals[10000];
+
+  vals[0] = 0.1;
+  for (int i = 1; i < 10000; ++i)
+    vals[i] = vals[i- 1] + 0.1123456;
+  
+  x = Eigen::Map< Eigen::Matrix<double,100,100> >(vals);
+  x *= 1e10;
+
+  for (int i = 0; i < x.cols(); ++i)
+    for (int j = 0; j < x.cols(); ++j)
+      ret_mat(i,j) = x(i,j);
+
+  return ret_mat;
+}
 
 void test_mult_LLT(const stan::agrad::matrix_v& L) {
   using stan::agrad::matrix_v;
@@ -236,10 +257,13 @@ TEST(AgradRevMatrix, multiplyLowerTriSelfTranspose) {
     4, -3;
   test_mult_LLT(I);
 
-  // matrix_v J(1,1);
-  // J << 3.0;
-  // test_mult_LLT(J);
+  L = generate_large_L_tri_mat();
+  EXPECT_NO_THROW(multiply_lower_tri_self_transpose(L));
 
-  // matrix_v K(0,0);
-  // test_mult_LLT(K);
+  matrix_v J(1,1);
+  J << 3.0;
+  test_mult_LLT(J);
+
+  matrix_v K(0,0);
+  test_mult_LLT(K);
 }
