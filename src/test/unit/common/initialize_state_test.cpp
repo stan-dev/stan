@@ -52,6 +52,10 @@ public:
     param_names__.push_back("c");
   }
 
+  void get_param_names(std::vector<std::string>& names) const {
+    constrained_param_names(names);
+  }
+
   template <typename RNG>
   void write_array(RNG& base_rng__,
                    std::vector<double>& params_r__,
@@ -419,6 +423,29 @@ TEST(initialize_state, rm_indices_from_name) {
   stan::common::rm_indices_from_name(name5);
   EXPECT_STREQ("", name5.c_str());
 }
+
+
+TEST_F(StanCommon, get_initial_values) {
+  using stan::common::get_initial_values;
+  Eigen::VectorXd cont_params;
+  
+  stan::io::dump context = context_factory("");
+
+  EXPECT_NO_THROW(get_initial_values(model, context, cont_params));
+  ASSERT_EQ(3, cont_params.size());
+  EXPECT_FLOAT_EQ(0.0, cont_params[0]);
+  EXPECT_FLOAT_EQ(1.0, cont_params[1]);
+  EXPECT_FLOAT_EQ(2.0, cont_params[2]);
+  EXPECT_EQ(0, rng.calls);
+  
+  // reset context
+  std::stringstream in("");
+  stan::io::dump empty_context = stan::io::dump(in);
+  EXPECT_THROW(get_initial_values(model, empty_context, cont_params), 
+               std::logic_error);
+}
+
+
 
 // Another complicated mock model with parameters as follows
 /**

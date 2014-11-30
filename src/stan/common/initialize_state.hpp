@@ -18,12 +18,42 @@
 #include <stan/common/context_factory.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
+#include <stan/io/random_init_var_context.hpp>
 #include <stan/common/write_error_msg.hpp>
 
 namespace stan {
   namespace common {    
   
     namespace {
+
+      /**
+       * Gets the initial values from the context provided for the
+       * model parameters.
+       *
+       * @param[in] model the model.
+       * @param[in] context the context that provides the model parameters.
+       * @param[out] cont_params Eigen vector that is used for output.
+       */
+      template <class Model, class Context>
+      void inline get_initial_values(const Model& model, Context& context,
+                                     Eigen::VectorXd& cont_params) {
+        std::vector<std::string> names;
+        model.get_param_names(names);
+      
+        cont_params.resize(model.num_params_r());
+        
+        int offset = 0;
+        for (int i = 0; i < names.size(); ++i) {
+          std::vector<double> vals = context.vals_r(names[i]);
+          for (int j = 0; j < vals.size(); j++)
+            cont_params(offset + j) = vals[j];
+          offset += vals.size();
+        }
+        
+        if (offset != model.num_params_r())
+          throw std::logic_error("context does not provide enough inits for the model");
+      }
+      
       /**
        * Remove indices from a parameter name. Specifically, if a parameter
        * is an array (or similar), the names return from
@@ -144,19 +174,33 @@ namespace stan {
       
       boost::random::uniform_real_distribution<double>
         init_range_distribution(-R, R);
-          
-      boost::variate_generator<RNG&, boost::random::uniform_real_distribution<double> >
-        init_rng(base_rng, init_range_distribution);
-          
+      
+      typedef boost::variate_generator<RNG&, boost::random::uniform_real_distribution<double> >
+        INIT_RNG;
+      
+      INIT_RNG init_rng(base_rng, init_range_distribution);
+
       cont_params.setZero();
-          
+
+      stan::io::random_init_var_context<Model, INIT_RNG> context(model, init_rng);
+      std::vector<std::string> names;
+      model.get_param_names(names);
+      
       // Random initializations until log_prob is finite
       Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
       static int MAX_INIT_TRIES = 100;
-          
+
+      
       for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
-        for (int i = 0; i < cont_params.size(); ++i) 
-          cont_params(i) = init_rng();
+        int offset = 0;
+        for (int i = 0; i < names.size(); ++i) {
+          std::vector<double> vals = context.vals_r(names[i]);
+          for (int j = 0; j < vals.size(); j++)
+            cont_params(offset + j) = vals[j];
+          offset += vals.size();
+        }
+        //for (int i = 0; i < cont_params.size(); ++i) 
+        //cont_params(i) = init_rng();
 
         double init_log_prob;
         try {
