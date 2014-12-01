@@ -1,3 +1,0 @@
-[submodule "example-models"]
-	path = example-models
-	url = git://github.com/stan-dev/example-models
