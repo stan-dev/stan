@@ -18,14 +18,14 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 ##
 # Rule for building a test
 ##
-test/%.o : src/test/%_test.cpp $(LIBGTEST) bin/libstan.a
+test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
 # Rule for building a test executable
 ##
-test/%$(EXE) : test/%.o bin/libstan.a
+test/%$(EXE) : test/%.o
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
 
@@ -39,7 +39,7 @@ STANC_TESTS_HEADERS := $(shell find src/test/unit/gm -type f -name '*_test.cpp')
 STANC_TESTS_O := $(patsubst src/%_test.cpp,%.o,$(STANC_TESTS_HEADERS))
 STANC_TESTS := $(patsubst src/%_test.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
 
-# $(STANC_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
+# $(STANC_TESTS) : test/%$(EXE) : test/%.o bin/libstanc.a
 # 	@mkdir -p $(dir $@)
 # 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 
