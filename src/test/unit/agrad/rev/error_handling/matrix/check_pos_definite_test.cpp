@@ -8,7 +8,6 @@ TEST(AgradRevErrorHandlingMatrix, checkPosDefiniteMatrix_nan) {
 
   Matrix<var, Dynamic, Dynamic> y;
   double nan = std::numeric_limits<double>::quiet_NaN();
-  //using stan::error_handling::check_pos_definite;
   using stan::agrad::check_pos_definite;
 
   y.resize(1,1);
