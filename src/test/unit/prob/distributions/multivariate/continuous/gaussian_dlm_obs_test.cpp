@@ -6,22 +6,7 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 using Eigen::MatrixXd;
-
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
 using stan::prob::gaussian_dlm_obs_log;
-
-typedef policy<
-  domain_error<errno_on_error>,
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error>
-  > errno_policy;
 
 /*
    The log-likelihoods are compared with results from R package dlm

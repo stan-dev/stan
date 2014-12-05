@@ -41,7 +41,7 @@ TEST(ProbDistributionsMultinomial,Propto) {
 
 using stan::prob::multinomial_log;
 
-TEST(ProbDistributionsMultinomial,DefaultPolicy) {
+TEST(ProbDistributionsMultinomial, error) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   double inf = std::numeric_limits<double>::infinity();
 
