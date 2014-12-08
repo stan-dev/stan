@@ -33,7 +33,7 @@ TEST(ProbDistributionsMatrixNormal,MatrixNormalPrec) {
   EXPECT_FLOAT_EQ(lp_ref,-2132.0748232368409845);
 }
 
-TEST(ProbDistributionsMatrixNormal,DefaultPolicySigma) {
+TEST(ProbDistributionsMatrixNormal, ErrorSigma) {
   Matrix<double,Dynamic,Dynamic> mu(3,5);
   mu.setZero();
   
@@ -65,7 +65,7 @@ TEST(ProbDistributionsMatrixNormal,DefaultPolicySigma) {
   Sigma(0, 0) = 9.0;
 }
 
-TEST(ProbDistributionsMatrixNormal,DefaultPolicyD) {
+TEST(ProbDistributionsMatrixNormal, ErrorD) {
   Matrix<double,Dynamic,Dynamic> mu(3,5);
   mu.setZero();
   
@@ -97,7 +97,7 @@ TEST(ProbDistributionsMatrixNormal,DefaultPolicyD) {
   D(0, 0) = 1.0;
 }
 
-TEST(ProbDistributionsMatrixNormal,DefaultPolicyY) {
+TEST(ProbDistributionsMatrixNormal, ErrorY) {
   Matrix<double,Dynamic,Dynamic> mu(3,5);
   mu.setZero();
   

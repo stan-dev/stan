@@ -46,9 +46,6 @@ namespace stan {
      * @tparam T_y Type of scalar outcome.
      * @tparam T_scale_succ Type of prior scale for successes.
      * @tparam T_scale_fail Type of prior scale for failures.
-     * @error_policy
-     *    @li alpha must be positive and finite.
-     *    @li beta must be positive and finite.
      */
     template <bool propto,
               typename T_y, typename T_scale_succ, typename T_scale_fail>
@@ -259,8 +256,8 @@ namespace stan {
       check_not_nan(function, "Random variable", y);
       check_consistent_sizes(function, 
                              "Random variable", y, 
-                             "Shape parameter", alpha, 
-                             "Scale Parameter", beta);
+                             "First shape parameter", alpha, 
+                             "Second shape parameter", beta);
       check_nonnegative(function, "Random variable", y);
       check_less_or_equal(function, "Random variable", y, 1);
 
@@ -404,8 +401,8 @@ namespace stan {
       check_less_or_equal(function, "Random variable", y, 1);
       check_consistent_sizes(function, 
                              "Random variable", y, 
-                             "Shape parameter", alpha, 
-                             "Scale Parameter", beta);
+                             "First shape parameter", alpha, 
+                             "Second shape parameter", beta);
       
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -520,8 +517,8 @@ namespace stan {
       check_less_or_equal(function, "Random variable", y, 1);
       check_consistent_sizes(function, 
                              "Random variable", y, 
-                             "Shape parameter", alpha, 
-                             "Scale Parameter", beta);
+                             "First shape parameter", alpha, 
+                             "Second shape parameter", beta);
       
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);

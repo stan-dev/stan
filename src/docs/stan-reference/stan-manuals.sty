@@ -20,6 +20,7 @@
 % \usepackage{index}
 % \newindex{funs}{fdx}{fns}{Functions}
 
+\usepackage[T1]{fontenc} % needed for |
 \usepackage{amsmath}
 \usepackage{xspace}
 \usepackage{fancyvrb}
@@ -185,6 +186,10 @@
 \renewcommand{\bottomfraction}{0.8}
 \renewcommand{\floatpagefraction}{0.75}
 \renewcommand{\textfraction}{0.07}
+
+
+% environment for Stan code
+\DefineVerbatimEnvironment{stancode}{Verbatim}{fontsize=\small,xleftmargin=2em}
 
 \raggedbottom
 

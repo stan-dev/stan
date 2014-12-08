@@ -35,8 +35,6 @@ namespace stan {
      * @tparam T_y Type of scalar outcome.
      * @tparam T_loc Type of location.
      * @tparam T_scale Type of scale.
-     * @error_policy
-     *    @li sigma must be positive.
      */
     template <bool propto,
               typename T_y, typename T_loc, typename T_scale>
@@ -152,9 +150,6 @@ namespace stan {
      * the given variate, location, and scale.
      *
      * \f$\frac{1}{\pi}\arctan\left(\frac{y-\mu}{\sigma}\right) + \frac{1}{2}\f$ 
-     *
-     * Errors are configured by policy.  All variables must be finite
-     * and the scale must be strictly greater than zero.
      *
      * @param y A scalar variate.
      * @param mu The location parameter.

@@ -13,7 +13,8 @@ New Features
 * added is_nan() and is_inf() function (#592)
 * nested reverse-mode autodiff, primarily for ode solver (#1031)
 * added get_lp() function to remove any need for bar lp__  (#470)
-* new functions cbind() and rbind() like those in R (#787)
+* new functions append_col() and append_row() like cbind and rbind
+  in R (#787)
 * added modulus function in a way tht is consistent with integer
   division across platforms (#577)
 * exposed pareto_type_2_rng (#580)
