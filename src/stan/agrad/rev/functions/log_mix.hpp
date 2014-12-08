@@ -46,19 +46,22 @@ namespace stan {
      * \f[
      * \frac{\partial}{\partial \theta} 
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
-     * = FIXME
+     * = \dfrac{\exp(\lambda_1) - \exp(\lambda_2)}
+     * {\left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right)}
      * \f]
      *
      * \f[
      * \frac{\partial}{\partial \lambda_1} 
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
-     * = FIXME
+     * = \dfrac{\theta \exp(\lambda_1)}
+     * {\left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right)} 
      * \f]
-     *
+     * 
      * \f[
      * \frac{\partial}{\partial \lambda_2} 
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
-     * = FIXME
+     * = \dfrac{\theta \exp(\lambda_2)}
+     * {\left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right)} 
      * \f]
      * 
      * @param theta[in] mixing proportion in [0,1].

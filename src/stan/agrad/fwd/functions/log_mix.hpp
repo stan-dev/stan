@@ -16,7 +16,23 @@ namespace stan {
 		using boost::is_same;
 
     // log_mix is a function of 3 variables
-    //
+    // The number of partial derivatives that need to be calculated is a function of
+    // the types of the arguments. These are templated out in the
+    // log_mix_helper_function that only returns the required partials 
+    // It does this by sequentially checking the types of the arguments
+    // theta_d, lambda1_d and lambda2_d against
+    // the dominant argument type, dom_arg_type, which will always default to
+    // fvar<T> given that this function shouldn't be called with three double
+    // arguments. There exists a stan/src/stan/math/functions/log_mix.hpp file
+    // to handle the triple double argument call, which necessarily returns
+    // only thet value of the log_sum_exp(log(theta) + lambda_1, log(1 - theta) +
+    // lambda_2). The partials are returned through the variable length n array
+    // partials_array. 
+    
+    // In order to be computationally stable, we multiply each of the partial
+    // derivatives by exp(max(lambda_1,lambda_2)) / exp(max(lambda_1,lambda_2))
+    // The "max" calculation is handled by an if statement internal to each
+    // implementation of log_mix.
     template <typename t_T, typename l1_T, typename l2_T, int N>
     inline void
     log_mix_partial_helper(const t_T& theta_d, 
@@ -55,6 +71,41 @@ namespace stan {
       } 
     }
 
+    /**
+     * Return the log mixture density with specified mixing proportion
+     * and log densities and its derivative at each.
+     *
+     * \f[
+     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) 
+     * = \log \left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right).
+     * \f]
+     * 
+     * \f[
+     * \frac{\partial}{\partial \theta} 
+     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
+     * = \dfrac{\exp(\lambda_1) - \exp(\lambda_2)}
+     * {\left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right)}
+     * \f]
+     *
+     * \f[
+     * \frac{\partial}{\partial \lambda_1} 
+     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
+     * = \dfrac{\theta \exp(\lambda_1)}
+     * {\left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right)} 
+     * \f]
+     * 
+     * \f[
+     * \frac{\partial}{\partial \lambda_2} 
+     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
+     * = \dfrac{\theta \exp(\lambda_2)}
+     * {\left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right)} 
+     * \f]
+     * 
+     * @param theta[in] mixing proportion in [0,1].
+     * @param lambda1 first log density.
+     * @param lambda2 second log density.
+     * @return log mixture of densities in specified proportion
+     */
 
     template <typename T>
     inline
