@@ -18,7 +18,7 @@ namespace stan {
   namespace agrad {
 
     inline 
-    void log_mix_deriv_inter_helper(const double& theta_val,
+    void log_mix_partial_helper(const double& theta_val,
                                     const double& lambda1_val,
                                     const double& lambda2_val,
                                     double& one_m_exp_lam2_m_lam1,
@@ -34,6 +34,38 @@ namespace stan {
           = 1 / (theta_val + one_m_t_prod_exp_lam2_m_lam1);
     }
 
+    /**
+     * Return the log mixture density with specified mixing proportion
+     * and log densities and its derivative at each.
+     *
+     * \f[
+     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) 
+     * = \log \left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right).
+     * \f]
+     * 
+     * \f[
+     * \frac{\partial}{\partial \theta} 
+     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
+     * = FIXME
+     * \f]
+     *
+     * \f[
+     * \frac{\partial}{\partial \lambda_1} 
+     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
+     * = FIXME
+     * \f]
+     *
+     * \f[
+     * \frac{\partial}{\partial \lambda_2} 
+     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
+     * = FIXME
+     * \f]
+     * 
+     * @param theta[in] mixing proportion in [0,1].
+     * @param lambda1 first log density.
+     * @param lambda2 second log density.
+     * @return log mixture of densities in specified proportion
+     */
     template <typename T_theta,
               typename T_lambda1,
               typename T_lambda2>
@@ -67,14 +99,14 @@ namespace stan {
       double one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1(0.0);
 
       if (lambda1 > lambda2)
-        log_mix_deriv_inter_helper(theta_double, 
+        log_mix_partial_helper(theta_double, 
                                    lambda1_double, 
                                    lambda2_double,
                                    one_m_exp_lam2_m_lam1,
                                    one_m_t_prod_exp_lam2_m_lam1,
                                    one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1);
       else {
-        log_mix_deriv_inter_helper(1.0 - theta_double, 
+        log_mix_partial_helper(1.0 - theta_double, 
                                    lambda2_double, 
                                    lambda1_double,
                                    one_m_exp_lam2_m_lam1,
