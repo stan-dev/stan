@@ -23,6 +23,8 @@
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
 #include <stan/prob/distributions/univariate/continuous/gamma.hpp>
 #include <stan/prob/distributions/univariate/discrete/poisson.hpp>
+#include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
+#include <stan/prob/internal_math/math/grad_reg_inc_beta.hpp>
 
 namespace stan {
 
@@ -381,6 +383,11 @@ namespace stan {
       }
     }             
 
+    /*
+    // Used in the original neg_binomial_2_ccdf_log implementation
+    // that was incompatible with the fvars used in higher-order
+    // autodiff.
+     
     namespace {
       
       //modified version of beta_ccdf_log
@@ -479,8 +486,57 @@ namespace stan {
       }      
       
     }
+    */
+
+    // Temporary neg_binomial_2_ccdf implementation that
+    // transforms the input parameters and calls neg_binomial_ccdf
+    template <typename T_n, typename T_location, typename T_precision>
+    typename return_type<T_location, T_precision>::type
+    neg_binomial_2_ccdf_log(const T_n& n,
+                            const T_location& mu,
+                            const T_precision& phi) {
+      if ( !( stan::length(n) && stan::length(mu) && stan::length(phi) ) )
+        return 0.0;
+      
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_less;
+      
+      static const std::string function("stan::prob::neg_binomial_2_cdf");
+      check_positive_finite(function, "Location parameter", mu);
+      check_positive_finite(function, "Precision parameter", phi);
+      check_not_nan(function, "Random variable", n);
+      check_consistent_sizes(function,
+                             "Random variable", n,
+                             "Location parameter", mu,
+                             "Precision Parameter", phi);
+      
+      VectorView<const T_n> n_vec(n);
+      VectorView<const T_location> mu_vec(mu);
+      VectorView<const T_precision> phi_vec(phi);
+      
+      size_t size_beta = max_size(mu, phi);
+      
+      std::vector<typename return_type<T_location, T_precision>::type> beta(size_beta);
+
+      for (size_t i = 0; i < size_beta; i++)
+        beta[i] = phi_vec[i] / mu_vec[i];
+      
+      // Cast a vector of size 1 down to a
+      // scalar to avoid dimension mismatch
+      if (size_beta == 1)
+        return neg_binomial_ccdf_log(n, phi, beta[0]);
+      else
+        return neg_binomial_ccdf_log(n, phi, beta);
+    }
     
-    template <typename T_n, typename T_location, 
+    /*
+    // Original neg_binomial_2_ccdf_log implementation
+    // that was incompatible with the fvars used in higher-order
+    // autodiff.
+    template <typename T_n, typename T_location,
               typename T_precision>
     typename return_type<T_location, T_precision>::type
     neg_binomial_2_ccdf_log(const T_n& n,
@@ -540,7 +596,8 @@ namespace stan {
           return beta_ccdf_log_modified(phi_mu, phi, np1);                                 
       }
     
-    }             
+    }
+    */
     
     template <class RNG>
     inline int
