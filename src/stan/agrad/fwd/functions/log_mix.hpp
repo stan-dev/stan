@@ -21,7 +21,7 @@ namespace stan {
     // log_mix_helper_function that only returns the required partials 
     // It does this by sequentially checking the types of the arguments
     // theta_d, lambda1_d and lambda2_d against
-    // the dominant argument type, dom_arg_type, which will always default to
+    // the dominant argument type, partial_return_type, which will always default to
     // fvar<T> given that this function shouldn't be called with three double
     // arguments. There exists a stan/src/stan/math/functions/log_mix.hpp file
     // to handle the triple double argument call, which necessarily returns
@@ -39,32 +39,32 @@ namespace stan {
                            const l1_T& lambda1_d, 
                            const l2_T& lambda2_d,
                            typename promote_args<t_T,l1_T,l2_T>::type (&partials_array)[N]){
-      typedef typename promote_args<t_T,l1_T,l2_T>::type dom_arg_type;
+      typedef typename promote_args<t_T,l1_T,l2_T>::type partial_return_type;
       using std::exp;
 
       typename promote_args<l1_T,l2_T>::type lam2_m_lam1 = lambda2_d - lambda1_d;
       typename promote_args<l1_T,l2_T>::type exp_lam2_m_lam1 = exp(lam2_m_lam1);
       typename promote_args<l1_T,l2_T>::type one_m_exp_lam2_m_lam1 = 1.0 - exp_lam2_m_lam1;
       typename promote_args<double,t_T>::type one_m_t = 1.0 - theta_d;
-      dom_arg_type one_m_t_prod_exp_lam2_m_lam1 = one_m_t * exp_lam2_m_lam1;
-      dom_arg_type t_plus_one_m_t_prod_exp_lam2_m_lam1 
+      partial_return_type one_m_t_prod_exp_lam2_m_lam1 = one_m_t * exp_lam2_m_lam1;
+      partial_return_type t_plus_one_m_t_prod_exp_lam2_m_lam1 
         = theta_d + one_m_t_prod_exp_lam2_m_lam1;
-      dom_arg_type one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1
+      partial_return_type one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1
         = 1.0 / t_plus_one_m_t_prod_exp_lam2_m_lam1;
       
       unsigned int offset = 0;
-      if (is_same<t_T, dom_arg_type>::value){
+      if (is_same<t_T, partial_return_type>::value){
         partials_array[offset] 
           = one_m_exp_lam2_m_lam1 
           * one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
          ++offset;
       }
-      if (is_same<l1_T, dom_arg_type>::value){
+      if (is_same<l1_T, partial_return_type>::value){
         partials_array[offset] 
           = theta_d * one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
          ++offset;
       }
-      if (is_same<l2_T, dom_arg_type>::value){
+      if (is_same<l2_T, partial_return_type>::value){
         partials_array[offset] 
           = one_m_t_prod_exp_lam2_m_lam1 
           * one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
