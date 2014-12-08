@@ -265,6 +265,7 @@ public:
                                       var& cdf_log,
                                       vector<var>& x) {
     cdf_log.grad(x, grad);
+    stan::agrad::recover_memory();
     return cdf_log.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad,
@@ -319,12 +320,14 @@ public:
                                       fvar<var>& cdf_log, 
                                       vector<var>& x) {
     cdf_log.val_.grad(x, grad);
+    stan::agrad::recover_memory();
     return cdf_log.val_.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad, 
                                       fvar<var>& cdf_log, 
                                       vector<var>& x) {
     cdf_log.d_.grad(x, grad);
+    stan::agrad::recover_memory();
     return cdf_log.val_.val();
   }
   double calculate_gradients_3rdorder(vector<double>& grad, 
@@ -338,18 +341,21 @@ public:
                                       fvar<fvar<var> >& cdf_log,
                                       vector<var>& x) {
     cdf_log.val_.val_.grad(x, grad);
+    stan::agrad::recover_memory();
     return cdf_log.val_.val_.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad,
                                       fvar<fvar<var> >& cdf_log, 
                                       vector<var>& x) {
     cdf_log.d_.val_.grad(x, grad);
+    stan::agrad::recover_memory();
     return cdf_log.val_.val_.val();
   }
   double calculate_gradients_3rdorder(vector<double>& grad,
                                       fvar<fvar<var> >& cdf_log, 
                                       vector<var>& x) {
     cdf_log.d_.d_.grad(x, grad);
+    stan::agrad::recover_memory();
     return cdf_log.val_.val_.val();
   }
 

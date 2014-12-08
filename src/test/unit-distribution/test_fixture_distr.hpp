@@ -319,6 +319,7 @@ public:
                                       var& logprob,
                                       vector<var>& x) {
     logprob.grad(x, grad);
+    stan::agrad::recover_memory();
     return logprob.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad,
@@ -373,12 +374,14 @@ public:
                                       fvar<var>& logprob, 
                                       vector<var>& x) {
     logprob.val_.grad(x, grad);
+    stan::agrad::recover_memory();
     return logprob.val_.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad, 
                                       fvar<var>& logprob, 
                                       vector<var>& x) {
     logprob.d_.grad(x, grad);
+    stan::agrad::recover_memory();
     return logprob.val_.val();
   }
   double calculate_gradients_3rdorder(vector<double>& grad, 
@@ -392,18 +395,21 @@ public:
                                       fvar<fvar<var> >& logprob,
                                       vector<var>& x) {
     logprob.val_.val_.grad(x, grad);
+    stan::agrad::recover_memory();
     return logprob.val_.val_.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad,
                                       fvar<fvar<var> >& logprob, 
                                       vector<var>& x) {
     logprob.d_.val_.grad(x, grad);
+    stan::agrad::recover_memory();
     return logprob.val_.val_.val();
   }
   double calculate_gradients_3rdorder(vector<double>& grad,
                                       fvar<fvar<var> >& logprob, 
                                       vector<var>& x) {
     logprob.d_.d_.grad(x, grad);
+    stan::agrad::recover_memory();
     return logprob.val_.val_.val();
   }
 
