@@ -9,6 +9,15 @@ namespace stan {
      * argument is unequal to zero and 0 otherwise.  Equivalent
      * to <code>x1 != 0 || x2 != 0</code>.
      *
+       \f[
+       \mbox{operator||}(x,y) = 
+       \begin{cases}
+         0 & \mbox{if } x,y=0 \\
+         1 & \mbox{if } x \neq 0 \textrm{ or } y\neq0\\[6pt]
+         1 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @tparam T1 Type of first argument.
      * @tparam T2 Type of second argument.
      * @param x1 First argument

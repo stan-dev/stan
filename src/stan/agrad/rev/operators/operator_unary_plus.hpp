@@ -21,6 +21,22 @@ namespace stan {
      * double-precision floating point already, promotion is
      * not necessary.
      *
+       \f[
+       \mbox{operator+}(x) = 
+       \begin{cases}
+         x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \frac{\partial\,\mbox{operator+}(x)}{\partial x} = 
+       \begin{cases}
+         1 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Argument variable.
      * @return The input reference.
      */

@@ -407,6 +407,8 @@ add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inv_wishart_rng",MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inverse",MATRIX_T,MATRIX_T);
 add("inverse_spd",MATRIX_T,MATRIX_T);
+add("is_inf",INT_T,DOUBLE_T);
+add("is_nan",INT_T,DOUBLE_T);
 add_binary("lbeta");
 add_unary("lgamma");
 add("lkj_corr_cholesky_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
@@ -576,6 +578,12 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
           int_vector_types[i],vector_types[j],vector_types[k]);
       add("neg_binomial_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_ccdf_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_cdf",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_cdf_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
       add("neg_binomial_2_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);
       add("neg_binomial_2_log_log",DOUBLE_T,
@@ -603,6 +611,16 @@ for (size_t i = 0; i < vector_types.size(); ++i)
     }
 add_binary("normal_rng");
 add_nullary("not_a_number");
+add("num_elements", INT_T, MATRIX_T);
+add("num_elements", INT_T, VECTOR_T);
+add("num_elements", INT_T, ROW_VECTOR_T);
+for (size_t i=1; i < 10; i++) {
+  add("num_elements", INT_T, expr_type(INT_T,i));
+  add("num_elements", INT_T, expr_type(DOUBLE_T,i));
+  add("num_elements", INT_T, expr_type(MATRIX_T,i));
+  add("num_elements", INT_T, expr_type(ROW_VECTOR_T,i));
+  add("num_elements", INT_T, expr_type(VECTOR_T,i));
+}
 add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
 add("ordered_logistic_rng",INT_T,DOUBLE_T,VECTOR_T);
 add_binary("owens_t");

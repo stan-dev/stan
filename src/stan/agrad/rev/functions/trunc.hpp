@@ -32,6 +32,23 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \mbox{trunc}(x) = 0\f$.
      *
+     *
+       \f[
+       \mbox{trunc}(x) = 
+       \begin{cases}
+         \lfloor x \rfloor & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{trunc}(x)}{\partial x} = 
+       \begin{cases}
+         0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Specified variable.
      * @return Truncation of the variable.
      */

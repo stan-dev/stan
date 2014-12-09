@@ -37,7 +37,23 @@ namespace stan {
      * value.  Although this function is not differentiable because it
      * is discontinuous at integral values, its gradient is returned
      * as zero everywhere.
-     * 
+     *
+       \f[
+       \mbox{ceil}(x) = 
+       \begin{cases}
+         \lceil x\rceil & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{ceil}(x)}{\partial x} = 
+       \begin{cases}
+         0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Input variable.
      * @return Ceiling of the variable.
      */

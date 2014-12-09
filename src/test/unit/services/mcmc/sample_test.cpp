@@ -1,6 +1,6 @@
 #include <stan/services/mcmc/sample.hpp>
 #include <gtest/gtest.h>
-#include <test/test-models/no-main/services/test_lp.cpp>
+#include <test/test-models/good/services/test_lp.cpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;

@@ -20,7 +20,26 @@ namespace stan {
         }
       };
     }
-    
+
+    /**
+     *
+       \f[
+       \mbox{inv}(x) = 
+       \begin{cases}
+         \frac{1}{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{inv}(x)}{\partial x} = 
+       \begin{cases}
+         -\frac{1}{x^2} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
+     */
     inline var inv(const var& a) {
       return var(new inv_vari(a.vi_));
     }

@@ -59,7 +59,7 @@ Eigen is distributed under the Mozilla Public License,
 version 2.
 %
 \begin{quote}
-\url{http:/http://opensource.org/licenses/mpl-2.0}
+\url{http://opensource.org/licenses/mpl-2.0}
 \end{quote}
 %
 The copyright of Eigen is owned jointly by its developers or their
@@ -434,9 +434,10 @@ model {
 \section{Some Differences in the Statistical Models that are Allowed}
 
 \begin{itemize}
-\item Stan does not yet support sampling discrete parameters (discrete
-  data is supported).  We plan to implement discrete sampling using a
-  combination of Gibbs and slice sampling but we haven't done so yet.
+\item Stan does not yet support estimation of discrete parameters
+  (discrete data is supported).  We plan to eventually implement a
+  combination of Gibbs and slice sampling for discrete parameters, but
+  we haven't done so yet.
 \item Stan has some distributions on covariance matrices that do not
   exist in \BUGS, including a uniform distribution over correlation
   matrices which may be rescaled, and the priors based on C-vines
@@ -1069,304 +1070,125 @@ Mac OS X with a single line-feed (LF) character (ASCII code point
 a carriage return (CR) character (ASCII code point \code{0x0D})
 followed by a line-feed (LF) character.
 
+\chapter{Warning and Error Messages}\label{error-messages.appendix}
+
+\noindent
+This appendix details the specific error messages returned by the
+underlying Stan engine.  The individual Stan interfaces (RStan,
+PyStan, CmdStan) also return error or warning messages in some
+circumstances.
+
+\section{Warnings vs.\ Errors}
+
+The messages returned by Stan come in two flavors, warnings and
+errors.  Error messages arise when a fatal problem occurs under the
+hood from which there is no way to recover.  Warning messages arise
+in circumstances from which the underlying program can continue to
+operaate.  
+
+An example warning message is an informational message about
+ill-formed input to an underlying function, which results in a
+Metropolis rejection during sampling or a reduction in step size for
+optimization, without causing a fatal error.  An example error message
+is when either sampling or optimization cannot find a region of
+non-zero probability or when a program being parsed is ill formed.
+When an error arises, whatever program is running cannot continue and
+the entire execution must halt.
+
+\section{Parsing and Compilation}
+
+Both warning messages and error messages may arise during parsing.  If
+a Stan program parses successfully, it should compile in \Cpp as
+well.  If it does not compile, there is an underlying bug in Stan's
+parser and \Cpp code generator.
+
+\begin{itemize}
+\item {\it Jacobian may be necessary.}  This message arises when the
+  parser cannot verify that the left-hand side of a sampling statement
+  is a linear function of a parameter.  If it is not a linear function
+  of the parameters, a Jacobian adjustment must be applied.  See
+  \refchapter{change-of-variables} for more information on how to
+  adjust for the Jacobian of a non-linear transform
+\end{itemize}
+
+
+\section{Initialization}
+
+\begin{itemize}
+\item {\it vanishing density.} This message arrises when there is a
+  problem with initialization not providing a finite log probability.
+%
+\end{itemize}
+
+\section{Function Evaluation}
+
+\begin{itemize}
+\item {\it informational message.}  This message shows up during
+  sampling when there is a rejected sample due to an underlying issue
+  with input to an underlying function (including probably functions
+  and sampling statements).  This is a {\it warning}\, message, not an
+  error message.  If it only appears at the beginning of warmup in
+  MCMC or during early iterations of optimization, it indicates that
+  adaptation has not yet found appropriate scales for the parameters
+  and an appropriate overall stepsize.  This causes problem like
+  overflow or underflow and thus causes illegal inputs to be passed to
+  functions.  Even if this message persists during sampling, the
+  Metropolis acceptance step will account for the problem and the
+  parameter values being evaluated will be rejected.  This can lead to
+  inefficiency in the best case and lack of ability to make progress
+  in the worst case.  In cases where the message persists, it is worth
+  investigating the arithmetic stability of the Stan program.  There
+  are several tips in this manual and in the user group about how to
+  rewrite problematic programs.
+\end{itemize}
+
+
+
 
 \chapter{Mathematical Functions}\label{math-functions.appendix}
 
-\section{acos}\label{acos-appendix.section}
-$\arccos(x)$ is the principal arc (inverse) cosine (in radians) function.
-%
-\[
-\frac{\partial \, \arccos(x)}{\partial x} = -\frac{1}{\sqrt{1-x^2}}
-\]
+This appendix provides the definition of several mathematical
+functions used throughout the manual.
 
-\section{acosh}\label{acosh-appendix.section}
-$\cosh^{-1}(x)$ is the inverse hyperbolic cosine (in radians) function.
-%
-\[
-\cosh^{-1}(x)=\ln\left(x+\sqrt{x^2-1}\right)
-\]
-%
-\[
-\frac{\partial \, \cosh^{-1}(x)}{\partial x} = \frac{1}{\sqrt{x^2-1}}
-\]
+\section{Beta}\label{beta-appendix.section}
 
-\section{asin}\label{asin-appendix.section}
-$\arcsin(x)$ is the principal arc (inverse) sine (in radians) function.
+The beta function, $\mbox{B}(\alpha,\beta)$, computes the normalizing
+constant for the beta distribution, and is defined for $a > 0$ and $b
+> 0$ by
 %
 \[
-\frac{\partial \, \arcsin(x)}{\partial x} = \frac{1}{\sqrt{1-x^2}}>
-\]
-
-\section{asinh}\label{asinh-appendix.section}
-$\sinh^{-1}(x)$ is the inverse hyperbolic sine (in radians) function.
-%
-\[
-\sinh^{-1}(x)=\ln\left(x+\sqrt{x^2+1}\right)
-\]
-%
-\[
-\frac{\partial \, \sinh^{-1}(x)}{\partial x} = \frac{1}{\sqrt{x^2+1}}
-\]
-
-\section{atan}\label{atan-appendix.section}
-$\arctan(x)$ is the principal arc (inverse) tangent (in radians) function.
-%
-\[
-\frac{\partial \, \arctan(x)}{\partial x} = \frac{1}{x^2+1}
-\]
-
-\section{atanh}\label{atanh-appendix.section}
-$\tanh^{-1}(x)$ is the inverse hyperbolic tangent (in radians) function.
-%
-\[
-\tanh^{-1}(x)=\frac{1}{2}\ln\left(\frac{1+x}{1-x}\right)
-\]
-%
-\[
-\frac{\partial \, \tanh^{-1}(x)}{\partial x} = \frac{1}{1-x^2}
-\]
-
-\section{bessel\_first\_kind}\label{bessel-first-kind-appendix.section}
-$J_v(x)$ is the bessel function of the first kind of order $v$.
-%
-\[
-J_v(x)=\left(\frac{1}{2}x\right)^v
-	\sum_{k=0}^\infty \frac{\left(-\frac{1}{4}x^2\right)^k}{k!\, \Gamma(v+k+1)}
-\]
-%
-\[
-\frac{\partial \, J_v(x)}{\partial x} = \frac{v}{x}J_v(x)-J_{v+1}(x)
-\]
-
-\section{bessel\_second\_kind}\label{bessel-second-kind-appendix.section}
-$Y_v(x)$ is the bessel function of the second kind of order $v$ for positive $x$.
-%
-\[
-Y_v(x)=\frac{J_v(x)\cos(v\pi)-J_{-v}(x)}{\sin(v\pi)}
-\]
-%
-\[
-\frac{\partial \, Y_v(x)}{\partial x} = \frac{v}{x}Y_v(x)-Y_{v+1}(x)
-\]
-
-\section{digamma}\label{digamma-appendix.section}
-$\Psi(x)$ is the digamma function.
-%
-\[
-\Psi(x)=\frac{\Gamma'(x)}{\Gamma(x)}
-\]
-%
-\[
-\frac{\partial \, \Psi(x)}{\partial x} = \frac{\Gamma''(x)\Gamma(x)-(\Gamma'(x))^2}{\Gamma^2(x)}
-\]
-
-\section{erf}\label{erf-appendix.section}
-$\erf(x)$ is the error function (also known as the Gauss error function).
-%
-\[
-\erf(x)=\frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt
-\]
-%
-\[
-\frac{\partial \, \erf(x)}{\partial x} = \frac{2}{\sqrt{\pi}} e^{-x^2}
-\]
-
-\section{erfc}\label{erfc-appendix.section}
-$\erfc(x)$ is the complementary error function (also known as the Gauss complementary error function).
-%
-\[
-\erfc(x)=\frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
-\]
-%
-\[
-\frac{\partial \, \erfc(x)}{\partial x} = -\frac{2}{\sqrt{\pi}} e^{-x^2}
-\]
-
-\section{falling\_factorial}\label{falling-factorial-appendix.section}
-$(x)_n$ is the falling factorial function.
-%
-\[
-(x)_n=\frac{\Gamma(x+1)}{\Gamma(x-n+1)}
-\]
-%
-\[
-\frac{\partial \, (x)_n}{\partial x} = (x)_n\Psi(x+1)
-\]
-%
-\[
-\frac{\partial \, (x)_n}{\partial n} = -(x)_n\Psi(n+1)
-\]
-
-\section{gamma\_p}\label{gamma-p-appendix.section}
-$P(a,z)$ is the normalised lower incomplete gamma function of $a$ and $z$.
-%
-\[
-P(a,z)=\frac{1}{\Gamma(a)}\int_0^zt^{a-1}e^{-t}dt
-\]
-%
-\[
-\frac{\partial \, P(a,z)}{\partial a} = -\frac{\Psi(a)}{\Gamma^2(a)}\int_0^zt^{a-1}e^{-t}dt 
-	+ \frac{1}{\Gamma(a)}\int_0^z (a-1)t^{a-2}e^{-t}dt
-\]
-%
-\[
-\frac{\partial \, P(a,z)}{\partial z} = \frac{z^{a-1}e^{-z}}{\Gamma(a)}
-\]
-
-\section{gamma\_q}\label{gamma-q-appendix.section}
-$Q(a,z)$ is the normalised upper incomplete gamma function of $a$ and $z$.
-%
-\[
-Q(a,z)=\frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt
-\]
-%
-\[
-\frac{\partial \, Q(a,z)}{\partial a} = -\frac{\Psi(a)}{\Gamma^2(a)}\int_z^\infty t^{a-1}e^{-t}dt 
-	+ \frac{1}{\Gamma(a)}\int_z^\infty (a-1)t^{a-2}e^{-t}dt
-\]
-%
-\[
-\frac{\partial \, Q(a,z)}{\partial z} = -\frac{z^{a-1}e^{-z}}{\Gamma(a)}
+\mbox{B}(a,b)
+\ = \
+\int_0^1 u^{a - 1} (1 - u)^{b - 1} \, du
+\ = \
+\frac{\Gamma(a) \, \Gamma(b)}{\Gamma(a+b)}.
 \]
 
 
-\section{inv\_cloglog}\label{inv-cloglog-appendix.section}
-$\mbox{cloglog}^{-1}(y)$ is 
-the inverse of the complementary log-log function.
-%
+\section{Gamma}\label{gamma-appendix.section}
+
+The gamma function, $\Gamma(x)$, is the generalization of the
+factorial function to continuous variables, defined so that for
+positive integers $n$,
 \[
-\mbox{cloglog}^{-1}(y)= 1 - \exp \left( - \exp(y) \right)
+\Gamma(n+1) = n!
 \]
 %
+Generalizing to all positive numbers and non-integer negative numbers,
 \[
-\frac{\partial \, \mbox{cloglog}^{-1}(y)}{\partial y} = \exp(y-\exp(y))
+\Gamma(x) = \int_0^{\infty} u^{x - 1} \exp(-u) \, du.
 \]
 
-\section{inv\_logit}\label{inv-logit-appendix.section}
-$\mbox{logit}^{-1}(y)$ is the logistic sigmoid function.
-%
-\[
-\mbox{logit}^{-1}(y) = \frac{1}{1 + \exp(-y)}
-\]
-%
-\[
-\frac{\partial \, \mbox{logit}^{-1}(y)}{\partial y} = \frac{\exp(y)}{(\exp(y)+1)^2}
-\]
 
-\section{lmgamma}\label{lmgamma-appendix.section}
-$\ln\Gamma_n(x)$ is the natural logarithm of the multinomial gamma function with \farg{n}
-dimensions.
-%
-\[
-\ln\Gamma_n(x) = \pi^{n(n-1)/4} \, \prod_{j=1}^n \Gamma(x + (1 - j)/2)
-\]
-%
-\[
-\frac{\partial \, \ln\Gamma_n(x)}{\partial x} = \sum_{j=1}^n \Psi(x + (1 - j) / 2)
-\]
+\section{Digamma}\label{digamma-appendix.section}
 
-\section{modified\_bessel\_first\_kind}\label{modified-bessel-first-kind-appendix.section}
-$I_v(z)$ is the modified Bessel function of the first kind with order \farg{v} applied to \farg{z}.
-\[
-{I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
-\]
+The digamma function $\Psi$ is the derivative of the $\log \Gamma$
+function,
 %
 \[
-\frac{\partial \, I_v(z)}{\partial z} = I_{v-1}(z)-\frac{v}{z}I_v(z)
-\]
-
-\section{modified\_bessel\_second\_kind}\label{modified-bessel-second-kind-appendix.section}
-$K_v(z)$ is the bessel function of the second kind of order $v$ for positive $z$.
-%
-\[
-{K_v}(z)
-=
-\frac{\pi}{2}\cdot\frac{I_{-v}(z) - I_{v}(z)}{\sin(v\pi)}
-\]
-%
-\[
-\frac{\partial \, K_v(z)}{\partial z} = -\frac{v}{z}K_v(z)-K_{v-1}(z)
-\]
-
-\section{owens\_t}\label{owens-t-appendix.section}
-$\mbox{owens\_t}(h,a)$ is the Owen's T
-  function for the probability of the event $X > h$ and $0<Y<aX$
-  where \farg{X} and \farg{Y} are independent standard normal random
-  variables.
-%
-\[
-\mbox{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx
-\]
-%
-\[
-\frac{\partial \, \mbox{owens\_t}(h,a)}{\partial h} = -\frac{1}{2\sqrt{2\pi}}
-	\erf\left(\frac{ha}{\sqrt{2}}\right)
-	\exp\left(-\frac{h^2}{2}\right)
-\]
-%
-\[
-\frac{\partial \, \mbox{owens\_t}(h,a)}{\partial a} = \frac{\exp\left(-\frac{1}{2}h^2(1+a^2)\right)}{2\pi (1+a^2)}
-\]
-
-\section{Phi}\label{Phi-appendix.section}
-$\Phi(x)$ is the unit normal cumulative distribution function.
-%
-\[
-\Phi(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
-\]
-%
-\[
-\frac{\partial \, \Phi(x)}{\partial x} = \frac{e^{-x^2/2}}{\sqrt{2\pi}}
-\]
-
-\section{Phi\_approx}\label{Phi-approx-appendix.section}
-$\Phi_{\mbox{\footnotesize approx}}(x)$ is the fast approximation of the 
-unit normal cumulative distribution function.
-%
-\[
-\Phi_{\mbox{\footnotesize approx}}(x) = \mbox{logit}^{-1}(0.07056 \,
-x^3 + 1.5976 \, x)
-\]
-%
-\[
-\frac{\partial \, \Phi_{\mbox{\footnotesize approx}}(x)}{\partial x}
-	= -\Phi_{\mbox{\footnotesize approx}}^2(x)
-		e^{-0.07056x^3 - 1.5976x}(-0.21168x^2-1.5976)
-\]
-
-\section{rising\_factorial}\label{rising-factorial-appendix.section}
-$x^{(n)}$ is the rising factorial function for positive $x$ and real $n$.
-%
-\[
-x^{(n)}=\frac{\Gamma(x+n)}{\Gamma(x)}
-\]
-%
-\[
-\frac{\partial \, x^{(n)}}{\partial x} = x^{(n)}(\Psi(x+n)-\Psi(x))
-\]
-%
-\[
-\frac{\partial \, x^{(n)}}{\partial n} = (x)_n\Psi(x+n)
-\]
-
-\section{tgamma}\label{gamma-appendix.section}
-$\Gamma(x)$ is the gamma function.
-%
-\[
-\Gamma(x)=\int_0^{\infty} u^{x - 1} \exp(-u) \, du
-\]
-%
-\[
-\frac{\partial \, \Gamma(x)}{\partial x} = \Gamma(x)\Psi(x)
-\]
-
-\section{trigamma}\label{trigamma-appendix.section}
-$\Psi_1(x)$ is the trigamma function.
-%
-\[
-\Psi_1(x)=\sum_{n=0}^\infty \frac{1}{(x+n)^2}
-\]
-%
-\[
-\frac{\partial \, \Psi_1(x)}{\partial x} = -2\sum_{n=0}^\infty \frac{1}{(x+n)^3}
+\Psi(u) 
+\ = \
+\frac{d}{d u} \log \Gamma(u) 
+\ = \
+\frac{1}{\Gamma(u)} \ \frac{d}{d u} \Gamma(u).
 \]

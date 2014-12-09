@@ -18,8 +18,26 @@ namespace stan {
      * <code> = log1p(exp(a))</code>
      *
      * <code> = log(1 + exp(x))</code>
-
+     *
      * <code> = log_sum_exp(0,x)</code>.
+     *
+     *
+       \f[
+       \mbox{log1p\_exp}(x) = 
+       \begin{cases}
+         \ln(1+\exp(x)) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{log1p\_exp}(x)}{\partial x} = 
+       \begin{cases}
+         \frac{\exp(x)}{1+\exp(x)} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type

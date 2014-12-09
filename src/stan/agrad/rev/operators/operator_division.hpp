@@ -63,6 +63,30 @@ namespace stan {
      *
      * \f$\frac{\partial}{\partial y} (x/y) = -x / y^2\f$.
      *
+       \f[
+       \mbox{operator/}(x,y) = 
+       \begin{cases}
+         \frac{x}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{operator/}(x,y)}{\partial x} = 
+       \begin{cases}
+         \frac{1}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{operator/}(x,y)}{\partial y} = 
+       \begin{cases}
+         -\frac{x}{y^2} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a First variable operand.
      * @param b Second variable operand.
      * @return Variable result of dividing the first variable by the

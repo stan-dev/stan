@@ -65,5 +65,4 @@
  * Templated probability distributions. 
  *
  * All paramaterizations are based on Bayesian Data Analysis.
- * Error handling for the distributions is described in @ref policy_page.
  */

@@ -4,10 +4,13 @@
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/utility/enable_if.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
+#include <stan/math/constants.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -39,14 +42,14 @@ namespace stan {
     typename boost::enable_if_c<is_var_or_arithmetic<T_y,T_loc,T_scale>::value,
                                 typename return_type<T_y,T_loc,T_scale>::type>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const char* function = "stan::prob::normal_log(%1%)";
+      static const std::string function("stan::prob::normal_log");
 
       using std::log;
       using stan::is_constant_struct;
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -60,14 +63,13 @@ namespace stan {
       double logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      check_not_nan(function, y, "Random variable", &logp);
-      check_finite(function, mu, "Location parameter", &logp);
-      check_positive(function, sigma, "Scale parameter", &logp);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,mu,sigma,
-                             "Random variable","Location parameter",
-                             "Scale parameter",
-                             &logp);
+                             "Random variable", y,
+                             "Location parameter", mu,
+                             "Scale parameter", sigma);
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_loc,T_scale>::value)
         return 0.0;
@@ -135,9 +137,6 @@ namespace stan {
      * 
      * \f$\Phi(x) = \frac{1}{\sqrt{2 \pi}} \int_{-\inf}^x e^{-t^2/2} dt\f$.
      * 
-     * Errors are configured by policy.  All variables must be finite
-     * and the scale must be strictly greater than zero.
-     * 
      * @param y A scalar variate.
      * @param mu The location of the normal distribution.
      * @param sigma The scale of the normal distriubtion
@@ -145,18 +144,17 @@ namespace stan {
      * @tparam T_y Type of y.
      * @tparam T_loc Type of mean parameter.
      * @tparam T_scale Type of standard deviation paramater.
-     * @tparam Policy Error-handling policy.
      */
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const char* function = "stan::prob::normal_cdf(%1%)";
+      static const std::string function("stan::prob::normal_cdf");
 
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::INV_SQRT_2;
 
       double cdf(1.0);
@@ -167,15 +165,15 @@ namespace stan {
             && stan::length(sigma)))
         return cdf;
 
-      check_not_nan(function, y, "Random variable", &cdf);
-      check_finite(function, mu, "Location parameter", &cdf);
-      check_not_nan(function, sigma, "Scale parameter", &cdf);
-      check_positive(function, sigma, "Scale parameter", &cdf);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,mu,sigma,
-                             "Random variable","Location parameter",
-                             "Scale parameter",
-                             &cdf);
+                             "Random variable", y,
+                             "Location parameter", mu,
+                             "Scale parameter", sigma);
+                             
 
      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
        operands_and_partials(y, mu, sigma);
@@ -231,12 +229,12 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const char* function = "stan::prob::normal_cdf_log(%1%)";
+      static const std::string function("stan::prob::normal_cdf_log");
 
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::math::INV_SQRT_2;
 
@@ -247,14 +245,14 @@ namespace stan {
             && stan::length(sigma)))
         return cdf_log;
 
-      check_not_nan(function, y, "Random variable", &cdf_log);
-      check_finite(function, mu, "Location parameter", &cdf_log);
-      check_not_nan(function, sigma, "Scale parameter", &cdf_log);
-      check_positive(function, sigma, "Scale parameter", &cdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,mu,sigma,
-                             "Random variable","Location parameter",
-                             "Scale parameter", &cdf_log);
+                             "Random variable", y,
+                             "Location parameter", mu,
+                             "Scale parameter", sigma);
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
@@ -303,12 +301,12 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const char* function = "stan::prob::normal_ccdf_log(%1%)";
+      static const std::string function("stan::prob::normal_ccdf_log");
 
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::math::INV_SQRT_2;
 
@@ -319,14 +317,14 @@ namespace stan {
             && stan::length(sigma)))
         return ccdf_log;
 
-      check_not_nan(function, y, "Random variable", &ccdf_log);
-      check_finite(function, mu, "Location parameter", &ccdf_log);
-      check_not_nan(function, sigma, "Scale parameter", &ccdf_log);
-      check_positive(function, sigma, "Scale parameter", &ccdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,mu,sigma,
-                             "Random variable","Location parameter",
-                             "Scale parameter", &ccdf_log);
+                             "Random variable", y,
+                             "Location parameter", mu,
+                             "Scale parameter", sigma);
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
@@ -379,16 +377,16 @@ namespace stan {
                RNG& rng) {
       using boost::variate_generator;
       using boost::normal_distribution;
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
 
-      static const char* function = "stan::prob::normal_rng(%1%)";
+      static const std::string function("stan::prob::normal_rng");
 
-      check_finite(function, mu, "Location parameter", (double*)0);
-      check_not_nan(function, mu, "Location parameter", (double*)0);
-      check_positive(function, sigma, "Scale parameter", (double*)0);
-      check_not_nan(function, sigma, "Scale parameter", (double*)0);
+      check_finite(function, "Location parameter", mu);
+      check_not_nan(function, "Location parameter", mu);
+      check_positive(function, "Scale parameter", sigma);
+      check_not_nan(function, "Scale parameter", sigma);
 
       variate_generator<RNG&, normal_distribution<> >
         norm_rng(rng, normal_distribution<>(mu, sigma));

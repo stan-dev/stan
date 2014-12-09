@@ -34,6 +34,33 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \mbox{acosh}(x) = \frac{x}{x^2 - 1}\f$.
      *
+     *
+       \f[
+       \mbox{acosh}(x) = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 1 \\
+         \cosh^{-1}(x) & \mbox{if } x \geq 1 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{acosh}(x)}{\partial x} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 1 \\
+         \frac{\partial\, \cosh^{-1}(x)}{\partial x} & \mbox{if } x \geq 1 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \cosh^{-1}(x)=\ln\left(x+\sqrt{x^2-1}\right)
+       \f]
+   
+       \f[
+       \frac{\partial \, \cosh^{-1}(x)}{\partial x} = \frac{1}{\sqrt{x^2-1}}
+       \f]
+     *
      * @param a The variable.
      * @return Inverse hyperbolic cosine of the variable.
      */

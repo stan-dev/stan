@@ -2,8 +2,8 @@
 #define STAN__AGRAD__REV__MATRIX__EIGEN_NUMTRAITS_HPP
 
 #include <limits>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
   namespace agrad {
@@ -32,7 +32,7 @@ namespace stan {
                       const stan::agrad::var* v2, int stride2, size_t length) : 
           vari(eval_gevv(alpha,v1,stride1,v2,stride2,length,&dotval_)), length_(length) {
           alpha_ = alpha->vi_;
-          v1_ = (stan::agrad::vari**)stan::agrad::memalloc_.alloc(2*length_*sizeof(stan::agrad::vari*));
+          v1_ = (stan::agrad::vari**)stan::agrad::ChainableStack::memalloc_.alloc(2*length_*sizeof(stan::agrad::vari*));
           v2_ = v1_ + length_;
           for (size_t i = 0; i < length_; i++)
             v1_[i] = v1[i*stride1].vi_;

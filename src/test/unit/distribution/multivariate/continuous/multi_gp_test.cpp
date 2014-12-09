@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_gp.hpp>
 
 // UTILITY FUNCTIONS FOR TESTING

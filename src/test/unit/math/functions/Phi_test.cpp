@@ -1,6 +1,6 @@
-#include "stan/math/functions/Phi.hpp"
-#include <gtest/gtest.h>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/math/functions/Phi.hpp>
+#include <gtest/gtest.h>
 
 TEST(MathFunctions, Phi) {
   EXPECT_EQ(0.5 + 0.5 * boost::math::erf(0.0), stan::math::Phi(0.0));

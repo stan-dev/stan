@@ -23,6 +23,22 @@ namespace stan {
     /**
      * Return the exponentiation of the specified variable (cmath).
      *
+       \f[
+       \mbox{exp}(x) = 
+       \begin{cases}
+         e^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{exp}(x)}{\partial x} = 
+       \begin{cases}
+         e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Variable to exponentiate.
      * @return Exponentiated variable.
      */

@@ -76,6 +76,34 @@ namespace stan {
      *
      * \f$\frac{\partial}{\partial y} \mbox{fdim}(x,y) = -\lfloor\frac{x}{y}\rfloor\f$ if \f$x \geq y\f$.
      * 
+     *
+       \f[
+       \mbox{fdim}(x,y) = 
+       \begin{cases}
+         0 & \mbox{if } x < y\\
+         x-y & \mbox{if } x \geq y \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{fdim}(x,y)}{\partial x} = 
+       \begin{cases}
+         0 & \mbox{if } x < y \\
+         1 & \mbox{if } x \geq y \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{fdim}(x,y)}{\partial y} = 
+       \begin{cases}
+         0 & \mbox{if } x < y \\
+         -\lfloor\frac{x}{y}\rfloor & \mbox{if } x \geq y \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]     
+     *
      * @param a First variable.
      * @param b Second variable.
      * @return The positive difference between the first and second

@@ -27,6 +27,23 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \tan x = \sec^2 x\f$.
      *
+     *
+       \f[
+       \mbox{tan}(x) = 
+       \begin{cases}
+         \tan(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{tan}(x)}{\partial x} = 
+       \begin{cases}
+         \sec^2(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Variable for radians of angle.
      * @return Tangent of variable. 
      */

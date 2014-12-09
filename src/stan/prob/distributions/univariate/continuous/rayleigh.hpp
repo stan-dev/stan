@@ -3,10 +3,13 @@
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
+#include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/square.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -19,13 +22,13 @@ namespace stan {
               typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_log(const T_y& y, const T_scale& sigma) {
-      static const char* function = "stan::prob::rayleigh_log(%1%)";
+      static const std::string function("stan::prob::rayleigh_log");
 
       using std::log;
       using stan::is_constant_struct;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -37,13 +40,12 @@ namespace stan {
       double logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      check_not_nan(function, y, "Random variable", &logp);
-      check_positive(function, sigma, "Scale parameter", &logp);
-      check_positive(function, y, "Random variable", &logp);
+      check_not_nan(function, "Random variable", y);
+      check_positive(function, "Scale parameter", sigma);
+      check_positive(function, "Random variable", y);
       check_consistent_sizes(function,
-                             y,sigma,
-                             "Random variable","Scale parameter",
-                             &logp);
+                             "Random variable", y,
+                             "Scale parameter", sigma);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_scale>::value)
@@ -103,12 +105,12 @@ namespace stan {
     template <typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_cdf(const T_y& y, const T_scale& sigma) {
-      static const char* function = "stan::prob::rayleigh_cdf(%1%)";
+      static const std::string function("stan::prob::rayleigh_cdf");
 
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::is_constant_struct;
       using stan::math::square;
@@ -120,14 +122,13 @@ namespace stan {
       if (!(stan::length(y) && stan::length(sigma)))
         return cdf;
 
-      check_not_nan(function, y, "Random variable", &cdf);
-      check_nonnegative(function, y, "Random variable", &cdf);
-      check_not_nan(function, sigma, "Scale parameter", &cdf);
-      check_positive(function, sigma, "Scale parameter", &cdf);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,sigma,
-                             "Random variable","Scale parameter",
-                             &cdf);
+                             "Random variable", y,
+                             "Scale parameter", sigma);
 
 
       // set up template expressions wrapping scalars into vector views
@@ -174,12 +175,12 @@ namespace stan {
     template <typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_cdf_log(const T_y& y, const T_scale& sigma) {
-      static const char* function = "stan::prob::rayleigh_cdf_log(%1%)";
+      static const std::string function("stan::prob::rayleigh_cdf_log");
 
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::is_constant_struct;
       using stan::math::square;
@@ -191,15 +192,13 @@ namespace stan {
       if (!(stan::length(y) && stan::length(sigma)))
         return cdf_log;
 
-      check_not_nan(function, y, "Random variable", &cdf_log);
-      check_nonnegative(function, y, "Random variable", &cdf_log);
-      check_not_nan(function, sigma, "Scale parameter", &cdf_log);
-      check_positive(function, sigma, "Scale parameter", &cdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,sigma,
-                             "Random variable","Scale parameter",
-                             &cdf_log);
-
+                             "Random variable", y,
+                             "Scale parameter", sigma);
 
       // set up template expressions wrapping scalars into vector views
       agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
@@ -237,12 +236,12 @@ namespace stan {
     template <typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_ccdf_log(const T_y& y, const T_scale& sigma) {
-      static const char* function = "stan::prob::rayleigh_ccdf_log(%1%)";
+      static const std::string function("stan::prob::rayleigh_ccdf_log");
 
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::is_constant_struct;
       using stan::math::square;
@@ -254,14 +253,13 @@ namespace stan {
       if (!(stan::length(y) && stan::length(sigma)))
         return ccdf_log;
 
-      check_not_nan(function, y, "Random variable", &ccdf_log);
-      check_nonnegative(function, y, "Random variable", &ccdf_log);
-      check_not_nan(function, sigma, "Scale parameter", &ccdf_log);
-      check_positive(function, sigma, "Scale parameter", &ccdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,sigma,
-                             "Random variable","Scale parameter",
-                             &ccdf_log);
+                             "Random variable", y,
+                             "Scale parameter", sigma);
 
 
       // set up template expressions wrapping scalars into vector views
@@ -301,11 +299,11 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::uniform_real_distribution;
 
-      static const char* function = "stan::prob::rayleigh_rng(%1%)";
+      static const std::string function("stan::prob::rayleigh_rng");
 
-      using stan::math::check_positive;
+      using stan::error_handling::check_positive;
 
-      check_positive(function, sigma, "Scale parameter", (double*)0);
+      check_positive(function, "Scale parameter", sigma);
 
       variate_generator<RNG&, uniform_real_distribution<> >
         uniform_rng(rng, uniform_real_distribution<>(0.0, 1.0));

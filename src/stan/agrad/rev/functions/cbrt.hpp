@@ -29,6 +29,22 @@ namespace stan {
      *
      * \f$\frac{d}{dx} x^{1/3} = \frac{1}{3 x^{2/3}}\f$.
      *
+       \f[
+       \mbox{cbrt}(x) = 
+       \begin{cases}
+         \sqrt[3]{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{cbrt}(x)}{\partial x} = 
+       \begin{cases}
+         \frac{1}{3x^{2/3}} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Specified variable.
      * @return Cube root of the variable.
      */

@@ -4,6 +4,8 @@
 #include <ostream>
 #include <stan/interface/recorder/recorder.hpp>
 
+#include <stan/math/meta/index_type.hpp>
+
 namespace stan {
   namespace interface {
     namespace recorder {
@@ -38,12 +40,13 @@ namespace stan {
          */
         template <class T>
         void operator()(const std::vector<T>& x) {
+          typedef typename stan::math::index_type<std::vector<T> >::type idx_t;
           if (!has_stream_)
             return;
         
           if (x.size() != 0) {
             *o_ << x[0];
-            for (typename std::vector<T>::size_type n = 1; n < x.size(); n++) {
+            for (idx_t n = 1; n < x.size(); n++) {
               *o_ << "," << x[n];
             }
           }

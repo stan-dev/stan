@@ -16,6 +16,15 @@ namespace stan {
      * (||) operators do not apply the same "short circuit" rules
      * as the built-in logical operators.  
      *
+        \f[
+        \mbox{operator!}(x) = 
+        \begin{cases}
+          0 & \mbox{if } x \neq 0 \\
+          1 & \mbox{if } x = 0 \\[6pt]
+          0 & \mbox{if } x = \textrm{NaN} 
+        \end{cases}
+        \f]
+     *
      * @param a Variable to negate.
      * @return True if variable is non-zero.
      */

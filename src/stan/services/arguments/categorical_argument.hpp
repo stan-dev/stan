@@ -71,7 +71,7 @@ namespace stan {
         bool good_arg = true;
         bool valid_arg = true;
         
-        while(good_arg) {
+        while (good_arg) {
           if (args.size() == 0)
             return valid_arg;
           

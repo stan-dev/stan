@@ -74,6 +74,31 @@ namespace stan {
      *
      * \f$\frac{\partial}{\partial y} \mbox{pow}(x,y) = x^y \ \log x\f$.
      *
+     *
+       \f[
+       \mbox{pow}(x,y) = 
+       \begin{cases}
+         x^y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{pow}(x,y)}{\partial x} = 
+       \begin{cases}
+         yx^{y-1} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{pow}(x,y)}{\partial y} = 
+       \begin{cases}
+         x^y\ln x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param base Base variable.
      * @param exponent Exponent variable.
      * @return Base raised to the exponent.

@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/no-main/gm/reject_generated_quantities.cpp>
+#include <test/test-models/good/gm/reject_generated_quantities.cpp>
 
 /* tests that stan program throws exception in generated quantities block
    this is compiled into cpp model object's method write_array

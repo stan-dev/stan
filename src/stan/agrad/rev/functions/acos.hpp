@@ -29,6 +29,31 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \arccos x = \frac{-1}{\sqrt{1 - x^2}}\f$.
      *
+     *
+       \f[
+       \mbox{acos}(x) = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < -1\\
+         \arccos(x) & \mbox{if } -1\leq x\leq 1 \\
+         \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{acos}(x)}{\partial x} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < -1\\
+         \frac{\partial\,\arccos(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
+         \textrm{NaN} & \mbox{if } x < -1\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial \, \arccos(x)}{\partial x} = -\frac{1}{\sqrt{1-x^2}}
+       \f]
+     *
      * @param a Variable in range [-1,1].
      * @return Arc cosine of variable, in radians. 
      */

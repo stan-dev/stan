@@ -1,6 +1,6 @@
 #include <stan/services/io/write_iteration.hpp>
 #include <gtest/gtest.h>
-#include <test/test-models/no-main/services/test_lp.cpp>
+#include <test/test-models/good/services/test_lp.cpp>
 #include <sstream>
 
 typedef test_lp_model_namespace::test_lp_model Model;
