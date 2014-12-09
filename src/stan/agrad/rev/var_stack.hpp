@@ -43,6 +43,7 @@ namespace stan {
       return nested_var_stack_sizes_.empty();
     }
 
+	void clear_stack(std::vector<chainable*> & stack, size_t start = 0);
     /**
      * Recover memory used for all variables for reuse.
      * 
@@ -53,8 +54,8 @@ namespace stan {
       if (!empty_nested())
         throw std::logic_error("empty_nested() must be true"
                                " before calling recover_memory()");
-      var_stack_.clear();
-      var_nochain_stack_.clear();
+      clear_stack(var_stack_);
+      clear_stack(var_nochain_stack_);
       for (size_t i = 0; i < var_alloc_stack_.size(); i++)
         delete var_alloc_stack_[i];
       var_alloc_stack_.clear();
@@ -74,14 +75,14 @@ namespace stan {
         throw std::logic_error("empty_nested() must be false"
                                " before calling recover_memory_nested()");
 
-      var_stack_.resize(nested_var_stack_sizes_.back());
+      clear_stack(var_stack_, nested_var_stack_sizes_.back());
       nested_var_stack_sizes_.pop_back();
 
-      var_nochain_stack_.resize(nested_var_nochain_stack_sizes_.back());
+	  clear_stack(var_nochain_stack_, nested_var_nochain_stack_sizes_.back());
       nested_var_nochain_stack_sizes_.pop_back();
 
       for (size_t i = nested_var_alloc_stack_starts_.back();
-           i < var_alloc_stack_.size(); 
+           i < var_alloc_stack_.size();
            ++i)
         delete var_alloc_stack_[i];
       nested_var_alloc_stack_starts_.pop_back();
