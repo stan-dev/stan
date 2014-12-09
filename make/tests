@@ -126,11 +126,11 @@ src/test/unit/optimization/bfgs_test.cpp: src/test/test-models/good/optimization
 src/test/unit/optimization/bfgs_update_test.cpp: src/test/test-models/good/optimization/rosenbrock.cpp
 src/test/unit/optimization/lbfgs_update_test.cpp: src/test/test-models/good/optimization/rosenbrock.cpp
 
-src/test/unit/services/init/command_init_test.cpp: src/test/test-models/good/common/test_lp.cpp
-src/test/unit/services/mcmc/run_markov_chain_test.cpp: src/test/test-models/good/common/test_lp.cpp
-src/test/unit/services/mcmc/sample_test.cpp: src/test/test-models/good/common/test_lp.cpp
-src/test/unit/services/mcmc/warmup_test.cpp: src/test/test-models/good/common/test_lp.cpp
-src/test/unit/services/io/write_iteration_test.cpp: src/test/test-models/good/common/test_lp.cpp
+src/test/unit/services/init/command_init_test.cpp: src/test/test-models/good/services/test_lp.cpp
+src/test/unit/services/mcmc/run_markov_chain_test.cpp: src/test/test-models/good/services/test_lp.cpp
+src/test/unit/services/mcmc/sample_test.cpp: src/test/test-models/good/services/test_lp.cpp
+src/test/unit/services/mcmc/warmup_test.cpp: src/test/test-models/good/services/test_lp.cpp
+src/test/unit/services/io/write_iteration_test.cpp: src/test/test-models/good/services/test_lp.cpp
 
 src/test/unit/gm/reject/reject_mult_args_test.cpp: src/test/test-models/good/gm/reject_mult_args.cpp
 src/test/unit/gm/reject/reject_model_test.cpp: src/test/test-models/good/gm/reject_model.cpp
