@@ -12,7 +12,7 @@
 namespace stan {
   namespace io {
 
-    // FIXME: should consolidate with the options from the command line in stan::gm
+    // FIXME: should consolidate with the options from the command line in stan::lang
     struct stan_csv_metadata {
       int stan_version_major;
       int stan_version_minor;

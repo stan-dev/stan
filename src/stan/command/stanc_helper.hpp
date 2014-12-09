@@ -1,5 +1,5 @@
 #include <stan/version.hpp>
-#include <stan/gm/compiler.hpp>
+#include <stan/lang/compiler.hpp>
 
 #include <exception>
 #include <fstream>
@@ -137,7 +137,7 @@ int stanc_helper(int argc, const char* argv[],
       }
     }
     
-    stan::gm::program prog;
+    stan::lang::program prog;
     std::fstream out(out_file_name.c_str(),
                      std::fstream::out);
     if (out_stream) {
@@ -146,7 +146,7 @@ int stanc_helper(int argc, const char* argv[],
       *out_stream << "Output file=" << out_file_name << std::endl;
     }
     bool valid_model 
-      = stan::gm::compile(err_stream,in,out,model_name,in_file_name);
+      = stan::lang::compile(err_stream,in,out,model_name,in_file_name);
     out.close();
     if (!valid_model) {
       if (err_stream)
