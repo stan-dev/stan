@@ -8,6 +8,7 @@
 #include <stan/math/functions/log_sum_exp.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/log_mix.hpp>
 #include <stan/agrad/rev/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/partials_vari.hpp>
@@ -78,13 +79,9 @@ namespace stan {
             const T_lambda1& lambda1,
             const T_lambda2& lambda2){
       using ::log;
-      using stan::math::log_sum_exp;
+      using stan::math::log_mix;
       using stan::math::log1m;
       using stan::is_constant_struct;
-
-      stan::error_handling::check_bounded("log_mix","theta",theta,0,1);
-      stan::error_handling::check_not_nan("log_mix","lambda1",lambda1);
-      stan::error_handling::check_not_nan("log_mix","lambda2",lambda2);
 
       OperandsAndPartials<T_theta, T_lambda1, T_lambda2> 
         operands_and_partials(theta, lambda1, lambda2);
@@ -94,8 +91,7 @@ namespace stan {
       const double lambda2_double = value_of(lambda2);
 
       double log_mix_function_value 
-        = log_sum_exp(log(theta_double) + lambda1_double,
-                         log1m(theta_double) + lambda2_double);
+        = log_mix(theta_double,lambda1_double,lambda2_double);
 
       double one_m_exp_lam2_m_lam1(0.0); 
       double one_m_t_prod_exp_lam2_m_lam1(0.0);
