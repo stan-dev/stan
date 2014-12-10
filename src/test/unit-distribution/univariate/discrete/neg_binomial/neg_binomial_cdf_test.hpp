@@ -11,7 +11,7 @@ using stan::agrad::var;
 class AgradCdfNegBinomial : public AgradCdfTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-        vector<double>& cdf) {
+                    vector<double>& cdf) {
     vector<double> param(3);
 
     param[0] = 15;          // Failures/Counts
@@ -22,7 +22,7 @@ public:
   }
   
   void invalid_values(vector<size_t>& index, 
-          vector<double>& value) {
+                      vector<double>& value) {
 
     // Successes/Shape
     index.push_back(1U);
@@ -65,10 +65,10 @@ public:
       
     for (int i = 0; i <= n; i++) {
         
-        typename stan::return_type<T_shape, T_inv_scale>::type temp;
-        temp = binomial_coefficient_log(i + alpha - 1, i);
+      typename stan::return_type<T_shape, T_inv_scale>::type temp;
+      temp = binomial_coefficient_log(i + alpha - 1, i);
 
-        cdf += exp( temp + alpha * log(beta / (1 + beta) ) + i * log(1 / (1 + beta) ) );
+      cdf += exp( temp + alpha * log(beta / (1 + beta) ) + i * log(1 / (1 + beta) ) );
         
     }
       

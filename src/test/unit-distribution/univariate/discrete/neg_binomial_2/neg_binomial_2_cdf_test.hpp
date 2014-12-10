@@ -5,6 +5,7 @@
 #include <stan/math/functions/binomial_coefficient_log.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
@@ -12,7 +13,7 @@ using stan::agrad::var;
 class AgradCdfNegBinomial2 : public AgradCdfTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-        vector<double>& cdf) {
+                    vector<double>& cdf) {
     vector<double> param(3);
 
     param[0] = 3;          // n
@@ -59,7 +60,7 @@ public:
   }
   
   void invalid_values(vector<size_t>& index, 
-          vector<double>& value) {
+                      vector<double>& value) {
 
     // mu
     index.push_back(1U);
@@ -80,7 +81,7 @@ public:
   }
   
   template <typename T_n, typename T_location, typename T_precision,
-      typename T3, typename T4, typename T5>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_location, T_precision>::type
   cdf(const T_n& n, const T_location& alpha, const T_precision& beta,
       const T3&, const T4&, const T5&) {
@@ -89,10 +90,10 @@ public:
 
 
   template <typename T_n, typename T_location, typename T_precision,
-      typename T3, typename T4, typename T5>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_location, T_precision>::type
   cdf_function(const T_n& nn, const T_location& mu, const T_precision& phi,
-         const T3&, const T4&, const T5&) {
+               const T3&, const T4&, const T5&) {
 
     using std::log;
     using std::exp;
@@ -105,7 +106,7 @@ public:
       typename stan::return_type<T_location, T_precision>::type lp(0);
       if (n != 0)
         lp += binomial_coefficient_log<typename stan::scalar_type<T_precision>::type>
-            (n + phi - 1.0, n);
+          (n + phi - 1.0, n);
       lp +=  multiply_log(n, mu) + multiply_log(phi, phi) - (n+phi)*log(mu + phi);
       cdf += exp(lp);
     }

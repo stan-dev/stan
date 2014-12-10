@@ -105,7 +105,7 @@ public:
       typename stan::return_type<T_location, T_precision>::type lp(0);
       if (n != 0)
         lp += binomial_coefficient_log<typename stan::scalar_type<T_precision>::type>
-            (n + phi - 1.0, n);
+          (n + phi - 1.0, n);
       lp +=  multiply_log(n, mu) + multiply_log(phi, phi) - (n+phi)*log(mu + phi);
       ccdf += exp(lp);
     }

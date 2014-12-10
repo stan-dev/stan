@@ -81,6 +81,7 @@ public:
     if (n != 0)
       return binomial_coefficient_log<typename stan::scalar_type<T_inv_scale>::type> (n + phi - 1.0, n)
         + multiply_log(n, mu) + multiply_log(phi, phi) - (n+phi)*log(mu + phi);
+    return log(0.0);
   }
 };
 
