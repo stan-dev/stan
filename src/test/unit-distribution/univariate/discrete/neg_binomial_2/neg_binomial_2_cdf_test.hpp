@@ -80,33 +80,29 @@ public:
   }
   
   template <typename T_n, typename T_location, typename T_precision,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+      typename T3, typename T4, typename T5>
   typename stan::return_type<T_location, T_precision>::type
   cdf(const T_n& n, const T_location& alpha, const T_precision& beta,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+      const T3&, const T4&, const T5&) {
     return stan::prob::neg_binomial_2_cdf(n, alpha, beta);
   }
 
 
   template <typename T_n, typename T_location, typename T_precision,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var
+      typename T3, typename T4, typename T5>
+  typename stan::return_type<T_location, T_precision>::type
   cdf_function(const T_n& nn, const T_location& mu, const T_precision& phi,
-         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+         const T3&, const T4&, const T5&) {
 
     using std::log;
     using std::exp;
     using stan::math::binomial_coefficient_log;
     using stan::math::multiply_log;
     
-    var cdf(0);
+    typename stan::return_type<T_location, T_precision>::type cdf(0);
     
     for (int n = 0; n <= nn; n++) {
-      var lp(0);
+      typename stan::return_type<T_location, T_precision>::type lp(0);
       if (n != 0)
         lp += binomial_coefficient_log<typename stan::scalar_type<T_precision>::type>
             (n + phi - 1.0, n);
