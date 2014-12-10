@@ -5,7 +5,7 @@
 // ********* superseded by version in autodiff.hpp for API ****
 
 #include <vector>
-#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/var.hpp>
 
 namespace stan {
 
