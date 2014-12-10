@@ -122,7 +122,7 @@ public:
         lp = TestClass.template log_prob
           <false,T0,T1,T2,T3,T4,T5>
           (p0,p1,p2,p3,p4,p5);
-        EXPECT_TRUE(lp - log_prob[n] < 1e-8)
+        EXPECT_TRUE(stan::agrad::abs(lp - log_prob[n]) < 1e-8)
           << "For all scalar inputs, when propto is false, log_prob should match the provided value. Failed at index: " << n;
       }
       if (all_constant<T0,T1,T2,T3,T4,T5>::value 
@@ -130,7 +130,7 @@ public:
         lp = TestClass.template log_prob
           <T0,T1,T2,T3,T4,T5>
           (p0,p1,p2,p3,p4,p5);
-        EXPECT_TRUE(lp - log_prob[n] < 1e-8)
+        EXPECT_TRUE(stan::agrad::abs(lp - log_prob[n]) < 1e-8)
           << "For all scalar and all constant inputs log_prob should match the provided value. Failed at index: " << n;
       }
     }
