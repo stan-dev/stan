@@ -50,7 +50,7 @@ TEST(ProbDistributionsCategoricalLogit,Propto) {
 }
 
 
-TEST(ProbDistributionsCategoricalLogit,DefaultPolicy) {
+TEST(ProbDistributionsCategoricalLogit, error) {
   using stan::prob::categorical_logit_log;
 
   unsigned int n = 1;

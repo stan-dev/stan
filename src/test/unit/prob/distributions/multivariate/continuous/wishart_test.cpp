@@ -120,7 +120,7 @@ TEST(ProbDistributionsWishart,4x4Propto) {
 
 using stan::prob::wishart_log;
 
-TEST(ProbDistributionsWishart,DefaultPolicy) {
+TEST(ProbDistributionsWishart, error) {
   Matrix<double,Dynamic,Dynamic> Sigma;
   Matrix<double,Dynamic,Dynamic> Y;
   double nu;

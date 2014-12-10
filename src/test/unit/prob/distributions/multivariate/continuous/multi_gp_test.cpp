@@ -7,22 +7,6 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
-
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
-
-
 TEST(ProbDistributionsMultiGP,MultiGP) {
   Matrix<double,Dynamic,1> mu(5,1);
   mu.setZero();
@@ -50,7 +34,7 @@ TEST(ProbDistributionsMultiGP,MultiGP) {
   EXPECT_FLOAT_EQ(lp_ref, stan::prob::multi_gp_log(y,Sigma,w));
 }
 
-TEST(ProbDistributionsMultiGP,DefaultPolicySigma) {
+TEST(ProbDistributionsMultiGP, ErrorSigma) {
   Matrix<double,Dynamic,Dynamic> y(3,5);
   y << 2.0, -2.0, 11.0, 4.0, -2.0, 11.0, 2.0, -5.0, 11.0, 0.0, -2.0, 11.0, 2.0, -2.0, -11.0;
   
@@ -75,7 +59,7 @@ TEST(ProbDistributionsMultiGP,DefaultPolicySigma) {
   Sigma(0, 1) = 9.0;
 }
 
-TEST(ProbDistributionsMultiGP,DefaultPolicyW) {
+TEST(ProbDistributionsMultiGP, ErrorW) {
   Matrix<double,Dynamic,Dynamic> y(3,5);
   y << 2.0, -2.0, 11.0, 4.0, -2.0, 11.0, 2.0, -5.0, 11.0, 0.0, -2.0, 11.0, 2.0, -2.0, -11.0;
   
@@ -102,7 +86,7 @@ TEST(ProbDistributionsMultiGP,DefaultPolicyW) {
   EXPECT_THROW (stan::prob::multi_gp_log(y, Sigma, w), std::domain_error);
 }
 
-TEST(ProbDistributionsMultiGP,DefaultPolicyY) {
+TEST(ProbDistributionsMultiGP, ErrorY) {
   Matrix<double,Dynamic,Dynamic> y(3,5);
   y << 2.0, -2.0, 11.0, 4.0, -2.0, 11.0, 2.0, -5.0, 11.0, 0.0, -2.0, 11.0, 2.0, -2.0, -11.0;
   

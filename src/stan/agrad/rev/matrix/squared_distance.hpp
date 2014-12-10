@@ -48,11 +48,11 @@ namespace stan {
                              const Eigen::Matrix<var,R2,C2> &v2) 
         : vari(var_squared_distance(v1, v2)), length_(v1.size())
         {
-          v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+          v1_ = (vari**)ChainableStack::memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
             v1_[i] = v1(i).vi_;
           
-          v2_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+          v2_ = (vari**)ChainableStack::memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
             v2_[i] = v2(i).vi_;
         }
@@ -92,11 +92,11 @@ namespace stan {
                                  const Eigen::Matrix<double,R2,C2> &v2) 
         : vari(var_squared_distance(v1, v2)), length_(v1.size())
         {
-          v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+          v1_ = (vari**)ChainableStack::memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
             v1_[i] = v1(i).vi_;
           
-          v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
+          v2_ = (double*)ChainableStack::memalloc_.alloc(length_*sizeof(double));
           for (size_t i = 0; i < length_; i++)
             v2_[i] = v2(i);
         }

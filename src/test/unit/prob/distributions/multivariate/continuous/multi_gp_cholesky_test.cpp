@@ -7,22 +7,6 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
-
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
-
-
 TEST(ProbDistributionsMultiGPCholesky,MultiGPCholesky) {
   Matrix<double,Dynamic,1> mu(5,1);
   mu.setZero();
@@ -51,7 +35,7 @@ TEST(ProbDistributionsMultiGPCholesky,MultiGPCholesky) {
   EXPECT_FLOAT_EQ(lp_ref, stan::prob::multi_gp_cholesky_log(y,L,w));
 }
 
-TEST(ProbDistributionsMultiGPCholesky,DefaultPolicyL) {
+TEST(ProbDistributionsMultiGPCholesky,ErrorL) {
   Matrix<double,Dynamic,Dynamic> y(3,5);
   y << 2.0, -2.0, 11.0, 4.0, -2.0, 11.0, 2.0, -5.0, 11.0, 0.0, -2.0, 11.0, 2.0, -2.0, -11.0;
   
@@ -70,7 +54,7 @@ TEST(ProbDistributionsMultiGPCholesky,DefaultPolicyL) {
   // TODO
 }
 
-TEST(ProbDistributionsMultiGPCholesky,DefaultPolicyW) {
+TEST(ProbDistributionsMultiGPCholesky,ErrorW) {
   Matrix<double,Dynamic,Dynamic> y(3,5);
   y << 2.0, -2.0, 11.0, 4.0, -2.0, 11.0, 2.0, -5.0, 11.0, 0.0, -2.0, 11.0, 2.0, -2.0, -11.0;
   
@@ -99,7 +83,7 @@ TEST(ProbDistributionsMultiGPCholesky,DefaultPolicyW) {
   EXPECT_THROW (stan::prob::multi_gp_cholesky_log(y, L, w), std::domain_error);
 }
 
-TEST(ProbDistributionsMultiGPCholesky,DefaultPolicyY) {
+TEST(ProbDistributionsMultiGPCholesky,ErrorY) {
   Matrix<double,Dynamic,Dynamic> y(3,5);
   y << 2.0, -2.0, 11.0, 4.0, -2.0, 11.0, 2.0, -5.0, 11.0, 0.0, -2.0, 11.0, 2.0, -2.0, -11.0;
   
