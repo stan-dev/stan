@@ -137,9 +137,6 @@ namespace stan {
      * 
      * \f$\Phi(x) = \frac{1}{\sqrt{2 \pi}} \int_{-\inf}^x e^{-t^2/2} dt\f$.
      * 
-     * Errors are configured by policy.  All variables must be finite
-     * and the scale must be strictly greater than zero.
-     * 
      * @param y A scalar variate.
      * @param mu The location of the normal distribution.
      * @param sigma The scale of the normal distriubtion
@@ -147,7 +144,6 @@ namespace stan {
      * @tparam T_y Type of y.
      * @tparam T_loc Type of mean parameter.
      * @tparam T_scale Type of standard deviation paramater.
-     * @tparam Policy Error-handling policy.
      */
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
