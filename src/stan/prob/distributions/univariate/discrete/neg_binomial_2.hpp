@@ -517,19 +517,28 @@ namespace stan {
       VectorView<const T_location> mu_vec(mu);
       VectorView<const T_precision> phi_vec(phi);
       
+      size_t size_n = stan::length(n);
       size_t size_beta = max_size(mu, phi);
       
       std::vector<typename return_type<T_location, T_precision>::type> beta(size_beta);
-
+      std::vector<typename return_type<T_n>::type> n_prime(size_n);
+      
+      for (size_t i = 0; i < size_n; ++i) {
+        if (n_vec[i] == std::numeric_limits<typename return_type<T_n>::type>::max())
+          n_prime[i] = n_vec[i];
+        else
+          n_prime[i] = n_vec[i] + 1;
+      }
+      
       for (size_t i = 0; i < size_beta; i++)
         beta[i] = phi_vec[i] / mu_vec[i];
       
       // Cast a vector of size 1 down to a
       // scalar to avoid dimension mismatch
       if (size_beta == 1)
-        return neg_binomial_ccdf_log(n, phi, beta[0]);
+        return neg_binomial_ccdf_log(n_prime, phi, beta[0]);
       else
-        return neg_binomial_ccdf_log(n, phi, beta);
+        return neg_binomial_ccdf_log(n_prime, phi, beta);
     }
     
     /*
