@@ -24,7 +24,7 @@ TEST(AgradRevMatrix,logSoftmaxLeak) {
     }
     Matrix<var,Dynamic,1> theta = log_softmax(x);
   }
-  EXPECT_TRUE(stan::agrad::memalloc_.bytes_allocated() > 4000000);
+  EXPECT_TRUE(stan::agrad::ChainableStack::memalloc_.bytes_allocated() > 4000000);
 }
 
 TEST(AgradRevMatrix,log_softmax) {

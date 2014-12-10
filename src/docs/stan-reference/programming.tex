@@ -1515,7 +1515,7 @@ Stan for more flexibility.
 
 The 1PL item-response model, also known as the Rasch model, has one
 parameter (1P) for questions and uses the logistic link function (L).
-This model is distributed with Stan in the file
+This model in the Stan example models repository at
 \url{example-models/misc/irt/irt.stan}.
 
 The model parameters are declared as follows.
@@ -2769,8 +2769,8 @@ component indicators form a latent Markov chain.
 
 In the situation where the hidden states are known, the following
 naive model can be used to fit the parameters $\theta$ and $\phi$.
-(This model is distributed with Stan on the path
-\nolinkurl{<stan>/example-models/misc/hmm/hmm.stan}.)
+(This model is part of the Stan example models repository on the path
+\nolinkurl{example-models/misc/hmm/hmm.stan}.)
 %
 \begin{stancode}
 data {
@@ -2827,8 +2827,8 @@ sentence and is prohibited elsewhere.
 The naive HMM estimation model presented above can be sped up
 dramatically by replacing the loops over categorical distributions
 with a single multinomial distribution.  A complete implementation is
-available in the Stan source distribution at path
-\nolinkurl{<stan>/example-models/misc/hmm/hmm-sufficient.stan}.  The data
+available in the Stan example models repository at path
+\nolinkurl{example-models/misc/hmm/hmm-sufficient.stan}.  The data
 is declared as before, but now a transformed data blocks computes the
 sufficient statistics for estimating the transition and emission
 matrices.
@@ -2870,14 +2870,14 @@ up in the same way by computing sufficient statistics.
 
 With the Dirichlet-multinomial HMM, the posterior can be computed
 analytically because the Dirichlet is the conjugate prior to the
-multinomial.  The following example, available in
-\nolinkurl{<stan>/example-models/hmm/hmm-analytic.stan}, illustrates how a
-Stan model can define the posterior analytically.  This is possible in
-the Stan language because the model only needs to define the
-conditional probability of the parameters given the data up to a
-proportion, which can be done by defining the (unnormalized) joint
-probability or the (unnormalized) conditional posterior, or anything
-in between.  
+multinomial.  The following example, available in the Stan example models
+repository \nolinkurl{example-models/hmm/hmm-analytic.stan},
+illustrates how a Stan model can define the posterior analytically.
+This is possible in the Stan language because the model only needs to
+define the conditional probability of the parameters given the data up
+to a proportion, which can be done by defining the (unnormalized)
+joint probability or the (unnormalized) conditional posterior, or
+anything in between.
 
 The model has the same data and parameters as the previous models, but
 now computes the posterior Dirichlet parameters in the transformed
@@ -2923,7 +2923,7 @@ problem, and for HMMs, it is computed with the so-called forward
 algorithm.  
 
 In Stan, the forward algorithm is coded as follows (the full model
-is in \nolinkurl{<stan>/example-models/misc/hmm/hmm-semisup.stan}).  First,
+is in \nolinkurl{example-models/misc/hmm/hmm-semisup.stan}).  First,
 two additional data variable are declared for the unsupervised data.
 %
 \begin{stancode}
@@ -4008,7 +4008,7 @@ the treatment effect of Scholastic Aptitude Test (SAT) coaching in
 eight schools based on the sample treatment effect and standard error
 in each school.  The model provided for this data in
 \citep[Section~5.5]{GelmanEtAl:2013} is included with the
-data in the Stan distribution in directory
+data in the Stan example model repository in directory
 \nolinkurl{example-models/misc/eight-schools/}.
 
 \subsubsection{Extensions and Alternatives}
@@ -5169,9 +5169,10 @@ mean $\mu_k$ to the data point $y_n$.
 
 \subsection{Stan Implementation of Soft $K$-Means}
 
-The following model is available in the Stan distribution (along with
-an R program to randomly generate data sets and a sample data set) in
-the directory \nolinkurl{stan/example-models/misc/soft-k-means}.
+The following model is available in the Stan example model repository
+(along with an R program to randomly generate data sets and a sample
+data set) in the directory
+\nolinkurl{example-models/misc/soft-k-means}.
 %
 \begin{stancode}
 data {
@@ -5367,7 +5368,7 @@ document identity array \code{doc}.
 \subsection{Estimation with Category-Labeled Training Data}
 
 The naive Bayes models along with R programs to simulate data for them
-and a sample data set are available in the distribution in the
+and a sample data set are available in the example models repository in
 directory \nolinkurl{example-models/misc/clustering/naive-bayes}.
 
 A naive Bayes model for estimating the simplex parameters given
@@ -5868,7 +5869,7 @@ squared exponential covariance function described in the previous section
 will be used with hyperparameters set to $\eta^2 = 1$, $\rho^2 = 1$,
 and $\sigma^2 = 0.1$, and the mean function $m$ is defined to always
 return the zero vector, $m(x) = {\bf 0}$.  The following model is
-included in the Stan distribution in file
+in the example models repository at 
 \nolinkurl{example-models/misc/gaussian-process/gp-sim.stan}.
 %
 \begin{stancode}
@@ -5905,7 +5906,7 @@ Section~\refsection{fit-gp} for a better approach.
 
 Only the covariance function's distance computation needs to change in
 moving from a univariate model to a multivariate model.  A
-multivariate sampling model is available in the source distribution at
+multivariate sampling model is available in the example models repository at
 \nolinkurl{example-models/misc/gaussian-process/gp-multi-sim.stan}.  The
 only lines that change from the univariate model above are as follows.
 %
@@ -6004,9 +6005,10 @@ defined based on prior knowledge of the scale of the output values
 which distances are measured among inputs ($1/\rho$).
 
 A Stan model to fit the hyperparameters of the general squared
-exponential covariance function is provided in the distribution in
-\nolinkurl{example-models/misc/gaussian-process/gp-fit.stan}.  The Stan
-code is very similar to the simulation models in terms of the
+exponential covariance function is provided in the example models
+repository in
+\nolinkurl{example-models/misc/gaussian-process/gp-fit.stan}.  The
+Stan code is very similar to the simulation models in terms of the
 computations, but the blocks in which variables are declared and
 statements are executed has changed to accommodate the hyperparameter
 estimation problem.
@@ -6116,7 +6118,7 @@ joint distribution of the observed $y$ and unobserved $\tilde{y}$.
 Although Stan does not support mixed vectors of parameters and data
 directly, such a vector may be synthesized as a local variable in the
 model block.  The following model, which takes this approach, is
-available in the distribution as
+available in the example models repository at
 \nolinkurl{example-models/misc/gaussian-process/gp-predict.stan}.  
 %
 \begin{stancode}
@@ -6230,7 +6232,7 @@ Because a Stan model is only required to be proportional to the
 posterior, the posterior may be coded directly.  An example that uses
 the analytic form of the posterior and provides sampling of the
 resulting multivariate normal through the Cholesky decomposition is
-provided in
+provided in the example models repository in
 \nolinkurl{example-models/misc/gaussian-process/gp-predict-analytic.stan}.  
 The data declaration is the same as for the standard example.  The
 calculation of the predictive mean \code{mu} and covariance Cholesky
@@ -6347,7 +6349,7 @@ adding the sampling statements for observed $z$, and then proceeding
 as for the previous regression models.  
 
 The following full model for prediction using logistic Gaussian
-process regression is available in the distribution at
+process regression is available in the example models repository at
 \nolinkurl{example-models/misc/gaussian-process/gp-logit-predict.stan}.
 %
 \begin{stancode}
