@@ -116,7 +116,6 @@ namespace stan {
      * @param beta Inverse scale parameter.
      * @tparam T_y Type of scalar.
      * @tparam T_inv_scale Type of inverse scale.
-     * @tparam Policy Error-handling policy.
      */
     template <typename T_y, typename T_inv_scale>
     typename return_type<T_y,T_inv_scale>::type

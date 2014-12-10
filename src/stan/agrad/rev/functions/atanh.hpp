@@ -5,6 +5,7 @@
 #include <stan/agrad/rev/internal/v_vari.hpp>
 #include <stan/agrad/rev/operators/operator_equal.hpp>
 #include <math.h>
+#include <limits>
 
 namespace stan {
   namespace agrad {

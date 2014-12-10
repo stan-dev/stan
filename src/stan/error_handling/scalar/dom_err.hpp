@@ -1,6 +1,7 @@
 #ifndef STAN__ERROR_HANDLING__SCALAR__DOM_ERR_HPP
 #define STAN__ERROR_HANDLING__SCALAR__DOM_ERR_HPP
 
+#include <typeinfo>
 #include <string>
 #include <sstream>
 #include <stdexcept>

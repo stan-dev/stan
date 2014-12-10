@@ -25,14 +25,14 @@ namespace stan {
         template<typename Derived>
         dot_self_vari(const Eigen::DenseBase<Derived> &v) : 
           vari(var_dot_self(v)), size_(v.size()) {
-          v_ = (vari**)memalloc_.alloc(size_*sizeof(vari*));
+          v_ = (vari**)ChainableStack::memalloc_.alloc(size_*sizeof(vari*));
           for (size_t i = 0; i < size_; i++)
             v_[i] = v[i].vi_;
         }
         template <int R, int C>
         dot_self_vari(const Eigen::Matrix<var,R,C>& v) :
           vari(var_dot_self(v)), size_(v.size()) {
-          v_ = (vari**) memalloc_.alloc(size_ * sizeof(vari*));
+          v_ = (vari**) ChainableStack::memalloc_.alloc(size_ * sizeof(vari*));
           for (size_t i = 0; i < size_; ++i)
             v_[i] = v(i).vi_;
         }

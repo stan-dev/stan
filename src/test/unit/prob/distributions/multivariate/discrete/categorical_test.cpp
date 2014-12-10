@@ -40,7 +40,7 @@ TEST(ProbDistributionsCategorical,VectorInt) {
 
 using stan::prob::categorical_log;
 
-TEST(ProbDistributionsCategorical,DefaultPolicy) {
+TEST(ProbDistributionsCategorical, error) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   double inf = std::numeric_limits<double>::infinity();
   

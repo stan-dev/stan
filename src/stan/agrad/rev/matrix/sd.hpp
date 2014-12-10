@@ -23,7 +23,7 @@ namespace stan {
       var calc_sd(size_t size,
                   const var* dtrs) {
         using std::sqrt;
-        vari** varis = (vari**) memalloc_.alloc(size * sizeof(vari*));
+        vari** varis = (vari**) ChainableStack::memalloc_.alloc(size * sizeof(vari*));
         for (size_t i = 0; i < size; ++i)
           varis[i] = dtrs[i].vi_;
         double sum = 0.0;
@@ -37,7 +37,7 @@ namespace stan {
         }
         double variance = sum_of_squares / (size - 1);
         double sd = sqrt(variance);
-        double* partials = (double*) memalloc_.alloc(size * sizeof(double));
+        double* partials = (double*) ChainableStack::memalloc_.alloc(size * sizeof(double));
         if (sum_of_squares < 1e-20) {
           double grad_limit = 1 / std::sqrt((double)size);
           for (size_t i = 0; i < size; ++i)

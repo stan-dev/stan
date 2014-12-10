@@ -89,7 +89,7 @@ namespace stan {
         }
         inline void initialize(vari** &mem_v, const var *inv, vari **shared = NULL) {
           if (shared == NULL) {
-            mem_v = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            mem_v = (vari**)ChainableStack::memalloc_.alloc(length_*sizeof(vari*));
             for (size_t i = 0; i < length_; i++)
               mem_v[i] = inv[i].vi_;
           }
@@ -100,7 +100,7 @@ namespace stan {
         template<typename Derived>
         inline void initialize(vari** &mem_v, const Eigen::DenseBase<Derived> &inv, vari **shared = NULL) {
           if (shared == NULL) {
-            mem_v = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+            mem_v = (vari**)ChainableStack::memalloc_.alloc(length_*sizeof(vari*));
             for (size_t i = 0; i < length_; i++)
               mem_v[i] = inv(i).vi_;
           }
@@ -111,7 +111,7 @@ namespace stan {
         
         inline void initialize(double* &mem_d, const double *ind, double *shared = NULL) {
           if (shared == NULL) {
-            mem_d = (double*)memalloc_.alloc(length_*sizeof(double));
+            mem_d = (double*)ChainableStack::memalloc_.alloc(length_*sizeof(double));
             for (size_t i = 0; i < length_; i++)
               mem_d[i] = ind[i];
           }
@@ -122,7 +122,7 @@ namespace stan {
         template<typename Derived>
         inline void initialize(double* &mem_d, const Eigen::DenseBase<Derived> &ind, double *shared = NULL) {
           if (shared == NULL) {
-            mem_d = (double*)memalloc_.alloc(length_*sizeof(double));
+            mem_d = (double*)ChainableStack::memalloc_.alloc(length_*sizeof(double));
             for (size_t i = 0; i < length_; i++)
               mem_d[i] = ind(i);
           }
