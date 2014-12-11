@@ -1,6 +1,7 @@
 #include <vector>
 #include <stan/agrad/rev/functions/log_mix.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <test/unit/agrad/rev/nan_util.hpp>
 #include <gtest/gtest.h>
 
 void test_log_mix_vvv(double theta, double lambda1, double lambda2) {
@@ -43,6 +44,9 @@ void test_log_mix_vvv(double theta, double lambda1, double lambda2) {
   for (size_t i = 0; i < g2.size(); ++i)
     EXPECT_FLOAT_EQ(g2[i], g[i]) << "failed on " << i << std::endl;
   stan::agrad::recover_memory();
+
+  var theta_v3 = 2.0;
+  EXPECT_THROW(log_mix(theta_v3,lambda1_v,lambda2_v),std::domain_error);
 }
 
 
@@ -82,6 +86,9 @@ void test_log_mix_vv_ex_lam_2(double theta, double lambda1, double lambda2) {
   for (size_t i = 0; i < g2.size(); ++i)
     EXPECT_FLOAT_EQ(g2[i], g[i]) << "failed on " << i << std::endl;
   stan::agrad::recover_memory();
+
+  var theta_v3 = 2.0;
+  EXPECT_THROW(log_mix(theta_v3,lambda1_v,lambda2),std::domain_error);
 }
 
 void test_log_mix_vv_ex_lam_1(double theta, double lambda1, double lambda2) {
@@ -120,6 +127,9 @@ void test_log_mix_vv_ex_lam_1(double theta, double lambda1, double lambda2) {
   for (size_t i = 0; i < g2.size(); ++i)
     EXPECT_FLOAT_EQ(g2[i], g[i]) << "failed on " << i << std::endl;
   stan::agrad::recover_memory();
+
+  var theta_v3 = 2.0;
+  EXPECT_THROW(log_mix(theta_v3,lambda1,lambda2_v),std::domain_error);
 }
 
 void test_log_mix_vv_ex_theta(double theta, double lambda1, double lambda2) {
@@ -158,6 +168,8 @@ void test_log_mix_vv_ex_theta(double theta, double lambda1, double lambda2) {
   for (size_t i = 0; i < g2.size(); ++i)
     EXPECT_FLOAT_EQ(g2[i], g[i]) << "failed on " << i << std::endl;
   stan::agrad::recover_memory();
+
+  EXPECT_THROW(log_mix(2.0,lambda1_v,lambda2_v),std::domain_error);
 }
 
 void test_log_mix_v_theta(double theta, double lambda1, double lambda2) {
@@ -192,6 +204,9 @@ void test_log_mix_v_theta(double theta, double lambda1, double lambda2) {
   for (size_t i = 0; i < g2.size(); ++i)
     EXPECT_FLOAT_EQ(g2[i], g[i]) << "failed on " << i << std::endl;
   stan::agrad::recover_memory();
+
+  var theta_v3 = 2.0;
+  EXPECT_THROW(log_mix(theta_v3,lambda1,lambda2),std::domain_error);
 }
 
 void test_log_mix_v_lam_1(double theta, double lambda1, double lambda2) {
@@ -226,6 +241,8 @@ void test_log_mix_v_lam_1(double theta, double lambda1, double lambda2) {
   for (size_t i = 0; i < g2.size(); ++i)
     EXPECT_FLOAT_EQ(g2[i], g[i]) << "failed on " << i << std::endl;
   stan::agrad::recover_memory();
+
+  EXPECT_THROW(log_mix(2.0,lambda1_v,lambda2),std::domain_error);
 }
 
 void test_log_mix_v_lam_2(double theta, double lambda1, double lambda2) {
@@ -260,6 +277,8 @@ void test_log_mix_v_lam_2(double theta, double lambda1, double lambda2) {
   for (size_t i = 0; i < g2.size(); ++i)
     EXPECT_FLOAT_EQ(g2[i], g[i]) << "failed on " << i << std::endl;
   stan::agrad::recover_memory();
+
+  EXPECT_THROW(log_mix(2.0,lambda1,lambda2_v),std::domain_error);
 }
 
 TEST(AgradRev,log_mix) {
@@ -284,4 +303,20 @@ TEST(AgradRev,log_mix) {
 
   test_log_mix_v_lam_2(0.7, 1.4, 3.99);
   test_log_mix_v_lam_2(0.1, -1.4, 3.99);
+}
+
+struct log_mix_fun {
+  template <typename T0, typename T1, typename T2>
+  inline
+  typename stan::return_type<T0,T1,T2>::type
+  operator()(const T0& arg1,
+             const T1& arg2,
+             const T2& arg3) const {
+    return log_mix(arg1,arg2,arg3);
+  }
+};
+
+TEST(AgradRev,log_mix_NaN) {
+  log_mix_fun log_mix;
+  test_nan(log_mix,0.6,0.3,0.5,true,false);
 }
