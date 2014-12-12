@@ -25,33 +25,6 @@ namespace stan {
       double* gradients_;
 
     public:
-      /**
-       * Construct a precomputed vari with the specified value,
-       * operands, and gradients.
-       * 
-       * @param[in] val The value of the variable.
-       * @param[in] varis Vector of operands.
-       * @param[in] gradients Vector of partial derivatives of value with
-       * respect to operands. 
-       * @throws std::invalid_argument if the sizes of the vectors
-       * don't match 
-       */
-      precomputed_gradients_vari(const double val,
-                                 const std::vector<vari*>& varis,
-                                 const std::vector<double>& gradients) 
-        : vari(val),
-          size_(varis.size()),
-          varis_(ChainableStack::memalloc_
-                 .alloc_array<vari*>(varis.size())),
-          gradients_(ChainableStack::memalloc_
-                     .alloc_array<double>(varis.size())) {
-
-        if (varis.size() != gradients.size())
-          throw std::invalid_argument("sizes of varis and gradients"
-                                      " do not match");
-        std::copy(varis.begin(), varis.end(), varis_);
-        std::copy(gradients.begin(), gradients.end(), gradients_);
-      }
 
       /**
        * Construct a precomputed vari with the specified value,
