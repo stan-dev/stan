@@ -37,7 +37,7 @@ namespace stan {
      * @param[in] independents Indepent (input) variables.
      * @param[out] jacobian Jacobian of the transform.
      */
-    inline void jacobian(std::vector<stan::agrad::var>& dependents,
+    inline void jacobian(std::vector<var>& dependents,
                          std::vector<var>& independents,
                          std::vector<std::vector<double> >& jacobian) {
       jacobian.resize(dependents.size());

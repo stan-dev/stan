@@ -1475,7 +1475,8 @@ using more basic \Stan functions.
     \farg{lp2} with mixing proportion \farg{theta},
     \begin{eqnarray*}
       \mbox{log\_mix}(\theta, \mbox{lp}_1, \mbox{lp}_2) 
-    & = & \log \!\left( \theta \mbox{lp}_1 + \left( 1 - \theta \right) \mbox{lp}_2
+      & = & \log \!\left( \theta \exp(\mbox{lp}_1) 
+      + \left( 1 - \theta \right) \exp(\mbox{lp}_2)
     \right)
     \\[3pt]
     & = & \mbox{log\_sum\_exp}\!\left(\log(\theta) + \mbox{lp}_1, \

@@ -18,14 +18,23 @@ namespace stan {
 
   namespace agrad {
 
+    /* Computes shared terms in log_mix partial derivative calculations
+     *
+     * @param[in] theta_val value of mixing proportion theta.
+     * @param[in] lambda1_val value of log density multiplied by theta.
+     * @param[in] lambda2_val value of log density multiplied by 1 - theta.
+     * @param[out] one_m_exp_lam2_m_lam1 shared term in deriv calculation.
+     * @param[out] one_m_t_prod_exp_lam2_m_lam1 shared term in deriv calculation.
+     * @param[out] one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1 shared term in deriv calculation.
+     */
     inline 
     void log_mix_partial_helper(const double& theta_val,
-                                    const double& lambda1_val,
-                                    const double& lambda2_val,
-                                    double& one_m_exp_lam2_m_lam1,
-                                    double& one_m_t_prod_exp_lam2_m_lam1,
-                                    double& one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1){
-        using ::exp;
+                                const double& lambda1_val,
+                                const double& lambda2_val,
+                                double& one_m_exp_lam2_m_lam1,
+                                double& one_m_t_prod_exp_lam2_m_lam1,
+                                double& one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1){
+        using std::exp;
         double lam2_m_lam1 = lambda2_val - lambda1_val;
         double exp_lam2_m_lam1 = exp(lam2_m_lam1);
         one_m_exp_lam2_m_lam1 = 1 - exp_lam2_m_lam1;
@@ -41,33 +50,35 @@ namespace stan {
      *
      * \f[
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) 
-     * = \log \left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right).
+     * = \log \left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right).
      * \f]
      * 
      * \f[
      * \frac{\partial}{\partial \theta} 
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
      * = \dfrac{\exp(\lambda_1) - \exp(\lambda_2)}
-     * {\left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right)}
+     * {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)}
      * \f]
      *
      * \f[
      * \frac{\partial}{\partial \lambda_1} 
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
      * = \dfrac{\theta \exp(\lambda_1)}
-     * {\left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right)} 
+     * {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)} 
      * \f]
      * 
      * \f[
      * \frac{\partial}{\partial \lambda_2} 
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
      * = \dfrac{\theta \exp(\lambda_2)}
-     * {\left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right)} 
+     * {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)} 
      * \f]
-     * 
-     * @param theta[in] mixing proportion in [0,1].
-     * @param lambda1 first log density.
-     * @param lambda2 second log density.
+     * @param[in] T_theta theta scalar type.
+     * @param[in] T_lambda1 lambda1 scalar type.
+     * @param[in] T_lambda2 lambda2 scalar type.
+     * @param[in] theta mixing proportion in [0,1].
+     * @param[in] lambda1 first log density.
+     * @param[in] lambda2 second log density.
      * @return log mixture of densities in specified proportion
      */
     template <typename T_theta,
@@ -78,7 +89,7 @@ namespace stan {
     log_mix(const T_theta& theta,
             const T_lambda1& lambda1,
             const T_lambda2& lambda2){
-      using ::log;
+      using std::log;
       using stan::math::log_mix;
       using stan::math::log1m;
       using stan::is_constant_struct;
@@ -111,7 +122,7 @@ namespace stan {
                                    one_m_exp_lam2_m_lam1,
                                    one_m_t_prod_exp_lam2_m_lam1,
                                    one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1);
-        one_m_exp_lam2_m_lam1 *= -1.0;
+        one_m_exp_lam2_m_lam1 = -one_m_exp_lam2_m_lam1;
         theta_double = one_m_t_prod_exp_lam2_m_lam1;
         one_m_t_prod_exp_lam2_m_lam1 = 1.0 - value_of(theta);
       }
