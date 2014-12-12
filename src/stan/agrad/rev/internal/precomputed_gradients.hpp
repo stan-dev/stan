@@ -20,6 +20,7 @@ namespace stan {
      */
     class precomputed_gradients_vari : public vari {
     protected:
+
       const size_t size_;
       vari** varis_;
       double* gradients_;
@@ -70,9 +71,9 @@ namespace stan {
      * specified value, vector of operands, and vector of partial
      * derivatives of value with respect to the operands.
      *
-     * @param value The value of the resulting dependent variable.
-     * @param operands operands.
-     * @param gradients vector of partial derivatives of result with
+     * @param[in] value The value of the resulting dependent variable.
+     * @param[in] operands operands.
+     * @param[in] gradients vector of partial derivatives of result with
      * respect to operands.
      * @return An auto-diff variable that uses the precomputed 
      *   gradients provided.
