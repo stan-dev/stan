@@ -22,7 +22,7 @@ transformed parameters {
   real y_hat[T,2]; 
   {
     int N;
-    N <- 0
+    N <- 0;
     y_hat <- integrate_ode(ode, y0, t0, segment(ts, 0, N), theta, x, x_int);
   }
 }
