@@ -21,6 +21,24 @@ transformed parameters {
 
   transformed_param_real <- log_mix(p_real_theta,
                                     p_real_lam_1,
+                                    d_real_lam_1);
+  transformed_param_real <- log_mix(p_real_theta,
+                                    d_real_lam_1,
+                                    p_real_lam_1);
+  transformed_param_real <- log_mix(p_real_theta,
+                                    d_real_lam_1,
+                                    d_real_lam_1);
+  transformed_param_real <- log_mix(d_real_theta,
+                                    p_real_lam_1,
+                                    p_real_lam_1);
+  transformed_param_real <- log_mix(d_real_theta,
+                                    p_real_lam_1,
+                                    d_real_lam_1);
+  transformed_param_real <- log_mix(d_real_theta,
+                                    d_real_lam_1,
+                                    p_real_lam_1);
+  transformed_param_real <- log_mix(p_real_theta,
+                                    p_real_lam_1,
                                     p_real_lam_1);
 }
 model {  
