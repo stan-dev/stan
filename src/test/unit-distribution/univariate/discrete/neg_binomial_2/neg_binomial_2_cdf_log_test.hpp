@@ -12,38 +12,39 @@ using stan::agrad::var;
 class AgradCdfLogNegBinomial2 : public AgradCdfLogTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-        vector<double>& cdf) {
+        vector<double>& cdf_log) {
     vector<double> param(3);
 
     param[0] = 3;          // n
     param[1] = 10;          // mu
     param[2] = 20;           // phi
     parameters.push_back(param);
-    cdf.push_back(log(0.02647526)); // expected cdf
+    cdf_log.push_back(std::log(0.0264752601628231235)); // expected cdf_log
     
     param[0] = 7;          // n
     param[1] = 15;          // mu
     param[2] = 10;           // phi
     parameters.push_back(param);
-    cdf.push_back(log(0.09189925)); // expected cdf
-
+    cdf_log.push_back(std::log(0.091899254171238523026)); // expected cdf_log
+    
     param[0] = 0;          // n
     param[1] = 15;          // mu
     param[2] = 10;           // phi
     parameters.push_back(param);
-    cdf.push_back(log(0.0001048576)); // expected ccdf
+    cdf_log.push_back(std::log(0.0001048576000000001529)); // expected cdf_log
     
     param[0] = 1;          // n
     param[1] = 15;          // mu
     param[2] = 10;           // phi
     parameters.push_back(param);
-    cdf.push_back(log(0.0007340032)); // expected ccdf
+    cdf_log.push_back(std::log(0.00073400320000000126002)); // expected cdf_log
     
     param[0] = 0;          // n
     param[1] = 10;          // mu
     param[2] = 1;           // phi
     parameters.push_back(param);
-    cdf.push_back(log(0.09090909)); // expected ccdf
+    cdf_log.push_back(std::log(0.090909090909090897736)); // expected cdf_log
+    
   }
   
   void invalid_values(vector<size_t>& index, 

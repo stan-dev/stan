@@ -231,8 +231,8 @@ namespace stan {
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
-        if (value_of(n_vec[i]) <= 0) 
-          return operands_and_partials.to_var(0.0,alpha,beta);
+        if (value_of(n_vec[i]) < 0)
+          return operands_and_partials.to_var(0.0, alpha, beta);
       }
           
       // Cache a few expensive function calls if alpha is a parameter
@@ -364,7 +364,7 @@ namespace stan {
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
-        if (value_of(n_vec[i]) <= 0) 
+        if (value_of(n_vec[i]) < 0)
           return operands_and_partials.to_var(stan::math::negative_infinity(),
                                               alpha,beta);
       }
@@ -478,7 +478,7 @@ namespace stan {
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
-        if (value_of(n_vec[i]) <= 0) 
+        if (value_of(n_vec[i]) < 0)
           return operands_and_partials.to_var(0.0,alpha,beta);
       }
           

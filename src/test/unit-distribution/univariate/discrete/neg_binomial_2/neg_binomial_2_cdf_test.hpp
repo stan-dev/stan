@@ -20,43 +20,43 @@ public:
     param[1] = 10;          // mu
     param[2] = 20;           // phi
     parameters.push_back(param);
-    cdf.push_back(0.02647526); // expected cdf
+    cdf.push_back(0.0264752601628231235); // expected cdf
     
     param[0] = 7;          // n
     param[1] = 15;          // mu
     param[2] = 10;           // phi
     parameters.push_back(param);
-    cdf.push_back(0.09189925); // expected cdf
+    cdf.push_back(0.091899254171238523026); // expected cdf
     
     param[0] = 0;          // n
     param[1] = 15;          // mu
     param[2] = 10;           // phi
     parameters.push_back(param);
-    cdf.push_back(0.0001048576); // expected ccdf
+    cdf.push_back(0.0001048576000000001529); // expected cdf
     
     param[0] = 1;          // n
     param[1] = 15;          // mu
     param[2] = 10;           // phi
     parameters.push_back(param);
-    cdf.push_back(0.0007340032); // expected ccdf
+    cdf.push_back(0.00073400320000000126002); // expected cdf
     
     param[0] = 0;          // n
     param[1] = 10;          // mu
     param[2] = 1;           // phi
     parameters.push_back(param);
-    cdf.push_back(0.09090909); // expected ccdf
+    cdf.push_back(0.090909090909090897736); // expected cdf
     
     param[0] = -1;          // n
     param[1] = 10;          // mu
     param[2] = 1;           // phi
     parameters.push_back(param);
-    cdf.push_back(0); // expected ccdf
+    cdf.push_back(0); // expected cdf
     
     param[0] = -89;          // n
     param[1] = 10;          // mu
     param[2] = 1;           // phi
     parameters.push_back(param);
-    cdf.push_back(0); // expected ccdf
+    cdf.push_back(0); // expected cdf
   }
   
   void invalid_values(vector<size_t>& index, 

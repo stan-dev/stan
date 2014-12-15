@@ -12,50 +12,39 @@ using stan::agrad::var;
 class AgradCdfLogNegBinomial2 : public AgradCcdfLogTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-        vector<double>& ccdf) {
+        vector<double>& ccdf_log) {
     vector<double> param(3);
 
     param[0] = 3;          // n
     param[1] = 10;          // mu
     param[2] = 20;           // phi
     parameters.push_back(param);
-    ccdf.push_back(log(1.0 - 0.02647526)); // expected ccdf
+    ccdf_log.push_back(std::log(1.0 - 0.0264752601628231235)); // expected ccdf_log
     
     param[0] = 7;          // n
     param[1] = 15;          // mu
     param[2] = 10;           // phi
     parameters.push_back(param);
-    ccdf.push_back(log(1.0 - 0.09189925)); // expected ccdf
+    ccdf_log.push_back(std::log(1.0 - 0.091899254171238523026)); // expected ccdf_log
     
     param[0] = 0;          // n
     param[1] = 15;          // mu
     param[2] = 10;           // phi
     parameters.push_back(param);
-    ccdf.push_back(log(1.0 - 0.0001048576)); // expected ccdf
+    ccdf_log.push_back(std::log(1.0 - 0.0001048576000000001529)); // expected ccdf_log
     
     param[0] = 1;          // n
     param[1] = 15;          // mu
     param[2] = 10;           // phi
     parameters.push_back(param);
-    ccdf.push_back(log(1.0 - 0.0007340032)); // expected ccdf
+    ccdf_log.push_back(std::log(1.0 - 0.00073400320000000126002)); // expected ccdf_log
     
     param[0] = 0;          // n
     param[1] = 10;          // mu
     param[2] = 1;           // phi
     parameters.push_back(param);
-    ccdf.push_back(log(1.0 - 0.09090909)); // expected ccdf
-    
-    param[0] = -1;          // n
-    param[1] = 10;          // mu
-    param[2] = 1;           // phi
-    parameters.push_back(param);
-    ccdf.push_back(log(1.0)); // expected ccdf
-    
-    param[0] = -6.0;          // n
-    param[1] = 10;          // mu
-    param[2] = 1;           // phi
-    parameters.push_back(param);
-    ccdf.push_back(log(1.0)); // expected ccdf
+    ccdf_log.push_back(std::log(1.0 - 0.090909090909090897736)); // expected ccdf_log
+                      
   }
   
   void invalid_values(vector<size_t>& index, 
@@ -86,7 +75,6 @@ public:
       const T3&, const T4&, const T5&) {
     return stan::prob::neg_binomial_2_ccdf_log(n, alpha, beta);
   }
-
 
   template <typename T_n, typename T_location, typename T_precision,
       typename T3, typename T4, typename T5>

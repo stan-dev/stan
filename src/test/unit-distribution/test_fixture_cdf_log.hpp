@@ -141,7 +141,9 @@ public:
 
       if (all_scalar<T0,T1,T2,T3,T4,T5>::value) {
         EXPECT_TRUE(stan::agrad::abs(expected_cdf_log[n] - cdf_log) < 1e-8)
-          << "For all scalar inputs cdf_log should match the provided value. Failed at index: " << n;
+          << "For all scalar inputs cdf_log should match the provided value. Failed at index: " << n << std::endl
+          << "expected: " << expected_cdf_log[n] << std::endl
+          << "actual:   " << cdf_log;
       }
     }
   }
