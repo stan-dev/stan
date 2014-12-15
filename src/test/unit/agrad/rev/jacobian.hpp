@@ -8,6 +8,7 @@
 #include <stan/agrad/rev/var.hpp>
 
 namespace stan {
+
   namespace agrad {
 
     /**
