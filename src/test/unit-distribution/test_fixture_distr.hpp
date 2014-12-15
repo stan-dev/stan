@@ -123,15 +123,21 @@ public:
           <false,T0,T1,T2,T3,T4,T5>
           (p0,p1,p2,p3,p4,p5);
         EXPECT_TRUE(stan::agrad::abs(lp - log_prob[n]) < 1e-8)
-          << "For all scalar inputs, when propto is false, log_prob should match the provided value. Failed at index: " << n;
+          << "For all scalar inputs, when propto is false, log_prob should match the provided value. Failed at index: "
+          << n << std::endl
+          << "expected: " << log_prob[n] << std::endl
+          << "actual:   " << lp;
       }
-      if (all_constant<T0,T1,T2,T3,T4,T5>::value 
+      if (all_constant<T0,T1,T2,T3,T4,T5>::value
           && all_scalar<T0,T1,T2,T3,T4,T5>::value) {
         lp = TestClass.template log_prob
           <T0,T1,T2,T3,T4,T5>
           (p0,p1,p2,p3,p4,p5);
         EXPECT_TRUE(stan::agrad::abs(lp - log_prob[n]) < 1e-8)
-          << "For all scalar and all constant inputs log_prob should match the provided value. Failed at index: " << n;
+          << "For all scalar and all constant inputs log_prob should match the provided value. Failed at index: "
+          << n << std::endl
+          << "expected: " << log_prob[n] << std::endl
+          << "actual:   " << lp;
       }
     }
   }

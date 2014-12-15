@@ -32,7 +32,8 @@ public:
     param[1] = 1e11; // alpha > 1e10, causes redux to Poisson
     param[2] = 1e10; // equiv to Poisson(1e11/1e10) = Poisson(10)
     parameters.push_back(param);
-    log_prob.push_back(-2.618557437134943821633); // log poisson(13|10)
+    log_prob.push_back(-2.6185576442008289933); // log poisson(13|10)
+
   }
  
   void invalid_values(vector<size_t>& index, 
