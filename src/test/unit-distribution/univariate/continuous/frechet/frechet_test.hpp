@@ -18,19 +18,19 @@ public:
     param[1] = 1.0;                 // alpha
     param[2] = 1.0;                 // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1.8862943); // expected log_prob
+    log_prob.push_back(-1.88629436); // expected log_prob
 
     param[0] = 0.8;                 // y
     param[1] = 2.9;                 // alpha
     param[2] = 1.8;                 // sigma
     parameters.push_back(param);
-    log_prob.push_back(-6.863833);  // expected log_prob
+    log_prob.push_back(-6.86383351);  // expected log_prob
 
     param[0] = 0.25;                // y
     param[1] = 3.9;                 // alpha
     param[2] = 1.7;                 // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1754.9395034);  // expected log_prob
+    log_prob.push_back(-1754.93950342517);  // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 
@@ -90,8 +90,8 @@ public:
 TEST(ProbDistributionsFrechet,Cumulative) {
   using stan::prob::frechet_cdf;
   using std::numeric_limits;
-  EXPECT_FLOAT_EQ(0.60653065, frechet_cdf(2.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(2.74433842e-5, frechet_cdf(0.8,2.9,1.8));
+  EXPECT_FLOAT_EQ(0.6065306597, frechet_cdf(2.0,1.0,1.0));
+  EXPECT_FLOAT_EQ(2.744338423e-5, frechet_cdf(0.8,2.9,1.8));
   EXPECT_FLOAT_EQ(0.0, frechet_cdf(0.25,3.9,1.7));
 
   EXPECT_FLOAT_EQ(1.0, frechet_cdf(numeric_limits<double>::infinity(),
