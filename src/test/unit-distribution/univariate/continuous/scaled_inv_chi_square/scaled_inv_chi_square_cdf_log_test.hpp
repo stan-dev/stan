@@ -15,7 +15,7 @@ public:
     param[1] = 0.5;           // nu (Degrees of Freedom)
     param[2] = 3.3;           // s  (Scale)
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.0781210912));  // expected cdf_log
+    cdf_log.push_back(std::log(0.078121091257371137070194));  // expected cdf_log
 
   }
   
@@ -61,26 +61,20 @@ public:
   }
     
   template <typename T_y, typename T_dof, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_dof, T_scale>::type 
   cdf_log(const T_y& y, const T_dof& nu, const T_scale& s,
-          const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, 
-          const T9&) {
+          const T3&, const T4&, const T5&) {
     return stan::prob::scaled_inv_chi_square_cdf_log(y, nu, s);
   }
 
 
   
   template <typename T_y, typename T_dof, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_dof, T_scale>::type 
   cdf_log_function(const T_y& y, const T_dof& nu, const T_scale& s,
-                   const T3&, const T4&, const T5&, const T6&, const T7&,
-                   const T8&, const T9&) {
+                   const T3&, const T4&, const T5&) {
     using stan::agrad::gamma_q;
     using stan::math::gamma_q;
 

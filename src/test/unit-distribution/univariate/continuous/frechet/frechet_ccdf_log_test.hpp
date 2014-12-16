@@ -19,13 +19,7 @@ public:
     param[1] = 1.0;                 // alpha
     param[2] = 1.0;                 // sigma
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.60653065));       // expected ccdf_log
-
-    param[0] = 0.25;                // y
-    param[1] = 2.9;                 // alpha
-    param[2] = 1.8;                 // sigma
-    parameters.push_back(param);
-    ccdf_log.push_back(0);  // expected ccdf_log
+    ccdf_log.push_back(std::log(0.3934693402873665757369));       // expected ccdf_log
 
     param[0] = 3.9;                 // y
     param[1] = 1.7;                 // alpha
@@ -63,7 +57,7 @@ public:
   }
     
   double lower_bound() {
-    return 1e-300;
+    return 1e-322;
   }
 
   bool has_upper_bound() {
@@ -71,27 +65,21 @@ public:
   }
 
   template <typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   ccdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-           const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, 
-           const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::frechet_ccdf_log(y, alpha, sigma);
   }
   
   template <typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   ccdf_log_function(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-               const T3&, const T4&, const T5&, const T6&, const T7&, 
-               const T8&, const T9&) {
+                    const T3&, const T4&, const T5&) {
     using std::log;
     using std::pow;
-	using std::exp;
+    using std::exp;
     return log(1.0 - exp(-pow(sigma / y, alpha)));
   }
 };
