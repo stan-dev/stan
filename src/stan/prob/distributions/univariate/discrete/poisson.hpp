@@ -388,7 +388,7 @@ namespace stan {
         P += log(Pi);
   
         if (!is_constant_struct<T_rate>::value)
-          operands_and_partials.d_x1[i] -= exp(-lambda_dbl) 
+          operands_and_partials.d_x1[i] += exp(-lambda_dbl) 
             * pow(lambda_dbl,n_dbl) / tgamma(n_dbl+1) / Pi;
 
       }
