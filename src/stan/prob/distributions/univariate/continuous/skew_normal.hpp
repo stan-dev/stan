@@ -3,15 +3,17 @@
 
 #include <boost/random/variate_generator.hpp>
 #include <boost/math/distributions.hpp>
-#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/math/functions/owens_t.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/math/functions/value_of.hpp>
 
 namespace stan {
 
@@ -22,14 +24,17 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                     const T_shape& alpha) {
-      static const char* function = "stan::prob::skew_normal_log(%1%)";
+      static const std::string function("stan::prob::skew_normal_log");
+      typedef typename stan::partials_return_type<T_y,T_loc,
+                                                  T_scale,T_shape>::type 
+        T_partials_return;
 
       using std::log;
       using stan::is_constant_struct;
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -41,18 +46,18 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      check_not_nan(function, y, "Random variable", &logp);
-      check_finite(function, mu, "Location parameter", &logp);
-      check_finite(function, alpha, "Shape parameter", &logp);
-      check_positive(function, sigma, "Scale parameter", &logp);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_finite(function, "Shape parameter", alpha);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,mu,sigma,alpha,
-                             "Random variable","Location parameter",
-                             "Scale parameter", "Shape paramter",
-                             &logp);
+                             "Random variable", y,
+                             "Location parameter", mu,
+                             "Scale parameter", sigma,
+                             "Shape paramter", alpha);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
@@ -62,15 +67,18 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
         operands_and_partials(y, mu, sigma, alpha);
 
+      using boost::math::erfc;
+      using boost::math::erf;
+
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, mu, sigma, alpha);
 
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,
-        is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
+      VectorBuilder<include_summand<propto,T_scale>::value,
+                    T_partials_return, T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -79,15 +87,15 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
 
         // reusable subexpression values
-        const double y_minus_mu_over_sigma 
+        const T_partials_return y_minus_mu_over_sigma 
           = (y_dbl - mu_dbl) * inv_sigma[n];
-        const double pi_dbl = boost::math::constants::pi<double>();
+        const double pi_dbl = stan::math::pi();
 
         // log probability
         if (include_summand<propto>::value)
@@ -97,15 +105,15 @@ namespace stan {
         if (include_summand<propto,T_y, T_loc, T_scale>::value)
           logp -= y_minus_mu_over_sigma * y_minus_mu_over_sigma / 2.0;
         if (include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
-          logp += log(boost::math::erfc(-alpha_dbl * y_minus_mu_over_sigma 
+          logp += log(erfc(-alpha_dbl * y_minus_mu_over_sigma 
                                         / std::sqrt(2.0)));
 
         // gradients
-        double deriv_logerf 
+        T_partials_return deriv_logerf 
           = 2.0 / std::sqrt(pi_dbl) 
           * exp(-alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0) 
                 * alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0))
-          / (1 + boost::math::erf(alpha_dbl * y_minus_mu_over_sigma 
+          / (1 + erf(alpha_dbl * y_minus_mu_over_sigma 
                                   / std::sqrt(2.0)));
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 
@@ -120,12 +128,12 @@ namespace stan {
             += -1.0 / sigma_dbl 
             + y_minus_mu_over_sigma * y_minus_mu_over_sigma / sigma_dbl 
             - deriv_logerf * y_minus_mu_over_sigma * alpha_dbl 
-              / (sigma_dbl * std::sqrt(2.0));
+            / (sigma_dbl * std::sqrt(2.0));
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x4[n] 
             += deriv_logerf * y_minus_mu_over_sigma / std::sqrt(2.0);
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,mu,sigma,alpha);
     }
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
@@ -140,16 +148,19 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                     const T_shape& alpha) {
-      static const char* function = "stan::prob::skew_normal_cdf(%1%)";
+      static const std::string function("stan::prob::skew_normal_cdf");
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
+                                                  T_shape>::type 
+        T_partials_return;
 
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::owens_t;
       using stan::math::value_of;
 
-      double cdf(1.0);
+      T_partials_return cdf(1.0);
       
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -158,17 +169,17 @@ namespace stan {
             && stan::length(alpha)))
         return cdf;
 
-      check_not_nan(function, y, "Random variable", &cdf);
-      check_finite(function, mu, "Location parameter", &cdf);
-      check_not_nan(function, sigma, "Scale parameter", &cdf);
-      check_positive(function, sigma, "Scale parameter", &cdf);
-      check_finite(function, alpha, "Shape parameter", &cdf);
-      check_not_nan(function, alpha, "Shape parameter", &cdf);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
+      check_finite(function, "Shape parameter", alpha);
+      check_not_nan(function, "Shape parameter", alpha);
       check_consistent_sizes(function,
-                             y,mu,sigma,alpha,
-                             "Random variable","Location parameter",
-                             "Scale parameter","Shape paramter",
-                             &cdf);
+                             "Random variable", y,
+                             "Location parameter", mu,
+                             "Scale parameter", sigma,
+                             "Shape paramter", alpha);
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
         operands_and_partials(y, mu, sigma, alpha);
@@ -184,26 +195,29 @@ namespace stan {
       const double SQRT_TWO_OVER_PI = std::sqrt(2.0 / stan::math::pi());
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double alpha_dbl_sq = alpha_dbl * alpha_dbl;
-        const double diff = (y_dbl - mu_dbl) / sigma_dbl;
-        const double diff_sq = diff * diff;
-        const double scaled_diff =  diff / SQRT_2;
-        const double scaled_diff_sq =  diff_sq * 0.5;
-        const double cdf_ = 0.5 * erfc(-scaled_diff) - 2 * owens_t(diff, 
-                                                                 alpha_dbl);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return alpha_dbl_sq = alpha_dbl * alpha_dbl;
+        const T_partials_return diff = (y_dbl - mu_dbl) / sigma_dbl;
+        const T_partials_return diff_sq = diff * diff;
+        const T_partials_return scaled_diff =  diff / SQRT_2;
+        const T_partials_return scaled_diff_sq =  diff_sq * 0.5;
+        const T_partials_return cdf_ = 0.5 * erfc(-scaled_diff) - 2 
+          * owens_t(diff, alpha_dbl);
+
         //cdf
         cdf *= cdf_;
 
         //gradients
-        const double deriv_erfc = SQRT_TWO_OVER_PI * 0.5 * exp(-scaled_diff_sq)
+        const T_partials_return deriv_erfc = SQRT_TWO_OVER_PI * 0.5 
+          * exp(-scaled_diff_sq)
           / sigma_dbl;
-        const double deriv_owens = erf(alpha_dbl * scaled_diff) 
+        const T_partials_return deriv_owens = erf(alpha_dbl * scaled_diff) 
           * exp(-scaled_diff_sq) / SQRT_TWO_OVER_PI / (-2.0 * pi()) / sigma_dbl;
-        const double rep_deriv = (-2.0 * deriv_owens + deriv_erfc) / cdf_;
+        const T_partials_return rep_deriv = (-2.0 * deriv_owens + deriv_erfc) 
+          / cdf_;
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv;
@@ -212,8 +226,9 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] -= rep_deriv * diff;
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x4[n] += -2.0 * exp(-0.5 * diff_sq * (1.0 
-                   + alpha_dbl_sq)) / ((1 + alpha_dbl_sq) * 2.0 * pi()) / cdf_;
+          operands_and_partials.d_x4[n] += -2.0 * exp(-0.5 * diff_sq 
+                                                      * (1.0  + alpha_dbl_sq))
+            / ((1 + alpha_dbl_sq) * 2.0 * pi()) / cdf_;
       }
 
       if (!is_constant_struct<T_y>::value)
@@ -229,23 +244,26 @@ namespace stan {
         for (size_t n = 0; n < stan::length(alpha); ++n) 
           operands_and_partials.d_x4[n] *= cdf;
 
-      return operands_and_partials.to_var(cdf);    
+      return operands_and_partials.to_var(cdf,y,mu,sigma,alpha);    
     }
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
-                    const T_shape& alpha) {
-      static const char* function = "stan::prob::skew_normal_cdf_log(%1%)";
+                        const T_shape& alpha) {
+      static const std::string function("stan::prob::skew_normal_cdf_log");
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
+                                                  T_shape>::type
+        T_partials_return;
 
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::owens_t;
 
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
       
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -254,17 +272,18 @@ namespace stan {
             && stan::length(alpha)))
         return cdf_log;
 
-      check_not_nan(function, y, "Random variable", &cdf_log);
-      check_finite(function, mu, "Location parameter", &cdf_log);
-      check_not_nan(function, sigma, "Scale parameter", &cdf_log);
-      check_positive(function, sigma, "Scale parameter", &cdf_log);
-      check_finite(function, alpha, "Shape parameter", &cdf_log);
-      check_not_nan(function, alpha, "Shape parameter", &cdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
+      check_finite(function, "Shape parameter", alpha);
+      check_not_nan(function, "Shape parameter", alpha);
       check_consistent_sizes(function,
-                             y,mu,sigma,alpha,
-                             "Random variable","Location parameter",
-                             "Scale parameter","Shape paramter",
-                             &cdf_log);
+                             "Random variable", y,
+                             "Location parameter", mu,
+                             "Scale parameter", sigma,
+                             "Shape paramter", alpha);
+
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
         operands_and_partials(y, mu, sigma, alpha);
@@ -280,26 +299,28 @@ namespace stan {
       const double SQRT_TWO_OVER_PI = std::sqrt(2.0 / stan::math::pi());
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double alpha_dbl_sq = alpha_dbl * alpha_dbl;
-        const double diff = (y_dbl - mu_dbl) / sigma_dbl;
-        const double diff_sq = diff * diff;
-        const double scaled_diff =  diff / SQRT_2;
-        const double scaled_diff_sq =  diff_sq * 0.5;
-        const double cdf_log_ = 0.5 * erfc(-scaled_diff) - 2 * owens_t(diff, 
-                                                                 alpha_dbl);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return alpha_dbl_sq = alpha_dbl * alpha_dbl;
+        const T_partials_return diff = (y_dbl - mu_dbl) / sigma_dbl;
+        const T_partials_return diff_sq = diff * diff;
+        const T_partials_return scaled_diff =  diff / SQRT_2;
+        const T_partials_return scaled_diff_sq =  diff_sq * 0.5;
+        const T_partials_return cdf_log_ = 0.5 * erfc(-scaled_diff) - 2 
+          * owens_t(diff, alpha_dbl);
+
         //cdf_log
         cdf_log += log(cdf_log_);
 
         //gradients
-        const double deriv_erfc = SQRT_TWO_OVER_PI * 0.5 * exp(-scaled_diff_sq)
-          / sigma_dbl;
-        const double deriv_owens = erf(alpha_dbl * scaled_diff) 
+        const T_partials_return deriv_erfc = SQRT_TWO_OVER_PI * 0.5 
+          * exp(-scaled_diff_sq) / sigma_dbl;
+        const T_partials_return deriv_owens = erf(alpha_dbl * scaled_diff) 
           * exp(-scaled_diff_sq) / SQRT_TWO_OVER_PI / (-2.0 * pi()) / sigma_dbl;
-        const double rep_deriv = (-2.0 * deriv_owens + deriv_erfc) / cdf_log_;
+        const T_partials_return rep_deriv = (-2.0 * deriv_owens + deriv_erfc) 
+          / cdf_log_;
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv;
@@ -308,27 +329,31 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] -= rep_deriv * diff;
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x4[n] += -2.0 * exp(-0.5 * diff_sq * (1.0
-                + alpha_dbl_sq)) / ((1 + alpha_dbl_sq) * 2.0 * pi()) / cdf_log_;
+          operands_and_partials.d_x4[n] += -2.0 * exp(-0.5 * diff_sq 
+                                                      * (1.0 + alpha_dbl_sq))
+            / ((1 + alpha_dbl_sq) * 2.0 * pi()) / cdf_log_;
       }
 
-      return operands_and_partials.to_var(cdf_log);    
+      return operands_and_partials.to_var(cdf_log,y,mu,sigma,alpha);    
     }
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                          const T_shape& alpha) {
-      static const char* function = "stan::prob::skew_normal_ccdf_log(%1%)";
+      static const std::string function("stan::prob::skew_normal_ccdf_log");
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
+                                                  T_shape>::type 
+        T_partials_return;
 
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::owens_t;
       using stan::math::value_of;
 
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
       
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -337,17 +362,17 @@ namespace stan {
             && stan::length(alpha)))
         return ccdf_log;
 
-      check_not_nan(function, y, "Random variable", &ccdf_log);
-      check_finite(function, mu, "Location parameter", &ccdf_log);
-      check_not_nan(function, sigma, "Scale parameter", &ccdf_log);
-      check_positive(function, sigma, "Scale parameter", &ccdf_log);
-      check_finite(function, alpha, "Shape parameter", &ccdf_log);
-      check_not_nan(function, alpha, "Shape parameter", &ccdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_finite(function, "Location parameter", mu);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
+      check_finite(function, "Shape parameter", alpha);
+      check_not_nan(function, "Shape parameter", alpha);
       check_consistent_sizes(function,
-                             y,mu,sigma,alpha,
-                             "Random variable","Location parameter",
-                             "Scale parameter","Shape paramter",
-                             &ccdf_log);
+                             "Random variable", y,
+                             "Location parameter", mu,
+                             "Scale parameter", sigma,
+                             "Shape paramter", alpha);
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
         operands_and_partials(y, mu, sigma, alpha);
@@ -363,26 +388,28 @@ namespace stan {
       const double SQRT_TWO_OVER_PI = std::sqrt(2.0 / stan::math::pi());
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double alpha_dbl_sq = alpha_dbl * alpha_dbl;
-        const double diff = (y_dbl - mu_dbl) / sigma_dbl;
-        const double diff_sq = diff * diff;
-        const double scaled_diff =  diff / SQRT_2;
-        const double scaled_diff_sq =  diff_sq * 0.5;
-        const double ccdf_log_ = 1.0 - 0.5 * erfc(-scaled_diff) + 2 * owens_t(diff, 
-                                                                 alpha_dbl);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return alpha_dbl_sq = alpha_dbl * alpha_dbl;
+        const T_partials_return diff = (y_dbl - mu_dbl) / sigma_dbl;
+        const T_partials_return diff_sq = diff * diff;
+        const T_partials_return scaled_diff =  diff / SQRT_2;
+        const T_partials_return scaled_diff_sq =  diff_sq * 0.5;
+        const T_partials_return ccdf_log_ = 1.0 - 0.5 * erfc(-scaled_diff) 
+          + 2 * owens_t(diff, alpha_dbl);
+
         //ccdf_log
         ccdf_log += log(ccdf_log_);
 
         //gradients
-        const double deriv_erfc = SQRT_TWO_OVER_PI * 0.5 * exp(-scaled_diff_sq)
-          / sigma_dbl;
-        const double deriv_owens = erf(alpha_dbl * scaled_diff) 
+        const T_partials_return deriv_erfc = SQRT_TWO_OVER_PI * 0.5 
+          * exp(-scaled_diff_sq) / sigma_dbl;
+        const T_partials_return deriv_owens = erf(alpha_dbl * scaled_diff) 
           * exp(-scaled_diff_sq) / SQRT_TWO_OVER_PI / (-2.0 * pi()) / sigma_dbl;
-        const double rep_deriv = (-2.0 * deriv_owens + deriv_erfc) / ccdf_log_;
+        const T_partials_return rep_deriv = (-2.0 * deriv_owens + deriv_erfc) 
+          / ccdf_log_;
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= rep_deriv;
@@ -391,11 +418,12 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] += rep_deriv * diff;
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x4[n] -= -2.0 * exp(-0.5 * diff_sq * (1.0 
-                   + alpha_dbl_sq)) / ((1 + alpha_dbl_sq) * 2.0 * pi()) / ccdf_log_;
+          operands_and_partials.d_x4[n] -= -2.0 * exp(-0.5 * diff_sq 
+                                                      * (1.0 + alpha_dbl_sq)) 
+            / ((1 + alpha_dbl_sq) * 2.0 * pi()) / ccdf_log_;
       }
 
-      return operands_and_partials.to_var(ccdf_log);    
+      return operands_and_partials.to_var(ccdf_log,y,mu,sigma,alpha);    
     }
 
     template <class RNG>
@@ -406,14 +434,14 @@ namespace stan {
                     RNG& rng) {
       boost::math::skew_normal_distribution<>dist (mu, sigma, alpha);
 
-      static const char* function = "stan::prob::skew_normal_rng(%1%)";
+      static const std::string function("stan::prob::skew_normal_rng");
 
-      using stan::math::check_positive;
-      using stan::math::check_finite;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
 
-      check_finite(function, mu, "Location parameter", (double*)0);
-      check_finite(function, alpha, "Shape parameter", (double*)0);
-      check_positive(function, sigma, "Scale parameter", (double*)0);
+      check_finite(function, "Location parameter", mu);
+      check_finite(function, "Shape parameter", alpha);
+      check_positive(function, "Scale parameter", sigma);
 
       return quantile(dist, stan::prob::uniform_rng(0.0,1.0,rng));
     }

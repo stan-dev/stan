@@ -14,12 +14,17 @@
 /doc/*.pdf
 
 # temporary latex files
-*~
 *.idx
 *.ilg
 *.ind
 *.fdb_latexmk
 *.fls
+
+# temporary emacs files
+*~
+\#*#
+auto/
+
 
 # depedencies files
 *.d
@@ -48,7 +53,7 @@ stan.kdev4
 !/src/test/test-models/**/.gitignore
 
 # tests: generated agrad tests
-/src/test/unit-distribution/*/*/*/*_generated_test.cpp
+/src/test/unit-distribution/*/*/*/*_generated_*_test.cpp
 
 # For the Mac
 *.DS_Store

@@ -3,6 +3,16 @@
 #include <vector>
 #include <stan/memory/stack_alloc.hpp>
 
+TEST(MemoryStackAlloc, allocArray) {
+  // just an example to show how alloc_array is used
+  stan::memory::stack_alloc allocator;
+  double* x = allocator.alloc_array<double>(10U);
+  for (int i = 0; i < 10; ++i)
+    x[i] = 3.0;
+  for (int i = 0; i < 10; ++i)
+    EXPECT_EQ(3.0, x[i]);
+}
+
 TEST(stack_alloc, bytes_allocated) {
   stan::memory::stack_alloc allocator;
   EXPECT_TRUE(0L <= allocator.bytes_allocated());

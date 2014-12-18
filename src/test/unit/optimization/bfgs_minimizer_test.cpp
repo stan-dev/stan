@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/optimization/bfgs.hpp>
-#include <test/test-models/no-main/optimization/rosenbrock.cpp>
+#include <test/test-models/good/optimization/rosenbrock.cpp>
 
 
 typedef rosenbrock_model_namespace::rosenbrock_model Model;
@@ -21,7 +21,7 @@ public:
 
 
 TEST_F(OptimizationBfgsMinimizer, constructor) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -30,7 +30,7 @@ TEST_F(OptimizationBfgsMinimizer, constructor) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, ls_opts) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -44,7 +44,7 @@ TEST_F(OptimizationBfgsMinimizer, ls_opts) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, conv_opts) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -61,7 +61,7 @@ TEST_F(OptimizationBfgsMinimizer, conv_opts) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, get_qnupdate) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -73,7 +73,7 @@ TEST_F(OptimizationBfgsMinimizer, get_qnupdate) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, curr_f) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -85,7 +85,7 @@ TEST_F(OptimizationBfgsMinimizer, curr_f) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, curr_x) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -98,7 +98,7 @@ TEST_F(OptimizationBfgsMinimizer, curr_x) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, curr_g) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -111,7 +111,7 @@ TEST_F(OptimizationBfgsMinimizer, curr_g) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, curr_p) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -124,7 +124,7 @@ TEST_F(OptimizationBfgsMinimizer, curr_p) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, prev_f) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -137,7 +137,7 @@ TEST_F(OptimizationBfgsMinimizer, prev_f) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, prev_x) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -151,7 +151,7 @@ TEST_F(OptimizationBfgsMinimizer, prev_x) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, prev_g) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -165,7 +165,7 @@ TEST_F(OptimizationBfgsMinimizer, prev_g) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, prev_p) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -179,7 +179,7 @@ TEST_F(OptimizationBfgsMinimizer, prev_p) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, prev_step_size) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -192,7 +192,7 @@ TEST_F(OptimizationBfgsMinimizer, prev_step_size) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, rel_grad_norm) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -205,7 +205,7 @@ TEST_F(OptimizationBfgsMinimizer, rel_grad_norm) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, rel_obj_decrease) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -218,7 +218,7 @@ TEST_F(OptimizationBfgsMinimizer, rel_obj_decrease) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, alpha0) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -231,7 +231,7 @@ TEST_F(OptimizationBfgsMinimizer, alpha0) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, alpha) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -244,7 +244,7 @@ TEST_F(OptimizationBfgsMinimizer, alpha) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, iter_num) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -258,7 +258,7 @@ TEST_F(OptimizationBfgsMinimizer, iter_num) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, note) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -271,7 +271,7 @@ TEST_F(OptimizationBfgsMinimizer, note) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, get_code_string) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -294,7 +294,7 @@ TEST_F(OptimizationBfgsMinimizer, get_code_string) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, initialize) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -320,7 +320,7 @@ TEST_F(OptimizationBfgsMinimizer, initialize) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, step) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -331,7 +331,7 @@ TEST_F(OptimizationBfgsMinimizer, step) {
 }
 
 TEST_F(OptimizationBfgsMinimizer, minimize) {
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);

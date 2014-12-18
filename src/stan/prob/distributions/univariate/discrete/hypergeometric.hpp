@@ -1,15 +1,18 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__HYPERGEOMETRIC_HPP
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__HYPERGEOMETRIC_HPP
 
+#include <vector>
 #include <boost/math/distributions.hpp>
-#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
-#include <stan/agrad/partials_vari.hpp>
-#include <stan/math.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_bounded.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_greater.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
+#include <stan/math/functions/binomial_coefficient_log.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
-#include <vector>
+#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
 namespace stan {
 
@@ -24,12 +27,12 @@ namespace stan {
     double
     hypergeometric_log(const T_n& n, const T_N& N, 
                        const T_a& a, const T_b& b) {
-      static const char* function = "stan::prob::hypergeometric_log(%1%)";
+      static const std::string function("stan::prob::hypergeometric_log");
 
-      using stan::math::check_finite;      
-      using stan::math::check_bounded;
-      using stan::math::check_greater;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_finite;      
+      using stan::error_handling::check_bounded;
+      using stan::error_handling::check_greater;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
@@ -47,20 +50,17 @@ namespace stan {
       size_t size = max_size(n, N, a, b);
       
       double logp(0.0);
-      check_bounded(function, n, 0, a, "Successes variable", &logp);
-      check_greater(function, N, n, "Draws parameter", &logp);
+      check_bounded(function, "Successes variable", n, 0, a);
+      check_greater(function, "Draws parameter", N, n);
       for (size_t i = 0; i < size; i++) {
-        check_bounded(function, N_vec[i]-n_vec[i], 0, b_vec[i], 
-                      "Draws parameter minus successes variable", &logp);
-        check_bounded(function, N_vec[i], 0, a_vec[i]+b_vec[i], 
-                      "Draws parameter", &logp);
+        check_bounded(function, "Draws parameter minus successes variable", N_vec[i]-n_vec[i], 0, b_vec[i]);
+        check_bounded(function, "Draws parameter", N_vec[i], 0, a_vec[i]+b_vec[i]);
       }
       check_consistent_sizes(function,
-                             n,N,a,b,
-                             "Successes variable","Draws parameter",
-                             "Successes in population parameter",
-                             "Failures in population parameter",
-                             &logp);
+                             "Successes variable", n,
+                             "Draws parameter", N,
+                             "Successes in population parameter", a,
+                             "Failures in population parameter", b);
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto>::value)
@@ -95,15 +95,15 @@ namespace stan {
                        RNG& rng) {
       using boost::variate_generator;
       
-      static const char* function = "stan::prob::hypergeometric_rng(%1%)";
+      static const std::string function("stan::prob::hypergeometric_rng");
 
-      using stan::math::check_bounded;
-      using stan::math::check_positive;
+      using stan::error_handling::check_bounded;
+      using stan::error_handling::check_positive;
 
-      check_bounded(function, N, 0, a+b, "Draws parameter", (int*)0);
-      check_positive(function,N,"Draws parameter", (int*)0);
-      check_positive(function,a,"Successes in population parameter", (int*)0);
-      check_positive(function,b,"Failures in population parameter", (int*)0);
+      check_bounded(function, "Draws parameter", N, 0, a+b);
+      check_positive(function, "Draws parameter", N);
+      check_positive(function, "Successes in population parameter", a);
+      check_positive(function, "Failures in population parameter", b);
 
       boost::math::hypergeometric_distribution<>dist (b, N, a + b);
       std::vector<double> index(a);
@@ -114,7 +114,7 @@ namespace stan {
       int min = 0;
       int max = a - 1;
       int mid = 0;
-      while(min < max) {
+      while (min < max) {
         mid = (min + max) / 2;
         if(index[mid] > c)
           max = mid;

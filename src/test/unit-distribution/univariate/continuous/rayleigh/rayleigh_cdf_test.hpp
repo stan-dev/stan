@@ -31,7 +31,7 @@ public:
     param[0] = 3.5;          // y
     param[1] = 7.2;           // sigma
     parameters.push_back(param);
-    cdf.push_back(0.111439); // expected cdf
+    cdf.push_back(0.11143902440462770394); // expected cdf
   }
   
   void invalid_values(vector<size_t>& index, 
@@ -64,27 +64,19 @@ public:
   }
 
   template <typename T_y, typename T_scale, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5> 
   typename stan::return_type<T_y, T_scale>::type 
   cdf(const T_y& y, const T_scale& sigma, const T2&,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+      const T3&, const T4&, const T5&) {
     return stan::prob::rayleigh_cdf(y, sigma);
   }
 
 
   template <typename T_y, typename T_scale, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-var  cdf_function(const T_y& y, const T_scale& sigma, const T2&,
-         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    using stan::prob::include_summand;
-
-    var cdf(1.0);
-    if (include_summand<true,T_y,T_scale>::value)
-      cdf *= (1.0 - exp(-0.5 * y * y / (sigma * sigma)));
-    return cdf;
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_y, T_scale>::type 
+  cdf_function(const T_y& y, const T_scale& sigma, const T2&,
+               const T3&, const T4&, const T5&) {
+    return (1.0 - exp(-0.5 * y * y / (sigma * sigma)));
   }
 };

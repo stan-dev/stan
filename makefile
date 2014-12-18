@@ -34,7 +34,7 @@ GTEST ?= lib/gtest_1.7.0
 ## 
 CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
-LDLIBS = -Lbin -lstan
+LDLIBS = 
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 WINE =
@@ -94,7 +94,6 @@ endif
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Model related:'
-	@echo '  - bin/libstan.a  : Build the Stan static library (used in linking models).'
 	@echo '  - bin/libstanc.a : Build the Stan compiler static library'
 	@echo '  Documentation:'
 	@echo '  - manual         : Builds the reference manual. Copies built manual to'

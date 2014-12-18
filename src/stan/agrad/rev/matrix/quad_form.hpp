@@ -9,9 +9,9 @@
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/value_of.hpp>
 #include <stan/math/matrix/quad_form.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {
   namespace agrad {
@@ -129,9 +129,10 @@ namespace stan {
     quad_form(const Eigen::Matrix<TA,RA,CA> &A,
               const Eigen::Matrix<TB,RB,CB> &B)
     {
-      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("quad_form(%1%)",A,"A",
-                                      B,"B",(double*)0);
+      stan::error_handling::check_square("quad_form", "A", A);
+      stan::error_handling::check_multiplicable("quad_form", 
+                                                "A", A, 
+                                                "B", B);
       
       quad_form_vari<TA,RA,CA,TB,RB,CB> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,CB>(A,B);
       
@@ -145,9 +146,10 @@ namespace stan {
     quad_form(const Eigen::Matrix<TA,RA,CA> &A,
               const Eigen::Matrix<TB,RB,1> &B)
     {
-      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("quad_form(%1%)",A,"A",
-                                      B,"B",(double*)0);
+      stan::error_handling::check_square("quad_form", "A", A);
+      stan::error_handling::check_multiplicable("quad_form",
+                                                "A", A,
+                                                "B", B);
       
       quad_form_vari<TA,RA,CA,TB,RB,1> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,1>(A,B);
       
@@ -162,10 +164,11 @@ namespace stan {
     quad_form_sym(const Eigen::Matrix<TA,RA,CA> &A,
                   const Eigen::Matrix<TB,RB,CB> &B)
     {
-      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
-      stan::math::check_symmetric("quad_form_sym(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("quad_form_sym(%1%)",A,"A",
-                                      B,"B",(double*)0);
+      stan::error_handling::check_square("quad_form", "A", A);
+      stan::error_handling::check_symmetric("quad_form_sym", "A", A);
+      stan::error_handling::check_multiplicable("quad_form_sym", 
+                                                "A", A, 
+                                                "B", B);
       
       quad_form_vari<TA,RA,CA,TB,RB,CB> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,CB>(A,B,true);
       
@@ -179,10 +182,11 @@ namespace stan {
     quad_form_sym(const Eigen::Matrix<TA,RA,CA> &A,
                   const Eigen::Matrix<TB,RB,1> &B)
     {
-      stan::math::check_square("quad_form(%1%)",A,"A",(double*)0);
-      stan::math::check_symmetric("quad_form_sym(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("quad_form_sym(%1%)",A,"A",
-                                      B,"B",(double*)0);
+      stan::error_handling::check_square("quad_form", "A", A);
+      stan::error_handling::check_symmetric("quad_form_sym", "A", A);
+      stan::error_handling::check_multiplicable("quad_form_sym", 
+                                                "A", A, 
+                                                "B", B);
       
       quad_form_vari<TA,RA,CA,TB,RB,1> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,1>(A,B,true);
       

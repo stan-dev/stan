@@ -16,12 +16,12 @@ public:
     param[0] = 7.9;                 // y
     param[1] = 3.0;                 // nu
     parameters.push_back(param);
-    log_prob.push_back(-3.835507);  // expected log_prob
+    log_prob.push_back(-3.835507153468185048695);  // expected log_prob
 
     param[0] = 1.9;                 // y
     param[1] = 0.5;                 // nu
     parameters.push_back(param);
-    log_prob.push_back(-2.8927);    // expected log_prob
+    log_prob.push_back(-2.892699734467359284906);    // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 
@@ -41,48 +41,33 @@ public:
 
 
   template <typename T_y, typename T_dof, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_dof, T2>::type 
   log_prob(const T_y& y, const T_dof& nu, 
-     const T2&, const T3&, const T4&, const T5&, 
-     const T6&, const T7&, const T8&, const T9&) {
+           const T2&, const T3&, const T4&, const T5&) {
     return stan::prob::chi_square_log(y, nu);
   }
 
   template <bool propto, 
       typename T_y, typename T_dof, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_dof>::type 
   log_prob(const T_y& y, const T_dof& nu, 
-     const T2&, const T3&, const T4&, const T5&,
-     const T6&, const T7&, const T8&, const T9&) {
+           const T2&, const T3&, const T4&, const T5&) {
     return stan::prob::chi_square_log<propto>(y, nu);
   }
   
   
   template <typename T_y, typename T_dof, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_dof& nu, 
-      const T2&, const T3&, const T4&, const T5&, 
-      const T6&, const T7&, const T8&, const T9&) {
-    using stan::prob::include_summand;
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_y, T_dof>::type 
+  log_prob_function(const T_y& y, const T_dof& nu, 
+                    const T2&, const T3&, const T4&, const T5&) {
     using stan::math::multiply_log;
     using boost::math::lgamma;
     using stan::prob::NEG_LOG_TWO_OVER_TWO;
     
-    var logp(0);
-    if (include_summand<true,T_dof>::value)
-      logp += nu * NEG_LOG_TWO_OVER_TWO - lgamma(0.5 * nu);
-    if (include_summand<true,T_y,T_dof>::value)
-      logp += multiply_log(0.5*nu-1.0, y);
-    if (include_summand<true,T_y>::value)
-      logp -= 0.5 * y;
-    return logp;
+    return nu * NEG_LOG_TWO_OVER_TWO - lgamma(0.5 * nu) 
+      + multiply_log(0.5*nu-1.0, y) - 0.5 * y;
   }
 };
