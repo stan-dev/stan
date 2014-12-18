@@ -37,23 +37,19 @@ public:
   }
 
   template <typename T_n, typename T_prob, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_prob>::type
   ccdf_log(const T_n& n, const T_prob& theta, const T2&,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::bernoulli_ccdf_log(n, theta);
   }
 
 
   template <typename T_n, typename T_prob, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_prob>::type
   ccdf_log_function(const T_n& n, const T_prob& theta,const T2&,
-         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+                    const T3&, const T4&, const T5&) {
 
     if(n < 0) return 0.0;
     if(n < 1) return log(theta);

@@ -614,9 +614,9 @@ namespace stan {
     }
     bool contains_var::operator()(const variable& e) const {
       var_origin vo = var_map_.get_origin(e.name_);
-      return ( vo == parameter_origin
-               || vo == transformed_parameter_origin
-               || vo == local_origin );
+      return vo == parameter_origin
+        || vo == transformed_parameter_origin
+        || ( vo == local_origin && e.type_.base_type_ != INT_T);
     }
     bool contains_var::operator()(const fun& e) const {
       for (size_t i = 0; i < e.args_.size(); ++i)

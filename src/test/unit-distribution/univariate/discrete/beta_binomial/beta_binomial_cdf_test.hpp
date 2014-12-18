@@ -19,7 +19,7 @@ public:
     param[2] = 13;         // alpha
     param[3] = 15;         // beta
     parameters.push_back(param);
-    cdf.push_back(0.26805232961); // expected cdf
+    cdf.push_back(0.2680523296111902594541368047465042591108987357277389728827508022844102288442195709664943608618480998); // expected cdf
   }
   
   void invalid_values(vector<size_t>& index, 
@@ -48,21 +48,19 @@ public:
   }
 
   template <typename T_n, typename T_N, typename T_size1, typename T_size2, 
-        typename T4, typename T5, typename T6, 
-        typename T7, typename T8, typename T9>
+            typename T4, typename T5>
   typename stan::return_type<T_size1,T_size2>::type
   cdf(const T_n& n, const T_N& N, const T_size1& alpha, const T_size2& beta, 
-      const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+      const T4&, const T5&) {
     return stan::prob::beta_binomial_cdf(n, N, alpha, beta);
   }
 
 
   template <typename T_n, typename T_N, typename T_size1, typename T_size2, 
-        typename T4, typename T5, typename T6, 
-        typename T7, typename T8, typename T9>
+            typename T4, typename T5>
   typename stan::return_type<T_size1,T_size2>::type
-  cdf_function(const T_n& n, const T_N& N, const T_size1& alpha, const T_size2& beta, 
-               const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+  cdf_function(const T_n& n, const T_N& N, const T_size1& alpha, 
+               const T_size2& beta, const T4&, const T5&) {
 
     using std::exp;
     using stan::math::lbeta;
