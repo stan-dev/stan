@@ -4197,6 +4197,12 @@ namespace stan {
       generate_comment("declare and define generated quantities",2,o);
       generate_local_var_decls(prog.generated_decl_.first,2,o,
                                is_var,is_fun_return); 
+
+      o << EOL;
+      o << INDENT2 << "double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());" << EOL;
+      o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
+      generate_init_vars(prog.generated_decl_.first, 2, o);
+
       o << EOL;
       generate_statements(prog.generated_decl_.second,2,o,include_sampling,
                           is_var,is_fun_return); 
