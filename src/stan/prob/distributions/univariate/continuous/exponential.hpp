@@ -58,10 +58,12 @@ namespace stan {
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
       
       T_partials_return logp(0.0);
       check_not_nan(function, "Random variable", y);
+			check_nonnegative(function, "Random variable", y);
       check_positive_finite(function, "Inverse scale parameter", beta);
       check_consistent_sizes(function,
                              "Random variable", y,

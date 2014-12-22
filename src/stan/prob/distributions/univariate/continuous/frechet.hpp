@@ -5,7 +5,6 @@
 #include <boost/random/variate_generator.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
-#include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
@@ -141,7 +140,6 @@ namespace stan {
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_positive;
-      using stan::error_handling::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -205,7 +203,6 @@ namespace stan {
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_positive;
-      using stan::error_handling::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -258,7 +255,6 @@ namespace stan {
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_positive;
-      using stan::error_handling::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
