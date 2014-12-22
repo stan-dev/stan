@@ -33,7 +33,7 @@ namespace stan {
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
       using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;      
+      using stan::error_handling::positive;      
       using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
@@ -50,7 +50,7 @@ namespace stan {
 
       // validate args (here done over var, which should be OK)
       check_not_nan(function, "Random variable", y);
-      check_nonnegative(function, "Random variable", y);
+      check_positive(function, "Random variable", y);
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
@@ -62,10 +62,6 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
-      
-      for (size_t n = 0; n < length(y); n++)
-        if (value_of(y_vec[n]) <= 0)
-          return LOG_ZERO;
       
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
@@ -160,7 +156,7 @@ namespace stan {
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
       using stan::error_handling::check_positive_finite;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
@@ -172,7 +168,7 @@ namespace stan {
         return cdf;
 
       check_not_nan(function, "Random variable", y);
-      check_nonnegative(function, "Random variable", y);
+      check_positive(function, "Random variable", y);
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
 
@@ -185,11 +181,6 @@ namespace stan {
       size_t N = max_size(y, mu, sigma);
 
       const double sqrt_pi = std::sqrt(stan::math::pi());
-
-      for (size_t i = 0; i < stan::length(y); i++) {
-        if (value_of(y_vec[i]) == 0.0) 
-          return operands_and_partials.to_var(0.0,y,mu,sigma);
-      }
 
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);
@@ -238,7 +229,7 @@ namespace stan {
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
       using stan::error_handling::check_positive_finite;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
@@ -250,7 +241,7 @@ namespace stan {
         return cdf_log;
 
       check_not_nan(function, "Random variable", y);
-      check_nonnegative(function, "Random variable", y);
+      check_positive(function, "Random variable", y);
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
 
@@ -263,12 +254,6 @@ namespace stan {
       size_t N = max_size(y, mu, sigma);
 
       const double sqrt_pi = std::sqrt(stan::math::pi());
-
-      for (size_t i = 0; i < stan::length(y); i++) {
-        if (value_of(y_vec[i]) == 0.0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),
-                                              y,mu,sigma);
-      }
 
       const double log_half = std::log(0.5);
 
@@ -309,7 +294,7 @@ namespace stan {
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
       using stan::error_handling::check_positive_finite;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
@@ -321,7 +306,7 @@ namespace stan {
         return ccdf_log;
 
       check_not_nan(function, "Random variable", y);
-      check_nonnegative(function, "Random variable", y);
+      check_positive(function, "Random variable", y);
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
 
@@ -334,11 +319,6 @@ namespace stan {
       size_t N = max_size(y, mu, sigma);
 
       const double sqrt_pi = std::sqrt(stan::math::pi());
-
-      for (size_t i = 0; i < stan::length(y); i++) {
-        if (value_of(y_vec[i]) == 0.0) 
-          return operands_and_partials.to_var(0.0,y,mu,sigma);
-      }
 
       const double log_half = std::log(0.5);
 

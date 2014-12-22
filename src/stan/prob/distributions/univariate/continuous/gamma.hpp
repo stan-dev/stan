@@ -10,6 +10,7 @@
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
@@ -42,7 +43,7 @@ namespace stan {
      * @param beta Inverse scale parameter.
      * @throw std::domain_error if alpha is not greater than 0.
      * @throw std::domain_error if beta is not greater than 0.
-     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @throw std::domain_error if y is not greater than 0.
      * @tparam T_y Type of scalar.
      * @tparam T_shape Type of shape.
      * @tparam T_inv_scale Type of inverse scale.
@@ -59,7 +60,7 @@ namespace stan {
       using stan::is_constant_struct;
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
       using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       
@@ -76,6 +77,7 @@ namespace stan {
       check_not_nan(function, "Random variable", y);
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Inverse scale parameter", beta); 
+      check_positive(function, "Random variable", y);
       check_consistent_sizes(function,
                              "Random variable", y,
                              "Shape parameter", alpha,
@@ -89,12 +91,6 @@ namespace stan {
       VectorView<const T_y> y_vec(y);
       VectorView<const T_shape> alpha_vec(alpha);
       VectorView<const T_inv_scale> beta_vec(beta);
-
-      for (size_t n = 0; n < length(y); n++) {
-        const T_partials_return y_dbl = value_of(y_vec[n]);
-        if (y_dbl < 0)
-          return LOG_ZERO;
-      }
 
       size_t N = max_size(y, alpha, beta);
       agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale> 
@@ -173,7 +169,7 @@ namespace stan {
      * @param beta Inverse scale parameter.
      * @throw std::domain_error if alpha is not greater than 0.
      * @throw std::domain_error if beta is not greater than 0.
-     * @throw std::domain_error if y is not greater than or equal to 0.
+     * @throw std::domain_error if y is not greater than 0.
      * @tparam T_y Type of scalar.
      * @tparam T_shape Type of shape.
      * @tparam T_inv_scale Type of inverse scale.
@@ -196,7 +192,7 @@ namespace stan {
       using stan::error_handling::check_consistent_sizes;
       using stan::error_handling::check_greater_or_equal;
       using stan::error_handling::check_less_or_equal;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -205,7 +201,7 @@ namespace stan {
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", beta);
       check_not_nan(function, "Random variable", y);
-      check_nonnegative(function, "Random variable", y); 
+      check_positive(function, "Random variable", y); 
       check_consistent_sizes(function, 
                              "Random variable", y, 
                              "Shape parameter", alpha, 
@@ -219,14 +215,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale> 
         operands_and_partials(y, alpha, beta);
-          
-      // Explicit return for extreme values
-      // The gradients are technically ill-defined, but treated as zero
-          
-      for (size_t i = 0; i < stan::length(y); i++) {
-        if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0,y,alpha,beta);
-      }
           
       // Compute CDF and its gradients
       using stan::math::gamma_p;
@@ -311,7 +299,7 @@ namespace stan {
       using stan::error_handling::check_consistent_sizes;
       using stan::error_handling::check_greater_or_equal;
       using stan::error_handling::check_less_or_equal;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -320,7 +308,7 @@ namespace stan {
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", beta);
       check_not_nan(function, "Random variable", y);
-      check_nonnegative(function, "Random variable", y); 
+      check_positive(function, "Random variable", y); 
       check_consistent_sizes(function, 
                              "Random variable", y, 
                              "Shape parameter", alpha, 
@@ -334,15 +322,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale> 
         operands_and_partials(y, alpha, beta);
-          
-      // Explicit return for extreme values
-      // The gradients are technically ill-defined, but treated as zero
-          
-      for (size_t i = 0; i < stan::length(y); i++) {
-        if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),
-                                              y,alpha,beta);
-      }
           
       // Compute cdf_log and its gradients
       using stan::math::gamma_p;
@@ -419,7 +398,7 @@ namespace stan {
       using stan::error_handling::check_consistent_sizes;
       using stan::error_handling::check_greater_or_equal;
       using stan::error_handling::check_less_or_equal;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -428,7 +407,7 @@ namespace stan {
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", beta);
       check_not_nan(function, "Random variable", y);
-      check_nonnegative(function, "Random variable", y); 
+      check_positive(function, "Random variable", y); 
       check_consistent_sizes(function, 
                              "Random variable", y, 
                              "Shape parameter", alpha, 
@@ -442,14 +421,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale> 
         operands_and_partials(y, alpha, beta);
-          
-      // Explicit return for extreme values
-      // The gradients are technically ill-defined, but treated as zero
-          
-      for (size_t i = 0; i < stan::length(y); i++) {
-        if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0,y,alpha,beta);
-      }
           
       // Compute ccdf_log and its gradients
       using stan::math::gamma_p;
