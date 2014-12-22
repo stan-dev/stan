@@ -2542,6 +2542,11 @@ namespace stan {
 
       generate_var_resizing(prog.derived_data_decl_.first, o);
       o << EOL;
+
+      o << INDENT2 << "double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());" << EOL;
+      o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
+      generate_init_vars(prog.derived_data_decl_.first, 2, o);
+
       bool include_sampling = false;
       bool is_var = false;
       bool is_fun_return = false;
