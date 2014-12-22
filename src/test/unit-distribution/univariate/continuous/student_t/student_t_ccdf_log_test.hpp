@@ -16,14 +16,14 @@ public:
     param[2] = 3.3;           // mu (Location)
     param[3] = 1.0;           // sigma (Scale)
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.86466887792));  // expected CCDF_log
+    ccdf_log.push_back(std::log(1.0 - 0.8646688779244795508561));  // expected CCDF_log
      
     param[0] = 2.5;           // y
     param[1] = 3.5;           // nu (Degrees of Freedom)
     param[2] = 3.3;           // mu (Location)
     param[3] = 1.0;           // sigma (Scale)
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.23723278834));  // expected CCDF_log
+    ccdf_log.push_back(std::log(1.0 - 0.2372327883473262233327));  // expected CCDF_log
       
   }
   
@@ -67,21 +67,18 @@ public:
   }
     
   template <typename T_y, typename T_dof, typename T_loc, typename T_scale, 
-        typename T4, typename T5, typename T6, 
-        typename T7, typename T8, typename T9>
+            typename T4, typename T5>
   typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type
   ccdf_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
-          const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T4&, const T5&) {
     return stan::prob::student_t_ccdf_log(y, nu, mu, sigma);
   }
 
   template <typename T_y, typename T_dof, typename T_loc, typename T_scale, 
-        typename T4, typename T5, typename T6, 
-        typename T7, typename T8, typename T9>
+            typename T4, typename T5>
   typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type
   ccdf_log_function(const T_y& y, const T_dof& nu, const T_loc& mu, 
-                   const T_scale& sigma, const T4&, const T5&, const T6&, 
-                   const T7&, const T8&, const T9&) {
+                    const T_scale& sigma, const T4&, const T5&) {
     return stan::prob::student_t_ccdf_log(y, nu, mu, sigma);
   }
 };

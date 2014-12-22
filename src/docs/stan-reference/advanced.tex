@@ -113,8 +113,7 @@ just the square root of the average squared residual,
 The squared error approach to linear regression can be directly coded
 in Stan with the following model.
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
   int<lower=0> N;
   int<lower=1> K;
@@ -135,8 +134,7 @@ generated quantities {
   real<lower=0> sigma_squared;
   sigma_squared <- squared_error / N;
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 Running Stan's optimizer on this model produces the MLE for the linear
 regression by directly minimizing the sum of squared errors and using
@@ -224,19 +222,17 @@ maximum likelihood estimate.
 In Stan, adding the ridge penalty involves adding its magnitude as a
 data variable and the penalty itself to the model block,
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
-  ...
+  // ...
   real<lower=0> lambda;
 }
-...
+// ...
 model {
-  ...
+  // ...
   increment_log_prob(- lambda * dot_self(beta));
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The noise term calculation remains the same.
 
@@ -269,20 +265,18 @@ The lasso can be implemented in Stan just as easily as ridge
 regression, with the magnitude declared as data and the penalty added
 to the model block,
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
-  ...
+  // ...
   real<lower=0> lambda;
 }
-...
+// ...
 model {
-  ...
+  // ...
   for (k in 1:K)
     increment_log_prob(- lambda * abs(beta[k]));
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 \subsubsection{The Elastic Net}
 
@@ -298,22 +292,20 @@ the lasso, providing both identification and variable selection.
 The naive elastic net can be implemented directly in Stan by combining
 implementations of ridge regression and the lasso, as
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
   real<lower=0> lambda1;
   real<lower=0> lambda2;
-  ...
+  // ...
 }
-...
+// ...
 model {
-  ...
+  // ...
   increment_log_prob(lambda2 * dot_self(beta));
   for (k in 1:K)
     increment_log_prob(lambda1 * abs(beta[k]));
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 
 The elastic net \citep{ZouHastie:2005} involves adjusting the final estimate for
@@ -328,15 +320,13 @@ To implement the elastic net in Stan, the data, parameter, and model
 blocks are the same as for the naive elastic net.  In addition, the
 elastic net estimate is calculated in the generated quantities block.
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 generated quantities {
   vector[K] beta_elastic_net;
-  ...
+  // ...
   beta_elastic_net <- (1 + lambda2) * beta;
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The error scale also needs to be calculated in the generated
 quantities block based on the elastic net coefficients
@@ -850,8 +840,8 @@ $\theta = \theta^{(1)}, \theta^{(2)},\ldots, \theta^{(N)}$, then
 \[
 p(\theta) = p(\theta^{(1)}) \prod_{n=2}^N p(\theta^{(n)}|\theta^{(n-1)}).
 \]
-\Stan generates a next state in a manner described in
-\refsection{intro-samplers}. 
+Stan uses Hamiltonian Monte Carlo to generate a next state in a manner
+described in \refchapter{hmc}.
 
 The Markov chains \Stan and other \MCMC samplers generate are ergodic
 in the sense required by the Markov chain central limit theorem,
@@ -1020,6 +1010,108 @@ near unity.  In this case, splitting each chain into two parts leads
 to $\hat{R}$ values substantially greater than 1 because the first
 half of each chain has not mixed with the second half.  
 
+
+\subsection{Converence is Global}
+
+A question that often arises is whether it is acceptable to monitor
+convergence of only a subset of the parameters or generated
+quantities.  The short answer is ``no,'' but this is elaborated
+further in this section.
+
+For example, consider the value \code{lp\_\_}, which is the log
+posterior density (up to a constant) It is a mistake to declare
+convergence in any practical sense if \code{lp\_\_} has not converged,
+because different chains are really in different parts of the space.
+Yet measuring convergence for \code{lp\_\_} is particularly tricky, as
+noted below.
+
+\subsubsection{Asymptotics and transience vs.\ equilibrium}
+
+Markov chain convergence is a global property in the sense that it
+does not depend on the choice of function of the parameters that is
+monitored.  There is no hard cutoff between pre-convergence
+``transience'' and post-convergence ``equilibrium.''  What happens is
+that as the number of states in the chain approaches infinity, the
+distribution of possible states in the chain approaches the target
+distribution and in that limit the expected value of the Monte Carlo
+estimator of any integrable function converges to the true
+expectation. There is nothing like warmup here, because in the limit,
+the effects of initial state are completely washed out.
+
+\subsubsection{Multivariate convergence of functions}
+
+The $\hat{R}$ statistic considers the composition of a Markov chain
+and a function, and if the Markov chain has converged then each Markov
+chain and function composition will have converged. Multivariate
+functions converge when all of their margins have converged by the
+Cramer-Wold theorem.  
+
+The transformation from unconstrained space to constrained space is
+just another function, so does not effect convergence.
+
+Different functions may have different autocorrelations, but if the
+Markov chain has equilibrated then all Markov chain plus function
+compositions should be consistent with convergence. Formally, any
+function that appears inconsistent is of concern and although it would
+be unreasonable to test every function, \code{lp\_\_} and other
+measured quantities should at least be consistent.
+
+The obvious difference in \code{lp\_\_} is that it tends to vary
+quickly with position and is consequently susceptible to outliers. 
+
+\subsubsection{Finite numbers of states}
+
+The question is what happens for finite numbers of states? If we can
+prove a strong geometric ergodicity property (which depends on the
+sampler and the target distribution), then one can show that there
+exists a finite time after which the chain forgets its initial state
+with a large probability. This is both the autocorrelation time and
+the warmup time.  But even if you can show it exists and is finite
+(which is nigh impossible) you can't compute an actual value
+analytically.
+
+So what we do in practice is hope that the finite number of draws is
+large enough for the expectations to be reasonably accurate. Removing
+warmup iterations improves the accuracy of the expectations but there
+is no guarantee that removing any finite number of samples will be
+enough.
+
+\subsubsection{Why inconsistent $\hat{R}$?}
+
+There are two things to worry about here.
+
+Firstly, as noted above, for any finite number of draws, there will
+always be some residual effect of the initial state, which typically
+manifests as some small (or large if the autocorrelation time is huge)
+probability of having a large outlier. Functions robust to such
+outliers (say, quantiles) will appear more stable and have better
+$\hat{R}$. Functions vulnerable to such outliers may show fragility.
+
+Secondly, use of the $\hat{R}$ statistic makes very strong
+assumptions. In particular, it assumes that the functions being
+considered are Gaussian or it only uses the first two moments and
+assumes some kind of independence.  The point is that strong
+assumptions are made that do not always hold. In particular, the
+distribution for the log posterior density (\code{lp\_\_}) almost
+never looks Gaussian, instead it features long tails that can lead to
+large $\hat{R}$ even in the large $N$ limit.  Tweaks to $\hat{R}$,
+such as using quantiles in place of raw values, have the flavor of
+making the samples of interest more Gaussian and hence the $\hat{R}$
+statistic more accurate.
+
+\subsubsection{Final words on convergence monitoring}
+
+``Convergence'' is a global property and holds for all integrable
+functions at once, but employing the $\hat{R}$ statistic requires
+additional assumptions and thus may not work for all functions equally
+well.
+
+Note that if you just compare the expectations between chains then we
+can rely on the Markov chain asymptotics for Gaussian distributions
+and can apply the standard tests.
+
+
+
 \section{Effective Sample Size}\label{effective-sample-size.section}
 
 The second technical difficulty posed by \MCMC methods is that the
@@ -1153,80 +1245,9 @@ On the other hand, if memory and data storage are no object, saving all
 ten thousand samples will have a higher effective sample size than
 thinning to one thousand samples.
 
-\section{Stan's Hamiltonian Monte Carlo Samplers}\label{intro-samplers.section}
-
-For continuous variables, \Stan uses Hamiltonian Monte Carlo (\HMC)
-sampling. \HMC is a Markov chain Monte Carlo (\MCMC) method based on
-simulating the Hamiltonian dynamics of a fictional physical system in
-which the parameter vector $\theta$ represents the position of a
-particle in $K$-dimensional space and potential energy is defined to
-be the negative (unnormalized) log probability.  Each sample in the
-Markov chain is generated by starting at the last sample, applying a
-random momentum to determine initial kinetic energy, then simulating
-the path of the particle in the field.  Standard \HMC runs the
-simulation for a fixed number of discrete steps of a fixed step size,
-whereas \NUTS adjusts the number of steps on each iteration and allows
-varying step sizes per parameter.
 
 
-
-\subsection{Step-Size Adaptation during Warmup}
-
-In addition to standard \HMC, \Stan implements an adaptive version of
-\HMC, the No-U-Turn Sampler (\NUTS).  By default, \NUTS automatically
-tunes a step sizes during warmup.  A global step size is optimized for
-a target Metropolis-Hastings reject rate using dual averaging; see
-\citep{Nesterov:2009} for details of dual averaging and
-\citep{Hoffman-Gelman:2011,Hoffman-Gelman:2014} for details of its use
-in \Stan.  For information on run-time configuration of step-size
-adaptation, see the interface-specific user's guides for RStan,
-PyStan, or CmdStan.  The step sizes per parameter are estimated
-during warmup.
-
-\subsection{Number of Steps}
-
-During sampling, \NUTS adapts the number of leapfrog steps (i.e., the
-simulation time), using a geometric criterion that stops a trajectory
-when it begins to head back in the direction of the initial state.
-Once a trajectory is stopped, \NUTS uses slice sampling to select a
-state along the trajectory as the next proposal.
-
-Although \Stan only samples continuous variables, its language is
-expressive enough to allow most discrete variables to be marginalized
-out; see \refchapter{mixture-modeling} for examples.
-
-\subsection{Detailed Balance}
-
-\HMC uses a Metropolis rejection step to ensure detailed balance of
-the resulting Markovian system; for details, see \citep{Neal:2011}.
-\NUTS uses a form of slice sampling which guarantees detailed balance;
-for details, see \citep{Hoffman-Gelman:2011,Hoffman-Gelman:2014}.%
-%
-\footnote{A transition density $\phi(\omega'|\omega)$ and density
-  $\pi(\omega)$ over state space $\Omega$ satisfy detailed balance if
-  and only if for all $\omega, \omega' \in \Omega$,
-\[
-\pi(\omega) \, \phi(\omega'|\omega)
-=
-\pi(\omega') \, \phi(\omega | \omega').
-\]
-Detailed balance ensures stationarity of the transition density $\phi$
-with respect to the equilibrium density $\pi$, so that
-\[
-\pi(\omega') = \int_{\Omega} \pi(\omega) \, \phi(\omega'|\omega) \, d\omega.
-\]
-} 
-%
-This adjustment treats the momentum term of the Hamiltonian as an
-auxiliary variable, and the only reason for rejecting a sample will be
-discretization error in computing the Hamiltonian.  In practice, the
-possibility of rejecting a proposed update means that one or more
-duplicate samples may appear in the chain; the resulting loss in
-inferential power is accounted for with effective sample size
-calculations as described in \refsection{effective-sample-size}.
-
-
-\chapter{Transformations of Variables}\label{variable-transforms.chapter}
+\chapter{Transformations of Constrained Variables}\label{variable-transforms.chapter}
 
 \noindent
 To avoid having to deal with constraints while simulating the
@@ -1336,7 +1357,7 @@ values.  Diagonal matrices, a simple form of triangular matrix, arise
 if each transformed variable only depends on a single untransformed
 variable.
 
-\section{Lower Bounded Scalar}
+\section{Lower Bounded Scalar}\label{lower-bound-transform.section}
 
 \Stan uses a logarithmic transform for lower and upper bounds.  
 
@@ -1587,7 +1608,7 @@ p_Y(y)
 \]
 
 
-\section{Unit Simplex}
+\section{Unit Simplex}\label{simplex-transform.section}
 
 Variables constrained to the unit simplex show up in multivariate
 discrete models as both parameters (categorical and multinomial) and

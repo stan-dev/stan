@@ -25,7 +25,7 @@ C++11 = false
 ##
 # Library locations
 ##
-EIGEN ?= lib/eigen_3.2.0
+EIGEN ?= lib/eigen_3.2.2
 BOOST ?= lib/boost_1.54.0
 GTEST ?= lib/gtest_1.7.0
 
@@ -34,7 +34,7 @@ GTEST ?= lib/gtest_1.7.0
 ## 
 CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
-LDLIBS = -Lbin -lstan
+LDLIBS = 
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 WINE =
@@ -66,14 +66,12 @@ bin/%.o : src/%.cpp
 # Rule for generating dependencies.
 ##
 bin/%.d : src/%.cpp
-	@if test -d $(dir $@); \
-	then \
-	(set -e; \
+	@mkdir -p $(dir $@)
+	@set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$);\
-	fi
+	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1\.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
 
 .PHONY: help
 help:
@@ -96,7 +94,6 @@ endif
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Model related:'
-	@echo '  - bin/libstan.a  : Build the Stan static library (used in linking models).'
 	@echo '  - bin/libstanc.a : Build the Stan compiler static library'
 	@echo '  Documentation:'
 	@echo '  - manual         : Builds the reference manual. Copies built manual to'
@@ -105,18 +102,25 @@ endif
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
 	@echo '                     (requires doxygen installation)'
-	@echo '  TESTS (requires make 3.81 or higher):'
+	@echo ' TESTS:'
 	@echo ''
-	@echo '    Header Tests'
-	@echo '      - test-headers'
+	@echo '   Unit tests are built through make by specifying the executable as the target'
+	@echo '   to make. For a test in src/test/*_test.cpp, the executable is test/*$(EXE).'
 	@echo ''
-	@echo '      Single Unit Test'
-	@echo '        For example, to make the diag_post_multiply test, make the target'
-	@echo '          - test/unit-agrad-fwd/matrix/diag_post_multiply$(EXE)'
+	@echo '   Header tests'
+	@echo '   - test-headers  : tests all source headers to ensure they are compilable and'
+	@echo '                     include enough header files.'
+	@echo ''
+	@echo '   To run a single header test, add "-test" to the end of the file name.'
+	@echo '   Example: make src/stan/math/constants.hpp-test'
 	@echo ''
 	@echo '  Clean:'
 	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
+	@echo '  - clean-manual   : Cleans temporary files from building the manual.'
+	@echo '  - clean-deps     : Removes dependency files for tests. If tests stop building,'
+	@echo '                     run this target.'
 	@echo '  - clean-all      : Cleans up all of Stan.'
+	@echo ''
 	@echo '  Higher level targets:'
 	@echo '  - docs           : Builds all docs.'
 	@echo ''
@@ -126,13 +130,13 @@ include make/libstan  # bin/libstan.a bin/libstanc.a
 include make/tests    # tests
 include make/doxygen  # doxygen
 include make/manual   # manual: manual, doc/stan-reference.pdf
-include make/local    # for local stuff
+-include make/local    # for local stuff
 
 ##
 # Dependencies
 ##
-ifneq (,$(filter-out test-headers,$(filter-out clean%,$(MAKECMDGOALS))))
- -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
+ifneq (,$(filter-out test-headers generate-tests clean% %-test %.d,$(MAKECMDGOALS)))
+  -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
 endif
 
 ##
@@ -146,10 +150,13 @@ docs: manual doxygen
 # Clean up.
 ##
 MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
-.PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
+.PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all clean-deps
 clean:
 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
-	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o) $(MODEL_SPECS:%.stan=%.d))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%$(EXE)))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.o))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.d))
 
 clean-dox:
 	$(RM) -r doc/api
@@ -157,10 +164,13 @@ clean-dox:
 clean-manual:
 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
-clean-models:
-	$(RM) -r models $(MODEL_HEADER).d
+clean-deps:
+	@echo '  removing dependency files'
+	$(shell find . -type f -name '*.d' -exec rm {} +)
 
-clean-all: clean clean-manual clean-models
+clean-all: clean clean-manual clean-deps
 	$(RM) -r test/* bin
-	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f | sed 's#\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
-
+	@echo '  removing .o files'
+	$(shell find src -type f -name '*.o' -exec rm {} +)
+	@echo '  removing generated test files'
+	$(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f -exec rm {} +)

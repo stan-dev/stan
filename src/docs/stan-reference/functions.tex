@@ -27,11 +27,9 @@ repeated application and assignment in a loop.
 
 The normal probability function is specified with the signature
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 normal_log(reals,reals,reals);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The pseudo-type \code{reals} is used to indicate that an argument
 position may be vectorized.  Argument positions declared as
@@ -46,11 +44,9 @@ row vector have the same size.
 
 The multivariate normal distribution accepting vector or array of
 vector arguments is written as
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 multi_normal_log(vectors,vectors,matrix);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 \subsection{Vectorized Integer Arguments}
 
@@ -65,38 +61,30 @@ namely \code{real} or \code{int}, is repeated.  For instance, if
 \code{y} is a vector of size \code{N}, \code{mu} is a vector of size
 \code{N}, and \code{sigma} is a scalar, then
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 ll <- normal_log(y, mu, sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 is just a more efficient way to write
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 ll <- 0;
 for (n in 1:N)
   ll <- ll + normal_log(y[n], mu[n], sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 With the same arguments, the vectorized sampling statement
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 y ~ normal(mu, sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 has the same effect on the total log probability as
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 for (n in 1:N)
   y[n] ~ normal(mu[n], sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 
 
@@ -405,10 +393,11 @@ carried out by first promoting the integer value.
   \fitem{int}{operator<}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is less than \farg{y} and 0 otherwise.
     \[
-    \mbox{operator\textless}(x,y) =
+    (x \text{\textless} y) = 
+    \text{operator\textless}(x,y) =
     \begin{cases}
-      1 & \mbox{if } x < y\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x < y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -416,21 +405,23 @@ carried out by first promoting the integer value.
   \fitem{int}{operator<=}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is less than or equal \farg{y} and 0 otherwise.
     \[
-    \mbox{operator\textless=}(x,y) = 
-    \begin{cases}
-      1 & \mbox{if } x \leq y\\
-      0 & \mbox{otherwise}
-    \end{cases}
+    (x \text{\textless=} y)
+    = \text{operator\textless=}(x,y)
+    = \begin{cases}
+        1 & \text{if $x \leq y$} \\
+        0 & \text{otherwise}
+      \end{cases}
     \]}
   %
   \fitemnobody{int}{operator>}{int \farg{x}, int \farg{y}}
   \fitem{int}{operator>}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is greater than \farg{y} and 0 otherwise.
     \[
-    \mbox{operator\textgreater}(x,y) = 
+    (x \text{\textgreater} y) = 
+    \text{operator\textgreater}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x > y\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x > y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -439,10 +430,11 @@ carried out by first promoting the integer value.
     Returns 1 if \farg{x} is greater than or equal to \farg{y}
     and 0 otherwise.
     \[
-    \mbox{operator\textgreater=}(x,y) = 
+    (x \text{\textgreater=} y) =
+    \text{operator\textgreater=}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x \geq y \\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \geq y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -450,10 +442,11 @@ carried out by first promoting the integer value.
   \fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is equal to \farg{y} and 0 otherwise.
     \[
-    \mbox{operator==}(x,y) = 
+    (x \text{==} y) = 
+    \text{operator==}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x = y \\
-      0 & \mbox{otherwise}
+      1 & \text{if $x = y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -461,10 +454,11 @@ carried out by first promoting the integer value.
   \fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is not equal to \farg{y} and 0 otherwise.
     \[
-    \mbox{operator!=}(x,y) = 
+    (x \text{!=} y) = 
+    \text{operator!=}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x \neq y \\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \neq y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}{operator"!"=}
   %
@@ -489,10 +483,11 @@ tightly than the comparisons.  Thus an expression such as
   \fitemindex{int}{operator!}{real \farg{x}}{
     Returns 1 if \farg{x} is zero and 0 otherwise.
     \[
-    \mbox{operator!}(x) = 
+    (\text{!}x) =
+    \text{operator!}(x) = 
     \begin{cases}
-      0 & \mbox{if } x \neq 0 \\
-      1 & \mbox{if } x = 0
+      0 & \text{if $x \neq 0$} \\
+      1 & \text{if $x = 0$}
     \end{cases}
     \]}{operator"!}
   %
@@ -500,10 +495,11 @@ tightly than the comparisons.  Thus an expression such as
   \fitem{int}{operator{\&\&}}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is unequal to 0 and \farg{y} is unequal to 0.
     \[
-    \mbox{operator\&\&}(x,y) = 
+    (x \text{\&\&} y) =
+    \text{operator\&\&}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x \neq 0 \mbox{ and } y \neq 0\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \neq 0$} \text{ and } y \neq 0\\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -511,10 +507,14 @@ tightly than the comparisons.  Thus an expression such as
   \fitemindex{int}{operator||}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is unequal to 0 or \farg{y} is unequal to 0.
     \[
-    \mbox{operator||}(x,y) = 
+    (x \vert\vert y) = 
+    % \textpipe from tipa package causes errors elsewhere
+    % | does not render correctly, instead rendering as a horizonal bar
+    % using math \vert seems the only option
+    \text{operator||}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x \neq 0 \textrm{ or } y \neq 0\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \neq 0$} \textrm{ or } y \neq 0\\
+      0 & \text{otherwise}
     \end{cases}
     \]
   }{operator"|"|}
@@ -524,19 +524,14 @@ tightly than the comparisons.  Thus an expression such as
 
 \subsubsection{Boolean Operator Short Circuiting}
 
-{\it Warning:} As of Stan 2.5.0, the boolean operators do {\it not}
-short circuit.  This is a known bug and will be fixed in a future
-release.
-
-% Here's the text to use in the future:
-% The intended behavior in the future is as described below.
-% Like in \Cpp, the boolean operators are implemented to short circuit
-% directly to a return value after evaluating the first argument if it
-% is sufficient to resolve the result.  In evaluating \code{a~||~b}, if
-% \code{a} evaluates to a value other than zero, the expression returns
-% the value 1 without evaluating the expression \code{b}.  Similarly,
-% evaluating \code{a~\&\&~b} first evaluates \code{a}, and if the result
-% is zero, returns 0 without evaluating \code{b}.
+Like in \Cpp, the boolean operators \Verb/&&/ and \Verb/||/ and are
+implemented to short circuit directly to a return value after
+evaluating the first argument if it is sufficient to resolve the
+result.  In evaluating \code{a~||~b}, if \code{a} evaluates to a value
+other than zero, the expression returns the value 1 without evaluating
+the expression \code{b}.  Similarly, evaluating \code{a~\&\&~b} first
+evaluates \code{a}, and if the result is zero, returns 0 without
+evaluating \code{b}.
 
 
 \subsection{Logical Functions}
@@ -553,7 +548,7 @@ are primarily provided for compatibility with BUGS and JAGS.
     \[
     \mbox{if\_else}(cond,x,y) = 
     \begin{cases}
-      x & \mbox{if } cond \neq 0\\
+      x & \mbox{if } cond \neq 0 \\
       y & \mbox{otherwise}
     \end{cases}
     \]}
@@ -569,41 +564,42 @@ are primarily provided for compatibility with BUGS and JAGS.
     \]}
   %
 \end{description}
+%
+Both of these are step-like functions; see the warning in
+\refsection{step-functions} applied to expressions dependent on
+parameters. 
 
-
-See the warning in \refsection{step-functions} about step-like
-functions applied to expressions dependent on parameters.
+The step function is often used in BUGS to perform conditional
+operations.  For instance, \code{step(a\,-\,b)} evaluates to 1 if
+\code{a} is greater than {b} and evaluates to 0 otherwise.  In Stan,
+the expression \code{step(a\,-\,b)} is more naturally coded directly
+in terms of the comparison operator, \code{(a\,>\,b)}.  
 
 The log probability function and gradient evaluations are more
-efficient in Stan when implemented using conditional statements.  If
-\code{y} is a \code{real} variable, and \code{c}, \code{x1}, and
-\code{x2} are scalar expressions (type \code{real} or \code{int}),
-then the assignment statements
+efficient in Stan when implemented using conditional statements than
+with mulitplications by step functions.  For example, if \code{y} is a
+\code{real} variable, and \code{c}, \code{x1}, and \code{x2} are
+scalar expressions (type \code{real} or \code{int}), then the
+assignment statements
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 y <- x1 * step(c) + x2 * (1 - step(c));
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 and
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 y <- if_else(c > 0, x1, x2);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 are more efficiently written with the conditional statement
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 if (c > 0)
   y <- x1;
 else
   y <- x2;
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The reason the functional versions are slower is that they evaluate
 all of their arguments; the step function approach is particularly
@@ -612,13 +608,26 @@ be more noticeable if \code{c}, \code{x1} or \code{x2}
 are parameters (including transformed parameters and local variables
 that depend on parameters) or if \code{x1} and \code{x2} are
 complicated expressions rather than constants or simple variables.  
-
-\emph{Warning: } \ If \code{y} is a parameter (including transformed
-parameters and local variables in model blocks) and any of \code{c},
-\code{x1}, or \code{x2} is a parameter, then all of the above
-approaches introduce the same discontinuities into the derivative of
-\code{y} with respect to the parameter arguments.
-
+%
+\begin{description}
+  %
+  \fitem{int}{is\_inf}{real \farg{x}}{
+    Returns \farg{1} if \farg{x} is infinite (positive or negative) and \farg{0} otherwise.
+  }
+  %
+\end{description}
+%
+\begin{description}
+  %
+  \fitem{int}{is\_nan}{real \farg{x}}{
+    Returns \farg{1} if \farg{x} is NaN and \farg{0} otherwise.
+  }
+  %
+\end{description}
+%
+Care must be taken because both of these indicator functions are
+step-like and thus can cause discontinuities in gradients when applied
+to parameters; see \refsection{step-functions} for details.
 
 \section{Real-Valued Arithmetic Operators}\label{real-valued-arithmetic-operators.section}
 
@@ -635,27 +644,34 @@ as \code{x~+~y} and \code{-x}, respectively.
   \fitem{real}{operator+}{real \farg{x}, real \farg{y}}{
     Returns the sum of \farg{x} and \farg{y}.
     \[
-    \mbox{operator+}(x,y) = x+y
+    (x + y) = \mbox{operator+}(x,y) = x+y
     \]}
   %
   \fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
     Returns the difference between \farg{x} and \farg{y}.
     \[
-    \mbox{operator-}(x,y) = x - y
+    (x - y) = \mbox{operator-}(x,y) = x - y
     \]}
   %
   \fitem{real}{operator*}{real \farg{x}, real \farg{y}}{
     Returns the product of \farg{x} and \farg{y}.
     \[
-    \mbox{operator*}(x,y) = xy
+    (x * y) = \mbox{operator*}(x,y) = xy
     \]}
   %
   \fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
     Returns the quotient of \farg{x} and \farg{y}.
     \[
-    \mbox{operator/}(x,y) = \frac{x}{y}
+    (x / y) = \mbox{operator/}(x,y) = \frac{x}{y}
     \]}
   %
+  \fitem{real}{operator\textasciicircum}{real \farg{x}, real \farg{y}}{
+    Return \farg{x} raised to the power of \farg{y}.
+    \[
+    (x\mbox{\textasciicircum}y) 
+    = \mbox{operator\textasciicircum}(x,y) = x^y
+    \]}
+  % 
 \end{description}
 
 \subsection{Unary Prefix Operators}
@@ -665,13 +681,13 @@ as \code{x~+~y} and \code{-x}, respectively.
   \fitem{real}{operator-}{real \farg{x}}{
     Returns the negation of the subtrahend \farg{x}.
     \[
-    \mbox{operator-}(x) = -x
+    (-x) = \mbox{operator-}(x) = -x
     \]}
   %
   \fitem{real}{operator+}{real \farg{x}}{
     Returns the value of \farg{x}.
     \[
-    \mbox{operator+}(x) = x
+    (+x) = \mbox{operator+}(x) = x
     \]}
 \end{description}
 
@@ -1453,6 +1469,20 @@ using more basic \Stan functions.
     \end{cases}
     \]}
   %
+  \fitem{real}{log\_mix}{real \farg{theta}, real \farg{lp1}, real
+    \farg{lp2}}{
+    Returns the log mixture of the log densities \farg{lp1} and
+    \farg{lp2} with mixing proportion \farg{theta},
+    \begin{eqnarray*}
+      \mbox{log\_mix}(\theta, \mbox{lp}_1, \mbox{lp}_2) 
+      & = & \log \!\left( \theta \exp(\mbox{lp}_1) 
+      + \left( 1 - \theta \right) \exp(\mbox{lp}_2)
+    \right)
+    \\[3pt]
+    & = & \mbox{log\_sum\_exp}\!\left(\log(\theta) + \mbox{lp}_1, \
+                               \mbox{log1m}(\theta) + \mbox{lp}_2\right).
+    \end{eqnarray*}
+  %
   \fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{ 
     Returns the natural logarithm of the sum of the natural exponentiation
     of \farg{x} and the natural exponentiation of \farg{y}.
@@ -1473,7 +1503,8 @@ using more basic \Stan functions.
     \mbox{log1m\_inv\_logit}(x) = \log(1 - \mbox{logit}^{-1}(x))
     \]
   See \refsection{link-functions} for a definition of inverse logit.}
-  %
+}
+    
 \end{description}
 
 
@@ -1635,12 +1666,10 @@ function.  The \code{dims()} function is defined to take an argument
 consisting of any variable with up to 8 array dimensions (and up to 2
 additional matrix dimensions) and returns an array of integers with
 the dimensions.  For example, if two variables are declared as follows,
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real x[7,8,9];
 matrix[8,9] y[7];
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 then calling \code{dims(x)} or \code{dims(y)} returns an integer 
 array of size 3 containing the elements 7, 8, and 9 in that order. 
@@ -1653,6 +1682,14 @@ reals, matrices, vectors, and row vectors.
 \fitem{int[]}{dims}{\farg{T} \farg{x}}{Returns an integer array
   containing the dimensions of \farg{x}; the type of the argument
   \farg{T} can be any Stan type with up to 8 array dimensions.}
+%
+\fitem{int}{num\_elements}{\farg{T}[] \farg{x}}{Returns the total
+  number of elements in the array \farg{x} including all elements
+  in contained arrays, vectors, and matrices.
+  \farg{T} can be any array type.  For example, if \code{x} is of
+  type \code{real[4,3]} then \code{num\_elements(x)} is 12, and if
+  \code{y} is declared as \code{matrix[3,4]~y[5]}, then \code{size(y)}
+  evaluates to 60.}
 %
 \fitem{int}{size}{\farg{T}[] \farg{x}}{Returns the number of elements
   in the array \farg{x}; the type of the array \farg{T} can be any
@@ -1691,8 +1728,7 @@ important because it is not possible to assign an integer array to a
 real array.  For example, the following example contrasts legal with
 illegal array creation and assignment
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real y[5];
 int x[5];
 
@@ -1704,37 +1740,32 @@ y <- rep_array(1,5);     // illegal
 
 x <- y;                  // illegal
 y <- x;                  // illegal
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 If the value being repeated \code{v} is a vector (i.e., \code{T} is
 \code{vector}), then \code{rep\_array(v,27)} is a size 27 array
 consisting of 27 copies of the vector \code{v}.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 vector[5] v;
 vector[5] a[3];
-...
+// ...
 a <- rep_array(v,3);  // fill a with copies of v
 a[2,4] <- 9.0;        // v[4], a[1,4], a[2,4] unchanged
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 If the type \farg{T} of \farg{x} is itself an array type, then the
 result will be an array with one, two, or three added dimensions,
 depending on which of the \code{rep\_array} functions is called.  For
 instance, consider the following legal code snippet.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real a[5,6];
 real b[3,4,5,6];
-...
+// ...
 b <- rep_array(a,3,4); //  make (3 x 4) copies of a
 b[1,1,1,1] <- 27.9;    //  a[1,1] unchanged
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 After the assignment to \code{b}, the value for \code{b[j,k,m,n]} is
 equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
@@ -1807,6 +1838,19 @@ Number of components of \farg{v} less than \farg{v[s]}}
 %
 \begin{description}
 %
+\fitem{int}{num\_elements}{vector \farg{x}}{The total
+  number of elements in the vector
+  \farg{x} (same as function \code{rows})}
+%
+\fitem{int}{num\_elements}{row\_vector \farg{x}}{The total
+  number of elements in the vector
+  \farg{x} (same as function \code{cols})}
+%
+\fitem{int}{num\_elements}{matrix \farg{x}}{The total
+  number of elements in the matrix \farg{x}.
+  For example, if \code{x} is a $5 \times 3$ matrix,
+  then \code{num\_elements(x)} is 15}
+%
 \fitem{int}{rows}{vector \farg{x}}{The number of
 rows in the vector \farg{x}}
 %
@@ -1829,7 +1873,7 @@ in the matrix \farg{x}}
 
 
 
-\section{Matrix Arithmetic Operators}
+\section{Matrix Arithmetic Operators}\label{matrix-arithmetic-operators.section}
 
 \Stan supports the basic matrix operations using infix, prefix and
 postfix operations.  This section lists the operations supported by
@@ -2133,7 +2177,7 @@ The dot product of the rows of \farg{x} with themselves}
 %
 \end{description}
 
-\subsection{Specialized Products}\label{specialized-products.section}
+\subsection{Specialized Products}
 
 
 \begin{description}
@@ -2377,13 +2421,11 @@ distinction between integer and real arguments, the following two
 statements produce the same result for vector broadcasting;  row vector
 and matrix broadcasting behave similarly.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 vector[3] x;
 x <- rep_vector(1, 3);
 x <- rep_vector(1.0, 3);  
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 There are no integer vector or matrix types, so integer values are
 automatically promoted.
@@ -2403,7 +2445,7 @@ matrix with diagonal \farg{x}}
 \end{description}
 
 \subsection{Columns and Rows}
-%
+
 \begin{description}
 %
 \fitem{vector}{col}{matrix \farg{x}, int \farg{n}}{The \farg{n}-th column
@@ -2413,6 +2455,14 @@ of matrix \farg{x}}
 of matrix \farg{x}}
 %
 \end{description}
+
+The \code{row} function is special in that it may be used as an lvalue
+in an assignment statement; for more information on assignment, see
+\refsection{assignment-statement}.  The row function is also special
+in that the indexing notation \code{x[m]} is just an alternative way
+of writing \code{row(x,m)}.  The \code{col} function may {\it not}\, be
+used as an lvalue, nor is there an indexing based shorthand for it.
+
 
 \subsection{Block Operations}
 

@@ -14,17 +14,17 @@ public:
     param[0] = 17;           // n
     param[1] = 13.0;         // lambda
     parameters.push_back(param);
-    cdf.push_back(0.890465); // expected cdf
+    cdf.push_back(0.8904649795242025600572); // expected cdf
 
     param[0] = 82;           // n
     param[1] = 42.0;         // lambda
     parameters.push_back(param);
-    cdf.push_back(0.99999998); // expected cdf
+    cdf.push_back(0.9999999845303266798879); // expected cdf
     
     param[0] = 0.0;          // n
     param[1] = 3.0;          // lambda
     parameters.push_back(param);
-    cdf.push_back(0.04978707); // expected cdf
+    cdf.push_back(0.04978706836786394446248); // expected cdf
   }
   
   void invalid_values(vector<size_t>& index, 
@@ -47,23 +47,19 @@ public:
   }
 
   template <typename T_n, typename T_rate, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_rate>::type
   cdf(const T_n& n, const T_rate& lambda, const T2&,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+      const T3&, const T4&, const T5&) {
     return stan::prob::poisson_cdf(n, lambda);
   }
 
 
   template <typename T_n, typename T_rate, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_rate>::type
   cdf_function(const T_n& n, const T_rate& lambda, const T2&,
-         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+               const T3&, const T4&, const T5&) {
     using std::pow;
     using stan::agrad::pow;
     using stan::agrad::lgamma;

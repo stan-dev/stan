@@ -6,13 +6,17 @@
 #include <limits>
 #include <map>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdexcept>
-#include <boost/throw_exception.hpp>
+
 #include <boost/lexical_cast.hpp>
-#include <stan/math/matrix.hpp>
+#include <boost/throw_exception.hpp>
+
 #include <stan/io/var_context.hpp>
+#include <stan/math/matrix.hpp>
+#include <stan/math/meta/index_type.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
 
 namespace stan {
 
@@ -105,8 +109,9 @@ namespace stan {
 
       template <typename T>
       void write_list(T xs) {
+        typedef typename stan::math::index_type<T>::type idx_t;
         out_ << "c(";
-        for (typename T::size_type i = 0; i < xs.size(); ++i) {
+        for (idx_t i = 0; i < xs.size(); ++i) {
           if (i > 0) out_ << ", ";
           write_val(xs[i]);
         }

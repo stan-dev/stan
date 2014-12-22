@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/multivariate/continuous/multi_normal.hpp"
+#include <stan/agrad/rev/matrix.hpp>
+#include <stan/agrad/fwd/matrix.hpp>
+#include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
-#include <stan/agrad/fwd.hpp>
-#include <stan/agrad/rev.hpp>
-#include <stan/agrad/fwd/matrix/multiply.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

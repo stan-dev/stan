@@ -176,6 +176,21 @@ namespace stan {
       }
 
       /**
+       * Allocate an array on the arena of the specified size to hold
+       * values of the specified template parameter type.
+       *
+       * @tparam T type of entries in allocated array.
+       * @param[in] n size of array to allocate.
+       * @return new array allocated on the arena.
+       */
+      template <typename T>
+      inline
+      T* alloc_array(size_t n) {
+        return static_cast<T*>(alloc(n * sizeof(T*)));
+      }
+
+
+      /**
        * Recover all the memory used by the stack allocator.  The stack
        * of memory blocks allocated so far will be available for further
        * allocations.  To free memory back to the system, use the

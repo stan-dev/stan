@@ -1,10 +1,4 @@
 #include <gtest/gtest.h>
-#include <iostream>
-#include <fstream>
-#include <istream>
-#include <sstream>
-#include <exception>
-#include <stdexcept>
 #include <test/unit/gm/utility.hpp>
 
 TEST(gm_parser, abs_math_function_signatures) {
@@ -229,6 +223,10 @@ TEST(gm_parser, logit_math_function_signatures) {
 
 TEST(gm_parser, log_falling_factorial_math_function_signatures) {
   test_parsable("function-signatures/math/functions/log_falling_factorial");
+}
+
+TEST(gm_parser, log_mix_math_function_signatures) {
+  test_parsable("function-signatures/math/functions/log_mix");
 }
 
 TEST(gm_parser, log_rising_factorial_math_function_signatures) {

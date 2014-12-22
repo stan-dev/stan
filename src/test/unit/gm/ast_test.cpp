@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
-#include <sstream>
 #include <cmath>
-#include <vector>
+#include <sstream>
 #include <string>
 #include <set>
-#include "stan/gm/ast_def.cpp"
+#include <vector>
+#include <stan/gm/ast_def.cpp>
+#include <gtest/gtest.h>
 
 using stan::gm::function_signatures;
 using stan::gm::expr_type;
@@ -13,6 +13,45 @@ using stan::gm::INT_T;
 using stan::gm::VECTOR_T;
 using stan::gm::ROW_VECTOR_T;
 using stan::gm::MATRIX_T;
+
+TEST(gmAst, hasVar) {
+  using stan::gm::base_var_decl;
+  using stan::gm::binary_op;
+  using stan::gm::expression;
+  using stan::gm::local_origin;
+  using stan::gm::parameter_origin;
+  using stan::gm::transformed_parameter_origin;
+  using stan::gm::unary_op;
+  using stan::gm::var_origin;
+  using stan::gm::variable;
+  using stan::gm::variable_map;
+  using std::vector;
+
+  variable_map vm;
+  vector<expression> dims;
+  base_var_decl alpha_decl = base_var_decl("alpha",dims,DOUBLE_T);
+  var_origin alpha_origin = parameter_origin;
+  vm.add("alpha", alpha_decl, alpha_origin);
+  
+  variable v("alpha");
+  v.set_type(DOUBLE_T, 2U);
+  expression e(v);
+  EXPECT_TRUE(has_var(e, vm));
+
+  vm.add("beta", 
+         base_var_decl("beta", vector<expression>(), INT_T),
+         local_origin);
+  variable v_beta("beta");
+  v_beta.set_type(INT_T, 0U);
+  expression e_beta(v_beta);
+  EXPECT_FALSE(has_var(e_beta, vm));
+
+  expression e2(binary_op(e,"+",e));
+  EXPECT_TRUE(has_var(e2,vm));
+
+  expression e_beta2(unary_op('!',unary_op('-',e_beta)));
+  EXPECT_FALSE(has_var(e_beta2,vm));
+}
 
 TEST(gm_ast,expr_type_num_dims) {
   EXPECT_EQ(0U,expr_type().num_dims());
@@ -242,9 +281,6 @@ TEST(gmAst, isUserDefined) {
   EXPECT_TRUE(is_user_defined_prob_function("bar_log",
                                             expression(int_literal(2)), // first arg
                                             args_pf));                  // remaining args
-  
-
-
 }
 
 TEST(gmAst, resetSigs) {
@@ -268,4 +304,48 @@ TEST(gmAst, resetSigs) {
   set<string> ks2 = fs2.key_set();
   EXPECT_EQ(keyset_size,ks2.size());
 
+}
+
+TEST(gmAst, solveOde) {
+  using stan::gm::integrate_ode;
+  using stan::gm::variable;
+  using stan::gm::expr_type;
+  using stan::gm::expression;
+
+  integrate_ode so; // null ctor should work and not raise error
+
+  std::string system_function_name = "foo";
+
+  variable y0("y0_var_name");
+  y0.set_type(DOUBLE_T, 1);  // plain old vector
+
+  variable t0("t0_var_name");
+  t0.set_type(DOUBLE_T, 0);  // double
+
+  variable ts("ts_var_name");
+  ts.set_type(DOUBLE_T, 1); 
+
+  variable theta("theta_var_name");
+  theta.set_type(DOUBLE_T, 1);
+  
+  variable x("x_var_name");
+  x.set_type(DOUBLE_T, 1);
+
+  variable x_int("x_int_var_name");
+  x.set_type(INT_T, 1);
+
+  // example of instantiation
+  integrate_ode so2(system_function_name, y0, t0, ts, theta, x, x_int);
+
+  // dumb test to make sure we at least get the right types back
+  EXPECT_EQ(system_function_name, so2.system_function_name_);
+  EXPECT_EQ(y0.type_, so2.y0_.expression_type());
+  EXPECT_EQ(t0.type_, so2.t0_.expression_type());
+  EXPECT_EQ(ts.type_, so2.ts_.expression_type());
+  EXPECT_EQ(theta.type_, so2.theta_.expression_type());
+  EXPECT_EQ(x.type_, so2.x_.expression_type());
+  EXPECT_EQ(x_int.type_, so2.x_int_.expression_type());
+
+  expression e2(so2);
+  EXPECT_EQ(expr_type(DOUBLE_T,2), e2.expression_type());
 }

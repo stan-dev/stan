@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_gp_cholesky.hpp>
 
 // UTILITY FUNCTIONS FOR TESTING

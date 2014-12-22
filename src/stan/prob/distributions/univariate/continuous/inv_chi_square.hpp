@@ -3,16 +3,20 @@
 
 #include <boost/random/chi_squared_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/gamma_q.hpp>
+#include <stan/math/functions/digamma.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/prob/internal_math/math/grad_reg_inc_gamma.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/prob/internal_math.hpp>
 
 namespace stan {
 
@@ -41,26 +45,26 @@ namespace stan {
               typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
     inv_chi_square_log(const T_y& y, const T_dof& nu) {
-      static const char* function = "stan::prob::inv_chi_square_log(%1%)";
+      static const std::string function("stan::prob::inv_chi_square_log");
+      typedef typename stan::partials_return_type<T_y,T_dof>::type 
+        T_partials_return;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(nu)))
         return 0.0;
 
-      using stan::math::check_positive_finite;      
-      using stan::math::check_not_nan;
+      using stan::error_handling::check_positive_finite;      
+      using stan::error_handling::check_not_nan;
       using stan::math::value_of;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_consistent_sizes;
 
-      double logp(0.0);
-      check_positive_finite(function, nu, "Degrees of freedom parameter",
-                            &logp);
-      check_not_nan(function, y, "Random variable", &logp);
+      T_partials_return logp(0.0);
+      check_positive_finite(function, "Degrees of freedom parameter", nu);
+      check_not_nan(function, "Random variable", y);
       check_consistent_sizes(function,
-                             y,nu,
-                             "Random variable","Degrees of freedom parameter",
-                             &logp);
+                             "Random variable", y,
+                             "Degrees of freedom parameter", nu);
 
        
       // set up template expressions wrapping scalars into vector views
@@ -76,24 +80,25 @@ namespace stan {
       using boost::math::lgamma;
       using stan::math::multiply_log;
 
-      DoubleVectorView<include_summand<propto,T_y,T_dof>::value,
-        is_vector<T_y>::value> log_y(length(y));
+      VectorBuilder<include_summand<propto,T_y,T_dof>::value,
+                    T_partials_return, T_y> log_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y,T_dof>::value)
           log_y[i] = log(value_of(y_vec[i]));
 
-      DoubleVectorView<include_summand<propto,T_y>::value,
-        is_vector<T_y>::value> inv_y(length(y));
+      VectorBuilder<include_summand<propto,T_y>::value,
+                    T_partials_return, T_y> inv_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y>::value)
           inv_y[i] = 1.0 / value_of(y_vec[i]);
 
-      DoubleVectorView<include_summand<propto,T_dof>::value,
-        is_vector<T_dof>::value> lgamma_half_nu(length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
-        is_vector<T_dof>::value> digamma_half_nu_over_two(length(nu));
+      VectorBuilder<include_summand<propto,T_dof>::value,
+                    T_partials_return, T_dof> lgamma_half_nu(length(nu));
+      VectorBuilder<!is_constant_struct<T_dof>::value,
+                     T_partials_return, T_dof> 
+        digamma_half_nu_over_two(length(nu));
       for (size_t i = 0; i < length(nu); i++) {
-        double half_nu = 0.5 * value_of(nu_vec[i]);
+        T_partials_return half_nu = 0.5 * value_of(nu_vec[i]);
         if (include_summand<propto,T_dof>::value)
           lgamma_half_nu[i] = lgamma(half_nu);
         if (!is_constant_struct<T_dof>::value)
@@ -102,8 +107,8 @@ namespace stan {
 
       agrad::OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
       for (size_t n = 0; n < N; n++) {
-        const double nu_dbl = value_of(nu_vec[n]);
-        const double half_nu = 0.5 * nu_dbl;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return half_nu = 0.5 * nu_dbl;
   
         if (include_summand<propto,T_dof>::value)
           logp += nu_dbl * NEG_LOG_TWO_OVER_TWO - lgamma_half_nu[n];
@@ -122,7 +127,7 @@ namespace stan {
             - 0.5*log_y[n];
         }
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,nu);
     }
 
     template <typename T_y, typename T_dof>
@@ -135,29 +140,30 @@ namespace stan {
     template <typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
     inv_chi_square_cdf(const T_y& y, const T_dof& nu) {
-          
+      typedef typename stan::partials_return_type<T_y,T_dof>::type 
+        T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(nu) ) ) return 1.0;
           
       // Error checks
-      static const char* function = "stan::prob::inv_chi_square_cdf(%1%)";
+      static const std::string function("stan::prob::inv_chi_square_cdf");
           
-      using stan::math::check_positive_finite;      
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
           
-      double P(1.0);
+      T_partials_return P(1.0);
           
-      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_not_nan(function, y, "Random variable", &P);
-      check_nonnegative(function, y, "Random variable", &P);
-      check_consistent_sizes(function, y, nu,
-                             "Random variable", 
-                             "Degrees of freedom parameter",
-                             &P);
+      check_positive_finite(function, "Degrees of freedom parameter", nu);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Degrees of freedom parameter", nu);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -171,23 +177,24 @@ namespace stan {
 
       for (size_t i = 0; i < stan::length(y); i++)
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,nu);
         
       // Compute CDF and its gradients
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
+      using stan::math::gamma_q;
+      using stan::math::digamma;
       using boost::math::tgamma;
-      using boost::math::digamma;
+      using std::exp;
+      using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> gamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value, 
-                       is_vector<T_dof>::value> digamma_vec(stan::length(nu));
+      VectorBuilder<!is_constant_struct<T_dof>::value,
+                     T_partials_return, T_dof> gamma_vec(stan::length(nu));
+      VectorBuilder<!is_constant_struct<T_dof>::value,
+                    T_partials_return, T_dof> digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value)  {
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double nu_dbl = value_of(nu_vec[i]);
+          const T_partials_return nu_dbl = value_of(nu_vec[i]);
           gamma_vec[i] = tgamma(0.5 * nu_dbl);
           digamma_vec[i] = digamma(0.5 * nu_dbl);
         }
@@ -203,25 +210,25 @@ namespace stan {
         }
 
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_inv_dbl = 1.0 / y_dbl;
-        const double nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_inv_dbl = 1.0 / y_dbl;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
                   
         // Compute
-        const double Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
+        const T_partials_return Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
                   
         P *= Pn;
                   
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] 
-            += 0.5 * y_inv_dbl * y_inv_dbl
-            * gamma_p_derivative(0.5 * nu_dbl, 0.5 * y_inv_dbl) / Pn;
+          operands_and_partials.d_x1[n] += 0.5 * y_inv_dbl * y_inv_dbl
+            * exp(-0.5*y_inv_dbl) * pow(0.5*y_inv_dbl,0.5*nu_dbl-1) 
+            / tgamma(0.5*nu_dbl) / Pn;
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
-            += 0.5 * stan::math::gradRegIncGamma(0.5 * nu_dbl, 
-                                                 0.5 * y_inv_dbl, 
-                                                 gamma_vec[n], 
-                                                 digamma_vec[n]) / Pn;
+            += 0.5 * stan::math::grad_reg_inc_gamma(0.5 * nu_dbl, 
+                                                    0.5 * y_inv_dbl, 
+                                                    gamma_vec[n], 
+                                                    digamma_vec[n]) / Pn;
       }
               
       if (!is_constant_struct<T_y>::value)
@@ -231,34 +238,36 @@ namespace stan {
         for (size_t n = 0; n < stan::length(nu); ++n) 
           operands_and_partials.d_x2[n] *= P;
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu);
     }
 
     template <typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
     inv_chi_square_cdf_log(const T_y& y, const T_dof& nu) {
-          
+      typedef typename stan::partials_return_type<T_y,T_dof>::type
+        T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(nu) ) ) return 0.0;
           
       // Error checks
-      static const char* function = "stan::prob::inv_chi_square_cdf_log(%1%)";
+      static const std::string function("stan::prob::inv_chi_square_cdf_log");
           
-      using stan::math::check_positive_finite;      
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
-      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_not_nan(function, y, "Random variable", &P);
-      check_nonnegative(function, y, "Random variable", &P);
-      check_consistent_sizes(function, y, nu,
-                             "Random variable", 
-                             "Degrees of freedom parameter", &P);
+      check_positive_finite(function, "Degrees of freedom parameter", nu);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Degrees of freedom parameter", nu);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -272,23 +281,25 @@ namespace stan {
 
       for (size_t i = 0; i < stan::length(y); i++)
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,nu);
         
       // Compute cdf_log and its gradients
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
+      using stan::math::gamma_q;
+      using stan::math::digamma;
       using boost::math::tgamma;
-      using boost::math::digamma;
+      using std::exp;
+      using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> gamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value, 
-                       is_vector<T_dof>::value> digamma_vec(stan::length(nu));
+      VectorBuilder<!is_constant_struct<T_dof>::value,
+                    T_partials_return, T_dof> gamma_vec(stan::length(nu));
+      VectorBuilder<!is_constant_struct<T_dof>::value,
+                    T_partials_return, T_dof> digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value)  {
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double nu_dbl = value_of(nu_vec[i]);
+          const T_partials_return nu_dbl = value_of(nu_vec[i]);
           gamma_vec[i] = tgamma(0.5 * nu_dbl);
           digamma_vec[i] = digamma(0.5 * nu_dbl);
         }
@@ -304,54 +315,57 @@ namespace stan {
         }
 
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_inv_dbl = 1.0 / y_dbl;
-        const double nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_inv_dbl = 1.0 / y_dbl;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
                   
         // Compute
-        const double Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
+        const T_partials_return Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
                   
         P += log(Pn);
                   
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += 0.5 * y_inv_dbl * y_inv_dbl
-            * gamma_p_derivative(0.5 * nu_dbl, 0.5 * y_inv_dbl) / Pn;
+            * exp(-0.5*y_inv_dbl) * pow(0.5*y_inv_dbl,0.5*nu_dbl-1) 
+            / tgamma(0.5*nu_dbl) / Pn;
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
-            += 0.5 * stan::math::gradRegIncGamma(0.5 * nu_dbl, 
-                                                 0.5 * y_inv_dbl, 
-                                                 gamma_vec[n], 
-                                                 digamma_vec[n]) / Pn;
+            += 0.5 * stan::math::grad_reg_inc_gamma(0.5 * nu_dbl, 
+                                                    0.5 * y_inv_dbl, 
+                                                    gamma_vec[n], 
+                                                    digamma_vec[n]) / Pn;
       }
               
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu);
     }
       
-  template <typename T_y, typename T_dof>
+    template <typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
     inv_chi_square_ccdf_log(const T_y& y, const T_dof& nu) {
-          
+      typedef typename stan::partials_return_type<T_y,T_dof>::type
+        T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(nu) ) ) return 0.0;
           
       // Error checks
-      static const char* function = "stan::prob::inv_chi_square_ccdf_log(%1%)";
+      static const std::string function("stan::prob::inv_chi_square_ccdf_log");
           
-      using stan::math::check_positive_finite;      
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;      
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
-      check_positive_finite(function, nu, "Degrees of freedom parameter", &P);
-      check_not_nan(function, y, "Random variable", &P);
-      check_nonnegative(function, y, "Random variable", &P);
-      check_consistent_sizes(function, y, nu,
-                             "Random variable", 
-                             "Degrees of freedom parameter", &P);
+      check_positive_finite(function, "Degrees of freedom parameter", nu);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Degrees of freedom parameter", nu);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -365,23 +379,24 @@ namespace stan {
 
       for (size_t i = 0; i < stan::length(y); i++)
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,nu);
         
       // Compute ccdf_log and its gradients
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
+      using stan::math::gamma_q;
+      using stan::math::digamma;
       using boost::math::tgamma;
-      using boost::math::digamma;
-          
+      using std::exp;
+      using std::pow;
+
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
-                       is_vector<T_dof>::value> gamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value, 
-                       is_vector<T_dof>::value> digamma_vec(stan::length(nu));
+      VectorBuilder<!is_constant_struct<T_dof>::value,
+                    T_partials_return, T_dof> gamma_vec(stan::length(nu));
+      VectorBuilder<!is_constant_struct<T_dof>::value,
+                    T_partials_return, T_dof> digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value)  {
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double nu_dbl = value_of(nu_vec[i]);
+          const T_partials_return nu_dbl = value_of(nu_vec[i]);
           gamma_vec[i] = tgamma(0.5 * nu_dbl);
           digamma_vec[i] = digamma(0.5 * nu_dbl);
         }
@@ -393,31 +408,34 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,nu);
         }
 
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_inv_dbl = 1.0 / y_dbl;
-        const double nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_inv_dbl = 1.0 / y_dbl;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
                   
         // Compute
-        const double Pn = 1.0 - gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
+        const T_partials_return Pn = 1.0 - gamma_q(0.5 * nu_dbl, 0.5 
+                                                   * y_inv_dbl);
                   
         P += log(Pn);
                   
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= 0.5 * y_inv_dbl * y_inv_dbl
-            * gamma_p_derivative(0.5 * nu_dbl, 0.5 * y_inv_dbl) / Pn;
+            * exp(-0.5*y_inv_dbl) * pow(0.5*y_inv_dbl,0.5*nu_dbl-1) 
+            / tgamma(0.5*nu_dbl) / Pn;      
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
-            -= 0.5 * stan::math::gradRegIncGamma(0.5 * nu_dbl, 
-                                                 0.5 * y_inv_dbl, 
-                                                 gamma_vec[n], 
-                                                 digamma_vec[n]) / Pn;
+            -= 0.5 * stan::math::grad_reg_inc_gamma(0.5 * nu_dbl, 
+                                                    0.5 * y_inv_dbl, 
+                                                    gamma_vec[n], 
+                                                    digamma_vec[n]) / Pn;
       }
               
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu);
     }
 
     template <class RNG>
@@ -427,12 +445,11 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::chi_squared_distribution;
 
-      static const char* function = "stan::prob::inv_chi_square_rng(%1%)";
+      static const std::string function("stan::prob::inv_chi_square_rng");
 
-      using stan::math::check_positive_finite;      
+      using stan::error_handling::check_positive_finite;      
 
-      check_positive_finite(function, nu, "Degrees of freedom parameter", 
-                            (double*)0);
+      check_positive_finite(function, "Degrees of freedom parameter", nu);
 
       variate_generator<RNG&, chi_squared_distribution<> >
         chi_square_rng(rng, chi_squared_distribution<>(nu));

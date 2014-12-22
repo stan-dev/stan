@@ -20,6 +20,7 @@
 % \usepackage{index}
 % \newindex{funs}{fdx}{fns}{Functions}
 
+\usepackage[T1]{fontenc} % needed for |
 \usepackage{amsmath}
 \usepackage{xspace}
 \usepackage{fancyvrb}
@@ -110,12 +111,15 @@
 \newcommand{\erf}[1]{\operatorname{erf}#1}
 \newcommand{\sech}[1]{\operatorname{sech}#1}
 
+\newcommand{\ternary}[3]{#1 \ ? \ #2 \ : \ #3}
+
 \newcommand{\refappendix}[1]{Appendix~\ref{#1.appendix}}
 \newcommand{\refpart}[1]{Part~\ref{#1.part}}
 \newcommand{\refchapter}[1]{Chapter~\ref{#1.chapter}}
 \newcommand{\refsection}[1]{Section~\ref{#1.section}}
 \newcommand{\reffigure}[1]{Figure~\ref{#1.figure}}
 \newcommand{\refnote}[1]{Footnote~\ref{#1.footnote}}
+\newcommand{\refequation}[1]{Equation~(\ref{#1.equation})}
 
 
 % \textwidth = 5in
@@ -177,6 +181,15 @@
 \setlength{\evensidemargin}{-0.5in}
 \setlength{\topmargin}{-0.875in}
 \setlength{\headsep}{18pt}
+
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\floatpagefraction}{0.75}
+\renewcommand{\textfraction}{0.07}
+
+
+% environment for Stan code
+\DefineVerbatimEnvironment{stancode}{Verbatim}{fontsize=\small,xleftmargin=2em}
 
 \raggedbottom
 

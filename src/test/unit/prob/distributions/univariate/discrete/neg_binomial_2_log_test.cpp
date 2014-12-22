@@ -4,9 +4,12 @@
 #include <boost/math/distributions.hpp>
 
 TEST(ProbDistributionsNegBinomial, error_check) {
+  using std::log;
+
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::neg_binomial_2_log_rng(6, 2, rng));
   EXPECT_NO_THROW(stan::prob::neg_binomial_2_log_rng(-0.5,1,rng));
+  EXPECT_NO_THROW(stan::prob::neg_binomial_2_log_rng(log(1e8),1,rng));
 
   EXPECT_THROW(stan::prob::neg_binomial_2_log_rng(0, -2, rng),std::domain_error);
   EXPECT_THROW(stan::prob::neg_binomial_2_log_rng(6, -2, rng),std::domain_error);
@@ -14,6 +17,7 @@ TEST(ProbDistributionsNegBinomial, error_check) {
   EXPECT_THROW(stan::prob::neg_binomial_2_log_rng(stan::math::positive_infinity(), 2,
                                             rng),
                std::domain_error);
+  EXPECT_THROW(stan::prob::neg_binomial_2_log_rng(log(1e10), 1e20, rng),std::domain_error);
   EXPECT_THROW(stan::prob::neg_binomial_2_log_rng(stan::math::positive_infinity(),
                                             6, rng),
                std::domain_error);

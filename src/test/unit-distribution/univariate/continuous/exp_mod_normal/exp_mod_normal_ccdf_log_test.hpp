@@ -16,14 +16,14 @@ public:
     param[2] = 1;           // sigma
     param[3] = 1; //lambda
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.2384216994));     // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.2384217081348766198445));     // expected ccdf_log
 
     param[0] = 1;           // y
     param[1] = 0;           // mu
     param[2] = 1;           // sigma
     param[3] = 1; //lambda
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.5380794103)); // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.538079416212226213645)); // expected ccdf_log
   }
   
   void invalid_values(vector<size_t>& index, 
@@ -70,23 +70,19 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T_inv_scale, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T_inv_scale, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale,T_inv_scale>::type 
   ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
-      const T_inv_scale& lambda, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T_inv_scale& lambda, const T4&, const T5&) {
     return stan::prob::exp_mod_normal_ccdf_log(y, mu, sigma, lambda);
   }
 
 
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T_inv_scale, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T_inv_scale, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale,T_inv_scale>::type 
   ccdf_log_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-         const T_inv_scale& lambda, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+                    const T_inv_scale& lambda, const T4&, const T5&) {
 
     return log(1.0 - (0.5 * (1 + erf((y - mu) / (sqrt(2.0) * sigma))) - exp(-lambda * (y - mu) + lambda * sigma * lambda * sigma / 2.0) * 0.5 * (1 + erf(((y - mu) - sigma * lambda * sigma) / (sqrt(2.0) * sigma)))));
   }

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/optimization/bfgs.hpp>
-#include <test/test-models/no-main/optimization/rosenbrock.cpp>
+#include <test/test-models/good/optimization/rosenbrock.cpp>
 
 typedef rosenbrock_model_namespace::rosenbrock_model Model;
 typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
@@ -11,7 +11,7 @@ TEST(OptimizationBfgs, rosenbrock_bfgs_convergence) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
 
@@ -42,7 +42,7 @@ TEST(OptimizationBfgs, rosenbrock_bfgs_termconds) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
 
@@ -59,38 +59,38 @@ TEST(OptimizationBfgs, rosenbrock_bfgs_termconds) {
 
   bfgs._conv_opts.maxIts = 5;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_MAXIT);
   EXPECT_EQ(bfgs.iter_num(),bfgs._conv_opts.maxIts);
   bfgs._conv_opts.maxIts = 1e9;
 
   bfgs._conv_opts.tolAbsX = 1e-8;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSX);
   bfgs._conv_opts.tolAbsX = 0;
 
   bfgs._conv_opts.tolAbsF = 1e-12;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSF);
   bfgs._conv_opts.tolAbsF = 0;
 
   bfgs._conv_opts.tolRelF = 1e+4;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_RELF);
   bfgs._conv_opts.tolRelF = 0;
 
   bfgs._conv_opts.tolAbsGrad = 1e-8;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSGRAD);
   bfgs._conv_opts.tolAbsGrad = 0;
 
   bfgs._conv_opts.tolRelGrad = 1e+3;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_RELGRAD);
   bfgs._conv_opts.tolRelGrad = 0;
 }
@@ -101,7 +101,7 @@ TEST(OptimizationBfgs, rosenbrock_lbfgs_convergence) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
 
@@ -135,7 +135,7 @@ TEST(OptimizationBfgs, rosenbrock_lbfgs_termconds) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
 
@@ -152,38 +152,38 @@ TEST(OptimizationBfgs, rosenbrock_lbfgs_termconds) {
 
   bfgs._conv_opts.maxIts = 5;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_MAXIT);
   EXPECT_EQ(bfgs.iter_num(),bfgs._conv_opts.maxIts);
   bfgs._conv_opts.maxIts = 1e9;
 
   bfgs._conv_opts.tolAbsX = 1e-8;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSX);
   bfgs._conv_opts.tolAbsX = 0;
 
   bfgs._conv_opts.tolAbsF = 1e-12;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSF);
   bfgs._conv_opts.tolAbsF = 0;
 
   bfgs._conv_opts.tolRelF = 1e+4;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_RELF);
   bfgs._conv_opts.tolRelF = 0;
 
   bfgs._conv_opts.tolAbsGrad = 1e-8;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_ABSGRAD);
   bfgs._conv_opts.tolAbsGrad = 0;
 
   bfgs._conv_opts.tolRelGrad = 1e+3;
   bfgs.initialize(cont_vector);
-  while(0 == (ret = bfgs.step()));
+  while (0 == (ret = bfgs.step()));
   EXPECT_EQ(ret,stan::optimization::TERM_RELGRAD);
   bfgs._conv_opts.tolRelGrad = 0;
 }
@@ -214,7 +214,7 @@ TEST(OptimizationBfgs, lp_no_jacobian) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -228,7 +228,7 @@ TEST(OptimizationBfgs, ModelAdaptor) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -240,7 +240,7 @@ TEST(OptimizationBfgs, ModelAdaptor_fevals) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -254,7 +254,7 @@ TEST(OptimizationBfgs, ModelAdaptor_operator_parens__matrix_double) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -273,7 +273,7 @@ TEST(OptimizationBfgs, ModelAdaptor_operator_parens__matrix_double_matrix) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -292,7 +292,7 @@ TEST(OptimizationBfgs, ModelAdaptor_df) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -310,7 +310,7 @@ TEST(OptimizationBfgs, BFGSLineSearch) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -323,7 +323,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_initialize) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -344,7 +344,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_grad_evals) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -358,7 +358,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_logp) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -372,7 +372,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_grad_norm) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -389,7 +389,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_grad) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);
@@ -407,7 +407,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_params_r) {
   cont_vector[0] = -1; cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA = "";
+  static const std::string DATA("");
   std::stringstream data_stream(DATA);
   stan::io::dump dummy_context(data_stream);
   Model rb_model(dummy_context);

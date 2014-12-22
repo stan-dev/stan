@@ -5,8 +5,9 @@
 #include <stan/agrad/rev/internal/dv_vari.hpp>
 #include <stan/agrad/rev/internal/dvd_vari.hpp>
 #include <stan/agrad/rev/internal/dvv_vari.hpp>
-#include <stan/agrad/rev/internal/matrix_vari.hpp>
 #include <stan/agrad/rev/internal/precomp_v_vari.hpp>
+#include <stan/agrad/rev/internal/precomp_vv_vari.hpp>
+#include <stan/agrad/rev/internal/precomp_vvv_vari.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 #include <stan/agrad/rev/internal/vd_vari.hpp>
 #include <stan/agrad/rev/internal/vdd_vari.hpp>

@@ -1,11 +1,9 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/multivariate/continuous/multi_student_t.hpp"
+#include <stan/agrad/rev/matrix.hpp>
+#include <stan/agrad/fwd/matrix.hpp>
+#include <stan/prob/distributions/multivariate/continuous/multi_student_t.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
-#include <stan/agrad/fwd.hpp>
-#include <stan/agrad/fwd/matrix.hpp>
-#include <stan/agrad/rev.hpp>
-#include <stan/agrad/rev/matrix.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -166,7 +164,7 @@ TEST(ProbDistributionsMultiStudentT,Nu) {
 }
 
 
-TEST(ProbDistributionsMultiStudentT,PolicySize1) {
+TEST(ProbDistributionsMultiStudentT,ErrorSize1) {
   Matrix<double,Dynamic,1> y(2,1);
   y << 2.0, -2.0;
   Matrix<double,Dynamic,1> mu(3,1);
@@ -180,7 +178,7 @@ TEST(ProbDistributionsMultiStudentT,PolicySize1) {
   EXPECT_THROW(multi_student_t_log(y,nu,mu,Sigma),std::domain_error);
 }
 
-TEST(ProbDistributionsMultiStudentT,PolicySize2) {
+TEST(ProbDistributionsMultiStudentT,ErrorSize2) {
   Matrix<double,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
   Matrix<double,Dynamic,1> mu(3,1);
@@ -193,7 +191,7 @@ TEST(ProbDistributionsMultiStudentT,PolicySize2) {
   EXPECT_THROW(multi_student_t_log(y,nu,mu,Sigma),std::domain_error);
 }
 
-TEST(ProbDistributionsMultiStudentT,PolicySize3) {
+TEST(ProbDistributionsMultiStudentT,ErrorSize3) {
   Matrix<double,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
   Matrix<double,Dynamic,1> mu(3,1);

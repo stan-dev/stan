@@ -57,16 +57,16 @@ namespace stan {
       vari(const double x): 
         val_(x),
         adj_(0.0) {
-        var_stack_.push_back(this);
+        ChainableStack::var_stack_.push_back(this);
       }
 
       vari(const double x,bool stacked): 
         val_(x),
         adj_(0.0) {
         if (stacked)
-          var_stack_.push_back(this);
+          ChainableStack::var_stack_.push_back(this);
         else
-          var_nochain_stack_.push_back(this);
+          ChainableStack::var_nochain_stack_.push_back(this);
       }
       
       /**

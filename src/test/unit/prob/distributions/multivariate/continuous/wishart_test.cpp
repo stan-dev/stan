@@ -1,15 +1,12 @@
 #include <gtest/gtest.h>
+#include <stan/agrad/rev/matrix.hpp>
+#include <stan/agrad/fwd/matrix.hpp>
 #include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/distributions.hpp>
 #include <stan/math/matrix/determinant.hpp>
 #include <stan/math/matrix/variance.hpp>
-#include <stan/agrad/fwd.hpp>
-#include <stan/agrad/fwd/matrix.hpp>
-#include <stan/agrad/rev.hpp>
-#include <stan/agrad/rev/matrix.hpp>
-
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -123,7 +120,7 @@ TEST(ProbDistributionsWishart,4x4Propto) {
 
 using stan::prob::wishart_log;
 
-TEST(ProbDistributionsWishart,DefaultPolicy) {
+TEST(ProbDistributionsWishart, error) {
   Matrix<double,Dynamic,Dynamic> Sigma;
   Matrix<double,Dynamic,Dynamic> Y;
   double nu;

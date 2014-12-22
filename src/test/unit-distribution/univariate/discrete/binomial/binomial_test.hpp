@@ -20,13 +20,13 @@ public:
     param[1] = 20;           // N
     param[2] = 0.4;          // theta
     parameters.push_back(param);
-    log_prob.push_back(-2.144372); // expected log_prob
+    log_prob.push_back(-2.144372241799002765106); // expected log_prob
     
     param[0] = 5;            // n
     param[1] = 15;           // N
     param[2] = 0.8;          // theta
     parameters.push_back(param);
-    log_prob.push_back(-9.20273); // expected log_prob
+    log_prob.push_back(-9.202729812928724939525); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index,
@@ -49,52 +49,35 @@ public:
   }
 
   template <class T_n, class T_N, class T_prob,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_prob>::type 
   log_prob(const T_n& n, const T_N& N, const T_prob& theta,
-     const T3&, const T4&, const T5&,
-     const T6&, const T7&, const T8&,
-     const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::binomial_log(n, N, theta);
   }
 
   template <bool propto, 
-      class T_n, class T_N, class T_prob,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            class T_n, class T_N, class T_prob,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_prob>::type 
   log_prob(const T_n& n, const T_N& N, const T_prob& theta,
-     const T3&, const T4&, const T5&,
-     const T6&, const T7&, const T8&,
-     const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::binomial_log<propto>(n, N, theta);
   }
   
   
   template <class T_n, class T_N, class T_prob,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_n& n, const T_N& N, const T_prob& theta,
-      const T3&, const T4&, const T5&,
-      const T6&, const T7&, const T8&,
-      const T9&) {
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_prob>::type 
+  log_prob_function(const T_n& n, const T_N& N, const T_prob& theta,
+                    const T3&, const T4&, const T5&) {
     using std::log;
     using stan::math::binomial_coefficient_log;
     using stan::math::log1m;
     using stan::math::multiply_log;
-    using stan::prob::include_summand;
 
-    var logp(0);
-    if (include_summand<true>::value)
-      logp += binomial_coefficient_log(N,n);
-    if (include_summand<true,T_prob>::value) 
-      logp += multiply_log(n,theta)
-  + (N - n) * log1m(theta);
-    return logp;
+    return binomial_coefficient_log(N,n) + multiply_log(n,theta) 
+      + (N - n) * log1m(theta);
   }
 };
 

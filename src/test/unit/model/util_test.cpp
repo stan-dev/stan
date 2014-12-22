@@ -9,8 +9,8 @@
 #include <stan/prob/transform.hpp>
 
 #include <stan/io/dump.hpp>
-#include <test/test-models/no-main/model/valid.cpp>
-//#include <test/test-models/no-main/model/domain_fail.cpp>
+#include <test/test-models/good/model/valid.cpp>
+//#include <test/test-models/good/model/domain_fail.cpp>
 
 class TestModel_uniform_01 {
 public:
