@@ -169,7 +169,7 @@ clean-deps:
 	$(shell find . -type f -name '*.d' -exec rm {} +)
 
 clean-all: clean clean-manual clean-deps
-	$(RM) -r test/* bin
+	$(RM) -r test bin
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
 	@echo '  removing generated test files'
