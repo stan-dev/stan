@@ -138,7 +138,7 @@ namespace stan {
       friend
       std::ostream& 
       operator<<(std::ostream& os, const fvar<T>& v) {
-        return os << v.val_ << ':' << v.d_;
+         return os << v.val_ << ':' << v.d_;
       }
     };
   }

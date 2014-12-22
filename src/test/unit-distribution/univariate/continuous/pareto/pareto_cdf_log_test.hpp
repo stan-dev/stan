@@ -15,7 +15,7 @@ public:
     param[1] = 0.5;           // y_min (Scale)
     param[2] = 3.3;           // alpha (Shape)
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.7376392612));  // expected cdf_log
+    cdf_log.push_back(std::log(0.7376392612457611797083));  // expected cdf_log
 
   }
   
@@ -61,26 +61,20 @@ public:
   }
     
   template <typename T_y, typename T_scale, typename T_shape,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_scale, T_shape>::type 
   cdf_log(const T_y& y, const T_scale& y_min, const T_shape& alpha,
-          const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, 
-          const T9&) {
+          const T3&, const T4&, const T5&) {
     return stan::prob::pareto_cdf_log(y, y_min, alpha);
   }
 
 
   
   template <typename T_y, typename T_scale, typename T_shape,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_scale, T_shape>::type 
   cdf_log_function(const T_y& y, const T_scale& y_min, const T_shape& alpha,
-                   const T3&, const T4&, const T5&, const T6&, const T7&, 
-                   const T8&, const T9&) {
+                   const T3&, const T4&, const T5&) {
       using std::exp;
       using std::log;
       return log(1.0 - exp(alpha * log(y_min / y)));

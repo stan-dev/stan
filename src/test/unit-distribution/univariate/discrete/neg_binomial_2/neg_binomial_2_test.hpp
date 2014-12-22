@@ -51,53 +51,37 @@ public:
   }
 
   template <class T_n, class T_location, class T_inv_scale,
-            typename T3, typename T4, typename T5,
-            typename T6, typename T7, typename T8,
-            typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_location,T_inv_scale>::type
   log_prob(const T_n& n, const T_location& mu, const T_inv_scale& phi,
-     const T3&, const T4&, const T5&,
-     const T6&, const T7&, const T8&,
-     const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::neg_binomial_2_log(n, mu, phi);
   }
 
   template <bool propto,
-      class T_n, class T_location, class T_inv_scale,
-            typename T3, typename T4, typename T5,
-            typename T6, typename T7, typename T8,
-            typename T9>
+            class T_n, class T_location, class T_inv_scale,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_location,T_inv_scale>::type
   log_prob(const T_n& n, const T_location& mu, const T_inv_scale& phi,
-     const T3&, const T4&, const T5&,
-     const T6&, const T7&, const T8&,
-     const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::neg_binomial_2_log<propto>(n, mu, phi);
   }
 
 
   template <class T_n, class T_location, class T_inv_scale,
-            typename T3, typename T4, typename T5,
-            typename T6, typename T7, typename T8,
-            typename T9>
-  var log_prob_function(const T_n& n, const T_location& mu, const T_inv_scale& phi,
-      const T3&, const T4&, const T5&,
-      const T6&, const T7&, const T8&,
-      const T9&) {
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_location,T_inv_scale>::type
+  log_prob_function(const T_n& n, const T_location& mu, 
+                    const T_inv_scale& phi, const T3&, const T4&, const T5&) {
     using std::log;
     using stan::math::binomial_coefficient_log;
     using stan::math::log_sum_exp;
     using stan::math::multiply_log;
-    using stan::prob::include_summand;
 
-    var logp(0);
-    if (include_summand<true,T_inv_scale>::value)
-      if (n != 0)
-        logp += binomial_coefficient_log<typename stan::scalar_type<T_inv_scale>::type>
-          (n + phi - 1.0, n);
-    if (include_summand<true,T_location,T_inv_scale>::value)
-      logp += multiply_log(n, mu) + multiply_log(phi, phi) - (n+phi)*log(mu + phi);
-    return logp;
+    if (n != 0)
+      return binomial_coefficient_log<typename stan::scalar_type<T_inv_scale>::type> (n + phi - 1.0, n)
+        + multiply_log(n, mu) + multiply_log(phi, phi) - (n+phi)*log(mu + phi);
+    return log(0.0);
   }
 };
 

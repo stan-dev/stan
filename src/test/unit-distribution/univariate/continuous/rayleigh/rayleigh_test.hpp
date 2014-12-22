@@ -17,7 +17,7 @@ public:
     param[0] = 4;           // y
     param[1] = 1;           // sigma
     parameters.push_back(param);
-    log_prob.push_back(-6.613705639); // expected log_prob
+    log_prob.push_back(-6.613705638880109381165535757083646863848999731279489491758639981013212756060610568788273346007162625); // expected log_prob
 
     param[0] = 1;           // y
     param[1] = 1;           // sigma
@@ -27,12 +27,12 @@ public:
     param[0] = 2;          // y
     param[1] = 1;           // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1.306852819); // expected log_prob
+    log_prob.push_back(-1.306852819440054690582767878541823431924499865639744745879319990506606378030305284394136673003581312); // expected log_prob
 
     param[0] = 3.5;          // y
     param[1] = 7.2;           // sigma
     parameters.push_back(param);
-    log_prob.push_back(-2.8135512); // expected log_prob
+    log_prob.push_back(-2.8135510897214907645); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 
@@ -53,44 +53,31 @@ public:
   }
 
   template <typename T_y, typename T_scale, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_scale>::type 
   log_prob(const T_y& y, const T_scale& sigma, const T2&,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::rayleigh_log(y, sigma);
   }
 
   template <bool propto, 
-      typename T_y, typename T_scale, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T_y, typename T_scale, typename T2,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_scale>::type 
   log_prob(const T_y& y, const T_scale& sigma, const T2&,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::rayleigh_log<propto>(y, sigma);
   }
   
   
   template <typename T_y, typename T_scale, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_scale& sigma, const T2&,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    using stan::prob::include_summand;
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_y, T_scale>::type 
+  log_prob_function(const T_y& y, const T_scale& sigma, const T2&,
+                    const T3&, const T4&, const T5&) {
     using stan::math::pi;
     using stan::math::square;
-    var lp(0.0);
-    if (include_summand<true,T_y,T_scale>::value)
-      lp -= 0.5 * y * y / (sigma * sigma);
-    if (include_summand<true,T_scale>::value)
-      lp -= 2.0 * log(sigma);
-    if (include_summand<true, T_y>::value)
-      lp += log(y);
-    return lp;
+    return -0.5 * y * y / (sigma * sigma) - 2.0 * log(sigma) + log(y);
   }
 };
 

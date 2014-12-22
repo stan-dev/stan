@@ -154,7 +154,7 @@ namespace stan {
           pass = false;
         }
 
-        // test data-only variables do not have parameters
+        // test data-only variables do not have parameters (int locals OK)
         if (has_var(ode_fun.t0_, var_map)) {
           error_msgs << "third argument to integrate_ode (initial times)"
                      << " must be data only and not reference parameters";
