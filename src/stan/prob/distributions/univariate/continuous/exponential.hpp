@@ -24,16 +24,16 @@ namespace stan {
      * y must be greater than or equal to 0.
      * 
      \f{eqnarray*}{
-       y 
-       &\sim& 
-       \mbox{\sf{Expon}}(\beta) \\
-       \log (p (y \,|\, \beta) )
-       &=& 
-       \log \left( \beta \exp^{-\beta y} \right) \\
-       &=& 
-       \log (\beta) - \beta y \\
-       & & 
-       \mathrm{where} \; y > 0
+     y 
+     &\sim& 
+     \mbox{\sf{Expon}}(\beta) \\
+     \log (p (y \,|\, \beta) )
+     &=& 
+     \log \left( \beta \exp^{-\beta y} \right) \\
+     &=& 
+     \log (\beta) - \beta y \\
+     & & 
+     \mathrm{where} \; y > 0
      \f}
      *
      * @param y A scalar variable.
@@ -47,6 +47,8 @@ namespace stan {
     typename return_type<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta) {
       static const std::string function("stan::prob::exponential_log");
+      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type 
+        T_partials_return;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -58,7 +60,7 @@ namespace stan {
       using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       
-      double logp(0.0);
+      T_partials_return logp(0.0);
       check_not_nan(function, "Random variable", y);
       check_positive_finite(function, "Inverse scale parameter", beta);
       check_consistent_sizes(function,
@@ -71,18 +73,18 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, beta);
       
-      DoubleVectorView<
-        include_summand<propto,T_inv_scale>::value,
-        is_vector<T_inv_scale>::value> log_beta(length(beta));
+      VectorBuilder<include_summand<propto,T_inv_scale>::value,
+                    T_partials_return, T_inv_scale> log_beta(length(beta));
       for (size_t i = 0; i < length(beta); i++)
         if (include_summand<propto,T_inv_scale>::value)
           log_beta[i] = log(value_of(beta_vec[i]));
 
-      agrad::OperandsAndPartials<T_y,T_inv_scale> operands_and_partials(y, beta);
+      agrad::OperandsAndPartials<T_y,T_inv_scale> 
+        operands_and_partials(y, beta);
 
       for (size_t n = 0; n < N; n++) {
-        const double beta_dbl = value_of(beta_vec[n]);
-        const double y_dbl = value_of(y_vec[n]);
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
         if (include_summand<propto,T_inv_scale>::value)
           logp += log_beta[n];
         if (include_summand<propto,T_y,T_inv_scale>::value)
@@ -93,7 +95,7 @@ namespace stan {
         if (!is_constant_struct<T_inv_scale>::value) 
           operands_and_partials.d_x2[n] += 1 / beta_dbl - y_dbl;
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,beta);
     }
     
     template <typename T_y, typename T_inv_scale>
@@ -120,6 +122,8 @@ namespace stan {
     template <typename T_y, typename T_inv_scale>
     typename return_type<T_y,T_inv_scale>::type
     exponential_cdf(const T_y& y, const T_inv_scale& beta) {
+      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type 
+        T_partials_return;
 
       static const std::string function("stan::prob::exponential_cdf");
 
@@ -129,7 +133,7 @@ namespace stan {
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
-     double cdf(1.0);
+      T_partials_return cdf(1.0);
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(beta)))
@@ -146,33 +150,34 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, beta);
       for (size_t n = 0; n < N; n++) {   
-        const double beta_dbl = value_of(beta_vec[n]);     
-        const double y_dbl = value_of(y_vec[n]);     
-        const double one_m_exp = 1.0 - exp(-beta_dbl * y_dbl);
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);     
+        const T_partials_return y_dbl = value_of(y_vec[n]);     
+        const T_partials_return one_m_exp = 1.0 - exp(-beta_dbl * y_dbl);
 
         // cdf
         cdf *= one_m_exp;
       }
 
       for(size_t n = 0; n < N; n++) {
-        const double beta_dbl = value_of(beta_vec[n]);     
-        const double y_dbl = value_of(y_vec[n]);     
-        const double one_m_exp = 1.0 - exp(-beta_dbl * y_dbl);
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);     
+        const T_partials_return y_dbl = value_of(y_vec[n]);     
+        const T_partials_return one_m_exp = 1.0 - exp(-beta_dbl * y_dbl);
 
         // gradients
-        double rep_deriv = exp(-beta_dbl * y_dbl) / one_m_exp;
+        T_partials_return rep_deriv = exp(-beta_dbl * y_dbl) / one_m_exp;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv * beta_dbl * cdf;
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x2[n] += rep_deriv * y_dbl * cdf;
       }
 
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,beta);
     }
 
     template <typename T_y, typename T_inv_scale>
     typename return_type<T_y,T_inv_scale>::type
     exponential_cdf_log(const T_y& y, const T_inv_scale& beta) {
+      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type T_partials_return;
 
       static const std::string function("stan::prob::exponential_cdf_log");
 
@@ -182,7 +187,7 @@ namespace stan {
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
-     double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(beta)))
@@ -199,25 +204,27 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, beta);
       for (size_t n = 0; n < N; n++) { 
-        const double beta_dbl = value_of(beta_vec[n]);     
-        const double y_dbl = value_of(y_vec[n]);            
-        double one_m_exp = 1.0 - exp(-beta_dbl * y_dbl);
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);     
+        const T_partials_return y_dbl = value_of(y_vec[n]);            
+        T_partials_return one_m_exp = 1.0 - exp(-beta_dbl * y_dbl);
         // log cdf
         cdf_log += log(one_m_exp);
 
         // gradients
-        double rep_deriv = -exp(-beta_dbl * y_dbl) / one_m_exp;
+        T_partials_return rep_deriv = -exp(-beta_dbl * y_dbl) / one_m_exp;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= rep_deriv * beta_dbl;
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x2[n] -= rep_deriv * y_dbl;
       }
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,beta);
     }
 
-   template <typename T_y, typename T_inv_scale>
+    template <typename T_y, typename T_inv_scale>
     typename return_type<T_y,T_inv_scale>::type
     exponential_ccdf_log(const T_y& y, const T_inv_scale& beta) {
+      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type 
+        T_partials_return;
 
      static const std::string function("stan::prob::exponential_ccdf_log");
 
@@ -227,7 +234,7 @@ namespace stan {
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
-     double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(beta)))
@@ -244,8 +251,8 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, beta);
       for (size_t n = 0; n < N; n++) { 
-        const double beta_dbl = value_of(beta_vec[n]);     
-        const double y_dbl = value_of(y_vec[n]);            
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);     
+        const T_partials_return y_dbl = value_of(y_vec[n]);            
         // log ccdf
         ccdf_log += -beta_dbl * y_dbl;
 
@@ -255,7 +262,7 @@ namespace stan {
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x2[n] -= y_dbl;
       }
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,beta);
     }
 
     template <class RNG>

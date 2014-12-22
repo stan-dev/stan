@@ -64,6 +64,16 @@ test/%.d : src/test/%_test.cpp
 	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
+.PRECIOUS: test/test-models/stanc.d
+test/test-models/stanc.d : src/test/test-models/stanc.cpp
+	@mkdir -p $(dir $@)
+	@set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(basename $(@F))\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+
 ############################################################
 ##
 # Target to verify header files within Stan has
@@ -100,7 +110,7 @@ test/test-models/stanc$(EXE) : src/test/test-models/stanc.cpp bin/libstanc.a
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
 TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
-$(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$(EXE)
+$(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$(EXE) test/test-models/stanc
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
 ##
@@ -174,12 +184,20 @@ test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generat
 
 
 test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
+
+## FIXME: think about how to do this generally using test_types
+# test_types := v fd fv ffd ffv
+
 .SECONDEXPANSION:
-src/test/unit-distribution/%_generated_test.cpp : src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
+#src/test/unit-distribution/%_generated_test.cpp : src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
+src/test/unit-distribution/%_generated_v_test.cpp src/test/unit-distribution/%_generated_fd_test.cpp src/test/unit-distribution/%_generated_fv_test.cpp src/test/unit-distribution/%_generated_ffd_test.cpp src/test/unit-distribution/%_generated_ffv_test.cpp: src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
 	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
-
-LIST_OF_GENERATED_TESTS := $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_test.cpp,g')
+LIST_OF_GENERATED_TESTS := $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_v_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fd_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fv_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffd_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffv_test.cpp,g')
 
 .PHONY: generate-tests
 generate-tests: $(LIST_OF_GENERATED_TESTS)
+
+ifeq (,$(filter-out test/% src/test/test-models/%.cpp,$(MAKECMDGOALS)))
+  -include test/test-models/stanc.d
+endif

@@ -1469,6 +1469,20 @@ using more basic \Stan functions.
     \end{cases}
     \]}
   %
+  \fitem{real}{log\_mix}{real \farg{theta}, real \farg{lp1}, real
+    \farg{lp2}}{
+    Returns the log mixture of the log densities \farg{lp1} and
+    \farg{lp2} with mixing proportion \farg{theta},
+    \begin{eqnarray*}
+      \mbox{log\_mix}(\theta, \mbox{lp}_1, \mbox{lp}_2) 
+      & = & \log \!\left( \theta \exp(\mbox{lp}_1) 
+      + \left( 1 - \theta \right) \exp(\mbox{lp}_2)
+    \right)
+    \\[3pt]
+    & = & \mbox{log\_sum\_exp}\!\left(\log(\theta) + \mbox{lp}_1, \
+                               \mbox{log1m}(\theta) + \mbox{lp}_2\right).
+    \end{eqnarray*}
+  %
   \fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{ 
     Returns the natural logarithm of the sum of the natural exponentiation
     of \farg{x} and the natural exponentiation of \farg{y}.
@@ -1489,7 +1503,8 @@ using more basic \Stan functions.
     \mbox{log1m\_inv\_logit}(x) = \log(1 - \mbox{logit}^{-1}(x))
     \]
   See \refsection{link-functions} for a definition of inverse logit.}
-  %
+}
+    
 \end{description}
 
 

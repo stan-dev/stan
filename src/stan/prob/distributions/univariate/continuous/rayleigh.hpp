@@ -8,8 +8,9 @@
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive.hpp>
-#include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/square.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -23,6 +24,8 @@ namespace stan {
     typename return_type<T_y,T_scale>::type
     rayleigh_log(const T_y& y, const T_scale& sigma) {
       static const std::string function("stan::prob::rayleigh_log");
+      typedef typename stan::partials_return_type<T_y,T_scale>::type 
+        T_partials_return;
 
       using std::log;
       using stan::is_constant_struct;
@@ -37,7 +40,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
       check_not_nan(function, "Random variable", y);
@@ -58,9 +61,9 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
 
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,
-                       is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
+      VectorBuilder<include_summand<propto,T_scale>::value,
+                    T_partials_return, T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -69,10 +72,10 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
-        const double y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
       
         // reusable subexpression values
-        const double y_over_sigma = y_dbl * inv_sigma[n];
+        const T_partials_return y_over_sigma = y_dbl * inv_sigma[n];
 
         static double NEGATIVE_HALF = -0.5;
 
@@ -85,14 +88,14 @@ namespace stan {
         logp += NEGATIVE_HALF * y_over_sigma * y_over_sigma;
 
         // gradients
-        double scaled_diff = inv_sigma[n] * y_over_sigma;
+        T_partials_return scaled_diff = inv_sigma[n] * y_over_sigma;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += 1.0 / y_dbl - scaled_diff;
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x2[n] 
             += y_over_sigma * scaled_diff - 2.0 * inv_sigma[n];
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,sigma);
     }
 
     template <typename T_y, typename T_scale>
@@ -106,6 +109,8 @@ namespace stan {
     typename return_type<T_y,T_scale>::type
     rayleigh_cdf(const T_y& y, const T_scale& sigma) {
       static const std::string function("stan::prob::rayleigh_cdf");
+      typedef typename stan::partials_return_type<T_y,T_scale>::type 
+        T_partials_return;
 
       using stan::error_handling::check_nonnegative;
       using stan::error_handling::check_positive;
@@ -116,7 +121,7 @@ namespace stan {
       using stan::math::square;
       using stan::math::value_of;
 
-      double cdf(1.0);
+      T_partials_return cdf(1.0);
 
       // check if any vectors are zero length
       if (!(stan::length(y) && stan::length(sigma)))
@@ -138,16 +143,16 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
       
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       }
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_sqr = y_dbl * y_dbl;
-        const double inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
-        const double exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_sqr = y_dbl * y_dbl;
+        const T_partials_return inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
+        const T_partials_return exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
 
         if (include_summand<false,T_y,T_scale>::value)
           cdf *= (1.0 - exp_val);
@@ -155,11 +160,11 @@ namespace stan {
 
       //gradients
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_sqr = square(y_dbl);
-        const double inv_sigma_sqr = square(inv_sigma[n]);
-        const double exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
-        const double exp_div_1m_exp = exp_val / (1.0 - exp_val);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_sqr = square(y_dbl);
+        const T_partials_return inv_sigma_sqr = square(inv_sigma[n]);
+        const T_partials_return exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
+        const T_partials_return exp_div_1m_exp = exp_val / (1.0 - exp_val);
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += y_dbl * inv_sigma_sqr 
@@ -169,13 +174,15 @@ namespace stan {
             * inv_sigma[n] * exp_div_1m_exp * cdf;
       }
 
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,sigma);
     }
 
     template <typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_cdf_log(const T_y& y, const T_scale& sigma) {
       static const std::string function("stan::prob::rayleigh_cdf_log");
+      typedef typename stan::partials_return_type<T_y,T_scale>::type
+        T_partials_return;
 
       using stan::error_handling::check_nonnegative;
       using stan::error_handling::check_positive;
@@ -185,8 +192,9 @@ namespace stan {
       using stan::is_constant_struct;
       using stan::math::square;
       using stan::math::value_of;
+      using stan::math::log1m;
 
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
 
       // check if any vectors are zero length
       if (!(stan::length(y) && stan::length(sigma)))
@@ -207,20 +215,20 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
       
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       }
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_sqr = y_dbl * y_dbl;
-        const double inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
-        const double exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
-        const double exp_div_1m_exp = exp_val / (1.0 - exp_val);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_sqr = y_dbl * y_dbl;
+        const T_partials_return inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
+        const T_partials_return exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
+        const T_partials_return exp_div_1m_exp = exp_val / (1.0 - exp_val);
 
         if (include_summand<false,T_y,T_scale>::value)
-          cdf_log += log(1.0 - exp_val);
+          cdf_log += log1m(exp_val);
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += y_dbl * inv_sigma_sqr 
@@ -230,13 +238,15 @@ namespace stan {
             * inv_sigma[n] * exp_div_1m_exp;
       }
 
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,sigma);
     }
 
     template <typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_ccdf_log(const T_y& y, const T_scale& sigma) {
       static const std::string function("stan::prob::rayleigh_ccdf_log");
+      typedef typename stan::partials_return_type<T_y,T_scale>::type
+        T_partials_return;
 
       using stan::error_handling::check_nonnegative;
       using stan::error_handling::check_positive;
@@ -247,7 +257,7 @@ namespace stan {
       using stan::math::square;
       using stan::math::value_of;
 
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
 
       // check if any vectors are zero length
       if (!(stan::length(y) && stan::length(sigma)))
@@ -269,15 +279,15 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
       
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       }
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_sqr = y_dbl * y_dbl;
-        const double inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_sqr = y_dbl * y_dbl;
+        const T_partials_return inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
 
         if (include_summand<false,T_y,T_scale>::value)
           ccdf_log += -0.5 * y_sqr * inv_sigma_sqr;
@@ -289,7 +299,7 @@ namespace stan {
             * inv_sigma[n];
       }
 
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,sigma);
     }
 
     template <class RNG>
