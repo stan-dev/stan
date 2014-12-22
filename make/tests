@@ -64,6 +64,16 @@ test/%.d : src/test/%_test.cpp
 	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
+.PRECIOUS: test/test-models/stanc.d
+test/test-models/stanc.d : src/test/test-models/stanc.cpp
+	@mkdir -p $(dir $@)
+	@set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(basename $(@F))\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+
 ############################################################
 ##
 # Target to verify header files within Stan has
@@ -100,7 +110,7 @@ test/test-models/stanc$(EXE) : src/test/test-models/stanc.cpp bin/libstanc.a
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
 TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
-$(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$(EXE)
+$(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$(EXE) test/test-models/stanc
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
 ##
@@ -187,3 +197,7 @@ LIST_OF_GENERATED_TESTS := $(shell find src/test/unit-distribution -type f -name
 
 .PHONY: generate-tests
 generate-tests: $(LIST_OF_GENERATED_TESTS)
+
+ifeq (,$(filter-out test/% src/test/test-models/%.cpp,$(MAKECMDGOALS)))
+  -include test/test-models/stanc.d
+endif
