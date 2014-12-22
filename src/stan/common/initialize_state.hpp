@@ -159,7 +159,7 @@ namespace stan {
                                  ContextFactory& context_factory) {
       try {
         typename ContextFactory::var_context_t context = context_factory(source);
-        model.transform_inits(context, cont_params);
+        model.transform_inits(context, cont_params, output);
       } catch(const std::exception& e) {
         if (output)
           *output << "Initialization from source failed."

@@ -13,11 +13,11 @@ parameters {
   real<lower=foo(),upper=1> y;
 }
 transformed parameters {
-  real<lower=-100,upper=foo()>,upper=1> yt;
+  real<lower=-100,upper=foo()> yt;
 }
 model {
   y ~ normal(0,1);
 }  
 generated quantities {
-  real<lower=-100,upper=foo()>,upper=1> g;
+  real<lower=-100,upper=foo()> g;
 }
