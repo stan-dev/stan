@@ -637,6 +637,7 @@ namespace stan {
       using boost::spirit::qi::int_;
       using boost::spirit::qi::lexeme;
       using boost::spirit::qi::lit;
+      using boost::spirit::qi::no_skip;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_r1;
@@ -704,7 +705,7 @@ namespace stan {
       
       integrate_ode_r.name("solve ode");
       integrate_ode_r 
-        %= lit("integrate_ode")
+        %= (lit("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > identifier_r          // system function name (function only)
         > lit(',')
