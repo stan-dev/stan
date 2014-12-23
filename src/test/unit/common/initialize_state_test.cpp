@@ -2,6 +2,7 @@
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
+#include <test/unit/util.hpp>
 
 // Mock Model
 class mock_model: public stan::model::prob_grad {
@@ -33,11 +34,73 @@ public:
       params_r__[n] = n;
     }
   }
+
+  void unconstrained_param_names(std::vector<std::string>& param_names__,
+                                 bool include_tparams__ = true,
+                                 bool include_gqs__ = true) const {
+    param_names__.clear();
+    for (int n = 0; n < num_params_r__; n++) {
+      std::stringstream param_name;
+      param_name << "param_" << n;
+      param_names__.push_back(param_name.str());
+    }
+  }
   
   mutable int templated_log_prob_calls;
   mutable int transform_inits_calls;
   double log_prob_return_value;
 };
+
+// Mock Inf Model returns inf, -inf
+class mock_inf_model: public stan::model::prob_grad {
+public:
+
+  mock_inf_model(size_t num_params_r): 
+    stan::model::prob_grad(num_params_r),
+    templated_log_prob_calls(0),
+    transform_inits_calls(0),
+    log_prob_return_value(0.0) { }
+  
+  void reset() {
+    templated_log_prob_calls = 0;
+    transform_inits_calls = 0;
+    log_prob_return_value = 0.0;
+  }
+
+  template <bool propto, bool jacobian_adjust_transforms, typename T>
+  T log_prob(Eigen::Matrix<T,Eigen::Dynamic,1>& params_r,
+             std::ostream* output_stream = 0) const {
+    templated_log_prob_calls++;
+    return log_prob_return_value;
+  }
+  
+  void transform_inits(const stan::io::var_context& context__,
+                       Eigen::VectorXd& params_r__) const {
+    transform_inits_calls++;
+    for (int n = 0; n < params_r__.size(); n++) {
+      if (n % 2 == 0)
+        params_r__[n] = std::numeric_limits<double>::infinity();
+      else
+        params_r__[n] = -std::numeric_limits<double>::infinity();
+    }
+  }
+
+  void unconstrained_param_names(std::vector<std::string>& param_names__,
+                                 bool include_tparams__ = true,
+                                 bool include_gqs__ = true) const {
+    param_names__.clear();
+    for (int n = 0; n < num_params_r__; n++) {
+      std::stringstream param_name;
+      param_name << "param_" << n;
+      param_names__.push_back(param_name.str());
+    }
+  }
+  
+  mutable int templated_log_prob_calls;
+  mutable int transform_inits_calls;
+  double log_prob_return_value;
+};
+
 
 class mock_rng {
 public:
@@ -93,11 +156,13 @@ public:
 class StanCommon : public testing::Test {
 public:
   StanCommon() :
-    model(3) {}
+    model(3),
+    inf_model(3) {}
 
   void SetUp() {
     cont_params = Eigen::VectorXd::Zero(3);
     model.reset();
+    inf_model.reset();
     rng.reset();
     output.clear();
     context_factory.reset();
@@ -106,6 +171,7 @@ public:
   std::string init;
   Eigen::VectorXd cont_params;
   mock_model model;
+  mock_inf_model inf_model;
   mock_rng rng;
   std::stringstream output;
   mock_context_factory context_factory;
@@ -336,4 +402,53 @@ TEST_F(StanCommon, get_double_from_string) {
   EXPECT_FALSE(get_double_from_string("", val));
   EXPECT_PRED1(boost::math::isnan<double>,
                val);
+}
+
+TEST_F(StanCommon, check_finite_initialization) {
+  using stan::common::check_finite_initialization;
+  Eigen::VectorXd valid(inf_model.num_params_r());
+  valid.setZero();
+  
+  EXPECT_TRUE(check_finite_initialization(valid, inf_model));
+  
+
+  Eigen::VectorXd invalid(inf_model.num_params_r());
+  for (int i = 0; i < invalid.size(); i++) {
+    invalid.setZero();
+    if (i % 2 == 0)
+      invalid[i] = std::numeric_limits<double>::infinity();
+    else
+      invalid[i] = -std::numeric_limits<double>::infinity();
+    
+    std::stringstream expected_msg;
+
+    expected_msg << "param_" << i << " initialized to value violating constraint";
+
+    EXPECT_THROW_MSG(check_finite_initialization(invalid, inf_model), 
+                     std::invalid_argument,
+                     expected_msg.str());
+  }
+
+  
+}
+
+TEST_F(StanCommon, initialize_state_source_inf) {
+  init = "abcd";
+  using stan::common::initialize_state_source;
+  EXPECT_TRUE(initialize_state_source(init,
+                                      cont_params,
+                                      inf_model,
+                                      rng,
+                                      &output,
+                                      context_factory));
+  ASSERT_EQ(3, cont_params.size());
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), cont_params[0]);
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), cont_params[1]);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), cont_params[2]);
+  EXPECT_EQ(1, inf_model.templated_log_prob_calls);
+  EXPECT_EQ(1, inf_model.transform_inits_calls);
+  EXPECT_EQ(0, rng.calls);
+  EXPECT_EQ("", output.str());
+  EXPECT_EQ(1, context_factory.calls);
+  EXPECT_EQ("abcd", context_factory.last_call);
 }

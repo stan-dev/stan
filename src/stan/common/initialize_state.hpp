@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <math.h>
+#include <stdexcept>
 
 #include <stan/math/matrix/Eigen.hpp>
 
@@ -16,9 +17,28 @@
 #include <stan/gm/error_codes.hpp>
 #include <stan/common/context_factory.hpp>
 #include <stan/common/write_error_msg.hpp>
+#include <stan/math/functions/is_inf.hpp>
 
 namespace stan {
   namespace common {    
+
+    template <class Model>
+    bool check_finite_initialization(Eigen::VectorXd& cont_params,
+                                     Model& model) {
+      for (int n = 0; n < cont_params.size(); n++) {
+        if (stan::math::is_inf(cont_params[n])) {
+          std::vector<std::string> param_names;
+          model.unconstrained_param_names(param_names);
+          
+          std::stringstream msg;
+          msg << param_names[n] << " initialized to value violating constraint";
+          
+          throw std::invalid_argument(msg.str());
+          return false;
+        }
+      }
+      return true;
+    }
     
     /**
      * Sets initial state to zero
