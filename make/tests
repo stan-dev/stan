@@ -87,6 +87,14 @@ else
   DEV_NULL = /dev/null
 endif
 
+##
+# Target to verify code generated Stan programs
+# (.stan -> .hpp) are compilable
+##
+.PHONY: %.hpp-test
+src/test/test-models/good/%.hpp-test : src/test/test-models/good/%.hpp
+	$(COMPILE.c) -fsyntax-only -O0 $< 
+
 .PHONY: HEADER_TESTS
 %.hpp-test : %.hpp test/dummy.cpp
 	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
@@ -155,14 +163,6 @@ src/test/unit/gm/reject/reject_func_call_transformed_parameters_test.cpp: src/te
 
 src/test/unit/gm/reject/reject_generated_quantities_test.cpp: src/test/test-models/good/gm/reject_generated_quantities.hpp
 src/test/unit/gm/reject/reject_func_call_generated_quantities_test.cpp: src/test/test-models/good/gm/reject_func_call_generated_quantities.hpp
-
-##
-# Target to verify code generated Stan programs
-# (.stan -> .hpp) are compilable
-##
-.PHONY: %.hpp-test
-%.hpp-test : %.hpp
-	$(COMPILE.c) -fsyntax-only -O$O $< 
 
 
 ##
