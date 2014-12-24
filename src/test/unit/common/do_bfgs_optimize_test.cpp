@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/common/do_bfgs_optimize.hpp>
 #include <stan/optimization/bfgs.hpp>
-#include <test/test-models/good/optimization/rosenbrock.cpp>
+#include <test/test-models/good/optimization/rosenbrock.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 
 typedef rosenbrock_model_namespace::rosenbrock_model Model;
