@@ -5,7 +5,7 @@
 #include <boost/random/variate_generator.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
-#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/constants.hpp>
@@ -55,6 +55,7 @@ namespace stan {
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_positive;
       using stan::math::value_of;
 
       // check if any vectors are zero length
@@ -65,6 +66,7 @@ namespace stan {
 
       T_partials_return logp(0.0);
       check_not_nan(function, "Random variable", y);
+      check_positive(function, "Random variable", y);
       check_positive_finite(function, "Degrees of freedom parameter", nu);
       check_positive_finite(function, "Scale parameter", s);
       check_consistent_sizes(function,
@@ -80,11 +82,6 @@ namespace stan {
       VectorView<const T_dof> nu_vec(nu);
       VectorView<const T_scale> s_vec(s);
       size_t N = max_size(y, nu, s);
-
-      for (size_t n = 0; n < N; n++) {
-        if (value_of(y_vec[n]) <= 0)
-          return LOG_ZERO;
-      }
 
       using stan::math::lgamma;
       using stan::math::digamma;
@@ -202,13 +199,13 @@ namespace stan {
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
       using stan::math::value_of;
           
       T_partials_return P(1.0);
           
       check_not_nan(function, "Random variable", y);
-      check_nonnegative(function, "Random variable", y);
+      check_positive(function, "Random variable", y);
       check_positive_finite(function, "Degrees of freedom parameter", nu);
       check_positive_finite(function, "Scale parameter", s);
       check_consistent_sizes(function, 
@@ -224,14 +221,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_y, T_dof, T_scale> 
         operands_and_partials(y, nu, s);
-          
-      // Explicit return for extreme values
-      // The gradients are technically ill-defined, but treated as zero
-          
-      for (size_t i = 0; i < stan::length(y); i++) {
-        if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0,y,nu,s);
-      }
           
       // Compute CDF and its gradients
       using stan::math::gamma_q;
@@ -331,13 +320,13 @@ namespace stan {
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
       using stan::math::value_of;
           
       T_partials_return P(0.0);
           
       check_not_nan(function, "Random variable", y);
-      check_nonnegative(function, "Random variable", y);
+      check_positive(function, "Random variable", y);
       check_positive_finite(function, "Degrees of freedom parameter", nu);
       check_positive_finite(function, "Scale parameter", s);
       check_consistent_sizes(function, 
@@ -353,14 +342,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_y, T_dof, T_scale> 
         operands_and_partials(y, nu, s);
-          
-      // Explicit return for extreme values
-      // The gradients are technically ill-defined, but treated as zero
-      for (size_t i = 0; i < stan::length(y); i++) {
-        if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),
-                                              y,nu,s);
-      }
           
       // Compute cdf_log and its gradients
       using stan::math::gamma_q;
@@ -450,7 +431,7 @@ namespace stan {
       T_partials_return P(0.0);
           
       check_not_nan(function, "Random variable", y);
-      check_nonnegative(function, "Random variable", y);
+      check_positive(function, "Random variable", y);
       check_positive_finite(function, "Degrees of freedom parameter", nu);
       check_positive_finite(function, "Scale parameter", s);
       check_consistent_sizes(function, 
@@ -466,13 +447,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_y, T_dof, T_scale> 
         operands_and_partials(y, nu, s);
-          
-      // Explicit return for extreme values
-      // The gradients are technically ill-defined, but treated as zero
-      for (size_t i = 0; i < stan::length(y); i++) {
-        if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0,y,nu,s);
-      }
           
       // Compute cdf_log and its gradients
       using stan::math::gamma_q;

@@ -45,7 +45,7 @@ namespace stan {
       // validate args (here done over var, which should be OK)
       check_not_nan(function, "Random variable", y);
       check_positive(function, "Scale parameter", sigma);
-      check_positive(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
       check_consistent_sizes(function,
                              "Random variable", y,
                              "Scale parameter", sigma);

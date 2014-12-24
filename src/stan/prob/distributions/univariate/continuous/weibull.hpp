@@ -6,7 +6,7 @@
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/error_handling/scalar/check_finite.hpp>
-#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/functions/multiply_log.hpp>
@@ -44,7 +44,8 @@ namespace stan {
 
       // set up return value accumulator
       T_partials_return logp(0.0);
-      check_finite(function, "Random variable", y);
+      check_not_nan(function, "Random variable", y);
+      check_positive_finite(function, "Random variable", y);
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
@@ -60,12 +61,6 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, alpha, sigma);
-
-      for (size_t n = 0; n < N; n++) {
-        const T_partials_return y_dbl = value_of(y_vec[n]);
-        if (y_dbl < 0)
-          return LOG_ZERO;
-      }
       
       VectorBuilder<include_summand<propto,T_shape>::value,
                     T_partials_return, T_shape> log_alpha(length(alpha));
@@ -147,7 +142,8 @@ namespace stan {
       static const std::string function("stan::prob::weibull_cdf");
 
       using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -158,7 +154,8 @@ namespace stan {
         return 1.0;
 
       T_partials_return cdf(1.0);
-      check_nonnegative(function, "Random variable", y);
+      check_non_nan(function, "Random variable", y);
+      check_positive(function, "Random variable", y);
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", sigma);
       
@@ -212,7 +209,6 @@ namespace stan {
       static const std::string function("stan::prob::weibull_cdf_log");
 
       using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -223,7 +219,9 @@ namespace stan {
         return 0.0;
 
       T_partials_return cdf_log(0.0);
-      check_nonnegative(function, "Random variable", y);
+
+      check_not_nan(function, "Random variable", y);
+      check_positive_finite(function, "Random variable", y);
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", sigma);
       
@@ -267,7 +265,8 @@ namespace stan {
       static const std::string function("stan::prob::weibull_ccdf_log");
 
       using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -278,7 +277,8 @@ namespace stan {
         return 0.0;
 
       T_partials_return ccdf_log(0.0);
-      check_nonnegative(function, "Random variable", y);
+      check_not_nan(function, "Random variable", y);
+      check_positive_finite(function, "Random variable", y);
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", sigma);
       

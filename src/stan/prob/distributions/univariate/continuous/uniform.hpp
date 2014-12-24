@@ -7,6 +7,8 @@
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/error_handling/scalar/check_finite.hpp>
 #include <stan/error_handling/scalar/check_greater.hpp>
+#include <stan/error_handling/scalar/check_greater_or_equal.hpp>
+#include <stan/error_handling/scalar/check_less_or_equal.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
@@ -51,6 +53,8 @@ namespace stan {
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
       using stan::error_handling::check_greater;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_less_or_equal;
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
 
@@ -66,6 +70,8 @@ namespace stan {
       check_finite(function, "Lower bound parameter", alpha);
       check_finite(function, "Upper bound parameter", beta);
       check_greater(function, "Upper bound parameter", beta, alpha);
+      check_greater_or_equal(function, "Upper bound parameter", y, alpha);
+      check_less_or_equal(function, "Upper bound parameter", y, beta);
       check_consistent_sizes(function,
                              "Random variable", y,
                              "Lower bound parameter", alpha,
@@ -79,13 +85,6 @@ namespace stan {
       VectorView<const T_low> alpha_vec(alpha);
       VectorView<const T_high> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
-
-      for (size_t n = 0; n < N; n++) {
-        const T_partials_return y_dbl = value_of(y_vec[n]);
-        if (y_dbl < value_of(alpha_vec[n]) 
-            || y_dbl > value_of(beta_vec[n]))
-          return LOG_ZERO;
-      }
 
       VectorBuilder<include_summand<propto,T_low,T_high>::value,
                     T_partials_return, T_low, T_high>
@@ -134,6 +133,8 @@ namespace stan {
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
       using stan::error_handling::check_greater;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_less_or_equal;
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
 
@@ -149,6 +150,8 @@ namespace stan {
       check_finite(function, "Lower bound parameter", alpha);
       check_finite(function, "Upper bound parameter", beta);
       check_greater(function, "Upper bound parameter", beta, alpha);
+      check_greater_or_equal(function, "Random variable", y, alpha);
+      check_less_or_equal(function, "Random variable", y, beta);
       check_consistent_sizes(function,
                              "Random variable", y,
                              "Lower bound parameter", alpha,
@@ -159,13 +162,6 @@ namespace stan {
       VectorView<const T_high> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
 
-      for (size_t n = 0; n < N; n++) {
-        const T_partials_return y_dbl = value_of(y_vec[n]);
-        if (y_dbl < value_of(alpha_vec[n]) 
-            || y_dbl > value_of(beta_vec[n]))
-          return 0.0;
-      }
-   
       agrad::OperandsAndPartials<T_y,T_low,T_high> 
         operands_and_partials(y,alpha,beta);
       for (size_t n = 0; n < N; n++) {
@@ -211,6 +207,8 @@ namespace stan {
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
       using stan::error_handling::check_greater;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_less_or_equal;
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
 
@@ -226,6 +224,8 @@ namespace stan {
       check_finite(function, "Lower bound parameter", alpha);
       check_finite(function, "Upper bound parameter", beta);
       check_greater(function, "Upper bound parameter", beta, alpha);
+      check_greater_or_equal(function, "Random variable", y, alpha);
+      check_less_or_equal(function, "Random variable", y, beta);
       check_consistent_sizes(function,
                              "Random variable", y,
                              "Lower bound parameter", alpha,
@@ -238,15 +238,6 @@ namespace stan {
 
       agrad::OperandsAndPartials<T_y,T_low,T_high> 
         operands_and_partials(y,alpha,beta);
-
-      for (size_t n = 0; n < N; n++) {
-        const T_partials_return y_dbl = value_of(y_vec[n]);
-        if (y_dbl < value_of(alpha_vec[n]) 
-            || y_dbl > value_of(beta_vec[n]))
-          return stan::math::negative_infinity();
-        if (y_dbl == value_of(beta_vec[n]))
-          return operands_and_partials.to_var(0.0,y,alpha,beta);
-      }
 
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);
@@ -281,6 +272,8 @@ namespace stan {
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
       using stan::error_handling::check_greater;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_less_or_equal;
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
 
@@ -296,6 +289,8 @@ namespace stan {
       check_finite(function, "Lower bound parameter", alpha);
       check_finite(function, "Upper bound parameter", beta);
       check_greater(function, "Upper bound parameter", beta, alpha);
+      check_greater_or_equal(function, "Random variable", y, alpha);
+      check_less_or_equal(function, "Random variable", y, beta);
       check_consistent_sizes(function,
                              "Random variable", y,
                              "Lower bound parameter", alpha,
@@ -305,15 +300,6 @@ namespace stan {
       VectorView<const T_low> alpha_vec(alpha);
       VectorView<const T_high> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
-
-      for (size_t n = 0; n < N; n++) {
-        const T_partials_return y_dbl = value_of(y_vec[n]);
-        if (y_dbl < value_of(alpha_vec[n]) 
-            || y_dbl > value_of(beta_vec[n]))
-          return 0.0;
-        if (y_dbl == value_of(beta_vec[n]))
-          return LOG_ZERO;
-      }
    
       agrad::OperandsAndPartials<T_y,T_low,T_high> 
         operands_and_partials(y,alpha,beta);

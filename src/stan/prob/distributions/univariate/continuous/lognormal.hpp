@@ -6,7 +6,7 @@
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/error_handling/scalar/check_finite.hpp>
-#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/math/constants.hpp>
@@ -19,7 +19,7 @@
 namespace stan {
   namespace prob {
 
-    // LogNormal(y|mu,sigma)  [y >= 0;  sigma > 0]
+    // LogNormal(y|mu,sigma)  [y > 0;  sigma > 0]
     // FIXME: document
     template <bool propto,
               typename T_y, typename T_loc, typename T_scale>
