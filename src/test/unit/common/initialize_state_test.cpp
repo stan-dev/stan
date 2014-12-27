@@ -77,7 +77,8 @@ public:
   }
   
   void transform_inits(const stan::io::var_context& context__,
-                       Eigen::VectorXd& params_r__) const {
+                       Eigen::VectorXd& params_r__,
+                       std::ostream* out) const {
     transform_inits_calls++;
     for (int n = 0; n < params_r__.size(); n++) {
       if (n % 2 == 0)
