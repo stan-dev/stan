@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include <test/test-models/good/mcmc/hmc/integrators/gauss.cpp>
+#include <test/test-models/good/mcmc/hmc/integrators/gauss.hpp>
 
 #include <stan/io/dump.hpp>
 

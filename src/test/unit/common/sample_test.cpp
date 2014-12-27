@@ -1,6 +1,6 @@
 #include <stan/common/sample.hpp>
 #include <gtest/gtest.h>
-#include <test/test-models/good/common/test_lp.cpp>
+#include <test/test-models/good/common/test_lp.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;

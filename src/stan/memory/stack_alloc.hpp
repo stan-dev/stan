@@ -186,7 +186,7 @@ namespace stan {
       template <typename T>
       inline
       T* alloc_array(size_t n) {
-        return static_cast<T*>(alloc(n * sizeof(T*)));
+        return static_cast<T*>(alloc(n * sizeof(T)));
       }
 
 
