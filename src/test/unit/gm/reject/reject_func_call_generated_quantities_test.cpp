@@ -3,10 +3,10 @@
 
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/good/gm/reject_func_call_generated_quantities.cpp>
+#include <test/test-models/good/gm/reject_func_call_generated_quantities.hpp>
 
 /* tests that stan program throws exception in generated quantities block
-   this is compiled into cpp model object's method write_array
+   this is compiled into hpp model object's method write_array
 */
 
 TEST(StanCommon, reject_func_call_generated_quantities) {

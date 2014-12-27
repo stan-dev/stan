@@ -16,13 +16,13 @@ void test_pg(const std::string& program_name,
   std::string path = "src/test/test-models/good/parser-generator";
   path += "/";
   path += program_name;
-  path += ".cpp";
+  path += ".hpp";
 
-  std::string cpp_code;
-  read_file(path, cpp_code);
-  // std::cout << "cpp_code=" << cpp_code << std::endl;
+  std::string hpp_code;
+  read_file(path, hpp_code);
+  // std::cout << "hpp_code=" << hpp_code << std::endl;
   
-  EXPECT_TRUE(cpp_code.find(expected_substring) != std::string::npos)
+  EXPECT_TRUE(hpp_code.find(expected_substring) != std::string::npos)
     << "program_name: " << program_name << std::endl
     << "expected_substring: " << expected_substring;
 }
@@ -46,14 +46,14 @@ void test_pg_count(const std::string& program_name,
   std::string path = "src/test/test-models/good/parser-generator";
   path += "/";
   path += program_name;
-  path += ".cpp";
+  path += ".hpp";
 
-  std::string cpp_code;
-  read_file(path, cpp_code);
-  // std::cout << "cpp_code=" << cpp_code << std::endl;
+  std::string hpp_code;
+  read_file(path, hpp_code);
+  // std::cout << "hpp_code=" << hpp_code << std::endl;
   
 
-  EXPECT_EQ(expected_count, count_occurrences(expected_substring,cpp_code));
+  EXPECT_EQ(expected_count, count_occurrences(expected_substring,hpp_code));
 }
 
 TEST(unitGm, simpleTest) {
