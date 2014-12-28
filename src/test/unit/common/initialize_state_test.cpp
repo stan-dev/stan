@@ -1,3 +1,4 @@
+#include <ostream>
 #include <stan/common/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -27,7 +28,8 @@ public:
   }
   
   void transform_inits(const stan::io::var_context& context__,
-                       Eigen::VectorXd& params_r__) const {
+                       Eigen::VectorXd& params_r__,
+                       std::ostream* out) const {
     transform_inits_calls++;
     for (int n = 0; n < params_r__.size(); n++) {
       params_r__[n] = n;

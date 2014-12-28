@@ -153,7 +153,7 @@ MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all clean-deps
 clean:
 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
-	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.hpp))
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%$(EXE)))
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.o))
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.d))
@@ -173,4 +173,4 @@ clean-all: clean clean-manual clean-deps
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
 	@echo '  removing generated test files'
-	$(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f -exec rm {} +)
+	$(shell find src/test/unit-distribution -name '*_generated_*_test.cpp' -type f -exec rm {} +)

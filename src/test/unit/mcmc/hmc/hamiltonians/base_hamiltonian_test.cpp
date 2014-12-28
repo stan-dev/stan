@@ -1,5 +1,5 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
-#include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.cpp>
+#include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
 
 #include <gtest/gtest.h>
 
