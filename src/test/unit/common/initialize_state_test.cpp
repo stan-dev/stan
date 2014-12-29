@@ -407,12 +407,12 @@ TEST_F(StanCommon, get_double_from_string) {
                val);
 }
 
-TEST_F(StanCommon, check_finite_initialization) {
-  using stan::common::check_finite_initialization;
+TEST_F(StanCommon, validate_unconstrained_initialization) {
+  using stan::common::validate_unconstrained_initialization;
   Eigen::VectorXd valid(inf_model.num_params_r());
   valid.setZero();
   
-  EXPECT_TRUE(check_finite_initialization(valid, inf_model));
+  EXPECT_TRUE(validate_unconstrained_initialization(valid, inf_model));
   
 
   Eigen::VectorXd invalid(inf_model.num_params_r());
@@ -425,33 +425,46 @@ TEST_F(StanCommon, check_finite_initialization) {
     
     std::stringstream expected_msg;
 
-    expected_msg << "param_" << i << " initialized to value violating constraint";
+    expected_msg << "param_" << i << " initialized to invalid value ("
+                 << invalid[i] << ")";
 
-    EXPECT_THROW_MSG(check_finite_initialization(invalid, inf_model), 
+    EXPECT_THROW_MSG(validate_unconstrained_initialization(invalid, inf_model), 
                      std::invalid_argument,
                      expected_msg.str());
   }
 
-  
+  for (int i = 0; i < invalid.size(); i++) {
+    invalid.setZero();
+    invalid[i] = std::numeric_limits<double>::quiet_NaN();
+    
+    std::stringstream expected_msg;
+
+    expected_msg << "param_" << i << " initialized to invalid value ("
+                 << invalid[i] << ")";
+
+    EXPECT_THROW_MSG(validate_unconstrained_initialization(invalid, inf_model), 
+                     std::invalid_argument,
+                     expected_msg.str());
+  }
 }
 
 TEST_F(StanCommon, initialize_state_source_inf) {
   init = "abcd";
   using stan::common::initialize_state_source;
-  EXPECT_TRUE(initialize_state_source(init,
-                                      cont_params,
-                                      inf_model,
-                                      rng,
-                                      &output,
-                                      context_factory));
+  EXPECT_FALSE(initialize_state_source(init,
+                                       cont_params,
+                                       inf_model,
+                                       rng,
+                                       &output,
+                                       context_factory));
   ASSERT_EQ(3, cont_params.size());
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), cont_params[0]);
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), cont_params[1]);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), cont_params[2]);
-  EXPECT_EQ(1, inf_model.templated_log_prob_calls);
+  EXPECT_EQ(0, inf_model.templated_log_prob_calls);
   EXPECT_EQ(1, inf_model.transform_inits_calls);
   EXPECT_EQ(0, rng.calls);
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ("param_0 initialized to invalid value (inf)\n", output.str());
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
 }

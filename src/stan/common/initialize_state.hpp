@@ -18,26 +18,29 @@
 #include <stan/common/context_factory.hpp>
 #include <stan/common/write_error_msg.hpp>
 #include <stan/math/functions/is_inf.hpp>
+#include <stan/math/functions/is_nan.hpp>
 
 namespace stan {
   namespace common {    
 
-    template <class Model>
-    bool check_finite_initialization(Eigen::VectorXd& cont_params,
-                                     Model& model) {
-      for (int n = 0; n < cont_params.size(); n++) {
-        if (stan::math::is_inf(cont_params[n])) {
-          std::vector<std::string> param_names;
-          model.unconstrained_param_names(param_names);
+    namespace {
+      template <class Model>
+      bool validate_unconstrained_initialization(Eigen::VectorXd& cont_params,
+                                                 Model& model) {
+        for (int n = 0; n < cont_params.size(); n++) {
+          if (stan::math::is_inf(cont_params[n]) || stan::math::is_nan(cont_params[n])) {
+            std::vector<std::string> param_names;
+            model.unconstrained_param_names(param_names);
           
-          std::stringstream msg;
-          msg << param_names[n] << " initialized to value violating constraint";
+            std::stringstream msg;
+            msg << param_names[n] << " initialized to invalid value (" 
+                << cont_params[n] << ")";
           
-          throw std::invalid_argument(msg.str());
-          return false;
+            throw std::invalid_argument(msg.str());
+          }
         }
+        return true;
       }
-      return true;
     }
     
     /**
@@ -54,10 +57,18 @@ namespace stan {
                                Model& model,
                                std::ostream* output) {
       cont_params.setZero();
-      
+
+      try {
+        validate_unconstrained_initialization(cont_params, model);
+      } catch (const std::exception& e) {
+        if (output)
+          *output << e.what() << std::endl;
+        return false;
+      }
+
       double init_log_prob;
       Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-      
+
       try {
         stan::model::gradient(model, cont_params, init_log_prob, init_grad, output);
       } catch (const std::exception& e) {
@@ -122,6 +133,14 @@ namespace stan {
         for (int i = 0; i < cont_params.size(); ++i) 
           cont_params(i) = init_rng();
 
+        try {
+          validate_unconstrained_initialization(cont_params, model);
+        } catch (const std::exception& e) {
+          if (output)
+            *output << e.what() << std::endl;
+          continue;
+        }
+        
         double init_log_prob;
         try {
           stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
@@ -137,7 +156,6 @@ namespace stan {
           if (!boost::math::isfinite(init_grad(i)))
             continue;
         break;
-            
       }
           
       if (num_init_tries > MAX_INIT_TRIES) {
@@ -186,6 +204,15 @@ namespace stan {
                   << std::endl << e.what() << std::endl;
         return false;
       }
+
+      try {
+        validate_unconstrained_initialization(cont_params, model);
+      } catch (const std::exception& e) {
+        if (output)
+          *output << e.what() << std::endl;
+        return false;
+      }
+      
       
       double init_log_prob;
       Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
