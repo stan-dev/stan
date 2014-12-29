@@ -45,7 +45,11 @@ that was read, and the constraint that was declared.
 After data is read into the model, the transformed data variable
 statements are executed in order to define the transformed data
 variables.  As the statements execute, declared constraints on
-variables are not enforced.
+variables are not enforced.  
+
+Transformed data variables are initialized with real values set to
+\code{NaN} and integer values set to the smallest integer (large
+absolute value negative number).
 
 After the statements are executed, all declared constraints on
 transformed data variables are validated.  If the validation fails,
@@ -1229,6 +1233,11 @@ For parameters, constraints are enforced by the transform applied and
 do not need to be checked.  For transformed parameters, the check is
 done after the statements in the transformed parameter block have
 executed.  
+
+For all blocks defining variables (transformed data, transformed
+parameters, generated quantities), real values are initialized to
+\code{NaN} and integer values are initialized to the smallest legal
+integer (i.e., a large absolute value negative number).
 
 For generated quantities, constraints are enforced after the
 statements in the generated quantities block have executed.

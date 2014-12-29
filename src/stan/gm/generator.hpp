@@ -2542,6 +2542,11 @@ namespace stan {
 
       generate_var_resizing(prog.derived_data_decl_.first, o);
       o << EOL;
+
+      o << INDENT2 << "double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());" << EOL;
+      o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
+      generate_init_vars(prog.derived_data_decl_.first, 2, o);
+
       bool include_sampling = false;
       bool is_var = false;
       bool is_fun_return = false;
@@ -2801,7 +2806,8 @@ namespace stan {
       o << EOL;
       o << INDENT << "void transform_inits(const stan::io::var_context& context__," << EOL;
       o << INDENT << "                     std::vector<int>& params_i__," << EOL;
-      o << INDENT << "                     std::vector<double>& params_r__) const {" << EOL;
+      o << INDENT << "                     std::vector<double>& params_r__," << EOL;
+      o << INDENT << "                     std::ostream* pstream__) const {" << EOL;
       o << INDENT2 << "stan::io::writer<double> writer__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "size_t pos__;" << EOL;
       o << INDENT2 << "(void) pos__; // dummy call to supress warning" << EOL;
@@ -2817,10 +2823,11 @@ namespace stan {
       o << INDENT << "}" << EOL2;
 
       o << INDENT << "void transform_inits(const stan::io::var_context& context," << EOL;
-      o << INDENT << "                     Eigen::Matrix<double,Eigen::Dynamic,1>& params_r) const {" << EOL;
+      o << INDENT << "                     Eigen::Matrix<double,Eigen::Dynamic,1>& params_r," << EOL;
+      o << INDENT << "                     std::ostream* pstream__) const {" << EOL;
       o << INDENT << "  std::vector<double> params_r_vec;" << EOL;
       o << INDENT << "  std::vector<int> params_i_vec;" << EOL;
-      o << INDENT << "  transform_inits(context, params_i_vec, params_r_vec);" << EOL;
+      o << INDENT << "  transform_inits(context, params_i_vec, params_r_vec, pstream__);" << EOL;
       o << INDENT << "  params_r.resize(params_r_vec.size());" << EOL;
       o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
       o << INDENT << "    params_r(i) = params_r_vec[i];" << EOL;
@@ -4192,6 +4199,12 @@ namespace stan {
       generate_comment("declare and define generated quantities",2,o);
       generate_local_var_decls(prog.generated_decl_.first,2,o,
                                is_var,is_fun_return); 
+
+      o << EOL;
+      o << INDENT2 << "double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());" << EOL;
+      o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
+      generate_init_vars(prog.generated_decl_.first, 2, o);
+
       o << EOL;
       generate_statements(prog.generated_decl_.second,2,o,include_sampling,
                           is_var,is_fun_return); 
