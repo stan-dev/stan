@@ -5,6 +5,7 @@
 #include <boost/random/variate_generator.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_integer_type.hpp>
 #include <stan/error_handling/scalar/check_bounded.hpp>
 #include <stan/error_handling/scalar/check_finite.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
@@ -32,6 +33,7 @@ namespace stan {
 
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
+      using stan::error_handling::check_integer_type;
       using stan::math::log1m;
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
@@ -49,10 +51,12 @@ namespace stan {
       check_bounded(function, "n", n, 0, 1);
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Random variable", n,
                              "Probability parameter", theta);
 
+      if (!is_same<scalar_type_helper<T_n>,int>)
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_prob>::value)
         return 0.0;
@@ -140,6 +144,7 @@ namespace stan {
       using stan::prob::include_summand;
       using stan::math::log1p;
       using stan::math::inv_logit;
+      using stan::check_integer_type;
       
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -152,6 +157,7 @@ namespace stan {
       // validate args (here done over var, which should be OK)
       check_bounded(function, "n", n, 0, 1);
       check_not_nan(function, "Logit transformed probability parameter", theta);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Random variable", n,
                              "Probability parameter", theta);
@@ -221,6 +227,7 @@ namespace stan {
       using stan::error_handling::check_bounded;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
+      using stan::check_integer_type;
           
       // Ensure non-zero argument lenghts
       if (!(stan::length(n) && stan::length(theta)))
@@ -231,6 +238,7 @@ namespace stan {
       // Validate arguments
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Random variable", n, 
                              "Probability parameter", theta);
@@ -284,7 +292,8 @@ namespace stan {
       using stan::error_handling::check_bounded;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-          
+      using stan::check_integer_type;
+      
       // Ensure non-zero argument lenghts
       if (!(stan::length(n) && stan::length(theta)))
         return 0.0;
@@ -294,6 +303,7 @@ namespace stan {
       // Validate arguments
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Random variable", n, 
                              "Probability parameter", theta);
@@ -344,6 +354,7 @@ namespace stan {
       using stan::error_handling::check_bounded;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
+      using stan::check_integer_type;
           
       // Ensure non-zero argument lenghts
       if (!(stan::length(n) && stan::length(theta)))
@@ -354,6 +365,7 @@ namespace stan {
       // Validate arguments
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Random variable", n, 
                              "Probability parameter", theta);

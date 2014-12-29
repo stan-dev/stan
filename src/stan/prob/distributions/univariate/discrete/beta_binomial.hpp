@@ -43,6 +43,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
+      using stan::check_integer_type;
 
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -55,6 +56,7 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_positive_finite(function, "First prior sample size parameter", alpha);
       check_positive_finite(function, "Second prior sample size parameter", beta);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Successes variable", n,
                              "Population size parameter", N,
@@ -194,6 +196,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
+      using stan::check_integer_type;
           
       // Ensure non-zero argument lengths
       if (!(stan::length(n) && stan::length(N) && stan::length(alpha) 
@@ -206,6 +209,7 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_positive_finite(function, "First prior sample size parameter", alpha);
       check_positive_finite(function, "Second prior sample size parameter", beta);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,                           
                              "Successes variable", n, 
                              "Population size parameter", N, 
@@ -319,6 +323,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
+      using stan::check_integer_type;
           
       // Ensure non-zero argument lengths
       if (!(stan::length(n) && stan::length(N) && stan::length(alpha) 
@@ -331,6 +336,7 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_positive_finite(function, "First prior sample size parameter", alpha);
       check_positive_finite(function, "Second prior sample size parameter", beta);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Successes variable", n, 
                              "Population size parameter", N, 
@@ -435,6 +441,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
+      using stan::check_integer_type;
           
       // Ensure non-zero argument lengths
       if (!(stan::length(n) && stan::length(N) && stan::length(alpha) 
@@ -447,6 +454,7 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_positive_finite(function, "First prior sample size parameter", alpha);
       check_positive_finite(function, "Second prior sample size parameter", beta);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Successes variable", n, 
                              "Population size parameter", N, 

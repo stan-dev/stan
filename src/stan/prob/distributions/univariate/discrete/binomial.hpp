@@ -31,6 +31,8 @@ namespace stan {
 
   namespace prob {
 
+    // typename boost::enable_if<is_same<scalar_type<T_n>,int> 
+    // && is_same<scalar_type<T_N>,int>,return_type<T_prob>::type>::type
     // Binomial(n|N,theta)  [N >= 0;  0 <= n <= N;  0 <= theta <= 1]
     template <bool propto,
               typename T_n,
@@ -51,6 +53,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
+      using stan::check_integer_type;
       
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -62,6 +65,7 @@ namespace stan {
       check_bounded(function, "Successes variable", n, 0, N);
       check_nonnegative(function, "Population size parameter", N);
       check_finite(function, "Probability parameter", theta);
+      check_integer_type(function,"Random variable", n);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
       check_consistent_sizes(function,
                              "Successes variable", n,
@@ -154,6 +158,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
+      using stan::check_integer_type;
       
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -165,6 +170,7 @@ namespace stan {
       check_bounded(function, "Successes variable", n, 0, N);
       check_nonnegative(function, "Population size parameter", N);
       check_finite(function, "Probability parameter", alpha);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Successes variable", n,
                              "Population size parameter", N,
@@ -253,6 +259,7 @@ namespace stan {
       using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
+      using stan::check_integer_type;
       using stan::prob::include_summand;
           
       // Ensure non-zero arguments lenghts
@@ -265,6 +272,7 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function, 
                              "Successes variable", n,
                              "Population size parameter", N, 
@@ -337,6 +345,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
+      using stan::check_integer_type;
           
       // Ensure non-zero arguments lenghts
       if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
@@ -348,6 +357,7 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function, 
                              "Successes variable", n, 
                              "Population size parameter", N, 
@@ -412,6 +422,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
+      using stan::check_integer_type;
           
       // Ensure non-zero arguments lenghts
       if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
@@ -423,6 +434,7 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
+      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Successes variable", n,
                              "Population size parameter", N,
