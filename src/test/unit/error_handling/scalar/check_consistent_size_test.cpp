@@ -14,7 +14,8 @@ TEST(ErrorHandlingScalar, checkConsistentSize) {
   Matrix<double,Dynamic,1> v1(4);
   EXPECT_EQ(4U, size_of(v1));
   EXPECT_TRUE(check_consistent_size(function, name1, v1, 4U));
-  EXPECT_THROW(check_consistent_size(function, name1, v1, 2U), std::domain_error);
+  EXPECT_THROW(check_consistent_size(function, name1, v1, 2U), 
+               std::invalid_argument);
 }
 
 TEST(ErrorHandlingScalar, checkConsistentSize_nan) {
@@ -32,5 +33,6 @@ TEST(ErrorHandlingScalar, checkConsistentSize_nan) {
   v1 << nan,nan,4,nan;
   EXPECT_EQ(4U, size_of(v1));
   EXPECT_TRUE(check_consistent_size(function, name1, v1, 4U));
-  EXPECT_THROW(check_consistent_size(function, name1, v1, 2U), std::domain_error);
+  EXPECT_THROW(check_consistent_size(function, name1, v1, 2U), 
+               std::invalid_argument);
 }

@@ -19,7 +19,7 @@ TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix) {
 
   EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
                                                           "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 
   x.resize(2,1);
   EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
@@ -37,7 +37,7 @@ TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix) {
                                                          "x", x));
   EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
                                                           "y", y),
-               std::domain_error);
+               std::invalid_argument);
 
 
   a.push_back(3.0);
@@ -45,7 +45,7 @@ TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix) {
 
   EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
                                                           "b", b),
-               std::domain_error);
+               std::invalid_argument);
 
   b.push_back(3.0);
   b.push_back(3.0);
@@ -77,7 +77,7 @@ TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix_nan) {
   y << nan, nan;
   EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
                                                           "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 
   x.resize(2,1);
   x << nan, nan;
@@ -95,14 +95,14 @@ TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix_nan) {
                                                          "x", x));
   EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
                                                           "y", y),
-               std::domain_error);
+               std::invalid_argument);
 
 
   a.push_back(nan);
   a.push_back(nan);
   EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
                                                           "b", b),
-               std::domain_error);
+               std::invalid_argument);
 
   b.push_back(nan);
   b.push_back(nan);

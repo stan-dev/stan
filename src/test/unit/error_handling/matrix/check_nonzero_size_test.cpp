@@ -16,7 +16,7 @@ TEST(ErrorHandlingMatrix, checkNonzeroSizeMatrix) {
   y.resize(0,0);
   EXPECT_THROW_MSG(check_nonzero_size("checkNonzeroSize",
                                       "y", y),
-                   std::domain_error, 
+                   std::invalid_argument, 
                    "has size 0");
 
   std::vector<double> a;
@@ -35,7 +35,7 @@ TEST(ErrorHandlingMatrix, checkNonzeroSizeMatrix) {
 
   a.resize(0);
   EXPECT_THROW_MSG(stan::error_handling::check_nonzero_size("checkNonzeroSize", "a", a), 
-                   std::domain_error,
+                   std::invalid_argument,
                    "has size 0");
 }
 
@@ -54,7 +54,7 @@ TEST(ErrorHandlingMatrix, checkNonzeroSizeMatrix_nan) {
 
   y.resize(0,0);
   EXPECT_THROW_MSG(stan::error_handling::check_nonzero_size("checkNonzeroSize", "y", y), 
-                   std::domain_error,
+                   std::invalid_argument,
                    "has size 0");
 
   std::vector<double> a;
@@ -72,6 +72,6 @@ TEST(ErrorHandlingMatrix, checkNonzeroSizeMatrix_nan) {
 
   a.resize(0);
   EXPECT_THROW_MSG(stan::error_handling::check_nonzero_size("checkNonzeroSize", "a", a), 
-                   std::domain_error,
+                   std::invalid_argument,
                    "has size 0");
 }

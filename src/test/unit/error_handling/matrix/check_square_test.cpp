@@ -10,7 +10,7 @@ TEST(ErrorHandlingMatrix, checkSquareMatrix) {
 
   y.resize(3, 2);
   EXPECT_THROW(stan::error_handling::check_square("checkSquareMatrix", "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 }
 
 TEST(ErrorHandlingMatrix, checkSquareMatrix_nan) {
@@ -25,5 +25,5 @@ TEST(ErrorHandlingMatrix, checkSquareMatrix_nan) {
   y.resize(3, 2);
   y << nan, nan, nan,nan, nan, nan;
   EXPECT_THROW(stan::error_handling::check_square("checkSquareMatrix", "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 }

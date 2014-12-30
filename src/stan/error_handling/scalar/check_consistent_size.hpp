@@ -2,7 +2,7 @@
 #define STAN__ERROR_HANDLING__SCALAR__CHECK_CONSISTENT_SIZE_HPP
 
 #include <sstream>
-#include <stan/error_handling/domain_error.hpp>
+#include <stan/error_handling/invalid_argument.hpp>
 #include <stan/meta/traits.hpp>
 
 namespace stan {
@@ -28,9 +28,9 @@ namespace stan {
           << "consistently sized;  all arguments must be scalars or "
           << "multidimensional values of the same shape.";
 
-      domain_error(function, name, x_size,
-              "dimension=",
-              msg.str());
+      invalid_argument(function, name, x_size,
+                       "dimension=",
+                       msg.str());
       
       return false;
     }

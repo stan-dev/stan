@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <stan/meta/traits.hpp>
-#include <stan/error_handling/domain_error.hpp>
+#include <stan/error_handling/invalid_argument.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
@@ -21,10 +21,10 @@ namespace stan {
       msg << ") has " << x.rows() << " rows and " 
           << x.cols() << " columns but it should be a vector so it should "
           << "either have 1 row or 1 column";
-      domain_error(function,
-              name,
-              typename scalar_type<T>::type(),
-              "(", msg.str());
+      invalid_argument(function,
+                       name,
+                       typename scalar_type<T>::type(),
+                       "(", msg.str());
       return false;
     }
 

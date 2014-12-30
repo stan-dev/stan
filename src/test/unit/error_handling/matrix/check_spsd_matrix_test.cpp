@@ -27,7 +27,7 @@ TEST(ErrorHandlingMatrix, checkSpsdNotSquare) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = 
     Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Zero(3,2);
   EXPECT_THROW(stan::error_handling::check_spsd_matrix("checkSpsdMatrix", "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 }
 
 TEST(ErrorHandlingMatrix, checkSpsdMatrixPosDef_nan) {

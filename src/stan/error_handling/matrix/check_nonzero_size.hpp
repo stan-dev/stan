@@ -4,7 +4,7 @@
 #include <string>
 #include <typeinfo>
 
-#include <stan/error_handling/domain_error.hpp>
+#include <stan/error_handling/invalid_argument.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/meta/traits.hpp>
 
@@ -14,7 +14,7 @@ namespace stan {
 
     /**
      * Return <code>true</code> if the specified matrix/vector is of
-     * non-zero size. Throws a std:domain_error otherwise. The message
+     * non-zero size. Throws a std:invalid_argument otherwise. The message
      * will indicate that the variable name "has size 0".
      *
      * NOTE: this will not throw if y contains nan values.
@@ -24,7 +24,7 @@ namespace stan {
      * @param name
      * @return <code>true</code> if the the specified matrix/vector is 
      * of non-zero size
-     * @throw std::domain_error if the specified matrix/vector is of
+     * @throw std::invalid_argument if the specified matrix/vector is of
      * non-zero size
      * @tparam T Type of scalar.
      */
@@ -38,9 +38,9 @@ namespace stan {
       if (y.size() > 0) 
         return true;
 
-      domain_error(function, name, size_t(), 
-              "has size ", 
-              ", but must have a non-zero size");
+      invalid_argument(function, name, size_t(), 
+                       "has size ", 
+                       ", but must have a non-zero size");
       return false;
     }
 

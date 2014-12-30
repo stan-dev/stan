@@ -17,12 +17,12 @@ TEST(ErrorHandlingMatrix, checkMultiplicableMatrix) {
   y.resize(1,2);
   EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
                                                          "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 
   x.resize(2,2);
   EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
                                                          "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 }
 
 TEST(ErrorHandlingMatrix, checkMultiplicableMatrix_nan) {
@@ -47,11 +47,11 @@ TEST(ErrorHandlingMatrix, checkMultiplicableMatrix_nan) {
   y << nan, nan;
   EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
                                                          "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 
   x.resize(2,2);
   x << nan, nan, nan, nan;
   EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
                                                          "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 }

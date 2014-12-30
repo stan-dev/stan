@@ -53,7 +53,7 @@ TEST(ErrorHandlingMatrix, checkCorrCholeskyMatrix) {
   y << 1, 2, 3, 4, 5, 6;
   EXPECT_THROW(check_cholesky_factor_corr("checkCorrCholeskyMatrix", 
                                           "y", y),
-               std::domain_error);
+               std::invalid_argument);
   y.resize(3,2);
   y << 
     1, 0,
@@ -61,12 +61,7 @@ TEST(ErrorHandlingMatrix, checkCorrCholeskyMatrix) {
     4, 5;
   EXPECT_THROW(check_cholesky_factor_corr("checkCorrCholeskyMatrix",
                                           "y", y),
-               std::domain_error);
-
-  y(0,1) = 1.5;
-  EXPECT_THROW(check_cholesky_factor_corr("checkCorrCholeskyMatrix", 
-                                          "y", y),
-               std::domain_error);
+               std::invalid_argument);
 
   // not unit vectors
   y.resize(3,3);

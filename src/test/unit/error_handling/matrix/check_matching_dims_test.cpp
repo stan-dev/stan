@@ -17,12 +17,12 @@ TEST(ErrorHandlingMatrix, checkMatchingDimsMatrix) {
   y.resize(1,2);
   EXPECT_THROW(stan::error_handling::check_matching_dims("checkMatchingDims", "x", x,
                                                          "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 
   x.resize(2,1);
   EXPECT_THROW(stan::error_handling::check_matching_dims("checkMatchingDims", "x", x,
                                                          "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 }
 
 TEST(ErrorHandlingMatrix, checkMatchingDimsMatrix_nan) {
@@ -45,11 +45,11 @@ TEST(ErrorHandlingMatrix, checkMatchingDimsMatrix_nan) {
   y << nan, nan;
   EXPECT_THROW(stan::error_handling::check_matching_dims("checkMatchingDims", "x", x,
                                                          "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 
   x.resize(2,1);
   x << nan, nan;
   EXPECT_THROW(stan::error_handling::check_matching_dims("checkMatchingDims", "x", x,
                                                          "y", y), 
-               std::domain_error);
+               std::invalid_argument);
 }
