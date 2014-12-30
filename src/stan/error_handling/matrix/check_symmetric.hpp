@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
@@ -51,7 +51,7 @@ namespace stan {
                  << name << "[" << stan::error_index::value +n << "," 
                  << stan::error_index::value + m 
                  << "] element is " << y(n,m);
-            dom_err(function, name, y(m,n), 
+            domain_error(function, name, y(m,n), 
                     msg1.str(), msg2.str());
             return false;
           }

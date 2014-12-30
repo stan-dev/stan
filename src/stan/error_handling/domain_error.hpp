@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING__SCALAR__DOM_ERR_HPP
-#define STAN__ERROR_HANDLING__SCALAR__DOM_ERR_HPP
+#ifndef STAN__ERROR_HANDLING__DOMAIN_ERROR_HPP
+#define STAN__ERROR_HANDLING__DOMAIN_ERROR_HPP
 
 #include <typeinfo>
 #include <string>
@@ -28,11 +28,11 @@ namespace stan {
      * @param msg2 Message to print after the variable
      */
     template <typename T>
-    inline void dom_err(const std::string& function,
-                        const std::string& name,
-                        const T& y,
-                        const std::string& msg1,
-                        const std::string& msg2) {
+    inline void domain_error(const std::string& function,
+                             const std::string& name,
+                             const T& y,
+                             const std::string& msg1,
+                             const std::string& msg2) {
       std::ostringstream message;
       
       message << function << "(" << typeid(T).name() << "): "
@@ -62,11 +62,11 @@ namespace stan {
      * @param msg1 Message to print before the variable
      */
     template <typename T>
-    inline void dom_err(const std::string& function,
-                        const std::string& name,
-                        const T& y,
-                        const std::string& msg1) {
-      dom_err(function, name, y, msg1, "");
+    inline void domain_error(const std::string& function,
+                             const std::string& name,
+                             const T& y,
+                             const std::string& msg1) {
+      domain_error(function, name, y, msg1, "");
     }
 
   }

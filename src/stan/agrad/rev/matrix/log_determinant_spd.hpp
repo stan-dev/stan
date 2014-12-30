@@ -2,7 +2,7 @@
 #define STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP
 
 #include <stan/agrad/rev.hpp> 
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/matrix/check_square.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
@@ -12,7 +12,7 @@ namespace stan {
 
     template <int R, int C>
     inline var log_determinant_spd(const Eigen::Matrix<var,R,C>& m) {
-      using stan::error_handling::dom_err;
+      using stan::error_handling::domain_error;
       using Eigen::Matrix;
 
       error_handling::check_square("log_determinant_spd", "m", m);
@@ -24,7 +24,7 @@ namespace stan {
       Eigen::LDLT<Matrix<double,R,C> > ldlt(m_d);
       if (ldlt.info() != Eigen::Success) {
         double y = 0;
-        dom_err("log_determinant_spd",
+        domain_error("log_determinant_spd",
                 "matrix argument", y,
                 "failed LDLT factorization");
       }
@@ -35,7 +35,7 @@ namespace stan {
           
       if (ldlt.isNegative() || (ldlt.vectorD().array() <= 1e-16).any()) {
         double y = 0;
-        dom_err("log_determinant_spd",
+        domain_error("log_determinant_spd",
                 "matrix argument", y,
                 "matrix is negative definite");
       }
@@ -44,7 +44,7 @@ namespace stan {
 
       if (!boost::math::isfinite(val)) {
         double y = 0;
-        dom_err("log_determinant_spd",
+        domain_error("log_determinant_spd",
                 "matrix argument", y,
                 "log determininant is infinite");
       }

@@ -2,7 +2,7 @@
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_SIMPLEX_HPP
 
 #include <sstream>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
@@ -41,7 +41,7 @@ namespace stan {
         std::stringstream msg;
         msg << "is not a valid simplex. " 
             << "length(" << name << ") = ";
-        dom_err(function, name, 0,
+        domain_error(function, name, 0,
                 msg.str());
         return false;
       }
@@ -52,7 +52,7 @@ namespace stan {
         msg.precision(10);
         msg << " sum(" << name << ") = " << sum
             << ", but should be ";
-        dom_err(function, name, 1.0,
+        domain_error(function, name, 1.0,
                 msg.str());
          return false;
       }
@@ -62,7 +62,7 @@ namespace stan {
           msg << "is not a valid simplex. "
                  << name << "[" << n + stan::error_index::value << "]"
                  << " = ";
-          dom_err(function, name, theta[n],
+          domain_error(function, name, theta[n],
                   msg.str(), 
                   ", but should be greater than or equal to 0");
           return false;

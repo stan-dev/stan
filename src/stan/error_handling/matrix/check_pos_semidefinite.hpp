@@ -5,7 +5,7 @@
 
 #include <boost/math/special_functions/fpclassify.hpp>
 
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
@@ -44,7 +44,7 @@ namespace stan {
         std::ostringstream msg;
         msg << "is not positive semi-definite. " 
             << name << "(0,0) is ";
-        dom_err(function, name, y(0,0),
+        domain_error(function, name, y(0,0),
                 msg.str());
       }
       Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
@@ -53,7 +53,7 @@ namespace stan {
         std::ostringstream msg;
         msg << "is not positive semi-definite. " 
             << name << "(0,0) is ";
-        dom_err(function, name, y(0,0),
+        domain_error(function, name, y(0,0),
                 msg.str());
       }
       for (int i = 0; i < y.size(); i++)
@@ -61,7 +61,7 @@ namespace stan {
           std::ostringstream msg;
           msg << "is not positive semi-definite. " 
                   << name << "(0,0) is ";
-          dom_err(function, name, y(0,0), 
+          domain_error(function, name, y(0,0), 
                   msg.str(), "");
         }
       return true;

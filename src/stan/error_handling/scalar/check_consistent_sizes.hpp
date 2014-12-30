@@ -2,7 +2,7 @@
 #define STAN__ERROR_HANDLING__SCALAR__CHECK_CONSISTENT_SIZES_HPP
 
 #include <stan/error_handling/scalar/check_consistent_size.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/meta/traits.hpp>
 
 namespace stan {

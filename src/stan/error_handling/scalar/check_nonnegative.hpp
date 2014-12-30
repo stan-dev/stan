@@ -1,8 +1,8 @@
 #ifndef STAN__ERROR_HANDLING__SCALAR__CHECK_NONNEGATIVE_HPP
 #define STAN__ERROR_HANDLING__SCALAR__CHECK_NONNEGATIVE_HPP
 
-#include <stan/error_handling/scalar/dom_err.hpp>
-#include <stan/error_handling/scalar/dom_err_vec.hpp>
+#include <stan/error_handling/domain_error.hpp>
+#include <stan/error_handling/domain_error_vec.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/meta/value_type.hpp>
@@ -20,7 +20,7 @@ namespace stan {
           // have to use not is_unsigned. is_signed will be false
           // floating point types that have no unsigned versions.
           if (!boost::is_unsigned<T_y>::value && !(y >= 0)) 
-            dom_err(function, name, y, 
+            domain_error(function, name, y, 
                     "is ", ", but must be >= 0!");
           return true;
         }
@@ -37,7 +37,7 @@ namespace stan {
           for (size_t n = 0; n < length(y); n++) {
             if (!boost::is_unsigned<typename value_type<T_y>::type>::value 
                 && !(stan::get(y,n) >= 0)) 
-              dom_err_vec(function, name, y, n,
+              domain_error_vec(function, name, y, n,
                           "is ", ", but must be >= 0!");
           }
           return true;

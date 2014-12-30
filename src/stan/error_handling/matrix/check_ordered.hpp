@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/meta/traits.hpp>
@@ -46,7 +46,7 @@ namespace stan {
           std::ostringstream msg2;
           msg2 << ", but should be greater than the previous element, "
                << y[n-1];
-          dom_err(function, name, y[n],
+          domain_error(function, name, y[n],
                   msg1.str(), msg2.str());
           return false;
         }
@@ -70,7 +70,7 @@ namespace stan {
           std::ostringstream msg2;
           msg2 << ", but should be greater than the previous element, "
                << y[n-1];
-          dom_err(function, name, y[n],
+          domain_error(function, name, y[n],
                   msg1.str(), msg2.str());
           return false;
         }

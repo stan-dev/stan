@@ -4,7 +4,7 @@
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 
 namespace stan {
 
@@ -33,7 +33,7 @@ namespace stan {
             msg << "is not lower triangular;"
                 << " " << name << "[" << stan::error_index::value + m << "," 
                 << stan::error_index::value + n << "]=";
-            dom_err(function, name, y(m,n),
+            domain_error(function, name, y(m,n),
                     msg.str());
             return false;
           }

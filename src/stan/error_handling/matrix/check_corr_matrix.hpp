@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/error_handling/matrix/check_symmetric.hpp>
@@ -58,7 +58,7 @@ namespace stan {
               << name << "(" << stan::error_index::value + k 
               << "," << stan::error_index::value + k 
               << ") is "; ;
-          dom_err(function, name, y(k,k),
+          domain_error(function, name, y(k,k),
                   msg.str(),
                   ", but should be near 1.0");
           return false;

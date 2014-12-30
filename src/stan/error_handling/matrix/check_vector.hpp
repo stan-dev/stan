@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <stan/meta/traits.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
@@ -21,7 +21,7 @@ namespace stan {
       msg << ") has " << x.rows() << " rows and " 
           << x.cols() << " columns but it should be a vector so it should "
           << "either have 1 row or 1 column";
-      dom_err(function,
+      domain_error(function,
               name,
               typename scalar_type<T>::type(),
               "(", msg.str());

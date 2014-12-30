@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
 
 namespace stan {
@@ -28,7 +28,7 @@ namespace stan {
         msg << "is not positive definite. "
             << "last conditional variance is ";
         const T too_small = A.vectorD().tail(1)(0);
-        dom_err(function, name, too_small,
+        domain_error(function, name, too_small,
                 msg.str(), ".");
         return false;
       }

@@ -2,7 +2,7 @@
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_POSITIVE_ORDERED_HPP
 
 #include <sstream>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/meta/traits.hpp>
@@ -42,7 +42,7 @@ namespace stan {
             << " The element at " << stan::error_index::value 
             << " is ";
 
-        dom_err(function, name, y[0],
+        domain_error(function, name, y[0],
                 msg.str(), ", but should be postive.");
       }
       for (size_type n = 1; n < y.size(); n++) {
@@ -54,7 +54,7 @@ namespace stan {
           std::ostringstream msg2;
           msg2 << ", but should be greater than the previous element, "
                << y[n-1];
-          dom_err(function, name, y[n],
+          domain_error(function, name, y[n],
                   msg1.str(), msg2.str());
           return false;
         }

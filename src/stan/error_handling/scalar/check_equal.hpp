@@ -1,8 +1,8 @@
 #ifndef STAN__ERROR_HANDLING__SCALAR__CHECK_EQUAL_HPP
 #define STAN__ERROR_HANDLING__SCALAR__CHECK_EQUAL_HPP
 
-#include <stan/error_handling/scalar/dom_err.hpp>
-#include <stan/error_handling/scalar/dom_err_vec.hpp>
+#include <stan/error_handling/domain_error.hpp>
+#include <stan/error_handling/domain_error_vec.hpp>
 
 namespace stan {
   namespace error_handling {
@@ -23,7 +23,7 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be equal to ";
               msg << eq_vec[n];
-              dom_err(function, name, y,
+              domain_error(function, name, y,
                       "is ", msg.str());
             }
           }
@@ -47,7 +47,7 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be equal to ";
               msg << eq_vec[n];
-              dom_err_vec(function, name, y, n,
+              domain_error_vec(function, name, y, n,
                           "is ", msg.str());
             }
           }

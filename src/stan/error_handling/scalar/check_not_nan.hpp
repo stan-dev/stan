@@ -1,8 +1,8 @@
 #ifndef STAN__ERROR_HANDLING_CHECK_NOT_NAN_HPP
 #define STAN__ERROR_HANDLING_CHECK_NOT_NAN_HPP
 
-#include <stan/error_handling/scalar/dom_err.hpp>
-#include <stan/error_handling/scalar/dom_err_vec.hpp>
+#include <stan/error_handling/domain_error.hpp>
+#include <stan/error_handling/domain_error_vec.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/meta/traits.hpp>
 
@@ -16,7 +16,7 @@ namespace stan {
                           const std::string& name,
                           const T_y& y) {
           if ((boost::math::isnan)(y)) 
-            dom_err(function, name, y,
+            domain_error(function, name, y,
                     "is ", ", but must not be nan!");
           return true;
         }
@@ -30,7 +30,7 @@ namespace stan {
           // using stan::length;
           for (size_t n = 0; n < stan::length(y); n++) {
             if ((boost::math::isnan)(stan::get(y,n)))
-              dom_err_vec(function, name, y, n,
+              domain_error_vec(function, name, y, n,
                           "is ", ", but must not be nan!");
           }
           return true;

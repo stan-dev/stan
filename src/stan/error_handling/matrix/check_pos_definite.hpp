@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 
@@ -32,7 +32,7 @@ namespace stan {
         std::ostringstream msg;
         msg << "is not positive definite. " 
                 << name << "(0,0) is ";
-        dom_err(function, name, y(0,0), 
+        domain_error(function, name, y(0,0), 
                 msg.str());
       }
       for (int i = 0; i < y.size(); ++i)
@@ -46,7 +46,7 @@ namespace stan {
         std::ostringstream msg;
         msg << "is not positive definite. " 
                 << name << "(0,0) is ";
-        dom_err(function, name, y(0,0),
+        domain_error(function, name, y(0,0),
                 msg.str());
       }
       return true;

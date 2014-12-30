@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 
 namespace stan {
   namespace error_handling {
@@ -31,7 +31,7 @@ namespace stan {
       std::ostringstream msg;
       msg << ") must be greater than 0 and less than " 
           << y.rows();
-      dom_err(function, name, i,
+      domain_error(function, name, i,
               "(", msg.str());
       return false;
     }

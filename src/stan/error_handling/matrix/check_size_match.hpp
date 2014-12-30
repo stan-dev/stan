@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <boost/type_traits/common_type.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 
 namespace stan {
   namespace error_handling {
@@ -22,7 +22,7 @@ namespace stan {
       std::ostringstream msg;
       msg << ") and " 
           << name_j << " (" << j << ") must match in size";
-      dom_err(function, name_i, i,
+      domain_error(function, name_i, i,
               "(", msg.str());
       return false;
     }

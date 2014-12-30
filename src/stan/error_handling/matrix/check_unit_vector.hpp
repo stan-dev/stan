@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
@@ -27,7 +27,7 @@ namespace stan {
                            const std::string& name,
                            const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
       if (theta.size() == 0) {
-        dom_err(function, name, 0,
+        domain_error(function, name, 0,
                 "is not a valid unit vector. ",
                 " elements in the vector.");
       }
@@ -36,7 +36,7 @@ namespace stan {
         std::stringstream msg;
         msg << "is not a valid unit vector."
             << " The sum of the squares of the elements should be 1, but is ";
-        dom_err(function, name, ssq,
+        domain_error(function, name, ssq,
                 msg.str());
       }
       return true;

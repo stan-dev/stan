@@ -2,7 +2,7 @@
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_MATCHING_DIMS_HPP
 
 #include <sstream>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/error_handling/matrix/check_size_match.hpp>
 

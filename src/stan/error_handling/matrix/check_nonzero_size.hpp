@@ -4,7 +4,7 @@
 #include <string>
 #include <typeinfo>
 
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/meta/traits.hpp>
 
@@ -38,7 +38,7 @@ namespace stan {
       if (y.size() > 0) 
         return true;
 
-      dom_err(function, name, size_t(), 
+      domain_error(function, name, size_t(), 
               "has size ", 
               ", but must have a non-zero size");
       return false;

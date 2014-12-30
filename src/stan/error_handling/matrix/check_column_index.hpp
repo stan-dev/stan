@@ -2,7 +2,7 @@
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_COLUMN_INDEX_HPP
 
 #include <sstream>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
@@ -31,7 +31,7 @@ namespace stan {
       std::ostringstream msg;
       msg << ") must be greater than 0 and less than " 
           << y.cols();
-      dom_err(function, name, i,
+      domain_error(function, name, i,
               "(", msg.str());
       return false;
     }
