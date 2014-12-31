@@ -8,7 +8,7 @@ TEST(MathMatrix, eigenvalues_sym) {
   m1 << 1, 2, 3, 4, 5, 6;
 
   using stan::math::eigenvalues_sym;
-  EXPECT_THROW(eigenvalues_sym(m0),std::domain_error);
+  EXPECT_THROW(eigenvalues_sym(m0),std::invalid_argument);
   EXPECT_THROW(eigenvalues_sym(m1),std::domain_error);
 }
 

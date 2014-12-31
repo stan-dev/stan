@@ -129,19 +129,19 @@ TEST(MathMatrix, append_row) {
   for (int i = 3; i < 6; i++)
     EXPECT_EQ(cvec(i), v3(i-3));
     
-  EXPECT_THROW(append_row(m32, m33), std::domain_error);
-  EXPECT_THROW(append_row(m32, m23), std::domain_error);
-  EXPECT_THROW(append_row(m32, v3), std::domain_error);
-  EXPECT_THROW(append_row(m32, rv3), std::domain_error);
-  EXPECT_THROW(append_row(m33, m32), std::domain_error);
-  EXPECT_THROW(append_row(m23, m32), std::domain_error);
-  EXPECT_THROW(append_row(v3, m32), std::domain_error);
-  EXPECT_THROW(append_row(rv3, m32), std::domain_error);
+  EXPECT_THROW(append_row(m32, m33), std::invalid_argument);
+  EXPECT_THROW(append_row(m32, m23), std::invalid_argument);
+  EXPECT_THROW(append_row(m32, v3), std::invalid_argument);
+  EXPECT_THROW(append_row(m32, rv3), std::invalid_argument);
+  EXPECT_THROW(append_row(m33, m32), std::invalid_argument);
+  EXPECT_THROW(append_row(m23, m32), std::invalid_argument);
+  EXPECT_THROW(append_row(v3, m32), std::invalid_argument);
+  EXPECT_THROW(append_row(rv3, m32), std::invalid_argument);
   
-  EXPECT_THROW(append_row(v3, m33), std::domain_error);
-  EXPECT_THROW(append_row(v3, m32), std::domain_error);
-  EXPECT_THROW(append_row(v3, rv3), std::domain_error);
-  EXPECT_THROW(append_row(m33, v3), std::domain_error);
-  EXPECT_THROW(append_row(m32, v3), std::domain_error);
-  EXPECT_THROW(append_row(rv3, v3), std::domain_error);
+  EXPECT_THROW(append_row(v3, m33), std::invalid_argument);
+  EXPECT_THROW(append_row(v3, m32), std::invalid_argument);
+  EXPECT_THROW(append_row(v3, rv3), std::invalid_argument);
+  EXPECT_THROW(append_row(m33, v3), std::invalid_argument);
+  EXPECT_THROW(append_row(m32, v3), std::invalid_argument);
+  EXPECT_THROW(append_row(rv3, v3), std::invalid_argument);
 }

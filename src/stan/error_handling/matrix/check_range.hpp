@@ -3,36 +3,73 @@
 
 #include <sstream> 
 #include <stdexcept>
+#include <stan/error_handling/out_of_range.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace error_handling {
 
-    namespace {
-
-      void raise_range_error(size_t max,
-                             size_t i, 
-                             const std::string& msg,
-                             size_t idx) {
-        std::stringstream s;
-        s << "INDEX OPERATOR [] OUT OF BOUNDS"
-          << "; index=" << i
-          << "; lower bound=1"
-          << "; upper bound=" << max
-          << "; index position=" << idx
-          << "; " << msg
-          << std::endl;
-        throw std::out_of_range(s.str());
-      }
-
+    /**
+     * Checks to see if an index into a container is 
+     * within range. If the index is out of range, throws
+     * an <code>out_of_range</code> exception with the
+     * specified message.
+     *
+     */
+    inline bool check_range(const std::string& function,
+                            const std::string& name,  
+                            const size_t max,
+                            const size_t index,
+                            const size_t nested_level,
+                            const std::string& error_msg) {
+      if ((index >= stan::error_index::value) 
+          && (index < max + stan::error_index::value))
+        return true;
+      
+      std::stringstream msg;
+      msg << "; index position = " << nested_level;
+      
+      out_of_range(function, max, index, msg.str(), error_msg);
+      return false;
     }
 
-    inline
-    void check_range(size_t max,
-                     size_t i, 
-                     const std::string& msg,
-                     size_t idx) {
-      if (i < 1 || i > max) 
-        raise_range_error(max,i,msg,idx);
+    /**
+     * Checks to see if an index into a container is 
+     * within range. If the index is out of range, throws
+     * an <code>out_of_range</code> exception with the
+     * specified message.
+     *
+     */
+    inline bool check_range(const std::string& function,
+                            const std::string& name,  
+                            const size_t max,
+                            const size_t index,
+                            const std::string& error_msg) {
+      if ((index >= stan::error_index::value) 
+          && (index < max + stan::error_index::value))
+        return true;
+      
+      out_of_range(function, max, index, error_msg);
+      return false;
+    }
+
+    /**
+     * Checks to see if an index into a container is 
+     * within range. If the index is out of range, throws
+     * an <code>out_of_range</code> exception with the
+     * specified message.
+     *
+     */
+    inline bool check_range(const std::string& function,
+                            const std::string& name,  
+                            const size_t max,
+                            const size_t index) {
+      if ((index >= stan::error_index::value) 
+          && (index < max + stan::error_index::value))
+        return true;
+      
+      out_of_range(function, max, index);
+      return false;
     }
 
 

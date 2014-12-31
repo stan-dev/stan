@@ -4,6 +4,7 @@
 #include <sstream>
 #include <boost/type_traits/common_type.hpp>
 #include <stan/error_handling/invalid_argument.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace error_handling {
@@ -16,14 +17,14 @@ namespace stan {
                                  const std::string& name_j, 
                                  T_size2 j) {
       typedef typename boost::common_type<T_size1,T_size2>::type common_type;
-      if (static_cast<common_type>(i) == static_cast<common_type>(j))
+      if (likely(static_cast<common_type>(i) == static_cast<common_type>(j)))
         return true;
 
       std::ostringstream msg;
       msg << ") and " 
           << name_j << " (" << j << ") must match in size";
       invalid_argument(function, name_i, i,
-              "(", msg.str());
+                       "(", msg.str());
       return false;
     }
 

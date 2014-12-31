@@ -49,7 +49,7 @@ TEST(MathMatrixAssign,vectorDouble) {
     EXPECT_FLOAT_EQ(y[i],x[i]);
 
   vector<double> z(2);
-  EXPECT_THROW(assign(x,z), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
 
   vector<int> ns(3);
   ns[0] = 1;
@@ -114,18 +114,18 @@ TEST(MathMatrixAssign,eigenRowVectorShapeMismatch) {
   x[2] = -5.1;
 
   Matrix<double,1,Dynamic> z(2);
-  EXPECT_THROW(assign(x,z), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
 
   Matrix<double,Dynamic,1> zz(3);
   zz << 1, 2, 3;
-  EXPECT_THROW(assign(x,zz),std::domain_error);
+  EXPECT_THROW(assign(x,zz),std::invalid_argument);
   
   Matrix<double,Dynamic,Dynamic> zzz(3,1);
   zzz << 1, 2, 3;
-  EXPECT_THROW(assign(x,zzz),std::domain_error);
+  EXPECT_THROW(assign(x,zzz),std::invalid_argument);
 
   Matrix<double,Dynamic,Dynamic> zzzz(1,3);
-  EXPECT_THROW(assign(x,zzzz),std::domain_error);
+  EXPECT_THROW(assign(x,zzzz),std::invalid_argument);
 }
 
 
@@ -177,18 +177,18 @@ TEST(MathMatrixAssign,eigenMatrixShapeMismatch) {
 
   Matrix<double,1,Dynamic> z(6);
   z << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,z), std::domain_error);
-  EXPECT_THROW(assign(z,x), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
+  EXPECT_THROW(assign(z,x), std::invalid_argument);
 
   Matrix<double,Dynamic,1> zz(6);
   zz << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,zz),std::domain_error);
-  EXPECT_THROW(assign(zz,x),std::domain_error);
+  EXPECT_THROW(assign(x,zz),std::invalid_argument);
+  EXPECT_THROW(assign(zz,x),std::invalid_argument);
   
   Matrix<double,Dynamic,Dynamic> zzz(6,1);
   zzz << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,zzz),std::domain_error);
-  EXPECT_THROW(assign(zzz,x),std::domain_error);
+  EXPECT_THROW(assign(x,zzz),std::invalid_argument);
+  EXPECT_THROW(assign(zzz,x),std::invalid_argument);
 
 }
 

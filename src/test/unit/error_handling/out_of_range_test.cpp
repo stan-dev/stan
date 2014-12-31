@@ -6,7 +6,6 @@ class ErrorHandlingScalar_out_of_range : public ::testing::Test {
 public:
   void SetUp() {
     function_ = "function";
-    y_name_ = "y";
     msg1_ = "error_message1 ";
     msg2_ = "error_message2 ";
   }
@@ -19,8 +18,7 @@ public:
                      << "accessing element out of range. "
                      << "index " << i << " out of range; "
                      << "expecting index to be between "
-                     << "1 and " << y.size() << " for " 
-                     << y_name_ << ".";
+                     << "1 and " << y.size();
     return expected_message.str();
   }
 
@@ -46,21 +44,20 @@ public:
   void test_throw(T y, size_t i) {
     using stan::error_handling::out_of_range;
     
-    EXPECT_THROW_MSG(out_of_range(function_, y_name_, y.size(), i, msg1_, msg2_),
+    EXPECT_THROW_MSG(out_of_range(function_, y.size(), i, msg1_, msg2_),
                      std::out_of_range,
                      expected_message_with_2_messages(y, i));
 
-    EXPECT_THROW_MSG(out_of_range(function_, y_name_, y.size(), i, msg1_),
+    EXPECT_THROW_MSG(out_of_range(function_, y.size(), i, msg1_),
                      std::out_of_range,
                      expected_message_with_1_message(y, i));
 
-    EXPECT_THROW_MSG(out_of_range(function_, y_name_, y.size(), i),
+    EXPECT_THROW_MSG(out_of_range(function_, y.size(), i),
                      std::out_of_range,
                      expected_message_with_0_messages(y, i));
   }
 
   std::string function_;
-  std::string y_name_;
   std::string msg1_;
   std::string msg2_;
 };

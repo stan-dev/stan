@@ -16,12 +16,12 @@ TEST(ErrorHandlingMatrix, checkRowIndexMatrix) {
   y.resize(2, 3);
   EXPECT_THROW(stan::error_handling::check_row_index("checkRowIndexMatrix",
                                                      "i", y, i), 
-               std::domain_error);
+               std::out_of_range);
 
   i=0;
   EXPECT_THROW(stan::error_handling::check_row_index("checkRowIndexMatrix",
                                                      "i", y, i), 
-               std::domain_error);
+               std::out_of_range);
 }
 
 TEST(ErrorHandlingMatrix, checkRowIndexMatrix_nan) {
@@ -42,10 +42,10 @@ TEST(ErrorHandlingMatrix, checkRowIndexMatrix_nan) {
   y << nan, nan, nan,nan, nan, nan;
   EXPECT_THROW(stan::error_handling::check_row_index("checkRowIndexMatrix",
                                                      "i", y, i), 
-               std::domain_error);
+               std::out_of_range);
 
   i=0;
   EXPECT_THROW(stan::error_handling::check_row_index("checkRowIndexMatrix",
                                                      "i", y, i), 
-               std::domain_error);
+               std::out_of_range);
 }

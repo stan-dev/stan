@@ -16,9 +16,9 @@ namespace stan {
      */
     template <typename T>
     inline size_t rank(const std::vector<T> & v, int s) {
-      size_t size = v.size();
       using stan::error_handling::check_range;
-      check_range(size,s,"in the function rank(v,s)",s);
+      size_t size = v.size();
+      check_range("rank", "v", size, s);
       s--;
       size_t count(0U);
       T compare(v[s]);
@@ -35,9 +35,10 @@ namespace stan {
      */
     template <typename T, int R, int C>
     inline size_t rank(const Eigen::Matrix<T,R,C> & v, int s) {
-      size_t size = v.size();
       using stan::error_handling::check_range;
-      check_range(size,s,"in the function rank(v,s)",s);
+      size_t size = v.size();
+
+      check_range("rank", "v", size, s);
       s--;
       const T * vv = v.data();
       size_t count(0U);

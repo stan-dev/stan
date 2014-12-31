@@ -7,5 +7,5 @@ TEST(MathMatrix, inverse_exception) {
   m1 << 1, 2, 3, 4, 5, 6;
 
   using stan::math::inverse;
-  EXPECT_THROW(inverse(m1),std::domain_error);
+  EXPECT_THROW(inverse(m1),std::invalid_argument);
 }

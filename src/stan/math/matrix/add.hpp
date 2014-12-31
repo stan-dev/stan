@@ -18,7 +18,7 @@ namespace stan {
      * @param m1 First matrix.
      * @param m2 Second matrix.  
      * @return Sum of the matrices.
-     * @throw std::domain_error if m1 and m2 do not have the same
+     * @throw std::invalid_argument if m1 and m2 do not have the same
      * dimensions.
      */
     template <typename T1, typename T2, int R, int C>

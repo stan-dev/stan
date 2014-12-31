@@ -19,17 +19,15 @@ namespace stan {
      *
      * The message is:
      * "<function>: index <index> out of range; expecting index to be between "
-     * "1 and <max> for <name>.<msg1><msg2>"
+     * "1 and <max><msg1><msg2>"
      *
      * @param function Name of the function
-     * @param name Name of the variable
      * @param max Max
      * @param index Index
      * @param msg1 Message to print
      * @param msg2 Message to print
      */
     inline void out_of_range(const std::string& function,
-                             const std::string& name,
                              const int max,
                              const int index,
                              const std::string& msg1,
@@ -41,7 +39,6 @@ namespace stan {
               << "expecting index to be between "
               << stan::error_index::value << " and " 
               << stan::error_index::value - 1 + max
-              << " for " << name << "."
               << msg1
               << msg2;
 
@@ -58,20 +55,18 @@ namespace stan {
      *
      * The message is:
      * "<function>: index <index> out of range; expecting index to be between "
-     * "1 and <max> for <name>.<msg1>"
+     * "1 and <max><msg1>"
      *
      * @param function Name of the function
-     * @param name Name of the variable
      * @param max Max
      * @param index Index
      * @param msg1 Message to print
      */
     inline void out_of_range(const std::string& function,
-                             const std::string& name,
                              const int max,
                              const int index,
                              const std::string& msg1) {
-      out_of_range(function, name, max, index, msg1, "");
+      out_of_range(function, max, index, msg1, "");
     }
 
 
@@ -85,18 +80,16 @@ namespace stan {
      *
      * The message is:
      * "<function>: index <index> out of range; expecting index to be between "
-     * "1 and <max> for <name>."
+     * "1 and <max>"
      *
      * @param function Name of the function
-     * @param name Name of the variable
      * @param index Index
      * @param max Max
      */
     inline void out_of_range(const std::string& function,
-                             const std::string& name,
                              const int max,
                              const int index) {
-      out_of_range(function, name, max, index, "", "");
+      out_of_range(function, max, index, "", "");
     }
 
   }

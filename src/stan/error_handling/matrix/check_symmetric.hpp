@@ -52,7 +52,7 @@ namespace stan {
                  << stan::error_index::value + m 
                  << "] element is " << y(n,m);
             domain_error(function, name, y(m,n), 
-                    msg1.str(), msg2.str());
+                         msg1.str(), msg2.str());
             return false;
           }
         }

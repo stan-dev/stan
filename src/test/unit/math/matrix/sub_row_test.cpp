@@ -25,7 +25,7 @@ TEST(MathMatrixSubRow,SubRow3) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_row(m,1,1,7), std::domain_error);
+  EXPECT_THROW(sub_row(m,1,1,7), std::out_of_range);
 }
 TEST(MathMatrixSubRow,SubRow4) {
   using stan::math::sub_row;
@@ -33,7 +33,7 @@ TEST(MathMatrixSubRow,SubRow4) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_row(m,7,1,1), std::domain_error);
+  EXPECT_THROW(sub_row(m,7,1,1), std::out_of_range);
 }
 TEST(MathMatrixSubRow,SubRow5) {
   using stan::math::sub_row;
@@ -41,7 +41,7 @@ TEST(MathMatrixSubRow,SubRow5) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_row(m,1,7,1), std::domain_error);
+  EXPECT_THROW(sub_row(m,1,7,1), std::out_of_range);
 }
 TEST(MathMatrixSubRow,SubRow6) {
   using stan::math::sub_row;

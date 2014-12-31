@@ -2,8 +2,9 @@
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_ROW_INDEX_HPP
 
 #include <sstream>
+#include <stan/error_handling/out_of_range.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/domain_error.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace error_handling {
@@ -25,14 +26,16 @@ namespace stan {
                                 const std::string& name, 
                                 const Eigen::Matrix<T_y,R,C>& y, 
                                 size_t i) {
-      if ((i > 0) && (i <= static_cast<size_t>(y.rows())))
+      if ((i >= stan::error_index::value) 
+          && (i < static_cast<size_t>(y.rows()) + stan::error_index::value))
         return true;
       
-      std::ostringstream msg;
-      msg << ") must be greater than 0 and less than " 
-          << y.rows();
-      domain_error(function, name, i,
-              "(", msg.str());
+      std::stringstream msg;
+      msg << " for rows of " << name;
+      out_of_range(function, 
+                   static_cast<int>(y.rows()),
+                   static_cast<int>(i), 
+                   msg.str());
       return false;
     }
 
