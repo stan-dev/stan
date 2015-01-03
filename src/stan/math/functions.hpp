@@ -9,6 +9,7 @@
 #include <stan/math/functions/bessel_second_kind.hpp>
 #include <stan/math/functions/binary_log_loss.hpp>
 #include <stan/math/functions/binomial_coefficient_log.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/digamma.hpp>
 #include <stan/math/functions/dist.hpp>
 #include <stan/math/functions/divide.hpp>
@@ -63,6 +64,7 @@
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/owens_t.hpp>
 #include <stan/math/functions/primitive_value.hpp>
+#include <stan/math/functions/rep_array.hpp>
 #include <stan/math/functions/rising_factorial.hpp>
 #include <stan/math/functions/scaled_add.hpp>
 #include <stan/math/functions/square.hpp>
