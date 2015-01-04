@@ -9,7 +9,7 @@
 #include <stan/agrad/rev/internal/vvv_vari.hpp>
 #include <stan/agrad/rev/internal/vvd_vari.hpp>
 #include <stan/agrad/rev/internal/vdv_vari.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/meta/likely.hpp>
 

@@ -2,7 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <test/unit/agrad/fwd/nan_util.hpp>
 
 TEST(AgradFwdAsin,Fvar) {
