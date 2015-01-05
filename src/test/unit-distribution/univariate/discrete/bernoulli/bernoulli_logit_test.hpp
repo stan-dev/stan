@@ -65,48 +65,38 @@ public:
   }
 
   template <class T_n, class T_prob, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_n, T_prob>::type 
   log_prob(const T_n& n, const T_prob& theta, const T2&,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::bernoulli_logit_log(n, theta);
   }
 
   template <bool propto, 
-      class T_n, class T_prob, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            class T_n, class T_prob, typename T2,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_n, T_prob>::type 
   log_prob(const T_n& n, const T_prob& theta, const T2&,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::bernoulli_logit_log<propto>(n, theta);
   }
   
   
   template <class T_n, class T_prob, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_n& n, const T_prob& theta, const T2&,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_n, T_prob>::type 
+  log_prob_function(const T_n& n, const T_prob& theta, const T2&,
+                    const T3&, const T4&, const T5&) {
     using std::log;
     using stan::math::log1m;
-    using stan::prob::include_summand;
-
-    if (include_summand<true,T_prob>::value) {
-      T_prob ntheta = (2*n-1) * theta;
-      // Handle extreme values gracefully using Taylor approximations.
-      const static double cutoff = 20.0;
-      if (ntheta > cutoff)
-  return -exp(-ntheta);
-      else if (ntheta < -cutoff)
-  return ntheta;
-      else
-  return -log(1 + exp(-ntheta));
-    }
+    T_prob ntheta = (2*n-1) * theta;
+    const static double cutoff = 20.0;
+    if (ntheta > cutoff)
+      return -exp(-ntheta);
+    else if (ntheta < -cutoff)
+      return ntheta;
+    else
+      return -log(1 + exp(-ntheta));
     return 0.0;
   }
 };

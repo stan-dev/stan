@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd.hpp>
 #include <stan/math/functions/inv.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <test/unit/agrad/fwd/nan_util.hpp>

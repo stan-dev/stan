@@ -5,6 +5,7 @@
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/agrad/rev/functions/fabs.hpp>
 #include <stan/agrad/rev/functions/log.hpp>
+#include <stan/agrad/rev/matrix/typedefs.hpp>
 
 TEST(AgradRevMatrix,log_determinant_diff) {
   using stan::agrad::matrix_v;

@@ -8,7 +8,7 @@
 #include <stan/error_handling/scalar/check_finite.hpp>
 #include <stan/error_handling/scalar/check_greater.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
@@ -45,6 +45,8 @@ namespace stan {
     typename return_type<T_y,T_low,T_high>::type
     uniform_log(const T_y& y, const T_low& alpha, const T_high& beta) {
       static const std::string function("stan::prob::uniform_log");
+      typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
+        T_partials_return;
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
@@ -59,7 +61,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
       check_not_nan(function, "Random variable", y);
       check_finite(function, "Lower bound parameter", alpha);
       check_finite(function, "Upper bound parameter", beta);
@@ -79,21 +81,22 @@ namespace stan {
       size_t N = max_size(y, alpha, beta);
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
         if (y_dbl < value_of(alpha_vec[n]) 
             || y_dbl > value_of(beta_vec[n]))
           return LOG_ZERO;
       }
 
-      DoubleVectorView<include_summand<propto,T_low,T_high>::value,
-        is_vector<T_low>::value | is_vector<T_high>::value> 
+      VectorBuilder<include_summand<propto,T_low,T_high>::value,
+                    T_partials_return, T_low, T_high>
         inv_beta_minus_alpha(max_size(alpha,beta));
       for (size_t i = 0; i < max_size(alpha,beta); i++) 
         if (include_summand<propto,T_low,T_high>::value)
           inv_beta_minus_alpha[i] 
             = 1.0 / (value_of(beta_vec[i]) - value_of(alpha_vec[i]));
-      DoubleVectorView<include_summand<propto,T_low,T_high>::value,
-        is_vector<T_low>::value | is_vector<T_high>::value> 
+
+      VectorBuilder<include_summand<propto,T_low,T_high>::value,
+                    T_partials_return, T_low, T_high>
         log_beta_minus_alpha(max_size(alpha,beta));
       for (size_t i = 0; i < max_size(alpha,beta); i++)
         if (include_summand<propto,T_low,T_high>::value)
@@ -111,7 +114,7 @@ namespace stan {
         if (!is_constant_struct<T_high>::value)
           operands_and_partials.d_x3[n] -= inv_beta_minus_alpha[n];
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,alpha,beta);
     }
 
     template <typename T_y, typename T_low, typename T_high>
@@ -125,6 +128,8 @@ namespace stan {
     typename return_type<T_y,T_low,T_high>::type
     uniform_cdf(const T_y& y, const T_low& alpha, const T_high& beta) {
       static const std::string function("stan::prob::uniform_cdf");
+      typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
+        T_partials_return;
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
@@ -139,7 +144,7 @@ namespace stan {
         return 1.0;
 
       // set up return value accumulator
-      double cdf(1.0);
+      T_partials_return cdf(1.0);
       check_not_nan(function, "Random variable", y);
       check_finite(function, "Lower bound parameter", alpha);
       check_finite(function, "Upper bound parameter", beta);
@@ -155,7 +160,7 @@ namespace stan {
       size_t N = max_size(y, alpha, beta);
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
         if (y_dbl < value_of(alpha_vec[n]) 
             || y_dbl > value_of(beta_vec[n]))
           return 0.0;
@@ -164,11 +169,11 @@ namespace stan {
       agrad::OperandsAndPartials<T_y,T_low,T_high> 
         operands_and_partials(y,alpha,beta);
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double beta_dbl = value_of(beta_vec[n]);
-        const double b_min_a = beta_dbl - alpha_dbl;
-        const double cdf_ = (y_dbl - alpha_dbl) / b_min_a;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);
+        const T_partials_return b_min_a = beta_dbl - alpha_dbl;
+        const T_partials_return cdf_ = (y_dbl - alpha_dbl) / b_min_a;
 
         //cdf
         cdf *= cdf_;
@@ -193,13 +198,15 @@ namespace stan {
         for (size_t n = 0; n < stan::length(beta); ++n) 
           operands_and_partials.d_x3[n] *= cdf;
 
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,alpha,beta);
     }
    
     template <typename T_y, typename T_low, typename T_high>
     typename return_type<T_y,T_low,T_high>::type
     uniform_cdf_log(const T_y& y, const T_low& alpha, const T_high& beta) {
       static const std::string function("stan::prob::uniform_cdf_log");
+      typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
+        T_partials_return;
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
@@ -214,7 +221,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
       check_not_nan(function, "Random variable", y);
       check_finite(function, "Lower bound parameter", alpha);
       check_finite(function, "Upper bound parameter", beta);
@@ -233,20 +240,20 @@ namespace stan {
         operands_and_partials(y,alpha,beta);
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
         if (y_dbl < value_of(alpha_vec[n]) 
             || y_dbl > value_of(beta_vec[n]))
           return stan::math::negative_infinity();
         if (y_dbl == value_of(beta_vec[n]))
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,alpha,beta);
       }
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double beta_dbl = value_of(beta_vec[n]);
-        const double b_min_a = beta_dbl - alpha_dbl;
-        const double cdf_log_ = (y_dbl - alpha_dbl) / b_min_a;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);
+        const T_partials_return b_min_a = beta_dbl - alpha_dbl;
+        const T_partials_return cdf_log_ = (y_dbl - alpha_dbl) / b_min_a;
 
         //cdf_log
         cdf_log += log(cdf_log_);
@@ -261,13 +268,15 @@ namespace stan {
           operands_and_partials.d_x3[n] -= 1.0 / b_min_a;
       }
 
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,alpha,beta);
     }
 
-  template <typename T_y, typename T_low, typename T_high>
+    template <typename T_y, typename T_low, typename T_high>
     typename return_type<T_y,T_low,T_high>::type
     uniform_ccdf_log(const T_y& y, const T_low& alpha, const T_high& beta) {
-    static const std::string function("stan::prob::uniform_ccdf_log");
+      static const std::string function("stan::prob::uniform_ccdf_log");
+      typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
+        T_partials_return;
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
@@ -282,7 +291,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
       check_not_nan(function, "Random variable", y);
       check_finite(function, "Lower bound parameter", alpha);
       check_finite(function, "Upper bound parameter", beta);
@@ -298,7 +307,7 @@ namespace stan {
       size_t N = max_size(y, alpha, beta);
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
         if (y_dbl < value_of(alpha_vec[n]) 
             || y_dbl > value_of(beta_vec[n]))
           return 0.0;
@@ -309,11 +318,11 @@ namespace stan {
       agrad::OperandsAndPartials<T_y,T_low,T_high> 
         operands_and_partials(y,alpha,beta);
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double beta_dbl = value_of(beta_vec[n]);
-        const double b_min_a = beta_dbl - alpha_dbl;
-        const double ccdf_log_ = 1.0 - (y_dbl - alpha_dbl) / b_min_a;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);
+        const T_partials_return b_min_a = beta_dbl - alpha_dbl;
+        const T_partials_return ccdf_log_ = 1.0 - (y_dbl - alpha_dbl) / b_min_a;
 
         //ccdf_log
         ccdf_log += log(ccdf_log_);
@@ -329,7 +338,7 @@ namespace stan {
             / b_min_a / ccdf_log_;
       }
 
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,alpha,beta);
     }
 
     template <class RNG>

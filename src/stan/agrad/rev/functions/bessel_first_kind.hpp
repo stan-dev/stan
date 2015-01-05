@@ -5,7 +5,7 @@
 #include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/internal/vd_vari.hpp>
 #include <stan/agrad/rev/internal/dv_vari.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/bessel_first_kind.hpp>
 
 namespace stan {

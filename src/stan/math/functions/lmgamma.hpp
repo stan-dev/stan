@@ -2,7 +2,7 @@
 #define STAN__MATH__FUNCTIONS__LMGAMMA_HPP
 
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 
 namespace stan {

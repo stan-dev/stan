@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/optimization/bfgs.hpp>
-#include <test/test-models/good/optimization/rosenbrock.cpp>
+#include <test/test-models/good/optimization/rosenbrock.hpp>
 
 
 typedef rosenbrock_model_namespace::rosenbrock_model Model;

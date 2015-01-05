@@ -42,18 +42,18 @@ stan.kdev4
 !/src/models/**/makefile
 
 # tests: compiled models
-/src/test/test-models/*.cpp
-/src/test/test-models/*/*.cpp
-/src/test/test-models/*/*/*.cpp
-/src/test/test-models/*/*/*/*.cpp
-/src/test/test-models/*/*/*/*/*.cpp
-/src/test/test-models/*/*/*/*/*/*.cpp
-/src/test/test-models/*/*/*/*/*/*/*.cpp
+/src/test/test-models/*.hpp
+/src/test/test-models/*/*.hpp
+/src/test/test-models/*/*/*.hpp
+/src/test/test-models/*/*/*/*.hpp
+/src/test/test-models/*/*/*/*/*.hpp
+/src/test/test-models/*/*/*/*/*/*.hpp
+/src/test/test-models/*/*/*/*/*/*/*.hpp
 !/src/test/test-models/**/*.stan
 !/src/test/test-models/**/.gitignore
 
 # tests: generated agrad tests
-/src/test/unit-distribution/*/*/*/*_generated_test.cpp
+/src/test/unit-distribution/*/*/*/*_generated_*_test.cpp
 
 # For the Mac
 *.DS_Store

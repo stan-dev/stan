@@ -2,7 +2,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <test/unit/agrad/rev/nan_util.hpp>
 

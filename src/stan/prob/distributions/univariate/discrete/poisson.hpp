@@ -10,8 +10,9 @@
 #include <stan/error_handling/scalar/check_less.hpp>
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/functions/gamma_q.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
@@ -25,6 +26,8 @@ namespace stan {
     template <bool propto, typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_log(const T_n& n, const T_rate& lambda) {
+      typedef typename stan::partials_return_type<T_n,T_rate>::type
+        T_partials_return;
 
       static const std::string function("stan::prob::poisson_log");
       
@@ -41,7 +44,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args
       check_nonnegative(function, "Random variable", n);
@@ -88,7 +91,7 @@ namespace stan {
       }
 
 
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,lambda);
     }
     
     template <typename T_n,
@@ -104,6 +107,8 @@ namespace stan {
               typename T_n, typename T_log_rate>
     typename return_type<T_log_rate>::type
     poisson_log_log(const T_n& n, const T_log_rate& alpha) {
+      typedef typename stan::partials_return_type<T_n,T_log_rate>::type
+        T_partials_return;
 
       static const std::string function("stan::prob::poisson_log_log");
       
@@ -121,7 +126,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args
       check_nonnegative(function, "Random variable", n);
@@ -152,12 +157,13 @@ namespace stan {
       agrad::OperandsAndPartials<T_log_rate> operands_and_partials(alpha);
 
       // FIXME: cache value_of for alpha_vec?  faster if only one?
-      DoubleVectorView<include_summand<propto,T_log_rate>::value,
-        is_vector<T_log_rate>::value>
+      VectorBuilder<include_summand<propto,T_log_rate>::value,
+                    T_partials_return, T_log_rate>
         exp_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
         if (include_summand<propto,T_log_rate>::value)
           exp_alpha[i] = exp(value_of(alpha_vec[i]));
+
       using stan::math::multiply_log;
       for (size_t i = 0; i < size; i++) {
         if (!(alpha_vec[i] == -std::numeric_limits<double>::infinity() 
@@ -172,7 +178,7 @@ namespace stan {
         if (!is_constant_struct<T_log_rate>::value)
           operands_and_partials.d_x1[i] += n_vec[i] - exp_alpha[i];
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,alpha);
     }
     
     template <typename T_n,
@@ -188,6 +194,8 @@ namespace stan {
     typename return_type<T_rate>::type
     poisson_cdf(const T_n& n, const T_rate& lambda) {
       static const std::string function("stan::prob::poisson_cdf");
+      typedef typename stan::partials_return_type<T_n,T_rate>::type 
+        T_partials_return;
           
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_nonnegative;
@@ -198,7 +206,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(lambda))) 
         return 1.0;
           
-      double P(1.0);
+      T_partials_return P(1.0);
           
       // Validate arguments
       check_not_nan(function, "Rate parameter", lambda);
@@ -214,46 +222,50 @@ namespace stan {
           
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
-          
+      using stan::math::gamma_q;
+      using boost::math::tgamma;
+      using std::exp;
+      using std::pow;
+
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
         
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,lambda);
       }
         
       for (size_t i = 0; i < size; i++) {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
-        if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity())
+        if (value_of(n_vec[i]) == std::numeric_limits<int>::max())
           continue;
           
-        const double n_dbl = value_of(n_vec[i]);
-        const double lambda_dbl = value_of(lambda_vec[i]);
-        const double Pi = gamma_q(n_dbl+1, lambda_dbl);
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return lambda_dbl = value_of(lambda_vec[i]);
+        const T_partials_return Pi = gamma_q(n_dbl+1, lambda_dbl);
 
         P *= Pi;
   
         if (!is_constant_struct<T_rate>::value)
-          operands_and_partials.d_x1[i] 
-            -= gamma_p_derivative(n_dbl + 1, lambda_dbl) / Pi;
+          operands_and_partials.d_x1[i] -= exp(-lambda_dbl) 
+            * pow(lambda_dbl,n_dbl) / tgamma(n_dbl+1) / Pi;
       }
       
       if (!is_constant_struct<T_rate>::value)
         for(size_t i = 0; i < stan::length(lambda); ++i) 
           operands_and_partials.d_x1[i] *= P;
       
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,lambda);
     }
 
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_cdf_log(const T_n& n, const T_rate& lambda) {
       static const std::string function("stan::prob::poisson_cdf_log");
+      typedef typename stan::partials_return_type<T_n,T_rate>::type 
+        T_partials_return;
           
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_nonnegative;
@@ -264,7 +276,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(lambda))) 
         return 0.0;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       // Validate arguments
       check_not_nan(function, "Rate parameter", lambda);
@@ -280,8 +292,10 @@ namespace stan {
           
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
+      using stan::math::gamma_q;
+      using boost::math::tgamma;
+      using std::exp;
+      using std::pow;
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
@@ -289,33 +303,37 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as neg infinity
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              lambda);
       }
         
       for (size_t i = 0; i < size; i++) {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
-        if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity())
+        if (value_of(n_vec[i]) == std::numeric_limits<int>::max())
           continue;
           
-        const double n_dbl = value_of(n_vec[i]);
-        const double lambda_dbl = value_of(lambda_vec[i]);
-        const double Pi = gamma_q(n_dbl+1, lambda_dbl);
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return lambda_dbl = value_of(lambda_vec[i]);
+        const T_partials_return Pi = gamma_q(n_dbl+1, lambda_dbl);
 
         P += log(Pi);
   
         if (!is_constant_struct<T_rate>::value)
-          operands_and_partials.d_x1[i] 
-            -= gamma_p_derivative(n_dbl + 1, lambda_dbl) / Pi;
+          operands_and_partials.d_x1[i] -= exp(-lambda_dbl) 
+            * pow(lambda_dbl,n_dbl) / tgamma(n_dbl+1) / Pi;
+
       }
       
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,lambda);
     }
 
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_ccdf_log(const T_n& n, const T_rate& lambda) {
       static const std::string function("stan::prob::poisson_ccdf_log");
+      typedef typename stan::partials_return_type<T_n,T_rate>::type 
+        T_partials_return;
           
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_nonnegative;
@@ -326,7 +344,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(lambda))) 
         return 0.0;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       // Validate arguments
       check_not_nan(function, "Rate parameter", lambda);
@@ -342,8 +360,10 @@ namespace stan {
           
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
+      using stan::math::gamma_q;
+      using boost::math::tgamma;
+      using std::exp;
+      using std::pow;
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
@@ -351,27 +371,29 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as neg infinity
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,lambda);
       }
         
       for (size_t i = 0; i < size; i++) {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
-        if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity())
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+        if (value_of(n_vec[i]) == std::numeric_limits<int>::max())
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              lambda);
           
-        const double n_dbl = value_of(n_vec[i]);
-        const double lambda_dbl = value_of(lambda_vec[i]);
-        const double Pi = 1.0 - gamma_q(n_dbl+1, lambda_dbl);
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return lambda_dbl = value_of(lambda_vec[i]);
+        const T_partials_return Pi = 1.0 - gamma_q(n_dbl+1, lambda_dbl);
 
         P += log(Pi);
   
         if (!is_constant_struct<T_rate>::value)
-          operands_and_partials.d_x1[i] 
-            += gamma_p_derivative(n_dbl + 1, lambda_dbl) / Pi;
+          operands_and_partials.d_x1[i] += exp(-lambda_dbl) 
+            * pow(lambda_dbl,n_dbl) / tgamma(n_dbl+1) / Pi;
+
       }
       
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,lambda);
     }
 
     static const double POISSON_MAX_RATE = pow(2,30);

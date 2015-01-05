@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/good/gm/reject_model.cpp>
+#include <test/test-models/good/gm/reject_model.hpp>
 
 /* tests that stan program throws exception in model block
-   this block gets compiled into .cpp model object's log_prob method
+   this block gets compiled into .hpp model object's log_prob method
 */
 
 TEST(StanCommon, reject_model) {

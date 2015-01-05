@@ -3,13 +3,12 @@
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <boost/utility/enable_if.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/error_handling/scalar/check_finite.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
@@ -39,10 +38,11 @@ namespace stan {
      */
     template <bool propto, 
               typename T_y, typename T_loc, typename T_scale>
-    typename boost::enable_if_c<is_var_or_arithmetic<T_y,T_loc,T_scale>::value,
-                                typename return_type<T_y,T_loc,T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const std::string function("stan::prob::normal_log");
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       using std::log;
       using stan::is_constant_struct;
@@ -60,7 +60,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
       check_not_nan(function, "Random variable", y);
@@ -75,15 +75,17 @@ namespace stan {
         return 0.0;
       
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
+      VectorBuilder<include_summand<propto,T_scale>::value, 
+                    T_partials_return, T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -92,13 +94,13 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
       
         // reusable subexpression values
-        const double y_minus_mu_over_sigma 
+        const T_partials_return y_minus_mu_over_sigma 
           = (y_dbl - mu_dbl) * inv_sigma[n];
-        const double y_minus_mu_over_sigma_squared 
+        const T_partials_return y_minus_mu_over_sigma_squared 
           = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
 
         static double NEGATIVE_HALF = - 0.5;
@@ -112,7 +114,7 @@ namespace stan {
           logp += NEGATIVE_HALF * y_minus_mu_over_sigma_squared;
 
         // gradients
-        double scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
+        T_partials_return scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= scaled_diff;
         if (!is_constant_struct<T_loc>::value)
@@ -121,7 +123,10 @@ namespace stan {
           operands_and_partials.d_x3[n] 
             += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
       }
-      return operands_and_partials.to_var(logp);
+
+      
+      return operands_and_partials.to_var(logp,y,mu,sigma);
+
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
@@ -131,7 +136,7 @@ namespace stan {
       return normal_log<false>(y,mu,sigma);
     }
 
-       /**
+    /**
      * Calculates the normal cumulative distribution function for the given
      * variate, location, and scale.
      * 
@@ -149,6 +154,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const std::string function("stan::prob::normal_cdf");
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+        T_partials_return;
 
       using stan::error_handling::check_positive;
       using stan::error_handling::check_finite;
@@ -157,7 +164,7 @@ namespace stan {
       using stan::error_handling::check_consistent_sizes;
       using stan::math::INV_SQRT_2;
 
-      double cdf(1.0);
+      T_partials_return cdf(1.0);
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -175,8 +182,8 @@ namespace stan {
                              "Scale parameter", sigma);
                              
 
-     agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
-       operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
@@ -185,11 +192,12 @@ namespace stan {
       const double SQRT_TWO_OVER_PI = std::sqrt(2.0 / stan::math::pi());
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
-        double cdf_;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) 
+          / (sigma_dbl * SQRT_2);
+        T_partials_return cdf_;
         if (scaled_diff < -37.5 * INV_SQRT_2)
           cdf_ = 0.0;
         else if (scaled_diff < -5.0 * INV_SQRT_2)
@@ -203,7 +211,7 @@ namespace stan {
         cdf *= cdf_;
 
         // gradients
-        const double rep_deriv = SQRT_TWO_OVER_PI * 0.5 
+        const T_partials_return rep_deriv = SQRT_TWO_OVER_PI * 0.5 
           * exp(-scaled_diff * scaled_diff) / cdf_ / sigma_dbl;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv;
@@ -223,13 +231,15 @@ namespace stan {
         for (size_t n = 0; n < stan::length(sigma); ++n) 
           operands_and_partials.d_x3[n] *= cdf;
 
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const std::string function("stan::prob::normal_cdf_log");
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+        T_partials_return;
 
       using stan::error_handling::check_positive;
       using stan::error_handling::check_finite;
@@ -238,7 +248,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::INV_SQRT_2;
 
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(mu) 
@@ -265,13 +275,14 @@ namespace stan {
     
       const double SQRT_TWO_OVER_PI = std::sqrt(2.0 / stan::math::pi());
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
 
-        const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) 
+          / (sigma_dbl * SQRT_2);
         
-        double one_p_erf;
+        T_partials_return one_p_erf;
         if (scaled_diff < -37.5 * INV_SQRT_2)
           one_p_erf = 0.0;
         else if (scaled_diff < -5.0 * INV_SQRT_2)
@@ -285,7 +296,7 @@ namespace stan {
         cdf_log += log_half + log(one_p_erf);
 
         // gradients
-        const double rep_deriv = SQRT_TWO_OVER_PI 
+        const T_partials_return rep_deriv = SQRT_TWO_OVER_PI 
           * exp(-scaled_diff * scaled_diff) / one_p_erf;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv / sigma_dbl;
@@ -295,13 +306,15 @@ namespace stan {
           operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff 
             * stan::math::SQRT_2 / sigma_dbl;
       }
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const std::string function("stan::prob::normal_ccdf_log");
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+        T_partials_return;
 
       using stan::error_handling::check_positive;
       using stan::error_handling::check_finite;
@@ -310,7 +323,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::INV_SQRT_2;
 
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(mu) 
@@ -337,13 +350,14 @@ namespace stan {
     
       const double SQRT_TWO_OVER_PI = std::sqrt(2.0 / stan::math::pi());
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
 
-        const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) 
+          / (sigma_dbl * SQRT_2);
         
-        double one_m_erf;
+        T_partials_return one_m_erf;
         if (scaled_diff < -37.5 * INV_SQRT_2)
           one_m_erf = 2.0;
         else if (scaled_diff < -5.0 * INV_SQRT_2)
@@ -357,7 +371,7 @@ namespace stan {
         ccdf_log += log_half + log(one_m_erf);
 
         // gradients
-        const double rep_deriv = SQRT_TWO_OVER_PI 
+        const T_partials_return rep_deriv = SQRT_TWO_OVER_PI 
           * exp(-scaled_diff * scaled_diff) / one_m_erf;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= rep_deriv / sigma_dbl;
@@ -367,7 +381,7 @@ namespace stan {
           operands_and_partials.d_x3[n] += rep_deriv * scaled_diff 
             * stan::math::SQRT_2 / sigma_dbl;
       }
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,mu,sigma);
     }
 
     template <class RNG>
