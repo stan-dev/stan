@@ -975,6 +975,53 @@ TEST(io_reader,cholesky_factor_constrain_jacobian_asymmetric) {
             lp);
 }
 
+TEST(io_reader, cholesky_corr) {
+  std::vector<int> theta_i;
+  std::vector<double> theta(9);
+  // column major
+  theta[0] = 1;
+  theta[1] = 0;
+  theta[2] = 0;
+
+  theta[3] = 0;
+  theta[4] = 1;
+  theta[5] = 0;
+
+  theta[6] = 0;
+  theta[7] = 0;
+  theta[8] = 1;
+  stan::io::reader<double> reader(theta, theta_i);
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S
+    = reader.cholesky_corr(3);
+  EXPECT_FLOAT_EQ(theta[0], S(0,0));
+  EXPECT_FLOAT_EQ(theta[1], S(1,0));
+  EXPECT_FLOAT_EQ(theta[4], S(1,1));
+  EXPECT_FLOAT_EQ(theta[7], S(1,2));
+  EXPECT_FLOAT_EQ(theta[8], S(2,2));
+}
+
+TEST(io_reader, cholesky_corr_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta(9);
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S;
+
+  // non lower-triangular
+  // column major
+  theta[0] = 1;
+  theta[1] = 0;
+  theta[2] = 0;
+
+  theta[3] = 0.5;
+  theta[4] = 1;
+  theta[5] = 0;
+
+  theta[6] = 0;
+  theta[7] = 0;
+  theta[8] = 1;
+  stan::io::reader<double> reader(theta, theta_i);
+  EXPECT_THROW(reader.cholesky_corr(3),
+               std::domain_error);
+}
 
 
 TEST(io_reader,eos_exception) {

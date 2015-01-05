@@ -995,8 +995,10 @@ namespace stan {
        * Cholesky factor for a correlation matrix.
        */
       inline matrix_t cholesky_corr(size_t K) {
+        using stan::error_handling::check_cholesky_factor_corr;
         matrix_t y(matrix(K,K));
-        stan::error_handling::check_cholesky_factor_corr("stan::io::cholesky_factor_corr", y, "Constrained matrix");
+        check_cholesky_factor_corr("stan::io::cholesky_factor_corr", 
+                                   "Constrained matrix", y);
         return y;
       }
 
