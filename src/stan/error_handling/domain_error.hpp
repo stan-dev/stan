@@ -26,6 +26,7 @@ namespace stan {
      * @param y Variable
      * @param msg1 Message to print before the variable
      * @param msg2 Message to print after the variable
+     * @throw std::domain_error
      */
     template <typename T>
     inline void domain_error(const std::string& function,
@@ -60,6 +61,7 @@ namespace stan {
      * @param name Name of the variable
      * @param y Variable
      * @param msg1 Message to print before the variable
+     * @throw std::domain_error
      */
     template <typename T>
     inline void domain_error(const std::string& function,

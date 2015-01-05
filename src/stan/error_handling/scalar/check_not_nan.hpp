@@ -39,12 +39,21 @@ namespace stan {
     }
 
     /**
-     * Checks if the variable y is nan.
+     * Return <code>true</code> if <code>y</code> is not
+     * <code>NaN</code>.
      *
-     * @param function Name of function being invoked.
-     * @param name Name of variable being tested.
-     * @param y Reference to variable being tested.
-     * @tparam T_y Type of variable being tested.
+     * This function is vectorized and will check each element of
+     * <code>y</code>. If any element is <code>NaN</code>, this
+     * function will throw an exception.
+     *
+     * @tparam T_y Type of y
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Variable to check
+     *
+     * @return <code>true</code> if y is not NaN.
+     * @throw <code>domain_error</code> if any element of y is NaN.
      */
     template <typename T_y>
     inline bool check_not_nan(const std::string& function,

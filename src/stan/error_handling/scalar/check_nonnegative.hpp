@@ -45,7 +45,23 @@ namespace stan {
       };
     }
 
-    // throws if any element in y is nan
+    /**
+     * Return <code>true</code> if <code>y</code> is non-negative.
+     *
+     * This function is vectorized and will check each element of
+     * <code>y</code>. If any element is <code>NaN</code>, this
+     * function will throw an exception.
+     *
+     * @tparam T_y Type of y
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Variable to check
+     *
+     * @return <code>true</code> if y is greater than or equal to 0.
+     * @throw <code>domain_error</code> if y is negative or
+     *   if any element of y is NaN.
+     */
     template <typename T_y>
     inline bool check_nonnegative(const std::string& function,
                                   const std::string& name,

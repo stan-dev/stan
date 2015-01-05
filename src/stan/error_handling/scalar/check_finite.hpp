@@ -17,7 +17,7 @@ namespace stan {
                           const T_y& y) {
           if (!(boost::math::isfinite)(y))
             domain_error(function, name, y,
-                    "is ", ", but must be finite!");
+                         "is ", ", but must be finite!");
           return true;
         }
       };
@@ -31,7 +31,7 @@ namespace stan {
           for (size_t n = 0; n < length(y); n++) {
             if (!(boost::math::isfinite)(stan::get(y,n)))
               domain_error_vec(function, name, y, n,
-                          "is ", ", but must be finite!");
+                               "is ", ", but must be finite!");
           }
           return true;
         }
@@ -39,8 +39,21 @@ namespace stan {
     }
     
     /**
-     * Checks if the variable y is finite.
-     * NOTE: throws if any element in y is nan.
+     * Return <code>true</code> if <code>y</code> is finite.
+     *
+     * This function is vectorized and will check each element of
+     * <code>y</code>. If any element is <code>NaN</code>, this
+     * function will throw an exception.
+     *
+     * @tparam T_y Type of y
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Variable to check
+     *
+     * @return <code>true</code> if y is finite.
+     * @throw <code>domain_error</code> if y is infinity, -infinity, or
+     *   NaN.
      */
     template <typename T_y>
     inline bool check_finite(const std::string& function,

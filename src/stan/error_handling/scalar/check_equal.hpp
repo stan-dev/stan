@@ -55,6 +55,33 @@ namespace stan {
         }
       };
     }
+
+    /**
+     * Return <code>true</code> if <code>y</code> is equal to
+     * <code>eq</code>.
+     *
+     * This function is vectorized over both <code>y</code> and
+     * <code>eq</code>. If both <code>y</code> and <code>eq</code> are
+     * scalar or vector-like, then each element is compared in order.
+     * If one of <code>y</code> or <code>eq</code> are vector and the
+     * other is scalar, then the scalar is broadcast to the size of
+     * the vector.
+     *
+     * If any element of <code>y</code> or <code>eq</code> is <code>NaN</code>
+     * this function will throw an exception.
+     *
+     * @tparam T_y Type of variable
+     * @tparam T_eq Type of comparison
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Variable to check equality
+     * @param eq Expected value for y
+     *
+     * @return <code>true</code> if y is equal to eq
+     * @throw <code>domain_error</code> if y is unequal to eq or 
+     *    if any element of y or eq is NaN.
+     */
     template <typename T_y, typename T_eq>
     inline bool check_equal(const std::string& function,
                             const std::string& name,

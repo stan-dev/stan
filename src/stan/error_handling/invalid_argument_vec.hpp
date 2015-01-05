@@ -28,8 +28,10 @@ namespace stan {
      * @param function Name of the function
      * @param name Name of the variable
      * @param y Variable
+     * @param i Index
      * @param msg1 Message to print before the variable
      * @param msg2 Message to print after the variable
+     * @throw std::invalid_argument
      */
     template <typename T>
     inline void invalid_argument_vec(const std::string& function,
@@ -62,7 +64,9 @@ namespace stan {
      * @param function Name of the function
      * @param name Name of the variable
      * @param y Variable
+     * @param i Index
      * @param msg Message to print before the variable
+     * @throw std::invalid_argument
      */
     template <typename T>
     inline void invalid_argument_vec(const std::string& function,

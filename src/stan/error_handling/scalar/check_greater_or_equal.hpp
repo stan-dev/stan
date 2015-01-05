@@ -55,7 +55,27 @@ namespace stan {
       };
     }
     
-    // throws if any element in y or low is nan
+    /**
+     * Return <code>true</code> if <code>y</code> is greater or equal
+     * than <code>low</code>.
+     *
+     * This function is vectorized and will check each element of
+     * <code>y</code> against each element of <code>low</code>. If any
+     * element is <code>NaN</code>, this function will throw an
+     * exception.
+     *
+     * @tparam T_y Type of y
+     * @tparam T_low Type of lower bound
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Variable to check
+     * @param low Lower bound
+     *
+     * @return <code>true</code> if y is greater or equal than low.
+     * @throw <code>domain_error</code> if y is not greater or equal to low or 
+     *   if any element of y or low is NaN.
+     */
     template <typename T_y, typename T_low>
     inline bool check_greater_or_equal(const std::string& function,
                                        const std::string& name,

@@ -69,7 +69,25 @@ namespace stan {
       };
     }
 
-    // public check_bounded function
+    /**
+     * Return <code>true</code if the value is between the low and high
+     * values, inclusively.
+     *
+     * @tparam T_y Type of value
+     * @tparam T_low Type of low value
+     * @tparam T_high Type of high value
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Value to check
+     * @param low Low bound
+     * @param high High bound
+     *
+     * @return <code>true</code> if the value is between low and high,
+     *   inclusively.
+     * @throw <code>std::domain_error</code> otherwise. This also throws
+     *   if any of the arguments are NaN.
+     */
     template <typename T_y, typename T_low, typename T_high>
     inline bool check_bounded(const std::string& function,
                               const std::string& name,  

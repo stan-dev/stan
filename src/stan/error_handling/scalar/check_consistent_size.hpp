@@ -8,28 +8,44 @@
 namespace stan {
   namespace error_handling {
 
-    // NOTE: this will not throw if nan is passed in.
+    /**
+     * Return <code>true</code if the dimension of x is consistent, which
+     * is defined to be <code>expected_size</code> if x is a vector or 1 if x
+     * is not a vector.
+     *
+     * Note: this will not throw an exception if x contains <code>NaN</code>.
+     *
+     * @tparam T Type of value
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param x Variable to check for consistent size
+     * @param expected_size Expected size if x is a vector
+     *
+     * @return <code>true</code> if x is scalar or if x is vector-like and
+     *   has size of <code>expected_size</code>
+     * @throw <code>invalid_argument</code> if the size is inconsistent
+     */
     template <typename T>
     inline bool check_consistent_size(const std::string& function,
                                       const std::string& name,
                                       const T& x,
-                                      size_t max_size) {
-      size_t x_size = stan::size_of(x);
-      if (is_vector<T>::value && x_size == max_size)
+                                      size_t expected_size) {
+      if (!is_vector<T>::value)
         return true;
-      if (!is_vector<T>::value && x_size == 1)
+      if (is_vector<T>::value && expected_size == stan::size_of(x))
         return true;
       
       std::stringstream msg;
-      msg << ", expecting dimension of either 1 or "
-          << "max_size=" << max_size
+      msg << ", expecting dimension = "
+          << expected_size
           << "; a vectorized function was called with arguments of different "
           << "scalar, array, vector, or matrix types, and they were not "
           << "consistently sized;  all arguments must be scalars or "
           << "multidimensional values of the same shape.";
 
-      invalid_argument(function, name, x_size,
-                       "dimension=",
+      invalid_argument(function, name, stan::size_of(x),
+                       "has dimension = ",
                        msg.str());
       
       return false;

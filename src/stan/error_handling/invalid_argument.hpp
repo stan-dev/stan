@@ -25,6 +25,7 @@ namespace stan {
      * @param y Variable
      * @param msg1 Message to print before the variable
      * @param msg2 Message to print after the variable
+     * @throw std::invalid_argument
      */
     template <typename T>
     inline void invalid_argument(const std::string& function,
@@ -59,6 +60,7 @@ namespace stan {
      * @param name Name of the variable
      * @param y Variable
      * @param msg1 Message to print before the variable
+     * @throw std::invalid_argument
      */
     template <typename T>
     inline void invalid_argument(const std::string& function,
