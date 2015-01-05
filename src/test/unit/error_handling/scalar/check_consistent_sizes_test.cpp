@@ -1,6 +1,49 @@
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <gtest/gtest.h>
 
+TEST(ErrorHandlingScalar, checkConsistentSizes_zero) {
+  using stan::error_handling::check_consistent_sizes;
+  const std::string function = "testConsSizes";
+  const std::string name1 = "name1";
+  const std::string name2 = "name2";
+  const std::string name3 = "name3";
+  const std::string name4 = "name4";
+
+  std::vector<double> v1(0);
+  double d1;
+
+  ASSERT_EQ(0, stan::size_of(v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1));
+
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, d1));
+
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, v1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, v1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, d1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, d1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, v1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, v1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, d1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, d1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, v1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, v1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, d1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, d1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, v1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, v1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, d1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, d1, name4, d1));
+}
+
 TEST(ErrorHandlingScalar, checkConsistentSizes) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
