@@ -3,9 +3,9 @@
 
 #include <boost/random/bernoulli_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
-#include <stan/error_handling/scalar/check_integer_type.hpp>
 #include <stan/error_handling/scalar/check_bounded.hpp>
 #include <stan/error_handling/scalar/check_finite.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
@@ -24,7 +24,7 @@ namespace stan {
     // Bernoulli(n|theta)   [0 <= n <= 1;   0 <= theta <= 1]
     // FIXME: documentation
     template <bool propto, typename T_n, typename T_prob>
-    typename return_type<T_prob>::type
+    typename boost::enable_if_c<stan::is_int<T_n>::value, typename return_type<T_prob>::type>::type 
     bernoulli_log(const T_n& n,
                   const T_prob& theta) {
       static const std::string function("stan::prob::bernoulli_log");
@@ -33,7 +33,6 @@ namespace stan {
 
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
-      using stan::error_handling::check_integer_type;
       using stan::math::log1m;
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
@@ -51,12 +50,10 @@ namespace stan {
       check_bounded(function, "n", n, 0, 1);
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Random variable", n,
                              "Probability parameter", theta);
 
-      if (!is_same<scalar_type_helper<T_n>,int>)
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_prob>::value)
         return 0.0;
@@ -130,7 +127,7 @@ namespace stan {
     // Bernoulli(n|inv_logit(theta))   [0 <= n <= 1;   -inf <= theta <= inf]
     // FIXME: documentation
     template <bool propto, typename T_n, typename T_prob>
-    typename return_type<T_prob>::type
+    typename boost::enable_if_c<stan::is_int<T_n>::value, typename return_type<T_prob>::type>::type 
     bernoulli_logit_log(const T_n& n, const T_prob& theta) {
       static const std::string function("stan::prob::bernoulli_logit_log");
       typedef typename stan::partials_return_type<T_n,T_prob>::type
@@ -144,7 +141,6 @@ namespace stan {
       using stan::prob::include_summand;
       using stan::math::log1p;
       using stan::math::inv_logit;
-      using stan::check_integer_type;
       
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -157,7 +153,6 @@ namespace stan {
       // validate args (here done over var, which should be OK)
       check_bounded(function, "n", n, 0, 1);
       check_not_nan(function, "Logit transformed probability parameter", theta);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Random variable", n,
                              "Probability parameter", theta);
@@ -217,7 +212,7 @@ namespace stan {
       
     // Bernoulli CDF
     template <typename T_n, typename T_prob>
-    typename return_type<T_prob>::type
+    typename boost::enable_if_c<stan::is_int<T_n>::value, typename return_type<T_prob>::type>::type 
     bernoulli_cdf(const T_n& n, const T_prob& theta) {
       static const std::string function("stan::prob::bernoulli_cdf");
       typedef typename stan::partials_return_type<T_n,T_prob>::type 
@@ -227,7 +222,7 @@ namespace stan {
       using stan::error_handling::check_bounded;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-      using stan::check_integer_type;
+      using stan::is_int;
           
       // Ensure non-zero argument lenghts
       if (!(stan::length(n) && stan::length(theta)))
@@ -238,11 +233,10 @@ namespace stan {
       // Validate arguments
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Random variable", n, 
                              "Probability parameter", theta);
-          
+      
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
       VectorView<const T_prob> theta_vec(theta);
@@ -282,7 +276,7 @@ namespace stan {
     }
       
     template <typename T_n, typename T_prob>
-    typename return_type<T_prob>::type
+    typename boost::enable_if_c<stan::is_int<T_n>::value, typename return_type<T_prob>::type>::type 
     bernoulli_cdf_log(const T_n& n, const T_prob& theta) {
       static const std::string function("stan::prob::bernoulli_cdf_log");
       typedef typename stan::partials_return_type<T_n,T_prob>::type 
@@ -292,7 +286,6 @@ namespace stan {
       using stan::error_handling::check_bounded;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-      using stan::check_integer_type;
       
       // Ensure non-zero argument lenghts
       if (!(stan::length(n) && stan::length(theta)))
@@ -303,7 +296,6 @@ namespace stan {
       // Validate arguments
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Random variable", n, 
                              "Probability parameter", theta);
@@ -344,7 +336,7 @@ namespace stan {
     }
 
     template <typename T_n, typename T_prob>
-    typename return_type<T_prob>::type
+    typename boost::enable_if_c<stan::is_int<T_n>::value, typename return_type<T_prob>::type>::type 
     bernoulli_ccdf_log(const T_n& n, const T_prob& theta) {
       static const std::string function("stan::prob::bernoulli_ccdf_log");
       typedef typename stan::partials_return_type<T_n,T_prob>::type 
@@ -354,7 +346,6 @@ namespace stan {
       using stan::error_handling::check_bounded;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-      using stan::check_integer_type;
           
       // Ensure non-zero argument lenghts
       if (!(stan::length(n) && stan::length(theta)))
@@ -365,7 +356,6 @@ namespace stan {
       // Validate arguments
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Random variable", n, 
                              "Probability parameter", theta);

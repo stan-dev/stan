@@ -28,6 +28,21 @@ struct is_empty<empty> {
   enum { value = true };
 };
 
+template <typename T>
+struct int_return_type {
+  typedef double type;
+};
+
+template <>
+struct int_return_type<int> {
+  typedef int type;
+};
+
+template <>
+struct int_return_type<empty> {
+  typedef empty type;
+};
+
 //------------------------------------------------------------
 
 namespace std {
@@ -537,6 +552,61 @@ fvar<fvar<var> > get_param<fvar<fvar<var> > >(const vector<double>& params,
   }
   return param;
 }
+
+// Finite difference template metaprogram
+template <typename T, size_t n, size_t i>
+struct diff_param{
+  static double perturb(const vector<double>& params, const double e) {
+    double param = 0;
+    if (n < params.size())
+      param = params[n];
+    return param;
+  }
+};
+
+template <size_t n, size_t i>
+struct diff_param<empty,n,i>{
+   static empty perturb(const vector<double>& /*params*/, const double /*e*/) {
+    return empty();
+  }
+};
+
+template <size_t n>
+struct diff_param<empty,n,n>{
+   static empty perturb(const vector<double>& /*params*/, const double /*e*/) {
+    return empty();
+  }
+};
+
+template <typename T, size_t n>
+struct diff_param<T,n,n>{
+  static double perturb(const vector<double>& params, const double e) {
+    double param = 0.0;
+    if (n < params.size())
+      param = params[n] + e;
+    return param;
+  }
+};
+
+template <size_t n>
+struct diff_param<int,n,n>{
+  static int perturb(const vector<double>& params, const double e) {
+    int param = 0.0;
+    if (n < params.size())
+      param = static_cast<int>(params[n]);
+    return param;
+  }
+};
+
+template <size_t n, size_t i>
+struct diff_param<int,n,i>{
+  static int perturb(const vector<double>& params, const double e) {
+    int param = 0.0;
+    if (n < params.size())
+      param = static_cast<int>(params[n]);
+    return param;
+  }
+};
 
 //------------------------------------------------------------
 

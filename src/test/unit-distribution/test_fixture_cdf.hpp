@@ -19,6 +19,7 @@ using stan::is_vector;
 using stan::is_constant;
 using stan::is_constant_struct;
 using stan::math::value_of;
+using stan::is_int;
 
 
 class AgradCdfTest {
@@ -92,6 +93,13 @@ public:
   typedef typename scalar_type<T3>::type Scalar3;
   typedef typename scalar_type<T4>::type Scalar4;
   typedef typename scalar_type<T5>::type Scalar5;
+
+  typedef typename int_return_type<Scalar0>::type FinDiffType0;
+  typedef typename int_return_type<Scalar1>::type FinDiffType1;
+  typedef typename int_return_type<Scalar2>::type FinDiffType2;
+  typedef typename int_return_type<Scalar3>::type FinDiffType3;
+  typedef typename int_return_type<Scalar4>::type FinDiffType4;
+  typedef typename int_return_type<Scalar5>::type FinDiffType5;
   
   typedef typename stan::agrad::fvar<typename stan::partials_return_type<T0,T1,T2,T3,T4,T5>::type> T_fvar_return;
   typedef typename stan::return_type<T0,T1,T2,T3,T4,T5>::type T_return_type;
@@ -207,43 +215,48 @@ public:
       test_nan_value(parameters, 5);
   }
 
+ template<size_t n>
  void add_finite_diff_1storder(const vector<double>& params, 
-                                vector<double>& finite_diff, 
-                                const size_t n) {
+                               vector<double>& finite_diff) {
     const double e = 1e-8;
     const double e2 = 2 * e;
 
-    vector<double> plus(6);
-    vector<double> minus(6);
-    for (size_t i = 0; i < 6; i++) {
-      plus[i] = get_param<double>(params, i);
-      minus[i] = get_param<double>(params, i);
-    }
-    plus[n] += e;
-    minus[n] -= e;
-    
+    FinDiffType0 p0 = diff_param<T0,0,n>::perturb(params, e);
+    FinDiffType1 p1 = diff_param<T1,1,n>::perturb(params, e);
+    FinDiffType2 p2 = diff_param<T2,2,n>::perturb(params, e);
+    FinDiffType3 p3 = diff_param<T3,3,n>::perturb(params, e);
+    FinDiffType4 p4 = diff_param<T4,4,n>::perturb(params, e);
+    FinDiffType5 p5 = diff_param<T5,5,n>::perturb(params, e);
+
+    FinDiffType0 m0 = diff_param<T0,0,n>::perturb(params, -e);
+    FinDiffType1 m1 = diff_param<T1,1,n>::perturb(params, -e);
+    FinDiffType2 m2 = diff_param<T2,2,n>::perturb(params, -e);
+    FinDiffType3 m3 = diff_param<T3,3,n>::perturb(params, -e);
+    FinDiffType4 m4 = diff_param<T4,4,n>::perturb(params, -e);
+    FinDiffType5 m5 = diff_param<T5,5,n>::perturb(params, -e);
+
     double cdf_plus = TestClass.cdf
-      (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
+      (p0,p1,p2,p3,p4,p5);
     double cdf_minus = TestClass.cdf
-      (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
+      (m0,m1,m2,m3,m4,m5);
 
     finite_diff.push_back((cdf_plus - cdf_minus) / e2);
   }
 
    void calculate_finite_diff(const vector<double>& params, 
                               vector<double>& finite_diff) {
-    if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value)
-      add_finite_diff_1storder(params, finite_diff, 0);
-    if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value)
-      add_finite_diff_1storder(params, finite_diff, 1);
-    if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value)
-      add_finite_diff_1storder(params, finite_diff, 2);
-    if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value)
-      add_finite_diff_1storder(params, finite_diff, 3);
-    if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value)
-      add_finite_diff_1storder(params, finite_diff, 4);
-    if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value)
-      add_finite_diff_1storder(params, finite_diff, 5);
+    if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value && !is_int<Scalar0>::value)
+      add_finite_diff_1storder<0>(params, finite_diff);
+    if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value && !is_int<Scalar1>::value)
+      add_finite_diff_1storder<1>(params, finite_diff);
+    if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value && !is_int<Scalar2>::value)
+      add_finite_diff_1storder<2>(params, finite_diff);
+    if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value && !is_int<Scalar3>::value)
+      add_finite_diff_1storder<3>(params, finite_diff);
+    if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value && !is_int<Scalar4>::value)
+      add_finite_diff_1storder<4>(params, finite_diff);
+    if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value && !is_int<Scalar5>::value)
+      add_finite_diff_1storder<5>(params, finite_diff);
   }
 
    // works for <double>

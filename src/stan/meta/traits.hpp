@@ -171,6 +171,11 @@ ERROR_INDEX
   };
 
   template <typename T>
+  struct is_int {
+    enum { value = boost::is_same<int, typename scalar_type<T>::type>::value } ;
+  };
+
+  template <typename T>
   inline T get(const T& x, size_t n) {
     return x;
   }

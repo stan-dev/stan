@@ -25,6 +25,41 @@ TEST(MetaTraits, isConstant) {
   EXPECT_FALSE(is_constant<fvar<double> >::value);
 }
 
+TEST(MetaTraits, isInt){
+  using stan::is_int;
+  using std::vector;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  typedef Matrix<double,Dynamic,1> temp_vec_d;
+  typedef Matrix<var,Dynamic,1> temp_vec_v;
+  typedef Matrix<fvar<var>,Dynamic,1> temp_vec_fv;
+  typedef Matrix<int,Dynamic,1> temp_vec_i;
+
+  typedef Matrix<double,Dynamic,Dynamic> temp_mat_d;
+  typedef Matrix<var,Dynamic,Dynamic> temp_mat_v;
+  typedef Matrix<fvar<var>,Dynamic,Dynamic> temp_mat_fv;
+  typedef Matrix<int,Dynamic,Dynamic> temp_mat_i;
+
+  EXPECT_TRUE(is_int<int>::value);
+  EXPECT_TRUE(is_int<vector<int> >::value);
+  EXPECT_FALSE(is_int<vector<double> >::value);
+  EXPECT_FALSE(is_int<vector<var> >::value);
+  EXPECT_TRUE(is_int<temp_vec_i>::value);
+  EXPECT_FALSE(is_int<temp_vec_d>::value);
+  EXPECT_FALSE(is_int<temp_vec_v>::value);
+  EXPECT_FALSE(is_int<temp_vec_fv>::value);
+  EXPECT_FALSE(is_int<vector<temp_vec_fv> >::value);
+  
+  EXPECT_TRUE(is_int<temp_mat_i>::value);
+  EXPECT_FALSE(is_int<temp_mat_d>::value);
+  EXPECT_FALSE(is_int<temp_mat_v>::value);
+  EXPECT_FALSE(is_int<temp_mat_fv>::value);
+  EXPECT_FALSE(is_int<vector<temp_mat_fv> >::value);
+}
+
 
 
 TEST(MetaTraits, is_vector) {
