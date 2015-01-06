@@ -9,7 +9,22 @@
 namespace stan {
   namespace error_handling {
 
-    // FIXME: update warnings
+    /**
+     * Return <code>true</code> if the provided sizes match.
+     *
+     * @tparam T_size1 Type of size 1
+     * @tparam T_size2 Type of size 2
+     *
+     * @param function Function name (for error messages)
+     * @param name_i Variable name 1 (for error messages)
+     * @param i Size 1
+     * @param name_j Variable name 2 (for error messages)
+     * @param j Size 2
+     * 
+     * @return <code>true</code> if the sizes match
+     * @throw <code>std::invalid_argument</code> if the sizes
+     *   do not match
+     */
     template <typename T_size1, typename T_size2>
     inline bool check_size_match(const std::string& function,
                                  const std::string& name_i,

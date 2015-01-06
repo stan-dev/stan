@@ -10,11 +10,20 @@ namespace stan {
   namespace error_handling {
 
     /**
-     * Checks to see if an index into a container is 
-     * within range. If the index is out of range, throws
-     * an <code>out_of_range</code> exception with the
-     * specified message.
+     * Return <code>true</code> if specified index is within range.
      *
+     * This check is 1-indexed by default. This behavior can be
+     * changed by setting <code>stan::error_index::value</code>.
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param max Maximum size of the variable
+     * @param index Index to check
+     * @param nested_level Nested level (for error messages)
+     * @param error_msg Additional error message (for error messages)
+     * 
+     * @return <code>true</code> if the index is within range
+     * @throw <code>std::out_of_range</code> if the index is not in range
      */
     inline bool check_range(const std::string& function,
                             const std::string& name,  
@@ -34,11 +43,19 @@ namespace stan {
     }
 
     /**
-     * Checks to see if an index into a container is 
-     * within range. If the index is out of range, throws
-     * an <code>out_of_range</code> exception with the
-     * specified message.
+     * Return <code>true</code> if specified index is within range.
      *
+     * This check is 1-indexed by default. This behavior can be
+     * changed by setting <code>stan::error_index::value</code>.
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param max Maximum size of the variable
+     * @param index Index to check
+     * @param error_msg Additional error message (for error messages)
+     * 
+     * @return <code>true</code> if the index is within range
+     * @throw <code>std::out_of_range</code> if the index is not in range
      */
     inline bool check_range(const std::string& function,
                             const std::string& name,  
@@ -54,11 +71,18 @@ namespace stan {
     }
 
     /**
-     * Checks to see if an index into a container is 
-     * within range. If the index is out of range, throws
-     * an <code>out_of_range</code> exception with the
-     * specified message.
+     * Return <code>true</code> if specified index is within range.
      *
+     * This check is 1-indexed by default. This behavior can be
+     * changed by setting <code>stan::error_index::value</code>.
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param max Maximum size of the variable
+     * @param index Index to check
+     * 
+     * @return <code>true</code> if the index is within range
+     * @throw <code>std::out_of_range</code> if the index is not in range
      */
     inline bool check_range(const std::string& function,
                             const std::string& name,  

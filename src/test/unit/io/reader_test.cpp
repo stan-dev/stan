@@ -1005,8 +1005,8 @@ TEST(io_reader, cholesky_corr_exception) {
   std::vector<double> theta(9);
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S;
 
-  // non lower-triangular
-  // column major
+  // non lower-triangular matrix (column major)
+  // the rest of these tests are with check_cholesky_factor_corr
   theta[0] = 1;
   theta[1] = 0;
   theta[2] = 0;

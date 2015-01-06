@@ -9,7 +9,31 @@
 namespace stan {
   namespace error_handling {
 
-    // NOTE: this will not throw  if y1 or y2 contains nan values.
+    /**
+     * Return <code>true</code> if the two matrices are of the same size.
+     *
+     * This function checks not only the runtime sizes, but the static 
+     * sizes as well. For example, a 4x1 matrix is not the same as a vector
+     * with 4 elements. This function does not throw if either matrix has
+     * nan values
+     * 
+     * @tparam T1 Scalar type of the first matrix
+     * @tparam T2 Scalar type of the second matrix
+     * @tparam R1 Rows specified at compile time of the first matrix
+     * @tparam C1 Columns specified at compile time of the first matrix
+     * @tparam R2 Rows specified at compile time of the second matrix
+     * @tparam C2 Columns specified at compile time of the second matrix
+     *
+     * @param function Function name (for error messages)
+     * @param name1 Variable name for the first matrix (for error messages)
+     * @param y1 First matrix
+     * @param name2 Variable name for the second matrix (for error messages)
+     * @param y2 Second matrix
+     *
+     * @return <code>true</code> if the dimensions of the two matrices match
+     * @throw <code>std::invalid_argument</code> if the dimensions of the matrices
+     *   do not match
+     */
     template <typename T1, typename T2, int R1, int C1, int R2, int C2>
     inline bool check_matching_dims(const std::string& function,
                                     const std::string& name1,

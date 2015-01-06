@@ -18,13 +18,16 @@ namespace stan {
      * Return <code>true</code> if the specified matrix is positive definite
      *
      * NOTE: symmetry is NOT checked by this function
-     * 
-     * @param function
-     * @param y Matrix to test.
-     * @param name
+     *
+     * @tparam T_y scalar type of the matrix
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Matrix to test
+     *
      * @return <code>true</code> if the matrix is positive semi-definite.
-     * @return throws if any element in y is nan
-     * @tparam T Type of scalar.
+     * @throw <code>std::domain_error</code> if the matrix is not positive
+     *   semi-definite or if any element of the matrix is <code>NaN</code>
      */
     // FIXME: update warnings (message has (0,0) item)
     template <typename T_y>
@@ -32,8 +35,8 @@ namespace stan {
     check_pos_semidefinite(const std::string& function,
                            const std::string& name,
                            const Eigen::Matrix<T_y,
-                                               Eigen::Dynamic,
-                                               Eigen::Dynamic>& y) {
+                           Eigen::Dynamic,
+                           Eigen::Dynamic>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
       using stan::math::index_type;
@@ -45,7 +48,7 @@ namespace stan {
         msg << "is not positive semi-definite. " 
             << name << "(0,0) is ";
         domain_error(function, name, y(0,0),
-                msg.str());
+                     msg.str());
       }
       Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
         = y.ldlt();
@@ -54,15 +57,15 @@ namespace stan {
         msg << "is not positive semi-definite. " 
             << name << "(0,0) is ";
         domain_error(function, name, y(0,0),
-                msg.str());
+                     msg.str());
       }
       for (int i = 0; i < y.size(); i++)
         if (boost::math::isnan(y(i))) {
           std::ostringstream msg;
           msg << "is not positive semi-definite. " 
-                  << name << "(0,0) is ";
+              << name << "(0,0) is ";
           domain_error(function, name, y(0,0), 
-                  msg.str(), "");
+                       msg.str(), "");
         }
       return true;
     }

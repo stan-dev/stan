@@ -1,5 +1,6 @@
 #include <stan/error_handling/matrix/check_simplex.hpp>
 #include <gtest/gtest.h>
+#include <test/unit/util.hpp>
 
 TEST(ErrorHandlingMatrix, checkSimplex) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
@@ -92,21 +93,12 @@ TEST(ErrorHandlingMatrix, checkSimplex_message_length) {
   std::string message;
   y.resize(0);
 
-  try {
-    stan::error_handling::check_simplex("checkSimplex",
-                                        "y", y);
-    FAIL() << "should have thrown";
-  } catch (std::domain_error& e) {
-    message = e.what();
-  } catch (...) {
-    FAIL() << "threw the wrong error";
-  }
-
-  EXPECT_TRUE(std::string::npos != message.find(" y is not a valid simplex"))
-    << message;
-
-  EXPECT_TRUE(std::string::npos != message.find("length(y) = 0"))
-    << message;
+  using stan::error_handling::check_simplex;
+  
+  EXPECT_THROW_MSG(check_simplex("checkSimplex",
+                                 "y", y),
+                   std::invalid_argument,
+                   "y has size 0, but must have a non-zero size");
 }
 
 TEST(ErrorHandlingMatrix, checkSimplex_nan) {

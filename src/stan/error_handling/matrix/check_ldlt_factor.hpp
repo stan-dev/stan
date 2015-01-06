@@ -10,14 +10,24 @@ namespace stan {
   namespace error_handling {
 
     /**
-     * Return <code>true</code> if the underlying matrix is positive definite
+     * Return <code>true</code> if the argument is a valid 
+     * <code>stan::math::LDLT_factor</code>.
      *
-     * @param function
-     * @param A 
-     * @param name
+     * <code>LDLT_factor</code> can be constructed in an invalid
+     * state, so it must be checked. A invalid <code>LDLT_factor</code>
+     * is constructed from a non positive definite matrix.
+     *
+     * @tparam T Type of scalar
+     * @tparam R Rows of the matrix
+     * @tparam C Columns of the matrix
+     * 
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param A <code>stan::math::LDLT_factor</code> to check for validity.
+     *
      * @return <code>true</code> if the matrix is positive definite.
-     * @return throws if any element in lower triangular of matrix is nan
-     * @tparam T Type of scalar.
+     * @return throws <code>std::domain_error</code> the LDLT_factor was
+     *   created improperly (A.success() == false)
      */
     template <typename T, int R, int C>
     inline bool check_ldlt_factor(const std::string& function,
@@ -30,7 +40,6 @@ namespace stan {
         const T too_small = A.vectorD().tail(1)(0);
         domain_error(function, name, too_small,
                 msg.str(), ".");
-        return false;
       }
       return true;
     }

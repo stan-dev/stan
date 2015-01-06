@@ -69,7 +69,7 @@ namespace stan {
      * @param high Upper bound
      *
      * @return <code>true</code> if y is less than or equal to low.
-     * @throw <code>domain_error</code> if y is not less than or equal to low or 
+     * @throw <code>std::domain_error</code> if y is not less than or equal to low or 
      *   if any element of y or high is NaN.
      */
     template <typename T_y, typename T_high>

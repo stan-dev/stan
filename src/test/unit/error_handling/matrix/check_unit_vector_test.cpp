@@ -1,5 +1,6 @@
 #include <stan/error_handling/matrix/check_unit_vector.hpp>
 #include <gtest/gtest.h>
+#include <test/unit/util.hpp>
 
 TEST(ErrorHandlingMatrix, checkUnitVector) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
@@ -8,7 +9,7 @@ TEST(ErrorHandlingMatrix, checkUnitVector) {
   EXPECT_TRUE(stan::error_handling::check_unit_vector("checkUnitVector",
                                                       "y", y));
 
-  y[1] = 0.55;
+  y[1] = 0;
   EXPECT_THROW(stan::error_handling::check_unit_vector("checkUnitVector", "y", y),
                std::domain_error);
 }
@@ -26,4 +27,13 @@ TEST(ErrorHandlingMatrix, checkUnitVector_nan) {
   y << nan, nan;
   EXPECT_THROW(stan::error_handling::check_unit_vector("checkUnitVector", "y", y),
                std::domain_error);
+}
+
+TEST(ErrorHandlingMatrix, checkUnitVector_0_size) {
+  using stan::error_handling::check_unit_vector;
+  Eigen::Matrix<double,Eigen::Dynamic,1> y(0, 1);
+  
+  EXPECT_THROW_MSG(check_unit_vector("checkUnitVector", "y", y),
+                   std::invalid_argument,
+                   "y has size 0, but must have a non-zero size");
 }

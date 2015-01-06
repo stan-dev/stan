@@ -27,3 +27,11 @@ TEST(ErrorHandlingMatrix, checkSquareMatrix_nan) {
   EXPECT_THROW(stan::error_handling::check_square("checkSquareMatrix", "y", y), 
                std::invalid_argument);
 }
+
+TEST(ErrorHandlingMatrix, checkSquareMatrix_0x0) {
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
+  
+  y.resize(0,0);
+  EXPECT_TRUE(stan::error_handling::check_square("checkSquareMatrix",
+                                                 "y", y));
+}

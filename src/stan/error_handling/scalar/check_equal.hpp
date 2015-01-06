@@ -79,7 +79,7 @@ namespace stan {
      * @param eq Expected value for y
      *
      * @return <code>true</code> if y is equal to eq
-     * @throw <code>domain_error</code> if y is unequal to eq or 
+     * @throw <code>std::domain_error</code> if y is unequal to eq or 
      *    if any element of y or eq is NaN.
      */
     template <typename T_y, typename T_eq>

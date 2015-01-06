@@ -12,16 +12,19 @@ namespace stan {
   namespace error_handling {
 
     /**
-     * Return <code>true</code> if the specified matrix is positive definite
+     * Return <code>true</code> if the specified matrix is positive definite.
      *
-     * NOTE: symmetry is NOT checked by this function
+     * Note: symmetry is NOT checked by this function
      * 
-     * @param function
-     * @param y Matrix to test.
-     * @param name
-     * @return <code>true</code> if the matrix is positive definite.
-     * @return throws if any element in lower triangular of matrix is nan.
-     * @tparam T Type of scalar.
+     * @tparam T_y Type of scalar of the matrix
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Matrix to test
+     * 
+     * @return <code>true</code> if the matrix is positive definite
+     * @throw <code>std::domain_error</code> if the matrix is not
+     *   positive definite or if any element is <code>NaN</code>.
      */
     // FIXME: update warnings (message has (0,0) item)
     template <typename T_y>

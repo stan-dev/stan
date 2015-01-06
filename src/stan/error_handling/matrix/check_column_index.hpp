@@ -10,22 +10,35 @@ namespace stan {
   namespace error_handling {
 
     /**
-     * Return <code>true</code> if the specified index is a valid column of the matrix
+     * Return <code>true</code> if the specified index is a valid
+     * column of the matrix.
      *
+     * By default, this is a 1-indexed check (as opposed to
+     * 0-indexed). Behavior can be changed by setting 
+     * <code>stan::error_index::value</code>. This function will
+     * throw an <code>std::out_of_range</code> exception if
+     * the index is out of bounds.
+     * 
      * NOTE: this will not throw if y contains nan values.
      *
-     * @param function
-     * @param i is index
-     * @param y Matrix to test against
-     * @param name
-     * @return <code>true</code> if the index is a valid column index of the matrix.
-     * @tparam T Type of scalar.
+     * @tparam T_y Type of scalar.
+     * @tparam R Number of rows of the matrix
+     * @tparam C Number of columns of the matrix
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Matrix 
+     * @param i Index to check
+     * 
+     * @return <code>true</code> if the index is a valid column index 
+     *   of the matrix.
+     * @throw std::out_of_range if index is an invalid column index
      */
     template <typename T_y, int R, int C>
     inline bool check_column_index(const std::string& function,
                                    const std::string& name,
                                    const Eigen::Matrix<T_y,R,C>& y,
-                                   size_t i) {
+                                   const size_t i) {
       if ((i >= stan::error_index::value) 
           && (i < static_cast<size_t>(y.cols()) + stan::error_index::value))
         return true;

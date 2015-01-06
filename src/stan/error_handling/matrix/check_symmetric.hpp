@@ -16,14 +16,20 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified matrix is symmetric
      * 
+     * The error message is either 0 or 1 indexed, specified by
+     * <code>stan::error_index::value</code>.
+     *
      * NOTE: squareness is not checked by this function
      *
-     * @param function 
-     * @param y Matrix to test.
-     * @param name
-     * @return <code>true</code> if the matrix is symmetric.
-     * @return throws if any element not on the main diagonal is NaN
-     * @tparam T Type of scalar.
+     * @tparam T_y Type of scalar.
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Matrix to test
+     *
+     * @return <code>true</code> if the matrix is symmetric
+     * @throw <code>std::domain_error</code> if any element not on the main diagonal 
+     *   is <code>NaN</code>
      */
     template <typename T_y>
     inline bool 

@@ -11,13 +11,19 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified matrix is square.
      *
+     * This check allows 0x0 matrices.
+     *
      * NOTE: this will not throw if any elements in y are nan.
      *
-     * @param function
-     * @param name
-     * @param y Matrix to test.
-     * @return <code>true</code> if the matrix is a square matrix.
      * @tparam T Type of scalar.
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Matrix to test
+     *
+     * @return <code>true</code> if the matrix is a square matrix.
+     * @throw <code>std::invalid_argument</code> if the matrix
+     *    is not square
      */
     template <typename T_y>
     inline bool check_square(const std::string& function,

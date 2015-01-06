@@ -12,15 +12,24 @@ namespace stan {
 
     /**
      * Return <code>true</code> if the specified matrix is lower
-     * triangular.  A matrix x is not lower triangular if there is
-     * a non-zero entry x[m,n] with m &lt; n.
+     * triangular.
+     *
+     * A matrix x is not lower triangular if there is a non-zero entry
+     * x[m,n] with m &lt; n. This function only inspects the upper
+     * triangular portion of the matrix, not including the diagonal.
+     * It will throw if any element in the upper triangular section
+     * of the matrix is NaN.
      * 
-     * @param function 
-     * @param y Matrix to test.
-     * @param name
-     * @return <code>true</code> if the matrix is symmetric.
-     * @return throws if any element in upper triangular is nan
-     * @tparam T Type of scalar.
+     * @tparam T Type of scalar of the matrix
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Matrix to test
+     * 
+     * @return <code>true</code> if the matrix is lower triangular.
+     * @throw <code>std::domain_error</code> if the matrix is not
+     *   lower triangular or if any element in the upper triangular
+     *   portion is NaN
      */
     template <typename T_y>
     inline bool check_lower_triangular(const std::string& function,
@@ -35,7 +44,6 @@ namespace stan {
                 << stan::error_index::value + n << "]=";
             domain_error(function, name, y(m,n),
                     msg.str());
-            return false;
           }
         }
       }

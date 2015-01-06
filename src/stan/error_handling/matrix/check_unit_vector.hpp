@@ -5,6 +5,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
+#include <stan/error_handling/matrix/check_nonzero_size.hpp>
 
 namespace stan {
 
@@ -13,24 +14,29 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified vector is unit vector.
      *
-     * <p>The test that the values sum to 1 is done to within the
-     * tolerance specified by <code>CONSTRAINT_TOLERANCE</code>.
+     * A valid unit vector is one where the square of the elements
+     * summed is equal to 1. This function tests that the sum is within the
+     * tolerance specified by <code>CONSTRAINT_TOLERANCE</code>.  This
+     * function only accepts Eigen vectors, statically typed vectors,
+     * not general matrices with 1 column.
      *
-     * @param function Function name
-     * @param name Variable name
+     * @tparam T_prob Scalar type of the vector
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
      * @param theta Vector to test.
+     *
      * @return <code>true</code> if the vector is a unit vector.
-     * @return throws if any element in theta is nan
+     * @throw <code>std::invalid_argument</code> if <code>theta</code>
+     *   is a 0-vector.
+     * @throw <code>std::domain_error</code> if the vector is not a unit
+     *   vector or if any element is <code>NaN</code>.
      */
     template <typename T_prob>
     bool check_unit_vector(const std::string& function,
                            const std::string& name,
                            const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
-      if (theta.size() == 0) {
-        domain_error(function, name, 0,
-                "is not a valid unit vector. ",
-                " elements in the vector.");
-      }
+      check_nonzero_size(function, name, theta);
       T_prob ssq = theta.squaredNorm();
       if (!(fabs(1.0 - ssq) <= CONSTRAINT_TOLERANCE)) {
         std::stringstream msg;

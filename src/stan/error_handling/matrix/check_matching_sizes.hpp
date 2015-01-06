@@ -10,7 +10,25 @@
 namespace stan {
   namespace error_handling {
 
-    // NOTE: this will not throw if y1 or y2 contains nan values.
+    /**
+     * Return <code>true</code> if two structures at the same size.
+     *
+     * This function only checks the runtime sizes for variables that
+     * implement a <code>size()</code> method.  This function does not
+     * throw if either variable has nan values.
+     * 
+     * @tparam T_y1 Type of the first variable
+     * @tparam T_y2 Type of the second variable
+     *
+     * @param function Function name (for error messages)
+     * @param name1 First variable name  (for error messages)
+     * @param y1 First variable
+     * @param name2 Second variable name (for error messages)
+     * @param y2 Second variable
+     *
+     * @return <code>true</code> if the sizes match
+     * @throw <code>std::invalid_argument</code> if the sizes do not match
+     */
     template <typename T_y1, typename T_y2>
     inline bool check_matching_sizes(const std::string& function,
                                      const std::string& name1,
