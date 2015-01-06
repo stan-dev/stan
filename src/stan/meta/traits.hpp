@@ -5,6 +5,7 @@
 #include <vector>
 #include <boost/type_traits.hpp>
 #include <boost/type_traits/is_arithmetic.hpp> 
+#include <boost/mpl/if.hpp>
 #include <boost/math/tools/promotion.hpp>
 
 #include <stan/agrad/fwd/fvar.hpp>
@@ -170,10 +171,38 @@ ERROR_INDEX
     typedef typename scalar_type_helper<is_vector<T>::value, T>::type type;
   };
 
-  template <typename T>
-  struct is_int {
-    enum { value = boost::is_same<int, typename scalar_type<T>::type>::value } ;
+  template <typename T1, typename T2>
+  struct is_int_binary_raw {
+    typedef typename boost::math::tools::promote_args<T1, T2>::type type;
   };
+
+  template <>
+  struct is_int_binary_raw<int,int> {
+    typedef int type;
+  };
+
+  template <typename T1,
+            typename T2 = int, 
+            typename T3 = int, 
+            typename T4 = int, 
+            typename T5 = int, 
+            typename T6 = int>
+    struct is_int {
+      typedef typename 
+      is_int_binary_raw<typename scalar_type<T1>::type, 
+        typename is_int_binary_raw<typename scalar_type<T2>::type, 
+          typename is_int_binary_raw<typename scalar_type<T3>::type, 
+            typename is_int_binary_raw<typename scalar_type<T4>::type, 
+              typename is_int_binary_raw<typename scalar_type<T5>::type, typename scalar_type<T6>::type 
+              >::type 
+            >::type 
+          >::type 
+        >::type 
+      >::type 
+      type;
+      enum { value = boost::is_same<int, type>::value } ;
+  };
+
 
   template <typename T>
   inline T get(const T& x, size_t n) {
