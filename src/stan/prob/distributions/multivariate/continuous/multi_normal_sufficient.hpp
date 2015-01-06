@@ -19,8 +19,7 @@ namespace stan {
 
   namespace prob {
 
-    template <bool propto,
-	      typename T_sample, typename T_loc, typename T_covar>
+    template <typename T_sample, typename T_loc, typename T_covar>
     typename boost::math::tools::promote_args<T_sample, typename scalar_type<T_loc>::type, T_covar>::type
     multi_normal_sufficient_log(const int sampleSize,
 				const Eigen::Matrix<T_sample,Eigen::Dynamic,1>& sampleMu,
@@ -78,16 +77,6 @@ namespace stan {
 	// lp_location = quad_form(ss, y_minus_mu).diagonal().sum() * sampleSize;
       }
       return (lp + lp_location) * -0.5;
-    }
-
-    template <typename T_sample, typename T_loc, typename T_covar>
-    typename boost::math::tools::promote_args<T_sample, typename scalar_type<T_loc>::type, T_covar>::type
-    multi_normal_sufficient_log(const int sampleSize,
-    				const Eigen::Matrix<T_sample,Eigen::Dynamic,1>& sampleMu,
-    				const Eigen::Matrix<T_sample,Eigen::Dynamic,Eigen::Dynamic>& sampleSigma,
-    				const T_loc& mu,
-    				const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      return multi_normal_sufficient_log<true>(sampleSize, sampleMu, sampleSigma, mu, Sigma);
     }
   }
 }
