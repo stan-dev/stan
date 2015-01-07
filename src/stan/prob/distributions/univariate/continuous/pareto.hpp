@@ -3,10 +3,13 @@
 
 #include <boost/random/exponential_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_greater_or_equal.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive_finite.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -22,12 +25,14 @@ namespace stan {
               typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y,T_scale,T_shape>::type
     pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
-      static const char* function = "stan::prob::pareto_log(%1%)";
-      
+      static const std::string function("stan::prob::pareto_log");
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type 
+        T_partials_return;
+
       using stan::math::value_of;
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -36,17 +41,16 @@ namespace stan {
         return 0.0;
       
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
       
       // validate args (here done over var, which should be OK)
-      check_not_nan(function, y, "Random variable", &logp);
-      check_positive_finite(function, y_min, "Scale parameter", &logp);
-      check_positive_finite(function, alpha, "Shape parameter", &logp);
+      check_not_nan(function, "Random variable", y);
+      check_positive_finite(function, "Scale parameter", y_min);
+      check_positive_finite(function, "Shape parameter", alpha);
       check_consistent_sizes(function,
-                             y,y_min,alpha,
-                             "Random variable","Scale parameter",
-                             "Shape parameter",
-                             &logp);
+                             "Random variable", y,
+                             "Scale parameter", y_min,
+                             "Shape parameter", alpha);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_scale,T_shape>::value)
@@ -66,28 +70,27 @@ namespace stan {
       agrad::OperandsAndPartials<T_y,T_scale,T_shape> 
         operands_and_partials(y, y_min, alpha);
       
-      DoubleVectorView<include_summand<propto,T_y,T_shape>::value,
-                       is_vector<T_y>::value> log_y(length(y));
+      VectorBuilder<include_summand<propto,T_y,T_shape>::value,
+                    T_partials_return, T_y> log_y(length(y));
       if (include_summand<propto,T_y,T_shape>::value)
         for (size_t n = 0; n < length(y); n++)
           log_y[n] = log(value_of(y_vec[n]));
 
-      DoubleVectorView<!is_constant_struct<T_y>::value
-                       ||!is_constant_struct<T_shape>::value,
-                       is_vector<T_y>::value> inv_y(length(y));
-      if (!is_constant_struct<T_y>::value||!is_constant_struct<T_shape>::value)
+      VectorBuilder<contains_nonconstant_struct<T_y,T_shape>::value,
+                    T_partials_return, T_y> inv_y(length(y));
+      if (contains_nonconstant_struct<T_y,T_shape>::value)
         for (size_t n = 0; n < length(y); n++)
           inv_y[n] = 1 / value_of(y_vec[n]);
 
-      DoubleVectorView<include_summand<propto,T_scale,T_shape>::value,
-                       is_vector<T_scale>::value> 
+      VectorBuilder<include_summand<propto,T_scale,T_shape>::value,
+                    T_partials_return, T_scale> 
         log_y_min(length(y_min));
       if (include_summand<propto,T_scale,T_shape>::value)
         for (size_t n = 0; n < length(y_min); n++)
           log_y_min[n] = log(value_of(y_min_vec[n]));
 
-      DoubleVectorView<include_summand<propto,T_shape>::value,
-                       is_vector<T_shape>::value> log_alpha(length(alpha));
+      VectorBuilder<include_summand<propto,T_shape>::value,
+                    T_partials_return, T_shape> log_alpha(length(alpha));
       if (include_summand<propto,T_shape>::value)
         for (size_t n = 0; n < length(alpha); n++)
           log_alpha[n] = log(value_of(alpha_vec[n]));
@@ -95,7 +98,7 @@ namespace stan {
       using stan::math::multiply_log;
 
       for (size_t n = 0; n < N; n++) {
-        const double alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
         // log probability
         if (include_summand<propto,T_shape>::value)
           logp += log_alpha[n];
@@ -113,7 +116,7 @@ namespace stan {
           operands_and_partials.d_x3[n] 
             += 1 / alpha_dbl + log_y_min[n] - log_y[n];
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,y_min,alpha);
     }
 
     template <typename T_y, typename T_scale, typename T_shape>
@@ -126,31 +129,34 @@ namespace stan {
     template <typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y, T_scale, T_shape>::type
     pareto_cdf(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
-          
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type 
+        T_partials_return;
+
       // Check sizes
       // Size checks
       if ( !( stan::length(y) && stan::length(y_min) && stan::length(alpha) ) )
         return 1.0;
           
       // Check errors
-      static const char* function = "stan::prob::pareto_cdf(%1%)";
+      static const std::string function("stan::prob::pareto_cdf");
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
           
-      double P(1.0);
+      T_partials_return P(1.0);
           
-      check_not_nan(function, y, "Random variable", &P);
-      check_nonnegative(function, y, "Random variable", &P);
-      check_positive_finite(function, y_min, "Scale parameter", &P);
-      check_positive_finite(function, alpha, "Shape parameter", &P);
-      check_consistent_sizes(function, y, y_min, alpha,
-                             "Random variable", "Scale parameter", 
-                             "Shape parameter", &P);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_positive_finite(function, "Scale parameter", y_min);
+      check_positive_finite(function, "Shape parameter", alpha);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Scale parameter", y_min, 
+                             "Shape parameter", alpha);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -166,7 +172,7 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) < value_of(y_min_vec[i])) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,y_min,alpha);
       }
           
       // Compute vectorized CDF and its gradients
@@ -180,13 +186,13 @@ namespace stan {
         }
               
         // Pull out values
-        const double log_dbl = log( value_of(y_min_vec[n]) 
+        const T_partials_return log_dbl = log( value_of(y_min_vec[n]) 
                                     / value_of(y_vec[n]) );
-        const double y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
               
         // Compute
-        const double Pn = 1.0 - exp( alpha_dbl * log_dbl );
+        const T_partials_return Pn = 1.0 - exp( alpha_dbl * log_dbl );
                     
         P *= Pn;
               
@@ -215,36 +221,39 @@ namespace stan {
           operands_and_partials.d_x3[n] *= P;
       }
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,y_min,alpha);
     }
 
     template <typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y, T_scale, T_shape>::type
     pareto_cdf_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
-          
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type 
+        T_partials_return;
+   
       // Size checks
       if ( !( stan::length(y) && stan::length(y_min) && stan::length(alpha) ) )
         return 0.0;
           
       // Check errors
-      static const char* function = "stan::prob::pareto_cdf_log(%1%)";
+      static const std::string function("stan::prob::pareto_cdf_log");
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
-      check_not_nan(function, y, "Random variable", &P);
-      check_nonnegative(function, y, "Random variable", &P);
-      check_positive_finite(function, y_min, "Scale parameter", &P);
-      check_positive_finite(function, alpha, "Shape parameter", &P);
-      check_consistent_sizes(function, y, y_min, alpha,
-                             "Random variable", "Scale parameter", 
-                             "Shape parameter", &P);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_positive_finite(function, "Scale parameter", y_min);
+      check_positive_finite(function, "Shape parameter", alpha);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Scale parameter", y_min, 
+                             "Shape parameter", alpha);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -260,7 +269,8 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) < value_of(y_min_vec[i])) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,y_min,alpha);
       }
           
       // Compute vectorized cdf_log and its gradients
@@ -270,17 +280,17 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,y_min,alpha);
         }
               
         // Pull out values
-        const double log_dbl = log( value_of(y_min_vec[n]) 
+        const T_partials_return log_dbl = log( value_of(y_min_vec[n]) 
                                     / value_of(y_vec[n]) );
-        const double y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
               
         // Compute
-        const double Pn = 1.0 - exp(alpha_dbl * log_dbl );
+        const T_partials_return Pn = 1.0 - exp(alpha_dbl * log_dbl );
                     
         P += log(Pn);
               
@@ -295,37 +305,40 @@ namespace stan {
             -= exp( alpha_dbl * log_dbl ) * log_dbl / Pn;
       }
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,y_min,alpha);
     }
 
     template <typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y, T_scale, T_shape>::type
     pareto_ccdf_log(const T_y& y, const T_scale& y_min,
                     const T_shape& alpha) {
-          
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type
+        T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(y_min) && stan::length(alpha) ) )
         return 0.0;
           
       // Check errors
-      static const char* function = "stan::prob::pareto_ccdf_log(%1%)";
+      static const std::string function("stan::prob::pareto_ccdf_log");
           
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_greater_or_equal;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_nonnegative;
+      using stan::error_handling::check_positive_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_greater_or_equal;
+      using stan::error_handling::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
-      check_not_nan(function, y, "Random variable", &P);
-      check_nonnegative(function, y, "Random variable", &P);
-      check_positive_finite(function, y_min, "Scale parameter", &P);
-      check_positive_finite(function, alpha, "Shape parameter", &P);
-      check_consistent_sizes(function, y, y_min, alpha,
-                             "Random variable", "Scale parameter", 
-                             "Shape parameter", &P);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_positive_finite(function, "Scale parameter", y_min);
+      check_positive_finite(function, "Shape parameter", alpha);
+      check_consistent_sizes(function, 
+                             "Random variable", y, 
+                             "Scale parameter", y_min, 
+                             "Shape parameter", alpha);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -341,7 +354,7 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) < value_of(y_min_vec[i])) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,y_min,alpha);
       }
           
       // Compute vectorized cdf_log and its gradients
@@ -351,14 +364,15 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              y,y_min,alpha);
         }
               
         // Pull out values
-        const double log_dbl = log( value_of(y_min_vec[n]) 
+        const T_partials_return log_dbl = log( value_of(y_min_vec[n]) 
                                     / value_of(y_vec[n]) );
-        const double y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
               
         P += alpha_dbl * log_dbl;
               
@@ -371,7 +385,7 @@ namespace stan {
           operands_and_partials.d_x3[n] += log_dbl;
       }
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,y_min,alpha);
     }
       
     template <class RNG>
@@ -382,12 +396,12 @@ namespace stan {
       using boost::variate_generator;
       using boost::exponential_distribution;
 
-      static const char* function = "stan::prob::pareto_rng(%1%)";
+      static const std::string function("stan::prob::pareto_rng");
       
-      using stan::math::check_positive_finite;
+      using stan::error_handling::check_positive_finite;
 
-      check_positive_finite(function, y_min, "Scale parameter", (double*)0);
-      check_positive_finite(function, alpha, "Shape parameter", (double*)0);
+      check_positive_finite(function, "Scale parameter", y_min);
+      check_positive_finite(function, "Shape parameter", alpha);
 
       variate_generator<RNG&, exponential_distribution<> >
         exp_rng(rng, exponential_distribution<>(alpha));

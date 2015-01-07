@@ -2,7 +2,7 @@
 #include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
 
 #include <stan/math/functions/square.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 using std::vector;
 using std::numeric_limits;
@@ -18,13 +18,13 @@ public:
     param[1] = 0.3;           // mu
     param[2] = 1.5;           // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1.509802579); // expected log_prob
+    log_prob.push_back(-1.509802579439102343528); // expected log_prob
 
     param[0] = 12.0;          // y
     param[1] = 3.0;           // mu
     param[2] = 0.9;           // sigma
     parameters.push_back(param);
-    log_prob.push_back(-3.462263161); // expected log_prob
+    log_prob.push_back(-3.462263160811773765602); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 
@@ -53,48 +53,34 @@ public:
   }
   
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::lognormal_log(y, mu, sigma);
   }
 
   template <bool propto, 
-      typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T_y, typename T_loc, typename T_scale,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::lognormal_log<propto>(y, mu, sigma);
   }
   
   
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    using stan::prob::include_summand;
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_y, T_loc, T_scale>::type 
+  log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
+                    const T3&, const T4&, const T5&) {
     using stan::math::pi;
     using stan::math::square;
     using stan::prob::NEG_LOG_SQRT_TWO_PI;
       
-    var lp(0.0);
-    if (include_summand<true>::value)
-      lp += NEG_LOG_SQRT_TWO_PI;
-    if (include_summand<true,T_scale>::value)
-      lp -= log(sigma);
-    if (include_summand<true,T_y>::value)
-      lp -= log(y);
-    if (include_summand<true,T_y,T_loc,T_scale>::value)
-      lp -= square(log(y) - mu) / (2.0 * sigma * sigma);
-    return lp;
+    return NEG_LOG_SQRT_TWO_PI - log(sigma) - log(y) 
+      - square(log(y) - mu) / (2.0 * sigma * sigma);
   }
 };
 

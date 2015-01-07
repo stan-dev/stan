@@ -3,10 +3,14 @@
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-
 #include <stan/agrad/partials_vari.hpp>
-#include <stan/math.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_nonnegative.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/square.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -19,13 +23,15 @@ namespace stan {
               typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_log(const T_y& y, const T_scale& sigma) {
-      static const char* function = "stan::prob::rayleigh_log(%1%)";
+      static const std::string function("stan::prob::rayleigh_log");
+      typedef typename stan::partials_return_type<T_y,T_scale>::type 
+        T_partials_return;
 
       using std::log;
       using stan::is_constant_struct;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -34,16 +40,15 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      check_not_nan(function, y, "Random variable", &logp);
-      check_positive(function, sigma, "Scale parameter", &logp);
-      check_positive(function, y, "Random variable", &logp);
+      check_not_nan(function, "Random variable", y);
+      check_positive(function, "Scale parameter", sigma);
+      check_positive(function, "Random variable", y);
       check_consistent_sizes(function,
-                             y,sigma,
-                             "Random variable","Scale parameter",
-                             &logp);
+                             "Random variable", y,
+                             "Scale parameter", sigma);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_scale>::value)
@@ -56,9 +61,9 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
 
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,
-                       is_vector<T_scale>::value> log_sigma(length(sigma));
+      VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
+      VectorBuilder<include_summand<propto,T_scale>::value,
+                    T_partials_return, T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -67,10 +72,10 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
-        const double y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
       
         // reusable subexpression values
-        const double y_over_sigma = y_dbl * inv_sigma[n];
+        const T_partials_return y_over_sigma = y_dbl * inv_sigma[n];
 
         static double NEGATIVE_HALF = -0.5;
 
@@ -83,14 +88,14 @@ namespace stan {
         logp += NEGATIVE_HALF * y_over_sigma * y_over_sigma;
 
         // gradients
-        double scaled_diff = inv_sigma[n] * y_over_sigma;
+        T_partials_return scaled_diff = inv_sigma[n] * y_over_sigma;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += 1.0 / y_dbl - scaled_diff;
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x2[n] 
             += y_over_sigma * scaled_diff - 2.0 * inv_sigma[n];
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,sigma);
     }
 
     template <typename T_y, typename T_scale>
@@ -103,31 +108,32 @@ namespace stan {
     template <typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_cdf(const T_y& y, const T_scale& sigma) {
-      static const char* function = "stan::prob::rayleigh_cdf(%1%)";
+      static const std::string function("stan::prob::rayleigh_cdf");
+      typedef typename stan::partials_return_type<T_y,T_scale>::type 
+        T_partials_return;
 
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::is_constant_struct;
       using stan::math::square;
       using stan::math::value_of;
 
-      double cdf(1.0);
+      T_partials_return cdf(1.0);
 
       // check if any vectors are zero length
       if (!(stan::length(y) && stan::length(sigma)))
         return cdf;
 
-      check_not_nan(function, y, "Random variable", &cdf);
-      check_nonnegative(function, y, "Random variable", &cdf);
-      check_not_nan(function, sigma, "Scale parameter", &cdf);
-      check_positive(function, sigma, "Scale parameter", &cdf);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,sigma,
-                             "Random variable","Scale parameter",
-                             &cdf);
+                             "Random variable", y,
+                             "Scale parameter", sigma);
 
 
       // set up template expressions wrapping scalars into vector views
@@ -137,16 +143,16 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
       
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       }
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_sqr = y_dbl * y_dbl;
-        const double inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
-        const double exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_sqr = y_dbl * y_dbl;
+        const T_partials_return inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
+        const T_partials_return exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
 
         if (include_summand<false,T_y,T_scale>::value)
           cdf *= (1.0 - exp_val);
@@ -154,11 +160,11 @@ namespace stan {
 
       //gradients
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_sqr = square(y_dbl);
-        const double inv_sigma_sqr = square(inv_sigma[n]);
-        const double exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
-        const double exp_div_1m_exp = exp_val / (1.0 - exp_val);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_sqr = square(y_dbl);
+        const T_partials_return inv_sigma_sqr = square(inv_sigma[n]);
+        const T_partials_return exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
+        const T_partials_return exp_div_1m_exp = exp_val / (1.0 - exp_val);
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += y_dbl * inv_sigma_sqr 
@@ -168,38 +174,39 @@ namespace stan {
             * inv_sigma[n] * exp_div_1m_exp * cdf;
       }
 
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,sigma);
     }
 
     template <typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_cdf_log(const T_y& y, const T_scale& sigma) {
-      static const char* function = "stan::prob::rayleigh_cdf_log(%1%)";
+      static const std::string function("stan::prob::rayleigh_cdf_log");
+      typedef typename stan::partials_return_type<T_y,T_scale>::type
+        T_partials_return;
 
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::is_constant_struct;
       using stan::math::square;
       using stan::math::value_of;
+      using stan::math::log1m;
 
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
 
       // check if any vectors are zero length
       if (!(stan::length(y) && stan::length(sigma)))
         return cdf_log;
 
-      check_not_nan(function, y, "Random variable", &cdf_log);
-      check_nonnegative(function, y, "Random variable", &cdf_log);
-      check_not_nan(function, sigma, "Scale parameter", &cdf_log);
-      check_positive(function, sigma, "Scale parameter", &cdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,sigma,
-                             "Random variable","Scale parameter",
-                             &cdf_log);
-
+                             "Random variable", y,
+                             "Scale parameter", sigma);
 
       // set up template expressions wrapping scalars into vector views
       agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
@@ -208,20 +215,20 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
       
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       }
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_sqr = y_dbl * y_dbl;
-        const double inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
-        const double exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
-        const double exp_div_1m_exp = exp_val / (1.0 - exp_val);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_sqr = y_dbl * y_dbl;
+        const T_partials_return inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
+        const T_partials_return exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
+        const T_partials_return exp_div_1m_exp = exp_val / (1.0 - exp_val);
 
         if (include_summand<false,T_y,T_scale>::value)
-          cdf_log += log(1.0 - exp_val);
+          cdf_log += log1m(exp_val);
 
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += y_dbl * inv_sigma_sqr 
@@ -231,37 +238,38 @@ namespace stan {
             * inv_sigma[n] * exp_div_1m_exp;
       }
 
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,sigma);
     }
 
     template <typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_ccdf_log(const T_y& y, const T_scale& sigma) {
-      static const char* function = "stan::prob::rayleigh_ccdf_log(%1%)";
+      static const std::string function("stan::prob::rayleigh_ccdf_log");
+      typedef typename stan::partials_return_type<T_y,T_scale>::type
+        T_partials_return;
 
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::is_constant_struct;
       using stan::math::square;
       using stan::math::value_of;
 
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
 
       // check if any vectors are zero length
       if (!(stan::length(y) && stan::length(sigma)))
         return ccdf_log;
 
-      check_not_nan(function, y, "Random variable", &ccdf_log);
-      check_nonnegative(function, y, "Random variable", &ccdf_log);
-      check_not_nan(function, sigma, "Scale parameter", &ccdf_log);
-      check_positive(function, sigma, "Scale parameter", &ccdf_log);
+      check_not_nan(function, "Random variable", y);
+      check_nonnegative(function, "Random variable", y);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y,sigma,
-                             "Random variable","Scale parameter",
-                             &ccdf_log);
+                             "Random variable", y,
+                             "Scale parameter", sigma);
 
 
       // set up template expressions wrapping scalars into vector views
@@ -271,15 +279,15 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
       
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       }
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_sqr = y_dbl * y_dbl;
-        const double inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_sqr = y_dbl * y_dbl;
+        const T_partials_return inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
 
         if (include_summand<false,T_y,T_scale>::value)
           ccdf_log += -0.5 * y_sqr * inv_sigma_sqr;
@@ -291,7 +299,7 @@ namespace stan {
             * inv_sigma[n];
       }
 
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,sigma);
     }
 
     template <class RNG>
@@ -301,11 +309,11 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::uniform_real_distribution;
 
-      static const char* function = "stan::prob::rayleigh_rng(%1%)";
+      static const std::string function("stan::prob::rayleigh_rng");
 
-      using stan::math::check_positive;
+      using stan::error_handling::check_positive;
 
-      check_positive(function, sigma, "Scale parameter", (double*)0);
+      check_positive(function, "Scale parameter", sigma);
 
       variate_generator<RNG&, uniform_real_distribution<> >
         uniform_rng(rng, uniform_real_distribution<>(0.0, 1.0));

@@ -16,7 +16,7 @@ public:
     param[1] = 45;          // Trials
     param[2] = 0.5;         // Probability
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.067578225422)); // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.06757822542283530020679)); // expected ccdf_log
   }
   
   void invalid_values(vector<size_t>& index, 
@@ -43,25 +43,19 @@ public:
   }
 
   template <typename T_n, typename T_N, typename T_prob,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_prob>::type
   ccdf_log(const T_n& n, const T_N& N, const T_prob& theta,
-          const T3&, const T4&, const T5&, const T6&, const T7&, 
-          const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::binomial_ccdf_log(n, N, theta);
   }
 
 
   template <typename T_n, typename T_N, typename T_prob,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_prob>::type
   ccdf_log_function(const T_n& n, const T_N& N, const T_prob& theta,
-                   const T3&, const T4&, const T5&, const T6&, const T7&, 
-                   const T8&, const T9&) {
+                    const T3&, const T4&, const T5&) {
 
     using std::log;
     using std::exp;

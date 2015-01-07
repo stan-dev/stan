@@ -61,7 +61,7 @@ namespace stan {
        * @return Pointer to allocated bytes.
        */
       static inline void* operator new(size_t nbytes) {
-        return memalloc_.alloc(nbytes);
+        return ChainableStack::memalloc_.alloc(nbytes);
       }
 
       /**
@@ -85,10 +85,10 @@ namespace stan {
      * Reset all adjoint values in the stack to zero.
      */
     static void set_zero_all_adjoints() {
-      for (size_t i = 0; i < var_stack_.size(); ++i)
-        var_stack_[i]->set_zero_adjoint();
-      for (size_t i = 0; i < var_nochain_stack_.size(); ++i)
-        var_nochain_stack_[i]->set_zero_adjoint();
+      for (size_t i = 0; i < ChainableStack::var_stack_.size(); ++i)
+        ChainableStack::var_stack_[i]->set_zero_adjoint();
+      for (size_t i = 0; i < ChainableStack::var_nochain_stack_.size(); ++i)
+        ChainableStack::var_nochain_stack_[i]->set_zero_adjoint();
     }
 
     /**
@@ -118,8 +118,8 @@ namespace stan {
 
       typedef std::vector<chainable*>::reverse_iterator it_t;
       vi->init_dependent(); 
-      it_t begin = var_stack_.rbegin();
-      it_t end = empty_nested() ? var_stack_.rend() : begin + nested_size();
+      it_t begin = ChainableStack::var_stack_.rbegin();
+      it_t end = empty_nested() ? ChainableStack::var_stack_.rend() : begin + nested_size();
       for (it_t it = begin; it < end; ++it) {
         (*it)->chain();
       }

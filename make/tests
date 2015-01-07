@@ -1,4 +1,4 @@
-#
+##
 # LIBGTEST is the google test library
 # GTEST_MAIN is the file that contains the google test
 ##
@@ -17,14 +17,14 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 ##
 # Rule for building a test
 ##
-test/%.o : src/test/%_test.cpp $(LIBGTEST) bin/libstan.a
+test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
 # Rule for building a test executable
 ##
-test/%$(EXE) : test/%.o bin/libstan.a
+test/%$(EXE) : test/%.o
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
 
@@ -38,7 +38,7 @@ STANC_TESTS_HEADERS := $(shell find src/test/unit/gm -type f -name '*_test.cpp')
 STANC_TESTS_O := $(patsubst src/%_test.cpp,%.o,$(STANC_TESTS_HEADERS))
 STANC_TESTS := $(patsubst src/%_test.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
 
-# $(STANC_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
+# $(STANC_TESTS) : test/%$(EXE) : test/%.o bin/libstanc.a
 # 	@mkdir -p $(dir $@)
 # 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 
@@ -63,6 +63,16 @@ test/%.d : src/test/%_test.cpp
 	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
+.PRECIOUS: test/test-models/stanc.d
+test/test-models/stanc.d : src/test/test-models/stanc.cpp
+	@mkdir -p $(dir $@)
+	@set -e; \
+	rm -f $@; \
+	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	sed -e 's,\($(basename $(@F))\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+
 ############################################################
 ##
 # Target to verify header files within Stan has
@@ -75,6 +85,14 @@ ifeq ($(OS_TYPE),win)
 else
   DEV_NULL = /dev/null
 endif
+
+##
+# Target to verify code generated Stan programs
+# (.stan -> .hpp) are compilable
+##
+.PHONY: %.hpp-test
+src/test/test-models/good/%.hpp-test : src/test/test-models/good/%.hpp
+	$(COMPILE.c) -fsyntax-only -O0 $< 
 
 .PHONY: HEADER_TESTS
 %.hpp-test : %.hpp test/dummy.cpp
@@ -99,69 +117,60 @@ test/test-models/stanc$(EXE) : src/test/test-models/stanc.cpp bin/libstanc.a
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
 TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
-$(patsubst %.stan,%.cpp,$(TEST_MODELS)) : %.cpp : %.stan test/test-models/stanc$(EXE)
+$(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$(EXE)
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
 
 ##
 # Explicitly specify dependencies for tests that depend on the generated C++ of Stan programs.
 ##
-src/test/unit/io/mcmc_writer_test.cpp: src/test/test-models/no-main/io_example.cpp
-src/test/unit/gm/generator_test.cpp: src/test/test-models/no-main/gm/test_lp.cpp
-src/test/unit/gm/parser_generator_test.cpp: $(patsubst %.stan,%.cpp,$(shell find src/test/test-models/syntax-only/parser-generator -type f -name '*.stan'))
+src/test/unit/io/mcmc_writer_test.cpp: src/test/test-models/good/io_example.hpp
+src/test/unit/gm/generator_test.cpp: src/test/test-models/good/gm/test_lp.hpp
+src/test/unit/gm/parser_generator_test.cpp: $(patsubst %.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
 
-src/test/unit/model/util_test.cpp: src/test/test-models/no-main/model/valid.cpp src/test/test-models/no-main/model/domain_fail.cpp
+src/test/unit/model/util_test.cpp: src/test/test-models/good/model/valid.hpp src/test/test-models/good/model/domain_fail.hpp
 
-src/test/unit/mcmc/hmc/hamiltonians/base_hamiltonian_test.cpp: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-src/test/unit/mcmc/hmc/hamiltonians/unit_e_metric_test.cpp: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-src/test/unit/mcmc/hmc/hamiltonians/diag_e_metric_test.cpp: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-src/test/unit/mcmc/hmc/hamiltonians/dense_e_metric_test.cpp: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-src/test/unit/mcmc/hmc/integrators/expl_leapfrog_test.cpp: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp 
-src/test/unit/mcmc/hmc/integrators/expl_leapfrog2_test.cpp: src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
+src/test/unit/mcmc/hmc/hamiltonians/base_hamiltonian_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
+src/test/unit/mcmc/hmc/hamiltonians/unit_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
+src/test/unit/mcmc/hmc/hamiltonians/diag_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
+src/test/unit/mcmc/hmc/hamiltonians/dense_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
+src/test/unit/mcmc/hmc/integrators/expl_leapfrog_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/command.hpp 
+src/test/unit/mcmc/hmc/integrators/expl_leapfrog2_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/gauss.hpp
 
-src/test/unit/common/do_bfgs_optimize_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
-src/test/unit/optimization/bfgs_linesearch_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
-src/test/unit/optimization/bfgs_minimizer_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
-src/test/unit/optimization/bfgs_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
-src/test/unit/optimization/bfgs_update_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
-src/test/unit/optimization/lbfgs_update_test.cpp: src/test/test-models/no-main/optimization/rosenbrock.cpp
+src/test/unit/common/do_bfgs_optimize_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/optimization/bfgs_linesearch_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/optimization/bfgs_minimizer_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/optimization/bfgs_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/optimization/bfgs_update_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
+src/test/unit/optimization/lbfgs_update_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
 
-src/test/unit/common/command_init_test.cpp: src/test/test-models/no-main/common/test_lp.cpp
-src/test/unit/common/run_markov_chain_test.cpp: src/test/test-models/no-main/common/test_lp.cpp
-src/test/unit/common/sample_test.cpp: src/test/test-models/no-main/common/test_lp.cpp
-src/test/unit/common/warmup_test.cpp: src/test/test-models/no-main/common/test_lp.cpp
-src/test/unit/common/write_iteration_test.cpp: src/test/test-models/no-main/common/test_lp.cpp
+src/test/unit/common/command_init_test.cpp: src/test/test-models/good/common/test_lp.hpp
+src/test/unit/common/run_markov_chain_test.cpp: src/test/test-models/good/common/test_lp.hpp
+src/test/unit/common/sample_test.cpp: src/test/test-models/good/common/test_lp.hpp
+src/test/unit/common/warmup_test.cpp: src/test/test-models/good/common/test_lp.hpp
+src/test/unit/common/write_iteration_test.cpp: src/test/test-models/good/common/test_lp.hpp
 
+src/test/unit/gm/reject/reject_mult_args_test.cpp: src/test/test-models/good/gm/reject_mult_args.hpp
 
-src/test/unit/gm/reject/reject_mult_args_test.cpp: src/test/test-models/no-main/gm/reject_mult_args.cpp
+src/test/unit/gm/reject/reject_model_test.cpp: src/test/test-models/good/gm/reject_model.hpp
+src/test/unit/gm/reject/reject_func_call_model_test.cpp: src/test/test-models/good/gm/reject_func_call_model.hpp
 
-src/test/unit/gm/reject/reject_model_test.cpp: src/test/test-models/no-main/gm/reject_model.cpp
-src/test/unit/gm/reject/reject_func_call_model_test.cpp: src/test/test-models/no-main/gm/reject_func_call_model.cpp
+src/test/unit/gm/reject/reject_transformed_data_test.cpp: src/test/test-models/good/gm/reject_transformed_data.hpp
+src/test/unit/gm/reject/reject_func_call_transformed_data_test.cpp: src/test/test-models/good/gm/reject_func_call_transformed_data.hpp
 
-src/test/unit/gm/reject/reject_transformed_data_test.cpp: src/test/test-models/no-main/gm/reject_transformed_data.cpp
-src/test/unit/gm/reject/reject_func_call_transformed_data_test.cpp: src/test/test-models/no-main/gm/reject_func_call_transformed_data.cpp
+src/test/unit/gm/reject/reject_transformed_parameters_test.cpp: src/test/test-models/good/gm/reject_transformed_parameters.hpp
+src/test/unit/gm/reject/reject_func_call_transformed_parameters_test.cpp: src/test/test-models/good/gm/reject_func_call_transformed_parameters.hpp
 
-src/test/unit/gm/reject/reject_transformed_parameters_test.cpp: src/test/test-models/no-main/gm/reject_transformed_parameters.cpp
-src/test/unit/gm/reject/reject_func_call_transformed_parameters_test.cpp: src/test/test-models/no-main/gm/reject_func_call_transformed_parameters.cpp
-
-src/test/unit/gm/reject/reject_generated_quantities_test.cpp: src/test/test-models/no-main/gm/reject_generated_quantities.cpp
-src/test/unit/gm/reject/reject_func_call_generated_quantities_test.cpp: src/test/test-models/no-main/gm/reject_func_call_generated_quantities.cpp
-
-##
-# Target to verify code generated Stan programs
-# (.stan -> .cpp) are compilable
-##
-.PHONY: %.cpp-test
-%.cpp-test : %.cpp
-	$(COMPILE.c) -fsyntax-only -O$O $< 
+src/test/unit/gm/reject/reject_generated_quantities_test.cpp: src/test/test-models/good/gm/reject_generated_quantities.hpp
+src/test/unit/gm/reject/reject_func_call_generated_quantities_test.cpp: src/test/test-models/good/gm/reject_func_call_generated_quantities.hpp
 
 
 ##
 # Compile models depends on every model within
-# src/test/test-models/syntax-only/*.stan being able to
-# be code-generated to a *.cpp, then passed through
+# src/test/test-models/good/*.stan being able to
+# be code-generated to a *.hpp, then passed through
 # the compiler using the -fsyntax-only flag
 ##
-test/integration/compile_models$(EXE) : $(patsubst %.stan,%.cpp-test,$(shell find src/test/test-models/syntax-only -type f -name '*.stan'))
+test/integration/compile_models$(EXE) : $(patsubst %.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
 
 
 ############################################################
@@ -174,12 +183,20 @@ test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generat
 
 
 test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
+
+## FIXME: think about how to do this generally using test_types
+# test_types := v fd fv ffd ffv
+
 .SECONDEXPANSION:
-src/test/unit-distribution/%_generated_test.cpp : src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
+#src/test/unit-distribution/%_generated_test.cpp : src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
+src/test/unit-distribution/%_generated_v_test.cpp src/test/unit-distribution/%_generated_fd_test.cpp src/test/unit-distribution/%_generated_fv_test.cpp src/test/unit-distribution/%_generated_ffd_test.cpp src/test/unit-distribution/%_generated_ffv_test.cpp: src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
 	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
-
-LIST_OF_GENERATED_TESTS := $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_test.cpp,g')
+LIST_OF_GENERATED_TESTS := $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_v_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fd_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fv_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffd_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffv_test.cpp,g')
 
 .PHONY: generate-tests
 generate-tests: $(LIST_OF_GENERATED_TESTS)
+
+ifeq (,$(filter-out test/% src/test/test-models/%.hpp,$(MAKECMDGOALS)))
+  -include test/test-models/stanc.d
+endif

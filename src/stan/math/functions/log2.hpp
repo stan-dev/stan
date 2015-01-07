@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
 

@@ -3,7 +3,7 @@
 
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/var.hpp>
-#include <stan/math/error_handling/matrix/check_pos_definite.hpp>
+#include <stan/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 
@@ -11,21 +11,18 @@ namespace stan {
 
   namespace agrad {
 
-    template <typename T_result, class Policy>
-    inline bool check_pos_definite(const char* function,
-                                   const Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                   const char* name,
-                                   T_result* result,
-                                   const Policy&) {
+    inline bool check_pos_definite(const std::string& function,
+                                   const std::string& name,
+                                   const Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic>& y) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
       using stan::math::index_type;
-      typedef typename index_type<Matrix<double,Dynamic,Dynamic> >::type size_type;
+      typedef index_type<Matrix<double,Dynamic,Dynamic> >::type size_type;
       Matrix<double,Dynamic,Dynamic> y_d(y.rows(),y.cols());
       for (size_type i = 0; i < y_d.rows(); i++) 
         for (size_type j = 0; j < y_d.cols(); j++)
           y_d(i,j) = y(i,j).val();
-      return stan::math::check_pos_definite(function,y_d,name,result,Policy());
+      return stan::error_handling::check_pos_definite(function, name, y_d);
     }
     
   }

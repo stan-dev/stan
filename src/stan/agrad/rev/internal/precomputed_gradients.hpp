@@ -1,97 +1,106 @@
 #ifndef STAN__AGRAD__REV__INTERNAL__PRECOMPUTED_GRADIENTS_HPP
 #define STAN__AGRAD__REV__INTERNAL__PRECOMPUTED_GRADIENTS_HPP
 
-#include <iostream>
+#include <algorithm>
 #include <vector>
 #include <stdexcept>
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/var.hpp>
 
 namespace stan {
+
   namespace agrad {
     
     /**
-     * This is a var implementation class that
-     * takes precomputed gradient values.
+     * A variable implementation taking a sequence of operands and
+     * partial derivatives with respect to the operands.
      *
-     * Stan users should use function precomputed_gradients
+     * Stan users should use function precomputed_gradients()
      * directly.
      */
     class precomputed_gradients_vari : public vari {
     protected:
-      std::vector<vari *> varis_;
-      std::vector<double> gradients_;
+
+      const size_t size_;
+      vari** varis_;
+      double* gradients_;
 
     public:
+
       /**
-       * Constructs a precomputed_gradients_vari.
-       * The the value, pointers to the varis, and
-       * gradient values need to be provided.
+       * Construct a precomputed vari with the specified value,
+       * operands, and gradients.
        * 
-       * Note: this class is slow since it
-       *
-       * @param val The value of the variable.
-       * @param varis Vector of pointers to the varis of 
-       *   independent variables of this class.
-       * @param gradients Vector of gradients with respect 
-       *   to the independent variables. These must be indexed
-       *   in the same order as varis.
-       * @throws std::invalid_argument if the sizes don't match
+       * @param[in] val The value of the variable.
+       * @param[in] size Size of operands and gradients
+       * @param[in] varis Operand implementations.
+       * @param[in] gradients Gradients with respect to operands.
        */
-      precomputed_gradients_vari(const double val,
-                                 std::vector<vari *>& varis,
-                                 const std::vector<double>& gradients) 
+      precomputed_gradients_vari(double val,
+                                 size_t size, 
+                                 vari** varis,
+                                 double* gradients)
         : vari(val),
+          size_(size),
           varis_(varis),
           gradients_(gradients) {
-        if (varis_.size() != gradients_.size())
-          throw std::invalid_argument("sizes of varis and gradients do not match");
+      }
+
+      /**
+       * Construct a precomputed vari with the specified value,
+       * operands, and gradients.
+       * 
+       * @param[in] val The value of the variable.
+       * @param[in] vars Vector of operands.
+       * @param[in] gradients Vector of partial derivatives of value
+       * with respect to operands.
+       * @throws std::invalid_argument if the sizes of the vectors
+       * don't match.
+       */
+      precomputed_gradients_vari(double val,
+                                 const std::vector<var>& vars,
+                                 const std::vector<double>& gradients)
+        : vari(val),
+          size_(vars.size()),
+          varis_(ChainableStack::memalloc_
+                 .alloc_array<vari*>(vars.size())),
+          gradients_(ChainableStack::memalloc_
+                     .alloc_array<double>(vars.size())) {
+        if (vars.size() != gradients.size())
+          throw std::invalid_argument("sizes of vars and gradients"
+                                      " do not match");
+        for (size_t i = 0; i < vars.size(); ++i)
+          varis_[i] = vars[i].vi_; 
+        std::copy(gradients.begin(), gradients.end(), gradients_);
       }
       
       /**
-       * Implements the chain rule for this variable.
-       *
-       * Each of the independent variables' adjoints
-       * are updated with the appropriate gradient
-       * value.
+       * Implements the chain rule for this variable, using the
+       * prestored operands and gradient. 
        */
       void chain() {
-        for (size_t n = 0; n < varis_.size(); n++) {
-          varis_[n]->adj_ += adj_ * gradients_[n];
-        }
+        for (size_t i = 0; i < size_; ++i) 
+          varis_[i]->adj_ += adj_ * gradients_[i];
       }
     };
 
-    
+
     /**
-     * This function is provided for Stan users 
-     * that want to compute gradients without
-     * using Stan's auto-diff.
+     * This function returns a var for an expression that has the
+     * specified value, vector of operands, and vector of partial
+     * derivatives of value with respect to the operands.
      *
-     * Users need to provide the value, the independent
-     * variables, and the gradients of this expression with
-     * respect to the indepedent variables.
-     *
-     * (For advanced users, a faster version that 
-     *  doesn't involve copying vectors exists can
-     *  be written.)
-     *
-     * @param value The value of the resulting dependent variable.
-     * @param vars The independent variables.
-     * @param gradients The value of the gradients of the dependent 
-     *   variable with respect to the independent variables.
-     * @returns An auto-diff variable that uses the precomputed 
+     * @param[in] value The value of the resulting dependent variable.
+     * @param[in] operands operands.
+     * @param[in] gradients vector of partial derivatives of result with
+     * respect to operands.
+     * @return An auto-diff variable that uses the precomputed 
      *   gradients provided.
      */
     var precomputed_gradients(const double value,
-                              const std::vector<var>& vars,
+                              const std::vector<var>& operands,
                               const std::vector<double>& gradients) {
-      std::vector<vari *> varis;
-      varis.resize(vars.size());
-      for (size_t n = 0; n < vars.size(); n++) {
-        varis[n] = vars[n].vi_;
-      }
-      return var(new precomputed_gradients_vari(value, varis, gradients));
+      return var(new precomputed_gradients_vari(value, operands, gradients));
     }
   }
 }
