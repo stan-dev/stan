@@ -514,7 +514,7 @@ TEST(io_reader, unit_vector_exception) {
   theta[5] = sqrt(1.0);
   EXPECT_NO_THROW (reader.unit_vector(4));
   EXPECT_THROW (reader.unit_vector(2), std::domain_error);
-  EXPECT_THROW (reader.unit_vector(0), std::domain_error);
+  EXPECT_THROW (reader.unit_vector(0), std::invalid_argument);
 }
 
 TEST(io_reader, simplex) {
@@ -542,7 +542,7 @@ TEST(io_reader, simplex_exception) {
   theta[5] = 1.0;
   EXPECT_NO_THROW (reader.simplex(4));
   EXPECT_THROW (reader.simplex(2), std::domain_error);
-  EXPECT_THROW (reader.simplex(0), std::domain_error);
+  EXPECT_THROW (reader.simplex(0), std::invalid_argument);
 }
 
 
@@ -796,7 +796,7 @@ TEST(io_reader, cov_matrix_exception) {
   theta[3] = 1.9;
   stan::io::reader<double> reader(theta,theta_i);
   EXPECT_THROW (reader.cov_matrix(2), std::domain_error);
-  EXPECT_THROW (reader.cov_matrix(0), std::domain_error);
+  EXPECT_THROW (reader.cov_matrix(0), std::invalid_argument);
 }
 TEST(io_reader,cov_matrix_constrain) {
   std::vector<int> theta_i;
