@@ -38,7 +38,7 @@ namespace stan {
      * = FIXME
      * \f]
      * 
-     * @param theta[in] mixing proportion in [0,1].
+     * @param[in] theta mixing proportion in [0,1].
      * @param lambda1 first log density.
      * @param lambda2 second log density.
      * @return log mixture of densities in specified proportion

@@ -70,7 +70,7 @@ namespace stan {
     }
 
     /**
-     * Return <code>true</code if the value is between the low and high
+     * Return <code>true</code> if the value is between the low and high
      * values, inclusively.
      *
      * @tparam T_y Type of value

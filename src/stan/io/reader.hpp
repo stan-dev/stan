@@ -1025,6 +1025,7 @@ namespace stan {
        * the transform.
        *
        * @param K Rows and columns of Cholesky factor
+       * @param lp Log probability reference to increment.
        * @return Next Cholesky factor for a correlation matrix.
        * @throw std::domain_error if the matrix is not a valid
        *    Cholesky factor for a correlation matrix.

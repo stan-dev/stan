@@ -423,7 +423,7 @@ namespace stan {
      * @tparam Validate_UTF_8 
      * @tparam Handler
      * @param in Input stream from which to parse
-     * @param Handler Handler for events from parser
+     * @param handler Handler for events from parser
      */
     template <bool Validate_UTF_8, typename Handler>
     void parse(std::istream& in, 
@@ -436,10 +436,9 @@ namespace stan {
      * sending events to the specified handler, and optionally
      * validating the UTF-8 encoding.
      *
-     * @tparam Validate_UTF_8 
      * @tparam Handler
      * @param in Input stream from which to parse
-     * @param Handler Handler for events from parser
+     * @param handler Handler for events from parser
      */
     template <typename Handler>
     void parse(std::istream& in, 

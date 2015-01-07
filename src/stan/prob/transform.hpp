@@ -34,8 +34,8 @@ namespace stan {
      * This function is intended to make starting values, given a unit
      * upper-triangular matrix U such that U'DU is a correlation matrix
      *   
+     * @param U Sigma matrix
      * @param CPCs fill this unbounded
-     * @param Sigma U matrix
      */
     template<typename T>
     void    

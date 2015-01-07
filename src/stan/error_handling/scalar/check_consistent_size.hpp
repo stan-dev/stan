@@ -9,7 +9,7 @@ namespace stan {
   namespace error_handling {
 
     /**
-     * Return <code>true</code if the dimension of x is consistent, which
+     * Return <code>true</code> if the dimension of x is consistent, which
      * is defined to be <code>expected_size</code> if x is a vector or 1 if x
      * is not a vector.
      *
