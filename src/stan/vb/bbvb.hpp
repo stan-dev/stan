@@ -41,7 +41,7 @@ namespace stan {
         cont_params_(cont_params),
         elbo_(elbo),
         rng_(rng),
-        n_monte_carlo_(5) {};
+        n_monte_carlo_(10) {};
 
       virtual ~bbvb() {};
 
@@ -63,7 +63,7 @@ namespace stan {
         double elbo(0.0);
         int dim = muL.dimension();
 
-        int elbo_n_monte_carlo(1000);
+        int elbo_n_monte_carlo(5);
 
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
@@ -117,7 +117,7 @@ namespace stan {
         double elbo(0.0);
         int dim = musigmatilde.dimension();
 
-        int elbo_n_monte_carlo(1000);
+        int elbo_n_monte_carlo(5);
 
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
@@ -368,9 +368,11 @@ namespace stan {
           //   stan::common::write_iteration_csv(
           //     *err_stream_, calc_ELBO(muL), print_vector);
           // }
-          if ((i < 10 || (i<100 && i%10==0) || i%100==0) && err_stream_){
-            print_vector.push_back(calc_ELBO(muL));
-            stan::common::write_iteration_csv(*err_stream_, i , print_vector);
+          if (err_stream_) {
+            if ((i < 10 || (i<100 && i%10==0) || i%100==0)){
+              print_vector.push_back(calc_ELBO(muL));
+              stan::common::write_iteration_csv(*err_stream_, i , print_vector);
+            }
           }
 
 
@@ -397,7 +399,7 @@ namespace stan {
         Eigen::VectorXd sigma_tilde_grad  = Eigen::VectorXd::Zero(model_.num_params_r());
 
         // ADAgrad parameters
-        double eta = 0.1;
+        double eta = 1.0;
         double tau = 1.0;
         Eigen::VectorXd mu_s          = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::VectorXd sigma_tilde_s = Eigen::VectorXd::Zero(model_.num_params_r());
@@ -445,10 +447,13 @@ namespace stan {
 
           // write elbo and parameters to "error stream"
           // if ((i < 100 || i % 100 == 0) && err_stream_){
-          if ((i < 10 || (i<100 && i%10==0) || i%100==0) && err_stream_){
-            print_vector.push_back(calc_ELBO(musigmatilde));
-            stan::common::write_iteration_csv(*err_stream_, i , print_vector);
+          if (err_stream_) {
+            if ((i < 10 || (i<100 && i%10==0) || i%100==0)){
+              print_vector.push_back(calc_ELBO(musigmatilde));
+              stan::common::write_iteration_csv(*err_stream_, i , print_vector);
+            }
           }
+
 
           // std::cout << "sigma_tilde = " << std::endl
           //                               << musigmatilde.sigma_tilde() << std::endl;
@@ -470,7 +475,7 @@ namespace stan {
         vb_params_fullrank muL = vb_params_fullrank(mu,L);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(muL, 10000);
+        do_robbins_monro_adagrad(muL, 1000);
 
         cont_params_ = muL.mu();
 
@@ -479,8 +484,8 @@ namespace stan {
         << muL.mu() << std::endl;
 
         std::cout
-        << "L_chol = " << std::endl
-        << muL.L_chol() << std::endl;
+        << "Sigma = " << std::endl
+        << muL.L_chol() * muL.L_chol().transpose() << std::endl;
 
         return;
       }
@@ -502,7 +507,7 @@ namespace stan {
         vb_params_meanfield musigmatilde = vb_params_meanfield(mu,sigma_tilde);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(musigmatilde, 10000);
+        do_robbins_monro_adagrad(musigmatilde, 1000);
 
         cont_params_ = musigmatilde.mu();
 
