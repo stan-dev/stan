@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REP_MATRIX_HPP
-#define STAN__MATH__REP_MATRIX_HPP
+#ifndef STAN__MATH__MATRIX__REP_MATRIX_HPP
+#define STAN__MATH__MATRIX__REP_MATRIX_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/error_handling/scalar/check_nonnegative.hpp>

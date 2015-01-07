@@ -1,4 +1,4 @@
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathsConstants, e) {

@@ -8,7 +8,7 @@
   //   Applied Statistics, 
   //   Volume 27, Number 1, pages 97-99, 1978.
 
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
 

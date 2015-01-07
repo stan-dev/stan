@@ -4,7 +4,7 @@
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/dv_vari.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/lmgamma.hpp>
 #include <stan/math/functions/digamma.hpp>
 

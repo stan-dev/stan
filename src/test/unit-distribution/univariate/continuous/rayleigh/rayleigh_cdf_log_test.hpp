@@ -1,7 +1,7 @@
 // Arguments: Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/rayleigh.hpp>
 
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 using std::vector;
 using std::numeric_limits;

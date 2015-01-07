@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 
 TEST(ProbDistributionsFrechet, error_check) {

@@ -2,7 +2,7 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/fwd/numeric_limits.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 TEST(AgradFwdNumericLimits,All_Fvar) {
   using stan::agrad::fvar;

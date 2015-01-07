@@ -9,7 +9,7 @@
 #include <stan/error_handling/scalar/check_finite.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
