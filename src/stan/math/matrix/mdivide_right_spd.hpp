@@ -27,12 +27,12 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_right_spd(const Eigen::Matrix<T1,R1,C1> &b,
                       const Eigen::Matrix<T2,R2,C2> &A) {
-      stan::error_handling::check_symmetric("mdivide_right_spd", "A", A);
-      stan::error_handling::check_pos_definite("mdivide_right_spd", "A", A);
       stan::error_handling::check_square("mdivide_right_spd", "A", A);
       stan::error_handling::check_multiplicable("mdivide_right_spd", 
                                                 "b", b,
                                                 "A", A);
+      stan::error_handling::check_symmetric("mdivide_right_spd", "A", A);
+      stan::error_handling::check_pos_definite("mdivide_right_spd", "A", A);
       // FIXME: This is nice and general but likely slow.
       return transpose(mdivide_left_spd(A,transpose(b)));
     }

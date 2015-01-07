@@ -268,7 +268,7 @@ void test_ode_error_conditions(F& f,
   msgs.clear();
   std::vector<T1> y0_bad;
   EXPECT_THROW_MSG(integrate_ode(f, y0_bad, t0, ts, theta, x, x_int, &msgs),
-                   std::domain_error,
+                   std::invalid_argument,
                    "initial state has size 0");
   EXPECT_EQ("", msgs.str());
   
@@ -285,7 +285,7 @@ void test_ode_error_conditions(F& f,
   msgs.clear();
   std::vector<double> ts_bad;
   EXPECT_THROW_MSG(integrate_ode(f, y0, t0, ts_bad, theta, x, x_int, &msgs),
-                   std::domain_error,
+                   std::invalid_argument,
                    "times has size 0");
   EXPECT_EQ("", msgs.str());
 

@@ -32,7 +32,7 @@ TEST(AgradFwdMatrixInverse,fd) {
   EXPECT_NEAR( 6,a_inv(1,0).d_,1.0E-12);
   EXPECT_NEAR(-3,a_inv(1,1).d_,1.0E-12);
 
-  EXPECT_THROW(stan::agrad::inverse(matrix_fd(2,3)), std::domain_error);
+  EXPECT_THROW(stan::agrad::inverse(matrix_fd(2,3)), std::invalid_argument);
 }
 TEST(AgradFwdMatrixInverse,fv_1stDeriv) {
   using stan::agrad::matrix_fv;
@@ -63,7 +63,7 @@ TEST(AgradFwdMatrixInverse,fv_1stDeriv) {
   EXPECT_NEAR( 6,a_inv(1,0).d_.val(),1.0E-12);
   EXPECT_NEAR(-3,a_inv(1,1).d_.val(),1.0E-12);
 
-  EXPECT_THROW(stan::agrad::inverse(matrix_fv(2,3)), std::domain_error);
+  EXPECT_THROW(stan::agrad::inverse(matrix_fv(2,3)), std::invalid_argument);
 
   AVEC q = createAVEC(d.val(),e.val(),f.val(),g.val());
   VEC h;
@@ -130,7 +130,7 @@ TEST(AgradFwdMatrixInverse,ffd) {
   EXPECT_NEAR( 6,a_inv(1,0).d_.val(),1.0E-12);
   EXPECT_NEAR(-3,a_inv(1,1).d_.val(),1.0E-12);
 
-  EXPECT_THROW(stan::agrad::inverse(matrix_ffd(2,3)), std::domain_error);
+  EXPECT_THROW(stan::agrad::inverse(matrix_ffd(2,3)), std::invalid_argument);
 }
 TEST(AgradFwdMatrixInverse,ffv_1stDeriv) {
   using stan::agrad::matrix_ffv;
@@ -161,7 +161,7 @@ TEST(AgradFwdMatrixInverse,ffv_1stDeriv) {
   EXPECT_NEAR( 6,a_inv(1,0).d_.val().val(),1.0E-12);
   EXPECT_NEAR(-3,a_inv(1,1).d_.val().val(),1.0E-12);
 
-  EXPECT_THROW(stan::agrad::inverse(matrix_ffv(2,3)), std::domain_error);
+  EXPECT_THROW(stan::agrad::inverse(matrix_ffv(2,3)), std::invalid_argument);
 
   AVEC q = createAVEC(d.val().val(),e.val().val(),f.val().val(),g.val().val());
   VEC h;

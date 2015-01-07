@@ -161,7 +161,7 @@ TEST(AgradRevMatrix, compute) {
   // tests on A: [1, 2, 3][2, 3, 4]
   A.resize(2,3);
   A << 1,2,2,3,3,4;
-  EXPECT_THROW(ldlt_A.compute(A), std::domain_error);
+  EXPECT_THROW(ldlt_A.compute(A), std::invalid_argument);
   ASSERT_FALSE(ldlt_A.success());
 }
 
