@@ -14,9 +14,9 @@
 
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
-#include <stan/math/error_handling/check_not_nan.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
 
 #include <stan/vb/base_vb.hpp>
 #include <stan/vb/vb_params_fullrank.hpp>
@@ -172,16 +172,13 @@ namespace stan {
         int dim       = muL.dimension();
         double tmp_lp = 0.0;
 
-        double tmp(0.0);
-        stan::math::check_size_match(function,
-                              mu_grad.size(),  "Dimension of mu grad vector",
-                              dim, "Dimension of mean vector in variational q",
-                              &tmp);
-        stan::math::check_square(function, L_grad, "Scale matrix", &tmp);
-        stan::math::check_size_match(function,
-                              L_grad.rows(), "Dimension of scale matrix",
-                              dim, "Dimension of mean vector in variational q",
-                              &tmp);
+        stan::error_handling::check_size_match(function,
+                              "Dimension of mu grad vector", mu_grad.size(),
+                              "Dimension of mean vector in variational q", dim);
+        stan::error_handling::check_square(function, "Scale matrix", L_grad);
+        stan::error_handling::check_size_match(function,
+                              "Dimension of scale matrix", L_grad.rows(),
+                              "Dimension of mean vector in variational q", dim);
 
         // Initialize everything to zero
         mu_grad = Eigen::VectorXd::Zero(dim);
@@ -243,11 +240,9 @@ namespace stan {
         int dim       = musigmatilde.dimension();
         double tmp_lp = 0.0;
 
-        double tmp(0.0);
-        stan::math::check_size_match(function,
-                              mu_grad.size(),  "Dimension of mu grad vector",
-                              dim, "Dimension of mean vector in variational q",
-                              &tmp);
+        stan::error_handling::check_size_match(function,
+                              "Dimension of mu grad vector", mu_grad.size(),
+                              "Dimension of mean vector in variational q", dim);
 
         // Initialize everything to zero
         mu_grad          = Eigen::VectorXd::Zero(dim);
@@ -267,9 +262,7 @@ namespace stan {
           }
           z_tilde = musigmatilde.to_unconstrained(z_check);
 
-          stan::math::check_not_nan(function,
-            z_tilde,  "z_tilde",
-            &tmp);
+          stan::error_handling::check_not_nan(function, "z_tilde", z_tilde);
 
           // Compute gradient step in unconstrained space
           stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,

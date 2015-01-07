@@ -4,9 +4,9 @@
 #include <vector>
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
-#include <stan/math/error_handling/matrix/check_cholesky_factor.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_cholesky_factor.hpp>
 
 namespace stan {
 
@@ -29,14 +29,12 @@ namespace stan {
 
         static const char* function = "stan::vb::vb_params_fullrank(%1%)";
 
-        double tmp(0.0);
-        stan::math::check_square(function, L_chol_, "Cholesky factor", &tmp);
-        stan::math::check_size_match(function,
-                                 dimension_,     "Dimension of mean vector",
-                                 L_chol_.rows(), "Dimension of Cholesky factor",
-                                 &tmp);
-        stan::math::check_cholesky_factor(function,
-                                 L_chol_, "Cholesky factor", &tmp);
+        stan::error_handling::check_square(function, "Cholesky factor", L_chol_);
+        stan::error_handling::check_size_match(function,
+                               "Dimension of mean vector",     dimension_,
+                               "Dimension of Cholesky factor", L_chol_.rows() );
+        stan::error_handling::check_cholesky_factor(function,
+                                 "Cholesky factor", L_chol_);
 
       };
 
@@ -56,11 +54,9 @@ namespace stan {
         static const char* function = "stan::vb::vb_params_fullrank"
                                       "::to_unconstrained(%1%)";
 
-        double tmp(0.0);
-        stan::math::check_size_match(function,
-                         z_check.size(), "Dimension of input vector",
-                         dimension_,     "Dimension of mean vector",
-                         &tmp);
+        stan::error_handling::check_size_match(function,
+                         "Dimension of input vector", z_check.size(),
+                         "Dimension of mean vector",  dimension_ );
 
         return L_chol_*z_check + mu_;
       };

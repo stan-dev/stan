@@ -624,76 +624,98 @@ namespace stan {
       //            Variational Algorithms            //
       //////////////////////////////////////////////////
 
-      if (parser.arg("method")->arg("vbfr")) {
+      if (parser.arg("method")->arg("variational")) {
 
-        double elbo = 0.0;
-        // cont_params = Eigen::VectorXd::Zero(model.num_params_r());
+        stan::gm::list_argument* algo
+          = dynamic_cast<stan::gm::list_argument*>(parser.arg("method")
+            ->arg("variational")->arg("algorithm"));
 
-        if (output_stream) {
-          std::vector<std::string> names;
-          names.push_back("lp");
-          names.push_back("ELBO");
-          model.constrained_param_names(names,true,true);
+        int num_samples = dynamic_cast<stan::gm::int_argument*>
+          (parser.arg("method")
+            ->arg("variational")->arg("num_samples"))->value();
 
-          (*output_stream) << names.at(0);
-          for (size_t i = 1; i < names.size(); ++i) {
-            (*output_stream) << "," << names.at(i);
+        int num_iterations = dynamic_cast<stan::gm::int_argument*>
+          (parser.arg("method")->arg("variational")->arg("iter"))->value();
+
+        bool save_iterations
+          = dynamic_cast<stan::gm::bool_argument*>(parser.arg("method")
+                                         ->arg("variational")
+                                         ->arg("save_variational"))->value();
+
+        double tol_param
+          = dynamic_cast<stan::gm::real_argument*>(
+                         algo->arg("tol_param"))->value();
+
+        if (algo->value() == "fullrank") {
+          double elbo = 0.0;
+          // cont_params = Eigen::VectorXd::Zero(model.num_params_r());
+
+          if (output_stream) {
+            std::vector<std::string> names;
+            names.push_back("lp");
+            names.push_back("ELBO");
+            model.constrained_param_names(names,true,true);
+
+            (*output_stream) << names.at(0);
+            for (size_t i = 1; i < names.size(); ++i) {
+              (*output_stream) << "," << names.at(i);
+            }
+            (*output_stream) << std::endl;
+            (*output_stream) << 0 << "," ;
           }
-          (*output_stream) << std::endl;
-          (*output_stream) << 0 << "," ;
-        }
 
-        stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo, base_rng,
-                                            output_stream, diagnostic_stream);
-        cmd_vb.run_robbins_monro_fullrank();
+          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo, base_rng,
+                                              output_stream, diagnostic_stream);
+          cmd_vb.run_robbins_monro_fullrank();
 
-        cont_params = cmd_vb.cont_params();
+          cont_params = cmd_vb.cont_params();
 
-        std::vector<double> cont_vector(cont_params.size());
-        for (int i = 0; i < cont_params.size(); ++i)
-          cont_vector.at(i) = cont_params(i);
-        std::vector<int> disc_vector;
+          std::vector<double> cont_vector(cont_params.size());
+          for (int i = 0; i < cont_params.size(); ++i)
+            cont_vector.at(i) = cont_params(i);
+          std::vector<int> disc_vector;
 
-        if (output_stream) {
-          write_iteration(*output_stream, model, base_rng,
-                          elbo, cont_vector, disc_vector);
-        }
-
-      }
-
-      if (parser.arg("method")->arg("vbmf")) {
-
-        double elbo = 0.0;
-        // cont_params = Eigen::VectorXd::Zero(model.num_params_r());
-
-        if (output_stream) {
-          std::vector<std::string> names;
-          names.push_back("lp");
-          names.push_back("ELBO");
-          model.constrained_param_names(names,true,true);
-
-          (*output_stream) << names.at(0);
-          for (size_t i = 1; i < names.size(); ++i) {
-            (*output_stream) << "," << names.at(i);
+          if (output_stream) {
+            write_iteration(*output_stream, model, base_rng,
+                            elbo, cont_vector, disc_vector);
           }
-          (*output_stream) << std::endl;
-          (*output_stream) << 0 << "," ;
+
         }
 
-        stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo, base_rng,
-                                            output_stream, diagnostic_stream);
-        cmd_vb.run_robbins_monro_meanfield();
+        if (algo->value() == "meanfield") {
+          double elbo = 0.0;
+          // cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
-        cont_params = cmd_vb.cont_params();
+          if (output_stream) {
+            std::vector<std::string> names;
+            names.push_back("lp");
+            names.push_back("ELBO");
+            model.constrained_param_names(names,true,true);
 
-        std::vector<double> cont_vector(cont_params.size());
-        for (int i = 0; i < cont_params.size(); ++i)
-          cont_vector.at(i) = cont_params(i);
-        std::vector<int> disc_vector;
+            (*output_stream) << names.at(0);
+            for (size_t i = 1; i < names.size(); ++i) {
+              (*output_stream) << "," << names.at(i);
+            }
+            (*output_stream) << std::endl;
+            (*output_stream) << 0 << "," ;
+          }
 
-        if (output_stream) {
-          write_iteration(*output_stream, model, base_rng,
-                          elbo, cont_vector, disc_vector);
+          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo, base_rng,
+                                              output_stream, diagnostic_stream);
+          cmd_vb.run_robbins_monro_meanfield();
+
+          cont_params = cmd_vb.cont_params();
+
+          std::vector<double> cont_vector(cont_params.size());
+          for (int i = 0; i < cont_params.size(); ++i)
+            cont_vector.at(i) = cont_params(i);
+          std::vector<int> disc_vector;
+
+          if (output_stream) {
+            write_iteration(*output_stream, model, base_rng,
+                            elbo, cont_vector, disc_vector);
+          }
+
         }
 
       }

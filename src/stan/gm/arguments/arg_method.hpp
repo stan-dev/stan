@@ -6,8 +6,7 @@
 #include <stan/gm/arguments/arg_sample.hpp>
 #include <stan/gm/arguments/arg_optimize.hpp>
 #include <stan/gm/arguments/arg_diagnose.hpp>
-#include <stan/gm/arguments/arg_vbmf.hpp>
-#include <stan/gm/arguments/arg_vbfr.hpp>
+#include <stan/gm/arguments/arg_variational.hpp>
 
 namespace stan {
 
@@ -25,8 +24,7 @@ namespace stan {
         _values.push_back(new arg_sample());
         _values.push_back(new arg_optimize());
         _values.push_back(new arg_diagnose());
-        _values.push_back(new arg_vbmf());
-        _values.push_back(new arg_vbfr());
+        _values.push_back(new arg_variational());
 
         _default_cursor = 0;
         _cursor = _default_cursor;

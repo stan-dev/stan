@@ -4,7 +4,7 @@
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/functions/max.hpp>
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
 
 namespace stan {
 
@@ -28,11 +28,9 @@ namespace stan {
 
         static const char* function = "stan::vb::vb_params_meanfield(%1%)";
 
-        double tmp(0.0);
-        stan::math::check_size_match(function,
-                               dimension_,          "Dimension of mean vector",
-                               sigma_tilde_.size(), "Dimension of std vector",
-                               &tmp);
+        stan::error_handling::check_size_match(function,
+                               "Dimension of mean vector", dimension_,
+                               "Dimension of std vector", sigma_tilde_.size() );
 
       };
 
@@ -54,11 +52,9 @@ namespace stan {
         static const char* function = "stan::vb::vb_params_meanfield"
                                       "::to_unconstrained(%1%)";
 
-        double tmp(0.0);
-        stan::math::check_size_match(function,
-                         dimension_,     "Dimension of mean vector",
-                         z_check.size(), "Dimension of input vector",
-                         &tmp);
+        stan::error_handling::check_size_match(function,
+                         "Dimension of mean vector", dimension_,
+                         "Dimension of input vector", z_check.size() );
 
         // exp(sigma_tilde) * z_check + mu
         return z_check.array().cwiseProduct(sigma_tilde_.array().exp())
