@@ -990,6 +990,8 @@ may be used instead of \code{y[3,1]} to access the value of the first
 column of the third row of \code{y}.  The form \code{y[3,1]} is the
 preferred form (see \refnote{array-index-style} in this chapter).
 
+\subsection{Assigning}
+
 Subarrays may be manipulated and assigned just like any other
 variables.  Similar to the behavior of matrices, Stan allows blocks
 such as 
@@ -1006,9 +1008,6 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 \end{stancode}
 %
 
-\subsection{Assigning}
-
----fixme---
 
 \subsection{Arrays of Matrices and Vectors}
 
