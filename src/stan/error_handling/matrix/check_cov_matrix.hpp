@@ -3,18 +3,17 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/scalar/check_positive_index.hpp>
 #include <stan/error_handling/matrix/check_pos_definite.hpp>
-#include <stan/error_handling/matrix/check_square.hpp>
-#include <stan/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {
   namespace error_handling {
 
     /**
      * Return <code>true</code> if the specified matrix is a valid
-     * covariance matrix.  A valid covariance matrix must be square,
-     * symmetric, and positive definite.
+     * covariance matrix.  
+     *
+     * A valid covariance matrix is a square, symmetric matrix that is
+     * positive definite.
      *
      * @tparam T Type of scalar.
      *
@@ -34,9 +33,6 @@ namespace stan {
     inline bool check_cov_matrix(const std::string& function,
                                  const std::string& name,
                                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
-      check_square(function, name, y);
-      check_positive_index(function, name, "rows", y.rows());
-      check_symmetric(function, name, y);
       check_pos_definite(function, name, y);
       return true;
     }

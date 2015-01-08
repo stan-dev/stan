@@ -53,3 +53,13 @@ TEST(ErrorHandlingMatrix, checkSymmetric_nan) {
   EXPECT_TRUE(stan::error_handling::check_symmetric("checkSymmetric",
                                                     "y", y));
 }
+
+TEST(ErrorHandlingMatrix, checkSymmetric_non_square) {
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
+  
+  y.resize(2,3);
+  EXPECT_THROW(stan::error_handling::check_symmetric("checkSymmetric",
+                                                     "y", y),
+               std::invalid_argument);
+
+}
