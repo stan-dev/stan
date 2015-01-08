@@ -19,8 +19,6 @@ namespace stan {
      * Throws a std:invalid_argument otherwise. The message
      * will indicate that the variable name "has size 0".
      *
-     * NOTE: this will not throw if y contains nan values.
-     *
      * @tparam T_y Type of container
      *
      * @param function Function name (for error messages)

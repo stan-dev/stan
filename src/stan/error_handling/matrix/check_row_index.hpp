@@ -15,8 +15,6 @@ namespace stan {
      * This check is 1-indexed by default. This behavior can be changed
      * by setting <code>stan::error_index::value</code>.
      *
-     * NOTE: this will not throw if y contains nan values.
-     *
      * @tparam T Scalar type
      * @tparam R Compile time rows
      * @tparam C Compile time columns

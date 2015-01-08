@@ -28,8 +28,8 @@ namespace stan {
      * @param y Matrix to test
      *
      * @return <code>true</code> if the matrix is symmetric
-     * @throw <code>std::domain_error</code> if any element not on the main diagonal 
-     *   is <code>NaN</code>
+     * @throw <code>std::domain_error</code> if any element not on the 
+     *   main diagonal is <code>NaN</code>
      */
     template <typename T_y>
     inline bool 

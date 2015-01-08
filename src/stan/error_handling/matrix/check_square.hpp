@@ -13,8 +13,6 @@ namespace stan {
      *
      * This check allows 0x0 matrices.
      *
-     * NOTE: this will not throw if any elements in y are nan.
-     *
      * @tparam T Type of scalar.
      *
      * @param function Function name (for error messages)

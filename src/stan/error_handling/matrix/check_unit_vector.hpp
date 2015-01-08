@@ -42,8 +42,7 @@ namespace stan {
         std::stringstream msg;
         msg << "is not a valid unit vector."
             << " The sum of the squares of the elements should be 1, but is ";
-        domain_error(function, name, ssq,
-                msg.str());
+        domain_error(function, name, ssq, msg.str());
       }
       return true;
     }

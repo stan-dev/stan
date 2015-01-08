@@ -50,8 +50,7 @@ namespace stan {
      * Return <code>true</code> if <code>y</code> is positive.
      *
      * This function is vectorized and will check each element of
-     * <code>y</code>. If any element is <code>NaN</code>, this
-     * function will throw an exception.
+     * <code>y</code>.
      *
      * @tparam T_y Type of y
      *

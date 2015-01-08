@@ -13,8 +13,6 @@ namespace stan {
      * is defined to be <code>expected_size</code> if x is a vector or 1 if x
      * is not a vector.
      *
-     * Note: this will not throw an exception if x contains <code>NaN</code>.
-     *
      * @tparam T Type of value
      *
      * @param function Function name (for error messages)

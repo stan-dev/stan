@@ -19,8 +19,6 @@ namespace stan {
      * throw an <code>std::out_of_range</code> exception if
      * the index is out of bounds.
      * 
-     * NOTE: this will not throw if y contains nan values.
-     *
      * @tparam T_y Type of scalar.
      * @tparam R Number of rows of the matrix
      * @tparam C Number of columns of the matrix

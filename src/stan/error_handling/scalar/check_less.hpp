@@ -56,9 +56,7 @@ namespace stan {
      * than <code>high</code>.
      *
      * This function is vectorized and will check each element of
-     * <code>y</code> against each element of <code>high</code>. If any
-     * element is <code>NaN</code>, this function will throw an
-     * exception.
+     * <code>y</code> against each element of <code>high</code>.
      *
      * @tparam T_y Type of y
      * @tparam T_high Type of upper bound
@@ -69,8 +67,8 @@ namespace stan {
      * @param high Upper bound
      *
      * @return <code>true</code> if y is strictly less than low.
-     * @throw <code>domain_error</code> if y is not less than low or 
-     *   if any element of y or high is NaN.
+     * @throw <code>domain_error</code> if y is not less than low
+     *   or if any element of y or high is NaN.
      */
     template <typename T_y, typename T_high>
     inline bool check_less(const std::string& function,

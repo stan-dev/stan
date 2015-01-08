@@ -17,8 +17,6 @@ namespace stan {
      * A matrix x is not lower triangular if there is a non-zero entry
      * x[m,n] with m &lt; n. This function only inspects the upper
      * triangular portion of the matrix, not including the diagonal.
-     * It will throw if any element in the upper triangular section
-     * of the matrix is NaN.
      * 
      * @tparam T Type of scalar of the matrix
      *

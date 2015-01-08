@@ -15,8 +15,7 @@ namespace stan {
      *
      * This checks the runtime sizes to determine whether the two
      * matrices are multiplicable. This allows Eigen matrices,
-     * vectors, and row vectors to be checked.  This function does not
-     * check the values within the matrices for <code>NaN</code>.
+     * vectors, and row vectors to be checked.
      *
      * @tparam T1 Type of first matrix
      * @tparam T2 Type of second matrix

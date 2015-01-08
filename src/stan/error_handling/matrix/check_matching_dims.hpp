@@ -14,8 +14,7 @@ namespace stan {
      *
      * This function checks not only the runtime sizes, but the static 
      * sizes as well. For example, a 4x1 matrix is not the same as a vector
-     * with 4 elements. This function does not throw if either matrix has
-     * nan values
+     * with 4 elements.
      * 
      * @tparam T1 Scalar type of the first matrix
      * @tparam T2 Scalar type of the second matrix

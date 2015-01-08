@@ -9,14 +9,12 @@
 namespace stan {
   namespace error_handling {
 
-    // NOTE: this will not throw if x contains nan values.
     /**
      * Return <code>true</code> if the matrix is either a
      * row vector or column vector.
      *
      * This function checks the runtime size of the matrix to check
-     * whether it is a row or column vector.  This function does not
-     * throw if the matrix contains <code>NaN</code>.
+     * whether it is a row or column vector.
      * 
      * @tparam T Scalar type of the matrix
      * @tparam R Compile time rows of the matrix

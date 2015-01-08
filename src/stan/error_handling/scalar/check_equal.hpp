@@ -67,9 +67,6 @@ namespace stan {
      * other is scalar, then the scalar is broadcast to the size of
      * the vector.
      *
-     * If any element of <code>y</code> or <code>eq</code> is <code>NaN</code>
-     * this function will throw an exception.
-     *
      * @tparam T_y Type of variable
      * @tparam T_eq Type of comparison
      *

@@ -14,8 +14,7 @@ namespace stan {
      * Return <code>true</code> if two structures at the same size.
      *
      * This function only checks the runtime sizes for variables that
-     * implement a <code>size()</code> method.  This function does not
-     * throw if either variable has nan values.
+     * implement a <code>size()</code> method.
      * 
      * @tparam T_y1 Type of the first variable
      * @tparam T_y2 Type of the second variable

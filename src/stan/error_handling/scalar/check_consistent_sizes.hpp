@@ -14,9 +14,6 @@ namespace stan {
      * Consistent size is defined as having the same size if vector-like or
      * being a scalar.
      *
-     * Note: this will not throw an exception if x1 or x2 contains
-     * <code>NaN</code>.
-     *
      * @tparam T1 Type of x1
      * @tparam T2 Type of x2
      *
@@ -48,9 +45,6 @@ namespace stan {
      *
      * Consistent size is defined as having the same size if vector-like or
      * being a scalar.
-     *
-     * Note: this will not throw an exception if x1, x2, or x3 contains
-     * <code>NaN</code>.
      *
      * @tparam T1 Type of x1
      * @tparam T2 Type of x2
@@ -89,9 +83,6 @@ namespace stan {
      *
      * Consistent size is defined as having the same size if
      * vector-like or being a scalar.
-     *
-     * Note: this will not throw an exception if x1, x2, x3, or x4
-     * contains <code>NaN</code>.
      *
      * @tparam T1 Type of x1
      * @tparam T2 Type of x2
