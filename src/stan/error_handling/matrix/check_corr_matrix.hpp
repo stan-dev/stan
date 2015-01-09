@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include <stan/error_handling/domain_error.hpp>
-#include <stan/error_handling/scalar/check_positive_index.hpp>
+#include <stan/error_handling/scalar/check_positive_size.hpp>
 #include <stan/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/error_handling/matrix/check_symmetric.hpp>
 #include <stan/error_handling/matrix/check_size_match.hpp>
@@ -55,7 +55,7 @@ namespace stan {
                        "Rows of correlation matrix", y.rows(), 
                        "columns of correlation matrix", y.cols());
       
-      check_positive_index(function, name, "rows", y.rows());
+      check_positive_size(function, name, "rows", y.rows());
 
       check_symmetric(function, "y", y);
       

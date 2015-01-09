@@ -5,7 +5,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
-#include <stan/error_handling/scalar/check_positive_index.hpp>
+#include <stan/error_handling/scalar/check_positive_size.hpp>
 #include <stan/error_handling/matrix/check_symmetric.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 
@@ -35,7 +35,7 @@ namespace stan {
                                    const std::string& name,
                                    const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       check_symmetric(function, name, y);
-      check_positive_index(function, name, "rows", y.rows());
+      check_positive_size(function, name, "rows", y.rows());
 
       if (y.rows() == 1 && !(y(0,0) > CONSTRAINT_TOLERANCE)) {
         std::ostringstream msg;

@@ -5,7 +5,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/error_handling/matrix/check_size_match.hpp>
-#include <stan/error_handling/scalar/check_positive_index.hpp>
+#include <stan/error_handling/scalar/check_positive_size.hpp>
 
 namespace stan {
   namespace error_handling {
@@ -36,12 +36,12 @@ namespace stan {
                                     const T1& y1,
                                     const std::string& name2,
                                     const T2& y2) {
-      check_positive_index(function, name1, "rows()", y1.rows());
-      check_positive_index(function, name2, "cols()", y2.cols());
+      check_positive_size(function, name1, "rows()", y1.rows());
+      check_positive_size(function, name2, "cols()", y2.cols());
       check_size_match(function, 
                        "Columns of matrix 1", y1.cols(), 
                        "Rows of matrix 2", y2.rows());
-      check_positive_index(function, name1, "rows()", y1.cols());
+      check_positive_size(function, name1, "cols()", y1.cols());
       return true;
     }
   }
