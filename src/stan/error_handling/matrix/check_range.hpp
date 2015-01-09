@@ -27,9 +27,9 @@ namespace stan {
      */
     inline bool check_range(const std::string& function,
                             const std::string& name,  
-                            const size_t max,
-                            const size_t index,
-                            const size_t nested_level,
+                            const int max,
+                            const int index,
+                            const int nested_level,
                             const std::string& error_msg) {
       if ((index >= stan::error_index::value) 
           && (index < max + stan::error_index::value))
@@ -59,8 +59,8 @@ namespace stan {
      */
     inline bool check_range(const std::string& function,
                             const std::string& name,  
-                            const size_t max,
-                            const size_t index,
+                            const int max,
+                            const int index,
                             const std::string& error_msg) {
       if ((index >= stan::error_index::value) 
           && (index < max + stan::error_index::value))
@@ -86,8 +86,8 @@ namespace stan {
      */
     inline bool check_range(const std::string& function,
                             const std::string& name,  
-                            const size_t max,
-                            const size_t index) {
+                            const int max,
+                            const int index) {
       if ((index >= stan::error_index::value) 
           && (index < max + stan::error_index::value))
         return true;

@@ -34,7 +34,9 @@ namespace stan {
       stan::error_handling::check_symmetric("mdivide_right_spd", "A", A);
       stan::error_handling::check_pos_definite("mdivide_right_spd", "A", A);
       // FIXME: This is nice and general but likely slow.
-      return transpose(mdivide_left_spd(A,transpose(b)));
+      // FIXME: After allowing for general MatrixBase in mdivide_left_spd, 
+      //        change to b.transpose()
+      return mdivide_left_spd(A,transpose(b)).transpose();
     }
 
   }

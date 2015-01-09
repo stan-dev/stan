@@ -37,7 +37,7 @@ namespace stan {
       std::stringstream msg;
       msg << ", expecting dimension = "
           << expected_size
-          << "; a vectorized function was called with arguments of different "
+          << "; a function was called with arguments of different "
           << "scalar, array, vector, or matrix types, and they were not "
           << "consistently sized;  all arguments must be scalars or "
           << "multidimensional values of the same shape.";

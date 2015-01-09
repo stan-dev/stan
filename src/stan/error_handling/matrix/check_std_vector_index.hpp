@@ -29,14 +29,14 @@ namespace stan {
     inline bool check_std_vector_index(const std::string& function,
                                        const std::string& name,
                                        const std::vector<T>& y,
-                                       size_t i) {
-      if ((i >= stan::error_index::value) 
-          && (i < y.size() + stan::error_index::value))
+                                       int i) {
+      if (i >= stan::error_index::value
+          && i < y.size() + stan::error_index::value)
         return true;
       
       std::stringstream msg;
       msg << " for " << name;
-      out_of_range(function, y.size(), static_cast<int>(i), msg.str());
+      out_of_range(function, y.size(), i, msg.str());
       return false;
     }
 

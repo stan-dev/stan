@@ -36,10 +36,8 @@ namespace stan {
                                    const T_y& y) {
       if (y.size() > 0) 
         return true;
-
-      using stan::math::index_type;
-      typedef typename index_type<T_y>::type size_t;
-      invalid_argument(function, name, size_t(), 
+      
+      invalid_argument(function, name, 0, 
                        "has size ", 
                        ", but must have a non-zero size");
       return false;
