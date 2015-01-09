@@ -72,7 +72,8 @@ namespace stan {
       using stan::math::log1m;
       using stan::math::multiply_log;
       using stan::math::value_of;
-      using stan::error_handling::check_nonnegative;
+      using stan::error_handling::check_less;
+      using stan::error_handling::check_positive;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 

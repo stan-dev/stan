@@ -765,7 +765,7 @@ public:
       T_return_type cdf_log_at_lower_bound = TestClass.template cdf_log
         <T0,T1,T2,T3,T4,T5>
         (p0,p1,p2,p3,p4,p5);
-      EXPECT_TRUE(stan::math::negative_infinity() == cdf_log_at_lower_bound)
+      EXPECT_FLOAT_EQ(0.0,std::exp(value_of(value_of(value_of(cdf_log_at_lower_bound)))))
         << "cdf_log evaluated at lower bound should equal negative infinity";
     }
   }
@@ -801,7 +801,8 @@ public:
       T_return_type cdf_log_at_upper_bound = TestClass.template cdf_log
         <T0,T1,T2,T3,T4,T5>
         (p0,p1,p2,p3,p4,p5);
-      EXPECT_TRUE(0.0 == cdf_log_at_upper_bound)
+      EXPECT_TRUE(cdf_log_at_upper_bound >= 0.0);
+      EXPECT_FLOAT_EQ(0.0,value_of(value_of(value_of(cdf_log_at_upper_bound))))
         << "cdf_log evaluated at upper bound should equal 0";
     }
   }

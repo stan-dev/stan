@@ -27,6 +27,11 @@ public:
   void invalid_values(vector<size_t>& index, 
           vector<double>& value) {
     // y
+    index.push_back(0U);
+    value.push_back(-1.0);
+
+    index.push_back(0U);
+    value.push_back(0.0);
     
     // nu
     index.push_back(1U);

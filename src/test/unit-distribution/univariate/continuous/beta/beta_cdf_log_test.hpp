@@ -29,6 +29,12 @@ public:
     index.push_back(0U);
     value.push_back(2.0);
 
+    index.push_back(0U);
+    value.push_back(1.0);
+
+    index.push_back(0U);
+    value.push_back(0.0);
+ 
     // alpha
     index.push_back(1U);
     value.push_back(-1.0);
@@ -56,7 +62,7 @@ public:
   }
 
   double lower_bound() {
-    return 0.0;
+    return 1e-200;
   }
     
   bool has_upper_bound() {
@@ -64,7 +70,7 @@ public:
   }
 
   double upper_bound() {
-    return 1.0;
+    return 9.999999999999999e-01;
   }
     
   template <typename T_y, typename T_scale_succ, typename T_scale_fail,

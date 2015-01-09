@@ -768,7 +768,7 @@ public:
       T_return_type cdf_at_lower_bound = TestClass.template cdf
         <T0,T1,T2,T3,T4,T5>
         (p0,p1,p2,p3,p4,p5);
-      EXPECT_TRUE(0.0 == cdf_at_lower_bound)
+      EXPECT_FLOAT_EQ(0.0,value_of(value_of(value_of(cdf_at_lower_bound))))
         << "CDF evaluated at lower bound should equal 0";
     }
   }
@@ -805,10 +805,9 @@ public:
       T_return_type cdf_at_upper_bound = TestClass.template cdf
         <T0,T1,T2,T3,T4,T5>
         (p0,p1,p2,p3,p4,p5);
-      EXPECT_TRUE(1.0 == cdf_at_upper_bound)
+      EXPECT_FLOAT_EQ(1.0,value_of(value_of(value_of(cdf_at_upper_bound))))
         << "CDF evaluated at upper bound is " 
-        << cdf_at_upper_bound
-        <<" but should equal 1";
+        << cdf_at_upper_bound <<" but should equal 1";
     }
   }
 
