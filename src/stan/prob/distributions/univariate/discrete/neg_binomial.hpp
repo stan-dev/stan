@@ -4,6 +4,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/random/negative_binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
@@ -34,7 +35,7 @@ namespace stan {
     template <bool propto,
               typename T_n,
               typename T_shape, typename T_inv_scale>
-    typename return_type<T_shape, T_inv_scale>::type
+    typename boost::enable_if_c<stan::is_int<T_n>::value, typename return_type<T_shape, T_inv_scale>::type>::type 
     neg_binomial_log(const T_n& n, 
                      const T_shape& alpha, 
                      const T_inv_scale& beta) {
@@ -184,7 +185,7 @@ namespace stan {
     // Negative Binomial CDF
     template <typename T_n, typename T_shape, 
               typename T_inv_scale>
-    typename return_type<T_shape, T_inv_scale>::type
+    typename boost::enable_if_c<stan::is_int<T_n>::value, typename return_type<T_shape, T_inv_scale>::type>::type 
     neg_binomial_cdf(const T_n& n, const T_shape& alpha, 
                      const T_inv_scale& beta) {
       static const std::string function("stan::prob::neg_binomial_cdf");
@@ -316,7 +317,7 @@ namespace stan {
 
     template <typename T_n, typename T_shape, 
               typename T_inv_scale>
-    typename return_type<T_shape, T_inv_scale>::type
+    typename boost::enable_if_c<stan::is_int<T_n>::value, typename return_type<T_shape, T_inv_scale>::type>::type 
     neg_binomial_cdf_log(const T_n& n, const T_shape& alpha, 
                      const T_inv_scale& beta) {
       static const std::string function("stan::prob::neg_binomial_cdf_log");
@@ -431,7 +432,7 @@ namespace stan {
 
     template <typename T_n, typename T_shape, 
               typename T_inv_scale>
-    typename return_type<T_shape, T_inv_scale>::type
+    typename boost::enable_if_c<stan::is_int<T_n>::value, typename return_type<T_shape, T_inv_scale>::type>::type 
     neg_binomial_ccdf_log(const T_n& n, const T_shape& alpha, 
                      const T_inv_scale& beta) {
       static const std::string function("stan::prob::neg_binomial_ccdf_log");

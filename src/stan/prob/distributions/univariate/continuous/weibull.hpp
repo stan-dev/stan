@@ -144,7 +144,6 @@ namespace stan {
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_positive;
       using stan::error_handling::check_not_nan;
-      using boost::math::tools::promote_args;
       using stan::math::value_of;
 
       // check if any vectors are zero length
@@ -209,7 +208,6 @@ namespace stan {
       static const std::string function("stan::prob::weibull_cdf_log");
 
       using stan::error_handling::check_positive_finite;
-      using boost::math::tools::promote_args;
       using stan::math::value_of;
 
       // check if any vectors are zero length
@@ -267,7 +265,6 @@ namespace stan {
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_positive;
       using stan::error_handling::check_not_nan;
-      using boost::math::tools::promote_args;
       using stan::math::value_of;
 
       // check if any vectors are zero length

@@ -3,6 +3,7 @@
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <stan/error_handling.hpp>
 #include <stan/math/functions/inv_logit.hpp>
 #include <stan/math/functions/log1m.hpp>
@@ -56,9 +57,13 @@ namespace stan {
      * non-finite value; or if the cutpoint vector is not sorted in
      * ascending order.
      */
-    template <bool propto, typename T_lambda, typename T_cut>
-    typename boost::math::tools::promote_args<T_lambda,T_cut>::type
-    ordered_logistic_log(int y, const T_lambda& lambda,  
+    template <bool propto, 
+              typename T_n,
+              typename T_lambda, 
+              typename T_cut>
+    typename boost::enable_if_c<stan::is_int<T_n>::value, 
+                                typename return_type<T_lambda, T_cut>::type>::type 
+    ordered_logistic_log(const T_n& y, const T_lambda& lambda,  
                          const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c) {
       using std::exp;
       using std::log;
@@ -104,7 +109,7 @@ namespace stan {
     }
 
     template <typename T_lambda, typename T_cut>
-    typename boost::math::tools::promote_args<T_lambda,T_cut>::type
+    typename return_type<T_lambda,T_cut>::type
     ordered_logistic_log(int y, const T_lambda& lambda,  
                          const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c) {
       return ordered_logistic_log<false>(y,lambda,c);

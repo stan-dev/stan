@@ -5,7 +5,6 @@
 #include <vector>
 #include <boost/type_traits.hpp>
 #include <boost/type_traits/is_arithmetic.hpp> 
-#include <boost/mpl/if.hpp>
 #include <boost/math/tools/promotion.hpp>
 
 #include <stan/agrad/fwd/fvar.hpp>

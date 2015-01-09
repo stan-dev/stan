@@ -5,6 +5,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/poisson_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/error_handling/scalar/check_less.hpp>
@@ -23,8 +24,11 @@ namespace stan {
   namespace prob {
 
     // Poisson(n|lambda)  [lambda > 0;  n >= 0]
-    template <bool propto, typename T_n, typename T_rate>
-    typename return_type<T_rate>::type
+    template <bool propto, 
+              typename T_n, 
+              typename T_rate>
+    typename boost::enable_if_c<stan::is_int<T_n>::value, 
+                                typename return_type<T_rate>::type>::type 
     poisson_log(const T_n& n, const T_rate& lambda) {
       typedef typename stan::partials_return_type<T_n,T_rate>::type
         T_partials_return;
@@ -104,8 +108,10 @@ namespace stan {
 
     // PoissonLog(n|alpha)  [n >= 0]   = Poisson(n|exp(alpha))
     template <bool propto,
-              typename T_n, typename T_log_rate>
-    typename return_type<T_log_rate>::type
+              typename T_n, 
+              typename T_log_rate>
+    typename boost::enable_if_c<stan::is_int<T_n>::value, 
+                                typename return_type<T_log_rate>::type>::type 
     poisson_log_log(const T_n& n, const T_log_rate& alpha) {
       typedef typename stan::partials_return_type<T_n,T_log_rate>::type
         T_partials_return;
@@ -190,8 +196,10 @@ namespace stan {
     }
 
     // Poisson CDF
-    template <typename T_n, typename T_rate>
-    typename return_type<T_rate>::type
+    template <typename T_n, 
+              typename T_rate>
+    typename boost::enable_if_c<stan::is_int<T_n>::value, 
+                                typename return_type<T_rate>::type>::type 
     poisson_cdf(const T_n& n, const T_rate& lambda) {
       static const std::string function("stan::prob::poisson_cdf");
       typedef typename stan::partials_return_type<T_n,T_rate>::type 
@@ -260,8 +268,10 @@ namespace stan {
       return operands_and_partials.to_var(P,lambda);
     }
 
-    template <typename T_n, typename T_rate>
-    typename return_type<T_rate>::type
+    template <typename T_n, 
+              typename T_rate>
+    typename boost::enable_if_c<stan::is_int<T_n>::value, 
+                                typename return_type<T_rate>::type>::type 
     poisson_cdf_log(const T_n& n, const T_rate& lambda) {
       static const std::string function("stan::prob::poisson_cdf_log");
       typedef typename stan::partials_return_type<T_n,T_rate>::type 
@@ -328,8 +338,10 @@ namespace stan {
       return operands_and_partials.to_var(P,lambda);
     }
 
-    template <typename T_n, typename T_rate>
-    typename return_type<T_rate>::type
+    template <typename T_n, 
+              typename T_rate>
+    typename boost::enable_if_c<stan::is_int<T_n>::value, 
+                                typename return_type<T_rate>::type>::type 
     poisson_ccdf_log(const T_n& n, const T_rate& lambda) {
       static const std::string function("stan::prob::poisson_ccdf_log");
       typedef typename stan::partials_return_type<T_n,T_rate>::type 

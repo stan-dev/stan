@@ -194,7 +194,6 @@ namespace stan {
       using stan::error_handling::check_less_or_equal;
       using stan::error_handling::check_positive;
       using stan::math::value_of;
-      using boost::math::tools::promote_args;
           
       T_partials_return P(1.0);
           
@@ -301,7 +300,6 @@ namespace stan {
       using stan::error_handling::check_less_or_equal;
       using stan::error_handling::check_positive;
       using stan::math::value_of;
-      using boost::math::tools::promote_args;
           
       T_partials_return P(0.0);
           
@@ -400,7 +398,6 @@ namespace stan {
       using stan::error_handling::check_less_or_equal;
       using stan::error_handling::check_positive;
       using stan::math::value_of;
-      using boost::math::tools::promote_args;
           
       T_partials_return P(0.0);
           

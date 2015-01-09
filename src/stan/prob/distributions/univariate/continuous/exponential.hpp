@@ -132,7 +132,6 @@ namespace stan {
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
       using stan::error_handling::check_not_nan;
-      using boost::math::tools::promote_args;
       using stan::math::value_of;
 
       T_partials_return cdf(1.0);
@@ -186,7 +185,6 @@ namespace stan {
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
       using stan::error_handling::check_not_nan;
-      using boost::math::tools::promote_args;
       using stan::math::value_of;
 
       T_partials_return cdf_log(0.0);
@@ -233,7 +231,6 @@ namespace stan {
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
       using stan::error_handling::check_not_nan;
-      using boost::math::tools::promote_args;
       using stan::math::value_of;
 
       T_partials_return ccdf_log(0.0);

@@ -4,6 +4,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/random/negative_binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
@@ -33,8 +34,10 @@ namespace stan {
     // NegBinomial(n|mu,phi)  [mu >= 0; phi > 0;  n >= 0]
     template <bool propto,
               typename T_n,
-              typename T_location, typename T_precision>
-    typename return_type<T_location, T_precision>::type
+              typename T_location, 
+              typename T_precision>
+    typename boost::enable_if_c<stan::is_int<T_n>::value, 
+                                typename return_type<T_location, T_precision>::type>::type 
     neg_binomial_2_log(const T_n& n,
                        const T_location& mu,
                        const T_precision& phi) {
@@ -136,7 +139,8 @@ namespace stan {
     }
 
     template <typename T_n,
-              typename T_location, typename T_precision>
+              typename T_location, 
+              typename T_precision>
     inline
     typename return_type<T_location, T_precision>::type
     neg_binomial_2_log(const T_n& n,
@@ -149,8 +153,10 @@ namespace stan {
     // NegBinomial(n|eta,phi)  [phi > 0;  n >= 0]
     template <bool propto,
               typename T_n,
-              typename T_log_location, typename T_precision>
-    typename return_type<T_log_location, T_precision>::type
+              typename T_log_location, 
+              typename T_precision>
+    typename boost::enable_if_c<stan::is_int<T_n>::value, 
+                                typename return_type<T_log_location, T_precision>::type>::type 
     neg_binomial_2_log_log(const T_n& n,
                            const T_log_location& eta,
                            const T_precision& phi) {
@@ -254,7 +260,8 @@ namespace stan {
     }
 
     template <typename T_n,
-              typename T_log_location, typename T_precision>
+              typename T_log_location, 
+              typename T_precision>
     inline
     typename return_type<T_log_location, T_precision>::type
     neg_binomial_2_log_log(const T_n& n,
@@ -263,9 +270,11 @@ namespace stan {
       return neg_binomial_2_log_log<false>(n,eta,phi);
     }
     
-    template <typename T_n, typename T_location, 
+    template <typename T_n, 
+              typename T_location, 
               typename T_precision>
-    typename return_type<T_location, T_precision>::type
+    typename boost::enable_if_c<stan::is_int<T_n>::value, 
+                                typename return_type<T_location, T_precision>::type>::type 
     neg_binomial_2_cdf(const T_n& n,
                        const T_location& mu,
                        const T_precision& phi) {
@@ -323,9 +332,11 @@ namespace stan {
       }
     }             
     
-    template <typename T_n, typename T_location, 
+    template <typename T_n, 
+              typename T_location, 
               typename T_precision>
-    typename return_type<T_location, T_precision>::type
+    typename boost::enable_if_c<stan::is_int<T_n>::value, 
+                                typename return_type<T_location, T_precision>::type>::type 
     neg_binomial_2_cdf_log(const T_n& n,
                        const T_location& mu,
                        const T_precision& phi) {
@@ -490,8 +501,11 @@ namespace stan {
 
     // Temporary neg_binomial_2_ccdf implementation that
     // transforms the input parameters and calls neg_binomial_ccdf
-    template <typename T_n, typename T_location, typename T_precision>
-    typename return_type<T_location, T_precision>::type
+    template <typename T_n, 
+              typename T_location, 
+              typename T_precision>
+    typename boost::enable_if_c<stan::is_int<T_n>::value, 
+                                typename return_type<T_location, T_precision>::type>::type 
     neg_binomial_2_ccdf_log(const T_n& n,
                             const T_location& mu,
                             const T_precision& phi) {

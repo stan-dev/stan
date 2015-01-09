@@ -3,6 +3,7 @@
 
 #include <boost/random/binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/error_handling/scalar/check_bounded.hpp>
@@ -31,14 +32,12 @@ namespace stan {
 
   namespace prob {
 
-    // typename boost::enable_if<is_same<scalar_type<T_n>,int> 
-    // && is_same<scalar_type<T_N>,int>,return_type<T_prob>::type>::type
     // Binomial(n|N,theta)  [N >= 0;  0 <= n <= N;  0 <= theta <= 1]
     template <bool propto,
               typename T_n,
               typename T_N,
               typename T_prob>
-    typename return_type<T_prob>::type
+    typename boost::enable_if_c<stan::is_int<T_n, T_N>::value, typename return_type<T_prob>::type>::type 
     binomial_log(const T_n& n, 
                  const T_N& N, 
                  const T_prob& theta) {
@@ -53,7 +52,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-      using stan::check_integer_type;
       
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -65,7 +63,6 @@ namespace stan {
       check_bounded(function, "Successes variable", n, 0, N);
       check_nonnegative(function, "Population size parameter", N);
       check_finite(function, "Probability parameter", theta);
-      check_integer_type(function,"Random variable", n);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
       check_consistent_sizes(function,
                              "Successes variable", n,
@@ -143,7 +140,7 @@ namespace stan {
               typename T_n,
               typename T_N,
               typename T_prob>
-    typename return_type<T_prob>::type
+    typename boost::enable_if_c<stan::is_int<T_n, T_N>::value, typename return_type<T_prob>::type>::type 
     binomial_logit_log(const T_n& n, 
                        const T_N& N, 
                        const T_prob& alpha) {
@@ -158,7 +155,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-      using stan::check_integer_type;
       
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -170,7 +166,6 @@ namespace stan {
       check_bounded(function, "Successes variable", n, 0, N);
       check_nonnegative(function, "Population size parameter", N);
       check_finite(function, "Probability parameter", alpha);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Successes variable", n,
                              "Population size parameter", N,
@@ -248,7 +243,7 @@ namespace stan {
 
     // Binomial CDF
     template <typename T_n, typename T_N, typename T_prob>
-    typename return_type<T_prob>::type
+    typename boost::enable_if_c<stan::is_int<T_n, T_N>::value, typename return_type<T_prob>::type>::type 
     binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta) {
       static const std::string function("stan::prob::binomial_cdf");
       typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type
@@ -259,7 +254,6 @@ namespace stan {
       using stan::error_handling::check_nonnegative;
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
-      using stan::check_integer_type;
       using stan::prob::include_summand;
           
       // Ensure non-zero arguments lenghts
@@ -272,7 +266,6 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function, 
                              "Successes variable", n,
                              "Population size parameter", N, 
@@ -333,7 +326,7 @@ namespace stan {
     }
 
     template <typename T_n, typename T_N, typename T_prob>
-    typename return_type<T_prob>::type
+    typename boost::enable_if_c<stan::is_int<T_n, T_N>::value, typename return_type<T_prob>::type>::type 
     binomial_cdf_log(const T_n& n, const T_N& N, const T_prob& theta) {
       static const std::string function("stan::prob::binomial_cdf_log");
       typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type
@@ -345,7 +338,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-      using stan::check_integer_type;
           
       // Ensure non-zero arguments lenghts
       if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
@@ -357,7 +349,6 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function, 
                              "Successes variable", n, 
                              "Population size parameter", N, 
@@ -410,7 +401,7 @@ namespace stan {
     }
 
     template <typename T_n, typename T_N, typename T_prob>
-    typename return_type<T_prob>::type
+    typename boost::enable_if_c<stan::is_int<T_n, T_N>::value, typename return_type<T_prob>::type>::type 
     binomial_ccdf_log(const T_n& n, const T_N& N, const T_prob& theta) {
       static const std::string function("stan::prob::binomial_ccdf_log");
       typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type 
@@ -422,7 +413,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-      using stan::check_integer_type;
           
       // Ensure non-zero arguments lenghts
       if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
@@ -434,7 +424,6 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0.0, 1.0);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Successes variable", n,
                              "Population size parameter", N,

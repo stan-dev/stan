@@ -236,7 +236,6 @@ namespace stan {
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
-      using boost::math::tools::promote_args;
       using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::error_handling::check_positive;
@@ -370,7 +369,6 @@ namespace stan {
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_positive;
       using stan::error_handling::check_less;
-      using boost::math::tools::promote_args;
       using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       
@@ -486,7 +484,6 @@ namespace stan {
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_positive;
       using stan::error_handling::check_less;
-      using boost::math::tools::promote_args;
       using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       

@@ -158,7 +158,6 @@ namespace stan {
       using stan::error_handling::check_finite;
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
-      using boost::math::tools::promote_args;
 
       T_partials_return cdf(1.0);
 

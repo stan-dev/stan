@@ -152,7 +152,6 @@ namespace stan {
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_consistent_sizes;
       using stan::error_handling::check_positive;
-      using boost::math::tools::promote_args;
       using stan::math::value_of;
           
       T_partials_return P(1.0);
@@ -249,7 +248,6 @@ namespace stan {
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_consistent_sizes;
       using stan::error_handling::check_positive;
-      using boost::math::tools::promote_args;
       using stan::math::value_of;
           
       T_partials_return P(0.0);
@@ -339,7 +337,6 @@ namespace stan {
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_consistent_sizes;
       using stan::error_handling::check_positive;
-      using boost::math::tools::promote_args;
       using stan::math::value_of;
           
       T_partials_return P(0.0);

@@ -2,6 +2,7 @@
 #define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BETA_BINOMIAL_HPP
 
 #include <stan/agrad/partials_vari.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
@@ -29,7 +30,7 @@ namespace stan {
     template <bool propto,
               typename T_n, typename T_N,
               typename T_size1, typename T_size2>
-    typename return_type<T_size1,T_size2>::type
+    typename boost::enable_if_c<stan::is_int<T_n, T_N>::value, typename return_type<T_size1, T_size2>::type>::type 
     beta_binomial_log(const T_n& n, 
                       const T_N& N, 
                       const T_size1& alpha, 
@@ -43,7 +44,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-      using stan::check_integer_type;
 
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -56,7 +56,6 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_positive_finite(function, "First prior sample size parameter", alpha);
       check_positive_finite(function, "Second prior sample size parameter", beta);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Successes variable", n,
                              "Population size parameter", N,
@@ -183,7 +182,7 @@ namespace stan {
     // Beta-Binomial CDF
     template <typename T_n, typename T_N, 
               typename T_size1, typename T_size2>
-    typename return_type<T_size1,T_size2>::type
+    typename boost::enable_if_c<stan::is_int<T_n, T_N>::value, typename return_type<T_size1, T_size2>::type>::type 
     beta_binomial_cdf(const T_n& n, const T_N& N, const T_size1& alpha, 
                       const T_size2& beta) {
       static const std::string function("stan::prob::beta_binomial_cdf");
@@ -196,7 +195,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-      using stan::check_integer_type;
           
       // Ensure non-zero argument lengths
       if (!(stan::length(n) && stan::length(N) && stan::length(alpha) 
@@ -209,7 +207,6 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_positive_finite(function, "First prior sample size parameter", alpha);
       check_positive_finite(function, "Second prior sample size parameter", beta);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,                           
                              "Successes variable", n, 
                              "Population size parameter", N, 
@@ -310,7 +307,7 @@ namespace stan {
 
     template <typename T_n, typename T_N, 
               typename T_size1, typename T_size2>
-    typename return_type<T_size1,T_size2>::type
+    typename boost::enable_if_c<stan::is_int<T_n, T_N>::value, typename return_type<T_size1, T_size2>::type>::type 
     beta_binomial_cdf_log(const T_n& n, const T_N& N, const T_size1& alpha, 
                           const T_size2& beta) {
       static const std::string function("stan::prob::beta_binomial_cdf_log");
@@ -323,7 +320,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-      using stan::check_integer_type;
           
       // Ensure non-zero argument lengths
       if (!(stan::length(n) && stan::length(N) && stan::length(alpha) 
@@ -336,7 +332,6 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_positive_finite(function, "First prior sample size parameter", alpha);
       check_positive_finite(function, "Second prior sample size parameter", beta);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Successes variable", n, 
                              "Population size parameter", N, 
@@ -428,7 +423,7 @@ namespace stan {
       
     template <typename T_n, typename T_N, 
               typename T_size1, typename T_size2>
-    typename return_type<T_size1,T_size2>::type
+    typename boost::enable_if_c<stan::is_int<T_n, T_N>::value, typename return_type<T_size1, T_size2>::type>::type 
     beta_binomial_ccdf_log(const T_n& n, const T_N& N, const T_size1& alpha, 
                            const T_size2& beta) {
       static const std::string function("stan::prob::beta_binomial_ccdf_log");
@@ -441,7 +436,6 @@ namespace stan {
       using stan::math::value_of;
       using stan::error_handling::check_consistent_sizes;
       using stan::prob::include_summand;
-      using stan::check_integer_type;
           
       // Ensure non-zero argument lengths
       if (!(stan::length(n) && stan::length(N) && stan::length(alpha) 
@@ -454,7 +448,6 @@ namespace stan {
       check_nonnegative(function, "Population size parameter", N);
       check_positive_finite(function, "First prior sample size parameter", alpha);
       check_positive_finite(function, "Second prior sample size parameter", beta);
-      check_integer_type(function,"Random variable", n);
       check_consistent_sizes(function,
                              "Successes variable", n, 
                              "Population size parameter", N, 
