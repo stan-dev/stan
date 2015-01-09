@@ -754,6 +754,34 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
   generated quantities block}
 \end{description}
 
+\section{Normal Distribution on Sufficient Statistics}\label{normal-ss-distribution.section}
+
+\subsubsection{Probability Density Function}
+
+If $\mu \in \reals$ and $\sigma \in \posreals$, then for $\bar{y} \in
+\reals, s^2 \in
+\posreals$ and $n \in \mathbb{N}^{+}$,
+\[
+\distro{Normal}(\bar{y}, s^2, n|\mu,\sigma)
+=
+\sigma^{-n-2}
+\exp\left( - \, \frac{1}{2\sigma^2}
+           \left[s^2 + n(\bar{y} - \mu)^2 \right]
+    \right)
+\!.
+\]
+
+Where $\bar{y} = \frac{1}{n} \sum\limits_{i=1}^n y_i, s^2 = \sum\limits_{i=1}^n (\bar{y} -y_i)^2$, $y_i$ are the observed random variables and $n$ is the number of observed random variables.
+
+\pitem{y bar}{normal\_sufficient}{s squared, n, mu, sigma}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+  \fitem{real}{normal\_sufficient\_log}{reals \farg{y bar}, reals \farg{s squared}, ints \farg{n}, reals \farg{mu}, reals
+    \farg{sigma}}{The log of the normal density of given the mean of the observed random variables \farg{y bar}, the sum of the squared deviations \farg{s squared}, the number of observed random variables \farg{n},
+   the location parameter \farg{mu} and the scale parameter \farg{sigma}}
+\end{description}
 
 \section{Exponentially Modified Normal Distribution}
 
