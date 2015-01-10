@@ -32,15 +32,15 @@ namespace stan {
                                 const std::string& name, 
                                 const Eigen::Matrix<T_y,R,C>& y, 
                                 size_t i) {
-      if ((i >= stan::error_index::value) 
-          && (i < static_cast<size_t>(y.rows()) + stan::error_index::value))
+      if (i >= stan::error_index::value
+          && i < static_cast<size_t>(y.rows()) + stan::error_index::value)
         return true;
       
       std::stringstream msg;
       msg << " for rows of " << name;
       out_of_range(function, 
-                   static_cast<int>(y.rows()),
-                   static_cast<int>(i), 
+                   y.rows(),
+                   i, 
                    msg.str());
       return false;
     }

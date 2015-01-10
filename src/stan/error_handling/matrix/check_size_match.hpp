@@ -31,8 +31,7 @@ namespace stan {
                                  T_size1 i,
                                  const std::string& name_j, 
                                  T_size2 j) {
-      typedef typename boost::common_type<T_size1,T_size2>::type common_type;
-      if (likely(static_cast<common_type>(i) == static_cast<common_type>(j)))
+      if (likely(i == static_cast<T_size1>(j)))
         return true;
 
       std::ostringstream msg;
