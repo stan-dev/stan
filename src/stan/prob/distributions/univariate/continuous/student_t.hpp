@@ -61,10 +61,10 @@ namespace stan {
                                                   T_scale>::type 
         T_partials_return;
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -235,10 +235,10 @@ namespace stan {
       
       static const std::string function("stan::prob::student_t_cdf");
           
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
           
       T_partials_return P(1.0);
@@ -421,10 +421,10 @@ namespace stan {
       
       static const std::string function("stan::prob::student_t_cdf_log");
           
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
           
       T_partials_return P(0.0);
@@ -594,10 +594,10 @@ namespace stan {
       
       static const std::string function("stan::prob::student_t_ccdf_log");
           
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
           
       T_partials_return P(0.0);
@@ -765,8 +765,8 @@ namespace stan {
 
       static const std::string function("stan::prob::student_t_rng");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
 
       check_positive_finite(function, "Degrees of freedom parameter", nu);
       check_finite(function, "Location parameter", mu);

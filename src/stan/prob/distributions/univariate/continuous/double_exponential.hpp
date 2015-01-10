@@ -31,9 +31,9 @@ namespace stan {
         T_partials_return;
       
       using stan::is_constant_struct;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
       using std::log;
@@ -155,9 +155,9 @@ namespace stan {
         return 1.0;
         
       using stan::math::value_of;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
+      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
 
       T_partials_return cdf(1.0);
@@ -228,10 +228,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
       
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_positive_finite;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
       T_partials_return cdf_log(0.0);
@@ -308,10 +308,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
       
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_positive_finite;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
       T_partials_return ccdf_log(0.0);
@@ -391,8 +391,8 @@ namespace stan {
       using boost::random::uniform_01;
       using std::log;
       using std::abs;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
       using stan::math::log1m;
 
       check_finite(function, "Location parameter", mu);

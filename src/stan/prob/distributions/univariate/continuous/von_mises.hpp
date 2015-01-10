@@ -32,11 +32,11 @@ namespace stan {
         return 0.0;
 
       using stan::is_constant_struct;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_greater;
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
+      using stan::math::check_greater;
+      using stan::math::check_nonnegative;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
       using stan::math::modified_bessel_first_kind;
@@ -147,8 +147,8 @@ namespace stan {
 
       static const std::string function("stan::prob::von_mises_rng");
 
-      stan::error_handling::check_finite(function, "mean", mu);
-      stan::error_handling::check_positive_finite(function, "inverse of variance", kappa);
+      stan::math::check_finite(function, "mean", mu);
+      stan::math::check_positive_finite(function, "inverse of variance", kappa);
 
       double r = 1 + pow((1 + 4 * kappa * kappa), 0.5);
       double rho = 0.5 * (r - pow(2 * r, 0.5)) / kappa;

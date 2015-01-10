@@ -31,10 +31,10 @@ namespace stan {
 
       using std::log;
       using stan::is_constant_struct;
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -153,10 +153,10 @@ namespace stan {
                                                   T_shape>::type 
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::owens_t;
       using stan::math::value_of;
 
@@ -256,11 +256,11 @@ namespace stan {
                                                   T_shape>::type
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::math::owens_t;
 
       T_partials_return cdf_log(0.0);
@@ -346,10 +346,10 @@ namespace stan {
                                                   T_shape>::type 
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::owens_t;
       using stan::math::value_of;
 
@@ -436,8 +436,8 @@ namespace stan {
 
       static const std::string function("stan::prob::skew_normal_rng");
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
 
       check_finite(function, "Location parameter", mu);
       check_finite(function, "Shape parameter", alpha);

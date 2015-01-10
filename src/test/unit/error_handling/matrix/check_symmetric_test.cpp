@@ -6,11 +6,11 @@ TEST(ErrorHandlingMatrix, checkSymmetric) {
   
   y.resize(2,2);
   y << 1, 3, 3, 1;
-  EXPECT_TRUE(stan::error_handling::check_symmetric("checkSymmetric",
+  EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric",
                                                     "y", y));
 
   y(0,1) = 3.5;
-  EXPECT_THROW(stan::error_handling::check_symmetric("checkSymmetric", "y", y),
+  EXPECT_THROW(stan::math::check_symmetric("checkSymmetric", "y", y),
                std::domain_error);
 }
 
@@ -21,7 +21,7 @@ TEST(ErrorHandlingMatrix, checkSymmetric_one_indexed_message) {
   y.resize(2,2);
   y << 1, 0, 3, 1;
   try {
-    stan::error_handling::check_symmetric("checkSymmetric", "y", y);
+    stan::math::check_symmetric("checkSymmetric", "y", y);
     FAIL() << "should have thrown";
   } catch (std::domain_error& e) {
     message = e.what();
@@ -41,16 +41,16 @@ TEST(ErrorHandlingMatrix, checkSymmetric_nan) {
 
   y.resize(2,2);
   y << 1, nan, 3, 1;
-  EXPECT_THROW(stan::error_handling::check_symmetric("checkSymmetric",
+  EXPECT_THROW(stan::math::check_symmetric("checkSymmetric",
                                                      "y", y),
                std::domain_error);
   y << nan, 3, 3, 1;
-  EXPECT_TRUE(stan::error_handling::check_symmetric("checkSymmetric",
+  EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric",
                                                     "y", y));
 
   y.resize(1,1);
   y << nan;
-  EXPECT_TRUE(stan::error_handling::check_symmetric("checkSymmetric",
+  EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric",
                                                     "y", y));
 }
 
@@ -58,7 +58,7 @@ TEST(ErrorHandlingMatrix, checkSymmetric_non_square) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   
   y.resize(2,3);
-  EXPECT_THROW(stan::error_handling::check_symmetric("checkSymmetric",
+  EXPECT_THROW(stan::math::check_symmetric("checkSymmetric",
                                                      "y", y),
                std::invalid_argument);
 

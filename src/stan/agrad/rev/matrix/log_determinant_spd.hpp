@@ -12,10 +12,10 @@ namespace stan {
 
     template <int R, int C>
     inline var log_determinant_spd(const Eigen::Matrix<var,R,C>& m) {
-      using stan::error_handling::domain_error;
+      using stan::math::domain_error;
       using Eigen::Matrix;
 
-      error_handling::check_square("log_determinant_spd", "m", m);
+      math::check_square("log_determinant_spd", "m", m);
 
       Matrix<double,R,C> m_d(m.rows(),m.cols());
       for (int i = 0; i < m.size(); ++i)

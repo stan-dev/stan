@@ -7,7 +7,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Return <code>true</code> if the matrix is either a

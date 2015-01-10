@@ -52,9 +52,9 @@ namespace stan {
       using stan::math::sum;
       using stan::math::log;
 
-      using stan::error_handling::check_size_match;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive;
+      using stan::math::check_size_match;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
 
       check_size_match(function, 
                        "Size of random variable (rows y)", y.rows(), 

@@ -12,7 +12,7 @@ TEST(AgradFwdMatrixEigenvaluesSym, exceptions_matrix_fd) {
 
   using stan::math::eigenvalues_sym;
   EXPECT_THROW(eigenvalues_sym(m0),std::invalid_argument);
-  EXPECT_THROW(eigenvalues_sym(m1),std::domain_error);
+  EXPECT_THROW(eigenvalues_sym(m1),std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixEigenvaluesSym, exceptions_matrix_ffd) {
@@ -22,7 +22,7 @@ TEST(AgradFwdMatrixEigenvaluesSym, exceptions_matrix_ffd) {
 
   using stan::math::eigenvalues_sym;
   EXPECT_THROW(eigenvalues_sym(m0),std::invalid_argument);
-  EXPECT_THROW(eigenvalues_sym(m1),std::domain_error);
+  EXPECT_THROW(eigenvalues_sym(m1),std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixEigenvaluesSym, exceptions_matrix_fv) {
@@ -32,7 +32,7 @@ TEST(AgradFwdMatrixEigenvaluesSym, exceptions_matrix_fv) {
 
   using stan::math::eigenvalues_sym;
   EXPECT_THROW(eigenvalues_sym(m0),std::invalid_argument);
-  EXPECT_THROW(eigenvalues_sym(m1),std::domain_error);
+  EXPECT_THROW(eigenvalues_sym(m1),std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixEigenvaluesSym, exceptions_matrix_ffv) {
@@ -42,7 +42,7 @@ TEST(AgradFwdMatrixEigenvaluesSym, exceptions_matrix_ffv) {
 
   using stan::math::eigenvalues_sym;
   EXPECT_THROW(eigenvalues_sym(m0),std::invalid_argument);
-  EXPECT_THROW(eigenvalues_sym(m1),std::domain_error);
+  EXPECT_THROW(eigenvalues_sym(m1),std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixEigenvaluesSym, matrix_fd) {

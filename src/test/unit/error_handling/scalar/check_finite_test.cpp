@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_finite.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_finite;
+using stan::math::check_finite;
 
 TEST(ErrorHandlingScalar,CheckFinite) {
   const std::string function = "check_finite";

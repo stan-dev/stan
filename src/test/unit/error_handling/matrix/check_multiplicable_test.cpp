@@ -8,20 +8,20 @@ TEST(ErrorHandlingMatrix, checkMultiplicableMatrix) {
   
   y.resize(3,3);
   x.resize(3,3);
-  EXPECT_TRUE(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
+  EXPECT_TRUE(stan::math::check_multiplicable("checkMultiplicable", "x", x,
                                                         "y", y));
   x.resize(3,2);
   y.resize(2,4);
-  EXPECT_TRUE(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
+  EXPECT_TRUE(stan::math::check_multiplicable("checkMultiplicable", "x", x,
                                                         "y", y));
 
   y.resize(1,2);
-  EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
+  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable", "x", x,
                                                          "y", y), 
                std::invalid_argument);
 
   x.resize(2,2);
-  EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
+  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable", "x", x,
                                                          "y", y), 
                std::invalid_argument);
 }
@@ -32,19 +32,19 @@ TEST(ErrorHandlingMatrix, checkMultiplicableMatrix_0) {
   
   x.resize(3,0);
   y.resize(0,3);
-  EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
+  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable", "x", x,
                                                          "y", y),
                std::invalid_argument);
 
   x.resize(0,4);
   y.resize(4,3);
-  EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
+  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable", "x", x,
                                                          "y", y),
                std::invalid_argument);
 
   x.resize(3,4);
   y.resize(4,0);
-  EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
+  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable", "x", x,
                                                          "y", y),
                std::invalid_argument);
 }
@@ -58,24 +58,24 @@ TEST(ErrorHandlingMatrix, checkMultiplicableMatrix_nan) {
   x.resize(3,3);
   y << nan, nan, nan,nan, nan, nan,nan, nan, nan;
   x << nan, nan, nan,nan, nan, nan,nan, nan, nan;
-  EXPECT_TRUE(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
+  EXPECT_TRUE(stan::math::check_multiplicable("checkMultiplicable", "x", x,
                                                         "y", y));
   x.resize(3,2);
   y.resize(2,4);
   y << nan, nan, nan,nan, nan, nan,nan, nan;
   x << nan, nan, nan,nan, nan, nan;
-  EXPECT_TRUE(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
+  EXPECT_TRUE(stan::math::check_multiplicable("checkMultiplicable", "x", x,
                                                         "y", y));
 
   y.resize(1,2);
   y << nan, nan;
-  EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
+  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable", "x", x,
                                                          "y", y), 
                std::invalid_argument);
 
   x.resize(2,2);
   x << nan, nan, nan, nan;
-  EXPECT_THROW(stan::error_handling::check_multiplicable("checkMultiplicable", "x", x,
+  EXPECT_THROW(stan::math::check_multiplicable("checkMultiplicable", "x", x,
                                                          "y", y), 
                std::invalid_argument);
 }

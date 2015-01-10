@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_less_or_equal.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_less_or_equal;
+using stan::math::check_less_or_equal;
 
 TEST(ErrorHandlingScalar,CheckLessOrEqual) {
   const std::string function = "check_less_or_equal";

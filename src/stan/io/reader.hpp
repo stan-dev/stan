@@ -464,14 +464,14 @@ namespace stan {
        * Return the next scalar, checking that it is
        * positive.  
        *
-       * <p>See <code>stan::error_handling::check_positive(T)</code>.
+       * <p>See <code>stan::math::check_positive(T)</code>.
        *
        * @return Next positive scalar.
        * @throw std::runtime_error if x is not positive
        */
       inline T scalar_pos() {
         T x(scalar());
-        stan::error_handling::check_positive("stan::io::scalar_pos", "Constrained scalar", x);
+        stan::math::check_positive("stan::io::scalar_pos", "Constrained scalar", x);
         return x;
       }
 
@@ -504,7 +504,7 @@ namespace stan {
        * Return the next scalar, checking that it is
        * greater than or equal to the specified lower bound.
        *
-       * <p>See <code>stan::error_handling::check_greater_or_equal(T,double)</code>.
+       * <p>See <code>stan::math::check_greater_or_equal(T,double)</code>.
        *
        * @param lb Lower bound.
        * @return Next scalar value.
@@ -515,7 +515,7 @@ namespace stan {
       template <typename TL>
       inline T scalar_lb(const TL lb) {
         T x(scalar());
-        stan::error_handling::check_greater_or_equal("stan::io::scalar_lb", "Constrained scalar", x, lb);
+        stan::math::check_greater_or_equal("stan::io::scalar_lb", "Constrained scalar", x, lb);
         return x;
       }
 
@@ -557,7 +557,7 @@ namespace stan {
        * Return the next scalar, checking that it is
        * less than or equal to the specified upper bound.
        *
-       * <p>See <code>stan::error_handling::check_less_or_equal(T,double)</code>.
+       * <p>See <code>stan::math::check_less_or_equal(T,double)</code>.
        *
        * @tparam TU Type of upper bound.
        * @param ub Upper bound.
@@ -568,7 +568,7 @@ namespace stan {
       template <typename TU>
       inline T scalar_ub(TU ub) {
         T x(scalar());
-        stan::error_handling::check_less_or_equal("stan::io::scalar_ub", "Constrained scalar", x, ub);
+        stan::math::check_less_or_equal("stan::io::scalar_ub", "Constrained scalar", x, ub);
         return x;
       }
 
@@ -608,7 +608,7 @@ namespace stan {
        * Return the next scalar, checking that it is between
        * the specified lower and upper bound.
        *
-       * <p>See <code>stan::error_handling::check_bounded(T,double,double)</code>.
+       * <p>See <code>stan::math::check_bounded(T,double,double)</code>.
        *
        * @tparam TL Type of lower bound.
        * @tparam TU Type of upper bound.
@@ -621,7 +621,7 @@ namespace stan {
       template <typename TL, typename TU>
       inline T scalar_lub(const TL lb, const TU ub) {
         T x(scalar());
-        stan::error_handling::check_bounded<T,TL,TU>("stan::io::scalar_lub", "Constrained scalar", x, lb, ub);
+        stan::math::check_bounded<T,TL,TU>("stan::io::scalar_lub", "Constrained scalar", x, lb, ub);
         return x;
       }
 
@@ -665,13 +665,13 @@ namespace stan {
        * Return the next scalar, checking that it is a valid value for
        * a probability, between 0 (inclusive) and 1 (inclusive).
        *
-       * <p>See <code>stan::error_handling::check_bounded(T)</code>.
+       * <p>See <code>stan::math::check_bounded(T)</code>.
        * 
        * @return Next probability value.
        */
       inline T prob() {
         T x(scalar());
-        stan::error_handling::check_bounded<T,double,double>("stan::io::prob", "Constrained probability", x, 0, 1);
+        stan::math::check_bounded<T,double,double>("stan::io::prob", "Constrained probability", x, 0, 1);
         return x;
       }
 
@@ -709,7 +709,7 @@ namespace stan {
        * value for a correlation, between -1 (inclusive) and
        * 1 (inclusive).
        *
-       * <p>See <code>stan::error_handling::check_bounded(T)</code>.
+       * <p>See <code>stan::math::check_bounded(T)</code>.
        *
        * @return Next correlation value.
        * @throw std::runtime_error if the value is not valid
@@ -717,7 +717,7 @@ namespace stan {
        */
       inline T corr() {
         T x(scalar());
-        stan::error_handling::check_bounded<T,double,double>("stan::io::corr", "Correlation value", x, -1, 1);
+        stan::math::check_bounded<T,double,double>("stan::io::corr", "Correlation value", x, -1, 1);
         return x;
       }
 
@@ -752,7 +752,7 @@ namespace stan {
        * Return a unit_vector of the specified size made up of the
        * next scalars.  
        *
-       * <p>See <code>stan::error_handling::check_unit_vector</code>.
+       * <p>See <code>stan::math::check_unit_vector</code>.
        *
        * @param k Size of returned unit_vector.
        * @return unit_vector read from the specified size number of scalars.
@@ -760,7 +760,7 @@ namespace stan {
        */
       inline vector_t unit_vector(size_t k) {
         vector_t theta(vector(k));
-        stan::error_handling::check_unit_vector("stan::io::unit_vector", "Constrained vector", theta);
+        stan::math::check_unit_vector("stan::io::unit_vector", "Constrained vector", theta);
         return theta;
       }
 
@@ -799,7 +799,7 @@ namespace stan {
        * Return a simplex of the specified size made up of the
        * next scalars.  
        *
-       * <p>See <code>stan::error_handling::check_simplex</code>.
+       * <p>See <code>stan::math::check_simplex</code>.
        *
        * @param k Size of returned simplex.
        * @return Simplex read from the specified size number of scalars.
@@ -807,7 +807,7 @@ namespace stan {
        */
       inline vector_t simplex(size_t k) {
         vector_t theta(vector(k));
-        stan::error_handling::check_simplex("stan::io::simplex", "Constrained vector", theta);
+        stan::math::check_simplex("stan::io::simplex", "Constrained vector", theta);
         return theta;
       }
 
@@ -846,7 +846,7 @@ namespace stan {
        * Return the next vector of specified size containing
        * values in ascending order.  
        *
-       * <p>See <code>stan::error_handling::check_ordered(T)</code> for
+       * <p>See <code>stan::math::check_ordered(T)</code> for
        * behavior on failure.
        *
        * @param k Size of returned vector.
@@ -854,7 +854,7 @@ namespace stan {
        */
       inline vector_t ordered(size_t k) {
         vector_t x(vector(k));
-        stan::error_handling::check_ordered("stan::io::ordered", "Constrained vector", x);
+        stan::math::check_ordered("stan::io::ordered", "Constrained vector", x);
         return x;
       }
 
@@ -890,7 +890,7 @@ namespace stan {
        * Return the next vector of specified size containing
        * positive values in ascending order.  
        *
-       * <p>See <code>stan::error_handling::check_positive_ordered(T)</code> for
+       * <p>See <code>stan::math::check_positive_ordered(T)</code> for
        * behavior on failure.
        *
        * @param k Size of returned vector.
@@ -898,7 +898,7 @@ namespace stan {
        */
       inline vector_t positive_ordered(size_t k) {
         vector_t x(vector(k));
-        stan::error_handling::check_positive_ordered("stan::io::positive_ordered", "Constrained vector", x);
+        stan::math::check_positive_ordered("stan::io::positive_ordered", "Constrained vector", x);
         return x;
       }
 
@@ -944,7 +944,7 @@ namespace stan {
        */
       inline matrix_t cholesky_factor(size_t M, size_t N) {
         matrix_t y(matrix(M,N));
-        stan::error_handling::check_cholesky_factor("stan::io::cholesky_factor", "Constrained matrix", y);
+        stan::math::check_cholesky_factor("stan::io::cholesky_factor", "Constrained matrix", y);
         return y;
       }
 
@@ -995,7 +995,7 @@ namespace stan {
        * Cholesky factor for a correlation matrix.
        */
       inline matrix_t cholesky_corr(size_t K) {
-        using stan::error_handling::check_cholesky_factor_corr;
+        using stan::math::check_cholesky_factor_corr;
         matrix_t y(matrix(K,K));
         check_cholesky_factor_corr("stan::io::cholesky_factor_corr", 
                                    "Constrained matrix", y);
@@ -1041,7 +1041,7 @@ namespace stan {
        * Return the next covariance matrix with the specified 
        * dimensionality.  
        *
-       * <p>See <code>stan::error_handling::check_cov_matrix(Matrix)</code>.
+       * <p>See <code>stan::math::check_cov_matrix(Matrix)</code>.
        *
        * @param k Dimensionality of covariance matrix.
        * @return Next covariance matrix of the specified dimensionality.
@@ -1050,7 +1050,7 @@ namespace stan {
        */
       inline matrix_t cov_matrix(size_t k) {
         matrix_t y(matrix(k,k));
-        stan::error_handling::check_cov_matrix("stan::io::cov_matrix", "Constrained matrix", y);
+        stan::math::check_cov_matrix("stan::io::cov_matrix", "Constrained matrix", y);
         return y;
       }
 
@@ -1087,7 +1087,7 @@ namespace stan {
       /**
        * Returns the next correlation matrix of the specified dimensionality.
        *
-       * <p>See <code>stan::error_handling::check_corr_matrix(Matrix)</code>.
+       * <p>See <code>stan::math::check_corr_matrix(Matrix)</code>.
        *
        * @param k Dimensionality of correlation matrix.
        * @return Next correlation matrix of the specified dimensionality.
@@ -1095,7 +1095,7 @@ namespace stan {
        */
       inline matrix_t corr_matrix(size_t k) {
         matrix_t x(matrix(k,k));
-        stan::error_handling::check_corr_matrix("stan::math::corr_matrix", "Constrained matrix", x);
+        stan::math::check_corr_matrix("stan::math::corr_matrix", "Constrained matrix", x);
         return x;
       }
 

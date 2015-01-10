@@ -6,7 +6,7 @@
 #include <stan/meta/traits.hpp>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Return <code>true</code> if the dimension of x is consistent, which

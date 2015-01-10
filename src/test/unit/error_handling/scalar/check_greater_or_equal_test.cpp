@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_greater_or_equal.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_greater_or_equal;
+using stan::math::check_greater_or_equal;
 
 TEST(ErrorHandlingScalar,CheckGreaterOrEqual) {
   const std::string function = "check_greater_or_equal";

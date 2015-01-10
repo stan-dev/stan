@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 TEST(ErrorHandlingScalar, checkConsistentSizes_zero) {
-  using stan::error_handling::check_consistent_sizes;
+  using stan::math::check_consistent_sizes;
   const std::string function = "testConsSizes";
   const std::string name1 = "name1";
   const std::string name2 = "name2";
@@ -47,7 +47,7 @@ TEST(ErrorHandlingScalar, checkConsistentSizes_zero) {
 TEST(ErrorHandlingScalar, checkConsistentSizes) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::error_handling::check_consistent_sizes;
+  using stan::math::check_consistent_sizes;
   using stan::size_of;
 
   const std::string function = "testConsSizes";
@@ -97,7 +97,7 @@ TEST(ErrorHandlingScalar, checkConsistentSizes) {
 TEST(ErrorHandlingScalar, checkConsistentSizes_nan) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::error_handling::check_consistent_sizes;
+  using stan::math::check_consistent_sizes;
   using stan::size_of;
 
   const std::string function = "testConsSizes";

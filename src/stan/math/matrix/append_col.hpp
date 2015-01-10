@@ -12,7 +12,7 @@ namespace stan {
     using Eigen::Dynamic;
     using Eigen::Matrix; 
     using std::vector;
-    using stan::error_handling::check_size_match;
+    using stan::math::check_size_match;
        
     //matrix append_col(matrix, matrix)
     //matrix append_col(matrix, vector)

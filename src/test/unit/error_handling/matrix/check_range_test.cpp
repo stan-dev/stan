@@ -3,7 +3,7 @@
 #include <test/unit/util.hpp>
 
 TEST(ErrorHandlingMatrix, checkRange_6_arg_std_vector) {
-    using stan::error_handling::check_range;
+    using stan::math::check_range;
     std::vector<double> x;
 
     x.resize(4);
@@ -27,7 +27,7 @@ TEST(ErrorHandlingMatrix, checkRange_6_arg_std_vector) {
 }
 
 TEST(ErrorHandlingMatrix, checkRange_4_arg_std_vector) {
-    using stan::error_handling::check_range;
+    using stan::math::check_range;
     std::vector<double> x;
 
     x.resize(4);

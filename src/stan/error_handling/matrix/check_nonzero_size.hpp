@@ -10,7 +10,7 @@
 
 namespace stan {
 
-  namespace error_handling {
+  namespace math {
 
     /**
      * Return <code>true</code> if the specified matrix/vector is of

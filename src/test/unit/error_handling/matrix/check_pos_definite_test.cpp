@@ -3,7 +3,7 @@
 #include <test/unit/util.hpp>
 
 TEST(ErrorHandlingMatrix, checkPosDefinite) {
-  using stan::error_handling::check_pos_definite;
+  using stan::math::check_pos_definite;
 
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
 
@@ -20,7 +20,7 @@ TEST(ErrorHandlingMatrix, checkPosDefinite) {
 }
 
 TEST(ErrorHandlingMatrix, checkPosDefinite_not_square) {
-  using stan::error_handling::check_pos_definite;
+  using stan::math::check_pos_definite;
   std::string expected_msg;
 
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
@@ -33,7 +33,7 @@ TEST(ErrorHandlingMatrix, checkPosDefinite_not_square) {
 }
 
 TEST(ErrorHandlingMatrix, checkPosDefinite_0_size) {
-  using stan::error_handling::check_pos_definite;
+  using stan::math::check_pos_definite;
   std::string expected_msg;
 
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
@@ -45,7 +45,7 @@ TEST(ErrorHandlingMatrix, checkPosDefinite_0_size) {
 }
 
 TEST(ErrorHandlingMatrix, checkPosDefinite_non_symmetric) {
-  using stan::error_handling::check_pos_definite;
+  using stan::math::check_pos_definite;
   std::string expected_msg;
 
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
@@ -65,7 +65,7 @@ TEST(ErrorHandlingMatrix, checkPosDefinite_non_symmetric) {
 TEST(ErrorHandlingMatrix, checkPosDefinite_nan) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double nan = std::numeric_limits<double>::quiet_NaN();
-  using stan::error_handling::check_pos_definite;
+  using stan::math::check_pos_definite;
 
   y.resize(1,1);
   y << nan;

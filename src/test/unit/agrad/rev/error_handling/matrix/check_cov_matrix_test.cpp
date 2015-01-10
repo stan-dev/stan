@@ -7,7 +7,7 @@ TEST(AgradRevErrorHandlingMatrix,CheckCovMatrix) {
   using Eigen::Dynamic;
   using Eigen::Matrix;
   
-  using stan::error_handling::check_cov_matrix;
+  using stan::math::check_cov_matrix;
   
   const std::string function = "check_cov_matrix";
   Matrix<var,Dynamic,Dynamic> Sigma;

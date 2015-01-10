@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace error_handling {
+  namespace math {
 
     /**
      * Throw an invalid argument exception with a consistently formatted message.

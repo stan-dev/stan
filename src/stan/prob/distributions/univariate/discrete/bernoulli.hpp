@@ -30,11 +30,11 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_prob>::type
         T_partials_return;
 
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_bounded;
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
       using stan::math::log1m;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
       
       // check if any vectors are zero length
@@ -133,10 +133,10 @@ namespace stan {
         T_partials_return;
 
       using stan::is_constant_struct;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_bounded;
+      using stan::math::check_not_nan;
+      using stan::math::check_bounded;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::math::log1p;
       using stan::math::inv_logit;
@@ -217,9 +217,9 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_prob>::type 
         T_partials_return;
       
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lenghts
@@ -280,9 +280,9 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_prob>::type 
         T_partials_return;
        
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lenghts
@@ -340,9 +340,9 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_prob>::type 
         T_partials_return;
       
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lenghts
@@ -404,8 +404,8 @@ namespace stan {
 
       static const std::string function("stan::prob::bernoulli_rng");
 
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_bounded;
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
  
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0, 1);

@@ -49,10 +49,10 @@ namespace stan {
         T_partials_return;
 
       using stan::is_constant_struct;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_positive_finite;
       using boost::math::tools::promote_args;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
       // check if any vectors are zero length
@@ -186,12 +186,12 @@ namespace stan {
       // Error checks
       static const std::string function("stan::prob::inv_gamma_cdf");
           
-      using stan::error_handling::check_positive_finite;      
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_less_or_equal;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;      
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_less_or_equal;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -305,12 +305,12 @@ namespace stan {
       // Error checks
       static const std::string function("stan::prob::inv_gamma_cdf_log");
           
-      using stan::error_handling::check_positive_finite;      
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_less_or_equal;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;      
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_less_or_equal;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -416,12 +416,12 @@ namespace stan {
       // Error checks
       static const std::string function("stan::prob::inv_gamma_ccdf_log");
           
-      using stan::error_handling::check_positive_finite;      
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_less_or_equal;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;      
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_less_or_equal;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -524,7 +524,7 @@ namespace stan {
 
       static const std::string function("stan::prob::inv_gamma_rng");
 
-      using stan::error_handling::check_positive_finite;
+      using stan::math::check_positive_finite;
  
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", beta);

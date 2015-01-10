@@ -129,8 +129,8 @@ namespace stan {
     quad_form(const Eigen::Matrix<TA,RA,CA> &A,
               const Eigen::Matrix<TB,RB,CB> &B)
     {
-      stan::error_handling::check_square("quad_form", "A", A);
-      stan::error_handling::check_multiplicable("quad_form", 
+      stan::math::check_square("quad_form", "A", A);
+      stan::math::check_multiplicable("quad_form", 
                                                 "A", A, 
                                                 "B", B);
       
@@ -146,8 +146,8 @@ namespace stan {
     quad_form(const Eigen::Matrix<TA,RA,CA> &A,
               const Eigen::Matrix<TB,RB,1> &B)
     {
-      stan::error_handling::check_square("quad_form", "A", A);
-      stan::error_handling::check_multiplicable("quad_form",
+      stan::math::check_square("quad_form", "A", A);
+      stan::math::check_multiplicable("quad_form",
                                                 "A", A,
                                                 "B", B);
       
@@ -164,9 +164,9 @@ namespace stan {
     quad_form_sym(const Eigen::Matrix<TA,RA,CA> &A,
                   const Eigen::Matrix<TB,RB,CB> &B)
     {
-      stan::error_handling::check_square("quad_form", "A", A);
-      stan::error_handling::check_symmetric("quad_form_sym", "A", A);
-      stan::error_handling::check_multiplicable("quad_form_sym", 
+      stan::math::check_square("quad_form", "A", A);
+      stan::math::check_symmetric("quad_form_sym", "A", A);
+      stan::math::check_multiplicable("quad_form_sym", 
                                                 "A", A, 
                                                 "B", B);
       
@@ -182,9 +182,9 @@ namespace stan {
     quad_form_sym(const Eigen::Matrix<TA,RA,CA> &A,
                   const Eigen::Matrix<TB,RB,1> &B)
     {
-      stan::error_handling::check_square("quad_form", "A", A);
-      stan::error_handling::check_symmetric("quad_form_sym", "A", A);
-      stan::error_handling::check_multiplicable("quad_form_sym", 
+      stan::math::check_square("quad_form", "A", A);
+      stan::math::check_symmetric("quad_form_sym", "A", A);
+      stan::math::check_multiplicable("quad_form_sym", 
                                                 "A", A, 
                                                 "B", B);
       

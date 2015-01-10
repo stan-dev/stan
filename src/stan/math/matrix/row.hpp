@@ -24,7 +24,7 @@ namespace stan {
     Eigen::Matrix<T,1,Eigen::Dynamic>
     row(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m, 
         size_t i) {
-      stan::error_handling::check_row_index("row", "j", m, i);
+      stan::math::check_row_index("row", "j", m, i);
       
       return m.row(i - 1);
     }

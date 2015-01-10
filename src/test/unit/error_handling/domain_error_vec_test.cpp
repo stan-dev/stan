@@ -49,7 +49,7 @@ public:
   template <class T>
   void test_throw(T y) {
     try {
-      stan::error_handling::domain_error_vec<T>
+      stan::math::domain_error_vec<T>
         (function_, y_name_, y, index_, msg1_, msg2_);
       FAIL() << "expecting call to domain_error_vec<> to throw a domain_error,"
              << "but threw nothing";
@@ -61,7 +61,7 @@ public:
     }
 
     try {
-      stan::error_handling::domain_error_vec<T>
+      stan::math::domain_error_vec<T>
         (function_, y_name_, y, index_, msg1_);
       FAIL() << "expecting call to domain_error_vec<> to throw a domain_error,"
              << "but threw nothing";
@@ -107,7 +107,7 @@ TEST_F(ErrorHandlingScalar_domain_error_vec, one_indexed) {
   int n = 5;
   std::vector<double> y(20);
   try {
-    stan::error_handling::domain_error_vec
+    stan::math::domain_error_vec
       (function_, y_name_, y, n, msg1_, msg2_);
     FAIL() << "expecting call to domain_error_vec<> to throw a domain_error,"
            << "but threw nothing";

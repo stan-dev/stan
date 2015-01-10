@@ -46,10 +46,10 @@ namespace stan {
 
       using std::log;
       using stan::is_constant_struct;
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -157,11 +157,11 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::math::INV_SQRT_2;
 
       T_partials_return cdf(1.0);
@@ -241,10 +241,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::math::INV_SQRT_2;
 
@@ -316,10 +316,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::math::INV_SQRT_2;
 
@@ -391,9 +391,9 @@ namespace stan {
                RNG& rng) {
       using boost::variate_generator;
       using boost::normal_distribution;
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
 
       static const std::string function("stan::prob::normal_rng");
 

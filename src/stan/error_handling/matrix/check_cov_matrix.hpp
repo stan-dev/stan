@@ -6,7 +6,7 @@
 #include <stan/error_handling/matrix/check_pos_definite.hpp>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Return <code>true</code> if the specified matrix is a valid

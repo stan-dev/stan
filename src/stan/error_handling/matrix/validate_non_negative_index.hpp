@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     inline 
     void 

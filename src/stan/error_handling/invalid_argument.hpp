@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Throw an invalid_argument exception with a consistently formatted message.

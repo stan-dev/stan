@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_corr_matrix.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_corr_matrix;
+using stan::math::check_corr_matrix;
 
 TEST(ErrorHandlingMatrix, CheckCorrMatrix) {
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y;

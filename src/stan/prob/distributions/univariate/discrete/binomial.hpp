@@ -45,11 +45,11 @@ namespace stan {
 
       static const std::string function("stan::prob::binomial_log");
       
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
       
       // check if any vectors are zero length
@@ -148,11 +148,11 @@ namespace stan {
 
       static const std::string function("stan::prob::binomial_logit_log");
       
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
       
       // check if any vectors are zero length
@@ -248,11 +248,11 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type
         T_partials_return;
           
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero arguments lenghts
@@ -331,11 +331,11 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type
         T_partials_return;
           
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero arguments lenghts
@@ -406,11 +406,11 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type 
         T_partials_return;
           
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero arguments lenghts
@@ -485,10 +485,10 @@ namespace stan {
 
       static const std::string function("stan::prob::binomial_rng");
       
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_less_or_equal;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_finite;
+      using stan::math::check_less_or_equal;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_nonnegative;
 
       check_nonnegative(function, "Population size parameter", N);
       check_finite(function, "Probability parameter", theta);

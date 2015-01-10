@@ -7,7 +7,7 @@
 #include <stan/math/matrix/LDLT_factor.hpp>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Return <code>true</code> if the argument is a valid 

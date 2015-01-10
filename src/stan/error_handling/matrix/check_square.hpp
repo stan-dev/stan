@@ -6,7 +6,7 @@
 #include <stan/error_handling/matrix/check_size_match.hpp>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Return <code>true</code> if the specified matrix is square.

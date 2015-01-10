@@ -65,7 +65,7 @@ namespace stan {
 
     template <int R, int C>
     inline var determinant(const Eigen::Matrix<var,R,C>& m) {
-      stan::error_handling::check_square("determinant", "m", m);
+      stan::math::check_square("determinant", "m", m);
       return var(new determinant_vari<R,C>(m));
     }
     

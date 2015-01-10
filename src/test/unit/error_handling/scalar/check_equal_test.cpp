@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_equal.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_equal;
+using stan::math::check_equal;
 
 TEST(ErrorHandlingScalar,CheckEqual) {
   const std::string function = "check_equal";

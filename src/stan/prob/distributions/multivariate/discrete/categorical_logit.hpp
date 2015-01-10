@@ -23,8 +23,8 @@ namespace stan {
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
       static const std::string function("stan::prob::categorical_logit_log");
 
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_finite;
       using stan::math::log_sum_exp;
 
       check_bounded(function, "categorical outcome out of support", n, 1, beta.size());
@@ -52,8 +52,8 @@ namespace stan {
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
       static const std::string function("stan::prob::categorical_logit_log");
 
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_finite;
       using stan::math::log_softmax;
       using stan::math::sum;
 

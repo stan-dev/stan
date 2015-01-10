@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_less.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_less;
+using stan::math::check_less;
 
 TEST(ErrorHandlingScalar,CheckLess) {
   const std::string function = "check_less";

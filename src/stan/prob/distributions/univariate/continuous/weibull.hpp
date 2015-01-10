@@ -29,11 +29,11 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
         T_partials_return;
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::math::multiply_log;
 
       // check if any vectors are zero length
@@ -146,8 +146,8 @@ namespace stan {
 
       static const std::string function("stan::prob::weibull_cdf");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -211,8 +211,8 @@ namespace stan {
 
       static const std::string function("stan::prob::weibull_cdf_log");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -266,8 +266,8 @@ namespace stan {
 
       static const std::string function("stan::prob::weibull_ccdf_log");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -320,7 +320,7 @@ namespace stan {
 
       static const std::string function("stan::prob::weibull_rng");
 
-      using stan::error_handling::check_positive_finite;
+      using stan::math::check_positive_finite;
   
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", sigma);

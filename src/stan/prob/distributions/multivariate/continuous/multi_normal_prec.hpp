@@ -38,16 +38,16 @@ namespace stan {
       typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp_type;
       lp_type lp(0.0);
       
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_symmetric;
-      using stan::error_handling::check_size_match;
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_symmetric;
+      using stan::math::check_size_match;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
       using stan::math::sum;
       using stan::math::trace_quad_form;
       using stan::math::log_determinant_ldlt;
       using stan::math::LDLT_factor;
-      using stan::error_handling::check_ldlt_factor;
+      using stan::math::check_ldlt_factor;
       
       check_size_match(function, 
                        "Rows of precision parameter", Sigma.rows(), 

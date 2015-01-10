@@ -42,7 +42,7 @@ public:
 
   template <class T>
   void test_throw(T y, size_t i) {
-    using stan::error_handling::out_of_range;
+    using stan::math::out_of_range;
     
     EXPECT_THROW_MSG(out_of_range(function_, y.size(), i, msg1_, msg2_),
                      std::out_of_range,

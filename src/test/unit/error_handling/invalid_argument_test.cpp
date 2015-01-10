@@ -41,7 +41,7 @@ public:
   template <class T>
   void test_throw(T y) {
     try {
-      stan::error_handling::invalid_argument<T>
+      stan::math::invalid_argument<T>
         (function_, y_name_, y, msg1_, msg2_);
       FAIL() << "expecting call to invalid_argument<> to throw a invalid_argument,"
              << "but threw nothing";
@@ -53,7 +53,7 @@ public:
     }
 
     try {
-      stan::error_handling::invalid_argument<T>
+      stan::math::invalid_argument<T>
         (function_, y_name_, y, msg1_);
       FAIL() << "expecting call to invalid_argument<> to throw a invalid_argument,"
              << "but threw nothing";

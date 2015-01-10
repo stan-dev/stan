@@ -41,7 +41,7 @@ public:
   template <class T>
   void test_throw(T y) {
     try {
-      stan::error_handling::domain_error<T>
+      stan::math::domain_error<T>
         (function_, y_name_, y, msg1_, msg2_);
       FAIL() << "expecting call to domain_error<> to throw a domain_error,"
              << "but threw nothing";
@@ -53,7 +53,7 @@ public:
     }
 
     try {
-      stan::error_handling::domain_error<T>
+      stan::math::domain_error<T>
         (function_, y_name_, y, msg1_);
       FAIL() << "expecting call to domain_error<> to throw a domain_error,"
              << "but threw nothing";

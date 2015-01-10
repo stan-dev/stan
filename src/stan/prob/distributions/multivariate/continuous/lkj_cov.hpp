@@ -26,9 +26,9 @@ namespace stan {
                 const T_shape& eta) {
       static const std::string function("stan::prob::lkj_cov_log");
       
-      using stan::error_handling::check_size_match;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive;
+      using stan::math::check_size_match;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
@@ -88,8 +88,8 @@ namespace stan {
                 const T_shape& eta) {
       static const std::string function("stan::prob::lkj_cov_log");
 
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);

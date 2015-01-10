@@ -5,7 +5,7 @@
 TEST(ErrorHandlingScalar, checkConsistentSize_EigenVector) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::error_handling::check_consistent_size;
+  using stan::math::check_consistent_size;
   using stan::size_of;
 
   const std::string function = "checkConsistentSize";
@@ -36,7 +36,7 @@ TEST(ErrorHandlingScalar, checkConsistentSize_EigenVector) {
 TEST(ErrorHandlingScalar, checkConsistentSize_StdVector) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::error_handling::check_consistent_size;
+  using stan::math::check_consistent_size;
   using stan::size_of;
 
   const std::string function = "checkConsistentSize";
@@ -65,7 +65,7 @@ TEST(ErrorHandlingScalar, checkConsistentSize_StdVector) {
 
 
 TEST(ErrorHandlingScalar, checkConsistentSize_scalar) {
-  using stan::error_handling::check_consistent_size;
+  using stan::math::check_consistent_size;
   using stan::size_of;
 
   const std::string function = "checkConsistentSize";
@@ -79,7 +79,7 @@ TEST(ErrorHandlingScalar, checkConsistentSize_scalar) {
 TEST(ErrorHandlingScalar, checkConsistentSize_nan) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::error_handling::check_consistent_size;
+  using stan::math::check_consistent_size;
   using stan::size_of;
 
   const std::string function = "checkConsistentSize";

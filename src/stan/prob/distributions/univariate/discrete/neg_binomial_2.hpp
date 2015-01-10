@@ -44,10 +44,10 @@ namespace stan {
 
       static const std::string function("stan::prob::neg_binomial_2_log");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
@@ -160,11 +160,11 @@ namespace stan {
 
       static const std::string function("stan::prob::neg_binomial_log");
 
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_nonnegative;
+      using stan::math::check_positive_finite;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
@@ -275,11 +275,11 @@ namespace stan {
               && stan::length(phi) ) ) 
         return 1.0;
         
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_less;
+      using stan::math::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_less;
       
       static const std::string function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
@@ -335,11 +335,11 @@ namespace stan {
               && stan::length(phi) ) ) 
         return 0.0;
         
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_less;
+      using stan::math::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_less;
       
       static const std::string function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
@@ -498,11 +498,11 @@ namespace stan {
       if ( !( stan::length(n) && stan::length(mu) && stan::length(phi) ) )
         return 0.0;
       
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_less;
+      using stan::math::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_less;
       
       static const std::string function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
@@ -548,11 +548,11 @@ namespace stan {
               && stan::length(phi) ) ) 
         return 0.0;
         
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_less;
+      using stan::math::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_less;
       
       static const std::string function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
@@ -609,7 +609,7 @@ namespace stan {
 
       static const std::string function("stan::prob::neg_binomial_2_rng");
 
-      using stan::error_handling::check_positive_finite;
+      using stan::math::check_positive_finite;
 
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
@@ -629,8 +629,8 @@ namespace stan {
 
       static const std::string function("stan::prob::neg_binomial_2_log_rng");
 
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
 
       check_finite(function, "Log-location parameter", eta);
       check_positive_finite(function, "Precision parameter", phi);

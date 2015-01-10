@@ -62,7 +62,7 @@ namespace stan {
     inline void 
     assign(Eigen::Matrix<LHS,R1,C1>& x, 
            const Eigen::Matrix<RHS,R2,C2>& y) {
-      stan::error_handling::check_matching_dims("assign",
+      stan::math::check_matching_dims("assign",
                                                 "x", x,
                                                 "y", y);
     }
@@ -88,7 +88,7 @@ namespace stan {
     inline void 
     assign(Eigen::Matrix<LHS,R,C>& x, 
            const Eigen::Matrix<RHS,R,C>& y) {
-      stan::error_handling::check_matching_dims("assign",
+      stan::math::check_matching_dims("assign",
                                                 "x", x,
                                                 "y", y);
       for (int i = 0; i < x.size(); ++i)
@@ -117,7 +117,7 @@ namespace stan {
     inline void 
     assign(Eigen::Block<LHS> x,
            const Eigen::Matrix<RHS,R,C>& y) {
-      stan::error_handling::check_matching_sizes("assign",
+      stan::math::check_matching_sizes("assign",
                                                  "x", x,
                                                  "y", y);
       for (int n = 0; n < y.cols(); ++n)
@@ -148,7 +148,7 @@ namespace stan {
     template <typename LHS, typename RHS>
     inline void 
     assign(std::vector<LHS>& x, const std::vector<RHS>& y) {
-      stan::error_handling::check_matching_sizes("assign",
+      stan::math::check_matching_sizes("assign",
                                                  "x", x,
                                                  "y", y);
       for (size_t i = 0; i < x.size(); ++i)

@@ -3,7 +3,7 @@
 #include <test/unit/util.hpp>
 
 TEST(ErrorHandlingScalar, CheckPositiveSize) {
-  using stan::error_handling::check_positive_size;
+  using stan::math::check_positive_size;
   std::string function = "function";
   std::string name = "name";
   std::string expr = "expr";

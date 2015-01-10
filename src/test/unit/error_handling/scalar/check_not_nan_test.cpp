@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_not_nan;
+using stan::math::check_not_nan;
 
 TEST(ErrorHandlingScalar,CheckNotNan) {
   const std::string function = "check_not_nan";

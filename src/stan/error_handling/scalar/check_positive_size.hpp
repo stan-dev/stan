@@ -5,7 +5,7 @@
 #include <stan/error_handling/invalid_argument.hpp>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Return <code>true</code> if <code>size</code> is positive.

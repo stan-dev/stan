@@ -8,7 +8,7 @@
 #include <stan/meta/traits.hpp>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Throw an out_of_range exception with a consistently formatted message.

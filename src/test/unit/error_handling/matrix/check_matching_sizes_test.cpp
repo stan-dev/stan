@@ -7,35 +7,35 @@ TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix) {
   
   y.resize(3,3);
   x.resize(3,3);
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                          "y", y));
   x.resize(0,0);
   y.resize(0,0);
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                          "y", y));
 
   y.resize(1,2);
 
 
-  EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_THROW(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                           "y", y), 
                std::invalid_argument);
 
   x.resize(2,1);
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                          "y", y));
 
   std::vector<double> a;
   std::vector<double> b;
   x.resize(0,0);
 
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "a", a,
                                                          "b", b));
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                          "b", b));
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "a", a,
                                                          "x", x));
-  EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
+  EXPECT_THROW(stan::math::check_matching_sizes("checkMatchingSizes", "a", a,
                                                           "y", y),
                std::invalid_argument);
 
@@ -43,7 +43,7 @@ TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix) {
   a.push_back(3.0);
   a.push_back(3.0);
 
-  EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
+  EXPECT_THROW(stan::math::check_matching_sizes("checkMatchingSizes", "a", a,
                                                           "b", b),
                std::invalid_argument);
 
@@ -51,9 +51,9 @@ TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix) {
   b.push_back(3.0);
   x.resize(2,1);
 
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "a", a,
                                                          "b", b));
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                          "b", b));
 }
 
@@ -66,41 +66,41 @@ TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix_nan) {
   x.resize(3,3);
   y << nan, nan, nan,nan, nan, nan,nan, nan, nan;
   x << nan, nan, nan,nan, nan, nan,nan, nan, nan;
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                          "y", y));
   x.resize(0,0);
   y.resize(0,0);
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                          "y", y));
 
   y.resize(1,2);
   y << nan, nan;
-  EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_THROW(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                           "y", y), 
                std::invalid_argument);
 
   x.resize(2,1);
   x << nan, nan;
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                          "y", y));
 
   std::vector<double> a;
   std::vector<double> b;
   x.resize(0,0);
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "a", a,
                                                          "b", b));
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                          "b", b));
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "a", a,
                                                          "x", x));
-  EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
+  EXPECT_THROW(stan::math::check_matching_sizes("checkMatchingSizes", "a", a,
                                                           "y", y),
                std::invalid_argument);
 
 
   a.push_back(nan);
   a.push_back(nan);
-  EXPECT_THROW(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
+  EXPECT_THROW(stan::math::check_matching_sizes("checkMatchingSizes", "a", a,
                                                           "b", b),
                std::invalid_argument);
 
@@ -108,9 +108,9 @@ TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix_nan) {
   b.push_back(nan);
   x.resize(2,1);
   x << nan, nan;
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "a", a,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "a", a,
                                                          "b", b));
-  EXPECT_TRUE(stan::error_handling::check_matching_sizes("checkMatchingSizes", "x", x,
+  EXPECT_TRUE(stan::math::check_matching_sizes("checkMatchingSizes", "x", x,
                                                          "b", b));
 }
 

@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_bounded.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_bounded;
+using stan::math::check_bounded;
 
 TEST(ErrorHandlingScalar,CheckBounded_x) {
   const std::string function = "check_bounded";

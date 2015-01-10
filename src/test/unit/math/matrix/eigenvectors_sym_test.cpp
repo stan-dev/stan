@@ -12,6 +12,6 @@ TEST(MathMatrix, eigenvectors_sym) {
   using stan::math::eigenvectors_sym;
   EXPECT_THROW(eigenvectors_sym(m0),std::invalid_argument);
   EXPECT_NO_THROW(eigenvectors_sym(ev_m1));
-  EXPECT_THROW(eigenvectors_sym(m1),std::domain_error);
+  EXPECT_THROW(eigenvectors_sym(m1),std::invalid_argument);
 }
 

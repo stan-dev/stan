@@ -27,10 +27,10 @@ namespace stan {
       using std::log;
       using std::exp;
       using stan::is_constant_struct;
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -118,10 +118,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
       T_partials_return cdf(1.0);
@@ -190,10 +190,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
       T_partials_return cdf_log(0.0);
@@ -246,10 +246,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
       T_partials_return ccdf_log(0.0);
@@ -308,8 +308,8 @@ namespace stan {
 
       static const std::string function("stan::prob::gumbel_rng");
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
 
 
       check_finite(function, "Location parameter", mu);

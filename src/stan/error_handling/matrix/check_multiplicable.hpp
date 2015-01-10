@@ -8,7 +8,7 @@
 #include <stan/error_handling/scalar/check_positive_size.hpp>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Return <code>true</code> if the matrices can be multiplied.

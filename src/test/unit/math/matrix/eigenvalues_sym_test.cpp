@@ -9,6 +9,6 @@ TEST(MathMatrix, eigenvalues_sym) {
 
   using stan::math::eigenvalues_sym;
   EXPECT_THROW(eigenvalues_sym(m0),std::invalid_argument);
-  EXPECT_THROW(eigenvalues_sym(m1),std::domain_error);
+  EXPECT_THROW(eigenvalues_sym(m1),std::invalid_argument);
 }
 

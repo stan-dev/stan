@@ -5,7 +5,7 @@
 #include <stan/error_handling/scalar/check_finite.hpp>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Return <code>true</code> if <code>y</code> is positive and finite.
@@ -28,8 +28,8 @@ namespace stan {
     inline bool check_positive_finite(const std::string& function,
                                       const std::string& name,
                                       const T_y& y) {
-      stan::error_handling::check_positive(function, name, y);
-      stan::error_handling::check_finite(function, name, y);
+      stan::math::check_positive(function, name, y);
+      stan::math::check_finite(function, name, y);
 
       return true;
     }

@@ -26,9 +26,9 @@ namespace stan {
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
       static const std::string function("stan::prob::multinomial_log");
 
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_simplex;
-      using stan::error_handling::check_size_match;
+      using stan::math::check_nonnegative;
+      using stan::math::check_simplex;
+      using stan::math::check_size_match;
       using boost::math::tools::promote_args;
       using boost::math::lgamma;
 
@@ -67,8 +67,8 @@ namespace stan {
                     const int N,
                     RNG& rng) {
       static const std::string function("stan::prob::multinomial_rng");
-      using stan::error_handling::check_simplex;
-      using stan::error_handling::check_positive;
+      using stan::math::check_simplex;
+      using stan::math::check_positive;
 
       check_simplex(function, "Probabilites parameter", theta);
       check_positive(function, "number of trials variables", N);

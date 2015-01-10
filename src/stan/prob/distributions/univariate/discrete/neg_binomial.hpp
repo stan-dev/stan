@@ -44,10 +44,10 @@ namespace stan {
 
       static const std::string function("stan::prob::neg_binomial_log");
 
-      using stan::error_handling::check_positive_finite;      
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;      
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
       
       // check if any vectors are zero length
@@ -192,9 +192,9 @@ namespace stan {
                                                   T_inv_scale>::type 
         T_partials_return;
           
-      using stan::error_handling::check_positive_finite;      
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;      
+      using stan::math::check_nonnegative;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero arugment lengths
@@ -324,9 +324,9 @@ namespace stan {
                                                   T_inv_scale>::type 
         T_partials_return;
           
-      using stan::error_handling::check_positive_finite;      
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;      
+      using stan::math::check_nonnegative;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero arugment lengths
@@ -439,9 +439,9 @@ namespace stan {
                                                   T_inv_scale>::type
         T_partials_return;
           
-      using stan::error_handling::check_positive_finite;      
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;      
+      using stan::math::check_nonnegative;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero arugment lengths
@@ -553,7 +553,7 @@ namespace stan {
 
       static const std::string function("stan::prob::neg_binomial_rng");
 
-      using stan::error_handling::check_positive_finite;      
+      using stan::math::check_positive_finite;      
 
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Inverse scale parameter", beta);

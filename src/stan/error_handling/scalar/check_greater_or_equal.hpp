@@ -5,7 +5,7 @@
 #include <stan/error_handling/domain_error.hpp>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     namespace {
       template <typename T_y,

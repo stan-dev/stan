@@ -32,9 +32,9 @@ namespace stan {
       static const std::string function("stan::prob::poisson_log");
       
       using boost::math::lgamma;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
       using stan::prob::include_summand;
       using stan::math::value_of;
       
@@ -113,10 +113,10 @@ namespace stan {
       static const std::string function("stan::prob::poisson_log_log");
       
       using boost::math::lgamma;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
       using std::exp;
       
@@ -197,10 +197,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_rate>::type 
         T_partials_return;
           
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
           
       // Ensure non-zero argument slengths
       if (!(stan::length(n) && stan::length(lambda))) 
@@ -267,10 +267,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_rate>::type 
         T_partials_return;
           
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
           
       // Ensure non-zero argument slengths
       if (!(stan::length(n) && stan::length(lambda))) 
@@ -335,10 +335,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_rate>::type 
         T_partials_return;
           
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
           
       // Ensure non-zero argument slengths
       if (!(stan::length(n) && stan::length(lambda))) 
@@ -407,9 +407,9 @@ namespace stan {
 
       static const std::string function("stan::prob::poisson_rng");
       
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_less;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less;
  
       check_not_nan(function, "Rate parameter", lambda);
       check_nonnegative(function, "Rate parameter", lambda);
@@ -431,9 +431,9 @@ namespace stan {
 
       static const std::string function("stan::prob::poisson_log_rng");
       
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_less;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less;
       using std::exp;
  
       check_not_nan(function, "Log rate parameter", alpha);

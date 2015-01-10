@@ -65,15 +65,15 @@ namespace stan {
 
       using stan::is_constant_struct;
       using stan::is_vector;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
       using stan::math::log1m;
       using stan::math::multiply_log;
       using stan::math::value_of;
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_less_or_equal;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less_or_equal;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -241,13 +241,13 @@ namespace stan {
       // Error checks
       static const std::string function("stan::prob::beta_cdf");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_less_or_equal;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less_or_equal;
       
       T_partials_return P(1.0);
         
@@ -384,12 +384,12 @@ namespace stan {
       // Error checks
       static const std::string function("stan::prob::beta_cdf");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_less_or_equal;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less_or_equal;
       using boost::math::tools::promote_args;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       
       T_partials_return cdf_log(0.0);
@@ -500,12 +500,12 @@ namespace stan {
       // Error checks
       static const std::string function("stan::prob::beta_cdf");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_less_or_equal;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less_or_equal;
       using boost::math::tools::promote_args;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       
       T_partials_return ccdf_log(0.0);
@@ -610,7 +610,7 @@ namespace stan {
       // Error checks
       static const std::string function("stan::prob::beta_rng");
 
-      using stan::error_handling::check_positive_finite;
+      using stan::math::check_positive_finite;
         
       check_positive_finite(function, "First shape parameter", alpha);
       check_positive_finite(function, "Second shape parameter", beta);

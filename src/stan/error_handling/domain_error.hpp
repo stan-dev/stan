@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Throw a domain error with a consistently formatted message.

@@ -33,12 +33,12 @@ namespace stan {
 
       using std::log;
       using stan::math::value_of;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_finite;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -159,13 +159,13 @@ namespace stan {
       // Check errors
       static const std::string function("stan::prob::pareto_type_2_cdf");
           
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
           
       T_partials_return P(1.0);
@@ -280,13 +280,13 @@ namespace stan {
       // Check errors
       static const std::string function("stan::prob::pareto_type_2_cdf_log");
           
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_finite;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
       using stan::math::log1m;
 
@@ -385,12 +385,12 @@ namespace stan {
       // Check errors
       static const std::string function("stan::prob::pareto_type_2_ccdf_log");
           
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
           
       T_partials_return P(0.0);
@@ -478,7 +478,7 @@ namespace stan {
                       RNG& rng) {
       static const std::string function("stan::prob::pareto_type_2_rng");
       
-      stan::error_handling::check_positive(function, "scale parameter", lambda);
+      stan::math::check_positive(function, "scale parameter", lambda);
 
       double uniform_01 = stan::prob::uniform_rng(0.0, 1.0, rng);
 

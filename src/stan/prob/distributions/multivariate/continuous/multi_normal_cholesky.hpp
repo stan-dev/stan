@@ -58,9 +58,9 @@ namespace stan {
       using stan::math::subtract;
       using stan::math::sum;
       
-      using stan::error_handling::check_size_match;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
+      using stan::math::check_size_match;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
 
       VectorViewMvt<const T_y> y_vec(y);
       VectorViewMvt<const T_loc> mu_vec(mu);
@@ -162,7 +162,7 @@ namespace stan {
 
       static const std::string function("stan::prob::multi_normal_cholesky_rng");
 
-      using stan::error_handling::check_finite;
+      using stan::math::check_finite;
  
       check_finite(function, "Location parameter", mu);
 
