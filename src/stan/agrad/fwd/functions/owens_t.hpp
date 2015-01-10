@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/owens_t.hpp>
 #include <stan/math/functions/square.hpp>
 

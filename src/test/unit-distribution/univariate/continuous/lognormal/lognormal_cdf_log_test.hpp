@@ -2,7 +2,7 @@
 #include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
 
 #include <stan/math/functions/square.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 using std::vector;
 using std::numeric_limits;

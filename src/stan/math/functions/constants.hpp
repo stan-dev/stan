@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__CONSTANTS_HPP
-#define STAN__MATH__CONSTANTS_HPP
+#ifndef STAN__MATH__FUNCTIONS__CONSTANTS_HPP
+#define STAN__MATH__FUNCTIONS__CONSTANTS_HPP
 
 #include <boost/math/constants/constants.hpp>
 
