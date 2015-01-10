@@ -20,7 +20,7 @@ namespace stan {
      * to Stan v2.5.0.)
      *
      * The message is:
-     * "<function>(<typeid(value_type<T>::type)>.name()>): <name>[<i+error_index>] <msg1><y>"
+     * "<function>: <name>[<i+error_index>] <msg1><y>"
      *    where error_index is the value of stan::error_index::value 
      * which indicates whether the message should be 0 or 1 indexed.
      *
@@ -56,7 +56,7 @@ namespace stan {
      * to Stan v2.5.0.)
      *
      * The message is:
-     * "<function>(<typeid(T)>.name()>): <name>[<i+error_index>] <msg1><y>"
+     * "<function>: <name>[<i+error_index>] <msg1><y>"
      *   where error_index is the value of stan::error_index::value 
      * which indicates whether the message should be 0 or 1 indexed.
      *

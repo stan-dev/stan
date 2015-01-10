@@ -15,9 +15,7 @@ public:
   template <class T>
   std::string expected_message_with_message(T y) {
     std::stringstream expected_message;
-    expected_message << "function("
-                     << typeid(T).name()
-                     << "): "
+    expected_message << "function: "
                      << y_name_
                      << " error_message "
                      << y
@@ -28,9 +26,7 @@ public:
   template <class T>
   std::string expected_message_without_message(T y) {
     std::stringstream expected_message;
-    expected_message << "function("
-                     << typeid(T).name()
-                     << "): "
+    expected_message << "function: "
                      << y_name_
                      << " error_message "
                      << y;

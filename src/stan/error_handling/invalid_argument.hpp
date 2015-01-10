@@ -17,7 +17,7 @@ namespace stan {
      * functions at once.
      *
      * The message is:
-     * "<function>(<typeid(T)>.name()>): <name> <msg1><y><msg2>"
+     * "<function>: <name> <msg1><y><msg2>"
      *
      * @tparam T Type of variable
      * @param function Name of the function
@@ -35,7 +35,7 @@ namespace stan {
                                  const std::string& msg2) {
       std::ostringstream message;
       
-      message << function << "(" << typeid(T).name() << "): "
+      message << function << ": "
               << name << " "
               << msg1
               << y
@@ -53,7 +53,7 @@ namespace stan {
      * to Stan v2.5.0.)
      *
      * The message is:
-     * "<function>(<typeid(T)>.name()>): <name> <msg1><y>"
+     * "<function>: <name> <msg1><y>"
      *
      * @tparam T Type of variable
      * @param function Name of the function

@@ -20,9 +20,7 @@ public:
   std::string expected_message_with_message(T y) {
     using stan::math::value_type;
     std::stringstream expected_message;
-    expected_message << "function("
-                     << typeid(typename value_type<T>::type).name()
-                     << "): "
+    expected_message << "function: "
                      << y_name_
                      << "[" << 1 + index_ << "] "
                      << "error_message "
@@ -35,9 +33,7 @@ public:
   std::string expected_message_without_message(T y) {
     using stan::math::value_type;
     std::stringstream expected_message;
-    expected_message << "function("
-                     << typeid(typename value_type<T>::type).name()
-                     << "): "
+    expected_message << "function: "
                      << y_name_
                      << "[" << 1 + index_ << "] "
                      << "error_message "
