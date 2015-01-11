@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV_HPP__
-#define __STAN__AGRAD__REV_HPP__
+#ifndef STAN__AGRAD__REV_HPP
+#define STAN__AGRAD__REV_HPP
 
 #include <stan/agrad/rev/var_stack.hpp>
 #include <stan/agrad/rev/chainable.hpp>
@@ -12,6 +12,6 @@
 #include <stan/agrad/rev/internal.hpp>
 #include <stan/agrad/rev/operators.hpp>
 #include <stan/agrad/rev/functions.hpp>
-#include <stan/agrad/rev/error_handling.hpp>
+#include <stan/agrad/rev/ode.hpp>
 
 #endif

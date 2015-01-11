@@ -1,8 +1,8 @@
-#ifndef __STAN__MATH__MATRIX__COL_HPP__
-#define __STAN__MATH__MATRIX__COL_HPP__
+#ifndef STAN__MATH__MATRIX__COL_HPP
+#define STAN__MATH__MATRIX__COL_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_column_index.hpp>
+#include <stan/error_handling/matrix/check_column_index.hpp>
 
 namespace stan {
   namespace math {
@@ -23,7 +23,7 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1>
     col(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m,
         size_t j) {
-      stan::math::check_column_index("col(%1%)",j,m,"j",(double*)0);
+      stan::error_handling::check_column_index("col", "j", m, j);
       return m.col(j - 1);
     }
 

@@ -1,11 +1,13 @@
-#ifndef __STAN__MATH__MATRIX__MDIVIDE_LEFT_SPD_HPP__
-#define __STAN__MATH__MATRIX__MDIVIDE_LEFT_SPD_HPP__
+#ifndef STAN__MATH__MATRIX__MDIVIDE_LEFT_SPD_HPP
+#define STAN__MATH__MATRIX__MDIVIDE_LEFT_SPD_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/promote_common.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_pos_definite.hpp>
+#include <stan/error_handling/matrix/check_symmetric.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace math {
@@ -23,10 +25,13 @@ namespace stan {
     inline 
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_left_spd(const Eigen::Matrix<T1,R1,C1> &A,
-                 const Eigen::Matrix<T2,R2,C2> &b) {
-      stan::math::check_square("mdivide_left_spd(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("mdivide_left_spd(%1%)",A,"A",
-                                      b,"b",(double*)0);
+                     const Eigen::Matrix<T2,R2,C2> &b) {
+      stan::error_handling::check_symmetric("mdivide_left_spd", "A", A);
+      stan::error_handling::check_pos_definite("mdivide_left_spd", "A", A);
+      stan::error_handling::check_square("mdivide_left_spd", "A", A);
+      stan::error_handling::check_multiplicable("mdivide_left_spd", 
+                                                "A", A,
+                                                "b", b);
       return promote_common<Eigen::Matrix<T1,R1,C1>,
                             Eigen::Matrix<T2,R1,C1> >(A)
         .llt()

@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__RECORDER__FILTERED_VALUES_HPP__
-#define __STAN__COMMON__RECORDER__FILTERED_VALUES_HPP__
+#ifndef STAN__COMMON__RECORDER__FILTERED_VALUES_HPP
+#define STAN__COMMON__RECORDER__FILTERED_VALUES_HPP
 
 #include <stan/common/recorder/values.hpp>
 #include <ostream>

@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__PARSER__STATEMENT_2_GRAMMAR_DEF__HPP__
-#define __STAN__GM__PARSER__STATEMENT_2_GRAMMAR_DEF__HPP__
+#ifndef STAN__GM__PARSER__STATEMENT_2_GRAMMAR_DEF__HPP
+#define STAN__GM__PARSER__STATEMENT_2_GRAMMAR_DEF__HPP
 
 #include <cstddef>
 #include <iomanip>
@@ -97,6 +97,7 @@ namespace stan {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::lit;
+      using boost::spirit::qi::no_skip;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
 
@@ -115,7 +116,7 @@ namespace stan {
       
       conditional_statement_r.name("if-else statement");
       conditional_statement_r
-        = lit("if")
+        = (lit("if")  >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > expression_g(_r2)
           [add_conditional_condition_f(_val,_1,_pass,
@@ -123,8 +124,8 @@ namespace stan {
         > lit(')')
         > statement_g(_r1,_r2,_r3)
           [add_conditional_body_f(_val,_1)]
-        > * (( lit("else")
-               >> lit("if") )
+        > * (((lit("else") >> no_skip[!char_("a-zA-Z0-9_")])
+              >> (lit("if")  >> no_skip[!char_("a-zA-Z0-9_")]))
              > lit('(')
              > expression_g(_r2)
                [add_conditional_condition_f(_val,_1,_pass,
@@ -133,7 +134,7 @@ namespace stan {
              > statement_g(_r1,_r2,_r3)
                [add_conditional_body_f(_val,_1)]
              )
-        > - (lit("else") 
+        > - ((lit("else") >> no_skip[!char_("a-zA-Z0-9_")])
              > statement_g(_r1,_r2,_r3)
                [add_conditional_body_f(_val,_1)]
              )

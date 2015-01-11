@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__MULTIPLY_LOG_HPP__
-#define __STAN__MATH__FUNCTIONS__MULTIPLY_LOG_HPP__
+#ifndef STAN__MATH__FUNCTIONS__MULTIPLY_LOG_HPP
+#define STAN__MATH__FUNCTIONS__MULTIPLY_LOG_HPP
 
 #include <boost/math/tools/promotion.hpp>
 
@@ -13,6 +13,34 @@ namespace stan {
      * 
      * \f$ a * \log b \f$.
      * 
+     *
+       \f[
+       \mbox{multiply\_log}(x,y) = 
+       \begin{cases}
+         0 & \mbox{if } x=y=0\\
+         x\ln y & \mbox{if } x,y\neq0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{multiply\_log}(x,y)}{\partial x} = 
+       \begin{cases}
+         \infty & \mbox{if } x=y=0\\
+         \ln y & \mbox{if } x,y\neq 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{multiply\_log}(x,y)}{\partial y} = 
+       \begin{cases}
+         \infty & \mbox{if } x=y=0\\
+         \frac{x}{y} & \mbox{if } x,y\neq 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a the first variable
      * @param b the second variable
      * 

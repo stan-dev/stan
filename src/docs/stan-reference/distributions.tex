@@ -330,8 +330,9 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 
 \subsubsection{Probability Mass Functions}
 
-If $N \in \nats$, $N > 0$, and $\theta \in \mbox{$N$-simplex}$, then for $y \in
-\setlist{1,\ldots,N}$, 
+If $N \in \nats$, $N > 0$, and if $\theta \in \reals^N$ forms an
+$N$-simplex (i.e., has nonnegative entries summing to one), then for
+$y \in \setlist{1,\ldots,N}$,
 %
 \[
 \distro{Categorical}(y|\theta) = \theta_y.
@@ -348,18 +349,23 @@ See \refsection{softmax} for the definition of the softmax function.
 
 
 \pitem{y}{categorical}{theta}
+\pitem{y}{categorical\_logit}{beta}
 
 
 \subsubsection{Stan Functions}
 
 All of the categorical distributions are vectorized so that the
 outcome \farg{y} can be a single integer (type \code{int}) or an array
-of integers (type \code{int[]}).
+of integers (type \code{int[]}).  
+
 
 \begin{description}
-\fitem{real}{categorical\_log}{ints \farg{y}, vector \farg{theta}}{The
-  log categorical probability mass function with outcome(s) \farg{y} in 
-$1:N$ given $N$-simplex distribution parameter \farg{theta}.}
+  \fitem{real}{categorical\_log}{ints \farg{y}, vector
+    \farg{theta}}{The log categorical probability mass function with
+    outcome(s) \farg{y} in $1:N$ given $N$-vector of outcome
+    probabilities \farg{theta}.  The parameter \farg{theta} must have
+    non-negative entries that sum to one, but it need not be a
+    variable declared as a simplex.}
 %
 \fitem{real}{categorical\_logit\_log}{ints \farg{y}, vector
   \farg{beta}}{The log categorical probability mass function with
@@ -437,47 +443,51 @@ For an alternative parametrization, see section \ref{sec:nbalt}
 
 \subsubsection{Probability Mass Function}
 
-If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
+If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $y \in
 \nats$,
 \[
-\distro{NegativeBinomial}(n|\alpha,\beta)
+\distro{NegativeBinomial}(y|\alpha,\beta)
  = 
-\binom{n + \alpha - 1}{\alpha - 1}
+\binom{y + \alpha - 1}{\alpha - 1}
 \,
 \left( \frac{\beta}{\beta+1} \right)^{\!\alpha}
 \,
-\left( \frac{1}{\beta + 1} \right)^{\!n} \!.
+\left( \frac{1}{\beta + 1} \right)^{\!y} \!.
 \]
-\begin{eqnarray*}
-\log \distro{NegativeBinomial}(n|\alpha,\beta)
-& = & \log \Gamma(n + \alpha) 
-  - \log \Gamma(n + 1)
-  - \log \Gamma(\alpha)
-\\[4pt]
-& & 
-  {} + \alpha \left(\log \beta - \log (\beta + 1) \right)
-  - n \log (\beta + 1)
-\end{eqnarray*}
+
+% DON'T REMOVE --- WE MAY INCLUDE ALL THESE IN THE FUTURE ELSEWHERE
+% \begin{eqnarray*}
+% \log \distro{NegativeBinomial}(y|\alpha,\beta)
+% & = & \log \Gamma(y + \alpha) 
+%   - \log \Gamma(y + 1)
+%   - \log \Gamma(\alpha)
+% \\[4pt]
+% & & 
+%   {} + \alpha \left(\log \beta - \log (\beta + 1) \right)
+%   - y \log (\beta + 1)
+% \end{eqnarray*}
+% \[
+% \frac{\partial}{\partial \alpha} 
+% \log \distro{NegativeBinomial}(y|\alpha,\beta)
+% = \Psi(y + \alpha)
+% - \Psi(\alpha)
+% + \log \beta
+% - \log (\beta + 1)
+% \]
+% \[
+% \frac{\partial}{\partial \beta} 
+% \log \distro{NegativeBinomial}(y|\alpha,\beta)
+% = \frac{\alpha}{\beta} - \frac{\alpha + y}{\beta + 1}
+% \]
+% where $\Psi$ is the digamma function (see
+% \refsection{digamma-appendix} for a definition).
+
+The mean and variance of a random variable $y \sim
+\distro{NegativeBinomial}(\alpha,\beta)$ are given by
 \[
-\frac{\partial}{\partial \alpha} 
-\log \distro{NegativeBinomial}(n|\alpha,\beta)
-= \Psi(n + \alpha)
-- \Psi(\alpha)
-+ \log \beta
-- \log (\beta + 1)
-\]
-\[
-\frac{\partial}{\partial \beta} 
-\log \distro{NegativeBinomial}(n|\alpha,\beta)
-= \frac{\alpha}{\beta} - \frac{\alpha + n}{\beta + 1}
-\]
-where $\Psi$ is the digamma function, defined as
-\[
-\Psi(x) = \frac{\partial}{\partial x} \log \Gamma(x).
-\]
-\[
-\mbox{With mean } E[Y] = \frac{\alpha}{\beta} \mbox{ and variance } Var[Y] =
-\frac{\alpha}{\beta^2} (\beta + 1)
+\mathbb{E}[y] = \frac{\alpha}{\beta} 
+\ \ \mbox{ and } \ \ 
+\mbox{Var}[Y] = \frac{\alpha}{\beta^2} (\beta + 1).
 \]
 
 \pitem{n}{neg\_binomial}{alpha,beta}
@@ -507,7 +517,8 @@ where $\Psi$ is the digamma function, defined as
 %
 \fitem{int}{neg\_binomial\_rng}{real \farg{alpha}, real \farg{beta}}{Generate a
   negative binomial variate with shape \farg{alpha} and inverse scale
-  \farg{beta}; may only be used in generated quantities block}
+\farg{beta}; may only be used in generated quantities block. \farg{alpha} $/$ \farg{beta} 
+must be less than $2 ^ {29}$}
 \end{description}
 
 
@@ -521,8 +532,8 @@ binomial distribution using the mean and inverse scale
 
 \subsubsection{Probability Mass Function}
 
-If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$, then for $y \in
-\nats$,
+If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$,
+then for $y \in \nats$,
 \[
 \distro{NegativeBinomial2}(y|\mu,\phi)
  =
@@ -532,10 +543,15 @@ If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$, then for $y 
 \,
 \left( \frac{\phi}{\mu+\phi} \right)^{\!\phi} \!.
 \]
+The mean and variance of a random variable $y \sim
+\distro{NegativeBinomial2}(y|\mu,\phi)$ are
 \[
-\mbox{With mean } E[Y] = \mu = e^\eta \mbox{ and variance } Var[Y] =
-\mu + \frac{\mu^2}{\phi}
+\mathbb{E}[Y] = \mu = e^\eta 
+\ \ \ \mbox{ and } \ \ \
+\mbox{Var}[Y] = \mu + \frac{\mu^2}{\phi}.
 \]
+The parameter $\phi$ represents precision, whereas its inverse,
+$\phi^{-1}$, represents overdispersion.
 
 \pitem{y}{neg\_binomial\_2}{mu, phi}
 
@@ -547,37 +563,44 @@ If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$, then for $y 
 %
  \fitem{real}{neg\_binomial\_2\_log}{ints \farg{y}, reals
    \farg{mu}, reals \farg{phi}}{The negative binomial probability
-   mass of \farg{n} given location \farg{mu} and inverse scale
+   mass of \farg{n} given location \farg{mu} and precision
    \farg{phi}.}
 %
  \fitem{real}{neg\_binomial\_2\_log\_log}{ints \farg{y}, reals
    \farg{eta}, reals \farg{phi}}{The log negative binomial probability
-   mass of \farg{n} given log-location \farg{eta} and inverse scale
-   \farg{phi}. This is useful for log-linear negative
+   mass of \farg{n} given log-location \farg{eta} and precision
+   \farg{phi}. This is especially useful for log-linear negative
    binomial regressions.}
 %
-\fitem{int}{neg\_binomial\_2\_rng}{real \farg{mu}, real \farg{phi}}{Generate a
-  negative binomial variate with location \farg{mu} and inverse scale
-  \farg{phi}; may only be used in generated quantities block}
+ \fitem{real}{neg\_binomial\_2\_cdf}{ints \farg{n}, reals
+   \farg{mu}, reals \farg{phi}}{The negative binomial cumulative
+   distribution function of \farg{n}
+   given location \farg{mu} and precision \farg{phi}.}
 %
-\fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{Generate a
-  negative binomial variate with log-location \farg{eta} and inverse scale
-  \farg{phi}; may only be used in generated quantities block}
+ \fitem{real}{neg\_binomial\_2\_cdf\_log}{ints \farg{n}, reals
+   \farg{mu}, reals \farg{phi}}{The log of the negative binomial
+   cumulative distribution function of \farg{n}
+   given location \farg{mu} and precision  \farg{phi}.}
+%
+ \fitem{real}{neg\_binomial\_2\_ccdf\_log}{ints \farg{n}, reals
+   \farg{mu}, reals \farg{phi}}{The log of the negative binomial 
+   complementary cumulative distribution function of \farg{n}
+   given location \farg{mu} and precision \farg{phi}.}
+%
+\fitem{int}{neg\_binomial\_2\_rng}{real \farg{mu}, real \farg{phi}}{
+  Generate a negative binomial variate with location
+  \farg{mu} and precision \farg{phi}; may only be used in
+  generated quantities block.
+  \farg{mu} must be less than $2 ^ {29}$.}
+%
+\fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{
+  Generate a negative binomial variate with log-location \farg{eta}
+  and precision \farg{phi}; may only be used in generated
+  quantities block. \farg{eta} must be less than $29 \log 2$.}
 \end{description}
 
 
-
-
-
-
-
-
-
-
-
-
-
-\section{Poisson Distribution}
+\section{Poisson Distribution}\label{poisson.section}
 
 \subsubsection{Probability Mass Function}
 
@@ -609,8 +632,9 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
 \fitem{real}{poisson\_ccdf\_log}{ints \farg{n}, reals \farg{lambda}}{The log of the 
   Poisson complementary cumulative distribution function of \farg{n} given rate \farg{lambda}}
 %
-\fitem{int}{poisson\_rng}{real \farg{lambda}}{Generate a poisson variate with 
- rate \farg{lambda}; may only be used in generated quantities block}
+\fitem{int}{poisson\_rng}{real \farg{lambda}}{Generate a Poisson variate with 
+  rate \farg{lambda}; may only be used in generated quantities block. \farg{lambda} must be 
+less than $2^{30}$.}
 \end{description}
 
 
@@ -641,6 +665,10 @@ If $\alpha \in \reals$, then for $n \in \nats$,
 \begin{description}
 \fitem{real}{poisson\_log\_log}{ints \farg{n}, reals \farg{alpha}}{The
   log Poisson probability mass of \farg{n} given log rate \farg{alpha}}
+%
+\fitem{int}{poisson\_log\_rng}{real \farg{alpha}}{Generate a Poisson variate with 
+log rate \farg{alpha}; may only be used in generated quantities block. \farg{alpha} must
+be less than $30 \log 2$}
 \end{description}
 
 
@@ -683,7 +711,7 @@ where the multinomial coefficient is defined by
 %
 \fitem{vector}{multinomial\_rng}{vector \farg{theta}, int \farg{N}}{Generate a
   multinomial variate with simplex distribution parameter \farg{theta} and 
-  (implicit) total count $N$; may only be used in generated quantities block}
+  total count \farg{N}; may only be used in generated quantities block}
 \end{description}
 
 
@@ -699,7 +727,7 @@ The unbounded univariate continuous probability distributions have
 support on all real numbers.
 
 
-\section{Normal Distribution}
+\section{Normal Distribution}\label{normal-distribution.section}
 
 \subsubsection{Probability Density Function}
 
@@ -794,7 +822,7 @@ may only be used in generated quantities block}
 
 \section{Skew Normal Distribution}
 
-\subsubsection{Probabilty Density Function}
+\subsubsection{Probability Density Function}
 
 If $\mu \in \reals$, $\sigma \in \posreals$, and $\alpha \in \reals$,
 then for $y \in \reals$,
@@ -1433,8 +1461,8 @@ quantities block}
 
 \subsubsection{Probability Density Function}
 
-If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
-\posreals$, 
+If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
+[0,\infty)$, 
 \[
 \distro{Weibull}(y|\alpha,\sigma)
 = 
@@ -1445,6 +1473,9 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
 \exp \! \left( \! - \left( \frac{y}{\sigma} \right)^{\alpha}  \right)
 .
 \]
+
+Note that if $Y \propto \distro{Weibull}(\alpha,\sigma)$,
+then $Y^{-1} \propto \distro{Frechet}(\alpha,\sigma^{-1})$.
 
 \pitem{y}{weibull}{alpha,sigma}
 
@@ -1475,6 +1506,57 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
   \farg{alpha} and scale \farg{sigma}; may only be used in generated 
 quantities block}
 \end{description}
+
+\section{Fr\'{e}chet Distribution}
+
+\subsubsection{Probability Density Function}
+
+If $\alpha \in \posreals$ and $\sigma \in \posreals$, then for $y \in
+\posreals$, 
+\[
+\distro{Frechet}(y|\alpha,\sigma)
+= 
+\frac{\alpha}{\sigma}
+\,
+\left( \frac{y}{\sigma} \right)^{-\alpha - 1}
+\,
+\exp \! \left( \! - \left( \frac{y}{\sigma} \right)^{-\alpha}  \right)
+.
+\]
+
+Note that if $Y \propto \distro{Frechet}(\alpha,\sigma)$,
+then $Y^{-1} \propto \distro{Weibull}(\alpha,\sigma^{-1})$.
+
+\pitem{y}{frechet}{alpha,sigma}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+\fitem{real}{frechet\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The log of the Fr\'{e}chet density of \farg{y} given shape
+  \farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{frechet\_cdf}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The Fr\'{e}chet cumulative distribution function of \farg{y} given
+  shape \farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{frechet\_cdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The log of the Fr\'{e}chet cumulative distribution function of 
+  \farg{y} given shape \farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{frechet\_ccdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The log of the Fr\'{e}chet complementary cumulative 
+  distribution function of \farg{y} given shape \farg{alpha} and scale 
+  \farg{sigma}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{frechet\_rng}{real \farg{alpha}, real
+  \farg{sigma}}{Generate an Fr\'{e}chet variate with shape
+  \farg{alpha} and scale \farg{sigma}; may only be used in generated 
+quantities block}
+\end{description}
+
 
 \chapter{Non-negative Continuous Distributions}
 \noindent
@@ -1554,15 +1636,12 @@ above some positive minimum value.
 
 \subsubsection{Probability Density Function}
 
-If $y_0 \in \posreals$ and $\alpha \in \posreals$, then for
-$y \in \posreals$,
+If $y_{\mbox{\footnotesize\rm min}} \in \posreals$ and $\alpha \in \posreals$, then for
+$y \in \posreals$ with $y \geq y_{\mbox{\footnotesize\rm min}}$, 
 \[
-\distro{Pareto}(y|y_0,\alpha)
+\distro{Pareto}(y|y_{\mbox{\footnotesize\rm min}},\alpha)
 =
-\alpha 
-\ y_0
-\, \left( \frac{1}{y} \right)^{\!\alpha+1}
-\! .
+\frac{\displaystyle \alpha\,y_{\mbox{\footnotesize\rm min}}^\alpha}{\displaystyle y^{\alpha+1}}.
 \]
 
 \pitem{y}{pareto}{y\_min,alpha}
@@ -1592,6 +1671,51 @@ $y \in \posreals$,
 \fitem{real}{pareto\_rng}{real \farg{y\_min}, real
   \farg{alpha}}{Generate a Pareto variate with positive minimum value 
   \farg{y\_min} and shape \farg{alpha}; may only be used in generated 
+  quantities block}
+\end{description}
+
+\section{Pareto Type 2 Distribution}
+
+\subsubsection{Probability Density Function}
+
+If $\mu \in \reals$, $\lambda \in \posreals$, and $\alpha \in \posreals$, then for
+$y \geq \mu$,
+\[
+\distro{Pareto\_Type\_2}(y|\mu,\lambda,\alpha)
+= 
+\ \frac{\alpha}{\lambda}
+\, \left( 1+\frac{y-\mu}{\lambda} \right)^{-(\alpha+1)}
+\! .
+\]
+
+Note that the Lomax distribution is a Pareto Type 2 distribution with $\mu=0$.
+
+\pitem{y}{pareto\_type\_2}{mu,lambda,alpha}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+  \fitem{real}{pareto\_type\_2\_log}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
+    \farg{alpha}}{The log of the Pareto Type 2 density of \farg{y} given
+    location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
+%
+  \fitem{real}{pareto\_type\_2\_cdf}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
+    \farg{alpha}}{The Pareto Type 2 cumulative distribution function of \farg{y} given
+    location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
+%
+  \fitem{real}{pareto\_type\_2\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
+    \farg{alpha}}{The log of the Pareto Type 2 cumulative distribution function of \farg{y} given
+    location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
+%
+  \fitem{real}{pareto\_type\_2\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals \farg{lambda}, reals
+    \farg{alpha}}{The log of the Pareto Type 2 complementary cumulative distribution function
+     of \farg{y} given location \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{pareto\_type\_2\_rng}{real \farg{mu}, real \farg{lambda}, real
+  \farg{alpha}}{Generate a Pareto Type 2 variate with location 
+  \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}; may only be used in generated 
   quantities block}
 \end{description}
 
@@ -1683,7 +1807,7 @@ If $\mu \in \reals$ and $\kappa \in \posreals$, then for $y \in
 \!.
 \]
 %
-In order for this density to properly nomralize, $y$ must be
+In order for this density to properly normalize, $y$ must be
 restricted to some interval  $(c, c + 2\pi)$ of length $2 \pi$,
 because
 %
@@ -1734,14 +1858,12 @@ based on the fact that as $\kappa \rightarrow \infty$,
 %
 The workaround is to replace \Verb|y ~ von_mises(mu,kappa)| with
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 if (kappa < 100)
   y ~ von_mises(mu, kappa);
 else 
   y ~ normal(mu, sqrt(1 / kappa));
-\end{Verbatim}
-\end{quote} 
+\end{stancode} 
 
 
 \chapter{Bounded Continuous Probabilities}
@@ -1973,7 +2095,7 @@ inverse scales, then for $y \in \reals^{K \times N}$,
 \[
 \distro{MultiGP}(y|\Sigma,w)
 =
-\prod_{i=1}^{K} \distro{MultiNormal}(y_i|0,w_i^{-1} \Sigma).
+\prod_{i=1}^{K} \distro{MultiNormal}(y_i|0,w_i^{-1} \Sigma),
 \]
 where $y_i$ is the $i$th row of $y$.  This is used to efficiently handle
 Gaussian Processes with multi-variate outputs where only the output dimensions
@@ -1986,13 +2108,46 @@ function does not take into account the mean prediction.
 
 \begin{description}
 %
-\fitem{real}{multi\_gp\_log}{vector \farg{y}, matrix \farg{Sigma},
+\fitem{real}{multi\_gp\_log}{matrix \farg{y}, matrix \farg{Sigma},
   vector \farg{w}}{The log of the multivariate GP density of matrix
   \farg{y} given kernel matrix \farg{Sigma} and inverses scales
   \farg{w}}
 %
 \end{description}
 
+
+\section{Multivariate Gaussian Process Distribution, Cholesky parameterization}
+
+\subsubsection{Probability Density Function}
+
+If $K,N \in \nats$, $L \in \reals^{N \times N}$ is lower
+triangular and such that $LL^{\top}$ is positive definite kernel matrix
+and $w \in \reals^{K}$ is a vector of positive
+inverse scales, then for $y \in \reals^{K \times N}$,
+\[
+\distro{MultiGPCholesky}(y|L,w)
+=
+\prod_{i=1}^{K} \distro{MultiNormal}(y_i|0,w_i^{-1} LL^{\top}),
+\]
+where $y_i$ is the $i$th row of $y$.  This is used to efficiently handle
+Gaussian Processes with multi-variate outputs where only the output dimensions
+share a kernel function but vary based on their scale.  If the model allows
+parametrization in terms of Cholesky factor of the kernel matrix, this distribution
+is also more efficient than $\distro{MultiGP}()$. Note that this
+function does not take into account the mean prediction.
+
+\pitem{y}{multi\_gp\_cholesky}{L,w}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{multi\_gp\_cholesky\_log}{matrix \farg{y}, matrix \farg{L},
+  vector \farg{w}}{The log of the multivariate GP density of matrix
+  \farg{y} given lower-triangular Cholesky factor of the kernel matrix \farg{L} and inverses scales
+  \farg{w}}
+%
+\end{description}
 
 
 \section{Multivariate Student-$t$ Distribution}
@@ -2078,8 +2233,8 @@ For $t \in 1, \dots, T$,
 where $y$ is $n \times T$ matrix where rows are variables and columns
 are observations. These functions calculate the log-likelihood of the
 observations marginalizing over the latent states ($p(y | F, G, V, W,
-m_{0}, C_{0})$).  This log-likelihood is system is calculated using
-the the Kalman Filter.  If $V$ is diagonal, then a more efficient
+m_{0}, C_{0})$). This log-likelihood is a system that is calculated using
+the Kalman Filter. If $V$ is diagonal, then a more efficient
 algorithm which sequentially processes observations and avoids a
 matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
 
@@ -2088,14 +2243,14 @@ matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
 \subsubsection{Stan Functions}
 
 The following two functions differ in the type of their \farg{V}, the
-first taking a full observation covariance matrix \farg{V} and the
-second a vector \farg{V} representing the diagonal of the observation
+first taking a full observation covariance matrix \farg{V}\ and the
+second a vector \farg{V}\ representing the diagonal of the observation
 covariance matrix.  The sampling statement defined in the previous
 section works with either type of observation \farg{V}.
 
 \begin{description}
 %
-\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{matrix \farg{y}, matrix \farg{F},
   matrix \farg{G}, matrix \farg{V}}{matrix \farg{W}, vector
   \farg{m0}, matrix \farg{C0}}{The log of the density of the
   Gaussian Dynamic Linear model with observation matrix \farg{y} in
@@ -2106,7 +2261,7 @@ section works with either type of observation \farg{V}.
   covariance \farg{C0}.}
 % 
 %
-\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{matrix \farg{y}, matrix \farg{F},
   matrix \farg{G}, vector \farg{V}}{matrix \farg{W}, vector \farg{m0},
   matrix \farg{C0}} {The log of the density of the Gaussian Dynamic
   Linear model with observation matrix \farg{y} in which rows are
@@ -2172,10 +2327,20 @@ may only be used in generated quantities block}
 \noindent
 The correlation matrix distributions have support on the (Cholesky
 factors of) correlation matrices.  A Cholesky factor $L$ for a $K
-\times K$ covariance matrix of dimensions $K$ has rows of unit length
-so that the diagonal of $L L^{\top}$ is the unit $K$-vector.
-
-
+\times K$ correlation matrix $\Sigma$ of dimension $K$ has rows of unit
+length so that the diagonal of $L L^{\top}$ is the unit $K$-vector. Even
+though models are usually conceptualized in terms of correlation matrices,
+it is better to operationalize them in terms of their Cholesky factors.
+If you are interested in the posterior distribution of the correlations,
+you can recover them in the generated quantities block via
+%
+\begin{stancode}
+generated quantities {
+  corr_matrix[K] Sigma;
+  Sigma <- multiply_lower_tri_self_transpose(L);
+}
+\end{stancode}
+%
 \section{LKJ Correlation Distribution}\label{lkj-correlation.section}
 
 \subsubsection{Probability Density Function}
@@ -2188,18 +2353,27 @@ unit diagonal (i.e., a correlation matrix), then
 \propto \det \left( \Sigma \right)^{(\eta - 1)}.
 \]
 %
-The shape parameter $\eta$ can be interpreted like the shape parameter
-of a symmetric beta distribution. 
+The expectation is the identity matrix for any positive value of the 
+shape parameter $\eta$, which can be interpreted like the shape parameter
+of a symmetric beta distribution:
 \begin{itemize}
 \item if $\eta = 1$, then the density is uniform over all correlation
   matrices of a given order;
 \item if $\eta > 1$, the identity matrix is the modal correlation
-  matrix, with sharper peaks in the density around the identity matrix
+  matrix, with a sharper peak in the density at the identity matrix
   for larger $\eta$; and
 \item for $0 < \eta < 1$, the density has a trough at the identity
   matrix.
+\item if $\eta$ were an unknown parameter, the Jeffreys prior is
+  proportional to $\sqrt{2\sum_{k=1}^{K-1}\left(
+  \psi_1\left(\eta+\frac{K-k-1}{2}\right) - 
+  2\psi_1\left(2\eta+K-k-1 \right)\right)}$, where $\psi_1()$ is the
+  trigamma function
 \end{itemize}
-See \citep{LewandowskiKurowickaJoe:2009} for definitions.
+See \citep{LewandowskiKurowickaJoe:2009} for definitions. However, it
+is much better computationally to work directly with the Cholesky factor
+of $\Sigma$, so this distribution should never be explicitly used in 
+practice.
 
 \pitem{y}{lkj\_corr}{eta}
 
@@ -2209,7 +2383,10 @@ See \citep{LewandowskiKurowickaJoe:2009} for definitions.
 %
   \fitem{real}{lkj\_corr\_log}{matrix \farg{y}, real
     \farg{eta}}{The log of the LKJ density for the correlation matrix
-    \farg{y} given nonnegative shape \farg{eta}.}
+    \farg{y} given nonnegative shape \farg{eta}. The only reason to
+    use this density function is if you want the code to run slower
+    and consume more memory with more risk of numerical errors. 
+    Use its Cholesky factor as described in the next section.}
 %
 \end{description}
 \begin{description}
@@ -2219,38 +2396,70 @@ See \citep{LewandowskiKurowickaJoe:2009} for definitions.
 \end{description}
 
 
-% \section{Cholesky LKJ Correlation Distribution}
+\section{Cholesky LKJ Correlation Distribution}
 
-% \subsubsection{Probability Density Function}
+Stan provides an implicit parameterization of the LKJ correlation matrix
+density in terms of its Cholesky factor, which you should use rather
+than the explicit parameterization in the previous section. For example, 
+if \code{L} is a Cholesky factor of a correlation matrix, then
+%
+\begin{stancode}
+L ~ lkj_corr_cholesky(2.0);
+# implies L * L' ~ lkj_corr(2.0);
+\end{stancode}
+%
+Because Stan requires models to have support on all valid constrained
+parameters, \code{L} will almost always
+%
+\footnote{It is possible to build up a valid \code{L} within Stan, but that
+would then require Jacobian adjustments to imply the intended posterior.}
+%
+be a parameter declared with the type of a
+Cholesky factor for a correlation matrix; for example,
+%
+\begin{stancode}
+parameters {
+  cholesky_factor_corr[K] L; 
+  # rather than corr_matrix[K] Sigma;
+  // ...
+\end{stancode}
+%
 
-% For $\eta > 0$, if $L$ is the Cholesky factor of a positive-definite
-% matrix with unit diagonal (i.e., a correlation matrix), then
-% \[
-% \distro{LkjCholesky}(L|\eta) 
-% \propto \det(L L^\top)^{(\eta - 1)} 
-% = \det(L)^{(2 \eta - 2)}.
-% \]
-% See the previous section for details on interpreting the shape
-% parameter $\eta$.
 
-% \pitem{L}{lkj\_corr\_cholesky}{eta}
+\subsubsection{Probability Density Function}
 
-% \subsubsection{Stan Functions}
+For $\eta > 0$, if $L$ is the Cholesky factor of a symmetric
+positive-definite matrix with unit diagonal (i.e., a correlation
+matrix), then
+\[
+\distro{LkjCholesky}(L|\eta) 
+\propto \left|J\right|\det(L L^\top)^{(\eta - 1)} 
+= \prod_{k=2}^K L_{kk}^{K-k+2\eta-2}.
+\]
+See the previous section for details on interpreting the shape
+parameter $\eta$. Note that even if $\eta=1$, it is still essential to
+evaluate the density function because the density of $L$ is not
+constant, regardless of the value of $\eta$, even though the density of
+$LL^\top$ is constant iff $\eta=1$.
 
-% \begin{description}
-% %
-%   \fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
-%     \farg{eta}}{The log of the LKJ density for the lower-triangular
-%     Cholesky factor \farg{L} of a correlation matrix given shape
-%     \farg{eta}.}
-% %
-% \end{description}
-% \begin{description}
-% \fitem{matrix}{lkj\_corr\_cholesky\_rng}{int \farg{K}, real \farg{eta}}{
-%   Generate a random Cholesky factor of a LKJ random correlation matrix
-%   of order \farg{K} with shape \farg{eta}; may only be used in 
-%   generated quantities block}
-% \end{description}
+\pitem{L}{lkj\_corr\_cholesky}{eta}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+  \fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
+    \farg{eta}}{The log of the LKJ density for the lower-triangular
+    Cholesky factor \farg{L} of a correlation matrix given shape
+    \farg{eta}.}
+%
+\end{description}
+\begin{description}
+\fitem{matrix}{lkj\_corr\_cholesky\_rng}{int \farg{K}, real \farg{eta}}{
+  Generate a random Cholesky factor of a correlation matrix of order
+  \farg{K} that is distributed LKJ with shape \farg{eta}; may only be 
+  used in generated quantities block}
+\end{description}
 
 
 
@@ -2360,21 +2569,6 @@ freedom \farg{nu} and symmetric and positive-definite scale matrix
  \farg{Sigma}; may only be used in generated quantities block}
 \end{description}
 
-\section{LKJ Covariance Distribution}
-
-\pitem{W}{lkj\_cov\_log}{mu,sigma,eta}
-
-\subsubsection{Stan Functions}
-
-\begin{description}
-  \fitem{real}{lkj\_cov\_log}{matrix \farg{W}, vector \farg{mu},
-    vector \farg{sigma}, real \farg{eta}}{The log of the LKJ density
-    for covariance matrix \farg{W} is the sum of log of the lognormal
-    density of the standard deviations given location vector \farg{mu}
-    and scale vector \farg{sigma} and the log of the lkj\_corr density
-    of the correlation matrix given shape \farg{eta}.  See the next
-    section for details on the lkj\_corr density.}
-\end{description}
 
 
 

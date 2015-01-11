@@ -1,6 +1,7 @@
-#ifndef __STAN__AGRAD__REV__INTERNAL__MATRIX_VARI_HPP__
-#define __STAN__AGRAD__REV__INTERNAL__MATRIX_VARI_HPP__
+#ifndef STAN__AGRAD__REV__INTERNAL__MATRIX_VARI_HPP
+#define STAN__AGRAD__REV__INTERNAL__MATRIX_VARI_HPP
 
+#include <stan/agrad/rev/matrix/Eigen_NumTraits.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>

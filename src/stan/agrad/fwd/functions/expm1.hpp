@@ -1,9 +1,9 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__EXPM1_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__EXPM1_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__EXPM1_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__EXPM1_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
-#include <boost/math/special_functions/expm1.hpp>
+#include <math.h>
 
 namespace stan {
 
@@ -13,8 +13,8 @@ namespace stan {
     inline
     fvar<T>
     expm1(const fvar<T>& x) {
-      using boost::math::expm1;
-      using std::exp;
+      using ::expm1;
+      using ::exp;
       return fvar<T>(expm1(x.val_), x.d_ * exp(x.val_));
     } 
   }

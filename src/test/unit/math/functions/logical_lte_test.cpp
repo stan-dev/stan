@@ -1,4 +1,5 @@
-#include "stan/math/functions/logical_lte.hpp"
+#include <stan/math/functions/logical_lte.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathFunctions,logical_lte) {
@@ -12,4 +13,12 @@ TEST(MathFunctions,logical_lte) {
 
   EXPECT_FALSE(logical_lte(5.7,-9.0));
   EXPECT_FALSE(logical_lte(-1,-2));
+}
+
+TEST(MathFunctions, logical_lte_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_FALSE(stan::math::logical_lte(1.0, nan));
+  EXPECT_FALSE(stan::math::logical_lte(nan, 2.0));
+  EXPECT_FALSE(stan::math::logical_lte(nan, nan));
 }

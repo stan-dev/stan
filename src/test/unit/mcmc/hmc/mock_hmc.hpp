@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__MOCK__HMC__BETA__
-#define __STAN__MCMC__MOCK__HMC__BETA__
+#ifndef STAN__MCMC__MOCK__HMC__BETA
+#define STAN__MCMC__MOCK__HMC__BETA
 
 #include <stan/math/matrix/Eigen.hpp>
 
@@ -60,15 +60,15 @@ namespace stan {
       double phi(ps_point& z) { return this->V(z); }
       
       const Eigen::VectorXd dtau_dq(ps_point& z) {
-        return Eigen::VectorXd::Zero(this->_model.num_params_r());
+        return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
       
       const Eigen::VectorXd dtau_dp(ps_point& z) {
-        return Eigen::VectorXd::Zero(this->_model.num_params_r());
+        return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
       
       const Eigen::VectorXd dphi_dq(ps_point& z) {
-        return Eigen::VectorXd::Zero(this->_model.num_params_r());
+        return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
       
       void sample_p(ps_point& z, BaseRNG& rng) {};

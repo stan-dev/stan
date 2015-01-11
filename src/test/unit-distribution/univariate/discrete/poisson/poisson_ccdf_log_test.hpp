@@ -14,12 +14,12 @@ public:
     param[0] = 17;           // n
     param[1] = 13.0;         // lambda
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.890465)); // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.8904649795242025600572)); // expected ccdf_log
     
     param[0] = 0.0;          // n
     param[1] = 3.0;          // lambda
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.04978707)); // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.04978706836786394446248)); // expected ccdf_log
   }
   
   void invalid_values(vector<size_t>& index, 
@@ -42,25 +42,19 @@ public:
   }
 
   template <typename T_n, typename T_rate, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_rate>::type
   ccdf_log(const T_n& n, const T_rate& lambda, const T2&,
-          const T3&, const T4&, const T5&, const T6&, const T7&, 
-          const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::poisson_ccdf_log(n, lambda);
   }
 
 
   template <typename T_n, typename T_rate, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_rate>::type
   ccdf_log_function(const T_n& n, const T_rate& lambda, const T2&,
-                   const T3&, const T4&, const T5&, const T6&, const T7&,
-                   const T8&, const T9&) {
+                    const T3&, const T4&, const T5&) {
     using std::pow;
     using stan::agrad::pow;
     using stan::agrad::lgamma;

@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS_HPP
+#define STAN__AGRAD__REV__FUNCTIONS_HPP
 
 #include <stan/agrad/rev/functions/Phi.hpp>
 #include <stan/agrad/rev/functions/Phi_approx.hpp>
@@ -43,6 +43,8 @@
 #include <stan/agrad/rev/functions/inv_logit.hpp>
 #include <stan/agrad/rev/functions/inv_sqrt.hpp>
 #include <stan/agrad/rev/functions/inv_square.hpp>
+#include <stan/agrad/rev/functions/is_inf.hpp>
+#include <stan/agrad/rev/functions/is_nan.hpp>
 #include <stan/agrad/rev/functions/is_uninitialized.hpp>
 #include <stan/agrad/rev/functions/lgamma.hpp>
 #include <stan/agrad/rev/functions/lmgamma.hpp>
@@ -55,6 +57,7 @@
 #include <stan/agrad/rev/functions/log2.hpp>
 #include <stan/agrad/rev/functions/log_diff_exp.hpp>
 #include <stan/agrad/rev/functions/log_falling_factorial.hpp>
+#include <stan/agrad/rev/functions/log_mix.hpp>
 #include <stan/agrad/rev/functions/log_rising_factorial.hpp>
 #include <stan/agrad/rev/functions/log_sum_exp.hpp>
 #include <stan/agrad/rev/functions/modified_bessel_first_kind.hpp>
@@ -62,6 +65,7 @@
 #include <stan/agrad/rev/functions/multiply_log.hpp>
 #include <stan/agrad/rev/functions/owens_t.hpp>
 #include <stan/agrad/rev/functions/pow.hpp>
+#include <stan/agrad/rev/functions/primitive_value.hpp>
 #include <stan/agrad/rev/functions/rising_factorial.hpp>
 #include <stan/agrad/rev/functions/round.hpp>
 #include <stan/agrad/rev/functions/sin.hpp>

@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__FAIL__HPP__
-#define __STAN__GM__ARGUMENTS__FAIL__HPP__
+#ifndef STAN__GM__ARGUMENTS__FAIL__HPP
+#define STAN__GM__ARGUMENTS__FAIL__HPP
 
 #include <stan/gm/arguments/unvalued_argument.hpp>
 

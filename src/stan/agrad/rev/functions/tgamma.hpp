@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__TGAMMA_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__TGAMMA_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__TGAMMA_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__TGAMMA_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/agrad/rev/var.hpp>
@@ -32,6 +32,33 @@ namespace stan {
      * where \f$\Psi^{(0)}(x)\f$ is the digamma function.
      *
      * See boost::math::digamma() for the double-based version.
+     *
+     *
+       \f[
+       \mbox{tgamma}(x) = 
+       \begin{cases}
+         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+         \Gamma(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{tgamma}(x)}{\partial x} = 
+       \begin{cases}
+         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+         \frac{\partial\, \Gamma(x)}{\partial x} & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \Gamma(x)=\int_0^{\infty} u^{x - 1} \exp(-u) \, du
+       \f]
+       
+       \f[
+       \frac{\partial \, \Gamma(x)}{\partial x} = \Gamma(x)\Psi(x)
+       \f]
      *
      * @param a Argument to function.
      * @return The Gamma function applied to the specified argument.

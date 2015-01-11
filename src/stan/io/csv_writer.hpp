@@ -1,10 +1,12 @@
-#ifndef __STAN__IO__CSV_WRITER_HPP__
-#define __STAN__IO__CSV_WRITER_HPP__
+#ifndef STAN__IO__CSV_WRITER_HPP
+#define STAN__IO__CSV_WRITER_HPP
 
-#include <stan/math/matrix.hpp>
 #include <ostream>
 #include <limits>
 #include <iomanip>
+#include <stan/math/matrix.hpp>
+#include <stan/math/meta/index_type.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
 
 namespace stan {
 
@@ -86,7 +88,8 @@ namespace stan {
        */
       void write(double x) {
         comma();
-        o_ << std::setprecision (std::numeric_limits<double>::digits10 + 1) << x;
+        o_ << std::setprecision (std::numeric_limits<double>::digits10 + 1)
+           << x;
       }
 
       /**
@@ -99,9 +102,11 @@ namespace stan {
        */
       template<int R, int C>
       void write_row_major(const Eigen::Matrix<double,R,C>& m) {
-        typedef typename Eigen::Matrix<double,R,C>::size_type size_type;
-        for (size_type i = 0; i < m.rows(); ++i)
-          for (size_type j = 0; j < m.cols(); ++j)
+        using Eigen::Matrix;
+        using stan::math::index_type;
+        typedef typename index_type<Matrix<double,R,C> >::type idx_t;
+        for (idx_t i = 0; i < m.rows(); ++i)
+          for (idx_t j = 0; j < m.cols(); ++j)
             write(m(i,j));
       }
 
@@ -115,9 +120,12 @@ namespace stan {
        */
       template<int R, int C>
       void write_col_major(const Eigen::Matrix<double,R,C>& m) {
-        typedef typename Eigen::Matrix<double,R,C>::size_type size_type;
-        for (size_type j = 0; j < m.cols(); ++j)
-          for (size_type i = 0; i < m.rows(); ++i)
+        using Eigen::Matrix;
+        using stan::math::index_type;
+        typedef typename index_type<Matrix<double,R,C> >::type idx_t;
+
+        for (idx_t j = 0; j < m.cols(); ++j)
+          for (idx_t i = 0; i < m.rows(); ++i)
             write(m(i,j));
       }
 

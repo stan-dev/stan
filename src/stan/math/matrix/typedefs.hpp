@@ -1,13 +1,19 @@
-#ifndef __STAN__MATH__MATRIX__TYPEDEFS_HPP__
-#define __STAN__MATH__MATRIX__TYPEDEFS_HPP__
+#ifndef STAN__MATH__MATRIX__TYPEDEFS_HPP
+#define STAN__MATH__MATRIX__TYPEDEFS_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
 
 namespace stan {
+
   namespace math {
 
-    // typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
-    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Index size_type;
+    /**
+     * Type for sizes and indexes in an Eigen matrix with double e
+     */
+    typedef 
+    index_type<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >::type
+    size_type;
 
     /**
      * Type for matrix of double values.

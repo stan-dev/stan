@@ -88,7 +88,7 @@ the Stan message groups at
 \section{Stan Programs}
 
 A \Stan program defines a statistical model through a conditional
-probability function $p(\theta|y;x)$, where $\theta$ is a sequence of
+probability function $p(\theta|y,x)$, where $\theta$ is a sequence of
 modeled unknown values (e.g., model parameters, latent variables, missing
 data, future predictions), $y$ is a sequence of modeled known 
 values, and $x$ is a sequence of unmodeled predictors and constants
@@ -135,22 +135,16 @@ Running the \Stan executable for a model first reads in and validates
 the known values $y$ and $x$, then generates a sequence of
 (non-independent) identically distributed samples $\theta^{(1)},
 \theta^{(2)}, \ldots$, each of which has the marginal distribution
-$p(\theta|y;x)$.
+$p(\theta|y,x)$.
 
 
 \section{Sampling}
 
 For continuous parameters, \Stan uses Hamiltonian Monte Carlo (\HMC)
-sampling \citep{Duane:1987, Neal:1994, Neal:2011}, a form of Markov chain Monte
-Carlo (\MCMC) sampling \citep{Metropolis:1953}.  \Stan 1.0 does not do
-discrete sampling.%
-%
-\footnote{Plans are in place to add full discrete sampling in \Stan
-  2.0.  An intermediate step will be to allow forward sampling of
-  discrete variables in the generated quantities block for predictive
-  modeling and model checking.}
-%
-\refchapter{mixture-modeling} discusses how finite discrete parameters
+sampling \citep{Duane:1987, Neal:1994, Neal:2011}, a form of Markov
+chain Monte Carlo (\MCMC) sampling \citep{Metropolis:1953}.  \Stan 1.0
+does not do discrete sampling. \refchapter{mixture-modeling} and
+\refchapter{latent-discrete} discuss how finite discrete parameters
 can be summed out of models.
 
 \HMC accelerates both convergence to the stationary distribution and
@@ -205,7 +199,7 @@ the underlying matrix operations.
 \subsection{Convergence Monitoring and Effective Sample Size}
 
 Samples in a Markov chain are only drawn with the marginal
-distribution $p(\theta|y;x)$ after the chain has converged to its
+distribution $p(\theta|y,x)$ after the chain has converged to its
 equilibrium distribution.  There are several methods to test whether
 an \MCMC method has failed to converge; unfortunately, passing the
 tests does not guarantee convergence.  The recommended method for
@@ -228,13 +222,13 @@ error due to correlated samples.
 \Stan was developed to support full Bayesian inference.  Bayesian
 inference is based in part on Bayes's rule,
 \[
-p(\theta|y;x) \propto p(y|\theta;x) \, p(\theta;x),
+p(\theta|y,x) \propto p(y|\theta,x) \, p(\theta,x),
 \]
 which, in this unnormalized form, states that the posterior
-probability $p(\theta|y;x)$ of parameters $\theta$ given data $y$ (and
+probability $p(\theta|y,x)$ of parameters $\theta$ given data $y$ (and
 constants $x$) is proportional (for fixed $y$ and $x$) to the
-product of the likelihood function $p(y|\theta;x)$ and prior
-$p(\theta;x)$.
+product of the likelihood function $p(y|\theta,x)$ and prior
+$p(\theta,x)$.
 
 For \Stan, Bayesian modeling involves coding the posterior probability
 function up to a proportion, which Bayes's rule shows is equivalent to
@@ -242,7 +236,7 @@ modeling the product of the likelihood function and prior up to a
 proportion.
 
 Full Bayesian inference involves propagating the uncertainty in the
-value of parameters $\theta$ modeled by the posterior $p(\theta|y;x)$.
+value of parameters $\theta$ modeled by the posterior $p(\theta|y,x)$.
 This can be accomplished by basing inference on a sequence of samples
 from the posterior using plug-in estimates for quantities of interest
 such as posterior means, posterior intervals, predictions based on the
@@ -270,6 +264,12 @@ posterior (MAP) estimate.  If parameters (typically hierarchical) have
 been marginalized out, it's sometimes called a maximum marginal
 likelihood (MML) estimate. 
 
+For optimization, the Jacobian of any transforms induced by
+constraints on variables are ignored.  It is more efficient in many
+optimization problems to remove lower and upper bound constraints in
+variable the declarations and instead rely on rejection in the model
+block to disallow out-of-support solutions.
+
 
 \subsection{Inference with Point Estimates}
 
@@ -285,21 +285,6 @@ posterior variance is low and the posterior mean is near the posterior
 mode, inference with point estimates can be very similar to full
 Bayesian inference.
 
-\subsubsection{``Empirical Bayes''}
 
-Fitting point estimates of priors and then using them for subsequent
-inference is sometimes called ``empirical Bayes'' (see, e.g.,
-\citep{Efron:2012}).%
-%
-\footnote{The scare quotes on ``empirical Bayes'' are because the
-  approach is no more empirical than full Bayes.  Empirical Bayes
-  approaches merely ignore some posterior uncertainty to make
-  inference more efficient computationally.}
-%
-Typically these optimizations will be done using maximum marignal
-likelihood rather than posterior modes of a full model.  Sometimes
-Empirical Bayes point estimates will be obtained using moment matching
-(see, e.g., the rat-tumor example in Chapter 5 of
-\citep{GelmanEtAl:2013}).
 
 

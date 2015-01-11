@@ -1,18 +1,24 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__CEIL_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__CEIL_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__CEIL_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__CEIL_HPP
 
-#include <cmath>
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace agrad {
 
     namespace {
-      class ceil_vari : public vari {
+      class ceil_vari : public op_v_vari {
       public:
         ceil_vari(vari* avi) :
-          vari(std::ceil(avi->val_)) {
+          op_v_vari(::ceil(avi->val_),avi) {
+        }
+        void chain() {
+          if (unlikely(boost::math::isnan(avi_->val_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
         }
       };
     }
@@ -31,7 +37,23 @@ namespace stan {
      * value.  Although this function is not differentiable because it
      * is discontinuous at integral values, its gradient is returned
      * as zero everywhere.
-     * 
+     *
+       \f[
+       \mbox{ceil}(x) = 
+       \begin{cases}
+         \lceil x\rceil & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{ceil}(x)}{\partial x} = 
+       \begin{cases}
+         0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Input variable.
      * @return Ceiling of the variable.
      */

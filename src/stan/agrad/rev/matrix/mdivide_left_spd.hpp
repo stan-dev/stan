@@ -1,13 +1,13 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_SPD_HPP__
-#define __STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_SPD_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_SPD_HPP
+#define STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_SPD_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace agrad {
@@ -37,11 +37,11 @@ namespace stan {
           : vari(0.0),
             M_(A.rows()),
             N_(B.cols()),
-            _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefA((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() * A.cols())),
-            _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefB((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
-            _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefC((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
             _alloc(new mdivide_left_spd_alloc<R1,C1,R2,C2>())
         {
@@ -121,9 +121,9 @@ namespace stan {
           : vari(0.0),
             M_(A.rows()),
             N_(B.cols()),
-            _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefB((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
-            _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefC((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
             _alloc(new mdivide_left_spd_alloc<R1,C1,R2,C2>())
         {
@@ -185,9 +185,9 @@ namespace stan {
           : vari(0.0),
             M_(A.rows()),
             N_(B.cols()),
-            _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefA((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() * A.cols())),
-            _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefC((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
             _alloc(new mdivide_left_spd_alloc<R1,C1,R2,C2>())
         {
@@ -245,9 +245,10 @@ namespace stan {
                      const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::check_square("mdivide_left_spd(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("mdivide_left_spd(%1%)",A,"A",
-                                      b,"b",(double*)0);      
+      stan::error_handling::check_square("mdivide_left_spd", "A", A);
+      stan::error_handling::check_multiplicable("mdivide_left_spd",
+                                                "A", A,
+                                                "b", b);
 
       // NOTE: this is not a memory leak, this vari is used in the 
       // expression graph to evaluate the adjoint, but is not needed
@@ -269,9 +270,10 @@ namespace stan {
                      const Eigen::Matrix<double,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::check_square("mdivide_left_spd(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("mdivide_left_spd(%1%)",A,"A",
-                                      b,"b",(double*)0);    
+      stan::error_handling::check_square("mdivide_left_spd", "A", A);
+      stan::error_handling::check_multiplicable("mdivide_left_spd",
+                                                "A", A,
+                                                "b", b);
       
       // NOTE: this is not a memory leak, this vari is used in the 
       // expression graph to evaluate the adjoint, but is not needed
@@ -293,9 +295,10 @@ namespace stan {
                      const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::check_square("mdivide_left_spd(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("mdivide_left_spd(%1%)",A,"A",
-                                      b,"b",(double*)0);    
+      stan::error_handling::check_square("mdivide_left_spd", "A", A);
+      stan::error_handling::check_multiplicable("mdivide_left_spd",
+                                                "A", A,
+                                                "b", b);
       
       // NOTE: this is not a memory leak, this vari is used in the 
       // expression graph to evaluate the adjoint, but is not needed

@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__ADAPT__DIAG__E__NUTS__BETA__
-#define __STAN__MCMC__ADAPT__DIAG__E__NUTS__BETA__
+#ifndef STAN__MCMC__ADAPT__DIAG__E__NUTS__BETA
+#define STAN__MCMC__ADAPT__DIAG__E__NUTS__BETA
 
 #include <stan/mcmc/stepsize_var_adapter.hpp>
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
@@ -30,17 +30,17 @@ namespace stan {
         
         sample s = diag_e_nuts<M, BaseRNG>::transition(init_sample);
         
-        if (this->_adapt_flag) {
+        if (this->adapt_flag_) {
         
-          this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, s.accept_stat());
+          this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_, s.accept_stat());
           
-          bool update = this->_var_adaptation.learn_variance(this->_z.mInv, this->_z.q);
+          bool update = this->var_adaptation_.learn_variance(this->z_.mInv, this->z_.q);
           
           if(update) {
             this->init_stepsize();
             
-            this->_stepsize_adaptation.set_mu(log(10 * this->_nom_epsilon));
-            this->_stepsize_adaptation.restart();
+            this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
+            this->stepsize_adaptation_.restart();
           }
           
         }
@@ -51,7 +51,7 @@ namespace stan {
                                
       void disengage_adaptation() {
         base_adapter::disengage_adaptation();
-        this->_stepsize_adaptation.complete_adaptation(this->_nom_epsilon);
+        this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
       }
 
     };

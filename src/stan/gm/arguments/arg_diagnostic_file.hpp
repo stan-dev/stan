@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__DIAGNOSTIC__FILE__HPP__
-#define __STAN__GM__ARGUMENTS__DIAGNOSTIC__FILE__HPP__
+#ifndef STAN__GM__ARGUMENTS__DIAGNOSTIC__FILE__HPP
+#define STAN__GM__ARGUMENTS__DIAGNOSTIC__FILE__HPP
 
 #include <stan/gm/arguments/singleton_argument.hpp>
 

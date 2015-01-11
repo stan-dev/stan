@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LBETA_HPP__
-#define __STAN__MATH__FUNCTIONS__LBETA_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LBETA_HPP
+#define STAN__MATH__FUNCTIONS__LBETA_HPP
 
 #include <boost/math/tools/promotion.hpp>
 
@@ -22,7 +22,32 @@ namespace stan {
      *
      * See boost::math::lgamma() for the double-based and stan::agrad for the
      * variable-based log Gamma function.
-     * 
+     *
+     *
+       \f[
+       \mbox{lbeta}(\alpha,\beta) = 
+       \begin{cases}
+         \ln\int_0^1 u^{\alpha - 1} (1 - u)^{\beta - 1} \, du & \mbox{if } \alpha,\beta>0 \\[6pt]
+         \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \frac{\partial\,\mbox{lbeta}(\alpha,\beta)}{\partial \alpha} = 
+       \begin{cases}
+         \Psi(\alpha)-\Psi(\alpha+\beta) & \mbox{if } \alpha,\beta>0 \\[6pt]
+         \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \frac{\partial\,\mbox{lbeta}(\alpha,\beta)}{\partial \beta} = 
+       \begin{cases}
+         \Psi(\beta)-\Psi(\alpha+\beta) & \mbox{if } \alpha,\beta>0 \\[6pt]
+         \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a First value
      * @param b Second value
      * @return Log of the beta function applied to the two values.

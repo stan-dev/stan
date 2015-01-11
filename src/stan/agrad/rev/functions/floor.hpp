@@ -1,18 +1,24 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__FLOOR_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__FLOOR_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__FLOOR_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__FLOOR_HPP
 
-#include <cmath>
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
   namespace agrad {
 
     namespace {
-      class floor_vari : public vari {
+      class floor_vari : public op_v_vari {
       public:
         floor_vari(vari* avi) :
-          vari(std::floor(avi->val_)) {
+          op_v_vari(::floor(avi->val_),avi) {
+        }
+        void chain() {
+          if (unlikely(boost::math::isnan(avi_->val_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
         }
       };
     }
@@ -32,6 +38,22 @@ namespace stan {
      * discontinuous at integral values, its gradient is returned as
      * zero everywhere.
      * 
+       \f[
+       \mbox{floor}(x) = 
+       \begin{cases}
+         \lfloor x \rfloor & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{floor}(x)}{\partial x} = 
+       \begin{cases}
+         0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Input variable.
      * @return Floor of the variable.
      */

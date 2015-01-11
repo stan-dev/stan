@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__PARSER__TERM_GRAMMAR__HPP__
-#define __STAN__GM__PARSER__TERM_GRAMMAR__HPP__
+#ifndef STAN__GM__PARSER__TERM_GRAMMAR__HPP
+#define STAN__GM__PARSER__TERM_GRAMMAR__HPP
 
 #include <string>
 #include <sstream>
@@ -67,6 +67,11 @@ namespace stan {
                               fun(var_origin), 
                               whitespace_grammar<Iterator> > 
       fun_r;
+
+      boost::spirit::qi::rule<Iterator, 
+                              integrate_ode(var_origin), 
+                              whitespace_grammar<Iterator> > 
+      integrate_ode_r;
 
 
       boost::spirit::qi::rule<Iterator, 

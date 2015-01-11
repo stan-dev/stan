@@ -1,5 +1,5 @@
+#include <stan/math/functions/log1p.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include "stan/math/functions/log1p.hpp"
 #include <gtest/gtest.h>
 
 
@@ -36,3 +36,9 @@ TEST(MathFunctions, log1p_exception) {
   EXPECT_TRUE(isnan(log1p(-10.0)));
 }
 
+TEST(MathFunctions, log1p_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::math::log1p(nan));
+}

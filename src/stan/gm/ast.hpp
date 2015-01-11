@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__AST_HPP__
-#define __STAN__GM__AST_HPP__
+#ifndef STAN__GM__AST_HPP
+#define STAN__GM__AST_HPP
 
 #include <map>
 #include <string>
@@ -42,10 +42,12 @@ namespace stan {
     struct print_statement;
     struct program;
     struct range;
+    struct reject_statement;
     struct return_statement;
     struct row_vector_var_decl;
     struct sample;
     struct simplex_var_decl;
+    struct integrate_ode;
     struct unit_vector_var_decl;
     struct statement;
     struct statements;
@@ -201,6 +203,7 @@ namespace stan {
       expr_type operator()(const array_literal& e) const;
       expr_type operator()(const variable& e) const;
       expr_type operator()(const fun& e) const;
+      expr_type operator()(const integrate_ode& e) const;
       expr_type operator()(const index_op& e) const;
       expr_type operator()(const binary_op& e) const;
       expr_type operator()(const unary_op& e) const;
@@ -216,6 +219,7 @@ namespace stan {
                              boost::recursive_wrapper<double_literal>,
                              boost::recursive_wrapper<array_literal>,
                              boost::recursive_wrapper<variable>,
+                             boost::recursive_wrapper<integrate_ode>,
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
                              boost::recursive_wrapper<binary_op>,
@@ -232,6 +236,7 @@ namespace stan {
       expression(const array_literal& expr);
       expression(const variable& expr);
       expression(const fun& expr);
+      expression(const integrate_ode& expr);
       expression(const index_op& expr);
       expression(const binary_op& expr);
       expression(const unary_op& expr);
@@ -268,6 +273,7 @@ namespace stan {
       bool operator()(const double_literal& x) const;
       bool operator()(const array_literal& x) const;
       bool operator()(const variable& x) const;
+      bool operator()(const integrate_ode& x) const;
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;
       bool operator()(const binary_op& x) const;
@@ -321,6 +327,24 @@ namespace stan {
       variable(std::string name);
       void set_type(const base_expr_type& base_type, 
                     size_t num_dims);
+    };
+
+    struct integrate_ode {
+      std::string system_function_name_;
+      expression y0_;    // initial state
+      expression t0_;    // initial time
+      expression ts_;    // solution times
+      expression theta_; // params
+      expression x_;     // data
+      expression x_int_;     // integer data
+      integrate_ode();
+      integrate_ode(const std::string& system_function_name,
+                const expression& y0,
+                const expression& t0,
+                const expression& ts,
+                const expression& theta,
+                const expression& x,
+                const expression& x_int);
     };
 
     struct fun {
@@ -519,6 +543,14 @@ namespace stan {
                                std::vector<expression> const& dims);
     };
 
+    struct cholesky_corr_var_decl : public base_var_decl {
+      expression K_;
+      cholesky_corr_var_decl();
+      cholesky_corr_var_decl(const expression& K,
+                             const std::string& name,
+                             const std::vector<expression>& dims);
+    };
+
     struct cov_matrix_var_decl : public base_var_decl {
       expression K_;
       cov_matrix_var_decl();
@@ -549,6 +581,7 @@ namespace stan {
       std::string operator()(const ordered_var_decl& x) const;
       std::string operator()(const positive_ordered_var_decl& x) const;
       std::string operator()(const cholesky_factor_var_decl& x) const;
+      std::string operator()(const cholesky_corr_var_decl& x) const;
       std::string operator()(const cov_matrix_var_decl& x) const;
       std::string operator()(const corr_matrix_var_decl& x) const;
     };
@@ -568,6 +601,7 @@ namespace stan {
                              boost::recursive_wrapper<ordered_var_decl>,
                              boost::recursive_wrapper<positive_ordered_var_decl>,
                              boost::recursive_wrapper<cholesky_factor_var_decl>,
+                             boost::recursive_wrapper<cholesky_corr_var_decl>,
                              boost::recursive_wrapper<cov_matrix_var_decl>,
                              boost::recursive_wrapper<corr_matrix_var_decl> >
       var_decl_t;
@@ -590,6 +624,7 @@ namespace stan {
       var_decl(const ordered_var_decl& decl);
       var_decl(const positive_ordered_var_decl& decl);
       var_decl(const cholesky_factor_var_decl& decl);
+      var_decl(const cholesky_corr_var_decl& decl);
       var_decl(const cov_matrix_var_decl& decl);
       var_decl(const corr_matrix_var_decl& decl);
 
@@ -607,6 +642,7 @@ namespace stan {
                              boost::recursive_wrapper<conditional_statement>,
                              boost::recursive_wrapper<while_statement>,
                              boost::recursive_wrapper<print_statement>,
+                             boost::recursive_wrapper<reject_statement>,
                              boost::recursive_wrapper<return_statement>,
                              boost::recursive_wrapper<no_op_statement> >
       statement_t;
@@ -625,6 +661,7 @@ namespace stan {
       statement(const conditional_statement& st);
       statement(const while_statement& st);
       statement(const print_statement& st);
+      statement(const reject_statement& st);
       statement(const no_op_statement& st);
       statement(const return_statement& st);
 
@@ -642,6 +679,7 @@ namespace stan {
       bool operator()(const conditional_statement& st) const;
       bool operator()(const while_statement& st) const;
       bool operator()(const print_statement& st) const;
+      bool operator()(const reject_statement& st) const;
       bool operator()(const no_op_statement& st) const;
       bool operator()(const return_statement& st) const;
     };
@@ -662,6 +700,7 @@ namespace stan {
       bool operator()(const conditional_statement& st) const;
       bool operator()(const while_statement& st) const;
       bool operator()(const print_statement& st) const;
+      bool operator()(const reject_statement& st) const;
       bool operator()(const no_op_statement& st) const;
       bool operator()(const return_statement& st) const;
     };
@@ -707,6 +746,12 @@ namespace stan {
       std::vector<printable> printables_;
       print_statement();
       print_statement(const std::vector<printable>& printables);
+    };
+
+    struct reject_statement {
+      std::vector<printable> printables_;
+      reject_statement();
+      reject_statement(const std::vector<printable>& printables);
     };
 
     struct return_statement {
@@ -810,6 +855,7 @@ namespace stan {
       bool operator()(const double_literal& e) const;
       bool operator()(const array_literal& e) const;
       bool operator()(const variable& e) const;
+      bool operator()(const integrate_ode& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const binary_op& e) const;
@@ -828,6 +874,7 @@ namespace stan {
       bool operator()(const double_literal& e) const;
       bool operator()(const array_literal& e) const;
       bool operator()(const variable& e) const;
+      bool operator()(const integrate_ode& e) const;
       bool operator()(const fun& e) const;
       bool operator()(const index_op& e) const;
       bool operator()(const binary_op& e) const;

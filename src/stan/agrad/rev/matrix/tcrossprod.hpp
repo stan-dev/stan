@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__TCROSSPROD_HPP__
-#define __STAN__AGRAD__REV__MATRIX__TCROSSPROD_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__TCROSSPROD_HPP
+#define STAN__AGRAD__REV__MATRIX__TCROSSPROD_HPP
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
@@ -34,7 +34,7 @@ namespace stan {
       matrix_v MMt(M.rows(),M.rows());
 
       vari** vs 
-        = (vari**)memalloc_.alloc((M.rows() * M.cols() ) * sizeof(vari*));
+        = (vari**)ChainableStack::memalloc_.alloc((M.rows() * M.cols() ) * sizeof(vari*));
       int pos = 0;
       for (int m = 0; m < M.rows(); ++m)
         for (int n = 0; n < M.cols(); ++n)

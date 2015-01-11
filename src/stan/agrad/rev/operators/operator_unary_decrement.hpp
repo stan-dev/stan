@@ -1,8 +1,9 @@
-#ifndef __STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_DECREMENT_HPP__
-#define __STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_DECREMENT_HPP__
+#ifndef STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_DECREMENT_HPP
+#define STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_DECREMENT_HPP
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
   namespace agrad {
@@ -14,7 +15,10 @@ namespace stan {
           op_v_vari(avi->val_ - 1.0, avi) {
         }
         void chain() {
-          avi_->adj_ += adj_;
+          if (unlikely(boost::math::isnan(avi_->val_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else
+            avi_->adj_ += adj_;
         }
       };
     }

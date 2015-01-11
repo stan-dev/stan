@@ -1,15 +1,13 @@
-#ifndef __STAN__AGRAD__REV__VAR_HPP__
-#define __STAN__AGRAD__REV__VAR_HPP__
+#ifndef STAN__AGRAD__REV__VAR_HPP
+#define STAN__AGRAD__REV__VAR_HPP
 
 #include <ostream>
-#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
   namespace agrad {
 
     // forward declare
-    static void recover_memory();
     static void grad(chainable* vi);
     
     /**
@@ -228,8 +226,8 @@ namespace stan {
        * the specified vector of (independent) variables, assigning the
        * specified vector to the gradient.
        *
-       * After the computation of the gradient and value, memory is
-       * recovered.
+       * The grad() function does <i>not</i> recover memory.  In Stan
+       * 2.4 and earlier, this function did recover memory.
        *
        * @param x Vector of independent variables.
        * @param g Gradient vector of partial derivatives of this
@@ -237,34 +235,12 @@ namespace stan {
        */
       void grad(std::vector<var>& x,
                 std::vector<double>& g) {
-        stan::agrad::grad(vi_);
+        stan::agrad::grad(vi_); // defined in chainable.hpp
         g.resize(x.size());
         for (size_t i = 0; i < x.size(); ++i) 
           g[i] = x[i].vi_->adj_;
-        recover_memory();
       }
       
-      /**
-       * Compute gradients of this dependent variable with respect to
-       * all variables on which it depends.  
-       *
-       * Memory is recovered, but not freed after this operation,
-       * calling <code>recover_memory()</code>; see
-       * <code>free_all()</code> to release resources back to
-       * the system rather than saving them for reuse).
-       *
-       * Until the next creation of a stan::agrad::var instance, the
-       * gradient values will be available from an instance <code>x</code>
-       * of <code>stan::agrad::var</code> via <code>x.adj()</code>.
-       * It may be slightly more efficient to do this without the intermediate
-       * creation and population of two vectors as done in the two-argument
-       * form <code>grad(std::vector<var>&, std::vector<double>&)</code>.
-       */
-      void grad() {
-        stan::agrad::grad(vi_);
-        recover_memory();
-      }
-
       // POINTER OVERRIDES
       
       /**

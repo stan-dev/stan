@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__BASE_MCMC__HPP__
-#define __STAN__MCMC__BASE_MCMC__HPP__
+#ifndef STAN__MCMC__BASE_MCMC__HPP
+#define STAN__MCMC__BASE_MCMC__HPP
 
 #include <ostream>
 #include <string>
@@ -14,13 +14,13 @@ namespace stan {
       
     public:
       
-      base_mcmc(std::ostream* o, std::ostream* e): _out_stream(o), _err_stream(e) {};
+      base_mcmc(std::ostream* o, std::ostream* e): out_stream_(o), err_stream_(e) {};
       
       virtual ~base_mcmc() {};
       
       virtual sample transition(sample& init_sample) = 0;
       
-      std::string name() { return _name; }
+      std::string name() { return name_; }
       
       virtual void write_sampler_param_names(std::ostream& o) {};
       
@@ -39,10 +39,10 @@ namespace stan {
       
     protected:
       
-      std::string _name;
+      std::string name_;
       
-      std::ostream* _out_stream;
-      std::ostream* _err_stream;
+      std::ostream* out_stream_;
+      std::ostream* err_stream_;
       
     };
 

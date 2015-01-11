@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__ADAPT__UNIT__E__NUTS__BETA__
-#define __STAN__MCMC__ADAPT__UNIT__E__NUTS__BETA__
+#ifndef STAN__MCMC__ADAPT__UNIT__E__NUTS__BETA
+#define STAN__MCMC__ADAPT__UNIT__E__NUTS__BETA
 
 #include <stan/mcmc/stepsize_adapter.hpp>
 #include <stan/mcmc/hmc/nuts/unit_e_nuts.hpp>
@@ -28,8 +28,8 @@ namespace stan {
         
         sample s = unit_e_nuts<M, BaseRNG>::transition(init_sample);
         
-        if (this->_adapt_flag)
-          this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, s.accept_stat());
+        if (this->adapt_flag_)
+          this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_, s.accept_stat());
         
         return s;
         
@@ -37,7 +37,7 @@ namespace stan {
                                
       void disengage_adaptation() {
         base_adapter::disengage_adaptation();
-        this->_stepsize_adaptation.complete_adaptation(this->_nom_epsilon);
+        this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
       }
 
     };

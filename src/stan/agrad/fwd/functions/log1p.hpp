@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__LOG1P_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__LOG1P_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__LOG1P_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__LOG1P_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/log1p.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
 

@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__CHAINS_HPP__
-#define __STAN__MCMC__CHAINS_HPP__
+#ifndef STAN__MCMC__CHAINS_HPP
+#define STAN__MCMC__CHAINS_HPP
 
 #include <algorithm>
 #include <cmath>
@@ -22,16 +22,16 @@
 #include <boost/accumulators/statistics/covariance.hpp>
 #include <boost/accumulators/statistics/variates/covariate.hpp>
 
-
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/additive_combine.hpp>
 
+#include <stan/io/stan_csv_reader.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/variance.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/prob/autocorrelation.hpp>
 #include <stan/prob/autocovariance.hpp>
 
-#include <stan/io/stan_csv_reader.hpp>
 
 namespace stan {  
 
@@ -182,6 +182,10 @@ namespace stan {
       }
 
       static Eigen::VectorXd autocorrelation(const Eigen::VectorXd& x) {
+        using std::vector;
+        using stan::math::index_type;
+        typedef typename index_type<vector<double> >::type idx_t;
+
         std::vector<double> ac;
         std::vector<double> sample(x.size());
         for (int i = 0; i < x.size(); i++)
@@ -189,12 +193,16 @@ namespace stan {
         stan::prob::autocorrelation(sample, ac);
 
         Eigen::VectorXd ac2(ac.size());
-        for (std::vector<double>::size_type i = 0; i < ac.size(); i++)
+        for (idx_t i = 0; i < ac.size(); i++)
           ac2(i) = ac[i];
         return ac2;
       }
 
       static Eigen::VectorXd autocovariance(const Eigen::VectorXd& x) {
+        using std::vector;
+        using stan::math::index_type;
+        typedef typename index_type<vector<double> >::type idx_t;
+
         std::vector<double> ac;
         std::vector<double> sample(x.size());
         for (int i = 0; i < x.size(); i++)
@@ -202,7 +210,7 @@ namespace stan {
         stan::prob::autocovariance(sample, ac);
 
         Eigen::VectorXd ac2(ac.size());
-        for (std::vector<double>::size_type i = 0; i < ac.size(); i++)
+        for (idx_t i = 0; i < ac.size(); i++)
           ac2(i) = ac[i];
         return ac2;
       }
@@ -435,21 +443,22 @@ namespace stan {
         add(num_chains(), sample);
       }
 
+      /**
+       * Convert a vector of vector<double> to Eigen::MatrixXd
+       *
+       * This method is added for the benefit of software wrapping
+       * Stan (e.g., PyStan) so that it need not additionally wrap Eigen.
+       *
+       */
       void add(const std::vector<std::vector<double> >& sample) {
-        /**
-        * Convert a vector of vector<double> to Eigen::MatrixXd
-        *
-        * This method is added for the benefit of software wrapping
-        * Stan (e.g., PyStan) so that it need not additionally wrap Eigen.
-        *
-        */
         int n_row = sample.size();
         if (n_row == 0)
             return;
         int n_col = sample[0].size();
         Eigen::MatrixXd sample_copy(n_row, n_col);
         for (int i = 0; i < n_row; i++) {
-            sample_copy.row(i) = Eigen::VectorXd::Map(&sample[i][0], sample[0].size());
+            sample_copy.row(i) 
+              = Eigen::VectorXd::Map(&sample[i][0], sample[0].size());
         }
         add(sample_copy);
       }

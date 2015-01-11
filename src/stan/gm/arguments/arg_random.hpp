@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__RANDOM__HPP__
-#define __STAN__GM__ARGUMENTS__RANDOM__HPP__
+#ifndef STAN__GM__ARGUMENTS__RANDOM__HPP
+#define STAN__GM__ARGUMENTS__RANDOM__HPP
 
 #include <stan/gm/arguments/categorical_argument.hpp>
 

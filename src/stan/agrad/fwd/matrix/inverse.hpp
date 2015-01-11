@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__INVERSE_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__INVERSE_HPP__
+#ifndef STAN__AGRAD__FWD__MATRIX__INVERSE_HPP
+#define STAN__AGRAD__FWD__MATRIX__INVERSE_HPP
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
@@ -9,11 +9,8 @@
 #include <stan/agrad/fwd/operators/operator_multiplication.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
-#include <stan/agrad/rev/matrix/multiply.hpp>
-#include <stan/agrad/rev/operators.hpp>
-#include <stan/agrad/rev/functions/abs.hpp>
 #include <stan/math/matrix/inverse.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace agrad {
@@ -25,7 +22,7 @@ namespace stan {
       using stan::math::multiply;
       using stan::agrad::multiply;
       using stan::math::inverse;
-      stan::math::check_square("inverse(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("inverse", "m", m);
       Eigen::Matrix<T,R,C> m_deriv(m.rows(), m.cols());
       Eigen::Matrix<T,R,C> m_inv(m.rows(), m.cols());
 

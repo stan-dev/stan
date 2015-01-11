@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__WRITE_MODEL_HPP__
-#define __STAN__COMMON__WRITE_MODEL_HPP__
+#ifndef STAN__COMMON__WRITE_MODEL_HPP
+#define STAN__COMMON__WRITE_MODEL_HPP
 
 #include <ostream>
 #include <string>

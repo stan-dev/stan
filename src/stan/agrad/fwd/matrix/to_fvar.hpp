@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__TO_FVAR_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__TO_FVAR_HPP__
+#ifndef STAN__AGRAD__FWD__MATRIX__TO_FVAR_HPP
+#define STAN__AGRAD__FWD__MATRIX__TO_FVAR_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_matching_dims.hpp>
+#include <stan/error_handling/matrix/check_matching_dims.hpp>
 
 namespace stan {
   namespace agrad {
@@ -131,8 +131,9 @@ namespace stan {
     to_fvar(const Eigen::Matrix<T,R,C>& val,
             const Eigen::Matrix<T,R,C>& deriv) {
       
-      stan::math::check_matching_dims("to_fvar(%1%)",val,"value",
-                                      deriv, "deriv",(double*)0);
+      stan::error_handling::check_matching_dims("to_fvar",
+                                                "value", val,
+                                                "deriv", deriv);
       Eigen::Matrix<fvar<T>,R,C> ret(val.rows(), val.cols());
       for(size_type i = 0; i < val.rows(); i++) {
         for(size_type j = 0; j < val.cols(); j++) {

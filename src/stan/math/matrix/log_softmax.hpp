@@ -1,18 +1,39 @@
-#ifndef __STAN__MATH__MATRIX__LOG_SOFTMAX_HPP__
-#define __STAN__MATH__MATRIX__LOG_SOFTMAX_HPP__
+#ifndef STAN__MATH__MATRIX__LOG_SOFTMAX_HPP
+#define STAN__MATH__MATRIX__LOG_SOFTMAX_HPP
 
 #include <cmath>
 #include <sstream>
 #include <stdexcept>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/log_sum_exp.hpp>
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
+#include <stan/error_handling/matrix/check_nonzero_size.hpp>
 
 namespace stan {
   namespace math {
 
    /**
-     * Return the natural logarithm of the softmax of the specified vector.
+     * Return the natural logarithm of the softmax of the specified
+     * vector.
+     *
+     * \f$
+     * \log \mbox{softmax}(y)
+     * \ = \ y - \log \sum_{k=1}^K \exp(y_k)
+     * \ = \ y - \mbox{log\_sum\_exp}(y).
+     * \f$
+     *
+     * For the log softmax function, the entries in the Jacobian are
+     * \f$
+     * \frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
+     * = \left\{ 
+     * \begin{array}{ll}
+     * 1 - \mbox{softmax}(y)[m]
+     * & \mbox{ if } m = k, \mbox{ and}
+     * \\[6pt]
+     * \mbox{softmax}(y)[m]
+     * & \mbox{ if } m \neq k.
+     * \end{array}
+     * \right.
+     * \f$
      *
      * @tparam T Scalar type of values in vector.
      * @param[in] v Vector to transform.
@@ -24,7 +45,7 @@ namespace stan {
       using std::exp;
       using std::log;
       using stan::math::log_sum_exp;
-      stan::math::check_nonzero_size("log_softmax(%1%)",v,"v", (double*)0);
+      stan::error_handling::check_nonzero_size("log_softmax", "v", v);
       Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
       T z = log_sum_exp(v);
       for (int i = 0; i < v.size(); ++i)

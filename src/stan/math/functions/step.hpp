@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__STEP_HPP__
-#define __STAN__MATH__FUNCTIONS__STEP_HPP__
+#ifndef STAN__MATH__FUNCTIONS__STEP_HPP
+#define STAN__MATH__FUNCTIONS__STEP_HPP
 
 namespace stan {
   namespace math {
@@ -10,6 +10,15 @@ namespace stan {
      * The function is defined by 
      *
      * <code>step(y) = (y < 0.0) ? 0 : 1</code>.
+     *
+       \f[
+       \mbox{step}(x) = 
+       \begin{cases}
+         0 & \mbox{if } x \leq 0 \\
+         1 & \mbox{if } x > 0  \\[6pt]
+         0 & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param y Scalar argument.
      *

@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__PARSER__WHITESPACE_GRAMMAR_HPP__
-#define __STAN__GM__PARSER__WHITESPACE_GRAMMAR_HPP__
+#ifndef STAN__GM__PARSER__WHITESPACE_GRAMMAR_HPP
+#define STAN__GM__PARSER__WHITESPACE_GRAMMAR_HPP
 
 #include <boost/spirit/include/qi.hpp>
 

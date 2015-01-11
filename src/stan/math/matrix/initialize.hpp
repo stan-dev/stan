@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__INITIALIZE_HPP__
-#define __STAN__MATH__MATRIX__INITIALIZE_HPP__
+#ifndef STAN__MATH__MATRIX__INITIALIZE_HPP
+#define STAN__MATH__MATRIX__INITIALIZE_HPP
 
 #include <vector>
 #include <boost/type_traits/is_arithmetic.hpp> 

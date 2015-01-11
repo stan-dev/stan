@@ -1,18 +1,22 @@
-#ifndef __STAN__IO__DUMP_HPP__
-#define __STAN__IO__DUMP_HPP__
+#ifndef STAN__IO__DUMP_HPP
+#define STAN__IO__DUMP_HPP
 
 #include <cctype>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdexcept>
-#include <boost/throw_exception.hpp>
+
 #include <boost/lexical_cast.hpp>
-#include <stan/math/matrix.hpp>
+#include <boost/throw_exception.hpp>
+
 #include <stan/io/var_context.hpp>
+#include <stan/math/matrix.hpp>
+#include <stan/math/meta/index_type.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
 
 namespace stan {
 
@@ -105,8 +109,9 @@ namespace stan {
 
       template <typename T>
       void write_list(T xs) {
+        typedef typename stan::math::index_type<T>::type idx_t;
         out_ << "c(";
-        for (typename T::size_type i = 0; i < xs.size(); ++i) {
+        for (idx_t i = 0; i < xs.size(); ++i) {
           if (i > 0) out_ << ", ";
           write_val(xs[i]);
         }
@@ -434,7 +439,6 @@ namespace stan {
       std::vector<double> stack_r_;
       std::vector<size_t> dims_;
       std::istream& in_;
-      // stan::io::buffered_stream in_;
 
       bool scan_single_char(char c_expected) {
         int c = in_.peek();
@@ -818,7 +822,8 @@ namespace stan {
        * they are floating point.
        */
       bool is_int() {
-        return stack_i_.size() > 0;
+        // return stack_i_.size() > 0;
+        return stack_r_.size() == 0;
       }
 
       /**
@@ -868,8 +873,8 @@ namespace stan {
             BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
           }
         }
-        catch ( const std::invalid_argument &exc ) {
-          std::string msg = "data " + name_ + " " + exc.what();
+        catch (const std::invalid_argument &e) {
+          std::string msg = "data " + name_ + " " + e.what();
           BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
         }
         return true;
@@ -933,13 +938,13 @@ namespace stan {
             vars_i_[reader.name()] 
               = std::pair<std::vector<int>, 
                           std::vector<size_t> >(reader.int_values(), 
-                                                      reader.dims());
+                                                reader.dims());
             
           } else {
             vars_r_[reader.name()] 
               = std::pair<std::vector<double>, 
                           std::vector<size_t> >(reader.double_values(), 
-                                                      reader.dims());
+                                                reader.dims());
           }
         }
       }

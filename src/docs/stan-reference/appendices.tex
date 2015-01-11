@@ -59,7 +59,7 @@ Eigen is distributed under the Mozilla Public License,
 version 2.
 %
 \begin{quote}
-\url{http:/http://opensource.org/licenses/mpl-2.0}
+\url{http://opensource.org/licenses/mpl-2.0}
 \end{quote}
 %
 The copyright of Eigen is owned jointly by its developers or their
@@ -434,9 +434,10 @@ model {
 \section{Some Differences in the Statistical Models that are Allowed}
 
 \begin{itemize}
-\item Stan does not yet support sampling discrete parameters (discrete
-  data is supported).  We plan to implement discrete sampling using a
-  combination of Gibbs and slice sampling but we haven't done so yet.
+\item Stan does not yet support estimation of discrete parameters
+  (discrete data is supported).  We plan to eventually implement a
+  combination of Gibbs and slice sampling for discrete parameters, but
+  we haven't done so yet.
 \item Stan has some distributions on covariance matrices that do not
   exist in \BUGS, including a uniform distribution over correlation
   matrices which may be rescaled, and the priors based on C-vines
@@ -933,11 +934,11 @@ Here's an example repeated from \refsection{documenting-functions}.
 \begin{Verbatim}
 /**
  * Return a data matrix of specified size with rows 
- * correspdonding to items and the first column filled 
+ * corresponding to items and the first column filled 
  * with the value 1 to represent the intercept and the 
  * remaining columns randomly filled with unit-normal draws.
  *
- * @param N Number of rows correspdong to data items
+ * @param N Number of rows correspond to data items
  * @param K Number of predictors, counting the intercept, per
  *          item.
  * @return Simulated predictor matrix.
@@ -1069,4 +1070,125 @@ Mac OS X with a single line-feed (LF) character (ASCII code point
 a carriage return (CR) character (ASCII code point \code{0x0D})
 followed by a line-feed (LF) character.
 
+\chapter{Warning and Error Messages}\label{error-messages.appendix}
 
+\noindent
+This appendix details the specific error messages returned by the
+underlying Stan engine.  The individual Stan interfaces (RStan,
+PyStan, CmdStan) also return error or warning messages in some
+circumstances.
+
+\section{Warnings vs.\ Errors}
+
+The messages returned by Stan come in two flavors, warnings and
+errors.  Error messages arise when a fatal problem occurs under the
+hood from which there is no way to recover.  Warning messages arise
+in circumstances from which the underlying program can continue to
+operaate.  
+
+An example warning message is an informational message about
+ill-formed input to an underlying function, which results in a
+Metropolis rejection during sampling or a reduction in step size for
+optimization, without causing a fatal error.  An example error message
+is when either sampling or optimization cannot find a region of
+non-zero probability or when a program being parsed is ill formed.
+When an error arises, whatever program is running cannot continue and
+the entire execution must halt.
+
+\section{Parsing and Compilation}
+
+Both warning messages and error messages may arise during parsing.  If
+a Stan program parses successfully, it should compile in \Cpp as
+well.  If it does not compile, there is an underlying bug in Stan's
+parser and \Cpp code generator.
+
+\begin{itemize}
+\item {\it Jacobian may be necessary.}  This message arises when the
+  parser cannot verify that the left-hand side of a sampling statement
+  is a linear function of a parameter.  If it is not a linear function
+  of the parameters, a Jacobian adjustment must be applied.  See
+  \refchapter{change-of-variables} for more information on how to
+  adjust for the Jacobian of a non-linear transform
+\end{itemize}
+
+
+\section{Initialization}
+
+\begin{itemize}
+\item {\it vanishing density.} This message arrises when there is a
+  problem with initialization not providing a finite log probability.
+%
+\end{itemize}
+
+\section{Function Evaluation}
+
+\begin{itemize}
+\item {\it informational message.}  This message shows up during
+  sampling when there is a rejected sample due to an underlying issue
+  with input to an underlying function (including probably functions
+  and sampling statements).  This is a {\it warning}\, message, not an
+  error message.  If it only appears at the beginning of warmup in
+  MCMC or during early iterations of optimization, it indicates that
+  adaptation has not yet found appropriate scales for the parameters
+  and an appropriate overall stepsize.  This causes problem like
+  overflow or underflow and thus causes illegal inputs to be passed to
+  functions.  Even if this message persists during sampling, the
+  Metropolis acceptance step will account for the problem and the
+  parameter values being evaluated will be rejected.  This can lead to
+  inefficiency in the best case and lack of ability to make progress
+  in the worst case.  In cases where the message persists, it is worth
+  investigating the arithmetic stability of the Stan program.  There
+  are several tips in this manual and in the user group about how to
+  rewrite problematic programs.
+\end{itemize}
+
+
+
+
+\chapter{Mathematical Functions}\label{math-functions.appendix}
+
+This appendix provides the definition of several mathematical
+functions used throughout the manual.
+
+\section{Beta}\label{beta-appendix.section}
+
+The beta function, $\mbox{B}(\alpha,\beta)$, computes the normalizing
+constant for the beta distribution, and is defined for $a > 0$ and $b
+> 0$ by
+%
+\[
+\mbox{B}(a,b)
+\ = \
+\int_0^1 u^{a - 1} (1 - u)^{b - 1} \, du
+\ = \
+\frac{\Gamma(a) \, \Gamma(b)}{\Gamma(a+b)}.
+\]
+
+
+\section{Gamma}\label{gamma-appendix.section}
+
+The gamma function, $\Gamma(x)$, is the generalization of the
+factorial function to continuous variables, defined so that for
+positive integers $n$,
+\[
+\Gamma(n+1) = n!
+\]
+%
+Generalizing to all positive numbers and non-integer negative numbers,
+\[
+\Gamma(x) = \int_0^{\infty} u^{x - 1} \exp(-u) \, du.
+\]
+
+
+\section{Digamma}\label{digamma-appendix.section}
+
+The digamma function $\Psi$ is the derivative of the $\log \Gamma$
+function,
+%
+\[
+\Psi(u) 
+\ = \
+\frac{d}{d u} \log \Gamma(u) 
+\ = \
+\frac{1}{\Gamma(u)} \ \frac{d}{d u} \Gamma(u).
+\]

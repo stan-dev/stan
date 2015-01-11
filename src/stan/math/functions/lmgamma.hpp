@@ -1,8 +1,8 @@
-#ifndef __STAN__MATH__FUNCTIONS__LMGAMMA_HPP__
-#define __STAN__MATH__FUNCTIONS__LMGAMMA_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LMGAMMA_HPP
+#define STAN__MATH__FUNCTIONS__LMGAMMA_HPP
 
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 
 namespace stan {
@@ -19,6 +19,33 @@ namespace stan {
      * <p>\f$\Gamma_k(x) = \pi^{k(k-1)/4} \, \prod_{j=1}^k \Gamma(x + (1 - j)/2)\f$,
      *
      * where \f$\Gamma()\f$ is the gamma function.
+     *
+     *
+       \f[
+       \mbox{lmgamma}(n,x) = 
+       \begin{cases}
+         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+         \ln\Gamma_n(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{lmgamma}(n,x)}{\partial x} = 
+       \begin{cases}
+         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+         \frac{\partial\, \ln\Gamma_n(x)}{\partial x} & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \ln\Gamma_n(x) = \pi^{n(n-1)/4} \, \prod_{j=1}^n \Gamma(x + (1 - j)/2)
+       \f]
+       
+       \f[
+       \frac{\partial \, \ln\Gamma_n(x)}{\partial x} = \sum_{j=1}^n \Psi(x + (1 - j) / 2)
+       \f]
      *
      * @param k Number of dimensions.
      * @param x Function argument.

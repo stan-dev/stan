@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX_HPP__
-#define __STAN__AGRAD__REV__MATRIX_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX_HPP
+#define STAN__AGRAD__REV__MATRIX_HPP
 
 #include <stan/agrad/rev/matrix/Eigen_NumTraits.hpp>
 #include <stan/agrad/rev/matrix/LDLT_alloc.hpp>

@@ -1,9 +1,9 @@
-#ifndef __STAN__MATH__FUNCTIONS__LOG2_HPP__
-#define __STAN__MATH__FUNCTIONS__LOG2_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LOG2_HPP
+#define STAN__MATH__FUNCTIONS__LOG2_HPP
 
 #include <stdexcept>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
 

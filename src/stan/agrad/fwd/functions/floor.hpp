@@ -1,8 +1,9 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__FLOOR_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__FLOOR_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__FLOOR_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__FLOOR_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <math.h>
 
 namespace stan {
 
@@ -12,7 +13,7 @@ namespace stan {
     inline
     fvar<T>
     floor(const fvar<T>& x) {
-      using std::floor;
+      using ::floor;
         return fvar<T>(floor(x.val_), 0);
     }
   }

@@ -1,7 +1,7 @@
-#ifndef __STAN__MATH__MATRIX__SOFTMAX_HPP__
-#define __STAN__MATH__MATRIX__SOFTMAX_HPP__
+#ifndef STAN__MATH__MATRIX__SOFTMAX_HPP
+#define STAN__MATH__MATRIX__SOFTMAX_HPP
 
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
+#include <stan/error_handling/matrix/check_nonzero_size.hpp>
 #include <cmath>
 #include <stan/math/matrix/Eigen.hpp>
 
@@ -11,6 +11,32 @@ namespace stan {
    /**
      * Return the softmax of the specified vector.
      *
+     * <p>
+     * \f$
+     * \mbox{softmax}(y)
+     * = \frac{\exp(y)}
+     * {\sum_{k=1}^K \exp(y_k)},
+     * \f$
+     *
+     * <p>The entries in the Jacobian of the softmax function are given by
+     * \f$
+     * \begin{array}{l}
+     * \displaystyle
+     * \frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
+     * \\[8pt]
+     * \displaystyle
+     * \mbox{ } \ \ \ = \left\{ 
+     * \begin{array}{ll}
+     * \mbox{softmax}(y)[k] - \mbox{softmax}(y)[k] \times \mbox{softmax}(y)[m]
+     * & \mbox{ if } m = k, \mbox{ and}
+     * \\[6pt]
+     * \mbox{softmax}(y)[k] * \mbox{softmax}(y)[m]
+     * & \mbox{ if } m \neq k.
+     * \end{array}
+     * \right.
+     * \end{array}
+     * \f$
+     *
      * @tparam T Scalar type of values in vector.
      * @param[in] v Vector to transform.
      * @return Unit simplex result of the softmax transform of the vector.
@@ -19,7 +45,7 @@ namespace stan {
     inline Eigen::Matrix<T,Eigen::Dynamic,1>
     softmax(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
       using std::exp;
-      stan::math::check_nonzero_size("softmax(%1%)",v,"v",(double*)0);
+      stan::error_handling::check_nonzero_size("softmax", "v", v);
       Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
       T sum(0.0);
       T max_v = v.maxCoeff();

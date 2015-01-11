@@ -1,9 +1,10 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__ATAN_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__ATAN_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__ATAN_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__ATAN_HPP
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <math.h>
 
 namespace stan {
   namespace agrad {
@@ -12,7 +13,7 @@ namespace stan {
       class atan_vari : public op_v_vari {
       public:
         atan_vari(vari* avi) :
-          op_v_vari(std::atan(avi->val_),avi) {
+          op_v_vari(::atan(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (1.0 + (avi_->val_ * avi_->val_));
@@ -27,6 +28,27 @@ namespace stan {
      * The derivative is defined by
      *
      * \f$\frac{d}{dx} \arctan x = \frac{1}{1 + x^2}\f$.
+     *
+     *
+       \f[
+       \mbox{atan}(x) = 
+       \begin{cases}
+         \arctan(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{atan}(x)}{\partial x} = 
+       \begin{cases}
+         \frac{\partial\, \arctan(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial \, \arctan(x)}{\partial x} = \frac{1}{x^2+1}
+       \f]
      *
      * @param a Variable in range [-1,1].
      * @return Arc tangent of variable, in radians. 

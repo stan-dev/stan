@@ -1,7 +1,8 @@
-#ifndef __STAN__MATH__MATRIX__TRACE_HPP__
-#define __STAN__MATH__MATRIX__TRACE_HPP__
+#ifndef STAN__MATH__MATRIX__TRACE_HPP
+#define STAN__MATH__MATRIX__TRACE_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace math {
@@ -20,6 +21,11 @@ namespace stan {
       return m.trace();
     }
     
+    template <typename T>
+    inline T
+      trace(const T& m) {
+      return m;
+    }
   }
 }
 #endif

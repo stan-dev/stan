@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__UTIL_HPP__
-#define __STAN__IO__UTIL_HPP__
+#ifndef STAN__IO__UTIL_HPP
+#define STAN__IO__UTIL_HPP
 
 #include <string>
 #include <ctime>

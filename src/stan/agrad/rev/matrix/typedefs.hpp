@@ -1,12 +1,16 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__TYPEDEFS_HPP__
-#define __STAN__AGRAD__REV__MATRIX__TYPEDEFS_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__TYPEDEFS_HPP
+#define STAN__AGRAD__REV__MATRIX__TYPEDEFS_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>
 
 namespace stan {
+
   namespace agrad {
-    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+
+    typedef 
+    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Index 
+    size_type;
 
     /**
      * The type of a matrix holding <code>stan::agrad::var</code>

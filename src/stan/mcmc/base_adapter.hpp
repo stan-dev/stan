@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__BASE__ADAPTER__BETA__
-#define __STAN__MCMC__BASE__ADAPTER__BETA__
+#ifndef STAN__MCMC__BASE__ADAPTER__BETA
+#define STAN__MCMC__BASE__ADAPTER__BETA
 
 namespace stan {
   
@@ -9,16 +9,16 @@ namespace stan {
       
     public:
       
-      base_adapter(): _adapt_flag(false) {};
+      base_adapter(): adapt_flag_(false) {};
       
-      virtual void engage_adaptation()    { _adapt_flag = true; }
-      virtual void disengage_adaptation() { _adapt_flag = false; }
+      virtual void engage_adaptation()    { adapt_flag_ = true; }
+      virtual void disengage_adaptation() { adapt_flag_ = false; }
       
-      bool adapting() { return _adapt_flag; }
+      bool adapting() { return adapt_flag_; }
       
     protected:
       
-      bool _adapt_flag;
+      bool adapt_flag_;
       
     };
     

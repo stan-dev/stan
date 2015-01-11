@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON_HPP___
-#define __STAN__COMMON_HPP___
+#ifndef STAN__COMMON_HPP_
+#define STAN__COMMON_HPP_
 
 #include <stan/common/command.hpp>
 #include <stan/common/do_print.hpp>

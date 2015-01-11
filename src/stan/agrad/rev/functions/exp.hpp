@@ -1,7 +1,7 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__EXP_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__EXP_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__EXP_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__EXP_HPP
 
-#include <cmath>
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 
@@ -12,7 +12,7 @@ namespace stan {
       class exp_vari : public op_v_vari {
       public:
         exp_vari(vari* avi) :
-          op_v_vari(std::exp(avi->val_),avi) {
+          op_v_vari(::exp(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * val_;
@@ -22,6 +22,22 @@ namespace stan {
 
     /**
      * Return the exponentiation of the specified variable (cmath).
+     *
+       \f[
+       \mbox{exp}(x) = 
+       \begin{cases}
+         e^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{exp}(x)}{\partial x} = 
+       \begin{cases}
+         e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param a Variable to exponentiate.
      * @return Exponentiated variable.

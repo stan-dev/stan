@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_LDLT_HPP__
-#define __STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_LDLT_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_LDLT_HPP
+#define STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_LDLT_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>

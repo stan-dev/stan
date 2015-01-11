@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__ERF_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__ERF_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__ERF_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__ERF_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
-#include <boost/math/special_functions/erf.hpp>
-#include <stan/math/constants.hpp>
+#include <math.h>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/square.hpp>
 
 namespace stan {
@@ -15,9 +15,9 @@ namespace stan {
     inline
     fvar<T>
     erf(const fvar<T>& x) {
-      using boost::math::erf;
-      using std::sqrt;
-      using std::exp;
+      using ::sqrt;
+      using ::exp;
+      using ::erf;
       using stan::math::square;
       return fvar<T>(erf(x.val_), x.d_ * exp(-square(x.val_)) 
                                   * stan::math::TWO_OVER_SQRT_PI);

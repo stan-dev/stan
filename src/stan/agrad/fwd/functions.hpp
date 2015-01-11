@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS_HPP
 
 #include <stan/agrad/fwd/functions/Phi.hpp>
 #include <stan/agrad/fwd/functions/abs.hpp>
@@ -40,6 +40,8 @@
 #include <stan/agrad/fwd/functions/inv_logit.hpp>
 #include <stan/agrad/fwd/functions/inv_sqrt.hpp>
 #include <stan/agrad/fwd/functions/inv_square.hpp>
+#include <stan/agrad/fwd/functions/is_inf.hpp>
+#include <stan/agrad/fwd/functions/is_nan.hpp>
 #include <stan/agrad/fwd/functions/lbeta.hpp>
 #include <stan/agrad/fwd/functions/lgamma.hpp>
 #include <stan/agrad/fwd/functions/lmgamma.hpp>
@@ -54,6 +56,7 @@
 #include <stan/agrad/fwd/functions/log_diff_exp.hpp>
 #include <stan/agrad/fwd/functions/log_falling_factorial.hpp>
 #include <stan/agrad/fwd/functions/log_inv_logit.hpp>
+#include <stan/agrad/fwd/functions/log_mix.hpp>
 #include <stan/agrad/fwd/functions/log_rising_factorial.hpp>
 #include <stan/agrad/fwd/functions/log_sum_exp.hpp>
 #include <stan/agrad/fwd/functions/logit.hpp>
@@ -62,6 +65,7 @@
 #include <stan/agrad/fwd/functions/multiply_log.hpp>
 #include <stan/agrad/fwd/functions/owens_t.hpp>
 #include <stan/agrad/fwd/functions/pow.hpp>
+#include <stan/agrad/fwd/functions/primitive_value.hpp>
 #include <stan/agrad/fwd/functions/rising_factorial.hpp>
 #include <stan/agrad/fwd/functions/round.hpp>
 #include <stan/agrad/fwd/functions/sin.hpp>
@@ -72,5 +76,6 @@
 #include <stan/agrad/fwd/functions/tanh.hpp>
 #include <stan/agrad/fwd/functions/tgamma.hpp>
 #include <stan/agrad/fwd/functions/trunc.hpp>
+#include <stan/agrad/fwd/functions/value_of.hpp>
 
 #endif

@@ -1,8 +1,9 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__COS_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__COS_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__COS_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__COS_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <math.h>
 
 namespace stan {
 
@@ -12,8 +13,8 @@ namespace stan {
     inline
     fvar<T>
     cos(const fvar<T>& x) {
-      using std::sin;
-      using std::cos;
+      using ::sin;
+      using ::cos;
       return fvar<T>(cos(x.val_), x.d_ * -sin(x.val_));
     }
   }

@@ -1,9 +1,9 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__ACOSH_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__ACOSH_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__ACOSH_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__ACOSH_HPP
 
+#include <math.h>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
-#include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/operators/operator_greater_than.hpp>
@@ -34,13 +34,40 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \mbox{acosh}(x) = \frac{x}{x^2 - 1}\f$.
      *
+     *
+       \f[
+       \mbox{acosh}(x) = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 1 \\
+         \cosh^{-1}(x) & \mbox{if } x \geq 1 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{acosh}(x)}{\partial x} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 1 \\
+         \frac{\partial\, \cosh^{-1}(x)}{\partial x} & \mbox{if } x \geq 1 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \cosh^{-1}(x)=\ln\left(x+\sqrt{x^2-1}\right)
+       \f]
+   
+       \f[
+       \frac{\partial \, \cosh^{-1}(x)}{\partial x} = \frac{1}{\sqrt{x^2-1}}
+       \f]
+     *
      * @param a The variable.
      * @return Inverse hyperbolic cosine of the variable.
      */
     inline var acosh(const stan::agrad::var& a) {
-      if (boost::math::isinf(a) && a > 0.0)
+      if (boost::math::isinf(a.val()) && a > 0.0)
         return var(new acosh_vari(a.val(),a.vi_));
-      return var(new acosh_vari(boost::math::acosh(a.val()),a.vi_));
+      return var(new acosh_vari(::acosh(a.val()),a.vi_));
     }
 
   }

@@ -1,11 +1,12 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__FMOD_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__FMOD_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__FMOD_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__FMOD_HPP
 
 #include <cmath>
 #include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/internal/v_vari.hpp>
+#include <stan/agrad/rev/internal/vd_vari.hpp>
 #include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/internal/dv_vari.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
   namespace agrad {
@@ -17,18 +18,28 @@ namespace stan {
           op_vv_vari(std::fmod(avi->val_,bvi->val_),avi,bvi) {
         }
         void chain() {
-          avi_->adj_ += adj_;
-          bvi_->adj_ -= adj_ * static_cast<int>(avi_->val_ / bvi_->val_);
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bvi_->val_))) {
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+            bvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          } else {
+            avi_->adj_ += adj_;
+            bvi_->adj_ -= adj_ * static_cast<int>(avi_->val_ / bvi_->val_);
+          }
         }
       };
 
-      class fmod_vd_vari : public op_v_vari {
+      class fmod_vd_vari : public op_vd_vari {
       public:
         fmod_vd_vari(vari* avi, double b) :
-          op_v_vari(std::fmod(avi->val_,b),avi) {
+          op_vd_vari(std::fmod(avi->val_,b),avi,b) {
         }
         void chain() {
-          avi_->adj_ += adj_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bd_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else
+            avi_->adj_ += adj_;
         }
       };
       
@@ -38,8 +49,13 @@ namespace stan {
           op_dv_vari(std::fmod(a,bvi->val_),a,bvi) {
         }
         void chain() {
-          int d = static_cast<int>(ad_ / bvi_->val_);
-          bvi_->adj_ -= adj_ * d;
+          if (unlikely(boost::math::isnan(bvi_->val_)
+                       || boost::math::isnan(ad_)))
+            bvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else {
+            int d = static_cast<int>(ad_ / bvi_->val_);
+            bvi_->adj_ -= adj_ * d;
+          }
         }
       };
     }
@@ -55,6 +71,31 @@ namespace stan {
      * \f$\frac{\partial}{\partial x} \mbox{fmod}(x,y) = 1\f$, and
      *
      * \f$\frac{\partial}{\partial y} \mbox{fmod}(x,y) = -\lfloor \frac{x}{y} \rfloor\f$.
+     *
+     *
+       \f[
+       \mbox{fmod}(x,y) = 
+       \begin{cases}
+         x - \lfloor \frac{x}{y}\rfloor y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \frac{\partial\,\mbox{fmod}(x,y)}{\partial x} = 
+       \begin{cases}
+         1 & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \frac{\partial\,\mbox{fmod}(x,y)}{\partial y} = 
+       \begin{cases}
+         -\lfloor \frac{x}{y}\rfloor & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param a First variable.
      * @param b Second variable.

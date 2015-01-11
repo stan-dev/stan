@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMAND__PRINT_HPP__
-#define __STAN__COMMAND__PRINT_HPP__
+#ifndef STAN__COMMAND__PRINT_HPP
+#define STAN__COMMAND__PRINT_HPP
 
 #include <algorithm>
 #include <iostream>

@@ -1,4 +1,5 @@
-#include "stan/math/functions/log_sum_exp.hpp"
+#include <stan/math/functions/log_sum_exp.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 void test_log_sum_exp(double a, double b) {
@@ -48,4 +49,17 @@ TEST(MathFunctions, log_sum_exp_2) {
   // exp(10000.0) overflows
   EXPECT_FLOAT_EQ(10000.0,log_sum_exp(10000.0,0.0));
   EXPECT_FLOAT_EQ(0.0,log_sum_exp(-10000.0,0.0));
+}
+
+TEST(MathFunctions, log_sum_exp_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::math::log_sum_exp(1.0, nan));
+
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::math::log_sum_exp(nan, 1.0));
+
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::math::log_sum_exp(nan, nan));
 }

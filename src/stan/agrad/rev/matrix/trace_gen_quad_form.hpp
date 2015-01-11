@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__TRACE_GEN_QUAD_FORM_HPP__
-#define __STAN__AGRAD__REV__MATRIX__TRACE_GEN_QUAD_FORM_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__TRACE_GEN_QUAD_FORM_HPP
+#define STAN__AGRAD__REV__MATRIX__TRACE_GEN_QUAD_FORM_HPP
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
@@ -10,8 +10,8 @@
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/math/matrix/trace_gen_quad_form.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace agrad {
@@ -112,12 +112,14 @@ namespace stan {
                         const Eigen::Matrix<TA,RA,CA> &A,
                         const Eigen::Matrix<TB,RB,CB> &B)
     {
-      stan::math::check_square("trace_gen_quad_form(%1%)",A,"A",(double*)0);
-      stan::math::check_square("trace_gen_quad_form(%1%)",D,"D",(double*)0);
-      stan::math::check_multiplicable("trace_gen_quad_form(%1%)",A,"A",
-                                         B,"B",(double*)0);
-      stan::math::check_multiplicable("trace_gen_quad_form(%1%)",B,"B",
-                                      D,"D",(double*)0);
+      stan::error_handling::check_square("trace_gen_quad_form", "A", A);
+      stan::error_handling::check_square("trace_gen_quad_form", "D", D);
+      stan::error_handling::check_multiplicable("trace_gen_quad_form", 
+                                                "A", A, 
+                                                "B", B);
+      stan::error_handling::check_multiplicable("trace_gen_quad_form",
+                                                "B", B,
+                                                "D", D);
       
       trace_gen_quad_form_vari_alloc<TD,RD,CD,TA,RA,CA,TB,RB,CB> *baseVari = new trace_gen_quad_form_vari_alloc<TD,RD,CD,TA,RA,CA,TB,RB,CB>(D,A,B);
       

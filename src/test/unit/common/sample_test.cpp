@@ -1,6 +1,6 @@
 #include <stan/common/sample.hpp>
 #include <gtest/gtest.h>
-#include <test/test-models/no-main/common/test_lp.cpp>
+#include <test/test-models/good/common/test_lp.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;
@@ -87,6 +87,9 @@ public:
     sample_output, diagnostic_output, message_output,
     writer_output;
 };
+
+
+
 
 
 TEST_F(StanCommon, sample) {

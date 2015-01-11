@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__MULTIPLY_LOWER_TRI_SELF_HPP__
-#define __STAN__MATH__MATRIX__MULTIPLY_LOWER_TRI_SELF_HPP__
+#ifndef STAN__MATH__MATRIX__MULTIPLY_LOWER_TRI_SELF_HPP
+#define STAN__MATH__MATRIX__MULTIPLY_LOWER_TRI_SELF_HPP
 
 #include <stan/math/matrix/typedefs.hpp>
 
@@ -16,17 +16,28 @@ namespace stan {
      */
     inline matrix_d
     multiply_lower_tri_self_transpose(const matrix_d& L) {
-      if (L.rows() == 0)
+      int K = L.rows();
+      int J = L.cols();
+      int k;
+      matrix_d LLt(K,K);
+      matrix_d Lt = L.transpose();
+
+      if (K == 0)
         return matrix_d(0,0);
-      if (L.rows() == 1) {
+      if (K == 1) {
         matrix_d result(1,1);
         result(0,0) = L(0,0) * L(0,0);
         return result;
       }
-      // FIXME:  write custom following agrad/matrix because can't get L_tri into
-      // multiplication as no template support for tri * tri
-      matrix_d L_tri = L.transpose().triangularView<Eigen::Upper>();
-      return L.triangularView<Eigen::Lower>() * L_tri;
+
+      for (int m = 0; m < K; ++m) {
+        k = (J < m + 1) ? J : m + 1;
+        LLt(m,m) = Lt.col(m).head(k).squaredNorm();
+        for (int n = (m + 1); n < K; ++n) {
+          LLt(n,m) = LLt(m,n) = Lt.col(m).head(k).dot(Lt.col(n).head(k));
+        }
+      }
+      return LLt;
     }
 
   }

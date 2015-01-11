@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LOGICAL_GT_HPP__
-#define __STAN__MATH__FUNCTIONS__LOGICAL_GT_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LOGICAL_GT_HPP
+#define STAN__MATH__FUNCTIONS__LOGICAL_GT_HPP
 
 namespace stan {
   namespace math {

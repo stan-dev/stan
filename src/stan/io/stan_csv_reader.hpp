@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__STAN_CSV_READER_HPP__
-#define __STAN__IO__STAN_CSV_READER_HPP__
+#ifndef STAN__IO__STAN_CSV_READER_HPP
+#define STAN__IO__STAN_CSV_READER_HPP
 
 #include <istream>
 #include <iostream>

@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__SINGULAR_VALUES_HPP__
-#define __STAN__MATH__MATRIX__SINGULAR_VALUES_HPP__
+#ifndef STAN__MATH__MATRIX__SINGULAR_VALUES_HPP
+#define STAN__MATH__MATRIX__SINGULAR_VALUES_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 

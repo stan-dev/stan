@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__OPERATORS_HPP__
-#define __STAN__AGRAD__FWD__OPERATORS_HPP__
+#ifndef STAN__AGRAD__FWD__OPERATORS_HPP
+#define STAN__AGRAD__FWD__OPERATORS_HPP
 
 #include <stan/agrad/fwd/operators/operator_addition.hpp>
 #include <stan/agrad/fwd/operators/operator_division.hpp>

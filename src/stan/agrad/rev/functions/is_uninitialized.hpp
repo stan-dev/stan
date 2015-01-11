@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__IS_UNINITIALIZED_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__IS_UNINITIALIZED_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__IS_UNINITIALIZED_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__IS_UNINITIALIZED_HPP
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>

@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__SUM_HPP__
-#define __STAN__AGRAD__REV__MATRIX__SUM_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__SUM_HPP
+#define STAN__AGRAD__REV__MATRIX__SUM_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
@@ -33,20 +33,20 @@ namespace stan {
         template<typename Derived>
         sum_v_vari(const Eigen::DenseBase<Derived> &v) :
           vari(var_sum(v)), length_(v.size()) {
-          v_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+          v_ = (vari**)ChainableStack::memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
             v_[i] = v(i).vi_;
         }
         template<int R1,int C1>
         sum_v_vari(const Eigen::Matrix<var,R1,C1> &v1) :
           vari(var_sum(v1)), length_(v1.size()) {
-          v_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+          v_ = (vari**)ChainableStack::memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
             v_[i] = v1(i).vi_;
         }
         sum_v_vari(const var *v, size_t len) :
           vari(var_sum(v,len)), length_(len) {
-          v_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
+          v_ = (vari**)ChainableStack::memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
             v_[i] = v[i].vi_;
         }

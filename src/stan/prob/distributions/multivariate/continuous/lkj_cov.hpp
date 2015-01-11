@@ -1,15 +1,15 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_COV_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_COV_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_COV_HPP
+#define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_COV_HPP
 
-#include <stan/prob/constants.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/math/matrix.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/prob/traits.hpp>
-
+#include <stan/prob/constants.hpp>
 #include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
 #include <stan/prob/distributions/multivariate/continuous/lkj_corr.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 
@@ -24,33 +24,30 @@ namespace stan {
                 const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,1>& sigma,
                 const T_shape& eta) {
-      static const char* function = "stan::prob::lkj_cov_log(%1%)";
+      static const std::string function("stan::prob::lkj_cov_log");
       
-      using stan::math::check_size_match;
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::error_handling::check_size_match;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
       check_size_match(function, 
-                       mu.rows(), "Rows of location parameter",
-                       sigma.rows(), "columns of scale parameter",
-                       &lp);
+                       "Rows of location parameter", mu.rows(),
+                       "columns of scale parameter", sigma.rows());
       check_size_match(function, 
-                       y.rows(), "Rows of random variable",
-                       y.cols(), "columns of random variable",
-                       &lp);
+                       "Rows of random variable", y.rows(),
+                       "columns of random variable", y.cols());
       check_size_match(function, 
-                       y.rows(), "Rows of random variable",
-                       mu.rows(), "rows of location parameter",
-                       &lp);
-      check_positive(function, eta, "Shape parameter", &lp);
-      check_finite(function, mu, "Location parameter", &lp);
-      check_finite(function, sigma, "Scale parameter", &lp);
+                       "Rows of random variable", y.rows(), 
+                       "rows of location parameter", mu.rows());
+      check_positive(function, "Shape parameter", eta);
+      check_finite(function, "Location parameter", mu);
+      check_finite(function, "Scale parameter", sigma);
       // FIXME: build vectorized versions
       for (int m = 0; m < y.rows(); ++m)
         for (int n = 0; n < y.cols(); ++n)
-          check_finite(function, y(m,n), "Covariance matrix", &lp);
+          check_finite(function, "Covariance matrix", y(m,n));
       
       const unsigned int K = y.rows();
       const Eigen::Array<T_y,Eigen::Dynamic,1> sds
@@ -89,16 +86,16 @@ namespace stan {
                 const T_loc& mu, 
                 const T_scale& sigma, 
                 const T_shape& eta) {
-      static const char* function = "stan::prob::lkj_cov_log(%1%)";
+      static const std::string function("stan::prob::lkj_cov_log");
 
-      using stan::math::check_finite;
-      using stan::math::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
-      check_positive(function, eta, "Shape parameter", &lp);
-      check_finite(function, mu, "Location parameter", &lp);
-      check_finite(function, sigma, "Scale parameter", &lp);
+      check_positive(function, "Shape parameter", eta);
+      check_finite(function, "Location parameter", mu);
+      check_finite(function, "Scale parameter", sigma);
       
       const unsigned int K = y.rows();
       const Eigen::Array<T_y,Eigen::Dynamic,1> sds

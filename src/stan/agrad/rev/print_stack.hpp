@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__PRINT_STACK_HPP__
-#define __STAN__AGRAD__PRINT_STACK_HPP__
+#ifndef STAN__AGRAD__PRINT_STACK_HPP
+#define STAN__AGRAD__PRINT_STACK_HPP
 
 #include <ostream>
 #include <stan/agrad/rev/var_stack.hpp>
@@ -18,12 +18,12 @@ namespace stan {
      * @param o ostream to modify
      */
     inline void print_stack(std::ostream& o) {
-      o << "STACK, size=" << var_stack_.size() << std::endl;
-      for (size_t i = 0; i < var_stack_.size(); ++i)
+      o << "STACK, size=" << ChainableStack::var_stack_.size() << std::endl;
+      for (size_t i = 0; i < ChainableStack::var_stack_.size(); ++i)
         o << i 
-          << "  " << var_stack_[i]
-          << "  " << (static_cast<vari*>(var_stack_[i]))->val_
-          << " : " << (static_cast<vari*>(var_stack_[i]))->adj_
+          << "  " << ChainableStack::var_stack_[i]
+          << "  " << (static_cast<vari*>(ChainableStack::var_stack_[i]))->val_
+          << " : " << (static_cast<vari*>(ChainableStack::var_stack_[i]))->adj_
           << std::endl;
     }
 

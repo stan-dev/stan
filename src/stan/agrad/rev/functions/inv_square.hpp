@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__INV_SQUARE_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__INV_SQUARE_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__INV_SQUARE_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__INV_SQUARE_HPP
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
@@ -21,6 +21,25 @@ namespace stan {
       };
     }
     
+    /**
+     *
+       \f[
+       \mbox{inv\_square}(x) = 
+       \begin{cases}
+         \frac{1}{x^2} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{inv\_square}(x)}{\partial x} = 
+       \begin{cases}
+         -\frac{2}{x^3} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
+     */
     inline var inv_square(const var& a) {
       return var(new inv_square_vari(a.vi_));
     }

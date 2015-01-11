@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__VAR__ADAPTATION__BETA__
-#define __STAN__MCMC__VAR__ADAPTATION__BETA__
+#ifndef STAN__MCMC__VAR__ADAPTATION__BETA
+#define STAN__MCMC__VAR__ADAPTATION__BETA
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
@@ -15,37 +15,38 @@ namespace stan {
       
     public:
       
-      var_adaptation(int n): windowed_adaptation("variance"), _estimator(n) {}
+      var_adaptation(int n): windowed_adaptation("variance"), estimator_(n) {}
 
       bool learn_variance(Eigen::VectorXd& var, const Eigen::VectorXd& q) {
 
-        if (adaptation_window()) _estimator.add_sample(q);
+        if (adaptation_window()) estimator_.add_sample(q);
 
         if (end_adaptation_window()) {
           
           compute_next_window();
           
-          _estimator.sample_variance(var);
+          estimator_.sample_variance(var);
           
-          double n = static_cast<double>(_estimator.num_samples());
+          double n = static_cast<double>(estimator_.num_samples());
           var = (n / (n + 5.0)) * var
                 + 1e-3 * (5.0 / (n + 5.0)) * Eigen::VectorXd::Ones(var.size());
           
-          _estimator.restart();
+          estimator_.restart();
           
-          ++_adapt_window_counter;
+          ++adapt_window_counter_;
           return true;
           
         }
         
-        ++_adapt_window_counter;
+        ++adapt_window_counter_;
         return false;
         
       }
       
     protected:
-
-      prob::welford_var_estimator _estimator;
+      
+      prob::welford_var_estimator estimator_;
+      
       
     };
     

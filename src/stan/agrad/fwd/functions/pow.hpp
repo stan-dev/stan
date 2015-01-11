@@ -1,8 +1,9 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__POW_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__POW_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__POW_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__POW_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/agrad/fwd/functions/sqrt.hpp>
 #include <stan/agrad/fwd/functions/inv.hpp>
 #include <stan/agrad/fwd/functions/inv_sqrt.hpp>
 #include <stan/agrad/fwd/functions/inv_square.hpp>
@@ -38,6 +39,7 @@ namespace stan {
     fvar<T>
     pow(const fvar<T>& x1, const double x2) {
       using std::pow;
+      using stan::agrad::sqrt;
       using stan::agrad::inv;
       using stan::agrad::inv_sqrt;
       using stan::agrad::inv_square;

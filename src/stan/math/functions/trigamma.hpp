@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__TRIGAMMA_HPP__
-#define __STAN__MATH__FUNCTIONS__TRIGAMMA_HPP__
+#ifndef STAN__MATH__FUNCTIONS__TRIGAMMA_HPP
+#define STAN__MATH__FUNCTIONS__TRIGAMMA_HPP
 
   // Reference:
   //   BE Schneider,
@@ -8,12 +8,41 @@
   //   Applied Statistics, 
   //   Volume 27, Number 1, pages 97-99, 1978.
 
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
 
   namespace math {
 
+    /**
+     *
+     *
+       \f[
+       \mbox{trigamma}(x) = 
+       \begin{cases}
+         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+         \Psi_1(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{trigamma}(x)}{\partial x} = 
+       \begin{cases}
+         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
+         \frac{\partial\, \Psi_1(x)}{\partial x} & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \Psi_1(x)=\sum_{n=0}^\infty \frac{1}{(x+n)^2}
+       \f]
+       
+       \f[
+       \frac{\partial \, \Psi_1(x)}{\partial x} = -2\sum_{n=0}^\infty \frac{1}{(x+n)^3}
+       \f]
+     */
     template <typename T>
     inline
     T

@@ -1,8 +1,10 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__FMOD_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__FMOD_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__FMOD_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__FMOD_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
 
@@ -23,7 +25,12 @@ namespace stan {
     fvar<T>
     fmod(const fvar<T>& x1, const double x2) {
       using std::fmod;
-      return fvar<T>(fmod(x1.val_, x2), x1.d_ / x2);
+      using stan::math::value_of;
+      if (unlikely(boost::math::isnan(value_of(x1.val_))
+                   || boost::math::isnan(x2)))
+        return fvar<T>(fmod(x1.val_,x2),stan::math::NOT_A_NUMBER);
+      else
+        return fvar<T>(fmod(x1.val_, x2), x1.d_ / x2);
     }
 
     template <typename T>

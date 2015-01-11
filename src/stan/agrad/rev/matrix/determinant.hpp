@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__DETERMINANT_HPP__
-#define __STAN__AGRAD__REV__MATRIX__DETERMINANT_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__DETERMINANT_HPP
+#define STAN__AGRAD__REV__MATRIX__DETERMINANT_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 // FIXME: use explicit files
 #include <stan/agrad/rev.hpp> 
@@ -26,9 +26,9 @@ namespace stan {
           : vari(determinant_vari_calc(A)), 
             _rows(A.rows()),
             _cols(A.cols()),
-            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            A_((double*)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
-            _adjARef((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _adjARef((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                           * A.rows() * A.cols()))
         {
           size_t pos = 0;
@@ -65,7 +65,7 @@ namespace stan {
 
     template <int R, int C>
     inline var determinant(const Eigen::Matrix<var,R,C>& m) {
-      stan::math::check_square("determinant(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("determinant", "m", m);
       return var(new determinant_vari<R,C>(m));
     }
     

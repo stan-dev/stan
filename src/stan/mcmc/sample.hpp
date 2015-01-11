@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__SAMPLE__HPP__
-#define __STAN__MCMC__SAMPLE__HPP__
+#ifndef STAN__MCMC__SAMPLE__HPP
+#define STAN__MCMC__SAMPLE__HPP
 
 #include <vector>
 #include <string>
@@ -12,45 +12,39 @@ namespace stan {
     
     class sample {
       
-    private:
-      
-      Eigen::VectorXd _cont_params; // Continuous coordinates of sample
-      double _log_prob;             // Log probability of sample
-      double _accept_stat;          // Acceptance statistic of transition
-      
     public:
       
       sample(const Eigen::VectorXd& q,
              double log_prob,
              double stat) :
-      _cont_params(q),
-      _log_prob(log_prob),
-      _accept_stat(stat) {};
+      cont_params_(q),
+      log_prob_(log_prob),
+      accept_stat_(stat) {};
       
       virtual ~sample() {}; // No-op
       
       int size_cont() const {
-        return _cont_params.size(); 
+        return cont_params_.size();
       }
       
       double cont_params(int k) const {
-        return _cont_params(k);
+        return cont_params_(k);
       }
       
       void cont_params(Eigen::VectorXd& x) const {
-        x = _cont_params;
+        x = cont_params_;
       }
       
       const Eigen::VectorXd& cont_params() const {
-        return _cont_params; 
+        return cont_params_;
       }
       
       inline double log_prob() const {
-        return _log_prob;
+        return log_prob_;
       }
       
       inline double accept_stat() const {
-        return _accept_stat;
+        return accept_stat_;
       }
       
       void get_sample_param_names(std::vector<std::string>& names) {
@@ -59,9 +53,15 @@ namespace stan {
       }
       
       void get_sample_params(std::vector<double>& values) {
-        values.push_back(_log_prob);
-        values.push_back(_accept_stat);
+        values.push_back(log_prob_);
+        values.push_back(accept_stat_);
       }
+      
+    private:
+      
+      Eigen::VectorXd cont_params_; // Continuous coordinates of sample
+      double log_prob_;             // Log probability of sample
+      double accept_stat_;          // Acceptance statistic of transition
       
     };
     

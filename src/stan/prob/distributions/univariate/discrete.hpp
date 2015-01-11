@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE_HPP__
+#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE_HPP
+#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE_HPP
 
 #include <stan/prob/distributions/univariate/discrete/bernoulli.hpp>
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>

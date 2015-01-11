@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__LOG10_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__LOG10_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__LOG10_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__LOG10_HPP
 
 #include <cmath>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
   namespace agrad {
@@ -30,6 +30,25 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \log_{10} x = \frac{1}{x \log 10}\f$.
      * 
+     *
+       \f[
+       \mbox{log10}(x) = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 0\\
+         \log_{10}(x) & \mbox{if } x \geq 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{log10}(x)}{\partial x} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 0\\
+         \frac{1}{x \ln10} & \mbox{if } x\geq 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Variable whose log is taken.
      * @return Base 10 log of variable.
      */

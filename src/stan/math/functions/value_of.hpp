@@ -1,14 +1,18 @@
-#ifndef __STAN__MATH__FUNCTIONS__VALUE_OF_HPP__
-#define __STAN__MATH__FUNCTIONS__VALUE_OF_HPP__
+#ifndef STAN__MATH__FUNCTIONS__VALUE_OF_HPP
+#define STAN__MATH__FUNCTIONS__VALUE_OF_HPP
 
 namespace stan {
+
   namespace math {
     
     /**
      * Return the value of the specified scalar argument
      * converted to a double value.
      *
-     * This function is meant to cover the primitive types. For
+     * <p>See the <code>stan::math::primitive_value</code> function to 
+     * extract values without casting to <code>double</code>.
+     *
+     * <p>This function is meant to cover the primitive types. For
      * types requiring pass-by-reference, this template function
      * should be specialized.
      *

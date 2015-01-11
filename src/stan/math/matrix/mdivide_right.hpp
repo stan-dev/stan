@@ -1,12 +1,12 @@
-#ifndef __STAN__MATH__MATRIX__MDIVIDE_RIGHT_HPP__
-#define __STAN__MATH__MATRIX__MDIVIDE_RIGHT_HPP__
+#ifndef STAN__MATH__MATRIX__MDIVIDE_RIGHT_HPP
+#define STAN__MATH__MATRIX__MDIVIDE_RIGHT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/mdivide_left.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace math {
@@ -24,9 +24,10 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_right(const Eigen::Matrix<T1,R1,C1> &b,
                   const Eigen::Matrix<T2,R2,C2> &A) {
-      stan::math::check_square("mdivide_right(%1%)",A,"A",(double*)0);
-      stan::math::check_multiplicable("mdivide_right(%1%)",b,"b",
-                                      A,"A",(double*)0);
+      stan::error_handling::check_square("mdivide_right", "A", A);
+      stan::error_handling::check_multiplicable("mdivide_right",
+                                                "b", b,
+                                                "A", A);
       // FIXME: This is nice and general but likely slow.
       return transpose(mdivide_left(transpose(A),transpose(b)));
 //      return promote_common<Eigen::Matrix<T1,R2,C2>,

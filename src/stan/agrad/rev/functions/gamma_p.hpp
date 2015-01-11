@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__GAMMA_P_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__GAMMA_P_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__GAMMA_P_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__GAMMA_P_HPP
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
@@ -22,8 +22,11 @@ namespace stan {
         }
         void chain() {
 
+          // return zero derivative as gamma_p is flat to machine precision for b / a > 10
+          if (std::fabs(bvi_->val_ / avi_->val_) > 10 ) return;
+          
           double u = stan::math::gamma_p(avi_->val_, bvi_->val_);
-      
+          
           double S = 0.0;
           double s = 1.0;
           double l = std::log(bvi_->val_);
@@ -54,6 +57,9 @@ namespace stan {
         }
         void chain() {
 
+          // return zero derivative as gamma_p is flat to machine precision for b / a > 10
+          if (std::fabs(bd_ / avi_->val_) > 10 ) return;
+          
           double u = stan::math::gamma_p(avi_->val_, bd_);
       
           double S = 0.0;
@@ -83,7 +89,9 @@ namespace stan {
                      a,bvi) {
         }
         void chain() {
-          bvi_->adj_ += adj_ * (std::exp(-bvi_->val_) * std::pow(bvi_->val_, ad_ - 1.0) / boost::math::tgamma(ad_));     
+          // return zero derivative as gamma_p is flat to machine precision for b / a > 10
+          if (std::fabs(bvi_->val_ / ad_) > 10 ) return;
+          bvi_->adj_ += adj_ * (std::exp(-bvi_->val_) * std::pow(bvi_->val_, ad_ - 1.0) / boost::math::tgamma(ad_));
         }
       };
     }

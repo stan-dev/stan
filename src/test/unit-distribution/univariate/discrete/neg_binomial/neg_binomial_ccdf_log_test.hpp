@@ -18,7 +18,14 @@ public:
     param[1] = 50;          // Successes/Shape
     param[2] = 3;           // logit(p)/Inverse Scale
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.4240861277)); // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.4240861277740262114122)); // expected ccdf_log
+    
+    param[0] = 0;          // Failures/Counts
+    param[1] = 15;          // Successes/Shape
+    param[2] = 3;           // logit(p)/Inverse Scale
+    parameters.push_back(param);
+    ccdf_log.push_back(std::log(1.0 - 0.013363461010158063716)); // expected ccdf_log
+
   }
   
   void invalid_values(vector<size_t>& index, 
@@ -43,25 +50,19 @@ public:
   }
 
   template <typename T_n, typename T_shape, typename T_inv_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_shape, T_inv_scale>::type
   ccdf_log(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
-          const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, 
-          const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::neg_binomial_ccdf_log(n, alpha, beta);
   }
 
 
   template <typename T_n, typename T_shape, typename T_inv_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_shape, T_inv_scale>::type
   ccdf_log_function(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
-                   const T3&, const T4&, const T5&, const T6&, const T7&, 
-                   const T8&, const T9&) {
+                    const T3&, const T4&, const T5&) {
 
     using std::log;
     using std::exp;

@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__BINARY_LOG_LOSS_HPP__
-#define __STAN__MATH__FUNCTIONS__BINARY_LOG_LOSS_HPP__
+#ifndef STAN__MATH__FUNCTIONS__BINARY_LOG_LOSS_HPP
+#define STAN__MATH__FUNCTIONS__BINARY_LOG_LOSS_HPP
 
 #include <boost/math/tools/promotion.hpp>
 

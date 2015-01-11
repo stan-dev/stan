@@ -1,11 +1,11 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP__
-#define __STAN__AGRAD__REV__MATRIX__MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP
+#define STAN__AGRAD__REV__MATRIX__MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
@@ -17,7 +17,7 @@ namespace stan {
     
     inline matrix_v 
     multiply_lower_tri_self_transpose(const matrix_v& L) {
-      //stan::math::check_square("multiply_lower_tri_self_transpose(%1%)",
+      //stan::error_handling::check_square("multiply_lower_tri_self_transpose",
       //L,"L",(double*)0);
       int K = L.rows();
       int J = L.cols();
@@ -32,7 +32,7 @@ namespace stan {
         Knz = (K-J)*J + (J * (J + 1)) / 2;
       else // if (K < J)
         Knz = (K * (K + 1)) / 2;
-      vari** vs = (vari**)memalloc_.alloc( Knz * sizeof(vari*) );
+      vari** vs = (vari**)ChainableStack::memalloc_.alloc( Knz * sizeof(vari*) );
       int pos = 0;
       for (int m = 0; m < K; ++m)
         for (int n = 0; n < ((J < (m+1))?J:(m+1)); ++n) {

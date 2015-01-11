@@ -1,7 +1,7 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__TRUNC_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__TRUNC_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__TRUNC_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__TRUNC_HPP
 
-#include <boost/math/special_functions/trunc.hpp>
+#include <math.h>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 
@@ -13,7 +13,7 @@ namespace stan {
     inline
     fvar<T>
     trunc(const fvar<T>& x) {
-      using boost::math::trunc;
+      using ::trunc;
       return fvar<T>(trunc(x.val_), 0);
     }
 

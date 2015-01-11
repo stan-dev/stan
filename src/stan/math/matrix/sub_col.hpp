@@ -1,9 +1,9 @@
-#ifndef __STAN__MATH__MATRIX__SUB_COL_HPP__
-#define __STAN__MATH__MATRIX__SUB_COL_HPP__
+#ifndef STAN__MATH__MATRIX__SUB_COL_HPP
+#define STAN__MATH__MATRIX__SUB_COL_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_row_index.hpp>
-#include <stan/math/error_handling/matrix/check_column_index.hpp>
+#include <stan/error_handling/matrix/check_row_index.hpp>
+#include <stan/error_handling/matrix/check_column_index.hpp>
 
 namespace stan {
   namespace math {
@@ -21,10 +21,10 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1>
     sub_col(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m,
           size_t i, size_t j, size_t nrows) {
-      stan::math::check_row_index("sub_col(%1%)",i,m,"i",(double*)0);
+      stan::error_handling::check_row_index("sub_col", "i", m, i);
       if (nrows > 0)
-        stan::math::check_row_index("sub_col(%1%)",i+nrows-1,m,"i+nrows-1",(double*)0);
-      stan::math::check_column_index("sub_col(%1%)",j,m,"j",(double*)0);
+        stan::error_handling::check_row_index("sub_col", "i+nrows-1", m, i+nrows-1);
+      stan::error_handling::check_column_index("sub_col", "j", m, j);
       return m.block(i - 1,j - 1,nrows,1);
     }
     

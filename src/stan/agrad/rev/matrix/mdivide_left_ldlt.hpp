@@ -1,11 +1,11 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_LDLT_HPP__
-#define __STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_LDLT_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_LDLT_HPP
+#define STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_LDLT_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/LDLT_alloc.hpp>
 #include <stan/agrad/rev/matrix/LDLT_factor.hpp>
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
 
 namespace stan {
   namespace agrad {
@@ -49,9 +49,9 @@ namespace stan {
           : vari(0.0),
             M_(A.rows()),
             N_(B.cols()),
-            _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefB((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
-            _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefC((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
           _alloc(new mdivide_left_ldlt_alloc<R1,C1,R2,C2>()),
           _alloc_ldlt(A._alloc)
@@ -124,9 +124,9 @@ namespace stan {
           : vari(0.0),
             M_(A.rows()),
             N_(B.cols()),
-            _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefB((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
-            _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefC((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
           _alloc(new mdivide_left_ldlt_alloc<R1,C1,R2,C2>())
         {
@@ -196,7 +196,7 @@ namespace stan {
           : vari(0.0),
             M_(A.rows()),
             N_(B.cols()),
-            _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefC((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
             _alloc(new mdivide_left_ldlt_alloc<R1,C1,R2,C2>()),
             _alloc_ldlt(A._alloc)
@@ -244,8 +244,9 @@ namespace stan {
                       const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
 
-      stan::math::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
-                                      b,"b",(double*)0);     
+      stan::error_handling::check_multiplicable("mdivide_left_ldlt",
+                                                "A", A,
+                                                "b", b);
      
       mdivide_left_ldlt_vv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vv_vari<R1,C1,R2,C2>(A,b);
       
@@ -270,8 +271,9 @@ namespace stan {
                       const Eigen::Matrix<double,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
-                                      b,"b",(double*)0);     
+      stan::error_handling::check_multiplicable("mdivide_left_ldlt",
+                                                "A", A,
+                                                "b", b);
 
       mdivide_left_ldlt_vd_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vd_vari<R1,C1,R2,C2>(A,b);
       
@@ -296,8 +298,9 @@ namespace stan {
                       const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
-                                      b,"b",(double*)0);     
+      stan::error_handling::check_multiplicable("mdivide_left_ldlt",
+                                                "A", A,
+                                                "b", b);
       
       mdivide_left_ldlt_dv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_dv_vari<R1,C1,R2,C2>(A,b);
       

@@ -1,11 +1,11 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__HYPOT_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__HYPOT_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__HYPOT_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__HYPOT_HPP
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
-#include <boost/math/special_functions/hypot.hpp>
+#include <math.h>
 
 namespace stan {
   namespace agrad {
@@ -14,7 +14,7 @@ namespace stan {
       class hypot_vv_vari : public op_vv_vari {
       public:
         hypot_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(boost::math::hypot(avi->val_,bvi->val_),
+          op_vv_vari(::hypot(avi->val_,bvi->val_),
                      avi,bvi) {
         }
         void chain() {
@@ -26,7 +26,7 @@ namespace stan {
       class hypot_vd_vari : public op_v_vari {
       public:
         hypot_vd_vari(vari* avi, double b) :
-          op_v_vari(boost::math::hypot(avi->val_,b),
+          op_v_vari(::hypot(avi->val_,b),
                     avi) {
         }
         void chain() {
@@ -84,6 +84,33 @@ namespace stan {
      * The derivative is
      *
      * \f$\frac{d}{d y} \sqrt{c^2 + y^2} = \frac{y}{\sqrt{c^2 + y^2}}\f$.
+     *
+       \f[
+       \mbox{hypot}(x,y) = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
+         \sqrt{x^2+y^2} & \mbox{if } x,y\geq 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{hypot}(x,y)}{\partial x} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
+         \frac{x}{\sqrt{x^2+y^2}} & \mbox{if } x,y\geq 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{hypot}(x,y)}{\partial y} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
+         \frac{y}{\sqrt{x^2+y^2}} & \mbox{if } x,y\geq 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param a Length of first side.
      * @param b Length of second side.

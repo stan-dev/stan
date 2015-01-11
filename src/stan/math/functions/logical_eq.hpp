@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LOGICAL_EQ_HPP__
-#define __STAN__MATH__FUNCTIONS__LOGICAL_EQ_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LOGICAL_EQ_HPP
+#define STAN__MATH__FUNCTIONS__LOGICAL_EQ_HPP
 
 namespace stan {
   namespace math {

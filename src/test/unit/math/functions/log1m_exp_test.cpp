@@ -1,7 +1,7 @@
-#include "stan/math/functions/log1m_exp.hpp"
+#include <stan/math/functions/log1m_exp.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathsSpecialFunctions, log1m_exp) {
+TEST(MathFunctions, log1m_exp) {
   using stan::math::log1m_exp;
 
   // exp(10000.0) overflows
@@ -17,4 +17,11 @@ TEST(MathsSpecialFunctions, log1m_exp) {
   EXPECT_FLOAT_EQ(-92.1034,log1m_exp(-1e-40));
   EXPECT_NO_THROW(log1m_exp(0));
   EXPECT_NO_THROW(log1m_exp(1));
+}
+
+TEST(MathFunctions, log1m_exp_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::math::log1m_exp(nan));
 }

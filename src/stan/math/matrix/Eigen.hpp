@@ -1,8 +1,8 @@
-#ifndef __STAN__MATH__MATRIX__EIGEN_HPP__
-#define __STAN__MATH__MATRIX__EIGEN_HPP__
+#ifndef STAN__MATH__MATRIX__EIGEN_HPP
+#define STAN__MATH__MATRIX__EIGEN_HPP
 
-#define EIGEN_DENSEBASE_PLUGIN "stan/math/matrix/EigenDenseBaseAddons.h"
 #include <Eigen/Dense>
 #include <Eigen/QR>
+#include <Eigen/src/Core/NumTraits.h>
 
 #endif

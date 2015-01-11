@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__MULTIPLY_LOG_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__MULTIPLY_LOG_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__MULTIPLY_LOG_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__MULTIPLY_LOG_HPP
 
 #include <limits>
 #include <stan/agrad/rev/var.hpp>
@@ -8,6 +8,7 @@
 #include <stan/agrad/rev/internal/dv_vari.hpp>
 #include <stan/agrad/rev/functions/log.hpp>
 #include <stan/math/functions/multiply_log.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
   namespace agrad {
@@ -20,11 +21,17 @@ namespace stan {
         }
         void chain() {
           using std::log;
-          avi_->adj_ += adj_ * log(bvi_->val_);
-          if (bvi_->val_ == 0.0 && avi_->val_ == 0)
-            bvi_->adj_ += adj_ * std::numeric_limits<double>::infinity();
-          else
-            bvi_->adj_ += adj_ * avi_->val_ / bvi_->val_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bvi_->val_))) {
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+            bvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          } else {
+            avi_->adj_ += adj_ * log(bvi_->val_);
+            if (bvi_->val_ == 0.0 && avi_->val_ == 0)
+              bvi_->adj_ += adj_ * std::numeric_limits<double>::infinity();
+            else
+              bvi_->adj_ += adj_ * avi_->val_ / bvi_->val_;
+          }
         }
       };
       class multiply_log_vd_vari : public op_vd_vari {
@@ -34,7 +41,11 @@ namespace stan {
         }
         void chain() {
           using std::log;
-          avi_->adj_ += adj_ * log(bd_);
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bd_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else
+            avi_->adj_ += adj_ * log(bd_);
         }
       };
       class multiply_log_dv_vari : public op_dv_vari {

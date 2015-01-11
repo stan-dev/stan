@@ -1,10 +1,11 @@
-#ifndef __STAN__AGRAD__REV__OPERATORS__OPERATOR_SUBTRACTION_HPP__
-#define __STAN__AGRAD__REV__OPERATORS__OPERATOR_SUBTRACTION_HPP__
+#ifndef STAN__AGRAD__REV__OPERATORS__OPERATOR_SUBTRACTION_HPP
+#define STAN__AGRAD__REV__OPERATORS__OPERATOR_SUBTRACTION_HPP
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/internal/vd_vari.hpp>
 #include <stan/agrad/rev/internal/dv_vari.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
   namespace agrad {
@@ -16,8 +17,14 @@ namespace stan {
           op_vv_vari(avi->val_ - bvi->val_, avi, bvi) {
         }
         void chain() {
-          avi_->adj_ += adj_;
-          bvi_->adj_ -= adj_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bvi_->val_))) {
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+            bvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          } else {
+            avi_->adj_ += adj_;
+            bvi_->adj_ -= adj_;
+          }
         }
       };
     
@@ -27,7 +34,11 @@ namespace stan {
           op_vd_vari(avi->val_ - b, avi, b) {
         }
         void chain() {
-          avi_->adj_ += adj_;
+          if (unlikely(boost::math::isnan(avi_->val_)
+                       || boost::math::isnan(bd_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else
+            avi_->adj_ += adj_;
         }
       };
 
@@ -37,7 +48,11 @@ namespace stan {
           op_dv_vari(a - bvi->val_, a, bvi) {
         }
         void chain() {
-          bvi_->adj_ -= adj_;
+          if (unlikely(boost::math::isnan(ad_)
+                       || boost::math::isnan(bvi_->val_)))
+            bvi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else
+            bvi_->adj_ -= adj_;
         }
       };
     }
@@ -51,6 +66,30 @@ namespace stan {
      *
      * \f$\frac{\partial}{\partial y} (x-y) = -1\f$.
      * 
+       \f[
+       \mbox{operator-}(x,y) = 
+       \begin{cases}
+         x-y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{operator-}(x,y)}{\partial x} = 
+       \begin{cases}
+         1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{operator-}(x,y)}{\partial y} = 
+       \begin{cases}
+         -1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a First variable operand.
      * @param b Second variable operand.
      * @return Variable result of subtracting the second variable from

@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__ABS_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__ABS_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__ABS_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__ABS_HPP
 
 #include <stan/agrad/rev/functions/fabs.hpp>
 
@@ -10,7 +10,25 @@ namespace stan {
      * Return the absolute value of the variable (std).  
      *
      * Delegates to <code>fabs()</code> (see for doc).
-     * 
+     *
+       \f[		
+       \mbox{abs}(x) = 
+       \begin{cases}
+         |x| & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{abs}(x)}{\partial x} = 
+       \begin{cases}
+         -1 & \mbox{if } x < 0 \\
+         0 & \mbox{if } x = 0 \\
+         1 & \mbox{if } x > 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
      * @param a Variable input.
      * @return Absolute value of variable.
      */

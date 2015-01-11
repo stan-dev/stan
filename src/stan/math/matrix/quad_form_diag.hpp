@@ -1,10 +1,11 @@
-#ifndef __STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP__
-#define __STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP__
+#ifndef STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP
+#define STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
-#include <stan/math/error_handling/check_equal.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_vector.hpp>
+#include <stan/error_handling/scalar/check_equal.hpp>
 
 namespace stan {
   namespace math {
@@ -17,13 +18,11 @@ namespace stan {
     inline Matrix
     <typename promote_args<T1,T2>::type, Dynamic, Dynamic>
     quad_form_diag(const Matrix<T1, Dynamic, Dynamic>& mat,
-          const Matrix<T2, R, C>& vec) {
-      if (vec.cols() != 1 && vec.rows() != 1)
-        throw std::domain_error("error in call to quad_form_diag: vec must be a vector");
-      stan::math::check_square("quad_form_diag(%1%)",mat,"mat",(double*)0);
+                   const Matrix<T2, R, C>& vec) {
+      stan::error_handling::check_vector("quad_form_diag", "vec", vec);
+      stan::error_handling::check_square("quad_form_diag", "mat", mat);
       int size = vec.size();
-      stan::math::check_equal("quad_form_diag(%1%)",mat.rows(), size, "matrix size",
-                              (double*)0);
+      stan::error_handling::check_equal("quad_form_diag", "matrix size", mat.rows(), size);
       Matrix<typename promote_args<T1,T2>::type, Dynamic, Dynamic>
         result(size, size);
       for (int i = 0; i < size; i++) {

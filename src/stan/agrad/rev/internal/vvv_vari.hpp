@@ -1,9 +1,10 @@
-#ifndef __STAN__AGRAD__REV__INTERNAL__VVV_VARI_HPP__
-#define __STAN__AGRAD__REV__INTERNAL__VVV_VARI_HPP__
+#ifndef STAN__AGRAD__REV__INTERNAL__VVV_VARI_HPP
+#define STAN__AGRAD__REV__INTERNAL__VVV_VARI_HPP
 
 #include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
+
   namespace agrad {
     
     class op_vvv_vari : public vari {

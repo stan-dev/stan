@@ -1,6 +1,6 @@
 #include <stan/common/command.hpp>
 #include <gtest/gtest.h>
-#include <test/test-models/no-main/common/test_lp.cpp>
+#include <test/test-models/good/common/test_lp.hpp>
 
 typedef test_lp_model_namespace::test_lp_model Model;
 typedef boost::ecuyer1988 rng_t;
@@ -13,7 +13,6 @@ public:
     stan::io::dump empty_data_context(empty_data_stream);
     empty_data_stream.close();
     
-
     model_output.str("");
     model = new Model(empty_data_context, &model_output);
     base_rng.seed(123456);

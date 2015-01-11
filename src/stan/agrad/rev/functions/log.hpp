@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__LOG_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__LOG_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__LOG_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__LOG_HPP
 
 #include <cmath>
 #include <stan/agrad/rev/var.hpp>
@@ -26,6 +26,24 @@ namespace stan {
      * The derivative is defined by
      *
      * \f$\frac{d}{dx} \log x = \frac{1}{x}\f$.
+     *
+       \f[
+       \mbox{log}(x) = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 0\\
+         \ln(x) & \mbox{if } x \geq 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{log}(x)}{\partial x} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 0\\
+         \frac{1}{x} & \mbox{if } x\geq 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param a Variable whose log is taken.
      * @return Natural log of variable.

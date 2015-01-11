@@ -2,6 +2,8 @@
 #include <stan/prob/distributions/multivariate/continuous/dirichlet.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
+#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/rev.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -173,4 +175,118 @@ TEST(ProbDistributionsDirichlet, marginalTwoChiSquareGoodnessFitTest) {
     chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
 
   EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}
+
+TEST(ProbDistributions,fvar_double) {
+  using stan::agrad::fvar;
+
+  Matrix<fvar<double>,Dynamic,1> theta(3,1);
+  theta << 0.2, 0.3, 0.5;
+  Matrix<fvar<double>,Dynamic,1> alpha(3,1);
+  alpha << 1.0, 1.0, 1.0;
+  for (int i = 0; i < 3; i++) {
+    theta(i).d_ = 1.0;
+    alpha(i).d_ = 1.0;
+  }
+
+  EXPECT_FLOAT_EQ(0.6931472, stan::prob::dirichlet_log(theta,alpha).val_);
+  EXPECT_FLOAT_EQ(0.99344212, stan::prob::dirichlet_log(theta,alpha).d_);
+  
+  Matrix<fvar<double>,Dynamic,1> theta2(4,1);
+  theta2 << 0.01, 0.01, 0.8, 0.18;
+  Matrix<fvar<double>,Dynamic,1> alpha2(4,1);
+  alpha2 << 10.5, 11.5, 19.3, 5.1;
+  for (int i = 0; i < 3; i++) {
+    theta2(i).d_ = 1.0;
+    alpha2(i).d_ = 1.0;
+  }
+
+  EXPECT_FLOAT_EQ(-43.40045, stan::prob::dirichlet_log(theta2,alpha2).val_);
+  EXPECT_FLOAT_EQ(2017.2858, stan::prob::dirichlet_log(theta2,alpha2).d_);
+}
+
+TEST(ProbDistributions,fvar_fvar_double) {
+  using stan::agrad::fvar;
+
+  Matrix<fvar<fvar<double> >,Dynamic,1> theta(3,1);
+  theta << 0.2, 0.3, 0.5;
+  Matrix<fvar<fvar<double> >,Dynamic,1> alpha(3,1);
+  alpha << 1.0, 1.0, 1.0;
+  for (int i = 0; i < 3; i++) {
+    theta(i).d_ = 1.0;
+    alpha(i).d_ = 1.0;
+  }
+
+  EXPECT_FLOAT_EQ(0.6931472, stan::prob::dirichlet_log(theta,alpha).val_.val_);
+  EXPECT_FLOAT_EQ(0.99344212, stan::prob::dirichlet_log(theta,alpha).d_.val_);
+  
+  Matrix<fvar<fvar<double> >,Dynamic,1> theta2(4,1);
+  theta2 << 0.01, 0.01, 0.8, 0.18;
+  Matrix<fvar<fvar<double> >,Dynamic,1> alpha2(4,1);
+  alpha2 << 10.5, 11.5, 19.3, 5.1;
+  for (int i = 0; i < 3; i++) {
+    theta2(i).d_ = 1.0;
+    alpha2(i).d_ = 1.0;
+  }
+
+  EXPECT_FLOAT_EQ(-43.40045, stan::prob::dirichlet_log(theta2,alpha2).val_.val_);
+  EXPECT_FLOAT_EQ(2017.2858, stan::prob::dirichlet_log(theta2,alpha2).d_.val_);
+}
+
+TEST(ProbDistributions,fvar_var) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  Matrix<fvar<var>,Dynamic,1> theta(3,1);
+  theta << 0.2, 0.3, 0.5;
+  Matrix<fvar<var>,Dynamic,1> alpha(3,1);
+  alpha << 1.0, 1.0, 1.0;
+  for (int i = 0; i < 3; i++) {
+    theta(i).d_ = 1.0;
+    alpha(i).d_ = 1.0;
+  }
+
+  EXPECT_FLOAT_EQ(0.6931472, stan::prob::dirichlet_log(theta,alpha).val_.val());
+  EXPECT_FLOAT_EQ(0.99344212, stan::prob::dirichlet_log(theta,alpha).d_.val());
+  
+  Matrix<fvar<var>,Dynamic,1> theta2(4,1);
+  theta2 << 0.01, 0.01, 0.8, 0.18;
+  Matrix<fvar<var>,Dynamic,1> alpha2(4,1);
+  alpha2 << 10.5, 11.5, 19.3, 5.1;
+  for (int i = 0; i < 3; i++) {
+    theta2(i).d_ = 1.0;
+    alpha2(i).d_ = 1.0;
+  }
+
+  EXPECT_FLOAT_EQ(-43.40045, stan::prob::dirichlet_log(theta2,alpha2).val_.val());
+  EXPECT_FLOAT_EQ(2017.2858, stan::prob::dirichlet_log(theta2,alpha2).d_.val());
+}
+
+TEST(ProbDistributions,fvar_fvar_var) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  Matrix<fvar<fvar<var> >,Dynamic,1> theta(3,1);
+  theta << 0.2, 0.3, 0.5;
+  Matrix<fvar<fvar<var> >,Dynamic,1> alpha(3,1);
+  alpha << 1.0, 1.0, 1.0;
+  for (int i = 0; i < 3; i++) {
+    theta(i).d_ = 1.0;
+    alpha(i).d_ = 1.0;
+  }
+
+  EXPECT_FLOAT_EQ(0.6931472, stan::prob::dirichlet_log(theta,alpha).val_.val_.val());
+  EXPECT_FLOAT_EQ(0.99344212, stan::prob::dirichlet_log(theta,alpha).d_.val_.val());
+  
+  Matrix<fvar<fvar<var> >,Dynamic,1> theta2(4,1);
+  theta2 << 0.01, 0.01, 0.8, 0.18;
+  Matrix<fvar<fvar<var> >,Dynamic,1> alpha2(4,1);
+  alpha2 << 10.5, 11.5, 19.3, 5.1;
+  for (int i = 0; i < 3; i++) {
+    theta2(i).d_ = 1.0;
+    alpha2(i).d_ = 1.0;
+  }
+
+  EXPECT_FLOAT_EQ(-43.40045, stan::prob::dirichlet_log(theta2,alpha2).val_.val_.val());
+  EXPECT_FLOAT_EQ(2017.2858, stan::prob::dirichlet_log(theta2,alpha2).d_.val_.val());
 }

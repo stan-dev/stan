@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__SOFTMAX_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__SOFTMAX_HPP__
+#ifndef STAN__AGRAD__FWD__MATRIX__SOFTMAX_HPP
+#define STAN__AGRAD__FWD__MATRIX__SOFTMAX_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/matrix/Eigen.hpp>

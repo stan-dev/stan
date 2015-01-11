@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__OPERATORS__OPERATOR_LESS_THAN_OR_EQUAL_HPP__
-#define __STAN__AGRAD__REV__OPERATORS__OPERATOR_LESS_THAN_OR_EQUAL_HPP__
+#ifndef STAN__AGRAD__REV__OPERATORS__OPERATOR_LESS_THAN_OR_EQUAL_HPP
+#define STAN__AGRAD__REV__OPERATORS__OPERATOR_LESS_THAN_OR_EQUAL_HPP
 
 #include <stan/agrad/rev/var.hpp>
 
@@ -9,6 +9,14 @@ namespace stan {
     /**
      * Less than or equal operator comparing two variables' values
      * (C++).
+       \f[
+       \mbox{operator\textless=}(x,y) = 
+       \begin{cases}
+         0 & \mbox{if } x > y\\
+         1 & \mbox{if } x \leq y \\[6pt]
+         0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param a First variable.
      * @param b Second variable.

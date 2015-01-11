@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__PRINT_PROGRESS_HPP__
-#define __STAN__COMMON__PRINT_PROGRESS_HPP__
+#ifndef STAN__COMMON__PRINT_PROGRESS_HPP
+#define STAN__COMMON__PRINT_PROGRESS_HPP
 
 #include <cmath>
 #include <iomanip>

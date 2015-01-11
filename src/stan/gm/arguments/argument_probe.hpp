@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__ARGUMENT__PROBE__HPP__
-#define __STAN__GM__ARGUMENTS__ARGUMENT__PROBE__HPP__
+#ifndef STAN__GM__ARGUMENTS__ARGUMENT__PROBE__HPP
+#define STAN__GM__ARGUMENTS__ARGUMENT__PROBE__HPP
 
 #include <string>
 #include <vector>

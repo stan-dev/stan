@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LOG_INV_LOGIT_HPP__
-#define __STAN__MATH__FUNCTIONS__LOG_INV_LOGIT_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LOG_INV_LOGIT_HPP
+#define STAN__MATH__FUNCTIONS__LOG_INV_LOGIT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 
@@ -9,6 +9,23 @@ namespace stan {
     /**
      * Returns the natural logarithm of the inverse logit of the
      * specified argument.
+     *
+     *
+       \f[
+       \mbox{log\_inv\_logit}(x) = 
+       \begin{cases}
+         \ln\left(\frac{1}{1+\exp(-x)}\right)& \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{log\_inv\_logit}(x)}{\partial x} = 
+       \begin{cases}
+         \frac{1}{1+\exp(x)} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @tparam T Scalar type
      * @param u Input.

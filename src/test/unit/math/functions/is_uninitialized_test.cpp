@@ -1,5 +1,6 @@
+#include <stan/math/functions/is_uninitialized.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
-#include "stan/math/functions/is_uninitialized.hpp"
 
 TEST(MathFunctions, is_uninitialized) {
   using stan::math::is_uninitialized;
@@ -12,3 +13,8 @@ TEST(MathFunctions, is_uninitialized) {
   EXPECT_FALSE(is_uninitialized(y));
 }
 
+TEST(MathFunctions, is_uninitialized_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_FALSE(stan::math::is_uninitialized(nan));
+}

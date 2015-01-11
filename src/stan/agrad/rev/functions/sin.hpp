@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__SIN_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__SIN_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__SIN_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__SIN_HPP
 
 #include <cmath>
 #include <stan/agrad/rev/var.hpp>
@@ -26,6 +26,23 @@ namespace stan {
      * The derivative is defined by
      *
      * \f$\frac{d}{dx} \sin x = \cos x\f$.
+     *
+     *
+       \f[
+       \mbox{sin}(x) = 
+       \begin{cases}
+         \sin(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{sin}(x)}{\partial x} = 
+       \begin{cases}
+         \cos(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param a Variable for radians of angle.
      * @return Sine of variable. 

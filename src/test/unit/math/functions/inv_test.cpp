@@ -1,6 +1,7 @@
-#include "stan/math/functions/inv.hpp"
+#include <stan/math/functions/inv.hpp>
+#include <stan/math/functions/constants.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/constants.hpp>
 
 TEST(MathsSpecialFunctions, inv) {
   double y = 2.0;
@@ -11,4 +12,11 @@ TEST(MathsSpecialFunctions, inv) {
 
   y = -32.7;
   EXPECT_FLOAT_EQ(1 / y, stan::math::inv(y));
+}
+
+TEST(MathFunctions, inv_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_PRED1(boost::math::isnan<double>,
+               stan::math::inv(nan));
 }

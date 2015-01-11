@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__VAR_CONTEXT_HPP__
-#define __STAN__IO__VAR_CONTEXT_HPP__
+#ifndef STAN__IO__VAR_CONTEXT_HPP
+#define STAN__IO__VAR_CONTEXT_HPP
 
 #include <sstream>
 #include <stdexcept>
@@ -28,6 +28,7 @@ namespace stan {
      */
     class var_context {
     public:
+      virtual ~var_context() {};
 
       /**
        * Return <code>true</code> if the specified variable name is

@@ -16,12 +16,13 @@ We%
   Betancourt, a physics Ph.D.\ about to start a postdoc at University
   College London, joined the development team in late 2012 after
   months of providing useful feedback on geometry and debugging
-  samplers at our meetings. Yuanjun Gao, a statistics graduate student at
-  Columbia, and Peter Li, an undergraduate student at Columbia,
+  samplers at our meetings. Yuanjun Gao, a statistics graduate student
+  at Columbia, and Peter Li, an undergraduate student at Columbia,
   joined the development team in the Fall semester of 2012.  Allen
-  Riddel joined the development team in Fall of 2013 and is currently
-  maintaining PyStan.  In the summer of 2014, Marco Inacio of the
-  University of S\~ao Paulo joined the development team.}
+  Riddell joined the development team in Fall of 2013 and is currently
+  maintaining PyStan.  In the summer of 2014, Marco Inacio (University
+  of S\~ao Paulo), Mitzi Morris (independent contractor), and Jeffrey
+  Arnold (University of Washington) joined the development team. }
 %
 did not set out to build \Stan as it currently exists.  We set out to
 apply full Bayesian inference to the sort of multilevel generalized
@@ -207,25 +208,28 @@ including bugs that resulted in our having to add more error checking.
 \section*{\Stan's Future}
 
 We're not done. There's still an enormous amount of work to do to
-improve \Stan.  Our to-do list is in the form of a Wiki on GitHub:
+improve \Stan.  Some older, higher-level goals are in a standalone
+to-do list:
 %
 \begin{quote}
 \url{https://github.com/stan-dev/stan/wiki/To-Do-List}
 \end{quote}
+
 %
 We are gradually weaning ourselves off of the to-do list in favor of
 the GitHub issue tracker (see the next section for a link).
 
-Two major features are on the short-term horizon for us after Stan
-2.  The first is a differential equation solver, which will allow
-fitting parameters of ordinary differential equations as part of model
-building (PKBUGS supplies this functionality for BUGS and it has been
-rolled into OpenBUGS).  The second big project is Riemannian manifold
-Hamiltonian Monte Carlo (RMHMC).  Both of these projects require us to
-put the finishing touches on higher-order automatic differentiation.
-We also have a number of smaller projects in the works, including more
-improvements to the modeling language itself, such as a way to define
-and reuse functions and general matrix and array index slicing.
+Some major features are on our short-term horizon: Riemannian manifold
+Hamiltonian Monte Carlo (RHMC), transformed Laplace approximations
+with uncertainty quantification for maximum likelihood estimation,
+marginal maximum likelihood estimation, data-parallel expectation
+propagation, and streaming (stochastic) variational inference. 
+
+We will also continue to work on improving numerical stability and
+efficiency throughout.  In addition, we plan to revise the interfaces
+to make them easier to understand and more flexible to use (a
+difficult pair of goals to balance).
+
 
 \section*{You Can Help}
 

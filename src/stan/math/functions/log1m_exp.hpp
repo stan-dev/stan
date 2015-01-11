@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LOG1M_EXP_HPP__
-#define __STAN__MATH__FUNCTIONS__LOG1M_EXP_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LOG1M_EXP_HPP
+#define STAN__MATH__FUNCTIONS__LOG1M_EXP_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stdexcept>
@@ -16,6 +16,24 @@ namespace stan {
      *
      * This function is only defined for x<0
      *
+     *
+       \f[
+       \mbox{log1m\_exp}(x) = 
+       \begin{cases}
+         \ln(1-\exp(x)) & \mbox{if } x < 0 \\
+         \textrm{NaN} & \mbox{if } x \geq 0\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{asinh}(x)}{\partial x} = 
+       \begin{cases}
+         -\frac{\exp(x)}{1-\exp(x)} & \mbox{if } x < 0 \\
+         \textrm{NaN} & \mbox{if } x \geq 0\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]     
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type

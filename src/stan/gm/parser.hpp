@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__PARSER__PARSER__HPP__
-#define __STAN__GM__PARSER__PARSER__HPP__
+#ifndef STAN__GM__PARSER__PARSER__HPP
+#define STAN__GM__PARSER__PARSER__HPP
 
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <iostream>
 #include <istream>
+#include <iterator>
 #include <map>
 #include <set>
 #include <sstream>
@@ -99,7 +100,6 @@ namespace stan {
         if (output_stream && is_nonempty(diagnostics)) {
           *output_stream << "DIAGNOSTIC(S) FROM PARSER:" 
                          << std::endl
-                         << std::endl
                          << diagnostics 
                          << std::endl;
         }
@@ -108,18 +108,17 @@ namespace stan {
         std::stringstream msg;
         std::string diagnostics = prog_grammar.error_msgs_.str();
         if (output_stream && is_nonempty(diagnostics)) {
-          msg << "EXPECTATION FAILURE - DIAGNOSTIC(S) FROM PARSER:"
-              << std::endl
+          msg << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
               << std::endl
               << diagnostics
               << std::endl;
         }
+
         throw std::invalid_argument(msg.str());
 
       } catch (const std::runtime_error& e) {
         std::stringstream msg;
-        msg << "NON EXPECTATION FAILURE - DIAGNOSTICS FROM PARSER:"
-            << std::endl
+        msg << "PROGRAM ERROR, MESSAGE(S) FROM PARSER:"
             << std::endl
             << prog_grammar.error_msgs_.str()
             << std::endl;
@@ -131,15 +130,23 @@ namespace stan {
       bool success = parse_succeeded && consumed_all_input;
 
       if (!success) {      
+
         std::stringstream msg;
         if (!parse_succeeded)
-          msg << "PARSE DID NOT SUCCEED." << std::endl; 
-        if (!consumed_all_input)
-          msg << "DIAGNOSTICS FROM PARSER:"
+          msg << "PARSE FAILED." << std::endl; 
+        if (!consumed_all_input) {
+          // get rest of program
+          std::basic_stringstream<char> unparsed_non_ws;
+          unparsed_non_ws << boost::make_iterator_range(fwd_begin, fwd_end);
+          // get next two lines (if possible)
+          msg << "PARSING HALTED AT LINE "
+              << get_line(fwd_begin)
               << std::endl
-              << "ERROR: non-whitespace beyond end of program."
+              << "UNPARSED STAN PROGRAM: "
+              << std::endl
+              << unparsed_non_ws.str()
               << std::endl;
-
+        }
         msg << std::endl << prog_grammar.error_msgs_.str() << std::endl;
         throw std::invalid_argument(msg.str());
       }

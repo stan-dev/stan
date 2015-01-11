@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__PARSER__PROGRAM_GRAMMAR__HPP__
-#define __STAN__GM__PARSER__PROGRAM_GRAMMAR__HPP__
+#ifndef STAN__GM__PARSER__PROGRAM_GRAMMAR__HPP
+#define STAN__GM__PARSER__PROGRAM_GRAMMAR__HPP
 
 #include <string>
 #include <sstream>
@@ -71,6 +71,7 @@ namespace stan {
                               std::vector<var_decl>(), 
                               whitespace_grammar<Iterator> >
       param_var_decls_r;
+
 
       boost::spirit::qi::rule<Iterator, 
                               program(),

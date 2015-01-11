@@ -1,14 +1,12 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__TRACE_GEN_QUAD_FORM_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__TRACE_GEN_QUAD_FORM_HPP__
+#ifndef STAN__AGRAD__FWD__MATRIX__TRACE_GEN_QUAD_FORM_HPP
+#define STAN__AGRAD__FWD__MATRIX__TRACE_GEN_QUAD_FORM_HPP
 
-#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
-#include <stan/agrad/rev/matrix/multiply.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/agrad/rev/operators.hpp>
 
 namespace stan {
   namespace agrad {
@@ -21,12 +19,14 @@ namespace stan {
       using stan::agrad::multiply;
       using stan::math::multiply;
 
-      stan::math::check_square("trace_gen_quad_form(%1%)",A,"A",(double*)0);
-      stan::math::check_square("trace_gen_quad_form(%1%)",D,"D",(double*)0);
-      stan::math::check_multiplicable("trace_gen_quad_form(%1%)",A,"A",
-                                      B,"B",(double*)0);
-      stan::math::check_multiplicable("trace_gen_quad_form(%1%)",B,"B",
-                                      D,"D",(double*)0);
+      stan::error_handling::check_square("trace_gen_quad_form", "A", A);
+      stan::error_handling::check_square("trace_gen_quad_form", "D", D);
+      stan::error_handling::check_multiplicable("trace_gen_quad_form",
+                                                "A", A,
+                                                "B", B);
+      stan::error_handling::check_multiplicable("trace_gen_quad_form", 
+                                                "B", B, 
+                                                "D", D);
       return stan::math::trace(multiply(multiply(D,stan::math::transpose(B)),
                                         multiply(A,B)));
     }

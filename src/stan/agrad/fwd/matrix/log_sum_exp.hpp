@@ -1,16 +1,12 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP__
+#ifndef STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP
+#define STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP
 
 #include <vector>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/matrix/log_sum_exp.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/operators.hpp>
-#include <stan/agrad/rev/functions/log.hpp>
-#include <stan/agrad/rev/functions/exp.hpp>
 #include <stan/agrad/fwd/functions/log.hpp>
 #include <stan/agrad/fwd/functions/exp.hpp>
-#include <stan/agrad/rev/matrix/log_sum_exp.hpp>
 
 namespace stan{
 

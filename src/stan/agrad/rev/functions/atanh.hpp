@@ -1,10 +1,11 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__ATANH_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__ATANH_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__ATANH_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__ATANH_HPP
 
-#include <boost/math/special_functions/atanh.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 #include <stan/agrad/rev/operators/operator_equal.hpp>
+#include <math.h>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -30,6 +31,35 @@ namespace stan {
      *
      * \f$\frac{d}{dx} \mbox{atanh}(x) = \frac{1}{1 - x^2}\f$.
      *
+       \f[
+       \mbox{atanh}(x) = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < -1\\
+         \tanh^{-1}(x) & \mbox{if } -1\leq x \leq 1 \\
+         \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{atanh}(x)}{\partial x} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < -1\\
+         \frac{\partial\, \tanh^{-1}(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
+         \textrm{NaN} & \mbox{if } x > 1\\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+   
+       \f[
+       \tanh^{-1}(x)=\frac{1}{2}\ln\left(\frac{1+x}{1-x}\right)
+       \f]
+       
+       \f[
+       \frac{\partial \, \tanh^{-1}(x)}{\partial x} = \frac{1}{1-x^2}
+       \f]
+    *
      * @param a The variable.
      * @return Inverse hyperbolic tangent of the variable.
      */
@@ -38,7 +68,7 @@ namespace stan {
         return var(new atanh_vari(std::numeric_limits<double>::infinity(),a.vi_));
       if (a == -1.0)
         return var(new atanh_vari(-std::numeric_limits<double>::infinity(),a.vi_));
-      return var(new atanh_vari(boost::math::atanh(a.val()),a.vi_));
+      return var(new atanh_vari(::atanh(a.val()),a.vi_));
     }
 
   }

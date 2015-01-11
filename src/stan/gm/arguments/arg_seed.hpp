@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__SEED__HPP__
-#define __STAN__GM__ARGUMENTS__SEED__HPP__
+#ifndef STAN__GM__ARGUMENTS__SEED__HPP
+#define STAN__GM__ARGUMENTS__SEED__HPP
 
 #include <stan/gm/arguments/singleton_argument.hpp>
 

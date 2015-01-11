@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__IBETA_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__IBETA_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__IBETA_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__IBETA_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
@@ -218,6 +218,7 @@ namespace stan {
      * @param x Random variate.
      * 
      * @return The normalized incomplete beta function.
+     * @throws if any argument is NaN.
      */
     inline var ibeta(const var& a,
                      const var& b,

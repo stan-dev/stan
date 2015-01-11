@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__WINDOWED__ADAPTATION__BETA__
-#define __STAN__MCMC__WINDOWED__ADAPTATION__BETA__
+#ifndef STAN__MCMC__WINDOWED__ADAPTATION__BETA
+#define STAN__MCMC__WINDOWED__ADAPTATION__BETA
 
 #include <ostream>
 #include <string>
@@ -14,19 +14,19 @@ namespace stan {
       
     public:
       
-      windowed_adaptation(std::string name): _estimator_name(name) {
-        _num_warmup = 0;
-        _adapt_init_buffer = 0;
-        _adapt_term_buffer = 0;
-        _adapt_base_window = 0;
+      windowed_adaptation(std::string name): estimator_name_(name) {
+        num_warmup_ = 0;
+        adapt_init_buffer_ = 0;
+        adapt_term_buffer_ = 0;
+        adapt_base_window_ = 0;
         
         restart();
       }
       
       void restart() {
-        _adapt_window_counter = 0;
-        _adapt_window_size = _adapt_base_window;
-        _adapt_next_window = _adapt_init_buffer + _adapt_window_size - 1;
+        adapt_window_counter_ = 0;
+        adapt_window_size_ = adapt_base_window_;
+        adapt_next_window_ = adapt_init_buffer_ + adapt_window_size_ - 1;
       }
       
       void set_window_params(unsigned int num_warmup,
@@ -37,7 +37,7 @@ namespace stan {
         
         if (num_warmup < 20) {
           if (e) {
-            *e << "WARNING: No " << _estimator_name << " estimation is" << std::endl;
+            *e << "WARNING: No " << estimator_name_ << " estimation is" << std::endl;
             *e << "         performed for num_warmup < 20" << std::endl << std::endl;
           }
           return;
@@ -50,73 +50,73 @@ namespace stan {
             *e << "         overflow the total number of warmup iterations." << std::endl;
           }
           
-          _num_warmup = num_warmup;
-          _adapt_init_buffer = 0.15 * num_warmup;
-          _adapt_term_buffer = 0.10 * num_warmup;
-          _adapt_base_window = num_warmup - (_adapt_init_buffer + _adapt_term_buffer);
+          num_warmup_ = num_warmup;
+          adapt_init_buffer_ = 0.15 * num_warmup;
+          adapt_term_buffer_ = 0.10 * num_warmup;
+          adapt_base_window_ = num_warmup - (adapt_init_buffer_ + adapt_term_buffer_);
           
           if(e) {
             *e << "         Defaulting to a 15%/75%/10% partition," << std::endl;
-            *e << "           init_buffer = " << _adapt_init_buffer << std::endl;
-            *e << "           adapt_window = " << _adapt_base_window << std::endl;
-            *e << "           term_buffer = " << _adapt_term_buffer << std::endl << std::endl;
+            *e << "           init_buffer = " << adapt_init_buffer_ << std::endl;
+            *e << "           adapt_window = " << adapt_base_window_ << std::endl;
+            *e << "           term_buffer = " << adapt_term_buffer_ << std::endl << std::endl;
           }
           
           return;
           
         }
         
-        _num_warmup = num_warmup;
-        _adapt_init_buffer = init_buffer;
-        _adapt_term_buffer = term_buffer;
-        _adapt_base_window = base_window;
+        num_warmup_ = num_warmup;
+        adapt_init_buffer_ = init_buffer;
+        adapt_term_buffer_ = term_buffer;
+        adapt_base_window_ = base_window;
         restart();
         
       }
       
       bool adaptation_window() {
-        return (_adapt_window_counter >= _adapt_init_buffer)
-               && (_adapt_window_counter < _num_warmup - _adapt_term_buffer)
-               && (_adapt_window_counter != _num_warmup);
+        return (adapt_window_counter_ >= adapt_init_buffer_)
+               && (adapt_window_counter_ < num_warmup_ - adapt_term_buffer_)
+               && (adapt_window_counter_ != num_warmup_);
       }
       
       bool end_adaptation_window() {
-        return (_adapt_window_counter == _adapt_next_window)
-               && (_adapt_window_counter != _num_warmup);
+        return (adapt_window_counter_ == adapt_next_window_)
+               && (adapt_window_counter_ != num_warmup_);
       }
       
       void compute_next_window() {
         
-        if (_adapt_next_window == _num_warmup - _adapt_term_buffer - 1) return;
+        if (adapt_next_window_ == num_warmup_ - adapt_term_buffer_ - 1) return;
         
-        _adapt_window_size *= 2;
-        _adapt_next_window = _adapt_window_counter + _adapt_window_size;
+        adapt_window_size_ *= 2;
+        adapt_next_window_ = adapt_window_counter_ + adapt_window_size_;
         
-        if (_adapt_next_window == _num_warmup - _adapt_term_buffer - 1) return;
+        if (adapt_next_window_ == num_warmup_ - adapt_term_buffer_ - 1) return;
         
         // Bounday of the following window, not the window just computed
-        unsigned int next_window_boundary = _adapt_next_window + 2 * _adapt_window_size;
+        unsigned int next_window_boundary = adapt_next_window_ + 2 * adapt_window_size_;
         
         // If the following window overtakes the full adaptation window,
         // then stretch the current window to the end of the full window
-        if (next_window_boundary >= _num_warmup - _adapt_term_buffer) {
-          _adapt_next_window = _num_warmup - _adapt_term_buffer - 1;
+        if (next_window_boundary >= num_warmup_ - adapt_term_buffer_) {
+          adapt_next_window_ = num_warmup_ - adapt_term_buffer_ - 1;
         }
         
       }
       
     protected:
       
-      std::string _estimator_name;
+      std::string estimator_name_;
       
-      unsigned int _num_warmup;
-      unsigned int _adapt_init_buffer;
-      unsigned int _adapt_term_buffer;
-      unsigned int _adapt_base_window;
+      unsigned int num_warmup_;
+      unsigned int adapt_init_buffer_;
+      unsigned int adapt_term_buffer_;
+      unsigned int adapt_base_window_;
       
-      unsigned int _adapt_window_counter;
-      unsigned int _adapt_next_window;
-      unsigned int _adapt_window_size;
+      unsigned int adapt_window_counter_;
+      unsigned int adapt_next_window_;
+      unsigned int adapt_window_size_;
       
     };
     

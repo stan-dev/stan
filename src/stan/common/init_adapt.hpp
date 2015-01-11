@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__INIT_ADAPT_HPP__
-#define __STAN__COMMON__INIT_ADAPT_HPP__
+#ifndef STAN__COMMON__INIT_ADAPT_HPP
+#define STAN__COMMON__INIT_ADAPT_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/mcmc/base_mcmc.hpp>

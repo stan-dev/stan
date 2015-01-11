@@ -15,7 +15,7 @@ public:
     param[1] = 0.5;           // alpha (Shape)
     param[2] = 3.3;           // beta (Scale)
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.138010737));  // expected cdf_log
+    cdf_log.push_back(std::log(0.138010737568659559638900550956));  // expected cdf_log
 
   }
   
@@ -60,26 +60,20 @@ public:
   }
     
   template <typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   cdf_log(const T_y& y, const T_shape& alpha, const T_scale& beta,
-          const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, 
-          const T9&) {
+          const T3&, const T4&, const T5&) {
     return stan::prob::inv_gamma_cdf_log(y, alpha, beta);
   }
 
 
   
   template <typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   cdf_log_function(const T_y& y, const T_shape& alpha, const T_scale& beta,
-                   const T3&, const T4&, const T5&, const T6&, const T7&, 
-                   const T8&, const T9&) {
+                   const T3&, const T4&, const T5&) {
     using stan::agrad::gamma_q;
     using stan::math::gamma_q;
 

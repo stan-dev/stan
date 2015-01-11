@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__LMGAMMA_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__LMGAMMA_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__LMGAMMA_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__LMGAMMA_HPP
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/dv_vari.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/lmgamma.hpp>
 #include <stan/math/functions/digamma.hpp>
 

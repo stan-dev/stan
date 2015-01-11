@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__BINARY_LOG_LOSS_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__BINARY_LOG_LOSS_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__BINARY_LOG_LOSS_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__BINARY_LOG_LOSS_HPP
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/log1p.hpp>
 
 namespace stan {
@@ -42,6 +42,25 @@ namespace stan {
      * \f$\frac{d}{d\hat{y}} \mbox{logloss}(1,\hat{y}) = - \frac{1}{\hat{y}}\f$, and
      *
      * \f$\frac{d}{d\hat{y}} \mbox{logloss}(0,\hat{y}) = \frac{1}{1 - \hat{y}}\f$.
+     *
+     *
+       \f[
+       \mbox{binary\_log\_loss}(y,\hat{y}) = 
+       \begin{cases}
+         y \log \hat{y} + (1 - y) \log (1 - \hat{y}) & \mbox{if } 0\leq \hat{y}\leq 1, 
+         y\in\{ 0,1 \}\\[6pt]
+         \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN}
+       \end{cases}
+       \f]
+   
+       \f[
+       \frac{\partial\,\mbox{binary\_log\_loss}(y,\hat{y})}{\partial \hat{y}} = 
+       \begin{cases}
+         \frac{y}{\hat{y}}-\frac{1-y}{1-\hat{y}} & \mbox{if } 0\leq \hat{y}\leq 1, 
+         y\in\{ 0,1 \}\\[6pt]
+         \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param y Reference value.
      * @param y_hat Response variable.

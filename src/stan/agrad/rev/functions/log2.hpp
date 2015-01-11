@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__LOG2_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__LOG2_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__LOG2_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__LOG2_HPP
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 #include <stan/math/functions/log2.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
   namespace agrad {
@@ -29,6 +29,24 @@ namespace stan {
      * The derivative is
      *
      * \f$\frac{d}{dx} \log_2 x = \frac{1}{x \log 2}\f$.
+     *
+       \f[
+       \mbox{log2}(x) = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 0 \\
+         \log_2(x) & \mbox{if } x\geq 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{log2}(x)}{\partial x} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < 0 \\
+         \frac{1}{x\ln2} & \mbox{if } x\geq 0 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param a Specified variable.
      * @return Base 2 logarithm of the variable.

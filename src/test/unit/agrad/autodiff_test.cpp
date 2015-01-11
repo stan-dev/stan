@@ -83,6 +83,8 @@ TEST(AgradAutoDiff,gradient) {
   EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx2(0));
   EXPECT_FLOAT_EQ(x(0) * x(0) + 3 * 2 * x(1), grad_fx2(1));
 }
+
+
 TEST(AgradAutoDiff,gradientDotVector) {
   using Eigen::Matrix;  using Eigen::Dynamic;
   using stan::agrad::var;
@@ -244,5 +246,5 @@ TEST(AgradAutodiff, RecoverMemory) {
   }
   // depends on starting allocation of 65K not being exceeded
   // without recovery_memory in autodiff::apply_recover(), takes 67M 
-  EXPECT_TRUE(stan::agrad::memalloc_.bytes_allocated() < 100000);
+  EXPECT_TRUE(stan::agrad::ChainableStack::memalloc_.bytes_allocated() < 100000);
 }  

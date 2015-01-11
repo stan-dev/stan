@@ -1,10 +1,9 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__GAMMA_P_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__GAMMA_P_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__GAMMA_P_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__GAMMA_P_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/gamma_p.hpp>
-#include <stan/prob/internal_math.hpp>
 
 namespace stan{
 

@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__AUTO_DIFF_HPP__
-#define __STAN__AGRAD__AUTO_DIFF_HPP__
+#ifndef STAN__AGRAD__AUTO_DIFF_HPP
+#define STAN__AGRAD__AUTO_DIFF_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev.hpp>
@@ -8,31 +8,6 @@
 namespace stan {
   
   namespace agrad {
-
-    /**
-     * Apply the specified function to the specified argument
-     * and return the result; if the function throws an exception,
-     * recover reverse-mode memory and rethrow.
-     *
-     * @tparam F Function type
-     * @tparam T Argument type of function
-     * @tparam R Return type of function
-     * @param[in] f Function
-     * @param[in] x Argument
-     * @return Value of applying function to argument
-     */
-    template <typename R, typename F, typename T>
-    inline 
-    R
-    apply_recover(const F& f,
-                  T& x) {
-      try {
-        return f(x);
-      } catch (std::exception& e) {
-        stan::agrad::recover_memory();
-        throw;
-      }
-    }
 
     /**
      * Return the derivative of the specified univariate function at
@@ -52,7 +27,7 @@ namespace stan {
                T& fx,
                T& dfx_dx)  {
       fvar<T> x_fvar = fvar<T>(x,1.0);
-      fvar<T> fx_fvar = apply_recover<fvar<T> >(f,x_fvar);
+      fvar<T> fx_fvar = f(x_fvar); 
       fx = fx_fvar.val_;
       dfx_dx = fx_fvar.d_;
     }
@@ -79,7 +54,7 @@ namespace stan {
       Eigen::Matrix<fvar<T>,Eigen::Dynamic,1> x_fvar(x.size());
       for (int i = 0; i < x.size(); ++i)
         x_fvar(i) = fvar<T>(x(i),i==n);
-      fvar<T> fx_fvar = apply_recover<fvar<T> >(f, x_fvar);
+      fvar<T> fx_fvar = f(x_fvar);
       fx = fx_fvar.val_;
       dfx_dxn = fx_fvar.d_;
     }
@@ -120,16 +95,22 @@ namespace stan {
              double& fx,
              Eigen::Matrix<double,Eigen::Dynamic,1>& grad_fx) {
       using stan::agrad::var;
-      Eigen::Matrix<var,Eigen::Dynamic,1> x_var(x.size());
-      for (int i = 0; i < x.size(); ++i)
-        x_var(i) = x(i);
-      var fx_var = apply_recover<var>(f,x_var);
-      fx = fx_var.val();
-      grad_fx.resize(x.size());
-      stan::agrad::grad(fx_var.vi_);
-      for (int i = 0; i < x.size(); ++i)
-        grad_fx(i) = x_var(i).adj();
-      stan::agrad::recover_memory();
+      start_nested();
+      try {
+        Eigen::Matrix<var,Eigen::Dynamic,1> x_var(x.size());
+        for (int i = 0; i < x.size(); ++i)
+          x_var(i) = x(i);
+        var fx_var = f(x_var);
+        fx = fx_var.val();
+        grad_fx.resize(x.size());
+        stan::agrad::grad(fx_var.vi_);
+        for (int i = 0; i < x.size(); ++i)
+          grad_fx(i) = x_var(i).adj();
+      } catch (const std::exception& /*e*/) {
+        stan::agrad::recover_memory_nested();
+        throw;
+      }
+      stan::agrad::recover_memory_nested();
     }
     template <typename T, typename F>
     void
@@ -142,7 +123,7 @@ namespace stan {
       for (int i = 0; i < x.size(); ++i) {
         for (int k = 0; k < x.size(); ++k)
           x_fvar(k) = fvar<T>(x(k),k==i);
-        fvar<T> fx_fvar = apply_recover<fvar<T> >(f, x_fvar);
+        fvar<T> fx_fvar = f(x_fvar);
         if (i == 0) fx = fx_fvar.val_;
         grad_fx(i) = fx_fvar.d_;
       }
@@ -157,22 +138,28 @@ namespace stan {
              Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& J) {
       using Eigen::Matrix;  using Eigen::Dynamic;
       using stan::agrad::var;
-      Matrix<var,Dynamic,1> x_var(x.size());
-      for (int k = 0; k < x.size(); ++k)
-        x_var(k) = x(k);
-      Matrix<var,Dynamic,1> fx_var 
-        = apply_recover<Matrix<var,Dynamic,1> >(f,x_var);
-      fx.resize(fx_var.size());
-      for (int i = 0; i < fx_var.size(); ++i)
-        fx(i) = fx_var(i).val(); 
-      J.resize(x.size(), fx_var.size());
-      for (int i = 0; i < fx_var.size(); ++i) {
-        if (i > 0)
-          set_zero_all_adjoints();
-        grad(fx_var(i).vi_);
+      start_nested();
+      try {
+        Matrix<var,Dynamic,1> x_var(x.size());
         for (int k = 0; k < x.size(); ++k)
-          J(k,i) = x_var(k).adj();
+          x_var(k) = x(k);
+        Matrix<var,Dynamic,1> fx_var = f(x_var);
+        fx.resize(fx_var.size());
+        for (int i = 0; i < fx_var.size(); ++i)
+          fx(i) = fx_var(i).val(); 
+        J.resize(x.size(), fx_var.size());
+        for (int i = 0; i < fx_var.size(); ++i) {
+          if (i > 0)
+            set_zero_all_adjoints();
+          grad(fx_var(i).vi_);
+          for (int k = 0; k < x.size(); ++k)
+            J(k,i) = x_var(k).adj();
+        }
+      } catch (const std::exception& e) {
+        stan::agrad::recover_memory_nested();
+        throw;
       }
+      stan::agrad::recover_memory_nested();
     }
     template <typename T, typename F>
     void
@@ -187,7 +174,7 @@ namespace stan {
         for (int k = 0; k < x.size(); ++k)
           x_fvar(k) = fvar<T>(x(k), i == k);
         Matrix<fvar<T>,Dynamic,1> fx_fvar 
-          = apply_recover<Matrix<fvar<T>,Dynamic,1> >(f,x_fvar);
+          = f(x_fvar);
         if (i == 0) {
           J.resize(x.size(),fx_fvar.size());
           fx.resize(fx_fvar.size());
@@ -209,19 +196,26 @@ namespace stan {
             double& fx,
             Eigen::Matrix<double,Eigen::Dynamic,1>& grad,
             Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& H) {
-      H.resize(x.size(), x.size());
-      grad.resize(x.size());
-      for (int i = 0; i < x.size(); ++i) {
-        Eigen::Matrix<fvar<var>, Eigen::Dynamic, 1> x_fvar(x.size());
-        for (int j = 0; j < x.size(); ++j) 
-          x_fvar(j) = fvar<var>(x(j),i==j);
-        fvar<var> fx_fvar = apply_recover<fvar<var> >(f,x_fvar);
-        grad(i) = fx_fvar.d_.val();
-        if (i == 0) fx = fx_fvar.val_.val();
-        stan::agrad::grad(fx_fvar.d_.vi_);
-        for (int j = 0; j < x.size(); ++j)
-          H(i,j) = x_fvar(j).val_.adj();
+      start_nested();
+      try {
+        H.resize(x.size(), x.size());
+        grad.resize(x.size());
+        for (int i = 0; i < x.size(); ++i) {
+          Eigen::Matrix<fvar<var>, Eigen::Dynamic, 1> x_fvar(x.size());
+          for (int j = 0; j < x.size(); ++j) 
+            x_fvar(j) = fvar<var>(x(j),i==j);
+          fvar<var> fx_fvar = f(x_fvar);
+          grad(i) = fx_fvar.d_.val();
+          if (i == 0) fx = fx_fvar.val_.val();
+          stan::agrad::grad(fx_fvar.d_.vi_);
+          for (int j = 0; j < x.size(); ++j)
+            H(i,j) = x_fvar(j).val_.adj();
+        }
+      } catch (const std::exception& e) {
+        stan::agrad::recover_memory_nested();
+        throw;
       }
+      stan::agrad::recover_memory_nested();
     }
     // time O(N^3);  space O(N^2)
     template <typename T, typename F>
@@ -239,8 +233,7 @@ namespace stan {
           for (int k = 0; k < x.size(); ++k)
             x_fvar(k) = fvar<fvar<T> >(fvar<T>(x(k),j==k), 
                                        fvar<T>(i==k,0));
-          fvar<fvar<T> > fx_fvar 
-            = apply_recover<fvar<fvar<T> > >(f,x_fvar);
+          fvar<fvar<T> > fx_fvar = f(x_fvar);
           if (j == 0) 
             fx = fx_fvar.val_.val_;
           if (i == j)
@@ -268,7 +261,7 @@ namespace stan {
       Matrix<fvar<T1>,Dynamic,1> x_fvar(x.size());
       for (int i = 0; i < x.size(); ++i)
         x_fvar(i) = fvar<T1>(x(i),v(i));
-      fvar<T1> fx_fvar = apply_recover<fvar<T1> >(f,x_fvar);
+      fvar<T1> fx_fvar = f(x_fvar);
       fx = fx_fvar.val_;
       grad_fx_dot_v = fx_fvar.d_;
     }
@@ -285,19 +278,26 @@ namespace stan {
                          Eigen::Matrix<double,Eigen::Dynamic,1>& Hv) {
       using stan::agrad::fvar;
       using stan::agrad::var;
-      using Eigen::Matrix; using Eigen::Dynamic;
-      Matrix<var,Dynamic,1> x_var(x.size());
-      for (int i = 0; i < x_var.size(); ++i)
-        x_var(i) = x(i);
-      var fx_var;
-      var grad_fx_var_dot_v;
-      gradient_dot_vector(f,x_var,v,fx_var,grad_fx_var_dot_v);
-      fx = fx_var.val();
-      stan::agrad::grad(grad_fx_var_dot_v.vi_);
-      Hv.resize(x.size());
-      for (int i = 0; i < x.size(); ++i) 
-        Hv(i) = x_var(i).adj();
-      stan::agrad::recover_memory();
+      using Eigen::Matrix; 
+      using Eigen::Dynamic;
+      start_nested();
+      try {
+        Matrix<var,Dynamic,1> x_var(x.size());
+        for (int i = 0; i < x_var.size(); ++i)
+          x_var(i) = x(i);
+        var fx_var;
+        var grad_fx_var_dot_v;
+        gradient_dot_vector(f,x_var,v,fx_var,grad_fx_var_dot_v);
+        fx = fx_var.val();
+        stan::agrad::grad(grad_fx_var_dot_v.vi_);
+        Hv.resize(x.size());
+        for (int i = 0; i < x.size(); ++i) 
+          Hv(i) = x_var(i).adj();
+      } catch (const std::exception& e) {
+        stan::agrad::recover_memory_nested();
+        throw;
+      }
+      stan::agrad::recover_memory_nested();
     }
     template <typename T, typename F>
     void
@@ -325,35 +325,39 @@ namespace stan {
                  Eigen::Matrix<double,Eigen::Dynamic,1>& grad_tr_MH) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
+      start_nested();
+      try {
       
-      grad_tr_MH.resize(x.size());
+        grad_tr_MH.resize(x.size());
 
-      Matrix<var,Dynamic,1> x_var(x.size());
-      for (int i = 0; i < x.size(); ++i)
-        x_var(i) = x(i);
+        Matrix<var,Dynamic,1> x_var(x.size());
+        for (int i = 0; i < x.size(); ++i)
+          x_var(i) = x(i);
 
-      Matrix<fvar<var>,Dynamic,1> x_fvar(x.size());
+        Matrix<fvar<var>,Dynamic,1> x_fvar(x.size());
       
-      var sum(0.0);
-      Matrix<double,Dynamic,1> M_n(x.size());
-      for (int n = 0; n < x.size(); ++n) {
-        for (int k = 0; k < x.size(); ++k)
-          M_n(k) = M(n,k);
-        for (int k = 0; k < x.size(); ++k)
-          x_fvar(k) = fvar<var>(x_var(k), k == n);
-        fvar<var> fx;
-        fvar<var> grad_fx_dot_v;
-        gradient_dot_vector<fvar<var>,double>(f,x_fvar,M_n,fx,grad_fx_dot_v);
-        sum += grad_fx_dot_v.d_;
+        var sum(0.0);
+        Matrix<double,Dynamic,1> M_n(x.size());
+        for (int n = 0; n < x.size(); ++n) {
+          for (int k = 0; k < x.size(); ++k)
+            M_n(k) = M(n,k);
+          for (int k = 0; k < x.size(); ++k)
+            x_fvar(k) = fvar<var>(x_var(k), k == n);
+          fvar<var> fx;
+          fvar<var> grad_fx_dot_v;
+          gradient_dot_vector<fvar<var>,double>(f,x_fvar,M_n,fx,grad_fx_dot_v);
+          sum += grad_fx_dot_v.d_;
+        }
+
+        stan::agrad::grad(sum.vi_);
+        for (int i = 0; i < x.size(); ++i)
+          grad_tr_MH(i) = x_var(i).adj();
+      } catch (const std::exception& e) {
+        stan::agrad::recover_memory_nested();
+        throw;
       }
-
-      stan::agrad::grad(sum.vi_);
-      for (int i = 0; i < x.size(); ++i)
-        grad_tr_MH(i) = x_var(i).adj();
-      stan::agrad::recover_memory();
+      stan::agrad::recover_memory_nested();
     }
-
-
 
   }
 }

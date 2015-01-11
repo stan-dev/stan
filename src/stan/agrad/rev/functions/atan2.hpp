@@ -1,11 +1,12 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__ATAN2_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__ATAN2_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__ATAN2_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__ATAN2_HPP
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/vv_vari.hpp>
 #include <stan/agrad/rev/internal/vd_vari.hpp>
 #include <stan/agrad/rev/internal/dv_vari.hpp>
+#include <math.h>
 
 namespace stan {
   namespace agrad {
@@ -14,7 +15,7 @@ namespace stan {
       class atan2_vv_vari : public op_vv_vari {
       public:
         atan2_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(std::atan2(avi->val_,bvi->val_),avi,bvi) {
+          op_vv_vari(::atan2(avi->val_,bvi->val_),avi,bvi) {
         }
         void chain() {
           double a_sq_plus_b_sq = (avi_->val_ * avi_->val_) + (bvi_->val_ * bvi_->val_);
@@ -26,7 +27,7 @@ namespace stan {
       class atan2_vd_vari : public op_vd_vari {
       public:
         atan2_vd_vari(vari* avi, double b) :
-          op_vd_vari(std::atan2(avi->val_,b),avi,b) {
+          op_vd_vari(::atan2(avi->val_,b),avi,b) {
         }
         void chain() {
           double a_sq_plus_b_sq = (avi_->val_ * avi_->val_) + (bd_ * bd_);
@@ -37,7 +38,7 @@ namespace stan {
       class atan2_dv_vari : public op_dv_vari {
       public:
         atan2_dv_vari(double a, vari* bvi) :
-          op_dv_vari(std::atan2(a,bvi->val_),a,bvi) {
+          op_dv_vari(::atan2(a,bvi->val_),a,bvi) {
         }
         void chain() {
           double a_sq_plus_b_sq = (ad_ * ad_) + (bvi_->val_ * bvi_->val_);
@@ -52,9 +53,9 @@ namespace stan {
      *
      * The partial derivatives are defined by
      *
-     * $\f$ \frac{\partial}{\partial x} \arctan \frac{x}{y} = \frac{y}{x^2 + y^2}\f$, and
+     * \f$ \frac{\partial}{\partial x} \arctan \frac{x}{y} = \frac{y}{x^2 + y^2}\f$, and
      * 
-     * $\f$ \frac{\partial}{\partial y} \arctan \frac{x}{y} = \frac{-x}{x^2 + y^2}\f$.
+     * \f$ \frac{\partial}{\partial y} \arctan \frac{x}{y} = \frac{-x}{x^2 + y^2}\f$.
      *
      * @param a Numerator variable.
      * @param b Denominator variable.
@@ -70,7 +71,7 @@ namespace stan {
      *
      * The derivative with respect to the variable is
      *
-     * $\f$ \frac{d}{d x} \arctan \frac{x}{c} = \frac{c}{x^2 + c^2}\f$.
+     * \f$ \frac{d}{d x} \arctan \frac{x}{c} = \frac{c}{x^2 + c^2}\f$.
      *
      * @param a Numerator variable.
      * @param b Denominator scalar.
@@ -86,7 +87,32 @@ namespace stan {
      *
      * The derivative with respect to the variable is
      *
-     * $\f$ \frac{\partial}{\partial y} \arctan \frac{c}{y} = \frac{-c}{c^2 + y^2}\f$.
+     * \f$ \frac{\partial}{\partial y} \arctan \frac{c}{y} = \frac{-c}{c^2 + y^2}\f$.
+     *
+     *
+       \f[
+       \mbox{atan2}(x,y) = 
+       \begin{cases}
+         \arctan\left(\frac{x}{y}\right) & \mbox{if } -\infty\leq x \leq \infty, -\infty\leq y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{atan2}(x,y)}{\partial x} = 
+       \begin{cases}
+         \frac{y}{x^2+y^2} & \mbox{if } -\infty\leq x\leq \infty, -\infty\leq y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{atan2}(x,y)}{\partial y} = 
+       \begin{cases}
+         -\frac{x}{x^2+y^2} & \mbox{if } -\infty\leq x\leq \infty, -\infty\leq y \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param a Numerator scalar.
      * @param b Denominator variable.

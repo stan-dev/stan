@@ -1,4 +1,5 @@
-#include "stan/math/functions/logical_or.hpp"
+#include <stan/math/functions/logical_or.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathFunctions,logical_or) {
@@ -13,4 +14,12 @@ TEST(MathFunctions,logical_or) {
   EXPECT_FALSE(logical_or(0.0, 0.0));
   EXPECT_FALSE(logical_or(0.0, 0));
   EXPECT_FALSE(logical_or(0, 0.0));
+}
+
+TEST(MathFunctions, logical_or_nan) {
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  
+  EXPECT_TRUE(stan::math::logical_or(1.0, nan));
+  EXPECT_TRUE(stan::math::logical_or(nan, 2.0));
+  EXPECT_TRUE(stan::math::logical_or(nan, nan));
 }

@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__IS_UNINITIALIZED_HPP__
-#define __STAN__MATH__FUNCTIONS__IS_UNINITIALIZED_HPP__
+#ifndef STAN__MATH__FUNCTIONS__IS_UNINITIALIZED_HPP
+#define STAN__MATH__FUNCTIONS__IS_UNINITIALIZED_HPP
 
 namespace stan {
 
@@ -13,6 +13,7 @@ namespace stan {
      * @tparam T Type of object to test.
      * @param x Object to test.
      * @return <code>true</code> if the specified object is uninitialized.
+     * @rerturn false if input is NaN.
      */
     template <typename T>
     inline bool is_uninitialized(T x) {

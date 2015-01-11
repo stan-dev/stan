@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LOG1P_HPP__
-#define __STAN__MATH__FUNCTIONS__LOG1P_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LOG1P_HPP
+#define STAN__MATH__FUNCTIONS__LOG1P_HPP
 
 #include <limits>
 #include <boost/math/tools/promotion.hpp>
@@ -12,6 +12,24 @@ namespace stan {
      *
      * The main use of this function is to cut down on intermediate
      * values during algorithmic differentiation.
+     *
+       \f[
+       \mbox{log1p}(x) = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < -1\\
+         \ln(1+x)& \mbox{if } x\geq -1 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{log1p}(x)}{\partial x} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x < -1\\
+         \frac{1}{1+x} & \mbox{if } x\geq -1 \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param x Specified value.
      * @return Natural log of one plus <code>x</code>.

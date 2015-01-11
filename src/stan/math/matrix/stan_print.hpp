@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__STAN_PRINT_HPP__
-#define __STAN__MATH__MATRIX__STAN_PRINT_HPP__
+#ifndef STAN__MATH__MATRIX__STAN_PRINT_HPP
+#define STAN__MATH__MATRIX__STAN_PRINT_HPP
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
@@ -49,7 +49,12 @@ namespace stan {
       *o << '[';
       for (int i = 0; i < x.rows(); ++i) {
         if (i > 0) *o << ',';
-        stan_print(o,x.row(i));
+        *o << '[';
+        for (int j = 0; j < x.row(i).size(); ++j) {
+          if (j > 0) *o << ',';
+          stan_print(o,x.row(i)(j));
+        }
+        *o << ']';
       }
       *o << ']';
     }

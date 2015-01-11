@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__INV_SQRT_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__INV_SQRT_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__INV_SQRT_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__INV_SQRT_HPP
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
@@ -21,6 +21,25 @@ namespace stan {
       };
     }
     
+    /**
+     *
+       \f[
+       \mbox{inv\_sqrt}(x) = 
+       \begin{cases}
+         \frac{1}{\sqrt{x}} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{inv\_sqrt}(x)}{\partial x} = 
+       \begin{cases}
+         -\frac{1}{2\sqrt{x^3}} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+     *
+     */
     inline var inv_sqrt(const var& a) {
       return var(new inv_sqrt_vari(a.vi_));
     }

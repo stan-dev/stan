@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__INV_SQUARE_HPP__
-#define __STAN__MATH__FUNCTIONS__INV_SQUARE_HPP__
+#ifndef STAN__MATH__FUNCTIONS__INV_SQUARE_HPP
+#define STAN__MATH__FUNCTIONS__INV_SQUARE_HPP
 
 #include <boost/math/tools/promotion.hpp>
 

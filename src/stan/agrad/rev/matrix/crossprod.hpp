@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__CROSSPROD_HPP__
-#define __STAN__AGRAD__REV__MATRIX__CROSSPROD_HPP__
+#ifndef STAN__AGRAD__REV__MATRIX__CROSSPROD_HPP
+#define STAN__AGRAD__REV__MATRIX__CROSSPROD_HPP
 
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/tcrossprod.hpp>

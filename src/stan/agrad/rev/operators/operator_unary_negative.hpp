@@ -1,8 +1,9 @@
-#ifndef __STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_NEGATIVE_HPP__
-#define __STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_NEGATIVE_HPP__
+#ifndef STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_NEGATIVE_HPP
+#define STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_NEGATIVE_HPP
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
   namespace agrad {
@@ -14,7 +15,10 @@ namespace stan {
           op_v_vari(-(avi->val_), avi) {
         }
         void chain() {
-          avi_->adj_ -= adj_;
+          if (unlikely(boost::math::isnan(avi_->val_)))
+            avi_->adj_ = std::numeric_limits<double>::quiet_NaN();
+          else
+            avi_->adj_ -= adj_;
         }
       };
     }
@@ -23,6 +27,22 @@ namespace stan {
      * Unary negation operator for variables (C++).
      *
      * \f$\frac{d}{dx} -x = -1\f$.
+     *
+       \f[
+       \mbox{operator-}(x) = 
+       \begin{cases}
+         -x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+
+       \f[
+       \frac{\partial\,\mbox{operator-}(x)}{\partial x} = 
+       \begin{cases}
+         -1 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param a Argument variable.
      * @return Negation of variable.

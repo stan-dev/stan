@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__DENSE__E__METRIC__BETA__
-#define __STAN__MCMC__DENSE__E__METRIC__BETA__
+#ifndef STAN__MCMC__DENSE__E__METRIC__BETA
+#define STAN__MCMC__DENSE__E__METRIC__BETA
 
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
@@ -7,6 +7,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <Eigen/Cholesky>
 
+#include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 
@@ -32,7 +33,7 @@ namespace stan {
       double phi(dense_e_point& z) { return this->V(z); }
       
       const Eigen::VectorXd dtau_dq(dense_e_point& z) {
-        return Eigen::VectorXd::Zero(this->_model.num_params_r());
+        return Eigen::VectorXd::Zero(this->model_.num_params_r());
       }
 
       const Eigen::VectorXd dtau_dp(dense_e_point& z) {
@@ -44,14 +45,14 @@ namespace stan {
       }
       
       void sample_p(dense_e_point& z, BaseRNG& rng) {
-        
+        typedef typename stan::math::index_type<Eigen::VectorXd>::type idx_t;
         boost::variate_generator<BaseRNG&, boost::normal_distribution<> > 
-          _rand_dense_gaus(rng, boost::normal_distribution<>());
+          rand_dense_gaus(rng, boost::normal_distribution<>());
         
         Eigen::VectorXd u(z.p.size());
         
-        for (Eigen::VectorXd::size_type i = 0; i < u.size(); ++i) 
-          u(i) = _rand_dense_gaus();
+        for (idx_t i = 0; i < u.size(); ++i) 
+          u(i) = rand_dense_gaus();
 
         z.p = z.mInv.llt().matrixL().solve(u);
         

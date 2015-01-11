@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__NUMERIC_LIMITS_HPP__
-#define __STAN__AGRAD__REV__NUMERIC_LIMITS_HPP__
+#ifndef STAN__AGRAD__REV__NUMERIC_LIMITS_HPP
+#define STAN__AGRAD__REV__NUMERIC_LIMITS_HPP
 
 #include <limits>
 #include <stan/agrad/rev/var.hpp>

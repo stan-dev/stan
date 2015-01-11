@@ -1,9 +1,9 @@
-#ifndef __STAN__MATH__MATRIX__LDLT_FACTOR_HPP__
-#define __STAN__MATH__MATRIX__LDLT_FACTOR_HPP__
+#ifndef STAN__MATH__MATRIX__LDLT_FACTOR_HPP
+#define STAN__MATH__MATRIX__LDLT_FACTOR_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <boost/shared_ptr.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace math {
@@ -52,20 +52,20 @@ namespace stan {
      * ~~~
      *
      **/
-    template<int R, int C>
-    class LDLT_factor<double,R,C> {
+    template<int R, int C, typename T>
+    class LDLT_factor<T,R,C> {
     public:
       LDLT_factor()
-      : N_(0), _ldltP(new Eigen::LDLT< Eigen::Matrix<double,R,C> >()) {}
+      : N_(0), _ldltP(new Eigen::LDLT< Eigen::Matrix<T,R,C> >()) {}
 
-      LDLT_factor(const Eigen::Matrix<double,R,C> &A)
-      : N_(0), _ldltP(new Eigen::LDLT< Eigen::Matrix<double,R,C> >())
+      LDLT_factor(const Eigen::Matrix<T,R,C> &A)
+      : N_(0), _ldltP(new Eigen::LDLT< Eigen::Matrix<T,R,C> >())
       {
         compute(A);
       }
       
-      inline void compute(const Eigen::Matrix<double,R,C> &A) {
-        stan::math::check_square("LDLT_factor(%1%)",A,"A",(double*)0);
+      inline void compute(const Eigen::Matrix<T,R,C> &A) {
+        stan::error_handling::check_square("LDLT_factor", "A", A);
         N_ = A.rows();
         _ldltP->compute(A);
       }
@@ -78,27 +78,31 @@ namespace stan {
         return ret;
       }
 
-      inline double log_abs_det() const {
+      inline T log_abs_det() const {
         return _ldltP->vectorD().array().log().sum();
       }
       
-      inline void inverse(Eigen::Matrix<double,R,C> &invA) const {
+      inline void inverse(Eigen::Matrix<T,R,C> &invA) const {
         invA.setIdentity(N_);
         _ldltP->solveInPlace(invA);
       }
 
       template<typename Rhs>
-      inline const Eigen::internal::solve_retval<Eigen::LDLT< Eigen::Matrix<double,R,C> >, Rhs>
+      inline const Eigen::internal::solve_retval<Eigen::LDLT< Eigen::Matrix<T,R,C> >, Rhs>
       solve(const Eigen::MatrixBase<Rhs>& b) const {
         return _ldltP->solve(b);
       }
 
-      inline Eigen::Matrix<double,R,C> solveRight(const Eigen::Matrix<double,R,C> &B) const {
+      inline Eigen::Matrix<T,R,C> solveRight(const Eigen::Matrix<T,R,C> &B) const {
         return _ldltP->solve(B.transpose()).transpose();
       }
 
-      inline Eigen::VectorXd vectorD() const {
+      inline Eigen::Matrix<T,Eigen::Dynamic,1> vectorD() const {
         return _ldltP->vectorD();
+      }
+     
+      inline Eigen::LDLT<Eigen::Matrix<T,R,C> > matrixLDLT() const {
+        return _ldltP->matrixLDLT();
       }
 
       inline size_t rows() const { return N_; }
@@ -108,7 +112,7 @@ namespace stan {
       typedef double value_type;
 
       size_t N_;
-      boost::shared_ptr< Eigen::LDLT< Eigen::Matrix<double,R,C> > > _ldltP;
+      boost::shared_ptr< Eigen::LDLT< Eigen::Matrix<T,R,C> > > _ldltP;
     };
   }
 }

@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__PARSER__STATEMENT_GRAMMAR_DEF__HPP__
-#define __STAN__GM__PARSER__STATEMENT_GRAMMAR_DEF__HPP__
+#ifndef STAN__GM__PARSER__STATEMENT_GRAMMAR_DEF__HPP
+#define STAN__GM__PARSER__STATEMENT_GRAMMAR_DEF__HPP
 
 #include <cstddef>
 #include <iomanip>
@@ -62,6 +62,9 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::return_statement,
                           (stan::gm::expression, return_value_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::print_statement,
+                          (std::vector<stan::gm::printable>, printables_) );
+
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::reject_statement,
                           (std::vector<stan::gm::printable>, printables_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::increment_log_prob_statement,
@@ -156,11 +159,11 @@ namespace stan {
             || lhs_origin == void_function_argument_origin_rng) {
           error_msgs << "Illegal to assign to function argument variables."
                      << std::endl
-                     << "Use local variables instead.";
+                     << "Use local variables instead."
+                     << std::endl;
           return false;
         }
             
-        
 
         // validate types
         a.var_type_ = vm.get(name);
@@ -175,31 +178,37 @@ namespace stan {
           error_msgs << "too many indexes for variable " 
                      << "; variable name = " << name
                      << "; num dimensions given = " << num_index_dims
-                     << "; variable array dimensions = " << lhs_var_num_dims;
-          return false;
-        }
-        if (lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
-          error_msgs << "mismatched dimensions on left- and right-hand side of assignment"
-                     << "; left dims=" << lhs_type.num_dims_
-                     << "; right dims=" << a.expr_.expression_type().num_dims_
+                     << "; variable array dimensions = " << lhs_var_num_dims
                      << std::endl;
           return false;
         }
 
         base_expr_type lhs_base_type = lhs_type.base_type_;
         base_expr_type rhs_base_type = a.expr_.expression_type().base_type_;
-        // int -> double promotion
+        // allow int -> double promotion
         bool types_compatible 
           = lhs_base_type == rhs_base_type
           || ( lhs_base_type == DOUBLE_T && rhs_base_type == INT_T );
         if (!types_compatible) {
           error_msgs << "base type mismatch in assignment"
-                     << "; left variable=" << a.var_dims_.name_
-                     << "; left base type=";
+                     << "; variable name = "
+                     << a.var_dims_.name_
+                     << ", type = ";
           write_base_expr_type(error_msgs,lhs_base_type);
-          error_msgs << "; right base type=";
+          error_msgs << "; right-hand side type=";
           write_base_expr_type(error_msgs,rhs_base_type);
           error_msgs << std::endl;
+          return false;
+        }
+        if (lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
+          error_msgs << "dimension mismatch in assignment"
+                     << "; variable name = "
+                     << a.var_dims_.name_
+                     << ", num dimensions given = "
+                     << lhs_type.num_dims_
+                     << "; right-hand side dimensions = "
+                     << a.expr_.expression_type().num_dims_
+                     << std::endl;
           return false;
         }
         return true;
@@ -236,6 +245,18 @@ namespace stan {
           error_msgs << "unknown distribution=" << s.dist_.family_ << std::endl;
           return false;
         }
+
+        if (function_name == "lkj_cov_log") {
+          error_msgs << "Warning: the lkj_cov_log() sampling distribution"
+                     << " is deprecated.  It will be removed in Stan 3."
+                     << std::endl
+                     << "Code LKJ covariance in terms of an lkj_corr()"
+                     << " distribution on a correlation matrix"
+                     << " and independent lognormals on the scales."
+                     << std::endl << std::endl;
+
+        }
+
         // test for LHS not being purely a variable
         if (has_non_param_var(s.expr_,var_map)) {
           // FIXME:  really want to get line numbers in here too
@@ -486,16 +507,6 @@ namespace stan {
     };
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
 
-    // // REMOVE ME
-    // namespace stan { 
-    //   namespace gm {
-    //     void generate_statement(const statement& s,
-    //                             int indent,
-    //                             std::ostream& os,
-    //                             bool is_var, bool is_fun_return, bool include_sampling);
-    //   }
-    // }
-
     struct validate_non_void_expression {
       template <typename T1, typename T2, typename T3>
       struct result { typedef void type; };
@@ -549,7 +560,8 @@ namespace stan {
         | while_statement_r(_r1,_r2,_r3)            // key "while"
         | statement_2_g(_r1,_r2,_r3)                // key "if"
         | print_statement_r(_r2)                    // key "print"
-        | return_statement_r(_r2)               // key "return"
+        | reject_statement_r(_r2)                   // key "reject"
+        | return_statement_r(_r2)                   // key "return"
         | void_return_statement_r(_r2)              // key "return"
         | assignment_r(_r2)                         // lvalue "<-"
         | sample_r(_r1,_r2)                         // expression "~"
@@ -573,7 +585,7 @@ namespace stan {
       // inherited  _r1 = true if samples allowed as statements
       increment_log_prob_statement_r.name("increment log prob statement");
       increment_log_prob_statement_r
-        %= lit("increment_log_prob") 
+        %= (lit("increment_log_prob") >> no_skip[!char_("a-zA-Z0-9_")])
         > eps[ validate_allow_sample_f(_r1,_pass,
                                        boost::phoenix::ref(error_msgs_)) ]
         > lit('(')
@@ -586,7 +598,7 @@ namespace stan {
       // _r1, _r2, _r3 same as statement_r
       while_statement_r.name("while statement");
       while_statement_r
-        = lit("while")
+        = (lit("while") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > expression_g(_r2)
           [_pass = add_while_condition_f(_val,_1,
@@ -600,7 +612,7 @@ namespace stan {
       // _r1, _r2, _r3 same as statement_r
       for_statement_r.name("for statement");
       for_statement_r
-        %= lit("for")
+        %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > identifier_r [_pass 
                         = add_loop_identifier_f(_1,_a,
@@ -616,7 +628,15 @@ namespace stan {
 
       print_statement_r.name("print statement");
       print_statement_r
-        %= lit("print")
+        %= (lit("print") >> no_skip[!char_("a-zA-Z0-9_")])
+        > lit('(')
+        > (printable_r(_r1) % ',')
+        > lit(')');
+
+      // reject
+      reject_statement_r.name("reject statement");
+      reject_statement_r
+        %= (lit("reject") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > (printable_r(_r1) % ',')
         > lit(')');
@@ -711,7 +731,7 @@ namespace stan {
       // _r1 = allow sampling, _r2 = var origin
       return_statement_r.name("return statement");
       return_statement_r
-        %= lit("return")
+        %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
         >> expression_g(_r1)
         >> lit(';') [ validate_return_allowed_f(_r1,_pass,
                                                 boost::phoenix::ref(error_msgs_)) ]

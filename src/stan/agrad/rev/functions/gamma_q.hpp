@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__GAMMA_Q_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__GAMMA_Q_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__GAMMA_Q_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__GAMMA_Q_HPP
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
@@ -7,7 +7,7 @@
 #include <stan/agrad/rev/internal/dv_vari.hpp>
 #include <stan/agrad/rev/internal/vd_vari.hpp>
 #include <stan/math/functions/gamma_q.hpp>
-#include <stan/prob/internal_math.hpp>
+#include <stan/prob/internal_math/math/grad_reg_inc_gamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 
@@ -23,7 +23,7 @@ namespace stan {
         }
         void chain() {
           avi_->adj_ += adj_ 
-            * stan::math::gradRegIncGamma(avi_->val_, bvi_->val_,
+            * stan::math::grad_reg_inc_gamma(avi_->val_, bvi_->val_,
                                           boost::math::tgamma(avi_->val_),
                                           boost::math::digamma(avi_->val_));
           bvi_->adj_ -= adj_ 
@@ -39,7 +39,7 @@ namespace stan {
         }
         void chain() {
           avi_->adj_ += adj_ 
-            * stan::math::gradRegIncGamma(avi_->val_, bd_,
+            * stan::math::grad_reg_inc_gamma(avi_->val_, bd_,
                                           boost::math::tgamma(avi_->val_),
                                           boost::math::digamma(avi_->val_));
         }

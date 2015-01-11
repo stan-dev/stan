@@ -1,7 +1,9 @@
-#ifndef __STAN__MATH__MATRIX__EXP_HPP__
-#define __STAN__MATH__MATRIX__EXP_HPP__
+#ifndef STAN__MATH__MATRIX__EXP_HPP
+#define STAN__MATH__MATRIX__EXP_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <limits>
 
 namespace stan {
   namespace math {
@@ -15,6 +17,18 @@ namespace stan {
     template<typename T, int Rows, int Cols>
     inline Eigen::Matrix<T,Rows,Cols> exp(const Eigen::Matrix<T,Rows,Cols>& m) {
       return m.array().exp().matrix();
+    }
+    
+    //FIXME:
+    //specialization not needed once Eigen fixes issue:
+    //http://eigen.tuxfamily.org/bz/show_bug.cgi?id=859
+    template<int Rows, int Cols>
+    inline Eigen::Matrix<double,Rows,Cols> exp(const Eigen::Matrix<double,Rows,Cols>& m) {
+      Eigen::Matrix<double,Rows,Cols> mat = m.array().exp().matrix();
+      for (int i = 0, size_ = mat.size(); i < size_; i++)
+        if (boost::math::isnan(m(i)))
+          mat(i) = std::numeric_limits<double>::quiet_NaN();
+      return mat;
     }
     
   }

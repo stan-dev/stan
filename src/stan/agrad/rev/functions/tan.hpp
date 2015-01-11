@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__FUNCTIONS__TAN_HPP__
-#define __STAN__AGRAD__REV__FUNCTIONS__TAN_HPP__
+#ifndef STAN__AGRAD__REV__FUNCTIONS__TAN_HPP
+#define STAN__AGRAD__REV__FUNCTIONS__TAN_HPP
 
 #include <cmath>
 #include <stan/agrad/rev/var.hpp>
@@ -26,6 +26,23 @@ namespace stan {
      * The derivative is defined by
      *
      * \f$\frac{d}{dx} \tan x = \sec^2 x\f$.
+     *
+     *
+       \f[
+       \mbox{tan}(x) = 
+       \begin{cases}
+         \tan(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{tan}(x)}{\partial x} = 
+       \begin{cases}
+         \sec^2(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      * @param a Variable for radians of angle.
      * @return Tangent of variable. 

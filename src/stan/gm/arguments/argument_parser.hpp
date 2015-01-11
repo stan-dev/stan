@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__ARGUMENT__PARSER__HPP__
-#define __STAN__GM__ARGUMENTS__ARGUMENT__PARSER__HPP__
+#ifndef STAN__GM__ARGUMENTS__ARGUMENT__PARSER__HPP
+#define STAN__GM__ARGUMENTS__ARGUMENT__PARSER__HPP
 
 #include <string>
 #include <vector>
@@ -47,7 +47,7 @@ namespace stan {
         
         std::vector<argument*> unset_args = _arguments;
         
-        while(good_arg) {
+        while (good_arg) {
           
           if (args.size() == 0)
             break;

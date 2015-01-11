@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__FWD__FUNCTIONS__LOG_DIFF_EXP_HPP__
-#define __STAN__AGRAD__FWD__FUNCTIONS__LOG_DIFF_EXP_HPP__
+#ifndef STAN__AGRAD__FWD__FUNCTIONS__LOG_DIFF_EXP_HPP
+#define STAN__AGRAD__FWD__FUNCTIONS__LOG_DIFF_EXP_HPP
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/log_diff_exp.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan{
 

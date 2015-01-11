@@ -1,8 +1,8 @@
-#ifndef __STAN__MATH__MATRIX__LOG_DETERMINANT_HPP__
-#define __STAN__MATH__MATRIX__LOG_DETERMINANT_HPP__
+#ifndef STAN__MATH__MATRIX__LOG_DETERMINANT_HPP
+#define STAN__MATH__MATRIX__LOG_DETERMINANT_HPP
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace math {
@@ -16,7 +16,7 @@ namespace stan {
      */
     template <typename T,int R, int C>
     inline T log_determinant(const Eigen::Matrix<T,R,C>& m) {
-      stan::math::check_square("log_determinant(%1%)",m,"m",(double*)0);
+      stan::error_handling::check_square("log_determinant", "m", m);
       return m.colPivHouseholderQr().logAbsDeterminant();
     }
     

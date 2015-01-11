@@ -1,5 +1,5 @@
-#ifndef __STAN__COMMON__COMMAND_HPP__
-#define __STAN__COMMON__COMMAND_HPP__
+#ifndef STAN__COMMON__COMMAND_HPP
+#define STAN__COMMON__COMMAND_HPP
 
 #include <fstream>
 #include <stdexcept>
@@ -33,7 +33,6 @@
 #include <stan/model/util.hpp>
 
 #include <stan/optimization/newton.hpp>
-#include <stan/optimization/nesterov_gradient.hpp>
 #include <stan/optimization/bfgs.hpp>
 
 #include <stan/common/write_iteration_csv.hpp>
@@ -53,6 +52,8 @@
 #include <stan/common/init_windowed_adapt.hpp>
 #include <stan/common/recorder/csv.hpp>
 #include <stan/common/recorder/messages.hpp>
+#include <stan/common/initialize_state.hpp>
+#include <stan/common/context_factory.hpp>
 
 namespace stan {
 
@@ -82,9 +83,6 @@ namespace stan {
       
       if (parser.help_printed())
         return err_code;
-
-      parser.print(&std::cout);
-      std::cout << std::endl;
       
       // Identification
       unsigned int id = dynamic_cast<stan::gm::int_argument*>(parser.arg("id"))->value();
@@ -159,6 +157,9 @@ namespace stan {
 
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
+      parser.print(&std::cout);
+      std::cout << std::endl;
+      
       if (output_stream) {
         write_stan(output_stream, "#");
         write_model(output_stream, model.model_name(), "#");
@@ -171,149 +172,14 @@ namespace stan {
         parser.print(diagnostic_stream, "#");
       }
       
-      int num_init_tries = -1;
-      
       std::string init = dynamic_cast<stan::gm::string_argument*>(
                          parser.arg("init"))->value();
       
-      try {
-        
-        double R = std::fabs(boost::lexical_cast<double>(init));
-        
-        if (R == 0) {
-          
-          cont_params.setZero();
-          
-          double init_log_prob;
-          Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-          
-          try {
-            stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
-          } catch (const std::exception& e) {
-            std::cout << "Rejecting initialization at zero because of gradient failure."
-                      << std::endl 
-                      << e.what() << std::endl;
-            return stan::gm::error_codes::OK;
-          }
-          
-          if (!boost::math::isfinite(init_log_prob)) {
-            std::cout << "Rejecting initialization at zero because of vanishing density." 
-                      << std::endl;
-            return 0;
-          }
-          
-          for (int i = 0; i < init_grad.size(); ++i) {
-            if (!boost::math::isfinite(init_grad[i])) {
-              std::cout << "Rejecting initialization at zero because of divergent gradient."
-                        << std::endl;
-              return 0;
-            }
-          }
-
-        } else {
-          
-          boost::random::uniform_real_distribution<double>
-          init_range_distribution(-R, R);
-          
-          boost::variate_generator<rng_t&,
-          boost::random::uniform_real_distribution<double> >
-          init_rng(base_rng, init_range_distribution);
-          
-          cont_params.setZero();
-          
-          // Random initializations until log_prob is finite
-          Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-          static int MAX_INIT_TRIES = 100;
-          
-          for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
-            
-            for (int i = 0; i < cont_params.size(); ++i)
-              cont_params(i) = init_rng();
-            
-            // FIXME: allow config vs. std::cout
-            double init_log_prob;
-            try {
-              stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
-            } catch (const std::exception& e) {
-              write_error_msg(&std::cout, e);
-              std::cout << "Rejecting proposed initial value with zero density." 
-                        << std::endl;
-              init_log_prob = -std::numeric_limits<double>::infinity();
-            }
-            
-            if (!boost::math::isfinite(init_log_prob))
-              continue;
-            for (int i = 0; i < init_grad.size(); ++i)
-              if (!boost::math::isfinite(init_grad(i)))
-                continue;
-            break;
-            
-          }
-          
-          if (num_init_tries > MAX_INIT_TRIES) {
-            std::cout << std::endl << std::endl
-                      << "Initialization between (" << -R << ", " << R << ") failed after "
-                      << MAX_INIT_TRIES << " attempts. " << std::endl;
-            std::cout << " Try specifying initial values,"
-                      << " reducing ranges of constrained values,"
-                      << " or reparameterizing the model."
-                      << std::endl;
-            return -1;
-          }
-          
-        }
-        
-      } catch(...) {
-      
-        try {
-        
-          std::fstream init_stream(init.c_str(), std::fstream::in);
-          if (init_stream.fail()) {
-            std::string msg("ERROR: specified initialization file does not exist: ");
-            msg += init;
-            throw std::invalid_argument(msg);
-          }
-          
-          stan::io::dump init_var_context(init_stream);
-          init_stream.close();
-          model.transform_inits(init_var_context, cont_params);
-        
-        } catch (const std::exception& e) {
-          std::cerr << "Error during user-specified initialization:" << std::endl
-                    << e.what() << std::endl;
-          return -5;
-        }
-        
-        double init_log_prob;
-        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-        
-        try {
-          stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
-        } catch (const std::exception& e) {
-          std::cout 
-            << "Rejecting user-specified initialization because of gradient failure."
-            << std::endl
-            << e.what() << std::endl;
-          return 0;
-        }
-        
-        if (!boost::math::isfinite(init_log_prob)) {
-          std::cout 
-            << "Rejecting user-specified initialization because of vanishing density."
-            << std::endl;
-          return 0;
-        }
-        
-        for (int i = 0; i < init_grad.size(); ++i) {
-          if (!boost::math::isfinite(init_grad[i])) {
-            std::cout 
-              << "Rejecting user-specified initialization because of divergent gradient."
-              << std::endl;
-            return 0;
-          }
-        }
-        
-      }
+      dump_factory var_context_factory;
+      if (!initialize_state<dump_factory>
+          (init, cont_params, model, base_rng, &std::cout,
+           var_context_factory))
+        return stan::gm::error_codes::SOFTWARE;
       
       //////////////////////////////////////////////////
       //               Model Diagnostics              //
@@ -395,45 +261,7 @@ namespace stan {
 
         double lp(0);
         int return_code = stan::gm::error_codes::CONFIG;
-        if (algo->value() == "nesterov") {
-          bool epsilon = dynamic_cast<stan::gm::real_argument*>(
-                         algo->arg("nesterov")->arg("stepsize"))->value();
-          
-          
-          stan::optimization::NesterovGradient<Model> ng(model, cont_vector, disc_vector,
-                                                         epsilon, &std::cout);
-          
-          lp = ng.logp();
-          
-          double lastlp = lp - 1;
-          std::cout << "Initial log joint probability = " << lp << std::endl;
-          if (output_stream && save_iterations) {
-            write_iteration(*output_stream, model, base_rng,
-                            lp, cont_vector, disc_vector);
-          }
-
-          int m = 0;
-          for (int i = 0; i < num_iterations; i++) {
-            lastlp = lp;
-            lp = ng.step();
-            ng.params_r(cont_vector);
-            if (do_print(i, refresh)) {
-              std::cout << "Iteration ";
-              std::cout << std::setw(2) << (m + 1) << ". ";
-              std::cout << "Log joint probability = " << std::setw(10) << lp;
-              std::cout << ". Improved by " << (lp - lastlp) << ".";
-              std::cout << std::endl;
-              std::cout.flush();
-            }
-            m++;
-            if (output_stream && save_iterations) {
-              write_iteration(*output_stream, model, base_rng,
-                              lp, cont_vector, disc_vector);
-            }
-
-          }
-          return_code = stan::gm::error_codes::OK;
-        } else if (algo->value() == "newton") {
+        if (algo->value() == "newton") {
           std::vector<double> gradient;
           try {
             lp = model.template log_prob<false, false>(cont_vector, disc_vector, &std::cout);
@@ -471,6 +299,7 @@ namespace stan {
           }
           return_code = stan::gm::error_codes::OK;
         } else if (algo->value() == "bfgs") {
+          NoOpFunctor callback;
           typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
           Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
 
@@ -491,8 +320,10 @@ namespace stan {
           return_code = do_bfgs_optimize(model,bfgs, base_rng,
                                          lp, cont_vector, disc_vector,
                                          output_stream, &std::cout, 
-                                         save_iterations, refresh);
+                                         save_iterations, refresh,
+                                         callback);
         } else if (algo->value() == "lbfgs") {
+          NoOpFunctor callback;
           typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::LBFGSUpdate<> > Optimizer;
           Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
 
@@ -515,7 +346,8 @@ namespace stan {
           return_code = do_bfgs_optimize(model,bfgs, base_rng,
                                          lp, cont_vector, disc_vector,
                                          output_stream, &std::cout, 
-                                         save_iterations, refresh);
+                                         save_iterations, refresh,
+                                         callback);
         } else {
           return_code = stan::gm::error_codes::CONFIG;
         }
@@ -555,7 +387,7 @@ namespace stan {
         
         stan::common::recorder::csv sample_recorder(output_stream, "# ");
         stan::common::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
-        stan::common::recorder::messages message_recorder(output_stream, "# ");
+        stan::common::recorder::messages message_recorder(&std::cout, "# ");
         
         stan::io::mcmc_writer<Model, 
                               stan::common::recorder::csv, stan::common::recorder::csv,
@@ -771,7 +603,7 @@ namespace stan {
         // Sampling
         start = clock();
         
-        sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
+        stan::common::sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
                              refresh, true,
                              writer,
                              s, model, base_rng,

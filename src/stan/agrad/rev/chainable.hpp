@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__CHAINABLE_HPP__
-#define __STAN__AGRAD__REV__CHAINABLE_HPP__
+#ifndef STAN__AGRAD__REV__CHAINABLE_HPP
+#define STAN__AGRAD__REV__CHAINABLE_HPP
 
 #include <vector>
 #include <stan/agrad/rev/var_stack.hpp>
@@ -61,7 +61,7 @@ namespace stan {
        * @return Pointer to allocated bytes.
        */
       static inline void* operator new(size_t nbytes) {
-        return memalloc_.alloc(nbytes);
+        return ChainableStack::memalloc_.alloc(nbytes);
       }
 
       /**
@@ -85,31 +85,44 @@ namespace stan {
      * Reset all adjoint values in the stack to zero.
      */
     static void set_zero_all_adjoints() {
-      for (size_t i = 0; i < var_stack_.size(); ++i)
-        var_stack_[i]->set_zero_adjoint();
-      for (size_t i = 0; i < var_nochain_stack_.size(); ++i)
-        var_nochain_stack_[i]->set_zero_adjoint();
+      for (size_t i = 0; i < ChainableStack::var_stack_.size(); ++i)
+        ChainableStack::var_stack_[i]->set_zero_adjoint();
+      for (size_t i = 0; i < ChainableStack::var_nochain_stack_.size(); ++i)
+        ChainableStack::var_nochain_stack_[i]->set_zero_adjoint();
     }
 
     /**
      * Compute the gradient for all variables starting from the
      * specified root variable implementation.  Does not recover
-     * memory.  This chainable variable's adjoint is initialized
-     * using the method <code>init_dependent()</code> and then the
-     * chain rule is applied working down the stack from this
-     * chainable and calling each chainable's <code>chain()</code>
-     * method in turn.
+     * memory.  This chainable variable's adjoint is initialized using
+     * the method <code>init_dependent()</code> and then the chain
+     * rule is applied working down the stack from this chainable and
+     * calling each chainable's <code>chain()</code> method in turn.
      *
+     * <p>This function computes a nested gradient only going back as far
+     * as the last nesting.
+     *
+     * <p>This function does not recover any memory from the computation.
+     * 
      * @param vi Variable implementation for root of partial
      * derivative propagation.
      */
     static void grad(chainable* vi) {
-      std::vector<chainable*>::reverse_iterator it;
 
+      // simple reference implementation (intended as doc):
+      //   vi->init_dependent(); 
+      //   size_t end = var_stack_.size();
+      //   size_t begin = empty_nested() ? 0 : end - nested_size();
+      //   for (size_t i = end; --i > begin; )  
+      //     var_stack_[i]->chain();
+
+      typedef std::vector<chainable*>::reverse_iterator it_t;
       vi->init_dependent(); 
-      // propagate derivates for vars
-      for (it = var_stack_.rbegin(); it < var_stack_.rend(); ++it)
+      it_t begin = ChainableStack::var_stack_.rbegin();
+      it_t end = empty_nested() ? ChainableStack::var_stack_.rend() : begin + nested_size();
+      for (it_t it = begin; it < end; ++it) {
         (*it)->chain();
+      }
     }
 
   }

@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__AUTOCORRELATION_HPP__
-#define __STAN__PROB__AUTOCORRELATION_HPP__
+#ifndef STAN__PROB__AUTOCORRELATION_HPP
+#define STAN__PROB__AUTOCORRELATION_HPP
 
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/mean.hpp>
@@ -22,9 +22,9 @@ namespace stan {
         if (N <= 2) return 2;
         while (true) {
           size_t m = N;
-          while((m % 2) == 0) m /= 2;
-          while((m % 3) == 0) m /= 3;
-          while((m % 5) == 0) m /= 5;
+          while ((m % 2) == 0) m /= 2;
+          while ((m % 3) == 0) m /= 3;
+          while ((m % 5) == 0) m /= 5;
           if (m <= 1)
             return N; 
           N++;

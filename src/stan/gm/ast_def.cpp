@@ -309,7 +309,6 @@ namespace stan {
                               function_signature_t& signature) {
 
       std::vector<function_signature_t> signatures = sigs_map_[name];
-      size_t match_index = 0; 
       size_t min_promotions = std::numeric_limits<size_t>::max(); 
       size_t num_matches = 0;
       for (size_t i = 0; i < signatures.size(); ++i) {
@@ -319,7 +318,6 @@ namespace stan {
         size_t promotions_ui = static_cast<size_t>(promotions);
         if (promotions_ui < min_promotions) {
           min_promotions = promotions_ui;
-          match_index = i;
           num_matches = 1;
         } else if (promotions_ui == min_promotions) {
           ++num_matches;
@@ -463,6 +461,11 @@ namespace stan {
                  << std::endl;
       return false;
     }
+    bool returns_type_vis::operator()(const reject_statement& st) const  {
+      error_msgs_ << "Expecting return, found reject statement." 
+                 << std::endl;
+      return false;
+    }
     bool returns_type_vis::operator()(const no_op_statement& st) const  {
       error_msgs_ << "Expecting return, found no_op statement." 
                  << std::endl;
@@ -530,10 +533,6 @@ namespace stan {
     expr_type expression_type_vis::operator()(const nil& /*e*/) const {
       return expr_type();
     }
-    // template <typename T>
-    // expr_type expression_type_vis::operator()(const T& e) const {
-    //   return e.type_;
-    // }
     expr_type expression_type_vis::operator()(const int_literal& e) const {
       return e.type_;
     }
@@ -545,6 +544,9 @@ namespace stan {
     }
     expr_type expression_type_vis::operator()(const variable& e) const {
       return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const integrate_ode& e) const {
+      return expr_type(DOUBLE_T,2);
     }
     expr_type expression_type_vis::operator()(const fun& e) const {
       return e.type_;
@@ -578,6 +580,7 @@ namespace stan {
     expression::expression(const double_literal& expr) : expr_(expr) { }
     expression::expression(const array_literal& expr) : expr_(expr) { }
     expression::expression(const variable& expr) : expr_(expr) { }
+    expression::expression(const integrate_ode& expr) : expr_(expr) { }
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
     expression::expression(const binary_op& expr) : expr_(expr) { }
@@ -611,15 +614,21 @@ namespace stan {
     }
     bool contains_var::operator()(const variable& e) const {
       var_origin vo = var_map_.get_origin(e.name_);
-      return ( vo == parameter_origin
-               || vo == transformed_parameter_origin
-               || vo == local_origin );
+      return vo == parameter_origin
+        || vo == transformed_parameter_origin
+        || ( vo == local_origin && e.type_.base_type_ != INT_T);
     }
     bool contains_var::operator()(const fun& e) const {
       for (size_t i = 0; i < e.args_.size(); ++i)
         if (boost::apply_visitor(*this,e.args_[i].expr_))
           return true;
       return false;
+    }
+    bool contains_var::operator()(const integrate_ode& e) const {
+      // only init state and params may contain vars
+      return boost::apply_visitor(*this, e.y0_.expr_)
+        || boost::apply_visitor(*this, e.theta_.expr_)
+        ;
     }
     bool contains_var::operator()(const index_op& e) const {
       return boost::apply_visitor(*this,e.expr_.expr_);
@@ -635,6 +644,7 @@ namespace stan {
     bool is_linear_function(const std::string& name) {
       return name == "add"
         || name == "block"
+        || name == "append_col"
         || name == "col"
         || name == "cols"
         || name == "diagonal"
@@ -642,6 +652,7 @@ namespace stan {
         || name == "minus"
         || name == "negative_infinity"
         || name == "not_a_number"
+        || name == "append_row"
         || name == "rep_matrix"
         || name == "rep_row_vector"
         || name == "rep_vector"
@@ -689,6 +700,12 @@ namespace stan {
       var_origin vo = var_map_.get_origin(e.name_);
       return ( vo == transformed_parameter_origin
                || vo == local_origin );
+    }
+    bool contains_nonparam_var::operator()(const integrate_ode& e) const {
+      // if any vars, return true because integration will be nonlinear
+      return boost::apply_visitor(*this, e.y0_.expr_)
+        || boost::apply_visitor(*this, e.theta_.expr_)
+        ;
     }
     bool contains_nonparam_var::operator()(const fun& e) const {
       // any function applied to non-linearly transformed var
@@ -739,6 +756,7 @@ namespace stan {
     bool is_nil_op::operator()(const double_literal& /* x */) const { return false; }
     bool is_nil_op::operator()(const array_literal& /* x */) const { return false; }
     bool is_nil_op::operator()(const variable& /* x */) const { return false; }
+    bool is_nil_op::operator()(const integrate_ode& /* x */) const { return false; }
     bool is_nil_op::operator()(const fun& /* x */) const { return false; }
     bool is_nil_op::operator()(const index_op& /* x */) const { return false; }
     bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
@@ -811,6 +829,24 @@ namespace stan {
     void variable::set_type(const base_expr_type& base_type, 
                             size_t num_dims) {
       type_ = expr_type(base_type, num_dims);
+    }
+
+
+    integrate_ode::integrate_ode() { }
+    integrate_ode::integrate_ode(const std::string& system_function_name,
+                         const expression& y0,
+                         const expression& t0,
+                         const expression& ts,
+                         const expression& theta,
+                         const expression& x,
+                         const expression& x_int) 
+      : system_function_name_(system_function_name),
+        y0_(y0),
+        t0_(t0),
+        ts_(ts),
+        theta_(theta),
+        x_(x),
+        x_int_(x_int) {
     }
 
 
@@ -1091,6 +1127,16 @@ namespace stan {
         N_(N) {
     }
 
+    cholesky_corr_var_decl::cholesky_corr_var_decl() 
+      : base_var_decl(MATRIX_T) { 
+    }
+    cholesky_corr_var_decl::cholesky_corr_var_decl(expression const& K,
+                                                   std::string const& name,
+                                                   std::vector<expression> const& dims)
+      : base_var_decl(name,dims,MATRIX_T),
+        K_(K) {
+    }
+
     cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(MATRIX_T) { 
     }
     cov_matrix_var_decl::cov_matrix_var_decl(expression const& K,
@@ -1145,6 +1191,9 @@ namespace stan {
     std::string name_vis::operator()(const cholesky_factor_var_decl& x) const {
       return x.name_;
     }
+    std::string name_vis::operator()(const cholesky_corr_var_decl& x) const {
+      return x.name_;
+    }
     std::string name_vis::operator()(const cov_matrix_var_decl& x) const {
       return x.name_;
     }
@@ -1168,6 +1217,7 @@ namespace stan {
     var_decl::var_decl(const ordered_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const positive_ordered_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const cholesky_factor_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const cholesky_corr_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const cov_matrix_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const corr_matrix_var_decl& decl) : decl_(decl) { }
 
@@ -1188,6 +1238,7 @@ namespace stan {
     statement::statement(const while_statement& st) : statement_(st) { }
     statement::statement(const conditional_statement& st) : statement_(st) { }
     statement::statement(const print_statement& st) : statement_(st) { }
+    statement::statement(const reject_statement& st) : statement_(st) { }
     statement::statement(const return_statement& st) : statement_(st) { }
     statement::statement(const no_op_statement& st) : statement_(st) { }
 
@@ -1220,6 +1271,9 @@ namespace stan {
       return false; 
     }
     bool is_no_op_statement_vis::operator()(const print_statement& st) const {
+      return false; 
+    }
+    bool is_no_op_statement_vis::operator()(const reject_statement& st) const {
       return false; 
     }
     bool is_no_op_statement_vis::operator()(const no_op_statement& st) const { 
@@ -1275,6 +1329,12 @@ namespace stan {
     print_statement::print_statement() { }
 
     print_statement::print_statement(const std::vector<printable>& printables) 
+      : printables_(printables) { 
+    }
+
+    reject_statement::reject_statement() { }
+
+    reject_statement::reject_statement(const std::vector<printable>& printables) 
       : printables_(printables) { 
     }
     

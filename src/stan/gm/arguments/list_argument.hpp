@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__LIST__ARGUMENT__BETA__
-#define __STAN__GM__ARGUMENTS__LIST__ARGUMENT__BETA__
+#ifndef STAN__GM__ARGUMENTS__LIST__ARGUMENT__BETA
+#define STAN__GM__ARGUMENTS__LIST__ARGUMENT__BETA
 
 #include <iostream>
 #include <stan/gm/arguments/valued_argument.hpp>

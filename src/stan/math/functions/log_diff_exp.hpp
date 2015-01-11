@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LOG_DIFF_EXP_HPP__
-#define __STAN__MATH__FUNCTIONS__LOG_DIFF_EXP_HPP__
+#ifndef STAN__MATH__FUNCTIONS__LOG_DIFF_EXP_HPP
+#define STAN__MATH__FUNCTIONS__LOG_DIFF_EXP_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stdexcept>
@@ -14,6 +14,34 @@ namespace stan {
      * of x1 and the natural exponentiation of x2
      *
      * This function is only defined for x<0
+     *
+     *
+       \f[
+       \mbox{log\_diff\_exp}(x,y) = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x \leq y\\
+         \ln(\exp(x)-\exp(y)) & \mbox{if } x > y \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial x} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x \leq y\\
+         \frac{\exp(x)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
+       
+       \f[
+       \frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial y} = 
+       \begin{cases}
+         \textrm{NaN} & \mbox{if } x \leq y\\
+         -\frac{\exp(y)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt]
+         \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
+       \end{cases}
+       \f]
      *
      */
     template <typename T1, typename T2>
