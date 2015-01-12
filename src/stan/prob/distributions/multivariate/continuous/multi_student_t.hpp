@@ -31,13 +31,11 @@ namespace stan {
      */
     template <bool propto,
               typename T_y, typename T_dof, typename T_loc, typename T_scale>
-    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type,T_dof,typename scalar_type<T_loc>::type,T_scale>::type
+    typename return_type<T_y, T_dof, T_loc, T_scale>::type
     multi_student_t_log(const T_y& y,
                         const T_dof& nu,
                         const T_loc& mu,
-                        const 
-                        Eigen::Matrix<T_scale,
-                        Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+                        const T_scale& Sigma) {
       static const char* function("stan::prob::multi_student_t");
 
       using stan::math::check_size_match;
@@ -51,7 +49,8 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
 
-      typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type,T_dof,typename scalar_type<T_loc>::type,T_scale>::type lp_type;
+      typedef typename scalar_type<T_scale>::type T_scale_elem;
+      typedef typename return_type<T_y, T_dof, T_loc, T_scale>::type lp_type;
       lp_type lp(0.0);
       
       // allows infinities
@@ -118,7 +117,7 @@ namespace stan {
       check_symmetric(function, "Scale parameter", Sigma);
 
       
-      LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
+      LDLT_factor<T_scale_elem,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
       check_ldlt_factor(function, "LDLT_Factor of scale parameter", ldlt_Sigma);
 
       if (size_y == 0) //y_vec[0].size() == 0
@@ -139,16 +138,14 @@ namespace stan {
       using Eigen::Array;
 
 
-      if (include_summand<propto,T_scale>::value) {
+      if (include_summand<propto,T_scale_elem>::value) {
         lp -= 0.5 * log_determinant_ldlt(ldlt_Sigma) * size_vec;
       }
 
-      if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
+      if (include_summand<propto,T_y,T_dof,T_loc,T_scale_elem>::value) {
         lp_type sum_lp_vec(0.0);
         for (size_t i = 0; i < size_vec; i++) {
-          Matrix<typename 
-                 boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type>::type,
-                 Dynamic, 1> y_minus_mu(size_y);
+          Eigen::Matrix<typename return_type<T_y, T_loc>::type, Eigen::Dynamic, 1> y_minus_mu(size_y);
           for (int j = 0; j < size_y; j++)
             y_minus_mu(j) = y_vec[i](j)-mu_vec[i](j);
           sum_lp_vec += log(1.0 + trace_inv_quad_form_ldlt(ldlt_Sigma,y_minus_mu) / nu);
@@ -160,13 +157,8 @@ namespace stan {
 
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
     inline 
-    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type,T_dof,typename scalar_type<T_loc>::type,T_scale>::type
-    multi_student_t_log(const T_y& y,
-                        const T_dof& nu,
-                        const T_loc& mu,
-                        const 
-                        Eigen::Matrix<T_scale,
-                        Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+    typename return_type<T_y, T_dof, T_loc, T_scale>::type
+    multi_student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& Sigma) {
       return multi_student_t_log<false>(y,nu,mu,Sigma);
     }
 

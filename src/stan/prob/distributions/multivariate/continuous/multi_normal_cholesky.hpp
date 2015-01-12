@@ -44,12 +44,13 @@ namespace stan {
      */
     template <bool propto,
               typename T_y, typename T_loc, typename T_covar>
-    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type
+    typename return_type<T_y, T_loc, T_covar>::type
     multi_normal_cholesky_log(const T_y& y,
                               const T_loc& mu,
-                              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
+                              const T_covar& L) {
       static const char* function("stan::prob::multi_normal_cholesky_log");
-      typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp_type;
+      typedef typename scalar_type<T_covar>::type T_covar_elem;
+      typedef typename return_type<T_y, T_loc, T_covar>::type lp_type;
       lp_type lp(0.0);
 
       using stan::math::mdivide_left_tri_low;
@@ -116,24 +117,20 @@ namespace stan {
       if (include_summand<propto>::value) 
         lp += NEG_LOG_SQRT_TWO_PI * size_y * size_vec;
 
-      if (include_summand<propto,T_covar>::value)
+      if (include_summand<propto,T_covar_elem>::value)
         lp -= L.diagonal().array().log().sum() * size_vec;
 
-      if (include_summand<propto,T_y,T_loc,T_covar>::value) {
+      if (include_summand<propto,T_y,T_loc,T_covar_elem>::value) {
         lp_type sum_lp_vec(0.0);
         for (size_t i = 0; i < size_vec; i++) {
-          Eigen::Matrix<typename 
-                        boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type>::type,
-                        Eigen::Dynamic, 1> y_minus_mu(size_y);
+	  Eigen::Matrix<typename return_type<T_y, T_loc>::type, Eigen::Dynamic, 1> y_minus_mu(size_y);
           for (int j = 0; j < size_y; j++)
             y_minus_mu(j) = y_vec[i](j)-mu_vec[i](j);
-          Eigen::Matrix<typename 
-                        boost::math::tools::promote_args<T_covar,typename scalar_type<T_loc>::type,typename scalar_type<T_y>::type>::type,
-                        Eigen::Dynamic, 1> 
-            half(mdivide_left_tri_low(L,y_minus_mu));
+          Eigen::Matrix<typename return_type<T_y, T_loc, T_covar>::type, Eigen::Dynamic, 1>
+	    half(mdivide_left_tri_low(L,y_minus_mu));
           // FIXME: this code does not compile. revert after fixing subtract()
           // Eigen::Matrix<typename 
-          //               boost::math::tools::promote_args<T_covar,typename scalar_type<T_loc>::type,typename scalar_type<T_y>::type>::type>::type,
+          //               boost::math::tools::promote_args<T_covar,typename value_type<T_loc>::type,typename value_type<T_y>::type>::type>::type,
           //               Eigen::Dynamic, 1> 
           //   half(mdivide_left_tri_low(L,subtract(y,mu)));
           sum_lp_vec += dot_self(half);
@@ -145,10 +142,8 @@ namespace stan {
 
     template <typename T_y, typename T_loc, typename T_covar>
     inline
-    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type
-    multi_normal_cholesky_log(const T_y& y,
-                              const T_loc& mu,
-                              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
+    typename return_type<T_y, T_loc, T_covar>::type
+    multi_normal_cholesky_log(const T_y& y, const T_loc& mu, const T_covar& L) {
       return multi_normal_cholesky_log<false>(y,mu,L);
     }
 

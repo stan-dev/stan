@@ -30,12 +30,13 @@ namespace stan {
 
     template <bool propto,
               typename T_y, typename T_loc, typename T_covar>
-    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type
+    typename return_type<T_y, T_loc, T_covar>::type
     multi_normal_prec_log(const T_y& y,
                           const T_loc& mu,
-                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+                          const T_covar& Sigma) {
       static const char* function("stan::prob::multi_normal_prec_log");
-      typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp_type;
+      typedef typename scalar_type<T_covar>::type T_covar_elem;
+      typedef typename return_type<T_y, T_loc, T_covar>::type lp_type;
       lp_type lp(0.0);
       
       using stan::math::check_not_nan;
@@ -52,7 +53,7 @@ namespace stan {
       check_positive(function, "Precision matrix rows", Sigma.rows());
       check_symmetric(function, "Precision matrix", Sigma);
       
-      LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
+      LDLT_factor<T_covar_elem,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
       check_ldlt_factor(function, "LDLT_Factor of precision parameter", ldlt_Sigma);
 
       using Eigen::Matrix;
@@ -110,18 +111,16 @@ namespace stan {
       if (size_y == 0) //y_vec[0].size() == 0
         return lp;
       
-      if (include_summand<propto,T_covar>::value)
+      if (include_summand<propto,T_covar_elem>::value)
         lp += 0.5 * log_determinant_ldlt(ldlt_Sigma) * size_vec;
 
       if (include_summand<propto>::value) 
         lp += NEG_LOG_SQRT_TWO_PI * size_y * size_vec;
 
-      if (include_summand<propto,T_y,T_loc,T_covar>::value) {
+      if (include_summand<propto,T_y,T_loc,T_covar_elem>::value) {
         lp_type sum_lp_vec(0.0);
         for (size_t i = 0; i < size_vec; i++) {
-          Matrix<typename 
-                 boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type>::type,
-                 Dynamic, 1> y_minus_mu(size_y);
+          Eigen::Matrix<typename return_type<T_y, T_loc>::type, Eigen::Dynamic, 1> y_minus_mu(size_y);
           for (int j = 0; j < size_y; j++)
             y_minus_mu(j) = y_vec[i](j)-mu_vec[i](j);
           sum_lp_vec += trace_quad_form(Sigma,y_minus_mu);
@@ -133,10 +132,8 @@ namespace stan {
     
     template <typename T_y, typename T_loc, typename T_covar>
     inline
-    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type
-    multi_normal_prec_log(const T_y& y,
-                          const T_loc& mu,
-                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+    typename return_type<T_y, T_loc, T_covar>::type
+    multi_normal_prec_log(const T_y& y, const T_loc& mu, const T_covar& Sigma) {
       return multi_normal_prec_log<false>(y,mu,Sigma);
     }
 
