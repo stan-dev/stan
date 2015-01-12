@@ -31,7 +31,7 @@ namespace stan {
           for (size_t n = 0; n < stan::length(y); n++) {
             if ((boost::math::isnan)(stan::get(y,n)))
               domain_error_vec(function, name, y, n,
-                          "is ", ", but must not be nan!");
+                               "is ", ", but must not be nan!");
           }
           return true;
         }

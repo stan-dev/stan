@@ -38,9 +38,9 @@ namespace stan {
       check_less_or_equal(function, "columns and rows of Cholesky factor",
                           y.cols(), y.rows());
       check_positive(function, "columns of Cholesky factor", y.cols());
-      // FIXME:  should report row i
       check_lower_triangular(function, name, y);
       for (int i = 0; i < y.cols(); ++i)
+        // FIXME:  should report row
         check_positive(function, name, y(i,i));
       return true;
     }

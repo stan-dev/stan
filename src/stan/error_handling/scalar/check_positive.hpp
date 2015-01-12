@@ -22,7 +22,7 @@ namespace stan {
           // floating point types that have no unsigned versions.
           if (!boost::is_unsigned<T_y>::value && !(y > 0)) 
             domain_error(function, name, y,
-                    "is ", ", but must be > 0!");
+                         "is ", ", but must be > 0!");
           return true;
         }
       };
@@ -38,7 +38,7 @@ namespace stan {
             if (!boost::is_unsigned<typename value_type<T_y>::type>::value
                 && !(stan::get(y,n) > 0)) 
               domain_error_vec(function, name, y, n,
-                          "is ", ", but must be > 0!");
+                               "is ", ", but must be > 0!");
           }
           return true;
         }

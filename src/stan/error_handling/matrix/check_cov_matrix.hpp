@@ -28,7 +28,6 @@ namespace stan {
      *   if the matrix is not positive definite, 
      *   or if any element of the matrix is nan
      */
-    // FIXME: update warnings
     template <typename T_y>
     inline bool check_cov_matrix(const std::string& function,
                                  const std::string& name,
