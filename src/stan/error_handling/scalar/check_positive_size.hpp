@@ -13,10 +13,10 @@ namespace stan {
      * @param function Function name (for error messages)
      * @param name Variable name (for error messages)
      * @param expr Expression for the dimension size (for error messages)
-     * @param val Size value to check
+     * @param size Size value to check
      *
-     * @return <code>true</code> if <code>val</code> is greater than 0.
-     * @throw <code>std::invalid_argument</code> if <code>val</code> is
+     * @return <code>true</code> if <code>size</code> is greater than 0.
+     * @throw <code>std::invalid_argument</code> if <code>size</code> is
      *   zero or negative.
      */
     inline bool check_positive_size(const std::string& function,
