@@ -36,9 +36,6 @@ namespace stan {
       using stan::math::check_symmetric;
       using stan::math::check_ldlt_factor;
 
-      check_size_match(function,
-                       "Rows of covariance parameter", Sigma.rows(), 
-                       "columns of covariance parameter", Sigma.cols());
       check_positive(function, "Covariance matrix rows", Sigma.rows());
       check_symmetric(function, "Covariance matrix", Sigma);
       

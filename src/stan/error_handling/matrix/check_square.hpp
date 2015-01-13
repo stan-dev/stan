@@ -28,8 +28,8 @@ namespace stan {
                              const std::string& name,
                              const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       check_size_match(function, 
-                       "Rows of matrix", y.rows(), 
-                       "columns of matrix", y.cols());
+                       "Expecting a square matrix; rows of ", name, y.rows(), 
+                       "columns of ", name, y.cols());
       return true;
     }
 

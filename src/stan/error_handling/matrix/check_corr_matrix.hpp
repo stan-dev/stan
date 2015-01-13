@@ -39,7 +39,7 @@ namespace stan {
      * @throw <code>std::invalid_argument</code> if the matrix is not square
      *   or if the matrix is 0x0
      * @throw <code>std::domain_error</code> if the matrix is non-symmetric,
-     *   diagonals not near 1, or not positive definite.
+     *   diagonals not near 1, not positive definite, or any of the elements nan.
      */
     template <typename T_y>
     inline bool check_corr_matrix(const std::string& function,

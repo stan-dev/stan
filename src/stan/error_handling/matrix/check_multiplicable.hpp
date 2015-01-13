@@ -39,8 +39,8 @@ namespace stan {
       check_positive_size(function, name1, "rows()", y1.rows());
       check_positive_size(function, name2, "cols()", y2.cols());
       check_size_match(function, 
-                       "Columns of matrix 1", y1.cols(), 
-                       "Rows of matrix 2", y2.rows());
+                       "Columns of ", name1, y1.cols(), 
+                       "Rows of ", name2, y2.rows());
       check_positive_size(function, name1, "cols()", y1.cols());
       return true;
     }

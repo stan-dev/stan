@@ -3,6 +3,7 @@
 
 #include <stan/error_handling/matrix/check_size_match.hpp>
 #include <stan/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 #include <stan/error_handling/scalar/check_greater.hpp>
 #include <stan/math/functions/lmgamma.hpp>
 #include <stan/math/matrix/crossprod.hpp>
@@ -68,6 +69,7 @@ namespace stan {
       using stan::math::check_greater;
       using stan::math::check_ldlt_factor;
       using stan::math::check_size_match;
+      using stan::math::check_square;
       using stan::math::index_type;
       using stan::math::LDLT_factor;
       using stan::math::log_determinant_ldlt;
@@ -78,12 +80,8 @@ namespace stan {
         = W.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       check_greater(function, "Degrees of freedom parameter", nu, k-1);
-      check_size_match(function, 
-                       "Rows of random variable", W.rows(), 
-                       "columns of random variable", W.cols());
-      check_size_match(function, 
-                       "Rows of scale parameter", S.rows(),
-                       "columns of scale parameter", S.cols());
+      check_square(function, "random variable", W); 
+      check_square(function, "scale parameter", S);
       check_size_match(function, 
                        "Rows of random variable", W.rows(), 
                        "columns of scale parameter", S.rows());
@@ -137,17 +135,16 @@ namespace stan {
 
       using Eigen::MatrixXd;
       using stan::math::index_type;
-      using stan::math::check_size_match;
       using stan::math::check_positive;
+      using stan::math::check_size_match;
+      using stan::math::check_square;
 
       static const std::string function("stan::prob::wishart_rng");
 
       typename index_type<MatrixXd>::type k = S.rows();
 
       check_positive(function, "degrees of freedom", nu);
-      check_size_match(function, 
-                       "Rows of scale parameter", S.rows(), 
-                       "columns of scale parameter", S.cols());
+      check_square(function, "scale parameter", S);
 
       MatrixXd B = MatrixXd::Zero(k, k);
 

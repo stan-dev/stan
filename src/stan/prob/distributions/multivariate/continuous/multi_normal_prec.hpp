@@ -49,9 +49,6 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
       
-      check_size_match(function, 
-                       "Rows of precision parameter", Sigma.rows(), 
-                       "columns of precision parameter", Sigma.cols());
       check_positive(function, "Precision matrix rows", Sigma.rows());
       check_symmetric(function, "Precision matrix", Sigma);
       

@@ -94,6 +94,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_size_match;
       using stan::math::check_spsd_matrix;
+      using stan::math::check_square;
       using stan::math::inverse_spd;
       using stan::math::log_determinant_spd;
       using stan::math::multiply;
@@ -117,20 +118,15 @@ namespace stan {
                        "rows of F", F.rows(), 
                        "rows of G", G.rows());
       check_finite(function, "F", F);
-      check_not_nan(function, "F", F);
       // check G
-      check_size_match(function,
-                       "rows of G", G.rows(),
-                       "columns of G", G.cols());
+      check_square(function, "G", G);
       check_finite(function, "G", G);
-      check_not_nan(function, "G", G);
       // check V
       check_size_match(function,
                        "rows of V", V.rows(),
                        "rows of y", y.rows());
       // TODO: incorporate support for infinite V
       check_finite(function, "V", V);
-      check_not_nan(function, "V", V);
       check_spsd_matrix(function, "V", V);
       // check W
       check_size_match(function,
@@ -138,21 +134,18 @@ namespace stan {
                        "rows of G", G.rows());
       // TODO: incorporate support for infinite W
       check_finite(function, "W", W);
-      check_not_nan(function, "W", W);
       check_spsd_matrix(function, "W", W);
       // check m0
       check_size_match(function,
                        "size of m0", m0.size(),
                        "rows of G", G.rows());
       check_finite(function, "m0", m0);
-      check_not_nan(function, "m0", m0);
       // check C0
       check_size_match(function,
                        "rows of C0", C0.rows(), 
                        "rows of G", G.rows());
       check_cov_matrix(function, "C0", C0);
       check_finite(function, "C0", C0);
-      check_not_nan(function, "C0", C0);
 
       if (y.cols() == 0 || y.rows() == 0)
         return lp;

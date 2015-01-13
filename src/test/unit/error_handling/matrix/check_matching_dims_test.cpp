@@ -1,5 +1,6 @@
 #include <stan/error_handling/matrix/check_matching_dims.hpp>
 #include <gtest/gtest.h>
+#include <test/unit/util.hpp>
 
 TEST(ErrorHandlingMatrix, checkMatchingDimsMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
@@ -52,4 +53,48 @@ TEST(ErrorHandlingMatrix, checkMatchingDimsMatrix_nan) {
   EXPECT_THROW(stan::math::check_matching_dims("checkMatchingDims", "x", x,
                                                          "y", y), 
                std::invalid_argument);
+}
+
+TEST(ErrorHandlingMatrix, checkMatchingDims_compile_time_sizes) {
+  using stan::math::check_matching_dims;
+
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> m_dynamic;
+  Eigen::Matrix<double, 2, 2> m_2x2;
+  Eigen::Matrix<double, Eigen::Dynamic, 1> vector(4);
+  Eigen::Matrix<double, 1, Eigen::Dynamic> rowvector(4);
+
+
+  m_dynamic.resize(2,2);
+  EXPECT_TRUE(check_matching_dims("check_matching_dims", "dynamic", m_dynamic,
+                                  "2x2", m_2x2));
+
+  m_dynamic.resize(3,3);
+  EXPECT_THROW_MSG(check_matching_dims("check_matching_dims", "dynamic", m_dynamic,
+                                       "2x2", m_2x2),
+                   std::invalid_argument,
+                   "check_matching_dims: Rows of dynamic (3) and rows of 2x2 (2) must match in size");
+
+  m_dynamic.resize(4,1);  
+  EXPECT_TRUE(check_matching_dims("check_matching_dims", "dynamic", m_dynamic,
+                                  "vector", vector));
+
+  m_dynamic.resize(3,1);  
+  EXPECT_THROW_MSG(check_matching_dims("check_matching_dims", "dynamic", m_dynamic,
+                                       "vector", vector),
+                   std::invalid_argument,
+                   "check_matching_dims: Rows of dynamic (3) and rows of vector (4) must match in size");
+
+
+  m_dynamic.resize(1,4);  
+  EXPECT_TRUE(check_matching_dims("check_matching_dims", "dynamic", m_dynamic,
+                                  "rowvector", rowvector));
+
+  m_dynamic.resize(1,3);  
+  EXPECT_THROW_MSG(check_matching_dims("check_matching_dims", "dynamic", m_dynamic,
+                                       "rowvector", rowvector),
+                   std::invalid_argument,
+                   "check_matching_dims: Columns of dynamic (3) and columns of rowvector (4) must match in size");
+
+  
+                   
 }

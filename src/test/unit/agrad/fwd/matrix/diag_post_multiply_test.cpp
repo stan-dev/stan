@@ -1,3 +1,4 @@
+//#define STAN__AGRAD__FWD__MATRIX__EIGEN_NUMTRAITS_HPP
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>

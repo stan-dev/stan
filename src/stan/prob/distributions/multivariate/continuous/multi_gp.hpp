@@ -63,9 +63,6 @@ namespace stan {
       using stan::math::check_ldlt_factor;
       using stan::math::check_not_nan;
 
-      check_size_match(function, 
-                       "Rows of kernel matrix", Sigma.rows(), 
-                       "columns of kernel matrix", Sigma.cols());
       check_positive(function, "Kernel rows", Sigma.rows());
       check_finite(function, "Kernel", Sigma);
       check_symmetric(function, "Kernel", Sigma);

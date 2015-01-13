@@ -36,7 +36,7 @@ TEST_F(ErrorHandlingMatrix, checkPosDefinite_not_square) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   
   y.resize(3, 4);
-  expected_msg = "Rows of matrix (3) and columns of matrix (4) must match in size";
+  expected_msg = "Expecting a square matrix; rows of y (3) and columns of y (4) must match in size";
   EXPECT_THROW_MSG(check_pos_definite(function, "y", y),
                    std::invalid_argument,
                    expected_msg);

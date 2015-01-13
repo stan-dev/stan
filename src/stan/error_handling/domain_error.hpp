@@ -35,7 +35,7 @@ namespace stan {
                              const std::string& msg1,
                              const std::string& msg2) {
       std::ostringstream message;
-      
+
       message << function << ": "
               << name << " "
               << msg1

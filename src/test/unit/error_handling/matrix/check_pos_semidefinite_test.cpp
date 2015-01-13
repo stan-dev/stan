@@ -37,7 +37,7 @@ TEST_F(ErrorHandlingMatrix, checkPosSemidefinite_bad_sizes) {
   y.resize(2,3);
   EXPECT_THROW_MSG(check_pos_semidefinite(function, "y", y),
                    std::invalid_argument,
-                   "function: Rows of matrix (2) and columns of matrix (3) must match in size");
+                   "function: Expecting a square matrix; rows of y (2) and columns of y (3) must match in size");
 }
 
 TEST_F(ErrorHandlingMatrix, checkPosSemidefinite) {

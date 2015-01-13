@@ -1,7 +1,6 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_CORR_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_CORR_HPP
 
-#include <stan/error_handling/matrix/check_size_match.hpp>
 #include <stan/error_handling/scalar/check_finite.hpp>
 #include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/prob/constants.hpp>
@@ -104,8 +103,6 @@ namespace stan {
                  const T_shape& eta) {
       static const std::string function("stan::prob::lkj_corr_log");
 
-      using stan::math::check_size_match;
-      using stan::math::check_not_nan;
       using stan::math::check_positive;
       using stan::math::check_corr_matrix;
       using stan::math::sum;
@@ -113,10 +110,6 @@ namespace stan {
       
       typename promote_args<T_y,T_shape>::type lp(0.0);
       check_positive(function, "Shape parameter", eta);
-      check_size_match(function, 
-                       "Rows of correlation matrix", y.rows(), 
-                       "columns of correlation matrix", y.cols());
-      check_not_nan(function, "Correlation matrix", y);
       check_corr_matrix(function, "Correlation matrix", y);
       
       const unsigned int K = y.rows();

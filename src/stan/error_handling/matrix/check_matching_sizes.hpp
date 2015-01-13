@@ -35,8 +35,8 @@ namespace stan {
                                      const std::string& name2,
                                      const T_y2& y2) {
       check_size_match(function,
-                       "size of y1", y1.size(),
-                       "size of y2", y2.size());
+                       "size of ", name1, y1.size(),
+                       "size of ", name2, y2.size());
       return true;
     }
 

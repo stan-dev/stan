@@ -58,18 +58,12 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
       
-      check_size_match(function, 
-                       "Rows of Sigma", Sigma.rows(), 
-                       "columns of Sigma", Sigma.cols());
       check_positive(function, "Sigma rows", Sigma.rows());
       check_finite(function, "Sigma", Sigma);
       check_symmetric(function, "Sigma", Sigma);
       
       LDLT_factor<T_Sigma,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
       check_ldlt_factor(function, "LDLT_Factor of Sigma", ldlt_Sigma);
-      check_size_match(function, 
-                       "Rows of D", D.rows(), 
-                       "Columns of D", D.cols());
       check_positive(function, "D rows", D.rows());
       check_finite(function, "D", D);
       check_symmetric(function, "Sigma", D);

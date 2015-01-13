@@ -40,17 +40,11 @@ namespace stan {
                                     const std::string& name2,
                                     const Eigen::Matrix<T2,R2,C2>& y2) {
       check_size_match(function, 
-                       "Templated rows of matrix 1", R1,
-                       "Templated rows of matrix 2", R2);
+                       "Rows of ", name1, y1.rows(),
+                       "rows of ", name2, y2.rows());
       check_size_match(function, 
-                       "Templated columns of matrix 1", C1,
-                       "Templated columns of matrix 2", C2);
-      check_size_match(function, 
-                       "Rows of matrix 1", y1.rows(),
-                       "Rows of matrix 2", y2.rows());
-      check_size_match(function, 
-                       "Columns of matrix 1", y1.cols(),
-                       "Columns of matrix 2", y2.cols());
+                       "Columns of ", name1, y1.cols(),
+                       "columns of ", name2, y2.cols());
       return true;
     }
 
