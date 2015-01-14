@@ -10,7 +10,7 @@
 #include <stan/agrad/rev/internal/vdd_vari.hpp>
 #include <stan/agrad/rev/internal/dvd_vari.hpp>
 #include <stan/agrad/rev/internal/ddv_vari.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 #include <stan/prob/internal_math/math/grad_reg_inc_beta.hpp>
 

@@ -73,6 +73,9 @@
 #include <stan/math/matrix/quad_form.hpp>
 #include <stan/math/matrix/quad_form_diag.hpp>
 #include <stan/math/matrix/rank.hpp>
+#include <stan/math/matrix/rep_vector.hpp>
+#include <stan/math/matrix/rep_row_vector.hpp>
+#include <stan/math/matrix/rep_matrix.hpp>
 #include <stan/math/matrix/resize.hpp>
 #include <stan/math/matrix/row.hpp>
 #include <stan/math/matrix/rows.hpp>

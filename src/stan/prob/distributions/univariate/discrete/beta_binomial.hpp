@@ -5,7 +5,7 @@
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/binomial_coefficient_log.hpp>
 #include <stan/math/functions/lbeta.hpp>
 #include <stan/math/functions/digamma.hpp>

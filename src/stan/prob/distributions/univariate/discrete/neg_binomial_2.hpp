@@ -9,7 +9,7 @@
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <stan/error_handling/scalar/check_less.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/binomial_coefficient_log.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>

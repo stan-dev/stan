@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/math/rep_row_vector.hpp>
+#include <stan/math/matrix/rep_row_vector.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/rev.hpp>

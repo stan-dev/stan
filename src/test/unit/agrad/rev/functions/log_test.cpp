@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/functions/log.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/operators/operator_less_than.hpp>
 #include <stan/agrad/rev/operators/operator_equal.hpp>

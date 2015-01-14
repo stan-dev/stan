@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/math/rep_vector.hpp>
+#include <stan/math/matrix/rep_vector.hpp>
 
 TEST(MathMatrix,rep_vector) {
   using stan::math::rep_vector;
