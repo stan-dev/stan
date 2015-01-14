@@ -631,20 +631,23 @@ namespace stan {
             ->arg("variational")->arg("algorithm"));
 
         int num_samples = dynamic_cast<stan::gm::int_argument*>
-          (parser.arg("method")
-            ->arg("variational")->arg("num_samples"))->value();
+          (parser.arg("method")->arg("variational")
+                               ->arg("num_samples"))->value();
 
         int num_iterations = dynamic_cast<stan::gm::int_argument*>
           (parser.arg("method")->arg("variational")->arg("iter"))->value();
 
-        bool save_iterations
-          = dynamic_cast<stan::gm::bool_argument*>(parser.arg("method")
-                                         ->arg("variational")
-                                         ->arg("save_variational"))->value();
+        double tol_rel_param = dynamic_cast<stan::gm::real_argument*>
+          (parser.arg("method")->arg("variational")->arg("tol_rel_param"))->value();
 
-        double tol_param
-          = dynamic_cast<stan::gm::real_argument*>(
-                         algo->arg("tol_param"))->value();
+        bool save_iterations = dynamic_cast<stan::gm::bool_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("save_variational"))->value();
+
+        std::cout << "num_samples: " << num_samples << std::endl;
+        std::cout << "num_iterations: " << num_iterations << std::endl;
+        std::cout << "save_iterations: " << save_iterations << std::endl;
+        std::cout << "tol_rel_param: " << tol_rel_param << std::endl;
 
         if (algo->value() == "fullrank") {
           double elbo = 0.0;

@@ -25,8 +25,8 @@ namespace stan {
         _subarguments.push_back(new arg_variational_algo());
         _subarguments.push_back(new arg_variational_num_samples());
         _subarguments.push_back(new arg_iter());
-        _subarguments.push_back(new arg_tolerance("tol_param",
-          "Convergence tolerance on changes norm of parameter",1e-8));
+        _subarguments.push_back(new arg_tolerance("tol_rel_param",
+          "Convergence tolerance on the relative norm of the parameters",1e+7));
         _subarguments.push_back(new arg_save_variational());
 
       }

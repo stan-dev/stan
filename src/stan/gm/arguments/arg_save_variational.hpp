@@ -13,7 +13,7 @@ namespace stan {
 
       arg_save_variational(): bool_argument() {
         _name = "save_variational";
-        _description = "Stream variatioanl inference progress to output?";
+        _description = "Stream variational inference progress to output?";
         _validity = "[0, 1]";
         _default = "0";
         _default_value = false;
