@@ -12,8 +12,12 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__WIENER_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__WIENER_HPP__
 
-#include <stan/prob/constants.hpp>
-#include <stan/math/error_handling.hpp>
+#include <stan/math/functions/constants.hpp>
+#include <stan/error_handling/scalar/check_consistent_sizes.hpp>
+#include <stan/error_handling/scalar/check_bounded.hpp>
+#include <stan/error_handling/scalar/check_finite.hpp>
+#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/prob/traits.hpp>
 #include <boost/math/distributions.hpp>
 #include <cmath>
@@ -47,20 +51,21 @@ namespace stan {
 
     const double MY_PI = boost::math::constants::pi<double>(),
                  MY_LN_SQRT_PI = std::log(std::sqrt(boost::math::constants::pi<double>())),
-                 WIENER_ERR = 0.000001;
+                 WIENER_ERR = 0.000001,
+                 LOG_ZERO = stan::math::negative_infinity();
 
     template <bool propto,
     typename T_y, typename T_alpha, typename T_tau, typename T_beta, typename T_delta>
     typename boost::math::tools::promote_args<T_y,T_alpha,T_tau,T_beta,T_delta>::type
     wiener_log(const T_y& y, const T_alpha& alpha, const T_tau& tau,
                const T_beta& beta, const T_delta& delta) {
-      static const char* function = "stan::prob::wiener_log(%1%)";
+      static const std::string function("stan::prob::wiener_log(%1%)");
 
-      using stan::math::check_greater;
-      using stan::math::check_not_nan;
-      using stan::math::check_finite;
-      using stan::math::check_positive;
-      using stan::math::check_bounded;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_bounded;
+      
       using stan::math::value_of;
       using boost::math::tools::promote_args;
       using boost::math::isinf;
@@ -69,19 +74,19 @@ namespace stan {
       typedef typename promote_args<T_y,T_alpha,T_tau,T_beta,T_delta>::type return_type;
       return_type lp(0.0);
 
-      check_not_nan (function, y, "Random variable", &lp);
-      check_not_nan (function, alpha, "Boundary separation", &lp);
-      check_not_nan (function, beta , "A-priori bias"      , &lp);
-      check_not_nan (function, tau  , "Nondecision time"   , &lp);
-      check_not_nan (function, delta, "Drift rate"         , &lp);
-      check_finite  (function, alpha, "Boundary separation", &lp);
-      check_finite  (function, beta , "A-priori bias"      , &lp);
-      check_finite  (function, tau  , "Nondecision time"   , &lp);
-      check_finite  (function, delta, "Drift rate"         , &lp);
-      check_positive(function, y, "Random variable", &lp);
-      check_positive(function, alpha, "Boundary separation", &lp);
-      check_positive(function, tau  , "Nondecision time"   , &lp);
-      check_bounded (function, beta , 0, 1, "A-priori bias", &lp);
+      check_not_nan (function, "Random variable", y);
+      check_not_nan (function, "Boundary separation", alpha);
+      check_not_nan (function, "A-priori bias", beta);
+      check_not_nan (function, "Nondecision time", tau);
+      check_not_nan (function, "Drift rate", delta);
+      check_finite  (function, "Boundary separation", alpha);
+      check_finite  (function, "A-priori bias", beta);
+      check_finite  (function, "Nondecision time", tau);
+      check_finite  (function, "Drift rate", delta);
+      check_positive(function, "Random variable", y);
+      check_positive(function, "Boundary separation", alpha);
+      check_positive(function, "Nondecision time", tau);
+      check_bounded (function, "A-priori bias", beta , 0, 1);
       
 
       if (y < tau) {

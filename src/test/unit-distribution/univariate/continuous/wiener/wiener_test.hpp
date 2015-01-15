@@ -1,7 +1,7 @@
 // Arguments: Double, Double, Double, Double, Double
 #include <stan/prob/distributions/univariate/continuous/wiener.hpp>
 
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/square.hpp>
 
 using std::vector;
@@ -21,15 +21,15 @@ public:
     param[3] = .55;           // beta
     param[4] = .4;            // delta
     parameters.push_back(param);
-    log_prob.push_back(-0.8929764); // expected log_prob
-  
+    log_prob.push_back(-0.892976431870503); // expected log_prob
+    
     param[0] = 2.1;           // y
     param[1] = 4.1;           // alpha
     param[2] = 1.9;           // tau
     param[3] = .05;           // beta
     param[4] = .1;            // delta
     parameters.push_back(param);
-    log_prob.push_back(-34.6844); // expected log_prob
+    log_prob.push_back(-34.6843978137965); // expected log_prob
   
     param[0] = 0.1;           // y
     param[1] = 10.1;          // alpha
@@ -37,7 +37,7 @@ public:
     param[3] = .95;           // beta
     param[4] = .5;            // delta
     parameters.push_back(param);
-    log_prob.push_back(0.587463); // expected log_prob
+    log_prob.push_back(0.587463027419532); // expected log_prob
   
     param[0] = 50.1;          // y
     param[1] = 4.3;           // alpha
@@ -45,7 +45,7 @@ public:
     param[3] = .65;           // beta
     param[4] = .15;           // delta
     parameters.push_back(param);
-    log_prob.push_back(-12.80167); // expected log_prob
+    log_prob.push_back(-12.8016739027639); // expected log_prob
   
     param[0] = 50.1;          // y
     param[1] = 1.1;           // alpha
@@ -53,7 +53,7 @@ public:
     param[3] = .99;           // beta
     param[4] = 10.5;          // delta
     parameters.push_back(param);
-    log_prob.push_back(-2906.315); // expected log_prob
+    log_prob.push_back(-2906.31526009645); // expected log_prob
   
     param[0] = 0.51;          // y
     param[1] = 1.1;           // alpha
@@ -61,7 +61,8 @@ public:
     param[3] = .2;            // beta
     param[4] = 10.5;          // delta
     parameters.push_back(param);
-    log_prob.push_back(-3.047995); // expected log_prob
+    log_prob.push_back(-3.04799507974442); // expected log_prob
+    
   }
  
   void invalid_values(vector<size_t>& index, 
@@ -85,36 +86,28 @@ public:
   }
 
   template <typename T_y, typename T_alpha, typename T_tau,
-      typename T_beta, typename T_delta, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+      typename T_beta, typename T_delta, typename T5>
   typename stan::return_type<T_y, T_alpha, T_tau, T_beta, T_delta>::type
   log_prob(const T_y& y, const T_alpha& alpha, const T_tau& tau,
-           const T_beta& beta, const T_delta& delta, const T5&,
-           const T6&, const T7&, const T8&, const T9&) {
+           const T_beta& beta, const T_delta& delta, const T5&) {
     return stan::prob::wiener_log(y, alpha, tau, beta, delta);
   }
 
   template <bool propto, 
       typename T_y, typename T_alpha, typename T_tau,
-      typename T_beta, typename T_delta, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+      typename T_beta, typename T_delta, typename T5>
   typename stan::return_type<T_y, T_alpha, T_tau, T_beta, T_delta>::type
   log_prob(const T_y& y, const T_alpha& alpha, const T_tau& tau,
-           const T_beta& beta, const T_delta& delta, const T5&,
-           const T6&, const T7&, const T8&, const T9&) {
+           const T_beta& beta, const T_delta& delta, const T5&) {
     return stan::prob::wiener_log<propto>(y, alpha, tau, beta, delta);
   }
   
   
   template <typename T_y, typename T_alpha, typename T_tau,
-      typename T_beta, typename T_delta, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_alpha& alpha, const T_tau& tau,
-           const T_beta& beta, const T_delta& delta, const T5&,
-           const T6&, const T7&, const T8&, const T9&) {
+      typename T_beta, typename T_delta, typename T5>
+  typename stan::return_type<T_y, T_alpha, T_tau, T_beta, T_delta, T5>::type
+  log_prob_function(const T_y& y, const T_alpha& alpha, const T_tau& tau,
+           const T_beta& beta, const T_delta& delta, const T5&) {
     using stan::prob::include_summand;
     using stan::math::pi;
     using stan::math::square;
