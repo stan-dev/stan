@@ -1,4 +1,4 @@
-// Arguments: Double, Double, Double, Double, Double
+// Arguments: Doubles, Doubles, Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/wiener.hpp>
 
 #include <stan/math/functions/constants.hpp>
@@ -46,14 +46,6 @@ public:
     param[4] = .15;           // delta
     parameters.push_back(param);
     log_prob.push_back(-12.8016739027639); // expected log_prob
-  
-    param[0] = 50.1;          // y
-    param[1] = 1.1;           // alpha
-    param[2] = 1.05;          // tau
-    param[3] = .99;           // beta
-    param[4] = 10.5;          // delta
-    parameters.push_back(param);
-    log_prob.push_back(-2906.31526009645); // expected log_prob
   
     param[0] = 0.51;          // y
     param[1] = 1.1;           // alpha
