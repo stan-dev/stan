@@ -130,6 +130,7 @@ include make/libstan  # bin/libstan.a bin/libstanc.a
 include make/tests    # tests
 include make/doxygen  # doxygen
 include make/manual   # manual: manual, doc/stan-reference.pdf
+-include $(HOME)/.config/stan/make.local # for local stuff
 -include make/local    # for local stuff
 
 ##
