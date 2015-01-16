@@ -47,8 +47,7 @@ namespace stan {
      
     const double MY_PI = boost::math::constants::pi<double>(),
                  MY_LN_SQRT_PI = std::log(std::sqrt(boost::math::constants::pi<double>())),
-                 WIENER_ERR = 0.000001,
-                 LOG_ZERO = stan::math::negative_infinity();
+                 WIENER_ERR = 0.000001;
 
     template <bool propto,
     typename T_y, typename T_alpha, typename T_tau, typename T_beta, typename T_delta>
@@ -113,7 +112,7 @@ namespace stan {
       
       for (size_t i = 0; i < N; i++)
         if (y_vec[i] < tau_vec[i]) {
-          lp = LOG_ZERO;
+          lp = stan::math::negative_infinity();
           return lp;
         }
       
