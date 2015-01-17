@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/error_handling/invalid_argument.hpp>
 #include <stan/error_handling/matrix/check_matching_sizes.hpp>
 #include <stan/error_handling/matrix/check_matching_dims.hpp>
 
@@ -56,15 +57,20 @@ namespace stan {
      * @tparam C2 Column shape of right-hand side matrix.
      * @param x Left-hand side matrix.
      * @param y Right-hand side matrix.
-     * @throw std::invalid_argument if sizes do not match.
+     * @throw std::invalid_argument
      */
     template <typename LHS, typename RHS, int R1, int C1, int R2, int C2>
     inline void 
     assign(Eigen::Matrix<LHS,R1,C1>& x, 
            const Eigen::Matrix<RHS,R2,C2>& y) {
-      stan::math::check_matching_dims("assign",
-                                                "x", x,
-                                                "y", y);
+      std::stringstream ss;
+      ss << "shapes must match, but found"
+         << " R1=" << R1 
+         << "; C1=" << C1
+         << "; R2=" << R2
+         << "; C2=" << C2;
+      invalid_argument("assign(Eigen::Matrix,Eigen::Matrix)",
+                       "", "", ss.str());
     }
 
     /**

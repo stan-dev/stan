@@ -125,7 +125,7 @@ TEST(MathMatrixAssign,eigenRowVectorShapeMismatch) {
   EXPECT_THROW(assign(x,zzz),std::invalid_argument);
 
   Matrix<double,Dynamic,Dynamic> zzzz(1,3);
-  EXPECT_NO_THROW(assign(x,zzzz));
+  EXPECT_THROW(assign(x,zzzz), std::invalid_argument);
 }
 
 
