@@ -8,6 +8,25 @@ VERSION_STRING := $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
 	mkdir -p doc/
 	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING).pdf;)
+	echo '# This file is semicolon delimited' > doc/stan-functions.txt
+	echo 'StanFunction; Arguments; ReturnType; Page' >> doc/stan-functions.txt
+	sed 's/^\\indexentry{{\\tt  \\bfseries //g' $(STANAPI_HOME)src/docs/stan-reference/stan-reference.idx | \
+	sed 's/ }!{\\tt  /;/g' | \
+	sed 's/{\\tt  \\slshape  //g' | \
+	sed 's/:.*em}/;/g' | \
+	sed 's/}|hyperpage}{/;/g' | \
+	sed 's/ }!sampling statement|hyperpage}{/;~;real;/g' | \
+	sed 's/}//g' | \
+	sed 's/\\_/_/g' | \
+	sed 's/^ //g' | \
+	sed 's/"\(.*\)"/\1/g' | \
+	sed 's/"!/!/g' | \
+	sed 's/{\\\&\\\&/\&\&/g' | \
+	sed 's/{//g' | \
+	sed 's/\\textasciicircum/\^/g' | \
+	sed 's/\\textbackslash /\\/g' | \
+	sed 's/@.*(/;(/g' | \
+	sort >> doc/stan-functions.txt
 
 MANUAL_FLAGS=
 
