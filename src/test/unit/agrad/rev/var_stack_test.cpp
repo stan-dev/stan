@@ -3,6 +3,23 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 
+struct foo : public stan::agrad::chainable_alloc {
+  std::vector<double> x_;
+  foo() : x_(3) { }
+  ~foo() { }
+  void chain() { }
+};
+
+TEST(AgradRev, varStackRecoverNestedSegFaultFix) {
+  // this test failed in 2.5, but passes in 2.6
+  stan::agrad::start_nested();
+  foo* x = new foo();
+  x->chain();
+  stan::agrad::recover_memory_nested();
+  // should be able to do this redundantly:
+  stan::agrad::recover_memory(); 
+}
+
 // just test basic autodiff;  no more free_memory operation
 TEST(AgradRev,varStack) { 
   AVAR a = 2.0;
