@@ -95,9 +95,33 @@ endif
 src/test/test-models/good/%.hpp-test : src/test/test-models/good/%.hpp
 	$(COMPILE.c) -fsyntax-only -O0 $< 
 
+.PHONY: %.hpp-test-second-order
+src/test/test-models/good/%.hpp-test-second-order : src/test/test-models/good/%.hpp test/dummy-second-order.cpp
+	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy-second-order.cpp
+
+
+
 .PHONY: HEADER_TESTS
 %.hpp-test : %.hpp test/dummy.cpp
 	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
+
+test/dummy-second-order.cpp:
+	@mkdir -p test
+	@touch $@
+	@echo "#include <stan/io/var_context.hpp>" >> $@
+	@echo "#include <stan/agrad/fwd/matrix.hpp>" >> $@
+	@echo "#include <stan/model/model_header.hpp>" >> $@
+	@echo "" >> $@
+	@echo "int main() {" >> $@
+	@echo "  stan::io::var_context* context = NULL;" >> $@
+	@echo "  stan_model model(*context);" >> $@
+	@echo "" >> $@
+	@echo "  std::vector<stan::agrad::fvar<double> > params_r;" >> $@
+	@echo "  std::vector<int> params_i;" >> $@
+	@echo "" >> $@
+	@echo "  model.log_prob<false, true>(params_r, params_i, &std::cout);" >> $@
+	@echo "  return 0;" >> $@
+	@echo "}" >> $@
 
 test/dummy.cpp:
 	@mkdir -p test
@@ -170,7 +194,7 @@ src/test/unit/lang/reject/reject_func_call_generated_quantities_test.cpp: src/te
 # be code-generated to a *.hpp, then passed through
 # the compiler using the -fsyntax-only flag
 ##
-test/integration/compile_models$(EXE) : $(patsubst %.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
+test/integration/compile_models$(EXE) : $(patsubst %.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan')) $(patsubst %.stan,%.hpp-test-second-order,$(shell find src/test/test-models/good -type f -name '*.stan'))
 
 src/test/performance/logistic_test.cpp: src/test/test-models/performance/logistic.hpp
 
