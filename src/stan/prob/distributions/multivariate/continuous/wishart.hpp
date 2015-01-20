@@ -1,12 +1,9 @@
 #ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__WISHART_HPP
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__WISHART_HPP
 
-#include <boost/concept_check.hpp>
-
-#include <stan/agrad/rev/matrix.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/error_handling/scalar/check_greater.hpp>
 #include <stan/math/functions/lmgamma.hpp>
 #include <stan/math/matrix/crossprod.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
@@ -18,9 +15,9 @@
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/prob/constants.hpp>
-#include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/chi_square.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 
@@ -62,15 +59,15 @@ namespace stan {
     wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
                 const T_dof& nu,
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
-      static const char* function = "stan::prob::wishart_log(%1%)";
+      static const std::string function("stan::prob::wishart_log");
 
       using boost::math::tools::promote_args;
       using Eigen::Dynamic;
       using Eigen::Lower;
       using Eigen::Matrix;
-      using stan::math::check_greater;
-      using stan::math::check_ldlt_factor;
-      using stan::math::check_size_match;
+      using stan::error_handling::check_greater;
+      using stan::error_handling::check_ldlt_factor;
+      using stan::error_handling::check_size_match;
       using stan::math::index_type;
       using stan::math::LDLT_factor;
       using stan::math::log_determinant_ldlt;
@@ -80,30 +77,24 @@ namespace stan {
       typename index_type<Matrix<T_scale,Dynamic,Dynamic> >::type k 
         = W.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      check_greater(function, nu, k-1, 
-                    "Degrees of freedom parameter", &lp);
+      check_greater(function, "Degrees of freedom parameter", nu, k-1);
       check_size_match(function, 
-                       W.rows(), "Rows of random variable",
-                       W.cols(), "columns of random variable",
-                       &lp);
+                       "Rows of random variable", W.rows(), 
+                       "columns of random variable", W.cols());
       check_size_match(function, 
-                       S.rows(), "Rows of scale parameter",
-                       S.cols(), "columns of scale parameter",
-                       &lp);
+                       "Rows of scale parameter", S.rows(),
+                       "columns of scale parameter", S.cols());
       check_size_match(function, 
-                       W.rows(), "Rows of random variable",
-                       S.rows(), "columns of scale parameter",
-                       &lp);
+                       "Rows of random variable", W.rows(), 
+                       "columns of scale parameter", S.rows());
       // FIXME: domain checks
 
       LDLT_factor<T_y,Eigen::Dynamic,Eigen::Dynamic> ldlt_W(W);
-      if (!check_ldlt_factor(function,ldlt_W,
-                             "LDLT_Factor of random variable",&lp))
+      if (!check_ldlt_factor(function, "LDLT_Factor of random variable", ldlt_W))
         return lp;
 
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_S(S);
-      if (!check_ldlt_factor(function,ldlt_S,
-                             "LDLT_Factor of scale parameter",&lp))
+      if (!check_ldlt_factor(function, "LDLT_Factor of scale parameter", ldlt_S))
         return lp;
       
       using stan::math::trace;
@@ -146,18 +137,17 @@ namespace stan {
 
       using Eigen::MatrixXd;
       using stan::math::index_type;
-      using stan::math::check_size_match;
-      using stan::math::check_positive;
+      using stan::error_handling::check_size_match;
+      using stan::error_handling::check_positive;
 
-      static const char* function = "stan::prob::wishart_rng(%1%)";
+      static const std::string function("stan::prob::wishart_rng");
 
       typename index_type<MatrixXd>::type k = S.rows();
 
-      check_positive(function,nu,"degrees of freedom",(double*)0);
+      check_positive(function, "degrees of freedom", nu);
       check_size_match(function, 
-                       S.rows(), "Rows of scale parameter",
-                       S.cols(), "columns of scale parameter",
-                       (double*)0);
+                       "Rows of scale parameter", S.rows(), 
+                       "columns of scale parameter", S.cols());
 
       MatrixXd B = MatrixXd::Zero(k, k);
 

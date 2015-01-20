@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 
 
-// This is an example of how to use stan::agrad::precomputed_gradients()
 TEST(StanAgradRevInternal, precomputed_gradients) {
   double value;
   std::vector<stan::agrad::var> vars;
@@ -32,64 +31,57 @@ TEST(StanAgradRevInternal, precomputed_gradients) {
 
 
 TEST(StanAgradRevInternal, precomputed_gradients_vari_no_independent_vars) {
-  double value;
-  std::vector<stan::agrad::vari *> varis;
+  double value = 1;
+  std::vector<stan::agrad::var> vars;
   std::vector<double> gradients;
-  
-  value = 1;
-  varis.resize(0);
-  gradients.resize(0);
-  EXPECT_NO_THROW(stan::agrad::precomputed_gradients_vari(value, varis, gradients));
-  stan::agrad::precomputed_gradients_vari vari(value, varis, gradients);
-  EXPECT_FLOAT_EQ(value, vari.val_);
-  EXPECT_FLOAT_EQ(0, vari.adj_);
-  EXPECT_NO_THROW(vari.chain());
+
+  stan::agrad::precomputed_gradients_vari vi(value, vars, gradients);
+  EXPECT_FLOAT_EQ(value, vi.val_);
+  EXPECT_FLOAT_EQ(0, vi.adj_);
+  EXPECT_NO_THROW(vi.chain());
 }
 
 TEST(StanAgradRevInternal, precomputed_gradients_vari_mismatched_sizes) {
   double value;
-  std::vector<stan::agrad::vari *> varis;
+  std::vector<stan::agrad::var> vars;
   std::vector<double> gradients;
 
   value = 1;
-  varis.resize(1);
+  vars.resize(1);
   gradients.resize(2);
-  EXPECT_THROW(stan::agrad::precomputed_gradients_vari(value, varis, gradients),
+  EXPECT_THROW(stan::agrad::precomputed_gradients_vari(value, vars, gradients),
                std::invalid_argument);
 }
 
 TEST(StanAgradRevInternal, precomputed_gradients_vari) {
-  double value;
-  std::vector<stan::agrad::vari *> varis;
+  double value = 1;
+  std::vector<stan::agrad::var> vars;
+  stan::agrad::var x1(2), x2(3);
+  vars.push_back(x1);
+  vars.push_back(x2);
+
   std::vector<double> gradients;
-  stan::agrad::vari x1(2), x2(3);
-  
-  value = 1;
-  varis.resize(2);
-  varis[0] = &x1;
-  varis[1] = &x2;
-  gradients.resize(2);
-  gradients[0] = 4;
-  gradients[1] = 5;
-  EXPECT_NO_THROW(stan::agrad::precomputed_gradients_vari(value, varis, gradients));
-  stan::agrad::precomputed_gradients_vari vari(value, varis, gradients);  
-  EXPECT_FLOAT_EQ(value, vari.val_);
-  EXPECT_FLOAT_EQ(0, vari.adj_);
+  gradients.push_back(4);
+  gradients.push_back(5);
 
-  EXPECT_NO_THROW(vari.chain())
-    << "running vari.chain() with no independent variables";
-  EXPECT_FLOAT_EQ(value, vari.val_);
-  EXPECT_FLOAT_EQ(0, vari.adj_);
-  EXPECT_FLOAT_EQ(0, x1.adj_);
-  EXPECT_FLOAT_EQ(0, x2.adj_);
+  stan::agrad::precomputed_gradients_vari vi(value, vars, gradients);  
+  EXPECT_FLOAT_EQ(value, vi.val_);
+  EXPECT_FLOAT_EQ(0, vi.adj_);
 
-  vari.init_dependent();
-  EXPECT_NO_THROW(vari.chain())
+  EXPECT_NO_THROW(vi.chain())
+    << "running vi.chain() with no independent variables";
+  EXPECT_FLOAT_EQ(value, vi.val_);
+  EXPECT_FLOAT_EQ(0, vi.adj_);
+  EXPECT_FLOAT_EQ(0, x1.vi_->adj_);
+  EXPECT_FLOAT_EQ(0, x2.vi_->adj_);
+
+  vi.init_dependent();
+  EXPECT_NO_THROW(vi.chain())
     << "running vari.chain() with vari initialized as dependent variable";
-  EXPECT_FLOAT_EQ(value, vari.val_);
-  EXPECT_FLOAT_EQ(1, vari.adj_);
-  EXPECT_FLOAT_EQ(gradients[0], x1.adj_);
-  EXPECT_FLOAT_EQ(gradients[1], x2.adj_);
+  EXPECT_FLOAT_EQ(value, vi.val_);
+  EXPECT_FLOAT_EQ(1, vi.adj_);
+  EXPECT_FLOAT_EQ(gradients[0], x1.vi_->adj_);
+  EXPECT_FLOAT_EQ(gradients[1], x2.vi_->adj_);
 }
 
 TEST(StanAgradRevInternal, precomputed_gradients_mismatched_sizes) {

@@ -8,123 +8,123 @@
 #include <test/unit/gm/utility.hpp>
 
 TEST(gm_parser,good_trunc) {
-  EXPECT_TRUE(is_parsable("src/test/test-models/reference/gm/good_trunc.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/bad/gm/good_trunc.stan"));
 }
 
 TEST(gm_parser,good_vec_constraints) {
-  EXPECT_TRUE(is_parsable("src/test/test-models/reference/gm/good_trunc.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/bad/gm/good_trunc.stan"));
 }
 
 TEST(gm_parser,good_const) {
-  EXPECT_TRUE(is_parsable("src/test/test-models/reference/gm/good_const.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/bad/gm/good_const.stan"));
 }
 
 TEST(gm_parser,good_matrix_ops) {
-  EXPECT_TRUE(is_parsable("src/test/test-models/reference/gm/good_matrix_ops.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/bad/gm/good_matrix_ops.stan"));
 }
 
 TEST(gm_parser,good_funs) {
-  EXPECT_TRUE(is_parsable("src/test/test-models/reference/gm/good_funs.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/bad/gm/good_funs.stan"));
 }
 
 
 TEST(gm_parser,good_vars) {
-  EXPECT_TRUE(is_parsable("src/test/test-models/reference/gm/good_vars.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/bad/gm/good_vars.stan"));
 }
 
 TEST(gm_parser,good_intercept_var) {
-  EXPECT_TRUE(is_parsable("src/test/test-models/reference/gm/good_intercept_var.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/bad/gm/good_intercept_var.stan"));
 }
 
 TEST(gm_parser,good_cov) {
-  EXPECT_TRUE(is_parsable("src/test/test-models/reference/gm/good_cov.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/bad/gm/good_cov.stan"));
 }
 
 TEST(gm_parser,good_local_var_array_size) {
-  EXPECT_TRUE(is_parsable("src/test/test-models/reference/gm/good_local_var_array_size.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/bad/gm/good_local_var_array_size.stan"));
 }
 
 TEST(gm_parser,parsable_test_bad1) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad1.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad1.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad2) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad2.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad2.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad3) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad3.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad3.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad4) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad4.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad4.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad5) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad5.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad5.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad6) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad6.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad6.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad7) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad7.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad7.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad8) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad8.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad8.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad9) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad9.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad9.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad10) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad10.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad10.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad11) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad11.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad11.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_bad_fun_name) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_fun_name.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad_fun_name.stan"),
                std::invalid_argument);
 }
 
 TEST(gm_parser,parsable_test_good_fun_name) {
-  EXPECT_TRUE(is_parsable("src/test/test-models/reference/gm/good_fun_name.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/bad/gm/good_fun_name.stan"));
 }
 
 TEST(gmParser,parsableBadPeriods) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_periods_data.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad_periods_data.stan"),
                std::invalid_argument);
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_periods_tdata.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad_periods_tdata.stan"),
                std::invalid_argument);
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_periods_params.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad_periods_params.stan"),
                std::invalid_argument);
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_periods_tparams.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad_periods_tparams.stan"),
                std::invalid_argument);
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_periods_gqs.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad_periods_gqs.stan"),
                std::invalid_argument);
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_periods_local.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad_periods_local.stan"),
                std::invalid_argument);
 }
 
 TEST(gmParser,declareVarWithSameNameAsModel) {
-  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_model_name_var.stan"),
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/gm/bad_model_name_var.stan"),
                std::invalid_argument);
 }
 

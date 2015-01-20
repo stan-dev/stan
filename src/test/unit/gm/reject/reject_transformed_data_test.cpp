@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/no-main/gm/reject_transformed_data.cpp>
+#include <test/test-models/good/gm/reject_transformed_data.hpp>
 
 /* tests that stan program throws exception in transformed data block
    this block is part of the generated cpp object's constructor

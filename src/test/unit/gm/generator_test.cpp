@@ -5,7 +5,7 @@
 #include <stan/gm/ast.hpp>
 #include <stan/gm/generator.hpp>
 #include <stan/io/dump.hpp>
-#include <test/test-models/no-main/gm/test_lp.cpp>
+#include <test/test-models/good/gm/test_lp.hpp>
 #include <test/unit/gm/utility.hpp>
 #include <gtest/gtest.h>
 
@@ -101,12 +101,13 @@ TEST(gm, logProbPolymorphismDouble) {
   stan::io::dump init_dump(init_in);
   std::vector<int> params_i_init;
   std::vector<double> params_r_init;
-  model.transform_inits(init_dump, params_i_init, params_r_init);
+  std::stringstream pstream;
+  model.transform_inits(init_dump, params_i_init, params_r_init, &pstream);
   EXPECT_EQ(0U, params_i_init.size());
   EXPECT_EQ(2U, params_r_init.size());
 
   Matrix<double,Dynamic,1> params_r_vec_init;
-  model.transform_inits(init_dump, params_r_vec_init);
+  model.transform_inits(init_dump, params_r_vec_init, &pstream);
   EXPECT_EQ(int(params_r.size()), params_r_vec_init.size());
   for (int i = 0; i < params_r_vec_init.size(); ++i)
     EXPECT_FLOAT_EQ(params_r_init[i], params_r_vec_init(i));

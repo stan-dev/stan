@@ -1,5 +1,5 @@
 #include <stan/io/mcmc_writer.hpp>
-#include <test/test-models/no-main/io_example.cpp>
+#include <test/test-models/good/io_example.hpp>
 
 #include <vector>
 #include <boost/random/additive_combine.hpp>

@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
-#include <sstream>
 #include <cmath>
-#include <vector>
+#include <sstream>
 #include <string>
 #include <set>
-#include "stan/gm/ast_def.cpp"
+#include <vector>
+#include <stan/gm/ast_def.cpp>
+#include <gtest/gtest.h>
 
 using stan::gm::function_signatures;
 using stan::gm::expr_type;
@@ -13,6 +13,45 @@ using stan::gm::INT_T;
 using stan::gm::VECTOR_T;
 using stan::gm::ROW_VECTOR_T;
 using stan::gm::MATRIX_T;
+
+TEST(gmAst, hasVar) {
+  using stan::gm::base_var_decl;
+  using stan::gm::binary_op;
+  using stan::gm::expression;
+  using stan::gm::local_origin;
+  using stan::gm::parameter_origin;
+  using stan::gm::transformed_parameter_origin;
+  using stan::gm::unary_op;
+  using stan::gm::var_origin;
+  using stan::gm::variable;
+  using stan::gm::variable_map;
+  using std::vector;
+
+  variable_map vm;
+  vector<expression> dims;
+  base_var_decl alpha_decl = base_var_decl("alpha",dims,DOUBLE_T);
+  var_origin alpha_origin = parameter_origin;
+  vm.add("alpha", alpha_decl, alpha_origin);
+  
+  variable v("alpha");
+  v.set_type(DOUBLE_T, 2U);
+  expression e(v);
+  EXPECT_TRUE(has_var(e, vm));
+
+  vm.add("beta", 
+         base_var_decl("beta", vector<expression>(), INT_T),
+         local_origin);
+  variable v_beta("beta");
+  v_beta.set_type(INT_T, 0U);
+  expression e_beta(v_beta);
+  EXPECT_FALSE(has_var(e_beta, vm));
+
+  expression e2(binary_op(e,"+",e));
+  EXPECT_TRUE(has_var(e2,vm));
+
+  expression e_beta2(unary_op('!',unary_op('-',e_beta)));
+  EXPECT_FALSE(has_var(e_beta2,vm));
+}
 
 TEST(gm_ast,expr_type_num_dims) {
   EXPECT_EQ(0U,expr_type().num_dims());

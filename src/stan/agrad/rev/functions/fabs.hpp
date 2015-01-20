@@ -5,7 +5,7 @@
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/internal/precomp_v_vari.hpp>
 #include <stan/agrad/rev/operators/operator_unary_negative.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 
 namespace stan {

@@ -16,12 +16,12 @@ public:
     param[0] = 7.9;                 // y
     param[1] = 3.0;                 // nu
     parameters.push_back(param);
-    ccdf_log.push_back(-3.0339689);  // expected ccdf_log
+    ccdf_log.push_back(std::log(1-0.951875748155839862541));// expected ccdf_log
 
     param[0] = 1.9;                 // y
     param[1] = 0.5;                 // nu
     parameters.push_back(param);
-    ccdf_log.push_back(-2.6142213);    // expected ccdf_log
+    ccdf_log.push_back(std::log(1-0.9267752080547182469417));    // expected ccdf_log
   }
  
   void invalid_values(vector<size_t>& index, 
@@ -54,24 +54,18 @@ public:
   }
 
   template <typename T_y, typename T_dof, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_dof, T2>::type 
   ccdf_log(const T_y& y, const T_dof& nu, 
-     const T2&, const T3&, const T4&, const T5&, 
-     const T6&, const T7&, const T8&, const T9&) {
+           const T2&, const T3&, const T4&, const T5&) {
     return stan::prob::chi_square_ccdf_log(y, nu);
   }
 
   template <typename T_y, typename T_dof, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_dof, T2>::type 
   ccdf_log_function(const T_y& y, const T_dof& nu, 
-      const T2&, const T3&, const T4&, const T5&, 
-      const T6&, const T7&, const T8&, const T9&) {
+                    const T2&, const T3&, const T4&, const T5&) {
     using stan::agrad::gamma_p;
     using stan::math::gamma_p;
     using std::log;

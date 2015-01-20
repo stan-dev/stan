@@ -18,13 +18,13 @@ public:
     param[1] = 1.0;                 // alpha
     param[2] = 1.0;                 // sigma
     parameters.push_back(param);
-    cdf.push_back(0.86466472);       // expected cdf
+    cdf.push_back(0.8646647167633872976822);       // expected cdf
 
     param[0] = 0.25;                // y
     param[1] = 2.9;                 // alpha
     param[2] = 1.8;                 // sigma
     parameters.push_back(param);
-    cdf.push_back(0.0032585711);  // expected cdf
+    cdf.push_back(0.00325857114906742380625);  // expected cdf
 
     param[0] = 3.9;                 // y
     param[1] = 1.7;                 // alpha
@@ -70,24 +70,18 @@ public:
   }
 
   template <typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   cdf(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-           const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, 
-           const T9&) {
+      const T3&, const T4&, const T5&) {
     return stan::prob::weibull_cdf(y, alpha, sigma);
   }
   
   template <typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   cdf_function(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-               const T3&, const T4&, const T5&, const T6&, const T7&, 
-               const T8&, const T9&) {
+               const T3&, const T4&, const T5&) {
     using std::log;
     using std::pow;
     return 1.0 - exp(-pow(y / sigma, alpha));

@@ -47,7 +47,7 @@ namespace stan {
         
         std::vector<argument*> unset_args = _arguments;
         
-        while(good_arg) {
+        while (good_arg) {
           
           if (args.size() == 0)
             break;

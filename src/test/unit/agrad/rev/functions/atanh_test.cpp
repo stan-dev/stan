@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/functions/atanh.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <test/unit/agrad/rev/nan_util.hpp>
 
 TEST(AgradRev,atanh) {

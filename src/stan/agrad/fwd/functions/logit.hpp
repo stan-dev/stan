@@ -5,7 +5,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/logit.hpp>
 #include <stan/math/functions/square.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
 

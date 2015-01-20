@@ -4,7 +4,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/agrad/rev/internal/precomp_v_vari.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
   namespace agrad {

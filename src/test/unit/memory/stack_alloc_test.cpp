@@ -1,8 +1,36 @@
 #include <gtest/gtest.h>
+#include <cmath>
 #include <stdlib.h>
+#include <utility>
 #include <vector>
 #include <stan/memory/stack_alloc.hpp>
 
+TEST(MemoryStackAlloc, allocArray) {
+  // just an example to show how alloc_array is used
+  stan::memory::stack_alloc allocator;
+  double* x = allocator.alloc_array<double>(10U);
+  for (int i = 0; i < 10; ++i)
+    x[i] = 3.0;
+  for (int i = 0; i < 10; ++i)
+    EXPECT_EQ(3.0, x[i]);
+}
+
+struct biggy {
+  double r[10];
+};
+
+TEST(MemoryStackAlloc, allocArrayBigger) {
+  size_t N = 1000;
+  size_t K = 10;
+  stan::memory::stack_alloc allocator;
+  biggy* x = allocator.alloc_array<biggy>(N);
+  for (int i = 0; i < N; ++i)
+    for (int k = 1; k < K; ++k)
+      x[i].r[k] = k * i;
+  for (int i = 0; i < N; ++i)
+    for (int k = 0; k < K; ++k)
+      EXPECT_FLOAT_EQ(k * i, x[i].r[k]);
+}
 TEST(stack_alloc, bytes_allocated) {
   stan::memory::stack_alloc allocator;
   EXPECT_TRUE(0L <= allocator.bytes_allocated());

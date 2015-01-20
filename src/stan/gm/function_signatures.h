@@ -433,6 +433,7 @@ add_unary("log2");
 add("log_determinant",DOUBLE_T,MATRIX_T);
 add_binary("log_diff_exp");
 add_binary("log_falling_factorial");
+add_ternary("log_mix");
 add_binary("log_rising_factorial");
 add_unary("log_inv_logit");
 add("log_softmax",VECTOR_T,VECTOR_T);
@@ -577,6 +578,12 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
       add("neg_binomial_cdf_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);
       add("neg_binomial_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_ccdf_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_cdf",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_cdf_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);
       add("neg_binomial_2_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/no-main/gm/reject_transformed_parameters.cpp>
+#include <test/test-models/good/gm/reject_transformed_parameters.hpp>
 
 /* tests that stan program throws exception in transformed parameters block
    which is part of the log_prob method of the generated cpp object

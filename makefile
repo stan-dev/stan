@@ -34,7 +34,7 @@ GTEST ?= lib/gtest_1.7.0
 ## 
 CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
-LDLIBS = -Lbin -lstan
+LDLIBS = 
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 WINE =
@@ -94,7 +94,6 @@ endif
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Model related:'
-	@echo '  - bin/libstan.a  : Build the Stan static library (used in linking models).'
 	@echo '  - bin/libstanc.a : Build the Stan compiler static library'
 	@echo '  Documentation:'
 	@echo '  - manual         : Builds the reference manual. Copies built manual to'
@@ -154,7 +153,7 @@ MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all clean-deps
 clean:
 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
-	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.hpp))
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%$(EXE)))
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.o))
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.d))
@@ -170,8 +169,8 @@ clean-deps:
 	$(shell find . -type f -name '*.d' -exec rm {} +)
 
 clean-all: clean clean-manual clean-deps
-	$(RM) -r test/* bin
+	$(RM) -r test bin
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
 	@echo '  removing generated test files'
-	$(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f -exec rm {} +)
+	$(shell find src/test/unit-distribution -name '*_generated_*_test.cpp' -type f -exec rm {} +)
