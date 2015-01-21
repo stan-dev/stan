@@ -12,18 +12,22 @@ public:
     vector<double> param(4);
 
     param[0] = 1.5;           // y
-    param[1] = 0;           // mu
+    param[1] = 0.1;           // mu
     param[2] = 0.5;           // lambda
     param[3] = 3.0;           // alpha
     parameters.push_back(param);
-    log_prob.push_back(-3.753417975251507474525379613285); // expected log_prob
+//    log_prob.push_back(-3.753417975251507474525379613285); // expected log_prob
+//    log_prob.push_back(-2.602689685444384171120191240334);
+    log_prob.push_back(-3.548244797701304964476776149240);
+//    log_prob.push_back(-2.602689685444384171120191240334); // expected log_prob
 
     param[0] = 19.5;          // y
-    param[1] = 0;          // mu
+    param[1] = 1.1;          // mu
     param[2] = 0.15;          // lambda
     param[3] = 5.0;           // alpha
     parameters.push_back(param);
-    log_prob.push_back(-25.74462604188692758825580639457); // expected log_prob
+    log_prob.push_back(-25.398980746315967138571068062447); // expected log_prob
+//    log_prob.push_back(-25.74462604188692758825580639457); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 

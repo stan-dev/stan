@@ -201,6 +201,8 @@ namespace stan {
                              "Random variable", y, 
                              "Shape parameter", alpha, 
                              "Scale Parameter", beta);
+      if(!is_constant_struct<T_y>::value)
+        check_greater_or_equal(function, "Random variable", y, 0.01);
 
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);

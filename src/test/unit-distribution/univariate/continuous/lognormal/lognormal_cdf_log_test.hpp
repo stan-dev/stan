@@ -31,6 +31,9 @@ public:
           vector<double>& value) {
     // y
     index.push_back(0U);
+    value.push_back(0.0);
+
+    index.push_back(0U);
     value.push_back(-1.0);
 
     index.push_back(0U);
@@ -62,7 +65,7 @@ public:
   }
 
   double lower_bound() {
-    return 0.0;
+    return 1e-322;
   }
     
   bool has_upper_bound() {

@@ -21,10 +21,16 @@ public:
   
   void invalid_values(vector<size_t>& index, 
           vector<double>& value) {
+    vector<vector<double> > params;
+    vector<double> cdf_values;
+    valid_values(params,cdf_values);
 
     // y
     index.push_back(0U);
     value.push_back(-1.0);
+
+    index.push_back(0U);
+    value.push_back(params[0][1] - 1e-2);
  
     // y_min
     index.push_back(1U);
@@ -53,7 +59,11 @@ public:
   }
   
   double lower_bound() {
-    return 0.0;
+    vector<vector<double> > params;
+    vector<double> cdf_values;
+    valid_values(params,cdf_values);
+
+    return params[0][1];
   }
     
   bool has_upper_bound() {

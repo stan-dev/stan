@@ -30,6 +30,12 @@ public:
   void invalid_values(vector<size_t>& index, 
           vector<double>& value) {
     // y
+    index.push_back(0U);
+    value.push_back(0.0);
+
+    index.push_back(0U);
+    value.push_back(-1.0);
+
     
     // mu
     index.push_back(1U);
@@ -96,7 +102,7 @@ TEST(ProbDistributionsLognormal,Cumulative) {
   // ?? double neg_inf = -pos_inf;
   // ?? EXPECT_FLOAT_EQ(0.0,lognormal_cdf(neg_inf,0.0,1.0));
 
-  EXPECT_FLOAT_EQ(0.0,lognormal_cdf(0.0,0.0,1.0));
+  EXPECT_FLOAT_EQ(0.0,lognormal_cdf(1e-322,0.0,1.0));
   EXPECT_FLOAT_EQ(1.0,lognormal_cdf(pos_inf,0.0,1.0));
 }
 

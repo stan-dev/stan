@@ -16,7 +16,8 @@ public:
     param[2] = 0.5;           // lambda
     param[3] = 3.0;           // alpha
     parameters.push_back(param);
-    cdf.push_back(0.4212962962962961688262);  // expected CDF
+//    cdf.push_back(0.4212962962962961688262);  // expected CDF
+    cdf.push_back(0.421296296296296279848547783331);  // expected CDF
 
   }
   

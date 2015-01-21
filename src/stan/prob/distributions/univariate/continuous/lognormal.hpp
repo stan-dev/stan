@@ -33,7 +33,7 @@ namespace stan {
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
       using stan::error_handling::check_positive_finite;
-      using stan::error_handling::positive;      
+      using stan::error_handling::check_positive;      
       using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
