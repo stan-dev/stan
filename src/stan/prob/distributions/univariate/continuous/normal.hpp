@@ -156,17 +156,18 @@ namespace stan {
      */
     template <bool propto, 
               typename T_y, typename T_s, typename T_n, typename T_loc, typename T_scale>
-    typename boost::enable_if_c<is_var_or_arithmetic<T_y,T_s,T_loc,T_scale>::value,
-                                typename return_type<T_y,T_s,T_loc,T_scale>::type>::type
+    typename return_type<T_y,T_s,T_loc,T_scale>::type
     normal_sufficient_log(const T_y& y_bar, const T_s& s_squared, const T_n& n_obs, const T_loc& mu, const T_scale& sigma) {
-      static const char* function = "stan::prob::normal_log(%1%)";
+      static const std::string function = "stan::prob::normal_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_s,T_n,T_loc,T_scale>::type 
+        T_partials_return;
 
       using std::log;
       using stan::is_constant_struct;
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+      using stan::error_handling::check_positive;
+      using stan::error_handling::check_finite;
+      using stan::error_handling::check_not_nan;
+      using stan::error_handling::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -179,24 +180,22 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      check_not_nan(function, y_bar, "Location parameter sufficient statistic", &logp);
-      check_not_nan(function, s_squared, "Scale parameter sufficient statistic", &logp);
-      check_not_nan(function, n_obs, "Number of observations", &logp);
-      check_finite(function, n_obs, "Number of observations", &logp);
-      check_positive(function, n_obs, "Number of observations", &logp);
-      check_finite(function, mu, "Location parameter", &logp);
-      check_positive(function, sigma, "Scale parameter", &logp);
+      check_not_nan(function, "Location parameter sufficient statistic", y_bar);
+      check_not_nan(function, "Scale parameter sufficient statistic", s_squared);
+      check_not_nan(function, "Number of observations", n_obs);
+      check_finite(function, "Number of observations", n_obs);
+      check_positive(function, "Number of observations", n_obs);
+      check_finite(function, "Location parameter", mu);
+      check_positive(function, "Scale parameter", sigma);
       check_consistent_sizes(function,
-                             y_bar, s_squared, n_obs, mu, sigma,
-                             "Location parameter sufficient statistic",
-                             "Scale parameter sufficient statistic",
-                             "Number of observations",
-                             "Location parameter",
-                             "Scale parameter",
-                             &logp);
+                             "Location parameter sufficient statistic", y_bar,
+                             "Scale parameter sufficient statistic", s_squared,
+                             "Number of observations", n_obs,
+                             "Location parameter", mu,
+                             "Scale parameter", sigma);
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_s,T_loc,T_scale>::value)
         return 0.0;
@@ -212,12 +211,12 @@ namespace stan {
       size_t N = max_size(y_bar, s_squared, n_obs, mu, sigma);
       
       for (size_t i = 0; i < N; i++) {
-        const double y_bar_dbl = value_of(y_bar_vec[i]);
-        const double s_squared_dbl = value_of(s_squared_vec[i]);
-        const double n_obs_dbl = n_obs_vec[i];
-        const double mu_dbl = value_of(mu_vec[i]);
-        const double sigma_dbl = value_of(sigma_vec[i]);
-        const double sigma_squared = pow(sigma_dbl,2);
+        const T_partials_return y_bar_dbl = value_of(y_bar_vec[i]);
+        const T_partials_return s_squared_dbl = value_of(s_squared_vec[i]);
+        const T_partials_return n_obs_dbl = n_obs_vec[i];
+        const T_partials_return mu_dbl = value_of(mu_vec[i]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[i]);
+        const T_partials_return sigma_squared = pow(sigma_dbl,2);
         
         if (include_summand<propto>::value)
           logp += NEG_LOG_SQRT_TWO_PI * n_obs_dbl;
@@ -226,7 +225,7 @@ namespace stan {
           logp -= n_obs_dbl*log(sigma_dbl);
         
            
-        const double cons_expr = 
+        const T_partials_return cons_expr = 
           (s_squared_dbl
            + n_obs_dbl * pow(y_bar_dbl - mu_dbl, 2));
           
@@ -235,7 +234,7 @@ namespace stan {
 
         // gradients
         if (!is_constant_struct<T_y>::value || !is_constant_struct<T_loc>::value) {
-          const double common_derivative = n_obs_dbl * (mu_dbl - y_bar_dbl) / sigma_squared;
+          const T_partials_return common_derivative = n_obs_dbl * (mu_dbl - y_bar_dbl) / sigma_squared;
           if (!is_constant_struct<T_y>::value)
             operands_and_partials.d_x1[i] += common_derivative;
           if (!is_constant_struct<T_loc>::value)
@@ -248,7 +247,7 @@ namespace stan {
           operands_and_partials.d_x4[i] 
             += cons_expr / pow(sigma_dbl, 3) - n_obs_dbl / sigma_dbl;
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp, y_bar, s_squared, mu, sigma);
     }
 
     template <typename T_y, typename T_s, typename T_n, typename T_loc, typename T_scale>
