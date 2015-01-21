@@ -32,13 +32,32 @@ namespace stan {
        * operands, and gradients.
        * 
        * @param[in] val The value of the variable.
+       * @param[in] size Size of operands and gradients
+       * @param[in] varis Operand implementations.
+       * @param[in] gradients Gradients with respect to operands.
+       */
+      precomputed_gradients_vari(double val,
+                                 size_t size, 
+                                 vari** varis,
+                                 double* gradients)
+        : vari(val),
+          size_(size),
+          varis_(varis),
+          gradients_(gradients) {
+      }
+
+      /**
+       * Construct a precomputed vari with the specified value,
+       * operands, and gradients.
+       * 
+       * @param[in] val The value of the variable.
        * @param[in] vars Vector of operands.
        * @param[in] gradients Vector of partial derivatives of value
        * with respect to operands.
        * @throws std::invalid_argument if the sizes of the vectors
        * don't match.
        */
-      precomputed_gradients_vari(const double val,
+      precomputed_gradients_vari(double val,
                                  const std::vector<var>& vars,
                                  const std::vector<double>& gradients)
         : vari(val),

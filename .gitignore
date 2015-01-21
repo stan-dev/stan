@@ -42,13 +42,13 @@ stan.kdev4
 !/src/models/**/makefile
 
 # tests: compiled models
-/src/test/test-models/*.cpp
-/src/test/test-models/*/*.cpp
-/src/test/test-models/*/*/*.cpp
-/src/test/test-models/*/*/*/*.cpp
-/src/test/test-models/*/*/*/*/*.cpp
-/src/test/test-models/*/*/*/*/*/*.cpp
-/src/test/test-models/*/*/*/*/*/*/*.cpp
+/src/test/test-models/*.hpp
+/src/test/test-models/*/*.hpp
+/src/test/test-models/*/*/*.hpp
+/src/test/test-models/*/*/*/*.hpp
+/src/test/test-models/*/*/*/*/*.hpp
+/src/test/test-models/*/*/*/*/*/*.hpp
+/src/test/test-models/*/*/*/*/*/*/*.hpp
 !/src/test/test-models/**/*.stan
 !/src/test/test-models/**/.gitignore
 

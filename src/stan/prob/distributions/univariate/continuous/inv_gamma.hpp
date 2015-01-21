@@ -10,7 +10,7 @@
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/functions/lgamma.hpp>
 #include <stan/math/functions/gamma_q.hpp>

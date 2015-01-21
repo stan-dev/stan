@@ -10,7 +10,7 @@
 #include <stan/error_handling/scalar/check_greater_or_equal.hpp>
 #include <stan/error_handling/scalar/check_less_or_equal.hpp>
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/math/functions/inv_logit.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/log_inv_logit.hpp>
