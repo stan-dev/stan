@@ -76,8 +76,9 @@ namespace stan {
                                " before calling recover_memory()");
       ChainableStack::var_stack_.clear();
       ChainableStack::var_nochain_stack_.clear();
-      for (size_t i = 0; i < ChainableStack::var_alloc_stack_.size(); i++)
+      for (size_t i = 0; i < ChainableStack::var_alloc_stack_.size(); ++i) {
         delete ChainableStack::var_alloc_stack_[i];
+      }
       ChainableStack::var_alloc_stack_.clear();
       ChainableStack::memalloc_.recover_all();
     }
@@ -103,8 +104,10 @@ namespace stan {
 
       for (size_t i = ChainableStack::nested_var_alloc_stack_starts_.back();
            i < ChainableStack::var_alloc_stack_.size(); 
-           ++i)
+           ++i) {
         delete ChainableStack::var_alloc_stack_[i];
+      }
+      ChainableStack::var_alloc_stack_.resize(ChainableStack::nested_var_alloc_stack_starts_.back());
       ChainableStack::nested_var_alloc_stack_starts_.pop_back();
 
       ChainableStack::memalloc_.recover_nested();
