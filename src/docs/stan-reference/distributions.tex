@@ -1,5 +1,33 @@
 \part{Discrete Distributions}\label{discrete-prob-functions.part}
 
+\chapter{Conventions for Probability Functions}
+
+The probability functions (density or mass, depending on discreteness
+of the variable) are all set up to follow some basic conventions.
+
+\section{Finite Inputs}
+
+All of the distribution functions are configured to throw exceptions
+(effectively rejecting samples or optimization steps) when they are
+supplied with non-finite arguments.  The two cases of non-finite
+arguments are the infinite values and not-a-number value;  see
+\refsection{numerica-data-types} for more information on
+floating-point values.
+
+
+\section{Boundary Conditions}
+
+Many distributions are defined with support or constraints on
+parameters forming an open interval.  For example, the normal density
+function accepts a scale parameter $\sigma > 0$.  If $\sigma = 0$, the
+probability function will throw an exception.  
+
+This is true even for (complementary) cumulative distribution
+functions, which will throw exceptions when given input that is out of
+the support.
+
+
+
 
 \chapter{Binary Distributions}
 
@@ -803,7 +831,7 @@ If $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in
     given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
   \fitemtwolines{real}{exp\_mod\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}}{reals \farg{lambda}}{The log of the
+<    reals \farg{sigma}}{reals \farg{lambda}}{The log of the
     exponentially modified normal cumulative distribution function of \farg{y} 
     given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
@@ -2330,9 +2358,10 @@ unit diagonal (i.e., a correlation matrix), then
 The expectation is the identity matrix for any positive value of the 
 shape parameter $\eta$, which can be interpreted like the shape parameter
 of a symmetric beta distribution:
+%
 \begin{itemize}
-\item if $\eta = 1$, then the density is uniform over all correlation
-  matrices of a given order;
+\item if $\eta = 1$, then the density is uniform over correlation
+  matrices of order $K$;
 \item if $\eta > 1$, the identity matrix is the modal correlation
   matrix, with a sharper peak in the density at the identity matrix
   for larger $\eta$; and
@@ -2344,6 +2373,7 @@ of a symmetric beta distribution:
   2\psi_1\left(2\eta+K-k-1 \right)\right)}$, where $\psi_1()$ is the
   trigamma function
 \end{itemize}
+%
 See \citep{LewandowskiKurowickaJoe:2009} for definitions. However, it
 is much better computationally to work directly with the Cholesky factor
 of $\Sigma$, so this distribution should never be explicitly used in 

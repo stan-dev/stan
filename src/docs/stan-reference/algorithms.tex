@@ -504,9 +504,44 @@ graphical model (e.g., where you can work down generatively from known
 hyperpriors to simulate parameters and data), there is no need to
 declare any parameters in Stan, the model block will be empty, and all
 output quantities will be produced in the generated quantities block.
-In this situation, the sampler must be configured to use the
-fixed-parameters setting.  Without parameters there is no need for
-adaptation and the number of warmup iterations should be set to zero.
+For example, to generate a sequence of $N$ draws from a binomial with
+trials $K$ and chance of success $\theta$, the following program suffices.
+%
+\begin{stancode}
+data {
+  real<lower=0,upper=1> theta;
+  int<lower=0> K;
+  int<lower=0> N;
+}
+model { 
+}
+generated quantities {
+  int<lower=0,upper=K> y[N];
+  for (n in 1:N)
+    y[n] <- binomial_rng(K, theta);
+}
+\end{stancode}
+%
+This program includes an empty model block because every Stan program
+must have a model block, even if it's empty.  For this model, the
+sampler must be configured to use the fixed-parameters setting because
+there are no parameters.  Without parameter sampling there is no need
+for adaptation and the number of warmup iterations should be set to
+zero.
+
+Most models that are written to be sampled without parameters will not
+declare any parameters, instead putting anything parameter-like in the
+data block.  Nevertheless, it is possible to include parameters for
+fixed-parameters sampling and initialize them in any of the usual ways
+(randomly, fixed to zero on the unconstrained scale, or with
+user-specified values).  For exmaple, \code{theta} in the example
+above could be declared as a parameter and initialized as a parameter.
+
+
+
+
+
+
 
 
 \section{General Configuration Options}\label{general-config.section}
