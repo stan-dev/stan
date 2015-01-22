@@ -43,7 +43,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type 
         T_partials_return;
 
-      static const std::string function("stan::prob::binomial_log");
+      static const char* function("stan::prob::binomial_log");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
@@ -146,7 +146,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type 
         T_partials_return;
 
-      static const std::string function("stan::prob::binomial_logit_log");
+      static const char* function("stan::prob::binomial_logit_log");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_bounded;
@@ -244,7 +244,7 @@ namespace stan {
     template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
     binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta) {
-      static const std::string function("stan::prob::binomial_cdf");
+      static const char* function("stan::prob::binomial_cdf");
       typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type
         T_partials_return;
           
@@ -327,7 +327,7 @@ namespace stan {
     template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
     binomial_cdf_log(const T_n& n, const T_N& N, const T_prob& theta) {
-      static const std::string function("stan::prob::binomial_cdf_log");
+      static const char* function("stan::prob::binomial_cdf_log");
       typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type
         T_partials_return;
           
@@ -402,7 +402,7 @@ namespace stan {
     template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
     binomial_ccdf_log(const T_n& n, const T_N& N, const T_prob& theta) {
-      static const std::string function("stan::prob::binomial_ccdf_log");
+      static const char* function("stan::prob::binomial_ccdf_log");
       typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type 
         T_partials_return;
           
@@ -483,7 +483,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::binomial_distribution;
 
-      static const std::string function("stan::prob::binomial_rng");
+      static const char* function("stan::prob::binomial_rng");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_less_or_equal;

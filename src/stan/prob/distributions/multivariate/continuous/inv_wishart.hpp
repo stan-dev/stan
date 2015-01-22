@@ -50,7 +50,7 @@ namespace stan {
     inv_wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
                     const T_dof& nu,
                     const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
-      static const std::string function("stan::prob::inv_wishart_log");
+      static const char* function("stan::prob::inv_wishart_log");
       
       using boost::math::tools::promote_args;
       using Eigen::Dynamic;
@@ -128,7 +128,7 @@ namespace stan {
                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
                     RNG& rng) {
 
-      static const std::string function("stan::prob::inv_wishart_rng");
+      static const char* function("stan::prob::inv_wishart_rng");
       
       using stan::error_handling::check_greater;
       using stan::error_handling::check_size_match;

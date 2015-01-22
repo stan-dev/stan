@@ -23,7 +23,7 @@ namespace stan {
               typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_log(const T_y& y, const T_scale& sigma) {
-      static const std::string function("stan::prob::rayleigh_log");
+      static const char* function("stan::prob::rayleigh_log");
       typedef typename stan::partials_return_type<T_y,T_scale>::type 
         T_partials_return;
 
@@ -108,7 +108,7 @@ namespace stan {
     template <typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_cdf(const T_y& y, const T_scale& sigma) {
-      static const std::string function("stan::prob::rayleigh_cdf");
+      static const char* function("stan::prob::rayleigh_cdf");
       typedef typename stan::partials_return_type<T_y,T_scale>::type 
         T_partials_return;
 
@@ -180,7 +180,7 @@ namespace stan {
     template <typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_cdf_log(const T_y& y, const T_scale& sigma) {
-      static const std::string function("stan::prob::rayleigh_cdf_log");
+      static const char* function("stan::prob::rayleigh_cdf_log");
       typedef typename stan::partials_return_type<T_y,T_scale>::type
         T_partials_return;
 
@@ -244,7 +244,7 @@ namespace stan {
     template <typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_ccdf_log(const T_y& y, const T_scale& sigma) {
-      static const std::string function("stan::prob::rayleigh_ccdf_log");
+      static const char* function("stan::prob::rayleigh_ccdf_log");
       typedef typename stan::partials_return_type<T_y,T_scale>::type
         T_partials_return;
 
@@ -309,7 +309,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::uniform_real_distribution;
 
-      static const std::string function("stan::prob::rayleigh_rng");
+      static const char* function("stan::prob::rayleigh_rng");
 
       using stan::error_handling::check_positive;
 
