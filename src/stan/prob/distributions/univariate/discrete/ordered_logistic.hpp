@@ -66,7 +66,7 @@ namespace stan {
       using stan::math::log1m;
       using stan::math::log1p_exp;
 
-      static const std::string function("stan::prob::ordered_logistic");
+      static const char* function("stan::prob::ordered_logistic");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_positive;
@@ -118,7 +118,7 @@ namespace stan {
       using boost::variate_generator;
       using stan::math::inv_logit;
 
-      static const std::string function("stan::prob::ordered_logistic");
+      static const char* function("stan::prob::ordered_logistic");
       
       using stan::error_handling::check_finite;
       using stan::error_handling::check_positive;

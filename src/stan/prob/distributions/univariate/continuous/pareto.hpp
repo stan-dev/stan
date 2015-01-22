@@ -25,7 +25,7 @@ namespace stan {
               typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y,T_scale,T_shape>::type
     pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
-      static const std::string function("stan::prob::pareto_log");
+      static const char* function("stan::prob::pareto_log");
       typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type 
         T_partials_return;
 
@@ -138,7 +138,7 @@ namespace stan {
         return 1.0;
           
       // Check errors
-      static const std::string function("stan::prob::pareto_cdf");
+      static const char* function("stan::prob::pareto_cdf");
           
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -235,7 +235,7 @@ namespace stan {
         return 0.0;
           
       // Check errors
-      static const std::string function("stan::prob::pareto_cdf_log");
+      static const char* function("stan::prob::pareto_cdf_log");
           
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -320,7 +320,7 @@ namespace stan {
         return 0.0;
           
       // Check errors
-      static const std::string function("stan::prob::pareto_ccdf_log");
+      static const char* function("stan::prob::pareto_ccdf_log");
           
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -396,7 +396,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::exponential_distribution;
 
-      static const std::string function("stan::prob::pareto_rng");
+      static const char* function("stan::prob::pareto_rng");
       
       using stan::error_handling::check_positive_finite;
 

@@ -6,8 +6,8 @@ TEST(AgradRevErrorHandlingScalar,CheckBounded_X) {
   using stan::agrad::var;
   using stan::error_handling::check_bounded;
  
-  const std::string function = "check_bounded";
-  const std::string name = "x";
+  const char* function = "check_bounded";
+  const char* name = "x";
   var x = 0;
   var low = -1;
   var high = 1;
@@ -50,8 +50,8 @@ TEST(AgradRevErrorHandlingScalar,CheckBounded_Low) {
   using stan::agrad::var;
   using stan::error_handling::check_bounded;
 
-  const std::string function = "check_bounded";
-  const std::string name = "x";
+  const char* function = "check_bounded";
+  const char* name = "x";
   var x = 0;
   var low = -1;
   var high = 1;
@@ -75,8 +75,8 @@ TEST(AgradRevErrorHandlingScalar,CheckBounded_High) {
   using stan::agrad::var;
   using stan::error_handling::check_bounded;
 
-  const std::string function = "check_bounded";
-  const std::string name = "x";
+  const char* function = "check_bounded";
+  const char* name = "x";
   var x = 0;
   var low = -1;
   var high = 1;

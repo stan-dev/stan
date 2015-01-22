@@ -21,8 +21,8 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T_y, int R, int C>
-    inline bool check_column_index(const std::string& function,
-                                   const std::string& name,
+    inline bool check_column_index(const char* function,
+                                   const char* name,
                                    const Eigen::Matrix<T_y,R,C>& y,
                                    size_t i) {
       if ((i > 0) && (i <= static_cast<size_t>(y.cols())))
@@ -31,8 +31,9 @@ namespace stan {
       std::ostringstream msg;
       msg << ") must be greater than 0 and less than " 
           << y.cols();
+      std::string msg_str(msg.str());
       dom_err(function, name, i,
-              "(", msg.str());
+              "(", msg_str.c_str());
       return false;
     }
 

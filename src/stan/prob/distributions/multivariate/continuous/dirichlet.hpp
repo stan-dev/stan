@@ -45,7 +45,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
     dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                   const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
-      static const std::string function("stan::prob::dirichlet_log");
+      static const char* function("stan::prob::dirichlet_log");
       using boost::math::lgamma;
       using boost::math::tools::promote_args;
       using stan::error_handling::check_consistent_sizes;

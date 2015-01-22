@@ -45,7 +45,7 @@ namespace stan {
               typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
     chi_square_log(const T_y& y, const T_dof& nu) {
-      static const std::string function("stan::prob::chi_square_log");
+      static const char* function("stan::prob::chi_square_log");
       typedef typename stan::partials_return_type<T_y,T_dof>::type 
         T_partials_return;
 
@@ -156,7 +156,7 @@ namespace stan {
     template <typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
     chi_square_cdf(const T_y& y, const T_dof& nu) {
-      static const std::string function("stan::prob::chi_square_cdf");
+      static const char* function("stan::prob::chi_square_cdf");
       typedef typename stan::partials_return_type<T_y,T_dof>::type 
         T_partials_return;
 
@@ -255,7 +255,7 @@ namespace stan {
     template <typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
     chi_square_cdf_log(const T_y& y, const T_dof& nu) {
-      static const std::string function("stan::prob::chi_square_cdf_log");
+      static const char* function("stan::prob::chi_square_cdf_log");
       typedef typename stan::partials_return_type<T_y,T_dof>::type 
         T_partials_return;
 
@@ -348,7 +348,7 @@ namespace stan {
     template <typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
     chi_square_ccdf_log(const T_y& y, const T_dof& nu) {
-      static const std::string function("stan::prob::chi_square_ccdf_log");
+      static const char* function("stan::prob::chi_square_ccdf_log");
       typedef typename stan::partials_return_type<T_y,T_dof>::type 
         T_partials_return;
 
@@ -445,7 +445,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::chi_squared_distribution;
 
-      static const std::string function("stan::prob::chi_square_rng");
+      static const char* function("stan::prob::chi_square_rng");
 
       using stan::error_handling::check_positive_finite;
       

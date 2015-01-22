@@ -29,8 +29,8 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T_y>
-    inline bool check_nonzero_size(const std::string& function,
-                                   const std::string& name,
+    inline bool check_nonzero_size(const char* function,
+                                   const char* name,
                                    const T_y& y) {
       using stan::math::index_type;
 

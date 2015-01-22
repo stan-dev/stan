@@ -11,8 +11,8 @@ namespace stan {
 
     // NOTE: this will not throw if x contains nan values.
     template <typename T, int R, int C>
-    inline bool check_vector(const std::string& function,
-                             const std::string& name,
+    inline bool check_vector(const char* function,
+                             const char* name,
                              const Eigen::Matrix<T,R,C>& x) {
       if (x.rows() == 1 || x.cols() == 1)
         return true;
@@ -21,10 +21,11 @@ namespace stan {
       msg << ") has " << x.rows() << " rows and " 
           << x.cols() << " columns but it should be a vector so it should "
           << "either have 1 row or 1 column";
+      std::string msg_str(msg.str());
       dom_err(function,
               name,
               typename scalar_type<T>::type(),
-              "(", msg.str());
+              "(", msg_str.c_str());
       return false;
     }
 

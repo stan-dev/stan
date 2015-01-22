@@ -27,7 +27,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale, T_inv_scale>::type
     exp_mod_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                        const T_inv_scale& lambda) {
-      static const std::string function("stan::prob::exp_mod_normal_log");
+      static const char* function("stan::prob::exp_mod_normal_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
                                                   T_inv_scale>::type 
         T_partials_return;
@@ -146,7 +146,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_inv_scale>::type
     exp_mod_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                        const T_inv_scale& lambda) {
-      static const std::string function("stan::prob::exp_mod_normal_cdf");
+      static const char* function("stan::prob::exp_mod_normal_cdf");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
                                                   T_inv_scale>::type 
         T_partials_return;
@@ -266,7 +266,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_inv_scale>::type
     exp_mod_normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                            const T_inv_scale& lambda) {
-      static const std::string function("stan::prob::exp_mod_normal_cdf_log");
+      static const char* function("stan::prob::exp_mod_normal_cdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
                                                   T_inv_scale>::type
         T_partials_return;
@@ -379,7 +379,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_inv_scale>::type
     exp_mod_normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                             const T_inv_scale& lambda) {
-      static const std::string function("stan::prob::exp_mod_normal_ccdf_log");
+      static const char* function("stan::prob::exp_mod_normal_ccdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
                                                   T_inv_scale>::type
         T_partials_return;
@@ -494,7 +494,7 @@ namespace stan {
                        const double lambda,
                        RNG& rng) {
 
-      static const std::string function("stan::prob::exp_mod_normal_rng");
+      static const char* function("stan::prob::exp_mod_normal_rng");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_finite;
