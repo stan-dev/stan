@@ -24,7 +24,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     multinomial_log(const std::vector<int>& ns,
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
-      static const std::string function("stan::prob::multinomial_log");
+      static const char* function("stan::prob::multinomial_log");
 
       using stan::error_handling::check_nonnegative;
       using stan::error_handling::check_simplex;
@@ -66,7 +66,7 @@ namespace stan {
     multinomial_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& theta,
                     const int N,
                     RNG& rng) {
-      static const std::string function("stan::prob::multinomial_rng");
+      static const char* function("stan::prob::multinomial_rng");
       using stan::error_handling::check_simplex;
       using stan::error_handling::check_positive;
 

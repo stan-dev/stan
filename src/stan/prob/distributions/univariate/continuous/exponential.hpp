@@ -46,7 +46,7 @@ namespace stan {
     template <bool propto, typename T_y, typename T_inv_scale>
     typename return_type<T_y,T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta) {
-      static const std::string function("stan::prob::exponential_log");
+      static const char* function("stan::prob::exponential_log");
       typedef typename stan::partials_return_type<T_y,T_inv_scale>::type 
         T_partials_return;
 
@@ -125,7 +125,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_inv_scale>::type 
         T_partials_return;
 
-      static const std::string function("stan::prob::exponential_cdf");
+      static const char* function("stan::prob::exponential_cdf");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -179,7 +179,7 @@ namespace stan {
     exponential_cdf_log(const T_y& y, const T_inv_scale& beta) {
       typedef typename stan::partials_return_type<T_y,T_inv_scale>::type T_partials_return;
 
-      static const std::string function("stan::prob::exponential_cdf_log");
+      static const char* function("stan::prob::exponential_cdf_log");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -226,7 +226,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_inv_scale>::type 
         T_partials_return;
 
-     static const std::string function("stan::prob::exponential_ccdf_log");
+     static const char* function("stan::prob::exponential_ccdf_log");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -272,7 +272,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::exponential_distribution;
 
-      static const std::string function("stan::prob::exponential_rng");
+      static const char* function("stan::prob::exponential_rng");
 
       using stan::error_handling::check_positive_finite;
 

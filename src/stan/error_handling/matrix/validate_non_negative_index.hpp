@@ -18,7 +18,8 @@ namespace stan {
             << "; variable=" << var_name
             << "; dimension size expression=" << expr
             << "; expression value=" << val;
-        throw std::invalid_argument(msg.str());
+        std::string msg_str(msg.str());
+        throw std::invalid_argument(msg_str.c_str());
       }
     }
 

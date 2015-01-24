@@ -21,8 +21,8 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T_y>
-    inline bool check_std_vector_index(const std::string& function,
-                                       const std::string& name,
+    inline bool check_std_vector_index(const char* function,
+                                       const char* name,
                                        const std::vector<T_y>& y,
                                        size_t i) {
       if ((i > 0) && (i <= static_cast<size_t>(y.size())))
@@ -31,8 +31,9 @@ namespace stan {
       std::ostringstream msg;
       msg << ") must be greater than 0 and less than " 
           << y.size();
+      std::string msg_str(msg.str());
       dom_err(function, name, i,
-              "(", msg.str());
+              "(", msg_str.c_str());
       return false;
     }
 

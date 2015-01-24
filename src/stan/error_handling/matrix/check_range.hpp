@@ -11,7 +11,7 @@ namespace stan {
 
       void raise_range_error(size_t max,
                              size_t i, 
-                             const std::string& msg,
+                             const char* msg,
                              size_t idx) {
         std::stringstream s;
         s << "INDEX OPERATOR [] OUT OF BOUNDS"
@@ -21,7 +21,8 @@ namespace stan {
           << "; index position=" << idx
           << "; " << msg
           << std::endl;
-        throw std::out_of_range(s.str());
+        std::string s_str(s.str());
+        throw std::out_of_range(s_str.c_str());
       }
 
     }
@@ -29,7 +30,7 @@ namespace stan {
     inline
     void check_range(size_t max,
                      size_t i, 
-                     const std::string& msg,
+                     const char* msg,
                      size_t idx) {
       if (i < 1 || i > max) 
         raise_range_error(max,i,msg,idx);
