@@ -4,7 +4,8 @@
 \chapter{Vectorization}\label{vectorization.chapter}
 
 \noindent
-Stan's scalar log probability functions all support vectorized
+Stan's scalar log probability functions, including the density
+functions, mass functions, CDFs, and CCDFs, all support vectorized
 function application, with results defined to be the sum of the
 elementwise application of the function.  In all cases, matrix
 operations are faster than loops and vectorized log probability
