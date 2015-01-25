@@ -5321,7 +5321,7 @@ data vectors $y$ as input.
 \begin{enumerate} 
 \item For each cluster $k$ in $1{:}K$, compute the cluster centroid $\mu_k$  by averaging the
   vectors assigned to that cluster;
-\item For each $n$ in $1:N$, reassign $y_n$ to the cluster $k$ to
+\item For each $n$ in $1:N$, reassign $y_n$ to the cluster $k$
   for which the (Euclidean) distance from $y_n$ to $\mu_k$ is smallest;
 \item If no vectors changed cluster, return the cluster assignments.
 \end{enumerate}

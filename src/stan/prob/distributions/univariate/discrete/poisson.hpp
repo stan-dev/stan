@@ -29,7 +29,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_rate>::type
         T_partials_return;
 
-      static const std::string function("stan::prob::poisson_log");
+      static const char* function("stan::prob::poisson_log");
       
       using boost::math::lgamma;
       using stan::error_handling::check_consistent_sizes;
@@ -110,7 +110,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n,T_log_rate>::type
         T_partials_return;
 
-      static const std::string function("stan::prob::poisson_log_log");
+      static const char* function("stan::prob::poisson_log_log");
       
       using boost::math::lgamma;
       using stan::error_handling::check_not_nan;
@@ -193,7 +193,7 @@ namespace stan {
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_cdf(const T_n& n, const T_rate& lambda) {
-      static const std::string function("stan::prob::poisson_cdf");
+      static const char* function("stan::prob::poisson_cdf");
       typedef typename stan::partials_return_type<T_n,T_rate>::type 
         T_partials_return;
           
@@ -263,7 +263,7 @@ namespace stan {
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_cdf_log(const T_n& n, const T_rate& lambda) {
-      static const std::string function("stan::prob::poisson_cdf_log");
+      static const char* function("stan::prob::poisson_cdf_log");
       typedef typename stan::partials_return_type<T_n,T_rate>::type 
         T_partials_return;
           
@@ -331,7 +331,7 @@ namespace stan {
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_ccdf_log(const T_n& n, const T_rate& lambda) {
-      static const std::string function("stan::prob::poisson_ccdf_log");
+      static const char* function("stan::prob::poisson_ccdf_log");
       typedef typename stan::partials_return_type<T_n,T_rate>::type 
         T_partials_return;
           
@@ -405,7 +405,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::poisson_distribution;
 
-      static const std::string function("stan::prob::poisson_rng");
+      static const char* function("stan::prob::poisson_rng");
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_nonnegative;
@@ -429,7 +429,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::poisson_distribution;
 
-      static const std::string function("stan::prob::poisson_log_rng");
+      static const char* function("stan::prob::poisson_log_rng");
       
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_nonnegative;

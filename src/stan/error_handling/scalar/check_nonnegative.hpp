@@ -14,8 +14,8 @@ namespace stan {
     namespace {
       template <typename T_y, bool is_vec>
       struct nonnegative {
-        static bool check(const std::string& function,
-                          const std::string& name,
+        static bool check(const char* function,
+                          const char* name,
                           const T_y& y) {
           // have to use not is_unsigned. is_signed will be false
           // floating point types that have no unsigned versions.
@@ -28,8 +28,8 @@ namespace stan {
     
       template <typename T_y>
       struct nonnegative<T_y, true> {
-        static bool check(const std::string& function,
-                          const std::string& name,
+        static bool check(const char* function,
+                          const char* name,
                           const T_y& y) {
           using stan::length;
           using stan::math::value_type;
@@ -47,8 +47,8 @@ namespace stan {
 
     // throws if any element in y is nan
     template <typename T_y>
-    inline bool check_nonnegative(const std::string& function,
-                                  const std::string& name,
+    inline bool check_nonnegative(const char* function,
+                                  const char* name,
                                   const T_y& y) {
       return nonnegative<T_y,is_vector_like<T_y>::value>
         ::check(function, name, y);
