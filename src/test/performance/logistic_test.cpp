@@ -8,19 +8,27 @@
 class performance : public ::testing::Test {
 public:
   static void SetUpTestCase() {
-    N = 100;
+    //N = 100;
+    N = 3;
     milliseconds_per_run.resize(N);
     last_draws_per_run.resize(N);
+    matches_tagged_version = false;
+    all_values_same = false;
   }
 
   static int N;
   static Eigen::Matrix<long, -1, 1> milliseconds_per_run;
   static std::vector<Eigen::Matrix<double, -1, 1> > last_draws_per_run;
+  static bool matches_tagged_version;
+  static bool all_values_same;
 };
+
 
 int performance::N;
 Eigen::Matrix<long, -1, 1> performance::milliseconds_per_run;
 std::vector<Eigen::Matrix<double, -1, 1> > performance::last_draws_per_run;
+bool performance::matches_tagged_version;
+bool performance::all_values_same;
 
 Eigen::Matrix<double, -1, 1> get_last_iteration_from_file(const char* filename) {
   Eigen::Matrix<double, -1, 1> draw;
@@ -71,34 +79,57 @@ TEST_F(performance, run) {
   SUCCEED();
 }
 
+bool close_enough(double expected, double val) {
+  if (std::fabs(expected - val) < 1e-10)
+    return true;
+  return false;
+}
+
 // evaluate
 TEST_F(performance, values_from_tagged_version) {
   int N_values = 8;
   ASSERT_EQ(N_values, last_draws_per_run[0].size())
     << "last tagged version, 2.5.0, had " << N_values << " elements";
-
+  
+  matches_tagged_version = true;
   Eigen::Matrix<double, -1, 1> first_run = last_draws_per_run[0];
   EXPECT_FLOAT_EQ(-67.5276, first_run[0])
     << "lp__: index 0";
+  matches_tagged_version &= close_enough(-67.5276, first_run[0]);
+
   EXPECT_FLOAT_EQ(0.773672, first_run[1])
     << "accept_stat__: index 1";
+  matches_tagged_version &= close_enough(0.773672, first_run[1]);
+
   EXPECT_FLOAT_EQ(0.901013, first_run[2])
     << "stepsize__: index 2";
+  matches_tagged_version &= close_enough(0.901013, first_run[2]);
+
   EXPECT_FLOAT_EQ(2, first_run[3])
     << "treedepth__: index 3";
+  matches_tagged_version &= close_enough(2, first_run[3]);
+
   EXPECT_FLOAT_EQ(3, first_run[4])
     << "n_leapfrog__: index 4";
+  matches_tagged_version &= close_enough(3, first_run[4]);
+
   EXPECT_FLOAT_EQ(0, first_run[5])
     << "n_divergent__: index 5";
+  matches_tagged_version &= close_enough(0, first_run[5]);
+
   EXPECT_FLOAT_EQ(1.71115, first_run[6])
     << "beta.1: index 6";
+  matches_tagged_version &= close_enough(1.71115, first_run[6]);
+
   EXPECT_FLOAT_EQ(-0.291085, first_run[7])
     << "beta.2: index 7";
+  matches_tagged_version &= close_enough(-0.291085, first_run[7]);
 }
 
 TEST_F(performance, values_same_run_to_run) {
   int N_values = last_draws_per_run[0].size();
   
+  all_values_same = true;
   for (int i = 0; i < N_values; i++) {
     double expected_value = last_draws_per_run[0][i];
     for (int n = 1; n < N; n++) {
@@ -106,6 +137,7 @@ TEST_F(performance, values_same_run_to_run) {
         << "expecting run to run values to be the same. Found run "
         << n << " to have different values than the 0th run for "
         << "index: " << i;
+      all_values_same &= close_enough(expected_value, last_draws_per_run[n][i]);
     }
   }
 }
@@ -165,6 +197,14 @@ TEST_F(performance, write_results_to_disk) {
     line << "," << milliseconds_per_run[n];
   }
 
+  // matches tagged values
+  header << "," << quote("matches tagged version");
+  line << "," << quote(matches_tagged_version ? "yes" : "no");
+  
+  // all values same
+  header << "," << quote("all values same");
+  line << "," << quote(all_values_same ? "yes" : "no");
+
   // append output to: test/performance/performance.csv
   bool write_header = false;
   std::fstream file_stream;
@@ -176,7 +216,6 @@ TEST_F(performance, write_results_to_disk) {
   } else {
     std::string file_header;
     std::getline(file_stream, file_header);
-    std::cout << "existing file header: " << file_header << std::endl;
     
     EXPECT_EQ(file_header, header.str()) 
       << "header of file is different";
