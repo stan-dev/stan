@@ -2729,11 +2729,11 @@ and sampling statements for more information).
 %
 \begin{stancode}
 increment_log_prob(normal_log(y, 0, 1));
-increment_log_prob(-(1 - log(normal_cdf(-0.5, 0, 1))));
+increment_log_prob(-(log(1 - normal_cdf(-0.5, 0, 1))));
 \end{stancode}
 %
-The denominator is actually implemented with the more efficient and
-stable version
+The denominator (second line above) is implemented with the more
+efficient and stable version
 %
 \begin{stancode}
 increment_log_prob(-normal_ccdf_log(-0.5, 0, 1));

@@ -4,7 +4,8 @@
 \chapter{Vectorization}\label{vectorization.chapter}
 
 \noindent
-Stan's scalar log probability functions all support vectorized
+Stan's scalar log probability functions, including the density
+functions, mass functions, CDFs, and CCDFs, all support vectorized
 function application, with results defined to be the sum of the
 elementwise application of the function.  In all cases, matrix
 operations are faster than loops and vectorized log probability
@@ -2510,7 +2511,7 @@ arbitrary subvector.
     \farg{rv}.}
 %
   \fitem{T[]}{head}{T[] \farg{sv}, int \farg{n}}{Return
-    the standard vector consisting of the first \farg{n} elements of
+    the array consisting of the first \farg{n} elements of
     \farg{sv}; applies to up to three-dimensional arrays containing
     any type of elements \code{T}.}
 %
@@ -2522,7 +2523,7 @@ arbitrary subvector.
     \farg{rv}.}
 %
   \fitem{T[]}{tail}{T[] \farg{sv}, int \farg{n}}{Return
-    the standard vector consisting of the last \farg{n} elements of
+    the array consisting of the last \farg{n} elements of
     \farg{sv}; applies to up to three-dimensional arrays containing
     any type of elements \code{T}.}
 %
@@ -2537,7 +2538,7 @@ arbitrary subvector.
     \farg{i} through through \farg{i} + \farg{n} - 1.}
 %
   \fitem{T[]}{segment}{T[] \farg{sv}, int \farg{i}, int
-    \farg{n}}{Return the standard vector consisting of the \farg{n}
+    \farg{n}}{Return the array consisting of the \farg{n}
     elements of \farg{sv} starting at \farg{i}; i.e., elements
     \farg{i} through through \farg{i} + \farg{n} - 1. Applies to up to
     three-dimensional arrays containing any type of elements
@@ -2551,8 +2552,13 @@ arbitrary subvector.
 Stan's matrix concatenation operations \code{append\_col} and
 \code{append\_row} are like the operations \code{cbind} and
 \code{rbind} in R.%
-\indexref{cbind}{{\tt\bfseries append\_col}}
-\indexref{rbind}{{\tt\bfseries append\_row}}
+
+% THIS WAS REALLY HARD WORK FIGURING OUT HOW TO GET THESE IN, SO
+% I'M LEAVING THIS HERE IN CASE WE WANT THEM BACK AGAIN OR SOMETHING
+% LIKE THEM:
+%
+% \indexref{cbind}{{\tt\bfseries append\_col}}
+% \indexref{rbind}{{\tt\bfseries append\_row}}
 
 
 
@@ -2560,15 +2566,25 @@ Stan's matrix concatenation operations \code{append\_col} and
 
 \begin{description}
 %
-\fitem{matrix}{append\_col}{matrix \farg{x}, matrix \farg{y}}{Combine matrices \farg{x} and \farg{y} by columns. The matrices must have the same number of rows.}
+  \fitem{matrix}{append\_col}{matrix \farg{x}, matrix
+    \farg{y}}{Combine matrices \farg{x} and \farg{y} by columns. The
+    matrices must have the same number of rows.}
 %
-\fitem{matrix}{append\_col}{matrix \farg{x}, vector \farg{y}}{Combine matrix \farg{x} and vector \farg{y} by columns. The matrix and the vector must have the same number of rows.}
+\fitem{matrix}{append\_col}{matrix \farg{x}, vector \farg{y}}{Combine
+  matrix \farg{x} and vector \farg{y} by columns. The matrix and the
+  vector must have the same number of rows.}
 %
-\fitem{matrix}{append\_col}{vector \farg{x}, matrix \farg{y}}{Combine vector \farg{x} and matrix \farg{y} by columns. The vector and the matrix must have the same number of rows.}
+\fitem{matrix}{append\_col}{vector \farg{x}, matrix \farg{y}}{Combine
+  vector \farg{x} and matrix \farg{y} by columns. The vector and the
+  matrix must have the same number of rows.}
 %
-\fitem{matrix}{append\_col}{vector \farg{x}, vector \farg{y}}{Combine vectors \farg{x} and \farg{y} by columns. The vectors must have the same number of rows.}
+\fitem{matrix}{append\_col}{vector \farg{x}, vector \farg{y}}{Combine
+  vectors \farg{x} and \farg{y} by columns. The vectors must have the
+  same number of rows.}
 %
-\fitem{row\_vector}{append\_col}{row\_vector \farg{x}, row\_vector \farg{y}}{Combine row vectors \farg{x} and \farg{y} of any size into another row vector.}
+\fitem{row\_vector}{append\_col}{row\_vector \farg{x}, row\_vector
+  \farg{y}}{Combine row vectors \farg{x} and \farg{y} of any size into
+  another row vector.}
 %
 \end{description}
 
@@ -2576,15 +2592,27 @@ Stan's matrix concatenation operations \code{append\_col} and
 
 \begin{description}
 %
-\fitem{matrix}{append\_row}{matrix \farg{x}, matrix \farg{y}}{Combine matrices \farg{x} and \farg{y} by columns. The matrices must have the same number of rows.}
+  \fitem{matrix}{append\_row}{matrix \farg{x}, matrix
+    \farg{y}}{Combine matrices \farg{x} and \farg{y} by rows. The
+    matrices must have the same number of columns.}
 %
-\fitem{matrix}{append\_row}{matrix \farg{x}, row\_vector \farg{y}}{Combine matrix \farg{x} and row vector \farg{y} by columns. The matrix and the row vector must have the same number of rows.}
+  \fitem{matrix}{append\_row}{matrix \farg{x}, row\_vector
+    \farg{y}}{Combine matrix \farg{x} and row vector \farg{y} by
+    rows. The matrix and the row vector must have the same number
+    of columns.}
 %
-\fitem{matrix}{append\_row}{row\_vector \farg{x}, matrix \farg{y}}{Combine row vector \farg{x} and matrix \farg{y} by columns. The row vector and the matrix must have the same number of rows.}
+  \fitem{matrix}{append\_row}{row\_vector \farg{x}, matrix
+    \farg{y}}{Combine row vector \farg{x} and matrix \farg{y} by
+    rows. The row vector and the matrix must have the same number
+    of columns.}
 %
-\fitem{matrix}{append\_row}{row\_vector \farg{x}, row\_vector \farg{y}}{Combine row vectors \farg{x} and \farg{y} by columns. The row vectors must have the same number of rows.}
+  \fitem{matrix}{append\_row}{row\_vector \farg{x}, row\_vector
+    \farg{y}}{Combine row vectors \farg{x} and \farg{y} by row. The
+    row vectors must have the same number of columns.}
 %
-\fitem{vector}{append\_row}{vector \farg{x}, vector \farg{y}}{Combine vectors \farg{x} and \farg{y} of any size into another vector.}
+  \fitem{vector}{append\_row}{vector \farg{x}, vector
+    \farg{y}}{Concatenate vectors \farg{x} and \farg{y} of any size into
+    another vector.}
 %
 \end{description}
 
