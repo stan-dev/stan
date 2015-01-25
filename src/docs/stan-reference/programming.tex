@@ -547,8 +547,8 @@ for (n in 1:N)
     // ... do something with a[m,n] ...
 \end{stancode}
 %
-Arrays, on the other hand, should be traversed in row-major (or
-first-index fastest) order.%
+Arrays, on the other hand, should be traversed in row-major order
+(i.e., last index fastest), as in the following example.
 %
 \begin{stancode}
 real a[M,N];
