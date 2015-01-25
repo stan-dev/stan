@@ -48,7 +48,7 @@ namespace stan {
               typename T_y, typename T_dof, typename T_scale>
     typename return_type<T_y,T_dof,T_scale>::type
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s) {
-      static const std::string function("stan::prob::scaled_inv_chi_square_log");
+      static const char* function("stan::prob::scaled_inv_chi_square_log");
       typedef typename stan::partials_return_type<T_y,T_dof,T_scale>::type
         T_partials_return;
       
@@ -197,7 +197,7 @@ namespace stan {
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
         return 1.0;
       
-      static const std::string function("stan::prob::scaled_inv_chi_square_cdf");
+      static const char* function("stan::prob::scaled_inv_chi_square_cdf");
           
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -326,7 +326,7 @@ namespace stan {
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
         return 0.0;
       
-      static const std::string function("stan::prob::scaled_inv_chi_square_cdf_log");
+      static const char* function("stan::prob::scaled_inv_chi_square_cdf_log");
           
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -439,7 +439,7 @@ namespace stan {
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
         return 0.0;
       
-      static const std::string function("stan::prob::scaled_inv_chi_square_ccdf_log");
+      static const char* function("stan::prob::scaled_inv_chi_square_ccdf_log");
           
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_not_nan;
@@ -550,7 +550,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::chi_squared_distribution;
 
-      static const std::string function("stan::prob::scaled_inv_chi_square_rng");
+      static const char* function("stan::prob::scaled_inv_chi_square_rng");
       
       using stan::error_handling::check_positive_finite;
 

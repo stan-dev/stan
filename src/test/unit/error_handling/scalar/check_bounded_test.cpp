@@ -4,8 +4,8 @@
 using stan::error_handling::check_bounded;
 
 TEST(ErrorHandlingScalar,CheckBounded_x) {
-  const std::string function = "check_bounded";
-  const std::string name = "x";
+  const char* function = "check_bounded";
+  const char* name = "x";
   double x = 0;
   double low = -1;
   double high = 1;
@@ -43,8 +43,8 @@ TEST(ErrorHandlingScalar,CheckBounded_x) {
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;  
 }
 TEST(ErrorHandlingScalar,CheckBounded_Low) {
-  const std::string function = "check_bounded";
-  const std::string name = "x";
+  const char* function = "check_bounded";
+  const char* name = "x";
   double x = 0;
   double low = -1;
   double high = 1;
@@ -66,8 +66,8 @@ TEST(ErrorHandlingScalar,CheckBounded_Low) {
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
 TEST(ErrorHandlingScalar,CheckBounded_High) {
-  const std::string function = "check_bounded";
-  const std::string name = "x";
+  const char* function = "check_bounded";
+  const char* name = "x";
   double x = 0;
   double low = -1;
   double high = 1;
@@ -90,8 +90,8 @@ TEST(ErrorHandlingScalar,CheckBounded_High) {
 TEST(ErrorHandlingScalar,CheckBounded_nan) {
   double nan = std::numeric_limits<double>::quiet_NaN();
 
-  const std::string function = "check_bounded";
-  const std::string name = "x";
+  const char* function = "check_bounded";
+  const char* name = "x";
   double x = 0;
   double low = -1;
   double high = 1;

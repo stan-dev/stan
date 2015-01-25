@@ -42,7 +42,7 @@ namespace stan {
                                                   T_precision>::type 
         T_partials_return;
 
-      static const std::string function("stan::prob::neg_binomial_2_log");
+      static const char* function("stan::prob::neg_binomial_2_log");
 
       using stan::error_handling::check_positive_finite;
       using stan::error_handling::check_nonnegative;
@@ -158,7 +158,7 @@ namespace stan {
                                                   T_precision>::type 
         T_partials_return;
 
-      static const std::string function("stan::prob::neg_binomial_log");
+      static const char* function("stan::prob::neg_binomial_log");
 
       using stan::error_handling::check_finite;
       using stan::error_handling::check_nonnegative;
@@ -281,7 +281,7 @@ namespace stan {
       using stan::error_handling::check_consistent_sizes;
       using stan::error_handling::check_less;
       
-      static const std::string function("stan::prob::neg_binomial_2_cdf");
+      static const char* function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);
@@ -341,7 +341,7 @@ namespace stan {
       using stan::error_handling::check_consistent_sizes;
       using stan::error_handling::check_less;
       
-      static const std::string function("stan::prob::neg_binomial_2_cdf");
+      static const char* function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);
@@ -504,7 +504,7 @@ namespace stan {
       using stan::error_handling::check_consistent_sizes;
       using stan::error_handling::check_less;
       
-      static const std::string function("stan::prob::neg_binomial_2_cdf");
+      static const char* function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);
@@ -554,7 +554,7 @@ namespace stan {
       using stan::error_handling::check_consistent_sizes;
       using stan::error_handling::check_less;
       
-      static const std::string function("stan::prob::neg_binomial_2_cdf");
+      static const char* function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);
@@ -607,7 +607,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
 
-      static const std::string function("stan::prob::neg_binomial_2_rng");
+      static const char* function("stan::prob::neg_binomial_2_rng");
 
       using stan::error_handling::check_positive_finite;
 
@@ -627,7 +627,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
 
-      static const std::string function("stan::prob::neg_binomial_2_log_rng");
+      static const char* function("stan::prob::neg_binomial_2_log_rng");
 
       using stan::error_handling::check_finite;
       using stan::error_handling::check_positive_finite;
