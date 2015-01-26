@@ -42,22 +42,6 @@ namespace stan {
       return result;
     }
        
-    //vector append_row(vector, vector)
-    template <typename T1, typename T2, int R1, int R2>
-    inline Matrix<typename return_type<T1, T2>::type, Dynamic, 1>
-    append_row(const Matrix<T1, R1, 1> & A,
-               const Matrix<T2, R1, 1> & B) {          
-      int Asize = A.size();
-      int Bsize = B.size();
-      Matrix<typename return_type<T1, T2>::type, 1, Dynamic>
-        result(Asize + Bsize);
-      for (int i = 0; i < Asize; i++)
-        result(i) = A(i);
-      for (int i = 0, j = Asize; i < Bsize; i++, j++)
-        result(j) = B(i);
-      return result;
-    }
-    
     //matrix append_row(matrix, matrix)
     //matrix append_row(matrix, row_vector)
     //matrix append_row(row_vector, matrix)
