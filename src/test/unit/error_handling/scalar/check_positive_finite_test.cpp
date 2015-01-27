@@ -4,7 +4,7 @@
 using stan::error_handling::check_positive_finite;
 
 TEST(ErrorHandlingScalar,CheckPositiveFinite) {
-  const std::string function = "check_positive_finite";
+  const char* function = "check_positive_finite";
   double x = 1;
  
   EXPECT_TRUE(check_positive_finite(function, "x", x))
@@ -29,7 +29,7 @@ TEST(ErrorHandlingScalar,CheckPositiveFinite) {
 
 // ---------- check_positive_finite: vector tests ----------
 TEST(ErrorHandlingScalar,CheckPositiveFinite_Vector) {
-  const std::string function = "check_positive_finite";
+  const char* function = "check_positive_finite";
   std::vector<double> x;
   
   x.clear();
@@ -77,7 +77,7 @@ TEST(ErrorHandlingScalar,CheckPositiveFinite_Vector) {
 
 // ---------- check_positive_finite: matrix tests ----------
 TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix) {
-  const std::string function = "check_positive_finite";
+  const char* function = "check_positive_finite";
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
   
   x.resize(3);
@@ -113,7 +113,7 @@ TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix) {
 
 
 TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix_one_indexed_message) {
-  const std::string function = "check_positive_finite";
+  const char* function = "check_positive_finite";
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
   std::string message;
 
@@ -132,7 +132,7 @@ TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix_one_indexed_message) {
     << message;
 }
 TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix_one_indexed_message_2) {
-  const std::string function = "check_positive_finite";
+  const char* function = "check_positive_finite";
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
   std::string message;
 
@@ -152,7 +152,7 @@ TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix_one_indexed_message_2) {
 }
 
 TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix_one_indexed_message_3) {
-  const std::string function = "check_positive_finite";
+  const char* function = "check_positive_finite";
   Eigen::Matrix<double,Eigen::Dynamic,1> x;
   std::string message;
 
@@ -172,7 +172,7 @@ TEST(ErrorHandlingScalar,CheckPositiveFinite_Matrix_one_indexed_message_3) {
 }
 
 TEST(ErrorHandlingScalar,CheckPositiveFinite_nan) {
-  const std::string function = "check_positive_finite";
+  const char* function = "check_positive_finite";
   double nan = std::numeric_limits<double>::quiet_NaN();
 
   EXPECT_THROW(check_positive_finite(function, "x", nan),

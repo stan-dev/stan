@@ -5,7 +5,7 @@
 using stan::error_handling::check_greater;
 
 TEST(ErrorHandlingScalar,CheckGreater) {
-  const std::string function = "check_greater";
+  const char* function = "check_greater";
   double x = 10.0;
   double lb = 0.0;
  
@@ -36,7 +36,7 @@ TEST(ErrorHandlingScalar,CheckGreater) {
 }
 
 TEST(ErrorHandlingScalar,CheckGreater_Matrix) {
-  const std::string function = "check_greater";
+  const char* function = "check_greater";
   double x;
   double low;
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
@@ -140,7 +140,7 @@ TEST(ErrorHandlingScalar,CheckGreater_Matrix) {
 }
 
 TEST(ErrorHandlingScalar,CheckGreater_Matrix_one_indexed_message) {
-  const std::string function = "check_greater";
+  const char* function = "check_greater";
   double x;
   double low;
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
@@ -200,7 +200,7 @@ TEST(ErrorHandlingScalar,CheckGreater_Matrix_one_indexed_message) {
 }
 
 TEST(ErrorHandlingScalar,CheckGreater_nan) {
-  const std::string function = "check_greater";
+  const char* function = "check_greater";
   double x = 10.0;
   double lb = 0.0;
   double nan = std::numeric_limits<double>::quiet_NaN();

@@ -34,8 +34,8 @@ namespace stan {
      */
     // FIXME: update warnings
     template <typename T_y>
-    inline bool check_corr_matrix(const std::string& function,
-                                  const std::string& name,
+    inline bool check_corr_matrix(const char* function,
+                                  const char* name,
                                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
@@ -58,8 +58,9 @@ namespace stan {
               << name << "(" << stan::error_index::value + k 
               << "," << stan::error_index::value + k 
               << ") is "; ;
+          std::string msg_str(msg.str());
           dom_err(function, name, y(k,k),
-                  msg.str(),
+                  msg_str.c_str(),
                   ", but should be near 1.0");
           return false;
         }

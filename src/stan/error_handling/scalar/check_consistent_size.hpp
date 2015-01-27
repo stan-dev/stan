@@ -10,8 +10,8 @@ namespace stan {
 
     // NOTE: this will not throw if nan is passed in.
     template <typename T>
-    inline bool check_consistent_size(const std::string& function,
-                                      const std::string& name,
+    inline bool check_consistent_size(const char* function,
+                                      const char* name,
                                       const T& x,
                                       size_t max_size) {
       size_t x_size = stan::size_of(x);
@@ -27,10 +27,11 @@ namespace stan {
           << "scalar, array, vector, or matrix types, and they were not "
           << "consistently sized;  all arguments must be scalars or "
           << "multidimensional values of the same shape.";
+      std::string msg_str(msg.str());
 
       dom_err(function, name, x_size,
               "dimension=",
-              msg.str());
+              msg_str.c_str());
       
       return false;
     }
