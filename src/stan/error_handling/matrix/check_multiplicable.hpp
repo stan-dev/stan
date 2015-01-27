@@ -12,10 +12,10 @@ namespace stan {
 
     // NOTE: this will not throw if y1 or y2 contains nan values.
     template <typename T1, typename T2>
-    inline bool check_multiplicable(const std::string& function,
-                                    const std::string& name1,
+    inline bool check_multiplicable(const char* function,
+                                    const char* name1,
                                     const T1& y1,
-                                    const std::string& name2,
+                                    const char* name2,
                                     const T2& y2) {
       check_size_match(function, 
                        "Columns of matrix 1", y1.cols(), 

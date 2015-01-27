@@ -12,8 +12,8 @@ namespace stan {
     namespace {
       template <typename T_y, bool is_vec>
       struct finite {
-        static bool check(const std::string& function,
-                          const std::string& name,
+        static bool check(const char* function,
+                          const char* name,
                           const T_y& y) {
           if (!(boost::math::isfinite)(y))
             dom_err(function, name, y,
@@ -24,8 +24,8 @@ namespace stan {
     
       template <typename T_y>
       struct finite<T_y, true> {
-        static bool check(const std::string& function,
-                          const std::string& name,
+        static bool check(const char* function,
+                          const char* name,
                           const T_y& y) {
           using stan::length;
           for (size_t n = 0; n < length(y); n++) {
@@ -43,8 +43,8 @@ namespace stan {
      * NOTE: throws if any element in y is nan.
      */
     template <typename T_y>
-    inline bool check_finite(const std::string& function,
-                             const std::string& name,
+    inline bool check_finite(const char* function,
+                             const char* name,
                              const T_y& y) {
       return finite<T_y, is_vector_like<T_y>::value>
         ::check(function, name, y);

@@ -7,8 +7,8 @@ TEST(ErrorHandlingScalar, checkConsistentSize) {
   using stan::error_handling::check_consistent_size;
   using stan::size_of;
 
-  const std::string function = "checkConsistentSize";
-  const std::string name1 = "name1";
+  const char* function = "checkConsistentSize";
+  const char* name1 = "name1";
   
 
   Matrix<double,Dynamic,1> v1(4);
@@ -23,8 +23,8 @@ TEST(ErrorHandlingScalar, checkConsistentSize_nan) {
   using stan::error_handling::check_consistent_size;
   using stan::size_of;
 
-  const std::string function = "checkConsistentSize";
-  const std::string name1 = "name1";
+  const char* function = "checkConsistentSize";
+  const char* name1 = "name1";
   
   double nan = std::numeric_limits<double>::quiet_NaN();
 

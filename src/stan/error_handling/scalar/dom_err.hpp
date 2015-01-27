@@ -28,11 +28,11 @@ namespace stan {
      * @param msg2 Message to print after the variable
      */
     template <typename T>
-    inline void dom_err(const std::string& function,
-                        const std::string& name,
+    inline void dom_err(const char* function,
+                        const char* name,
                         const T& y,
-                        const std::string& msg1,
-                        const std::string& msg2) {
+                        const char* msg1,
+                        const char* msg2) {
       std::ostringstream message;
       
       message << function << "(" << typeid(T).name() << "): "
@@ -62,10 +62,10 @@ namespace stan {
      * @param msg1 Message to print before the variable
      */
     template <typename T>
-    inline void dom_err(const std::string& function,
-                        const std::string& name,
+    inline void dom_err(const char* function,
+                        const char* name,
                         const T& y,
-                        const std::string& msg1) {
+                        const char* msg1) {
       dom_err(function, name, y, msg1, "");
     }
 

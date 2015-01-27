@@ -29,8 +29,8 @@ namespace stan {
      * @tparam T_y Type of elements of Cholesky factor
      */
     template <typename T_y>
-    bool check_cholesky_factor_corr(const std::string& function,
-                                    const std::string& name,
+    bool check_cholesky_factor_corr(const char* function,
+                                    const char* name,
                                     const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       if (!check_square(function, name, y))
         return false;
@@ -61,7 +61,7 @@ namespace stan {
      * @tparam T_result Type of result.
      */
     template <typename T_y>
-    inline bool check_cholesky_factor_corr(const std::string& function,
+    inline bool check_cholesky_factor_corr(const char* function,
                                            const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       return check_cholesky_factor_corr(function, "(internal variable)", y);
     }
