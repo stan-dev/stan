@@ -8965,6 +8965,7 @@ transformed parameter.
 Sampling from heavy tailed distributions such as the Cauchy is
 difficult for Hamiltonian Monte Carlo, which operates within a
 Euclidean geometry.%
+%
 \footnote{Riemannian Manifold Hamiltonian Monte Carlo (RMHMC) overcomes
   this difficulty by simulating the Hamiltonian dynamics in a a space
   with a position-dependent metric; see
@@ -8992,7 +8993,7 @@ The inverse of the cumulative distribution function,
 $F_X^{-1}:(0,1) \rightarrow \reals$, is thus
 %
 \[
-F^{-1}_X(y) = \mu + \tau \tan \left( \pi \left( x - \frac{1}{2} \right) \right).
+F^{-1}_X(y) = \mu + \tau \tan \left( \pi \left( y - \frac{1}{2} \right) \right).
 \]
 Thus if the random variable $Y$ has a unit uniform distribution, $Y
 \sim \distro{Uniform}(0,1)$, then $F^{-1}_X(Y)$ has a Cauchy
