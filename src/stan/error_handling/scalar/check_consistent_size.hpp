@@ -25,8 +25,8 @@ namespace stan {
      * @throw <code>invalid_argument</code> if the size is inconsistent
      */
     template <typename T>
-    inline bool check_consistent_size(const std::string& function,
-                                      const std::string& name,
+    inline bool check_consistent_size(const char* function,
+                                      const char* name,
                                       const T& x,
                                       size_t expected_size) {
       if (!is_vector<T>::value)
@@ -41,11 +41,11 @@ namespace stan {
           << "scalar, array, vector, or matrix types, and they were not "
           << "consistently sized;  all arguments must be scalars or "
           << "multidimensional values of the same shape.";
+      std::string msg_str(msg.str());
 
       invalid_argument(function, name, stan::size_of(x),
                        "has dimension = ",
-                       msg.str());
-      
+                       msg_str.c_str());
       return false;
     }
 

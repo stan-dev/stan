@@ -25,20 +25,21 @@ namespace stan {
      * @return <code>true</code> if the index is within range
      * @throw <code>std::out_of_range</code> if the index is not in range
      */
-    inline bool check_range(const std::string& function,
-                            const std::string& name,  
+    inline bool check_range(const char* function,
+                            const char* name,  
                             const int max,
                             const int index,
                             const int nested_level,
-                            const std::string& error_msg) {
+                            const char* error_msg) {
       if ((index >= stan::error_index::value) 
           && (index < max + stan::error_index::value))
         return true;
       
       std::stringstream msg;
       msg << "; index position = " << nested_level;
+      std::string msg_str(msg.str());
       
-      out_of_range(function, max, index, msg.str(), error_msg);
+      out_of_range(function, max, index, msg_str.c_str(), error_msg);
       return false;
     }
 
@@ -57,11 +58,11 @@ namespace stan {
      * @return <code>true</code> if the index is within range
      * @throw <code>std::out_of_range</code> if the index is not in range
      */
-    inline bool check_range(const std::string& function,
-                            const std::string& name,  
+    inline bool check_range(const char* function,
+                            const char* name,  
                             const int max,
                             const int index,
-                            const std::string& error_msg) {
+                            const char* error_msg) {
       if ((index >= stan::error_index::value) 
           && (index < max + stan::error_index::value))
         return true;
@@ -84,8 +85,8 @@ namespace stan {
      * @return <code>true</code> if the index is within range
      * @throw <code>std::out_of_range</code> if the index is not in range
      */
-    inline bool check_range(const std::string& function,
-                            const std::string& name,  
+    inline bool check_range(const char* function,
+                            const char* name,  
                             const int max,
                             const int index) {
       if ((index >= stan::error_index::value) 

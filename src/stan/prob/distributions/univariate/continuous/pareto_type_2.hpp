@@ -27,7 +27,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     pareto_type_2_log(const T_y& y, const T_loc& mu, const T_scale& lambda, 
                       const T_shape& alpha) {
-      static const std::string function("stan::prob::pareto_type_2_log");
+      static const char* function("stan::prob::pareto_type_2_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_shape>::type 
         T_partials_return;      
 
@@ -80,7 +80,7 @@ namespace stan {
       if (include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
         for (size_t n = 0; n < N; n++)
           log1p_scaled_diff[n] = log1p((value_of(y_vec[n]) 
-                                            - value_of(mu_vec[n]))
+                                        - value_of(mu_vec[n]))
                                        / value_of(lambda_vec[n]));
 
       VectorBuilder<include_summand<propto,T_scale>::value,
@@ -137,14 +137,14 @@ namespace stan {
     inline
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     pareto_type_2_log(const T_y& y, const T_loc& mu, 
-              const T_scale& lambda, const T_shape& alpha) {
+                      const T_scale& lambda, const T_shape& alpha) {
       return pareto_type_2_log<false>(y,mu,lambda,alpha);
     }
     
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y, T_loc, T_scale, T_shape>::type
     pareto_type_2_cdf(const T_y& y, const T_loc& mu, 
-              const T_scale& lambda, const T_shape& alpha) {
+                      const T_scale& lambda, const T_shape& alpha) {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_shape>::type 
         T_partials_return;
 
@@ -157,7 +157,7 @@ namespace stan {
         return 1.0;
           
       // Check errors
-      static const std::string function("stan::prob::pareto_type_2_cdf");
+      static const char* function("stan::prob::pareto_type_2_cdf");
           
       using stan::math::check_greater_or_equal;
       using stan::math::check_finite;
@@ -206,7 +206,7 @@ namespace stan {
         const T_partials_return lambda_dbl = value_of(lambda_vec[i]);
         const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
         const T_partials_return temp = 1 + (value_of(y_vec[i]) 
-                                 - value_of(mu_vec[i])) 
+                                            - value_of(mu_vec[i])) 
           / lambda_dbl;
         p1_pow_alpha[i] = pow(temp, -alpha_dbl);
 
@@ -265,7 +265,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y, T_loc, T_scale, T_shape>::type
     pareto_type_2_cdf_log(const T_y& y, const T_loc& mu, 
-                  const T_scale& lambda, const T_shape& alpha) {
+                          const T_scale& lambda, const T_shape& alpha) {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_shape>::type 
         T_partials_return;
 
@@ -278,7 +278,7 @@ namespace stan {
         return 0.0;
           
       // Check errors
-      static const std::string function("stan::prob::pareto_type_2_cdf_log");
+      static const char* function("stan::prob::pareto_type_2_cdf_log");
           
       using stan::math::check_greater_or_equal;
       using stan::math::check_finite;
@@ -317,7 +317,7 @@ namespace stan {
         cdf_log(N);
 
       VectorBuilder<true, T_partials_return,
-                       T_y,T_loc,T_scale,T_shape>
+                    T_y,T_loc,T_scale,T_shape>
         inv_p1_pow_alpha_minus_one(N);
 
       VectorBuilder<!is_constant_struct<T_shape>::value, 
@@ -326,7 +326,7 @@ namespace stan {
 
       for (size_t i = 0; i < N; i++) {
         const T_partials_return temp = 1.0 + (value_of(y_vec[i]) 
-                                   - value_of(mu_vec[i])) 
+                                              - value_of(mu_vec[i])) 
           / value_of(lambda_vec[i]);
         const T_partials_return p1_pow_alpha = pow(temp, value_of(alpha_vec[i]));
         cdf_log[i] = log1m(1.0 / p1_pow_alpha);
@@ -370,7 +370,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y, T_loc, T_scale, T_shape>::type
     pareto_type_2_ccdf_log(const T_y& y, const T_loc& mu,
-                   const T_scale& lambda, const T_shape& alpha) {
+                           const T_scale& lambda, const T_shape& alpha) {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_shape>::type 
         T_partials_return;
 
@@ -383,7 +383,7 @@ namespace stan {
         return 0.0;
           
       // Check errors
-      static const std::string function("stan::prob::pareto_type_2_ccdf_log");
+      static const char* function("stan::prob::pareto_type_2_ccdf_log");
           
       using stan::math::check_greater_or_equal;
       using stan::math::check_positive_finite;
@@ -476,7 +476,7 @@ namespace stan {
                       const double lambda,
                       const double alpha,
                       RNG& rng) {
-      static const std::string function("stan::prob::pareto_type_2_rng");
+      static const char* function("stan::prob::pareto_type_2_rng");
       
       stan::math::check_positive(function, "scale parameter", lambda);
 

@@ -27,10 +27,10 @@ namespace stan {
           numerator(k-1) = lgamma(2 * k);
         constant = sum(numerator);
         if ( (K % 2) == 1 ) constant += 0.25 * (K * K - 1) * LOG_PI -
-          0.25 * (Km1 * Km1) * LOG_TWO - Km1 * lgamma( (K + 1) / 2);
+                              0.25 * (Km1 * Km1) * LOG_TWO - Km1 * lgamma( (K + 1) / 2);
         else constant += 0.25 * K * (K - 2) * LOG_PI +
-          0.25 * (3 * K * K - 4 * K) * LOG_TWO +
-          K * lgamma(K / 2) - Km1 * lgamma(K);
+               0.25 * (3 * K * K - 4 * K) * LOG_TWO +
+               K * lgamma(K / 2) - Km1 * lgamma(K);
       }
       else {
         constant = -Km1 * lgamma(eta + 0.5 * Km1);
@@ -46,10 +46,10 @@ namespace stan {
               typename T_covar, typename T_shape>
     typename boost::math::tools::promote_args<T_covar, T_shape>::type
     lkj_corr_cholesky_log(
-             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
-             const T_shape& eta) {
+                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
+                          const T_shape& eta) {
 
-      static const std::string function("stan::prob::lkj_corr_cholesky_log");
+      static const char* function("stan::prob::lkj_corr_cholesky_log");
 
       using boost::math::tools::promote_args;
       using stan::math::check_positive;
@@ -74,9 +74,9 @@ namespace stan {
         for (size_t k = 0; k < Km1; k++)
           values(k) = (Km1 - k - 1) * log_diagonals(k);
         if ( (eta == 1.0) &&
-            stan::is_constant<typename stan::scalar_type<T_shape> >::value) {
-            lp += sum(values);
-            return(lp);
+             stan::is_constant<typename stan::scalar_type<T_shape> >::value) {
+          lp += sum(values);
+          return(lp);
         }
         values += (2.0 * eta - 2.0) * log_diagonals;
         lp += sum(values);
@@ -89,8 +89,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T_covar, T_shape>::type
     lkj_corr_cholesky_log(
-             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
-             const T_shape& eta) {
+                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
+                          const T_shape& eta) {
       return lkj_corr_cholesky_log<false>(L,eta);
     }
 
@@ -101,7 +101,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y, T_shape>::type
     lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
                  const T_shape& eta) {
-      static const std::string function("stan::prob::lkj_corr_log");
+      static const char* function("stan::prob::lkj_corr_log");
 
       using stan::math::check_positive;
       using stan::math::check_corr_matrix;
@@ -120,11 +120,11 @@ namespace stan {
         lp += do_lkj_constant(eta, K);
 
       if ( (eta == 1.0) &&
-          stan::is_constant<typename stan::scalar_type<T_shape> >::value )
+           stan::is_constant<typename stan::scalar_type<T_shape> >::value )
         return lp;
 
       if (!include_summand<propto,T_y,T_shape>::value)
-          return lp;
+        return lp;
 
       Eigen::Matrix<T_y,Eigen::Dynamic,1> values =
         y.ldlt().vectorD().array().log().matrix();
@@ -145,7 +145,7 @@ namespace stan {
     lkj_corr_cholesky_rng(const size_t K,
                           const double eta,
                           RNG& rng) {
-      static const std::string function("stan::prob::lkj_corr_cholesky_rng");
+      static const char* function("stan::prob::lkj_corr_cholesky_rng");
 
       using stan::math::check_positive;
       
@@ -170,15 +170,14 @@ namespace stan {
                  const double eta,
                  RNG& rng) {
 
-      static const std::string function("stan::prob::lkj_corr_rng");
+      static const char* function("stan::prob::lkj_corr_rng");
 
       using stan::math::check_positive;
       
       check_positive(function, "Shape parameter", eta);
 
       using stan::math::multiply_lower_tri_self_transpose;
-      return multiply_lower_tri_self_transpose(
-                  lkj_corr_cholesky_rng(K, eta, rng) );
+      return multiply_lower_tri_self_transpose(lkj_corr_cholesky_rng(K, eta, rng));
     }
 
   }

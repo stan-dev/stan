@@ -33,8 +33,8 @@ namespace stan {
      * @throw std::out_of_range if index is an invalid column index
      */
     template <typename T_y, int R, int C>
-    inline bool check_column_index(const std::string& function,
-                                   const std::string& name,
+    inline bool check_column_index(const char* function,
+                                   const char* name,
                                    const Eigen::Matrix<T_y,R,C>& y,
                                    const size_t i) {
       if (i >= stan::error_index::value
@@ -43,10 +43,11 @@ namespace stan {
 
       std::stringstream msg;
       msg << " for columns of " << name;
+      std::string msg_str(msg.str());
       out_of_range(function, 
                    y.cols(),
                    i, 
-                   msg.str());
+                   msg_str.c_str());
       return false;
     }
 

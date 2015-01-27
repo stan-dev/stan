@@ -6,13 +6,14 @@
 
 #include <gtest/gtest.h>
 
+const char* function_ = "function";
+const char* y_name_ = "y";
+const char* msg1_ = "error_message ";
+const char* msg2_ = " second message";
+
 class ErrorHandlingScalar_domain_error_vec : public ::testing::Test {
 public:
   void SetUp() {
-    function_ = "function";
-    y_name_ = "y";
-    msg1_ = "error_message ";
-    msg2_ = " second message";
     index_ = 0;
   }
 
@@ -69,10 +70,6 @@ public:
     }
   }
 
-  std::string function_;
-  std::string y_name_;
-  std::string msg1_;
-  std::string msg2_;
   size_t index_;
 };
 

@@ -69,8 +69,9 @@ namespace stan {
          << "; C1=" << C1
          << "; R2=" << R2
          << "; C2=" << C2;
+      std::string ss_str(ss.str());
       invalid_argument("assign(Eigen::Matrix,Eigen::Matrix)",
-                       "", "", ss.str());
+                       "", "", ss_str.c_str());
     }
 
     /**

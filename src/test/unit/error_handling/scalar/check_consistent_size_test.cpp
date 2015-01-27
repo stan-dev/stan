@@ -8,8 +8,8 @@ TEST(ErrorHandlingScalar, checkConsistentSize_EigenVector) {
   using stan::math::check_consistent_size;
   using stan::size_of;
 
-  const std::string function = "checkConsistentSize";
-  const std::string name1 = "name1";
+  const char* function = "checkConsistentSize";
+  const char* name1 = "name1";
   
 
   Matrix<double,Dynamic,1> x(4);
@@ -39,8 +39,8 @@ TEST(ErrorHandlingScalar, checkConsistentSize_StdVector) {
   using stan::math::check_consistent_size;
   using stan::size_of;
 
-  const std::string function = "checkConsistentSize";
-  const std::string name1 = "name1";
+  const char* function = "checkConsistentSize";
+  const char* name1 = "name1";
   
 
   std::vector<double> x(4);
@@ -68,8 +68,8 @@ TEST(ErrorHandlingScalar, checkConsistentSize_scalar) {
   using stan::math::check_consistent_size;
   using stan::size_of;
 
-  const std::string function = "checkConsistentSize";
-  const std::string name1 = "name1";
+  const char* function = "checkConsistentSize";
+  const char* name1 = "name1";
   
   double x = 0;
   
@@ -82,8 +82,8 @@ TEST(ErrorHandlingScalar, checkConsistentSize_nan) {
   using stan::math::check_consistent_size;
   using stan::size_of;
 
-  const std::string function = "checkConsistentSize";
-  const std::string name1 = "name1";
+  const char* function = "checkConsistentSize";
+  const char* name1 = "name1";
   
   double nan = std::numeric_limits<double>::quiet_NaN();
 

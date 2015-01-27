@@ -26,7 +26,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_log(const T_y& y, 
                            const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::double_exponential_log");
+      static const char* function("stan::prob::double_exponential_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
       
@@ -145,7 +145,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_cdf(const T_y& y, 
                            const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::double_exponential_cdf");
+      static const char* function("stan::prob::double_exponential_cdf");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
 
@@ -209,12 +209,12 @@ namespace stan {
         else {
           const T_partials_return rep_deriv = cdf * inv_sigma 
             / (2.0 * exp_scaled_diff - 1.0);
-        if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += rep_deriv;
-        if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] -= rep_deriv;
-        if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff;
+          if (!is_constant_struct<T_y>::value)
+            operands_and_partials.d_x1[n] += rep_deriv;
+          if (!is_constant_struct<T_loc>::value)
+            operands_and_partials.d_x2[n] -= rep_deriv;
+          if (!is_constant_struct<T_scale>::value)
+            operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff;
         }
       }
       return operands_and_partials.to_var(cdf,y,mu,sigma);
@@ -224,7 +224,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_cdf_log(const T_y& y, const T_loc& mu, 
                                const T_scale& sigma) {
-      static const std::string function("stan::prob::double_exponential_cdf_log");
+      static const char* function("stan::prob::double_exponential_cdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
       
@@ -288,13 +288,13 @@ namespace stan {
           //gradients
           const T_partials_return rep_deriv = 1.0 
             / (2.0 * exp(scaled_diff) - 1.0);
-        if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += rep_deriv * inv_sigma;
-        if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] -= rep_deriv * inv_sigma;
-        if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff 
-            * inv_sigma;
+          if (!is_constant_struct<T_y>::value)
+            operands_and_partials.d_x1[n] += rep_deriv * inv_sigma;
+          if (!is_constant_struct<T_loc>::value)
+            operands_and_partials.d_x2[n] -= rep_deriv * inv_sigma;
+          if (!is_constant_struct<T_scale>::value)
+            operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff 
+              * inv_sigma;
         }
       }
       return operands_and_partials.to_var(cdf_log,y,mu,sigma);
@@ -303,8 +303,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_ccdf_log(const T_y& y, const T_loc& mu, 
-                               const T_scale& sigma) {
-      static const std::string function("stan::prob::double_exponential_ccdf_log");
+                                const T_scale& sigma) {
+      static const char* function("stan::prob::double_exponential_ccdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
       
@@ -356,13 +356,13 @@ namespace stan {
           //gradients
           const T_partials_return rep_deriv = 1.0 
             / (2.0 * exp(-scaled_diff) - 1.0);
-        if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] -= rep_deriv * inv_sigma;
-        if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] += rep_deriv * inv_sigma;
-        if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += rep_deriv * scaled_diff 
-            * inv_sigma;
+          if (!is_constant_struct<T_y>::value)
+            operands_and_partials.d_x1[n] -= rep_deriv * inv_sigma;
+          if (!is_constant_struct<T_loc>::value)
+            operands_and_partials.d_x2[n] += rep_deriv * inv_sigma;
+          if (!is_constant_struct<T_scale>::value)
+            operands_and_partials.d_x3[n] += rep_deriv * scaled_diff 
+              * inv_sigma;
         }
         else {
           // log ccdf
@@ -385,7 +385,7 @@ namespace stan {
     double_exponential_rng(const double mu,
                            const double sigma,
                            RNG& rng) {
-      static const std::string function("stan::prob::double_exponential_rng");
+      static const char* function("stan::prob::double_exponential_rng");
 
       using boost::variate_generator;
       using boost::random::uniform_01;

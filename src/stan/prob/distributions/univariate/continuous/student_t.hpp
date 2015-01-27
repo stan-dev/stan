@@ -56,7 +56,7 @@ namespace stan {
     typename return_type<T_y,T_dof,T_loc,T_scale>::type
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
                   const T_scale& sigma) {
-      static const std::string function("stan::prob::student_t_log");
+      static const char* function("stan::prob::student_t_log");
       typedef typename stan::partials_return_type<T_y,T_dof,T_loc,
                                                   T_scale>::type 
         T_partials_return;
@@ -233,7 +233,7 @@ namespace stan {
             && stan::length(sigma))) 
         return 1.0;
       
-      static const std::string function("stan::prob::student_t_cdf");
+      static const char* function("stan::prob::student_t_cdf");
           
       using stan::math::check_positive_finite;
       using stan::math::check_finite;
@@ -419,7 +419,7 @@ namespace stan {
             && stan::length(sigma))) 
         return 0.0;
       
-      static const std::string function("stan::prob::student_t_cdf_log");
+      static const char* function("stan::prob::student_t_cdf_log");
           
       using stan::math::check_positive_finite;
       using stan::math::check_finite;
@@ -592,7 +592,7 @@ namespace stan {
             && stan::length(sigma))) 
         return 0.0;
       
-      static const std::string function("stan::prob::student_t_ccdf_log");
+      static const char* function("stan::prob::student_t_ccdf_log");
           
       using stan::math::check_positive_finite;
       using stan::math::check_finite;
@@ -763,7 +763,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::student_t_distribution;
 
-      static const std::string function("stan::prob::student_t_rng");
+      static const char* function("stan::prob::student_t_rng");
 
       using stan::math::check_positive_finite;
       using stan::math::check_finite;

@@ -2,20 +2,18 @@
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
+
+const char* function = "function";
 class ErrorHandlingMatrix : public ::testing::Test {
 public:
   void SetUp() {
-    function = "function";
   }
   
-  std::string function;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
 };
 
 TEST_F(ErrorHandlingMatrix, checkPosDefinite) {
   using stan::math::check_pos_definite;
-
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
 
   y.resize(1,1);
   y << 1;
@@ -32,8 +30,6 @@ TEST_F(ErrorHandlingMatrix, checkPosDefinite) {
 TEST_F(ErrorHandlingMatrix, checkPosDefinite_not_square) {
   using stan::math::check_pos_definite;
   std::string expected_msg;
-
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   
   y.resize(3, 4);
   expected_msg = "Expecting a square matrix; rows of y (3) and columns of y (4) must match in size";
@@ -46,8 +42,6 @@ TEST_F(ErrorHandlingMatrix, checkPosDefinite_0_size) {
   using stan::math::check_pos_definite;
   std::string expected_msg;
 
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
-
   expected_msg = "y must have a positive size, but is 0; dimension size expression = rows";
   EXPECT_THROW_MSG(check_pos_definite(function, "y", y),
                    std::invalid_argument,
@@ -58,8 +52,6 @@ TEST_F(ErrorHandlingMatrix, checkPosDefinite_non_symmetric) {
   using stan::math::check_pos_definite;
   std::string expected_msg;
 
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
-  
   y.resize(3,3);
   y <<
     1, 0, 0,
@@ -73,7 +65,6 @@ TEST_F(ErrorHandlingMatrix, checkPosDefinite_non_symmetric) {
 }
 
 TEST_F(ErrorHandlingMatrix, checkPosDefinite_nan) {
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double nan = std::numeric_limits<double>::quiet_NaN();
   using stan::math::check_pos_definite;
 

@@ -25,7 +25,7 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     lognormal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::lognormal_log");
+      static const char* function("stan::prob::lognormal_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
 
@@ -151,7 +151,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     lognormal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::lognormal_cdf");
+      static const char* function("stan::prob::lognormal_cdf");
 
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
@@ -230,7 +230,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     lognormal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::lognormal_cdf_log");
+      static const char* function("stan::prob::lognormal_cdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
 
@@ -301,7 +301,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     lognormal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::lognormal_ccdf_log");
+      static const char* function("stan::prob::lognormal_ccdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
 
@@ -377,7 +377,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::lognormal_distribution;
 
-      static const std::string function("stan::prob::lognormal_rng");
+      static const char* function("stan::prob::lognormal_rng");
 
       using stan::math::check_finite;
       using stan::math::check_positive_finite;

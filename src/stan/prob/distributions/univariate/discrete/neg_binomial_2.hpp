@@ -42,7 +42,7 @@ namespace stan {
                                                   T_precision>::type 
         T_partials_return;
 
-      static const std::string function("stan::prob::neg_binomial_2_log");
+      static const char* function("stan::prob::neg_binomial_2_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
@@ -158,7 +158,7 @@ namespace stan {
                                                   T_precision>::type 
         T_partials_return;
 
-      static const std::string function("stan::prob::neg_binomial_log");
+      static const char* function("stan::prob::neg_binomial_log");
 
       using stan::math::check_finite;
       using stan::math::check_nonnegative;
@@ -281,7 +281,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::check_less;
       
-      static const std::string function("stan::prob::neg_binomial_2_cdf");
+      static const char* function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);
@@ -327,8 +327,8 @@ namespace stan {
               typename T_precision>
     typename return_type<T_location, T_precision>::type
     neg_binomial_2_cdf_log(const T_n& n,
-                       const T_location& mu,
-                       const T_precision& phi) {
+                           const T_location& mu,
+                           const T_precision& phi) {
                          
       // Size checks
       if ( !( stan::length(n) && stan::length(mu) 
@@ -341,7 +341,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::check_less;
       
-      static const std::string function("stan::prob::neg_binomial_2_cdf");
+      static const char* function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);
@@ -390,100 +390,100 @@ namespace stan {
      
     namespace {
       
-      //modified version of beta_ccdf_log
-      //used in neg_binomial_2_ccdf_log
-      //modifications made: remove unnecessary validations and include:
-      //if (beta_dbl < 1)
-      //  continue;
-      template <typename T_y, typename T_scale_succ, typename T_scale_fail>
-      typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-      beta_ccdf_log_modified(const T_y& y, const T_scale_succ& alpha, 
-                    const T_scale_fail& beta) {
-        typedef typename stan::partials_return_type<T_y,T_scale_succ,
-                                                    T_scale_fail>::type 
-          T_partials_return;
+    //modified version of beta_ccdf_log
+    //used in neg_binomial_2_ccdf_log
+    //modifications made: remove unnecessary validations and include:
+    //if (beta_dbl < 1)
+    //  continue;
+    template <typename T_y, typename T_scale_succ, typename T_scale_fail>
+    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
+    beta_ccdf_log_modified(const T_y& y, const T_scale_succ& alpha, 
+    const T_scale_fail& beta) {
+    typedef typename stan::partials_return_type<T_y,T_scale_succ,
+    T_scale_fail>::type 
+    T_partials_return;
 
-        using stan::math::value_of;
+    using stan::math::value_of;
 
-        double ccdf_log(0.0);
+    double ccdf_log(0.0);
         
-        // Wrap arguments in vectors
-        VectorView<const T_y> y_vec(y);
-        VectorView<const T_scale_succ> alpha_vec(alpha);
-        VectorView<const T_scale_fail> beta_vec(beta);
-        size_t N = max_size(y, alpha, beta);
+    // Wrap arguments in vectors
+    VectorView<const T_y> y_vec(y);
+    VectorView<const T_scale_succ> alpha_vec(alpha);
+    VectorView<const T_scale_fail> beta_vec(beta);
+    size_t N = max_size(y, alpha, beta);
 
-        agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
-          operands_and_partials(y, alpha, beta);
+    agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
+    operands_and_partials(y, alpha, beta);
 
-        // Compute CDF and its gradients
-        using boost::math::ibeta;
-        using boost::math::ibeta_derivative;
-        using boost::math::digamma;
+    // Compute CDF and its gradients
+    using boost::math::ibeta;
+    using boost::math::ibeta_derivative;
+    using boost::math::digamma;
           
-        // Cache a few expensive function calls if alpha or beta is a parameter
-        VectorBuilder<true, T_partials_return, T_scale_succ, T_scale_fail>
-          digamma_alpha_vec(max_size(alpha, beta));
-        VectorBuilder<true, T_partials_return, T_scale_succ, T_scale_fail>
-          digamma_beta_vec(max_size(alpha, beta));
-        VectorBuilder<true, T_partials_return, T_scale_succ, T_scale_fail>
-          digamma_sum_vec(max_size(alpha, beta));        
-        VectorBuilder<true, T_partials_return, T_scale_succ, T_scale_fail>
-          betafunc_vec(max_size(alpha, beta));
+    // Cache a few expensive function calls if alpha or beta is a parameter
+    VectorBuilder<true, T_partials_return, T_scale_succ, T_scale_fail>
+    digamma_alpha_vec(max_size(alpha, beta));
+    VectorBuilder<true, T_partials_return, T_scale_succ, T_scale_fail>
+    digamma_beta_vec(max_size(alpha, beta));
+    VectorBuilder<true, T_partials_return, T_scale_succ, T_scale_fail>
+    digamma_sum_vec(max_size(alpha, beta));        
+    VectorBuilder<true, T_partials_return, T_scale_succ, T_scale_fail>
+    betafunc_vec(max_size(alpha, beta));
           
-        if (!is_constant_struct<T_scale_succ>::value 
-            || !is_constant_struct<T_scale_fail>::value) {
+    if (!is_constant_struct<T_scale_succ>::value 
+    || !is_constant_struct<T_scale_fail>::value) {
               
-          for (size_t i = 0; i < N; i++) {
+    for (size_t i = 0; i < N; i++) {
 
-            const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
-            const T_partials_return beta_dbl = value_of(beta_vec[i]);
+    const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
+    const T_partials_return beta_dbl = value_of(beta_vec[i]);
                   
-            digamma_alpha_vec[i] = digamma(alpha_dbl);
-            digamma_beta_vec[i] = digamma(beta_dbl);
-            digamma_sum_vec[i] = digamma(alpha_dbl + beta_dbl);
-            betafunc_vec[i] = boost::math::beta(alpha_dbl, beta_dbl);
-          }
-        }
+    digamma_alpha_vec[i] = digamma(alpha_dbl);
+    digamma_beta_vec[i] = digamma(beta_dbl);
+    digamma_sum_vec[i] = digamma(alpha_dbl + beta_dbl);
+    betafunc_vec[i] = boost::math::beta(alpha_dbl, beta_dbl);
+    }
+    }
           
-        // Compute vectorized CDFLog and gradient
-        for (size_t n = 0; n < N; n++) {
+    // Compute vectorized CDFLog and gradient
+    for (size_t n = 0; n < N; n++) {
                 
-          // Pull out values
-          const T_partials_return y_dbl = value_of(y_vec[n]);
-          const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
-          const T_partials_return beta_dbl = value_of(beta_vec[n]);
+    // Pull out values
+    const T_partials_return y_dbl = value_of(y_vec[n]);
+    const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+    const T_partials_return beta_dbl = value_of(beta_vec[n]);
           
-          if (beta_dbl < 1)
-            continue;
+    if (beta_dbl < 1)
+    continue;
                     
-          // Compute
-          const T_partials_return Pn = 1.0 - ibeta(alpha_dbl, beta_dbl, y_dbl);
+    // Compute
+    const T_partials_return Pn = 1.0 - ibeta(alpha_dbl, beta_dbl, y_dbl);
 
-          ccdf_log += log(Pn);
+    ccdf_log += log(Pn);
                     
-          if (!is_constant_struct<T_y>::value)
-            operands_and_partials.d_x1[n] -= 
-              ibeta_derivative(alpha_dbl, beta_dbl, y_dbl) / Pn;
+    if (!is_constant_struct<T_y>::value)
+    operands_and_partials.d_x1[n] -= 
+    ibeta_derivative(alpha_dbl, beta_dbl, y_dbl) / Pn;
 
-          double g1 = 0;
-          double g2 = 0;
+    double g1 = 0;
+    double g2 = 0;
                 
-          if (!is_constant_struct<T_scale_succ>::value
-              || !is_constant_struct<T_scale_fail>::value) {
-            stan::math::grad_reg_inc_beta(g1, g2, alpha_dbl, beta_dbl, y_dbl, 
-                                          digamma_alpha_vec[n], 
-                                          digamma_beta_vec[n], digamma_sum_vec[n], 
-                                          betafunc_vec[n]);
-          }
-          if (!is_constant_struct<T_scale_succ>::value)
-            operands_and_partials.d_x2[n] -= g1 / Pn;
-          if (!is_constant_struct<T_scale_fail>::value)
-            operands_and_partials.d_x3[n] -= g2 / Pn;
-        }
+    if (!is_constant_struct<T_scale_succ>::value
+    || !is_constant_struct<T_scale_fail>::value) {
+    stan::math::grad_reg_inc_beta(g1, g2, alpha_dbl, beta_dbl, y_dbl, 
+    digamma_alpha_vec[n], 
+    digamma_beta_vec[n], digamma_sum_vec[n], 
+    betafunc_vec[n]);
+    }
+    if (!is_constant_struct<T_scale_succ>::value)
+    operands_and_partials.d_x2[n] -= g1 / Pn;
+    if (!is_constant_struct<T_scale_fail>::value)
+    operands_and_partials.d_x3[n] -= g2 / Pn;
+    }
           
-        return operands_and_partials.to_var(ccdf_log);
-      }      
+    return operands_and_partials.to_var(ccdf_log);
+    }      
       
     }
     */
@@ -504,7 +504,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::check_less;
       
-      static const std::string function("stan::prob::neg_binomial_2_cdf");
+      static const char* function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);
@@ -537,64 +537,64 @@ namespace stan {
     // that was incompatible with the fvars used in higher-order
     // autodiff.
     template <typename T_n, typename T_location,
-              typename T_precision>
+    typename T_precision>
     typename return_type<T_location, T_precision>::type
     neg_binomial_2_ccdf_log(const T_n& n,
-                       const T_location& mu,
-                       const T_precision& phi) {
+    const T_location& mu,
+    const T_precision& phi) {
                          
-      // Size checks
-      if ( !( stan::length(n) && stan::length(mu) 
-              && stan::length(phi) ) ) 
-        return 0.0;
+    // Size checks
+    if ( !( stan::length(n) && stan::length(mu) 
+    && stan::length(phi) ) ) 
+    return 0.0;
         
-      using stan::math::check_nonnegative;
-      using stan::math::check_positive_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
-      using stan::math::check_less;
+    using stan::math::check_nonnegative;
+    using stan::math::check_positive_finite;
+    using stan::math::check_not_nan;
+    using stan::math::check_consistent_sizes;
+    using stan::math::check_less;
       
-      static const std::string function("stan::prob::neg_binomial_2_cdf");
-      check_positive_finite(function, "Location parameter", mu);
-      check_positive_finite(function, "Precision parameter", phi);
-      check_not_nan(function, "Random variable", n);
-      check_consistent_sizes(function, 
-                             "Random variable", n, 
-                             "Location parameter", mu, 
-                             "Precision Parameter", phi);
+    static const char* function("stan::prob::neg_binomial_2_cdf");
+    check_positive_finite(function, "Location parameter", mu);
+    check_positive_finite(function, "Precision parameter", phi);
+    check_not_nan(function, "Random variable", n);
+    check_consistent_sizes(function, 
+    "Random variable", n, 
+    "Location parameter", mu, 
+    "Precision Parameter", phi);
       
-      VectorView<const T_n> n_vec(n);
-      VectorView<const T_location> mu_vec(mu);
-      VectorView<const T_precision> phi_vec(phi);
+    VectorView<const T_n> n_vec(n);
+    VectorView<const T_location> mu_vec(mu);
+    VectorView<const T_precision> phi_vec(phi);
       
-      size_t size_phi_mu = max_size(mu, phi);
-      size_t size_n = length(n);
+    size_t size_phi_mu = max_size(mu, phi);
+    size_t size_n = length(n);
       
-      std::vector<typename return_type<T_location, T_precision>::type> phi_mu(size_phi_mu);
-      std::vector<typename return_type<T_n>::type> np1(size_n);
-      std::vector<size_t> np_zeros;
+    std::vector<typename return_type<T_location, T_precision>::type> phi_mu(size_phi_mu);
+    std::vector<typename return_type<T_n>::type> np1(size_n);
+    std::vector<size_t> np_zeros;
 
-      for (size_t i = 0; i < size_phi_mu; i++)
-        phi_mu[i] = phi_vec[i]/(phi_vec[i]+mu_vec[i]);
+    for (size_t i = 0; i < size_phi_mu; i++)
+    phi_mu[i] = phi_vec[i]/(phi_vec[i]+mu_vec[i]);
 
-      for (size_t i = 0; i < size_n; i++)
-        if (n_vec[i] < 0)
-          np1[i] = 0.9;        
-        else
-          np1[i] = n_vec[i] + 1.0;
+    for (size_t i = 0; i < size_n; i++)
+    if (n_vec[i] < 0)
+    np1[i] = 0.9;        
+    else
+    np1[i] = n_vec[i] + 1.0;
               
-      if (size_n == 1) {
-        if (size_phi_mu == 1)
-          return beta_ccdf_log_modified(phi_mu[0], phi, np1[0]);                       
-        else
-          return beta_ccdf_log_modified(phi_mu, phi, np1[0]);                   
-      }
-      else {
-        if (size_phi_mu == 1)
-          return beta_ccdf_log_modified(phi_mu[0], phi, np1);                       
-        else
-          return beta_ccdf_log_modified(phi_mu, phi, np1);                                 
-      }
+    if (size_n == 1) {
+    if (size_phi_mu == 1)
+    return beta_ccdf_log_modified(phi_mu[0], phi, np1[0]);                       
+    else
+    return beta_ccdf_log_modified(phi_mu, phi, np1[0]);                   
+    }
+    else {
+    if (size_phi_mu == 1)
+    return beta_ccdf_log_modified(phi_mu[0], phi, np1);                       
+    else
+    return beta_ccdf_log_modified(phi_mu, phi, np1);                                 
+    }
     
     }
     */
@@ -607,7 +607,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
 
-      static const std::string function("stan::prob::neg_binomial_2_rng");
+      static const char* function("stan::prob::neg_binomial_2_rng");
 
       using stan::math::check_positive_finite;
 
@@ -627,7 +627,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
 
-      static const std::string function("stan::prob::neg_binomial_2_log_rng");
+      static const char* function("stan::prob::neg_binomial_2_log_rng");
 
       using stan::math::check_finite;
       using stan::math::check_positive_finite;

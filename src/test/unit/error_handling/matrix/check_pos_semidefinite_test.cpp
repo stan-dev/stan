@@ -2,13 +2,12 @@
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
+const char* function = "function";
 class ErrorHandlingMatrix : public ::testing::Test {
 public:
   void SetUp() {
-    function = "function";
   }
   
-  std::string function;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
 };
 

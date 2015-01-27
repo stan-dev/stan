@@ -29,8 +29,8 @@ namespace stan {
      *   vector.
      */
     template <typename T, int R, int C>
-    inline bool check_vector(const std::string& function,
-                             const std::string& name,
+    inline bool check_vector(const char* function,
+                             const char* name,
                              const Eigen::Matrix<T,R,C>& x) {
       if (R == 1)
         return true;
@@ -43,10 +43,11 @@ namespace stan {
       msg << ") has " << x.rows() << " rows and " 
           << x.cols() << " columns but it should be a vector so it should "
           << "either have 1 row or 1 column";
+      std::string msg_str(msg.str());
       invalid_argument(function,
                        name,
                        typename scalar_type<T>::type(),
-                       "(", msg.str());
+                       "(", msg_str.c_str());
       return false;
     }
 

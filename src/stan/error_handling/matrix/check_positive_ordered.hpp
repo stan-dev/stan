@@ -27,8 +27,8 @@ namespace stan {
      *   values, or if any element is <code>NaN</code>.
      */
     template <typename T_y>
-    bool check_positive_ordered(const std::string& function, 
-                                const std::string& name,
+    bool check_positive_ordered(const char* function, 
+                                const char* name,
                                 const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
@@ -43,9 +43,10 @@ namespace stan {
         msg << "is not a valid positive_ordered vector."
             << " The element at " << stan::error_index::value 
             << " is ";
-
+        std::string msg_str(msg.str());
         domain_error(function, name, y[0],
-                msg.str(), ", but should be postive.");
+                     msg_str.c_str(), ", but should be postive.");
+        return false;
       }
       check_ordered(function, name, y);
       return true;

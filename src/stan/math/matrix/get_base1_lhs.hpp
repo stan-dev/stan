@@ -8,7 +8,7 @@
 namespace stan {
   namespace math {
     
-   /**
+    /**
      * Return a reference to the value of the specified vector at the
      * specified base-one index.  If the index is out of range, throw
      * a <code>std::out_of_range</code> exception with the specified
@@ -26,7 +26,7 @@ namespace stan {
     inline
     T& get_base1_lhs(std::vector<T>& x, 
                      size_t i, 
-                     const std::string& error_msg,
+                     const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i, idx, error_msg);
@@ -53,7 +53,7 @@ namespace stan {
     T& get_base1_lhs(std::vector<std::vector<T> >& x, 
                      size_t i1, 
                      size_t i2,
-                     const std::string& error_msg,
+                     const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
@@ -82,7 +82,7 @@ namespace stan {
                      size_t i1, 
                      size_t i2,
                      size_t i3,
-                     const std::string& error_msg,
+                     const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
@@ -113,7 +113,7 @@ namespace stan {
                      size_t i2,
                      size_t i3,
                      size_t i4,
-                     const std::string& error_msg,
+                     const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
@@ -146,7 +146,7 @@ namespace stan {
                      size_t i3,
                      size_t i4,
                      size_t i5,
-                     const std::string& error_msg,
+                     const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
@@ -181,7 +181,7 @@ namespace stan {
                      size_t i4,
                      size_t i5,
                      size_t i6,
-                     const std::string& error_msg,
+                     const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
@@ -219,7 +219,7 @@ namespace stan {
                      size_t i5,
                      size_t i6,
                      size_t i7,
-                     const std::string& error_msg,
+                     const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
@@ -259,7 +259,7 @@ namespace stan {
                      size_t i6,
                      size_t i7,
                      size_t i8,
-                     const std::string& error_msg,
+                     const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
@@ -292,7 +292,7 @@ namespace stan {
     Eigen::Block<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
     get_base1_lhs(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
                   size_t m,
-                  const std::string& error_msg,
+                  const char* error_msg,
                   size_t idx) {
       using stan::math::check_range;
       check_range("[]", "rows of x", x.rows(), m, idx, error_msg);
@@ -320,7 +320,7 @@ namespace stan {
     T& get_base1_lhs(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
                      size_t m,
                      size_t n,
-                     const std::string& error_msg,
+                     const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "rows of x", x.rows(), m, idx, error_msg);
@@ -346,7 +346,7 @@ namespace stan {
     inline
     T& get_base1_lhs(Eigen::Matrix<T,Eigen::Dynamic,1>& x,
                      size_t m,
-                     const std::string& error_msg,
+                     const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), m, idx, error_msg);
@@ -371,7 +371,7 @@ namespace stan {
     inline
     T& get_base1_lhs(Eigen::Matrix<T,1,Eigen::Dynamic>& x,
                      size_t n,
-                     const std::string& error_msg,
+                     const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), n, idx, error_msg);

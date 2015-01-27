@@ -31,10 +31,10 @@ namespace stan {
      *   multiplicable or if either matrix is size 0 for either rows or columns
      */
     template <typename T1, typename T2>
-    inline bool check_multiplicable(const std::string& function,
-                                    const std::string& name1,
+    inline bool check_multiplicable(const char* function,
+                                    const char* name1,
                                     const T1& y1,
-                                    const std::string& name2,
+                                    const char* name2,
                                     const T2& y2) {
       check_positive_size(function, name1, "rows()", y1.rows());
       check_positive_size(function, name2, "cols()", y2.cols());

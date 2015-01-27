@@ -11,8 +11,8 @@ namespace stan {
 
   namespace agrad {
 
-    inline bool check_pos_definite(const std::string& function,
-                                   const std::string& name,
+    inline bool check_pos_definite(const char* function,
+                                   const char* name,
                                    const Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic>& y) {
       using Eigen::Matrix;
       using Eigen::Dynamic;

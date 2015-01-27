@@ -5,7 +5,8 @@
 TEST(AgradRevErrorHandlingScalar,CheckNotNan) {
   using stan::agrad::var;
   using stan::math::check_not_nan;
-  const std::string function = "check_not_nan";
+  const char* function = "check_not_nan";
+
   var x = 0;
   double x_d = 0;
  

@@ -24,8 +24,8 @@ namespace stan {
      *    is not square
      */
     template <typename T_y>
-    inline bool check_square(const std::string& function,
-                             const std::string& name,
+    inline bool check_square(const char* function,
+                             const char* name,
                              const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       check_size_match(function, 
                        "Expecting a square matrix; rows of ", name, y.rows(), 

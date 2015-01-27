@@ -51,7 +51,7 @@ namespace stan {
     inv_wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
                     const T_dof& nu,
                     const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
-      static const std::string function("stan::prob::inv_wishart_log");
+      static const char* function("stan::prob::inv_wishart_log");
       
       using boost::math::tools::promote_args;
       using Eigen::Dynamic;
@@ -95,14 +95,14 @@ namespace stan {
         lp -= 0.5 * (nu + k + 1.0) * log_determinant_ldlt(ldlt_W);
       }
       if (include_summand<propto,T_y,T_scale>::value) {
-//        L = crossprod(mdivide_left_tri_low(L));
-//        Eigen::Matrix<T_y,Eigen::Dynamic,1> W_inv_vec = Eigen::Map<
-//          const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(
-//                                                                   &L(0), L.size(), 1);
-//        Eigen::Matrix<T_scale,Eigen::Dynamic,1> S_vec = Eigen::Map<
-//          const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(
-//                                                                       &S(0), S.size(), 1);
-//        lp -= 0.5 * dot_product(S_vec, W_inv_vec); // trace(S * W^-1)
+        //        L = crossprod(mdivide_left_tri_low(L));
+        //        Eigen::Matrix<T_y,Eigen::Dynamic,1> W_inv_vec = Eigen::Map<
+        //          const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(
+        //                                                                   &L(0), L.size(), 1);
+        //        Eigen::Matrix<T_scale,Eigen::Dynamic,1> S_vec = Eigen::Map<
+        //          const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(
+        //                                                                       &S(0), S.size(), 1);
+        //        lp -= 0.5 * dot_product(S_vec, W_inv_vec); // trace(S * W^-1)
         Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Winv_S(mdivide_left_ldlt(ldlt_W, static_cast<Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(S.template selfadjointView<Eigen::Lower>())));
         lp -= 0.5*trace(Winv_S);
       }
@@ -126,7 +126,7 @@ namespace stan {
                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
                     RNG& rng) {
 
-      static const std::string function("stan::prob::inv_wishart_rng");
+      static const char* function("stan::prob::inv_wishart_rng");
       
       using stan::math::check_greater;
       using stan::math::check_square;

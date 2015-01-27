@@ -26,10 +26,10 @@ namespace stan {
      *   do not match
      */
     template <typename T_size1, typename T_size2>
-    inline bool check_size_match(const std::string& function,
-                                 const std::string& name_i,
+    inline bool check_size_match(const char* function,
+                                 const char* name_i,
                                  T_size1 i,
-                                 const std::string& name_j, 
+                                 const char* name_j, 
                                  T_size2 j) {
       if (likely(i == static_cast<T_size1>(j)))
         return true;
@@ -37,8 +37,9 @@ namespace stan {
       std::ostringstream msg;
       msg << ") and " 
           << name_j << " (" << j << ") must match in size";
+      std::string msg_str(msg.str());
       invalid_argument(function, name_i, i,
-                       "(", msg.str());
+                       "(", msg_str.c_str());
       return false;
     }
 
@@ -62,23 +63,25 @@ namespace stan {
      *   do not match
      */
     template <typename T_size1, typename T_size2>
-    inline bool check_size_match(const std::string& function,
-                                 const std::string& expr_i,
-                                 const std::string& name_i,
+    inline bool check_size_match(const char* function,
+                                 const char* expr_i,
+                                 const char* name_i,
                                  T_size1 i,
-                                 const std::string& expr_j,
-                                 const std::string& name_j, 
+                                 const char* expr_j,
+                                 const char* name_j, 
                                  T_size2 j) {
       if (likely(i == static_cast<T_size1>(j)))
         return true;
-
-      std::string updated_name = expr_i + name_i;
+      std::ostringstream updated_name;
+      updated_name << expr_i << name_i;
+      std::string updated_name_str(updated_name.str());
       std::ostringstream msg;
       msg << ") and " 
           << expr_j << name_j 
           << " (" << j << ") must match in size";
-      invalid_argument(function, updated_name, i,
-                       "(", msg.str());
+      std::string msg_str(msg.str());
+      invalid_argument(function, updated_name_str.c_str(), i,
+                       "(", msg_str.c_str());
       return false;
     }
 

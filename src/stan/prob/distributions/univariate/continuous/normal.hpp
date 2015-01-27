@@ -40,7 +40,7 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::normal_log");
+      static const char* function("stan::prob::normal_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
 
@@ -153,7 +153,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::normal_cdf");
+      static const char* function("stan::prob::normal_cdf");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
 
@@ -237,7 +237,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::normal_cdf_log");
+      static const char* function("stan::prob::normal_cdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
 
@@ -312,7 +312,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::normal_ccdf_log");
+      static const char* function("stan::prob::normal_ccdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
 
@@ -395,7 +395,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
 
-      static const std::string function("stan::prob::normal_rng");
+      static const char* function("stan::prob::normal_rng");
 
       check_finite(function, "Location parameter", mu);
       check_not_nan(function, "Location parameter", mu);

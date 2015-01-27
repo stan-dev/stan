@@ -26,8 +26,8 @@ namespace stan {
      * @throw <code>std::out_of_range</code> if the index is out of range.
      */
     template <typename T>
-    inline bool check_std_vector_index(const std::string& function,
-                                       const std::string& name,
+    inline bool check_std_vector_index(const char* function,
+                                       const char* name,
                                        const std::vector<T>& y,
                                        int i) {
       if (i >= stan::error_index::value
@@ -36,7 +36,8 @@ namespace stan {
       
       std::stringstream msg;
       msg << " for " << name;
-      out_of_range(function, y.size(), i, msg.str());
+      std::string msg_str(msg.str());
+      out_of_range(function, y.size(), i, msg_str.c_str());
       return false;
     }
 

@@ -41,9 +41,9 @@ namespace stan {
               typename T_y, typename T_covar, typename T_w>
     typename boost::math::tools::promote_args<T_y,T_covar,T_w>::type
     multi_gp_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                 const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
-                 const Eigen::Matrix<T_w,Eigen::Dynamic,1>& w) {
-      static const std::string function("stan::prob::multi_gp_cholesky_log");
+                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
+                          const Eigen::Matrix<T_w,Eigen::Dynamic,1>& w) {
+      static const char* function("stan::prob::multi_gp_cholesky_log");
       typedef typename boost::math::tools::promote_args<T_y,T_covar,T_w>::type T_lp;
       T_lp lp(0.0);
 
@@ -86,7 +86,7 @@ namespace stan {
         for (int i = 0; i < y.rows(); i++) {
           Eigen::Matrix<T_y, Eigen::Dynamic, 1> y_row( y.row(i) );
           Eigen::Matrix<typename boost::math::tools::promote_args<T_y,T_covar>::type,
-              Eigen::Dynamic, 1> 
+                        Eigen::Dynamic, 1> 
             half(mdivide_left_tri_low(L,y_row));
           sum_lp_vec += w(i) * dot_self(half);
         }
@@ -100,8 +100,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T_y,T_covar,T_w>::type
     multi_gp_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                 const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
-                 const Eigen::Matrix<T_w,Eigen::Dynamic,1>& w) {
+                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
+                          const Eigen::Matrix<T_w,Eigen::Dynamic,1>& w) {
       return multi_gp_cholesky_log<false>(y,L,w);
     }
   }    

@@ -2,12 +2,13 @@
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
+const char* function_ = "function";
+const char* msg1_ = "error_message1 ";
+const char* msg2_ = "error_message2 ";
+
 class ErrorHandlingScalar_out_of_range : public ::testing::Test {
 public:
   void SetUp() {
-    function_ = "function";
-    msg1_ = "error_message1 ";
-    msg2_ = "error_message2 ";
   }
 
 
@@ -56,10 +57,6 @@ public:
                      std::out_of_range,
                      expected_message_with_0_messages(y, i));
   }
-
-  std::string function_;
-  std::string msg1_;
-  std::string msg2_;
 };
 
 TEST_F(ErrorHandlingScalar_out_of_range, double) {

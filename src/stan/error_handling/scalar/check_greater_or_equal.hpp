@@ -12,8 +12,8 @@ namespace stan {
                 typename T_low,
                 bool is_vec>
       struct greater_or_equal {
-        static bool check(const std::string& function,
-                          const std::string& name,
+        static bool check(const char* function,
+                          const char* name,
                           const T_y& y,
                           const T_low& low) {
           using stan::length;
@@ -23,8 +23,9 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be greater than or equal to ";
               msg << low_vec[n];
+              std::string msg_str(msg.str());
               domain_error(function, name, y,
-                      "is ", msg.str());
+                           "is ", msg_str.c_str());
             }
           }
           return true;
@@ -34,8 +35,8 @@ namespace stan {
       template <typename T_y,
                 typename T_low>
       struct greater_or_equal<T_y, T_low, true> {
-        static bool check(const std::string& function,
-                          const std::string& name,
+        static bool check(const char* function,
+                          const char* name,
                           const T_y& y,
                           const T_low& low) {
           using stan::length;
@@ -46,8 +47,9 @@ namespace stan {
               std::stringstream msg;
               msg << ", but must be greater than or equal to ";
               msg << low_vec[n];
+              std::string msg_str(msg.str());
               domain_error_vec(function, name, y, n,
-                          "is ", msg.str());
+                               "is ", msg_str.c_str());
             }
           }
           return true;
@@ -75,8 +77,8 @@ namespace stan {
      *   if any element of y or low is NaN.
      */
     template <typename T_y, typename T_low>
-    inline bool check_greater_or_equal(const std::string& function,
-                                       const std::string& name,
+    inline bool check_greater_or_equal(const char* function,
+                                       const char* name,
                                        const T_y& y,
                                        const T_low& low) {
       return greater_or_equal<T_y, T_low, is_vector_like<T_y>::value>

@@ -32,8 +32,8 @@ namespace stan {
      *   or if any element in matrix is NaN
      */
     template <typename T_y>
-    inline bool check_cholesky_factor(const std::string& function,
-                                      const std::string& name,
+    inline bool check_cholesky_factor(const char* function,
+                                      const char* name,
                                       const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       check_less_or_equal(function, "columns and rows of Cholesky factor",
                           y.cols(), y.rows());

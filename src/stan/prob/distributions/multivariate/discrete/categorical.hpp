@@ -21,7 +21,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_log(int n, 
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
-      static const std::string function("stan::prob::categorical_log");
+      static const char* function("stan::prob::categorical_log");
 
       using stan::math::check_bounded;
       using stan::math::check_simplex;
@@ -51,7 +51,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_log(const typename 
                     math::index_type<Eigen::Matrix<T_prob,
-                                                   Eigen::Dynamic,1> >::type n, 
+                    Eigen::Dynamic,1> >::type n, 
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
 
       return categorical_log<false>(n,theta);
@@ -64,7 +64,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_log(const std::vector<int>& ns, 
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
-      static const std::string function("stan::prob::categorical_log");
+      static const char* function("stan::prob::categorical_log");
 
       using boost::math::tools::promote_args;
       using stan::math::check_bounded;
@@ -121,7 +121,7 @@ namespace stan {
       using boost::uniform_01;
       using stan::math::check_simplex;
 
-      static const std::string function("stan::prob::categorical_rng");
+      static const char* function("stan::prob::categorical_rng");
 
       check_simplex(function, "Probabilities parameter", theta);
 

@@ -68,19 +68,19 @@ namespace stan {
     };
 
     void generate_start_namespace(std::string name,
-                                   std::ostream& o) {
+                                  std::ostream& o) {
       o << "namespace " << name << "_namespace {" << EOL2;
     }
 
-     void generate_end_namespace(std::ostream& o) {
-       o << "} // namespace" << EOL2;
-     }
+    void generate_end_namespace(std::ostream& o) {
+      o << "} // namespace" << EOL2;
+    }
 
-     void generate_comment(std::string const& msg, int indent, 
-                           std::ostream& o) {
-       generate_indent(indent,o);
-       o << "// " << msg        << EOL;
-     }
+    void generate_comment(std::string const& msg, int indent, 
+                          std::ostream& o) {
+      generate_indent(indent,o);
+      o << "// " << msg        << EOL;
+    }
 
 
     template <bool isLHS>
@@ -338,7 +338,7 @@ namespace stan {
     }
 
     void generate_class_decl(const std::string& model_name,
-                        std::ostream& o) {
+                             std::ostream& o) {
       o << "class " << model_name << " : public prob_grad {" << EOL;
     }
 
@@ -379,12 +379,12 @@ namespace stan {
 
     // only generates the test
     void generate_validate_context_size(std::ostream& o,
-                                 const std::string& stage,
-                                 const std::string& var_name,
-                                 const std::string& base_type,
-                                 const std::vector<expression>& dims,
-                                 const expression& type_arg1 = expression(),
-                                 const expression& type_arg2 = expression()) {
+                                        const std::string& stage,
+                                        const std::string& var_name,
+                                        const std::string& base_type,
+                                        const std::vector<expression>& dims,
+                                        const expression& type_arg1 = expression(),
+                                        const expression& type_arg2 = expression()) {
       o << INDENT2 
         << "context__.validate_dims("
         << '"' << stage << '"'
@@ -848,7 +848,7 @@ namespace stan {
            << EOL;
         generate_indent(indents_ + x.dims_.size() + 1, o_);
         o_ << "throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what()));"
-          << EOL;
+           << EOL;
         generate_indent(indents_ + x.dims_.size(), o_);
         o_ << "};" << EOL;
         generate_end_for_dims(x.dims_.size());
@@ -909,8 +909,8 @@ namespace stan {
 
 
     void generate_validate_var_decl(const var_decl& decl,
-                                     int indent,
-                                     std::ostream& o) {
+                                    int indent,
+                                    std::ostream& o) {
       validate_var_decl_visgen vis(indent,o);
       boost::apply_visitor(vis,decl.decl_);
     }
@@ -1587,7 +1587,7 @@ namespace stan {
           generate_expression(x.expr_,o_);
           o_ << " > ";
           generate_expression(x.truncation_.high_.expr_,o_); // low
-                                                            // bound
+          // bound
           o_ << ") lp_accum__.add(-std::numeric_limits<double>::infinity());" << EOL;
         }
         // generate log denominator for case where bounds test pass
@@ -1805,7 +1805,7 @@ namespace stan {
       
       generate_validate_transformed_params(p.derived_decl_.first,2,o);
       o << INDENT2
-        << "const std::string function__ = \"validate transformed params\";" 
+        << "const char* function__ = \"validate transformed params\";" 
         << EOL;
       o << INDENT2
         << "(void) function__; // dummy to suppress unused var warning" 
@@ -2306,8 +2306,8 @@ namespace stan {
     };
 
     void suppress_warning(const std::string& indent,
-                         const std::string& var_name,
-                         std::ostream& o) {
+                          const std::string& var_name,
+                          std::ostream& o) {
       o << indent << "(void) " 
         << var_name << ";"
         << " // dummy call to supress warning"
@@ -2526,8 +2526,8 @@ namespace stan {
         << EOL;
       o << INDENT2 << ": prob_grad(0) {"
         << EOL; // resize 0 with var_resizing
-      o << INDENT2 << "static const std::string function__(\"" 
-        << model_name << "_namespace::" << model_name << "\");" << EOL;
+      o << INDENT2 << "static const char* function__ = \"" 
+        << model_name << "_namespace::" << model_name << "\";" << EOL;
       suppress_warning(INDENT2, "function__", o);
       o << INDENT2 << "size_t pos__;" << EOL;
       suppress_warning(INDENT2, "pos__", o);
@@ -2700,7 +2700,7 @@ namespace stan {
         o_ << "try { writer__." << write_method_name;
         generate_name_dims(var_name,dims.size());
         o_ << "); } catch (const std::exception& e) { "
-              " throw std::runtime_error(std::string(\"Error transforming variable "
+          " throw std::runtime_error(std::string(\"Error transforming variable "
            << var_name << ": \") + e.what()); }" << EOL;
       }
       void generate_name_dims(const std::string name, 
@@ -3010,7 +3010,7 @@ namespace stan {
 
 
     void generate_param_names_method(const program& prog,
-                                          std::ostream& o) {
+                                     std::ostream& o) {
       write_param_names_visgen vis(o);
       o << EOL << INDENT
         << "void get_param_names(std::vector<std::string>& names__) const {"
@@ -3354,7 +3354,7 @@ namespace stan {
       o << INDENT << "}" << EOL2;
     }
 
-   // see write_csv_visgen for similar structure
+    // see write_csv_visgen for similar structure
     struct unconstrained_param_names_visgen : public visgen {
       unconstrained_param_names_visgen(std::ostream& o)
         : visgen(o) {
@@ -3500,7 +3500,7 @@ namespace stan {
 
 
     void generate_unconstrained_param_names_method(const program& prog,
-                                                 std::ostream& o) {
+                                                   std::ostream& o) {
       o << EOL << INDENT 
         << "void unconstrained_param_names(std::vector<std::string>& param_names__,"
         << EOL << INDENT 
@@ -3791,8 +3791,8 @@ namespace stan {
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" 
         << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
-      o << INDENT2 << "static const std::string function__(\""
-        << model_name << "_namespace::write_csv\");" << EOL;
+      o << INDENT2 << "static const char* function__ = \""
+        << model_name << "_namespace::write_csv\";" << EOL;
       suppress_warning(INDENT2, "function__", o);
 
       // declares, reads, and writes parameters
@@ -4152,8 +4152,8 @@ namespace stan {
       o << INDENT << "                 std::ostream* pstream__ = 0) const {" << EOL;
       o << INDENT2 << "vars__.resize(0);" << EOL;
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
-      o << INDENT2 << "static const std::string function__(\""
-        << model_name << "_namespace::write_array\");" << EOL;
+      o << INDENT2 << "static const char* function__ = \""
+        << model_name << "_namespace::write_array\";" << EOL;
       suppress_warning(INDENT2, "function__", o);
 
       // declares, reads, and sets parameters

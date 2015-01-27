@@ -31,8 +31,8 @@ namespace stan {
      *   has zero size
      */
     template <typename T_y>
-    inline bool check_nonzero_size(const std::string& function,
-                                   const std::string& name,
+    inline bool check_nonzero_size(const char* function,
+                                   const char* name,
                                    const T_y& y) {
       if (y.size() > 0) 
         return true;

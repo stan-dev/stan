@@ -60,7 +60,7 @@ namespace stan {
     wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
                 const T_dof& nu,
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
-      static const std::string function("stan::prob::wishart_log");
+      static const char* function("stan::prob::wishart_log");
 
       using boost::math::tools::promote_args;
       using Eigen::Dynamic;
@@ -139,7 +139,7 @@ namespace stan {
       using stan::math::check_size_match;
       using stan::math::check_square;
 
-      static const std::string function("stan::prob::wishart_rng");
+      static const char* function("stan::prob::wishart_rng");
 
       typename index_type<MatrixXd>::type k = S.rows();
 

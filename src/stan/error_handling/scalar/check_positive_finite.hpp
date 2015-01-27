@@ -25,8 +25,8 @@ namespace stan {
      *   if any element of y is NaN.
      */
     template <typename T_y>
-    inline bool check_positive_finite(const std::string& function,
-                                      const std::string& name,
+    inline bool check_positive_finite(const char* function,
+                                      const char* name,
                                       const T_y& y) {
       stan::math::check_positive(function, name, y);
       stan::math::check_finite(function, name, y);

@@ -34,12 +34,12 @@ namespace stan {
      * @throw std::invalid_argument
      */
     template <typename T>
-    inline void invalid_argument_vec(const std::string& function,
-                                 const std::string& name,
-                                 const T& y,
-                                 const size_t i,
-                                 const std::string& msg1,
-                                 const std::string& msg2) {
+    inline void invalid_argument_vec(const char* function,
+                                     const char* name,
+                                     const T& y,
+                                     const size_t i,
+                                     const char* msg1,
+                                     const char* msg2) {
       std::ostringstream vec_name_stream;
       vec_name_stream << name
                       << "[" << stan::error_index::value + i << "]";
@@ -69,11 +69,11 @@ namespace stan {
      * @throw std::invalid_argument
      */
     template <typename T>
-    inline void invalid_argument_vec(const std::string& function,
-                                 const std::string& name,
-                                 const T& y,
-                                 const size_t i,
-                                 const std::string& msg) {
+    inline void invalid_argument_vec(const char* function,
+                                     const char* name,
+                                     const T& y,
+                                     const size_t i,
+                                     const char* msg) {
       invalid_argument_vec(function, name, y, i, msg, "");
     }
     

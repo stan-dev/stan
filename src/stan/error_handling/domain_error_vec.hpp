@@ -34,12 +34,12 @@ namespace stan {
      * @throw std::domain_error
      */
     template <typename T>
-    inline void domain_error_vec(const std::string& function,
-                                 const std::string& name,
+    inline void domain_error_vec(const char* function,
+                                 const char* name,
                                  const T& y,
                                  const size_t i,
-                                 const std::string& msg1,
-                                 const std::string& msg2) {
+                                 const char* msg1,
+                                 const char* msg2) {
       std::ostringstream vec_name_stream;
       vec_name_stream << name
                       << "[" << stan::error_index::value + i << "]";
@@ -69,11 +69,11 @@ namespace stan {
      * @throw std::domain_error
      */
     template <typename T>
-    inline void domain_error_vec(const std::string& function,
-                                 const std::string& name,
+    inline void domain_error_vec(const char* function,
+                                 const char* name,
                                  const T& y,
                                  const size_t i,
-                                 const std::string& msg) {
+                                 const char* msg) {
       domain_error_vec(function, name, y, i, msg, "");
     }
     

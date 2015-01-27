@@ -42,8 +42,8 @@ namespace stan {
      *   diagonals not near 1, not positive definite, or any of the elements nan.
      */
     template <typename T_y>
-    inline bool check_corr_matrix(const std::string& function,
-                                  const std::string& name,
+    inline bool check_corr_matrix(const char* function,
+                                  const char* name,
                                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
@@ -66,9 +66,10 @@ namespace stan {
               << name << "(" << stan::error_index::value + k 
               << "," << stan::error_index::value + k 
               << ") is "; ;
+          std::string msg_str(msg.str());
           domain_error(function, name, y(k,k),
-                  msg.str(),
-                  ", but should be near 1.0");
+                       msg_str.c_str(),
+                       ", but should be near 1.0");
           return false;
         }
       }

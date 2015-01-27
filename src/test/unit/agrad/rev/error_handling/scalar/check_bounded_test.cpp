@@ -6,8 +6,8 @@ TEST(AgradRevErrorHandlingScalar,CheckBounded_X) {
   using stan::agrad::var;
   using stan::math::check_bounded;
  
-  const std::string function = "check_bounded";
-  const std::string name = "x";
+  const char* function = "check_bounded";
+  const char* name = "x";
   var x = 0;
   var low = -1;
   var high = 1;
@@ -25,12 +25,12 @@ TEST(AgradRevErrorHandlingScalar,CheckBounded_X) {
 
   x = low-1;
   EXPECT_THROW(check_bounded(function, name, x, low, high), 
-                std::domain_error) 
+               std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;  
   
   x = high+1;
   EXPECT_THROW(check_bounded(function, name, x, low, high), 
-                std::domain_error) 
+               std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
 
   x = std::numeric_limits<var>::quiet_NaN();
@@ -50,8 +50,8 @@ TEST(AgradRevErrorHandlingScalar,CheckBounded_Low) {
   using stan::agrad::var;
   using stan::math::check_bounded;
 
-  const std::string function = "check_bounded";
-  const std::string name = "x";
+  const char* function = "check_bounded";
+  const char* name = "x";
   var x = 0;
   var low = -1;
   var high = 1;
@@ -75,8 +75,8 @@ TEST(AgradRevErrorHandlingScalar,CheckBounded_High) {
   using stan::agrad::var;
   using stan::math::check_bounded;
 
-  const std::string function = "check_bounded";
-  const std::string name = "x";
+  const char* function = "check_bounded";
+  const char* name = "x";
   var x = 0;
   var low = -1;
   var high = 1;

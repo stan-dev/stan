@@ -25,7 +25,7 @@ namespace stan {
                 const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,1>& sigma,
                 const T_shape& eta) {
-      static const std::string function("stan::prob::lkj_cov_log");
+      static const char* function("stan::prob::lkj_cov_log");
       
       using stan::math::check_size_match;
       using stan::math::check_finite;
@@ -86,7 +86,7 @@ namespace stan {
                 const T_loc& mu, 
                 const T_scale& sigma, 
                 const T_shape& eta) {
-      static const std::string function("stan::prob::lkj_cov_log");
+      static const char* function("stan::prob::lkj_cov_log");
 
       using stan::math::check_finite;
       using stan::math::check_positive;

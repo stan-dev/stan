@@ -5,7 +5,7 @@
 using stan::math::check_greater;
 
 TEST(ErrorHandlingScalar,CheckGreater) {
-  const std::string function = "check_greater";
+  const char* function = "check_greater";
   double x = 10.0;
   double lb = 0.0;
  
@@ -36,7 +36,7 @@ TEST(ErrorHandlingScalar,CheckGreater) {
 }
 
 TEST(ErrorHandlingScalar,CheckGreater_Matrix) {
-  const std::string function = "check_greater";
+  const char* function = "check_greater";
   double x;
   double low;
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
@@ -79,7 +79,7 @@ TEST(ErrorHandlingScalar,CheckGreater_Matrix) {
   x_vec   << -1, 0,  1;
   low_vec << -2, -1, -std::numeric_limits<double>::infinity();
   EXPECT_TRUE(check_greater(function, "x", x_vec, low_vec))
-  << "check_greater: matrix<3,1>, matrix<3,1>, should pass with -infinity";
+    << "check_greater: matrix<3,1>, matrix<3,1>, should pass with -infinity";
 
   // x_vec, low
   x_vec   << -1, 0, 1;
@@ -140,7 +140,7 @@ TEST(ErrorHandlingScalar,CheckGreater_Matrix) {
 }
 
 TEST(ErrorHandlingScalar,CheckGreater_Matrix_one_indexed_message) {
-  const std::string function = "check_greater";
+  const char* function = "check_greater";
   double x;
   double low;
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
@@ -200,7 +200,7 @@ TEST(ErrorHandlingScalar,CheckGreater_Matrix_one_indexed_message) {
 }
 
 TEST(ErrorHandlingScalar,CheckGreater_nan) {
-  const std::string function = "check_greater";
+  const char* function = "check_greater";
   double x = 10.0;
   double lb = 0.0;
   double nan = std::numeric_limits<double>::quiet_NaN();

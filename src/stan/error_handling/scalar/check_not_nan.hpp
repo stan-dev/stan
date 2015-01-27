@@ -12,22 +12,21 @@ namespace stan {
     namespace {
       template <typename T_y, bool is_vec>
       struct not_nan {
-        static bool check(const std::string& function,
-                          const std::string& name,
+        static bool check(const char* function,
+                          const char* name,
                           const T_y& y) {
           if ((boost::math::isnan)(y)) 
             domain_error(function, name, y,
-                    "is ", ", but must not be nan!");
+                         "is ", ", but must not be nan!");
           return true;
         }
       };
     
       template <typename T_y>
       struct not_nan<T_y, true> {
-        static bool check(const std::string& function,
-                          const std::string& name,
+        static bool check(const char* function,
+                          const char* name,
                           const T_y& y) {
-          // using stan::length;
           for (size_t n = 0; n < stan::length(y); n++) {
             if ((boost::math::isnan)(stan::get(y,n)))
               domain_error_vec(function, name, y, n,
@@ -56,8 +55,8 @@ namespace stan {
      * @throw <code>domain_error</code> if any element of y is NaN.
      */
     template <typename T_y>
-    inline bool check_not_nan(const std::string& function,
-                              const std::string& name,
+    inline bool check_not_nan(const char* function,
+                              const char* name,
                               const T_y& y) {
       return not_nan<T_y, is_vector_like<T_y>::value>
         ::check(function, name, y);

@@ -2,13 +2,14 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/rev/var.hpp>
 
+const char* function_ = "function";
+const char* y_name_ = "y";
+const char* msg1_ = "error_message ";
+const char* msg2_ = " after y";
+
 class ErrorHandlingScalar_invalid_argument : public ::testing::Test {
 public:
   void SetUp() {
-    function_ = "function";
-    y_name_ = "y";
-    msg1_ = "error_message ";
-    msg2_ = " after y";
   }
 
 
@@ -62,10 +63,6 @@ public:
 
   }
 
-  std::string function_;
-  std::string y_name_;
-  std::string msg1_;
-  std::string msg2_;
 };
 
 TEST_F(ErrorHandlingScalar_invalid_argument, double) {

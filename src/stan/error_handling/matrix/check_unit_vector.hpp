@@ -33,8 +33,8 @@ namespace stan {
      *   vector or if any element is <code>NaN</code>.
      */
     template <typename T_prob>
-    bool check_unit_vector(const std::string& function,
-                           const std::string& name,
+    bool check_unit_vector(const char* function,
+                           const char* name,
                            const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
       check_nonzero_size(function, name, theta);
       T_prob ssq = theta.squaredNorm();
@@ -42,7 +42,8 @@ namespace stan {
         std::stringstream msg;
         msg << "is not a valid unit vector."
             << " The sum of the squares of the elements should be 1, but is ";
-        domain_error(function, name, ssq, msg.str());
+        std::string msg_str(msg.str());
+        domain_error(function, name, ssq, msg_str.c_str());
       }
       return true;
     }

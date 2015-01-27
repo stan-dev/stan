@@ -33,8 +33,8 @@ namespace stan {
      */
     template <typename T_y>
     inline bool 
-    check_symmetric(const std::string& function,
-                    const std::string& name,
+    check_symmetric(const char* function,
+                    const char* name,
                     const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       check_square(function, name, y);
 
@@ -52,15 +52,17 @@ namespace stan {
           if (!(fabs(y(m,n) - y(n,m)) <= CONSTRAINT_TOLERANCE)) {
             std::ostringstream msg1;
             msg1 << "is not symmetric. " 
-                    << name << "[" << stan::error_index::value + m << "," 
-                    << stan::error_index::value +n << "] = ";
+                 << name << "[" << stan::error_index::value + m << "," 
+                 << stan::error_index::value +n << "] = ";
+            std::string msg1_str(msg1.str());
             std::ostringstream msg2;
             msg2 << ", but "
                  << name << "[" << stan::error_index::value +n << "," 
                  << stan::error_index::value + m 
                  << "] = " << y(n,m);
+            std::string msg2_str(msg2.str());
             domain_error(function, name, y(m,n), 
-                         msg1.str(), msg2.str());
+                         msg1_str.c_str(), msg2_str.c_str());
             return false;
           }
         }

@@ -29,11 +29,11 @@ namespace stan {
      * @throw std::domain_error
      */
     template <typename T>
-    inline void domain_error(const std::string& function,
-                             const std::string& name,
+    inline void domain_error(const char* function,
+                             const char* name,
                              const T& y,
-                             const std::string& msg1,
-                             const std::string& msg2) {
+                             const char* msg1,
+                             const char* msg2) {
       std::ostringstream message;
 
       message << function << ": "
@@ -64,10 +64,10 @@ namespace stan {
      * @throw std::domain_error
      */
     template <typename T>
-    inline void domain_error(const std::string& function,
-                             const std::string& name,
+    inline void domain_error(const char* function,
+                             const char* name,
                              const T& y,
-                             const std::string& msg1) {
+                             const char* msg1) {
       domain_error(function, name, y, msg1, "");
     }
 

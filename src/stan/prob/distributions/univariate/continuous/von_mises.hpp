@@ -145,7 +145,7 @@ namespace stan {
       using boost::variate_generator;
       using stan::prob::uniform_rng;
 
-      static const std::string function("stan::prob::von_mises_rng");
+      static const char* function("stan::prob::von_mises_rng");
 
       stan::math::check_finite(function, "mean", mu);
       stan::math::check_positive_finite(function, "inverse of variance", kappa);

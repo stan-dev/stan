@@ -36,8 +36,8 @@ namespace stan {
      *   or if any element in matrix is NaN
      */
     template <typename T_y>
-    bool check_cholesky_factor_corr(const std::string& function,
-                                    const std::string& name,
+    bool check_cholesky_factor_corr(const char* function,
+                                    const char* name,
                                     const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       check_square(function, name, y);
       check_lower_triangular(function, name, y);

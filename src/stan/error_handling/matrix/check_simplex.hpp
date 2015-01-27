@@ -38,8 +38,8 @@ namespace stan {
      *   simplex or if any element is <code>NaN</code>.
      */
     template <typename T_prob>
-    bool check_simplex(const std::string& function,
-                       const std::string& name,
+    bool check_simplex(const char* function,
+                       const char* name,
                        const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
@@ -55,19 +55,21 @@ namespace stan {
         msg.precision(10);
         msg << " sum(" << name << ") = " << sum
             << ", but should be ";
+        std::string msg_str(msg.str());
         domain_error(function, name, 1.0,
-                msg.str());
-         return false;
+                     msg_str.c_str());
+        return false;
       }
       for (size_t n = 0; n < theta.size(); n++) {
         if (!(theta[n] >= 0)) {
           std::ostringstream msg;
           msg << "is not a valid simplex. "
-                 << name << "[" << n + stan::error_index::value << "]"
-                 << " = ";
+              << name << "[" << n + stan::error_index::value << "]"
+              << " = ";
+          std::string msg_str(msg.str());
           domain_error(function, name, theta[n],
-                  msg.str(), 
-                  ", but should be greater than or equal to 0");
+                       msg_str.c_str(),
+                       ", but should be greater than or equal to 0");
           return false;
         }
       }
