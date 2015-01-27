@@ -173,6 +173,8 @@ src/test/unit/gm/reject/reject_func_call_generated_quantities_test.cpp: src/test
 ##
 test/integration/compile_models$(EXE) : $(patsubst %.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
 
+src/test/performance/logistic_test.cpp: src/test/test-models/performance/logistic.hpp
+
 
 ############################################################
 ##
