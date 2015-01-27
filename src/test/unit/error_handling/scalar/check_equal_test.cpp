@@ -4,7 +4,7 @@
 using stan::error_handling::check_equal;
 
 TEST(ErrorHandlingScalar,CheckEqual) {
-  const std::string function = "check_equal";
+  const char* function = "check_equal";
   double x = 0.0;
   double eq = 0.0;
  
@@ -38,7 +38,7 @@ TEST(ErrorHandlingScalar,CheckEqual) {
 }
 
 TEST(ErrorHandlingScalar,CheckEqualMatrix) {
-  const std::string function = "check_equal";
+  const char* function = "check_equal";
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
   Eigen::Matrix<double,Eigen::Dynamic,1> eq_vec;
   x_vec.resize(3);
@@ -65,7 +65,7 @@ TEST(ErrorHandlingScalar,CheckEqualMatrix) {
 
 
 TEST(ErrorHandlingScalar,CheckEqual_Matrix_one_indexed_message) {
-  const std::string function = "check_equal";
+  const char* function = "check_equal";
   double x;
   double eq;
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec(3);
@@ -120,7 +120,7 @@ TEST(ErrorHandlingScalar,CheckEqual_Matrix_one_indexed_message) {
 }
 
 TEST(ErrorHandlingScalar,CheckEqual_nan) {
-  const std::string function = "check_equal";
+  const char* function = "check_equal";
   double x = 0.0;
   double eq = 0.0;
   double nan = std::numeric_limits<double>::quiet_NaN();
