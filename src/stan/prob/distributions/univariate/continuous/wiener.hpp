@@ -54,7 +54,7 @@ namespace stan {
     typename return_type<T_y,T_alpha,T_tau,T_beta,T_delta>::type
     wiener_log(const T_y& y, const T_alpha& alpha, const T_tau& tau,
                const T_beta& beta, const T_delta& delta) {
-      static const std::string function("stan::prob::wiener_log(%1%)");
+      static const char* function("stan::prob::wiener_log(%1%)");
 
       using stan::error_handling::check_not_nan;
       using stan::error_handling::check_finite;
