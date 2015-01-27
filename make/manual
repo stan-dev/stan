@@ -1,16 +1,20 @@
-.PHONY: manual $(STANAPI_HOME)src/docs/stan-reference/stan-reference.tex 
+.PHONY: manual $(STANAPI_HOME)src/docs/stan-reference/stan-reference.tex $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt
 
 MAJOR_VERSION := $(shell grep MAJOR_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 MINOR_VERSION := $(shell grep MINOR_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 PATCH_VERSION := $(shell grep PATCH_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 VERSION_STRING := $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 
-manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
-	mkdir -p doc/
-	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING).pdf;)
-	echo '# This file is semicolon delimited' > doc/stan-functions.txt
-	echo 'StanFunction; Arguments; ReturnType; Page' >> doc/stan-functions.txt
-	sed 's/^\\indexentry{{\\tt  \\bfseries //g' $(STANAPI_HOME)src/docs/stan-reference/stan-reference.idx | \
+manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt
+	@mkdir -p doc/
+	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING)$(suffix $(artifact));)
+
+
+$(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
+	@echo '  building $@'
+	@echo '# This file is semicolon delimited' > $@
+	@echo 'StanFunction; Arguments; ReturnType; Page' >> $@
+	@sed 's/^\\indexentry{{\\tt  \\bfseries //g' $(STANAPI_HOME)src/docs/stan-reference/stan-reference.idx | \
 	sed 's/ }!{\\tt  /;/g' | \
 	sed 's/{\\tt  \\slshape  //g' | \
 	sed 's/:.*em}/;/g' | \
@@ -26,7 +30,7 @@ manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
 	sed 's/\\textasciicircum/\^/g' | \
 	sed 's/\\textbackslash /\\/g' | \
 	sed 's/@.*(/;(/g' | \
-	sort >> doc/stan-functions.txt
+	sort >> $@
 
 MANUAL_FLAGS=
 
