@@ -35,5 +35,5 @@ $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt: $(STANAPI_HOME)src/do
 MANUAL_FLAGS=
 
 %.pdf: %.tex
-	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -interaction=nonstopmode -file-line-error" -use-make $(notdir $^)
+	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)
 
