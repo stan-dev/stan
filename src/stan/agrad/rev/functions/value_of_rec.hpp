@@ -1,8 +1,6 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__VALUE_OF_REC_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__VALUE_OF_REC_HPP
 
-#include <stan/agrad/rev/var.hpp>
-
 namespace stan {
   namespace agrad {
 
@@ -12,7 +10,7 @@ namespace stan {
      * @param v Variable.
      * @return Value of variable.
      */
-    inline double value_of_rec(const stan::agrad::var& v) {
+    inline double value_of_rec(const var& v) {
       return v.vi_->val_;
     }
 

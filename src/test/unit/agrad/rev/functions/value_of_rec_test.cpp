@@ -1,3 +1,5 @@
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/functions/value_of_rec.hpp>
 #include <stan/agrad/rev/functions/value_of_rec.hpp>
 #include <test/unit/agrad/util.hpp>
@@ -6,7 +8,7 @@
 TEST(AgradRev,value_of_rec) {
   using stan::agrad::var;
   using stan::agrad::fvar;
-  using stan::agrad::value_of_rec;
+  using stan::math::value_of_rec;
 
   double a(5.0);
 

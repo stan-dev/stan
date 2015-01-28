@@ -1,3 +1,4 @@
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/functions/value_of_rec.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>

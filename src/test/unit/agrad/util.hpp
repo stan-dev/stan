@@ -96,9 +96,9 @@ void fill(const std::vector<double>& contents,
           Eigen::Matrix<T,R,C>& M){
 
   size_t ij = 0;
-  for (size_type i = 0; i < C; ++i)
-    for (size_type j = 0; j < R; ++j)
-      M(j,i) = T(contents[ij++]);
+  for (int j = 0; j < C; ++j)
+    for (int i = 0; i < R; ++i)
+      M(i,j) = T(contents[ij++]);
       
 }
 

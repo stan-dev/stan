@@ -12,8 +12,8 @@ namespace stan {
      *
      * This is used as a convenience function for implementing varis of matrix operations.
      **/
-    template<int R,int C>
-    inline const Eigen::Matrix<double,R,C> &value_of(const Eigen::Matrix<double,R,C> &M) {
+    template<int R, int C>
+    inline const Eigen::Matrix<double,R,C>& value_of(const Eigen::Matrix<double,R,C>& M) {
       return M;
     }
     
@@ -23,12 +23,11 @@ namespace stan {
      *
      * This is used as a convenience function for implementing varis of matrix operations.
      **/
-    template<int R,int C>
-    inline Eigen::Matrix<double,R,C> value_of(const Eigen::Matrix<var,R,C> &M) {
-      int i,j;
+    template<int R, int C>
+    inline Eigen::Matrix<double,R,C> value_of(const Eigen::Matrix<var,R,C>& M) {
       Eigen::Matrix<double,R,C> Md(M.rows(),M.cols());
-      for (j = 0; j < M.cols(); j++)
-        for (i = 0; i < M.rows(); i++)
+      for (int j = 0; j < M.cols(); j++)
+        for (int i = 0; i < M.rows(); i++)
           Md(i,j) = M(i,j).vi_->val_;
       return Md;
     }
