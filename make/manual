@@ -1,13 +1,36 @@
-.PHONY: manual $(STANAPI_HOME)src/docs/stan-reference/stan-reference.tex 
+.PHONY: manual $(STANAPI_HOME)src/docs/stan-reference/stan-reference.tex $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt
 
 MAJOR_VERSION := $(shell grep MAJOR_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 MINOR_VERSION := $(shell grep MINOR_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 PATCH_VERSION := $(shell grep PATCH_VERSION $(STANAPI_HOME)src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
 VERSION_STRING := $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 
-manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
-	mkdir -p doc/
-	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING).pdf;)
+manual: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt
+	@mkdir -p doc/
+	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING)$(suffix $(artifact));)
+
+
+$(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt: $(STANAPI_HOME)src/docs/stan-reference/stan-reference.pdf
+	@echo '  building $@'
+	@echo '# This file is semicolon delimited' > $@
+	@echo 'StanFunction; Arguments; ReturnType; Page' >> $@
+	@sed 's/^\\indexentry{{\\tt  \\bfseries //g' $(STANAPI_HOME)src/docs/stan-reference/stan-reference.idx | \
+	sed 's/ }!{\\tt  /;/g' | \
+	sed 's/{\\tt  \\slshape  //g' | \
+	sed 's/:.*em}/;/g' | \
+	sed 's/}|hyperpage}{/;/g' | \
+	sed 's/ }!sampling statement|hyperpage}{/;~;real;/g' | \
+	sed 's/}//g' | \
+	sed 's/\\_/_/g' | \
+	sed 's/^ //g' | \
+	sed 's/"\(.*\)"/\1/g' | \
+	sed 's/"!/!/g' | \
+	sed 's/{\\\&\\\&/\&\&/g' | \
+	sed 's/{//g' | \
+	sed 's/\\textasciicircum/\^/g' | \
+	sed 's/\\textbackslash /\\/g' | \
+	sed 's/@.*(/;(/g' | \
+	sort >> $@
 
 MANUAL_FLAGS=
 
