@@ -4,6 +4,7 @@
 #include <stan/error_handling/scalar/dom_err.hpp>
 #include <stan/error_handling/scalar/dom_err_vec.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/math/functions/value_of_rec.hpp>
 #include <stan/meta/traits.hpp>
 
 namespace stan {
@@ -15,7 +16,8 @@ namespace stan {
         static bool check(const char* function,
                           const char* name,
                           const T_y& y) {
-          if ((boost::math::isnan)(y)) 
+          using stan::math::value_of_rec;
+          if ((boost::math::isnan)(value_of_rec(y))) 
             dom_err(function, name, y,
                     "is ", ", but must not be nan!");
           return true;
@@ -28,8 +30,9 @@ namespace stan {
                           const char* name,
                           const T_y& y) {
           // using stan::length;
+          using stan::math::value_of_rec;
           for (size_t n = 0; n < stan::length(y); n++) {
-            if ((boost::math::isnan)(stan::get(y,n)))
+            if ((boost::math::isnan)(value_of_rec(stan::get(y,n))))
               dom_err_vec(function, name, y, n,
                           "is ", ", but must not be nan!");
           }

@@ -9,6 +9,7 @@
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/math/functions/value_of_rec.hpp>
 
 namespace stan {
 
@@ -59,7 +60,7 @@ namespace stan {
                 msg_str.c_str());
       }
       for (int i = 0; i < y.size(); i++)
-        if (boost::math::isnan(y(i))) {
+        if (boost::math::isnan(value_of_rec(y(i)))) {
           std::ostringstream msg;
           msg << "is not positive semi-definite. " 
                   << name << "(0,0) is ";
