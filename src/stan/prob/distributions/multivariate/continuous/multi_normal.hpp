@@ -25,7 +25,7 @@ namespace stan {
     multi_normal_log(const T_y& y,
                      const T_loc& mu,
                      const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-     static const std::string function("stan::prob::multi_normal_log");
+     static const char* function("stan::prob::multi_normal_log");
       typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp_type;
       lp_type lp(0.0);
       
@@ -134,7 +134,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::normal_distribution;
 
-      static const std::string function("stan::prob::multi_normal_rng");
+      static const char* function("stan::prob::multi_normal_rng");
 
       using stan::error_handling::check_finite;
       using stan::error_handling::check_positive;

@@ -42,7 +42,7 @@ namespace stan {
                                                   T_inv_scale>::type 
         T_partials_return;
 
-      static const std::string function("stan::prob::neg_binomial_log");
+      static const char* function("stan::prob::neg_binomial_log");
 
       using stan::error_handling::check_positive_finite;      
       using stan::error_handling::check_nonnegative;
@@ -187,7 +187,7 @@ namespace stan {
     typename return_type<T_shape, T_inv_scale>::type
     neg_binomial_cdf(const T_n& n, const T_shape& alpha, 
                      const T_inv_scale& beta) {
-      static const std::string function("stan::prob::neg_binomial_cdf");
+      static const char* function("stan::prob::neg_binomial_cdf");
       typedef typename stan::partials_return_type<T_n,T_shape,
                                                   T_inv_scale>::type 
         T_partials_return;
@@ -319,7 +319,7 @@ namespace stan {
     typename return_type<T_shape, T_inv_scale>::type
     neg_binomial_cdf_log(const T_n& n, const T_shape& alpha, 
                      const T_inv_scale& beta) {
-      static const std::string function("stan::prob::neg_binomial_cdf_log");
+      static const char* function("stan::prob::neg_binomial_cdf_log");
       typedef typename stan::partials_return_type<T_n,T_shape,
                                                   T_inv_scale>::type 
         T_partials_return;
@@ -434,7 +434,7 @@ namespace stan {
     typename return_type<T_shape, T_inv_scale>::type
     neg_binomial_ccdf_log(const T_n& n, const T_shape& alpha, 
                      const T_inv_scale& beta) {
-      static const std::string function("stan::prob::neg_binomial_ccdf_log");
+      static const char* function("stan::prob::neg_binomial_ccdf_log");
       typedef typename stan::partials_return_type<T_n,T_shape,
                                                   T_inv_scale>::type
         T_partials_return;
@@ -551,7 +551,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
 
-      static const std::string function("stan::prob::neg_binomial_rng");
+      static const char* function("stan::prob::neg_binomial_rng");
 
       using stan::error_handling::check_positive_finite;      
 
