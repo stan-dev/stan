@@ -8,6 +8,8 @@ typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
 typedef stan::math::index_type<Eigen::Matrix<double,-1,-1> >::type size_type;
 
+using stan::agrad::fvar;
+
 AVEC createAVEC(AVAR x) {
   AVEC v;
   v.push_back(x);
@@ -86,5 +88,25 @@ VEC cgradvec(AVAR f, AVEC x) {
   return g;
 }
 
+// Returns a matrix with the contents of a 
+// vector; Fills the matrix column-wise
 
+template<typename T, int R, int C>
+void fill(const std::vector<double>& contents,
+          Eigen::Matrix<T,R,C>& M){
+
+  size_t ij = 0;
+  for (size_type i = 0; i < C; ++i)
+    for (size_type j = 0; j < R; ++j)
+      M(j,i) = T(contents[ij++]);
+      
+}
+
+template<typename T>
+void create_vec(const std::vector<double>& vals,
+                std::vector<T>& created_vars){
+
+  for (size_t i = 0; i < vals.size(); ++i)
+    created_vars.push_back(T(vals[i]));
+}
 
