@@ -2,6 +2,12 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/rev/var.hpp>
 
+
+const char* function_ = "function";
+const char* y_name_ = "y";
+const char* msg1_ = "error_message ";
+const char* msg2_ = " after y";
+
 class ErrorHandlingScalar_dom_err : public ::testing::Test {
 public:
   void SetUp() {
@@ -61,11 +67,6 @@ public:
     }
 
   }
-
-  const char* function_ = "function";
-  const char* y_name_ = "y";
-  const char* msg1_ = "error_message ";
-  const char* msg2_ = " after y";
 };
 
 TEST_F(ErrorHandlingScalar_dom_err, double) {

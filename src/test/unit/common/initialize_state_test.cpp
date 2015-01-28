@@ -464,7 +464,11 @@ TEST_F(StanCommon, initialize_state_source_inf) {
   EXPECT_EQ(0, inf_model.templated_log_prob_calls);
   EXPECT_EQ(1, inf_model.transform_inits_calls);
   EXPECT_EQ(0, rng.calls);
-  EXPECT_EQ("param_0 initialized to invalid value (inf)\n", output.str());
+  std::stringstream msg;
+  msg << "param_0 initialized to invalid value ("
+      << std::numeric_limits<double>::infinity()
+      << ")\n";
+  EXPECT_EQ(msg.str(), output.str());
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
 }
