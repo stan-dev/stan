@@ -10,6 +10,7 @@ namespace stan {
     /**
      * Return the value of the specified variable.  
      *
+     * @tparam T Scalar type
      * @param v Variable.
      * @return Value of variable.
      */

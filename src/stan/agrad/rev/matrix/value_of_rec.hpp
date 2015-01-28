@@ -12,6 +12,9 @@ namespace stan {
      * a new matrix is returned with the value of the constituent vars.
      *
      * This is used as a convenience function for implementing varis of matrix operations.
+     * @tparam R Rows of matrix M
+     * @tparam C Columns of matrix M
+     * @param[in] M Matrix
      **/
     template<int R,int C>
     inline Eigen::Matrix<double,R,C> value_of_rec(const Eigen::Matrix<var,R,C> &M) {

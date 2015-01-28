@@ -9,10 +9,6 @@
 namespace stan {
   namespace agrad {
     
-    template<int R,int C>
-    inline const Eigen::Matrix<double,R,C> &value_of_rec(const Eigen::Matrix<double,R,C> &M) {
-      return M;
-    }
     /**
      * Convert a matrix to a matrix of doubles. Matrix scalars can be 
      * arbitrarily-nested fvars and vars. fvar<var> and higher order
