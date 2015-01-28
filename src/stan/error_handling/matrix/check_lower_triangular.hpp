@@ -23,8 +23,8 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T_y>
-    inline bool check_lower_triangular(const std::string& function,
-                const std::string& name,
+    inline bool check_lower_triangular(const char* function,
+                const char* name,
                 const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
       for (int n = 1; n < y.cols(); ++n) {
         for (int m = 0; m < n && m < y.rows(); ++m) {
@@ -33,8 +33,9 @@ namespace stan {
             msg << "is not lower triangular;"
                 << " " << name << "[" << stan::error_index::value + m << "," 
                 << stan::error_index::value + n << "]=";
+            std::string msg_str(msg.str());
             dom_err(function, name, y(m,n),
-                    msg.str());
+                    msg_str.c_str());
             return false;
           }
         }

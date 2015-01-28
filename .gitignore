@@ -12,6 +12,7 @@
 # /doc/
 /doc/api
 /doc/*.pdf
+/doc/*.txt
 
 # temporary latex files
 *.idx

@@ -25,8 +25,8 @@ namespace stan {
      * @return throws if any element in y is nan
      */
     template <typename T_y>
-    bool check_ordered(const std::string& function,
-                       const std::string& name,
+    bool check_ordered(const char* function,
+                       const char* name,
                        const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
@@ -43,11 +43,13 @@ namespace stan {
           msg1 << "is not a valid ordered vector."
                << " The element at " << stan::error_index::value + n 
                << " is ";
+          std::string msg1_str(msg1.str());
           std::ostringstream msg2;
           msg2 << ", but should be greater than the previous element, "
                << y[n-1];
+          std::string msg2_str(msg2.str());
           dom_err(function, name, y[n],
-                  msg1.str(), msg2.str());
+                  msg1_str.c_str(), msg2_str.c_str());
           return false;
         }
       }
@@ -55,8 +57,8 @@ namespace stan {
     }  
     
     template <typename T_y>
-    bool check_ordered(const std::string& function,
-                       const std::string& name,
+    bool check_ordered(const char* function,
+                       const char* name,
                        const std::vector<T_y>& y) {
       if (y.size() == 0) {
         return true;
@@ -67,11 +69,13 @@ namespace stan {
           msg1 << "is not a valid ordered vector."
                << " The element at " << stan::error_index::value + n 
                << " is ";
+          std::string msg1_str(msg1.str());
           std::ostringstream msg2;
           msg2 << ", but should be greater than the previous element, "
                << y[n-1];
+          std::string msg2_str(msg2.str());
           dom_err(function, name, y[n],
-                  msg1.str(), msg2.str());
+                  msg1_str.c_str(), msg2_str.c_str());
           return false;
         }
       }

@@ -26,7 +26,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_log(const T_y& y, 
                            const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::double_exponential_log");
+      static const char* function("stan::prob::double_exponential_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
       
@@ -145,7 +145,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_cdf(const T_y& y, 
                            const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::double_exponential_cdf");
+      static const char* function("stan::prob::double_exponential_cdf");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
 
@@ -224,7 +224,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_cdf_log(const T_y& y, const T_loc& mu, 
                                const T_scale& sigma) {
-      static const std::string function("stan::prob::double_exponential_cdf_log");
+      static const char* function("stan::prob::double_exponential_cdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
         T_partials_return;
       
@@ -304,7 +304,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     double_exponential_ccdf_log(const T_y& y, const T_loc& mu, 
                                const T_scale& sigma) {
-      static const std::string function("stan::prob::double_exponential_ccdf_log");
+      static const char* function("stan::prob::double_exponential_ccdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
       
@@ -385,7 +385,7 @@ namespace stan {
     double_exponential_rng(const double mu,
                            const double sigma,
                            RNG& rng) {
-      static const std::string function("stan::prob::double_exponential_rng");
+      static const char* function("stan::prob::double_exponential_rng");
 
       using boost::variate_generator;
       using boost::random::uniform_01;

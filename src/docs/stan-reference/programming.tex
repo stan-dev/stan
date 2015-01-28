@@ -547,8 +547,8 @@ for (n in 1:N)
     // ... do something with a[m,n] ...
 \end{stancode}
 %
-Arrays, on the other hand, should be traversed in row-major (or
-first-index fastest) order.%
+Arrays, on the other hand, should be traversed in row-major order
+(i.e., last index fastest), as in the following example.
 %
 \begin{stancode}
 real a[M,N];
@@ -736,7 +736,7 @@ parameters {
   real<lower=0> sigma;  // error scale
 }
 model {
-  y ~ normal(x * beta, sigma);  // likelihood
+  y ~ normal(x * beta + alpha, sigma);  // likelihood
 }
 \end{stancode}
 %
@@ -750,7 +750,9 @@ In the model above, \code{x} is an $N \times K$ matrix of predictors
 and \code{beta} a $K$-vector of coefficients, so \code{x * beta} is an
 $N$-vector of predictions, one for each of the $N$ data items.  These
 predictions line up with the outcomes in the $N$-vector \code{y}, so
-the entire model may be written using matrix arithmetic as shown.
+the entire model may be written using matrix arithmetic as shown.  It
+would be possible to include a column of 1 values in \code{x} and
+remove the \code{alpha} parameter.  
 
 The sampling statement in the model above is just a more efficient,
 vector-based approach to coding the model with a loop, as in the
@@ -1472,7 +1474,7 @@ as
 for a reasonably large value of $A$, such as $A = 10$.
 
 
-\section{Item-Response Theory Models}
+\section{Item-Response Theory Models}\label{item-response-models.section}
 
 Item-response theory (IRT) models the situation in which a number of
 students each answer one or more of a group of test questions.  The
@@ -1514,9 +1516,9 @@ Stan for more flexibility.
 \subsection{1PL (Rasch) Model}
 
 The 1PL item-response model, also known as the Rasch model, has one
-parameter (1P) for questions and uses the logistic link function (L).
-This model in the Stan example models repository at
-\url{example-models/misc/irt/irt.stan}.
+parameter (1P) for questions and uses the logistic link function (L).%
+%
+
 
 The model parameters are declared as follows.
 %
@@ -1588,9 +1590,8 @@ as described in the next section.
 The simple 1PL model described in the previous section is generalized
 in this section with the addition of a discrimination parameter to
 model how noisy a question is and by adding multilevel priors for the
-student and question parameters.
-
-The model parameters are declared as follows.
+question difficulty and discrimination parameters.  The model
+parameters are declared as follows.
 %
 
 \begin{stancode}
@@ -1598,8 +1599,7 @@ parameters {
   real delta;                  // mean student ability
   real alpha[J];               // ability for j - mean
   real beta[K];                // difficulty for k
-  real log_gamma[K];           // discrimination of k
-  real<lower=0> sigma_alpha;   // scale of abilities
+  real<lower=0> gamma[K];      // discrimination of k
   real<lower=0> sigma_beta;    // scale of difficulties 
   real<lower=0> sigma_gamma;   // scale of log discrimination
 }
@@ -1607,41 +1607,61 @@ parameters {
 %
 The parameters should be clearer after the model definition.
 %
-
 \begin{stancode}
 model {
-  alpha ~ normal(0,sigma_alpha); 
+  alpha ~ normal(0,1);
   beta ~ normal(0,sigma_beta);   
-  log_gamma ~ normal(0,sigma_gamma);
-  delta ~ cauchy(0,5);
+  gamma ~ lognormal(0,sigma_gamma);
+  mu_beta ~ cauchy(0,5);
   sigma_alpha ~ cauchy(0,5);
   sigma_beta ~ cauchy(0,5);
   sigma_gamma ~ cauchy(0,5);
   for (n in 1:N)
-    y[n] ~ bernoulli_logit( 
-               exp(log_gamma[kk[n]])
-               * (alpha[jj[n]] - beta[kk[n]] + delta) );
+    y[n] ~ bernoulli_logit(gamma[kk[n]] 
+                           * (alpha[jj[n]] - (beta[kk[n]] + mu_beta)));
 }
 \end{stancode}
 %
-First, the predictor inside the \code{bernoulli\_logit} term is
-equivalent to the predictor of the 1PL model multiplied by the
-discriminativeness for the question, \code{exp(log\_gamma[kk[n]])}.
-The parameter \code{log\_gamma[k]} represents how discriminative a
-question is, with log discriminations above 0 being less (because
-their exponentiation drives the predictor away from zero, which drives
-the prediction away from 0.5) and discriminations below 0 being more
-noisy (driving the predictor toward zero and hence the prediction
-toward 0.5).
+This is similar to the 1PL model, with the additional parameter
+\code{gamma[k]} modeling how discriminative question \code{k} is.  If
+\code{gamma[k]} is greater than 1, responses are more attenuated with
+less chance of getting a question right at random.  The parameter
+\code{gamma[k]} is constrained to be positive, which prohibits there
+being questions that are easier for students of lesser ability;  such
+questions are not unheard of, but they tend to be eliminated from most
+testing situations where an IRT model would be applied.
 
-An alternative to explicitly exponentiating the unconstrained
-discrimination parameter \code{log\_gamma} would be to declare a
-discrimination parameter \code{gamma} with a constraint
-\code{<lower=0>} and provide a lognormal or other positive-constrained
-prior.  Either way, the positive-constrained discrimination term
-identifies the signs in the model, while at the same time eliminating
-the unlikely possibility that there is a question that is easier for
-less able students to answer correctly.
+The model is parameterized here with student abilities \code{alpha}
+being given a unit normal prior.  This is to identify both the scale
+and the location of the parameters, both of which would be
+unidentified otherwise; see \refchapter{problematic-posteriors} for
+further discussion of identifiability. The difficulty and
+discrimination parameters \code{beta} and \code{gamma} then have
+varying scales given hierarchically in this model.  They could also be
+given weakly informative non-hierarchical priors, such as
+%
+\begin{stancode}
+  beta ~ normal(0,5);
+  gamma ~ lognormal(0,2);
+\end{stancode}
+%
+The point is that the \code{alpha} determines the scale and location
+and \code{beta} and \code{gamma} are allowed to float.  
+
+The \code{beta} parameter is here given a non-centered
+parameterization, with parameter \code{mu\_beta} serving as the mean
+\code{beta} location. An alternative would've been to take:
+\begin{stancode}
+  beta ~ normal(mu_beta, sigma_beta);
+\end{stancode}
+and
+\begin{stancode}
+  y[n] ~ bernoulli_logit(gamma[kk[n]] * (alpha[jj[n]] - beta[kk[n]]));
+\end{stancode}
+%
+Non-centered parameterizations tend to be more efficient in
+hierarchical models; see \refsection{reparameterization} for more
+information on non-centered reparameterizations.
 
 The intercept term \code{delta} can't be modeled hierarchically, so it
 is given a weakly informative $\distro{Cauchy}(0,5)$ prior.
@@ -1651,6 +1671,8 @@ in the half-Cauchy prior is implicit; explicit truncation is not
 necessary because the log probability need only be calculated up to a
 proportion and the scale variables are constrained to $(0,\infty)$ by 
 their declarations.
+
+
 
 \section{Priors for Identifiabilty}\label{priors-for-identification.section}
 
@@ -2129,13 +2151,8 @@ Times series data come arranged in temporal order.  This chapter
 presents two kinds of time series models, regression-like models such
 as autogression and moving average models, and hidden Markov models. 
 
-In later chapters, we discuss two alternative models which may be
-applied to time-series data, 
-%
-\begin{itemize}
-\item Gaussian processes (GP) in \refchapter{gaussian-processes} and 
-\item hidden Markov models (HMM) in \refsection{hmms}.
-\end{itemize}
+\refchapter{gaussian-processes} presents Gaussian processes, which may
+also be used for time-series (and spatial) data.
 
 
 \section{Autoregressive Models}
@@ -2768,9 +2785,10 @@ component indicators form a latent Markov chain.
 \subsection{Supervised Parameter Estimation}
 
 In the situation where the hidden states are known, the following
-naive model can be used to fit the parameters $\theta$ and $\phi$.
-(This model is part of the Stan example models repository on the path
-\nolinkurl{example-models/misc/hmm/hmm.stan}.)
+naive model can be used to fit the parameters $\theta$ and $\phi$.%
+%
+\footnote{The program code is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
 %
 \begin{stancode}
 data {
@@ -2826,12 +2844,14 @@ sentence and is prohibited elsewhere.
 
 The naive HMM estimation model presented above can be sped up
 dramatically by replacing the loops over categorical distributions
-with a single multinomial distribution.  A complete implementation is
-available in the Stan example models repository at path
-\nolinkurl{example-models/misc/hmm/hmm-sufficient.stan}.  The data
-is declared as before, but now a transformed data blocks computes the
-sufficient statistics for estimating the transition and emission
-matrices.
+with a single multinomial distribution.%
+%
+\footnote{The model is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
+%
+The data is declared as before, but now a transformed data blocks
+computes the sufficient statistics for estimating the transition and
+emission matrices.
 %
 \begin{stancode}
 transformed data {
@@ -2870,8 +2890,11 @@ up in the same way by computing sufficient statistics.
 
 With the Dirichlet-multinomial HMM, the posterior can be computed
 analytically because the Dirichlet is the conjugate prior to the
-multinomial.  The following example, available in the Stan example models
-repository \nolinkurl{example-models/hmm/hmm-analytic.stan},
+multinomial.  The following example
+%
+\footnote{The program is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
+%
 illustrates how a Stan model can define the posterior analytically.
 This is possible in the Stan language because the model only needs to
 define the conditional probability of the parameters given the data up
@@ -2922,9 +2945,13 @@ sequence with an unknown state sequence.  This is a marginalization
 problem, and for HMMs, it is computed with the so-called forward
 algorithm.  
 
-In Stan, the forward algorithm is coded as follows (the full model
-is in \nolinkurl{example-models/misc/hmm/hmm-semisup.stan}).  First,
-two additional data variable are declared for the unsupervised data.
+In Stan, the forward algorithm is coded as follows.%
+%
+\footnote{The program is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
+%
+First, two additional data variable are declared for the unsupervised
+data.
 %
 \begin{stancode}
 data {
@@ -3057,6 +3084,8 @@ is represented in the BUGS modeling language via the cut operation.
 That is, the model is fit independently of \code{u}, then those
 parameters used to find the most likely state to have generated
 \code{u}.
+
+
 
 
 
@@ -3240,6 +3269,7 @@ all convenient to place a prior on the full covariance matrix \code{L
 adjustment is provided in the subsection of
 \refsection{change-of-variables} devoted to covariance matrices.
 
+
 \chapter{Truncated or Censored Data}
 
 \noindent
@@ -3305,7 +3335,8 @@ for (n in 1:N)
 %
 then if the value of \code{y[n]} is less than the value of \code{L}
 or greater than the value of \code{U}, the sampling statement produces
-a zero-probability estimate.
+a zero-probability estimate.  For user-defined truncation, this
+zeroing outside of truncation bounds must be handled explicitly.
 
 To avoid variables straying outside of truncation bounds, appropriate
 constraints are required.  For example, if \code{y} is a parameter in
@@ -3671,6 +3702,14 @@ defined by \citet{Lambert:1992}, add additional probability mass to
 the outcome of zero.  Hurdle models, on the other hand, are formulated
 as pure mixtures of zero and non-zero outcomes.  
 
+Zero inflation and hurdle models can be formulated for discrete
+distributions other than the Poisson.  Zero inflation does not work
+for continuous distributions in Stan because of issues with
+derivatives; in particular, there is no way to add a point mass to a
+continuous distribution, such as zero-inflating a normal as a
+regression coefficient prior.
+
+
 \subsection{Zero Inflation}
 
 Consider the following example for zero-inflated Poisson
@@ -3749,7 +3788,7 @@ the Poisson distribution.  The hurdle model is even more straightforward to
 program in Stan, as it does not require an explicit mixture.  
 %
 \begin{stancode}
-y[n] ~ bernoulli(theta);
+(y[n] == 0) ~ bernoulli(theta);
 if (y[n] > 0)
   y[n] ~ poisson(lambda) T[1,];
 \end{stancode}
@@ -3757,7 +3796,7 @@ if (y[n] > 0)
 The \code{[1,]} after the Poisson indicates that it is truncated below
 at 1; see \refsection{poisson}.  Although the variable 
 \code{y[n]} is being ``sampled'' twice, the effect on the log
-probability fucntion follows the definition (on the log scale).  
+probability function follows the definition (on the log scale).  
 
 
 \chapter{Measurement Error and Meta-Analysis}
@@ -3825,7 +3864,7 @@ data {
 parameters {
   real x[N];          // unknown true value   
   real mu_x;          // prior location
-  real sigma_x        // prior scale
+  real sigma_x;       // prior scale
   ...
 }
 model {
@@ -4006,10 +4045,12 @@ priors compared to the scale of the data.
 \citet{Rubin:1981} provided a hierarchical Bayesian meta-analysis of
 the treatment effect of Scholastic Aptitude Test (SAT) coaching in
 eight schools based on the sample treatment effect and standard error
-in each school.  The model provided for this data in
+in each school.%
+%
+\footnote{The model provided for this data in
 \citep[Section~5.5]{GelmanEtAl:2013} is included with the
-data in the Stan example model repository in directory
-\nolinkurl{example-models/misc/eight-schools/}.
+data in the Stan example model repository, 
+\url{http://mc-stan.org/examples.html}.}
 
 \subsubsection{Extensions and Alternatives}
 
@@ -4315,7 +4356,27 @@ requiring far fewer iterations for the same degree of accuracy) to
 calculate these covariances in expectation using \code{lp}.
 
 
+\subsection{Multiple Change Points}
 
+There is no obstacle in principle to allowing multiple change points.
+The only issue is that computation increases from linear to quadratic
+in marginalizing out two change points, cubic for three change points,
+and so on.  There are three parameters, \code{e}, \code{m}, and
+\code{l}, and two loops for the change point and then one over time,
+with log densities being stored in a matrix.
+%
+\begin{stancode}
+matrix[T,T] lp;
+lp <- rep_matrix(log_unif,T);
+for (s1 in 1:T)
+  for (s2 in 1:T)
+    for (t in 1:T)
+      lp[s1,s2] <- lp[s1,s2] 
+        + poisson_log(D[t], if_else(t < s1, e, if_else(t < s2, m, l)));
+\end{stancode}
+%
+The matrix can then be converted back to a vector using
+\code{to\_vector} before being passed to \code{log\_sum\_exp}.
 
 \section{Mark-Recapture Models}
 
@@ -5082,6 +5143,200 @@ be averaged across the iterations to provide the posterior probability
 distribution over each $z_i$.
 
 
+\chapter{Sparse and Ragged Data Structures}
+
+\noindent
+Stan does not directly support either sparse or ragged data
+structures, though both can be accommodated with some programming
+effort. 
+
+\section{Sparse Data Structures}
+
+Coding sparse data structures is as easy as moving from a matrix-like
+data structure to a database-like data structure.  For example,
+consider the coding of sparse data for the IRT models discussed in
+\refsection{item-response-models}.  There are $J$ students and $K$
+questions, and if every student answers every question, then it is
+practical to declare the data as a $J \times K$ array of answers.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> J;
+  int<lower=1> K;
+  int<lower=0,upper=1> y[J,K];
+  ...
+model {
+  for (j in 1:J)
+    for (k in 1:K)
+      y[j,k] ~ bernoulli_logit(delta[k] * (alpha[j] - beta[k]));
+  ...
+\end{Verbatim}
+\end{quote}
+%
+
+\begin{figure}
+\begin{center}
+\begin{minipage}[c]{0.45\textwidth}
+\[
+y 
+=
+\left[
+\begin{array}{cccc}
+0 & 1 & \mbox{NA} & 1
+\\
+0 & \mbox{NA} & \mbox{NA} & 1
+\\
+\mbox{NA} & 0 & \mbox{NA} & \mbox{NA}
+\end{array}
+\right]
+\]
+\end{minipage}
+\ \ \
+\begin{minipage}[c]{0.45\textwidth}
+\begin{tabular}{ll|l}
+$jj$ & $kk$ & $y$ 
+\\ \hline
+1 & 1 & 0
+\\
+1 & 2 & 1
+\\
+1 & 4 & 1
+\\
+2 & 1 & 0
+\\
+2 & 4 & 1
+\\
+3 & 2 & 0
+\end{tabular}
+\end{minipage}
+\end{center}
+\vspace*{-12pt}
+\caption{\small\it  Example of coding sparse arrays in Stan.  On the left is a definition
+  of a sparse matrix $y$ using the NA notation from R (which is not
+  supported by Stan).  On the right is a database-like encoding of the
+  same sparse matrix $y$ that can be used directly in Stan.  The first
+  two columns, $jj$ and $kk$, denote the indexes and the final column,
+  $y$, the value.  For example, the fifth row of the database-like
+  data structure on the right indicates that $y_{2,4} = 0$.}\label{sparse-data.figure}
+\end{figure}
+%
+When not every student is given every question, the dense array coding
+will no longer work, because Stan does not support undefined values.
+\reffigure{sparse-data} shows an example with $J=3$ and $K=4$, with
+missing responses shown as NA, as in R.  There is no support within
+Stan for R's NA values, so this data structure cannot be used
+directly.  Instead, it must be converted to a ``long form'' as in a
+database, with columns indicating the $j$ and $k$ indices along with
+the value.  For instance, with $jj$ and $kk$ used for the indices
+(following \citep{GelmanHill:2007}), the data structure can be coded
+as in the right-hand example in \reffigure{sparse-data}.  This says
+that $y_{1,1} = 0$, $y_{1,2} = 1$, and so on, up to $y_{3,2} = 1$,
+with all other entries undefined.
+
+Letting $N$ be the number of $y$ that are defined, here $N=6$,
+the data and model can be formulated as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  ...
+  int<lower=1> N;
+  int<lower=1,upper=J> jj[N];
+  int<lower=1,upper=K> kk[N];
+  int<lower=0,upper=1> y[N];
+  ...
+model {
+  for (n in 1:N)
+    y[n] ~ bernoulli_logit(delta[kk[n]]
+                           * (alpha[jj[n]] - beta[kk[n]]));
+  ...
+\end{Verbatim}
+\end{quote}
+%
+In the situation where there are no missing values, the two model
+formulations produce exactly the same log posterior density.
+
+
+\section{Ragged Data Structures}
+
+Ragged arrays are arrays that are not rectangular, but have different
+sized entries.  This kind of structure crops up when there are
+different numbers of observations per entry.  
+
+A general approach to dealing with ragged structure is to move to a
+full database-like data structure as discussed in the previous
+section.  A more compact approach is possible with some indexing into
+a linear array.
+
+For example, consider a data structure for three groups, each of which
+has a different number of observations.
+%
+\begin{figure}
+\begin{center}
+\begin{minipage}[c]{0.35\textwidth}
+$y_1 =  \left[1.3 \ \ 2.4 \ \ 0.9\right]$
+\\[3pt]
+$y_2 = \left[-1.8 \ \ -0.1\right]$
+\\[3pt]
+$y_3 = \left[12.9 \ \ 18.7 \ \ 42.9 \ \ 4.7\right]$
+\end{minipage}
+\ \ \
+\begin{minipage}[c]{0.60\textwidth}
+$y = [1.3 \ \ 2.4 \ \ 0.9 \ \ -1.8 \ \ -0.1 \ \ 129 \ \ 18.7 \ \ 42.9
+\ \ 4.7]$
+\\[3pt]
+$s  =  \{ 3 \ \ 2 \ \ 4 \}$
+\end{minipage}
+\end{center}
+\caption{\small\it Example of coding ragged arrays in Stan.  On the
+  left is the definition of a ragged data structure $y$ with three
+  rows of different sizes ($y_1$ is size 3, $y_2$ size 2, and $y_3$
+  size 4).  On the right is an example of how to code the data in Stan,
+  using a single vector $z$ to hold all the values and a separate
+  array of integers $s$ to hold the group row sizes.  With this
+  coding, In this particular example, $y_1 = z_{1:3}$, $y_2 =
+  z_{4:5}$, and $y_3 = z_{6:9}$.}\label{ragged-data.figure}
+\end{figure}
+%
+
+Suppose the model is a very simple varying intercept model, which,
+using vectorized notation, would yield a likelihood
+\[
+\prod_{n=1}^3 y_n ~ normal(\mu_n, \sigma).
+\]
+There's no direct way to encode this in Stan.  
+
+A full datatabse type structure could be used, as in the sparse
+example, but this is inefficient, wasting space for unnecessary
+indices and not allowing vector-based density operations.  A better
+way to code this data is as a single list of values, with a separate
+data structure indicating the sizes of each subarray.  This is
+indicated on the right of \reffigure{ragged-data}.  This coding uses a
+single array for the values and a separate array for the sizes of each
+row.  
+
+The model can then be coded up using slicing operations as follows.
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=0> N;   // # observations
+  int<lower=0> K;   // # of groups
+  vector[N] y;      // observations
+  int s[K];         // group sizes
+  ...
+model {
+  int pos;
+  pos <- 1;
+  for (k in 1:K)
+    segment(y, pos, s[k]) ~ normal(mu[k], sigma);
+\end{Verbatim}
+\end{quote}
+%
+This coding allows for efficient vectorization, which is worth the
+copy cost entailed by the \code{segment()} vector slicing operation.
+
+
 \chapter{Clustering Models}\label{clustering.chapter}
 
 \noindent
@@ -5116,7 +5371,7 @@ data vectors $y$ as input.
 \begin{enumerate} 
 \item For each cluster $k$ in $1{:}K$, compute the cluster centroid $\mu_k$  by averaging the
   vectors assigned to that cluster;
-\item For each $n$ in $1:N$, reassign $y_n$ to the cluster $k$ to
+\item For each $n$ in $1:N$, reassign $y_n$ to the cluster $k$
   for which the (Euclidean) distance from $y_n$ to $\mu_k$ is smallest;
 \item If no vectors changed cluster, return the cluster assignments.
 \end{enumerate}
@@ -5169,10 +5424,11 @@ mean $\mu_k$ to the data point $y_n$.
 
 \subsection{Stan Implementation of Soft $K$-Means}
 
-The following model is available in the Stan example model repository
-(along with an R program to randomly generate data sets and a sample
-data set) in the directory
-\nolinkurl{example-models/misc/soft-k-means}.
+Consider the following Stan program for implementing $K$-means
+clustering.%
+%
+\footnote{The model is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
 %
 \begin{stancode}
 data {
@@ -5214,7 +5470,7 @@ The only parameter is \code{mu}, where \code{mu[k]} is the centroid
 for cluster $k$.  The transformed parameters \code{soft\_z[n]} contain
 the log of the unnormalized cluster assignment probabilities.  The
 vector \code{soft\_z[n]} can be converted back to a normalized simplex
-using the softmax function (see \refsection{softmax}), either externally
+using the softmax function (see \refsection{softmax}), either
 externally or within the model's generated quantities block.
 
 \subsection{Generalizing Soft $K$-Means}
@@ -5367,13 +5623,13 @@ document identity array \code{doc}.
 
 \subsection{Estimation with Category-Labeled Training Data}
 
-The naive Bayes models along with R programs to simulate data for them
-and a sample data set are available in the example models repository in
-directory \nolinkurl{example-models/misc/clustering/naive-bayes}.
 
 A naive Bayes model for estimating the simplex parameters given
 training data with documents of known categories can be coded in Stan
-as follows 
+as follows%
+%
+\footnote{This model is available in the example model repository;
+  see \url{http://mc-stan.org/examples.html}.}
 %
 \begin{stancode}
 data {
@@ -5868,9 +6124,11 @@ a multivariate normal distribution.  To make the model concrete, the
 squared exponential covariance function described in the previous section
 will be used with hyperparameters set to $\eta^2 = 1$, $\rho^2 = 1$,
 and $\sigma^2 = 0.1$, and the mean function $m$ is defined to always
-return the zero vector, $m(x) = {\bf 0}$.  The following model is
-in the example models repository at 
-\nolinkurl{example-models/misc/gaussian-process/gp-sim.stan}.
+return the zero vector, $m(x) = {\bf 0}$.  Consider the following
+implementation of a Gaussian process simulator.%
+%
+\footnote{This model is available in the example model repository;
+  see \url{http://mc-stan.org/examples.html}.}
 %
 \begin{stancode}
 data {
@@ -5905,10 +6163,12 @@ Section~\refsection{fit-gp} for a better approach.
 \subsection{Multivariate Inputs}
 
 Only the covariance function's distance computation needs to change in
-moving from a univariate model to a multivariate model.  A
-multivariate sampling model is available in the example models repository at
-\nolinkurl{example-models/misc/gaussian-process/gp-multi-sim.stan}.  The
-only lines that change from the univariate model above are as follows.
+moving from a univariate model to a multivariate model.%
+%
+\footnote{The model is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
+%
+The only lines that change from the univariate model above are as follows.
 %
 \begin{stancode}
 data {
@@ -5953,15 +6213,18 @@ target distribution,
 \mu + Lz \sim \distro{Normal}(\mu,k(x)).
 \]
 
-This transform can be applied directly to Gaussian process simulation,
-as shown in the model
-\nolinkurl{example-models/misc/gaussian-process/gp-sim-cholesky.stan} in
-the distribution.  This model has the same data declarations for
-\code{N} and \code{x}, and the same transformed data definitions of
-\code{mu} and \code{Sigma} as the previous model, with the addition of
-a transformed data variable for the Cholesky decomposition.  The
-parameters change to the raw parameters sampled from an isotropic unit
-normal, and the actual samples are defined as generated quantities.
+This transform can be applied directly to Gaussian process
+simulation.%
+%
+\footnote{The code is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
+%
+This model has the same data declarations for \code{N} and \code{x},
+and the same transformed data definitions of \code{mu} and
+\code{Sigma} as the previous model, with the addition of a transformed
+data variable for the Cholesky decomposition.  The parameters change
+to the raw parameters sampled from an isotropic unit normal, and the
+actual samples are defined as generated quantities.
 %
 \begin{stancode}
 ...
@@ -6004,11 +6267,12 @@ defined based on prior knowledge of the scale of the output values
 ($\eta$), the scale of the output noise ($\sigma$), and the scale at
 which distances are measured among inputs ($1/\rho$).
 
-A Stan model to fit the hyperparameters of the general squared
-exponential covariance function is provided in the example models
-repository in
-\nolinkurl{example-models/misc/gaussian-process/gp-fit.stan}.  The
-Stan code is very similar to the simulation models in terms of the
+The Stan code%
+%
+\footnote{The program code is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
+%
+is very similar to the simulation models in terms of the
 computations, but the blocks in which variables are declared and
 statements are executed has changed to accommodate the hyperparameter
 estimation problem.
@@ -6094,8 +6358,43 @@ hyperparameters can be generalized by declaring \code{rho} to be a
 vector of size \code{D} and defining the covariance function as in
 this subsection.
 
-The collection of $\rho_d$ parameters can also be modeled
-hierarchically.
+
+\subsubsection{Priors for Gaussian Process Parameters}
+
+The parameters $\rho$ and $\eta$ are only weakly identifiable, and the
+ratio of them is better identified and affects the
+nonlinearity. However it is usual to use independent priors.  It may
+be easier to formulate a prior for $1/rho$, which is the length
+scale.  
+
+If the length scale is larger than the scale of the data the model is
+practically linear (with respect to the particular covariate) and
+increasing the length scale does not change the model. Thus you should
+use a prior which goes down for the larger length scale values. If the
+length scale is so small that the correlation between data points is
+zero, then decreasing the length scale further does not change the
+model. There is typically no need to restrict the length scale from
+going to very small values, but sometimes it can be helpful.  One
+reasonable choice of priors is a half-t prior for the length scale,
+with the scale of the prior determined to be weakly informative (or
+more informative if information is available).
+
+The parameter $\eta$ corresponds to how much of the variation is
+explained by the regression function and has a similar role to the
+prior variance for linear model weights.  This means the prior can be
+the same as used in linear models, such as a half-t prior on $\eta$.
+
+A priori, the closer $\rho_d$ is to zero, the less effect the
+predictor dimension $d$ has.  A posterior, the actual dependencies
+between $x$ and $y$ play a role.  With one covariate $x_1$ having a
+linear effect and another covariate $x_2$ having a nonlinear effect,
+it is possible that $\rho_1 < \rho_2$ even if the predictive relevance
+of x1 is higher. That is, $\rho$ is related to the relevance, but it
+is more accurate to say that it measures the nonlinearity or the
+expected number of upcrossings \cite[page~80]{RasmussenWilliams:2006}.
+
+The collection of $\rho_d$ (or $1/rho_d$) parameters can also be
+modeled hierarchically.
 
 
 \section{Predictive Inference with a Gaussian Process}
@@ -6117,9 +6416,10 @@ A direct implementation in Stan defines a model in terms of the
 joint distribution of the observed $y$ and unobserved $\tilde{y}$.
 Although Stan does not support mixed vectors of parameters and data
 directly, such a vector may be synthesized as a local variable in the
-model block.  The following model, which takes this approach, is
-available in the example models repository at
-\nolinkurl{example-models/misc/gaussian-process/gp-predict.stan}.  
+model block.  The following model takes this approach.%
+%
+\footnote{The program code is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
 %
 \begin{stancode}
 data {
@@ -6229,11 +6529,14 @@ There is no noise term including $\sigma^2$ because the indexes of
 elements in $x$ and $\tilde{x}$ are never the same.
 
 Because a Stan model is only required to be proportional to the
-posterior, the posterior may be coded directly.  An example that uses
-the analytic form of the posterior and provides sampling of the
-resulting multivariate normal through the Cholesky decomposition is
-provided in the example models repository in
-\nolinkurl{example-models/misc/gaussian-process/gp-predict-analytic.stan}.  
+posterior, the posterior may be coded directly.  The following
+example%
+%
+\footnote{The program code is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
+%
+uses the analytic form of the posterior and provides sampling of the
+resulting multivariate normal through the Cholesky decomposition.
 The data declaration is the same as for the standard example.  The
 calculation of the predictive mean \code{mu} and covariance Cholesky
 factor \code{L} is done in the transformed data block.
@@ -6348,9 +6651,11 @@ accomplished in Stan by declaring the vector $y$ as a parameter,
 adding the sampling statements for observed $z$, and then proceeding 
 as for the previous regression models.  
 
-The following full model for prediction using logistic Gaussian
-process regression is available in the example models repository at
-\nolinkurl{example-models/misc/gaussian-process/gp-logit-predict.stan}.
+Consider the following full model for prediction using logistic Gaussian
+process regression.
+%
+\footnote{The model is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
 %
 \begin{stancode}
 data {
@@ -6770,9 +7075,11 @@ If $\alpha = -1$, $\beta = 1$, and $y \in (-1,1)$, this reduces to
 \[
 \distro{Triangle}(y|-1,1) = 1 - |y|.
 \]
-The file \url{example-models/basic_distributions/triangle.stan} contains
-the following \Stan implementation of a sampler from 
-$\distro{Triangle}(-1,1)$.
+Consider the following Stan implementation of
+$\distro{Triangle}(-1,1)$ for sampling.%
+%
+\footnote{The program is available in the Stan example model repository;
+see \url{http://mc-stan.org/examples.html}.}
 %
 \begin{stancode}
 parameters {
@@ -7146,11 +7453,10 @@ statements and \code{increment\_log\_prob()} statements; other
 functions are not.  Because of this access, their use is restricted to
 the transformed parameters and model blocks.
 
-Here is an example of a function to return the centered coefficients
-derived from a non-centered vector of parameters \code{beta\_raw}
-along with the location \code{mu} of the center and the scale
-\code{sigma}; see \refsection{reparameterization} for more information
-on centering.
+Here is an example of a function to assign standard normal priors to a
+vector of coefficients, along with a center and scale, and return the
+translated and scaled coefficients; see
+\refsection{reparameterization} for more information on centering.
 %
 \begin{stancode}
 functions {
@@ -7414,7 +7720,6 @@ pseudo-random number generators.  Such functions may only be used in
 the generated quantities block.
 
 
-<<<<<<< HEAD
 \section{Recursive Functions}
 
 Stan supports recursive function definitions, which can be useful for
@@ -7459,6 +7764,8 @@ way to the base case, adding the following conditional clause.
     else if (n == 1)
       return a;
 \end{stancode}
+
+
 
 \chapter{Solving Differential Equations}\label{ode-solver.chapter}
 
@@ -8657,6 +8964,7 @@ transformed parameter.
 Sampling from heavy tailed distributions such as the Cauchy is
 difficult for Hamiltonian Monte Carlo, which operates within a
 Euclidean geometry.%
+%
 \footnote{Riemannian Manifold Hamiltonian Monte Carlo (RMHMC) overcomes
   this difficulty by simulating the Hamiltonian dynamics in a a space
   with a position-dependent metric; see
@@ -8684,7 +8992,7 @@ The inverse of the cumulative distribution function,
 $F_X^{-1}:(0,1) \rightarrow \reals$, is thus
 %
 \[
-F^{-1}_X(y) = \mu + \tau \tan \left( \pi \left( x - \frac{1}{2} \right) \right).
+F^{-1}_X(y) = \mu + \tau \tan \left( \pi \left( y - \frac{1}{2} \right) \right).
 \]
 Thus if the random variable $Y$ has a unit uniform distribution, $Y
 \sim \distro{Uniform}(0,1)$, then $F^{-1}_X(Y)$ has a Cauchy
@@ -8817,6 +9125,7 @@ with
 parameters {
   real<lower=0> nu;
   real<lower=0> tau;
+  real alpha;  
   ...
 transformed parameters {
   real beta;
@@ -9080,10 +9389,13 @@ model {
     }
     A[j,j] <- sqrt(c[j]);
   }
+  for (i in 1:(K-1))
+    A[i,K] <- 0;
+  A[K,K] <- sqrt(c[K]);
   
-  for (i in 1:K) {
+  for (i in 1:K)
     c[i] ~ chi_square(nu - i + 1);
-  }
+
   z ~ normal(0,1);
   // implies: L * A * A' * L' ~ wishart(nu, L * L')
   y ~ multi_normal_cholesky(mu, L * A);
@@ -9144,10 +9456,14 @@ model {
     }
     A[j,j] <- sqrt(c[j]);
   }
+  for (i in 1:(K-1))
+    A[i,K] <- 0;
+  A[K,K] <- sqrt(c[K]);
+
   A_inv_L_inv <- mdivide_left_tri_low(A, L_inv);
-  for (i in 1:K) {
+  for (i in 1:K)
     c[i] ~ chi_square(nu - i + 1);
-  }
+
   z ~ normal(0,1); // implies: crossprod(A_inv_L_inv) ~ 
   // inv_wishart(nu, L_inv' * L_inv)
   ...
