@@ -4,7 +4,7 @@
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradMatrix,value_of_rec) {
+TEST(MathMatrix,value_of_rec) {
   using stan::math::value_of_rec;
   using std::vector;
 
