@@ -5303,7 +5303,7 @@ $s  =  \{ 3 \ \ 2 \ \ 4 \}$
 Suppose the model is a very simple varying intercept model, which,
 using vectorized notation, would yield a likelihood
 \[
-\prod_{n=1}^3 y_n ~ normal(\mu_n, \sigma).
+\prod_{n=1}^3 \log \distro{Normal}(y_n | \mu_n, \sigma).
 \]
 There's no direct way to encode this in Stan.  
 
