@@ -1,6 +1,4 @@
-#include <stan/math/matrix/value_of_rec.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/math/matrix/value_of.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 
