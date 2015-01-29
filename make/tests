@@ -13,14 +13,14 @@ $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
-	$(COMPILE.c) -O$O $(CFLAGS) $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
 # Rule for building a test
 ##
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(CFLAGS) $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
 # Rule for building a test executable
@@ -93,11 +93,11 @@ endif
 ##
 .PHONY: %.hpp-test
 src/test/test-models/good/%.hpp-test : src/test/test-models/good/%.hpp
-	$(COMPILE.c) $(CFLAGS) -fsyntax-only -O0 $< 
+	$(COMPILE.c) -fsyntax-only -O0 $< 
 
 .PHONY: HEADER_TESTS
 %.hpp-test : %.hpp test/dummy.cpp
-	$(COMPILE.c) $(CFLAGS) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
+	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
 
 test/dummy.cpp:
 	@mkdir -p test
