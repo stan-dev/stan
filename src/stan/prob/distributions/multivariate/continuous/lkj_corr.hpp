@@ -72,7 +72,7 @@ namespace stan {
         Eigen::Matrix<T_covar,Eigen::Dynamic,1> log_diagonals =
           L.diagonal().tail(Km1).array().log();
         Eigen::Matrix<T_covar,Eigen::Dynamic,1> values(Km1);
-        for (size_t k = 0; k < Km1; k++)
+        for (int k = 0; k < Km1; k++)
           values(k) = (Km1 - k - 1) * log_diagonals(k);
         if ( (eta == 1.0) &&
             stan::is_constant<typename stan::scalar_type<T_shape> >::value) {
