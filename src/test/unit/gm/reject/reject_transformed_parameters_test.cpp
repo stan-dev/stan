@@ -26,7 +26,7 @@ TEST(StanCommon, reject_transformed_parameters) {
   for (int i = 0; i < cont_params.size(); ++i)
     cont_vector.at(i) = cont_params(i);
   std::vector<int> disc_vector;
-  double lp(0);
+  double lp;
 
   // call model's log_prob function, check that exception is thrown
   try {
