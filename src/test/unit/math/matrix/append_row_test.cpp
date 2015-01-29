@@ -10,6 +10,20 @@ using Eigen::VectorXd;
 using Eigen::RowVectorXd;
 using std::vector;
 
+template <int R, int C>
+void correct_type(const Eigen::Matrix<double,R,C>& x) {
+  EXPECT_EQ(Eigen::Dynamic, R);
+  EXPECT_EQ(1, C);
+}
+
+TEST(MathMatrix, append_row_types) {
+  VectorXd x(2);
+  x << 1, 2;
+  VectorXd y(3);
+  y << 3, 4, 5;
+  correct_type(append_row(x,y));
+}
+
 TEST(MathMatrix, append_row) {
   MatrixXd m33(3, 3);
   m33 << 1, 2, 3,

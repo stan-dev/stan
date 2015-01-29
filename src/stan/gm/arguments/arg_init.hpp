@@ -14,7 +14,7 @@ namespace stan {
       arg_init(): string_argument() {
         _name = "init";
         _description = std::string("Initialization method: ")
-          + std::string("\"x\" initializes randomly bewteen [-x, x], ")
+          + std::string("\"x\" initializes randomly between [-x, x], ")
           + std::string("\"0\" initializes to 0, ")
           + std::string("anything else identifies a file of values");
         _default = "\"2\"";
