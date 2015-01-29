@@ -199,7 +199,7 @@ bool check_all_double(string base, string arg) {
         boost::is_any_of(delimiters), 
         boost::token_compress_on);
 
-  for (int i = 0; i < tokens.size(); i++) {
+  for (size_t i = 0; i < tokens.size(); i++) {
     if (tokens[i] == "1" || tokens[i] == "Eigen::Dynamic>" 
         || tokens[i] == "1>" || tokens[i] == "Eigen::Dynamic")
       result = result && true;
@@ -222,7 +222,7 @@ int num_doubles(string arguments) {
         boost::token_compress_on);
 
   int num = 0;
-  for (int i = 0; i < tokens.size(); i++) {
+  for (size_t i = 0; i < tokens.size(); i++) {
     if (tokens[i] == "Doubles")
       ++num;
   }
@@ -237,7 +237,7 @@ int num_ints(string arguments) {
         boost::token_compress_on);
 
   int num = 0;
-  for (int i = 0; i < tokens.size(); i++) {
+  for (size_t i = 0; i < tokens.size(); i++) {
     if (tokens[i] == "Ints")
       ++num;
   }
