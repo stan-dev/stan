@@ -56,7 +56,7 @@ TEST_F(StanAgradRevOde, decouple_states_dv) {
 
   mock_ode_functor mock_ode;
   
-  int T = 10;
+  size_t T = 10;
 
       
   std::vector<double> y0(2);
@@ -69,11 +69,11 @@ TEST_F(StanAgradRevOde, decouple_states_dv) {
   coupled_ode_system<mock_ode_functor, double, var> 
     coupled_system(mock_ode, y0, theta, x, x_int, &msgs);
 
-  int k = 0;
+  size_t k = 0;
   std::vector<std::vector<double> > ys_coupled(T);
-  for (int t = 0; t < T; t++) {
+  for (size_t t = 0; t < T; t++) {
     std::vector<double> coupled_state(coupled_system.size(), 0.0);
-    for (int n = 0; n < coupled_system.size(); n++)
+    for (size_t n = 0; n < coupled_system.size(); n++)
       coupled_state[n] = ++k;
     ys_coupled[t] = coupled_state;
   }
@@ -82,11 +82,11 @@ TEST_F(StanAgradRevOde, decouple_states_dv) {
   ys = coupled_system.decouple_states(ys_coupled);
 
   ASSERT_EQ(T, ys.size());
-  for (int t = 0; t < T; t++)
+  for (size_t t = 0; t < T; t++)
     ASSERT_EQ(2, ys[t].size());
   
-  for (int t = 0; t < T; t++)
-    for (int n = 0; n < 2; n++)
+  for (size_t t = 0; t < T; t++)
+    for (size_t n = 0; n < 2; n++)
       EXPECT_FLOAT_EQ(ys_coupled[t][n], ys[t][n].val());
 }
 TEST_F(StanAgradRevOde, initial_state_dv) {
@@ -94,25 +94,25 @@ TEST_F(StanAgradRevOde, initial_state_dv) {
   using stan::agrad::var;
   mock_ode_functor base_ode;
 
-  const int N = 3;
-  const int M = 4;
+  const size_t N = 3;
+  const size_t M = 4;
 
   std::vector<double> y0_d(N, 0.0);
   std::vector<var> theta_v(M, 0.0);
 
-  for (int n = 0; n < N; n++)
+  for (size_t n = 0; n < N; n++)
     y0_d[n] = n+1;
-  for (int m = 0; m < M; m++)
+  for (size_t m = 0; m < M; m++)
     theta_v[m] = 10 * (m+1);
      
   coupled_ode_system<mock_ode_functor, double, var>
     coupled_system_dv(base_ode, y0_d, theta_v, x, x_int, &msgs);
 
   std::vector<double> state = coupled_system_dv.initial_state();
-  for (int n = 0; n < N; n++) 
+  for (size_t n = 0; n < N; n++) 
     EXPECT_FLOAT_EQ(y0_d[n], state[n])
       << "we don't need derivatives of y0; initial state gets the initial values";
-  for (int n = N; n < state.size(); n++)
+  for (size_t n = N; n < state.size(); n++)
     EXPECT_FLOAT_EQ(0.0, state[n]);
 }
 TEST_F(StanAgradRevOde, size_dv) {
@@ -120,8 +120,8 @@ TEST_F(StanAgradRevOde, size_dv) {
   using stan::agrad::var;
   mock_ode_functor base_ode;
 
-  const int N = 3;
-  const int M = 4;
+  const size_t N = 3;
+  const size_t M = 4;
 
   std::vector<double> y0_d(N, 0.0);
   std::vector<var> theta_v(M, 0.0);
@@ -137,8 +137,8 @@ TEST_F(StanAgradRevOde, memory_recovery_dv) {
   using stan::agrad::var;
   mock_ode_functor base_ode;
 
-  const int N = 3;
-  const int M = 4;
+  const size_t N = 3;
+  const size_t M = 4;
 
   std::vector<double> y0_d(N, 0.0);
   std::vector<var> theta_v(M, 0.0);
@@ -160,9 +160,9 @@ TEST_F(StanAgradRevOde, memory_recovery_exception_dv) {
   using stan::agrad::var;
   std::string message = "ode throws";
 
-  const int N = 3;
-  const int M = 4;
-  for (int n = 0; n < N+1; n++) {
+  const size_t N = 3;
+  const size_t M = 4;
+  for (size_t n = 0; n < N+1; n++) {
     std::stringstream scoped_message;
     scoped_message << "iteration " << n;
     SCOPED_TRACE(scoped_message.str());
@@ -232,7 +232,7 @@ TEST_F(StanAgradRevOde, decouple_states_vd) {
   using stan::agrad::var;
 
   mock_ode_functor mock_ode;
-  int T = 10;
+  size_t T = 10;
 
   std::vector<var> y0(2);
   std::vector<double> theta(1);
@@ -244,11 +244,11 @@ TEST_F(StanAgradRevOde, decouple_states_vd) {
   coupled_ode_system<mock_ode_functor, var, double>
     coupled_system(mock_ode, y0, theta, x, x_int, &msgs);
       
-  int k = 0;
+  size_t k = 0;
   std::vector<std::vector<double> > ys_coupled(T);
-  for (int t = 0; t < T; t++) {
+  for (size_t t = 0; t < T; t++) {
     std::vector<double> coupled_state(coupled_system.size(), 0.0);
-    for (int n = 0; n < coupled_system.size(); n++)
+    for (size_t n = 0; n < coupled_system.size(); n++)
       coupled_state[n] = ++k;
     ys_coupled[t] = coupled_state;
   }
@@ -257,11 +257,11 @@ TEST_F(StanAgradRevOde, decouple_states_vd) {
   ys = coupled_system.decouple_states(ys_coupled);
       
   ASSERT_EQ(T, ys.size());
-  for (int t = 0; t < T; t++)
+  for (size_t t = 0; t < T; t++)
     ASSERT_EQ(2, ys[t].size());
   
-  for (int t = 0; t < T; t++)
-    for (int n = 0; n < 2; n++)
+  for (size_t t = 0; t < T; t++)
+    for (size_t n = 0; n < 2; n++)
       EXPECT_FLOAT_EQ(ys_coupled[t][n] + y0[n].val(), 
                       ys[t][n].val());
 }
@@ -270,15 +270,15 @@ TEST_F(StanAgradRevOde, initial_state_vd) {
   using stan::agrad::var;
   mock_ode_functor base_ode;
 
-  const int N = 3;
-  const int M = 4;
+  const size_t N = 3;
+  const size_t M = 4;
 
   std::vector<var> y0_v(N, 0.0);
   std::vector<double> theta_d(M, 0.0);
 
-  for (int n = 0; n < N; n++)
+  for (size_t n = 0; n < N; n++)
     y0_v[n] = n+1;
-  for (int m = 0; m < M; m++)
+  for (size_t m = 0; m < M; m++)
     theta_d[m] = 10 * (m+1);
      
   coupled_ode_system<mock_ode_functor, var, double>
@@ -287,10 +287,10 @@ TEST_F(StanAgradRevOde, initial_state_vd) {
   std::vector<double> state;
 
   state = coupled_system_vd.initial_state();
-  for (int n = 0; n < N; n++) 
+  for (size_t n = 0; n < N; n++) 
     EXPECT_FLOAT_EQ(0.0, state[n])
       << "we need derivatives of y0; initial state gets set to 0";
-  for (int n = N; n < state.size(); n++)
+  for (size_t n = N; n < state.size(); n++)
     EXPECT_FLOAT_EQ(0.0, state[n]);
 }
 TEST_F(StanAgradRevOde, size_vd) {
@@ -298,8 +298,8 @@ TEST_F(StanAgradRevOde, size_vd) {
   using stan::agrad::var;
   mock_ode_functor base_ode;
 
-  const int N = 3;
-  const int M = 4;
+  const size_t N = 3;
+  const size_t M = 4;
 
   std::vector<var> y0_v(N, 0.0);
   std::vector<double> theta_d(M, 0.0);
@@ -315,8 +315,8 @@ TEST_F(StanAgradRevOde, memory_recovery_vd) {
   using stan::agrad::var;
   mock_ode_functor base_ode;
 
-  const int N = 3;
-  const int M = 4;
+  const size_t N = 3;
+  const size_t M = 4;
 
   std::vector<var> y0_v(N, 0.0);
   std::vector<double> theta_d(M, 0.0);
@@ -338,9 +338,9 @@ TEST_F(StanAgradRevOde, memory_recovery_exception_vd) {
   using stan::agrad::var;
   std::string message = "ode throws";
 
-  const int N = 3;
-  const int M = 4;
-  for (int n = 0; n < N+1; n++) {
+  const size_t N = 3;
+  const size_t M = 4;
+  for (size_t n = 0; n < N+1; n++) {
     std::stringstream scoped_message;
     scoped_message << "iteration " << n;
     SCOPED_TRACE(scoped_message.str());
@@ -424,12 +424,12 @@ TEST_F(StanAgradRevOde, decouple_states_vv) {
   coupled_ode_system<harm_osc_ode_fun, var, var>
     coupled_system(harm_osc, y0, theta, x, x_int, &msgs);
 
-  int T = 10;
-  int k = 0;
+  size_t T = 10;
+  size_t k = 0;
   std::vector<std::vector<double> > ys_coupled(T);
-  for (int t = 0; t < T; t++) {
+  for (size_t t = 0; t < T; t++) {
     std::vector<double> coupled_state(coupled_system.size(), 0.0);
-    for (int n = 0; n < coupled_system.size(); n++)
+    for (size_t n = 0; n < coupled_system.size(); n++)
       coupled_state[n] = ++k;
     ys_coupled[t] = coupled_state;
   }
@@ -438,11 +438,11 @@ TEST_F(StanAgradRevOde, decouple_states_vv) {
   ys = coupled_system.decouple_states(ys_coupled);
 
   ASSERT_EQ(T, ys.size());
-  for (int t = 0; t < T; t++)
-    ASSERT_EQ(2, ys[t].size());
+  for (size_t t = 0; t < T; t++)
+    ASSERT_EQ(2U, ys[t].size());
   
-  for (int t = 0; t < T; t++)
-    for (int n = 0; n < 2; n++)
+  for (size_t t = 0; t < T; t++)
+    for (size_t n = 0; n < 2; n++)
       EXPECT_FLOAT_EQ(ys_coupled[t][n] + y0[n].val(), 
                       ys[t][n].val());
 }
@@ -451,25 +451,25 @@ TEST_F(StanAgradRevOde, initial_state_vv) {
   using stan::agrad::var;
   mock_ode_functor base_ode;
 
-  const int N = 3;
-  const int M = 4;
+  const size_t N = 3;
+  const size_t M = 4;
 
   std::vector<var> y0_v(N, 0.0);
   std::vector<var> theta_v(M, 0.0);
 
-  for (int n = 0; n < N; n++)
+  for (size_t n = 0; n < N; n++)
     y0_v[n] = n+1;
-  for (int m = 0; m < M; m++)
+  for (size_t m = 0; m < M; m++)
     theta_v[m] = 10 * (m+1);
      
   coupled_ode_system<mock_ode_functor, var, var>
     coupled_system_vv(base_ode, y0_v, theta_v, x, x_int, &msgs);
 
   std::vector<double>  state = coupled_system_vv.initial_state();
-  for (int n = 0; n < N; n++) 
+  for (size_t n = 0; n < N; n++) 
     EXPECT_FLOAT_EQ(0.0, state[n])
       << "we need derivatives of y0; initial state gets set to 0";
-  for (int n = N; n < state.size(); n++)
+  for (size_t n = N; n < state.size(); n++)
     EXPECT_FLOAT_EQ(0.0, state[n]);
 }
 TEST_F(StanAgradRevOde, size_vv) {
@@ -477,8 +477,8 @@ TEST_F(StanAgradRevOde, size_vv) {
   using stan::agrad::var;
   mock_ode_functor base_ode;
 
-  const int N = 3;
-  const int M = 4;
+  const size_t N = 3;
+  const size_t M = 4;
 
   std::vector<var> y0_v(N, 0.0);
   std::vector<var> theta_v(M, 0.0);
@@ -494,8 +494,8 @@ TEST_F(StanAgradRevOde, memory_recovery_vv) {
   using stan::agrad::var;
   mock_ode_functor base_ode;
 
-  const int N = 3;
-  const int M = 4;
+  const size_t N = 3;
+  const size_t M = 4;
 
   std::vector<var> y0_v(N, 0.0);
   std::vector<var> theta_v(M, 0.0);
@@ -517,9 +517,9 @@ TEST_F(StanAgradRevOde, memory_recovery_exception_vv) {
   using stan::agrad::var;
   std::string message = "ode throws";
 
-  const int N = 3;
-  const int M = 4;
-  for (int n = 0; n < N+1; n++) {
+  const size_t N = 3;
+  const size_t M = 4;
+  for (size_t n = 0; n < N+1; n++) {
     std::stringstream scoped_message;
     scoped_message << "iteration " << n;
     SCOPED_TRACE(scoped_message.str());
