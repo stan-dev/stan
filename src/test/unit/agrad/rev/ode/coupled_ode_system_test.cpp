@@ -83,7 +83,7 @@ TEST_F(StanAgradRevOde, decouple_states_dv) {
 
   ASSERT_EQ(T, ys.size());
   for (size_t t = 0; t < T; t++)
-    ASSERT_EQ(2, ys[t].size());
+    ASSERT_EQ(2U, ys[t].size());
   
   for (size_t t = 0; t < T; t++)
     for (size_t n = 0; n < 2; n++)
@@ -258,7 +258,7 @@ TEST_F(StanAgradRevOde, decouple_states_vd) {
       
   ASSERT_EQ(T, ys.size());
   for (size_t t = 0; t < T; t++)
-    ASSERT_EQ(2, ys[t].size());
+    ASSERT_EQ(2U, ys[t].size());
   
   for (size_t t = 0; t < T; t++)
     for (size_t n = 0; n < 2; n++)
