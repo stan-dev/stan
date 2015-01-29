@@ -18,7 +18,7 @@ finite_diff_params(const F& f,
                    const std::vector<double>& theta,
                    const std::vector<double>& x,
                    const std::vector<int>& x_int,
-                   const int& param_index,
+                   const size_t& param_index,
                    const double& diff) {
   std::stringstream msgs;
   std::vector<double> theta_ub(theta.size());
@@ -59,7 +59,7 @@ finite_diff_initial_position(const F& f,
                              const std::vector<double>& theta,
                              const std::vector<double>& x,
                              const std::vector<int>& x_int,
-                             const int& param_index,
+                             const size_t& param_index,
                              const double& diff) {
   std::stringstream msgs;
   std::vector<double> y_in_ub(y_in.size());
