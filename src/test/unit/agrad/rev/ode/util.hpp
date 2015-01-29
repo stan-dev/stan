@@ -23,7 +23,7 @@ finite_diff_params(const F& f,
   std::stringstream msgs;
   std::vector<double> theta_ub(theta.size());
   std::vector<double> theta_lb(theta.size());
-  for (int i = 0; i < theta.size(); i++) {
+  for (size_t i = 0; i < theta.size(); i++) {
     if (i == param_index) {
       theta_ub[i] = theta[i] + diff;
       theta_lb[i] = theta[i] - diff;
@@ -43,8 +43,8 @@ finite_diff_params(const F& f,
 
   std::vector<std::vector<double> > results(ts.size());
 
-  for (int i = 0; i < ode_res_ub.size(); i++) 
-    for (int j = 0; j < ode_res_ub[j].size(); j++)
+  for (size_t i = 0; i < ode_res_ub.size(); i++) 
+    for (size_t j = 0; j < ode_res_ub[j].size(); j++)
       results[i].push_back((ode_res_ub[i][j] - ode_res_lb[i][j]) / (2*diff));
   return results;
 }
@@ -64,7 +64,7 @@ finite_diff_initial_position(const F& f,
   std::stringstream msgs;
   std::vector<double> y_in_ub(y_in.size());
   std::vector<double> y_in_lb(y_in.size());
-  for (int i = 0; i < y_in.size(); i++) {
+  for (size_t i = 0; i < y_in.size(); i++) {
     if (i == param_index) {
       y_in_ub[i] = y_in[i] + diff;
       y_in_lb[i] = y_in[i] - diff;
@@ -84,8 +84,8 @@ finite_diff_initial_position(const F& f,
 
   std::vector<std::vector<double> > results(ts.size());
 
-  for (int i = 0; i < ode_res_ub.size(); i++) 
-    for (int j = 0; j < ode_res_ub[j].size(); j++)
+  for (size_t i = 0; i < ode_res_ub.size(); i++) 
+    for (size_t j = 0; j < ode_res_ub[j].size(); j++)
       results[i].push_back((ode_res_ub[i][j] - ode_res_lb[i][j]) / (2*diff));
   return results;
 }
@@ -106,13 +106,13 @@ void test_ode_finite_diff_dv(const F& f,
   std::stringstream msgs;
 
   std::vector<std::vector<std::vector<double> > > finite_diff_res(theta.size());
-  for (int i = 0; i < theta.size(); i++)
+  for (size_t i = 0; i < theta.size(); i++)
     finite_diff_res[i] = finite_diff_params(f, t_in, ts, y_in, theta, x, x_int, i, diff);
 
   std::vector<double> grads_eff;
 
   std::vector<stan::agrad::var> theta_v;
-  for (int i = 0; i < theta.size(); i++)
+  for (size_t i = 0; i < theta.size(); i++)
     theta_v.push_back(theta[i]);
 
   std::vector<std::vector<stan::agrad::var> > ode_res;
@@ -120,12 +120,12 @@ void test_ode_finite_diff_dv(const F& f,
   ode_res = stan::math::integrate_ode(f, y_in, t_in,
                                       ts, theta_v, x, x_int, &msgs);
   
-  for (int i = 0; i < ts.size(); i++) {
-    for (int j = 0; j < y_in.size(); j++) {
+  for (size_t i = 0; i < ts.size(); i++) {
+    for (size_t j = 0; j < y_in.size(); j++) {
       grads_eff.clear();
       ode_res[i][j].grad(theta_v, grads_eff);
 
-      for (int k = 0; k < theta.size(); k++)
+      for (size_t k = 0; k < theta.size(); k++)
         EXPECT_NEAR(grads_eff[k], finite_diff_res[k][i][j], diff2)
           << "Gradient of integrate_ode failed with initial positions"
           << " known and parameters unknown at time index " << i
@@ -152,13 +152,13 @@ void test_ode_finite_diff_vd(const F& f,
   std::stringstream msgs;
 
   std::vector<std::vector<std::vector<double> > > finite_diff_res(y_in.size());
-  for (int i = 0; i < y_in.size(); i++)
+  for (size_t i = 0; i < y_in.size(); i++)
     finite_diff_res[i] = finite_diff_initial_position(f, t_in, ts, y_in, theta, x, x_int, i, diff);
 
   std::vector<double> grads_eff;
 
   std::vector<stan::agrad::var> y_in_v;
-  for (int k = 0; k < y_in.size(); k++)
+  for (size_t k = 0; k < y_in.size(); k++)
     y_in_v.push_back(y_in[k]);
 
   std::vector<std::vector<stan::agrad::var> > ode_res;
@@ -166,12 +166,12 @@ void test_ode_finite_diff_vd(const F& f,
   ode_res = stan::math::integrate_ode(f, y_in_v, t_in,
                                       ts, theta, x, x_int, &msgs);
 
-  for (int i = 0; i < ts.size(); i++) {
-    for (int j = 0; j < y_in.size(); j++) {
+  for (size_t i = 0; i < ts.size(); i++) {
+    for (size_t j = 0; j < y_in.size(); j++) {
       grads_eff.clear();
       ode_res[i][j].grad(y_in_v, grads_eff);
 
-      for (int k = 0; k < y_in.size(); k++)
+      for (size_t k = 0; k < y_in.size(); k++)
         EXPECT_NEAR(grads_eff[k], finite_diff_res[k][i][j], diff2)
           << "Gradient of integrate_ode failed with initial positions"
           << " unknown and parameters known at time index " << i
@@ -199,28 +199,28 @@ void test_ode_finite_diff_vv(const F& f,
   std::stringstream msgs;
 
   std::vector<std::vector<std::vector<double> > > finite_diff_res_y(y_in.size());
-  for (int i = 0; i < y_in.size(); i++)
+  for (size_t i = 0; i < y_in.size(); i++)
     finite_diff_res_y[i] = finite_diff_initial_position(f, t_in, ts, y_in,
                                                         theta, x, x_int, i, diff);
 
   std::vector<std::vector<std::vector<double> > > finite_diff_res_p(theta.size());
-  for (int i = 0; i < theta.size(); i++)
+  for (size_t i = 0; i < theta.size(); i++)
     finite_diff_res_p[i] = finite_diff_params(f, t_in, ts, y_in, theta, x,
                                               x_int, i, diff);
 
 
   std::vector<double> grads_eff;
   std::vector<stan::agrad::var> y_in_v;
-  for (int i = 0; i < y_in.size(); i++)
+  for (size_t i = 0; i < y_in.size(); i++)
     y_in_v.push_back(y_in[i]);
 
   std::vector<stan::agrad::var> vars = y_in_v;
 
   std::vector<stan::agrad::var> theta_v;
-  for (int i = 0; i < theta.size(); i++)
+  for (size_t i = 0; i < theta.size(); i++)
     theta_v.push_back(theta[i]);
 
-  for (int i = 0; i < theta_v.size(); i++)
+  for (size_t i = 0; i < theta_v.size(); i++)
     vars.push_back(theta_v[i]);
 
   std::vector<std::vector<stan::agrad::var> > ode_res;
@@ -228,18 +228,18 @@ void test_ode_finite_diff_vv(const F& f,
   ode_res = stan::math::integrate_ode(f, y_in_v, t_in,
                                       ts, theta_v, x, x_int, &msgs);
 
-  for (int i = 0; i < ts.size(); i++) {
-    for (int j = 0; j < y_in.size(); j++) {
+  for (size_t i = 0; i < ts.size(); i++) {
+    for (size_t j = 0; j < y_in.size(); j++) {
       grads_eff.clear();
       ode_res[i][j].grad(vars, grads_eff);
 
-      for (int k = 0; k < theta.size(); k++)
+      for (size_t k = 0; k < theta.size(); k++)
         EXPECT_NEAR(grads_eff[k+y_in.size()], finite_diff_res_p[k][i][j], diff2)
           << "Gradient of integrate_ode failed with initial positions"
           << " unknown and parameters unknown for param at time index " << i
           << ", equation index " << j 
           << ", and parameter index: " << k;
-      for (int k = 0; k < y_in.size(); k++)
+      for (size_t k = 0; k < y_in.size(); k++)
         EXPECT_NEAR(grads_eff[k], finite_diff_res_y[k][i][j], diff2)
           << "Gradient of integrate_ode failed with initial positions"
           << " unknown and parameters known for initial position at time index " << i
@@ -518,7 +518,7 @@ void test_ode_error_conditions_vd(const F& f,
                                   const std::vector<double>& x,
                                   const std::vector<int>& x_int) {
   std::vector<stan::agrad::var> y_var;
-  for (int i = 0; i < y_in.size(); i++) 
+  for (size_t i = 0; i < y_in.size(); i++) 
     y_var.push_back(y_in[i]);
   test_ode_error_conditions(f, t_in, ts, y_var, theta, x, x_int);
   test_ode_error_conditions_nan(f, t_in, ts, y_var, theta, x, x_int);
@@ -532,7 +532,7 @@ void test_ode_error_conditions_dv(const F& f,
                                   const std::vector<double>& x,
                                   const std::vector<int>& x_int) {
   std::vector<stan::agrad::var> theta_var;
-  for (int i = 0; i < theta.size(); i++) 
+  for (size_t i = 0; i < theta.size(); i++) 
     theta_var.push_back(theta[i]);
   test_ode_error_conditions(f, t_in, ts, y_in, theta_var, x, x_int);
   test_ode_error_conditions_nan(f, t_in, ts, y_in, theta_var, x, x_int);
@@ -546,10 +546,10 @@ void test_ode_error_conditions_vv(const F& f,
                                   const std::vector<double>& x,
                                   const std::vector<int>& x_int) {
   std::vector<stan::agrad::var> y_var;
-  for (int i = 0; i < y_in.size(); i++) 
+  for (size_t i = 0; i < y_in.size(); i++) 
     y_var.push_back(y_in[i]); 
   std::vector<stan::agrad::var> theta_var;
-  for (int i = 0; i < theta.size(); i++) 
+  for (size_t i = 0; i < theta.size(); i++) 
     theta_var.push_back(theta[i]);
   test_ode_error_conditions(f, t_in, ts, y_var, theta_var, x, x_int);
   test_ode_error_conditions_nan(f, t_in, ts, y_var, theta_var, x, x_int);
