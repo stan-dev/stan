@@ -50,7 +50,7 @@ namespace stan {
       typedef typename std::vector<T>::value_type type;
 
     };
-
+    
     
   }
 }

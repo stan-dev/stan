@@ -7,7 +7,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/rev/matrix/value_of.hpp>
+#include <stan/math/matrix/value_of.hpp>
 #include <stan/math/matrix/quad_form.hpp>
 #include <stan/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/error_handling/matrix/check_square.hpp>
@@ -16,16 +16,15 @@
 namespace stan {
   namespace agrad {
     namespace {
-      template<typename TA,int RA,int CA,typename TB,int RB,int CB>
+      template <typename TA, int RA, int CA, typename TB, int RB, int CB>
       class quad_form_vari_alloc : public chainable_alloc {
       private:
         inline void compute(const Eigen::Matrix<double,RA,CA> &A,
                             const Eigen::Matrix<double,RB,CB> &B)
         {
-          int i,j;
           Eigen::Matrix<double,CB,CB> Cd(B.transpose()*A*B);
-          for (j = 0; j < C_.cols(); j++) {
-            for (i = 0; i < C_.rows(); i++) {
+          for (int j = 0; j < C_.cols(); j++) {
+            for (int i = 0; i < C_.rows(); i++) {
               if (_sym) {
                 C_(i,j) = var(new vari(0.5*(Cd(i,j) + Cd(j,i)),false));
               }
@@ -42,6 +41,7 @@ namespace stan {
                              bool symmetric = false)
         : A_(A), B_(B), C_(B_.cols(),B_.cols()), _sym(symmetric)
         {
+          using stan::math::value_of;
           compute(value_of(A),value_of(B));
         }
         
@@ -51,7 +51,7 @@ namespace stan {
         bool                     _sym;
       };
       
-      template<typename TA,int RA,int CA,typename TB,int RB,int CB>
+      template <typename TA, int RA, int CA, typename TB, int RB, int CB>
       class quad_form_vari : public vari {
       protected:
         inline void chainA(Eigen::Matrix<double,RA,CA> &A, 
@@ -66,10 +66,9 @@ namespace stan {
                            const Eigen::Matrix<double,RB,CB> &Bd,
                            const Eigen::Matrix<double,CB,CB> &adjC)
         {
-          int i,j;
           Eigen::Matrix<double,RA,CA>     adjA(Bd*adjC*Bd.transpose());
-          for (j = 0; j < A.cols(); j++) {
-            for (i = 0; i < A.rows(); i++) {
+          for (int j = 0; j < A.cols(); j++) {
+            for (int i = 0; i < A.rows(); i++) {
               A(i,j).vi_->adj_ += adjA(i,j);
             }
           }
@@ -79,10 +78,9 @@ namespace stan {
                            const Eigen::Matrix<double,RB,CB> &Bd,
                            const Eigen::Matrix<double,CB,CB> &adjC)
         {
-          int i,j;
           Eigen::Matrix<double,RA,CA>     adjB(Ad*Bd*adjC.transpose() + Ad.transpose()*Bd*adjC);
-          for (j = 0; j < B.cols(); j++)
-            for (i = 0; i < B.rows(); i++)
+          for (int j = 0; j < B.cols(); j++)
+            for (int i = 0; i < B.rows(); i++)
               B(i,j).vi_->adj_ += adjB(i,j);
         }
         
@@ -105,11 +103,11 @@ namespace stan {
         }
         
         virtual void chain() {
-          int i,j;
+          using stan::math::value_of;
           Eigen::Matrix<double,CB,CB> adjC(_impl->C_.rows(),_impl->C_.cols());
           
-          for (j = 0; j < _impl->C_.cols(); j++)
-            for (i = 0; i < _impl->C_.rows(); i++)
+          for (int j = 0; j < _impl->C_.cols(); j++)
+            for (int i = 0; i < _impl->C_.rows(); i++)
               adjC(i,j) = _impl->C_(i,j).vi_->adj_;
           
           chainAB(_impl->A_, _impl->B_,
@@ -121,7 +119,7 @@ namespace stan {
       };
     }
     
-    template<typename TA,int RA,int CA,typename TB,int RB,int CB>
+    template <typename TA, int RA, int CA, typename TB, int RB, int CB>
     inline typename
     boost::enable_if_c< boost::is_same<TA,var>::value ||
                         boost::is_same<TB,var>::value,
@@ -138,7 +136,7 @@ namespace stan {
       
       return baseVari->_impl->C_;
     }
-    template<typename TA,int RA,int CA,typename TB,int RB>
+    template <typename TA, int RA, int CA, typename TB, int RB>
     inline typename
     boost::enable_if_c< boost::is_same<TA,var>::value ||
                         boost::is_same<TB,var>::value,
@@ -156,7 +154,7 @@ namespace stan {
       return baseVari->_impl->C_(0,0);
     }
     
-    template<typename TA,int RA,int CA,typename TB,int RB,int CB>
+    template <typename TA, int RA, int CA, typename TB, int RB, int CB>
     inline typename
     boost::enable_if_c< boost::is_same<TA,var>::value ||
                         boost::is_same<TB,var>::value,
@@ -174,7 +172,7 @@ namespace stan {
       
       return baseVari->_impl->C_;
     }
-    template<typename TA,int RA,int CA,typename TB,int RB>
+    template <typename TA, int RA, int CA, typename TB, int RB>
     inline typename
     boost::enable_if_c< boost::is_same<TA,var>::value ||
                         boost::is_same<TB,var>::value,

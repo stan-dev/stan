@@ -8,8 +8,6 @@ typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
 typedef stan::math::index_type<Eigen::Matrix<double,-1,-1> >::type size_type;
 
-using stan::agrad::fvar;
-
 AVEC createAVEC(AVAR x) {
   AVEC v;
   v.push_back(x);
