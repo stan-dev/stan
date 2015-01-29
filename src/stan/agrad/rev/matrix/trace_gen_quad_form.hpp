@@ -22,9 +22,9 @@ namespace stan {
                 typename TB, int RB, int CB>
       class trace_gen_quad_form_vari_alloc : public chainable_alloc {
       public:
-        trace_gen_quad_form_vari_alloc(const Eigen::Matrix<TD,RD,CD> &D,
-                                       const Eigen::Matrix<TA,RA,CA> &A,
-                                       const Eigen::Matrix<TB,RB,CB> &B)
+        trace_gen_quad_form_vari_alloc(const Eigen::Matrix<TD,RD,CD>& D,
+                                       const Eigen::Matrix<TA,RA,CA>& A,
+                                       const Eigen::Matrix<TB,RB,CB>& B)
         : D_(D), A_(A), B_(B)
         { }
         
@@ -45,10 +45,10 @@ namespace stan {
                 typename TB, int RB, int CB>
       class trace_gen_quad_form_vari : public vari {
       protected:
-        static inline void computeAdjoints(const double &adj,
-                                           const Eigen::Matrix<double,RD,CD> &D,
-                                           const Eigen::Matrix<double,RA,CA> &A,
-                                           const Eigen::Matrix<double,RB,CB> &B,
+        static inline void computeAdjoints(const double& adj,
+                                           const Eigen::Matrix<double,RD,CD>& D,
+                                           const Eigen::Matrix<double,RA,CA>& A,
+                                           const Eigen::Matrix<double,RB,CB>& B,
                                            Eigen::Matrix<var,RD,CD> *varD,
                                            Eigen::Matrix<var,RA,CA> *varA,
                                            Eigen::Matrix<var,RB,CB> *varB)
@@ -108,9 +108,9 @@ namespace stan {
                         boost::is_same<TA,var>::value ||
                         boost::is_same<TB,var>::value,
                         var >::type
-    trace_gen_quad_form(const Eigen::Matrix<TD,RD,CD> &D,
-                        const Eigen::Matrix<TA,RA,CA> &A,
-                        const Eigen::Matrix<TB,RB,CB> &B)
+    trace_gen_quad_form(const Eigen::Matrix<TD,RD,CD>& D,
+                        const Eigen::Matrix<TA,RA,CA>& A,
+                        const Eigen::Matrix<TB,RB,CB>& B)
     {
       stan::error_handling::check_square("trace_gen_quad_form", "A", A);
       stan::error_handling::check_square("trace_gen_quad_form", "D", D);
