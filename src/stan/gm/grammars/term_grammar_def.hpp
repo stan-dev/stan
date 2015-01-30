@@ -728,8 +728,7 @@ namespace stan {
       factor_r.name("factor");
       factor_r =
         integrate_ode_r(_r1)    [_val = _1]
-        | 
-        fun_r(_r1)          [set_fun_type_named_f(_val,_1,_r1,_pass,
+        | fun_r(_r1)          [set_fun_type_named_f(_val,_1,_r1,_pass,
                                                     boost::phoenix::ref(error_msgs_))]
         | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
                                                      boost::phoenix::ref(error_msgs_),
