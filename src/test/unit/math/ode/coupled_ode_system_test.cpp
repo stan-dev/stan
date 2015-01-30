@@ -73,7 +73,7 @@ TEST_F(StanMathOde, initial_state_dd) {
   for (int n = 0; n < N; n++) 
     EXPECT_FLOAT_EQ(y0_d[n], state[n])
       << "we don't need derivatives of y0; initial state gets the initial values";
-  for (int n = N; n < state.size(); n++)
+  for (size_t n = N; n < state.size(); n++)
     EXPECT_FLOAT_EQ(0.0, state[n]);
 }
 

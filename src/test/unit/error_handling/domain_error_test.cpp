@@ -62,7 +62,6 @@ public:
     }
 
   }
-
 };
 
 TEST_F(ErrorHandlingScalar_domain_error, double) {

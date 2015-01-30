@@ -41,7 +41,7 @@ public:
                                  bool include_tparams__ = true,
                                  bool include_gqs__ = true) const {
     param_names__.clear();
-    for (int n = 0; n < num_params_r__; n++) {
+    for (size_t n = 0; n < num_params_r__; n++) {
       std::stringstream param_name;
       param_name << "param_" << n;
       param_names__.push_back(param_name.str());
@@ -92,7 +92,7 @@ public:
                                  bool include_tparams__ = true,
                                  bool include_gqs__ = true) const {
     param_names__.clear();
-    for (int n = 0; n < num_params_r__; n++) {
+    for (size_t n = 0; n < num_params_r__; n++) {
       std::stringstream param_name;
       param_name << "param_" << n;
       param_names__.push_back(param_name.str());

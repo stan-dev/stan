@@ -80,7 +80,7 @@ namespace stan {
       if (y.size() == 0) 
         return true;
 
-      for (int n = 1; n < y.size(); n++) {
+      for (size_t n = 1; n < y.size(); n++) {
         if (!(y[n] > y[n-1])) {
           std::ostringstream msg1;
           msg1 << "is not a valid ordered vector."

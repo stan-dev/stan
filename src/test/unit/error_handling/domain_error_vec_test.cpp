@@ -3,7 +3,6 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/math/matrix/meta/value_type.hpp>
 #include <stan/math/meta/value_type.hpp>
-
 #include <gtest/gtest.h>
 
 const char* function_ = "function";

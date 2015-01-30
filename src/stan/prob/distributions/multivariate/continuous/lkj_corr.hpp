@@ -23,7 +23,7 @@ namespace stan {
       if (eta == 1.0) {
         // C++ integer division is appropriate in this block
         Eigen::VectorXd numerator( Km1 / 2 );
-        for(size_t k = 1; k <= numerator.rows(); k++)
+        for(int k = 1; k <= numerator.rows(); k++)
           numerator(k-1) = lgamma(2 * k);
         constant = sum(numerator);
         if ( (K % 2) == 1 ) constant += 0.25 * (K * K - 1) * LOG_PI -
@@ -34,7 +34,7 @@ namespace stan {
       }
       else {
         constant = -Km1 * lgamma(eta + 0.5 * Km1);
-        for (size_t k = 1; k <= Km1; k++)
+        for (int k = 1; k <= Km1; k++)
           constant += 0.5 * k * LOG_PI + lgamma(eta + 0.5 * (Km1 - k));
       }
       return constant;
@@ -71,7 +71,7 @@ namespace stan {
         Eigen::Matrix<T_covar,Eigen::Dynamic,1> log_diagonals =
           L.diagonal().tail(Km1).array().log();
         Eigen::Matrix<T_covar,Eigen::Dynamic,1> values(Km1);
-        for (size_t k = 0; k < Km1; k++)
+        for (int k = 0; k < Km1; k++)
           values(k) = (Km1 - k - 1) * log_diagonals(k);
         if ( (eta == 1.0) &&
              stan::is_constant<typename stan::scalar_type<T_shape> >::value) {

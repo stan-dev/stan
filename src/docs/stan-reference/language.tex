@@ -990,6 +990,8 @@ may be used instead of \code{y[3,1]} to access the value of the first
 column of the third row of \code{y}.  The form \code{y[3,1]} is the
 preferred form (see \refnote{array-index-style} in this chapter).
 
+\subsection{Assigning}
+
 Subarrays may be manipulated and assigned just like any other
 variables.  Similar to the behavior of matrices, Stan allows blocks
 such as 
@@ -1006,9 +1008,6 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 \end{stancode}
 %
 
-\subsection{Assigning}
-
----fixme---
 
 \subsection{Arrays of Matrices and Vectors}
 
@@ -2730,11 +2729,11 @@ and sampling statements for more information).
 %
 \begin{stancode}
 increment_log_prob(normal_log(y, 0, 1));
-increment_log_prob(-(1 - log(normal_cdf(-0.5, 0, 1))));
+increment_log_prob(-(log(1 - normal_cdf(-0.5, 0, 1))));
 \end{stancode}
 %
-The denominator is actually implemented with the more efficient and
-stable version
+The denominator (second line above) is implemented with the more
+efficient and stable version
 %
 \begin{stancode}
 increment_log_prob(-normal_ccdf_log(-0.5, 0, 1));
