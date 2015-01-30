@@ -1,6 +1,8 @@
 #ifndef STAN__AGRAD__REV__FUNCTIONS__VALUE_OF_REC_HPP
 #define STAN__AGRAD__REV__FUNCTIONS__VALUE_OF_REC_HPP
 
+#include <stan/agrad/rev/var.hpp>
+
 namespace stan {
   namespace agrad {
 
