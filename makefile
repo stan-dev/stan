@@ -39,6 +39,7 @@ LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 WINE =
 
+-include make/local    # for local stuff
 
 ##
 # Get information about the compiler used.
@@ -58,6 +59,19 @@ WINE =
 ##
 -include make/detect_os
 
+include make/libstan  # bin/libstan.a bin/libstanc.a
+include make/tests    # tests
+include make/doxygen  # doxygen
+include make/manual   # manual: manual, doc/stan-reference.pdf
+
+##
+# Dependencies
+##
+ifneq (,$(filter-out test-headers generate-tests clean% %-test %.d,$(MAKECMDGOALS)))
+  -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
+endif
+
+
 bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
@@ -72,6 +86,8 @@ bin/%.d : src/%.cpp
 	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1\.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
+
+
 
 .PHONY: help
 help:
@@ -126,18 +142,6 @@ endif
 	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
-include make/libstan  # bin/libstan.a bin/libstanc.a
-include make/tests    # tests
-include make/doxygen  # doxygen
-include make/manual   # manual: manual, doc/stan-reference.pdf
--include make/local    # for local stuff
-
-##
-# Dependencies
-##
-ifneq (,$(filter-out test-headers generate-tests clean% %-test %.d,$(MAKECMDGOALS)))
-  -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
-endif
 
 ##
 # Documentation

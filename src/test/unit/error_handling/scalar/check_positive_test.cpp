@@ -15,7 +15,7 @@ TEST(ErrorHandlingScalar,CheckPositive_nan) {
   x.push_back(2.0);
   x.push_back(3.0);
 
-  for (int i = 0; i < x.size(); i++) {
+  for (size_t i = 0; i < x.size(); i++) {
     x[i] = nan;
     EXPECT_THROW(check_positive(function, "x", x),
                  std::domain_error);
