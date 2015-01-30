@@ -8,8 +8,6 @@ typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
 typedef stan::math::index_type<Eigen::Matrix<double,-1,-1> >::type size_type;
 
-using stan::agrad::fvar;
-
 AVEC createAVEC(AVAR x) {
   AVEC v;
   v.push_back(x);
@@ -96,9 +94,9 @@ void fill(const std::vector<double>& contents,
           Eigen::Matrix<T,R,C>& M){
 
   size_t ij = 0;
-  for (size_type i = 0; i < C; ++i)
-    for (size_type j = 0; j < R; ++j)
-      M(j,i) = T(contents[ij++]);
+  for (int j = 0; j < C; ++j)
+    for (int i = 0; i < R; ++i)
+      M(i,j) = T(contents[ij++]);
       
 }
 

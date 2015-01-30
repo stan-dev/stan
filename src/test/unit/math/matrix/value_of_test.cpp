@@ -1,9 +1,9 @@
-#include <stan/math/matrix/value_of_rec.hpp>
+#include <stan/math/matrix/value_of.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathMatrix,value_of_rec) {
-  using stan::math::value_of_rec;
+TEST(MathMatrix,value_of) {
+  using stan::math::value_of;
   using std::vector;
 
   vector<double> a_vals;
@@ -21,8 +21,8 @@ TEST(MathMatrix,value_of_rec) {
   Eigen::Matrix<double,5,1> b;
   fill(b_vals, b);
 
-  Eigen::MatrixXd d_a = value_of_rec(a);
-  Eigen::VectorXd d_b = value_of_rec(b);
+  Eigen::MatrixXd d_a = value_of(a);
+  Eigen::VectorXd d_b = value_of(b);
 
   for (size_type i = 0; i < 5; ++i){
     EXPECT_FLOAT_EQ(b(i), d_b(i));

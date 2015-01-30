@@ -12,7 +12,7 @@ namespace stan {
      * @param v Variable.
      * @return Value of variable.
      */
-    inline double value_of_rec(const stan::agrad::var& v) {
+    inline double value_of_rec(const var& v) {
       return v.vi_->val_;
     }
 
