@@ -126,7 +126,7 @@ namespace stan {
           values.push_back(value);
         
         draw.resize(values.size());
-        for (int n = 0; n < draw.size(); ++n) {
+        for (size_t n = 0; n < draw.size(); ++n) {
           draw[n] = atof(values[n].c_str());
         }
         
