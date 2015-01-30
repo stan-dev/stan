@@ -114,6 +114,12 @@ namespace stan {
               << std::endl;
         }
 
+        if (output_stream) {
+          msg << "PARSER EXPECTED: "
+              << e.what_
+              << std::endl;
+        }
+
         throw std::invalid_argument(msg.str());
 
       } catch (const std::runtime_error& e) {
