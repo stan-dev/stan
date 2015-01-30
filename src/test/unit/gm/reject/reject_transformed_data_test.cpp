@@ -19,8 +19,9 @@ TEST(StanCommon, reject_transformed_data) {
 
   // instantiate model
   try {
-     reject_transformed_data_model_namespace::reject_transformed_data_model* model 
-       = new reject_transformed_data_model_namespace::reject_transformed_data_model(empty_data_context, &model_output);
+    reject_transformed_data_model_namespace::reject_transformed_data_model* model 
+      = new reject_transformed_data_model_namespace::reject_transformed_data_model(empty_data_context, &model_output);
+    delete model;
   } catch (const std::domain_error& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "---------------------------------" << std::endl

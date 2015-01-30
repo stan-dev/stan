@@ -28,7 +28,7 @@ TEST(StanCommon, reject_func_call_generated_quantities) {
   for (int i = 0; i < cont_params.size(); ++i)
     cont_vector.at(i) = cont_params(i);
   std::vector<int> disc_vector;
-  double lp(0);
+  double lp;
 
   boost::ecuyer1988 base_rng;
   base_rng.seed(123456);

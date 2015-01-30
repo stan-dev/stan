@@ -6,6 +6,12 @@
 
 #include <gtest/gtest.h>
 
+
+const char* function_ = "function";
+const char* y_name_ = "y";
+const char* msg1_ = "error_message ";
+const char* msg2_ = " second message";
+
 class ErrorHandlingScalar_dom_err_vec : public ::testing::Test {
 public:
   void SetUp() {
@@ -69,10 +75,6 @@ public:
     }
   }
 
-  const char* function_ = "function";
-  const char* y_name_ = "y";
-  const char* msg1_ = "error_message ";
-  const char* msg2_ = " second message";
   size_t index_;
 };
 
