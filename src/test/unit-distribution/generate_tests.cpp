@@ -199,7 +199,7 @@ bool check_all_double(string base, string arg) {
         boost::is_any_of(delimiters), 
         boost::token_compress_on);
 
-  for (int i = 0; i < tokens.size(); i++) {
+  for (size_t i = 0; i < tokens.size(); i++) {
     if (tokens[i] == "1" || tokens[i] == "Eigen::Dynamic>" 
         || tokens[i] == "1>" || tokens[i] == "Eigen::Dynamic")
       result = result && true;
@@ -222,7 +222,7 @@ int num_doubles(string arguments) {
         boost::token_compress_on);
 
   int num = 0;
-  for (int i = 0; i < tokens.size(); i++) {
+  for (size_t i = 0; i < tokens.size(); i++) {
     if (tokens[i] == "Doubles")
       ++num;
   }
@@ -237,7 +237,7 @@ int num_ints(string arguments) {
         boost::token_compress_on);
 
   int num = 0;
-  for (int i = 0; i < tokens.size(); i++) {
+  for (size_t i = 0; i < tokens.size(); i++) {
     if (tokens[i] == "Ints")
       ++num;
   }
@@ -404,11 +404,11 @@ int create_files(const int& argc, const char* argv[],const int& index,
  * @return 0 for success, negative number otherwise.
  */
 int main(int argc, const char* argv[]) {
-  int var_num = create_files(argc,argv,1,-1);
-  int fd_num = create_files(argc,argv,2,-1);
-  int fv_num = create_files(argc,argv,3,-1);
-  int ffd_num = create_files(argc,argv,4,-1);
-  int ffv_num = create_files(argc,argv,5,-1);
+  create_files(argc,argv,1,-1);  // create var tests
+  create_files(argc,argv,2,-1);   // create fd tests
+  create_files(argc,argv,3,-1);   // create fv tests
+  create_files(argc,argv,4,-1);  // create ffd tests
+  create_files(argc,argv,5,-1);  // create ffv tests
   
   return 0;
 }
