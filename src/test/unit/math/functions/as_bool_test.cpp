@@ -13,9 +13,9 @@ TEST(MathFunctions, as_bool) {
   EXPECT_FALSE(as_bool(0.0));
   EXPECT_FALSE(as_bool(0.0f));
 
-  EXPECT_EQ(true, as_bool(10));
-  EXPECT_EQ(true, as_bool(-1));
-  EXPECT_EQ(false, as_bool(0));
+  EXPECT_TRUE(as_bool(10));
+  EXPECT_TRUE(as_bool(-1));
+  EXPECT_FALSE(as_bool(0));
 }
 
 TEST(MathFunctions, as_bool_nan) {

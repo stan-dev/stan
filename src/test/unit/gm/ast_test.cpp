@@ -293,7 +293,7 @@ TEST(gmAst, resetSigs) {
   stan::gm::function_signatures& fs1
     = stan::gm::function_signatures::instance();
   set<string> ks1 = fs1.key_set();
-  int keyset_size = ks1.size();
+  size_t keyset_size = ks1.size();
   EXPECT_TRUE(keyset_size > 0);
   
   stan::gm::function_signatures::reset_sigs();
@@ -302,8 +302,7 @@ TEST(gmAst, resetSigs) {
     = stan::gm::function_signatures::instance();
 
   set<string> ks2 = fs2.key_set();
-  EXPECT_EQ(keyset_size,ks2.size());
-
+  EXPECT_EQ(keyset_size, ks2.size());
 }
 
 TEST(gmAst, solveOde) {
