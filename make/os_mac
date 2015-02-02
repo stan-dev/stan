@@ -19,6 +19,7 @@ ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-tautological-compare
   CFLAGS += -Wno-c++11-long-long
+  CFLAGS += -Wsign-compare
   ifeq (true,$(C++11))
     CFLAGS += -stdlib=libc++ -std=c++11
   endif

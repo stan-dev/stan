@@ -16,7 +16,7 @@ namespace stan {
     template <typename T>
     void stan_print(std::ostream* o, const std::vector<T>& x) {
       *o << '[';
-      for (int i = 0; i < x.size(); ++i) {
+      for (size_t i = 0; i < x.size(); ++i) {
         if (i > 0) *o << ',';
         stan_print(o,x[i]);
       }

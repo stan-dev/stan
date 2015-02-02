@@ -647,7 +647,7 @@ void add_var<fvar<var> >(vector<var>& x, fvar<var>& p) {
 
 template <>
 void add_var<vector<fvar<var> > >(vector<var>& x, vector<fvar<var> >& p) {
-  for (size_type n = 0; n < p.size(); n++)
+  for (size_t n = 0; n < p.size(); n++)
     x.push_back(p[n].val_);}
 
 template <>
@@ -669,7 +669,7 @@ void add_var<fvar<fvar<var> > >(vector<var>& x, fvar<fvar<var> >& p) {
 
 template <>
 void add_var<vector<fvar<fvar<var> > > >(vector<var>& x, vector<fvar<fvar<var> > >& p) {
-  for (size_type n = 0; n < p.size(); n++)
+  for (size_t n = 0; n < p.size(); n++)
     x.push_back(p[n].val_.val_);
 }
 
