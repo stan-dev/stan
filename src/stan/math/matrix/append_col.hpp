@@ -41,24 +41,7 @@ namespace stan {
           result(i, j) = B(i, k);
       return result;
     }
-       
-    //row_vector append_col(row_vector, row_vector)
-    template <typename T1, typename T2, int C1, int C2>
-    inline Matrix<typename return_type<T1, T2>::type, 1, Dynamic>
-    append_col(const Matrix<T1, 1, C1> & A,
-          const Matrix<T2, 1, C2> & B) {
-      int Asize = A.size();
-      int Bsize = B.size();
-      Matrix<typename return_type<T1, T2>::type, 1, Dynamic>
-        result(Asize + Bsize);
-      for (int i = 0; i < Asize; i++)
-        result(i) = A(i);
-      for (int i = 0, j = Asize; i < Bsize; i++, j++)
-        result(j) = B(i);
-      return result;
-    }
     
-       
     //matrix append_col(matrix, matrix)
     //matrix append_col(matrix, vector)
     //matrix append_col(vector, matrix)
@@ -78,12 +61,11 @@ namespace stan {
     }
        
     //row_vector append_col(row_vector, row_vector)
-    template <typename T, int C1, int C2>
+    template <typename T>
     inline Matrix<T, 1, Dynamic>
-    append_col(const Matrix<T, 1, C1> & A,
-          const Matrix<T, 1, C2> & B) {          
-      Matrix<T, 1, Dynamic>
-        result(A.size()+B.size());
+    append_col(const Matrix<T, 1, Dynamic> & A,
+          const Matrix<T, 1, Dynamic> & B) {          
+      Matrix<T, 1, Dynamic> result(A.size()+B.size());
       result << A, B;
       return result;
     }

@@ -24,8 +24,6 @@
 # temporary emacs files
 *~
 \#*#
-auto/
-
 
 # depedencies files
 *.d
@@ -35,12 +33,6 @@ stan.Rproj
 .kdev4/
 stan.kdev4
 .Rapp.history
-
-# models:
-/src/models/**
-!/src/models/**.stan
-!/src/models/**.R
-!/src/models/**/makefile
 
 # tests: compiled models
 /src/test/test-models/*.hpp
@@ -60,4 +52,4 @@ stan.kdev4
 *.DS_Store
 
 # local make include
-make/local
+/make/local
