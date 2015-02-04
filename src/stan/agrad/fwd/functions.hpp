@@ -77,5 +77,6 @@
 #include <stan/agrad/fwd/functions/tgamma.hpp>
 #include <stan/agrad/fwd/functions/trunc.hpp>
 #include <stan/agrad/fwd/functions/value_of.hpp>
+#include <stan/agrad/fwd/functions/value_of_rec.hpp>
 
 #endif

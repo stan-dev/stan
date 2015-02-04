@@ -4,7 +4,7 @@
 ##
 LIBGTEST = test/libgtest.a
 GTEST_MAIN = $(GTEST)/src/gtest_main.cc
-CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
+CFLAGS_GTEST += -isystem $(GTEST)/include -isystem $(GTEST)
 
 ##
 # Build the google test library.
@@ -172,6 +172,8 @@ src/test/unit/gm/reject/reject_func_call_generated_quantities_test.cpp: src/test
 # the compiler using the -fsyntax-only flag
 ##
 test/integration/compile_models$(EXE) : $(patsubst %.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
+
+src/test/performance/logistic_test.cpp: src/test/test-models/performance/logistic.hpp
 
 
 ############################################################
