@@ -68,9 +68,9 @@ namespace stan {
       std::vector<double> theta_dbl_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
-      const int N_;
-      const int M_;
-      const int size_;
+      const size_t N_;
+      const size_t M_;
+      const size_t size_;
       std::ostream* msgs_;
 
       /**
@@ -102,7 +102,7 @@ namespace stan {
           size_(N_ + N_ * M_),
                 msgs_(msgs) {
 
-        for (int m = 0; m < M_; m++)
+        for (size_t m = 0; m < M_; m++)
           theta_dbl_[m] = stan::agrad::value_of(theta[m]);
       }
 
@@ -138,7 +138,7 @@ namespace stan {
         vector<double> grad;
         vector<var> vars;
 
-        for (int i = 0; i < N_; i++) {
+        for (size_t i = 0; i < N_; i++) {
           theta_temp.clear();
           y_temp.clear();
           dy_dt_temp.clear();
@@ -146,24 +146,24 @@ namespace stan {
           vars.clear();
           try {
             stan::agrad::start_nested();
-            for (int j = 0; j < N_; j++) {
+            for (size_t j = 0; j < N_; j++) {
               y_temp.push_back(y[j]);
               vars.push_back(y_temp[j]);
             }
 
-            for (int j = 0; j < M_; j++) {
+            for (size_t j = 0; j < M_; j++) {
               theta_temp.push_back(theta_dbl_[j]);
               vars.push_back(theta_temp[j]);
             }
             dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_,msgs_);
             dy_dt_temp[i].grad(vars, grad);
           
-            for (int j = 0; j < M_; j++) { 
+            for (size_t j = 0; j < M_; j++) { 
               // orders derivatives by equation (i.e. if there are 2 eqns 
               // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
               // dy1_dt, dy2_dt, dy1_da, dy2_da, dy1_db, dy2_db
               double temp_deriv = grad[y_temp.size() + j];
-              for (int k = 0; k < N_; k++)
+              for (size_t k = 0; k < N_; k++)
                 temp_deriv += y[N_ + N_ * j + k] * grad[k];
 
               coupled_sys[i + j * N_] = temp_deriv;
@@ -183,7 +183,7 @@ namespace stan {
        *
        * @return size of the coupled system.
        */
-      int size() const {
+      size_t size() const {
         return size_;
       }
 
@@ -202,7 +202,7 @@ namespace stan {
        */
       std::vector<double> initial_state() {
         std::vector<double> state(size_, 0.0);
-        for (int n = 0; n < N_; n++)
+        for (size_t n = 0; n < N_; n++)
           state[n] = y0_dbl_[n];
         return state;
       }
@@ -286,9 +286,9 @@ namespace stan {
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
       std::ostream* msgs_;
-      const int N_;
-      const int M_;
-      const int size_;
+      const size_t N_;
+      const size_t M_;
+      const size_t size_;
 
       /**
        * Construct a coupled ODE system for an unknown initial state
@@ -320,7 +320,7 @@ namespace stan {
         M_(theta.size()),
         size_(N_ + N_ * N_) {
 
-        for (int n = 0; n < N_; n++)
+        for (size_t n = 0; n < N_; n++)
           y0_dbl_[n] = stan::agrad::value_of(y0_[n]);
       }
 
@@ -341,7 +341,7 @@ namespace stan {
                       std::vector<double>& dy_dt,
                       double t) {
         std::vector<double> y_base(y.begin(), y.begin() + N_);
-        for (int n = 0; n < N_; n++)
+        for (size_t n = 0; n < N_; n++)
           y_base[n] += y0_dbl_[n];
 
         dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,msgs_);
@@ -355,14 +355,14 @@ namespace stan {
         std::vector<double> grad;
         std::vector<stan::agrad::var> vars;
 
-        for (int i = 0; i < N_; i++) {
+        for (size_t i = 0; i < N_; i++) {
           y_temp.clear();
           dy_dt_temp.clear();
           grad.clear();
           vars.clear();
           try {
             stan::agrad::start_nested();
-            for (int j = 0; j < N_; j++) {
+            for (size_t j = 0; j < N_; j++) {
               y_temp.push_back(y[j] + y0_dbl_[j]);
               vars.push_back(y_temp[j]);
             }
@@ -370,12 +370,12 @@ namespace stan {
             dy_dt_temp = f_(t,y_temp,theta_dbl_,x_,x_int_,msgs_);
             dy_dt_temp[i].grad(vars, grad);
 
-            for (int j = 0; j < N_; j++) { 
+            for (size_t j = 0; j < N_; j++) { 
               // orders derivatives by equation (i.e. if there are 2 eqns 
               // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
               // dy1_dt, dy2_dt, dy1_da, dy2_da, dy1_db, dy2_db
               double temp_deriv = grad[j];
-              for (int k = 0; k < N_; k++)
+              for (size_t k = 0; k < N_; k++)
                 temp_deriv += y[N_ + N_ * j + k] * grad[k];
 
               coupled_sys[i+j*N_] = temp_deriv;
@@ -395,7 +395,7 @@ namespace stan {
        *
        * @return size of the coupled system.
        */
-      int size() const {
+      size_t size() const {
         return size_;
       }
 
@@ -509,9 +509,9 @@ namespace stan {
       std::vector<double> theta_dbl_;
       const std::vector<double>& x_;
       const std::vector<int>& x_int_;
-      const int N_;
-      const int M_;
-      const int size_;
+      const size_t N_;
+      const size_t M_;
+      const size_t size_;
       std::ostream* msgs_;
 
       /**
@@ -545,10 +545,10 @@ namespace stan {
           size_(N_ + N_ * (N_ + M_)),
           msgs_(msgs) {
 
-        for (int n = 0; n < N_; n++)
+        for (size_t n = 0; n < N_; n++)
           y0_dbl_[n] = stan::agrad::value_of(y0[n]);
 
-        for (int m = 0; m < M_; m++)
+        for (size_t m = 0; m < M_; m++)
           theta_dbl_[m] = stan::agrad::value_of(theta[m]);
       }
 
@@ -572,7 +572,7 @@ namespace stan {
         using stan::agrad::var;
           
         vector<double> y_base(y.begin(), y.begin()+N_);
-        for (int n = 0; n < N_; n++)
+        for (size_t n = 0; n < N_; n++)
           y_base[n] += y0_dbl_[n];
 
         dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,msgs_);
@@ -586,7 +586,7 @@ namespace stan {
         vector<double> grad;
         vector<var> vars;
 
-        for (int i = 0; i < N_; i++) {
+        for (size_t i = 0; i < N_; i++) {
           theta_temp.clear();
           y_temp.clear();
           dy_dt_temp.clear();
@@ -595,12 +595,12 @@ namespace stan {
           try {
             stan::agrad::start_nested();
 
-            for (int j = 0; j < N_; j++) {
+            for (size_t j = 0; j < N_; j++) {
               y_temp.push_back(y[j] + y0_dbl_[j]);
               vars.push_back(y_temp[j]);
             }
 
-            for (int j = 0; j < M_; j++) {
+            for (size_t j = 0; j < M_; j++) {
               theta_temp.push_back(theta_dbl_[j]);
               vars.push_back(theta_temp[j]);
             }
@@ -608,12 +608,12 @@ namespace stan {
             dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_,msgs_);
             dy_dt_temp[i].grad(vars, grad);
 
-            for (int j = 0; j < N_+M_; j++) { 
+            for (size_t j = 0; j < N_+M_; j++) { 
               // orders derivatives by equation (i.e. if there are 2 eqns 
               // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
               // dy1_dt, dy2_dt, dy1_da, dy2_da, dy1_db, dy2_db
               double temp_deriv = grad[j];
-              for (int k = 0; k < N_; k++)
+              for (size_t k = 0; k < N_; k++)
                 temp_deriv += y[N_ + N_ * j + k] * grad[k];
 
               coupled_sys[i + j * N_] = temp_deriv;
@@ -632,7 +632,7 @@ namespace stan {
        *
        * @return size of the coupled system.
        */
-      int size() const {
+      size_t size() const {
         return size_;
       }
 

@@ -32,7 +32,7 @@ namespace stan {
       apply(const Eigen::Matrix<S, -1,-1>& x) {
         Eigen::Matrix<typename promote_scalar_type<T,S>::type, -1,-1>
           y(x.rows(), x.cols());
-        for (size_t i = 0; i < x.size(); ++i)
+        for (int i = 0; i < x.size(); ++i)
           y(i) = promote_scalar_struct<T,S>::apply(x(i));
         return y;
       }
@@ -63,7 +63,7 @@ namespace stan {
       apply(const Eigen::Matrix<S, 1,-1>& x) {
         Eigen::Matrix<typename promote_scalar_type<T,S>::type, 1,-1>
           y(x.rows(), x.cols());
-        for (size_t i = 0; i < x.size(); ++i)
+        for (int i = 0; i < x.size(); ++i)
           y(i) = promote_scalar_struct<T,S>::apply(x(i));
         return y;
       }
@@ -94,7 +94,7 @@ namespace stan {
       apply(const Eigen::Matrix<S, -1,1>& x) {
         Eigen::Matrix<typename promote_scalar_type<T,S>::type, -1,1>
           y(x.rows(), x.cols());
-        for (size_t i = 0; i < x.size(); ++i)
+        for (int i = 0; i < x.size(); ++i)
           y(i) = promote_scalar_struct<T,S>::apply(x(i));
         return y;
       }

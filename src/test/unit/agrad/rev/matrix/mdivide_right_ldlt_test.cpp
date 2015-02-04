@@ -4,6 +4,8 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/math/matrix/mdivide_right_spd.hpp>
+#include <stan/agrad/rev/functions/value_of.hpp>
+#include <stan/math/matrix/value_of.hpp>
 #include <stan/agrad/rev/matrix/mdivide_left_spd.hpp>
 
 TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
@@ -14,6 +16,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
   using stan::math::mdivide_right_spd;
   using stan::math::mdivide_right_ldlt;
   using stan::math::LDLT_factor;  
+  using stan::math::value_of;
   using std::vector;
 
   row_vector_v b(5);
@@ -39,7 +42,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
     ldlt_A.compute(A);
     ASSERT_TRUE(ldlt_A.success());
     x = mdivide_right_ldlt(b, ldlt_A);
-    x_val = stan::agrad::value_of(x);
+    x_val = value_of(x);
     ASSERT_EQ(expected.size(), x_val.size());
     for (int n = 0; n < expected.size(); n++) {
       EXPECT_FLOAT_EQ(expected(n), x_val(n))
@@ -66,7 +69,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
       7, 4,  2,  20, -5, 
       5, 4,  5, -5,  20;
     x_basic = mdivide_right_spd(b,A);
-    x_basic_val = stan::agrad::value_of(x_basic);
+    x_basic_val = value_of(x_basic);
     ASSERT_EQ(expected.size(), x_basic_val.size());
     for (int n = 0; n < expected.size(); n++) {
       EXPECT_FLOAT_EQ(expected(n), x_basic_val(n))
@@ -102,6 +105,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vd) {
   using stan::math::LDLT_factor;  
   using stan::math::mdivide_right_spd;
   using std::vector;
+  using stan::math::value_of;
 
   row_vector_v b(5);
   matrix_d A(5,5);
@@ -126,7 +130,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vd) {
     ldlt_A.compute(A);
     ASSERT_TRUE(ldlt_A.success());
     x = mdivide_right_ldlt(b, ldlt_A);
-    x_val = stan::agrad::value_of(x);
+    x_val = value_of(x);
     ASSERT_EQ(expected.size(), x_val.size());
     for (int n = 0; n < expected.size(); n++) {
       EXPECT_FLOAT_EQ(expected(n), x_val(n))
@@ -150,7 +154,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vd) {
       7, 4,  2,  20, -5, 
       5, 4,  5, -5,  20;
     x_basic = mdivide_right_spd(b ,stan::agrad::to_var(A));
-    x_basic_val = stan::agrad::value_of(x_basic);
+    x_basic_val = value_of(x_basic);
     ASSERT_EQ(expected.size(), x_basic_val.size());
     for (int n = 0; n < expected.size(); n++) {
       EXPECT_FLOAT_EQ(expected(n), x_basic_val(n))
@@ -181,6 +185,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_dv) {
   using stan::math::mdivide_right_ldlt;
   using stan::math::LDLT_factor;  
   using stan::math::mdivide_right_spd;
+  using stan::math::value_of;
   using std::vector;
 
   row_vector_d b(5);
@@ -206,7 +211,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_dv) {
     ldlt_A.compute(A);
     ASSERT_TRUE(ldlt_A.success());
     x = mdivide_right_ldlt(b, ldlt_A);
-    x_val = stan::agrad::value_of(x);
+    x_val = value_of(x);
     ASSERT_EQ(expected.size(), x_val.size());
     for (int n = 0; n < expected.size(); n++) {
       EXPECT_FLOAT_EQ(expected(n), x_val(n))
@@ -230,7 +235,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_dv) {
       7, 4,  2,  20, -5, 
       5, 4,  5, -5,  20;
     x_basic = mdivide_right_spd(stan::agrad::to_var(b),A);
-    x_basic_val = stan::agrad::value_of(x_basic);
+    x_basic_val = value_of(x_basic);
     ASSERT_EQ(expected.size(), x_basic_val.size());
     for (int n = 0; n < expected.size(); n++) {
       EXPECT_FLOAT_EQ(expected(n), x_basic_val(n))
