@@ -2,7 +2,10 @@
 #include <stan/agrad/rev.hpp>
 #include <gtest/gtest.h>
 
-TEST(ErrorHandlingScalar,CheckGreaterOrEqual) {
+using stan::agrad::var;
+using stan::error_handling::check_greater_or_equal;
+
+TEST(AgradRevErrorHandlingScalar,CheckGreaterOrEqual) {
   const char* function = "check_greater_or_equal";
   var x = 10.0;
   var lb = 0.0;
@@ -33,10 +36,10 @@ TEST(ErrorHandlingScalar,CheckGreaterOrEqual) {
   lb = std::numeric_limits<double>::infinity();
   EXPECT_NO_THROW(check_greater_or_equal(function, "x", x, lb))
     << "check_greater should not throw an exception with x == Inf and lb == Inf";
-  stan::agrad::recover_memory()
+  stan::agrad::recover_memory();
 }
 
-TEST(ErrorHandlingScalar,CheckGreaterOrEqualMatrix) {
+TEST(AgradRevErrorHandlingScalar,CheckGreaterOrEqualMatrix) {
   const char* function = "check_greater_or_equal";
   var x;
   var low;
@@ -161,7 +164,7 @@ TEST(AgradRevErrorHandlingScalar, CheckGreaterOrEqualVarCheckUnivariate) {
   size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
   EXPECT_EQ(1U,stack_size_after_call);
 
-  EXPECT_THROW(check_finite(function,"a",a,10.0),std::domain_error);
+  EXPECT_THROW(check_greater_or_equal(function,"a",a,10.0),std::domain_error);
   stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
   EXPECT_EQ(1U,stack_size_after_call);
 
