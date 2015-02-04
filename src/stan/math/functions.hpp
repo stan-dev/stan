@@ -73,5 +73,6 @@
 #include <stan/math/functions/sum.hpp>
 #include <stan/math/functions/trigamma.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/value_of_rec.hpp>
 
 #endif
