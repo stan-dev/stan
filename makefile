@@ -38,6 +38,7 @@ LDLIBS =
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 WINE =
+N_TESTS = 75 # override this in make/local. If <= 0, N_TESTS + 1 is interpreted as the number of batches to group the tests into
 
 -include make/local    # for local stuff
 
