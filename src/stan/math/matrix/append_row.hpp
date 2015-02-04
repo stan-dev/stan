@@ -21,7 +21,7 @@ namespace stan {
     template <typename T1, typename T2, int R1, int C1, int R2, int C2>
     inline Matrix<typename return_type<T1, T2>::type, Dynamic, Dynamic>
     append_row(const Matrix<T1, R1, C1> & A,
-          const Matrix<T2, R2, C2> & B) {
+               const Matrix<T2, R2, C2> & B) {
       int Arows = A.rows();
       int Brows = B.rows();
       int Acols = A.cols();
@@ -42,22 +42,6 @@ namespace stan {
       return result;
     }
        
-    //vector append_row(vector, vector)
-    template <typename T1, typename T2, int R1, int R2>
-    inline Matrix<typename return_type<T1, T2>::type, Dynamic, 1>
-    append_row(const Matrix<T1, R1, 1> & A,
-          const Matrix<T2, R1, 1> & B) {          
-      int Asize = A.size();
-      int Bsize = B.size();
-      Matrix<typename return_type<T1, T2>::type, 1, Dynamic>
-        result(Asize + Bsize);
-      for (int i = 0; i < Asize; i++)
-        result(i) = A(i);
-      for (int i = 0, j = Asize; i < Bsize; i++, j++)
-        result(j) = B(i);
-      return result;
-    }
-    
     //matrix append_row(matrix, matrix)
     //matrix append_row(matrix, row_vector)
     //matrix append_row(row_vector, matrix)
@@ -65,7 +49,7 @@ namespace stan {
     template <typename T, int R1, int C1, int R2, int C2>
     inline Matrix<T, Dynamic, Dynamic>
     append_row(const Matrix<T, R1, C1> & A,
-          const Matrix<T, R2, C2> & B) {
+               const Matrix<T, R2, C2> & B) {
       check_size_match("append_row",
                        "columns of A", A.cols(), 
                        "columns of B", B.cols());
@@ -77,12 +61,11 @@ namespace stan {
     }
        
     //vector append_row(vector, vector)
-    template <typename T, int R1, int R2>
+    template <typename T>
     inline Matrix<T, Dynamic, 1>
-    append_row(const Matrix<T, R1, 1> & A,
-          const Matrix<T, R1, 1> & B) {          
-      Matrix<T, Dynamic, 1>
-        result(A.size()+B.size());
+    append_row(const Matrix<T, Dynamic, 1> & A,
+               const Matrix<T, Dynamic, 1> & B) {          
+      Matrix<T, Dynamic, 1> result(A.size() + B.size());
       result << A, B;
       return result;
     }

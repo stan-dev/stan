@@ -135,7 +135,7 @@ struct gradable {
   void test() {
     std::vector<double> g;
     f_.grad(x_, g);
-    EXPECT_EQ(g_expected_.size(), g.size());
+    EXPECT_EQ(g_expected_.size(), static_cast<int>(g.size()));
     for (int i = 0; i < g_expected_.size(); ++i)
       EXPECT_FLOAT_EQ(g_expected_(i), g[i]);
   }

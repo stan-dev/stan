@@ -255,12 +255,13 @@ the $\beta_k$,
 \]
 it has the effect of shrinking parameters all the way to 0 in maximum
 likelihood estimates.  Thus it can be used for variable selection as
-well as just shrinkage.
-
-But there is one drawback.  Stan's optimizers are not set up to deal
-with the absolute value in the formula, so they are unlikely to drive
-estimates all the way to 0.  
-
+well as just shrinkage.%
+%
+\footnote{In practice, Stan's gradient-based optimizers are not
+  guaranteed to produce exact zero values; see
+  \cite{LangfordEtAl:2009} for a discussion of getting exactly zero
+  values with gradient descent.}
+%
 The lasso can be implemented in Stan just as easily as ridge
 regression, with the magnitude declared as data and the penalty added
 to the model block,
@@ -283,8 +284,9 @@ model {
 The naive elastic net \citep{ZouHastie:2005} involves a weighted
 average of ridge and lasso penalties, with a penalty function
 \[
-r(\beta) = \lambda_1 \sum_{k=1}^K \beta_k^2 + \lambda_2 \sum_{k=1}^K
-|\beta_k|.
+r(\beta)
+= \lambda_1 \sum_{k=1}^K |\beta_k|
++ \lambda_2 \sum_{k=1}^K \beta_k^2.
 \]
 The naive elastic net combines properties of both ridge regression and
 the lasso, providing both identification and variable selection.
@@ -301,12 +303,14 @@ data {
 // ...
 model {
   // ...
-  increment_log_prob(lambda2 * dot_self(beta));
   for (k in 1:K)
-    increment_log_prob(lambda1 * abs(beta[k]));
+    increment_log_prob(-lambda1 * fabs(beta[k]));
+  increment_log_prob(-lambda2 * dot_self(beta));
 }
 \end{stancode}
 %
+Note that the signs are negative in the program because $r(\beta)$ is
+a penalty function.
 
 The elastic net \citep{ZouHastie:2005} involves adjusting the final estimate for
 $\beta$ based on the fit $\hat{\beta}$ produced by the naive elastic
