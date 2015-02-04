@@ -4,7 +4,7 @@
 ##
 LIBGTEST = test/libgtest.a
 GTEST_MAIN = $(GTEST)/src/gtest_main.cc
-CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
+CFLAGS_GTEST += -isystem $(GTEST)/include -isystem $(GTEST)
 
 ##
 # Build the google test library.
