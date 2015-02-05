@@ -678,8 +678,7 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  for (n in 1:N)
-    y[n] ~ normal(alpha + beta * x[n], sigma);
+  y ~ normal(alpha + beta * x, sigma);
 }
 \end{stancode}
 %
@@ -691,16 +690,22 @@ improper priors for the two regression coefficients.
 
 \subsection{Matrix Notation and Vectorization}
 
-The sampling statement in the previous model can be vectorized and
-written equivalently as follows:
+The sampling statement in the previous model is vectorized, with
+%
+\begin{quote}
+\begin{Verbatim}
+  y ~ normal(alpha + beta * x, sigma);
+\end{Verbatim}
+\end{quote}
+%
+providing the same model as the unvectorized version,
 %
 \begin{stancode}
-model {
-  y ~ normal(alpha + beta * x, sigma);
-}
+  for (n in 1:N)
+    y[n] ~ normal(alpha + beta * x[n], sigma);
 \end{stancode}
 %
-The main difference is that the vectorized form is much faster.%
+In addition to being more concise, the vectorized form is much faster.%
 %
 \footnote{Unlike in Python and R, which are interpreted, Stan is
   translated to \Cpp and compiled, so loops and assignment statements
@@ -1344,7 +1349,7 @@ data {
 }
 parameters {
   real mu[D];
-  real<lower=0,upper=1000> sigma[D];
+  real<lower=0> sigma[D];
   vector[D] beta[L];
 }
 model {
@@ -1358,6 +1363,13 @@ model {
 }
 \end{stancode}  
 %
+The standard deviation parameter \code{sigma} gets an implicit uniform
+prior on $(0,\infty)$ because of its declaration with a lower-bound
+constraint of zero.  Stan allows improper priors as long as the
+posterior is proper.  Nevertheless, it is usually helpful to have
+informative or at least weakly informative priors for all parameters;
+see \refsection{regression-priors} for recommendations on priors for
+regression coefficients and scales.
 
 \subsubsection{Optimizing the Model}
 
@@ -5061,7 +5073,7 @@ probability function on the log scale,
 \begin{array}{l}
 \mbox{ } \ \log p(y | \theta, \pi)
 \\[3pt]
-\mbox{ } \ \ \ = \
+\mbox{ } \  = \
 \sum_{i=1}^I \log \left( \sum_{k=1}^K \exp
   \left( \log \distro{Categorical}(z_i | \pi)
          + \sum_{j=1}^J
@@ -5303,7 +5315,7 @@ $s  =  \{ 3 \ \ 2 \ \ 4 \}$
 Suppose the model is a very simple varying intercept model, which,
 using vectorized notation, would yield a likelihood
 \[
-\prod_{n=1}^3 y_n ~ normal(\mu_n, \sigma).
+\prod_{n=1}^3 \log \distro{Normal}(y_n | \mu_n, \sigma).
 \]
 There's no direct way to encode this in Stan.  
 

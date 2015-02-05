@@ -1,6 +1,6 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_POS_SEMIDEFINITE_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_POS_SEMIDEFINITE_HPP
-
+#include <iostream>
 #include <sstream>
 #include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/matrix/check_symmetric.hpp>
@@ -8,6 +8,8 @@
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive_size.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/math/matrix/value_of_rec.hpp>
 
 namespace stan {
 
@@ -43,7 +45,8 @@ namespace stan {
       using Eigen::LDLT;
       using Eigen::Matrix;
       using Eigen::Dynamic;
-      LDLT<Matrix<T_y,Dynamic,Dynamic> > cholesky = y.ldlt();
+      LDLT<Matrix<double, Dynamic, Dynamic> > cholesky 
+        = value_of_rec(y).ldlt();
       if (cholesky.info() != Eigen::Success || (cholesky.vectorD().array() < 0.0).any())
         domain_error(function, name, y, "is not positive semi-definite:\n");
       check_not_nan(function, name, y);

@@ -8,6 +8,7 @@
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive_size.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/value_of_rec.hpp>
 
 namespace stan {
 
@@ -43,7 +44,8 @@ namespace stan {
       using Eigen::LDLT;
       using Eigen::Matrix;
       using Eigen::Dynamic;
-      LDLT<Matrix<T_y,Dynamic,Dynamic> > cholesky = y.ldlt();
+      LDLT< Matrix<double, Dynamic, Dynamic> > cholesky 
+        = value_of_rec(y).ldlt();
       if (cholesky.info() != Eigen::Success
           || !cholesky.isPositive()
           || (cholesky.vectorD().array() <= CONSTRAINT_TOLERANCE).any())

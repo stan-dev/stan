@@ -8,6 +8,7 @@
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/math/matrix/value_of.hpp>
 #include <stan/meta/traits.hpp>
 
 namespace stan {
@@ -49,7 +50,7 @@ namespace stan {
         return true;
       for (size_type m = 0; m < k; ++m) {
         for (size_type n = m + 1; n < k; ++n) {
-          if (!(fabs(y(m,n) - y(n,m)) <= CONSTRAINT_TOLERANCE)) {
+          if (!(fabs(value_of(y(m,n)) - value_of(y(n,m))) <= CONSTRAINT_TOLERANCE)) {
             std::ostringstream msg1;
             msg1 << "is not symmetric. " 
                  << name << "[" << stan::error_index::value + m << "," 
