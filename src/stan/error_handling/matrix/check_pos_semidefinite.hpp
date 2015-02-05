@@ -9,6 +9,7 @@
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/math/matrix/value_of_rec.hpp>
 
 namespace stan {
 
@@ -37,6 +38,7 @@ namespace stan {
       using Eigen::Dynamic;
       using Eigen::Matrix;
       using stan::math::index_type;
+      using stan::math::value_of_rec;
 
       typedef typename index_type<Matrix<T_y,Dynamic,Dynamic> >::type size_type;
 
@@ -48,8 +50,8 @@ namespace stan {
         dom_err(function, name, y(0,0),
                 msg_str.c_str());
       }
-      Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
-        = y.ldlt();
+      Eigen::LDLT< Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
+        = value_of_rec(y).ldlt();
       if(cholesky.info() != Eigen::Success || (cholesky.vectorD().array() < 0.0).any()) {
         std::ostringstream msg;
         msg << "is not positive semi-definite. " 
@@ -59,7 +61,7 @@ namespace stan {
                 msg_str.c_str());
       }
       for (int i = 0; i < y.size(); i++)
-        if (boost::math::isnan(y(i))) {
+        if (boost::math::isnan(value_of_rec(y(i)))) {
           std::ostringstream msg;
           msg << "is not positive semi-definite. " 
                   << name << "(0,0) is ";

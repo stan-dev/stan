@@ -5,6 +5,7 @@
 #include <stan/error_handling/scalar/dom_err_vec.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/math/functions/value_of_rec.hpp>
 
 namespace stan {
   namespace error_handling {
@@ -15,7 +16,8 @@ namespace stan {
         static bool check(const char* function,
                           const char* name,
                           const T_y& y) {
-          if (!(boost::math::isfinite)(y))
+          using stan::math::value_of_rec;
+          if (!(boost::math::isfinite)(value_of_rec(y)))
             dom_err(function, name, y,
                     "is ", ", but must be finite!");
           return true;
@@ -27,9 +29,10 @@ namespace stan {
         static bool check(const char* function,
                           const char* name,
                           const T_y& y) {
+          using stan::math::value_of_rec;
           using stan::length;
           for (size_t n = 0; n < length(y); n++) {
-            if (!(boost::math::isfinite)(stan::get(y,n)))
+            if (!(boost::math::isfinite)(value_of_rec(stan::get(y,n))))
               dom_err_vec(function, name, y, n,
                           "is ", ", but must be finite!");
           }
