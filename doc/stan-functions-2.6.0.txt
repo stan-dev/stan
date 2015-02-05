@@ -1,0 +1,612 @@
+# This file is semicolon delimited
+StanFunction; Arguments; ReturnType; Page
+abs;(int x);int;292
+abs;(real x);real;301
+acos;(real x);real;306
+acosh;(real x);real;307
+append_col;(matrix x, matrix y);matrix;334
+append_col;(matrix x, vector y);matrix;335
+append_col;(row_vector x, row_vector y);row_vector;335
+append_col;(vector x, matrix y);matrix;335
+append_col;(vector x, vector y);matrix;335
+append_row;(matrix x, matrix y);matrix;335
+append_row;(matrix x, row_vector y);matrix;335
+append_row;(row_vector x, matrix y);matrix;335
+append_row;(row_vector x, row_vector y);matrix;335
+append_row;(vector x, vector y);vector;335
+asin;(real x);real;306
+asinh;(real x);real;307
+atan2;(real x, real y);real;306
+atan;(real x);real;306
+atanh;(real x);real;307
+bernoulli;~;real;345
+bernoulli_ccdf_log;(ints y, reals theta);real;345
+bernoulli_cdf;(ints y, reals theta);real;345
+bernoulli_cdf_log;(ints y, reals theta);real;345
+bernoulli_log;(ints y, reals theta);real;345
+bernoulli_logit;~;real;346
+bernoulli_logit_log;(ints y, reals alpha);real;346
+bernoulli_rng;(real theta);int;345
+bessel_first_kind;(int v, real x);real;311
+bessel_second_kind;(int v, real x);real;312
+beta;~;real;379
+beta_binomial;~;real;349
+beta_binomial_ccdf_log;(ints n, ints N, reals alpha, reals beta);real;350
+beta_binomial_cdf;(ints n, ints N, reals alpha, reals beta);real;349
+beta_binomial_cdf_log;(ints n, ints N, reals alpha, reals beta);real;350
+beta_binomial_log;(ints n, ints N, reals alpha, reals beta);real;349
+beta_binomial_rng;(int N, real alpha, real beta);int;350
+beta_ccdf_log;(reals theta, reals alpha, reals beta);real;379
+beta_cdf;(reals theta, reals alpha, reals beta);real;379
+beta_cdf_log;(reals theta, reals alpha, reals beta);real;379
+beta_log;(reals theta, reals alpha, reals beta);real;379
+beta_rng;(real alpha, real beta);real;380
+binary_log_loss;(int y, real y_hat);real;309
+binomial;~;real;347
+binomial_ccdf_log;(ints n, ints N, reals theta);real;348
+binomial_cdf;(ints n, ints N, reals theta);real;347
+binomial_cdf_log;(ints n, ints N, reals theta);real;348
+binomial_coefficient_log;(real x, real y);real;311
+binomial_log;(ints n, ints N, reals theta);real;347
+binomial_logit;~;real;349
+binomial_logit_log;(ints n, ints N, reals alpha);real;349
+binomial_rng;(int N, real theta);int;348
+block;(matrix x, int i, int j, int n_rows, int n_cols);matrix;333
+categorical;~;real;351
+categorical_log;(ints y, vector theta);real;351
+categorical_logit;~;real;351
+categorical_logit_log;(ints y, vector beta);real;351
+categorical_rng;(vector theta);int;351
+cauchy;~;real;364
+cauchy_ccdf_log;(reals y, reals mu, reals sigma);real;364
+cauchy_cdf;(reals y, reals mu, reals sigma);real;364
+cauchy_cdf_log;(reals y, reals mu, reals sigma);real;364
+cauchy_log;(reals y, reals mu, reals sigma);real;364
+cauchy_rng;(real mu, real sigma);real;364
+cbrt;(real x);real;303
+ceil;(real x);real;302
+chi_square;~;real;369
+chi_square_ccdf_log;(reals y, reals nu);real;369
+chi_square_cdf;(reals y, reals nu);real;369
+chi_square_cdf_log;(reals y, reals nu);real;369
+chi_square_log;(reals y, reals nu);real;369
+chi_square_rng;(real nu);real;369
+cholesky_decompose;(matrix A);matrix;339
+col;(matrix x, int n);vector;333
+cols;(matrix x);int;322
+cols;(row_vector x);int;322
+cols;(vector x);int;322
+columns_dot_product;(matrix x, matrix y);row_vector;327
+columns_dot_product;(row_vector x, row_vector y);row_vector;327
+columns_dot_product;(vector x, vector y);row_vector;327
+columns_dot_self;(matrix x);row_vector;328
+columns_dot_self;(row_vector x);row_vector;328
+columns_dot_self;(vector x);row_vector;328
+cos;(real x);real;305
+cosh;(real x);real;306
+crossprod;(matrix x);matrix;328
+cumulative_sum;(real[] x);real[];327
+cumulative_sum;(row_vector rv);row_vector;327
+cumulative_sum;(vector v);vector;327
+determinant;(matrix A);real;337
+diag_matrix;(vector x);matrix;333
+diag_post_multiply;(matrix m, row_vector rv);matrix;330
+diag_post_multiply;(matrix m, vector v);matrix;329
+diag_pre_multiply;(row_vector rv, matrix m);matrix;329
+diag_pre_multiply;(vector v, matrix m);matrix;329
+diagonal;(matrix x);vector;332
+digamma;(real x);real;310
+dims;(T x);int[];318
+dirichlet;~;real;391
+dirichlet_log;(vector theta, vector alpha);real;391
+dirichlet_rng;(vector alpha);vector;391
+distance;(row_vector x, row_vector y);real;318
+distance;(row_vector x, vector y);real;317
+distance;(vector x, row_vector y);real;317
+distance;(vector x, vector y);real;317
+dot_product;(row_vector x, row_vector y);real;327
+dot_product;(row_vector x, vector y);real;327
+dot_product;(vector x, row_vector y);real;327
+dot_product;(vector x, vector y);real;327
+dot_self;(row_vector x);real;328
+dot_self;(vector x);real;328
+double_exponential;~;real;365
+double_exponential_ccdf_log;(reals y, reals mu, reals sigma);real;365
+double_exponential_cdf;(reals y, reals mu, reals sigma);real;365
+double_exponential_cdf_log;(reals y, reals mu, reals sigma);real;365
+double_exponential_log;(reals y, reals mu, reals sigma);real;365
+double_exponential_rng;(real mu, real sigma);real;365
+e;();real;294
+eigenvalues_sym;(matrix A);vector;338
+eigenvectors_sym;(matrix A);matrix;338
+erf;(real x);real;308
+erfc;(real x);real;308
+exp2;(real x);real;304
+exp;(matrix x);matrix;326
+exp;(real x);real;303
+exp;(row_vector x);row_vector;326
+exp;(vector x);vector;326
+exp_mod_normal;~;real;361
+exp_mod_normal_ccdf_log;(reals y, reals mu, reals sigma reals lambda);real;361
+exp_mod_normal_cdf;(reals y, reals mu, reals sigma reals lambda);real;361
+exp_mod_normal_cdf_log;(reals y, reals mu, < reals sigma reals lambda);real;361
+exp_mod_normal_log;(reals y, reals mu, reals sigma reals lambda);real;361
+exp_mod_normal_rng;(real mu, real sigma, real lambda);real;361
+expm1;(real x);real;313
+exponential;~;real;371
+exponential_ccdf_log;(reals y, reals beta);real;372
+exponential_cdf;(reals y, reals beta);real;372
+exponential_cdf_log;(reals y, reals beta);real;372
+exponential_log;(reals y, reals beta);real;371
+exponential_rng;(real beta);real;372
+fabs;(real x);real;301
+falling_factorial;(real x, real n);real;312
+fdim;(real x, real y);real;301
+floor;(real x);real;302
+fma;(real x, real y, real z);real;313
+fmax;(real x, real y);real;302
+fmin;(real x, real y);real;301
+fmod;(real x, real y);real;302
+frechet;~;real;375
+frechet_ccdf_log;(reals y, reals alpha, reals sigma);real;375
+frechet_cdf;(reals y, reals alpha, reals sigma);real;375
+frechet_cdf_log;(reals y, reals alpha, reals sigma);real;375
+frechet_log;(reals y, reals alpha, reals sigma);real;375
+frechet_rng;(real alpha, real sigma);real;375
+gamma;~;real;372
+gamma_ccdf_log;(reals y, reals alpha, reals beta);real;373
+gamma_cdf;(reals y, reals alpha, reals beta);real;372
+gamma_cdf_log;(reals y, reals alpha, reals beta);real;372
+gamma_log;(reals y, reals alpha, reals beta);real;372
+gamma_p;(real a, real z);real;311
+gamma_q;(real a, real z);real;311
+gamma_rng;(real alpha, real beta);real;373
+gaussian_dlm_obs;~;real;389
+gaussian_dlm_obs_log;(matrix y, matrix F, matrix G, matrix V matrix W, vector m0, matrix C0);real;390
+gaussian_dlm_obs_log;(matrix y, matrix F, matrix G, vector V matrix W, vector m0, matrix C0);real;390
+get_lp;();real;295
+gumbel;~;real;366
+gumbel_ccdf_log;(reals y, reals mu, reals beta);real;367
+gumbel_cdf;(reals y, reals mu, reals beta);real;367
+gumbel_cdf_log;(reals y, reals mu, reals beta);real;367
+gumbel_log;(reals y, reals mu, reals beta);real;366
+gumbel_rng;(real mu, real beta);real;367
+head;(T[] sv, int n);T[];334
+head;(row_vector rv, int n);row_vector;334
+head;(vector v, int n);vector;334
+hypergeometric;~;real;350
+hypergeometric_log;(int n, int N, int a, int b);real;350
+hypergeometric_rng;(int N, real a, real b);int;350
+hypot;(real x, real y);real;305
+if_else;(int cond, real x, real y);real;298
+increment_log_prob;(T lp);void;289
+int_step;(int x);int;292
+int_step;(real x);int;292
+inv;(real x);real;304
+inv_chi_square;~;real;370
+inv_chi_square_ccdf_log;(reals y, reals nu);real;370
+inv_chi_square_cdf;(reals y, reals nu);real;370
+inv_chi_square_cdf_log;(reals y, reals nu);real;370
+inv_chi_square_log;(reals y, reals nu);real;370
+inv_chi_square_rng;(real nu);real;370
+inv_cloglog;(real y);real;308
+inv_gamma;~;real;373
+inv_gamma_ccdf_log;(reals y, reals alpha, reals beta);real;373
+inv_gamma_cdf;(reals y, reals alpha, reals beta);real;373
+inv_gamma_cdf_log;(reals y, reals alpha, reals beta);real;373
+inv_gamma_log;(reals y, reals alpha, reals beta);real;373
+inv_gamma_rng;(real alpha, real beta);real;373
+inv_logit;(real y);real;308
+inv_sqrt;(real x);real;305
+inv_square;(real x);real;305
+inv_wishart;~;real;396
+inv_wishart_log;(matrix W, real nu, matrix Sigma);real;396
+inv_wishart_rng;(real nu, matrix Sigma);matrix;396
+inverse;(matrix A);matrix;338
+inverse_spd;(matrix A);matrix;338
+is_inf;(real x);int;299
+is_nan;(real x);int;299
+lbeta;(real alpha, real beta);real;309
+lgamma;(real x);real;310
+lkj_corr;~;real;393
+lkj_corr_cholesky;~;real;394
+lkj_corr_cholesky_log;(matrix L, real eta);real;394
+lkj_corr_cholesky_rng;(int K, real eta);matrix;394
+lkj_corr_log;(matrix y, real eta);real;393
+lkj_corr_rng;(int K, real eta);matrix;393
+lmgamma;(int n, real x);real;310
+log10;();real;294
+log10;(real x);real;304
+log1m;(real x);real;314
+log1m_exp;(real x);real;314
+log1m_inv_logit;(real x);real;315
+log1p;(real x);real;314
+log1p_exp;(real x);real;314
+log2;();real;294
+log2;(real x);real;304
+log;(matrix x);matrix;326
+log;(real x);real;304
+log;(row_vector x);row_vector;326
+log;(vector x);vector;326
+log_determinant;(matrix A);real;337
+log_diff_exp;(real x, real y);real;314
+log_falling_factorial;(real x, real n);real;313
+log_inv_logit;(real x);real;315
+log_mix;(real theta, real lp1, real lp2);real;315
+log_rising_factorial;(real x, real n);real;313
+log_softmax;(vector x);vector;336
+log_sum_exp;(matrix x);real;330
+log_sum_exp;(real x, real y);real;315
+log_sum_exp;(real x[]);real;316
+log_sum_exp;(row_vector x);real;330
+log_sum_exp;(vector x);real;330
+logistic;~;real;365
+logistic_ccdf_log;(reals y, reals mu, reals sigma);real;366
+logistic_cdf;(reals y, reals mu, reals sigma);real;366
+logistic_cdf_log;(reals y, reals mu, reals sigma);real;366
+logistic_log;(reals y, reals mu, reals sigma);real;366
+logistic_rng;(real mu, real sigma);real;366
+logit;(real x);real;307
+lognormal;~;real;368
+lognormal_ccdf_log;(reals y, reals mu, reals sigma);real;368
+lognormal_cdf;(reals y, reals mu, reals sigma);real;368
+lognormal_cdf_log;(reals y, reals mu, reals sigma);real;368
+lognormal_log;(reals y, reals mu, reals sigma);real;368
+lognormal_rng;(real mu, real beta);real;368
+machine_precision;();real;294
+max;(int x, int y);int;293
+max;(int x[]);int;316
+max;(matrix x);real;330
+max;(real x[]);real;316
+max;(row_vector x);real;330
+max;(vector x);real;330
+mdivide_left_tri_low;(matrix A, matrix B);matrix;337
+mdivide_left_tri_low;(matrix A, vector B);vector;337
+mdivide_right_tri_low;(matrix B, matrix A);matrix;337
+mdivide_right_tri_low;(row_vector B, matrix A);row_vector;337
+mean;(matrix x);real;331
+mean;(real x[]);real;317
+mean;(row_vector x);real;331
+mean;(vector x);real;331
+min;(int x, int y);int;293
+min;(int x[]);int;316
+min;(matrix x);real;330
+min;(real x[]);real;316
+min;(row_vector x);real;330
+min;(vector x);real;330
+modified_bessel_first_kind;(int v, real z);real;312
+modified_bessel_second_kind;(int v, real z);real;312
+multi_gp;~;real;387
+multi_gp_cholesky;~;real;388
+multi_gp_cholesky_log;(matrix y, matrix L, vector w);real;388
+multi_gp_log;(matrix y, matrix Sigma, vector w);real;387
+multi_normal;~;real;384
+multi_normal_cholesky;~;real;386
+multi_normal_cholesky_log;(row_vectors y, row_vectors mu, matrix L);real;386
+multi_normal_cholesky_log;(row_vectors y, vectors mu, matrix L);real;386
+multi_normal_cholesky_log;(vectors y, row_vectors mu, matrix L);real;386
+multi_normal_cholesky_log;(vectors y, vectors mu, matrix L);real;386
+multi_normal_cholesky_rng;(vector mu, matrix L);vector;386
+multi_normal_log;(row_vectors y, row_vectors mu, matrix Sigma);real;385
+multi_normal_log;(row_vectors y, vectors mu, matrix Sigma);real;384
+multi_normal_log;(vectors y, row_vectors mu, matrix Sigma);real;384
+multi_normal_log;(vectors y, vectors mu, matrix Sigma);real;384
+multi_normal_prec;~;real;385
+multi_normal_prec_log;(row_vectors y, row_vectors mu, matrix Omega);real;385
+multi_normal_prec_log;(row_vectors y, vectors mu, matrix Omega);real;385
+multi_normal_prec_log;(vectors y, row_vectors mu, matrix Omega);real;385
+multi_normal_prec_log;(vectors y, vectors mu, matrix Omega);real;385
+multi_normal_rng;(vector mu, matrix Sigma);vector;385
+multi_student_t;~;real;388
+multi_student_t_log;(row_vectors y, real nu, row_vectors mu, matrix Sigma);real;389
+multi_student_t_log;(row_vectors y, real nu, vectors mu, matrix Sigma);real;389
+multi_student_t_log;(vectors y, real nu, row_vectors mu, matrix Sigma);real;388
+multi_student_t_log;(vectors y, real nu, vectors mu, matrix Sigma);real;388
+multi_student_t_rng;(real nu, vector mu, matrix Sigma);vector;389
+multinomial;~;real;358
+multinomial_log;(int[] y, vector theta);real;358
+multinomial_rng;(vector theta, int N);vector;358
+multiply_log;(real x, real y);real;314
+multiply_lower_tri_self_transpose;(matrix x);matrix;329
+neg_binomial;~;real;353
+neg_binomial_2;~;real;354
+neg_binomial_2_ccdf_log;(ints n, reals mu, reals phi);real;355
+neg_binomial_2_cdf;(ints n, reals mu, reals phi);real;355
+neg_binomial_2_cdf_log;(ints n, reals mu, reals phi);real;355
+neg_binomial_2_log;(ints y, reals mu, reals phi);real;355
+neg_binomial_2_log;~;real;354
+neg_binomial_2_log_log;(ints y, reals eta, reals phi);real;355
+neg_binomial_2_log_rng;(real eta, real phi);int;355
+neg_binomial_2_rng;(real mu, real phi);int;355
+neg_binomial_ccdf_log;(ints n, reals alpha, reals beta);real;354
+neg_binomial_cdf;(ints n, reals alpha, reals beta);real;353
+neg_binomial_cdf_log;(ints n, reals alpha, reals beta);real;353
+neg_binomial_log;(ints n, reals alpha, reals beta);real;353
+neg_binomial_rng;(real alpha, real beta);int;354
+negative_infinity;();real;294
+normal;~;real;360
+normal_ccdf_log;(reals y, reals mu, reals sigma);real;360
+normal_cdf;(reals y, reals mu, reals sigma);real;360
+normal_cdf_log;(reals y, reals mu, reals sigma);real;360
+normal_log;(reals y, reals mu, reals sigma);real;360
+normal_rng;(real mu, real sigma);real;361
+not_a_number;();real;294
+num_elements;(T[] x);int;318
+num_elements;(matrix x);int;322
+num_elements;(row_vector x);int;322
+num_elements;(vector x);int;322
+operator!;(int x);int;297
+operator!;(real x);int;297
+operator!=;(int x, int y);int;296
+operator!=;(real x, real y);int;297
+operator&&;(int x, int y);int;297
+operator&&;(real x, real y);int;297
+operator';(matrix x);matrix;335
+operator';(row_vector x);vector;336
+operator';(vector x);row_vector;336
+operator*;(int x, int y);int;292
+operator*;(matrix x, matrix y);matrix;324
+operator*;(matrix x, real y);matrix;324
+operator*;(matrix x, vector y);vector;324
+operator*;(real x, matrix y);matrix;323
+operator*;(real x, real y);real;300
+operator*;(real x, row_vector y);row_vector;323
+operator*;(real x, vector y);vector;323
+operator*;(row_vector x, matrix y);row_vector;324
+operator*;(row_vector x, real y);row_vector;324
+operator*;(row_vector x, vector y);real;324
+operator*;(vector x, real y);vector;323
+operator*;(vector x, row_vector y);matrix;324
+operator+;(int x);int;292
+operator+;(int x, int y);int;292
+operator+;(matrix x, matrix y);matrix;323
+operator+;(matrix x, real y);matrix;324
+operator+;(real x);real;300
+operator+;(real x, matrix y);matrix;324
+operator+;(real x, real y);real;299
+operator+;(real x, row_vector y);row_vector;324
+operator+;(real x, vector y);vector;324
+operator+;(row_vector x, real y);row_vector;324
+operator+;(row_vector x, row_vector y);row_vector;323
+operator+;(vector x, real y);vector;324
+operator+;(vector x, vector y);vector;323
+operator-;(int x);int;292
+operator-;(int x, int y);int;292
+operator-;(matrix x);matrix;323
+operator-;(matrix x, matrix y);matrix;323
+operator-;(matrix x, real y);matrix;325
+operator-;(real x);real;300
+operator-;(real x, matrix y);matrix;325
+operator-;(real x, real y);real;300
+operator-;(real x, row_vector y);row_vector;325
+operator-;(real x, vector y);vector;325
+operator-;(row_vector x);row_vector;323
+operator-;(row_vector x, real y);row_vector;325
+operator-;(row_vector x, row_vector y);row_vector;323
+operator-;(vector x);vector;323
+operator-;(vector x, real y);vector;324
+operator-;(vector x, vector y);vector;323
+operator.*;(matrix x, matrix y);matrix;325
+operator.*;(row_vector x, row_vector y);row_vector;325
+operator.*;(vector x, vector y);vector;325
+operator./;(matrix x, matrix y);matrix;326
+operator./;(matrix x, real y);matrix;326
+operator./;(real x, matrix y);matrix;326
+operator./;(real x, row_vector y);row_vector;326
+operator./;(real x, vector y);vector;326
+operator./;(row_vector x, real y);row_vector;326
+operator./;(row_vector x, row_vector y);row_vector;326
+operator./;(vector x, real y);vector;325
+operator./;(vector x, vector y);vector;325
+operator/;(int x, int y);int;292
+operator/;(matrix B, matrix A);matrix;336
+operator/;(matrix x, real y);matrix;325
+operator/;(real x, real y);real;300
+operator/;(row_vector b, matrix A);row_vector;336
+operator/;(row_vector x, real y);row_vector;325
+operator/;(vector x, real y);vector;325
+operator<;(int x, int y);int;295
+operator<;(real x, real y);int;296
+operator<=;(int x, int y);int;296
+operator<=;(real x, real y);int;296
+operator==;(int x, int y);int;296
+operator==;(real x, real y);int;296
+operator>;(int x, int y);int;296
+operator>;(real x, real y);int;296
+operator>=;(int x, int y);int;296
+operator>=;(real x, real y);int;296
+operator\;(matrix A, matrix B);matrix;336
+operator\;(matrix A, vector b);vector;336
+operator^ ;(real x, real y);real;300
+operator||;(int x, int y);int;297
+operator||;(real x, real y);int;297
+ordered_logistic;~;real;352
+ordered_logistic_log;(int k, real eta, vector c);real;352
+ordered_logistic_rng;(real eta, vector c);int;352
+owens_t;(real h, real a);real;309
+pareto;~;real;377
+pareto_ccdf_log;(reals y, reals y_min, reals alpha);real;377
+pareto_cdf;(reals y, reals y_min, reals alpha);real;377
+pareto_cdf_log;(reals y, reals y_min, reals alpha);real;377
+pareto_log;(reals y, reals y_min, reals alpha);real;377
+pareto_rng;(real y_min, real alpha);real;377
+pareto_type_2;~;real;378
+pareto_type_2_ccdf_log;(reals y, reals mu, reals lambda, reals alpha);real;378
+pareto_type_2_cdf;(reals y, reals mu, reals lambda, reals alpha);real;378
+pareto_type_2_cdf_log;(reals y, reals mu, reals lambda, reals alpha);real;378
+pareto_type_2_log;(reals y, reals mu, reals lambda, reals alpha);real;378
+pareto_type_2_rng;(real mu, real lambda, real alpha);real;378
+phi ;(real x);real;308
+phi_approx ;(real x);real;309
+pi;();real;294
+poisson;~;real;356
+poisson_ccdf_log;(ints n, reals lambda);real;356
+poisson_cdf;(ints n, reals lambda);real;356
+poisson_cdf_log;(ints n, reals lambda);real;356
+poisson_log;(ints n, reals lambda);real;356
+poisson_log;~;real;357
+poisson_log_log;(ints n, reals alpha);real;357
+poisson_log_rng;(real alpha);int;357
+poisson_rng;(real lambda);int;356
+positive_infinity;();real;294
+pow;(real x, real y);real;304
+print;(T1 x1,..., TN xN);void;290
+prod;(int x[]);real;316
+prod;(matrix x);real;331
+prod;(real x[]);real;316
+prod;(row_vector x);real;331
+prod;(vector x);real;331
+qr_Q;(matrix A);matrix;338
+qr_R;(matrix A);matrix;338
+quad_form;(matrix A, matrix B);matrix;328
+quad_form;(matrix A, vector B);real;329
+quad_form_diag;(matrix m, row_vector rv);matrix;329
+quad_form_diag;(matrix m, vector v);matrix;329
+quad_form_sym;(matrix A, matrix B);matrix;329
+quad_form_sym;(matrix A, vector B);real;329
+rank;(int[] v, int s);int;321
+rank;(real[] v, int s);int;321
+rank;(row_vector v, int s);int;340
+rank;(vector v, int s);int;340
+rayleigh;~;real;376
+rayleigh_ccdf_log;(real y, real sigma);real;376
+rayleigh_cdf;(real y, real sigma);real;376
+rayleigh_cdf_log;(real y, real sigma);real;376
+rayleigh_log;(reals y, reals sigma);real;376
+rayleigh_rng;(real sigma);real;376
+rep_array;(T x, int k, int m, int n);];319
+rep_array;(T x, int m, int n);];319
+rep_array;(T x, int n);T[];319
+rep_matrix;(real x, int m, int n);matrix;332
+rep_matrix;(row_vector rv, int m);matrix;332
+rep_matrix;(vector v, int n);matrix;332
+rep_row_vector;(real x, int n);row_vector;332
+rep_vector;(real x, int m);vector;332
+rising_factorial;(real x, real n);real;313
+round;(real x);real;303
+row;(matrix x, int m);row_vector;333
+rows;(matrix x);int;322
+rows;(row_vector x);int;322
+rows;(vector x);int;322
+rows_dot_product;(matrix x, matrix y);vector;328
+rows_dot_product;(row_vector x, row_vector y);vector;327
+rows_dot_product;(vector x, vector y);vector;327
+rows_dot_self;(matrix x);vector;328
+rows_dot_self;(row_vector x);vector;328
+rows_dot_self;(vector x);vector;328
+scaled_inv_chi_square;~;real;370
+scaled_inv_chi_square_ccdf_log;(reals y, reals nu, reals sigma);real;371
+scaled_inv_chi_square_cdf;(reals y, reals nu, reals sigma);real;371
+scaled_inv_chi_square_cdf_log;(reals y, reals nu, reals sigma);real;371
+scaled_inv_chi_square_log;(reals y, reals nu, reals sigma);real;371
+scaled_inv_chi_square_rng;(real nu, real sigma);real;371
+sd;(matrix x);real;332
+sd;(real x[]);real;317
+sd;(row_vector x);real;331
+sd;(vector x);real;331
+segment;(T[] sv, int i, int n);T[];334
+segment;(row_vector v, int i, int n);row_vector;334
+segment;(vector v, int i, int n);vector;334
+sin;(real x);real;305
+singular_values;(matrix A);vector;339
+sinh;(real x);real;306
+size;(T[] x);int;319
+skew_normal;~;real;362
+skew_normal_ccdf_log;(reals y, reals mu, reals sigma reals alpha);real;362
+skew_normal_cdf;(reals y, reals mu, reals sigma, reals alpha);real;362
+skew_normal_cdf_log;(reals y, reals mu, reals sigma reals alpha);real;362
+skew_normal_log;(reals y, reals mu, reals sigma, reals alpha);real;362
+skew_normal_rng;(real mu, real sigma, real alpha);real;362
+softmax;(vector x);vector;336
+sort_asc;(int[] v);int[];320
+sort_asc;(real[] v);real[];320
+sort_asc;(row_vector v);row_vector;339
+sort_asc;(vector v);vector;339
+sort_desc;(int[] v);int[];321
+sort_desc;(real[] v);real[];320
+sort_desc;(row_vector v);row_vector;339
+sort_desc;(vector v);vector;339
+sort_indices_asc;(int[] v);int[];321
+sort_indices_asc;(real[] v);int[];321
+sort_indices_asc;(row_vector v);int[];340
+sort_indices_asc;(vector v);int[];340
+sort_indices_desc;(int[] v);int[];321
+sort_indices_desc;(real[] v);int[];321
+sort_indices_desc;(row_vector v);int[];340
+sort_indices_desc;(vector v);int[];340
+sqrt2;();real;294
+sqrt;(real x);real;303
+square;(real x);real;303
+squared_distance;(row_vector x, row_vector y[]);real;318
+squared_distance;(row_vector x, vector y[]);real;318
+squared_distance;(vector x, row_vector y[]);real;318
+squared_distance;(vector x, vector y[]);real;318
+step;(real x);real;298
+student_t;~;real;363
+student_t_ccdf_log;(reals y, reals nu, reals mu, reals sigma);real;363
+student_t_cdf;(reals y, reals nu, reals mu, reals sigma);real;363
+student_t_cdf_log;(reals y, reals nu, reals mu, reals sigma);real;363
+student_t_log;(reals y, reals nu, reals mu, reals sigma);real;363
+student_t_rng;(real nu, real mu, real sigma);real;363
+sub_col;(matrix x, int i, int j, int n_rows);vector;333
+sub_row;(matrix x, int i, int j, int n_cols);row_vector;333
+sum;(int x[]);int;316
+sum;(matrix x);real;331
+sum;(real x[]);real;316
+sum;(row_vector x);real;331
+sum;(vector x);real;330
+tail;(T[] sv, int n);T[];334
+tail;(row_vector rv, int n);row_vector;334
+tail;(vector v, int n);vector;334
+tan;(real x);real;305
+tanh;(real x);real;307
+tcrossprod;(matrix x);matrix;328
+tgamma;(real x);real;310
+to_array_1d;(int[...] a);int[];342
+to_array_1d;(matrix m);real[];342
+to_array_1d;(real[...] a);real[];342
+to_array_1d;(row_vector v);real[];342
+to_array_1d;(vector v);real[];342
+to_array_2d;(matrix m);real[,];342
+to_matrix;(int[,] a);matrix;341
+to_matrix;(matrix m);matrix;341
+to_matrix;(real[,] a);matrix;341
+to_matrix;(row_vector v);matrix;341
+to_matrix;(vector v);matrix;341
+to_row_vector;(int[] a);row_vector;342
+to_row_vector;(matrix m);row_vector;342
+to_row_vector;(real[] a);row_vector;342
+to_row_vector;(row_vector v);row_vector;342
+to_row_vector;(vector v);row_vector;342
+to_vector;(int[] a);vector;341
+to_vector;(matrix m);vector;341
+to_vector;(real[] a);vector;341
+to_vector;(row_vector v);vector;341
+to_vector;(vector v);vector;341
+trace;(matrix A);real;337
+trace_gen_quad_form;(matrix D,matrix A, matrix B);real;329
+trace_quad_form;(matrix A, matrix B);real;329
+trigamma;(real x);real;310
+trunc;(real x);real;303
+uniform;~;real;383
+uniform_ccdf_log;(reals y, reals alpha, reals beta);real;383
+uniform_cdf;(reals y, reals alpha, reals beta);real;383
+uniform_cdf_log;(reals y, reals alpha, reals beta);real;383
+uniform_log;(reals y, reals alpha, reals beta);real;383
+uniform_rng;(real alpha, real beta);real;383
+variance;(matrix x);real;331
+variance;(real x[]);real;317
+variance;(row_vector x);real;331
+variance;(vector x);real;331
+von_mises;~;real;381
+von_mises_log;(reals y, reals mu, reals kappa);real;381
+von_mises_rng;(reals mu, reals kappa);real;381
+weibull;~;real;374
+weibull_ccdf_log;(reals y, reals alpha, reals sigma);real;374
+weibull_cdf;(reals y, reals alpha, reals sigma);real;374
+weibull_cdf_log;(reals y, reals alpha, reals sigma);real;374
+weibull_log;(reals y, reals alpha, reals sigma);real;374
+weibull_rng;(real alpha, real sigma);real;374
+wishart;~;real;395
+wishart_log;(matrix W, real nu, matrix Sigma);real;395
+wishart_rng;(real nu, matrix Sigma);matrix;395
