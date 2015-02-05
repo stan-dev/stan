@@ -30,8 +30,8 @@ namespace stan {
                                        const char* name,
                                        const std::vector<T>& y,
                                        int i) {
-      if (i >= stan::error_index::value
-          && i < y.size() + stan::error_index::value)
+      if (i >= static_cast<int>(stan::error_index::value)
+          && i < static_cast<int>(y.size() + stan::error_index::value))
         return true;
       
       std::stringstream msg;
