@@ -356,11 +356,30 @@ TEST(AgradAutoDiff,GradientHessian){
   double normal_eval_agrad;
   double poly_eval_agrad;
 
+  double normal_eval_agrad_hessian;
+  double poly_eval_agrad_hessian;
+
   double normal_eval_analytic;
   double poly_eval_analytic;
 
   Matrix<double,Dynamic,Dynamic> norm_hess_agrad;
   Matrix<double,Dynamic,Dynamic> poly_hess_agrad;
+
+  Matrix<double,Dynamic,Dynamic> norm_hess_agrad_hessian;
+  Matrix<double,Dynamic,Dynamic> poly_hess_agrad_hessian;
+
+  Matrix<double,Dynamic,1> norm_grad_agrad_hessian;
+  Matrix<double,Dynamic,1> poly_grad_agrad_hessian;
+
+  stan::agrad::hessian(log_normal_density,normal_eval_vec,
+                       normal_eval_agrad_hessian,
+                       norm_grad_agrad_hessian,
+                       norm_hess_agrad_hessian);
+
+  stan::agrad::hessian(mixed_third_poly,poly_eval_vec,
+                       poly_eval_agrad_hessian,
+                       poly_grad_agrad_hessian,
+                       poly_hess_agrad_hessian);
 
   Matrix<double,Dynamic,Dynamic> norm_hess_analytic;
   Matrix<double,Dynamic,Dynamic> poly_hess_analytic;
@@ -391,6 +410,8 @@ TEST(AgradAutoDiff,GradientHessian){
     for (int j = 0; j < 3; ++j)
       for (int k = 0; k < 3; ++k) {
         if (i == 0){
+          EXPECT_FLOAT_EQ(norm_hess_agrad_hessian(j,k),norm_hess_analytic(j,k));
+          EXPECT_FLOAT_EQ(poly_hess_agrad_hessian(j,k),poly_hess_analytic(j,k));
           EXPECT_FLOAT_EQ(norm_hess_analytic(j,k),norm_hess_agrad(j,k));
           EXPECT_FLOAT_EQ(poly_hess_analytic(j,k),poly_hess_agrad(j,k));
         }
