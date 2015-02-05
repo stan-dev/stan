@@ -318,11 +318,10 @@ namespace stan {
     // // N * (fwd(2) + bk)
     template <typename F>
     void
-    grad_tr_mat_times_hessian(
-                 const F& f,
-                 const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
-                 const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& M,
-                 Eigen::Matrix<double,Eigen::Dynamic,1>& grad_tr_MH) {
+    grad_tr_mat_times_hessian(const F& f,
+															const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+															const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& M,
+															Eigen::Matrix<double,Eigen::Dynamic,1>& grad_tr_MH) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
       start_nested();
@@ -397,16 +396,18 @@ namespace stan {
                  double& fx,
                  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& H,
                  std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >& grad_H) {
+			using Eigen::Matrix;
+			using Eigen::Dynamic;
       start_nested();
       fx = f(x);
       try {
         int d = x.size();
         H.resize(d, d);
         for (int i = 0; i < d; ++i)
-          grad_H.push_back(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>(d,d));
+          grad_H.push_back(Matrix<double,Dynamic,Dynamic>(d,d));
         for (int i = 0; i < d; ++i) {
           for (int j = i; j < d; ++j) {
-            Eigen::Matrix<fvar<fvar<var> >, Eigen::Dynamic, 1> x_ffvar(d);
+            Matrix<fvar<fvar<var> >, Dynamic, 1> x_ffvar(d);
             for (int k = 0; k < d; ++k) 
               x_ffvar(k) = fvar<fvar<var> >(fvar<var>(x(k),i==k),
                                             fvar<var>(j==k,0));
