@@ -3,8 +3,6 @@
 
 #include <stan/meta/traits.hpp>
 #include <stan/error_handling/domain_error.hpp>
-#include <string>
-#include <typeinfo>
 #include <stan/error_handling/matrix/check_size_match.hpp>
 
 namespace stan {
@@ -15,7 +13,7 @@ namespace stan {
      *
      * This function only checks the runtime sizes for variables that
      * implement a <code>size()</code> method.
-     * 
+     *
      * @tparam T_y1 Type of the first variable
      * @tparam T_y2 Type of the second variable
      *

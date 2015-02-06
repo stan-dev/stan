@@ -1,7 +1,6 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_MULTIPLICABLE_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_MULTIPLICABLE_HPP
 
-#include <sstream>
 #include <stan/meta/traits.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/error_handling/matrix/check_size_match.hpp>
@@ -19,7 +18,7 @@ namespace stan {
      *
      * @tparam T1 Type of first matrix
      * @tparam T2 Type of second matrix
-     * 
+     *
      * @param function Function name (for error messages)
      * @param name1 Variable name for the first matrix (for error messages)
      * @param y1 First matrix
@@ -38,8 +37,8 @@ namespace stan {
                                     const T2& y2) {
       check_positive_size(function, name1, "rows()", y1.rows());
       check_positive_size(function, name2, "cols()", y2.cols());
-      check_size_match(function, 
-                       "Columns of ", name1, y1.cols(), 
+      check_size_match(function,
+                       "Columns of ", name1, y1.cols(),
                        "Rows of ", name2, y2.rows());
       check_positive_size(function, name1, "cols()", y1.cols());
       return true;

@@ -1,7 +1,6 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_POS_SEMIDEFINITE_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_POS_SEMIDEFINITE_HPP
-#include <iostream>
-#include <sstream>
+
 #include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/matrix/check_symmetric.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
@@ -10,11 +9,12 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/math/matrix/value_of_rec.hpp>
+#include <sstream>
 
 namespace stan {
 
   namespace math {
-
+    using Eigen::Dynamic;
     /**
      * Return <code>true</code> if the specified matrix is positive definite
      *
@@ -32,22 +32,23 @@ namespace stan {
      *   or if any element of the matrix is <code>NaN</code>.
      */
     template <typename T_y>
-    inline bool 
+    inline bool
     check_pos_semidefinite(const char* function,
                            const char* name,
-                           const Eigen::Matrix<T_y, Eigen::Dynamic, Eigen::Dynamic>& y) {
+                           const Eigen::Matrix<T_y, Dynamic, Dynamic>& y) {
       check_symmetric(function, name, y);
       check_positive_size(function, name, "rows", y.rows());
-      
-      if (y.rows() == 1 && !(y(0,0) >= 0.0))
+
+      if (y.rows() == 1 && !(y(0, 0) >= 0.0))
         domain_error(function, name, y, "is not positive semi-definite: ");
 
       using Eigen::LDLT;
       using Eigen::Matrix;
       using Eigen::Dynamic;
-      LDLT<Matrix<double, Dynamic, Dynamic> > cholesky 
+      LDLT<Matrix<double, Dynamic, Dynamic> > cholesky
         = value_of_rec(y).ldlt();
-      if (cholesky.info() != Eigen::Success || (cholesky.vectorD().array() < 0.0).any())
+      if (cholesky.info() != Eigen::Success
+          || (cholesky.vectorD().array() < 0.0).any())
         domain_error(function, name, y, "is not positive semi-definite:\n");
       check_not_nan(function, name, y);
       return true;

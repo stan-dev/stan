@@ -1,9 +1,10 @@
 #ifndef STAN__ERROR_HANDLING__SCALAR__CHECK_CONSISTENT_SIZE_HPP
 #define STAN__ERROR_HANDLING__SCALAR__CHECK_CONSISTENT_SIZE_HPP
 
-#include <sstream>
 #include <stan/error_handling/invalid_argument.hpp>
 #include <stan/meta/traits.hpp>
+#include <sstream>
+#include <string>
 
 namespace stan {
   namespace math {
@@ -33,7 +34,7 @@ namespace stan {
         return true;
       if (is_vector<T>::value && expected_size == stan::size_of(x))
         return true;
-      
+
       std::stringstream msg;
       msg << ", expecting dimension = "
           << expected_size

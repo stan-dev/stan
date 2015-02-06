@@ -3,6 +3,7 @@
 
 #include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/domain_error_vec.hpp>
+#include <string>
 
 namespace stan {
   namespace math {
@@ -11,7 +12,7 @@ namespace stan {
       template <typename T_y, typename T_high, bool is_vec>
       struct less {
         static bool check(const char* function,
-                          const char* name,  
+                          const char* name,
                           const T_y& y,
                           const T_high& high) {
           using stan::length;
@@ -29,7 +30,7 @@ namespace stan {
           return true;
         }
       };
-    
+
       template <typename T_y, typename T_high>
       struct less<T_y, T_high, true> {
         static bool check(const char* function,
@@ -39,7 +40,7 @@ namespace stan {
           using stan::length;
           VectorView<const T_high> high_vec(high);
           for (size_t n = 0; n < length(y); n++) {
-            if (!(stan::get(y,n) < high_vec[n])) {
+            if (!(stan::get(y, n) < high_vec[n])) {
               std::stringstream msg;
               msg << ", but must be less than ";
               msg << high_vec[n];
@@ -74,7 +75,7 @@ namespace stan {
      */
     template <typename T_y, typename T_high>
     inline bool check_less(const char* function,
-                           const char* name,  
+                           const char* name,
                            const T_y& y,
                            const T_high& high) {
       return less<T_y, T_high, is_vector_like<T_y>::value>

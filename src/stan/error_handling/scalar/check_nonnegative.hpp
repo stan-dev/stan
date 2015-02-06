@@ -19,13 +19,13 @@ namespace stan {
                           const T_y& y) {
           // have to use not is_unsigned. is_signed will be false
           // floating point types that have no unsigned versions.
-          if (!boost::is_unsigned<T_y>::value && !(y >= 0)) 
-            domain_error(function, name, y, 
+          if (!boost::is_unsigned<T_y>::value && !(y >= 0))
+            domain_error(function, name, y,
                          "is ", ", but must be >= 0!");
           return true;
         }
       };
-    
+
       template <typename T_y>
       struct nonnegative<T_y, true> {
         static bool check(const char* function,
@@ -35,8 +35,8 @@ namespace stan {
           using stan::math::value_type;
 
           for (size_t n = 0; n < length(y); n++) {
-            if (!boost::is_unsigned<typename value_type<T_y>::type>::value 
-                && !(stan::get(y,n) >= 0)) 
+            if (!boost::is_unsigned<typename value_type<T_y>::type>::value
+                && !(stan::get(y, n) >= 0))
               domain_error_vec(function, name, y, n,
                                "is ", ", but must be >= 0!");
           }
@@ -65,7 +65,7 @@ namespace stan {
     inline bool check_nonnegative(const char* function,
                                   const char* name,
                                   const T_y& y) {
-      return nonnegative<T_y,is_vector_like<T_y>::value>
+      return nonnegative<T_y, is_vector_like<T_y>::value>
         ::check(function, name, y);
     }
   }

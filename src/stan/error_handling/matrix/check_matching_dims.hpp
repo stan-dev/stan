@@ -1,10 +1,10 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_MATCHING_DIMS_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_MATCHING_DIMS_HPP
 
-#include <sstream>
 #include <stan/error_handling/domain_error.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/error_handling/matrix/check_size_match.hpp>
+#include <sstream>
 
 namespace stan {
   namespace math {
@@ -12,10 +12,10 @@ namespace stan {
     /**
      * Return <code>true</code> if the two matrices are of the same size.
      *
-     * This function checks not only the runtime sizes, but the static 
+     * This function checks not only the runtime sizes, but the static
      * sizes as well. For example, a 4x1 matrix is not the same as a vector
      * with 4 elements.
-     * 
+     *
      * @tparam T1 Scalar type of the first matrix
      * @tparam T2 Scalar type of the second matrix
      * @tparam R1 Rows specified at compile time of the first matrix
@@ -36,13 +36,13 @@ namespace stan {
     template <typename T1, typename T2, int R1, int C1, int R2, int C2>
     inline bool check_matching_dims(const char* function,
                                     const char* name1,
-                                    const Eigen::Matrix<T1,R1,C1>& y1,
+                                    const Eigen::Matrix<T1, R1, C1>& y1,
                                     const char* name2,
-                                    const Eigen::Matrix<T2,R2,C2>& y2) {
-      check_size_match(function, 
+                                    const Eigen::Matrix<T2, R2, C2>& y2) {
+      check_size_match(function,
                        "Rows of ", name1, y1.rows(),
                        "rows of ", name2, y2.rows());
-      check_size_match(function, 
+      check_size_match(function,
                        "Columns of ", name1, y1.cols(),
                        "columns of ", name2, y2.cols());
       return true;

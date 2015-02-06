@@ -3,6 +3,7 @@
 
 #include <stan/error_handling/domain_error_vec.hpp>
 #include <stan/error_handling/domain_error.hpp>
+#include <string>
 
 namespace stan {
   namespace math {
@@ -31,7 +32,7 @@ namespace stan {
           return true;
         }
       };
-      
+
       template <typename T_y,
                 typename T_low>
       struct greater_or_equal<T_y, T_low, true> {
@@ -43,7 +44,7 @@ namespace stan {
           using stan::get;
           VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(y); n++) {
-            if (!(get(y,n) >= low_vec[n])) {
+            if (!(get(y, n) >= low_vec[n])) {
               std::stringstream msg;
               msg << ", but must be greater than or equal to ";
               msg << low_vec[n];
@@ -56,7 +57,7 @@ namespace stan {
         }
       };
     }
-    
+
     /**
      * Return <code>true</code> if <code>y</code> is greater or equal
      * than <code>low</code>.

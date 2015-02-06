@@ -1,10 +1,11 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_VECTOR_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_VECTOR_HPP
 
-#include <sstream>
 #include <stan/meta/traits.hpp>
 #include <stan/error_handling/invalid_argument.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <sstream>
+#include <string>
 
 namespace stan {
   namespace math {
@@ -15,7 +16,7 @@ namespace stan {
      *
      * This function checks the runtime size of the matrix to check
      * whether it is a row or column vector.
-     * 
+     *
      * @tparam T Scalar type of the matrix
      * @tparam R Compile time rows of the matrix
      * @tparam C Compile time columns of the matrix
@@ -31,16 +32,16 @@ namespace stan {
     template <typename T, int R, int C>
     inline bool check_vector(const char* function,
                              const char* name,
-                             const Eigen::Matrix<T,R,C>& x) {
+                             const Eigen::Matrix<T, R, C>& x) {
       if (R == 1)
         return true;
       if (C == 1)
         return true;
       if (x.rows() == 1 || x.cols() == 1)
         return true;
-      
+
       std::ostringstream msg;
-      msg << ") has " << x.rows() << " rows and " 
+      msg << ") has " << x.rows() << " rows and "
           << x.cols() << " columns but it should be a vector so it should "
           << "either have 1 row or 1 column";
       std::string msg_str(msg.str());

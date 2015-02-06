@@ -1,14 +1,14 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_SIMPLEX_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_SIMPLEX_HPP
 
-#include <sstream>
 #include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/matrix/constraint_tolerance.hpp>
 #include <stan/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/meta/traits.hpp>
-
+#include <sstream>
+#include <string>
 
 namespace stan {
 
@@ -34,18 +34,18 @@ namespace stan {
      * @return <code>true</code> if the vector is a simplex
      * @throw <code>std::invalid_argument</code> if <code>theta</code>
      *   is a 0-vector.
-     * @throw <code>std::domain_error</code> if the vector is not a 
+     * @throw <code>std::domain_error</code> if the vector is not a
      *   simplex or if any element is <code>NaN</code>.
      */
     template <typename T_prob>
     bool check_simplex(const char* function,
                        const char* name,
-                       const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
+                       const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
       using stan::math::index_type;
 
-      typedef typename index_type<Matrix<T_prob,Dynamic,1> >::type size_t;
+      typedef typename index_type<Matrix<T_prob, Dynamic, 1> >::type size_t;
 
       check_nonzero_size(function, name, theta);
       if (!(fabs(1.0 - theta.sum()) <= CONSTRAINT_TOLERANCE)) {
@@ -74,8 +74,7 @@ namespace stan {
         }
       }
       return true;
-    }                         
-
+    }
   }
 }
 #endif

@@ -17,13 +17,13 @@ namespace stan {
                           const char* name,
                           const T_y& y) {
           using stan::math::value_of_rec;
-          if ((boost::math::isnan)(value_of_rec(y))) 
+          if ((boost::math::isnan)(value_of_rec(y)))
             domain_error(function, name, y,
                          "is ", ", but must not be nan!");
           return true;
         }
       };
-    
+
       template <typename T_y>
       struct not_nan<T_y, true> {
         static bool check(const char* function,
@@ -31,7 +31,7 @@ namespace stan {
                           const T_y& y) {
           using stan::math::value_of_rec;
           for (size_t n = 0; n < stan::length(y); n++) {
-            if ((boost::math::isnan)(value_of_rec(stan::get(y,n))))
+            if ((boost::math::isnan)(value_of_rec(stan::get(y, n))))
               domain_error_vec(function, name, y, n,
                                "is ", ", but must not be nan!");
           }

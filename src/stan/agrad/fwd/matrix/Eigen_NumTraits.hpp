@@ -1,10 +1,9 @@
 #ifndef STAN__AGRAD__FWD__MATRIX__EIGEN_NUMTRAITS_HPP
 #define STAN__AGRAD__FWD__MATRIX__EIGEN_NUMTRAITS_HPP
 
-#include <limits>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-
+#include <limits>
 
 namespace Eigen {
 
@@ -41,15 +40,15 @@ namespace Eigen {
      *
      * @return Same epsilon as a <code>double</code>.
      */
-    inline static Real epsilon() { 
-      return std::numeric_limits<double>::epsilon(); 
+    inline static Real epsilon() {
+      return std::numeric_limits<double>::epsilon();
     }
 
     /**
      * Return dummy precision
      */
     inline static Real dummy_precision() {
-      return 1e-12; // copied from NumTraits.h values for double
+      return 1e-12;  // copied from NumTraits.h values for double
     }
 
     /**
@@ -93,14 +92,13 @@ namespace Eigen {
      * Implemented this for printing to stream.
      */
     template<typename T>
-    struct significant_decimals_default_impl<stan::agrad::fvar<T>,false>
-    {
-      static inline int run()
-      {
+    struct significant_decimals_default_impl<stan::agrad::fvar<T>, false> {
+      static inline int run() {
         using std::ceil;
         using std::log;
-        return cast<double,int>(ceil(-log(std::numeric_limits<double>::epsilon())
-                                     / log(10.0)));
+        return cast<double, int>
+          (ceil(-log(std::numeric_limits<double>::epsilon())
+                / log(10.0)));
       }
     };
 

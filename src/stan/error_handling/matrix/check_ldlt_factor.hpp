@@ -1,16 +1,17 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_LDLT_FACTOR_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_LDLT_FACTOR_HPP
 
-#include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/error_handling/domain_error.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
+#include <sstream>
+#include <string>
 
 namespace stan {
   namespace math {
 
     /**
-     * Return <code>true</code> if the argument is a valid 
+     * Return <code>true</code> if the argument is a valid
      * <code>stan::math::LDLT_factor</code>.
      *
      * <code>LDLT_factor</code> can be constructed in an invalid
@@ -20,7 +21,7 @@ namespace stan {
      * @tparam T Type of scalar
      * @tparam R Rows of the matrix
      * @tparam C Columns of the matrix
-     * 
+     *
      * @param function Function name (for error messages)
      * @param name Variable name (for error messages)
      * @param A <code>stan::math::LDLT_factor</code> to check for validity.
@@ -32,7 +33,7 @@ namespace stan {
     template <typename T, int R, int C>
     inline bool check_ldlt_factor(const char* function,
                                   const char* name,
-                                  stan::math::LDLT_factor<T,R,C> &A) {
+                                  stan::math::LDLT_factor<T, R, C> &A) {
       if (!A.success()) {
         std::ostringstream msg;
         msg << "is not positive definite. "

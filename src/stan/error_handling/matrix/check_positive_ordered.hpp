@@ -1,12 +1,13 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_POSITIVE_ORDERED_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_POSITIVE_ORDERED_HPP
 
-#include <sstream>
 #include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/matrix/check_ordered.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 #include <stan/meta/traits.hpp>
+#include <sstream>
+#include <string>
 
 namespace stan {
 
@@ -15,7 +16,7 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified vector contains
      * non-negative values and is sorted into strictly increasing
-     * order. 
+     * order.
      *
      * @param function Function name (for error messages)
      * @param name Variable name (for error messages)
@@ -27,21 +28,22 @@ namespace stan {
      *   values, or if any element is <code>NaN</code>.
      */
     template <typename T_y>
-    bool check_positive_ordered(const char* function, 
-                                const char* name,
-                                const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y) {
+    bool
+    check_positive_ordered(const char* function,
+                           const char* name,
+                           const Eigen::Matrix<T_y, Eigen::Dynamic, 1>& y) {
       using Eigen::Dynamic;
       using Eigen::Matrix;
       using stan::math::index_type;
 
-      typedef typename index_type<Matrix<T_y,Dynamic,1> >::type size_type;
+      typedef typename index_type<Matrix<T_y, Dynamic, 1> >::type size_type;
       if (y.size() == 0) {
         return true;
       }
       if (y[0] < 0) {
         std::ostringstream msg;
         msg << "is not a valid positive_ordered vector."
-            << " The element at " << stan::error_index::value 
+            << " The element at " << stan::error_index::value
             << " is ";
         std::string msg_str(msg.str());
         domain_error(function, name, y[0],
@@ -50,8 +52,7 @@ namespace stan {
       }
       check_ordered(function, name, y);
       return true;
-    }                         
-
+    }
   }
 }
 #endif

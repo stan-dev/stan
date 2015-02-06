@@ -3,6 +3,7 @@
 
 #include <stan/error_handling/scalar/check_consistent_size.hpp>
 #include <stan/meta/traits.hpp>
+#include <algorithm>
 
 namespace stan {
   namespace math {
@@ -29,7 +30,7 @@ namespace stan {
     template <typename T1, typename T2>
     inline bool check_consistent_sizes(const char* function,
                                        const char* name1,
-                                       const T1& x1, 
+                                       const T1& x1,
                                        const char* name2,
                                        const T2& x2) {
       using stan::is_vector;
@@ -64,10 +65,10 @@ namespace stan {
     template <typename T1, typename T2, typename T3>
     inline bool check_consistent_sizes(const char* function,
                                        const char* name1,
-                                       const T1& x1, 
-                                       const char* name2, 
-                                       const T2& x2, 
-                                       const char* name3, 
+                                       const T1& x1,
+                                       const char* name2,
+                                       const T2& x2,
+                                       const char* name3,
                                        const T3& x3) {
       size_t max_size = std::max(is_vector<T1>::value * size_of(x1),
                                  std::max(is_vector<T2>::value * size_of(x2),
@@ -104,18 +105,19 @@ namespace stan {
      */
     template <typename T1, typename T2, typename T3, typename T4>
     inline bool check_consistent_sizes(const char* function,
-                                       const char* name1, 
-                                       const T1& x1, 
-                                       const char* name2, 
-                                       const T2& x2, 
-                                       const char* name3, 
-                                       const T3& x3, 
+                                       const char* name1,
+                                       const T1& x1,
+                                       const char* name2,
+                                       const T2& x2,
+                                       const char* name3,
+                                       const T3& x3,
                                        const char* name4,
                                        const T4& x4) {
-      size_t max_size = std::max(is_vector<T1>::value * size_of(x1),
-                                 std::max(is_vector<T2>::value * size_of(x2),
-                                          std::max(is_vector<T3>::value * size_of(x3), 
-                                                   is_vector<T4>::value * size_of(x4))));
+      size_t max_size
+        = std::max(is_vector<T1>::value * size_of(x1),
+                   std::max(is_vector<T2>::value * size_of(x2),
+                            std::max(is_vector<T3>::value * size_of(x3),
+                                     is_vector<T4>::value * size_of(x4))));
       return check_consistent_size(function, name1, x1, max_size)
         && check_consistent_size(function, name2, x2, max_size)
         && check_consistent_size(function, name3, x3, max_size)

@@ -3,6 +3,7 @@
 
 #include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/domain_error_vec.hpp>
+#include <string>
 
 namespace stan {
   namespace math {
@@ -24,7 +25,7 @@ namespace stan {
               msg << ", but must be equal to ";
               msg << eq_vec[n];
               std::string msg_str(msg.str());
-              
+
               domain_error(function, name, y,
                            "is ", msg_str.c_str());
             }
@@ -32,7 +33,7 @@ namespace stan {
           return true;
         }
       };
-      
+
       // throws if y or eq is nan
       template <typename T_y,
                 typename T_eq>
@@ -45,7 +46,7 @@ namespace stan {
           using stan::get;
           VectorView<const T_eq> eq_vec(eq);
           for (size_t n = 0; n < length(y); n++) {
-            if (!(get(y,n) == eq_vec[n])) {
+            if (!(get(y, n) == eq_vec[n])) {
               std::stringstream msg;
               msg << ", but must be equal to ";
               msg << eq_vec[n];

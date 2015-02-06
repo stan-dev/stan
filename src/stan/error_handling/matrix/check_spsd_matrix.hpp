@@ -1,7 +1,6 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_SPSD_MATRIX_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_SPSD_MATRIX_HPP
 
-#include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/error_handling/scalar/check_positive_size.hpp>
 #include <stan/error_handling/matrix/check_pos_semidefinite.hpp>
@@ -10,9 +9,9 @@
 
 namespace stan {
   namespace math {
-
+    using Eigen::Dynamic;
     /**
-     * Return <code>true</code> if the specified matrix is a 
+     * Return <code>true</code> if the specified matrix is a
      * square, symmetric, and positive semi-definite.
      *
      * @tparam T Scalar type of the matrix
@@ -29,9 +28,10 @@ namespace stan {
      *   or if the matrix is not positive semi-definite
      */
     template <typename T_y>
-    inline bool check_spsd_matrix(const char* function, 
-                                  const char* name,
-                                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
+    inline bool
+    check_spsd_matrix(const char* function,
+                      const char* name,
+                      const Eigen::Matrix<T_y, Dynamic, Dynamic>& y) {
       check_square(function, name, y);
       check_positive_size(function, name, "rows()", y.rows());
       check_symmetric(function, name, y);

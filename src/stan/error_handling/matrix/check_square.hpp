@@ -1,9 +1,9 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_SQUARE_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_SQUARE_HPP
 
-#include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/error_handling/matrix/check_size_match.hpp>
+#include <sstream>
 
 namespace stan {
   namespace math {
@@ -24,11 +24,12 @@ namespace stan {
      *    is not square
      */
     template <typename T_y>
-    inline bool check_square(const char* function,
-                             const char* name,
-                             const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y) {
-      check_size_match(function, 
-                       "Expecting a square matrix; rows of ", name, y.rows(), 
+    inline bool
+    check_square(const char* function,
+                 const char* name,
+                 const Eigen::Matrix<T_y, Eigen::Dynamic, Eigen::Dynamic>& y) {
+      check_size_match(function,
+                       "Expecting a square matrix; rows of ", name, y.rows(),
                        "columns of ", name, y.cols());
       return true;
     }

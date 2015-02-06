@@ -3,12 +3,12 @@
 
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 namespace stan {
   namespace math {
 
-    inline 
-    void 
+    inline void
     validate_non_negative_index(const char* var_name,
                                 const char* expr,
                                 int val) {

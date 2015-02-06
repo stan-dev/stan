@@ -23,7 +23,7 @@ namespace stan {
           return true;
         }
       };
-    
+
       template <typename T_y>
       struct finite<T_y, true> {
         static bool check(const char* function,
@@ -32,7 +32,7 @@ namespace stan {
           using stan::math::value_of_rec;
           using stan::length;
           for (size_t n = 0; n < length(y); n++) {
-            if (!(boost::math::isfinite)(value_of_rec(stan::get(y,n))))
+            if (!(boost::math::isfinite)(value_of_rec(stan::get(y, n))))
               domain_error_vec(function, name, y, n,
                                "is ", ", but must be finite!");
           }
@@ -40,7 +40,7 @@ namespace stan {
         }
       };
     }
-    
+
     /**
      * Return <code>true</code> if <code>y</code> is finite.
      *

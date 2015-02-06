@@ -3,6 +3,7 @@
 
 #include <stan/error_handling/domain_error.hpp>
 #include <stan/error_handling/domain_error_vec.hpp>
+#include <string>
 
 namespace stan {
   namespace math {
@@ -13,7 +14,7 @@ namespace stan {
                 bool is_vec>
       struct greater {
         static bool check(const char* function,
-                          const char* name,  
+                          const char* name,
                           const T_y& y,
                           const T_low& low) {
           using stan::length;
@@ -31,7 +32,7 @@ namespace stan {
           return true;
         }
       };
-    
+
       template <typename T_y,
                 typename T_low>
       struct greater<T_y, T_low, true> {
@@ -42,7 +43,7 @@ namespace stan {
           using stan::length;
           VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(y); n++) {
-            if (!(stan::get(y,n) > low_vec[n])) {
+            if (!(stan::get(y, n) > low_vec[n])) {
               std::stringstream msg;
               msg << ", but must be greater than ";
               msg << low_vec[n];
@@ -55,7 +56,7 @@ namespace stan {
         }
       };
     }
-    
+
     /**
      * Return <code>true</code> if <code>y</code> is strictly greater
      * than <code>low</code>.
@@ -77,13 +78,12 @@ namespace stan {
      */
     template <typename T_y, typename T_low>
     inline bool check_greater(const char* function,
-                              const char* name,  
+                              const char* name,
                               const T_y& y,
                               const T_low& low) {
       return greater<T_y, T_low, is_vector_like<T_y>::value>
         ::check(function, name, y, low);
     }
- 
   }
 }
 #endif

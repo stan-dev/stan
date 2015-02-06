@@ -1,8 +1,9 @@
 #ifndef STAN__ERROR_HANDLING__SCALAR__CHECK_POSITIVE_SIZE_HPP
 #define STAN__ERROR_HANDLING__SCALAR__CHECK_POSITIVE_SIZE_HPP
 
-#include <sstream>
 #include <stan/error_handling/invalid_argument.hpp>
+#include <sstream>
+#include <string>
 
 namespace stan {
   namespace math {
@@ -27,7 +28,7 @@ namespace stan {
         std::stringstream msg;
         msg << "; dimension size expression = " << expr;
         std::string msg_str(msg.str());
-        invalid_argument(function, name, size, 
+        invalid_argument(function, name, size,
                          "must have a positive size, but is ",
                          msg_str.c_str());
       }

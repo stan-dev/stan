@@ -1,10 +1,11 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_STD_VECTOR_INDEX_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_STD_VECTOR_INDEX_HPP
 
-#include <sstream>
-#include <vector>
 #include <stan/error_handling/out_of_range.hpp>
 #include <stan/meta/traits.hpp>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace math {
@@ -21,7 +22,7 @@ namespace stan {
      * @param name Variable name (for error messages)
      * @param y <code>std::vector</code> to test
      * @param i Index
-     * 
+     *
      * @return <code>true</code> if the index is a valid in std vector.
      * @throw <code>std::out_of_range</code> if the index is out of range.
      */
@@ -33,7 +34,7 @@ namespace stan {
       if (i >= static_cast<int>(stan::error_index::value)
           && i < static_cast<int>(y.size() + stan::error_index::value))
         return true;
-      
+
       std::stringstream msg;
       msg << " for " << name;
       std::string msg_str(msg.str());
