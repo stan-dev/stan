@@ -73,9 +73,11 @@ namespace stan {
      * = \dfrac{\theta \exp(\lambda_2)}
      * {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)} 
      * \f]
-     * @param[in] T_theta theta scalar type.
-     * @param[in] T_lambda1 lambda1 scalar type.
-     * @param[in] T_lambda2 lambda2 scalar type.
+     *
+     * @tparam T_theta theta scalar type.
+     * @tparam T_lambda1 lambda1 scalar type.
+     * @tparam T_lambda2 lambda2 scalar type.
+     *
      * @param[in] theta mixing proportion in [0,1].
      * @param[in] lambda1 first log density.
      * @param[in] lambda2 second log density.

@@ -412,9 +412,9 @@ TEST(AgradFwdMatrixOperatorMultiplication,fd_matrix_vector_exception) {
   matrix_fd v1(3,2);
   vector_d d2(4);
   vector_fd v2(4);
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorMultiplication,fd_rowvector_matrix) {
   using stan::math::matrix_d;
@@ -473,9 +473,9 @@ TEST(AgradFwdMatrixOperatorMultiplication,fd_rowvector_matrix_exception) {
   row_vector_fd v1(4);
   matrix_d d2(3,2);
   matrix_fd v2(3,2);
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorMultiplication,fd_matrix_matrix) {
   using stan::math::matrix_d;
@@ -544,9 +544,9 @@ TEST(AgradFwdMatrixOperatorMultiplication,fd_matrix_matrix_exception) {
   matrix_d d2(3,2);
   matrix_fd v2(3,2);
 
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorMultiplication,fv_vector_scalar_1stDeriv) {
   using stan::math::vector_d;
@@ -1167,9 +1167,9 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_vector_exception) {
   matrix_fv v1(3,2);
   vector_d d2(4);
   vector_fv v2(4);
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_matrix_1stDeriv) {
   using stan::math::matrix_d;
@@ -1273,9 +1273,9 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_matrix_exception) {
   row_vector_fv v1(4);
   matrix_d d2(3,2);
   matrix_fv v2(3,2);
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_matrix_1stDeriv) {
   using stan::math::matrix_d;
@@ -1388,9 +1388,9 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_matrix_exception) {
   matrix_d d2(3,2);
   matrix_fv v2(3,2);
 
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorMultiplication,ffd_vector_scalar) {
   using stan::math::vector_d;
@@ -1831,9 +1831,9 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffd_matrix_vector_exception) {
   matrix_ffd v1(3,2);
   vector_d d2(4);
   vector_ffd v2(4);
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorMultiplication,ffd_rowvector_matrix) {
   using stan::math::matrix_d;
@@ -1897,9 +1897,9 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffd_rowvector_matrix_exception) {
   row_vector_ffd v1(4);
   matrix_d d2(3,2);
   matrix_ffd v2(3,2);
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorMultiplication,ffd_matrix_matrix) {
   using stan::math::matrix_d;
@@ -1982,9 +1982,9 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffd_matrix_matrix_exception) {
   matrix_d d2(3,2);
   matrix_ffd v2(3,2);
 
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorMultiplication,ffv_vector_scalar_1stDeriv) {
   using stan::math::vector_d;
@@ -2987,9 +2987,9 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_vector_exception) {
   matrix_ffv v1(3,2);
   vector_d d2(4);
   vector_ffv v2(4);
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_matrix_1stDeriv) {
   using stan::math::matrix_d;
@@ -3177,9 +3177,9 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_matrix_exception) {
   row_vector_ffv v1(4);
   matrix_d d2(3,2);
   matrix_ffv v2(3,2);
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_matrix_1stDeriv) {
   using stan::math::matrix_d;
@@ -3377,7 +3377,7 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_matrix_exception) {
   matrix_d d2(3,2);
   matrix_ffv v2(3,2);
 
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }

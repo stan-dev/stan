@@ -26,9 +26,9 @@ TEST(AgradFwdMatrixQrQ, fd) {
 
   using stan::math::qr_Q;
   using stan::math::transpose;
-  EXPECT_THROW(qr_Q(m0),std::domain_error);
+  EXPECT_THROW(qr_Q(m0), std::invalid_argument);
   EXPECT_NO_THROW(qr_Q(m1));
-  EXPECT_THROW(qr_Q(transpose(m1)),std::domain_error);
+  EXPECT_THROW(qr_Q(transpose(m1)), std::domain_error);
 
   matrix_fd res = qr_Q(m1);
   matrix_d res2 = qr_Q(m2);
@@ -65,9 +65,9 @@ TEST(AgradFwdMatrixQrQ, ffd) {
 
   using stan::math::qr_Q;
   using stan::math::transpose;
-  EXPECT_THROW(qr_Q(m0),std::domain_error);
+  EXPECT_THROW(qr_Q(m0), std::invalid_argument);
   EXPECT_NO_THROW(qr_Q(m1));
-  EXPECT_THROW(qr_Q(transpose(m1)),std::domain_error);
+  EXPECT_THROW(qr_Q(transpose(m1)), std::domain_error);
 
   matrix_ffd res = qr_Q(m1);
   matrix_d res2 = qr_Q(m2);
@@ -104,9 +104,9 @@ TEST(AgradFwdMatrixQrQ, fv1) {
 
   using stan::math::qr_Q;
   using stan::math::transpose;
-  EXPECT_THROW(qr_Q(m0),std::domain_error);
+  EXPECT_THROW(qr_Q(m0), std::invalid_argument);
   EXPECT_NO_THROW(qr_Q(m1));
-  EXPECT_THROW(qr_Q(transpose(m1)),std::domain_error);
+  EXPECT_THROW(qr_Q(transpose(m1)), std::domain_error);
 
   matrix_fv res = qr_Q(m1);
   matrix_d res2 = qr_Q(m2);
@@ -198,9 +198,9 @@ TEST(AgradFwdMatrixQrQ, ffv1) {
 
   using stan::math::qr_Q;
   using stan::math::transpose;
-  EXPECT_THROW(qr_Q(m0),std::domain_error);
+  EXPECT_THROW(qr_Q(m0), std::invalid_argument);
   EXPECT_NO_THROW(qr_Q(m1));
-  EXPECT_THROW(qr_Q(transpose(m1)),std::domain_error);
+  EXPECT_THROW(qr_Q(transpose(m1)), std::domain_error);
 
   matrix_ffv res = qr_Q(m1);
   matrix_d res2 = qr_Q(m2);

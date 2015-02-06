@@ -45,7 +45,7 @@ TEST(MathMatrix,multiply_rv_v_exception) {
 
   rv.resize(2);
   v.resize(3);
-  EXPECT_THROW(stan::math::multiply(rv, v), std::domain_error);
+  EXPECT_THROW(stan::math::multiply(rv, v), std::invalid_argument);
 }
 TEST(MathMatrix,multiply_m_v_exception) {
   stan::math::matrix_d m;
@@ -57,11 +57,12 @@ TEST(MathMatrix,multiply_m_v_exception) {
 
   m.resize(3, 0);
   v.resize(0);
-  EXPECT_NO_THROW(stan::math::multiply(m, v));
+  EXPECT_THROW(stan::math::multiply(m, v),
+               std::invalid_argument);
 
   m.resize(2, 3);
   v.resize(2);
-  EXPECT_THROW(stan::math::multiply(m, v), std::domain_error);  
+  EXPECT_THROW(stan::math::multiply(m, v), std::invalid_argument);  
 }
 TEST(MathMatrix,multiply_rv_m_exception) {
   stan::math::row_vector_d rv;
@@ -73,11 +74,12 @@ TEST(MathMatrix,multiply_rv_m_exception) {
 
   rv.resize(0);
   m.resize(0, 3);
-  EXPECT_NO_THROW(stan::math::multiply(rv, m));
+  EXPECT_THROW(stan::math::multiply(rv, m),
+               std::invalid_argument);
 
   rv.resize(3);
   m.resize(2, 3);
-  EXPECT_THROW(stan::math::multiply(rv, m), std::domain_error);
+  EXPECT_THROW(stan::math::multiply(rv, m), std::invalid_argument);
 }
 TEST(MathMatrix,multiply_m_m_exception) {
   stan::math::matrix_d m1, m2;
@@ -89,11 +91,12 @@ TEST(MathMatrix,multiply_m_m_exception) {
   
   m1.resize(2, 0);
   m2.resize(0, 3);
-  EXPECT_NO_THROW(stan::math::multiply(m1, m2));
+  EXPECT_THROW(stan::math::multiply(m1, m2),
+               std::invalid_argument);
 
   m1.resize(4, 3);
   m2.resize(2, 3);
-  EXPECT_THROW(stan::math::multiply(m1, m2), std::domain_error);
+  EXPECT_THROW(stan::math::multiply(m1, m2), std::invalid_argument);
 }
 
 TEST(MathMatrix, multiply) {

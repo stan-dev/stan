@@ -10,7 +10,7 @@ TEST(MathMatrix, cholesky_decompose) {
   using stan::math::cholesky_decompose;
 
   EXPECT_NO_THROW(cholesky_decompose(m0));
-  EXPECT_THROW(cholesky_decompose(m1),std::domain_error);
+  EXPECT_THROW(cholesky_decompose(m1),std::invalid_argument);
 }
 
 TEST(MathMatrix, cholesky_decompose_exception) {
@@ -25,7 +25,7 @@ TEST(MathMatrix, cholesky_decompose_exception) {
   EXPECT_NO_THROW(stan::math::cholesky_decompose(m));
   
   m.resize(2, 3);
-  EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
+  EXPECT_THROW(stan::math::cholesky_decompose(m), std::invalid_argument);
 
   // not symmetric
   m.resize(2,2);

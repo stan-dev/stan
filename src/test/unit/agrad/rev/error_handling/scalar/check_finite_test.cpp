@@ -4,7 +4,7 @@
 
 TEST(AgradRevErrorHandlingScalar,CheckFinite) {
   using stan::agrad::var;
-  using stan::error_handling::check_finite;
+  using stan::math::check_finite;
  
   const char* function = "check_bounded";
   const char* name = "x";
@@ -30,7 +30,7 @@ TEST(AgradRevErrorHandlingScalar,CheckFinite) {
 
 TEST(AgradRevErrorHandlingScalar, CheckFiniteVarCheckUnivariate) {
   using stan::agrad::var;
-  using stan::error_handling::check_finite;
+  using stan::math::check_finite;
 
   const char* function = "check_finite";
   var a(5.0);
@@ -54,7 +54,7 @@ TEST(AgradRevErrorHandlingScalar, CheckFiniteVarCheckUnivariate) {
 TEST(AgradRevErrorHandlingScalar, CheckFiniteVarCheckVectorized) {
   using stan::agrad::var;
   using std::vector;
-  using stan::error_handling::check_finite;
+  using stan::math::check_finite;
 
   int N = 5;
   const char* function = "check_finite";

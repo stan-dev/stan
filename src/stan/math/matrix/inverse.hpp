@@ -16,7 +16,7 @@ namespace stan {
     inline
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     inverse(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      stan::error_handling::check_square("inverse", "m", m);
+      stan::math::check_square("inverse", "m", m);
       return m.inverse();
     }
 

@@ -1,10 +1,53 @@
 #include <stan/error_handling/scalar/check_consistent_sizes.hpp>
 #include <gtest/gtest.h>
 
+TEST(ErrorHandlingScalar, checkConsistentSizes_zero) {
+  using stan::math::check_consistent_sizes;
+  const char* function = "testConsSizes";
+  const char* name1 = "name1";
+  const char* name2 = "name2";
+  const char* name3 = "name3";
+  const char* name4 = "name4";
+
+  std::vector<double> v1(0);
+  double d1;
+
+  ASSERT_EQ(0, stan::size_of(v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1));
+
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, d1));
+
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, v1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, v1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, d1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, v1, name3, d1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, v1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, v1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, d1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, v1, name2, d1, name3, d1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, v1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, v1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, d1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, v1, name3, d1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, v1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, v1, name4, d1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, d1, name4, v1));
+  EXPECT_TRUE(check_consistent_sizes(function, name1, d1, name2, d1, name3, d1, name4, d1));
+}
+
 TEST(ErrorHandlingScalar, checkConsistentSizes) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::error_handling::check_consistent_sizes;
+  using stan::math::check_consistent_sizes;
   using stan::size_of;
 
   const char* function = "testConsSizes";
@@ -31,30 +74,30 @@ TEST(ErrorHandlingScalar, checkConsistentSizes) {
   ASSERT_EQ(3U, size_of(v));
   const char* name = "inconsistent";
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name, v),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2, name3, v3),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name, v, name3, v3),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name2, v2, name, v),
-               std::domain_error);
+               std::invalid_argument);
 
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2, name3, v3, name4, v4),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name, v, name3, v3, name4, v4),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name2, v2, name, v, name4, v4),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2, name3, v3, name, v),
-               std::domain_error);
+               std::invalid_argument);
 }
 
 TEST(ErrorHandlingScalar, checkConsistentSizes_nan) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::error_handling::check_consistent_sizes;
+  using stan::math::check_consistent_sizes;
   using stan::size_of;
 
   const char* function = "testConsSizes";
@@ -87,23 +130,23 @@ TEST(ErrorHandlingScalar, checkConsistentSizes_nan) {
   ASSERT_EQ(3U, size_of(v));
   const char* name = "inconsistent";
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name, v),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2, name3, v3),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name, v, name3, v3),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name2, v2, name, v),
-               std::domain_error);
+               std::invalid_argument);
 
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2, name3, v3, name4, v4),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name, v, name3, v3, name4, v4),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name2, v2, name, v, name4, v4),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2, name3, v3, name, v),
-               std::domain_error);
+               std::invalid_argument);
 }
 

@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_finite.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_finite;
+using stan::math::check_finite;
 
 TEST(ErrorHandlingScalar,CheckFinite) {
   const char* function = "check_finite";
@@ -52,7 +52,7 @@ TEST(ErrorHandlingScalar,CheckFinite_Vector) {
   x.push_back(0);
   x.push_back(std::numeric_limits<double>::quiet_NaN());
   EXPECT_THROW(check_finite(function, "x", x), std::domain_error)
- << "check_finite should throw exception on NaN";
+    << "check_finite should throw exception on NaN";
 }
 
 // ---------- check_finite: matrix tests ----------

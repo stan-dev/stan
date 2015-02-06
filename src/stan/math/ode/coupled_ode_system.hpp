@@ -99,7 +99,7 @@ namespace stan {
                       std::vector<double>& dy_dt,
                       double t) {
         dy_dt = f_(t,y,theta_dbl_,x_,x_int_,msgs_);
-        stan::error_handling::check_matching_sizes("coupled_ode_system",
+        stan::math::check_matching_sizes("coupled_ode_system",
                                                    "y", y,
                                                    "dy_dt", dy_dt);
       }

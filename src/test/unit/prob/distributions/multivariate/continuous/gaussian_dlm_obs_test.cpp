@@ -134,11 +134,11 @@ TEST_F(ProbDistributionsGaussianDLMInputs, PoliciesY) {
 
 TEST_F(ProbDistributionsGaussianDLMInputs, PoliciesF) {
   Matrix<double, Dynamic, Dynamic> FF_sz1 = MatrixXd::Random(4, 3);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF_sz1, GG, V, W, m0, C0), std::domain_error);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF_sz1, GG, V_vec, W, m0, C0), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF_sz1, GG, V, W, m0, C0), std::invalid_argument);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF_sz1, GG, V_vec, W, m0, C0), std::invalid_argument);
   Matrix<double, Dynamic, Dynamic> FF_sz2 = MatrixXd::Random(2, 4);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF_sz2, GG, V, W, m0, C0), std::domain_error);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF_sz2, GG, V_vec, W, m0, C0), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF_sz2, GG, V, W, m0, C0), std::invalid_argument);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF_sz2, GG, V_vec, W, m0, C0), std::invalid_argument);
   // finite and NaN
   Matrix<double, Dynamic, Dynamic> FF_inf = FF;
   FF_inf(0, 0) = std::numeric_limits<double>::infinity();
@@ -153,11 +153,11 @@ TEST_F(ProbDistributionsGaussianDLMInputs, PoliciesF) {
 TEST_F(ProbDistributionsGaussianDLMInputs, PoliciesG) {
   // size
   Matrix<double, Dynamic, Dynamic> GG_sz1 = MatrixXd::Random(3, 3);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG_sz1, V, W, m0, C0), std::domain_error);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG_sz1, V_vec, W, m0, C0), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG_sz1, V, W, m0, C0), std::invalid_argument);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG_sz1, V_vec, W, m0, C0), std::invalid_argument);
   Matrix<double, Dynamic, Dynamic> GG_sz2 = MatrixXd::Random(2, 3);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG_sz2, V, W, m0, C0), std::domain_error);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG_sz2, V_vec, W, m0, C0), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG_sz2, V, W, m0, C0), std::invalid_argument);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG_sz2, V_vec, W, m0, C0), std::invalid_argument);
   // finite and NaN
   Matrix<double, Dynamic, Dynamic> GG_inf = GG;
   GG_inf(0, 0) = std::numeric_limits<double>::infinity();
@@ -191,12 +191,12 @@ TEST_F(ProbDistributionsGaussianDLMInputs, PoliciesW) {
   EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W_nan, m0, C0), std::domain_error);
   // wrong size
   Matrix<double, Dynamic, Dynamic> W_sz = MatrixXd::Identity(4, 4);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V, W_sz, m0, C0), std::domain_error);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W_sz, m0, C0), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V, W_sz, m0, C0), std::invalid_argument);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W_sz, m0, C0), std::invalid_argument);
   // not square
   Matrix<double, Dynamic, Dynamic> W_notsq = MatrixXd::Identity(2, 3);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V, W_notsq, m0, C0), std::domain_error);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W_notsq, m0, C0), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V, W_notsq, m0, C0), std::invalid_argument);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W_notsq, m0, C0), std::invalid_argument);
   // positive semi-definite is okay
   Matrix<double, Dynamic, Dynamic> W_psd = MatrixXd::Zero(2, 2);
   W_psd(0,0) = 1.0;
@@ -223,10 +223,10 @@ TEST_F(ProbDistributionsGaussianDLMInputs, PoliciesVMatrix) {
   EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_nan, W, m0, C0), std::domain_error);
   // wrong size
   Matrix<double, Dynamic, Dynamic> V2 = MatrixXd::Identity(2, 2);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V2, W, m0, C0), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V2, W, m0, C0), std::invalid_argument);
   // not square
   Matrix<double, Dynamic, Dynamic> V3 = MatrixXd::Identity(2, 3);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V3, W, m0, C0), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V3, W, m0, C0), std::invalid_argument);
   // positive semi-definite is okay
   Matrix<double, Dynamic, Dynamic> V_psd = MatrixXd::Zero(3,3);
   V_psd(0,0) = 1.0;
@@ -237,7 +237,7 @@ TEST_F(ProbDistributionsGaussianDLMInputs, PoliciesVVector) {
   // negative
   Matrix<double, Dynamic, Dynamic> V_neg = V_vec;
   V_neg(0) = -1;
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_neg, W, m0, C0), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_neg, W, m0, C0), std::invalid_argument);
   // finite and NaN
   Matrix<double, Dynamic, Dynamic> V_infinite = V_vec;
   V_infinite(0) = std::numeric_limits<double>::infinity();
@@ -247,7 +247,7 @@ TEST_F(ProbDistributionsGaussianDLMInputs, PoliciesVVector) {
   EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_nan, W, m0, C0), std::domain_error);
   // wrong size
   Matrix<double, Dynamic, 1> V_badsz = Matrix<double, Dynamic, 1>::Constant(2, 1.0);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_badsz, W, m0, C0), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_badsz, W, m0, C0), std::invalid_argument);
   // positive semi-definite is okay
   Matrix<double, Dynamic, 1> V_psd = Matrix<double, Dynamic, 1>::Zero(3);
   V_psd(0) = 1.0;
@@ -258,8 +258,8 @@ TEST_F(ProbDistributionsGaussianDLMInputs, Policiesm0) {
   // m0
   // size
   Matrix<double, Dynamic, 1> m0_sz = Matrix<double, Dynamic, 1>::Zero(4, 1);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V, W, m0_sz, C0), std::domain_error);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W, m0_sz, C0), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V, W, m0_sz, C0), std::invalid_argument);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W, m0_sz, C0), std::invalid_argument);
   // finite and NaN
   Matrix<double, Dynamic, 1> m0_inf = m0;
   m0_inf(0) = std::numeric_limits<double>::infinity();
@@ -274,8 +274,8 @@ TEST_F(ProbDistributionsGaussianDLMInputs, Policiesm0) {
 TEST_F(ProbDistributionsGaussianDLMInputs, PoliciesC0) {
   // size
   Matrix<double, Dynamic, Dynamic> C0_sz = MatrixXd::Identity(3, 3);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V, W, m0, C0_sz), std::domain_error);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W, m0, C0_sz), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V, W, m0, C0_sz), std::invalid_argument);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W, m0, C0_sz), std::invalid_argument);
   // negative
   Matrix<double, Dynamic, Dynamic> C0_neg = C0;
   C0_neg(0, 0) = -1;
@@ -288,8 +288,8 @@ TEST_F(ProbDistributionsGaussianDLMInputs, PoliciesC0) {
   EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W, m0, C0_neg), std::domain_error);
   // not square
   Matrix<double, Dynamic, Dynamic> C0_notsq = MatrixXd::Identity(3, 2);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V, W, m0, C0_notsq), std::domain_error);
-  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W, m0, C0_notsq), std::domain_error);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V, W, m0, C0_notsq), std::invalid_argument);
+  EXPECT_THROW(gaussian_dlm_obs_log(y, FF, GG, V_vec, W, m0, C0_notsq), std::invalid_argument);
 }
 
 

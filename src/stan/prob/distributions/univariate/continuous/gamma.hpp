@@ -57,10 +57,10 @@ namespace stan {
         T_partials_return;
 
       using stan::is_constant_struct;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_not_nan;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       
       // check if any vectors are zero length
@@ -191,12 +191,12 @@ namespace stan {
       // Error checks
       static const char* function("stan::prob::gamma_cdf");
           
-      using stan::error_handling::check_positive_finite;      
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_less_or_equal;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;      
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_less_or_equal;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -273,8 +273,8 @@ namespace stan {
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x2[n] 
             -= stan::math::grad_reg_inc_gamma(alpha_dbl, beta_dbl
-                                           * y_dbl, gamma_vec[n],
-                                           digamma_vec[n]) / Pn;
+                                              * y_dbl, gamma_vec[n],
+                                              digamma_vec[n]) / Pn;
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x3[n] += y_dbl  * exp(-beta_dbl * y_dbl) 
             * pow(beta_dbl * y_dbl,alpha_dbl-1) / tgamma(alpha_dbl) / Pn;
@@ -306,12 +306,12 @@ namespace stan {
       // Error checks
       static const char* function("stan::prob::gamma_cdf_log");
           
-      using stan::error_handling::check_positive_finite;      
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_less_or_equal;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;      
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_less_or_equal;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -389,8 +389,8 @@ namespace stan {
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x2[n] 
             -= stan::math::grad_reg_inc_gamma(alpha_dbl, beta_dbl
-                                           * y_dbl, gamma_vec[n],
-                                           digamma_vec[n]) / Pn;
+                                              * y_dbl, gamma_vec[n],
+                                              digamma_vec[n]) / Pn;
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x3[n] += y_dbl * exp(-beta_dbl * y_dbl) 
             * pow(beta_dbl * y_dbl,alpha_dbl-1) / tgamma(alpha_dbl) / Pn;
@@ -399,7 +399,7 @@ namespace stan {
       return operands_and_partials.to_var(P,y,alpha,beta);
     }
 
- template <typename T_y, typename T_shape, typename T_inv_scale>
+    template <typename T_y, typename T_shape, typename T_inv_scale>
     typename return_type<T_y,T_shape,T_inv_scale>::type
     gamma_ccdf_log(const T_y& y, const T_shape& alpha, 
                    const T_inv_scale& beta) {
@@ -414,12 +414,12 @@ namespace stan {
       // Error checks
       static const char* function("stan::prob::gamma_ccdf_log");
           
-      using stan::error_handling::check_positive_finite;      
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_less_or_equal;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;      
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_less_or_equal;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -497,8 +497,8 @@ namespace stan {
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x2[n] 
             += stan::math::grad_reg_inc_gamma(alpha_dbl, beta_dbl
-                                           * y_dbl, gamma_vec[n],
-                                           digamma_vec[n]) / Pn;
+                                              * y_dbl, gamma_vec[n],
+                                              digamma_vec[n]) / Pn;
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x3[n] -= y_dbl * exp(-beta_dbl * y_dbl) 
             * pow(beta_dbl * y_dbl,alpha_dbl-1) / tgamma(alpha_dbl) / Pn;
@@ -517,7 +517,7 @@ namespace stan {
 
       static const char* function("stan::prob::gamma_rng");
 
-      using stan::error_handling::check_positive_finite;
+      using stan::math::check_positive_finite;
       
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Inverse scale parameter", beta);

@@ -61,7 +61,7 @@ namespace stan {
      * @return sample standard deviation of specified vector
      */
     var sd(const std::vector<var>& v) {
-      stan::error_handling::check_nonzero_size("sd", "v", v);
+      stan::math::check_nonzero_size("sd", "v", v);
       if (v.size() == 1) return 0;
       return calc_sd(v.size(), &v[0]);
     }
@@ -78,7 +78,7 @@ namespace stan {
      */
     template <int R, int C>
     var sd(const Eigen::Matrix<var,R,C>& m) {
-      stan::error_handling::check_nonzero_size("sd", "m", m);
+      stan::math::check_nonzero_size("sd", "m", m);
       if (m.size() == 1) return 0;
       return calc_sd(m.size(), &m(0));
     }

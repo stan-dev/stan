@@ -5,7 +5,7 @@
 TEST(AgradRevErrorHandlingScalar, checkConsistentSize) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::error_handling::check_consistent_size;
+  using stan::math::check_consistent_size;
   using stan::size_of;
   using stan::agrad::var;
 
@@ -17,14 +17,14 @@ TEST(AgradRevErrorHandlingScalar, checkConsistentSize) {
   v1 << 4.0,5.0,6.0,7.0;
   EXPECT_EQ(4U, size_of(v1));
   EXPECT_TRUE(check_consistent_size(function, name1, v1, 4U));
-  EXPECT_THROW(check_consistent_size(function, name1, v1, 2U), std::domain_error);
+  EXPECT_THROW(check_consistent_size(function, name1, v1, 2U), std::invalid_argument);
   stan::agrad::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, checkConsistentSize_nan) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::error_handling::check_consistent_size;
+  using stan::math::check_consistent_size;
   using stan::size_of;
   using stan::agrad::var;
 
@@ -37,14 +37,14 @@ TEST(AgradRevErrorHandlingScalar, checkConsistentSize_nan) {
   v1 << nan,nan,4,nan;
   EXPECT_EQ(4U, size_of(v1));
   EXPECT_TRUE(check_consistent_size(function, name1, v1, 4U));
-  EXPECT_THROW(check_consistent_size(function, name1, v1, 2U), std::domain_error);
+  EXPECT_THROW(check_consistent_size(function, name1, v1, 2U), std::invalid_argument);
   stan::agrad::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckConsistentSizeVarCheckVectorized) {
   using stan::agrad::var;
   using std::vector;
-  using stan::error_handling::check_consistent_size;
+  using stan::math::check_consistent_size;
 
   int N = 5;
   const char* function = "check_consistent_size";
