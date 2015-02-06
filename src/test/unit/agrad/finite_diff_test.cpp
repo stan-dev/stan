@@ -6,14 +6,6 @@
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/agrad/finite_diff.hpp>
 
-struct fun0 {
-  template <typename T>
-  inline
-  T operator()(const T& x) const {
-    return 5.0 * x * x * x;
-  }
-};
-
 struct norm_functor {
   template <typename T>
   inline
@@ -27,31 +19,33 @@ TEST(AgradFiniteDiff,gradient) {
   using Eigen::Dynamic;
 
   third_order_mixed f;
-  norm_functor n;
-  Matrix<double,Dynamic,1> x(3);
+  norm_functor norm;
+  Matrix<double,Dynamic,1> f_vec(3);
   Matrix<double,Dynamic,1> norm_vec(3);
 
-  x << 0.5, 0.3, 0.1;
+  f_vec << 0.5, 0.3, 0.1;
   norm_vec << 0.5, 0.3, 0.7;
 
-  double fx;
-  double fin_diff_fx;
+  double f_eval;
+  double f_fin_diff_eval;
+  double norm_eval;
+  double norm_fin_diff_eval;
 
-  Matrix<double,Dynamic,1> grad_fx;
-  Matrix<double,Dynamic,1> finite_diff_fx;
+  Matrix<double,Dynamic,1> grad_f;
+  Matrix<double,Dynamic,1> finite_diff_f;
 
-  Matrix<double,Dynamic,1> grad_norm_fx;
-  Matrix<double,Dynamic,1> finite_diff_norm_fx;
+  Matrix<double,Dynamic,1> grad_norm;
+  Matrix<double,Dynamic,1> finite_diff_norm;
 
-  stan::agrad::gradient(f,x,fx,grad_fx);
-  stan::agrad::finite_diff_gradient(f,x,fin_diff_fx,finite_diff_fx);
+  stan::agrad::gradient(f,f_vec,f_eval,grad_f);
+  stan::agrad::finite_diff_gradient(f,f_vec,f_fin_diff_eval,finite_diff_f);
 
-  stan::agrad::gradient(n,norm_vec,fx,grad_norm_fx);
-  stan::agrad::finite_diff_gradient(n,norm_vec,fx,finite_diff_norm_fx);
+  stan::agrad::gradient(norm,norm_vec,norm_eval,grad_norm);
+  stan::agrad::finite_diff_gradient(norm,norm_vec,norm_fin_diff_eval,finite_diff_norm);
 
   for (size_type i = 0; i < 3; ++i){
-    EXPECT_NEAR(grad_norm_fx(i), finite_diff_norm_fx(i), 1e-12);
-    EXPECT_NEAR(grad_fx(i), finite_diff_fx(i), 1e-12);
+    EXPECT_NEAR(grad_norm(i), finite_diff_norm(i), 1e-12);
+    EXPECT_NEAR(grad_f(i), finite_diff_f(i), 1e-12);
   }
 
 }
@@ -60,95 +54,121 @@ TEST(AgradFiniteDiff,hessian) {
   using Eigen::Matrix;  
   using Eigen::Dynamic;
   third_order_mixed f;
-  norm_functor n;
-  Matrix<double,Dynamic,1> x(3);
+  norm_functor norm;
+  Matrix<double,Dynamic,1> f_vec(3);
   Matrix<double,Dynamic,1> norm_vec(3);
 
-  Matrix<double,3,3> third_order_mixed_hess_result;
+  f_vec << 0.5, 0.7, 0.4;
 
-  x << 0.5, 0.7, 0.4;
-
-  third_order_mixed_hess_result = third_order_mixed_hess(x);
+  Matrix<double,3,3> an_H_f = third_order_mixed_hess(f_vec);
 
   norm_vec << 0.5, 0.3, 0.7;
 
-  double fx(0);
-  double finite_diff_x(0);
-  Matrix<double,Dynamic,1> grad;
-  Matrix<double,Dynamic,Dynamic> H;
-  Matrix<double,Dynamic,Dynamic> finite_diff_H;
-  Matrix<double,Dynamic,Dynamic> finite_diff_H_auto;
+  double f_eval(0);
+  double f_fin_diff_eval(0);
+  double f_fin_diff_auto_eval(0);
+  double norm_eval(0);
+  double norm_fin_diff_eval(0);
+  double norm_fin_diff_auto_eval(0);
+  Matrix<double,Dynamic,1> grad_f;
+  Matrix<double,Dynamic,Dynamic> H_f;
+  Matrix<double,Dynamic,Dynamic> fin_diff_H_f;
+  Matrix<double,Dynamic,Dynamic> fin_diff_auto_H_f;
 
-  Matrix<double,Dynamic,1> norm_grad;
-  Matrix<double,Dynamic,Dynamic> norm_H;
-  Matrix<double,Dynamic,Dynamic> finite_diff_norm_H;
-  Matrix<double,Dynamic,Dynamic> finite_diff_norm_H_auto;
+  Matrix<double,Dynamic,1> grad_norm;
+  Matrix<double,Dynamic,Dynamic> H_norm;
+  Matrix<double,Dynamic,Dynamic> fin_diff_H_norm;
+  Matrix<double,Dynamic,Dynamic> fin_diff_auto_H_norm;
 
-  stan::agrad::hessian(f,x,fx,grad,H);
-  stan::agrad::finite_diff_hessian(f,x,finite_diff_x,finite_diff_H);
-  stan::agrad::finite_diff_hessian_auto(f,x,finite_diff_x,finite_diff_H_auto);
+  stan::agrad::hessian(f,f_vec,f_eval,grad_f,H_f);
+  stan::agrad::finite_diff_hessian(f,f_vec,f_fin_diff_eval,fin_diff_H_f);
+  stan::agrad::finite_diff_hessian_auto(f,f_vec,f_fin_diff_auto_eval,
+                                        fin_diff_auto_H_f);
 
-  stan::agrad::hessian(n,norm_vec,fx,norm_grad,norm_H);
-  stan::agrad::finite_diff_hessian(n,norm_vec,finite_diff_x,finite_diff_norm_H);
-  stan::agrad::finite_diff_hessian(n,norm_vec,finite_diff_x,finite_diff_norm_H_auto);
+  EXPECT_FLOAT_EQ(f_eval,f_fin_diff_eval);
+  EXPECT_FLOAT_EQ(f_eval,f_fin_diff_auto_eval);
 
-  Matrix<double,3,3> norm_hess_an = norm_hess(norm_vec);
+  stan::agrad::hessian(norm,norm_vec,norm_eval,grad_norm,H_norm);
+  stan::agrad::finite_diff_hessian(norm,norm_vec,
+                                   norm_fin_diff_eval,
+                                   fin_diff_H_norm);
+  stan::agrad::finite_diff_hessian(norm,norm_vec,
+                                   norm_fin_diff_auto_eval,
+                                   fin_diff_auto_H_norm);
 
+  EXPECT_FLOAT_EQ(norm_eval,norm_fin_diff_eval);
+  EXPECT_FLOAT_EQ(norm_eval,norm_fin_diff_auto_eval);
+  Matrix<double,3,3> an_H_norm = norm_hess(norm_vec);
+
+  EXPECT_FLOAT_EQ(f_eval,f_fin_diff_eval);
+  EXPECT_FLOAT_EQ(f_eval,f_fin_diff_auto_eval);
   for (size_type i = 0; i < 3; ++i)
     for (size_type j = 0; j < 3; ++j){
-      EXPECT_NEAR(H(i,j), finite_diff_H(i,j), 1e-09);
-      EXPECT_NEAR(third_order_mixed_hess_result(i,j), finite_diff_H(i,j),1e-09) << "i: " << i << " j: " << j;
-      EXPECT_NEAR(third_order_mixed_hess_result(i,j), finite_diff_H_auto(i,j),1e-09) << "i: " << i << " j: " << j;
+      EXPECT_NEAR(H_f(i,j), fin_diff_H_f(i,j), 1e-09);
+      EXPECT_NEAR(an_H_f(i,j), fin_diff_H_f(i,j),1e-09) << "i: " << i << " j: " << j;
+      EXPECT_NEAR(an_H_f(i,j), fin_diff_auto_H_f(i,j),1e-09) << "i: " << i << " j: " << j;
     }
 
   for (size_type i = 0; i < 3; ++i)
     for (size_type j = 0; j < 3; ++j){
-      EXPECT_NEAR(norm_H(i,j), finite_diff_norm_H(i,j), 1e-09) << "i: " << i << " j: " << j;
-      EXPECT_NEAR(norm_hess_an(i,j), finite_diff_norm_H(i,j), 1e-09) << "i: " << i << " j: " << j;
-      EXPECT_NEAR(norm_hess_an(i,j), finite_diff_norm_H_auto(i,j), 1e-09) << "i: " << i << " j: " << j;
+      EXPECT_NEAR(H_norm(i,j), fin_diff_H_norm(i,j), 1e-09) << "i: " << i << " j: " << j;
+      EXPECT_NEAR(an_H_norm(i,j), fin_diff_H_norm(i,j), 1e-09) << "i: " << i << " j: " << j;
+      EXPECT_NEAR(an_H_norm(i,j), fin_diff_auto_H_norm(i,j), 1e-09) << "i: " << i << " j: " << j;
     }
 
 }
 
-// FIXME Add normal grad_hessian tests, just as in 
-// autodiff_test.cpp and also change naming in this test,
-// it is terrible
 TEST(AgradFiniteDiff,grad_hessian) {
   using Eigen::Matrix;  
   using Eigen::Dynamic;
-  norm_functor n;
-  third_order_mixed fun;
+  norm_functor norm;
+  third_order_mixed f;
   Matrix<double,Dynamic,1> norm_vec(3);
   norm_vec << 0.5, 0.3, 0.7;
 
-  Matrix<double,Dynamic,1> fun_vec(3);
-  fun_vec << 1.6666667e-01, 0.5, 1;
+  Matrix<double,Dynamic,1> f_vec(3);
+  f_vec << 1.6666667e-01, 0.5, 1;
 
-  double fx(0);
-  double finite_diff_x(0);
 
-  Matrix<double,Dynamic,Dynamic> norm_H_ad;
-  std::vector<Matrix<double,Dynamic,Dynamic> > ad_grad_H;
+  double f_eval(0);
+  Matrix<double,Dynamic,Dynamic> H_f;
+  std::vector<Matrix<double,Dynamic,Dynamic> > grad_H_f;
+  stan::agrad::grad_hessian(f,f_vec,f_eval,H_f,grad_H_f);
 
-  Matrix<double,Dynamic,1> norm_grad;
-  Matrix<double,Dynamic,Dynamic> norm_H;
-  std::vector<Matrix<double,Dynamic,Dynamic> > finite_diff_norm_H;
-  std::vector<Matrix<double,Dynamic,Dynamic> > an_norm_H = 
-    third_order_mixed_grad_hess(fun_vec);
+  double f_fin_diff_eval(0);
+  std::vector<Matrix<double,Dynamic,Dynamic> > fin_diff_grad_H_f;
+  stan::agrad::finite_diff_grad_hessian_auto(f,f_vec,f_fin_diff_eval,
+                                             fin_diff_grad_H_f);
 
-  stan::agrad::grad_hessian(fun,fun_vec,fx,norm_H_ad,ad_grad_H);
-  stan::agrad::finite_diff_grad_hessian_auto(fun,fun_vec,finite_diff_x,finite_diff_norm_H);
+  std::vector<Matrix<double,Dynamic,Dynamic> > an_grad_H_f = 
+    third_order_mixed_grad_hess(f_vec);
 
+  EXPECT_FLOAT_EQ(f_eval,f_fin_diff_eval);
+
+  double norm_eval;
+  Matrix<double,Dynamic,Dynamic> H_norm;
+  std::vector<Matrix<double,Dynamic,Dynamic> > grad_H_norm;
+  stan::agrad::grad_hessian(norm,norm_vec,norm_eval,H_norm,grad_H_norm);
+
+  double norm_fin_diff_eval;
+  std::vector<Matrix<double,Dynamic,Dynamic> > fin_diff_grad_H_norm;
+  stan::agrad::finite_diff_grad_hessian_auto(norm,norm_vec,
+                                             norm_fin_diff_eval,
+                                             fin_diff_grad_H_norm);
+
+  std::vector<Matrix<double,Dynamic,Dynamic> > an_grad_H_norm = 
+    norm_grad_hess(norm_vec);
+
+  EXPECT_FLOAT_EQ(norm_eval,norm_fin_diff_eval);
 
   for (size_t i = 0; i < 3; ++i){
     for (size_type j = 0; j < 3; ++j){
       for (size_type k = 0; k < 3; ++k){
-        EXPECT_NEAR(ad_grad_H[i](j,k),finite_diff_norm_H[i](j,k),1e-10) << " i: " << i << " j: " << j << " k: " << k; 
-        EXPECT_NEAR(an_norm_H[i](j,k),finite_diff_norm_H[i](j,k),1e-10) << " i: " << i << " j: " << j << " k: " << k; 
-        EXPECT_NEAR(ad_grad_H[i](j,k),an_norm_H[i](j,k),1e-10) << " i: " << i << " j: " << j << " k: " << k; 
+        EXPECT_NEAR(an_grad_H_f[i](j,k),fin_diff_grad_H_f[i](j,k),1e-10) << " i: " << i << " j: " << j << " k: " << k; 
+        EXPECT_NEAR(grad_H_f[i](j,k),fin_diff_grad_H_f[i](j,k),1e-10) << " i: " << i << " j: " << j << " k: " << k; 
+        EXPECT_NEAR(an_grad_H_norm[i](j,k),fin_diff_grad_H_norm[i](j,k),1e-10) << " i: " << i << " j: " << j << " k: " << k; 
+        EXPECT_NEAR(grad_H_norm[i](j,k),fin_diff_grad_H_norm[i](j,k),1e-10) << " i: " << i << " j: " << j << " k: " << k; 
       }
     }
   }
-
-
 }

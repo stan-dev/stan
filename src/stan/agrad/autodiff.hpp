@@ -395,8 +395,8 @@ namespace stan {
                  std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >& grad_H) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
-      start_nested();
       fx = f(x);
+      start_nested();
       try {
         int d = x.size();
         H.resize(d, d);

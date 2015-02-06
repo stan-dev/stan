@@ -208,29 +208,29 @@ namespace stan {
       using Eigen::VectorXd;
 
       int d = x.size();
+      double dummy_fx_eval;
 
       Matrix<double,Dynamic,1> x_temp(x);
       Matrix<double,Dynamic,1> g_auto(d);
       hess_fx.resize(d, d);
 
-      fx = f(x);
       
       for (int i = 0; i < d; ++i){
         VectorXd g_diff = VectorXd::Zero(d);
         x_temp(i) += 2.0 * epsilon;
-        gradient(f, x_temp, fx, g_auto);
+        gradient(f, x_temp, dummy_fx_eval, g_auto);
         g_diff = -g_auto;
 
         x_temp(i) = x(i) + -2.0 * epsilon;
-        gradient(f, x_temp, fx, g_auto);
+        gradient(f, x_temp, dummy_fx_eval, g_auto);
         g_diff += g_auto;
 
         x_temp(i) = x(i) + epsilon;
-        gradient(f, x_temp, fx, g_auto);
+        gradient(f, x_temp, dummy_fx_eval, g_auto);
         g_diff += 8.0 * g_auto;
 
         x_temp(i) = x(i) - epsilon;
-        gradient(f, x_temp, fx, g_auto);
+        gradient(f, x_temp, dummy_fx_eval, g_auto);
         g_diff -= 8.0 * g_auto;
 
         x_temp(i) = x(i);
@@ -238,13 +238,13 @@ namespace stan {
         
         hess_fx.col(i) = g_diff;
       }
-
+      fx = f(x);
     }
     
     /** 
      * Calculate the value and the gradient of the hessian of the specified
      * function at the specified argument using second-order autodiff and
-     * first-order finite difference.  
+       * first-order finite difference.  
      *
      * <p>The functor must implement 
      * 
@@ -272,31 +272,31 @@ namespace stan {
       using Eigen::Dynamic;
 
       int d = x.size();
+      double dummy_fx_eval;
 
       Matrix<double,Dynamic,1> x_temp(x);
       Matrix<double,Dynamic,1> grad_auto(d);
       Matrix<double,Dynamic,Dynamic> H_auto(d,d);
       Matrix<double,Dynamic,Dynamic> H_diff(d,d);
 
-      fx = f(x);
       
       for (int i = 0; i < d; ++i){
         H_diff.setZero();
 
         x_temp(i) += 2.0 * epsilon;
-        hessian(f, x_temp, fx, grad_auto, H_auto);
+        hessian(f, x_temp, dummy_fx_eval, grad_auto, H_auto);
         H_diff = -H_auto;
 
         x_temp(i) = x(i) + -2.0 * epsilon;
-        hessian(f, x_temp, fx, grad_auto, H_auto);
+        hessian(f, x_temp, dummy_fx_eval, grad_auto, H_auto);
         H_diff += H_auto;
 
         x_temp(i) = x(i) + epsilon;
-        hessian(f, x_temp, fx, grad_auto, H_auto);
+        hessian(f, x_temp, dummy_fx_eval, grad_auto, H_auto);
         H_diff += 8.0 * H_auto;
 
         x_temp(i) = x(i) + -epsilon;
-        hessian(f, x_temp, fx, grad_auto, H_auto);
+        hessian(f, x_temp, dummy_fx_eval, grad_auto, H_auto);
         H_diff -= 8.0 * H_auto;
 
         x_temp(i) = x(i);
@@ -304,7 +304,7 @@ namespace stan {
         
         grad_hess_fx.push_back(H_diff);
       }
-
+      fx = f(x);
     }
 
   }
