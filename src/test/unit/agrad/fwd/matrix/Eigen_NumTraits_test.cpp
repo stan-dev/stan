@@ -9,5 +9,5 @@ TEST(AgradFwdMatrixEigenNumTraits, insertion_operator) {
   Eigen::Matrix<fvar<double>, -1, -1> A(2, 2);
   A << 1, 2, 3, 4;
   output << A;
-  EXPECT_EQ("  1:0   2:0\n  3:0   4:0", output.str());
+  EXPECT_EQ("1 2\n3 4", output.str());
 }
