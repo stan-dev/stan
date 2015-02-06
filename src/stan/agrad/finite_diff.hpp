@@ -133,7 +133,6 @@ namespace stan {
                         double& fx,
                         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& hess_fx, 
                         const double epsilon = 1e-03) {
-
       using Eigen::Matrix;
       using Eigen::Dynamic;
 
@@ -204,9 +203,9 @@ namespace stan {
                              double& fx,
                              Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& hess_fx, 
                              const double epsilon = 1e-03) {
-
       using Eigen::Matrix;
       using Eigen::Dynamic;
+      using Eigen::VectorXd;
 
       int d = x.size();
 
