@@ -316,9 +316,9 @@ namespace stan {
     template <typename F>
     void
     grad_tr_mat_times_hessian(const F& f,
-															const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
-															const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& M,
-															Eigen::Matrix<double,Eigen::Dynamic,1>& grad_tr_MH) {
+                              const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+                              const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& M,
+                              Eigen::Matrix<double,Eigen::Dynamic,1>& grad_tr_MH) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
       start_nested();
@@ -393,8 +393,8 @@ namespace stan {
                  double& fx,
                  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& H,
                  std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >& grad_H) {
-			using Eigen::Matrix;
-			using Eigen::Dynamic;
+      using Eigen::Matrix;
+      using Eigen::Dynamic;
       start_nested();
       fx = f(x);
       try {
