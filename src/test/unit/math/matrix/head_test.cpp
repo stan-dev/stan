@@ -19,7 +19,7 @@ TEST(MathMatrixHead,HeadVector3) {
   using stan::math::head;
   Eigen::VectorXd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(MathMatrixHead,HeadVector4) {
   using stan::math::head;
@@ -48,7 +48,7 @@ TEST(MathMatrixHead,HeadRowVector3) {
   using stan::math::head;
   Eigen::RowVectorXd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(MathMatrixHead,HeadRowVector4) {
   using stan::math::head;
@@ -78,7 +78,7 @@ TEST(MathMatrixHead,HeadStdVector3) {
   using stan::math::head;
   std::vector<int> v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(MathMatrixHead,HeadStdVector4) {
   using stan::math::head;

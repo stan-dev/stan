@@ -12,7 +12,7 @@ TEST(MathMatrix, qr_R) {
   using stan::math::qr_R;
   using stan::math::qr_Q;
   using stan::math::transpose;
-  EXPECT_THROW(qr_R(m0),std::domain_error);
+  EXPECT_THROW(qr_R(m0), std::invalid_argument);
   EXPECT_NO_THROW(qr_R(m1));
 
   stan::math::matrix_d m2(3,2);

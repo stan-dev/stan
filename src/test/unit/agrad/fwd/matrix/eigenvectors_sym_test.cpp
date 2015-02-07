@@ -13,9 +13,9 @@ TEST(AgradFwdMatrixEigenvectorsSym, excepts_fd) {
   ev_m1 << 2.0;
 
   using stan::math::eigenvectors_sym;
-  EXPECT_THROW(eigenvectors_sym(m0),std::domain_error);
+  EXPECT_THROW(eigenvectors_sym(m0),std::invalid_argument);
   EXPECT_NO_THROW(eigenvectors_sym(ev_m1));
-  EXPECT_THROW(eigenvectors_sym(m1),std::domain_error);
+  EXPECT_THROW(eigenvectors_sym(m1),std::invalid_argument);
 }
 TEST(AgradFwdMatrixEigenvectorsSym, excepts_ffd) {
   stan::agrad::matrix_ffd m0;
@@ -25,9 +25,9 @@ TEST(AgradFwdMatrixEigenvectorsSym, excepts_ffd) {
   ev_m1 << 2.0;
 
   using stan::math::eigenvectors_sym;
-  EXPECT_THROW(eigenvectors_sym(m0),std::domain_error);
+  EXPECT_THROW(eigenvectors_sym(m0),std::invalid_argument);
   EXPECT_NO_THROW(eigenvectors_sym(ev_m1));
-  EXPECT_THROW(eigenvectors_sym(m1),std::domain_error);
+  EXPECT_THROW(eigenvectors_sym(m1),std::invalid_argument);
 }
 TEST(AgradFwdMatrixEigenvectorsSym, excepts_fv) {
   stan::agrad::matrix_fv m0;
@@ -37,9 +37,9 @@ TEST(AgradFwdMatrixEigenvectorsSym, excepts_fv) {
   ev_m1 << 2.0;
 
   using stan::math::eigenvectors_sym;
-  EXPECT_THROW(eigenvectors_sym(m0),std::domain_error);
+  EXPECT_THROW(eigenvectors_sym(m0),std::invalid_argument);
   EXPECT_NO_THROW(eigenvectors_sym(ev_m1));
-  EXPECT_THROW(eigenvectors_sym(m1),std::domain_error);
+  EXPECT_THROW(eigenvectors_sym(m1),std::invalid_argument);
 }
 TEST(AgradFwdMatrixEigenvectorsSym, excepts_ffv) {
   stan::agrad::matrix_ffv m0;
@@ -49,9 +49,9 @@ TEST(AgradFwdMatrixEigenvectorsSym, excepts_ffv) {
   ev_m1 << 2.0;
 
   using stan::math::eigenvectors_sym;
-  EXPECT_THROW(eigenvectors_sym(m0),std::domain_error);
+  EXPECT_THROW(eigenvectors_sym(m0),std::invalid_argument);
   EXPECT_NO_THROW(eigenvectors_sym(ev_m1));
-  EXPECT_THROW(eigenvectors_sym(m1),std::domain_error);
+  EXPECT_THROW(eigenvectors_sym(m1),std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixEigenvectorsSym, matrix_fd) {

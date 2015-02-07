@@ -26,7 +26,7 @@ TEST(AgradFwdMatrixSubCol,SubCol3_matrix_fd) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,1,1,7), std::domain_error);
+  EXPECT_THROW(sub_col(m,1,1,7), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol4_matrix_fd) {
   using stan::math::sub_col;
@@ -34,7 +34,7 @@ TEST(AgradFwdMatrixSubCol,SubCol4_matrix_fd) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,7,1,1), std::domain_error);
+  EXPECT_THROW(sub_col(m,7,1,1), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol5_matrix_fd) {
   using stan::math::sub_col;
@@ -42,7 +42,7 @@ TEST(AgradFwdMatrixSubCol,SubCol5_matrix_fd) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,1,7,1), std::domain_error);
+  EXPECT_THROW(sub_col(m,1,7,1), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol6_matrix_fd) {
   using stan::math::sub_col;
@@ -81,7 +81,7 @@ TEST(AgradFwdMatrixSubCol,SubCol3_matrix_fv) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,1,1,7), std::domain_error);
+  EXPECT_THROW(sub_col(m,1,1,7), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol4_matrix_fv) {
   using stan::math::sub_col;
@@ -89,7 +89,7 @@ TEST(AgradFwdMatrixSubCol,SubCol4_matrix_fv) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,7,1,1), std::domain_error);
+  EXPECT_THROW(sub_col(m,7,1,1), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol5_matrix_fv) {
   using stan::math::sub_col;
@@ -97,7 +97,7 @@ TEST(AgradFwdMatrixSubCol,SubCol5_matrix_fv) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,1,7,1), std::domain_error);
+  EXPECT_THROW(sub_col(m,1,7,1), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol6_matrix_fv) {
   using stan::math::sub_col;
@@ -135,7 +135,7 @@ TEST(AgradFwdMatrixSubCol,SubCol3_matrix_ffd) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,1,1,7), std::domain_error);
+  EXPECT_THROW(sub_col(m,1,1,7), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol4_matrix_ffd) {
   using stan::math::sub_col;
@@ -143,7 +143,7 @@ TEST(AgradFwdMatrixSubCol,SubCol4_matrix_ffd) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,7,1,1), std::domain_error);
+  EXPECT_THROW(sub_col(m,7,1,1), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol5_matrix_ffd) {
   using stan::math::sub_col;
@@ -151,7 +151,7 @@ TEST(AgradFwdMatrixSubCol,SubCol5_matrix_ffd) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,1,7,1), std::domain_error);
+  EXPECT_THROW(sub_col(m,1,7,1), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol6_matrix_ffd) {
   using stan::math::sub_col;
@@ -190,7 +190,7 @@ TEST(AgradFwdMatrixSubCol,SubCol3_matrix_ffv) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,1,1,7), std::domain_error);
+  EXPECT_THROW(sub_col(m,1,1,7), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol4_matrix_ffv) {
   using stan::math::sub_col;
@@ -198,7 +198,7 @@ TEST(AgradFwdMatrixSubCol,SubCol4_matrix_ffv) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,7,1,1), std::domain_error);
+  EXPECT_THROW(sub_col(m,7,1,1), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol5_matrix_ffv) {
   using stan::math::sub_col;
@@ -206,7 +206,7 @@ TEST(AgradFwdMatrixSubCol,SubCol5_matrix_ffv) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       m(i,j) = (i + 1) * (j + 1);
-  EXPECT_THROW(sub_col(m,1,7,1), std::domain_error);
+  EXPECT_THROW(sub_col(m,1,7,1), std::out_of_range);
 }
 TEST(AgradFwdMatrixSubCol,SubCol6_matrix_ffv) {
   using stan::math::sub_col;

@@ -68,8 +68,8 @@ TEST(AgradRevMatrix, sd_vector_exception) {
 
   vector_d d1;
   vector_v v1;
-  EXPECT_THROW(sd(d1), std::domain_error);
-  EXPECT_THROW(sd(v1), std::domain_error);
+  EXPECT_THROW(sd(d1), std::invalid_argument);
+  EXPECT_THROW(sd(v1), std::invalid_argument);
 }
 TEST(AgradRevMatrix, sd_rowvector) {
   using stan::math::sd;
@@ -104,8 +104,8 @@ TEST(AgradRevMatrix, sd_rowvector_exception) {
   row_vector_d d;
   row_vector_v v;
   
-  EXPECT_THROW(sd(d), std::domain_error);
-  EXPECT_THROW(sd(v), std::domain_error);
+  EXPECT_THROW(sd(d), std::invalid_argument);
+  EXPECT_THROW(sd(v), std::invalid_argument);
 }
 TEST(AgradRevMatrix, sd_matrix) {
   using stan::math::sd;
@@ -138,18 +138,18 @@ TEST(AgradRevMatrix, sd_matrix_exception) {
   matrix_d d;
   matrix_v v;
 
-  EXPECT_THROW(sd(d), std::domain_error);
-  EXPECT_THROW(sd(v), std::domain_error);
+  EXPECT_THROW(sd(d), std::invalid_argument);
+  EXPECT_THROW(sd(v), std::invalid_argument);
 
   d.resize(1, 0);
   v.resize(1, 0);
-  EXPECT_THROW(sd(d), std::domain_error);
-  EXPECT_THROW(sd(v), std::domain_error);
+  EXPECT_THROW(sd(d), std::invalid_argument);
+  EXPECT_THROW(sd(v), std::invalid_argument);
 
   d.resize(0, 1);
   v.resize(0, 1);
-  EXPECT_THROW(sd(d), std::domain_error);
-  EXPECT_THROW(sd(v), std::domain_error);
+  EXPECT_THROW(sd(d), std::invalid_argument);
+  EXPECT_THROW(sd(v), std::invalid_argument);
 }
 TEST(AgradRevMatrix, sdStdVector) {
   using stan::math::sd; // should use arg-dep lookup (and for sqrt)

@@ -15,7 +15,7 @@ TEST(MathMatrix,add_v_exception) {
 
   d1.resize(2);
   d2.resize(3);
-  EXPECT_THROW(stan::math::add(d1, d2), std::domain_error);
+  EXPECT_THROW(stan::math::add(d1, d2), std::invalid_argument);
 }
 TEST(MathMatrix,add_rv_exception) {
   stan::math::row_vector_d d1, d2;
@@ -30,7 +30,7 @@ TEST(MathMatrix,add_rv_exception) {
 
   d1.resize(2);
   d2.resize(3);
-  EXPECT_THROW(stan::math::add(d1, d2), std::domain_error);
+  EXPECT_THROW(stan::math::add(d1, d2), std::invalid_argument);
 }
 TEST(MathMatrix,add_m_exception) {
   stan::math::matrix_d d1, d2;
@@ -45,7 +45,7 @@ TEST(MathMatrix,add_m_exception) {
 
   d1.resize(2,3);
   d2.resize(3,3);
-  EXPECT_THROW(stan::math::add(d1, d2), std::domain_error);
+  EXPECT_THROW(stan::math::add(d1, d2), std::invalid_argument);
 }
 
 
@@ -117,7 +117,7 @@ TEST(MathMatrix, add) {
   m2 << 10, 100, 1000, 0, -10, -12;
 
   using stan::math::add;
-  EXPECT_THROW(add(v1,v2),std::domain_error);
-  EXPECT_THROW(add(rv1,rv2),std::domain_error);
-  EXPECT_THROW(add(m1,m2),std::domain_error);
+  EXPECT_THROW(add(v1,v2),std::invalid_argument);
+  EXPECT_THROW(add(rv1,rv2),std::invalid_argument);
+  EXPECT_THROW(add(m1,m2),std::invalid_argument);
 }

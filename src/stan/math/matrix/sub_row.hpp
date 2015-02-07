@@ -22,10 +22,10 @@ namespace stan {
     Eigen::Matrix<T,1,Eigen::Dynamic>
     sub_row(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m,
                size_t i, size_t j, size_t ncols) {
-      stan::error_handling::check_row_index("sub_row", "i", m, i);
-      stan::error_handling::check_column_index("sub_row", "j", m, j);
+      stan::math::check_row_index("sub_row", "i", m, i);
+      stan::math::check_column_index("sub_row", "j", m, j);
       if (ncols > 0)
-        stan::error_handling::check_column_index("sub_col", "j+ncols-1", m, j+ncols-1);
+        stan::math::check_column_index("sub_col", "j+ncols-1", m, j+ncols-1);
       return m.block(i - 1,j - 1,1,ncols);
     }
 

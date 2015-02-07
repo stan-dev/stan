@@ -24,7 +24,7 @@ TEST(AgradFwdMatrixTail,TailVector3_fd) {
   using stan::math::tail;
   stan::agrad::vector_fd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,TailVector4_fd) {
   using stan::math::tail;
@@ -54,7 +54,7 @@ TEST(AgradFwdMatrixTail,tailRowVector3_fd) {
   using stan::math::tail;
   stan::agrad::row_vector_fd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,tailRowVector4_fd) {
   using stan::math::tail;
@@ -85,7 +85,7 @@ TEST(AgradFwdMatrixTail,tailStdVector3_fd) {
   using stan::math::tail;
   std::vector<fvar<double> > v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,tailStdVector4_fd) {
   using stan::math::tail;
@@ -113,7 +113,7 @@ TEST(AgradFwdMatrixTail,TailVector3_fv) {
   using stan::math::tail;
   stan::agrad::vector_fv v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,TailVector4_fv) {
   using stan::math::tail;
@@ -143,7 +143,7 @@ TEST(AgradFwdMatrixTail,tailRowVector3_fv) {
   using stan::math::tail;
   stan::agrad::row_vector_fv v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,tailRowVector4_fv) {
   using stan::math::tail;
@@ -174,7 +174,7 @@ TEST(AgradFwdMatrixTail,tailStdVector3_fv) {
   using stan::math::tail;
   std::vector<fvar<var> > v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,tailStdVector4_fv) {
   using stan::math::tail;
@@ -202,7 +202,7 @@ TEST(AgradFwdMatrixTail,TailVector3_ffd) {
   using stan::math::tail;
   stan::agrad::vector_ffd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,TailVector4_ffd) {
   using stan::math::tail;
@@ -232,7 +232,7 @@ TEST(AgradFwdMatrixTail,tailRowVector3_ffd) {
   using stan::math::tail;
   stan::agrad::row_vector_ffd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,tailRowVector4_ffd) {
   using stan::math::tail;
@@ -263,7 +263,7 @@ TEST(AgradFwdMatrixTail,tailStdVector3_ffd) {
   using stan::math::tail;
   std::vector<fvar<fvar<double> > > v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,tailStdVector4_ffd) {
   using stan::math::tail;
@@ -291,7 +291,7 @@ TEST(AgradFwdMatrixTail,TailVector3_ffv) {
   using stan::math::tail;
   stan::agrad::vector_ffv v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,TailVector4_ffv) {
   using stan::math::tail;
@@ -321,7 +321,7 @@ TEST(AgradFwdMatrixTail,tailRowVector3_ffv) {
   using stan::math::tail;
   stan::agrad::row_vector_ffv v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,tailRowVector4_ffv) {
   using stan::math::tail;
@@ -352,7 +352,7 @@ TEST(AgradFwdMatrixTail,tailStdVector3_ffv) {
   using stan::math::tail;
   std::vector<fvar<fvar<var> > > v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixTail,tailStdVector4_ffv) {
   using stan::math::tail;

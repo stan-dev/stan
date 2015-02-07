@@ -38,9 +38,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, vector_vector_fd_exception) {
   vector_d d2(2);
   vector_fd v2(4);
 
-  EXPECT_THROW(columns_dot_product(v1, d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1, v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1, v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1, d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1, v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixColumnsDotProduct, rowvector_vector_fd) {
   using stan::math::vector_d;
@@ -53,9 +53,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, rowvector_vector_fd) {
   vector_d d2(3);
   vector_fd v2(3);
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v2), std::invalid_argument);
 } 
 TEST(AgradFwdMatrixColumnsDotProduct, vector_rowvector_fd) {
   using stan::math::vector_d;
@@ -68,9 +68,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, vector_rowvector_fd) {
   row_vector_d d2(3);
   row_vector_fd v2(3);
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v2), std::invalid_argument);
 } 
 TEST(AgradFwdMatrixColumnsDotProduct, rowvector_rowvector_fd) {
   using stan::math::row_vector_d;
@@ -181,27 +181,27 @@ TEST(AgradFwdMatrixColumnsDotProduct, matrix_matrix_fd_exception) {
   v5 << 4, -2, -1, 2, 1, 2;
   v6 << 4, -2, -1, 2, 1, 2;
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,d3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v4), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,d3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v4), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d1,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v4), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d1,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v4), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d2,v1), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d2,v1), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d3,v1), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v4), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d3,v1), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v4), std::invalid_argument);
 }
 TEST(AgradFwdMatrixColumnsDotProduct, vector_vector_fv_1stDeriv) {
   using stan::math::vector_d;
@@ -283,9 +283,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, vector_vector_fv_exception) {
   vector_d d2(2);
   vector_fv v2(4);
 
-  EXPECT_THROW(columns_dot_product(v1, d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1, v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1, v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1, d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1, v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixColumnsDotProduct, rowvector_vector_fv_exceptions) {
   using stan::math::vector_d;
@@ -300,9 +300,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, rowvector_vector_fv_exceptions) {
   vector_d d2(3);
   vector_fv v2(3);
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v2), std::invalid_argument);
 } 
 TEST(AgradFwdMatrixColumnsDotProduct, vector_rowvector_fv_exceptions) {
   using stan::math::vector_d;
@@ -317,9 +317,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, vector_rowvector_fv_exceptions) {
   row_vector_d d2(3);
   row_vector_fv v2(3);
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v2), std::invalid_argument);
 } 
 TEST(AgradFwdMatrixColumnsDotProduct, rowvector_rowvector_fv_1stDeriv) {
   using stan::math::row_vector_d;
@@ -522,27 +522,27 @@ TEST(AgradFwdMatrixColumnsDotProduct, matrix_matrix_fv_exception) {
   v5 << d,e,f,d,e,f;
   v6 << d,e,f,d,e,f;
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,d3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v4), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,d3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v4), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d1,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v4), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d1,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v4), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d2,v1), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d2,v1), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d3,v1), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v4), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d3,v1), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v4), std::invalid_argument);
 }
 TEST(AgradFwdMatrixColumnsDotProduct, vector_vector_ffd) {
   using stan::math::vector_d;
@@ -593,9 +593,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, vector_vector_ffd_exception) {
   vector_d d2(2);
   vector_ffd v2(4);
 
-  EXPECT_THROW(columns_dot_product(v1, d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1, v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1, v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1, d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1, v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixColumnsDotProduct, rowvector_vector_ffd) {
   using stan::math::vector_d;
@@ -609,9 +609,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, rowvector_vector_ffd) {
   vector_d d2(3);
   vector_ffd v2(3);
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v2), std::invalid_argument);
 } 
 TEST(AgradFwdMatrixColumnsDotProduct, vector_rowvector_ffd) {
   using stan::math::vector_d;
@@ -625,9 +625,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, vector_rowvector_ffd) {
   row_vector_d d2(3);
   row_vector_ffd v2(3);
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v2), std::invalid_argument);
 } 
 TEST(AgradFwdMatrixColumnsDotProduct, rowvector_rowvector_ffd) {
   using stan::math::row_vector_d;
@@ -774,27 +774,27 @@ TEST(AgradFwdMatrixColumnsDotProduct, matrix_matrix_ffd_exception) {
   v5 << d,e,f,d,e,f;
   v6 << d,e,f,d,e,f;
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,d3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v4), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,d3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v4), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d1,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v4), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d1,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v4), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d2,v1), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d2,v1), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d3,v1), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v4), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d3,v1), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v4), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixColumnsDotProduct, vector_vector_ffv_1stDeriv) {
@@ -945,9 +945,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, vector_vector_ffv_exception) {
   vector_d d2(2);
   vector_ffv v2(4);
 
-  EXPECT_THROW(columns_dot_product(v1, d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1, v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1, v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1, d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1, v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixColumnsDotProduct, rowvector_vector_ffv_exceptions) {
   using stan::math::vector_d;
@@ -962,9 +962,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, rowvector_vector_ffv_exceptions) {
   vector_d d2(3);
   vector_ffv v2(3);
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v2), std::invalid_argument);
 } 
 TEST(AgradFwdMatrixColumnsDotProduct, vector_rowvector_ffv_exceptions) {
   using stan::math::vector_d;
@@ -979,9 +979,9 @@ TEST(AgradFwdMatrixColumnsDotProduct, vector_rowvector_ffv_exceptions) {
   row_vector_d d2(3);
   row_vector_ffv v2(3);
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v2), std::invalid_argument);
 } 
 TEST(AgradFwdMatrixColumnsDotProduct, rowvector_rowvector_ffv_1stDeriv) {
   using stan::math::row_vector_d;
@@ -1335,25 +1335,25 @@ TEST(AgradFwdMatrixColumnsDotProduct, matrix_matrix_ffv_exception) {
   v5 << d,e,f,d,e,f;
   v6 << d,e,f,d,e,f;
 
-  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,d3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v4), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(v1,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,d3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v4), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(v1,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d1,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v4), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d1,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d1,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v4), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d1,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d2,v1), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v5), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d2,v6), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d2,v1), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v5), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d2,v6), std::invalid_argument);
 
-  EXPECT_THROW(columns_dot_product(d3,v1), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v2), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v3), std::domain_error);
-  EXPECT_THROW(columns_dot_product(d3,v4), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d3,v1), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v2), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v3), std::invalid_argument);
+  EXPECT_THROW(columns_dot_product(d3,v4), std::invalid_argument);
 }

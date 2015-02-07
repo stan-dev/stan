@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_greater_or_equal.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_greater_or_equal;
+using stan::math::check_greater_or_equal;
 
 TEST(ErrorHandlingScalar,CheckGreaterOrEqual) {
   const char* function = "check_greater_or_equal";
@@ -81,7 +81,7 @@ TEST(ErrorHandlingScalar,CheckGreaterOrEqualMatrix) {
   x_vec   << -1, 0,  1;
   low_vec << -2, -1, -std::numeric_limits<double>::infinity();
   EXPECT_TRUE(check_greater_or_equal(function, "x", x_vec, low_vec))
-  << "check_greater_or_equal: matrix<3,1>, matrix<3,1>, should pass with -infinity";
+    << "check_greater_or_equal: matrix<3,1>, matrix<3,1>, should pass with -infinity";
 
   // x_vec, low
   x_vec   << -1, 0, 1;
