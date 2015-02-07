@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 using stan::agrad::var;
-using stan::error_handling::check_nonnegative;
+using stan::math::check_nonnegative;
 
 TEST(AgradRevErrorHandlingScalar,CheckNonnegative) {
   const char* function = "check_nonnegative";
@@ -60,7 +60,7 @@ TEST(AgradRevErrorHandlingScalar,CheckNonnegativeVectorized) {
 
 TEST(AgradRevErrorHandlingScalar, CheckNonnegativeVarCheckUnivariate) {
   using stan::agrad::var;
-  using stan::error_handling::check_nonnegative;
+  using stan::math::check_nonnegative;
 
   const char* function = "check_nonnegative";
   var a(5.0);
@@ -93,7 +93,7 @@ TEST(AgradRevErrorHandlingScalar, CheckNonnegativeVarCheckUnivariate) {
 TEST(AgradRevErrorHandlingScalar, CheckNonnegativeVarCheckVectorized) {
   using stan::agrad::var;
   using std::vector;
-  using stan::error_handling::check_nonnegative;
+  using stan::math::check_nonnegative;
 
   int N = 5;
   const char* function = "check_nonnegative";

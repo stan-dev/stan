@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_bounded.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_bounded;
+using stan::math::check_bounded;
 
 TEST(ErrorHandlingScalar,CheckBounded_x) {
   const char* function = "check_bounded";
@@ -23,7 +23,7 @@ TEST(ErrorHandlingScalar,CheckBounded_x) {
 
   x = low-1;
   EXPECT_THROW(check_bounded(function, name, x, low, high), 
-                std::domain_error) 
+               std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;  
   
   x = high+1;
@@ -58,7 +58,7 @@ TEST(ErrorHandlingScalar,CheckBounded_Low) {
 
   low = std::numeric_limits<double>::quiet_NaN();
   EXPECT_THROW(check_bounded(function, name, x, low, high), 
-                std::domain_error) 
+               std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 
   low = std::numeric_limits<double>::infinity();

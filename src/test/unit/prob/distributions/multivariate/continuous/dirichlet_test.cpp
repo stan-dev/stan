@@ -78,7 +78,7 @@ TEST(ProbDistributions,DirichletBounds) {
   bad_alpha = Matrix<double,Dynamic,1>(4,1);
   bad_alpha << 1, 2, 3, 4;
   EXPECT_THROW(stan::prob::dirichlet_log(good_theta,bad_alpha),
-               std::domain_error)
+               std::invalid_argument)
     << "size mismatch: theta is a 2-vector, alpha is a 4-vector";
 }
 

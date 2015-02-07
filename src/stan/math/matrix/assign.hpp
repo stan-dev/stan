@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/error_handling/invalid_argument.hpp>
 #include <stan/error_handling/matrix/check_matching_sizes.hpp>
 #include <stan/error_handling/matrix/check_matching_dims.hpp>
 
@@ -56,20 +57,21 @@ namespace stan {
      * @tparam C2 Column shape of right-hand side matrix.
      * @param x Left-hand side matrix.
      * @param y Right-hand side matrix.
-     * @throw std::domain_error if sizes do not match.
+     * @throw std::invalid_argument
      */
     template <typename LHS, typename RHS, int R1, int C1, int R2, int C2>
     inline void 
     assign(Eigen::Matrix<LHS,R1,C1>& x, 
            const Eigen::Matrix<RHS,R2,C2>& y) {
       std::stringstream ss;
-      ss << "error in call to assign(Eigen::Matrix,Eigen::Matrix)"
-         << "; shapes must match, but found"
+      ss << "shapes must match, but found"
          << " R1=" << R1 
          << "; C1=" << C1
          << "; R2=" << R2
          << "; C2=" << C2;
-      throw std::domain_error(ss.str());
+      std::string ss_str(ss.str());
+      invalid_argument("assign(Eigen::Matrix,Eigen::Matrix)",
+                       "", "", ss_str.c_str());
     }
 
     /**
@@ -87,13 +89,13 @@ namespace stan {
      * @tparam C Column shape of both mtarices.
      * @param x Left-hand side matrix.
      * @param y Right-hand side matrix.
-     * @throw std::domain_error if sizes do not match.
+     * @throw std::invalid_argument if sizes do not match.
      */
     template <typename LHS, typename RHS, int R, int C>
     inline void 
     assign(Eigen::Matrix<LHS,R,C>& x, 
            const Eigen::Matrix<RHS,R,C>& y) {
-      stan::error_handling::check_matching_dims("assign",
+      stan::math::check_matching_dims("assign",
                                                 "x", x,
                                                 "y", y);
       for (int i = 0; i < x.size(); ++i)
@@ -116,13 +118,13 @@ namespace stan {
      * @tparam C Column shape for right-hand side matrix.
      * @param x Left-hand side block view of matrix.
      * @param y Right-hand side matrix.
-     * @throw std::domain_error if sizes do not match.
+     * @throw std::invalid_argument if sizes do not match.
      */
     template <typename LHS, typename RHS, int R, int C>
     inline void 
     assign(Eigen::Block<LHS> x,
            const Eigen::Matrix<RHS,R,C>& y) {
-      stan::error_handling::check_matching_sizes("assign",
+      stan::math::check_matching_sizes("assign",
                                                  "x", x,
                                                  "y", y);
       for (int n = 0; n < y.cols(); ++n)
@@ -148,12 +150,12 @@ namespace stan {
      * @tparam RHS Type of right-hand side vector elements.
      * @param x Left-hand side vector.
      * @param y Right-hand side vector.
-     * @throw std::domain_error if sizes do not match.
+     * @throw std::invalid_argument if sizes do not match.
      */
     template <typename LHS, typename RHS>
     inline void 
     assign(std::vector<LHS>& x, const std::vector<RHS>& y) {
-      stan::error_handling::check_matching_sizes("assign",
+      stan::math::check_matching_sizes("assign",
                                                  "x", x,
                                                  "y", y);
       for (size_t i = 0; i < x.size(); ++i)

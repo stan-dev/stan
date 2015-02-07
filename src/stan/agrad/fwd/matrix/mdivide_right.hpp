@@ -28,8 +28,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_right;
-      stan::error_handling::check_square("mdivide_right", "b", b);
-      stan::error_handling::check_multiplicable("mdivide_right",
+      stan::math::check_square("mdivide_right", "b", b);
+      stan::math::check_multiplicable("mdivide_right",
                                                 "A", A,
                                                 "b", b);
 
@@ -73,8 +73,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_right;
-      stan::error_handling::check_square("mdivide_right", "b", b);
-      stan::error_handling::check_multiplicable("mdivide_right",
+      stan::math::check_square("mdivide_right", "b", b);
+      stan::math::check_multiplicable("mdivide_right",
                                                 "A", A,
                                                 "b", b);
 
@@ -101,8 +101,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_right;
-      stan::error_handling::check_square("mdivide_right", "b", b);
-      stan::error_handling::check_multiplicable("mdivide_right",
+      stan::math::check_square("mdivide_right", "b", b);
+      stan::math::check_multiplicable("mdivide_right",
                                                 "A", A,
                                                 "b", b);
       Eigen::Matrix<T,R1,C2> 

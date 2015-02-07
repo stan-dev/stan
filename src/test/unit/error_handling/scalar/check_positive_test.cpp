@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 TEST(ErrorHandlingScalar,CheckPositive) {
-  using stan::error_handling::check_positive;
+  using stan::math::check_positive;
   const char* function = "check_positive";
 
   EXPECT_TRUE(check_positive(function, "x", nan));
@@ -30,8 +30,9 @@ TEST(ErrorHandlingScalar,CheckPositive) {
 }
 
 TEST(ErrorHandlingScalar,CheckPositive_nan) {
-  using stan::error_handling::check_positive;
+  using stan::math::check_positive;
   const char* function = "check_positive";
+
   double nan = std::numeric_limits<double>::quiet_NaN();
 
   EXPECT_THROW(check_positive(function, "x", nan),

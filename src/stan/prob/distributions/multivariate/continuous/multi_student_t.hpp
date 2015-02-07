@@ -37,19 +37,19 @@ namespace stan {
                         const T_loc& mu,
                         const 
                         Eigen::Matrix<T_scale,
-                                      Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+                        Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
       static const char* function("stan::prob::multi_student_t");
 
-      using stan::error_handling::check_size_match;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_symmetric;
-      using stan::error_handling::check_positive;      
+      using stan::math::check_size_match;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_symmetric;
+      using stan::math::check_positive;      
       using boost::math::tools::promote_args;
       using boost::math::lgamma;
       using stan::math::log_determinant_ldlt;
       using stan::math::LDLT_factor;
-      using stan::error_handling::check_ldlt_factor;
+      using stan::math::check_ldlt_factor;
 
       typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type,T_dof,typename scalar_type<T_loc>::type,T_scale>::type lp_type;
       lp_type lp(0.0);
@@ -147,8 +147,8 @@ namespace stan {
         lp_type sum_lp_vec(0.0);
         for (size_t i = 0; i < size_vec; i++) {
           Matrix<typename 
-              boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type>::type,
-              Dynamic, 1> y_minus_mu(size_y);
+                 boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type>::type,
+                 Dynamic, 1> y_minus_mu(size_y);
           for (int j = 0; j < size_y; j++)
             y_minus_mu(j) = y_vec[i](j)-mu_vec[i](j);
           sum_lp_vec += log(1.0 + trace_inv_quad_form_ldlt(ldlt_Sigma,y_minus_mu) / nu);
@@ -166,7 +166,7 @@ namespace stan {
                         const T_loc& mu,
                         const 
                         Eigen::Matrix<T_scale,
-                                      Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+                        Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
       return multi_student_t_log<false>(y,nu,mu,Sigma);
     }
 
@@ -176,14 +176,14 @@ namespace stan {
     multi_student_t_rng(const double nu,
                         const Eigen::Matrix<double,Eigen::Dynamic,1>& mu,
                         const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& s,
-                     RNG& rng) {
+                        RNG& rng) {
 
       static const char* function("stan::prob::multi_student_t_rng");
 
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_symmetric;
-      using stan::error_handling::check_positive;      
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_symmetric;
+      using stan::math::check_positive;      
  
       check_finite(function, "Location parameter", mu);
       check_symmetric(function, "Scale parameter", s);

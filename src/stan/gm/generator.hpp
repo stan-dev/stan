@@ -68,19 +68,19 @@ namespace stan {
     };
 
     void generate_start_namespace(std::string name,
-                                   std::ostream& o) {
+                                  std::ostream& o) {
       o << "namespace " << name << "_namespace {" << EOL2;
     }
 
-     void generate_end_namespace(std::ostream& o) {
-       o << "} // namespace" << EOL2;
-     }
+    void generate_end_namespace(std::ostream& o) {
+      o << "} // namespace" << EOL2;
+    }
 
-     void generate_comment(std::string const& msg, int indent, 
-                           std::ostream& o) {
-       generate_indent(indent,o);
-       o << "// " << msg        << EOL;
-     }
+    void generate_comment(std::string const& msg, int indent, 
+                          std::ostream& o) {
+      generate_indent(indent,o);
+      o << "// " << msg        << EOL;
+    }
 
 
     template <bool isLHS>
@@ -303,7 +303,7 @@ namespace stan {
       generate_using("stan::math::lgamma",o);
       generate_using("stan::model::prob_grad",o);
       generate_using_namespace("stan::math",o);
-      generate_using_namespace("stan::error_handling",o);
+      generate_using_namespace("stan::math",o);
       generate_using_namespace("stan::prob",o);
       o << EOL;
     }
@@ -338,7 +338,7 @@ namespace stan {
     }
 
     void generate_class_decl(const std::string& model_name,
-                        std::ostream& o) {
+                             std::ostream& o) {
       o << "class " << model_name << " : public prob_grad {" << EOL;
     }
 
@@ -379,12 +379,12 @@ namespace stan {
 
     // only generates the test
     void generate_validate_context_size(std::ostream& o,
-                                 const std::string& stage,
-                                 const std::string& var_name,
-                                 const std::string& base_type,
-                                 const std::vector<expression>& dims,
-                                 const expression& type_arg1 = expression(),
-                                 const expression& type_arg2 = expression()) {
+                                        const std::string& stage,
+                                        const std::string& var_name,
+                                        const std::string& base_type,
+                                        const std::vector<expression>& dims,
+                                        const expression& type_arg1 = expression(),
+                                        const expression& type_arg2 = expression()) {
       o << INDENT2 
         << "context__.validate_dims("
         << '"' << stage << '"'
@@ -848,7 +848,7 @@ namespace stan {
            << EOL;
         generate_indent(indents_ + x.dims_.size() + 1, o_);
         o_ << "throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what()));"
-          << EOL;
+           << EOL;
         generate_indent(indents_ + x.dims_.size(), o_);
         o_ << "};" << EOL;
         generate_end_for_dims(x.dims_.size());
@@ -873,7 +873,7 @@ namespace stan {
                              const std::string& type_name) const {
         generate_begin_for_dims(x.dims_);
         generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "try { stan::error_handling::check_" << type_name << "(function__,";
+        o_ << "try { stan::math::check_" << type_name << "(function__,";
         o_ << "\"";
         generate_loop_var(x.name_,x.dims_.size());
         o_ << "\",";
@@ -909,8 +909,8 @@ namespace stan {
 
 
     void generate_validate_var_decl(const var_decl& decl,
-                                     int indent,
-                                     std::ostream& o) {
+                                    int indent,
+                                    std::ostream& o) {
       validate_var_decl_visgen vis(indent,o);
       boost::apply_visitor(vis,decl.decl_);
     }
@@ -1587,7 +1587,7 @@ namespace stan {
           generate_expression(x.expr_,o_);
           o_ << " > ";
           generate_expression(x.truncation_.high_.expr_,o_); // low
-                                                            // bound
+          // bound
           o_ << ") lp_accum__.add(-std::numeric_limits<double>::infinity());" << EOL;
         }
         // generate log denominator for case where bounds test pass
@@ -2306,8 +2306,8 @@ namespace stan {
     };
 
     void suppress_warning(const std::string& indent,
-                         const std::string& var_name,
-                         std::ostream& o) {
+                          const std::string& var_name,
+                          std::ostream& o) {
       o << indent << "(void) " 
         << var_name << ";"
         << " // dummy call to supress warning"
@@ -2700,7 +2700,7 @@ namespace stan {
         o_ << "try { writer__." << write_method_name;
         generate_name_dims(var_name,dims.size());
         o_ << "); } catch (const std::exception& e) { "
-              " throw std::runtime_error(std::string(\"Error transforming variable "
+          " throw std::runtime_error(std::string(\"Error transforming variable "
            << var_name << ": \") + e.what()); }" << EOL;
       }
       void generate_name_dims(const std::string name, 
@@ -3010,7 +3010,7 @@ namespace stan {
 
 
     void generate_param_names_method(const program& prog,
-                                          std::ostream& o) {
+                                     std::ostream& o) {
       write_param_names_visgen vis(o);
       o << EOL << INDENT
         << "void get_param_names(std::vector<std::string>& names__) const {"
@@ -3354,7 +3354,7 @@ namespace stan {
       o << INDENT << "}" << EOL2;
     }
 
-   // see write_csv_visgen for similar structure
+    // see write_csv_visgen for similar structure
     struct unconstrained_param_names_visgen : public visgen {
       unconstrained_param_names_visgen(std::ostream& o)
         : visgen(o) {
@@ -3500,7 +3500,7 @@ namespace stan {
 
 
     void generate_unconstrained_param_names_method(const program& prog,
-                                                 std::ostream& o) {
+                                                   std::ostream& o) {
       o << EOL << INDENT 
         << "void unconstrained_param_names(std::vector<std::string>& param_names__,"
         << EOL << INDENT 

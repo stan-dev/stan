@@ -2,7 +2,7 @@
 #include <stan/agrad/rev.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_greater;
+using stan::math::check_greater;
 using stan::agrad::var;
 
 TEST(AgradRevErrorHandlingScalar,CheckGreater) {
@@ -151,7 +151,7 @@ TEST(AgradRevErrorHandlingScalar,CheckGreaterMatrix) {
 
 TEST(AgradRevErrorHandlingScalar, CheckGreaterVarCheckUnivariate) {
   using stan::agrad::var;
-  using stan::error_handling::check_greater;
+  using stan::math::check_greater;
 
   const char* function = "check_greater";
   var a(5.0);
@@ -174,7 +174,7 @@ TEST(AgradRevErrorHandlingScalar, CheckGreaterVarCheckUnivariate) {
 TEST(AgradRevErrorHandlingScalar, CheckGreaterVarCheckVectorized) {
   using stan::agrad::var;
   using std::vector;
-  using stan::error_handling::check_greater;
+  using stan::math::check_greater;
 
   int N = 5;
   const char* function = "check_greater";

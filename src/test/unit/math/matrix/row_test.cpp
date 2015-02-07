@@ -19,6 +19,6 @@ TEST(MathMatrix, row_exception) {
   
   using stan::math::row;
 
-  EXPECT_THROW(row(m1,5),std::domain_error);
-  EXPECT_THROW(row(m1,0),std::domain_error);
+  EXPECT_THROW(row(m1,5),std::out_of_range);
+  EXPECT_THROW(row(m1,0),std::out_of_range);
 }

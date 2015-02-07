@@ -77,7 +77,7 @@ TEST(ProbDistributionsMultinomial, error) {
   theta(2) = 0.5;
   
   ns.resize(2);
-  EXPECT_THROW(multinomial_log(ns, theta), std::domain_error);
+  EXPECT_THROW(multinomial_log(ns, theta), std::invalid_argument);
 }
 
 TEST(ProbDistributionsMultinomial, zeros) {
