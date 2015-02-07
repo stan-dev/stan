@@ -28,7 +28,7 @@ namespace stan {
       std::time(&rawtime);
 
       char cbuf[80];
-      std::strftime(cbuf,80,"%a %b %d %Y %H:%M:%S",
+      std::strftime(cbuf, 80, "%a %b %d %Y %H:%M:%S",
                     std::localtime(&rawtime));
 
       return std::string(cbuf);
