@@ -103,6 +103,8 @@
 #include <stan/math/matrix/trace_quad_form.hpp>
 #include <stan/math/matrix/transpose.hpp>
 #include <stan/math/matrix/typedefs.hpp>
+#include <stan/math/matrix/value_of.hpp>
+#include <stan/math/matrix/value_of_rec.hpp>
 #include <stan/math/matrix/variance.hpp>
 
 #endif

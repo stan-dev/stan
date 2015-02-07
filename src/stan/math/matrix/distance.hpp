@@ -25,9 +25,9 @@ namespace stan {
     distance(const Eigen::Matrix<T1, R1, C1>& v1,
              const Eigen::Matrix<T2, R2, C2>& v2) {
       using std::sqrt;
-      stan::error_handling::check_vector("distance", "v1", v1);
-      stan::error_handling::check_vector("distance", "v2", v2);
-      stan::error_handling::check_matching_sizes("distance",
+      stan::math::check_vector("distance", "v1", v1);
+      stan::math::check_vector("distance", "v2", v2);
+      stan::math::check_matching_sizes("distance",
                                                  "v1", v1,
                                                  "v2", v2);
       return sqrt(squared_distance(v1,v2));

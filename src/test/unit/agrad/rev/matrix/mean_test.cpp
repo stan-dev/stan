@@ -30,8 +30,8 @@ TEST(AgradRevMatrix, mean_vector_exception) {
 
   vector_d d;
   vector_v v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradRevMatrix, mean_rowvector) {
   using stan::math::mean;
@@ -58,8 +58,8 @@ TEST(AgradRevMatrix, mean_rowvector_exception) {
 
   row_vector_d d;
   row_vector_v v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradRevMatrix, mean_matrix) {
   using stan::math::mean;
@@ -86,13 +86,13 @@ TEST(AgradRevMatrix, mean_matrix_exception) {
  
   matrix_d d;
   matrix_v v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradRevMatrix, meanStdVector) {
   using stan::math::mean; // should use arg-dep lookup
   AVEC x(0);
-  EXPECT_THROW(mean(x), std::domain_error);
+  EXPECT_THROW(mean(x), std::invalid_argument);
   x.push_back(1.0);
   EXPECT_FLOAT_EQ(1.0, mean(x).val());
   x.push_back(2.0);

@@ -5,6 +5,7 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/fwd/numeric_limits.hpp>
+#include <stan/agrad/fwd/matrix/Eigen_NumTraits.hpp>
 
 namespace stan {
   namespace agrad {

@@ -19,7 +19,7 @@ TEST(MathMatrixTail,TailVector3) {
   using stan::math::tail;
   Eigen::VectorXd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(MathMatrixTail,TailVector4) {
   using stan::math::tail;
@@ -48,7 +48,7 @@ TEST(MathMatrixTail,TailRowVector3) {
   using stan::math::tail;
   Eigen::RowVectorXd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(MathMatrixTail,TailRowVector4) {
   using stan::math::tail;
@@ -77,7 +77,7 @@ TEST(MathMatrixTail,TailStdVector3) {
   using stan::math::tail;
   std::vector<int> v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_THROW(tail(v,4), std::domain_error);
+  EXPECT_THROW(tail(v,4), std::out_of_range);
 }
 TEST(MathMatrixTail,TailStdVector4) {
   using stan::math::tail;

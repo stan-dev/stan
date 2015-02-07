@@ -5,7 +5,7 @@
 TEST(MathMatrix, mean) {
   using stan::math::mean;
   std::vector<double> x;
-  EXPECT_THROW(mean(x),std::domain_error);
+  EXPECT_THROW(mean(x),std::invalid_argument);
   x.push_back(1.0);
   EXPECT_FLOAT_EQ(1.0,mean(x));
   x.push_back(2.0);
@@ -14,7 +14,7 @@ TEST(MathMatrix, mean) {
   EXPECT_FLOAT_EQ(2.0,mean(x));
 
   stan::math::vector_d v;
-  EXPECT_THROW(mean(v),std::domain_error);
+  EXPECT_THROW(mean(v),std::invalid_argument);
   v = stan::math::vector_d(1);
   v << 1.0;
   EXPECT_FLOAT_EQ(1.0,mean(v));
@@ -26,7 +26,7 @@ TEST(MathMatrix, mean) {
   EXPECT_FLOAT_EQ(2.0,mean(v));
 
   stan::math::row_vector_d rv;
-  EXPECT_THROW(mean(rv),std::domain_error);
+  EXPECT_THROW(mean(rv),std::invalid_argument);
   rv = stan::math::row_vector_d(1);
   rv << 1.0;
   EXPECT_FLOAT_EQ(1.0,mean(rv));
@@ -38,7 +38,7 @@ TEST(MathMatrix, mean) {
   EXPECT_FLOAT_EQ(2.0,mean(rv));
 
   stan::math::matrix_d m;
-  EXPECT_THROW(mean(m),std::domain_error);
+  EXPECT_THROW(mean(m),std::invalid_argument);
   m = stan::math::matrix_d(1,1);
   m << 1.0;
   EXPECT_FLOAT_EQ(1.0,mean(m));
@@ -54,9 +54,9 @@ TEST(MathMatrix,mean_exception) {
   Matrix<double,Dynamic,1> v;
   Matrix<double,1,Dynamic> rv;
 
-  EXPECT_THROW(stan::math::mean(m), std::domain_error);
-  EXPECT_THROW(stan::math::mean(v), std::domain_error);
-  EXPECT_THROW(stan::math::mean(rv), std::domain_error);
+  EXPECT_THROW(stan::math::mean(m), std::invalid_argument);
+  EXPECT_THROW(stan::math::mean(v), std::invalid_argument);
+  EXPECT_THROW(stan::math::mean(rv), std::invalid_argument);
 
   Matrix<double,Dynamic,Dynamic> m_nz(2,3);
   Matrix<double,Dynamic,1> v_nz(2);

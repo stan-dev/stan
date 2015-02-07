@@ -37,7 +37,6 @@
 #include <stan/agrad/rev/matrix/trace_inv_quad_form_ldlt.hpp>
 #include <stan/agrad/rev/matrix/trace_quad_form.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/rev/matrix/value_of.hpp>
 #include <stan/agrad/rev/matrix/variance.hpp>
 
 #endif

@@ -23,7 +23,7 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1>
     col(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m,
         size_t j) {
-      stan::error_handling::check_column_index("col", "j", m, j);
+      stan::math::check_column_index("col", "j", m, j);
       return m.col(j - 1);
     }
 
