@@ -514,7 +514,7 @@ TEST(io_reader, unit_vector_exception) {
   theta[5] = sqrt(1.0);
   EXPECT_NO_THROW (reader.unit_vector(4));
   EXPECT_THROW (reader.unit_vector(2), std::domain_error);
-  EXPECT_THROW (reader.unit_vector(0), std::domain_error);
+  EXPECT_THROW (reader.unit_vector(0), std::invalid_argument);
 }
 
 TEST(io_reader, simplex) {
@@ -542,7 +542,7 @@ TEST(io_reader, simplex_exception) {
   theta[5] = 1.0;
   EXPECT_NO_THROW (reader.simplex(4));
   EXPECT_THROW (reader.simplex(2), std::domain_error);
-  EXPECT_THROW (reader.simplex(0), std::domain_error);
+  EXPECT_THROW (reader.simplex(0), std::invalid_argument);
 }
 
 
@@ -796,7 +796,7 @@ TEST(io_reader, cov_matrix_exception) {
   theta[3] = 1.9;
   stan::io::reader<double> reader(theta,theta_i);
   EXPECT_THROW (reader.cov_matrix(2), std::domain_error);
-  EXPECT_THROW (reader.cov_matrix(0), std::domain_error);
+  EXPECT_THROW (reader.cov_matrix(0), std::invalid_argument);
 }
 TEST(io_reader,cov_matrix_constrain) {
   std::vector<int> theta_i;
@@ -923,7 +923,7 @@ TEST(io_reader,cholesky_factor_constrain) {
     theta.push_back(-static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(3U,3U));
-  EXPECT_TRUE(stan::error_handling::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
+  EXPECT_TRUE(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
   EXPECT_EQ(3,L.rows());
   EXPECT_EQ(3,L.cols());
   EXPECT_EQ(9,L.size());
@@ -936,7 +936,7 @@ TEST(io_reader,cholesky_factor_constrain_asymmetric) {
     theta.push_back(-static_cast<double>(i));
   stan::io::reader<double> reader(theta,theta_i);
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(3U,2U));
-  EXPECT_TRUE(stan::error_handling::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
+  EXPECT_TRUE(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
   EXPECT_EQ(3,L.rows());
   EXPECT_EQ(2,L.cols());
   EXPECT_EQ(6,L.size());
@@ -950,7 +950,7 @@ TEST(io_reader,cholesky_factor_constrain_jacobian) {
   stan::io::reader<double> reader(theta,theta_i);
   double lp = 1.9;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(3U,3U,lp));
-  EXPECT_TRUE(stan::error_handling::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
+  EXPECT_TRUE(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
   EXPECT_EQ(3,L.rows());
   EXPECT_EQ(3,L.cols());
   EXPECT_EQ(9,L.size());
@@ -966,7 +966,7 @@ TEST(io_reader,cholesky_factor_constrain_jacobian_asymmetric) {
   stan::io::reader<double> reader(theta,theta_i);
   double lp = 1.9;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(4U,3U,lp));
-  EXPECT_TRUE(stan::error_handling::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
+  EXPECT_TRUE(stan::math::check_cholesky_factor("test_cholesky_factor_constrain","L",L));
   EXPECT_EQ(4,L.rows());
   EXPECT_EQ(3,L.cols());
   EXPECT_EQ(12,L.size());
@@ -975,6 +975,53 @@ TEST(io_reader,cholesky_factor_constrain_jacobian_asymmetric) {
             lp);
 }
 
+TEST(io_reader, cholesky_corr) {
+  std::vector<int> theta_i;
+  std::vector<double> theta(9);
+  // column major
+  theta[0] = 1;
+  theta[1] = 0;
+  theta[2] = 0;
+
+  theta[3] = 0;
+  theta[4] = 1;
+  theta[5] = 0;
+
+  theta[6] = 0;
+  theta[7] = 0;
+  theta[8] = 1;
+  stan::io::reader<double> reader(theta, theta_i);
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S
+    = reader.cholesky_corr(3);
+  EXPECT_FLOAT_EQ(theta[0], S(0,0));
+  EXPECT_FLOAT_EQ(theta[1], S(1,0));
+  EXPECT_FLOAT_EQ(theta[4], S(1,1));
+  EXPECT_FLOAT_EQ(theta[7], S(1,2));
+  EXPECT_FLOAT_EQ(theta[8], S(2,2));
+}
+
+TEST(io_reader, cholesky_corr_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta(9);
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S;
+
+  // non lower-triangular matrix (column major)
+  // the rest of these tests are with check_cholesky_factor_corr
+  theta[0] = 1;
+  theta[1] = 0;
+  theta[2] = 0;
+
+  theta[3] = 0.5;
+  theta[4] = 1;
+  theta[5] = 0;
+
+  theta[6] = 0;
+  theta[7] = 0;
+  theta[8] = 1;
+  stan::io::reader<double> reader(theta, theta_i);
+  EXPECT_THROW(reader.cholesky_corr(3),
+               std::domain_error);
+}
 
 
 TEST(io_reader,eos_exception) {

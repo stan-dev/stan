@@ -2,7 +2,7 @@
 #include <stan/agrad/rev.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_less;
+using stan::math::check_less;
 using stan::agrad::var;
 
 TEST(AgradRevErrorHandlingScalar,CheckLess) {
@@ -126,7 +126,7 @@ TEST(AgradRevErrorHandlingScalar,CheckLess_Matrix) {
 
 TEST(AgradRevErrorHandlingScalar, CheckLessVarCheckUnivariate) {
   using stan::agrad::var;
-  using stan::error_handling::check_less;
+  using stan::math::check_less;
 
   const char* function = "check_less";
   var a(5.0);
@@ -149,7 +149,7 @@ TEST(AgradRevErrorHandlingScalar, CheckLessVarCheckUnivariate) {
 TEST(AgradRevErrorHandlingScalar, CheckLessVarCheckVectorized) {
   using stan::agrad::var;
   using std::vector;
-  using stan::error_handling::check_less;
+  using stan::math::check_less;
 
   int N = 5;
   const char* function = "check_less";

@@ -81,10 +81,10 @@ TEST(AgradRevMatrix, add_vector_vector_exception) {
   vector_d d1(5), d2(1);
   vector_v v1(5), v2(1);
   
-  EXPECT_THROW(add(d1, d2), std::domain_error);
-  EXPECT_THROW(add(v1, d2), std::domain_error);
-  EXPECT_THROW(add(d1, v2), std::domain_error);
-  EXPECT_THROW(add(v1, v2), std::domain_error);
+  EXPECT_THROW(add(d1, d2), std::invalid_argument);
+  EXPECT_THROW(add(v1, d2), std::invalid_argument);
+  EXPECT_THROW(add(d1, v2), std::invalid_argument);
+  EXPECT_THROW(add(v1, v2), std::invalid_argument);
 }
 TEST(AgradRevMatrix, add_rowvector_rowvector) {
   using stan::math::add;
@@ -139,10 +139,10 @@ TEST(AgradRevMatrix, add_rowvector_rowvector_exception) {
   row_vector_v v1(5), v2(2);
 
   row_vector_v output;
-  EXPECT_THROW( add(d1, d2), std::domain_error);
-  EXPECT_THROW( add(d1, v2), std::domain_error);
-  EXPECT_THROW( add(v1, d2), std::domain_error);
-  EXPECT_THROW( add(v1, v2), std::domain_error);
+  EXPECT_THROW( add(d1, d2), std::invalid_argument);
+  EXPECT_THROW( add(d1, v2), std::invalid_argument);
+  EXPECT_THROW( add(v1, d2), std::invalid_argument);
+  EXPECT_THROW( add(v1, v2), std::invalid_argument);
 }
 TEST(AgradRevMatrix, add_matrix_matrix) {
   using stan::math::add;
@@ -192,8 +192,8 @@ TEST(AgradRevMatrix, add_matrix_matrix_exception) {
   matrix_d d1(2,2), d2(1,2);
   matrix_v v1(2,2), v2(1,2);
 
-  EXPECT_THROW(add(d1, d2), std::domain_error);
-  EXPECT_THROW(add(d1, v2), std::domain_error);
-  EXPECT_THROW(add(v1, d2), std::domain_error);
-  EXPECT_THROW(add(v1, v2), std::domain_error);
+  EXPECT_THROW(add(d1, d2), std::invalid_argument);
+  EXPECT_THROW(add(d1, v2), std::invalid_argument);
+  EXPECT_THROW(add(v1, d2), std::invalid_argument);
+  EXPECT_THROW(add(v1, v2), std::invalid_argument);
 }

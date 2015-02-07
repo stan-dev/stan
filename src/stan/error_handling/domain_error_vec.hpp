@@ -1,15 +1,15 @@
-#ifndef STAN__ERROR_HANDLING__SCALAR__DOM_ERR_VEC_HPP
-#define STAN__ERROR_HANDLING__SCALAR__DOM_ERR_VEC_HPP
+#ifndef STAN__ERROR_HANDLING__DOMAIN_ERROR_VEC_HPP
+#define STAN__ERROR_HANDLING__DOMAIN_ERROR_VEC_HPP
 
 #include <sstream>
 #include <string>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/error_handling/domain_error.hpp>
 #include <stan/math/meta/value_type.hpp>
 #include <stan/meta/traits.hpp>
 
 namespace stan {
 
-  namespace error_handling {
+  namespace math {
 
     /**
      * Throw a domain error with a consistently formatted message.
@@ -20,7 +20,7 @@ namespace stan {
      * to Stan v2.5.0.)
      *
      * The message is:
-     * "<function>(<typeid(value_type<T>::type)>.name()>): <name>[<i+error_index>] <msg1><y>"
+     * "<function>: <name>[<i+error_index>] <msg1><y>"
      *    where error_index is the value of stan::error_index::value 
      * which indicates whether the message should be 0 or 1 indexed.
      *
@@ -28,21 +28,23 @@ namespace stan {
      * @param function Name of the function
      * @param name Name of the variable
      * @param y Variable
+     * @param i Index
      * @param msg1 Message to print before the variable
      * @param msg2 Message to print after the variable
+     * @throw std::domain_error
      */
     template <typename T>
-    inline void dom_err_vec(const char* function,
-                            const char* name,
-                            const T& y,
-                            const size_t i,
-                            const char* msg1,
-                            const char* msg2) {
+    inline void domain_error_vec(const char* function,
+                                 const char* name,
+                                 const T& y,
+                                 const size_t i,
+                                 const char* msg1,
+                                 const char* msg2) {
       std::ostringstream vec_name_stream;
       vec_name_stream << name
                       << "[" << stan::error_index::value + i << "]";
       std::string vec_name(vec_name_stream.str());
-      dom_err(function, vec_name.c_str(), stan::get(y, i) , msg1, msg2);
+      domain_error(function, vec_name.c_str(), stan::get(y, i) , msg1, msg2);
     }
 
     /**
@@ -54,7 +56,7 @@ namespace stan {
      * to Stan v2.5.0.)
      *
      * The message is:
-     * "<function>(<typeid(T)>.name()>): <name>[<i+error_index>] <msg1><y>"
+     * "<function>: <name>[<i+error_index>] <msg1><y>"
      *   where error_index is the value of stan::error_index::value 
      * which indicates whether the message should be 0 or 1 indexed.
      *
@@ -62,15 +64,17 @@ namespace stan {
      * @param function Name of the function
      * @param name Name of the variable
      * @param y Variable
+     * @param i Index
      * @param msg Message to print before the variable
+     * @throw std::domain_error
      */
     template <typename T>
-    inline void dom_err_vec(const char* function,
-                            const char* name,
-                            const T& y,
-                            const size_t i,
-                            const char* msg) {
-      dom_err_vec(function, name, y, i, msg, "");
+    inline void domain_error_vec(const char* function,
+                                 const char* name,
+                                 const T& y,
+                                 const size_t i,
+                                 const char* msg) {
+      domain_error_vec(function, name, y, i, msg, "");
     }
     
   }

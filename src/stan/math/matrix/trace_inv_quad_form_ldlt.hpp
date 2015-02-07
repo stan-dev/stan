@@ -24,7 +24,7 @@ namespace stan {
                        typename boost::math::tools::promote_args<T1,T2>::type>::type
     trace_inv_quad_form_ldlt(const stan::math::LDLT_factor<T1,R2,C2> &A,
                              const Eigen::Matrix<T2,R3,C3> &B) {
-      stan::error_handling::check_multiplicable("trace_inv_quad_form_ldlt",
+      stan::math::check_multiplicable("trace_inv_quad_form_ldlt",
                                                 "A", A,
                                                 "B", B);
       

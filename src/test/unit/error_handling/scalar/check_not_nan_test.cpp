@@ -3,7 +3,7 @@
 #include <stan/agrad/rev/var_stack.hpp>
 #include <stan/agrad/rev.hpp>
 
-using stan::error_handling::check_not_nan;
+using stan::math::check_not_nan;
 
 TEST(ErrorHandlingScalar,CheckNotNan) {
   const char* function = "check_not_nan";

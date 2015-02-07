@@ -4,8 +4,9 @@
 
 TEST(AgradRevErrorHandlingScalar,CheckNotNan) {
   using stan::agrad::var;
-  using stan::error_handling::check_not_nan;
+  using stan::math::check_not_nan;
   const char* function = "check_not_nan";
+
   var x = 0;
   double x_d = 0;
  
@@ -39,7 +40,7 @@ TEST(AgradRevErrorHandlingScalar,CheckNotNan) {
 
 TEST(AgradRevErrorHandlingScalar, CheckNotNanVarCheckUnivariate) {
   using stan::agrad::var;
-  using stan::error_handling::check_not_nan;
+  using stan::math::check_not_nan;
 
   const char* function = "check_not_nan";
   var a(5.0);
@@ -58,7 +59,7 @@ TEST(AgradRevErrorHandlingScalar, CheckNotNanVarCheckUnivariate) {
 TEST(AgradRevErrorHandlingScalar, CheckNotNanVarCheckVectorized) {
   using stan::agrad::var;
   using std::vector;
-  using stan::error_handling::check_not_nan;
+  using stan::math::check_not_nan;
 
   int N = 5;
   const char* function = "check_not_nan";

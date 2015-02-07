@@ -65,7 +65,7 @@ namespace stan {
        * @param A A symmetric positive definite matrix to factorize
        **/
       inline void compute(const Eigen::Matrix<stan::agrad::var,R,C> &A) {
-        stan::error_handling::check_square("comute", "A", A);
+        stan::math::check_square("comute", "A", A);
         _alloc->compute(A);
       }
       
