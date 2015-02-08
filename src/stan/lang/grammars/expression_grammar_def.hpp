@@ -123,7 +123,7 @@ namespace stan {
 
       // _r1 : var_origin
 
-      expression_r.name("expression (top level, precedence 15, binary ||");
+      expression_r.name("expression");
       expression_r
         = expression14_r(_r1) [_val = _1]
         > *( lit("||") 
@@ -131,7 +131,7 @@ namespace stan {
                                                    boost::phoenix::ref(error_msgs))] 
              );
 
-      expression14_r.name("expression, precedence 14, binary &&");
+      expression14_r.name("expression");
       expression14_r 
         = expression10_r(_r1) [_val = _1]
         > *( lit("&&") 
@@ -139,7 +139,7 @@ namespace stan {
                                                    boost::phoenix::ref(error_msgs))] 
              );
 
-      expression10_r.name("expression, precedence 10, binary ==, !=");
+      expression10_r.name("expression");
       expression10_r 
         = expression09_r(_r1) [_val = _1]
         > *( ( lit("==") 
@@ -151,7 +151,7 @@ namespace stan {
                                                       boost::phoenix::ref(error_msgs))] ) 
               );
 
-      expression09_r.name("expression, precedence 9, binary <, <=, >, >=");
+      expression09_r.name("expression");
       expression09_r 
         = expression07_g(_r1) [_val = _1]
         > *( ( lit("<=")

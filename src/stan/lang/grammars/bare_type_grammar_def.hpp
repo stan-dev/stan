@@ -58,7 +58,7 @@ namespace stan {
       using boost::spirit::qi::rethrow;
       using namespace boost::spirit::qi::labels;
 
-      bare_type_r.name("bare type");
+      bare_type_r.name("bare type definition (no dimensions)");
       bare_type_r
         %= 
         type_identifier_r
@@ -79,10 +79,9 @@ namespace stan {
         %= 
         eps[_val = 0]
         >> - ( lit('[')[_val = 1]
-               >> *(lit(',')[_val += 1])
-               >> lit(']') )
-        ;
-
+               > *(lit(',')[_val += 1])
+               > lit(']') );
+      
      }
   }
 }

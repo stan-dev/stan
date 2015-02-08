@@ -14,7 +14,6 @@
 #include <stdexcept>
 
 #include <boost/spirit/include/qi.hpp>
-// FIXME: get rid of unused include
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
@@ -142,17 +141,13 @@ namespace stan {
         term_g(var_map,error_msgs,eg)
     {
       using boost::spirit::qi::_1;
-      using boost::spirit::qi::char_;
-      using boost::spirit::qi::double_;
       using boost::spirit::qi::eps;
-      using boost::spirit::qi::int_;
-      using boost::spirit::qi::lexeme;
       using boost::spirit::qi::lit;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_r1;
       
-      expression07_r.name("expression, precedence 7, binary +, -");
+      expression07_r.name("expression");
       expression07_r 
         =  term_g(_r1)
             [_val = _1]
