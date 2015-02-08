@@ -610,7 +610,7 @@ namespace stan {
       bool operator()(const expression& expr,
                       std::stringstream& error_msgs) const {
         if (!expr.expression_type().is_primitive_int()) {
-          error_msgs << "expression denoting integer required; found type=" 
+          error_msgs << "array indices must be integer expressions; found type=" 
                      << expr.expression_type() << std::endl;
           return false;
         }
@@ -644,7 +644,7 @@ namespace stan {
 
       // _r1 : var_origin
 
-      term_r.name("term");
+      term_r.name("expression");
       term_r 
         = ( negated_factor_r(_r1)                       
             [_val = _1]
@@ -670,9 +670,10 @@ namespace stan {
              )
         ;
 
+      negated_factor_r.name("expression");
       negated_factor_r 
         = lit('-') >> negated_factor_r(_r1) 
-        [negate_expr_f(_val,_1,_pass,boost::phoenix::ref(error_msgs_))]
+                      [negate_expr_f(_val,_1,_pass,boost::phoenix::ref(error_msgs_))]
         | lit('!') >> negated_factor_r(_r1) 
                       [logical_negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)  [_val = _1]
@@ -680,7 +681,7 @@ namespace stan {
         | indexed_factor_r(_r1) [_val = _1];
 
 
-      exponentiated_factor_r.name("(optionally) exponentiated factor");
+      exponentiated_factor_r.name("expression");
       exponentiated_factor_r 
         = ( indexed_factor_r(_r1) [_val = _1] 
             >> lit('^') 
@@ -690,7 +691,7 @@ namespace stan {
             )
         ;
 
-      indexed_factor_r.name("(optionally) indexed factor [sub]");
+      indexed_factor_r.name("expression");
       indexed_factor_r 
         = factor_r(_r1) [_val = _1]
         > * (  
@@ -703,7 +704,7 @@ namespace stan {
                )
         ;
       
-      integrate_ode_r.name("solve ode");
+      integrate_ode_r.name("expression");
       integrate_ode_r 
         %= (lit("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
@@ -725,7 +726,7 @@ namespace stan {
                                          _pass,
                                          boost::phoenix::ref(error_msgs_))];
 
-      factor_r.name("factor");
+      factor_r.name("expression");
       factor_r =
         integrate_ode_r(_r1)    [_val = _1]
         | fun_r(_r1)          [set_fun_type_named_f(_val,_1,_r1,_pass,
@@ -755,17 +756,17 @@ namespace stan {
 
       fun_r.name("function and argument expressions");
       fun_r 
-        %= identifier_r // no test yet on valid naming
+        %= identifier_r
         >> args_r(_r1);
 
 
-      identifier_r.name("identifier (expression grammar)");
+      identifier_r.name("identifier");
       identifier_r
         %= lexeme[char_("a-zA-Z") 
                   >> *char_("a-zA-Z0-9_.")];
 
 
-      args_r.name("function argument expressions");
+      args_r.name("function arguments");
       args_r 
         %= (lit('(') >> lit(')'))
         | ( ( lit('(')
@@ -773,18 +774,23 @@ namespace stan {
             > lit(')') )
         ;
 
-      
+      dim_r.name("array dimension (integer expression)");
+      dim_r
+        %= expression_g(_r1)
+        > eps [_pass = validate_int_expr3_f(_val,boost::phoenix::ref(error_msgs_))]
+        ;
+
       dims_r.name("array dimensions");
       dims_r 
         %= lit('[') 
-        > (expression_g(_r1)
-           [_pass = validate_int_expr3_f(_1,boost::phoenix::ref(error_msgs_))]
-           % ',')
+        > ( dim_r(_r1)
+            % ',' )
         > lit(']')
         ;
 
- 
-      variable_r.name("variable expression");
+
+
+      variable_r.name("variable name");
       variable_r
         %= identifier_r 
         > !lit('(');    // negative lookahead to prevent failure in

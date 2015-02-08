@@ -496,7 +496,9 @@ namespace stan {
                       bool& pass,
                       std::stringstream& error_msgs) const {
         if (!allow_sample) {
-          error_msgs << "sampling only allowed in model."
+          error_msgs << "Sampling statements (~) and increment_log_prob() are"
+                     << std::endl
+                     << "only allowed in the model block."
                      << std::endl;
           pass = false;
           return;

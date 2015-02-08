@@ -106,13 +106,14 @@ namespace stan {
         using boost::format;
         using std::setw;
 
+
+        size_t idx_errline = get_line(_where);
+
         error_msgs << msg << std::endl;
 
-        size_t idx_errline = 0;
-        idx_errline = get_line(_where);
-
         if (idx_errline > 0) {
-          error_msgs << "ERROR at line " << idx_errline << std::endl;
+          error_msgs << "ERROR at line " << idx_errline << std::endl << std::endl;
+
 
           std::basic_stringstream<char> sprogram;
           sprogram << boost::make_iterator_range (_begin, _end);
@@ -187,7 +188,6 @@ namespace stan {
           > -data_var_decls_r
           > -derived_data_var_decls_r
           > -param_var_decls_r
-          // scope lp__ to "transformed params" and "model" only
           > eps[add_lp_var_f(boost::phoenix::ref(var_map_))]
           > -derived_var_decls_r
           > model_r
@@ -195,7 +195,7 @@ namespace stan {
           > -generated_var_decls_r
           ;
 
-        model_r.name("model declaration");
+        model_r.name("model declaration (or perhaps an earlier block)");
         model_r 
           %= lit("model")
           > statement_g(true,local_origin,false)  // assign only to locals
@@ -203,41 +203,44 @@ namespace stan {
 
         data_var_decls_r.name("data variable declarations");
         data_var_decls_r
-          %= lit("data")
-          > lit('{')
+          %= ( lit("data")
+               > lit('{') )
           > var_decls_g(true,data_origin) // +constraints
           > lit('}');
 
         derived_data_var_decls_r.name("transformed data block");
         derived_data_var_decls_r
-          %= ( lit("transformed")
-               >> lit("data") )
-          > lit('{')
+          %= ( ( lit("transformed")
+                 >> lit("data") )
+               > lit('{') )
           > var_decls_g(true,transformed_data_origin)  // -constraints
           > *statement_g(false,transformed_data_origin,false) // -sampling
           > lit('}');
 
         param_var_decls_r.name("parameter variable declarations");
         param_var_decls_r
-          %= lit("parameters")
-          > lit('{')
+          %= ( lit("parameters")
+               > lit('{')
+               )
           > var_decls_g(true,parameter_origin) // +constraints
           > lit('}');
 
         derived_var_decls_r.name("derived variable declarations");
         derived_var_decls_r
           %= ( lit("transformed")
-               >> lit("parameters") )
-          > lit('{')
+               > lit("parameters") 
+               > lit('{')
+               )
           > var_decls_g(true,transformed_parameter_origin) // -constraints
           > *statement_g(false,transformed_parameter_origin,false) // -sampling
           > lit('}');
 
         generated_var_decls_r.name("generated variable declarations");
         generated_var_decls_r
-          %= lit("generated")
-          > lit("quantities")
-          > lit('{')
+          %= ( lit("generated")
+               > lit("quantities")
+               > lit('{') 
+               )
           > var_decls_g(true,derived_origin) // -constraints
           > *statement_g(false,derived_origin,false) // -sampling
           > lit('}');
