@@ -29,11 +29,11 @@ namespace stan {
 
         static const char* function = "stan::vb::vb_params_fullrank(%1%)";
 
-        stan::error_handling::check_square(function, "Cholesky factor", L_chol_);
-        stan::error_handling::check_size_match(function,
+        stan::math::check_square(function, "Cholesky factor", L_chol_);
+        stan::math::check_size_match(function,
                                "Dimension of mean vector",     dimension_,
                                "Dimension of Cholesky factor", L_chol_.rows() );
-        stan::error_handling::check_cholesky_factor(function,
+        stan::math::check_cholesky_factor(function,
                                  "Cholesky factor", L_chol_);
 
       };
@@ -54,7 +54,7 @@ namespace stan {
         static const char* function = "stan::vb::vb_params_fullrank"
                                       "::to_unconstrained(%1%)";
 
-        stan::error_handling::check_size_match(function,
+        stan::math::check_size_match(function,
                          "Dimension of input vector", z_check.size(),
                          "Dimension of mean vector",  dimension_ );
 

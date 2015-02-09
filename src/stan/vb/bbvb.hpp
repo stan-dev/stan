@@ -173,11 +173,11 @@ namespace stan {
         int dim       = muL.dimension();
         double tmp_lp = 0.0;
 
-        stan::error_handling::check_size_match(function,
+        stan::math::check_size_match(function,
                               "Dimension of mu grad vector", mu_grad.size(),
                               "Dimension of mean vector in variational q", dim);
-        stan::error_handling::check_square(function, "Scale matrix", L_grad);
-        stan::error_handling::check_size_match(function,
+        stan::math::check_square(function, "Scale matrix", L_grad);
+        stan::math::check_size_match(function,
                               "Dimension of scale matrix", L_grad.rows(),
                               "Dimension of mean vector in variational q", dim);
 
@@ -241,7 +241,7 @@ namespace stan {
         int dim       = musigmatilde.dimension();
         double tmp_lp = 0.0;
 
-        stan::error_handling::check_size_match(function,
+        stan::math::check_size_match(function,
                               "Dimension of mu grad vector", mu_grad.size(),
                               "Dimension of mean vector in variational q", dim);
 
@@ -263,7 +263,7 @@ namespace stan {
           }
           z_tilde = musigmatilde.to_unconstrained(z_check);
 
-          stan::error_handling::check_not_nan(function, "z_tilde", z_tilde);
+          stan::math::check_not_nan(function, "z_tilde", z_tilde);
 
           // Compute gradient step in unconstrained space
           stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,

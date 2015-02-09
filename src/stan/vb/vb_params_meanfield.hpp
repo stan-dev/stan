@@ -28,7 +28,7 @@ namespace stan {
 
         static const char* function = "stan::vb::vb_params_meanfield(%1%)";
 
-        stan::error_handling::check_size_match(function,
+        stan::math::check_size_match(function,
                                "Dimension of mean vector", dimension_,
                                "Dimension of std vector", sigma_tilde_.size() );
 
@@ -52,7 +52,7 @@ namespace stan {
         static const char* function = "stan::vb::vb_params_meanfield"
                                       "::to_unconstrained(%1%)";
 
-        stan::error_handling::check_size_match(function,
+        stan::math::check_size_match(function,
                          "Dimension of mean vector", dimension_,
                          "Dimension of input vector", z_check.size() );
 
