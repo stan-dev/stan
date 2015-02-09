@@ -2,7 +2,7 @@
 #include <stan/agrad/rev.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_equal;
+using stan::math::check_equal;
 using stan::agrad::var;
 
 TEST(AgradRevErrorHandlingScalar,CheckEqual) {

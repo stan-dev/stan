@@ -249,12 +249,12 @@ TEST(AgradFwdMatrixMdivideRightTriLow,fd__rowvector_matrix_exceptions) {
   matrix_fd fvm1(4,4), fvm2(3,3);
   matrix_d vm1(4,4), vm2(3,3);
 
-  EXPECT_THROW(mdivide_right_tri_low(fv1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv1,vm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(v1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv2,fvm1), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv2,vm1), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(v2,fvm1), std::domain_error);
+  EXPECT_THROW(mdivide_right_tri_low(fv1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv1,vm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(v1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv2,fvm1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv2,vm1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(v2,fvm1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMdivideRightTriLow,fd__matrix_matrix_exceptions) {
   using stan::math::matrix_d;
@@ -264,9 +264,9 @@ TEST(AgradFwdMatrixMdivideRightTriLow,fd__matrix_matrix_exceptions) {
   matrix_fd fvm1(4,4), fvm2(3,3);
   matrix_d vm1(4,4), vm2(3,3);
 
-  EXPECT_THROW(mdivide_right_tri_low(fvm1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fvm1,vm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(vm1,fvm2), std::domain_error);
+  EXPECT_THROW(mdivide_right_tri_low(fvm1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fvm1,vm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(vm1,fvm2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMdivideRightTriLow,fv__rowvector_fv_matrix_fv_1stDeriv) {
   using stan::agrad::matrix_fv;
@@ -778,12 +778,12 @@ TEST(AgradFwdMatrixMdivideRightTriLow,fv__rowvector_matrix_exceptions) {
   matrix_fv fvm1(4,4), fvm2(3,3);
   matrix_d vm1(4,4), vm2(3,3);
 
-  EXPECT_THROW(mdivide_right_tri_low(fv1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv1,vm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(v1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv2,fvm1), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv2,vm1), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(v2,fvm1), std::domain_error);
+  EXPECT_THROW(mdivide_right_tri_low(fv1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv1,vm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(v1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv2,fvm1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv2,vm1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(v2,fvm1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMdivideRightTriLow,fv__matrix_matrix_exceptions) {
   using stan::math::matrix_d;
@@ -793,9 +793,9 @@ TEST(AgradFwdMatrixMdivideRightTriLow,fv__matrix_matrix_exceptions) {
   matrix_fv fvm1(4,4), fvm2(3,3);
   matrix_d vm1(4,4), vm2(3,3);
 
-  EXPECT_THROW(mdivide_right_tri_low(fvm1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fvm1,vm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(vm1,fvm2), std::domain_error);
+  EXPECT_THROW(mdivide_right_tri_low(fvm1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fvm1,vm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(vm1,fvm2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMdivideRightTriLow,ffd__rowvector_ffd_matrix_ffd) {
   using stan::agrad::matrix_ffd;
@@ -1075,12 +1075,12 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffd__rowvector_matrix_exceptions) {
   matrix_ffd fvm1(4,4), fvm2(3,3);
   matrix_d vm1(4,4), vm2(3,3);
 
-  EXPECT_THROW(mdivide_right_tri_low(fv1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv1,vm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(v1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv2,fvm1), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv2,vm1), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(v2,fvm1), std::domain_error);
+  EXPECT_THROW(mdivide_right_tri_low(fv1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv1,vm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(v1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv2,fvm1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv2,vm1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(v2,fvm1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMdivideRightTriLow,ffd__matrix_matrix_exceptions) {
   using stan::math::matrix_d;
@@ -1090,9 +1090,9 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffd__matrix_matrix_exceptions) {
   matrix_ffd fvm1(4,4), fvm2(3,3);
   matrix_d vm1(4,4), vm2(3,3);
 
-  EXPECT_THROW(mdivide_right_tri_low(fvm1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fvm1,vm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(vm1,fvm2), std::domain_error);
+  EXPECT_THROW(mdivide_right_tri_low(fvm1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fvm1,vm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(vm1,fvm2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMdivideRightTriLow,ffv__rowvector_ffv_matrix_ffv_1stDeriv) {
   using stan::agrad::matrix_ffv;
@@ -2084,12 +2084,12 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffv__rowvector_matrix_exceptions) {
   matrix_ffv fvm1(4,4), fvm2(3,3);
   matrix_d vm1(4,4), vm2(3,3);
 
-  EXPECT_THROW(mdivide_right_tri_low(fv1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv1,vm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(v1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv2,fvm1), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fv2,vm1), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(v2,fvm1), std::domain_error);
+  EXPECT_THROW(mdivide_right_tri_low(fv1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv1,vm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(v1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv2,fvm1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fv2,vm1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(v2,fvm1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMdivideRightTriLow,ffv__matrix_matrix_exceptions) {
   using stan::math::matrix_d;
@@ -2099,7 +2099,7 @@ TEST(AgradFwdMatrixMdivideRightTriLow,ffv__matrix_matrix_exceptions) {
   matrix_ffv fvm1(4,4), fvm2(3,3);
   matrix_d vm1(4,4), vm2(3,3);
 
-  EXPECT_THROW(mdivide_right_tri_low(fvm1,fvm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(fvm1,vm2), std::domain_error);
-  EXPECT_THROW(mdivide_right_tri_low(vm1,fvm2), std::domain_error);
+  EXPECT_THROW(mdivide_right_tri_low(fvm1,fvm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(fvm1,vm2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_tri_low(vm1,fvm2), std::invalid_argument);
 }

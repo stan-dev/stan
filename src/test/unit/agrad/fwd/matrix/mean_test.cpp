@@ -37,8 +37,8 @@ TEST(AgradFwdMatrixMean, fd_vector_exception) {
 
   vector_d d;
   vector_fd v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, fd_rowvector) {
   using stan::math::mean;
@@ -71,8 +71,8 @@ TEST(AgradFwdMatrixMean, fd_rowvector_exception) {
 
   row_vector_d d;
   row_vector_fd v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, fd_matrix) {
   using stan::math::mean;
@@ -105,15 +105,15 @@ TEST(AgradFwdMatrixMean, fd_matrix_exception) {
  
   matrix_d d;
   matrix_fd v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, fd_StdVector) {
   using stan::math::mean;
   using stan::agrad::fvar;
 
   std::vector<fvar<double> > x(0);
-  EXPECT_THROW(mean(x), std::domain_error);
+  EXPECT_THROW(mean(x), std::invalid_argument);
   x.push_back(1.0);
   EXPECT_FLOAT_EQ(1.0, mean(x).val_);
   x.push_back(2.0);
@@ -202,8 +202,8 @@ TEST(AgradFwdMatrixMean, fv_vector_exception) {
 
   vector_d d;
   vector_fv v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, fv_rowvector_1stDeriv) {
   using stan::math::mean;
@@ -270,8 +270,8 @@ TEST(AgradFwdMatrixMean, fv_rowvector_exception) {
 
   row_vector_d d;
   row_vector_fv v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, fv_matrix_1stDeriv) {
   using stan::math::mean;
@@ -338,8 +338,8 @@ TEST(AgradFwdMatrixMean, fv_matrix_exception) {
  
   matrix_d d;
   matrix_fv v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, fv_StdVector_1stDeriv) {
   using stan::math::mean;
@@ -347,7 +347,7 @@ TEST(AgradFwdMatrixMean, fv_StdVector_1stDeriv) {
   using stan::agrad::var;
 
   std::vector<fvar<var> > x(0);
-  EXPECT_THROW(mean(x), std::domain_error);
+  EXPECT_THROW(mean(x), std::invalid_argument);
   x.push_back(1.0);
   EXPECT_FLOAT_EQ(1.0, mean(x).val_.val());
   x.push_back(2.0);
@@ -426,8 +426,8 @@ TEST(AgradFwdMatrixMean, ffd_vector_exception) {
 
   vector_d d;
   vector_ffd v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, ffd_rowvector) {
   using stan::math::mean;
@@ -464,8 +464,8 @@ TEST(AgradFwdMatrixMean, ffd_rowvector_exception) {
 
   row_vector_d d;
   row_vector_ffd v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, ffd_matrix) {
   using stan::math::mean;
@@ -502,15 +502,15 @@ TEST(AgradFwdMatrixMean, ffd_matrix_exception) {
  
   matrix_d d;
   matrix_ffd v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, ffd_StdVector) {
   using stan::math::mean;
   using stan::agrad::fvar;
 
   std::vector<fvar<fvar<double> > > x(0);
-  EXPECT_THROW(mean(x), std::domain_error);
+  EXPECT_THROW(mean(x), std::invalid_argument);
   x.push_back(1.0);
   EXPECT_FLOAT_EQ(1.0, mean(x).val_.val());
   x.push_back(2.0);
@@ -649,8 +649,8 @@ TEST(AgradFwdMatrixMean, ffv_vector_exception) {
 
   vector_d d;
   vector_ffv v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, ffv_rowvector_1stDeriv) {
   using stan::math::mean;
@@ -772,8 +772,8 @@ TEST(AgradFwdMatrixMean, ffv_rowvector_exception) {
 
   row_vector_d d;
   row_vector_ffv v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, ffv_matrix_1stDeriv) {
   using stan::math::mean;
@@ -895,8 +895,8 @@ TEST(AgradFwdMatrixMean, ffv_matrix_exception) {
  
   matrix_d d;
   matrix_ffv v;
-  EXPECT_THROW(mean(d), std::domain_error);
-  EXPECT_THROW(mean(v), std::domain_error);
+  EXPECT_THROW(mean(d), std::invalid_argument);
+  EXPECT_THROW(mean(v), std::invalid_argument);
 }
 TEST(AgradFwdMatrixMean, ffv_StdVector_1stDeriv) {
   using stan::math::mean;
@@ -904,7 +904,7 @@ TEST(AgradFwdMatrixMean, ffv_StdVector_1stDeriv) {
   using stan::agrad::var;
 
   std::vector<fvar<fvar<var> > > x(0);
-  EXPECT_THROW(mean(x), std::domain_error);
+  EXPECT_THROW(mean(x), std::invalid_argument);
   x.push_back(1.0);
   EXPECT_FLOAT_EQ(1.0, mean(x).val_.val().val());
   x.push_back(2.0);

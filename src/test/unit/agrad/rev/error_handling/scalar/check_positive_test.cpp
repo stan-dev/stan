@@ -5,7 +5,7 @@
 using stan::agrad::var;
 
 TEST(AgradRevErrorHandlingScalar,CheckPositive) {
-  using stan::error_handling::check_positive;
+  using stan::math::check_positive;
   const char* function = "check_positive";
 
   EXPECT_TRUE(check_positive(function, "x", nan));
@@ -34,7 +34,7 @@ TEST(AgradRevErrorHandlingScalar,CheckPositive) {
 
 TEST(AgradRevErrorHandlingScalar, CheckPositiveVarCheckUnivariate) {
   using stan::agrad::var;
-  using stan::error_handling::check_positive;
+  using stan::math::check_positive;
 
   const char* function = "check_positive";
   var a(5.0);
@@ -53,7 +53,7 @@ TEST(AgradRevErrorHandlingScalar, CheckPositiveVarCheckUnivariate) {
 TEST(AgradRevErrorHandlingScalar, CheckPositiveVarCheckVectorized) {
   using stan::agrad::var;
   using std::vector;
-  using stan::error_handling::check_positive;
+  using stan::math::check_positive;
 
   int N = 5;
   const char* function = "check_positive";

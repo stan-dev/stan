@@ -30,9 +30,9 @@ namespace stan {
         T_partials_return;
 
       using stan::math::value_of;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -140,11 +140,11 @@ namespace stan {
       // Check errors
       static const char* function("stan::prob::pareto_cdf");
           
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
           
       T_partials_return P(1.0);
@@ -187,7 +187,7 @@ namespace stan {
               
         // Pull out values
         const T_partials_return log_dbl = log( value_of(y_min_vec[n]) 
-                                    / value_of(y_vec[n]) );
+                                               / value_of(y_vec[n]) );
         const T_partials_return y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
         const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
               
@@ -237,11 +237,11 @@ namespace stan {
       // Check errors
       static const char* function("stan::prob::pareto_cdf_log");
           
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
           
       T_partials_return P(0.0);
@@ -285,7 +285,7 @@ namespace stan {
               
         // Pull out values
         const T_partials_return log_dbl = log( value_of(y_min_vec[n]) 
-                                    / value_of(y_vec[n]) );
+                                               / value_of(y_vec[n]) );
         const T_partials_return y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
         const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
               
@@ -322,11 +322,11 @@ namespace stan {
       // Check errors
       static const char* function("stan::prob::pareto_ccdf_log");
           
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_greater_or_equal;
-      using stan::error_handling::check_consistent_sizes;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
           
       T_partials_return P(0.0);
@@ -370,7 +370,7 @@ namespace stan {
               
         // Pull out values
         const T_partials_return log_dbl = log( value_of(y_min_vec[n]) 
-                                    / value_of(y_vec[n]) );
+                                               / value_of(y_vec[n]) );
         const T_partials_return y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
         const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
               
@@ -398,7 +398,7 @@ namespace stan {
 
       static const char* function("stan::prob::pareto_rng");
       
-      using stan::error_handling::check_positive_finite;
+      using stan::math::check_positive_finite;
 
       check_positive_finite(function, "Scale parameter", y_min);
       check_positive_finite(function, "Shape parameter", alpha);

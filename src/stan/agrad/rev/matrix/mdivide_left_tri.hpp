@@ -297,8 +297,8 @@ namespace stan {
                      const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::error_handling::check_square("mdivide_left_tri", "A", A);
-      stan::error_handling::check_multiplicable("mdivide_left_tri",
+      stan::math::check_square("mdivide_left_tri", "A", A);
+      stan::math::check_multiplicable("mdivide_left_tri",
                                                 "A", A,
                                                 "b", b);
       
@@ -321,8 +321,8 @@ namespace stan {
                      const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::error_handling::check_square("mdivide_left_tri", "A", A);
-      stan::error_handling::check_multiplicable("mdivide_left_tri",
+      stan::math::check_square("mdivide_left_tri", "A", A);
+      stan::math::check_multiplicable("mdivide_left_tri",
                                                 "A", A,
                                                 "b", b);
       
@@ -345,8 +345,8 @@ namespace stan {
                      const Eigen::Matrix<double,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::error_handling::check_square("mdivide_left_tri", "A", A);
-      stan::error_handling::check_multiplicable("mdivide_left_tri",
+      stan::math::check_square("mdivide_left_tri", "A", A);
+      stan::math::check_multiplicable("mdivide_left_tri",
                                                 "A", A,
                                                 "b", b);
       

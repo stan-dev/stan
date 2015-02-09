@@ -21,7 +21,7 @@ TEST(MathMatrix, distance_vector_vector) {
   v2.resize(2);
   v1 << 1;
   v2 << 2, 3;
-  EXPECT_THROW(stan::math::distance(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v1, v2), std::invalid_argument);
 }
 
 TEST(MathMatrix, distance_rowvector_vector) {
@@ -42,7 +42,7 @@ TEST(MathMatrix, distance_rowvector_vector) {
   v.resize(2);
   rv << 1;
   v << 2, 3;
-  EXPECT_THROW(stan::math::distance(rv, v), std::domain_error);
+  EXPECT_THROW(stan::math::distance(rv, v), std::invalid_argument);
 }
 
 TEST(MathMatrix, distance_vector_rowvector) {
@@ -63,7 +63,7 @@ TEST(MathMatrix, distance_vector_rowvector) {
   rv.resize(2);
   v << 1;
   rv << 2, 3;
-  EXPECT_THROW(stan::math::distance(v, rv), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v, rv), std::invalid_argument);
 }
 
 TEST(MathMatrix, distance_special_values) {

@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 using stan::agrad::var;
-using stan::error_handling::check_positive_finite;
+using stan::math::check_positive_finite;
 
 TEST(AgradRevErrorHandlingScalar,CheckPositiveFinite) {
   const char* function = "check_positive_finite";
@@ -118,7 +118,7 @@ TEST(AgradRevErrorHandlingScalar,CheckPositiveFinite_Matrix) {
 
 TEST(AgradRevErrorHandlingScalar, CheckPositiveFiniteVarCheckUnivariate) {
   using stan::agrad::var;
-  using stan::error_handling::check_positive_finite;
+  using stan::math::check_positive_finite;
 
   const char* function = "check_positive_finite";
   var a(5.0);
@@ -137,7 +137,7 @@ TEST(AgradRevErrorHandlingScalar, CheckPositiveFiniteVarCheckUnivariate) {
 TEST(AgradRevErrorHandlingScalar, CheckPositiveFiniteVarCheckVectorized) {
   using stan::agrad::var;
   using std::vector;
-  using stan::error_handling::check_positive_finite;
+  using stan::math::check_positive_finite;
 
   int N = 5;
   const char* function = "check_positive_finite";

@@ -33,7 +33,7 @@ TEST(AgradRevMatrix,log_softmax) {
   using Eigen::Dynamic;
   using stan::agrad::vector_v;
 
-  EXPECT_THROW(log_softmax(vector_v()),std::domain_error);
+  EXPECT_THROW(log_softmax(vector_v()),std::invalid_argument);
   
   Matrix<AVAR,Dynamic,1> x(1);
   x << 0.0;

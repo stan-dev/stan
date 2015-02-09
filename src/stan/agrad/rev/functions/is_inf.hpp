@@ -15,7 +15,8 @@ namespace stan {
      *
      * Delegates to <code>stan::math::is_inf</code>.
      *
-     * @param x Value to test.
+     * @param v Value to test.
+     *
      * @return <code>1</code> if the value is infinite and <code>0</code> otherwise.
      */
     inline 

@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_ordered.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_ordered;
+using stan::math::check_ordered;
 
 TEST(ErrorHandlingMatrix, checkOrdered) {
   Eigen::Matrix<double, Eigen::Dynamic, 1> y;

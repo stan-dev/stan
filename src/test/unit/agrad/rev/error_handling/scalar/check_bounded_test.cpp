@@ -4,7 +4,7 @@
 
 TEST(AgradRevErrorHandlingScalar,CheckBounded_X) {
   using stan::agrad::var;
-  using stan::error_handling::check_bounded;
+  using stan::math::check_bounded;
  
   const char* function = "check_bounded";
   const char* name = "x";
@@ -25,12 +25,12 @@ TEST(AgradRevErrorHandlingScalar,CheckBounded_X) {
 
   x = low-1;
   EXPECT_THROW(check_bounded(function, name, x, low, high), 
-                std::domain_error) 
+               std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;  
   
   x = high+1;
   EXPECT_THROW(check_bounded(function, name, x, low, high), 
-                std::domain_error) 
+               std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
 
   x = std::numeric_limits<var>::quiet_NaN();
@@ -49,7 +49,7 @@ TEST(AgradRevErrorHandlingScalar,CheckBounded_X) {
 
 TEST(AgradRevErrorHandlingScalar,CheckBounded_Low) {
   using stan::agrad::var;
-  using stan::error_handling::check_bounded;
+  using stan::math::check_bounded;
 
   const char* function = "check_bounded";
   const char* name = "x";
@@ -75,7 +75,7 @@ TEST(AgradRevErrorHandlingScalar,CheckBounded_Low) {
 }
 TEST(AgradRevErrorHandlingScalar,CheckBounded_High) {
   using stan::agrad::var;
-  using stan::error_handling::check_bounded;
+  using stan::math::check_bounded;
 
   const char* function = "check_bounded";
   const char* name = "x";
@@ -102,7 +102,7 @@ TEST(AgradRevErrorHandlingScalar,CheckBounded_High) {
 
 TEST(AgradRevErrorHandlingScalar, CheckBoundedVarCheckUnivariate) {
   using stan::agrad::var;
-  using stan::error_handling::check_bounded;
+  using stan::math::check_bounded;
 
   const char* function = "check_bounded";
   var a(5.0);
@@ -121,7 +121,7 @@ TEST(AgradRevErrorHandlingScalar, CheckBoundedVarCheckUnivariate) {
 TEST(AgradRevErrorHandlingScalar, CheckBoundedVarCheckVectorized) {
   using stan::agrad::var;
   using std::vector;
-  using stan::error_handling::check_bounded;
+  using stan::math::check_bounded;
 
   int N = 5;
   const char* function = "check_bounded";
