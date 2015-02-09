@@ -94,17 +94,17 @@ TEST(ProbDistributionsInvWishart, Error) {
   
   nu = 5;
   Sigma.resize(2,1);
-  EXPECT_THROW(inv_wishart_log(Y, nu, Sigma), std::domain_error);
+  EXPECT_THROW(inv_wishart_log(Y, nu, Sigma), std::invalid_argument);
 
   nu = 5;
   Sigma.resize(2,2);
   Y.resize(2,1);
-  EXPECT_THROW(inv_wishart_log(Y, nu, Sigma), std::domain_error);
+  EXPECT_THROW(inv_wishart_log(Y, nu, Sigma), std::invalid_argument);
   
   nu = 5;
   Sigma.resize(2,2);
   Y.resize(3,3);
-  EXPECT_THROW(inv_wishart_log(Y, nu, Sigma), std::domain_error);
+  EXPECT_THROW(inv_wishart_log(Y, nu, Sigma), std::invalid_argument);
 
   Sigma.resize(3,3);
   Sigma.setIdentity();

@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING__SCALAR__DOM_ERR_HPP
-#define STAN__ERROR_HANDLING__SCALAR__DOM_ERR_HPP
+#ifndef STAN__ERROR_HANDLING__DOMAIN_ERROR_HPP
+#define STAN__ERROR_HANDLING__DOMAIN_ERROR_HPP
 
 #include <typeinfo>
 #include <string>
@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Throw a domain error with a consistently formatted message.
@@ -18,7 +18,7 @@ namespace stan {
      * to Stan v2.5.0.)
      *
      * The message is:
-     * "<function>(<typeid(T)>.name()>): <name> <msg1><y><msg2>"
+     * "<function>: <name> <msg1><y><msg2>"
      *
      * @tparam T Type of variable
      * @param function Name of the function
@@ -26,16 +26,17 @@ namespace stan {
      * @param y Variable
      * @param msg1 Message to print before the variable
      * @param msg2 Message to print after the variable
+     * @throw std::domain_error
      */
     template <typename T>
-    inline void dom_err(const char* function,
-                        const char* name,
-                        const T& y,
-                        const char* msg1,
-                        const char* msg2) {
+    inline void domain_error(const char* function,
+                             const char* name,
+                             const T& y,
+                             const char* msg1,
+                             const char* msg2) {
       std::ostringstream message;
-      
-      message << function << "(" << typeid(T).name() << "): "
+
+      message << function << ": "
               << name << " "
               << msg1
               << y
@@ -53,20 +54,21 @@ namespace stan {
      * to Stan v2.5.0.)
      *
      * The message is:
-     * "<function>(<typeid(T)>.name()>): <name> <msg1><y>"
+     * "<function>: <name> <msg1><y>"
      *
      * @tparam T Type of variable
      * @param function Name of the function
      * @param name Name of the variable
      * @param y Variable
      * @param msg1 Message to print before the variable
+     * @throw std::domain_error
      */
     template <typename T>
-    inline void dom_err(const char* function,
-                        const char* name,
-                        const T& y,
-                        const char* msg1) {
-      dom_err(function, name, y, msg1, "");
+    inline void domain_error(const char* function,
+                             const char* name,
+                             const T& y,
+                             const char* msg1) {
+      domain_error(function, name, y, msg1, "");
     }
 
   }

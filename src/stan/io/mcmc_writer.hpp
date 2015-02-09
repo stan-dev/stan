@@ -40,8 +40,9 @@ namespace stan {
       /**
        * Constructor.
        *
-       * @param sample_stream samples are "written" to this stream (can abstract this?)
-       * @param diagnostic_stream diagnostic information is "written" to this stream
+       * @param sample_recorder samples are "written" to this stream (can abstract this?)
+       * @param diagnostic_recorder diagnostic information is "written" to this stream
+       * @param message_recorder messages are written to this stream
        * @param msg_stream messages are output to this stream
        *
        * @pre arguments == 0 if and only if they are not meant to be used
@@ -133,7 +134,7 @@ namespace stan {
        * Prints additional sampler info to the stream.
        * 
        * @param sampler sampler
-       * @param stream stream to output stuff to
+       * @param recorder stream to output stuff to
        */
       template <class Recorder>
       void write_adapt_finish(stan::mcmc::base_mcmc* sampler, 
@@ -219,8 +220,7 @@ namespace stan {
        *
        * @param warmDeltaT warmup time in seconds
        * @param sampleDeltaT sample time in seconds
-       * @param stream output stream
-       * @param prefix prepend each line with the prefix; default is ""
+       * @param recorder output stream
        *
        * @pre none
        * @post none

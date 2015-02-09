@@ -27,8 +27,8 @@ TEST(AgradRevMatrix,col_v_exc0) {
 
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(col(y,0),std::domain_error);
-  EXPECT_THROW(col(y,7),std::domain_error);
+  EXPECT_THROW(col(y,0),std::out_of_range);
+  EXPECT_THROW(col(y,7),std::out_of_range);
 }
 TEST(AgradRevMatrix,col_v_excHigh) {
   using stan::math::col;
@@ -36,6 +36,6 @@ TEST(AgradRevMatrix,col_v_excHigh) {
 
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(col(y,0),std::domain_error);
-  EXPECT_THROW(col(y,5),std::domain_error);
+  EXPECT_THROW(col(y,0),std::out_of_range);
+  EXPECT_THROW(col(y,5),std::out_of_range);
 }

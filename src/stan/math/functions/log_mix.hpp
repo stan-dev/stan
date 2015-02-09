@@ -38,7 +38,7 @@ namespace stan {
      * = FIXME
      * \f]
      * 
-     * @param theta[in] mixing proportion in [0,1].
+     * @param[in] theta mixing proportion in [0,1].
      * @param lambda1 first log density.
      * @param lambda2 second log density.
      * @return log mixture of densities in specified proportion
@@ -47,9 +47,9 @@ namespace stan {
                    double lambda1,
                    double lambda2) {
       using std::log;
-      stan::error_handling::check_not_nan("log_mix","lambda1",lambda1);
-      stan::error_handling::check_not_nan("log_mix","lambda2",lambda2);
-      stan::error_handling::check_bounded("log_mix","theta",theta,0,1);
+      stan::math::check_not_nan("log_mix","lambda1",lambda1);
+      stan::math::check_not_nan("log_mix","lambda2",lambda2);
+      stan::math::check_bounded("log_mix","theta",theta,0,1);
       return log_sum_exp(log(theta) + lambda1,
                          log1m(theta) + lambda2);
     }

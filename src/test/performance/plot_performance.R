@@ -25,7 +25,7 @@ col_index <- ifelse(performance$matches.tagged.version == "yes" &
 
 cols <- rbind(c("gray", "black"), c("red4", "red"))
 
-png("performance.png")
+png("performance.png", 900, 550)
 par(mar = c(6, 4, 2, 0.5))
 plot(NA,
      xlim=xlim, ylim=ylim,
@@ -36,7 +36,7 @@ plot(NA,
      type="n", xaxt="n")
 axis(1, at=x,
      labels=FALSE)
-text(x=x, y=-150, labels = label, srt=60,
+text(x=x, y=-0.150, labels = label, srt=60,
      xpd=TRUE, cex=0.5, adj=1)
 
 points(x, performance$mean, col=cols[col_index, 2])

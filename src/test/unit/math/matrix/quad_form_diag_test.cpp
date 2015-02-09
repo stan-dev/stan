@@ -44,7 +44,7 @@ TEST(MathMatrix,quadFormDiagException) {
   m << 
     2, 3,
     4, 5;
-  EXPECT_THROW(quad_form_diag(m,m), std::domain_error);
+  EXPECT_THROW(quad_form_diag(m,m), std::invalid_argument);
 
   Matrix<double,Dynamic,1> v(3);
   v << 1, 2, 3;
@@ -59,8 +59,8 @@ TEST(MathMatrix,quadFormDiagException) {
   Matrix<double,Dynamic,1> v2(2);
   v2 << 1, 2;
 
-  EXPECT_THROW(quad_form_diag(m2,v), std::domain_error);
-  EXPECT_THROW(quad_form_diag(m2,v2), std::domain_error);
+  EXPECT_THROW(quad_form_diag(m2,v), std::invalid_argument);
+  EXPECT_THROW(quad_form_diag(m2,v2), std::invalid_argument);
 }
 
 

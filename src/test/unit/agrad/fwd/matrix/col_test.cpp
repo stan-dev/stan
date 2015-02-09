@@ -43,8 +43,8 @@ TEST(AgradFwdMatrixCol,matrix_fd_exc0) {
    y(1,0).d_ = 1.0;
    y(1,1).d_ = 1.0;
    y(1,2).d_ = 1.0;
-  EXPECT_THROW(col(y,0),std::domain_error);
-  EXPECT_THROW(col(y,7),std::domain_error);
+  EXPECT_THROW(col(y,0),std::out_of_range);
+  EXPECT_THROW(col(y,7),std::out_of_range);
 }
 TEST(AgradFwdMatrixCol,matrix_fd_excHigh) {
   using stan::math::col;
@@ -58,8 +58,8 @@ TEST(AgradFwdMatrixCol,matrix_fd_excHigh) {
    y(1,0).d_ = 1.0;
    y(1,1).d_ = 1.0;
    y(1,2).d_ = 1.0;
-  EXPECT_THROW(col(y,0),std::domain_error);
-  EXPECT_THROW(col(y,5),std::domain_error);
+  EXPECT_THROW(col(y,0),std::out_of_range);
+  EXPECT_THROW(col(y,5),std::out_of_range);
 }
 TEST(AgradFwdMatrixCol,matrix_fv) {
   using stan::math::col;
@@ -106,8 +106,8 @@ TEST(AgradFwdMatrixCol,matrix_fv_exc0) {
   matrix_fv y(2,3);
   y << a,b,c,d,e,f;
 
-  EXPECT_THROW(col(y,0),std::domain_error);
-  EXPECT_THROW(col(y,7),std::domain_error);
+  EXPECT_THROW(col(y,0),std::out_of_range);
+  EXPECT_THROW(col(y,7),std::out_of_range);
 }
 TEST(AgradFwdMatrixCol,matrix_fv_excHigh) {
   using stan::math::col;
@@ -124,8 +124,8 @@ TEST(AgradFwdMatrixCol,matrix_fv_excHigh) {
   matrix_fv y(2,3);
   y << a,b,c,d,e,f;
 
-  EXPECT_THROW(col(y,0),std::domain_error);
-  EXPECT_THROW(col(y,5),std::domain_error);
+  EXPECT_THROW(col(y,0),std::out_of_range);
+  EXPECT_THROW(col(y,5),std::out_of_range);
 }
 TEST(AgradFwdMatrixCol,matrix_ffd) {
   using stan::math::col;
@@ -196,8 +196,8 @@ TEST(AgradFwdMatrixCol,matrix_ffd_exc0) {
   matrix_ffd y(2,3);
   y << a,b,c,d,e,f;
 
-  EXPECT_THROW(col(y,0),std::domain_error);
-  EXPECT_THROW(col(y,7),std::domain_error);
+  EXPECT_THROW(col(y,0),std::out_of_range);
+  EXPECT_THROW(col(y,7),std::out_of_range);
 }
 TEST(AgradFwdMatrixCol,matrix_ffd_excHigh) {
   using stan::math::col;
@@ -226,8 +226,8 @@ TEST(AgradFwdMatrixCol,matrix_ffd_excHigh) {
   matrix_ffd y(2,3);
   y << a,b,c,d,e,f;
 
-  EXPECT_THROW(col(y,0),std::domain_error);
-  EXPECT_THROW(col(y,5),std::domain_error);
+  EXPECT_THROW(col(y,0),std::out_of_range);
+  EXPECT_THROW(col(y,5),std::out_of_range);
 }
 TEST(AgradFwdMatrixCol,matrix_ffv) {
   using stan::math::col;
@@ -300,8 +300,8 @@ TEST(AgradFwdMatrixCol,matrix_ffv_exc0) {
   matrix_ffv y(2,3);
   y << a,b,c,d,e,f;
 
-  EXPECT_THROW(col(y,0),std::domain_error);
-  EXPECT_THROW(col(y,7),std::domain_error);
+  EXPECT_THROW(col(y,0),std::out_of_range);
+  EXPECT_THROW(col(y,7),std::out_of_range);
 }
 TEST(AgradFwdMatrixCol,matrix_ffv_excHigh) {
   using stan::math::col;
@@ -331,6 +331,6 @@ TEST(AgradFwdMatrixCol,matrix_ffv_excHigh) {
   matrix_ffv y(2,3);
   y << a,b,c,d,e,f;
 
-  EXPECT_THROW(col(y,0),std::domain_error);
-  EXPECT_THROW(col(y,5),std::domain_error);
+  EXPECT_THROW(col(y,0),std::out_of_range);
+  EXPECT_THROW(col(y,5),std::out_of_range);
 }

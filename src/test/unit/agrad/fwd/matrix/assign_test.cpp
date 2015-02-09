@@ -31,7 +31,7 @@ TEST(AgradFwdMatrixAssign,vector_fvar_double) {
   }
 
   vector<fvar<double> > z(2);
-  EXPECT_THROW(assign(x,z), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixAssign,eigen_row_vector_fvar_double_to_fvar_double) {
@@ -67,18 +67,18 @@ TEST(AgradFwdMatrixAssign,eigen_row_vector_fvar_double_shape_mismatch) {
   x[2] = -5.1;
 
   Matrix<fvar<double>,1,Dynamic> z(2);
-  EXPECT_THROW(assign(x,z), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
 
   Matrix<fvar<double>,Dynamic,1> zz(3);
   zz << 1, 2, 3;
-  EXPECT_THROW(assign(x,zz),std::domain_error);
+  EXPECT_THROW(assign(x,zz), std::invalid_argument);
   
   Matrix<fvar<double>,Dynamic,Dynamic> zzz(3,1);
   zzz << 1, 2, 3;
-  EXPECT_THROW(assign(x,zzz),std::domain_error);
+  EXPECT_THROW(assign(x,zzz), std::invalid_argument);
 
   Matrix<fvar<double>,Dynamic,Dynamic> zzzz(1,3);
-  EXPECT_THROW(assign(x,zzzz),std::domain_error);
+  EXPECT_THROW(assign(x,zzzz), std::invalid_argument);
 }
 
 
@@ -119,18 +119,18 @@ TEST(AgradFwdMatrixAssign,eigen_matrix_fvar_double_shape_mismatch) {
 
   Matrix<fvar<double>,1,Dynamic> z(6);
   z << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,z), std::domain_error);
-  EXPECT_THROW(assign(z,x), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
+  EXPECT_THROW(assign(z,x), std::invalid_argument);
 
   Matrix<fvar<double>,Dynamic,1> zz(6);
   zz << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,zz),std::domain_error);
-  EXPECT_THROW(assign(zz,x),std::domain_error);
+  EXPECT_THROW(assign(x,zz), std::invalid_argument);
+  EXPECT_THROW(assign(zz,x), std::invalid_argument);
   
   Matrix<fvar<double>,Dynamic,Dynamic> zzz(6,1);
   zzz << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,zzz),std::domain_error);
-  EXPECT_THROW(assign(zzz,x),std::domain_error);
+  EXPECT_THROW(assign(x,zzz), std::invalid_argument);
+  EXPECT_THROW(assign(zzz,x), std::invalid_argument);
 
 }
 
@@ -280,7 +280,7 @@ TEST(AgradFwdMatrixAssign,vector_fvar_fvar_double) {
   }
 
   vector<fvar<fvar<double> > > z(2);
-  EXPECT_THROW(assign(x,z), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixAssign,eigen_row_vector_fvar_fvar_double_to_fvar_fvar_double) {
@@ -324,18 +324,18 @@ TEST(AgradFwdMatrixAssign,eigen_row_vector_fvar_fvar_double_shape_mismatch) {
   x[2] = -5.1;
 
   Matrix<fvar<fvar<double> >,1,Dynamic> z(2);
-  EXPECT_THROW(assign(x,z), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
 
   Matrix<fvar<fvar<double> >,Dynamic,1> zz(3);
   zz << 1, 2, 3;
-  EXPECT_THROW(assign(x,zz),std::domain_error);
+  EXPECT_THROW(assign(x,zz), std::invalid_argument);
   
   Matrix<fvar<fvar<double> >,Dynamic,Dynamic> zzz(3,1);
   zzz << 1, 2, 3;
-  EXPECT_THROW(assign(x,zzz),std::domain_error);
+  EXPECT_THROW(assign(x,zzz), std::invalid_argument);
 
   Matrix<fvar<fvar<double> >,Dynamic,Dynamic> zzzz(1,3);
-  EXPECT_THROW(assign(x,zzzz),std::domain_error);
+  EXPECT_THROW(assign(x,zzzz), std::invalid_argument);
 }
 
 
@@ -390,18 +390,18 @@ TEST(AgradFwdMatrixAssign,eigen_matrix_fvar_fvar_double_shape_mismatch) {
 
   Matrix<fvar<fvar<double> >,1,Dynamic> z(6);
   z << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,z), std::domain_error);
-  EXPECT_THROW(assign(z,x), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
+  EXPECT_THROW(assign(z,x), std::invalid_argument);
 
   Matrix<fvar<fvar<double> >,Dynamic,1> zz(6);
   zz << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,zz),std::domain_error);
-  EXPECT_THROW(assign(zz,x),std::domain_error);
+  EXPECT_THROW(assign(x,zz), std::invalid_argument);
+  EXPECT_THROW(assign(zz,x), std::invalid_argument);
   
   Matrix<fvar<fvar<double> >,Dynamic,Dynamic> zzz(6,1);
   zzz << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,zzz),std::domain_error);
-  EXPECT_THROW(assign(zzz,x),std::domain_error);
+  EXPECT_THROW(assign(x,zzz), std::invalid_argument);
+  EXPECT_THROW(assign(zzz,x), std::invalid_argument);
 
 }
 
@@ -556,7 +556,7 @@ TEST(AgradFwdMatrixAssign,vector_fvar_var) {
   }
 
   vector<fvar<var> > z(2);
-  EXPECT_THROW(assign(x,z), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
 
   std::vector<double> grads;
   std::vector<var> vars;
@@ -614,18 +614,18 @@ TEST(AgradFwdMatrixAssign,eigen_row_vector_fvar_var_shape_mismatch) {
   x[2] = -5.1;
 
   Matrix<fvar<var>,1,Dynamic> z(2);
-  EXPECT_THROW(assign(x,z), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
 
   Matrix<fvar<var>,Dynamic,1> zz(3);
   zz << 1, 2, 3;
-  EXPECT_THROW(assign(x,zz),std::domain_error);
+  EXPECT_THROW(assign(x,zz), std::invalid_argument);
   
   Matrix<fvar<var>,Dynamic,Dynamic> zzz(3,1);
   zzz << 1, 2, 3;
-  EXPECT_THROW(assign(x,zzz),std::domain_error);
+  EXPECT_THROW(assign(x,zzz), std::invalid_argument);
 
   Matrix<fvar<var>,Dynamic,Dynamic> zzzz(1,3);
-  EXPECT_THROW(assign(x,zzzz),std::domain_error);
+  EXPECT_THROW(assign(x,zzzz), std::invalid_argument);
 }
 
 
@@ -683,18 +683,18 @@ TEST(AgradFwdMatrixAssign,eigen_matrix_fvar_var_shape_mismatch) {
 
   Matrix<fvar<var>,1,Dynamic> z(6);
   z << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,z), std::domain_error);
-  EXPECT_THROW(assign(z,x), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
+  EXPECT_THROW(assign(z,x), std::invalid_argument);
 
   Matrix<fvar<var>,Dynamic,1> zz(6);
   zz << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,zz),std::domain_error);
-  EXPECT_THROW(assign(zz,x),std::domain_error);
+  EXPECT_THROW(assign(x,zz), std::invalid_argument);
+  EXPECT_THROW(assign(zz,x), std::invalid_argument);
   
   Matrix<fvar<var>,Dynamic,Dynamic> zzz(6,1);
   zzz << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,zzz),std::domain_error);
-  EXPECT_THROW(assign(zzz,x),std::domain_error);
+  EXPECT_THROW(assign(x,zzz), std::invalid_argument);
+  EXPECT_THROW(assign(zzz,x), std::invalid_argument);
 
 }
 
@@ -877,7 +877,7 @@ TEST(AgradFwdMatrixAssign,vector_fvar_fvar_var) {
   }
 
   vector<fvar<fvar<var> > > z(2);
-  EXPECT_THROW(assign(x,z), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
 
   std::vector<double> grads;
   std::vector<var> vars;
@@ -943,18 +943,18 @@ TEST(AgradFwdMatrixAssign,eigen_row_vector_fvar_fvar_var_shape_mismatch) {
   x[2] = -5.1;
 
   Matrix<fvar<fvar<var> >,1,Dynamic> z(2);
-  EXPECT_THROW(assign(x,z), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
 
   Matrix<fvar<fvar<var> >,Dynamic,1> zz(3);
   zz << 1, 2, 3;
-  EXPECT_THROW(assign(x,zz),std::domain_error);
+  EXPECT_THROW(assign(x,zz), std::invalid_argument);
   
   Matrix<fvar<fvar<var> >,Dynamic,Dynamic> zzz(3,1);
   zzz << 1, 2, 3;
-  EXPECT_THROW(assign(x,zzz),std::domain_error);
+  EXPECT_THROW(assign(x,zzz), std::invalid_argument);
 
   Matrix<fvar<fvar<var> >,Dynamic,Dynamic> zzzz(1,3);
-  EXPECT_THROW(assign(x,zzzz),std::domain_error);
+  EXPECT_THROW(assign(x,zzzz), std::invalid_argument);
 }
 
 
@@ -1026,18 +1026,18 @@ TEST(AgradFwdMatrixAssign,eigen_matrix_fvar_fvar_var_shape_mismatch) {
 
   Matrix<fvar<fvar<var> >,1,Dynamic> z(6);
   z << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,z), std::domain_error);
-  EXPECT_THROW(assign(z,x), std::domain_error);
+  EXPECT_THROW(assign(x,z), std::invalid_argument);
+  EXPECT_THROW(assign(z,x), std::invalid_argument);
 
   Matrix<fvar<fvar<var> >,Dynamic,1> zz(6);
   zz << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,zz),std::domain_error);
-  EXPECT_THROW(assign(zz,x),std::domain_error);
+  EXPECT_THROW(assign(x,zz), std::invalid_argument);
+  EXPECT_THROW(assign(zz,x), std::invalid_argument);
   
   Matrix<fvar<fvar<var> >,Dynamic,Dynamic> zzz(6,1);
   zzz << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(assign(x,zzz),std::domain_error);
-  EXPECT_THROW(assign(zzz,x),std::domain_error);
+  EXPECT_THROW(assign(x,zzz), std::invalid_argument);
+  EXPECT_THROW(assign(zzz,x), std::invalid_argument);
 
 }
 
