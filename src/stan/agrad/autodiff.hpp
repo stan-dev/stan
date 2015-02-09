@@ -6,7 +6,7 @@
 #include <stan/agrad/fwd.hpp>
 
 namespace stan {
-  
+ 
   namespace agrad {
 
     /**
@@ -26,8 +26,8 @@ namespace stan {
                const T& x,
                T& fx,
                T& dfx_dx)  {
-      fvar<T> x_fvar = fvar<T>(x,1.0);
-      fvar<T> fx_fvar = f(x_fvar); 
+      fvar<T> x_fvar = fvar<T>(x, 1.0);
+      fvar<T> fx_fvar = f(x_fvar);
       fx = fx_fvar.val_;
       dfx_dx = fx_fvar.d_;
     }
@@ -47,7 +47,7 @@ namespace stan {
     template <typename T, typename F>
     void
     partial_derivative(const F& f,
-                       const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                       const Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
                        int n,
                        T& fx,
                        T& dfx_dxn) {
