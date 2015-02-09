@@ -644,11 +644,6 @@ namespace stan {
           (parser.arg("method")->arg("variational")
                                ->arg("save_variational"))->value();
 
-        std::cout << "num_samples: " << num_samples << std::endl;
-        std::cout << "num_iterations: " << num_iterations << std::endl;
-        std::cout << "save_iterations: " << save_iterations << std::endl;
-        std::cout << "tol_rel_param: " << tol_rel_param << std::endl;
-
         if (algo->value() == "fullrank") {
           double elbo = 0.0;
           // cont_params = Eigen::VectorXd::Zero(model.num_params_r());
@@ -667,9 +662,10 @@ namespace stan {
             (*output_stream) << 0 << "," ;
           }
 
-          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo, base_rng,
+          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo,
+                                              num_samples, base_rng,
                                               output_stream, diagnostic_stream);
-          cmd_vb.run_robbins_monro_fullrank();
+          cmd_vb.run_fullrank(num_iterations);
 
           cont_params = cmd_vb.cont_params();
 
@@ -703,9 +699,10 @@ namespace stan {
             (*output_stream) << 0 << "," ;
           }
 
-          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo, base_rng,
+          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo,
+                                              num_samples, base_rng,
                                               output_stream, diagnostic_stream);
-          cmd_vb.run_robbins_monro_meanfield();
+          cmd_vb.run_meanfield(num_iterations);
 
           cont_params = cmd_vb.cont_params();
 

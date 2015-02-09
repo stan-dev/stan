@@ -34,6 +34,7 @@ namespace stan {
       bbvb(M& m,
            Eigen::VectorXd& cont_params,
            double& elbo,
+           int& n_monte_carlo,
            BaseRNG& rng,
            std::ostream* o, std::ostream* e):
         base_vb(o, e, "bbvb"),
@@ -41,7 +42,7 @@ namespace stan {
         cont_params_(cont_params),
         elbo_(elbo),
         rng_(rng),
-        n_monte_carlo_(10) {};
+        n_monte_carlo_(n_monte_carlo) {};
 
       virtual ~bbvb() {};
 
@@ -454,9 +455,9 @@ namespace stan {
         }
       }
 
-      void run_robbins_monro_fullrank() {
+      void run_fullrank(int max_iterations) {
         std::cout
-        << "This is base_vb::bbvb::run_robbins_monro_fullrank()" << std::endl;
+        << "This is base_vb::bbvb::run_fullrank()" << std::endl;
         std::cout
         << "cont_params_ = " << std::endl
         << cont_params_ << std::endl << std::endl;
@@ -468,7 +469,7 @@ namespace stan {
         vb_params_fullrank muL = vb_params_fullrank(mu,L);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(muL, 1000);
+        do_robbins_monro_adagrad(muL, max_iterations);
 
         cont_params_ = muL.mu();
 
@@ -483,9 +484,9 @@ namespace stan {
         return;
       }
 
-      void run_robbins_monro_meanfield() {
+      void run_meanfield(int max_iterations) {
         std::cout
-        << "This is base_vb::bbvb::run_robbins_monro_meanfield()" << std::endl;
+        << "This is base_vb::bbvb::run_meanfield()" << std::endl;
         std::cout
         << "cont_params_ = " << std::endl
         << cont_params_ << std::endl << std::endl;
@@ -500,7 +501,7 @@ namespace stan {
         vb_params_meanfield musigmatilde = vb_params_meanfield(mu,sigma_tilde);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(musigmatilde, 1000);
+        do_robbins_monro_adagrad(musigmatilde, max_iterations);
 
         cont_params_ = musigmatilde.mu();
 
