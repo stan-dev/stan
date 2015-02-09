@@ -45,7 +45,7 @@ namespace stan {
     multi_gp_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                  const Eigen::Matrix<T_w,Eigen::Dynamic,1>& w) {
-      static const std::string function("stan::prob::multi_gp_log");
+      static const char* function("stan::prob::multi_gp_log");
       typedef typename boost::math::tools::promote_args<T_y,T_covar,T_w>::type T_lp;
       T_lp lp(0.0);
       
@@ -55,17 +55,14 @@ namespace stan {
       using stan::math::log_determinant_ldlt;
       using stan::math::trace_gen_inv_quad_form_ldlt;
 
-      using stan::error_handling::check_size_match;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_symmetric;
-      using stan::error_handling::check_ldlt_factor;
-      using stan::error_handling::check_not_nan;
+      using stan::math::check_size_match;
+      using stan::math::check_positive_finite;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_symmetric;
+      using stan::math::check_ldlt_factor;
+      using stan::math::check_not_nan;
 
-      check_size_match(function, 
-                       "Rows of kernel matrix", Sigma.rows(), 
-                       "columns of kernel matrix", Sigma.cols());
       check_positive(function, "Kernel rows", Sigma.rows());
       check_finite(function, "Kernel", Sigma);
       check_symmetric(function, "Kernel", Sigma);

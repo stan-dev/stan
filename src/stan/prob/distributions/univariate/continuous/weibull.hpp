@@ -25,15 +25,15 @@ namespace stan {
               typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
-      static const std::string function("stan::prob::weibull_log");
+      static const char* function("stan::prob::weibull_log");
       typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
         T_partials_return;
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::math::multiply_log;
 
       // check if any vectors are zero length
@@ -144,10 +144,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
         T_partials_return;
 
-      static const std::string function("stan::prob::weibull_cdf");
+      static const char* function("stan::prob::weibull_cdf");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -209,10 +209,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
         T_partials_return;
 
-      static const std::string function("stan::prob::weibull_cdf_log");
+      static const char* function("stan::prob::weibull_cdf_log");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -264,10 +264,10 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type 
         T_partials_return;
 
-      static const std::string function("stan::prob::weibull_ccdf_log");
+      static const char* function("stan::prob::weibull_ccdf_log");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -318,9 +318,9 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::weibull_distribution;
 
-      static const std::string function("stan::prob::weibull_rng");
+      static const char* function("stan::prob::weibull_rng");
 
-      using stan::error_handling::check_positive_finite;
+      using stan::math::check_positive_finite;
   
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", sigma);

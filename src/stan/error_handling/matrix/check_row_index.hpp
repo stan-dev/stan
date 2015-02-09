@@ -1,38 +1,49 @@
 #ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_ROW_INDEX_HPP
 #define STAN__ERROR_HANDLING__MATRIX__CHECK_ROW_INDEX_HPP
 
-#include <sstream>
+#include <stan/error_handling/out_of_range.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
+#include <stan/meta/traits.hpp>
+#include <sstream>
+#include <string>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
     /**
      * Return <code>true</code> if the specified index is a valid row of the matrix
      *
-     * NOTE: this will not throw if y contains nan values.
+     * This check is 1-indexed by default. This behavior can be changed
+     * by setting <code>stan::error_index::value</code>.
      *
-     * @param function
+     * @tparam T Scalar type
+     * @tparam R Compile time rows
+     * @tparam C Compile time columns
+     *
+     * @param function Function name (for error messages)
+     * @param name Variable name (for error messages)
+     * @param y Matrix to test
      * @param i is index
-     * @param y Matrix to test against
-     * @param name
-     * @return <code>true</code> if the index is a valid row index of the matrix.
-     * @tparam T Type of scalar.
+     *
+     * @return <code>true</code> if the index is a valid row index in the matrix
+     * @throw <code>std::out_of_range</code> if the index is out of range.
      */
     template <typename T_y, int R, int C>
-    inline bool check_row_index(const std::string& function,
-                                const std::string& name, 
-                                const Eigen::Matrix<T_y,R,C>& y, 
+    inline bool check_row_index(const char* function,
+                                const char* name,
+                                const Eigen::Matrix<T_y, R, C>& y,
                                 size_t i) {
-      if ((i > 0) && (i <= static_cast<size_t>(y.rows())))
+      if (i >= stan::error_index::value
+          && i < static_cast<size_t>(y.rows()) + stan::error_index::value)
         return true;
-      
-      std::ostringstream msg;
-      msg << ") must be greater than 0 and less than " 
-          << y.rows();
-      dom_err(function, name, i,
-              "(", msg.str());
+
+      std::stringstream msg;
+      msg << " for rows of " << name;
+      std::string msg_str(msg.str());
+      out_of_range(function,
+                   y.rows(),
+                   i,
+                   msg_str.c_str());
       return false;
     }
 

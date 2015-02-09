@@ -2,9 +2,37 @@
 #include <stan/math/matrix/meta/value_type.hpp>  
 #include <gtest/gtest.h>
 
+TEST(ErrorHandlingScalar,CheckPositive) {
+  using stan::math::check_positive;
+  const char* function = "check_positive";
+
+  EXPECT_TRUE(check_positive(function, "x", nan));
+
+  std::vector<double> x;
+  x.push_back(1.0);
+  x.push_back(2.0);
+  x.push_back(3.0);
+
+  for (size_t i = 0; i < x.size(); i++) {
+    EXPECT_TRUE(check_positive(function, "x", x));
+  }
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> x_mat(3);
+  x_mat   << 1, 2, 3;
+  for (int i = 0; i < x_mat.size(); i++) {
+    EXPECT_TRUE(check_positive(function, "x", x_mat));
+  }
+
+  x_mat(0) = 0;
+
+  EXPECT_THROW(check_positive(function, "x", x_mat),
+               std::domain_error);
+}
+
 TEST(ErrorHandlingScalar,CheckPositive_nan) {
-  using stan::error_handling::check_positive;
-  const std::string function = "check_positive";
+  using stan::math::check_positive;
+  const char* function = "check_positive";
+
   double nan = std::numeric_limits<double>::quiet_NaN();
 
   EXPECT_THROW(check_positive(function, "x", nan),
@@ -15,7 +43,7 @@ TEST(ErrorHandlingScalar,CheckPositive_nan) {
   x.push_back(2.0);
   x.push_back(3.0);
 
-  for (int i = 0; i < x.size(); i++) {
+  for (size_t i = 0; i < x.size(); i++) {
     x[i] = nan;
     EXPECT_THROW(check_positive(function, "x", x),
                  std::domain_error);

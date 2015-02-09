@@ -126,7 +126,7 @@ TEST(StanMathOde_integrate_ode, error_conditions) {
 
   std::vector<double> y0_bad;
   EXPECT_THROW_MSG(integrate_ode(harm_osc, y0_bad, t0, ts, theta, x, x_int, 0),
-                   std::domain_error,
+                   std::invalid_argument,
                    "initial state has size 0");
   
   double t0_bad = 2.0;
@@ -136,7 +136,7 @@ TEST(StanMathOde_integrate_ode, error_conditions) {
 
   std::vector<double> ts_bad;
   EXPECT_THROW_MSG(integrate_ode(harm_osc, y0, t0, ts_bad, theta, x, x_int, 0),
-                   std::domain_error,
+                   std::invalid_argument,
                    "times has size 0");
 
   ts_bad.push_back(3);

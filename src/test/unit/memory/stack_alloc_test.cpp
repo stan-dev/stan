@@ -24,11 +24,11 @@ TEST(MemoryStackAlloc, allocArrayBigger) {
   size_t K = 10;
   stan::memory::stack_alloc allocator;
   biggy* x = allocator.alloc_array<biggy>(N);
-  for (int i = 0; i < N; ++i)
-    for (int k = 1; k < K; ++k)
+  for (size_t i = 0; i < N; ++i)
+    for (size_t k = 1; k < K; ++k)
       x[i].r[k] = k * i;
-  for (int i = 0; i < N; ++i)
-    for (int k = 0; k < K; ++k)
+  for (size_t i = 0; i < N; ++i)
+    for (size_t k = 0; k < K; ++k)
       EXPECT_FLOAT_EQ(k * i, x[i].r[k]);
 }
 TEST(stack_alloc, bytes_allocated) {

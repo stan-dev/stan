@@ -26,7 +26,7 @@ C++11 = false
 # Library locations
 ##
 EIGEN ?= lib/eigen_3.2.2
-BOOST ?= lib/boost_1.54.0
+BOOST ?= lib/boost_1.55.0
 GTEST ?= lib/gtest_1.7.0
 
 ##
@@ -39,6 +39,8 @@ LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 WINE =
 
+-include $(HOME)/.config/stan/make.local  # define local variables
+-include make/local                       # overwrite local variables
 
 ##
 # Get information about the compiler used.
@@ -58,6 +60,19 @@ WINE =
 ##
 -include make/detect_os
 
+include make/libstan  # bin/libstan.a bin/libstanc.a
+include make/tests    # tests
+include make/doxygen  # doxygen
+include make/manual   # manual: manual, doc/stan-reference.pdf
+
+##
+# Dependencies
+##
+ifneq (,$(filter-out test-headers generate-tests clean% %-test %.d,$(MAKECMDGOALS)))
+  -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
+endif
+
+
 bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
@@ -72,6 +87,8 @@ bin/%.d : src/%.cpp
 	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1\.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
+
+
 
 .PHONY: help
 help:
@@ -126,18 +143,6 @@ endif
 	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
-include make/libstan  # bin/libstan.a bin/libstanc.a
-include make/tests    # tests
-include make/doxygen  # doxygen
-include make/manual   # manual: manual, doc/stan-reference.pdf
--include make/local    # for local stuff
-
-##
-# Dependencies
-##
-ifneq (,$(filter-out test-headers generate-tests clean% %-test %.d,$(MAKECMDGOALS)))
-  -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
-endif
 
 ##
 # Documentation
@@ -162,6 +167,7 @@ clean-dox:
 	$(RM) -r doc/api
 
 clean-manual:
+	rm -rf doc
 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 clean-deps:

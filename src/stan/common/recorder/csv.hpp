@@ -27,6 +27,7 @@ namespace stan {
          * Construct an object.
          *
          * @param o pointer to stream. Will accept 0.
+         * @param prefix Prefix string
          */
         csv(std::ostream *o, std::string prefix) 
           : o_(o), has_stream_(o != 0), prefix_(prefix) { }

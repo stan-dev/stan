@@ -11,8 +11,8 @@ namespace stan {
 
   namespace agrad {
 
-    inline bool check_pos_definite(const std::string& function,
-                                   const std::string& name,
+    inline bool check_pos_definite(const char* function,
+                                   const char* name,
                                    const Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic>& y) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
@@ -22,7 +22,7 @@ namespace stan {
       for (size_type i = 0; i < y_d.rows(); i++) 
         for (size_type j = 0; j < y_d.cols(); j++)
           y_d(i,j) = y(i,j).val();
-      return stan::error_handling::check_pos_definite(function, name, y_d);
+      return stan::math::check_pos_definite(function, name, y_d);
     }
     
   }

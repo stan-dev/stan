@@ -1,7 +1,7 @@
 #include <stan/error_handling/matrix/check_positive_ordered.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_positive_ordered;
+using stan::math::check_positive_ordered;
 
 TEST(ErrorHandlingMatrix, checkPositiveOrdered) {
   Eigen::Matrix<double, Eigen::Dynamic, 1> y;

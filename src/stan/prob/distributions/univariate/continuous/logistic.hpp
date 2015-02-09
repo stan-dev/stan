@@ -24,13 +24,13 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     logistic_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const std::string function("stan::prob::logistic_log");
+      static const char* function("stan::prob::logistic_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
       
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
       
@@ -148,12 +148,12 @@ namespace stan {
         return 1.0;
           
       // Error checks
-      static const std::string function("stan::prob::logistic_cdf");
+      static const char* function("stan::prob::logistic_cdf");
           
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_not_nan;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -244,12 +244,12 @@ namespace stan {
         return 0.0;
           
       // Error checks
-      static const std::string function("stan::prob::logistic_cdf_log");
+      static const char* function("stan::prob::logistic_cdf_log");
           
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_not_nan;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -325,12 +325,12 @@ namespace stan {
         return 0.0;
           
       // Error checks
-      static const std::string function("stan::prob::logistic_cdf_log");
+      static const char* function("stan::prob::logistic_cdf_log");
           
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_not_nan;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
@@ -379,7 +379,7 @@ namespace stan {
               
         // Compute
         const T_partials_return Pn = 1.0 - 1.0 / (1.0 + exp(-(y_dbl - mu_dbl) 
-                                                             * sigma_inv_vec));
+                                                            * sigma_inv_vec));
         P += log(Pn);
               
         if (!is_constant_struct<T_y>::value)
@@ -404,10 +404,10 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::exponential_distribution;
 
-      static const std::string function("stan::prob::logistic_rng");
+      static const char* function("stan::prob::logistic_rng");
       
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
 
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);

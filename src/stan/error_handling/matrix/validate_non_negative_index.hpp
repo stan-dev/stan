@@ -3,14 +3,14 @@
 
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 namespace stan {
-  namespace error_handling {
+  namespace math {
 
-    inline 
-    void 
-    validate_non_negative_index(const std::string& var_name,
-                                const std::string& expr,
+    inline void
+    validate_non_negative_index(const char* var_name,
+                                const char* expr,
                                 int val) {
       if (val < 0) {
         std::stringstream msg;
@@ -18,7 +18,8 @@ namespace stan {
             << "; variable=" << var_name
             << "; dimension size expression=" << expr
             << "; expression value=" << val;
-        throw std::invalid_argument(msg.str());
+        std::string msg_str(msg.str());
+        throw std::invalid_argument(msg_str.c_str());
       }
     }
 

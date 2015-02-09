@@ -29,8 +29,8 @@ void test_pg(const std::string& program_name,
 
 int count_occurrences(const std::string target,
                       const std::string s) {
-  int count = 0;
-  int offset = 0;
+  size_t count = 0;
+  size_t offset = 0;
   while (true) {
     offset = s.find(target, offset);
     if (offset == std::string::npos) break;

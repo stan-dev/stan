@@ -198,29 +198,29 @@ TEST(AgradFwdMatrixTraceGenInvQuadFormLDLT,exceptions_fd) {
   fd2.compute(fd2_);
 
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv1, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv1, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv2, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv2, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixTraceGenInvQuadFormLDLT,matrix_ffd_matrix_ffd_matrix_ffd) {
@@ -408,29 +408,29 @@ TEST(AgradFwdMatrixTraceGenInvQuadFormLDLT,exceptions_ffd) {
   fd2.compute(fd2_);
 
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv1, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv1, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv2, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv2, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_fv_matrix_fv1) {
@@ -944,29 +944,29 @@ TEST(AgradFwdMatrixTraceGenInvQuadFormLDLT,exceptions_fv) {
   fd2.compute(fd2_);
 
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv1, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv1, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv2, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv2, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_ffv1) {
@@ -1975,27 +1975,27 @@ TEST(AgradFwdMatrixTraceGenInvQuadFormLDLT,exceptions_ffv) {
   fd2.compute(fd2_);
 
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv1, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv1, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvd2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvf2), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv2, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv2, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv2_, fv1, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvd1), 
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(trace_gen_inv_quad_form_ldlt(fv1_, fv2, rvf1), 
-               std::domain_error);
+               std::invalid_argument);
 }

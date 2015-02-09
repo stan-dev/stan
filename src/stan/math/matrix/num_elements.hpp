@@ -37,7 +37,7 @@ namespace stan {
      * This assumes it is not ragged and that each of its contained
      * elements has the same number of elements.
      *
-     * @param m argument vector
+     * @param v argument vector
      * @return number of contained arguments
      */
     template <typename T>

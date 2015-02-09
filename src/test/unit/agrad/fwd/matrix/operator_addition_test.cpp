@@ -183,10 +183,10 @@ TEST(AgradFwdMatrixOperatorAddition,fd_vector_vector_exception) {
   vector_d d1(5), d2(1);
   vector_fd v1(5), v2(1);
   
-  EXPECT_THROW(add(d1, d2), std::domain_error);
-  EXPECT_THROW(add(v1, d2), std::domain_error);
-  EXPECT_THROW(add(d1, v2), std::domain_error);
-  EXPECT_THROW(add(v1, v2), std::domain_error);
+  EXPECT_THROW(add(d1, d2), std::invalid_argument);
+  EXPECT_THROW(add(v1, d2), std::invalid_argument);
+  EXPECT_THROW(add(d1, v2), std::invalid_argument);
+  EXPECT_THROW(add(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorAddition,fd_rowvector_rowvector) {
   using stan::math::add;
@@ -266,10 +266,10 @@ TEST(AgradFwdMatrixOperatorAddition,fd_rowvector_rowvector_exception) {
   row_vector_fd v1(5), v2(2);
 
   row_vector_fd output;
-  EXPECT_THROW( add(d1, d2), std::domain_error);
-  EXPECT_THROW( add(d1, v2), std::domain_error);
-  EXPECT_THROW( add(v1, d2), std::domain_error);
-  EXPECT_THROW( add(v1, v2), std::domain_error);
+  EXPECT_THROW( add(d1, d2), std::invalid_argument);
+  EXPECT_THROW( add(d1, v2), std::invalid_argument);
+  EXPECT_THROW( add(v1, d2), std::invalid_argument);
+  EXPECT_THROW( add(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorAddition,fd_matrix_matrix) {
   using stan::math::add;
@@ -339,10 +339,10 @@ TEST(AgradFwdMatrixOperatorAddition,fd_matrix_matrix_exception) {
   matrix_d d1(2,2), d2(1,2);
   matrix_fd v1(2,2), v2(1,2);
 
-  EXPECT_THROW(add(d1, d2), std::domain_error);
-  EXPECT_THROW(add(d1, v2), std::domain_error);
-  EXPECT_THROW(add(v1, d2), std::domain_error);
-  EXPECT_THROW(add(v1, v2), std::domain_error);
+  EXPECT_THROW(add(d1, d2), std::invalid_argument);
+  EXPECT_THROW(add(d1, v2), std::invalid_argument);
+  EXPECT_THROW(add(v1, d2), std::invalid_argument);
+  EXPECT_THROW(add(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorAddition,fv_scalar_matrix_1stDeriv) {
   using stan::agrad::matrix_fv;
@@ -652,10 +652,10 @@ TEST(AgradFwdMatrixOperatorAddition,fv_vector_vector_exception) {
   vector_d d1(5), d2(1);
   vector_fv v1(5), v2(1);
   
-  EXPECT_THROW(add(d1, d2), std::domain_error);
-  EXPECT_THROW(add(v1, d2), std::domain_error);
-  EXPECT_THROW(add(d1, v2), std::domain_error);
-  EXPECT_THROW(add(v1, v2), std::domain_error);
+  EXPECT_THROW(add(d1, d2), std::invalid_argument);
+  EXPECT_THROW(add(v1, d2), std::invalid_argument);
+  EXPECT_THROW(add(d1, v2), std::invalid_argument);
+  EXPECT_THROW(add(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorAddition,fv_rowvector_rowvector_1stDeriv) {
   using stan::math::add;
@@ -777,10 +777,10 @@ TEST(AgradFwdMatrixOperatorAddition,fv_rowvector_rowvector_exception) {
   row_vector_fv v1(5), v2(2);
 
   row_vector_fv output;
-  EXPECT_THROW( add(d1, d2), std::domain_error);
-  EXPECT_THROW( add(d1, v2), std::domain_error);
-  EXPECT_THROW( add(v1, d2), std::domain_error);
-  EXPECT_THROW( add(v1, v2), std::domain_error);
+  EXPECT_THROW( add(d1, d2), std::invalid_argument);
+  EXPECT_THROW( add(d1, v2), std::invalid_argument);
+  EXPECT_THROW( add(v1, d2), std::invalid_argument);
+  EXPECT_THROW( add(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorAddition,fv_matrix_matrix_1stDeriv) {
   using stan::math::add;
@@ -890,10 +890,10 @@ TEST(AgradFwdMatrixOperatorAddition,fv_matrix_matrix_exception) {
   matrix_d d1(2,2), d2(1,2);
   matrix_fv v1(2,2), v2(1,2);
 
-  EXPECT_THROW(add(d1, d2), std::domain_error);
-  EXPECT_THROW(add(d1, v2), std::domain_error);
-  EXPECT_THROW(add(v1, d2), std::domain_error);
-  EXPECT_THROW(add(v1, v2), std::domain_error);
+  EXPECT_THROW(add(d1, d2), std::invalid_argument);
+  EXPECT_THROW(add(d1, v2), std::invalid_argument);
+  EXPECT_THROW(add(v1, d2), std::invalid_argument);
+  EXPECT_THROW(add(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorAddition,ffd_scalar_matrix) {
   using stan::agrad::matrix_ffd;
@@ -1093,10 +1093,10 @@ TEST(AgradFwdMatrixOperatorAddition,ffd_vector_vector_exception) {
   vector_d d1(5), d2(1);
   vector_ffd v1(5), v2(1);
   
-  EXPECT_THROW(add(d1, d2), std::domain_error);
-  EXPECT_THROW(add(v1, d2), std::domain_error);
-  EXPECT_THROW(add(d1, v2), std::domain_error);
-  EXPECT_THROW(add(v1, v2), std::domain_error);
+  EXPECT_THROW(add(d1, d2), std::invalid_argument);
+  EXPECT_THROW(add(v1, d2), std::invalid_argument);
+  EXPECT_THROW(add(d1, v2), std::invalid_argument);
+  EXPECT_THROW(add(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorAddition,ffd_rowvector_rowvector) {
   using stan::math::add;
@@ -1180,10 +1180,10 @@ TEST(AgradFwdMatrixOperatorAddition,ffd_rowvector_rowvector_exception) {
   row_vector_ffd v1(5), v2(2);
 
   row_vector_ffd output;
-  EXPECT_THROW( add(d1, d2), std::domain_error);
-  EXPECT_THROW( add(d1, v2), std::domain_error);
-  EXPECT_THROW( add(v1, d2), std::domain_error);
-  EXPECT_THROW( add(v1, v2), std::domain_error);
+  EXPECT_THROW( add(d1, d2), std::invalid_argument);
+  EXPECT_THROW( add(d1, v2), std::invalid_argument);
+  EXPECT_THROW( add(v1, d2), std::invalid_argument);
+  EXPECT_THROW( add(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorAddition,ffd_matrix_matrix) {
   using stan::math::add;
@@ -1257,10 +1257,10 @@ TEST(AgradFwdMatrixOperatorAddition,ffd_matrix_matrix_exception) {
   matrix_d d1(2,2), d2(1,2);
   matrix_ffd v1(2,2), v2(1,2);
 
-  EXPECT_THROW(add(d1, d2), std::domain_error);
-  EXPECT_THROW(add(d1, v2), std::domain_error);
-  EXPECT_THROW(add(v1, d2), std::domain_error);
-  EXPECT_THROW(add(v1, v2), std::domain_error);
+  EXPECT_THROW(add(d1, d2), std::invalid_argument);
+  EXPECT_THROW(add(d1, v2), std::invalid_argument);
+  EXPECT_THROW(add(v1, d2), std::invalid_argument);
+  EXPECT_THROW(add(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorAddition,ffv_scalar_matrix_1stDeriv) {
   using stan::agrad::matrix_ffv;
@@ -1792,10 +1792,10 @@ TEST(AgradFwdMatrixOperatorAddition,ffv_vector_vector_exception) {
   vector_d d1(5), d2(1);
   vector_ffv v1(5), v2(1);
   
-  EXPECT_THROW(add(d1, d2), std::domain_error);
-  EXPECT_THROW(add(v1, d2), std::domain_error);
-  EXPECT_THROW(add(d1, v2), std::domain_error);
-  EXPECT_THROW(add(v1, v2), std::domain_error);
+  EXPECT_THROW(add(d1, d2), std::invalid_argument);
+  EXPECT_THROW(add(v1, d2), std::invalid_argument);
+  EXPECT_THROW(add(d1, v2), std::invalid_argument);
+  EXPECT_THROW(add(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorAddition,ffv_rowvector_rowvector_1stDeriv) {
   using stan::math::add;
@@ -1995,10 +1995,10 @@ TEST(AgradFwdMatrixOperatorAddition,ffv_rowvector_rowvector_exception) {
   row_vector_ffv v1(5), v2(2);
 
   row_vector_ffv output;
-  EXPECT_THROW( add(d1, d2), std::domain_error);
-  EXPECT_THROW( add(d1, v2), std::domain_error);
-  EXPECT_THROW( add(v1, d2), std::domain_error);
-  EXPECT_THROW( add(v1, v2), std::domain_error);
+  EXPECT_THROW( add(d1, d2), std::invalid_argument);
+  EXPECT_THROW( add(d1, v2), std::invalid_argument);
+  EXPECT_THROW( add(v1, d2), std::invalid_argument);
+  EXPECT_THROW( add(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorAddition,ffv_matrix_matrix_1stDeriv) {
   using stan::math::add;
@@ -2180,8 +2180,8 @@ TEST(AgradFwdMatrixOperatorAddition,ffv_matrix_matrix_exception) {
   matrix_d d1(2,2), d2(1,2);
   matrix_ffv v1(2,2), v2(1,2);
 
-  EXPECT_THROW(add(d1, d2), std::domain_error);
-  EXPECT_THROW(add(d1, v2), std::domain_error);
-  EXPECT_THROW(add(v1, d2), std::domain_error);
-  EXPECT_THROW(add(v1, v2), std::domain_error);
+  EXPECT_THROW(add(d1, d2), std::invalid_argument);
+  EXPECT_THROW(add(d1, v2), std::invalid_argument);
+  EXPECT_THROW(add(v1, d2), std::invalid_argument);
+  EXPECT_THROW(add(v1, v2), std::invalid_argument);
 }

@@ -41,7 +41,7 @@ public:
                                  bool include_tparams__ = true,
                                  bool include_gqs__ = true) const {
     param_names__.clear();
-    for (int n = 0; n < num_params_r__; n++) {
+    for (size_t n = 0; n < num_params_r__; n++) {
       std::stringstream param_name;
       param_name << "param_" << n;
       param_names__.push_back(param_name.str());
@@ -92,7 +92,7 @@ public:
                                  bool include_tparams__ = true,
                                  bool include_gqs__ = true) const {
     param_names__.clear();
-    for (int n = 0; n < num_params_r__; n++) {
+    for (size_t n = 0; n < num_params_r__; n++) {
       std::stringstream param_name;
       param_name << "param_" << n;
       param_names__.push_back(param_name.str());
@@ -464,7 +464,10 @@ TEST_F(StanCommon, initialize_state_source_inf) {
   EXPECT_EQ(0, inf_model.templated_log_prob_calls);
   EXPECT_EQ(1, inf_model.transform_inits_calls);
   EXPECT_EQ(0, rng.calls);
-  EXPECT_EQ("param_0 initialized to invalid value (inf)\n", output.str());
+  std::stringstream expected_msg;
+  expected_msg << "param_0 initialized to invalid value (" 
+               << std::numeric_limits<double>::infinity() << ")\n";
+  EXPECT_EQ(expected_msg.str(), output.str());
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
 }

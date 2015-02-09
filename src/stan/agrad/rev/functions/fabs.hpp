@@ -29,15 +29,15 @@ namespace stan {
      * Returns std::numeric_limits<double>::quiet_NaN() for NaN inputs.
      *
      *
-       \[		
+       \f[		
        \mbox{fabs}(x) = 
        \begin{cases}
          |x| & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
-       \]
+       \f]
    
-       \[
+       \f[
        \frac{\partial\,\mbox{fabs}(x)}{\partial x} = 
        \begin{cases}
          -1 & \mbox{if } x < 0 \\
@@ -45,7 +45,7 @@ namespace stan {
          1 & \mbox{if } x > 0 \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
-       \]
+       \f]
      *
      * @param a Input variable.
      * @return Absolute value of variable.

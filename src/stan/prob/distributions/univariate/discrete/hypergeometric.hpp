@@ -27,12 +27,12 @@ namespace stan {
     double
     hypergeometric_log(const T_n& n, const T_N& N, 
                        const T_a& a, const T_b& b) {
-      static const std::string function("stan::prob::hypergeometric_log");
+      static const char* function("stan::prob::hypergeometric_log");
 
-      using stan::error_handling::check_finite;      
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_greater;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_finite;      
+      using stan::math::check_bounded;
+      using stan::math::check_greater;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
@@ -95,10 +95,10 @@ namespace stan {
                        RNG& rng) {
       using boost::variate_generator;
       
-      static const std::string function("stan::prob::hypergeometric_rng");
+      static const char* function("stan::prob::hypergeometric_rng");
 
-      using stan::error_handling::check_bounded;
-      using stan::error_handling::check_positive;
+      using stan::math::check_bounded;
+      using stan::math::check_positive;
 
       check_bounded(function, "Draws parameter", N, 0, a+b);
       check_positive(function, "Draws parameter", N);

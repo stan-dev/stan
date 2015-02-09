@@ -2,6 +2,7 @@
 #define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_COV_HPP
 
 #include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/error_handling/matrix/check_square.hpp>
 #include <stan/error_handling/scalar/check_finite.hpp>
 #include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/math/matrix.hpp>
@@ -24,20 +25,19 @@ namespace stan {
                 const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,1>& sigma,
                 const T_shape& eta) {
-      static const std::string function("stan::prob::lkj_cov_log");
+      static const char* function("stan::prob::lkj_cov_log");
       
-      using stan::error_handling::check_size_match;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive;
+      using stan::math::check_size_match;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+      using stan::math::check_square;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
       check_size_match(function, 
                        "Rows of location parameter", mu.rows(),
                        "columns of scale parameter", sigma.rows());
-      check_size_match(function, 
-                       "Rows of random variable", y.rows(),
-                       "columns of random variable", y.cols());
+      check_square(function, "random variable", y); 
       check_size_match(function, 
                        "Rows of random variable", y.rows(), 
                        "rows of location parameter", mu.rows());
@@ -86,10 +86,10 @@ namespace stan {
                 const T_loc& mu, 
                 const T_scale& sigma, 
                 const T_shape& eta) {
-      static const std::string function("stan::prob::lkj_cov_log");
+      static const char* function("stan::prob::lkj_cov_log");
 
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_positive;
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);

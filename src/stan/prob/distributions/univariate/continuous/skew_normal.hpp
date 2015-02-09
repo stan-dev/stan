@@ -24,17 +24,17 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                     const T_shape& alpha) {
-      static const std::string function("stan::prob::skew_normal_log");
+      static const char* function("stan::prob::skew_normal_log");
       typedef typename stan::partials_return_type<T_y,T_loc,
                                                   T_scale,T_shape>::type 
         T_partials_return;
 
       using std::log;
       using stan::is_constant_struct;
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
@@ -106,7 +106,7 @@ namespace stan {
           logp -= y_minus_mu_over_sigma * y_minus_mu_over_sigma / 2.0;
         if (include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
           logp += log(erfc(-alpha_dbl * y_minus_mu_over_sigma 
-                                        / std::sqrt(2.0)));
+                           / std::sqrt(2.0)));
 
         // gradients
         T_partials_return deriv_logerf 
@@ -114,7 +114,7 @@ namespace stan {
           * exp(-alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0) 
                 * alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0))
           / (1 + erf(alpha_dbl * y_minus_mu_over_sigma 
-                                  / std::sqrt(2.0)));
+                     / std::sqrt(2.0)));
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 
             += -y_minus_mu_over_sigma / sigma_dbl 
@@ -148,15 +148,15 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                     const T_shape& alpha) {
-      static const std::string function("stan::prob::skew_normal_cdf");
+      static const char* function("stan::prob::skew_normal_cdf");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
                                                   T_shape>::type 
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::owens_t;
       using stan::math::value_of;
 
@@ -251,16 +251,16 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                         const T_shape& alpha) {
-      static const std::string function("stan::prob::skew_normal_cdf_log");
+      static const char* function("stan::prob::skew_normal_cdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
                                                   T_shape>::type
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::math::owens_t;
 
       T_partials_return cdf_log(0.0);
@@ -341,15 +341,15 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                          const T_shape& alpha) {
-      static const std::string function("stan::prob::skew_normal_ccdf_log");
+      static const char* function("stan::prob::skew_normal_ccdf_log");
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
                                                   T_shape>::type 
         T_partials_return;
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::owens_t;
       using stan::math::value_of;
 
@@ -434,10 +434,10 @@ namespace stan {
                     RNG& rng) {
       boost::math::skew_normal_distribution<>dist (mu, sigma, alpha);
 
-      static const std::string function("stan::prob::skew_normal_rng");
+      static const char* function("stan::prob::skew_normal_rng");
 
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
 
       check_finite(function, "Location parameter", mu);
       check_finite(function, "Shape parameter", alpha);

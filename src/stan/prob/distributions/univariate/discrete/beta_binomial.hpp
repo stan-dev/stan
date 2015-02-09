@@ -34,14 +34,14 @@ namespace stan {
                       const T_N& N, 
                       const T_size1& alpha, 
                       const T_size2& beta) {
-      static const std::string function("stan::prob::beta_binomial_log");
+      static const char* function("stan::prob::beta_binomial_log");
       typedef typename stan::partials_return_type<T_size1,T_size2>::type
         T_partials_return;
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
@@ -184,15 +184,15 @@ namespace stan {
     typename return_type<T_size1,T_size2>::type
     beta_binomial_cdf(const T_n& n, const T_N& N, const T_size1& alpha, 
                       const T_size2& beta) {
-      static const std::string function("stan::prob::beta_binomial_cdf");
+      static const char* function("stan::prob::beta_binomial_cdf");
       typedef typename stan::partials_return_type<T_n,T_N,T_size1,
                                                   T_size2>::type
         T_partials_return;
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lengths
@@ -275,8 +275,8 @@ namespace stan {
           digammaOne = digamma(mu + nu);
           digammaTwo = digamma(alpha_dbl + beta_dbl);
           stan::math::grad_F32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1,
-                              n_dbl + 2,
-                              1 - nu, (T_partials_return)1);
+                               n_dbl + 2,
+                               1 - nu, (T_partials_return)1);
         }
         if (!is_constant_struct<T_size1>::value) {
           const T_partials_return g 
@@ -309,15 +309,15 @@ namespace stan {
     typename return_type<T_size1,T_size2>::type
     beta_binomial_cdf_log(const T_n& n, const T_N& N, const T_size1& alpha, 
                           const T_size2& beta) {
-      static const std::string function("stan::prob::beta_binomial_cdf_log");
+      static const char* function("stan::prob::beta_binomial_cdf_log");
       typedef typename stan::partials_return_type<T_n,T_N,T_size1,
                                                   T_size2>::type 
         T_partials_return;
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lengths
@@ -401,7 +401,7 @@ namespace stan {
           digammaOne = digamma(mu + nu);
           digammaTwo = digamma(alpha_dbl + beta_dbl);
           stan::math::grad_F32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1, 
-                              n_dbl + 2, 1 - nu, (T_partials_return)1);
+                               n_dbl + 2, 1 - nu, (T_partials_return)1);
         }
         if (!is_constant_struct<T_size1>::value) {
           const T_partials_return g 
@@ -425,15 +425,15 @@ namespace stan {
     typename return_type<T_size1,T_size2>::type
     beta_binomial_ccdf_log(const T_n& n, const T_N& N, const T_size1& alpha, 
                            const T_size2& beta) {
-      static const std::string function("stan::prob::beta_binomial_ccdf_log");
+      static const char* function("stan::prob::beta_binomial_ccdf_log");
       typedef typename stan::partials_return_type<T_n,T_N,T_size1,
                                                   T_size2>::type 
         T_partials_return;
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
       using stan::math::value_of;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
           
       // Ensure non-zero argument lengths
@@ -517,7 +517,7 @@ namespace stan {
           digammaOne = digamma(mu + nu);
           digammaTwo = digamma(alpha_dbl + beta_dbl);
           stan::math::grad_F32(dF, (T_partials_return)1, mu, -N_dbl + n_dbl + 1,
-                              n_dbl + 2, 1 - nu, (T_partials_return)1);
+                               n_dbl + 2, 1 - nu, (T_partials_return)1);
         }
         if (!is_constant_struct<T_size1>::value) {
           const T_partials_return g 
@@ -543,10 +543,10 @@ namespace stan {
                       const double beta,
                       RNG& rng) {
 
-      static const std::string function("stan::prob::beta_binomial_rng");
+      static const char* function("stan::prob::beta_binomial_rng");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_nonnegative;
+      using stan::math::check_positive_finite;
+      using stan::math::check_nonnegative;
   
       check_nonnegative(function, "Population size parameter", N);
       check_positive_finite(function, "First prior sample size parameter", alpha);
