@@ -44,7 +44,6 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_symmetric;
       using stan::math::check_positive;
-      using boost::math::tools::promote_args;
       using boost::math::lgamma;
       using stan::math::log_determinant_ldlt;
       using stan::math::LDLT_factor;
