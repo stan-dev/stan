@@ -8,7 +8,7 @@
 namespace stan {
   namespace interface {
     namespace recorder {
-      
+
       template <class InternalVector>
       class values: public recorder {
       private:
@@ -18,16 +18,15 @@ namespace stan {
         std::vector<InternalVector> x_;
 
       public:
-
         values(const size_t N,
-               const size_t M) 
+               const size_t M)
           : m_(0), N_(N), M_(M) {
           x_.reserve(N_);
           for (size_t n = 0; n < N_; n++)
             x_.push_back(InternalVector(M_));
         }
 
-        values(const std::vector<InternalVector>& x)
+        explicit values(const std::vector<InternalVector>& x)
           : m_(0), N_(x.size()), M_(0),
             x_(x) {
           if (N_ > 0)
@@ -39,18 +38,19 @@ namespace stan {
         template <class T>
         void operator()(const std::vector<T>& x) {
           if (N_ != x.size())
-            throw std::length_error("vector provided does not match the parameter length");
-          if (m_ == M_) 
+            throw std::length_error("vector provided does not "
+                                    "match the parameter length");
+          if (m_ == M_)
             throw std::out_of_range("");
           for (size_t n = 0; n < N_; n++)
             x_[n][m_] = x[n];
           m_++;
         }
-      
+
         void operator()(const std::string x) { }
-      
+
         void operator()() { }
-      
+
         bool is_recording() const {
           if (m_ < M_)
             return true;
