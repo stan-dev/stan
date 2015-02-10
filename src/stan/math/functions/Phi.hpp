@@ -3,7 +3,7 @@
 
 #include <boost/math/tools/promotion.hpp>
 #include <boost/math/special_functions/erf.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 
 namespace stan {
@@ -31,7 +31,7 @@ namespace stan {
     Phi(const T x) {
       // overridden in fvar and var, so can hard-code boost versions
       // here for scalars only
-      using stan::error_handling::check_not_nan;
+      using stan::math::check_not_nan;
       
       check_not_nan("Phi",  "x", x);
       if (x < -37.5)

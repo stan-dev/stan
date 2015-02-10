@@ -53,5 +53,5 @@ TEST(MathMatrix,softmax_exception) {
   using stan::math::log_softmax;
   stan::math::vector_d v0;  // size == 0
 
-  EXPECT_THROW(log_softmax(v0),std::domain_error);
+  EXPECT_THROW(log_softmax(v0),std::invalid_argument);
 }  

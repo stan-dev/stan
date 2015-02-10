@@ -9,7 +9,7 @@
 #include <stan/agrad/rev/internal/vvv_vari.hpp>
 #include <stan/agrad/rev/internal/vvd_vari.hpp>
 #include <stan/agrad/rev/internal/vdv_vari.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/meta/likely.hpp>
 
@@ -116,7 +116,7 @@ namespace stan {
      * plus the third argument.
      *
      * The double-based version
-     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -143,7 +143,7 @@ namespace stan {
      * arguments plus the third argument.
      *
      * The double-based version
-     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -168,7 +168,7 @@ namespace stan {
      * two arguments plus the third argument.
      *
      * The double-based version
-     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -193,7 +193,7 @@ namespace stan {
      * arguments plus the third argument.
      *
      * The double-based version
-     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -216,7 +216,7 @@ namespace stan {
      * two arguments plus the third argument.
      *
      * The double-based version
-     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -239,7 +239,7 @@ namespace stan {
      * first two arguments plus the third argument.
      *
      * The double-based version
-     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -262,7 +262,7 @@ namespace stan {
      * arguments plus the third argument.
      *
      * The double-based version
-     * <code>::fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivaties are
      *

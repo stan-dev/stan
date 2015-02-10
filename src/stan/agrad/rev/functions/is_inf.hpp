@@ -4,7 +4,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 #include <stan/math/functions/is_inf.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
 
@@ -15,7 +15,8 @@ namespace stan {
      *
      * Delegates to <code>stan::math::is_inf</code>.
      *
-     * @param x Value to test.
+     * @param v Value to test.
+     *
      * @return <code>1</code> if the value is infinite and <code>0</code> otherwise.
      */
     inline 

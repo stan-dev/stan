@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/services/mcmc/run_markov_chain.hpp>
-#include <test/test-models/good/services/test_lp.cpp>
+#include <test/test-models/good/services/test_lp.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;

@@ -1,6 +1,7 @@
 #ifndef STAN__AGRAD__FWD__MATRIX_HPP
 #define STAN__AGRAD__FWD__MATRIX_HPP
 
+#include <stan/agrad/fwd/matrix/Eigen_NumTraits.hpp>
 #include <stan/agrad/fwd/matrix/columns_dot_product.hpp>
 #include <stan/agrad/fwd/matrix/columns_dot_self.hpp>
 #include <stan/agrad/fwd/matrix/crossprod.hpp>

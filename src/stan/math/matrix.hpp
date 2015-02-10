@@ -73,6 +73,9 @@
 #include <stan/math/matrix/quad_form.hpp>
 #include <stan/math/matrix/quad_form_diag.hpp>
 #include <stan/math/matrix/rank.hpp>
+#include <stan/math/matrix/rep_vector.hpp>
+#include <stan/math/matrix/rep_row_vector.hpp>
+#include <stan/math/matrix/rep_matrix.hpp>
 #include <stan/math/matrix/resize.hpp>
 #include <stan/math/matrix/row.hpp>
 #include <stan/math/matrix/rows.hpp>
@@ -100,6 +103,8 @@
 #include <stan/math/matrix/trace_quad_form.hpp>
 #include <stan/math/matrix/transpose.hpp>
 #include <stan/math/matrix/typedefs.hpp>
+#include <stan/math/matrix/value_of.hpp>
+#include <stan/math/matrix/value_of_rec.hpp>
 #include <stan/math/matrix/variance.hpp>
 
 #endif

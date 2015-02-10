@@ -433,6 +433,7 @@ add_unary("log2");
 add("log_determinant",DOUBLE_T,MATRIX_T);
 add_binary("log_diff_exp");
 add_binary("log_falling_factorial");
+add_ternary("log_mix");
 add_binary("log_rising_factorial");
 add_unary("log_inv_logit");
 add("log_softmax",VECTOR_T,VECTOR_T);

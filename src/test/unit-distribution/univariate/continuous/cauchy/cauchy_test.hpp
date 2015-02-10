@@ -18,19 +18,19 @@ public:
     param[1] = 0.0;                // mu
     param[2] = 1.0;                // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1.837877); // expected log_prob
+    log_prob.push_back(-1.837877066409345339082); // expected log_prob
 
     param[0] = -1.5;                // y
     param[1] = 0.0;                 // mu
     param[2] = 1.0;                 // sigma
     parameters.push_back(param);
-    log_prob.push_back(-2.323385); // expected log_prob
+    log_prob.push_back(-2.323384882191046330036); // expected log_prob
 
     param[0] = -1.5;                // y
     param[1] = -1.0;                // mu
     param[2] = 1.0;                 // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1.367873); // expected log_prob
+    log_prob.push_back(-1.367873437163609873224); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 
@@ -59,45 +59,32 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::cauchy_log(y, mu, sigma);
   }
 
   template <bool propto, 
-      typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T_y, typename T_loc, typename T_scale,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::cauchy_log<propto>(y, mu, sigma);
   }
   
   
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_y, T_loc, T_scale>::type 
+  log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
+                        const T3&, const T4&, const T5&) {
     using stan::math::log1p;
     using stan::math::square;
-    using stan::prob::include_summand;
-    
-    var lp = 0.0;
-    if (include_summand<true>::value)
-      lp += stan::prob::NEG_LOG_PI;
-    if (include_summand<true,T_scale>::value)
-      lp -= log(sigma);
-    if (include_summand<true,T_y,T_loc,T_scale>::value)
-      lp -= log1p(square((y - mu) / sigma));
-    return lp;
+    return stan::prob::NEG_LOG_PI - log(sigma) 
+      - log1p(square((y - mu) / sigma));
   }
 };
 

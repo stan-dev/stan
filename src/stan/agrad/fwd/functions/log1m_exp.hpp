@@ -5,7 +5,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/log1m_exp.hpp>
 #include <boost/math/special_functions/expm1.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan{
 

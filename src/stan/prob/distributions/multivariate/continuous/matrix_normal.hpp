@@ -38,38 +38,32 @@ namespace stan {
      * @tparam T_D Type of D.
      */
     template <bool propto,
-    typename T_y, typename T_Mu, typename T_Sigma, typename T_D>
+              typename T_y, typename T_Mu, typename T_Sigma, typename T_D>
     typename boost::math::tools::promote_args<T_y,T_Mu,T_Sigma,T_D>::type
     matrix_normal_prec_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                            const Eigen::Matrix<T_Mu,Eigen::Dynamic,Eigen::Dynamic>& Mu,
                            const Eigen::Matrix<T_Sigma,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                            const Eigen::Matrix<T_D,Eigen::Dynamic,Eigen::Dynamic>& D) {
-      static const std::string function("stan::prob::matrix_normal_prec_log");
+      static const char* function("stan::prob::matrix_normal_prec_log");
       typename boost::math::tools::promote_args<T_y,T_Mu,T_Sigma,T_D>::type lp(0.0);
       
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_symmetric;
-      using stan::error_handling::check_size_match;
-      using stan::error_handling::check_positive;
-      using stan::error_handling::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_symmetric;
+      using stan::math::check_size_match;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
       using stan::math::trace_gen_quad_form;
       using stan::math::log_determinant_ldlt;
       using stan::math::subtract;
       using stan::math::LDLT_factor;
-      using stan::error_handling::check_ldlt_factor;
+      using stan::math::check_ldlt_factor;
       
-      check_size_match(function, 
-                       "Rows of Sigma", Sigma.rows(), 
-                       "columns of Sigma", Sigma.cols());
       check_positive(function, "Sigma rows", Sigma.rows());
       check_finite(function, "Sigma", Sigma);
       check_symmetric(function, "Sigma", Sigma);
       
       LDLT_factor<T_Sigma,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
       check_ldlt_factor(function, "LDLT_Factor of Sigma", ldlt_Sigma);
-      check_size_match(function, 
-                       "Rows of D", D.rows(), 
-                       "Columns of D", D.cols());
       check_positive(function, "D rows", D.rows());
       check_finite(function, "D", D);
       check_symmetric(function, "Sigma", D);

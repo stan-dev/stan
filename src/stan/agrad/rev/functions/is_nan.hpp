@@ -4,7 +4,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/internal/v_vari.hpp>
 #include <stan/math/functions/is_nan.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math/functions/constants.hpp>
 
 namespace stan {
 
@@ -13,9 +13,10 @@ namespace stan {
     /**
      * Returns 1 if the input's value is NaN and 0 otherwise.
      *
-     * Delegates to <code>stan::math::is_nan</code>.
+     * Delegates to <code>stan::math::is_nan(double)</code>.
      *
-     * @param x Value to test.
+     * @param v Value to test.
+     *
      * @return <code>1</code> if the value is NaN and <code>0</code> otherwise.
      */
     inline 

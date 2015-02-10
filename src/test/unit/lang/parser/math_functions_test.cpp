@@ -225,6 +225,10 @@ TEST(lang_parser, log_falling_factorial_math_function_signatures) {
   test_parsable("function-signatures/math/functions/log_falling_factorial");
 }
 
+TEST(lang_parser, log_mix_math_function_signatures) {
+  test_parsable("function-signatures/math/functions/log_mix");
+}
+
 TEST(lang_parser, log_rising_factorial_math_function_signatures) {
   test_parsable("function-signatures/math/functions/log_rising_factorial");
 }

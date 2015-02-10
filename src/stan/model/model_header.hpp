@@ -26,10 +26,10 @@
 #include <stan/math.hpp>
 #include <stan/math/matrix.hpp>
 
-#include <stan/math/rep_array.hpp>
-#include <stan/math/rep_vector.hpp>
-#include <stan/math/rep_row_vector.hpp>
-#include <stan/math/rep_matrix.hpp>
+#include <stan/math/functions/rep_array.hpp>
+#include <stan/math/matrix/rep_vector.hpp>
+#include <stan/math/matrix/rep_row_vector.hpp>
+#include <stan/math/matrix/rep_matrix.hpp>
 
 #include <stan/model/prob_grad.hpp>
 #include <stan/prob/distributions.hpp>

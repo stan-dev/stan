@@ -21,31 +21,31 @@ public:
     param[1] = 1.0;                  // mu
     param[2] = 1.0;                  // sigma
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.8160603));   // expected cdf_log
+    cdf_log.push_back(std::log(0.8160602794142788392022381149192695662770944344841160827460815991512692521275500983214263628270401781));   // expected cdf_log
     
     param[0] = -3.0;                 // y
     param[1] = 2.0;                  // mu
     param[2] = 1.0;                  // sigma
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.003368973));   // expected cdf_log
+    cdf_log.push_back(std::log(0.003368973499542733548318024211574212124424792513677542715152765786341761257802031140724569422104180774));   // expected cdf_log
     
     param[0] = 1.0;                  // y
     param[1] = 0.0;                  // mu
     param[2] = 2.0;                  // sigma
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.6967347));   // expected cdf_log
+    cdf_log.push_back(std::log(0.6967346701436832881981002325044097732790409322564065221585539206324717402931257880006761942460052720));   // expected cdf_log
 
     param[0] = 1.9;                  // y
     param[1] = 2.3;                  // mu
     param[2] = 0.5;                  // sigma
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.2246645));        // expected cdf_log
+    cdf_log.push_back(std::log(0.224664482058610795715051192507781));        // expected cdf_log
 
     param[0] = 1.9;                  // y
     param[1] = 2.3;                  // mu
     param[2] = 0.25;                  // sigma
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.10094826));        // expected cdf_log
+    cdf_log.push_back(std::log(0.10094825899732770424258963382167488));        // expected cdf_log
   }
  
   void invalid_values(vector<size_t>& index, 
@@ -82,22 +82,18 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+          const T3&, const T4&, const T5&) {
     return stan::prob::double_exponential_cdf_log(y, mu, sigma);
   }
   
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   cdf_log_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+                   const T3&, const T4&, const T5&) {
     return stan::prob::double_exponential_cdf_log(y, mu, sigma);
   }
 };

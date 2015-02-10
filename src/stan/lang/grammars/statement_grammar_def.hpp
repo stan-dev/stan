@@ -585,7 +585,7 @@ namespace stan {
       // inherited  _r1 = true if samples allowed as statements
       increment_log_prob_statement_r.name("increment log prob statement");
       increment_log_prob_statement_r
-        %= lit("increment_log_prob") 
+        %= (lit("increment_log_prob") >> no_skip[!char_("a-zA-Z0-9_")])
         > eps[ validate_allow_sample_f(_r1,_pass,
                                        boost::phoenix::ref(error_msgs_)) ]
         > lit('(')
@@ -598,7 +598,7 @@ namespace stan {
       // _r1, _r2, _r3 same as statement_r
       while_statement_r.name("while statement");
       while_statement_r
-        = lit("while")
+        = (lit("while") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > expression_g(_r2)
           [_pass = add_while_condition_f(_val,_1,
@@ -612,7 +612,7 @@ namespace stan {
       // _r1, _r2, _r3 same as statement_r
       for_statement_r.name("for statement");
       for_statement_r
-        %= lit("for")
+        %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > identifier_r [_pass 
                         = add_loop_identifier_f(_1,_a,
@@ -628,7 +628,7 @@ namespace stan {
 
       print_statement_r.name("print statement");
       print_statement_r
-        %= lit("print")
+        %= (lit("print") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > (printable_r(_r1) % ',')
         > lit(')');
@@ -636,7 +636,7 @@ namespace stan {
       // reject
       reject_statement_r.name("reject statement");
       reject_statement_r
-        %= lit("reject")
+        %= (lit("reject") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > (printable_r(_r1) % ',')
         > lit(')');
@@ -731,7 +731,7 @@ namespace stan {
       // _r1 = allow sampling, _r2 = var origin
       return_statement_r.name("return statement");
       return_statement_r
-        %= lit("return")
+        %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
         >> expression_g(_r1)
         >> lit(';') [ validate_return_allowed_f(_r1,_pass,
                                                 boost::phoenix::ref(error_msgs_)) ]

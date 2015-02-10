@@ -60,24 +60,19 @@ public:
   }
 
   template <typename T_y, typename T_inv_scale, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_inv_scale>::type 
   cdf(const T_y& y, const T_inv_scale& beta, const T2&,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+      const T3&, const T4&, const T5&) {
     return stan::prob::exponential_cdf(y, beta);
   }
   
   
   template <typename T_y, typename T_inv_scale, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_inv_scale>::type 
   cdf_function(const T_y& y, const T_inv_scale& beta, 
-        const T2&, const T3&, const T4&, const T5&, 
-        const T6&, const T7&, const T8&, const T9&) {
+               const T2&, const T3&, const T4&, const T5&) {
     using std::log;
     using std::exp;
 

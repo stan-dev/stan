@@ -45,7 +45,11 @@ that was read, and the constraint that was declared.
 After data is read into the model, the transformed data variable
 statements are executed in order to define the transformed data
 variables.  As the statements execute, declared constraints on
-variables are not enforced.
+variables are not enforced.  
+
+Transformed data variables are initialized with real values set to
+\code{NaN} and integer values set to the smallest integer (large
+absolute value negative number).
 
 After the statements are executed, all declared constraints on
 transformed data variables are validated.  If the validation fails,
@@ -986,6 +990,8 @@ may be used instead of \code{y[3,1]} to access the value of the first
 column of the third row of \code{y}.  The form \code{y[3,1]} is the
 preferred form (see \refnote{array-index-style} in this chapter).
 
+\subsection{Assigning}
+
 Subarrays may be manipulated and assigned just like any other
 variables.  Similar to the behavior of matrices, Stan allows blocks
 such as 
@@ -1002,9 +1008,6 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 \end{stancode}
 %
 
-\subsection{Assigning}
-
----fixme---
 
 \subsection{Arrays of Matrices and Vectors}
 
@@ -1229,6 +1232,11 @@ For parameters, constraints are enforced by the transform applied and
 do not need to be checked.  For transformed parameters, the check is
 done after the statements in the transformed parameter block have
 executed.  
+
+For all blocks defining variables (transformed data, transformed
+parameters, generated quantities), real values are initialized to
+\code{NaN} and integer values are initialized to the smallest legal
+integer (i.e., a large absolute value negative number).
 
 For generated quantities, constraints are enforced after the
 statements in the generated quantities block have executed.
@@ -2721,11 +2729,11 @@ and sampling statements for more information).
 %
 \begin{stancode}
 increment_log_prob(normal_log(y, 0, 1));
-increment_log_prob(-(1 - log(normal_cdf(-0.5, 0, 1))));
+increment_log_prob(-(log(1 - normal_cdf(-0.5, 0, 1))));
 \end{stancode}
 %
-The denominator is actually implemented with the more efficient and
-stable version
+The denominator (second line above) is implemented with the more
+efficient and stable version
 %
 \begin{stancode}
 increment_log_prob(-normal_ccdf_log(-0.5, 0, 1));

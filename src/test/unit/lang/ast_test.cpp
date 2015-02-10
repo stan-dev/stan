@@ -1,9 +1,9 @@
-#include <sstream>
 #include <cmath>
-#include <vector>
+#include <sstream>
 #include <string>
 #include <set>
 #include <stan/lang/ast_def.cpp>
+#include <vector>
 #include <gtest/gtest.h>
 
 using stan::lang::function_signatures;
@@ -14,7 +14,46 @@ using stan::lang::VECTOR_T;
 using stan::lang::ROW_VECTOR_T;
 using stan::lang::MATRIX_T;
 
-TEST(lang_ast,expr_type_num_dims) {
+TEST(gmAst, hasVar) {
+  using stan::gm::base_var_decl;
+  using stan::gm::binary_op;
+  using stan::gm::expression;
+  using stan::gm::local_origin;
+  using stan::gm::parameter_origin;
+  using stan::gm::transformed_parameter_origin;
+  using stan::gm::unary_op;
+  using stan::gm::var_origin;
+  using stan::gm::variable;
+  using stan::gm::variable_map;
+  using std::vector;
+
+  variable_map vm;
+  vector<expression> dims;
+  base_var_decl alpha_decl = base_var_decl("alpha",dims,DOUBLE_T);
+  var_origin alpha_origin = parameter_origin;
+  vm.add("alpha", alpha_decl, alpha_origin);
+  
+  variable v("alpha");
+  v.set_type(DOUBLE_T, 2U);
+  expression e(v);
+  EXPECT_TRUE(has_var(e, vm));
+
+  vm.add("beta", 
+         base_var_decl("beta", vector<expression>(), INT_T),
+         local_origin);
+  variable v_beta("beta");
+  v_beta.set_type(INT_T, 0U);
+  expression e_beta(v_beta);
+  EXPECT_FALSE(has_var(e_beta, vm));
+
+  expression e2(binary_op(e,"+",e));
+  EXPECT_TRUE(has_var(e2,vm));
+
+  expression e_beta2(unary_op('!',unary_op('-',e_beta)));
+  EXPECT_FALSE(has_var(e_beta2,vm));
+}
+
+TEST(gm_ast,expr_type_num_dims) {
   EXPECT_EQ(0U,expr_type().num_dims());
   EXPECT_EQ(2U,expr_type(INT_T,2U).num_dims());
   EXPECT_EQ(2U,expr_type(VECTOR_T,2U).num_dims());
@@ -254,7 +293,7 @@ TEST(langAst, resetSigs) {
   stan::lang::function_signatures& fs1
     = stan::lang::function_signatures::instance();
   set<string> ks1 = fs1.key_set();
-  int keyset_size = ks1.size();
+  size_t keyset_size = ks1.size();
   EXPECT_TRUE(keyset_size > 0);
   
   stan::lang::function_signatures::reset_sigs();
@@ -263,8 +302,7 @@ TEST(langAst, resetSigs) {
     = stan::lang::function_signatures::instance();
 
   set<string> ks2 = fs2.key_set();
-  EXPECT_EQ(keyset_size,ks2.size());
-
+  EXPECT_EQ(keyset_size, ks2.size());
 }
 
 TEST(langAst, solveOde) {

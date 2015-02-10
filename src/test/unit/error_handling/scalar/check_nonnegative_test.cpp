@@ -1,10 +1,10 @@
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_nonnegative;
+using stan::math::check_nonnegative;
 
 TEST(ErrorHandlingScalar,CheckNonnegative) {
-  const std::string function = "check_nonnegative";
+  const char* function = "check_nonnegative";
   double x = 0;
 
   EXPECT_TRUE(check_nonnegative(function, "x", x)) 
@@ -30,7 +30,7 @@ TEST(ErrorHandlingScalar,CheckNonnegative) {
 
 TEST(ErrorHandlingScalar,CheckNonnegativeVectorized) {
   int N = 5;
-  const std::string function = "check_nonnegative";
+  const char* function = "check_nonnegative";
   std::vector<double> x(N);
 
   x.assign(N, 0);
@@ -57,7 +57,7 @@ TEST(ErrorHandlingScalar,CheckNonnegativeVectorized) {
 
 TEST(ErrorHandlingScalar, CheckNonnegativeVectorized_one_indexed_message) {
   int N = 5;
-  const std::string function = "check_nonnegative";
+  const char* function = "check_nonnegative";
   std::vector<double> x(N);
   std::string message;
 
@@ -76,7 +76,7 @@ TEST(ErrorHandlingScalar, CheckNonnegativeVectorized_one_indexed_message) {
 }
 
 TEST(ErrorHandlingScalar,CheckNonnegative_nan) {
-  const std::string function = "check_nonnegative";
+  const char* function = "check_nonnegative";
   double nan = std::numeric_limits<double>::quiet_NaN();
 
   EXPECT_THROW(check_nonnegative(function, "x", nan),
@@ -87,7 +87,7 @@ TEST(ErrorHandlingScalar,CheckNonnegative_nan) {
   x.push_back(2.0);
   x.push_back(3.0);
 
-  for (int i = 0; i < x.size(); i++) {
+  for (size_t i = 0; i < x.size(); i++) {
     x[i] = nan;
     EXPECT_THROW(check_nonnegative(function, "x", x),
                  std::domain_error);

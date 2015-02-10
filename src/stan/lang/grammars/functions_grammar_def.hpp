@@ -318,7 +318,7 @@ namespace stan {
 
       functions_r.name("function declarations and definitions");
       functions_r 
-        %= lit("functions") 
+        %= lit("functions")  // block, so doesn't need guard to not be continued
         >> lit('{')
         >> *function_r
         >> lit('}')[ validate_declarations_f(_pass, 

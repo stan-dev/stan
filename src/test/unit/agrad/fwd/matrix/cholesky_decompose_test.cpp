@@ -18,7 +18,7 @@ TEST(AgradFwdMatrixCholeskyDecompose, exception_mat_fd) {
   EXPECT_NO_THROW(stan::math::cholesky_decompose(m));
   
   m.resize(2, 3);
-  EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
+  EXPECT_THROW(stan::math::cholesky_decompose(m), std::invalid_argument);
 
   // not symmetric
   m.resize(2,2);
@@ -38,7 +38,7 @@ TEST(AgradFwdMatrixCholeskyDecompose, exception_mat_ffd) {
   EXPECT_NO_THROW(stan::math::cholesky_decompose(m));
   
   m.resize(2, 3);
-  EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
+  EXPECT_THROW(stan::math::cholesky_decompose(m), std::invalid_argument);
 
   // not symmetric
   m.resize(2,2);
@@ -58,7 +58,7 @@ TEST(AgradFwdMatrixCholeskyDecompose, exception_mat_fv) {
   EXPECT_NO_THROW(stan::math::cholesky_decompose(m));
   
   m.resize(2, 3);
-  EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
+  EXPECT_THROW(stan::math::cholesky_decompose(m), std::invalid_argument);
 
   // not symmetric
   m.resize(2,2);
@@ -78,7 +78,7 @@ TEST(AgradFwdMatrixCholeskyDecompose, exception_mat_ffv) {
   EXPECT_NO_THROW(stan::math::cholesky_decompose(m));
   
   m.resize(2, 3);
-  EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
+  EXPECT_THROW(stan::math::cholesky_decompose(m), std::invalid_argument);
 
   // not symmetric
   m.resize(2,2);

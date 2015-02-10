@@ -133,12 +133,12 @@ TEST_F(AgradDistributionsDirichlet,Bounds) {
   bad_alpha = Matrix<double,Dynamic,1>(4,1);
   bad_alpha << 1, 2, 3, 4;
   EXPECT_THROW(dirichlet_log(to_var(good_theta),to_var(bad_alpha)),
-               std::domain_error)
+               std::invalid_argument)
     << "size mismatch: theta is a 2-vector, alpha is a 4-vector";
   EXPECT_THROW(dirichlet_log(to_var(good_theta),bad_alpha),
-               std::domain_error)
+               std::invalid_argument)
     << "size mismatch: theta is a 2-vector, alpha is a 4-vector";
   EXPECT_THROW(dirichlet_log(good_theta,to_var(bad_alpha)),
-               std::domain_error)
+               std::invalid_argument)
     << "size mismatch: theta is a 2-vector, alpha is a 4-vector";
 }

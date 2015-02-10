@@ -5,7 +5,7 @@
 
 \pagestyle{plain}
 
-\newcommand{\stanversion}{2.5.0}
+\newcommand{\stanversion}{2.6.0}
 
 \frontmatter
 \include{title}
@@ -14,7 +14,7 @@
 \include{preface}
 \include{acknowledgements}
 \newcounter{savepage}
-\setcounter{savepage}{\arabic{page}}
+\setcounter{savepage}{\arabic{page} + 1}
 
 \mainmatter
 \setcounter{page}{\thesavepage}
@@ -26,6 +26,7 @@
 \include{distributions}
 \include{advanced}
 \include{algorithms}
+\include{process}
 \include{contributed}
 
 \appendix

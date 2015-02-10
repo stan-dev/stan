@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/good/lang/reject_model.cpp>
+#include <test/test-models/good/lang/reject_model.hpp>
 
 /* tests that stan program throws exception in model block
-   this block gets compiled into .cpp model object's log_prob method
+   this block gets compiled into .hpp model object's log_prob method
 */
 
 TEST(StanCommon, reject_model) {
@@ -26,11 +26,10 @@ TEST(StanCommon, reject_model) {
   for (int i = 0; i < cont_params.size(); ++i)
     cont_vector.at(i) = cont_params(i);
   std::vector<int> disc_vector;
-  double lp(0);
 
   // call model's log_prob function, check that exception is thrown
   try {
-    lp = model->log_prob<false, false>(cont_vector, disc_vector, &std::cout);
+    model->log_prob<false, false>(cont_vector, disc_vector, &std::cout);
   } catch (const std::domain_error& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "---------------------------------" << std::endl

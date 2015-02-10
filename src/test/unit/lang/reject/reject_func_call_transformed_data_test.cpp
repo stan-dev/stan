@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <sstream>
-#include <test/test-models/good/lang/reject_func_call_transformed_data.cpp>
+#include <test/test-models/good/lang/reject_func_call_transformed_data.hpp>
 
 /* tests that stan program throws exception in transformed data block
-   this block is part of the generated cpp object's constructor
+   this block is part of the generated hpp object's constructor
 */
 
 
@@ -19,8 +19,9 @@ TEST(StanCommon, reject_func_call_transformed_data) {
 
   // instantiate model
   try {
-     reject_func_call_transformed_data_model_namespace::reject_func_call_transformed_data_model* model 
-       = new reject_func_call_transformed_data_model_namespace::reject_func_call_transformed_data_model(empty_data_context, &model_output);
+    reject_func_call_transformed_data_model_namespace::reject_func_call_transformed_data_model* model 
+      = new reject_func_call_transformed_data_model_namespace::reject_func_call_transformed_data_model(empty_data_context, &model_output);
+    delete model;
   } catch (const std::domain_error& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "---------------------------------" << std::endl

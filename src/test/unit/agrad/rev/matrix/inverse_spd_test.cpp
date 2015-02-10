@@ -27,7 +27,7 @@ TEST(AgradRevMatrix,inverse_spd_val) {
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 
-  EXPECT_THROW(inverse_spd(matrix_v(2,3)), std::domain_error);
+  EXPECT_THROW(inverse_spd(matrix_v(2,3)), std::invalid_argument);
 
   a << 2.0, 3.0, 
   1.0, 7.0;

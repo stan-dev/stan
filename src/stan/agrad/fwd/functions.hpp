@@ -56,6 +56,7 @@
 #include <stan/agrad/fwd/functions/log_diff_exp.hpp>
 #include <stan/agrad/fwd/functions/log_falling_factorial.hpp>
 #include <stan/agrad/fwd/functions/log_inv_logit.hpp>
+#include <stan/agrad/fwd/functions/log_mix.hpp>
 #include <stan/agrad/fwd/functions/log_rising_factorial.hpp>
 #include <stan/agrad/fwd/functions/log_sum_exp.hpp>
 #include <stan/agrad/fwd/functions/logit.hpp>
@@ -76,5 +77,6 @@
 #include <stan/agrad/fwd/functions/tgamma.hpp>
 #include <stan/agrad/fwd/functions/trunc.hpp>
 #include <stan/agrad/fwd/functions/value_of.hpp>
+#include <stan/agrad/fwd/functions/value_of_rec.hpp>
 
 #endif
