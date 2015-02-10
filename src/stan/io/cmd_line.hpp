@@ -11,10 +11,10 @@
 namespace stan {
 
   namespace io {
-    
+
     /**
      * Print help option with padding.
-     * 
+     *
      * Print 2 spaces, the specified help option, then pad
      * to the specified width with spaces.  If there is not
      * room for at least 2 padding spaces, start a new line
@@ -24,7 +24,7 @@ namespace stan {
      * @param width Width of option (defaults to 20).
      * @param o Output stream ptr, default to null
      */
-    void pad_help_option(std::ostream* o, 
+    void pad_help_option(std::ostream* o,
                          const std::string& option = "",
                          unsigned int width = 20) {
       if (!o) return;
@@ -32,18 +32,18 @@ namespace stan {
       int padding = width - option.size();
       if (padding < 2) {
         *o << std::endl;
-        padding = width + 2; // 2 is 
+        padding = width + 2;  // 2 is
       }
       for (int i = 0; i < padding; ++i)
         *o << ' ';
     }
 
-    /** 
+    /**
      * Prints single print option to output ptr if non-null.
-     * 
+     *
      * @param o
-     * @param key_val 
-     * @param msg 
+     * @param key_val
+     * @param msg
      * @param note
      */
     void print_help_helper(std::ostream* o,
@@ -51,25 +51,25 @@ namespace stan {
                            const std::string& msg,
                            const std::string& note = "") {
       if (!o) return;
-      pad_help_option(o,key_val);
-      *o << msg 
+      pad_help_option(o, key_val);
+      *o << msg
          << std::endl;
       if (note.size() > 0) {
-        pad_help_option(o,"");
-        *o << "    (" << note << ")" 
+        pad_help_option(o, "");
+        *o << "    (" << note << ")"
            << std::endl;
       }
       *o << std::endl;
     }
 
-    /** 
+    /**
      * Prints single print option to output ptr if non-null.
-     * 
+     *
      * @param o
-     * @param key 
-     * @param value_type 
-     * @param msg 
-     * @param note 
+     * @param key
+     * @param value_type
+     * @param msg
+     * @param note
      */
     void print_help_option(std::ostream* o,
                            const std::string& key,
@@ -80,7 +80,7 @@ namespace stan {
       ss << "--" << key;
       if (value_type.size() > 0)
         ss << "=<" << value_type << ">";
-      print_help_helper(o,ss.str(),msg,note);
+      print_help_helper(o, ss.str(), msg, note);
     }
 
     /**
@@ -92,7 +92,7 @@ namespace stan {
      * command itself.  There method <code>command()</code> retrieves
      * the command.
      *
-     * <p><b>Key/Value</b>: The second type of argument is a key-value pair, 
+     * <p><b>Key/Value</b>: The second type of argument is a key-value pair,
      * which must be in the form <code>--key=val</code>.  Two hyphens
      * are used to separate arguments from negated numbers.  The method
      * <code>has_key(const std::string&)</code> indicates if there is a key
@@ -113,7 +113,7 @@ namespace stan {
     class cmd_line {
     private:
       std::string cmd_;
-      std::map<std::string,std::string> key_val_;
+      std::map<std::string, std::string> key_val_;
       std::set<std::string> flag_;
       std::vector<std::string> bare_;
       void parse_arg(const std::string& s) {
@@ -125,12 +125,13 @@ namespace stan {
         }
         for (size_t i = 2; i < s.size(); ++i) {
           if (s[i] == '=') {
-            key_val_[s.substr(2,i - 2)] = s.substr(i + 1,s.size() - i - 1);
+            key_val_[s.substr(2, i - 2)] = s.substr(i + 1, s.size() - i - 1);
             return;
-          } 
+          }
         }
-        flag_.insert(s.substr(2,s.size()));
+        flag_.insert(s.substr(2, s.size()));
       }
+
     public:
       /**
        * Construct a command-line argument object from the specified
@@ -141,7 +142,7 @@ namespace stan {
        */
       cmd_line(int argc, const char* argv[])
         : cmd_(argv[0]) {
-        for (int i = 1; i < argc; ++i) 
+        for (int i = 1; i < argc; ++i)
           parse_arg(argv[i]);
       }
 
@@ -155,7 +156,7 @@ namespace stan {
       std::string command() {
         return cmd_;
       }
-      
+
       /**
        * Return <code>true</code> if the specified key is defined.
        *
@@ -167,14 +168,14 @@ namespace stan {
       }
 
       /**
-       * Returns the value for the key provided. 
+       * Returns the value for the key provided.
        *
        * If the specified key is defined, write the value of the key
        * into the specified reference and return <code>true</code>,
        * otherwise do not modify the reference and return
        * <code>false</code>.
        *
-       * <p>The conversions defined by <code>std::ostream</code> 
+       * <p>The conversions defined by <code>std::ostream</code>
        * are used to convert the base string value to the specified
        * type.  Thus this method will work as long as <code>operator>>()</code>
        * is defined for the specified type.
@@ -215,9 +216,9 @@ namespace stan {
 
       /**
        * Returns the bare argument.
-       * 
+       *
        * If the specified index is valid for bare arguments,
-       * write the bare argument at the specified index into 
+       * write the bare argument at the specified index into
        * the specified reference, and otherwise return false
        * without modifying the reference.
        *
@@ -252,7 +253,8 @@ namespace stan {
           ++flag_count;
         }
         size_t key_val_count = 0;
-        for (std::map<std::string,std::string>::const_iterator it = key_val_.begin();
+        for (std::map<std::string, std::string>::const_iterator it
+               = key_val_.begin();
              it != key_val_.end();
              ++it) {
           out << "KEY " << key_val_count << "=" << (*it).first;
@@ -265,7 +267,6 @@ namespace stan {
           ++bare_count;
         }
       }
-
     };
 
     // explicit instantation for std::string to allow for spaces
@@ -281,16 +282,14 @@ namespace stan {
     // explicit instantation for std::string to allow for spaces
     // in key_val_
     template <>
-    bool cmd_line::val<std::string>(const std::string& key, std::string& x) const {
+    bool cmd_line::val<std::string>(const std::string& key,
+                                    std::string& x) const {
       if (!has_key(key))
         return false;
       x = key_val_.find(key)->second;
       return true;
     }
-
-
   }
-
 }
 
 #endif

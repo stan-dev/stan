@@ -8,7 +8,7 @@
 namespace stan {
   namespace common {
     namespace recorder {
-      
+
       /**
        * Does nothing
        */
@@ -22,20 +22,20 @@ namespace stan {
          */
         template <class T>
         void operator()(const std::vector<T>& x) { }
-      
+
         /**
          * Do nothing with a string.
-         * 
+         *
          * @param x string to print with prefix in front
          */
         void operator()(const std::string x) { }
-      
+
         /**
          * Do nothing
          *
          */
         void operator()() { }
-      
+
         /**
          * Indicator function for whether the instance is recording.
          */
