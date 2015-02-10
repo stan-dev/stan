@@ -10,6 +10,7 @@ namespace stan {
       
       class recorder {
       public:
+        virtual ~recorder() {};
         // Can't enforce this method with a pure virtual function
         //template <class T>
         //virtual void operator()(const std::vector<T>& x) = 0;
