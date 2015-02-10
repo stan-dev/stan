@@ -1,4 +1,7 @@
 #include <ostream>
+#include <stan/io/var_context.hpp>
+#include <stan/io/dump.hpp>
+#include <stan/interface/var_context_factory/var_context_factory.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -407,8 +410,8 @@ TEST_F(StanServices, get_double_from_string) {
                val);
 }
 
-TEST_F(StanCommon, validate_unconstrained_initialization) {
-  using stan::common::validate_unconstrained_initialization;
+TEST_F(StanServices, validate_unconstrained_initialization) {
+  using stan::services::init::validate_unconstrained_initialization;
   Eigen::VectorXd valid(inf_model.num_params_r());
   valid.setZero();
   
@@ -448,9 +451,9 @@ TEST_F(StanCommon, validate_unconstrained_initialization) {
   }
 }
 
-TEST_F(StanCommon, initialize_state_source_inf) {
+TEST_F(StanServices, initialize_state_source_inf) {
   init = "abcd";
-  using stan::common::initialize_state_source;
+  using stan::services::init::initialize_state_source;
   EXPECT_FALSE(initialize_state_source(init,
                                        cont_params,
                                        inf_model,
