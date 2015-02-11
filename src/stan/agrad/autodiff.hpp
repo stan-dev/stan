@@ -187,7 +187,6 @@ namespace stan {
       }
     }
 
-
     // time O(N^2);  space O(N^2)
     template <typename F>
     void
@@ -196,11 +195,11 @@ namespace stan {
             double& fx,
             Eigen::Matrix<double, Eigen::Dynamic, 1>& grad,
             Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& H) {
-      start_nested();
+			H.resize(x.size(), x.size());
+			grad.resize(x.size());
       try {
-        H.resize(x.size(), x.size());
-        grad.resize(x.size());
         for (int i = 0; i < x.size(); ++i) {
+      		start_nested();
           Eigen::Matrix<fvar<var>, Eigen::Dynamic, 1> x_fvar(x.size());
           for (int j = 0; j < x.size(); ++j)
             x_fvar(j) = fvar<var>(x(j), i == j);
@@ -210,12 +209,12 @@ namespace stan {
           stan::agrad::grad(fx_fvar.d_.vi_);
           for (int j = 0; j < x.size(); ++j)
             H(i, j) = x_fvar(j).val_.adj();
+      		stan::agrad::recover_memory_nested();
         }
       } catch (const std::exception& e) {
         stan::agrad::recover_memory_nested();
         throw;
       }
-      stan::agrad::recover_memory_nested();
     }
     // time O(N^3);  space O(N^2)
     template <typename T, typename F>
@@ -398,15 +397,14 @@ namespace stan {
                  std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& grad_H) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
-      start_nested();
-      fx = f(x);
+     	fx = f(x);
+			int d = x.size();
+			H.resize(d, d);
+			grad_H.resize(d,Matrix<double, Dynamic, Dynamic>(d, d));
       try {
-        int d = x.size();
-        H.resize(d, d);
-        for (int i = 0; i < d; ++i)
-          grad_H.push_back(Matrix<double, Dynamic, Dynamic>(d, d));
         for (int i = 0; i < d; ++i) {
           for (int j = i; j < d; ++j) {
+      			start_nested();
             Matrix<fvar<fvar<var> >, Dynamic, 1> x_ffvar(d);
             for (int k = 0; k < d; ++k)
               x_ffvar(k) = fvar<fvar<var> >(fvar<var>(x(k), i == k),
@@ -419,13 +417,13 @@ namespace stan {
               grad_H[i](j, k) = x_ffvar(k).val_.val_.adj();
               grad_H[j](i, k) = grad_H[i](j, k);
             }
+						recover_memory_nested();
           }
         }
       } catch (const std::exception& e) {
         stan::agrad::recover_memory_nested();
         throw;
       }
-      stan::agrad::recover_memory_nested();
     }
 
   }  // namespace agrad
