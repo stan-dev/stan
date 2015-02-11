@@ -27,16 +27,16 @@
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/bfgs.hpp>
 
-#include "stan/services/diagnose.hpp"
-#include "stan/services/init.hpp"
-#include "stan/services/io.hpp"
-#include "stan/services/mcmc.hpp"
-#include "stan/services/optimization.hpp"
+#include <stan/services/diagnose.hpp>
+#include <stan/services/init.hpp>
+#include <stan/services/io.hpp>
+#include <stan/services/mcmc.hpp>
+#include <stan/services/optimization.hpp>
 
 // FIXME: These belong to the interfaces and should be templated out here
-#include "stan/interface/callback/noop_callback.hpp"
-#include "stan/interface/var_context_factory/dump_factory.hpp"
-#include "stan/interface/recorder.hpp"
+#include <stan/interface/callback/noop_callback.hpp>
+#include <stan/interface/var_context_factory/dump_factory.hpp>
+#include <stan/interface/recorder.hpp>
 
 #include <fstream>
 #include <limits>
