@@ -6,11 +6,11 @@
 #include <iostream>
 #include <vector>
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/matrix/grad.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/autodiff.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/rev/mat/fun/grad.hpp>
+#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/mix/mat/functor/autodiff.hpp>
 
 namespace stan {
 

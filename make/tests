@@ -178,7 +178,7 @@ src/test/performance/logistic_test.cpp: src/test/test-models/performance/logisti
 ##
 # Test generator for distribution tests
 ##
-test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generate_tests.cpp
+test/prob/generate_tests$(EXE) : src/test/prob/generate_tests.cpp
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
 
@@ -189,11 +189,11 @@ test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
 # test_types := v fd fv ffd ffv
 
 .SECONDEXPANSION:
-#src/test/unit-distribution/%_generated_test.cpp : src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
-src/test/unit-distribution/%_generated_v_test.cpp src/test/unit-distribution/%_generated_fd_test.cpp src/test/unit-distribution/%_generated_fv_test.cpp src/test/unit-distribution/%_generated_ffd_test.cpp src/test/unit-distribution/%_generated_ffv_test.cpp: src/test/unit-distribution/$$(call test_name,$$*) test/unit-distribution/generate_tests$(EXE)
-	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
+#src/test/prob/%_generated_test.cpp : src/test/prob/$$(call test_name,$$*) test/prob/generate_tests$(EXE)
+src/test/prob/%_generated_v_test.cpp src/test/prob/%_generated_fd_test.cpp src/test/prob/%_generated_fv_test.cpp src/test/prob/%_generated_ffd_test.cpp src/test/prob/%_generated_ffv_test.cpp: src/test/prob/$$(call test_name,$$*) test/prob/generate_tests$(EXE)
+	$(WINE) test/prob/generate_tests$(EXE) $<
 
-LIST_OF_GENERATED_TESTS := $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_v_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fd_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fv_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffd_test.cpp,g') $(shell find src/test/unit-distribution -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffv_test.cpp,g')
+LIST_OF_GENERATED_TESTS := $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_v_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fd_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fv_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffd_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffv_test.cpp,g')
 
 .PHONY: generate-tests
 generate-tests: $(LIST_OF_GENERATED_TESTS)

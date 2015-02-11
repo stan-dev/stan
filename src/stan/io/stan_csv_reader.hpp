@@ -3,7 +3,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-#include <stan/math/matrix.hpp>
 #include <istream>
 #include <iostream>
 #include <sstream>

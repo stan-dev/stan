@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/optimization/bfgs_linesearch.hpp>
-#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 
 TEST(OptimizationBfgsLinesearch, CubicInterp) {
   using stan::optimization::CubicInterp;

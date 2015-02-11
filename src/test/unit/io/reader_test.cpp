@@ -1,5 +1,5 @@
 #include <stan/io/reader.hpp>
-#include <stan/error_handling/matrix/check_cholesky_factor.hpp>
+#include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
 #include <gtest/gtest.h>
 
 TEST(io_reader, scalar) {

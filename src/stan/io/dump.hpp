@@ -5,9 +5,8 @@
 #include <boost/throw_exception.hpp>
 
 #include <stan/io/var_context.hpp>
-#include <stan/math/matrix.hpp>
-#include <stan/math/meta/index_type.hpp>
-#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/math/prim/scal/meta/index_type.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
 
 #include <cctype>
 #include <iostream>

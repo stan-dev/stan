@@ -14,11 +14,10 @@
 #include <boost/random/additive_combine.hpp>
 
 #include <stan/io/stan_csv_reader.hpp>
-#include <stan/math/matrix.hpp>
-#include <stan/math/matrix/variance.hpp>
-#include <stan/math/matrix/meta/index_type.hpp>
-#include <stan/prob/autocorrelation.hpp>
-#include <stan/prob/autocovariance.hpp>
+#include <stan/math/prim/mat/fun/variance.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/mat/fun/autocorrelation.hpp>
+#include <stan/math/prim/mat/fun/autocovariance.hpp>
 
 #include <algorithm>
 #include <cmath>

@@ -4,9 +4,9 @@
 
 #include <vector>
 #include <stan/io/reader.hpp>
-#include <stan/math/matrix/accumulator.hpp>
-#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
-#include <stan/prob/transform.hpp>
+#include <stan/math/prim/mat/fun/accumulator.hpp>
+#include <stan/math/prim/scal/prob/uniform.hpp>
+#include <stan/math/prim/scal/fun/transform.hpp>
 
 #include <stan/io/dump.hpp>
 #include <test/test-models/good/model/valid.hpp>
