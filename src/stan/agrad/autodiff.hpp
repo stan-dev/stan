@@ -195,11 +195,11 @@ namespace stan {
             double& fx,
             Eigen::Matrix<double, Eigen::Dynamic, 1>& grad,
             Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& H) {
-			H.resize(x.size(), x.size());
-			grad.resize(x.size());
+      H.resize(x.size(), x.size());
+      grad.resize(x.size());
       try {
         for (int i = 0; i < x.size(); ++i) {
-      		start_nested();
+          start_nested();
           Eigen::Matrix<fvar<var>, Eigen::Dynamic, 1> x_fvar(x.size());
           for (int j = 0; j < x.size(); ++j)
             x_fvar(j) = fvar<var>(x(j), i == j);
@@ -209,7 +209,7 @@ namespace stan {
           stan::agrad::grad(fx_fvar.d_.vi_);
           for (int j = 0; j < x.size(); ++j)
             H(i, j) = x_fvar(j).val_.adj();
-      		stan::agrad::recover_memory_nested();
+          stan::agrad::recover_memory_nested();
         }
       } catch (const std::exception& e) {
         stan::agrad::recover_memory_nested();
@@ -397,14 +397,14 @@ namespace stan {
                  std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& grad_H) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
-     	fx = f(x);
-			int d = x.size();
-			H.resize(d, d);
-			grad_H.resize(d,Matrix<double, Dynamic, Dynamic>(d, d));
+      fx = f(x);
+      int d = x.size();
+      H.resize(d, d);
+      grad_H.resize(d,Matrix<double, Dynamic, Dynamic>(d, d));
       try {
         for (int i = 0; i < d; ++i) {
           for (int j = i; j < d; ++j) {
-      			start_nested();
+            start_nested();
             Matrix<fvar<fvar<var> >, Dynamic, 1> x_ffvar(d);
             for (int k = 0; k < d; ++k)
               x_ffvar(k) = fvar<fvar<var> >(fvar<var>(x(k), i == k),
@@ -417,7 +417,7 @@ namespace stan {
               grad_H[i](j, k) = x_ffvar(k).val_.val_.adj();
               grad_H[j](i, k) = grad_H[i](j, k);
             }
-						recover_memory_nested();
+            recover_memory_nested();
           }
         }
       } catch (const std::exception& e) {
