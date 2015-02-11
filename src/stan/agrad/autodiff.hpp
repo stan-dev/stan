@@ -187,7 +187,35 @@ namespace stan {
       }
     }
 
-    // time O(N^2);  space O(N^2)
+    /**
+     * Calculate the value, the gradient, and the Hessian,
+     * of the specified function at the specified argument in 
+     * O(N^2) time and O(N^2) space.
+     *
+     * <p>The functor must implement
+     *
+     * <code>
+     * stan::agrad::fvar<stan::agrad::var>
+     * operator()(const
+     * Eigen::Matrix<stan::agrad::fvar<stan::agrad::var>, Eigen::Dynamic, 1>&)
+     * </code>
+     *
+     * using only operations that are defined for
+     * <code>stan::agrad::fvar</code> and <code>stan::agrad::var</code>.
+     *
+     * This latter constraint usually
+     * requires the functions to be defined in terms of the libraries
+     * defined in Stan or in terms of functions with appropriately
+     * general namespace imports that eventually depend on functions
+     * defined in Stan.
+     *
+     * @tparam F Type of function
+     * @param[in] f Function
+     * @param[in] x Argument to function
+     * @param[out] fx Function applied to argument
+     * @param[out] grad gradient of function at argument
+     * @param[out] H Hessian of function at argument
+     */
     template <typename F>
     void
     hessian(const F& f,
@@ -364,12 +392,9 @@ namespace stan {
      * <p>The functor must implement
      *
      * <code>
-     * using stan::agrad::fvar;
-     * using stan::agrad::var;
-     *
-     * fvar<fvar<var> >
+     * stan::agrad::fvar<stan::agrad::fvar<stan::agrad::var> >
      * operator()(const
-     * Eigen::Matrix<fvar<fvar<var> >, Eigen::Dynamic, 1>&)
+     * Eigen::Matrix<stan::agrad::fvar<stan::agrad::fvar<stan::agrad::var> >, Eigen::Dynamic, 1>&)
      * </code>
      *
      * using only operations that are defined for
