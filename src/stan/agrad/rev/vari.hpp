@@ -106,7 +106,7 @@ namespace stan {
        * @return The modified ostream.
        */
       friend std::ostream& operator<<(std::ostream& os, const vari* v) {
-        return os << v << "  " << v->val_ << " : " << v->adj_;
+        return os << v->val_ << ":" << v->adj_;
       }
     };
 

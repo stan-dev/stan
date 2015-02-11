@@ -1,4 +1,10 @@
 #include <stan/agrad/rev/vari.hpp>
-#include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <sstream>
 
+TEST(AgradRev, insertion_operator) {
+  stan::agrad::vari v(5);
+  std::stringstream ss;
+  ss << &v;
+  EXPECT_EQ("5:0", ss.str());
+}

@@ -4,12 +4,13 @@
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/io/mcmc_writer.hpp>
 #include <stan/common/run_markov_chain.hpp>
+#include <string>
 
 namespace stan {
   namespace common {
-    
     template <class Model, class RNG, class StartTransitionCallback,
-              class SampleRecorder, class DiagnosticRecorder, class MessageRecorder>
+              class SampleRecorder, class DiagnosticRecorder,
+              class MessageRecorder>
     void sample(stan::mcmc::base_mcmc* sampler,
                 int num_warmup,
                 int num_samples,
@@ -17,7 +18,8 @@ namespace stan {
                 int refresh,
                 bool save,
                 stan::io::mcmc_writer
-                <Model,SampleRecorder,DiagnosticRecorder,MessageRecorder>& writer,
+                <Model, SampleRecorder, DiagnosticRecorder,
+                MessageRecorder>& writer,
                 stan::mcmc::sample& init_s,
                 Model& model,
                 RNG& base_rng,
@@ -25,9 +27,9 @@ namespace stan {
                 const std::string& suffix,
                 std::ostream& o,
                 StartTransitionCallback& callback) {
-      run_markov_chain<Model, RNG, StartTransitionCallback, 
+      run_markov_chain<Model, RNG, StartTransitionCallback,
                        SampleRecorder, DiagnosticRecorder, MessageRecorder>
-        (sampler, num_samples, num_warmup, 
+        (sampler, num_samples, num_warmup,
          num_warmup + num_samples, num_thin,
          refresh, save, false,
          writer,
@@ -35,7 +37,6 @@ namespace stan {
          prefix, suffix, o,
          callback);
     }
-
   }
 }
 
