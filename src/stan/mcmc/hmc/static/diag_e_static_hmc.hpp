@@ -10,29 +10,24 @@ namespace stan {
 
   namespace mcmc {
 
-    // Hamiltonian Monte Carlo on a 
+    // Hamiltonian Monte Carlo on a
     // Euclidean manifold with diagonal metric
     // and static integration time
-    
     template <typename M, class BaseRNG>
-    class diag_e_static_hmc: public base_static_hmc<M, 
-                                                    diag_e_point,
-                                                    diag_e_metric, 
-                                                    expl_leapfrog, 
-                                                    BaseRNG> {
-      
+    class diag_e_static_hmc
+      : public base_static_hmc<M, diag_e_point, diag_e_metric,
+                               expl_leapfrog, BaseRNG> {
     public:
-      
-      diag_e_static_hmc(M &m, BaseRNG& rng, std::ostream* o = &std::cout, std::ostream* e = 0):
-      base_static_hmc<M, diag_e_point, diag_e_metric, expl_leapfrog, BaseRNG>(m, rng, o, e)
-      { this->name_ = "Static HMC with a diagonal Euclidean metric"; }
-
-                        
+      diag_e_static_hmc(M &m, BaseRNG& rng,
+                        std::ostream* o = &std::cout, std::ostream* e = 0)
+        : base_static_hmc<M, diag_e_point, diag_e_metric,
+                          expl_leapfrog, BaseRNG>(m, rng, o, e) {
+        this->name_ = "Static HMC with a diagonal Euclidean metric";
+      }
     };
 
-  } // mcmc
+  }  // mcmc
 
-} // stan
-          
+}  // stan
 
 #endif

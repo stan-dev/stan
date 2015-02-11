@@ -1,8 +1,9 @@
 #ifndef STAN__COMMON__CONTEXT_FACTORY_HPP
 #define STAN__COMMON__CONTEXT_FACTORY_HPP
 
-#include <fstream>
 #include <stan/io/dump.hpp>
+#include <fstream>
+#include <string>
 
 namespace stan {
   namespace common {
@@ -21,9 +22,10 @@ namespace stan {
       stan::io::dump operator()(const std::string source) {
         std::fstream source_stream(source.c_str(),
                                    std::fstream::in);
-        
+
         if (source_stream.fail()) {
-          std::string message("dump_factory Error: the file " + source + " does not exist.");
+          std::string message("dump_factory Error: the file "
+                              + source + " does not exist.");
           throw std::runtime_error(message);
         }
 
@@ -33,7 +35,7 @@ namespace stan {
         return dump;
       }
     };
-    
+
   }
 }
 
