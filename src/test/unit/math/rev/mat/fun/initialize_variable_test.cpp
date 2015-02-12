@@ -1,6 +1,6 @@
 #include <stan/math/rev/mat/fun/initialize_variable.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradRevMatrix, initializeVariable) {
   using stan::agrad::initialize_variable;

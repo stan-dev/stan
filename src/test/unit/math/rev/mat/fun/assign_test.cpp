@@ -1,6 +1,6 @@
 #include <stan/math/prim/mat/fun/assign.hpp>
 #include <stan/math/prim/mat/fun/get_base1_lhs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
 

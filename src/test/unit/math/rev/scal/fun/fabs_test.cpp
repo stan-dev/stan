@@ -1,8 +1,8 @@
 #include <limits>
 #include <stan/math/rev/scal/fun/fabs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/scal/fun/nan_util.hpp>
+#include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev,fabs_var) {
   AVAR a = 0.68;

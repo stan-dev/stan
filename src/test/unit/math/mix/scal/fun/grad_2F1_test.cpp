@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/grad_2F1.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(ProbInternalMath, grad2F1_fd1) {
   using stan::agrad::fvar;

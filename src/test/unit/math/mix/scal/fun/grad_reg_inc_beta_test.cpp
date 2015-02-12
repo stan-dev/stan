@@ -2,7 +2,7 @@
 #include <stan/math/fwd/scal/fun/inc_beta.hpp>
 #include <stan/math/rev/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(ProbInternalMath, grad_reg_inc_beta_fd) {
   using stan::agrad::fvar;

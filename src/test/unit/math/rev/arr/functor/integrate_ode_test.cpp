@@ -13,9 +13,13 @@
 #include <stan/math/prim/scal/fun/promote_scalar.hpp>
 
 #include <test/unit/math/rev/arr/functor/util.hpp>
+#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/scal/fun/value_of_rec.hpp>
 
-#include <test/unit/math/prim/mat/meta/prim/arr/functor/harmonic_oscillator.hpp>
-#include <test/unit/math/prim/mat/meta/prim/arr/functor/lorenz.hpp>
+#include <test/unit/math/prim/arr/functor/harmonic_oscillator.hpp>
+#include <test/unit/math/prim/arr/functor/lorenz.hpp>
 
 
 template <typename F, typename T_y0, typename T_theta>

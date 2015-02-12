@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(ProbInternalMath, gradRegIncGamma_typical) {
   double a = 0.5;

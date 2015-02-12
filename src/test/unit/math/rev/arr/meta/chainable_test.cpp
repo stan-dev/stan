@@ -1,5 +1,5 @@
 #include <stan/math/rev/arr/meta/chainable.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
 namespace chainable_test {

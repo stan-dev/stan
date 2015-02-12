@@ -4,7 +4,7 @@
 #include <stan/math/prim/mat/fun/mdivide_left.hpp>
 #include <stan/math/prim/mat/fun/multiply.hpp>
 #include <stan/math/rev/mat/fun/multiply.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 using stan::agrad::fvar;
 TEST(AgradFwdMatrixMdivideLeft,fd_matrix_matrix) {

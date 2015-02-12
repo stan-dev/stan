@@ -3,7 +3,7 @@
 #include <stan/math/rev/mat/fun/log_sum_exp.hpp>
 #include <stan/math/fwd/mat/fun/log_sum_exp.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradFwdMatrixLogSoftmax,fd) {
   using stan::agrad::log_softmax;

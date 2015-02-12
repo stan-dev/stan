@@ -1,8 +1,8 @@
 #include <stan/math/rev/scal/fun/lgamma.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
-#include <test/unit/math/prim/mat/meta/rev/scal/fun/nan_util.hpp>
+#include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev,lgamma) {
   AVAR a = 3.0;

@@ -1,6 +1,8 @@
 #include <stan/math/rev/mat/fun/dot_self.hpp>
+#include <stan/math/prim/mat/fun/dot_self.hpp>
+#include <stan/math/prim/mat/fun/columns_dot_self.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 template <int R, int C>
 void assert_val_grad(Eigen::Matrix<stan::agrad::var,R,C>& v) {

@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 using stan::agrad::fvar;
 TEST(AgradFwdMatrixOperatorAddition,fd_scalar_matrix) {

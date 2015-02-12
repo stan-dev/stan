@@ -1,5 +1,6 @@
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <gtest/gtest.h>
+#include <stan/math/rev/scal/fun/value_of_rec.hpp>
 
 TEST(AgradRevErrorHandlingScalar,CheckFinite) {
   using stan::agrad::var;

@@ -1,7 +1,7 @@
 #include <stan/math/fwd/mat/fun/rows_dot_self.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/scal/meta/fvar.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradFwdMatrixRowsDotSelf,fd) {
   using stan::math::columns_dot_self;

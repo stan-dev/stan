@@ -1,9 +1,9 @@
 #include <stan/math/rev/scal/fun/ibeta.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/ibeta.hpp>
 #include <boost/math/special_functions/beta.hpp>
-#include <test/unit/math/prim/mat/meta/rev/scal/fun/nan_util.hpp>
+#include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev,ibeta_vvv) {
   using stan::agrad::var;

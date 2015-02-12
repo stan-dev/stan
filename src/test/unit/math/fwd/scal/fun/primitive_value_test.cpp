@@ -3,7 +3,7 @@
 #include <stan/math/rev/scal/fun/primitive_value.hpp>
 
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradFwd,primitiveValue) {

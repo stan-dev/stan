@@ -1,7 +1,7 @@
 #include <stan/math/prim/mat/fun/rows.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradFwdMatrixRows,fd_vector) {
   using stan::agrad::vector_fd;

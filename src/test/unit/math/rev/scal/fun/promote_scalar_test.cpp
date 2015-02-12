@@ -1,5 +1,5 @@
 #include <stan/math/prim/mat/fun/promote_scalar.hpp>
-#include <test/unit/math/prim/mat/meta/prim/scal/fun/promote_type_test_util.hpp>
+#include <test/unit/math/prim/scal/fun/promote_type_test_util.hpp>
 #include <stan/math/rev/arr/meta/var.hpp>
 #include <gtest/gtest.h>
 

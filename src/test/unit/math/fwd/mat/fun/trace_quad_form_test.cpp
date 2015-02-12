@@ -1,6 +1,6 @@
 #include <stan/math/fwd/mat/fun/trace_quad_form.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
 using stan::agrad::fvar;

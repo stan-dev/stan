@@ -7,7 +7,7 @@
 #include <stan/math/rev/scal/fun/abs.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/rev/scal/fun/fabs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
 using stan::agrad::var;

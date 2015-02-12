@@ -2,7 +2,7 @@
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/diag_post_multiply.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 using stan::math::matrix_d;
 using stan::math::vector_d;

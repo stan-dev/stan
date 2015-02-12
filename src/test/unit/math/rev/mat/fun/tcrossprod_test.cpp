@@ -1,7 +1,26 @@
 #include <stan/math/rev/mat/fun/tcrossprod.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/jacobian.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/jacobian.hpp>
+#include <stan/math/rev/scal/fun/operator_addition.hpp>
+#include <stan/math/rev/scal/fun/operator_divide_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_division.hpp>
+#include <stan/math/rev/scal/fun/operator_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_minus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/scal/fun/operator_multiply_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_not_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_plus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_decrement.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_increment.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_not.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_plus.hpp>
 
 void test_tcrossprod(const stan::agrad::matrix_v& L) {
   using stan::agrad::matrix_v;

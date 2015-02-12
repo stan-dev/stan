@@ -1,8 +1,8 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/rev/scal/fun/log1m.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/scal/fun/nan_util.hpp>
+#include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev,log1m) {
   AVAR a = 0.1;

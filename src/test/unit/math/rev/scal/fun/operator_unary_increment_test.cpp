@@ -1,7 +1,7 @@
 #include <stan/math/rev/scal/fun/operator_unary_increment.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/scal/fun/nan_util.hpp>
+#include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev,plus_plus_a) {
   AVAR a(5.0);

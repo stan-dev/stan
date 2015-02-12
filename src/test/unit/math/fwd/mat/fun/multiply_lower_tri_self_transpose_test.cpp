@@ -4,7 +4,7 @@
 #include <stan/math/fwd/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/rev/mat/fun/multiply.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 using stan::agrad::fvar;
 TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, fd_3x3_matrix) {

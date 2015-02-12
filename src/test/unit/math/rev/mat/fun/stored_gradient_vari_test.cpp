@@ -4,6 +4,25 @@
 #include <stan/math/rev/arr/meta/var.hpp>
 #include <stan/math/rev/arr/meta/vari.hpp>
 #include <stan/math/rev/mat/fun/stored_gradient_vari.hpp>
+#include <stan/math/rev/scal/fun/operator_addition.hpp>
+#include <stan/math/rev/scal/fun/operator_divide_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_division.hpp>
+#include <stan/math/rev/scal/fun/operator_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_minus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/scal/fun/operator_multiply_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_not_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_plus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_decrement.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_increment.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_not.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_plus.hpp>
 
 TEST(StoredGradientVari, propagate3) {
   using stan::agrad::var;

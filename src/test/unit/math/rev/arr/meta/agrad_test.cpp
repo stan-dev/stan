@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
+#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/scal/fun/sin.hpp>
 
 TEST(AgradRev, multiple_grads) {
   for (int i = 0; i < 100; ++i) {

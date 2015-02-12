@@ -1,7 +1,7 @@
 #include <stan/math/prim/scal/prob/normal.hpp>
 #include <gtest/gtest.h>
 #include <vector>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 
 std::vector<double> test_fun(double y, double mu, double sigma) {
