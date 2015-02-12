@@ -36,5 +36,13 @@ TEST(GmGrammars,test1) {
               "PARSER EXPECTED: <statement>");
   test_throws("err-incr-log-prob-scope",
               "Sampling statements (~) and increment_log_prob() are");
+  test_throws("err-decl-vector",
+              "PARSER EXPECTED: \"[");
+  test_throws("err-decl-vector-2",
+              "PARSER EXPECTED: \"]");
+  test_throws("err-decl-matrix",
+              "PARSER EXPECTED: \",");
+  test_throws("err-decl-matrix-2",
+              "indexed expression dimensionality = 0; indexes supplied = 1");
 }
  

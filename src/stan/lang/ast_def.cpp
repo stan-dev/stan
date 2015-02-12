@@ -586,6 +586,19 @@ namespace stan {
     expression::expression(const binary_op& expr) : expr_(expr) { }
     expression::expression(const unary_op& expr) : expr_(expr) { }
 
+    int expression::total_dims() const {
+      int sum = expression_type().num_dims_;
+      if (expression_type().type() == VECTOR_T) 
+        ++sum;
+      if (expression_type().type() == ROW_VECTOR_T) 
+        ++sum;
+      if (expression_type().type() == MATRIX_T)
+        sum += 2;
+      return sum;
+    }
+
+
+
     printable::printable() : printable_("") { }
     printable::printable(const expression& expr) : printable_(expr) { }
     printable::printable(const std::string& msg) : printable_(msg) { }

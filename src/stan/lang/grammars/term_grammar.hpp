@@ -87,6 +87,7 @@ namespace stan {
 
       boost::spirit::qi::rule<Iterator, 
                               expression(var_origin), 
+                              boost::spirit::qi::locals<std::vector<std::vector<stan::gm::expression> > >,
                               whitespace_grammar<Iterator> > 
       indexed_factor_r;
 
