@@ -379,7 +379,7 @@ TEST(io_writer, unit_vector_unconstrain_exception) {
   EXPECT_THROW(writer.unit_vector_unconstrain(y), std::domain_error);
   
   y.resize(0);
-  EXPECT_THROW(writer.unit_vector_unconstrain(y), std::domain_error);
+  EXPECT_THROW(writer.unit_vector_unconstrain(y), std::invalid_argument);
 }
 TEST(io_writer, simplex_unconstrain_exception) {
   std::vector<int> theta_i;
@@ -398,7 +398,7 @@ TEST(io_writer, simplex_unconstrain_exception) {
   EXPECT_THROW(writer.simplex_unconstrain(y), std::domain_error);
   
   y.resize(0);
-  EXPECT_THROW(writer.simplex_unconstrain(y), std::domain_error);
+  EXPECT_THROW(writer.simplex_unconstrain(y), std::invalid_argument);
 }
 TEST(io_writer, corr_matrix_unconstrain_exception) {
   std::vector<int> theta_i;
@@ -414,10 +414,10 @@ TEST(io_writer, corr_matrix_unconstrain_exception) {
   EXPECT_THROW(writer.corr_matrix_unconstrain(y), std::domain_error);
 
   y.resize(0,0);
-  EXPECT_THROW(writer.corr_matrix_unconstrain(y), std::domain_error);
+  EXPECT_THROW(writer.corr_matrix_unconstrain(y), std::invalid_argument);
 
   y.resize(1,2);
-  EXPECT_THROW(writer.corr_matrix_unconstrain(y), std::domain_error);
+  EXPECT_THROW(writer.corr_matrix_unconstrain(y), std::invalid_argument);
 }
 TEST(io_writer, cov_matrix_unconstrain_exception) {
   std::vector<int> theta_i;

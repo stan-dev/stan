@@ -22,7 +22,7 @@ TEST(AgradRevMatrix,inverse_val) {
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 
-  EXPECT_THROW(inverse(matrix_v(2,3)), std::domain_error);
+  EXPECT_THROW(inverse(matrix_v(2,3)), std::invalid_argument);
 }
 TEST(AgradRevMatrix,inverse_grad) {
   using stan::math::inverse;

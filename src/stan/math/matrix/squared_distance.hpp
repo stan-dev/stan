@@ -21,9 +21,9 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T1,T2>::type
     squared_distance(const Eigen::Matrix<T1, R1, C1>& v1, 
                      const Eigen::Matrix<T2, R2, C2>& v2) {
-      stan::error_handling::check_vector("squared_distance", "v1", v1);
-      stan::error_handling::check_vector("squared_distance", "v2", v2);
-      stan::error_handling::check_matching_sizes("squared_distance", 
+      stan::math::check_vector("squared_distance", "v1", v1);
+      stan::math::check_vector("squared_distance", "v2", v2);
+      stan::math::check_matching_sizes("squared_distance", 
                                                  "v1", v1,
                                                  "v2", v2);
       if (v1.rows() != v2.rows())

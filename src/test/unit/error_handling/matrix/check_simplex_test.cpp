@@ -1,16 +1,17 @@
 #include <stan/error_handling/matrix/check_simplex.hpp>
 #include <gtest/gtest.h>
+#include <test/unit/util.hpp>
 
 TEST(ErrorHandlingMatrix, checkSimplex) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
   y.setZero();
   y << 0.5, 0.5;
   
-  EXPECT_TRUE(stan::error_handling::check_simplex("checkSimplex",
+  EXPECT_TRUE(stan::math::check_simplex("checkSimplex",
                                                   "y", y));
                   
   y[1] = 0.55;
-  EXPECT_THROW(stan::error_handling::check_simplex("checkSimplex", 
+  EXPECT_THROW(stan::math::check_simplex("checkSimplex", 
                                                    "y", y), 
                std::domain_error);
 }
@@ -24,7 +25,7 @@ TEST(ErrorHandlingMatrix, checkSimplex_message_negative_value) {
   y[0] = -0.1;
   y[1] = 1.1;
   try {
-    stan::error_handling::check_simplex("checkSimplex",
+    stan::math::check_simplex("checkSimplex",
                                         "y", y);
     FAIL() << "should have thrown";
   } catch (std::domain_error& e) {
@@ -46,7 +47,7 @@ TEST(ErrorHandlingMatrix, checkSimplex_message_negative_value) {
   y[1] = -0.1;
   y[2] = 1.0;
   try {
-    stan::error_handling::check_simplex("checkSimplex",
+    stan::math::check_simplex("checkSimplex",
                                         "y", y);
     FAIL() << "should have thrown";
   } catch (std::domain_error& e) {
@@ -70,7 +71,7 @@ TEST(ErrorHandlingMatrix, checkSimplex_message_sum) {
   y[13] = 0.9;
 
   try {
-    stan::error_handling::check_simplex("checkSimplex",
+    stan::math::check_simplex("checkSimplex",
                                         "y", y);
     FAIL() << "should have thrown";
   } catch (std::domain_error& e) {
@@ -92,21 +93,12 @@ TEST(ErrorHandlingMatrix, checkSimplex_message_length) {
   std::string message;
   y.resize(0);
 
-  try {
-    stan::error_handling::check_simplex("checkSimplex",
-                                        "y", y);
-    FAIL() << "should have thrown";
-  } catch (std::domain_error& e) {
-    message = e.what();
-  } catch (...) {
-    FAIL() << "threw the wrong error";
-  }
-
-  EXPECT_TRUE(std::string::npos != message.find(" y is not a valid simplex"))
-    << message;
-
-  EXPECT_TRUE(std::string::npos != message.find("length(y) = 0"))
-    << message;
+  using stan::math::check_simplex;
+  
+  EXPECT_THROW_MSG(check_simplex("checkSimplex",
+                                 "y", y),
+                   std::invalid_argument,
+                   "y has size 0, but must have a non-zero size");
 }
 
 TEST(ErrorHandlingMatrix, checkSimplex_nan) {
@@ -115,23 +107,23 @@ TEST(ErrorHandlingMatrix, checkSimplex_nan) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   y << nan, 0.5;
   
-  EXPECT_THROW(stan::error_handling::check_simplex("checkSimplex",
+  EXPECT_THROW(stan::math::check_simplex("checkSimplex",
                                                    "y", y),
                std::domain_error);
                   
   y[1] = 0.55;
-  EXPECT_THROW(stan::error_handling::check_simplex("checkSimplex", 
+  EXPECT_THROW(stan::math::check_simplex("checkSimplex", 
                                                    "y", y), 
                std::domain_error);
 
   y[0] = 0.5;
   y[1] = nan;
-  EXPECT_THROW(stan::error_handling::check_simplex("checkSimplex", 
+  EXPECT_THROW(stan::math::check_simplex("checkSimplex", 
                                                    "y", y), 
                std::domain_error);
 
   y[0] = nan;
-  EXPECT_THROW(stan::error_handling::check_simplex("checkSimplex", 
+  EXPECT_THROW(stan::math::check_simplex("checkSimplex", 
                                                    "y", y), 
                std::domain_error);
 }

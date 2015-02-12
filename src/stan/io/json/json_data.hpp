@@ -1,13 +1,6 @@
 #ifndef STAN__IO__JSON__JSON_DATA_HPP
 #define STAN__IO__JSON__JSON_DATA_HPP
 
-#include <cctype>
-#include <iostream>
-#include <limits>
-#include <map>
-#include <sstream>
-#include <string>
-#include <vector>
 #include <boost/throw_exception.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stan/math/matrix.hpp>
@@ -15,7 +8,13 @@
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/json_parser.hpp>
 #include <stan/io/json/json_data_handler.hpp>
-
+#include <cctype>
+#include <iostream>
+#include <limits>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace stan {
 
@@ -28,8 +27,8 @@ namespace stan {
      * value or a non-empty array of values of any dimensionality.
      * Arrays must be retangular and the values of an array are all of
      * the same type, either double or int.
-     * 
-     * <p>The dimensions and values of variables are accessed by variable name. 
+     *
+     * <p>The dimensions and values of variables are accessed by variable name.
      * The values of a variable are stored as a vector of values and
      * a vector of array dimensions, where a scalar value consists of
      * a single value and an emtpy vector for the dimensionality.
@@ -39,12 +38,12 @@ namespace stan {
      * stored as a vector of ints, else the array will be stored
      * as a vector of type double.
      *
-     * <p><code>json_data</code> objects are created by using the 
+     * <p><code>json_data</code> objects are created by using the
      * <code>json_parser</code> and a <code>json_data_handler</code>
-     * to read a single JSON text from an input stream. 
+     * to read a single JSON text from an input stream.
      */
     class json_data : public stan::io::var_context {
-    private: 
+    private:
       vars_map_r vars_r_;
       vars_map_i vars_i_;
 
@@ -58,15 +57,14 @@ namespace stan {
        * returns <code>false</code> if the values are all integers.
        *
        * @param name Variable name to test.
-       * @return <code>true</code> if the variable exists in the 
+       * @return <code>true</code> if the variable exists in the
        * real values of the json_data.
        */
       bool contains_r_only(const std::string& name) const {
         return vars_r_.find(name) != vars_r_.end();
       }
 
-    public: 
-
+    public:
       /**
        * Construct a json_data object from the specified input stream.
        *
@@ -75,7 +73,7 @@ namespace stan {
        * @param in Input stream from which to read.
        * @throws json_exception if data is not well-formed stan data declaration
        */
-      json_data(std::istream& in) : vars_r_(), vars_i_() {
+      explicit json_data(std::istream& in) : vars_r_(), vars_i_() {
         json_data_handler handler(vars_r_, vars_i_);
         stan::json::parse(in, handler);
       }
@@ -106,7 +104,7 @@ namespace stan {
 
       /**
        * Return the double values for the variable with the specified
-       * name or null. 
+       * name or null.
        *
        * @param name Name of variable.
        * @return Values of variable.
@@ -124,7 +122,7 @@ namespace stan {
         }
         return empty_vec_r_;
       }
-      
+
       /**
        * Return the dimensions for the variable with the specified
        * name.
@@ -154,7 +152,7 @@ namespace stan {
         }
         return empty_vec_i_;
       }
-      
+
       /**
        * Return the dimensions for the integer variable with the specified
        * name.
@@ -176,7 +174,7 @@ namespace stan {
        * @param names Vector to store the list of names in.
        */
       virtual void names_r(std::vector<std::string>& names) const {
-        names.resize(0);        
+        names.resize(0);
         for (vars_map_r::const_iterator it = vars_r_.begin();
              it != vars_r_.end(); ++it)
           names.push_back((*it).first);
@@ -189,26 +187,25 @@ namespace stan {
        * @param names Vector to store the list of names in.
        */
       virtual void names_i(std::vector<std::string>& names) const {
-        names.resize(0);        
+        names.resize(0);
         for (vars_map_i::const_iterator it = vars_i_.begin();
              it != vars_i_.end(); ++it)
           names.push_back((*it).first);
       }
 
-      /** 
+      /**
        * Remove variable from the object.
-       * 
+       *
        * @param name Name of the variable to remove.
        * @return If variable is removed returns <code>true</code>, else
        *   returns <code>false</code>.
        */
       bool remove(const std::string& name) {
-        return (vars_i_.erase(name) > 0) 
+        return (vars_i_.erase(name) > 0)
           || (vars_r_.erase(name) > 0);
       }
-      
     };
-    
+
   }
 
 }

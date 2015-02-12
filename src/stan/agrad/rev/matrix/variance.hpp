@@ -49,7 +49,7 @@ namespace stan {
      * @return sample variance of specified vector
      */
     var variance(const std::vector<var>& v) {
-      stan::error_handling::check_nonzero_size("variance", "v", v);
+      stan::math::check_nonzero_size("variance", "v", v);
       if (v.size() == 1) return 0;
       return calc_variance(v.size(), &v[0]);
     }
@@ -66,7 +66,7 @@ namespace stan {
      */
     template <int R, int C>
     var variance(const Eigen::Matrix<var,R,C>& m) {
-      stan::error_handling::check_nonzero_size("variance", "m", m);
+      stan::math::check_nonzero_size("variance", "m", m);
       if (m.size() == 1) return 0;
       return calc_variance(m.size(), &m(0));
     }

@@ -55,8 +55,8 @@ TEST(AgradRevMatrix, variance_vector_exception) {
 
   vector_d d1;
   vector_v v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradRevMatrix, variance_rowvector) {
   using stan::math::variance;
@@ -89,8 +89,8 @@ TEST(AgradRevMatrix, variance_rowvector_exception) {
 
   row_vector_d d1;
   row_vector_v v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradRevMatrix, variance_matrix) {
   using stan::math::variance;
@@ -123,18 +123,18 @@ TEST(AgradRevMatrix, variance_matrix_exception) {
 
   matrix_d d1;
   matrix_v v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 
   d1.resize(0,1);
   v1.resize(0,1);
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 
   d1.resize(1,0);
   v1.resize(1,0);
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradRevMatrix, varianceStdVector) {
   using stan::math::variance; // should use arg-dep lookup

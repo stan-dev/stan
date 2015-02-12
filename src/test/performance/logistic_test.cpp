@@ -94,7 +94,7 @@ TEST_F(performance, run) {
   clock_t t;
   for (int n = 0; n < N; ++n) {
     t = clock();      // start timer
-    stan::common::command<stan_model>(argc, argv);
+    stan::services::command<stan_model>(argc, argv);
     t = clock() - t;  // end timer
     seconds_per_run[n] = static_cast<double>(t) / CLOCKS_PER_SEC; 
     last_draws_per_run[n] 

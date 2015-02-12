@@ -102,22 +102,22 @@ TEST(AgradRevMatrix, assign_error) {
   y_dbl[1] = 3.0;
   
   AVEC y_var(3);
-  EXPECT_THROW(assign(y_var,y_dbl), std::domain_error);
+  EXPECT_THROW(assign(y_var,y_dbl), std::invalid_argument);
   
   Matrix<double,Dynamic,1> v_dbl(6);
   v_dbl << 1,2,3,4,5,6;
   Matrix<AVAR,Dynamic,1> v_var(5);
-  EXPECT_THROW(assign(v_var,v_dbl), std::domain_error);
+  EXPECT_THROW(assign(v_var,v_dbl), std::invalid_argument);
 
   Matrix<double,1,Dynamic> rv_dbl(3);
   rv_dbl << 2, 4, 6;
   Matrix<AVAR,1,Dynamic> rv_var(6);
-  EXPECT_THROW(assign(rv_var,rv_dbl), std::domain_error);
+  EXPECT_THROW(assign(rv_var,rv_dbl), std::invalid_argument);
 
   Matrix<double,Dynamic,Dynamic> m_dbl(2,3);
   m_dbl << 2, 4, 6, 100, 200, 300;
   Matrix<AVAR,Dynamic,Dynamic> m_var(1,1);
-  EXPECT_THROW(assign(m_var,m_dbl), std::domain_error);
+  EXPECT_THROW(assign(m_var,m_dbl), std::invalid_argument);
 }
 
 TEST(MathAssign,VarDouble) {

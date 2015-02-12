@@ -184,28 +184,28 @@ TEST(AgradFwdMatrixMdivideRightSPD,fd_exceptions) {
   row_vector_d rvd1(3), rvd2(4);
   row_vector_d vd1(3), vd2(4);
 
-  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf1, fv1), std::domain_error);
   EXPECT_THROW(mdivide_right_spd(rvd1, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vd2, fv1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vd2, fv1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf2, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf1, fv2), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf1, fv2), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvd2, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvd1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vd1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fd1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvd1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vf1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vd1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fd1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf1, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf2, fd1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(vf2, fd1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf2, fd2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf1, fd2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf1, fd2), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf1, fd2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vf1, fd2), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixMdivideRightSPD,matrix_ffd_matrix_ffd) {
@@ -382,28 +382,28 @@ TEST(AgradFwdMatrixMdivideRightSPD,ffd_exceptions) {
   row_vector_d rvd1(3), rvd2(4);
   row_vector_d vd1(3), vd2(4);
 
-  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf1, fv1), std::domain_error);
   EXPECT_THROW(mdivide_right_spd(rvd1, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vd2, fv1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vd2, fv1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf2, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf1, fv2), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf1, fv2), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvd2, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvd1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vd1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fd1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvd1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vf1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vd1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fd1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf1, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf2, fd1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(vf2, fd1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf2, fd2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf1, fd2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf1, fd2), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf1, fd2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vf1, fd2), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixMdivideRightSPD,matrix_fv_matrix_fv1) {
@@ -878,28 +878,28 @@ TEST(AgradFwdMatrixMdivideRightSPD,fv_exceptions) {
   row_vector_d rvd1(3), rvd2(4);
   row_vector_d vd1(3), vd2(4);
 
-  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf1, fv1), std::domain_error);
   EXPECT_THROW(mdivide_right_spd(rvd1, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vd2, fv1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vd2, fv1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf2, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf1, fv2), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf1, fv2), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvd2, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvd1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vd1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fd1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvd1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vf1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vd1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fd1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf1, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf2, fd1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(vf2, fd1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf2, fd2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf1, fd2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf1, fd2), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf1, fd2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vf1, fd2), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixMdivideRightSPD,matrix_ffv_matrix_ffv1) {
@@ -1843,26 +1843,26 @@ TEST(AgradFwdMatrixMdivideRightSPD,ffv_exceptions) {
   row_vector_d rvd1(3), rvd2(4);
   row_vector_d vd1(3), vd2(4);
 
-  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fd2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(fv2, fd1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf1, fv1), std::domain_error);
   EXPECT_THROW(mdivide_right_spd(rvd1, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vd2, fv1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fv1), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vd2, fv1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf2, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf1, fv2), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf1, fv2), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvd2, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvd1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vd1, fv2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf2, fd1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvd1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vf1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vd1, fv2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(rvf2, fd1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf1, fd1), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf2, fd1), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(vf2, fd1), std::invalid_argument);
   EXPECT_THROW(mdivide_right_spd(rvf2, fd2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(rvf1, fd2), std::domain_error);
-  EXPECT_THROW(mdivide_right_spd(vf1, fd2), std::domain_error);
+  EXPECT_THROW(mdivide_right_spd(rvf1, fd2), std::invalid_argument);
+  EXPECT_THROW(mdivide_right_spd(vf1, fd2), std::invalid_argument);
 }
