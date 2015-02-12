@@ -1,23 +1,40 @@
 #ifndef STAN__PROB__TRANSFORM_HPP
 #define STAN__PROB__TRANSFORM_HPP
 
+
+#include <boost/throw_exception.hpp>
+#include <boost/math/tools/promotion.hpp>
+#include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
+#include <stan/math/prim/mat/err/check_cholesky_factor_corr.hpp>
+#include <stan/math/prim/mat/err/check_corr_matrix.hpp>
+#include <stan/math/prim/mat/err/check_cov_matrix.hpp>
+#include <stan/math/prim/mat/err/check_ordered.hpp>
+#include <stan/math/prim/mat/err/check_positive_ordered.hpp>
+#include <stan/math/prim/mat/err/check_square.hpp>
+#include <stan/math/prim/mat/err/check_simplex.hpp>
+#include <stan/math/prim/mat/err/check_unit_vector.hpp>
+#include <stan/math/prim/mat/fun/sum.hpp>
+#include <stan/math/prim/mat/fun/multiply_lower_tri_self_transpose.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/scal/err/check_bounded.hpp>
+#include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
+#include <stan/math/prim/scal/err/check_less.hpp>
+#include <stan/math/prim/scal/err/check_less_or_equal.hpp>
+#include <stan/math/prim/scal/err/check_positive.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
+#include <stan/math/prim/scal/fun/inv_logit.hpp>
+#include <stan/math/prim/scal/fun/log1m.hpp>
+#include <stan/math/prim/scal/fun/log1p_exp.hpp>
+#include <stan/math/prim/scal/fun/logit.hpp>
+#include <stan/math/prim/scal/fun/square.hpp>
+
 #include <cmath>
 #include <cstddef>
+#include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <sstream>
 #include <vector>
-
-#include <boost/throw_exception.hpp>
-#include <boost/math/tools/promotion.hpp>
-
-#include <stan/math/prim/scal/err/check_bounded.hpp>
-#include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
-#include <stan/math/prim/mat/err/check_square.hpp>
-
-#include <stan/math/prim/mat/fun/sum.hpp>
-#include <stan/math/prim/mat/fun/multiply_lower_tri_self_transpose.hpp>
-#include <stan/math/prim/mat/meta/index_type.hpp>
 
 
 namespace stan {

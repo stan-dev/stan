@@ -1,7 +1,9 @@
 #ifndef STAN__AGRAD__AUTO_DIFF_HPP
 #define STAN__AGRAD__AUTO_DIFF_HPP
 
+#include <stan/math/fwd/scal/meta/fvar.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/rev/arr/meta/var.hpp>
 #include <vector>
 
 namespace stan {

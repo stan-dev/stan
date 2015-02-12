@@ -1,10 +1,12 @@
 #ifndef STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP
 #define STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP
 
-#include <stan/agrad/rev.hpp> 
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/scal/fun/precomputed_gradients.hpp>
 
 namespace stan {
 

@@ -4,10 +4,16 @@
 #include <math.h>
 #include <stan/math/prim/scal/fun/lbeta.hpp>
 #include <stan/math/rev/scal/fun/exp.hpp>
+#include <stan/math/rev/scal/fun/fabs.hpp>
 #include <stan/math/rev/scal/fun/lgamma.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/log1m.hpp>
-#include <stan/math/rev/scal/fun/fabs.hpp>
+#include <stan/math/rev/scal/fun/operator_addition.hpp>
+#include <stan/math/rev/scal/fun/operator_division.hpp>
+#include <stan/math/rev/scal/fun/operator_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
+#include <stan/math/rev/scal/fun/operator_plus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 

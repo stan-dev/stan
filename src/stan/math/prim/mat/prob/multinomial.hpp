@@ -6,11 +6,12 @@
 #include <boost/random/variate_generator.hpp>
 #include <stan/math/prim/mat/err/check_simplex.hpp>
 #include <stan/math/prim/mat/err/check_size_match.hpp>
+#include <stan/math/prim/mat/prob/categorical.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
+#include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/prob/binomial.hpp>
-#include <stan/math/prim/mat/prob/categorical.hpp>
 #include <stan/math/prim/scal/meta/prob_traits.hpp>
 
 namespace stan {
