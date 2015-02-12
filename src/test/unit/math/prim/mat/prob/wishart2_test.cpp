@@ -2,6 +2,28 @@
 #include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
 #include <stan/math/prim/mat/prob/wishart.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/rev/mat/fun/to_var.hpp>
+#include <stan/math/rev/scal/fun/operator_addition.hpp>
+#include <stan/math/rev/scal/fun/operator_division.hpp>
+#include <stan/math/rev/scal/fun/operator_divide_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/scal/fun/operator_multiply_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_plus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_minus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_not_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/scal/fun/abs.hpp>
+#include <stan/math/rev/scal/fun/lgamma.hpp>
+#include <stan/math/rev/scal/fun/floor.hpp>
+#include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/rev/mat/fun/mdivide_left_ldlt.hpp>
+#include <stan/math/rev/mat/fun/log_determinant_ldlt.hpp>
 
 
 template <typename T_y, typename T_dof, typename T_scale>

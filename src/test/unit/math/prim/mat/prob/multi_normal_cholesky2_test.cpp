@@ -1,6 +1,25 @@
 #include <gtest/gtest.h>
 
 #include <stan/math/prim/mat/prob/multi_normal_cholesky.hpp>
+#include <stan/math/rev/mat/fun/to_var.hpp>
+#include <stan/math/rev/scal/fun/operator_addition.hpp>
+#include <stan/math/rev/scal/fun/operator_division.hpp>
+#include <stan/math/rev/scal/fun/operator_divide_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/scal/fun/operator_multiply_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_plus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_minus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_not_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/rev/scal/fun/value_of_rec.hpp>
+#include <stan/math/rev/mat/fun/dot_self.hpp>
 
 #include <vector>
 #include <test/unit/math/prim/mat/prob/test_gradients.hpp>

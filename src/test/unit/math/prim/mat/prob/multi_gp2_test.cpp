@@ -1,11 +1,36 @@
 #include <gtest/gtest.h>
+#include <stan/math/rev/scal/meta/numeric_limits.hpp>
+#include <stan/math/rev/arr/meta/var.hpp>
 #include <stan/math/prim/mat/prob/multi_gp.hpp>
+#include <stan/math/rev/scal/fun/operator_addition.hpp>
+#include <stan/math/rev/scal/fun/operator_division.hpp>
+#include <stan/math/rev/scal/fun/operator_divide_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/scal/fun/operator_multiply_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_plus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_minus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_not_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/mat/fun/sum.hpp>
+#include <stan/math/rev/mat/fun/to_var.hpp>
+#include <stan/math/rev/scal/fun/abs.hpp>
+#include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/rev/scal/fun/value_of_rec.hpp>
+#include <stan/math/rev/scal/fun/value_of.hpp>
+#include <stan/math/rev/mat/fun/trace_gen_inv_quad_form_ldlt.hpp>
+#include <stan/math/rev/mat/fun/log_determinant_ldlt.hpp>
 
 // UTILITY FUNCTIONS FOR TESTING
 #include <vector>
 #include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
-#include <stan/math/prim/mat/prob/test_gradients.hpp>
-#include <stan/math/prim/mat/prob/agrad_distributions_multi_gp.hpp>
+#include <test/unit/math/prim/mat/prob/test_gradients.hpp>
+#include <test/unit/math/prim/mat/prob/agrad_distributions_multi_gp.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
