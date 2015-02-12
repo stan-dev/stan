@@ -80,12 +80,12 @@ TEST(parserFunctions,funsBad10) {
 
 TEST(parserFunctions,funsBad11) {
   test_throws("functions-bad11",
-              "sampling only allowed in model");
+              "Sampling statements (~) and increment_log_prob()");
 }
 
 TEST(parserFunctions,funsBad12) {
   test_throws("functions-bad12",
-              "sampling only allowed in model");
+              "Sampling statements (~) and increment_log_prob()");
 }
 
 TEST(parserFunctions,funsBad13) {

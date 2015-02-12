@@ -554,6 +554,13 @@ namespace stan {
     };
     boost::phoenix::function<transpose_expr> transpose_f;
 
+    int num_dimss(std::vector<std::vector<stan::gm::expression> >& dimss) {
+      int sum = 0;
+      for (size_t i = 0; i < dimss.size(); ++i)
+        sum += dimss[i].size();
+      return sum;
+    }
+
     struct add_expression_dimss {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef void type; };
@@ -562,10 +569,25 @@ namespace stan {
                       bool& pass,
                       std::ostream& error_msgs) const {
         index_op iop(expression,dimss);
+        int expr_dims = expression.total_dims();
+        int index_dims = num_dimss(dimss);
+        if (expr_dims < index_dims) {
+          error_msgs << "Indexed expression must have at least as many dimensions as"
+                     << " number of indexes supplied: "
+                     << std::endl
+                     << "    indexed expression dimensionality = " << expr_dims
+                     << "; indexes supplied = " << dimss.size()
+                     << std::endl;
+          pass=false;
+          return;
+        }
         iop.infer_type();
         if (iop.type_.is_ill_formed()) {
-          error_msgs << "indexes inappropriate for expression." << std::endl;
+          error_msgs << "Indexed expression must have at least as many dimensions as"
+                     << " number of indexes supplied."
+                     << std::endl;
           pass = false;
+          return;
         } 
         pass = true;
         expression = iop;
@@ -631,6 +653,7 @@ namespace stan {
         expression_g(eg)
     {
       using boost::spirit::qi::_1;
+      using boost::spirit::qi::_a;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::double_;
       using boost::spirit::qi::eps;
@@ -695,10 +718,11 @@ namespace stan {
       indexed_factor_r 
         = factor_r(_r1) [_val = _1]
         > * (  
-             (+dims_r(_r1)) 
-               [add_expression_dimss_f(_val, _1, _pass,
-                                       boost::phoenix::ref(error_msgs_))]
-               | 
+             ( ( +dims_r(_r1)) [_a = _1]
+                 > eps
+               [add_expression_dimss_f(_val, _a, _pass,
+                                       boost::phoenix::ref(error_msgs_))] )
+             | 
                lit("'") 
                [_val = transpose_f(_val, boost::phoenix::ref(error_msgs_))] 
                )

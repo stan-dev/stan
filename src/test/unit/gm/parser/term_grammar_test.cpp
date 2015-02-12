@@ -49,7 +49,7 @@ TEST(gmParserTermGrammar, logicalNegateExprFun) {
 
 TEST(gmParserTermGrammar, addExpressionDimssFun) {
   test_throws("validate_add_expression_dimss_bad",
-              "indexes inappropriate");
+              "Indexed expression must have at least as many dimensions");
   test_parsable("validate_add_expression_dimss_good");
 }
 
