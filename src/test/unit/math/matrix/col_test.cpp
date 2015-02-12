@@ -18,7 +18,7 @@ TEST(MathMatrix, col_exception) {
   m1 << 1, 2, 3, 4, 5, 6;
 
   using stan::math::col;
-  EXPECT_THROW(col(m1,5),std::domain_error);
-  EXPECT_THROW(col(m1,0),std::domain_error);
+  EXPECT_THROW(col(m1,5),std::out_of_range);
+  EXPECT_THROW(col(m1,0),std::out_of_range);
 
 }

@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 TEST(ErrorHandlingMatrix, CheckLDLTFactor_nan) {
-  using stan::error_handling::check_ldlt_factor;
+  using stan::math::check_ldlt_factor;
 
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> x(2,2);

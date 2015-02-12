@@ -183,10 +183,10 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_vector_vector_exception) {
   vector_fd v1(5), v2(1);
   
   vector_fd output;
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorSubtraction,fd_rowvector_rowvector) {
   using stan::math::subtract;
@@ -268,10 +268,10 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_rowvector_rowvector_exception) {
   row_vector_fd v1(5), v2(2);
 
   row_vector_fd output;
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorSubtraction,fd_matrix_matrix) {
   using stan::math::subtract;
@@ -344,10 +344,10 @@ TEST(AgradFwdMatrixOperatorSubtraction,fd_matrix_matrix_exception) {
   matrix_d d1(2,2), d2(1,2);
   matrix_fd v1(2,2), v2(1,2);
 
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorSubtraction,fv_scalar_matrix_1stDeriv) {
   using stan::math::subtract;
@@ -655,10 +655,10 @@ TEST(AgradFwdMatrixOperatorSubtraction,fv_vector_vector_exception) {
   vector_fv v1(5), v2(1);
   
   vector_fv output;
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorSubtraction,fv_rowvector_rowvector_1stDeriv) {
   using stan::math::subtract;
@@ -783,10 +783,10 @@ TEST(AgradFwdMatrixOperatorSubtraction,fv_rowvector_rowvector_exception) {
   row_vector_fv v1(5), v2(2);
 
   row_vector_fv output;
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorSubtraction,fv_matrix_matrix_1stDeriv) {
   using stan::math::subtract;
@@ -902,10 +902,10 @@ TEST(AgradFwdMatrixOperatorSubtraction,fv_matrix_matrix_exception) {
   matrix_d d1(2,2), d2(1,2);
   matrix_fv v1(2,2), v2(1,2);
 
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_scalar_matrix) {
   using stan::math::subtract;
@@ -1109,10 +1109,10 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffd_vector_vector_exception) {
   vector_ffd v1(5), v2(1);
   
   vector_ffd output;
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_rowvector_rowvector) {
   using stan::math::subtract;
@@ -1202,10 +1202,10 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffd_rowvector_rowvector_exception) {
   row_vector_ffd v1(5), v2(2);
 
   row_vector_ffd output;
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorSubtraction,ffd_matrix_matrix) {
   using stan::math::subtract;
@@ -1282,10 +1282,10 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffd_matrix_matrix_exception) {
   matrix_d d1(2,2), d2(1,2);
   matrix_ffd v1(2,2), v2(1,2);
 
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorSubtraction,ffv_scalar_matrix_1stDeriv) {
   using stan::math::subtract;
@@ -1811,10 +1811,10 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffv_vector_vector_exception) {
   vector_ffv v1(5), v2(1);
   
   vector_ffv output;
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorSubtraction,ffv_rowvector_rowvector_1stDeriv) {
   using stan::math::subtract;
@@ -2019,10 +2019,10 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffv_rowvector_rowvector_exception) {
   row_vector_ffv v1(5), v2(2);
 
   row_vector_ffv output;
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }
 TEST(AgradFwdMatrixOperatorSubtraction,ffv_matrix_matrix_1stDeriv) {
   using stan::math::subtract;
@@ -2216,8 +2216,8 @@ TEST(AgradFwdMatrixOperatorSubtraction,ffv_matrix_matrix_exception) {
   matrix_d d1(2,2), d2(1,2);
   matrix_ffv v1(2,2), v2(1,2);
 
-  EXPECT_THROW(subtract(d1, d2), std::domain_error);
-  EXPECT_THROW(subtract(d1, v2), std::domain_error);
-  EXPECT_THROW(subtract(v1, d2), std::domain_error);
-  EXPECT_THROW(subtract(v1, v2), std::domain_error);
+  EXPECT_THROW(subtract(d1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(d1, v2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, d2), std::invalid_argument);
+  EXPECT_THROW(subtract(v1, v2), std::invalid_argument);
 }

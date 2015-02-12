@@ -10,6 +10,20 @@ using Eigen::VectorXd;
 using Eigen::RowVectorXd;
 using std::vector;
 
+template <int R, int C>
+void correct_type(const Eigen::Matrix<double,R,C>& x) {
+  EXPECT_EQ(Eigen::Dynamic, C);
+  EXPECT_EQ(1, R);
+}
+
+TEST(MathMatrix, append_col_types) {
+  RowVectorXd x(2);
+  x << 1, 2;
+  RowVectorXd y(3);
+  y << 3, 4, 5;
+  correct_type(append_col(x,y));
+}
+
 TEST(MathMatrix, append_col) {
   MatrixXd m33(3, 3);
   m33 << 1, 2, 3,
@@ -128,19 +142,19 @@ TEST(MathMatrix, append_col) {
   for (int i = 3; i < 6; i++)
     EXPECT_EQ(rvec(i), rv3(i-3));
     
-  EXPECT_THROW(append_col(m23, m33), std::domain_error);
-  EXPECT_THROW(append_col(m23, m32), std::domain_error);
-  EXPECT_THROW(append_col(m23, v3), std::domain_error);
-  EXPECT_THROW(append_col(m23, rv3), std::domain_error);
-  EXPECT_THROW(append_col(m33, m23), std::domain_error);
-  EXPECT_THROW(append_col(m32, m23), std::domain_error);
-  EXPECT_THROW(append_col(v3, m23), std::domain_error);
-  EXPECT_THROW(append_col(rv3, m23), std::domain_error);
+  EXPECT_THROW(append_col(m23, m33), std::invalid_argument);
+  EXPECT_THROW(append_col(m23, m32), std::invalid_argument);
+  EXPECT_THROW(append_col(m23, v3), std::invalid_argument);
+  EXPECT_THROW(append_col(m23, rv3), std::invalid_argument);
+  EXPECT_THROW(append_col(m33, m23), std::invalid_argument);
+  EXPECT_THROW(append_col(m32, m23), std::invalid_argument);
+  EXPECT_THROW(append_col(v3, m23), std::invalid_argument);
+  EXPECT_THROW(append_col(rv3, m23), std::invalid_argument);
   
-  EXPECT_THROW(append_col(rv3, m33), std::domain_error);
-  EXPECT_THROW(append_col(rv3, m32), std::domain_error);
-  EXPECT_THROW(append_col(rv3, v3), std::domain_error);
-  EXPECT_THROW(append_col(m33, rv3), std::domain_error);
-  EXPECT_THROW(append_col(m32, rv3), std::domain_error);
-  EXPECT_THROW(append_col(v3, rv3), std::domain_error);
+  EXPECT_THROW(append_col(rv3, m33), std::invalid_argument);
+  EXPECT_THROW(append_col(rv3, m32), std::invalid_argument);
+  EXPECT_THROW(append_col(rv3, v3), std::invalid_argument);
+  EXPECT_THROW(append_col(m33, rv3), std::invalid_argument);
+  EXPECT_THROW(append_col(m32, rv3), std::invalid_argument);
+  EXPECT_THROW(append_col(v3, rv3), std::invalid_argument);
 }

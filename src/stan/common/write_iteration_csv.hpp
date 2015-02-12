@@ -6,7 +6,7 @@
 
 namespace stan {
   namespace common {
-    
+
     void write_iteration_csv(std::ostream& output_stream,
                              const double lp,
                              const std::vector<double>& model_values) {

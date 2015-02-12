@@ -70,16 +70,16 @@ namespace stan {
       using boost::numeric::odeint::make_dense_output;  
       using boost::numeric::odeint::runge_kutta_dopri5;
       
-      stan::error_handling::check_finite("integrate_ode", "initial state", y0);
-      stan::error_handling::check_finite("integrate_ode", "initial time", t0);
-      stan::error_handling::check_finite("integrate_ode", "times", ts);
-      stan::error_handling::check_finite("integrate_ode", "parameter vector", theta);
-      stan::error_handling::check_finite("integrate_ode", "continuous data", x);
+      stan::math::check_finite("integrate_ode", "initial state", y0);
+      stan::math::check_finite("integrate_ode", "initial time", t0);
+      stan::math::check_finite("integrate_ode", "times", ts);
+      stan::math::check_finite("integrate_ode", "parameter vector", theta);
+      stan::math::check_finite("integrate_ode", "continuous data", x);
 
-      stan::error_handling::check_nonzero_size("integrate_ode", "times", ts);
-      stan::error_handling::check_nonzero_size("integrate_ode", "initial state", y0);
-      stan::error_handling::check_ordered("integrate_ode", "times", ts);
-      stan::error_handling::check_less("integrate_ode", "initial time", t0, ts[0]);
+      stan::math::check_nonzero_size("integrate_ode", "times", ts);
+      stan::math::check_nonzero_size("integrate_ode", "initial state", y0);
+      stan::math::check_ordered("integrate_ode", "times", ts);
+      stan::math::check_less("integrate_ode", "initial time", t0, ts[0]);
       
       const double absolute_tolerance = 1e-6;
       const double relative_tolerance = 1e-6;

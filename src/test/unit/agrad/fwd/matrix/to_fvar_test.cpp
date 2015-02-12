@@ -142,7 +142,7 @@ TEST(AgradFwdMatrixToFvar,fd_matrix_matrix) {
   EXPECT_FLOAT_EQ(18, output(2,2).d_);
 
   matrix_d val1(4,4);
-  EXPECT_THROW(stan::agrad::to_fvar(val1, d), std::domain_error);
+  EXPECT_THROW(stan::agrad::to_fvar(val1, d), std::invalid_argument);
 }
 TEST(AgradFwdMatrixToFvar,fv_vector) {
   using stan::math::vector_d;

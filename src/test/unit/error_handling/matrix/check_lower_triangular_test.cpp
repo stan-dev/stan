@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 TEST(ErrorHandlingMatrix, checkLowerTriangular) {
-  using stan::error_handling::check_lower_triangular;
+  using stan::math::check_lower_triangular;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   
   y.resize(1,1);
@@ -47,7 +47,7 @@ TEST(ErrorHandlingMatrix, checkLowerTriangular) {
 
 
 TEST(ErrorHandlingMatrix, checkLowerTriangular_one_indexed_message) {
-  using stan::error_handling::check_lower_triangular;
+  using stan::math::check_lower_triangular;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   std::string message;
 
@@ -69,7 +69,7 @@ TEST(ErrorHandlingMatrix, checkLowerTriangular_one_indexed_message) {
 }
 
 TEST(ErrorHandlingMatrix, checkLowerTriangular_nan) {
-  using stan::error_handling::check_lower_triangular;
+  using stan::math::check_lower_triangular;
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
     double nan = std::numeric_limits<double>::quiet_NaN();
 

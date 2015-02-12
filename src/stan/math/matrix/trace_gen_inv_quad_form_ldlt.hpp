@@ -29,11 +29,11 @@ namespace stan {
                                  const stan::math::LDLT_factor<T2,R2,C2> &A,
                                  const Eigen::Matrix<T3,R3,C3> &B) {
     
-      stan::error_handling::check_square("trace_gen_inv_quad_form_ldlt", "D", D);
-      stan::error_handling::check_multiplicable("trace_gen_inv_quad_form_ldlt", 
+      stan::math::check_square("trace_gen_inv_quad_form_ldlt", "D", D);
+      stan::math::check_multiplicable("trace_gen_inv_quad_form_ldlt", 
                                                 "A", A,
                                                 "B", B);
-      stan::error_handling::check_multiplicable("trace_gen_inv_quad_form_ldlt",
+      stan::math::check_multiplicable("trace_gen_inv_quad_form_ldlt",
                                                 "B", B,
                                                 "D", D);
       

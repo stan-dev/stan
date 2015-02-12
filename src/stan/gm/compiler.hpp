@@ -21,18 +21,12 @@ namespace stan {
      * @param stan_gm_in Stan model specification
      * @param cpp_out C++ code output stream
      * @param model_name Name of model class
-     * @param include_main Indicates whether to generate a main
-     *    function
      * @param in_file_name Name of input file to use in error
      * messages; defaults to <code>input</code>.
+     *
      * @return <code>false</code> if code could not be generated
      *    due to syntax error in the Stan model; 
      *    <code>true</code> otherwise.
-     * @param msgs
-     * @param stan_gm_in
-     * @param cpp_out
-     * @param model_name
-     * @param in_file_name
      */
     bool compile(std::ostream* msgs, // for warnings
                  std::istream& stan_gm_in,

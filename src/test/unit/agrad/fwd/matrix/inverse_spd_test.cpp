@@ -25,87 +25,86 @@ class AgradFwdMatrixInverseSPD : public testing::Test {
 TEST_F(AgradFwdMatrixInverseSPD, exception_fd) {
   using stan::math::inverse_spd;
 
-  stan::agrad::matrix_fd m1(2,3);
-  
   // non-square
+  stan::agrad::matrix_fd m1(2,3);
   m1 << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  EXPECT_THROW(inverse_spd(m1),std::invalid_argument);
 
-  stan::agrad::matrix_fd m2(3,3);
   
   // non-symmetric
+  stan::agrad::matrix_fd m2(3,3);
   m2 << 1, 2, 3, 4, 5, 6, 7, 8, 9;  
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  EXPECT_THROW(inverse_spd(m2),std::domain_error);
 
   // not positive definite
-  m2 << 1, 2, 3,
+  stan::agrad::matrix_fd m3(3,3);
+  m3 << 1, 2, 3,
         2, 4, 5,
         3, 5, 6;
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  EXPECT_THROW(inverse_spd(m3),std::domain_error);
 }
 
 TEST_F(AgradFwdMatrixInverseSPD, exception_ffd) {
   using stan::math::inverse_spd;
 
-  stan::agrad::matrix_ffd m1(2,3);
-  
   // non-square
+  stan::agrad::matrix_ffd m1(2,3);
   m1 << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  EXPECT_THROW(inverse_spd(m1),std::invalid_argument);
 
-  stan::agrad::matrix_ffd m2(3,3);
   
   // non-symmetric
+  stan::agrad::matrix_ffd m2(3,3);
   m2 << 1, 2, 3, 4, 5, 6, 7, 8, 9;  
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  EXPECT_THROW(inverse_spd(m2),std::domain_error);
 
   // not positive definite
-  m2 << 1, 2, 3,
+  stan::agrad::matrix_ffd m3(3,3);
+  m3 << 1, 2, 3,
         2, 4, 5,
         3, 5, 6;
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  EXPECT_THROW(inverse_spd(m3),std::domain_error);
 }
 TEST_F(AgradFwdMatrixInverseSPD, exception_fv) {
   using stan::math::inverse_spd;
 
-  stan::agrad::matrix_fv m1(2,3);
-  
   // non-square
+  stan::agrad::matrix_fv m1(2,3);
   m1 << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  EXPECT_THROW(inverse_spd(m1),std::invalid_argument);
 
-  stan::agrad::matrix_fv m2(3,3);
-  
   // non-symmetric
-  m2 << 1, 2, 3, 4, 5, 6, 7, 8, 9;  
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  stan::agrad::matrix_fv m2(3,3);
+  m2 << 1, 2, 3, 4, 5, 6, 7, 8, 9;
+  EXPECT_THROW(inverse_spd(m2),std::domain_error);
 
   // not positive definite
-  m2 << 1, 2, 3,
+  stan::agrad::matrix_fv m3(3,3);
+  m3 << 1, 2, 3,
         2, 4, 5,
         3, 5, 6;
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  EXPECT_THROW(inverse_spd(m3),std::domain_error);
 }
 TEST_F(AgradFwdMatrixInverseSPD, exception_ffv) {
   using stan::math::inverse_spd;
 
-  stan::agrad::matrix_ffv m1(2,3);
-  
   // non-square
+  stan::agrad::matrix_ffv m1(2,3);
   m1 << 1, 2, 3, 4, 5, 6;
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  EXPECT_THROW(inverse_spd(m1),std::invalid_argument);
 
-  stan::agrad::matrix_ffv m2(3,3);
   
   // non-symmetric
+  stan::agrad::matrix_ffv m2(3,3);
   m2 << 1, 2, 3, 4, 5, 6, 7, 8, 9;  
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  EXPECT_THROW(inverse_spd(m2),std::domain_error);
 
-  // not positive definite
-  m2 << 1, 2, 3,
+  // not positive definite 
+  stan::agrad::matrix_ffv m3(3,3);
+  m3 << 1, 2, 3,
         2, 4, 5,
         3, 5, 6;
-  EXPECT_THROW(inverse_spd(m1),std::domain_error);
+  EXPECT_THROW(inverse_spd(m3),std::domain_error);
 }
 
 TEST_F(AgradFwdMatrixInverseSPD, matrix_fd) {

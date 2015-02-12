@@ -13,7 +13,7 @@ namespace stan {
     inline var log_determinant(const Eigen::Matrix<var,R,C>& m) {
       using Eigen::Matrix;
 
-      error_handling::check_square("log_determinant","m", m);
+      math::check_square("log_determinant","m", m);
 
       Matrix<double,R,C> m_d(m.rows(),m.cols());
       for (int i = 0; i < m.size(); ++i)

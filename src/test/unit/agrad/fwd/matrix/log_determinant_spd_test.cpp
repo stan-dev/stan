@@ -27,7 +27,7 @@ TEST(AgradFwdMatrixLogDeterminantSPD,fd_exception) {
   using stan::agrad::matrix_fd;
   using stan::math::log_determinant_spd;
   
-  EXPECT_THROW(log_determinant_spd(matrix_fd(2,3)), std::domain_error);
+  EXPECT_THROW(log_determinant_spd(matrix_fd(2,3)), std::invalid_argument);
 }
 TEST(AgradFwdMatrixLogDeterminantSPD,fv_1stDeriv) {
   using stan::agrad::matrix_fv;
@@ -84,7 +84,7 @@ TEST(AgradFwdMatrixLogDeterminantSPD,fv_exception) {
   using stan::agrad::matrix_fv;
   using stan::math::log_determinant_spd;
   
-  EXPECT_THROW(log_determinant_spd(matrix_fv(2,3)), std::domain_error);
+  EXPECT_THROW(log_determinant_spd(matrix_fv(2,3)), std::invalid_argument);
 }
 TEST(AgradFwdMatrixLogDeterminantSPD,ffd) {
   using stan::agrad::matrix_ffd;
@@ -114,7 +114,7 @@ TEST(AgradFwdMatrixLogDeterminantSPD,ffd_exception) {
   using stan::agrad::matrix_ffd;
   using stan::math::log_determinant_spd;
   
-  EXPECT_THROW(log_determinant_spd(matrix_ffd(2,3)), std::domain_error);
+  EXPECT_THROW(log_determinant_spd(matrix_ffd(2,3)), std::invalid_argument);
 }
 TEST(AgradFwdMatrixLogDeterminantSPD,ffv_1stDeriv) {
   using stan::agrad::matrix_ffv;
@@ -229,5 +229,5 @@ TEST(AgradFwdMatrixLogDeterminantSPD,ffv_exception) {
   using stan::agrad::matrix_ffv;
   using stan::math::log_determinant_spd;
   
-  EXPECT_THROW(log_determinant_spd(matrix_ffv(2,3)), std::domain_error);
+  EXPECT_THROW(log_determinant_spd(matrix_ffv(2,3)), std::invalid_argument);
 }

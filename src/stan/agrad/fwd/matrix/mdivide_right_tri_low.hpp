@@ -23,8 +23,8 @@ namespace stan {
                           const Eigen::Matrix<fvar<T>, R2, C2>& b) {
       using stan::math::multiply;      
       using stan::math::mdivide_right;
-      stan::error_handling::check_square("mdivide_right_tri_low", "b", b);
-      stan::error_handling::check_multiplicable("mdivide_right_tri_low",
+      stan::math::check_square("mdivide_right_tri_low", "b", b);
+      stan::math::check_multiplicable("mdivide_right_tri_low",
                                                 "A", A,
                                                 "b", b);
 
@@ -70,8 +70,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_right;
-      stan::error_handling::check_square("mdivide_right_tri_low", "b", b);
-      stan::error_handling::check_multiplicable("mdivide_right_tri_low",
+      stan::math::check_square("mdivide_right_tri_low", "b", b);
+      stan::math::check_multiplicable("mdivide_right_tri_low",
                                                 "A", A,
                                                 "b", b);
 
@@ -106,8 +106,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_right;
-      stan::error_handling::check_square("mdivide_right_tri_low", "b", b);
-      stan::error_handling::check_multiplicable("mdivide_right_tri_low",
+      stan::math::check_square("mdivide_right_tri_low", "b", b);
+      stan::math::check_multiplicable("mdivide_right_tri_low",
                                                 "A", A,
                                                 "b", b);
 

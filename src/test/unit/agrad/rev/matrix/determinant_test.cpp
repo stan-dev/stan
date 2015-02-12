@@ -34,7 +34,7 @@ TEST(AgradRevMatrix,deteriminant_exception) {
   using stan::agrad::matrix_v;
   using stan::math::determinant;
 
-  EXPECT_THROW(determinant(matrix_v(2,3)), std::domain_error);
+  EXPECT_THROW(determinant(matrix_v(2,3)), std::invalid_argument);
 }
 TEST(AgradRevMatrix,determinant_grad) {
   using stan::agrad::matrix_v;

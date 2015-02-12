@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd.hpp>
+#include <sstream>
 
 TEST(AgradFwdFvar,Fvar) {
   using stan::agrad::fvar;
@@ -47,4 +48,12 @@ TEST(AgradFwdFvar,Fvar) {
   fvar<double> i(4, nan);
   EXPECT_FLOAT_EQ(4, i.val_);
   EXPECT_TRUE(boost::math::isnan(i.d_));
+}
+
+TEST(AgradFwdFvar, insertion_operator) {
+  using stan::agrad::fvar;
+  fvar<double> a(5.0);
+  std::stringstream ss;
+  ss << a;
+  EXPECT_EQ("5", ss.str());
 }

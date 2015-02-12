@@ -13,8 +13,8 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     qr_Q(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
       typedef Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> matrix_t;
-      stan::error_handling::check_nonzero_size("qr_Q", "m", m);
-      stan::error_handling::check_greater_or_equal("qr_Q", "m.rows()", 
+      stan::math::check_nonzero_size("qr_Q", "m", m);
+      stan::math::check_greater_or_equal("qr_Q", "m.rows()", 
                                                    static_cast<size_t>(m.rows()),
                                                    static_cast<size_t>(m.cols()));
 
