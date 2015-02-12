@@ -16,7 +16,7 @@ TEST(MathMatrix,eltDivideVecException) {
   stan::math::vector_d v2(3);
   v1 << 1, 2;
   v2 << 10, 100, 1000;
-  EXPECT_THROW(stan::math::elt_divide(v1,v2), std::domain_error);
+  EXPECT_THROW(stan::math::elt_divide(v1,v2), std::invalid_argument);
 }
 TEST(MathMatrix,eltDivideVecByScalar) {
   stan::math::vector_d v1(2);
@@ -46,7 +46,7 @@ TEST(MathMatrix,eltDivideRowVecException) {
   stan::math::row_vector_d v2(3);
   v1 << 1, 2;
   v2 << 10, 100, 1000;
-  EXPECT_THROW(stan::math::elt_divide(v1,v2), std::domain_error);
+  EXPECT_THROW(stan::math::elt_divide(v1,v2), std::invalid_argument);
 }
 TEST(MathMatrix,eltDivideRowVecByScalar) {
   stan::math::row_vector_d v1(2);
@@ -85,8 +85,8 @@ TEST(MathMatrix,eltDivideMatrixException) {
   m1 << 1, 2, 3, 4, 5, 6;
   m2 << -1, -2, -3, -4, -5, -6, -7, -8;
   m3 << 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24;
-  EXPECT_THROW(stan::math::elt_divide(m1,m2),std::domain_error);
-  EXPECT_THROW(stan::math::elt_divide(m1,m3),std::domain_error);
+  EXPECT_THROW(stan::math::elt_divide(m1,m2),std::invalid_argument);
+  EXPECT_THROW(stan::math::elt_divide(m1,m3),std::invalid_argument);
 }
 TEST(MathMatrix,eltDivideMatrixByScalar) {
   stan::math::matrix_d m1(2,3);

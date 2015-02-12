@@ -19,11 +19,11 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1>
     segment(const Eigen::Matrix<T,Eigen::Dynamic,1>& v,
             size_t i, size_t n) {
-      stan::error_handling::check_greater("segment", "n", i, 0.0);
-      stan::error_handling::check_less_or_equal("segment", "n", i, static_cast<size_t>(v.rows()));
+      stan::math::check_greater("segment", "n", i, 0.0);
+      stan::math::check_less_or_equal("segment", "n", i, static_cast<size_t>(v.rows()));
       if (n != 0) {
-        stan::error_handling::check_greater("segment", "n", i+n-1, 0.0);
-        stan::error_handling::check_less_or_equal("segment", "n", i+n-1, static_cast<size_t>(v.rows()));
+        stan::math::check_greater("segment", "n", i+n-1, 0.0);
+        stan::math::check_less_or_equal("segment", "n", i+n-1, static_cast<size_t>(v.rows()));
       } 
       return v.segment(i-1,n);
     }
@@ -33,11 +33,11 @@ namespace stan {
     Eigen::Matrix<T,1,Eigen::Dynamic>
     segment(const Eigen::Matrix<T,1,Eigen::Dynamic>& v,
             size_t i, size_t n) {
-      stan::error_handling::check_greater("segment", "n", i, 0.0);
-      stan::error_handling::check_less_or_equal("segment", "n", i, static_cast<size_t>(v.cols()));
+      stan::math::check_greater("segment", "n", i, 0.0);
+      stan::math::check_less_or_equal("segment", "n", i, static_cast<size_t>(v.cols()));
       if (n != 0) {
-        stan::error_handling::check_greater("segment", "n", i+n-1, 0.0);
-        stan::error_handling::check_less_or_equal("segment", "n", i+n-1, static_cast<size_t>(v.cols()));
+        stan::math::check_greater("segment", "n", i+n-1, 0.0);
+        stan::math::check_less_or_equal("segment", "n", i+n-1, static_cast<size_t>(v.cols()));
       } 
       
       return v.segment(i-1,n);
@@ -48,11 +48,11 @@ namespace stan {
     std::vector<T> 
     segment(const std::vector<T>& sv,
             size_t i, size_t n) {
-      stan::error_handling::check_greater("segment", "i", i, 0.0);
-      stan::error_handling::check_less_or_equal("segment", "i", i, sv.size());
+      stan::math::check_greater("segment", "i", i, 0.0);
+      stan::math::check_less_or_equal("segment", "i", i, sv.size());
       if (n != 0) {
-        stan::error_handling::check_greater("segment", "i+n-1", i+n-1, 0.0);
-        stan::error_handling::check_less_or_equal("segment", "i+n-1", i+n-1, static_cast<size_t>(sv.size()));
+        stan::math::check_greater("segment", "i+n-1", i+n-1, 0.0);
+        stan::math::check_less_or_equal("segment", "i+n-1", i+n-1, static_cast<size_t>(sv.size()));
       }
       std::vector<T> s;
       for (size_t j = 0; j < n; ++j)

@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 #include <stan/error_handling/matrix.hpp>
-#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 
 TEST(AgradRevErrorHandlingMatrix,CheckCovMatrix) {
   using stan::agrad::var;
   using Eigen::Dynamic;
   using Eigen::Matrix;
   
-  using stan::error_handling::check_cov_matrix;
+  using stan::math::check_cov_matrix;
   
   const char* function = "check_cov_matrix";
   Matrix<var,Dynamic,Dynamic> Sigma;

@@ -23,7 +23,7 @@ TEST(AgradFwdMatrixDeterminant,matrix_fd) {
   EXPECT_FLOAT_EQ(-1,a_det.val_);
   EXPECT_FLOAT_EQ(1,a_det.d_);
 
-  EXPECT_THROW(determinant(matrix_fd(2,3)), std::domain_error);
+  EXPECT_THROW(determinant(matrix_fd(2,3)), std::invalid_argument);
 }
 TEST(AgradFwdMatrixDeterminant,matrix_fv_1stDeriv) {
   using stan::agrad::matrix_fv;
@@ -44,7 +44,7 @@ TEST(AgradFwdMatrixDeterminant,matrix_fv_1stDeriv) {
   EXPECT_FLOAT_EQ(-1,a_det.val_.val());
   EXPECT_FLOAT_EQ(1,a_det.d_.val());
 
-  EXPECT_THROW(determinant(matrix_fv(2,3)), std::domain_error);
+  EXPECT_THROW(determinant(matrix_fv(2,3)), std::invalid_argument);
 
   AVEC z = createAVEC(b.val(),c.val(),d.val(),e.val());
   VEC h;
@@ -100,7 +100,7 @@ TEST(AgradFwdMatrixDeterminant,matrix_ffd) {
    EXPECT_FLOAT_EQ(-1,a_det.val_.val());
    EXPECT_FLOAT_EQ(1,a_det.d_.val());
 
-  EXPECT_THROW(determinant(matrix_ffd(2,3)), std::domain_error);
+  EXPECT_THROW(determinant(matrix_ffd(2,3)), std::invalid_argument);
 }
 TEST(AgradFwdMatrixDeterminant,matrix_ffv_1stDeriv) {
   using stan::agrad::matrix_ffv;
@@ -121,7 +121,7 @@ TEST(AgradFwdMatrixDeterminant,matrix_ffv_1stDeriv) {
   EXPECT_FLOAT_EQ(-1,a_det.val_.val().val());
   EXPECT_FLOAT_EQ(1,a_det.d_.val().val());
 
-  EXPECT_THROW(determinant(matrix_ffv(2,3)), std::domain_error);
+  EXPECT_THROW(determinant(matrix_ffv(2,3)), std::invalid_argument);
 
   AVEC z = createAVEC(b.val().val(),c.val().val(),d.val().val(),e.val().val());
   VEC h;

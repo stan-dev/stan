@@ -14,7 +14,5 @@
 #include <stan/error_handling/scalar/check_not_nan.hpp>
 #include <stan/error_handling/scalar/check_positive.hpp>
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
-#include <stan/error_handling/scalar/dom_err.hpp>
-#include <stan/error_handling/scalar/dom_err_vec.hpp>
 
 #endif

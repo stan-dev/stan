@@ -75,7 +75,7 @@ namespace stan {
                         Eigen::Matrix<var,R1,C2> >::type
     multiply(const Eigen::Matrix<T1,R1,C1>& m1,
              const Eigen::Matrix<T2,R2,C2>& m2) {
-      stan::error_handling::check_multiplicable("multiply",
+      stan::math::check_multiplicable("multiply",
                                                 "m1", m1,
                                                 "m2", m2);
       Eigen::Matrix<var,R1,C2> result(m1.rows(),m2.cols());

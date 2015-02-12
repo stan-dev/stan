@@ -154,7 +154,7 @@ TEST(ProbDistributionsMultiNormal,SizeMismatch) {
   Matrix<double,Dynamic,Dynamic> Sigma(2,3);
   Sigma << 9.0, -3.0, 0.0,
     -3.0,  4.0, 0.0;  
-  EXPECT_THROW(stan::prob::multi_normal_log(y, mu, Sigma), std::domain_error);
+  EXPECT_THROW(stan::prob::multi_normal_log(y, mu, Sigma), std::invalid_argument);
 }
 
 TEST(ProbDistributionsMultiNormal, error_check) {

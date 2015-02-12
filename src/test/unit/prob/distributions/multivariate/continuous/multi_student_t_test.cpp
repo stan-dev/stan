@@ -175,7 +175,7 @@ TEST(ProbDistributionsMultiStudentT,ErrorSize1) {
     0.0, 0.0, 5.0;
   double nu = 4.0;
 
-  EXPECT_THROW(multi_student_t_log(y,nu,mu,Sigma),std::domain_error);
+  EXPECT_THROW(multi_student_t_log(y,nu,mu,Sigma),std::invalid_argument);
 }
 
 TEST(ProbDistributionsMultiStudentT,ErrorSize2) {
@@ -188,7 +188,7 @@ TEST(ProbDistributionsMultiStudentT,ErrorSize2) {
     -3.0,  4.0, 0.0;
   double nu = 4.0;
 
-  EXPECT_THROW(multi_student_t_log(y,nu,mu,Sigma),std::domain_error);
+  EXPECT_THROW(multi_student_t_log(y,nu,mu,Sigma),std::invalid_argument);
 }
 
 TEST(ProbDistributionsMultiStudentT,ErrorSize3) {
@@ -201,7 +201,7 @@ TEST(ProbDistributionsMultiStudentT,ErrorSize3) {
     -3.0,  4.0, 0.0;
   double nu = 4.0;
 
-  EXPECT_THROW(multi_student_t_log(y,nu,mu,Sigma),std::domain_error);
+  EXPECT_THROW(multi_student_t_log(y,nu,mu,Sigma),std::invalid_argument);
 }
 
 TEST(ProbDistributionsMultiStudentT,ProptoAllDoublesZero) {

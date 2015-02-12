@@ -42,12 +42,12 @@ TEST_F(AgradRev,a_ostream) {
   std::ostringstream os;
   
   os << a;
-  EXPECT_EQ ("6:0", os.str());
+  EXPECT_EQ ("6", os.str());
 
   os.str("");
   a = 10.5;
   os << a;
-  EXPECT_EQ ("10.5:0", os.str());
+  EXPECT_EQ ("10.5", os.str());
 }
 
 TEST_F(AgradRev, smart_ptrs) {
@@ -89,7 +89,7 @@ TEST_F(AgradRev, print) {
   var initialized_var(0);
   output << initialized_var;
   str = output.str();
-  EXPECT_STREQ("0:0", output.str().c_str());
+  EXPECT_STREQ("0", output.str().c_str());
 
 
   output.clear();
@@ -135,7 +135,7 @@ struct gradable {
   void test() {
     std::vector<double> g;
     f_.grad(x_, g);
-    EXPECT_EQ(g_expected_.size(), g.size());
+    EXPECT_EQ(g_expected_.size(), static_cast<int>(g.size()));
     for (int i = 0; i < g_expected_.size(); ++i)
       EXPECT_FLOAT_EQ(g_expected_(i), g[i]);
   }

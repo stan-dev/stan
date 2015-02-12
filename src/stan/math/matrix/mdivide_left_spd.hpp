@@ -26,10 +26,10 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_left_spd(const Eigen::Matrix<T1,R1,C1> &A,
                      const Eigen::Matrix<T2,R2,C2> &b) {
-      stan::error_handling::check_symmetric("mdivide_left_spd", "A", A);
-      stan::error_handling::check_pos_definite("mdivide_left_spd", "A", A);
-      stan::error_handling::check_square("mdivide_left_spd", "A", A);
-      stan::error_handling::check_multiplicable("mdivide_left_spd", 
+      stan::math::check_symmetric("mdivide_left_spd", "A", A);
+      stan::math::check_pos_definite("mdivide_left_spd", "A", A);
+      stan::math::check_square("mdivide_left_spd", "A", A);
+      stan::math::check_multiplicable("mdivide_left_spd", 
                                                 "A", A,
                                                 "b", b);
       return promote_common<Eigen::Matrix<T1,R1,C1>,

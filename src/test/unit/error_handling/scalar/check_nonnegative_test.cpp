@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_nonnegative.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_nonnegative;
+using stan::math::check_nonnegative;
 
 TEST(ErrorHandlingScalar,CheckNonnegative) {
   const char* function = "check_nonnegative";
@@ -87,7 +87,7 @@ TEST(ErrorHandlingScalar,CheckNonnegative_nan) {
   x.push_back(2.0);
   x.push_back(3.0);
 
-  for (int i = 0; i < x.size(); i++) {
+  for (size_t i = 0; i < x.size(); i++) {
     x[i] = nan;
     EXPECT_THROW(check_nonnegative(function, "x", x),
                  std::domain_error);

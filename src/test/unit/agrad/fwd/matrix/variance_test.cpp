@@ -45,8 +45,8 @@ TEST(AgradFwdMatrixVariance, fd_vector_exception) {
 
   vector_d d1;
   vector_fd v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, fd_rowvector) {
   using stan::math::variance;
@@ -87,8 +87,8 @@ TEST(AgradFwdMatrixVariance, fd_rowvector_exception) {
 
   row_vector_d d1;
   row_vector_fd v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, fd_matrix) {
   using stan::math::variance;
@@ -129,18 +129,18 @@ TEST(AgradFwdMatrixVariance, fd_matrix_exception) {
 
   matrix_d d1;
   matrix_fd v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 
   d1.resize(0,1);
   v1.resize(0,1);
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 
   d1.resize(1,0);
   v1.resize(1,0);
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, fd_StdVector) {
   using stan::math::variance;
@@ -233,8 +233,8 @@ TEST(AgradFwdMatrixVariance, fv_vector_exception) {
 
   vector_d d1;
   vector_fv v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, fv_rowvector_1stDeriv) {
   using stan::math::variance;
@@ -308,8 +308,8 @@ TEST(AgradFwdMatrixVariance, fv_rowvector_exception) {
 
   row_vector_d d1;
   row_vector_fv v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, fv_matrix_1stDeriv) {
   using stan::math::variance;
@@ -382,18 +382,18 @@ TEST(AgradFwdMatrixVariance, fv_matrix_exception) {
 
   matrix_d d1;
   matrix_fv v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 
   d1.resize(0,1);
   v1.resize(0,1);
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 
   d1.resize(1,0);
   v1.resize(1,0);
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, fv_StdVector_1stDeriv) {
   using stan::math::variance;
@@ -485,8 +485,8 @@ TEST(AgradFwdMatrixVariance, ffd_vector_exception) {
 
   vector_d d1;
   vector_ffd v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, ffd_rowvector) {
   using stan::math::variance;
@@ -527,8 +527,8 @@ TEST(AgradFwdMatrixVariance, ffd_rowvector_exception) {
 
   row_vector_d d1;
   row_vector_ffd v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, ffd_matrix) {
   using stan::math::variance;
@@ -569,18 +569,18 @@ TEST(AgradFwdMatrixVariance, ffd_matrix_exception) {
 
   matrix_d d1;
   matrix_ffd v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 
   d1.resize(0,1);
   v1.resize(0,1);
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 
   d1.resize(1,0);
   v1.resize(1,0);
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, ffd_StdVector) {
   using stan::math::variance;
@@ -725,8 +725,8 @@ TEST(AgradFwdMatrixVariance, ffv_vector_exception) {
 
   vector_d d1;
   vector_ffv v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, ffv_rowvector_1stDeriv) {
   using stan::math::variance;
@@ -852,8 +852,8 @@ TEST(AgradFwdMatrixVariance, ffv_rowvector_exception) {
 
   row_vector_d d1;
   row_vector_ffv v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, ffv_matrix_1stDeriv) {
   using stan::math::variance;
@@ -976,18 +976,18 @@ TEST(AgradFwdMatrixVariance, ffv_matrix_exception) {
 
   matrix_d d1;
   matrix_ffv v1;
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 
   d1.resize(0,1);
   v1.resize(0,1);
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 
   d1.resize(1,0);
   v1.resize(1,0);
-  EXPECT_THROW(variance(d1), std::domain_error);
-  EXPECT_THROW(variance(v1), std::domain_error);
+  EXPECT_THROW(variance(d1), std::invalid_argument);
+  EXPECT_THROW(variance(v1), std::invalid_argument);
 }
 TEST(AgradFwdMatrixVariance, ffv_StdVector_1stDeriv) {
   using stan::math::variance;
