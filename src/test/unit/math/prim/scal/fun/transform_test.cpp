@@ -1,9 +1,33 @@
-#include <gtest/gtest.h>
-
-#include <stan/math/prim/scal/fun/transform.hpp>
+#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/mat/fun/sum.hpp>
+#include <stan/math/rev/mat/fun/multiply_lower_tri_self_transpose.hpp>
+#include <stan/math/rev/scal/fun/cos.hpp>
+#include <stan/math/rev/scal/fun/exp.hpp>
+#include <stan/math/rev/scal/fun/fabs.hpp>
+#include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/rev/scal/fun/log1p.hpp>
+#include <stan/math/rev/scal/fun/log1m.hpp>
+#include <stan/math/rev/scal/fun/operator_addition.hpp>
+#include <stan/math/rev/scal/fun/operator_division.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than.hpp>
+#include <stan/math/rev/scal/fun/operator_minus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/scal/fun/operator_multiply_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_plus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/scal/fun/sin.hpp>
+#include <stan/math/rev/scal/fun/sqrt.hpp>
+#include <stan/math/rev/scal/fun/tanh.hpp>
 #include <stan/math/prim/mat/fun/determinant.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/scal/fun/transform.hpp>
+#include <test/unit/util.hpp>
+#include <test/unit/math/rev/mat/fun/jacobian.hpp>
 
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <gtest/gtest.h>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;

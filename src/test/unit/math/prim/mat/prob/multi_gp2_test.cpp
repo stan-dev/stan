@@ -3,7 +3,7 @@
 
 // UTILITY FUNCTIONS FOR TESTING
 #include <vector>
-#include <test/unit/prim/mat/prob/expect_eq_diffs.hpp>
+#include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
 #include <stan/math/prim/mat/prob/test_gradients.hpp>
 #include <stan/math/prim/mat/prob/agrad_distributions_multi_gp.hpp>
 

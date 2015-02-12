@@ -3,11 +3,11 @@
 #include <stan/math/prim/mat/prob/multi_normal_prec.hpp>
 
 #include <vector>
-#include <stan/math/prim/mat/prob/test_gradients.hpp>
-#include <stan/math/prim/mat/prob/test_gradients_multi_normal.hpp>
-#include <test/unit/prim/mat/prob/expect_eq_diffs.hpp>
-#include <stan/math/prim/mat/prob/agrad_distributions_multi_normal_multi_row.hpp>
-#include <stan/math/prim/mat/prob/agrad_distributions_multi_normal.hpp>
+#include <test/unit/math/prim/mat/prob/test_gradients.hpp>
+#include <test/unit/math/prim/mat/prob/test_gradients_multi_normal.hpp>
+#include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
+#include <test/unit/math/prim/mat/prob/agrad_distributions_multi_normal_multi_row.hpp>
+#include <test/unit/math/prim/mat/prob/agrad_distributions_multi_normal.hpp>
 
 
 using Eigen::Dynamic;

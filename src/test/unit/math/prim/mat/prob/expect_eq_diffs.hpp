@@ -1,6 +1,9 @@
 #ifndef TEST__UNIT_DISTRIBUTION__EXPECT_EQ_DIFFS_HPP
 #define TEST__UNIT_DISTRIBUTION__EXPECT_EQ_DIFFS_HPP
 
+#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/scal/meta/numeric_limits.hpp>
+#include <cmath>
 
 void expect_eq_diffs(double x1, double x2, 
                      double y1, double y2,

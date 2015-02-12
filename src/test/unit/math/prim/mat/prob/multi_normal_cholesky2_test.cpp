@@ -3,9 +3,9 @@
 #include <stan/math/prim/mat/prob/multi_normal_cholesky.hpp>
 
 #include <vector>
-#include <stan/math/prim/mat/prob/test_gradients.hpp>
-#include <stan/math/prim/mat/prob/test_gradients_multi_normal.hpp>
-#include <test/unit/prim/mat/prob/expect_eq_diffs.hpp>
+#include <test/unit/math/prim/mat/prob/test_gradients.hpp>
+#include <test/unit/math/prim/mat/prob/test_gradients_multi_normal.hpp>
+#include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
 
 
 using Eigen::Dynamic;

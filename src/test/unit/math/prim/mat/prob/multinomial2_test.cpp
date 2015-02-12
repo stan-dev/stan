@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <test/prob/expect_eq_diffs.hpp>
+#include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/mat/prob/multinomial.hpp>
 

@@ -1,5 +1,5 @@
 #include <stan/math/prim/mat/fun/diag_pre_multiply.hpp>
-#include <test/unit/math/prim/mat/meta/prim/mat/fun/expect_matrix_eq.hpp>
+#include <test/unit/math/prim/mat/fun/expect_matrix_eq.hpp>
 #include <gtest/gtest.h>
 
 using Eigen::Matrix;

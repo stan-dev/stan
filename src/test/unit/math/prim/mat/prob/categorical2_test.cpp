@@ -1,7 +1,14 @@
 #include <gtest/gtest.h>
-#include <test/prob/expect_eq_diffs.hpp>
+#include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/mat/prob/categorical.hpp>
+#include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/rev/scal/fun/operator_addition.hpp>
+#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/fabs.hpp>
+#include <stan/math/prim/mat/err/check_simplex.hpp>
 
 template <typename T_prob>
 void expect_propto(unsigned int n1, T_prob theta1, 
@@ -30,7 +37,7 @@ TEST(AgradDistributionsCategorical,Propto) {
   expect_propto(n, theta1,
                 n, theta2,
                 "var: theta");
-  
+
   n = 2;
   expect_propto(n, theta1,
                 n, theta2,

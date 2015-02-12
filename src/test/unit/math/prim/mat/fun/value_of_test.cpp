@@ -1,5 +1,5 @@
 #include <stan/math/prim/mat/fun/value_of.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathMatrix,value_of) {

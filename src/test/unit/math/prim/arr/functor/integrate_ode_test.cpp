@@ -9,9 +9,9 @@
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
 #include <stan/math/prim/arr/functor/integrate_ode.hpp>
 
-#include <test/unit/math/prim/mat/meta/prim/arr/functor/util.hpp>
-#include <test/unit/math/prim/mat/meta/prim/arr/functor/harmonic_oscillator.hpp>
-#include <test/unit/math/prim/mat/meta/prim/arr/functor/lorenz.hpp>
+#include <test/unit/math/prim/arr/functor/util.hpp>
+#include <test/unit/math/prim/arr/functor/harmonic_oscillator.hpp>
+#include <test/unit/math/prim/arr/functor/lorenz.hpp>
 
 #include <test/unit/util.hpp>
 

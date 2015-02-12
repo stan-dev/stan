@@ -1,16 +1,18 @@
 #ifndef STAN__MODEL__UTIL_HPP
 #define STAN__MODEL__UTIL_HPP
 
+#include <stan/math/fwd/scal/fun/square.hpp>
+#include <stan/math/fwd/scal/fun/operator_multiplication.hpp>
+#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/rev/mat/fun/grad.hpp>
+#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/mix/mat/functor/autodiff.hpp>
+
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <vector>
-
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/rev/mat/fun/grad.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/mix/mat/functor/autodiff.hpp>
 
 namespace stan {
 

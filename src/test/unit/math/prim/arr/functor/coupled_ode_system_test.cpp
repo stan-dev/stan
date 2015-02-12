@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
 #include <test/unit/util.hpp>
-#include <test/unit/math/prim/mat/meta/prim/arr/functor/harmonic_oscillator.hpp>
-#include <test/unit/math/prim/mat/meta/prim/arr/functor/mock_ode_functor.hpp>
-#include <test/unit/math/prim/mat/meta/prim/arr/functor/mock_throwing_ode_functor.hpp>
+#include <test/unit/math/prim/arr/functor/harmonic_oscillator.hpp>
+#include <test/unit/math/prim/arr/functor/mock_ode_functor.hpp>
+#include <test/unit/math/prim/arr/functor/mock_throwing_ode_functor.hpp>
 
 struct StanMathOde : public ::testing::Test {
   std::stringstream msgs;

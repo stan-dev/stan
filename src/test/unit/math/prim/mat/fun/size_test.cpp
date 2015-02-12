@@ -1,5 +1,6 @@
 #include <stan/math/prim/mat/fun/size.hpp>
 #include <gtest/gtest.h>
+#include <Eigen/Dense>
 
 TEST(MathMatrix,size) {
   using std::vector;

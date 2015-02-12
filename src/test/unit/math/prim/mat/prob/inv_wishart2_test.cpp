@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/mat/prob/inv_wishart.hpp>
-#include <test/unit/prim/mat/prob/expect_eq_diffs.hpp>
+#include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
 
 
 template <typename T_y, typename T_dof, typename T_scale>

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-
+#include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/meta/seq_view.hpp>
 
 using stan::math::matrix_d;

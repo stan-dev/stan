@@ -1,5 +1,5 @@
 #include <stan/math/prim/mat/meta/index_type.hpp>
-#include <test/unit/math/prim/mat/meta/prim/scal/fun/promote_type_test_util.hpp>
+#include <test/unit/math/prim/scal/fun/promote_type_test_util.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathMeta, index_type) {
