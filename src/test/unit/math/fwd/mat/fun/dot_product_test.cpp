@@ -1,7 +1,7 @@
 #include <stan/math/fwd/mat/fun/dot_product.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradFwdMatrixDotProduct, vector_vector_fd) {
   using stan::math::vector_d;

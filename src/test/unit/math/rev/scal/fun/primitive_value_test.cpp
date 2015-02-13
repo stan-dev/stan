@@ -2,7 +2,7 @@
 #include <stan/math/prim/scal/fun/primitive_value.hpp>
 #include <stan/math/rev/scal/fun/primitive_value.hpp>
 
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,primitiveValue) {

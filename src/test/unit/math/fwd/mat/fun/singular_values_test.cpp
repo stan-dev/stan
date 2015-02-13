@@ -1,6 +1,6 @@
 #include <stan/math/prim/mat/fun/singular_values.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradFwdMatrixSingularValues, mat_fd) {

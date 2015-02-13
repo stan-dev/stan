@@ -3,7 +3,7 @@
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradFwdMatrixEltDivide,fd_vec_vv) {
   using stan::math::elt_divide;

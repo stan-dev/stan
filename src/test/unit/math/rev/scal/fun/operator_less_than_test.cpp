@@ -1,5 +1,5 @@
 #include <stan/math/rev/scal/fun/operator_less_than.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,a_lt_b) {

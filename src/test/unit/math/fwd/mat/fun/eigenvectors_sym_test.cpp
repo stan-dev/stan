@@ -1,5 +1,5 @@
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/prim/mat/fun/eigenvectors_sym.hpp>
 #include <gtest/gtest.h>
 

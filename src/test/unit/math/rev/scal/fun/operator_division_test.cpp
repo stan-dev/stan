@@ -1,7 +1,7 @@
 #include <stan/math/rev/scal/fun/operator_division.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/scal/fun/nan_util.hpp>
+#include <test/unit/math/rev/scal/fun/nan_util.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>
 
 TEST(AgradRev,a_div_b) {

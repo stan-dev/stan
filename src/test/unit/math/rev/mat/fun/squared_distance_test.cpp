@@ -1,6 +1,6 @@
 #include <stan/math/rev/mat/fun/squared_distance.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradRevMatrix, squared_distance_vector_vector) {
   using stan::math::vector_d;

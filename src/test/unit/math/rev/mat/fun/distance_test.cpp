@@ -1,7 +1,7 @@
 #include <stan/math/rev/mat/fun/squared_distance.hpp>
 #include <stan/math/prim/mat/fun/distance.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 
 TEST(AgradRevMatrix, distance_vector_vector) {

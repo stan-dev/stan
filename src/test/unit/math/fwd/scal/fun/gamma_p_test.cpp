@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/gamma.hpp>
 #include <stan/math/rev/scal/fun/gamma_p.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/prim/mat/meta/fwd/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdGammaP, gamma_p){

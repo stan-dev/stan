@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/prim/mat/meta/fwd/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdTgamma, Fvar) {

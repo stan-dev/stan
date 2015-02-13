@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/fwd/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/fun/lbeta.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(ProbInternalMath, inc_beta_fd) {
   using stan::agrad::fvar;

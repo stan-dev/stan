@@ -1,6 +1,6 @@
 #include <stan/math/rev/mat/fun/to_var.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradRevMatrix,to_var_scalar) {
   double d = 5.0;

@@ -2,7 +2,7 @@
 #include <stan/math/rev/scal/fun/abs.hpp>
 #include <stan/math/fwd/mat/fun/inverse.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradFwdMatrixInverse,fd) {

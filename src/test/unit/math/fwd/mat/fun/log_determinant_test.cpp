@@ -5,7 +5,7 @@
 #include <stan/math/prim/mat/fun/log_determinant.hpp>
 #include <stan/math/fwd/scal/meta/fvar.hpp>
 #include <stan/math/rev/mat/fun/multiply.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradFwdMatrixLogDeterminant,fd) {
   using stan::agrad::matrix_fd;

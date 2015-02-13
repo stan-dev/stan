@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/log1m_exp.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/prim/mat/meta/fwd/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdLog1mExp,Fvar) {

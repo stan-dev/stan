@@ -1,9 +1,10 @@
 #include <stan/math/rev/scal/fun/fdim.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/fdim.hpp>
-#include <test/unit/math/prim/mat/meta/rev/scal/fun/nan_util.hpp>
+#include <test/unit/math/rev/scal/fun/nan_util.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/rev/scal/meta/numeric_limits.hpp>
 
 TEST(AgradRev,fdim_vv) {
   using stan::agrad::fdim;

@@ -1,9 +1,9 @@
 #include <stan/math/rev/scal/fun/digamma.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/zeta.hpp>
-#include <test/unit/math/prim/mat/meta/rev/scal/fun/nan_util.hpp>
+#include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev,digamma) {
   AVAR a = 0.5;

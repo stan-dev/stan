@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/fwd/scal/meta/fvar.hpp>
 #include <stan/math/prim/mat/fun/divide.hpp>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 using stan::agrad::fvar;
 using stan::agrad::var;

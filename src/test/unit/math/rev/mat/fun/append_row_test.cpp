@@ -1,8 +1,10 @@
 #include <stan/math/prim/mat/fun/append_row.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/prim/mat/fun/sum.hpp>
+#include <stan/math/rev/mat/fun/sum.hpp>
 #include <stan/math/rev/scal/fun/exp.hpp>
+#include <stan/math/rev/mat/fun/typedefs.hpp>
 
 using stan::math::sum;
 using stan::math::append_row;

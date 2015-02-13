@@ -1,7 +1,50 @@
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/meta/rev/mat/fun/util.hpp>
-
-// this didn't need to be external, so it's here now:
+#include <test/unit/math/rev/mat/fun/util.hpp>
+#include <stan/math/rev/mat/fun/dot_product.hpp>
+#include <stan/math/rev/scal/fun/exp.hpp>
+#include <stan/math/prim/mat/fun/columns_dot_self.hpp>
+#include <stan/math/prim/mat/fun/multiply.hpp>
+#include <stan/math/prim/mat/fun/transpose.hpp>
+#include <stan/math/prim/mat/fun/subtract.hpp>
+#include <stan/math/prim/mat/fun/get_base1.hpp>
+#include <stan/math/prim/mat/fun/assign.hpp>
+#include <stan/math/prim/mat/fun/cumulative_sum.hpp>
+#include <stan/math/prim/mat/fun/promoter.hpp>
+#include <stan/math/prim/mat/fun/promote_common.hpp>
+#include <stan/math/prim/mat/fun/prod.hpp>
+#include <stan/math/prim/mat/fun/diag_matrix.hpp>
+#include <stan/math/prim/mat/fun/dot_product.hpp>
+#include <stan/math/prim/mat/fun/mean.hpp>
+#include <stan/math/prim/mat/fun/variance.hpp>
+#include <stan/math/prim/mat/fun/sd.hpp>
+#include <stan/math/rev/mat/fun/dot_self.hpp>
+#include <stan/math/prim/mat/fun/dot_self.hpp>
+#include <stan/math/prim/mat/fun/softmax.hpp>
+#include <stan/math/rev/mat/fun/initialize_variable.hpp>
+#include <stan/math/rev/mat/fun/multiply.hpp>
+#include <stan/math/rev/mat/fun/crossprod.hpp>
+#include <stan/math/rev/mat/fun/tcrossprod.hpp>
+#include <stan/math/rev/mat/fun/multiply_lower_tri_self_transpose.hpp>
+#include <stan/math/rev/scal/fun/sqrt.hpp>
+#include <stan/math/rev/scal/fun/operator_addition.hpp>
+#include <stan/math/rev/scal/fun/operator_divide_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_division.hpp>
+#include <stan/math/rev/scal/fun/operator_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_minus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/scal/fun/operator_multiply_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_not_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_plus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_decrement.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_increment.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_not.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_plus.hpp>
 
 
 TEST(AgradRevMatrix, dot_product_vv) {
