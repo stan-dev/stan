@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__CHAINABLE_HPP
-#define STAN__AGRAD__REV__CHAINABLE_HPP
+#ifndef STAN__MATH__REV__ARR__META__CHAINABLE_HPP
+#define STAN__MATH__REV__ARR__META__CHAINABLE_HPP
 
 #include <vector>
 #include <stan/math/rev/arr/meta/var_stack.hpp>

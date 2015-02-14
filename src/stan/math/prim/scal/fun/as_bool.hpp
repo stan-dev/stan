@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__AS_BOOL_HPP
-#define STAN__MATH__FUNCTIONS__AS_BOOL_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__AS_BOOL_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__AS_BOOL_HPP
 
 namespace stan {
   namespace math {

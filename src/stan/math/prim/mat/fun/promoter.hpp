@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__PROMOTER_HPP
-#define STAN__MATH__MATRIX__PROMOTER_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__PROMOTER_HPP
+#define STAN__MATH__PRIM__MAT__FUN__PROMOTER_HPP
 
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

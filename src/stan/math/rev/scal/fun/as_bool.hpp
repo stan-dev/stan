@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__AS_BOOL_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__AS_BOOL_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__AS_BOOL_HPP
+#define STAN__MATH__REV__SCAL__FUN__AS_BOOL_HPP
 
 #include <stan/math/rev/arr/meta/var.hpp>
 

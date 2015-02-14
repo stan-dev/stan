@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_POS_SEMIDEFINITE_HPP
-#define STAN__ERROR_HANDLING__MATRIX__CHECK_POS_SEMIDEFINITE_HPP
+#ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_POS_SEMIDEFINITE_HPP
+#define STAN__MATH__PRIM__MAT__ERR__CHECK_POS_SEMIDEFINITE_HPP
 
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <stan/math/prim/mat/err/check_symmetric.hpp>

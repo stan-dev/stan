@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS_CONSTANTS_HPP
-#define STAN__PROB__DISTRIBUTIONS_CONSTANTS_HPP
+#ifndef STAN__MATH__PRIM__SCAL__META__CONSTANTS_HPP
+#define STAN__MATH__PRIM__SCAL__META__CONSTANTS_HPP
 
 #include <boost/math/constants/constants.hpp>
 

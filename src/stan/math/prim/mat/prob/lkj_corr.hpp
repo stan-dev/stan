@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_CORR_HPP
-#define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__LKJ_CORR_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__LKJ_CORR_HPP
+#define STAN__MATH__PRIM__MAT__PROB__LKJ_CORR_HPP
 
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>

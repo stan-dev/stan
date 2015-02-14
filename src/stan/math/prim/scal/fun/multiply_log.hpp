@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__MULTIPLY_LOG_HPP
-#define STAN__MATH__FUNCTIONS__MULTIPLY_LOG_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__MULTIPLY_LOG_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__MULTIPLY_LOG_HPP
 
 #include <boost/math/tools/promotion.hpp>
 

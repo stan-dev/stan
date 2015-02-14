@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__LMGAMMA_HPP
-#define STAN__MATH__FUNCTIONS__LMGAMMA_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__LMGAMMA_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__LMGAMMA_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>

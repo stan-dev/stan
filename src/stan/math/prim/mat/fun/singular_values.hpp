@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__SINGULAR_VALUES_HPP
-#define STAN__MATH__MATRIX__SINGULAR_VALUES_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__SINGULAR_VALUES_HPP
+#define STAN__MATH__PRIM__MAT__FUN__SINGULAR_VALUES_HPP
 
 // NOTE: if using this with rev mode, include numeric_limits
 //  or else this seg-faults.

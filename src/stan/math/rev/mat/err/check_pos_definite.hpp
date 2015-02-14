@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP
-#define STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP
+#ifndef STAN__MATH__REV__MAT__ERR__CHECK_POS_DEFINITE_HPP
+#define STAN__MATH__REV__MAT__ERR__CHECK_POS_DEFINITE_HPP
 
 #include <stan/math/prim/mat/err/check_pos_definite.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

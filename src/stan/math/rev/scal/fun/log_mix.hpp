@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__LOG_MIX_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__LOG_MIX_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__LOG_MIX_HPP
+#define STAN__MATH__REV__SCAL__FUN__LOG_MIX_HPP
 
 #include <cmath>
 #include <stan/math/prim/scal/err/check_bounded.hpp>

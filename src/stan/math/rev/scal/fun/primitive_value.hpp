@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__PRIMITIVE_VALUE_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__PRIMITIVE_VALUE_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__PRIMITIVE_VALUE_HPP
+#define STAN__MATH__REV__SCAL__FUN__PRIMITIVE_VALUE_HPP
 
 #include <stan/math/rev/arr/meta/var.hpp>
 #include <stan/math/prim/scal/fun/primitive_value.hpp>

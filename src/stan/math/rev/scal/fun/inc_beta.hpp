@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__INTERNAL_MATH__REV__INC_BETA_HPP__
-#define __STAN__PROB__INTERNAL_MATH__REV__INC_BETA_HPP__
+#ifndef STAN__MATH__REV__SCAL__FUN__INC_BETA_HPP
+#define STAN__MATH__REV__SCAL__FUN__INC_BETA_HPP
 
 #include <valarray>
 #include <stan/math/rev/arr/meta/var.hpp>

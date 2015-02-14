@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__EXPM1_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__EXPM1_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__EXPM1_HPP
+#define STAN__MATH__REV__SCAL__FUN__EXPM1_HPP
 
 #include <valarray>
 #include <stan/math/rev/arr/meta/var.hpp>

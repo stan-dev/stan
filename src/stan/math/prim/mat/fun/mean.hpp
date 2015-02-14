@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__MEAN_HPP
-#define STAN__MATH__MATRIX__MEAN_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__MEAN_HPP
+#define STAN__MATH__PRIM__MAT__FUN__MEAN_HPP
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>

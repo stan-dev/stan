@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__TRIGAMMA_HPP
-#define STAN__MATH__FUNCTIONS__TRIGAMMA_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__TRIGAMMA_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__TRIGAMMA_HPP
 
   // Reference:
   //   BE Schneider,

@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__FUNCTIONS__FMA_HPP
-#define STAN__AGRAD__FWD__FUNCTIONS__FMA_HPP
+#ifndef STAN__MATH__FWD__SCAL__FUN__FMA_HPP
+#define STAN__MATH__FWD__SCAL__FUN__FMA_HPP
 
 #include <cmath>
 #include <stan/math/fwd/scal/meta/fvar.hpp>

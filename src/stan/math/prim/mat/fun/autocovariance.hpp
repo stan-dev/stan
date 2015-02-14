@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__AUTOCOVARIANCE_HPP
-#define STAN__PROB__AUTOCOVARIANCE_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__AUTOCOVARIANCE_HPP
+#define STAN__MATH__PRIM__MAT__FUN__AUTOCOVARIANCE_HPP
 
 #include <stan/math/prim/mat/fun/autocorrelation.hpp>
 #include <stan/math/prim/mat/fun/variance.hpp>

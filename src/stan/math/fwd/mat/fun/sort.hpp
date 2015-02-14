@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__SORT_HPP
-#define STAN__AGRAD__FWD__SORT_HPP
+#ifndef STAN__MATH__FWD__MAT__FUN__SORT_HPP
+#define STAN__MATH__FWD__MAT__FUN__SORT_HPP
 
 #include <stan/math/fwd/scal/meta/fvar.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>

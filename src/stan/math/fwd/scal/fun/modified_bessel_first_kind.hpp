@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__FUNCTIONS__MODIFIED_BESSEL_FIRST_KIND_HPP
-#define STAN__AGRAD__FWD__FUNCTIONS__MODIFIED_BESSEL_FIRST_KIND_HPP
+#ifndef STAN__MATH__FWD__SCAL__FUN__MODIFIED_BESSEL_FIRST_KIND_HPP
+#define STAN__MATH__FWD__SCAL__FUN__MODIFIED_BESSEL_FIRST_KIND_HPP
 
 #include <stan/math/fwd/scal/meta/fvar.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>

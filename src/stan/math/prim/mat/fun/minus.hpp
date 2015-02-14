@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__MINUS_HPP
-#define STAN__MATH__MATRIX__MINUS_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__MINUS_HPP
+#define STAN__MATH__PRIM__MAT__FUN__MINUS_HPP
 
 namespace stan {
   namespace math {

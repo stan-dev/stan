@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_CORR_MATRIX_HPP
-#define STAN__ERROR_HANDLING__MATRIX__CHECK_CORR_MATRIX_HPP
+#ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_CORR_MATRIX_HPP
+#define STAN__MATH__PRIM__MAT__ERR__CHECK_CORR_MATRIX_HPP
 
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <stan/math/prim/scal/err/check_positive_size.hpp>

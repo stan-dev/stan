@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__VALUE_OF_HPP
-#define STAN__MATH__MATRIX__VALUE_OF_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__VALUE_OF_HPP
+#define STAN__MATH__PRIM__MAT__FUN__VALUE_OF_HPP
 
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/child_type.hpp>

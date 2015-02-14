@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING__OUT_OF_RANGE_HPP
-#define STAN__ERROR_HANDLING__OUT_OF_RANGE_HPP
+#ifndef STAN__MATH__PRIM__SCAL__ERR__OUT_OF_RANGE_HPP
+#define STAN__MATH__PRIM__SCAL__ERR__OUT_OF_RANGE_HPP
 
 #include <typeinfo>
 #include <string>

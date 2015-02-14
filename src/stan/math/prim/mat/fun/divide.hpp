@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__DIVIDE_HPP
-#define STAN__MATH__MATRIX__DIVIDE_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__DIVIDE_HPP
+#define STAN__MATH__PRIM__MAT__FUN__DIVIDE_HPP
 
 #include <boost/type_traits/is_arithmetic.hpp> 
 #include <boost/utility/enable_if.hpp>

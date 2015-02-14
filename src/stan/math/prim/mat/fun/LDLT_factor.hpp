@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__LDLT_FACTOR_HPP
-#define STAN__MATH__MATRIX__LDLT_FACTOR_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__LDLT_FACTOR_HPP
+#define STAN__MATH__PRIM__MAT__FUN__LDLT_FACTOR_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <boost/shared_ptr.hpp>

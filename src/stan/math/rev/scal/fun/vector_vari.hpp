@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__INTERNAL__VECTOR_VARI_HPP
-#define STAN__AGRAD__REV__INTERNAL__VECTOR_VARI_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__VECTOR_VARI_HPP
+#define STAN__MATH__REV__SCAL__FUN__VECTOR_VARI_HPP
 
 #include <vector>
 #include <stan/math/rev/arr/meta/var.hpp>

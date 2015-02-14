@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__AUTO_DIFF_HPP
-#define STAN__AGRAD__AUTO_DIFF_HPP
+#ifndef STAN__MATH__MIX__MAT__FUNCTOR__AUTODIFF_HPP
+#define STAN__MATH__MIX__MAT__FUNCTOR__AUTODIFF_HPP
 
 #include <stan/math/fwd/scal/meta/fvar.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

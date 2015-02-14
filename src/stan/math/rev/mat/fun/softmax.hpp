@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__MATRIX__SOFTMAX_HPP
-#define STAN__AGRAD__REV__MATRIX__SOFTMAX_HPP
+#ifndef STAN__MATH__REV__MAT__FUN__SOFTMAX_HPP
+#define STAN__MATH__REV__MAT__FUN__SOFTMAX_HPP
 
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

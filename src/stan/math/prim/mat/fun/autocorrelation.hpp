@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__AUTOCORRELATION_HPP
-#define STAN__PROB__AUTOCORRELATION_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__AUTOCORRELATION_HPP
+#define STAN__MATH__PRIM__MAT__FUN__AUTOCORRELATION_HPP
 
 #include <stan/math/prim/mat/fun/mean.hpp>
 

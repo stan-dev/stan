@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__OWENS__T_HPP
-#define STAN__MATH__FUNCTIONS__OWENS__T_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__OWENS_T_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__OWENS_T_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <boost/math/special_functions/owens_t.hpp>

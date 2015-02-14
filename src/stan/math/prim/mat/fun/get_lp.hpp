@@ -1,3 +1,6 @@
+#ifndef STAN__MATH__PRIM__MAT__FUN__GET_LP_HPP
+#define STAN__MATH__PRIM__MAT__FUN__GET_LP_HPP
+
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/mat/fun/accumulator.hpp>
 
@@ -16,3 +19,5 @@ namespace stan {
   }
 
 }
+
+#endif

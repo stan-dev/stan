@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__APPEND__ROW_HPP
-#define STAN__MATH__MATRIX__APPEND__ROW_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__APPEND_ROW_HPP
+#define STAN__MATH__PRIM__MAT__FUN__APPEND_ROW_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp> //stan::return_type

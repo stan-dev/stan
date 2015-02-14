@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_PLUS_HPP
-#define STAN__AGRAD__REV__OPERATORS__OPERATOR_UNARY_PLUS_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__OPERATOR_UNARY_PLUS_HPP
+#define STAN__MATH__REV__SCAL__FUN__OPERATOR_UNARY_PLUS_HPP
 
 #include <stan/math/rev/arr/meta/var.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

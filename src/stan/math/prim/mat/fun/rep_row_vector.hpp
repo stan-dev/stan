@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__REP_ROW_VECTOR_HPP
-#define STAN__MATH__MATRIX__REP_ROW_VECTOR_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__REP_ROW_VECTOR_HPP
+#define STAN__MATH__PRIM__MAT__FUN__REP_ROW_VECTOR_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__ABS_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__ABS_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__ABS_HPP
+#define STAN__MATH__REV__SCAL__FUN__ABS_HPP
 
 #include <stan/math/rev/scal/fun/fabs.hpp>
 

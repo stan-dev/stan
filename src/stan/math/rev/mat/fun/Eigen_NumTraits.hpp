@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__MATRIX__EIGEN_NUMTRAITS_HPP
-#define STAN__AGRAD__REV__MATRIX__EIGEN_NUMTRAITS_HPP
+#ifndef STAN__MATH__REV__MAT__FUN__EIGEN_NUMTRAITS_HPP
+#define STAN__MATH__REV__MAT__FUN__EIGEN_NUMTRAITS_HPP
 
 #include <limits>
 #include <stan/math/rev/arr/meta/var.hpp>

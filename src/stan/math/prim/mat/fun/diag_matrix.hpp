@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__DIAG_MATRIX_HPP
-#define STAN__MATH__MATRIX__DIAG_MATRIX_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__DIAG_MATRIX_HPP
+#define STAN__MATH__PRIM__MAT__FUN__DIAG_MATRIX_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 

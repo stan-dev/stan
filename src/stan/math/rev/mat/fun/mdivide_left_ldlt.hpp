@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_LDLT_HPP
-#define STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_LDLT_HPP
+#ifndef STAN__MATH__REV__MAT__FUN__MDIVIDE_LEFT_LDLT_HPP
+#define STAN__MATH__REV__MAT__FUN__MDIVIDE_LEFT_LDLT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/arr/meta/var.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__SORT_HPP
-#define STAN__AGRAD__REV__SORT_HPP
+#ifndef STAN__MATH__REV__MAT__FUN__SORT_HPP
+#define STAN__MATH__REV__MAT__FUN__SORT_HPP
 
 #include <valarray>
 #include <stan/math/rev/arr/meta/var.hpp>

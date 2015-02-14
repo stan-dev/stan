@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__UNIFORM_HPP
-#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__UNIFORM_HPP
+#ifndef STAN__MATH__PRIM__SCAL__PROB__UNIFORM_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__UNIFORM_HPP
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

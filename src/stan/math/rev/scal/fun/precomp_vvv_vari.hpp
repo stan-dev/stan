@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__INTERNAL__PRECOMP_VVV_VARI_HPP
-#define STAN__AGRAD__REV__INTERNAL__PRECOMP_VVV_VARI_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__PRECOMP_VVV_VARI_HPP
+#define STAN__MATH__REV__SCAL__FUN__PRECOMP_VVV_VARI_HPP
 
 #include <stan/math/rev/arr/meta/vari.hpp>
 #include <stan/math/rev/scal/fun/vvv_vari.hpp>

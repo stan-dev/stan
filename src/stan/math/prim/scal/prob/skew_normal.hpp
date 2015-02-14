@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SKEW__NORMAL__HPP
-#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SKEW__NORMAL__HPP
+#ifndef STAN__MATH__PRIM__SCAL__PROB__SKEW_NORMAL_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__SKEW_NORMAL_HPP
 
 #include <boost/random/variate_generator.hpp>
 #include <boost/math/distributions.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__FDIM_HPP
-#define STAN__MATH__FUNCTIONS__FDIM_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__FDIM_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__FDIM_HPP
 
 #include <math.h> 
 #include <boost/math/special_functions/fpclassify.hpp>

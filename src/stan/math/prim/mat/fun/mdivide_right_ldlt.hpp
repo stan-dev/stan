@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__MDIVIDE_RIGHT_LDLT_HPP
-#define STAN__MATH__MATRIX__MDIVIDE_RIGHT_LDLT_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__MDIVIDE_RIGHT_LDLT_HPP
+#define STAN__MATH__PRIM__MAT__FUN__MDIVIDE_RIGHT_LDLT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/LDLT_factor.hpp>

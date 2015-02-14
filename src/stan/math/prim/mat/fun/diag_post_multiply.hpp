@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__DIAG_POST_MULTIPLY_HPP
-#define STAN__MATH__MATRIX__DIAG_POST_MULTIPLY_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__DIAG_POST_MULTIPLY_HPP
+#define STAN__MATH__PRIM__MAT__FUN__DIAG_POST_MULTIPLY_HPP
 
 #include <stdexcept>
 #include <boost/math/tools/promotion.hpp>

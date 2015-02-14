@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__FMOD_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__FMOD_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__FMOD_HPP
+#define STAN__MATH__REV__SCAL__FUN__FMOD_HPP
 
 #include <cmath>
 #include <stan/math/rev/arr/meta/var.hpp>

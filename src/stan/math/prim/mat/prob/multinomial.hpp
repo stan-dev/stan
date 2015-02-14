@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__MULTINOMIAL_HPP
-#define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__MULTINOMIAL_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__MULTINOMIAL_HPP
+#define STAN__MATH__PRIM__MAT__PROB__MULTINOMIAL_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/uniform_01.hpp>

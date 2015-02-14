@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__GUMBEL_HPP
-#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__GUMBEL_HPP
+#ifndef STAN__MATH__PRIM__SCAL__PROB__GUMBEL_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__GUMBEL_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>

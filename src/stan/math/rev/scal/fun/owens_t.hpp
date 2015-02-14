@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__OWENS__T_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__OWENS__T_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__OWENS_T_HPP
+#define STAN__MATH__REV__SCAL__FUN__OWENS_T_HPP
 
 #include <math.h>
 #include <stan/math/rev/arr/meta/var.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__INV_SQRT_HPP
-#define STAN__MATH__FUNCTIONS__INV_SQRT_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__INV_SQRT_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__INV_SQRT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 

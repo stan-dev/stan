@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__OPERATORS__OPERATOR_LESS_THAN_HPP
-#define STAN__AGRAD__FWD__OPERATORS__OPERATOR_LESS_THAN_HPP
+#ifndef STAN__MATH__FWD__SCAL__FUN__OPERATOR_LESS_THAN_HPP
+#define STAN__MATH__FWD__SCAL__FUN__OPERATOR_LESS_THAN_HPP
 
 #include <stan/math/fwd/scal/meta/fvar.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>
