@@ -3,28 +3,28 @@
 #include <gtest/gtest.h>
 
 using stan::math::append_row;
-using Eigen::Dynamic;
-using Eigen::Matrix;
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
-using Eigen::RowVectorXd;
-using std::vector;
+
 
 template <int R, int C>
-void correct_type(const Eigen::Matrix<double,R,C>& x) {
+void correct_type_vector(const Eigen::Matrix<double,R,C>& x) {
   EXPECT_EQ(Eigen::Dynamic, R);
   EXPECT_EQ(1, C);
 }
 
-TEST(MathMatrix, append_row_types) {
-  VectorXd x(2);
-  x << 1, 2;
-  VectorXd y(3);
-  y << 3, 4, 5;
-  correct_type(append_row(x,y));
+template <int R, int C>
+void correct_type_matrix(const Eigen::Matrix<double,R,C>& x) {
+  EXPECT_EQ(Eigen::Dynamic, R);
+  EXPECT_EQ(Eigen::Dynamic, C);
 }
 
 TEST(MathMatrix, append_row) {
+  using Eigen::Dynamic;
+  using Eigen::Matrix;
+  using Eigen::MatrixXd;
+  using Eigen::VectorXd;
+  using Eigen::RowVectorXd;
+  using std::vector;  
+  
   MatrixXd m33(3, 3);
   m33 << 1, 2, 3,
          4, 5, 6,
@@ -158,4 +158,17 @@ TEST(MathMatrix, append_row) {
   EXPECT_THROW(append_row(m33, v3), std::invalid_argument);
   EXPECT_THROW(append_row(m32, v3), std::invalid_argument);
   EXPECT_THROW(append_row(rv3, v3), std::invalid_argument);
+  
+  correct_type_matrix(append_row(m23, m33));
+  correct_type_matrix(append_row(m33, m23));
+  correct_type_matrix(append_row(m32, m32b));
+  correct_type_matrix(append_row(m32b, m32));
+  correct_type_matrix(append_row(m33, rv3));
+  correct_type_matrix(append_row(rv3, m33));
+  correct_type_matrix(append_row(m23, rv3));
+  correct_type_matrix(append_row(rv3, m23));
+  correct_type_matrix(append_row(rv3, rv3b));
+  correct_type_matrix(append_row(rv3b, rv3));
+  correct_type_vector(append_row(v3, v3b));
+  correct_type_vector(append_row(v3b, v3));
 }
