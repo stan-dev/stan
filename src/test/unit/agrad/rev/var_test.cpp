@@ -42,12 +42,12 @@ TEST_F(AgradRev,a_ostream) {
   std::ostringstream os;
   
   os << a;
-  EXPECT_EQ ("6:0", os.str());
+  EXPECT_EQ ("6", os.str());
 
   os.str("");
   a = 10.5;
   os << a;
-  EXPECT_EQ ("10.5:0", os.str());
+  EXPECT_EQ ("10.5", os.str());
 }
 
 TEST_F(AgradRev, smart_ptrs) {
@@ -89,7 +89,7 @@ TEST_F(AgradRev, print) {
   var initialized_var(0);
   output << initialized_var;
   str = output.str();
-  EXPECT_STREQ("0:0", output.str().c_str());
+  EXPECT_STREQ("0", output.str().c_str());
 
 
   output.clear();

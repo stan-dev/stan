@@ -1,13 +1,6 @@
 #ifndef STAN__IO__JSON__JSON_DATA_HANDLER_HPP
 #define STAN__IO__JSON__JSON_DATA_HANDLER_HPP
 
-#include <cctype>
-#include <iostream>
-#include <limits>
-#include <map>
-#include <sstream>
-#include <string>
-#include <vector>
 #include <boost/throw_exception.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stan/math/matrix.hpp>
@@ -15,24 +8,31 @@
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/json_parser.hpp>
 #include <stan/io/json/json_handler.hpp>
+#include <cctype>
+#include <iostream>
+#include <limits>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <utility>
 
 namespace stan {
 
   namespace json {
 
     namespace {
-      typedef 
-      std::map<std::string, 
+      typedef
+      std::map<std::string,
                std::pair<std::vector<double>,
-                         std::vector<size_t> > > 
+                         std::vector<size_t> > >
       vars_map_r;
 
-      typedef 
-      std::map<std::string, 
-               std::pair<std::vector<int>, 
-                         std::vector<size_t> > > 
+      typedef
+      std::map<std::string,
+               std::pair<std::vector<int>,
+                         std::vector<size_t> > >
       vars_map_i;
-
     }
 
     /**
@@ -41,7 +41,7 @@ namespace stan {
      * a set of Stan variable declarations in JSON format.
      * Each Stan variable consists of a JSON key : value pair.
      * The key is a string and the value is either a single numeric
-     * scalar value or a JSON array of numeric values.  
+     * scalar value or a JSON array of numeric values.
      *
      * <p>The <code>json_data_handler</code> checks that the top-level
      * JSON object contains a set of name-value pairs
@@ -99,10 +99,10 @@ namespace stan {
        * @param vars_r - name-value map for real-valued variables
        * @param vars_i - name-value map for int-valued variables
        */
-      json_data_handler(vars_map_r& vars_r, vars_map_i& vars_i) : 
-        json_handler(), vars_r_(vars_r), vars_i_(vars_i), 
-        key_(), values_r_(), values_i_(), 
-        dims_(), dims_verify_(), dims_unknown_(), 
+      json_data_handler(vars_map_r& vars_r, vars_map_i& vars_i) :
+        json_handler(), vars_r_(vars_r), vars_i_(vars_i),
+        key_(), values_r_(), values_i_(),
+        dims_(), dims_verify_(), dims_unknown_(),
         dim_idx_(), dim_last_(), is_int_() {
       }
 
@@ -113,7 +113,7 @@ namespace stan {
       }
 
       void end_text() {
-        reset(); 
+        reset();
       }
 
       void start_array() {
@@ -122,7 +122,8 @@ namespace stan {
         }
         if (dim_idx_ > 0 && dim_last_ == dim_idx_) {
             std::stringstream errorMsg;
-            errorMsg << "variable: " << key_ << ", error: non-scalar array value";
+            errorMsg << "variable: " << key_
+                     << ", error: non-scalar array value";
             throw json_error(errorMsg.str());
           }
         incr_dim_size();
@@ -139,7 +140,8 @@ namespace stan {
       void end_array() {
         if (dims_[dim_idx_-1] == 0) {
           std::stringstream errorMsg;
-          errorMsg << "variable: " << key_ << ", error: empty array not allowed";
+          errorMsg << "variable: " << key_
+                   << ", error: empty array not allowed";
           throw json_error(errorMsg.str());
         }
         if (dims_unknown_[dim_idx_-1] == true) {
@@ -149,8 +151,8 @@ namespace stan {
           errorMsg << "variable: " << key_ << ", error: non-rectangular array";
           throw json_error(errorMsg.str());
         }
-        if (0 == dim_last_ 
-            && ((is_int_ && values_i_.size() > 0) || (values_r_.size() > 0))) 
+        if (0 == dim_last_
+            && ((is_int_ && values_i_.size() > 0) || (values_r_.size() > 0)))
           dim_last_ = dim_idx_;
         dim_idx_--;
       }
@@ -158,14 +160,15 @@ namespace stan {
       void start_object() {
         if (!is_init()) {
           std::stringstream errorMsg;
-          errorMsg << "variable: " << key_ << ", error: nested objects not allowed";
+          errorMsg << "variable: " << key_
+                   << ", error: nested objects not allowed";
           throw json_error(errorMsg.str());
         }
       }
 
       void end_object() {
         save_current_key_value_pair();
-        reset(); 
+        reset();
       }
 
       void null() {
@@ -176,7 +179,8 @@ namespace stan {
 
       void boolean(bool p) {
         std::stringstream errorMsg;
-        errorMsg << "variable: " << key_ << ", error: boolean values not allowed";
+        errorMsg << "variable: " << key_
+                 << ", error: boolean values not allowed";
         throw json_error(errorMsg.str());
       }
 
@@ -188,11 +192,13 @@ namespace stan {
           tmp = std::numeric_limits<double>::infinity();
         } else {
           std::stringstream errorMsg;
-          errorMsg << "variable: " << key_ << ", error: string values not allowed";
+          errorMsg << "variable: " << key_
+                   << ", error: string values not allowed";
           throw json_error(errorMsg.str());
         }
         if (is_int_) {
-          for (std::vector<int>::iterator it = values_i_.begin(); it != values_i_.end(); ++it)
+          for (std::vector<int>::iterator it = values_i_.begin();
+               it != values_i_.end(); ++it)
             values_r_.push_back(*it);
         }
         is_int_ = false;
@@ -206,10 +212,10 @@ namespace stan {
         key_ = key;
       }
 
-      void number_double(double x) { 
+      void number_double(double x) {
         set_last_dim();
         if (is_int_) {
-          for (std::vector<int>::iterator it = values_i_.begin(); 
+          for (std::vector<int>::iterator it = values_i_.begin();
                it != values_i_.end(); ++it)
             values_r_.push_back(*it);
         }
@@ -218,7 +224,7 @@ namespace stan {
         incr_dim_size();
       }
 
-      void number_long(long n) { 
+      void number_long(long n) {
         set_last_dim();
         if (is_int_) {
           values_i_.push_back(n);
@@ -228,7 +234,7 @@ namespace stan {
         incr_dim_size();
       }
 
-      void number_unsigned_long(unsigned long n) { 
+      void number_unsigned_long(unsigned long n) {
         set_last_dim();
         if (is_int_) {
           values_i_.push_back(n);
@@ -251,11 +257,11 @@ namespace stan {
 
         // transpose order of array values to column-major
         if (is_int_) {
-          std::pair<std::vector<int>, 
+          std::pair<std::vector<int>,
                     std::vector<size_t> > pair;
           if (dims_.size() > 1) {
             std::vector<int> cm_values_i(values_i_.size());
-            to_column_major(cm_values_i,values_i_,dims_);
+            to_column_major(cm_values_i, values_i_, dims_);
             pair = make_pair(cm_values_i, dims_);
 
           } else {
@@ -263,11 +269,11 @@ namespace stan {
           }
           vars_i_[key_] = pair;
         } else {
-          std::pair<std::vector<double>, 
+          std::pair<std::vector<double>,
                     std::vector<size_t> > pair;
           if (dims_.size() > 1) {
             std::vector<double> cm_values_r(values_r_.size());
-            to_column_major(cm_values_r,values_r_,dims_);
+            to_column_major(cm_values_r, values_r_, dims_);
             pair = make_pair(cm_values_r, dims_);
           } else {
             pair = make_pair(values_r_, dims_);
@@ -280,15 +286,17 @@ namespace stan {
         if (dim_idx_ > 0) {
           if (dims_unknown_[dim_idx_-1])
             dims_[dim_idx_-1]++;
-          else 
+          else
             dims_verify_[dim_idx_-1]++;
         }
       }
 
       template <typename T>
-      void to_column_major(std::vector<T>& cm_vals, const std::vector<T>& rm_vals, const std::vector<size_t>& dims) {
+      void to_column_major(std::vector<T>& cm_vals,
+                           const std::vector<T>& rm_vals,
+                           const std::vector<size_t>& dims) {
         for (size_t i = 0; i< rm_vals.size(); i++) {
-          size_t idx = convert_offset_rtl_2_ltr(i,dims);
+          size_t idx = convert_offset_rtl_2_ltr(i, dims);
           cm_vals[idx] = rm_vals[i];
         }
       }
@@ -303,9 +311,10 @@ namespace stan {
       }
 
       // convert row-major offset to column-major offset
-      size_t convert_offset_rtl_2_ltr(size_t rtl_offset, const std::vector<size_t>& dims) {
+      size_t convert_offset_rtl_2_ltr(size_t rtl_offset,
+                                      const std::vector<size_t>& dims) {
         size_t rtl_dsize = 1;
-        for (size_t i = 1; i < dims.size(); i++) 
+        for (size_t i = 1; i < dims.size(); i++)
           rtl_dsize *= dims[i];
 
         // array index should be valid, but check just in case
