@@ -2,7 +2,11 @@
 #include <stan/math/prim/scal/fun/inv_sqrt.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
-#include <test/unit/math/prim/mat/meta/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <stan/math/fwd/scal/fun/inv_sqrt.hpp>
+#include <stan/math/rev/scal/fun/inv_sqrt.hpp>
+#include <stan/math/fwd/scal/fun/sqrt.hpp>
+#include <stan/math/rev/scal/fun/sqrt.hpp>
 
 TEST(AgradFwdInvSqrt,Fvar) {
   using stan::agrad::fvar;

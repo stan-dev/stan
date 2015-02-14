@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
-#include <test/unit/math/prim/mat/meta/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <stan/math/fwd/scal/fun/fdim.hpp>
+#include <stan/math/rev/scal/fun/fdim.hpp>
+#include <stan/math/fwd/scal/fun/floor.hpp>
+#include <stan/math/rev/scal/fun/floor.hpp>
 
 TEST(AgradFwdFdim,Fvar) {
   using stan::agrad::fvar;

@@ -1,7 +1,11 @@
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/expm1.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
-#include <test/unit/math/prim/mat/meta/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <stan/math/fwd/scal/fun/expm1.hpp>
+#include <stan/math/rev/scal/fun/expm1.hpp>
+#include <stan/math/fwd/scal/fun/exp.hpp>
+#include <stan/math/rev/scal/fun/exp.hpp>
 
 TEST(AgradFwdExpm1,Fvar) {
   using stan::agrad::fvar;

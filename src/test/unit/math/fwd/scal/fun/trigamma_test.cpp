@@ -1,7 +1,24 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/trigamma.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
-#include <test/unit/math/prim/mat/meta/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <stan/math/fwd/scal/fun/operator_addition.hpp>
+#include <stan/math/fwd/scal/fun/operator_division.hpp>
+#include <stan/math/fwd/scal/fun/operator_equal.hpp>
+#include <stan/math/fwd/scal/fun/operator_greater_than.hpp>
+#include <stan/math/fwd/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/fwd/scal/fun/operator_less_than.hpp>
+#include <stan/math/fwd/scal/fun/operator_less_than_or_equal.hpp>
+#include <stan/math/fwd/scal/fun/operator_multiplication.hpp>
+#include <stan/math/fwd/scal/fun/operator_not_equal.hpp>
+#include <stan/math/fwd/scal/fun/operator_subtraction.hpp>
+#include <stan/math/fwd/scal/fun/operator_unary_minus.hpp>
+#include <stan/math/fwd/scal/fun/cos.hpp>
+#include <stan/math/rev/scal/fun/cos.hpp>
+#include <stan/math/fwd/scal/fun/floor.hpp>
+#include <stan/math/rev/scal/fun/floor.hpp>
+#include <stan/math/fwd/scal/fun/sin.hpp>
+#include <stan/math/rev/scal/fun/sin.hpp>
 
 TEST(AgradFwdTrigamma, Fvar) {
   using stan::agrad::fvar;

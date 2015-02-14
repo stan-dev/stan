@@ -2,7 +2,9 @@
 #include <stan/math/prim/scal/fun/inv.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
-#include <test/unit/math/prim/mat/meta/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <stan/math/fwd/scal/fun/inv.hpp>
+#include <stan/math/rev/scal/fun/inv.hpp>
 
 TEST(AgradFwdInv,Fvar) {
   using stan::agrad::fvar;
