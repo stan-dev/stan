@@ -45,14 +45,14 @@ TEST(StanIoMcmcWriter, write_sample_names) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
 
-  stan::common::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::common::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::common::recorder::messages message_recorder(&message_stream, "# ");
+  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
+  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
+  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::messages> 
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::messages>
     writer(sample_recorder, diagnostic_recorder, message_recorder);
   
   writer.write_sample_names(sample, &sampler, model);
@@ -97,14 +97,14 @@ TEST(StanIoMcmcWriter, write_sample_params) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
 
-  stan::common::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::common::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::common::recorder::messages message_recorder(&message_stream, "# ");
+  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
+  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
+  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::messages> 
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::messages> 
     writer(sample_recorder, diagnostic_recorder, message_recorder);
   
   writer.write_sample_params<rng_t>(base_rng, sample, sampler, model);
@@ -162,14 +162,14 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
   
-  stan::common::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::common::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::common::recorder::messages message_recorder(&message_stream, "# ");
+  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
+  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
+  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::messages> 
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::messages> 
     writer(sample_recorder, diagnostic_recorder, message_recorder);
   
   writer.write_adapt_finish(&sampler);
@@ -255,14 +255,14 @@ TEST(StanIoMcmcWriter, write_diagnostic_names) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
   
-  stan::common::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::common::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::common::recorder::messages message_recorder(&message_stream, "# ");
+  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
+  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
+  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::messages> 
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::messages> 
     writer(sample_recorder, diagnostic_recorder, message_recorder);
   
   writer.write_diagnostic_names(sample, &sampler, model);
@@ -313,14 +313,14 @@ TEST(StanIoMcmcWriter, write_diagnostic_params) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
   
-  stan::common::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::common::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::common::recorder::messages message_recorder(&message_stream, "# ");
+  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
+  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
+  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::messages> 
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::messages> 
     writer(sample_recorder, diagnostic_recorder, message_recorder);
   
   writer.write_diagnostic_params(sample, &sampler);
@@ -381,14 +381,14 @@ TEST(StanIoMcmcWriter, write_timing) {
   std::stringstream diagnostic_stream;
   std::stringstream message_stream;
   
-  stan::common::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::common::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::common::recorder::messages message_recorder(&message_stream, "# ");
+  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
+  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
+  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
 
   stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::csv,
-                        stan::common::recorder::messages> 
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::csv,
+                        stan::interface::recorder::messages> 
     writer(sample_recorder, diagnostic_recorder, message_recorder);
   
   double warm = 0.193933;

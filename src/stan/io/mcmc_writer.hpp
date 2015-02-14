@@ -1,7 +1,7 @@
 #ifndef STAN__IO__MCMC__WRITER__HPP
 #define STAN__IO__MCMC__WRITER__HPP
 
-#include <stan/common/recorder/csv.hpp>
+#include <stan/interface/recorder/csv.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
