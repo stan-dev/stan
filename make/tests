@@ -201,3 +201,10 @@ generate-tests: $(LIST_OF_GENERATED_TESTS)
 ifeq (,$(filter-out test/% src/test/test-models/%.hpp,$(MAKECMDGOALS)))
   -include test/test-models/stanc.d
 endif
+
+
+
+##
+# Include the test dependencies
+##
+include make/test-math-dependencies
