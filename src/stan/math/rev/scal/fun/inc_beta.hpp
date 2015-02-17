@@ -3,13 +3,13 @@
 
 #include <valarray>
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/scal/fun/vvv_vari.hpp>
-#include <stan/math/rev/scal/fun/vvd_vari.hpp>
-#include <stan/math/rev/scal/fun/vdv_vari.hpp>
-#include <stan/math/rev/scal/fun/dvv_vari.hpp>
-#include <stan/math/rev/scal/fun/vdd_vari.hpp>
-#include <stan/math/rev/scal/fun/dvd_vari.hpp>
-#include <stan/math/rev/scal/fun/ddv_vari.hpp>
+#include <stan/math/rev/core/vvv_vari.hpp>
+#include <stan/math/rev/core/vvd_vari.hpp>
+#include <stan/math/rev/core/vdv_vari.hpp>
+#include <stan/math/rev/core/dvv_vari.hpp>
+#include <stan/math/rev/core/vdd_vari.hpp>
+#include <stan/math/rev/core/dvd_vari.hpp>
+#include <stan/math/rev/core/ddv_vari.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>

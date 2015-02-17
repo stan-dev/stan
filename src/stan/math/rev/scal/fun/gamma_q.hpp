@@ -3,9 +3,9 @@
 
 #include <valarray>
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/scal/fun/vv_vari.hpp>
-#include <stan/math/rev/scal/fun/dv_vari.hpp>
-#include <stan/math/rev/scal/fun/vd_vari.hpp>
+#include <stan/math/rev/core/vv_vari.hpp>
+#include <stan/math/rev/core/dv_vari.hpp>
+#include <stan/math/rev/core/vd_vari.hpp>
 #include <stan/math/prim/scal/fun/gamma_q.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>

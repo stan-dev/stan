@@ -3,7 +3,7 @@
 
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
-#include <stan/math/rev/scal/fun/v_vari.hpp>
+#include <stan/math/rev/core/v_vari.hpp>
 
 namespace stan {
   namespace agrad {

@@ -3,17 +3,17 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
-#include <stan/math/fwd/scal/fun/operator_addition.hpp>
-#include <stan/math/fwd/scal/fun/operator_division.hpp>
-#include <stan/math/fwd/scal/fun/operator_equal.hpp>
-#include <stan/math/fwd/scal/fun/operator_greater_than.hpp>
-#include <stan/math/fwd/scal/fun/operator_greater_than_or_equal.hpp>
-#include <stan/math/fwd/scal/fun/operator_less_than.hpp>
-#include <stan/math/fwd/scal/fun/operator_less_than_or_equal.hpp>
-#include <stan/math/fwd/scal/fun/operator_multiplication.hpp>
-#include <stan/math/fwd/scal/fun/operator_not_equal.hpp>
-#include <stan/math/fwd/scal/fun/operator_subtraction.hpp>
-#include <stan/math/fwd/scal/fun/operator_unary_minus.hpp>
+#include <stan/math/fwd/core/operator_addition.hpp>
+#include <stan/math/fwd/core/operator_division.hpp>
+#include <stan/math/fwd/core/operator_equal.hpp>
+#include <stan/math/fwd/core/operator_greater_than.hpp>
+#include <stan/math/fwd/core/operator_greater_than_or_equal.hpp>
+#include <stan/math/fwd/core/operator_less_than.hpp>
+#include <stan/math/fwd/core/operator_less_than_or_equal.hpp>
+#include <stan/math/fwd/core/operator_multiplication.hpp>
+#include <stan/math/fwd/core/operator_not_equal.hpp>
+#include <stan/math/fwd/core/operator_subtraction.hpp>
+#include <stan/math/fwd/core/operator_unary_minus.hpp>
 #include <stan/math/fwd/scal/fun/ceil.hpp>
 #include <stan/math/rev/scal/fun/ceil.hpp>
 #include <stan/math/fwd/scal/fun/digamma.hpp>
@@ -37,7 +37,7 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/fwd/core/numeric_limits.hpp>
-#include <stan/math/rev/scal/meta/numeric_limits.hpp>
+#include <stan/math/rev/core/numeric_limits.hpp>
 
 TEST(AgradFwdTgamma, Fvar) {
   using stan::agrad::fvar;

@@ -3,12 +3,12 @@
 
 #include <math.h>
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/scal/fun/v_vari.hpp>
+#include <stan/math/rev/core/v_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/rev/scal/meta/numeric_limits.hpp>
-#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
-#include <stan/math/rev/scal/fun/operator_equal.hpp>
-#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/rev/core/operator_greater_than.hpp>
+#include <stan/math/rev/core/operator_equal.hpp>
+#include <stan/math/rev/core/operator_unary_negative.hpp>
 
 namespace stan {
   namespace agrad {

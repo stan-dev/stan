@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__SCAL__FUN__MODIFIED_BESSEL_SECOND_KIND_HPP
 
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/scal/fun/dv_vari.hpp>
+#include <stan/math/rev/core/dv_vari.hpp>
 #include <stan/math/prim/scal/fun/modified_bessel_second_kind.hpp>
 
 namespace stan {

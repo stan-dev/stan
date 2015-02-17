@@ -2,10 +2,10 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/constants.hpp>
-#include <stan/math/rev/scal/meta/numeric_limits.hpp>
-#include <stan/math/rev/scal/fun/operator_less_than.hpp>
-#include <stan/math/rev/scal/fun/operator_equal.hpp>
-#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/rev/core/operator_less_than.hpp>
+#include <stan/math/rev/core/operator_equal.hpp>
+#include <stan/math/rev/core/operator_unary_negative.hpp>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev,log_a) {

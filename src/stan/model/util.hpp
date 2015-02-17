@@ -2,7 +2,7 @@
 #define STAN__MODEL__UTIL_HPP
 
 #include <stan/math/fwd/scal/fun/square.hpp>
-#include <stan/math/fwd/scal/fun/operator_multiplication.hpp>
+#include <stan/math/fwd/core/operator_multiplication.hpp>
 #include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/mat/fun/grad.hpp>

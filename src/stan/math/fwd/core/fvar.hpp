@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__META__FVAR_HPP
-#define STAN__MATH__FWD__SCAL__META__FVAR_HPP
+#ifndef STAN__MATH__FWD__CORE__FVAR_HPP
+#define STAN__MATH__FWD__CORE__FVAR_HPP
 
 #include <ostream>
 #include <boost/math/special_functions/fpclassify.hpp>

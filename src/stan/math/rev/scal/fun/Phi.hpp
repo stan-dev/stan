@@ -3,7 +3,7 @@
 
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/prim/scal/fun/Phi.hpp>
-#include <stan/math/rev/scal/fun/v_vari.hpp>
+#include <stan/math/rev/core/v_vari.hpp>
 
 namespace stan {
   namespace agrad {

@@ -3,7 +3,7 @@
 
 #include <math.h>
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/scal/fun/v_vari.hpp>
+#include <stan/math/rev/core/v_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {

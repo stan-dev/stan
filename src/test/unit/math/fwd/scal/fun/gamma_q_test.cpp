@@ -5,7 +5,7 @@
 #include <stan/math/fwd/scal/fun/gamma_q.hpp>
 #include <stan/math/rev/scal/fun/gamma_q.hpp>
 #include <stan/math/fwd/core/numeric_limits.hpp>
-#include <stan/math/rev/scal/meta/numeric_limits.hpp>
+#include <stan/math/rev/core/numeric_limits.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>

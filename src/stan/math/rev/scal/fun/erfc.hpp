@@ -5,7 +5,7 @@
 #include <valarray>
 #include <boost/math/special_functions/erf.hpp>
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/scal/fun/v_vari.hpp>
+#include <stan/math/rev/core/v_vari.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 namespace stan {

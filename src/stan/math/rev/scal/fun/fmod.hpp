@@ -3,9 +3,9 @@
 
 #include <cmath>
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/scal/fun/vd_vari.hpp>
-#include <stan/math/rev/scal/fun/vv_vari.hpp>
-#include <stan/math/rev/scal/fun/dv_vari.hpp>
+#include <stan/math/rev/core/vd_vari.hpp>
+#include <stan/math/rev/core/vv_vari.hpp>
+#include <stan/math/rev/core/dv_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {

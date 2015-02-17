@@ -3,9 +3,9 @@
 
 #include <math.h>
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/scal/fun/vv_vari.hpp>
-#include <stan/math/rev/scal/fun/vd_vari.hpp>
-#include <stan/math/rev/scal/fun/dv_vari.hpp>
+#include <stan/math/rev/core/vv_vari.hpp>
+#include <stan/math/rev/core/vd_vari.hpp>
+#include <stan/math/rev/core/dv_vari.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>
 #include <boost/math/special_functions/owens_t.hpp>

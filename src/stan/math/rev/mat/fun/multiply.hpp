@@ -9,7 +9,7 @@
 #include <stan/math/prim/mat/err/check_multiplicable.hpp>
 #include <stan/math/rev/mat/fun/to_var.hpp>
 #include <stan/math/rev/mat/fun/dot_product.hpp>
-#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/core/operator_multiplication.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/math/tools/promotion.hpp>

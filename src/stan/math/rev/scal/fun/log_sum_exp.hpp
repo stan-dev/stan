@@ -3,12 +3,12 @@
 
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/calculate_chain.hpp>
-#include <stan/math/rev/scal/fun/vv_vari.hpp>
-#include <stan/math/rev/scal/fun/vd_vari.hpp>
-#include <stan/math/rev/scal/fun/dv_vari.hpp>
-#include <stan/math/rev/scal/fun/vector_vari.hpp>
-#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
-#include <stan/math/rev/scal/fun/operator_not_equal.hpp>
+#include <stan/math/rev/core/vv_vari.hpp>
+#include <stan/math/rev/core/vd_vari.hpp>
+#include <stan/math/rev/core/dv_vari.hpp>
+#include <stan/math/rev/core/vector_vari.hpp>
+#include <stan/math/rev/core/operator_greater_than.hpp>
+#include <stan/math/rev/core/operator_not_equal.hpp>
 #include <stan/math/prim/scal/fun/log_sum_exp.hpp>
 
 namespace stan {

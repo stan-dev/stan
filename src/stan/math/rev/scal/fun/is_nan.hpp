@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__SCAL__FUN__IS_NAN_HPP
 
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/scal/fun/v_vari.hpp>
+#include <stan/math/rev/core/v_vari.hpp>
 #include <stan/math/prim/scal/fun/is_nan.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
