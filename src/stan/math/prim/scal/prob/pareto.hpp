@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__PARETO_HPP
-#define STAN__PROB__DISTRIBUTIONS__PARETO_HPP
+#ifndef STAN__MATH__PRIM__SCAL__PROB__PARETO_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__PARETO_HPP
 
 #include <boost/random/exponential_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

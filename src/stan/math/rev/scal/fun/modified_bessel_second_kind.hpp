@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__MODIFIED_BESSEL_SECOND_KIND_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__MODIFIED_BESSEL_SECOND_KIND_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__MODIFIED_BESSEL_SECOND_KIND_HPP
+#define STAN__MATH__REV__SCAL__FUN__MODIFIED_BESSEL_SECOND_KIND_HPP
 
 #include <stan/math/rev/arr/meta/var.hpp>
 #include <stan/math/rev/scal/fun/dv_vari.hpp>

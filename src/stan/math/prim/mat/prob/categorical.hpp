@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_HPP
-#define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_HPP
+#define STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>

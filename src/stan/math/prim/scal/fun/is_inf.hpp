@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__IS_INF_HPP
-#define STAN__MATH__FUNCTIONS__IS_INF_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__IS_INF_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__IS_INF_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
 

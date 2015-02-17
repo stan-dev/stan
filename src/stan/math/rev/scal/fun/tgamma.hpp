@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__TGAMMA_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__TGAMMA_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__TGAMMA_HPP
+#define STAN__MATH__REV__SCAL__FUN__TGAMMA_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/rev/arr/meta/var.hpp>

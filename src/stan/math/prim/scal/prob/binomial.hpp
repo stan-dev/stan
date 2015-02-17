@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BINOMIAL_HPP
-#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BINOMIAL_HPP
+#ifndef STAN__MATH__PRIM__SCAL__PROB__BINOMIAL_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__BINOMIAL_HPP
 
 #include <boost/random/binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

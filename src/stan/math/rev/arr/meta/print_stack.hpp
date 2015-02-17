@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__PRINT_STACK_HPP
-#define STAN__AGRAD__PRINT_STACK_HPP
+#ifndef STAN__MATH__REV__ARR__META__PRINT_STACK_HPP
+#define STAN__MATH__REV__ARR__META__PRINT_STACK_HPP
 
 #include <ostream>
 #include <stan/math/rev/arr/meta/var_stack.hpp>

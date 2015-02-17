@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__INTERNAL_MATH__MATH__GRAD_REG_INC_GAMMA_HPP
-#define STAN__PROB__INTERNAL_MATH__MATH__GRAD_REG_INC_GAMMA_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__GRAD_REG_INC_GAMMA_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__GRAD_REG_INC_GAMMA_HPP
 
 #include <math.h>
 #include <stan/math/prim/scal/fun/gamma_p.hpp>

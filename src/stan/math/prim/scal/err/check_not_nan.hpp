@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING_CHECK_NOT_NAN_HPP
-#define STAN__ERROR_HANDLING_CHECK_NOT_NAN_HPP
+#ifndef STAN__MATH__PRIM__SCAL__ERR__CHECK_NOT_NAN_HPP
+#define STAN__MATH__PRIM__SCAL__ERR__CHECK_NOT_NAN_HPP
 
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <stan/math/prim/arr/err/domain_error_vec.hpp>

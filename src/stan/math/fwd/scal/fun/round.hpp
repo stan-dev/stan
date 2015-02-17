@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__FUNCTIONS__ROUND_HPP
-#define STAN__AGRAD__FWD__FUNCTIONS__ROUND_HPP
+#ifndef STAN__MATH__FWD__SCAL__FUN__ROUND_HPP
+#define STAN__MATH__FWD__SCAL__FUN__ROUND_HPP
 
 #include <math.h>
 #include <stan/math/fwd/scal/meta/fvar.hpp>

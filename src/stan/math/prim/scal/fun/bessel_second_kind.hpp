@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__BESSEL_SECOND_KIND_HPP
-#define STAN__MATH__FUNCTIONS__BESSEL_SECOND_KIND_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__BESSEL_SECOND_KIND_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__BESSEL_SECOND_KIND_HPP
 
 #include <boost/math/special_functions/bessel.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__COSH_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__COSH_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__COSH_HPP
+#define STAN__MATH__REV__SCAL__FUN__COSH_HPP
 
 #include <valarray>
 #include <stan/math/rev/arr/meta/var.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__MATRIX__INVERSE_HPP
-#define STAN__AGRAD__FWD__MATRIX__INVERSE_HPP
+#ifndef STAN__MATH__FWD__MAT__FUN__INVERSE_HPP
+#define STAN__MATH__FWD__MAT__FUN__INVERSE_HPP
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>

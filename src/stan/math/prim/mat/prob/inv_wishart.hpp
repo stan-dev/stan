@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP
-#define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__INV_WISHART_HPP
+#define STAN__MATH__PRIM__MAT__PROB__INV_WISHART_HPP
 
 #include <stan/math/prim/mat/err/check_ldlt_factor.hpp>
 #include <stan/math/prim/scal/err/check_greater.hpp>

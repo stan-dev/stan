@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__PHI_HPP
-#define STAN__MATH__FUNCTIONS__PHI_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__PHI_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__PHI_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <boost/math/special_functions/erf.hpp>

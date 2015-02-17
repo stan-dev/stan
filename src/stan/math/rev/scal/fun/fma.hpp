@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__FMA_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__FMA_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__FMA_HPP
+#define STAN__MATH__REV__SCAL__FUN__FMA_HPP
 
 #include <cmath>
 #include <valarray>

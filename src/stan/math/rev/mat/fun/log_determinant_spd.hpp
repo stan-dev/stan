@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP
-#define STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP
+#ifndef STAN__MATH__REV__MAT__FUN__LOG_DETERMINANT_SPD_HPP
+#define STAN__MATH__REV__MAT__FUN__LOG_DETERMINANT_SPD_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/err/domain_error.hpp>

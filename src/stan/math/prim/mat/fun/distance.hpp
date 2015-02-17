@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__DISTANCE_HPP
-#define STAN__MATH__MATRIX__DISTANCE_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__DISTANCE_HPP
+#define STAN__MATH__PRIM__MAT__FUN__DISTANCE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>

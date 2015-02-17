@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__MATRIX__CROSSPROD_HPP
-#define STAN__AGRAD__REV__MATRIX__CROSSPROD_HPP
+#ifndef STAN__MATH__REV__MAT__FUN__CROSSPROD_HPP
+#define STAN__MATH__REV__MAT__FUN__CROSSPROD_HPP
 
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 #include <stan/math/rev/mat/fun/tcrossprod.hpp>

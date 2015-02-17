@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__PARETO_TYPE_2_HPP
-#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__PARETO_TYPE_2_HPP
+#ifndef STAN__MATH__PRIM__SCAL__PROB__PARETO_TYPE_2_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__PARETO_TYPE_2_HPP
 
 #include <boost/random/variate_generator.hpp>
 #include <stan/math/mix/scal/meta/partials_vari.hpp>

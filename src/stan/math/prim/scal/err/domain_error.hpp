@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING__DOMAIN_ERROR_HPP
-#define STAN__ERROR_HANDLING__DOMAIN_ERROR_HPP
+#ifndef STAN__MATH__PRIM__SCAL__ERR__DOMAIN_ERROR_HPP
+#define STAN__MATH__PRIM__SCAL__ERR__DOMAIN_ERROR_HPP
 
 #include <typeinfo>
 #include <string>

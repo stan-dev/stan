@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__MATRIX__LOG_SOFTMAX_HPP
-#define STAN__AGRAD__REV__MATRIX__LOG_SOFTMAX_HPP
+#ifndef STAN__MATH__REV__MAT__FUN__LOG_SOFTMAX_HPP
+#define STAN__MATH__REV__MAT__FUN__LOG_SOFTMAX_HPP
 
 #include <cmath>
 #include <vector>

@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__MATRIX__TRACE_QUAD_FORM_HPP
-#define STAN__AGRAD__FWD__MATRIX__TRACE_QUAD_FORM_HPP
+#ifndef STAN__MATH__FWD__MAT__FUN__TRACE_QUAD_FORM_HPP
+#define STAN__MATH__FWD__MAT__FUN__TRACE_QUAD_FORM_HPP
 
 #include <boost/type_traits.hpp>
 #include <stan/math/prim/mat/err/check_multiplicable.hpp>

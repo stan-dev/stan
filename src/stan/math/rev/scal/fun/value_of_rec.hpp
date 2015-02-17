@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__VALUE_OF_REC_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__VALUE_OF_REC_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__VALUE_OF_REC_HPP
+#define STAN__MATH__REV__SCAL__FUN__VALUE_OF_REC_HPP
 
 #include <stan/math/rev/arr/meta/var.hpp>
 

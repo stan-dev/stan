@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__INT_STEP_HPP
-#define STAN__MATH__FUNCTIONS__INT_STEP_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__INT_STEP_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__INT_STEP_HPP
 
 namespace stan {
   namespace math {

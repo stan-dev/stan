@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__FUNCTIONS__BINOMIAL_COEFFICIENT_LOG_HPP
-#define STAN__AGRAD__FWD__FUNCTIONS__BINOMIAL_COEFFICIENT_LOG_HPP
+#ifndef STAN__MATH__FWD__SCAL__FUN__BINOMIAL_COEFFICIENT_LOG_HPP
+#define STAN__MATH__FWD__SCAL__FUN__BINOMIAL_COEFFICIENT_LOG_HPP
 
 #include <stan/math/fwd/scal/meta/fvar.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>

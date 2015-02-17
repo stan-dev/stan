@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__MDIVIDE_RIGHT_TRI_HPP
-#define STAN__MATH__MATRIX__MDIVIDE_RIGHT_TRI_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__MDIVIDE_RIGHT_TRI_HPP
+#define STAN__MATH__PRIM__MAT__FUN__MDIVIDE_RIGHT_TRI_HPP
 
 #include <stdexcept>
 #include <boost/math/tools/promotion.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__COMMON_TYPE_HPP
-#define STAN__MATH__MATRIX__COMMON_TYPE_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__COMMON_TYPE_HPP
+#define STAN__MATH__PRIM__MAT__FUN__COMMON_TYPE_HPP
 
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

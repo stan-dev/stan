@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__VALUE_OF_REC_HPP
-#define STAN__MATH__MATRIX__VALUE_OF_REC_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__VALUE_OF_REC_HPP
+#define STAN__MATH__PRIM__MAT__FUN__VALUE_OF_REC_HPP
 
 #include <stan/math/prim/scal/fun/value_of_rec.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

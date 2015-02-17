@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__MATRIX__GRAD_HPP
-#define STAN__AGRAD__REV__MATRIX__GRAD_HPP
+#ifndef STAN__MATH__REV__MAT__FUN__GRAD_HPP
+#define STAN__MATH__REV__MAT__FUN__GRAD_HPP
 
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>

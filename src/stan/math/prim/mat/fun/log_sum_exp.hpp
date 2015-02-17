@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__LOG_SUM_EXP_HPP
-#define STAN__MATH__MATRIX__LOG_SUM_EXP_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__LOG_SUM_EXP_HPP
+#define STAN__MATH__PRIM__MAT__FUN__LOG_SUM_EXP_HPP
 
 #include <limits>
 #include <vector>

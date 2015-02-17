@@ -1,7 +1,13 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
-#include <test/unit/math/prim/mat/meta/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <stan/math/fwd/scal/fun/log1m.hpp>
+#include <stan/math/rev/scal/fun/log1m.hpp>
+#include <stan/math/fwd/scal/fun/log.hpp>
+#include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/fwd/scal/fun/exp.hpp>
+#include <stan/math/rev/scal/fun/exp.hpp>
 
 TEST(AgradFwdLog1m,Fvar) {
   using stan::agrad::fvar;

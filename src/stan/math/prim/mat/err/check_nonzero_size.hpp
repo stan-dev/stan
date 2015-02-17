@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_NONZERO_SIZE_HPP
-#define STAN__ERROR_HANDLING__MATRIX__CHECK_NONZERO_SIZE_HPP
+#ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_NONZERO_SIZE_HPP
+#define STAN__MATH__PRIM__MAT__ERR__CHECK_NONZERO_SIZE_HPP
 
 #include <stan/math/prim/scal/err/invalid_argument.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>

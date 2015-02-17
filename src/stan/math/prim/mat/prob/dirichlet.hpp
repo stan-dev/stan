@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__DIRICHLET_HPP
-#define STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__DIRICHLET_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__DIRICHLET_HPP
+#define STAN__MATH__PRIM__MAT__PROB__DIRICHLET_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>

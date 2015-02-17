@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__PROMOTE_SCALAR_HPP
-#define STAN__MATH__FUNCTIONS__PROMOTE_SCALAR_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__PROMOTE_SCALAR_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__PROMOTE_SCALAR_HPP
 
 #include <vector>
 #include <stan/math/prim/scal/fun/promote_scalar_type.hpp>

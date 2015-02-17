@@ -1,5 +1,5 @@
-#ifndef STAN_AGRAD_FWD_FUNCTIONS_IS_NAN_HPP
-#define STAN_AGRAD_FWD_FUNCTIONS_IS_NAN_HPP
+#ifndef STAN__MATH__FWD__SCAL__FUN__IS_NAN_HPP
+#define STAN__MATH__FWD__SCAL__FUN__IS_NAN_HPP
 
 #include <stan/math/fwd/scal/meta/fvar.hpp>
 #include <stan/math/prim/scal/fun/is_nan.hpp>

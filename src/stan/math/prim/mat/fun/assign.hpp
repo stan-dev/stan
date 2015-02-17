@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__ASSIGN_HPP
-#define STAN__MATH__MATRIX__ASSIGN_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__ASSIGN_HPP
+#define STAN__MATH__PRIM__MAT__FUN__ASSIGN_HPP
 
 #include <vector>
 #include <sstream>

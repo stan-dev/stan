@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__MIN_HPP
-#define STAN__MATH__MATRIX__MIN_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__MIN_HPP
+#define STAN__MATH__PRIM__MAT__FUN__MIN_HPP
 
 #include <stdexcept>
 #include <vector>

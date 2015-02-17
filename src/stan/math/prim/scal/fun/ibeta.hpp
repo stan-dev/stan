@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__IBETA_HPP
-#define STAN__MATH__FUNCTIONS__IBETA_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__IBETA_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__IBETA_HPP
 
 #include <boost/math/special_functions/beta.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>

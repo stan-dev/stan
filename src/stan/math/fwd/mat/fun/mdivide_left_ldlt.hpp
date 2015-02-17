@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__MATRIX__MDIVIDE_LEFT_LDLT_HPP
-#define STAN__AGRAD__FWD__MATRIX__MDIVIDE_LEFT_LDLT_HPP
+#ifndef STAN__MATH__FWD__MAT__FUN__MDIVIDE_LEFT_LDLT_HPP
+#define STAN__MATH__FWD__MAT__FUN__MDIVIDE_LEFT_LDLT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

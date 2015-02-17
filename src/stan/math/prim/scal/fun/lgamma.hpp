@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__LGAMMA_HPP
-#define STAN__MATH__FUNCTIONS__LGAMMA_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__LGAMMA_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__LGAMMA_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 

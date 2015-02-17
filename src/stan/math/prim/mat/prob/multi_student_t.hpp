@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__MULTI_STUDENT_T_HPP
-#define STAN__PROB__DISTRIBUTIONS__MULTI_STUDENT_T_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__MULTI_STUDENT_T_HPP
+#define STAN__MATH__PRIM__MAT__PROB__MULTI_STUDENT_T_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

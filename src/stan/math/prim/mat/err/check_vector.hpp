@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING__MATRIX__CHECK_VECTOR_HPP
-#define STAN__ERROR_HANDLING__MATRIX__CHECK_VECTOR_HPP
+#ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_VECTOR_HPP
+#define STAN__MATH__PRIM__MAT__ERR__CHECK_VECTOR_HPP
 
 #include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/scal/err/invalid_argument.hpp>

@@ -2,6 +2,44 @@
 #define TEST__UNIT_AGRAD_FWD__NAN_UTIL_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/math/fwd/scal/meta/numeric_limits.hpp>
+#include <stan/math/rev/scal/meta/numeric_limits.hpp>
+#include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
+#include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
+#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/scal/fun/abs.hpp>
+#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/scal/fun/abs.hpp>
+#include <stan/math/rev/scal/fun/operator_addition.hpp>
+#include <stan/math/rev/scal/fun/operator_divide_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_division.hpp>
+#include <stan/math/rev/scal/fun/operator_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
+#include <stan/math/rev/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than.hpp>
+#include <stan/math/rev/scal/fun/operator_less_than_or_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_minus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/scal/fun/operator_multiply_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_not_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_plus_equal.hpp>
+#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_decrement.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_increment.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_not.hpp>
+#include <stan/math/rev/scal/fun/operator_unary_plus.hpp>
+#include <stan/math/fwd/scal/fun/operator_addition.hpp>
+#include <stan/math/fwd/scal/fun/operator_division.hpp>
+#include <stan/math/fwd/scal/fun/operator_equal.hpp>
+#include <stan/math/fwd/scal/fun/operator_greater_than.hpp>
+#include <stan/math/fwd/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/fwd/scal/fun/operator_less_than.hpp>
+#include <stan/math/fwd/scal/fun/operator_less_than_or_equal.hpp>
+#include <stan/math/fwd/scal/fun/operator_multiplication.hpp>
+#include <stan/math/fwd/scal/fun/operator_not_equal.hpp>
+#include <stan/math/fwd/scal/fun/operator_subtraction.hpp>
+#include <stan/math/fwd/scal/fun/operator_unary_minus.hpp>
 #include <gtest/gtest.h>
 
 template <typename F>

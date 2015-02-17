@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__IS_INF_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__IS_INF_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__IS_INF_HPP
+#define STAN__MATH__REV__SCAL__FUN__IS_INF_HPP
 
 #include <stan/math/rev/arr/meta/var.hpp>
 #include <stan/math/rev/scal/fun/v_vari.hpp>

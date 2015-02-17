@@ -1,5 +1,5 @@
-#ifndef STAN__ERROR_HANDLING__SCALAR__CHECK_POSITIVE_SIZE_HPP
-#define STAN__ERROR_HANDLING__SCALAR__CHECK_POSITIVE_SIZE_HPP
+#ifndef STAN__MATH__PRIM__SCAL__ERR__CHECK_POSITIVE_SIZE_HPP
+#define STAN__MATH__PRIM__SCAL__ERR__CHECK_POSITIVE_SIZE_HPP
 
 #include <stan/math/prim/scal/err/invalid_argument.hpp>
 #include <sstream>

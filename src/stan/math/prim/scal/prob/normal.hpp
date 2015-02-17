@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP
-#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__NORMAL_HPP
+#ifndef STAN__MATH__PRIM__SCAL__PROB__NORMAL_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__NORMAL_HPP
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

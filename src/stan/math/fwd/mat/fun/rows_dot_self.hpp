@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__MATRIX__ROWS_DOT_SELF_HPP
-#define STAN__AGRAD__FWD__MATRIX__ROWS_DOT_SELF_HPP
+#ifndef STAN__MATH__FWD__MAT__FUN__ROWS_DOT_SELF_HPP
+#define STAN__MATH__FWD__MAT__FUN__ROWS_DOT_SELF_HPP
 
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__MATRIX__LOG_DETERMINANT_HPP
-#define STAN__AGRAD__FWD__MATRIX__LOG_DETERMINANT_HPP
+#ifndef STAN__MATH__FWD__MAT__FUN__LOG_DETERMINANT_HPP
+#define STAN__MATH__FWD__MAT__FUN__LOG_DETERMINANT_HPP
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>

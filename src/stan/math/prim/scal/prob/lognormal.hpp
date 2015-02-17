@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__LOGNORMAL_HPP
-#define STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__LOGNORMAL_HPP
+#ifndef STAN__MATH__PRIM__SCAL__PROB__LOGNORMAL_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__LOGNORMAL_HPP
 
 #include <boost/random/lognormal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

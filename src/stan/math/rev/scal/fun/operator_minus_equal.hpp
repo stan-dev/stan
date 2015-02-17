@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__OPERATORS__OPERATOR_MINUS_EQUAL_HPP
-#define STAN__AGRAD__REV__OPERATORS__OPERATOR_MINUS_EQUAL_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__OPERATOR_MINUS_EQUAL_HPP
+#define STAN__MATH__REV__SCAL__FUN__OPERATOR_MINUS_EQUAL_HPP
 
 #include <stan/math/rev/arr/meta/var.hpp>
 #include <stan/math/rev/scal/fun/operator_subtraction.hpp>

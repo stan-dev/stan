@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__MATRIX__LOG_SOFTMAX_HPP
-#define STAN__AGRAD__FWD__MATRIX__LOG_SOFTMAX_HPP
+#ifndef STAN__MATH__FWD__MAT__FUN__LOG_SOFTMAX_HPP
+#define STAN__MATH__FWD__MAT__FUN__LOG_SOFTMAX_HPP
 
 #include <stan/math/fwd/scal/meta/fvar.hpp>
 #include <stan/math/fwd/mat/fun/softmax.hpp>

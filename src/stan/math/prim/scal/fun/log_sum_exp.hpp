@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FUNCTIONS__LOG_SUM_EXP_HPP
-#define STAN__MATH__FUNCTIONS__LOG_SUM_EXP_HPP
+#ifndef STAN__MATH__PRIM__SCAL__FUN__LOG_SUM_EXP_HPP
+#define STAN__MATH__PRIM__SCAL__FUN__LOG_SUM_EXP_HPP
 
 #include <stan/math/prim/scal/fun/log1p_exp.hpp>
 #include <vector>

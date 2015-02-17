@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__TAIL_HPP
-#define STAN__MATH__MATRIX__TAIL_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__TAIL_HPP
+#define STAN__MATH__PRIM__MAT__FUN__TAIL_HPP
 
 #include <vector>
 #include <stan/math/prim/mat/err/check_column_index.hpp>

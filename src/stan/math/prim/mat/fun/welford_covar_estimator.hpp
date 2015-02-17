@@ -1,5 +1,5 @@
-#ifndef STAN__PROB__WELFORD__COVAR__ESTIMATOR__BETA
-#define STAN__PROB__WELFORD__COVAR__ESTIMATOR__BETA
+#ifndef STAN__MATH__PRIM__MAT__FUN__WELFORD_COVAR_ESTIMATOR_HPP
+#define STAN__MATH__PRIM__MAT__FUN__WELFORD_COVAR_ESTIMATOR_HPP
 
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

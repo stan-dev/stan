@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__FUNCTIONS__ERFC_HPP
-#define STAN__AGRAD__REV__FUNCTIONS__ERFC_HPP
+#ifndef STAN__MATH__REV__SCAL__FUN__ERFC_HPP
+#define STAN__MATH__REV__SCAL__FUN__ERFC_HPP
 
 #include <math.h>
 #include <valarray>

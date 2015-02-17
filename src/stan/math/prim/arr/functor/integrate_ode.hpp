@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__ODE__INTEGRATE_ODE_HPP
-#define STAN__MATH__ODE__INTEGRATE_ODE_HPP
+#ifndef STAN__MATH__PRIM__ARR__FUNCTOR__INTEGRATE_ODE_HPP
+#define STAN__MATH__PRIM__ARR__FUNCTOR__INTEGRATE_ODE_HPP
 
 #include <ostream>
 #include <vector>

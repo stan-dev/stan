@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MATRIX__META__VALUE_TYPE_HPP
-#define STAN__MATH__MATRIX__META__VALUE_TYPE_HPP
+#ifndef STAN__MATH__PRIM__MAT__META__VALUE_TYPE_HPP
+#define STAN__MATH__PRIM__MAT__META__VALUE_TYPE_HPP
 
 #include <stan/math/prim/scal/meta/value_type.hpp>
 #include <Eigen/Core>

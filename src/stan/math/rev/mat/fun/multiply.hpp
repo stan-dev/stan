@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__REV__MATRIX__MULTIPLY_HPP
-#define STAN__AGRAD__REV__MATRIX__MULTIPLY_HPP
+#ifndef STAN__MATH__REV__MAT__FUN__MULTIPLY_HPP
+#define STAN__MATH__REV__MAT__FUN__MULTIPLY_HPP
 
 #include <stan/math/rev/arr/meta/var.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>

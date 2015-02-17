@@ -1,5 +1,5 @@
-#ifndef STAN__AGRAD__FWD__MATRIX__TYPEDEFS_HPP
-#define STAN__AGRAD__FWD__MATRIX__TYPEDEFS_HPP
+#ifndef STAN__MATH__FWD__MAT__FUN__TYPEDEFS_HPP
+#define STAN__MATH__FWD__MAT__FUN__TYPEDEFS_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/fwd/scal/meta/fvar.hpp>
