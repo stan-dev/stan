@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <vector>
 #include <stdexcept>
-#include <stan/math/rev/arr/meta/vari.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/vari.hpp>
+#include <stan/math/rev/core/var.hpp>
 
 namespace stan {
 

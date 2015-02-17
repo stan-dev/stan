@@ -1,4 +1,4 @@
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/mat/fun/sum.hpp>
 #include <stan/math/rev/mat/fun/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/rev/scal/fun/cos.hpp>

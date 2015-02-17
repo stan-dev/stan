@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__MAT__FUN__LOG_SUM_EXP_HPP
 #define STAN__MATH__REV__MAT__FUN__LOG_SUM_EXP_HPP
 
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/calculate_chain.hpp>
 #include <stan/math/rev/scal/fun/vv_vari.hpp>
 #include <stan/math/rev/scal/fun/vd_vari.hpp>

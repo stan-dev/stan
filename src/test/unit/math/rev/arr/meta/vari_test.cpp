@@ -1,4 +1,4 @@
-#include <stan/math/rev/arr/meta/vari.hpp>
+#include <stan/math/rev/core/vari.hpp>
 #include <gtest/gtest.h>
 #include <sstream>
 

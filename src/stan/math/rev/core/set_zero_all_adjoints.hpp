@@ -1,7 +1,7 @@
-#ifndef STAN__MATH__REV__ARR__META__ZERO_ALL_ADJOINTS_HPP
-#define STAN__MATH__REV__ARR__META__ZERO_ALL_ADJOINTS_HPP
+#ifndef STAN__MATH__REV__CORE__ZERO_ALL_ADJOINTS_HPP
+#define STAN__MATH__REV__CORE__ZERO_ALL_ADJOINTS_HPP
 
-#include <stan/math/rev/arr/meta/var_stack.hpp>
+#include <stan/math/rev/core/var_stack.hpp>
 
 namespace stan {
   namespace agrad {

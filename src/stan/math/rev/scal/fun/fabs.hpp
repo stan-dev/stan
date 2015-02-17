@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__FABS_HPP
 #define STAN__MATH__REV__SCAL__FUN__FABS_HPP
 
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/arr/meta/vari.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/vari.hpp>
 #include <stan/math/rev/scal/fun/precomp_v_vari.hpp>
 #include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>

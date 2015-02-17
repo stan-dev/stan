@@ -1,7 +1,7 @@
 #include <stan/math/prim/mat/fun/cholesky_decompose.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/prim/mat/fun/singular_values.hpp>
 #include <stan/math/prim/mat/fun/transpose.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>

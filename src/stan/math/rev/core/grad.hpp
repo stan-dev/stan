@@ -1,8 +1,8 @@
-#ifndef STAN__MATH__REV__ARR__META__GRAD_HPP
-#define STAN__MATH__REV__ARR__META__GRAD_HPP
+#ifndef STAN__MATH__REV__CORE__GRAD_HPP
+#define STAN__MATH__REV__CORE__GRAD_HPP
 
-#include <stan/math/rev/arr/meta/chainable.hpp>
-#include <stan/math/rev/arr/meta/var_stack.hpp>
+#include <stan/math/rev/core/chainable.hpp>
+#include <stan/math/rev/core/var_stack.hpp>
 #include <vector>
 
 namespace stan {

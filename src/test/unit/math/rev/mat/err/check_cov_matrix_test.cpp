@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/operator_greater_than.hpp>

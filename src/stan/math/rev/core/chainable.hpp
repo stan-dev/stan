@@ -1,7 +1,7 @@
-#ifndef STAN__MATH__REV__ARR__META__CHAINABLE_HPP
-#define STAN__MATH__REV__ARR__META__CHAINABLE_HPP
+#ifndef STAN__MATH__REV__CORE__CHAINABLE_HPP
+#define STAN__MATH__REV__CORE__CHAINABLE_HPP
 
-#include <stan/math/rev/arr/meta/var_stack.hpp>
+#include <stan/math/rev/core/var_stack.hpp>
 #include <cstddef>
 
 namespace stan {

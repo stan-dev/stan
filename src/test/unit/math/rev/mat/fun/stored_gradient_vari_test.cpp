@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <vector>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/arr/meta/vari.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/vari.hpp>
 #include <stan/math/rev/mat/fun/stored_gradient_vari.hpp>
 #include <stan/math/rev/scal/fun/operator_addition.hpp>
 #include <stan/math/rev/scal/fun/operator_divide_equal.hpp>

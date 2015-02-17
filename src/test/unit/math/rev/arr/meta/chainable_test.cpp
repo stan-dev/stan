@@ -1,4 +1,4 @@
-#include <stan/math/rev/arr/meta/chainable.hpp>
+#include <stan/math/rev/core/chainable.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 

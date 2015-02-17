@@ -1,4 +1,4 @@
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/prim/mat/err/check_nonzero_size.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>

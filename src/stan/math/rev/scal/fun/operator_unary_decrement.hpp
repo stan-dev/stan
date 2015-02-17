@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__OPERATOR_UNARY_DECREMENT_HPP
 #define STAN__MATH__REV__SCAL__FUN__OPERATOR_UNARY_DECREMENT_HPP
 
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/v_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 

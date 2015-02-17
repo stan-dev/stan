@@ -2,8 +2,8 @@
 #define STAN__MATH__REV__SCAL__FUN__VECTOR_VARI_HPP
 
 #include <vector>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/arr/meta/vari.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/vari.hpp>
 
 namespace stan {
   namespace agrad {

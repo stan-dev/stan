@@ -1,5 +1,5 @@
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/arr/meta/var_stack.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/var_stack.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
 #include <gtest/gtest.h>

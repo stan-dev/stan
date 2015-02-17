@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__SCAL__FUN__ACOSH_HPP
 
 #include <math.h>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/v_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/rev/scal/meta/numeric_limits.hpp>

@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__SCAL__FUN__ABS_HPP
 
 #include <stan/math/fwd/scal/fun/value_of.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/abs.hpp>

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <sstream>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/fwd/scal/fun/operator_addition.hpp>
 #include <stan/math/fwd/scal/fun/operator_division.hpp>
 #include <stan/math/fwd/scal/fun/operator_equal.hpp>

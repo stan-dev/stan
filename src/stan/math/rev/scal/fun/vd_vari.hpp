@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__VD_VARI_HPP
 #define STAN__MATH__REV__SCAL__FUN__VD_VARI_HPP
 
-#include <stan/math/rev/arr/meta/vari.hpp>
+#include <stan/math/rev/core/vari.hpp>
 
 namespace stan {
   namespace agrad {

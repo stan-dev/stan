@@ -1,7 +1,7 @@
 #include <stan/math/fwd/mat/fun/determinant.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/rev/mat/fun/multiply.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/rev/scal/fun/operator_addition.hpp>

@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__FWD__MAT__FUN__SOFTMAX_HPP
 #define STAN__MATH__FWD__MAT__FUN__SOFTMAX_HPP
 
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/softmax.hpp>
 

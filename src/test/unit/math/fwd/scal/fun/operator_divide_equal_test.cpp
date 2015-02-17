@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/fwd/scal/fun/operator_addition.hpp>
 #include <stan/math/fwd/scal/fun/operator_division.hpp>
 #include <stan/math/fwd/scal/fun/operator_equal.hpp>

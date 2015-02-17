@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__FMAX_HPP
 #define STAN__MATH__REV__SCAL__FUN__FMAX_HPP
 
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/rev/scal/fun/precomp_v_vari.hpp>
 #include <stan/math/rev/scal/fun/precomputed_gradients.hpp>

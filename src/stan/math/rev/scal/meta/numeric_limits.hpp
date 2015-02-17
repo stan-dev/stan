@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__SCAL__META__NUMERIC_LIMITS_HPP
 
 #include <limits>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 
 namespace std {
 

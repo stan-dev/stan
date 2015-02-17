@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <boost/type_traits.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>
 
 using stan::length;

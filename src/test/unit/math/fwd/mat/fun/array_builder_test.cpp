@@ -1,6 +1,6 @@
 #include <stan/math/prim/mat/fun/array_builder.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/rev/scal/fun/operator_addition.hpp>
 #include <stan/math/rev/scal/fun/operator_divide_equal.hpp>
 #include <stan/math/rev/scal/fun/operator_division.hpp>

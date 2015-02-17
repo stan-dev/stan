@@ -1,10 +1,10 @@
 #include <stan/math/fwd/mat/fun/divide.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/prim/mat/fun/divide.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
-#include <stan/math/fwd/scal/meta/numeric_limits.hpp>
+#include <stan/math/fwd/core/numeric_limits.hpp>
 #include <stan/math/rev/scal/meta/numeric_limits.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>

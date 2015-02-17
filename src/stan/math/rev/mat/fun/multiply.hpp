@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__MAT__FUN__MULTIPLY_HPP
 #define STAN__MATH__REV__MAT__FUN__MULTIPLY_HPP
 
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

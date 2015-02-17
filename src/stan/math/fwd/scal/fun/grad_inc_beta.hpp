@@ -9,7 +9,7 @@
 #include <stan/math/fwd/scal/fun/exp.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 
 #include <stan/math/fwd/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/fun/grad_2F1.hpp>

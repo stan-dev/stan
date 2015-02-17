@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__MAT__FUN__LDLT_FACTOR_HPP
 #define STAN__MATH__REV__MAT__FUN__LDLT_FACTOR_HPP
 
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/mat/fun/LDLT_alloc.hpp>
 #include <stan/math/prim/mat/fun/LDLT_factor.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>

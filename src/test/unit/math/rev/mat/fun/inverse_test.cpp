@@ -4,7 +4,7 @@
 #include <stan/math/prim/mat/fun/sum.hpp>
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 #include <stan/math/rev/mat/fun/multiply.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/operator_addition.hpp>
 #include <stan/math/rev/scal/fun/operator_divide_equal.hpp>
 #include <stan/math/rev/scal/fun/operator_division.hpp>

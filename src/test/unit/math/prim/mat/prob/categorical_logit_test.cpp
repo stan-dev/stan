@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 #include <limits>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/arr/meta/var_stack.hpp>
-#include <stan/math/rev/arr/meta/chainable.hpp>
-#include <stan/math/rev/arr/meta/vari.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/var_stack.hpp>
+#include <stan/math/rev/core/chainable.hpp>
+#include <stan/math/rev/core/vari.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/rev/scal/fun/operator_addition.hpp>
 #include <stan/math/rev/scal/fun/operator_division.hpp>
 #include <stan/math/rev/scal/fun/operator_divide_equal.hpp>

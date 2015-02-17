@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__ARR__META__VAR_STACK_HPP
-#define STAN__MATH__REV__ARR__META__VAR_STACK_HPP
+#ifndef STAN__MATH__REV__CORE__VAR_STACK_HPP
+#define STAN__MATH__REV__CORE__VAR_STACK_HPP
 
 #include <stdexcept>
 #include <vector>

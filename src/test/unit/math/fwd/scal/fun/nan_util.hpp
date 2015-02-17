@@ -2,13 +2,13 @@
 #define TEST__UNIT_AGRAD_FWD__NAN_UTIL_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/fwd/scal/meta/numeric_limits.hpp>
+#include <stan/math/fwd/core/numeric_limits.hpp>
 #include <stan/math/rev/scal/meta/numeric_limits.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/abs.hpp>
 #include <stan/math/rev/scal/fun/operator_addition.hpp>
 #include <stan/math/rev/scal/fun/operator_divide_equal.hpp>

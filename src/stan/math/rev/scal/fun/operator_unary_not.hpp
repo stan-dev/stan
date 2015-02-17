@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__OPERATOR_UNARY_NOT_HPP
 #define STAN__MATH__REV__SCAL__FUN__OPERATOR_UNARY_NOT_HPP
 
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 
 namespace stan {
   namespace agrad {

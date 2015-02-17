@@ -30,7 +30,7 @@
 #include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
 #include <stan/math/rev/scal/fun/operator_unary_not.hpp>
 #include <stan/math/rev/scal/fun/operator_unary_plus.hpp>
-#include <stan/math/rev/arr/meta/grad.hpp>
+#include <stan/math/rev/core/grad.hpp>
 
 TEST(AgradPartialsVari, OperandsAndPartials) {
   using stan::agrad::OperandsAndPartials;

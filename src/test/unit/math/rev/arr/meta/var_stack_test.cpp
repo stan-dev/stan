@@ -1,4 +1,4 @@
-#include <stan/math/rev/arr/meta/var_stack.hpp>
+#include <stan/math/rev/core/var_stack.hpp>
 #include <stan/math/rev/scal/fun/operator_multiplication.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>

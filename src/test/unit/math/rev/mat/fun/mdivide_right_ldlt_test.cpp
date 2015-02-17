@@ -4,7 +4,7 @@
 #include <stan/math/prim/mat/fun/mdivide_right_ldlt.hpp>
 #include <stan/math/prim/mat/fun/mdivide_right_spd.hpp>
 #include <stan/math/rev/mat/fun/LDLT_factor.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/prim/mat/fun/mdivide_right_ldlt.hpp>
 #include <stan/math/prim/mat/fun/mdivide_right_spd.hpp>
 #include <stan/math/rev/mat/fun/LDLT_factor.hpp>

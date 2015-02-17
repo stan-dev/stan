@@ -1,6 +1,6 @@
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 
 const char* function_ = "function";
 const char* y_name_ = "y";

@@ -1,9 +1,9 @@
-#ifndef STAN__MATH__REV__ARR__META__VAR_HPP
-#define STAN__MATH__REV__ARR__META__VAR_HPP
+#ifndef STAN__MATH__REV__CORE__VAR_HPP
+#define STAN__MATH__REV__CORE__VAR_HPP
 
 #include <ostream>
-#include <stan/math/rev/arr/meta/vari.hpp>
-#include <stan/math/rev/arr/meta/grad.hpp>
+#include <stan/math/rev/core/vari.hpp>
+#include <stan/math/rev/core/grad.hpp>
 
 namespace stan {
   namespace agrad {

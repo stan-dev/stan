@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__MAT__FUN__TRACE_INV_QUAD_FORM_LDLT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/mat/fun/LDLT_alloc.hpp>
 #include <stan/math/rev/mat/fun/LDLT_factor.hpp>
 #include <boost/type_traits/is_same.hpp>

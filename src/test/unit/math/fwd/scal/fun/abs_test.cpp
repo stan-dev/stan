@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/fwd/scal/fun/operator_addition.hpp>
 #include <stan/math/fwd/scal/fun/operator_division.hpp>
 #include <stan/math/fwd/scal/fun/operator_equal.hpp>

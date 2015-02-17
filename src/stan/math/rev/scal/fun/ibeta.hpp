@@ -3,7 +3,7 @@
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/vvv_vari.hpp>
 #include <stan/math/rev/scal/fun/vvd_vari.hpp>
 #include <stan/math/rev/scal/fun/vdv_vari.hpp>

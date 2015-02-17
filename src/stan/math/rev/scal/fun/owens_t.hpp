@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__SCAL__FUN__OWENS_T_HPP
 
 #include <math.h>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/vv_vari.hpp>
 #include <stan/math/rev/scal/fun/vd_vari.hpp>
 #include <stan/math/rev/scal/fun/dv_vari.hpp>

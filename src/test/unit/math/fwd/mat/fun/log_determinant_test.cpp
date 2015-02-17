@@ -3,7 +3,7 @@
 #include <stan/math/prim/mat/fun/log_determinant.hpp>
 #include <stan/math/fwd/mat/fun/log_determinant.hpp>
 #include <stan/math/prim/mat/fun/log_determinant.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/rev/mat/fun/multiply.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/fwd/scal/fun/operator_addition.hpp>

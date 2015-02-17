@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__SCAL__FUN__SINH_HPP
 
 #include <valarray>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/v_vari.hpp>
 
 namespace stan {

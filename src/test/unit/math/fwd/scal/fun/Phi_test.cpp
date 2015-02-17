@@ -15,7 +15,7 @@
 #include <stan/math/fwd/scal/fun/operator_not_equal.hpp>
 #include <stan/math/fwd/scal/fun/operator_subtraction.hpp>
 #include <stan/math/fwd/scal/fun/operator_unary_minus.hpp>
-#include <stan/math/fwd/scal/meta/numeric_limits.hpp>
+#include <stan/math/fwd/core/numeric_limits.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
 #include <stan/math/rev/scal/meta/numeric_limits.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>

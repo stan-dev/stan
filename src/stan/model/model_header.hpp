@@ -316,11 +316,11 @@
 #include <stan/math/prim/scal/prob/von_mises.hpp>
 #include <stan/math/prim/scal/prob/weibull.hpp>
 #include <stan/math/rev/arr/functor/coupled_ode_system.hpp>
-#include <stan/math/rev/arr/meta/chainable.hpp>
-#include <stan/math/rev/arr/meta/print_stack.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/arr/meta/var_stack.hpp>
-#include <stan/math/rev/arr/meta/vari.hpp>
+#include <stan/math/rev/core/chainable.hpp>
+#include <stan/math/rev/core/print_stack.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/var_stack.hpp>
+#include <stan/math/rev/core/vari.hpp>
 #include <stan/math/rev/mat/err/check_pos_definite.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/mat/fun/LDLT_alloc.hpp>

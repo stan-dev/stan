@@ -124,8 +124,8 @@
 #include <stan/math/fwd/scal/fun/trunc.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/fwd/scal/fun/value_of_rec.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
-#include <stan/math/fwd/scal/meta/numeric_limits.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core/numeric_limits.hpp>
 
 using std::vector;
 using stan::agrad::var;

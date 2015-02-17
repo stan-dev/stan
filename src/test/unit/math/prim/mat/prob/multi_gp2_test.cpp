@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/rev/scal/meta/numeric_limits.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/prim/mat/prob/multi_gp.hpp>
 #include <stan/math/rev/scal/fun/operator_addition.hpp>
 #include <stan/math/rev/scal/fun/operator_division.hpp>

@@ -1,5 +1,5 @@
 #include <stan/math/prim/scal/fun/sign.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/operator_addition.hpp>
 #include <stan/math/rev/scal/fun/operator_divide_equal.hpp>
 #include <stan/math/rev/scal/fun/operator_division.hpp>

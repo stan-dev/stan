@@ -5,8 +5,8 @@
 // ********* superseded by version in autodiff.hpp for API ****
 
 #include <vector>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/arr/meta/set_zero_all_adjoints.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/set_zero_all_adjoints.hpp>
 
 namespace stan {
 

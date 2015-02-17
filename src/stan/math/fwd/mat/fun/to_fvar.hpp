@@ -4,7 +4,7 @@
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/err/check_matching_dims.hpp>
 

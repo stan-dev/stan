@@ -1,7 +1,7 @@
 #include <stan/math/prim/mat/fun/columns_dot_self.hpp>
 #include <stan/math/fwd/mat/fun/rows_dot_self.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/fwd/scal/fun/operator_addition.hpp>
 #include <stan/math/fwd/scal/fun/operator_division.hpp>

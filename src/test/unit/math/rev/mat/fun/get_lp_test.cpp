@@ -1,7 +1,7 @@
 #include <stan/math/prim/mat/fun/accumulator.hpp>
 #include <stan/math/prim/mat/fun/get_lp.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/operator_addition.hpp>
 #include <stan/math/rev/scal/fun/operator_divide_equal.hpp>
 #include <stan/math/rev/scal/fun/operator_division.hpp>

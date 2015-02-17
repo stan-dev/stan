@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__MAT__FUN__EIGEN_NUMTRAITS_HPP
 
 #include <limits>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
 namespace stan {

@@ -1,7 +1,7 @@
 #include <stan/math/prim/mat/fun/inverse_spd.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
-#include <stan/math/rev/arr/meta/print_stack.hpp>
+#include <stan/math/rev/core/print_stack.hpp>
 #include <stan/math/prim/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/sum.hpp>
 #include <stan/math/rev/scal/fun/abs.hpp>

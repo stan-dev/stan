@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__SCAL__FUN__INC_BETA_HPP
 
 #include <valarray>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/vvv_vari.hpp>
 #include <stan/math/rev/scal/fun/vvd_vari.hpp>
 #include <stan/math/rev/scal/fun/vdv_vari.hpp>

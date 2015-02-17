@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <valarray>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/ddv_vari.hpp>
 #include <stan/math/rev/scal/fun/vdd_vari.hpp>
 #include <stan/math/rev/scal/fun/vvv_vari.hpp>
