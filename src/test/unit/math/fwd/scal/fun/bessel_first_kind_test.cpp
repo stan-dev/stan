@@ -10,17 +10,17 @@
 #include <stan/math/fwd/scal/fun/pow.hpp>
 #include <stan/math/fwd/scal/fun/sin.hpp>
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
-#include <stan/math/fwd/scal/fun/operator_addition.hpp>
-#include <stan/math/fwd/scal/fun/operator_division.hpp>
-#include <stan/math/fwd/scal/fun/operator_equal.hpp>
-#include <stan/math/fwd/scal/fun/operator_greater_than.hpp>
-#include <stan/math/fwd/scal/fun/operator_greater_than_or_equal.hpp>
-#include <stan/math/fwd/scal/fun/operator_less_than.hpp>
-#include <stan/math/fwd/scal/fun/operator_less_than_or_equal.hpp>
-#include <stan/math/fwd/scal/fun/operator_multiplication.hpp>
-#include <stan/math/fwd/scal/fun/operator_not_equal.hpp>
-#include <stan/math/fwd/scal/fun/operator_subtraction.hpp>
-#include <stan/math/fwd/scal/fun/operator_unary_minus.hpp>
+#include <stan/math/fwd/core/operator_addition.hpp>
+#include <stan/math/fwd/core/operator_division.hpp>
+#include <stan/math/fwd/core/operator_equal.hpp>
+#include <stan/math/fwd/core/operator_greater_than.hpp>
+#include <stan/math/fwd/core/operator_greater_than_or_equal.hpp>
+#include <stan/math/fwd/core/operator_less_than.hpp>
+#include <stan/math/fwd/core/operator_less_than_or_equal.hpp>
+#include <stan/math/fwd/core/operator_multiplication.hpp>
+#include <stan/math/fwd/core/operator_not_equal.hpp>
+#include <stan/math/fwd/core/operator_subtraction.hpp>
+#include <stan/math/fwd/core/operator_unary_minus.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/scal/fun/bessel_first_kind.hpp>
 #include <stan/math/rev/scal/fun/cos.hpp>
@@ -30,7 +30,7 @@
 #include <stan/math/rev/scal/fun/pow.hpp>
 #include <stan/math/rev/scal/fun/sin.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
-#include <stan/math/rev/scal/meta/numeric_limits.hpp>
+#include <stan/math/rev/core/numeric_limits.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 
 TEST(AgradFwdBesselFirstKind,Fvar) {

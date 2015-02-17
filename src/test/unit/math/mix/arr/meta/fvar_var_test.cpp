@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <sstream>
 
 TEST(AgradFwdFvar, insertion_operator) {

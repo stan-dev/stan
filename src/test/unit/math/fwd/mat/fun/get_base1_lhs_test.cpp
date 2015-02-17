@@ -1,6 +1,6 @@
 #include <stan/math/prim/mat/fun/get_base1_lhs.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <gtest/gtest.h>
 
 using stan::agrad::fvar;

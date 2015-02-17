@@ -1,7 +1,7 @@
 #ifndef TEST__UNIT_DISTRIBUTION__TEST_FIXTURE_DISTR_HPP
 #define TEST__UNIT_DISTRIBUTION__TEST_FIXTURE_DISTR_HPP
 
-#include <stan/math/fwd/scal/meta/numeric_limits.hpp>
+#include <stan/math/fwd/core/numeric_limits.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <test/prob/utility.hpp>
 #include <boost/type_traits/is_same.hpp>

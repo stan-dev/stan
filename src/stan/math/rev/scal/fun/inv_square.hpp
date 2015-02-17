@@ -2,8 +2,8 @@
 #define STAN__MATH__REV__SCAL__FUN__INV_SQUARE_HPP
 
 #include <valarray>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/scal/fun/v_vari.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/v_vari.hpp>
 #include <stan/math/prim/scal/fun/inv_square.hpp>
 
 namespace stan {

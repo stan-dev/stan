@@ -3,10 +3,10 @@
 #include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/mat/prob/categorical.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
-#include <stan/math/rev/scal/fun/operator_addition.hpp>
-#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
-#include <stan/math/rev/scal/fun/operator_less_than_or_equal.hpp>
-#include <stan/math/rev/scal/fun/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/core/operator_addition.hpp>
+#include <stan/math/rev/core/operator_subtraction.hpp>
+#include <stan/math/rev/core/operator_less_than_or_equal.hpp>
+#include <stan/math/rev/core/operator_greater_than_or_equal.hpp>
 #include <stan/math/rev/scal/fun/fabs.hpp>
 #include <stan/math/prim/mat/err/check_simplex.hpp>
 

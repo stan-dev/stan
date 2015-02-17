@@ -2,7 +2,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
-#include <stan/math/rev/scal/meta/numeric_limits.hpp>
+#include <stan/math/rev/core/numeric_limits.hpp>
 
 TEST(AgradRev,is_inf) {
   using stan::math::is_inf;

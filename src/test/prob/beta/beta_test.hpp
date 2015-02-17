@@ -3,7 +3,7 @@
 
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <boost/utility/enable_if.hpp>
 
 using std::vector;

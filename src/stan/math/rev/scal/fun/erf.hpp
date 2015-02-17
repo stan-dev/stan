@@ -3,8 +3,8 @@
 
 #include <valarray>
 #include <math.h>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/scal/fun/v_vari.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/v_vari.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 namespace stan {

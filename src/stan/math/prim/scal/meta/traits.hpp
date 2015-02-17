@@ -7,8 +7,8 @@
 #include <boost/type_traits/is_arithmetic.hpp> 
 #include <boost/math/tools/promotion.hpp>
 
-#include <stan/math/fwd/scal/meta/fvar.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/rev/core/var.hpp>
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/value_type.hpp>

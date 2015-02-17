@@ -1,7 +1,7 @@
 #include <stan/math/rev/scal/fun/inv_cloglog.hpp>
 #include <stan/math/rev/scal/fun/exp.hpp>
-#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
-#include <stan/math/rev/scal/fun/operator_subtraction.hpp>
+#include <stan/math/rev/core/operator_unary_negative.hpp>
+#include <stan/math/rev/core/operator_subtraction.hpp>
 #include <stan/math/prim/scal/fun/inv_cloglog.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>

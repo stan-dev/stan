@@ -4,7 +4,7 @@
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/softmax.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/prim/mat/err/check_nonzero_size.hpp>
 
 namespace stan {

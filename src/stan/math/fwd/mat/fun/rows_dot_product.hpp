@@ -7,7 +7,7 @@
 #include <stan/math/prim/mat/err/check_matching_dims.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/mat/fun/dot_product.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 
 
 namespace stan {

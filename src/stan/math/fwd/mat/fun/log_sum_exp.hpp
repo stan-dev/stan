@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__MAT__FUN__LOG_SUM_EXP_HPP
 
 #include <vector>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/prim/mat/fun/log_sum_exp.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>

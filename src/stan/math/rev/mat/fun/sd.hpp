@@ -6,9 +6,9 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/mean.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/arr/meta/vari.hpp>
-#include <stan/math/rev/mat/fun/stored_gradient_vari.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/vari.hpp>
+#include <stan/math/rev/core/stored_gradient_vari.hpp>
 #include <stan/math/prim/mat/err/check_nonzero_size.hpp>
 
 namespace stan {

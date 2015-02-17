@@ -8,7 +8,7 @@
 #include <stan/math/prim/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/transpose.hpp>
 #include <stan/math/prim/mat/fun/trace.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 
 namespace stan {
   namespace agrad {

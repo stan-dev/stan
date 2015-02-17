@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/prim/mat/fun/initialize.hpp>
 
 using stan::agrad::fvar;

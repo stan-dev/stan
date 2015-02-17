@@ -11,7 +11,7 @@
 #include <stan/math/fwd/mat/fun/to_fvar.hpp>
 #include <stan/math/fwd/mat/fun/multiply.hpp>
 #include <stan/math/fwd/mat/fun/inverse.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 
 namespace stan {
   namespace agrad {

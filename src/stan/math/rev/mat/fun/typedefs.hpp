@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__MAT__FUN__TYPEDEFS_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 
 namespace stan {
 

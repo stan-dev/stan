@@ -4,9 +4,9 @@
 #include <stan/math/prim/mat/err/check_pos_definite.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
-#include <stan/math/rev/scal/meta/numeric_limits.hpp>
+#include <stan/math/rev/core/numeric_limits.hpp>
 
 namespace stan {
 

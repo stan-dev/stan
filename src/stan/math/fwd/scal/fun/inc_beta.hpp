@@ -11,7 +11,7 @@
 #include <stan/math/fwd/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/fun/lbeta.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 
 namespace stan {
 

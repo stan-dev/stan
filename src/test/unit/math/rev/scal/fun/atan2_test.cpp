@@ -1,6 +1,6 @@
 #include <stan/math/rev/scal/fun/atan2.hpp>
-#include <stan/math/rev/scal/fun/operator_division.hpp>
-#include <stan/math/rev/scal/fun/operator_multiplication.hpp>
+#include <stan/math/rev/core/operator_division.hpp>
+#include <stan/math/rev/core/operator_multiplication.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>

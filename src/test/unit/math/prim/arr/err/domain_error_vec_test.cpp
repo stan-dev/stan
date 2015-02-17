@@ -1,6 +1,6 @@
 #include <vector>
 #include <stan/math/prim/arr/err/domain_error_vec.hpp>
-#include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/math/prim/mat/meta/value_type.hpp>
 #include <stan/math/prim/scal/meta/value_type.hpp>
 #include <gtest/gtest.h>

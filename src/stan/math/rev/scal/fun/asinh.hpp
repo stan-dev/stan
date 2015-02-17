@@ -2,12 +2,12 @@
 #define STAN__MATH__REV__SCAL__FUN__ASINH_HPP
 
 #include <valarray>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/scal/fun/v_vari.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/v_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/rev/scal/meta/numeric_limits.hpp>
-#include <stan/math/rev/scal/fun/operator_equal.hpp>
-#include <stan/math/rev/scal/fun/operator_unary_negative.hpp>
+#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/rev/core/operator_equal.hpp>
+#include <stan/math/rev/core/operator_unary_negative.hpp>
 #include <math.h>
 
 namespace stan {

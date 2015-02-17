@@ -2,10 +2,10 @@
 #define STAN__MATH__REV__MAT__FUN__SORT_HPP
 
 #include <valarray>
-#include <stan/math/rev/arr/meta/var.hpp>
-#include <stan/math/rev/scal/fun/v_vari.hpp>
-#include <stan/math/rev/scal/fun/operator_greater_than.hpp>
-#include <stan/math/rev/scal/fun/operator_less_than.hpp>
+#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core/v_vari.hpp>
+#include <stan/math/rev/core/operator_greater_than.hpp>
+#include <stan/math/rev/core/operator_less_than.hpp>
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <algorithm>    // std::sort

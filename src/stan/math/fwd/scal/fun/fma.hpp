@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__SCAL__FUN__FMA_HPP
 
 #include <cmath>
-#include <stan/math/fwd/scal/meta/fvar.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>
 
 namespace stan {
