@@ -3,8 +3,8 @@
 #include <sstream>
 #include <vector>
 
-
 #include <stan/math/prim/arr/functor/integrate_ode.hpp>
+#include <stan/math/rev/arr/meta/set_zero_all_adjoints.hpp>
 #include <test/unit/util.hpp>
 
 //calculates finite diffs for integrate_ode with varying parameters

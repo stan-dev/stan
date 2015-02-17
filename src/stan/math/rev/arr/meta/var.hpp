@@ -3,6 +3,7 @@
 
 #include <ostream>
 #include <stan/math/rev/arr/meta/vari.hpp>
+#include <stan/math/rev/arr/meta/grad.hpp>
 
 namespace stan {
   namespace agrad {

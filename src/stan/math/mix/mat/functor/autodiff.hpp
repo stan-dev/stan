@@ -4,6 +4,8 @@
 #include <stan/math/fwd/scal/meta/fvar.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/arr/meta/var.hpp>
+#include <stan/math/rev/arr/meta/grad.hpp>
+#include <stan/math/rev/arr/meta/set_zero_all_adjoints.hpp>
 #include <vector>
 
 namespace stan {

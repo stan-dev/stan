@@ -5,6 +5,7 @@
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/scal/fun/operator_plus_equal.hpp>
+#include <stan/math/rev/arr/meta/grad.hpp>
 
 TEST(ProbDistributionsNormal, cdf_tails) {
   using stan::agrad::var;
