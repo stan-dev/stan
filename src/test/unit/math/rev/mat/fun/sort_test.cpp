@@ -1,4 +1,5 @@
-#include <stan/math/rev/mat/fun/sort.hpp>
+#include <stan/math/rev/mat/fun/sort_asc.hpp>
+#include <stan/math/rev/mat/fun/sort_desc.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/prim/mat/fun/sort.hpp>

@@ -35,6 +35,8 @@
 #include <stan/math/rev/core/operator_unary_plus.hpp>
 #include <stan/math/fwd/mat/fun/columns_dot_self.hpp>
 #include <stan/math/rev/mat/fun/dot_self.hpp>
+#include <stan/math/rev/mat/fun/columns_dot_self.hpp>
+
 
 TEST(AgradFwdMatrixRowsDotSelf,fd) {
   using stan::math::columns_dot_self;

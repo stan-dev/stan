@@ -42,6 +42,7 @@
 #include <stan/math/fwd/mat/fun/dot_self.hpp>
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
 #include <stan/math/rev/mat/fun/dot_self.hpp>
+#include <stan/math/rev/mat/fun/columns_dot_self.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 
 using Eigen::Dynamic;

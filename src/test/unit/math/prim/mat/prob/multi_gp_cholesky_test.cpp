@@ -27,6 +27,7 @@
 #include <stan/math/rev/scal/fun/abs.hpp>
 #include <stan/math/rev/mat/fun/sum.hpp>
 #include <stan/math/rev/mat/fun/dot_self.hpp>
+#include <stan/math/rev/mat/fun/columns_dot_self.hpp>
 #include <stan/math/fwd/core/operator_addition.hpp>
 #include <stan/math/fwd/core/operator_division.hpp>
 #include <stan/math/fwd/core/operator_greater_than.hpp>

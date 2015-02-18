@@ -255,39 +255,6 @@ namespace stan {
       return var(new dot_product_vari<T1,T2>(&v1[0], &v2[0], v1.size()));
     }
 
-    template<typename T1, int R1, int C1, typename T2, int R2, int C2>
-    inline
-    typename boost::enable_if_c<boost::is_same<T1,var>::value ||
-                                boost::is_same<T2,var>::value,
-                                Eigen::Matrix<var, 1, C1> >::type
-    columns_dot_product(const Eigen::Matrix<T1, R1, C1>& v1, 
-                        const Eigen::Matrix<T2, R2, C2>& v2) {
-      stan::math::check_matching_sizes("dot_product",
-                                                 "v1", v1,
-                                                 "v2", v2);
-      Eigen::Matrix<var, 1, C1> ret(1,v1.cols());
-      for (size_type j = 0; j < v1.cols(); ++j) {
-        ret(j) = var(new dot_product_vari<T1,T2>(v1.col(j),v2.col(j)));
-      }
-      return ret;
-    }
-    
-    template<typename T1, int R1, int C1, typename T2, int R2, int C2>
-    inline
-    typename boost::enable_if_c<boost::is_same<T1,var>::value ||
-                                boost::is_same<T2,var>::value,
-                                Eigen::Matrix<var, R1, 1> >::type
-    rows_dot_product(const Eigen::Matrix<T1, R1, C1>& v1, 
-                     const Eigen::Matrix<T2, R2, C2>& v2) {
-      stan::math::check_matching_sizes("dot_product",
-                                                 "v1", v1,
-                                                 "v2", v2);
-      Eigen::Matrix<var, R1, 1> ret(v1.rows(),1);
-      for (size_type j = 0; j < v1.rows(); ++j) {
-        ret(j) = var(new dot_product_vari<T1,T2>(v1.row(j),v2.row(j)));
-      }
-      return ret;
-    }
   }
 }
 #endif

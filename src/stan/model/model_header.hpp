@@ -1,8 +1,6 @@
 #ifndef STAN__MODEL__MODEL__HEADER_HPP__
 #define STAN__MODEL__MODEL__HEADER_HPP__
 
-
-
 #include <boost/exception/all.hpp>
 #include <boost/random/linear_congruential.hpp>
 
@@ -334,6 +332,7 @@
 #include <stan/math/rev/core/dvv_vari.hpp>
 #include <stan/math/rev/core/dvv_vari.hpp>
 #include <stan/math/rev/core/empty_nested.hpp>
+#include <stan/math/rev/core/gevv_vvv_vari.hpp>
 #include <stan/math/rev/core/grad.hpp>
 #include <stan/math/rev/core/matrix_vari.hpp>
 #include <stan/math/rev/core/matrix_vari.hpp>
@@ -414,6 +413,8 @@
 #include <stan/math/rev/core/vvv_vari.hpp>
 #include <stan/math/rev/core/vvv_vari.hpp>
 #include <stan/math/rev/mat/err/check_pos_definite.hpp>
+#include <stan/math/rev/mat/fun/columns_dot_product.hpp>
+#include <stan/math/rev/mat/fun/columns_dot_self.hpp>
 #include <stan/math/rev/mat/fun/crossprod.hpp>
 #include <stan/math/rev/mat/fun/determinant.hpp>
 #include <stan/math/rev/mat/fun/divide.hpp>
@@ -436,9 +437,12 @@
 #include <stan/math/rev/mat/fun/multiply.hpp>
 #include <stan/math/rev/mat/fun/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/rev/mat/fun/quad_form.hpp>
+#include <stan/math/rev/mat/fun/quad_form_sym.hpp>
+#include <stan/math/rev/mat/fun/rows_dot_product.hpp>
 #include <stan/math/rev/mat/fun/sd.hpp>
 #include <stan/math/rev/mat/fun/softmax.hpp>
-#include <stan/math/rev/mat/fun/sort.hpp>
+#include <stan/math/rev/mat/fun/sort_asc.hpp>
+#include <stan/math/rev/mat/fun/sort_desc.hpp>
 #include <stan/math/rev/mat/fun/squared_distance.hpp>
 #include <stan/math/rev/mat/fun/stan_print.hpp>
 #include <stan/math/rev/mat/fun/sum.hpp>
@@ -463,6 +467,10 @@
 #include <stan/math/rev/scal/fun/bessel_second_kind.hpp>
 #include <stan/math/rev/scal/fun/binary_log_loss.hpp>
 #include <stan/math/rev/scal/fun/boost_fpclassify.hpp>
+#include <stan/math/rev/scal/fun/boost_isinfinite.hpp>
+#include <stan/math/rev/scal/fun/boost_isinf.hpp>
+#include <stan/math/rev/scal/fun/boost_isnan.hpp>
+#include <stan/math/rev/scal/fun/boost_isnormal.hpp>
 #include <stan/math/rev/scal/fun/calculate_chain.hpp>
 #include <stan/math/rev/scal/fun/cbrt.hpp>
 #include <stan/math/rev/scal/fun/ceil.hpp>
