@@ -2,7 +2,6 @@
 #include <limits>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/var_stack.hpp>
 #include <stan/math/rev/core/chainable.hpp>
 #include <stan/math/rev/core/vari.hpp>
 #include <stan/math/fwd/core/fvar.hpp>

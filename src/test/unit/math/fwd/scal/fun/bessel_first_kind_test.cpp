@@ -30,7 +30,7 @@
 #include <stan/math/rev/scal/fun/pow.hpp>
 #include <stan/math/rev/scal/fun/sin.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
-#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/rev/core/std_numeric_limits.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 
 TEST(AgradFwdBesselFirstKind,Fvar) {

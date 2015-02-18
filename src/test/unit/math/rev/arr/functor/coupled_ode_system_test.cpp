@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <stan/math/rev/core/recover_memory.hpp>
 #include <stan/math/rev/arr/functor/coupled_ode_system.hpp>
 #include <stan/math/rev/core/operator_multiplication.hpp>
 #include <stan/math/rev/core/operator_subtraction.hpp>

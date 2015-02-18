@@ -3,10 +3,9 @@
 #include <stan/math/fwd/mat/fun/eigen_numtraits.hpp>
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/vari.hpp>
-#include <stan/math/rev/core/var_stack.hpp>
 #include <stan/math/rev/core/chainable.hpp>
-#include <stan/math/fwd/core/numeric_limits.hpp>
-#include <stan/math/fwd/core/numeric_limits.hpp>
+#include <stan/math/fwd/core/std_numeric_limits.hpp>
+#include <stan/math/fwd/core/std_numeric_limits.hpp>
 #include <stan/math/rev/core/operator_addition.hpp>
 #include <stan/math/rev/core/operator_division.hpp>
 #include <stan/math/rev/core/operator_divide_equal.hpp>

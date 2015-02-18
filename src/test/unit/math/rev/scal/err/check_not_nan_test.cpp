@@ -1,7 +1,8 @@
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
 #include <gtest/gtest.h>
+#include <stan/math/rev/core/recover_memory.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
-#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/rev/core/std_numeric_limits.hpp>
 #include <stan/math/rev/core/operator_addition.hpp>
 #include <stan/math/rev/core/operator_divide_equal.hpp>
 #include <stan/math/rev/core/operator_division.hpp>

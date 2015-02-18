@@ -2,7 +2,10 @@
 #define STAN__MATH__REV__CORE__GRAD_HPP
 
 #include <stan/math/rev/core/chainable.hpp>
-#include <stan/math/rev/core/var_stack.hpp>
+#include <stan/math/rev/core/chainable_alloc.hpp>
+#include <stan/math/rev/core/chainablestack.hpp>
+#include <stan/math/rev/core/empty_nested.hpp>
+#include <stan/math/rev/core/nested_size.hpp>
 #include <vector>
 
 namespace stan {

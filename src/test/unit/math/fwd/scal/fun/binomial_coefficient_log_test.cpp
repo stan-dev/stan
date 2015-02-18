@@ -4,8 +4,8 @@
 #include <stan/math/fwd/scal/fun/binomial_coefficient_log.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
-#include <stan/math/fwd/core/numeric_limits.hpp>
-#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/fwd/core/std_numeric_limits.hpp>
+#include <stan/math/rev/core/std_numeric_limits.hpp>
 #include <stan/math/fwd/core/operator_addition.hpp>
 #include <stan/math/fwd/core/operator_division.hpp>
 #include <stan/math/fwd/core/operator_equal.hpp>

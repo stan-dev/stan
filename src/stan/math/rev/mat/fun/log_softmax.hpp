@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <stdexcept>
+#include <stan/math/rev/core/chainable.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/log_softmax.hpp>
 #include <stan/math/prim/mat/fun/softmax.hpp>

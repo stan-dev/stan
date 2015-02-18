@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__NUMERIC_LIMITS_HPP
-#define STAN__MATH__REV__CORE__NUMERIC_LIMITS_HPP
+#ifndef STAN__MATH__REV__CORE__STD_NUMERIC_LIMITS_HPP
+#define STAN__MATH__REV__CORE__STD_NUMERIC_LIMITS_HPP
 
 #include <limits>
 #include <stan/math/rev/core/var.hpp>
@@ -49,32 +49,6 @@ namespace std {
     static const bool tinyness_before = numeric_limits<double>::tinyness_before;
     static const float_round_style round_style = numeric_limits<double>::round_style;
   };
-
-  /**
-   * Checks if the given number is NaN.
-   * 
-   * Return <code>true</code> if the value of the
-   * specified variable is not a number.
-   *
-   * @param a Variable to test.
-   * @return <code>true</code> if value is not a number.
-   */
-  inline int isnan(const stan::agrad::var& a) {
-    return isnan(a.val());
-  }
-
-  /**
-   * Checks if the given number is infinite.
-   * 
-   * Return <code>true</code> if the value of the
-   * a is positive or negative infinity.
-   *
-   * @param a Variable to test.
-   * @return <code>true</code> if value is infinite.
-   */
-  inline int isinf(const stan::agrad::var& a) {
-    return isinf(a.val());
-  }
 
 }
 #endif

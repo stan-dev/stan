@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <stan/math/rev/core/recover_memory.hpp>
 #include <stan/math/prim/scal/fun/exp2.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>

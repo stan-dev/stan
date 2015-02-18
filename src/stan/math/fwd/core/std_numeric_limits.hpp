@@ -1,8 +1,7 @@
-#ifndef STAN__MATH__FWD__CORE__NUMERIC_LIMITS_HPP
-#define STAN__MATH__FWD__CORE__NUMERIC_LIMITS_HPP
+#ifndef STAN__MATH__FWD__CORE__STD_NUMERIC_LIMITS_HPP
+#define STAN__MATH__FWD__CORE__STD_NUMERIC_LIMITS_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
 
 namespace std {
 

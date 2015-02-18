@@ -4,7 +4,7 @@
 #include <stan/math/prim/scal/fun/fdim.hpp>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>
-#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/rev/core/std_numeric_limits.hpp>
 
 TEST(AgradRev,fdim_vv) {
   using stan::agrad::fdim;

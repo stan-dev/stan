@@ -2,9 +2,11 @@
 #define STAN__MATH__MIX__CORE__PARTIALS_VARI_HPP
 
 #include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/rev/core/chainable.hpp>
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/vari.hpp>
 #include <stan/math/fwd/core/fvar.hpp>
+
 namespace stan {
   namespace agrad {
 

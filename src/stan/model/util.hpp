@@ -17,6 +17,7 @@
 #include <stan/math/mix/mat/functor/jacobian.hpp>
 #include <stan/math/mix/mat/functor/partial_derivative.hpp>
 #include <stan/math/rev/core/grad.hpp>
+#include <stan/math/rev/core/recover_memory.hpp>
 
 #include <cmath>
 #include <iomanip>

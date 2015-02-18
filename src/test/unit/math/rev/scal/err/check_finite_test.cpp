@@ -1,4 +1,5 @@
 #include <stan/math/prim/scal/err/check_finite.hpp>
+#include <stan/math/rev/core/recover_memory.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 

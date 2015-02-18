@@ -6,6 +6,8 @@
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/grad.hpp>
 #include <stan/math/rev/core/set_zero_all_adjoints.hpp>
+#include <stan/math/rev/core/start_nested.hpp>
+#include <stan/math/rev/core/recover_memory_nested.hpp>
 #include <stan/math/mix/mat/functor/gradient_dot_vector.hpp>
 #include <vector>
 

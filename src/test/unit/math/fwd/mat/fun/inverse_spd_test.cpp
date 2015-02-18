@@ -1,3 +1,4 @@
+#include <stan/math/rev/core/recover_memory.hpp>
 #include <stan/math/prim/mat/fun/inverse_spd.hpp>
 #include <stan/math/fwd/mat/fun/inverse.hpp>
 #include <stan/math/rev/mat/fun/multiply.hpp>
