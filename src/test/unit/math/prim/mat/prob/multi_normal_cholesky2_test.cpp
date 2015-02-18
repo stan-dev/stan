@@ -20,6 +20,7 @@
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/mat/fun/dot_self.hpp>
+#include <stan/math/rev/mat/fun/columns_dot_self.hpp>
 
 #include <vector>
 #include <test/unit/math/prim/mat/prob/test_gradients.hpp>

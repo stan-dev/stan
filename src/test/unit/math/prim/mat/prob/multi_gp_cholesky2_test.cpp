@@ -24,6 +24,7 @@
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/mat/fun/sum.hpp>
 #include <stan/math/rev/mat/fun/dot_self.hpp>
+#include <stan/math/rev/mat/fun/columns_dot_self.hpp>
 
 // UTILITY FUNCTIONS FOR TESTING
 #include <vector>

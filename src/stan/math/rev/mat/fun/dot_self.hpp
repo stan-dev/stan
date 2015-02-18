@@ -79,22 +79,6 @@ namespace stan {
       return var(new dot_self_vari(v));
     }
 
-    /**
-     * Returns the dot product of each column of a matrix with itself.
-     * @param x Matrix.
-     * @tparam T scalar type
-     */
-    template<int R,int C>
-    inline Eigen::Matrix<var,1,C> 
-    columns_dot_self(const Eigen::Matrix<var,R,C>& x) {
-      Eigen::Matrix<var,1,C> ret(1,x.cols());
-      for (size_type i = 0; i < x.cols(); i++) {
-        ret(i) = var(new dot_self_vari(x.col(i)));
-      }
-      return ret;
-    }
-
-    
   }
 }
 #endif

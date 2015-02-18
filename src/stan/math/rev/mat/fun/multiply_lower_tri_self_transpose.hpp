@@ -11,6 +11,7 @@
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 #include <stan/math/rev/mat/fun/dot_product.hpp>
 #include <stan/math/rev/mat/fun/dot_self.hpp>
+#include <stan/math/rev/mat/fun/columns_dot_self.hpp>
 
 namespace stan {
   namespace agrad {
