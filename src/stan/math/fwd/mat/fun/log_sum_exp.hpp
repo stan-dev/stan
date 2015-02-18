@@ -8,9 +8,9 @@
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     // FIXME: cut-and-paste from fwd/log_sum_exp.hpp; should
     // be able to generalize

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <stan/math/fwd/mat/fun/sort.hpp>
+#include <stan/math/fwd/mat/fun/sort_asc.hpp>
+#include <stan/math/fwd/mat/fun/sort_desc.hpp>
 #include <stan/math/prim/mat/fun/sort.hpp>
 
 #include <stan/math/prim/mat/fun/typedefs.hpp>
