@@ -330,7 +330,11 @@
 #include <stan/math/prim/scal/prob/chi_square_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/chi_square_log.hpp>
 #include <stan/math/prim/scal/prob/chi_square_rng.hpp>
-#include <stan/math/prim/scal/prob/double_exponential.hpp>
+#include <stan/math/prim/scal/prob/double_exponential_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/double_exponential_cdf.hpp>
+#include <stan/math/prim/scal/prob/double_exponential_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/double_exponential_log.hpp>
+#include <stan/math/prim/scal/prob/double_exponential_rng.hpp>
 #include <stan/math/prim/scal/prob/exp_mod_normal.hpp>
 #include <stan/math/prim/scal/prob/exponential.hpp>
 #include <stan/math/prim/scal/prob/frechet.hpp>

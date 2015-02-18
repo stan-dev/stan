@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__CHI_SQUARE_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__CHI_SQUARE_HPP
+#ifndef STAN__MATH__PRIM__SCAL__PROB__CHI_SQUARE_CDF_LOG_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__CHI_SQUARE_CDF_LOG_HPP
 
 #include <boost/random/chi_squared_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
