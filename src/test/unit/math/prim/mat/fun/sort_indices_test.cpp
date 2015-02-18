@@ -1,5 +1,7 @@
 #include <stdexcept>
 #include <stan/math/prim/mat/fun/sort_indices.hpp>
+#include <stan/math/prim/mat/fun/sort_indices_asc.hpp>
+#include <stan/math/prim/mat/fun/sort_indices_desc.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <gtest/gtest.h>
 

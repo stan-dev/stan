@@ -74,31 +74,6 @@ namespace stan {
       }
     
     }
-    
-    /**
-     * Return a sorted copy of the argument container in ascending order.
-     *
-     * @tparam C type of container
-     * @param xs Container to sort
-     * @return sorted version of container
-     */
-    template <typename C>
-    std::vector<int> sort_indices_asc(const C& xs) {
-      return sort_indices<true>(xs);
-    }
-
-    /**
-     * Return a sorted copy of the argument container in ascending order.
-     *
-     * @tparam C type of container
-     * @param xs Container to sort
-     * @return sorted version of container
-     */
-    template <typename C>
-    std::vector<int> sort_indices_desc(const C& xs) {
-      return sort_indices<false>(xs);
-    }
-
 
   }
 }

@@ -16,6 +16,7 @@
 #include <stan/math/prim/mat/fun/log_determinant_spd.hpp>
 #include <stan/math/prim/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/quad_form.hpp>
+#include <stan/math/prim/mat/fun/quad_form_sym.hpp>
 #include <stan/math/prim/mat/fun/subtract.hpp>
 #include <stan/math/prim/mat/fun/tcrossprod.hpp>
 #include <stan/math/prim/mat/fun/trace_quad_form.hpp>
