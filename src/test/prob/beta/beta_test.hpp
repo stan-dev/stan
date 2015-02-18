@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/beta.hpp>
+#include <stan/math/prim/scal/prob/beta_log.hpp>
 
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>

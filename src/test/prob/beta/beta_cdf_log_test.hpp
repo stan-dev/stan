@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/beta.hpp>
+#include <stan/math/prim/scal/prob/beta_cdf_log.hpp>
 
 using std::vector;
 using std::numeric_limits;

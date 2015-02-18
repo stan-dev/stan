@@ -19,7 +19,8 @@
 #include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/scal/meta/prob_traits.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
-#include <stan/math/prim/scal/prob/beta.hpp>
+#include <stan/math/prim/scal/prob/beta_cdf.hpp>
+#include <stan/math/prim/scal/prob/beta_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/gamma.hpp>
 #include <stan/math/prim/scal/prob/poisson.hpp>
 #include <stan/math/prim/scal/prob/neg_binomial.hpp>
