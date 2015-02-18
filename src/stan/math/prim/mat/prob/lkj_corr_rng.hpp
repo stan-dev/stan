@@ -4,7 +4,6 @@
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
-#include <stan/math/prim/scal/prob/beta.hpp>
 #include <stan/math/prim/scal/meta/prob_traits.hpp>
 #include <stan/math/prim/scal/fun/transform.hpp>
 #include <stan/math/prim/mat/prob/lkj_corr_cholesky_rng.hpp>

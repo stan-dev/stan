@@ -314,7 +314,12 @@
 #include <stan/math/prim/scal/prob/beta_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/beta_log.hpp>
 #include <stan/math/prim/scal/prob/beta_rng.hpp>
-#include <stan/math/prim/scal/prob/binomial.hpp>
+#include <stan/math/prim/scal/prob/binomial_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/binomial_cdf.hpp>
+#include <stan/math/prim/scal/prob/binomial_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/binomial_log.hpp>
+#include <stan/math/prim/scal/prob/binomial_logit_log.hpp>
+#include <stan/math/prim/scal/prob/binomial_rng.hpp>
 #include <stan/math/prim/scal/prob/cauchy.hpp>
 #include <stan/math/prim/scal/prob/chi_square.hpp>
 #include <stan/math/prim/scal/prob/double_exponential.hpp>

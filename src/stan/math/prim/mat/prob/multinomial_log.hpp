@@ -10,7 +10,6 @@
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
-#include <stan/math/prim/scal/prob/binomial.hpp>
 #include <stan/math/prim/scal/meta/prob_traits.hpp>
 
 namespace stan {

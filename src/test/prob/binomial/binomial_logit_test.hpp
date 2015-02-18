@@ -1,5 +1,5 @@
 // Arguments: Ints, Ints, Doubles
-#include <stan/math/prim/scal/prob/binomial.hpp>
+#include <stan/math/prim/scal/prob/binomial_logit_log.hpp>
 
 #include <stan/math/prim/scal/fun/logit.hpp>
 #include <stan/math/prim/scal/fun/binomial_coefficient_log.hpp>

@@ -1,6 +1,5 @@
 // Arguments: Ints, Doubles, Doubles
 #include <stan/math/prim/scal/prob/neg_binomial_2.hpp>
-#include <stan/math/prim/scal/prob/binomial.hpp>
 
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <stan/math/prim/scal/fun/log_sum_exp.hpp>

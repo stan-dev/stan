@@ -16,7 +16,6 @@
 #include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/scal/meta/prob_traits.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
-#include <stan/math/prim/scal/prob/binomial.hpp>
 #include <stan/math/prim/scal/prob/beta_rng.hpp>
 #include <stan/math/prim/scal/fun/F32.hpp>
 #include <stan/math/prim/scal/fun/grad_F32.hpp>

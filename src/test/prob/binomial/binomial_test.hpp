@@ -1,5 +1,6 @@
 // Arguments: Ints, Ints, Doubles
-#include <stan/math/prim/scal/prob/binomial.hpp>
+#include <stan/math/prim/scal/prob/binomial_log.hpp>
+#include <stan/math/prim/scal/prob/binomial_cdf.hpp>
 #include <stan/math/prim/scal/prob/bernoulli_cdf.hpp>
 
 #include <stan/math/prim/scal/fun/multiply_log.hpp>

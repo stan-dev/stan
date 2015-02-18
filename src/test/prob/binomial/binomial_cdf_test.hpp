@@ -1,5 +1,5 @@
 // Arguments: Ints, Ints, Doubles
-#include <stan/math/prim/scal/prob/binomial.hpp>
+#include <stan/math/prim/scal/prob/binomial_cdf.hpp>
 #include <boost/math/special_functions/binomial.hpp>
 
 using std::vector;
