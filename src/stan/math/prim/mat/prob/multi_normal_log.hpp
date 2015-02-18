@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MULTI_NORMAL_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MULTI_NORMAL_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__MULTI_NORMAL_LOG_HPP
+#define STAN__MATH__PRIM__MAT__PROB__MULTI_NORMAL_LOG_HPP
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -129,33 +129,6 @@ namespace stan {
       return multi_normal_log<false>(y, mu, Sigma);
     }
 
-    template <class RNG>
-    inline Eigen::VectorXd
-    multi_normal_rng(const Eigen::Matrix<double, Dynamic, 1>& mu,
-                     const Eigen::Matrix<double, Dynamic, Dynamic>& S,
-                     RNG& rng) {
-      using boost::variate_generator;
-      using boost::normal_distribution;
-
-      static const char* function("stan::prob::multi_normal_rng");
-
-      using stan::math::check_finite;
-      using stan::math::check_positive;
-      using stan::math::check_symmetric;
-
-      check_positive(function, "Covariance matrix rows", S.rows());
-      check_symmetric(function, "Covariance matrix", S);
-      check_finite(function, "Location parameter", mu);
-
-      variate_generator<RNG&, normal_distribution<> >
-        std_normal_rng(rng, normal_distribution<>(0, 1));
-
-      Eigen::VectorXd z(S.cols());
-      for (int i = 0; i < S.cols(); i++)
-        z(i) = std_normal_rng();
-
-      return mu + S.llt().matrixL() * z;
-    }
   }
 }
 

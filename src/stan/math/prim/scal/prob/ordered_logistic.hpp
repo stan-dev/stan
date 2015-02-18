@@ -15,7 +15,7 @@
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
-#include <stan/math/prim/mat/prob/categorical.hpp>
+#include <stan/math/prim/mat/prob/categorical_rng.hpp>
 #include <stan/math/prim/scal/meta/prob_traits.hpp>
 
 namespace stan {

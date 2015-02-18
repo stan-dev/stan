@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__DIRICHLET_HPP
-#define STAN__MATH__PRIM__MAT__PROB__DIRICHLET_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__DIRICHLET_LOG_HPP
+#define STAN__MATH__PRIM__MAT__PROB__DIRICHLET_LOG_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
@@ -77,27 +77,6 @@ namespace stan {
     dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                   const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
       return dirichlet_log<false>(theta,alpha);
-    }
-
-    template <class RNG>
-    inline Eigen::VectorXd
-    dirichlet_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& alpha,
-                  RNG& rng) {
-      using boost::variate_generator;
-      using boost::gamma_distribution;
-
-      double sum = 0;
-      Eigen::VectorXd y(alpha.rows());
-      for(int i = 0; i < alpha.rows(); i++) {
-        variate_generator<RNG&, gamma_distribution<> >
-          gamma_rng(rng, gamma_distribution<>(alpha(i,0),1));
-        y(i) = gamma_rng();
-        sum += y(i);
-      }
-
-      for(int i = 0; i < alpha.rows(); i++)
-        y(i) /= sum;
-      return y;
     }
   }
 }

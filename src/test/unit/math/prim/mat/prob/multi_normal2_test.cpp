@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <stan/math/prim/mat/prob/multi_normal.hpp>
+#include <stan/math/prim/mat/prob/multi_normal_log.hpp>
 #include <stan/math/rev/mat/fun/to_var.hpp>
 #include <stan/math/rev/core/operator_addition.hpp>
 #include <stan/math/rev/core/operator_division.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MATRIX_NORMAL_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MATRIX_NORMAL_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__MATRIX_NORMAL_PREC_LOG_HPP
+#define STAN__MATH__PRIM__MAT__PROB__MATRIX_NORMAL_PREC_LOG_HPP
 
 #include <stan/math/prim/mat/err/check_ldlt_factor.hpp>
 #include <stan/math/prim/mat/err/check_size_match.hpp>

@@ -23,7 +23,7 @@
 #include <stan/math/fwd/core/operator_subtraction.hpp>
 #include <stan/math/fwd/core/operator_unary_minus.hpp>
 #include <stan/math/prim/mat/fun/log_softmax.hpp>
-#include <stan/math/prim/mat/prob/categorical_logit.hpp>
+#include <stan/math/prim/mat/prob/categorical_logit_log.hpp>
 #include <stan/math/fwd/mat/fun/log_softmax.hpp>
 #include <stan/math/fwd/mat/fun/log_sum_exp.hpp>
 #include <stan/math/rev/mat/fun/log_softmax.hpp>

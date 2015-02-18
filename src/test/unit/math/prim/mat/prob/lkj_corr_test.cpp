@@ -53,7 +53,10 @@
 #include <stan/math/fwd/scal/fun/tan.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/fwd/scal/fun/value_of_rec.hpp>
-#include <stan/math/prim/mat/prob/lkj_corr.hpp>
+#include <stan/math/prim/mat/prob/lkj_corr_log.hpp>
+#include <stan/math/prim/mat/prob/lkj_corr_rng.hpp>
+#include <stan/math/prim/mat/prob/lkj_corr_cholesky_log.hpp>
+#include <stan/math/prim/mat/prob/lkj_corr_cholesky_rng.hpp>
 #include <stan/math/prim/scal/prob/uniform.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>

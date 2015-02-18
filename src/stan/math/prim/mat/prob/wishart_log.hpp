@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__WISHART_HPP
-#define STAN__MATH__PRIM__MAT__PROB__WISHART_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__WISHART_LOG_HPP
+#define STAN__MATH__PRIM__MAT__PROB__WISHART_LOG_HPP
 
 #include <stan/math/prim/mat/err/check_size_match.hpp>
 #include <stan/math/prim/mat/err/check_ldlt_factor.hpp>
@@ -126,37 +126,6 @@ namespace stan {
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
       return wishart_log<false>(W,nu,S);
     }
-
-    template <class RNG>
-    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
-    wishart_rng(const double nu,
-                const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
-                RNG& rng) {
-
-      using Eigen::MatrixXd;
-      using stan::math::index_type;
-      using stan::math::check_positive;
-      using stan::math::check_size_match;
-      using stan::math::check_square;
-
-      static const char* function("stan::prob::wishart_rng");
-
-      typename index_type<MatrixXd>::type k = S.rows();
-
-      check_positive(function, "degrees of freedom", nu);
-      check_square(function, "scale parameter", S);
-
-      MatrixXd B = MatrixXd::Zero(k, k);
-
-      for (int j = 0; j < k; ++j) {
-        for (int i = 0; i < j; ++i)
-          B(i, j) = normal_rng(0, 1, rng);
-        B(j,j) = std::sqrt(chi_square_rng(nu - j, rng));
-      }
-                
-      return stan::math::crossprod(B * S.llt().matrixU());
-    }
-
 
   }
 

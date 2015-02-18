@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/math/prim/mat/prob/inv_wishart.hpp>
+#include <stan/math/prim/mat/prob/inv_wishart_log.hpp>
 #include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
 #include <stan/math/rev/mat/fun/to_var.hpp>
 #include <stan/math/rev/core/operator_addition.hpp>

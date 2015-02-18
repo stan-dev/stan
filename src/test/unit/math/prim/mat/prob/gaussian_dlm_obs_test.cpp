@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/math/prim/mat/prob/gaussian_dlm_obs.hpp>
+#include <stan/math/prim/mat/prob/gaussian_dlm_obs_log.hpp>
 #include <stan/math/rev/core/operator_addition.hpp>
 #include <stan/math/rev/core/operator_division.hpp>
 #include <stan/math/rev/core/operator_divide_equal.hpp>

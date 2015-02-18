@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include <stan/math/prim/mat/prob/multi_student_t.hpp>
+#include <stan/math/prim/mat/prob/multi_student_t_log.hpp>
+#include <stan/math/prim/mat/prob/multi_student_t_rng.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
 #include <stan/math/rev/core/operator_addition.hpp>

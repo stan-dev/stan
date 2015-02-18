@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/math/prim/mat/prob/matrix_normal.hpp>
+#include <stan/math/prim/mat/prob/matrix_normal_prec_log.hpp>
 #include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/fwd/mat/fun/eigen_numtraits.hpp>
 #include <stan/math/fwd/core/std_numeric_limits.hpp>
