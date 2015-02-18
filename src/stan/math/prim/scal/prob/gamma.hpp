@@ -3,7 +3,7 @@
 
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <stan/math/mix/scal/meta/partials_vari.hpp>
+#include <stan/math/mix/core/partials_vari.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
 #include <stan/math/prim/scal/err/check_less_or_equal.hpp>

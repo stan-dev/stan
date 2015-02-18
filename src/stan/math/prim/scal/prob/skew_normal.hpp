@@ -3,7 +3,7 @@
 
 #include <boost/random/variate_generator.hpp>
 #include <boost/math/distributions.hpp>
-#include <stan/math/mix/scal/meta/partials_vari.hpp>
+#include <stan/math/mix/core/partials_vari.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>

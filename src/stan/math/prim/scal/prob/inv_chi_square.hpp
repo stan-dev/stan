@@ -3,7 +3,7 @@
 
 #include <boost/random/chi_squared_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <stan/math/mix/scal/meta/partials_vari.hpp>
+#include <stan/math/mix/core/partials_vari.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>

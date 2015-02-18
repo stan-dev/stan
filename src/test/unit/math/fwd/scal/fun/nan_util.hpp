@@ -2,8 +2,8 @@
 #define TEST__UNIT_AGRAD_FWD__NAN_UTIL_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/fwd/core/numeric_limits.hpp>
-#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/fwd/core/std_numeric_limits.hpp>
+#include <stan/math/rev/core/std_numeric_limits.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/fwd/core/fvar.hpp>

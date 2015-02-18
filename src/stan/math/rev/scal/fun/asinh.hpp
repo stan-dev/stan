@@ -5,7 +5,7 @@
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/v_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/rev/core/std_numeric_limits.hpp>
 #include <stan/math/rev/core/operator_equal.hpp>
 #include <stan/math/rev/core/operator_unary_negative.hpp>
 #include <math.h>

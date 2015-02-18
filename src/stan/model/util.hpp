@@ -7,8 +7,17 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/mat/fun/grad.hpp>
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/mix/mat/functor/autodiff.hpp>
+#include <stan/math/mix/mat/functor/derivative.hpp>
+#include <stan/math/mix/mat/functor/grad_hessian.hpp>
+#include <stan/math/mix/mat/functor/grad_tr_mat_times_hessian.hpp>
+#include <stan/math/mix/mat/functor/gradient.hpp>
+#include <stan/math/mix/mat/functor/gradient_dot_vector.hpp>
+#include <stan/math/mix/mat/functor/hessian.hpp>
+#include <stan/math/mix/mat/functor/hessian_times_vector.hpp>
+#include <stan/math/mix/mat/functor/jacobian.hpp>
+#include <stan/math/mix/mat/functor/partial_derivative.hpp>
 #include <stan/math/rev/core/grad.hpp>
+#include <stan/math/rev/core/recover_memory.hpp>
 
 #include <cmath>
 #include <iomanip>

@@ -4,7 +4,7 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/fwd/core/numeric_limits.hpp>
+#include <stan/math/fwd/core/std_numeric_limits.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 
 namespace stan {

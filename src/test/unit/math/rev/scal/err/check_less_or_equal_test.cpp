@@ -1,5 +1,6 @@
 #include <stan/math/prim/scal/err/check_less_or_equal.hpp>
 #include <gtest/gtest.h>
+#include <stan/math/rev/core/recover_memory.hpp>
 #include <stan/math/rev/core/operator_addition.hpp>
 #include <stan/math/rev/core/operator_divide_equal.hpp>
 #include <stan/math/rev/core/operator_division.hpp>
@@ -19,7 +20,7 @@
 #include <stan/math/rev/core/operator_unary_negative.hpp>
 #include <stan/math/rev/core/operator_unary_not.hpp>
 #include <stan/math/rev/core/operator_unary_plus.hpp>
-#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/rev/core/std_numeric_limits.hpp>
 
 using stan::math::check_less_or_equal;
 using stan::agrad::var;

@@ -3,7 +3,7 @@
 
 #include <boost/random/binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <stan/math/mix/scal/meta/partials_vari.hpp>
+#include <stan/math/mix/core/partials_vari.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>

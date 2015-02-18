@@ -33,8 +33,8 @@
 #include <stan/math/rev/core/operator_unary_plus.hpp>
 #include <stan/math/fwd/scal/fun/ceil.hpp>
 #include <stan/math/rev/scal/fun/ceil.hpp>
-#include <stan/math/fwd/core/numeric_limits.hpp>
-#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/fwd/core/std_numeric_limits.hpp>
+#include <stan/math/rev/core/std_numeric_limits.hpp>
 
 TEST(AgradFwdCeil,Fvar) {
   using stan::agrad::fvar;

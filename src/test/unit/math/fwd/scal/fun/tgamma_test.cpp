@@ -36,8 +36,8 @@
 #include <stan/math/rev/scal/fun/tgamma.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
-#include <stan/math/fwd/core/numeric_limits.hpp>
-#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/fwd/core/std_numeric_limits.hpp>
+#include <stan/math/rev/core/std_numeric_limits.hpp>
 
 TEST(AgradFwdTgamma, Fvar) {
   using stan::agrad::fvar;

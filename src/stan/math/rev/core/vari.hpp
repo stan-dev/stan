@@ -1,10 +1,10 @@
 #ifndef STAN__MATH__REV__CORE__VARI_HPP
 #define STAN__MATH__REV__CORE__VARI_HPP
 
-#include <ostream>
-
-#include <stan/math/rev/core/var_stack.hpp>
 #include <stan/math/rev/core/chainable.hpp>
+#include <stan/math/rev/core/chainable_alloc.hpp>
+#include <stan/math/rev/core/chainablestack.hpp>
+#include <ostream>
 
 namespace stan {
   namespace agrad {

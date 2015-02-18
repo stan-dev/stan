@@ -4,7 +4,7 @@
 #include <boost/random/normal_distribution.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <stan/math/mix/scal/meta/partials_vari.hpp>
+#include <stan/math/mix/core/partials_vari.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>

@@ -2,7 +2,8 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/constants.hpp>
-#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/rev/core/std_numeric_limits.hpp>
+#include <stan/math/rev/core/std_isnan.hpp>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev,tan_var) {

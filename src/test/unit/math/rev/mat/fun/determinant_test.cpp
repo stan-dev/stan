@@ -25,7 +25,7 @@
 #include <stan/math/rev/core/operator_unary_not.hpp>
 #include <stan/math/rev/core/operator_unary_plus.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
-#include <stan/math/rev/core/numeric_limits.hpp>
+#include <stan/math/rev/core/std_numeric_limits.hpp>
 
 TEST(AgradRevMatrix,determinant) {
   using stan::agrad::matrix_v;
