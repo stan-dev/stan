@@ -1,4 +1,4 @@
-#include <stan/math/prim/scal/prob/exp_mod_normal.hpp>
+#include <stan/math/prim/scal/prob/exp_mod_normal_rng.hpp>
 #include <boost/math/distributions.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>

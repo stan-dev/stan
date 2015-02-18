@@ -1,5 +1,6 @@
 // Arguments: Doubles, Doubles
-#include <stan/math/prim/scal/prob/exponential.hpp>
+#include <stan/math/prim/scal/prob/exponential_log.hpp>
+#include <stan/math/prim/scal/prob/exponential_cdf.hpp>
 
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 
