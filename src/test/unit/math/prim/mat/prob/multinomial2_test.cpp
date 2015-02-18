@@ -18,6 +18,9 @@
 #include <stan/math/rev/core/operator_not_equal.hpp>
 #include <stan/math/rev/core/operator_subtraction.hpp>
 #include <stan/math/rev/core/operator_unary_negative.hpp>
+#include <stan/math/rev/scal/fun/fabs.hpp>
+#include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/rev/scal/fun/multiply_log.hpp>
 
 template <typename T_prob>
 void expect_propto(std::vector<int>& ns1, T_prob theta1, 
