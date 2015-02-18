@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include <stan/math/prim/mat/prob/wishart.hpp>
+#include <stan/math/prim/mat/prob/wishart_log.hpp>
+#include <stan/math/prim/mat/prob/wishart_rng.hpp>
 #include <stan/math/fwd/mat/fun/mdivide_left_ldlt.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/special_functions/digamma.hpp>

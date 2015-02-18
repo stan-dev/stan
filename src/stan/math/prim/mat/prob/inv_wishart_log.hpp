@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__INV_WISHART_HPP
-#define STAN__MATH__PRIM__MAT__PROB__INV_WISHART_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__INV_WISHART_LOG_HPP
+#define STAN__MATH__PRIM__MAT__PROB__INV_WISHART_LOG_HPP
 
 #include <stan/math/prim/mat/err/check_ldlt_factor.hpp>
 #include <stan/math/prim/scal/err/check_greater.hpp>
@@ -11,7 +11,7 @@
 #include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/prob_traits.hpp>
-#include <stan/math/prim/mat/prob/wishart.hpp>
+#include <stan/math/prim/mat/prob/wishart_log.hpp>
 
 namespace stan {
   namespace prob {
@@ -120,29 +120,6 @@ namespace stan {
       return inv_wishart_log<false>(W,nu,S);
     }
 
-    template <class RNG>
-    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
-    inv_wishart_rng(const double nu,
-                    const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
-                    RNG& rng) {
-
-      static const char* function("stan::prob::inv_wishart_rng");
-      
-      using stan::math::check_greater;
-      using stan::math::check_square;
-      using Eigen::MatrixXd;
-      using stan::math::index_type;
-
-      typename index_type<MatrixXd>::type k = S.rows();
-      
-      check_greater(function, "Degrees of freedom parameter", nu, k-1);
-      check_square(function, "scale parameter", S);
-
-      MatrixXd S_inv = MatrixXd::Identity(k, k);
-      S_inv = S.ldlt().solve(S_inv);
-
-      return wishart_rng(nu, S_inv, rng).inverse();
-    }
   }
 }
 #endif

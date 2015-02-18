@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__GAUSSIAN_DLM_OBS_HPP
-#define STAN__MATH__PRIM__MAT__PROB__GAUSSIAN_DLM_OBS_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__GAUSSIAN_DLM_OBS_LOG_HPP
+#define STAN__MATH__PRIM__MAT__PROB__GAUSSIAN_DLM_OBS_LOG_HPP
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

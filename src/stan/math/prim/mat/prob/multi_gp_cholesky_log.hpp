@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MULTI_GP_CHOLESKY_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MULTI_GP_CHOLESKY_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__MULTI_GP_CHOLESKY_LOG_HPP
+#define STAN__MATH__PRIM__MAT__PROB__MULTI_GP_CHOLESKY_LOG_HPP
 
 #include <stan/math/prim/mat/err/check_size_match.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>

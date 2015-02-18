@@ -37,7 +37,8 @@
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/abs.hpp>
 
-#include <stan/math/prim/mat/prob/inv_wishart.hpp>
+#include <stan/math/prim/mat/prob/inv_wishart_log.hpp>
+#include <stan/math/prim/mat/prob/inv_wishart_rng.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>

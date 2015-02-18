@@ -21,7 +21,8 @@
 #include <stan/math/fwd/core/operator_multiplication.hpp>
 #include <stan/math/fwd/core/operator_subtraction.hpp>
 #include <stan/math/fwd/core/operator_unary_minus.hpp>
-#include <stan/math/prim/mat/prob/categorical.hpp>
+#include <stan/math/prim/mat/prob/categorical_log.hpp>
+#include <stan/math/prim/mat/prob/categorical_rng.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/rev/scal/fun/fabs.hpp>

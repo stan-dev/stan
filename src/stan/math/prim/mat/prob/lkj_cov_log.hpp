@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__LKJ_COV_HPP
-#define STAN__MATH__PRIM__MAT__PROB__LKJ_COV_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__LKJ_COV_LOG_HPP
+#define STAN__MATH__PRIM__MAT__PROB__LKJ_COV_LOG_HPP
 
 #include <stan/math/prim/mat/err/check_size_match.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>
@@ -8,7 +8,7 @@
 #include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/prob/lognormal.hpp>
-#include <stan/math/prim/mat/prob/lkj_corr.hpp>
+#include <stan/math/prim/mat/prob/lkj_corr_log.hpp>
 #include <stan/math/prim/scal/meta/prob_traits.hpp>
 
 namespace stan {

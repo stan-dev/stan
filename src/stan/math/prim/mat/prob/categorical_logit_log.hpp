@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_LOGIT_HPP
-#define STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_LOGIT_HPP
+#ifndef STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_LOGIT_LOG_HPP
+#define STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_LOGIT_LOG_HPP
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>

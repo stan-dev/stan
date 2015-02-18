@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/math/prim/mat/prob/lkj_cov.hpp>
+#include <stan/math/prim/mat/prob/lkj_cov_log.hpp>
 
 TEST(ProbDistributionsLkjCorr,testIdentity) {
   unsigned int K = 4;
