@@ -1,5 +1,5 @@
 // Arguments: Ints, Ints, Doubles, Doubles
-#include <stan/math/prim/scal/prob/beta_binomial.hpp>
+#include <stan/math/prim/scal/prob/beta_binomial_ccdf_log.hpp>
 #include <boost/math/special_functions/binomial.hpp>
 
 #include <stan/math/prim/scal/fun/lbeta.hpp>
