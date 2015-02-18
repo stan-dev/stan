@@ -1,6 +1,8 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/prim/mat/fun/sort_indices.hpp>
+#include <stan/math/prim/mat/fun/sort_indices_asc.hpp>
+#include <stan/math/prim/mat/fun/sort_indices_desc.hpp>
 #include <stan/math/rev/core/operator_addition.hpp>
 #include <stan/math/rev/core/operator_divide_equal.hpp>
 #include <stan/math/rev/core/operator_division.hpp>

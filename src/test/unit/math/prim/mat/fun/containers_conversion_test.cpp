@@ -1,4 +1,8 @@
-#include <stan/math/prim/mat/fun/containers_conversion.hpp>
+#include <stan/math/prim/mat/fun/to_matrix.hpp>
+#include <stan/math/prim/mat/fun/to_vector.hpp>
+#include <stan/math/prim/mat/fun/to_row_vector.hpp>
+#include <stan/math/prim/mat/fun/to_array_2d.hpp>
+#include <stan/math/prim/mat/fun/to_array_1d.hpp>
 #include <test/unit/math/prim/mat/fun/expect_matrix_eq.hpp>
 #include <gtest/gtest.h>
 

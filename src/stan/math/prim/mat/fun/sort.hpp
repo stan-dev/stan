@@ -55,7 +55,7 @@ namespace stan {
      * @return Eigen vector ordered.
      * @tparam T Type of elements of the vector.
      */
- template <typename T, int R, int C>
+    template <typename T, int R, int C>
     inline typename Eigen::Matrix<T,R,C> sort_desc(Eigen::Matrix<T,R,C> xs) {
       std::sort(xs.data(), xs.data()+xs.size(), std::greater<T>());
       return xs;

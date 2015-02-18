@@ -58,7 +58,6 @@
 #include <stan/math/prim/mat/fun/columns_dot_product.hpp>
 #include <stan/math/prim/mat/fun/columns_dot_self.hpp>
 #include <stan/math/prim/mat/fun/common_type.hpp>
-#include <stan/math/prim/mat/fun/containers_conversion.hpp>
 #include <stan/math/prim/mat/fun/crossprod.hpp>
 #include <stan/math/prim/mat/fun/cumulative_sum.hpp>
 #include <stan/math/prim/mat/fun/determinant.hpp>
@@ -118,6 +117,7 @@
 #include <stan/math/prim/mat/fun/qr_R.hpp>
 #include <stan/math/prim/mat/fun/quad_form.hpp>
 #include <stan/math/prim/mat/fun/quad_form_diag.hpp>
+#include <stan/math/prim/mat/fun/quad_form_sym.hpp>
 #include <stan/math/prim/mat/fun/rank.hpp>
 #include <stan/math/prim/mat/fun/rep_matrix.hpp>
 #include <stan/math/prim/mat/fun/rep_row_vector.hpp>
@@ -142,6 +142,11 @@
 #include <stan/math/prim/mat/fun/sum.hpp>
 #include <stan/math/prim/mat/fun/tail.hpp>
 #include <stan/math/prim/mat/fun/tcrossprod.hpp>
+#include <stan/math/prim/mat/fun/to_array_1d.hpp>
+#include <stan/math/prim/mat/fun/to_array_2d.hpp>
+#include <stan/math/prim/mat/fun/to_matrix.hpp>
+#include <stan/math/prim/mat/fun/to_row_vector.hpp>
+#include <stan/math/prim/mat/fun/to_vector.hpp>
 #include <stan/math/prim/mat/fun/trace.hpp>
 #include <stan/math/prim/mat/fun/trace_gen_inv_quad_form_ldlt.hpp>
 #include <stan/math/prim/mat/fun/trace_gen_quad_form.hpp>
@@ -467,7 +472,7 @@
 #include <stan/math/rev/scal/fun/bessel_second_kind.hpp>
 #include <stan/math/rev/scal/fun/binary_log_loss.hpp>
 #include <stan/math/rev/scal/fun/boost_fpclassify.hpp>
-#include <stan/math/rev/scal/fun/boost_isinfinite.hpp>
+#include <stan/math/rev/scal/fun/boost_isfinite.hpp>
 #include <stan/math/rev/scal/fun/boost_isinf.hpp>
 #include <stan/math/rev/scal/fun/boost_isnan.hpp>
 #include <stan/math/rev/scal/fun/boost_isnormal.hpp>
