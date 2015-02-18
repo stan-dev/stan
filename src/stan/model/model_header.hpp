@@ -320,7 +320,11 @@
 #include <stan/math/prim/scal/prob/binomial_log.hpp>
 #include <stan/math/prim/scal/prob/binomial_logit_log.hpp>
 #include <stan/math/prim/scal/prob/binomial_rng.hpp>
-#include <stan/math/prim/scal/prob/cauchy.hpp>
+#include <stan/math/prim/scal/prob/cauchy_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/cauchy_cdf.hpp>
+#include <stan/math/prim/scal/prob/cauchy_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/cauchy_log.hpp>
+#include <stan/math/prim/scal/prob/cauchy_rng.hpp>
 #include <stan/math/prim/scal/prob/chi_square.hpp>
 #include <stan/math/prim/scal/prob/double_exponential.hpp>
 #include <stan/math/prim/scal/prob/exp_mod_normal.hpp>

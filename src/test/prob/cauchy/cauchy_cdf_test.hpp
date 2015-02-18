@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/cauchy.hpp>
+#include <stan/math/prim/scal/prob/cauchy_cdf.hpp>
 
 #include <stan/math/prim/scal/fun/constants.hpp>
 
