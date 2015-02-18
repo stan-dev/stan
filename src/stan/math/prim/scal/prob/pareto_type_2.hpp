@@ -2,7 +2,7 @@
 #define STAN__MATH__PRIM__SCAL__PROB__PARETO_TYPE_2_HPP
 
 #include <boost/random/variate_generator.hpp>
-#include <stan/math/mix/scal/meta/partials_vari.hpp>
+#include <stan/math/mix/core/partials_vari.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_greater_or_equal.hpp>

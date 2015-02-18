@@ -10,7 +10,7 @@
 #include <stan/math/prim/scal/fun/log_mix.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/traits.hpp>
-#include <stan/math/mix/scal/meta/partials_vari.hpp>
+#include <stan/math/mix/core/partials_vari.hpp>
 
 
 namespace stan {

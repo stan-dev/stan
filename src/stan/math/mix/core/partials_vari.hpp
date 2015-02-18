@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MIX__SCAL__META__PARTIALS_VARI_HPP
-#define STAN__MATH__MIX__SCAL__META__PARTIALS_VARI_HPP
+#ifndef STAN__MATH__MIX__CORE__PARTIALS_VARI_HPP
+#define STAN__MATH__MIX__CORE__PARTIALS_VARI_HPP
 
 #include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/rev/core/var.hpp>
