@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles
-#include <stan/math/prim/scal/prob/chi_square.hpp>
+#include <stan/math/prim/scal/prob/chi_square_cdf_log.hpp>
 
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 

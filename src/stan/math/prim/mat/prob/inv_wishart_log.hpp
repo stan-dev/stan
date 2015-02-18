@@ -11,7 +11,8 @@
 #include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/prob_traits.hpp>
-#include <stan/math/prim/mat/prob/wishart_log.hpp>
+#include <stan/math/prim/scal/fun/lmgamma.hpp>
+#include <stan/math/prim/mat/fun/trace.hpp>
 
 namespace stan {
   namespace prob {

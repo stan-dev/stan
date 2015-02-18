@@ -325,7 +325,11 @@
 #include <stan/math/prim/scal/prob/cauchy_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/cauchy_log.hpp>
 #include <stan/math/prim/scal/prob/cauchy_rng.hpp>
-#include <stan/math/prim/scal/prob/chi_square.hpp>
+#include <stan/math/prim/scal/prob/chi_square_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/chi_square_cdf.hpp>
+#include <stan/math/prim/scal/prob/chi_square_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/chi_square_log.hpp>
+#include <stan/math/prim/scal/prob/chi_square_rng.hpp>
 #include <stan/math/prim/scal/prob/double_exponential.hpp>
 #include <stan/math/prim/scal/prob/exp_mod_normal.hpp>
 #include <stan/math/prim/scal/prob/exponential.hpp>

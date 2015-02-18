@@ -17,7 +17,6 @@
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/prob/normal.hpp>
-#include <stan/math/prim/scal/prob/chi_square.hpp>
 #include <stan/math/prim/scal/meta/prob_traits.hpp>
 
 namespace stan {
