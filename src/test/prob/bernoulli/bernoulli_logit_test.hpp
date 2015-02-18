@@ -1,5 +1,5 @@
 // Arguments: Ints, Doubles
-#include <stan/math/prim/scal/prob/bernoulli.hpp>
+#include <stan/math/prim/scal/prob/bernoulli_logit_log.hpp>
 
 #include <stan/math/prim/scal/fun/logit.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>

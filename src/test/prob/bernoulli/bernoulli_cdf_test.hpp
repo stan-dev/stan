@@ -1,5 +1,5 @@
 // Arguments: Ints, Doubles
-#include <stan/math/prim/scal/prob/bernoulli.hpp>
+#include <stan/math/prim/scal/prob/bernoulli_cdf.hpp>
 
 using std::vector;
 using std::numeric_limits;

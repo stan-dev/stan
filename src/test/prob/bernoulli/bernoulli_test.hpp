@@ -1,5 +1,6 @@
 // Arguments: Ints, Doubles
-#include <stan/math/prim/scal/prob/bernoulli.hpp>
+#include <stan/math/prim/scal/prob/bernoulli_log.hpp>
+#include <stan/math/prim/scal/prob/bernoulli_cdf.hpp>
 
 #include <stan/math/prim/scal/fun/log1m.hpp>
 
