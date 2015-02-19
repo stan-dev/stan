@@ -360,7 +360,8 @@
 #include <stan/math/prim/scal/prob/gumbel_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/gumbel_log.hpp>
 #include <stan/math/prim/scal/prob/gumbel_rng.hpp>
-#include <stan/math/prim/scal/prob/hypergeometric.hpp>
+#include <stan/math/prim/scal/prob/hypergeometric_log.hpp>
+#include <stan/math/prim/scal/prob/hypergeometric_rng.hpp>
 #include <stan/math/prim/scal/prob/inv_chi_square.hpp>
 #include <stan/math/prim/scal/prob/inv_gamma.hpp>
 #include <stan/math/prim/scal/prob/logistic.hpp>
