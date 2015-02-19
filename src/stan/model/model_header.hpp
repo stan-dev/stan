@@ -476,7 +476,11 @@
 #include <stan/math/prim/scal/prob/student_t_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/student_t_log.hpp>
 #include <stan/math/prim/scal/prob/student_t_rng.hpp>
-#include <stan/math/prim/scal/prob/uniform.hpp>
+#include <stan/math/prim/scal/prob/uniform_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/uniform_cdf.hpp>
+#include <stan/math/prim/scal/prob/uniform_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/uniform_log.hpp>
+#include <stan/math/prim/scal/prob/uniform_rng.hpp>
 #include <stan/math/prim/scal/prob/von_mises.hpp>
 #include <stan/math/prim/scal/prob/weibull.hpp>
 #include <stan/math/rev/arr/functor/coupled_ode_system.hpp>

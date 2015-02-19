@@ -10,7 +10,7 @@
 #include <stan/math/prim/scal/meta/is_constant_struct.hpp>
 #include <stan/math/prim/scal/fun/modified_bessel_first_kind.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
-#include <stan/math/prim/scal/prob/uniform.hpp>
+#include <stan/math/prim/scal/prob/uniform_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan { 

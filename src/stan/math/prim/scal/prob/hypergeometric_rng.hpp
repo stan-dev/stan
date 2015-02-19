@@ -17,7 +17,7 @@
 #include <stan/math/prim/scal/meta/return_type.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
-#include <stan/math/prim/scal/prob/uniform.hpp>
+#include <stan/math/prim/scal/prob/uniform_rng.hpp>
 
 namespace stan {
 

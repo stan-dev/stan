@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/uniform.hpp>
+#include <stan/math/prim/scal/prob/uniform_log.hpp>
 
 using std::vector;
 using std::numeric_limits;
