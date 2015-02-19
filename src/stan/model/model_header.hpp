@@ -444,7 +444,11 @@
 #include <stan/math/prim/scal/prob/pareto_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/pareto_log.hpp>
 #include <stan/math/prim/scal/prob/pareto_rng.hpp>
-#include <stan/math/prim/scal/prob/pareto_type_2.hpp>
+#include <stan/math/prim/scal/prob/pareto_type_2_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/pareto_type_2_cdf.hpp>
+#include <stan/math/prim/scal/prob/pareto_type_2_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/pareto_type_2_log.hpp>
+#include <stan/math/prim/scal/prob/pareto_type_2_rng.hpp>
 #include <stan/math/prim/scal/prob/poisson.hpp>
 #include <stan/math/prim/scal/prob/rayleigh.hpp>
 #include <stan/math/prim/scal/prob/scaled_inv_chi_square.hpp>
