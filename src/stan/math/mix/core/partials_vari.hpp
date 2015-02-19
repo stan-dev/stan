@@ -3,7 +3,7 @@
 
 #include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/fwd/scal/meta/is_fvar.hpp>
-
+#include <stan/math/fwd/scal/meta/partials_type.hpp>
 #include <stan/math/prim/scal/meta/is_vector.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/is_vector_like.hpp>
@@ -17,6 +17,7 @@
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/vari.hpp>
 #include <stan/math/rev/scal/meta/is_var.hpp>
+#include <stan/math/rev/scal/meta/partials_type.hpp>
 
 namespace stan {
   namespace agrad {

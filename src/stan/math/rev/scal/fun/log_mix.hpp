@@ -12,7 +12,6 @@
 #include <stan/math/prim/scal/meta/is_constant_struct.hpp>
 #include <stan/math/mix/core/partials_vari.hpp>
 
-
 namespace stan {
 
   namespace agrad {
