@@ -179,4 +179,4 @@ clean-all: clean clean-manual clean-deps
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
 	@echo '  removing generated test files'
-	$(shell find src/test/unit-distribution -name '*_generated_*_test.cpp' -type f -exec rm {} +)
+	$(shell find src/test/prob -name '*_generated_*_test.cpp' -type f -exec rm {} +)
