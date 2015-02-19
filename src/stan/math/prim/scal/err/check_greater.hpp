@@ -3,6 +3,9 @@
 
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <stan/math/prim/arr/err/domain_error_vec.hpp>
+#include <stan/math/prim/scal/meta/is_vector_like.hpp>
+#include <stan/math/prim/scal/meta/VectorView.hpp>
+#include <stan/math/prim/scal/meta/length.hpp>
 #include <string>
 
 namespace stan {

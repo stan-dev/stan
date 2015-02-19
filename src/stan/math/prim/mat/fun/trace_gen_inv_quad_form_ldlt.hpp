@@ -9,6 +9,7 @@
 #include <stan/math/prim/mat/fun/trace.hpp>
 #include <stan/math/prim/mat/fun/transpose.hpp>
 #include <stan/math/prim/mat/fun/multiply.hpp>
+#include <stan/math/prim/scal/meta/is_var.hpp>
 
 namespace stan {
   namespace math {

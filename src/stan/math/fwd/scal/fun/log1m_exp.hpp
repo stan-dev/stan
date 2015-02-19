@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__SCAL__FUN__LOG1M_EXP_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <stan/math/prim/scal/fun/log1m_exp.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>

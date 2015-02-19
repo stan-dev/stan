@@ -2,7 +2,7 @@
 #define STAN__MATH__PRIM__MAT__FUN__TO_VECTOR_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp> //stan::scalar_type
+ //stan::scalar_type
 #include <vector>
 
 namespace stan {

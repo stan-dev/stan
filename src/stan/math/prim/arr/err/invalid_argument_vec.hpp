@@ -5,7 +5,8 @@
 #include <string>
 #include <stan/math/prim/scal/err/invalid_argument.hpp>
 #include <stan/math/prim/scal/meta/value_type.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/error_index.hpp>
+#include <stan/math/prim/scal/meta/get.hpp>
 
 namespace stan {
 

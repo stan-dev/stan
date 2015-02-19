@@ -2,7 +2,7 @@
 #define STAN__MATH__PRIM__MAT__ERR__CHECK_STD_VECTOR_INDEX_HPP
 
 #include <stan/math/prim/scal/err/out_of_range.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <sstream>
 #include <string>
 #include <vector>

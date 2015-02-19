@@ -4,6 +4,7 @@
 #include <test/unit/math/prim/arr/functor/harmonic_oscillator.hpp>
 #include <test/unit/math/prim/arr/functor/mock_ode_functor.hpp>
 #include <test/unit/math/prim/arr/functor/mock_throwing_ode_functor.hpp>
+#include <stan/math/rev/core/var.hpp>
 
 struct StanMathOde : public ::testing::Test {
   std::stringstream msgs;

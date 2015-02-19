@@ -2,7 +2,7 @@
 #define STAN__MATH__PRIM__MAT__FUN__DISTANCE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/mat/fun/squared_distance.hpp>
 #include <stan/math/prim/mat/err/check_vector.hpp>

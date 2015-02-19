@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/mat/prob/multinomial_log.hpp>
 #include <stan/math/rev/mat/fun/to_var.hpp>
 #include <stan/math/rev/core/operator_addition.hpp>

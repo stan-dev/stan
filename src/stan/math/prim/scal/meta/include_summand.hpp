@@ -1,7 +1,8 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__PROB_TRAITS_HPP
-#define STAN__MATH__PRIM__SCAL__META__PROB_TRAITS_HPP
+#ifndef STAN__MATH__PRIM__SCAL__META__INCLUDE_SUMMAND_HPP
+#define STAN__MATH__PRIM__SCAL__META__INCLUDE_SUMMAND_HPP
 
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/is_constant.hpp>
+#include <stan/math/prim/scal/meta/scalar_type.hpp>
 #include <boost/math/tools/promotion.hpp>
 
 namespace stan {

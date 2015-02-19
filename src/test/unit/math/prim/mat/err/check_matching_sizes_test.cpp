@@ -1,4 +1,5 @@
 #include <stan/math/prim/mat/err/check_matching_sizes.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <gtest/gtest.h>
 
 TEST(ErrorHandlingMatrix, checkMatchingSizesMatrix) {

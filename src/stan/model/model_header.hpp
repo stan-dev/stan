@@ -333,8 +333,8 @@
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/index_type.hpp>
 #include <stan/math/prim/scal/meta/likely.hpp>
-#include <stan/math/prim/scal/meta/prob_traits.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/include_summand.hpp>
+
 #include <stan/math/prim/scal/meta/value_type.hpp>
 #include <stan/math/prim/scal/prob/bernoulli_ccdf_log.hpp>
 #include <stan/math/prim/scal/prob/bernoulli_cdf.hpp>

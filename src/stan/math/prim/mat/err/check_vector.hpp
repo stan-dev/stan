@@ -1,7 +1,8 @@
 #ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_VECTOR_HPP
 #define STAN__MATH__PRIM__MAT__ERR__CHECK_VECTOR_HPP
 
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/return_type.hpp>
+#include <stan/math/prim/scal/meta/scalar_type.hpp>
 #include <stan/math/prim/scal/err/invalid_argument.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <sstream>

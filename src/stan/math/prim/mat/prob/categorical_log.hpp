@@ -9,7 +9,8 @@
 #include <stan/math/prim/mat/fun/sum.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
-#include <stan/math/prim/scal/meta/prob_traits.hpp>
+#include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <stan/math/prim/scal/meta/is_constant_struct.hpp>
 
 namespace stan {
 

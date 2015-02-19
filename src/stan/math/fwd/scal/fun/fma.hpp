@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <stan/math/fwd/core/fvar.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/return_type.hpp>
 
 namespace stan {
 

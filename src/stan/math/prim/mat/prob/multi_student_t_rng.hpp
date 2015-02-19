@@ -17,7 +17,7 @@
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/mat/prob/multi_normal_rng.hpp>
 #include <stan/math/prim/scal/prob/inv_gamma_rng.hpp>
-#include <stan/math/prim/scal/meta/prob_traits.hpp>
+#include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <cstdlib>
 
 namespace stan {

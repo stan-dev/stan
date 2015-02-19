@@ -2,7 +2,7 @@
 #define STAN__MATH__PRIM__MAT__FUN__TRACE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 
 namespace stan {
   namespace math {

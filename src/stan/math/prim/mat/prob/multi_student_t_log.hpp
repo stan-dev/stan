@@ -16,7 +16,8 @@
 #include <stan/math/prim/scal/fun/log1p.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/mat/prob/multi_normal_log.hpp>
-#include <stan/math/prim/scal/meta/prob_traits.hpp>
+#include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <stan/math/prim/scal/meta/VectorViewMvt.hpp>
 #include <cstdlib>
 
 namespace stan {

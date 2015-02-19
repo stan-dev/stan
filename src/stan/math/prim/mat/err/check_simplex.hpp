@@ -6,7 +6,7 @@
 #include <stan/math/prim/mat/err/check_nonzero_size.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/error_index.hpp>
 #include <sstream>
 #include <string>
 
