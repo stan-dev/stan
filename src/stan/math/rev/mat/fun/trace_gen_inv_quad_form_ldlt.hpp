@@ -3,7 +3,8 @@
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/core/var.hpp>
-#include <boost/type_traits/is_same.hpp>
+#include <stan/math/prim/scal/meta/is_var.hpp>
+#include <stan/math/rev/scal/meta/is_var.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <stan/math/prim/mat/err/check_multiplicable.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>
@@ -19,12 +20,12 @@ namespace stan {
      **/
     template <typename T1,int R1,int C1,typename T2,int R2,int C2,typename T3,int R3,int C3>
     inline typename
-    boost::enable_if_c<boost::is_same<T1,var>::value || 
-    boost::is_same<T2,var>::value || 
-                       boost::is_same<T3,var>::value, var>::type
-    trace_gen_inv_quad_form_ldlt(const Eigen::Matrix<T1,R1,C1> &D,
-                                 const stan::math::LDLT_factor<T2,R2,C2> &A,
-                                 const Eigen::Matrix<T3,R3,C3> &B)
+    boost::enable_if_c<stan::is_var<T1>::value ||
+    stan::is_var<T2>::value || 
+    stan::is_var<T3>::value, var>::type
+      trace_gen_inv_quad_form_ldlt(const Eigen::Matrix<T1,R1,C1> &D,
+                                   const stan::math::LDLT_factor<T2,R2,C2> &A,
+                                   const Eigen::Matrix<T3,R3,C3> &B)
     {
       stan::math::check_square("trace_gen_inv_quad_form_ldlt", "D", D);
       stan::math::check_multiplicable("trace_gen_inv_quad_form_ldlt", 

@@ -1,6 +1,9 @@
 #ifndef STAN__MATH__MIX__CORE__PARTIALS_VARI_HPP
 #define STAN__MATH__MIX__CORE__PARTIALS_VARI_HPP
 
+#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/scal/meta/is_fvar.hpp>
+
 #include <stan/math/prim/scal/meta/is_vector.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/is_vector_like.hpp>
@@ -13,7 +16,7 @@
 #include <stan/math/rev/core/chainable.hpp>
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/vari.hpp>
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/rev/scal/meta/is_var.hpp>
 
 namespace stan {
   namespace agrad {

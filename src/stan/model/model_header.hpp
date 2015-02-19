@@ -712,6 +712,7 @@
 #include <stan/math/rev/scal/fun/trunc.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
+#include <stan/math/rev/scal/meta/is_var.hpp>
 
 #include <stan/model/prob_grad.hpp>
 #include <stan/services/command.hpp>

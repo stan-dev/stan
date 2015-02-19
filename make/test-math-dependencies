@@ -55,7 +55,7 @@ test-math-dependencies:
 ## Check for files inside src/stan/math/*/arr that contain
 ##   stan/math/*/mat
 	@$(call math_warnings, 'arr', src/stan/math/*/arr,\
-             '<stan/math/.*/mat/', 'File includes an array header file.')
+             '<stan/math/.*/mat/', 'File includes an matrix header file.')
 	@$(call math_warnings, 'arr', src/stan/math/*/arr,\
              '<Eigen', 'File includes an Eigen header.')
 	@$(call math_warnings, 'arr', src/stan/math/*/arr,\
