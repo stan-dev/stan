@@ -377,7 +377,11 @@
 #include <stan/math/prim/scal/prob/logistic_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/logistic_log.hpp>
 #include <stan/math/prim/scal/prob/logistic_rng.hpp>
-#include <stan/math/prim/scal/prob/lognormal.hpp>
+#include <stan/math/prim/scal/prob/lognormal_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/lognormal_cdf.hpp>
+#include <stan/math/prim/scal/prob/lognormal_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/lognormal_log.hpp>
+#include <stan/math/prim/scal/prob/lognormal_rng.hpp>
 #include <stan/math/prim/scal/prob/neg_binomial.hpp>
 #include <stan/math/prim/scal/prob/neg_binomial_2.hpp>
 #include <stan/math/prim/scal/prob/normal.hpp>
