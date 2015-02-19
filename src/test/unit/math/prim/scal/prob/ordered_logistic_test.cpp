@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include <stan/math/prim/scal/prob/ordered_logistic.hpp>
+#include <stan/math/prim/scal/prob/ordered_logistic_log.hpp>
+#include <stan/math/prim/scal/prob/ordered_logistic_rng.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>

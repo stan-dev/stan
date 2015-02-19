@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__ORDERED_LOGISTIC_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__ORDERED_LOGISTIC_HPP
+#ifndef STAN__MATH__PRIM__SCAL__PROB__ORDERED_LOGISTIC_LOG_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__ORDERED_LOGISTIC_LOG_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -107,41 +107,6 @@ namespace stan {
     ordered_logistic_log(int y, const T_lambda& lambda,  
                          const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c) {
       return ordered_logistic_log<false>(y,lambda,c);
-    }
-
-    template <class RNG>
-    inline int
-    ordered_logistic_rng(const double eta,
-                         const Eigen::Matrix<double,Eigen::Dynamic,1>& c,
-                         RNG& rng) {
-      using boost::variate_generator;
-      using stan::math::inv_logit;
-
-      static const char* function("stan::prob::ordered_logistic");
-      
-      using stan::math::check_finite;
-      using stan::math::check_positive;
-      using stan::math::check_nonnegative;
-      using stan::math::check_less;
-      using stan::math::check_less_or_equal;
-      using stan::math::check_greater;
-      using stan::math::check_bounded;
-
-      check_finite(function, "Location parameter", eta);
-      check_greater(function, "Size of cut points parameter", c.size(), 0);
-      for (int i = 1; i < c.size(); ++i) {
-        check_greater(function, "Cut points parameter", c(i), c(i - 1));
-      }
-      check_finite(function, "Cut points parameter", c(c.size()-1));
-      check_finite(function, "Cut points parameter", c(0));
-
-      Eigen::VectorXd cut(c.rows()+1);
-      cut(0) = 1 - inv_logit(eta - c(0));
-      for(int j = 1; j < c.rows(); j++)
-        cut(j) = inv_logit(eta - c(j - 1)) - inv_logit(eta - c(j));
-      cut(c.rows()) = inv_logit(eta - c(c.rows() - 1));
-
-      return stan::prob::categorical_rng(cut, rng);
     }
   }
 }

@@ -437,7 +437,8 @@
 #include <stan/math/prim/scal/prob/normal_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/normal_log.hpp>
 #include <stan/math/prim/scal/prob/normal_rng.hpp>
-#include <stan/math/prim/scal/prob/ordered_logistic.hpp>
+#include <stan/math/prim/scal/prob/ordered_logistic_log.hpp>
+#include <stan/math/prim/scal/prob/ordered_logistic_rng.hpp>
 #include <stan/math/prim/scal/prob/pareto.hpp>
 #include <stan/math/prim/scal/prob/pareto_type_2.hpp>
 #include <stan/math/prim/scal/prob/poisson.hpp>
