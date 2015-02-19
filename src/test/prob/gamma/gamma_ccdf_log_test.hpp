@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/gamma.hpp>
+#include <stan/math/prim/scal/prob/gamma_ccdf_log.hpp>
 
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 

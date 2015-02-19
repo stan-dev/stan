@@ -1,0 +1,56 @@
+#ifndef STAN__MATH__PRIM__SCAL__PROB__GAMMA_RNG_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__GAMMA_RNG_HPP
+
+#include <boost/random/gamma_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <stan/math/mix/core/partials_vari.hpp>
+#include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
+#include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
+#include <stan/math/prim/scal/err/check_less_or_equal.hpp>
+#include <stan/math/prim/scal/err/check_nonnegative.hpp>
+#include <stan/math/prim/scal/err/check_not_nan.hpp>
+#include <stan/math/prim/scal/err/check_positive_finite.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
+#include <stan/math/prim/scal/fun/multiply_log.hpp>
+#include <stan/math/prim/scal/fun/value_of.hpp>
+#include <stan/math/prim/scal/fun/gamma_p.hpp>
+#include <stan/math/prim/scal/fun/digamma.hpp>
+#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/meta/prob_traits.hpp>
+
+#include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
+
+namespace stan {
+
+  namespace prob {
+
+    template <class RNG>
+    inline double
+    gamma_rng(const double alpha,
+              const double beta,
+              RNG& rng) {
+      using boost::variate_generator;
+      using boost::gamma_distribution;
+
+      static const char* function("stan::prob::gamma_rng");
+
+      using stan::math::check_positive_finite;
+      
+      check_positive_finite(function, "Shape parameter", alpha);
+      check_positive_finite(function, "Inverse scale parameter", beta);
+
+      /*
+        the boost gamma distribution is defined by
+        shape and scale, whereas the stan one is defined
+        by shape and rate
+      */
+      variate_generator<RNG&, gamma_distribution<> >
+        gamma_rng(rng, gamma_distribution<>(alpha, 1.0 / beta));
+      return gamma_rng();
+    }
+
+  }
+}
+
+#endif
