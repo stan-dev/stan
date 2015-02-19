@@ -466,7 +466,11 @@
 #include <stan/math/prim/scal/prob/scaled_inv_chi_square_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/scaled_inv_chi_square_log.hpp>
 #include <stan/math/prim/scal/prob/scaled_inv_chi_square_rng.hpp>
-#include <stan/math/prim/scal/prob/skew_normal.hpp>
+#include <stan/math/prim/scal/prob/skew_normal_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/skew_normal_cdf.hpp>
+#include <stan/math/prim/scal/prob/skew_normal_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/skew_normal_log.hpp>
+#include <stan/math/prim/scal/prob/skew_normal_rng.hpp>
 #include <stan/math/prim/scal/prob/student_t.hpp>
 #include <stan/math/prim/scal/prob/uniform.hpp>
 #include <stan/math/prim/scal/prob/von_mises.hpp>

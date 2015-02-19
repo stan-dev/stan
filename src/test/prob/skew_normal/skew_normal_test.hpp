@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/skew_normal.hpp>
+#include <stan/math/prim/scal/prob/skew_normal_log.hpp>
 
 using std::vector;
 using std::numeric_limits;

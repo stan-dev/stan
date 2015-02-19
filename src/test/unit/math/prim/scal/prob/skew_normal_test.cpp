@@ -1,4 +1,4 @@
-#include <stan/math/prim/scal/prob/skew_normal.hpp>
+#include <stan/math/prim/scal/prob/skew_normal_rng.hpp>
 #include <boost/math/distributions.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
