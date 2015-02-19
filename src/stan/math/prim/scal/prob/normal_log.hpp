@@ -13,6 +13,7 @@
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+#include <stan/math/prim/scal/meta/max_size.hpp>
 
 namespace stan {
 

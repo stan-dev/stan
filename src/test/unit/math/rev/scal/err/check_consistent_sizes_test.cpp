@@ -1,6 +1,7 @@
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/rev/core/recover_memory.hpp>
 #include <gtest/gtest.h>
+#include <stan/math/rev/core/var.hpp>
 
 TEST(AgradRevErrorHandlingScalar, checkConsistentSizes) {
   using Eigen::Matrix;
