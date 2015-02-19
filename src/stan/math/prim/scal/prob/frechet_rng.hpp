@@ -1,0 +1,48 @@
+#ifndef STAN__MATH__PRIM__SCAL__PROB__FRECHET_RNG_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__FRECHET_RNG_HPP
+
+#include <boost/random/weibull_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <stan/math/mix/core/partials_vari.hpp>
+#include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
+#include <stan/math/prim/scal/err/check_nonnegative.hpp>
+#include <stan/math/prim/scal/err/check_not_nan.hpp>
+#include <stan/math/prim/scal/err/check_positive.hpp>
+#include <stan/math/prim/scal/err/check_positive_finite.hpp>
+#include <stan/math/prim/scal/fun/log1m.hpp>
+#include <stan/math/prim/scal/fun/multiply_log.hpp>
+#include <stan/math/prim/scal/fun/value_of.hpp>
+#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/meta/prob_traits.hpp>
+
+namespace stan {
+
+  namespace prob {
+
+    template <class RNG>
+    inline double
+    frechet_rng(const double alpha,
+                const double sigma,
+                RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::weibull_distribution;
+
+      static const char* function("stan::prob::frechet_rng");
+
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_positive;
+  
+      check_finite(function, "Shape parameter", alpha);
+      check_positive(function, "Shape parameter", alpha);
+      check_not_nan(function, "Scale parameter", sigma);
+      check_positive(function, "Scale parameter", sigma);
+
+      variate_generator<RNG&, weibull_distribution<> >
+        weibull_rng(rng, weibull_distribution<>(alpha, 1.0/sigma));
+      return 1.0 / weibull_rng();
+    }
+  }
+}
+#endif

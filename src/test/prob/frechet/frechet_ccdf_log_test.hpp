@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/frechet.hpp>
+#include <stan/math/prim/scal/prob/frechet_ccdf_log.hpp>
 
 #include <stan/math/prim/scal/fun/log1m_exp.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
