@@ -1,5 +1,5 @@
 // Arguments: Ints, Doubles, Doubles
-#include <stan/math/prim/scal/prob/neg_binomial.hpp>
+#include <stan/math/prim/scal/prob/neg_binomial_ccdf_log.hpp>
 #include <boost/math/special_functions/binomial.hpp>
 
 #include <stan/math/prim/scal/fun/binomial_coefficient_log.hpp>

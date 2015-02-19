@@ -23,7 +23,7 @@
 #include <stan/math/prim/scal/prob/beta_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/gamma_rng.hpp>
 #include <stan/math/prim/scal/prob/poisson.hpp>
-#include <stan/math/prim/scal/prob/neg_binomial.hpp>
+#include <stan/math/prim/scal/prob/neg_binomial_ccdf_log.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 
 namespace stan {
