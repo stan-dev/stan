@@ -1,5 +1,5 @@
 // Arguments: Ints, Doubles
-#include <stan/math/prim/scal/prob/poisson.hpp>
+#include <stan/math/prim/scal/prob/poisson_log_log.hpp>
 
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 

@@ -449,7 +449,13 @@
 #include <stan/math/prim/scal/prob/pareto_type_2_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/pareto_type_2_log.hpp>
 #include <stan/math/prim/scal/prob/pareto_type_2_rng.hpp>
-#include <stan/math/prim/scal/prob/poisson.hpp>
+#include <stan/math/prim/scal/prob/poisson_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/poisson_cdf.hpp>
+#include <stan/math/prim/scal/prob/poisson_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/poisson_log.hpp>
+#include <stan/math/prim/scal/prob/poisson_log_log.hpp>
+#include <stan/math/prim/scal/prob/poisson_log_rng.hpp>
+#include <stan/math/prim/scal/prob/poisson_rng.hpp>
 #include <stan/math/prim/scal/prob/rayleigh.hpp>
 #include <stan/math/prim/scal/prob/scaled_inv_chi_square.hpp>
 #include <stan/math/prim/scal/prob/skew_normal.hpp>

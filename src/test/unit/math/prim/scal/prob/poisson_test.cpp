@@ -1,4 +1,5 @@
-#include <stan/math/prim/scal/prob/poisson.hpp>
+#include <stan/math/prim/scal/prob/poisson_rng.hpp>
+#include <stan/math/prim/scal/prob/poisson_log_rng.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>

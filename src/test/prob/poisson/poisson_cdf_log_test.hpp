@@ -1,5 +1,5 @@
 // Arguments: Ints, Doubles
-#include <stan/math/prim/scal/prob/poisson.hpp>
+#include <stan/math/prim/scal/prob/poisson_cdf_log.hpp>
 
 using std::vector;
 using std::numeric_limits;

@@ -20,7 +20,7 @@
 #include <stan/math/prim/scal/meta/prob_traits.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/prob/gamma_rng.hpp>
-#include <stan/math/prim/scal/prob/poisson.hpp>
+#include <stan/math/prim/scal/prob/poisson_rng.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 
 namespace stan {
