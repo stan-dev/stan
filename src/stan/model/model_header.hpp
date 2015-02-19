@@ -372,7 +372,11 @@
 #include <stan/math/prim/scal/prob/inv_gamma_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/inv_gamma_log.hpp>
 #include <stan/math/prim/scal/prob/inv_gamma_rng.hpp>
-#include <stan/math/prim/scal/prob/logistic.hpp>
+#include <stan/math/prim/scal/prob/logistic_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/logistic_cdf.hpp>
+#include <stan/math/prim/scal/prob/logistic_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/logistic_log.hpp>
+#include <stan/math/prim/scal/prob/logistic_rng.hpp>
 #include <stan/math/prim/scal/prob/lognormal.hpp>
 #include <stan/math/prim/scal/prob/neg_binomial.hpp>
 #include <stan/math/prim/scal/prob/neg_binomial_2.hpp>

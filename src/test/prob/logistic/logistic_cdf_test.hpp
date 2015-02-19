@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/logistic.hpp>
+#include <stan/math/prim/scal/prob/logistic_cdf.hpp>
 
 using std::vector;
 using std::numeric_limits;

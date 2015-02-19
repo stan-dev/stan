@@ -1,5 +1,6 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/logistic.hpp>
+#include <stan/math/prim/scal/prob/logistic_log.hpp>
+#include <stan/math/prim/scal/prob/logistic_cdf.hpp>
 
 #include <stan/math/prim/scal/fun/log1p.hpp>
 
