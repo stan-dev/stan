@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles
-#include <stan/math/prim/scal/prob/rayleigh.hpp>
+#include <stan/math/prim/scal/prob/rayleigh_log.hpp>
 
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>

@@ -456,7 +456,11 @@
 #include <stan/math/prim/scal/prob/poisson_log_log.hpp>
 #include <stan/math/prim/scal/prob/poisson_log_rng.hpp>
 #include <stan/math/prim/scal/prob/poisson_rng.hpp>
-#include <stan/math/prim/scal/prob/rayleigh.hpp>
+#include <stan/math/prim/scal/prob/rayleigh_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/rayleigh_cdf.hpp>
+#include <stan/math/prim/scal/prob/rayleigh_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/rayleigh_log.hpp>
+#include <stan/math/prim/scal/prob/rayleigh_rng.hpp>
 #include <stan/math/prim/scal/prob/scaled_inv_chi_square.hpp>
 #include <stan/math/prim/scal/prob/skew_normal.hpp>
 #include <stan/math/prim/scal/prob/student_t.hpp>
