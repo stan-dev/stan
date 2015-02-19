@@ -2,7 +2,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 
 TEST(AgradRev,owens_t_vv) {
   using stan::agrad::var;

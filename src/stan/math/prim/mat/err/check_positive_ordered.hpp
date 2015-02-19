@@ -5,7 +5,7 @@
 #include <stan/math/prim/mat/err/check_ordered.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <sstream>
 #include <string>
 

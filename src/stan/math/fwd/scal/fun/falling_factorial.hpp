@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__SCAL__FUN__FALLING_FACTORIAL_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <stan/math/prim/scal/fun/falling_factorial.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 

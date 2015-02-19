@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__CORE__OPERATOR_GREATER_THAN_OR_EQUAL_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 
 namespace stan {
 

@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__SCAL__FUN__INV_SQRT_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <boost/math/tools/promotion.hpp>
 
 namespace stan {

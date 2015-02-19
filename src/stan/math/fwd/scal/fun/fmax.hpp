@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__SCAL__FUN__FMAX_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <math.h>
 #include <stan/math/prim/scal/meta/likely.hpp>

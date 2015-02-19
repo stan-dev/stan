@@ -2,7 +2,7 @@
 #define STAN__MATH__PRIM__SCAL__ERR__CHECK_CONSISTENT_SIZES_HPP
 
 #include <stan/math/prim/scal/err/check_consistent_size.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <algorithm>
 
 namespace stan {

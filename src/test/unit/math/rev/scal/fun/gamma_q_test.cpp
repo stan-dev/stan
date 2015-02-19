@@ -3,7 +3,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/return_type.hpp>
 
 TEST(AgradRev,gamma_q_var_var) {
   AVAR a = 0.5;

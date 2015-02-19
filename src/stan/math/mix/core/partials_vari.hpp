@@ -1,7 +1,15 @@
 #ifndef STAN__MATH__MIX__CORE__PARTIALS_VARI_HPP
 #define STAN__MATH__MIX__CORE__PARTIALS_VARI_HPP
 
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/is_vector.hpp>
+#include <stan/math/prim/scal/meta/length.hpp>
+#include <stan/math/prim/scal/meta/is_vector_like.hpp>
+#include <stan/math/prim/scal/meta/VectorView.hpp>
+#include <stan/math/prim/scal/meta/is_constant_struct.hpp>
+#include <stan/math/prim/scal/meta/contains_fvar.hpp>
+#include <stan/math/prim/scal/meta/partials_return_type.hpp>
+#include <stan/math/prim/scal/meta/partials_type.hpp>
+#include <stan/math/prim/scal/meta/return_type.hpp>
 #include <stan/math/rev/core/chainable.hpp>
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/vari.hpp>

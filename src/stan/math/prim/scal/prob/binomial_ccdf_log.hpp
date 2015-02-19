@@ -18,8 +18,8 @@
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/binomial_coefficient_log.hpp>
 #include <stan/math/prim/scal/fun/lbeta.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
-#include <stan/math/prim/scal/meta/prob_traits.hpp>
+
+#include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 
 #include <stan/math/prim/scal/fun/inc_beta.hpp>

@@ -2,7 +2,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/return_type.hpp>
 
 TEST(AgradRev,a_minuseq_b) {
   AVAR a(5.0);

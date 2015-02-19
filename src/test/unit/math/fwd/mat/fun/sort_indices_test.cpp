@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-
 #include <stan/math/prim/mat/fun/sort_indices.hpp>
-
+#include <stan/math/prim/mat/fun/sort_indices_asc.hpp>
+#include <stan/math/prim/mat/fun/sort_indices_desc.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/core/fvar.hpp>

@@ -3,7 +3,7 @@
 
 #include <stan/math/prim/scal/err/invalid_argument.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <string>
 
 namespace stan {

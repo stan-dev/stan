@@ -2,7 +2,8 @@
 #define STAN__MATH__PRIM__MAT__ERR__CHECK_RANGE_HPP
 
 #include <stan/math/prim/scal/err/out_of_range.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/scal/meta/error_index.hpp>
 #include <sstream>
 #include <string>
 

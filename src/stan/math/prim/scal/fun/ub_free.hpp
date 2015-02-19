@@ -3,6 +3,7 @@
 
 #include <stan/math/prim/scal/fun/identity_free.hpp>
 #include <stan/math/prim/scal/err/check_less_or_equal.hpp>
+#include <boost/math/tools/promotion.hpp>
 #include <cmath>
 #include <limits>
 

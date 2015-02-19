@@ -12,7 +12,6 @@
 #include <stan/math/prim/scal/err/check_equal.hpp>
 #include <stan/math/prim/mat/err/check_matching_sizes.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
 
 namespace stan {
 

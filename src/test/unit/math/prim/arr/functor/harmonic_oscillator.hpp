@@ -1,7 +1,7 @@
 #ifndef TEST__UNIT__MATH__ODE__HARMONIC_OSCILLATOR
 #define TEST__UNIT__MATH__ODE__HARMONIC_OSCILLATOR
 
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/return_type.hpp>
 #include <stdexcept>
 
 struct harm_osc_ode_fun {

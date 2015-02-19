@@ -3,7 +3,7 @@
 
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/fwd/core/fvar.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/abs.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>

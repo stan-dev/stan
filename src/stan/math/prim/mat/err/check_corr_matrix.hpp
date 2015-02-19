@@ -9,6 +9,7 @@
 #include <stan/math/prim/mat/err/constraint_tolerance.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/scal/meta/error_index.hpp>
 #include <sstream>
 #include <string>
 

@@ -1,11 +1,11 @@
 #ifndef STAN__MATH__PRIM__SCAL__ERR__OUT_OF_RANGE_HPP
 #define STAN__MATH__PRIM__SCAL__ERR__OUT_OF_RANGE_HPP
 
+#include <stan/math/prim/scal/meta/error_index.hpp>
 #include <typeinfo>
 #include <string>
 #include <sstream>
 #include <stdexcept>
-#include <stan/math/prim/scal/meta/traits.hpp>
 
 namespace stan {
   namespace math {

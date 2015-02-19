@@ -8,9 +8,9 @@
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/math/prim/mat/fun/log_determinant_ldlt.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_ldlt.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <stan/math/prim/scal/meta/constants.hpp>
-#include <stan/math/prim/scal/meta/prob_traits.hpp>
+#include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/lmgamma.hpp>
 #include <stan/math/prim/mat/fun/trace.hpp>
 

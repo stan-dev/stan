@@ -4,6 +4,7 @@
 #include <cmath>
 #include <stan/math/prim/scal/fun/identity_free.hpp>
 #include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
+#include <boost/math/tools/promotion.hpp>
 
 namespace stan {
   

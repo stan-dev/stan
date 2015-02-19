@@ -9,7 +9,7 @@
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/log_mix.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/is_constant_struct.hpp>
 #include <stan/math/mix/core/partials_vari.hpp>
 
 

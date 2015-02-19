@@ -1,7 +1,7 @@
 #include <stan/math/rev/scal/fun/fmax.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/return_type.hpp>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev,fmax_vv) {

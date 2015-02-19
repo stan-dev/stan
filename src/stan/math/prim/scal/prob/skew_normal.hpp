@@ -10,10 +10,10 @@
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/fun/owens_t.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/is_constant_struct.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/prob/uniform.hpp>
-#include <stan/math/prim/scal/meta/prob_traits.hpp>
+#include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
 

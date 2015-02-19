@@ -4,13 +4,13 @@
 #include <ostream>
 #include <vector>
 #include <boost/numeric/odeint.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/err/check_less.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/mat/err/check_nonzero_size.hpp>
 #include <stan/math/prim/mat/err/check_ordered.hpp>
-
+#include <stan/math/prim/scal/meta/return_type.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_observer.hpp>
 

@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__MAT__FUN__SORT_DESC_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
+
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <algorithm>    // std::sort
