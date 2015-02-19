@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/student_t.hpp>
+#include <stan/math/prim/scal/prob/student_t_cdf.hpp>
 
 using std::vector;
 using std::numeric_limits;
