@@ -439,7 +439,11 @@
 #include <stan/math/prim/scal/prob/normal_rng.hpp>
 #include <stan/math/prim/scal/prob/ordered_logistic_log.hpp>
 #include <stan/math/prim/scal/prob/ordered_logistic_rng.hpp>
-#include <stan/math/prim/scal/prob/pareto.hpp>
+#include <stan/math/prim/scal/prob/pareto_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/pareto_cdf.hpp>
+#include <stan/math/prim/scal/prob/pareto_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/pareto_log.hpp>
+#include <stan/math/prim/scal/prob/pareto_rng.hpp>
 #include <stan/math/prim/scal/prob/pareto_type_2.hpp>
 #include <stan/math/prim/scal/prob/poisson.hpp>
 #include <stan/math/prim/scal/prob/rayleigh.hpp>

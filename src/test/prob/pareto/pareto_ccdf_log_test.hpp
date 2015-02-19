@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/pareto.hpp>
+#include <stan/math/prim/scal/prob/pareto_ccdf_log.hpp>
 
 using std::vector;
 using std::numeric_limits;

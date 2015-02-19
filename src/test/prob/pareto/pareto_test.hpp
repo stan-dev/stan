@@ -1,5 +1,6 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/pareto.hpp>
+#include <stan/math/prim/scal/prob/pareto_log.hpp>
+#include <stan/math/prim/scal/prob/pareto_cdf.hpp>
 
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 
