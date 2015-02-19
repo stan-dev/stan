@@ -432,7 +432,11 @@
 #include <stan/math/prim/scal/prob/neg_binomial_2_log_log.hpp>
 #include <stan/math/prim/scal/prob/neg_binomial_2_log_rng.hpp>
 #include <stan/math/prim/scal/prob/neg_binomial_2_rng.hpp>
-#include <stan/math/prim/scal/prob/normal.hpp>
+#include <stan/math/prim/scal/prob/normal_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/normal_cdf.hpp>
+#include <stan/math/prim/scal/prob/normal_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/normal_log.hpp>
+#include <stan/math/prim/scal/prob/normal_rng.hpp>
 #include <stan/math/prim/scal/prob/ordered_logistic.hpp>
 #include <stan/math/prim/scal/prob/pareto.hpp>
 #include <stan/math/prim/scal/prob/pareto_type_2.hpp>

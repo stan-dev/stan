@@ -1,4 +1,4 @@
-#include <stan/math/prim/scal/prob/normal.hpp>
+#include <stan/math/prim/scal/prob/normal_log.hpp>
 #include <gtest/gtest.h>
 #include <vector>
 #include <test/unit/math/rev/mat/fun/util.hpp>

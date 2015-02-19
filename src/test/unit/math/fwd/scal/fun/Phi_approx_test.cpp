@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/Phi_approx.hpp>
 #include <stan/math/rev/scal/fun/Phi_approx.hpp>
-#include <stan/math/prim/scal/prob/normal.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/pow.hpp>

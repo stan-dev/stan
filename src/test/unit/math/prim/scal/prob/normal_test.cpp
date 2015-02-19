@@ -1,4 +1,8 @@
-#include <stan/math/prim/scal/prob/normal.hpp>
+#include <stan/math/prim/scal/prob/normal_log.hpp>
+#include <stan/math/prim/scal/prob/normal_cdf.hpp>
+#include <stan/math/prim/scal/prob/normal_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/normal_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/normal_rng.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/distributions.hpp>
 #include <boost/random/mersenne_twister.hpp>

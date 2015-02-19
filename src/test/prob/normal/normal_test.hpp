@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/normal.hpp>
+#include <stan/math/prim/scal/prob/normal_log.hpp>
 
 #include <stan/math/prim/scal/fun/constants.hpp>
 

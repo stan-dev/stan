@@ -9,7 +9,7 @@
 #include <stan/math/mix/mat/functor/hessian_times_vector.hpp>
 #include <stan/math/mix/mat/functor/jacobian.hpp>
 #include <stan/math/mix/mat/functor/partial_derivative.hpp>
-#include <stan/math/prim/scal/prob/normal.hpp>
+#include <stan/math/prim/scal/prob/normal_log.hpp>
 #include <stan/math/fwd/core/operator_addition.hpp>
 #include <stan/math/fwd/core/operator_division.hpp>
 #include <stan/math/fwd/core/operator_equal.hpp>
