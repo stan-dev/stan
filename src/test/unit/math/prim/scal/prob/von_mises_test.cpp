@@ -1,4 +1,4 @@
-#include <stan/math/prim/scal/prob/von_mises.hpp>
+#include <stan/math/prim/scal/prob/von_mises_rng.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>

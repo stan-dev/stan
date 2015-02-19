@@ -481,7 +481,8 @@
 #include <stan/math/prim/scal/prob/uniform_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/uniform_log.hpp>
 #include <stan/math/prim/scal/prob/uniform_rng.hpp>
-#include <stan/math/prim/scal/prob/von_mises.hpp>
+#include <stan/math/prim/scal/prob/von_mises_log.hpp>
+#include <stan/math/prim/scal/prob/von_mises_rng.hpp>
 #include <stan/math/prim/scal/prob/weibull.hpp>
 #include <stan/math/rev/arr/functor/coupled_ode_system.hpp>
 #include <stan/math/rev/core/autodiffstackstorage.hpp>
