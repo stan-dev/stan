@@ -1,5 +1,6 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/inv_gamma.hpp>
+#include <stan/math/prim/scal/prob/inv_gamma_log.hpp>
+#include <stan/math/prim/scal/prob/inv_gamma_cdf.hpp>
 
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 

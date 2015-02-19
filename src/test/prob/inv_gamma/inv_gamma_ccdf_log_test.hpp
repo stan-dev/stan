@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/inv_gamma.hpp>
+#include <stan/math/prim/scal/prob/inv_gamma_ccdf_log.hpp>
 
 using std::vector;
 using std::numeric_limits;

@@ -367,7 +367,11 @@
 #include <stan/math/prim/scal/prob/inv_chi_square_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/inv_chi_square_log.hpp>
 #include <stan/math/prim/scal/prob/inv_chi_square_rng.hpp>
-#include <stan/math/prim/scal/prob/inv_gamma.hpp>
+#include <stan/math/prim/scal/prob/inv_gamma_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/inv_gamma_cdf.hpp>
+#include <stan/math/prim/scal/prob/inv_gamma_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/inv_gamma_log.hpp>
+#include <stan/math/prim/scal/prob/inv_gamma_rng.hpp>
 #include <stan/math/prim/scal/prob/logistic.hpp>
 #include <stan/math/prim/scal/prob/lognormal.hpp>
 #include <stan/math/prim/scal/prob/neg_binomial.hpp>
