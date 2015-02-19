@@ -1,4 +1,4 @@
-#include <stan/math/prim/scal/prob/neg_binomial_2.hpp>
+#include <stan/math/prim/scal/prob/neg_binomial_2_rng.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
