@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/scaled_inv_chi_square.hpp>
+#include <stan/math/prim/scal/prob/scaled_inv_chi_square_log.hpp>
 
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>
