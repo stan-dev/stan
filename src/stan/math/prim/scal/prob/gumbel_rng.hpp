@@ -1,0 +1,44 @@
+#ifndef STAN__MATH__PRIM__SCAL__PROB__GUMBEL_RNG_HPP
+#define STAN__MATH__PRIM__SCAL__PROB__GUMBEL_RNG_HPP
+
+#include <boost/random/uniform_01.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <stan/math/mix/core/partials_vari.hpp>
+#include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
+#include <stan/math/prim/scal/err/check_finite.hpp>
+#include <stan/math/prim/scal/err/check_not_nan.hpp>
+#include <stan/math/prim/scal/err/check_positive.hpp>
+#include <stan/math/prim/scal/meta/traits.hpp>
+#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/meta/prob_traits.hpp>
+#include <stan/math/prim/scal/fun/value_of.hpp>
+
+namespace stan {
+
+  namespace prob {
+
+    template <class RNG>
+    inline double
+    gumbel_rng(const double mu,
+               const double beta,
+               RNG& rng) {
+      using boost::variate_generator;
+      using boost::uniform_01;
+
+      static const char* function("stan::prob::gumbel_rng");
+
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+
+
+      check_finite(function, "Location parameter", mu);
+      check_positive(function, "Scale parameter", beta); 
+
+      variate_generator<RNG&, uniform_01<> >
+        uniform01_rng(rng, uniform_01<>());
+      return mu - beta * std::log(-std::log(uniform01_rng()));
+    }
+  }
+}
+#endif
+

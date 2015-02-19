@@ -355,7 +355,11 @@
 #include <stan/math/prim/scal/prob/gamma_cdf_log.hpp>
 #include <stan/math/prim/scal/prob/gamma_log.hpp>
 #include <stan/math/prim/scal/prob/gamma_rng.hpp>
-#include <stan/math/prim/scal/prob/gumbel.hpp>
+#include <stan/math/prim/scal/prob/gumbel_ccdf_log.hpp>
+#include <stan/math/prim/scal/prob/gumbel_cdf.hpp>
+#include <stan/math/prim/scal/prob/gumbel_cdf_log.hpp>
+#include <stan/math/prim/scal/prob/gumbel_log.hpp>
+#include <stan/math/prim/scal/prob/gumbel_rng.hpp>
 #include <stan/math/prim/scal/prob/hypergeometric.hpp>
 #include <stan/math/prim/scal/prob/inv_chi_square.hpp>
 #include <stan/math/prim/scal/prob/inv_gamma.hpp>

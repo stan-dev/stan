@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
-#include <stan/math/prim/scal/prob/gumbel.hpp>
+#include <stan/math/prim/scal/prob/gumbel_cdf_log.hpp>
 
 using std::vector;
 using std::numeric_limits;
