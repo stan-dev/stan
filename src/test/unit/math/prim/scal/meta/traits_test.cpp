@@ -26,6 +26,7 @@
 #include <stan/math/prim/scal/meta/VectorViewMvt.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/max_size_mvt.hpp>
+#include <stan/math/fwd/scal/meta/is_fvar.hpp>
 
 using stan::length;
 
