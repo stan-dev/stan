@@ -1,5 +1,5 @@
 // Arguments: Doubles, Doubles
-#include <stan/math/prim/scal/prob/inv_chi_square.hpp>
+#include <stan/math/prim/scal/prob/inv_chi_square_cdf.hpp>
 
 using std::vector;
 using std::numeric_limits;

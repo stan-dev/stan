@@ -1,4 +1,4 @@
-#include <stan/math/prim/scal/prob/inv_chi_square.hpp>
+#include <stan/math/prim/scal/prob/inv_chi_square_rng.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
