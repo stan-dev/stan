@@ -12,11 +12,11 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
-#include <stan/math/prim/scal/meta/traits.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/prob/uniform.hpp>
-#include <stan/math/prim/scal/meta/prob_traits.hpp>
-
+#include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
+#include <stan/math/prim/scal/meta/VectorView.hpp>
+#include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 
 namespace stan {
   namespace prob {
