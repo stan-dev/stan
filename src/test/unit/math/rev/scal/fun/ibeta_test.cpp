@@ -4,6 +4,7 @@
 #include <stan/math/prim/scal/fun/ibeta.hpp>
 #include <boost/math/special_functions/beta.hpp>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
+#include <stan/math/prim/scal/meta/return_type.hpp>
 
 TEST(AgradRev,ibeta_vvv) {
   using stan::agrad::var;
