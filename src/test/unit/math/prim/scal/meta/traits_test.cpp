@@ -28,6 +28,8 @@
 #include <stan/math/prim/scal/meta/max_size_mvt.hpp>
 #include <stan/math/fwd/scal/meta/is_fvar.hpp>
 #include <stan/math/rev/scal/meta/is_var.hpp>
+#include <stan/math/fwd/scal/meta/partials_type.hpp>
+#include <stan/math/rev/scal/meta/partials_type.hpp>
 
 using stan::length;
 

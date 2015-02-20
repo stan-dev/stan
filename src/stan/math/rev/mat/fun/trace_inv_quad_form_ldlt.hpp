@@ -6,9 +6,9 @@
 #include <stan/math/rev/core/chainable_alloc.hpp>
 #include <stan/math/rev/mat/fun/LDLT_alloc.hpp>
 #include <stan/math/rev/mat/fun/LDLT_factor.hpp>
-#include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <stan/math/prim/mat/err/check_multiplicable.hpp>
+#include <stan/math/rev/scal/meta/is_var.hpp>
 
 namespace stan {
   namespace agrad {
@@ -60,7 +60,7 @@ namespace stan {
         trace_inv_quad_form_ldlt_impl(const Eigen::Matrix<T1,R1,C1> &D,
                                       const stan::math::LDLT_factor<T2,R2,C2> &A,
                                       const Eigen::Matrix<T3,R3,C3> &B)
-          : Dtype_(boost::is_same<T1,var>::value?1:0),
+          : Dtype_(stan::is_var<T1>::value),
             _ldlt(A)
         {
           initializeB(B,true);
@@ -158,8 +158,9 @@ namespace stan {
      **/
     template <typename T2,int R2,int C2,typename T3,int R3,int C3>
     inline typename
-    boost::enable_if_c<boost::is_same<T2,var>::value ||
-    boost::is_same<T3,var>::value, var>::type
+    boost::enable_if_c<stan::is_var<T2>::value ||
+                       stan::is_var<T3>::value, 
+                       var>::type
       trace_inv_quad_form_ldlt(const stan::math::LDLT_factor<T2,R2,C2> &A,
                                const Eigen::Matrix<T3,R3,C3> &B)
     {
@@ -167,7 +168,7 @@ namespace stan {
                                                 "A", A,
                                                 "B", B);
       
-      trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3> *_impl = new trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3>(A,B);
+      trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3>* _impl = new trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3>(A,B);
       
       return var(new trace_inv_quad_form_ldlt_vari<T2,R2,C2,T3,R3,C3>(_impl));
     }
