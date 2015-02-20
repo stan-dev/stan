@@ -26,8 +26,6 @@
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
-#include <stan/math/fwd/scal/fun/inc_beta.hpp>
-#include <stan/math/rev/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/meta/max_size.hpp>
 
 namespace stan {
