@@ -350,10 +350,10 @@ TEST(langAst, solveOde) {
 }
 
 void testTotalDims(int expected_total_dims,
-                   const stan::gm::base_expr_type& base_type,
+                   const stan::lang::base_expr_type& base_type,
                    size_t num_dims) {
-  using stan::gm::expression;
-  using stan::gm::variable;
+  using stan::lang::expression;
+  using stan::lang::variable;
 
   variable v("foo");
   v.set_type(base_type, num_dims);
