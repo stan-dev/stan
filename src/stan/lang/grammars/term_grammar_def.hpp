@@ -554,7 +554,7 @@ namespace stan {
     };
     boost::phoenix::function<transpose_expr> transpose_f;
 
-    int num_dimss(std::vector<std::vector<stan::gm::expression> >& dimss) {
+    int num_dimss(std::vector<std::vector<stan::lang::expression> >& dimss) {
       int sum = 0;
       for (size_t i = 0; i < dimss.size(); ++i)
         sum += dimss[i].size();
