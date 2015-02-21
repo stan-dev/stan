@@ -3,7 +3,7 @@
 
 #include <boost/random/student_t_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <stan/math/mix/core/partials_vari.hpp>
+#include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>

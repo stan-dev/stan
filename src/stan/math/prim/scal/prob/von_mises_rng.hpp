@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__PRIM__SCAL__PROB__VON_MISES_RNG_HPP
 #define STAN__MATH__PRIM__SCAL__PROB__VON_MISES_RNG_HPP
 
-#include <stan/math/mix/core/partials_vari.hpp>
+#include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_greater.hpp>
