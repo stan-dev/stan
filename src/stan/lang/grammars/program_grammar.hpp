@@ -77,6 +77,16 @@ namespace stan {
                               program(),
                               whitespace_grammar<Iterator> >
       program_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::unused_type,
+                              whitespace_grammar<Iterator> >
+      end_var_decls_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::unused_type,
+                              whitespace_grammar<Iterator> >
+      end_var_decls_statements_r;
     
     };
 
