@@ -1,4 +1,4 @@
-#include <stan/math/prim/scal/fun/scaled_add.hpp>
+#include <stan/math/prim/arr/fun/scaled_add.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 

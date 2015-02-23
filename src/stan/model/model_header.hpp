@@ -18,6 +18,9 @@
 #include <stan/math/prim/arr/fun/dot_self.hpp>
 #include <stan/math/prim/arr/fun/log_sum_exp.hpp>
 #include <stan/math/prim/arr/fun/rep_array.hpp>
+#include <stan/math/prim/arr/fun/scaled_add.hpp>
+#include <stan/math/prim/arr/fun/sub.hpp>
+#include <stan/math/prim/arr/fun/sum.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_observer.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
 #include <stan/math/prim/arr/functor/integrate_ode.hpp>
@@ -316,14 +319,11 @@
 #include <stan/math/prim/scal/fun/read_cov_L.hpp>
 #include <stan/math/prim/scal/fun/read_cov_matrix.hpp>
 #include <stan/math/prim/scal/fun/rising_factorial.hpp>
-#include <stan/math/prim/scal/fun/scaled_add.hpp>
 #include <stan/math/prim/scal/fun/sign.hpp>
 #include <stan/math/prim/scal/fun/simplex_constrain.hpp>
 #include <stan/math/prim/scal/fun/simplex_free.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>
 #include <stan/math/prim/scal/fun/step.hpp>
-#include <stan/math/prim/scal/fun/sub.hpp>
-#include <stan/math/prim/scal/fun/sum.hpp>
 #include <stan/math/prim/scal/fun/trigamma.hpp>
 #include <stan/math/prim/scal/fun/ub_constrain.hpp>
 #include <stan/math/prim/scal/fun/ub_free.hpp>
