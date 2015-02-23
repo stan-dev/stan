@@ -4,6 +4,7 @@
 #include <vector>
 #include <stan/math/prim/scal/fun/promote_scalar_type.hpp>
 #include <stan/math/prim/scal/meta/index_type.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
 
 namespace stan {
 

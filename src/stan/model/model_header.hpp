@@ -25,6 +25,7 @@
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
 #include <stan/math/prim/arr/functor/integrate_ode.hpp>
 #include <stan/math/prim/arr/meta/get.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
 #include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
 #include <stan/math/prim/mat/err/check_cholesky_factor_corr.hpp>
 #include <stan/math/prim/mat/err/check_column_index.hpp>

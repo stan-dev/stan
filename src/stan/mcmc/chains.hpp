@@ -15,7 +15,9 @@
 
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/math/prim/mat/fun/variance.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/scal/meta/index_type.hpp>
 #include <stan/math/prim/mat/fun/autocorrelation.hpp>
 #include <stan/math/prim/mat/fun/autocovariance.hpp>
 
