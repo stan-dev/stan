@@ -10,7 +10,6 @@
 #include <stan/math/rev/core/start_nested.hpp>
 #include <stan/math/rev/core/operator_plus_equal.hpp>
 #include <stan/math/prim/scal/err/check_equal.hpp>
-#include <stan/math/prim/mat/err/check_matching_sizes.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
 
 namespace stan {
