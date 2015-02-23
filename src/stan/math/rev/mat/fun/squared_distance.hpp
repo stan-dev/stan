@@ -13,6 +13,7 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
 #include <stan/math/prim/scal/meta/index_type.hpp>
 
 

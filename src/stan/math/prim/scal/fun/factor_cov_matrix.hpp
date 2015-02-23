@@ -2,7 +2,7 @@
 #define STAN__MATH__PRIM__SCAL__FUN__FACTOR_COV_MATRIX_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/scal/fun/factor_U.hpp>
+#include <stan/math/prim/mat/fun/factor_U.hpp>
 #include <cstddef>
 
 

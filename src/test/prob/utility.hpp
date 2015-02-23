@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stan/model/model_header.hpp>
+#include <stan/math/fwd/arr/fun/log_sum_exp.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/fwd/mat/fun/columns_dot_product.hpp>
 #include <stan/math/fwd/mat/fun/columns_dot_self.hpp>

@@ -9,6 +9,8 @@
 #include <stan/math/prim/scal/meta/contains_vector.hpp>
 #include <stan/math/prim/scal/meta/scalar_type.hpp>
 #include <stan/math/prim/scal/meta/get.hpp>
+#include <stan/math/prim/arr/meta/get.hpp>
+#include <stan/math/prim/mat/meta/get.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/size_of.hpp>
 #include <stan/math/prim/scal/meta/max_size.hpp>

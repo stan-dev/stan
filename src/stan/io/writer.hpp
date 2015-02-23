@@ -43,9 +43,10 @@
 #include <stan/math/prim/mat/err/constraint_tolerance.hpp>
 #include <stan/math/prim/mat/err/validate_non_negative_index.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
 #include <stan/math/prim/scal/meta/index_type.hpp>
 #include <stan/math/prim/scal/fun/factor_cov_matrix.hpp>
-#include <stan/math/prim/scal/fun/factor_U.hpp>
+#include <stan/math/prim/mat/fun/factor_U.hpp>
 #include <stan/math/prim/scal/fun/read_corr_L.hpp>
 #include <stan/math/prim/scal/fun/read_corr_matrix.hpp>
 #include <stan/math/prim/scal/fun/read_cov_L.hpp>

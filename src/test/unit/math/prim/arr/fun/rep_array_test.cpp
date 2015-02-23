@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/math/prim/scal/fun/rep_array.hpp>
+#include <stan/math/prim/arr/fun/rep_array.hpp>
 
 TEST(MathMatrix,rep_array) {
   using stan::math::rep_array;

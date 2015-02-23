@@ -2,6 +2,7 @@
 #define STAN__INTERFACE__RECORDER__CSV_HPP
 
 #include <stan/math/prim/scal/meta/index_type.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
 #include <ostream>
 #include <stan/interface/recorder/recorder.hpp>
 

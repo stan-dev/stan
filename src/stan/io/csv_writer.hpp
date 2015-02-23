@@ -2,6 +2,7 @@
 #define STAN__IO__CSV_WRITER_HPP
 
 #include <stan/math/prim/scal/meta/index_type.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <iomanip>
 #include <limits>

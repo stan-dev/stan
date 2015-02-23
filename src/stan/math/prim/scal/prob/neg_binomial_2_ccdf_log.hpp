@@ -13,7 +13,6 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/binomial_coefficient_log.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
-#include <stan/math/prim/scal/fun/log_sum_exp.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/fun/lgamma.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>

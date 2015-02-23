@@ -1,8 +1,8 @@
-#include <stan/math/prim/scal/fun/dist.hpp>
+#include <stan/math/prim/arr/fun/dot.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
-TEST(MathFunctions, dist) {
+TEST(MathFunctions, dot) {
   std::vector<double> x(3), y(3);
   x[0] = 2.33;
   x[1] = 8.88;
@@ -11,12 +11,13 @@ TEST(MathFunctions, dist) {
   y[1] = 4.45;
   y[2] = 1.03;
 
-  EXPECT_FLOAT_EQ(9.835151, stan::math::dist(x,y));
-  EXPECT_FLOAT_EQ(9.835151, stan::math::dist(y,x));
-  EXPECT_FLOAT_EQ(0.0, stan::math::dist(x,x));
+  EXPECT_FLOAT_EQ(55.3521, stan::math::dot(x,y));
+  EXPECT_FLOAT_EQ(55.3521, stan::math::dot(y,x));
+  EXPECT_FLOAT_EQ(180.5194, stan::math::dot(x,x));
+  EXPECT_FLOAT_EQ(26.915, stan::math::dot(y,y));
 }
 
-TEST(MathFunctions, dist_nan) {
+TEST(MathFunctions, dot_nan) {
   std::vector<double> x(3), y(3);
   x[0] = 2.33;
   x[1] = 8.88;
@@ -29,20 +30,20 @@ TEST(MathFunctions, dist_nan) {
   x[2] = nan;
 
   EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::dist(x, y));
+               stan::math::dot(x, y));
   EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::dist(y, x));
+               stan::math::dot(y, x));
 
 
   x[0] = nan;
   x[1] = nan;
   x[2] = nan;
   EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::dist(x, y));
+               stan::math::dot(x, y));
   EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::dist(y, x));
+               stan::math::dot(y, x));
 
 
   EXPECT_PRED1(boost::math::isnan<double>,
-               stan::math::dist(x, x));
+               stan::math::dot(x, x));
 }

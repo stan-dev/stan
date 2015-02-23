@@ -1,7 +1,6 @@
 #ifndef STAN__MATH__PRIM__SCAL__FUN__MODULUS_HPP
 #define STAN__MATH__PRIM__SCAL__FUN__MODULUS_HPP
 
-#include <vector>
 #include <cstddef>
 #include <cstdlib>
 
