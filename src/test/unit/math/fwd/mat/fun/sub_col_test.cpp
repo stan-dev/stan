@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/fun/sub_col.hpp>
 #include <gtest/gtest.h>
 

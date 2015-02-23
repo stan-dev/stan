@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/diag_pre_multiply.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>

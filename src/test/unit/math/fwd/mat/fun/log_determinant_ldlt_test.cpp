@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/fun/log_determinant_ldlt.hpp>
 #include <stan/math/prim/mat/fun/LDLT_factor.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>

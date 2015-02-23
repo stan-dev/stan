@@ -1,4 +1,4 @@
-#include <stan/math/mix/core/partials_vari.hpp>
+#include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/core/operator_addition.hpp>
 #include <stan/math/fwd/core/operator_division.hpp>

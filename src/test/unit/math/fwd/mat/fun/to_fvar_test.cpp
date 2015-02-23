@@ -1,6 +1,10 @@
 #include <stan/math/fwd/mat/fun/to_fvar.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
+#include <stan/math/prim/mat/fun/typedefs.hpp>
+#include <stan/math/rev/mat/fun/typedefs.hpp>
+#include <stan/math/fwd/mat/fun/typedefs.hpp>
 
 TEST(AgradFwdMatrixToFvar,fd_scalar) {
   using stan::agrad::fvar;

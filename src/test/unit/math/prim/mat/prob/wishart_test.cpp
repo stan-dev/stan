@@ -37,6 +37,7 @@
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/abs.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

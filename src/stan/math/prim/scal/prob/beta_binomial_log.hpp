@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__PRIM__SCAL__PROB__BETA_BINOMIAL_LOG_HPP
 #define STAN__MATH__PRIM__SCAL__PROB__BETA_BINOMIAL_LOG_HPP
 
-#include <stan/math/mix/core/partials_vari.hpp>
+#include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <stan/math/prim/scal/err/check_positive_finite.hpp>

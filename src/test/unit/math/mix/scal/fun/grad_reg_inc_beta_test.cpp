@@ -39,6 +39,25 @@
 #include <stan/math/rev/scal/fun/floor.hpp>
 #include <stan/math/fwd/scal/fun/sin.hpp>
 #include <stan/math/rev/scal/fun/sin.hpp>
+#include <stan/math/fwd/scal/fun/log.hpp>
+#include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/fwd/scal/fun/exp.hpp>
+#include <stan/math/rev/scal/fun/exp.hpp>
+#include <stan/math/fwd/scal/fun/acos.hpp>
+#include <stan/math/rev/scal/fun/acos.hpp>
+#include <stan/math/fwd/scal/fun/fabs.hpp>
+#include <stan/math/rev/scal/fun/fabs.hpp>
+#include <stan/math/fwd/scal/fun/value_of.hpp>
+#include <stan/math/rev/scal/fun/value_of.hpp>
+#include <stan/math/fwd/scal/fun/ceil.hpp>
+#include <stan/math/rev/scal/fun/ceil.hpp>
+#include <stan/math/fwd/scal/fun/lbeta.hpp>
+#include <stan/math/fwd/scal/fun/grad_inc_beta.hpp>
+#include <stan/math/rev/scal/fun/grad_inc_beta.hpp>
+
+#include <stan/math/rev/core/std_numeric_limits.hpp>
+#include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
+
 
 TEST(ProbInternalMath, grad_reg_inc_beta_fd) {
   using stan::agrad::fvar;

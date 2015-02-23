@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MIX__CORE__PARTIALS_VARI_HPP
-#define STAN__MATH__MIX__CORE__PARTIALS_VARI_HPP
+#ifndef STAN__MATH__PRIM__SCAL__META__OPERANDSANDPARTIALS_HPP
+#define STAN__MATH__PRIM__SCAL__META__OPERANDSANDPARTIALS_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/fwd/scal/meta/is_fvar.hpp>

@@ -1,4 +1,5 @@
 #include <stan/math/fwd/mat/fun/dot_self.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/mat/fun/columns_dot_self.hpp>
 #include <stan/math/prim/mat/fun/columns_dot_self.hpp>
 #include <gtest/gtest.h>

@@ -1,6 +1,7 @@
 #include <stan/math/fwd/mat/fun/mdivide_right_tri_low.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/rev/mat/fun/multiply.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>

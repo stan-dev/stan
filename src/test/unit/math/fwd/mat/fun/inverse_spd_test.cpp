@@ -3,6 +3,7 @@
 #include <stan/math/fwd/mat/fun/inverse.hpp>
 #include <stan/math/rev/mat/fun/multiply.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>
 #include <stan/math/rev/scal/fun/abs.hpp>

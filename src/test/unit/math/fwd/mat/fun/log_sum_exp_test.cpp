@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/fwd/mat/fun/log_sum_exp.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/rev/mat/fun/log_sum_exp.hpp>
 #include <stan/math/rev/scal/fun/exp.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>

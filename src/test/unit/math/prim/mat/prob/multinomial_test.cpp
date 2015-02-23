@@ -29,6 +29,12 @@
 #include <stan/math/fwd/core/operator_unary_minus.hpp>
 #include <stan/math/fwd/core/operator_equal.hpp>
 #include <stan/math/fwd/core/operator_not_equal.hpp>
+#include <stan/math/rev/scal/fun/fabs.hpp>
+#include <stan/math/fwd/scal/fun/fabs.hpp>
+#include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/fwd/scal/fun/log.hpp>
+#include <stan/math/rev/scal/fun/value_of.hpp>
+#include <stan/math/fwd/scal/fun/value_of.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;

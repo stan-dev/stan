@@ -1,6 +1,7 @@
 #include <stan/math/prim/mat/fun/row.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradFwdMatrixRow,fd_v) {

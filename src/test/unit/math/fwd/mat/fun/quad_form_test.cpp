@@ -2,6 +2,7 @@
 #include <stan/math/prim/mat/fun/quad_form.hpp>
 #include <stan/math/prim/mat/fun/quad_form_sym.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/rev/mat/fun/multiply.hpp>
 #include <stan/math/fwd/mat/fun/multiply.hpp>
 #include <stan/math/fwd/mat/fun/dot_product.hpp>

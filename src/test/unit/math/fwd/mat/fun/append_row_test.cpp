@@ -1,5 +1,6 @@
 #include <stan/math/prim/mat/fun/append_row.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/rev/core/operator_addition.hpp>

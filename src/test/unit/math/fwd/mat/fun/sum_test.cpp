@@ -3,6 +3,7 @@
 #include <stan/math/prim/mat/fun/sum.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/core/fvar.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/fwd/core/operator_addition.hpp>
