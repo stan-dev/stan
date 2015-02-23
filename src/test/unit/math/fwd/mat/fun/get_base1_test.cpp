@@ -1,4 +1,5 @@
 #include <stan/math/prim/mat/fun/get_base1.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/rev/core/var.hpp>
 #include <gtest/gtest.h>

@@ -1,4 +1,5 @@
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/prim/mat/fun/eigenvectors_sym.hpp>
 #include <gtest/gtest.h>

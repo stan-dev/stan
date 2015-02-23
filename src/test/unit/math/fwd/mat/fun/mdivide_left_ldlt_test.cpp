@@ -2,6 +2,7 @@
 #include <stan/math/fwd/mat/fun/mdivide_left_ldlt.hpp>
 #include <stan/math/rev/mat/fun/mdivide_left_ldlt.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/core/operator_addition.hpp>

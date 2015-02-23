@@ -1,5 +1,6 @@
 #include <stan/math/prim/mat/fun/cholesky_decompose.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/scal/fun/value_of.hpp>

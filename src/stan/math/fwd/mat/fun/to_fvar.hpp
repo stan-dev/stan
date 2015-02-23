@@ -7,6 +7,7 @@
 #include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/err/check_matching_dims.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 
 namespace stan {
   namespace agrad {

@@ -1,5 +1,6 @@
 #include <stan/math/prim/mat/fun/qr_Q.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/fun/transpose.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
