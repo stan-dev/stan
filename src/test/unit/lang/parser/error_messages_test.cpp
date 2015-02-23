@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <test/unit/gm/utility.hpp>
+#include <test/unit/lang/utility.hpp>
 
-TEST(GmGrammars,test1) {
+TEST(LangGrammars,test1) {
   test_throws("err-open-block", 
               "PARSER EXPECTED: \"{");
   test_throws("err-close-block", 
@@ -16,8 +16,6 @@ TEST(GmGrammars,test1) {
               "PARSER EXPECTED: \"{");
   test_throws("err-expected-end-of-model", 
               "PARSER EXPECTED: whitespace to end of file");
-  test_throws("err-bare-type-close-square", 
-              "PARSER EXPECTED: \"]");
   test_throws("err-second-operand-plus", 
               "PARSER EXPECTED: <expression>");
   test_throws("err-nested-parens", 
@@ -44,5 +42,15 @@ TEST(GmGrammars,test1) {
               "PARSER EXPECTED: \",");
   test_throws("err-decl-matrix-2",
               "indexed expression dimensionality = 0; indexes supplied = 1");
+  test_throws("err-decl-no-expression",
+              "PARSER EXPECTED: <expression>");
+  test_throws("err-decl-double",
+              "a variable declaration, beginning with type");
+  test_throws("err-decl-double-params",
+              "or a <statement>");
+  test_throws("err-fun-bare-types-int",
+              "comma to indicate more dimensions or ]");
+  test_throws("err-bare-type-close-square", 
+              "comma to indicate more dimensions or ]");
 }
  

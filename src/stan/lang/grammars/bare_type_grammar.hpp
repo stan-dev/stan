@@ -43,6 +43,12 @@ namespace stan {
                               size_t(),
                               whitespace_grammar<Iterator> > 
       array_dims_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::unused_type,
+                              whitespace_grammar<Iterator> >
+      end_bare_types_r;
+
       
     };
   }
