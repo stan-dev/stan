@@ -1,4 +1,5 @@
 #include <stan/math/prim/scal/fun/log_sum_exp.hpp>
+#include <stan/math/prim/arr/fun/log_sum_exp.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 

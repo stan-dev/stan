@@ -16,6 +16,8 @@
 #include <stan/math/prim/arr/fun/dist.hpp>
 #include <stan/math/prim/arr/fun/dot.hpp>
 #include <stan/math/prim/arr/fun/dot_self.hpp>
+#include <stan/math/prim/arr/fun/log_sum_exp.hpp>
+#include <stan/math/prim/arr/fun/rep_array.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_observer.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
 #include <stan/math/prim/arr/functor/integrate_ode.hpp>
@@ -78,6 +80,7 @@
 #include <stan/math/prim/mat/fun/elt_divide.hpp>
 #include <stan/math/prim/mat/fun/elt_multiply.hpp>
 #include <stan/math/prim/mat/fun/exp.hpp>
+#include <stan/math/prim/mat/fun/factor_U.hpp>
 #include <stan/math/prim/mat/fun/fill.hpp>
 #include <stan/math/prim/mat/fun/get_base1.hpp>
 #include <stan/math/prim/mat/fun/get_base1_lhs.hpp>
@@ -231,11 +234,9 @@
 #include <stan/math/prim/scal/fun/cov_matrix_free_lkj.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/fun/divide.hpp>
-#include <stan/math/prim/scal/fun/dot_self.hpp>
 #include <stan/math/prim/scal/fun/exp2.hpp>
 #include <stan/math/prim/scal/fun/F32.hpp>
 #include <stan/math/prim/scal/fun/factor_cov_matrix.hpp>
-#include <stan/math/prim/scal/fun/factor_U.hpp>
 #include <stan/math/prim/scal/fun/falling_factorial.hpp>
 #include <stan/math/prim/scal/fun/fdim.hpp>
 #include <stan/math/prim/scal/fun/gamma_p.hpp>
@@ -314,7 +315,6 @@
 #include <stan/math/prim/scal/fun/read_corr_matrix.hpp>
 #include <stan/math/prim/scal/fun/read_cov_L.hpp>
 #include <stan/math/prim/scal/fun/read_cov_matrix.hpp>
-#include <stan/math/prim/scal/fun/rep_array.hpp>
 #include <stan/math/prim/scal/fun/rising_factorial.hpp>
 #include <stan/math/prim/scal/fun/scaled_add.hpp>
 #include <stan/math/prim/scal/fun/sign.hpp>

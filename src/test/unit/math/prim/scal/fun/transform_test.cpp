@@ -21,10 +21,10 @@
 #include <stan/math/rev/scal/fun/sin.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 #include <stan/math/rev/scal/fun/tanh.hpp>
+#include <stan/math/prim/mat/fun/factor_U.hpp>
 #include <stan/math/prim/mat/fun/determinant.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/fun/factor_cov_matrix.hpp>
-#include <stan/math/prim/scal/fun/factor_U.hpp>
 #include <stan/math/prim/scal/fun/read_corr_L.hpp>
 #include <stan/math/prim/scal/fun/read_corr_matrix.hpp>
 #include <stan/math/prim/scal/fun/read_cov_L.hpp>

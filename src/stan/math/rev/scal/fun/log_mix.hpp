@@ -4,7 +4,6 @@
 #include <cmath>
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
-#include <stan/math/prim/scal/fun/log_sum_exp.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/log_mix.hpp>

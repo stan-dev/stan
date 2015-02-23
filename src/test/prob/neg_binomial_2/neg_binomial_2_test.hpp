@@ -2,7 +2,6 @@
 #include <stan/math/prim/scal/prob/neg_binomial_2_log.hpp>
 
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
-#include <stan/math/prim/scal/fun/log_sum_exp.hpp>
 #include <stan/math/prim/scal/fun/binomial_coefficient_log.hpp>
 
 using std::vector;
@@ -74,7 +73,6 @@ public:
                     const T_inv_scale& phi, const T3&, const T4&, const T5&) {
     using std::log;
     using stan::math::binomial_coefficient_log;
-    using stan::math::log_sum_exp;
     using stan::math::multiply_log;
 
     if (n != 0)

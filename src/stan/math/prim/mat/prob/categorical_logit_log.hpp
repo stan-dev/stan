@@ -5,7 +5,7 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
-#include <stan/math/prim/scal/fun/log_sum_exp.hpp>
+#include <stan/math/prim/arr/fun/log_sum_exp.hpp>
 #include <stan/math/prim/mat/fun/log_softmax.hpp>
 #include <stan/math/prim/mat/fun/log_sum_exp.hpp>
 #include <stan/math/prim/mat/fun/sum.hpp>
