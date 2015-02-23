@@ -1,4 +1,4 @@
-#include <stan/math/prim/scal/fun/dist.hpp>
+#include <stan/math/prim/arr/fun/dist.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 

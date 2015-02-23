@@ -13,6 +13,7 @@
 
 #include <stan/math/prim/arr/err/domain_error_vec.hpp>
 #include <stan/math/prim/arr/err/invalid_argument_vec.hpp>
+#include <stan/math/prim/arr/fun/dist.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_observer.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
 #include <stan/math/prim/arr/functor/integrate_ode.hpp>
@@ -228,7 +229,6 @@
 #include <stan/math/prim/scal/fun/cov_matrix_free.hpp>
 #include <stan/math/prim/scal/fun/cov_matrix_free_lkj.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
-#include <stan/math/prim/scal/fun/dist.hpp>
 #include <stan/math/prim/scal/fun/divide.hpp>
 #include <stan/math/prim/scal/fun/dot.hpp>
 #include <stan/math/prim/scal/fun/dot_self.hpp>
