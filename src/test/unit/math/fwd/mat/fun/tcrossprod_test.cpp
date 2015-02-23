@@ -1,6 +1,7 @@
 #include <stan/math/fwd/mat/fun/tcrossprod.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/transpose.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>

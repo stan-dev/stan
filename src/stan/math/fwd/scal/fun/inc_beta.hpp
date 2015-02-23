@@ -4,14 +4,13 @@
 #include <boost/math/special_functions/beta.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/fwd/scal/fun/grad_inc_beta.hpp>
-#include <stan/math/rev/scal/fun/grad_inc_beta.hpp>
 #include <stan/math/fwd/scal/fun/pow.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
 #include <stan/math/fwd/scal/fun/lbeta.hpp>
 #include <stan/math/fwd/scal/fun/digamma.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 #include <stan/math/prim/scal/fun/lbeta.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
-#include <stan/math/fwd/core/fvar.hpp>
 
 namespace stan {
 
@@ -25,7 +24,6 @@ namespace stan {
       using stan::math::grad_reg_inc_beta;
       using stan::math::inc_beta;
       using stan::math::lbeta;
-      using stan::agrad::exp;
       using stan::agrad::digamma;
       using stan::agrad::lbeta;
       using stan::agrad::pow;

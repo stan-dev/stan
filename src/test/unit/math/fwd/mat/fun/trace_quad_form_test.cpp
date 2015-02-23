@@ -1,5 +1,6 @@
 #include <stan/math/fwd/mat/fun/trace_quad_form.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
+#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/core/operator_addition.hpp>
