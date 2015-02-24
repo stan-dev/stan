@@ -11,13 +11,13 @@
 #include <stan/io/writer.hpp>
 #include <stan/io/csv_writer.hpp>
 
+#include <stan/math/prim/arr.hpp>
+#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/scal.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/arr.hpp>
 #include <stan/math/rev/mat.hpp>
 #include <stan/math/rev/scal.hpp>
-#include <stan/math/prim/arr.hpp>
-#include <stan/math/prim/mat.hpp>
-#include <stan/math/prim/scal.hpp>
 
 #include <stan/model/prob_grad.hpp>
 #include <stan/services/command.hpp>
