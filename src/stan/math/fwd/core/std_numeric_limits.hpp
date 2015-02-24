@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__FWD__CORE__STD_NUMERIC_LIMITS_HPP
 #define STAN__MATH__FWD__CORE__STD_NUMERIC_LIMITS_HPP
 
-#include <stan/math/fwd/core.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 
 namespace std {
 

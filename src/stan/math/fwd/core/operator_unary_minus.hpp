@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__FWD__CORE__OPERATOR_UNARY_MINUS_HPP
 #define STAN__MATH__FWD__CORE__OPERATOR_UNARY_MINUS_HPP
 
-#include <stan/math/fwd/core.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 
 
 namespace stan {

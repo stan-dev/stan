@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__FWD__CORE__OPERATOR_MULTIPLICATION_HPP
 #define STAN__MATH__FWD__CORE__OPERATOR_MULTIPLICATION_HPP
 
-#include <stan/math/fwd/core.hpp>
+#include <stan/math/fwd/core/fvar.hpp>
 
 
 namespace stan {
