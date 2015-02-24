@@ -1,3 +1,4 @@
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/arr/err/invalid_argument_vec.hpp>
 #include <vector>
 #include <gtest/gtest.h>
@@ -69,35 +70,9 @@ public:
   size_t index_;
 };
 
-TEST_F(ErrorHandlingScalar_invalid_argument_vec, vdouble) {
-  std::vector<double> y;
+TEST_F(ErrorHandlingScalar_invalid_argument_vec, vvar) {
+  std::vector<stan::agrad::var> y;
   y.push_back(10);
   
-  test_throw<std::vector<double> >(y);
-}
-
-TEST_F(ErrorHandlingScalar_invalid_argument_vec, vint) {
-  std::vector<int> y;
-  y.push_back(10);
-  
-  test_throw<std::vector<int> >(y);
-}
-
-TEST_F(ErrorHandlingScalar_invalid_argument_vec, one_indexed) {
-  std::string message;
-  int n = 5;
-  std::vector<double> y(20);
-  try {
-    stan::math::invalid_argument_vec
-      (function_, y_name_, y, n, msg1_, msg2_);
-    FAIL() << "expecting call to invalid_argument_vec<> to throw a invalid_argument,"
-           << "but threw nothing";
-  } catch(std::invalid_argument& e) {
-    message = e.what();
-  } catch(...) {
-    FAIL() << "expecting call to invalid_argument_vec<> to throw a invalid_argument,"
-           << "but threw a different type";
-  }
-
-  EXPECT_NE(std::string::npos, message.find("[6]"));
+  test_throw<std::vector<stan::agrad::var> >(y);
 }
