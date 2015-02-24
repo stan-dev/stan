@@ -2,6 +2,8 @@
 #define STAN__MATH__PRIM__SCAL__FUN__LUB_CONSTRAIN_HPP
 
 #include <stan/math/prim/scal/err/check_less.hpp>
+#include <stan/math/prim/scal/fun/lb_constrain.hpp>
+#include <stan/math/prim/scal/fun/ub_constrain.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <cmath>
 #include <limits>
