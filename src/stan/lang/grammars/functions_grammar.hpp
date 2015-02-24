@@ -70,6 +70,11 @@ namespace stan {
                               whitespace_grammar<Iterator> > 
       identifier_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::unused_type,
+                              whitespace_grammar<Iterator> >
+      close_arg_decls_r;
+
     };
                                
 

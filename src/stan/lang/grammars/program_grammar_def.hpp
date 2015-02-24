@@ -220,9 +220,11 @@ namespace stan {
             "       simplex, ordered, positive_ordered, corr_matrix, cov_matrix,\n"
             "       cholesky_corr, cholesky_cov\n"
            "  or a <statement>\n"
-           "  or '}' to close variable declarations");
+           "  or '}' to close variable declarations and definitions");
         end_var_decls_statements_r %= lit('}');
 
+        end_var_definitions_r.name("expected another statement or '}' to close declarations");
+        end_var_definitions_r %= lit('}');
 
         data_var_decls_r.name("data variable declarations");
         data_var_decls_r
@@ -237,8 +239,18 @@ namespace stan {
                  >> lit("data") )
                > lit('{') )
           > var_decls_g(true,transformed_data_origin)  // -constraints
-          > *statement_g(false,transformed_data_origin,false) // -sampling
-          > end_var_decls_statements_r;
+          > ( (statement_g(false,transformed_data_origin,false)
+               > *statement_g(false,transformed_data_origin,false)
+               > end_var_definitions_r
+               ) 
+              | ( *statement_g(false,transformed_data_origin,false)
+                  > end_var_decls_statements_r
+                  )
+              )
+          ;
+
+          //          > *statement_g(false,transformed_data_origin,false) // -sampling
+          // > end_var_decls_statements_r;
 
         param_var_decls_r.name("parameter variable declarations");
         param_var_decls_r

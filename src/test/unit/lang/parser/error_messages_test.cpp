@@ -47,10 +47,20 @@ TEST(LangGrammars,test1) {
   test_throws("err-decl-double",
               "a variable declaration, beginning with type");
   test_throws("err-decl-double-params",
-              "or a <statement>");
+              "variable \"lijaflj\" does not exist");
   test_throws("err-fun-bare-types-int",
               "comma to indicate more dimensions or ]");
   test_throws("err-bare-type-close-square", 
-              "comma to indicate more dimensions or ]");
+              "comma to indicate more dimensions or ] to end type declaration");
+  test_throws("err-close-function-args",
+              "PARSER EXPECTED: <argument declaration or close paren");
+  test_throws("err-if-else",
+              "PARSER EXPECTED: \")");
+  test_throws("err-if-else-no-cond",
+              "PARSER EXPECTED: <expression>");
+  test_throws("err-if-else-double-else",
+              "variable \"else\" does not exist.");
+  test_throws("err-var-decl-after-statement",
+              "variable \"real\" does not exist");
 }
  
