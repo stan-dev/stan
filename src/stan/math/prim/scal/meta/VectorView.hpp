@@ -3,6 +3,7 @@
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/meta/scalar_type.hpp>
+#include <stan/math/prim/mat/meta/is_vector_like.hpp>
 #include <stan/math/prim/scal/meta/is_vector_like.hpp>
 #include <stdexcept>
 #include <vector>

@@ -4,6 +4,7 @@
 #include <stan/math/prim/arr/meta/length.hpp>
 #include <stan/math/prim/mat/meta/length.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
+#include <stan/math/prim/mat/meta/is_vector_like.hpp>
 #include <stan/math/prim/scal/meta/is_vector_like.hpp>
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <stan/math/prim/arr/err/domain_error_vec.hpp>

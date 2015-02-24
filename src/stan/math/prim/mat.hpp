@@ -172,6 +172,7 @@
 #include <stan/math/prim/mat/meta/get.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector_lik.hpp>
 #include <stan/math/prim/mat/meta/length.hpp>
 #include <stan/math/prim/mat/meta/seq_view.hpp>
 #include <stan/math/prim/mat/meta/value_type.hpp>

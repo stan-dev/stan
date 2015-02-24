@@ -1,6 +1,7 @@
 #ifndef STAN__MATH__PRIM__SCAL__META__VECTORVIEWMVT_HPP
 #define STAN__MATH__PRIM__SCAL__META__VECTORVIEWMVT_HPP
 
+#include <stan/math/prim/mat/meta/is_vector_like.hpp>
 #include <stan/math/prim/scal/meta/is_vector_like.hpp>
 #include <stan/math/prim/scal/meta/scalar_type_pre.hpp>
 #include <stdexcept>
