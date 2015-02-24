@@ -5,16 +5,6 @@
 #include <stan/math/fwd/scal/fun/atan.hpp>
 #include <stan/math/rev/scal/fun/atan.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 
 class AgradFwdAtan : public testing::Test {
   void SetUp() {

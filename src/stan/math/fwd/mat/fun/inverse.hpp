@@ -6,7 +6,6 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/multiply.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/mat/fun/to_fvar.hpp>
 #include <stan/math/fwd/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/inverse.hpp>

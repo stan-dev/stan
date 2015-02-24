@@ -10,7 +10,6 @@
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/mat/fun/to_fvar.hpp>
 #include <stan/math/fwd/mat/fun/dot_product.hpp>
-#include <stan/math/fwd/core.hpp>
 
 namespace stan {
   namespace agrad {

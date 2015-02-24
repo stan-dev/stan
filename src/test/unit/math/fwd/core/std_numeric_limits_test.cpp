@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 TEST(AgradFwdNumericLimits,All_Fvar) {

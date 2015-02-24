@@ -6,17 +6,6 @@
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/cbrt.hpp>
 #include <stan/math/rev/scal/fun/cbrt.hpp>
 

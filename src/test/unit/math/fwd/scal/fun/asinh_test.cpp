@@ -8,16 +8,6 @@
 #include <stan/math/rev/scal/fun/asinh.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 
 class AgradFwdAsinh : public testing::Test {
   void SetUp() {

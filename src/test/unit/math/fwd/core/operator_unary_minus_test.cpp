@@ -2,16 +2,6 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdOperatorUnaryMinus, Fvar) {
   using stan::agrad::fvar;

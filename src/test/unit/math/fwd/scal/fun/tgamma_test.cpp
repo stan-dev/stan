@@ -4,16 +4,6 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/ceil.hpp>
 #include <stan/math/rev/scal/fun/ceil.hpp>
 #include <stan/math/fwd/scal/fun/digamma.hpp>
@@ -36,7 +26,6 @@
 #include <stan/math/rev/scal/fun/tgamma.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
-#include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 
 TEST(AgradFwdTgamma, Fvar) {

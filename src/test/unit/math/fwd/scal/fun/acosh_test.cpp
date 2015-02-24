@@ -7,16 +7,6 @@
 #include <stan/math/rev/scal/fun/acosh.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdAcosh,Fvar) {
   using stan::agrad::fvar;

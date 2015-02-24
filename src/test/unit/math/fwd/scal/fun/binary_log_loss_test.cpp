@@ -3,16 +3,6 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/fwd/scal/fun/binary_log_loss.hpp>

@@ -6,16 +6,6 @@
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdAtan2,Fvar) {
   using stan::agrad::fvar;

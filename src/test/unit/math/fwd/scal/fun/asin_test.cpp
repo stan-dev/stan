@@ -7,16 +7,6 @@
 #include <stan/math/rev/scal/fun/asin.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdAsin,Fvar) {
   using stan::agrad::fvar;

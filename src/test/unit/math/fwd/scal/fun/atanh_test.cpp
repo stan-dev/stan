@@ -5,16 +5,6 @@
 #include <stan/math/fwd/scal/fun/atanh.hpp>
 #include <stan/math/rev/scal/fun/atanh.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdAtanh,Fvar) {
   using stan::agrad::fvar;
