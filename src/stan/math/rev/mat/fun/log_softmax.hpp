@@ -9,7 +9,7 @@
 #include <stan/math/prim/mat/fun/log_softmax.hpp>
 #include <stan/math/prim/mat/fun/softmax.hpp>
 #include <stan/math/rev/core/var.hpp>
-#include <stan/math/prim/mat/err/check_nonzero_size.hpp>
+#include <stan/math/prim/scal/err/check_nonzero_size.hpp>
 
 namespace stan {
   namespace agrad {

@@ -2,7 +2,7 @@
 #define STAN__MATH__PRIM__MAT__FUN__QR_Q_HPP
 
 #include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
-#include <stan/math/prim/mat/err/check_nonzero_size.hpp>
+#include <stan/math/prim/scal/err/check_nonzero_size.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <Eigen/QR>
 
