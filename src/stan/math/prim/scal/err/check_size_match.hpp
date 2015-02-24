@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_SIZE_MATCH_HPP
-#define STAN__MATH__PRIM__MAT__ERR__CHECK_SIZE_MATCH_HPP
+#ifndef STAN__MATH__PRIM__SCAL__ERR__CHECK_SIZE_MATCH_HPP
+#define STAN__MATH__PRIM__SCAL__ERR__CHECK_SIZE_MATCH_HPP
 
 #include <boost/type_traits/common_type.hpp>
 #include <stan/math/prim/scal/err/invalid_argument.hpp>

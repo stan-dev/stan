@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__PRIM__MAT__PROB__WISHART_RNG_HPP
 #define STAN__MATH__PRIM__MAT__PROB__WISHART_RNG_HPP
 
-#include <stan/math/prim/mat/err/check_size_match.hpp>
+#include <stan/math/prim/scal/err/check_size_match.hpp>
 #include <stan/math/prim/mat/err/check_ldlt_factor.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>
 #include <stan/math/prim/scal/err/check_greater.hpp>
