@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__COV_MATRIX_CONSTRAIN_LKJ_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__COV_MATRIX_CONSTRAIN_LKJ_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__COV_MATRIX_CONSTRAIN_LKJ_HPP
+#define STAN__MATH__PRIM__MAT__FUN__COV_MATRIX_CONSTRAIN_LKJ_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/fun/corr_constrain.hpp>

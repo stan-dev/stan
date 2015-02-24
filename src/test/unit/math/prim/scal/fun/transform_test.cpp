@@ -13,7 +13,7 @@
 #include <stan/math/prim/mat/fun/factor_U.hpp>
 #include <stan/math/prim/mat/fun/determinant.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/scal/fun/factor_cov_matrix.hpp>
+#include <stan/math/prim/mat/fun/factor_cov_matrix.hpp>
 #include <stan/math/prim/scal/fun/read_corr_L.hpp>
 #include <stan/math/prim/scal/fun/read_corr_matrix.hpp>
 #include <stan/math/prim/scal/fun/read_cov_L.hpp>
@@ -41,16 +41,16 @@
 #include <stan/math/prim/scal/fun/ordered_free.hpp>
 #include <stan/math/prim/scal/fun/positive_ordered_constrain.hpp>
 #include <stan/math/prim/scal/fun/positive_ordered_free.hpp>
-#include <stan/math/prim/scal/fun/cholesky_factor_constrain.hpp>
-#include <stan/math/prim/scal/fun/cholesky_factor_free.hpp>
-#include <stan/math/prim/scal/fun/cholesky_corr_constrain.hpp>
-#include <stan/math/prim/scal/fun/cholesky_corr_free.hpp>
-#include <stan/math/prim/scal/fun/corr_matrix_constrain.hpp>
-#include <stan/math/prim/scal/fun/corr_matrix_free.hpp>
-#include <stan/math/prim/scal/fun/cov_matrix_constrain.hpp>
-#include <stan/math/prim/scal/fun/cov_matrix_free.hpp>
-#include <stan/math/prim/scal/fun/cov_matrix_constrain_lkj.hpp>
-#include <stan/math/prim/scal/fun/cov_matrix_free_lkj.hpp>
+#include <stan/math/prim/mat/fun/cholesky_factor_constrain.hpp>
+#include <stan/math/prim/mat/fun/cholesky_factor_free.hpp>
+#include <stan/math/prim/mat/fun/cholesky_corr_constrain.hpp>
+#include <stan/math/prim/mat/fun/cholesky_corr_free.hpp>
+#include <stan/math/prim/mat/fun/corr_matrix_constrain.hpp>
+#include <stan/math/prim/mat/fun/corr_matrix_free.hpp>
+#include <stan/math/prim/mat/fun/cov_matrix_constrain.hpp>
+#include <stan/math/prim/mat/fun/cov_matrix_free.hpp>
+#include <stan/math/prim/mat/fun/cov_matrix_constrain_lkj.hpp>
+#include <stan/math/prim/mat/fun/cov_matrix_free_lkj.hpp>
 #include <test/unit/util.hpp>
 #include <test/unit/math/rev/mat/fun/jacobian.hpp>
 
