@@ -1,6 +1,7 @@
 #ifndef STAN__MATH__FWD__SCAL_HPP
 #define STAN__MATH__FWD__SCAL_HPP
 
+#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/Phi.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>
 #include <stan/math/fwd/scal/fun/acos.hpp>

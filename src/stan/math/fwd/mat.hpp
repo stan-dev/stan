@@ -1,6 +1,7 @@
 #ifndef STAN__MATH__FWD__MAT_HPP
 #define STAN__MATH__FWD__MAT_HPP
 
+#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/fwd/mat/fun/columns_dot_product.hpp>
 #include <stan/math/fwd/mat/fun/columns_dot_self.hpp>
