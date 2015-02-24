@@ -198,6 +198,8 @@
 #include <stan/math/prim/mat/prob/multi_student_t_rng.hpp>
 #include <stan/math/prim/mat/prob/multinomial_log.hpp>
 #include <stan/math/prim/mat/prob/multinomial_rng.hpp>
+#include <stan/math/prim/mat/prob/ordered_logistic_log.hpp>
+#include <stan/math/prim/mat/prob/ordered_logistic_rng.hpp>
 #include <stan/math/prim/mat/prob/wishart_log.hpp>
 #include <stan/math/prim/mat/prob/wishart_rng.hpp>
 
