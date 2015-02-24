@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__MAT__FUN__MULTIPLY_HPP
 #define STAN__MATH__REV__MAT__FUN__MULTIPLY_HPP
 
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -9,7 +9,6 @@
 #include <stan/math/prim/mat/err/check_multiplicable.hpp>
 #include <stan/math/rev/mat/fun/to_var.hpp>
 #include <stan/math/rev/mat/fun/dot_product.hpp>
-#include <stan/math/rev/core/operator_multiplication.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/math/tools/promotion.hpp>

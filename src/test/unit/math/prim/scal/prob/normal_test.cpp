@@ -8,8 +8,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
-#include <stan/math/rev/core/operator_plus_equal.hpp>
-#include <stan/math/rev/core/grad.hpp>
+#include <stan/math/rev/core.hpp>
 
 TEST(ProbDistributionsNormal, cdf_tails) {
   using stan::agrad::var;

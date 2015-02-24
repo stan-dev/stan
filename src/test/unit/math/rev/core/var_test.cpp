@@ -1,7 +1,4 @@
-#include <stan/math/rev/core/operator_multiplication.hpp>
-#include <stan/math/rev/core/recover_memory.hpp>
-#include <stan/math/rev/core/recover_memory_nested.hpp>
-#include <stan/math/rev/core/start_nested.hpp>
+#include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/prim/mat/fun/Eigen.hpp>  // only used for stack tests
 #include <stan/math/rev/mat/fun/multiply.hpp>

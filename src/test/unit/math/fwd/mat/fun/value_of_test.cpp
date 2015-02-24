@@ -1,6 +1,6 @@
 #include <stan/math/prim/mat/fun/value_of.hpp>
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>

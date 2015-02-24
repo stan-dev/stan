@@ -1,5 +1,4 @@
-#include <stan/math/rev/core/operator_unary_plus.hpp>
-#include <stan/math/rev/core/operator_equal.hpp>
+#include <stan/math/rev/core.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
 #include <gtest/gtest.h>

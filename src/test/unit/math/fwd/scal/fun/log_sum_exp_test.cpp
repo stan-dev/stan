@@ -6,6 +6,7 @@
 #include <stan/math/fwd/arr/fun/log_sum_exp.hpp>
 #include <stan/math/fwd/scal/fun/log_sum_exp.hpp>
 #include <stan/math/rev/scal/fun/log_sum_exp.hpp>
+#include <stan/math/rev/arr/fun/log_sum_exp.hpp>
 #include <stan/math/fwd/scal/fun/log1p_exp.hpp>
 #include <stan/math/rev/scal/fun/log1p_exp.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>

@@ -1,5 +1,4 @@
-#include <stan/math/rev/core/precomputed_gradients.hpp>
-#include <stan/math/rev/core/recover_memory.hpp>
+#include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 
 

@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__VALUE_OF_HPP
 #define STAN__MATH__REV__SCAL__FUN__VALUE_OF_HPP
 
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {

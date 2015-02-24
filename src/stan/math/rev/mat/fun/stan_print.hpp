@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__MAT__FUN__STAN_PRINT_HPP
 
 #include <ostream>
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {

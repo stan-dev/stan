@@ -1,8 +1,8 @@
 #ifndef TEST__UNIT_DISTRIBUTION__TEST_FIXTURE_DISTR_HPP
 #define TEST__UNIT_DISTRIBUTION__TEST_FIXTURE_DISTR_HPP
 
-#include <stan/math/rev/core/recover_memory.hpp>
-#include <stan/math/fwd/core/std_numeric_limits.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <test/prob/utility.hpp>
 #include <boost/type_traits/is_same.hpp>

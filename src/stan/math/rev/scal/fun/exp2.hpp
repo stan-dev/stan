@@ -2,8 +2,7 @@
 #define STAN__MATH__REV__SCAL__FUN__EXP2_HPP
 
 #include <valarray>
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/v_vari.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <math.h>
 

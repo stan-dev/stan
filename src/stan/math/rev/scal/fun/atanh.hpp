@@ -1,9 +1,7 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__ATANH_HPP
 #define STAN__MATH__REV__SCAL__FUN__ATANH_HPP
 
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/v_vari.hpp>
-#include <stan/math/rev/core/operator_equal.hpp>
+#include <stan/math/rev/core.hpp>
 #include <math.h>
 #include <limits>
 

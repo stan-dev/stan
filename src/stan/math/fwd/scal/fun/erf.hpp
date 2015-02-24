@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__FWD__SCAL__FUN__ERF_HPP
 #define STAN__MATH__FWD__SCAL__FUN__ERF_HPP
 
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 
 #include <math.h>
 #include <stan/math/prim/scal/fun/constants.hpp>

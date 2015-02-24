@@ -1,8 +1,7 @@
 #include <stan/math/rev/scal/fun/cos.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/rev/core/std_numeric_limits.hpp>
-#include <stan/math/rev/core/std_isnan.hpp>
+#include <stan/math/rev/core.hpp>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev,cos_var) {

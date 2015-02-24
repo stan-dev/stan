@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__PRIM__MAT__PROB__MULTI_GP_CHOLESKY_LOG_HPP
 #define STAN__MATH__PRIM__MAT__PROB__MULTI_GP_CHOLESKY_LOG_HPP
 
-#include <stan/math/prim/mat/err/check_size_match.hpp>
+#include <stan/math/prim/scal/err/check_size_match.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>

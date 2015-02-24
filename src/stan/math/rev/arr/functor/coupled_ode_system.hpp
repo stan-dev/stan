@@ -4,11 +4,7 @@
 #include <ostream>
 #include <vector>
 #include <stan/math/rev/scal/fun/value_of.hpp>
-#include <stan/math/rev/core/precomputed_gradients.hpp>
-#include <stan/math/rev/core/recover_memory.hpp>
-#include <stan/math/rev/core/recover_memory_nested.hpp>
-#include <stan/math/rev/core/start_nested.hpp>
-#include <stan/math/rev/core/operator_plus_equal.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/err/check_equal.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
 

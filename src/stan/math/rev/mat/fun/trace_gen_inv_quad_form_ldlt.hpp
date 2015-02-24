@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__MAT__FUN__TRACE_GEN_INV_QUAD_FORM_LDLT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/meta/is_var.hpp>
 #include <stan/math/rev/scal/meta/is_var.hpp>
 #include <boost/utility/enable_if.hpp>

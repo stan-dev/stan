@@ -1,6 +1,6 @@
 #include <stan/math/prim/mat/fun/resize.hpp>
-#include <stan/math/fwd/core/fvar.hpp>
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/fwd/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 
 using Eigen::Matrix;

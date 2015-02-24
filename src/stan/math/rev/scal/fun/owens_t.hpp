@@ -2,10 +2,7 @@
 #define STAN__MATH__REV__SCAL__FUN__OWENS_T_HPP
 
 #include <math.h>
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/vv_vari.hpp>
-#include <stan/math/rev/core/vd_vari.hpp>
-#include <stan/math/rev/core/dv_vari.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>
 #include <boost/math/special_functions/owens_t.hpp>

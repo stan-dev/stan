@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__SCAL__FUN__OWENS_T_HPP
 
 #include <math.h>
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/owens_t.hpp>

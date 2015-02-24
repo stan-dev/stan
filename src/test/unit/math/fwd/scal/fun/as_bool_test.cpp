@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/as_bool.hpp>
-#include <stan/math/fwd/core/fvar.hpp>
-#include <stan/math/fwd/core/operator_not_equal.hpp>
+#include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwd,asBool) {
   using stan::math::as_bool;

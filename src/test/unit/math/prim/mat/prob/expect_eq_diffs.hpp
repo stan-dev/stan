@@ -1,7 +1,7 @@
 #ifndef TEST__UNIT_DISTRIBUTION__EXPECT_EQ_DIFFS_HPP
 #define TEST__UNIT_DISTRIBUTION__EXPECT_EQ_DIFFS_HPP
 
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 #include <cmath>
 
 void expect_eq_diffs(double x1, double x2, 

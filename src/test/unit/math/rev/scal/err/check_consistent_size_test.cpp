@@ -1,6 +1,5 @@
 #include <stan/math/prim/scal/err/check_consistent_size.hpp>
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/recover_memory.hpp>
+#include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRevErrorHandlingScalar, checkConsistentSize) {

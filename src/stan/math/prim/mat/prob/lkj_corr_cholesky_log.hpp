@@ -5,7 +5,7 @@
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-#include <stan/math/prim/scal/fun/factor_cov_matrix.hpp>
+#include <stan/math/prim/mat/fun/factor_cov_matrix.hpp>
 #include <stan/math/prim/mat/fun/factor_U.hpp>
 #include <stan/math/prim/scal/fun/read_corr_L.hpp>
 #include <stan/math/prim/scal/fun/read_corr_matrix.hpp>
@@ -30,20 +30,20 @@
 #include <stan/math/prim/scal/fun/unit_vector_free.hpp>
 #include <stan/math/prim/scal/fun/simplex_constrain.hpp>
 #include <stan/math/prim/scal/fun/simplex_free.hpp>
-#include <stan/math/prim/scal/fun/ordered_constrain.hpp>
-#include <stan/math/prim/scal/fun/ordered_free.hpp>
+#include <stan/math/prim/mat/fun/ordered_constrain.hpp>
+#include <stan/math/prim/mat/fun/ordered_free.hpp>
 #include <stan/math/prim/scal/fun/positive_ordered_constrain.hpp>
 #include <stan/math/prim/scal/fun/positive_ordered_free.hpp>
-#include <stan/math/prim/scal/fun/cholesky_factor_constrain.hpp>
-#include <stan/math/prim/scal/fun/cholesky_factor_free.hpp>
-#include <stan/math/prim/scal/fun/cholesky_corr_constrain.hpp>
-#include <stan/math/prim/scal/fun/cholesky_corr_free.hpp>
-#include <stan/math/prim/scal/fun/corr_matrix_constrain.hpp>
-#include <stan/math/prim/scal/fun/corr_matrix_free.hpp>
-#include <stan/math/prim/scal/fun/cov_matrix_constrain.hpp>
-#include <stan/math/prim/scal/fun/cov_matrix_free.hpp>
-#include <stan/math/prim/scal/fun/cov_matrix_constrain_lkj.hpp>
-#include <stan/math/prim/scal/fun/cov_matrix_free_lkj.hpp>
+#include <stan/math/prim/mat/fun/cholesky_factor_constrain.hpp>
+#include <stan/math/prim/mat/fun/cholesky_factor_free.hpp>
+#include <stan/math/prim/mat/fun/cholesky_corr_constrain.hpp>
+#include <stan/math/prim/mat/fun/cholesky_corr_free.hpp>
+#include <stan/math/prim/mat/fun/corr_matrix_constrain.hpp>
+#include <stan/math/prim/mat/fun/corr_matrix_free.hpp>
+#include <stan/math/prim/mat/fun/cov_matrix_constrain.hpp>
+#include <stan/math/prim/mat/fun/cov_matrix_free.hpp>
+#include <stan/math/prim/mat/fun/cov_matrix_constrain_lkj.hpp>
+#include <stan/math/prim/mat/fun/cov_matrix_free_lkj.hpp>
 #include <stan/math/prim/mat/prob/lkj_corr_log.hpp>
 
 namespace stan {

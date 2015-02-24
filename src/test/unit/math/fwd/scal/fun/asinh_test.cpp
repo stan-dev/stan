@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/math/rev/core/recover_memory.hpp>
+#include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/asinh.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
@@ -7,17 +7,7 @@
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
 #include <stan/math/rev/scal/fun/asinh.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
-#include <stan/math/fwd/core/operator_addition.hpp>
-#include <stan/math/fwd/core/operator_division.hpp>
-#include <stan/math/fwd/core/operator_equal.hpp>
-#include <stan/math/fwd/core/operator_greater_than.hpp>
-#include <stan/math/fwd/core/operator_greater_than_or_equal.hpp>
-#include <stan/math/fwd/core/operator_less_than.hpp>
-#include <stan/math/fwd/core/operator_less_than_or_equal.hpp>
-#include <stan/math/fwd/core/operator_multiplication.hpp>
-#include <stan/math/fwd/core/operator_not_equal.hpp>
-#include <stan/math/fwd/core/operator_subtraction.hpp>
-#include <stan/math/fwd/core/operator_unary_minus.hpp>
+#include <stan/math/fwd/core.hpp>
 
 class AgradFwdAsinh : public testing::Test {
   void SetUp() {

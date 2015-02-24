@@ -3,13 +3,11 @@
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
-#include <stan/math/rev/core/chainable_alloc.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
-#include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/prim/mat/fun/value_of.hpp>
-#include <stan/math/rev/core/vari.hpp>
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/fun/trace_quad_form.hpp>
 #include <stan/math/prim/mat/err/check_multiplicable.hpp>

@@ -1,8 +1,7 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__PHI_APPROX_HPP
 #define STAN__MATH__REV__SCAL__FUN__PHI_APPROX_HPP
 
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/precomp_v_vari.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 
 namespace stan {

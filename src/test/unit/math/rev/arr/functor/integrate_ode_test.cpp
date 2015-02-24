@@ -13,9 +13,7 @@
 #include <stan/math/prim/scal/fun/promote_scalar.hpp>
 
 #include <test/unit/math/rev/arr/functor/util.hpp>
-#include <stan/math/rev/core/operator_multiplication.hpp>
-#include <stan/math/rev/core/operator_subtraction.hpp>
-#include <stan/math/rev/core/operator_unary_negative.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 
 #include <test/unit/math/prim/arr/functor/harmonic_oscillator.hpp>

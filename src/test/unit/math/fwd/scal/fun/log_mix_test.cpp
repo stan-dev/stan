@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/math/rev/core/recover_memory.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/log_mix.hpp>
 #include <stan/math/prim/mat/err/constraint_tolerance.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>

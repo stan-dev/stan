@@ -2,10 +2,7 @@
 #include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
 #include <stan/math/prim/mat/prob/categorical_log.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
-#include <stan/math/rev/core/operator_addition.hpp>
-#include <stan/math/rev/core/operator_subtraction.hpp>
-#include <stan/math/rev/core/operator_less_than_or_equal.hpp>
-#include <stan/math/rev/core/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/fabs.hpp>
 #include <stan/math/prim/mat/err/check_simplex.hpp>
 

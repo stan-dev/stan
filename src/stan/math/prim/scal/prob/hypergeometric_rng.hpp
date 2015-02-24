@@ -42,7 +42,7 @@ namespace stan {
       check_positive(function, "Failures in population parameter", b);
 
       boost::math::hypergeometric_distribution<>dist (b, N, a + b);
-      std::vector<double> index(a);
+      double index[a];
       for(int i = 0; i < a; i++)
         index[i] = cdf(dist, i + 1);
 

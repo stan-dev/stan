@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__SCAL__FUN__VALUE_OF_REC_HPP
 
 #include <stan/math/prim/scal/fun/value_of_rec.hpp>
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 
 namespace stan {
   namespace agrad {

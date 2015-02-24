@@ -22,9 +22,10 @@ namespace stan {
   namespace prob {
 
     /**
-     * The log of the Cauchy density for the specified scalar(s) given the specified
-     * location parameter(s) and scale parameter(s). y, mu, or sigma can each either be scalar or std::vector.
-     * Any vector inputs must be the same length.
+     * The log of the Cauchy density for the specified scalar(s) given
+     * the specified location parameter(s) and scale parameter(s). y,
+     * mu, or sigma can each either be scalar a vector.  Any vector
+     * inputs must be the same length.
      *
      * <p> The result log probability is defined to be the sum of
      * the log probabilities for each observation/mu/sigma triple.

@@ -3,7 +3,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <stan/math/rev/mat/fun/typedefs.hpp>
-#include <stan/math/rev/core/operator_unary_negative.hpp>
+#include <stan/math/rev/core.hpp>
 
 TEST(AgradRevMatrix, minus_scalar) {
   using stan::math::minus;

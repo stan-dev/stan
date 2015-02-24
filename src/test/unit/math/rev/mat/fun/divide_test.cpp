@@ -1,7 +1,7 @@
 #include <stan/math/rev/mat/fun/divide.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
-#include <stan/math/rev/core/std_isnan.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/mat/fun/divide.hpp>
 
 TEST(AgradRevMatrix, divide_scalar) {

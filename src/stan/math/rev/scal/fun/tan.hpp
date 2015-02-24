@@ -2,8 +2,7 @@
 #define STAN__MATH__REV__SCAL__FUN__TAN_HPP
 
 #include <cmath>
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/v_vari.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {

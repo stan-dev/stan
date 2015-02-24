@@ -1,9 +1,4 @@
-#include <stan/math/rev/core/chainable.hpp>
-#include <stan/math/rev/core/chainable_alloc.hpp>
-#include <stan/math/rev/core/recover_memory.hpp>
-#include <stan/math/rev/core/recover_memory_nested.hpp>
-#include <stan/math/rev/core/start_nested.hpp>
-#include <stan/math/rev/core/operator_multiplication.hpp>
+#include <stan/math/rev/core.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
