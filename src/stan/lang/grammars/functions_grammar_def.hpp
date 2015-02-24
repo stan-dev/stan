@@ -335,7 +335,7 @@ namespace stan {
         > identifier_r[ set_allows_sampling_origin_f(_1,_a,_b) ]
         > lit('(')
         > arg_decls_r
-        > lit(')')
+        > close_arg_decls_r
         > eps [ scope_lp_f(boost::phoenix::ref(var_map_)) ]
         > statement_g(_a,_b,true)
         > eps [ unscope_variables_f(_val,
@@ -348,6 +348,9 @@ namespace stan {
                                           boost::phoenix::ref(error_msgs_) ) ]
         ;
       
+      close_arg_decls_r.name("argument declaration or close paren ) to end argument declarations");
+      close_arg_decls_r %= lit(')');
+
       arg_decls_r.name("function argument declaration sequence");
       arg_decls_r
         %= arg_decl_r % ','
