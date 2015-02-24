@@ -95,8 +95,6 @@
 #include <stan/math/prim/scal/fun/modified_bessel_second_kind.hpp>
 #include <stan/math/prim/scal/fun/modulus.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
-#include <stan/math/prim/scal/fun/ordered_constrain.hpp>
-#include <stan/math/prim/scal/fun/ordered_free.hpp>
 #include <stan/math/prim/scal/fun/owens_t.hpp>
 #include <stan/math/prim/scal/fun/positive_constrain.hpp>
 #include <stan/math/prim/scal/fun/positive_free.hpp>

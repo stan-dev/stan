@@ -31,8 +31,8 @@
 #include <stan/math/prim/scal/fun/unit_vector_free.hpp>
 #include <stan/math/prim/scal/fun/simplex_constrain.hpp>
 #include <stan/math/prim/scal/fun/simplex_free.hpp>
-#include <stan/math/prim/scal/fun/ordered_constrain.hpp>
-#include <stan/math/prim/scal/fun/ordered_free.hpp>
+#include <stan/math/prim/mat/fun/ordered_constrain.hpp>
+#include <stan/math/prim/mat/fun/ordered_free.hpp>
 #include <stan/math/prim/scal/fun/positive_ordered_constrain.hpp>
 #include <stan/math/prim/scal/fun/positive_ordered_free.hpp>
 #include <stan/math/prim/mat/fun/cholesky_factor_constrain.hpp>
