@@ -2,14 +2,14 @@
 #define STAN__MATH__REV__SCAL__FUN__INC_BETA_HPP
 
 #include <valarray>
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/vvv_vari.hpp>
-#include <stan/math/rev/core/vvd_vari.hpp>
-#include <stan/math/rev/core/vdv_vari.hpp>
-#include <stan/math/rev/core/dvv_vari.hpp>
-#include <stan/math/rev/core/vdd_vari.hpp>
-#include <stan/math/rev/core/dvd_vari.hpp>
-#include <stan/math/rev/core/ddv_vari.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>

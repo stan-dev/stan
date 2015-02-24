@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__LOG1P_EXP_HPP
 #define STAN__MATH__REV__SCAL__FUN__LOG1P_EXP_HPP
 
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/v_vari.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/log1p_exp.hpp>
 #include <stan/math/rev/scal/fun/calculate_chain.hpp>
 

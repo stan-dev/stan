@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__FWD__SCAL__FUN__BINOMIAL_COEFFICIENT_LOG_HPP
 #define STAN__MATH__FWD__SCAL__FUN__BINOMIAL_COEFFICIENT_LOG_HPP
 
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/prim/scal/fun/binomial_coefficient_log.hpp>

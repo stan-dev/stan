@@ -1,5 +1,5 @@
-#include <stan/math/rev/core/precomp_vv_vari.hpp>
-#include <stan/math/rev/core/recover_memory.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 

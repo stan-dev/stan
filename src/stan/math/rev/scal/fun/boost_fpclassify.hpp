@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__SCAL__FUN__BOOST_FPCLASSIFY_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace boost {
 

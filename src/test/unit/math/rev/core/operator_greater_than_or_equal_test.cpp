@@ -1,4 +1,4 @@
-#include <stan/math/rev/core/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/core.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 

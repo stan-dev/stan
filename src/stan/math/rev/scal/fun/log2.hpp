@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__LOG2_HPP
 #define STAN__MATH__REV__SCAL__FUN__LOG2_HPP
 
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/v_vari.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/log2.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 

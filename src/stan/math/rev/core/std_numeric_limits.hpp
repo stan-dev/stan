@@ -2,7 +2,7 @@
 #define STAN__MATH__REV__CORE__STD_NUMERIC_LIMITS_HPP
 
 #include <limits>
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace std {
 

@@ -4,8 +4,8 @@
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/gamma_q.hpp>
 #include <stan/math/rev/scal/fun/gamma_q.hpp>
-#include <stan/math/fwd/core/std_numeric_limits.hpp>
-#include <stan/math/rev/core/std_numeric_limits.hpp>
+#include <stan/math/fwd/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>

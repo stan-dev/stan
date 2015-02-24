@@ -1,9 +1,9 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__IS_UNINITIALIZED_HPP
 #define STAN__MATH__REV__SCAL__FUN__IS_UNINITIALIZED_HPP
 
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/vari.hpp>
-#include <stan/math/rev/core/operator_unary_negative.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/is_uninitialized.hpp>
 
 namespace stan {

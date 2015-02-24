@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {

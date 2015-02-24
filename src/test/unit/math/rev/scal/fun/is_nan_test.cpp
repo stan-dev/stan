@@ -2,7 +2,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
-#include <stan/math/rev/core/std_numeric_limits.hpp>
+#include <stan/math/rev/core.hpp>
 
 TEST(AgradRev,is_nan) {
   using stan::math::is_nan;

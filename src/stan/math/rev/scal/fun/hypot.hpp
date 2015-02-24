@@ -2,9 +2,9 @@
 #define STAN__MATH__REV__SCAL__FUN__HYPOT_HPP
 
 #include <valarray>
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/vv_vari.hpp>
-#include <stan/math/rev/core/v_vari.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <math.h>
 
 namespace stan {

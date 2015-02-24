@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__REV__CORE__OPERATOR_UNARY_DECREMENT_HPP
 #define STAN__MATH__REV__CORE__OPERATOR_UNARY_DECREMENT_HPP
 
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/v_vari.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {

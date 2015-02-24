@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__CORE__CHAINABLESTACK_HPP
 #define STAN__MATH__REV__CORE__CHAINABLESTACK_HPP
 
-#include <stan/math/rev/core/autodiffstackstorage.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {

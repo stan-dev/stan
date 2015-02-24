@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__FWD__SCAL__FUN__TGAMMA_HPP
 #define STAN__MATH__FWD__SCAL__FUN__TGAMMA_HPP
 
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 
 #include <boost/math/special_functions/digamma.hpp>
 

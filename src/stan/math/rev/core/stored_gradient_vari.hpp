@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__CORE__STORED_GRADIENT_VARI_HPP
 #define STAN__MATH__REV__CORE__STORED_GRADIENT_VARI_HPP
 
-#include <stan/math/rev/core/vari.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace stan {
 

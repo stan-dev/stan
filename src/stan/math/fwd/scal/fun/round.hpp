@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__SCAL__FUN__ROUND_HPP
 
 #include <math.h>
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 
 
 namespace stan {

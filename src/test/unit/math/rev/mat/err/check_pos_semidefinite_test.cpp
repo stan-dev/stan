@@ -1,10 +1,10 @@
 #include <stan/math/prim/mat/err/check_pos_semidefinite.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/recover_memory.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
-#include <stan/math/rev/core/operator_greater_than.hpp>
-#include <stan/math/rev/core/operator_greater_than_or_equal.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>

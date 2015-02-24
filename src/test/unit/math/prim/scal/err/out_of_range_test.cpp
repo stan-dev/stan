@@ -1,5 +1,5 @@
 #include <stan/math/prim/scal/err/out_of_range.hpp>
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 

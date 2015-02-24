@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__CORE__OPERATOR_GREATER_THAN_OR_EQUAL_HPP
 #define STAN__MATH__REV__CORE__OPERATOR_GREATER_THAN_OR_EQUAL_HPP
 
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {

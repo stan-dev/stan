@@ -1,10 +1,10 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__LOG_RISING_FACTORIAL_HPP
 #define STAN__MATH__REV__SCAL__FUN__LOG_RISING_FACTORIAL_HPP
 
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/vd_vari.hpp>
-#include <stan/math/rev/core/dv_vari.hpp>
-#include <stan/math/rev/core/vv_vari.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/log_rising_factorial.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 

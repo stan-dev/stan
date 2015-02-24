@@ -1,13 +1,13 @@
 #ifndef STAN__MATH__MIX__MAT__FUNCTOR__HESSIAN_HPP
 #define STAN__MATH__MIX__MAT__FUNCTOR__HESSIAN_HPP
 
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/grad.hpp>
-#include <stan/math/rev/core/start_nested.hpp>
-#include <stan/math/rev/core/recover_memory_nested.hpp>
-#include <stan/math/rev/core/set_zero_all_adjoints.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <vector>
 
 namespace stan {

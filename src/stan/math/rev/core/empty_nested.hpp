@@ -1,9 +1,9 @@
 #ifndef STAN__MATH__REV__CORE__EMPTY_NESTED_HPP
 #define STAN__MATH__REV__CORE__EMPTY_NESTED_HPP
 
-#include <stan/math/rev/core/chainable.hpp>
-#include <stan/math/rev/core/chainable_alloc.hpp>
-#include <stan/math/rev/core/chainablestack.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {

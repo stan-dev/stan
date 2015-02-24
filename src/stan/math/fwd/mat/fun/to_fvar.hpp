@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__MAT__FUN__TO_FVAR_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/err/check_matching_dims.hpp>
 #include <stan/math/prim/scal/meta/is_constant.hpp>
 #include <boost/utility/enable_if.hpp>

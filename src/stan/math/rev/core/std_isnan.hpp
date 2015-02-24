@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__CORE__STD_ISNAN_HPP
 #define STAN__MATH__REV__CORE__STD_ISNAN_HPP
 
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 #include <cmath>
 
 namespace std {

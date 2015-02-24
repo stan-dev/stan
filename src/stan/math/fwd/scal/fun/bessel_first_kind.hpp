@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__FWD__SCAL__FUN__BESSEL_FIRST_KIND_HPP
 #define STAN__MATH__FWD__SCAL__FUN__BESSEL_FIRST_KIND_HPP
 
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 
 #include <stan/math/prim/scal/fun/bessel_first_kind.hpp>
 

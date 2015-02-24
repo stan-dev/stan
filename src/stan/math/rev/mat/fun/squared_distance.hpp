@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/vari.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 

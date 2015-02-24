@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__CORE__CHAINABLE_ALLOC_HPP
 #define STAN__MATH__REV__CORE__CHAINABLE_ALLOC_HPP
 
-#include <stan/math/rev/core/chainablestack.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stdexcept>
 
 namespace stan {

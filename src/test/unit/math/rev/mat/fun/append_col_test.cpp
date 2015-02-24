@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stan/math/prim/mat/fun/append_col.hpp>
-#include <stan/math/rev/core/recover_memory.hpp>
+#include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/prim/mat/fun/sum.hpp>

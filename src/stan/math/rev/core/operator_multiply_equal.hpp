@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__REV__CORE__OPERATOR_MULTIPLY_EQUAL_HPP
 #define STAN__MATH__REV__CORE__OPERATOR_MULTIPLY_EQUAL_HPP
 
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/operator_multiplication.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {

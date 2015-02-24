@@ -2,7 +2,7 @@
 #include <stan/math/prim/scal/prob/normal_cdf.hpp>
 
 #include <stan/math/prim/scal/fun/constants.hpp>
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 #include <boost/utility/enable_if.hpp>
 
 using std::vector;

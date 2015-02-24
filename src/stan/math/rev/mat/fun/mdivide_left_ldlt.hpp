@@ -1,9 +1,9 @@
 #ifndef STAN__MATH__REV__MAT__FUN__MDIVIDE_LEFT_LDLT_HPP
 #define STAN__MATH__REV__MAT__FUN__MDIVIDE_LEFT_LDLT_HPP
 
-#include <stan/math/rev/core/chainable_alloc.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/rev/core/var.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/mat/fun/LDLT_alloc.hpp>
 #include <stan/math/rev/mat/fun/LDLT_factor.hpp>
 #include <stan/math/prim/mat/err/check_multiplicable.hpp>

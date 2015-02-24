@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__FWD__MAT__FUN__SORT_ASC_HPP
 #define STAN__MATH__FWD__MAT__FUN__SORT_ASC_HPP
 
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

@@ -1,10 +1,10 @@
 #ifndef STAN__MATH__REV__CORE__OPERATOR_DIVISION_HPP
 #define STAN__MATH__REV__CORE__OPERATOR_DIVISION_HPP
 
-#include <stan/math/rev/core/var.hpp>
-#include <stan/math/rev/core/vv_vari.hpp>
-#include <stan/math/rev/core/vd_vari.hpp>
-#include <stan/math/rev/core/dv_vari.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {

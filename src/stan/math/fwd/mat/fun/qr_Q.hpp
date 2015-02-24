@@ -5,7 +5,7 @@
 #include <Eigen/QR>
 #include <stan/math/prim/scal/err/check_nonzero_size.hpp>
 #include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 
 namespace stan {
   namespace agrad {

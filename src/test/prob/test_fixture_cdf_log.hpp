@@ -1,7 +1,7 @@
 #ifndef TEST__UNIT_DISTRIBUTION__TEST_FIXTURE_CDF_LOG_HPP
 #define TEST__UNIT_DISTRIBUTION__TEST_FIXTURE_CDF_LOG_HPP
 
-#include <stan/math/rev/core/recover_memory.hpp>
+#include <stan/math/rev/core.hpp>
 #include <stdexcept>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <test/prob/utility.hpp>

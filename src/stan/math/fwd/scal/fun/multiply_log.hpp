@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__FWD__SCAL__FUN__MULTIPLY_LOG_HPP
 #define STAN__MATH__FWD__SCAL__FUN__MULTIPLY_LOG_HPP
 
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 

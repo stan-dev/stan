@@ -2,7 +2,7 @@
 #define STAN__MATH__FWD__SCAL__FUN__LOG_MIX_HPP
 
 #include <cmath>
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/log_mix.hpp>
 #include <boost/math/tools/promotion.hpp>

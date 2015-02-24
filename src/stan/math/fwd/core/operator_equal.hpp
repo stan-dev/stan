@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__FWD__CORE__OPERATOR_EQUAL_HPP
 #define STAN__MATH__FWD__CORE__OPERATOR_EQUAL_HPP
 
-#include <stan/math/fwd/core/fvar.hpp>
+#include <stan/math/fwd/core.hpp>
 
 
 namespace stan {

@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__REV__CORE__PRECOMP_VVV_VARI_HPP
 #define STAN__MATH__REV__CORE__PRECOMP_VVV_VARI_HPP
 
-#include <stan/math/rev/core/vari.hpp>
-#include <stan/math/rev/core/vvv_vari.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {
