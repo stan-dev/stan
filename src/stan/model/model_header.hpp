@@ -350,6 +350,8 @@
 #include <stan/math/prim/scal/meta/is_var_or_arithmetic.hpp>
 #include <stan/math/prim/scal/meta/is_vector.hpp>
 #include <stan/math/prim/scal/meta/is_vector_like.hpp>
+#include <stan/math/prim/arr/meta/length.hpp>
+#include <stan/math/prim/mat/meta/length.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/length_mvt.hpp>
 #include <stan/math/prim/scal/meta/likely.hpp>
