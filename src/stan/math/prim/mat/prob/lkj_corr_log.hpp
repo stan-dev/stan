@@ -13,7 +13,7 @@
 #include <stan/math/prim/mat/fun/read_corr_matrix.hpp>
 #include <stan/math/prim/mat/fun/read_cov_L.hpp>
 #include <stan/math/prim/mat/fun/read_cov_matrix.hpp>
-#include <stan/math/prim/scal/fun/make_nu.hpp>
+#include <stan/math/prim/mat/fun/make_nu.hpp>
 #include <stan/math/prim/scal/fun/identity_constrain.hpp>
 #include <stan/math/prim/scal/fun/identity_free.hpp>
 #include <stan/math/prim/scal/fun/positive_constrain.hpp>

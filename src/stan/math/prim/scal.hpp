@@ -88,7 +88,6 @@
 #include <stan/math/prim/scal/fun/logit.hpp>
 #include <stan/math/prim/scal/fun/lub_constrain.hpp>
 #include <stan/math/prim/scal/fun/lub_free.hpp>
-#include <stan/math/prim/scal/fun/make_nu.hpp>
 #include <stan/math/prim/scal/fun/max.hpp>
 #include <stan/math/prim/scal/fun/min.hpp>
 #include <stan/math/prim/scal/fun/modified_bessel_first_kind.hpp>
