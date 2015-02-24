@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__REV__CORE__START_NESTED_HPP
 #define STAN__MATH__REV__CORE__START_NESTED_HPP
 
-#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core/chainablestack.hpp>
 
 namespace stan {
   namespace agrad {

@@ -1,9 +1,9 @@
 #ifndef STAN__MATH__REV__CORE__OPERATOR_UNARY_PLUS_HPP
 #define STAN__MATH__REV__CORE__OPERATOR_UNARY_PLUS_HPP
 
-#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core/precomp_v_vari.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 namespace stan {

@@ -1,10 +1,10 @@
 #ifndef STAN__MATH__REV__CORE__RECOVER_MEMORY_HPP
 #define STAN__MATH__REV__CORE__RECOVER_MEMORY_HPP
 
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/core/chainable.hpp>
+#include <stan/math/rev/core/chainable_alloc.hpp>
+#include <stan/math/rev/core/chainablestack.hpp>
+#include <stan/math/rev/core/empty_nested.hpp>
 #include <stdexcept>
 
 namespace stan {
