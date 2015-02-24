@@ -1,4 +1,4 @@
-#include <stan/math/prim/mat/err/check_nonzero_size.hpp>
+#include <stan/math/prim/scal/err/check_nonzero_size.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 

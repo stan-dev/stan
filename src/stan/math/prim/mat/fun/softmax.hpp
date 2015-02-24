@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__SOFTMAX_HPP
 #define STAN__MATH__PRIM__MAT__FUN__SOFTMAX_HPP
 
-#include <stan/math/prim/mat/err/check_nonzero_size.hpp>
+#include <stan/math/prim/scal/err/check_nonzero_size.hpp>
 #include <cmath>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
