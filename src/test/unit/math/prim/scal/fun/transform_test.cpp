@@ -7,17 +7,6 @@
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/log1p.hpp>
 #include <stan/math/rev/scal/fun/log1m.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/sin.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 #include <stan/math/rev/scal/fun/tanh.hpp>

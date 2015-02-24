@@ -6,8 +6,6 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/mean.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/err/check_nonzero_size.hpp>
 
 namespace stan {

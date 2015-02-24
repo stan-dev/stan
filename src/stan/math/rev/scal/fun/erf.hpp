@@ -4,7 +4,6 @@
 #include <valarray>
 #include <math.h>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 namespace stan {

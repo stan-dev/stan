@@ -4,24 +4,6 @@
 #include <stan/math/rev/mat/fun/log_softmax.hpp>
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/exp.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 

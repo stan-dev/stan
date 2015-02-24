@@ -2,34 +2,6 @@
 #include <stan/math/prim/mat/fun/cumulative_sum.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/core.hpp>
 
 template <typename T>

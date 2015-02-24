@@ -2,9 +2,6 @@
 #define STAN__MATH__REV__SCAL__FUN__BESSEL_FIRST_KIND_HPP
 
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/bessel_first_kind.hpp>
 

@@ -3,7 +3,6 @@
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/inv_cloglog.hpp>
-#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {

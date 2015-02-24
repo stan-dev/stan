@@ -4,7 +4,6 @@
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/rev/core.hpp>
 
 // test sum of first n numbers for sum of a
 void test_sum(stan::math::accumulator<stan::agrad::var>& a,

@@ -3,7 +3,6 @@
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {

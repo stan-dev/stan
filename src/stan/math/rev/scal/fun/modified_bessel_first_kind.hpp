@@ -2,7 +2,6 @@
 #define STAN__MATH__REV__SCAL__FUN__MODIFIED_BESSEL_FIRST_KIND_HPP
 
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/modified_bessel_first_kind.hpp>
 
 namespace stan {

@@ -9,11 +9,6 @@
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/log1m.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 

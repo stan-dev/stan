@@ -14,8 +14,6 @@
 
 #include <test/unit/math/rev/arr/functor/util.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 
 #include <test/unit/math/prim/arr/functor/harmonic_oscillator.hpp>

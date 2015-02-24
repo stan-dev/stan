@@ -4,7 +4,6 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
 
 TEST(AgradRev,acosh_val) {

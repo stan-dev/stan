@@ -2,7 +2,6 @@
 #define STAN__MATH__REV__SCAL__FUN__IS_INF_HPP
 
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/is_inf.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 

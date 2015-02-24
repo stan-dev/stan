@@ -2,7 +2,6 @@
 #define STAN__MATH__REV__SCAL__FUN__PHI_APPROX_HPP
 
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 
 namespace stan {

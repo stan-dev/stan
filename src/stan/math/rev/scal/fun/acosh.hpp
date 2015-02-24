@@ -3,12 +3,7 @@
 
 #include <math.h>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 
 namespace stan {
   namespace agrad {

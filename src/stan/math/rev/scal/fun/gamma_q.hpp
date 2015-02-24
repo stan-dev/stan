@@ -3,9 +3,6 @@
 
 #include <valarray>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/gamma_q.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>

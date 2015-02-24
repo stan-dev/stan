@@ -6,7 +6,6 @@
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
-#include <stan/math/rev/core.hpp>
 
 namespace stan {
 

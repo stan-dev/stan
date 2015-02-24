@@ -4,34 +4,6 @@
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/scal/fun/digamma.hpp>
 #include <stan/math/rev/scal/fun/digamma.hpp>
@@ -55,7 +27,6 @@
 #include <stan/math/fwd/scal/fun/grad_inc_beta.hpp>
 #include <stan/math/rev/scal/fun/grad_inc_beta.hpp>
 
-#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 
 

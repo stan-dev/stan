@@ -3,9 +3,6 @@
 
 #include <limits>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

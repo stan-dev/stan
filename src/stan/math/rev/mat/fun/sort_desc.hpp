@@ -3,9 +3,6 @@
 
 #include <valarray>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <algorithm>    // std::sort

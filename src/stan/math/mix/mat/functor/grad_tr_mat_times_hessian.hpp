@@ -4,10 +4,6 @@
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/mix/mat/functor/gradient_dot_vector.hpp>
 #include <vector>
 

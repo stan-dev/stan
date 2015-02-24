@@ -2,9 +2,6 @@
 #define STAN__MATH__REV__SCAL__FUN__BESSEL_SECOND_KIND_HPP
 
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/bessel_second_kind.hpp>
 

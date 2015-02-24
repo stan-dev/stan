@@ -3,7 +3,6 @@
 
 #include <cmath>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <math.h>
 
 namespace stan {

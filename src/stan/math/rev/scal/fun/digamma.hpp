@@ -4,7 +4,6 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/zeta.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/trigamma.hpp>
 
 namespace stan {

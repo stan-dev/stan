@@ -6,7 +6,6 @@
 
 #include <vector>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 
 namespace stan {
 

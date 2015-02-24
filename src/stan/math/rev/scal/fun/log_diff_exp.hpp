@@ -3,12 +3,6 @@
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/calculate_chain.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/log_diff_exp.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 

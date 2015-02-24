@@ -3,9 +3,6 @@
 #include <stan/math/prim/mat/prob/categorical_log.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/fabs.hpp>
 #include <stan/math/prim/mat/err/check_simplex.hpp>
 
