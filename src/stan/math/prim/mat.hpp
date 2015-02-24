@@ -105,6 +105,8 @@
 #include <stan/math/prim/mat/fun/num_elements.hpp>
 #include <stan/math/prim/mat/fun/ordered_constrain.hpp>
 #include <stan/math/prim/mat/fun/ordered_free.hpp>
+#include <stan/math/prim/mat/fun/positive_ordered_constrain.hpp>
+#include <stan/math/prim/mat/fun/positive_ordered_free.hpp>
 #include <stan/math/prim/mat/fun/prod.hpp>
 #include <stan/math/prim/mat/fun/promote_common.hpp>
 #include <stan/math/prim/mat/fun/promote_scalar.hpp>
@@ -116,6 +118,10 @@
 #include <stan/math/prim/mat/fun/quad_form_diag.hpp>
 #include <stan/math/prim/mat/fun/quad_form_sym.hpp>
 #include <stan/math/prim/mat/fun/rank.hpp>
+#include <stan/math/prim/mat/fun/read_corr_L.hpp>
+#include <stan/math/prim/mat/fun/read_corr_matrix.hpp>
+#include <stan/math/prim/mat/fun/read_cov_L.hpp>
+#include <stan/math/prim/mat/fun/read_cov_matrix.hpp>
 #include <stan/math/prim/mat/fun/rep_matrix.hpp>
 #include <stan/math/prim/mat/fun/rep_row_vector.hpp>
 #include <stan/math/prim/mat/fun/rep_vector.hpp>
@@ -126,6 +132,8 @@
 #include <stan/math/prim/mat/fun/rows_dot_self.hpp>
 #include <stan/math/prim/mat/fun/sd.hpp>
 #include <stan/math/prim/mat/fun/segment.hpp>
+#include <stan/math/prim/mat/fun/simplex_constrain.hpp>
+#include <stan/math/prim/mat/fun/simplex_free.hpp>
 #include <stan/math/prim/mat/fun/singular_values.hpp>
 #include <stan/math/prim/mat/fun/size.hpp>
 #include <stan/math/prim/mat/fun/softmax.hpp>
@@ -153,6 +161,8 @@
 #include <stan/math/prim/mat/fun/trace_quad_form.hpp>
 #include <stan/math/prim/mat/fun/transpose.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
+#include <stan/math/prim/mat/fun/unit_vector_constrain.hpp>
+#include <stan/math/prim/mat/fun/unit_vector_free.hpp>
 #include <stan/math/prim/mat/fun/value_of.hpp>
 #include <stan/math/prim/mat/fun/value_of_rec.hpp>
 #include <stan/math/prim/mat/fun/variance.hpp>

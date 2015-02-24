@@ -4,7 +4,7 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/fun/corr_constrain.hpp>
 #include <stan/math/prim/scal/fun/positive_constrain.hpp>
-#include <stan/math/prim/scal/fun/read_cov_matrix.hpp>
+#include <stan/math/prim/mat/fun/read_cov_matrix.hpp>
 
 namespace stan {
   

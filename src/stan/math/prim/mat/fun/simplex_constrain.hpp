@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__SIMPLEX_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__SIMPLEX_CONSTRAIN_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__SIMPLEX_CONSTRAIN_HPP
+#define STAN__MATH__PRIM__MAT__FUN__SIMPLEX_CONSTRAIN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>

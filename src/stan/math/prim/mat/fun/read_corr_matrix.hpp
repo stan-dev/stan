@@ -1,8 +1,8 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__READ_CORR_MATRIX_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__READ_CORR_MATRIX_HPP
+#ifndef STAN__MATH__PRIM__MAT__FUN__READ_CORR_MATRIX_HPP
+#define STAN__MATH__PRIM__MAT__FUN__READ_CORR_MATRIX_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/scal/fun/read_corr_L.hpp>
+#include <stan/math/prim/mat/fun/read_corr_L.hpp>
 #include <stan/math/prim/mat/fun/multiply_lower_tri_self_transpose.hpp>
 
 namespace stan {
