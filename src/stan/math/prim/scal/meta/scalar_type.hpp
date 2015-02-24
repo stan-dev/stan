@@ -3,6 +3,8 @@
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/arr/meta/is_vector.hpp>
 #include <stan/math/prim/mat/meta/value_type.hpp>
 #include <stan/math/prim/scal/meta/value_type.hpp>
 

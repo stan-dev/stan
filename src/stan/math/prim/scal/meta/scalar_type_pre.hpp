@@ -2,6 +2,8 @@
 #define STAN__MATH__PRIM__SCAL__META__SCALAR_TYPE_PRE_HPP
 
 #include <stan/math/prim/scal/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/arr/meta/is_vector.hpp>
 #include <stan/math/prim/mat/meta/value_type.hpp>
 #include <stan/math/prim/scal/meta/value_type.hpp>
 

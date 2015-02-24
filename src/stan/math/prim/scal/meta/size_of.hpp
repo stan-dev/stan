@@ -2,6 +2,8 @@
 #define STAN__MATH__PRIM__SCAL__META__SIZE_OF_HPP
 
 #include <stan/math/prim/scal/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/arr/meta/is_vector.hpp>
 
 namespace stan {
 
