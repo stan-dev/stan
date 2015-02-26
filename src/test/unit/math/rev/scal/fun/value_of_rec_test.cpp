@@ -1,3 +1,4 @@
+#include <stan/math/prim/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/core.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
