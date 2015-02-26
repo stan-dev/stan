@@ -110,6 +110,7 @@ namespace stan {
         if (output_stream && is_nonempty(diagnostics)) {
           msg << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
               << std::endl
+              << std::endl
               << diagnostics;
         }
 

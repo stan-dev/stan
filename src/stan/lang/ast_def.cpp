@@ -115,10 +115,15 @@ namespace stan {
       return num_dims_;
     }
 
+    // output matches unsized types used to declare functions
     std::ostream& operator<<(std::ostream& o, const expr_type& et) {
       write_base_expr_type(o,et.type());
-      if (et.num_dims() > 0) 
-        o << '[' << et.num_dims() << ']';
+      if (et.num_dims() > 0) {
+        o << '[';
+        for (size_t i = 1; i < et.num_dims(); ++i)
+          o << ",";
+        o << ']';
+      }
       return o;
     }
 
@@ -348,28 +353,39 @@ namespace stan {
         }
       }
 
-      if (num_matches == 1) {
-        return signatures[match_index].first;
-      } else if (num_matches == 0) {
-        error_msgs << "no matches for function name=\"" << name << "\"" 
+      if (num_matches == 1)
+        return signatures[match_index].first; 
+
+      // all returns after here are for ill-typed input
+
+      if (num_matches == 0) {
+        error_msgs << "no matches for function signature:"
                    << std::endl;
       } else {
-        error_msgs << num_matches << " matches with " 
-                   << min_promotions << " integer promotions "
-                   << "for function name=\"" << name << "\"" << std::endl;
+        error_msgs << num_matches << " matches for function signature with " 
+                   << min_promotions << " integer promotions: "
+                   << std::endl;
       }
-      for (size_t i = 0; i < args.size(); ++i)
-        error_msgs << "    arg " << i << " type=" << args[i] << std::endl;
+      error_msgs << "  " << name << "(";
+      for (size_t i = 0; i < args.size(); ++i) {
+        if (i > 0)
+          error_msgs << ", ";
+        error_msgs << args[i];
+      }
+      error_msgs << ")"
+                 << std::endl;
 
-      error_msgs << "available function signatures for "
+      error_msgs << std::endl
+                 << "available function signatures for "
                  << name << ":" << std::endl;
       for (size_t i = 0; i < signatures.size(); ++i) {
-        error_msgs << i << ".  " << name << "(";
+        error_msgs << "  " << name << "(";
         for (size_t j = 0; j < signatures[i].second.size(); ++j) {
           if (j > 0) error_msgs << ", ";
           error_msgs << signatures[i].second[j];
         }
-        error_msgs << ") : " << signatures[i].first << std::endl;
+        error_msgs << ")"
+                   << std::endl;
       }
       return expr_type(); // ill-formed dummy
     }
