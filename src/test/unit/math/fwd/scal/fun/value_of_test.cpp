@@ -1,5 +1,4 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
-#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

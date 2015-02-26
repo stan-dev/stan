@@ -2,6 +2,7 @@
 #define TEST__UNIT_AGRAD_FWD__NAN_UTIL_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/math/tools/promotion.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>

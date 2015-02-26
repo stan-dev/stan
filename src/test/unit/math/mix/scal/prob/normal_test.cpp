@@ -29,31 +29,8 @@ std::vector<double> test_fun(double y, double mu, double sigma) {
   return grad;
 }
 
-TEST(ProbAgradDistributionsNormal, fwd) {
-  using stan::agrad::fvar;
-  using stan::prob::normal_log;
-
-  EXPECT_FLOAT_EQ(-0.918938533204673, 
-                  normal_log<false>(0,0,1));
-  EXPECT_FLOAT_EQ(-0.918938533204673, 
-                  normal_log<false>(0,0,fvar<double>(1.0)).val());
-  EXPECT_FLOAT_EQ(-0.918938533204673, 
-                  normal_log<false>(0,fvar<double>(0),1).val());
-  EXPECT_FLOAT_EQ(-0.918938533204673, 
-                  normal_log<false>(0,fvar<double>(0),fvar<double>(1)).val());
-  EXPECT_FLOAT_EQ(-0.918938533204673, 
-                  normal_log<false>(fvar<double>(0),0,1).val());
-  EXPECT_FLOAT_EQ(-0.918938533204673, 
-                  normal_log<false>(fvar<double>(0),0,fvar<double>(1)).val());
-  EXPECT_FLOAT_EQ(-0.918938533204673, 
-                  normal_log<false>(fvar<double>(0),fvar<double>(0),1).val());
-  EXPECT_FLOAT_EQ(-0.918938533204673, 
-                  normal_log<false>(fvar<double>(0),fvar<double>(0),fvar<double>(1)).val());
-}
-
 TEST(ProbAgradDistributionsNormal, derivatives) {
   using stan::agrad::fvar;
-  using stan::agrad::var;
   using stan::prob::normal_log;
    
   std::vector<double> grad = test_fun(0,0,1);
@@ -66,9 +43,8 @@ TEST(ProbAgradDistributionsNormal, derivatives) {
   EXPECT_NO_THROW(normal_log(y,1,1));
   EXPECT_FLOAT_EQ(normal_log(x,1,1).val_,-0.918938533204672741780);
   EXPECT_FLOAT_EQ(normal_log(x,2,1).d_,2);
-  
-
 }
+
 TEST(ProbAgradDistributionsNormal, FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
