@@ -1,3 +1,8 @@
+#include <stan/math/prim/mat/meta/get.hpp>
+#include <stan/math/prim/arr/meta/get.hpp>
+#include <stan/math/prim/mat/meta/length.hpp>
+#include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector_like.hpp>
 #include <stan/math/rev/mat/fun/trace_quad_form.hpp>
 #include <stan/math/rev/mat/fun/sum.hpp>
 #include <gtest/gtest.h>

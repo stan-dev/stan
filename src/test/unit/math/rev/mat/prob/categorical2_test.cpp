@@ -1,3 +1,10 @@
+#include <stan/math/prim/arr/meta/length.hpp>
+#include <stan/math/prim/arr/meta/get.hpp>
+#include <stan/math/prim/arr/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/length.hpp>
+#include <stan/math/prim/mat/meta/get.hpp>
+#include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector_like.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/prob/expect_eq_diffs.hpp>
 #include <stan/math/prim/mat/prob/categorical_log.hpp>

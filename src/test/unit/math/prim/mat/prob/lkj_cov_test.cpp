@@ -1,3 +1,9 @@
+#include <stan/math/prim/mat/meta/get.hpp>
+#include <stan/math/prim/arr/meta/get.hpp>
+#include <stan/math/prim/mat/meta/length.hpp>
+#include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector_like.hpp>
+#include <stan/math/prim/mat/fun/value_of_rec.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/prim/mat/prob/lkj_cov_log.hpp>
 
