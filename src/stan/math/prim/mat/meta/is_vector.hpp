@@ -2,6 +2,7 @@
 #define STAN__MATH__PRIM__MAT__META__IS_VECTOR_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/scal/meta/is_vector.hpp>
 
 namespace stan {
 

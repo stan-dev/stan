@@ -1,10 +1,10 @@
 #ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_POS_DEFINITE_HPP
 #define STAN__MATH__PRIM__MAT__ERR__CHECK_POS_DEFINITE_HPP
 
+#include <stan/math/prim/scal/err/check_not_nan.hpp>
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <stan/math/prim/mat/err/check_symmetric.hpp>
 #include <stan/math/prim/mat/err/constraint_tolerance.hpp>
-#include <stan/math/prim/scal/err/check_not_nan.hpp>
 #include <stan/math/prim/scal/err/check_positive_size.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/value_of_rec.hpp>
