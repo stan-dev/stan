@@ -2,6 +2,8 @@
 #define STAN__MATH__REV__SCAL_HPP
 
 #include <stan/math/rev/core.hpp>
+#include <stan/math/rev/scal/meta/is_var.hpp>
+#include <stan/math/rev/scal/meta/partials_type.hpp>
 #include <stan/math/rev/scal/fun/Phi.hpp>
 #include <stan/math/rev/scal/fun/Phi_approx.hpp>
 #include <stan/math/rev/scal/fun/abs.hpp>
@@ -88,7 +90,5 @@
 #include <stan/math/rev/scal/fun/trunc.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
-#include <stan/math/rev/scal/meta/is_var.hpp>
-#include <stan/math/rev/scal/meta/partials_type.hpp>
 
 #endif

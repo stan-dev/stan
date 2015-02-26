@@ -2,6 +2,8 @@
 #define STAN__MATH__FWD__SCAL_HPP
 
 #include <stan/math/fwd/core.hpp>
+#include <stan/math/fwd/scal/meta/is_fvar.hpp>
+#include <stan/math/fwd/scal/meta/partials_type.hpp>
 #include <stan/math/fwd/scal/fun/Phi.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>
 #include <stan/math/fwd/scal/fun/acos.hpp>
@@ -81,7 +83,5 @@
 #include <stan/math/fwd/scal/fun/trunc.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/fwd/scal/fun/value_of_rec.hpp>
-#include <stan/math/fwd/scal/meta/is_fvar.hpp>
-#include <stan/math/fwd/scal/meta/partials_type.hpp>
 
 #endif
