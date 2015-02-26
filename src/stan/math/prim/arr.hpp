@@ -1,8 +1,6 @@
 #ifndef STAN__MATH__PRIM__ARR_HPP
 #define STAN__MATH__PRIM__ARR_HPP
 
-#include <stan/math/prim/arr/err/domain_error_vec.hpp>
-#include <stan/math/prim/arr/err/invalid_argument_vec.hpp>
 #include <stan/math/prim/arr/fun/dist.hpp>
 #include <stan/math/prim/arr/fun/dot.hpp>
 #include <stan/math/prim/arr/fun/dot_self.hpp>

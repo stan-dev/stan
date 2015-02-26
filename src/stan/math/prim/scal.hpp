@@ -1,6 +1,8 @@
 #ifndef STAN__MATH__PRIM__SCAL_HPP
 #define STAN__MATH__PRIM__SCAL_HPP
 
+#include <stan/math/prim/scal/err/domain_error_vec.hpp>
+#include <stan/math/prim/scal/err/invalid_argument_vec.hpp>
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/err/check_consistent_size.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>

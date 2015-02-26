@@ -2,7 +2,7 @@
 #define STAN__MATH__PRIM__SCAL__ERR__CHECK_NONNEGATIVE_HPP
 
 #include <stan/math/prim/scal/err/domain_error.hpp>
-#include <stan/math/prim/arr/err/domain_error_vec.hpp>
+#include <stan/math/prim/scal/err/domain_error_vec.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 #include <stan/math/prim/arr/meta/length.hpp>
 #include <stan/math/prim/mat/meta/length.hpp>
