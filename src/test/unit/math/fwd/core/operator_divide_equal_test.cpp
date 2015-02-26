@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
-#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/rev/core.hpp>
 
 TEST(AgradFwdOperatorDivideEqual, Fvar) {
   using stan::agrad::fvar;
@@ -30,36 +28,6 @@ TEST(AgradFwdOperatorDivideEqual, Fvar) {
   EXPECT_FLOAT_EQ(0.5 / -0.4, d.val_);
   EXPECT_FLOAT_EQ((1.0 * -0.4 - 2.0 * 0.5) / (-0.4 * -0.4), d.d_);
 }
-
-TEST(AgradFwdOperatorDivideEqual, FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-
-  fvar<var> x(0.5,1.3);
-
-  x /= 0.3;
-  EXPECT_FLOAT_EQ(0.5 / 0.3, x.val_.val());
-  EXPECT_FLOAT_EQ(1.3, x.d_.val());
-
-  AVEC y = createAVEC(x.val_);
-  VEC g;
-  x.val_.grad(y,g);
-  EXPECT_FLOAT_EQ(1.0, g[0]);
-}
-TEST(AgradFwdOperatorDivideEqual, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-
-  fvar<var> x(0.5,1.3);
-
-  x /= 0.3;
-
-  AVEC y = createAVEC(x.val_);
-  VEC g;
-  x.d_.grad(y,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
-}
-
 TEST(AgradFwdOperatorDivideEqual, FvarFvarDouble) {
   using stan::agrad::fvar;
 
@@ -73,70 +41,15 @@ TEST(AgradFwdOperatorDivideEqual, FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, x.d_.val_);
   EXPECT_FLOAT_EQ(0, x.d_.d_);
 }
-TEST(AgradFwdOperatorDivideEqual, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-
-  fvar<fvar<var> > x;
-  x.val_.val_ = 0.5;
-  x.val_.d_ = 1.0;
-
-  x /= 0.3;
-  EXPECT_FLOAT_EQ(0.5 / 0.3, x.val_.val_.val());
-  EXPECT_FLOAT_EQ(1, x.val_.d_.val());
-  EXPECT_FLOAT_EQ(0, x.d_.val_.val());
-  EXPECT_FLOAT_EQ(0, x.d_.d_.val());
-
-  AVEC p = createAVEC(x.val_.val_);
-  VEC g;
-  x.val_.val_.grad(p,g);
-  EXPECT_FLOAT_EQ(1, g[0]);
-}
-TEST(AgradFwdOperatorDivideEqual, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-
-  fvar<fvar<var> > x;
-  x.val_.val_ = 0.5;
-  x.val_.d_ = 1.0;
-
-  x /= 0.3;
-
-  AVEC p = createAVEC(x.val_.val_);
-  VEC g;
-  x.val_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
-}
-TEST(AgradFwdOperatorDivideEqual, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-
-  fvar<fvar<var> > x;
-  x.val_.val_ = 0.5;
-  x.val_.d_ = 1.0;
-  x.d_.val_ = 1.0;
-
-  x /= 0.3;
-
-  AVEC p = createAVEC(x.val_.val_);
-  VEC g;
-  x.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
-}
 
 TEST(AgradFwdOperatorDivideEqual, div_eq_nan) {
   using stan::agrad::fvar;
-  using stan::agrad::var;
   double nan = std::numeric_limits<double>::quiet_NaN();
   double a = 3.0;
   fvar<double> nan_fd = std::numeric_limits<double>::quiet_NaN();
   fvar<double> a_fd = 3.0;
-  fvar<var> nan_fv = std::numeric_limits<double>::quiet_NaN();
-  fvar<var> a_fv = 3.0;
   fvar<fvar<double> > nan_ffd = std::numeric_limits<double>::quiet_NaN();
   fvar<fvar<double> > a_ffd = 3.0;
-  fvar<fvar<var> > nan_ffv = std::numeric_limits<double>::quiet_NaN();
-  fvar<fvar<var> > a_ffv = 3.0;
 
   EXPECT_TRUE(boost::math::isnan( (nan_fd/=a).val()));
   EXPECT_TRUE(boost::math::isnan( (nan_fd/=a_fd).val()));
@@ -145,24 +58,10 @@ TEST(AgradFwdOperatorDivideEqual, div_eq_nan) {
   EXPECT_TRUE(boost::math::isnan( (a_fd/=nan).val()));
   EXPECT_TRUE(boost::math::isnan( (a_fd/=nan_fd).val()));
 
-  EXPECT_TRUE(boost::math::isnan( (nan_fv/=a).val().val()));
-  EXPECT_TRUE(boost::math::isnan( (nan_fv/=a_fv).val().val()));
-  EXPECT_TRUE(boost::math::isnan( (nan_fv/=nan).val().val()));
-  EXPECT_TRUE(boost::math::isnan( (nan_fv/=nan_fv).val().val()));
-  EXPECT_TRUE(boost::math::isnan( (a_fv/=nan).val().val()));
-  EXPECT_TRUE(boost::math::isnan( (a_fv/=nan_fv).val().val()));
-
   EXPECT_TRUE(boost::math::isnan( (nan_ffd/=a).val().val()));
   EXPECT_TRUE(boost::math::isnan( (nan_ffd/=a_ffd).val().val()));
   EXPECT_TRUE(boost::math::isnan( (nan_ffd/=nan).val().val()));
   EXPECT_TRUE(boost::math::isnan( (nan_ffd/=nan_ffd).val().val()));
   EXPECT_TRUE(boost::math::isnan( (a_ffd/=nan).val().val()));
   EXPECT_TRUE(boost::math::isnan( (a_ffd/=nan_ffd).val().val()));
-
-  EXPECT_TRUE(boost::math::isnan( (nan_ffv/=a).val().val().val()));
-  EXPECT_TRUE(boost::math::isnan( (nan_ffv/=a_ffv).val().val().val()));
-  EXPECT_TRUE(boost::math::isnan( (nan_ffv/=nan).val().val().val()));
-  EXPECT_TRUE(boost::math::isnan( (nan_ffv/=nan_ffv).val().val().val()));
-  EXPECT_TRUE(boost::math::isnan( (a_ffv/=nan).val().val().val()));
-  EXPECT_TRUE(boost::math::isnan( (a_ffv/=nan_ffv).val().val().val()));
 }
