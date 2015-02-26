@@ -2,6 +2,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/asin.hpp>
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
 #include <stan/math/rev/scal/fun/asin.hpp>
@@ -205,5 +206,6 @@ struct asin_fun {
 
 TEST(AgradFwdAsin,asin_NaN) {
   asin_fun asin_;
-  test_nan(asin_,false);
+  test_nan_fwd(asin_,false);
+  test_nan_mix(asin_,false);
 }

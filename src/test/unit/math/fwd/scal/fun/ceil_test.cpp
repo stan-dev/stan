@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/scal/fun/ceil.hpp>
@@ -184,5 +185,6 @@ struct ceil_fun {
 
 TEST(AgradFwdCeil,ceil_NaN) {
   ceil_fun ceil_;
-  test_nan(ceil_,false);
+  test_nan_fwd(ceil_,false);
+  test_nan_mix(ceil_,false);
 }

@@ -6,6 +6,7 @@
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/cbrt.hpp>
 #include <stan/math/rev/scal/fun/cbrt.hpp>
 
@@ -192,5 +193,6 @@ struct cbrt_fun {
 
 TEST(AgradFwdCbrt,cbrt_NaN) {
   cbrt_fun cbrt_;
-  test_nan(cbrt_,false);
+  test_nan_fwd(cbrt_,false);
+  test_nan_mix(cbrt_,false);
 }

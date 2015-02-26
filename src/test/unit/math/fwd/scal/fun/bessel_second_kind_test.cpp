@@ -2,6 +2,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/prim/scal/fun/bessel_second_kind.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/fwd/scal/fun/bessel_second_kind.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
@@ -190,5 +191,6 @@ struct bessel_second_kind_fun {
 
 TEST(AgradFwdBesselSecondKind,bessel_second_kind_NaN) {
   bessel_second_kind_fun bessel_second_kind_;
-  test_nan(bessel_second_kind_,false);
+  test_nan_fwd(bessel_second_kind_,false);
+  test_nan_mix(bessel_second_kind_,false);
 }

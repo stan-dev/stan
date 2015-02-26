@@ -2,6 +2,7 @@
 #include <boost/math/special_functions/acosh.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/acosh.hpp>
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
 #include <stan/math/rev/scal/fun/acosh.hpp>
@@ -185,5 +186,6 @@ struct acosh_fun {
 
 TEST(AgradFwdAcosh,acosh_NaN) {
   acosh_fun acosh_;
-  test_nan(acosh_,false);
+  test_nan_fwd(acosh_,false);
+  test_nan_mix(acosh_,false);
 }

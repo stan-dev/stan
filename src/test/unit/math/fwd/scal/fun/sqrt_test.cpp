@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 #include <stan/math/fwd/scal/fun/sinh.hpp>
@@ -191,5 +192,6 @@ struct sqrt_fun {
 
 TEST(AgradFwdSqrt,sqrt_NaN) {
   sqrt_fun sqrt_;
-  test_nan(sqrt_,false);
+  test_nan_fwd(sqrt_,false);
+  test_nan_mix(sqrt_,false);
 }

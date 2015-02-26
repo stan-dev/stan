@@ -3,6 +3,7 @@
 #include <stan/math/prim/scal/fun/logit.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/logit.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/rev/scal/fun/fabs.hpp>
@@ -186,5 +187,6 @@ struct logit_fun {
 
 TEST_F(AgradFwdLogit,logit_NaN) {
   logit_fun logit_;
-  test_nan(logit_,false);
+  test_nan_fwd(logit_,false);
+  test_nan_mix(logit_,false);
 }

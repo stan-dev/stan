@@ -2,6 +2,7 @@
 #include <stan/math/prim/scal/fun/log1m_exp.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/log1m_exp.hpp>
 #include <stan/math/rev/scal/fun/log1m_exp.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
@@ -157,5 +158,6 @@ struct log1m_exp_fun {
 
 TEST(AgradFwdLog1mExp,log1m_exp_NaN) {
   log1m_exp_fun log1m_exp_;
-  test_nan(log1m_exp_,false);
+  test_nan_fwd(log1m_exp_,false);
+  test_nan_mix(log1m_exp_,false);
 }

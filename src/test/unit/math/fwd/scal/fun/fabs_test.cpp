@@ -2,6 +2,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/rev/scal/fun/fabs.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
@@ -198,5 +199,6 @@ struct fabs_fun {
 
 TEST(AgradFwdFabs,fabs_NaN) {
   fabs_fun fabs_;
-  test_nan(fabs_,false);
+  test_nan_fwd(fabs_,false);
+  test_nan_mix(fabs_,false);
 }

@@ -4,6 +4,7 @@
 #include <stan/math/rev/scal/fun/gamma_p.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/gamma_p.hpp>
 #include <stan/math/rev/scal/fun/gamma_p.hpp>
 #include <stan/math/fwd/core.hpp>
@@ -429,5 +430,6 @@ struct gamma_p_fun {
 
 TEST(AgradFwdGammaP, nan) {
   gamma_p_fun gamma_p_;
-  test_nan(gamma_p_,3.0,5.0,false);
+  test_nan_fwd(gamma_p_,3.0,5.0,false);
+  test_nan_mix(gamma_p_,3.0,5.0,false);
 }

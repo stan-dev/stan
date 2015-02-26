@@ -6,6 +6,7 @@
 #include <stan/math/rev/scal/fun/boost_fpclassify.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
@@ -189,5 +190,6 @@ struct lmgamma_fun {
 
 TEST(AgradFwdLmgamma,lmgamma_NaN) {
   lmgamma_fun lmgamma_;
-  test_nan(lmgamma_,false);
+  test_nan_fwd(lmgamma_,false);
+  test_nan_mix(lmgamma_,false);
 }

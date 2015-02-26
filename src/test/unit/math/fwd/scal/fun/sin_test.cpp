@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
 #include <stan/math/rev/scal/fun/cos.hpp>
 #include <stan/math/fwd/scal/fun/sin.hpp>
@@ -175,5 +176,6 @@ struct sin_fun {
 
 TEST(AgradFwdSin,sin_NaN) {
   sin_fun sin_;
-  test_nan(sin_,false);
+  test_nan_fwd(sin_,false);
+  test_nan_mix(sin_,false);
 }

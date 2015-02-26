@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/owens_t.hpp>
 #include <stan/math/rev/scal/fun/owens_t.hpp>
 #include <stan/math/fwd/scal/fun/erf.hpp>
@@ -364,5 +365,6 @@ struct owens_t_fun {
 
 TEST(AgradFwdOwensT, nan) {
   owens_t_fun owens_t_;
-  test_nan(owens_t_,3.0,5.0,false);
+  test_nan_fwd(owens_t_,3.0,5.0,false);
+  test_nan_mix(owens_t_,3.0,5.0,false);
 }

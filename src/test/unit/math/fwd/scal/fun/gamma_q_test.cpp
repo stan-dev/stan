@@ -2,6 +2,7 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/gamma_q.hpp>
 #include <stan/math/rev/scal/fun/gamma_q.hpp>
 #include <stan/math/fwd/core.hpp>
@@ -427,5 +428,6 @@ struct gamma_q_fun {
 
 TEST(AgradFwdGammaQ, nan) {
   gamma_q_fun gamma_q_;
-  test_nan(gamma_q_,3.0,5.0,false);
+  test_nan_fwd(gamma_q_,3.0,5.0,false);
+  test_nan_mix(gamma_q_,3.0,5.0,false);
 }

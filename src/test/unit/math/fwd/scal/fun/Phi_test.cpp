@@ -4,6 +4,7 @@
 #include <stan/math/prim/scal/prob/normal_log.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
 #include <stan/math/rev/core.hpp>
@@ -304,5 +305,6 @@ struct Phi_fun {
 
 TEST(AgradFwdPhi,Phi_NaN) {
   Phi_fun Phi_;
-  test_nan(Phi_,true);
+  test_nan_fwd(Phi_,true);
+  test_nan_mix(Phi_,true);
 }

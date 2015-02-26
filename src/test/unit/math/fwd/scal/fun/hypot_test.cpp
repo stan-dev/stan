@@ -7,6 +7,7 @@
 #include <boost/math/special_functions/hypot.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdHypot,Fvar) {
   using stan::agrad::fvar;
@@ -377,5 +378,6 @@ struct hypot_fun {
 
 TEST(AgradFwdHypot, nan) {
   hypot_fun hypot_;
-  test_nan(hypot_,3.0,5.0,false);
+  test_nan_fwd(hypot_,3.0,5.0,false);
+  test_nan_mix(hypot_,3.0,5.0,false);
 }

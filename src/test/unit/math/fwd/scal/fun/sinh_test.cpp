@@ -2,6 +2,7 @@
 #include <stan/math/rev/core.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/sinh.hpp>
 #include <stan/math/rev/scal/fun/sinh.hpp>
 #include <stan/math/fwd/scal/fun/cosh.hpp>
@@ -191,5 +192,6 @@ struct sinh_fun {
 
 TEST_F(AgradFwdSinh,sinh_NaN) {
   sinh_fun sinh_;
-  test_nan(sinh_,false);
+  test_nan_fwd(sinh_,false);
+  test_nan_mix(sinh_,false);
 }

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/cosh.hpp>
 #include <stan/math/rev/scal/fun/cosh.hpp>
 #include <stan/math/fwd/core.hpp>
@@ -195,5 +196,6 @@ struct cosh_fun {
 
 TEST(AgradFwdCosh,cosh_NaN) {
   cosh_fun cosh_;
-  test_nan(cosh_,false);
+  test_nan_fwd(cosh_,false);
+  test_nan_mix(cosh_,false);
 }

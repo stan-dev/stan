@@ -4,6 +4,7 @@
 #include <stan/math/fwd/scal/fun/binomial_coefficient_log.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
@@ -442,5 +443,6 @@ struct binomial_coefficient_log_fun {
 
 TEST(AgradFwdBinomialCoefficientLog, nan) {
   binomial_coefficient_log_fun binomial_coefficient_log_;
-  test_nan(binomial_coefficient_log_,3.0,5.0,false);
+  test_nan_fwd(binomial_coefficient_log_,3.0,5.0,false);
+  test_nan_mix(binomial_coefficient_log_,3.0,5.0,false);
 }

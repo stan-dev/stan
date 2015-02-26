@@ -3,6 +3,7 @@
 #include <boost/math/special_functions/asinh.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/asinh.hpp>
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
 #include <stan/math/rev/scal/fun/asinh.hpp>
@@ -192,5 +193,6 @@ struct asinh_fun {
 
 TEST_F(AgradFwdAsinh,asinh_NaN) {
   asinh_fun asinh_;
-  test_nan(asinh_,false);
+  test_nan_fwd(asinh_,false);
+  test_nan_mix(asinh_,false);
 }

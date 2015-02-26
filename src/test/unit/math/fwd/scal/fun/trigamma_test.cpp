@@ -2,6 +2,7 @@
 #include <stan/math/prim/scal/fun/trigamma.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
 #include <stan/math/rev/scal/fun/cos.hpp>
@@ -164,5 +165,6 @@ struct trigamma_fun {
 
 TEST(AgradFwdTrigamma,trigamma_NaN) {
   trigamma_fun trigamma_;
-  test_nan(trigamma_,false);
+  test_nan_fwd(trigamma_,false);
+  test_nan_mix(trigamma_,false);
 }

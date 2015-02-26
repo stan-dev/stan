@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
 #include <stan/math/rev/scal/fun/exp.hpp>
 
@@ -196,5 +197,6 @@ struct exp_fun {
 
 TEST(AgradFwdExp,exp_NaN) {
   exp_fun exp_;
-  test_nan(exp_,false);
+  test_nan_fwd(exp_,false);
+  test_nan_mix(exp_,false);
 }

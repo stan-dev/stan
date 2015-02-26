@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
 
 TEST(AgradFwdOperatorSubtraction, Fvar) {
@@ -350,5 +351,6 @@ struct subtract_fun {
 
 TEST(AgradFwdOperatorSubtraction, subtract_nan) {
   subtract_fun subtract_;
-  test_nan(subtract_,3.0,5.0,false);
+  test_nan_fwd(subtract_,3.0,5.0,false);
+  test_nan_mix(subtract_,3.0,5.0,false);
 }

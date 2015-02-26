@@ -2,6 +2,7 @@
 #include <stan/math/prim/scal/fun/binary_log_loss.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
@@ -269,5 +270,6 @@ struct binary_log_loss_fun {
 
 TEST(AgradFwdBinaryLogLoss,binary_log_loss_NaN) {
   binary_log_loss_fun binary_log_loss_;
-  test_nan(binary_log_loss_,false);
+  test_nan_fwd(binary_log_loss_,false);
+  test_nan_mix(binary_log_loss_,false);
 }

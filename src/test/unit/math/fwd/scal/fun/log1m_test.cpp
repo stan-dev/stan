@@ -2,6 +2,7 @@
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/log1m.hpp>
 #include <stan/math/rev/scal/fun/log1m.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
@@ -174,5 +175,6 @@ struct log1m_fun {
 
 TEST(AgradFwdLog1m,log1m_NaN) {
   log1m_fun log1m_;
-  test_nan(log1m_,false);
+  test_nan_fwd(log1m_,false);
+  test_nan_mix(log1m_,false);
 }

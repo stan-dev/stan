@@ -3,6 +3,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/ceil.hpp>
 #include <stan/math/rev/scal/fun/ceil.hpp>
@@ -191,5 +192,6 @@ struct tgamma_fun {
 
 TEST(AgradFwdTgamma,tgamma_NaN) {
   tgamma_fun tgamma_;
-  test_nan(tgamma_,false);
+  test_nan_fwd(tgamma_,false);
+  test_nan_mix(tgamma_,false);
 }

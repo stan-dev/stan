@@ -2,6 +2,7 @@
 #include <stan/math/rev/core.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/atan.hpp>
 #include <stan/math/rev/scal/fun/atan.hpp>
 #include <stan/math/fwd/core.hpp>
@@ -190,5 +191,6 @@ struct atan_fun {
 
 TEST_F(AgradFwdAtan,atan_NaN) {
   atan_fun atan_;
-  test_nan(atan_,false);
+  test_nan_fwd(atan_,false);
+  test_nan_mix(atan_,false);
 }

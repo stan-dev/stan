@@ -3,6 +3,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/inv.hpp>
 #include <stan/math/rev/scal/fun/inv.hpp>
 
@@ -162,5 +163,6 @@ struct inv_fun {
 
 TEST(AgradFwdInv,inv_NaN) {
   inv_fun inv_;
-  test_nan(inv_,false);
+  test_nan_fwd(inv_,false);
+  test_nan_mix(inv_,false);
 }

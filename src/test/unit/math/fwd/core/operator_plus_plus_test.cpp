@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdOperatorPlusPlus, Fvar) {
   using stan::agrad::fvar;
@@ -118,8 +119,9 @@ struct plus_plus_fun {
   }
 };
 
-TEST(AgradFwdOperatorPlusPlus, plus_plus_nan) {
-  plus_plus_fun plus_plus_;
-
-  test_nan(plus_plus_,false);
-}
+//TEST(AgradFwdOperatorPlusPlus, plus_plus_nan) {
+//  plus_plus_fun plus_plus_;
+//
+//  test_nan_fwd(plus_plus_,false);
+  test_nan_mix(plus_plus_,false);
+//}

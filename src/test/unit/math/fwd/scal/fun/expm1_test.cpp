@@ -2,6 +2,7 @@
 #include <boost/math/special_functions/expm1.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/expm1.hpp>
 #include <stan/math/rev/scal/fun/expm1.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
@@ -193,6 +194,7 @@ struct expm1_fun {
 
 TEST(AgradFwdExpm1,expm1_NaN) {
   expm1_fun expm1_;
-  test_nan(expm1_,false);
+  test_nan_fwd(expm1_,false);
+  test_nan_mix(expm1_,false);
 }
 

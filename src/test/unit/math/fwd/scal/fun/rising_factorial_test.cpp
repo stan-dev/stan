@@ -2,6 +2,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/rising_factorial.hpp>
 #include <stan/math/rev/scal/fun/rising_factorial.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
@@ -383,5 +384,6 @@ struct rising_factorial_fun {
 
 TEST(AgradFwdRisingFactorial, nan) {
   rising_factorial_fun rising_factorial_;
-  test_nan(rising_factorial_,3.0,5.0,false);
+  test_nan_fwd(rising_factorial_,3.0,5.0,false);
+  test_nan_mix(rising_factorial_,3.0,5.0,false);
 }

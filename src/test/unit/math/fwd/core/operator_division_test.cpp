@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
 
 TEST(AgradFwdOperatorDivision, Fvar) {
@@ -351,5 +352,7 @@ struct divide_fun {
 
 TEST(AgradFwdOperatorDivision, divide_nan) {
   divide_fun divide_;
-  test_nan(divide_,3.0,5.0,false);
+  test_nan_mix(divide_,3.0,5.0,false);
+  test_nan_fwd(divide_,3.0,5.0,false);
+  test_nan_mix(divide_,3.0,5.0,false);
 }

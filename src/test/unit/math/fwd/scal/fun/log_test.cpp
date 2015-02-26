@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 
@@ -184,5 +185,6 @@ struct log_fun {
 
 TEST(AgradFwdLog,log_NaN) {
   log_fun log_;
-  test_nan(log_,false);
+  test_nan_fwd(log_,false);
+  test_nan_mix(log_,false);
 }

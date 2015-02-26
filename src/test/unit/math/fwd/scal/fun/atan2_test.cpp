@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/atan2.hpp>
 #include <stan/math/rev/scal/fun/atan2.hpp>
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
@@ -394,5 +395,6 @@ struct atan2_fun {
 
 TEST(AgradFwdAtan2, nan) {
   atan2_fun atan2_;
-  test_nan(atan2_,3.0,5.0,false);
+  test_nan_fwd(atan2_,3.0,5.0,false);
+  test_nan_mix(atan2_,3.0,5.0,false);
 }

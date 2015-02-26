@@ -2,6 +2,7 @@
 #include <boost/math/special_functions/erf.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/erf.hpp>
 #include <stan/math/rev/scal/fun/erf.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
@@ -208,5 +209,6 @@ struct erf_fun {
 
 TEST(AgradFwdErf,erf_NaN) {
   erf_fun erf_;
-  test_nan(erf_,false);
+  test_nan_fwd(erf_,false);
+  test_nan_mix(erf_,false);
 }

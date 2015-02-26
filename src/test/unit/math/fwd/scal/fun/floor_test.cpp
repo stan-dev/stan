@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/floor.hpp>
 #include <stan/math/rev/scal/fun/floor.hpp>
 
@@ -173,5 +174,6 @@ struct floor_fun {
 
 TEST(AgradFwdFloor,floor_NaN) {
   floor_fun floor_;
-  test_nan(floor_,false);
+  test_nan_fwd(floor_,false);
+  test_nan_mix(floor_,false);
 }

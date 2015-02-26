@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/trunc.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/scal/fun/trunc.hpp>
@@ -172,5 +173,6 @@ struct trunc_fun {
 
 TEST(AgradFwdTrunc,trunc_NaN) {
   trunc_fun trunc_;
-  test_nan(trunc_,false);
+  test_nan_fwd(trunc_,false);
+  test_nan_mix(trunc_,false);
 }

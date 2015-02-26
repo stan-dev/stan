@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
@@ -194,5 +195,6 @@ struct tan_fun {
 
 TEST(AgradFwdTan,tan_NaN) {
   tan_fun tan_;
-  test_nan(tan_,false);
+  test_nan_fwd(tan_,false);
+  test_nan_mix(tan_,false);
 }

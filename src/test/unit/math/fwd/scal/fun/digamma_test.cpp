@@ -2,6 +2,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
 #include <stan/math/rev/scal/fun/cos.hpp>
 #include <stan/math/fwd/scal/fun/digamma.hpp>
@@ -172,5 +173,6 @@ struct digamma_fun {
 
 TEST(AgradFwdDigamma,digamma_NaN) {
   digamma_fun digamma_;
-  test_nan(digamma_,false);
+  test_nan_fwd(digamma_,false);
+  test_nan_mix(digamma_,false);
 }

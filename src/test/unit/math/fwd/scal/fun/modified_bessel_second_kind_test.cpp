@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/modified_bessel_second_kind.hpp>
 #include <stan/math/rev/scal/fun/modified_bessel_second_kind.hpp>
 
@@ -165,5 +166,6 @@ struct modified_bessel_second_kind_fun {
 
 TEST(AgradFwdModifiedBesselSecondKind,modified_bessel_second_kind_NaN) {
   modified_bessel_second_kind_fun modified_bessel_second_kind_;
-  test_nan(modified_bessel_second_kind_,false);
+  test_nan_fwd(modified_bessel_second_kind_,false);
+  test_nan_mix(modified_bessel_second_kind_,false);
 }

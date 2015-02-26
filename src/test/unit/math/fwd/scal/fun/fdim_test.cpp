@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/fdim.hpp>
 #include <stan/math/rev/scal/fun/fdim.hpp>
 #include <stan/math/fwd/scal/fun/floor.hpp>
@@ -430,5 +431,6 @@ struct fdim_fun {
 
 TEST(AgradFwdFdim, nan) {
   fdim_fun fdim_;
-  test_nan(fdim_,3.0,5.0,false);
+  test_nan_fwd(fdim_,3.0,5.0,false);
+  test_nan_mix(fdim_,3.0,5.0,false);
 }

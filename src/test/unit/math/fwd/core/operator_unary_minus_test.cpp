@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdOperatorUnaryMinus, Fvar) {
@@ -115,5 +116,6 @@ struct neg_fun {
 TEST(AgradFwdOperatorUnaryMinus, neg_nan) {
   neg_fun neg_;
 
-  test_nan(neg_,false);
+  test_nan_fwd(neg_,false);
+  test_nan_mix(neg_,false);
 }

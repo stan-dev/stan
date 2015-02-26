@@ -2,6 +2,7 @@
 #include <boost/math/special_functions/atanh.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/atanh.hpp>
 #include <stan/math/rev/scal/fun/atanh.hpp>
 #include <stan/math/fwd/core.hpp>
@@ -180,5 +181,6 @@ struct atanh_fun {
 
 TEST(AgradFwdAtanh,atanh_NaN) {
   atanh_fun atanh_;
-  test_nan(atanh_,false);
+  test_nan_fwd(atanh_,false);
+  test_nan_mix(atanh_,false);
 }

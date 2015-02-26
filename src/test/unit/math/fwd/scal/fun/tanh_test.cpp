@@ -2,6 +2,7 @@
 #include <stan/math/rev/core.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/tanh.hpp>
 #include <stan/math/rev/scal/fun/tanh.hpp>
@@ -184,5 +185,6 @@ struct tanh_fun {
 
 TEST_F(AgradFwdTanh,tanh_NaN) {
   tanh_fun tanh_;
-  test_nan(tanh_,false);
+  test_nan_fwd(tanh_,false);
+  test_nan_mix(tanh_,false);
 }

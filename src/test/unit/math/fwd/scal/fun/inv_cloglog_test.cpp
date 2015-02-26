@@ -2,6 +2,7 @@
 #include <stan/math/prim/scal/fun/inv_cloglog.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/inv_cloglog.hpp>
 #include <stan/math/rev/scal/fun/inv_cloglog.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
@@ -190,5 +191,6 @@ struct inv_cloglog_fun {
 
 TEST(AgradFwdInvCLogLog,inv_cloglog_NaN) {
   inv_cloglog_fun inv_cloglog_;
-  test_nan(inv_cloglog_,false);
+  test_nan_fwd(inv_cloglog_,false);
+  test_nan_mix(inv_cloglog_,false);
 }

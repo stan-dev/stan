@@ -2,6 +2,7 @@
 #include <stan/math/prim/scal/fun/square.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/scal/fun/square.hpp>
@@ -190,5 +191,6 @@ struct square_fun {
 
 TEST(AgradFwdSquare,square_NaN) {
   square_fun square_;
-  test_nan(square_,false);
+  test_nan_fwd(square_,false);
+  test_nan_mix(square_,false);
 }

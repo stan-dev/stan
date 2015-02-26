@@ -2,6 +2,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/acos.hpp>
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
 #include <stan/math/rev/scal/fun/acos.hpp>
@@ -202,5 +203,6 @@ struct acos_fun {
 
 TEST(AgradFwdAcos,acos_NaN) {
   acos_fun acos_;
-  test_nan(acos_,false);
+  test_nan_fwd(acos_,false);
+  test_nan_mix(acos_,false);
 }

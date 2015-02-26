@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/multiply_log.hpp>
 #include <stan/math/rev/scal/fun/multiply_log.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
@@ -401,5 +402,6 @@ struct multiply_log_fun {
 
 TEST(AgradFwdMultiplyLog, nan) {
   multiply_log_fun multiply_log_;
-  test_nan(multiply_log_,3.0,5.0,false);
+  test_nan_fwd(multiply_log_,3.0,5.0,false);
+  test_nan_mix(multiply_log_,3.0,5.0,false);
 }

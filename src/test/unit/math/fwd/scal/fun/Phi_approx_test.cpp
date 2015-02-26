@@ -4,6 +4,7 @@
 #include <stan/math/rev/scal/fun/Phi_approx.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/pow.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
@@ -184,5 +185,6 @@ struct Phi_approx_fun {
 
 TEST(AgradFwdPhi_approx,Phi_approx_NaN) {
   Phi_approx_fun Phi_approx_;
-  test_nan(Phi_approx_,false);
+  test_nan_fwd(Phi_approx_,false);
+  test_nan_mix(Phi_approx_,false);
 }

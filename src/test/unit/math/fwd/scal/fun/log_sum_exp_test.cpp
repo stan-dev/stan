@@ -3,6 +3,7 @@
 #include <stan/math/prim/arr/fun/log_sum_exp.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/arr/fun/log_sum_exp.hpp>
 #include <stan/math/fwd/scal/fun/log_sum_exp.hpp>
 #include <stan/math/rev/scal/fun/log_sum_exp.hpp>
@@ -398,5 +399,6 @@ struct log_sum_exp_fun {
 
 TEST(AgradFwdLogSumExp, nan) {
   log_sum_exp_fun log_sum_exp_;
-  test_nan(log_sum_exp_,3.0,5.0,false);
+  test_nan_fwd(log_sum_exp_,3.0,5.0,false);
+  test_nan_mix(log_sum_exp_,3.0,5.0,false);
 }

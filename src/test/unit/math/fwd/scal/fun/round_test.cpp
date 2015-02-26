@@ -2,6 +2,7 @@
 #include <boost/math/special_functions/round.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/round.hpp>
 #include <stan/math/rev/scal/fun/round.hpp>
 
@@ -177,5 +178,6 @@ struct round_fun {
 
 TEST(AgradFwdRound,round_NaN) {
   round_fun round_;
-  test_nan(round_,false);
+  test_nan_fwd(round_,false);
+  test_nan_mix(round_,false);
 }

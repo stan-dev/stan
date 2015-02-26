@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/pow.hpp>
 #include <stan/math/rev/scal/fun/pow.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
@@ -381,5 +382,6 @@ struct pow_fun {
 
 TEST(AgradFwdPow, nan) {
   pow_fun pow_;
-  test_nan(pow_,3.0,5.0,false);
+  test_nan_fwd(pow_,3.0,5.0,false);
+  test_nan_mix(pow_,3.0,5.0,false);
 }

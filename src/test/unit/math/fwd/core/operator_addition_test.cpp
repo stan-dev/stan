@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
 
 TEST(AgradFwdOperatorAddition,Fvar) {
@@ -54,6 +55,7 @@ TEST(AgradFwdOperatorAddition,FvarVar_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1, g[0]);
   EXPECT_FLOAT_EQ(1, g[1]);
 }
+
 TEST(AgradFwdOperatorAddition,FvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -70,6 +72,7 @@ TEST(AgradFwdOperatorAddition,FvarVar_Double_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(1, g[0]);
 }
+
 TEST(AgradFwdOperatorAddition,Double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -348,5 +351,7 @@ struct add_fun {
 
 TEST(AgradFwdOperatorAddition, add_nan) {
   add_fun add_;
-  test_nan(add_,3.0,5.0,false);
+  test_nan_fwd(add_,3.0,5.0,false);
+  test_nan_mix(add_,3.0,5.0,false);
+  test_nan_mix(add_,3.0,5.0,false);
 }

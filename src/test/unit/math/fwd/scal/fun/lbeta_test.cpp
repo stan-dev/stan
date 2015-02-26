@@ -4,6 +4,7 @@
 #include <stan/math/fwd/scal/fun/lbeta.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/digamma.hpp>
 #include <stan/math/rev/scal/fun/digamma.hpp>
 #include <stan/math/fwd/scal/fun/exp.hpp>
@@ -434,5 +435,6 @@ struct lbeta_fun {
 
 TEST(AgradFwdLbeta, nan) {
   lbeta_fun lbeta_;
-  test_nan(lbeta_,3.0,5.0,false);
+  test_nan_fwd(lbeta_,3.0,5.0,false);
+  test_nan_mix(lbeta_,3.0,5.0,false);
 }

@@ -3,6 +3,7 @@
 #include <stan/math/prim/scal/fun/exp2.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/exp2.hpp>
 #include <stan/math/rev/scal/fun/exp2.hpp>
 
@@ -213,5 +214,6 @@ struct exp2_fun {
 
 TEST_F(AgradFwdExp2,exp2_NaN) {
   exp2_fun exp2_;
-  test_nan(exp2_,false);
+  test_nan_fwd(exp2_,false);
+  test_nan_mix(exp2_,false);
 }

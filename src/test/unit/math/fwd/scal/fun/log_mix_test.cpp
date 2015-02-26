@@ -4,6 +4,7 @@
 #include <stan/math/prim/mat/err/constraint_tolerance.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <cmath>
 #include <typeinfo>
 #include <stan/math/fwd/scal/fun/log_mix.hpp>
@@ -1609,5 +1610,6 @@ struct log_mix_fun {
 
 TEST(AgradFwdLogMix, log_mix_NaN) {
   log_mix_fun log_mix_;
-  test_nan(log_mix_,0.7,3.0,5.0,true);
+  test_nan_fwd(log_mix_,0.7,3.0,5.0,true);
+  test_nan_mix(log_mix_,0.7,3.0,5.0,true);
 }

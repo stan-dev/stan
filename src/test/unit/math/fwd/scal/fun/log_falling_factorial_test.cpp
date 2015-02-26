@@ -2,6 +2,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/log_falling_factorial.hpp>
 #include <stan/math/rev/scal/fun/log_falling_factorial.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
@@ -373,5 +374,6 @@ struct log_falling_factorial_fun {
 
 TEST(AgradFwdLogFallingFactorial, nan) {
   log_falling_factorial_fun log_falling_factorial_;
-  test_nan(log_falling_factorial_,3.0,5.0,false);
+  test_nan_fwd(log_falling_factorial_,3.0,5.0,false);
+  test_nan_mix(log_falling_factorial_,3.0,5.0,false);
 }

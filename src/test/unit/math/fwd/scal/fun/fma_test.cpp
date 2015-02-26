@@ -3,6 +3,7 @@
 #include <stan/math/fwd/scal/fun/fma.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <test/unit/math/mix/scal/fun/nan_util.hpp>
 #include <stan/math/rev/scal/fun/fma.hpp>
 
 TEST(AgradFwdFma,Fvar) { 
@@ -878,5 +879,6 @@ struct fma_fun {
 
 TEST(AgradFwdFma,fma_NaN) {
   fma_fun fma_;
-  test_nan(fma_,0.6,0.3,0.5,false);
+  test_nan_fwd(fma_,0.6,0.3,0.5,false);
+  test_nan_mix(fma_,0.6,0.3,0.5,false);
 }
