@@ -119,9 +119,9 @@ struct plus_plus_fun {
   }
 };
 
-//TEST(AgradFwdOperatorPlusPlus, plus_plus_nan) {
-//  plus_plus_fun plus_plus_;
-//
-//  test_nan_fwd(plus_plus_,false);
+TEST(AgradFwdOperatorPlusPlus, plus_plus_nan) {
+  plus_plus_fun plus_plus_;
+
+  test_nan_fwd(plus_plus_,false);
   test_nan_mix(plus_plus_,false);
-//}
+}

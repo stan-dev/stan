@@ -123,5 +123,4 @@ TEST(AgradFwdOperatorMinusMinus, minus_minus_nan) {
 
   test_nan_fwd(minus_minus_,false);
   test_nan_mix(minus_minus_,false);
-  test_nan_mix(minus_minus_,false);
 }

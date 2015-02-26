@@ -354,5 +354,4 @@ TEST(AgradFwdOperatorDivision, divide_nan) {
   divide_fun divide_;
   test_nan_mix(divide_,3.0,5.0,false);
   test_nan_fwd(divide_,3.0,5.0,false);
-  test_nan_mix(divide_,3.0,5.0,false);
 }

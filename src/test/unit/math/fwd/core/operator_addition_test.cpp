@@ -353,5 +353,4 @@ TEST(AgradFwdOperatorAddition, add_nan) {
   add_fun add_;
   test_nan_fwd(add_,3.0,5.0,false);
   test_nan_mix(add_,3.0,5.0,false);
-  test_nan_mix(add_,3.0,5.0,false);
 }
