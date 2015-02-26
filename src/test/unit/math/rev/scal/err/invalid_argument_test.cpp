@@ -1,5 +1,6 @@
 #include <stan/math/prim/scal/err/invalid_argument.hpp>
 #include <gtest/gtest.h>
+#include <stan/math/rev/core.hpp>
 
 const char* function_ = "function";
 const char* y_name_ = "y";
@@ -64,8 +65,8 @@ public:
 
 };
 
-TEST_F(ErrorHandlingScalar_invalid_argument, double) {
-  double y = 10;
+TEST_F(ErrorHandlingScalar_invalid_argument, var) {
+  stan::agrad::var y = 10;
   
-  test_throw<double>(y);
+  test_throw<stan::agrad::var>(y);
 }

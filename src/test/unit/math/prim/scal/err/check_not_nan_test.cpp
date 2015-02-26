@@ -1,12 +1,3 @@
-#include <stan/math/prim/mat/meta/is_vector.hpp>
-#include <stan/math/prim/arr/meta/is_vector.hpp>
-#include <stan/math/prim/mat/meta/value_type.hpp>
-#include <stan/math/prim/mat/meta/length.hpp>
-#include <stan/math/prim/mat/meta/get.hpp>
-#include <stan/math/prim/arr/meta/length.hpp>
-#include <stan/math/prim/arr/meta/get.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
 #include <gtest/gtest.h>
 
@@ -75,43 +66,3 @@ TEST(ErrorHandlingScalar, CheckNotNanVectorized_one_indexed_message) {
   EXPECT_NE(std::string::npos, message.find("[3]"))
     << message;
 }
-
-TEST(ErrorHandlingScalar, CheckNotNanVarCheckUnivariate) {
-  using stan::agrad::var;
-
-  const char* function = "check_not_nan";
-  var a(5.0);
-
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
-
-  EXPECT_TRUE(1U == stack_size);
-  EXPECT_TRUE(check_not_nan(function,"a",a));
-
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
-  EXPECT_TRUE(1U == stack_size_after_call);
-
-  stan::agrad::recover_memory();
-}
-
-TEST(ErrorHandlingScalar, CheckNotNanVarCheckVectorized) {
-  using stan::agrad::var;
-  using std::vector;
-
-  int N = 5;
-  const char* function = "check_not_nan";
-  vector<var> a;
-
-  for (int i = 0; i < N; ++i)
-   a.push_back(var(i));
-
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
-
-  EXPECT_TRUE(5U == stack_size);
-  EXPECT_TRUE(check_not_nan(function,"a",a));
-
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
-  EXPECT_TRUE(5U == stack_size_after_call);
-  stan::agrad::recover_memory();
-}
-
-

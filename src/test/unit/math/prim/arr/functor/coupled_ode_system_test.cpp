@@ -4,7 +4,6 @@
 #include <test/unit/math/prim/arr/functor/harmonic_oscillator.hpp>
 #include <test/unit/math/prim/arr/functor/mock_ode_functor.hpp>
 #include <test/unit/math/prim/arr/functor/mock_throwing_ode_functor.hpp>
-#include <stan/math/rev/core.hpp>
 
 struct StanMathOde : public ::testing::Test {
   std::stringstream msgs;
@@ -14,7 +13,6 @@ struct StanMathOde : public ::testing::Test {
 
 TEST_F(StanMathOde, decouple_states_dd) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
 
   harm_osc_ode_fun harm_osc;
 
