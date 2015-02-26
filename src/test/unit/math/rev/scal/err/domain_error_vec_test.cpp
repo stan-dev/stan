@@ -1,5 +1,6 @@
 #include <vector>
-#include <stan/math/prim/arr/err/domain_error_vec.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/prim/scal/err/domain_error_vec.hpp>
 #include <gtest/gtest.h>
 
 const char* function_ = "function";
@@ -69,35 +70,9 @@ public:
   size_t index_;
 };
 
-TEST_F(ErrorHandlingScalar_domain_error_vec, vdouble) {
-  std::vector<double> y;
+TEST_F(ErrorHandlingScalar_domain_error_vec, vvar) {
+  std::vector<stan::agrad::var> y;
   y.push_back(10);
   
-  test_throw<std::vector<double> >(y);
-}
-
-TEST_F(ErrorHandlingScalar_domain_error_vec, vint) {
-  std::vector<int> y;
-  y.push_back(10);
-  
-  test_throw<std::vector<int> >(y);
-}
-
-TEST_F(ErrorHandlingScalar_domain_error_vec, one_indexed) {
-  std::string message;
-  int n = 5;
-  std::vector<double> y(20);
-  try {
-    stan::math::domain_error_vec
-      (function_, y_name_, y, n, msg1_, msg2_);
-    FAIL() << "expecting call to domain_error_vec<> to throw a domain_error,"
-           << "but threw nothing";
-  } catch(std::domain_error& e) {
-    message = e.what();
-  } catch(...) {
-    FAIL() << "expecting call to domain_error_vec<> to throw a domain_error,"
-           << "but threw a different type";
-  }
-
-  EXPECT_NE(std::string::npos, message.find("[6]"));
+  test_throw<std::vector<stan::agrad::var> >(y);
 }

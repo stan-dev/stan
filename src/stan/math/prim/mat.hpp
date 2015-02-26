@@ -1,6 +1,13 @@
 #ifndef STAN__MATH__PRIM__MAT_HPP
 #define STAN__MATH__PRIM__MAT_HPP
 
+#include <stan/math/prim/mat/meta/get.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector_like.hpp>
+#include <stan/math/prim/mat/meta/length.hpp>
+#include <stan/math/prim/mat/meta/seq_view.hpp>
+#include <stan/math/prim/mat/meta/value_type.hpp>
 #include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
 #include <stan/math/prim/mat/err/check_cholesky_factor_corr.hpp>
 #include <stan/math/prim/mat/err/check_column_index.hpp>
@@ -169,13 +176,6 @@
 #include <stan/math/prim/mat/fun/variance.hpp>
 #include <stan/math/prim/mat/fun/welford_covar_estimator.hpp>
 #include <stan/math/prim/mat/fun/welford_var_estimator.hpp>
-#include <stan/math/prim/mat/meta/get.hpp>
-#include <stan/math/prim/mat/meta/index_type.hpp>
-#include <stan/math/prim/mat/meta/is_vector.hpp>
-#include <stan/math/prim/mat/meta/is_vector_like.hpp>
-#include <stan/math/prim/mat/meta/length.hpp>
-#include <stan/math/prim/mat/meta/seq_view.hpp>
-#include <stan/math/prim/mat/meta/value_type.hpp>
 #include <stan/math/prim/mat/prob/categorical_log.hpp>
 #include <stan/math/prim/mat/prob/categorical_logit_log.hpp>
 #include <stan/math/prim/mat/prob/categorical_rng.hpp>

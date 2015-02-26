@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__ARR__ERR__INVALID_ARGUMENT_VEC_HPP
-#define STAN__MATH__PRIM__ARR__ERR__INVALID_ARGUMENT_VEC_HPP
+#ifndef STAN__MATH__PRIM__SCAL__ERR__INVALID_ARGUMENT_VEC_HPP
+#define STAN__MATH__PRIM__SCAL__ERR__INVALID_ARGUMENT_VEC_HPP
 
 #include <sstream>
 #include <string>
@@ -7,8 +7,6 @@
 #include <stan/math/prim/scal/meta/value_type.hpp>
 #include <stan/math/prim/scal/meta/error_index.hpp>
 #include <stan/math/prim/scal/meta/get.hpp>
-#include <stan/math/prim/arr/meta/get.hpp>
-#include <stan/math/prim/mat/meta/get.hpp>
 
 namespace stan {
 
