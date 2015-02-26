@@ -1,3 +1,9 @@
+#include <stan/math/prim/mat/meta/get.hpp>
+#include <stan/math/prim/arr/meta/get.hpp>
+#include <stan/math/prim/mat/meta/length.hpp>
+#include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector_like.hpp>
+#include <stan/math/prim/mat/fun/value_of_rec.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>

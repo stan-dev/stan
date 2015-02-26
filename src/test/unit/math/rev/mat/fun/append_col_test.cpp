@@ -1,3 +1,8 @@
+#include <stan/math/prim/mat/meta/get.hpp>
+#include <stan/math/prim/arr/meta/get.hpp>
+#include <stan/math/prim/mat/meta/length.hpp>
+#include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector_like.hpp>
 #include <iostream>
 #include <stan/math/prim/mat/fun/append_col.hpp>
 #include <stan/math/rev/core.hpp>

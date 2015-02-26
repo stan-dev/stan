@@ -1,3 +1,9 @@
+#include <stan/math/prim/mat/meta/get.hpp>
+#include <stan/math/prim/arr/meta/get.hpp>
+#include <stan/math/prim/mat/meta/length.hpp>
+#include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector_like.hpp>
+#include <stan/math/prim/mat/fun/value_of_rec.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_spd.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <gtest/gtest.h>
