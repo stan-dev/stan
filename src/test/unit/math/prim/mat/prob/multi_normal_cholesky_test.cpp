@@ -3,24 +3,7 @@
 #include <stan/math/prim/mat/prob/multi_normal_cholesky_rng.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/rev/scal/fun/log.hpp>
-#include <stan/math/rev/scal/fun/value_of_rec.hpp>
-#include <stan/math/rev/scal/fun/value_of.hpp>
-#include <stan/math/rev/scal/fun/abs.hpp>
-#include <stan/math/fwd/scal/fun/log.hpp>
-#include <stan/math/fwd/scal/fun/abs.hpp>
-#include <stan/math/fwd/scal/fun/fabs.hpp>
-#include <stan/math/fwd/scal/fun/value_of_rec.hpp>
-#include <stan/math/fwd/scal/fun/value_of.hpp>
-#include <stan/math/fwd/mat/fun/sum.hpp>
-#include <stan/math/fwd/mat/fun/multiply.hpp>
-#include <stan/math/fwd/mat/fun/dot_self.hpp>
-#include <stan/math/fwd/scal/fun/sqrt.hpp>
-#include <stan/math/rev/mat/fun/dot_self.hpp>
-#include <stan/math/rev/mat/fun/columns_dot_self.hpp>
-#include <stan/math/rev/scal/fun/sqrt.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -86,19 +69,6 @@ TEST(ProbDistributionsMultiNormalCholesky,Vectorized) {
   EXPECT_FLOAT_EQ(-6.26954-6.537833, stan::prob::multi_normal_cholesky_log(y_t,vec_mu,L));
   EXPECT_FLOAT_EQ(-6.26954-6.537833, stan::prob::multi_normal_cholesky_log(y,vec_mu_t,L));
   EXPECT_FLOAT_EQ(-6.26954-6.537833, stan::prob::multi_normal_cholesky_log(y_t,vec_mu_t,L));
-}
-TEST(ProbDistributionsMultiNormalCholesky,MultiNormalVar) {
-  using stan::agrad::var;
-  Matrix<var,Dynamic,1> y(3,1);
-  y << 2.0, -2.0, 11.0;
-  Matrix<var,Dynamic,1> mu(3,1);
-  mu << 1.0, -1.0, 3.0;
-  Matrix<var,Dynamic,Dynamic> Sigma(3,3);
-  Sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    0.0, 0.0, 5.0;
-  Matrix<var,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_cholesky_log(y,mu,L).val());
 }
 
 TEST(ProbDistributionsMultiNormalCholesky,MultiNormalOneRow) {
@@ -265,110 +235,4 @@ TEST(ProbDistributionsMultiNormalCholesky, marginalThreeChiSquareGoodnessFitTest
     chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
 
   EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
-}
-
-TEST(ProbDistributionsMultiNormalCholesky,fvar_double) {
-  using stan::agrad::fvar;
-  Matrix<fvar<double>,Dynamic,1> y(3,1);
-  y << 2.0, -2.0, 11.0;
-  Matrix<fvar<double>,Dynamic,1> mu(3,1);
-  mu << 1.0, -1.0, 3.0;
-  Matrix<fvar<double>,Dynamic,Dynamic> Sigma(3,3);
-  Sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    0.0, 0.0, 5.0;
-
-  Sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    0.0, 0.0, 5.0;
-  for (int i = 0; i < 3; i++) {
-    y(i).d_ = 1.0;
-    mu(i).d_ = 1.0;
-    for (int j = 0; j < 3; j++)
-      Sigma(i,j).d_ = 1.0;
-  }
-
-  Matrix<fvar<double>,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_cholesky_log(y,mu,L).val_);
-  EXPECT_FLOAT_EQ(0.54899865, stan::prob::multi_normal_cholesky_log(y,mu,L).d_);
-}
-
-TEST(ProbDistributionsMultiNormalCholesky,fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-  Matrix<fvar<var>,Dynamic,1> y(3,1);
-  y << 2.0, -2.0, 11.0;
-  Matrix<fvar<var>,Dynamic,1> mu(3,1);
-  mu << 1.0, -1.0, 3.0;
-  Matrix<fvar<var>,Dynamic,Dynamic> Sigma(3,3);
-  Sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    0.0, 0.0, 5.0;
-
-  Sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    0.0, 0.0, 5.0;
-  for (int i = 0; i < 3; i++) {
-    y(i).d_ = 1.0;
-    mu(i).d_ = 1.0;
-    for (int j = 0; j < 3; j++)
-      Sigma(i,j).d_ = 1.0;
-  }
-
-  Matrix<fvar<var>,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_cholesky_log(y,mu,L).val_.val());
-  EXPECT_FLOAT_EQ(0.54899865, stan::prob::multi_normal_cholesky_log(y,mu,L).d_.val());
-}
-
-TEST(ProbDistributionsMultiNormalCholesky,fvar_fvar_double) {
-  using stan::agrad::fvar;
-  Matrix<fvar<fvar<double> >,Dynamic,1> y(3,1);
-  y << 2.0, -2.0, 11.0;
-  Matrix<fvar<fvar<double> >,Dynamic,1> mu(3,1);
-  mu << 1.0, -1.0, 3.0;
-  Matrix<fvar<fvar<double> >,Dynamic,Dynamic> Sigma(3,3);
-  Sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    0.0, 0.0, 5.0;
-
-  Sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    0.0, 0.0, 5.0;
-  for (int i = 0; i < 3; i++) {
-    y(i).d_.val_ = 1.0;
-    mu(i).d_.val_ = 1.0;
-    for (int j = 0; j < 3; j++)
-      Sigma(i,j).d_.val_ = 1.0;
-  }
-
-  Matrix<fvar<fvar<double> >,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_cholesky_log(y,mu,L).val_.val_);
-  EXPECT_FLOAT_EQ(0.54899865, stan::prob::multi_normal_cholesky_log(y,mu,L).d_.val_);
-}
-
-TEST(ProbDistributionsMultiNormalCholesky,fvar_fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-  Matrix<fvar<fvar<var> >,Dynamic,1> y(3,1);
-  y << 2.0, -2.0, 11.0;
-  Matrix<fvar<fvar<var> >,Dynamic,1> mu(3,1);
-  mu << 1.0, -1.0, 3.0;
-  Matrix<fvar<fvar<var> >,Dynamic,Dynamic> Sigma(3,3);
-  Sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    0.0, 0.0, 5.0;
-
-  Sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    0.0, 0.0, 5.0;
-  for (int i = 0; i < 3; i++) {
-    y(i).d_.val_ = 1.0;
-    mu(i).d_.val_ = 1.0;
-    for (int j = 0; j < 3; j++)
-      Sigma(i,j).d_.val_ = 1.0;
-  }
-
-  Matrix<fvar<fvar<var> >,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_cholesky_log(y,mu,L).val_.val_.val());
-  EXPECT_FLOAT_EQ(0.54899865, stan::prob::multi_normal_cholesky_log(y,mu,L).d_.val_.val());
 }

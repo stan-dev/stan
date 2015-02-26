@@ -9,9 +9,9 @@
 #include <stan/math/rev/mat/fun/columns_dot_self.hpp>
 
 #include <vector>
-#include <test/unit/math/prim/mat/prob/test_gradients.hpp>
-#include <test/unit/math/prim/mat/prob/test_gradients_multi_normal.hpp>
-#include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
+#include <test/unit/math/rev/mat/prob/test_gradients.hpp>
+#include <test/unit/math/rev/mat/prob/test_gradients_multi_normal.hpp>
+#include <test/unit/math/rev/mat/prob/expect_eq_diffs.hpp>
 
 
 using Eigen::Dynamic;
