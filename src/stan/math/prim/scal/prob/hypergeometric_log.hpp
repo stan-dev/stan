@@ -1,7 +1,6 @@
 #ifndef STAN__MATH__PRIM__SCAL__PROB__HYPERGEOMETRIC_LOG_HPP
 #define STAN__MATH__PRIM__SCAL__PROB__HYPERGEOMETRIC_LOG_HPP
 
-#include <vector>
 #include <boost/math/distributions.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_bounded.hpp>
