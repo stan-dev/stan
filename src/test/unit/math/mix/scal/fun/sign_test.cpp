@@ -4,6 +4,19 @@
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 
+TEST(AgradFwdSign, Fvar) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<var> v;
+  v = 0;
+  EXPECT_EQ(0, stan::math::sign(v));
+  v = 0.0000001;
+  EXPECT_EQ(1, stan::math::sign(v));
+  v = -0.001;
+  EXPECT_EQ(-1, stan::math::sign(v));
+}
+
 
 TEST(AgradFwdSign, FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
