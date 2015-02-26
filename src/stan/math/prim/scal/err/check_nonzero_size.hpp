@@ -2,7 +2,6 @@
 #define STAN__MATH__PRIM__SCAL__ERR__CHECK_NONZERO_SIZE_HPP
 
 #include <stan/math/prim/scal/err/invalid_argument.hpp>
-#include <stan/math/prim/mat/meta/index_type.hpp>
 
 #include <string>
 
