@@ -207,6 +207,10 @@ namespace stan {
         fun.type_ = function_signatures::instance().get_result_type(fun.name_,
                                                                     arg_types,
                                                                     error_msgs);
+        if (fun.type_ == ILL_FORMED_T) {
+          pass = false;
+          return;
+        }
 
 
         if (has_rng_suffix(fun.name_)) {  

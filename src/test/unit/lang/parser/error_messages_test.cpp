@@ -62,5 +62,7 @@ TEST(LangGrammars,test1) {
               "variable \"else\" does not exist.");
   test_throws("err-var-decl-after-statement",
               "variable \"real\" does not exist");
+  test_throws("err-double-dims",
+              "dimension declaration requires expression denoting integer; found type=real");
 }
  
