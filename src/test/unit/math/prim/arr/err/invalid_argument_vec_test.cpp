@@ -1,9 +1,5 @@
-#include <vector>
 #include <stan/math/prim/arr/err/invalid_argument_vec.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/prim/mat/meta/value_type.hpp>
-#include <stan/math/prim/scal/meta/value_type.hpp>
-
+#include <vector>
 #include <gtest/gtest.h>
 
 const char* function_ = "function";
@@ -85,14 +81,6 @@ TEST_F(ErrorHandlingScalar_invalid_argument_vec, vint) {
   y.push_back(10);
   
   test_throw<std::vector<int> >(y);
-}
-
-
-TEST_F(ErrorHandlingScalar_invalid_argument_vec, vvar) {
-  std::vector<stan::agrad::var> y;
-  y.push_back(10);
-  
-  test_throw<std::vector<stan::agrad::var> >(y);
 }
 
 TEST_F(ErrorHandlingScalar_invalid_argument_vec, one_indexed) {

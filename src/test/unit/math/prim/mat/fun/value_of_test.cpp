@@ -1,6 +1,14 @@
 #include <stan/math/prim/mat/fun/value_of.hpp>
-#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
+
+template<typename T, int R, int C>
+void fill(const std::vector<double>& contents,
+          Eigen::Matrix<T,R,C>& M){
+  size_t ij = 0;
+  for (int j = 0; j < C; ++j)
+    for (int i = 0; i < R; ++i)
+      M(i,j) = T(contents[ij++]);
+}
 
 TEST(MathMatrix,value_of) {
   using stan::math::value_of;
@@ -24,12 +32,10 @@ TEST(MathMatrix,value_of) {
   Eigen::MatrixXd d_a = value_of(a);
   Eigen::VectorXd d_b = value_of(b);
 
-  for (size_type i = 0; i < 5; ++i){
+  for (int i = 0; i < 5; ++i)
     EXPECT_FLOAT_EQ(b(i), d_b(i));
-  }
 
-  for (size_type i = 0; i < 2; ++i)
-    for (size_type j = 0; j < 5; ++j){
+  for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 5; ++j)
       EXPECT_FLOAT_EQ(a(i,j), d_a(i,j));
-    }
 }

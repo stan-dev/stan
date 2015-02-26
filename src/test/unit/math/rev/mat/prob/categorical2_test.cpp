@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <test/unit/math/prim/mat/prob/expect_eq_diffs.hpp>
+#include <test/unit/math/rev/mat/prob/expect_eq_diffs.hpp>
 #include <stan/math/prim/mat/prob/categorical_log.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/rev/core.hpp>

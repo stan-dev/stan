@@ -1,6 +1,5 @@
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/rev/core.hpp>
 
 const char* function_ = "function";
 const char* y_name_ = "y";
@@ -68,10 +67,4 @@ TEST_F(ErrorHandlingScalar_domain_error, double) {
   double y = 10;
   
   test_throw<double>(y);
-}
-
-TEST_F(ErrorHandlingScalar_domain_error, var) {
-  stan::agrad::var y = 10;
-  
-  test_throw<stan::agrad::var>(y);
 }

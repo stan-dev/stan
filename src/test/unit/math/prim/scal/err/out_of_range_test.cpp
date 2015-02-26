@@ -1,5 +1,4 @@
 #include <stan/math/prim/scal/err/out_of_range.hpp>
-#include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 
@@ -62,14 +61,6 @@ public:
 
 TEST_F(ErrorHandlingScalar_out_of_range, double) {
   std::vector<double> y(4);
-  
-  test_throw(y, 0);
-  test_throw(y, 5);
-}
-
-
-TEST_F(ErrorHandlingScalar_out_of_range, var) {
-  std::vector<stan::agrad::var> y(4);
   
   test_throw(y, 0);
   test_throw(y, 5);
