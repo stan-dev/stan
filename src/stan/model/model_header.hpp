@@ -4,6 +4,9 @@
 #include <boost/exception/all.hpp>
 #include <boost/random/linear_congruential.hpp>
 
+// FIXME: this currently needs to be included first
+#include <stan/math/prim/mat/fun/value_of_rec.hpp>
+
 #include <stan/math/prim/arr.hpp>
 #include <stan/math/prim/mat.hpp>
 #include <stan/math/prim/scal.hpp>
