@@ -5,6 +5,7 @@
 #include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
+
   namespace agrad {
 
     // forward declare
@@ -71,134 +72,127 @@ namespace stan {
         : vi_(static_cast<vari*>(0U))
       { }
 
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param b Value.
-       */
-      var(bool b) :
-        vi_(new vari(static_cast<double>(b))) {
-      }
 
       /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param c Value.
-       */
-      var(char c) :
-        vi_(new vari(static_cast<double>(c))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(short n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned short n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(long int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned long int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned long long n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(long long n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
        *
        * @param x Value.
        */
-      var(float x) :
-        vi_(new vari(static_cast<double>(x))) {
-      }
+      var(float x)
+      : vi_(new vari(static_cast<double>(x)))
+      { }
 
       /**      
-       * Construct a variable with the specified value.
-       *
-       * @param x Value of the variable.
-       */
-      var(double x) :
-        vi_(new vari(x)) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
        *
        * @param x Value.
        */
-      var(long double x) :
-        vi_(new vari(static_cast<double>(x))) {
-      }
+      var(double x)
+      : vi_(new vari(static_cast<double>(x)))
+      { }
+
+      /**      
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(long double x)
+      : vi_(new vari(static_cast<double>(x)))
+      { }
+
+
+      /**      
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(bool x) 
+      : vi_(new vari(static_cast<double>(x)))
+      { }
+
+      /**      
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(char x) 
+      : vi_(new vari(static_cast<double>(x)))
+      { }
+
+      /**      
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(short x) 
+      : vi_(new vari(static_cast<double>(x)))
+      { }
+
+      /**      
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(int x) 
+      : vi_(new vari(static_cast<double>(x)))
+      { }
+
+      /**      
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(long x) 
+      : vi_(new vari(static_cast<double>(x)))
+      { }
+
+      /**      
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(unsigned char x) 
+      : vi_(new vari(static_cast<double>(x)))
+      { }
+
+      /**      
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(unsigned short x) 
+      : vi_(new vari(static_cast<double>(x)))
+      { }
+
+      /**      
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(unsigned int x) 
+      : vi_(new vari(static_cast<double>(x)))
+      { }
+
+      /**      
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.
+       *
+       * @param x Value.
+       */
+      var(unsigned long x) 
+      : vi_(new vari(static_cast<double>(x)))
+      { }
 
       /**
        * Return the value of this variable.
