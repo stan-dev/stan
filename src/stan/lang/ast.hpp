@@ -243,6 +243,7 @@ namespace stan {
       expression(const expression_t& expr_);
 
       expr_type expression_type() const; 
+      int total_dims() const; 
 
       expression& operator+=(const expression& rhs);
       expression& operator-=(const expression& rhs);
