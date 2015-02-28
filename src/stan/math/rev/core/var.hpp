@@ -83,11 +83,12 @@ namespace stan {
        *
        * @param x Value.
        */
-      var(float x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
 
       var(double x)
+      : vi_(new vari(x))
+      {  } 
+
+      var(float x)
       : vi_(new vari(static_cast<double>(x))) 
       {  } 
 
@@ -127,9 +128,17 @@ namespace stan {
       : vi_(new vari(static_cast<double>(x))) 
       {  } 
 
-      var(unsigned long x)
+      var(unsigned long x) 
       : vi_(new vari(static_cast<double>(x))) 
       {  } 
+
+#ifdef _WIN64
+      // HACK HACK HACK: add 64-bit unsigned type for Windows 64 bit
+      // without using long long
+      var(size_t x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+#endif
 
       /**
        * Return the value of this variable.
