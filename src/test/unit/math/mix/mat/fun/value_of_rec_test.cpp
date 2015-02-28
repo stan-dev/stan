@@ -6,7 +6,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradMatrix,value_of_rec) {
+TEST(AgradMixMatrix,value_of_rec) {
   using stan::agrad::var;
   using stan::agrad::fvar;
   using stan::math::value_of_rec;

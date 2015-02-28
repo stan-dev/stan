@@ -1,6 +1,5 @@
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <gtest/gtest.h>
-#include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradFwdMatrixEigenNumTraits, insertion_operator) {
   using stan::agrad::fvar;

@@ -2,7 +2,6 @@
 #include <stan/math/prim/mat/fun/rank.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/rev/core.hpp>
 
 template <typename T>
 void test_rank() {
@@ -70,7 +69,6 @@ void test_rank_int() {
 TEST(AgradFwdMatrixRank,rank) {
   using stan::math::rank;
   using stan::agrad::fvar;
-  using stan::agrad::var;
 
   test_rank< std::vector<fvar<double> > >();
   test_rank< Eigen::Matrix<fvar<double> ,Eigen::Dynamic,1> >();
@@ -80,14 +78,6 @@ TEST(AgradFwdMatrixRank,rank) {
   test_rank_int< Eigen::Matrix<fvar<double> ,Eigen::Dynamic,1> >();
   test_rank_int< Eigen::Matrix<fvar<double> ,1,Eigen::Dynamic> >();
 
-  test_rank< std::vector<fvar<var> > >();
-  test_rank< Eigen::Matrix<fvar<var> ,Eigen::Dynamic,1> >();
-  test_rank< Eigen::Matrix<fvar<var> ,1,Eigen::Dynamic> >();
-
-  test_rank_int< std::vector<fvar<var> > >();
-  test_rank_int< Eigen::Matrix<fvar<var> ,Eigen::Dynamic,1> >();
-  test_rank_int< Eigen::Matrix<fvar<var> ,1,Eigen::Dynamic> >();
-
   test_rank< std::vector<fvar<fvar<double> > > >();
   test_rank< Eigen::Matrix<fvar<fvar<double> > ,Eigen::Dynamic,1> >();
   test_rank< Eigen::Matrix<fvar<fvar<double> > ,1,Eigen::Dynamic> >();
@@ -95,12 +85,4 @@ TEST(AgradFwdMatrixRank,rank) {
   test_rank_int< std::vector<fvar<fvar<double> > > >();
   test_rank_int< Eigen::Matrix<fvar<fvar<double> > ,Eigen::Dynamic,1> >();
   test_rank_int< Eigen::Matrix<fvar<fvar<double> > ,1,Eigen::Dynamic> >();
-
-  test_rank< std::vector<fvar<fvar<var> > > >();
-  test_rank< Eigen::Matrix<fvar<fvar<var> > ,Eigen::Dynamic,1> >();
-  test_rank< Eigen::Matrix<fvar<fvar<var> > ,1,Eigen::Dynamic> >();
-
-  test_rank_int< std::vector<fvar<fvar<var> > > >();
-  test_rank_int< Eigen::Matrix<fvar<fvar<var> > ,Eigen::Dynamic,1> >();
-  test_rank_int< Eigen::Matrix<fvar<fvar<var> > ,1,Eigen::Dynamic> >();
 }

@@ -1,10 +1,8 @@
 #include <stan/math/prim/mat/fun/get_base1.hpp>
-#include <stan/math/mix/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <gtest/gtest.h>
 
 using stan::agrad::fvar;
-using stan::agrad::var;
 
 TEST(AgradFwdMatrixGetBase1,failing_pre_20_fd) {
   using Eigen::Matrix;

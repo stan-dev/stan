@@ -1,4 +1,3 @@
-#include <stan/math/rev/core.hpp>
 #include <stan/math/prim/mat/fun/inverse_spd.hpp>
 #include <stan/math/fwd/mat/fun/inverse.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
@@ -9,7 +8,6 @@
 
 class AgradFwdMatrixInverseSPD : public testing::Test {
   void SetUp() {
-    stan::agrad::recover_memory();
   }
 };
 

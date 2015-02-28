@@ -1,13 +1,18 @@
 #include <stan/math/prim/mat/fun/value_of.hpp>
-#include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
-#include <stan/math/rev/scal/fun/value_of.hpp>
-#include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradMatrix,value_of) {
-  using stan::agrad::var;
+template<typename T, int R, int C>
+void fill(const std::vector<double>& contents,
+          Eigen::Matrix<T,R,C>& M){
+  size_t ij = 0;
+  for (int j = 0; j < C; ++j)
+    for (int i = 0; i < R; ++i)
+      M(i,j) = T(contents[ij++]);
+}
+
+TEST(AgradFwdMatrix,value_of) {
   using stan::agrad::fvar;
   using stan::math::value_of;
   using std::vector;
@@ -27,16 +32,6 @@ TEST(AgradMatrix,value_of) {
   Eigen::Matrix<double,5,1> b;
   fill(b_vals, b);
 
-  Eigen::Matrix<var,2,5> v_a;
-  fill(a_vals, v_a);
-  Eigen::Matrix<var,5,1> v_b;
-  fill(b_vals, v_b);
-
-  Eigen::Matrix<fvar<var>,2,5> fv_a;
-  fill(a_vals, fv_a);
-  Eigen::Matrix<fvar<var>,5,1> fv_b;
-  fill(b_vals, fv_b);
-
   Eigen::Matrix<fvar<double>,2,5> fd_a;
   fill(a_vals, fd_a);
   Eigen::Matrix<fvar<double>,5,1> fd_b;
@@ -47,40 +42,19 @@ TEST(AgradMatrix,value_of) {
   Eigen::Matrix<fvar<fvar<double> >,5,1> ffd_b;
   fill(b_vals, ffd_b);
 
-  Eigen::Matrix<fvar<fvar<var> >,2,5> ffv_a;
-  fill(a_vals, ffv_a);
-  Eigen::Matrix<fvar<fvar<var> >,5,1> ffv_b;
-  fill(b_vals, ffv_b);
-
-  Eigen::MatrixXd d_a = value_of(a);
-  Eigen::VectorXd d_b = value_of(b);
-  Eigen::MatrixXd d_v_a = value_of(v_a);
-  Eigen::MatrixXd d_v_b = value_of(v_b);
-  Eigen::Matrix<var,-1,-1> d_fv_a = value_of(fv_a);
-  Eigen::Matrix<var,-1,-1> d_fv_b = value_of(fv_b);
   Eigen::MatrixXd d_fd_a = value_of(fd_a);
   Eigen::MatrixXd d_fd_b = value_of(fd_b);
   Eigen::Matrix<fvar<double>,-1,-1> d_ffd_a = value_of(ffd_a);
   Eigen::Matrix<fvar<double>,-1,-1> d_ffd_b = value_of(ffd_b);
-  Eigen::Matrix<fvar<var>,-1,-1> d_ffv_a = value_of(ffv_a);
-  Eigen::Matrix<fvar<var>,-1,-1> d_ffv_b = value_of(ffv_b);
 
-  for (size_type i = 0; i < 5; ++i){
-    EXPECT_FLOAT_EQ(b(i), d_b(i));
-    EXPECT_FLOAT_EQ(b(i), d_v_b(i));
-    EXPECT_FLOAT_EQ(b(i), d_fv_b(i).val());
+  for (int i = 0; i < 5; ++i){
     EXPECT_FLOAT_EQ(b(i), d_fd_b(i));
     EXPECT_FLOAT_EQ(b(i), d_ffd_b(i).val_);
-    EXPECT_FLOAT_EQ(b(i), d_ffv_b(i).val_.val());
   }
 
-  for (size_type i = 0; i < 2; ++i)
-    for (size_type j = 0; j < 5; ++j){
-      EXPECT_FLOAT_EQ(a(i,j), d_a(i,j));
-      EXPECT_FLOAT_EQ(a(i,j), d_v_a(i,j));
-      EXPECT_FLOAT_EQ(a(i,j), d_fv_a(i,j).val());
+  for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 5; ++j){
       EXPECT_FLOAT_EQ(a(i,j), d_fd_a(i,j));
       EXPECT_FLOAT_EQ(a(i,j), d_ffd_a(i,j).val_);
-      EXPECT_FLOAT_EQ(a(i,j), d_ffv_a(i,j).val_.val());
     }
 }

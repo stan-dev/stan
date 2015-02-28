@@ -10,7 +10,6 @@ void fill(const std::vector<double>& contents,
       M(i,j) = T(contents[ij++]);
 }
 
-
 TEST(MathMatrix,value_of_rec) {
   using stan::math::value_of_rec;
   using std::vector;
