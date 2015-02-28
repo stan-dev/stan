@@ -31,9 +31,9 @@ TEST(AgradRevMatrix, distance_vector_vector_exception) {
   vector_d d2(2);
   vector_v v2(4);
 
-  EXPECT_THROW(stan::math::distance(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::math::distance(d1, v2), std::domain_error);
-  EXPECT_THROW(stan::math::distance(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::math::distance(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::math::distance(v1, v2), std::invalid_argument);
 }
 TEST(AgradRevMatrix, distance_rowvector_vector) {
   using stan::math::vector_d;
@@ -66,9 +66,9 @@ TEST(AgradRevMatrix, distance_rowvector_vector_exception) {
   vector_d d2(2);
   vector_v v2(4);
 
-  EXPECT_THROW(stan::math::distance(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::math::distance(d1, v2), std::domain_error);
-  EXPECT_THROW(stan::math::distance(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::math::distance(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::math::distance(v1, v2), std::invalid_argument);
 }
 TEST(AgradRevMatrix, distance_vector_rowvector) {
   using stan::math::vector_d;
@@ -101,9 +101,9 @@ TEST(AgradRevMatrix, distance_vector_rowvector_exception) {
   row_vector_d d2(2);
   row_vector_v v2(4);
 
-  EXPECT_THROW(stan::math::distance(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::math::distance(d1, v2), std::domain_error);
-  EXPECT_THROW(stan::math::distance(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::math::distance(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::math::distance(v1, v2), std::invalid_argument);
 }
 TEST(AgradRevMatrix, distance_rowvector_rowvector) {
   using stan::math::row_vector_d;
@@ -128,9 +128,9 @@ TEST(AgradRevMatrix, distance_rowvector_rowvector_exception) {
   row_vector_d d1(3), d2(2);
   row_vector_v v1(3), v2(4);
 
-  EXPECT_THROW(stan::math::distance(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::math::distance(d1, v2), std::domain_error);
-  EXPECT_THROW(stan::math::distance(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v1, d2), std::invalid_argument);
+  EXPECT_THROW(stan::math::distance(d1, v2), std::invalid_argument);
+  EXPECT_THROW(stan::math::distance(v1, v2), std::invalid_argument);
 }
 
 TEST(AgradRevMatrix, distance_vv) {

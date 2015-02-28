@@ -1,73 +1,66 @@
 #ifndef STAN__MCMC__SAMPLE__HPP
 #define STAN__MCMC__SAMPLE__HPP
 
+#include <stan/math/matrix/Eigen.hpp>
+
 #include <vector>
 #include <string>
 
-#include <stan/math/matrix/Eigen.hpp>
-
 namespace stan {
-  
+
   namespace mcmc {
-    
+
     class sample {
-      
     public:
-      
-      sample(const Eigen::VectorXd& q,
-             double log_prob,
-             double stat) :
-      cont_params_(q),
-      log_prob_(log_prob),
-      accept_stat_(stat) {};
-      
-      virtual ~sample() {}; // No-op
-      
+      sample(const Eigen::VectorXd& q, double log_prob, double stat)
+        : cont_params_(q), log_prob_(log_prob), accept_stat_(stat) {
+      }
+
+      virtual ~sample() {}  // No-op
+
       int size_cont() const {
         return cont_params_.size();
       }
-      
+
       double cont_params(int k) const {
         return cont_params_(k);
       }
-      
+
       void cont_params(Eigen::VectorXd& x) const {
         x = cont_params_;
       }
-      
+
       const Eigen::VectorXd& cont_params() const {
         return cont_params_;
       }
-      
+
       inline double log_prob() const {
         return log_prob_;
       }
-      
+
       inline double accept_stat() const {
         return accept_stat_;
       }
-      
+
       void get_sample_param_names(std::vector<std::string>& names) {
         names.push_back("lp__");
         names.push_back("accept_stat__");
       }
-      
+
       void get_sample_params(std::vector<double>& values) {
         values.push_back(log_prob_);
         values.push_back(accept_stat_);
       }
-      
+
     private:
-      
-      Eigen::VectorXd cont_params_; // Continuous coordinates of sample
-      double log_prob_;             // Log probability of sample
-      double accept_stat_;          // Acceptance statistic of transition
-      
+      Eigen::VectorXd cont_params_;  // Continuous coordinates of sample
+      double log_prob_;              // Log probability of sample
+      double accept_stat_;           // Acceptance statistic of transition
     };
-    
-  } // mcmc
-  
-} // stan
+
+  }  // mcmc
+
+}  // stan
 
 #endif
 

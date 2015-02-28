@@ -35,7 +35,7 @@ TEST(AgradFwdMatrixDistance, vector_fd_vector_fd) {
   v2.resize(2);
   v1 << 1;
   v2 << 2, 3;
-  EXPECT_THROW(stan::math::distance(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v1, v2), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, rowvector_fd_vector_fd) {
@@ -66,7 +66,7 @@ TEST(AgradFwdMatrixDistance, rowvector_fd_vector_fd) {
   v.resize(2);
   rv << 1;
   v << 2, 3;
-  EXPECT_THROW(stan::math::distance(rv, v), std::domain_error);
+  EXPECT_THROW(stan::math::distance(rv, v), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, vector_fd_rowvector_fd) {
@@ -97,7 +97,7 @@ TEST(AgradFwdMatrixDistance, vector_fd_rowvector_fd) {
   rv.resize(2);
   v << 1;
   rv << 2, 3;
-  EXPECT_THROW(stan::math::distance(v, rv), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v, rv), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, special_values_fd) {
@@ -153,7 +153,7 @@ TEST(AgradFwdMatrixDistance, vector_ffd_vector_ffd) {
   v2.resize(2);
   v1 << 1;
   v2 << 2, 3;
-  EXPECT_THROW(stan::math::distance(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v1, v2), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, rowvector_ffd_vector_ffd) {
@@ -184,7 +184,7 @@ TEST(AgradFwdMatrixDistance, rowvector_ffd_vector_ffd) {
   v.resize(2);
   rv << 1;
   v << 2, 3;
-  EXPECT_THROW(stan::math::distance(rv, v), std::domain_error);
+  EXPECT_THROW(stan::math::distance(rv, v), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, vector_ffd_rowvector_ffd) {
@@ -215,7 +215,7 @@ TEST(AgradFwdMatrixDistance, vector_ffd_rowvector_ffd) {
   rv.resize(2);
   v << 1;
   rv << 2, 3;
-  EXPECT_THROW(stan::math::distance(v, rv), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v, rv), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, special_values_ffd) {
@@ -288,7 +288,7 @@ TEST(AgradFwdMatrixDistance, vector_fv_vector_fv1) {
   v2.resize(2);
   v1 << 1;
   v2 << 2, 3;
-  EXPECT_THROW(stan::math::distance(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v1, v2), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, vector_fv_vector_fv2) {
@@ -373,7 +373,7 @@ TEST(AgradFwdMatrixDistance, rowvector_fv_vector_fv1) {
   v.resize(2);
   rv << 1;
   v << 2, 3;
-  EXPECT_THROW(stan::math::distance(rv, v), std::domain_error);
+  EXPECT_THROW(stan::math::distance(rv, v), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, rowvector_fv_vector_fv2) {
@@ -459,7 +459,7 @@ TEST(AgradFwdMatrixDistance, vector_fv_rowvector_fv1) {
   rv.resize(2);
   v << 1;
   rv << 2, 3;
-  EXPECT_THROW(stan::math::distance(v, rv), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v, rv), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, vector_fv_rowvector_fv2) {
@@ -569,7 +569,7 @@ TEST(AgradFwdMatrixDistance, vector_fv_vector_ffv1) {
   v2.resize(2);
   v1 << 1;
   v2 << 2, 3;
-  EXPECT_THROW(stan::math::distance(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v1, v2), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, vector_fv_vector_ffv2) {
@@ -746,7 +746,7 @@ TEST(AgradFwdMatrixDistance, rowvector_fv_vector_ffv1) {
   v.resize(2);
   rv << 1;
   v << 2, 3;
-  EXPECT_THROW(stan::math::distance(rv, v), std::domain_error);
+  EXPECT_THROW(stan::math::distance(rv, v), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, rowvector_fv_vector_ffv2) {
@@ -924,7 +924,7 @@ TEST(AgradFwdMatrixDistance, vector_fv_rowvector_ffv1) {
   rv.resize(2);
   v << 1;
   rv << 2, 3;
-  EXPECT_THROW(stan::math::distance(v, rv), std::domain_error);
+  EXPECT_THROW(stan::math::distance(v, rv), std::invalid_argument);
 }
 
 TEST(AgradFwdMatrixDistance, vector_fv_rowvector_ffv2) {

@@ -27,8 +27,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_left;
-      stan::error_handling::check_square("mdivide_left", "A", A);
-      stan::error_handling::check_multiplicable("mdivide_left",
+      stan::math::check_square("mdivide_left", "A", A);
+      stan::math::check_multiplicable("mdivide_left",
                                                 "A", A,
                                                 "b", b);
 
@@ -72,8 +72,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_left;
-      stan::error_handling::check_square("mdivide_left", "A", A);
-      stan::error_handling::check_multiplicable("mdivide_left",
+      stan::math::check_square("mdivide_left", "A", A);
+      stan::math::check_multiplicable("mdivide_left",
                                                 "A", A,
                                                 "b", b);
 
@@ -99,8 +99,8 @@ namespace stan {
       
       using stan::math::multiply;      
       using stan::math::mdivide_left;
-      stan::error_handling::check_square("mdivide_left", "A", A);
-      stan::error_handling::check_multiplicable("mdivide_left",
+      stan::math::check_square("mdivide_left", "A", A);
+      stan::math::check_multiplicable("mdivide_left",
                                                 "A", A,
                                                 "b", b);
 

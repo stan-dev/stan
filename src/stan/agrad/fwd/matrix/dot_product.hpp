@@ -19,9 +19,9 @@ namespace stan {
     fvar<T> 
     dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
                 const Eigen::Matrix<fvar<T>, R2, C2>& v2) {
-      stan::error_handling::check_vector("dot_product", "v1", v1);
-      stan::error_handling::check_vector("dot_product", "v2", v2);
-      stan::error_handling::check_matching_sizes("dot_product",
+      stan::math::check_vector("dot_product", "v1", v1);
+      stan::math::check_vector("dot_product", "v2", v2);
+      stan::math::check_matching_sizes("dot_product",
                                                  "v1", v1,
                                                  "v2", v2);
 
@@ -36,9 +36,9 @@ namespace stan {
     fvar<T> 
     dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
                 const Eigen::Matrix<double, R2, C2>& v2) {
-      stan::error_handling::check_vector("dot_product", "v1", v1);
-      stan::error_handling::check_vector("dot_product", "v2", v2);
-      stan::error_handling::check_matching_sizes("dot_product",
+      stan::math::check_vector("dot_product", "v1", v1);
+      stan::math::check_vector("dot_product", "v2", v2);
+      stan::math::check_matching_sizes("dot_product",
                                                  "v1", v1,
                                                  "v2", v2);
 
@@ -53,9 +53,9 @@ namespace stan {
     fvar<T> 
     dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                 const Eigen::Matrix<fvar<T>, R2, C2>& v2) {
-      stan::error_handling::check_vector("dot_product", "v1", v1);
-      stan::error_handling::check_vector("dot_product", "v2", v2);
-      stan::error_handling::check_matching_sizes("dot_product",
+      stan::math::check_vector("dot_product", "v1", v1);
+      stan::math::check_vector("dot_product", "v2", v2);
+      stan::math::check_matching_sizes("dot_product",
                                                  "v1", v1,
                                                  "v2", v2);
 
@@ -71,8 +71,8 @@ namespace stan {
     dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
                 const Eigen::Matrix<fvar<T>, R2, C2>& v2,
                 size_type& length) {
-      stan::error_handling::check_vector("dot_product", "v1", v1);
-      stan::error_handling::check_vector("dot_product", "v2", v2);
+      stan::math::check_vector("dot_product", "v1", v1);
+      stan::math::check_vector("dot_product", "v2", v2);
 
       fvar<T> ret(0,0);
       for(size_type i = 0; i < length; i++)
@@ -86,8 +86,8 @@ namespace stan {
     dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
                 const Eigen::Matrix<double, R2, C2>& v2,
                 size_type& length) {
-      stan::error_handling::check_vector("dot_product", "v1", v1);
-      stan::error_handling::check_vector("dot_product", "v2", v2);
+      stan::math::check_vector("dot_product", "v1", v1);
+      stan::math::check_vector("dot_product", "v2", v2);
 
       fvar<T> ret(0,0);
       for(size_type i = 0; i < length; i++)
@@ -101,8 +101,8 @@ namespace stan {
     dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                 const Eigen::Matrix<fvar<T>, R2, C2>& v2,
                 size_type& length) {
-      stan::error_handling::check_vector("dot_product", "v1", v1);
-      stan::error_handling::check_vector("dot_product", "v2", v2);
+      stan::math::check_vector("dot_product", "v1", v1);
+      stan::math::check_vector("dot_product", "v2", v2);
 
       fvar<T> ret(0,0);
       for(size_type i = 0; i < length; i++)
@@ -115,7 +115,7 @@ namespace stan {
     fvar<T>
     dot_product(const std::vector<fvar<T> >& v1,
                 const std::vector<fvar<T> >& v2) {
-      stan::error_handling::check_matching_sizes("dot_product",
+      stan::math::check_matching_sizes("dot_product",
                                                  "v1", v1,
                                                  "v2", v2);
       fvar<T> ret(0,0);
@@ -129,7 +129,7 @@ namespace stan {
     fvar<T>
     dot_product(const std::vector<double>& v1,
                 const std::vector<fvar<T> >& v2) {
-      stan::error_handling::check_matching_sizes("dot_product",
+      stan::math::check_matching_sizes("dot_product",
                                                  "v1", v1,
                                                  "v2", v2);
       fvar<T> ret(0,0);
@@ -143,7 +143,7 @@ namespace stan {
     fvar<T>
     dot_product(const std::vector<fvar<T> >& v1,
                 const std::vector<double>& v2) {
-      stan::error_handling::check_matching_sizes("dot_product",
+      stan::math::check_matching_sizes("dot_product",
                                                  "v1", v1,
                                                  "v2", v2);
       fvar<T> ret(0,0);

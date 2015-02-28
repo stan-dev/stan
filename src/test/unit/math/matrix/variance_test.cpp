@@ -5,7 +5,7 @@
 TEST(MathMatrix,variance) {
   using stan::math::variance;
   std::vector<double> x;
-  EXPECT_THROW(variance(x),std::domain_error);
+  EXPECT_THROW(variance(x),std::invalid_argument);
   x.push_back(1.0);
   EXPECT_FLOAT_EQ(0.0,variance(x));
   x.push_back(2.0);
@@ -14,7 +14,7 @@ TEST(MathMatrix,variance) {
   EXPECT_FLOAT_EQ(1.0,variance(x));
 
   stan::math::vector_d v;
-  EXPECT_THROW(variance(v),std::domain_error);
+  EXPECT_THROW(variance(v),std::invalid_argument);
   v = stan::math::vector_d(1);
   v << 1.0;
   EXPECT_FLOAT_EQ(0.0,variance(v));
@@ -26,7 +26,7 @@ TEST(MathMatrix,variance) {
   EXPECT_FLOAT_EQ(1.0,variance(v));
 
   stan::math::row_vector_d rv;
-  EXPECT_THROW(variance(rv),std::domain_error);
+  EXPECT_THROW(variance(rv),std::invalid_argument);
   rv = stan::math::row_vector_d(1);
   rv << 1.0;
   EXPECT_FLOAT_EQ(0.0,variance(rv));
@@ -39,7 +39,7 @@ TEST(MathMatrix,variance) {
 
 
   stan::math::matrix_d m;
-  EXPECT_THROW(variance(m),std::domain_error);
+  EXPECT_THROW(variance(m),std::invalid_argument);
   m = stan::math::matrix_d(1,1);
   m << 1.0;
   EXPECT_FLOAT_EQ(0.0,variance(m));

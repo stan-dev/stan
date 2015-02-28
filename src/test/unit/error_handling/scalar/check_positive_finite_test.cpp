@@ -1,7 +1,7 @@
 #include <stan/error_handling/scalar/check_positive_finite.hpp>
 #include <gtest/gtest.h>
 
-using stan::error_handling::check_positive_finite;
+using stan::math::check_positive_finite;
 
 TEST(ErrorHandlingScalar,CheckPositiveFinite) {
   const char* function = "check_positive_finite";
@@ -72,7 +72,7 @@ TEST(ErrorHandlingScalar,CheckPositiveFinite_Vector) {
   x.push_back(2);
   x.push_back(std::numeric_limits<double>::quiet_NaN());
   EXPECT_THROW(check_positive_finite(function, "x", x), std::domain_error)
- << "check_positive_finite should throw exception on NaN";
+    << "check_positive_finite should throw exception on NaN";
 }
 
 // ---------- check_positive_finite: matrix tests ----------
@@ -183,7 +183,7 @@ TEST(ErrorHandlingScalar,CheckPositiveFinite_nan) {
   x.push_back(2.0);
   x.push_back(3.0);
 
-  for (int i = 0; i < x.size(); i++) {
+  for (size_t i = 0; i < x.size(); i++) {
     x[i] = nan;
     EXPECT_THROW(check_positive_finite(function, "x", x),
                  std::domain_error);

@@ -51,7 +51,7 @@ TEST(AgradRevMatrix,log_deteriminant_exception) {
   using stan::agrad::matrix_v;
   using stan::math::log_determinant;
   
-  EXPECT_THROW(log_determinant(matrix_v(2,3)), std::domain_error);
+  EXPECT_THROW(log_determinant(matrix_v(2,3)), std::invalid_argument);
 }
 
 TEST(AgradRevMatrix,log_determinant_grad) {
