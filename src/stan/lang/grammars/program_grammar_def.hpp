@@ -106,13 +106,13 @@ namespace stan {
         using boost::format;
         using std::setw;
 
+        size_t idx_errline = get_line(_where);
+
         error_msgs << msg << std::endl;
 
-        size_t idx_errline = 0;
-        idx_errline = get_line(_where);
-
         if (idx_errline > 0) {
-          error_msgs << "ERROR at line " << idx_errline << std::endl;
+          error_msgs << "ERROR at line " << idx_errline << std::endl << std::endl;
+
 
           std::basic_stringstream<char> sprogram;
           sprogram << boost::make_iterator_range (_begin, _end);
@@ -175,6 +175,10 @@ namespace stan {
 
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;
+        using boost::spirit::qi::char_;
+        using boost::spirit::qi::_pass;
+        using boost::spirit::qi::lexeme;
+
 
         // add model_name to var_map with special origin and no 
         var_map_.add(model_name,
@@ -187,7 +191,6 @@ namespace stan {
           > -data_var_decls_r
           > -derived_data_var_decls_r
           > -param_var_decls_r
-          // scope lp__ to "transformed params" and "model" only
           > eps[add_lp_var_f(boost::phoenix::ref(var_map_))]
           > -derived_var_decls_r
           > model_r
@@ -195,52 +198,87 @@ namespace stan {
           > -generated_var_decls_r
           ;
 
-        model_r.name("model declaration");
+        model_r.name("model declaration (or perhaps an earlier block)");
         model_r 
           %= lit("model")
           > statement_g(true,local_origin,false)  // assign only to locals
           ;
 
+        end_var_decls_r.name(
+            "one of the following:\n"
+            "  a variable declaration, beginning with type,\n"
+            "      (int, real, vector, row_vector, matrix, unit_vector,\n"
+            "       simplex, ordered, positive_ordered, corr_matrix, cov_matrix,\n"
+            "       cholesky_corr, cholesky_cov\n"
+            "  or '}' to close variable declarations");
+        end_var_decls_r %= lit('}');
+
+        end_var_decls_statements_r.name(
+           "one of the following:\n"
+           "  a variable declaration, beginning with type\n"
+            "      (int, real, vector, row_vector, matrix, unit_vector,\n"
+            "       simplex, ordered, positive_ordered, corr_matrix, cov_matrix,\n"
+            "       cholesky_corr, cholesky_cov\n"
+           "  or a <statement>\n"
+           "  or '}' to close variable declarations and definitions");
+        end_var_decls_statements_r %= lit('}');
+
+        end_var_definitions_r.name("expected another statement or '}' to close declarations");
+        end_var_definitions_r %= lit('}');
+
         data_var_decls_r.name("data variable declarations");
         data_var_decls_r
-          %= lit("data")
-          > lit('{')
-          > var_decls_g(true,data_origin) // +constraints
-          > lit('}');
+          %= ( lit("data")
+               > lit('{') )
+          >  var_decls_g(true,data_origin) // +constraints
+          > end_var_decls_r;
 
         derived_data_var_decls_r.name("transformed data block");
         derived_data_var_decls_r
-          %= ( lit("transformed")
-               >> lit("data") )
-          > lit('{')
+          %= ( ( lit("transformed")
+                 >> lit("data") )
+               > lit('{') )
           > var_decls_g(true,transformed_data_origin)  // -constraints
-          > *statement_g(false,transformed_data_origin,false) // -sampling
-          > lit('}');
+          > ( (statement_g(false,transformed_data_origin,false)
+               > *statement_g(false,transformed_data_origin,false)
+               > end_var_definitions_r
+               ) 
+              | ( *statement_g(false,transformed_data_origin,false)
+                  > end_var_decls_statements_r
+                  )
+              )
+          ;
+
+          //          > *statement_g(false,transformed_data_origin,false) // -sampling
+          // > end_var_decls_statements_r;
 
         param_var_decls_r.name("parameter variable declarations");
         param_var_decls_r
-          %= lit("parameters")
-          > lit('{')
+          %= ( lit("parameters")
+               > lit('{')
+               )
           > var_decls_g(true,parameter_origin) // +constraints
-          > lit('}');
+          > end_var_decls_r;
 
         derived_var_decls_r.name("derived variable declarations");
         derived_var_decls_r
           %= ( lit("transformed")
-               >> lit("parameters") )
-          > lit('{')
+               > lit("parameters") 
+               > lit('{')
+               )
           > var_decls_g(true,transformed_parameter_origin) // -constraints
           > *statement_g(false,transformed_parameter_origin,false) // -sampling
-          > lit('}');
+          > end_var_decls_statements_r;
 
         generated_var_decls_r.name("generated variable declarations");
         generated_var_decls_r
-          %= lit("generated")
-          > lit("quantities")
-          > lit('{')
+          %= ( lit("generated")
+               > lit("quantities")
+               > lit('{') 
+               )
           > var_decls_g(true,derived_origin) // -constraints
           > *statement_g(false,derived_origin,false) // -sampling
-          > lit('}');
+          > end_var_decls_statements_r;
 
         using boost::spirit::qi::on_error;
         using boost::spirit::qi::rethrow;

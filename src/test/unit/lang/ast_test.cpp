@@ -348,3 +348,29 @@ TEST(langAst, solveOde) {
   expression e2(so2);
   EXPECT_EQ(expr_type(DOUBLE_T,2), e2.expression_type());
 }
+
+void testTotalDims(int expected_total_dims,
+                   const stan::lang::base_expr_type& base_type,
+                   size_t num_dims) {
+  using stan::lang::expression;
+  using stan::lang::variable;
+
+  variable v("foo");
+  v.set_type(base_type, num_dims);
+  
+  expression e(v);
+  EXPECT_EQ(expected_total_dims,e.total_dims());
+}
+
+TEST(gmAst,expressionTotalDims) {
+  testTotalDims(0, DOUBLE_T, 0);
+  testTotalDims(2, DOUBLE_T, 2);
+  testTotalDims(0, INT_T, 0);
+  testTotalDims(2, INT_T, 2);
+  testTotalDims(2, MATRIX_T, 0);
+  testTotalDims(5, MATRIX_T, 3);
+  testTotalDims(1, VECTOR_T, 0);
+  testTotalDims(4, VECTOR_T, 3);
+  testTotalDims(1, ROW_VECTOR_T, 0);
+  testTotalDims(4, ROW_VECTOR_T, 3);
+}
