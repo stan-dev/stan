@@ -18,8 +18,8 @@ TEST(AgradRevMatrix, dot_product_vv) {
   AVEC ab;
   VEC grad;
   for (size_t i = 0; i < 3; i++) {
-    ab.push_back(static_cast<double>(a[i]));
-    ab.push_back(static_cast<double>(b[i]));
+    ab.push_back(a[i]);
+    ab.push_back(b[i]);
   }
   c.grad(ab, grad);
   EXPECT_EQ(grad[0], 1);
@@ -73,8 +73,8 @@ TEST(AgradRevMatrix, dot_product_vv_vec) {
   AVEC ab;
   VEC grad;
   for (size_t i = 0; i < 3; i++) {
-    ab.push_back(static_cast<double>(a[i]));
-    ab.push_back(static_cast<double>(b[i]));
+    ab.push_back(a[i]);
+    ab.push_back(b[i]);
   }
   c.grad(ab, grad);
   EXPECT_EQ(grad[0], 1);
