@@ -3,6 +3,8 @@
 
 #include <ostream>
 #include <stan/agrad/rev/vari.hpp>
+#include <boost/type_traits/is_arithmetic.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace stan {
 
@@ -75,124 +77,17 @@ namespace stan {
 
       /**      
        * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
+       * will be static cast to <code>double</code>.  The second
+       * argument cannot be specified---it is a dummy for allowing
+       * Boost's SFINAE implementation.
        *
+       * @tparam type of argument
        * @param x Value.
        */
-      var(float x)
-      : vi_(new vari(static_cast<double>(x)))
-      { }
-
-      /**      
-       * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(double x)
-      : vi_(new vari(static_cast<double>(x)))
-      { }
-
-      /**      
-       * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(long double x)
-      : vi_(new vari(static_cast<double>(x)))
-      { }
-
-
-      /**      
-       * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(bool x) 
-      : vi_(new vari(static_cast<double>(x)))
-      { }
-
-      /**      
-       * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(char x) 
-      : vi_(new vari(static_cast<double>(x)))
-      { }
-
-      /**      
-       * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(short x) 
-      : vi_(new vari(static_cast<double>(x)))
-      { }
-
-      /**      
-       * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(int x) 
-      : vi_(new vari(static_cast<double>(x)))
-      { }
-
-      /**      
-       * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(long x) 
-      : vi_(new vari(static_cast<double>(x)))
-      { }
-
-      /**      
-       * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(unsigned char x) 
-      : vi_(new vari(static_cast<double>(x)))
-      { }
-
-      /**      
-       * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(unsigned short x) 
-      : vi_(new vari(static_cast<double>(x)))
-      { }
-
-      /**      
-       * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(unsigned int x) 
-      : vi_(new vari(static_cast<double>(x)))
-      { }
-
-      /**      
-       * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(unsigned long x) 
-      : vi_(new vari(static_cast<double>(x)))
-      { }
+      template <typename T>
+      var(const T x, typename boost::enable_if<boost::is_arithmetic<T> >::type* /*dummy*/ = 0)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
 
       /**
        * Return the value of this variable.
