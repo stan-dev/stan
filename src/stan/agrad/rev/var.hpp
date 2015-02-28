@@ -77,15 +77,55 @@ namespace stan {
 
       /**      
        * Construct a variable with the specified value.  The value
-       * will be static cast to <code>double</code>.  The second
-       * argument cannot be specified---it is a dummy for allowing
-       * Boost's SFINAE implementation.
+       * will be static cast to <code>double</code>.  
        *
-       * @tparam type of argument
        * @param x Value.
        */
-      template <typename T>
-      var(const T x, typename boost::enable_if<boost::is_arithmetic<T> >::type* /*dummy*/ = 0)
+      var(float x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+
+      var(double x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+
+      var(long double x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+
+      var(bool x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+
+      var(char x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+
+      var(short x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+
+      var(int x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+
+      var(long x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+
+      var(unsigned char x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+
+      var(unsigned short x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+
+      var(unsigned int x)
+      : vi_(new vari(static_cast<double>(x))) 
+      {  } 
+
+      var(unsigned long x)
       : vi_(new vari(static_cast<double>(x))) 
       {  } 
 
