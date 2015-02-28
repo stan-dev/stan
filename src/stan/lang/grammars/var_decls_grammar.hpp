@@ -144,7 +144,6 @@ namespace stan {
                               whitespace_grammar<Iterator> > 
       var_decls_r;
 
-
     };
 
   }

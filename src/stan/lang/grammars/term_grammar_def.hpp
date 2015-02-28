@@ -207,6 +207,10 @@ namespace stan {
         fun.type_ = function_signatures::instance().get_result_type(fun.name_,
                                                                     arg_types,
                                                                     error_msgs);
+        if (fun.type_ == ILL_FORMED_T) {
+          pass = false;
+          return;
+        }
 
 
         if (has_rng_suffix(fun.name_)) {  
@@ -554,6 +558,13 @@ namespace stan {
     };
     boost::phoenix::function<transpose_expr> transpose_f;
 
+    int num_dimss(std::vector<std::vector<stan::lang::expression> >& dimss) {
+      int sum = 0;
+      for (size_t i = 0; i < dimss.size(); ++i)
+        sum += dimss[i].size();
+      return sum;
+    }
+
     struct add_expression_dimss {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef void type; };
@@ -562,10 +573,25 @@ namespace stan {
                       bool& pass,
                       std::ostream& error_msgs) const {
         index_op iop(expression,dimss);
+        int expr_dims = expression.total_dims();
+        int index_dims = num_dimss(dimss);
+        if (expr_dims < index_dims) {
+          error_msgs << "Indexed expression must have at least as many dimensions as"
+                     << " number of indexes supplied: "
+                     << std::endl
+                     << "    indexed expression dimensionality = " << expr_dims
+                     << "; indexes supplied = " << dimss.size()
+                     << std::endl;
+          pass=false;
+          return;
+        }
         iop.infer_type();
         if (iop.type_.is_ill_formed()) {
-          error_msgs << "indexes inappropriate for expression." << std::endl;
+          error_msgs << "Indexed expression must have at least as many dimensions as"
+                     << " number of indexes supplied."
+                     << std::endl;
           pass = false;
+          return;
         } 
         pass = true;
         expression = iop;
@@ -610,7 +636,7 @@ namespace stan {
       bool operator()(const expression& expr,
                       std::stringstream& error_msgs) const {
         if (!expr.expression_type().is_primitive_int()) {
-          error_msgs << "expression denoting integer required; found type=" 
+          error_msgs << "array indices must be integer expressions; found type=" 
                      << expr.expression_type() << std::endl;
           return false;
         }
@@ -631,6 +657,8 @@ namespace stan {
         expression_g(eg)
     {
       using boost::spirit::qi::_1;
+      using boost::spirit::qi::_a;
+      using boost::spirit::qi::_b;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::double_;
       using boost::spirit::qi::eps;
@@ -644,7 +672,7 @@ namespace stan {
 
       // _r1 : var_origin
 
-      term_r.name("term");
+      term_r.name("expression");
       term_r 
         = ( negated_factor_r(_r1)                       
             [_val = _1]
@@ -670,9 +698,10 @@ namespace stan {
              )
         ;
 
+      negated_factor_r.name("expression");
       negated_factor_r 
         = lit('-') >> negated_factor_r(_r1) 
-        [negate_expr_f(_val,_1,_pass,boost::phoenix::ref(error_msgs_))]
+                      [negate_expr_f(_val,_1,_pass,boost::phoenix::ref(error_msgs_))]
         | lit('!') >> negated_factor_r(_r1) 
                       [logical_negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)  [_val = _1]
@@ -680,7 +709,7 @@ namespace stan {
         | indexed_factor_r(_r1) [_val = _1];
 
 
-      exponentiated_factor_r.name("(optionally) exponentiated factor");
+      exponentiated_factor_r.name("expression");
       exponentiated_factor_r 
         = ( indexed_factor_r(_r1) [_val = _1] 
             >> lit('^') 
@@ -690,20 +719,21 @@ namespace stan {
             )
         ;
 
-      indexed_factor_r.name("(optionally) indexed factor [sub]");
+      indexed_factor_r.name("expression");
       indexed_factor_r 
         = factor_r(_r1) [_val = _1]
         > * (  
-             (+dims_r(_r1)) 
-               [add_expression_dimss_f(_val, _1, _pass,
-                                       boost::phoenix::ref(error_msgs_))]
-               | 
+             ( ( +dims_r(_r1)) [_a = _1]
+                 > eps
+               [add_expression_dimss_f(_val, _a, _pass,
+                                       boost::phoenix::ref(error_msgs_))] )
+             | 
                lit("'") 
                [_val = transpose_f(_val, boost::phoenix::ref(error_msgs_))] 
                )
         ;
       
-      integrate_ode_r.name("solve ode");
+      integrate_ode_r.name("expression");
       integrate_ode_r 
         %= (lit("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
@@ -725,15 +755,16 @@ namespace stan {
                                          _pass,
                                          boost::phoenix::ref(error_msgs_))];
 
-      factor_r.name("factor");
+      factor_r.name("expression");
       factor_r =
         integrate_ode_r(_r1)    [_val = _1]
-        | 
-        fun_r(_r1)          [set_fun_type_named_f(_val,_1,_r1,_pass,
-                                                    boost::phoenix::ref(error_msgs_))]
-        | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
-                                                     boost::phoenix::ref(error_msgs_),
-                                                     _pass)]
+        | ( fun_r(_r1)[_b = _1]
+            > eps[set_fun_type_named_f(_val,_b,_r1,_pass,
+                                       boost::phoenix::ref(error_msgs_))] )
+        | ( variable_r[_a = _1]
+            > eps [_val = set_var_type_f(_a,boost::phoenix::ref(var_map_),
+                                        boost::phoenix::ref(error_msgs_),
+                                        _pass)] )
         | int_literal_r       [_val = _1]
         | double_literal_r    [_val = _1]
         | ( lit('(') 
@@ -756,17 +787,17 @@ namespace stan {
 
       fun_r.name("function and argument expressions");
       fun_r 
-        %= identifier_r // no test yet on valid naming
+        %= identifier_r
         >> args_r(_r1);
 
 
-      identifier_r.name("identifier (expression grammar)");
+      identifier_r.name("identifier");
       identifier_r
         %= lexeme[char_("a-zA-Z") 
                   >> *char_("a-zA-Z0-9_.")];
 
 
-      args_r.name("function argument expressions");
+      args_r.name("function arguments");
       args_r 
         %= (lit('(') >> lit(')'))
         | ( ( lit('(')
@@ -774,18 +805,23 @@ namespace stan {
             > lit(')') )
         ;
 
-      
+      dim_r.name("array dimension (integer expression)");
+      dim_r
+        %= expression_g(_r1)
+        > eps [_pass = validate_int_expr3_f(_val,boost::phoenix::ref(error_msgs_))]
+        ;
+
       dims_r.name("array dimensions");
       dims_r 
         %= lit('[') 
-        > (expression_g(_r1)
-           [_pass = validate_int_expr3_f(_1,boost::phoenix::ref(error_msgs_))]
-           % ',')
+        > ( dim_r(_r1)
+            % ',' )
         > lit(']')
         ;
 
- 
-      variable_r.name("variable expression");
+
+
+      variable_r.name("variable name");
       variable_r
         %= identifier_r 
         > !lit('(');    // negative lookahead to prevent failure in
