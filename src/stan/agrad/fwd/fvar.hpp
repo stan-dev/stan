@@ -20,6 +20,12 @@ namespace stan {
 
       typedef fvar value_type;
 
+      fvar() : val_(0.0), d_(0.0) { }
+
+      fvar(const fvar<T>& x) 
+        : val_(x.val_), d_(x.d_) { 
+      }
+
       // TV and TD must be assignable to T
       template <typename TV, typename TD>
       fvar(const TV& val, const TD& deriv) : val_(val), d_(deriv) { 
@@ -34,7 +40,6 @@ namespace stan {
           d_ = val;
       }
       
-      fvar() : val_(0.0), d_(0.0) { }
 
       template <typename T2>
       inline
