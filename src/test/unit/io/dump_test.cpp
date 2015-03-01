@@ -616,13 +616,19 @@ TEST(io_dump, bad_syntax_struct) {
 }
 
 template <typename T>
-void testWriteVal(const::std::string& expected,
+void testWriteVal(const::std::string& expected_number_string,
                   T x) {
   std::stringstream s;
   stan::io::dump_writer writer(s);
   writer.write("foo", x);
   std::string written = s.str();
-  EXPECT_EQ("\"foo\" <- \n" + expected, written);
+
+  std::stringstream ss_expected;
+  ss_expected << "\"foo\" <- "
+             << std::endl
+             << expected_number_string;
+  std::string expected = ss_expected.str();
+  EXPECT_EQ(expected, written);
 }
 
 TEST(ioDump, writeVal) {
