@@ -15,8 +15,8 @@ namespace stan {
       T val_;  // value
       T d_;    // tangent (aka derivative)
 
-      T val() { return val_; }
-      T tangent() { return d_; }
+      T val() const { return val_; }
+      T tangent() const { return d_; }
 
       typedef fvar value_type;
 
