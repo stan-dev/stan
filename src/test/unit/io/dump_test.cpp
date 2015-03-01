@@ -647,12 +647,10 @@ TEST(ioDump, writeVal) {
 
   testWriteVal("2.", static_cast<float>(2.0));
   testWriteVal("2.", static_cast<double>(2.0));
-  testWriteVal("2.", static_cast<long double>(2.0));
 
   // need to make this round in binary to guarantee output
   testWriteVal("2.5", static_cast<float>(2.5));
   testWriteVal("2.5", static_cast<double>(2.5));
-  testWriteVal("2.5", static_cast<long double>(2.5));
 
   testWriteVal("1e+100", static_cast<double>(1e+100));
   testWriteVal("-1e-100", static_cast<double>(-1e-100));
