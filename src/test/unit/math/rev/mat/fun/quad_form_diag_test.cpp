@@ -29,7 +29,7 @@ TEST(MathMatrix,quadFormDiag2_vv) {
     0, 2, 0,
     0, 0, 3;
   
-  Matrix<var,Dynamic,Dynamic> v_m_times_m = v_m * m * v_m;
+  Matrix<var,Dynamic,Dynamic> v_m_times_m = multiply(v_m, multiply(m, v_m));
 
   expect_matrix_eq(v_m_times_m, quad_form_diag(m,v));
 
@@ -52,7 +52,7 @@ TEST(MathMatrix,quadFormDiag2_vd) {
     0, 2, 0,
     0, 0, 3;
   
-  Matrix<var,Dynamic,Dynamic> v_m_times_m1 = v_m * m1 * v_m;
+  Matrix<var,Dynamic,Dynamic> v_m_times_m1 = multiply(v_m, multiply(m1, v_m));
 
   Matrix<var,Dynamic,Dynamic> m2(3,3);
   m2 << 1, 2, 3, 4, 5, 6, 7, 8, 9;
@@ -77,7 +77,7 @@ TEST(MathMatrix,quadFormDiag2_dv) {
     0, 2, 0,
     0, 0, 3;
 
-  Matrix<var,Dynamic,Dynamic> v_m_times_m2 = v_m * m2 * v_m;
+  Matrix<var,Dynamic,Dynamic> v_m_times_m2 = multiply(v_m, multiply(m2, v_m));
 
   expect_matrix_eq(v_m_times_m2, quad_form_diag(m1,v));
 
@@ -121,7 +121,7 @@ TEST(MathMatrix,quadFormDiagGrad_vv) {
     xs2.push_back(v_m(i,i));
 
   
-  Matrix<var,Dynamic,Dynamic> m_times_vm = v_m * m2 * v_m;
+  Matrix<var,Dynamic,Dynamic> m_times_vm = multiply(v_m, multiply(m2, v_m));
 
   var norm2 = m_times_vm.norm();
   std::vector<double> g2;
@@ -164,7 +164,7 @@ TEST(MathMatrix,quadFormDiagGrad_vd) {
   for (int i = 0; i < 9; ++i)
     xs2.push_back(m2(i));
   
-  Matrix<var,Dynamic,Dynamic> v_m_times_v_m = v_m * m2 * v_m;
+  Matrix<var,Dynamic,Dynamic> v_m_times_v_m = multiply(v_m, multiply(m2, v_m));
 
   var norm2 = v_m_times_v_m.norm();
   std::vector<double> g2;
@@ -207,7 +207,7 @@ TEST(MathMatrix,quadFormDiagGrad_dv) {
   for (int i = 0; i < 3; ++i)
     xs2.push_back(v_m(i,i));
   
-  Matrix<var,Dynamic,Dynamic> v_m_times_v_m = v_m * m2 * v_m;
+  Matrix<var,Dynamic,Dynamic> v_m_times_v_m = multiply(v_m, multiply(m2,v_m));
 
   var norm2 = v_m_times_v_m.norm();
   std::vector<double> g2;

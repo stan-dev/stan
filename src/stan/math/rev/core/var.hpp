@@ -61,7 +61,8 @@ namespace stan {
        *
        * @param vi Variable implementation. 
        */
-      explicit var(vari* vi)
+      template <typename T>
+      explicit var(T* vi)
         : vi_(vi) 
       {  }
 
@@ -76,6 +77,9 @@ namespace stan {
         : vi_(static_cast<vari*>(0U))
       { }
 
+      template <typename T>
+      var(T x) : vi_(new vari(x)) { }
+
 
       /**      
        * Construct a variable with the specified value.  The value
@@ -84,61 +88,61 @@ namespace stan {
        * @param x Value.
        */
 
-      var(double x)
-      : vi_(new vari(x))
-      {  } 
+//       var(double x)
+//       : vi_(new vari(x))
+//       {  } 
 
-      var(float x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
+//       var(float x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
 
-      var(long double x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
+//       var(long double x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
 
-      var(bool x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
+//       var(bool x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
 
-      var(char x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
+//       var(char x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
 
-      var(short x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
+//       var(short x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
 
-      var(int x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
+//       var(int x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
 
-      var(long x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
+//       var(long x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
 
-      var(unsigned char x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
+//       var(unsigned char x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
 
-      var(unsigned short x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
+//       var(unsigned short x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
 
-      var(unsigned int x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
+//       var(unsigned int x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
 
-      var(unsigned long x) 
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
+//       var(unsigned long x) 
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
 
-#ifdef _WIN64
-      // HACK HACK HACK: add 64-bit unsigned type for Windows 64 bit
-      // without using long long
-      var(size_t x)
-      : vi_(new vari(static_cast<double>(x))) 
-      {  } 
-#endif
+// #ifdef _WIN64
+//       // HACK HACK HACK: add 64-bit unsigned type for Windows 64 bit
+//       // without using long long
+//       var(size_t x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+// #endif
 
       /**
        * Return the value of this variable.

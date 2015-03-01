@@ -282,7 +282,7 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_vv_basic) {
     0,  1,
     -3, -3,
     5,  2;
-  matrix_v tmp = transpose(B) * inverse(A) * B;
+  matrix_v tmp = multiply(transpose(B), multiply(inverse(A), B));
   x_basic = trace(tmp);
   x_basic_val = x_basic.val();
   
@@ -351,8 +351,8 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_vd_basic) {
     0,  1,
     -3, -3,
     5,  2;
-  matrix_v tmp = stan::agrad::to_var(transpose(B)) * inverse(A) 
-    * stan::agrad::to_var(B);
+  matrix_v tmp = multiply(stan::agrad::to_var(transpose(B)), 
+                          multiply(inverse(A), stan::agrad::to_var(B)));
   x_basic = trace(tmp);
   x_basic_val = x_basic.val();
   
@@ -419,7 +419,9 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_dv_basic) {
     0,  1,
     -3, -3,
     5,  2;
-  matrix_v tmp = transpose(B) * stan::agrad::to_var(A.inverse().eval()) * B;
+  matrix_v tmp = multiply(transpose(B),
+                          multiply(stan::agrad::to_var(A.inverse().eval()),
+                                   B));
   x_basic = trace(tmp);
   x_basic_val = x_basic.val();
   

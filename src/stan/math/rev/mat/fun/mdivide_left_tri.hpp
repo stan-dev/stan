@@ -353,7 +353,8 @@ namespace stan {
       // NOTE: this is not a memory leak, this vari is used in the 
       // expression graph to evaluate the adjoint, but is not needed
       // for the returned matrix.  Memory will be cleaned up with the arena allocator.
-      mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2> *baseVari = new mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2>(A,b);
+      mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2> *baseVari 
+        = new mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2>(A,b);
       
       size_t pos = 0;
       for (size_type j = 0; j < res.cols(); j++)

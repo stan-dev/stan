@@ -6,6 +6,7 @@
 #include <stan/math/prim/mat/err/check_square.hpp>
 
 namespace stan {
+
   namespace math {
 
     // This class is conceptually similar to the corresponding Eigen class
@@ -69,13 +70,24 @@ namespace stan {
         N_ = A.rows();
         _ldltP->compute(A);
       }
-      
+
       inline bool success() const {
-        bool ret;
-        ret = _ldltP->info() == Eigen::Success;
-        ret = ret && _ldltP->isPositive();
-        ret = ret && (_ldltP->vectorD().array() > 0).all();
-        return ret;
+        using stan::math::is_nan;
+        // bool ret;
+        // ret = _ldltP->info() == Eigen::Success;
+        // ret = ret && _ldltP->isPositive();
+        // ret = ret && (_ldltP->vectorD().array() > 0).all();
+        // return ret;
+
+        if (_ldltP->info() != Eigen::Success)
+           return false;
+         if (!(_ldltP->isPositive()))
+           return false;
+         Eigen::Matrix<T,Eigen::Dynamic,1> ldltP_diag(_ldltP->vectorD());
+         for (int i = 0; i < ldltP_diag.size(); ++i)
+           if (ldltP_diag(i) <= 0 || is_nan(ldltP_diag(i)))
+             return false;
+         return true;
       }
 
       inline T log_abs_det() const {

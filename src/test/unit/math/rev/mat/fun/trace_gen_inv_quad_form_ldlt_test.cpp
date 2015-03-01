@@ -547,7 +547,9 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvv_basic) {
         3.0,  2.0, 1.0, 112.0;
   cd << 1, 2, 3, 4;
   
-  matrix_v tmp = bv.transpose() * inverse(av) * bv;
+  matrix_v tmp1 = bv.transpose();
+  matrix_v tmp2 = inverse(av);
+  matrix_v tmp = multiply(tmp1, multiply(tmp2,bv));
   matrix_v gen_inv_quad_form = multiply(cd, tmp);
   result_basic = trace(gen_inv_quad_form);
   vars.clear();
@@ -1006,7 +1008,9 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvv_basic) {
         3.0,  2.0, 1.0, 112.0;
   cv << 1, 2, 3, 4;
 
-  matrix_v tmp = bv.transpose() * inverse(av) * bv;
+  matrix_v tmp1 = bv.transpose();
+  matrix_v tmp2 = inverse(av);
+  matrix_v tmp = multiply(tmp1, multiply(tmp2,  bv));
   matrix_v gen_inv_quad_form = multiply(cv, tmp);
   result_basic = trace(gen_inv_quad_form);
 
