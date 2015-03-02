@@ -19,6 +19,8 @@
 #include <stan/math/rev/scal/fun/abs.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
+#include <stan/math/fwd/scal/fun/is_nan.hpp>
+#include <stan/math/rev/scal/fun/is_nan.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

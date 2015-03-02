@@ -26,6 +26,8 @@
 #include <stan/math/fwd/mat/fun/sum.hpp>
 #include <stan/math/fwd/mat/fun/dot_self.hpp>
 #include <stan/math/fwd/mat/fun/multiply.hpp>
+#include <stan/math/fwd/scal/fun/is_nan.hpp>
+#include <stan/math/rev/scal/fun/is_nan.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

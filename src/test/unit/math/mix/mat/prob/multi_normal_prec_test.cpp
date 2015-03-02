@@ -21,6 +21,8 @@
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 #include <stan/math/fwd/mat/fun/trace_quad_form.hpp>
 #include <stan/math/rev/mat/fun/trace_quad_form.hpp>
+#include <stan/math/fwd/scal/fun/is_nan.hpp>
+#include <stan/math/rev/scal/fun/is_nan.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
