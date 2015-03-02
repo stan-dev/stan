@@ -9,6 +9,8 @@
 #include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>
 #include <stan/math/rev/scal/fun/abs.hpp>
+#include <stan/math/fwd/scal/fun/is_nan.hpp>
+#include <stan/math/rev/scal/fun/is_nan.hpp>
 
 using stan::agrad::fvar;
 using stan::agrad::var;
