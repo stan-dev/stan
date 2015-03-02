@@ -327,7 +327,23 @@ TEST(langGenerator,shortCircuit1) {
                  "transformed data { int a; a <- 1 && 2; }"
                  "model { }",
                  "(primitive_value(1) && primitive_value(2))");
-
-
 }
 
+void test_generate_quoted_string(const std::string& s,
+                                 const std::string& expected_output_content) {
+  std::stringstream ss;
+  stan::lang::generate_quoted_string(s,ss);
+  std::string s_rendered = ss.str();
+  EXPECT_EQ("\"" + expected_output_content + "\"", 
+            s_rendered);
+}
+
+TEST(langGenerator, quotedString) {
+  test_generate_quoted_string("","");
+  test_generate_quoted_string("abc", "abc");
+  test_generate_quoted_string("abc'def", "abc'def");
+  test_generate_quoted_string("\"abc", "'abc");
+  test_generate_quoted_string("abc\"", "abc'");
+  test_generate_quoted_string("abc\"def", "abc'def");
+  test_generate_quoted_string("abc\"def\"ghi", "abc'def'ghi");
+}
