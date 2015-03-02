@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/mat/prob/multi_normal_prec_log.hpp>
 #include <stan/math/rev/core.hpp>
+#include <stan/math/rev/scal/fun/is_nan.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>

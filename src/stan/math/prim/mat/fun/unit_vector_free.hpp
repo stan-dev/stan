@@ -2,6 +2,7 @@
 #define STAN__MATH__PRIM__MAT__FUN__UNIT_VECTOR_FREE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/math/prim/mat/err/check_unit_vector.hpp>
 #include <cmath>
 

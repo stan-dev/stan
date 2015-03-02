@@ -8,6 +8,8 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/rev/mat/fun/sum.hpp>
 #include <stan/math/prim/mat/fun/sum.hpp>
+#include <stan/math/prim/mat/fun/multiply.hpp>
+#include <stan/math/rev/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/trace_inv_quad_form_ldlt.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/fun/inverse.hpp>
@@ -19,6 +21,7 @@
 TEST(AgradRevMatrix, trace_inv_quad_form_ldlt_mat) {
   using stan::agrad::matrix_v;
   using stan::math::matrix_d;
+  using stan::math::multiply;
   
   matrix_v av(4,4);
   matrix_d ad(4,4);
@@ -239,6 +242,7 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_vv_basic) {
   using stan::math::trace;
   using stan::math::transpose;
   using stan::math::inverse;
+  using stan::math::multiply;
   
   matrix_v A(4,4);
   matrix_v B(4,2);

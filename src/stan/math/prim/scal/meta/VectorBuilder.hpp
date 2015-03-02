@@ -4,6 +4,7 @@
 #include <stan/math/prim/scal/meta/contains_vector.hpp>
 #include <vector>
 #include <stdexcept>
+#include <vector>
 
 namespace stan {
 

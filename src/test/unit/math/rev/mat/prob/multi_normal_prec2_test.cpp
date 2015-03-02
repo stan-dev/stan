@@ -11,6 +11,7 @@
 #include <stan/math/rev/mat/fun/to_var.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/rev/scal/fun/is_nan.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/scal/fun/abs.hpp>
 #include <stan/math/rev/mat/fun/trace_quad_form.hpp>
