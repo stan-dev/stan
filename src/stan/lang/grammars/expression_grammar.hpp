@@ -32,11 +32,14 @@ namespace stan {
                                           whitespace_grammar<Iterator> > {
       
       expression_grammar(variable_map& var_map,
-                         std::stringstream& error_msgs);
+                         std::stringstream& error_msgs,
+                         Iterator& it);
 
       variable_map& var_map_;
 
       std::stringstream& error_msgs_;
+
+      Iterator& it_;
 
       expression07_grammar<Iterator> expression07_g;
 

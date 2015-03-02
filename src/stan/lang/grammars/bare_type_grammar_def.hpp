@@ -35,10 +35,12 @@ namespace stan {
 
      template <typename Iterator>
      bare_type_grammar<Iterator>::bare_type_grammar(variable_map& var_map,
-                                                    std::stringstream& error_msgs)
+                                                    std::stringstream& error_msgs,
+                                                    Iterator& it)
        : bare_type_grammar::base_type(bare_type_r),
          var_map_(var_map),
-         error_msgs_(error_msgs)
+         error_msgs_(error_msgs),
+         it_(it)
      {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;

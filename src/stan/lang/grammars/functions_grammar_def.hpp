@@ -288,14 +288,16 @@ namespace stan {
 
   template <typename Iterator>
   functions_grammar<Iterator>::functions_grammar(variable_map& var_map,
-                                                 std::stringstream& error_msgs)
+                                                 std::stringstream& error_msgs,
+                                                 Iterator& it)
       : functions_grammar::base_type(functions_r),
         var_map_(var_map),
         functions_declared_(),
         functions_defined_(),
         error_msgs_(error_msgs),
-        statement_g(var_map_,error_msgs_),
-        bare_type_g(var_map_,error_msgs_)
+        it_(it),
+        statement_g(var_map_,error_msgs_,it),
+        bare_type_g(var_map_,error_msgs_,it)
   {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;

@@ -29,14 +29,16 @@ namespace stan {
 
       term_grammar(variable_map& var_map,
                    std::stringstream& error_msgs,
+                   Iterator& it,
                    expression_grammar<Iterator>& eg);
 
       variable_map& var_map_;
 
       std::stringstream& error_msgs_;
 
-      stan::lang::expression_grammar<Iterator>& expression_g;
+      Iterator& it_;
 
+      stan::lang::expression_grammar<Iterator>& expression_g;
 
       boost::spirit::qi::rule<Iterator, 
                               std::vector<expression>(var_origin), 

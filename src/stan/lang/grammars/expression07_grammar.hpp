@@ -30,15 +30,17 @@ namespace stan {
       
       expression07_grammar(variable_map& var_map,
                            std::stringstream& error_msgs,
+                           Iterator& it,
                            expression_grammar<Iterator>& eg);
 
+      // global parser information
       variable_map& var_map_;
-
       std::stringstream& error_msgs_;
+      Iterator& it_;
 
+      // nested grammars
       term_grammar<Iterator> term_g;
-
-
+      
       boost::spirit::qi::rule<Iterator, 
                               expression(var_origin), 
                               whitespace_grammar<Iterator> > 

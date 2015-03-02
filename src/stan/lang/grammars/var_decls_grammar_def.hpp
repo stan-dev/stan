@@ -651,14 +651,16 @@ namespace stan {
 
     template <typename Iterator>
     var_decls_grammar<Iterator>::var_decls_grammar(variable_map& var_map,
-                                                   std::stringstream& error_msgs)
+                                                   std::stringstream& error_msgs,
+                                                   Iterator& it)
       : var_decls_grammar::base_type(var_decls_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
+        it_(it),
         // expression_g allows full recursion
-        expression_g(var_map,error_msgs),
+        expression_g(var_map,error_msgs,it),
         // expression07_g disallows comparisons
-        expression07_g(var_map,error_msgs,expression_g)
+        expression07_g(var_map,error_msgs,it,expression_g)
     {
 
       using boost::spirit::qi::_1;

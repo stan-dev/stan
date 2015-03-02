@@ -87,11 +87,13 @@ namespace stan {
     template <typename Iterator>
     statement_2_grammar<Iterator>::statement_2_grammar(variable_map& var_map,
                                                        std::stringstream& error_msgs,
+                                                       Iterator& it,
                                                        statement_grammar<Iterator>& sg)
       : statement_2_grammar::base_type(statement_2_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        expression_g(var_map,error_msgs),
+        it_(it),
+        expression_g(var_map,error_msgs,it),
         statement_g(sg)
     {
       using boost::spirit::qi::_1;

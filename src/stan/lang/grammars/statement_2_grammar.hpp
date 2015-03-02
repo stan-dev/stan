@@ -28,17 +28,19 @@ namespace stan {
       
       statement_2_grammar(variable_map& var_map,
                           std::stringstream& error_msgs,
+                          Iterator& it,
                           statement_grammar<Iterator>& sg);
 
 
       // global info for parses
       variable_map& var_map_;
       std::stringstream& error_msgs_;
+      Iterator& it_;
       
       // grammars
       expression_grammar<Iterator> expression_g;  
       statement_grammar<Iterator>& statement_g;
-
+      
       // rules
 
       boost::spirit::qi::rule<Iterator, 

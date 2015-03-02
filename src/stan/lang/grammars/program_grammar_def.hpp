@@ -163,22 +163,23 @@ namespace stan {
     boost::phoenix::function<program_error> program_error_f;
 
     template <typename Iterator>
-    program_grammar<Iterator>::program_grammar(const std::string& model_name) 
+    program_grammar<Iterator>::program_grammar(const std::string& model_name,
+                                               Iterator& it) 
         : program_grammar::base_type(program_r),
           model_name_(model_name),
+          it_(it),
           var_map_(),
           error_msgs_(),
-          expression_g(var_map_,error_msgs_),
-          var_decls_g(var_map_,error_msgs_),
-          statement_g(var_map_,error_msgs_),
-          functions_g(var_map_,error_msgs_) {
-
+          expression_g(var_map_,error_msgs_,it),
+          var_decls_g(var_map_,error_msgs_,it),
+          statement_g(var_map_,error_msgs_,it),
+          functions_g(var_map_,error_msgs_,it) 
+    {
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;
         using boost::spirit::qi::char_;
         using boost::spirit::qi::_pass;
         using boost::spirit::qi::lexeme;
-
 
         // add model_name to var_map with special origin and no 
         var_map_.add(model_name,

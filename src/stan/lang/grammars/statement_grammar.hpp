@@ -26,12 +26,14 @@ namespace stan {
   
       
       statement_grammar(variable_map& var_map,
-                        std::stringstream& error_msgs);
+                        std::stringstream& error_msgs,
+                        Iterator& it);
 
 
       // global info for parses
       variable_map& var_map_;
       std::stringstream& error_msgs_;
+      Iterator& it_;
       
       // grammars
       expression_grammar<Iterator> expression_g;  

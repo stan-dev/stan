@@ -104,11 +104,13 @@ namespace stan {
 
     template <typename Iterator>
     expression_grammar<Iterator>::expression_grammar(variable_map& var_map,
-                                                     std::stringstream& error_msgs)
+                                                     std::stringstream& error_msgs,
+                                                     Iterator& it)
       : expression_grammar::base_type(expression_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        expression07_g(var_map,error_msgs,*this)
+        it_(it),
+        expression07_g(var_map,error_msgs,it,*this)
     {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;

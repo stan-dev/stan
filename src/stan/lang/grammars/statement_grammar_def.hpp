@@ -527,13 +527,15 @@ namespace stan {
 
     template <typename Iterator>
     statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
-                                                   std::stringstream& error_msgs)
+                                                   std::stringstream& error_msgs,
+                                                   Iterator& it)
       : statement_grammar::base_type(statement_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        expression_g(var_map,error_msgs),
-        var_decls_g(var_map,error_msgs),
-        statement_2_g(var_map,error_msgs,*this)
+        it_(it),
+        expression_g(var_map,error_msgs,it),
+        var_decls_g(var_map,error_msgs,it),
+        statement_2_g(var_map,error_msgs,it,*this)
     {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;

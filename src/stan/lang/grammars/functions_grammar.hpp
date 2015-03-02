@@ -34,6 +34,8 @@ namespace stan {
                          function_signature_t> > functions_defined_;
 
       std::stringstream& error_msgs_;
+
+      Iterator& it_;
       
       // grammars
       statement_grammar<Iterator> statement_g;
@@ -41,7 +43,8 @@ namespace stan {
       
       // constructor
       functions_grammar(variable_map& var_map,
-                        std::stringstream& error_msgs);
+                        std::stringstream& error_msgs,
+                        Iterator& it);
 
       // rules
       boost::spirit::qi::rule<Iterator, 
