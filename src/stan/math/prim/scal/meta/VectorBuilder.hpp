@@ -2,6 +2,7 @@
 #define STAN__MATH__PRIM__SCAL__META__VECTORBUILDER_HPP
 
 #include <stan/math/prim/scal/meta/contains_vector.hpp>
+#include <vector>
 #include <stdexcept>
 
 namespace stan {
