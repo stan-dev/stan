@@ -13,6 +13,7 @@
 #include <stan/math/prim/mat/fun/determinant.hpp>
 #include <stan/math/prim/mat/fun/variance.hpp>
 #include <stan/math/fwd/core.hpp>
+#include <stan/math/fwd/scal/fun/is_nan.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
 

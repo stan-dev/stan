@@ -8,6 +8,7 @@
 #include <stan/math/prim/mat/prob/multi_gp_log.hpp>
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
+#include <stan/math/fwd/scal/fun/is_nan.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/fwd/scal/fun/value_of_rec.hpp>

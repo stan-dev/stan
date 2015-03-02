@@ -5,8 +5,8 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/likely.hpp>
-#include <stan/math/functions/is_nan.hpp>
-#include <stan/meta/likely.hpp>
+#include <stan/math/prim/scal/fun/is_nan.hpp>
+#include <stan/math/prim/scal/meta/likely.hpp>
 
 namespace stan {
 

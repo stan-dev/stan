@@ -4,6 +4,7 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <boost/shared_ptr.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>
+#include <stan/math/prim/scal/fun/is_nan.hpp>
 
 namespace stan {
 
