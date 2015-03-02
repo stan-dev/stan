@@ -5,15 +5,16 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/likely.hpp>
+#include <stan/math/functions/is_nan.hpp>
+#include <stan/meta/likely.hpp>
 
 namespace stan {
+
   namespace agrad {
 
     /**
      * Returns the maximum of the two variable arguments (C99).
      *
-     * See boost::math::fmax() for the double-based version.
-     * 
      * No new variable implementations are created, with this function
      * defined as if by
      *
@@ -61,31 +62,26 @@ namespace stan {
      */
     inline var fmax(const stan::agrad::var& a,
                     const stan::agrad::var& b) {
-      if (unlikely(boost::math::isnan(a.vi_->val_))) {
-        if(boost::math::isnan(b.vi_->val_)) {
-          std::vector<stan::agrad::var> vars;
-          std::vector<double> grads;
-          vars.push_back(a);
-          vars.push_back(b);
-          grads.push_back(stan::math::NOT_A_NUMBER);
-          grads.push_back(stan::math::NOT_A_NUMBER);
-          return var(precomputed_gradients(stan::math::NOT_A_NUMBER,
-                                           vars, grads));
-        }
-        else
-          return b;
-      } else if (unlikely(boost::math::isnan(b.vi_->val_)))
+      using stan::math::NOT_A_NUMBER;
+      if (unlikely(is_nan(a))) {
+        if (unlikely(is_nan(b)))
+          return var(new precomp_vv_vari(NOT_A_NUMBER,
+                                         a.vi_, b.vi_,
+                                         NOT_A_NUMBER, NOT_A_NUMBER));
+
+        return b;
+      }
+
+      if (unlikely(is_nan(b)))
         return a;
-      else
-        return a.vi_->val_ > b.vi_->val_ ? a : b;
+
+      return a > b ? a : b;
     }
 
     /**
      * Returns the maximum of the variable and scalar, promoting the
      * scalar to a variable if it is larger (C99).
      *
-     * See boost::math::fmax() for the double-based version.
-     * 
      * For <code>fmax(a,b)</code>, if a's value is greater than b,
      * then a is returned, otherwise a fesh variable implementation
      * wrapping the value b is returned.
@@ -98,25 +94,26 @@ namespace stan {
      */
     inline var fmax(const stan::agrad::var& a,
                     const double& b) {
-      if (unlikely(boost::math::isnan(a.vi_->val_))) {
-        if(boost::math::isnan(b))
+      using stan::math::NOT_A_NUMBER;
+      if (unlikely(is_nan(a))) {
+        if (unlikely(is_nan(b)))
           return var(new precomp_v_vari(stan::math::NOT_A_NUMBER,
                                         a.vi_,
                                         stan::math::NOT_A_NUMBER));
-        else
-          return var(b);
-      } else if (unlikely(boost::math::isnan(b)))
+
+        return var(b);
+      }      
+
+      if (unlikely(is_nan(b)))
         return a;
-      else
-        return a.vi_->val_ >= b ? a : var(b);
+
+      return a >= b ? a : var(b);
     }
 
     /**
      * Returns the maximum of a scalar and variable, promoting the scalar to
      * a variable if it is larger (C99).
      *
-     * See boost::math::fmax() for the double-based version.
-     * 
      * For <code>fmax(a,b)</code>, if a is greater than b's value,
      * then a fresh variable implementation wrapping a is returned, otherwise 
      * b is returned.
@@ -129,17 +126,19 @@ namespace stan {
      */
     inline var fmax(const double& a,
                     const stan::agrad::var& b) {
-      if (unlikely(boost::math::isnan(b.vi_->val_))) {
-        if(boost::math::isnan(a))
+      using stan::math::NOT_A_NUMBER;
+      if (unlikely(is_nan(b))) {
+        if (unlikely(is_nan(a)))
           return var(new precomp_v_vari(stan::math::NOT_A_NUMBER,
                                         b.vi_,
                                         stan::math::NOT_A_NUMBER));
-        else
-          return var(a);
-      } else if (unlikely(boost::math::isnan(a)))
+        return var(a);
+      }
+
+      if (unlikely(is_nan(a)))
         return b;
-      else
-        return a > b.vi_->val_ ? var(a) : b;
+
+      return a > b ? var(a) : b;
     }
 
   }

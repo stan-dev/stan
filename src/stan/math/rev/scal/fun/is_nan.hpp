@@ -18,9 +18,7 @@ namespace stan {
      *
      * @return <code>1</code> if the value is NaN and <code>0</code> otherwise.
      */
-    inline 
-    int
-    is_nan(const var& v) {
+    inline bool is_nan(const var& v) {
       return stan::math::is_nan(v.val());
     }
 
