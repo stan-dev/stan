@@ -723,8 +723,8 @@ TEST(AgradFwdMatrixAssign,vector_vector_fvar_var) {
   vector<vector<fvar<var> > > x(3,vector<fvar<var> >(2));
   for (size_t i = 0; i < 3; ++i)
     for (size_t j = 0; j < 2; ++j) {
-      x[i][j] = (i + 1) * (j - 10);
-      x[i][j].d_ = i+j;
+      x[i][j] = static_cast<double>((i + 1) * (j - 10));
+      x[i][j].d_ = static_cast<double>(i+j);
     }
   
   vector<vector<fvar<var> > > y(3,vector<fvar<var> >(2));
@@ -767,8 +767,8 @@ TEST(AgradFwdMatrixAssign,vector_vector_vector_fvar_var) {
   for (size_t k = 0; k < 4; ++k)
     for (size_t i = 0; i < 3; ++i)
       for (size_t j = 0; j < 2; ++j) {
-        x[k][i][j] = (i + 1) * (j - 10) * (20 * k + 100);
-        x[k][i][j].d_ = i+j+k;
+        x[k][i][j] = static_cast<double>((i + 1) * (j - 10) * (20 * k + 100));
+        x[k][i][j].d_ = static_cast<double>(i+j+k);
         vars.push_back(x[k][i][j].val_);
       }
   
@@ -805,8 +805,8 @@ TEST(AgradFwdMatrixAssign,vector_eigen_vector_fvar_var) {
   vector<Matrix<fvar<var>,Dynamic,1> > x(2, Matrix<fvar<var>,Dynamic,1>(3));
   for (size_t i = 0; i < 2; ++i)
     for (int j = 0; j < 3; ++j) {
-      x[i](j) = (i + 1) * (10 * j + 2);
-      x[i](j).d_ = i+j;
+      x[i](j) = static_cast<double>((i + 1) * (10 * j + 2));
+      x[i](j).d_ = static_cast<double>(i+j);
       vars.push_back(x[i](j).val_);
     }
   vector<Matrix<fvar<var>,Dynamic,1> > y(2, Matrix<fvar<var>,Dynamic,1>(3));
@@ -1066,10 +1066,10 @@ TEST(AgradFwdMatrixAssign,vector_vector_fvar_fvar_var) {
   vector<vector<fvar<fvar<var> > > > x(3,vector<fvar<fvar<var> > >(2));
   for (size_t i = 0; i < 3; ++i)
     for (size_t j = 0; j < 2; ++j) {
-      x[i][j] = (i + 1) * (j - 10);
-      x[i][j].val_.d_ = i+j;
-      x[i][j].d_ = i+j;
-      x[i][j].d_.d_ = i+j;
+      x[i][j] = static_cast<double>((i + 1) * (j - 10));
+      x[i][j].val_.d_ = static_cast<double>(i+j);
+      x[i][j].d_ = static_cast<double>(i+j);
+      x[i][j].d_.d_ = static_cast<double>(i+j);
     }
   
   vector<vector<fvar<fvar<var> > > > y(3,vector<fvar<fvar<var> > >(2));
@@ -1114,10 +1114,10 @@ TEST(AgradFwdMatrixAssign,vector_vector_vector_fvar_fvar_var) {
   for (size_t k = 0; k < 4; ++k)
     for (size_t i = 0; i < 3; ++i)
       for (size_t j = 0; j < 2; ++j) {
-        x[k][i][j] = (i + 1) * (j - 10) * (20 * k + 100);
-        x[k][i][j].val_.d_ = i+j+k;
-        x[k][i][j].d_ = i+j+k;
-        x[k][i][j].d_.d_ = i+j+k;
+        x[k][i][j] = static_cast<double>((i + 1) * (j - 10) * (20 * k + 100));
+        x[k][i][j].val_.d_ = static_cast<double>(i+j+k);
+        x[k][i][j].d_ = static_cast<double>(i+j+k);
+        x[k][i][j].d_.d_ = static_cast<double>(i+j+k);
         vars.push_back(x[k][i][j].val_.val_);
       }
   
@@ -1156,10 +1156,10 @@ TEST(AgradFwdMatrixAssign,vector_eigen_vector_fvar_fvar_var) {
   vector<Matrix<fvar<fvar<var> >,Dynamic,1> > x(2, Matrix<fvar<fvar<var> >,Dynamic,1>(3));
   for (size_t i = 0; i < 2; ++i)
     for (int j = 0; j < 3; ++j) {
-      x[i](j) = (i + 1) * (10 * j + 2);
-      x[i](j).val_.d_ = i+j;
-      x[i](j).d_ = i+j;
-      x[i](j).d_.d_ = i+j;
+      x[i](j) = static_cast<double>((i + 1) * (10 * j + 2));
+      x[i](j).val_.d_ = static_cast<double>(i+j);
+      x[i](j).d_ = static_cast<double>(i+j);
+      x[i](j).d_.d_ = static_cast<double>(i+j);
       vars.push_back(x[i](j).val_.val_);
     }
   vector<Matrix<fvar<fvar<var> >,Dynamic,1> > y(2, Matrix<fvar<fvar<var> >,Dynamic,1>(3));
