@@ -86,7 +86,7 @@ namespace stan {
       lp_iterator fwd_begin = lp_iterator(stan_string.begin());
       lp_iterator fwd_end = lp_iterator(stan_string.end());
 
-      program_grammar<lp_iterator> prog_grammar(model_name,fwd_begin);
+      program_grammar<lp_iterator> prog_grammar(model_name);
       whitespace_grammar<lp_iterator> whitesp_grammar;
       
       bool parse_succeeded = false;

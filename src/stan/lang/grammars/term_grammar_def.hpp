@@ -650,12 +650,10 @@ namespace stan {
     template <typename Iterator>
     term_grammar<Iterator>::term_grammar(variable_map& var_map,
                                          std::stringstream& error_msgs,
-                                         Iterator& it,
                                          expression_grammar<Iterator>& eg)
       : term_grammar::base_type(term_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        it_(it),
         expression_g(eg)
     {
       using boost::spirit::qi::_1;

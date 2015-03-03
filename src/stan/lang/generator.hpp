@@ -1775,6 +1775,12 @@ namespace stan {
                             bool include_sampling,
                             bool is_var,
                             bool is_fun_return) {
+      generate_indent(indent,o);
+      o << "current_statement_begin__ = " <<  s.begin_line_ << ";" 
+        << EOL;
+      generate_indent(indent,o);
+      o << "current_statement_end__ = " << s.end_line_ << ";" 
+        << EOL;
       statement_visgen vis(indent,include_sampling,is_var,is_fun_return, o);
       boost::apply_visitor(vis,s.statement_);
     }
@@ -2546,8 +2552,12 @@ namespace stan {
       o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
       o << INDENT << "    std::ostream* pstream__ = 0)"
         << EOL;
-      o << INDENT2 << ": prob_grad(0) {"
+      o << INDENT2 << ": prob_grad(0) {" 
         << EOL; // resize 0 with var_resizing
+      o << INDENT2 << "current_statement_begin__ = -1;"
+        << EOL
+        << INDENT2 << "current_statement_end__ = -1;"
+        << EOL;
       o << INDENT2 << "static const char* function__ = \"" 
         << model_name << "_namespace::" << model_name << "\";" << EOL;
       suppress_warning(INDENT2, "function__", o);
@@ -4650,6 +4660,34 @@ namespace stan {
       }
     }
 
+    void generate_member_var_decls_all(const program& prog,
+                                       std::ostream& out) {
+      generate_member_var_decls(prog.data_decl_,1,out);
+      generate_member_var_decls(prog.derived_data_decl_.first,1,out);
+    }
+
+    void generate_globals(std::ostream& out) {
+      out << "static int current_statement_begin__;" 
+          << EOL;
+      out << "static int current_statement_end__;" 
+          << EOL2;
+    }
+
+    void generate_statement_line_numbers_methods(std::ostream& out) {
+      out << INDENT << "int current_statement_begin() {"
+          << EOL
+          << INDENT2 << "return current_statement_begin__;"
+          << EOL
+          << INDENT << "}"
+          << EOL2;
+      out << INDENT << "int current_statement_end() {"
+          << EOL
+          << INDENT2 << "return current_statement_end__;"
+          << EOL
+          << INDENT << "}"
+          << EOL2;
+    }
+
     void generate_cpp(const program& prog, 
                       const std::string& model_name,
                       std::ostream& out) {
@@ -4658,11 +4696,11 @@ namespace stan {
       generate_start_namespace(model_name,out);
       generate_usings(out);
       generate_typedefs(out);
+      generate_globals(out);
       generate_functions(prog.function_decl_defs_,out);
       generate_class_decl(model_name,out);
       generate_private_decl(out);
-      generate_member_var_decls(prog.data_decl_,1,out);
-      generate_member_var_decls(prog.derived_data_decl_.first,1,out);
+      generate_member_var_decls_all(prog,out);
       generate_public_decl(out);
       generate_constructor(prog,model_name,out);
       generate_destructor(model_name,out);
@@ -4677,6 +4715,7 @@ namespace stan {
       generate_model_name_method(model_name,out);
       generate_constrained_param_names_method(prog,out);
       generate_unconstrained_param_names_method(prog,out);
+      generate_statement_line_numbers_methods(out);
       generate_end_class_decl(out);
       generate_end_namespace(out);
       generate_model_typedef(model_name,out);

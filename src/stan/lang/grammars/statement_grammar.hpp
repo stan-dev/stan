@@ -26,14 +26,12 @@ namespace stan {
   
       
       statement_grammar(variable_map& var_map,
-                        std::stringstream& error_msgs,
-                        Iterator& it);
+                        std::stringstream& error_msgs);
 
 
       // global info for parses
       variable_map& var_map_;
       std::stringstream& error_msgs_;
-      Iterator& it_;
       
       // grammars
       expression_grammar<Iterator> expression_g;  
@@ -151,6 +149,11 @@ namespace stan {
                               statement(bool,var_origin,bool), 
                               whitespace_grammar<Iterator> > 
       statement_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              statement(bool,var_origin,bool), 
+                              whitespace_grammar<Iterator> > 
+      statement_sub_r;
 
       boost::spirit::qi::rule<Iterator, 
                               boost::spirit::qi::locals<std::vector<var_decl> >,

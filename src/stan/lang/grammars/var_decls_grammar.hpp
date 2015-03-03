@@ -24,13 +24,11 @@ namespace stan {
                                    whitespace_grammar<Iterator> > {
 
       var_decls_grammar(variable_map& var_map,
-                        std::stringstream& error_msgs,
-                        Iterator& it);
+                        std::stringstream& error_msgs);
 
       // global info for parses
       variable_map& var_map_;
       std::stringstream& error_msgs_;
-      Iterator& it_;
 
       // grammars
       expression_grammar<Iterator> expression_g;      

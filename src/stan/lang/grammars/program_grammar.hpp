@@ -24,12 +24,10 @@ namespace stan {
                                    program(), 
                                    whitespace_grammar<Iterator> > {
       
-      program_grammar(const std::string& model_name,
-                      Iterator& it);
+      program_grammar(const std::string& model_name);
       
       // global info for parses
       std::string model_name_;
-      Iterator& it_;
       variable_map var_map_;
       std::stringstream error_msgs_;
 

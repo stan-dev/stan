@@ -115,7 +115,7 @@ namespace stan {
 
 
           std::basic_stringstream<char> sprogram;
-          sprogram << boost::make_iterator_range (_begin, _end);
+          sprogram << boost::make_iterator_range(_begin, _end);
 
           // show error in context 2 lines before, 1 lines after
           size_t idx_errcol = 0;
@@ -163,17 +163,15 @@ namespace stan {
     boost::phoenix::function<program_error> program_error_f;
 
     template <typename Iterator>
-    program_grammar<Iterator>::program_grammar(const std::string& model_name,
-                                               Iterator& it) 
+    program_grammar<Iterator>::program_grammar(const std::string& model_name)
         : program_grammar::base_type(program_r),
           model_name_(model_name),
-          it_(it),
           var_map_(),
           error_msgs_(),
-          expression_g(var_map_,error_msgs_,it),
-          var_decls_g(var_map_,error_msgs_,it),
-          statement_g(var_map_,error_msgs_,it),
-          functions_g(var_map_,error_msgs_,it) 
+          expression_g(var_map_,error_msgs_),
+          var_decls_g(var_map_,error_msgs_),
+          statement_g(var_map_,error_msgs_),
+          functions_g(var_map_,error_msgs_) 
     {
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;

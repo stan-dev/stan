@@ -8,11 +8,10 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
-#include <stdexcept>
-
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/lexical_cast.hpp>
@@ -524,18 +523,28 @@ namespace stan {
     };
     boost::phoenix::function<validate_non_void_expression> validate_non_void_expression_f;
     
+    struct add_line_number {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
+      template <typename T, typename It>
+      void operator()(T& stmt,
+                      It& begin,
+                      It& end) const {
+        stmt.begin_line_ = get_line(begin);
+        stmt.end_line_ = get_line(end);
+      }
+    };
+    boost::phoenix::function<add_line_number> add_line_number_f;
 
     template <typename Iterator>
     statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
-                                                   std::stringstream& error_msgs,
-                                                   Iterator& it)
+                                                   std::stringstream& error_msgs)
       : statement_grammar::base_type(statement_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        it_(it),
-        expression_g(var_map,error_msgs,it),
-        var_decls_g(var_map,error_msgs,it),
-        statement_2_g(var_map,error_msgs,it,*this)
+        expression_g(var_map,error_msgs),
+        var_decls_g(var_map,error_msgs),
+        statement_2_g(var_map,error_msgs,*this)
     {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
@@ -545,18 +554,29 @@ namespace stan {
       using boost::spirit::qi::no_skip;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
+      using boost::spirit::qi::raw;
 
       using boost::spirit::qi::labels::_a;
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
       using boost::spirit::qi::labels::_r3;
 
+      using boost::phoenix::begin;
+      using boost::phoenix::end;
+
       // inherited features
       //   _r1 true if sample_r allowed
       //   _r2 source of variables allowed for assignments
       //   _r3 true if return_r allowed 
+
       statement_r.name("statement");
-      statement_r
+      statement_r 
+        = raw[ statement_sub_r(_r1,_r2,_r3)[_val = _1] ]
+          [ add_line_number_f(_val, begin(_1), end(_1)) ]
+        ;
+
+      statement_sub_r.name("statement");
+      statement_sub_r
         %= no_op_statement_r                        // key ";"
         | statement_seq_r(_r1,_r2,_r3)              // key "{"
         | increment_log_prob_statement_r(_r1,_r2)   // key "increment_log_prob"
@@ -570,7 +590,7 @@ namespace stan {
         | assignment_r(_r2)                         // lvalue "<-"
         | sample_r(_r1,_r2)                         // expression "~"
         | expression_g(_r2)                         // expression
-          [expression_as_statement_f(_pass,_1,boost::phoenix::ref(error_msgs_))]
+           [expression_as_statement_f(_pass,_1,boost::phoenix::ref(error_msgs_))]
         ;
 
       // _r1, _r2, _r3 same as statement_r

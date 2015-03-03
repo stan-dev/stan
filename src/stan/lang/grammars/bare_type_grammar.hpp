@@ -24,12 +24,9 @@ namespace stan {
       // global info for function defs
       variable_map& var_map_;
       std::stringstream& error_msgs_;
-      Iterator& it_;
       
-      // constructor
       bare_type_grammar(variable_map& var_map,
-                        std::stringstream& error_msgs,
-                        Iterator& it);
+                        std::stringstream& error_msgs);
 
       boost::spirit::qi::rule<Iterator, 
                               expr_type(),

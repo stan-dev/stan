@@ -35,16 +35,13 @@ namespace stan {
 
       std::stringstream& error_msgs_;
 
-      Iterator& it_;
-      
       // grammars
       statement_grammar<Iterator> statement_g;
       bare_type_grammar<Iterator> bare_type_g;
       
       // constructor
       functions_grammar(variable_map& var_map,
-                        std::stringstream& error_msgs,
-                        Iterator& it);
+                        std::stringstream& error_msgs);
 
       // rules
       boost::spirit::qi::rule<Iterator, 
