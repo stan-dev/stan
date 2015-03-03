@@ -1,12 +1,11 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__READ_CORR_L_HPP
 #define STAN__MATH__PRIM__MAT__FUN__READ_CORR_L_HPP
-
+#include <iostream>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>
 #include <stan/math/prim/mat/fun/sum.hpp>
 #include <cstddef>
-
 
 namespace stan {
   
@@ -52,14 +51,14 @@ namespace stan {
 
       L(0,0) = 1.0;
       L.col(0).tail(pull) = temp = CPCs.head(pull);
-      acc.tail(pull) = 1.0 - temp.square();
+      acc.tail(pull) = T(1.0) - temp.square();
       for(size_t i = 1; i < (K - 1); i++) {
         position += pull;
         pull--;
         temp = CPCs.segment(position, pull);
         L(i,i) = sqrt(acc(i-1));
         L.col(i).tail(pull) = temp * acc.tail(pull).sqrt();
-        acc.tail(pull) *= 1.0 - temp.square();
+        acc.tail(pull) *= T(1.0) - temp.square();
       }
       L(K-1,K-1) = sqrt(acc(K-2));
       return L.matrix();
