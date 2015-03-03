@@ -82,6 +82,24 @@ namespace stan {
       o << "// " << msg        << EOL;
     }
 
+    /**
+     * Print a the specified string to the specified output stream,
+     * wrapping in double quotes (") and replacing all double quotes
+     * in the input with apostrophes (').  For example, if the input
+     * string is <tt>ab"cde"fg</tt> then the string
+     * <tt>"ab'cde'fg"</tt> is streamed to the output stream.
+     *
+     * @param s String to output
+     * @param o Output stream
+     */
+    void generate_quoted_string(const std::string& s,
+                                std::ostream& o) {
+      o << '"';
+      for (size_t i = 0; i < s.size(); ++i) {
+        o << ((s[i] == '"') ? '\'' : s[i]);
+      }
+      o << '"';
+    }
 
     template <bool isLHS>
     void generate_indexed_expr(const std::string& expr,
@@ -89,8 +107,6 @@ namespace stan {
                                base_expr_type base_type, // may have more dims
                                size_t e_num_dims, // array dims
                                std::ostream& o) {
-      // FIXME: add more get_base1 functions and fold nested calls into API
-      // up to a given size, then default to this behavior
       size_t ai_size = indexes.size();
       if (ai_size == 0) {
         // no indexes
@@ -104,7 +120,9 @@ namespace stan {
         for (size_t n = 0; n < ai_size; ++n) {
           o << ',';
           generate_expression(indexes[n],o);
-          o << ',' << '"' << expr << '"' << ',' << (n+1) << ')';
+          o << ',';
+          generate_quoted_string(expr,o);
+          o << ',' << (n+1) << ')';
         }
       } else { 
         for (size_t n = 0; n < ai_size - 1; ++n)
@@ -113,13 +131,17 @@ namespace stan {
         for (size_t n = 0; n < ai_size - 2; ++n) {
           o << ',';
           generate_expression(indexes[n],o);
-          o << ',' << '"' << expr << '"' << ',' << (n+1) << ')';
+          o << ',';
+          generate_quoted_string(expr,o);
+          o << ',' << (n+1) << ')';
         }
         o << ',';
         generate_expression(indexes[ai_size - 2U],o);
         o << ',';
         generate_expression(indexes[ai_size - 1U],o);
-        o << ',' << '"' << expr << '"' << ',' << (ai_size-1U) << ')';
+        o << ',';
+        generate_quoted_string(expr,o);
+        o << ',' << (ai_size-1U) << ')';
       }
     }
 

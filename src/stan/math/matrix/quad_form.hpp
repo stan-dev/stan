@@ -50,14 +50,16 @@ namespace stan {
                   const Eigen::Matrix<T,RB,CB>& B)
     {
       using stan::math::multiply;
-      
+      using stan::math::transpose;
+
       stan::math::check_square("quad_form_sym", "A", A);
       stan::math::check_multiplicable("quad_form_sym", 
                                                 "A", A, 
                                                 "B", B);
       stan::math::check_symmetric("quad_form_sym", "A", A);
-      Eigen::Matrix<T,CB,CB> ret(multiply(stan::math::transpose(B),multiply(A,B)));
-      return 0.5*(ret + stan::math::transpose(ret));
+      Eigen::Matrix<T,CB,CB> ret(multiply(transpose(B), multiply(A,B)));
+
+      return T(0.5) * (ret + transpose(ret));
     }
     
     template<int RA,int CA,int RB,typename T>
