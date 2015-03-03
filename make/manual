@@ -17,9 +17,11 @@ $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt: $(STANAPI_HOME)src/do
 	@sed 's/^\\indexentry{{\\tt  \\bfseries //g' $(STANAPI_HOME)src/docs/stan-reference/stan-reference.idx | \
 	sed 's/ }!{\\tt  /;/g' | \
 	sed 's/{\\tt  \\slshape  //g' | \
+	sed 's/:.*T}\[.*\]}/;T\[\]/g' | \
 	sed 's/:.*em}/;/g' | \
 	sed 's/}|hyperpage}{/;/g' | \
 	sed 's/ }!sampling statement|hyperpage}{/;~;real;/g' | \
+        sed 's/|hyperpage/;/g' | \
 	sed 's/}//g' | \
 	sed 's/\\_/_/g' | \
 	sed 's/^ //g' | \
