@@ -350,21 +350,21 @@ TEST(AgradRevMatrix, UserCase1) {
 
   vector_v vk(DpKm1);
   for (size_t k = 0; k < DpKm1; ++k)
-    vk[k] = (k + 1) * (k + 2);
+    vk[k] = static_cast<double>((k + 1) * (k + 2));
   
   matrix_v L_etaprec(DpKm1,DpKm1);
   for (size_t m = 0; m < DpKm1; ++m)
     for (size_t n = 0; n < DpKm1; ++n)
-      L_etaprec(m,n) = (m + 1) * (n + 1);
+      L_etaprec(m,n) = static_cast<double>((m + 1) * (n + 1));
 
   vector_d etamu(DpKm1);
   for (size_t k = 0; k < DpKm1; ++k)
-    etamu[k] = 10 + (k * k);
+    etamu[k] = static_cast<double>(10 + (k * k));
   
   vector<vector_d> eta(H,vector_d(DpKm1));
   for (size_t h = 0; h < H; ++h)
     for (size_t k = 0; k < DpKm1; ++k)
-      eta[h][k] = (h + 1) * (k + 10);
+      eta[h][k] = static_cast<double>((h + 1) * (k + 10));
 
   AVAR lp__ = 0.0;
 
