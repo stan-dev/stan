@@ -183,6 +183,7 @@ namespace stan {
       // in WIN64, size_t = unsigned long long, which is a C++11
       // feature, so use this ctor to enable it
       var(size_t x) : vi_(new vari(static_cast<double>(x))) { }
+      var(ptrdiff_t x) : vi_(new vari(static_cast<double>(x))) { }
 #endif
 
       /**
