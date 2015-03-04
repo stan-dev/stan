@@ -134,17 +134,17 @@ TEST(ProbDistributionsWishart, error) {
   
   nu = 5;
   Sigma.resize(2,1);
-  EXPECT_THROW(wishart_log(Y, nu, Sigma), std::domain_error);
+  EXPECT_THROW(wishart_log(Y, nu, Sigma), std::invalid_argument);
 
   nu = 5;
   Sigma.resize(2,2);
   Y.resize(2,1);
-  EXPECT_THROW(wishart_log(Y, nu, Sigma), std::domain_error);
+  EXPECT_THROW(wishart_log(Y, nu, Sigma), std::invalid_argument);
   
   nu = 5;
   Sigma.resize(2,2);
   Y.resize(3,3);
-  EXPECT_THROW(wishart_log(Y, nu, Sigma), std::domain_error);
+  EXPECT_THROW(wishart_log(Y, nu, Sigma), std::invalid_argument);
 
   Sigma.resize(3,3);
   Sigma.setIdentity();
@@ -168,7 +168,7 @@ TEST(ProbDistributionsWishart, error_check) {
   EXPECT_THROW(stan::prob::wishart_rng(-3.0, sigma,rng),std::domain_error);
 
   Matrix<double,Dynamic,Dynamic> sigma2(3,4);
-  EXPECT_THROW(stan::prob::wishart_rng(3.0, sigma2,rng),std::domain_error);
+  EXPECT_THROW(stan::prob::wishart_rng(3.0, sigma2,rng),std::invalid_argument);
 }
 
 TEST(ProbDistributionsWishart, marginalTwoChiSquareGoodnessFitTest) {

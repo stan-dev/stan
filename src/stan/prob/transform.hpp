@@ -11,15 +11,17 @@
 #include <boost/throw_exception.hpp>
 #include <boost/math/tools/promotion.hpp>
 
-#include <stan/math.hpp>
 #include <stan/error_handling/scalar/check_bounded.hpp>
 #include <stan/error_handling/scalar/check_greater_or_equal.hpp>
 #include <stan/error_handling/matrix/check_square.hpp>
-#include <stan/math/matrix.hpp>
-
-#include <stan/math/matrix/sum.hpp>
 #include <stan/error_handling/matrix.hpp>
+
+#include <stan/math.hpp>
+
+#include <stan/math/matrix.hpp>
+#include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
+#include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/meta/index_type.hpp>
 
 
@@ -34,13 +36,14 @@ namespace stan {
      * This function is intended to make starting values, given a unit
      * upper-triangular matrix U such that U'DU is a correlation matrix
      *   
+     * @param U Sigma matrix
      * @param CPCs fill this unbounded
-     * @param Sigma U matrix
      */
-    template<typename T>
+    template <typename T>
     void    
     factor_U(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& U,
              Eigen::Array<T,Eigen::Dynamic,1>& CPCs) { 
+      using stan::math::subtract;
 
       size_t K = U.rows();
       size_t position = 0;
@@ -57,14 +60,16 @@ namespace stan {
 
       Eigen::Array<T,Eigen::Dynamic,1> acc(K);
       acc(0) = -0.0;
-      acc.tail(pull) = 1.0 - temp.square();
+      Eigen::Matrix<T,Eigen::Dynamic,1> temp_square(temp.square());
+      acc.tail(pull) = subtract(1.0, temp_square);
       for(size_t i = 1; i < (K - 1); i++) {
         position += pull;
         pull--;
         temp = U.row(i).tail(pull);
         temp /= sqrt(acc.tail(pull) / acc(i));
         CPCs.segment(position, pull) = temp;
-        acc.tail(pull) *= 1.0 - temp.square();
+        Eigen::Matrix<T,Eigen::Dynamic,1> temp_square2(temp.square());
+        acc.tail(pull) *= subtract(1.0, temp_square2).array();
       }
       CPCs = 0.5 * ( (1.0 + CPCs) / (1.0 - CPCs) ).log(); // now unbounded
     }
@@ -137,6 +142,7 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     read_corr_L(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
                 const size_t K) {
+      using stan::math::subtract;
       Eigen::Array<T,Eigen::Dynamic,1> temp;         
       Eigen::Array<T,Eigen::Dynamic,1> acc(K-1);  
       acc.setOnes();
@@ -149,14 +155,16 @@ namespace stan {
 
       L(0,0) = 1.0;
       L.col(0).tail(pull) = temp = CPCs.head(pull);
-      acc.tail(pull) = 1.0 - temp.square();
+      Eigen::Matrix<T,Eigen::Dynamic,1> temp_square(temp.square());
+      acc.tail(pull) = subtract(1.0, temp_square); // T(1.0) - temp.square();
       for(size_t i = 1; i < (K - 1); i++) {
         position += pull;
         pull--;
         temp = CPCs.segment(position, pull);
         L(i,i) = sqrt(acc(i-1));
         L.col(i).tail(pull) = temp * acc.tail(pull).sqrt();
-        acc.tail(pull) *= 1.0 - temp.square();
+        Eigen::Matrix<T,Eigen::Dynamic,1> temp_square2(temp.square());
+        acc.tail(pull) *= subtract(1.0, temp_square2).array();
       }
       L(K-1,K-1) = sqrt(acc(K-2));
       return L.matrix();
@@ -478,7 +486,7 @@ namespace stan {
      *
      * <p>\f$f^{-1}(x) = \log(x)\f$.
      * 
-     * <p>The input is validated using <code>stan::error_handling::check_positive()</code>.
+     * <p>The input is validated using <code>stan::math::check_positive()</code>.
      * 
      * @param y Input scalar.
      * @return Unconstrained value that produces the input when constrained.
@@ -488,7 +496,7 @@ namespace stan {
     template <typename T>
     inline
     T positive_free(const T y) {
-      stan::error_handling::check_positive("stan::prob::positive_free", "Positive variable", y);
+      stan::math::check_positive("stan::prob::positive_free", "Positive variable", y);
       return log(y);
     }
 
@@ -568,7 +576,7 @@ namespace stan {
     lb_free(const T y, const TL lb) {
       if (lb == -std::numeric_limits<double>::infinity())
         return identity_free(y);
-      stan::error_handling::check_greater_or_equal("stan::prob::lb_free", 
+      stan::math::check_greater_or_equal("stan::prob::lb_free", 
                                                    "Lower bounded variable", y, lb);
       return log(y - lb);
     }
@@ -665,7 +673,7 @@ namespace stan {
     ub_free(const T y, const TU ub) {
       if (ub == std::numeric_limits<double>::infinity())
         return identity_free(y);
-      stan::error_handling::check_less_or_equal("stan::prob::ub_free", 
+      stan::math::check_less_or_equal("stan::prob::ub_free", 
                                                 "Upper bounded variable", y, ub);
       return log(ub - y);
     }
@@ -704,26 +712,23 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_constrain(const T x, TL lb, TU ub) {
-      stan::error_handling::check_less("lub_constrain", "lb", lb, ub);
+      using stan::math::inv_logit;
+      stan::math::check_less("lub_constrain", "lb", lb, ub);
       if (lb == -std::numeric_limits<double>::infinity())
         return ub_constrain(x,ub);
       if (ub == std::numeric_limits<double>::infinity())
         return lb_constrain(x,lb);
 
-      T inv_logit_x;
+      T inv_logit_x(inv_logit(x));
       if (x > 0) {
-        T exp_minus_x = exp(-x);
-        inv_logit_x = 1.0 / (1.0 + exp_minus_x);
         // Prevent x from reaching one unless it really really should.
         if ((x < std::numeric_limits<double>::infinity()) 
             && (inv_logit_x == 1))
             inv_logit_x = 1 - 1e-15;
       } else {
-        T exp_x = exp(x);
-        inv_logit_x = 1.0 - 1.0 / (1.0 + exp_x);
         // Prevent x from reaching zero unless it really really should.
         if ((x > -std::numeric_limits<double>::infinity()) 
-            && (inv_logit_x== 0))
+            && (inv_logit_x == 0))
             inv_logit_x = 1e-15;
       }
       return lb + (ub - lb) * inv_logit_x;
@@ -773,6 +778,8 @@ namespace stan {
     template <typename T, typename TL, typename TU>
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_constrain(const T x, const TL lb, const TU ub, T& lp) {
+      using stan::math::inv_logit;
+      using stan::math::log1p_exp;
       if (!(lb < ub)) {
         std::stringstream s;
         s << "domain error in lub_constrain;  lower bound = " << lb
@@ -783,19 +790,15 @@ namespace stan {
         return ub_constrain(x,ub,lp);
       if (ub == std::numeric_limits<double>::infinity())
         return lb_constrain(x,lb,lp);
-      T inv_logit_x;
+      T inv_logit_x(inv_logit(x));
       if (x > 0) {
-        T exp_minus_x = exp(-x);
-        inv_logit_x = 1.0 / (1.0 + exp_minus_x);
-        lp += log(ub - lb) - x - 2 * log1p(exp_minus_x);
+        lp += log(ub - lb) - x - 2 * log1p_exp(-x);
         // Prevent x from reaching one unless it really really should.
         if ((x < std::numeric_limits<double>::infinity()) 
             && (inv_logit_x == 1))
             inv_logit_x = 1 - 1e-15;
       } else {
-        T exp_x = exp(x);
-        inv_logit_x = 1.0 - 1.0 / (1.0 + exp_x);
-        lp += log(ub - lb) + x - 2 * log1p(exp_x);
+        lp += log(ub - lb) + x - 2 * log1p_exp(x); // log1p(exp_x);
         // Prevent x from reaching zero unless it really really should.
         if ((x > -std::numeric_limits<double>::infinity()) 
             && (inv_logit_x== 0))
@@ -839,7 +842,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_free(const T y, TL lb, TU ub) {
       using stan::math::logit;
-      stan::error_handling::check_bounded<T, TL, TU>
+      stan::math::check_bounded<T, TL, TU>
         ("stan::prob::lub_free",
          "Bounded variable",
          y, lb, ub);
@@ -922,7 +925,7 @@ namespace stan {
     inline
     T prob_free(const T y) {
       using stan::math::logit;
-      stan::error_handling::check_bounded<T,double,double>
+      stan::math::check_bounded<T,double,double>
         ("stan::prob::prob_free", "Probability variable",
          y, 0, 1);
       return logit(y);
@@ -989,7 +992,7 @@ namespace stan {
     template <typename T>
     inline
     T corr_free(const T y) {
-      stan::error_handling::check_bounded<T,double,double>
+      stan::math::check_bounded<T,double,double>
         ("stan::prob::lub_free",
          "Correlation variable", y, -1, 1);
       return atanh(y);
@@ -1066,7 +1069,7 @@ namespace stan {
       using stan::math::index_type;
       typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
 
-      stan::error_handling::check_unit_vector("stan::prob::unit_vector_free", 
+      stan::math::check_unit_vector("stan::prob::unit_vector_free", 
                                               "Unit vector variable", x);
       int Km1 = x.size() - 1;
       Matrix<T,Dynamic,1> y(Km1);
@@ -1189,7 +1192,7 @@ namespace stan {
 
       typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
 
-      stan::error_handling::check_simplex("stan::prob::simplex_free", "Simplex variable", x);
+      stan::math::check_simplex("stan::prob::simplex_free", "Simplex variable", x);
       int Km1 = x.size() - 1;
       Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
       T stick_len(x(Km1));
@@ -1278,7 +1281,7 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
-      stan::error_handling::check_ordered("stan::prob::ordered_free", 
+      stan::math::check_ordered("stan::prob::ordered_free", 
                                           "Ordered variable", y);
       using Eigen::Matrix;
       using Eigen::Dynamic;
@@ -1375,7 +1378,7 @@ namespace stan {
 
       typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
 
-      stan::error_handling::check_positive_ordered("stan::prob::positive_ordered_free", 
+      stan::math::check_positive_ordered("stan::prob::positive_ordered_free", 
                                                    "Positive ordered variable", 
                                                    y);
 
@@ -1480,7 +1483,7 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1>
     cholesky_factor_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
       using std::log;
-      if (!stan::error_handling::check_cholesky_factor("cholesky_factor_free", "y", y))
+      if (!stan::math::check_cholesky_factor("cholesky_factor_free", "y", y))
         throw std::domain_error("cholesky_factor_free: y is not a Cholesky factor");
       int M = y.rows();
       int N = y.cols();
@@ -1590,7 +1593,7 @@ namespace stan {
       using Eigen::Dynamic;
       using stan::math::square;
 
-      stan::error_handling::check_square("cholesky_corr_free", "x", x);
+      stan::math::check_square("cholesky_corr_free", "x", x);
       // should validate lower-triangular, unit lengths
 
       int K = (x.rows() * (x.rows() - 1)) / 2;

@@ -49,9 +49,9 @@ TEST(MathMatrixBlock,Block1) {
     for (int j = 0; j < 3; ++j)
       EXPECT_FLOAT_EQ(m(1 + i, 1 + j),b4(i,j));
 
-  EXPECT_THROW(block(m,5,2,1,1), std::domain_error);
-  EXPECT_THROW(block(m,1,7,1,1), std::domain_error);
-  EXPECT_THROW(block(m,1,1,6,1), std::domain_error);
-  EXPECT_THROW(block(m,1,1,1,6), std::domain_error);
+  EXPECT_THROW(block(m,5,2,1,1), std::out_of_range);
+  EXPECT_THROW(block(m,1,7,1,1), std::out_of_range);
+  EXPECT_THROW(block(m,1,1,6,1), std::out_of_range);
+  EXPECT_THROW(block(m,1,1,1,6), std::out_of_range);
 }
 

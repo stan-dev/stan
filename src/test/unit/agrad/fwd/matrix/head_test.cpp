@@ -24,7 +24,7 @@ TEST(AgradFwdMatrixHead,HeadVector3_fd) {
   using stan::math::head;
   stan::agrad::vector_fd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadVector4_fd) {
   using stan::math::head;
@@ -54,7 +54,7 @@ TEST(AgradFwdMatrixHead,HeadRowVector3_fd) {
   using stan::math::head;
   stan::agrad::row_vector_fd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadRowVector4_fd) {
   using stan::math::head;
@@ -85,7 +85,7 @@ TEST(AgradFwdMatrixHead,HeadStdVector3_fd) {
   using stan::math::head;
   std::vector<fvar<double> > v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadStdVector4_fd) {
   using stan::math::head;
@@ -113,7 +113,7 @@ TEST(AgradFwdMatrixHead,HeadVector3_fv) {
   using stan::math::head;
   stan::agrad::vector_fv v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadVector4_fv) {
   using stan::math::head;
@@ -143,7 +143,7 @@ TEST(AgradFwdMatrixHead,HeadRowVector3_fv) {
   using stan::math::head;
   stan::agrad::row_vector_fv v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadRowVector4_fv) {
   using stan::math::head;
@@ -174,7 +174,7 @@ TEST(AgradFwdMatrixHead,HeadStdVector3_fv) {
   using stan::math::head;
   std::vector<fvar<var> > v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadStdVector4_fv) {
   using stan::math::head;
@@ -202,7 +202,7 @@ TEST(AgradFwdMatrixHead,HeadVector3_ffd) {
   using stan::math::head;
   stan::agrad::vector_ffd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadVector4_ffd) {
   using stan::math::head;
@@ -232,7 +232,7 @@ TEST(AgradFwdMatrixHead,HeadRowVector3_ffd) {
   using stan::math::head;
   stan::agrad::row_vector_ffd v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadRowVector4_ffd) {
   using stan::math::head;
@@ -263,7 +263,7 @@ TEST(AgradFwdMatrixHead,HeadStdVector3_ffd) {
   using stan::math::head;
   std::vector<fvar<fvar<double> > > v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadStdVector4_ffd) {
   using stan::math::head;
@@ -291,7 +291,7 @@ TEST(AgradFwdMatrixHead,HeadVector3_ffv) {
   using stan::math::head;
   stan::agrad::vector_ffv v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadVector4_ffv) {
   using stan::math::head;
@@ -321,7 +321,7 @@ TEST(AgradFwdMatrixHead,HeadRowVector3_ffv) {
   using stan::math::head;
   stan::agrad::row_vector_ffv v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadRowVector4_ffv) {
   using stan::math::head;
@@ -352,7 +352,7 @@ TEST(AgradFwdMatrixHead,HeadStdVector3_ffv) {
   using stan::math::head;
   std::vector<fvar<fvar<var> > > v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_THROW(head(v,4), std::domain_error);
+  EXPECT_THROW(head(v,4), std::out_of_range);
 }
 TEST(AgradFwdMatrixHead,HeadStdVector4_ffv) {
   using stan::math::head;

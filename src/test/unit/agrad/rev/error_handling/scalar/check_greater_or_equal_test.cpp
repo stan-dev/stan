@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 using stan::agrad::var;
-using stan::error_handling::check_greater_or_equal;
+using stan::math::check_greater_or_equal;
 
 TEST(AgradRevErrorHandlingScalar,CheckGreaterOrEqual) {
   const char* function = "check_greater_or_equal";
@@ -151,7 +151,7 @@ TEST(AgradRevErrorHandlingScalar,CheckGreaterOrEqualMatrix) {
 
 TEST(AgradRevErrorHandlingScalar, CheckGreaterOrEqualVarCheckUnivariate) {
   using stan::agrad::var;
-  using stan::error_handling::check_greater_or_equal;
+  using stan::math::check_greater_or_equal;
 
   const char* function = "check_greater_or_equal";
   var a(5.0);
@@ -174,7 +174,7 @@ TEST(AgradRevErrorHandlingScalar, CheckGreaterOrEqualVarCheckUnivariate) {
 TEST(AgradRevErrorHandlingScalar, CheckFiniteVarCheckVectorized) {
   using stan::agrad::var;
   using std::vector;
-  using stan::error_handling::check_greater_or_equal;
+  using stan::math::check_greater_or_equal;
 
   int N = 5;
   const char* function = "check_greater_or_equal";

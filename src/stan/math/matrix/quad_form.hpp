@@ -22,8 +22,8 @@ namespace stan {
               const Eigen::Matrix<T,RB,CB>& B)
     {
       using stan::math::multiply;
-      stan::error_handling::check_square("quad_form", "A", A);
-      stan::error_handling::check_multiplicable("quad_form",
+      stan::math::check_square("quad_form", "A", A);
+      stan::math::check_multiplicable("quad_form",
                                                 "A", A,
                                                 "B", B);
       return multiply(stan::math::transpose(B),multiply(A,B));
@@ -37,8 +37,8 @@ namespace stan {
       using stan::math::multiply;
       using stan::math::dot_product;
 
-      stan::error_handling::check_square("quad_form", "A", A);
-      stan::error_handling::check_multiplicable("quad_form",
+      stan::math::check_square("quad_form", "A", A);
+      stan::math::check_multiplicable("quad_form",
                                                 "A", A,
                                                 "B", B);
       return dot_product(B,multiply(A,B));
@@ -50,14 +50,16 @@ namespace stan {
                   const Eigen::Matrix<T,RB,CB>& B)
     {
       using stan::math::multiply;
-      
-      stan::error_handling::check_square("quad_form_sym", "A", A);
-      stan::error_handling::check_multiplicable("quad_form_sym", 
+      using stan::math::transpose;
+
+      stan::math::check_square("quad_form_sym", "A", A);
+      stan::math::check_multiplicable("quad_form_sym", 
                                                 "A", A, 
                                                 "B", B);
-      stan::error_handling::check_symmetric("quad_form_sym", "A", A);
-      Eigen::Matrix<T,CB,CB> ret(multiply(stan::math::transpose(B),multiply(A,B)));
-      return 0.5*(ret + stan::math::transpose(ret));
+      stan::math::check_symmetric("quad_form_sym", "A", A);
+      Eigen::Matrix<T,CB,CB> ret(multiply(transpose(B), multiply(A,B)));
+
+      return T(0.5) * (ret + transpose(ret));
     }
     
     template<int RA,int CA,int RB,typename T>
@@ -68,11 +70,11 @@ namespace stan {
       using stan::math::multiply;
       using stan::math::dot_product;
 
-      stan::error_handling::check_square("quad_form_sym", "A", A);
-      stan::error_handling::check_multiplicable("quad_form_sym", 
+      stan::math::check_square("quad_form_sym", "A", A);
+      stan::math::check_multiplicable("quad_form_sym", 
                                                 "A", A, 
                                                 "B", B);
-      stan::error_handling::check_symmetric("quad_form_sym", "A", A);
+      stan::math::check_symmetric("quad_form_sym", "A", A);
       return dot_product(B,multiply(A,B));
     }
   }

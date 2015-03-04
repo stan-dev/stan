@@ -22,7 +22,7 @@ namespace stan {
       using stan::math::multiply;
       using stan::agrad::multiply;
       using stan::math::inverse;
-      stan::error_handling::check_square("inverse", "m", m);
+      stan::math::check_square("inverse", "m", m);
       Eigen::Matrix<T,R,C> m_deriv(m.rows(), m.cols());
       Eigen::Matrix<T,R,C> m_inv(m.rows(), m.cols());
 
@@ -35,8 +35,9 @@ namespace stan {
 
       m_inv = stan::math::inverse(m_inv);
 
-      m_deriv = -1 * multiply(multiply(m_inv, m_deriv), m_inv);
-    
+      m_deriv = multiply(multiply(m_inv, m_deriv), m_inv);
+      m_deriv = -m_deriv;
+
       return to_fvar(m_inv, m_deriv);
     }
   }

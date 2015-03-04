@@ -3,8 +3,11 @@
 
 #include <ostream>
 #include <stan/agrad/rev/vari.hpp>
+#include <boost/type_traits/is_arithmetic.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace stan {
+
   namespace agrad {
 
     // forward declare
@@ -56,7 +59,8 @@ namespace stan {
        *
        * @param vi Variable implementation. 
        */
-      explicit var(vari* vi)
+      template <typename T>
+      explicit var(T* vi)
         : vi_(vi) 
       {  }
 
@@ -71,134 +75,72 @@ namespace stan {
         : vi_(static_cast<vari*>(0U))
       { }
 
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param b Value.
-       */
-      var(bool b) :
-        vi_(new vari(static_cast<double>(b))) {
-      }
+      template <typename T>
+      var(T x) : vi_(new vari(x)) { }
+
 
       /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param c Value.
-       */
-      var(char c) :
-        vi_(new vari(static_cast<double>(c))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(short n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned short n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(long int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned long int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned long long n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(long long n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
+       * Construct a variable with the specified value.  The value
+       * will be static cast to <code>double</code>.  
        *
        * @param x Value.
        */
-      var(float x) :
-        vi_(new vari(static_cast<double>(x))) {
-      }
 
-      /**      
-       * Construct a variable with the specified value.
-       *
-       * @param x Value of the variable.
-       */
-      var(double x) :
-        vi_(new vari(x)) {
-      }
+//       var(double x)
+//       : vi_(new vari(x))
+//       {  } 
 
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(long double x) :
-        vi_(new vari(static_cast<double>(x))) {
-      }
+//       var(float x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+
+//       var(long double x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+
+//       var(bool x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+
+//       var(char x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+
+//       var(short x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+
+//       var(int x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+
+//       var(long x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+
+//       var(unsigned char x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+
+//       var(unsigned short x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+
+//       var(unsigned int x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+
+//       var(unsigned long x) 
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+
+// #ifdef _WIN64
+//       // HACK HACK HACK: add 64-bit unsigned type for Windows 64 bit
+//       // without using long long
+//       var(size_t x)
+//       : vi_(new vari(static_cast<double>(x))) 
+//       {  } 
+// #endif
 
       /**
        * Return the value of this variable.
@@ -387,7 +329,7 @@ namespace stan {
       friend std::ostream& operator<<(std::ostream& os, const var& v) {
         if (v.vi_ == 0)
           return os << "uninitialized";
-        return os << v.val() << ':' << v.adj();
+        return os << v.val();
       }
     };
 

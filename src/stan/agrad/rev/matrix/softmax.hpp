@@ -59,7 +59,7 @@ namespace stan {
       using Eigen::Matrix;
       using Eigen::Dynamic;
 
-      stan::error_handling::check_nonzero_size("softmax", "alpha", alpha);
+      stan::math::check_nonzero_size("softmax", "alpha", alpha);
 
       vari** alpha_vi_array
         = (vari**) ChainableStack::memalloc_.alloc(sizeof(vari*) * alpha.size());

@@ -21,7 +21,7 @@ namespace stan {
     inline 
     typename boost::math::tools::promote_args<T>::type
     mean(const std::vector<T>& v) {
-      stan::error_handling::check_nonzero_size("mean", "v", v);
+      stan::math::check_nonzero_size("mean", "v", v);
       T sum(v[0]);
       for (size_t i = 1; i < v.size(); ++i)
         sum += v[i];
@@ -38,7 +38,7 @@ namespace stan {
     inline  
     typename boost::math::tools::promote_args<T>::type
     mean(const Eigen::Matrix<T,R,C>& m) {
-      stan::error_handling::check_nonzero_size("mean", "m", m);
+      stan::math::check_nonzero_size("mean", "m", m);
       return m.mean();
     }    
     

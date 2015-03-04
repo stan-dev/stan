@@ -16,7 +16,7 @@ namespace stan {
      */
     template <typename T,int R, int C>
     inline T determinant(const Eigen::Matrix<T,R,C>& m) {
-      stan::error_handling::check_square("determinant", "m", m);
+      stan::math::check_square("determinant", "m", m);
       return m.determinant();
     }    
     

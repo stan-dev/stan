@@ -297,8 +297,8 @@ namespace stan {
                      const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::error_handling::check_square("mdivide_left_tri", "A", A);
-      stan::error_handling::check_multiplicable("mdivide_left_tri",
+      stan::math::check_square("mdivide_left_tri", "A", A);
+      stan::math::check_multiplicable("mdivide_left_tri",
                                                 "A", A,
                                                 "b", b);
       
@@ -321,8 +321,8 @@ namespace stan {
                      const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::error_handling::check_square("mdivide_left_tri", "A", A);
-      stan::error_handling::check_multiplicable("mdivide_left_tri",
+      stan::math::check_square("mdivide_left_tri", "A", A);
+      stan::math::check_multiplicable("mdivide_left_tri",
                                                 "A", A,
                                                 "b", b);
       
@@ -345,15 +345,16 @@ namespace stan {
                      const Eigen::Matrix<double,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::error_handling::check_square("mdivide_left_tri", "A", A);
-      stan::error_handling::check_multiplicable("mdivide_left_tri",
+      stan::math::check_square("mdivide_left_tri", "A", A);
+      stan::math::check_multiplicable("mdivide_left_tri",
                                                 "A", A,
                                                 "b", b);
       
       // NOTE: this is not a memory leak, this vari is used in the 
       // expression graph to evaluate the adjoint, but is not needed
       // for the returned matrix.  Memory will be cleaned up with the arena allocator.
-      mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2> *baseVari = new mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2>(A,b);
+      mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2> *baseVari 
+        = new mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2>(A,b);
       
       size_t pos = 0;
       for (size_type j = 0; j < res.cols(); j++)

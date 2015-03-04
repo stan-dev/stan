@@ -188,7 +188,8 @@ TEST(AgradRevMatrix,softmax) {
   using Eigen::Dynamic;
   using stan::agrad::vector_v;
 
-  EXPECT_THROW(softmax(vector_v()),std::domain_error);
+  EXPECT_THROW(softmax(vector_v()),
+               std::invalid_argument);
   
   Matrix<AVAR,Dynamic,1> x(1);
   x << 0.0;
@@ -215,7 +216,8 @@ TEST(AgradRevMatrix,softmax) {
 TEST(AgradRevMatrix, meanStdVector) {
   using stan::math::mean; // should use arg-dep lookup
   AVEC x(0);
-  EXPECT_THROW(mean(x), std::domain_error);
+  EXPECT_THROW(mean(x), 
+               std::invalid_argument);
   x.push_back(1.0);
   EXPECT_FLOAT_EQ(1.0, mean(x).val());
   x.push_back(2.0);
@@ -348,21 +350,21 @@ TEST(AgradRevMatrix, UserCase1) {
 
   vector_v vk(DpKm1);
   for (size_t k = 0; k < DpKm1; ++k)
-    vk[k] = (k + 1) * (k + 2);
+    vk[k] = static_cast<double>((k + 1) * (k + 2));
   
   matrix_v L_etaprec(DpKm1,DpKm1);
   for (size_t m = 0; m < DpKm1; ++m)
     for (size_t n = 0; n < DpKm1; ++n)
-      L_etaprec(m,n) = (m + 1) * (n + 1);
+      L_etaprec(m,n) = static_cast<double>((m + 1) * (n + 1));
 
   vector_d etamu(DpKm1);
   for (size_t k = 0; k < DpKm1; ++k)
-    etamu[k] = 10 + (k * k);
+    etamu[k] = static_cast<double>(10 + (k * k));
   
   vector<vector_d> eta(H,vector_d(DpKm1));
   for (size_t h = 0; h < H; ++h)
     for (size_t k = 0; k < DpKm1; ++k)
-      eta[h][k] = (h + 1) * (k + 10);
+      eta[h][k] = static_cast<double>((h + 1) * (k + 10));
 
   AVAR lp__ = 0.0;
 

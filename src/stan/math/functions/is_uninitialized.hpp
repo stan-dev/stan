@@ -13,7 +13,7 @@ namespace stan {
      * @tparam T Type of object to test.
      * @param x Object to test.
      * @return <code>true</code> if the specified object is uninitialized.
-     * @rerturn false if input is NaN.
+     * @return false if input is NaN.
      */
     template <typename T>
     inline bool is_uninitialized(T x) {

@@ -5,7 +5,7 @@
 TEST(AgradRevErrorHandlingScalar, checkConsistentSizes) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::error_handling::check_consistent_sizes;
+  using stan::math::check_consistent_sizes;
   using stan::size_of;
   using stan::agrad::var;
 
@@ -33,31 +33,31 @@ TEST(AgradRevErrorHandlingScalar, checkConsistentSizes) {
   ASSERT_EQ(3U, size_of(v));
   const char* name = "inconsistent";
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name, v),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2, name3, v3),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name, v, name3, v3),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name2, v2, name, v),
-               std::domain_error);
+               std::invalid_argument);
 
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2, name3, v3, name4, v4),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name, v, name3, v3, name4, v4),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name1, v1, name2, v2, name, v, name4, v4),
-               std::domain_error);
+               std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2, name3, v3, name, v),
-               std::domain_error);
+               std::invalid_argument);
   stan::agrad::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckConsistentSizeVarCheckVectorized) {
   using stan::agrad::var;
   using std::vector;
-  using stan::error_handling::check_consistent_sizes;
+  using stan::math::check_consistent_sizes;
 
   int N = 5;
   const char* function = "check_consistent_size";

@@ -21,8 +21,8 @@ namespace stan {
     {
       using stan::agrad::multiply;
       using stan::math::multiply;
-      stan::error_handling::check_square("trace_quad_form", "A", A);
-      stan::error_handling::check_multiplicable("trace_quad_form", 
+      stan::math::check_square("trace_quad_form", "A", A);
+      stan::math::check_multiplicable("trace_quad_form", 
                                                 "A", A, 
                                                 "B", B);
       return stan::math::trace(multiply(stan::math::transpose(B),

@@ -246,9 +246,9 @@ TEST(AgradRevMatrix, multiply_matrix_vector_exception) {
   matrix_v v1(3,2);
   vector_d d2(4);
   vector_v v2(4);
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradRevMatrix, multiply_rowvector_matrix) {
   using stan::math::matrix_d;
@@ -292,9 +292,9 @@ TEST(AgradRevMatrix, multiply_rowvector_matrix_exception) {
   row_vector_v v1(4);
   matrix_d d2(3,2);
   matrix_v v2(3,2);
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradRevMatrix, multiply_matrix_matrix) {
   using stan::math::matrix_d;
@@ -343,9 +343,9 @@ TEST(AgradRevMatrix, multiply_matrix_matrix_exception) {
   matrix_d d2(3,2);
   matrix_v v2(3,2);
 
-  EXPECT_THROW(multiply(v1, v2), std::domain_error);
-  EXPECT_THROW(multiply(v1, d2), std::domain_error);
-  EXPECT_THROW(multiply(d1, v2), std::domain_error);
+  EXPECT_THROW(multiply(v1, v2), std::invalid_argument);
+  EXPECT_THROW(multiply(v1, d2), std::invalid_argument);
+  EXPECT_THROW(multiply(d1, v2), std::invalid_argument);
 }
 TEST(AgradRevMatrix,multiply_scalar_vector_cv) {
   using stan::agrad::multiply;

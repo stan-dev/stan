@@ -20,8 +20,8 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,1>
     eigenvalues_sym(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      stan::error_handling::check_nonzero_size("eigenvalues_sym", "m", m);
-      stan::error_handling::check_symmetric("eigenvalues_sym", "m", m);
+      stan::math::check_nonzero_size("eigenvalues_sym", "m", m);
+      stan::math::check_symmetric("eigenvalues_sym", "m", m);
 
       Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
         solver(m,Eigen::EigenvaluesOnly);

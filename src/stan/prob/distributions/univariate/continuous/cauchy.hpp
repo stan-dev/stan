@@ -45,10 +45,10 @@ namespace stan {
         T_partials_return;
 
       using stan::is_constant_struct;
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
       // check if any vectors are zero length
@@ -170,10 +170,10 @@ namespace stan {
         
       static const char* function("stan::prob::cauchy_cdf");
       
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -269,10 +269,10 @@ namespace stan {
         
       static const char* function("stan::prob::cauchy_cdf");
       
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -315,7 +315,7 @@ namespace stan {
         cdf_log += log(Pn);
             
         const T_partials_return rep_deriv = 1.0 / (pi() * Pn 
-                                        * (z * z * sigma_dbl + sigma_dbl));
+                                                   * (z * z * sigma_dbl + sigma_dbl));
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv;
         if (!is_constant_struct<T_loc>::value)
@@ -339,10 +339,10 @@ namespace stan {
         
       static const char* function("stan::prob::cauchy_cdf");
       
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
-      using stan::error_handling::check_not_nan;
-      using stan::error_handling::check_consistent_sizes;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
@@ -406,8 +406,8 @@ namespace stan {
 
       static const char* function("stan::prob::cauchy_rng");
 
-      using stan::error_handling::check_positive_finite;
-      using stan::error_handling::check_finite;
+      using stan::math::check_positive_finite;
+      using stan::math::check_finite;
       
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
