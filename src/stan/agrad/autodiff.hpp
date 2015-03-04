@@ -294,12 +294,6 @@ namespace stan {
       fx = fx_fvar.val_;
       grad_fx_dot_v = fx_fvar.d_;
     }
-<<<<<<< HEAD
-=======
-
-
-
->>>>>>> develop
 
     template <typename F>
     void
