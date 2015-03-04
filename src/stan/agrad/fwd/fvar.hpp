@@ -15,10 +15,16 @@ namespace stan {
       T val_;  // value
       T d_;    // tangent (aka derivative)
 
-      T val() { return val_; }
-      T tangent() { return d_; }
+      T val() const { return val_; }
+      T tangent() const { return d_; }
 
       typedef fvar value_type;
+
+      fvar() : val_(0.0), d_(0.0) { }
+
+      fvar(const fvar<T>& x) 
+        : val_(x.val_), d_(x.d_) { 
+      }
 
       // TV and TD must be assignable to T
       template <typename TV, typename TD>
@@ -34,7 +40,6 @@ namespace stan {
           d_ = val;
       }
       
-      fvar() : val_(0.0), d_(0.0) { }
 
       template <typename T2>
       inline

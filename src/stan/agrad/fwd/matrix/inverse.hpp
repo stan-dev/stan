@@ -35,8 +35,9 @@ namespace stan {
 
       m_inv = stan::math::inverse(m_inv);
 
-      m_deriv = -1 * multiply(multiply(m_inv, m_deriv), m_inv);
-    
+      m_deriv = multiply(multiply(m_inv, m_deriv), m_inv);
+      m_deriv = -m_deriv;
+
       return to_fvar(m_inv, m_deriv);
     }
   }
