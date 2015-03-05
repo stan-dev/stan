@@ -12,33 +12,14 @@ namespace stan {
      * <p>See the <code>stan::math::primitive_value</code> function to 
      * extract values without casting to <code>double</code>.
      *
-     * <p>This function is meant to cover the primitive types. For
-     * types requiring pass-by-reference, this template function
-     * should be specialized.
-     *
-     * @tparam T Type of scalar.
      * @param x Scalar to convert to double.
      * @return Value of scalar cast to a double.
      */
-    template <typename T>
-    inline double value_of_rec(const T x) {
-      return static_cast<double>(x);
+    inline double value_of_rec(double x) {
+      return x;
     }
-
-    /**
-     * Return the specified argument. 
-     *
-     * <p>See <code>value_of(T)</code> for a polymorphic
-     * implementation using static casts.
-     * 
-     * <p>This inline pass-through no-op should be compiled away.
-     *
-     * @param x Specified value.
-     * @return Specified value.
-     */
-    template <>
-    inline double value_of_rec<double>(const double x) {
-      return x; 
+    inline double value_of_rec(int x) {
+      return static_cast<double>(x);
     }
 
   }
