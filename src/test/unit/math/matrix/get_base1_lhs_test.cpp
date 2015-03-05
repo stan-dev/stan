@@ -1,6 +1,18 @@
 #include <stan/math/matrix/get_base1_lhs.hpp>
 #include <gtest/gtest.h>
 
+TEST(MathMatrix, failing_in_26) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::math::get_base1_lhs;
+  Matrix<double,Dynamic,Dynamic> y(2,3);
+  EXPECT_THROW(get_base1_lhs(y,3,1,"y",2), std::exception);
+  EXPECT_THROW(get_base1_lhs(y,1,4,"y",2), std::exception);
+  for (int i = 1; i <= 2; ++i)
+    for (int j = 1; j <= 3; ++j)
+      EXPECT_FLOAT_EQ(y(i-1,j-1), get_base1_lhs(y,i,j,"y",2));
+}
+
 TEST(MathMatrix,failing_pre_20) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
