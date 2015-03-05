@@ -132,6 +132,8 @@ endif
 	@echo '   To run a single header test, add "-test" to the end of the file name.'
 	@echo '   Example: make src/stan/math/constants.hpp-test'
 	@echo ''
+	@echo '  - test           : run all tests'
+	@echo ''
 	@echo '  Clean:'
 	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
 	@echo '  - clean-manual   : Cleans temporary files from building the manual.'
