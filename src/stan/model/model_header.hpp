@@ -6,6 +6,7 @@
 
 // FIXME: this currently needs to be included first
 #include <stan/math/prim/mat/fun/value_of_rec.hpp>
+#include <stan/math/prim/mat/meta/get.hpp>
 
 #include <stan/math/prim/arr.hpp>
 #include <stan/math/prim/mat.hpp>
