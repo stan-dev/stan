@@ -539,11 +539,6 @@ above could be declared as a parameter and initialized as a parameter.
 
 
 
-
-
-
-
-
 \section{General Configuration Options}\label{general-config.section}
 
 Stan's interfaces provide a number of configuration options that are
@@ -748,6 +743,40 @@ Stan models.
 
 The general configuration options for optimization are the same as
 those for MCMC;  see \refsection{general-config} for details.
+
+
+\section{Writing Models for Optimization}
+
+\subsection{Constrained vs.\ Unconstrained Parameters}
+
+For constrained optimization problems, for instance, with a standard
+deviation parameter $\sigma$ constrained so that $\sigma > 0$, it can
+be much more efficient to declare a parameter \code{sigma} with no
+constraints.  This allows the optimizer to easily get close to 0
+without having to tend toward $-\infty$ on the $\log \sigma$ scale.  
+
+The Jacobian adjustment is not an issue for posterior modes, because
+Stan turns off the built-in Jacobian adjustments for optimization.
+
+With unconstrained parameterizations of parameters with constrained
+support, it is important to provide a custom initialization that is
+within the support.  For example, declaring a vector
+%
+\begin{quote}
+\begin{Verbatim}
+vector[M] sigma;
+\end{Verbatim}
+\end{quote}
+%
+and using the default random initialization which is
+$\distro{Uniform}(-2,2)$ on the unconstrained scale, means that there
+is only a $2^{-M}$ chance that the initialization will be within
+support.  
+
+For any given optimization problem, it is probably worthwhile trying
+the program both ways, with and without the constraint, to see which
+one is more efficient.  
+
 
 
 \chapter{Diagnostic Mode}\label{diagnostic-algorithms.chapter}
