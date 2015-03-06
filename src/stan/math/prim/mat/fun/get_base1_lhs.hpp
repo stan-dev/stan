@@ -324,7 +324,7 @@ namespace stan {
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "rows of x", x.rows(), m, idx, error_msg);
-      check_range("[]", "cols of x", x.rows(), n, idx + 1, error_msg);
+      check_range("[]", "cols of x", x.cols(), n, idx + 1, error_msg);
       return x(m - 1, n - 1);
     }
 
