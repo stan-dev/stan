@@ -24,11 +24,11 @@ TEST(langParserStatementGrammar, validateIntExpr2) {
 
 TEST(langParserStatementGrammar, validateAllowSample) {
   test_throws("validate_allow_sample_bad1",
-              "sampling only allowed in model");
+              "Sampling statements (~) and increment_log_prob() are");
   test_throws("validate_allow_sample_bad2",
-              "sampling only allowed in model");
+              "Sampling statements (~) and increment_log_prob() are");
   test_throws("validate_allow_sample_bad3",
-              "sampling only allowed in model");
+              "Sampling statements (~) and increment_log_prob() are");
 }
 
 TEST(langParserStatementGrammarDef, jacobianAdjustmentWarning) {

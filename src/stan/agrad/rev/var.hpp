@@ -3,8 +3,11 @@
 
 #include <ostream>
 #include <stan/agrad/rev/vari.hpp>
+#include <boost/type_traits/is_arithmetic.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace stan {
+
   namespace agrad {
 
     // forward declare
@@ -52,153 +55,136 @@ namespace stan {
       }
 
       /**
-       * Construct a variable from a pointer to a variable implementation.
-       *
-       * @param vi Variable implementation. 
-       */
-      explicit var(vari* vi)
-        : vi_(vi) 
-      {  }
-
-      /**
        * Construct a variable for later assignment.   
        *
        * This is implemented as a no-op, leaving the underlying implementation
        * dangling.  Before an assignment, the behavior is thus undefined just
        * as for a basic double.
        */
-      var() 
-        : vi_(static_cast<vari*>(0U))
-      { }
+      var() : vi_(static_cast<vari*>(0U)) { }
 
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
+
+      /**
+       * Construct a variable from a pointer to a variable implementation.
        *
-       * @param b Value.
+       * @param vi Variable implementation. 
        */
-      var(bool b) :
-        vi_(new vari(static_cast<double>(b))) {
-      }
+      explicit var(vari* vi) : vi_(vi) {  }
 
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param c Value.
-       */
-      var(char c) :
-        vi_(new vari(static_cast<double>(c))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(short n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned short n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(long int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned long int n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(unsigned long long n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param n Value.
-       */
-      var(long long n) :
-        vi_(new vari(static_cast<double>(n))) {
-      }
-
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
-       *
-       * @param x Value.
-       */
-      var(float x) :
-        vi_(new vari(static_cast<double>(x))) {
-      }
-
-      /**      
-       * Construct a variable with the specified value.
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
        *
        * @param x Value of the variable.
        */
-      var(double x) :
-        vi_(new vari(x)) {
-      }
+      var(float x) : vi_(new vari(static_cast<double>(x))) { }
 
-      /**      
-       * Construct a variable by static casting the specified
-       * value to <code>double</code>.
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument as
+       * a value and a zero adjoint.
        *
-       * @param x Value.
+       * @param x Value of the variable.
        */
-      var(long double x) :
-        vi_(new vari(static_cast<double>(x))) {
-      }
+      var(double x) : vi_(new vari(x)) { }
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
+      var(long double x) : vi_(new vari(x)) { }
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
+      var(bool x) : vi_(new vari(static_cast<double>(x))) { }
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
+      var(char x) : vi_(new vari(static_cast<double>(x))) { }
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
+      var(short x) : vi_(new vari(static_cast<double>(x))) { }
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
+      var(int x) : vi_(new vari(static_cast<double>(x))) { }
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
+      var(long x) : vi_(new vari(static_cast<double>(x))) { }
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
+      var(unsigned char x) : vi_(new vari(static_cast<double>(x))) { }
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
+      var(unsigned short x) : vi_(new vari(static_cast<double>(x))) { }
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
+      var(unsigned int x) : vi_(new vari(static_cast<double>(x))) { }
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
+      var(unsigned long x) : vi_(new vari(static_cast<double>(x))) { }
+      
+#ifdef _WIN64
+      // in WIN64, size_t = unsigned long long, which is a C++11
+      // feature, so use this ctor to enable it
+      var(size_t x) : vi_(new vari(static_cast<double>(x))) { }
+      var(ptrdiff_t x) : vi_(new vari(static_cast<double>(x))) { }
+#endif
 
       /**
        * Return the value of this variable.
@@ -215,7 +201,7 @@ namespace stan {
        * after one of the <code>grad()</code> methods has been
        * called.  
        *
-       * @return Adjoint value for this variable.
+       * @return Adjoint for this variable.
        */
       inline double adj() const {
         return vi_->adj_;
