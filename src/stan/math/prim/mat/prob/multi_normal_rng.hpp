@@ -20,10 +20,10 @@ namespace stan {
   namespace prob {
     using Eigen::Dynamic;
 
-    template <class RNG>
+    template <class RNG, typename T1, typename T2>
     inline Eigen::VectorXd
-    multi_normal_rng(const Eigen::Matrix<double, Dynamic, 1>& mu,
-                     const Eigen::Matrix<double, Dynamic, Dynamic>& S,
+    multi_normal_rng(const Eigen::MatrixBase<T1>& mu,
+                     const Eigen::MatrixBase<T2>& S,
                      RNG& rng) {
       using boost::variate_generator;
       using boost::normal_distribution;
