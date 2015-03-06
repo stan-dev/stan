@@ -46,8 +46,8 @@ namespace stan {
 
     VectorView(std::vector<scalar_t>& v) : x_(&v[0]) { }
 
-    template <int R, int C>
-    VectorView(Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
+    template <typename ET>
+    VectorView(Eigen::MatrixBase<ET>& m) : x_(&m(0)) { }
 
     VectorView(scalar_t* x) : x_(x) { }
 
@@ -79,8 +79,8 @@ namespace stan {
 
     VectorView(const std::vector<scalar_t>& v) : x_(&v[0]) { }
 
-    template <int R, int C>
-    VectorView(const Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
+    template <typename ET>
+    VectorView(const Eigen::MatrixBase<ET>& m) : x_(&m(0)) { }
 
     const scalar_t& operator[](int i) const {
       if (throw_if_accessed) 
