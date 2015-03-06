@@ -20,9 +20,10 @@ namespace stan {
      * Return <code>true</code> if the specified matrix is symmetric.
      *
      * The error message is either 0 or 1 indexed, specified by
-     * <code>stan::error_index::value</code>.
+     * <code>stan::error_index::value</code>. Note that a 1x1 row or
+     * column vector is considered symmetric.
      *
-     * @tparam T_y Type of scalar.
+     * @tparam T Type of matrix.
      *
      * @param function Function name (for error messages)
      * @param name Variable name (for error messages)
@@ -33,18 +34,17 @@ namespace stan {
      * @throw <code>std::domain_error</code> if any element not on the
      *   main diagonal is <code>NaN</code>
      */
-    template <typename T_y>
+    template <typename T>
     inline bool
     check_symmetric(const char* function,
                     const char* name,
-                    const Eigen::Matrix<T_y, Dynamic, Dynamic>& y) {
+                    const Eigen::MatrixBase<T>& y) {
       check_square(function, name, y);
 
       using Eigen::Matrix;
       using stan::math::index_type;
 
-      typedef typename index_type<Matrix<T_y, Dynamic, Dynamic> >::type
-        size_type;
+      typedef typename index_type<T>::type size_type;
 
       size_type k = y.rows();
       if (k == 1)
