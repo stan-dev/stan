@@ -1,0 +1,4 @@
+functions foo {
+}
+model {
+}
