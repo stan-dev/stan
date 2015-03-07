@@ -433,6 +433,68 @@ a diagonal matrix, whihc is itself regularized toward a unit matrix.
 Variances or covariances are estimated using Welford accumulators
 to avoid a loss of precision over many floating point operations.
 
+\subsubsection{Warmup Times and Estimating the Mass Matrix}
+
+The mass matrix can compensate for linear (i.e. global) correlations
+in the posterior which can dramatically improve the performance of HMC
+in some problems. This requires knowing the global correlations.
+
+In complex models, the global correlations are usually difficult, if
+not impossible, to derivate analytically; for example, nonlinear model
+components convolve the scales of the data, so standardizing the data
+doesn’t always help.  Therefore, Stan estimates these correlations
+online with an adaptive warmup.  In models with strong nonlinear
+(i.e. local) correlations this learning can be slow, even with
+regularization. This is ultimately why warmup in Stan often needs to
+be so long, and why a sufficiently long warmup can yield such
+substantial performance improvements.
+
+\subsubsection{Nonlinearity}
+
+The mass matrix compensates for only linear (equivalently global or
+position-independent) correlations in the posterior. The hierarchical
+parameterizations, on the other hand, affect some of the nasty
+nonlinear (equivalently local or position-dependent) correlations
+common in hierarchical models.%
+%
+\footnote{Only in Riemannian HMC does the metric, which can be thought
+  of as a position-dependent mass matrix, start compensating for
+  nonlinear correlations.}
+
+One of the biggest difficulties with dense mass matrices is the
+estimation of the mass matrix itself which introduces a bit of a
+chicken-and-egg scenario;  in order to estimate an appropriate mass
+matrix for sampling, convergence is required, and in order to
+converge, an appropriate mass matrix is required.
+
+\subsubsection{Dense vs.\ Diagonal Mass Matrices}
+
+Statistical models for which sampling is problematic are not typically
+dominated by linear correlations for which a dense mass matrix can
+adjust.  Rather, they are governed by more complex nonlinear
+correlations that are best tackled with better parameterizations or
+more advanced algorithms, such as Riemannian HMC.
+
+\subsubsection{Warmup Times and Curvature}
+
+MCMC convergence time is roughly equivalent to the autocorrelation
+time.  Because HMC (and NUTS) chains tend to be lowly autocorrelated
+they also tend to converge quite rapidly. 
+
+This only applies wehn there is uniformity of curvature across the
+posterior, an assumption which is violated in many complex models.
+Quite often, the tails have large curvature while the bulk of the
+posterior mass is relatively well-behaved; in other words, warmup is slow
+not because the actual convergence time is slow but rather because the
+cost of an HMC iteration is more expensive out in the tails.
+
+Poor behavior in the tails is the kind of pathology that can be
+uncovered by running only a few warmup iterations. By looking at the
+acceptance probabilities and step sizes of the first few iterations
+provides an idea of how bad the problem is and whether it must be
+addressed with modeling efforts such as tighter priors or
+reparameterizations.  
+
 
 \subsection{NUTS and its Configuration}
 
