@@ -3,11 +3,17 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/throw_exception.hpp>
+#include <boost/type_traits/is_floating_point.hpp> 
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_arithmetic.hpp>
+#include <boost/utility/enable_if.hpp>
+
+
 
 #include <stan/io/var_context.hpp>
-#include <stan/math/matrix.hpp>
-#include <stan/math/meta/index_type.hpp>
-#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/math/prim/scal/meta/index_type.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
 
 #include <cctype>
 #include <iostream>
@@ -56,8 +62,23 @@ namespace stan {
       }
 
 
+      /**
+       * Write the sepcified floating-point value to the output,
+       * adding a period to the end if the output would otherwise not
+       * include a period or scientific notation.  This allows the
+       * parser to detect that this is a floating-point value.
+       *
+       * <p>The second argument should not be specified; it is only there
+       * to enable SFINAE to restrict the first argument to integral
+       * types.
+       *
+       * @tparam T Type of floating point input. 
+       * @param x Input.
+       * @paramu dummy Dummy pararameter to allow SFINAE.
+       */
       // adds period at end of output if necessary for double
-      void write_val(const double& x) {
+      template <typename T>
+      void write_val(T x, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0) {
         std::stringstream ss;
         ss << x;
         std::string s;
@@ -73,42 +94,39 @@ namespace stan {
         out_ << s << ".";
       }
 
-      void write_val(const unsigned long long int& n) {
+      /**
+       * Write the sepcified integer value to the output.  
+       *
+       * <p>The second argument should not be specified; it is only
+       * there to enable SFINAE to restrict the first argument to
+       * integral types.
+       *
+       * @tparam T Type of integral input. 
+       * @param x Input.
+       * @paramu dummy Dummy pararameter to allow SFINAE.
+       */
+      template <typename T>
+      void write_val(T n, typename boost::enable_if<boost::is_integral<T> >::type* dummy = 0) {
         out_ << n;
       }
 
-      void write_val(const unsigned long int& n) {
-        out_ << n;
+      /**
+       * Write the specified character as an integer.  
+       *
+       * @param c character to write
+       */
+      void write_val(char c) {
+        return write_val(static_cast<short>(c));
       }
 
-      void write_val(const unsigned int& n) {
-        out_ << n;
+      /**
+       * Write the specified unsigned character as an integer.  
+       *
+       * @param c character to write
+       */
+      void write_val(unsigned char c) {
+        return write_val(static_cast<unsigned short>(c));
       }
-
-      void write_val(const unsigned short& n) {
-        out_ << n;
-      }
-
-      void write_val(const long long& n) {
-        out_ << n;
-      }
-
-      void write_val(const long& n) {
-        out_ << n;
-      }
-
-      void write_val(const int& n) {
-        out_ << n;
-      }
-
-      void write_val(const short& n) {
-        out_ << n;
-      }
-
-      void write_val(const char& n) {
-        out_ << n;
-      }
-
 
       template <typename T>
       void write_list(T xs) {
@@ -240,10 +258,8 @@ namespace stan {
       void write_stan(const std::vector<int>& x) {
         write_list(x);
       }
-      void write_stan(double x) {
-        write_val(x);
-      }
-      void write_stan(int x) {
+      template <typename T>
+      void write_stan(T x, typename boost::enable_if<boost::is_arithmetic<T> >::type* dummy = 0) {
         write_val(x);
       }
       void write_stan(const Eigen::Matrix<double, 1, Dynamic>& x) {
@@ -269,7 +285,8 @@ namespace stan {
         out_ << "))";
       }
 
-    public:
+    public: 
+
       /**
        * Construct a dump writer writing to standard output.
        */

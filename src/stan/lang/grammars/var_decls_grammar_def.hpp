@@ -724,10 +724,11 @@ namespace stan {
             [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
                        boost::phoenix::ref(error_msgs_))]
             )
+        > eps        
+          [_pass = validate_decl_constraints_f(_r1,_a,_val,
+                                     boost::phoenix::ref(error_msgs_))]
+
         > lit(';')
-        [_pass 
-         = validate_decl_constraints_f(_r1,_a,_val,
-                                       boost::phoenix::ref(error_msgs_))]
         ;
 
       int_decl_r.name("integer declaration");
