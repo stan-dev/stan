@@ -4,10 +4,10 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <Eigen/Cholesky>
 
-#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 

@@ -1,6 +1,34 @@
 STAN C++ RELEASE NOTES
 ======================================================================
 
+v2.6.1 (3 March 2015)
+======================================================================
+Language Enhancements
+----------------------------------------
+* improved warning messages from the parser [#1244]
+
+API/Build/Test Enhancements
+----------------------------------------
+* the C++ API now throws 3 types of exceptions [#685]
+* parts of the C++ API were rearranged (gm, common) [#942]
+* replace promote_args
+* allow reading from a local makefile outside of the code repository [#1277]
+* added gradient of hessian functional in C++ [#1272]
+* supressed printing of adjoints when printing stan::agrad::var [#330]
+* removed some cpplint warnings [#1282]
+* removed doxygen warnings [#1290]
+* reimplemented fmix and fmax [#1311]
+
+Bug Fixes
+----------------------------------------
+* allow nested indexes to compile with integrate_ode [#1317]
+
+Documentation
+----------------------------------------
+* fixed typos in MCMC sampling
+
+
+
 v2.6.0 (5 February 2015)
 ======================================================================
 

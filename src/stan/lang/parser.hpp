@@ -110,8 +110,19 @@ namespace stan {
         if (output_stream && is_nonempty(diagnostics)) {
           msg << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
               << std::endl
-              << diagnostics
-              << std::endl;
+              << std::endl
+              << diagnostics;
+        }
+
+        if (output_stream) {
+          std::stringstream ss;
+          ss << e.what_;
+          std::string e_what = ss.str();
+          std::string angle_eps("<eps>");
+          if (e_what != angle_eps)
+            msg << "PARSER EXPECTED: "
+                << e.what_
+                << std::endl;
         }
 
         throw std::invalid_argument(msg.str());
@@ -134,15 +145,15 @@ namespace stan {
         std::stringstream msg;
         if (!parse_succeeded)
           msg << "PARSE FAILED." << std::endl; 
+
         if (!consumed_all_input) {
-          // get rest of program
           std::basic_stringstream<char> unparsed_non_ws;
           unparsed_non_ws << boost::make_iterator_range(fwd_begin, fwd_end);
-          // get next two lines (if possible)
-          msg << "PARSING HALTED AT LINE "
-              << get_line(fwd_begin)
+          msg << "PARSER EXPECTED: whitespace to end of file."
               << std::endl
-              << "UNPARSED STAN PROGRAM: "
+              << "FOUND AT line "
+              << get_line(fwd_begin)
+              << ": "
               << std::endl
               << unparsed_non_ws.str()
               << std::endl;
@@ -150,6 +161,7 @@ namespace stan {
         msg << std::endl << prog_grammar.error_msgs_.str() << std::endl;
         throw std::invalid_argument(msg.str());
       }
+
       return true;
     }
 

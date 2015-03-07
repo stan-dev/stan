@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/fpclassify.hpp>
 
+
 void test_list3(stan::io::dump_reader& reader,
                const std::vector<double>& vals) {
   std::vector<double> vals2 = reader.double_values();
@@ -612,4 +613,45 @@ TEST(io_dump, bad_syntax_seq2) {
 
 TEST(io_dump, bad_syntax_struct) {
   test_exception("a <- structure(1:2, .Dim = c(2,3) ");
+}
+
+template <typename T>
+void testWriteVal(const::std::string& expected_number_string,
+                  T x) {
+  std::stringstream s;
+  stan::io::dump_writer writer(s);
+  writer.write("foo", x);
+  std::string written = s.str();
+
+  std::stringstream ss_expected;
+  ss_expected << "\"foo\" <- "
+             << std::endl
+             << expected_number_string;
+  std::string expected = ss_expected.str();
+  EXPECT_EQ(expected, written);
+}
+
+TEST(ioDump, writeVal) {
+  testWriteVal("2", static_cast<char>(2));
+  testWriteVal("2", static_cast<short>(2));
+  testWriteVal("2", static_cast<int>(2));
+  testWriteVal("2", static_cast<long>(2));
+
+  testWriteVal("2", static_cast<unsigned char>(2));
+  testWriteVal("2", static_cast<unsigned short>(2));
+  testWriteVal("2", static_cast<unsigned int>(2));
+  testWriteVal("2", static_cast<unsigned long>(2));
+
+  testWriteVal("2", static_cast<size_t>(2));
+  testWriteVal("2", static_cast<ptrdiff_t>(2));
+
+  testWriteVal("2.", static_cast<float>(2.0));
+  testWriteVal("2.", static_cast<double>(2.0));
+
+  // need to make this round in binary to guarantee output
+  testWriteVal("2.5", static_cast<float>(2.5));
+  testWriteVal("2.5", static_cast<double>(2.5));
+
+  testWriteVal("1e+100", static_cast<double>(1e+100));
+  testWriteVal("-1e-100", static_cast<double>(-1e-100));
 }

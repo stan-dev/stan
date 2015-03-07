@@ -3,7 +3,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-#include <stan/math/matrix.hpp>
+#include <Eigen/Dense>
 #include <istream>
 #include <iostream>
 #include <sstream>
