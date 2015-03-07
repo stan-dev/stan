@@ -2,7 +2,9 @@
 #define STAN__IO__READER_HPP
 
 #include <boost/throw_exception.hpp>
-#include <stan/prob/transform.hpp>
+#include <stan/math/prim/arr.hpp>
+#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/scal.hpp>
 #include <vector>
 
 namespace stan {
