@@ -1734,7 +1734,7 @@ parameters are declared as follows.
 
 \begin{stancode}
 parameters {    
-  real delta;                  // mean student ability
+  real mu_beta;                  // mean student ability
   real alpha[J];               // ability for j - mean
   real beta[K];                // difficulty for k
   real<lower=0> gamma[K];      // discrimination of k
@@ -1801,14 +1801,14 @@ Non-centered parameterizations tend to be more efficient in
 hierarchical models; see \refsection{reparameterization} for more
 information on non-centered reparameterizations.
 
-The intercept term \code{delta} can't be modeled hierarchically, so it
-is given a weakly informative $\distro{Cauchy}(0,5)$ prior.
-Similarly, the scale terms, \code{sigma\_alpha}, \code{sigma\_beta},
-and \code{sigma\_gamma}, are given half-Cauchy priors.  The truncation
-in the half-Cauchy prior is implicit; explicit truncation is not
-necessary because the log probability need only be calculated up to a
-proportion and the scale variables are constrained to $(0,\infty)$ by 
-their declarations.
+The intercept term \code{mu\_beta} can't itself be modeled
+hierarchically, so it is given a weakly informative
+$\distro{Cauchy}(0,5)$ prior.  Similarly, the scale terms,
+\code{sigma\_alpha}, \code{sigma\_beta}, and \code{sigma\_gamma}, are
+given half-Cauchy priors.  The truncation in the half-Cauchy prior is
+implicit; explicit truncation is not necessary because the log
+probability need only be calculated up to a proportion and the scale
+variables are constrained to $(0,\infty)$ by their declarations.
 
 
 
@@ -6427,8 +6427,12 @@ transformed data {
 }
 parameters {
   real<lower=0> eta_sq;
-  real<lower=0> rho_sq;
+  real<lower=0> inv_rho_sq;
   real<lower=0> sigma_sq;
+}
+transformed parameters {
+  real<lower=0> rho_sq;
+  rho_sq <- inv(inv_rho_sq);
 }
 model {
   matrix[N,N] Sigma;
@@ -6444,7 +6448,7 @@ model {
     Sigma[k,k] <- eta_sq + sigma_sq;  // + jitter
 
   eta_sq ~ cauchy(0,5);
-  rho_sq ~ cauchy(0,5);
+  inv_rho_sq ~ cauchy(0,5);
   sigma_sq ~ cauchy(0,5);
 
   y ~ multi_normal(mu,Sigma);
@@ -6461,7 +6465,11 @@ precomputed as transformed data.  The rest of the model consists of
 the priors for the hyperparameters and the multivariate
 normal likelihood, only now the value \code{y} is known and the
 covariance matrix \code{Sigma} is an unknown dependent on the
-hyperparameters.  
+hyperparameters.  Note that a prior is put on the scale term
+\code{inv\_rho\_sq}, then \code{rho\_sq} is defined as
+\code{inv(inv\_rho\_sq)}, which is just a more efficient way of
+expressing \code{1~/~rho\_sq}.  An alternative would be to just divide
+by \code{inv\_rho\_sq}.
 
 Hamiltonian Monte Carlo sampling is quite fast and effective for
 hyperparameter inference in this model \citep{Neal:1997}, and the Stan
@@ -6502,8 +6510,8 @@ this subsection.
 The parameters $\rho$ and $\eta$ are only weakly identifiable, and the
 ratio of them is better identified and affects the
 nonlinearity. However it is usual to use independent priors.  It may
-be easier to formulate a prior for $1/rho$, which is the length
-scale.  
+be easier to formulate a prior for $1/\rho$, which is the length
+scale or $1/\rho^2$ as in the earlier example.  
 
 If the length scale is larger than the scale of the data the model is
 practically linear (with respect to the particular covariate) and
@@ -6531,7 +6539,7 @@ of x1 is higher. That is, $\rho$ is related to the relevance, but it
 is more accurate to say that it measures the nonlinearity or the
 expected number of upcrossings \cite[page~80]{RasmussenWilliams:2006}.
 
-The collection of $\rho_d$ (or $1/rho_d$) parameters can also be
+The collection of $\rho_d$ (or $1/\rho_d$) parameters can also be
 modeled hierarchically.
 
 
@@ -6704,7 +6712,7 @@ transformed data {
         K[i,j] <- exp(-pow(x1[i] - x2[j],2));
     
     K_transpose_div_Sigma <- K' / Sigma;
-<    mu <- K_transpose_div_Sigma * y1; 
+    mu <- K_transpose_div_Sigma * y1; 
     Tau <- Omega - K_transpose_div_Sigma * K;
     for (i in 1:(N2-1))
       for (j in (i+1):N2)
