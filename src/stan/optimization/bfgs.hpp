@@ -8,8 +8,8 @@
 
 #include <boost/math/special_functions/fpclassify.hpp>
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/model/util.hpp>
 
 #include <stan/optimization/bfgs_linesearch.hpp>
