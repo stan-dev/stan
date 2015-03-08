@@ -2,7 +2,7 @@
 #define STAN__MCMC__BASE__NUTS__BETA
 
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/functions/min.hpp>
+#include <stan/math/prim/scal/fun/min.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <math.h>
