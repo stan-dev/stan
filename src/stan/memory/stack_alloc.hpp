@@ -11,7 +11,7 @@
     #include <stdint.h> // FIXME: replace with cstddef?
 #endif
 #include <vector>
-#include <stan/meta/likely.hpp>
+#include <stan/math/prim/scal/meta/likely.hpp>
 
 namespace stan { 
 

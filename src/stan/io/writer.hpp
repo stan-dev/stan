@@ -1,10 +1,9 @@
 #ifndef STAN__IO__WRITER_HPP
 #define STAN__IO__WRITER_HPP
 
-#include <stan/math/matrix/meta/index_type.hpp>
-#include <stan/math/meta/index_type.hpp>
-#include <stan/prob/transform.hpp>
-
+#include <stan/math/prim/arr.hpp>
+#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/scal.hpp>
 #include <stdexcept>
 #include <vector>
 
