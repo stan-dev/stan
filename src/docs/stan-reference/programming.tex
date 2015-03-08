@@ -6885,6 +6885,41 @@ As with BUGS, Stan supports a direct encoding of reparameterizations.
 Stan also supports changes of variables by directly incrementing the
 log probability accumulator with the log Jacobian of the transform.
 
+\section{Theoretical and Practical Background}
+
+A Bayesian posterior is technically a probability \emph{measure},
+which is a parameterization-invariant, abstract mathematical object.%
+%
+\footnote{This is in contrast to (penalized) maximum likelihood
+  estimates, which are not parameterization invariant.}
+%
+Stan's modeling language, on the other hand, defines a probability
+\emph{density}, which is a non-unique, parameterization-dependent
+function in $\reals^N \rightarrow \reals^{+}$.  In practice, this
+means a given model can be represented different ways in Stan, and
+different representations have different computational performances.
+
+As pointed out by \cite{Gelman:2004} in a paper discussing the
+relation between parameterizations and Bayesian modeling, a change of
+parameterization often carries with it suggestions of how the model
+might change, because we tend to use certain natural classes of prior
+distributions.  Thus, it's not \emph{just}\ that we have a fixed
+distribution that we want to sample from, with reparameterizations
+being computational aids.  In addition, once we reparameterize and add
+prior information, the model itself typically changes, often in useful
+ways.%
+%
+\footnote{Gelman's handy statistical lexicon
+  (\url{http://andrewgelman.com/2009/05/24/handy_statistic/}) calls
+  this \emph{The Pinocchio Principle}, ``A model that is created
+  solely for computational reasons can take on a life of its own.''
+  This principle is also related to what Gelman calls \emph{The Folk
+    Theorem}, ``When you have computational problems, often there's a
+  problem with your model.''}
+
+
+
+
 \section{Reparameterizations}
 
 Reparameterizations may be implemented straightforwardly.  For
