@@ -1,13 +1,7 @@
 #include <gtest/gtest.h>
-
 #include <stan/model/util.hpp>
-
 #include <vector>
 #include <stan/io/reader.hpp>
-#include <stan/math/matrix/accumulator.hpp>
-#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
-#include <stan/prob/transform.hpp>
-
 #include <stan/io/dump.hpp>
 #include <test/test-models/good/model/valid.hpp>
 //#include <test/test-models/good/model/domain_fail.hpp>

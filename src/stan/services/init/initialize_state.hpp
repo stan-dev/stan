@@ -10,9 +10,9 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/interface/var_context_factory/var_context_factory.hpp>
 #include <stan/services/io/write_error_msg.hpp>
-#include <stan/math/functions/is_inf.hpp>
-#include <stan/math/functions/is_nan.hpp>
-#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/prim/scal/fun/is_inf.hpp>
+#include <stan/math/prim/scal/fun/is_nan.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 
 #include <math.h>
 #include <iostream>
