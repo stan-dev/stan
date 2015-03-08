@@ -22,6 +22,8 @@ std::vector<expr_type> primitive_types;
 primitive_types.push_back(INT_T);
 primitive_types.push_back(DOUBLE_T);
 
+add("sparse_multiply",VECTOR_T,INT_T,INT_T,VECTOR_T,INT_T,INT_T,INT_T, VECTOR_T);
+
 add_unary("abs");
 add("abs",INT_T,INT_T);
 add_unary("acos");
