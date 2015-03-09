@@ -76,10 +76,7 @@ namespace stan {
         : E(e),
           e_(e),
           line_(line),
-          what_(std::string("exception raised at line=")
-                + std::to_string(line)
-                + std::string(": ")
-                + std::string(e.what())) {
+          what_(construct_what(e,line)) {
       }
 
       /**
