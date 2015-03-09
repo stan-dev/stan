@@ -1,16 +1,25 @@
 #ifndef STAN__MODEL__UTIL_HPP
 #define STAN__MODEL__UTIL_HPP
 
+#include <stan/math/fwd/scal/fun/square.hpp>
+#include <stan/math/fwd/core.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/rev/mat/fun/grad.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/mix/mat/functor/derivative.hpp>
+#include <stan/math/mix/mat/functor/grad_hessian.hpp>
+#include <stan/math/mix/mat/functor/grad_tr_mat_times_hessian.hpp>
+#include <stan/math/mix/mat/functor/gradient.hpp>
+#include <stan/math/mix/mat/functor/gradient_dot_vector.hpp>
+#include <stan/math/mix/mat/functor/hessian.hpp>
+#include <stan/math/mix/mat/functor/hessian_times_vector.hpp>
+#include <stan/math/mix/mat/functor/jacobian.hpp>
+#include <stan/math/mix/mat/functor/partial_derivative.hpp>
+
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <vector>
-
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/matrix/grad.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/autodiff.hpp>
 
 namespace stan {
 

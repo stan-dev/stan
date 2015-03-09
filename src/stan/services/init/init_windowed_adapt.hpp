@@ -3,7 +3,7 @@
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
-#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/services/init/init_adapt.hpp>
 
 namespace stan {
