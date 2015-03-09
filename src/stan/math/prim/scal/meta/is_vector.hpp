@@ -7,7 +7,7 @@ namespace stan {
 
   template <typename T>
   struct is_vector {
-    enum { value = 0 };
+    enum { value = false };
     typedef T type;
   };
 }
