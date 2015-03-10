@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_AD_HPP
-#define STAN__MATH__PRIM__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_AD_HPP
+#ifndef STAN__MATH__REV__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_AD_HPP
+#define STAN__MATH__REV__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_AD_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/core.hpp>

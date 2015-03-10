@@ -18,6 +18,7 @@
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/fwd/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
+#include <test/unit/math/rev/mat/fun/util.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
