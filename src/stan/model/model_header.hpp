@@ -8,13 +8,13 @@
 #include <stan/math/prim/mat/fun/value_of_rec.hpp>
 #include <stan/math/prim/mat/meta/get.hpp>
 
+#include <stan/math/prim/scal.hpp>
 #include <stan/math/prim/arr.hpp>
 #include <stan/math/prim/mat.hpp>
-#include <stan/math/prim/scal.hpp>
 #include <stan/math/rev/core.hpp>
+#include <stan/math/rev/scal.hpp>
 #include <stan/math/rev/arr.hpp>
 #include <stan/math/rev/mat.hpp>
-#include <stan/math/rev/scal.hpp>
 
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
