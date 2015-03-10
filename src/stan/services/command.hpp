@@ -27,6 +27,8 @@
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/bfgs.hpp>
 
+#include <stan/vb/bbvb.hpp>
+
 #include <stan/services/diagnose.hpp>
 #include <stan/services/init.hpp>
 #include <stan/services/io.hpp>
@@ -55,7 +57,7 @@ namespace stan {
       valid_arguments.push_back(new stan::services::arg_init());
       valid_arguments.push_back(new stan::services::arg_random());
       valid_arguments.push_back(new stan::services::arg_output());
-      
+
       stan::services::argument_parser parser(valid_arguments);
 
       int err_code = parser.parse_args(argc, argv, &std::cout, &std::cout);
@@ -77,8 +79,8 @@ namespace stan {
       //////////////////////////////////////////////////
 
       unsigned int random_seed = 0;
-      
-      stan::services::u_int_argument* random_arg 
+
+      stan::services::u_int_argument* random_arg
         = dynamic_cast<stan::services::u_int_argument*>
         (parser.arg("random")->arg("seed"));
 
@@ -110,7 +112,7 @@ namespace stan {
       std::string data_file
         = dynamic_cast<stan::services::string_argument*>
         (parser.arg("data")->arg("file"))->value();
-      
+
       std::fstream data_stream(data_file.c_str(),
                                std::fstream::in);
       stan::io::dump data_var_context(data_stream);
@@ -129,7 +131,7 @@ namespace stan {
       std::string diagnostic_file
         = dynamic_cast<stan::services::string_argument*>
           (parser.arg("output")->arg("diagnostic_file"))->value();
-      
+
       std::fstream* diagnostic_stream = 0;
       if (diagnostic_file != "") {
         diagnostic_stream = new std::fstream(diagnostic_file.c_str(),
@@ -165,13 +167,13 @@ namespace stan {
 
       std::string init = dynamic_cast<stan::services::string_argument*>(
                          parser.arg("init"))->value();
-      
+
       interface::var_context_factory::dump_factory var_context_factory;
       if (!init::initialize_state<interface::var_context_factory::dump_factory>
           (init, cont_params, model, base_rng, &std::cout,
            var_context_factory))
         return stan::services::error_codes::SOFTWARE;
-      
+
       //////////////////////////////////////////////////
       //               Model Diagnostics              //
       //////////////////////////////////////////////////
@@ -181,19 +183,19 @@ namespace stan {
         for (int i = 0; i < cont_params.size(); ++i)
           cont_vector.at(i) = cont_params(i);
         std::vector<int> disc_vector;
-        
+
         stan::services::list_argument* test = dynamic_cast<stan::services::list_argument*>
                               (parser.arg("method")->arg("diagnose")->arg("test"));
-        
+
         if (test->value() == "gradient") {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
 
           double epsilon = dynamic_cast<stan::services::real_argument*>
                            (test->arg("gradient")->arg("epsilon"))->value();
-          
+
           double error = dynamic_cast<stan::services::real_argument*>
                          (test->arg("gradient")->arg("error"))->value();
-          
+
           int num_failed
             = stan::model::test_gradients<true, true>
             (model, cont_vector, disc_vector,
@@ -212,9 +214,9 @@ namespace stan {
               (model, cont_vector, disc_vector,
                epsilon, error, *diagnostic_stream);
           }
-          
+
           (void) num_failed; // FIXME: do something with the number failed
-          
+
           return stan::services::error_codes::OK;
 
         }
@@ -229,14 +231,14 @@ namespace stan {
         for (int i = 0; i < cont_params.size(); ++i)
           cont_vector.at(i) = cont_params(i);
         std::vector<int> disc_vector;
-        
+
         stan::services::list_argument* algo = dynamic_cast<stan::services::list_argument*>
                               (parser.arg("method")->arg("optimize")->arg("algorithm"));
 
         int num_iterations = dynamic_cast<stan::services::int_argument*>(
                              parser.arg("method")->arg("optimize")->arg("iter"))->value();
 
-        bool save_iterations 
+        bool save_iterations
           = dynamic_cast<stan::services::bool_argument*>(parser.arg("method")
                                          ->arg("optimize")
                                          ->arg("save_iterations"))->value();
@@ -311,7 +313,7 @@ namespace stan {
           bfgs._conv_opts.tolAbsX = dynamic_cast<stan::services::real_argument*>(
                          algo->arg("bfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
-          
+
           return_code = optimization::do_bfgs_optimize(model,bfgs, base_rng,
                                          lp, cont_vector, disc_vector,
                                          output_stream, &std::cout,
@@ -321,7 +323,7 @@ namespace stan {
           interface::callback::noop_callback callback;
           typedef stan::optimization::BFGSLineSearch
             <Model,stan::optimization::LBFGSUpdate<> > Optimizer;
-          
+
           Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
 
           bfgs.get_qnupdate().set_history_size(dynamic_cast<services::int_argument*>(
@@ -389,25 +391,25 @@ namespace stan {
         interface::recorder::csv sample_recorder(output_stream, "# ");
         interface::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
         interface::recorder::messages message_recorder(&std::cout, "# ");
-        
-        stan::io::mcmc_writer<Model, 
+
+        stan::io::mcmc_writer<Model,
                               interface::recorder::csv, interface::recorder::csv,
                               interface::recorder::messages>
           writer(sample_recorder, diagnostic_recorder, message_recorder, &std::cout);
-        
+
         // Sampling parameters
         int num_warmup = dynamic_cast<stan::services::int_argument*>(
                           parser.arg("method")->arg("sample")->arg("num_warmup"))->value();
-        
+
         int num_samples = dynamic_cast<stan::services::int_argument*>(
                           parser.arg("method")->arg("sample")->arg("num_samples"))->value();
-        
+
         int num_thin = dynamic_cast<stan::services::int_argument*>(
                        parser.arg("method")->arg("sample")->arg("thin"))->value();
-        
+
         bool save_warmup = dynamic_cast<stan::services::bool_argument*>(
                            parser.arg("method")->arg("sample")->arg("save_warmup"))->value();
-        
+
         stan::mcmc::sample s(cont_params, 0, 0);
 
         double warmDeltaT;
@@ -419,7 +421,7 @@ namespace stan {
         stan::services::list_argument* algo
           = dynamic_cast<stan::services::list_argument*>
             (parser.arg("method")->arg("sample")->arg("algorithm"));
-        
+
         stan::services::categorical_argument* adapt
           = dynamic_cast<stan::services::categorical_argument*>
             (parser.arg("method")->arg("sample")->arg("adapt"));
@@ -453,8 +455,8 @@ namespace stan {
 
         } else if (algo->value() == "hmc") {
           int engine_index = 0;
-          
-          stan::services::list_argument* engine 
+
+          stan::services::list_argument* engine
             = dynamic_cast<stan::services::list_argument*>
               (algo->arg("hmc")->arg("engine"));
 
@@ -465,7 +467,7 @@ namespace stan {
           }
 
           int metric_index = 0;
-          stan::services::list_argument* metric 
+          stan::services::list_argument* metric
             = dynamic_cast<stan::services::list_argument*>
               (algo->arg("hmc")->arg("metric"));
           if (metric->value() == "unit_e") {
@@ -620,14 +622,14 @@ namespace stan {
 
         // Warm-Up
         clock_t start = clock();
-        
+
         mcmc::warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
                                    refresh, save_warmup,
                                    writer,
                                    s, model, base_rng,
                                    prefix, suffix, std::cout,
                                    startTransitionCallback);
-        
+
         clock_t end = clock();
         warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
@@ -639,7 +641,7 @@ namespace stan {
 
         // Sampling
         start = clock();
-        
+
         mcmc::sample<Model, rng_t>
           (sampler_ptr, num_warmup, num_samples, num_thin,
            refresh, true,
@@ -647,7 +649,7 @@ namespace stan {
            s, model, base_rng,
            prefix, suffix, std::cout,
            startTransitionCallback);
-        
+
         end = clock();
         sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
@@ -655,6 +657,106 @@ namespace stan {
 
         if (sampler_ptr)
           delete sampler_ptr;
+      }
+
+      //////////////////////////////////////////////////
+      //            Variational Algorithms            //
+      //////////////////////////////////////////////////
+
+      if (parser.arg("method")->arg("variational")) {
+
+        stan::services::list_argument* algo
+          = dynamic_cast<stan::services::list_argument*>(parser.arg("method")
+            ->arg("variational")->arg("algorithm"));
+
+        int num_samples = dynamic_cast<stan::services::int_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("num_samples"))->value();
+
+        int num_iterations = dynamic_cast<stan::services::int_argument*>
+          (parser.arg("method")->arg("variational")->arg("iter"))->value();
+
+        double tol_rel_param = dynamic_cast<stan::services::real_argument*>
+          (parser.arg("method")->arg("variational")->arg("tol_rel_param"))->value();
+
+        bool save_iterations = dynamic_cast<stan::services::bool_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("save_variational"))->value();
+
+        if (algo->value() == "fullrank") {
+          double elbo = 0.0;
+          // cont_params = Eigen::VectorXd::Zero(model.num_params_r());
+
+          if (output_stream) {
+            std::vector<std::string> names;
+            names.push_back("lp");
+            names.push_back("ELBO");
+            model.constrained_param_names(names,true,true);
+
+            (*output_stream) << names.at(0);
+            for (size_t i = 1; i < names.size(); ++i) {
+              (*output_stream) << "," << names.at(i);
+            }
+            (*output_stream) << std::endl;
+            (*output_stream) << 0 << "," ;
+          }
+
+          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo,
+                                              num_samples, base_rng,
+                                              output_stream, diagnostic_stream);
+          cmd_vb.run_fullrank(num_iterations);
+
+          cont_params = cmd_vb.cont_params();
+
+          std::vector<double> cont_vector(cont_params.size());
+          for (int i = 0; i < cont_params.size(); ++i)
+            cont_vector.at(i) = cont_params(i);
+          std::vector<int> disc_vector;
+
+          if (output_stream) {
+            io::write_iteration(*output_stream, model, base_rng,
+                            elbo, cont_vector, disc_vector);
+          }
+
+        }
+
+        if (algo->value() == "meanfield") {
+          double elbo = 0.0;
+          // cont_params = Eigen::VectorXd::Zero(model.num_params_r());
+
+          if (output_stream) {
+            std::vector<std::string> names;
+            names.push_back("lp");
+            names.push_back("ELBO");
+            model.constrained_param_names(names,true,true);
+
+            (*output_stream) << names.at(0);
+            for (size_t i = 1; i < names.size(); ++i) {
+              (*output_stream) << "," << names.at(i);
+            }
+            (*output_stream) << std::endl;
+            (*output_stream) << 0 << "," ;
+          }
+
+          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo,
+                                              num_samples, base_rng,
+                                              output_stream, diagnostic_stream);
+          cmd_vb.run_meanfield(num_iterations);
+
+          cont_params = cmd_vb.cont_params();
+
+          std::vector<double> cont_vector(cont_params.size());
+          for (int i = 0; i < cont_params.size(); ++i)
+            cont_vector.at(i) = cont_params(i);
+          std::vector<int> disc_vector;
+
+          if (output_stream) {
+            io::write_iteration(*output_stream, model, base_rng,
+                            elbo, cont_vector, disc_vector);
+          }
+
+        }
+
       }
 
       if (output_stream) {

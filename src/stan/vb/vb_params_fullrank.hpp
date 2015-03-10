@@ -2,11 +2,10 @@
 #define STAN__VB__VB_PARAMS_FULLRANK__HPP
 
 #include <vector>
-
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/error_handling/matrix/check_size_match.hpp>
-#include <stan/error_handling/matrix/check_square.hpp>
-#include <stan/error_handling/matrix/check_cholesky_factor.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/scal/err/check_size_match.hpp>
+#include <stan/math/prim/mat/err/check_square.hpp>
+#include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
 
 namespace stan {
 

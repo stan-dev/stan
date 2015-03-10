@@ -2,9 +2,9 @@
 #define STAN__VB__VB_PARAMS_MEANFIELD__HPP
 
 #include <vector>
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/functions/max.hpp>
-#include <stan/error_handling/matrix/check_size_match.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/scal/err/check_size_match.hpp>
+#include <stan/math/prim/scal/fun/max.hpp>
 
 namespace stan {
 

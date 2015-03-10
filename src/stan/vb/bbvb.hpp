@@ -1,22 +1,20 @@
 #ifndef STAN__VB__BBVB__HPP
 #define STAN__VB__BBVB__HPP
 
-#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 
 #include <ostream>
-#include <stan/common/write_iteration_csv.hpp>
+#include <stan/services/io/write_iteration_csv.hpp>
 
-#include <stan/math/matrix/log_determinant.hpp>
+#include <stan/math/prim/mat/fun/log_determinant.hpp>
 #include <stan/model/util.hpp>
 
-#include <stan/math/functions.hpp>  // I had to add these two lines beceause
-#include <stan/math/matrix.hpp>     // the unit tests wouldn't compile...
+// #include <stan/math/functions.hpp>  // I had to add these two lines beceause
+// #include <stan/math/matrix.hpp>     // the unit tests wouldn't compile...
 
-#include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
-
-#include <stan/error_handling/matrix/check_size_match.hpp>
-#include <stan/error_handling/matrix/check_square.hpp>
-#include <stan/error_handling/scalar/check_not_nan.hpp>
+#include <stan/math/prim/mat/err/check_square.hpp>
+#include <stan/math/prim/scal/err/check_size_match.hpp>
+#include <stan/math/prim/scal/err/check_not_nan.hpp>
 
 #include <stan/vb/base_vb.hpp>
 #include <stan/vb/vb_params_fullrank.hpp>
@@ -365,7 +363,7 @@ namespace stan {
           if (err_stream_) {
             if ((i < 10 || (i<100 && i%10==0) || i%100==0)){
               print_vector.push_back(calc_ELBO(muL));
-              stan::common::write_iteration_csv(*err_stream_, i , print_vector);
+              services::io::write_iteration_csv(*err_stream_, i , print_vector);
             }
           }
 
@@ -444,7 +442,7 @@ namespace stan {
           if (err_stream_) {
             if ((i < 10 || (i<100 && i%10==0) || i%100==0)){
               print_vector.push_back(calc_ELBO(musigmatilde));
-              stan::common::write_iteration_csv(*err_stream_, i , print_vector);
+              services::io::write_iteration_csv(*err_stream_, i , print_vector);
             }
           }
 
