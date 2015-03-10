@@ -31,11 +31,11 @@ namespace stan {
      */
     template <typename F>
     void
-    finite_diff_grad_hessian_auto(const F& f,
-                                  const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
-                                  double& fx,
-                                  std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >& grad_hess_fx, 
-                                  const double epsilon = 1e-04) {
+    finite_diff_grad_hessian(const F& f,
+														 const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+														 double& fx,
+														 std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >& grad_hess_fx, 
+														 const double epsilon = 1e-04) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
 

@@ -156,8 +156,8 @@ TEST(AgradFiniteDiff,grad_hessian) {
 
   double f_fin_diff_eval(0);
   std::vector<Matrix<double,Dynamic,Dynamic> > fin_diff_grad_H_f;
-  stan::agrad::finite_diff_grad_hessian_auto(f,f_vec,f_fin_diff_eval,
-                                             fin_diff_grad_H_f);
+  stan::agrad::finite_diff_grad_hessian(f,f_vec,f_fin_diff_eval,
+                                        fin_diff_grad_H_f);
 
   std::vector<Matrix<double,Dynamic,Dynamic> > an_grad_H_f = 
     third_order_mixed_grad_hess(f_vec);
@@ -171,9 +171,9 @@ TEST(AgradFiniteDiff,grad_hessian) {
 
   double norm_fin_diff_eval;
   std::vector<Matrix<double,Dynamic,Dynamic> > fin_diff_grad_H_norm;
-  stan::agrad::finite_diff_grad_hessian_auto(norm,norm_vec,
-                                             norm_fin_diff_eval,
-                                             fin_diff_grad_H_norm);
+  stan::agrad::finite_diff_grad_hessian(norm,norm_vec,
+                                        norm_fin_diff_eval,
+                                        fin_diff_grad_H_norm);
 
   std::vector<Matrix<double,Dynamic,Dynamic> > an_grad_H_norm = 
     norm_grad_hess(norm_vec);
