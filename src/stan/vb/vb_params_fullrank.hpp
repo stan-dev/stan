@@ -6,6 +6,7 @@
 #include <stan/math/prim/scal/err/check_size_match.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>
 #include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
+#include <stan/math/prim/mat/fun/LDLT_factor.hpp>
 
 namespace stan {
 
@@ -47,6 +48,26 @@ namespace stan {
       // Mutators
       void set_mu(Eigen::VectorXd const& mu) { mu_ = mu; }
       void set_L_chol(Eigen::MatrixXd const& L_chol) { L_chol_ = L_chol; }
+
+      // Calculate natural parameters
+      Eigen::VectorXd nat_params() const {
+
+        // FIXME: stupid Eigen. can't initialize LLT factor with L.
+        // Compute the covariance matrix
+        Eigen::MatrixXd Sigma = L_chol_ * L_chol_.transpose();
+        stan::math::LDLT_factor<double,-1,-1> Sigma_LDLT(Sigma);
+
+        // Create a vector twice the dimension size
+        Eigen::VectorXd natural_params(dimension_ + dimension_^2);
+
+        // Concatenate the natural parameters
+        natural_params << (Sigma_LDLT.solve(mu_)).array(),
+                          (Sigma_LDLT.solve(
+                            Eigen::MatrixXd::Identity(dimension_,dimension_))
+                          ).array();
+
+        return natural_params;
+      }
 
       // Implements f^{-1}(\check{z}) = L\check{z} + \mu
       Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& z_check) const {

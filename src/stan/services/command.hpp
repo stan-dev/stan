@@ -706,7 +706,7 @@ namespace stan {
                                               base_rng,
                                               output_stream,
                                               refresh, diagnostic_stream);
-          cmd_vb.run_fullrank(max_iterations);
+          cmd_vb.run_fullrank(tol_rel_param, max_iterations);
 
           cont_params = cmd_vb.cont_params();
 
@@ -744,7 +744,7 @@ namespace stan {
                                               base_rng,
                                               output_stream,
                                               refresh, diagnostic_stream);
-          cmd_vb.run_meanfield(max_iterations);
+          cmd_vb.run_meanfield(tol_rel_param, max_iterations);
 
           cont_params = cmd_vb.cont_params();
 

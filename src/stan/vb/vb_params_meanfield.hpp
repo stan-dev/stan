@@ -47,7 +47,23 @@ namespace stan {
         sigma_tilde_ = sigma_tilde;
       }
 
-      // Implements f^{-1}(\check{z}) = sigma * \check{z} + \mu
+      // Calculate natural parameters
+      Eigen::VectorXd nat_params() const {
+
+        // Compute the variance
+        Eigen::VectorXd variance = sigma_tilde_.array().exp().square();
+
+        // Create a vector twice the dimension size
+        Eigen::VectorXd natural_params(2*dimension_);
+
+        // Concatenate the natural parameters
+        natural_params << mu_.array().cwiseQuotient(variance.array()),
+                          variance.array().cwiseInverse();
+
+        return natural_params;
+      }
+
+      // Implement f^{-1}(\check{z}) = sigma * \check{z} + \mu
       Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& z_check) const {
         static const char* function = "stan::vb::vb_params_meanfield"
                                       "::to_unconstrained(%1%)";

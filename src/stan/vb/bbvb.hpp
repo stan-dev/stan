@@ -6,15 +6,18 @@
 #include <ostream>
 #include <stan/services/io/write_iteration_csv.hpp>
 
-#include <stan/math/prim/mat/fun/log_determinant.hpp>
+// #include <stan/math/prim/mat/fun/log_determinant.hpp>
+// #include <stan/math/prim/arr/fun/dot_self.hpp>
 #include <stan/model/util.hpp>
 
 // #include <stan/math/functions.hpp>  // I had to add these two lines beceause
 // #include <stan/math/matrix.hpp>     // the unit tests wouldn't compile...
 
-#include <stan/math/prim/mat/err/check_square.hpp>
-#include <stan/math/prim/scal/err/check_size_match.hpp>
-#include <stan/math/prim/scal/err/check_not_nan.hpp>
+// #include <stan/math/prim/mat/err/check_square.hpp>
+// #include <stan/math/prim/scal/err/check_size_match.hpp>
+// #include <stan/math/prim/scal/err/check_not_nan.hpp>
+
+#include <stan/math/prim.hpp>
 
 #include <stan/vb/base_vb.hpp>
 #include <stan/vb/vb_params_fullrank.hpp>
@@ -301,9 +304,11 @@ namespace stan {
        * Runs Robbins-Monro Stochastic Gradient for some number of iterations
        *
        * @param muL            mean and cholesky factor of affine transform
-       * @param max_iterations number of iterations to run algorithm
+       * @param tol_rel_param   relative tolerance parameter for convergence
+       * @param max_iterations max number of iterations to run algorithm
        */
       void do_robbins_monro_adagrad( vb_params_fullrank& muL,
+                                     double tol_rel_param,
                                      int max_iterations ) {
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(model_.num_params_r(),
@@ -315,13 +320,20 @@ namespace stan {
         Eigen::MatrixXd L_s  = Eigen::MatrixXd::Zero(model_.num_params_r(),
                                                      model_.num_params_r());
 
-        // rmsprop parameters
+        // RMSprop window_size
         double window_size = 100.0;
+        double post_factor = 1.0 / window_size;
+        double pre_factor  = 1.0 - post_factor;
+
+        // Copy of previous parameters, for convergence check
+        vb_params_fullrank muL_prev = muL;
 
         std::vector<double> print_vector;
 
         for (int i = 0; i < max_iterations; ++i)
         {
+          muL_prev = muL;
+
           // Compute gradient using Monte Carlo integration
           calc_combined_grad(muL, mu_grad, L_grad);
 
@@ -329,11 +341,11 @@ namespace stan {
           mu_s.array() += mu_grad.array().square();
           L_s.array()  += L_grad.array().square();
 
-          // Moving average for rmsprop
-          mu_s.array() = ( 1 - 1.0/window_size ) * mu_s.array()
-                          + 1.0/window_size * mu_grad.array().square();
-          L_s.array()  = ( 1 - 1.0/window_size ) * L_s.array()
-                          + 1.0/window_size * L_grad.array().square();
+          // RMSprop moving average weighting
+          mu_s.array() = pre_factor * mu_s.array()
+                       + post_factor * mu_grad.array().square();
+          L_s.array()  = pre_factor * L_s.array()
+                       + post_factor * L_grad.array().square();
 
 
           // Take ADAgrad or rmsprop step
@@ -350,6 +362,13 @@ namespace stan {
           // std::cout
           // << "L_chol = "  << std::endl
           // << muL.L_chol() << std::endl;
+
+          // std::cout << muL_prev.nat_params()<< std::endl;
+          // std::cout << muL.nat_params()<< std::endl;
+          std::cout << "rel_obj_decrease = "
+                    << rel_obj_decrease(muL.nat_params(),
+                                        muL_prev.nat_params())
+                    << std::endl;
 
           // write elbo and parameters to "diagnostic stream"
           if (err_stream_) {
@@ -374,11 +393,14 @@ namespace stan {
        * Runs Robbins-Monro Stochastic Gradient for some number of iterations
        *
        * @param musigmatilde    mean and log-std vector of affine transform
-       * @param max_iterations  number of iterations to run algorithm
+       * @param tol_rel_param   relative tolerance parameter for convergence
+       * @param max_iterations  max number of iterations to run algorithm
        */
       void do_robbins_monro_adagrad( vb_params_meanfield& musigmatilde,
+                                     double tol_rel_param,
                                      int max_iterations ) {
 
+        // Gradients
         Eigen::VectorXd mu_grad           = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::VectorXd sigma_tilde_grad  = Eigen::VectorXd::Zero(model_.num_params_r());
 
@@ -389,11 +411,19 @@ namespace stan {
 
         // RMSprop window_size
         double window_size = 100.0;
+        double post_factor = 1.0 / window_size;
+        double pre_factor  = 1.0 - post_factor;
 
+        // Copy of previous parameters, for convergence check
+        vb_params_meanfield musigmatilde_prev = musigmatilde;
+
+        // Vector for diagnostic csv writer
         std::vector<double> print_vector;
 
         for (int i = 0; i < max_iterations; ++i)
         {
+          musigmatilde_prev = musigmatilde;
+
           // Compute gradient using Monte Carlo integration
           calc_combined_grad(musigmatilde, mu_grad, sigma_tilde_grad);
 
@@ -401,10 +431,11 @@ namespace stan {
           mu_s.array()           += mu_grad.array().square();
           sigma_tilde_s.array()  += sigma_tilde_grad.array().square();
 
-          mu_s.array() = ( 1.0 - 1.0/window_size ) * mu_s.array()
-                          + 1.0/window_size * mu_grad.array().square();
-          sigma_tilde_s.array()  = ( 1.0 - 1.0/window_size ) * sigma_tilde_s.array()
-                          + 1.0/window_size * sigma_tilde_grad.array().square();
+          // RMSprop moving average weighting
+          mu_s.array() = pre_factor * mu_s.array()
+                       + post_factor * mu_grad.array().square();
+          sigma_tilde_s.array()  = pre_factor * sigma_tilde_s.array()
+                                 + post_factor * sigma_tilde_grad.array().square();
 
           // Take ADAgrad or rmsprop step
           musigmatilde.set_mu(
@@ -415,6 +446,13 @@ namespace stan {
             musigmatilde.sigma_tilde().array()  +
             eta_stepsize_ * sigma_tilde_grad.array()  / (tau + sigma_tilde_s.array().sqrt())
             );
+
+          // std::cout << musigmatilde_prev.nat_params()<< std::endl;
+          // std::cout << musigmatilde.nat_params()<< std::endl;
+          std::cout << "rel_obj_decrease = "
+                    << rel_obj_decrease(musigmatilde.nat_params(),
+                                        musigmatilde_prev.nat_params())
+                    << std::endl;
 
           // print out to std::cout for now
           // std::cout
@@ -436,12 +474,9 @@ namespace stan {
         }
       }
 
-      void run_fullrank(int max_iterations) {
+      void run_fullrank(double tol_rel_param, int max_iterations) {
         std::cout
         << "This is base_vb::bbvb::run_fullrank()" << std::endl;
-        std::cout
-        << "cont_params_ = " << std::endl
-        << cont_params_ << std::endl << std::endl;
 
         // Initialize variational parameters: mu, L
         Eigen::VectorXd mu = cont_params_;
@@ -450,7 +485,7 @@ namespace stan {
         vb_params_fullrank muL = vb_params_fullrank(mu,L);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(muL, max_iterations);
+        do_robbins_monro_adagrad(muL, tol_rel_param, max_iterations);
 
         cont_params_ = muL.mu();
 
@@ -473,24 +508,19 @@ namespace stan {
         return;
       }
 
-      void run_meanfield(int max_iterations) {
+      void run_meanfield(double tol_rel_param, int max_iterations) {
         std::cout
         << "This is base_vb::bbvb::run_meanfield()" << std::endl;
-        std::cout
-        << "cont_params_ = " << std::endl
-        << cont_params_ << std::endl << std::endl;
 
         // Initialize variational parameters: mu, sigma_tilde
         Eigen::VectorXd mu           = cont_params_;
         Eigen::MatrixXd sigma_tilde  = Eigen::VectorXd::Constant(
                                                 model_.num_params_r(),
-                                                1.0
-                                                );
-
+                                                1.0);
         vb_params_meanfield musigmatilde = vb_params_meanfield(mu,sigma_tilde);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(musigmatilde, max_iterations);
+        do_robbins_monro_adagrad(musigmatilde, tol_rel_param, max_iterations);
 
         cont_params_ = musigmatilde.mu();
 
@@ -507,6 +537,13 @@ namespace stan {
 
       Eigen::VectorXd const& cont_params() {
         return cont_params_;
+      }
+
+      double rel_obj_decrease(Eigen::VectorXd const& prev,
+                              Eigen::VectorXd const& curr) const {
+        return (prev - curr).norm() / std::max(prev.norm(),
+                                               std::max(curr.norm(),
+                                                        1.0));
       }
 
     protected:
