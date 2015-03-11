@@ -20,6 +20,8 @@
 #include <stan/vb/vb_params_fullrank.hpp>
 #include <stan/vb/vb_params_meanfield.hpp>
 
+#include <stan/io/dump.hpp>
+
 namespace stan {
 
   namespace vb {
@@ -34,13 +36,16 @@ namespace stan {
            double& elbo,
            int& n_monte_carlo,
            BaseRNG& rng,
-           std::ostream* o, std::ostream* e):
-        base_vb(o, e, "bbvb"),
+           std::ostream* output_stream,
+           int& refresh,
+           std::ostream* diagnostic_stream):
+        base_vb(output_stream, diagnostic_stream, "bbvb"),
         model_(m),
         cont_params_(cont_params),
         elbo_(elbo),
         rng_(rng),
-        n_monte_carlo_(n_monte_carlo) {};
+        n_monte_carlo_(n_monte_carlo),
+        refresh_(refresh) {};
 
       virtual ~bbvb() {};
 
@@ -316,13 +321,6 @@ namespace stan {
 
         for (int i = 0; i < max_iterations; ++i)
         {
-          print_vector.clear();
-
-          std::cout
-          // << "----------------" << std::endl
-          << "  iter " << i     << std::endl;
-          // << "----------------" << std::endl;
-
           // Compute gradient using Monte Carlo integration
           calc_combined_grad(muL, mu_grad, L_grad);
 
@@ -352,21 +350,14 @@ namespace stan {
           // << "L_chol = "  << std::endl
           // << muL.L_chol() << std::endl;
 
-          // write elbo and parameters to "error stream"
-          // if (err_stream_){
-          //   for (int d = 0; d < muL.dimension(); ++d) {
-          //     print_vector.push_back(muL.mu()(d));
-          //   }
-          //   stan::common::write_iteration_csv(
-          //     *err_stream_, calc_ELBO(muL), print_vector);
-          // }
+          // write elbo and parameters to "diagnostic stream"
           if (err_stream_) {
-            if ((i < 10 || (i<100 && i%10==0) || i%100==0)){
+            if (i % refresh_ == 0) {
+              print_vector.clear();
               print_vector.push_back(calc_ELBO(muL));
               services::io::write_iteration_csv(*err_stream_, i , print_vector);
             }
           }
-
 
           // std::cout << "Sigma = " << std::endl
           //                               << muL.L_chol() * muL.L_chol().transpose() << std::endl;
@@ -403,13 +394,6 @@ namespace stan {
 
         for (int i = 0; i < max_iterations; ++i)
         {
-          print_vector.clear();
-
-          std::cout
-          // << "----------------" << std::endl
-          << "  iter " << i     << std::endl;
-          // << "----------------" << std::endl;
-
           // Compute gradient using Monte Carlo integration
           calc_combined_grad(musigmatilde, mu_grad, sigma_tilde_grad);
 
@@ -437,10 +421,10 @@ namespace stan {
           // << "mu = " << std::endl
           // << musigmatilde.mu() << std::endl;
 
-          // write elbo and parameters to "error stream"
-          // if ((i < 100 || i % 100 == 0) && err_stream_){
+          // write elbo and parameters to "diagnostic stream"
           if (err_stream_) {
-            if ((i < 10 || (i<100 && i%10==0) || i%100==0)){
+            if (i % refresh_ == 0) {
+              print_vector.clear();
               print_vector.push_back(calc_ELBO(musigmatilde));
               services::io::write_iteration_csv(*err_stream_, i , print_vector);
             }
@@ -478,6 +462,14 @@ namespace stan {
         std::cout
         << "Sigma = " << std::endl
         << muL.L_chol() * muL.L_chol().transpose() << std::endl;
+
+        // std::stringstream s;
+        // stan::io::dump_writer writer(s);
+        // writer.write("mu", muL.mu());
+        // s << "\n";
+        // writer.write("L_chol", muL.L_chol());
+        // std::string written = s.str();
+        // std::cout << written << std::endl;
 
         return;
       }
@@ -525,6 +517,7 @@ namespace stan {
       double elbo_;
       BaseRNG& rng_;
       int n_monte_carlo_;
+      int refresh_;
 
     };
 

@@ -679,13 +679,8 @@ namespace stan {
         double tol_rel_param = dynamic_cast<stan::services::real_argument*>
           (parser.arg("method")->arg("variational")->arg("tol_rel_param"))->value();
 
-        bool save_iterations = dynamic_cast<stan::services::bool_argument*>
-          (parser.arg("method")->arg("variational")
-                               ->arg("save_variational"))->value();
-
         if (algo->value() == "fullrank") {
           double elbo = 0.0;
-          // cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
           if (output_stream) {
             std::vector<std::string> names;
@@ -703,7 +698,8 @@ namespace stan {
 
           stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo,
                                               num_samples, base_rng,
-                                              output_stream, diagnostic_stream);
+                                              output_stream,
+                                              refresh, diagnostic_stream);
           cmd_vb.run_fullrank(num_iterations);
 
           cont_params = cmd_vb.cont_params();
@@ -722,7 +718,6 @@ namespace stan {
 
         if (algo->value() == "meanfield") {
           double elbo = 0.0;
-          // cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
           if (output_stream) {
             std::vector<std::string> names;
@@ -740,7 +735,8 @@ namespace stan {
 
           stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo,
                                               num_samples, base_rng,
-                                              output_stream, diagnostic_stream);
+                                              output_stream,
+                                              refresh, diagnostic_stream);
           cmd_vb.run_meanfield(num_iterations);
 
           cont_params = cmd_vb.cont_params();

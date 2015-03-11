@@ -7,7 +7,6 @@
 #include <stan/services/arguments/arg_variational_num_samples.hpp>
 #include <stan/services/arguments/arg_iter.hpp>
 #include <stan/services/arguments/arg_tolerance.hpp>
-#include <stan/services/arguments/arg_save_variational.hpp>
 
 namespace stan {
 
@@ -27,7 +26,6 @@ namespace stan {
         _subarguments.push_back(new arg_iter());
         _subarguments.push_back(new arg_tolerance("tol_rel_param",
           "Convergence tolerance on the relative norm of the parameters",1e+7));
-        _subarguments.push_back(new arg_save_variational());
 
       }
 
