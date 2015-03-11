@@ -35,6 +35,7 @@ namespace stan {
            Eigen::VectorXd& cont_params,
            double& elbo,
            int& n_monte_carlo,
+           double& eta_stepsize,
            BaseRNG& rng,
            std::ostream* output_stream,
            int& refresh,
@@ -45,6 +46,7 @@ namespace stan {
         elbo_(elbo),
         rng_(rng),
         n_monte_carlo_(n_monte_carlo),
+        eta_stepsize_(eta_stepsize),
         refresh_(refresh) {};
 
       virtual ~bbvb() {};
@@ -67,7 +69,7 @@ namespace stan {
         double elbo(0.0);
         int dim = muL.dimension();
 
-        int elbo_n_monte_carlo(5);
+        int elbo_n_monte_carlo(100);
 
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
@@ -308,7 +310,6 @@ namespace stan {
                                                         model_.num_params_r());
 
         // ADAgrad parameters
-        double eta = 0.1;
         double tau = 1.0;
         Eigen::VectorXd mu_s = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::MatrixXd L_s  = Eigen::MatrixXd::Zero(model_.num_params_r(),
@@ -337,9 +338,9 @@ namespace stan {
 
           // Take ADAgrad or rmsprop step
           muL.set_mu( muL.mu().array() +
-            eta * mu_grad.array() / (tau + mu_s.array().sqrt()) );
+            eta_stepsize_ * mu_grad.array() / (tau + mu_s.array().sqrt()) );
           muL.set_L_chol(  muL.L_chol().array()  +
-            eta * L_grad.array()  / (tau + L_s.array().sqrt()) );
+            eta_stepsize_ * L_grad.array()  / (tau + L_s.array().sqrt()) );
 
           // print out to std::cout for now
           // std::cout
@@ -360,7 +361,7 @@ namespace stan {
           }
 
           // std::cout << "Sigma = " << std::endl
-          //                               << muL.L_chol() * muL.L_chol().transpose() << std::endl;
+          // << muL.L_chol() * muL.L_chol().transpose() << std::endl;
 
 
         }
@@ -382,7 +383,6 @@ namespace stan {
         Eigen::VectorXd sigma_tilde_grad  = Eigen::VectorXd::Zero(model_.num_params_r());
 
         // ADAgrad parameters
-        double eta = 1.0;
         double tau = 1.0;
         Eigen::VectorXd mu_s          = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::VectorXd sigma_tilde_s = Eigen::VectorXd::Zero(model_.num_params_r());
@@ -409,11 +409,11 @@ namespace stan {
           // Take ADAgrad or rmsprop step
           musigmatilde.set_mu(
             musigmatilde.mu().array() +
-            eta * mu_grad.array() / (tau + mu_s.array().sqrt())
+            eta_stepsize_ * mu_grad.array() / (tau + mu_s.array().sqrt())
             );
           musigmatilde.set_sigma_tilde(
             musigmatilde.sigma_tilde().array()  +
-            eta * sigma_tilde_grad.array()  / (tau + sigma_tilde_s.array().sqrt())
+            eta_stepsize_ * sigma_tilde_grad.array()  / (tau + sigma_tilde_s.array().sqrt())
             );
 
           // print out to std::cout for now
@@ -429,7 +429,6 @@ namespace stan {
               services::io::write_iteration_csv(*err_stream_, i , print_vector);
             }
           }
-
 
           // std::cout << "sigma_tilde = " << std::endl
           //                               << musigmatilde.sigma_tilde() << std::endl;
@@ -517,6 +516,7 @@ namespace stan {
       double elbo_;
       BaseRNG& rng_;
       int n_monte_carlo_;
+      double eta_stepsize_;
       int refresh_;
 
     };

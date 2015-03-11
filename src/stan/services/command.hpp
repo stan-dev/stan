@@ -673,11 +673,16 @@ namespace stan {
           (parser.arg("method")->arg("variational")
                                ->arg("num_samples"))->value();
 
-        int num_iterations = dynamic_cast<stan::services::int_argument*>
+        int max_iterations = dynamic_cast<stan::services::int_argument*>
           (parser.arg("method")->arg("variational")->arg("iter"))->value();
 
         double tol_rel_param = dynamic_cast<stan::services::real_argument*>
-          (parser.arg("method")->arg("variational")->arg("tol_rel_param"))->value();
+          (parser.arg("method")->arg("variational")
+                               ->arg("tol_rel_param"))->value();
+
+        double eta_stepsize = dynamic_cast<stan::services::real_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("eta_stepsize"))->value();
 
         if (algo->value() == "fullrank") {
           double elbo = 0.0;
@@ -696,11 +701,12 @@ namespace stan {
             (*output_stream) << 0 << "," ;
           }
 
-          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo,
-                                              num_samples, base_rng,
+          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params,
+                                              elbo, num_samples, eta_stepsize,
+                                              base_rng,
                                               output_stream,
                                               refresh, diagnostic_stream);
-          cmd_vb.run_fullrank(num_iterations);
+          cmd_vb.run_fullrank(max_iterations);
 
           cont_params = cmd_vb.cont_params();
 
@@ -733,11 +739,12 @@ namespace stan {
             (*output_stream) << 0 << "," ;
           }
 
-          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params, elbo,
-                                              num_samples, base_rng,
+          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params,
+                                              elbo, num_samples, eta_stepsize,
+                                              base_rng,
                                               output_stream,
                                               refresh, diagnostic_stream);
-          cmd_vb.run_meanfield(num_iterations);
+          cmd_vb.run_meanfield(max_iterations);
 
           cont_params = cmd_vb.cont_params();
 
