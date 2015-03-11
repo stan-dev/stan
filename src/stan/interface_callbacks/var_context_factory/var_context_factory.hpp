@@ -1,10 +1,10 @@
-#ifndef STAN__INTERFACE__VAR_CONTEXT_FACTORY__VAR_CONTEXT_FACTORY_HPP
-#define STAN__INTERFACE__VAR_CONTEXT_FACTORY__VAR_CONTEXT_FACTORY_HPP
+#ifndef STAN__INTERFACE_CALLBACKS__VAR_CONTEXT_FACTORY__VAR_CONTEXT_FACTORY_HPP
+#define STAN__INTERFACE_CALLBACKS__VAR_CONTEXT_FACTORY__VAR_CONTEXT_FACTORY_HPP
 
 #include <string>
 
 namespace stan {
-  namespace interface {
+  namespace interface_callbacks {
     namespace var_context_factory {
 
       template <typename VARCON>

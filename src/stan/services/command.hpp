@@ -34,9 +34,9 @@
 #include <stan/services/optimization.hpp>
 
 // FIXME: These belong to the interfaces and should be templated out here
-#include <stan/interface/callback/noop_callback.hpp>
-#include <stan/interface/var_context_factory/dump_factory.hpp>
-#include <stan/interface/recorder.hpp>
+#include <stan/interface_callbacks/interrupt/noop.hpp>
+#include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
+#include <stan/interface_callbacks/writer.hpp>
 
 #include <fstream>
 #include <limits>
@@ -49,6 +49,29 @@ namespace stan {
 
     template <class Model>
     int command(int argc, const char* argv[]) {
+      
+      // BEGIN TEMP CALLBACKS
+      // FIXME: The below should all be callbacks created externally
+      
+      interface_callbacks::interrupt::noop interrupt;
+      
+      interface_callbacks::writer::cout info; // Informative messages
+      interface_callbacks::writer::cerr err;  // Error messages
+      
+      // Sample output
+      std::string output_file =
+        dynamic_cast<stan::services::string_argument*>
+        (parser.arg("output")->arg("file"))->value();
+      interface_callbacks::writer::fstream_csv output_stream(output_file);
+      
+      // Diagnostic output
+      std::string diagnostic_file =
+        dynamic_cast<stan::services::string_argument*>
+        (parser.arg("output")->arg("diagnostic_file"))->value();
+      interface_callbacks::writer::fstream_csv diagnostic_stream(diagnostic_file);
+      
+      // END TEMP CALLBACKS
+      
       std::vector<stan::services::argument*> valid_arguments;
       valid_arguments.push_back(new stan::services::arg_id());
       valid_arguments.push_back(new stan::services::arg_data());
@@ -61,7 +84,7 @@ namespace stan {
       int err_code = parser.parse_args(argc, argv, &std::cout, &std::cout);
 
       if (err_code != 0) {
-        std::cout << "Failed to parse arguments, terminating Stan" << std::endl;
+        info.write_message("Failed to parse arguments, terminating Stan");
         return err_code;
       }
 
@@ -116,26 +139,6 @@ namespace stan {
       stan::io::dump data_var_context(data_stream);
       data_stream.close();
 
-      // Sample output
-      std::string output_file = dynamic_cast<stan::services::string_argument*>(
-                                parser.arg("output")->arg("file"))->value();
-      std::fstream* output_stream = 0;
-      if (output_file != "") {
-        output_stream = new std::fstream(output_file.c_str(),
-                                         std::fstream::out);
-      }
-
-      // Diagnostic output
-      std::string diagnostic_file
-        = dynamic_cast<stan::services::string_argument*>
-          (parser.arg("output")->arg("diagnostic_file"))->value();
-      
-      std::fstream* diagnostic_stream = 0;
-      if (diagnostic_file != "") {
-        diagnostic_stream = new std::fstream(diagnostic_file.c_str(),
-                                             std::fstream::out);
-      }
-
       // Refresh rate
       int refresh = dynamic_cast<stan::services::int_argument*>(
                     parser.arg("output")->arg("refresh"))->value();
@@ -144,32 +147,28 @@ namespace stan {
       //                Initialize Model              //
       //////////////////////////////////////////////////
 
-      Model model(data_var_context, &std::cout);
+      Model model(data_var_context, &std::cout); /////***** FIXME NOW *****//////
 
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
-      parser.print(&std::cout);
+      parser.print(&std::cout); /////***** FIXME NOW *****//////
       std::cout << std::endl;
 
-      if (output_stream) {
-        io::write_stan(output_stream, "#");
-        io::write_model(output_stream, model.model_name(), "#");
-        parser.print(output_stream, "#");
-      }
+      services::io::write_stan(output_stream, "#");
+      services::io::write_model(output_stream, model.model_name(), "#");
+      parser.print(output_stream, "#");
 
-      if (diagnostic_stream) {
-        io::write_stan(diagnostic_stream, "#");
-        io::write_model(diagnostic_stream, model.model_name(), "#");
-        parser.print(diagnostic_stream, "#");
-      }
+      services::io::write_stan(diagnostic_stream, "#");
+      services::io::write_model(diagnostic_stream, model.model_name(), "#");
+      parser.print(diagnostic_stream, "#");
 
       std::string init = dynamic_cast<stan::services::string_argument*>(
                          parser.arg("init"))->value();
       
-      interface::var_context_factory::dump_factory var_context_factory;
-      if (!init::initialize_state<interface::var_context_factory::dump_factory>
+      interface_callbacks::var_context_factory::dump_factory var_context_factory;
+      if (!init::initialize_state<interface_callbacks::var_context_factory::dump_factory>
           (init, cont_params, model, base_rng, &std::cout,
-           var_context_factory))
+           var_context_factory)) /////***** FIXME NOW *****//////
         return stan::services::error_codes::SOFTWARE;
       
       //////////////////////////////////////////////////
@@ -186,7 +185,9 @@ namespace stan {
                               (parser.arg("method")->arg("diagnose")->arg("test"));
         
         if (test->value() == "gradient") {
-          std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
+
+          info.write_message("");
+          info.write_message("TEST GRADIENT MODE");
 
           double epsilon = dynamic_cast<stan::services::real_argument*>
                            (test->arg("gradient")->arg("epsilon"))->value();
@@ -197,21 +198,12 @@ namespace stan {
           int num_failed
             = stan::model::test_gradients<true, true>
             (model, cont_vector, disc_vector,
-             epsilon, error, std::cout);
+             epsilon, error, info);
 
-          if (output_stream) {
-            num_failed
-              = stan::model::test_gradients<true, true>
-              (model, cont_vector, disc_vector,
-               epsilon, error, *output_stream);
-          }
-
-          if (diagnostic_stream) {
-            num_failed
-              = stan::model::test_gradients<true, true>
-              (model, cont_vector, disc_vector,
-               epsilon, error, *diagnostic_stream);
-          }
+          num_failed
+            = stan::model::test_gradients<true, true>
+            (model, cont_vector, disc_vector,
+             epsilon, error, output_stream);
           
           (void) num_failed; // FIXME: do something with the number failed
           
@@ -225,6 +217,9 @@ namespace stan {
       //////////////////////////////////////////////////
 
       if (parser.arg("method")->arg("optimize")) {
+        
+        using interface_callbacks::writer;
+        
         std::vector<double> cont_vector(cont_params.size());
         for (int i = 0; i < cont_params.size(); ++i)
           cont_vector.at(i) = cont_params(i);
@@ -240,17 +235,11 @@ namespace stan {
           = dynamic_cast<stan::services::bool_argument*>(parser.arg("method")
                                          ->arg("optimize")
                                          ->arg("save_iterations"))->value();
-        if (output_stream) {
-          std::vector<std::string> names;
-          names.push_back("lp__");
-          model.constrained_param_names(names, true, true);
 
-          (*output_stream) << names.at(0);
-          for (size_t i = 1; i < names.size(); ++i) {
-            (*output_stream) << "," << names.at(i);
-          }
-          (*output_stream) << std::endl;
-        }
+        std::vector<std::string> names;
+        names.push_back("lp__");
+        model.constrained_param_names(names, true, true);
+        ouput_stream.write_state_names(names);
 
         double lp(0);
         int return_code = stan::services::error_codes::CONFIG;
@@ -258,45 +247,42 @@ namespace stan {
           std::vector<double> gradient;
           try {
             lp = model.template log_prob<false, false>
-              (cont_vector, disc_vector, &std::cout);
+              (cont_vector, disc_vector, &std::cout); /////***** FIXME NOW *****//////
           } catch (const std::exception& e) {
-            io::write_error_msg(&std::cout, e);
+            services::io::write_error_msg(err, e);
             lp = -std::numeric_limits<double>::infinity();
           }
 
-          std::cout << "initial log joint probability = " << lp << std::endl;
-          if (output_stream && save_iterations) {
-            io::write_iteration(*output_stream, model, base_rng,
-                            lp, cont_vector, disc_vector);
+          info.write_message("initial log joint probability = " + writer::to_string(lp));
+          if (save_iterations) {
+            services::io::write_iteration(output_stream, model, base_rng,
+                                          lp, cont_vector, disc_vector);
           }
 
           double lastlp = lp * 1.1;
           int m = 0;
-          std::cout << "(lp - lastlp) / lp > 1e-8: "
-                    << ((lp - lastlp) / fabs(lp)) << std::endl;
+          info.write_message("(lp - lastlp) / lp > 1e-8: "
+                             + :writer::to_string((lp - lastlp) / fabs(lp)));
           while ((lp - lastlp) / fabs(lp) > 1e-8) {
             lastlp = lp;
             lp = stan::optimization::newton_step
               (model, cont_vector, disc_vector);
-            std::cout << "Iteration ";
-            std::cout << std::setw(2) << (m + 1) << ". ";
-            std::cout << "Log joint probability = " << std::setw(10) << lp;
-            std::cout << ". Improved by " << (lp - lastlp) << ".";
-            std::cout << std::endl;
-            std::cout.flush();
+            info.write_message("Iteration " + writer::to_string(m + 1, 2) + ". "
+                               + "Log joint probability = " + writer::to_string(lp, 10)
+                               + ". Improved by " + writer::to_string(lp - lastlp) + ".");
             m++;
 
-            if (output_stream && save_iterations) {
-              io::write_iteration(*output_stream, model, base_rng,
-                              lp, cont_vector, disc_vector);
+            if (save_iterations) {
+              servides::io::write_iteration(output_stream, model, base_rng,
+                                            lp, cont_vector, disc_vector);
             }
           }
           return_code = stan::services::error_codes::OK;
         } else if (algo->value() == "bfgs") {
-          interface::callback::noop_callback callback;
+          
           typedef stan::optimization::BFGSLineSearch
             <Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
-          Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
+          Optimizer bfgs(model, cont_vector, disc_vector, &std::cout); /////***** FIXME NOW *****//////
 
           bfgs._ls_opts.alpha0 = dynamic_cast<stan::services::real_argument*>(
                          algo->arg("bfgs")->arg("init_alpha"))->value();
@@ -316,9 +302,9 @@ namespace stan {
                                          lp, cont_vector, disc_vector,
                                          output_stream, &std::cout,
                                          save_iterations, refresh,
-                                         callback);
+                                         interrupt); /////***** FIXME NOW *****//////
         } else if (algo->value() == "lbfgs") {
-          interface::callback::noop_callback callback;
+          
           typedef stan::optimization::BFGSLineSearch
             <Model,stan::optimization::LBFGSUpdate<> > Optimizer;
           
@@ -344,17 +330,14 @@ namespace stan {
                                          lp, cont_vector, disc_vector,
                                          output_stream, &std::cout,
                                          save_iterations, refresh,
-                                         callback);
+                                         interrupt); /////***** FIXME NOW *****//////
         } else {
           return_code = stan::services::error_codes::CONFIG;
         }
 
-        if (output_stream) {
-          io::write_iteration(*output_stream, model, base_rng,
-                          lp, cont_vector, disc_vector);
-          output_stream->close();
-          delete output_stream;
-        }
+        services::io::write_iteration(output_stream, model, base_rng,
+                                      lp, cont_vector, disc_vector);
+
         return return_code;
       }
 
@@ -616,7 +599,7 @@ namespace stan {
 
         std::string prefix = "";
         std::string suffix = "\n";
-        interface::callback::noop_callback startTransitionCallback;
+        interface_callbacks::interrupt::noop startTransitionCallback;
 
         // Warm-Up
         clock_t start = clock();
@@ -655,16 +638,6 @@ namespace stan {
 
         if (sampler_ptr)
           delete sampler_ptr;
-      }
-
-      if (output_stream) {
-        output_stream->close();
-        delete output_stream;
-      }
-
-      if (diagnostic_stream) {
-        diagnostic_stream->close();
-        delete diagnostic_stream;
       }
 
       for (size_t i = 0; i < valid_arguments.size(); ++i)

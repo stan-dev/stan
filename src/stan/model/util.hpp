@@ -273,13 +273,13 @@ namespace stan {
      * @return number of failed gradient comparisons versus allowed
      * error, so 0 if all gradients pass
      */
-    template <bool propto, bool jacobian_adjust_transform, class M>
+    template <bool propto, bool jacobian_adjust_transform, class M, class Writer>
     int test_gradients(const M& model,
                        std::vector<double>& params_r,
                        std::vector<int>& params_i,
                        double epsilon = 1e-6,
                        double error = 1e-6,
-                       std::ostream& o = std::cout,
+                       Writer& writer,
                        std::ostream* msgs = 0) {
       std::vector<double> grad;
       double lp 
@@ -299,24 +299,24 @@ namespace stan {
 
       int num_failed = 0;
         
-      o << std::endl
-        << " Log probability=" << lp
-        << std::endl;
+      writer.write_messgae("");
+      writer.write_message(" Log probability=" + Writer::to_string(lp));
+      writer.write_messgae("");
 
-      o << std::endl
-        << std::setw(10) << "param idx"
-        << std::setw(16) << "value"
-        << std::setw(16) << "model"
-        << std::setw(16) << "finite diff"
-        << std::setw(16) << "error" 
-        << std::endl;
+      writer.write_message("");
+      writer.write_message(  Writer::pad("param idx", 10)
+                           + Writer::pad("value", 16)
+                           + Writer::pad("model", 16)
+                           + Writer::pad("finite diff", 16)
+                           + Writer::pad("error", 16));
+      writer.write_message("");
+      
       for (size_t k = 0; k < params_r.size(); k++) {
-        o << std::setw(10) << k
-          << std::setw(16) << params_r[k]
-          << std::setw(16) << grad[k]
-          << std::setw(16) << grad_fd[k]
-          << std::setw(16) << (grad[k] - grad_fd[k])
-          << std::endl;
+        writer.write_message(  Writer::to_string(k, 10)
+                             + Writer::to_string(params_r[k], 16)
+                             + Writer::to_string(grad[k], 16)
+                             + Writer::to_string(grad_fd[k], 16)
+                             + Writer::to_string((grad[k] - grad_fd[k]), 16));
         if (std::fabs(grad[k] - grad_fd[k]) > error)
           num_failed++;
       }

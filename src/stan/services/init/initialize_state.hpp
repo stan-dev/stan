@@ -8,7 +8,6 @@
 
 #include <stan/model/util.hpp>
 #include <stan/services/error_codes.hpp>
-#include <stan/interface/var_context_factory/var_context_factory.hpp>
 #include <stan/services/io/write_error_msg.hpp>
 #include <stan/math/prim/scal/fun/is_inf.hpp>
 #include <stan/math/prim/scal/fun/is_nan.hpp>

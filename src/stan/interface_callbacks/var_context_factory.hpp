@@ -1,0 +1,7 @@
+#ifndef STAN__INTERFACE_CALLBACKS__VAR_CONTEXT_FACTORY__HPP
+#define STAN__INTERFACE_CALLBACKS__VAR_CONTEXT_FACTORY__HPP
+
+#include <stan/interface_callbacks/var_context_factory/var_context_factory.hpp>
+#include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
+
+#endif
