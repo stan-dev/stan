@@ -11,31 +11,26 @@ namespace stan {
       
     public:
       
-      virtual void print(std::ostream* s, const int depth, const std::string prefix) {
-        if (!s)
-          return;
-        
+      template <class Writer>
+      void print(Writer& writer, const int depth, const std::string prefix) {
         std::string indent(compute_indent(depth), ' ');
         
-        *s << prefix << indent << _name << " = " << print_value();
+        std::string msg = prefix + indent + _name + " = " + print_value();
         if(is_default())
-          *s << " (Default)";
-        *s << std::endl;
+          msg += " (Default)";
+        writer.write_message(msg);
       }
       
-      virtual void print_help(std::ostream* s, const int depth, const bool recurse = false) {
-        if (!s) 
-          return;
-        
+      template <class Writer>
+      void print_help(Writer& writer, const int depth, const bool recurse = false) {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
         
-        *s << indent << _name << "=<" << _value_type << ">" << std::endl;
-        *s << indent << subindent << _description << std::endl;
-        *s << indent << subindent << "Valid values:" << print_valid() << std::endl;
-        *s << indent << subindent << "Defaults to " << _default << std::endl;
-        *s << std::endl;
-        
+        writer.write_message(indent + _name + "=<" + _value_type + ">");
+        writer.write_message(indent + subindent + _description);
+        writer.write_message(indent + subindent + "Valid values:" + print_valid());
+        writer.write_message(indent + subindent + "Defaults to " + _default);
+        writer.write_message("");
       }
       
       virtual std::string print_value() = 0;

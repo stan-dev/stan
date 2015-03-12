@@ -1,7 +1,6 @@
 #ifndef STAN__SERVICES__ARGUMENTS__LIST__ARGUMENT__BETA
 #define STAN__SERVICES__ARGUMENTS__LIST__ARGUMENT__BETA
 
-#include <iostream>
 #include <stan/services/arguments/valued_argument.hpp>
 #include <stan/services/arguments/arg_fail.hpp>
 
@@ -28,25 +27,29 @@ namespace stan {
         
       }
 
-      void print(std::ostream* s, int depth, const std::string prefix) {
-        valued_argument::print(s, depth, prefix);
-        _values.at(_cursor)->print(s, depth + 1, prefix);
+      template <class Writer>
+      void print(Writer& writer, int depth, const std::string prefix) {
+        valued_argument::print(writer, depth, prefix);
+        _values.at(_cursor)->print(writer, depth + 1, prefix);
       }
       
-      void print_help(std::ostream* s, int depth, bool recurse) {
+      template <class Writer>
+      void print_help(Writer& writer, int depth, bool recurse) {
         _default = _values.at(_default_cursor)->name();
 
-        valued_argument::print_help(s, depth);
+        valued_argument::print_help(writer, depth);
         
         if (recurse) {
           for (std::vector<argument*>::iterator it = _values.begin();
                it != _values.end(); ++it)
-            (*it)->print_help(s, depth + 1, true);
+            (*it)->print_help(writer, depth + 1, true);
         }
       }
       
-      bool parse_args(std::vector<std::string>& args, std::ostream* out,
-                      std::ostream* err, bool& help_flag) {
+      template <class InfoWriter, class ErrWriter>
+      bool parse_args(std::vector<std::string>& args,
+                      InfoWriter& info, ErrWriter& err,
+                      bool& help_flag) {
         
         if(args.size() == 0) return true;
         
@@ -55,13 +58,13 @@ namespace stan {
         split_arg(args.back(), name, value);
         
         if(_name == "help") {
-          print_help(out, 0, false);
+          print_help(info, 0, false);
           help_flag |= true;
           args.clear();
           return false;
         }
         else if(_name == "help-all") {
-          print_help(out, 0, true);
+          print_help(info, 0, true);
           help_flag |= true;
           args.clear();
           return false;
@@ -77,18 +80,14 @@ namespace stan {
             if( _values.at(i)->name() != value) continue;
             
             _cursor = i;
-            valid_arg &= _values.at(_cursor)->parse_args(args, out, err, help_flag);
+            valid_arg &= _values.at(_cursor)->parse_args(args, info, err, help_flag);
             good_arg = true;
             break;
           }
           
           if(!good_arg) {
-            
-            if(err) {
-              *err << value << " is not a valid value for \"" << _name << "\"" << std::endl;
-              *err << std::string(indent_width, ' ') << "Valid values:" << print_valid() << std::endl;
-            }
-            
+            err.write_message(value + " is not a valid value for \"" + _name + "\"");
+            err.write_message(std::string(indent_width, ' ') + "Valid values:" + print_valid());
             args.clear();
           }
           

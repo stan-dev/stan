@@ -55,14 +55,15 @@ namespace stan {
         _name = name;
       }
 
-
-      bool parse_args(std::vector<std::string>& args, std::ostream* out,
-                      std::ostream* err, bool& help_flag) {
+      template <class InfoWriter, class ErrWriter>
+      bool parse_args(std::vector<std::string>& args,
+                      InfoWriter& info, ErrWriter& err,
+                      bool& help_flag) {
         if (args.size() == 0) 
           return true;
 
         if ( (args.back() == "help") || (args.back() == "help-all") ) {
-          print_help(out, 0);
+          print_help(info, 0);
           help_flag |= true;
           args.clear();
           return true;
@@ -79,14 +80,10 @@ namespace stan {
           T proposed_value = boost::lexical_cast<T>(value);
           
           if (!set_value(proposed_value)) {
-            
-            if (err) {
-              *err << proposed_value << " is not a valid value for "
-                   << "\"" << _name << "\"" << std::endl;
-              *err << std::string(indent_width, ' ') 
-                   << "Valid values:" << print_valid() << std::endl;
-            }
-            
+            err.write_message(proposed_value + " is not a valid value for "
+                              + "\"" + _name << "\"");
+            err.write_message(std::string(indent_width, ' ')
+                              + "Valid values:" << print_valid());
             args.clear();
             return false;
           }

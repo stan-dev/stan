@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <fstream>
 #include <cstring>
 
 #include <stan/services/arguments/argument.hpp>
@@ -25,13 +24,14 @@ namespace stan {
         _arguments.insert(_arguments.begin(), new arg_method());
       }
       
+      template <class InfoWriter, class ErrWriter>
       int parse_args(int argc,
                       const char* argv[],
-                      std::ostream* out = 0,
-                      std::ostream* err = 0) {
+                      InfoWriter& info,
+                      ErrWriter& err) {
         
         if (argc == 1) {
-          print_usage(out, argv[0]);
+          print_usage(info, argv[0]);
           return error_codes::USAGE;
         }
 
@@ -79,12 +79,12 @@ namespace stan {
           for (arg_it = unset_args.begin(); arg_it != unset_args.end(); ++arg_it) {
             if ( (*arg_it)->name() == cat_name) {
               args.pop_back();
-              valid_arg &= (*arg_it)->parse_args(args, out, err, _help_flag);
+              valid_arg &= (*arg_it)->parse_args(args, info, err, _help_flag);
               good_arg = true;
               break;
             }
             else if ( (*arg_it)->name() == val_name) {
-              valid_arg &= (*arg_it)->parse_args(args, out, err, _help_flag);
+              valid_arg &= (*arg_it)->parse_args(args, info, err, _help_flag);
               good_arg = true;
               break;
             }
@@ -97,19 +97,19 @@ namespace stan {
             _help_flag |= true;
             args.clear();
           } else if (cat_name == "help-all") {
-            print_help(out, true);
+            print_help(info, true);
             _help_flag |= true;
             args.clear();
           }
           
           if (_help_flag) {
-            print_usage(out, argv[0]);
+            print_usage(info, argv[0]);
             return error_codes::OK;
           }
           
-          if (!good_arg && err) {
+          if (!good_arg) {
           
-            *err << cat_name << " is either mistyped or misplaced." << std::endl;
+            err.write_message(cat_name + " is either mistyped or misplaced.");
           
             std::vector<std::string> valid_paths;
             
@@ -118,9 +118,9 @@ namespace stan {
             }
             
             if (valid_paths.size()) {
-              *err << "Perhaps you meant one of the following valid configurations?" << std::endl;
+              err.write_message("Perhaps you meant one of the following valid configurations?");
               for (size_t i = 0; i < valid_paths.size(); ++i)
-                *err << "  " << valid_paths.at(i) << std::endl;
+                err.write_message("  " + valid_paths.at(i));
             }
           }
         }
@@ -129,78 +129,68 @@ namespace stan {
           return error_codes::OK;
         
         if (!_method_flag)
-          *err << "A method must be specified!" << std::endl;
+          err.write_message("A method must be specified!");
         
         return (valid_arg && good_arg && _method_flag) ?
           error_codes::OK : error_codes::USAGE;
       }
       
-      void print(std::ostream* s, const std::string prefix = "") {
-        if (!s) 
-          return;
-
+      template <class Writer>
+      void print(Writer& writer, const std::string& prefix = "") {
         for (size_t i = 0; i < _arguments.size(); ++i) {
-          _arguments.at(i)->print(s, 0, prefix);
+          _arguments.at(i)->print(writer, 0, prefix);
         }
         
       }
       
-      void print_help(std::ostream* s, bool recurse) {
-        if (!s) 
-          return;
-        
+      template <class Writer>
+      void print_help(Writer& writer, bool recurse) {
         for (size_t i = 0; i < _arguments.size(); ++i) {
-          _arguments.at(i)->print_help(s, 1, recurse);
+          _arguments.at(i)->print_help(writer, 1, recurse);
         }
       }
       
-      void print_usage(std::ostream* s, const char* executable) {
-        if (!s)
-          return;
-        
+      template <class Writer>
+      void print_usage(Writer& writer, const char* executable) {
         std::string indent(2, ' ');
         int width = 12;
-        *s << std::left;
         
-        *s << "Usage: " << executable << " <arg1> <subarg1_1> ... <subarg1_m>"
-           << " ... <arg_n> <subarg_n_1> ... <subarg_n_m>"
-           << std::endl << std::endl;
+        writer.write_message("Usage: " + std::string(executable)
+                             + " <arg1> <subarg1_1> ... <subarg1_m>"
+                             + " ... <arg_n> <subarg_n_1> ... <subarg_n_m>");
+        writer.write_message("");
         
-        *s << "Begin by selecting amongst the following inference methods"
-           << " and diagnostics," << std::endl;
+        writer.write_message("Begin by selecting amongst the following "
+                             + "inference methods and diagnostics,");
 
         std::vector<argument*>::iterator arg_it = _arguments.begin();
         list_argument* method = dynamic_cast<list_argument*>(*arg_it);
         
         for (std::vector<argument*>::iterator value_it = method->values().begin();
              value_it != method->values().end(); ++value_it) {
-          *s << std::setw(width)
-             << indent + (*value_it)->name()
-             << indent + (*value_it)->description() << std::endl;
+          writer.write_messsage(  Writer::pad(indent + (*value_it)->name(), width)
+                                + indent + (*value_it)->description());
         }
-        *s << std::endl;
+        writer.write_message("");
         
-        *s << "Or see help information with" << std::endl;
-        *s << std::setw(width)
-           << indent + "help"
-           << indent + "Prints help" << std::endl;
-        *s << std::setw(width)
-           << indent + "help-all"
-           << indent + "Prints entire argument tree" << std::endl;
-        *s << std::endl;
+        writer.write_message("Or see help information with");
+        writer.write_message(Writer::pad(indent + "help", width) + indent + "Prints help");
+        writer.write_message(Writer::pad(indent + "help-all", width)
+                             + "Prints entire argument tree");
+        writer.write_message("");
         
-        *s << "Additional configuration available by specifying" << std::endl;
+        writer.write_message("Additional configuration available by specifying");
         
         ++arg_it;
         for (; arg_it != _arguments.end(); ++arg_it) {
-          *s << std::setw(width)
-             << indent + (*arg_it)->name()
-             << indent + (*arg_it)->description() << std::endl;
+          writer.write_messsage(  Writer::pad(indent + (*arg_it)->name(), width)
+                                + indent + (*arg_it)->description());
         }
         
-        *s << std::endl;
-        *s << "See " << executable << " <arg1> [ help | help-all ] "
-           << "for details on individual arguments." << std::endl << std::endl;
+        writer.write_message("");
+        writer.write_message(  "See " + executable + " <arg1> [ help | help-all ] "
+                             + "for details on individual arguments.");
+        writer.write_message("");
         
       }
       

@@ -21,18 +21,20 @@ namespace stan {
         _subarguments.clear();
       }
       
-      void print(std::ostream* s, const int depth, const std::string prefix) {
+      template <class Writer>
+      void print(Writer& writer, const int depth, const std::string prefix) {
         if (!s)
           return;
         std::string indent(compute_indent(depth), ' ');
-        *s << prefix << indent << _name << std::endl;
+        writer.write_message(prefix + indent + _name);
         
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
-          (*it)->print(s, depth + 1, prefix);
+          (*it)->print(writer, depth + 1, prefix);
       }
       
-      void print_help(std::ostream* s, const int depth, const bool recurse) {
+      template <class Writer>
+      void print_help(Writer& writer, const int depth, const bool recurse) {
         
         if (!s) 
           return;
@@ -40,33 +42,37 @@ namespace stan {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
         
-        *s << indent << _name << std::endl;
-        *s << indent << subindent << _description << std::endl;
+        writer.write_message(indent + _name);
+        writer.write_message(indent + subindent + _description);
         if (_subarguments.size() > 0) {
-          *s << indent << subindent << "Valid subarguments:";
+          std::string msg = indent + subindent + "Valid subarguments:";
           
           std::vector<argument*>::iterator it = _subarguments.begin();
-          *s << " " << (*it)->name();
+          message +=  " " + (*it)->name();
           ++it;
           
           for (; it != _subarguments.end(); ++it)
-            *s << ", " << (*it)->name();
-          *s << std::endl << std::endl;
+            msg +=  ", " + (*it)->name();
         
+          writer.write_message(msg);
+          writer.write_message("");
+          
           if (recurse) {
             for (std::vector<argument*>::iterator it = _subarguments.begin();
                  it != _subarguments.end(); ++it)
-              (*it)->print_help(s, depth + 1, true);
+              (*it)->print_help(writer, depth + 1, true);
           }
         }
         else {
-          *s << std::endl;
+          writer.write_message("");
         }
          
       }
       
-      bool parse_args(std::vector<std::string>& args, std::ostream* out,
-                      std::ostream* err, bool& help_flag) {
+      template <class InfoWriter, class ErrWriter>
+      bool parse_args(std::vector<std::string>& args,
+                      InfoWriter& info, ErrWriter& err,
+                      bool& help_flag) {
 
         bool good_arg = true;
         bool valid_arg = true;
@@ -80,12 +86,12 @@ namespace stan {
           std::string cat_name = args.back();
           
           if (cat_name == "help") {
-            print_help(out, 0, false);
+            print_help(info, 0, false);
             help_flag |= true;
             args.clear();
             return true;
           } else if (cat_name == "help-all") {
-            print_help(out, 0, true);
+            print_help(info, 0, true);
             help_flag |= true;
             args.clear();
             return true;
@@ -101,11 +107,11 @@ namespace stan {
                it != _subarguments.end(); ++it) {
             if ( (*it)->name() == cat_name) {
               args.pop_back();
-              valid_arg &= (*it)->parse_args(args, out, err, help_flag);
+              valid_arg &= (*it)->parse_args(args, info, err, help_flag);
               good_arg = true;
               break;
             } else if ( (*it)->name() == val_name ) {
-              valid_arg &= (*it)->parse_args(args, out, err, help_flag);
+              valid_arg &= (*it)->parse_args(args, info, err, help_flag);
               good_arg = true;
               break;
             } else {

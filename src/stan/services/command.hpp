@@ -81,7 +81,7 @@ namespace stan {
       
       stan::services::argument_parser parser(valid_arguments);
 
-      int err_code = parser.parse_args(argc, argv, &std::cout, &std::cout);
+      int err_code = parser.parse_args(argc, argv, info, err);
 
       if (err_code != 0) {
         info.write_message("Failed to parse arguments, terminating Stan");
@@ -151,8 +151,8 @@ namespace stan {
 
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
-      parser.print(&std::cout); /////***** FIXME NOW *****//////
-      std::cout << std::endl;
+      parser.print(cout); /////***** FIXME NOW *****//////
+      cout.write_message("");
 
       services::io::write_stan(output_stream, "#");
       services::io::write_model(output_stream, model.model_name(), "#");

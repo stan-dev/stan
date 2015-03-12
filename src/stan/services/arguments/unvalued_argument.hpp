@@ -16,28 +16,28 @@ namespace stan {
       unvalued_argument()
         : _is_present(false) {}
       
-      void print(std::ostream* s, const int depth, const std::string prefix) {}
+      template <class Writer>
+      void print(Writer& writer, const int depth, const std::string prefix) {}
       
-      void print_help(std::ostream* s, const int depth, const bool recurse = false) {
-        if (!s)
-          return;
-        
+      template <class Writer>
+      void print_help(Writer& writer, const int depth, const bool recurse = false) {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
 
-        *s << indent << _name << std::endl;
-        *s << indent << subindent << _description << std::endl;
-        *s << std::endl;
-        
+        writer.write_message(indent + _name);
+        writer.write_message(indent + subindent + _description);
+        writer.write_message();
       }
       
-      bool parse_args(std::vector<std::string>& args, std::ostream* out,
-                      std::ostream* err, bool& help_flag) {
+      template <class InfoWriter, class ErrWriter>
+      bool parse_args(std::vector<std::string>& args,
+                      InfoWriter& info, ErrWriter& err,
+                      bool& help_flag) {
         if (args.size() == 0)
           return true;
         
         if ((args.back() == "help") || (args.back() == "help-all")) {
-          print_help(out, 0);
+          print_help(info, 0);
           help_flag |= true;
           args.clear();
           return true;
