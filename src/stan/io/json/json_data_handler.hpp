@@ -3,7 +3,6 @@
 
 #include <boost/throw_exception.hpp>
 #include <boost/lexical_cast.hpp>
-#include <stan/math/matrix.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/json_parser.hpp>

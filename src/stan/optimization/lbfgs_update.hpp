@@ -6,7 +6,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/circular_buffer.hpp>
 
-#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 
 namespace stan {
   namespace optimization {

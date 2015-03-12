@@ -1,7 +1,7 @@
 #ifndef STAN__SERVICES__INIT__INIT_ADAPT_HPP
 #define STAN__SERVICES__INIT__INIT_ADAPT_HPP
 
-#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
 #include <stan/services/arguments/singleton_argument.hpp>

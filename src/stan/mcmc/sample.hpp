@@ -1,7 +1,7 @@
 #ifndef STAN__MCMC__SAMPLE__HPP
 #define STAN__MCMC__SAMPLE__HPP
 
-#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 
 #include <vector>
 #include <string>
