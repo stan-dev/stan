@@ -1,23 +1,17 @@
 #ifndef STAN__VB__BBVB__HPP
 #define STAN__VB__BBVB__HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-
+#include <boost/circular_buffer.hpp>
 #include <ostream>
-#include <stan/services/io/write_iteration_csv.hpp>
+#include <numeric>
 
-// #include <stan/math/prim/mat/fun/log_determinant.hpp>
-// #include <stan/math/prim/arr/fun/dot_self.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/model/util.hpp>
+
+#include <stan/services/io/write_iteration_csv.hpp>
 
 // #include <stan/math/functions.hpp>  // I had to add these two lines beceause
 // #include <stan/math/matrix.hpp>     // the unit tests wouldn't compile...
-
-// #include <stan/math/prim/mat/err/check_square.hpp>
-// #include <stan/math/prim/scal/err/check_size_match.hpp>
-// #include <stan/math/prim/scal/err/check_not_nan.hpp>
-
-#include <stan/math/prim.hpp>
 
 #include <stan/vb/base_vb.hpp>
 #include <stan/vb/vb_params_fullrank.hpp>
@@ -304,11 +298,11 @@ namespace stan {
        * Runs Robbins-Monro Stochastic Gradient for some number of iterations
        *
        * @param muL            mean and cholesky factor of affine transform
-       * @param tol_rel_param   relative tolerance parameter for convergence
+       * @param tol_rel_obj    relative tolerance parameter for convergence
        * @param max_iterations max number of iterations to run algorithm
        */
       void do_robbins_monro_adagrad( vb_params_fullrank& muL,
-                                     double tol_rel_param,
+                                     double tol_rel_obj,
                                      int max_iterations ) {
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(model_.num_params_r(),
@@ -328,11 +322,25 @@ namespace stan {
         // Copy of previous parameters, for convergence check
         vb_params_fullrank muL_prev = muL;
 
-        std::vector<double> print_vector;
+        // Initialize ELBO and convergence tracking variables
+        double elbo(0.0);
+        double elbo_prev = std::numeric_limits<double>::min();
+        double delta_elbo = std::numeric_limits<double>::max();
+        double delta_elbo_ave = std::numeric_limits<double>::max();
 
+        // Heuristic to estimate how far to look back in rolling window
+        int cb_size = (int)(0.1*max_iterations/static_cast<double>(refresh_));
+        boost::circular_buffer<double> cb(cb_size);
+
+        // Timing variables
+        clock_t start = clock();
+        clock_t end;
+        double delta_t;
+
+        // Main loop
+        std::vector<double> print_vector;
         bool do_more_iterations = true;
         int iter_counter = 0;
-        double delta = std::numeric_limits<double>::max();
         while (do_more_iterations) {
           muL_prev = muL;
 
@@ -349,35 +357,42 @@ namespace stan {
           L_s.array()  = pre_factor * L_s.array()
                        + post_factor * L_grad.array().square();
 
-
           // Take ADAgrad or rmsprop step
           muL.set_mu( muL.mu().array() +
             eta_stepsize_ * mu_grad.array() / (tau + mu_s.array().sqrt()) );
           muL.set_L_chol(  muL.L_chol().array()  +
             eta_stepsize_ * L_grad.array()  / (tau + L_s.array().sqrt()) );
 
-          // Relative change in natural parameters
-          delta = rel_param_decrease(muL.nat_params(),
-                                     muL_prev.nat_params());
-          std::cout << iter_counter << " delta = " << delta << std::endl;
+          // Check for convergence every "refresh_"th iteration
+          if (iter_counter % refresh_ == 0) {
+            elbo_prev = elbo;
+            elbo = calc_ELBO(muL);
+            delta_elbo = rel_decrease(elbo, elbo_prev);
+            cb.push_back(delta_elbo);
+            delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
+                             / static_cast<double>(cb_size);
+            std::cout << iter_counter << " delta_elbo_ave =  " << delta_elbo_ave << std::endl;
 
-          // Write elbo and parameters to "diagnostic stream"
-          if (err_stream_) {
-            if (iter_counter % refresh_ == 0) {
+            if (err_stream_) {
+              end = clock();
+              delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+
               print_vector.clear();
-              print_vector.push_back(calc_ELBO(muL));
+              print_vector.push_back(delta_t);
+              print_vector.push_back(elbo);
               services::io::write_iteration_csv(*err_stream_,
                                                 iter_counter, print_vector);
+            }
+
+            if (delta_elbo_ave < tol_rel_obj) {
+              std::cout << "ELBO CONVERGED" << std::endl;
+              do_more_iterations = false;
             }
           }
 
           // Check for max iterations
           if (iter_counter == max_iterations) {
-            do_more_iterations = false;
-          }
-
-          // Check for convergence
-          if (delta < tol_rel_param) {
+            std::cout << "MAX ITERATIONS" << std::endl;
             do_more_iterations = false;
           }
 
@@ -393,11 +408,11 @@ namespace stan {
        * Runs Robbins-Monro Stochastic Gradient for some number of iterations
        *
        * @param musigmatilde    mean and log-std vector of affine transform
-       * @param tol_rel_param   relative tolerance parameter for convergence
+       * @param tol_rel_obj   relative tolerance parameter for convergence
        * @param max_iterations  max number of iterations to run algorithm
        */
       void do_robbins_monro_adagrad( vb_params_meanfield& musigmatilde,
-                                     double tol_rel_param,
+                                     double tol_rel_obj,
                                      int max_iterations ) {
 
         // Gradients
@@ -470,7 +485,7 @@ namespace stan {
           }
 
           // Check for convergence
-          if (delta < tol_rel_param) {
+          if (delta < tol_rel_obj) {
             do_more_iterations = false;
           }
 
@@ -478,7 +493,7 @@ namespace stan {
         }
       }
 
-      void run_fullrank(double tol_rel_param, int max_iterations) {
+      void run_fullrank(double tol_rel_obj, int max_iterations) {
         std::cout
         << "This is base_vb::bbvb::run_fullrank()" << std::endl;
 
@@ -489,7 +504,7 @@ namespace stan {
         vb_params_fullrank muL = vb_params_fullrank(mu,L);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(muL, tol_rel_param, max_iterations);
+        do_robbins_monro_adagrad(muL, tol_rel_obj, max_iterations);
 
         cont_params_ = muL.mu();
 
@@ -512,7 +527,7 @@ namespace stan {
         return;
       }
 
-      void run_meanfield(double tol_rel_param, int max_iterations) {
+      void run_meanfield(double tol_rel_obj, int max_iterations) {
         std::cout
         << "This is base_vb::bbvb::run_meanfield()" << std::endl;
 
@@ -524,7 +539,7 @@ namespace stan {
         vb_params_meanfield musigmatilde = vb_params_meanfield(mu,sigma_tilde);
 
         // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(musigmatilde, tol_rel_param, max_iterations);
+        do_robbins_monro_adagrad(musigmatilde, tol_rel_obj, max_iterations);
 
         cont_params_ = musigmatilde.mu();
 
@@ -548,6 +563,10 @@ namespace stan {
         return (prev - curr).norm() / std::max(prev.norm(),
                                                std::max(curr.norm(),
                                                         1.0));
+      }
+
+      double rel_decrease(double prev, double curr) const {
+        return std::abs(curr - prev) / std::abs(prev);
       }
 
     protected:

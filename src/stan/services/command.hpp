@@ -676,9 +676,9 @@ namespace stan {
         int max_iterations = dynamic_cast<stan::services::int_argument*>
           (parser.arg("method")->arg("variational")->arg("iter"))->value();
 
-        double tol_rel_param = dynamic_cast<stan::services::real_argument*>
+        double tol_rel_obj = dynamic_cast<stan::services::real_argument*>
           (parser.arg("method")->arg("variational")
-                               ->arg("tol_rel_param"))->value();
+                               ->arg("tol_rel_obj"))->value();
 
         double eta_stepsize = dynamic_cast<stan::services::real_argument*>
           (parser.arg("method")->arg("variational")
@@ -706,7 +706,7 @@ namespace stan {
                                               base_rng,
                                               output_stream,
                                               refresh, diagnostic_stream);
-          cmd_vb.run_fullrank(tol_rel_param, max_iterations);
+          cmd_vb.run_fullrank(tol_rel_obj, max_iterations);
 
           cont_params = cmd_vb.cont_params();
 
@@ -744,7 +744,7 @@ namespace stan {
                                               base_rng,
                                               output_stream,
                                               refresh, diagnostic_stream);
-          cmd_vb.run_meanfield(tol_rel_param, max_iterations);
+          cmd_vb.run_meanfield(tol_rel_obj, max_iterations);
 
           cont_params = cmd_vb.cont_params();
 
