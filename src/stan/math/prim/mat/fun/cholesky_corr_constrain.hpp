@@ -4,6 +4,7 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>
+#include <stan/math/prim/scal/fun/corr_constrain.hpp>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
