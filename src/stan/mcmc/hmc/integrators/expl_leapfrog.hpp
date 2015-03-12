@@ -1,7 +1,7 @@
 #ifndef STAN__MCMC__EXPL__LEAPFROG__BETA
 #define STAN__MCMC__EXPL__LEAPFROG__BETA
 
-#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/mcmc/hmc/integrators/base_leapfrog.hpp>
 
 namespace stan {
