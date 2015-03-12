@@ -120,7 +120,7 @@ namespace stan {
         double elbo(0.0);
         int dim = musigmatilde.dimension();
 
-        int elbo_n_monte_carlo(5);
+        int elbo_n_monte_carlo(100);
 
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
@@ -370,7 +370,7 @@ namespace stan {
             delta_elbo = rel_decrease(elbo, elbo_prev);
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
-                             / static_cast<double>(cb_size);
+                             / (double)(cb.size());
             std::cout << iter_counter << " delta_elbo_ave =  " << delta_elbo_ave << std::endl;
 
             if (err_stream_) {
@@ -397,7 +397,6 @@ namespace stan {
           }
 
           ++iter_counter;
-
         }
       }
 
@@ -424,7 +423,7 @@ namespace stan {
         Eigen::VectorXd mu_s          = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::VectorXd sigma_tilde_s = Eigen::VectorXd::Zero(model_.num_params_r());
 
-        // RMSprop window_size
+                // RMSprop window_size
         double window_size = 100.0;
         double post_factor = 1.0 / window_size;
         double pre_factor  = 1.0 - post_factor;
@@ -432,12 +431,25 @@ namespace stan {
         // Copy of previous parameters, for convergence check
         vb_params_meanfield musigmatilde_prev = musigmatilde;
 
-        // Vector for diagnostic csv writer
-        std::vector<double> print_vector;
+        // Initialize ELBO and convergence tracking variables
+        double elbo(0.0);
+        double elbo_prev = std::numeric_limits<double>::min();
+        double delta_elbo = std::numeric_limits<double>::max();
+        double delta_elbo_ave = std::numeric_limits<double>::max();
 
+        // Heuristic to estimate how far to look back in rolling window
+        int cb_size = (int)(0.1*max_iterations/static_cast<double>(refresh_));
+        boost::circular_buffer<double> cb(cb_size);
+
+        // Timing variables
+        clock_t start = clock();
+        clock_t end;
+        double delta_t;
+
+        // Main loop
+        std::vector<double> print_vector;
         bool do_more_iterations = true;
         int iter_counter = 0;
-        double delta = std::numeric_limits<double>::max();
         while (do_more_iterations) {
           musigmatilde_prev = musigmatilde;
 
@@ -464,28 +476,36 @@ namespace stan {
             eta_stepsize_ * sigma_tilde_grad.array()  / (tau + sigma_tilde_s.array().sqrt())
             );
 
-          // Relative change in natural parameters
-          delta = rel_param_decrease(musigmatilde.nat_params(),
-                                     musigmatilde_prev.nat_params());
-          std::cout << iter_counter << " delta = " << delta << std::endl;
+          // Check for convergence every "refresh_"th iteration
+          if (iter_counter % refresh_ == 0) {
+            elbo_prev = elbo;
+            elbo = calc_ELBO(musigmatilde);
+            delta_elbo = rel_decrease(elbo, elbo_prev);
+            cb.push_back(delta_elbo);
+            delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
+                             / (double)(cb.size());
+            std::cout << iter_counter << " delta_elbo_ave =  " << delta_elbo_ave << std::endl;
 
-          // Write elbo and parameters to "diagnostic stream"
-          if (err_stream_) {
-            if (iter_counter % refresh_ == 0) {
+            if (err_stream_) {
+              end = clock();
+              delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+
               print_vector.clear();
-              print_vector.push_back(calc_ELBO(musigmatilde));
+              print_vector.push_back(delta_t);
+              print_vector.push_back(elbo);
               services::io::write_iteration_csv(*err_stream_,
                                                 iter_counter, print_vector);
+            }
+
+            if (delta_elbo_ave < tol_rel_obj) {
+              std::cout << "ELBO CONVERGED" << std::endl;
+              do_more_iterations = false;
             }
           }
 
           // Check for max iterations
           if (iter_counter == max_iterations) {
-            do_more_iterations = false;
-          }
-
-          // Check for convergence
-          if (delta < tol_rel_obj) {
+            std::cout << "MAX ITERATIONS" << std::endl;
             do_more_iterations = false;
           }
 
