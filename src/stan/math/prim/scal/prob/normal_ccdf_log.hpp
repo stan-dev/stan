@@ -83,7 +83,7 @@ namespace stan {
         if (contains_nonconstant_struct<T_y, T_loc, T_scale>::value) {
           const T_partials_return rep_deriv_div_sigma
             = scaled_diff > 8.25 * INV_SQRT_2
-            ? 0.0
+            ? std::numeric_limits<double>::infinity()
             : SQRT_TWO_OVER_PI * exp(-scaled_diff * scaled_diff)
             / one_m_erf / sigma_dbl;
           if (!is_constant_struct<T_y>::value)
