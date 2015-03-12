@@ -27,7 +27,7 @@ namespace stan {
         _subarguments.push_back(new arg_variational_eta_stepsize());
         _subarguments.push_back(new arg_iter());
         _subarguments.push_back(new arg_tolerance("tol_rel_param",
-          "Convergence tolerance on the relative norm of the parameters",1e+7));
+          "Convergence tolerance on the relative norm of the parameters",1e-3));
 
       }
 

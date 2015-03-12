@@ -330,8 +330,10 @@ namespace stan {
 
         std::vector<double> print_vector;
 
-        for (int i = 0; i < max_iterations; ++i)
-        {
+        bool do_more_iterations = true;
+        int iter_counter = 0;
+        double delta = std::numeric_limits<double>::max();
+        while (do_more_iterations) {
           muL_prev = muL;
 
           // Compute gradient using Monte Carlo integration
@@ -354,34 +356,32 @@ namespace stan {
           muL.set_L_chol(  muL.L_chol().array()  +
             eta_stepsize_ * L_grad.array()  / (tau + L_s.array().sqrt()) );
 
-          // print out to std::cout for now
-          // std::cout
-          // << "mu = "  << std::endl
-          // << muL.mu() << std::endl;
+          // Relative change in natural parameters
+          delta = rel_param_decrease(muL.nat_params(),
+                                     muL_prev.nat_params());
+          std::cout << iter_counter << " delta = " << delta << std::endl;
 
-          // std::cout
-          // << "L_chol = "  << std::endl
-          // << muL.L_chol() << std::endl;
-
-          // std::cout << muL_prev.nat_params()<< std::endl;
-          // std::cout << muL.nat_params()<< std::endl;
-          std::cout << "rel_obj_decrease = "
-                    << rel_obj_decrease(muL.nat_params(),
-                                        muL_prev.nat_params())
-                    << std::endl;
-
-          // write elbo and parameters to "diagnostic stream"
+          // Write elbo and parameters to "diagnostic stream"
           if (err_stream_) {
-            if (i % refresh_ == 0) {
+            if (iter_counter % refresh_ == 0) {
               print_vector.clear();
               print_vector.push_back(calc_ELBO(muL));
-              services::io::write_iteration_csv(*err_stream_, i , print_vector);
+              services::io::write_iteration_csv(*err_stream_,
+                                                iter_counter, print_vector);
             }
           }
 
-          // std::cout << "Sigma = " << std::endl
-          // << muL.L_chol() * muL.L_chol().transpose() << std::endl;
+          // Check for max iterations
+          if (iter_counter == max_iterations) {
+            do_more_iterations = false;
+          }
 
+          // Check for convergence
+          if (delta < tol_rel_param) {
+            do_more_iterations = false;
+          }
+
+          ++iter_counter;
 
         }
       }
@@ -420,8 +420,10 @@ namespace stan {
         // Vector for diagnostic csv writer
         std::vector<double> print_vector;
 
-        for (int i = 0; i < max_iterations; ++i)
-        {
+        bool do_more_iterations = true;
+        int iter_counter = 0;
+        double delta = std::numeric_limits<double>::max();
+        while (do_more_iterations) {
           musigmatilde_prev = musigmatilde;
 
           // Compute gradient using Monte Carlo integration
@@ -447,30 +449,32 @@ namespace stan {
             eta_stepsize_ * sigma_tilde_grad.array()  / (tau + sigma_tilde_s.array().sqrt())
             );
 
-          // std::cout << musigmatilde_prev.nat_params()<< std::endl;
-          // std::cout << musigmatilde.nat_params()<< std::endl;
-          std::cout << "rel_obj_decrease = "
-                    << rel_obj_decrease(musigmatilde.nat_params(),
-                                        musigmatilde_prev.nat_params())
-                    << std::endl;
+          // Relative change in natural parameters
+          delta = rel_param_decrease(musigmatilde.nat_params(),
+                                     musigmatilde_prev.nat_params());
+          std::cout << iter_counter << " delta = " << delta << std::endl;
 
-          // print out to std::cout for now
-          // std::cout
-          // << "mu = " << std::endl
-          // << musigmatilde.mu() << std::endl;
-
-          // write elbo and parameters to "diagnostic stream"
+          // Write elbo and parameters to "diagnostic stream"
           if (err_stream_) {
-            if (i % refresh_ == 0) {
+            if (iter_counter % refresh_ == 0) {
               print_vector.clear();
               print_vector.push_back(calc_ELBO(musigmatilde));
-              services::io::write_iteration_csv(*err_stream_, i , print_vector);
+              services::io::write_iteration_csv(*err_stream_,
+                                                iter_counter, print_vector);
             }
           }
 
-          // std::cout << "sigma_tilde = " << std::endl
-          //                               << musigmatilde.sigma_tilde() << std::endl;
+          // Check for max iterations
+          if (iter_counter == max_iterations) {
+            do_more_iterations = false;
+          }
 
+          // Check for convergence
+          if (delta < tol_rel_param) {
+            do_more_iterations = false;
+          }
+
+          ++iter_counter;
         }
       }
 
@@ -539,8 +543,8 @@ namespace stan {
         return cont_params_;
       }
 
-      double rel_obj_decrease(Eigen::VectorXd const& prev,
-                              Eigen::VectorXd const& curr) const {
+      double rel_param_decrease(Eigen::VectorXd const& prev,
+                                Eigen::VectorXd const& curr) const {
         return (prev - curr).norm() / std::max(prev.norm(),
                                                std::max(curr.norm(),
                                                         1.0));
