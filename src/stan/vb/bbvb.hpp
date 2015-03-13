@@ -220,6 +220,8 @@ namespace stan {
 
         // Add gradient of entropy term
         L_grad.diagonal().array() += muL.L_chol().diagonal().array().inverse();
+
+        stan::agrad::recover_memory();
       }
 
 
@@ -290,6 +292,8 @@ namespace stan {
 
         // Add gradient of entropy term (just equal to element-wise 1 here)
         sigma_tilde_grad.array() += 1.0;
+
+        stan::agrad::recover_memory();
       }
 
 
