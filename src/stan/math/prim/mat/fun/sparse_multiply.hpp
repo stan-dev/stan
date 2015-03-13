@@ -50,7 +50,7 @@ namespace stan {
       for (int j = 0; j < n; ++j) {
         int end = u[j] + z[j] - 1;
         for (int q = u[j] - 1; q < end; ++q)
-          y(v[q]) += w[q] * b[j];
+          y[v[q]] += w[q] * b[j];
       }
       return y;
     }
@@ -93,11 +93,15 @@ namespace stan {
       typedef typename boost::math::tools::promote_args<T1, T2>::type fun_scalar_t;
       Eigen::Matrix<fun_scalar_t, Eigen::Dynamic, 1>  y(m);
       for (int i = 0; i < m; ++i) {
-        int end = u[j] + z[j] - 1;
-        for (int q = u[j] - 1; q < end; ++q)
+				// int start = u[i] - 2
+        int end = u[i] + z[i] - 1;
+        for (int q = u[i] - 1; q < end; ++q)
 					// Now this is the compressed row format version.  FIXME:
-					// Modify to use dot product function.
-          y(i) += w[q] * b[v[q]];
+					// Modify to use dot product function.  The pieces are:
+					// y[i] (easy)... 
+					// w[start:end] 
+					// b[v[start:end]] copied to a std::vector<double>...
+          y[i] += w[q] * b[v[q]];
       }
       return y;
     }
