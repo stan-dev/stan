@@ -4,6 +4,7 @@
 #include <boost/circular_buffer.hpp>
 #include <ostream>
 #include <numeric>
+#include <algorithm>
 
 #include <stan/math/prim.hpp>
 #include <stan/model/util.hpp>
@@ -327,6 +328,7 @@ namespace stan {
         double elbo_prev = std::numeric_limits<double>::min();
         double delta_elbo = std::numeric_limits<double>::max();
         double delta_elbo_ave = std::numeric_limits<double>::max();
+        double delta_elbo_med = std::numeric_limits<double>::max();
 
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = (int)(0.1*max_iterations/static_cast<double>(refresh_));
@@ -371,7 +373,9 @@ namespace stan {
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / (double)(cb.size());
+            delta_elbo_med = alp_median(cb);
             std::cout << iter_counter << " delta_elbo_ave =  " << delta_elbo_ave << std::endl;
+            std::cout << iter_counter << " delta_elbo_med =  " << delta_elbo_med << std::endl;
 
             if (err_stream_) {
               end = clock();
@@ -385,7 +389,12 @@ namespace stan {
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
-              std::cout << "ELBO CONVERGED" << std::endl;
+              std::cout << "MEAN ELBO CONVERGED" << std::endl;
+              do_more_iterations = false;
+            }
+
+            if (delta_elbo_med < tol_rel_obj) {
+              std::cout << "MEDIAN ELBO CONVERGED" << std::endl;
               do_more_iterations = false;
             }
           }
@@ -423,7 +432,7 @@ namespace stan {
         Eigen::VectorXd mu_s          = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::VectorXd sigma_tilde_s = Eigen::VectorXd::Zero(model_.num_params_r());
 
-                // RMSprop window_size
+        // RMSprop window_size
         double window_size = 100.0;
         double post_factor = 1.0 / window_size;
         double pre_factor  = 1.0 - post_factor;
@@ -436,6 +445,7 @@ namespace stan {
         double elbo_prev = std::numeric_limits<double>::min();
         double delta_elbo = std::numeric_limits<double>::max();
         double delta_elbo_ave = std::numeric_limits<double>::max();
+        double delta_elbo_med = std::numeric_limits<double>::max();
 
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = (int)(0.1*max_iterations/static_cast<double>(refresh_));
@@ -484,7 +494,9 @@ namespace stan {
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / (double)(cb.size());
+            delta_elbo_med = alp_median(cb);
             std::cout << iter_counter << " delta_elbo_ave =  " << delta_elbo_ave << std::endl;
+            std::cout << iter_counter << " delta_elbo_med =  " << delta_elbo_med << std::endl;
 
             if (err_stream_) {
               end = clock();
@@ -498,9 +510,15 @@ namespace stan {
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
-              std::cout << "ELBO CONVERGED" << std::endl;
+              std::cout << "MEAN ELBO CONVERGED" << std::endl;
               do_more_iterations = false;
             }
+
+            if (delta_elbo_med < tol_rel_obj) {
+              std::cout << "MEDIAN ELBO CONVERGED" << std::endl;
+              do_more_iterations = false;
+            }
+
           }
 
           // Check for max iterations
@@ -576,6 +594,19 @@ namespace stan {
 
       Eigen::VectorXd const& cont_params() {
         return cont_params_;
+      }
+
+      double alp_median(boost::circular_buffer<double>& cb) {
+
+          std::vector<double> v;
+          for (boost::circular_buffer<double>::iterator i = cb.begin();
+                i != cb.end(); ++i) {
+            v.push_back(*i);
+          }
+
+          size_t n = v.size() / 2;
+          std::nth_element(v.begin(), v.begin()+n, v.end());
+          return v[n];
       }
 
       double rel_param_decrease(Eigen::VectorXd const& prev,
