@@ -92,18 +92,19 @@ namespace stan {
         return true;
       }
       
-      virtual void probe_args(argument* base_arg, std::stringstream& s) {
+      template <class Writer>
+      void probe_args(argument* base_arg, Writer& writer) {
 
-        s << "good" << std::endl;
+        writer.write_message("good");
         _value = _good_value;
-        base_arg->print(&s, 0, "");
-        s << std::endl;
+        base_arg->print(writer, 0, "");
+        writer.write_message("");
         
         if (_constrained) {
-          s << "bad" << std::endl;
+          writer.write_message("bad");
           _value = _bad_value;
-          base_arg->print(&s, 0, "");
-          s << std::endl;
+          base_arg->print(writer, 0, "");
+          writer.write_message("");
         }
 
         _value = _default_value;

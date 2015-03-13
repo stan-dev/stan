@@ -99,23 +99,24 @@ namespace stan {
         
       };
 
-      virtual void probe_args(argument* base_arg, std::stringstream& s) {
+      template <class Writer>
+      void probe_args(argument* base_arg, Writer& writer) {
 
         for (size_t i = 0; i < _values.size(); ++i) {
           _cursor = i;
           
-          s << "good" << std::endl;
-          base_arg->print(&s, 0, "");
-          s << std::endl;
+          writer.write_message("good");
+          base_arg->print(writer, 0, "");
+          writer.write_message("");
 
-          _values.at(i)->probe_args(base_arg, s);
+          _values.at(i)->probe_args(base_arg, writer);
         }
         
         _values.push_back(new arg_fail);
         _cursor = _values.size() - 1;
-        s << "bad" << std::endl;
-        base_arg->print(&s, 0, "");
-        s << std::endl;
+        writer.write_message("bad");
+        base_arg->print(writer, 0, "");
+        writer.write_message("");
         
         _values.pop_back();
         _cursor = _default_cursor;

@@ -23,8 +23,6 @@ namespace stan {
       
       template <class Writer>
       void print(Writer& writer, const int depth, const std::string prefix) {
-        if (!s)
-          return;
         std::string indent(compute_indent(depth), ' ');
         writer.write_message(prefix + indent + _name);
         
@@ -35,10 +33,6 @@ namespace stan {
       
       template <class Writer>
       void print_help(Writer& writer, const int depth, const bool recurse) {
-        
-        if (!s) 
-          return;
-        
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
         
@@ -48,7 +42,7 @@ namespace stan {
           std::string msg = indent + subindent + "Valid subarguments:";
           
           std::vector<argument*>::iterator it = _subarguments.begin();
-          message +=  " " + (*it)->name();
+          msg +=  " " + (*it)->name();
           ++it;
           
           for (; it != _subarguments.end(); ++it)
@@ -122,10 +116,11 @@ namespace stan {
         return valid_arg;
       };
       
-      virtual void probe_args(argument* base_arg, std::stringstream& s) {
+      template <class Writer>
+      void probe_args(argument* base_arg, Writer& writer) {
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it) {
-          (*it)->probe_args(base_arg, s);
+          (*it)->probe_args(base_arg, writer);
         }
       }
       

@@ -11,13 +11,14 @@ namespace stan {
       // FIXME: Move to CmdStan
       class cout: public writer {
       public:
-        void writer_key_value(const std::string& key, double value) {}
-        void writer_key_value(const std::string& key, const std::string& value) {}
-        void write_state_names(const std::vector<std::string>& names) {}
-        void write_state(const std::vector<double>& state) {}
+        void write_key_value(const std::string& key, double value) {}
+        void write_key_value(const std::string& key, const std::string& value) {}
+        void write_state_names(std::vector<std::string>& names) {}
+        void write_state(std::vector<double>& state) {}
         void write_message(const std::string& message) {
           std::cout << message << std::endl;
-        };
+        }
+      };
 
     }
   }

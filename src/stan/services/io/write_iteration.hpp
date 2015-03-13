@@ -19,7 +19,7 @@ namespace stan {
                            std::vector<double>& cont_vector,
                            std::vector<int>& disc_vector) {
         std::vector<double> values;
-        model.write_array(base_rng, cont_vector, disc_vector, model_values,
+        model.write_array(base_rng, cont_vector, disc_vector, values,
                           true, true, &std::cout); /////***** FIXME NOW *****//////
         values.insert(values.begin(), lp);
         writer.write_state(values);

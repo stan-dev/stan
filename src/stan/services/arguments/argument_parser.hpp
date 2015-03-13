@@ -160,7 +160,7 @@ namespace stan {
                              + " ... <arg_n> <subarg_n_1> ... <subarg_n_m>");
         writer.write_message("");
         
-        writer.write_message("Begin by selecting amongst the following "
+        writer.write_message(std::string("Begin by selecting amongst the following ")
                              + "inference methods and diagnostics,");
 
         std::vector<argument*>::iterator arg_it = _arguments.begin();
@@ -168,8 +168,8 @@ namespace stan {
         
         for (std::vector<argument*>::iterator value_it = method->values().begin();
              value_it != method->values().end(); ++value_it) {
-          writer.write_messsage(  Writer::pad(indent + (*value_it)->name(), width)
-                                + indent + (*value_it)->description());
+          writer.write_message(  Writer::pad(indent + (*value_it)->name(), width)
+                               + indent + (*value_it)->description());
         }
         writer.write_message("");
         
@@ -183,12 +183,12 @@ namespace stan {
         
         ++arg_it;
         for (; arg_it != _arguments.end(); ++arg_it) {
-          writer.write_messsage(  Writer::pad(indent + (*arg_it)->name(), width)
-                                + indent + (*arg_it)->description());
+          writer.write_message(  Writer::pad(indent + (*arg_it)->name(), width)
+                               + indent + (*arg_it)->description());
         }
         
         writer.write_message("");
-        writer.write_message(  "See " + executable + " <arg1> [ help | help-all ] "
+        writer.write_message(  std::string("See ") + executable + " <arg1> [ help | help-all ] "
                              + "for details on individual arguments.");
         writer.write_message("");
         

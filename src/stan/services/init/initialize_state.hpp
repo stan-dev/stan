@@ -54,17 +54,16 @@ namespace stan {
        *                            quite sure
        * @param[in,out] output      output stream for messages
        */
-      template <class Model>
+      template <class Model, class Writer>
       bool initialize_state_zero(Eigen::VectorXd& cont_params,
                                  Model& model,
-                                 std::ostream* output) {
+                                 Writer& writer) {
         cont_params.setZero();
         
         try {
           validate_unconstrained_initialization(cont_params, model);
         } catch (const std::exception& e) {
-          if (output)
-            *output << e.what() << std::endl;
+          writer.write_message(e.what());
           return false;
         }
         
@@ -73,29 +72,24 @@ namespace stan {
         
         try {
           stan::model::gradient(model, cont_params, init_log_prob,
-                                init_grad, output);
+                                init_grad, &std::cout); // FIXME
         } catch (const std::exception& e) {
-          if (output)
-            *output << "Rejecting initialization at zero "
-            << "because of gradient failure."
-            << std::endl << e.what() << std::endl;
+          writer.write_message(std::string("Rejecting initialization at zero ")
+                                 + "because of gradient failure.");
+          writer.write_message(e.what());
           return false;
         }
         
         if (!boost::math::isfinite(init_log_prob)) {
-          if (output)
-            *output << "Rejecting initialization at zero "
-            << "because of vanishing density."
-            << std::endl;
+          writer.write_message(std::string("Rejecting initialization at zero ")
+                               + "because of vanishing density.");
           return false;
         }
         
         for (int i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad[i])) {
-            if (output)
-              *output << "Rejecting initialization at zero "
-              << "because of divergent gradient."
-              << std::endl;
+            writer.write_message(std::string("Rejecting initialization at zero ")
+                                 + "because of divergent gradient.");
             return false;
           }
         }
@@ -115,12 +109,12 @@ namespace stan {
        * @param[in,out] base_rng    the random number generator. State may change.
        * @param[in,out] output      output stream for messages
        */
-      template <class Model, class RNG>
+      template <class Model, class RNG, class Writer>
       bool initialize_state_random(const double R,
                                    Eigen::VectorXd& cont_params,
                                    Model& model,
                                    RNG& base_rng,
-                                   std::ostream* output) {
+                                   Writer& writer) {
         int num_init_tries = -1;
         
         boost::random::uniform_real_distribution<double>
@@ -128,7 +122,7 @@ namespace stan {
         
         boost::variate_generator
         <RNG&, boost::random::uniform_real_distribution<double> >
-        init_rng(base_rng, init_range_distribution);
+          init_rng(base_rng, init_range_distribution);
         
         cont_params.setZero();
         
@@ -144,8 +138,7 @@ namespace stan {
           try {
             validate_unconstrained_initialization(cont_params, model);
           } catch (const std::exception& e) {
-            if (output)
-              *output << e.what() << std::endl;
+            writer.write_message(e.what());
             continue;
           }
           
@@ -154,10 +147,8 @@ namespace stan {
             stan::model::gradient(model, cont_params, init_log_prob,
                                   init_grad, &std::cout);
           } catch (const std::exception& e) {
-            io::write_error_msg(output, e);
-            if (output)
-              *output << "Rejecting proposed initial value with zero density."
-              << std::endl;
+            io::write_error_msg(writer, e);
+            writer.write_message("Rejecting proposed initial value with zero density.");
             init_log_prob = -std::numeric_limits<double>::infinity();
           }
           if (!boost::math::isfinite(init_log_prob))
@@ -169,15 +160,15 @@ namespace stan {
         }
         
         if (num_init_tries > MAX_INIT_TRIES) {
-          if (output)
-            *output << std::endl << std::endl
-            << "Initialization between (" << -R << ", " << R
-            << ") failed after "
-            << MAX_INIT_TRIES << " attempts. " << std::endl
-            << " Try specifying initial values,"
-            << " reducing ranges of constrained values,"
-            << " or reparameterizing the model."
-            << std::endl;
+          writer.write_message("");
+          writer.write_message("");
+          writer.write_message("Initialization between ("
+                               + Writer::to_string(-R) + ", "
+                               + Writer::to_string(R) + ") failed after "
+                               + Writer::to_string(MAX_INIT_TRIES) + " attempts.");
+          writer.write_message(std::string(" Try specifying initial values,")
+                               + " reducing ranges of constrained values,"
+                               + " or reparameterizing the model.");
           return false;
         }
         return true;
@@ -199,29 +190,27 @@ namespace stan {
        *                            the concept of a context_factory. This has
        *                            one method that takes a string.
        */
-      template <class ContextFactory, class Model, class RNG>
+      template <class ContextFactory, class Model, class RNG, class Writer>
       bool initialize_state_source(const std::string source,
                                    Eigen::VectorXd& cont_params,
                                    Model& model,
                                    RNG& base_rng,
-                                   std::ostream* output,
+                                   Writer& writer,
                                    ContextFactory& context_factory) {
         try {
           typename ContextFactory::var_context_t context
           = context_factory(source);
-          model.transform_inits(context, cont_params, output);
+          model.transform_inits(context, cont_params, &std::cout); // FIXME
         } catch(const std::exception& e) {
-          if (output)
-            *output << "Initialization from source failed."
-            << std::endl << e.what() << std::endl;
+          writer.write_message("Initialization from source failed.");
+          writer.write_message(e.what());
           return false;
         }
         
         try {
           validate_unconstrained_initialization(cont_params, model);
         } catch (const std::exception& e) {
-          if (output)
-            *output << e.what() << std::endl;
+          writer.write_message(e.what());
           return false;
         }
         
@@ -233,27 +222,22 @@ namespace stan {
           stan::model::gradient(model, cont_params, init_log_prob,
                                 init_grad, &std::cout);
         } catch (const std::exception& e) {
-          if (output)
-            *output << "Rejecting user-specified initialization "
-            << "because of gradient failure."
-            << std::endl << e.what() << std::endl;
+          writer.write_message(std::string("Rejecting user-specified initialization ")
+                               + "because of gradient failure.");
+          writer.write_message(e.what());
           return false;
         }
         
         if (!boost::math::isfinite(init_log_prob)) {
-          if (output)
-            *output << "Rejecting user-specified initialization "
-            << "because of vanishing density."
-            << std::endl;
+          writer.write_message(std::string("Rejecting user-specified initialization ")
+                               + "because of vanishing density.");
           return false;
         }
         
         for (int i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad[i])) {
-            if (output)
-              *output << "Rejecting user-specified initialization "
-              << "because of divergent gradient."
-              << std::endl;
+            writer.write_message(std::string("Rejecting user-specified initialization ")
+                                 + "because of divergent gradient.");
             return false;
           }
         }
@@ -293,24 +277,24 @@ namespace stan {
        *                            the concept of a context_factory. This has
        *                            one method that takes a string.
        */
-      template <class ContextFactory, class Model, class RNG>
+      template <class ContextFactory, class Model, class RNG, class Writer>
       bool initialize_state(const std::string init,
                             Eigen::VectorXd& cont_params,
                             Model& model,
                             RNG& base_rng,
-                            std::ostream* output,
+                            Writer& writer,
                             ContextFactory& context_factory) {
         double R;
         if (get_double_from_string(init, R)) {
           if (R == 0) {
-            return initialize_state_zero(cont_params, model, output);
+            return initialize_state_zero(cont_params, model, writer);
           } else {
             return initialize_state_random(R, cont_params, model,
-                                           base_rng, output);
+                                           base_rng, writer);
           }
         } else {
           return initialize_state_source(init, cont_params, model,
-                                         base_rng, output,
+                                         base_rng, writer,
                                          context_factory);
         }
         return false;

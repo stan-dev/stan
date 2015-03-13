@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <ostringstream>
+#include <boost/lexical_cast.hpp>
 
 namespace stan {
   namespace interface_callbacks {
@@ -13,29 +13,36 @@ namespace stan {
       public:
         virtual ~writer() {};
         
-        virtual void writer_key_value(const std::string& key,
-                                      double value) = 0;
-        virtual void writer_key_value(const std::string& key,
-                                      const std::string& value) = 0;
+        virtual void write_key_value(const std::string& key,
+                                    double value) = 0;
+        virtual void write_key_value(const std::string& key,
+                                    const std::string& value) = 0;
         
-        virtual void write_state_names(const std::vector<std::string>& names) = 0;
-        virtual void write_state(const std::vector<double>& state) = 0;
+        virtual void write_state_names(std::vector<std::string>& names) = 0;
+        virtual void write_state(std::vector<double>& state) = 0;
         
         virtual void write_message(const std::string& message) = 0;
         
         // FIXME: Replace with std::to_string when we update to C++11
-        static to_string(double x) {
-          static_cast<std::ostringstream*>( &(std::ostringstream() << x) )->str();
+        static std::string to_string(double x) {
+          return boost::lexical_cast<std::string>(x);
         }
         
-        static to_string(double x, int width) {
-          static_cast<std::ostringstream*>( &(std::ostringstream()
-                                              << std::setw(width) << x) )->str();
-        }
-        
-        static pad(std::string& str, int width) {
-          if (str.size() < width)
+        static std::string to_string(double x, int width) {
+          std::string str = boost::lexical_cast<std::string>(x);
+          if (str.size() < width) {
             str.insert(str.begin(), width - str.size(), ' ');
+            return str;
+          } else
+            return str;
+        }
+        
+        static std::string pad(std::string str, int width) {
+          if (str.size() < width) {
+            str.insert(str.begin(), width - str.size(), ' ');
+            return str;
+          } else
+            return str;
         }
         
       };

@@ -45,7 +45,8 @@ namespace stan {
         return true; 
       }
       
-      virtual void probe_args(argument* base_arg, std::stringstream& s) {};
+      template <class Writer>
+      void probe_args(argument* base_arg, Writer& writer) {};
       
       virtual void find_arg(std::string name,
                             std::string prefix,

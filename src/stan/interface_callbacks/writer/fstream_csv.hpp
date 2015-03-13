@@ -16,34 +16,34 @@ namespace stan {
         
         bool good() { return output.good(); }
         
-        void writer_key_value(const std::string& key, double value) {
+        void write_key_value(const std::string& key, double value) {
           output << key << " = " << value << std::endl;
         };
         
-        void writer_key_value(const std::string& key, const std::string& value) {
+        void write_key_value(const std::string& key, const std::string& value) {
           output << key << " = " << value << std::endl;
         };
         
-        void write_state_names(const std::vector<std::string>& names) {
+        void write_state_names(std::vector<std::string>& names) {
           if (names.empty()) return;
           
-          std::vector<std::string>::iterator last = names.back();
+          std::vector<std::string>::iterator last = names.end();
           --last;
           
           for (std::vector<std::string>::iterator it = names.begin(); it != last; ++it)
             output << *it << ",";
-          output << names.last() << std::endl;
+          output << names.back() << std::endl;
         };
         
-        void write_state(const std::vector<double>& state) {
+        void write_state(std::vector<double>& state) {
           if (state.empty()) return;
           
-          std::vector<double>::iterator last = state.back();
+          std::vector<double>::iterator last = state.end();
           --last;
           
           for (std::vector<double>::iterator it = state.begin(); it != last; ++it)
             output << *it << ",";
-          output << state.last() << std::endl;
+          output << state.back() << std::endl;
         };
         
         void write_message(const std::string& message) {

@@ -10,7 +10,6 @@
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/json.hpp>
-#include <stan/io/mcmc_writer.hpp>
 
 #include <stan/services/arguments.hpp>
 
@@ -53,33 +52,21 @@ namespace stan {
       // BEGIN TEMP CALLBACKS
       // FIXME: The below should all be callbacks created externally
       
-      interface_callbacks::interrupt::noop interrupt;
+      stan::interface_callbacks::interrupt::noop iteration_interrupt;
       
-      interface_callbacks::writer::cout info; // Informative messages
-      interface_callbacks::writer::cerr err;  // Error messages
-      
-      // Sample output
-      std::string output_file =
-        dynamic_cast<stan::services::string_argument*>
-        (parser.arg("output")->arg("file"))->value();
-      interface_callbacks::writer::fstream_csv output_stream(output_file);
-      
-      // Diagnostic output
-      std::string diagnostic_file =
-        dynamic_cast<stan::services::string_argument*>
-        (parser.arg("output")->arg("diagnostic_file"))->value();
-      interface_callbacks::writer::fstream_csv diagnostic_stream(diagnostic_file);
-      
+      stan::interface_callbacks::writer::cout info; // Informative messages
+      stan::interface_callbacks::writer::cerr err;  // Error messages
+
       // END TEMP CALLBACKS
       
-      std::vector<stan::services::argument*> valid_arguments;
-      valid_arguments.push_back(new stan::services::arg_id());
+      std::vector<argument*> valid_arguments;
+      valid_arguments.push_back(new arg_id());
       valid_arguments.push_back(new stan::services::arg_data());
       valid_arguments.push_back(new stan::services::arg_init());
       valid_arguments.push_back(new stan::services::arg_random());
       valid_arguments.push_back(new stan::services::arg_output());
       
-      stan::services::argument_parser parser(valid_arguments);
+      argument_parser parser(valid_arguments);
 
       int err_code = parser.parse_args(argc, argv, info, err);
 
@@ -91,6 +78,21 @@ namespace stan {
       if (parser.help_printed())
         return err_code;
 
+      // BEGIN TEMP CALLBACKS
+      // FIXME: The below should all be callbacks created externally
+      
+      // Sample output
+      std::string output_file =
+        dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value();
+      stan::interface_callbacks::writer::fstream_csv output_stream(output_file);
+      
+      // Diagnostic output
+      std::string diagnostic_file =
+        dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value();
+      stan::interface_callbacks::writer::fstream_csv diagnostic_stream(diagnostic_file);
+      
+      // END TEMP CALLBACKS
+      
       // Identification
       unsigned int id = dynamic_cast<stan::services::int_argument*>
         (parser.arg("id"))->value();
@@ -151,8 +153,8 @@ namespace stan {
 
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
-      parser.print(cout); /////***** FIXME NOW *****//////
-      cout.write_message("");
+      parser.print(info); /////***** FIXME NOW *****//////
+      info.write_message("");
 
       services::io::write_stan(output_stream, "#");
       services::io::write_model(output_stream, model.model_name(), "#");
@@ -167,8 +169,7 @@ namespace stan {
       
       interface_callbacks::var_context_factory::dump_factory var_context_factory;
       if (!init::initialize_state<interface_callbacks::var_context_factory::dump_factory>
-          (init, cont_params, model, base_rng, &std::cout,
-           var_context_factory)) /////***** FIXME NOW *****//////
+          (init, cont_params, model, base_rng, info, var_context_factory))
         return stan::services::error_codes::SOFTWARE;
       
       //////////////////////////////////////////////////
@@ -195,15 +196,15 @@ namespace stan {
           double error = dynamic_cast<stan::services::real_argument*>
                          (test->arg("gradient")->arg("error"))->value();
           
-          int num_failed
-            = stan::model::test_gradients<true, true>
-            (model, cont_vector, disc_vector,
-             epsilon, error, info);
+          int num_failed =
+            stan::model::test_gradients<true, true>(model, cont_vector,
+                                                    disc_vector, info,
+                                                    epsilon, error);
 
           num_failed
-            = stan::model::test_gradients<true, true>
-            (model, cont_vector, disc_vector,
-             epsilon, error, output_stream);
+            = stan::model::test_gradients<true, true>(model, cont_vector,
+                                                      disc_vector, output_stream,
+                                                      epsilon, error);
           
           (void) num_failed; // FIXME: do something with the number failed
           
@@ -217,8 +218,6 @@ namespace stan {
       //////////////////////////////////////////////////
 
       if (parser.arg("method")->arg("optimize")) {
-        
-        using interface_callbacks::writer;
         
         std::vector<double> cont_vector(cont_params.size());
         for (int i = 0; i < cont_params.size(); ++i)
@@ -239,7 +238,7 @@ namespace stan {
         std::vector<std::string> names;
         names.push_back("lp__");
         model.constrained_param_names(names, true, true);
-        ouput_stream.write_state_names(names);
+        output_stream.write_state_names(names);
 
         double lp(0);
         int return_code = stan::services::error_codes::CONFIG;
@@ -253,7 +252,7 @@ namespace stan {
             lp = -std::numeric_limits<double>::infinity();
           }
 
-          info.write_message("initial log joint probability = " + writer::to_string(lp));
+          info.write_message("initial log joint probability = " + stan::interface_callbacks::writer::writer::to_string(lp));
           if (save_iterations) {
             services::io::write_iteration(output_stream, model, base_rng,
                                           lp, cont_vector, disc_vector);
@@ -262,19 +261,19 @@ namespace stan {
           double lastlp = lp * 1.1;
           int m = 0;
           info.write_message("(lp - lastlp) / lp > 1e-8: "
-                             + :writer::to_string((lp - lastlp) / fabs(lp)));
+                             + stan::interface_callbacks::writer::writer::to_string((lp - lastlp) / fabs(lp)));
           while ((lp - lastlp) / fabs(lp) > 1e-8) {
             lastlp = lp;
             lp = stan::optimization::newton_step
               (model, cont_vector, disc_vector);
-            info.write_message("Iteration " + writer::to_string(m + 1, 2) + ". "
-                               + "Log joint probability = " + writer::to_string(lp, 10)
-                               + ". Improved by " + writer::to_string(lp - lastlp) + ".");
+            info.write_message("Iteration " + stan::interface_callbacks::writer::writer::to_string(m + 1, 2) + ". "
+                               + "Log joint probability = " + stan::interface_callbacks::writer::writer::to_string(lp, 10)
+                               + ". Improved by " + stan::interface_callbacks::writer::writer::to_string(lp - lastlp) + ".");
             m++;
 
             if (save_iterations) {
-              servides::io::write_iteration(output_stream, model, base_rng,
-                                            lp, cont_vector, disc_vector);
+              io::write_iteration(output_stream, model, base_rng,
+                                  lp, cont_vector, disc_vector);
             }
           }
           return_code = stan::services::error_codes::OK;
@@ -298,11 +297,13 @@ namespace stan {
                          algo->arg("bfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
           
+          // FIXME: first cout should be output_stream
+          // FIXME: second cout should be info
           return_code = optimization::do_bfgs_optimize(model,bfgs, base_rng,
-                                         lp, cont_vector, disc_vector,
-                                         output_stream, &std::cout,
-                                         save_iterations, refresh,
-                                         interrupt); /////***** FIXME NOW *****//////
+                                                       lp, cont_vector, disc_vector,
+                                                       &std::cout, &std::cout,
+                                                       save_iterations, refresh,
+                                                       iteration_interrupt);
         } else if (algo->value() == "lbfgs") {
           
           typedef stan::optimization::BFGSLineSearch
@@ -326,11 +327,13 @@ namespace stan {
                          algo->arg("lbfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
 
+          // FIXME: first cout should be output_stream
+          // FIXME: second cout should be info
           return_code = optimization::do_bfgs_optimize(model,bfgs, base_rng,
-                                         lp, cont_vector, disc_vector,
-                                         output_stream, &std::cout,
-                                         save_iterations, refresh,
-                                         interrupt); /////***** FIXME NOW *****//////
+                                                       lp, cont_vector, disc_vector,
+                                                       &std::cout, &std::cout,
+                                                       save_iterations, refresh,
+                                                       iteration_interrupt);
         } else {
           return_code = stan::services::error_codes::CONFIG;
         }
@@ -368,15 +371,6 @@ namespace stan {
         std::cout << "Adjust your expectations accordingly!"
                   << std::endl << std::endl;
         std::cout << std::endl;
-
-        interface::recorder::csv sample_recorder(output_stream, "# ");
-        interface::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
-        interface::recorder::messages message_recorder(&std::cout, "# ");
-        
-        stan::io::mcmc_writer<Model, 
-                              interface::recorder::csv, interface::recorder::csv,
-                              interface::recorder::messages>
-          writer(sample_recorder, diagnostic_recorder, message_recorder, &std::cout);
         
         // Sampling parameters
         int num_warmup = dynamic_cast<stan::services::int_argument*>(
@@ -390,11 +384,6 @@ namespace stan {
         
         bool save_warmup = dynamic_cast<stan::services::bool_argument*>(
                            parser.arg("method")->arg("sample")->arg("save_warmup"))->value();
-        
-        stan::mcmc::sample s(cont_params, 0, 0);
-
-        double warmDeltaT;
-        double sampleDeltaT;
 
         // Sampler
         stan::mcmc::base_mcmc* sampler_ptr = 0;
@@ -593,48 +582,18 @@ namespace stan {
           }
         }
 
-        // Headers
-        writer.write_sample_names(s, sampler_ptr, model);
-        writer.write_diagnostic_names(s, sampler_ptr, model);
-
-        std::string prefix = "";
-        std::string suffix = "\n";
-        interface_callbacks::interrupt::noop startTransitionCallback;
-
-        // Warm-Up
-        clock_t start = clock();
         
-        mcmc::warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
-                                   refresh, save_warmup,
-                                   writer,
-                                   s, model, base_rng,
-                                   prefix, suffix, std::cout,
-                                   startTransitionCallback);
+        mcmc::mcmc_writer<Model, rng_t,
+                          stan::interface_callbacks::writer::fstream_csv,
+                          stan::interface_callbacks::writer::fstream_csv,
+                          stan::interface_callbacks::writer::cout>
+          writer(model, base_rng, output_stream, diagnostic_stream, info);
         
-        clock_t end = clock();
-        warmDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-
-        if (adapt_engaged) {
-          dynamic_cast<stan::mcmc::base_adapter*>(sampler_ptr)
-            ->disengage_adaptation();
-          writer.write_adapt_finish(sampler_ptr);
-        }
-
-        // Sampling
-        start = clock();
+        stan::mcmc::sample s(cont_params, 0, 0);
         
-        mcmc::sample<Model, rng_t>
-          (sampler_ptr, num_warmup, num_samples, num_thin,
-           refresh, true,
-           writer,
-           s, model, base_rng,
-           prefix, suffix, std::cout,
-           startTransitionCallback);
-        
-        end = clock();
-        sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-
-        writer.write_timing(warmDeltaT, sampleDeltaT);
+        mcmc::sample(*sampler_ptr, s, num_warmup, num_samples,
+                     num_thin, refresh, save_warmup, adapt_engaged,
+                     writer, iteration_interrupt);
 
         if (sampler_ptr)
           delete sampler_ptr;

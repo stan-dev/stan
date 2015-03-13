@@ -3,7 +3,7 @@
 
 namespace stan {
   namespace interface_callbacks {
-    namespace callbacks {
+    namespace interrupt {
 
       // This callback allows the interfaces to interrupt
       // execution at various points in command.hpp

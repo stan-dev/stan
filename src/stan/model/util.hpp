@@ -277,9 +277,9 @@ namespace stan {
     int test_gradients(const M& model,
                        std::vector<double>& params_r,
                        std::vector<int>& params_i,
+                       Writer& writer,
                        double epsilon = 1e-6,
                        double error = 1e-6,
-                       Writer& writer,
                        std::ostream* msgs = 0) {
       std::vector<double> grad;
       double lp 
@@ -299,9 +299,9 @@ namespace stan {
 
       int num_failed = 0;
         
-      writer.write_messgae("");
+      writer.write_message("");
       writer.write_message(" Log probability=" + Writer::to_string(lp));
-      writer.write_messgae("");
+      writer.write_message("");
 
       writer.write_message("");
       writer.write_message(  Writer::pad("param idx", 10)
