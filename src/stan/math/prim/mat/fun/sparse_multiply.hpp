@@ -33,7 +33,7 @@ namespace stan {
     template <typename T1, typename T2>
     inline
     Eigen::Matrix<typename boost::math::tools::promote_args<T1, T2>::type, Eigen::Dynamic, 1>
-    sparse_multiply(const int& m,
+    sparse_multiply_csc(const int& m,
                     const int& n,
                     const Eigen::Matrix<T1, Eigen::Dynamic,1>& w,
                     const std::vector<int>& v,
@@ -50,7 +50,7 @@ namespace stan {
       for (int j = 0; j < n; ++j) {
         int end = u[j] + z[j] - 1;
         for (int q = u[j] - 1; q < end; ++q)
-          y[v[q]] += w[q] * b[j];
+          y(v[q]) += w[q] * b(j);
       }
       return y;
     }
@@ -78,7 +78,7 @@ namespace stan {
     template <typename T1, typename T2>
     inline
     Eigen::Matrix<typename boost::math::tools::promote_args<T1, T2>::type, Eigen::Dynamic, 1>
-    sparse_multiply(const int& m,
+    sparse_multiply_csr(const int& m,
                     const int& n,
                     const Eigen::Matrix<T1, Eigen::Dynamic,1>& w,
                     const std::vector<int>& v,
@@ -92,16 +92,15 @@ namespace stan {
 
       typedef typename boost::math::tools::promote_args<T1, T2>::type fun_scalar_t;
       Eigen::Matrix<fun_scalar_t, Eigen::Dynamic, 1>  y(m);
+			Eigen::Matrix<T2,Eigen::Dynamic,1> b_sub(n);
       for (int i = 0; i < m; ++i) {
-				// int start = u[i] - 2
         int end = u[i] + z[i] - 1;
-        for (int q = u[i] - 1; q < end; ++q)
-					// Now this is the compressed row format version.  FIXME:
-					// Modify to use dot product function.  The pieces are:
-					// y[i] (easy)... 
-					// w[start:end] 
-					// b[v[start:end]] copied to a std::vector<double>...
-          y[i] += w[q] * b[v[q]];
+				int p = 0;
+        for (int q = u[i]-1; q < end; ++q) {
+					b_sub(p) = b(v[q]); 
+					++p;
+				}
+				y(i) = dot_product(w.segment(u[i]-1,z[i]),b_sub.segment(0,p-1));
       }
       return y;
     }
