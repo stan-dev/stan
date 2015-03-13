@@ -260,11 +260,6 @@ namespace stan {
             lp = model.template log_prob<false, false>
               (cont_vector, disc_vector, &std::cout);
           } catch (const std::exception& e) {
-            std::cout << "ERROR in statement beginning at line="
-                      << model.current_statement_begin()
-                      << " and ending at line="
-                      << model.current_statement_end()
-                      << std::endl;
             io::write_error_msg(&std::cout, e);
             lp = -std::numeric_limits<double>::infinity();
           }

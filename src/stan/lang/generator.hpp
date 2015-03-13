@@ -1769,18 +1769,35 @@ namespace stan {
       }
     };
 
+    struct is_numbered_statement_vis : public boost::static_visitor<bool> {
+      bool operator()(const nil& st) const { return false; }
+      bool operator()(const assignment& st) const { return true; }
+      bool operator()(const sample& st) const { return true; }
+      bool operator()(const increment_log_prob_statement& t) const  { return true; }
+      bool operator()(const expression& st) const  { return true; }
+      bool operator()(const statements& st) const  { return false; }
+      bool operator()(const for_statement& st) const  { return true; }
+      bool operator()(const conditional_statement& st) const { return true; }
+      bool operator()(const while_statement& st) const { return true; }
+      bool operator()(const print_statement& st) const { return true; }
+      bool operator()(const reject_statement& st) const { return true; }
+      bool operator()(const no_op_statement& st) const { return true; }
+      bool operator()(const return_statement& st) const { return true; }
+    };
+
+
     void generate_statement(const statement& s,
                             int indent,
                             std::ostream& o,
                             bool include_sampling,
                             bool is_var,
                             bool is_fun_return) {
-      generate_indent(indent,o);
-      o << "current_statement_begin__ = " <<  s.begin_line_ << ";" 
-        << EOL;
-      generate_indent(indent,o);
-      o << "current_statement_end__ = " << s.end_line_ << ";" 
-        << EOL;
+      is_numbered_statement_vis vis_is_numbered;
+      if (boost::apply_visitor(vis_is_numbered,s.statement_)) {
+        generate_indent(indent,o);
+        o << "current_statement_begin__ = " <<  s.begin_line_ << ";" 
+          << EOL;
+      }
       statement_visgen vis(indent,include_sampling,is_var,is_fun_return, o);
       boost::apply_visitor(vis,s.statement_);
     }
@@ -2555,8 +2572,6 @@ namespace stan {
       o << INDENT2 << ": prob_grad(0) {" 
         << EOL; // resize 0 with var_resizing
       o << INDENT2 << "current_statement_begin__ = -1;"
-        << EOL
-        << INDENT2 << "current_statement_end__ = -1;"
         << EOL;
       o << INDENT2 << "static const char* function__ = \"" 
         << model_name << "_namespace::" << model_name << "\";" << EOL;
@@ -4546,8 +4561,23 @@ namespace stan {
       bool is_var = false;
       bool is_fun_return = true;
       bool include_sampling = true;
-      generate_statement(fun.body_,1,out,
+      out << INDENT
+          << "int current_statement_begin__ = -1;" 
+          << EOL;
+      out << INDENT 
+          << "try {"
+          << EOL;
+      generate_statement(fun.body_,2,out,
                          include_sampling,is_var,is_fun_return);
+      out << INDENT
+          << "} catch (const std::exception& e) {"
+          << EOL 
+          << INDENT2
+          << "stan::lang::throw_located_exception(e,current_statement_begin__);"
+          << EOL
+          << INDENT
+          << "}"
+          << EOL;
       out << "}" 
           << EOL;
     }
@@ -4669,24 +4699,8 @@ namespace stan {
     void generate_globals(std::ostream& out) {
       out << "static int current_statement_begin__;" 
           << EOL;
-      out << "static int current_statement_end__;" 
-          << EOL2;
     }
 
-    void generate_statement_line_numbers_methods(std::ostream& out) {
-      out << INDENT << "int current_statement_begin() {"
-          << EOL
-          << INDENT2 << "return current_statement_begin__;"
-          << EOL
-          << INDENT << "}"
-          << EOL2;
-      out << INDENT << "int current_statement_end() {"
-          << EOL
-          << INDENT2 << "return current_statement_end__;"
-          << EOL
-          << INDENT << "}"
-          << EOL2;
-    }
 
     void generate_cpp(const program& prog, 
                       const std::string& model_name,
@@ -4715,7 +4729,6 @@ namespace stan {
       generate_model_name_method(model_name,out);
       generate_constrained_param_names_method(prog,out);
       generate_unconstrained_param_names_method(prog,out);
-      generate_statement_line_numbers_methods(out);
       generate_end_class_decl(out);
       generate_end_namespace(out);
       generate_model_typedef(model_name,out);
