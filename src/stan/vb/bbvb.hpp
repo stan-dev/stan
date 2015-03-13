@@ -333,8 +333,16 @@ namespace stan {
         double delta_elbo_med = std::numeric_limits<double>::max();
 
         // Heuristic to estimate how far to look back in rolling window
-        int cb_size = (int)(0.1*max_iterations/static_cast<double>(refresh_));
+        int cb_size = (int)
+                std::max(0.1*max_iterations/static_cast<double>(refresh_),1.0);
         boost::circular_buffer<double> cb(cb_size);
+
+        std::cout << "  iter"
+                  << "       ELBO"
+                  << "   delta_ELBO_mean"
+                  << "   delta_ELBO_med"
+                  << "   notes "
+                  << std::endl;
 
         // Timing variables
         clock_t start = clock();
@@ -376,12 +384,16 @@ namespace stan {
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / (double)(cb.size());
             delta_elbo_med = circ_buff_median(cb);
-            std::cout << "iter = " << std::setw(4) << iter_counter
-                      << " delta_elbo_ave = "
-                      << std::fixed << std::setprecision(3)
+            std::cout << "  " << std::setw(4) << iter_counter
+                      << "  "
+                      << std::right << std::setw(9) << std::setprecision(1)
+                      << elbo
+                      << "  "
+                      << std::setw(16) << std::fixed << std::setprecision(3)
                       << delta_elbo_ave
-                      << " delta_elbo_med = " << delta_elbo_med
-                      << std::endl;
+                      << "  "
+                      << std::setw(15) << std::fixed << std::setprecision(3)
+                      << delta_elbo_med;
 
             if (err_stream_) {
               end = clock();
@@ -395,14 +407,22 @@ namespace stan {
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
-              std::cout << "MEAN ELBO CONVERGED" << std::endl;
+              std::cout << "   MEAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (delta_elbo_med < tol_rel_obj) {
-              std::cout << "MEDIAN ELBO CONVERGED" << std::endl;
+              std::cout << "   MEDIAN ELBO CONVERGED";
               do_more_iterations = false;
             }
+
+            if (iter_counter > 100){
+              if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
+                std::cout << "   MAY BE DIVERGING... LOOK AT ELBO";
+              }
+            }
+
+            std::cout << std::endl;
           }
 
           // Check for max iterations
@@ -454,8 +474,16 @@ namespace stan {
         double delta_elbo_med = std::numeric_limits<double>::max();
 
         // Heuristic to estimate how far to look back in rolling window
-        int cb_size = (int)(0.1*max_iterations/static_cast<double>(refresh_));
+        int cb_size = (int)
+                std::max(0.1*max_iterations/static_cast<double>(refresh_),1.0);
         boost::circular_buffer<double> cb(cb_size);
+
+        std::cout << "  iter"
+                  << "       ELBO"
+                  << "   delta_ELBO_mean"
+                  << "   delta_ELBO_med"
+                  << "   notes "
+                  << std::endl;
 
         // Timing variables
         clock_t start = clock();
@@ -501,12 +529,16 @@ namespace stan {
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / (double)(cb.size());
             delta_elbo_med = circ_buff_median(cb);
-            std::cout << "iter = " << std::setw(4) << iter_counter
-                      << " delta_elbo_ave = "
-                      << std::fixed << std::setprecision(3)
+            std::cout << "  " << std::setw(4) << iter_counter
+                      << "  "
+                      << std::right << std::setw(9) << std::setprecision(1)
+                      << elbo
+                      << "  "
+                      << std::setw(16) << std::fixed << std::setprecision(3)
                       << delta_elbo_ave
-                      << " delta_elbo_med = " << delta_elbo_med
-                      << std::endl;
+                      << "  "
+                      << std::setw(15) << std::fixed << std::setprecision(3)
+                      << delta_elbo_med;
 
             if (err_stream_) {
               end = clock();
@@ -520,20 +552,27 @@ namespace stan {
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
-              std::cout << "MEAN ELBO CONVERGED" << std::endl;
+              std::cout << "   MEAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (delta_elbo_med < tol_rel_obj) {
-              std::cout << "MEDIAN ELBO CONVERGED" << std::endl;
+              std::cout << "   MEDIAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
+            if (iter_counter > 100){
+              if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
+                std::cout << "   MAY BE DIVERGING... LOOK AT ELBO";
+              }
+            }
+
+            std::cout << std::endl;
           }
 
           // Check for max iterations
           if (iter_counter == max_iterations) {
-            std::cout << "MAX ITERATIONS" << std::endl;
+            std::cout << "MAX ITERATIONS REACHED" << std::endl;
             do_more_iterations = false;
           }
 
@@ -556,13 +595,13 @@ namespace stan {
 
         cont_params_ = muL.mu();
 
-        std::cout
-        << "mu = " << std::endl
-        << muL.mu() << std::endl;
+        // std::cout
+        // << "mu = " << std::endl
+        // << muL.mu() << std::endl;
 
-        std::cout
-        << "Sigma = " << std::endl
-        << muL.L_chol() * muL.L_chol().transpose() << std::endl;
+        // std::cout
+        // << "Sigma = " << std::endl
+        // << muL.L_chol() * muL.L_chol().transpose() << std::endl;
 
         // std::stringstream s;
         // stan::io::dump_writer writer(s);
@@ -591,13 +630,13 @@ namespace stan {
 
         cont_params_ = musigmatilde.mu();
 
-        std::cout
-        << "mu = " << std::endl
-        << musigmatilde.mu() << std::endl;
+        // std::cout
+        // << "mu = " << std::endl
+        // << musigmatilde.mu() << std::endl;
 
-        std::cout
-        << "sigma_tilde = " << std::endl
-        << musigmatilde.sigma_tilde() << std::endl;
+        // std::cout
+        // << "sigma_tilde = " << std::endl
+        // << musigmatilde.sigma_tilde() << std::endl;
 
         return;
       }
@@ -621,12 +660,12 @@ namespace stan {
           return v[n];
       }
 
-      double rel_param_decrease(Eigen::VectorXd const& prev,
-                                Eigen::VectorXd const& curr) const {
-        return (prev - curr).norm() / std::max(prev.norm(),
-                                               std::max(curr.norm(),
-                                                        1.0));
-      }
+      // double rel_param_decrease(Eigen::VectorXd const& prev,
+      //                           Eigen::VectorXd const& curr) const {
+      //   return (prev - curr).norm() / std::max(prev.norm(),
+      //                                          std::max(curr.norm(),
+      //                                                   1.0));
+      // }
 
       double rel_decrease(double prev, double curr) const {
         return std::abs(curr - prev) / std::abs(prev);
