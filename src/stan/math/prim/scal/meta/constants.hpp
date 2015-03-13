@@ -16,6 +16,8 @@ namespace stan {
 
       const double LOG_TWO = std::log(2.0);
 
+      const double LOG_HALF = std::log(0.5);
+
       const double NEG_LOG_TWO = - LOG_TWO;
 
       const double NEG_LOG_SQRT_TWO_PI 
