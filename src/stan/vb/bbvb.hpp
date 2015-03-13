@@ -373,7 +373,7 @@ namespace stan {
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / (double)(cb.size());
-            delta_elbo_med = alp_median(cb);
+            delta_elbo_med = circ_buff_median(cb);
             std::cout << iter_counter << " delta_elbo_ave =  " << delta_elbo_ave << std::endl;
             std::cout << iter_counter << " delta_elbo_med =  " << delta_elbo_med << std::endl;
 
@@ -494,7 +494,7 @@ namespace stan {
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / (double)(cb.size());
-            delta_elbo_med = alp_median(cb);
+            delta_elbo_med = circ_buff_median(cb);
             std::cout << iter_counter << " delta_elbo_ave =  " << delta_elbo_ave << std::endl;
             std::cout << iter_counter << " delta_elbo_med =  " << delta_elbo_med << std::endl;
 
@@ -596,10 +596,12 @@ namespace stan {
         return cont_params_;
       }
 
-      double alp_median(boost::circular_buffer<double>& cb) {
+      // Compute the median of a circular buffer
+      double circ_buff_median(boost::circular_buffer<double> const& cb) {
 
+          // FIXME: naive implementation; creates a copy as a vector
           std::vector<double> v;
-          for (boost::circular_buffer<double>::iterator i = cb.begin();
+          for (boost::circular_buffer<double>::const_iterator i = cb.begin();
                 i != cb.end(); ++i) {
             v.push_back(*i);
           }
