@@ -25,7 +25,6 @@
 #include <stan/math/fwd/mat/fun/qr_R.hpp>
 #include <stan/math/fwd/mat/fun/rows_dot_product.hpp>
 #include <stan/math/fwd/mat/fun/rows_dot_self.hpp>
-#incldue <stan/math/fwd/mat/fun/sparse_multiply.hpp>
 #include <stan/math/fwd/mat/fun/softmax.hpp>
 #include <stan/math/fwd/mat/fun/sort_asc.hpp>
 #include <stan/math/fwd/mat/fun/sort_desc.hpp>
