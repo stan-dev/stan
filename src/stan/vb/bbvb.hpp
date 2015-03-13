@@ -203,6 +203,7 @@ namespace stan {
           // Compute gradient step in unconstrained space
           stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,
                                 &std::cout);
+          stan::agrad::recover_memory();
 
           // Update mu
           mu_grad += tmp_mu_grad;
@@ -220,8 +221,6 @@ namespace stan {
 
         // Add gradient of entropy term
         L_grad.diagonal().array() += muL.L_chol().diagonal().array().inverse();
-
-        stan::agrad::recover_memory();
       }
 
 
@@ -273,6 +272,7 @@ namespace stan {
           // Compute gradient step in unconstrained space
           stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,
                                 &std::cout);
+          stan::agrad::recover_memory();
 
           // Update mu
           mu_grad.array() = mu_grad.array() + tmp_mu_grad.array();
@@ -292,8 +292,6 @@ namespace stan {
 
         // Add gradient of entropy term (just equal to element-wise 1 here)
         sigma_tilde_grad.array() += 1.0;
-
-        stan::agrad::recover_memory();
       }
 
 
@@ -378,8 +376,12 @@ namespace stan {
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / (double)(cb.size());
             delta_elbo_med = circ_buff_median(cb);
-            std::cout << iter_counter << " delta_elbo_ave =  " << delta_elbo_ave << std::endl;
-            std::cout << iter_counter << " delta_elbo_med =  " << delta_elbo_med << std::endl;
+            std::cout << "iter = " << std::setw(4) << iter_counter
+                      << " delta_elbo_ave = "
+                      << std::fixed << std::setprecision(3)
+                      << delta_elbo_ave
+                      << " delta_elbo_med = " << delta_elbo_med
+                      << std::endl;
 
             if (err_stream_) {
               end = clock();
@@ -499,8 +501,12 @@ namespace stan {
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / (double)(cb.size());
             delta_elbo_med = circ_buff_median(cb);
-            std::cout << iter_counter << " delta_elbo_ave =  " << delta_elbo_ave << std::endl;
-            std::cout << iter_counter << " delta_elbo_med =  " << delta_elbo_med << std::endl;
+            std::cout << "iter = " << std::setw(4) << iter_counter
+                      << " delta_elbo_ave = "
+                      << std::fixed << std::setprecision(3)
+                      << delta_elbo_ave
+                      << " delta_elbo_med = " << delta_elbo_med
+                      << std::endl;
 
             if (err_stream_) {
               end = clock();
