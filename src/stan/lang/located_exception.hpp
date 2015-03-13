@@ -96,9 +96,12 @@ namespace stan {
       };
 
       /**
-       * Return a constant reference to the nested exception.
+       * Return a constant reference to the nested exception as
+       * a reference to the class template type.
+       * 
+       * @return The nested exception.
        */
-      const E& nested_exception() const throw() {
+      const E& get_nested() const throw() {
         return e_;
       }
 
@@ -131,10 +134,21 @@ namespace stan {
         return true;
       }
 
+      /**
+       * Return the underlying exception dynamically cast to the specified
+       * template parameter type.
+       * 
+       * @tparam E2 Type to which the underlying exception is cast.
+       * @return Underlying exception dynamically cast to the
+       * specified type.
+       * @throw std::bad_cast if the cast cannot be performed.
+       */
       template <typename E2>
-      const E2& get() const throw() {
-        return static_cast<const E2&>(e_);
+      const E2& get_nested_as() const {
+        return dynamic_cast<const E2&>(e_);
       }
+
+
     };
 
     /**

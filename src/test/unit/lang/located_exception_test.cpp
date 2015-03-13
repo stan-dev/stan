@@ -27,6 +27,24 @@ TEST(langLocatedException, catchable) {
   EXPECT_THROW(throw le, located_exception<domain_error>);
 }
 
+struct bar_exception : std::exception {
+  bar_exception() 
+  : std::exception() { 
+  }
+};
+
+TEST(langLocatedException, catchableBad) {
+  try {
+    bar_exception be;
+    stan::lang::throw_located_exception(be,3);
+  } catch (const bar_exception& e) {
+    FAIL();
+  } catch (const std::exception& e) {
+    SUCCEED();
+  }
+}
+
+
 TEST(langLocatedException, get) {
  using std::domain_error;
   using std::string;
@@ -35,16 +53,29 @@ TEST(langLocatedException, get) {
   // makes sure get returns reference, not copy
   domain_error de("foo");
   located_exception<domain_error> le(de, 3);
-  EXPECT_EQ(&de, &le.nested_exception());
+  EXPECT_EQ(&de, &le.get_nested());
 }
 
+
+TEST(langLocatedException, getAs) {
+  using std::domain_error;
+  using std::string;
+  using stan::lang::located_exception;
+
+  // makes sure get returns reference, not copy
+  domain_error de("foo");
+  located_exception<std::exception> le(de, 3);
+  EXPECT_NO_THROW(le.get_nested_as<std::exception>());
+  EXPECT_NO_THROW(le.get_nested_as<domain_error>());
+  EXPECT_THROW(le.get_nested_as<std::out_of_range>(), 
+               std::bad_cast);
+}
 
 TEST(langLocatedException, line) {
  using std::domain_error;
   using std::string;
   using stan::lang::located_exception;
 
-  // makes sure get returns reference, not copy
   domain_error de("foo");
   located_exception<domain_error> le(de, 3);
   EXPECT_EQ(3, le.line());
