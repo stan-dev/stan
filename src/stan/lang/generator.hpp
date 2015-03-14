@@ -1397,7 +1397,7 @@ namespace stan {
                             std::ostream& o) {
       generate_init_vars_visgen vis(indent,o);
       o << EOL;
-      generate_comment("initialized transformed params to avoid seg fault on val access",
+      generate_comment("initialize transformed variables to avoid seg fault on val access",
                        indent,o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis,vs[i].decl_);
@@ -2593,19 +2593,32 @@ namespace stan {
       o << INDENT2 << "double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());" << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
       generate_init_vars(prog.derived_data_decl_.first, 2, o);
+      o << std::endl;
+
+      o << INDENT2
+        << "try {"
+        << EOL;
 
       bool include_sampling = false;
       bool is_var = false;
       bool is_fun_return = false;
       for (size_t i = 0; i < prog.derived_data_decl_.second.size(); ++i)
         generate_statement(prog.derived_data_decl_.second[i],
-                           2,o,include_sampling,is_var,is_fun_return);
+                           3,o,include_sampling,is_var,is_fun_return);
 
-      o << EOL;
+      o << INDENT2
+        << "} catch (const std::exception& e) {"
+        << EOL
+        << INDENT3
+        << "stan::lang::throw_located_exception(e,current_statement_begin__);"
+        << EOL
+        << INDENT2
+        << "}"
+        << EOL2;
+
       generate_comment("validate transformed data",2,o);
       generate_validate_var_decls(prog.derived_data_decl_.first,2,o);
 
-      o << EOL;
       generate_comment("set parameter ranges",2,o);
       generate_set_param_ranges(prog.parameter_decl_,o);
       // o << EOL << INDENT2 << "set_param_ranges();" << EOL;
@@ -4661,19 +4674,21 @@ namespace stan {
 
       generate_function_inline_return_type(fun,scalar_t_name,out);
 
-      out <<  "operator()";
+      out <<  INDENT 
+          << "operator()";
       generate_function_arguments(fun,is_rng,is_lp,is_log,out);
       out << " const {"
           << std::endl;
 
-      out << INDENT
+      out << INDENT2
           << "return ";
       generate_function_name(fun,out);
       generate_functor_arguments(fun,is_rng,is_lp,is_log,out);
       out << ";"
           << std::endl;
 
-      out << "}"
+      out << INDENT
+          << "}"
           << std::endl;
 
       out << "};"
