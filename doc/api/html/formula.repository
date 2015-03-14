@@ -1,0 +1,455 @@
+\form#0:\[ \mbox{fma}(x,y,z) = \begin{cases} x\cdot y+z & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#1:\[ \frac{\partial\,\mbox{fma}(x,y,z)}{\partial x} = \begin{cases} y & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#2:\[ \frac{\partial\,\mbox{fma}(x,y,z)}{\partial y} = \begin{cases} x & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#3:\[ \frac{\partial\,\mbox{fma}(x,y,z)}{\partial z} = \begin{cases} 1 & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#4:\[ \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) = \log \left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right). \]
+\form#5:\[ \frac{\partial}{\partial \theta} \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) = \dfrac{\exp(\lambda_1) - \exp(\lambda_2)} {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)} \]
+\form#6:\[ \frac{\partial}{\partial \lambda_1} \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) = \dfrac{\theta \exp(\lambda_1)} {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)} \]
+\form#7:\[ \frac{\partial}{\partial \lambda_2} \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) = \dfrac{\theta \exp(\lambda_2)} {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)} \]
+\form#8:$\log \sum_{n=1}^N \exp(x_n) = \max(x) + \log \sum_{n=1}^N \exp(x_n - \max(x))$
+\form#9:$L$
+\form#10:$A$
+\form#11:$A = L \times L^T$
+\form#12:${k \choose 2} = \frac{k(k-1)}{2}$
+\form#13:$k \choose 2$
+\form#14:$k \choose 2 + k$
+\form#15:$k$
+\form#16:$ \log \mbox{softmax}(y) \ = \ y - \log \sum_{k=1}^K \exp(y_k) \ = \ y - \mbox{log\_sum\_exp}(y). $
+\form#17:$ \frac{\partial}{\partial y_m} \mbox{softmax}(y)[k] = \left\{ \begin{array}{ll} 1 - \mbox{softmax}(y)[m] & \mbox{ if } m = k, \mbox{ and} \\[6pt] \mbox{softmax}(y)[m] & \mbox{ if } m \neq k. \end{array} \right. $
+\form#18:$ \mbox{softmax}(y) = \frac{\exp(y)} {\sum_{k=1}^K \exp(y_k)}, $
+\form#19:$ \begin{array}{l} \displaystyle \frac{\partial}{\partial y_m} \mbox{softmax}(y)[k] \\[8pt] \displaystyle \mbox{ } \ \ \ = \left\{ \begin{array}{ll} \mbox{softmax}(y)[k] - \mbox{softmax}(y)[k] \times \mbox{softmax}(y)[m] & \mbox{ if } m = k, \mbox{ and} \\[6pt] \mbox{softmax}(y)[k] * \mbox{softmax}(y)[m] & \mbox{ if } m \neq k. \end{array} \right. \end{array} $
+\form#20:\begin{eqnarray*} \theta &\sim& \mbox{\sf{Dirichlet}} (\alpha_1, \ldots, \alpha_k) \\ \log (p (\theta \,|\, \alpha_1, \ldots, \alpha_k) ) &=& \log \left( \frac{\Gamma(\alpha_1 + \cdots + \alpha_k)}{\Gamma(\alpha_1) \cdots \Gamma(\alpha_k)} \theta_1^{\alpha_1 - 1} \cdots \theta_k^{\alpha_k - 1} \right) \\ &=& \log (\Gamma(\alpha_1 + \cdots + \alpha_k)) - \log(\Gamma(\alpha_1)) - \cdots - \log(\Gamma(\alpha_k)) + (\alpha_1 - 1) \log (\theta_1) + \cdots + (\alpha_k - 1) \log (\theta_k) \end{eqnarray*}
+\form#21:$t = 1:T$
+\form#22:\begin{eqnarray*} y_t & \sim N(F' \theta_t, V) \\ \theta_t & \sim N(G \theta_{t-1}, W) \\ \theta_0 & \sim N(m_0, C_0) \end{eqnarray*}
+\form#23:\begin{eqnarray*} y_t & \sim N(F' \theta_t, diag(V)) \\ \theta_t & \sim N(G \theta_{t-1}, W) \\ \theta_0 & \sim N(m_0, C_0) \end{eqnarray*}
+\form#24:\begin{eqnarray*} W &\sim& \mbox{\sf{Inv-Wishart}}_{\nu} (S) \\ \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} \times \left| S \right|^{\nu/2} \left| W \right|^{-(\nu + k + 1) / 2} \times \exp (-\frac{1}{2} \mbox{tr} (S W^{-1})) \right) \\ &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))} +\frac{\nu}{2} \log(\det(S)) - \frac{\nu+k+1}{2}\log (\det(W)) - \frac{1}{2} \mbox{tr}(S W^{-1}) \end{eqnarray*}
+\form#25:\begin{eqnarray*} W &\sim& \mbox{\sf{Wishart}}_{\nu} (S) \\ \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} \times \left| S \right|^{-\nu/2} \left| W \right|^{(\nu - k - 1) / 2} \times \exp (-\frac{1}{2} \mbox{tr} (S^{-1} W)) \right) \\ &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))} -\frac{\nu}{2} \log(\det(S)) + \frac{\nu-k-1}{2}\log (\det(W)) - \frac{1}{2} \mbox{tr} (S^{-1}W) \end{eqnarray*}
+\form#26:\[ \mbox{bessel\_first\_kind}(v,x) = \begin{cases} J_v(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{error} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#27:\[ \frac{\partial\,\mbox{bessel\_first\_kind}(v,x)}{\partial x} = \begin{cases} \frac{\partial\, J_v(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{error} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#28:\[ J_v(x)=\left(\frac{1}{2}x\right)^v \sum_{k=0}^\infty \frac{\left(-\frac{1}{4}x^2\right)^k}{k!\, \Gamma(v+k+1)} \]
+\form#29:\[ \frac{\partial \, J_v(x)}{\partial x} = \frac{v}{x}J_v(x)-J_{v+1}(x) \]
+\form#30:\[ \mbox{bessel\_second\_kind}(v,x) = \begin{cases} \textrm{error} & \mbox{if } x \leq 0 \\ Y_v(x) & \mbox{if } x > 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#31:\[ \frac{\partial\,\mbox{bessel\_second\_kind}(v,x)}{\partial x} = \begin{cases} \textrm{error} & \mbox{if } x \leq 0 \\ \frac{\partial\, Y_v(x)}{\partial x} & \mbox{if } x > 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#32:\[ Y_v(x)=\frac{J_v(x)\cos(v\pi)-J_{-v}(x)}{\sin(v\pi)} \]
+\form#33:\[ \frac{\partial \, Y_v(x)}{\partial x} = \frac{v}{x}Y_v(x)-Y_{v+1}(x) \]
+\form#34:$\hat{y} \in [0, 1]$
+\form#35:$y \in \{ 0, 1 \}$
+\form#36:$\mbox{logloss}(1,\hat{y}) = -\log \hat{y} $
+\form#37:$\mbox{logloss}(0,\hat{y}) = -\log (1 - \hat{y}) $
+\form#38:${N \choose n}$
+\form#39:$0 \leq n \leq N$
+\form#40:${N \choose n} = \frac{N!}{n! (N-n)!}$
+\form#41:$ \log {N \choose n} = \log \ \Gamma(N+1) - \log \Gamma(n+1) - \log \Gamma(N-n+1)$
+\form#42:\[ \mbox{binomial\_coefficient\_log}(x,y) = \begin{cases} \textrm{error} & \mbox{if } y > x \textrm{ or } y < 0\\ \ln\Gamma(x+1) & \mbox{if } 0\leq y \leq x \\ \quad -\ln\Gamma(y+1)& \\ \quad -\ln\Gamma(x-y+1)& \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#43:\[ \frac{\partial\,\mbox{binomial\_coefficient\_log}(x,y)}{\partial x} = \begin{cases} \textrm{error} & \mbox{if } y > x \textrm{ or } y < 0\\ \Psi(x+1) & \mbox{if } 0\leq y \leq x \\ \quad -\Psi(x-y+1)& \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#44:\[ \frac{\partial\,\mbox{binomial\_coefficient\_log}(x,y)}{\partial y} = \begin{cases} \textrm{error} & \mbox{if } y > x \textrm{ or } y < 0\\ -\Psi(y+1) & \mbox{if } 0\leq y \leq x \\ \quad +\Psi(x-y+1)& \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#45:$ e $
+\form#46:$ \sqrt{2} $
+\form#47:$ 1 / \sqrt{2} $
+\form#48:$ \log 2 $
+\form#49:$ \log 10 $
+\form#50:$f(x) = \tanh x = \frac{\exp(2x) - 1}{\exp(2x) + 1}$
+\form#51:$\log | \frac{d}{dx} \tanh x | = \log (1 - \tanh^2 x)$
+\form#52:$ f^{-1}(y) = \mbox{atanh}\, y = \frac{1}{2} \log \frac{y + 1}{y - 1}$
+\form#53:\[ \mbox{digamma}(x) = \begin{cases} \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\ \Psi(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#54:\[ \frac{\partial\,\mbox{digamma}(x)}{\partial x} = \begin{cases} \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\ \frac{\partial\, \Psi(x)}{\partial x} & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#55:\[ \Psi(x)=\frac{\Gamma'(x)}{\Gamma(x)} \]
+\form#56:\[ \frac{\partial \, \Psi(x)}{\partial x} = \frac{\Gamma''(x)\Gamma(x)-(\Gamma'(x))^2}{\Gamma^2(x)} \]
+\form#57:\[ \mbox{falling\_factorial}(x,n) = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ (x)_n & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#58:\[ \frac{\partial\,\mbox{falling\_factorial}(x,n)}{\partial x} = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ \frac{\partial\, (x)_n}{\partial x} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#59:\[ \frac{\partial\,\mbox{falling\_factorial}(x,n)}{\partial n} = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ \frac{\partial\, (x)_n}{\partial n} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#60:\[ (x)_n=\frac{\Gamma(x+1)}{\Gamma(x-n+1)} \]
+\form#61:\[ \frac{\partial \, (x)_n}{\partial x} = (x)_n\Psi(x+1) \]
+\form#62:\[ \frac{\partial \, (x)_n}{\partial n} = -(x)_n\Psi(n+1) \]
+\form#63:\[ \mbox{gamma\_p}(a,z) = \begin{cases} \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\ P(a,z) & \mbox{if } a > 0, z \geq 0 \\[6pt] \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN} \end{cases} \]
+\form#64:\[ \frac{\partial\,\mbox{gamma\_p}(a,z)}{\partial a} = \begin{cases} \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\ \frac{\partial\, P(a,z)}{\partial a} & \mbox{if } a > 0, z \geq 0 \\[6pt] \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN} \end{cases} \]
+\form#65:\[ \frac{\partial\,\mbox{gamma\_p}(a,z)}{\partial z} = \begin{cases} \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\ \frac{\partial\, P(a,z)}{\partial z} & \mbox{if } a > 0, z \geq 0 \\[6pt] \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN} \end{cases} \]
+\form#66:\[ P(a,z)=\frac{1}{\Gamma(a)}\int_0^zt^{a-1}e^{-t}dt \]
+\form#67:\[ \frac{\partial \, P(a,z)}{\partial a} = -\frac{\Psi(a)}{\Gamma^2(a)}\int_0^zt^{a-1}e^{-t}dt + \frac{1}{\Gamma(a)}\int_0^z (a-1)t^{a-2}e^{-t}dt \]
+\form#68:\[ \frac{\partial \, P(a,z)}{\partial z} = \frac{z^{a-1}e^{-z}}{\Gamma(a)} \]
+\form#69:\[ \mbox{gamma\_q}(a,z) = \begin{cases} \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\ Q(a,z) & \mbox{if } a > 0, z \geq 0 \\[6pt] \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN} \end{cases} \]
+\form#70:\[ \frac{\partial\,\mbox{gamma\_q}(a,z)}{\partial a} = \begin{cases} \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\ \frac{\partial\, Q(a,z)}{\partial a} & \mbox{if } a > 0, z \geq 0 \\[6pt] \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN} \end{cases} \]
+\form#71:\[ \frac{\partial\,\mbox{gamma\_q}(a,z)}{\partial z} = \begin{cases} \textrm{error} & \mbox{if } a\leq 0 \textrm{ or } z < 0\\ \frac{\partial\, Q(a,z)}{\partial z} & \mbox{if } a > 0, z \geq 0 \\[6pt] \textrm{NaN} & \mbox{if } a = \textrm{NaN or } z = \textrm{NaN} \end{cases} \]
+\form#72:\[ Q(a,z)=\frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt \]
+\form#73:\[ \frac{\partial \, Q(a,z)}{\partial a} = -\frac{\Psi(a)}{\Gamma^2(a)}\int_z^\infty t^{a-1}e^{-t}dt + \frac{1}{\Gamma(a)}\int_z^\infty (a-1)t^{a-2}e^{-t}dt \]
+\form#74:\[ \frac{\partial \, Q(a,z)}{\partial z} = -\frac{z^{a-1}e^{-z}}{\Gamma(a)} \]
+\form#75:\[ \mbox{int\_step}(x) = \begin{cases} 0 & \mbox{if } x \leq 0 \\ 1 & \mbox{if } x > 0 \\[6pt] 0 & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#76:\[ \mbox{inv\_cloglog}(y) = \begin{cases} \mbox{cloglog}^{-1}(y) & \mbox{if } -\infty\leq y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } y = \textrm{NaN} \end{cases} \]
+\form#77:\[ \frac{\partial\,\mbox{inv\_cloglog}(y)}{\partial y} = \begin{cases} \frac{\partial\, \mbox{cloglog}^{-1}(y)}{\partial y} & \mbox{if } -\infty\leq y\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } y = \textrm{NaN} \end{cases} \]
+\form#78:\[ \mbox{cloglog}^{-1}(y) = 1 - \exp \left( - \exp(y) \right) \]
+\form#79:\[ \frac{\partial \, \mbox{cloglog}^{-1}(y)}{\partial y} = \exp(y-\exp(y)) \]
+\form#80:$\mbox{logit}^{-1}(x) = \frac{1}{1 + \exp(-x)}$
+\form#81:\[ \mbox{inv\_logit}(y) = \begin{cases} \mbox{logit}^{-1}(y) & \mbox{if } -\infty\leq y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } y = \textrm{NaN} \end{cases} \]
+\form#82:\[ \frac{\partial\,\mbox{inv\_logit}(y)}{\partial y} = \begin{cases} \frac{\partial\, \mbox{logit}^{-1}(y)}{\partial y} & \mbox{if } -\infty\leq y\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } y = \textrm{NaN} \end{cases} \]
+\form#83:\[ \mbox{logit}^{-1}(y) = \frac{1}{1 + \exp(-y)} \]
+\form#84:\[ \frac{\partial \, \mbox{logit}^{-1}(y)}{\partial y} = \frac{\exp(y)}{(\exp(y)+1)^2} \]
+\form#85:$\mbox{inverse\_softmax}(x)[i] = \log x[i]$
+\form#86:$f(x) = \exp(x) + L$
+\form#87:$a > 0$
+\form#88:$b > 0$
+\form#89:$\mbox{B}(a,b) = \frac{\Gamma(a) \Gamma(b)}{\Gamma(a+b)}$
+\form#90:$\log \mbox{B}(a,b) = \log \Gamma(a) + \log \Gamma(b) - \log \Gamma(a+b)$
+\form#91:\[ \mbox{lbeta}(\alpha,\beta) = \begin{cases} \ln\int_0^1 u^{\alpha - 1} (1 - u)^{\beta - 1} \, du & \mbox{if } \alpha,\beta>0 \\[6pt] \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN} \end{cases} \]
+\form#92:\[ \frac{\partial\,\mbox{lbeta}(\alpha,\beta)}{\partial \alpha} = \begin{cases} \Psi(\alpha)-\Psi(\alpha+\beta) & \mbox{if } \alpha,\beta>0 \\[6pt] \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN} \end{cases} \]
+\form#93:\[ \frac{\partial\,\mbox{lbeta}(\alpha,\beta)}{\partial \beta} = \begin{cases} \Psi(\beta)-\Psi(\alpha+\beta) & \mbox{if } \alpha,\beta>0 \\[6pt] \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN} \end{cases} \]
+\form#94:\[ \mbox{lgamma}(x) = \begin{cases} \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\ \ln\Gamma(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#95:\[ \frac{\partial\,\mbox{lgamma}(x)}{\partial x} = \begin{cases} \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\ \Psi(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#96:$\Gamma_k(x)$
+\form#97:$x$
+\form#98:$\Gamma_k(x) = \pi^{k(k-1)/4} \, \prod_{j=1}^k \Gamma(x + (1 - j)/2)$
+\form#99:$\Gamma()$
+\form#100:\[ \mbox{lmgamma}(n,x) = \begin{cases} \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\ \ln\Gamma_n(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#101:\[ \frac{\partial\,\mbox{lmgamma}(n,x)}{\partial x} = \begin{cases} \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\ \frac{\partial\, \ln\Gamma_n(x)}{\partial x} & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#102:\[ \ln\Gamma_n(x) = \pi^{n(n-1)/4} \, \prod_{j=1}^n \Gamma(x + (1 - j)/2) \]
+\form#103:\[ \frac{\partial \, \ln\Gamma_n(x)}{\partial x} = \sum_{j=1}^n \Psi(x + (1 - j) / 2) \]
+\form#104:\[ \mbox{log1m}(x) = \begin{cases} \ln(1-x) & \mbox{if } x \leq 1 \\ \textrm{NaN} & \mbox{if } x > 1\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#105:\[ \frac{\partial\,\mbox{log1m}(x)}{\partial x} = \begin{cases} -\frac{1}{1-x} & \mbox{if } x \leq 1 \\ \textrm{NaN} & \mbox{if } x > 1\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#106:\[ \mbox{log1m\_exp}(x) = \begin{cases} \ln(1-\exp(x)) & \mbox{if } x < 0 \\ \textrm{NaN} & \mbox{if } x \geq 0\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#107:\[ \frac{\partial\,\mbox{asinh}(x)}{\partial x} = \begin{cases} -\frac{\exp(x)}{1-\exp(x)} & \mbox{if } x < 0 \\ \textrm{NaN} & \mbox{if } x \geq 0\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#108:\[ \mbox{log1m\_inv\_logit}(x) = \begin{cases} -\ln(\exp(x)+1) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#109:\[ \frac{\partial\,\mbox{log1m\_inv\_logit}(x)}{\partial x} = \begin{cases} -\frac{\exp(x)}{\exp(x)+1} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#110:\[ \mbox{log1p}(x) = \begin{cases} \textrm{NaN} & \mbox{if } x < -1\\ \ln(1+x)& \mbox{if } x\geq -1 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#111:\[ \frac{\partial\,\mbox{log1p}(x)}{\partial x} = \begin{cases} \textrm{NaN} & \mbox{if } x < -1\\ \frac{1}{1+x} & \mbox{if } x\geq -1 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#112:\[ \mbox{log1p\_exp}(x) = \begin{cases} \ln(1+\exp(x)) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#113:\[ \frac{\partial\,\mbox{log1p\_exp}(x)}{\partial x} = \begin{cases} \frac{\exp(x)}{1+\exp(x)} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#114:\[ \mbox{log\_diff\_exp}(x,y) = \begin{cases} \textrm{NaN} & \mbox{if } x \leq y\\ \ln(\exp(x)-\exp(y)) & \mbox{if } x > y \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#115:\[ \frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial x} = \begin{cases} \textrm{NaN} & \mbox{if } x \leq y\\ \frac{\exp(x)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#116:\[ \frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial y} = \begin{cases} \textrm{NaN} & \mbox{if } x \leq y\\ -\frac{\exp(y)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#117:\[ \mbox{log\_falling\_factorial}(x,n) = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ \ln (x)_n & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#118:\[ \frac{\partial\,\mbox{log\_falling\_factorial}(x,n)}{\partial x} = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ \Psi(x) & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#119:\[ \frac{\partial\,\mbox{log\_falling\_factorial}(x,n)}{\partial n} = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ -\Psi(n) & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#120:\[ \mbox{log\_inv\_logit}(x) = \begin{cases} \ln\left(\frac{1}{1+\exp(-x)}\right)& \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#121:\[ \frac{\partial\,\mbox{log\_inv\_logit}(x)}{\partial x} = \begin{cases} \frac{1}{1+\exp(x)} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#122:\[ \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) = \log \left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right). \]
+\form#123:\[ \frac{\partial}{\partial \theta} \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) = FIXME \]
+\form#124:\[ \frac{\partial}{\partial \lambda_1} \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) = FIXME \]
+\form#125:\[ \frac{\partial}{\partial \lambda_2} \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) = FIXME \]
+\form#126:\[ \mbox{log\_rising\_factorial}(x,n) = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ \ln x^{(n)} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#127:\[ \frac{\partial\,\mbox{log\_rising\_factorial}(x,n)}{\partial x} = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ \Psi(x+n) - \Psi(x) & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#128:\[ \frac{\partial\,\mbox{log\_rising\_factorial}(x,n)}{\partial n} = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ \Psi(x+n) & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#129:$\log (\exp(a) + \exp(b)) = m + \log(\exp(a-m) + \exp(b-m))$
+\form#130:$m = max(a,b)$
+\form#131:\[ \mbox{log\_sum\_exp}(x,y) = \begin{cases} \ln(\exp(x)+\exp(y)) & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#132:\[ \frac{\partial\,\mbox{log\_sum\_exp}(x,y)}{\partial x} = \begin{cases} \frac{\exp(x)}{\exp(x)+\exp(y)} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#133:\[ \frac{\partial\,\mbox{log\_sum\_exp}(x,y)}{\partial y} = \begin{cases} \frac{\exp(y)}{\exp(x)+\exp(y)} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#134:\[ \mbox{operator\&\&}(x,y) = \begin{cases} 0 & \mbox{if } x = 0 \textrm{ or } y=0 \\ 1 & \mbox{if } x,y \neq 0 \\[6pt] 1 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#135:\[ \mbox{operator||}(x,y) = \begin{cases} 0 & \mbox{if } x,y=0 \\ 1 & \mbox{if } x \neq 0 \textrm{ or } y\neq0\\[6pt] 1 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#136:$x \in [0,1]$
+\form#137:$\mbox{logit}(x) = \log \left( \frac{x}{1 - x} \right)$
+\form#138:\[ \mbox{logit}(x) = \begin{cases} \textrm{NaN}& \mbox{if } x < 0 \textrm{ or } x > 1\\ \ln\frac{x}{1-x} & \mbox{if } 0\leq x \leq 1 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#139:\[ \frac{\partial\,\mbox{logit}(x)}{\partial x} = \begin{cases} \textrm{NaN}& \mbox{if } x < 0 \textrm{ or } x > 1\\ \frac{1}{x-x^2}& \mbox{if } 0\leq x\leq 1 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#140:$f(x) = L + (U - L) \mbox{logit}^{-1}(x)$
+\form#141:$\log \left| \frac{d}{dx} \left( L + (U-L) \mbox{logit}^{-1}(x) \right) \right|$
+\form#142:$ {} = \log | (U-L) \, (\mbox{logit}^{-1}(x)) \, (1 - \mbox{logit}^{-1}(x)) |$
+\form#143:$ {} = \log (U - L) + \log (\mbox{logit}^{-1}(x)) + \log (1 - \mbox{logit}^{-1}(x))$
+\form#144:$f^{-1}(y) = \mbox{logit}(\frac{y - L}{U - L})$
+\form#145:$U$
+\form#146:\[ \mbox{modified\_bessel\_first\_kind}(v,z) = \begin{cases} I_v(z) & \mbox{if } -\infty\leq z \leq \infty \\[6pt] \textrm{error} & \mbox{if } z = \textrm{NaN} \end{cases} \]
+\form#147:\[ \frac{\partial\,\mbox{modified\_bessel\_first\_kind}(v,z)}{\partial z} = \begin{cases} \frac{\partial\, I_v(z)}{\partial z} & \mbox{if } -\infty\leq z\leq \infty \\[6pt] \textrm{error} & \mbox{if } z = \textrm{NaN} \end{cases} \]
+\form#148:\[ {I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)} \]
+\form#149:\[ \frac{\partial \, I_v(z)}{\partial z} = I_{v-1}(z)-\frac{v}{z}I_v(z) \]
+\form#150:\[ \mbox{modified\_bessel\_second\_kind}(v,z) = \begin{cases} \textrm{error} & \mbox{if } z \leq 0 \\ K_v(z) & \mbox{if } z > 0 \\[6pt] \textrm{NaN} & \mbox{if } z = \textrm{NaN} \end{cases} \]
+\form#151:\[ \frac{\partial\,\mbox{modified\_bessel\_second\_kind}(v,z)}{\partial z} = \begin{cases} \textrm{error} & \mbox{if } z \leq 0 \\ \frac{\partial\, K_v(z)}{\partial z} & \mbox{if } z > 0 \\[6pt] \textrm{NaN} & \mbox{if } z = \textrm{NaN} \end{cases} \]
+\form#152:\[ {K_v}(z) = \frac{\pi}{2}\cdot\frac{I_{-v}(z) - I_{v}(z)}{\sin(v\pi)} \]
+\form#153:\[ \frac{\partial \, K_v(z)}{\partial z} = -\frac{v}{z}K_v(z)-K_{v-1}(z) \]
+\form#154:$ a * \log b $
+\form#155:\[ \mbox{multiply\_log}(x,y) = \begin{cases} 0 & \mbox{if } x=y=0\\ x\ln y & \mbox{if } x,y\neq0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#156:\[ \frac{\partial\,\mbox{multiply\_log}(x,y)}{\partial x} = \begin{cases} \infty & \mbox{if } x=y=0\\ \ln y & \mbox{if } x,y\neq 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#157:\[ \frac{\partial\,\mbox{multiply\_log}(x,y)}{\partial y} = \begin{cases} \infty & \mbox{if } x=y=0\\ \frac{x}{y} & \mbox{if } x,y\neq 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#158:\[ \mbox{owens\_t}(h,a) = \begin{cases} \mbox{owens\_t}(h,a) & \mbox{if } -\infty\leq h,a \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } h = \textrm{NaN or } a = \textrm{NaN} \end{cases} \]
+\form#159:\[ \frac{\partial\,\mbox{owens\_t}(h,a)}{\partial h} = \begin{cases} \frac{\partial\, \mbox{owens\_t}(h,a)}{\partial h} & \mbox{if } -\infty\leq h,a\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } h = \textrm{NaN or } a = \textrm{NaN} \end{cases} \]
+\form#160:\[ \frac{\partial\,\mbox{owens\_t}(h,a)}{\partial a} = \begin{cases} \frac{\partial\, \mbox{owens\_t}(h,a)}{\partial a} & \mbox{if } -\infty\leq h,a\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } h = \textrm{NaN or } a = \textrm{NaN} \end{cases} \]
+\form#161:\[ \mbox{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx \]
+\form#162:\[ \frac{\partial \, \mbox{owens\_t}(h,a)}{\partial h} = -\frac{1}{2\sqrt{2\pi}} \operatorname{erf}\left(\frac{ha}{\sqrt{2}}\right) \exp\left(-\frac{h^2}{2}\right) \]
+\form#163:\[ \frac{\partial \, \mbox{owens\_t}(h,a)}{\partial a} = \frac{\exp\left(-\frac{1}{2}h^2(1+a^2)\right)}{2\pi (1+a^2)} \]
+\form#164:$\Phi(x) = \int_{-\infty}^x \mbox{\sf Norm}(x|0,1) \ dx$
+\form#165:$f(x) = \exp(x)$
+\form#166:$\log | \frac{d}{dx} \mbox{exp}(x) | = \log | \mbox{exp}(x) | = x$
+\form#167:$f$
+\form#168:$f^{-1}(x) = \log(x)$
+\form#169:$f(x) = \mbox{logit}^{-1}(x) = \frac{1}{1 + \exp(x)}$
+\form#170:$\log | \frac{d}{dx} \mbox{logit}^{-1}(x) |$
+\form#171:$\log ((\mbox{logit}^{-1}(x)) (1 - \mbox{logit}^{-1}(x))$
+\form#172:$\log (\mbox{logit}^{-1}(x)) + \log (1 - \mbox{logit}^{-1}(x))$
+\form#173:$f^{-1}(y) = \mbox{logit}(y) = \frac{1 - y}{y}$
+\form#174:\[ \mbox{rising\_factorial}(x,n) = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ x^{(n)} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#175:\[ \frac{\partial\,\mbox{rising\_factorial}(x,n)}{\partial x} = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ \frac{\partial\, x^{(n)}}{\partial x} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#176:\[ \frac{\partial\,\mbox{rising\_factorial}(x,n)}{\partial n} = \begin{cases} \textrm{error} & \mbox{if } x \leq 0\\ \frac{\partial\, x^{(n)}}{\partial n} & \mbox{if } x > 0 \textrm{ and } -\infty \leq n \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } n = \textrm{NaN} \end{cases} \]
+\form#177:\[ x^{(n)}=\frac{\Gamma(x+n)}{\Gamma(x)} \]
+\form#178:\[ \frac{\partial \, x^{(n)}}{\partial x} = x^{(n)}(\Psi(x+n)-\Psi(x)) \]
+\form#179:\[ \frac{\partial \, x^{(n)}}{\partial n} = (x)_n\Psi(x+n) \]
+\form#180:$\mbox{square}(x) = x^2$
+\form#181:\[ \mbox{step}(x) = \begin{cases} 0 & \mbox{if } x \leq 0 \\ 1 & \mbox{if } x > 0 \\[6pt] 0 & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#182:\[ \mbox{trigamma}(x) = \begin{cases} \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\ \Psi_1(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#183:\[ \frac{\partial\,\mbox{trigamma}(x)}{\partial x} = \begin{cases} \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\ \frac{\partial\, \Psi_1(x)}{\partial x} & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#184:\[ \Psi_1(x)=\sum_{n=0}^\infty \frac{1}{(x+n)^2} \]
+\form#185:\[ \frac{\partial \, \Psi_1(x)}{\partial x} = -2\sum_{n=0}^\infty \frac{1}{(x+n)^3} \]
+\form#186:$f(x) = U - \exp(x)$
+\form#187:$ \log | \frac{d}{dx} -\mbox{exp}(x) + U | = \log | -\mbox{exp}(x) + 0 | = x$
+\form#188:$f^{-1}(y) = \log -(y - U)$
+\form#189:$\frac{1}{\pi}\arctan\left(\frac{y-\mu}{\sigma}\right) + \frac{1}{2}$
+\form#190:\begin{eqnarray*} y &\sim& \chi^2_\nu \\ \log (p (y \,|\, \nu)) &=& \log \left( \frac{2^{-\nu / 2}}{\Gamma (\nu / 2)} y^{\nu / 2 - 1} \exp^{- y / 2} \right) \\ &=& - \frac{\nu}{2} \log(2) - \log (\Gamma (\nu / 2)) + (\frac{\nu}{2} - 1) \log(y) - \frac{y}{2} \\ & & \mathrm{ where } \; y \ge 0 \end{eqnarray*}
+\form#191:$ f(y|\mu,\sigma) = \begin{cases} \ \frac{1}{2} \exp\left(\frac{y-\mu}{\sigma}\right), \mbox{if } y < \mu \\ 1 - \frac{1}{2} \exp\left(-\frac{y-\mu}{\sigma}\right), \mbox{if } y \ge \mu \ \end{cases}$
+\form#192:\begin{eqnarray*} y &\sim& \mbox{\sf{Expon}}(\beta) \\ \log (p (y \,|\, \beta) ) &=& \log \left( \beta \exp^{-\beta y} \right) \\ &=& \log (\beta) - \beta y \\ & & \mathrm{where} \; y > 0 \end{eqnarray*}
+\form#193:\begin{eqnarray*} y &\sim& \mbox{\sf{Gamma}}(\alpha, \beta) \\ \log (p (y \,|\, \alpha, \beta) ) &=& \log \left( \frac{\beta^\alpha}{\Gamma(\alpha)} y^{\alpha - 1} \exp^{- \beta y} \right) \\ &=& \alpha \log(\beta) - \log(\Gamma(\alpha)) + (\alpha - 1) \log(y) - \beta y\\ & & \mathrm{where} \; y > 0 \end{eqnarray*}
+\form#194:\begin{eqnarray*} y &\sim& \mbox{\sf{Inv-}}\chi^2_\nu \\ \log (p (y \,|\, \nu)) &=& \log \left( \frac{2^{-\nu / 2}}{\Gamma (\nu / 2)} y^{- (\nu / 2 + 1)} \exp^{-1 / (2y)} \right) \\ &=& - \frac{\nu}{2} \log(2) - \log (\Gamma (\nu / 2)) - (\frac{\nu}{2} + 1) \log(y) - \frac{1}{2y} \\ & & \mathrm{ where } \; y > 0 \end{eqnarray*}
+\form#195:$\Phi(x) = \frac{1}{\sqrt{2 \pi}} \int_{-\inf}^x e^{-t^2/2} dt$
+\form#196:\begin{eqnarray*} y &\sim& \mbox{\sf{Inv-}}\chi^2(\nu, s^2) \\ \log (p (y \,|\, \nu, s)) &=& \log \left( \frac{(\nu / 2)^{\nu / 2}}{\Gamma (\nu / 2)} s^\nu y^{- (\nu / 2 + 1)} \exp^{-\nu s^2 / (2y)} \right) \\ &=& \frac{\nu}{2} \log(\frac{\nu}{2}) - \log (\Gamma (\nu / 2)) + \nu \log(s) - (\frac{\nu}{2} + 1) \log(y) - \frac{\nu s^2}{2y} \\ & & \mathrm{ where } \; y > 0 \end{eqnarray*}
+\form#197:\begin{eqnarray*} y &\sim& t_{\nu} (\mu, \sigma^2) \\ \log (p (y \,|\, \nu, \mu, \sigma) ) &=& \log \left( \frac{\Gamma((\nu + 1) /2)} {\Gamma(\nu/2)\sqrt{\nu \pi} \sigma} \left( 1 + \frac{1}{\nu} (\frac{y - \mu}{\sigma})^2 \right)^{-(\nu + 1)/2} \right) \\ &=& \log( \Gamma( (\nu+1)/2 )) - \log (\Gamma (\nu/2) - \frac{1}{2} \log(\nu \pi) - \log(\sigma) -\frac{\nu + 1}{2} \log (1 + \frac{1}{\nu} (\frac{y - \mu}{\sigma})^2) \end{eqnarray*}
+\form#198:\begin{eqnarray*} y &\sim& \mbox{\sf{U}}(\alpha, \beta) \\ \log (p (y \,|\, \alpha, \beta)) &=& \log \left( \frac{1}{\beta-\alpha} \right) \\ &=& \log (1) - \log (\beta - \alpha) \\ &=& -\log (\beta - \alpha) \\ & & \mathrm{ where } \; y \in [\alpha, \beta], \log(0) \; \mathrm{otherwise} \end{eqnarray*}
+\form#199:$ \frac{d x_n}{dt} $
+\form#200:\[ \frac{d x_{N+m}}{dt} = \frac{d}{dt} \frac{\partial x_1}{\partial \theta_m} \]
+\form#201:\[ \frac{d x_{N+n}}{dt} = \frac{d}{dt} \frac{\partial x_1}{\partial y0_n} \]
+\form#202:\[ \frac{d x_{N + n}}{dt} = \frac{d}{dt} \frac{\partial x_1}{\partial y0_n} \]
+\form#203:\[ \frac{d x_{N+N+m}}{dt} = \frac{d}{dt} \frac{\partial x_1}{\partial \theta_m} \]
+\form#204:$\frac{\partial}{\partial x} (x+y) = 1$
+\form#205:$\frac{\partial}{\partial y} (x+y) = 1$
+\form#206:\[ \mbox{operator+}(x,y) = \begin{cases} x+y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#207:\[ \frac{\partial\,\mbox{operator+}(x,y)}{\partial x} = \begin{cases} 1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#208:\[ \frac{\partial\,\mbox{operator+}(x,y)}{\partial y} = \begin{cases} 1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#209:$\frac{d}{dx} (x + c) = 1$
+\form#210:$\frac{d}{dy} (c + y) = 1$
+\form#211:$\frac{\partial}{\partial x} (x/y) = 1/y$
+\form#212:$\frac{\partial}{\partial y} (x/y) = -x / y^2$
+\form#213:\[ \mbox{operator/}(x,y) = \begin{cases} \frac{x}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#214:\[ \frac{\partial\,\mbox{operator/}(x,y)}{\partial x} = \begin{cases} \frac{1}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#215:\[ \frac{\partial\,\mbox{operator/}(x,y)}{\partial y} = \begin{cases} -\frac{x}{y^2} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#216:$\frac{\partial}{\partial x} (x/c) = 1/c$
+\form#217:$\frac{d}{d y} (c/y) = -c / y^2$
+\form#218:\[ \mbox{operator==}(x,y) = \begin{cases} 0 & \mbox{if } x \neq y\\ 1 & \mbox{if } x = y \\[6pt] 0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#219:\[ \mbox{operator\textgreater}(x,y) = \begin{cases} 0 & \mbox{if } x \leq y\\ 1 & \mbox{if } x > y \\[6pt] 0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#220:\[ \mbox{operator\textgreater=}(x,y) = \begin{cases} 0 & \mbox{if } x < y\\ 1 & \mbox{if } x \geq y \\[6pt] 0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#221:\[ \mbox{operator\textless}(x,y) = \begin{cases} 0 & \mbox{if } x \geq y \\ 1 & \mbox{if } x < y \\[6pt] 0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#222:\[ \mbox{operator\textless=}(x,y) = \begin{cases} 0 & \mbox{if } x > y\\ 1 & \mbox{if } x \leq y \\[6pt] 0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#223:$\frac{\partial}{\partial x} (x * y) = y$
+\form#224:$\frac{\partial}{\partial y} (x * y) = x$
+\form#225:\[ \mbox{operator*}(x,y) = \begin{cases} xy & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#226:\[ \frac{\partial\,\mbox{operator*}(x,y)}{\partial x} = \begin{cases} y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#227:\[ \frac{\partial\,\mbox{operator*}(x,y)}{\partial y} = \begin{cases} x & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#228:$\frac{\partial}{\partial x} (x * c) = c$
+\form#229:$\frac{\partial}{\partial y} (c * y) = c$
+\form#230:\[ \mbox{operator!=}(x,y) = \begin{cases} 0 & \mbox{if } x = y\\ 1 & \mbox{if } x \neq y \\[6pt] 0 & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#231:$\frac{\partial}{\partial x} (x-y) = 1$
+\form#232:$\frac{\partial}{\partial y} (x-y) = -1$
+\form#233:\[ \mbox{operator-}(x,y) = \begin{cases} x-y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#234:\[ \frac{\partial\,\mbox{operator-}(x,y)}{\partial x} = \begin{cases} 1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#235:\[ \frac{\partial\,\mbox{operator-}(x,y)}{\partial y} = \begin{cases} -1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#236:$\frac{\partial}{\partial x} (x-c) = 1$
+\form#237:$\frac{\partial}{\partial y} (c-y) = -1$
+\form#238:$\frac{d}{dx} -x = -1$
+\form#239:\[ \mbox{operator-}(x) = \begin{cases} -x & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#240:\[ \frac{\partial\,\mbox{operator-}(x)}{\partial x} = \begin{cases} -1 & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#241:\[ \mbox{operator!}(x) = \begin{cases} 0 & \mbox{if } x \neq 0 \\ 1 & \mbox{if } x = 0 \\[6pt] 0 & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#242:$\frac{d}{dx} +x = \frac{d}{dx} x = 1$
+\form#243:\[ \mbox{operator+}(x) = \begin{cases} x & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#244:\[ \frac{\partial\,\mbox{operator+}(x)}{\partial x} = \begin{cases} 1 & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#245:\[ \mbox{abs}(x) = \begin{cases} |x| & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#246:\[ \frac{\partial\,\mbox{abs}(x)}{\partial x} = \begin{cases} -1 & \mbox{if } x < 0 \\ 0 & \mbox{if } x = 0 \\ 1 & \mbox{if } x > 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#247:$\frac{d}{dx} \arccos x = \frac{-1}{\sqrt{1 - x^2}}$
+\form#248:\[ \mbox{acos}(x) = \begin{cases} \textrm{NaN} & \mbox{if } x < -1\\ \arccos(x) & \mbox{if } -1\leq x\leq 1 \\ \textrm{NaN} & \mbox{if } x > 1\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#249:\[ \frac{\partial\,\mbox{acos}(x)}{\partial x} = \begin{cases} \textrm{NaN} & \mbox{if } x < -1\\ \frac{\partial\,\arccos(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\ \textrm{NaN} & \mbox{if } x < -1\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#250:\[ \frac{\partial \, \arccos(x)}{\partial x} = -\frac{1}{\sqrt{1-x^2}} \]
+\form#251:$\frac{d}{dx} \mbox{acosh}(x) = \frac{x}{x^2 - 1}$
+\form#252:\[ \mbox{acosh}(x) = \begin{cases} \textrm{NaN} & \mbox{if } x < 1 \\ \cosh^{-1}(x) & \mbox{if } x \geq 1 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#253:\[ \frac{\partial\,\mbox{acosh}(x)}{\partial x} = \begin{cases} \textrm{NaN} & \mbox{if } x < 1 \\ \frac{\partial\, \cosh^{-1}(x)}{\partial x} & \mbox{if } x \geq 1 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#254:\[ \cosh^{-1}(x)=\ln\left(x+\sqrt{x^2-1}\right) \]
+\form#255:\[ \frac{\partial \, \cosh^{-1}(x)}{\partial x} = \frac{1}{\sqrt{x^2-1}} \]
+\form#256:$\frac{d}{dx} \arcsin x = \frac{1}{\sqrt{1 - x^2}}$
+\form#257:\[ \mbox{asin}(x) = \begin{cases} \textrm{NaN} & \mbox{if } x < -1\\ \arcsin(x) & \mbox{if } -1\leq x\leq 1 \\ \textrm{NaN} & \mbox{if } x > 1\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#258:\[ \frac{\partial\,\mbox{asin}(x)}{\partial x} = \begin{cases} \textrm{NaN} & \mbox{if } x < -1\\ \frac{\partial\,\arcsin(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\ \textrm{NaN} & \mbox{if } x < -1\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#259:\[ \frac{\partial \, \arcsin(x)}{\partial x} = \frac{1}{\sqrt{1-x^2}} \]
+\form#260:$\frac{d}{dx} \mbox{asinh}(x) = \frac{x}{x^2 + 1}$
+\form#261:\[ \mbox{asinh}(x) = \begin{cases} \sinh^{-1}(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#262:\[ \frac{\partial\,\mbox{asinh}(x)}{\partial x} = \begin{cases} \frac{\partial\, \sinh^{-1}(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#263:\[ \sinh^{-1}(x)=\ln\left(x+\sqrt{x^2+1}\right) \]
+\form#264:\[ \frac{\partial \, \sinh^{-1}(x)}{\partial x} = \frac{1}{\sqrt{x^2+1}} \]
+\form#265:$\frac{d}{dx} \arctan x = \frac{1}{1 + x^2}$
+\form#266:\[ \mbox{atan}(x) = \begin{cases} \arctan(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#267:\[ \frac{\partial\,\mbox{atan}(x)}{\partial x} = \begin{cases} \frac{\partial\, \arctan(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#268:\[ \frac{\partial \, \arctan(x)}{\partial x} = \frac{1}{x^2+1} \]
+\form#269:$ \frac{\partial}{\partial x} \arctan \frac{x}{y} = \frac{y}{x^2 + y^2}$
+\form#270:$ \frac{\partial}{\partial y} \arctan \frac{x}{y} = \frac{-x}{x^2 + y^2}$
+\form#271:$ \frac{d}{d x} \arctan \frac{x}{c} = \frac{c}{x^2 + c^2}$
+\form#272:$ \frac{\partial}{\partial y} \arctan \frac{c}{y} = \frac{-c}{c^2 + y^2}$
+\form#273:\[ \mbox{atan2}(x,y) = \begin{cases} \arctan\left(\frac{x}{y}\right) & \mbox{if } -\infty\leq x \leq \infty, -\infty\leq y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#274:\[ \frac{\partial\,\mbox{atan2}(x,y)}{\partial x} = \begin{cases} \frac{y}{x^2+y^2} & \mbox{if } -\infty\leq x\leq \infty, -\infty\leq y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#275:\[ \frac{\partial\,\mbox{atan2}(x,y)}{\partial y} = \begin{cases} -\frac{x}{x^2+y^2} & \mbox{if } -\infty\leq x\leq \infty, -\infty\leq y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#276:$\frac{d}{dx} \mbox{atanh}(x) = \frac{1}{1 - x^2}$
+\form#277:\[ \mbox{atanh}(x) = \begin{cases} \textrm{NaN} & \mbox{if } x < -1\\ \tanh^{-1}(x) & \mbox{if } -1\leq x \leq 1 \\ \textrm{NaN} & \mbox{if } x > 1\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#278:\[ \frac{\partial\,\mbox{atanh}(x)}{\partial x} = \begin{cases} \textrm{NaN} & \mbox{if } x < -1\\ \frac{\partial\, \tanh^{-1}(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\ \textrm{NaN} & \mbox{if } x > 1\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#279:\[ \tanh^{-1}(x)=\frac{1}{2}\ln\left(\frac{1+x}{1-x}\right) \]
+\form#280:\[ \frac{\partial \, \tanh^{-1}(x)}{\partial x} = \frac{1}{1-x^2} \]
+\form#281:$\hat{y}$
+\form#282:$\frac{d}{d\hat{y}} \mbox{logloss}(1,\hat{y}) = - \frac{1}{\hat{y}}$
+\form#283:$\frac{d}{d\hat{y}} \mbox{logloss}(0,\hat{y}) = \frac{1}{1 - \hat{y}}$
+\form#284:\[ \mbox{binary\_log\_loss}(y,\hat{y}) = \begin{cases} y \log \hat{y} + (1 - y) \log (1 - \hat{y}) & \mbox{if } 0\leq \hat{y}\leq 1, y\in\{ 0,1 \}\\[6pt] \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN} \end{cases} \]
+\form#285:\[ \frac{\partial\,\mbox{binary\_log\_loss}(y,\hat{y})}{\partial \hat{y}} = \begin{cases} \frac{y}{\hat{y}}-\frac{1-y}{1-\hat{y}} & \mbox{if } 0\leq \hat{y}\leq 1, y\in\{ 0,1 \}\\[6pt] \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN} \end{cases} \]
+\form#286:$\frac{d}{dx} x^{1/3} = \frac{1}{3 x^{2/3}}$
+\form#287:\[ \mbox{cbrt}(x) = \begin{cases} \sqrt[3]{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#288:\[ \frac{\partial\,\mbox{cbrt}(x)}{\partial x} = \begin{cases} \frac{1}{3x^{2/3}} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#289:$\frac{d}{dx} {\lceil x \rceil} = 0$
+\form#290:\[ \mbox{ceil}(x) = \begin{cases} \lceil x\rceil & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#291:\[ \frac{\partial\,\mbox{ceil}(x)}{\partial x} = \begin{cases} 0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#292:$\frac{d}{dx} \cos x = - \sin x$
+\form#293:\[ \mbox{cos}(x) = \begin{cases} \cos(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#294:\[ \frac{\partial\,\mbox{cos}(x)}{\partial x} = \begin{cases} -\sin(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#295:$\frac{d}{dx} \cosh x = \sinh x$
+\form#296:\[ \mbox{cosh}(x) = \begin{cases} \cosh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#297:\[ \frac{\partial\,\mbox{cosh}(x)}{\partial x} = \begin{cases} \sinh(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#298:$\frac{d}{dx} \mbox{erf}(x) = \frac{2}{\sqrt{\pi}} \exp(-x^2)$
+\form#299:\[ \mbox{erf}(x) = \begin{cases} \operatorname{erf}(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#300:\[ \frac{\partial\,\mbox{erf}(x)}{\partial x} = \begin{cases} \frac{\partial\, \operatorname{erf}(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#301:\[ \operatorname{erf}(x)=\frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt \]
+\form#302:\[ \frac{\partial \, \operatorname{erf}(x)}{\partial x} = \frac{2}{\sqrt{\pi}} e^{-x^2} \]
+\form#303:$\frac{d}{dx} \mbox{erfc}(x) = - \frac{2}{\sqrt{\pi}} \exp(-x^2)$
+\form#304:\[ \mbox{erfc}(x) = \begin{cases} \operatorname{erfc}(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#305:\[ \frac{\partial\,\mbox{erfc}(x)}{\partial x} = \begin{cases} \frac{\partial\, \operatorname{erfc}(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#306:\[ \operatorname{erfc}(x)=\frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt \]
+\form#307:\[ \frac{\partial \, \operatorname{erfc}(x)}{\partial x} = -\frac{2}{\sqrt{\pi}} e^{-x^2} \]
+\form#308:\[ \mbox{exp}(x) = \begin{cases} e^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#309:\[ \frac{\partial\,\mbox{exp}(x)}{\partial x} = \begin{cases} e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#310:$\frac{d}{dx} 2^x = (\log 2) 2^x$
+\form#311:\[ \mbox{exp2}(x) = \begin{cases} 2^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#312:\[ \frac{\partial\,\mbox{exp2}(x)}{\partial x} = \begin{cases} 2^x\ln2 & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#313:$\frac{d}{dx} \exp(a) - 1 = \exp(a)$
+\form#314:\[ \mbox{expm1}(x) = \begin{cases} e^x-1 & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#315:\[ \frac{\partial\,\mbox{expm1}(x)}{\partial x} = \begin{cases} e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#316:$\frac{d}{dx}|x| = \mbox{sgn}(x)$
+\form#317:$\mbox{sgn}(x)$
+\form#318:$x < 0$
+\form#319:$x == 0$
+\form#320:$x == 1$
+\form#321:\[ \mbox{fabs}(x) = \begin{cases} |x| & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#322:\[ \frac{\partial\,\mbox{fabs}(x)}{\partial x} = \begin{cases} -1 & \mbox{if } x < 0 \\ 0 & \mbox{if } x = 0 \\ 1 & \mbox{if } x > 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#323:$\frac{\partial}{\partial x} \mbox{fdim}(x,y) = 0.0$
+\form#324:$x < y$
+\form#325:$\frac{\partial}{\partial x} \mbox{fdim}(x,y) = 1.0$
+\form#326:$x \geq y$
+\form#327:$\frac{\partial}{\partial y} \mbox{fdim}(x,y) = 0.0$
+\form#328:$\frac{\partial}{\partial y} \mbox{fdim}(x,y) = -\lfloor\frac{x}{y}\rfloor$
+\form#329:\[ \mbox{fdim}(x,y) = \begin{cases} 0 & \mbox{if } x < y\\ x-y & \mbox{if } x \geq y \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#330:\[ \frac{\partial\,\mbox{fdim}(x,y)}{\partial x} = \begin{cases} 0 & \mbox{if } x < y \\ 1 & \mbox{if } x \geq y \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#331:\[ \frac{\partial\,\mbox{fdim}(x,y)}{\partial y} = \begin{cases} 0 & \mbox{if } x < y \\ -\lfloor\frac{x}{y}\rfloor & \mbox{if } x \geq y \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#332:$\frac{d}{d y} \mbox{fdim}(c,y) = 0.0$
+\form#333:$c < y$
+\form#334:$\frac{d}{d y} \mbox{fdim}(c,y) = -\lfloor\frac{c}{y}\rfloor$
+\form#335:$c \geq y$
+\form#336:$\frac{d}{d x} \mbox{fdim}(x,c) = 0.0$
+\form#337:$x < c$
+\form#338:$\frac{d}{d x} \mbox{fdim}(x,c) = 1.0$
+\form#339:$x \geq yc$
+\form#340:$\frac{d}{dx} {\lfloor x \rfloor} = 0$
+\form#341:\[ \mbox{floor}(x) = \begin{cases} \lfloor x \rfloor & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#342:\[ \frac{\partial\,\mbox{floor}(x)}{\partial x} = \begin{cases} 0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#343:$\frac{\partial}{\partial x} (x * y) + z = y$
+\form#344:$\frac{\partial}{\partial y} (x * y) + z = x$
+\form#345:$\frac{\partial}{\partial z} (x * y) + z = 1$
+\form#346:$\frac{\partial}{\partial x} (x * y) + c = y$
+\form#347:$\frac{\partial}{\partial y} (x * y) + c = x$
+\form#348:$\frac{\partial}{\partial x} (x * c) + z = c$
+\form#349:$\frac{\partial}{\partial z} (x * c) + z = 1$
+\form#350:$\frac{d}{d x} (x * c) + d = c$
+\form#351:$\frac{d}{d y} (c * y) + d = c$
+\form#352:$\frac{\partial}{\partial z} (c * d) + z = 1$
+\form#353:$\frac{\partial}{\partial y} (c * y) + z = c$
+\form#354:$\frac{\partial}{\partial z} (c * y) + z = 1$
+\form#355:\[ \mbox{fmax}(x,y) = \begin{cases} x & \mbox{if } x \geq y \\ y & \mbox{if } x < y \\[6pt] x & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\ y & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\ \textrm{NaN} & \mbox{if } x,y = \textrm{NaN} \end{cases} \]
+\form#356:\[ \frac{\partial\,\mbox{fmax}(x,y)}{\partial x} = \begin{cases} 1 & \mbox{if } x \geq y \\ 0 & \mbox{if } x < y \\[6pt] 1 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\ 0 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\ \textrm{NaN} & \mbox{if } x,y = \textrm{NaN} \end{cases} \]
+\form#357:\[ \frac{\partial\,\mbox{fmax}(x,y)}{\partial y} = \begin{cases} 0 & \mbox{if } x \geq y \\ 1 & \mbox{if } x < y \\[6pt] 0 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\ 1 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\ \textrm{NaN} & \mbox{if } x,y = \textrm{NaN} \end{cases} \]
+\form#358:\[ \mbox{fmin}(x,y) = \begin{cases} x & \mbox{if } x \leq y \\ y & \mbox{if } x > y \\[6pt] x & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\ y & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\ \textrm{NaN} & \mbox{if } x,y = \textrm{NaN} \end{cases} \]
+\form#359:\[ \frac{\partial\,\mbox{fmin}(x,y)}{\partial x} = \begin{cases} 1 & \mbox{if } x \leq y \\ 0 & \mbox{if } x > y \\[6pt] 1 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\ 0 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\ \textrm{NaN} & \mbox{if } x,y = \textrm{NaN} \end{cases} \]
+\form#360:\[ \frac{\partial\,\mbox{fmin}(x,y)}{\partial y} = \begin{cases} 0 & \mbox{if } x \leq y \\ 1 & \mbox{if } x > y \\[6pt] 0 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\ 1 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\ \textrm{NaN} & \mbox{if } x,y = \textrm{NaN} \end{cases} \]
+\form#361:$x = y$
+\form#362:$\frac{\partial}{\partial x} \mbox{fmod}(x,y) = 1$
+\form#363:$\frac{\partial}{\partial y} \mbox{fmod}(x,y) = -\lfloor \frac{x}{y} \rfloor$
+\form#364:\[ \mbox{fmod}(x,y) = \begin{cases} x - \lfloor \frac{x}{y}\rfloor y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#365:\[ \frac{\partial\,\mbox{fmod}(x,y)}{\partial x} = \begin{cases} 1 & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#366:\[ \frac{\partial\,\mbox{fmod}(x,y)}{\partial y} = \begin{cases} -\lfloor \frac{x}{y}\rfloor & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#367:$\frac{d}{d x} \mbox{fmod}(x,c) = \frac{1}{c}$
+\form#368:$\frac{d}{d y} \mbox{fmod}(c,y) = -\lfloor \frac{c}{y} \rfloor$
+\form#369:$\frac{\partial}{\partial x} \sqrt{x^2 + y^2} = \frac{x}{\sqrt{x^2 + y^2}}$
+\form#370:$\frac{\partial}{\partial y} \sqrt{x^2 + y^2} = \frac{y}{\sqrt{x^2 + y^2}}$
+\form#371:$\frac{d}{d x} \sqrt{x^2 + c^2} = \frac{x}{\sqrt{x^2 + c^2}}$
+\form#372:$\frac{d}{d y} \sqrt{c^2 + y^2} = \frac{y}{\sqrt{c^2 + y^2}}$
+\form#373:\[ \mbox{hypot}(x,y) = \begin{cases} \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\ \sqrt{x^2+y^2} & \mbox{if } x,y\geq 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#374:\[ \frac{\partial\,\mbox{hypot}(x,y)}{\partial x} = \begin{cases} \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\ \frac{x}{\sqrt{x^2+y^2}} & \mbox{if } x,y\geq 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#375:\[ \frac{\partial\,\mbox{hypot}(x,y)}{\partial y} = \begin{cases} \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\ \frac{y}{\sqrt{x^2+y^2}} & \mbox{if } x,y\geq 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#376:\[ \mbox{inv}(x) = \begin{cases} \frac{1}{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#377:\[ \frac{\partial\,\mbox{inv}(x)}{\partial x} = \begin{cases} -\frac{1}{x^2} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#378:$\frac{d}{dx} \mbox{cloglog}^{-1}(x) = \exp (x - \exp (x))$
+\form#379:$\frac{d}{dx} \mbox{logit}^{-1}(x) = \mbox{logit}^{-1}(x) (1 - \mbox{logit}^{-1}(x))$
+\form#380:\[ \mbox{inv\_sqrt}(x) = \begin{cases} \frac{1}{\sqrt{x}} & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#381:\[ \frac{\partial\,\mbox{inv\_sqrt}(x)}{\partial x} = \begin{cases} -\frac{1}{2\sqrt{x^3}} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#382:\[ \mbox{inv\_square}(x) = \begin{cases} \frac{1}{x^2} & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#383:\[ \frac{\partial\,\mbox{inv\_square}(x)}{\partial x} = \begin{cases} -\frac{2}{x^3} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#384:$\frac{d}{dx} \Gamma(x) = \psi^{(0)}(x)$
+\form#385:$\frac{d}{dx} \log x = \frac{1}{x}$
+\form#386:\[ \mbox{log}(x) = \begin{cases} \textrm{NaN} & \mbox{if } x < 0\\ \ln(x) & \mbox{if } x \geq 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#387:\[ \frac{\partial\,\mbox{log}(x)}{\partial x} = \begin{cases} \textrm{NaN} & \mbox{if } x < 0\\ \frac{1}{x} & \mbox{if } x\geq 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#388:$\frac{d}{dx} \log_{10} x = \frac{1}{x \log 10}$
+\form#389:\[ \mbox{log10}(x) = \begin{cases} \textrm{NaN} & \mbox{if } x < 0\\ \log_{10}(x) & \mbox{if } x \geq 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#390:\[ \frac{\partial\,\mbox{log10}(x)}{\partial x} = \begin{cases} \textrm{NaN} & \mbox{if } x < 0\\ \frac{1}{x \ln10} & \mbox{if } x\geq 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#391:$\frac{d}{dx} \log (1 - x) = -\frac{1}{1 - x}$
+\form#392:$\frac{d}{dx} \log (1 + x) = \frac{1}{1 + x}$
+\form#393:$\frac{d}{dx} \log_2 x = \frac{1}{x \log 2}$
+\form#394:\[ \mbox{log2}(x) = \begin{cases} \textrm{NaN} & \mbox{if } x < 0 \\ \log_2(x) & \mbox{if } x\geq 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#395:\[ \frac{\partial\,\mbox{log2}(x)}{\partial x} = \begin{cases} \textrm{NaN} & \mbox{if } x < 0 \\ \frac{1}{x\ln2} & \mbox{if } x\geq 0 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#396:$\frac{d}{dx} \Phi(x) = \mbox{\sf Norm}(x|0,1) = \frac{1}{\sqrt{2\pi}} \exp(-\frac{1}{2} x^2)$
+\form#397:\[ \mbox{Phi}(x) = \begin{cases} 0 & \mbox{if } x < -37.5 \\ \Phi(x) & \mbox{if } -37.5 \leq x \leq 8.25 \\ 1 & \mbox{if } x > 8.25 \\[6pt] \textrm{error} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#398:\[ \frac{\partial\,\mbox{Phi}(x)}{\partial x} = \begin{cases} 0 & \mbox{if } x < -27.5 \\ \frac{\partial\,\Phi(x)}{\partial x} & \mbox{if } -27.5 \leq x \leq 27.5 \\ 0 & \mbox{if } x > 27.5 \\[6pt] \textrm{error} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#399:\[ \Phi(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt \]
+\form#400:\[ \frac{\partial \, \Phi(x)}{\partial x} = \frac{e^{-x^2/2}}{\sqrt{2\pi}} \]
+\form#401:\[ \mbox{Phi\_approx}(x) = \begin{cases} \Phi_{\mbox{\footnotesize approx}}(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#402:\[ \frac{\partial\,\mbox{Phi\_approx}(x)}{\partial x} = \begin{cases} \frac{\partial\,\Phi_{\mbox{\footnotesize approx}}(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#403:\[ \Phi_{\mbox{\footnotesize approx}}(x) = \mbox{logit}^{-1}(0.07056 \, x^3 + 1.5976 \, x) \]
+\form#404:\[ \frac{\partial \, \Phi_{\mbox{\footnotesize approx}}(x)}{\partial x} = -\Phi_{\mbox{\footnotesize approx}}^2(x) e^{-0.07056x^3 - 1.5976x}(-0.21168x^2-1.5976) \]
+\form#405:$\frac{\partial}{\partial x} \mbox{pow}(x,y) = y x^{y-1}$
+\form#406:$\frac{\partial}{\partial y} \mbox{pow}(x,y) = x^y \ \log x$
+\form#407:\[ \mbox{pow}(x,y) = \begin{cases} x^y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#408:\[ \frac{\partial\,\mbox{pow}(x,y)}{\partial x} = \begin{cases} yx^{y-1} & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#409:\[ \frac{\partial\,\mbox{pow}(x,y)}{\partial y} = \begin{cases} x^y\ln x & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN} \end{cases} \]
+\form#410:$\frac{d}{dx} \mbox{pow}(x,c) = c x^{c-1}$
+\form#411:$\frac{d}{d y} \mbox{pow}(c,y) = c^y \log c $
+\form#412:$\frac{d}{dx} \mbox{round}(x) = 0$
+\form#413:\[ \mbox{round}(x) = \begin{cases} \lceil x \rceil & \mbox{if } x-\lfloor x\rfloor \geq 0.5 \\ \lfloor x \rfloor & \mbox{if } x-\lfloor x\rfloor < 0.5 \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#414:\[ \frac{\partial\,\mbox{round}(x)}{\partial x} = \begin{cases} 0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#415:$\frac{d}{dx} \sin x = \cos x$
+\form#416:\[ \mbox{sin}(x) = \begin{cases} \sin(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#417:\[ \frac{\partial\,\mbox{sin}(x)}{\partial x} = \begin{cases} \cos(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#418:$\frac{d}{dx} \sinh x = \cosh x$
+\form#419:\[ \mbox{sinh}(x) = \begin{cases} \sinh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#420:\[ \frac{\partial\,\mbox{sinh}(x)}{\partial x} = \begin{cases} \cosh(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#421:$\frac{d}{dx} \sqrt{x} = \frac{1}{2 \sqrt{x}}$
+\form#422:\[ \mbox{sqrt}(x) = \begin{cases} \textrm{NaN} & x < 0 \\ \sqrt{x} & \mbox{if } x\geq 0\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#423:\[ \frac{\partial\,\mbox{sqrt}(x)}{\partial x} = \begin{cases} \textrm{NaN} & x < 0 \\ \frac{1}{2\sqrt{x}} & x\geq 0\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#424:\[ \mbox{square}(x) = \begin{cases} x^2 & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#425:\[ \frac{\partial\,\mbox{square}(x)}{\partial x} = \begin{cases} 2x & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#426:$\mbox{step}(x) = 0$
+\form#427:$\frac{d}{dx} \tan x = \sec^2 x$
+\form#428:\[ \mbox{tan}(x) = \begin{cases} \tan(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#429:\[ \frac{\partial\,\mbox{tan}(x)}{\partial x} = \begin{cases} \sec^2(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#430:$\frac{d}{dx} \tanh x = \frac{1}{\cosh^2 x}$
+\form#431:\[ \mbox{tanh}(x) = \begin{cases} \tanh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#432:\[ \frac{\partial\,\mbox{tanh}(x)}{\partial x} = \begin{cases} \mbox{sech}^2(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#433:$\frac{d}{dx} \Gamma(x) = \Gamma(x) \Psi^{(0)}(x)$
+\form#434:$\Psi^{(0)}(x)$
+\form#435:\[ \mbox{tgamma}(x) = \begin{cases} \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\ \Gamma(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#436:\[ \frac{\partial\,\mbox{tgamma}(x)}{\partial x} = \begin{cases} \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\ \frac{\partial\, \Gamma(x)}{\partial x} & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#437:\[ \Gamma(x)=\int_0^{\infty} u^{x - 1} \exp(-u) \, du \]
+\form#438:\[ \frac{\partial \, \Gamma(x)}{\partial x} = \Gamma(x)\Psi(x) \]
+\form#439:$\frac{d}{dx} \mbox{trunc}(x) = 0$
+\form#440:\[ \mbox{trunc}(x) = \begin{cases} \lfloor x \rfloor & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#441:\[ \frac{\partial\,\mbox{trunc}(x)}{\partial x} = \begin{cases} 0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt] \textrm{NaN} & \mbox{if } x = \textrm{NaN} \end{cases} \]
+\form#442:\[ \min_\alpha f(x_0 + \alpha p) \]
+\form#443:$ f(x_0 + \alpha p) \leq f(x_0) + c_1 \alpha p^T g(x_0) $
+\form#444:$ \vert p^T g(x_0 + \alpha p) \vert \leq c_2 \vert p^T g(x_0) \vert $
+\form#445:$g(x) = \frac{\partial f}{\partial x}$
+\form#446:$ \alpha $
+\form#447:$ x_0 + \alpha p $
+\form#448:$ f(x_0 + \alpha p) $
+\form#449:$ g(x_0 + \alpha p) $
+\form#450:$ p^T g(x_0) < 0 $
+\form#451:$ x_0 $
+\form#452:$ f(x_0) $
+\form#453:$ g(x_0) $
+\form#454:$ 0 < c_1 < c_2 < 1 $
