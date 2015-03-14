@@ -11,6 +11,8 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
+#include <stan/math/prim/scal/meta/max_size.hpp>
 
 namespace stan {
 
@@ -78,15 +80,20 @@ namespace stan {
         ccdf_log += log_half + log(one_m_erf);
 
         // gradients
-        const T_partials_return rep_deriv = SQRT_TWO_OVER_PI 
-          * exp(-scaled_diff * scaled_diff) / one_m_erf;
-        if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] -= rep_deriv / sigma_dbl;
-        if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] += rep_deriv / sigma_dbl;
-        if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += rep_deriv * scaled_diff 
-            * stan::math::SQRT_2 / sigma_dbl;
+        if (contains_nonconstant_struct<T_y, T_loc, T_scale>::value) {
+          const T_partials_return rep_deriv_div_sigma
+            = scaled_diff > 8.25 * INV_SQRT_2
+            ? std::numeric_limits<double>::infinity()
+            : SQRT_TWO_OVER_PI * exp(-scaled_diff * scaled_diff)
+            / one_m_erf / sigma_dbl;
+          if (!is_constant_struct<T_y>::value)
+            operands_and_partials.d_x1[n] -= rep_deriv_div_sigma;
+          if (!is_constant_struct<T_loc>::value)
+            operands_and_partials.d_x2[n] += rep_deriv_div_sigma;
+          if (!is_constant_struct<T_scale>::value)
+            operands_and_partials.d_x3[n] += rep_deriv_div_sigma
+              * scaled_diff * stan::math::SQRT_2;
+        }
       }
       return operands_and_partials.to_var(ccdf_log,y,mu,sigma);
     }
