@@ -3,28 +3,28 @@
 #include <gtest/gtest.h>
 
 using stan::math::append_col;
-using Eigen::Dynamic;
-using Eigen::Matrix;
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
-using Eigen::RowVectorXd;
-using std::vector;
+
 
 template <int R, int C>
-void correct_type(const Eigen::Matrix<double,R,C>& x) {
+void correct_type_row_vector(const Eigen::Matrix<double,R,C>& x) {
   EXPECT_EQ(Eigen::Dynamic, C);
   EXPECT_EQ(1, R);
 }
 
-TEST(MathMatrix, append_col_types) {
-  RowVectorXd x(2);
-  x << 1, 2;
-  RowVectorXd y(3);
-  y << 3, 4, 5;
-  correct_type(append_col(x,y));
+template <int R, int C>
+void correct_type_matrix(const Eigen::Matrix<double,R,C>& x) {
+  EXPECT_EQ(Eigen::Dynamic, C);
+  EXPECT_EQ(Eigen::Dynamic, R);
 }
-
+  
 TEST(MathMatrix, append_col) {
+  using Eigen::Dynamic;
+  using Eigen::Matrix;
+  using Eigen::MatrixXd;
+  using Eigen::VectorXd;
+  using Eigen::RowVectorXd;
+  using std::vector;
+  
   MatrixXd m33(3, 3);
   m33 << 1, 2, 3,
          4, 5, 6,
@@ -54,7 +54,6 @@ TEST(MathMatrix, append_col) {
   
   RowVectorXd rv3b(3);
   rv3b << 44, 45, 46;
-
   MatrixXd mat;
   RowVectorXd rvec;
   
@@ -157,4 +156,17 @@ TEST(MathMatrix, append_col) {
   EXPECT_THROW(append_col(m33, rv3), std::invalid_argument);
   EXPECT_THROW(append_col(m32, rv3), std::invalid_argument);
   EXPECT_THROW(append_col(v3, rv3), std::invalid_argument);
+
+  correct_type_matrix(append_col(m32, m33));
+  correct_type_matrix(append_col(m33, m32));
+  correct_type_matrix(append_col(m23, m23b));
+  correct_type_matrix(append_col(m23b, m23));
+  correct_type_matrix(append_col(m33, v3));
+  correct_type_matrix(append_col(v3, m33));
+  correct_type_matrix(append_col(m32, v3));
+  correct_type_matrix(append_col(v3, m32));
+  correct_type_matrix(append_col(v3, v3b));
+  correct_type_matrix(append_col(v3b, v3));
+  correct_type_row_vector(append_col(rv3, rv3b));
+  correct_type_row_vector(append_col(rv3b, rv3));
 }
