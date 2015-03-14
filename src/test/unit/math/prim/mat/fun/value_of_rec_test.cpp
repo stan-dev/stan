@@ -26,11 +26,17 @@ TEST(MathMatrix,value_of_rec) {
   
   Eigen::Matrix<double,2,5> a; 
   fill(a_vals, a);
+  Eigen::Map< Eigen::Matrix<double,2,5> > am(a.data(), a.rows(), a.cols());
   Eigen::Matrix<double,5,1> b;
   fill(b_vals, b);
+  Eigen::Map< Eigen::Matrix<double,5,1> > bm(b.data(), b.rows(), b.cols());
 
   Eigen::MatrixXd d_a = value_of_rec(a);
+  Eigen::MatrixXd d_a2 = value_of_rec(am);
+  EXPECT_TRUE(d_a == d_a2);
   Eigen::VectorXd d_b = value_of_rec(b);
+  Eigen::VectorXd d_b2 = value_of_rec(bm);
+  EXPECT_TRUE(d_b == d_b2);
 
   for (int i = 0; i < 5; ++i)
     EXPECT_FLOAT_EQ(b(i), d_b(i));

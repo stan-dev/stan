@@ -2,6 +2,7 @@
 #define STAN__MATH__REV__SCAL_HPP
 
 #include <stan/math/rev/core.hpp>
+#include <stan/math/rev/scal/meta/get.hpp>
 #include <stan/math/rev/scal/meta/is_var.hpp>
 #include <stan/math/rev/scal/meta/partials_type.hpp>
 #include <stan/math/rev/scal/fun/Phi.hpp>

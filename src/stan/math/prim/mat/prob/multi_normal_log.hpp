@@ -25,9 +25,8 @@ namespace stan {
     template <bool propto,
               typename T_y, typename T_loc, typename T_covar>
     typename return_type<T_y, T_loc, T_covar>::type
-    multi_normal_log(const T_y& y,
-                     const T_loc& mu,
-                     const T_covar& Sigma) {
+    multi_normal_log(const T_y& y, const T_loc& mu,
+		     const Eigen::MatrixBase<T_covar>& Sigma) {
       static const char* function("stan::prob::multi_normal_log");
       typedef typename scalar_type<T_covar>::type T_covar_elem;
       typedef typename return_type<T_y, T_loc, T_covar>::type lp_type;
@@ -125,9 +124,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_covar>
     inline
     typename return_type<T_y, T_loc, T_covar>::type
-    multi_normal_log(const T_y& y,
-                     const T_loc& mu,
-                     const T_covar& Sigma) {
+    multi_normal_log(const T_y& y, const T_loc& mu,
+		     const Eigen::MatrixBase<T_covar>& Sigma) {
       return multi_normal_log<false>(y, mu, Sigma);
     }
 

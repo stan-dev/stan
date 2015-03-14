@@ -13,7 +13,7 @@ namespace stan {
      *
      * This check allows 0x0 matrices.
      *
-     * @tparam T Type of scalar.
+     * @tparam T Type of matrix.
      *
      * @param function Function name (for error messages)
      * @param name Variable name (for error messages)
@@ -27,7 +27,7 @@ namespace stan {
     inline bool
     check_square(const char* function,
                  const char* name,
-                 const Eigen::Matrix<T_y, Eigen::Dynamic, Eigen::Dynamic>& y) {
+                 const Eigen::MatrixBase<T_y>& y) {
       check_size_match(function,
                        "Expecting a square matrix; rows of ", name, y.rows(),
                        "columns of ", name, y.cols());

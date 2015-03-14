@@ -21,6 +21,16 @@ namespace stan {
       typedef typename Eigen::Matrix<T,R,C>::Index type;
     };
 
+    template <typename T>
+    struct index_type<Eigen::MatrixBase<T> > {
+      typedef typename index_type<T>::type type;
+    };
+
+    template <typename T>
+    struct index_type<Eigen::Map<T> > {
+      typedef typename index_type<T>::type type;
+    };
+
     
   }
 

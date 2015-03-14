@@ -25,6 +25,9 @@ TEST(ProbDistributionsMultiNormal,NotVectorized) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma));
+  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(Eigen::Map<typeof(y)>(y.data(), y.rows(), y.cols()),
+							  Eigen::Map<typeof(mu)>(mu.data(), mu.rows(), mu.cols()),
+							  Eigen::Map<typeof(Sigma)>(Sigma.data(), Sigma.rows(), Sigma.cols())));
 }
 
 TEST(ProbDistributionsMultiNormal,Vectorized) {
@@ -221,7 +224,8 @@ TEST(ProbDistributionsMultiNormal, marginalOneChiSquareGoodnessFitTest) {
   }
   Eigen::VectorXd a(mu.rows());
   while (count < N) {
-    a = stan::prob::multi_normal_rng(mu,sigma,rng);
+    a = stan::prob::multi_normal_rng(Eigen::Map<typeof(mu)>(mu.data(), mu.rows(), mu.cols()),
+				     Eigen::Map<typeof(sigma)>(sigma.data(), sigma.rows(), sigma.cols()), rng);
     int i = 0;
     while (i < K-1 && a(0) > loc[i]) 
       ++i;

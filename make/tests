@@ -208,3 +208,7 @@ endif
 # Include the test dependencies
 ##
 include make/test-math-dependencies
+
+.PHONY: test 
+test: test-math-dependencies
+	./runTests.py src/test/unit

@@ -48,6 +48,15 @@ namespace stan {
     typedef typename scalar_type<T>::type type;
   };
 
+  template <typename T>
+  struct scalar_type<Eigen::MatrixBase<T> > {
+    typedef typename scalar_type<T>::type type;
+  };
+
+  template <typename T>
+  struct scalar_type<Eigen::Map<T> > {
+    typedef typename scalar_type<T>::type type;
+  };
 
 }
 #endif

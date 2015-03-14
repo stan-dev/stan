@@ -9,16 +9,12 @@ namespace stan {
 
   // length_mvt() should only be applied to std vector or Eigen matrix
   template <typename T>
-  size_t length_mvt(const T& ) {
-    throw std::out_of_range("length_mvt passed to an unrecognized type.");
+  size_t length_mvt(const Eigen::MatrixBase<T>& ) {
     return 1U;
   }
-  template <typename T, int R, int C>
-  size_t length_mvt(const Eigen::Matrix<T,R,C>& ) {
-    return 1U;
-  }
-  template <typename T, int R, int C>
-  size_t length_mvt(const std::vector<Eigen::Matrix<T,R,C> >& x) {
+
+  template <typename T>
+  size_t length_mvt(const std::vector<T>& x) {
     return x.size();
   }
 

@@ -100,6 +100,8 @@ namespace stan {
        */
       var(long double x) : vi_(new vari(x)) { }
 
+      var(__float128 x) : vi_(new vari(static_cast<double>(x))) { }
+
       /**
        * Construct a variable from the specified arithmetic argument
        * by constructing a new <code>vari</code> with the argument
@@ -381,4 +383,5 @@ namespace stan {
 
   }
 }
+
 #endif

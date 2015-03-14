@@ -21,6 +21,15 @@ namespace stan {
       typedef typename Eigen::Matrix<T,R,C>::Scalar type;
     };
 
+    template <typename T>
+    struct value_type<Eigen::MatrixBase<T> > {
+      typedef typename value_type<T>::type type;
+    };
+
+    template <typename T>
+    struct value_type<Eigen::Map<T> > {
+      typedef typename value_type<T>::type type;
+    };
     
   }
 
