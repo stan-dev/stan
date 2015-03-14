@@ -35,6 +35,7 @@ namespace stan {
       
       template <class Writer>
       void print_help(Writer& writer, int depth, bool recurse) {
+        std::cout << "list_argument: Trying to write some fucking messages!" << std::endl;
         _default = _values.at(_default_cursor)->name();
 
         valued_argument::print_help(writer, depth);

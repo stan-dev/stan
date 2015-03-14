@@ -1,7 +1,6 @@
 #ifndef STAN__SERVICES__INIT__INIT_STATIC_HMC_HPP
 #define STAN__SERVICES__INIT__INIT_STATIC_HMC_HPP
 
-#include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/arguments/argument.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
 #include <stan/services/arguments/singleton_argument.hpp>
@@ -11,7 +10,7 @@ namespace stan {
     namespace init {
     
       template<class Sampler>
-      bool init_static_hmc(stan::mcmc::base_mcmc* sampler, 
+      bool init_static_hmc(Sampler& sampler,
                            stan::services::argument* algorithm) {
 
         stan::services::categorical_argument* hmc 
@@ -31,8 +30,8 @@ namespace stan {
         double int_time 
           = dynamic_cast<stan::services::real_argument*>(base->arg("int_time"))->value();
         
-        dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize_and_T(epsilon, int_time);
-        dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
+        sampler.set_nominal_stepsize_and_T(epsilon, int_time);
+        sampler.set_stepsize_jitter(epsilon_jitter);
         
         return true;
       }

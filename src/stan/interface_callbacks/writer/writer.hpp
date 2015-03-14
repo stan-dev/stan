@@ -24,11 +24,13 @@ namespace stan {
         virtual void write_message(const std::string& message) = 0;
         
         // FIXME: Replace with std::to_string when we update to C++11
-        static std::string to_string(double x) {
+        template <typename T>
+        static std::string to_string(T x) {
           return boost::lexical_cast<std::string>(x);
         }
         
-        static std::string to_string(double x, int width) {
+        template <typename T>
+        static std::string to_string(T x, int width) {
           std::string str = boost::lexical_cast<std::string>(x);
           if (str.size() < width) {
             str.insert(str.begin(), width - str.size(), ' ');

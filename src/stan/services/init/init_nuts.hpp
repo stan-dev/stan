@@ -1,7 +1,6 @@
 #ifndef STAN__SERVICES__INIT__INIT_NUTS_HPP
 #define STAN__SERVICES__INIT__INIT_NUTS_HPP
 
-#include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/arguments/argument.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
 #include <stan/services/arguments/singleton_argument.hpp>
@@ -11,7 +10,7 @@ namespace stan {
     namespace init {
     
       template<class Sampler>
-      bool init_nuts(stan::mcmc::base_mcmc* sampler, 
+      bool init_nuts(Sampler& sampler,
                      stan::services::argument* algorithm) {
         stan::services::categorical_argument* hmc 
           = dynamic_cast<stan::services::categorical_argument*>
@@ -27,9 +26,9 @@ namespace stan {
           = dynamic_cast<stan::services::real_argument*>(hmc->arg("stepsize_jitter"))->value();
         int max_depth = dynamic_cast<stan::services::int_argument*>(base->arg("max_depth"))->value();
         
-        dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize(epsilon);
-        dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
-        dynamic_cast<Sampler*>(sampler)->set_max_depth(max_depth);
+        sampler.set_nominal_stepsize(epsilon);
+        sampler.set_stepsize_jitter(epsilon_jitter);
+        sampler.set_max_depth(max_depth);
         
         return true;
       }

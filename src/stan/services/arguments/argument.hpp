@@ -35,7 +35,9 @@ namespace stan {
       void print(Writer& writer, const int depth, const std::string prefix) {}
       
       template <class Writer>
-      void print_help(Writer& writer, const int depth, const bool recurse) {}
+      void print_help(Writer& writer, const int depth, const bool recurse) {
+        std::cout << "Calling base method for some reason..." << std::endl;
+      }
       
       template <class InfoWriter, class ErrWriter>
       bool parse_args(std::vector<std::string>& args,

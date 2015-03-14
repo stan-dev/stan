@@ -146,6 +146,7 @@ namespace stan {
       template <class Writer>
       void print_help(Writer& writer, bool recurse) {
         for (size_t i = 0; i < _arguments.size(); ++i) {
+          std::cout << i << std::endl;
           _arguments.at(i)->print_help(writer, 1, recurse);
         }
       }
@@ -175,7 +176,7 @@ namespace stan {
         
         writer.write_message("Or see help information with");
         writer.write_message(Writer::pad(indent + "help", width) + indent + "Prints help");
-        writer.write_message(Writer::pad(indent + "help-all", width)
+        writer.write_message(Writer::pad(indent + "help-all", width) + indent
                              + "Prints entire argument tree");
         writer.write_message("");
         

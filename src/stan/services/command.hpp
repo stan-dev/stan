@@ -301,7 +301,7 @@ namespace stan {
           // FIXME: second cout should be info
           return_code = optimization::do_bfgs_optimize(model,bfgs, base_rng,
                                                        lp, cont_vector, disc_vector,
-                                                       &std::cout, &std::cout,
+                                                       output_stream, info,
                                                        save_iterations, refresh,
                                                        iteration_interrupt);
         } else if (algo->value() == "lbfgs") {
@@ -331,7 +331,7 @@ namespace stan {
           // FIXME: second cout should be info
           return_code = optimization::do_bfgs_optimize(model,bfgs, base_rng,
                                                        lp, cont_vector, disc_vector,
-                                                       &std::cout, &std::cout,
+                                                       output_stream, info,
                                                        save_iterations, refresh,
                                                        iteration_interrupt);
         } else {
@@ -385,9 +385,7 @@ namespace stan {
         bool save_warmup = dynamic_cast<stan::services::bool_argument*>(
                            parser.arg("method")->arg("sample")->arg("save_warmup"))->value();
 
-        // Sampler
-        stan::mcmc::base_mcmc* sampler_ptr = 0;
-
+        // Sample!
         stan::services::list_argument* algo
           = dynamic_cast<stan::services::list_argument*>
             (parser.arg("method")->arg("sample")->arg("algorithm"));
@@ -398,190 +396,6 @@ namespace stan {
         bool adapt_engaged
           = dynamic_cast<stan::services::bool_argument*>(adapt->arg("engaged"))
             ->value();
-
-        if (model.num_params_r() == 0 && algo->value() != "fixed_param") {
-          std::cout
-            << "Must use algorithm=fixed_param for "
-            << "model that has no parameters."
-            << std::endl;
-          return -1;
-        }
-
-        if (algo->value() == "fixed_param") {
-          sampler_ptr = new stan::mcmc::fixed_param_sampler();
-
-          adapt_engaged = false;
-
-          if (num_warmup != 0) {
-            std::cout << "Warning: warmup will be skipped "
-                      << "for the fixed parameter sampler!"
-                      << std::endl;
-            num_warmup = 0;
-          }
-
-        } else if (algo->value() == "rwm") {
-          std::cout << algo->arg("rwm")->description() << std::endl;
-          return 0;
-
-        } else if (algo->value() == "hmc") {
-          int engine_index = 0;
-          
-          stan::services::list_argument* engine 
-            = dynamic_cast<stan::services::list_argument*>
-              (algo->arg("hmc")->arg("engine"));
-
-          if (engine->value() == "static") {
-            engine_index = 0;
-          } else if (engine->value() == "nuts") {
-            engine_index = 1;
-          }
-
-          int metric_index = 0;
-          stan::services::list_argument* metric 
-            = dynamic_cast<stan::services::list_argument*>
-              (algo->arg("hmc")->arg("metric"));
-          if (metric->value() == "unit_e") {
-            metric_index = 0;
-          } else if (metric->value() == "diag_e") {
-            metric_index = 1;
-          } else if (metric->value() == "dense_e") {
-            metric_index = 2;
-          }
-
-          int sampler_select = engine_index
-            + 10 * metric_index
-            + 100 * static_cast<int>(adapt_engaged);
-
-          switch (sampler_select) {
-            case 0: {
-              typedef stan::mcmc::unit_e_static_hmc<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
-                return 0;
-              break;
-            }
-
-            case 1: {
-              typedef stan::mcmc::unit_e_nuts<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
-                return 0;
-              break;
-            }
-
-            case 10: {
-              typedef stan::mcmc::diag_e_static_hmc<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
-                return 0;
-              break;
-            }
-
-            case 11: {
-              typedef stan::mcmc::diag_e_nuts<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
-                return 0;
-              break;
-            }
-
-            case 20: {
-              typedef stan::mcmc::dense_e_static_hmc<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
-                return 0;
-              break;
-            }
-
-            case 21: {
-              typedef stan::mcmc::dense_e_nuts<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
-                return 0;
-              break;
-            }
-
-            case 100: {
-              typedef stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
-                return 0;
-              if (!init::init_adapt<sampler>(sampler_ptr, adapt, cont_params))
-                return 0;
-              break;
-            }
-
-            case 101: {
-              typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
-                return 0;
-              if (!init::init_adapt<sampler>(sampler_ptr, adapt, cont_params))
-                return 0;
-              break;
-            }
-
-            case 110: {
-              typedef stan::mcmc::adapt_diag_e_static_hmc<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
-                return 0;
-              if (!init::init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params))
-                return 0;
-              break;
-            }
-
-            case 111: {
-              typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
-                return 0;
-              if (!init::init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params))
-                return 0;
-              break;
-            }
-
-            case 120: {
-              typedef stan::mcmc::adapt_dense_e_static_hmc<Model, rng_t>
-                sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
-                return 0;
-              if (!init::init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params))
-                return 0;
-              break;
-            }
-
-            case 121: {
-              typedef stan::mcmc::adapt_dense_e_nuts<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng,
-                                        &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
-                return 0;
-              if (!init::init_windowed_adapt<sampler>
-                  (sampler_ptr, adapt, num_warmup, cont_params))
-                return 0;
-              break;
-            }
-
-            default:
-              std::cout << "No sampler matching HMC specification!"
-                        << std::endl;
-              return 0;
-          }
-        }
-
         
         mcmc::mcmc_writer<Model, rng_t,
                           stan::interface_callbacks::writer::fstream_csv,
@@ -590,13 +404,236 @@ namespace stan {
           writer(model, base_rng, output_stream, diagnostic_stream, info);
         
         stan::mcmc::sample s(cont_params, 0, 0);
-        
-        mcmc::sample(*sampler_ptr, s, num_warmup, num_samples,
-                     num_thin, refresh, save_warmup, adapt_engaged,
-                     writer, iteration_interrupt);
 
-        if (sampler_ptr)
-          delete sampler_ptr;
+        if (algo->value() == "fixed_param") {
+          
+          if (model.num_params_r() == 0 && algo->value() != "fixed_param") {
+            std::cout
+              << "Must use algorithm=fixed_param for "
+              << "model that has no parameters."
+              << std::endl;
+            return -1;
+          }
+        
+          if (num_warmup != 0) {
+            std::cout << "Warning: warmup will be skipped "
+                      << "for the fixed parameter sampler!"
+                      << std::endl;
+            num_warmup = 0;
+          }
+          
+          stan::mcmc::fixed_param_sampler sampler;
+          
+          mcmc::sample(sampler, s, num_warmup, num_samples,
+                       num_thin, refresh, save_warmup,
+                       writer, iteration_interrupt);
+
+
+        } else if (algo->value() == "rwm") {
+          std::cout << algo->arg("rwm")->description() << std::endl;
+          return 0;
+
+        } else if (algo->value() == "hmc") {
+          stan::services::list_argument* engine 
+            = dynamic_cast<stan::services::list_argument*>
+              (algo->arg("hmc")->arg("engine"));
+
+          stan::services::list_argument* metric 
+            = dynamic_cast<stan::services::list_argument*>
+              (algo->arg("hmc")->arg("metric"));
+
+          if (   engine->value() == "static"
+              && metric->value() == "unit_e"
+              && adapt_engaged == false) {
+            stan::mcmc::unit_e_static_hmc<Model, rng_t>
+              sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_static_hmc(sampler, algo))
+              return 0;
+            
+            mcmc::sample(sampler, s, num_warmup, num_samples,
+                         num_thin, refresh, save_warmup,
+                         writer, iteration_interrupt);
+          }
+          
+          if (   engine->value() == "nuts"
+              && metric->value() == "unit_e"
+              && adapt_engaged == false) {
+            stan::mcmc::unit_e_nuts<Model, rng_t>
+            sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_nuts(sampler, algo))
+              return 0;
+            
+            mcmc::sample(sampler, s, num_warmup, num_samples,
+                         num_thin, refresh, save_warmup,
+                         writer, iteration_interrupt);
+          }
+          
+          if (   engine->value() == "static"
+              && metric->value() == "diag_e"
+              && adapt_engaged == false) {
+            stan::mcmc::diag_e_static_hmc<Model, rng_t>
+              sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_static_hmc(sampler, algo))
+              return 0;
+            
+            mcmc::sample(sampler, s, num_warmup, num_samples,
+                         num_thin, refresh, save_warmup,
+                         writer, iteration_interrupt);
+          }
+          
+          if (   engine->value() == "nuts"
+              && metric->value() == "diag_e"
+              && adapt_engaged == false) {
+            stan::mcmc::diag_e_nuts<Model, rng_t>
+              sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_nuts(sampler, algo))
+              return 0;
+            
+            mcmc::sample(sampler, s, num_warmup, num_samples,
+                         num_thin, refresh, save_warmup,
+                         writer, iteration_interrupt);
+          }
+          
+          if (   engine->value() == "static"
+              && metric->value() == "dense_e"
+              && adapt_engaged == false) {
+            stan::mcmc::dense_e_static_hmc<Model, rng_t>
+              sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_static_hmc(sampler, algo))
+              return 0;
+            
+            mcmc::sample(sampler, s, num_warmup, num_samples,
+                         num_thin, refresh, save_warmup,
+                         writer, iteration_interrupt);
+          }
+          
+          if (   engine->value() == "nuts"
+              && metric->value() == "dense_e"
+              && adapt_engaged == false) {
+            stan::mcmc::dense_e_nuts<Model, rng_t>
+              sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_nuts(sampler, algo))
+              return 0;
+            
+            mcmc::sample(sampler, s, num_warmup, num_samples,
+                         num_thin, refresh, save_warmup,
+                         writer, iteration_interrupt);
+          }
+
+          if (   engine->value() == "static"
+              && metric->value() == "unit_e"
+              && adapt_engaged == true) {
+            stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t>
+              sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_static_hmc(sampler, algo))
+              return 0;
+            if (!init::init_adapt(sampler, adapt, cont_params))
+              return 0;
+            
+            mcmc::adapt_sample(sampler, s, num_warmup, num_samples,
+                               num_thin, refresh, save_warmup,
+                               writer, iteration_interrupt);
+          }
+          
+          if (   engine->value() == "nuts"
+              && metric->value() == "unit_e"
+              && adapt_engaged == true) {
+            stan::mcmc::adapt_unit_e_nuts<Model, rng_t>
+              sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_nuts(sampler, algo))
+              return 0;
+            if (!init::init_adapt(sampler, adapt, cont_params))
+              return 0;
+            
+            mcmc::adapt_sample(sampler, s, num_warmup, num_samples,
+                               num_thin, refresh, save_warmup,
+                               writer, iteration_interrupt);
+          }
+          
+          if (   engine->value() == "static"
+              && metric->value() == "diag_e"
+              && adapt_engaged == true) {
+            stan::mcmc::adapt_diag_e_static_hmc<Model, rng_t>
+              sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_static_hmc(sampler, algo))
+              return 0;
+            if (!init::init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
+              return 0;
+            
+            mcmc::adapt_sample(sampler, s, num_warmup, num_samples,
+                               num_thin, refresh, save_warmup,
+                               writer, iteration_interrupt);
+          }
+          
+          if (   engine->value() == "nuts"
+              && metric->value() == "diag_e"
+              && adapt_engaged == true) {
+            stan::mcmc::adapt_diag_e_nuts<Model, rng_t>
+              sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_nuts(sampler, algo))
+              return 0;
+            if (!init::init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
+              return 0;
+            
+            mcmc::adapt_sample(sampler, s, num_warmup, num_samples,
+                               num_thin, refresh, save_warmup,
+                               writer, iteration_interrupt);
+          }
+          
+          if (   engine->value() == "static"
+              && metric->value() == "dense_e"
+              && adapt_engaged == true) {
+            stan::mcmc::adapt_dense_e_static_hmc<Model, rng_t>
+              sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_static_hmc(sampler, algo))
+              return 0;
+            if (!init::init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
+              return 0;
+            
+            mcmc::adapt_sample(sampler, s, num_warmup, num_samples,
+                               num_thin, refresh, save_warmup,
+                               writer, iteration_interrupt);
+          }
+          
+          if (   engine->value() == "nuts"
+              && metric->value() == "dense_e"
+              && adapt_engaged == true) {
+            stan::mcmc::adapt_dense_e_nuts<Model, rng_t>
+              sampler(model, base_rng, &std::cout, &std::cout);
+            
+            if (!init::init_nuts(sampler, algo))
+              return 0;
+            if (!init::init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
+              return 0;
+            
+            mcmc::adapt_sample(sampler, s, num_warmup, num_samples,
+                               num_thin, refresh, save_warmup,
+                               writer, iteration_interrupt);
+          }
+
+          if(   !(   engine->value() == "static"
+                  || engine->value() == "nuts")
+             || !(   metric->value() == "unit_e"
+                  || metric->value() == "diag_e"
+                  || metric->value() == "dense_e")) {
+              std::cout << "No sampler matching HMC specification!"
+                        << std::endl;
+              return 0;
+          }
+          
+        }
+
       }
 
       for (size_t i = 0; i < valid_arguments.size(); ++i)

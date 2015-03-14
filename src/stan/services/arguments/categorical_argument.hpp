@@ -33,6 +33,7 @@ namespace stan {
       
       template <class Writer>
       void print_help(Writer& writer, const int depth, const bool recurse) {
+        std::cout << "categorical_argument: Trying to write some fucking messages!" << std::endl;
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
         

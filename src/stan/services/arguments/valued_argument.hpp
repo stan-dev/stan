@@ -26,6 +26,7 @@ namespace stan {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
         
+        std::cout << "valued_argument: Trying to write some fucking messages!" << std::endl;
         writer.write_message(indent + _name + "=<" + _value_type + ">");
         writer.write_message(indent + subindent + _description);
         writer.write_message(indent + subindent + "Valid values:" + print_valid());

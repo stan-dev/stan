@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__MCMC__SAMPLE_HPP
-#define STAN__SERVICES__MCMC__SAMPLE_HPP
+#ifndef STAN__SERVICES__MCMC__ADAPT_SAMPLE_HPP
+#define STAN__SERVICES__MCMC__ADAPT_SAMPLE_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/mcmc/generate_transitions.hpp>
@@ -9,15 +9,15 @@ namespace stan {
     namespace mcmc {
       
       template <class Sampler, class MCMCWriter, class Interrupt>
-      void sample(Sampler& sampler,
-                  stan::mcmc::sample& sample,
-                  int num_warmup,
-                  int num_samples,
-                  int num_thin,
-                  int refresh,
-                  bool save_warmup,
-                  MCMCWriter& writer,
-                  Interrupt& interrupt) {
+      void adapt_sample(Sampler& sampler,
+                        stan::mcmc::sample& sample,
+                        int num_warmup,
+                        int num_samples,
+                        int num_thin,
+                        int refresh,
+                        bool save_warmup,
+                        MCMCWriter& writer,
+                        Interrupt& interrupt) {
         
         double warm_delta_t;
         double sample_delta_t;
@@ -32,7 +32,10 @@ namespace stan {
                                    refresh, save_warmup, true, writer, interrupt);
         clock_t end = clock();
         warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-
+        
+        sampler.disengage_adaptation();
+        writer.write_adapt_finish(sampler);
+        
         // Sampling
         start = clock();
         mcmc::generate_transitions(sampler, sample,
