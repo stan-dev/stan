@@ -30,7 +30,7 @@ TEST(StanCommon, reject_mult_args) {
   // call model's log_prob function, check that exception is thrown
   try {
     model->log_prob<false, false>(cont_vector, disc_vector, &std::cout);
-  } catch (const std::domain_error& e) {
+  } catch (const std::exception& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "---------------------------------" << std::endl
              << "--- EXPECTED: error_msg=" << error_msg << std::endl
@@ -41,5 +41,6 @@ TEST(StanCommon, reject_mult_args) {
     return;
   }
   FAIL() << "model failed to do reject" << std::endl;
+  return;
 }
 

@@ -22,7 +22,7 @@ TEST(StanCommon, reject_func_call_transformed_data) {
     reject_func_call_transformed_data_model_namespace::reject_func_call_transformed_data_model* model 
       = new reject_func_call_transformed_data_model_namespace::reject_func_call_transformed_data_model(empty_data_context, &model_output);
     delete model;
-  } catch (const std::domain_error& e) {
+  } catch (const std::exception& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "---------------------------------" << std::endl
              << "--- EXPECTED: error_msg=" << error_msg << std::endl

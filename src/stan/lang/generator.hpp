@@ -841,10 +841,8 @@ namespace stan {
         if (!(x.range_.has_low() || x.range_.has_high()))
           return; // unconstrained
         generate_begin_for_dims(x.dims_);
-        generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "try { " << EOL;
         if (x.range_.has_low()) {
-          generate_indent(indents_ + 1 + x.dims_.size(),o_);
+          generate_indent(indents_ + x.dims_.size(), o_);
           o_ << "check_greater_or_equal(function__,";
           o_ << "\"";
           generate_loop_var(x.name_,x.dims_.size());
@@ -855,7 +853,7 @@ namespace stan {
           o_ << ");" << EOL;
         }
         if (x.range_.has_high()) {
-          generate_indent(indents_ + 1 + x.dims_.size(),o_);
+          generate_indent(indents_ + x.dims_.size(),o_);
           o_ << "check_less_or_equal(function__,";
           o_ << "\"";
           generate_loop_var(x.name_,x.dims_.size());
@@ -865,14 +863,6 @@ namespace stan {
           generate_expression(x.range_.high_.expr_,o_);
           o_ << ");" << EOL;
         }
-        generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "} catch (const std::exception& e) { "
-           << EOL;
-        generate_indent(indents_ + x.dims_.size() + 1, o_);
-        o_ << "throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what()));"
-           << EOL;
-        generate_indent(indents_ + x.dims_.size(), o_);
-        o_ << "};" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(int_var_decl const& x) const {
@@ -895,12 +885,13 @@ namespace stan {
                              const std::string& type_name) const {
         generate_begin_for_dims(x.dims_);
         generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "try { stan::math::check_" << type_name << "(function__,";
+        o_ << "stan::math::check_" << type_name << "(function__,";
         o_ << "\"";
         generate_loop_var(x.name_,x.dims_.size());
         o_ << "\",";
         generate_loop_var(x.name_,x.dims_.size());
-        o_ << "); } catch (const std::exception& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
+        o_ << ");" 
+           << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(unit_vector_var_decl const& x) const {
@@ -1397,7 +1388,8 @@ namespace stan {
                             std::ostream& o) {
       generate_init_vars_visgen vis(indent,o);
       o << EOL;
-      generate_comment("initialize transformed variables to avoid seg fault on val access",
+      generate_comment("initialize transformed variables to"
+                       " avoid seg fault on val access",
                        indent,o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis,vs[i].decl_);
@@ -1786,6 +1778,8 @@ namespace stan {
     };
 
 
+
+
     void generate_statement(const statement& s,
                             int indent,
                             std::ostream& o,
@@ -1802,6 +1796,7 @@ namespace stan {
       boost::apply_visitor(vis,s.statement_);
     }
 
+    // FIXME:  don't ever call this -- call generate statement instead
     void generate_statements(const std::vector<statement>& ss,
                              int indent,
                              std::ostream& o,
@@ -1813,23 +1808,75 @@ namespace stan {
         boost::apply_visitor(vis,ss[i].statement_);
     }
 
+    void generate_try(int indent,
+                      std::ostream& o) {
+      generate_indent(indent,o);
+      o << "try {"
+        << EOL;
+    }
+
+    void generate_catch_throw_located(int indent,
+                                      std::ostream& o) {
+      generate_indent(indent,o);
+      o << "} catch (const std::exception& e) {"
+        << EOL;
+      generate_indent(indent + 1, o);
+      o << "stan::lang::throw_located_exception(e,current_statement_begin__);"
+        << EOL;
+      generate_indent(indent, o);
+      o << "}"
+        << EOL;
+    }
+
+    void generate_located_statement(const statement& s,
+                                    int indent,
+                                    std::ostream& o,
+                                    bool include_sampling,
+                                    bool is_var,
+                                    bool is_fun_return) {
+      generate_try(indent,o);
+      generate_statement(s,indent+1,o,include_sampling,is_var,is_fun_return);
+      generate_catch_throw_located(indent,o);
+    }
+
+    void generate_located_statements(const std::vector<statement>& ss,
+                                     int indent,
+                                     std::ostream& o,
+                                     bool include_sampling,
+                                     bool is_var,
+                                     bool is_fun_return) {
+      generate_try(indent,o);
+      for (size_t i = 0; i < ss.size(); ++i)
+        generate_statement(ss[i],indent + 1,o,include_sampling,is_var,is_fun_return);
+      generate_catch_throw_located(indent,o);
+    }
+
+
 
     void generate_log_prob(program const& p,
                            std::ostream& o) {
 
 
       o << EOL;
-      o << INDENT << "template <bool propto__, bool jacobian__, typename T__>" << EOL;
-      o << INDENT << "T__ log_prob(vector<T__>& params_r__," << EOL;
-      o << INDENT << "             vector<int>& params_i__," << EOL;
-      o << INDENT << "             std::ostream* pstream__ = 0) const {" << EOL2;
+      o << INDENT << "template <bool propto__, bool jacobian__, typename T__>"
+        << EOL;
+      o << INDENT << "T__ log_prob(vector<T__>& params_r__," 
+        << EOL;
+      o << INDENT << "             vector<int>& params_i__,"
+        << EOL;
+      o << INDENT << "             std::ostream* pstream__ = 0) const {" 
+        << EOL2;
 
       // use this dummy for inits
-      o << INDENT2 << "T__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());" << EOL;
-      o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
+      o << INDENT2 << "T__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());"
+        << EOL;
+      o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning" 
+        << EOL2;
 
-      o << INDENT2 << "T__ lp__(0.0);" << EOL;
-      o << INDENT2 << "stan::math::accumulator<T__> lp_accum__;" << EOL2;
+      o << INDENT2 << "T__ lp__(0.0);" 
+        << EOL;
+      o << INDENT2 << "stan::math::accumulator<T__> lp_accum__;" 
+        << EOL2;
 
       bool is_var = true;
       bool is_fun_return = false;
@@ -1841,13 +1888,14 @@ namespace stan {
       generate_comment("transformed parameters",2,o);
       generate_local_var_decls(p.derived_decl_.first,2,o,is_var,is_fun_return);
       generate_init_vars(p.derived_decl_.first,2,o);
+      o << EOL;
 
-      o << EOL;
+
       bool include_sampling = true;
-      generate_statements(p.derived_decl_.second,2,o,include_sampling,
-                          is_var,is_fun_return);
+      generate_located_statements(p.derived_decl_.second,2,o,include_sampling,
+                                  is_var,is_fun_return);
       o << EOL;
-      
+
       generate_validate_transformed_params(p.derived_decl_.first,2,o);
       o << INDENT2
         << "const char* function__ = \"validate transformed params\";" 
@@ -1858,9 +1906,14 @@ namespace stan {
         
       generate_validate_var_decls(p.derived_decl_.first,2,o);
 
+      o << EOL;
       generate_comment("model body",2,o);
-      generate_statement(p.statement_,2,o,include_sampling,
-                         is_var,is_fun_return);
+
+
+      generate_located_statement(p.statement_,2,o,include_sampling,
+                                 is_var,is_fun_return);
+
+
       o << EOL;
       o << INDENT2 << "lp_accum__.add(lp__);" << EOL;
       o << INDENT2 << "return lp_accum__.sum();" << EOL2;
@@ -2572,7 +2625,7 @@ namespace stan {
       o << INDENT2 << ": prob_grad(0) {" 
         << EOL; // resize 0 with var_resizing
       o << INDENT2 << "current_statement_begin__ = -1;"
-        << EOL;
+        << EOL2;
       o << INDENT2 << "static const char* function__ = \"" 
         << model_name << "_namespace::" << model_name << "\";" << EOL;
       suppress_warning(INDENT2, "function__", o);
@@ -2590,35 +2643,23 @@ namespace stan {
       generate_var_resizing(prog.derived_data_decl_.first, o);
       o << EOL;
 
-      o << INDENT2 << "double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());" << EOL;
+      o << INDENT2 << "double DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());"
+        << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
       generate_init_vars(prog.derived_data_decl_.first, 2, o);
-      o << std::endl;
-
-      o << INDENT2
-        << "try {"
-        << EOL;
+      o << EOL;
 
       bool include_sampling = false;
       bool is_var = false;
       bool is_fun_return = false;
-      for (size_t i = 0; i < prog.derived_data_decl_.second.size(); ++i)
-        generate_statement(prog.derived_data_decl_.second[i],
-                           3,o,include_sampling,is_var,is_fun_return);
+      generate_located_statements(prog.derived_data_decl_.second,
+                                  2,o,include_sampling,is_var,is_fun_return);
 
-      o << INDENT2
-        << "} catch (const std::exception& e) {"
-        << EOL
-        << INDENT3
-        << "stan::lang::throw_located_exception(e,current_statement_begin__);"
-        << EOL
-        << INDENT2
-        << "}"
-        << EOL2;
-
+      o << EOL;
       generate_comment("validate transformed data",2,o);
       generate_validate_var_decls(prog.derived_data_decl_.first,2,o);
 
+      o << EOL;
       generate_comment("set parameter ranges",2,o);
       generate_set_param_ranges(prog.parameter_decl_,o);
       // o << EOL << INDENT2 << "set_param_ranges();" << EOL;
@@ -2757,11 +2798,24 @@ namespace stan {
                                const std::string& var_name,
                                const std::vector<expression>& dims) const {
         generate_dims_loop_fwd(dims);
-        o_ << "try { writer__." << write_method_name;
+        o_ << "try {"
+           << EOL
+           << INDENT3
+           << "writer__." << write_method_name;
         generate_name_dims(var_name,dims.size());
-        o_ << "); } catch (const std::exception& e) { "
-          " throw std::runtime_error(std::string(\"Error transforming variable "
-           << var_name << ": \") + e.what()); }" << EOL;
+        o_ << ");"
+           << EOL
+           << INDENT2
+           << "} catch (const std::exception& e) { "
+           << EOL
+           << INDENT3
+           << "throw std::runtime_error("
+           << "std::string(\"Error transforming variable "
+           << var_name << ": \") + e.what());"
+           << EOL
+           << INDENT2
+           << "}" 
+           << EOL;
       }
       void generate_name_dims(const std::string name, 
                               size_t num_dims) const {
@@ -2773,7 +2827,8 @@ namespace stan {
                                 const std::string& base_type,
                                 const std::vector<expression>& dims,
                                 const expression& type_arg1 = expression(),
-                                const expression& type_arg2 = expression()) const {
+                                const expression& type_arg2 = expression()) 
+      const {
         o_ << INDENT2;
         generate_type(base_type,dims,dims.size(),o_);
         o_ << ' ' << name;
@@ -2846,8 +2901,10 @@ namespace stan {
         o_ << EOL << INDENT2
            << "if (!(context__.contains_i(\"" << name << "\")))"
            << EOL << INDENT3
-           << "throw std::runtime_error(\"variable " << name << " missing\");" << EOL;
-        o_ << INDENT2 << "vals_i__ = context__.vals_i(\"" << name << "\");" << EOL;
+           << "throw std::runtime_error(\"variable " << name << " missing\");"
+           << EOL;
+        o_ << INDENT2 << "vals_i__ = context__.vals_i(\"" << name << "\");"
+           << EOL;
         o_ << INDENT2 << "pos__ = 0U;" << EOL;
       }
       void generate_check_double(const std::string& name, size_t /*n*/) const {
@@ -2864,21 +2921,29 @@ namespace stan {
     void generate_init_method(const std::vector<var_decl>& vs,
                               std::ostream& o) {
       o << EOL;
-      o << INDENT << "void transform_inits(const stan::io::var_context& context__," << EOL;
-      o << INDENT << "                     std::vector<int>& params_i__," << EOL;
-      o << INDENT << "                     std::vector<double>& params_r__," << EOL;
-      o << INDENT << "                     std::ostream* pstream__) const {" << EOL;
-      o << INDENT2 << "stan::io::writer<double> writer__(params_r__,params_i__);" << EOL;
+      o << INDENT 
+        << "void transform_inits(const stan::io::var_context& context__," 
+        << EOL;
+      o << INDENT << "                     std::vector<int>& params_i__," 
+        << EOL;
+      o << INDENT << "                     std::vector<double>& params_r__,"
+        << EOL;
+      o << INDENT << "                     std::ostream* pstream__) const {" 
+        << EOL;
+      o << INDENT2 << "stan::io::writer<double> "
+        << "writer__(params_r__,params_i__);" 
+        << EOL;
       o << INDENT2 << "size_t pos__;" << EOL;
       o << INDENT2 << "(void) pos__; // dummy call to supress warning" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
-      o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
-      o << EOL;
+      o << INDENT2 << "std::vector<int> vals_i__;"
+        << EOL;
       generate_init_visgen vis(o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis, vs[i].decl_);
-
-      o << INDENT2 << "params_r__ = writer__.data_r();" << EOL;
+      
+      o << EOL 
+        << INDENT2 << "params_r__ = writer__.data_r();" << EOL;
       o << INDENT2 << "params_i__ = writer__.data_i();" << EOL;
       o << INDENT << "}" << EOL2;
 
@@ -3878,8 +3943,8 @@ namespace stan {
                                is_var,is_fun_return); 
       o << EOL;
       bool include_sampling = false;
-      generate_statements(prog.derived_decl_.second,2,o,include_sampling,
-                          is_var,is_fun_return); 
+      generate_located_statements(prog.derived_decl_.second,2,o,include_sampling,
+                                  is_var,is_fun_return); 
       o << EOL;
 
       generate_validate_var_decls(prog.derived_decl_.first,2,o);
@@ -3893,8 +3958,8 @@ namespace stan {
       generate_comment("declare and define generated quantities",2,o);
       generate_local_var_decls(prog.generated_decl_.first,2,o,is_var,is_fun_return); 
       o << EOL;
-      generate_statements(prog.generated_decl_.second,2,o,include_sampling,
-                          is_var,is_fun_return); 
+      generate_located_statements(prog.generated_decl_.second,2,o,include_sampling,
+                                  is_var,is_fun_return); 
       o << EOL;
 
       generate_comment("validate generated quantities",2,o);
@@ -4241,8 +4306,8 @@ namespace stan {
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var,is_fun_return); 
       o << EOL;
       bool include_sampling = false;
-      generate_statements(prog.derived_decl_.second,2,o,include_sampling,
-                          is_var,is_fun_return); 
+      generate_located_statements(prog.derived_decl_.second,2,o,include_sampling,
+                                  is_var,is_fun_return); 
       o << EOL;
 
       generate_comment("validate transformed parameters",2,o);
@@ -4266,8 +4331,8 @@ namespace stan {
       generate_init_vars(prog.generated_decl_.first, 2, o);
 
       o << EOL;
-      generate_statements(prog.generated_decl_.second,2,o,include_sampling,
-                          is_var,is_fun_return); 
+      generate_located_statements(prog.generated_decl_.second,2,o,include_sampling,
+                                  is_var,is_fun_return); 
       o << EOL;
 
       generate_comment("validate generated quantities",2,o);
@@ -4480,8 +4545,11 @@ namespace stan {
 
     void generate_function_inline_return_type(const function_decl_def& fun,
                                               const std::string& scalar_t_name,
+                                              int indent,
                                               std::ostream& out) {
-      out << "inline" << EOL;
+      out << "inline" 
+          << EOL;
+      generate_indent(indent,out);
       generate_bare_type(fun.return_type_,scalar_t_name,out);
       out << EOL;
     }
@@ -4577,20 +4645,10 @@ namespace stan {
       out << INDENT
           << "int current_statement_begin__ = -1;" 
           << EOL;
-      out << INDENT 
-          << "try {"
-          << EOL;
-      generate_statement(fun.body_,2,out,
-                         include_sampling,is_var,is_fun_return);
-      out << INDENT
-          << "} catch (const std::exception& e) {"
-          << EOL 
-          << INDENT2
-          << "stan::lang::throw_located_exception(e,current_statement_begin__);"
-          << EOL
-          << INDENT
-          << "}"
-          << EOL;
+
+      generate_located_statement(fun.body_,1,out,
+                                 include_sampling,is_var,is_fun_return);
+
       out << "}" 
           << EOL;
     }
@@ -4615,7 +4673,7 @@ namespace stan {
                                           const std::string& scalar_t_name,
                                           std::ostream& out) {
       generate_function_template_parameters(fun,false,false,false,out);
-      generate_function_inline_return_type(fun,scalar_t_name,out);
+      generate_function_inline_return_type(fun,scalar_t_name,0,out);
       generate_function_name(fun,out);
       generate_function_arguments(fun,false,false,false,out);
       generate_propto_default_function_body(fun,out);
@@ -4642,7 +4700,7 @@ namespace stan {
         = fun_scalar_type(fun, is_lp);
 
       generate_function_template_parameters(fun,is_rng,is_lp,is_log,out);
-      generate_function_inline_return_type(fun,scalar_t_name,out);
+      generate_function_inline_return_type(fun,scalar_t_name,0,out);
       generate_function_name(fun,out);
       generate_function_arguments(fun,is_rng,is_lp,is_log,out);
       generate_function_body(fun,scalar_t_name,out);
@@ -4661,39 +4719,39 @@ namespace stan {
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_log = ends_with("_log", fun.name_);
-      std::string scalar_t_name 
-        = fun_scalar_type(fun, is_lp);
+      std::string scalar_t_name = fun_scalar_type(fun, is_lp);
 
-      out << std::endl
+      out << EOL
           << "struct ";
       generate_function_name(fun,out);
       out << "_functor__ {"
-          << std::endl;
+          << EOL;
 
+      out << INDENT;
       generate_function_template_parameters(fun,is_rng,is_lp,is_log,out);
 
-      generate_function_inline_return_type(fun,scalar_t_name,out);
+      out << INDENT;
+      generate_function_inline_return_type(fun,scalar_t_name,1,out);
 
       out <<  INDENT 
           << "operator()";
       generate_function_arguments(fun,is_rng,is_lp,is_log,out);
       out << " const {"
-          << std::endl;
+          << EOL;
 
       out << INDENT2
           << "return ";
       generate_function_name(fun,out);
       generate_functor_arguments(fun,is_rng,is_lp,is_log,out);
       out << ";"
-          << std::endl;
+          << EOL;
 
       out << INDENT
           << "}"
-          << std::endl;
+          << EOL;
 
       out << "};"
-          << std::endl 
-          << std::endl;
+          << EOL2;
     }
 
 
