@@ -1,8 +1,30 @@
 STAN C++ RELEASE NOTES
 ======================================================================
 
+v2.6.2 (14 March 2015)
+======================================================================
+
+Bug Fixes
+----------------------------------------
+* fixed append_row and append_col to return the corect types [#1297]
+* documentation fix: fixed generation of stan-functions.txt [#1327]
+* changed constructor of stan::agrad::var so it can compile without
+  C++11 [#1337, 1364]
+* fixed bug in matrix double-indexing [#1342]
+* fixed calculation of derivative in normal_cdf_log, normal_ccdf_log
+  [#1357]
+
+API Enhancements
+----------------------------------------
+* refactored math / autodiff library [#1222, #1349, #1353]
+* fixed capitalization in tests [#1355]
+* updated Eigen to 3.2.4 [#1173]
+
+
+
 v2.6.1 (3 March 2015)
 ======================================================================
+
 Language Enhancements
 ----------------------------------------
 * improved warning messages from the parser [#1244]
