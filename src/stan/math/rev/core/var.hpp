@@ -1,12 +1,12 @@
 #ifndef STAN__MATH__REV__CORE__VAR_HPP
 #define STAN__MATH__REV__CORE__VAR_HPP
 
+#include <boost/math/tools/config.hpp>
 #include <ostream>
 #include <stan/math/rev/core/vari.hpp>
 #include <stan/math/rev/core/grad.hpp>
 #include <stan/math/rev/core/chainable.hpp>
 #include <stan/math/rev/core/chainable_alloc.hpp>
-#include <boost/utility/enable_if.hpp>
 
 namespace stan {
 
@@ -182,11 +182,47 @@ namespace stan {
       var(unsigned long x) : vi_(new vari(static_cast<double>(x))) { }
       
 #ifdef _WIN64
-      // in WIN64, size_t = unsigned long long, which is a C++11
-      // feature, so use this ctor to enable it
+
+      // these two ctors are for Win64 to enable 64-bit signed
+      // and unsigned integers, because long and unsigned long
+      // are still 32-bit
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
       var(size_t x) : vi_(new vari(static_cast<double>(x))) { }
+
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
       var(ptrdiff_t x) : vi_(new vari(static_cast<double>(x))) { }
 #endif
+
+
+#ifdef BOOST_MATH_USE_FLOAT128 
+
+      // this ctor is for later GCCs that have the __float128
+      // type enabled, because it gets enabled by boost
+
+      /**
+       * Construct a variable from the specified arithmetic argument
+       * by constructing a new <code>vari</code> with the argument
+       * cast to <code>double</code>, and a zero adjoint.
+       *
+       * @param x Value of the variable.
+       */
+      var(__float128 x) : vi_(new vari(static_cast<double>(x))) { } 
+
+#endif 
 
       /**
        * Return the value of this variable.
