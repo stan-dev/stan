@@ -50,7 +50,7 @@ namespace stan {
       for (int j = 0; j < n; ++j) {
         int end = u[j] + z[j] - 1;
         for (int q = u[j] - 1; q < end; ++q)
-          y(v[q]) += w[q] * b(j);
+          y(v[q]-1) += w[q] * b(j);
       }
       return y;
     }
@@ -100,7 +100,7 @@ namespace stan {
 					b_sub(p) = b(v[q]); 
 					++p;
 				}
-				y(i) = dot_product(w.segment(u[i]-1,z[i]),b_sub.segment(0,p-1));
+				y(i) = stan::math::dot_product(w.segment(u[i]-1,z[i]),b_sub.segment(0,p-1));
       }
       return y;
     }
