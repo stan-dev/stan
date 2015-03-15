@@ -80,8 +80,6 @@ namespace stan {
           }
           z_tilde = muL.to_unconstrained(z_check);
 
-          // FIXME: is this the right way to do this?
-          //
           // We need to call the stan::agrad::var version of log_prob
           // to get the correct proportionality and Jacobian terms
           for (int var_index = 0; var_index < dim; ++var_index) {
@@ -89,7 +87,6 @@ namespace stan {
           }
           elbo += (model_.template
                    log_prob<true,true>(z_tilde_var, &std::cout)).val();
-          // END of FIXME
         }
         elbo /= static_cast<double>(n_monte_carlo_elbo_);
 
@@ -132,8 +129,6 @@ namespace stan {
           }
           z_tilde = musigmatilde.to_unconstrained(z_check);
 
-          // FIXME: is this the right way to do this?
-          //
           // We need to call the stan::agrad::var version of log_prob
           // to get the correct proportionality and Jacobian terms
           for (int var_index = 0; var_index < dim; ++var_index) {
@@ -141,7 +136,6 @@ namespace stan {
           }
           elbo += (model_.template
                    log_prob<true,true>(z_tilde_var, &std::cout)).val();
-          // END of FIXME
         }
         elbo /= static_cast<double>(n_monte_carlo_elbo_);
 
