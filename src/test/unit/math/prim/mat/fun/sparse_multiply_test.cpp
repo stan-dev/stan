@@ -22,20 +22,8 @@ TEST(SparseStuff,sparse_multiply_csc) {
 	stan::math::vector_d b(3);
 	b << 22, 33, 44;
 
-//	std::cout << X_w << std::endl;
-//	for (unsigned int i=0; i < X_v.size(); ++i) 	
-//		std::cout << X_v[i] << ", ";
-//	std::cout << ";" <<  std::endl;
-//	for (unsigned int i=0; i < X_u.size(); ++i) 	
-//		std::cout << X_u[i] << ", ";
-//	std::cout << ";" <<  std::endl;
-//	for (unsigned int i=0; i < X_z.size(); ++i) 	
-//		std::cout << X_z[i] << ", ";
-//	std::cout << ";" <<  std::endl;
-
 	stan::math::vector_d result = stan::math::sparse_multiply_csc(
 			2, 3, X_w, X_v, X_u, X_z, b);
-//	stan::math::vector_d result = stan::math::multiply(m,b);
 
   EXPECT_FLOAT_EQ( 440.0,result(0));
   EXPECT_FLOAT_EQ(1034.0,result(1));
@@ -55,21 +43,12 @@ TEST(SparseStuff,sparse_multiply_csr) {
 	stan::math::vector_d b(3);
 	b << 22, 33, 44;
 
-//	std::cout << X_w << std::endl;
-//	for (unsigned int i=0; i < X_v.size(); ++i) 	
-//		std::cout << X_v[i] << ", ";
-//	std::cout << ";" <<  std::endl;
-//	for (unsigned int i=0; i < X_u.size(); ++i) 	
-//		std::cout << X_u[i] << ", ";
-//	std::cout << ";" <<  std::endl;
-//	for (unsigned int i=0; i < X_z.size(); ++i) 	
-//		std::cout << X_z[i] << ", ";
-//	std::cout << ";" <<  std::endl;
-
 	stan::math::vector_d result = stan::math::sparse_multiply_csr(
 			2, 3, X_w, X_v, X_u, X_z, b);
-//	stan::math::vector_d result = stan::math::multiply(m,b);
 
   EXPECT_FLOAT_EQ( 440.0,result(0));
   EXPECT_FLOAT_EQ(1034.0,result(1));
 }
+
+
+
