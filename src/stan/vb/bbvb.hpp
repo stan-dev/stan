@@ -32,7 +32,7 @@ namespace stan {
       bbvb(M& m,
            Eigen::VectorXd& cont_params,
            double& elbo,
-           int& n_monte_carlo,
+           int& n_monte_carlo_grad,
            double& eta_stepsize,
            BaseRNG& rng,
            std::ostream* output_stream,
@@ -43,7 +43,8 @@ namespace stan {
         cont_params_(cont_params),
         elbo_(elbo),
         rng_(rng),
-        n_monte_carlo_(n_monte_carlo),
+        n_monte_carlo_grad_(n_monte_carlo_grad),
+        n_monte_carlo_elbo_(100),
         eta_stepsize_(eta_stepsize),
         refresh_(refresh) {};
 
@@ -67,13 +68,11 @@ namespace stan {
         double elbo(0.0);
         int dim = muL.dimension();
 
-        int elbo_n_monte_carlo(100);
-
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
         Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tilde_var(dim);
 
-        for (int i = 0; i < elbo_n_monte_carlo; ++i) {
+        for (int i = 0; i < n_monte_carlo_elbo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d) {
             z_check(d) = stan::prob::normal_rng(0,1,rng_);
@@ -91,7 +90,7 @@ namespace stan {
                    log_prob<true,true>(z_tilde_var, &std::cout)).val();
           // END of FIXME
         }
-        elbo /= static_cast<double>(elbo_n_monte_carlo);
+        elbo /= static_cast<double>(n_monte_carlo_elbo_);
 
         // Entropy of normal: 0.5 * log det (L^T L) = sum(log(abs(diag(L))))
         double tmp(0.0);
@@ -121,13 +120,11 @@ namespace stan {
         double elbo(0.0);
         int dim = musigmatilde.dimension();
 
-        int elbo_n_monte_carlo(100);
-
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
         Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tilde_var(dim);
 
-        for (int i = 0; i < elbo_n_monte_carlo; ++i) {
+        for (int i = 0; i < n_monte_carlo_elbo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d) {
             z_check(d) = stan::prob::normal_rng(0,1,rng_);
@@ -145,7 +142,7 @@ namespace stan {
                    log_prob<true,true>(z_tilde_var, &std::cout)).val();
           // END of FIXME
         }
-        elbo /= static_cast<double>(elbo_n_monte_carlo);
+        elbo /= static_cast<double>(n_monte_carlo_elbo_);
 
         // Entropy of normal: 0.5 * log det diag(sigma^2) = sum(log(sigma))
         //                                                = sum(sigma_tilde)
@@ -192,7 +189,7 @@ namespace stan {
         Eigen::VectorXd z_tilde = Eigen::VectorXd::Zero(dim);
 
         // Naive Monte Carlo integration
-        for (int i = 0; i < n_monte_carlo_; ++i) {
+        for (int i = 0; i < n_monte_carlo_grad_; ++i) {
 
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d) {
@@ -216,8 +213,8 @@ namespace stan {
           }
 
         }
-        mu_grad /= static_cast<double>(n_monte_carlo_);
-        L_grad  /= static_cast<double>(n_monte_carlo_);
+        mu_grad /= static_cast<double>(n_monte_carlo_grad_);
+        L_grad  /= static_cast<double>(n_monte_carlo_grad_);
 
         // Add gradient of entropy term
         L_grad.diagonal().array() += muL.L_chol().diagonal().array().inverse();
@@ -259,7 +256,7 @@ namespace stan {
         Eigen::VectorXd z_tilde = Eigen::VectorXd::Zero(dim);
 
         // Naive Monte Carlo integration
-        for (int i = 0; i < n_monte_carlo_; ++i) {
+        for (int i = 0; i < n_monte_carlo_grad_; ++i) {
 
           // Draw from standard normal and transform to unconstrained space
           for (int d = 0; d < dim; ++d) {
@@ -282,8 +279,8 @@ namespace stan {
             + tmp_mu_grad.array().cwiseProduct(z_check.array());
 
         }
-        mu_grad           /= static_cast<double>(n_monte_carlo_);
-        sigma_tilde_grad  /= static_cast<double>(n_monte_carlo_);
+        mu_grad           /= static_cast<double>(n_monte_carlo_grad_);
+        sigma_tilde_grad  /= static_cast<double>(n_monte_carlo_grad_);
 
         // multiply by exp(sigma_tilde)
         sigma_tilde_grad.array() =
@@ -677,7 +674,8 @@ namespace stan {
       Eigen::VectorXd& cont_params_;
       double elbo_;
       BaseRNG& rng_;
-      int n_monte_carlo_;
+      int n_monte_carlo_grad_;
+      int n_monte_carlo_elbo_;
       double eta_stepsize_;
       int refresh_;
 
