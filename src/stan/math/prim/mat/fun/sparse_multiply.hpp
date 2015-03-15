@@ -92,15 +92,17 @@ namespace stan {
 
       typedef typename boost::math::tools::promote_args<T1, T2>::type fun_scalar_t;
       Eigen::Matrix<fun_scalar_t, Eigen::Dynamic, 1>  y(m);
-			Eigen::Matrix<T2,Eigen::Dynamic,1> b_sub(n);
       for (int i = 0; i < m; ++i) {
         int end = u[i] + z[i] - 1;
 				int p = 0;
+				Eigen::Matrix<T2,Eigen::Dynamic,1> b_sub(z[i]);
         for (int q = u[i]-1; q < end; ++q) {
-					b_sub(p) = b(v[q]); 
+					b_sub(p) = b(v[q]-1); 
 					++p;
 				}
-				y(i) = stan::math::dot_product(w.segment(u[i]-1,z[i]),b_sub.segment(0,p-1));
+				Eigen::Matrix<T2,Eigen::Dynamic,1> w_sub = w.segment(u[i]-1,z[i]);
+//				y(i) = stan::math::dot_product(w.segment(u[i]-1,z[i]),b_sub.segment(0,p-1));
+				y(i) = stan::math::dot_product(w_sub,b_sub);
       }
       return y;
     }
