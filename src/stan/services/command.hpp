@@ -669,9 +669,13 @@ namespace stan {
           = dynamic_cast<stan::services::list_argument*>(parser.arg("method")
             ->arg("variational")->arg("algorithm"));
 
-        int num_samples = dynamic_cast<stan::services::int_argument*>
+        int grad_samples = dynamic_cast<stan::services::int_argument*>
           (parser.arg("method")->arg("variational")
-                               ->arg("num_samples"))->value();
+                               ->arg("grad_samples"))->value();
+
+        int elbo_samples = dynamic_cast<stan::services::int_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("elbo_samples"))->value();
 
         int max_iterations = dynamic_cast<stan::services::int_argument*>
           (parser.arg("method")->arg("variational")->arg("iter"))->value();
@@ -702,7 +706,8 @@ namespace stan {
           }
 
           stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params,
-                                              elbo, num_samples, eta_stepsize,
+                                              elbo, grad_samples, elbo_samples,
+                                              eta_stepsize,
                                               base_rng,
                                               output_stream,
                                               refresh, diagnostic_stream);
@@ -740,7 +745,8 @@ namespace stan {
           }
 
           stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params,
-                                              elbo, num_samples, eta_stepsize,
+                                              elbo, grad_samples, elbo_samples,
+                                              eta_stepsize,
                                               base_rng,
                                               output_stream,
                                               refresh, diagnostic_stream);

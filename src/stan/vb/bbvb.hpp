@@ -33,6 +33,7 @@ namespace stan {
            Eigen::VectorXd& cont_params,
            double& elbo,
            int& n_monte_carlo_grad,
+           int& n_monte_carlo_elbo,
            double& eta_stepsize,
            BaseRNG& rng,
            std::ostream* output_stream,
@@ -44,7 +45,7 @@ namespace stan {
         elbo_(elbo),
         rng_(rng),
         n_monte_carlo_grad_(n_monte_carlo_grad),
-        n_monte_carlo_elbo_(100),
+        n_monte_carlo_elbo_(n_monte_carlo_elbo),
         eta_stepsize_(eta_stepsize),
         refresh_(refresh) {};
 
