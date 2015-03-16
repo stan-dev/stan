@@ -2,6 +2,7 @@
 #define STAN__MATH__PRIM__MAT__FUN__CHOLESKY_DECOMPOSE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat/err/check_pos_definite.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>
 #include <stan/math/prim/mat/err/check_symmetric.hpp>
 
@@ -16,13 +17,16 @@ namespace stan {
      * <p>\f$A = L \times L^T\f$.
      * @param m Symmetrix matrix.
      * @return Square root of matrix.
-     * @throw std::domain_error if m is not a symmetric matrix.
+     * @throw std::domain_error if m is not a symmetric matrix or
+     *   if m is not positive definite (if m has more than 0 elements)
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     cholesky_decompose(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
       stan::math::check_square("cholesky_decompose", "m", m);
       stan::math::check_symmetric("cholesky_decompose", "m", m);
+      if (m.size() > 0)
+        stan::math::check_pos_definite("cholesky_decompose", "m", m);
       Eigen::LLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >llt(m.rows());
       llt.compute(m);
       return llt.matrixL();
