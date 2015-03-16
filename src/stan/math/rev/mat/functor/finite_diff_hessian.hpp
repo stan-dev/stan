@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_AD_HPP
-#define STAN__MATH__REV__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_AD_HPP
+#ifndef STAN__MATH__REV__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_HPP
+#define STAN__MATH__REV__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/core.hpp>
@@ -39,11 +39,11 @@ namespace stan {
      */
     template <typename F>
     void
-    finite_diff_hessian_AD(const F& f,
-                           const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
-                           double& fx,
-                           Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& hess_fx, 
-                           const double epsilon = 1e-03) {
+    finite_diff_hessian(const F& f,
+                        const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+                        double& fx,
+                        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& hess_fx, 
+                        const double epsilon = 1e-03) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
       using Eigen::VectorXd;

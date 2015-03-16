@@ -22,7 +22,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/prim/mat/functor/finite_diff_hessian.hpp>
 #include <stan/math/prim/mat/functor/finite_diff_gradient.hpp>
-#include <stan/math/rev/mat/functor/finite_diff_hessian_AD.hpp>
+#include <stan/math/rev/mat/functor/finite_diff_hessian.hpp>
 #include <stan/math/rev/mat/functor/finite_diff_grad_hessian.hpp>
 
 struct norm_functor {
@@ -101,7 +101,7 @@ TEST(AgradFiniteDiff,hessian) {
 
   stan::agrad::hessian(f,f_vec,f_eval,grad_f,H_f);
   stan::math::finite_diff_hessian(f,f_vec,f_fin_diff_eval,fin_diff_H_f);
-  stan::agrad::finite_diff_hessian_AD(f,f_vec,f_fin_diff_auto_eval,
+  stan::agrad::finite_diff_hessian(f,f_vec,f_fin_diff_auto_eval,
                                       fin_diff_auto_H_f);
 
   EXPECT_FLOAT_EQ(f_eval,f_fin_diff_eval);
