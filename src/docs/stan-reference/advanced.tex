@@ -1121,7 +1121,14 @@ and can apply the standard tests.
 The second technical difficulty posed by \MCMC methods is that the
 samples will typically be autocorrelated within a chain.  This
 increases the uncertainty of the estimation of posterior quantities of
-interest, such as means, variances or quantiles.
+interest, such as means, variances or quantiles.  
+
+A nice introductory reference for analyzing MCMC results in general
+and effective sample size in particular is \citep{Geyer:2011}.  The
+particular calculations used by Stan follow those for split-$\hat{R}$,
+which involve both cross-chain (mean) and within-chain calculations
+(autocorrelation); they were introduced in this manual and explained
+in more detail in \citep{GelmanEtAl:2013}.
 
 \subsection{Definition of Effective Sample Size}
 
@@ -1189,7 +1196,7 @@ V_t =
 \sum_{m=1}^M 
 \
 \left(
-\frac{1}{N_m}
+\frac{1}{N_m - t}
 \sum_{n=t+1}^{N_m}
 \left(
 \theta_m^{(n)} - \theta_m^{(n-t)}
@@ -1212,8 +1219,9 @@ effective sample size.
 
 Because of the noise in the correlation estimates $\hat{\rho}_t$ as $t$
 increases, typically only the initial estimates of $\hat{\rho}_t$
-where $\hat{\rho}_t < 0$ will be used.  Setting $T'$ to be the
+where $\hat{\rho}_t > 0$ will be used.  Setting $T'$ to be the
 first lag such that $\rho_{T' + 1} < 0$, 
+%
 \[
 T' = \arg\min_t \ \hat{\rho}_{t+1} < 0,
 \]
@@ -1224,6 +1232,21 @@ the effective sample size estimator is defined as
 \frac{MN}
      {1 + \sum_{t=1}^{T'} \hat{\rho}_t}.
 \]
+%
+Exact autocorrelations can happen only on odd lags \citep{Geyer:2011}.
+By summing over pairs, the paired autocorrelation is guaranteed to be
+positive modulo estimator noise.  This is the motivation behind the
+many termination criterion of \cite{Geyer:2011}. Stan does not (yet)
+do the paired expectations because NUTS almost by construction avoids
+the negative autocorrelation regime.  Thus terminating at the first
+negative autocorrelation is a reasonable approximation for stopping
+when the noise in the autocorrelation estimator dominates.
+
+Stan carries out the autocorrelation computations for all lags
+simultaneously using Eigen's fast Fourier transform (FFT) package with
+appropriate padding; see \citep{Geyer:2011} for more detail on using
+FFT for autocorrelation calculations.
+
 
 \subsection{Thinning Samples}
 

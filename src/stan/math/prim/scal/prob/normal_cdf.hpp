@@ -11,6 +11,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
 #include <stan/math/prim/scal/meta/max_size.hpp>
 
 namespace stan {
@@ -92,16 +93,21 @@ namespace stan {
         cdf *= cdf_;
 
         // gradients
-        const T_partials_return rep_deriv = SQRT_TWO_OVER_PI * 0.5 
-          * exp(-scaled_diff * scaled_diff) / cdf_ / sigma_dbl;
-        if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += rep_deriv;
-        if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] -= rep_deriv;
-        if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff * SQRT_2;
+        if (contains_nonconstant_struct<T_y, T_loc, T_scale>::value) {
+          const T_partials_return rep_deriv
+            = scaled_diff < -37.5 * INV_SQRT_2
+                     ? 0.0
+                     : SQRT_TWO_OVER_PI * 0.5 
+                     * exp(-scaled_diff * scaled_diff) / cdf_ / sigma_dbl;
+          if (!is_constant_struct<T_y>::value)
+            operands_and_partials.d_x1[n] += rep_deriv;
+          if (!is_constant_struct<T_loc>::value)
+            operands_and_partials.d_x2[n] -= rep_deriv;
+          if (!is_constant_struct<T_scale>::value)
+            operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff * SQRT_2;
+        }
       }
-
+      
       if (!is_constant_struct<T_y>::value)
         for (size_t n = 0; n < stan::length(y); ++n) 
           operands_and_partials.d_x1[n] *= cdf;
