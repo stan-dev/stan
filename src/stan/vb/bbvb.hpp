@@ -11,10 +11,6 @@
 
 #include <stan/services/io/write_iteration_csv.hpp>
 
-// #include <stan/math/functions.hpp>  // I had to add these two lines beceause
-// #include <stan/math/matrix.hpp>     // the unit tests wouldn't compile...
-
-#include <stan/vb/base_vb.hpp>
 #include <stan/vb/vb_params_fullrank.hpp>
 #include <stan/vb/vb_params_meanfield.hpp>
 
@@ -25,7 +21,7 @@ namespace stan {
   namespace vb {
 
     template <class M, class BaseRNG>
-    class bbvb : public base_vb {
+    class bbvb {
 
     public:
 
@@ -39,7 +35,6 @@ namespace stan {
            std::ostream* output_stream,
            int& refresh,
            std::ostream* diagnostic_stream):
-        base_vb(output_stream, diagnostic_stream, "bbvb"),
         model_(m),
         cont_params_(cont_params),
         elbo_(elbo),
@@ -47,7 +42,9 @@ namespace stan {
         n_monte_carlo_grad_(n_monte_carlo_grad),
         n_monte_carlo_elbo_(n_monte_carlo_elbo),
         eta_stepsize_(eta_stepsize),
-        refresh_(refresh) {};
+        refresh_(refresh),
+        out_stream_(output_stream),
+        diag_stream_(diagnostic_stream) {};
 
       virtual ~bbvb() {};
 
@@ -317,9 +314,6 @@ namespace stan {
         double post_factor = 1.0 / window_size;
         double pre_factor  = 1.0 - post_factor;
 
-        // Copy of previous parameters, for convergence check
-        vb_params_fullrank muL_prev = muL;
-
         // Initialize ELBO and convergence tracking variables
         double elbo(0.0);
         double elbo_prev = std::numeric_limits<double>::min();
@@ -349,7 +343,6 @@ namespace stan {
         bool do_more_iterations = true;
         int iter_counter = 0;
         while (do_more_iterations) {
-          muL_prev = muL;
 
           // Compute gradient using Monte Carlo integration
           calc_combined_grad(muL, mu_grad, L_grad);
@@ -390,14 +383,14 @@ namespace stan {
                       << std::setw(15) << std::fixed << std::setprecision(3)
                       << delta_elbo_med;
 
-            if (err_stream_) {
+            if (diag_stream_) {
               end = clock();
               delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
               print_vector.clear();
               print_vector.push_back(delta_t);
               print_vector.push_back(elbo);
-              services::io::write_iteration_csv(*err_stream_,
+              services::io::write_iteration_csv(*diag_stream_,
                                                 iter_counter, print_vector);
             }
 
@@ -458,9 +451,6 @@ namespace stan {
         double post_factor = 1.0 / window_size;
         double pre_factor  = 1.0 - post_factor;
 
-        // Copy of previous parameters, for convergence check
-        vb_params_meanfield musigmatilde_prev = musigmatilde;
-
         // Initialize ELBO and convergence tracking variables
         double elbo(0.0);
         double elbo_prev = std::numeric_limits<double>::min();
@@ -490,8 +480,6 @@ namespace stan {
         bool do_more_iterations = true;
         int iter_counter = 0;
         while (do_more_iterations) {
-          musigmatilde_prev = musigmatilde;
-
           // Compute gradient using Monte Carlo integration
           calc_combined_grad(musigmatilde, mu_grad, sigma_tilde_grad);
 
@@ -535,14 +523,14 @@ namespace stan {
                       << std::setw(15) << std::fixed << std::setprecision(3)
                       << delta_elbo_med;
 
-            if (err_stream_) {
+            if (diag_stream_) {
               end = clock();
               delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
               print_vector.clear();
               print_vector.push_back(delta_t);
               print_vector.push_back(elbo);
-              services::io::write_iteration_csv(*err_stream_,
+              services::io::write_iteration_csv(*diag_stream_,
                                                 iter_counter, print_vector);
             }
 
@@ -676,6 +664,8 @@ namespace stan {
       int n_monte_carlo_elbo_;
       double eta_stepsize_;
       int refresh_;
+      std::ostream* out_stream_;
+      std::ostream* diag_stream_;
 
     };
 
