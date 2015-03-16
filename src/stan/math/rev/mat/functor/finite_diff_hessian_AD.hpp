@@ -22,6 +22,14 @@ namespace stan {
      * Eigen::Matrix<double,Eigen::Dynamic,1>&)
      * </code>
      *
+     * The reference for this algorithm is:
+     *
+     * De Levie: An improved numerical approximation
+     * for the first derivative, page 3 
+     *
+     * This function involves 4 calls to f. Error 
+     * on order of epsilon ^ 4.
+     *
      * @tparam F Type of function
      * @param[in] f Function
      * @param[in] x Argument to function
@@ -48,9 +56,9 @@ namespace stan {
       hess_fx.resize(d, d);
 
       
-      for (int i = 0; i < d; ++i){
+      for (int i = 0; i < d; ++i) {
         VectorXd g_diff = VectorXd::Zero(d);
-        x_temp(i) += 2.0 * epsilon;
+        x_temp(i) = x(i) + 2.0 * epsilon;
         gradient(f, x_temp, dummy_fx_eval, g_auto);
         g_diff = -g_auto;
 
@@ -73,8 +81,6 @@ namespace stan {
       }
       fx = f(x);
     }
-    
-
   }
 }
 #endif

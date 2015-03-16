@@ -19,7 +19,13 @@ namespace stan {
      * Eigen::Matrix<double,Eigen::Dynamic,1>&)
      * </code>
      *
-     * Error should be on order of epsilon ^ 6
+     * Error should be on order of epsilon ^ 6. 
+     * The reference for this algorithm is:
+     *
+     * De Levie: An improved numerical approximation
+     * for the first derivative, page 3 
+     *
+     * This function involves 6 calls to f.
      * 
      * @tparam F Type of function
      * @param[in] f Function
@@ -44,10 +50,10 @@ namespace stan {
 
       fx = f(x);
       
-      for (int i = 0; i < d; ++i){
+      for (int i = 0; i < d; ++i) {
         double delta_f = 0.0;
 
-        x_temp(i) += 3.0 * epsilon;
+        x_temp(i) = x(i) + 3.0 * epsilon;
         delta_f = f(x_temp);
 
         x_temp(i) = x(i) + 2.0 * epsilon;
@@ -70,8 +76,7 @@ namespace stan {
         x_temp(i) = x(i);
         grad_fx(i) = delta_f;
       }
-
     }
-	}
+  }
 }
 #endif

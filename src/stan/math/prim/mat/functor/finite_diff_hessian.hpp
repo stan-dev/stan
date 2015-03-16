@@ -11,7 +11,7 @@ namespace stan {
     double
     finite_diff_hess_helper(const F& f,
                             const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
-                            const int& lambda,
+                            const int lambda,
                             const double epsilon = 1e-03) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
@@ -46,7 +46,12 @@ namespace stan {
      * Eigen::Matrix<double,Eigen::Dynamic,1>&)
      * </code>
      *
-     * Error should be on order of epsilon ^ 4
+     * Error should be on order of epsilon ^ 4, with 4 
+     * calls to the function f.
+     *
+     * Reference: 
+     * Eberly: Derivative Approximation by Finite Differences
+     * Page 6
      * 
      * @tparam F Type of function
      * @param[in] f Function
@@ -55,7 +60,6 @@ namespace stan {
      * @param[out] hess_fx Hessian of function at argument
      * @param[in] epsilon perturbation size
      */
-
     template <typename F>
     void
     finite_diff_hessian(const F& f,
@@ -74,10 +78,10 @@ namespace stan {
       fx = f(x);
       
       double f_diff(0.0);
-      for (int i = 0; i < d; ++i){
-        for (int j = i; j < d; ++j){
+      for (int i = 0; i < d; ++i) {
+        for (int j = i; j < d; ++j) {
           x_temp(i) += 2.0 * epsilon;
-          if(i != j){
+          if (i != j) {
             f_diff = -finite_diff_hess_helper(f,x_temp,j);
             x_temp(i) = x(i) + -2.0 * epsilon;
             f_diff += finite_diff_hess_helper(f,x_temp,j);

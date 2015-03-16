@@ -22,6 +22,13 @@ namespace stan {
      * Eigen::Matrix<double,Eigen::Dynamic,1>&)
      * </code>
      *
+     * Reference:
+     *
+     * De Levie: An improved numerical approximation
+     * for the first derivative, page 3 
+     *
+     * 4 calls to the function, f.
+     *
      * @tparam F Type of function
      * @param[in] f Function
      * @param[in] x Argument to function
@@ -32,10 +39,10 @@ namespace stan {
     template <typename F>
     void
     finite_diff_grad_hessian(const F& f,
-														 const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
-														 double& fx,
-														 std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >& grad_hess_fx, 
-														 const double epsilon = 1e-04) {
+                             const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+                             double& fx,
+                             std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >& grad_hess_fx,
+                             const double epsilon = 1e-04) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
 
@@ -48,10 +55,10 @@ namespace stan {
       Matrix<double,Dynamic,Dynamic> H_diff(d,d);
 
       
-      for (int i = 0; i < d; ++i){
+      for (int i = 0; i < d; ++i) {
         H_diff.setZero();
 
-        x_temp(i) += 2.0 * epsilon;
+        x_temp(i) = x(i) + 2.0 * epsilon;
         hessian(f, x_temp, dummy_fx_eval, grad_auto, H_auto);
         H_diff = -H_auto;
 
