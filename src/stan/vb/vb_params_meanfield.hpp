@@ -47,6 +47,12 @@ namespace stan {
         sigma_tilde_ = sigma_tilde;
       }
 
+      // Entropy of normal: 0.5 * log det diag(sigma^2) = sum(log(sigma))
+      //                                                = sum(sigma_tilde)
+      double entropy() const {
+        return stan::math::sum( sigma_tilde_ );
+      }
+
       // Calculate natural parameters
       Eigen::VectorXd nat_params() const {
 

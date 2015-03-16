@@ -50,23 +50,22 @@ namespace stan {
 
 
       /**
-       * FULL-RANK ELBO
+       * ELBO
        *
        * Calculates the "blackbox" Evidence Lower BOund (ELBO) by sampling
        * from the standard multivariate normal (for now), affine transform
        * the sample, and evaluating the log joint, adjusted by the entropy
-       * term of the normal, which is proportional to 0.5*logdet(L^T L)
+       * term of the normal
        *
-       * @param   muL              mean and cholesky factor of affine transform
+       * @param   vb_params        variational parameters class
        * @param   constant_factor  difference between log_prob agrad and double
        * @return                   evidence lower bound (elbo)
        */
-      double calc_ELBO(vb_params_fullrank const& muL,
+      template <typename T>
+      double calc_ELBO(T const& vb_params,
                        double constant_factor) {
-        // static const char* function = "stan::vb::bbvb.calc_ELBO(%1%)";
-        // double error_tmp(0.0);
         double elbo(0.0);
-        int dim = muL.dimension();
+        int dim = vb_params.dimension();
 
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
@@ -76,65 +75,20 @@ namespace stan {
           for (int d = 0; d < dim; ++d) {
             z_check(d) = stan::prob::normal_rng(0,1,rng_);
           }
-          z_tilde = muL.to_unconstrained(z_check);
+          z_tilde = vb_params.to_unconstrained(z_check);
 
+          // Accumulate log probability
           elbo += (model_.template log_prob<false,true>(z_tilde, &std::cout))
                    + constant_factor;
         }
+        // Divide to get Monte Carlo integral estimate
         elbo /= static_cast<double>(n_monte_carlo_elbo_);
 
-        // Entropy of normal: 0.5 * log det (L^T L) = sum(log(abs(diag(L))))
-        double tmp(0.0);
-        for (int d = 0; d < dim; ++d) {
-          tmp = abs(muL.L_chol()(d,d));
-          if (tmp != 0.0) {
-            elbo += log(tmp);
-          }
-        }
+        // Add entropy term
+        elbo += vb_params.entropy();
 
         return elbo;
       }
-
-
-      /**
-       * MEAN-FIELD ELBO
-       *
-       * Calculates the "blackbox" Evidence Lower BOund (ELBO) by sampling
-       * from the standard multivariate normal (for now), affine transform
-       * the sample, and evaluating the log joint, adjusted by the entropy
-       * term of the normal, which is proportional to 0.5*logdet(L^T L)
-       *
-       * @param   musigmatilde     mean and log-std vector of affine transform
-       * @param   constant_factor  difference between log_prob agrad and double
-       * @return                   evidence lower bound (elbo)
-       */
-      double calc_ELBO(vb_params_meanfield const& musigmatilde,
-                       double constant_factor) {
-        double elbo(0.0);
-        int dim = musigmatilde.dimension();
-
-        Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
-        Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
-
-        for (int i = 0; i < n_monte_carlo_elbo_; ++i) {
-          // Draw from standard normal and transform to unconstrained space
-          for (int d = 0; d < dim; ++d) {
-            z_check(d) = stan::prob::normal_rng(0,1,rng_);
-          }
-          z_tilde = musigmatilde.to_unconstrained(z_check);
-
-          elbo += (model_.template log_prob<false,true>(z_tilde, &std::cout))
-                   + constant_factor;
-        }
-        elbo /= static_cast<double>(n_monte_carlo_elbo_);
-
-        // Entropy of normal: 0.5 * log det diag(sigma^2) = sum(log(sigma))
-        //                                                = sum(sigma_tilde)
-        elbo += stan::math::sum( musigmatilde.sigma_tilde() );
-
-        return elbo;
-      }
-
 
       /**
        * FULL-RANK GRADIENTS

@@ -49,6 +49,19 @@ namespace stan {
       void set_mu(Eigen::VectorXd const& mu) { mu_ = mu; }
       void set_L_chol(Eigen::MatrixXd const& L_chol) { L_chol_ = L_chol; }
 
+      // Entropy of normal: 0.5 * log det (L^T L) = sum(log(abs(diag(L))))
+      double entropy() const {
+        double tmp(0.0);
+        double result(0.0);
+        for (int d = 0; d < dimension_; ++d) {
+          tmp = abs(L_chol_(d,d));
+          if (tmp != 0.0) {
+            result += log(tmp);
+          }
+        }
+        return result;
+      }
+
       // Calculate natural parameters
       Eigen::VectorXd nat_params() const {
 
