@@ -6,6 +6,9 @@
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
+#include <stan/math/prim/scal/err/check_equal.hpp>
+#include <stan/math/prim/scal/err/check_positive.hpp>
+
 namespace stan {
 
   namespace math {
@@ -55,8 +58,8 @@ namespace stan {
       return y;
     }
 
-    /** Return the multiplication of the sparse matrix spefcified by
-     * by values and indexing by the specified dense vector.
+    /** Return the multiplication of the sparse matrix (specified by
+     * by values and indexing) by the specified dense vector.
      *
      * The sparse matrix X of dimension m by n is represented by the
      * vector w (of values), the integer array v (containing one-based
@@ -67,11 +70,15 @@ namespace stan {
      *
      * @tparam T1 Type of sparse matrix entries.
      * @tparam T2 Type of dense vector entries.
-     * @param m Rows in matrix.
-     * @param n Columns in matrix.
-     * @param v One-based column index of each value.
-     * @param u one-based index of where each row starts in w.
-     * @param z number of non-zero entries in each row of w.
+     * @param m Number of rows in matrix.
+     * @param n Number of columns in matrix.
+		 * @param w Vector of non-zero values in matrix.
+     * @param v One-based column index of each non-zero value, same
+		 *          length as w.
+     * @param u one-based index of where each row starts in w, equal to
+		 *          the number of rows plus one.
+     * @param z number of non-zero entries in each row of w, equal to
+		 *          the number of rows..
      * @return dense vector for the product.
      * @throw ... explain error conditions briefly ...
      */
@@ -86,9 +93,13 @@ namespace stan {
                     const std::vector<int>& z,
                     const Eigen::Matrix<T2, Eigen::Dynamic,1>& b) {
 
-      // a whole bunch of error checking goes here, e.g., m, n > 0,
-      // etc. etc.  we can't throw index out of bounds exceptions at
-      // run time
+			stan::math::check_positive("sparse_multiply_csr","m",m);
+			stan::math::check_positive("sparse_multiply_csr","n",n);
+			stan::math::check_equal("sparse_multiply_csr","n/b", n, b.size());
+			stan::math::check_equal("sparse_multiply_csr","m/u", m, u.size()-1);
+			stan::math::check_equal("sparse_multiply_csr","m/z", m, z.size()  );
+			stan::math::check_equal("sparse_multiply_csr","w/v", w.size(), v.size());
+			stan::math::check_equal("sparse_multiply_csr","u/z/v", u[m-1]+z[m-1]-1, v.size());
 
       typedef typename boost::math::tools::promote_args<T1, T2>::type fun_scalar_t;
       Eigen::Matrix<fun_scalar_t, Eigen::Dynamic, 1>  y(m);
@@ -101,7 +112,6 @@ namespace stan {
           ++p;
         }
         Eigen::Matrix<T2,Eigen::Dynamic,1> w_sub = w.segment(u[i]-1,z[i]);
-//        y(i) = stan::math::dot_product(w.segment(u[i]-1,z[i]),b_sub.segment(0,p-1));
         y(i) = stan::math::dot_product(w_sub,b_sub);
       }
       return y;
