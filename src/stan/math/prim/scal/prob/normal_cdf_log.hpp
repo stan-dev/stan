@@ -11,6 +11,8 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/meta/max_size.hpp>
+#include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
 
 namespace stan {
 
@@ -53,7 +55,6 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
-      double log_half = std::log(0.5);  
     
       const double SQRT_TWO_OVER_PI = std::sqrt(2.0 / stan::math::pi());
       for (size_t n = 0; n < N; n++) {
@@ -75,18 +76,23 @@ namespace stan {
           one_p_erf = 1.0 + erf(scaled_diff);
 
         // log cdf
-        cdf_log += log_half + log(one_p_erf);
+        cdf_log += LOG_HALF + log(one_p_erf);
 
         // gradients
-        const T_partials_return rep_deriv = SQRT_TWO_OVER_PI 
-          * exp(-scaled_diff * scaled_diff) / one_p_erf;
-        if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += rep_deriv / sigma_dbl;
-        if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] -= rep_deriv / sigma_dbl;
-        if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff 
-            * stan::math::SQRT_2 / sigma_dbl;
+        if (contains_nonconstant_struct<T_y, T_loc, T_scale>::value) {
+          const T_partials_return rep_deriv_div_sigma
+            = scaled_diff < -37.5 * INV_SQRT_2
+                            ? std::numeric_limits<double>::infinity()
+                            : SQRT_TWO_OVER_PI * exp(-scaled_diff * scaled_diff)
+                            / sigma_dbl / one_p_erf;
+          if (!is_constant_struct<T_y>::value)
+            operands_and_partials.d_x1[n] += rep_deriv_div_sigma;
+          if (!is_constant_struct<T_loc>::value)
+            operands_and_partials.d_x2[n] -= rep_deriv_div_sigma;
+          if (!is_constant_struct<T_scale>::value)
+            operands_and_partials.d_x3[n] -= rep_deriv_div_sigma
+              * scaled_diff * stan::math::SQRT_2;
+        }
       }
       return operands_and_partials.to_var(cdf_log,y,mu,sigma);
     }
