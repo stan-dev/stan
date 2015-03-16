@@ -7,7 +7,7 @@
 #include <stan/math/prim/mat/fun/read_cov_matrix.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -20,8 +20,8 @@ namespace stan {
      *
      * <p>The transform scales the correlation matrix transform defined
      * in <code>corr_matrix_constrain(Matrix,size_t)</code>
-     * with the constrained deviations.  
-     * 
+     * with the constrained deviations.
+     *
      * @param x Input vector of unconstrained partial correlations and
      * standard deviations.
      * @param k Dimensionality of returned covariance matrix.
@@ -30,8 +30,8 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
-    cov_matrix_constrain_lkj(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    cov_matrix_constrain_lkj(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
                          size_t k) {
       size_t k_choose_2 = (k * (k - 1)) / 2;
       Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
@@ -48,7 +48,7 @@ namespace stan {
      * Return the covariance matrix of the specified dimensionality
      * derived from constraining the specified vector of unconstrained
      * values and increment the specified log probability reference
-     * with the log absolute Jacobian determinant.  
+     * with the log absolute Jacobian determinant.
      *
      * <p>The transform is defined as for
      * <code>cov_matrix_constrain(Matrix,size_t)</code>.
@@ -59,7 +59,7 @@ namespace stan {
      * <code>cov_matrix_constrain(Matrix,size_t,T&)</code> with
      * the Jacobian of the transfrom of the correlation matrix
      * into a covariance matrix by scaling by standard deviations.
-     * 
+     *
      * @param x Input vector of unconstrained partial correlations and
      * standard deviations.
      * @param k Dimensionality of returned covariance matrix.
@@ -69,9 +69,9 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
-    cov_matrix_constrain_lkj(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-                         size_t k, 
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    cov_matrix_constrain_lkj(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                         size_t k,
                          T& lp) {
       size_t k_choose_2 = (k * (k - 1)) / 2;
       Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);

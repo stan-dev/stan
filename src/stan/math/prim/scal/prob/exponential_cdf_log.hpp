@@ -19,7 +19,7 @@
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
     template <typename T_y, typename T_inv_scale>
@@ -37,7 +37,7 @@ namespace stan {
 
       T_partials_return cdf_log(0.0);
       // check if any vectors are zero length
-      if (!(stan::length(y) 
+      if (!(stan::length(y)
             && stan::length(beta)))
         return cdf_log;
 
@@ -45,16 +45,15 @@ namespace stan {
       check_nonnegative(function, "Random variable", y);
       check_positive_finite(function, "Inverse scale parameter", beta);
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale> 
+      agrad::OperandsAndPartials<T_y, T_inv_scale>
         operands_and_partials(y, beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, beta);
-      for (size_t n = 0; n < N; n++) { 
-        const T_partials_return beta_dbl = value_of(beta_vec[n]);     
-        const T_partials_return y_dbl = value_of(y_vec[n]);            
-        T_partials_return one_m_exp = 1.0 - exp(-beta_dbl * y_dbl);
+      for (size_t n = 0; n < N; n++) {
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);        T_partials_return one_m_exp = 1.0 - exp(-beta_dbl * y_dbl);
         // log cdf
         cdf_log += log(one_m_exp);
 

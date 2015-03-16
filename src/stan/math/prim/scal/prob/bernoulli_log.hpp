@@ -36,12 +36,12 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
-      
+
       // check if any vectors are zero length
       if (!(stan::length(n)
             && stan::length(theta)))
         return 0.0;
-      
+
       // set up return value accumulator
       T_partials_return logp(0.0);
 
@@ -62,8 +62,8 @@ namespace stan {
       VectorView<const T_prob> theta_vec(theta);
       size_t N = max_size(n, theta);
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
-      
-      if (length(theta) == 1) {  
+
+      if (length(theta) == 1) {
         size_t sum = 0;
         for (size_t n = 0; n < N; n++) {
           sum += value_of(n_vec[n]);
@@ -96,12 +96,12 @@ namespace stan {
           // pull out values of arguments
           const int n_int = value_of(n_vec[n]);
           const T_partials_return theta_dbl = value_of(theta_vec[n]);
-    
+
           if (n_int == 1)
             logp += log(theta_dbl);
           else
             logp += log1m(theta_dbl);
-    
+
           // gradient
           if (!is_constant_struct<T_prob>::value) {
             if (n_int == 1)
@@ -117,10 +117,10 @@ namespace stan {
     template <typename T_y, typename T_prob>
     inline
     typename return_type<T_prob>::type
-    bernoulli_log(const T_y& n, 
+    bernoulli_log(const T_y& n,
                   const T_prob& theta) {
       return bernoulli_log<false>(n,theta);
     }
   }  // namespace prob
-}  // namespace stan 
+}  // namespace stan
 #endif

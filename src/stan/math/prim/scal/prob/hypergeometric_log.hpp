@@ -22,17 +22,17 @@ namespace stan {
   namespace prob {
 
     // Hypergeometric(n|N,a,b)  [0 <= n <= a;  0 <= N-n <= b;  0 <= N <= a+b]
-    // n: #white balls drawn;  N: #balls drawn;  
+    // n: #white balls drawn;  N: #balls drawn;
     // a: #white balls;  b: #black balls
     template <bool propto,
               typename T_n, typename T_N,
               typename T_a, typename T_b>
     double
-    hypergeometric_log(const T_n& n, const T_N& N, 
+    hypergeometric_log(const T_n& n, const T_N& N,
                        const T_a& a, const T_b& b) {
       static const char* function("stan::prob::hypergeometric_log");
 
-      using stan::math::check_finite;      
+      using stan::math::check_finite;
       using stan::math::check_bounded;
       using stan::math::check_greater;
       using stan::math::check_consistent_sizes;
@@ -51,7 +51,7 @@ namespace stan {
       VectorView<const T_a> a_vec(a);
       VectorView<const T_b> b_vec(b);
       size_t size = max_size(n, N, a, b);
-      
+
       double logp(0.0);
       check_bounded(function, "Successes variable", n, 0, a);
       check_greater(function, "Draws parameter", N, n);
@@ -64,7 +64,7 @@ namespace stan {
                              "Draws parameter", N,
                              "Successes in population parameter", a,
                              "Failures in population parameter", b);
-      
+
       // check if no variables are involved and prop-to
       if (!include_summand<propto>::value)
         return 0.0;
@@ -83,9 +83,9 @@ namespace stan {
               typename T_b>
     inline
     double
-    hypergeometric_log(const T_n& n, 
-                       const T_N& N, 
-                       const T_a& a, 
+    hypergeometric_log(const T_n& n,
+                       const T_N& N,
+                       const T_a& a,
                        const T_b& b) {
       return hypergeometric_log<false>(n,N,a,b);
     }

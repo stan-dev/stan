@@ -10,13 +10,13 @@ namespace stan {
 
     /**
      * Return the sum of the specified matrices.  The two matrices
-     * must have the same dimensions. 
+     * must have the same dimensions.
      * @tparam T1 Scalar type of first matrix.
      * @tparam T2 Scalar type of second matrix.
      * @tparam R Row type of matrices.
      * @tparam C Column type of matrices.
      * @param m1 First matrix.
-     * @param m2 Second matrix.  
+     * @param m2 Second matrix.
      * @return Sum of the matrices.
      * @throw std::invalid_argument if m1 and m2 do not have the same
      * dimensions.
@@ -29,13 +29,13 @@ namespace stan {
       stan::math::check_matching_dims("add",
                                                 "m1", m1,
                                                 "m2", m2);
-      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>      
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>
         result(m1.rows(),m1.cols());
       for (int i = 0; i < result.size(); ++i)
         result(i) = m1(i) + m2(i);
       return result;
     }
-    
+
     /**
      * Return the sum of the specified matrix and specified scalar.
      *
@@ -48,15 +48,15 @@ namespace stan {
     template <typename T1, typename T2, int R, int C>
     inline
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>
-    add(const Eigen::Matrix<T1,R,C>& m, 
+    add(const Eigen::Matrix<T1,R,C>& m,
         const T2& c) {
-      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>      
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>
         result(m.rows(),m.cols());
       for (int i = 0; i < result.size(); ++i)
         result(i) = m(i) + c;
       return result;
     }
-    
+
     /**
      * Return the sum of the specified scalar and specified matrix.
      *
@@ -71,7 +71,7 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>
     add(const T1& c,
         const Eigen::Matrix<T2,R,C>& m) {
-      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>      
+      Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R,C>
         result(m.rows(),m.cols());
       for (int i = 0; i < result.size(); ++i)
         result(i) = c + m(i);

@@ -6,10 +6,10 @@
 #include <stan/math/prim/mat/meta/index_type.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
-    // Unit vector   
+    // Unit vector
 
     /**
      * Return the unit length vector corresponding to the free vector y.
@@ -20,7 +20,7 @@ namespace stan {
      * @tparam T Scalar type.
      **/
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    Eigen::Matrix<T,Eigen::Dynamic,1>
     unit_vector_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
@@ -33,7 +33,7 @@ namespace stan {
       for (size_type k = 1; k <= Km1; ++k) {
         T yk_1 = y(k-1) + half_pi;
         T sin_yk_1 = sin(yk_1);
-        x(k) = x(k-1)*sin_yk_1; 
+        x(k) = x(k-1)*sin_yk_1;
         x(k-1) *= cos(yk_1);
       }
       return x;
@@ -49,7 +49,7 @@ namespace stan {
      * @tparam T Scalar type.
      **/
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    Eigen::Matrix<T,Eigen::Dynamic,1>
     unit_vector_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y, T &lp) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
@@ -63,7 +63,7 @@ namespace stan {
       for (size_type k = 1; k <= Km1; ++k) {
         T yk_1 = y(k-1) + half_pi;
         T sin_yk_1 = sin(yk_1);
-        x(k) = x(k-1) * sin_yk_1; 
+        x(k) = x(k-1) * sin_yk_1;
         x(k-1) *= cos(yk_1);
         if (k < Km1)
           lp += (Km1 - k) * log(fabs(sin_yk_1));

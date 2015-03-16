@@ -25,9 +25,9 @@
 
 
 namespace stan {
-  
+
   namespace prob {
-    
+
     template <class RNG>
     inline double
     scaled_inv_chi_square_rng(const double nu,
@@ -35,18 +35,18 @@ namespace stan {
                               RNG& rng) {
       using boost::variate_generator;
       using boost::random::chi_squared_distribution;
-      
+
       static const char* function("stan::prob::scaled_inv_chi_square_rng");
-      
+
       using stan::math::check_positive_finite;
-      
+
       check_positive_finite(function, "Degrees of freedom parameter", nu);
       check_positive_finite(function, "Scale parameter", s);
-      
+
       variate_generator<RNG&, chi_squared_distribution<> >
         chi_square_rng(rng, chi_squared_distribution<>(nu));
       return nu * s / chi_square_rng();
-    }    
+    }
   }
 }
 #endif

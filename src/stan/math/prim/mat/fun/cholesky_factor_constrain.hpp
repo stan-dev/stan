@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 namespace stan {
-  
+
   namespace prob {
 
     // CHOLESKY FACTOR
@@ -16,7 +16,7 @@ namespace stan {
      * Return the Cholesky factor of the specified size read from the
      * specified vector.  A total of (N choose 2) + N + (M - N) * N
      * elements are required to read an M by N Cholesky factor.
-     * 
+     *
      * @tparam T Type of scalars in matrix
      * @param x Vector of unconstrained values
      * @param M Number of rows
@@ -58,7 +58,7 @@ namespace stan {
      * reference with the log Jacobian adjustment of the transform.  A
      * total of (N choose 2) + N + N * (M - N) free parameters are required to read
      * an M by N Cholesky factor.
-     * 
+     *
      * @tparam T Type of scalars in matrix
      * @param x Vector of unconstrained values
      * @param M Number of rows
@@ -83,7 +83,7 @@ namespace stan {
         pos += n;
         log_jacobians[n] = x(pos++);
       }
-      lp += sum(log_jacobians);  // optimized for autodiff vs. direct lp += 
+      lp += sum(log_jacobians);  // optimized for autodiff vs. direct lp +=
       return cholesky_factor_constrain(x,M,N);
     }
 

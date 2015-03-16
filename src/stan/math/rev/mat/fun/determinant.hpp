@@ -20,12 +20,12 @@ namespace stan {
         vari** _adjARef;
       public:
         determinant_vari(const Eigen::Matrix<var,R,C> &A)
-          : vari(determinant_vari_calc(A)), 
+          : vari(determinant_vari_calc(A)),
             _rows(A.rows()),
             _cols(A.cols()),
-            A_((double*)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(double) 
+            A_((double*)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(double)
                                                      * A.rows() * A.cols())),
-            _adjARef((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*) 
+            _adjARef((vari**)stan::agrad::ChainableStack::memalloc_.alloc(sizeof(vari*)
                                                           * A.rows() * A.cols()))
         {
           size_t pos = 0;
@@ -36,7 +36,7 @@ namespace stan {
             }
           }
         }
-        static 
+        static
         double determinant_vari_calc(const Eigen::Matrix<var,R,C> &A) {
           Eigen::Matrix<double,R,C> Ad(A.rows(),A.cols());
           for (size_type j = 0; j < A.rows(); j++)
@@ -48,7 +48,7 @@ namespace stan {
           using Eigen::Matrix;
           using Eigen::Map;
           Matrix<double,R,C> adjA(_rows,_cols);
-          adjA = (adj_ * val_) * 
+          adjA = (adj_ * val_) *
             Map<Matrix<double,R,C> >(A_,_rows,_cols).inverse().transpose();
           size_t pos = 0;
           for (size_type j = 0; j < _cols; j++) {
@@ -65,7 +65,7 @@ namespace stan {
       stan::math::check_square("determinant", "m", m);
       return var(new determinant_vari<R,C>(m));
     }
-    
+
   }
 }
 #endif

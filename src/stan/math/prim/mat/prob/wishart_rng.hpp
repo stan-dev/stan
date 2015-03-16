@@ -50,7 +50,7 @@ namespace stan {
           B(i, j) = normal_rng(0, 1, rng);
         B(j,j) = std::sqrt(chi_square_rng(nu - j, rng));
       }
-                
+
       return stan::math::crossprod(B * S.llt().matrixU());
     }
 

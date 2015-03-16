@@ -5,7 +5,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Return the element-wise logarithm of the matrix or vector.
      *
@@ -17,7 +17,7 @@ namespace stan {
       return m.array().log().matrix();
     }
 
-    
+
   }
 }
 #endif

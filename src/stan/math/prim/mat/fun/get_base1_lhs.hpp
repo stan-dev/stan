@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Return a reference to the value of the specified vector at the
      * specified base-one index.  If the index is out of range, throw
@@ -24,8 +24,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<T>& x, 
-                     size_t i, 
+    T& get_base1_lhs(std::vector<T>& x,
+                     size_t i,
                      const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
@@ -50,8 +50,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<T> >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<T> >& x,
+                     size_t i1,
                      size_t i2,
                      const char* error_msg,
                      size_t idx) {
@@ -78,8 +78,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<T> > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector<T> > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      const char* error_msg,
@@ -108,8 +108,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<T> > > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<T> > > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      size_t i4,
@@ -140,8 +140,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      size_t i4,
@@ -174,8 +174,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      size_t i4,
@@ -211,8 +211,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      size_t i4,
@@ -250,8 +250,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      size_t i4,
@@ -276,7 +276,7 @@ namespace stan {
      *
      * <b>Warning</b>:  Because a copy is involved, it is inefficient
      * to access element of matrices by first using this method
-     * to get a row then using a second call to get the value at 
+     * to get a row then using a second call to get the value at
      a specified column.
      *
      * @param x Matrix from which to get a row
@@ -377,7 +377,7 @@ namespace stan {
       check_range("[]", "x", x.size(), n, idx, error_msg);
       return x(n - 1);
     }
-    
+
   }
 }
 #endif

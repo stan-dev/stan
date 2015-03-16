@@ -19,33 +19,33 @@ namespace stan {
 
   namespace prob {
 
-    /** 
+    /**
      * Calculates the double exponential cumulative density function.
      *
      * \f$ f(y|\mu,\sigma) = \begin{cases} \
-     \frac{1}{2} \exp\left(\frac{y-\mu}{\sigma}\right), \mbox{if } y < \mu \\ 
+     \frac{1}{2} \exp\left(\frac{y-\mu}{\sigma}\right), \mbox{if } y < \mu \\
      1 - \frac{1}{2} \exp\left(-\frac{y-\mu}{\sigma}\right), \mbox{if } y \ge \mu \
      \end{cases}\f$
-     * 
+     *
      * @param y A scalar variate.
      * @param mu The location parameter.
      * @param sigma The scale parameter.
-     * 
+     *
      * @return The cumulative density function.
      */
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
-    double_exponential_cdf(const T_y& y, 
+    double_exponential_cdf(const T_y& y,
                            const T_loc& mu, const T_scale& sigma) {
       static const char* function("stan::prob::double_exponential_cdf");
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
 
       // Size checks
-      if ( !( stan::length(y) && stan::length(mu) 
-              && stan::length(sigma) ) ) 
+      if ( !( stan::length(y) && stan::length(mu)
+              && stan::length(sigma) ) )
         return 1.0;
-        
+
       using stan::math::value_of;
       using stan::math::check_finite;
       using stan::math::check_positive_finite;
@@ -58,7 +58,7 @@ namespace stan {
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -89,7 +89,7 @@ namespace stan {
         const T_partials_return scaled_diff = (y_dbl - mu_dbl) / sigma_dbl;
         const T_partials_return exp_scaled_diff = exp(scaled_diff);
         const T_partials_return inv_sigma = 1.0 / sigma_dbl;
-        
+
         if(y_dbl < mu_dbl) {
           if (!is_constant_struct<T_y>::value)
             operands_and_partials.d_x1[n] += inv_sigma * cdf;
@@ -99,7 +99,7 @@ namespace stan {
             operands_and_partials.d_x3[n] -= scaled_diff * inv_sigma  * cdf;
         }
         else {
-          const T_partials_return rep_deriv = cdf * inv_sigma 
+          const T_partials_return rep_deriv = cdf * inv_sigma
             / (2.0 * exp_scaled_diff - 1.0);
           if (!is_constant_struct<T_y>::value)
             operands_and_partials.d_x1[n] += rep_deriv;

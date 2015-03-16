@@ -17,7 +17,7 @@ namespace stan {
     inline double primitive_value(const agrad::var& v) {
       return v.val();
     }
-    
+
   }
 }
 #endif

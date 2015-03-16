@@ -113,10 +113,10 @@ namespace stan {
       check_not_nan(function, "y", y);
       // check F
       check_size_match(function,
-                       "columns of F", F.cols(), 
+                       "columns of F", F.cols(),
                        "rows of y", y.rows());
       check_size_match(function,
-                       "rows of F", F.rows(), 
+                       "rows of F", F.rows(),
                        "rows of G", G.rows());
       check_finite(function, "F", F);
       // check G
@@ -143,7 +143,7 @@ namespace stan {
       check_finite(function, "m0", m0);
       // check C0
       check_size_match(function,
-                       "rows of C0", C0.rows(), 
+                       "rows of C0", C0.rows(),
                        "rows of G", G.rows());
       check_cov_matrix(function, "C0", C0);
       check_finite(function, "C0", C0);
@@ -310,20 +310,20 @@ namespace stan {
                        "columns of F", F.cols(),
                        "rows of y", y.rows());
       check_size_match(function,
-                       "rows of F", F.rows(), 
+                       "rows of F", F.rows(),
                        "rows of G", G.rows());
       check_finite(function, "F", F);
       check_not_nan(function, "F", F);
       // check G
       check_size_match(function,
-                       "rows of G", G.rows(), 
+                       "rows of G", G.rows(),
                        "columns of G", G.cols());
       check_finite(function, "G", G);
       check_not_nan(function, "G", G);
       // check V
       check_nonnegative(function, "V", V);
       check_size_match(function,
-                       "size of V", V.size(), 
+                       "size of V", V.size(),
                        "rows of y", y.rows());
       // TODO: support infinite V
       check_finite(function, "V", V);
@@ -345,7 +345,7 @@ namespace stan {
       // check C0
       check_cov_matrix(function, "C0", C0);
       check_size_match(function,
-                       "rows of C0", C0.rows(), 
+                       "rows of C0", C0.rows(),
                        "rows of G", G.rows());
       check_finite(function, "C0", C0);
       check_not_nan(function, "C0", C0);

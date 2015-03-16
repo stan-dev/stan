@@ -11,7 +11,7 @@ namespace stan {
   namespace agrad {
 
     template<typename T, int R,int C>
-    inline Eigen::Matrix<fvar<T>,1,C> 
+    inline Eigen::Matrix<fvar<T>,1,C>
     columns_dot_self(const Eigen::Matrix<fvar<T>,R,C>& x) {
       Eigen::Matrix<fvar<T>,1,C> ret(1,x.cols());
       for (size_type i = 0; i < x.cols(); i++) {
@@ -19,7 +19,7 @@ namespace stan {
         ret(0,i) = dot_self(ccol);
       }
       return ret;
-    }    
+    }
   }
 }
 #endif

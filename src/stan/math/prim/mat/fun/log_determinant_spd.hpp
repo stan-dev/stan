@@ -8,7 +8,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the log absolute determinant of the specified square matrix.
      *
@@ -27,7 +27,7 @@ namespace stan {
 //      return 2*ret;
       return m.ldlt().vectorD().array().log().sum();
     }
-    
+
   }
 }
 #endif

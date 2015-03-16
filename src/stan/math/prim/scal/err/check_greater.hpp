@@ -76,7 +76,7 @@ namespace stan {
      * @param low Lower bound
      *
      * @return <code>true</code> if y is strictly greater than low.
-     * @throw <code>domain_error</code> if y is not greater than low or 
+     * @throw <code>domain_error</code> if y is not greater than low or
      *   if any element of y or low is NaN.
      */
     template <typename T_y, typename T_low>

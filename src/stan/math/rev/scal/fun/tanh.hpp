@@ -29,15 +29,15 @@ namespace stan {
      *
      *
        \f[
-       \mbox{tanh}(x) = 
+       \mbox{tanh}(x) =
        \begin{cases}
          \tanh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{tanh}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{tanh}(x)}{\partial x} =
        \begin{cases}
          \mbox{sech}^2(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

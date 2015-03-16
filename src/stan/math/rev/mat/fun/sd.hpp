@@ -12,10 +12,10 @@
 namespace stan {
 
   namespace agrad {
-    
+
     namespace {  // anonymous
 
-      // if x.size() = N, and x[i] = x[j] = 
+      // if x.size() = N, and x[i] = x[j] =
       // then lim sd(x) -> 0 [ d/dx[n] sd(x) ] = sqrt(N) / N
 
       var calc_sd(size_t size,

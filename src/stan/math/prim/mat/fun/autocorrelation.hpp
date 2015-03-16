@@ -9,15 +9,15 @@
 
 
 namespace stan {
-  
+
   namespace prob {
 
     namespace {
       /**
-       * Find the optimal next size for the FFT so that 
-       * a minimum number of zeros are padded. 
-       */ 
-      size_t fft_next_good_size(size_t N) { 
+       * Find the optimal next size for the FFT so that
+       * a minimum number of zeros are padded.
+       */
+      size_t fft_next_good_size(size_t N) {
         if (N <= 2) return 2;
         while (true) {
           size_t m = N;
@@ -25,12 +25,12 @@ namespace stan {
           while ((m % 3) == 0) m /= 3;
           while ((m % 5) == 0) m /= 5;
           if (m <= 1)
-            return N; 
+            return N;
           N++;
         }
       }
-    } 
-    
+    }
+
     /**
      * Write autocorrelation estimates for every lag for the specified
      * input sequence into the specified result using the specified
@@ -41,7 +41,7 @@ namespace stan {
      * followed by a normalization, followed by an inverse transform.
      *
      * <p>An FFT engine can be created for reuse for type double with:
-     * 
+     *
      * <pre>
      *     Eigen::FFT<double> fft;
      * </pre>
@@ -60,37 +60,37 @@ namespace stan {
       using std::complex;
 
       size_t N = y.size();
-      size_t M = fft_next_good_size(N); 
+      size_t M = fft_next_good_size(N);
       size_t Mt2 = 2 * M;
 
 
       vector<complex<T> > freqvec;
-      
+
       // centered_signal = y-mean(y) followed by N zeroes
       vector<T> centered_signal(y);
       centered_signal.insert(centered_signal.end(),Mt2-N,0.0);
       T mean = stan::math::mean(y);
       for (size_t i = 0; i < N; i++)
         centered_signal[i] -= mean;
-      
+
       fft.fwd(freqvec,centered_signal);
       for (size_t i = 0; i < Mt2; ++i)
         freqvec[i] = complex<T>(norm(freqvec[i]), 0.0);
-      
+
       fft.inv(ac,freqvec);
       ac.resize(N);
 
       /*
-      vector<T> mask_correction_factors;      
+      vector<T> mask_correction_factors;
       vector<T> mask;
       mask.insert(mask.end(),N,1.0);
       mask.insert(mask.end(),N,0.0);
-      
+
       freqvec.resize(0);
       fft.fwd(freqvec,mask);
       for (size_t i = 0; i < Nt2; ++i)
         freqvec[i] = complex<T>(norm(freqvec[i]), 0.0);
-      
+
       fft.inv(mask_correction_factors, freqvec);
 
       for (size_t i = 0; i < N; ++i) {
@@ -98,9 +98,9 @@ namespace stan {
       }
       */
       for (size_t i = 0; i < N; ++i) {
-        ac[i] /= (N - i); 
-      } 
-      T var = ac[0];      
+        ac[i] /= (N - i);
+      }
+      T var = ac[0];
       for (size_t i = 0; i < N; ++i)
         ac[i] /= var;
     }
@@ -109,7 +109,7 @@ namespace stan {
      * Write autocorrelation estimates for every lag for the specified
      * input sequence into the specified result.  The return vector be
      * resized to the same length as the input sequence with lags
-     * given by array index. 
+     * given by array index.
      *
      * <p>The implementation involves a fast Fourier transform,
      * followed by a normalization, followed by an inverse transform.

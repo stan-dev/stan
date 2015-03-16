@@ -9,34 +9,34 @@
 namespace stan {
   namespace services {
     namespace init {
-    
+
       template<class Sampler>
-      bool init_static_hmc(stan::mcmc::base_mcmc* sampler, 
+      bool init_static_hmc(stan::mcmc::base_mcmc* sampler,
                            stan::services::argument* algorithm) {
 
-        stan::services::categorical_argument* hmc 
+        stan::services::categorical_argument* hmc
           = dynamic_cast<stan::services::categorical_argument*>
           (algorithm->arg("hmc"));
-        
-        stan::services::categorical_argument* base 
+
+        stan::services::categorical_argument* base
           = dynamic_cast<stan::services::categorical_argument*>
           (algorithm->arg("hmc")->arg("engine")->arg("static"));
-        
-        double epsilon 
+
+        double epsilon
           = dynamic_cast<stan::services::real_argument*>
           (hmc->arg("stepsize"))->value();
-        double epsilon_jitter 
+        double epsilon_jitter
           = dynamic_cast<stan::services::real_argument*>
           (hmc->arg("stepsize_jitter"))->value();
-        double int_time 
+        double int_time
           = dynamic_cast<stan::services::real_argument*>(base->arg("int_time"))->value();
-        
+
         dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize_and_T(epsilon, int_time);
         dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
-        
+
         return true;
       }
-    
+
     }
   }
 }

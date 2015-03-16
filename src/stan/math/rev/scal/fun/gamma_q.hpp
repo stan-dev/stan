@@ -19,15 +19,15 @@ namespace stan {
                      avi,bvi) {
         }
         void chain() {
-          avi_->adj_ += adj_ 
+          avi_->adj_ += adj_
             * stan::math::grad_reg_inc_gamma(avi_->val_, bvi_->val_,
                                           boost::math::tgamma(avi_->val_),
                                           boost::math::digamma(avi_->val_));
-          bvi_->adj_ -= adj_ 
+          bvi_->adj_ -= adj_
             * boost::math::gamma_p_derivative(avi_->val_, bvi_->val_);
         }
       };
-      
+
       class gamma_q_vd_vari : public op_vd_vari {
       public:
         gamma_q_vd_vari(vari* avi, double b) :
@@ -35,7 +35,7 @@ namespace stan {
                      avi,b) {
         }
         void chain() {
-          avi_->adj_ += adj_ 
+          avi_->adj_ += adj_
             * stan::math::grad_reg_inc_gamma(avi_->val_, bd_,
                                           boost::math::tgamma(avi_->val_),
                                           boost::math::digamma(avi_->val_));
@@ -49,7 +49,7 @@ namespace stan {
                      a,bvi) {
         }
         void chain() {
-          bvi_->adj_ -= adj_ 
+          bvi_->adj_ -= adj_
             * boost::math::gamma_p_derivative(ad_, bvi_->val_);
         }
       };

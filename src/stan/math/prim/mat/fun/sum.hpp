@@ -6,7 +6,7 @@
 
 namespace stan {
   namespace math {
-   
+
     /**
      * Return the sum of the values in the specified
      * standard vector.
@@ -23,7 +23,7 @@ namespace stan {
         sum += xs[i];
       return sum;
     }
- 
+
     /**
      * Returns the sum of the coefficients of the specified
      * column vector.
@@ -33,8 +33,8 @@ namespace stan {
     template <typename T, int R, int C>
     inline double sum(const Eigen::Matrix<T,R,C>& v) {
       return v.sum();
-    }    
-    
+    }
+
   }
 }
 #endif

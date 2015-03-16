@@ -23,10 +23,10 @@ namespace stan {
     inline Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_left_ldlt(const stan::math::LDLT_factor<T1,R1,C1> &A,
                       const Eigen::Matrix<T2,R2,C2> &b) {
-      stan::math::check_multiplicable("mdivide_left_ldlt", 
+      stan::math::check_multiplicable("mdivide_left_ldlt",
                                                 "A", A,
                                                 "b", b);
-      
+
       return A.solve(promote_common<Eigen::Matrix<T1,R2,C2>,
                                       Eigen::Matrix<T2,R2,C2> >(b));
     }

@@ -13,10 +13,10 @@
 
 namespace stan {
   namespace agrad {
-    
+
     template<typename T, int R,int C>
-    inline 
-    Eigen::Matrix<fvar<T>,R,C> 
+    inline
+    Eigen::Matrix<fvar<T>,R,C>
     inverse(const Eigen::Matrix<fvar<T>, R, C>& m) {
       using stan::math::multiply;
       using stan::agrad::multiply;

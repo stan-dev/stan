@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class fmod_vv_vari : public op_vv_vari {
       public:
@@ -39,7 +39,7 @@ namespace stan {
             avi_->adj_ += adj_;
         }
       };
-      
+
       class fmod_dv_vari : public op_dv_vari {
       public:
         fmod_dv_vari(double a, vari* bvi) :
@@ -56,7 +56,7 @@ namespace stan {
         }
       };
     }
-    
+
     /**
      * Return the floating point remainder after dividing the
      * first variable by the second (cmath).
@@ -71,23 +71,23 @@ namespace stan {
      *
      *
        \f[
-       \mbox{fmod}(x,y) = 
+       \mbox{fmod}(x,y) =
        \begin{cases}
          x - \lfloor \frac{x}{y}\rfloor y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
-       \frac{\partial\,\mbox{fmod}(x,y)}{\partial x} = 
+       \frac{\partial\,\mbox{fmod}(x,y)}{\partial x} =
        \begin{cases}
          1 & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
-       \frac{\partial\,\mbox{fmod}(x,y)}{\partial y} = 
+       \frac{\partial\,\mbox{fmod}(x,y)}{\partial y} =
        \begin{cases}
          -\lfloor \frac{x}{y}\rfloor & \mbox{if } -\infty\leq x,y\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
@@ -102,7 +102,7 @@ namespace stan {
     inline var fmod(const var& a, const var& b) {
       return var(new fmod_vv_vari(a.vi_,b.vi_));
     }
-  
+
     /**
      * Return the floating point remainder after dividing the
      * the first variable by the second scalar (cmath).

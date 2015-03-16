@@ -30,14 +30,14 @@ namespace stan {
         T_partials_return;
 
       static const char* function("stan::prob::poisson_log");
-      
+
       using boost::math::lgamma;
       using stan::math::check_consistent_sizes;
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
       using stan::prob::include_summand;
       using stan::math::value_of;
-      
+
       // check if any vectors are zero length
       if (!(stan::length(n)
             && stan::length(lambda)))
@@ -51,9 +51,9 @@ namespace stan {
       check_not_nan(function, "Rate parameter", lambda);
       check_nonnegative(function, "Rate parameter", lambda);
       check_consistent_sizes(function,
-                             "Random variable", n, 
+                             "Random variable", n,
                              "Rate parameter", lambda);
-      
+
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_rate>::value)
         return 0.0;
@@ -69,7 +69,7 @@ namespace stan {
       for (size_t i = 0; i < size; i++)
         if (lambda_vec[i] == 0 && n_vec[i] != 0)
           return LOG_ZERO;
-      
+
       // return accumulator with gradients
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
@@ -79,21 +79,21 @@ namespace stan {
           if (include_summand<propto>::value)
             logp -= lgamma(n_vec[i] + 1.0);
           if (include_summand<propto,T_rate>::value)
-            logp += multiply_log(n_vec[i], value_of(lambda_vec[i])) 
+            logp += multiply_log(n_vec[i], value_of(lambda_vec[i]))
               - value_of(lambda_vec[i]);
         }
-  
+
         // gradients
         if (!is_constant_struct<T_rate>::value)
-          operands_and_partials.d_x1[i] 
+          operands_and_partials.d_x1[i]
             += n_vec[i] / value_of(lambda_vec[i]) - 1.0;
-        
+
       }
 
 
       return operands_and_partials.to_var(logp,lambda);
     }
-    
+
     template <typename T_n,
               typename T_rate>
     inline

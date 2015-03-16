@@ -6,7 +6,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class sqrt_vari : public op_v_vari {
       public:
@@ -25,9 +25,9 @@ namespace stan {
      * The derivative is defined by
      *
      * \f$\frac{d}{dx} \sqrt{x} = \frac{1}{2 \sqrt{x}}\f$.
-     * 
+     *
        \f[
-       \mbox{sqrt}(x) = 
+       \mbox{sqrt}(x) =
        \begin{cases}
          \textrm{NaN} & x < 0 \\
          \sqrt{x} & \mbox{if } x\geq 0\\[6pt]
@@ -36,7 +36,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{sqrt}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{sqrt}(x)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & x < 0 \\
          \frac{1}{2\sqrt{x}} & x\geq 0\\[6pt]

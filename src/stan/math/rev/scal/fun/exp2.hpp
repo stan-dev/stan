@@ -31,15 +31,15 @@ namespace stan {
      * \f$\frac{d}{dx} 2^x = (\log 2) 2^x\f$.
      *
        \f[
-       \mbox{exp2}(x) = 
+       \mbox{exp2}(x) =
        \begin{cases}
          2^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
-       \frac{\partial\,\mbox{exp2}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{exp2}(x)}{\partial x} =
        \begin{cases}
          2^x\ln2 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

@@ -12,7 +12,7 @@ namespace stan {
 
     /**
      * Throw an out_of_range exception with a consistently formatted message.
-     * 
+     *
      * This is an abstraction for all Stan functions to use when throwing
      * out of range. This will allow us to change the behavior for all
      * functions at once.
@@ -33,11 +33,11 @@ namespace stan {
                              const char* msg1 = "",
                              const char* msg2 = "") {
       std::ostringstream message;
-      
+
       message << function << ": accessing element out of range. "
               << "index " << index << " out of range; "
               << "expecting index to be between "
-              << stan::error_index::value << " and " 
+              << stan::error_index::value << " and "
               << stan::error_index::value - 1 + max
               << msg1
               << msg2;

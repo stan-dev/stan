@@ -22,7 +22,7 @@ namespace stan {
     void fill(T& x, const S& y) {
       x = y;
     }
-    
+
     /**
      * Fill the specified container with the specified value.
      *
@@ -57,7 +57,7 @@ namespace stan {
         fill(x[i],y);
     }
 
-    
+
 
   }
 }

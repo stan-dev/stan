@@ -4,13 +4,13 @@
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_num_samples: public int_argument {
-      
+
     public:
-      
+
       arg_num_samples(): int_argument() {
         _name = "num_samples";
         _description = "Number of sampling iterations";
@@ -22,13 +22,13 @@ namespace stan {
         _bad_value = -1.0;
         _value = _default_value;
       };
-      
+
       bool is_valid(int value) { return value >= 0; }
-      
+
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

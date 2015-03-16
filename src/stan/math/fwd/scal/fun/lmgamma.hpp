@@ -20,7 +20,7 @@ namespace stan {
       T deriv = 0;
       for(int count = 1; count < x1 + 1; count++)
         deriv += x2.d_ * digamma(x2.val_ + (1.0 - count) / 2.0);
-      return fvar<typename 
+      return fvar<typename
                 stan::return_type<T,int>::type>(lmgamma(x1, x2.val_), deriv);
     }
   }

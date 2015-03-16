@@ -6,13 +6,13 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
 namespace stan {
-  
+
   namespace math {
 
     /**
      * Template metaprogram to calculate a type for a matrix whose
      * underlying scalar is converted from the second template
-     * parameter type to the first. 
+     * parameter type to the first.
      *
      * This is the case for a vector container type.
      *
@@ -26,7 +26,7 @@ namespace stan {
        * The promoted type.
        */
       typedef Eigen::Matrix<typename promote_scalar_type<T,S>::type,
-                            Eigen::Dynamic, Eigen::Dynamic> 
+                            Eigen::Dynamic, Eigen::Dynamic>
         type;
 
     };
@@ -35,7 +35,7 @@ namespace stan {
     /**
      * Template metaprogram to calculate a type for a vector whose
      * underlying scalar is converted from the second template
-     * parameter type to the first. 
+     * parameter type to the first.
      *
      * @tparam T result scalar type.
      * @tparam S input vector scalar type
@@ -47,7 +47,7 @@ namespace stan {
        * The promoted type.
        */
       typedef Eigen::Matrix<typename promote_scalar_type<T,S>::type,
-                            Eigen::Dynamic, 1> 
+                            Eigen::Dynamic, 1>
         type;
 
     };
@@ -56,7 +56,7 @@ namespace stan {
     /**
      * Template metaprogram to calculate a type for a row vector whose
      * underlying scalar is converted from the second template
-     * parameter type to the first. 
+     * parameter type to the first.
      *
      * @tparam T result scalar type.
      * @tparam S input row vector scalar type
@@ -68,7 +68,7 @@ namespace stan {
        * The promoted type.
        */
       typedef Eigen::Matrix<typename promote_scalar_type<T,S>::type,
-                            1, Eigen::Dynamic> 
+                            1, Eigen::Dynamic>
         type;
 
     };

@@ -44,18 +44,18 @@ namespace stan {
      *
      *
        \f[
-       \mbox{binary\_log\_loss}(y,\hat{y}) = 
+       \mbox{binary\_log\_loss}(y,\hat{y}) =
        \begin{cases}
-         y \log \hat{y} + (1 - y) \log (1 - \hat{y}) & \mbox{if } 0\leq \hat{y}\leq 1, 
+         y \log \hat{y} + (1 - y) \log (1 - \hat{y}) & \mbox{if } 0\leq \hat{y}\leq 1,
          y\in\{ 0,1 \}\\[6pt]
          \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
-       \frac{\partial\,\mbox{binary\_log\_loss}(y,\hat{y})}{\partial \hat{y}} = 
+       \frac{\partial\,\mbox{binary\_log\_loss}(y,\hat{y})}{\partial \hat{y}} =
        \begin{cases}
-         \frac{y}{\hat{y}}-\frac{1-y}{1-\hat{y}} & \mbox{if } 0\leq \hat{y}\leq 1, 
+         \frac{y}{\hat{y}}-\frac{1-y}{1-\hat{y}} & \mbox{if } 0\leq \hat{y}\leq 1,
          y\in\{ 0,1 \}\\[6pt]
          \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN}
        \end{cases}

@@ -26,9 +26,9 @@ namespace stan {
         return alpha->vi_->val_ * result;
       }
     public:
-      gevv_vvv_vari(const stan::agrad::var* alpha, 
-                    const stan::agrad::var* v1, int stride1, 
-                    const stan::agrad::var* v2, int stride2, size_t length) : 
+      gevv_vvv_vari(const stan::agrad::var* alpha,
+                    const stan::agrad::var* v1, int stride1,
+                    const stan::agrad::var* v2, int stride2, size_t length) :
         vari(eval_gevv(alpha,v1,stride1,v2,stride2,length,&dotval_)), length_(length) {
         alpha_ = alpha->vi_;
         v1_ = (stan::agrad::vari**)stan::agrad::ChainableStack::memalloc_.alloc(2*length_*sizeof(stan::agrad::vari*));
@@ -48,7 +48,7 @@ namespace stan {
         alpha_->adj_ += adj_ * dotval_;
       }
     };
-    
+
   }
 }
 

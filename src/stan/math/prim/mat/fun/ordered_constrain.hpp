@@ -6,7 +6,7 @@
 #include <cmath>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -19,7 +19,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    Eigen::Matrix<T,Eigen::Dynamic,1>
     ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
@@ -46,12 +46,12 @@ namespace stan {
      *
      * @param x Free vector of scalars.
      * @param lp Log probability reference.
-     * @return Positive, increasing ordered vector. 
+     * @return Positive, increasing ordered vector.
      * @tparam T Type of scalar.
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    Eigen::Matrix<T,Eigen::Dynamic,1>
     ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
       using Eigen::Matrix;
       using Eigen::Dynamic;

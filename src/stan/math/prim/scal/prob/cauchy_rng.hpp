@@ -32,7 +32,7 @@ namespace stan {
 
       using stan::math::check_positive_finite;
       using stan::math::check_finite;
-      
+
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
 

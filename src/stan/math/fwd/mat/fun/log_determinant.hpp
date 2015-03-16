@@ -13,9 +13,9 @@
 
 namespace stan {
   namespace agrad {
-    
+
     template<typename T, int R,int C>
-    inline 
+    inline
     fvar<T>
     log_determinant(const Eigen::Matrix<fvar<T>, R, C>& m) {
       stan::math::check_square("log_determinant", "m", m);

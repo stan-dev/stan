@@ -24,7 +24,7 @@ namespace stan {
       static const char* function("stan::prob::uniform_cdf");
       typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
         T_partials_return;
-      
+
       using stan::math::check_not_nan;
       using stan::math::check_finite;
       using stan::math::check_greater;
@@ -32,8 +32,8 @@ namespace stan {
       using stan::math::check_consistent_sizes;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(alpha) 
+      if (!(stan::length(y)
+            && stan::length(alpha)
             && stan::length(beta)))
         return 1.0;
 
@@ -55,12 +55,12 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);
-        if (y_dbl < value_of(alpha_vec[n]) 
+        if (y_dbl < value_of(alpha_vec[n])
             || y_dbl > value_of(beta_vec[n]))
           return 0.0;
       }
-   
-      agrad::OperandsAndPartials<T_y,T_low,T_high> 
+
+      agrad::OperandsAndPartials<T_y,T_low,T_high>
         operands_and_partials(y,alpha,beta);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);
@@ -76,20 +76,20 @@ namespace stan {
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += 1.0 / b_min_a / cdf_;
         if (!is_constant_struct<T_low>::value)
-          operands_and_partials.d_x2[n] += (y_dbl - beta_dbl) / b_min_a 
+          operands_and_partials.d_x2[n] += (y_dbl - beta_dbl) / b_min_a
             / b_min_a / cdf_;
         if (!is_constant_struct<T_high>::value)
           operands_and_partials.d_x3[n] -= 1.0 / b_min_a;
       }
 
       if (!is_constant_struct<T_y>::value)
-        for (size_t n = 0; n < stan::length(y); ++n) 
+        for (size_t n = 0; n < stan::length(y); ++n)
           operands_and_partials.d_x1[n] *= cdf;
       if (!is_constant_struct<T_low>::value)
-        for (size_t n = 0; n < stan::length(alpha); ++n) 
+        for (size_t n = 0; n < stan::length(alpha); ++n)
           operands_and_partials.d_x2[n] *= cdf;
       if (!is_constant_struct<T_high>::value)
-        for (size_t n = 0; n < stan::length(beta); ++n) 
+        for (size_t n = 0; n < stan::length(beta); ++n)
           operands_and_partials.d_x3[n] *= cdf;
 
       return operands_and_partials.to_var(cdf,y,alpha,beta);

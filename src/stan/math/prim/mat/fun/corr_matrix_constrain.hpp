@@ -8,7 +8,7 @@
 #include <stdexcept>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -28,7 +28,7 @@ namespace stan {
      *
      * <p>The free vector entries are first constrained to be
      * valid correlation values using <code>corr_constrain(T)</code>.
-     * 
+     *
      * @param x Vector of unconstrained partial correlations.
      * @param k Dimensionality of returned correlation matrix.
      * @tparam T Type of scalar.
@@ -36,7 +36,7 @@ namespace stan {
      * matrix.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     corr_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
                   typename math::index_type<Eigen::Matrix<T,Eigen::Dynamic,1> >::type k) {
 
@@ -51,7 +51,7 @@ namespace stan {
       Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       for (size_type i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[i]);
-      return read_corr_matrix(cpcs,k); 
+      return read_corr_matrix(cpcs,k);
     }
 
     /**
@@ -64,18 +64,18 @@ namespace stan {
      * <p>The transform is as specified for
      * <code>corr_matrix_constrain(Matrix,size_t)</code>; the
      * paper it cites also defines the Jacobians for correlation inputs,
-     * which are composed with the correlation constrained Jacobians 
+     * which are composed with the correlation constrained Jacobians
      * defined in <code>corr_constrain(T,double)</code> for
      * this function.
-     * 
+     *
      * @param x Vector of unconstrained partial correlations.
      * @param k Dimensionality of returned correlation matrix.
      * @param lp Log probability reference to increment.
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
-    corr_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    corr_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
                   typename math::index_type<Eigen::Matrix<T,Eigen::Dynamic,1> >::type k,
                   T& lp) {
       using Eigen::Array;
@@ -83,7 +83,7 @@ namespace stan {
       using Eigen::Matrix;
       using stan::math::index_type;
       typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
-  
+
       size_type k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
         throw std::invalid_argument ("x is not a valid correlation matrix");
@@ -92,7 +92,7 @@ namespace stan {
         cpcs[i] = corr_constrain(x[i],lp);
       return read_corr_matrix(cpcs,k,lp);
     }
-    
+
   }
 
 }

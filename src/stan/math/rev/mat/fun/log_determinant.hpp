@@ -24,20 +24,20 @@ namespace stan {
 
       double val = hh.logAbsDeterminant();
 
-      vari** varis 
+      vari** varis
         = ChainableStack::memalloc_.alloc_array<vari*>(m.size());
       for (int i = 0; i < m.size(); ++i)
         varis[i] = m(i).vi_;
 
       Matrix<double,R,C> m_inv_transpose = hh.inverse().transpose();
-      double* gradients 
+      double* gradients
         = ChainableStack::memalloc_.alloc_array<double>(m.size());
       for (int i = 0; i < m.size(); ++i)
         gradients[i] = m_inv_transpose(i);
 
       return var(new precomputed_gradients_vari(val,m.size(),varis,gradients));
     }
-    
+
   }
 }
 #endif

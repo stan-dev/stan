@@ -7,17 +7,17 @@
 #include <cmath>
 
 namespace stan {
-  
+
   namespace prob {
 
 
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    Eigen::Matrix<T,Eigen::Dynamic,1>
     unit_vector_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
 
-      stan::math::check_unit_vector("stan::prob::unit_vector_free", 
+      stan::math::check_unit_vector("stan::prob::unit_vector_free",
                                               "Unit vector variable", x);
       int Km1 = x.size() - 1;
       Matrix<T,Dynamic,1> y(Km1);

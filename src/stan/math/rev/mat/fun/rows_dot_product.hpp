@@ -22,7 +22,7 @@ namespace stan {
     typename boost::enable_if_c<boost::is_same<T1,var>::value ||
                                 boost::is_same<T2,var>::value,
                                 Eigen::Matrix<var, R1, 1> >::type
-    rows_dot_product(const Eigen::Matrix<T1, R1, C1>& v1, 
+    rows_dot_product(const Eigen::Matrix<T1, R1, C1>& v1,
                      const Eigen::Matrix<T2, R2, C2>& v2) {
       stan::math::check_matching_sizes("dot_product",
                                                  "v1", v1,

@@ -6,7 +6,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the determinant of the specified square matrix.
      *
@@ -18,8 +18,8 @@ namespace stan {
     inline T determinant(const Eigen::Matrix<T,R,C>& m) {
       stan::math::check_square("determinant", "m", m);
       return m.determinant();
-    }    
-    
+    }
+
   }
 }
 #endif

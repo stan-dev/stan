@@ -15,7 +15,7 @@ namespace stan {
      * from the front of the specified vector.
      * @tparam T Type of value in vector
      * @param v Vector input
-     * @param n Size of return 
+     * @param n Size of return
      * @return The first n elements of v
      */
     template <typename T>
@@ -51,7 +51,7 @@ namespace stan {
      * from the front of the specified standard vector.
      * @tparam T Type of value in vector
      * @param sv Standard vector
-     * @param n Size of return 
+     * @param n Size of return
      * @return The first n elements of sv
      */
     template <typename T>

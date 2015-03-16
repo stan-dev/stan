@@ -27,12 +27,12 @@ namespace stan {
     {
       stan::math::check_square("quad_form", "A", A);
       stan::math::check_symmetric("quad_form_sym", "A", A);
-      stan::math::check_multiplicable("quad_form_sym", 
-                                                "A", A, 
+      stan::math::check_multiplicable("quad_form_sym",
+                                                "A", A,
                                                 "B", B);
-      
+
       quad_form_vari<TA,RA,CA,TB,RB,CB> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,CB>(A,B,true);
-      
+
       return baseVari->_impl->C_;
     }
     template <typename TA, int RA, int CA, typename TB, int RB>
@@ -45,12 +45,12 @@ namespace stan {
     {
       stan::math::check_square("quad_form", "A", A);
       stan::math::check_symmetric("quad_form_sym", "A", A);
-      stan::math::check_multiplicable("quad_form_sym", 
-                                                "A", A, 
+      stan::math::check_multiplicable("quad_form_sym",
+                                                "A", A,
                                                 "B", B);
-      
+
       quad_form_vari<TA,RA,CA,TB,RB,1> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,1>(A,B,true);
-      
+
       return baseVari->_impl->C_(0,0);
     }
   }

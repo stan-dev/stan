@@ -23,12 +23,12 @@ namespace stan {
     }
 
     /**
-     * The log gamma function for variables (C99).  
+     * The log gamma function for variables (C99).
      *
      * The derivatie is the digamma function,
      *
      * \f$\frac{d}{dx} \Gamma(x) = \psi^{(0)}(x)\f$.
-     * 
+     *
      * @param a The variable.
      * @return Log gamma of the variable.
      */

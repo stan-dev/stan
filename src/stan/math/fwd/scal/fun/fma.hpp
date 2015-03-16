@@ -10,7 +10,7 @@ namespace stan {
   namespace agrad {
 
     /**
-     * The fused multiply-add operation (C99).   
+     * The fused multiply-add operation (C99).
      *
      * This double-based operation delegates to <code>fma</code>.
      *
@@ -20,31 +20,31 @@ namespace stan {
      *
      *
        \f[
-       \mbox{fma}(x,y,z) = 
+       \mbox{fma}(x,y,z) =
        \begin{cases}
          x\cdot y+z & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{fma}(x,y,z)}{\partial x} = 
+       \frac{\partial\,\mbox{fma}(x,y,z)}{\partial x} =
        \begin{cases}
          y & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{fma}(x,y,z)}{\partial y} = 
+       \frac{\partial\,\mbox{fma}(x,y,z)}{\partial y} =
        \begin{cases}
          x & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{fma}(x,y,z)}{\partial z} = 
+       \frac{\partial\,\mbox{fma}(x,y,z)}{\partial z} =
        \begin{cases}
          1 & \mbox{if } -\infty\leq x,y,z \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

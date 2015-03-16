@@ -11,19 +11,19 @@ namespace stan {
      * A var implementation that stores the daughter variable
      * implementation pointers and the partial derivative with respect
      * to the result explicitly in arrays constructed on the
-     * auto-diff memory stack.  
+     * auto-diff memory stack.
      *
      * Like a simplified version of OperandsAndPartials.
      */
     class stored_gradient_vari : public vari {
 
-    protected: 
+    protected:
 
       size_t size_;
       vari** dtrs_;
       double* partials_;
 
-    public: 
+    public:
 
       /**
        * Construct a stored gradient vari with the specified
@@ -41,7 +41,7 @@ namespace stan {
                            double* partials)
         : vari(value),
           size_(size),
-          dtrs_(dtrs), 
+          dtrs_(dtrs),
           partials_(partials) {
       }
 

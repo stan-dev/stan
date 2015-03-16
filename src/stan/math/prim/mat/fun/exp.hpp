@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Return the element-wise exponentiation of the matrix or vector.
      *
@@ -18,7 +18,7 @@ namespace stan {
     inline Eigen::Matrix<T,Rows,Cols> exp(const Eigen::Matrix<T,Rows,Cols>& m) {
       return m.array().exp().matrix();
     }
-    
+
     //FIXME:
     //specialization not needed once Eigen fixes issue:
     //http://eigen.tuxfamily.org/bz/show_bug.cgi?id=859
@@ -30,7 +30,7 @@ namespace stan {
           mat(i) = std::numeric_limits<double>::quiet_NaN();
       return mat;
     }
-    
+
   }
 }
 #endif

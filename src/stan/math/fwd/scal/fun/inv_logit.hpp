@@ -16,7 +16,7 @@ namespace stan {
       using std::exp;
       using std::pow;
       using stan::math::inv_logit;
-      return fvar<T>(inv_logit(x.val_), 
+      return fvar<T>(inv_logit(x.val_),
            x.d_ * inv_logit(x.val_) * (1 - inv_logit(x.val_)));
     }
   }

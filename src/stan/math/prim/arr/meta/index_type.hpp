@@ -24,7 +24,7 @@ namespace stan {
 
     };
 
-    
+
   }
 }
 

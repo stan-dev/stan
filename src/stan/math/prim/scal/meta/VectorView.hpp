@@ -25,7 +25,7 @@ namespace stan {
    *  Note: this is not safe. It is possible to read past the size of
    *  an array.
    *
-   *  Uses: 
+   *  Uses:
    *    Read arguments to prob functions as vectors, even if scalars, so
    *    they can be read by common code (and scalars automatically
    *    broadcast up to behave like vectors) : VectorView of immutable
@@ -39,7 +39,7 @@ namespace stan {
             bool is_array = stan::is_vector_like<T>::value,
             bool throw_if_accessed = false>
   class VectorView {
-  public: 
+  public:
     typedef typename scalar_type<T>::type scalar_t;
 
     VectorView(scalar_t& c) : x_(&c) { }
@@ -52,11 +52,11 @@ namespace stan {
     VectorView(scalar_t* x) : x_(x) { }
 
     scalar_t& operator[](int i) {
-      if (throw_if_accessed) 
+      if (throw_if_accessed)
         throw std::out_of_range("VectorView: this cannot be accessed");
-      if (is_array) 
+      if (is_array)
         return x_[i];
-      else 
+      else
         return x_[0];
     }
   private:
@@ -83,11 +83,11 @@ namespace stan {
     VectorView(const Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
 
     const scalar_t& operator[](int i) const {
-      if (throw_if_accessed) 
+      if (throw_if_accessed)
         throw std::out_of_range("VectorView: this cannot be accessed");
       if (is_array)
         return x_[i];
-      else 
+      else
         return x_[0];
     }
   private:

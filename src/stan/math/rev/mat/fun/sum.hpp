@@ -20,14 +20,14 @@ namespace stan {
           for (size_t i = 0; i < length; i++)
             result += v[i].vi_->val_;
           return result;
-        } 
+        }
         template<typename Derived>
         inline static double var_sum(const Eigen::DenseBase<Derived> &v) {
           double result = 0;
           for (int i = 0; i < v.size(); i++)
             result += v(i).vi_->val_;
           return result;
-        } 
+        }
       public:
         template<typename Derived>
         sum_v_vari(const Eigen::DenseBase<Derived> &v) :

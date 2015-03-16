@@ -11,15 +11,15 @@ namespace stan {
   namespace agrad {
 
     template<typename T>
-    inline 
-    fvar<T> 
+    inline
+    fvar<T>
     to_fvar(const T& x) {
       return fvar<T>(x);
     }
 
-    template<typename T> 
-    inline 
-    fvar<T> 
+    template<typename T>
+    inline
+    fvar<T>
     to_fvar(const fvar<T>& x) {
       return x;
     }
@@ -47,7 +47,7 @@ namespace stan {
     Eigen::Matrix<fvar<T>, R, C>
     to_fvar(const Eigen::Matrix<T,R,C>& val,
             const Eigen::Matrix<T,R,C>& deriv) {
-      
+
       stan::math::check_matching_dims("to_fvar",
                                       "value", val,
                                       "deriv", deriv);

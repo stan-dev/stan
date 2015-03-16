@@ -10,36 +10,36 @@ namespace stan {
     namespace {
 
       template <typename T>
-      void resize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
-                  const std::vector<size_t>& dims, 
+      void resize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
+                  const std::vector<size_t>& dims,
                   size_t pos) {
         x.resize(dims[pos],dims[pos+1]);
       }
 
       template <typename T>
-      void resize(Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-                  const std::vector<size_t>& dims, 
+      void resize(Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                  const std::vector<size_t>& dims,
                   size_t pos) {
         x.resize(dims[pos]);
       }
 
       template <typename T>
-      void resize(Eigen::Matrix<T,1,Eigen::Dynamic>& x, 
-                  const std::vector<size_t>& dims, 
+      void resize(Eigen::Matrix<T,1,Eigen::Dynamic>& x,
+                  const std::vector<size_t>& dims,
                   size_t pos) {
         x.resize(dims[pos]);
       }
 
       template <typename T>
-      void resize(T /*x*/, 
-                  const std::vector<size_t>& /*dims*/, 
+      void resize(T /*x*/,
+                  const std::vector<size_t>& /*dims*/,
                   size_t /*pos*/) {
         // no-op
       }
 
       template <typename T>
-      void resize(std::vector<T>& x, 
-                  const std::vector<size_t>& dims, 
+      void resize(std::vector<T>& x,
+                  const std::vector<size_t>& dims,
                   size_t pos) {
         x.resize(dims[pos]);
         ++pos;

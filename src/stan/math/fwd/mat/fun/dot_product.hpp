@@ -14,9 +14,9 @@ namespace stan {
 
     //dot_product for vec (in matrix) * vec (in matrix); does all combos of row row, col col, row col, col row
     template<typename T, int R1, int C1, int R2, int C2>
-    inline 
-    fvar<T> 
-    dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
+    inline
+    fvar<T>
+    dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1,
                 const Eigen::Matrix<fvar<T>, R2, C2>& v2) {
       stan::math::check_vector("dot_product", "v1", v1);
       stan::math::check_vector("dot_product", "v2", v2);
@@ -31,9 +31,9 @@ namespace stan {
     }
 
     template<typename T, int R1, int C1, int R2, int C2>
-    inline 
-    fvar<T> 
-    dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
+    inline
+    fvar<T>
+    dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1,
                 const Eigen::Matrix<double, R2, C2>& v2) {
       stan::math::check_vector("dot_product", "v1", v1);
       stan::math::check_vector("dot_product", "v2", v2);
@@ -48,9 +48,9 @@ namespace stan {
     }
 
     template<typename T, int R1, int C1, int R2, int C2>
-    inline 
-    fvar<T> 
-    dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+    inline
+    fvar<T>
+    dot_product(const Eigen::Matrix<double, R1, C1>& v1,
                 const Eigen::Matrix<fvar<T>, R2, C2>& v2) {
       stan::math::check_vector("dot_product", "v1", v1);
       stan::math::check_vector("dot_product", "v2", v2);
@@ -65,9 +65,9 @@ namespace stan {
     }
 
     template<typename T, int R1,int C1, int R2, int C2>
-    inline 
-    fvar<T> 
-    dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
+    inline
+    fvar<T>
+    dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1,
                 const Eigen::Matrix<fvar<T>, R2, C2>& v2,
                 size_type& length) {
       stan::math::check_vector("dot_product", "v1", v1);
@@ -80,9 +80,9 @@ namespace stan {
     }
 
     template<typename T, int R1,int C1, int R2, int C2>
-    inline 
-    fvar<T> 
-    dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
+    inline
+    fvar<T>
+    dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1,
                 const Eigen::Matrix<double, R2, C2>& v2,
                 size_type& length) {
       stan::math::check_vector("dot_product", "v1", v1);
@@ -95,9 +95,9 @@ namespace stan {
     }
 
     template<typename T, int R1,int C1, int R2, int C2>
-    inline 
-    fvar<T> 
-    dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+    inline
+    fvar<T>
+    dot_product(const Eigen::Matrix<double, R1, C1>& v1,
                 const Eigen::Matrix<fvar<T>, R2, C2>& v2,
                 size_type& length) {
       stan::math::check_vector("dot_product", "v1", v1);
@@ -110,7 +110,7 @@ namespace stan {
     }
 
     template<typename T>
-    inline 
+    inline
     fvar<T>
     dot_product(const std::vector<fvar<T> >& v1,
                 const std::vector<fvar<T> >& v2) {
@@ -124,7 +124,7 @@ namespace stan {
     }
 
     template<typename T>
-    inline 
+    inline
     fvar<T>
     dot_product(const std::vector<double>& v1,
                 const std::vector<fvar<T> >& v2) {
@@ -138,7 +138,7 @@ namespace stan {
     }
 
     template<typename T>
-    inline 
+    inline
     fvar<T>
     dot_product(const std::vector<fvar<T> >& v1,
                 const std::vector<double>& v2) {
@@ -152,7 +152,7 @@ namespace stan {
     }
 
     template<typename T>
-    inline 
+    inline
     fvar<T>
     dot_product(const std::vector<fvar<T> >& v1,
                 const std::vector<fvar<T> >& v2,
@@ -164,7 +164,7 @@ namespace stan {
     }
 
     template<typename T>
-    inline 
+    inline
     fvar<T>
     dot_product(const std::vector<double>& v1,
                 const std::vector<fvar<T> >& v2,
@@ -176,7 +176,7 @@ namespace stan {
     }
 
     template<typename T>
-    inline 
+    inline
     fvar<T>
     dot_product(const std::vector<fvar<T> >& v1,
                 const std::vector<double>& v2,

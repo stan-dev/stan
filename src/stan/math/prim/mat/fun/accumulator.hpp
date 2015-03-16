@@ -28,7 +28,7 @@ namespace stan {
 
     public:
       /**
-       * Construct an accumulator. 
+       * Construct an accumulator.
        */
       accumulator()
         : buf_() {
@@ -38,7 +38,7 @@ namespace stan {
        * Destroy an accumulator.
        */
       ~accumulator() { }
-      
+
       /**
        * Add the specified arithmetic type value to the buffer after
        * static casting it to the class type <code>T</code>.
@@ -68,7 +68,7 @@ namespace stan {
        * @param x Value to add
        */
       template <typename S>
-      typename boost::disable_if<boost::is_arithmetic<S>, 
+      typename boost::disable_if<boost::is_arithmetic<S>,
                                  typename boost::enable_if<boost::is_same<S,T>,
                                                            void>::type >::type
       add(const S& x) {
@@ -89,7 +89,7 @@ namespace stan {
         for (int i = 0; i < m.size(); ++i)
           add(m(i));
       }
-      
+
       /**
        * Recursively add each entry in the specified standard vector
        * to the buffer.  This will allow vectors of primitives,
@@ -104,7 +104,7 @@ namespace stan {
         for (size_t i = 0; i < xs.size(); ++i)
           add(xs[i]);
       }
-      
+
       /**
        * Return the sum of the accumulated values.
        *

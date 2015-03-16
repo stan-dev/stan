@@ -33,15 +33,15 @@ namespace stan {
      *
      *
        \f[
-       \mbox{trunc}(x) = 
+       \mbox{trunc}(x) =
        \begin{cases}
          \lfloor x \rfloor & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{trunc}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{trunc}(x)}{\partial x} =
        \begin{cases}
          0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

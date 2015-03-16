@@ -43,8 +43,8 @@ namespace stan {
       using stan::math::multiply_log;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(alpha) 
+      if (!(stan::length(y)
+            && stan::length(alpha)
             && stan::length(sigma)))
         return 0.0;
 
@@ -72,7 +72,7 @@ namespace stan {
       for (size_t i = 0; i < length(alpha); i++)
         if (include_summand<propto,T_shape>::value)
           log_alpha[i] = log(value_of(alpha_vec[i]));
-      
+
       VectorBuilder<include_summand<propto,T_y,T_shape>::value,
                     T_partials_return, T_y> log_y(length(y));
       for (size_t i = 0; i < length(y); i++)
@@ -90,9 +90,9 @@ namespace stan {
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y,T_shape,T_scale>::value)
           inv_y[i] = 1.0 / value_of(y_vec[i]);
-      
+
       VectorBuilder<include_summand<propto,T_y,T_shape,T_scale>::value,
-                    T_partials_return, T_y, T_shape, T_scale> 
+                    T_partials_return, T_y, T_shape, T_scale>
         sigma_div_y_pow_alpha(N);
       for (size_t i = 0; i < N; i++)
         if (include_summand<propto,T_y,T_shape,T_scale>::value) {
@@ -114,16 +114,16 @@ namespace stan {
 
         if (!is_constant_struct<T_y>::value) {
           const T_partials_return inv_y_dbl = value_of(inv_y[n]);
-          operands_and_partials.d_x1[n] 
+          operands_and_partials.d_x1[n]
             += -(alpha_dbl+1.0) * inv_y_dbl
             + alpha_dbl * sigma_div_y_pow_alpha[n] * inv_y_dbl;
         }
-        if (!is_constant_struct<T_shape>::value) 
-          operands_and_partials.d_x2[n] 
-            += 1.0/alpha_dbl 
+        if (!is_constant_struct<T_shape>::value)
+          operands_and_partials.d_x2[n]
+            += 1.0/alpha_dbl
             + (1.0 - sigma_div_y_pow_alpha[n]) * (log_sigma[n] - log_y[n]);
-        if (!is_constant_struct<T_scale>::value) 
-          operands_and_partials.d_x3[n] 
+        if (!is_constant_struct<T_scale>::value)
+          operands_and_partials.d_x3[n]
             += alpha_dbl / value_of(sigma_vec[n]) * (1 - sigma_div_y_pow_alpha[n]);
       }
       return operands_and_partials.to_var(logp,y,alpha,sigma);

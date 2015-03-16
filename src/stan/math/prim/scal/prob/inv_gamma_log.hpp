@@ -34,7 +34,7 @@ namespace stan {
      * shape and scale parameters.
      * Shape and scale parameters must be greater than 0.
      * y must be greater than 0.
-     * 
+     *
      * @param y A scalar variable.
      * @param alpha Shape parameter.
      * @param beta Scale parameter.
@@ -50,7 +50,7 @@ namespace stan {
     typename return_type<T_y,T_shape,T_scale>::type
     inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta) {
       static const char* function("stan::prob::inv_gamma_log");
-      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type 
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
         T_partials_return;
 
       using stan::is_constant_struct;
@@ -61,8 +61,8 @@ namespace stan {
       using stan::math::value_of;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(alpha) 
+      if (!(stan::length(y)
+            && stan::length(alpha)
             && stan::length(beta)))
         return 0.0;
 
@@ -93,9 +93,9 @@ namespace stan {
       }
 
       size_t N = max_size(y, alpha, beta);
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
+      agrad::OperandsAndPartials<T_y, T_shape, T_scale>
         operands_and_partials(y, alpha, beta);
-      
+
       using stan::math::lgamma;
       using stan::math::digamma;
 
@@ -141,13 +141,13 @@ namespace stan {
           logp -= (alpha_dbl+1.0) * log_y[n];
         if (include_summand<propto,T_y,T_scale>::value)
           logp -= beta_dbl * inv_y[n];
-  
+
         // gradients
         if (!is_constant<typename is_vector<T_y>::type>::value)
-          operands_and_partials.d_x1[n] 
+          operands_and_partials.d_x1[n]
             += -(alpha_dbl+1) * inv_y[n] + beta_dbl * inv_y[n] * inv_y[n];
         if (!is_constant<typename is_vector<T_shape>::type>::value)
-          operands_and_partials.d_x2[n] 
+          operands_and_partials.d_x2[n]
             += -digamma_alpha[n] + log_beta[n] - log_y[n];
         if (!is_constant<typename is_vector<T_scale>::type>::value)
           operands_and_partials.d_x3[n] += alpha_dbl / beta_dbl - inv_y[n];

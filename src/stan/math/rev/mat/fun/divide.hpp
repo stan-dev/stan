@@ -10,7 +10,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     /**
      * Return the division of the first scalar by
      * the second scalar.
@@ -19,8 +19,8 @@ namespace stan {
      * @return Vector divided by the scalar.
      */
     inline double
-    divide(double x, double y) { 
-      return x / y; 
+    divide(double x, double y) {
+      return x / y;
     }
     template <typename T1, typename T2>
     inline var

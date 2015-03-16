@@ -20,7 +20,7 @@ namespace stan {
       using std::log;
       T pow_x1_x2(pow(x1.val_,x2.val_));
       return fvar<T>(pow_x1_x2,
-                     (x2.d_ * log(x1.val_) 
+                     (x2.d_ * log(x1.val_)
                       + x2.val_ * x1.d_ / x1.val_) * pow_x1_x2);
     }
 

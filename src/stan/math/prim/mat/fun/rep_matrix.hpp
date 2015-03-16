@@ -10,7 +10,7 @@ namespace stan {
   namespace math {
 
     template <typename T>
-    inline 
+    inline
     Eigen::Matrix<typename boost::math::tools::promote_args<T>::type,
                   Eigen::Dynamic,Eigen::Dynamic>
     rep_matrix(const T& x, int m, int n) {

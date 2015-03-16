@@ -1,7 +1,7 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__MULTIPLY_HPP
 #define STAN__MATH__PRIM__MAT__FUN__MULTIPLY_HPP
 
-#include <boost/type_traits/is_arithmetic.hpp> 
+#include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/err/check_matching_sizes.hpp>
@@ -20,7 +20,7 @@ namespace stan {
      */
     template <int R, int C, typename T>
     inline
-    typename boost::enable_if_c<boost::is_arithmetic<T>::value, 
+    typename boost::enable_if_c<boost::is_arithmetic<T>::value,
                                 Eigen::Matrix<double, R, C> >::type
     multiply(const Eigen::Matrix<double, R, C>& m,
              T c) {
@@ -40,7 +40,7 @@ namespace stan {
      */
     template <int R, int C, typename T>
     inline
-    typename boost::enable_if_c<boost::is_arithmetic<T>::value, 
+    typename boost::enable_if_c<boost::is_arithmetic<T>::value,
                                 Eigen::Matrix<double, R, C> >::type
     multiply(T c,
              const Eigen::Matrix<double,R,C>& m) {
@@ -60,7 +60,7 @@ namespace stan {
     template<int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<double,R1,C2> multiply(const Eigen::Matrix<double,R1,C1>& m1,
                                                 const Eigen::Matrix<double,R2,C2>& m2) {
-      
+
       stan::math::check_multiplicable("multiply",
                                                 "m1", m1,
                                                 "m2", m2);
@@ -82,7 +82,7 @@ namespace stan {
       stan::math::check_matching_sizes("multiply",
                                                  "rv", rv,
                                                  "v", v);
-      if (rv.size() != v.size()) 
+      if (rv.size() != v.size())
         throw std::domain_error("rv.size() != v.size()");
       return rv.dot(v);
     }

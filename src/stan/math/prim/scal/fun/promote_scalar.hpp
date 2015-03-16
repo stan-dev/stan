@@ -23,7 +23,7 @@ namespace stan {
 
       /**
        * Return the value of the input argument promoted to the type
-       * specified by the template parameter.  
+       * specified by the template parameter.
        *
        * This is the base case for mismatching template parameter
        * types in which the underlying scalar type of template
@@ -41,7 +41,7 @@ namespace stan {
      * Struct to hold static function for promoting underlying scalar
      * types.  This specialization is for equal input and output types
      * of function types.
-     * 
+     *
      * @tparam T input and return type of nested static function.
      */
     template <typename T>
@@ -61,7 +61,7 @@ namespace stan {
     /**
      * Struct to hold static function for promoting underlying scalar
      * types.  This specialization is for standard vector inputs.
-     * 
+     *
      * @tparam T return scalar type
      * @tparam S input type for standard vector elements in static
      * nested function, which must have an underlying scalar type
@@ -80,7 +80,7 @@ namespace stan {
        */
       static std::vector<typename promote_scalar_type<T,S>::type>
       apply(const std::vector<S>& x) {
-        typedef std::vector<typename promote_scalar_type<T,S>::type> return_t; 
+        typedef std::vector<typename promote_scalar_type<T,S>::type> return_t;
         typedef typename index_type<return_t>::type idx_t;
         return_t y(x.size());
         for (idx_t i = 0; i < x.size(); ++i)

@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace math {
-   
+
     /**
      * Return the number of components of v less than v[s].
      *
@@ -47,7 +47,7 @@ namespace stan {
         if (vv[i]<compare) count++;
       return count;
     }
-    
+
   }
 }
 #endif

@@ -26,7 +26,7 @@ namespace stan {
     typename return_type<T_y,T_scale,T_shape>::type
     pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
       static const char* function("stan::prob::pareto_log");
-      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type 
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type
         T_partials_return;
 
       using stan::math::value_of;
@@ -35,14 +35,14 @@ namespace stan {
       using stan::math::check_consistent_sizes;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(y_min) 
+      if (!(stan::length(y)
+            && stan::length(y_min)
             && stan::length(alpha)))
         return 0.0;
-      
+
       // set up return value accumulator
       T_partials_return logp(0.0);
-      
+
       // validate args (here done over var, which should be OK)
       check_not_nan(function, "Random variable", y);
       check_positive_finite(function, "Scale parameter", y_min);
@@ -55,7 +55,7 @@ namespace stan {
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_scale,T_shape>::value)
         return 0.0;
-      
+
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> y_min_vec(y_min);
       VectorView<const T_shape> alpha_vec(alpha);
@@ -67,9 +67,9 @@ namespace stan {
       }
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y,T_scale,T_shape> 
+      agrad::OperandsAndPartials<T_y,T_scale,T_shape>
         operands_and_partials(y, y_min, alpha);
-      
+
       VectorBuilder<include_summand<propto,T_y,T_shape>::value,
                     T_partials_return, T_y> log_y(length(y));
       if (include_summand<propto,T_y,T_shape>::value)
@@ -83,7 +83,7 @@ namespace stan {
           inv_y[n] = 1 / value_of(y_vec[n]);
 
       VectorBuilder<include_summand<propto,T_scale,T_shape>::value,
-                    T_partials_return, T_scale> 
+                    T_partials_return, T_scale>
         log_y_min(length(y_min));
       if (include_summand<propto,T_scale,T_shape>::value)
         for (size_t n = 0; n < length(y_min); n++)
@@ -94,7 +94,7 @@ namespace stan {
       if (include_summand<propto,T_shape>::value)
         for (size_t n = 0; n < length(alpha); n++)
           log_alpha[n] = log(value_of(alpha_vec[n]));
-      
+
       using stan::math::multiply_log;
 
       for (size_t n = 0; n < N; n++) {
@@ -106,14 +106,14 @@ namespace stan {
           logp += alpha_dbl * log_y_min[n];
         if (include_summand<propto,T_y,T_shape>::value)
           logp -= alpha_dbl * log_y[n] + log_y[n];
-  
+
         // gradients
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= alpha_dbl * inv_y[n] + inv_y[n];
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x2[n] += alpha_dbl / value_of(y_min_vec[n]);
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x3[n] 
+          operands_and_partials.d_x3[n]
             += 1 / alpha_dbl + log_y_min[n] - log_y[n];
       }
       return operands_and_partials.to_var(logp,y,y_min,alpha);

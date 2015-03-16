@@ -13,7 +13,7 @@
 namespace stan {
 
   namespace math {
-    
+
     /**
      * Return a sorted copy of the argument container in ascending order.
      *

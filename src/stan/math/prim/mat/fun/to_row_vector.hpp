@@ -7,11 +7,11 @@
 
 namespace stan {
   namespace math {
-    
+
     using Eigen::Dynamic;
-    using Eigen::Matrix; 
+    using Eigen::Matrix;
     using std::vector;
-    
+
     //row_vector to_row_vector(matrix)
     //row_vector to_row_vector(vector)
     //row_vector to_row_vector(row_vector)
@@ -19,15 +19,15 @@ namespace stan {
     inline Matrix<T, 1, Dynamic>
     to_row_vector(const Matrix<T, R, C>& matrix) {
       return Matrix<T, 1, Dynamic>::Map(matrix.data(), matrix.rows()*matrix.cols());
-    }  
-      
+    }
+
     //row_vector to_row_vector(real[])
     template <typename T>
     inline Matrix<T, 1, Dynamic>
     to_row_vector(const vector<T> & vec) {
       return Matrix<T, 1, Dynamic>::Map(vec.data(), vec.size());
     }
-    
+
     //row_vector to_row_vector(int[])
     inline Matrix<double, 1, Dynamic>
     to_row_vector(const vector<int> & vec) {

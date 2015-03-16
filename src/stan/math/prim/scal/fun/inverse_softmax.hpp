@@ -21,7 +21,7 @@ namespace stan {
      * up to a scaling factor.
      *
      * Because of the definition, values of 0.0 in the simplex
-     * are converted to negative infinity, and values of 1.0 
+     * are converted to negative infinity, and values of 1.0
      * are converted to 0.0.
      *
      * There is no check that the input vector is a valid simplex vector.

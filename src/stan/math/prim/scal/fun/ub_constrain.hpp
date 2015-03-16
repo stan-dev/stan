@@ -7,7 +7,7 @@
 #include <limits>
 
 namespace stan {
-  
+
   namespace prob {
 
     // UPPER BOUND
@@ -20,11 +20,11 @@ namespace stan {
      *
      * <p>\f$f(x) = U - \exp(x)\f$
      *
-     * <p>where \f$U\f$ is the upper bound.  
-     * 
+     * <p>where \f$U\f$ is the upper bound.
+     *
      * If the upper bound is positive infinity, this function
      * reduces to <code>identity_constrain(x)</code>.
-     * 
+     *
      * @param x Free scalar.
      * @param ub Upper bound.
      * @return Transformed scalar with specified upper bound.
@@ -50,7 +50,7 @@ namespace stan {
      * <code>ub_constrain(T,double)</code>.  The log absolute Jacobian
      * determinant is
      *
-     * <p>\f$ \log | \frac{d}{dx} -\mbox{exp}(x) + U | 
+     * <p>\f$ \log | \frac{d}{dx} -\mbox{exp}(x) + U |
      *     = \log | -\mbox{exp}(x) + 0 | = x\f$.
      *
      * If the upper bound is positive infinity, this function

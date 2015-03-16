@@ -92,9 +92,9 @@ namespace stan {
 
       template <class Iterator, class I>
       void operator()(
-        Iterator _begin, 
-        Iterator _end, 
-        Iterator _where, 
+        Iterator _begin,
+        Iterator _end,
+        Iterator _where,
         I const& _info,
         std::string msg,
         variable_map& vm,
@@ -127,7 +127,7 @@ namespace stan {
           std::string line_2before = "";
           std::string line_before = "";
           std::string line_err = "";
-          std::string line_after = "";            
+          std::string line_after = "";
 
           size_t idx_line = 0;
           size_t idx_before = idx_errline - 1;
@@ -135,7 +135,7 @@ namespace stan {
               // read lines up to error line, save 2 most recently read
               while (idx_before > idx_line) {
                 line_2before = line_before;
-                std::getline(sprogram,line_before);  
+                std::getline(sprogram,line_before);
                 idx_line++;
               }
               if (line_2before.length() > 0) {
@@ -150,7 +150,7 @@ namespace stan {
           lineno = str(fmt_lineno % idx_errline);
           error_msgs << lineno << line_err << std::endl
                      << setw(idx_errcol + lineno.length()) << "^" << std::endl;
-            
+
           if (!sprogram.eof()) {
             std::getline(sprogram,line_after);
             lineno = str(fmt_lineno % (idx_errline+1));
@@ -163,7 +163,7 @@ namespace stan {
     boost::phoenix::function<program_error> program_error_f;
 
     template <typename Iterator>
-    program_grammar<Iterator>::program_grammar(const std::string& model_name) 
+    program_grammar<Iterator>::program_grammar(const std::string& model_name)
         : program_grammar::base_type(program_r),
           model_name_(model_name),
           var_map_(),
@@ -180,13 +180,13 @@ namespace stan {
         using boost::spirit::qi::lexeme;
 
 
-        // add model_name to var_map with special origin and no 
+        // add model_name to var_map with special origin and no
         var_map_.add(model_name,
                      base_var_decl(),
                      model_name_origin);
 
         program_r.name("program");
-        program_r 
+        program_r
           %= -functions_g
           > -data_var_decls_r
           > -derived_data_var_decls_r
@@ -199,7 +199,7 @@ namespace stan {
           ;
 
         model_r.name("model declaration (or perhaps an earlier block)");
-        model_r 
+        model_r
           %= lit("model")
           > statement_g(true,local_origin,false)  // assign only to locals
           ;
@@ -242,7 +242,7 @@ namespace stan {
           > ( (statement_g(false,transformed_data_origin,false)
                > *statement_g(false,transformed_data_origin,false)
                > end_var_definitions_r
-               ) 
+               )
               | ( *statement_g(false,transformed_data_origin,false)
                   > end_var_decls_statements_r
                   )
@@ -263,7 +263,7 @@ namespace stan {
         derived_var_decls_r.name("derived variable declarations");
         derived_var_decls_r
           %= ( lit("transformed")
-               > lit("parameters") 
+               > lit("parameters")
                > lit('{')
                )
           > var_decls_g(true,transformed_parameter_origin) // -constraints
@@ -274,7 +274,7 @@ namespace stan {
         generated_var_decls_r
           %= ( lit("generated")
                > lit("quantities")
-               > lit('{') 
+               > lit('{')
                )
           > var_decls_g(true,derived_origin) // -constraints
           > *statement_g(false,derived_origin,false) // -sampling
@@ -292,7 +292,7 @@ namespace stan {
             boost::phoenix::ref(var_map_),
             boost::phoenix::ref(error_msgs_)
           )
-        ); 
+        );
     }
 
   }

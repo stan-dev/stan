@@ -15,7 +15,7 @@ namespace stan {
         }
         void chain() {
           static const double NEG_HALF = -0.5;
-          avi_->adj_ += adj_ 
+          avi_->adj_ += adj_
             * stan::math::INV_SQRT_TWO_PI * std::exp(NEG_HALF * avi_->val_ * avi_->val_);
         }
       };
@@ -32,7 +32,7 @@ namespace stan {
      *
      *
        \f[
-       \mbox{Phi}(x) = 
+       \mbox{Phi}(x) =
        \begin{cases}
          0 & \mbox{if } x < -37.5 \\
          \Phi(x) & \mbox{if } -37.5 \leq x \leq 8.25 \\
@@ -40,9 +40,9 @@ namespace stan {
          \textrm{error} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{Phi}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{Phi}(x)}{\partial x} =
        \begin{cases}
          0 & \mbox{if } x < -27.5 \\
          \frac{\partial\,\Phi(x)}{\partial x} & \mbox{if } -27.5 \leq x \leq 27.5 \\
@@ -50,11 +50,11 @@ namespace stan {
          \textrm{error} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
        \Phi(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
        \f]
-       
+
        \f[
        \frac{\partial \, \Phi(x)}{\partial x} = \frac{e^{-x^2/2}}{\sqrt{2\pi}}
        \f]

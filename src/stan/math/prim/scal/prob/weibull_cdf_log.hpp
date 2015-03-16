@@ -35,8 +35,8 @@ namespace stan {
       using stan::math::value_of;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(alpha) 
+      if (!(stan::length(y)
+            && stan::length(alpha)
             && stan::length(sigma)))
         return 0.0;
 
@@ -44,8 +44,8 @@ namespace stan {
       check_nonnegative(function, "Random variable", y);
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", sigma);
-      
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
+
+      agrad::OperandsAndPartials<T_y, T_shape, T_scale>
         operands_and_partials(y, alpha, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -73,7 +73,7 @@ namespace stan {
           operands_and_partials.d_x3[n] -= rep_deriv * alpha_dbl / sigma_dbl;
       }
 
-      return operands_and_partials.to_var(cdf_log,y,alpha,sigma);    
+      return operands_and_partials.to_var(cdf_log,y,alpha,sigma);
     }
   }
 }

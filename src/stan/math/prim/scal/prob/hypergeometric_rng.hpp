@@ -30,7 +30,7 @@ namespace stan {
                        const int b,
                        RNG& rng) {
       using boost::variate_generator;
-      
+
       static const char* function("stan::prob::hypergeometric_rng");
 
       using stan::math::check_bounded;

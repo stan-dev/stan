@@ -20,7 +20,7 @@ namespace stan {
           //derivative of log(1-exp(x)) = -exp(x)/(1-exp(x)) = -1/(exp(-x)-1) = -1/expm1(-x)
           avi_->adj_ -= adj_ / boost::math::expm1(-(avi_->val_));
         }
-      };      
+      };
     }
 
     /**

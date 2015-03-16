@@ -14,9 +14,9 @@ namespace stan {
   namespace agrad {
 
     template<typename T, int R1,int C1,int R2, int C2>
-    inline 
+    inline
     Eigen::Matrix<fvar<T>, R1, 1>
-    rows_dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
+    rows_dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1,
                      const Eigen::Matrix<fvar<T>, R2, C2>& v2) {
       stan::math::check_matching_dims("rows_dot_product",
                                                 "v1", v1,
@@ -29,11 +29,11 @@ namespace stan {
       }
       return ret;
     }
-    
+
     template<typename T, int R1,int C1,int R2, int C2>
-    inline 
+    inline
     Eigen::Matrix<fvar<T>, R1, 1>
-    rows_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+    rows_dot_product(const Eigen::Matrix<double, R1, C1>& v1,
                      const Eigen::Matrix<fvar<T>, R2, C2>& v2) {
       stan::math::check_matching_dims("rows_dot_product",
                                                 "v1", v1,
@@ -48,9 +48,9 @@ namespace stan {
     }
 
     template<typename T, int R1,int C1,int R2, int C2>
-    inline 
+    inline
     Eigen::Matrix<fvar<T>, R1, 1>
-    rows_dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
+    rows_dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1,
                      const Eigen::Matrix<double, R2, C2>& v2) {
       stan::math::check_matching_dims("rows_dot_product",
                                                 "v1", v1,

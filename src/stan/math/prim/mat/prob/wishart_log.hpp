@@ -22,26 +22,26 @@ namespace stan {
 
   namespace prob {
 
-    // Wishart(Sigma|n,Omega)  [Sigma, Omega symmetric, non-neg, definite; 
+    // Wishart(Sigma|n,Omega)  [Sigma, Omega symmetric, non-neg, definite;
     //                          Sigma.dims() = Omega.dims();
     //                           n > Sigma.rows() - 1]
     /**
-     * The log of the Wishart density for the given W, degrees of freedom, 
-     * and scale matrix. 
-     * 
+     * The log of the Wishart density for the given W, degrees of freedom,
+     * and scale matrix.
+     *
      * The scale matrix, S, must be k x k, symmetric, and semi-positive definite.
      * Dimension, k, is implicit.
      * nu must be greater than k-1
      *
      * \f{eqnarray*}{
      W &\sim& \mbox{\sf{Wishart}}_{\nu} (S) \\
-     \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1} 
+     \log (p (W \,|\, \nu, S) ) &=& \log \left( \left(2^{\nu k/2} \pi^{k (k-1) /4} \prod_{i=1}^k{\Gamma (\frac{\nu + 1 - i}{2})} \right)^{-1}
      \times \left| S \right|^{-\nu/2} \left| W \right|^{(\nu - k - 1) / 2}
      \times \exp (-\frac{1}{2} \mbox{tr} (S^{-1} W)) \right) \\
      &=& -\frac{\nu k}{2}\log(2) - \frac{k (k-1)}{4} \log(\pi) - \sum_{i=1}^{k}{\log (\Gamma (\frac{\nu+1-i}{2}))}
      -\frac{\nu}{2} \log(\det(S)) + \frac{\nu-k-1}{2}\log (\det(W)) - \frac{1}{2} \mbox{tr} (S^{-1}W)
      \f}
-     * 
+     *
      * @param W A scalar matrix
      * @param nu Degrees of freedom
      * @param S The scale matrix
@@ -72,16 +72,16 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::log_determinant_ldlt;
       using stan::math::mdivide_left_ldlt;
-      
 
-      typename index_type<Matrix<T_scale,Dynamic,Dynamic> >::type k 
+
+      typename index_type<Matrix<T_scale,Dynamic,Dynamic> >::type k
         = W.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       check_greater(function, "Degrees of freedom parameter", nu, k-1);
-      check_square(function, "random variable", W); 
+      check_square(function, "random variable", W);
       check_square(function, "scale parameter", S);
-      check_size_match(function, 
-                       "Rows of random variable", W.rows(), 
+      check_size_match(function,
+                       "Rows of random variable", W.rows(),
                        "columns of scale parameter", S.rows());
       // FIXME: domain checks
 
@@ -92,7 +92,7 @@ namespace stan {
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_S(S);
       if (!check_ldlt_factor(function, "LDLT_Factor of scale parameter", ldlt_S))
         return lp;
-      
+
       using stan::math::trace;
       using stan::math::lmgamma;
       if (include_summand<propto,T_dof>::value)
@@ -105,8 +105,8 @@ namespace stan {
         lp -= 0.5 * nu * log_determinant_ldlt(ldlt_S);
 
       if (include_summand<propto,T_scale,T_y>::value) {
-        Matrix<typename promote_args<T_y,T_scale>::type,Dynamic,Dynamic> 
-          Sinv_W(mdivide_left_ldlt(ldlt_S, 
+        Matrix<typename promote_args<T_y,T_scale>::type,Dynamic,Dynamic>
+          Sinv_W(mdivide_left_ldlt(ldlt_S,
                                    static_cast<Matrix<T_y,Dynamic,Dynamic> >(W.template selfadjointView<Lower>())));
         lp -= 0.5 * trace(Sinv_W);
       }

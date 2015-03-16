@@ -22,14 +22,14 @@ namespace stan {
           return fvar<T>(fmax(x1.val_,x2.val_),NOT_A_NUMBER);
         else
           return fvar<T>(x2.val_, x2.d_);
-      } else if (unlikely(boost::math::isnan(x2.val_))) 
+      } else if (unlikely(boost::math::isnan(x2.val_)))
         return fvar<T>(x1.val_,x1.d_);
       else if(x1.val_ > x2.val_)
         return fvar<T>(x1.val_, x1.d_);
       else if(x1.val_ == x2.val_)
         return fvar<T>(x1.val_, NOT_A_NUMBER);
-      else 
-        return fvar<T>(x2.val_, x2.d_);      
+      else
+        return fvar<T>(x2.val_, x2.d_);
     }
 
     template <typename T>
@@ -43,14 +43,14 @@ namespace stan {
           return fvar<T>(fmax(x1,x2.val_),NOT_A_NUMBER);
         else
           return fvar<T>(x2.val_, x2.d_);
-      } else if (unlikely(boost::math::isnan(x2.val_))) 
+      } else if (unlikely(boost::math::isnan(x2.val_)))
         return fvar<T>(x1,0.0);
       else if(x1 > x2.val_)
         return fvar<T>(x1, 0.0);
       else if(x1 == x2.val_)
         return fvar<T>(x2.val_, NOT_A_NUMBER);
-      else 
-        return fvar<T>(x2.val_, x2.d_);    
+      else
+        return fvar<T>(x2.val_, x2.d_);
     }
 
     template <typename T>
@@ -64,13 +64,13 @@ namespace stan {
           return fvar<T>(fmax(x1.val_,x2),NOT_A_NUMBER);
         else
           return fvar<T>(x2, 0.0);
-      } else if (unlikely(boost::math::isnan(x2))) 
+      } else if (unlikely(boost::math::isnan(x2)))
         return fvar<T>(x1.val_,x1.d_);
       else if(x1.val_ > x2)
         return fvar<T>(x1.val_, x1.d_);
       else if(x1.val_ == x2)
         return fvar<T>(x1.val_, NOT_A_NUMBER);
-      else 
+      else
         return fvar<T>(x2, 0.0);
     }
   }

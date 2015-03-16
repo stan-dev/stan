@@ -5,7 +5,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Return the second argument if the first argument is true
      * and otherwise return the second argument.

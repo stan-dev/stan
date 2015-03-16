@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class increment_vari : public op_v_vari {
       public:
@@ -38,7 +38,7 @@ namespace stan {
     }
 
     /**
-     * Postfix increment operator for variables (C++).  
+     * Postfix increment operator for variables (C++).
      *
      * Following C++, the expression <code>(a++)</code> is defined to behave like
      * the sequence of operations
@@ -46,7 +46,7 @@ namespace stan {
      * <code>var temp = a;  a = a + 1.0;  return temp;</code>
      *
      * @param a Variable to increment.
-     * @return Input variable. 
+     * @return Input variable.
      */
     inline var operator++(var& a, int /*dummy*/) {
       var temp(a);

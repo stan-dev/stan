@@ -30,7 +30,7 @@ namespace stan {
 
       using stan::math::check_finite;
       using stan::math::check_bounded;
- 
+
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0, 1);
 

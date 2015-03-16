@@ -19,7 +19,7 @@
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -28,7 +28,7 @@ namespace stan {
      *
      * Inverse scale parameter must be greater than 0.
      * y must be greater than or equal to 0.
-     * 
+     *
      * @param y A scalar variable.
      * @param beta Inverse scale parameter.
      * @tparam T_y Type of scalar.
@@ -37,7 +37,7 @@ namespace stan {
     template <typename T_y, typename T_inv_scale>
     typename return_type<T_y,T_inv_scale>::type
     exponential_cdf(const T_y& y, const T_inv_scale& beta) {
-      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type 
+      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type
         T_partials_return;
 
       static const char* function("stan::prob::exponential_cdf");
@@ -50,7 +50,7 @@ namespace stan {
 
       T_partials_return cdf(1.0);
       // check if any vectors are zero length
-      if (!(stan::length(y) 
+      if (!(stan::length(y)
             && stan::length(beta)))
         return cdf;
 
@@ -58,15 +58,15 @@ namespace stan {
       check_nonnegative(function, "Random variable", y);
       check_positive_finite(function, "Inverse scale parameter", beta);
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale> 
+      agrad::OperandsAndPartials<T_y, T_inv_scale>
         operands_and_partials(y, beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, beta);
-      for (size_t n = 0; n < N; n++) {   
-        const T_partials_return beta_dbl = value_of(beta_vec[n]);     
-        const T_partials_return y_dbl = value_of(y_vec[n]);     
+      for (size_t n = 0; n < N; n++) {
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return one_m_exp = 1.0 - exp(-beta_dbl * y_dbl);
 
         // cdf
@@ -74,8 +74,8 @@ namespace stan {
       }
 
       for(size_t n = 0; n < N; n++) {
-        const T_partials_return beta_dbl = value_of(beta_vec[n]);     
-        const T_partials_return y_dbl = value_of(y_vec[n]);     
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return one_m_exp = 1.0 - exp(-beta_dbl * y_dbl);
 
         // gradients

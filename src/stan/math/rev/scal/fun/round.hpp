@@ -34,16 +34,16 @@ namespace stan {
      *
      *
        \f[
-       \mbox{round}(x) = 
+       \mbox{round}(x) =
        \begin{cases}
          \lceil x \rceil & \mbox{if } x-\lfloor x\rfloor \geq 0.5 \\
          \lfloor x \rfloor & \mbox{if } x-\lfloor x\rfloor < 0.5 \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{round}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{round}(x)}{\partial x} =
        \begin{cases}
          0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

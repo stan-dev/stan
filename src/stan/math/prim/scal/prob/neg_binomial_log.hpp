@@ -36,27 +36,27 @@ namespace stan {
               typename T_n,
               typename T_shape, typename T_inv_scale>
     typename return_type<T_shape, T_inv_scale>::type
-    neg_binomial_log(const T_n& n, 
-                     const T_shape& alpha, 
+    neg_binomial_log(const T_n& n,
+                     const T_shape& alpha,
                      const T_inv_scale& beta) {
       typedef typename stan::partials_return_type<T_n,T_shape,
-                                                  T_inv_scale>::type 
+                                                  T_inv_scale>::type
         T_partials_return;
 
       static const char* function("stan::prob::neg_binomial_log");
 
-      using stan::math::check_positive_finite;      
+      using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
-      
+
       // check if any vectors are zero length
       if (!(stan::length(n)
             && stan::length(alpha)
             && stan::length(beta)))
         return 0.0;
-      
+
       T_partials_return logp(0.0);
       check_nonnegative(function, "Failures variable", n);
       check_positive_finite(function, "Shape parameter", alpha);
@@ -75,20 +75,20 @@ namespace stan {
       using stan::math::digamma;
       using stan::math::lgamma;
       using std::log;
-      
+
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
       VectorView<const T_shape> alpha_vec(alpha);
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t size = max_size(n, alpha, beta);
 
-      agrad::OperandsAndPartials<T_shape,T_inv_scale> 
+      agrad::OperandsAndPartials<T_shape,T_inv_scale>
         operands_and_partials(alpha,beta);
 
       size_t len_ab = max_size(alpha,beta);
       VectorBuilder<true, T_partials_return, T_shape,T_inv_scale>
         lambda(len_ab);
-      for (size_t i = 0; i < len_ab; ++i) 
+      for (size_t i = 0; i < len_ab; ++i)
         lambda[i] = value_of(alpha_vec[i]) / value_of(beta_vec[i]);
 
       VectorBuilder<true, T_partials_return, T_inv_scale>
@@ -104,12 +104,12 @@ namespace stan {
       VectorBuilder<true, T_partials_return, T_inv_scale,T_shape>
         alpha_times_log_beta_over_1p_beta(len_ab);
       for (size_t i = 0; i < len_ab; ++i)
-        alpha_times_log_beta_over_1p_beta[i] 
+        alpha_times_log_beta_over_1p_beta[i]
           = value_of(alpha_vec[i])
-          * log(value_of(beta_vec[i]) 
+          * log(value_of(beta_vec[i])
                 / (1.0 + value_of(beta_vec[i])));
 
-      VectorBuilder<!is_constant_struct<T_shape>::value, 
+      VectorBuilder<!is_constant_struct<T_shape>::value,
                     T_partials_return, T_shape>
         digamma_alpha(length(alpha));
       if (!is_constant_struct<T_shape>::value)
@@ -122,14 +122,14 @@ namespace stan {
         for (size_t i = 0; i < length(beta); ++i)
           log_beta[i] = log(value_of(beta_vec[i]));
 
-      VectorBuilder<!is_constant_struct<T_inv_scale>::value, 
+      VectorBuilder<!is_constant_struct<T_inv_scale>::value,
                     T_partials_return, T_shape,T_inv_scale>
         lambda_m_alpha_over_1p_beta(len_ab);
       if (!is_constant_struct<T_inv_scale>::value)
         for (size_t i = 0; i < len_ab; ++i)
           lambda_m_alpha_over_1p_beta[i] =
             lambda[i]
-            - ( value_of(alpha_vec[i]) 
+            - ( value_of(alpha_vec[i])
                 / (1.0 + value_of(beta_vec[i])) );
 
       for (size_t i = 0; i < size; i++) {
@@ -141,7 +141,7 @@ namespace stan {
 
           if (!is_constant_struct<T_shape>::value)
             operands_and_partials.d_x1[i]
-              += n_vec[i] / value_of(alpha_vec[i]) 
+              += n_vec[i] / value_of(alpha_vec[i])
               - 1.0 / value_of(beta_vec[i]);
           if (!is_constant_struct<T_inv_scale>::value)
             operands_and_partials.d_x2[i]
@@ -149,13 +149,13 @@ namespace stan {
         } else { // standard density definition
           if (include_summand<propto,T_shape>::value)
             if (n_vec[i] != 0)
-              logp += binomial_coefficient_log(n_vec[i] 
+              logp += binomial_coefficient_log(n_vec[i]
                                                + value_of(alpha_vec[i])
-                                               - 1.0, 
+                                               - 1.0,
                                                n_vec[i]);
           if (include_summand<propto,T_shape,T_inv_scale>::value)
-            logp += 
-              alpha_times_log_beta_over_1p_beta[i] 
+            logp +=
+              alpha_times_log_beta_over_1p_beta[i]
               - n_vec[i] * log1p_beta[i];
 
           if (!is_constant_struct<T_shape>::value)
@@ -172,12 +172,12 @@ namespace stan {
       return operands_and_partials.to_var(logp,alpha,beta);
     }
 
-    template <typename T_n, 
+    template <typename T_n,
               typename T_shape, typename T_inv_scale>
     inline
     typename return_type<T_shape, T_inv_scale>::type
-    neg_binomial_log(const T_n& n, 
-                     const T_shape& alpha, 
+    neg_binomial_log(const T_n& n,
+                     const T_shape& alpha,
                      const T_inv_scale& beta) {
       return neg_binomial_log<false>(n,alpha,beta);
     }

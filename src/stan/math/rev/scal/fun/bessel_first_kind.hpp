@@ -21,7 +21,7 @@ namespace stan {
       };
     }
 
-    inline var bessel_first_kind(const int& v, 
+    inline var bessel_first_kind(const int& v,
                                  const var& a) {
       return var(new bessel_first_kind_dv_vari(v, a.vi_));
     }

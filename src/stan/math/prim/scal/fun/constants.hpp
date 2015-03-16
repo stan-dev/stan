@@ -8,31 +8,31 @@ namespace stan {
   namespace math {
 
     /**
-     * The base of the natural logarithm, 
+     * The base of the natural logarithm,
      * \f$ e \f$.
      */
     const double E = boost::math::constants::e<double>();
 
-    /** 
-     * The value of the square root of 2, 
-     * \f$ \sqrt{2} \f$. 
+    /**
+     * The value of the square root of 2,
+     * \f$ \sqrt{2} \f$.
      */
     const double SQRT_2 = std::sqrt(2.0);
 
-    /** 
-     * The value of 1 over the square root of 2, 
-     * \f$ 1 / \sqrt{2} \f$. 
+    /**
+     * The value of 1 over the square root of 2,
+     * \f$ 1 / \sqrt{2} \f$.
      */
     const double INV_SQRT_2 = 1.0 / SQRT_2;
 
     /**
-     * The natural logarithm of 2, 
+     * The natural logarithm of 2,
      * \f$ \log 2 \f$.
      */
     const double LOG_2 = std::log(2.0);
 
     /**
-     * The natural logarithm of 10, 
+     * The natural logarithm of 10,
      * \f$ \log 10 \f$.
      */
     const double LOG_10 = std::log(10.0);
@@ -51,7 +51,7 @@ namespace stan {
      * (Quiet) not-a-number value.
      */
     const double NOT_A_NUMBER = std::numeric_limits<double>::quiet_NaN();
-    
+
     /**
      * Smallest positive value.
      */
@@ -71,7 +71,7 @@ namespace stan {
 
     /**
      * Return the value of pi.
-     * 
+     *
      * @return Pi.
      */
     inline double pi() {
@@ -90,7 +90,7 @@ namespace stan {
     /**
      * Return the square root of two.
      *
-     * @return Square root of two. 
+     * @return Square root of two.
      */
     inline double sqrt2() {
       return SQRT_2;
@@ -144,11 +144,11 @@ namespace stan {
     }
 
     const double TWO_OVER_SQRT_PI = 2.0 / std::sqrt(boost::math::constants::pi<double>());
-    
+
     const double NEG_TWO_OVER_SQRT_PI = -TWO_OVER_SQRT_PI;
-    
+
     const double INV_SQRT_TWO_PI = 1.0 / std::sqrt(2.0 * boost::math::constants::pi<double>());
-    
+
   }
 }
 

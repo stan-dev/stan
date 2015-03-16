@@ -24,7 +24,7 @@
 namespace stan {
   namespace services {
     namespace init {
-    
+
       namespace {
         template <class Model>
         bool validate_unconstrained_initialization(Eigen::VectorXd& cont_params,
@@ -34,18 +34,18 @@ namespace stan {
                 || stan::math::is_nan(cont_params[n])) {
               std::vector<std::string> param_names;
               model.unconstrained_param_names(param_names);
-              
+
               std::stringstream msg;
               msg << param_names[n] << " initialized to invalid value ("
               << cont_params[n] << ")";
-              
+
               throw std::invalid_argument(msg.str());
             }
           }
           return true;
         }
       }
-      
+
       /**
        * Sets initial state to zero
        *
@@ -60,7 +60,7 @@ namespace stan {
                                  Model& model,
                                  std::ostream* output) {
         cont_params.setZero();
-        
+
         try {
           validate_unconstrained_initialization(cont_params, model);
         } catch (const std::exception& e) {
@@ -68,10 +68,10 @@ namespace stan {
             *output << e.what() << std::endl;
           return false;
         }
-        
+
         double init_log_prob;
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-        
+
         try {
           stan::model::gradient(model, cont_params, init_log_prob,
                                 init_grad, output);
@@ -82,7 +82,7 @@ namespace stan {
             << std::endl << e.what() << std::endl;
           return false;
         }
-        
+
         if (!boost::math::isfinite(init_log_prob)) {
           if (output)
             *output << "Rejecting initialization at zero "
@@ -90,7 +90,7 @@ namespace stan {
             << std::endl;
           return false;
         }
-        
+
         for (int i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad[i])) {
             if (output)
@@ -102,8 +102,8 @@ namespace stan {
         }
         return true;
       }
-      
-      
+
+
       /**
        * Initializes state to random uniform values within range.
        *
@@ -123,25 +123,25 @@ namespace stan {
                                    RNG& base_rng,
                                    std::ostream* output) {
         int num_init_tries = -1;
-        
+
         boost::random::uniform_real_distribution<double>
         init_range_distribution(-R, R);
-        
+
         boost::variate_generator
         <RNG&, boost::random::uniform_real_distribution<double> >
         init_rng(base_rng, init_range_distribution);
-        
+
         cont_params.setZero();
-        
+
         // Random initializations until log_prob is finite
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         static int MAX_INIT_TRIES = 100;
-        
+
         for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES;
              ++num_init_tries) {
           for (int i = 0; i < cont_params.size(); ++i)
             cont_params(i) = init_rng();
-          
+
           try {
             validate_unconstrained_initialization(cont_params, model);
           } catch (const std::exception& e) {
@@ -149,7 +149,7 @@ namespace stan {
               *output << e.what() << std::endl;
             continue;
           }
-          
+
           double init_log_prob;
           try {
             stan::model::gradient(model, cont_params, init_log_prob,
@@ -168,7 +168,7 @@ namespace stan {
               continue;
           break;
         }
-        
+
         if (num_init_tries > MAX_INIT_TRIES) {
           if (output)
             *output << std::endl << std::endl
@@ -183,8 +183,8 @@ namespace stan {
         }
         return true;
       }
-      
-      
+
+
       /**
        * Creates the initial state using the source parameter
        *
@@ -217,7 +217,7 @@ namespace stan {
             << std::endl << e.what() << std::endl;
           return false;
         }
-        
+
         try {
           validate_unconstrained_initialization(cont_params, model);
         } catch (const std::exception& e) {
@@ -225,11 +225,11 @@ namespace stan {
             *output << e.what() << std::endl;
           return false;
         }
-        
-        
+
+
         double init_log_prob;
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-        
+
         try {
           stan::model::gradient(model, cont_params, init_log_prob,
                                 init_grad, &std::cout);
@@ -240,7 +240,7 @@ namespace stan {
             << std::endl << e.what() << std::endl;
           return false;
         }
-        
+
         if (!boost::math::isfinite(init_log_prob)) {
           if (output)
             *output << "Rejecting user-specified initialization "
@@ -248,7 +248,7 @@ namespace stan {
             << std::endl;
           return false;
         }
-        
+
         for (int i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad[i])) {
             if (output)
@@ -260,7 +260,7 @@ namespace stan {
         }
         return true;
       }
-      
+
       /**
        * Converts string to double. Returns true if it is able to convert
        * the number, false otherwise.
@@ -278,7 +278,7 @@ namespace stan {
         }
         return true;
       }
-      
+
       /**
        * Creates the initial state.
        *

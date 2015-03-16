@@ -19,7 +19,7 @@ namespace stan {
         vari(f),
         size_(vs.size()) {
 
-        vis_ = (vari**) operator new(sizeof(vari*) * vs.size()); 
+        vis_ = (vari**) operator new(sizeof(vari*) * vs.size());
         for (int i = 0; i < vs.size(); ++i)
           vis_[i] = vs(i).vi_;
       }

@@ -7,7 +7,7 @@
 
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -40,10 +40,10 @@ namespace stan {
 
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> R = D * Sigma * D;
       // to hopefully prevent pivoting due to floating point error
-      R.diagonal().setOnes(); 
+      R.diagonal().setOnes();
       Eigen::LDLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > ldlt;
       ldlt = R.ldlt();
-      if (!ldlt.isPositive()) 
+      if (!ldlt.isPositive())
         return false;
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> U = ldlt.matrixU();
       factor_U(U, CPCs);

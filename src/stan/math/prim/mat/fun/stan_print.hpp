@@ -12,7 +12,7 @@ namespace stan {
     void stan_print(std::ostream* o, const T& x) {
       *o << x;
     }
-    
+
     template <typename T>
     void stan_print(std::ostream* o, const std::vector<T>& x) {
       *o << '[';
@@ -44,7 +44,7 @@ namespace stan {
     }
 
     template <typename T>
-    void stan_print(std::ostream* o, 
+    void stan_print(std::ostream* o,
                     const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x) {
       *o << '[';
       for (int i = 0; i < x.rows(); ++i) {

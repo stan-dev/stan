@@ -6,10 +6,10 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Structure for building up arrays in an expression (rather than
-     * in statements) using an argumentchaining add() method and 
+     * in statements) using an argumentchaining add() method and
      * a getter method array() to return the result.
      */
     template <typename T>

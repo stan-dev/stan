@@ -12,13 +12,13 @@ namespace stan {
 
     /**
      * Base template class for a coupled ordinary differential equation
-     * system, which adds sensitivities to the base system. 
+     * system, which adds sensitivities to the base system.
      *
      * This template class declaration should not be instantiated
      * directly --- it is just here to serve as a base for its
      * specializations, some of which are defined in namespace
      * <code>stan::aggrad</code>.
-     * 
+     *
      * @tparam F the functor for the base ode system
      * @tparam T1 type of the initial state
      * @tparam T2 type of the parameters
@@ -30,7 +30,7 @@ namespace stan {
 
     /**
      * The coupled ode system for known initial values and known
-     * parameters. 
+     * parameters.
      *
      * <p>This coupled system does not add anything to the base
      * system used to construct it, but is here for generality of the
@@ -50,11 +50,11 @@ namespace stan {
       const int M_;
       const int size_;
       std::ostream* msgs_;
-      
+
       /**
        * Construct the coupled ODE system from the base system
        * function, initial state, parameters, data and a stream for
-       * messages. 
+       * messages.
        *
        * @param[in] f base ode system functor.
        * @param[in] y0 initial state of the base ode.
@@ -69,11 +69,11 @@ namespace stan {
                          const std::vector<double>& x,
                          const std::vector<int>& x_int,
                          std::ostream* msgs)
-        : f_(f),  
+        : f_(f),
           y0_dbl_(y0),
           theta_dbl_(theta),
-          x_(x), 
-          x_int_(x_int), 
+          x_(x),
+          x_int_(x_int),
           N_(y0.size()),
           M_(theta.size()),
           size_(N_),
@@ -85,14 +85,14 @@ namespace stan {
        * respect to the specified state at the specified time using
        * the system state function.
        *
-       * The derivative vector created is the same length as the 
+       * The derivative vector created is the same length as the
        * length as the state vector.
        *
        * @param[in] y current state of the coupled ode.
        * @param[out] dy_dt populated with derivatives of the coupled
        * system evaluated at specified state and time.
        * @param[in] t time.
-       * @throw exception if the system function does not return 
+       * @throw exception if the system function does not return
        * a derivative vector of the same size as the state vector.
        */
       void operator()(const std::vector<double>& y,
@@ -112,7 +112,7 @@ namespace stan {
       int size() const {
         return size_;
       }
-      
+
       /**
        * Returns the initial state of the coupled system, which is
        * identical to the base ODE original state in this
@@ -137,12 +137,12 @@ namespace stan {
        *
        * <p>In this class's implementation, the coupled system is
        * equivalent to the base system, so this function just returns
-       * its input. 
+       * its input.
        *
-       * @param y the vector of the coupled states after solving the ode 
+       * @param y the vector of the coupled states after solving the ode
        * @return the decoupled states
        */
-      std::vector<std::vector<double> > 
+      std::vector<std::vector<double> >
       decouple_states(const std::vector<std::vector<double> >& y) {
         return y;
       }

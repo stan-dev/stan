@@ -3,7 +3,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/type_traits/is_floating_point.hpp> 
+#include <boost/type_traits/is_floating_point.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -72,7 +72,7 @@ namespace stan {
        * to enable SFINAE to restrict the first argument to integral
        * types.
        *
-       * @tparam T Type of floating point input. 
+       * @tparam T Type of floating point input.
        * @param x Input.
        * @paramu dummy Dummy pararameter to allow SFINAE.
        */
@@ -95,13 +95,13 @@ namespace stan {
       }
 
       /**
-       * Write the sepcified integer value to the output.  
+       * Write the sepcified integer value to the output.
        *
        * <p>The second argument should not be specified; it is only
        * there to enable SFINAE to restrict the first argument to
        * integral types.
        *
-       * @tparam T Type of integral input. 
+       * @tparam T Type of integral input.
        * @param x Input.
        * @paramu dummy Dummy pararameter to allow SFINAE.
        */
@@ -111,7 +111,7 @@ namespace stan {
       }
 
       /**
-       * Write the specified character as an integer.  
+       * Write the specified character as an integer.
        *
        * @param c character to write
        */
@@ -120,7 +120,7 @@ namespace stan {
       }
 
       /**
-       * Write the specified unsigned character as an integer.  
+       * Write the specified unsigned character as an integer.
        *
        * @param c character to write
        */
@@ -285,7 +285,7 @@ namespace stan {
         out_ << "))";
       }
 
-    public: 
+    public:
 
       /**
        * Construct a dump writer writing to standard output.

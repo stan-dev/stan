@@ -37,12 +37,12 @@ namespace stan {
      * @tparam T_y Underlying type of scalar in sequence.
      * @tparam T_loc Type of location parameter.
      */
-    template <bool propto, 
+    template <bool propto,
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function("stan::prob::normal_log");
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
 
       using std::log;
@@ -55,8 +55,8 @@ namespace stan {
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(sigma)))
         return 0.0;
 
@@ -74,9 +74,9 @@ namespace stan {
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_loc,T_scale>::value)
         return 0.0;
-      
+
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -85,7 +85,7 @@ namespace stan {
       size_t N = max_size(y, mu, sigma);
 
       VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
-      VectorBuilder<include_summand<propto,T_scale>::value, 
+      VectorBuilder<include_summand<propto,T_scale>::value,
                     T_partials_return, T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
@@ -97,11 +97,11 @@ namespace stan {
         // pull out values of arguments
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
-      
+
         // reusable subexpression values
-        const T_partials_return y_minus_mu_over_sigma 
+        const T_partials_return y_minus_mu_over_sigma
           = (y_dbl - mu_dbl) * inv_sigma[n];
-        const T_partials_return y_minus_mu_over_sigma_squared 
+        const T_partials_return y_minus_mu_over_sigma_squared
           = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
 
         static double NEGATIVE_HALF = - 0.5;
@@ -121,11 +121,11 @@ namespace stan {
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] += scaled_diff;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
+          operands_and_partials.d_x3[n]
             += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
       }
 
-      
+
       return operands_and_partials.to_var(logp,y,mu,sigma);
 
     }

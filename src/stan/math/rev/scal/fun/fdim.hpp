@@ -68,14 +68,14 @@ namespace stan {
      * \f$\frac{\partial}{\partial x} \mbox{fdim}(x,y) = 1.0\f$ if \f$x \geq y\f$.
      *
      * With respect to the second argument, the partial is
-     * 
+     *
      * \f$\frac{\partial}{\partial y} \mbox{fdim}(x,y) = 0.0\f$ if \f$x < y\f$, and
      *
      * \f$\frac{\partial}{\partial y} \mbox{fdim}(x,y) = -\lfloor\frac{x}{y}\rfloor\f$ if \f$x \geq y\f$.
-     * 
+     *
      *
        \f[
-       \mbox{fdim}(x,y) = 
+       \mbox{fdim}(x,y) =
        \begin{cases}
          0 & \mbox{if } x < y\\
          x-y & \mbox{if } x \geq y \\[6pt]
@@ -84,7 +84,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{fdim}(x,y)}{\partial x} = 
+       \frac{\partial\,\mbox{fdim}(x,y)}{\partial x} =
        \begin{cases}
          0 & \mbox{if } x < y \\
          1 & \mbox{if } x \geq y \\[6pt]
@@ -93,13 +93,13 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{fdim}(x,y)}{\partial y} = 
+       \frac{\partial\,\mbox{fdim}(x,y)}{\partial y} =
        \begin{cases}
          0 & \mbox{if } x < y \\
          -\lfloor\frac{x}{y}\rfloor & \mbox{if } x \geq y \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
-       \f]     
+       \f]
      *
      * @param a First variable.
      * @param b Second variable.
@@ -125,7 +125,7 @@ namespace stan {
      * \f$\frac{d}{d y} \mbox{fdim}(c,y) = 0.0\f$ if \f$c < y\f$, and
      *
      * \f$\frac{d}{d y} \mbox{fdim}(c,y) = -\lfloor\frac{c}{y}\rfloor\f$ if \f$c \geq y\f$.
-     * 
+     *
      * @param a First value.
      * @param b Second variable.
      * @return The positive difference between the first and second

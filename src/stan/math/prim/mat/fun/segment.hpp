@@ -24,7 +24,7 @@ namespace stan {
       if (n != 0) {
         stan::math::check_greater("segment", "n", i+n-1, 0.0);
         stan::math::check_less_or_equal("segment", "n", i+n-1, static_cast<size_t>(v.rows()));
-      } 
+      }
       return v.segment(i-1,n);
     }
 
@@ -38,14 +38,14 @@ namespace stan {
       if (n != 0) {
         stan::math::check_greater("segment", "n", i+n-1, 0.0);
         stan::math::check_less_or_equal("segment", "n", i+n-1, static_cast<size_t>(v.cols()));
-      } 
-      
+      }
+
       return v.segment(i-1,n);
     }
 
 
     template <typename T>
-    std::vector<T> 
+    std::vector<T>
     segment(const std::vector<T>& sv,
             size_t i, size_t n) {
       stan::math::check_greater("segment", "i", i, 0.0);

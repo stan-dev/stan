@@ -10,7 +10,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the distance between the specified vectors.
      *

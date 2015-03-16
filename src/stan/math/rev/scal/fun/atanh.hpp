@@ -24,13 +24,13 @@ namespace stan {
      * The inverse hyperbolic tangent function for variables (C99).
      *
      * For non-variable function, see boost::math::atanh().
-     * 
+     *
      * The derivative is defined by
      *
      * \f$\frac{d}{dx} \mbox{atanh}(x) = \frac{1}{1 - x^2}\f$.
      *
        \f[
-       \mbox{atanh}(x) = 
+       \mbox{atanh}(x) =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < -1\\
          \tanh^{-1}(x) & \mbox{if } -1\leq x \leq 1 \\
@@ -38,9 +38,9 @@ namespace stan {
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{atanh}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{atanh}(x)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < -1\\
          \frac{\partial\, \tanh^{-1}(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
@@ -48,12 +48,12 @@ namespace stan {
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-   
-   
+
+
        \f[
        \tanh^{-1}(x)=\frac{1}{2}\ln\left(\frac{1+x}{1-x}\right)
        \f]
-       
+
        \f[
        \frac{\partial \, \tanh^{-1}(x)}{\partial x} = \frac{1}{1-x^2}
        \f]

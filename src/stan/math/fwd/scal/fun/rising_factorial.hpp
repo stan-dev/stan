@@ -30,7 +30,7 @@ namespace stan {
       using boost::math::digamma;
 
       T rising_fact(rising_factorial(x.val_,n));
-      return fvar<T>(rising_fact, 
+      return fvar<T>(rising_fact,
                      rising_fact * x.d_ * (digamma(x.val_ + n) - digamma(x.val_)));
     }
 
@@ -42,7 +42,7 @@ namespace stan {
       using boost::math::digamma;
 
       T rising_fact(rising_factorial(x,n.val_));
-      return fvar<T>(rising_fact, 
+      return fvar<T>(rising_fact,
                      rising_fact * (digamma(x + n.val_) * n.d_));
     }
   }

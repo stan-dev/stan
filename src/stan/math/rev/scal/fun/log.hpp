@@ -27,16 +27,16 @@ namespace stan {
      * \f$\frac{d}{dx} \log x = \frac{1}{x}\f$.
      *
        \f[
-       \mbox{log}(x) = 
+       \mbox{log}(x) =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < 0\\
          \ln(x) & \mbox{if } x \geq 0 \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{log}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{log}(x)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < 0\\
          \frac{1}{x} & \mbox{if } x\geq 0 \\[6pt]
@@ -50,7 +50,7 @@ namespace stan {
     inline var log(const var& a) {
       return var(new log_vari(a.vi_));
     }
-    
+
   }
 }
 #endif

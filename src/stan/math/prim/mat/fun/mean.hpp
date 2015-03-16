@@ -8,7 +8,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the sample mean (i.e., average) of the coefficients
      * in the specified standard vector.
@@ -18,7 +18,7 @@ namespace stan {
      * than 1.
      */
     template <typename T>
-    inline 
+    inline
     typename boost::math::tools::promote_args<T>::type
     mean(const std::vector<T>& v) {
       stan::math::check_nonzero_size("mean", "v", v);
@@ -35,13 +35,13 @@ namespace stan {
      * @return Sample mean of vector coefficients.
      */
     template <typename T, int R, int C>
-    inline  
+    inline
     typename boost::math::tools::promote_args<T>::type
     mean(const Eigen::Matrix<T,R,C>& m) {
       stan::math::check_nonzero_size("mean", "m", m);
       return m.mean();
-    }    
-    
+    }
+
   }
 }
 #endif

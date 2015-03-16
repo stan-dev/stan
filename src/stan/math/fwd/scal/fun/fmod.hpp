@@ -16,7 +16,7 @@ namespace stan {
     fmod(const fvar<T>& x1, const fvar<T>& x2) {
       using std::fmod;
       using std::floor;
-      return fvar<T>(fmod(x1.val_, x2.val_), 
+      return fvar<T>(fmod(x1.val_, x2.val_),
                      x1.d_ - x2.d_ * floor(x1.val_ / x2.val_));
     }
 

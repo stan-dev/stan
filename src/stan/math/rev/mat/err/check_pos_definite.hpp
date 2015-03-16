@@ -19,12 +19,12 @@ namespace stan {
       using stan::math::index_type;
       typedef index_type<Matrix<double,Dynamic,Dynamic> >::type size_type;
       Matrix<double,Dynamic,Dynamic> y_d(y.rows(),y.cols());
-      for (size_type i = 0; i < y_d.rows(); i++) 
+      for (size_type i = 0; i < y_d.rows(); i++)
         for (size_type j = 0; j < y_d.cols(); j++)
           y_d(i,j) = y(i,j).val();
       return stan::math::check_pos_definite(function, name, y_d);
     }
-    
+
   }
 
 }

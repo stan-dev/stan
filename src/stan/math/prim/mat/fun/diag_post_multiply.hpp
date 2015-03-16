@@ -20,7 +20,7 @@ namespace stan {
       int m1_rows = m1.rows();
       Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R1, C1>
         result(m1_rows, m1_cols);
-      
+
       for (int j = 0; j < m1_cols; ++j)
         for (int i = 0; i < m1_rows; ++i)
           result(i,j) = m2(j) * m1(i,j);

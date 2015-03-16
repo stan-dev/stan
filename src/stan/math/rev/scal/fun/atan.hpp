@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class atan_vari : public op_v_vari {
       public:
@@ -30,27 +30,27 @@ namespace stan {
      *
      *
        \f[
-       \mbox{atan}(x) = 
+       \mbox{atan}(x) =
        \begin{cases}
          \arctan(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{atan}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{atan}(x)}{\partial x} =
        \begin{cases}
          \frac{\partial\, \arctan(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
        \frac{\partial \, \arctan(x)}{\partial x} = \frac{1}{x^2+1}
        \f]
      *
      * @param a Variable in range [-1,1].
-     * @return Arc tangent of variable, in radians. 
+     * @return Arc tangent of variable, in radians.
      */
     inline var atan(const var& a) {
       return var(new atan_vari(a.vi_));

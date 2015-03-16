@@ -29,7 +29,7 @@ namespace stan {
         result[i] = x[i] + result[i-1];
       return result;
     }
-    
+
     /**
      * Return the cumulative sum of the specified matrix.
      *
@@ -41,11 +41,11 @@ namespace stan {
      * @tparam T Scalar type of matrix.
      * @tparam R Row type of matrix.
      * @tparam C Column type of matrix.
-     * @param m Matrix of values. 
+     * @param m Matrix of values.
      * @return Cumulative sum of values.
      */
     template <typename T, int R, int C>
-    inline Eigen::Matrix<T,R,C> 
+    inline Eigen::Matrix<T,R,C>
     cumulative_sum(const Eigen::Matrix<T,R,C>& m) {
       Eigen::Matrix<T,R,C> result(m.rows(),m.cols());
       if (m.size() == 0)

@@ -7,10 +7,10 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Return the elementwise multiplication of the specified
-     * matrices.  
+     * matrices.
      *
      * @tparam T1 Type of scalars in first matrix.
      * @tparam T2 Type of scalars in second matrix.
@@ -33,7 +33,7 @@ namespace stan {
         result(i) = m1(i) * m2(i);
       return result;
     }
-    
+
   }
 }
 #endif

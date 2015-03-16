@@ -5,7 +5,7 @@
 #include <stan/math/prim/scal/fun/logit.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -17,7 +17,7 @@ namespace stan {
      * function,
      *
      * <p>\f$f^{-1}(y) = \mbox{logit}(y) = \frac{1 - y}{y}\f$.
-     * 
+     *
      * @param y Scalar input.
      * @tparam T Type of scalar.
      * @throw std::domain_error if y is less than 0 or greater than 1.
@@ -31,7 +31,7 @@ namespace stan {
          y, 0, 1);
       return logit(y);
     }
-    
+
   }
 
 }

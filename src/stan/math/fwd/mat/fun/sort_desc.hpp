@@ -16,18 +16,18 @@ namespace stan {
     inline
     std::vector< fvar<T> >
     sort_desc(std::vector< fvar<T> > xs) {
-      std::sort(xs.begin(), xs.end(), std::greater< fvar<T> >());      
-      return xs;      
+      std::sort(xs.begin(), xs.end(), std::greater< fvar<T> >());
+      return xs;
     }
-    
+
     template <typename T, int R, int C>
     inline
     typename Eigen::Matrix<fvar<T>,R,C>
     sort_desc(Eigen::Matrix<fvar<T>,R,C> xs) {
-      std::sort(xs.data(), xs.data()+xs.size(), std::greater< fvar<T> >());      
-      return xs;      
+      std::sort(xs.data(), xs.data()+xs.size(), std::greater< fvar<T> >());
+      return xs;
     }
-        
+
   }
 }
 #endif

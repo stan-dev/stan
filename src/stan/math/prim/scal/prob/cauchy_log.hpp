@@ -43,7 +43,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function("stan::prob::cauchy_log");
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
 
       using stan::is_constant_struct;
@@ -54,11 +54,11 @@ namespace stan {
       using stan::math::value_of;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(sigma)))
         return 0.0;
-      
+
       // set up return value accumulator
       T_partials_return logp(0.0);
 
@@ -77,7 +77,7 @@ namespace stan {
 
       using stan::math::log1p;
       using stan::math::square;
-      
+
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
@@ -98,22 +98,22 @@ namespace stan {
         }
       }
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
-  
+
         // reusable subexpression values
         const T_partials_return y_minus_mu
           = y_dbl - mu_dbl;
         const T_partials_return y_minus_mu_squared
           = y_minus_mu * y_minus_mu;
-        const T_partials_return y_minus_mu_over_sigma 
+        const T_partials_return y_minus_mu_over_sigma
           = y_minus_mu * inv_sigma[n];
-        const T_partials_return y_minus_mu_over_sigma_squared 
+        const T_partials_return y_minus_mu_over_sigma_squared
           = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
 
         // log probability
@@ -123,17 +123,17 @@ namespace stan {
           logp -= log_sigma[n];
         if (include_summand<propto,T_y,T_loc,T_scale>::value)
           logp -= log1p(y_minus_mu_over_sigma_squared);
-  
+
         // gradients
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= 2 * y_minus_mu
             / (sigma_squared[n] + y_minus_mu_squared);
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] += 2 * y_minus_mu 
+          operands_and_partials.d_x2[n] += 2 * y_minus_mu
             / (sigma_squared[n] + y_minus_mu_squared);
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
-            += (y_minus_mu_squared - sigma_squared[n]) 
+          operands_and_partials.d_x3[n]
+            += (y_minus_mu_squared - sigma_squared[n])
             * inv_sigma[n] / (sigma_squared[n] + y_minus_mu_squared);
       }
       return operands_and_partials.to_var(logp,y,mu,sigma);

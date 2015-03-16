@@ -22,13 +22,13 @@ namespace stan {
 
       fvar() : val_(0.0), d_(0.0) { }
 
-      fvar(const fvar<T>& x) 
-        : val_(x.val_), d_(x.d_) { 
+      fvar(const fvar<T>& x)
+        : val_(x.val_), d_(x.d_) {
       }
 
       // TV and TD must be assignable to T
       template <typename TV, typename TD>
-      fvar(const TV& val, const TD& deriv) : val_(val), d_(deriv) { 
+      fvar(const TV& val, const TD& deriv) : val_(val), d_(deriv) {
         if (unlikely(boost::math::isnan(val)))
           d_ = val;
       }
@@ -39,7 +39,7 @@ namespace stan {
         if (unlikely(boost::math::isnan(val)))
           d_ = val;
       }
-      
+
 
       template <typename T2>
       inline
@@ -141,7 +141,7 @@ namespace stan {
       }
 
       friend
-      std::ostream& 
+      std::ostream&
       operator<<(std::ostream& os, const fvar<T>& v) {
         return os << v.val_;
       }

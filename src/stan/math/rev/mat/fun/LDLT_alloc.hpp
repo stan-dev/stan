@@ -23,9 +23,9 @@ namespace stan {
       LDLT_alloc(const Eigen::Matrix<var,R,C> &A) : N_(0) {
         compute(A);
       }
-      
+
       /**
-       * Compute the LDLT factorization and store pointers to the 
+       * Compute the LDLT factorization and store pointers to the
        * vari's of the matrix entries to be used when chain() is
        * called elsewhere.
        **/
@@ -41,7 +41,7 @@ namespace stan {
             _variA(i,j) = A(i,j).vi_;
           }
         }
-          
+
         _ldlt.compute(Ad);
       }
 
@@ -49,7 +49,7 @@ namespace stan {
       inline double log_abs_det() const {
         return _ldlt.vectorD().array().log().sum();
       }
-        
+
       size_t N_;
       Eigen::LDLT<Eigen::Matrix<double,R,C> > _ldlt;
       Eigen::Matrix<vari*,R,C> _variA;

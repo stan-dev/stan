@@ -14,8 +14,8 @@
 
 namespace stan {
   namespace agrad {
-    
-    inline matrix_v 
+
+    inline matrix_v
     multiply_lower_tri_self_transpose(const matrix_v& L) {
       //stan::math::check_square("multiply_lower_tri_self_transpose",
       //L,"L",(double*)0);

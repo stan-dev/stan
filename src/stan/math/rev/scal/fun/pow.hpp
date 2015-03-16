@@ -72,23 +72,23 @@ namespace stan {
      *
      *
        \f[
-       \mbox{pow}(x,y) = 
+       \mbox{pow}(x,y) =
        \begin{cases}
          x^y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{pow}(x,y)}{\partial x} = 
+       \frac{\partial\,\mbox{pow}(x,y)}{\partial x} =
        \begin{cases}
          yx^{y-1} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{pow}(x,y)}{\partial y} = 
+       \frac{\partial\,\mbox{pow}(x,y)}{\partial y} =
        \begin{cases}
          x^y\ln x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
@@ -102,7 +102,7 @@ namespace stan {
     inline var pow(const var& base, const var& exponent) {
       return var(new pow_vv_vari(base.vi_,exponent.vi_));
     }
-  
+
     /**
      * Return the base variable raised to the power of the exponent
      * scalar (cmath).
@@ -130,9 +130,9 @@ namespace stan {
      * variable (cmath).
      *
      * The derivative for the variable is
-     * 
+     *
      * \f$\frac{d}{d y} \mbox{pow}(c,y) = c^y \log c \f$.
-     * 
+     *
      * @param base Base scalar.
      * @param exponent Exponent variable.
      * @return Base raised to the exponent.

@@ -6,7 +6,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the log absolute determinant of the specified square matrix.
      *
@@ -19,7 +19,7 @@ namespace stan {
       stan::math::check_square("log_determinant", "m", m);
       return m.colPivHouseholderQr().logAbsDeterminant();
     }
-    
+
   }
 }
 #endif

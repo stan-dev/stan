@@ -18,7 +18,7 @@ namespace stan {
                     const Eigen::Matrix<double,RB,CB> &B)
     {
       stan::math::check_square("trace_quad_form", "A", A);
-      stan::math::check_multiplicable("trace_quad_form", 
+      stan::math::check_multiplicable("trace_quad_form",
                                                 "A", A,
                                                 "B", B);
 

@@ -37,8 +37,8 @@ namespace stan {
 
       T_partials_return cdf_log(0.0);
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(beta)))
         return cdf_log;
 
@@ -46,12 +46,12 @@ namespace stan {
       check_finite(function, "Location parameter", mu);
       check_not_nan(function, "Scale parameter", beta);
       check_positive(function, "Scale parameter", beta);
-      check_consistent_sizes(function, 
+      check_consistent_sizes(function,
                              "Random variable", y,
                              "Location parameter", mu,
                              "Scale parameter", beta);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, beta);
 
       VectorView<const T_y> y_vec(y);

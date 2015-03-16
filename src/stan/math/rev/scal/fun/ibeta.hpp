@@ -8,7 +8,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       /**
        * Calculates the generalized hypergeometric 3F2(a, a, b; a+1, a+1; z).
@@ -48,12 +48,12 @@ namespace stan {
           using boost::math::ibeta;
           using stan::agrad::ibeta_hypergeometric_helper;
           avi_->adj_ += adj_ *
-            (log(c) - digamma(a) + digamma(a+b)) * val_ - 
+            (log(c) - digamma(a) + digamma(a+b)) * val_ -
             tgamma(a)*tgamma(a+b)/tgamma(b) * pow(c,a) / tgamma(1+a) / tgamma(1+a) * ibeta_hypergeometric_helper(a, 1-b, c);
-          bvi_->adj_ += adj_ * 
+          bvi_->adj_ += adj_ *
             (tgamma(b)*tgamma(a+b)/tgamma(a)*pow(1-c,b) * ibeta_hypergeometric_helper(b,1-a,1-c)/tgamma(b+1)/tgamma(b+1)
              + ibeta(b, a, 1-c) * (digamma(b) - digamma(a+b) - log(1-c)));
-          cvi_->adj_ += adj_ * 
+          cvi_->adj_ += adj_ *
             boost::math::ibeta_derivative(a,b,c);
         }
       };
@@ -76,9 +76,9 @@ namespace stan {
           using boost::math::ibeta;
           using stan::agrad::ibeta_hypergeometric_helper;
           avi_->adj_ += adj_ *
-            (log(c) - digamma(a) + digamma(a+b)) * val_ - 
+            (log(c) - digamma(a) + digamma(a+b)) * val_ -
             tgamma(a)*tgamma(a+b)/tgamma(b) * pow(c,a) / tgamma(1+a) / tgamma(1+a) * ibeta_hypergeometric_helper(a, 1-b, c);
-          bvi_->adj_ += adj_ * 
+          bvi_->adj_ += adj_ *
             (tgamma(b)*tgamma(a+b)/tgamma(a)*pow(1-c,b) * ibeta_hypergeometric_helper(b,1-a,1-c)/tgamma(b+1)/tgamma(b+1)
              + ibeta(b, a, 1-c) * (digamma(b) - digamma(a+b) - log(1-c)));
         }
@@ -102,9 +102,9 @@ namespace stan {
           using boost::math::ibeta;
           using stan::agrad::ibeta_hypergeometric_helper;
           avi_->adj_ += adj_ *
-            (log(c) - digamma(a) + digamma(a+b)) * val_ - 
+            (log(c) - digamma(a) + digamma(a+b)) * val_ -
             tgamma(a)*tgamma(a+b)/tgamma(b) * pow(c,a) / tgamma(1+a) / tgamma(1+a) * ibeta_hypergeometric_helper(a, 1-b, c);
-          cvi_->adj_ += adj_ * 
+          cvi_->adj_ += adj_ *
             boost::math::ibeta_derivative(a,b,c);
         }
       };
@@ -127,7 +127,7 @@ namespace stan {
           using boost::math::ibeta;
           using stan::agrad::ibeta_hypergeometric_helper;
           avi_->adj_ += adj_ *
-            (log(c) - digamma(a) + digamma(a+b)) * val_ - 
+            (log(c) - digamma(a) + digamma(a+b)) * val_ -
             tgamma(a)*tgamma(a+b)/tgamma(b) * pow(c,a) / tgamma(1+a) / tgamma(1+a) * ibeta_hypergeometric_helper(a, 1-b, c);
         }
       };
@@ -149,10 +149,10 @@ namespace stan {
           using boost::math::digamma;
           using boost::math::ibeta;
           using stan::agrad::ibeta_hypergeometric_helper;
-          bvi_->adj_ += adj_ * 
+          bvi_->adj_ += adj_ *
             (tgamma(b)*tgamma(a+b)/tgamma(a)*pow(1-c,b) * ibeta_hypergeometric_helper(b,1-a,1-c)/tgamma(b+1)/tgamma(b+1)
              + ibeta(b, a, 1-c) * (digamma(b) - digamma(a+b) - log(1-c)));
-          cvi_->adj_ += adj_ * 
+          cvi_->adj_ += adj_ *
             boost::math::ibeta_derivative(a,b,c);
         }
       };
@@ -174,7 +174,7 @@ namespace stan {
           using boost::math::digamma;
           using boost::math::ibeta;
           using stan::agrad::ibeta_hypergeometric_helper;
-          bvi_->adj_ += adj_ * 
+          bvi_->adj_ += adj_ *
             (tgamma(b)*tgamma(a+b)/tgamma(a)*pow(1-c,b) * ibeta_hypergeometric_helper(b,1-a,1-c)/tgamma(b+1)/tgamma(b+1)
              + ibeta(b, a, 1-c) * (digamma(b) - digamma(a+b) - log(1-c)));
         }
@@ -189,13 +189,13 @@ namespace stan {
           double b = bd_;
           double c = cvi_->val_;
 
-          cvi_->adj_ += adj_ * 
+          cvi_->adj_ += adj_ *
             boost::math::ibeta_derivative(a,b,c);
         }
       };
     }
 
-    /** 
+    /**
      * The normalized incomplete beta function of a, b, and x.
      *
      * Used to compute the cumulative density function for the beta
@@ -205,11 +205,11 @@ namespace stan {
      * The values were checked using both finite differences and
      * by independent code for calculating the derivatives found
      * in JSS (paper by Boik and Robison-Cox).
-     * 
+     *
      * @param a Shape parameter.
      * @param b Shape parameter.
      * @param x Random variate.
-     * 
+     *
      * @return The normalized incomplete beta function.
      * @throws if any argument is NaN.
      */

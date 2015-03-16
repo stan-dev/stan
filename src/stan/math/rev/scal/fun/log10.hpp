@@ -28,19 +28,19 @@ namespace stan {
      * The derivative is defined by
      *
      * \f$\frac{d}{dx} \log_{10} x = \frac{1}{x \log 10}\f$.
-     * 
+     *
      *
        \f[
-       \mbox{log10}(x) = 
+       \mbox{log10}(x) =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < 0\\
          \log_{10}(x) & \mbox{if } x \geq 0 \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{log10}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{log10}(x)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < 0\\
          \frac{1}{x \ln10} & \mbox{if } x\geq 0 \\[6pt]

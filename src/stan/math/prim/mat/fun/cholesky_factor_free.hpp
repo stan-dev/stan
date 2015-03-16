@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**

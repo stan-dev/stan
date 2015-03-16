@@ -22,12 +22,12 @@ namespace stan {
 
   namespace prob {
 
-    template <bool propto, 
+    template <bool propto,
               typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
     rayleigh_log(const T_y& y, const T_scale& sigma) {
       static const char* function("stan::prob::rayleigh_log");
-      typedef typename stan::partials_return_type<T_y,T_scale>::type 
+      typedef typename stan::partials_return_type<T_y,T_scale>::type
         T_partials_return;
 
       using std::log;
@@ -56,7 +56,7 @@ namespace stan {
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_scale>::value)
         return 0.0;
-      
+
       // set up template expressions wrapping scalars into vector views
       agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
 
@@ -76,7 +76,7 @@ namespace stan {
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
         const T_partials_return y_dbl = value_of(y_vec[n]);
-      
+
         // reusable subexpression values
         const T_partials_return y_over_sigma = y_dbl * inv_sigma[n];
 
@@ -84,7 +84,7 @@ namespace stan {
 
         // log probability
         if (include_summand<propto,T_scale>::value)
-          logp -= 2.0 * log_sigma[n];        
+          logp -= 2.0 * log_sigma[n];
         if (include_summand<propto,T_y>::value)
           logp += log(y_dbl);
         // if (include_summand<propto,T_y,T_scale>::value)
@@ -95,7 +95,7 @@ namespace stan {
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += 1.0 / y_dbl - scaled_diff;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x2[n] 
+          operands_and_partials.d_x2[n]
             += y_over_sigma * scaled_diff - 2.0 * inv_sigma[n];
       }
       return operands_and_partials.to_var(logp,y,sigma);

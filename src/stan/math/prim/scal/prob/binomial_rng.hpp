@@ -36,7 +36,7 @@ namespace stan {
       using boost::binomial_distribution;
 
       static const char* function("stan::prob::binomial_rng");
-      
+
       using stan::math::check_finite;
       using stan::math::check_less_or_equal;
       using stan::math::check_greater_or_equal;
@@ -51,7 +51,7 @@ namespace stan {
         binomial_rng(rng, binomial_distribution<>(N, theta));
       return binomial_rng();
     }
-    
+
   }
 }
 #endif

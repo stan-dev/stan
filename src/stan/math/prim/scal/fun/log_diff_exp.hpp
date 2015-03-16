@@ -17,25 +17,25 @@ namespace stan {
      *
      *
        \f[
-       \mbox{log\_diff\_exp}(x,y) = 
+       \mbox{log\_diff\_exp}(x,y) =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x \leq y\\
          \ln(\exp(x)-\exp(y)) & \mbox{if } x > y \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial x} = 
+       \frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x \leq y\\
          \frac{\exp(x)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial y} = 
+       \frac{\partial\,\mbox{log\_diff\_exp}(x,y)}{\partial y} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x \leq y\\
          -\frac{\exp(y)}{\exp(x)-\exp(y)} & \mbox{if } x > y \\[6pt]

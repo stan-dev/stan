@@ -25,23 +25,23 @@ namespace stan {
      *
      *
        \f[
-       \mbox{lbeta}(\alpha,\beta) = 
+       \mbox{lbeta}(\alpha,\beta) =
        \begin{cases}
          \ln\int_0^1 u^{\alpha - 1} (1 - u)^{\beta - 1} \, du & \mbox{if } \alpha,\beta>0 \\[6pt]
          \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
-       \frac{\partial\,\mbox{lbeta}(\alpha,\beta)}{\partial \alpha} = 
+       \frac{\partial\,\mbox{lbeta}(\alpha,\beta)}{\partial \alpha} =
        \begin{cases}
          \Psi(\alpha)-\Psi(\alpha+\beta) & \mbox{if } \alpha,\beta>0 \\[6pt]
          \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
-       \frac{\partial\,\mbox{lbeta}(\alpha,\beta)}{\partial \beta} = 
+       \frac{\partial\,\mbox{lbeta}(\alpha,\beta)}{\partial \beta} =
        \begin{cases}
          \Psi(\beta)-\Psi(\alpha+\beta) & \mbox{if } \alpha,\beta>0 \\[6pt]
          \textrm{NaN} & \mbox{if } \alpha = \textrm{NaN or } \beta = \textrm{NaN}

@@ -15,7 +15,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     /**
      * Return the product of two scalars.
      * @param[in] v First scalar.
@@ -38,7 +38,7 @@ namespace stan {
      * @return Product of scalar and matrix.
      */
     template<typename T1,typename T2,int R2,int C2>
-    inline Eigen::Matrix<var,R2,C2> multiply(const T1& c, 
+    inline Eigen::Matrix<var,R2,C2> multiply(const T1& c,
                                              const Eigen::Matrix<T2, R2, C2>& m) {
       // FIXME:  pull out to eliminate overpromotion of one side
       // move to matrix.hpp w. promotion?
@@ -52,11 +52,11 @@ namespace stan {
      * @return Product of scalar and matrix.
      */
     template<typename T1,int R1,int C1,typename T2>
-    inline Eigen::Matrix<var,R1,C1> multiply(const Eigen::Matrix<T1, R1, C1>& m, 
+    inline Eigen::Matrix<var,R1,C1> multiply(const Eigen::Matrix<T1, R1, C1>& m,
                                              const T2& c) {
       return to_var(m) * to_var(c);
     }
-    
+
     /**
      * Return the product of the specified matrices.  The number of
      * columns in the first matrix must be the same as the number of rows
@@ -91,7 +91,7 @@ namespace stan {
               result(i,j) = var(new dot_product_vari<T1,T2>(crow,ccol,NULL,v2));
             }
           }
-          else { 
+          else {
             if (i == 0) {
               dot_product_vari<T1,T2> *v1 = static_cast<dot_product_vari<T1,T2>*>(result(i,0).vi_);
               result(i,j) = var(new dot_product_vari<T1,T2>(crow,ccol,v1,NULL));
@@ -120,7 +120,7 @@ namespace stan {
     inline typename
     boost::enable_if_c< boost::is_same<T1,var>::value ||
                         boost::is_same<T2,var>::value, var >::type
-    multiply(const Eigen::Matrix<T1, 1, C1>& rv, 
+    multiply(const Eigen::Matrix<T1, 1, C1>& rv,
              const Eigen::Matrix<T2, R2, 1>& v) {
       if (rv.size() != v.size())
         throw std::domain_error("row vector and vector must be same length in multiply");
