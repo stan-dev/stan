@@ -57,10 +57,12 @@ namespace stan {
        * the sample, and evaluating the log joint, adjusted by the entropy
        * term of the normal, which is proportional to 0.5*logdet(L^T L)
        *
-       * @param   muL   mean and cholesky factor of affine transform
-       * @return        evidence lower bound (elbo)
+       * @param   muL              mean and cholesky factor of affine transform
+       * @param   constant_factor  difference between log_prob agrad and double
+       * @return                   evidence lower bound (elbo)
        */
-      double calc_ELBO(vb_params_fullrank const& muL) {
+      double calc_ELBO(vb_params_fullrank const& muL,
+                       double constant_factor) {
         // static const char* function = "stan::vb::bbvb.calc_ELBO(%1%)";
         // double error_tmp(0.0);
         double elbo(0.0);
@@ -68,7 +70,6 @@ namespace stan {
 
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
-        Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tilde_var(dim);
 
         for (int i = 0; i < n_monte_carlo_elbo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
@@ -77,13 +78,8 @@ namespace stan {
           }
           z_tilde = muL.to_unconstrained(z_check);
 
-          // We need to call the stan::agrad::var version of log_prob
-          // to get the correct proportionality and Jacobian terms
-          for (int var_index = 0; var_index < dim; ++var_index) {
-            z_tilde_var(var_index) = stan::agrad::var(z_tilde(var_index));
-          }
-          elbo += (model_.template
-                   log_prob<true,true>(z_tilde_var, &std::cout)).val();
+          elbo += (model_.template log_prob<false,true>(z_tilde, &std::cout))
+                   + constant_factor;
         }
         elbo /= static_cast<double>(n_monte_carlo_elbo_);
 
@@ -108,16 +104,17 @@ namespace stan {
        * the sample, and evaluating the log joint, adjusted by the entropy
        * term of the normal, which is proportional to 0.5*logdet(L^T L)
        *
-       * @param   musigmatilde   mean and log-std vector of affine transform
-       * @return                 evidence lower bound (elbo)
+       * @param   musigmatilde     mean and log-std vector of affine transform
+       * @param   constant_factor  difference between log_prob agrad and double
+       * @return                   evidence lower bound (elbo)
        */
-      double calc_ELBO(vb_params_meanfield const& musigmatilde) {
+      double calc_ELBO(vb_params_meanfield const& musigmatilde,
+                       double constant_factor) {
         double elbo(0.0);
         int dim = musigmatilde.dimension();
 
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
-        Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tilde_var(dim);
 
         for (int i = 0; i < n_monte_carlo_elbo_; ++i) {
           // Draw from standard normal and transform to unconstrained space
@@ -126,16 +123,8 @@ namespace stan {
           }
           z_tilde = musigmatilde.to_unconstrained(z_check);
 
-          // We need to call the stan::agrad::var version of log_prob
-          // to get the correct proportionality and Jacobian terms
-          for (int var_index = 0; var_index < dim; ++var_index) {
-            z_tilde_var(var_index) = stan::agrad::var(z_tilde(var_index));
-          }
-          elbo += (model_.template
-                   log_prob<true,true>(z_tilde_var, &std::cout)).val();
-          // want:
-          // elbo += (model_.template log_prob<false,true>(z_tilde, &std::cout)
-          //         + constant_calculated_elsewhere;
+          elbo += (model_.template log_prob<false,true>(z_tilde, &std::cout))
+                   + constant_factor;
         }
         elbo /= static_cast<double>(n_monte_carlo_elbo_);
 
@@ -326,6 +315,20 @@ namespace stan {
                 std::max(0.1*max_iterations/static_cast<double>(refresh_),1.0);
         boost::circular_buffer<double> cb(cb_size);
 
+        // Compute difference between agrad::var version of log_prob
+        // and double version. This is used in the ELBO calculation.
+        int dim = muL.dimension();
+        Eigen::VectorXd z_tmp = Eigen::VectorXd::Zero(dim);
+        Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tmp_agrad(dim);
+        for (int var_index = 0; var_index < dim; ++var_index) {
+            z_tmp_agrad(var_index) = stan::agrad::var(0.0);
+          }
+        double constant_factor = (model_.template
+                   log_prob<true,true>(z_tmp_agrad, &std::cout)).val()
+                   -
+                   (model_.template log_prob<false,true>(z_tmp, &std::cout));
+
+        // Print stuff
         std::cout << "  iter"
                   << "       ELBO"
                   << "   delta_ELBO_mean"
@@ -366,7 +369,7 @@ namespace stan {
           // Check for convergence every "refresh_"th iteration
           if (iter_counter % refresh_ == 0) {
             elbo_prev = elbo;
-            elbo = calc_ELBO(muL);
+            elbo = calc_ELBO(muL, constant_factor);
             delta_elbo = rel_decrease(elbo, elbo_prev);
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
@@ -406,7 +409,7 @@ namespace stan {
 
             if (iter_counter > 100){
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
-                std::cout << "   MAY BE DIVERGING... LOOK AT ELBO";
+                std::cout << "   MAY BE DIVERGING... INSPECT ELBO";
               }
             }
 
@@ -463,6 +466,20 @@ namespace stan {
                 std::max(0.1*max_iterations/static_cast<double>(refresh_),1.0);
         boost::circular_buffer<double> cb(cb_size);
 
+        // Compute difference between agrad::var version of log_prob
+        // and double version. This is used in the ELBO calculation.
+        int dim = musigmatilde.dimension();
+        Eigen::VectorXd z_tmp = Eigen::VectorXd::Zero(dim);
+        Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tmp_agrad(dim);
+        for (int var_index = 0; var_index < dim; ++var_index) {
+            z_tmp_agrad(var_index) = stan::agrad::var(0.0);
+          }
+        double constant_factor = (model_.template
+                   log_prob<true,true>(z_tmp_agrad, &std::cout)).val()
+                   -
+                   (model_.template log_prob<false,true>(z_tmp, &std::cout));
+
+        // Print stuff
         std::cout << "  iter"
                   << "       ELBO"
                   << "   delta_ELBO_mean"
@@ -506,7 +523,7 @@ namespace stan {
           // Check for convergence every "refresh_"th iteration
           if (iter_counter % refresh_ == 0) {
             elbo_prev = elbo;
-            elbo = calc_ELBO(musigmatilde);
+            elbo = calc_ELBO(musigmatilde, constant_factor);
             delta_elbo = rel_decrease(elbo, elbo_prev);
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
@@ -546,7 +563,7 @@ namespace stan {
 
             if (iter_counter > 100){
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
-                std::cout << "   MAY BE DIVERGING... LOOK AT ELBO";
+                std::cout << "   MAY BE DIVERGING... INSPECT ELBO";
               }
             }
 
