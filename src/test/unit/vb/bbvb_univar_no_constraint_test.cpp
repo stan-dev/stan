@@ -5,7 +5,7 @@
 
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 
-#include <test/test-models/no-main/vb/univariate_no_constraint.cpp>
+#include <test/test-models/good/vb/univariate_no_constraint.hpp>
 
 typedef boost::ecuyer1988 rng_t;
 typedef univariate_no_constraint_model_namespace::univariate_no_constraint_model Model;
