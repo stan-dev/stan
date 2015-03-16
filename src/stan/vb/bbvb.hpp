@@ -136,6 +136,9 @@ namespace stan {
           }
           elbo += (model_.template
                    log_prob<true,true>(z_tilde_var, &std::cout)).val();
+          // want:
+          // elbo += (model_.template log_prob<false,true>(z_tilde, &std::cout)
+          //         + constant_calculated_elsewhere;
         }
         elbo /= static_cast<double>(n_monte_carlo_elbo_);
 
