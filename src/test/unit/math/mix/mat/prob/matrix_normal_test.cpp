@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/mat/prob/matrix_normal_prec_log.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/mat/fun/eigen_numtraits.hpp>
+#include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>
