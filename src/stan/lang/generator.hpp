@@ -1821,7 +1821,7 @@ namespace stan {
       o << "} catch (const std::exception& e) {"
         << EOL;
       generate_indent(indent + 1, o);
-      o << "stan::lang::throw_located_exception(e,current_statement_begin__);"
+      o << "throw stan::lang::located_exception(e,current_statement_begin__);"
         << EOL;
       generate_indent(indent, o);
       o << "}"

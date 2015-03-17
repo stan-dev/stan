@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
+#include <stan/lang/located_exception.hpp>
 #include <stan/services/io/write_iteration.hpp>
 
 #include <stdexcept>
 #include <sstream>
+#include <typeinfo>
 #include <test/test-models/good/lang/reject_func_call_generated_quantities.hpp>
 
 /* tests that stan program throws exception in generated quantities block
@@ -10,6 +12,9 @@
 */
 
 TEST(StanCommon, reject_func_call_generated_quantities) {
+  using std::domain_error;
+  using stan::lang::located_exception;
+
   std::string error_msg = "user-specified rejection";
 
   std::fstream empty_data_stream(std::string("").c_str());
@@ -37,13 +42,17 @@ TEST(StanCommon, reject_func_call_generated_quantities) {
   try {
     stan::services::io::write_iteration(model_output, *model, base_rng,
                     lp, cont_vector, disc_vector);
-  } catch (const std::exception& e) {
+  } catch (const located_exception& e) {
+    std::cout << "e=" << typeid(e).name() << std::endl
+              << e.what() << std::endl;
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "---------------------------------" << std::endl
              << "--- EXPECTED: error_msg=" << error_msg << std::endl
              << "--- FOUND: e.what()=" << e.what() << std::endl
              << "--------------------------------*" << std::endl
              << std::endl;
+      EXPECT_TRUE(e.base_exception_is<domain_error>());
+      EXPECT_FALSE(e.base_exception_is<located_exception>());
     }
     return;
   }
