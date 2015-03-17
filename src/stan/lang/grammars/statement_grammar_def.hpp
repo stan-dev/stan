@@ -42,41 +42,41 @@
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::assignment,
                           (stan::lang::variable_dims, var_dims_)
-                          (stan::lang::expression, expr_) );
+                          (stan::lang::expression, expr_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::variable_dims,
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) );
+                          (std::vector<stan::lang::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::distribution,
                           (std::string, family_)
-                          (std::vector<stan::lang::expression>, args_) );
+                          (std::vector<stan::lang::expression>, args_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::for_statement,
                           (std::string, variable_)
                           (stan::lang::range, range_)
-                          (stan::lang::statement, statement_) );
+                          (stan::lang::statement, statement_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::return_statement,
-                          (stan::lang::expression, return_value_) );
+                          (stan::lang::expression, return_value_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::print_statement,
-                          (std::vector<stan::lang::printable>, printables_) );
+                          (std::vector<stan::lang::printable>, printables_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::reject_statement,
-                          (std::vector<stan::lang::printable>, printables_) );
+                          (std::vector<stan::lang::printable>, printables_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::increment_log_prob_statement,
-                          (stan::lang::expression, log_prob_) );
+                          (stan::lang::expression, log_prob_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::sample,
                           (stan::lang::expression, expr_)
                           (stan::lang::distribution, dist_) 
-                          (stan::lang::range, truncation_) );
+                          (stan::lang::range, truncation_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::statements,
                           (std::vector<stan::lang::var_decl>, local_decl_)
-                          (std::vector<stan::lang::statement>, statements_) );
+                          (std::vector<stan::lang::statement>, statements_) )
 
 namespace stan {
 
