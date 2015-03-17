@@ -35,4 +35,6 @@
 #include <stan/math/fwd/mat/fun/trace_quad_form.hpp>
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 
+#include <stan/math/fwd/mat/functor/gradient.hpp>
+
 #endif
