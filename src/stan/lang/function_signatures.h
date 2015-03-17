@@ -22,7 +22,11 @@ std::vector<expr_type> primitive_types;
 primitive_types.push_back(INT_T);
 primitive_types.push_back(DOUBLE_T);
 
-add("sparse_multiply",VECTOR_T,INT_T,INT_T,VECTOR_T,INT_T,INT_T,INT_T, VECTOR_T);
+add("sparse_multiply_csc",VECTOR_T,INT_T,INT_T,
+	VECTOR_T,int_vector_types[1],int_vector_types[1],int_vector_types[1], VECTOR_T);
+add("sparse_multiply_csr",VECTOR_T,INT_T,INT_T,
+	VECTOR_T,int_vector_types[1],int_vector_types[1],int_vector_types[1], VECTOR_T);
+
 
 add_unary("abs");
 add("abs",INT_T,INT_T);

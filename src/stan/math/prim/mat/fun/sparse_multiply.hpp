@@ -54,13 +54,13 @@ namespace stan {
                     const std::vector<int>& z,
                     const Eigen::Matrix<T2, Eigen::Dynamic,1>& b) {
 
-      stan::math::check_positive("sparse_multiply_csr","m",m);
-      stan::math::check_positive("sparse_multiply_csr","n",n);
-      stan::math::check_equal("sparse_multiply_csr","n/b", n, b.size());
-      stan::math::check_equal("sparse_multiply_csr","n/u", n, u.size()-1);
-      stan::math::check_equal("sparse_multiply_csr","n/z", n, z.size()  );
-      stan::math::check_equal("sparse_multiply_csr","w/v", w.size(), v.size());
-      stan::math::check_equal("sparse_multiply_csr","u/z/v", u[n-1]+z[n-1]-1, v.size());
+      stan::math::check_positive("sparse_multiply_csc","m",m);
+      stan::math::check_positive("sparse_multiply_csc","n",n);
+      stan::math::check_equal("sparse_multiply_csc","n/b", n, b.size());
+      stan::math::check_equal("sparse_multiply_csc","n/u", n, u.size()-1);
+      stan::math::check_equal("sparse_multiply_csc","n/z", n, z.size()  );
+      stan::math::check_equal("sparse_multiply_csc","w/v", w.size(), v.size());
+      stan::math::check_equal("sparse_multiply_csc","u/z/v", u[n-1]+z[n-1]-1, v.size());
 
       typedef typename boost::math::tools::promote_args<T1, T2>::type fun_scalar_t;
       Eigen::Matrix<fun_scalar_t, Eigen::Dynamic, 1>  y(m);
