@@ -37,7 +37,7 @@ TEST(StanCommon, reject_generated_quantities) {
   try {
     stan::services::io::write_iteration(model_output, *model, base_rng,
                     lp, cont_vector, disc_vector);
-  } catch (const std::domain_error& e) {
+  } catch (const std::exception& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "---------------------------------" << std::endl
              << "--- EXPECTED: error_msg=" << error_msg << std::endl

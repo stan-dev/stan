@@ -1821,7 +1821,11 @@ namespace stan {
       o << "} catch (const std::exception& e) {"
         << EOL;
       generate_indent(indent + 1, o);
-      o << "throw stan::lang::located_exception(e,current_statement_begin__);"
+      o << "stan::lang::rethrow_located(e,current_statement_begin__);"
+        << EOL;
+      generate_comment("Next line prevents compiler griping about no return",
+                       indent + 1, o);
+      o << "throw std::runtime_error(\"*** IF YOU SEE THIS, PLEASE REPORT A BUG ***\");"
         << EOL;
       generate_indent(indent, o);
       o << "}"
