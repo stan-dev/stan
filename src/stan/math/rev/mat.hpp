@@ -2,7 +2,6 @@
 #define STAN__MATH__REV__MAT_HPP
 
 #include <stan/math/rev/core.hpp>
-#include <stan/math/rev/mat/err/check_pos_definite.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/mat/fun/LDLT_alloc.hpp>
 #include <stan/math/rev/mat/fun/LDLT_factor.hpp>
