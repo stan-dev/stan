@@ -113,7 +113,7 @@ namespace stan {
                     const std::vector<int>& u,
                     const std::vector<int>& z,
                     const Eigen::Matrix<T2, Eigen::Dynamic,1>& b) {
-			using stan::math::dot_product;
+      using stan::math::dot_product;
 
       stan::math::check_positive("sparse_multiply_csr","m",m);
       stan::math::check_positive("sparse_multiply_csr","n",n);
@@ -134,7 +134,7 @@ namespace stan {
           ++p;
         }
         Eigen::Matrix<T1,Eigen::Dynamic,1> w_sub;
-				w_sub = w.segment(u[i]-1,z[i]);
+        w_sub = w.segment(u[i]-1,z[i]);
         y(i) = dot_product(w_sub,b_sub);
       }
       return y;
