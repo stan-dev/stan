@@ -106,7 +106,7 @@ namespace stan {
       using std::exception;
 
       std::stringstream o;
-      o << "Exception thrown at line=" << line << ":" 
+      o << "Exception thrown at line " << line << ":" 
         << std::endl
         << e.what();
       std::string s = o.str();
