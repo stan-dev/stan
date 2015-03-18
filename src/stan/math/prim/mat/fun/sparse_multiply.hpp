@@ -5,6 +5,7 @@
 #include <boost/math/tools/promotion.hpp>
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat/fun/dot_product.hpp>
 
 #include <stan/math/prim/scal/err/check_equal.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
@@ -112,6 +113,7 @@ namespace stan {
                     const std::vector<int>& u,
                     const std::vector<int>& z,
                     const Eigen::Matrix<T2, Eigen::Dynamic,1>& b) {
+			using stan::math::dot_product;
 
       stan::math::check_positive("sparse_multiply_csr","m",m);
       stan::math::check_positive("sparse_multiply_csr","n",n);
@@ -126,13 +128,14 @@ namespace stan {
       for (int i = 0; i < m; ++i) {
         int end = u[i] + z[i] - 1;
         int p = 0;
-        Eigen::Matrix<T2,Eigen::Dynamic,1> b_sub(z[i]);
+        Eigen::Matrix<fun_scalar_t,Eigen::Dynamic,1> b_sub(z[i]);
         for (int q = u[i]-1; q < end; ++q) {
           b_sub(p) = b(v[q]-1); 
           ++p;
         }
-        Eigen::Matrix<T2,Eigen::Dynamic,1> w_sub = w.segment(u[i]-1,z[i]);
-        y(i) = stan::math::dot_product(w_sub,b_sub);
+        Eigen::Matrix<T1,Eigen::Dynamic,1> w_sub;
+				w_sub = w.segment(u[i]-1,z[i]);
+        y(i) = dot_product(w_sub,b_sub);
       }
       return y;
     }
