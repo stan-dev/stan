@@ -298,6 +298,9 @@ TEST_F(StanServices, initialize_state_random_reject_all) {
   EXPECT_EQ(0, model.transform_inits_calls);
   EXPECT_EQ(300, rng.calls);
   EXPECT_NE("", output.str()) << "expecting error message";
+  EXPECT_TRUE(output.str()
+              .find("Rejecting initialization at zero because of vanishing density.")
+              != std::string::npos);
 }
 
 

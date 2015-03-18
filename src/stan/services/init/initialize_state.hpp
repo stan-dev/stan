@@ -161,11 +161,22 @@ namespace stan {
               << std::endl;
             init_log_prob = -std::numeric_limits<double>::infinity();
           }
-          if (!boost::math::isfinite(init_log_prob))
+          if (!boost::math::isfinite(init_log_prob)) {
+            if (output)
+              *output << "Rejecting initialization at zero "
+                      << "because of vanishing density."
+                      << std::endl;
             continue;
-          for (int i = 0; i < init_grad.size(); ++i)
-            if (!boost::math::isfinite(init_grad(i)))
+          }
+          for (int i = 0; i < init_grad.size(); ++i) {
+            if (!boost::math::isfinite(init_grad(i))) {
+              if (output)
+                *output << "Rejecting initialization at zero "
+                        << "because of divergent gradient."
+                        << std::endl;
               continue;
+            }
+          }
           break;
         }
         
