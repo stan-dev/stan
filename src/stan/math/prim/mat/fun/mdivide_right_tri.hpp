@@ -21,9 +21,9 @@ namespace stan {
      * @throws std::domain_error if A is not square or the rows of b don't
      * match the size of A.
      */
-    template <int TriView, typename T1, typename T2, 
+    template <int TriView, typename T1, typename T2,
               int R1, int C1, int R2, int C2>
-    inline 
+    inline
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_right_tri(const Eigen::Matrix<T1,R1,C1> &b,
                       const Eigen::Matrix<T2,R2,C2> &A) {

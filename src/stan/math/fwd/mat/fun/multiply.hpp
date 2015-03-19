@@ -15,8 +15,8 @@ namespace stan {
   namespace agrad {
 
     template<typename T, int R1,int C1>
-    inline 
-    Eigen::Matrix<fvar<T>,R1,C1> 
+    inline
+    Eigen::Matrix<fvar<T>,R1,C1>
     multiply(const Eigen::Matrix<fvar<T>, R1, C1>& m, const fvar<T>& c) {
       Eigen::Matrix<fvar<T>,R1,C1> res(m.rows(),m.cols());
       for(int i = 0; i < m.rows(); i++) {
@@ -27,8 +27,8 @@ namespace stan {
     }
 
     template<typename T,int R2,int C2>
-    inline 
-    Eigen::Matrix<fvar<T>, R2, C2> 
+    inline
+    Eigen::Matrix<fvar<T>, R2, C2>
     multiply(const Eigen::Matrix<fvar<T>, R2, C2>& m, const double c) {
       Eigen::Matrix<fvar<T>,R2,C2> res(m.rows(),m.cols());
       for(int i = 0; i < m.rows(); i++) {
@@ -39,8 +39,8 @@ namespace stan {
     }
 
     template<typename T, int R1,int C1>
-    inline 
-    Eigen::Matrix<fvar<T>,R1,C1> 
+    inline
+    Eigen::Matrix<fvar<T>,R1,C1>
     multiply(const Eigen::Matrix<double, R1, C1>& m, const fvar<T>& c) {
       Eigen::Matrix<fvar<T>,R1,C1> res(m.rows(),m.cols());
       for(int i = 0; i < m.rows(); i++) {
@@ -51,33 +51,33 @@ namespace stan {
     }
 
     template<typename T, int R1,int C1>
-    inline 
-    Eigen::Matrix<fvar<T>,R1,C1> 
+    inline
+    Eigen::Matrix<fvar<T>,R1,C1>
     multiply(const fvar<T>& c, const Eigen::Matrix<fvar<T>, R1, C1>& m) {
       return multiply(m, c);
     }
 
     template<typename T, int R1,int C1>
-    inline 
-    Eigen::Matrix<fvar<T>,R1,C1> 
+    inline
+    Eigen::Matrix<fvar<T>,R1,C1>
     multiply(const double c, const Eigen::Matrix<fvar<T>, R1, C1>& m) {
       return multiply(m, c);
     }
 
     template<typename T, int R1,int C1>
-    inline 
-    Eigen::Matrix<fvar<T>,R1,C1> 
+    inline
+    Eigen::Matrix<fvar<T>,R1,C1>
     multiply(const fvar<T>& c, const Eigen::Matrix<double, R1, C1>& m) {
       return multiply(m, c);
     }
-    
+
     template<typename T, int R1,int C1,int R2,int C2>
-    inline 
-    Eigen::Matrix<fvar<T>,R1,C2> 
+    inline
+    Eigen::Matrix<fvar<T>,R1,C2>
     multiply(const Eigen::Matrix<fvar<T>,R1,C1>& m1,
              const Eigen::Matrix<fvar<T>,R2,C2>& m2) {
       stan::math::check_multiplicable("multiply",
-                                                "m1", m1, 
+                                                "m1", m1,
                                                 "m2", m2);
       Eigen::Matrix<fvar<T>,R1,C2> result(m1.rows(),m2.cols());
       for (size_type i = 0; i < m1.rows(); i++) {
@@ -91,8 +91,8 @@ namespace stan {
     }
 
     template<typename T, int R1,int C1,int R2,int C2>
-    inline 
-    Eigen::Matrix<fvar<T>,R1,C2> 
+    inline
+    Eigen::Matrix<fvar<T>,R1,C2>
     multiply(const Eigen::Matrix<fvar<T>,R1,C1>& m1,
              const Eigen::Matrix<double,R2,C2>& m2) {
       stan::math::check_multiplicable("multiply",
@@ -111,7 +111,7 @@ namespace stan {
 
     template<typename T, int R1,int C1,int R2,int C2>
     inline
-    Eigen::Matrix<fvar<T>,R1,C2> 
+    Eigen::Matrix<fvar<T>,R1,C2>
     multiply(const Eigen::Matrix<double,R1,C1>& m1,
              const Eigen::Matrix<fvar<T>,R2,C2>& m2) {
       stan::math::check_multiplicable("multiply",
@@ -129,9 +129,9 @@ namespace stan {
     }
 
     template <typename T, int C1,int R2>
-    inline 
+    inline
     fvar<T>
-    multiply(const Eigen::Matrix<fvar<T>, 1, C1>& rv, 
+    multiply(const Eigen::Matrix<fvar<T>, 1, C1>& rv,
              const Eigen::Matrix<fvar<T>, R2, 1>& v) {
       if (rv.size() != v.size())
         throw std::domain_error("row vector and vector must be same length in multiply");
@@ -139,9 +139,9 @@ namespace stan {
     }
 
     template <typename T, int C1,int R2>
-    inline 
+    inline
     fvar<T>
-    multiply(const Eigen::Matrix<fvar<T>, 1, C1>& rv, 
+    multiply(const Eigen::Matrix<fvar<T>, 1, C1>& rv,
              const Eigen::Matrix<double, R2, 1>& v) {
       if (rv.size() != v.size())
         throw std::domain_error("row vector and vector must be same length in multiply");
@@ -149,9 +149,9 @@ namespace stan {
     }
 
     template <typename T, int C1,int R2>
-    inline 
+    inline
     fvar<T>
-    multiply(const Eigen::Matrix<double, 1, C1>& rv, 
+    multiply(const Eigen::Matrix<double, 1, C1>& rv,
              const Eigen::Matrix<fvar<T>, R2, 1>& v) {
       if (rv.size() != v.size())
         throw std::domain_error("row vector and vector must be same length in multiply");

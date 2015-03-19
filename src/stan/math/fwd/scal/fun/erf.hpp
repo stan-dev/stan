@@ -19,7 +19,7 @@ namespace stan {
       using ::exp;
       using ::erf;
       using stan::math::square;
-      return fvar<T>(erf(x.val_), x.d_ * exp(-square(x.val_)) 
+      return fvar<T>(erf(x.val_), x.d_ * exp(-square(x.val_))
                                   * stan::math::TWO_OVER_SQRT_PI);
     }
   }

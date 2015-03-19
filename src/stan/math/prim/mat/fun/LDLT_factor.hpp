@@ -16,7 +16,7 @@ namespace stan {
 
     template<typename T, int R, int C>
     class LDLT_factor;
-    
+
     /**
      * LDLT_factor is a thin wrapper on Eigen::LDLT to allow for
      * reusing factorizations and efficient autodiff of things like
@@ -40,7 +40,7 @@ namespace stan {
      * Now, the caller should check that ldlt_A1.success() and ldlt_A2.success()
      * are true or abort accordingly.  Alternatively, call check_ldlt_factor().
      *
-     * Note that ldlt_A1 and ldlt_A2 are completely equivalent.  They simply 
+     * Note that ldlt_A1 and ldlt_A2 are completely equivalent.  They simply
      * demonstrate two different ways to construct the factorization.
      *
      * Now, the caller can use the LDLT_factor objects as needed.  For instance
@@ -65,7 +65,7 @@ namespace stan {
       {
         compute(A);
       }
-      
+
       inline void compute(const Eigen::Matrix<T,R,C> &A) {
         stan::math::check_square("LDLT_factor", "A", A);
         N_ = A.rows();
@@ -94,7 +94,7 @@ namespace stan {
       inline T log_abs_det() const {
         return _ldltP->vectorD().array().log().sum();
       }
-      
+
       inline void inverse(Eigen::Matrix<T,R,C> &invA) const {
         invA.setIdentity(N_);
         _ldltP->solveInPlace(invA);
@@ -113,14 +113,14 @@ namespace stan {
       inline Eigen::Matrix<T,Eigen::Dynamic,1> vectorD() const {
         return _ldltP->vectorD();
       }
-     
+
       inline Eigen::LDLT<Eigen::Matrix<T,R,C> > matrixLDLT() const {
         return _ldltP->matrixLDLT();
       }
 
       inline size_t rows() const { return N_; }
       inline size_t cols() const { return N_; }
-      
+
       typedef size_t size_type;
       typedef double value_type;
 

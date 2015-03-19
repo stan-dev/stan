@@ -59,8 +59,8 @@ namespace stan {
     }
 
     inline bool parse(std::ostream* output_stream,
-                      std::istream& input, 
-                      const std::string& filename, 
+                      std::istream& input,
+                      const std::string& filename,
                       const std::string& model_name,
                       program& result) {
 
@@ -88,19 +88,19 @@ namespace stan {
 
       program_grammar<lp_iterator> prog_grammar(model_name);
       whitespace_grammar<lp_iterator> whitesp_grammar;
-      
+
       bool parse_succeeded = false;
       try {
-        parse_succeeded = phrase_parse(fwd_begin, 
+        parse_succeeded = phrase_parse(fwd_begin,
                                        fwd_end,
                                        prog_grammar,
                                        whitesp_grammar,
                                        result);
         std::string diagnostics = prog_grammar.error_msgs_.str();
         if (output_stream && is_nonempty(diagnostics)) {
-          *output_stream << "DIAGNOSTIC(S) FROM PARSER:" 
+          *output_stream << "DIAGNOSTIC(S) FROM PARSER:"
                          << std::endl
-                         << diagnostics 
+                         << diagnostics
                          << std::endl;
         }
       } catch (const expectation_failure<lp_iterator>& e) {
@@ -136,15 +136,15 @@ namespace stan {
 
         throw std::invalid_argument(msg.str());
       }
-      
-      bool consumed_all_input = (fwd_begin == fwd_end); 
+
+      bool consumed_all_input = (fwd_begin == fwd_end);
       bool success = parse_succeeded && consumed_all_input;
 
-      if (!success) {      
+      if (!success) {
 
         std::stringstream msg;
         if (!parse_succeeded)
-          msg << "PARSE FAILED." << std::endl; 
+          msg << "PARSE FAILED." << std::endl;
 
         if (!consumed_all_input) {
           std::basic_stringstream<char> unparsed_non_ws;

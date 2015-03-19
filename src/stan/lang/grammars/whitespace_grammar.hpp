@@ -3,12 +3,12 @@
 
 #include <boost/spirit/include/qi.hpp>
 
-namespace stan { 
+namespace stan {
 
   namespace lang {
 
     template <typename Iterator>
-    struct whitespace_grammar 
+    struct whitespace_grammar
       : public boost::spirit::qi::grammar<Iterator> {
     public:
       whitespace_grammar();

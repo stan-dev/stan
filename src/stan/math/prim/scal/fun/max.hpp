@@ -4,8 +4,8 @@
 namespace stan {
   namespace math {
 
-    inline double max(const double a, const double b) { 
-      return a > b ? a : b; 
+    inline double max(const double a, const double b) {
+      return a > b ? a : b;
     }
 
   }

@@ -8,7 +8,7 @@
 
 namespace stan {
   namespace math {
-   
+
     /**
      * Return the specified standard vector in ascending order.
      *
@@ -60,7 +60,7 @@ namespace stan {
       std::sort(xs.data(), xs.data()+xs.size(), std::greater<T>());
       return xs;
     }
-    
+
   }
 }
 #endif

@@ -85,7 +85,7 @@ namespace stan {
     template <bool propto,
               typename T_y, typename T_shape>
     typename boost::math::tools::promote_args<T_y, T_shape>::type
-    lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
+    lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                  const T_shape& eta) {
       static const char* function("stan::prob::lkj_corr_log");
 
@@ -93,11 +93,11 @@ namespace stan {
       using stan::math::check_corr_matrix;
       using stan::math::sum;
       using boost::math::tools::promote_args;
-      
+
       typename promote_args<T_y,T_shape>::type lp(0.0);
       check_positive(function, "Shape parameter", eta);
       check_corr_matrix(function, "Correlation matrix", y);
-      
+
       const unsigned int K = y.rows();
       if (K == 0)
         return 0.0;
@@ -121,11 +121,11 @@ namespace stan {
     template <typename T_y, typename T_shape>
     inline
     typename boost::math::tools::promote_args<T_y, T_shape>::type
-    lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y, 
+    lkj_corr_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                  const T_shape& eta) {
       return lkj_corr_log<false>(y,eta);
     }
-    
+
   }
 }
 #endif

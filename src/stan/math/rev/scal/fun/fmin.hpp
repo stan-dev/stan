@@ -17,9 +17,9 @@ namespace stan {
      *
      * For <code>fmin(a,b)</code>, if a's value is less than b's,
      * then a is returned, otherwise b is returned.
-     * 
+     *
        \f[
-       \mbox{fmin}(x,y) = 
+       \mbox{fmin}(x,y) =
        \begin{cases}
          x & \mbox{if } x \leq y \\
          y & \mbox{if } x > y \\[6pt]
@@ -30,7 +30,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{fmin}(x,y)}{\partial x} = 
+       \frac{\partial\,\mbox{fmin}(x,y)}{\partial x} =
        \begin{cases}
          1 & \mbox{if } x \leq y \\
          0 & \mbox{if } x > y \\[6pt]
@@ -41,7 +41,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{fmin}(x,y)}{\partial y} = 
+       \frac{\partial\,\mbox{fmin}(x,y)}{\partial y} =
        \begin{cases}
          0 & \mbox{if } x \leq y \\
          1 & \mbox{if } x > y \\[6pt]
@@ -80,7 +80,7 @@ namespace stan {
      * For <code>fmin(a,b)</code>, if a's value is less than or equal
      * to b, then a is returned, otherwise a fresh variable wrapping b
      * is returned.
-     * 
+     *
      * @param a First variable.
      * @param b Second value
      * @return If the first variable's value is less than or equal to the second value,
@@ -114,7 +114,7 @@ namespace stan {
      * @param a First value.
      * @param b Second variable.
      * @return If the first value is smaller than the second variable's value,
-     * return the first value promoted to a variable, otherwise return the 
+     * return the first value promoted to a variable, otherwise return the
      * second variable.
      */
     inline var fmin(double a,
@@ -131,7 +131,7 @@ namespace stan {
 
       if (unlikely(is_nan(a)))
         return b;
-      
+
       return b <= a ? b : var(a);
     }
 

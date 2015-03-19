@@ -4,7 +4,7 @@
 namespace stan {
 
   struct error_index {
-    enum { value = 
+    enum { value =
 #ifdef ERROR_INDEX
 ERROR_INDEX
 #else

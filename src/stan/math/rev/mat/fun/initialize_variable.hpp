@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     /**
      * Initialize variable to value.  (Function may look pointless, but
      * its needed to bottom out recursion.)
@@ -18,7 +18,7 @@ namespace stan {
 
     /**
      * Initialize every cell in the matrix to the specified value.
-     * 
+     *
      */
     template <int R, int C>
     inline void initialize_variable(Eigen::Matrix<var,R,C>& matrix, const var& value) {

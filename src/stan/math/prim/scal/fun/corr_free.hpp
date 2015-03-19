@@ -5,7 +5,7 @@
 #include <cmath>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**

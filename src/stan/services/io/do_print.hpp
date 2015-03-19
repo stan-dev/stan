@@ -4,16 +4,16 @@
 namespace stan {
   namespace services {
     namespace io {
-    
+
       /**
        * Indicates whether it should print on the current iteration.
        * The function returns:
-       *   true if refresh > 0 and 
+       *   true if refresh > 0 and
        *     (n == 0 or (n + 1) % refresh == 0 or special == true)
        *   false otherwise.
        * Examples:
        *   if refresh = 0, always returns false.
-       *   if refresh = 10 and special == false, 
+       *   if refresh = 10 and special == false,
        *      returns true for n = {0, 9, 19, ...},
        *      returns false for n = {1 - 8, 10 - 18, 20 - 28, ...}.
        *   if refresh = 10 and special == true, returns true for all n.
@@ -26,7 +26,7 @@ namespace stan {
         return (refresh > 0) &&
           (special || n == 0 || ((n + 1) % refresh == 0) );
       }
-      
+
       /**
        * Indicates whether it should print on the current iteration.
        * The function returns:
@@ -36,7 +36,7 @@ namespace stan {
        *   if refresh = 0, always returns false.
        *   if refresh = 10, returns true for n = {0, 9, 19, ...},
        *      returns false for n = {1 - 8, 10 - 18, 20 - 28, ...}.
-       * 
+       *
        * @param n Iteration number
        * @param refresh Number of iterations to refresh
        */

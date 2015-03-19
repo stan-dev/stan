@@ -14,20 +14,20 @@
 
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
      * This function is intended to make starting values, given a unit
      * upper-triangular matrix U such that U'DU is a correlation matrix
-     *   
+     *
      * @param U Sigma matrix
      * @param CPCs fill this unbounded
      */
     template<typename T>
-    void    
+    void
     factor_U(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& U,
-             Eigen::Array<T,Eigen::Dynamic,1>& CPCs) { 
+             Eigen::Array<T,Eigen::Dynamic,1>& CPCs) {
 
       size_t K = U.rows();
       size_t position = 0;

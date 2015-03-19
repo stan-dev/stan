@@ -9,11 +9,11 @@
 #include <stan/math/prim/scal/fun/logit.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
-     * Return the simplex corresponding to the specified free vector.  
+     * Return the simplex corresponding to the specified free vector.
      * A simplex is a vector containing values greater than or equal
      * to 0 that sum to 1.  A vector with (K-1) unconstrained values
      * will produce a simplex of size K.
@@ -25,7 +25,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    Eigen::Matrix<T,Eigen::Dynamic,1>
     simplex_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
 
       // cut & paste simplex_constrain(Eigen::Matrix,T) w/o Jacobian
@@ -42,9 +42,9 @@ namespace stan {
       Matrix<T,Dynamic,1> x(Km1 + 1);
       T stick_len(1.0);
       for (size_type k = 0; k < Km1; ++k) {
-        T z_k(inv_logit(y(k) - log(Km1 - k))); 
+        T z_k(inv_logit(y(k) - log(Km1 - k)));
         x(k) = stick_len * z_k;
-        stick_len -= x(k); 
+        stick_len -= x(k);
       }
       x(Km1) = stick_len;
       return x;
@@ -52,20 +52,20 @@ namespace stan {
 
     /**
      * Return the simplex corresponding to the specified free vector
-     * and increment the specified log probability reference with 
-     * the log absolute Jacobian determinant of the transform. 
+     * and increment the specified log probability reference with
+     * the log absolute Jacobian determinant of the transform.
      *
      * The simplex transform is defined through a centered
      * stick-breaking process.
-     * 
+     *
      * @param y Free vector input of dimensionality K - 1.
      * @param lp Log probability reference to increment.
      * @return Simplex of dimensionality K.
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
-    simplex_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y, 
+    Eigen::Matrix<T,Eigen::Dynamic,1>
+    simplex_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
                       T& lp) {
 
       using Eigen::Dynamic;

@@ -10,7 +10,7 @@
 #include <stdexcept>
 
 namespace stan {
-  
+
   namespace prob {
 
     // CHOLESKY CORRELATION MATRIX

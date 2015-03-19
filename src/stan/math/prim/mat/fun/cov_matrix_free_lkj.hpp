@@ -6,7 +6,7 @@
 #include <stdexcept>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -28,7 +28,7 @@ namespace stan {
      *    factorized by factor_cov_matrix()
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    Eigen::Matrix<T,Eigen::Dynamic,1>
     cov_matrix_free_lkj(
             const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
 

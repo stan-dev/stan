@@ -24,8 +24,8 @@ namespace stan {
       stan::math::check_multiplicable("trace_gen_quad_form",
                                                 "A", A,
                                                 "B", B);
-      stan::math::check_multiplicable("trace_gen_quad_form", 
-                                                "B", B, 
+      stan::math::check_multiplicable("trace_gen_quad_form",
+                                                "B", B,
                                                 "D", D);
       return stan::math::trace(multiply(multiply(D,stan::math::transpose(B)),
                                         multiply(A,B)));

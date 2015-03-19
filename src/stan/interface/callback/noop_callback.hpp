@@ -12,7 +12,7 @@ namespace stan {
         noop_callback() {}
         void operator()() { };
       };
-    
+
     }
   }
 }

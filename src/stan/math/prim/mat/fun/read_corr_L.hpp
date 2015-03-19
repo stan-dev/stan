@@ -8,7 +8,7 @@
 #include <cstddef>
 
 namespace stan {
-  
+
   namespace prob {
 
 
@@ -18,7 +18,7 @@ namespace stan {
      * Return the Cholesky factor of the correlation matrix of the
      * specified dimensionality corresponding to the specified
      * canonical partial correlations.
-     * 
+     *
      * It is generally better to work with the Cholesky factor rather
      * than the correlation matrix itself when the determinant,
      * inverse, etc. of the correlation matrix is needed for some
@@ -33,17 +33,17 @@ namespace stan {
      * @return Cholesky factor of correlation matrix for specified
      * canonical partial correlations.
 
-     * @tparam T Type of underlying scalar.  
+     * @tparam T Type of underlying scalar.
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     read_corr_L(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs, // on (-1,1)
                 const size_t K) {
-      Eigen::Array<T,Eigen::Dynamic,1> temp;         
-      Eigen::Array<T,Eigen::Dynamic,1> acc(K-1);  
+      Eigen::Array<T,Eigen::Dynamic,1> temp;
+      Eigen::Array<T,Eigen::Dynamic,1> acc(K-1);
       acc.setOnes();
       // Cholesky factor of correlation matrix
-      Eigen::Array<T,Eigen::Dynamic,Eigen::Dynamic> L(K,K); 
+      Eigen::Array<T,Eigen::Dynamic,Eigen::Dynamic> L(K,K);
       L.setZero();
 
       size_t position = 0;
@@ -74,7 +74,7 @@ namespace stan {
      *
      * <p>The implementation is Ben Goodrich's Cholesky
      * factor-based approach to the C-vine method of:
-     * 
+     *
      * <ul><li> Daniel Lewandowski, Dorota Kurowicka, and Harry Joe,
      * Generating random correlation matrices based on vines and
      * extended onion method Journal of Multivariate Analysis 100
@@ -87,7 +87,7 @@ namespace stan {
      * Jacobian determinant.
      * @return Cholesky factor of correlation matrix for specified
      * partial correlations.
-     * @tparam T Type of underlying scalar.  
+     * @tparam T Type of underlying scalar.
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
@@ -101,7 +101,7 @@ namespace stan {
 
       Eigen::Matrix<T,Eigen::Dynamic,1> values(CPCs.rows() - 1);
       size_t pos = 0;
-      // no need to abs() because this Jacobian determinant 
+      // no need to abs() because this Jacobian determinant
       // is strictly positive (and triangular)
       // see inverse of Jacobian in equation 11 of LKJ paper
       for (size_t k = 1; k <= (K - 2); k++)

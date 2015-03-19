@@ -16,7 +16,7 @@ namespace stan {
           op_vv_vari(stan::math::log_rising_factorial(avi->val_, bvi->val_), avi, bvi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * (boost::math::digamma(avi_->val_ + bvi_->val_) 
+          avi_->adj_ += adj_ * (boost::math::digamma(avi_->val_ + bvi_->val_)
                                 - boost::math::digamma(avi_->val_));
           bvi_->adj_ += adj_ * boost::math::digamma(avi_->val_ + bvi_->val_);
         }
@@ -43,17 +43,17 @@ namespace stan {
       };
     }
 
-    inline var log_rising_factorial(const var& a, 
+    inline var log_rising_factorial(const var& a,
                                     const double& b) {
       return var(new log_rising_factorial_vd_vari(a.vi_, b));
     }
 
-    inline var log_rising_factorial(const var& a, 
+    inline var log_rising_factorial(const var& a,
                                     const var& b) {
       return var(new log_rising_factorial_vv_vari(a.vi_, b.vi_));
     }
 
-    inline var log_rising_factorial(const double& a, 
+    inline var log_rising_factorial(const double& a,
                                     const var& b) {
       return var(new log_rising_factorial_dv_vari(a, b.vi_));
     }

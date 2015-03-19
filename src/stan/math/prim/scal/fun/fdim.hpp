@@ -1,14 +1,14 @@
 #ifndef STAN__MATH__PRIM__SCAL__FUN__FDIM_HPP
 #define STAN__MATH__PRIM__SCAL__FUN__FDIM_HPP
 
-#include <math.h> 
+#include <math.h>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/tools/promotion.hpp>
 
 namespace stan {
   namespace math {
-    /** 
-     * The positive difference function (C99).  
+    /**
+     * The positive difference function (C99).
      *
      * The function is defined by
      *
@@ -25,7 +25,7 @@ namespace stan {
         return std::numeric_limits<typename boost::math::tools::promote_args<T1, T2>::type>
           ::quiet_NaN();
       return ::fdim(a, b);
-    } 
+    }
   }
 }
 

@@ -12,7 +12,7 @@ namespace stan {
     log_determinant_ldlt(stan::math::LDLT_factor<T,R,C> &A) {
       return A.log_abs_det();
     }
-    
+
   }
 }
 #endif

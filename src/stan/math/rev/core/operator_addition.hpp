@@ -45,31 +45,31 @@ namespace stan {
     /**
      * Addition operator for variables (C++).
      *
-     * The partial derivatives are defined by 
+     * The partial derivatives are defined by
      *
      * \f$\frac{\partial}{\partial x} (x+y) = 1\f$, and
      *
      * \f$\frac{\partial}{\partial y} (x+y) = 1\f$.
      *
-     * 
+     *
        \f[
-       \mbox{operator+}(x,y) = 
+       \mbox{operator+}(x,y) =
        \begin{cases}
          x+y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{operator+}(x,y)}{\partial x} = 
+       \frac{\partial\,\mbox{operator+}(x,y)}{\partial x} =
        \begin{cases}
          1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
-       \frac{\partial\,\mbox{operator+}(x,y)}{\partial y} = 
+       \frac{\partial\,\mbox{operator+}(x,y)}{\partial y} =
        \begin{cases}
          1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
@@ -80,7 +80,7 @@ namespace stan {
      * @param b Second variable operand.
      * @return Variable result of adding two variables.
      */
-    inline var operator+(const var& a, const var& b) {    
+    inline var operator+(const var& a, const var& b) {
       return var(new add_vv_vari(a.vi_,b.vi_));
     }
 

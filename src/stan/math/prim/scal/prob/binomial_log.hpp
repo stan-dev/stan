@@ -34,21 +34,21 @@ namespace stan {
               typename T_N,
               typename T_prob>
     typename return_type<T_prob>::type
-    binomial_log(const T_n& n, 
-                 const T_N& N, 
+    binomial_log(const T_n& n,
+                 const T_N& N,
                  const T_prob& theta) {
-      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type 
+      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type
         T_partials_return;
 
       static const char* function("stan::prob::binomial_log");
-      
+
       using stan::math::check_finite;
       using stan::math::check_bounded;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::prob::include_summand;
-      
+
       // check if any vectors are zero length
       if (!(stan::length(n)
             && stan::length(N)
@@ -77,11 +77,11 @@ namespace stan {
       size_t size = max_size(n, N, theta);
 
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
-      
+
       using stan::math::multiply_log;
       using stan::math::binomial_coefficient_log;
       using stan::math::log1m;
-        
+
       if (include_summand<propto>::value)
         for (size_t i = 0; i < size; ++i)
           logp += binomial_coefficient_log(N_vec[i],n_vec[i]);
@@ -103,14 +103,14 @@ namespace stan {
           temp2 += N_vec[i] - n_vec[i];
         }
         if (!is_constant_struct<T_prob>::value) {
-          operands_and_partials.d_x1[0] 
+          operands_and_partials.d_x1[0]
             += temp1 / value_of(theta_vec[0])
             - temp2 / (1.0 - value_of(theta_vec[0]));
         }
       } else {
         if (!is_constant_struct<T_prob>::value) {
           for (size_t i = 0; i < size; ++i)
-            operands_and_partials.d_x1[i] 
+            operands_and_partials.d_x1[i]
               += n_vec[i] / value_of(theta_vec[i])
               - (N_vec[i] - n_vec[i]) / (1.0 - value_of(theta_vec[i]));
         }
@@ -119,13 +119,13 @@ namespace stan {
       return operands_and_partials.to_var(logp,theta);
     }
 
-    template <typename T_n, 
+    template <typename T_n,
               typename T_N,
               typename T_prob>
     inline
     typename return_type<T_prob>::type
-    binomial_log(const T_n& n, 
-                 const T_N& N, 
+    binomial_log(const T_n& n,
+                 const T_N& N,
                  const T_prob& theta) {
       return binomial_log<false>(n,N,theta);
     }

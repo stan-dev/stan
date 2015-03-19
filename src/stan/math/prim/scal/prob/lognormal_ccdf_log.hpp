@@ -23,11 +23,11 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     lognormal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function("stan::prob::lognormal_ccdf_log");
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
 
       T_partials_return ccdf_log = 0.0;
-      
+
       using stan::math::check_not_nan;
       using stan::math::check_finite;
       using stan::math::check_nonnegative;
@@ -36,8 +36,8 @@ namespace stan {
       using stan::math::value_of;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(sigma)))
         return ccdf_log;
 
@@ -46,7 +46,7 @@ namespace stan {
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -57,7 +57,7 @@ namespace stan {
       const double sqrt_pi = std::sqrt(stan::math::pi());
 
       for (size_t i = 0; i < stan::length(y); i++) {
-        if (value_of(y_vec[i]) == 0.0) 
+        if (value_of(y_vec[i]) == 0.0)
           return operands_and_partials.to_var(0.0,y,mu,sigma);
       }
 
@@ -67,9 +67,9 @@ namespace stan {
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
         const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
-        const T_partials_return scaled_diff = (log(y_dbl) - mu_dbl) 
+        const T_partials_return scaled_diff = (log(y_dbl) - mu_dbl)
           / (sigma_dbl * SQRT_2);
-        const T_partials_return rep_deriv = SQRT_2 / sqrt_pi 
+        const T_partials_return rep_deriv = SQRT_2 / sqrt_pi
           * exp(-scaled_diff * scaled_diff) / sigma_dbl;
 
         //ccdf_log
@@ -82,7 +82,7 @@ namespace stan {
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] += rep_deriv / erfc_calc;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += rep_deriv * scaled_diff * SQRT_2 
+          operands_and_partials.d_x3[n] += rep_deriv * scaled_diff * SQRT_2
             / erfc_calc;
       }
 

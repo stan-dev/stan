@@ -9,7 +9,7 @@
 #include <stdexcept>
 
 namespace stan {
-  
+
   namespace prob {
 
     const double CONSTRAINT_TOLERANCE = 1E-8;
@@ -23,7 +23,7 @@ namespace stan {
      * inverse transform in this function is simpler in that it only
      * needs to compute the \f$k \choose 2\f$ partial correlations
      * and then free those.
-     * 
+     *
      * @param y The correlation matrix to free.
      * @return Vector of unconstrained values that produce the
      * specified correlation matrix when transformed.
@@ -35,7 +35,7 @@ namespace stan {
      *    factor_cov_matrix() on log scale are unconstrained.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    Eigen::Matrix<T,Eigen::Dynamic,1>
     corr_matrix_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
       using Eigen::Array;
       using Eigen::Dynamic;

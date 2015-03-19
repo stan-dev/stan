@@ -6,12 +6,12 @@ namespace stan {
 
     /**
      * The logical and function which returns 1 if both arguments
-     * are unequal to zero and 0 otherwise. 
+     * are unequal to zero and 0 otherwise.
      * Equivalent
      * to <code>x1 != 0 && x2 != 0</code>.
      *
        \f[
-       \mbox{operator\&\&}(x,y) = 
+       \mbox{operator\&\&}(x,y) =
        \begin{cases}
          0 & \mbox{if } x = 0 \textrm{ or } y=0 \\
          1 & \mbox{if } x,y \neq 0 \\[6pt]

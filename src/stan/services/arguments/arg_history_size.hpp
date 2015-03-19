@@ -4,13 +4,13 @@
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_history_size: public int_argument {
-      
+
     public:
-      
+
       arg_history_size(): int_argument() {
         _name = "history_size";
         _description = "Amount of history to keep for L-BFGS";
@@ -22,13 +22,13 @@ namespace stan {
         _bad_value = -1;
         _value = _default_value;
       };
-      
+
       bool is_valid(int value) { return value > 0; }
-      
+
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

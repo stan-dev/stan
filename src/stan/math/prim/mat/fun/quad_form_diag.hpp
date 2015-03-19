@@ -9,11 +9,11 @@
 
 namespace stan {
   namespace math {
-    
+
     using Eigen::Dynamic;
     using Eigen::Matrix;
     using boost::math::tools::promote_args;
-    
+
     template <typename T1, typename T2, int R, int C>
     inline Matrix
     <typename promote_args<T1,T2>::type, Dynamic, Dynamic>

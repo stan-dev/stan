@@ -8,7 +8,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the dot product of the specified vectors.
      *
@@ -19,7 +19,7 @@ namespace stan {
      * size or if they are both not vector dimensioned.
      */
     template<int R1,int C1,int R2, int C2>
-    inline double dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+    inline double dot_product(const Eigen::Matrix<double, R1, C1>& v1,
                               const Eigen::Matrix<double, R2, C2>& v2) {
       stan::math::check_vector("dot_product", "v1", v1);
       stan::math::check_vector("dot_product", "v2", v2);
@@ -34,7 +34,7 @@ namespace stan {
      * @param v2 Second array.
      * @param length Length of both arrays.
      */
-    inline double dot_product(const double* v1, const double* v2, 
+    inline double dot_product(const double* v1, const double* v2,
                               size_t length) {
       double result = 0;
       for (size_t i = 0; i < length; i++)
@@ -54,7 +54,7 @@ namespace stan {
                                                  "v2", v2);
       return dot_product(&v1[0], &v2[0], v1.size());
     }
-    
+
   }
 }
 #endif

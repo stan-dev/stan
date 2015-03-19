@@ -16,7 +16,7 @@ namespace stan {
       using std::exp;
       using stan::math::log_inv_logit;
       return fvar<T>(log_inv_logit(x.val_),
-                        x.d_  / (1 + exp(x.val_))); 
+                        x.d_  / (1 + exp(x.val_)));
     }
   }
 }

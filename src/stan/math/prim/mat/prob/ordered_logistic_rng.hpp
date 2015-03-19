@@ -28,7 +28,7 @@ namespace stan {
       using stan::math::inv_logit;
 
       static const char* function("stan::prob::ordered_logistic");
-      
+
       using stan::math::check_finite;
       using stan::math::check_positive;
       using stan::math::check_nonnegative;

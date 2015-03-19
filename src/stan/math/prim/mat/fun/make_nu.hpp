@@ -5,13 +5,13 @@
 #include <stan/math/prim/mat/meta/index_type.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
-    /** 
+    /**
      * This function calculates the degrees of freedom for the t
      * distribution that corresponds to the shape parameter in the
-     * Lewandowski et. al. distribution 
+     * Lewandowski et. al. distribution
      *
      * @param eta hyperparameter on (0,inf), eta = 1 <-> correlation
      * matrix is uniform
@@ -25,14 +25,14 @@ namespace stan {
       using Eigen::Matrix;
       using stan::math::index_type;
       typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
-  
+
       Array<T,Dynamic,1> nu(K * (K - 1) / 2);
-  
+
       T alpha = eta + (K - 2.0) / 2.0; // from Lewandowski et. al.
 
-      // Best (1978) implies nu = 2 * alpha for the dof in a t 
+      // Best (1978) implies nu = 2 * alpha for the dof in a t
       // distribution that generates a beta variate on (-1,1)
-      T alpha2 = 2.0 * alpha; 
+      T alpha2 = 2.0 * alpha;
       for (size_type j = 0; j < (K - 1); j++) {
         nu(j) = alpha2;
       }

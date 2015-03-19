@@ -5,9 +5,9 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
 namespace stan {
-  
+
   namespace math {
-    // from input type F to output type T 
+    // from input type F to output type T
 
     // scalar, F != T  (base template)
     template <typename F, typename T>

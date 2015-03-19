@@ -10,7 +10,7 @@
 
 namespace stan {
   namespace agrad {
-   
+
     /**
      * Return the specified standard vector in descending order with gradients kept.
      *
@@ -35,7 +35,7 @@ namespace stan {
       std::sort(xs.data(), xs.data()+xs.size(), std::greater<var>());
       return xs;
     }
-    
+
   }
 }
 #endif

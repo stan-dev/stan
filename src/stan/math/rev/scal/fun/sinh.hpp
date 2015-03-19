@@ -6,7 +6,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class sinh_vari : public op_v_vari {
       public:
@@ -28,15 +28,15 @@ namespace stan {
      *
      *
        \f[
-       \mbox{sinh}(x) = 
+       \mbox{sinh}(x) =
        \begin{cases}
          \sinh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{sinh}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{sinh}(x)}{\partial x} =
        \begin{cases}
          \cosh(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
@@ -49,7 +49,7 @@ namespace stan {
     inline var sinh(const var& a) {
       return var(new sinh_vari(a.vi_));
     }
-    
+
   }
 }
 #endif

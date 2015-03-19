@@ -9,7 +9,7 @@ namespace stan {
   namespace services {
     namespace mcmc {
 
-      template <class Model, class RNG, class StartTransitionCallback, 
+      template <class Model, class RNG, class StartTransitionCallback,
                 class SampleRecorder, class DiagnosticRecorder, class MessageRecorder>
       void run_markov_chain(stan::mcmc::base_mcmc* sampler,
                             const int num_iterations,
@@ -20,7 +20,7 @@ namespace stan {
                             const bool save,
                             const bool warmup,
                             stan::io::mcmc_writer <Model,
-                            SampleRecorder, DiagnosticRecorder, MessageRecorder>& 
+                            SampleRecorder, DiagnosticRecorder, MessageRecorder>&
                             writer,
                             stan::mcmc::sample& init_s,
                             Model& model,
@@ -31,18 +31,18 @@ namespace stan {
                             StartTransitionCallback& callback) {
         for (int m = 0; m < num_iterations; ++m) {
           callback();
-          
+
           print_progress(m, start, finish, refresh, warmup, prefix, suffix, o);
-        
+
           init_s = sampler->transition(init_s);
-            
+
           if ( save && ( (m % num_thin) == 0) ) {
             writer.write_sample_params(base_rng, init_s, *sampler, model);
             writer.write_diagnostic_params(init_s, sampler);
           }
 
         }
-        
+
       }
 
     }

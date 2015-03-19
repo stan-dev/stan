@@ -21,7 +21,7 @@ namespace stan {
 
     /**
      * Copy the right-hand side's value to the left-hand side
-     * variable.  
+     * variable.
      *
      * The <code>assign()</code> function is overloaded.  This
      * instance will match arguments where the right-hand side is
@@ -41,7 +41,7 @@ namespace stan {
 
     /**
      * Copy the right-hand side's value to the left-hand side
-     * variable.  
+     * variable.
      *
      * The <code>assign()</code> function is overloaded.  This
      * instance will be called for arguments that are both
@@ -60,12 +60,12 @@ namespace stan {
      * @throw std::invalid_argument
      */
     template <typename LHS, typename RHS, int R1, int C1, int R2, int C2>
-    inline void 
-    assign(Eigen::Matrix<LHS,R1,C1>& x, 
+    inline void
+    assign(Eigen::Matrix<LHS,R1,C1>& x,
            const Eigen::Matrix<RHS,R2,C2>& y) {
       std::stringstream ss;
       ss << "shapes must match, but found"
-         << " R1=" << R1 
+         << " R1=" << R1
          << "; C1=" << C1
          << "; R2=" << R2
          << "; C2=" << C2;
@@ -76,7 +76,7 @@ namespace stan {
 
     /**
      * Copy the right-hand side's value to the left-hand side
-     * variable.  
+     * variable.
      *
      * The <code>assign()</code> function is overloaded.  This
      * instance will be called for arguments that are both
@@ -92,8 +92,8 @@ namespace stan {
      * @throw std::invalid_argument if sizes do not match.
      */
     template <typename LHS, typename RHS, int R, int C>
-    inline void 
-    assign(Eigen::Matrix<LHS,R,C>& x, 
+    inline void
+    assign(Eigen::Matrix<LHS,R,C>& x,
            const Eigen::Matrix<RHS,R,C>& y) {
       stan::math::check_matching_dims("assign",
                                                 "x", x,
@@ -104,7 +104,7 @@ namespace stan {
 
     /**
      * Copy the right-hand side's value to the left-hand side
-     * variable.  
+     * variable.
      *
      * The <code>assign()</code> function is overloaded.  This
      * instance will be called for arguments that are both
@@ -121,7 +121,7 @@ namespace stan {
      * @throw std::invalid_argument if sizes do not match.
      */
     template <typename LHS, typename RHS, int R, int C>
-    inline void 
+    inline void
     assign(Eigen::Block<LHS> x,
            const Eigen::Matrix<RHS,R,C>& y) {
       stan::math::check_matching_sizes("assign",
@@ -135,7 +135,7 @@ namespace stan {
 
     /**
      * Copy the right-hand side's value to the left-hand side
-     * variable.  
+     * variable.
      *
      * The <code>assign()</code> function is overloaded.  This
      * instance will be called for arguments that are both
@@ -144,7 +144,7 @@ namespace stan {
      *
      * For example, a <code>std::vector&lt;int&gt;</code> can be
      * assigned to a <code>std::vector&lt;double&gt;</code> using this
-     * function. 
+     * function.
      *
      * @tparam LHS Type of left-hand side vector elements.
      * @tparam RHS Type of right-hand side vector elements.
@@ -153,7 +153,7 @@ namespace stan {
      * @throw std::invalid_argument if sizes do not match.
      */
     template <typename LHS, typename RHS>
-    inline void 
+    inline void
     assign(std::vector<LHS>& x, const std::vector<RHS>& y) {
       stan::math::check_matching_sizes("assign",
                                                  "x", x,

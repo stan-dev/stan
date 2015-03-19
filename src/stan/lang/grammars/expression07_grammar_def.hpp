@@ -46,7 +46,7 @@
 #include <stan/lang/grammars/expression07_grammar.hpp>
 
 
-namespace stan { 
+namespace stan {
 
   namespace lang {
 
@@ -146,17 +146,17 @@ namespace stan {
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
       using boost::spirit::qi::labels::_r1;
-      
+
       expression07_r.name("expression");
-      expression07_r 
+      expression07_r
         =  term_g(_r1)
             [_val = _1]
         > *( ( lit('+')
-               > term_g(_r1) // expression07_r       
+               > term_g(_r1) // expression07_r
                 [_val = addition3_f(_val,_1,boost::phoenix::ref(error_msgs))] )
-              |  
-              ( lit('-') 
-                > term_g(_r1) // expression07_r   
+              |
+              ( lit('-')
+                > term_g(_r1) // expression07_r
                 [_val = subtraction3_f(_val,_1,boost::phoenix::ref(error_msgs))] )
               )
         > eps[_pass = validate_expr_type3_f(_val,boost::phoenix::ref(error_msgs_))]

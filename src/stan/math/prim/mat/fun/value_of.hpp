@@ -7,9 +7,9 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
-     * Convert a matrix of type T to a matrix of doubles. 
+     * Convert a matrix of type T to a matrix of doubles.
      *
      * T must implement value_of. See
      * test/agrad/fwd/matrix/value_of.cpp for fvar and var usage.
@@ -18,7 +18,7 @@ namespace stan {
      * @tparam R Rows of matrix
      * @tparam C Columns of matrix
      * @param[in] M Matrix to be converted
-     * @return Matrix of values 
+     * @return Matrix of values
      **/
     template <typename T, int R, int C>
     inline Eigen::Matrix<typename child_type<T>::type,R,C> value_of(const Eigen::Matrix<T,R,C>& M) {

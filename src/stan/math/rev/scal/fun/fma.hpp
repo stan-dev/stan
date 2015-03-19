@@ -73,7 +73,7 @@ namespace stan {
 
       class fma_vdd_vari : public op_vdd_vari {
       public:
-        fma_vdd_vari(vari* avi, double b, double c) : 
+        fma_vdd_vari(vari* avi, double b, double c) :
           op_vdd_vari(::fma(avi->val_ , b, c),
                       avi,b,c) {
         }
@@ -90,7 +90,7 @@ namespace stan {
       class fma_ddv_vari : public op_ddv_vari {
       public:
         fma_ddv_vari(double a, double b, vari* cvi) :
-          op_ddv_vari(::fma(a, b, cvi->val_), 
+          op_ddv_vari(::fma(a, b, cvi->val_),
                       a,b,cvi) {
         }
         void chain() {
@@ -200,7 +200,7 @@ namespace stan {
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
     inline var fma(const stan::agrad::var& a,
-                   const double& b, 
+                   const double& b,
                    const double& c) {
       return var(new fma_vdd_vari(a.vi_,b,c));
     }

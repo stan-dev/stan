@@ -24,7 +24,7 @@ namespace stan {
      * For the log softmax function, the entries in the Jacobian are
      * \f$
      * \frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
-     * = \left\{ 
+     * = \left\{
      * \begin{array}{ll}
      * 1 - \mbox{softmax}(y)[m]
      * & \mbox{ if } m = k, \mbox{ and}

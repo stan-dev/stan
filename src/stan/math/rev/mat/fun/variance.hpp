@@ -11,7 +11,7 @@
 namespace stan {
 
   namespace agrad {
-    
+
     namespace {  // anonymous
 
       var calc_variance(size_t size,

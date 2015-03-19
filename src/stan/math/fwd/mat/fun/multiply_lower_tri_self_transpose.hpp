@@ -10,10 +10,10 @@
 
 namespace stan {
   namespace agrad {
-    
+
     template<typename T,int R, int C>
     inline
-    Eigen::Matrix<fvar<T>,R,R> 
+    Eigen::Matrix<fvar<T>,R,R>
     multiply_lower_tri_self_transpose(const Eigen::Matrix<fvar<T>, R, C>& m) {
       if (m.rows() == 0)
         return Eigen::Matrix<fvar<T>,R,R>(0,0);

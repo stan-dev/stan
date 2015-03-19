@@ -22,7 +22,7 @@
 #include <stan/math/prim/scal/fun/grad_F32.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
     template <class RNG>
@@ -36,13 +36,13 @@ namespace stan {
 
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
-  
+
       check_nonnegative(function, "Population size parameter", N);
       check_positive_finite(function, "First prior sample size parameter", alpha);
       check_positive_finite(function, "Second prior sample size parameter", beta);
 
       double a = stan::prob::beta_rng(alpha, beta, rng);
-      while(a > 1 || a < 0) 
+      while(a > 1 || a < 0)
         a = stan::prob::beta_rng(alpha, beta, rng);
       return stan::prob::binomial_rng(N, a, rng);
     }

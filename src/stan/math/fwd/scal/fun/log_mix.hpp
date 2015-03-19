@@ -15,7 +15,7 @@ namespace stan {
 
     /* Returns an array of size N with partials of log_mix wrt to its
      * parameters instantiated as fvar<T>
-     * 
+     *
      * @tparam T_theta theta scalar type
      * @tparam T_lambda1 lambda_1 scalar type
      * @tparam T_lambda2 lambda_2 scalar type
@@ -28,8 +28,8 @@ namespace stan {
      */
     template <typename T_theta, typename T_lambda1, typename T_lambda2, int N>
     inline void
-    log_mix_partial_helper(const T_theta& theta, 
-                           const T_lambda1& lambda1, 
+    log_mix_partial_helper(const T_theta& theta,
+                           const T_lambda1& lambda1,
                            const T_lambda2& lambda2,
                            typename promote_args<T_theta,T_lambda1,T_lambda2>::type (&partials_array)[N]){
       typedef typename promote_args<T_theta,T_lambda1,T_lambda2>::type partial_return_type;
@@ -40,28 +40,28 @@ namespace stan {
       typename promote_args<T_lambda1,T_lambda2>::type one_m_exp_lam2_m_lam1 = 1.0 - exp_lam2_m_lam1;
       typename promote_args<double,T_theta>::type one_m_t = 1.0 - theta;
       partial_return_type one_m_t_prod_exp_lam2_m_lam1 = one_m_t * exp_lam2_m_lam1;
-      partial_return_type t_plus_one_m_t_prod_exp_lam2_m_lam1 
+      partial_return_type t_plus_one_m_t_prod_exp_lam2_m_lam1
         = theta + one_m_t_prod_exp_lam2_m_lam1;
       partial_return_type one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1
         = 1.0 / t_plus_one_m_t_prod_exp_lam2_m_lam1;
-      
+
       unsigned int offset = 0;
       if (is_same<T_theta, partial_return_type>::value){
-        partials_array[offset] 
-          = one_m_exp_lam2_m_lam1 
+        partials_array[offset]
+          = one_m_exp_lam2_m_lam1
           * one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
          ++offset;
       }
       if (is_same<T_lambda1, partial_return_type>::value){
-        partials_array[offset] 
+        partials_array[offset]
           = theta * one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
          ++offset;
       }
       if (is_same<T_lambda2, partial_return_type>::value){
-        partials_array[offset] 
-          = one_m_t_prod_exp_lam2_m_lam1 
+        partials_array[offset]
+          = one_m_t_prod_exp_lam2_m_lam1
           * one_d_t_plus_one_m_t_prod_exp_lam2_m_lam1;
-      } 
+      }
     }
 
     /**
@@ -69,29 +69,29 @@ namespace stan {
      * and log densities and its derivative at each.
      *
      * \f[
-     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) 
+     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
      * = \log \left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right).
      * \f]
-     * 
+     *
      * \f[
-     * \frac{\partial}{\partial \theta} 
+     * \frac{\partial}{\partial \theta}
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
      * = \dfrac{\exp(\lambda_1) - \exp(\lambda_2)}
      * {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)}
      * \f]
      *
      * \f[
-     * \frac{\partial}{\partial \lambda_1} 
+     * \frac{\partial}{\partial \lambda_1}
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
      * = \dfrac{\theta \exp(\lambda_1)}
-     * {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)} 
+     * {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)}
      * \f]
-     * 
+     *
      * \f[
-     * \frac{\partial}{\partial \lambda_2} 
+     * \frac{\partial}{\partial \lambda_2}
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
      * = \dfrac{\theta \exp(\lambda_2)}
-     * {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)} 
+     * {\left( \theta \exp(\lambda_1) + (1 - \theta) \exp(\lambda_2) \right)}
      * \f]
      *
      * @tparam T scalar type.
@@ -114,15 +114,15 @@ namespace stan {
         fvar<T> partial_deriv_array[3];
         log_mix_partial_helper(theta, lambda1, lambda2, partial_deriv_array);
         return fvar<T>(log_mix(theta.val_, lambda1.val_, lambda2.val_),
-                       theta.d_ * value_of(partial_deriv_array[0]) 
-                       + lambda1.d_ * value_of(partial_deriv_array[1]) 
+                       theta.d_ * value_of(partial_deriv_array[0])
+                       + lambda1.d_ * value_of(partial_deriv_array[1])
                        + lambda2.d_ * value_of(partial_deriv_array[2]));
       } else {
         fvar<T> partial_deriv_array[3];
         log_mix_partial_helper(1.0 - theta, lambda2, lambda1, partial_deriv_array);
         return fvar<T>(log_mix(theta.val_, lambda1.val_, lambda2.val_),
-                       -theta.d_ * value_of(partial_deriv_array[0]) 
-                       + lambda1.d_ * value_of(partial_deriv_array[2]) 
+                       -theta.d_ * value_of(partial_deriv_array[0])
+                       + lambda1.d_ * value_of(partial_deriv_array[2])
                        + lambda2.d_ * value_of(partial_deriv_array[1]));
       }
     }
@@ -138,13 +138,13 @@ namespace stan {
         fvar<T> partial_deriv_array[2];
         log_mix_partial_helper(theta, lambda1, lambda2, partial_deriv_array);
         return fvar<T>(log_mix(theta.val_, lambda1.val_, lambda2),
-                       theta.d_ * value_of(partial_deriv_array[0]) 
+                       theta.d_ * value_of(partial_deriv_array[0])
                        + lambda1.d_ * value_of(partial_deriv_array[1]));
       } else {
         fvar<T> partial_deriv_array[2];
         log_mix_partial_helper(1.0 - theta, lambda2, lambda1, partial_deriv_array);
         return fvar<T>(log_mix(theta.val_, lambda1.val_, lambda2),
-                       -theta.d_ * value_of(partial_deriv_array[0]) 
+                       -theta.d_ * value_of(partial_deriv_array[0])
                        + lambda1.d_ * value_of(partial_deriv_array[1]));
       }
     }
@@ -160,20 +160,20 @@ namespace stan {
         fvar<T> partial_deriv_array[2];
         log_mix_partial_helper(theta, lambda1, lambda2, partial_deriv_array);
         return fvar<T>(log_mix(theta.val_, lambda1, lambda2.val_),
-                       theta.d_ * value_of(partial_deriv_array[0]) 
+                       theta.d_ * value_of(partial_deriv_array[0])
                        + lambda2.d_ * value_of(partial_deriv_array[1]));
       } else {
         fvar<T> partial_deriv_array[2];
         log_mix_partial_helper(1.0 - theta, lambda2, lambda1, partial_deriv_array);
         return fvar<T>(log_mix(theta.val_, lambda1, lambda2.val_),
-                       -theta.d_ * value_of(partial_deriv_array[0]) 
+                       -theta.d_ * value_of(partial_deriv_array[0])
                        + lambda2.d_ * value_of(partial_deriv_array[1]));
       }
     }
 
     template<typename T>
     inline
-    fvar<T> 
+    fvar<T>
     log_mix(const double theta, const fvar<T>& lambda1, const fvar<T>& lambda2) {
       using stan::math::log_mix;
       using stan::math::value_of;
@@ -182,13 +182,13 @@ namespace stan {
         fvar<T> partial_deriv_array[2];
         log_mix_partial_helper(theta, lambda1, lambda2, partial_deriv_array);
         return fvar<T>(log_mix(theta, lambda1.val_, lambda2.val_),
-                       lambda1.d_ * value_of(partial_deriv_array[0]) 
+                       lambda1.d_ * value_of(partial_deriv_array[0])
                        + lambda2.d_ * value_of(partial_deriv_array[1]));
       } else {
         fvar<T> partial_deriv_array[2];
         log_mix_partial_helper(1.0 - theta, lambda2, lambda1,partial_deriv_array);
         return fvar<T>(log_mix(theta, lambda1.val_, lambda2.val_),
-                       lambda1.d_ * value_of(partial_deriv_array[1]) 
+                       lambda1.d_ * value_of(partial_deriv_array[1])
                        + lambda2.d_ * value_of(partial_deriv_array[0]));
       }
     }
@@ -219,7 +219,7 @@ namespace stan {
     log_mix(const double theta, const fvar<T>& lambda1, const double lambda2) {
       using stan::math::log_mix;
       using stan::math::value_of;
-      
+
       if (lambda1.val_ > lambda2) {
         fvar<T> partial_deriv_array[1];
         log_mix_partial_helper(theta, lambda1, lambda2, partial_deriv_array);
@@ -235,7 +235,7 @@ namespace stan {
 
     template<typename T>
     inline
-    fvar<T> 
+    fvar<T>
     log_mix(const double theta, const double lambda1, const fvar<T>& lambda2) {
       using stan::math::log_mix;
       using stan::math::value_of;

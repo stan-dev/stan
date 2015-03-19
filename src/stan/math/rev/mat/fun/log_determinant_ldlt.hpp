@@ -28,7 +28,7 @@ namespace stan {
 
         virtual void chain() {
           Eigen::Matrix<double,R,C> invA;
-          
+
           // If we start computing Jacobians, this may be a bit inefficient
           invA.setIdentity(_alloc_ldlt->N_, _alloc_ldlt->N_);
           _alloc_ldlt->_ldlt.solveInPlace(invA);
@@ -39,7 +39,7 @@ namespace stan {
             }
           }
         }
-        
+
         const LDLT_alloc<R,C> *_alloc_ldlt;
       };
     }

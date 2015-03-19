@@ -28,7 +28,7 @@ namespace stan {
                                                 "B", B);
       return multiply(stan::math::transpose(B),multiply(A,B));
     }
-    
+
     template<int RA,int CA,int RB,typename T>
     inline T
     quad_form(const Eigen::Matrix<T,RA,CA>& A,
@@ -43,7 +43,7 @@ namespace stan {
                                                 "B", B);
       return dot_product(B,multiply(A,B));
     }
-    
+
   }
 }
 

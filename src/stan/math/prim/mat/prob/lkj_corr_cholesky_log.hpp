@@ -55,7 +55,7 @@ namespace stan {
               typename T_covar, typename T_shape>
     typename boost::math::tools::promote_args<T_covar, T_shape>::type
     lkj_corr_cholesky_log(
-                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
+                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
                           const T_shape& eta) {
 
       static const char* function("stan::prob::lkj_corr_cholesky_log");
@@ -64,7 +64,7 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_lower_triangular;
       using stan::math::sum;
-      
+
       typename promote_args<T_covar,T_shape>::type lp(0.0);
       check_positive(function, "Shape parameter", eta);
       check_lower_triangular(function, "Random variable", L);
@@ -72,8 +72,8 @@ namespace stan {
       const unsigned int K = L.rows();
       if (K == 0)
         return 0.0;
-            
-      if (include_summand<propto,T_shape>::value) 
+
+      if (include_summand<propto,T_shape>::value)
         lp += do_lkj_constant(eta, K);
       if (include_summand<propto,T_covar,T_shape>::value) {
         const int Km1 = K - 1;
@@ -90,7 +90,7 @@ namespace stan {
         values += (2.0 * eta - 2.0) * log_diagonals;
         lp += sum(values);
       }
-      
+
       return lp;
     }
 
@@ -98,7 +98,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T_covar, T_shape>::type
     lkj_corr_cholesky_log(
-                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
+                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
                           const T_shape& eta) {
       return lkj_corr_cholesky_log<false>(L,eta);
     }

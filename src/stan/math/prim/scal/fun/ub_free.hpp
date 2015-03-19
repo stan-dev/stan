@@ -8,7 +8,7 @@
 #include <limits>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -39,7 +39,7 @@ namespace stan {
     ub_free(const T y, const TU ub) {
       if (ub == std::numeric_limits<double>::infinity())
         return identity_free(y);
-      stan::math::check_less_or_equal("stan::prob::ub_free", 
+      stan::math::check_less_or_equal("stan::prob::ub_free",
                                                 "Upper bounded variable", y, ub);
       return log(ub - y);
     }

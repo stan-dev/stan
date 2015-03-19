@@ -39,8 +39,8 @@ namespace stan {
       using stan::math::multiply_log;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(alpha) 
+      if (!(stan::length(y)
+            && stan::length(alpha)
             && stan::length(sigma)))
         return 0.0;
 
@@ -68,13 +68,13 @@ namespace stan {
         if (y_dbl < 0)
           return LOG_ZERO;
       }
-      
+
       VectorBuilder<include_summand<propto,T_shape>::value,
                     T_partials_return, T_shape> log_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
         if (include_summand<propto,T_shape>::value)
           log_alpha[i] = log(value_of(alpha_vec[i]));
-      
+
       VectorBuilder<include_summand<propto,T_y,T_shape>::value,
                     T_partials_return, T_y> log_y(length(y));
       for (size_t i = 0; i < length(y); i++)
@@ -92,7 +92,7 @@ namespace stan {
       for (size_t i = 0; i < length(sigma); i++)
         if (include_summand<propto,T_y,T_shape,T_scale>::value)
           inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
-      
+
       VectorBuilder<include_summand<propto,T_y,T_shape,T_scale>::value,
                     T_partials_return, T_y, T_shape, T_scale>
         y_div_sigma_pow_alpha(N);
@@ -103,7 +103,7 @@ namespace stan {
           y_div_sigma_pow_alpha[i] = pow(y_dbl * inv_sigma[i], alpha_dbl);
         }
 
-      agrad::OperandsAndPartials<T_y,T_shape,T_scale> 
+      agrad::OperandsAndPartials<T_y,T_shape,T_scale>
         operands_and_partials(y,alpha,sigma);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
@@ -118,16 +118,16 @@ namespace stan {
 
         if (!is_constant_struct<T_y>::value) {
           const T_partials_return inv_y = 1.0 / value_of(y_vec[n]);
-          operands_and_partials.d_x1[n] 
-            += (alpha_dbl-1.0) * inv_y 
+          operands_and_partials.d_x1[n]
+            += (alpha_dbl-1.0) * inv_y
             - alpha_dbl * y_div_sigma_pow_alpha[n] * inv_y;
         }
-        if (!is_constant_struct<T_shape>::value) 
-          operands_and_partials.d_x2[n] 
-            += 1.0/alpha_dbl 
+        if (!is_constant_struct<T_shape>::value)
+          operands_and_partials.d_x2[n]
+            += 1.0/alpha_dbl
             + (1.0 - y_div_sigma_pow_alpha[n]) * (log_y[n] - log_sigma[n]);
-        if (!is_constant_struct<T_scale>::value) 
-          operands_and_partials.d_x3[n] 
+        if (!is_constant_struct<T_scale>::value)
+          operands_and_partials.d_x3[n]
             += alpha_dbl * inv_sigma[n] * ( y_div_sigma_pow_alpha[n] - 1.0 );
       }
       return operands_and_partials.to_var(logp,y,alpha,sigma);

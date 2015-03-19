@@ -64,7 +64,7 @@ namespace stan {
      * \f$\frac{\partial}{\partial y} (x/y) = -x / y^2\f$.
      *
        \f[
-       \mbox{operator/}(x,y) = 
+       \mbox{operator/}(x,y) =
        \begin{cases}
          \frac{x}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
@@ -72,7 +72,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator/}(x,y)}{\partial x} = 
+       \frac{\partial\,\mbox{operator/}(x,y)}{\partial x} =
        \begin{cases}
          \frac{1}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
@@ -80,7 +80,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator/}(x,y)}{\partial y} = 
+       \frac{\partial\,\mbox{operator/}(x,y)}{\partial y} =
        \begin{cases}
          -\frac{x}{y^2} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
@@ -119,7 +119,7 @@ namespace stan {
      * The derivative with respect to the variable is
      *
      * \f$\frac{d}{d y} (c/y) = -c / y^2\f$.
-     * 
+     *
      * @param a Scalar operand.
      * @param b Variable operand.
      * @return Variable result of dividing the scalar by the variable.

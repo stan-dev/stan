@@ -52,7 +52,7 @@ namespace stan {
      * \f$\frac{\partial}{\partial y} (x * y) = x\f$.
      *
        \f[
-       \mbox{operator*}(x,y) = 
+       \mbox{operator*}(x,y) =
        \begin{cases}
          xy & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
@@ -60,7 +60,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator*}(x,y)}{\partial x} = 
+       \frac{\partial\,\mbox{operator*}(x,y)}{\partial x} =
        \begin{cases}
          y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
@@ -68,7 +68,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator*}(x,y)}{\partial y} = 
+       \frac{\partial\,\mbox{operator*}(x,y)}{\partial y} =
        \begin{cases}
          x & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
@@ -89,7 +89,7 @@ namespace stan {
      * The partial derivative for the variable is
      *
      * \f$\frac{\partial}{\partial x} (x * c) = c\f$, and
-     * 
+     *
      * @param a Variable operand.
      * @param b Scalar operand.
      * @return Variable result of multiplying operands.

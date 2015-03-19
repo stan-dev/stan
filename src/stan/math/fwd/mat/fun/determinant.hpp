@@ -14,9 +14,9 @@
 
 namespace stan {
   namespace agrad {
-    
+
     template<typename T, int R,int C>
-    inline 
+    inline
     fvar<T>
     determinant(const Eigen::Matrix<fvar<T>, R, C>& m) {
       using stan::math::multiply;

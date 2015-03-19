@@ -40,8 +40,8 @@ namespace stan {
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(beta)))
         return 0.0;
 
@@ -60,9 +60,9 @@ namespace stan {
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_loc,T_scale>::value)
         return 0.0;
-      
+
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, beta);
 
       VectorView<const T_y> y_vec(y);
@@ -83,9 +83,9 @@ namespace stan {
         // pull out values of arguments
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
-      
+
         // reusable subexpression values
-        const T_partials_return y_minus_mu_over_beta 
+        const T_partials_return y_minus_mu_over_beta
           = (y_dbl - mu_dbl) * inv_beta[n];
 
         // log probability
@@ -95,15 +95,15 @@ namespace stan {
           logp += -y_minus_mu_over_beta - exp(-y_minus_mu_over_beta);
 
         // gradients
-        T_partials_return scaled_diff = inv_beta[n] 
+        T_partials_return scaled_diff = inv_beta[n]
           * exp(-y_minus_mu_over_beta);
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= inv_beta[n] - scaled_diff;
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] += inv_beta[n] - scaled_diff;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
-            += -inv_beta[n] + y_minus_mu_over_beta * inv_beta[n] 
+          operands_and_partials.d_x3[n]
+            += -inv_beta[n] + y_minus_mu_over_beta * inv_beta[n]
             - scaled_diff * y_minus_mu_over_beta;
       }
       return operands_and_partials.to_var(logp,y,mu,beta);

@@ -19,7 +19,7 @@ namespace stan {
     template <bool propto,
               typename T_prob>
     typename boost::math::tools::promote_args<T_prob>::type
-    categorical_logit_log(int n, 
+    categorical_logit_log(int n,
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
       static const char* function("stan::prob::categorical_logit_log");
 
@@ -29,7 +29,7 @@ namespace stan {
 
       check_bounded(function, "categorical outcome out of support", n, 1, beta.size());
       check_finite(function, "log odds parameter", beta);
-      
+
       if (!include_summand<propto,T_prob>::value)
         return 0.0;
 
@@ -40,7 +40,7 @@ namespace stan {
     template <typename T_prob>
     inline
     typename boost::math::tools::promote_args<T_prob>::type
-    categorical_logit_log(int n, 
+    categorical_logit_log(int n,
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
       return categorical_logit_log<false>(n,beta);
     }
@@ -48,7 +48,7 @@ namespace stan {
     template <bool propto,
               typename T_prob>
     typename boost::math::tools::promote_args<T_prob>::type
-    categorical_logit_log(const std::vector<int>& ns, 
+    categorical_logit_log(const std::vector<int>& ns,
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
       static const char* function("stan::prob::categorical_logit_log");
 
@@ -63,10 +63,10 @@ namespace stan {
 
       if (!include_summand<propto,T_prob>::value)
         return 0.0;
-      
+
       if (ns.size() == 0)
         return 0.0;
-        
+
       Eigen::Matrix<T_prob,Eigen::Dynamic,1> log_softmax_beta
         = log_softmax(beta);
 

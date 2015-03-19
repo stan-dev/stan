@@ -4,13 +4,13 @@
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_test_grad_err: public real_argument {
-      
+
     public:
-      
+
       arg_test_grad_err(): real_argument() {
         _name = "error";
         _description = "Error threshold";
@@ -22,13 +22,13 @@ namespace stan {
         _bad_value = -1.0;
         _value = _default_value;
       };
-      
+
       bool is_valid(double value) { return value > 0; }
 
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

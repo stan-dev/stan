@@ -9,8 +9,8 @@ namespace stan {
   namespace agrad {
 
     template <typename T, int R, int C>
-    inline 
-    fvar<T> 
+    inline
+    fvar<T>
     sum(const Eigen::Matrix<fvar<T>,R,C>& m) {
       fvar<T> sum = 0;
       if (m.size() == 0)

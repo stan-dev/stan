@@ -18,7 +18,7 @@ namespace stan {
         void chain() {
           avi_->adj_ += adj_ * calculate_chain(avi_->val_, val_);
         }
-      };      
+      };
     }
 
     /**

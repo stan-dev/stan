@@ -10,7 +10,7 @@ namespace stan {
   namespace math {
 
     template <typename T1, typename T2, int R1,int C1,int R2,int C2>
-    inline 
+    inline
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,
     R1,C2>
     mdivide_left_tri_low(const Eigen::Matrix<T1,R1,C1> &A,
@@ -27,7 +27,7 @@ namespace stan {
       return mdivide_left_tri<Eigen::Lower,T1,T2,R1,C1,R2,C2>(A,b);
     }
     template <typename T,int R1, int C1>
-    inline 
+    inline
     Eigen::Matrix<T,R1,C1>
     mdivide_left_tri_low(const Eigen::Matrix<T,R1,C1> &A) {
       stan::math::check_square("mdivide_left_tri_low", "A", A);

@@ -8,7 +8,7 @@ namespace std {
 
   /**
    * Checks if the given number is infinite.
-   * 
+   *
    * Return <code>true</code> if the value of the
    * a is positive or negative infinity.
    *

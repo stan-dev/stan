@@ -13,19 +13,19 @@ namespace stan {
 
       // these function and the following class just translate
       // log_sum_exp for std::vector for Eigen::Matrix
-      
+
       template <int R, int C>
       double log_sum_exp_as_double(const Eigen::Matrix<var,R,C>& x) {
         using std::numeric_limits;
         using std::exp;
         using std::log;
         double max = -numeric_limits<double>::infinity();
-        for (int i = 0; i < x.size(); ++i) 
-          if (x(i) > max) 
+        for (int i = 0; i < x.size(); ++i)
+          if (x(i) > max)
             max = x(i).val();
         double sum = 0.0;
-        for (int i = 0; i < x.size(); ++i) 
-          if (x(i) != -numeric_limits<double>::infinity()) 
+        for (int i = 0; i < x.size(); ++i)
+          if (x(i) != -numeric_limits<double>::infinity())
             sum += exp(x(i).val() - max);
         return max + log(sum);
       }

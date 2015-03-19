@@ -27,7 +27,7 @@ namespace stan {
      * The behaviour of using an LDLT_factor without success() returning true is
      * undefined.
      *
-     * Note that ldlt_A1 and ldlt_A2 are completely equivalent.  They simply 
+     * Note that ldlt_A1 and ldlt_A2 are completely equivalent.  They simply
      * demonstrate two different ways to construct the factorization.
      *
      * Now, the caller can use the LDLT_factor objects as needed.  For instance
@@ -39,7 +39,7 @@ namespace stan {
      * d1 = log_determinant_ldlt(ldlt_A1);
      * d2 = log_determinant_ldlt(ldlt_A2);
      * ~~~
-     * 
+     *
      **/
     template<int R, int C>
     class LDLT_factor<stan::agrad::var,R,C> {
@@ -55,7 +55,7 @@ namespace stan {
       : _alloc(new stan::agrad::LDLT_alloc<R,C>()) {
         compute(A);
       }
-     
+
       /**
        * Use the LDLT_factor object to factorize a new matrix.  After calling
        * this function, the user should call success() to check that the
@@ -68,7 +68,7 @@ namespace stan {
         stan::math::check_square("comute", "A", A);
         _alloc->compute(A);
       }
-      
+
       /**
        * Compute the actual numerical result of inv(A)*b.  Note that this isn't
        * meant to handle any of the autodiff.  This is a convenience function
@@ -85,7 +85,7 @@ namespace stan {
       solve(const Eigen::MatrixBase<Rhs>& b) const {
         return _alloc->_ldlt.solve(b);
       }
-      
+
       /**
        * Determine whether the most recent factorization succeeded.  This should
        * always be called after the object is constructed (with a matrix) or
@@ -113,7 +113,7 @@ namespace stan {
 
       inline size_t rows() const { return _alloc->N_; }
       inline size_t cols() const { return _alloc->N_; }
-      
+
       typedef size_t size_type;
       typedef stan::agrad::var value_type;
 

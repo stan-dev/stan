@@ -6,7 +6,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the product of the coefficients of the specified
      * standard vector.
@@ -21,7 +21,7 @@ namespace stan {
         product *= v[i];
       return product;
     }
-    
+
     /**
      * Returns the product of the coefficients of the specified
      * column vector.
@@ -33,7 +33,7 @@ namespace stan {
       if (v.size() == 0) return 1.0;
       return v.prod();
     }
-    
+
   }
 }
 #endif

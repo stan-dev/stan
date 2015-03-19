@@ -7,7 +7,7 @@
 #include <stan/math/prim/scal/fun/ub_free.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -15,7 +15,7 @@ namespace stan {
      * specified lower- and upper-bounded scalar given the specified
      * bounds.
      *
-     * <p>The transfrom in <code>lub_constrain(T,double,double)</code>, 
+     * <p>The transfrom in <code>lub_constrain(T,double,double)</code>,
      * is reversed by a transformed and scaled logit,
      *
      * <p>\f$f^{-1}(y) = \mbox{logit}(\frac{y - L}{U - L})\f$
@@ -27,7 +27,7 @@ namespace stan {
      * the upper bound is positive infinity and the lower bound
      * finite, this function reduces to
      * <code>lb_free(x,lb)</code>.  If the upper bound is
-     * positive infinity and the lower bound negative infinity, 
+     * positive infinity and the lower bound negative infinity,
      * this function reduces to <code>identity_free(y)</code>.
      *
      * @tparam T Type of scalar.

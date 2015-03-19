@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the minimum coefficient in the specified
      * column vector.
@@ -20,7 +20,7 @@ namespace stan {
         throw std::domain_error("error: cannot take min of empty int vector");
       int min = x[0];
       for (size_t i = 1; i < x.size(); ++i)
-        if (x[i] < min) 
+        if (x[i] < min)
           min = x[i];
       return min;
     }
@@ -38,7 +38,7 @@ namespace stan {
         return std::numeric_limits<T>::infinity();
       T min = x[0];
       for (size_t i = 1; i < x.size(); ++i)
-        if (x[i] < min) 
+        if (x[i] < min)
           min = x[i];
       return min;
     }
@@ -51,11 +51,11 @@ namespace stan {
      */
     template <typename T, int R, int C>
     inline T min(const Eigen::Matrix<T,R,C>& m) {
-      if (m.size() == 0) 
+      if (m.size() == 0)
         return std::numeric_limits<double>::infinity();
       return m.minCoeff();
-    }    
-    
+    }
+
   }
 }
 #endif

@@ -18,7 +18,7 @@ namespace stan {
    *  - is_vec: boolean variable indicating whether this instance
    *      should allocate a vector, if it is used. If this is false,
    *      the instance will only allocate a single double value.
-   *      If this is true, it will allocate the number requested. 
+   *      If this is true, it will allocate the number requested.
    *      Note that this is calculated based on template parameters
    *      T2 through T7.
    *
@@ -56,7 +56,7 @@ namespace stan {
     }
   };
 
-  template<bool used, typename T1, typename T2, typename T3=double, 
+  template<bool used, typename T1, typename T2, typename T3=double,
            typename T4=double, typename T5=double, typename T6=double,
            typename T7=double>
   class VectorBuilder {

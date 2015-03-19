@@ -23,7 +23,7 @@ namespace stan {
 
     /**
      * The inverse hyperbolic sine function for variables (C99).
-     * 
+     *
      * For non-variable function, see boost::math::asinh().
      *
      * The derivative is defined by
@@ -32,25 +32,25 @@ namespace stan {
      *
      *
        \f[
-       \mbox{asinh}(x) = 
+       \mbox{asinh}(x) =
        \begin{cases}
          \sinh^{-1}(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{asinh}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{asinh}(x)}{\partial x} =
        \begin{cases}
          \frac{\partial\, \sinh^{-1}(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
        \sinh^{-1}(x)=\ln\left(x+\sqrt{x^2+1}\right)
        \f]
-       
+
        \f[
        \frac{\partial \, \sinh^{-1}(x)}{\partial x} = \frac{1}{\sqrt{x^2+1}}
        \f]

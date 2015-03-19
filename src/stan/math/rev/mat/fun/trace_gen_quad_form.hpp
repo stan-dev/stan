@@ -26,19 +26,19 @@ namespace stan {
                                        const Eigen::Matrix<TB,RB,CB>& B)
         : D_(D), A_(A), B_(B)
         { }
-        
+
         double compute() {
           using stan::math::value_of;
           return stan::math::trace_gen_quad_form(value_of(D_),
                                                  value_of(A_),
                                                  value_of(B_));
         }
-        
+
         Eigen::Matrix<TD,RD,CD>  D_;
         Eigen::Matrix<TA,RA,CA>  A_;
         Eigen::Matrix<TB,RB,CB>  B_;
       };
-      
+
       template <typename TD, int RD, int CD,
                 typename TA, int RA, int CA,
                 typename TB, int RB, int CB>
@@ -58,7 +58,7 @@ namespace stan {
             BD.noalias() = B*D;
           if (varB || varD)
             AtB.noalias() = A.transpose()*B;
-          
+
           if (varB) {
             Eigen::Matrix<double,RB,CB> adjB(adj*(A*BD + AtB*D.transpose()));
             for (int j = 0; j < B.cols(); j++)
@@ -79,11 +79,11 @@ namespace stan {
           }
         }
 
-        
+
       public:
         trace_gen_quad_form_vari(trace_gen_quad_form_vari_alloc<TD,RD,CD,TA,RA,CA,TB,RB,CB> *impl)
         : vari(impl->compute()), _impl(impl) { }
-        
+
         virtual void chain() {
           using stan::math::value_of;
           computeAdjoints(adj_,
@@ -94,11 +94,11 @@ namespace stan {
                           (Eigen::Matrix<var,RA,CA>*)(boost::is_same<TA,var>::value?(&_impl->A_):NULL),
                           (Eigen::Matrix<var,RB,CB>*)(boost::is_same<TB,var>::value?(&_impl->B_):NULL));
         }
-        
+
         trace_gen_quad_form_vari_alloc<TD,RD,CD,TA,RA,CA,TB,RB,CB> *_impl;
       };
     }
-    
+
     template <typename TD, int RD, int CD,
               typename TA, int RA, int CA,
               typename TB, int RB, int CB>
@@ -113,15 +113,15 @@ namespace stan {
     {
       stan::math::check_square("trace_gen_quad_form", "A", A);
       stan::math::check_square("trace_gen_quad_form", "D", D);
-      stan::math::check_multiplicable("trace_gen_quad_form", 
-                                                "A", A, 
+      stan::math::check_multiplicable("trace_gen_quad_form",
+                                                "A", A,
                                                 "B", B);
       stan::math::check_multiplicable("trace_gen_quad_form",
                                                 "B", B,
                                                 "D", D);
-      
+
       trace_gen_quad_form_vari_alloc<TD,RD,CD,TA,RA,CA,TB,RB,CB> *baseVari = new trace_gen_quad_form_vari_alloc<TD,RD,CD,TA,RA,CA,TB,RB,CB>(D,A,B);
-      
+
       return var(new trace_gen_quad_form_vari<TD,RD,CD,TA,RA,CA,TB,RB,CB>(baseVari));
     }
   }

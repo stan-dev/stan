@@ -7,10 +7,10 @@
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class neg_vari : public op_v_vari {
-      public: 
+      public:
         neg_vari(vari* avi) :
           op_v_vari(-(avi->val_), avi) {
         }
@@ -29,7 +29,7 @@ namespace stan {
      * \f$\frac{d}{dx} -x = -1\f$.
      *
        \f[
-       \mbox{operator-}(x) = 
+       \mbox{operator-}(x) =
        \begin{cases}
          -x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
@@ -37,7 +37,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator-}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{operator-}(x)}{\partial x} =
        \begin{cases}
          -1 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

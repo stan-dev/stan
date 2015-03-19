@@ -29,7 +29,7 @@ namespace stan {
 
       variate_generator<RNG&, uniform_01<> >
         uniform01_rng(rng, uniform_01<>());
-      
+
       Eigen::VectorXd index(theta.rows());
       index.setZero();
 

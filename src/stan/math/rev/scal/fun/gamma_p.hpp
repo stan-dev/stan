@@ -21,25 +21,25 @@ namespace stan {
 
           // return zero derivative as gamma_p is flat to machine precision for b / a > 10
           if (std::fabs(bvi_->val_ / avi_->val_) > 10 ) return;
-          
+
           double u = stan::math::gamma_p(avi_->val_, bvi_->val_);
-          
+
           double S = 0.0;
           double s = 1.0;
           double l = std::log(bvi_->val_);
           double g = boost::math::tgamma(avi_->val_);
           double dig = boost::math::digamma(avi_->val_);
-      
+
           int k = 0;
           double delta = s / (avi_->val_ * avi_->val_);
-      
+
           while (std::fabs(delta) > 1e-6) {
             S += delta;
             ++k;
             s *= -bvi_->val_ / k;
             delta = s / ((k + avi_->val_) * (k + avi_->val_));
           }
-          
+
 
           avi_->adj_ -= adj_ * ((u) * ( dig - l ) + std::exp( avi_->val_ * l ) * S / g);
           bvi_->adj_ += adj_ * (std::exp(-bvi_->val_) * std::pow(bvi_->val_, avi_->val_ - 1.0) / g);
@@ -56,18 +56,18 @@ namespace stan {
 
           // return zero derivative as gamma_p is flat to machine precision for b / a > 10
           if (std::fabs(bd_ / avi_->val_) > 10 ) return;
-          
+
           double u = stan::math::gamma_p(avi_->val_, bd_);
-      
+
           double S = 0.0;
           double s = 1.0;
           double l = std::log(bd_);
           double g = boost::math::tgamma(avi_->val_);
           double dig = boost::math::digamma(avi_->val_);
-      
+
           int k = 0;
           double delta = s / (avi_->val_ * avi_->val_);
-      
+
           while (std::fabs(delta) > 1e-6) {
             S += delta;
             ++k;

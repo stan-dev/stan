@@ -12,7 +12,7 @@
 namespace stan {
   namespace services {
     namespace io {
-    
+
       template <class Model, class RNG>
       void write_iteration(std::ostream& output_stream,
                            Model& model,
@@ -22,7 +22,7 @@ namespace stan {
                            std::vector<int>& disc_vector) {
         std::vector<double> model_values;
         model.write_array(base_rng, cont_vector, disc_vector, model_values,
-                          true, true, &std::cout);  
+                          true, true, &std::cout);
         write_iteration_csv(output_stream, lp, model_values);
       }
 

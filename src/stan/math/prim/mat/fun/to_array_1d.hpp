@@ -7,12 +7,12 @@
 
 namespace stan {
   namespace math {
-    
+
     using Eigen::Dynamic;
-    using Eigen::Matrix; 
+    using Eigen::Matrix;
     using std::vector;
-    
-    //real[] to_array_1d(matrix) 
+
+    //real[] to_array_1d(matrix)
     //real[] to_array_1d(row_vector)
     //real[] to_array_1d(vector)
     template <typename T, int R, int C>
@@ -22,7 +22,7 @@ namespace stan {
       vector<T> result(size);
       for (int i=0; i < size; i++)
         result[i] = datap[i];
-      return result;    
+      return result;
     }
 
     //real[] to_array_1d(...)
@@ -31,8 +31,8 @@ namespace stan {
     to_array_1d(const vector<T> & x) {
       return x;
     }
-        
-    //real[] to_array_1d(...)    
+
+    //real[] to_array_1d(...)
     template <typename T>
     inline vector<typename scalar_type<T>::type>
     to_array_1d(const vector< vector<T> > & x) {
@@ -46,7 +46,7 @@ namespace stan {
           y[ij] = x[i][j];
       return to_array_1d(y);
     }
-    
+
   }
 }
 #endif

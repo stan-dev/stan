@@ -25,7 +25,7 @@ namespace stan {
      * \frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
      * \\[8pt]
      * \displaystyle
-     * \mbox{ } \ \ \ = \left\{ 
+     * \mbox{ } \ \ \ = \left\{
      * \begin{array}{ll}
      * \mbox{softmax}(y)[k] - \mbox{softmax}(y)[k] \times \mbox{softmax}(y)[m]
      * & \mbox{ if } m = k, \mbox{ and}

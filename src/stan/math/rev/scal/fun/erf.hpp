@@ -16,7 +16,7 @@ namespace stan {
           op_v_vari(::erf(avi->val_),avi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * stan::math::TWO_OVER_SQRT_PI 
+          avi_->adj_ += adj_ * stan::math::TWO_OVER_SQRT_PI
             * ::exp(- avi_->val_ * avi_->val_);
         }
       };
@@ -30,28 +30,28 @@ namespace stan {
      * The derivative is
      *
      * \f$\frac{d}{dx} \mbox{erf}(x) = \frac{2}{\sqrt{\pi}} \exp(-x^2)\f$.
-     * 
+     *
      *
        \f[
-       \mbox{erf}(x) = 
+       \mbox{erf}(x) =
        \begin{cases}
          \operatorname{erf}(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{erf}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{erf}(x)}{\partial x} =
        \begin{cases}
          \frac{\partial\, \operatorname{erf}(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
        \operatorname{erf}(x)=\frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt
        \f]
-       
+
        \f[
        \frac{\partial \, \operatorname{erf}(x)}{\partial x} = \frac{2}{\sqrt{\pi}} e^{-x^2}
        \f]

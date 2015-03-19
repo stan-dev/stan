@@ -9,7 +9,7 @@
 #include <limits>
 
 namespace stan {
-  
+
   namespace prob {
     /**
      * Return the lower- and upper-bounded scalar derived by
@@ -25,9 +25,9 @@ namespace stan {
      * the upper bound is positive infinity and the lower bound
      * finite, this function reduces to
      * <code>lb_constrain(x,lb)</code>.  If the upper bound is
-     * positive infinity and the lower bound negative infinity, 
+     * positive infinity and the lower bound negative infinity,
      * this function reduces to <code>identity_constrain(x)</code>.
-     * 
+     *
      * @param x Free scalar to transform.
      * @param lb Lower bound.
      * @param ub Upper bound.
@@ -53,14 +53,14 @@ namespace stan {
         T exp_minus_x = exp(-x);
         inv_logit_x = 1.0 / (1.0 + exp_minus_x);
         // Prevent x from reaching one unless it really really should.
-        if ((x < std::numeric_limits<double>::infinity()) 
+        if ((x < std::numeric_limits<double>::infinity())
             && (inv_logit_x == 1))
             inv_logit_x = 1 - 1e-15;
       } else {
         T exp_x = exp(x);
         inv_logit_x = 1.0 - 1.0 / (1.0 + exp_x);
         // Prevent x from reaching zero unless it really really should.
-        if ((x > -std::numeric_limits<double>::infinity()) 
+        if ((x > -std::numeric_limits<double>::infinity())
             && (inv_logit_x== 0))
             inv_logit_x = 1e-15;
       }
@@ -76,17 +76,17 @@ namespace stan {
      * <p>The transform is as defined in
      * <code>lub_constrain(T,double,double)</code>.  The log absolute
      * Jacobian determinant is given by
-     * 
+     *
      * <p>\f$\log \left| \frac{d}{dx} \left(
-     *                L + (U-L) \mbox{logit}^{-1}(x) \right) 
+     *                L + (U-L) \mbox{logit}^{-1}(x) \right)
      *            \right|\f$
      *
      * <p>\f$ {} = \log |
      *         (U-L)
-     *         \, (\mbox{logit}^{-1}(x)) 
+     *         \, (\mbox{logit}^{-1}(x))
      *         \, (1 - \mbox{logit}^{-1}(x)) |\f$
      *
-     * <p>\f$ {} = \log (U - L) + \log (\mbox{logit}^{-1}(x)) 
+     * <p>\f$ {} = \log (U - L) + \log (\mbox{logit}^{-1}(x))
      *                          + \log (1 - \mbox{logit}^{-1}(x))\f$
      *
      * <p>If the lower bound is negative infinity and upper bound finite,
@@ -94,7 +94,7 @@ namespace stan {
      * the upper bound is positive infinity and the lower bound
      * finite, this function reduces to
      * <code>lb_constrain(x,lb,lp)</code>.  If the upper bound is
-     * positive infinity and the lower bound negative infinity, 
+     * positive infinity and the lower bound negative infinity,
      * this function reduces to <code>identity_constrain(x,lp)</code>.
      *
      * @param x Free scalar to transform.
@@ -127,7 +127,7 @@ namespace stan {
         inv_logit_x = 1.0 / (1.0 + exp_minus_x);
         lp += log(ub - lb) - x - 2 * log1p(exp_minus_x);
         // Prevent x from reaching one unless it really really should.
-        if ((x < std::numeric_limits<double>::infinity()) 
+        if ((x < std::numeric_limits<double>::infinity())
             && (inv_logit_x == 1))
             inv_logit_x = 1 - 1e-15;
       } else {
@@ -135,7 +135,7 @@ namespace stan {
         inv_logit_x = 1.0 - 1.0 / (1.0 + exp_x);
         lp += log(ub - lb) + x - 2 * log1p(exp_x);
         // Prevent x from reaching zero unless it really really should.
-        if ((x > -std::numeric_limits<double>::infinity()) 
+        if ((x > -std::numeric_limits<double>::infinity())
             && (inv_logit_x== 0))
             inv_logit_x = 1e-15;
       }

@@ -25,14 +25,13 @@ namespace stan {
     cauchy_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
         T_partials_return;
-              
-      // Size checks
-      if ( !( stan::length(y) && stan::length(mu) 
-              && stan::length(sigma) ) ) 
+        // Size checks
+      if ( !( stan::length(y) && stan::length(mu)
+              && stan::length(sigma) ) )
         return 0.0;
-        
+
       static const char* function("stan::prob::cauchy_cdf");
-      
+
       using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
@@ -41,44 +40,41 @@ namespace stan {
       using stan::math::value_of;
 
       T_partials_return cdf_log(0.0);
-        
+
       check_not_nan(function, "Random variable", y);
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
-      check_consistent_sizes(function, 
-                             "Random variable", y, 
-                             "Location parameter", mu, 
+      check_consistent_sizes(function,
+                             "Random variable", y,
+                             "Location parameter", mu,
                              "Scale Parameter", sigma);
-        
+
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
-        
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
-        
+
       // Compute CDFLog and its gradients
       using std::atan;
       using stan::math::pi;
 
       // Compute vectorized CDF and gradient
       for (size_t n = 0; n < N; n++) {
-            
         // Pull out values
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
         const T_partials_return sigma_inv_dbl = 1.0 / value_of(sigma_vec[n]);
         const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
-            
         const T_partials_return z = (y_dbl - mu_dbl) * sigma_inv_dbl;
-          
+
         // Compute
         const T_partials_return Pn = atan(z) / pi() + 0.5;
         cdf_log += log(Pn);
-            
-        const T_partials_return rep_deriv = 1.0 / (pi() * Pn 
+        const T_partials_return rep_deriv = 1.0 / (pi() * Pn
                                                    * (z * z * sigma_dbl + sigma_dbl));
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv;

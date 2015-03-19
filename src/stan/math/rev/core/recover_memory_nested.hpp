@@ -16,7 +16,7 @@ namespace stan {
      * <code>std::logic_error</code> exception is thrown.
      *
      * @throw std::logic_error if <code>empty_nested()</code> returns
-     * <code>true</code> 
+     * <code>true</code>
      */
     static inline void recover_memory_nested() {
       if (empty_nested())
@@ -30,7 +30,7 @@ namespace stan {
       ChainableStack::nested_var_nochain_stack_sizes_.pop_back();
 
       for (size_t i = ChainableStack::nested_var_alloc_stack_starts_.back();
-           i < ChainableStack::var_alloc_stack_.size(); 
+           i < ChainableStack::var_alloc_stack_.size();
            ++i) {
         delete ChainableStack::var_alloc_stack_[i];
       }

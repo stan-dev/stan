@@ -27,7 +27,7 @@ namespace stan {
       stan::math::check_column_index("sub_col", "j", m, j);
       return m.block(i - 1,j - 1,nrows,1);
     }
-    
+
 
   }
 }

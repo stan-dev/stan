@@ -39,15 +39,15 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_finite;
       using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;      
+      using stan::math::check_nonnegative;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::prob::include_summand;
 
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(sigma)))
         return 0.0;
 
@@ -63,23 +63,23 @@ namespace stan {
                              "Random variable", y,
                              "Location parameter", mu,
                              "Scale parameter", sigma);
-      
+
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
-      
+
       for (size_t n = 0; n < length(y); n++)
         if (value_of(y_vec[n]) <= 0)
           return LOG_ZERO;
-      
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
- 
+
       using stan::math::square;
       using std::log;
       using stan::prob::NEG_LOG_SQRT_TWO_PI;
-      
+
 
       VectorBuilder<include_summand<propto,T_scale>::value,
                     T_partials_return, T_scale> log_sigma(length(sigma));
@@ -97,7 +97,7 @@ namespace stan {
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
         for (size_t n = 0; n < length(sigma); n++)
           inv_sigma_sq[n] = inv_sigma[n] * inv_sigma[n];
-      
+
       VectorBuilder<include_summand<propto,T_y,T_loc,T_scale>::value,
                     T_partials_return, T_y> log_y(length(y));
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
@@ -124,7 +124,7 @@ namespace stan {
         T_partials_return logy_m_mu_div_sigma(0);
         if (contains_nonconstant_struct<T_y,T_loc,T_scale>::value)
           logy_m_mu_div_sigma = logy_m_mu * inv_sigma_sq[n];
-  
+
 
         // log probability
         if (include_summand<propto,T_scale>::value)
@@ -140,7 +140,7 @@ namespace stan {
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] += logy_m_mu_div_sigma;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
+          operands_and_partials.d_x3[n]
             += (logy_m_mu_div_sigma * logy_m_mu - 1) * inv_sigma[n];
       }
       return operands_and_partials.to_var(logp,y,mu,sigma);

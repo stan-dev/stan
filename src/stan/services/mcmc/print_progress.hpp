@@ -9,11 +9,11 @@
 namespace stan {
   namespace services {
     namespace mcmc {
-    
+
       void print_progress(const int m,
-                          const int start, 
-                          const int finish, 
-                          const int refresh, 
+                          const int start,
+                          const int finish,
+                          const int refresh,
                           const bool warmup,
                           const std::string prefix,
                           const std::string suffix,
@@ -24,7 +24,7 @@ namespace stan {
           o << "Iteration: ";
           o << std::setw(it_print_width) << m + 1 + start
             << " / " << finish;
-          o << " [" << std::setw(3) 
+          o << " [" << std::setw(3)
             << static_cast<int>( (100.0 * (start + m + 1)) / finish )
             << "%] ";
           o << (warmup ? " (Warmup)" : " (Sampling)");

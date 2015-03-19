@@ -2,7 +2,7 @@
 #define STAN__MATH__PRIM__MAT__FUN__INITIALIZE_HPP
 
 #include <vector>
-#include <boost/type_traits/is_arithmetic.hpp> 
+#include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
@@ -18,7 +18,7 @@ namespace stan {
       x = v;
     }
     template <typename T, typename V>
-    inline 
+    inline
     typename boost::enable_if_c<boost::is_arithmetic<V>::value, void>::type
     initialize(T& x, V v) {
       x = v;
@@ -34,6 +34,6 @@ namespace stan {
         initialize(x[i],v);
     }
 
-  }    
+  }
 }
 #endif

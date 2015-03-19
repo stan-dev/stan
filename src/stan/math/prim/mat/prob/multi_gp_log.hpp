@@ -33,7 +33,7 @@ namespace stan {
      * @param Sigma The NxN kernel matrix
      * @param w A d-dimensional vector of positve inverse scale parameters for each output.
      * @return The log of the multivariate GP density.
-     * @throw std::domain_error if Sigma is not square, not symmetric, 
+     * @throw std::domain_error if Sigma is not square, not symmetric,
      * or not semi-positive definite.
      * @tparam T_y Type of scalar.
      * @tparam T_covar Type of kernel.
@@ -48,7 +48,7 @@ namespace stan {
       static const char* function("stan::prob::multi_gp_log");
       typedef typename boost::math::tools::promote_args<T_y,T_covar,T_w>::type T_lp;
       T_lp lp(0.0);
-      
+
       using stan::math::sum;
       using stan::math::log;
       using stan::math::LDLT_factor;
@@ -66,22 +66,22 @@ namespace stan {
       check_positive(function, "Kernel rows", Sigma.rows());
       check_finite(function, "Kernel", Sigma);
       check_symmetric(function, "Kernel", Sigma);
-      
+
       LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
       check_ldlt_factor(function, "LDLT_Factor of Sigma", ldlt_Sigma);
 
-      check_size_match(function, 
-                       "Size of random variable (rows y)", y.rows(), 
+      check_size_match(function,
+                       "Size of random variable (rows y)", y.rows(),
                        "Size of kernel scales (w)", w.size());
-      check_size_match(function, 
-                       "Size of random variable", y.cols(), 
+      check_size_match(function,
+                       "Size of random variable", y.cols(),
                        "rows of covariance parameter", Sigma.rows());
       check_positive_finite(function, "Kernel scales", w);
       check_finite(function, "Random variable", y);
-      
+
       if (y.rows() == 0)
         return lp;
-      
+
       if (include_summand<propto>::value) {
         lp += NEG_LOG_SQRT_TWO_PI * y.rows() * y.cols();
       }
@@ -93,7 +93,7 @@ namespace stan {
       if (include_summand<propto,T_w>::value) {
         lp += (0.5 * y.cols()) * sum(log(w));
       }
-      
+
       if (include_summand<propto,T_y,T_w,T_covar>::value) {
         Eigen::Matrix<T_w,Eigen::Dynamic,Eigen::Dynamic> w_mat(w.asDiagonal());
         Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> yT(y.transpose());
@@ -102,7 +102,7 @@ namespace stan {
 
       return lp;
     }
-    
+
     template <typename T_y, typename T_covar, typename T_w>
     inline
     typename boost::math::tools::promote_args<T_y,T_covar,T_w>::type
@@ -111,7 +111,7 @@ namespace stan {
                  const Eigen::Matrix<T_w,Eigen::Dynamic,1>& w) {
       return multi_gp_log<false>(y,Sigma,w);
     }
-  }    
+  }
 }
 
 #endif

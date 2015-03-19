@@ -18,7 +18,7 @@ namespace stan {
      *
      * @return <code>1</code> if the value is infinite and <code>0</code> otherwise.
      */
-    inline 
+    inline
     int
     is_inf(const var& v) {
       return stan::math::is_inf(v.val());

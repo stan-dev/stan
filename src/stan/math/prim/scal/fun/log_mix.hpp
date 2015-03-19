@@ -16,28 +16,28 @@ namespace stan {
      * and log densities.
      *
      * \f[
-     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2) 
+     * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
      * = \log \left( \theta \lambda_1 + (1 - \theta) \lambda_2 \right).
      * \f]
-     * 
+     *
      * \f[
-     * \frac{\partial}{\partial \theta} 
+     * \frac{\partial}{\partial \theta}
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
      * = FIXME
      * \f]
      *
      * \f[
-     * \frac{\partial}{\partial \lambda_1} 
+     * \frac{\partial}{\partial \lambda_1}
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
      * = FIXME
      * \f]
      *
      * \f[
-     * \frac{\partial}{\partial \lambda_2} 
+     * \frac{\partial}{\partial \lambda_2}
      * \mbox{log\_mix}(\theta, \lambda_1, \lambda_2)
      * = FIXME
      * \f]
-     * 
+     *
      * @param[in] theta mixing proportion in [0,1].
      * @param lambda1 first log density.
      * @param lambda2 second log density.

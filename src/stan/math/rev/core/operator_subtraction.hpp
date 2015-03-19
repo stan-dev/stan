@@ -27,7 +27,7 @@ namespace stan {
           }
         }
       };
-    
+
       class subtract_vd_vari : public op_vd_vari {
       public:
         subtract_vd_vari(vari* avi, double b) :
@@ -60,14 +60,14 @@ namespace stan {
     /**
      * Subtraction operator for variables (C++).
      *
-     * The partial derivatives are defined by 
+     * The partial derivatives are defined by
      *
      * \f$\frac{\partial}{\partial x} (x-y) = 1\f$, and
      *
      * \f$\frac{\partial}{\partial y} (x-y) = -1\f$.
-     * 
+     *
        \f[
-       \mbox{operator-}(x,y) = 
+       \mbox{operator-}(x,y) =
        \begin{cases}
          x-y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
@@ -75,7 +75,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator-}(x,y)}{\partial x} = 
+       \frac{\partial\,\mbox{operator-}(x,y)}{\partial x} =
        \begin{cases}
          1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
@@ -83,7 +83,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator-}(x,y)}{\partial y} = 
+       \frac{\partial\,\mbox{operator-}(x,y)}{\partial y} =
        \begin{cases}
          -1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}

@@ -7,7 +7,7 @@
 #include <limits>
 
 namespace stan {
-  
+
   namespace prob {
     // LOWER BOUND
 

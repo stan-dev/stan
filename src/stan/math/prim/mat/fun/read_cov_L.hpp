@@ -5,10 +5,10 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
-    /** 
+    /**
      * This is the function that should be called prior to evaluating
      * the density of any elliptical distribution
      *
@@ -21,7 +21,7 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     read_cov_L(const Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
-               const Eigen::Array<T,Eigen::Dynamic,1>& sds, 
+               const Eigen::Array<T,Eigen::Dynamic,1>& sds,
                T& log_prob) {
       size_t K = sds.rows();
       // adjust due to transformation from correlations to covariances

@@ -40,8 +40,8 @@ namespace stan {
       using stan::math::value_of;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(alpha) 
+      if (!(stan::length(y)
+            && stan::length(alpha)
             && stan::length(sigma)))
         return 1.0;
 
@@ -49,8 +49,8 @@ namespace stan {
       check_positive(function, "Random variable", y);
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", sigma);
-      
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
+
+      agrad::OperandsAndPartials<T_y, T_shape, T_scale>
         operands_and_partials(y, alpha, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -77,16 +77,16 @@ namespace stan {
       }
 
       if (!is_constant_struct<T_y>::value)
-        for (size_t n = 0; n < stan::length(y); ++n) 
+        for (size_t n = 0; n < stan::length(y); ++n)
           operands_and_partials.d_x1[n] *= cdf;
       if (!is_constant_struct<T_shape>::value)
-        for (size_t n = 0; n < stan::length(alpha); ++n) 
+        for (size_t n = 0; n < stan::length(alpha); ++n)
           operands_and_partials.d_x2[n] *= cdf;
       if (!is_constant_struct<T_scale>::value)
-        for (size_t n = 0; n < stan::length(sigma); ++n) 
+        for (size_t n = 0; n < stan::length(sigma); ++n)
           operands_and_partials.d_x3[n] *= cdf;
 
-      return operands_and_partials.to_var(cdf, y, alpha, sigma);    
+      return operands_and_partials.to_var(cdf, y, alpha, sigma);
     }
   }
 }

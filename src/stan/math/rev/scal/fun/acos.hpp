@@ -30,7 +30,7 @@ namespace stan {
      *
      *
        \f[
-       \mbox{acos}(x) = 
+       \mbox{acos}(x) =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < -1\\
          \arccos(x) & \mbox{if } -1\leq x\leq 1 \\
@@ -40,7 +40,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{acos}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{acos}(x)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < -1\\
          \frac{\partial\,\arccos(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
@@ -54,7 +54,7 @@ namespace stan {
        \f]
      *
      * @param a Variable in range [-1,1].
-     * @return Arc cosine of variable, in radians. 
+     * @return Arc cosine of variable, in radians.
      */
     inline var acos(const var& a) {
       return var(new acos_vari(a.vi_));

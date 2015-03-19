@@ -5,20 +5,20 @@
 #include <cmath>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
      * Return the unconstrained value corresponding to the specified
-     * positive-constrained value.  
+     * positive-constrained value.
      *
      * <p>The transform is the inverse of the transform \f$f\f$ applied by
      * <code>positive_constrain(T)</code>, namely
      *
      * <p>\f$f^{-1}(x) = \log(x)\f$.
-     * 
+     *
      * <p>The input is validated using <code>stan::math::check_positive()</code>.
-     * 
+     *
      * @param y Input scalar.
      * @return Unconstrained value that produces the input when constrained.
      * @tparam T Type of scalar.

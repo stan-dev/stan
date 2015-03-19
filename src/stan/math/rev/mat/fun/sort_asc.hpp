@@ -10,7 +10,7 @@
 
 namespace stan {
   namespace agrad {
-   
+
     /**
      * Return the specified standard vector in ascending order with gradients kept.
      *
@@ -22,7 +22,7 @@ namespace stan {
       std::sort(xs.begin(), xs.end());
       return xs;
     }
-    
+
     /**
      * Return the specified eigen vector in ascending order with gradients kept.
      *

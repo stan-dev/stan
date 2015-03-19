@@ -19,13 +19,13 @@
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
     template <typename T_y, typename T_inv_scale>
     typename return_type<T_y,T_inv_scale>::type
     exponential_ccdf_log(const T_y& y, const T_inv_scale& beta) {
-      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type 
+      typedef typename stan::partials_return_type<T_y,T_inv_scale>::type
         T_partials_return;
 
       static const char* function("stan::prob::exponential_ccdf_log");
@@ -38,7 +38,7 @@ namespace stan {
 
       T_partials_return ccdf_log(0.0);
       // check if any vectors are zero length
-      if (!(stan::length(y) 
+      if (!(stan::length(y)
             && stan::length(beta)))
         return ccdf_log;
 
@@ -46,16 +46,15 @@ namespace stan {
       check_nonnegative(function, "Random variable", y);
       check_positive_finite(function, "Inverse scale parameter", beta);
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale> 
+      agrad::OperandsAndPartials<T_y, T_inv_scale>
         operands_and_partials(y, beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, beta);
-      for (size_t n = 0; n < N; n++) { 
-        const T_partials_return beta_dbl = value_of(beta_vec[n]);     
-        const T_partials_return y_dbl = value_of(y_vec[n]);            
-        // log ccdf
+      for (size_t n = 0; n < N; n++) {
+        const T_partials_return beta_dbl = value_of(beta_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);        // log ccdf
         ccdf_log += -beta_dbl * y_dbl;
 
         // gradients

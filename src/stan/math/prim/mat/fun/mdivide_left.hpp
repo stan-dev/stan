@@ -19,13 +19,13 @@ namespace stan {
      * match the size of A.
      */
     template <typename T1, typename T2, int R1, int C1, int R2, int C2>
-    inline 
+    inline
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_left(const Eigen::Matrix<T1,R1,C1> &A,
                  const Eigen::Matrix<T2,R2,C2> &b) {
       stan::math::check_square("mdivide_left", "A", A);
       stan::math::check_multiplicable("mdivide_left",
-                                                "A", A, 
+                                                "A", A,
                                                 "b", b);
       return promote_common<Eigen::Matrix<T1,R1,C1>,
                             Eigen::Matrix<T2,R1,C1> >(A)

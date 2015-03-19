@@ -9,7 +9,7 @@
 namespace stan {
 
   namespace agrad {
-   
+
     /**
      * Propagate chain rule to calculate gradients starting from
      * the specified variable.  Resizes the input vector to be the
@@ -32,7 +32,7 @@ namespace stan {
       for (int i = 0; i < x.size(); ++i)
         g(i) = x(i).vi_->adj_;
     }
-    
+
   }
 }
 

@@ -18,7 +18,7 @@ namespace stan {
     /**
      * The log of the Dirichlet density for the given theta and
      * a vector of prior sample sizes, alpha.
-     * Each element of alpha must be greater than 0. 
+     * Each element of alpha must be greater than 0.
      * Each element of theta must be greater than or 0.
      * Theta sums to 1.
      *
@@ -29,7 +29,7 @@ namespace stan {
      &=& \log (\Gamma(\alpha_1 + \cdots + \alpha_k)) - \log(\Gamma(\alpha_1)) - \cdots - \log(\Gamma(\alpha_k)) +
      (\alpha_1 - 1) \log (\theta_1) + \cdots + (\alpha_k - 1) \log (\theta_k)
      \f}
-     * 
+     *
      * @param theta A scalar vector.
      * @param alpha Prior sample sizes.
      * @return The log of the Dirichlet density.
@@ -52,10 +52,10 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_simplex;
       using stan::math::multiply_log;
-      
-      typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);      
-      check_consistent_sizes(function, 
-                             "probabilities", theta, 
+
+      typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);
+      check_consistent_sizes(function,
+                             "probabilities", theta,
                              "prior sample sizes", alpha);
       check_positive(function, "prior sample sizes", alpha);
       check_simplex(function, "probabilities", theta);
@@ -66,7 +66,7 @@ namespace stan {
           lp -= lgamma(alpha[k]);
       }
       if (include_summand<propto,T_prob,T_prior_sample_size>::value)
-        for (int k = 0; k < theta.rows(); ++k) 
+        for (int k = 0; k < theta.rows(); ++k)
           lp += multiply_log(alpha[k]-1, theta[k]);
       return lp;
     }

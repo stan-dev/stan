@@ -63,7 +63,7 @@ namespace stan {
      * Return the value of a*log(b).
      *
      * When both a and b are 0, the value returned is 0.
-     * The partial deriviative with respect to a is log(b). 
+     * The partial deriviative with respect to a is log(b).
      * The partial deriviative with respect to b is a/b. When
      * a and b are both 0, this is set to Inf.
      *
@@ -78,7 +78,7 @@ namespace stan {
      * Return the value of a*log(b).
      *
      * When both a and b are 0, the value returned is 0.
-     * The partial deriviative with respect to a is log(b). 
+     * The partial deriviative with respect to a is log(b).
      *
      * @param a First variable.
      * @param b Second scalar.

@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the dot product of the specified vectors.
      *
@@ -19,7 +19,7 @@ namespace stan {
      */
     template<int R1,int C1,int R2, int C2>
     inline Eigen::Matrix<double, R1, 1>
-    rows_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+    rows_dot_product(const Eigen::Matrix<double, R1, C1>& v1,
                      const Eigen::Matrix<double, R2, C2>& v2) {
       stan::math::check_matching_sizes("rows_dot_product",
                                                  "v1", v1,
@@ -29,8 +29,8 @@ namespace stan {
         ret(j) = v1.row(j).dot(v2.row(j));
       }
       return ret;
-    }    
-    
+    }
+
   }
 }
 #endif

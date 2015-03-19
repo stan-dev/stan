@@ -145,7 +145,7 @@ int stanc_helper(int argc, const char* argv[],
       *out_stream << "Output file=" << out_file_name << std::endl;
     }
 
-    bool valid_model 
+    bool valid_model
       = stan::lang::compile(err_stream,in,out,model_name,in_file_name);
 
     out.close();

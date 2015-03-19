@@ -21,7 +21,7 @@ namespace stan {
       typedef typename Eigen::Matrix<T,R,C>::Index type;
     };
 
-    
+
   }
 
 }

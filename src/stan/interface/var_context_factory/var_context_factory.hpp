@@ -14,7 +14,7 @@ namespace stan {
         virtual VARCON operator()(const std::string source) = 0;
         typedef VARCON var_context_t;
       };
-      
+
     }
   }
 }

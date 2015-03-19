@@ -27,9 +27,9 @@ namespace stan {
         vari** v1_;
         vari** v2_;
         size_t length_;
-        
+
         template <int R1,int C1,int R2,int C2>
-        inline static double 
+        inline static double
         var_squared_distance(const Eigen::Matrix<var,R1,C1> &v1,
                              const Eigen::Matrix<var,R2,C2> &v2) {
           using Eigen::Matrix;
@@ -45,13 +45,13 @@ namespace stan {
       public:
         template<int R1,int C1,int R2,int C2>
         squared_distance_vv_vari(const Eigen::Matrix<var,R1,C1> &v1,
-                             const Eigen::Matrix<var,R2,C2> &v2) 
+                             const Eigen::Matrix<var,R2,C2> &v2)
         : vari(var_squared_distance(v1, v2)), length_(v1.size())
         {
           v1_ = (vari**)ChainableStack::memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
             v1_[i] = v1(i).vi_;
-          
+
           v2_ = (vari**)ChainableStack::memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
             v2_[i] = v2(i).vi_;
@@ -69,9 +69,9 @@ namespace stan {
         vari** v1_;
         double* v2_;
         size_t length_;
-        
+
         template<int R1,int C1,int R2,int C2>
-        inline static double 
+        inline static double
         var_squared_distance(const Eigen::Matrix<var,R1,C1> &v1,
                              const Eigen::Matrix<double,R2,C2> &v2) {
 
@@ -89,13 +89,13 @@ namespace stan {
       public:
         template<int R1,int C1,int R2,int C2>
         squared_distance_vd_vari(const Eigen::Matrix<var,R1,C1> &v1,
-                                 const Eigen::Matrix<double,R2,C2> &v2) 
+                                 const Eigen::Matrix<double,R2,C2> &v2)
         : vari(var_squared_distance(v1, v2)), length_(v1.size())
         {
           v1_ = (vari**)ChainableStack::memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
             v1_[i] = v1(i).vi_;
-          
+
           v2_ = (double*)ChainableStack::memalloc_.alloc(length_*sizeof(double));
           for (size_t i = 0; i < length_; i++)
             v2_[i] = v2(i);
@@ -107,9 +107,9 @@ namespace stan {
         }
       };
     }
-    
+
     template<int R1,int C1,int R2, int C2>
-    inline var squared_distance(const Eigen::Matrix<var, R1, C1>& v1, 
+    inline var squared_distance(const Eigen::Matrix<var, R1, C1>& v1,
                                 const Eigen::Matrix<var, R2, C2>& v2) {
       stan::math::check_vector("squared_distance", "v1", v1);
       stan::math::check_vector("squared_distance", "v2", v2);
@@ -119,17 +119,17 @@ namespace stan {
       return var(new squared_distance_vv_vari(v1,v2));
     }
     template<int R1,int C1,int R2, int C2>
-    inline var squared_distance(const Eigen::Matrix<var, R1, C1>& v1, 
+    inline var squared_distance(const Eigen::Matrix<var, R1, C1>& v1,
                                 const Eigen::Matrix<double, R2, C2>& v2) {
       stan::math::check_vector("squared_distance", "v1", v1);
       stan::math::check_vector("squared_distance", "v2", v2);
-      stan::math::check_matching_sizes("squared_distance", 
+      stan::math::check_matching_sizes("squared_distance",
                                                  "v1", v1,
                                                  "v2", v2);
       return var(new squared_distance_vd_vari(v1,v2));
     }
     template<int R1,int C1,int R2, int C2>
-    inline var squared_distance(const Eigen::Matrix<double, R1, C1>& v1, 
+    inline var squared_distance(const Eigen::Matrix<double, R1, C1>& v1,
                                 const Eigen::Matrix<var, R2, C2>& v2) {
       stan::math::check_vector("squared_distance", "v1", v1);
       stan::math::check_vector("squared_distance", "v2", v2);

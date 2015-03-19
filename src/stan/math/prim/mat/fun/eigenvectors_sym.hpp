@@ -16,7 +16,7 @@ namespace stan {
 
       Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
         solver(m);
-      return solver.eigenvectors(); 
+      return solver.eigenvectors();
     }
 
   }

@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the maximum coefficient in the specified
      * column vector.
@@ -21,7 +21,7 @@ namespace stan {
         throw std::domain_error("error: cannot take max of empty int vector");
       int max = x[0];
       for (size_t i = 1; i < x.size(); ++i)
-        if (x[i] > max) 
+        if (x[i] > max)
           max = x[i];
       return max;
     }
@@ -39,7 +39,7 @@ namespace stan {
         return -std::numeric_limits<T>::infinity();
       T max = x[0];
       for (size_t i = 1; i < x.size(); ++i)
-        if (x[i] > max) 
+        if (x[i] > max)
           max = x[i];
       return max;
     }
@@ -56,7 +56,7 @@ namespace stan {
         return -std::numeric_limits<double>::infinity();
       return m.maxCoeff();
     }
-    
+
   }
 }
 #endif

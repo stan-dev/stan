@@ -28,15 +28,15 @@ namespace stan {
      *
      *
        \f[
-       \mbox{sin}(x) = 
+       \mbox{sin}(x) =
        \begin{cases}
          \sin(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{sin}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{sin}(x)}{\partial x} =
        \begin{cases}
          \cos(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
@@ -44,7 +44,7 @@ namespace stan {
        \f]
      *
      * @param a Variable for radians of angle.
-     * @return Sine of variable. 
+     * @return Sine of variable.
      */
     inline var sin(const var& a) {
       return var(new sin_vari(a.vi_));

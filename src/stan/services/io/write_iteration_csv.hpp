@@ -7,7 +7,7 @@
 namespace stan {
   namespace services {
     namespace io {
-    
+
       void write_iteration_csv(std::ostream& output_stream,
                                const double lp,
                                const std::vector<double>& model_values) {
@@ -17,7 +17,7 @@ namespace stan {
         }
         output_stream << std::endl;
       }
-      
+
     }
   }
 }

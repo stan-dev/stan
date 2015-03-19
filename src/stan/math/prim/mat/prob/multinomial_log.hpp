@@ -15,7 +15,7 @@
 namespace stan {
 
   namespace prob {
-    // Multinomial(ns|N,theta)   [0 <= n <= N;  SUM ns = N;   
+    // Multinomial(ns|N,theta)   [0 <= n <= N;  SUM ns = N;
     //                            0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto,
               typename T_prob>
@@ -33,14 +33,14 @@ namespace stan {
       typename promote_args<T_prob>::type lp(0.0);
       check_nonnegative(function, "Number of trials variable", ns);
       check_simplex(function, "Probabilites parameter", theta);
-      check_size_match(function, 
+      check_size_match(function,
                        "Size of number of trials variable", ns.size(),
                        "rows of probabilities parameter", theta.rows());
       using stan::math::multiply_log;
 
-      if (include_summand<propto>::value) {     
+      if (include_summand<propto>::value) {
         double sum = 1.0;
-        for (unsigned int i = 0; i < ns.size(); ++i) 
+        for (unsigned int i = 0; i < ns.size(); ++i)
           sum += ns[i];
         lp += lgamma(sum);
         for (unsigned int i = 0; i < ns.size(); ++i)

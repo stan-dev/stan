@@ -17,7 +17,7 @@ namespace stan {
       using boost::math::digamma;
 
       T falling_fact(falling_factorial(x.val_,n.val_));
-      return fvar<T>(falling_fact, falling_fact * digamma(x.val_ + 1) * x.d_ 
+      return fvar<T>(falling_fact, falling_fact * digamma(x.val_ + 1) * x.d_
                      - falling_fact * digamma(n.val_ + 1) * n.d_);
     }
 
@@ -28,7 +28,7 @@ namespace stan {
       using boost::math::digamma;
 
       T falling_fact(falling_factorial(x.val_,n));
-      return fvar<T>(falling_fact, 
+      return fvar<T>(falling_fact,
                      falling_fact * digamma(x.val_ + 1) * x.d_);
     }
 
@@ -39,7 +39,7 @@ namespace stan {
       using boost::math::digamma;
 
       T falling_fact(falling_factorial(x, n.val_));
-      return fvar<T>(falling_fact, 
+      return fvar<T>(falling_fact,
                      -falling_fact * digamma(n.val_ + 1) * n.d_);
     }
   }

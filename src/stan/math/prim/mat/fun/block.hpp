@@ -31,7 +31,7 @@ namespace stan {
       check_column_index("block", "j+ncols-1", m, j+ncols-1);
       return m.block(i - 1,j - 1,nrows,ncols);
     }
-    
+
   }
 }
 #endif

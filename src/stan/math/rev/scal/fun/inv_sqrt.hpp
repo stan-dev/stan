@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class inv_sqrt_vari : public op_v_vari {
       public:
@@ -19,19 +19,19 @@ namespace stan {
         }
       };
     }
-    
+
     /**
      *
        \f[
-       \mbox{inv\_sqrt}(x) = 
+       \mbox{inv\_sqrt}(x) =
        \begin{cases}
          \frac{1}{\sqrt{x}} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{inv\_sqrt}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{inv\_sqrt}(x)}{\partial x} =
        \begin{cases}
          -\frac{1}{2\sqrt{x^3}} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

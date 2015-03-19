@@ -6,7 +6,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     /**
      * Returns the result of pre-multiplying a matrix by its
      * own transpose.

@@ -12,7 +12,7 @@ namespace stan {
   namespace agrad {
 
     template <typename T1, typename T2>
-    inline 
+    inline
     typename stan::return_type<T1,T2>::type
     divide(const T1& v, const T2& c) {
       return v / c;
@@ -32,7 +32,7 @@ namespace stan {
     template <typename T, int R, int C>
     inline Eigen::Matrix<fvar<T>,R,C>
     divide(const Eigen::Matrix<fvar<T>, R,C>& v, const double c) {
-      Eigen::Matrix<fvar<T>,R,C> 
+      Eigen::Matrix<fvar<T>,R,C>
         res(v.rows(),v.cols());
       for(int i = 0; i < v.rows(); i++) {
         for(int j = 0; j < v.cols(); j++)
@@ -44,7 +44,7 @@ namespace stan {
     template <typename T, int R, int C>
     inline Eigen::Matrix<fvar<T>,R,C>
     divide(const Eigen::Matrix<double, R,C>& v, const fvar<T>& c) {
-      Eigen::Matrix<fvar<T>,R,C> 
+      Eigen::Matrix<fvar<T>,R,C>
         res(v.rows(),v.cols());
       for(int i = 0; i < v.rows(); i++) {
         for(int j = 0; j < v.cols(); j++)

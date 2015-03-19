@@ -23,9 +23,9 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline const T& 
-    get_base1(const std::vector<T>& x, 
-              size_t i, 
+    inline const T&
+    get_base1(const std::vector<T>& x,
+              size_t i,
               const char* error_msg,
               size_t idx) {
       using stan::math::check_range;
@@ -49,9 +49,9 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline const T& 
-    get_base1(const std::vector<std::vector<T> >& x, 
-              size_t i1, 
+    inline const T&
+    get_base1(const std::vector<std::vector<T> >& x,
+              size_t i1,
               size_t i2,
               const char* error_msg,
               size_t idx) {
@@ -77,9 +77,9 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline const T& 
-    get_base1(const std::vector<std::vector<std::vector<T> > >& x, 
-              size_t i1, 
+    inline const T&
+    get_base1(const std::vector<std::vector<std::vector<T> > >& x,
+              size_t i1,
               size_t i2,
               size_t i3,
               const char* error_msg,
@@ -107,9 +107,9 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline const T& 
-    get_base1(const std::vector<std::vector<std::vector<std::vector<T> > > >& x, 
-              size_t i1, 
+    inline const T&
+    get_base1(const std::vector<std::vector<std::vector<std::vector<T> > > >& x,
+              size_t i1,
               size_t i2,
               size_t i3,
               size_t i4,
@@ -139,9 +139,9 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline const T& 
-    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > >& x, 
-              size_t i1, 
+    inline const T&
+    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > >& x,
+              size_t i1,
               size_t i2,
               size_t i3,
               size_t i4,
@@ -173,9 +173,9 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline const T& 
-    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > >& x, 
-              size_t i1, 
+    inline const T&
+    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > >& x,
+              size_t i1,
               size_t i2,
               size_t i3,
               size_t i4,
@@ -210,9 +210,9 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline const T& 
-    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > >& x, 
-              size_t i1, 
+    inline const T&
+    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > >& x,
+              size_t i1,
               size_t i2,
               size_t i3,
               size_t i4,
@@ -249,9 +249,9 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline const T& 
-    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > > >& x, 
-              size_t i1, 
+    inline const T&
+    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > > >& x,
+              size_t i1,
               size_t i2,
               size_t i3,
               size_t i4,
@@ -276,7 +276,7 @@ namespace stan {
      *
      * <b>Warning</b>:  Because a copy is involved, it is inefficient
      * to access element of matrices by first using this method
-     * to get a row then using a second call to get the value at 
+     * to get a row then using a second call to get the value at
      a specified column.
      *
      * @param x Matrix from which to get a row
@@ -315,7 +315,7 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline const T& 
+    inline const T&
     get_base1(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
               size_t m,
               size_t n,
@@ -367,7 +367,7 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline const T& 
+    inline const T&
     get_base1(const Eigen::Matrix<T,1,Eigen::Dynamic>& x,
               size_t n,
               const char* error_msg,

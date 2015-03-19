@@ -24,7 +24,7 @@ namespace stan {
       static const char* function("stan::prob::uniform_cdf_log");
       typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
         T_partials_return;
-      
+
       using stan::math::check_not_nan;
       using stan::math::check_finite;
       using stan::math::check_greater;
@@ -32,8 +32,8 @@ namespace stan {
       using stan::math::check_consistent_sizes;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(alpha) 
+      if (!(stan::length(y)
+            && stan::length(alpha)
             && stan::length(beta)))
         return 0.0;
 
@@ -53,12 +53,12 @@ namespace stan {
       VectorView<const T_high> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
 
-      agrad::OperandsAndPartials<T_y,T_low,T_high> 
+      agrad::OperandsAndPartials<T_y,T_low,T_high>
         operands_and_partials(y,alpha,beta);
 
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);
-        if (y_dbl < value_of(alpha_vec[n]) 
+        if (y_dbl < value_of(alpha_vec[n])
             || y_dbl > value_of(beta_vec[n]))
           return stan::math::negative_infinity();
         if (y_dbl == value_of(beta_vec[n]))

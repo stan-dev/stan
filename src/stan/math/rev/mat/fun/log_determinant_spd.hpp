@@ -33,7 +33,7 @@ namespace stan {
        // compute the inverse of A (needed for the derivative)
       m_d.setIdentity(m.rows(), m.cols());
       ldlt.solveInPlace(m_d);
-          
+
       if (ldlt.isNegative() || (ldlt.vectorD().array() <= 1e-16).any()) {
         double y = 0;
         domain_error("log_determinant_spd",
@@ -62,7 +62,7 @@ namespace stan {
 
       return var(new precomputed_gradients_vari(val,m.size(),operands,gradients));
     }
-    
+
 
   }
 

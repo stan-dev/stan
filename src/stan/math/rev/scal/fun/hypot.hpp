@@ -63,7 +63,7 @@ namespace stan {
      * The derivative is
      *
      * \f$\frac{d}{d x} \sqrt{x^2 + c^2} = \frac{x}{\sqrt{x^2 + c^2}}\f$.
-     * 
+     *
      * @param a Length of first side.
      * @param b Length of second side.
      * @return Length of hypoteneuse.
@@ -84,25 +84,25 @@ namespace stan {
      * \f$\frac{d}{d y} \sqrt{c^2 + y^2} = \frac{y}{\sqrt{c^2 + y^2}}\f$.
      *
        \f[
-       \mbox{hypot}(x,y) = 
+       \mbox{hypot}(x,y) =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
          \sqrt{x^2+y^2} & \mbox{if } x,y\geq 0 \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{hypot}(x,y)}{\partial x} = 
+       \frac{\partial\,\mbox{hypot}(x,y)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
          \frac{x}{\sqrt{x^2+y^2}} & \mbox{if } x,y\geq 0 \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{hypot}(x,y)}{\partial y} = 
+       \frac{\partial\,\mbox{hypot}(x,y)}{\partial y} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < 0 \text{ or } y < 0 \\
          \frac{y}{\sqrt{x^2+y^2}} & \mbox{if } x,y\geq 0 \\[6pt]

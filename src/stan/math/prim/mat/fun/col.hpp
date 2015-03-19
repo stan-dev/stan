@@ -13,7 +13,7 @@ namespace stan {
      *
      * This is equivalent to calling <code>m.col(i - 1)</code> and
      * assigning the resulting template expression to a column vector.
-     * 
+     *
      * @param m Matrix.
      * @param j Column index (count from 1).
      * @return Specified column of the matrix.

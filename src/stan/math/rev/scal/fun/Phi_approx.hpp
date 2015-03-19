@@ -14,27 +14,27 @@ namespace stan {
      *
      *
        \f[
-       \mbox{Phi\_approx}(x) = 
+       \mbox{Phi\_approx}(x) =
        \begin{cases}
          \Phi_{\mbox{\footnotesize approx}}(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{Phi\_approx}(x)}{\partial x} = 
+       \frac{\partial\,\mbox{Phi\_approx}(x)}{\partial x} =
        \begin{cases}
-         \frac{\partial\,\Phi_{\mbox{\footnotesize approx}}(x)}{\partial x} 
+         \frac{\partial\,\Phi_{\mbox{\footnotesize approx}}(x)}{\partial x}
          & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
        \Phi_{\mbox{\footnotesize approx}}(x) = \mbox{logit}^{-1}(0.07056 \,
        x^3 + 1.5976 \, x)
        \f]
-       
+
        \f[
        \frac{\partial \, \Phi_{\mbox{\footnotesize approx}}(x)}{\partial x}
        = -\Phi_{\mbox{\footnotesize approx}}^2(x)

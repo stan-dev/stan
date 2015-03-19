@@ -20,14 +20,14 @@ namespace stan {
 
   namespace prob {
 
-    template <bool propto, 
+    template <bool propto,
               typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
-    skew_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+    skew_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
                     const T_shape& alpha) {
       static const char* function("stan::prob::skew_normal_log");
       typedef typename stan::partials_return_type<T_y,T_loc,
-                                                  T_scale,T_shape>::type 
+                                                  T_scale,T_shape>::type
         T_partials_return;
 
       using std::log;
@@ -40,8 +40,8 @@ namespace stan {
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(sigma)
             && stan::length(alpha)))
         return 0.0;
@@ -63,9 +63,9 @@ namespace stan {
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
         return 0.0;
-      
+
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
         operands_and_partials(y, mu, sigma, alpha);
 
       using boost::math::erfc;
@@ -94,7 +94,7 @@ namespace stan {
         const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
 
         // reusable subexpression values
-        const T_partials_return y_minus_mu_over_sigma 
+        const T_partials_return y_minus_mu_over_sigma
           = (y_dbl - mu_dbl) * inv_sigma[n];
         const double pi_dbl = stan::math::pi();
 
@@ -106,32 +106,32 @@ namespace stan {
         if (include_summand<propto,T_y, T_loc, T_scale>::value)
           logp -= y_minus_mu_over_sigma * y_minus_mu_over_sigma / 2.0;
         if (include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
-          logp += log(erfc(-alpha_dbl * y_minus_mu_over_sigma 
+          logp += log(erfc(-alpha_dbl * y_minus_mu_over_sigma
                            / std::sqrt(2.0)));
 
         // gradients
-        T_partials_return deriv_logerf 
-          = 2.0 / std::sqrt(pi_dbl) 
-          * exp(-alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0) 
+        T_partials_return deriv_logerf
+          = 2.0 / std::sqrt(pi_dbl)
+          * exp(-alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0)
                 * alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0))
-          / (1 + erf(alpha_dbl * y_minus_mu_over_sigma 
+          / (1 + erf(alpha_dbl * y_minus_mu_over_sigma
                      / std::sqrt(2.0)));
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] 
-            += -y_minus_mu_over_sigma / sigma_dbl 
+          operands_and_partials.d_x1[n]
+            += -y_minus_mu_over_sigma / sigma_dbl
             + deriv_logerf * alpha_dbl / (sigma_dbl * std::sqrt(2.0)) ;
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] 
-            += y_minus_mu_over_sigma / sigma_dbl 
+          operands_and_partials.d_x2[n]
+            += y_minus_mu_over_sigma / sigma_dbl
             + deriv_logerf * -alpha_dbl / (sigma_dbl * std::sqrt(2.0));
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
-            += -1.0 / sigma_dbl 
-            + y_minus_mu_over_sigma * y_minus_mu_over_sigma / sigma_dbl 
-            - deriv_logerf * y_minus_mu_over_sigma * alpha_dbl 
+          operands_and_partials.d_x3[n]
+            += -1.0 / sigma_dbl
+            + y_minus_mu_over_sigma * y_minus_mu_over_sigma / sigma_dbl
+            - deriv_logerf * y_minus_mu_over_sigma * alpha_dbl
             / (sigma_dbl * std::sqrt(2.0));
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x4[n] 
+          operands_and_partials.d_x4[n]
             += deriv_logerf * y_minus_mu_over_sigma / std::sqrt(2.0);
       }
       return operands_and_partials.to_var(logp,y,mu,sigma,alpha);

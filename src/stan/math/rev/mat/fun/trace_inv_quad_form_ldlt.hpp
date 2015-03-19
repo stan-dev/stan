@@ -15,7 +15,7 @@ namespace stan {
       template <typename T2, int R2,int C2,typename T3,int R3,int C3>
       class trace_inv_quad_form_ldlt_impl : public chainable_alloc {
       protected:
-        inline void initializeB(const Eigen::Matrix<var,R3,C3> &B,bool haveD) { 
+        inline void initializeB(const Eigen::Matrix<var,R3,C3> &B,bool haveD) {
           Eigen::Matrix<double,R3,C3> Bd(B.rows(),B.cols());
           _variB.resize(B.rows(),B.cols());
           for (int j = 0; j < B.cols(); j++) {
@@ -25,14 +25,14 @@ namespace stan {
             }
           }
           AinvB_ = _ldlt.solve(Bd);
-          if (haveD) 
+          if (haveD)
             C_.noalias() = Bd.transpose()*AinvB_;
           else
             _value = (Bd.transpose()*AinvB_).trace();
         }
         inline void initializeB(const Eigen::Matrix<double,R3,C3> &B,bool haveD) {
           AinvB_ = _ldlt.solve(B);
-          if (haveD) 
+          if (haveD)
             C_.noalias() = B.transpose()*AinvB_;
           else
             _value = (B.transpose()*AinvB_).trace();
@@ -64,10 +64,10 @@ namespace stan {
         {
           initializeB(B,true);
           initializeD(D);
-          
+
           _value = (D_*C_).trace();
         }
-        
+
         trace_inv_quad_form_ldlt_impl(const stan::math::LDLT_factor<T2,R2,C2> &A,
                                       const Eigen::Matrix<T3,R3,C3> &B)
           : Dtype_(2),
@@ -75,7 +75,7 @@ namespace stan {
         {
           initializeB(B,false);
         }
-        
+
         const int Dtype_; // 0 = double, 1 = var, 2 = missing
         stan::math::LDLT_factor<T2,R2,C2> _ldlt;
         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> D_;
@@ -95,7 +95,7 @@ namespace stan {
         static inline void chainB(const double &adj,
                                   trace_inv_quad_form_ldlt_impl<T2,R2,C2,double,R3,C3> *impl) {
         }
-        
+
         static inline void chainA(const double &adj,
                                   trace_inv_quad_form_ldlt_impl<var,R2,C2,T3,R3,C3> *impl) {
           Eigen::Matrix<double,R2,C2> aA;
@@ -122,21 +122,21 @@ namespace stan {
             for (int i = 0; i < aB.rows(); i++)
               impl->_variB(i,j)->adj_ += aB(i,j);
         }
-        
+
       public:
         trace_inv_quad_form_ldlt_vari(trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3> *impl)
           : vari(impl->_value), _impl(impl)
         {}
-        
+
         virtual void chain() {
           // F = trace(D * B' * inv(A) * B)
           // aA = -aF * inv(A') * B * D' * B' * inv(A')
           // aB = aF*(inv(A) * B * D + inv(A') * B * D')
           // aD = aF*(B' * inv(A) * B)
           chainA(adj_, _impl);
-          
+
           chainB(adj_, _impl);
-          
+
           if (_impl->Dtype_ == 1) {
             for (int j = 0; j < _impl->_variD.cols(); j++)
               for (int i = 0; i < _impl->_variD.rows(); i++)
@@ -146,7 +146,7 @@ namespace stan {
 
         trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3> *_impl;
       };
-      
+
     }
 
 
@@ -158,7 +158,7 @@ namespace stan {
     template <typename T2,int R2,int C2,typename T3,int R3,int C3>
     inline typename
     boost::enable_if_c<stan::is_var<T2>::value ||
-                       stan::is_var<T3>::value, 
+                       stan::is_var<T3>::value,
                        var>::type
       trace_inv_quad_form_ldlt(const stan::math::LDLT_factor<T2,R2,C2> &A,
                                const Eigen::Matrix<T3,R3,C3> &B)
@@ -166,9 +166,9 @@ namespace stan {
       stan::math::check_multiplicable("trace_inv_quad_form_ldlt",
                                                 "A", A,
                                                 "B", B);
-      
+
       trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3>* _impl = new trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3>(A,B);
-      
+
       return var(new trace_inv_quad_form_ldlt_vari<T2,R2,C2,T3,R3,C3>(_impl));
     }
 

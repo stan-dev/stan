@@ -34,7 +34,7 @@ namespace stan {
                            const T_log_location& eta,
                            const T_precision& phi) {
       typedef typename stan::partials_return_type<T_n,T_log_location,
-                                                  T_precision>::type 
+                                                  T_precision>::type
         T_partials_return;
 
       static const char* function("stan::prob::neg_binomial_log");
@@ -86,11 +86,11 @@ namespace stan {
       VectorBuilder<true, T_partials_return, T_log_location> eta__(length(eta));
       for (size_t i = 0, size = length(eta); i < size; ++i)
         eta__[i] = value_of(eta_vec[i]);
-  
+
       VectorBuilder<true, T_partials_return, T_precision> phi__(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
-        phi__[i] = value_of(phi_vec[i]);  
-        
+        phi__[i] = value_of(phi_vec[i]);
+
 
       VectorBuilder<true, T_partials_return, T_precision>
         log_phi(length(phi));
@@ -126,7 +126,7 @@ namespace stan {
         if (!is_constant_struct<T_precision>::value)
           operands_and_partials.d_x2[i]
             += 1.0 - n_plus_phi[i]/(exp(eta__[i]) + phi__[i])
-            + log_phi[i] - logsumexp_eta_logphi[i] - digamma(phi__[i]) 
+            + log_phi[i] - logsumexp_eta_logphi[i] - digamma(phi__[i])
             + digamma(n_plus_phi[i]);
       }
       return operands_and_partials.to_var(logp,eta,phi);

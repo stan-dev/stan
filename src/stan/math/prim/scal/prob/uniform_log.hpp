@@ -20,8 +20,8 @@ namespace stan {
 
     // CONTINUOUS, UNIVARIATE DENSITIES
     /**
-     * The log of a uniform density for the given 
-     * y, lower, and upper bound. 
+     * The log of a uniform density for the given
+     * y, lower, and upper bound.
      *
      \f{eqnarray*}{
      y &\sim& \mbox{\sf{U}}(\alpha, \beta) \\
@@ -30,11 +30,11 @@ namespace stan {
      &=& -\log (\beta - \alpha) \\
      & & \mathrm{ where } \; y \in [\alpha, \beta], \log(0) \; \mathrm{otherwise}
      \f}
-     * 
+     *
      * @param y A scalar variable.
      * @param alpha Lower bound.
      * @param beta Upper bound.
-     * @throw std::invalid_argument if the lower bound is greater than 
+     * @throw std::invalid_argument if the lower bound is greater than
      *    or equal to the lower bound
      * @tparam T_y Type of scalar.
      * @tparam T_low Type of lower bound.
@@ -47,7 +47,7 @@ namespace stan {
       static const char* function("stan::prob::uniform_log");
       typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
         T_partials_return;
-      
+
       using stan::math::check_not_nan;
       using stan::math::check_finite;
       using stan::math::check_greater;
@@ -55,8 +55,8 @@ namespace stan {
       using stan::math::check_consistent_sizes;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(alpha) 
+      if (!(stan::length(y)
+            && stan::length(alpha)
             && stan::length(beta)))
         return 0.0;
 
@@ -70,7 +70,7 @@ namespace stan {
                              "Random variable", y,
                              "Lower bound parameter", alpha,
                              "Upper bound parameter", beta);
-      
+
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_low,T_high>::value)
         return 0.0;
@@ -82,7 +82,7 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);
-        if (y_dbl < value_of(alpha_vec[n]) 
+        if (y_dbl < value_of(alpha_vec[n])
             || y_dbl > value_of(beta_vec[n]))
           return LOG_ZERO;
       }
@@ -90,9 +90,9 @@ namespace stan {
       VectorBuilder<include_summand<propto,T_low,T_high>::value,
                     T_partials_return, T_low, T_high>
         inv_beta_minus_alpha(max_size(alpha,beta));
-      for (size_t i = 0; i < max_size(alpha,beta); i++) 
+      for (size_t i = 0; i < max_size(alpha,beta); i++)
         if (include_summand<propto,T_low,T_high>::value)
-          inv_beta_minus_alpha[i] 
+          inv_beta_minus_alpha[i]
             = 1.0 / (value_of(beta_vec[i]) - value_of(alpha_vec[i]));
 
       VectorBuilder<include_summand<propto,T_low,T_high>::value,
@@ -100,10 +100,10 @@ namespace stan {
         log_beta_minus_alpha(max_size(alpha,beta));
       for (size_t i = 0; i < max_size(alpha,beta); i++)
         if (include_summand<propto,T_low,T_high>::value)
-          log_beta_minus_alpha[i] 
+          log_beta_minus_alpha[i]
             = log(value_of(beta_vec[i]) - value_of(alpha_vec[i]));
-      
-      agrad::OperandsAndPartials<T_y,T_low,T_high> 
+
+      agrad::OperandsAndPartials<T_y,T_low,T_high>
         operands_and_partials(y,alpha,beta);
       for (size_t n = 0; n < N; n++) {
         if (include_summand<propto,T_low,T_high>::value)

@@ -42,17 +42,17 @@ namespace stan {
       };
     }
 
-    inline var rising_factorial(const var& a, 
+    inline var rising_factorial(const var& a,
                                 const double& b) {
       return var(new rising_factorial_vd_vari(a.vi_, b));
     }
 
-    inline var rising_factorial(const var& a, 
+    inline var rising_factorial(const var& a,
                                 const var& b) {
       return var(new rising_factorial_vv_vari(a.vi_, b.vi_));
     }
 
-    inline var rising_factorial(const double& a, 
+    inline var rising_factorial(const double& a,
                                 const var& b) {
       return var(new rising_factorial_dv_vari(a, b.vi_));
     }

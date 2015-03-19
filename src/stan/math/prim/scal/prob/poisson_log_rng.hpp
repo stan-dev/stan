@@ -30,12 +30,12 @@ namespace stan {
       using boost::random::poisson_distribution;
 
       static const char* function("stan::prob::poisson_log_rng");
-      
+
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
       using stan::math::check_less;
       using std::exp;
- 
+
       check_not_nan(function, "Log rate parameter", alpha);
       check_less(function, "Log rate parameter", alpha, POISSON_MAX_LOG_RATE);
 

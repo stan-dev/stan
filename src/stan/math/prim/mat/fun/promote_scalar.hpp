@@ -12,7 +12,7 @@ namespace stan {
     /**
      * Struct to hold static function for promoting underlying scalar
      * types.  This specialization is for Eigen matrix inputs.
-     * 
+     *
      * @tparam T return scalar type
      * @tparam S input matrix scalar type for static nested function, which must
      * have a scalar type assignable to T
@@ -43,7 +43,7 @@ namespace stan {
     /**
      * Struct to hold static function for promoting underlying scalar
      * types.  This specialization is for Eigen column vector inputs.
-     * 
+     *
      * @tparam T return scalar type
      * @tparam S input matrix scalar type for static nested function, which must
      * have a scalar type assignable to T
@@ -74,7 +74,7 @@ namespace stan {
     /**
      * Struct to hold static function for promoting underlying scalar
      * types.  This specialization is for Eigen row vector inputs.
-     * 
+     *
      * @tparam T return scalar type
      * @tparam S input matrix scalar type for static nested function, which must
      * have a scalar type assignable to T

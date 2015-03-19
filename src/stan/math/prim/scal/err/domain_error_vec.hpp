@@ -14,7 +14,7 @@ namespace stan {
 
     /**
      * Throw a domain error with a consistently formatted message.
-     * 
+     *
      * This is an abstraction for all Stan functions to use when throwing
      * domain errors. This will allow us to change the behavior for all
      * functions at once. (We've already changed behavior mulitple times up
@@ -22,7 +22,7 @@ namespace stan {
      *
      * The message is:
      * "<function>: <name>[<i+error_index>] <msg1><y>"
-     *    where error_index is the value of stan::error_index::value 
+     *    where error_index is the value of stan::error_index::value
      * which indicates whether the message should be 0 or 1 indexed.
      *
      * @tparam T Type of variable
@@ -50,7 +50,7 @@ namespace stan {
 
     /**
      * Throw a domain error with a consistently formatted message.
-     * 
+     *
      * This is an abstraction for all Stan functions to use when throwing
      * domain errors. This will allow us to change the behavior for all
      * functions at once. (We've already changed behavior mulitple times up
@@ -58,7 +58,7 @@ namespace stan {
      *
      * The message is:
      * "<function>: <name>[<i+error_index>] <msg1><y>"
-     *   where error_index is the value of stan::error_index::value 
+     *   where error_index is the value of stan::error_index::value
      * which indicates whether the message should be 0 or 1 indexed.
      *
      * @tparam T Type of variable
@@ -77,7 +77,7 @@ namespace stan {
                                  const char* msg) {
       domain_error_vec(function, name, y, i, msg, "");
     }
-    
+
   }
 }
 #endif

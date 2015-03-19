@@ -41,8 +41,8 @@ namespace Eigen {
      *
      * @return Same epsilon as a <code>double</code>.
      */
-    inline static Real epsilon() { 
-      return std::numeric_limits<double>::epsilon(); 
+    inline static Real epsilon() {
+      return std::numeric_limits<double>::epsilon();
     }
 
     /**
@@ -67,7 +67,7 @@ namespace Eigen {
      * point, <code>&#45;std::numeric_limits&lt;double&gt;::max()</code>.
      *
      * @return Same lowest value as a <code>double</code>.
-     */    
+     */
     inline static Real lowest() {
       return -std::numeric_limits<double>::max();
     }
@@ -108,7 +108,7 @@ namespace Eigen {
      * Scalar product traits override for Eigen for automatic
      * gradient variables.
      */
-    template <>  
+    template <>
     struct scalar_product_traits<stan::agrad::var,double> {
       typedef stan::agrad::var ReturnType;
     };
@@ -117,7 +117,7 @@ namespace Eigen {
      * Scalar product traits override for Eigen for automatic
      * gradient variables.
      */
-    template <>  
+    template <>
     struct scalar_product_traits<double,stan::agrad::var> {
       typedef stan::agrad::var ReturnType;
     };
