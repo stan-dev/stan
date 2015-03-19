@@ -1,7 +1,7 @@
 #ifndef STAN__MCMC__MOCK__HMC__BETA
 #define STAN__MCMC__MOCK__HMC__BETA
 
-#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 
 #include <stan/model/prob_grad.hpp>
 

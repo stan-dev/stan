@@ -77,7 +77,7 @@
 
 \newcommand{\Stan}{Stan\xspace}
 \newcommand{\stanc}{{\ttfamily stanc}\xspace}
-\newcommand*{\Cpp}{C\raise.2ex\hbox{\footnotesize ++}\xspace} %\ensuremath{++}
+\newcommand*{\Cpp}{C\raise.15ex\hbox{\footnotesize ++}\xspace} %\ensuremath{++}
 \newcommand{\clang}{{\ttfamily clang\raise.2ex\hbox{\footnotesize ++}}\xspace} 
 \newcommand{\gpp}{{\ttfamily g\raise.2ex\hbox{\footnotesize ++}}\xspace} 
 
@@ -142,6 +142,8 @@
 \newcommand{\fitemindexsort}[6]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
   \\[2pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt
       (#3):\,#1}|hyperpage}}
+
+\newcommand{\indexref}[2]{\index{{\tt\bfseries #1}@{\tt #1}|see {#2}}}
 
 \newcommand{\farg}[1]{{\tt\slshape #1}}
 
