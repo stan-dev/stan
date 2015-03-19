@@ -3,7 +3,6 @@
 #include <stan/math/mix/mat/functor/derivative.hpp>
 #include <stan/math/mix/mat/functor/grad_hessian.hpp>
 #include <stan/math/mix/mat/functor/grad_tr_mat_times_hessian.hpp>
-#include <stan/math/fwd/mat/functor/gradient.hpp>
 #include <stan/math/rev/mat/functor/gradient.hpp>
 #include <stan/math/mix/mat/functor/gradient_dot_vector.hpp>
 #include <stan/math/mix/mat/functor/hessian.hpp>
@@ -200,30 +199,6 @@ TEST(AgradAutoDiff,partialDerivative) {
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7,fx);
   EXPECT_FLOAT_EQ(5 * 5 + 3 * 2 * 7,d2);
 }
-
-TEST(AgradAutoDiff,gradient) {
-    
-  
-  fun1 f;
-  Matrix<double,Dynamic,1> x(2);
-  x << 5, 7;
-  double fx;
-  Matrix<double,Dynamic,1> grad_fx;
-  stan::agrad::gradient(f,x,fx,grad_fx);
-  EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx);
-  EXPECT_EQ(2,grad_fx.size());
-  EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx(0));
-  EXPECT_FLOAT_EQ(x(0) * x(0) + 3 * 2 * x(1), grad_fx(1));
-
-  double fx2(0);
-  Matrix<double,Dynamic,1> grad_fx2;
-  stan::agrad::gradient<double>(f,x,fx2,grad_fx2);
-  EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx2);
-  EXPECT_EQ(2,grad_fx2.size());
-  EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx2(0));
-  EXPECT_FLOAT_EQ(x(0) * x(0) + 3 * 2 * x(1), grad_fx2(1));
-}
-
 
 TEST(AgradAutoDiff,gradientDotVector) {
     
@@ -436,30 +411,3 @@ TEST(AgradAutoDiff,GradientHessian){
         EXPECT_FLOAT_EQ(poly_grad_hess_analytic[i](j,k),poly_grad_hess_agrad[i](j,k));
       }
 }
-
-stan::agrad::var 
-sum_and_throw(const Matrix<stan::agrad::var,Dynamic,1>& x) {
-  stan::agrad::var y = 0;
-  for (int i = 0; i < x.size(); ++i)
-    y += x(i);
-  throw std::domain_error("fooey");
-  return y;
-}
-
-TEST(AgradAutoDiff, RecoverMemory) {
-  using Eigen::VectorXd;
-  for (int i = 0; i < 100000; ++i) {
-    try {
-      VectorXd x(5);
-      x << 1, 2, 3, 4, 5;
-      double fx;
-      VectorXd grad_fx;
-      gradient(sum_and_throw,x,fx,grad_fx);
-    } catch (const std::domain_error& e) {
-      // ignore me
-    }
-  }
-  // depends on starting allocation of 65K not being exceeded
-  // without recovery_memory in autodiff::apply_recover(), takes 67M 
-  EXPECT_TRUE(stan::agrad::ChainableStack::memalloc_.bytes_allocated() < 100000);
-}  
