@@ -160,12 +160,14 @@ namespace stan {
         }
         
         if (num_init_tries > MAX_INIT_TRIES) {
-          writer.write_message("");
-          writer.write_message("");
-          writer.write_message("Initialization between ("
-                               + Writer::to_string(-R) + ", "
-                               + Writer::to_string(R) + ") failed after "
-                               + Writer::to_string(MAX_INIT_TRIES) + " attempts.");
+          writer.write_message();
+          writer.write_message();
+          
+          std::stringstream msg;
+          msg << "Initialization between (" << -R << ", " << R
+              << ") failed after " << MAX_INIT_TRIES << " attempts.";
+          writer.write_message(msg.str());
+          
           writer.write_message(std::string(" Try specifying initial values,")
                                + " reducing ranges of constrained values,"
                                + " or reparameterizing the model.");

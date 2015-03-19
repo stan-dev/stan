@@ -1,13 +1,13 @@
-#ifndef STAN__SERVICES__MCMC__GENERATE_TRANSITIONS_HPP
-#define STAN__SERVICES__MCMC__GENERATE_TRANSITIONS_HPP
+#ifndef STAN__SERVICES__SAMPLE__GENERATE_TRANSITIONS_HPP
+#define STAN__SERVICES__SAMPLE__GENERATE_TRANSITIONS_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/io/do_print.hpp>
-#include <stan/services/mcmc/progress.hpp>
+#include <stan/services/sample/progress.hpp>
 
 namespace stan {
   namespace services {
-    namespace mcmc {
+    namespace sample {
 
       template <class Sampler, class MCMCWriter, class Interrupt>
       void generate_transitions(Sampler& sampler,
@@ -37,8 +37,8 @@ namespace stan {
         
       }
 
-    }
-  }
-}
+    } // sample
+  } // services
+} // stan
 
 #endif

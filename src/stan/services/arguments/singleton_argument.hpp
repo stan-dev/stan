@@ -55,9 +55,9 @@ namespace stan {
         _name = name;
       }
 
-      template <class InfoWriter, class ErrWriter>
       bool parse_args(std::vector<std::string>& args,
-                      InfoWriter& info, ErrWriter& err,
+                      interface_callbacks::writer::base_writer& info,
+                      interface_callbacks::writer::base_writer& err,
                       bool& help_flag) {
         if (args.size() == 0) 
           return true;
@@ -80,10 +80,15 @@ namespace stan {
           T proposed_value = boost::lexical_cast<T>(value);
           
           if (!set_value(proposed_value)) {
-            err.write_message(proposed_value + " is not a valid value for "
-                              + "\"" + _name << "\"");
+            
+            std::stringstream msg;
+            msg << proposed_value << " is not a valid value for "
+                   << "\"" << _name << "\"";
+            err.write_message(msg.str());
+            
             err.write_message(std::string(indent_width, ' ')
-                              + "Valid values:" << print_valid());
+                              + "Valid values:" + print_valid());
+            
             args.clear();
             return false;
           }
@@ -92,19 +97,19 @@ namespace stan {
         return true;
       }
       
-      template <class Writer>
-      void probe_args(argument* base_arg, Writer& writer) {
+      virtual void probe_args(argument* base_arg,
+                              interface_callbacks::writer::base_writer& w) {
 
-        writer.write_message("good");
+        w.write_message("good");
         _value = _good_value;
-        base_arg->print(writer, 0, "");
-        writer.write_message("");
+        base_arg->print(w, 0, "");
+        w.write_message();
         
         if (_constrained) {
-          writer.write_message("bad");
+          w.write_message("bad");
           _value = _bad_value;
-          base_arg->print(writer, 0, "");
-          writer.write_message("");
+          base_arg->print(w, 0, "");
+          w.write_message();
         }
 
         _value = _default_value;

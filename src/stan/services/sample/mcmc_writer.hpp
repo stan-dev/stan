@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__MCMC__MCMC__WRITER__HPP
-#define STAN__SERVICES__MCMC__MCMC__WRITER__HPP
+#ifndef STAN__SERVICES__SAMPLE__MCMC__WRITER__HPP
+#define STAN__SERVICES__SAMPLE__MCMC__WRITER__HPP
 
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
@@ -9,7 +9,7 @@
 
 namespace stan {
   namespace services {
-    namespace mcmc {
+    namespace sample {
 
       template <class Model, class RNG,
                 class SampleWriter, class DiagnosticWriter,
@@ -133,7 +133,7 @@ namespace stan {
         }
 
       };
-    } // mcmc
+    } // sample
   } // services
 } // stan
 

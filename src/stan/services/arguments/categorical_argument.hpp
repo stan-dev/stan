@@ -21,52 +21,52 @@ namespace stan {
         _subarguments.clear();
       }
       
-      template <class Writer>
-      void print(Writer& writer, const int depth, const std::string prefix) {
-        std::string indent(compute_indent(depth), ' ');
-        writer.write_message(prefix + indent + _name);
+      void print(interface_callbacks::writer::base_writer& w,
+                 const int depth, const std::string prefix) {
+        w.write_message(prefix + std::string(compute_indent(depth), ' ') + _name);
         
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
-          (*it)->print(writer, depth + 1, prefix);
+          (*it)->print(w, depth + 1, prefix);
       }
       
-      template <class Writer>
-      void print_help(Writer& writer, const int depth, const bool recurse) {
-        std::cout << "categorical_argument: Trying to write some fucking messages!" << std::endl;
+      void print_help(interface_callbacks::writer::base_writer& w,
+                      const int depth, const bool recurse) {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
         
-        writer.write_message(indent + _name);
-        writer.write_message(indent + subindent + _description);
+        w.write_message(indent + _name);
+        w.write_message(indent + subindent + _description);
         if (_subarguments.size() > 0) {
-          std::string msg = indent + subindent + "Valid subarguments:";
+          w.write_message(indent + subindent + "Valid subarguments:");
+          
           
           std::vector<argument*>::iterator it = _subarguments.begin();
-          msg +=  " " + (*it)->name();
+          
+          std::string subargs(" " + (*it)->name());
           ++it;
           
           for (; it != _subarguments.end(); ++it)
-            msg +=  ", " + (*it)->name();
-        
-          writer.write_message(msg);
-          writer.write_message("");
+            subargs += ", " + (*it)->name();
           
+          w.write_message(subargs);
+          w.write_message();
+        
           if (recurse) {
             for (std::vector<argument*>::iterator it = _subarguments.begin();
                  it != _subarguments.end(); ++it)
-              (*it)->print_help(writer, depth + 1, true);
+              (*it)->print_help(w, depth + 1, true);
           }
         }
         else {
-          writer.write_message("");
+          w.write_message();
         }
          
       }
       
-      template <class InfoWriter, class ErrWriter>
       bool parse_args(std::vector<std::string>& args,
-                      InfoWriter& info, ErrWriter& err,
+                      interface_callbacks::writer::base_writer& info,
+                      interface_callbacks::writer::base_writer& err,
                       bool& help_flag) {
 
         bool good_arg = true;
@@ -117,11 +117,11 @@ namespace stan {
         return valid_arg;
       };
       
-      template <class Writer>
-      void probe_args(argument* base_arg, Writer& writer) {
+      virtual void probe_args(argument* base_arg,
+                              interface_callbacks::writer::base_writer& w) {
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it) {
-          (*it)->probe_args(base_arg, writer);
+          (*it)->probe_args(base_arg, w);
         }
       }
       

@@ -36,7 +36,7 @@ namespace stan {
       void write_sampler_state(std::ostream* o) {
         if (!o)
           return;
-        *o << "# Step size = " << get_nominal_stepsize() << std::endl;
+        *o << "Step size = " << get_nominal_stepsize() << std::endl;
         z_.write_metric(o);
       }
 

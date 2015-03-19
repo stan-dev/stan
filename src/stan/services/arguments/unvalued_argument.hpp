@@ -16,23 +16,25 @@ namespace stan {
       unvalued_argument()
         : _is_present(false) {}
       
-      template <class Writer>
-      void print(Writer& writer, const int depth, const std::string prefix) {}
+      void print(interface_callbacks::writer::base_writer& w,
+                 const int depth, const std::string prefix) {}
       
-      template <class Writer>
-      void print_help(Writer& writer, const int depth, const bool recurse = false) {
-        std::cout << "unvalued_argument: Trying to write some fucking messages!" << std::endl;
+      void print_help(interface_callbacks::writer::base_writer& w,
+                      const int depth, const bool recurse = false) {
+        
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
 
-        writer.write_message(indent + _name);
-        writer.write_message(indent + subindent + _description);
-        writer.write_message();
+        w.write_message(std::string(indent_width * depth, ' ') + _name);
+        w.write_message(std::string(indent_width * (depth + 1), ' ')
+                        + _description);
+        w.write_message();
+        
       }
       
-      template <class InfoWriter, class ErrWriter>
       bool parse_args(std::vector<std::string>& args,
-                      InfoWriter& info, ErrWriter& err,
+                      interface_callbacks::writer::base_writer& info,
+                      interface_callbacks::writer::base_writer& err,
                       bool& help_flag) {
         if (args.size() == 0)
           return true;

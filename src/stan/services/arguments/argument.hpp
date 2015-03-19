@@ -6,6 +6,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+
 namespace stan {
   namespace services {
     
@@ -31,24 +33,21 @@ namespace stan {
         return _description; 
       }
 
-      template <class Writer>
-      void print(Writer& writer, const int depth, const std::string prefix) {}
+      virtual void print(interface_callbacks::writer::base_writer& w,
+                         const int depth, const std::string prefix) = 0;
       
-      template <class Writer>
-      void print_help(Writer& writer, const int depth, const bool recurse) {
-        std::cout << "Calling base method for some reason..." << std::endl;
-      }
+      virtual void print_help(interface_callbacks::writer::base_writer& w,
+                              const int depth, const bool recurse) = 0;
       
-      template <class InfoWriter, class ErrWriter>
-      bool parse_args(std::vector<std::string>& args,
-                              InfoWriter& info,
-                              ErrWriter& err,
+      virtual bool parse_args(std::vector<std::string>& args,
+                              interface_callbacks::writer::base_writer& info,
+                              interface_callbacks::writer::base_writer& err,
                               bool& help_flag) { 
         return true; 
       }
       
-      template <class Writer>
-      void probe_args(argument* base_arg, Writer& writer) {};
+      virtual void probe_args(argument* base_arg,
+                              interface_callbacks::writer::base_writer& w) {};
       
       virtual void find_arg(std::string name,
                             std::string prefix,
@@ -58,7 +57,9 @@ namespace stan {
         }
       }
       
-      static void split_arg(const std::string& arg, std::string& name, std::string& value) {
+      static void split_arg(const std::string& arg,
+                            std::string& name,
+                            std::string& value) {
         size_t pos = arg.find('=');
         
         if (pos != std::string::npos) {

@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__MCMC__PROGRESS_HPP
-#define STAN__SERVICES__MCMC__PROGRESS_HPP
+#ifndef STAN__SERVICES__SAMPLE__PROGRESS_HPP
+#define STAN__SERVICES__SAMPLE__PROGRESS_HPP
 
 #include <cmath>
 #include <sstream>
@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace services {
-    namespace mcmc {
+    namespace sample {
     
       std::string progress(const int n,
                            const int start,
@@ -28,8 +28,8 @@ namespace stan {
         return message.str();
       }
 
-    }
-  }
-}
+    } // sample
+  } // services
+} // stan
 
 #endif

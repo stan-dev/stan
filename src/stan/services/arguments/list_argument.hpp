@@ -1,6 +1,7 @@
 #ifndef STAN__SERVICES__ARGUMENTS__LIST__ARGUMENT__BETA
 #define STAN__SERVICES__ARGUMENTS__LIST__ARGUMENT__BETA
 
+#include <iostream>
 #include <stan/services/arguments/valued_argument.hpp>
 #include <stan/services/arguments/arg_fail.hpp>
 
@@ -27,29 +28,28 @@ namespace stan {
         
       }
 
-      template <class Writer>
-      void print(Writer& writer, int depth, const std::string prefix) {
-        valued_argument::print(writer, depth, prefix);
-        _values.at(_cursor)->print(writer, depth + 1, prefix);
+      void print(interface_callbacks::writer::base_writer& w,
+                 int depth, const std::string prefix) {
+        valued_argument::print(w, depth, prefix);
+        _values.at(_cursor)->print(w, depth + 1, prefix);
       }
       
-      template <class Writer>
-      void print_help(Writer& writer, int depth, bool recurse) {
-        std::cout << "list_argument: Trying to write some fucking messages!" << std::endl;
+      void print_help(interface_callbacks::writer::base_writer& w,
+                      int depth, bool recurse) {
         _default = _values.at(_default_cursor)->name();
 
-        valued_argument::print_help(writer, depth);
+        valued_argument::print_help(w, depth);
         
         if (recurse) {
           for (std::vector<argument*>::iterator it = _values.begin();
                it != _values.end(); ++it)
-            (*it)->print_help(writer, depth + 1, true);
+            (*it)->print_help(w, depth + 1, true);
         }
       }
       
-      template <class InfoWriter, class ErrWriter>
       bool parse_args(std::vector<std::string>& args,
-                      InfoWriter& info, ErrWriter& err,
+                      interface_callbacks::writer::base_writer& info,
+                      interface_callbacks::writer::base_writer& err,
                       bool& help_flag) {
         
         if(args.size() == 0) return true;
@@ -87,8 +87,14 @@ namespace stan {
           }
           
           if(!good_arg) {
-            err.write_message(value + " is not a valid value for \"" + _name + "\"");
-            err.write_message(std::string(indent_width, ' ') + "Valid values:" + print_valid());
+            
+            std::stringstream msg;
+            msg << value << " is not a valid value for \"" << _name << "\"";
+            err.write_message(msg.str());
+            
+            err.write_message(std::string(indent_width, ' ')
+                              + "Valid values:" + print_valid());
+            
             args.clear();
           }
           
@@ -100,24 +106,24 @@ namespace stan {
         
       };
 
-      template <class Writer>
-      void probe_args(argument* base_arg, Writer& writer) {
+      virtual void probe_args(argument* base_arg,
+                              interface_callbacks::writer::base_writer& w) {
 
         for (size_t i = 0; i < _values.size(); ++i) {
           _cursor = i;
           
-          writer.write_message("good");
-          base_arg->print(writer, 0, "");
-          writer.write_message("");
+          w.write_message("good");
+          base_arg->print(w, 0, "");
+          w.write_message();
 
-          _values.at(i)->probe_args(base_arg, writer);
+          _values.at(i)->probe_args(base_arg, w);
         }
         
         _values.push_back(new arg_fail);
         _cursor = _values.size() - 1;
-        writer.write_message("bad");
-        base_arg->print(writer, 0, "");
-        writer.write_message("");
+        w.write_message("bad");
+        base_arg->print(w, 0, "");
+        w.write_message();
         
         _values.pop_back();
         _cursor = _default_cursor;

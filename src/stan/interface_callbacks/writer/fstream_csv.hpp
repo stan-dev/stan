@@ -1,7 +1,7 @@
 #ifndef STAN__INTERFACE_CALLBACKS__WRITER__FSTREAM_CSV_HPP
 #define STAN__INTERFACE_CALLBACKS__WRITER__FSTREAM_CSV_HPP
 
-#include <stan/interface_callbacks/writer/writer.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <string>
 
 namespace stan {
@@ -9,7 +9,7 @@ namespace stan {
     namespace writer {
       
       // FIXME: Move to CmdStan
-      class fstream_csv: public writer {
+      class fstream_csv: public base_writer {
       public:
         fstream_csv(const std::string& filename):
           output(filename.c_str(), std::fstream::out) {}
@@ -45,6 +45,10 @@ namespace stan {
             output << *it << ",";
           output << state.back() << std::endl;
         };
+        
+        void write_message() {
+          output << std::endl;
+        }
         
         void write_message(const std::string& message) {
           output << message << std::endl;

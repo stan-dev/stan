@@ -3,7 +3,9 @@
 
 #include <string>
 #include <vector>
-#include <cstring>
+#include <sstream>
+
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 
 #include <stan/services/arguments/argument.hpp>
 #include <stan/services/arguments/arg_method.hpp>
@@ -17,18 +19,27 @@ namespace stan {
       
     public:
       
-      argument_parser(std::vector<argument*>& valid_args)
-        : _arguments(valid_args),
+      argument_parser()
+        : _arguments(),
           _help_flag(false),
           _method_flag(false) {
-        _arguments.insert(_arguments.begin(), new arg_method());
+        _arguments.push_back(new arg_method());
       }
       
-      template <class InfoWriter, class ErrWriter>
+      ~argument_parser() {
+        for(std::vector<argument*>::iterator it = _arguments.begin();
+            it != _arguments.end(); it++)
+          if (*it) delete *it;
+      }
+      
+      void push_valid_arg(argument* arg) {
+        _arguments.push_back(arg);
+      }
+      
       int parse_args(int argc,
-                      const char* argv[],
-                      InfoWriter& info,
-                      ErrWriter& err) {
+                     const char* argv[],
+                     interface_callbacks::writer::base_writer& info,
+                     interface_callbacks::writer::base_writer& err) {
         
         if (argc == 1) {
           print_usage(info, argv[0]);
@@ -131,67 +142,95 @@ namespace stan {
         if (!_method_flag)
           err.write_message("A method must be specified!");
         
-        return (valid_arg && good_arg && _method_flag) ?
-          error_codes::OK : error_codes::USAGE;
+        return (valid_arg && good_arg && _method_flag)
+               ? error_codes::OK : error_codes::USAGE;
       }
       
-      template <class Writer>
-      void print(Writer& writer, const std::string& prefix = "") {
+      void print(interface_callbacks::writer::base_writer& w,
+                 std::string prefix = "") {
         for (size_t i = 0; i < _arguments.size(); ++i) {
-          _arguments.at(i)->print(writer, 0, prefix);
+          _arguments.at(i)->print(w, 0, prefix);
         }
         
       }
       
-      template <class Writer>
-      void print_help(Writer& writer, bool recurse) {
+      void print_help(interface_callbacks::writer::base_writer& w,
+                      bool recurse) {
         for (size_t i = 0; i < _arguments.size(); ++i) {
-          std::cout << i << std::endl;
-          _arguments.at(i)->print_help(writer, 1, recurse);
+          _arguments.at(i)->print_help(w, 1, recurse);
         }
       }
       
-      template <class Writer>
-      void print_usage(Writer& writer, const char* executable) {
+      void print_usage(interface_callbacks::writer::base_writer& w,
+                       const char* executable) {
+
         std::string indent(2, ' ');
         int width = 12;
+
+        w.write_message(std::string("Usage: ") + executable
+                        + " <arg1> <subarg1_1> ... <subarg1_m>"
+                        + " ... <arg_n> <subarg_n_1> ... <subarg_n_m>");
         
-        writer.write_message("Usage: " + std::string(executable)
-                             + " <arg1> <subarg1_1> ... <subarg1_m>"
-                             + " ... <arg_n> <subarg_n_1> ... <subarg_n_m>");
-        writer.write_message("");
-        
-        writer.write_message(std::string("Begin by selecting amongst the following ")
-                             + "inference methods and diagnostics,");
+        w.write_message(std::string("Begin by selecting amongst the following ")
+                        + " inference methods and diagnostics,");
 
         std::vector<argument*>::iterator arg_it = _arguments.begin();
         list_argument* method = dynamic_cast<list_argument*>(*arg_it);
         
+        std::stringstream ss;
+        
         for (std::vector<argument*>::iterator value_it = method->values().begin();
              value_it != method->values().end(); ++value_it) {
-          writer.write_message(  Writer::pad(indent + (*value_it)->name(), width)
-                               + indent + (*value_it)->description());
+          ss.str(std::string());
+          ss.clear();
+          
+          ss << std::setw(width)
+             << indent + (*value_it)->name()
+             << indent + (*value_it)->description();
+          
+          w.write_message(ss.str());
         }
-        writer.write_message("");
         
-        writer.write_message("Or see help information with");
-        writer.write_message(Writer::pad(indent + "help", width) + indent + "Prints help");
-        writer.write_message(Writer::pad(indent + "help-all", width) + indent
-                             + "Prints entire argument tree");
-        writer.write_message("");
+        w.write_message();
+        w.write_message("Or see help information with");
         
-        writer.write_message("Additional configuration available by specifying");
+        ss.str(std::string());
+        ss.clear();
+        
+        ss << std::setw(width)
+           << indent + "help"
+           << indent + "Prints help";
+        
+        w.write_message(ss.str());
+        
+        ss.str(std::string());
+        ss.clear();
+        
+        ss << std::setw(width)
+           << indent + "help-all"
+           << indent + "Prints entire argument tree";
+        
+        w.write_message(ss.str());
+        w.write_message();
+        
+        w.write_message("Additional configuration available by specifying");
         
         ++arg_it;
         for (; arg_it != _arguments.end(); ++arg_it) {
-          writer.write_message(  Writer::pad(indent + (*arg_it)->name(), width)
-                               + indent + (*arg_it)->description());
+          ss.str(std::string());
+          ss.clear();
+          
+          ss << std::setw(width)
+             << indent + (*arg_it)->name()
+             << indent + (*arg_it)->description();
+          
+          w.write_message(ss.str());
         }
         
-        writer.write_message("");
-        writer.write_message(  std::string("See ") + executable + " <arg1> [ help | help-all ] "
-                             + "for details on individual arguments.");
-        writer.write_message("");
+        w.write_message();
+        w.write_message(std::string("See ") + executable + " <arg1> [ help | help-all ] "
+                        + "for details on individual arguments.");
+        w.write_message();
         
       }
       
@@ -209,7 +248,7 @@ namespace stan {
       
     protected:
       
-      std::vector<argument*>& _arguments;
+      std::vector<argument*> _arguments;
       
       // We can also check for, and warn the user of, deprecated arguments
       //std::vector<argument*> deprecated_arguments;

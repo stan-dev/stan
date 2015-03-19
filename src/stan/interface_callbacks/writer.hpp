@@ -5,6 +5,6 @@
 #include <stan/interface_callbacks/writer/cout.hpp>
 #include <stan/interface_callbacks/writer/fstream_csv.hpp>
 #include <stan/interface_callbacks/writer/noop.hpp>
-#include <stan/interface_callbacks/writer/writer.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 
 #endif

@@ -11,27 +11,30 @@ namespace stan {
       
     public:
       
-      template <class Writer>
-      void print(Writer& writer, const int depth, const std::string prefix) {
+      virtual void print(interface_callbacks::writer::base_writer& w,
+                         const int depth, const std::string prefix) {
+
         std::string indent(compute_indent(depth), ' ');
         
-        std::string msg = prefix + indent + _name + " = " + print_value();
+        std::string msg = prefix + std::string(compute_indent(depth), ' ')
+                          + _name + " = " + print_value();
         if(is_default())
           msg += " (Default)";
-        writer.write_message(msg);
+        w.write_message(msg);
       }
       
-      template <class Writer>
-      void print_help(Writer& writer, const int depth, const bool recurse = false) {
+      virtual void print_help(interface_callbacks::writer::base_writer& w,
+                              const int depth, const bool recurse = false) {
+
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
+    
+        w.write_message(indent + _name + "=<" + _value_type + ">");
+        w.write_message(indent + subindent + _description);
+        w.write_message(indent + subindent + "Valid values:" + print_valid());
+        w.write_message(indent + subindent + "Defaults to " + _default);
+        w.write_message();
         
-        std::cout << "valued_argument: Trying to write some fucking messages!" << std::endl;
-        writer.write_message(indent + _name + "=<" + _value_type + ">");
-        writer.write_message(indent + subindent + _description);
-        writer.write_message(indent + subindent + "Valid values:" + print_valid());
-        writer.write_message(indent + subindent + "Defaults to " + _default);
-        writer.write_message("");
       }
       
       virtual std::string print_value() = 0;
