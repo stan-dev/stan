@@ -10,15 +10,6 @@ namespace stan {
 
   namespace io {
 
-    namespace {
-      size_t product(const std::vector<size_t>& dims) {
-         size_t y = 1U;
-         for (size_t i = 0; i < dims.size(); ++i)
-           y *= dims[i];
-         return y;
-       }
-    }
-
     /**
      * A <code>var_reader</code> reads array variables of integer and
      * floating point type by name and dimension.
@@ -34,7 +25,6 @@ namespace stan {
      * <p>If a variable has integer variables, it should return
      * those integer values cast to floating point values when
      * accessed through the floating-point methods.
- 
      */
     class var_context {
     public:
