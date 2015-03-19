@@ -12,7 +12,7 @@
 #include <stan/lang/grammars/term_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 
-namespace stan { 
+namespace stan {
 
   namespace lang {
 
@@ -23,11 +23,11 @@ namespace stan {
     struct expression_grammar;
 
     template <typename Iterator>
-    struct expression07_grammar 
+    struct expression07_grammar
       : public boost::spirit::qi::grammar<Iterator,
                                           expression(var_origin),
                                           whitespace_grammar<Iterator> > {
-      
+
       expression07_grammar(variable_map& var_map,
                            std::stringstream& error_msgs,
                            expression_grammar<Iterator>& eg);
@@ -38,10 +38,10 @@ namespace stan {
 
       // nested grammars
       term_grammar<Iterator> term_g;
-      
-      boost::spirit::qi::rule<Iterator, 
-                              expression(var_origin), 
-                              whitespace_grammar<Iterator> > 
+
+      boost::spirit::qi::rule<Iterator,
+                              expression(var_origin),
+                              whitespace_grammar<Iterator> >
       expression07_r;
 
     };

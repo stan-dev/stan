@@ -71,7 +71,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::increment_log_prob_statement,
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::sample,
                           (stan::lang::expression, expr_)
-                          (stan::lang::distribution, dist_) 
+                          (stan::lang::distribution, dist_)
                           (stan::lang::range, truncation_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::statements,
@@ -109,7 +109,7 @@ namespace stan {
         if (origin != void_function_argument_origin
             && origin != void_function_argument_origin_lp
             && origin != void_function_argument_origin_rng) {
-          error_msgs << "Void returns only allowed from function bodies of void return type." 
+          error_msgs << "Void returns only allowed from function bodies of void return type."
                      << std::endl;
           pass = false;
           return;
@@ -133,7 +133,7 @@ namespace stan {
         std::string name = a.var_dims_.name_;
         if (!vm.exists(name)) {
           error_msgs << "unknown variable in assignment"
-                     << "; lhs variable=" << a.var_dims_.name_ 
+                     << "; lhs variable=" << a.var_dims_.name_
                      << std::endl;
           return false;
         }
@@ -162,7 +162,7 @@ namespace stan {
                      << std::endl;
           return false;
         }
-            
+
 
         // validate types
         a.var_type_ = vm.get(name);
@@ -174,7 +174,7 @@ namespace stan {
                                                  num_index_dims);
 
         if (lhs_type.is_ill_formed()) {
-          error_msgs << "too many indexes for variable " 
+          error_msgs << "too many indexes for variable "
                      << "; variable name = " << name
                      << "; num dimensions given = " << num_index_dims
                      << "; variable array dimensions = " << lhs_var_num_dims
@@ -185,7 +185,7 @@ namespace stan {
         base_expr_type lhs_base_type = lhs_type.base_type_;
         base_expr_type rhs_base_type = a.expr_.expression_type().base_type_;
         // allow int -> double promotion
-        bool types_compatible 
+        bool types_compatible
           = lhs_base_type == rhs_base_type
           || ( lhs_base_type == DOUBLE_T && rhs_base_type == INT_T );
         if (!types_compatible) {
@@ -312,7 +312,7 @@ namespace stan {
                      << std::endl;
           return false;
         }
-        if (s.truncation_.has_high() 
+        if (s.truncation_.has_high()
             && !is_univariate(s.truncation_.high_.expression_type())) {
           error_msgs << "Upper bounds in truncated distributions must be univariate."
                      << std::endl
@@ -327,7 +327,7 @@ namespace stan {
 
         if (s.truncation_.has_low()) {
           std::vector<expr_type> arg_types_trunc(arg_types);
-          arg_types_trunc[0] = s.truncation_.low_.expression_type(); 
+          arg_types_trunc[0] = s.truncation_.low_.expression_type();
           std::string function_name_cdf(s.dist_.family_);
           function_name_cdf += "_cdf_log";
           if (!is_double_return(function_name_cdf,arg_types_trunc,error_msgs)) {
@@ -354,7 +354,7 @@ namespace stan {
           }
           if (!is_double_return(function_name_cdf,arg_types,error_msgs)) {
             error_msgs << "upper bound in truncation type does not match"
-                       << " sampled variate in distribution's type" 
+                       << " sampled variate in distribution's type"
                        << std::endl;
             return false;
           }
@@ -422,7 +422,7 @@ namespace stan {
         }
         ws.condition_ = e;
         return true;
-      }               
+      }
     };
     boost::phoenix::function<add_while_condition> add_while_condition_f;
 
@@ -435,11 +435,11 @@ namespace stan {
       }
     };
     boost::phoenix::function<add_while_body> add_while_body_f;
-    
+
     struct add_loop_identifier {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef bool type; };
-      bool operator()(const std::string& name, 
+      bool operator()(const std::string& name,
                       std::string& name_local,
                       variable_map& vm,
                       std::stringstream& error_msgs) const {
@@ -449,7 +449,7 @@ namespace stan {
                      << " variable name=\"" << name << "\"" << std::endl;
           return false; // variable exists
         }
-        vm.add(name, 
+        vm.add(name,
                base_var_decl(name,std::vector<expression>(),
                              INT_T),
                local_origin); // loop var acts like local
@@ -461,7 +461,7 @@ namespace stan {
     struct remove_loop_identifier {
       template <typename T1, typename T2>
       struct result { typedef void type; };
-      void operator()(const std::string& name, 
+      void operator()(const std::string& name,
                       variable_map& vm) const {
         vm.remove(name);
       }
@@ -476,7 +476,7 @@ namespace stan {
                       bool& pass,
                       std::stringstream& error_msgs) const {
         if (!expr.expression_type().is_primitive_int()) {
-          error_msgs << "expression denoting integer required; found type=" 
+          error_msgs << "expression denoting integer required; found type="
                      << expr.expression_type() << std::endl;
           pass = false;
           return;
@@ -511,9 +511,9 @@ namespace stan {
     struct validate_non_void_expression {
       template <typename T1, typename T2, typename T3>
       struct result { typedef void type; };
-      
-      void operator()(const expression& e, 
-                      bool& pass, 
+
+      void operator()(const expression& e,
+                      bool& pass,
                       std::ostream& error_msgs) const {
         pass = !e.expression_type().is_void();
         if (!pass) {
@@ -522,7 +522,7 @@ namespace stan {
       }
     };
     boost::phoenix::function<validate_non_void_expression> validate_non_void_expression_f;
-    
+
     struct add_line_number {
       template <typename T1, typename T2, typename T3>
       struct result { typedef void type; };
@@ -567,13 +567,12 @@ namespace stan {
       // inherited features
       //   _r1 true if sample_r allowed
       //   _r2 source of variables allowed for assignments
-      //   _r3 true if return_r allowed 
+      //   _r3 true if return_r allowed
 
       statement_r.name("statement");
-      statement_r 
+      statement_r
         = raw[ statement_sub_r(_r1,_r2,_r3)[_val = _1] ]
-          [ add_line_number_f(_val, begin(_1), end(_1)) ]
-        ;
+          [ add_line_number_f(_val, begin(_1), end(_1)) ];
 
       statement_sub_r.name("statement");
       statement_sub_r
@@ -590,8 +589,7 @@ namespace stan {
         | assignment_r(_r2)                         // lvalue "<-"
         | sample_r(_r1,_r2)                         // expression "~"
         | expression_g(_r2)                         // expression
-           [expression_as_statement_f(_pass,_1,boost::phoenix::ref(error_msgs_))]
-        ;
+           [expression_as_statement_f(_pass,_1,boost::phoenix::ref(error_msgs_))];
 
       // _r1, _r2, _r3 same as statement_r
       statement_seq_r.name("sequence of statements");
@@ -600,8 +598,7 @@ namespace stan {
         > local_var_decls_r[_a = _1]
         > *statement_r(_r1,_r2,_r3)
         > lit('}')
-        > eps[unscope_locals_f(_a,boost::phoenix::ref(var_map_))]
-        ;
+        > eps[unscope_locals_f(_a,boost::phoenix::ref(var_map_))];
 
       local_var_decls_r
         %= var_decls_g(false,local_origin); // - constants
@@ -616,8 +613,7 @@ namespace stan {
         > expression_g(_r2) [ validate_non_void_expression_f(_1,_pass,
                                                              boost::phoenix::ref(error_msgs_)) ]
         > lit(')')
-        > lit(';') 
-        ;
+        > lit(';');
 
       // _r1, _r2, _r3 same as statement_r
       while_statement_r.name("while statement");
@@ -629,16 +625,15 @@ namespace stan {
                                          boost::phoenix::ref(error_msgs_))]
         > lit(')')
         > statement_r(_r1,_r2,_r3)
-          [add_while_body_f(_val,_1)]
-        ;
-      
+          [add_while_body_f(_val,_1)];
+
 
       // _r1, _r2, _r3 same as statement_r
       for_statement_r.name("for statement");
       for_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
-        > identifier_r [_pass 
+        > identifier_r [_pass
                         = add_loop_identifier_f(_1,_a,
                                                 boost::phoenix::ref(var_map_),
                                                 boost::phoenix::ref(error_msgs_))]
@@ -646,9 +641,8 @@ namespace stan {
         > range_r(_r2)
         > lit(')')
         > statement_r(_r1,_r2,_r3)
-        > eps 
+        > eps
         [remove_loop_identifier_f(_a,boost::phoenix::ref(var_map_))];
-      ;
 
       print_statement_r.name("print statement");
       print_statement_r
@@ -667,7 +661,7 @@ namespace stan {
 
       printable_r.name("printable");
       printable_r
-        %= printable_string_r 
+        %= printable_string_r
         | expression_g(_r1);
 
       printable_string_r.name("printable quoted string");
@@ -675,17 +669,17 @@ namespace stan {
         %= lit('"')
         > no_skip[*char_("a-zA-Z0-9/~!@#$%^&*()`_+-={}|[]:;'<>?,./ ")]
         > lit('"');
-      
+
       identifier_r.name("identifier");
       identifier_r
-        %= (lexeme[char_("a-zA-Z") 
+        %= (lexeme[char_("a-zA-Z")
                    >> *char_("a-zA-Z0-9_.")]);
 
       range_r.name("range expression pair, colon");
-      range_r 
+      range_r
         %= expression_g(_r1)
            [validate_int_expr2_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
-        >> lit(':') 
+        >> lit(':')
         >> expression_g(_r1)
            [validate_int_expr2_f(_1,_pass,boost::phoenix::ref(error_msgs_))];
 
@@ -696,30 +690,28 @@ namespace stan {
         > expression_g(_r1)
         > lit(';')
           [_pass = validate_assignment_f(_val,_r1,boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))]
-        ;
+                                         boost::phoenix::ref(error_msgs_))];
 
       var_lhs_r.name("variable and array dimensions");
-      var_lhs_r 
-        %= identifier_r 
+      var_lhs_r
+        %= identifier_r
         >> opt_dims_r(_r1);
 
       opt_dims_r.name("array dimensions (optional)");
-      opt_dims_r 
+      opt_dims_r
         %=  * dims_r(_r1);
 
       dims_r.name("array dimensions");
-      dims_r 
-        %= lit('[') 
+      dims_r
+        %= lit('[')
         > (expression_g(_r1)
            [validate_int_expr2_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
            % ',')
-        > lit(']')
-        ;
+        > lit(']');
 
       // inherited  _r1 = true if samples allowed as statements
       sample_r.name("distribution of expression");
-      sample_r 
+      sample_r
         %= ( expression_g(_r2)
              >> lit('~') )
         > eps
@@ -731,26 +723,23 @@ namespace stan {
         > eps
           [_pass = validate_sample_f(_val,
                                      boost::phoenix::ref(var_map_),
-                                     boost::phoenix::ref(error_msgs_))]
-        ;
+                                     boost::phoenix::ref(error_msgs_))];
 
       distribution_r.name("distribution and parameters");
       distribution_r
         %= ( identifier_r
              >> lit('(')
              >> -(expression_g(_r1) % ',') )
-        > lit(')')
-        ;
+        > lit(')');
 
       truncation_range_r.name("range pair");
       truncation_range_r
         %= lit('T')
-        > lit('[') 
+        > lit('[')
         > -expression_g(_r1)
         > lit(',')
         > -expression_g(_r1)
-        > lit(']')
-        ;
+        > lit(']');
 
       // _r1 = allow sampling, _r2 = var origin
       return_statement_r.name("return statement");
@@ -758,26 +747,23 @@ namespace stan {
         %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
         >> expression_g(_r1)
         >> lit(';') [ validate_return_allowed_f(_r1,_pass,
-                                                boost::phoenix::ref(error_msgs_)) ]
-        ;
+                                                boost::phoenix::ref(error_msgs_)) ];
 
       // _r1 = var origin
       void_return_statement_r.name("void return statement");
       void_return_statement_r
         = lit("return")[_val = expression()]
         >> lit(';') [ validate_void_return_allowed_f(_r1,_pass,
-                                                     boost::phoenix::ref(error_msgs_)) ]
-        ;
+                                                     boost::phoenix::ref(error_msgs_)) ];
 
       no_op_statement_r.name("no op statement");
-      no_op_statement_r 
+      no_op_statement_r
         %= lit(';') [_val = no_op_statement()];  // ok to re-use instance
 
       using boost::spirit::qi::on_error;
       using boost::spirit::qi::fail;
       using boost::spirit::qi::rethrow;
       using namespace boost::spirit::qi::labels;
-      
     }
 
   }

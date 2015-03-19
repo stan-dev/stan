@@ -171,15 +171,14 @@ namespace stan {
           expression_g(var_map_,error_msgs_),
           var_decls_g(var_map_,error_msgs_),
           statement_g(var_map_,error_msgs_),
-          functions_g(var_map_,error_msgs_) 
-    {
+          functions_g(var_map_,error_msgs_) {
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;
         using boost::spirit::qi::char_;
         using boost::spirit::qi::_pass;
         using boost::spirit::qi::lexeme;
 
-        // add model_name to var_map with special origin and no 
+        // add model_name to var_map with special origin and no
         var_map_.add(model_name,
                      base_var_decl(),
                      model_name_origin);
