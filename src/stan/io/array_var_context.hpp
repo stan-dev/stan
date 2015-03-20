@@ -8,7 +8,19 @@
 #include <sstream>
 
 namespace stan {
+
   namespace io {
+
+    namespace {
+      template<typename T>
+      T product(std::vector<T> dims) {
+         T y = 1;
+         for (size_t i = 0; i < dims.size(); ++i)
+           y *= dims[i];
+         return y;
+       }
+    }
+
     /**
      * An array_var_context object represents a named arrays
      * with dimensions constructed from an array, a vector
