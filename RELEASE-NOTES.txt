@@ -1,6 +1,26 @@
 STAN C++ RELEASE NOTES
 ======================================================================
 
+v2.6.3 (17 March 2015)
+======================================================================
+
+Bug Fixes
+----------------------------------------
+* removed extra semicolons in code; they are techinically a C++11
+  extension [#1379]
+* removed use of variable length array; this is a C99 feature
+  [#1381]
+
+Features
+----------------------------------------
+* error messages in initialization during sampling get printed out
+  to the message stream [#1326]
+
+Test Enhancements
+----------------------------------------
+* added tests for is_vector_like [#1360]
+
+
 v2.6.2 (14 March 2015)
 ======================================================================
 
