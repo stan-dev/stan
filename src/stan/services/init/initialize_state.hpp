@@ -215,14 +215,12 @@ namespace stan {
           double init_log_prob;
           try {
             stan::model::gradient(model, cont_params, init_log_prob,
-                                  init_grad, &std::cout);
+                                  init_grad, output);
           } catch (const std::exception& e) {
             io::write_error_msg(output, e);
             if (output)
-              *output << "Rejecting proposed initial value with zero density."
-              << std::endl;
-              *output << "Rejecting proposed initial value because of"
-                         " gradient failure"
+              *output << "Rejecting proposed initial value "
+                         "because of gradient failure."
                       << std::endl;
             init_log_prob = -std::numeric_limits<double>::infinity();
           }
@@ -436,7 +434,7 @@ namespace stan {
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         try {
           stan::model::gradient(model, cont_params, init_log_prob,
-                                init_grad, &std::cout);
+                                init_grad, output);
         } catch (const std::exception& e) {
           if (output)
             *output << "Rejecting user-specified initialization "
