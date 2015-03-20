@@ -25,7 +25,6 @@ namespace stan {
       variable_map& var_map_;
       std::stringstream& error_msgs_;
       
-      // constructor
       bare_type_grammar(variable_map& var_map,
                         std::stringstream& error_msgs);
 
