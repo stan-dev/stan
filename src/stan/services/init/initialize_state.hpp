@@ -107,6 +107,63 @@ namespace stan {
           return true;
         }
       }
+
+      /***
+       * Set initial values to what container cont_params has.
+       *
+       * @param[in]    cont_params the initialized state. This should be the
+       *                            right size and set to 0.
+       * @param[in,out] model       the model. Side effects on model? I'm not
+       *                            quite sure
+       * @param[in,out] output      output stream for messages
+       * @param[in]     init_how    a string to show how the initialized values
+                                    are obtained. It can be one of "user", "random",
+                                    "zero", and "user partially".
+       */
+      template <class Model>
+      bool initialize_state_values(Eigen::VectorXd& cont_params,
+                                   Model& model,
+                                   const std::string& init_how,
+                                   std::ostream* output) {
+        try {
+          validate_unconstrained_initialization(cont_params, model);
+        } catch (const std::exception& e) {
+          if (output)
+            *output << e.what() << std::endl;
+          return false;
+        }
+        double init_log_prob;
+        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
+        try {
+          stan::model::gradient(model, cont_params, init_log_prob,
+                                init_grad, output);
+        } catch (const std::exception& e) {
+          io::write_error_msg(output, e);
+          if (output)
+            *output << "Rejecting proposed initial value using method "
+                    << init_how << " because of gradient failure."
+                    << std::endl;
+          return false;
+        }
+        if (!boost::math::isfinite(init_log_prob)) {
+          if (output)
+            *output << "Rejecting proposed initial value using method "
+                    << init_how << " because of vanishing density."
+                    << std::endl;
+          return false;
+        }
+        for (int i = 0; i < init_grad.size(); ++i) {
+          if (!boost::math::isfinite(init_grad(i))) {
+            if (output)
+              *output << "Rejecting proposed initial value using method "
+                      << init_how << " because of divergent gradient."
+                      << std::endl;
+            return false;
+          }
+        }
+        return true;
+      }
+
       
       /**
        * Sets initial state to zero
@@ -130,42 +187,10 @@ namespace stan {
             *output << e.what() << std::endl;
           return false;
         }
-        
-        double init_log_prob;
-        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-        
-        try {
-          stan::model::gradient(model, cont_params, init_log_prob,
-                                init_grad, output);
-        } catch (const std::exception& e) {
-          if (output)
-            *output << "Rejecting initialization at zero "
-            << "because of gradient failure."
-            << std::endl << e.what() << std::endl;
-          return false;
-        }
-        
-        if (!boost::math::isfinite(init_log_prob)) {
-          if (output)
-            *output << "Rejecting initialization at zero "
-            << "because of vanishing density."
-            << std::endl;
-          return false;
-        }
-        
-        for (int i = 0; i < init_grad.size(); ++i) {
-          if (!boost::math::isfinite(init_grad[i])) {
-            if (output)
-              *output << "Rejecting initialization at zero "
-              << "because of divergent gradient."
-              << std::endl;
-            return false;
-          }
-        }
-        return true;
+        return initialize_state_values(cont_params, model, "zero", output);
       }
-      
-      
+
+
       /**
        * Initializes state to random uniform values within range.
        *
@@ -196,51 +221,14 @@ namespace stan {
         cont_params.setZero();
         
         // Random initializations until log_prob is finite
-        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         static int MAX_INIT_TRIES = 100;
         
         for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES;
              ++num_init_tries) {
           for (int i = 0; i < cont_params.size(); ++i)
             cont_params(i) = init_rng();
-          
-          try {
-            validate_unconstrained_initialization(cont_params, model);
-          } catch (const std::exception& e) {
-            if (output)
-              *output << e.what() << std::endl;
-            continue;
-          }
-          
-          double init_log_prob;
-          try {
-            stan::model::gradient(model, cont_params, init_log_prob,
-                                  init_grad, output);
-          } catch (const std::exception& e) {
-            io::write_error_msg(output, e);
-            if (output)
-              *output << "Rejecting proposed initial value "
-                         "because of gradient failure."
-                      << std::endl;
-            init_log_prob = -std::numeric_limits<double>::infinity();
-          }
-          if (!boost::math::isfinite(init_log_prob)) {
-            if (output)
-              *output << "Rejecting initialization at zero "
-                      << "because of vanishing density."
-                      << std::endl;
-            continue;
-          }
-          for (int i = 0; i < init_grad.size(); ++i) {
-            if (!boost::math::isfinite(init_grad(i))) {
-              if (output)
-                *output << "Rejecting initialization at zero "
-                        << "because of divergent gradient."
-                        << std::endl;
-              continue;
-            }
-          }
-          break;
+          if (initialize_state_values(cont_params, model, "random", output))
+            break;
         }
         
         if (num_init_tries > MAX_INIT_TRIES) {
@@ -258,6 +246,7 @@ namespace stan {
         return true;
       }
 
+      
       /**
        * Creates the initial state.
        *
@@ -286,7 +275,6 @@ namespace stan {
                                               std::ostream* output,
                                               ContextFactory& context_factory) {
         try {
-          typename ContextFactory::var_context_t context = context_factory(source);
 
           boost::random::uniform_real_distribution<double>
             init_range_distribution(-R, R);
@@ -296,11 +284,9 @@ namespace stan {
 
           cont_params.setZero();
 
-          // Random initializations until log_prob is finite
-          Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
           static int MAX_INIT_TRIES = 100;
 
-          int num_init_tries;
+          int num_init_tries = -1;
           std::vector<std::string> cont_names;
           model.constrained_param_names(cont_names, false, false);
           rm_indices_from_name(cont_names);
@@ -311,13 +297,8 @@ namespace stan {
               cont_vecs[i] = init_rng();
               cont_params[i] = cont_vecs[i];
             }
-            try {
-              validate_unconstrained_initialization(cont_params, model);
-            } catch (const std::exception& e) {
-              if (output)
-                *output << e.what() << std::endl;
-              continue;
-            }
+            typename ContextFactory::var_context_t context
+              = context_factory(source);
             std::vector<double> cont_vecs_constrained;
             std::vector<int> int_vecs;
             model.write_array(base_rng, cont_vecs, int_vecs,
@@ -329,29 +310,9 @@ namespace stan {
                                                        dims);
             stan::io::chained_var_context cvc(context, random_context);
             model.transform_inits(cvc, cont_params, output);
-            double init_log_prob;
-            try {
-              stan::model::gradient(model, cont_params, init_log_prob,
-                                    init_grad, output);
-            } catch (const std::exception& e) {
-              io::write_error_msg(output, e);
-              if (output)
-                *output << "Rejecting proposed initial value "
-                           "because of gradient failure."
-                        << std::endl;
-              init_log_prob = -std::numeric_limits<double>::infinity();
-            }
-            if (!boost::math::isfinite(init_log_prob)) {
-              if (output)
-                *output << "Rejecting initialization at zero "
-                           "because of vanishing density."
-                        << std::endl;
-              continue;
-            }
-            for (int i = 0; i < init_grad.size(); ++i)
-              if (!boost::math::isfinite(init_grad(i)))
-                continue;
-            break;
+            if (initialize_state_values(cont_params, model,
+                                        "user partially", output))
+              break;
           }
 
           if (num_init_tries > MAX_INIT_TRIES) {
@@ -421,46 +382,8 @@ namespace stan {
             << std::endl << e.what() << std::endl;
           return false;
         }
-
-        try {
-          validate_unconstrained_initialization(cont_params, model);
-        } catch (const std::exception& e) {
-          if (output)
-            *output << e.what() << std::endl;
-          return false;
-        }
-
-        double init_log_prob;
-        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-        try {
-          stan::model::gradient(model, cont_params, init_log_prob,
-                                init_grad, output);
-        } catch (const std::exception& e) {
-          if (output)
-            *output << "Rejecting user-specified initialization "
-            << "because of gradient failure."
-            << std::endl << e.what() << std::endl;
-          return false;
-        }
-
-        if (!boost::math::isfinite(init_log_prob)) {
-          if (output)
-            *output << "Rejecting user-specified initialization "
-            << "because of vanishing density."
-            << std::endl;
-          return false;
-        }
-
-        for (int i = 0; i < init_grad.size(); ++i) {
-          if (!boost::math::isfinite(init_grad[i])) {
-            if (output)
-              *output << "Rejecting user-specified initialization "
-              << "because of divergent gradient."
-              << std::endl;
-            return false;
-          }
-        }
-        return true;
+        return initialize_state_values(cont_params, model, "user specified",
+                                       output);
       }
 
 
