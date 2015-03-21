@@ -26,7 +26,7 @@
 namespace stan {
   namespace services {
     namespace init {
-    
+
       namespace {
 
         /**
@@ -96,11 +96,11 @@ namespace stan {
                 || stan::math::is_nan(cont_params[n])) {
               std::vector<std::string> param_names;
               model.unconstrained_param_names(param_names);
-              
+
               std::stringstream msg;
               msg << param_names[n] << " initialized to invalid value ("
               << cont_params[n] << ")";
-              
+
               throw std::invalid_argument(msg.str());
             }
           }
@@ -164,7 +164,7 @@ namespace stan {
         return true;
       }
 
-      
+
       /**
        * Sets initial state to zero
        *
@@ -179,7 +179,7 @@ namespace stan {
                                  Model& model,
                                  std::ostream* output) {
         cont_params.setZero();
-        
+
         try {
           validate_unconstrained_initialization(cont_params, model);
         } catch (const std::exception& e) {
@@ -210,19 +210,19 @@ namespace stan {
                                    RNG& base_rng,
                                    std::ostream* output) {
         int num_init_tries = -1;
-        
+
         boost::random::uniform_real_distribution<double>
         init_range_distribution(-R, R);
-        
+
         boost::variate_generator
         <RNG&, boost::random::uniform_real_distribution<double> >
         init_rng(base_rng, init_range_distribution);
-        
+
         cont_params.setZero();
-        
+
         // Random initializations until log_prob is finite
         static int MAX_INIT_TRIES = 100;
-        
+
         for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES;
              ++num_init_tries) {
           for (int i = 0; i < cont_params.size(); ++i)
@@ -230,7 +230,7 @@ namespace stan {
           if (initialize_state_values(cont_params, model, "random", output))
             break;
         }
-        
+
         if (num_init_tries > MAX_INIT_TRIES) {
           if (output)
             *output << std::endl << std::endl
@@ -246,7 +246,7 @@ namespace stan {
         return true;
       }
 
-      
+
       /**
        * Creates the initial state.
        *
@@ -275,7 +275,6 @@ namespace stan {
                                               std::ostream* output,
                                               ContextFactory& context_factory) {
         try {
-
           boost::random::uniform_real_distribution<double>
             init_range_distribution(-R, R);
           boost::variate_generator
@@ -327,7 +326,6 @@ namespace stan {
                       << std::endl;
             return false;
           }
-
         } catch(const std::exception& e) {
           if (output)
             *output << "Initialization partially from source failed."

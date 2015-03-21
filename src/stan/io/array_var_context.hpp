@@ -1,11 +1,13 @@
 #ifndef STAN__IO__ARRAY_VAR_CONTEXT_HPP
 #define STAN__IO__ARRAY_VAR_CONTEXT_HPP
 
-#include <map>
-#include <vector>
 #include <stan/io/var_context.hpp>
 #include <boost/throw_exception.hpp>
+#include <map>
 #include <sstream>
+#include <string>
+#include <vector>
+#include <utility>
 
 namespace stan {
 
@@ -41,6 +43,7 @@ namespace stan {
       bool contains_r_only(const std::string& name) const {
         return vars_r_.find(name) != vars_r_.end();
       }
+
       /**
        * Check (1) if the vecotr size of dimensions is no smaller
        * than the name vecotr size; (2) if the size of the input
@@ -50,7 +53,6 @@ namespace stan {
       void validate(const std::vector<std::string>& names,
                     const std::vector<T>& array,
                     const std::vector<std::vector<size_t> >& dims) {
-
         size_t total = 0;
         size_t num_par = names.size();
         if (num_par > dims.size()) {
@@ -58,7 +60,7 @@ namespace stan {
           msg << "size of vector of dimensions (found " << dims.size() << ") "
               << "should be no smaller than number of parameters (found "
               << num_par << ").";
-          BOOST_THROW_EXCEPTION (std::invalid_argument(msg.str()));
+          BOOST_THROW_EXCEPTION(std::invalid_argument(msg.str()));
         }
         for (size_t i = 0; i < num_par; i++)
           total += stan::io::product(dims[i]);
@@ -68,10 +70,10 @@ namespace stan {
           msg << "array is not long enough for all elements: " << array_len
               << " is found, but "
               << total << " is needed.";
-          BOOST_THROW_EXCEPTION (std::invalid_argument(msg.str()));
+          BOOST_THROW_EXCEPTION(std::invalid_argument(msg.str()));
         }
-
       }
+
       void add_r(const std::vector<std::string>& names,
                  const std::vector<double>& values,
                  const std::vector<std::vector<size_t> >& dims) {
@@ -277,7 +279,6 @@ namespace stan {
         return (vars_i_.erase(name) > 0)
           || (vars_r_.erase(name) > 0);
       }
-
     };
   }
 }
