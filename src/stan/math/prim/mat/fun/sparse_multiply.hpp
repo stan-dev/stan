@@ -133,7 +133,7 @@ namespace stan {
           b_sub(p) = b(v[q]-1); 
           ++p;
         }
-				Eigen::Matrix<T1,Eigen::Dynamic,1> w_sub(w.segment(u[i]-1,z[i])); 
+        Eigen::Matrix<T1,Eigen::Dynamic,1> w_sub(w.segment(u[i]-1,z[i])); 
         y(i) = dot_product(w_sub,b_sub);
       }
       return y;
