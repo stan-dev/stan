@@ -30,7 +30,7 @@ namespace stan {
         
         std::stringstream msg;
         msg << "initial log joint probability = " << lp;
-        info.write_message(msg.str());
+        info(msg.str());
         
         if (save_iterations) {
           io::write_iteration(output_stream, model, base_rng,
@@ -47,7 +47,7 @@ namespace stan {
             msg << "    Iter " << "     log prob " << "       ||dx|| "
                 << "     ||grad|| " <<  "      alpha " << "     alpha0 "
                 << " # evals " << " Notes ";
-            info.write_message(msg.str());
+            info(msg.str());
           }
               
           ret = bfgs.step();
@@ -65,7 +65,7 @@ namespace stan {
             msg << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha0() << " ";
             msg << " " << std::setw(7) << bfgs.grad_evals() << " ";
             msg << " " << bfgs.note();
-            info.write_message(msg.str());
+            info(msg.str());
           }
              
           if (save_iterations) {
@@ -76,13 +76,13 @@ namespace stan {
             
         int return_code;
         if (ret >= 0) {
-          info.write_message("Optimization terminated normally: ");
+          info("Optimization terminated normally: ");
           return_code = stan::services::error_codes::OK;
         } else {
-          info.write_message("Optimization terminated with error: ");
+          info("Optimization terminated with error: ");
           return_code = stan::services::error_codes::SOFTWARE;
         }
-        info.write_message("  " + bfgs.get_code_string(ret));
+        info("  " + bfgs.get_code_string(ret));
 
         return return_code;
       }

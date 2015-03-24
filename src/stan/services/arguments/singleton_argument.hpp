@@ -83,11 +83,11 @@ namespace stan {
             
             std::stringstream msg;
             msg << proposed_value << " is not a valid value for "
-                   << "\"" << _name << "\"";
-            err.write_message(msg.str());
+                << "\"" << _name << "\"";
+            err(msg.str());
             
-            err.write_message(std::string(indent_width, ' ')
-                              + "Valid values:" + print_valid());
+            err(std::string(indent_width, ' ')
+                + "Valid values:" + print_valid());
             
             args.clear();
             return false;
@@ -100,16 +100,16 @@ namespace stan {
       virtual void probe_args(argument* base_arg,
                               interface_callbacks::writer::base_writer& w) {
 
-        w.write_message("good");
+        w("good");
         _value = _good_value;
         base_arg->print(w, 0, "");
-        w.write_message();
+        w();
         
         if (_constrained) {
-          w.write_message("bad");
+          w("bad");
           _value = _bad_value;
           base_arg->print(w, 0, "");
-          w.write_message();
+          w();
         }
 
         _value = _default_value;

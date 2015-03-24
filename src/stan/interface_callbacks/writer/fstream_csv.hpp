@@ -16,15 +16,15 @@ namespace stan {
         
         bool good() { return output.good(); }
         
-        void write_key_value(const std::string& key, double value) {
+        void operator()(const std::string& key, double value) {
           output << key << " = " << value << std::endl;
         };
         
-        void write_key_value(const std::string& key, const std::string& value) {
+        void operator()(const std::string& key, const std::string& value) {
           output << key << " = " << value << std::endl;
         };
         
-        void write_state_names(std::vector<std::string>& names) {
+        void operator()(std::vector<std::string>& names) {
           if (names.empty()) return;
           
           std::vector<std::string>::iterator last = names.end();
@@ -35,7 +35,7 @@ namespace stan {
           output << names.back() << std::endl;
         };
         
-        void write_state(std::vector<double>& state) {
+        void operator()(std::vector<double>& state) {
           if (state.empty()) return;
           
           std::vector<double>::iterator last = state.end();
@@ -46,11 +46,11 @@ namespace stan {
           output << state.back() << std::endl;
         };
         
-        void write_message() {
+        void operator()() {
           output << std::endl;
         }
         
-        void write_message(const std::string& message) {
+        void operator()(const std::string& message) {
           output << message << std::endl;
         };
         

@@ -63,7 +63,7 @@ namespace stan {
         try {
           validate_unconstrained_initialization(cont_params, model);
         } catch (const std::exception& e) {
-          writer.write_message(e.what());
+          writer(e.what());
           return false;
         }
         
@@ -74,21 +74,21 @@ namespace stan {
           stan::model::gradient(model, cont_params, init_log_prob,
                                 init_grad, &std::cout); // FIXME
         } catch (const std::exception& e) {
-          writer.write_message(std::string("Rejecting initialization at zero ")
+          writer(std::string("Rejecting initialization at zero ")
                                  + "because of gradient failure.");
-          writer.write_message(e.what());
+          writer(e.what());
           return false;
         }
         
         if (!boost::math::isfinite(init_log_prob)) {
-          writer.write_message(std::string("Rejecting initialization at zero ")
+          writer(std::string("Rejecting initialization at zero ")
                                + "because of vanishing density.");
           return false;
         }
         
         for (int i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad[i])) {
-            writer.write_message(std::string("Rejecting initialization at zero ")
+            writer(std::string("Rejecting initialization at zero ")
                                  + "because of divergent gradient.");
             return false;
           }
@@ -138,7 +138,7 @@ namespace stan {
           try {
             validate_unconstrained_initialization(cont_params, model);
           } catch (const std::exception& e) {
-            writer.write_message(e.what());
+            writer(e.what());
             continue;
           }
           
@@ -148,7 +148,7 @@ namespace stan {
                                   init_grad, &std::cout);
           } catch (const std::exception& e) {
             io::write_error_msg(writer, e);
-            writer.write_message("Rejecting proposed initial value with zero density.");
+            writer("Rejecting proposed initial value with zero density.");
             init_log_prob = -std::numeric_limits<double>::infinity();
           }
           if (!boost::math::isfinite(init_log_prob))
@@ -160,15 +160,15 @@ namespace stan {
         }
         
         if (num_init_tries > MAX_INIT_TRIES) {
-          writer.write_message();
-          writer.write_message();
+          writer();
+          writer();
           
           std::stringstream msg;
           msg << "Initialization between (" << -R << ", " << R
               << ") failed after " << MAX_INIT_TRIES << " attempts.";
-          writer.write_message(msg.str());
+          writer(msg.str());
           
-          writer.write_message(std::string(" Try specifying initial values,")
+          writer(std::string(" Try specifying initial values,")
                                + " reducing ranges of constrained values,"
                                + " or reparameterizing the model.");
           return false;
@@ -204,15 +204,15 @@ namespace stan {
           = context_factory(source);
           model.transform_inits(context, cont_params, &std::cout); // FIXME
         } catch(const std::exception& e) {
-          writer.write_message("Initialization from source failed.");
-          writer.write_message(e.what());
+          writer("Initialization from source failed.");
+          writer(e.what());
           return false;
         }
         
         try {
           validate_unconstrained_initialization(cont_params, model);
         } catch (const std::exception& e) {
-          writer.write_message(e.what());
+          writer(e.what());
           return false;
         }
         
@@ -224,21 +224,21 @@ namespace stan {
           stan::model::gradient(model, cont_params, init_log_prob,
                                 init_grad, &std::cout);
         } catch (const std::exception& e) {
-          writer.write_message(std::string("Rejecting user-specified initialization ")
+          writer(std::string("Rejecting user-specified initialization ")
                                + "because of gradient failure.");
-          writer.write_message(e.what());
+          writer(e.what());
           return false;
         }
         
         if (!boost::math::isfinite(init_log_prob)) {
-          writer.write_message(std::string("Rejecting user-specified initialization ")
+          writer(std::string("Rejecting user-specified initialization ")
                                + "because of vanishing density.");
           return false;
         }
         
         for (int i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad[i])) {
-            writer.write_message(std::string("Rejecting user-specified initialization ")
+            writer(std::string("Rejecting user-specified initialization ")
                                  + "because of divergent gradient.");
             return false;
           }

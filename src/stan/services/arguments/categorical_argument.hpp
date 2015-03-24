@@ -23,7 +23,7 @@ namespace stan {
       
       void print(interface_callbacks::writer::base_writer& w,
                  const int depth, const std::string prefix) {
-        w.write_message(prefix + std::string(compute_indent(depth), ' ') + _name);
+        w(prefix + std::string(compute_indent(depth), ' ') + _name);
         
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
@@ -35,10 +35,10 @@ namespace stan {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
         
-        w.write_message(indent + _name);
-        w.write_message(indent + subindent + _description);
+        w(indent + _name);
+        w(indent + subindent + _description);
         if (_subarguments.size() > 0) {
-          w.write_message(indent + subindent + "Valid subarguments:");
+          w(indent + subindent + "Valid subarguments:");
           
           
           std::vector<argument*>::iterator it = _subarguments.begin();
@@ -49,8 +49,8 @@ namespace stan {
           for (; it != _subarguments.end(); ++it)
             subargs += ", " + (*it)->name();
           
-          w.write_message(subargs);
-          w.write_message();
+          w(subargs);
+          w();
         
           if (recurse) {
             for (std::vector<argument*>::iterator it = _subarguments.begin();
@@ -59,7 +59,7 @@ namespace stan {
           }
         }
         else {
-          w.write_message();
+          w();
         }
          
       }

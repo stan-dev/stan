@@ -11,20 +11,20 @@ namespace stan {
       // FIXME: Move to CmdStan
       class cout: public base_writer {
       public:
-        void write_key_value(const std::string& key, double value) {
+        void operator()(const std::string& key, double value) {
           std::cout << key << " = " << value << std::endl;
         }
-        void write_key_value(const std::string& key, const std::string& value) {
+        void operator()(const std::string& key, const std::string& value) {
           std::cout << key << " = " << value << std::endl;
         }
         
-        void write_state_names(std::vector<std::string>& names) {}
-        void write_state(std::vector<double>& state) {}
+        void operator()(std::vector<std::string>& names) {}
+        void operator()(std::vector<double>& state) {}
         
-        void write_message() {
+        void operator()() {
           std::cout << std::endl;
         }
-        void write_message(const std::string& message) {
+        void operator()(const std::string& message) {
           std::cout << message << std::endl;
         }
       };

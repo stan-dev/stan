@@ -50,7 +50,7 @@ namespace stan {
         std::vector<std::string> names;
         names.push_back("lp__");
         model.constrained_param_names(names, true, true);
-        output.write_state_names(names);
+        output(names);
         
         double lp(0);
         
@@ -68,7 +68,7 @@ namespace stan {
           msg.str(std::string());
           msg.clear();
           msg << "initial log joint probability = " << lp;
-          info.write_message(msg.str());
+          info(msg.str());
           
           if (save_iterations) {
             services::io::write_iteration(output, model, base_rng,
@@ -81,7 +81,7 @@ namespace stan {
           msg.str(std::string());
           msg.clear();
           msg << "(lp - lastlp) / lp > 1e-8: " << (lp - lastlp) / std::fabs(lp);
-          info.write_message(msg.str());
+          info(msg.str());
           
           while ((lp - lastlp) / std::fabs(lp) > 1e-8) {
             lastlp = lp;
@@ -94,7 +94,7 @@ namespace stan {
                 << std::setw(2) << (m + 1) << ". "
                 << "Log joint probability = " << std::setw(10) << lp
                 << ". Improved by " << (lp - lastlp) << ".";
-            info.write_message(msg.str());
+            info(msg.str());
             
             m++;
             

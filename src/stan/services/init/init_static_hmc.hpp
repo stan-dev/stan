@@ -15,20 +15,21 @@ namespace stan {
 
         stan::services::categorical_argument* hmc 
           = dynamic_cast<stan::services::categorical_argument*>
-          (algorithm->arg("hmc"));
+            (algorithm->arg("hmc"));
         
         stan::services::categorical_argument* base 
           = dynamic_cast<stan::services::categorical_argument*>
-          (algorithm->arg("hmc")->arg("engine")->arg("static"));
+            (algorithm->arg("hmc")->arg("engine")->arg("static"));
         
         double epsilon 
           = dynamic_cast<stan::services::real_argument*>
-          (hmc->arg("stepsize"))->value();
+            (hmc->arg("stepsize"))->value();
         double epsilon_jitter 
           = dynamic_cast<stan::services::real_argument*>
-          (hmc->arg("stepsize_jitter"))->value();
+            (hmc->arg("stepsize_jitter"))->value();
         double int_time 
-          = dynamic_cast<stan::services::real_argument*>(base->arg("int_time"))->value();
+          = dynamic_cast<stan::services::real_argument*>
+            (base->arg("int_time"))->value();
         
         sampler.set_nominal_stepsize_and_T(epsilon, int_time);
         sampler.set_stepsize_jitter(epsilon_jitter);

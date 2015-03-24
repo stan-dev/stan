@@ -52,16 +52,16 @@ namespace stan {
         
         std::stringstream msg;
         msg << "Gradient evaluation took " << deltaT << " seconds";
-        info.write_message(msg.str());
+        info(msg.str());
         
         msg.str(std::string());
         msg.clear();
         msg << "1000 transitions using 10 leapfrog steps "
             << "per transition would take " << 1e4 * deltaT << " seconds.";
-        info.write_message(msg.str());
+        info(msg.str());
         
-        info.write_message("Adjust your expectations accordingly!");
-        info.write_message();
+        info("Adjust your expectations accordingly!");
+        info();
         
         // Sampling parameters
         int num_warmup = dynamic_cast<stan::services::int_argument*>
@@ -93,13 +93,13 @@ namespace stan {
         if (algo->value() == "fixed_param") {
           
           if (model.num_params_r() == 0 && algo->value() != "fixed_param") {
-            err.write_message(std::string("Must use algorithm=fixed_param for ")
-                              + "model that has no parameters.");
+            err(std::string("Must use algorithm=fixed_param for ")
+                + "model that has no parameters.");
             return stan::services::error_codes::USAGE;
           }
           
           if (num_warmup != 0) {
-            info.write_message(std::string("Warning: warmup will be skipped ")
+            info(std::string("Warning: warmup will be skipped ")
                                + "for the fixed parameter sampler!");
             num_warmup = 0;
           }
@@ -113,7 +113,7 @@ namespace stan {
           return stan::services::error_codes::OK;
           
         } else if (algo->value() == "rwm") {
-          info.write_message(algo->arg("rwm")->description());
+          info(algo->arg("rwm")->description());
           return stan::services::error_codes::OK;
           
         } else if (algo->value() == "hmc") {
@@ -334,7 +334,7 @@ namespace stan {
              || !(   metric->value() == "unit_e"
                   || metric->value() == "diag_e"
                   || metric->value() == "dense_e")) {
-               err.write_message("No sampler matching HMC specification!");
+               err("No sampler matching HMC specification!");
                return stan::services::error_codes::USAGE;
              }
           

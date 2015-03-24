@@ -90,10 +90,10 @@ namespace stan {
             
             std::stringstream msg;
             msg << value << " is not a valid value for \"" << _name << "\"";
-            err.write_message(msg.str());
+            err(msg.str());
             
-            err.write_message(std::string(indent_width, ' ')
-                              + "Valid values:" + print_valid());
+            err(std::string(indent_width, ' ')
+                + "Valid values:" + print_valid());
             
             args.clear();
           }
@@ -112,18 +112,18 @@ namespace stan {
         for (size_t i = 0; i < _values.size(); ++i) {
           _cursor = i;
           
-          w.write_message("good");
+          w("good");
           base_arg->print(w, 0, "");
-          w.write_message();
+          w();
 
           _values.at(i)->probe_args(base_arg, w);
         }
         
         _values.push_back(new arg_fail);
         _cursor = _values.size() - 1;
-        w.write_message("bad");
+        w("bad");
         base_arg->print(w, 0, "");
-        w.write_message();
+        w();
         
         _values.pop_back();
         _cursor = _default_cursor;

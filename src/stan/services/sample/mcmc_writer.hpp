@@ -46,7 +46,7 @@ namespace stan {
           sampler.get_sampler_param_names(names);
           model_.constrained_param_names(names, true, true);
 
-          sample_writer_.write_state_names(names);
+          sample_writer_(names);
           
           // Write diagnostic names
           names.clear();
@@ -59,7 +59,7 @@ namespace stan {
           
           sampler.get_sampler_diagnostic_names(model_names, names);
           
-          diagnostic_writer_.write_state_names(names);
+          diagnostic_writer_(names);
           
         }
 
@@ -81,7 +81,7 @@ namespace stan {
           for (int i = 0; i < model_values.size(); ++i)
             values.push_back(model_values(i));
 
-          sample_writer_.write_state(values);
+          sample_writer_(values);
           
           // Internal sampler state
           values.clear();
@@ -90,7 +90,7 @@ namespace stan {
           sampler.get_sampler_params(values);
           sampler.get_sampler_diagnostics(values);
           
-          diagnostic_writer_.write_state(values);
+          diagnostic_writer_(values);
           
         }
 
@@ -107,7 +107,7 @@ namespace stan {
         }
         
         void write_message(std::string& message) {
-          info_writer_.write_message(message);
+          info_writer_(message);
         }
         
       private:
@@ -117,19 +117,19 @@ namespace stan {
           std::stringstream stream;
           sampler.write_sampler_state(&stream);
           
-          writer.write_message(prefix + "Adaptation terminated");
-          writer.write_message(prefix + stream.str());
+          writer(prefix + "Adaptation terminated");
+          writer(prefix + stream.str());
         }
         
         template <class Writer>
         void write_timing_(double warm_delta_t, double sample_delta_t,
                            Writer& writer, std::string prefix) {
-          writer.write_message("");
-          writer.write_message(prefix + "Elapsed Time (seconds):");
-          writer.write_key_value(prefix + "Warmup", warm_delta_t);
-          writer.write_key_value(prefix + "Sampling", sample_delta_t);
-          writer.write_key_value(prefix + "Total", warm_delta_t + sample_delta_t);
-          writer.write_message("");
+          writer("");
+          writer(prefix + "Elapsed Time (seconds):");
+          writer(prefix + "Warmup", warm_delta_t);
+          writer(prefix + "Sampling", sample_delta_t);
+          writer(prefix + "Total", warm_delta_t + sample_delta_t);
+          writer("");
         }
 
       };

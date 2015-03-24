@@ -61,7 +61,7 @@ namespace stan {
       int err_code = parser.parse_args(argc, argv, info, err);
 
       if (err_code != 0) {
-        info.write_message("Failed to parse arguments, terminating Stan");
+        info("Failed to parse arguments, terminating Stan");
         return err_code;
       }
 
@@ -95,7 +95,7 @@ namespace stan {
       
       stan::services::u_int_argument* random_arg 
         = dynamic_cast<stan::services::u_int_argument*>
-        (parser.arg("random")->arg("seed"));
+          (parser.arg("random")->arg("seed"));
 
       if (random_arg->is_default()) {
         random_seed
@@ -132,8 +132,8 @@ namespace stan {
       data_stream.close();
 
       // Refresh rate
-      int refresh = dynamic_cast<stan::services::int_argument*>(
-                    parser.arg("output")->arg("refresh"))->value();
+      int refresh = dynamic_cast<stan::services::int_argument*>
+                    (parser.arg("output")->arg("refresh"))->value();
 
       //////////////////////////////////////////////////
       //                Initialize Model              //
@@ -144,7 +144,7 @@ namespace stan {
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
       parser.print(info);
-      info.write_message();
+      info();
 
       services::io::write_stan(output_stream, "#");
       services::io::write_model(output_stream, model.model_name(), "#");

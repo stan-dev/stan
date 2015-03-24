@@ -13,16 +13,16 @@ namespace stan {
       public:
         virtual ~base_writer() {};
         
-        virtual void write_key_value(const std::string& key,
-                                     double value) = 0;
-        virtual void write_key_value(const std::string& key,
-                                     const std::string& value) = 0;
+        virtual void operator()(const std::string& key,
+                                double value) = 0;
+        virtual void operator()(const std::string& key,
+                                const std::string& value) = 0;
         
-        virtual void write_state_names(std::vector<std::string>& names) = 0;
-        virtual void write_state(std::vector<double>& state) = 0;
+        virtual void operator()(std::vector<std::string>& names) = 0;
+        virtual void operator()(std::vector<double>& state) = 0;
         
-        virtual void write_message() = 0;
-        virtual void write_message(const std::string& message) = 0;
+        virtual void operator()() = 0;
+        virtual void operator()(const std::string& message) = 0;
         
       };
 

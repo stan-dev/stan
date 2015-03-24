@@ -20,7 +20,7 @@ namespace stan {
                           + _name + " = " + print_value();
         if(is_default())
           msg += " (Default)";
-        w.write_message(msg);
+        w(msg);
       }
       
       virtual void print_help(interface_callbacks::writer::base_writer& w,
@@ -29,11 +29,11 @@ namespace stan {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
     
-        w.write_message(indent + _name + "=<" + _value_type + ">");
-        w.write_message(indent + subindent + _description);
-        w.write_message(indent + subindent + "Valid values:" + print_valid());
-        w.write_message(indent + subindent + "Defaults to " + _default);
-        w.write_message();
+        w(indent + _name + "=<" + _value_type + ">");
+        w(indent + subindent + _description);
+        w(indent + subindent + "Valid values:" + print_valid());
+        w(indent + subindent + "Defaults to " + _default);
+        w();
         
       }
       

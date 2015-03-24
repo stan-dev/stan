@@ -18,10 +18,14 @@ namespace stan {
         init_adapt<Sampler>(sampler, adapt, cont_params);
         
         unsigned int init_buffer 
-          = dynamic_cast<stan::services::u_int_argument*>(adapt->arg("init_buffer"))->value();
+          = dynamic_cast<stan::services::u_int_argument*>
+            (adapt->arg("init_buffer"))->value();
         unsigned int term_buffer 
-          = dynamic_cast<stan::services::u_int_argument*>(adapt->arg("term_buffer"))->value();
-        unsigned int window = dynamic_cast<stan::services::u_int_argument*>(adapt->arg("window"))->value();
+          = dynamic_cast<stan::services::u_int_argument*>
+            (adapt->arg("term_buffer"))->value();
+        unsigned int window
+          = dynamic_cast<stan::services::u_int_argument*>
+            (adapt->arg("window"))->value();
         
         sampler.set_window_params(num_warmup, init_buffer,
                                   term_buffer, window, &std::cout);

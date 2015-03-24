@@ -21,8 +21,8 @@ namespace stan {
         
         if (test->value() == "gradient") {
           
-          info.write_message();
-          info.write_message("TEST GRADIENT MODE");
+          info();
+          info("TEST GRADIENT MODE");
           
           double epsilon = dynamic_cast<stan::services::real_argument*>
                            (test->arg("gradient")->arg("epsilon"))->value();

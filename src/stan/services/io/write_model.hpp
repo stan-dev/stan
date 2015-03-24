@@ -11,7 +11,7 @@ namespace stan {
       void write_model(Writer& writer,
                        const std::string& model_name,
                        const std::string& prefix = "") {
-        writer.write_message(prefix + " model = " + model_name);
+        writer(prefix + " model = " + model_name);
       }
 
     }

@@ -25,10 +25,10 @@ namespace stan {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
 
-        w.write_message(std::string(indent_width * depth, ' ') + _name);
-        w.write_message(std::string(indent_width * (depth + 1), ' ')
-                        + _description);
-        w.write_message();
+        w(std::string(indent_width * depth, ' ') + _name);
+        w(std::string(indent_width * (depth + 1), ' ')
+          + _description);
+        w();
         
       }
       

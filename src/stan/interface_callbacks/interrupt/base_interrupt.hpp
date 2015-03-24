@@ -1,5 +1,5 @@
-#ifndef STAN__INTERFACE_CALLBACKS__INTERRUPT__INTERRUPT_HPP
-#define STAN__INTERFACE_CALLBACKS__INTERRUPT__INTERRUPT_HPP
+#ifndef STAN__INTERFACE_CALLBACKS__INTERRUPT__BASE_INTERRUPT_HPP
+#define STAN__INTERFACE_CALLBACKS__INTERRUPT__BASE_INTERRUPT_HPP
 
 namespace stan {
   namespace interface_callbacks {
@@ -7,9 +7,9 @@ namespace stan {
 
       // This callback allows the interfaces to interrupt
       // execution at various points in command.hpp
-      class interrupt {
+      class base_interrupt {
       public:
-        interrupt() {}
+        base_interrupt() {}
         virtual void operator()() = 0;
       };
     

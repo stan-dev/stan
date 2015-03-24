@@ -302,9 +302,9 @@ namespace stan {
       std::stringstream msg;
       msg << " Log probability = " << lp;
       
-      writer.write_message();
-      writer.write_message(msg.str());
-      writer.write_message();
+      writer();
+      writer(msg.str());
+      writer();
       
       msg.str(std::string());
       msg.clear();
@@ -314,9 +314,9 @@ namespace stan {
           << std::setw(16) << "finite diff"
           << std::setw(16) << "error";
       
-      writer.write_message();
-      writer.write_message(msg.str());
-      writer.write_message();
+      writer();
+      writer(msg.str());
+      writer();
       
       for (size_t k = 0; k < params_r.size(); k++) {
         msg.str(std::string());
@@ -326,7 +326,7 @@ namespace stan {
             << std::setw(16) << grad[k]
             << std::setw(16) << grad_fd[k]
             << std::setw(16) << (grad[k] - grad_fd[k]);
-        writer.write_message(msg.str());
+        writer(msg.str());
         
         if (std::fabs(grad[k] - grad_fd[k]) > error)
           num_failed++;

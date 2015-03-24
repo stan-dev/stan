@@ -43,10 +43,14 @@ namespace stan {
                       stan::services::categorical_argument* adapt,
                       const Eigen::VectorXd& cont_params) {
         
-        double delta = dynamic_cast<stan::services::real_argument*>(adapt->arg("delta"))->value();
-        double gamma = dynamic_cast<stan::services::real_argument*>(adapt->arg("gamma"))->value();
-        double kappa = dynamic_cast<stan::services::real_argument*>(adapt->arg("kappa"))->value();
-        double t0    = dynamic_cast<stan::services::real_argument*>(adapt->arg("t0"))->value();
+        double delta = dynamic_cast<stan::services::real_argument*>
+                       (adapt->arg("delta"))->value();
+        double gamma = dynamic_cast<stan::services::real_argument*>
+                       (adapt->arg("gamma"))->value();
+        double kappa = dynamic_cast<stan::services::real_argument*>
+                       (adapt->arg("kappa"))->value();
+        double t0    = dynamic_cast<stan::services::real_argument*>
+                       (adapt->arg("t0"))->value();
         
         return init_adapt(sampler, delta, gamma, kappa, t0, cont_params);
       }

@@ -120,7 +120,7 @@ namespace stan {
           
           if (!good_arg) {
           
-            err.write_message(cat_name + " is either mistyped or misplaced.");
+            err(cat_name + " is either mistyped or misplaced.");
           
             std::vector<std::string> valid_paths;
             
@@ -129,9 +129,9 @@ namespace stan {
             }
             
             if (valid_paths.size()) {
-              err.write_message("Perhaps you meant one of the following valid configurations?");
+              err("Perhaps you meant one of the following valid configurations?");
               for (size_t i = 0; i < valid_paths.size(); ++i)
-                err.write_message("  " + valid_paths.at(i));
+                err("  " + valid_paths.at(i));
             }
           }
         }
@@ -140,7 +140,7 @@ namespace stan {
           return error_codes::OK;
         
         if (!_method_flag)
-          err.write_message("A method must be specified!");
+          err("A method must be specified!");
         
         return (valid_arg && good_arg && _method_flag)
                ? error_codes::OK : error_codes::USAGE;
@@ -167,12 +167,12 @@ namespace stan {
         std::string indent(2, ' ');
         int width = 12;
 
-        w.write_message(std::string("Usage: ") + executable
-                        + " <arg1> <subarg1_1> ... <subarg1_m>"
-                        + " ... <arg_n> <subarg_n_1> ... <subarg_n_m>");
+        w(std::string("Usage: ") + executable
+          + " <arg1> <subarg1_1> ... <subarg1_m>"
+          + " ... <arg_n> <subarg_n_1> ... <subarg_n_m>");
         
-        w.write_message(std::string("Begin by selecting amongst the following ")
-                        + " inference methods and diagnostics,");
+        w(std::string("Begin by selecting amongst the following ")
+          + " inference methods and diagnostics,");
 
         std::vector<argument*>::iterator arg_it = _arguments.begin();
         list_argument* method = dynamic_cast<list_argument*>(*arg_it);
@@ -188,11 +188,11 @@ namespace stan {
              << indent + (*value_it)->name()
              << indent + (*value_it)->description();
           
-          w.write_message(ss.str());
+          w(ss.str());
         }
         
-        w.write_message();
-        w.write_message("Or see help information with");
+        w();
+        w("Or see help information with");
         
         ss.str(std::string());
         ss.clear();
@@ -201,7 +201,7 @@ namespace stan {
            << indent + "help"
            << indent + "Prints help";
         
-        w.write_message(ss.str());
+        w(ss.str());
         
         ss.str(std::string());
         ss.clear();
@@ -210,10 +210,10 @@ namespace stan {
            << indent + "help-all"
            << indent + "Prints entire argument tree";
         
-        w.write_message(ss.str());
-        w.write_message();
+        w(ss.str());
+        w();
         
-        w.write_message("Additional configuration available by specifying");
+        w("Additional configuration available by specifying");
         
         ++arg_it;
         for (; arg_it != _arguments.end(); ++arg_it) {
@@ -224,13 +224,13 @@ namespace stan {
              << indent + (*arg_it)->name()
              << indent + (*arg_it)->description();
           
-          w.write_message(ss.str());
+          w(ss.str());
         }
         
-        w.write_message();
-        w.write_message(std::string("See ") + executable + " <arg1> [ help | help-all ] "
-                        + "for details on individual arguments.");
-        w.write_message();
+        w();
+        w(std::string("See ") + executable + " <arg1> [ help | help-all ] "
+          + "for details on individual arguments.");
+        w();
         
       }
       
