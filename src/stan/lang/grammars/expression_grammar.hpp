@@ -35,7 +35,6 @@ namespace stan {
                          std::stringstream& error_msgs);
 
       variable_map& var_map_;
-
       std::stringstream& error_msgs_;
 
       expression07_grammar<Iterator> expression07_g;
