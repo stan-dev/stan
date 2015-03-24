@@ -66,7 +66,8 @@ namespace stan {
      *
      * @param function Function name (for error messages)
      * @param name Variable name (for error messages)
-     * @param cholesky Eigen::LDLT to test
+     * @param cholesky Eigen::LDLT to test, whose progenitor 
+     * must not have any NaN elements
      *
      * @return <code>true</code> if the matrix is positive definite
      * @throw <code>std::domain_error</code> if the matrix is not positive definite.
@@ -79,7 +80,7 @@ namespace stan {
       if (cholesky.info() != Eigen::Success
           || !cholesky.isPositive()
           || (cholesky.vectorD().array() <= CONSTRAINT_TOLERANCE).any())
-        domain_error(function, name, cholesky, "is not positive definite:\n");
+        domain_error(function, name, cholesky.matrixLDLT(), "is not positive definite:\n");
       return true;
     }
     
@@ -91,10 +92,11 @@ namespace stan {
      *
      * @param function Function name (for error messages)
      * @param name Variable name (for error messages)
-     * @param cholesky Eigen::LDLT to test
+     * @param cholesky Eigen::LLT to test, whose progenitor 
+     * must not have any NaN elements
      *
      * @return <code>true</code> if the matrix is positive definite
-     * @throw <code>std::domain_error</code> if the matrix is not positive definite.
+     * @throw <code>std::domain_error</code> if the diagonal of the L matrix is not positive.
      */
     template <typename Derived>
     inline bool
