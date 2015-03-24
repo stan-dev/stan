@@ -1,3 +1,4 @@
+#include <vector>
 #include <stan/math/prim/scal/prob/hypergeometric_rng.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
@@ -25,13 +26,13 @@ TEST(ProbDistributionsHypergeometric, chiSquareGoodnessFitTest) {
   boost::math::hypergeometric_distribution<>dist (15, num_draws, 25);
   boost::math::chi_squared mydist(K-1);
 
-  int loc[K - 1];
+  std::vector<int> loc(K - 1);
   for(int i = 1; i < K; i++)
     loc[i - 1] = i - 1;
 
   int count = 0;
-  int bin [K];
-  double expect [K];
+  std::vector<int> bin(K);
+  std::vector<double> expect(K);
   for(int i = 0 ; i < K; i++) {
     bin[i] = 0;
     expect[i] = N * pdf(dist, i);
