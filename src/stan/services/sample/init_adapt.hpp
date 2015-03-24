@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__INIT__INIT_ADAPT_HPP
-#define STAN__SERVICES__INIT__INIT_ADAPT_HPP
+#ifndef STAN__SERVICES__SAMPLE__INIT_ADAPT_HPP
+#define STAN__SERVICES__SAMPLE__INIT_ADAPT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace services {
-    namespace init {
+    namespace sample {
     
       template<class Sampler>
       bool init_adapt(Sampler& sampler,
@@ -55,8 +55,8 @@ namespace stan {
         return init_adapt(sampler, delta, gamma, kappa, t0, cont_params);
       }
 
-    }
-  }
-}
+    } // sample
+  } // services
+} // stan
 
 #endif

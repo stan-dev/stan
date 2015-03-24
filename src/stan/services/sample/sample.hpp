@@ -14,7 +14,6 @@
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 
 #include <stan/services/arguments.hpp>
-#include <stan/services/init.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/sample.hpp>
 
@@ -131,7 +130,7 @@ namespace stan {
             stan::mcmc::unit_e_static_hmc<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_static_hmc(sampler, algo))
+            if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_sampler(sampler, s, num_warmup, num_samples,
@@ -147,7 +146,7 @@ namespace stan {
             stan::mcmc::unit_e_nuts<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_nuts(sampler, algo))
+            if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_sampler(sampler, s, num_warmup, num_samples,
@@ -163,7 +162,7 @@ namespace stan {
             stan::mcmc::diag_e_static_hmc<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_static_hmc(sampler, algo))
+            if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_sampler(sampler, s, num_warmup, num_samples,
@@ -179,7 +178,7 @@ namespace stan {
             stan::mcmc::diag_e_nuts<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_nuts(sampler, algo))
+            if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_sampler(sampler, s, num_warmup, num_samples,
@@ -195,7 +194,7 @@ namespace stan {
             stan::mcmc::dense_e_static_hmc<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_static_hmc(sampler, algo))
+            if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_sampler(sampler, s, num_warmup, num_samples,
@@ -211,7 +210,7 @@ namespace stan {
             stan::mcmc::dense_e_nuts<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_nuts(sampler, algo))
+            if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_sampler(sampler, s, num_warmup, num_samples,
@@ -227,9 +226,9 @@ namespace stan {
             stan::mcmc::adapt_unit_e_static_hmc<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_static_hmc(sampler, algo))
+            if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init::init_adapt(sampler, adapt, cont_params))
+            if (!init_adapt(sampler, adapt, cont_params))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,
@@ -245,9 +244,9 @@ namespace stan {
             stan::mcmc::adapt_unit_e_nuts<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_nuts(sampler, algo))
+            if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init::init_adapt(sampler, adapt, cont_params))
+            if (!init_adapt(sampler, adapt, cont_params))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,
@@ -263,9 +262,9 @@ namespace stan {
             stan::mcmc::adapt_diag_e_static_hmc<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_static_hmc(sampler, algo))
+            if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init::init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
+            if (!init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,
@@ -281,9 +280,9 @@ namespace stan {
             stan::mcmc::adapt_diag_e_nuts<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_nuts(sampler, algo))
+            if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init::init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
+            if (!init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,
@@ -299,9 +298,9 @@ namespace stan {
             stan::mcmc::adapt_dense_e_static_hmc<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_static_hmc(sampler, algo))
+            if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init::init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
+            if (!init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,
@@ -317,9 +316,9 @@ namespace stan {
             stan::mcmc::adapt_dense_e_nuts<Model, RNG>
             sampler(model, base_rng, &std::cout, &std::cout);
             
-            if (!init::init_nuts(sampler, algo))
+            if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init::init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
+            if (!init_windowed_adapt(sampler, adapt, num_warmup, cont_params))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,

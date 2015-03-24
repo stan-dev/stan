@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__INIT__INIT_NUTS_HPP
-#define STAN__SERVICES__INIT__INIT_NUTS_HPP
+#ifndef STAN__SERVICES__SAMPLE__INIT_STATIC_HMC_HPP
+#define STAN__SERVICES__SAMPLE__INIT_STATIC_HMC_HPP
 
 #include <stan/services/arguments/argument.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>
@@ -7,38 +7,38 @@
 
 namespace stan {
   namespace services {
-    namespace init {
+    namespace sample {
     
       template<class Sampler>
-      bool init_nuts(Sampler& sampler,
-                     stan::services::argument* algorithm) {
+      bool init_static_hmc(Sampler& sampler,
+                           stan::services::argument* algorithm) {
+
         stan::services::categorical_argument* hmc 
           = dynamic_cast<stan::services::categorical_argument*>
-          (algorithm->arg("hmc"));
+            (algorithm->arg("hmc"));
         
         stan::services::categorical_argument* base 
           = dynamic_cast<stan::services::categorical_argument*>
-            (algorithm->arg("hmc")->arg("engine")->arg("nuts"));
-
-        double epsilon
+            (algorithm->arg("hmc")->arg("engine")->arg("static"));
+        
+        double epsilon 
           = dynamic_cast<stan::services::real_argument*>
             (hmc->arg("stepsize"))->value();
         double epsilon_jitter 
           = dynamic_cast<stan::services::real_argument*>
             (hmc->arg("stepsize_jitter"))->value();
-        int max_depth
-          = dynamic_cast<stan::services::int_argument*>
-            (base->arg("max_depth"))->value();
+        double int_time 
+          = dynamic_cast<stan::services::real_argument*>
+            (base->arg("int_time"))->value();
         
-        sampler.set_nominal_stepsize(epsilon);
+        sampler.set_nominal_stepsize_and_T(epsilon, int_time);
         sampler.set_stepsize_jitter(epsilon_jitter);
-        sampler.set_max_depth(max_depth);
         
         return true;
       }
     
-    }
-  }
-}
+    } // sample
+  } // services
+} // stan
 
 #endif

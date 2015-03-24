@@ -1,13 +1,13 @@
-#ifndef STAN__SERVICES__INIT__INIT_WINDOWED_ADAPT_HPP
-#define STAN__SERVICES__INIT__INIT_WINDOWED_ADAPT_HPP
+#ifndef STAN__SERVICES__SAMPLE__INIT_WINDOWED_ADAPT_HPP
+#define STAN__SERVICES__SAMPLE__INIT_WINDOWED_ADAPT_HPP
 
 #include <stan/services/arguments/categorical_argument.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/services/init/init_adapt.hpp>
+#include <stan/services/sample/init_adapt.hpp>
 
 namespace stan {
   namespace services {
-    namespace init {
+    namespace sample {
     
       template<class Sampler>
       bool init_windowed_adapt(Sampler& sampler,
@@ -34,8 +34,8 @@ namespace stan {
         
       }
     
-    }
-  }
-}
+    } // sample
+  } // services
+} // stan
 
 #endif
