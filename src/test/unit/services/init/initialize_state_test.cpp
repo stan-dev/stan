@@ -173,6 +173,92 @@ public:
 };
 
 
+// Mock Throwing Model throws exception
+class mock_throwing_model: public stan::model::prob_grad {
+public:
+
+  mock_throwing_model(size_t num_params_r): 
+    stan::model::prob_grad(num_params_r),
+    templated_log_prob_calls(0),
+    transform_inits_calls(0),
+    write_array_calls(0),
+    log_prob_return_value(0.0) { }
+  
+  void reset() {
+    templated_log_prob_calls = 0;
+    transform_inits_calls = 0;
+    write_array_calls = 0;
+    log_prob_return_value = 0.0;
+  }
+
+  template <bool propto, bool jacobian_adjust_transforms, typename T>
+  T log_prob(Eigen::Matrix<T,Eigen::Dynamic,1>& params_r,
+             std::ostream* output_stream = 0) const {
+    templated_log_prob_calls++;
+    throw std::domain_error("throwing within log_prob");
+    return log_prob_return_value;
+  }
+  
+  void transform_inits(const stan::io::var_context& context__,
+                       Eigen::VectorXd& params_r__,
+                       std::ostream* out) const {
+    transform_inits_calls++;
+    for (int n = 0; n < params_r__.size(); n++) {
+      params_r__[n] = n;
+    }
+  }
+
+  void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
+    dimss__.resize(0);
+    std::vector<size_t> scalar_dim;
+    dimss__.push_back(scalar_dim);
+    dimss__.push_back(scalar_dim);
+    dimss__.push_back(scalar_dim);
+  }
+
+  void constrained_param_names(std::vector<std::string>& param_names__,
+                               bool include_tparams__ = true,
+                               bool include_gqs__ = true) const {
+    param_names__.push_back("a");
+    param_names__.push_back("b");
+    param_names__.push_back("c");
+  }
+
+  void get_param_names(std::vector<std::string>& names) const {
+    constrained_param_names(names);
+  }
+
+  void unconstrained_param_names(std::vector<std::string>& param_names__,
+                                 bool include_tparams__ = true,
+                                 bool include_gqs__ = true) const {
+    param_names__.clear();
+    for (size_t n = 0; n < num_params_r__; n++) {
+      std::stringstream param_name;
+      param_name << "param_" << n;
+      param_names__.push_back(param_name.str());
+    }
+  }
+
+  template <typename RNG>
+  void write_array(RNG& base_rng__,
+                   std::vector<double>& params_r__,
+                   std::vector<int>& params_i__,
+                   std::vector<double>& vars__,
+                   bool include_tparams__ = true,
+                   bool include_gqs__ = true,
+                   std::ostream* pstream__ = 0) const {
+     write_array_calls++;
+     vars__.resize(0);
+     for (size_t i = 0; i < params_r__.size(); i++)
+       vars__.push_back(params_r__[i]);
+  }
+  
+  mutable int templated_log_prob_calls;
+  mutable int transform_inits_calls;
+  mutable int write_array_calls;
+  double log_prob_return_value;
+};
+
 class mock_rng {
 public:
   typedef double result_type;
@@ -199,6 +285,7 @@ public:
 
   int calls;
 };
+
 
 class mock_context_factory 
   : public stan::interface::var_context_factory::var_context_factory<stan::io::dump> {
@@ -228,7 +315,8 @@ class StanServices : public testing::Test {
 public:
   StanServices() :
     model(3),
-    inf_model(3) {}
+    inf_model(3),
+    throwing_model(3) {}
 
   void SetUp() {
     cont_params = Eigen::VectorXd::Zero(3);
@@ -243,6 +331,7 @@ public:
   Eigen::VectorXd cont_params;
   mock_model model;
   mock_inf_model inf_model;
+  mock_throwing_model throwing_model;
   mock_rng rng;
   std::stringstream output;
   mock_context_factory context_factory;
@@ -301,12 +390,41 @@ TEST_F(StanServices, initialize_state_zero_negative_infinity) {
   EXPECT_EQ(0, model.transform_inits_calls);
   EXPECT_NE("", output.str()) 
     << "expecting an error message here";
+  EXPECT_TRUE(output.str()
+              .find("Rejecting initial value")
+              != std::string::npos);
+  EXPECT_TRUE(output.str()
+              .find("Log probability evaluates to log(0)")
+              != std::string::npos)
+    << output.str();
 }
 
-TEST_F(StanServices, DISABLED_initialize_state_zero_grad_error) {
-  // FIXME: it's really hard to get the derivatives to be off
-  //        through mock objects
-  FAIL() << "need to add a test here";
+TEST_F(StanServices, initialize_state_zero_grad_error) {
+  using stan::services::init::initialize_state_zero;
+  throwing_model.log_prob_return_value =
+    -std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(initialize_state_zero(cont_params,
+                                     throwing_model,
+                                     &output));
+  ASSERT_EQ(3, cont_params.size());
+  EXPECT_FLOAT_EQ(0, cont_params[0]);
+  EXPECT_FLOAT_EQ(0, cont_params[1]);
+  EXPECT_FLOAT_EQ(0, cont_params[2]);
+  EXPECT_EQ(1, throwing_model.templated_log_prob_calls);
+  EXPECT_EQ(0, model.transform_inits_calls);
+  EXPECT_NE("", output.str()) << "expecting error message";
+  EXPECT_TRUE(output.str()
+              .find("Rejecting initial value")
+              != std::string::npos);
+  EXPECT_TRUE(output.str()
+              .find("throwing within log_prob")
+              != std::string::npos)
+    << output.str();
+  EXPECT_TRUE(output.str()
+              .find("Error evaluating the log probability "
+                    "at the initial value.")
+              != std::string::npos)
+    << output.str();
 }
 
 TEST_F(StanServices, initialize_state_number) {
@@ -369,8 +487,10 @@ TEST_F(StanServices, initialize_state_random_reject_all) {
   EXPECT_EQ(300, rng.calls);
   EXPECT_NE("", output.str()) << "expecting error message";
   EXPECT_TRUE(output.str()
-              .find("Rejecting proposed initial value using"
-                    " method random because of vanishing density.")
+              .find("Rejecting initial value")
+              != std::string::npos);
+  EXPECT_TRUE(output.str()
+              .find("Log probability evaluates to log(0)")
               != std::string::npos);
 }
 
@@ -444,15 +564,49 @@ TEST_F(StanServices, initialize_state_source_neg_infinity) {
   EXPECT_EQ(0, model.write_array_calls);
   EXPECT_EQ(0, rng.calls);
   EXPECT_NE("", output.str())
-    << "expecting some message here";
+    << "expecting error message";
+  EXPECT_TRUE(output.str()
+              .find("Rejecting initial value")
+              != std::string::npos);
+  EXPECT_TRUE(output.str()
+              .find("Log probability evaluates to log(0)")
+              != std::string::npos) << output.str();
   EXPECT_EQ(1, context_factory.calls);
   EXPECT_EQ("abcd", context_factory.last_call);
 }
 
-TEST_F(StanServices, DISABLED_initialize_state_source_gradient_throws) {
-  // FIXME: add this test
-  FAIL() << "it's not easy to force the model to throw when calculating the gradient"
-         << " using this mock. need to add this test";
+TEST_F(StanServices, initialize_state_source_gradient_throws) {
+  init = "abcd";
+  using stan::services::init::initialize_state_source;
+  throwing_model.log_prob_return_value 
+    = -std::numeric_limits<double>::infinity();
+  EXPECT_FALSE(initialize_state_source(init,
+                                       cont_params,
+                                       throwing_model,
+                                       rng,
+                                       &output,
+                                       context_factory));
+  ASSERT_EQ(3, cont_params.size());
+  EXPECT_FLOAT_EQ(0, cont_params[0]);
+  EXPECT_FLOAT_EQ(1, cont_params[1]);
+  EXPECT_FLOAT_EQ(2, cont_params[2]);
+  EXPECT_EQ(1, throwing_model.templated_log_prob_calls);
+  EXPECT_EQ(1, throwing_model.transform_inits_calls);
+  EXPECT_EQ(0, throwing_model.write_array_calls);
+  EXPECT_EQ(0, rng.calls);
+  EXPECT_NE("", output.str())
+    << "expecting error message";
+  EXPECT_TRUE(output.str()
+              .find("Rejecting initial value")
+              != std::string::npos);
+  EXPECT_TRUE(output.str()
+              .find("Error evaluating the log probability at the initial value.")
+              != std::string::npos) << output.str();
+  EXPECT_TRUE(output.str()
+              .find("throwing within log_prob")
+              != std::string::npos) << output.str();
+  EXPECT_EQ(1, context_factory.calls);
+  EXPECT_EQ("abcd", context_factory.last_call);
 }
 
 TEST_F(StanServices, DISABLED_initialize_state_source_gradient_infinite) {

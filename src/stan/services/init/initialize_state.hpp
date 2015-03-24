@@ -140,23 +140,28 @@ namespace stan {
         } catch (const std::exception& e) {
           io::write_error_msg(output, e);
           if (output)
-            *output << "Rejecting proposed initial value using method "
-                    << init_how << " because of gradient failure."
-                    << std::endl;
+            *output << std::endl
+                    << "Rejecting initial value:" << std::endl
+                    << "  Error evaluating the log probability at the initial "
+                    << "value." << std::endl;
           return false;
         }
         if (!boost::math::isfinite(init_log_prob)) {
           if (output)
-            *output << "Rejecting proposed initial value using method "
-                    << init_how << " because of vanishing density."
+            *output << "Rejecting initial value:" << std::endl
+                    << "  Log probability evaluates to log(0), i.e. negative infinity."
+                    << std::endl
+                    << "  Stan can not start sampling from this initial value."
                     << std::endl;
           return false;
         }
         for (int i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad(i))) {
             if (output)
-              *output << "Rejecting proposed initial value using method "
-                      << init_how << " because of divergent gradient."
+              *output << "Rejecting initial value:" << std::endl
+                      << "  Gradient evaluated at the initial value is not finite."
+                      << std::endl
+                      << "  Stan can not start sampling from this initial value."
                       << std::endl;
             return false;
           }
