@@ -649,6 +649,8 @@ namespace stan {
       statement_t;
     
       statement_t statement_;
+      size_t begin_line_;
+      size_t end_line_;
 
       statement();
       statement(const statement_t& st);
