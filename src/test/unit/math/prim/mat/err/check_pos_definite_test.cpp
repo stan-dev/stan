@@ -106,9 +106,11 @@ TEST_F(ErrorHandlingMatrix, checkPosDefinite_non_symmetric) {
 
 TEST_F(ErrorHandlingMatrix, checkPosDefinite_non_pos_definite) {
   using stan::math::check_pos_definite;
-  std::stringstream expected_msg1;
-  std::stringstream expected_msg2;
-  std::stringstream expected_msg3;
+  std::stringstream expected_msg1_mat;
+  std::stringstream expected_msg1_llt;
+  std::stringstream expected_msg1_ldlt;
+  std::stringstream expected_msg2_mat;
+  std::stringstream expected_msg3_mat;
   std::stringstream expected_msg4;
 
   y.resize(3,3);
@@ -117,52 +119,57 @@ TEST_F(ErrorHandlingMatrix, checkPosDefinite_non_pos_definite) {
     0, -1, 0,
     0, 0, -1;
   
-  expected_msg1 << "function: y is not positive definite:\n" << 
+  expected_msg1_mat << "function: y is not positive definite:\n" << 
     "-1  0  0\n 0 -1  0\n 0  0 -1";
   EXPECT_THROW_MSG(check_pos_definite(function, "y", y),
                    std::domain_error,
-                   expected_msg1.str());
+                   expected_msg1_mat.str());
 
+  expected_msg1_llt << "function: Cholesky decomposition of y failed";
   Eigen::LLT<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > llt_err1(y); 
   EXPECT_THROW_MSG(check_pos_definite(function, "y", llt_err1),
                    std::domain_error,
-                   expected_msg1.str());
+                   expected_msg1_llt.str());
+  expected_msg1_ldlt << "function: LDLT decomposition of y failed";
   Eigen::LDLT<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > ldlt_err1 = y.ldlt(); 
-  EXPECT_THROW(check_pos_definite(function, "y", ldlt_err1),
-                   std::domain_error);
+  EXPECT_THROW_MSG(check_pos_definite(function, "y", ldlt_err1),
+                   std::domain_error,
+									 expected_msg1_ldlt.str());
   y.resize(2,2);
   y <<
     1, 2, 
     2, 1; 
-  expected_msg2 << "function: y is not positive definite:\n" << 
+  expected_msg2_mat << "function: y is not positive definite:\n" <<
     "1 2\n2 1";
   EXPECT_THROW_MSG(check_pos_definite(function, "y", y),
                    std::domain_error,
-                   expected_msg2.str());
+                   expected_msg2_mat.str());
   Eigen::LLT<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > llt_err2(y); 
   EXPECT_THROW_MSG(check_pos_definite(function, "y", llt_err2),
                    std::domain_error,
-                   expected_msg2.str());
+                   expected_msg1_llt.str());
 
   Eigen::LDLT<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > ldlt_err2 = y.ldlt(); 
-  EXPECT_THROW(check_pos_definite(function, "y", ldlt_err2),
-                   std::domain_error);
-  expected_msg3 << "function: y is not positive definite:\n" << 
-    "1 1\n1 1";
+  EXPECT_THROW_MSG(check_pos_definite(function, "y", ldlt_err2),
+                   std::domain_error,
+									 expected_msg1_ldlt.str());
   y <<
     1, 1, 
     1, 1; 
+  expected_msg3_mat << "function: y is not positive definite:\n" <<
+    "1 1\n1 1";
   EXPECT_THROW_MSG(check_pos_definite(function, "y", y),
                    std::domain_error,
-                   expected_msg3.str());
+                   expected_msg3_mat.str());
 
   Eigen::LLT<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > llt_err3(y); 
   EXPECT_THROW_MSG(check_pos_definite(function, "y", llt_err3),
                    std::domain_error,
-                   expected_msg3.str());
+                   expected_msg1_llt.str());
   Eigen::LDLT<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > ldlt_err3 = y.ldlt(); 
-  EXPECT_THROW(check_pos_definite(function, "y", ldlt_err3),
-                   std::domain_error);
+  EXPECT_THROW_MSG(check_pos_definite(function, "y", ldlt_err3),
+                   std::domain_error,
+									 expected_msg1_ldlt.str());
 }
 
 TEST_F(ErrorHandlingMatrix, checkPosDefinite_nan) {
