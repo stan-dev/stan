@@ -12,7 +12,6 @@
 #include <stan/math/prim/mat/fun/dot_self.hpp>
 #include <stan/math/prim/mat/fun/log.hpp>
 #include <stan/math/prim/mat/fun/log_determinant.hpp>
-#include <stan/math/prim/mat/fun/mdivide_left_spd.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_tri_low.hpp>
 #include <stan/math/prim/mat/fun/multiply.hpp>
 #include <stan/math/prim/mat/fun/subtract.hpp>

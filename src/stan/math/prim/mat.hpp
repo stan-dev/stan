@@ -97,12 +97,10 @@
 #include <stan/math/prim/mat/fun/max.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_ldlt.hpp>
-#include <stan/math/prim/mat/fun/mdivide_left_spd.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_tri.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_tri_low.hpp>
 #include <stan/math/prim/mat/fun/mdivide_right.hpp>
 #include <stan/math/prim/mat/fun/mdivide_right_ldlt.hpp>
-#include <stan/math/prim/mat/fun/mdivide_right_spd.hpp>
 #include <stan/math/prim/mat/fun/mdivide_right_tri.hpp>
 #include <stan/math/prim/mat/fun/mdivide_right_tri_low.hpp>
 #include <stan/math/prim/mat/fun/mean.hpp>
