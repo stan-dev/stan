@@ -12,8 +12,8 @@ TEST(SparseStuff,sparse_multiply_csr) {
   stan::math::matrix_d m(2,3);
 	Eigen::SparseMatrix<double,Eigen::RowMajor> a;
   m << 2.0, 4.0, 6.0, 8.0, 10.0, 12.0;
-
 	a = m.sparseView();
+
   stan::math::vector_d X_w = stan::math::extract_w(a);
 	std::vector<int> X_v = stan::math::extract_v(a);
   std::vector<int> X_u = stan::math::extract_u(a);
@@ -34,8 +34,8 @@ TEST(SparseStuff,sparse_multiply_csr_m0) {
   stan::math::matrix_d m(2,3);
 	Eigen::SparseMatrix<double,Eigen::RowMajor> a;
   m << 2.0, 4.0, 6.0, 8.0, 10.0, 12.0;
-
 	a = m.sparseView();
+
   stan::math::vector_d X_w = stan::math::extract_w(a);
 	std::vector<int> X_v = stan::math::extract_v(a);
   std::vector<int> X_u = stan::math::extract_u(a);
@@ -54,8 +54,8 @@ TEST(SparseStuff,sparse_multiply_csr_n0) {
   stan::math::matrix_d m(2,3);
 	Eigen::SparseMatrix<double,Eigen::RowMajor> a;
   m << 2.0, 4.0, 6.0, 8.0, 10.0, 12.0;
-
 	a = m.sparseView();
+
   stan::math::vector_d X_w = stan::math::extract_w(a);
 	std::vector<int> X_v = stan::math::extract_v(a);
   std::vector<int> X_u = stan::math::extract_u(a);
@@ -74,8 +74,8 @@ TEST(SparseStuff,sparse_multiply_csr_b_short) {
   stan::math::matrix_d m(2,3);
 	Eigen::SparseMatrix<double,Eigen::RowMajor> a;
   m << 2.0, 4.0, 6.0, 8.0, 10.0, 12.0;
-
 	a = m.sparseView();
+
   stan::math::vector_d X_w = stan::math::extract_w(a);
 	std::vector<int> X_v = stan::math::extract_v(a);
   std::vector<int> X_u = stan::math::extract_u(a);
@@ -94,8 +94,8 @@ TEST(SparseStuff,sparse_multiply_csr_u_short) {
   stan::math::matrix_d m(2,3);
 	Eigen::SparseMatrix<double,Eigen::RowMajor> a;
   m << 2.0, 4.0, 6.0, 8.0, 10.0, 12.0;
-
 	a = m.sparseView();
+
   stan::math::vector_d X_w = stan::math::extract_w(a);
 	std::vector<int> X_v = stan::math::extract_v(a);
   std::vector<int> X_u = stan::math::extract_u(a);
@@ -117,8 +117,8 @@ TEST(SparseStuff,sparse_multiply_csr_z_short) {
   stan::math::matrix_d m(2,3);
 	Eigen::SparseMatrix<double,Eigen::RowMajor> a;
   m << 2.0, 4.0, 6.0, 8.0, 10.0, 12.0;
-
 	a = m.sparseView();
+
   stan::math::vector_d X_w = stan::math::extract_w(a);
 	std::vector<int> X_v = stan::math::extract_v(a);
   std::vector<int> X_u = stan::math::extract_u(a);
@@ -140,8 +140,8 @@ TEST(SparseStuff,sparse_multiply_csr_v_short) {
   stan::math::matrix_d m(2,3);
 	Eigen::SparseMatrix<double,Eigen::RowMajor> a;
   m << 2.0, 4.0, 6.0, 8.0, 10.0, 12.0;
-
 	a = m.sparseView();
+
   stan::math::vector_d X_w = stan::math::extract_w(a);
 	std::vector<int> X_v = stan::math::extract_v(a);
   std::vector<int> X_u = stan::math::extract_u(a);
@@ -163,8 +163,8 @@ TEST(SparseStuff,sparse_multiply_csr_z_wrong) {
   stan::math::matrix_d m(2,3);
 	Eigen::SparseMatrix<double,Eigen::RowMajor> a;
   m << 2.0, 4.0, 6.0, 8.0, 10.0, 12.0;
-
 	a = m.sparseView();
+
   stan::math::vector_d X_w = stan::math::extract_w(a);
 	std::vector<int> X_v = stan::math::extract_v(a);
   std::vector<int> X_u = stan::math::extract_u(a);
