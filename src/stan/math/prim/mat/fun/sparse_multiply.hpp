@@ -65,6 +65,7 @@ namespace stan {
 
       typedef typename boost::math::tools::promote_args<T1, T2>::type fun_scalar_t;
       Eigen::Matrix<fun_scalar_t, Eigen::Dynamic, 1>  y(m);
+      y.setZero();
       for (int j = 0; j < n; ++j) {
         int end = u[j] + z[j] - 1;
         for (int q = u[j] - 1; q < end; ++q)
@@ -129,6 +130,7 @@ namespace stan {
         int end = u[i] + z[i] - 1;
         int p = 0;
         Eigen::Matrix<fun_scalar_t,Eigen::Dynamic,1> b_sub(z[i]);
+        b_sub.setZero();
         for (int q = u[i]-1; q < end; ++q) {
           b_sub(p) = b(v[q]-1); 
           ++p;
