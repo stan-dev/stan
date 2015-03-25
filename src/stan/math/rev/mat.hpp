@@ -21,7 +21,6 @@
 #include <stan/math/rev/mat/fun/log_sum_exp.hpp>
 #include <stan/math/rev/mat/fun/mdivide_left.hpp>
 #include <stan/math/rev/mat/fun/mdivide_left_ldlt.hpp>
-#include <stan/math/rev/mat/fun/mdivide_left_spd.hpp>
 #include <stan/math/rev/mat/fun/mdivide_left_tri.hpp>
 #include <stan/math/rev/mat/fun/multiply.hpp>
 #include <stan/math/rev/mat/fun/multiply_lower_tri_self_transpose.hpp>
