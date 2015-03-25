@@ -30,6 +30,7 @@ namespace stan {
     template <typename T> 
     const Eigen::Matrix<T, Eigen::Dynamic,1> extract_w(Eigen::SparseMatrix<T> A) {
       Eigen::Matrix<T,Eigen::Dynamic,1> w(A.nonZeros());
+      w.setZero();
       for (int j = 0; j < A.nonZeros(); ++j)
         w[j] = *(A.valuePtr()+j);
       return w;
@@ -79,6 +80,7 @@ namespace stan {
     template <typename T> 
     const Eigen::Matrix<T,Eigen::Dynamic,1> extract_w(Eigen::SparseMatrix<T, Eigen::RowMajor> A) {
       Eigen::Matrix<T,Eigen::Dynamic,1> w(A.nonZeros());
+      w.setZero();
       for (int j = 0; j < A.nonZeros(); ++j)
         w[j] = *(A.valuePtr()+j);
       return w;
