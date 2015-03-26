@@ -134,7 +134,7 @@ TEST_F(ErrorHandlingMatrix, checkPosDefinite_non_pos_definite) {
   Eigen::LDLT<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > ldlt_err1 = y.ldlt(); 
   EXPECT_THROW_MSG(check_pos_definite(function, "y", ldlt_err1),
                    std::domain_error,
-									 expected_msg1_ldlt.str());
+                   expected_msg1_ldlt.str());
   y.resize(2,2);
   y <<
     1, 2, 
@@ -152,7 +152,7 @@ TEST_F(ErrorHandlingMatrix, checkPosDefinite_non_pos_definite) {
   Eigen::LDLT<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > ldlt_err2 = y.ldlt(); 
   EXPECT_THROW_MSG(check_pos_definite(function, "y", ldlt_err2),
                    std::domain_error,
-									 expected_msg1_ldlt.str());
+                   expected_msg1_ldlt.str());
   y <<
     1, 1, 
     1, 1; 
@@ -169,7 +169,7 @@ TEST_F(ErrorHandlingMatrix, checkPosDefinite_non_pos_definite) {
   Eigen::LDLT<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > ldlt_err3 = y.ldlt(); 
   EXPECT_THROW_MSG(check_pos_definite(function, "y", ldlt_err3),
                    std::domain_error,
-									 expected_msg1_ldlt.str());
+                   expected_msg1_ldlt.str());
 }
 
 TEST_F(ErrorHandlingMatrix, checkPosDefinite_nan) {

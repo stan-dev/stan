@@ -12,7 +12,6 @@
 #include <stan/math/prim/scal/err/check_positive_size.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/value_of_rec.hpp>
-#include <cstdio>
 namespace stan {
 
   namespace math {
