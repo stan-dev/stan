@@ -86,7 +86,7 @@ TEST(SparseStuff,sparse_multiply_csr_b_short) {
 
 	EXPECT_THROW({
 	stan::math::vector_d result = stan::math::sparse_multiply_csr(2, 3, X_w, X_v, X_u, X_z, b);},
-	std::domain_error);
+	std::invalid_argument);
 }
 
 // Test that short u throws (CSR).
@@ -109,7 +109,7 @@ TEST(SparseStuff,sparse_multiply_csr_u_short) {
 
 	EXPECT_THROW({
 	stan::math::vector_d result = stan::math::sparse_multiply_csr(2, 3, X_w, X_v, X_u, X_z, b);},
-	std::domain_error);
+	std::invalid_argument);
 }
 
 // Test that short z throws (CSR).
@@ -132,7 +132,7 @@ TEST(SparseStuff,sparse_multiply_csr_z_short) {
 
 	EXPECT_THROW({
 	stan::math::vector_d result = stan::math::sparse_multiply_csr(2, 3, X_w, X_v, X_u, X_z, b);},
-	std::domain_error);
+	std::invalid_argument);
 }
 
 // Test that short v throws (CSR).
@@ -155,7 +155,7 @@ TEST(SparseStuff,sparse_multiply_csr_v_short) {
 
 	EXPECT_THROW({
 	stan::math::vector_d result = stan::math::sparse_multiply_csr(2, 3, X_w, X_v, X_u, X_z, b);},
-	std::domain_error);
+	std::invalid_argument);
 }
 
 // Test that wrong z throws (CSR).
@@ -178,7 +178,7 @@ TEST(SparseStuff,sparse_multiply_csr_z_wrong) {
 
 	EXPECT_THROW({
 	stan::math::vector_d result = stan::math::sparse_multiply_csr(2, 3, X_w, X_v, X_u, X_z, b);},
-	std::domain_error);
+	std::invalid_argument);
 }
 
 
