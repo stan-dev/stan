@@ -1,10 +1,8 @@
-#ifndef STAN__MATH__MIX__MAT__FUNCTOR__GRADIENT_HPP
-#define STAN__MATH__MIX__MAT__FUNCTOR__GRADIENT_HPP
+#ifndef STAN__MATH__FWD__MAT__FUNCTOR__GRADIENT_HPP
+#define STAN__MATH__FWD__MAT__FUNCTOR__GRADIENT_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/rev/core.hpp>
-#include <vector>
 
 namespace stan {
 
@@ -19,13 +17,13 @@ namespace stan {
      * <p>The functor must implement
      *
      * <code>
-     * stan::agrad::var
+     * stan::agrad::fvar
      * operator()(const
      * Eigen::Matrix<stan::agrad::var, Eigen::Dynamic, 1>&)
      * </code>
      *
      * using only operations that are defined for
-     * <code>stan::agrad::var</code>.  This latter constraint usually
+     * <code>stan::agrad::fvar</code>.  This latter constraint usually
      * requires the functions to be defined in terms of the libraries
      * defined in Stan or in terms of functions with appropriately
      * general namespace imports that eventually depend on functions
@@ -41,30 +39,6 @@ namespace stan {
      * @param[out] fx Function applied to argument
      * @param[out] grad_fx Gradient of function at argument
      */
-    template <typename F>
-    void
-    gradient(const F& f,
-             const Eigen::Matrix<double, Dynamic, 1>& x,
-             double& fx,
-             Eigen::Matrix<double, Dynamic, 1>& grad_fx) {
-      using stan::agrad::var;
-      start_nested();
-      try {
-        Eigen::Matrix<var, Dynamic, 1> x_var(x.size());
-        for (int i = 0; i < x.size(); ++i)
-          x_var(i) = x(i);
-        var fx_var = f(x_var);
-        fx = fx_var.val();
-        grad_fx.resize(x.size());
-        stan::agrad::grad(fx_var.vi_);
-        for (int i = 0; i < x.size(); ++i)
-          grad_fx(i) = x_var(i).adj();
-      } catch (const std::exception& /*e*/) {
-        stan::agrad::recover_memory_nested();
-        throw;
-      }
-      stan::agrad::recover_memory_nested();
-    }
     template <typename T, typename F>
     void
     gradient(const F& f,

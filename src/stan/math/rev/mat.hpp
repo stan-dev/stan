@@ -43,5 +43,6 @@
 #include <stan/math/rev/mat/fun/trace_quad_form.hpp>
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 #include <stan/math/rev/mat/fun/variance.hpp>
+#include <stan/math/rev/mat/functor/gradient.hpp>
 
 #endif
