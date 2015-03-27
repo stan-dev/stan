@@ -116,14 +116,10 @@ namespace stan {
        * @param[in,out] model       the model. Side effects on model? I'm not
        *                            quite sure
        * @param[in,out] output      output stream for messages
-       * @param[in]     init_how    a string to show how the initialized values
-                                    are obtained. It can be one of "user", "random",
-                                    "zero", and "user partially".
        */
       template <class Model>
       bool initialize_state_values(Eigen::VectorXd& cont_params,
                                    Model& model,
-                                   const std::string& init_how,
                                    std::ostream* output) {
         try {
           validate_unconstrained_initialization(cont_params, model);
@@ -140,23 +136,28 @@ namespace stan {
         } catch (const std::exception& e) {
           io::write_error_msg(output, e);
           if (output)
-            *output << "Rejecting proposed initial value using method "
-                    << init_how << " because of gradient failure."
-                    << std::endl;
+            *output << std::endl
+                    << "Rejecting initial value:" << std::endl
+                    << "  Error evaluating the log probability at the initial "
+                    << "value." << std::endl;
           return false;
         }
         if (!boost::math::isfinite(init_log_prob)) {
           if (output)
-            *output << "Rejecting proposed initial value using method "
-                    << init_how << " because of vanishing density."
+            *output << "Rejecting initial value:" << std::endl
+                    << "  Log probability evaluates to log(0), i.e. negative infinity."
+                    << std::endl
+                    << "  Stan can't start sampling from this initial value."
                     << std::endl;
           return false;
         }
         for (int i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad(i))) {
             if (output)
-              *output << "Rejecting proposed initial value using method "
-                      << init_how << " because of divergent gradient."
+              *output << "Rejecting initial value:" << std::endl
+                      << "  Gradient evaluated at the initial value is not finite."
+                      << std::endl
+                      << "  Stan can't start sampling from this initial value."
                       << std::endl;
             return false;
           }
@@ -179,15 +180,7 @@ namespace stan {
                                  Model& model,
                                  std::ostream* output) {
         cont_params.setZero();
-
-        try {
-          validate_unconstrained_initialization(cont_params, model);
-        } catch (const std::exception& e) {
-          if (output)
-            *output << e.what() << std::endl;
-          return false;
-        }
-        return initialize_state_values(cont_params, model, "zero", output);
+        return initialize_state_values(cont_params, model, output);
       }
 
 
@@ -218,8 +211,6 @@ namespace stan {
         <RNG&, boost::random::uniform_real_distribution<double> >
         init_rng(base_rng, init_range_distribution);
 
-        cont_params.setZero();
-
         // Random initializations until log_prob is finite
         static int MAX_INIT_TRIES = 100;
 
@@ -227,7 +218,7 @@ namespace stan {
              ++num_init_tries) {
           for (int i = 0; i < cont_params.size(); ++i)
             cont_params(i) = init_rng();
-          if (initialize_state_values(cont_params, model, "random", output))
+          if (initialize_state_values(cont_params, model, output))
             break;
         }
 
@@ -281,8 +272,6 @@ namespace stan {
             <RNG&, boost::random::uniform_real_distribution<double> >
             init_rng(base_rng, init_range_distribution);
 
-          cont_params.setZero();
-
           static int MAX_INIT_TRIES = 100;
 
           int num_init_tries = -1;
@@ -309,8 +298,7 @@ namespace stan {
                                                        dims);
             stan::io::chained_var_context cvc(context, random_context);
             model.transform_inits(cvc, cont_params, output);
-            if (initialize_state_values(cont_params, model,
-                                        "user partially", output))
+            if (initialize_state_values(cont_params, model, output))
               break;
           }
 
@@ -380,8 +368,7 @@ namespace stan {
             << std::endl << e.what() << std::endl;
           return false;
         }
-        return initialize_state_values(cont_params, model, "user specified",
-                                       output);
+        return initialize_state_values(cont_params, model, output);
       }
 
 
