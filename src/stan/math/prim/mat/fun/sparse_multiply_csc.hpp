@@ -53,13 +53,16 @@ namespace stan {
                     const std::vector<int>& u,
                     const std::vector<int>& z,
                     const Eigen::Matrix<T2, Eigen::Dynamic, 1>& b) {
-      stan::math::check_positive("sparse_multiply_csc", "m", m);
-      stan::math::check_positive("sparse_multiply_csc", "n", n);
-      stan::math::check_size_match("sparse_multiply_csc", "n", n, "b", b.size() );
-      stan::math::check_size_match("sparse_multiply_csc", "n", n, "u", u.size()-1);
-      stan::math::check_size_match("sparse_multiply_csc", "n", n, "z", z.size() );
-      stan::math::check_size_match("sparse_multiply_csc", "w", w.size(), "v", v.size());
-      stan::math::check_size_match("sparse_multiply_csc", "u/z", u[n-1] + z[n-1]-1, "v", v.size());
+      using stan::math::check_positive;
+      using stan::math::check_size_match;
+
+      check_positive("sparse_multiply_csc", "m", m);
+      check_positive("sparse_multiply_csc", "n", n);
+      check_size_match("sparse_multiply_csc", "n", n, "b", b.size() );
+      check_size_match("sparse_multiply_csc", "n", n, "u", u.size()-1);
+      check_size_match("sparse_multiply_csc", "n", n, "z", z.size() );
+      check_size_match("sparse_multiply_csc", "w", w.size(), "v", v.size());
+      check_size_match("sparse_multiply_csc", "u/z", u[n-1] + z[n-1]-1, "v", v.size());
 
       typedef typename boost::math::tools::promote_args<T1, T2>::type fun_scalar_t;
       Eigen::Matrix<fun_scalar_t, Eigen::Dynamic, 1>  y(m);
