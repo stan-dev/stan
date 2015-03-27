@@ -34,7 +34,7 @@ namespace stan {
                          function_signature_t> > functions_defined_;
 
       std::stringstream& error_msgs_;
-      
+
       // grammars
       statement_grammar<Iterator> statement_g;
       bare_type_grammar<Iterator> bare_type_g;
