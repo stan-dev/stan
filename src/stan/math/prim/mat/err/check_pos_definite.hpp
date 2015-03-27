@@ -78,7 +78,7 @@ namespace stan {
                        const Eigen::LDLT<Derived>& cholesky) {
       if (cholesky.info() != Eigen::Success
           || !cholesky.isPositive()
-          || (cholesky.vectorD().array() <= 0.0).any())
+          || !(cholesky.vectorD().array() > 0.0).all())
         domain_error(function, "LDLT decomposition of", " failed", name);
       return true;
     }
@@ -103,7 +103,7 @@ namespace stan {
                        const char* name,
                        const Eigen::LLT<Derived>& cholesky) {
       if (cholesky.info() != Eigen::Success
-          || (cholesky.matrixLLT().diagonal().array() <= 0.0).any())
+          || !(cholesky.matrixLLT().diagonal().array() > 0.0).all())
         domain_error(function, "Cholesky decomposition of", " failed", name);
       return true;
     }
