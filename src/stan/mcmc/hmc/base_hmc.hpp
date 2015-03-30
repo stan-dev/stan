@@ -18,26 +18,28 @@ namespace stan {
 
   namespace mcmc {
 
-    template <class M, class P, template<class, class> class H,
-              template<class, class> class I, class BaseRNG>
+    template <class Model,
+              template<class, class, class> class Hamiltonian,
+              template<class> class Integrator,
+              class BaseRNG,
+              class Writer>
     class base_hmc : public base_mcmc {
     public:
-      base_hmc(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e)
-        : base_mcmc(o, e),
+      base_hmc(Model &m, BaseRNG& rng, Writer& writer)
+        : base_mcmc(),
           z_(m.num_params_r()),
-          integrator_(this->out_stream_),
-          hamiltonian_(m, this->err_stream_),
+          integrator_(),
+          hamiltonian_(m, writer),
           rand_int_(rng),
           rand_uniform_(rand_int_),
           nom_epsilon_(0.1),
           epsilon_(nom_epsilon_),
           epsilon_jitter_(0.0) {}
 
-      void write_sampler_state(std::ostream* o) {
-        if (!o)
-          return;
-        *o << "Step size = " << get_nominal_stepsize() << std::endl;
-        z_.write_metric(o);
+      template <class InfoWriter>
+      void write_sampler_state(InfoWriter& writer) {
+        writer("Step size", get_nominal_stepsize());
+        z_.write_metric(writer);
       }
 
       void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
@@ -112,7 +114,7 @@ namespace stan {
         this->z_.ps_point::operator=(z_init);
       }
 
-      P& z() {
+     typename Hamiltonian<Model, BaseRNG, Writer>::PointType& z() {
         return z_;
       }
 
@@ -146,9 +148,9 @@ namespace stan {
       }
 
     protected:
-      P z_;
-      I<H<M, BaseRNG>, P> integrator_;
-      H<M, BaseRNG> hamiltonian_;
+      typename Hamiltonian<Model, BaseRNG, Writer>::PointType z_;
+      Integrator<Hamiltonian<Model, BaseRNG, Writer> > integrator_;
+      Hamiltonian<Model, BaseRNG, Writer> hamiltonian_;
 
       BaseRNG& rand_int_;
 

@@ -9,11 +9,12 @@ namespace stan {
   namespace services {
     namespace sample {
     
-      template<class Sampler>
+      template<class Sampler, class ErrWriter>
       bool init_windowed_adapt(Sampler& sampler,
                                stan::services::categorical_argument* adapt, 
                                unsigned int num_warmup, 
-                               const Eigen::VectorXd& cont_params) {
+                               const Eigen::VectorXd& cont_params,
+                               ErrWriter& err) {
         
         init_adapt<Sampler>(sampler, adapt, cont_params);
         
@@ -28,7 +29,7 @@ namespace stan {
             (adapt->arg("window"))->value();
         
         sampler.set_window_params(num_warmup, init_buffer,
-                                  term_buffer, window, &std::cout);
+                                  term_buffer, window, err);
         
         return true;
         

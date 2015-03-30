@@ -29,12 +29,12 @@ namespace stan {
 
     // The No-U-Turn Sampler (NUTS).
 
-    template <class M, class P, template<class, class> class H,
-              template<class, class> class I, class BaseRNG>
-    class base_nuts: public base_hmc<M, P, H, I, BaseRNG> {
+    template <class M, template<class, class, class> class H,
+              template<class> class I, class BaseRNG, class Writer>
+    class base_nuts: public base_hmc<M, H, I, BaseRNG, Writer> {
     public:
-      base_nuts(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e)
-        : base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e),
+      base_nuts(M &m, BaseRNG& rng, Writer& writer)
+        : base_hmc<M, H, I, BaseRNG, Writer>(m, rng, writer),
         depth_(0), max_depth_(5), max_delta_(1000),
         n_leapfrog_(0), n_divergent_(0) {
       }
@@ -147,15 +147,6 @@ namespace stan {
         return sample(this->z_.q, - this->z_.V, accept_prob);
       }
 
-      void write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,treedepth__,n_leapfrog__,n_divergent__,";
-      }
-
-      void write_sampler_params(std::ostream& o) {
-        o << this->epsilon_    << "," << this->depth_ << ","
-          << this->n_leapfrog_ << "," << this->n_divergent_ << ",";
-      }
-
       void get_sampler_param_names(std::vector<std::string>& names) {
         names.push_back("stepsize__");
         names.push_back("treedepth__");
@@ -170,7 +161,8 @@ namespace stan {
         values.push_back(this->n_divergent_);
       }
 
-      virtual bool compute_criterion(ps_point& start, P& finish,
+      virtual bool compute_criterion(ps_point& start,
+                                     typename H<M, BaseRNG, Writer>::PointType& finish,
                                      Eigen::VectorXd& rho) = 0;
 
       // Returns number of valid points in the completed subtree

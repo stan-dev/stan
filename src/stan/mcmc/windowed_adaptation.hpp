@@ -2,11 +2,10 @@
 #define STAN__MCMC__WINDOWED__ADAPTATION__BETA
 
 #include <stan/mcmc/base_adaptation.hpp>
-#include <ostream>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <string>
 
 namespace stan {
-
   namespace mcmc {
 
     class windowed_adaptation: public base_adaptation {
@@ -31,24 +30,18 @@ namespace stan {
                              unsigned int init_buffer,
                              unsigned int term_buffer,
                              unsigned int base_window,
-                             std::ostream* e = 0) {
+                             interface_callbacks::writer::base_writer& writer) {
         if (num_warmup < 20) {
-          if (e) {
-            *e << "WARNING: No " << estimator_name_
-               << " estimation is" << std::endl;
-            *e << "         performed for num_warmup < 20"
-               << std::endl << std::endl;
-          }
+          writer("WARNING: No " + estimator_name_ + " estimation is");
+          writer("         performed for num_warmup < 20");
+          writer();
           return;
         }
 
         if (init_buffer + base_window + term_buffer > num_warmup) {
-          if (e) {
-            *e << "WARNING: The initial buffer, adaptation window, "
-               << "and terminal buffer" << std::endl
-               << "         overflow the total number of warmup iterations."
-               << std::endl;
-          }
+          writer(std::string("WARNING: The initial buffer, adaptation window, ")
+                 + "and terminal buffer");
+          writer("         overflow the total number of warmup iterations.");
 
           num_warmup_ = num_warmup;
           adapt_init_buffer_ = 0.15 * num_warmup;
@@ -56,14 +49,23 @@ namespace stan {
           adapt_base_window_
             = num_warmup - (adapt_init_buffer_ + adapt_term_buffer_);
 
-          if (e) {
-            *e
-              << "         Defaulting to a 15%/75%/10% partition," << std::endl
-              << "           init_buffer = " << adapt_init_buffer_ << std::endl
-              << "           adapt_window = " << adapt_base_window_ << std::endl
-              << "           term_buffer = " << adapt_term_buffer_ << std::endl
-              << std::endl;
-          }
+          writer("         Defaulting to a 15%/75%/10% partition,");
+          
+          std::stringstream msg;
+          msg << "           init_buffer = " << adapt_init_buffer_;
+          writer(msg.str());
+          
+          msg.str(std::string());
+          msg.clear();
+          msg << "           adapt_window = " << adapt_base_window_;
+          writer(msg.str());
+                 
+          msg.str(std::string());
+          msg.clear();
+          msg << "           term_buffer = " << adapt_term_buffer_;
+          writer(msg.str());
+          
+          writer();
 
           return;
         }
@@ -120,7 +122,6 @@ namespace stan {
     };
 
   }  // mcmc
-
 }  // stan
 
 #endif

@@ -17,9 +17,15 @@ namespace stan {
                                 double value) = 0;
         virtual void operator()(const std::string& key,
                                 const std::string& value) = 0;
+        virtual void operator()(const std::string& key,
+                                const double* values,
+                                int n_values) = 0;
+        virtual void operator()(const std::string& key,
+                                const double* values,
+                                int n_rows, int n_cols) = 0;
         
-        virtual void operator()(std::vector<std::string>& names) = 0;
-        virtual void operator()(std::vector<double>& state) = 0;
+        virtual void operator()(const std::vector<std::string>& names) = 0;
+        virtual void operator()(const std::vector<double>& state) = 0;
         
         virtual void operator()() = 0;
         virtual void operator()(const std::string& message) = 0;

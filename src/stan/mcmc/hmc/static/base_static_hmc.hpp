@@ -15,12 +15,12 @@ namespace stan {
 
     // Hamiltonian Monte Carlo
     // with static integration time
-    template <class M, class P, template<class, class> class H,
-              template<class, class> class I, class BaseRNG>
-    class base_static_hmc : public base_hmc<M, P, H, I, BaseRNG> {
+    template <class M, template<class, class, class> class H,
+              template<class> class I, class BaseRNG, class Writer>
+    class base_static_hmc : public base_hmc<M, H, I, BaseRNG, Writer> {
     public:
-      base_static_hmc(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e)
-        : base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e), T_(1) {
+      base_static_hmc(M &m, BaseRNG& rng, Writer& writer)
+        : base_hmc<M, H, I, BaseRNG, Writer>(m, rng, writer), T_(1) {
         update_L_();
       }
 
@@ -53,14 +53,6 @@ namespace stan {
         acceptProb = acceptProb > 1 ? 1 : acceptProb;
 
         return sample(this->z_.q, - this->hamiltonian_.V(this->z_), acceptProb);
-      }
-
-      void write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,int_time__,";
-      }
-
-      void write_sampler_params(std::ostream& o) {
-        o << this->epsilon_ << "," << this->T_ << ",";
       }
 
       void get_sampler_param_names(std::vector<std::string>& names) {

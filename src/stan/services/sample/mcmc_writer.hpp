@@ -4,7 +4,6 @@
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <string>
-#include <sstream>
 #include <vector>
 
 namespace stan {
@@ -114,11 +113,8 @@ namespace stan {
         template <class Sampler, class Writer>
         void write_adapt_finish_(Sampler& sampler,
                                  Writer& writer, std::string prefix) {
-          std::stringstream stream;
-          sampler.write_sampler_state(&stream);
-          
           writer(prefix + "Adaptation terminated");
-          writer(prefix + stream.str());
+          sampler.write_sampler_state(writer);
         }
         
         template <class Writer>

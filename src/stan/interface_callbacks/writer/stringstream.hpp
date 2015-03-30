@@ -1,90 +1,102 @@
-#ifndef STAN__INTERFACE_CALLBACKS__WRITER__FSTREAM_CSV_HPP
-#define STAN__INTERFACE_CALLBACKS__WRITER__FSTREAM_CSV_HPP
+#ifndef STAN__INTERFACE_CALLBACKS__WRITER__STRINGSTREAM_HPP
+#define STAN__INTERFACE_CALLBACKS__WRITER__STRINGSTREAM_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <string>
+#include <sstream>
 
 namespace stan {
   namespace interface_callbacks {
     namespace writer {
       
-      // FIXME: Move to CmdStan
-      class fstream_csv: public base_writer {
+      // An implementation of base_writer
+      // using stringstream for unit tests
+      
+      class stringstream: public base_writer {
       public:
-        fstream_csv(const std::string& filename):
-          output(filename.c_str(), std::fstream::out) {}
-        
-        bool good() { return output.good(); }
-        
         void operator()(const std::string& key, double value) {
-          output << key << " = " << value << std::endl;
-        };
-        
+          clear();
+          stream_ << key << " = " << value << std::endl;
+        }
         void operator()(const std::string& key, const std::string& value) {
-          output << key << " = " << value << std::endl;
-        };
+          clear();
+          stream_ << key << " = " << value << std::endl;
+        }
         
         void operator()(const std::string& key,
                         const double* values,
                         int n_values) {
           if (n_values == 0) return;
+          clear();
           
-          output << key << " = ";
+          stream_ << key << " = ";
           
-          output << values[0];
+          stream_ << values[0];
           for (int n = 1; n < n_values; ++n)
-            output << "," << values[n];
-          output << std::endl;
+            stream_ << "," << values[n];
+          stream_ << std::endl;
         }
         
         void operator()(const std::string& key,
                         const double* values,
                         int n_rows, int n_cols) {
           if (n_rows == 0 || n_cols == 0) return;
+          clear();
           
-          output << key << ":" << std::endl;
+          stream_ << key << ":" << std::endl;
           
           for (int i = 0; i < n_rows; ++i) {
-            output << "," << values[i];
+            stream_ << "," << values[i];
             for (int j = 1; j < n_cols; ++j)
-              output << "," << values[i * n_cols + j];
-            output << std::endl;
+              stream_ << "," << values[i * n_cols + j];
+            stream_ << std::endl;
           }
         }
         
         void operator()(const std::vector<std::string>& names) {
           if (names.empty()) return;
+          clear();
           
           std::vector<std::string>::const_iterator last = names.end();
           --last;
           
           for (std::vector<std::string>::const_iterator it = names.begin(); it != last; ++it)
-            output << *it << ",";
-          output << names.back() << std::endl;
-        };
+            stream_ << *it << ",";
+          stream_ << names.back() << std::endl;
+        }
         
         void operator()(const std::vector<double>& state) {
           if (state.empty()) return;
+          clear();
           
           std::vector<double>::const_iterator last = state.end();
           --last;
           
           for (std::vector<double>::const_iterator it = state.begin(); it != last; ++it)
-            output << *it << ",";
-          output << state.back() << std::endl;
-        };
-        
-        void operator()() {
-          output << std::endl;
+            stream_ << *it << ",";
+          stream_ << state.back() << std::endl;
         }
         
+        void operator()() {
+          clear();
+          stream_ << std::endl;
+        }
         void operator()(const std::string& message) {
-          output << message << std::endl;
-        };
-        
-      private:
-        std::fstream output;
+          clear();
+          stream_ << message << std::endl;
+        }
       };
+      
+      void clear() {
+        stream_.str(std::string());
+        stream_.clear();
+      }
+      
+      std::string content() {
+        return stream_.str();
+      }
+      
+    private:
+      std::stringstream stream_;
 
     }
   }

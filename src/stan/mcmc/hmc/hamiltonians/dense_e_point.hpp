@@ -23,16 +23,10 @@ namespace stan {
         fast_matrix_copy_<double>(mInv, z.mInv);
       }
 
-      void write_metric(std::ostream* o) {
-        if (!o)
-          return;
-        *o << "# Elements of inverse mass matrix:" << std::endl;
-        for (int i = 0; i < mInv.rows(); ++i) {
-          *o << "# " << mInv(i, 0) << std::flush;
-          for (int j = 1; j < mInv.cols(); ++j)
-            *o << ", " << mInv(i, j) << std::flush;
-          *o << std::endl;
-        }
+      template <class Writer>
+      void write_metric(Writer& writer) {
+        writer("# Elements of inverse mass matrix:");
+        writer("M_inv", mInv.data(), mInv.rows(), mInv.cols());
       }
     };
 

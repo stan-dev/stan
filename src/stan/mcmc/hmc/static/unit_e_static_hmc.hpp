@@ -14,15 +14,12 @@ namespace stan {
     // Euclidean manifold with unit metric
     // and static integration time
 
-    template <typename M, class BaseRNG>
+    template <class M, class BaseRNG, class Writer>
     class unit_e_static_hmc
-      : public base_static_hmc<M, unit_e_point,  unit_e_metric,
-                               expl_leapfrog, BaseRNG> {
+      : public base_static_hmc<M, unit_e_metric, expl_leapfrog, BaseRNG, Writer> {
     public:
-      unit_e_static_hmc(M &m, BaseRNG& rng,
-                        std::ostream* o = &std::cout, std::ostream* e = 0)
-        : base_static_hmc<M, unit_e_point, unit_e_metric,
-                          expl_leapfrog, BaseRNG>(m, rng, o, e) {
+      unit_e_static_hmc(M &m, BaseRNG& rng, Writer& writer)
+        : base_static_hmc<M, unit_e_metric, expl_leapfrog, BaseRNG, Writer>(m, rng, writer) {
         this->name_ = "Static HMC with a unit Euclidean metric";
       }
     };

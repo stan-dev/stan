@@ -13,6 +13,12 @@ namespace stan {
     public:
       explicit unit_e_point(int n)
         : ps_point(n) {}
+      
+      template <class Writer>
+      void write_metric(Writer& writer) {
+        writer("# No free parameters for unit metric");
+      }
+      
     };
 
   }  // mcmc

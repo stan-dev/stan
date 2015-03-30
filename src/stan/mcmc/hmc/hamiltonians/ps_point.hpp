@@ -28,7 +28,6 @@ namespace stan {
         fast_vector_copy_<double>(g, z.g);
       }
 
-
       ps_point& operator= (const ps_point& z) {
         if (this == &z)
           return *this;
@@ -66,12 +65,6 @@ namespace stan {
           values.push_back(p(i));
         for (int i = 0; i < q.size(); ++i)
           values.push_back(g(i));
-      }
-
-      virtual void write_metric(std::ostream* o) {
-        if (!o)
-          return;
-        *o << "# No free parameters for unit metric" << std::endl;
       }
 
     protected:

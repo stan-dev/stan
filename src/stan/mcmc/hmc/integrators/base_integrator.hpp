@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__BASE__INTEGRATOR__BETA
-#define STAN__MCMC__BASE__INTEGRATOR__BETA
+#ifndef STAN__MCMC__HMC__INTEGRATORS__BASE_INTEGRATOR_HPP
+#define STAN__MCMC__HMC__INTEGRATORS__BASE_INTEGRATOR_HPP
 
 #include <ostream>
 
@@ -7,16 +7,13 @@ namespace stan {
 
   namespace mcmc {
 
-    template <typename H, typename P>
+    template <typename Hamiltonian>
     class base_integrator {
     public:
-      explicit base_integrator(std::ostream* o)
-        : out_stream_(o) {}
-
-      virtual void evolve(P& z, H& hamiltonian, const double epsilon) = 0;
-
-    protected:
-      std::ostream* out_stream_;
+      base_integrator() {}
+      virtual void evolve(typename Hamiltonian::PointType& z,
+                          Hamiltonian& hamiltonian,
+                          const double epsilon) = 0;
     };
 
   }  // mcmc
