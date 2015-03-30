@@ -12,15 +12,14 @@ namespace stan {
     /**
      * Compute trace(B^T A B).
      **/
-    template<int RA,int CA,int RB,int CB>
+    template<int RA, int CA, int RB, int CB>
     inline double
-    trace_quad_form(const Eigen::Matrix<double,RA,CA> &A,
-                    const Eigen::Matrix<double,RB,CB> &B)
-    {
+    trace_quad_form(const Eigen::Matrix<double, RA, CA> &A,
+                    const Eigen::Matrix<double, RB, CB> &B) {
       stan::math::check_square("trace_quad_form", "A", A);
-      stan::math::check_multiplicable("trace_quad_form", 
-                                                "A", A,
-                                                "B", B);
+      stan::math::check_multiplicable("trace_quad_form",
+                                      "A", A,
+                                      "B", B);
 
       return (B.transpose()*A*B).trace();
     }

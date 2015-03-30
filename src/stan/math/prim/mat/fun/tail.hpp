@@ -1,13 +1,13 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__TAIL_HPP
 #define STAN__MATH__PRIM__MAT__FUN__TAIL_HPP
 
-#include <vector>
 #include <stan/math/prim/mat/err/check_column_index.hpp>
 #include <stan/math/prim/mat/err/check_row_index.hpp>
 #include <stan/math/prim/mat/err/check_std_vector_index.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/math/prim/arr/meta/index_type.hpp>
+#include <vector>
 
 namespace stan {
 
@@ -19,8 +19,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,Eigen::Dynamic,1>
-    tail(const Eigen::Matrix<T,Eigen::Dynamic,1>& v,
+    Eigen::Matrix<T, Eigen::Dynamic, 1>
+    tail(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
          size_t n) {
       if (n != 0)
         stan::math::check_row_index("tail", "n", v, n);
@@ -34,8 +34,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,1,Eigen::Dynamic>
-    tail(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv,
+    Eigen::Matrix<T, 1, Eigen::Dynamic>
+    tail(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv,
          size_t n) {
       if (n != 0)
         stan::math::check_column_index("tail", "n", rv, n);

@@ -27,7 +27,7 @@ namespace stan {
       using boost::exponential_distribution;
 
       static const char* function("stan::prob::pareto_rng");
-      
+
       using stan::math::check_positive_finite;
 
       check_positive_finite(function, "Scale parameter", y_min);

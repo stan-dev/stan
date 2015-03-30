@@ -11,7 +11,7 @@ namespace stan {
 
     /**
      * Return the value of the specified arithmetic argument
-     * unmodified with its own declared type.  
+     * unmodified with its own declared type.
      *
      * <p>This template function can only be instantiated with
      * arithmetic types as defined by Boost's
@@ -23,16 +23,16 @@ namespace stan {
      * @tparam T type of arithmetic input.
      * @param x input.
      * @return input unmodified.
-     */ 
+     */
     template <typename T>
-    inline 
+    inline
     typename boost::enable_if<boost::is_arithmetic<T>, T>::type
     primitive_value(T x) {
       return x;
     }
 
     /**
-     * Return the primitive value of the specified argument.  
+     * Return the primitive value of the specified argument.
      *
      * <p>This implementation only applies to non-arithmetic types as
      * defined by Boost's <code>is_arithmetic</code> trait metaprogram.
@@ -40,7 +40,7 @@ namespace stan {
      * @tparam T type of non-arithmetic input.
      * @param x input.
      * @return value of input.
-     */ 
+     */
     template <typename T>
     inline
     typename boost::disable_if<boost::is_arithmetic<T>, double>::type

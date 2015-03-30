@@ -32,12 +32,12 @@ namespace stan {
      *
      * \f{eqnarray*}{
      y &\sim& t_{\nu} (\mu, \sigma^2) \\
-     \log (p (y \,|\, \nu, \mu, \sigma) ) &=& \log \left( \frac{\Gamma((\nu + 1) /2)}
+     \log (p (y \, |\, \nu, \mu, \sigma) ) &=& \log \left( \frac{\Gamma((\nu + 1) /2)}
      {\Gamma(\nu/2)\sqrt{\nu \pi} \sigma} \left( 1 + \frac{1}{\nu} (\frac{y - \mu}{\sigma})^2 \right)^{-(\nu + 1)/2} \right) \\
      &=& \log( \Gamma( (\nu+1)/2 )) - \log (\Gamma (\nu/2) - \frac{1}{2} \log(\nu \pi) - \log(\sigma)
      -\frac{\nu + 1}{2} \log (1 + \frac{1}{\nu} (\frac{y - \mu}{\sigma})^2)
      \f}
-     * 
+     *
      * @param y A scalar variable.
      * @param nu Degrees of freedom.
      * @param mu The mean of the Student-t distribution.
@@ -50,14 +50,14 @@ namespace stan {
      * @tparam T_loc Type of location.
      * @tparam T_scale Type of scale.
      */
-    template <bool propto, typename T_y, typename T_dof, 
+    template <bool propto, typename T_y, typename T_dof,
               typename T_loc, typename T_scale>
-    typename return_type<T_y,T_dof,T_loc,T_scale>::type
-    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
+    typename return_type<T_y, T_dof, T_loc, T_scale>::type
+    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu,
                   const T_scale& sigma) {
       static const char* function("stan::prob::student_t_log");
-      typedef typename stan::partials_return_type<T_y,T_dof,T_loc,
-                                                  T_scale>::type 
+      typedef typename stan::partials_return_type<T_y, T_dof, T_loc,
+                                                  T_scale>::type
         T_partials_return;
 
       using stan::math::check_positive_finite;
@@ -66,8 +66,8 @@ namespace stan {
       using stan::math::check_consistent_sizes;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(nu) 
+      if (!(stan::length(y)
+            && stan::length(nu)
             && stan::length(mu)
             && stan::length(sigma)))
         return 0.0;
@@ -86,7 +86,7 @@ namespace stan {
                              "Scale parameter", sigma);
 
       // check if no variables are involved and prop-to
-      if (!include_summand<propto,T_y,T_dof,T_loc,T_scale>::value)
+      if (!include_summand<propto, T_y, T_dof, T_loc, T_scale>::value)
         return 0.0;
 
       VectorView<const T_y> y_vec(y);
@@ -101,67 +101,69 @@ namespace stan {
       using stan::math::square;
       using stan::math::value_of;
 
-      VectorBuilder<include_summand<propto,T_y,T_dof,T_loc,T_scale>::value,
+      VectorBuilder<include_summand<propto, T_y, T_dof, T_loc, T_scale>::value,
                     T_partials_return, T_dof> half_nu(length(nu));
-      for (size_t i = 0; i < length(nu); i++) 
-        if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) 
+      for (size_t i = 0; i < length(nu); i++)
+        if (include_summand<propto, T_y, T_dof, T_loc, T_scale>::value)
           half_nu[i] = 0.5 * value_of(nu_vec[i]);
 
-      VectorBuilder<include_summand<propto,T_dof>::value,
+      VectorBuilder<include_summand<propto, T_dof>::value,
                     T_partials_return, T_dof> lgamma_half_nu(length(nu));
-      VectorBuilder<include_summand<propto,T_dof>::value,
-                    T_partials_return, T_dof> 
+      VectorBuilder<include_summand<propto, T_dof>::value,
+                    T_partials_return, T_dof>
         lgamma_half_nu_plus_half(length(nu));
-      if (include_summand<propto,T_dof>::value)
+      if (include_summand<propto, T_dof>::value) {
         for (size_t i = 0; i < length(nu); i++) {
           lgamma_half_nu[i] = lgamma(half_nu[i]);
           lgamma_half_nu_plus_half[i] = lgamma(half_nu[i] + 0.5);
         }
+      }
 
       VectorBuilder<!is_constant_struct<T_dof>::value,
                     T_partials_return, T_dof> digamma_half_nu(length(nu));
       VectorBuilder<!is_constant_struct<T_dof>::value,
                     T_partials_return, T_dof>
         digamma_half_nu_plus_half(length(nu));
-      if (!is_constant_struct<T_dof>::value)
+      if (!is_constant_struct<T_dof>::value) {
         for (size_t i = 0; i < length(nu); i++) {
           digamma_half_nu[i] = digamma(half_nu[i]);
           digamma_half_nu_plus_half[i] = digamma(half_nu[i] + 0.5);
         }
+      }
 
-      VectorBuilder<include_summand<propto,T_dof>::value,
+      VectorBuilder<include_summand<propto, T_dof>::value,
                     T_partials_return, T_dof> log_nu(length(nu));
       for (size_t i = 0; i < length(nu); i++)
-        if (include_summand<propto,T_dof>::value)
+        if (include_summand<propto, T_dof>::value)
           log_nu[i] = log(value_of(nu_vec[i]));
 
-      VectorBuilder<include_summand<propto,T_scale>::value,
+      VectorBuilder<include_summand<propto, T_scale>::value,
                     T_partials_return, T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++)
-        if (include_summand<propto,T_scale>::value)
+        if (include_summand<propto, T_scale>::value)
           log_sigma[i] = log(value_of(sigma_vec[i]));
 
-      VectorBuilder<include_summand<propto,T_y,T_dof,T_loc,T_scale>::value,
+      VectorBuilder<include_summand<propto, T_y, T_dof, T_loc, T_scale>::value,
                     T_partials_return, T_y, T_dof, T_loc, T_scale>
         square_y_minus_mu_over_sigma__over_nu(N);
 
-      VectorBuilder<include_summand<propto,T_y,T_dof,T_loc,T_scale>::value,
+      VectorBuilder<include_summand<propto, T_y, T_dof, T_loc, T_scale>::value,
                     T_partials_return, T_y, T_dof, T_loc, T_scale>
         log1p_exp(N);
 
-      for (size_t i = 0; i < N; i++) 
-        if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
+      for (size_t i = 0; i < N; i++)
+        if (include_summand<propto, T_y, T_dof, T_loc, T_scale>::value) {
           const T_partials_return y_dbl = value_of(y_vec[i]);
           const T_partials_return mu_dbl = value_of(mu_vec[i]);
           const T_partials_return sigma_dbl = value_of(sigma_vec[i]);
           const T_partials_return nu_dbl = value_of(nu_vec[i]);
-          square_y_minus_mu_over_sigma__over_nu[i] 
+          square_y_minus_mu_over_sigma__over_nu[i]
             = square((y_dbl - mu_dbl) / sigma_dbl) / nu_dbl;
           log1p_exp[i] = log1p(square_y_minus_mu_over_sigma__over_nu[i]);
         }
 
-      agrad::OperandsAndPartials<T_y,T_dof,T_loc,T_scale>
-        operands_and_partials(y,nu,mu,sigma);
+      agrad::OperandsAndPartials<T_y, T_dof, T_loc, T_scale>
+        operands_and_partials(y, nu, mu, sigma);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
@@ -169,24 +171,24 @@ namespace stan {
         const T_partials_return nu_dbl = value_of(nu_vec[n]);
         if (include_summand<propto>::value)
           logp += NEG_LOG_SQRT_PI;
-        if (include_summand<propto,T_dof>::value)
+        if (include_summand<propto, T_dof>::value)
           logp += lgamma_half_nu_plus_half[n] - lgamma_half_nu[n]
             -  0.5 * log_nu[n];
-        if (include_summand<propto,T_scale>::value)
+        if (include_summand<propto, T_scale>::value)
           logp -= log_sigma[n];
-        if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value)
+        if (include_summand<propto, T_y, T_dof, T_loc, T_scale>::value)
           logp -= (half_nu[n] + 0.5)
             * log1p_exp[n];
-  
+
         if (!is_constant_struct<T_y>::value) {
-          operands_and_partials.d_x1[n] 
+          operands_and_partials.d_x1[n]
             += -(half_nu[n]+0.5)
             * 1.0 / (1.0 + square_y_minus_mu_over_sigma__over_nu[n])
             * (2.0 * (y_dbl - mu_dbl) / square(sigma_dbl) / nu_dbl);
         }
         if (!is_constant_struct<T_dof>::value) {
           const T_partials_return inv_nu = 1.0 / nu_dbl;
-          operands_and_partials.d_x2[n] 
+          operands_and_partials.d_x2[n]
             += 0.5*digamma_half_nu_plus_half[n] - 0.5*digamma_half_nu[n]
             - 0.5 * inv_nu
             - 0.5*log1p_exp[n]
@@ -195,28 +197,28 @@ namespace stan {
                * square_y_minus_mu_over_sigma__over_nu[n] * inv_nu);
         }
         if (!is_constant_struct<T_loc>::value) {
-          operands_and_partials.d_x3[n] 
-            -= (half_nu[n] + 0.5) 
-            / (1.0 + square_y_minus_mu_over_sigma__over_nu[n]) 
+          operands_and_partials.d_x3[n]
+            -= (half_nu[n] + 0.5)
+            / (1.0 + square_y_minus_mu_over_sigma__over_nu[n])
             * (2.0 * (mu_dbl - y_dbl) / (sigma_dbl*sigma_dbl*nu_dbl));
         }
         if (!is_constant_struct<T_scale>::value) {
           const T_partials_return inv_sigma = 1.0 / sigma_dbl;
-          operands_and_partials.d_x4[n] 
+          operands_and_partials.d_x4[n]
             += -inv_sigma
             + (nu_dbl + 1.0) / (1.0 + square_y_minus_mu_over_sigma__over_nu[n])
             * (square_y_minus_mu_over_sigma__over_nu[n] * inv_sigma);
         }
       }
-      return operands_and_partials.to_var(logp,y,nu,mu,sigma);
+      return operands_and_partials.to_var(logp, y, nu, mu, sigma);
     }
 
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
     inline
-    typename return_type<T_y,T_dof,T_loc,T_scale>::type
-    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
+    typename return_type<T_y, T_dof, T_loc, T_scale>::type
+    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu,
                   const T_scale& sigma) {
-      return student_t_log<false>(y,nu,mu,sigma);
+      return student_t_log<false>(y, nu, mu, sigma);
     }
   }
 }

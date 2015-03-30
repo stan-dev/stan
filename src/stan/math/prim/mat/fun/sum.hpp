@@ -1,12 +1,12 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__SUM_HPP
 #define STAN__MATH__PRIM__MAT__FUN__SUM_HPP
 
-#include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <vector>
 
 namespace stan {
   namespace math {
-   
+
     /**
      * Return the sum of the values in the specified
      * standard vector.
@@ -23,7 +23,7 @@ namespace stan {
         sum += xs[i];
       return sum;
     }
- 
+
     /**
      * Returns the sum of the coefficients of the specified
      * column vector.
@@ -31,10 +31,10 @@ namespace stan {
      * @return Sum of coefficients of vector.
      */
     template <typename T, int R, int C>
-    inline double sum(const Eigen::Matrix<T,R,C>& v) {
+    inline double sum(const Eigen::Matrix<T, R, C>& v) {
       return v.sum();
-    }    
-    
+    }
+
   }
 }
 #endif

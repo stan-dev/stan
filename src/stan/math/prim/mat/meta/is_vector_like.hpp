@@ -8,7 +8,7 @@ namespace stan {
 
   // handles eigen matrix
   template <typename T>
-  struct is_vector_like<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > {
+  struct is_vector_like<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > {
     enum { value = true };
   };
 }

@@ -1,12 +1,12 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__LOG_SOFTMAX_HPP
 #define STAN__MATH__PRIM__MAT__FUN__LOG_SOFTMAX_HPP
 
-#include <cmath>
-#include <sstream>
-#include <stdexcept>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/log_sum_exp.hpp>
 #include <stan/math/prim/scal/err/check_nonzero_size.hpp>
+#include <cmath>
+#include <sstream>
+#include <stdexcept>
 
 namespace stan {
   namespace math {
@@ -24,7 +24,7 @@ namespace stan {
      * For the log softmax function, the entries in the Jacobian are
      * \f$
      * \frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
-     * = \left\{ 
+     * = \left\{
      * \begin{array}{ll}
      * 1 - \mbox{softmax}(y)[m]
      * & \mbox{ if } m = k, \mbox{ and}
@@ -40,13 +40,13 @@ namespace stan {
      * @return Unit simplex result of the softmax transform of the vector.
      */
     template <typename T>
-    inline Eigen::Matrix<T,Eigen::Dynamic,1>
-    log_softmax(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
+    inline Eigen::Matrix<T, Eigen::Dynamic, 1>
+    log_softmax(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
       using std::exp;
       using std::log;
       using stan::math::log_sum_exp;
       stan::math::check_nonzero_size("log_softmax", "v", v);
-      Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
+      Eigen::Matrix<T, Eigen::Dynamic, 1> theta(v.size());
       T z = log_sum_exp(v);
       for (int i = 0; i < v.size(); ++i)
         theta(i) = v(i) - z;

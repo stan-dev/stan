@@ -7,7 +7,7 @@
 #include <limits>
 
 namespace stan {
-  
+
   namespace prob {
 
     // UPPER BOUND
@@ -20,11 +20,11 @@ namespace stan {
      *
      * <p>\f$f(x) = U - \exp(x)\f$
      *
-     * <p>where \f$U\f$ is the upper bound.  
-     * 
+     * <p>where \f$U\f$ is the upper bound.
+     *
      * If the upper bound is positive infinity, this function
      * reduces to <code>identity_constrain(x)</code>.
-     * 
+     *
      * @param x Free scalar.
      * @param ub Upper bound.
      * @return Transformed scalar with specified upper bound.
@@ -33,7 +33,7 @@ namespace stan {
      */
     template <typename T, typename TU>
     inline
-    typename boost::math::tools::promote_args<T,TU>::type
+    typename boost::math::tools::promote_args<T, TU>::type
     ub_constrain(const T x, const TU ub) {
       if (ub == std::numeric_limits<double>::infinity())
         return identity_constrain(x);
@@ -47,14 +47,14 @@ namespace stan {
      * determinant of the transform.
      *
      * <p>The transform is as specified for
-     * <code>ub_constrain(T,double)</code>.  The log absolute Jacobian
+     * <code>ub_constrain(T, double)</code>.  The log absolute Jacobian
      * determinant is
      *
-     * <p>\f$ \log | \frac{d}{dx} -\mbox{exp}(x) + U | 
+     * <p>\f$ \log | \frac{d}{dx} -\mbox{exp}(x) + U |
      *     = \log | -\mbox{exp}(x) + 0 | = x\f$.
      *
      * If the upper bound is positive infinity, this function
-     * reduces to <code>identity_constrain(x,lp)</code>.
+     * reduces to <code>identity_constrain(x, lp)</code>.
      *
      * @param x Free scalar.
      * @param ub Upper bound.
@@ -65,10 +65,10 @@ namespace stan {
      */
     template <typename T, typename TU>
     inline
-    typename boost::math::tools::promote_args<T,TU>::type
+    typename boost::math::tools::promote_args<T, TU>::type
     ub_constrain(const T x, const TU ub, T& lp) {
       if (ub == std::numeric_limits<double>::infinity())
-        return identity_constrain(x,lp);
+        return identity_constrain(x, lp);
       lp += x;
       return ub - exp(x);
     }

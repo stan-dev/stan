@@ -2,8 +2,8 @@
 #define STAN__MATH__PRIM__SCAL__FUN__INVERSE_SOFTMAX_HPP
 
 #include <boost/math/tools/promotion.hpp>
-#include <stdexcept>
 #include <boost/throw_exception.hpp>
+#include <stdexcept>
 
 namespace stan {
   namespace math {
@@ -21,7 +21,7 @@ namespace stan {
      * up to a scaling factor.
      *
      * Because of the definition, values of 0.0 in the simplex
-     * are converted to negative infinity, and values of 1.0 
+     * are converted to negative infinity, and values of 1.0
      * are converted to 0.0.
      *
      * There is no check that the input vector is a valid simplex vector.
@@ -33,8 +33,9 @@ namespace stan {
     template <typename Vector>
     void inverse_softmax(const Vector& simplex, Vector& y) {
       using std::log;
-      if(simplex.size() != y.size())
-        BOOST_THROW_EXCEPTION(std::invalid_argument ("simplex.size() != y.size()"));
+      if (simplex.size() != y.size())
+        BOOST_THROW_EXCEPTION(std::invalid_argument
+                              ("simplex.size() != y.size()"));
       for (size_t i = 0; i < simplex.size(); ++i)
         y[i] = log(simplex[i]);
     }

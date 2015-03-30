@@ -22,9 +22,9 @@ namespace stan {
   namespace prob {
 
     template <typename T_y, typename T_shape, typename T_scale>
-    typename return_type<T_y,T_shape,T_scale>::type
+    typename return_type<T_y, T_shape, T_scale>::type
     weibull_cdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
-      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+      typedef typename stan::partials_return_type<T_y, T_shape, T_scale>::type
         T_partials_return;
 
       static const char* function("stan::prob::weibull_cdf_log");
@@ -35,8 +35,8 @@ namespace stan {
       using stan::math::value_of;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(alpha) 
+      if (!(stan::length(y)
+            && stan::length(alpha)
             && stan::length(sigma)))
         return 0.0;
 
@@ -44,8 +44,8 @@ namespace stan {
       check_nonnegative(function, "Random variable", y);
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", sigma);
-      
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
+
+      agrad::OperandsAndPartials<T_y, T_shape, T_scale>
         operands_and_partials(y, alpha, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -60,10 +60,10 @@ namespace stan {
         const T_partials_return exp_ = exp(-pow_);
         const T_partials_return cdf_ = 1.0 - exp_;
 
-        //cdf_log
+        // cdf_log
         cdf_log += log(cdf_);
 
-        //gradients
+        // gradients
         const T_partials_return rep_deriv = pow_ / (1.0 / exp_ - 1.0);
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv * alpha_dbl / y_dbl;
@@ -73,7 +73,7 @@ namespace stan {
           operands_and_partials.d_x3[n] -= rep_deriv * alpha_dbl / sigma_dbl;
       }
 
-      return operands_and_partials.to_var(cdf_log,y,alpha,sigma);    
+      return operands_and_partials.to_var(cdf_log, y, alpha, sigma);
     }
   }
 }

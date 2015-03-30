@@ -6,7 +6,7 @@
 namespace stan {
 
   template <typename T, int R, int C>
-  size_t length(const Eigen::Matrix<T,R,C>& m) {
+  size_t length(const Eigen::Matrix<T, R, C>& m) {
     return m.size();
   }
 }

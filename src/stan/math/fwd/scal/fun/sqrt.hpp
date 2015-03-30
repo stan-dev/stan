@@ -10,7 +10,7 @@ namespace stan {
   namespace agrad {
 
     template <typename T>
-    inline 
+    inline
     fvar<T>
     sqrt(const fvar<T>& x) {
       using std::sqrt;

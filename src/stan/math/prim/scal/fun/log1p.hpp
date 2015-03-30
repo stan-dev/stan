@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__PRIM__SCAL__FUN__LOG1P_HPP
 #define STAN__MATH__PRIM__SCAL__FUN__LOG1P_HPP
 
-#include <limits>
 #include <boost/math/tools/promotion.hpp>
+#include <limits>
 
 namespace stan {
   namespace math {
@@ -14,16 +14,16 @@ namespace stan {
      * values during algorithmic differentiation.
      *
        \f[
-       \mbox{log1p}(x) = 
+       \mbox{log1p}(x) =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < -1\\
          \ln(1+x)& \mbox{if } x\geq -1 \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{log1p}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{log1p}(x)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < -1\\
          \frac{1}{1+x} & \mbox{if } x\geq -1 \\[6pt]

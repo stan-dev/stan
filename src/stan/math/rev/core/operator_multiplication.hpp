@@ -5,6 +5,7 @@
 #include <stan/math/rev/core/vv_vari.hpp>
 #include <stan/math/rev/core/vd_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -52,25 +53,25 @@ namespace stan {
      * \f$\frac{\partial}{\partial y} (x * y) = x\f$.
      *
        \f[
-       \mbox{operator*}(x,y) = 
+       \mbox{operator*}(x, y) =
        \begin{cases}
-         xy & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         xy & \mbox{if } -\infty\leq x, y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator*}(x,y)}{\partial x} = 
+       \frac{\partial\, \mbox{operator*}(x, y)}{\partial x} =
        \begin{cases}
-         y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         y & \mbox{if } -\infty\leq x, y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator*}(x,y)}{\partial y} = 
+       \frac{\partial\, \mbox{operator*}(x, y)}{\partial y} =
        \begin{cases}
-         x & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         x & \mbox{if } -\infty\leq x, y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
@@ -80,7 +81,7 @@ namespace stan {
      * @return Variable result of multiplying operands.
      */
     inline var operator*(const var& a, const var& b) {
-      return var(new multiply_vv_vari(a.vi_,b.vi_));
+      return var(new multiply_vv_vari(a.vi_, b.vi_));
     }
 
     /**
@@ -89,7 +90,7 @@ namespace stan {
      * The partial derivative for the variable is
      *
      * \f$\frac{\partial}{\partial x} (x * c) = c\f$, and
-     * 
+     *
      * @param a Variable operand.
      * @param b Scalar operand.
      * @return Variable result of multiplying operands.
@@ -97,7 +98,7 @@ namespace stan {
     inline var operator*(const var& a, const double b) {
       if (b == 1.0)
         return a;
-      return var(new multiply_vd_vari(a.vi_,b));
+      return var(new multiply_vd_vari(a.vi_, b));
     }
 
     /**
@@ -114,7 +115,7 @@ namespace stan {
     inline var operator*(const double a, const var& b) {
       if (a == 1.0)
         return b;
-      return var(new multiply_vd_vari(b.vi_,a)); // by symmetry
+      return var(new multiply_vd_vari(b.vi_, a));  // by symmetry
     }
 
   }

@@ -16,7 +16,7 @@ namespace stan {
     fmod(const fvar<T>& x1, const fvar<T>& x2) {
       using std::fmod;
       using std::floor;
-      return fvar<T>(fmod(x1.val_, x2.val_), 
+      return fvar<T>(fmod(x1.val_, x2.val_),
                      x1.d_ - x2.d_ * floor(x1.val_ / x2.val_));
     }
 
@@ -28,7 +28,7 @@ namespace stan {
       using stan::math::value_of;
       if (unlikely(boost::math::isnan(value_of(x1.val_))
                    || boost::math::isnan(x2)))
-        return fvar<T>(fmod(x1.val_,x2),stan::math::NOT_A_NUMBER);
+        return fvar<T>(fmod(x1.val_, x2), stan::math::NOT_A_NUMBER);
       else
         return fvar<T>(fmod(x1.val_, x2), x1.d_ / x2);
     }

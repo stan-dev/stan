@@ -12,7 +12,7 @@ namespace stan {
      *
      * The exponent base 2 function is defined by
      *
-     * <code>exp2(y) = pow(2.0,y)</code>.
+     * <code>exp2(y) = pow(2.0, y)</code>.
      *
      * @param y Value.
      * @tparam T Type of scalar.
@@ -22,7 +22,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T>::type
     exp2(const T y) {
       using ::pow;
-      return pow(2.0,y);
+      return pow(2.0, y);
     }
   }
 }

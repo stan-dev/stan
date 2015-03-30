@@ -1,9 +1,9 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__ACOS_HPP
 #define STAN__MATH__REV__SCAL__FUN__ACOS_HPP
 
-#include <valarray>
 #include <stan/math/rev/core.hpp>
 #include <math.h>
+#include <valarray>
 
 namespace stan {
   namespace agrad {
@@ -11,8 +11,8 @@ namespace stan {
     namespace {
       class acos_vari : public op_v_vari {
       public:
-        acos_vari(vari* avi) :
-          op_v_vari(::acos(avi->val_),avi) {
+        explicit acos_vari(vari* avi) :
+          op_v_vari(::acos(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ -= adj_ / std::sqrt(1.0 - (avi_->val_ * avi_->val_));
@@ -30,7 +30,7 @@ namespace stan {
      *
      *
        \f[
-       \mbox{acos}(x) = 
+       \mbox{acos}(x) =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < -1\\
          \arccos(x) & \mbox{if } -1\leq x\leq 1 \\
@@ -40,10 +40,10 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{acos}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{acos}(x)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < -1\\
-         \frac{\partial\,\arccos(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
+         \frac{\partial\, \arccos(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
          \textrm{NaN} & \mbox{if } x < -1\\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
@@ -53,8 +53,8 @@ namespace stan {
        \frac{\partial \, \arccos(x)}{\partial x} = -\frac{1}{\sqrt{1-x^2}}
        \f]
      *
-     * @param a Variable in range [-1,1].
-     * @return Arc cosine of variable, in radians. 
+     * @param a Variable in range [-1, 1].
+     * @return Arc cosine of variable, in radians.
      */
     inline var acos(const var& a) {
       return var(new acos_vari(a.vi_));

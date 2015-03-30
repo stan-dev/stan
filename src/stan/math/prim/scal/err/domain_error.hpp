@@ -11,7 +11,7 @@ namespace stan {
 
     /**
      * Throw a domain error with a consistently formatted message.
-     * 
+     *
      * This is an abstraction for all Stan functions to use when throwing
      * domain errors. This will allow us to change the behavior for all
      * functions at once. (We've already changed behavior mulitple times up
@@ -47,7 +47,7 @@ namespace stan {
 
     /**
      * Throw a domain error with a consistently formatted message.
-     * 
+     *
      * This is an abstraction for all Stan functions to use when throwing
      * domain errors. This will allow us to change the behavior for all
      * functions at once. (We've already changed behavior mulitple times up

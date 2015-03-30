@@ -10,8 +10,8 @@ namespace stan {
     namespace {
       class log1m_vari : public op_v_vari {
       public:
-        log1m_vari(vari* avi) :
-          op_v_vari(stan::math::log1p(-avi->val_),avi) {
+        explicit log1m_vari(vari* avi) :
+          op_v_vari(stan::math::log1p(-avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (avi_->val_ - 1);

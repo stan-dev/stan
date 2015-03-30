@@ -6,12 +6,12 @@
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class exp_vari : public op_v_vari {
       public:
-        exp_vari(vari* avi) :
-          op_v_vari(::exp(avi->val_),avi) {
+        explicit exp_vari(vari* avi) :
+          op_v_vari(::exp(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * val_;
@@ -23,7 +23,7 @@ namespace stan {
      * Return the exponentiation of the specified variable (cmath).
      *
        \f[
-       \mbox{exp}(x) = 
+       \mbox{exp}(x) =
        \begin{cases}
          e^x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
@@ -31,7 +31,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{exp}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{exp}(x)}{\partial x} =
        \begin{cases}
          e^x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

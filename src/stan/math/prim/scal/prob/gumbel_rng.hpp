@@ -37,7 +37,7 @@ namespace stan {
 
 
       check_finite(function, "Location parameter", mu);
-      check_positive(function, "Scale parameter", beta); 
+      check_positive(function, "Scale parameter", beta);
 
       variate_generator<RNG&, uniform_01<> >
         uniform01_rng(rng, uniform_01<>());

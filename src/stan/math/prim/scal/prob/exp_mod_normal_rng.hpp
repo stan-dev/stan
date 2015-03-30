@@ -32,7 +32,6 @@ namespace stan {
                        const double sigma,
                        const double lambda,
                        RNG& rng) {
-
       static const char* function("stan::prob::exp_mod_normal_rng");
 
       using stan::math::check_positive_finite;
@@ -42,7 +41,7 @@ namespace stan {
       check_positive_finite(function, "Inv_scale parameter", lambda);
       check_positive_finite(function, "Scale parameter", sigma);
 
-      return stan::prob::normal_rng(mu, sigma,rng) 
+      return stan::prob::normal_rng(mu, sigma, rng)
         + stan::prob::exponential_rng(lambda, rng);
     }
   }

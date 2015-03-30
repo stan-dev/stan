@@ -66,7 +66,7 @@ namespace Eigen {
      * point, <code>&#45;std::numeric_limits&lt;double&gt;::max()</code>.
      *
      * @return Same lowest value as a <code>double</code>.
-     */    
+     */
     inline static Real lowest() {
       return -std::numeric_limits<double>::max();
     }
