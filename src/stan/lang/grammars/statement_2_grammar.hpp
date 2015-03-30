@@ -11,7 +11,7 @@
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
 
-namespace stan { 
+namespace stan {
 
   namespace lang {
 
@@ -19,13 +19,13 @@ namespace stan {
     struct statement_grammar;
 
     template <typename Iterator>
-    struct statement_2_grammar 
+    struct statement_2_grammar
       : boost::spirit::qi::grammar<Iterator,
                                    statement(bool,var_origin,bool),
                                    whitespace_grammar<Iterator> > {
-      
-  
-      
+
+
+
       statement_2_grammar(variable_map& var_map,
                           std::stringstream& error_msgs,
                           statement_grammar<Iterator>& sg);
@@ -34,26 +34,26 @@ namespace stan {
       // global info for parses
       variable_map& var_map_;
       std::stringstream& error_msgs_;
-      
+
       // grammars
-      expression_grammar<Iterator> expression_g;  
+      expression_grammar<Iterator> expression_g;
       statement_grammar<Iterator>& statement_g;
 
       // rules
 
-      boost::spirit::qi::rule<Iterator, 
+      boost::spirit::qi::rule<Iterator,
                               conditional_statement(bool,var_origin,bool),
-                              whitespace_grammar<Iterator> > 
+                              whitespace_grammar<Iterator> >
       conditional_statement_r;
 
 
-      boost::spirit::qi::rule<Iterator, 
-                              statement(bool,var_origin,bool), 
-                              whitespace_grammar<Iterator> > 
+      boost::spirit::qi::rule<Iterator,
+                              statement(bool,var_origin,bool),
+                              whitespace_grammar<Iterator> >
       statement_2_r;
 
     };
-                               
+
 
   }
 }
