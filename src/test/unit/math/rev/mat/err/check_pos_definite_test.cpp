@@ -4,10 +4,11 @@
 #include <stan/math/prim/mat/meta/is_vector.hpp>
 #include <stan/math/prim/mat/meta/is_vector_like.hpp>
 #include <stan/math/prim/mat/fun/value_of_rec.hpp>
-#include <stan/math/rev/mat/err/check_pos_definite.hpp>
+#include <stan/math/prim/mat/err/check_pos_definite.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
+#include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 
 TEST(AgradRevErrorHandlingMatrix, checkPosDefiniteMatrix_nan) {
@@ -17,7 +18,7 @@ TEST(AgradRevErrorHandlingMatrix, checkPosDefiniteMatrix_nan) {
 
   Matrix<var, Dynamic, Dynamic> y;
   double nan = std::numeric_limits<double>::quiet_NaN();
-  using stan::agrad::check_pos_definite;
+  using stan::math::check_pos_definite;
 
   y.resize(1,1);
   y << nan;

@@ -5,7 +5,6 @@
 #include <stan/math/mix/mat/functor/derivative.hpp>
 #include <stan/math/mix/mat/functor/grad_hessian.hpp>
 #include <stan/math/mix/mat/functor/grad_tr_mat_times_hessian.hpp>
-#include <stan/math/mix/mat/functor/gradient.hpp>
 #include <stan/math/mix/mat/functor/gradient_dot_vector.hpp>
 #include <stan/math/mix/mat/functor/hessian.hpp>
 #include <stan/math/mix/mat/functor/hessian_times_vector.hpp>
