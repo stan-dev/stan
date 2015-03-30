@@ -1,10 +1,11 @@
+#include <stan/interface_callbacks/writer/stringstream.hpp>
 #include <stan/services/io/write_iteration.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
-#include <sstream>
 
 typedef test_lp_model_namespace::test_lp_model Model;
 typedef boost::ecuyer1988 rng_t;
+typedef stan::interface_callbacks::writer::stringstream writer_t;
 
 class StanUi : public testing::Test {
 public:
@@ -28,7 +29,7 @@ public:
 };
 
 TEST_F(StanUi, write_iteration) {
-  std::stringstream stream;
+  writer_t writer;
   Model model = *model_ptr;
   double lp;
   std::vector<double> cont_vector;
@@ -38,9 +39,9 @@ TEST_F(StanUi, write_iteration) {
   cont_vector.push_back(0);
   cont_vector.push_back(0);
 
-  stan::services::io::write_iteration(stream, model, base_rng,
+  stan::services::io::write_iteration(writer, model, base_rng,
                             lp, cont_vector, disc_vector);
-  EXPECT_EQ("1,0,0,1,1,2713\n", stream.str())
+  EXPECT_EQ("1,0,0,1,1,2713\n", writer.contents())
     << "the output should be (1,  0,       0,    exp(0),    exp(0), 2713) \n"
     << "                     (lp, y[1], y[2], exp(y[1]), exp(y[2]),  xgq)";
 

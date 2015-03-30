@@ -1,4 +1,5 @@
-#include <stan/io/mcmc_writer.hpp>
+#include <stan/services/sample/mcmc_writer.hpp>
+#include <stan/interface_callbacks/writer/stringstream.hpp>
 #include <test/test-models/good/io_example.hpp>
 
 #include <vector>
@@ -12,16 +13,18 @@
 
 #include <gtest/gtest.h>
 
+typedef boost::ecuyer1988 rng_t;
+typedef stan::interface_callbacks::writer::stringstream writer_t;
 
-TEST(StanIoMcmcWriter, write_sample_names) {
+TEST(StanIoMcmcWriter, write_names) {
   
   // Model
   std::fstream data_stream("", std::fstream::in);
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
 
-  std::stringstream output;
-  io_example_model_namespace::io_example_model model(data_var_context, &output);
+  std::stringstream model_output;
+  stan_model model(data_var_context, &model_output);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -34,46 +37,49 @@ TEST(StanIoMcmcWriter, write_sample_names) {
   stan::mcmc::sample sample(real, log_prob, accept_stat);
   
   // Sampler
-  typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
+  writer_t sampler_writer;
+  stan::mcmc::adapt_diag_e_nuts<stan_model, rng_t, writer_t>
+    sampler(model, base_rng, sampler_writer);
   sampler.seed(real);
   
   // Writer
-  std::stringstream sample_stream;
-  std::stringstream diagnostic_stream;
-  std::stringstream message_stream;
+  writer_t output;
+  writer_t diagnostic;
+  writer_t info;
+  
+  stan::services::sample::mcmc_writer
+    <stan_model, rng_t, writer_t, writer_t, writer_t>
+      writer(model, base_rng, output, diagnostic, info);
 
-  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
+  writer.write_names(sample, sampler);
+  
+  std::string expected_output =
+    "lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,"
+    "mu1,mu2\n";
+  std::string expected_diagnostic =
+    "lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,"
+    "mu1,mu2,p_mu1,p_mu2,g_mu1,g_mu2\n";
+  std::string expected_info = "";
 
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::messages>
-    writer(sample_recorder, diagnostic_recorder, message_recorder);
+  EXPECT_EQ("", model_output.str());
   
-  writer.write_sample_names(sample, &sampler, model);
-  
-  std::string line;
-  std::getline(sample_stream, line);
-  
-  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,mu1,mu2", line);
-  EXPECT_EQ("", message_stream.str());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ(expected_output, output.contents());
+  EXPECT_EQ(expected_diagnostic, diagnostic.contents());
+  EXPECT_EQ(expected_info, info.contents());
+
 }
 
-TEST(StanIoMcmcWriter, write_sample_params) {
+TEST(StanIoMcmcWriter, write_state) {
   
   // Model
   std::fstream data_stream("", std::fstream::in);
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  std::stringstream output;
-  io_example_model_namespace::io_example_model model(data_var_context, &output);
+  std::stringstream model_output;
+  stan_model model(data_var_context, &model_output);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -86,48 +92,38 @@ TEST(StanIoMcmcWriter, write_sample_params) {
   stan::mcmc::sample sample(real, log_prob, accept_stat);
   
   // Sampler
-  typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
+  writer_t sampler_writer;
+  stan::mcmc::adapt_diag_e_nuts<stan_model, rng_t, writer_t>
+    sampler(model, base_rng, sampler_writer);
   sampler.seed(real);
+  sampler.z().p.setZero();
+  sampler.z().g.setZero();
   
   // Writer
-  std::stringstream sample_stream;
-  std::stringstream diagnostic_stream;
-  std::stringstream message_stream;
-
-  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
-
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::messages> 
-    writer(sample_recorder, diagnostic_recorder, message_recorder);
+  writer_t output;
+  writer_t diagnostic;
+  writer_t info;
   
-  writer.write_sample_params<rng_t>(base_rng, sample, sampler, model);
+  stan::services::sample::mcmc_writer
+    <stan_model, rng_t, writer_t, writer_t, writer_t>
+      writer(model, base_rng, output, diagnostic, info);
   
-  std::string line;
-  std::getline(sample_stream, line);
+  writer.write_state(sample, sampler);
   
-  std::stringstream expected_stream;
-  expected_stream << log_prob << ",";
-  expected_stream << accept_stat << ",";
-  expected_stream << sampler.get_current_stepsize() << ",";
-  expected_stream << 0 << ",";
-  expected_stream << 0 << ",";
-  expected_stream << 0 << ",";
-  expected_stream << real(0) << ",";
-  expected_stream << real(1);
+  std::string expected_output =
+    "3.14,0.84,0.1,0,0,0,1.43,2.71\n";
+  std::string expected_diagnostic =
+    "3.14,0.84,0.1,0,0,0,1.43,2.71,0,0,0,0\n";
+  std::string expected_info = "";
   
-  std::string expected_line;
-  std::getline(expected_stream, expected_line);
+  EXPECT_EQ("", model_output.str());
   
-  EXPECT_EQ(expected_line, line);
-  EXPECT_EQ("", message_stream.str());
-  EXPECT_EQ("", output.str());
+  EXPECT_EQ(expected_output, output.contents());
+  EXPECT_EQ(expected_diagnostic, diagnostic.contents());
+  EXPECT_EQ(expected_info, info.contents());
+  
 }
 
 TEST(StanIoMcmcWriter, write_adapt_finish) {
@@ -137,8 +133,8 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  std::stringstream output;
-  io_example_model_namespace::io_example_model model(data_var_context, &output);
+  std::stringstream model_output;
+  stan_model model(data_var_context, &model_output);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -151,202 +147,38 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
   stan::mcmc::sample sample(real, log_prob, accept_stat);
   
   // Sampler
-  typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
+  writer_t sampler_writer;
+  stan::mcmc::adapt_diag_e_nuts<stan_model, rng_t, writer_t>
+    sampler(model, base_rng, sampler_writer);
   sampler.seed(real);
   
   // Writer
-  std::stringstream sample_stream;
-  std::stringstream diagnostic_stream;
-  std::stringstream message_stream;
+  writer_t output;
+  writer_t diagnostic;
+  writer_t info;
   
-  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
-
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::messages> 
-    writer(sample_recorder, diagnostic_recorder, message_recorder);
+  stan::services::sample::mcmc_writer
+    <stan_model, rng_t, writer_t, writer_t, writer_t>
+      writer(model, base_rng, output, diagnostic, info);
   
-  writer.write_adapt_finish(&sampler);
+  writer.write_adapt_finish(sampler);
   
-  std::stringstream expected_stream;
-  expected_stream << "# Adaptation terminated" << std::endl;
-  expected_stream << "# Step size = " << sampler.get_current_stepsize() << std::endl;
-  expected_stream << "# Diagonal elements of inverse mass matrix:" << std::endl;
-  expected_stream << "# " << sampler.z().mInv(0) << ", " << sampler.z().mInv(1) << std::endl;
+  std::string expected_output =
+    "# Adaptation terminated\nStep size = 0.1\n"
+    "# Diagonal elements of inverse mass matrix:\nM_inv = 1,1\n";
+  std::string expected_diagnostic =
+    "# Adaptation terminated\nStep size = 0.1\n"
+    "# Diagonal elements of inverse mass matrix:\nM_inv = 1,1\n";
+  std::string expected_info = "";
   
-  std::string line;
-  std::string expected_line;
+  EXPECT_EQ("", model_output.str());
   
-  // Line 1
-  std::getline(expected_stream, expected_line);
+  EXPECT_EQ(expected_output, output.contents());
+  EXPECT_EQ(expected_diagnostic, diagnostic.contents());
+  EXPECT_EQ(expected_info, info.contents());
   
-  std::getline(sample_stream, line);
-  EXPECT_EQ(expected_line, line);
-  
-  std::getline(diagnostic_stream, line);
-  EXPECT_EQ(expected_line, line);
-  
-  // Line 2
-  std::getline(expected_stream, expected_line);
-  
-  std::getline(sample_stream, line);
-  EXPECT_EQ(expected_line, line);
-  
-  std::getline(diagnostic_stream, line);
-  EXPECT_EQ(expected_line, line);
-  
-  // Line 3
-  std::getline(expected_stream, expected_line);
-  
-  std::getline(sample_stream, line);
-  EXPECT_EQ(expected_line, line);
-  
-  std::getline(diagnostic_stream, line);
-  EXPECT_EQ(expected_line, line);
-  
-  // Line 4
-  std::getline(expected_stream, expected_line);
-  
-  std::getline(sample_stream, line);
-  EXPECT_EQ(expected_line, line);
-  
-  std::getline(diagnostic_stream, line);
-  EXPECT_EQ(expected_line, line);
-  
-  EXPECT_EQ("", message_stream.str());
-  EXPECT_EQ("", output.str());
-}
-
-TEST(StanIoMcmcWriter, write_diagnostic_names) {
-  
-  // Model
-  std::fstream data_stream("", std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
-  
-  std::stringstream output;
-  io_example_model_namespace::io_example_model model(data_var_context, &output);
-  
-  // Sample
-  Eigen::VectorXd real(2);
-  real(0) = 1.43;
-  real(1) = 2.71;
-  
-  double log_prob = 3.14;
-  double accept_stat = 0.84;
-  
-  stan::mcmc::sample sample(real, log_prob, accept_stat);
-  
-  // Sampler
-  typedef boost::ecuyer1988 rng_t;
-  rng_t base_rng(0);
-  
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
-  sampler.seed(real);
-  
-  // Writer
-  std::stringstream sample_stream;
-  std::stringstream diagnostic_stream;
-  std::stringstream message_stream;
-  
-  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
-
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::messages> 
-    writer(sample_recorder, diagnostic_recorder, message_recorder);
-  
-  writer.write_diagnostic_names(sample, &sampler, model);
-  
-  std::string line;
-  std::getline(diagnostic_stream, line);
-  
-  // FIXME: make this work, too
-  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,mu1,mu2,p_mu1,p_mu2,g_mu1,g_mu2", line);
-  
-  EXPECT_EQ("", message_stream.str());
-  EXPECT_EQ("", output.str());
-}
-
-TEST(StanIoMcmcWriter, write_diagnostic_params) {
-  
-  // Model
-  std::fstream data_stream("", std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
-  
-  std::stringstream output;
-  io_example_model_namespace::io_example_model model(data_var_context, &output);
-  
-  // Sample
-  Eigen::VectorXd real(2);
-  real(0) = 1.43;
-  real(1) = 2.71;
-  
-  double log_prob = 3.14;
-  double accept_stat = 0.84;
-  
-  stan::mcmc::sample sample(real, log_prob, accept_stat);
-  
-  // Sampler
-  typedef boost::ecuyer1988 rng_t;
-  rng_t base_rng(0);
-  
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
-  sampler.seed(real);
-  sampler.z().p(0) = 0;
-  sampler.z().p(1) = 0;
-  sampler.z().g(0) = 0;
-  sampler.z().g(1) = 0;
-  
-  // Writer
-  std::stringstream sample_stream;
-  std::stringstream diagnostic_stream;
-  std::stringstream message_stream;
-  
-  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
-
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::messages> 
-    writer(sample_recorder, diagnostic_recorder, message_recorder);
-  
-  writer.write_diagnostic_params(sample, &sampler);
-  
-  std::string line;
-  std::getline(diagnostic_stream, line);
-  
-  std::stringstream expected_stream;
-  expected_stream << log_prob << ",";
-  expected_stream << accept_stat << ",";
-  expected_stream << sampler.get_current_stepsize() << ",";
-  expected_stream << 0 << ",";
-  expected_stream << 0 << ",";
-  expected_stream << 0 << ",";
-  expected_stream << real(0) << ",";
-  expected_stream << real(1) << ",";
-  expected_stream << 0 << ",";
-  expected_stream << 0 << ",";
-  expected_stream << 0 << ",";
-  expected_stream << 0;
-  
-  std::string expected_line;
-  std::getline(expected_stream, expected_line);
-  
-  EXPECT_EQ(expected_line, line);
-  EXPECT_EQ("", output.str()); 
 }
 
 TEST(StanIoMcmcWriter, write_timing) {
@@ -356,8 +188,8 @@ TEST(StanIoMcmcWriter, write_timing) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  std::stringstream output;
-  io_example_model_namespace::io_example_model model(data_var_context, &output);
+  std::stringstream model_output;
+  stan_model model(data_var_context, &model_output);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -370,87 +202,86 @@ TEST(StanIoMcmcWriter, write_timing) {
   stan::mcmc::sample sample(real, log_prob, accept_stat);
   
   // Sampler
-  typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<io_example_model_namespace::io_example_model, rng_t> sampler(model, base_rng, 0);
+  writer_t sampler_writer;
+  stan::mcmc::adapt_diag_e_nuts<stan_model, rng_t, writer_t>
+    sampler(model, base_rng, sampler_writer);
   sampler.seed(real);
   
   // Writer
-  std::stringstream sample_stream;
-  std::stringstream diagnostic_stream;
-  std::stringstream message_stream;
+  writer_t output;
+  writer_t diagnostic;
+  writer_t info;
   
-  stan::interface::recorder::csv sample_recorder(&sample_stream, "# ");
-  stan::interface::recorder::csv diagnostic_recorder(&diagnostic_stream, "# ");
-  stan::interface::recorder::messages message_recorder(&message_stream, "# ");
+  stan::services::sample::mcmc_writer
+    <stan_model, rng_t, writer_t, writer_t, writer_t>
+      writer(model, base_rng, output, diagnostic, info);
+  
+  writer.write_timing(10, 10);
+  
+  std::string expected_output =
+    "\n# Elapsed Time (seconds):\n# Warmup = 10\n# Sampling = 10\n# Total = 20\n\n";
+  std::string expected_diagnostic =
+    "\n# Elapsed Time (seconds):\n# Warmup = 10\n# Sampling = 10\n# Total = 20\n\n";
+  std::string expected_info =
+    "\nElapsed Time (seconds):\nWarmup = 10\nSampling = 10\nTotal = 20\n\n";
+  
+  EXPECT_EQ("", model_output.str());
+  
+  EXPECT_EQ(expected_output, output.contents());
+  EXPECT_EQ(expected_diagnostic, diagnostic.contents());
+  EXPECT_EQ(expected_info, info.contents());
+  
+}
 
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::messages> 
-    writer(sample_recorder, diagnostic_recorder, message_recorder);
+TEST(StanIoMcmcWriter, write_message) {
   
-  double warm = 0.193933;
-  double sampling = 0.483830;
-
-  writer.write_timing(warm, sampling, sample_recorder);
-
-  std::stringstream expected_stream;
-  expected_stream << std::endl;
-  expected_stream << "#  Elapsed Time: " << warm << " seconds (Warm-up)" << std::endl;
-  expected_stream << "#                " << sampling << " seconds (Sampling)" << std::endl;
-  expected_stream << "#                " << warm + sampling << " seconds (Total)" << std::endl;
-  expected_stream << std::endl;
+  // Model
+  std::fstream data_stream("", std::fstream::in);
+  stan::io::dump data_var_context(data_stream);
+  data_stream.close();
   
-  std::string line;
-  std::string expected_line;
-
-  // Line 1
-  std::getline(expected_stream, expected_line);
+  std::stringstream model_output;
+  stan_model model(data_var_context, &model_output);
   
-  std::getline(sample_stream, line);
-  EXPECT_EQ(expected_line, line);
+  // Sample
+  Eigen::VectorXd real(2);
+  real(0) = 1.43;
+  real(1) = 2.71;
   
-  std::getline(diagnostic_stream, line);
-  EXPECT_EQ(expected_line, line);
+  double log_prob = 3.14;
+  double accept_stat = 0.84;
   
-  // Line 2
-  std::getline(expected_stream, expected_line);
+  stan::mcmc::sample sample(real, log_prob, accept_stat);
   
-  std::getline(sample_stream, line);
-  EXPECT_EQ(expected_line, line);
+  // Sampler
+  rng_t base_rng(0);
   
-  std::getline(diagnostic_stream, line);
-  EXPECT_EQ(expected_line, line);
+  writer_t sampler_writer;
+  stan::mcmc::adapt_diag_e_nuts<stan_model, rng_t, writer_t>
+    sampler(model, base_rng, sampler_writer);
+  sampler.seed(real);
   
-  // Line 3
-  std::getline(expected_stream, expected_line);
+  // Writer
+  writer_t output;
+  writer_t diagnostic;
+  writer_t info;
   
-  std::getline(sample_stream, line);
-  EXPECT_EQ(expected_line, line);
+  stan::services::sample::mcmc_writer
+    <stan_model, rng_t, writer_t, writer_t, writer_t>
+      writer(model, base_rng, output, diagnostic, info);
   
-  std::getline(diagnostic_stream, line);
-  EXPECT_EQ(expected_line, line);
+  writer.write_message("Important message");
   
-  // Line 4
-  std::getline(expected_stream, expected_line);
+  std::string expected_output = "";
+  std::string expected_diagnostic = "";
+  std::string expected_info = "Important message\n";
   
-  std::getline(sample_stream, line);
-  EXPECT_EQ(expected_line, line);
+  EXPECT_EQ("", model_output.str());
   
-  std::getline(diagnostic_stream, line);
-  EXPECT_EQ(expected_line, line);
+  EXPECT_EQ(expected_output, output.contents());
+  EXPECT_EQ(expected_diagnostic, diagnostic.contents());
+  EXPECT_EQ(expected_info, info.contents());
   
-  // Line 5
-  std::getline(expected_stream, expected_line);
-  
-  std::getline(sample_stream, line);
-  EXPECT_EQ(expected_line, line);
-  
-  std::getline(diagnostic_stream, line);
-  EXPECT_EQ(expected_line, line);
-  
-  EXPECT_EQ("", message_stream.str());
-  EXPECT_EQ("", output.str());
 }

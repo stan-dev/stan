@@ -12,16 +12,16 @@ namespace stan {
       void write_error_msg(Writer& writer,
                            const std::exception& e) {
         writer();
-        writer(std::string("Informational Message: The current Metropolis ")
-               + std::string("proposal is about to be rejected because of the")
-               + std::string("following issue:"));
+        writer("Informational Message: The current Metropolis "
+               "proposal is about to be rejected because of the "
+               "following issue:");
         writer(e.what());
-        writer(std::string("If this warning occurs sporadically, such as for ")
-               + std::string("highly constrained variable types like covariance ")
-               + std::string("matrices, then the sampler is fine,"));
-        writer(std::string("but if this warning occurs often then your model ")
-               + std::string("may be either severely ill-conditioned or ")
-               + std::string("misspecified."));
+        writer("If this warning occurs sporadically, such as for "
+               "highly constrained variable types like covariance "
+               "matrices, then the sampler is fine,"
+               "but if this warning occurs often then your model "
+               "may be either severely ill-conditioned or "
+               "misspecified.");
       }
     
     }

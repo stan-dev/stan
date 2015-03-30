@@ -1,65 +1,83 @@
-#include <stan/services/mcmc/warmup.hpp>
+#include <stan/mcmc/base_mcmc.hpp>
+#include <stan/mcmc/base_adapter.hpp>
+#include <stan/services/sample/run_adaptive_sampler.hpp>
+#include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
+#include <stan/interface_callbacks/writer/stringstream.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;
+typedef stan::interface_callbacks::writer::stringstream writer_t;
 
-class mock_sampler : public stan::mcmc::base_mcmc {
+class mock_sampler : public stan::mcmc::base_mcmc,
+                     public stan::mcmc::base_adapter {
 public:
-  mock_sampler(std::ostream *output, std::ostream *error)
-    : base_mcmc(output, error), n_transition_called(0) { }
-
+  mock_sampler()
+  : base_mcmc(), n_transition_called_(0) { }
+  
   stan::mcmc::sample transition(stan::mcmc::sample& init_sample) {
-    n_transition_called++;
+    n_transition_called_++;
     return init_sample;
   }
-
-  int n_transition_called;
+       
+  template <class Writer>
+  void write_sampler_state(Writer& writer) {
+   writer("Adaptive parameter", 0.4838);
+  }
+  
+  int n_transition_called() {
+    return n_transition_called_;
+  }
+  
+private:
+  int n_transition_called_;
 };
 
-struct mock_callback {
-  int n;
-  mock_callback() : n(0) { }
+class mock_interrupt: public stan::interface_callbacks::interrupt::base_interrupt {
+public:
+  mock_interrupt(): n_(0) {}
   
   void operator()() {
-    n++;
+    n_++;
   }
+  
+  void clear() {
+    n_ = 0;
+  }
+  
+  int n() {
+    return n_;
+  }
+  
+private:
+  int n_;
 };
 
 class StanServices : public testing::Test {
 public:
   void SetUp() {
-    output.str("");
-    error.str("");
-
+    
     model_output.str("");
-    sample_output.str("");
-    diagnostic_output.str("");
-    message_output.str("");
-    writer_output.str("");
-
-    sampler = new mock_sampler(&output, &error);
-
-    std::fstream empty_data_stream(std::string("").c_str());
+    output.clear();
+    diagnostic.clear();
+    info.clear();
+    
+    base_rng.seed(123456);
+    
+    sampler = new mock_sampler();
+    
+    std::fstream empty_data_stream(std::string("").c_str(), std::fstream::in);
     stan::io::dump empty_data_context(empty_data_stream);
     empty_data_stream.close();
     
     model = new stan_model(empty_data_context, &model_output);
     
-    stan::interface::recorder::csv sample_recorder(&sample_output, "# ");
-    stan::interface::recorder::csv diagnostic_recorder(&diagnostic_output, "# ");
-    stan::interface::recorder::messages message_recorder(&message_output, "# ");
-
-    writer = new stan::io::mcmc_writer<stan_model,
-                                       stan::interface::recorder::csv,
-                                       stan::interface::recorder::csv,
-                                       stan::interface::recorder::messages>
-      (sample_recorder, diagnostic_recorder, message_recorder, &writer_output);
-
-    base_rng.seed(123456);
-
-    q = Eigen::VectorXd(0,1);
+    writer = new stan::services::sample::mcmc_writer
+      <stan_model, rng_t, writer_t, writer_t, writer_t>
+      (*model, base_rng, output, diagnostic, info);
+    
+    q = Eigen::VectorXd::Zero(4);
     log_prob = 0;
     stat = 0;
   }
@@ -69,60 +87,56 @@ public:
     delete writer;
   }
   
+  std::stringstream model_output;
+  
+  writer_t output;
+  writer_t diagnostic;
+  writer_t info;
+  
+  rng_t base_rng;
+  
   mock_sampler* sampler;
   stan_model* model;
-  stan::io::mcmc_writer<stan_model,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::messages>* writer;
-  rng_t base_rng;
-
+  stan::services::sample::mcmc_writer
+    <stan_model, rng_t, writer_t, writer_t, writer_t>* writer;
+  
   Eigen::VectorXd q;
   double log_prob;
   double stat;
-
-  std::stringstream output, error;
-
-  std::stringstream model_output,
-    sample_output, diagnostic_output, message_output,
-    writer_output;
+  
 };
 
-
-TEST_F(StanServices, warmup) {
-  std::string expected_warmup_output =  "Iteration:  1 / 80 [  1%]  (Warmup)\nIteration:  4 / 80 [  5%]  (Warmup)\nIteration:  8 / 80 [ 10%]  (Warmup)\nIteration: 12 / 80 [ 15%]  (Warmup)\nIteration: 16 / 80 [ 20%]  (Warmup)\nIteration: 20 / 80 [ 25%]  (Warmup)\nIteration: 24 / 80 [ 30%]  (Warmup)\nIteration: 28 / 80 [ 35%]  (Warmup)\n";
+TEST_F(StanServices, sample) {
+  
+  std::string expected_output = "lp__,accept_stat__,y.1,y.2,z.1,z.2,xgq\n# Adaptation terminated\nAdaptive parameter = 0.4838\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n\n# ";
+  std::string expected_diagnostic = "lp__,accept_stat__\n# Adaptation terminated\nAdaptive parameter = 0.4838\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n\n# ";
+  std::string expected_info = "Iteration:  1 / 30 [  3%]  (Warmup)\nIteration:  4 / 30 [ 13%]  (Warmup)\nIteration:  8 / 30 [ 26%]  (Warmup)\nIteration: 12 / 30 [ 40%]  (Warmup)\nIteration: 16 / 30 [ 53%]  (Warmup)\nIteration: 20 / 30 [ 66%]  (Warmup)\nIteration: 24 / 30 [ 80%]  (Warmup)\nIteration: 28 / 30 [ 93%]  (Warmup)\nIteration: 30 / 30 [100%]  (Warmup)\nIteration: 31 / 80 [ 38%]  (Sampling)\nIteration: 34 / 80 [ 42%]  (Sampling)\nIteration: 38 / 80 [ 47%]  (Sampling)\nIteration: 42 / 80 [ 52%]  (Sampling)\nIteration: 46 / 80 [ 57%]  (Sampling)\nIteration: 50 / 80 [ 62%]  (Sampling)\nIteration: 54 / 80 [ 67%]  (Sampling)\nIteration: 58 / 80 [ 72%]  (Sampling)\nIteration: 62 / 80 [ 77%]  (Sampling)\nIteration: 66 / 80 [ 82%]  (Sampling)\nIteration: 70 / 80 [ 87%]  (Sampling)\nIteration: 74 / 80 [ 92%]  (Sampling)\nIteration: 78 / 80 [ 97%]  (Sampling)\nIteration: 80 / 80 [100%]  (Sampling)\n\n";
   
   int num_warmup = 30;
   int num_samples = 50;
   int num_thin = 2;
   int refresh = 4;
-  bool save = false;
+  bool save_warmup = false;
   stan::mcmc::sample s(q, log_prob, stat);
-  std::string prefix = "";
-  std::string suffix = "\n";
-  std::stringstream ss;
-  mock_callback callback;
-
-  stan::services::mcmc::warmup(sampler,
-                               num_warmup, num_samples,
-                               num_thin, refresh, save,
-                               *writer, s, *model, base_rng,
-                               prefix, suffix, ss,
-                               callback);
   
-  EXPECT_EQ(num_warmup, sampler->n_transition_called);
-  EXPECT_EQ(num_warmup, callback.n);
-
-  EXPECT_EQ(expected_warmup_output, ss.str());
-
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error.str());
-
+  mock_interrupt interrupt;
+  
+  stan::services::sample::run_adaptive_sampler(*sampler, s,
+                                               num_warmup, num_samples,
+                                               num_thin, refresh, save_warmup,
+                                               *writer, interrupt);
+  
+  EXPECT_EQ(num_warmup + num_samples, sampler->n_transition_called());
+  EXPECT_EQ(num_warmup + num_samples, interrupt.n());
+  
+  // Strip away elapsed time which is too variable
+  EXPECT_EQ(expected_info,
+            info.contents().substr(0, info.contents().find("Elapsed")));
+  
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", sample_output.str());
-  EXPECT_EQ("", diagnostic_output.str());
-  EXPECT_EQ("", message_output.str());
-  EXPECT_EQ("", writer_output.str());
+  EXPECT_EQ(expected_output,
+            output.contents().substr(0, output.contents().find("Elapsed")));
+  EXPECT_EQ(expected_diagnostic,
+            diagnostic.contents().substr(0, diagnostic.contents().find("Elapsed")));
 }
-
 

@@ -5,6 +5,7 @@
 #include <stan/model/prob_grad.hpp>
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace stan {
   namespace services {
@@ -105,7 +106,7 @@ namespace stan {
           write_timing_(warm_delta_t, sample_delta_t, info_writer_, "");
         }
         
-        void write_message(std::string& message) {
+        void write_message(const std::string& message) {
           info_writer_(message);
         }
         

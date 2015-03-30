@@ -1,65 +1,76 @@
+#include <stan/mcmc/base_mcmc.hpp>
+#include <stan/services/sample/generate_transitions.hpp>
+#include <stan/interface_callbacks/interrupt/base_interrupt.hpp>
+#include <stan/interface_callbacks/writer/stringstream.hpp>
 #include <gtest/gtest.h>
-#include <stan/services/mcmc/run_markov_chain.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <sstream>
 
 typedef boost::ecuyer1988 rng_t;
+typedef stan::interface_callbacks::writer::stringstream writer_t;
 
 class mock_sampler : public stan::mcmc::base_mcmc {
 public:
-  mock_sampler(std::ostream *output, std::ostream *error)
-    : base_mcmc(output, error), n_transition_called(0) { }
-
+  mock_sampler()
+  : base_mcmc(), n_transition_called_(0) { }
+  
   stan::mcmc::sample transition(stan::mcmc::sample& init_sample) {
-    n_transition_called++;
+    n_transition_called_++;
     return init_sample;
   }
-
-  int n_transition_called;
+  
+  int n_transition_called() {
+    return n_transition_called_;
+  }
+  
+private:
+  int n_transition_called_;
 };
 
-struct mock_callback {
-  int n;
-  mock_callback() : n(0) { }
+class mock_interrupt: public stan::interface_callbacks::interrupt::base_interrupt {
+public:
+  mock_interrupt(): n_(0) {}
   
   void operator()() {
-    n++;
+    n_++;
   }
+  
+  void clear() {
+    n_ = 0;
+  }
+  
+  int n() {
+    return n_;
+  }
+  
+private:
+  int n_;
 };
 
 class StanServices : public testing::Test {
 public:
   void SetUp() {
-    output.str("");
-    error.str("");
-
+    
     model_output.str("");
-    sample_output.str("");
-    diagnostic_output.str("");
-    message_output.str("");
-    writer_output.str("");
-
-    sampler = new mock_sampler(&output, &error);
-
-    std::fstream empty_data_stream(std::string("").c_str());
+    output.clear();
+    diagnostic.clear();
+    info.clear();
+    
+    base_rng.seed(123456);
+    
+    sampler = new mock_sampler();
+    
+    std::fstream empty_data_stream(std::string("").c_str(), std::fstream::in);
     stan::io::dump empty_data_context(empty_data_stream);
     empty_data_stream.close();
     
     model = new stan_model(empty_data_context, &model_output);
     
-    stan::interface::recorder::csv sample_recorder(&sample_output, "# ");
-    stan::interface::recorder::csv diagnostic_recorder(&diagnostic_output, "# ");
-    stan::interface::recorder::messages message_recorder(&message_output, "# ");
-
-    writer = new stan::io::mcmc_writer<stan_model,
-                                       stan::interface::recorder::csv,
-                                       stan::interface::recorder::csv,
-                                       stan::interface::recorder::messages>
-      (sample_recorder, diagnostic_recorder, message_recorder, &writer_output);
-
-    base_rng.seed(123456);
-
-    q = Eigen::VectorXd(0,1);
+    writer = new stan::services::sample::mcmc_writer
+      <stan_model, rng_t, writer_t, writer_t, writer_t>
+        (*model, base_rng, output, diagnostic, info);
+    
+    q = Eigen::VectorXd::Zero(4);
     log_prob = 0;
     stat = 0;
   }
@@ -69,61 +80,82 @@ public:
     delete writer;
   }
   
+  std::stringstream model_output;
+  
+  writer_t output;
+  writer_t diagnostic;
+  writer_t info;
+  
+  rng_t base_rng;
+  
   mock_sampler* sampler;
   stan_model* model;
-  stan::io::mcmc_writer<stan_model,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::csv,
-                        stan::interface::recorder::messages>* writer;
-  rng_t base_rng;
-
+  stan::services::sample::mcmc_writer
+    <stan_model, rng_t, writer_t, writer_t, writer_t>* writer;
+  
   Eigen::VectorXd q;
   double log_prob;
   double stat;
-
-  std::stringstream output, error;
-
-  std::stringstream model_output,
-    sample_output, diagnostic_output, message_output,
-    writer_output;
+  
 };
 
-
-TEST_F(StanServices, run_markov_chain) {
-  std::string expected_run_markov_chain_output = "Iteration: 50 / 100 [ 50%]  (Sampling)\nIteration: 53 / 100 [ 53%]  (Sampling)\nIteration: 57 / 100 [ 57%]  (Sampling)\nIteration: 61 / 100 [ 61%]  (Sampling)\nIteration: 65 / 100 [ 65%]  (Sampling)\nIteration: 69 / 100 [ 69%]  (Sampling)\nIteration: 73 / 100 [ 73%]  (Sampling)\nIteration: 77 / 100 [ 77%]  (Sampling)\nIteration: 81 / 100 [ 81%]  (Sampling)\nIteration: 85 / 100 [ 85%]  (Sampling)\nIteration: 89 / 100 [ 89%]  (Sampling)\nIteration: 93 / 100 [ 93%]  (Sampling)\nIteration: 97 / 100 [ 97%]  (Sampling)\nIteration: 100 / 100 [100%]  (Sampling)\n";
-
-  int num_iterations = 51;
-  int start = 49;
-  int finish = 100;
+TEST_F(StanServices, Warmup) {
+  
+  std::string expected_output = "";
+  std::string expected_diagnostic = "";
+  std::string expected_info = "Iteration:  1 / 60 [  1%]  (Warmup)\nIteration:  4 / 60 [  6%]  (Warmup)\nIteration:  8 / 60 [ 13%]  (Warmup)\nIteration: 12 / 60 [ 20%]  (Warmup)\nIteration: 16 / 60 [ 26%]  (Warmup)\nIteration: 20 / 60 [ 33%]  (Warmup)\nIteration: 24 / 60 [ 40%]  (Warmup)\nIteration: 28 / 60 [ 46%]  (Warmup)\n";
+  
+  int num_warmup = 30;
+  int num_samples = 60;
   int num_thin = 2;
   int refresh = 4;
-  bool save = false;
-  bool warmup = false;
-  stan::mcmc::sample s(q, log_prob, stat);
-  std::string prefix = "";
-  std::string suffix = "\n";
-  std::stringstream ss;
-  mock_callback callback;
-
-  stan::services::mcmc::run_markov_chain(sampler,
-                                         num_iterations, start, finish,
-                                         num_thin, refresh, save, warmup,
-                                         *writer, s, *model, base_rng,
-                                         prefix, suffix, ss,
-                                         callback);
   
-  EXPECT_EQ(num_iterations, sampler->n_transition_called);
-  EXPECT_EQ(num_iterations, callback.n);
-
-  EXPECT_EQ(expected_run_markov_chain_output, ss.str());
-
-  EXPECT_EQ("", output.str());
-  EXPECT_EQ("", error.str());
-
+  stan::mcmc::sample s(q, log_prob, stat);
+  
+  mock_interrupt interrupt;
+  
+  stan::services::sample::generate_transitions(*sampler, s,
+                                               num_warmup, 0, num_samples,
+                                               num_thin, refresh, false,
+                                               true, *writer, interrupt);
+  
+  EXPECT_EQ(num_warmup, sampler->n_transition_called());
+  EXPECT_EQ(num_warmup, interrupt.n());
+  
+  EXPECT_EQ(expected_info, info.contents());
+  
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", sample_output.str());
-  EXPECT_EQ("", diagnostic_output.str());
-  EXPECT_EQ("", message_output.str());
-  EXPECT_EQ("", writer_output.str());
+  EXPECT_EQ(expected_output, output.contents());
+  EXPECT_EQ(expected_diagnostic, diagnostic.contents());
+}
+
+TEST_F(StanServices, Sample) {
+  
+  std::string expected_output = "0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n";
+  std::string expected_diagnostic = "0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n";
+  std::string expected_info = "Iteration: 31 / 90 [ 34%]  (Sampling)\nIteration: 34 / 90 [ 37%]  (Sampling)\nIteration: 38 / 90 [ 42%]  (Sampling)\nIteration: 42 / 90 [ 46%]  (Sampling)\nIteration: 46 / 90 [ 51%]  (Sampling)\nIteration: 50 / 90 [ 55%]  (Sampling)\nIteration: 54 / 90 [ 60%]  (Sampling)\nIteration: 58 / 90 [ 64%]  (Sampling)\nIteration: 62 / 90 [ 68%]  (Sampling)\nIteration: 66 / 90 [ 73%]  (Sampling)\nIteration: 70 / 90 [ 77%]  (Sampling)\nIteration: 74 / 90 [ 82%]  (Sampling)\nIteration: 78 / 90 [ 86%]  (Sampling)\nIteration: 82 / 90 [ 91%]  (Sampling)\nIteration: 86 / 90 [ 95%]  (Sampling)\nIteration: 90 / 90 [100%]  (Sampling)\n";
+  
+  int num_warmup = 30;
+  int num_samples = 60;
+  int num_thin = 2;
+  int refresh = 4;
+  
+  stan::mcmc::sample s(q, log_prob, stat);
+  
+  mock_interrupt interrupt;
+  
+  stan::services::sample::generate_transitions(*sampler, s,
+                                               num_samples, num_warmup, num_warmup + num_samples,
+                                               num_thin, refresh, true,
+                                               false, *writer, interrupt);
+  
+  EXPECT_EQ(num_samples, sampler->n_transition_called());
+  EXPECT_EQ(num_samples, interrupt.n());
+  
+  EXPECT_EQ(expected_info, info.contents());
+  
+  EXPECT_EQ("", model_output.str());
+  EXPECT_EQ(expected_output, output.contents());
+  EXPECT_EQ(expected_diagnostic, diagnostic.contents());
 }
 

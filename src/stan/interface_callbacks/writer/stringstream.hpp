@@ -14,11 +14,9 @@ namespace stan {
       class stringstream: public base_writer {
       public:
         void operator()(const std::string& key, double value) {
-          clear();
           stream_ << key << " = " << value << std::endl;
         }
         void operator()(const std::string& key, const std::string& value) {
-          clear();
           stream_ << key << " = " << value << std::endl;
         }
         
@@ -26,7 +24,6 @@ namespace stan {
                         const double* values,
                         int n_values) {
           if (n_values == 0) return;
-          clear();
           
           stream_ << key << " = ";
           
@@ -40,7 +37,6 @@ namespace stan {
                         const double* values,
                         int n_rows, int n_cols) {
           if (n_rows == 0 || n_cols == 0) return;
-          clear();
           
           stream_ << key << ":" << std::endl;
           
@@ -54,7 +50,6 @@ namespace stan {
         
         void operator()(const std::vector<std::string>& names) {
           if (names.empty()) return;
-          clear();
           
           std::vector<std::string>::const_iterator last = names.end();
           --last;
@@ -66,7 +61,6 @@ namespace stan {
         
         void operator()(const std::vector<double>& state) {
           if (state.empty()) return;
-          clear();
           
           std::vector<double>::const_iterator last = state.end();
           --last;
@@ -77,11 +71,9 @@ namespace stan {
         }
         
         void operator()() {
-          clear();
           stream_ << std::endl;
         }
         void operator()(const std::string& message) {
-          clear();
           stream_ << message << std::endl;
         }
         
