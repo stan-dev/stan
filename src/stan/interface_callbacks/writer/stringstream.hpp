@@ -84,19 +84,19 @@ namespace stan {
           clear();
           stream_ << message << std::endl;
         }
+        
+        void clear() {
+          stream_.str(std::string());
+          stream_.clear();
+        }
+        
+        std::string contents() {
+          return stream_.str();
+        }
+        
+      private:
+        std::stringstream stream_;
       };
-      
-      void clear() {
-        stream_.str(std::string());
-        stream_.clear();
-      }
-      
-      std::string content() {
-        return stream_.str();
-      }
-      
-    private:
-      std::stringstream stream_;
 
     }
   }

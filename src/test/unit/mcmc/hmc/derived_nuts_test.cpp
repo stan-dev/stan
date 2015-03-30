@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <boost/random/additive_combine.hpp>
+#include <stan/interface_callbacks/writer/noop.hpp>
 
 #include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
@@ -13,6 +14,7 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 
 typedef boost::ecuyer1988 rng_t;
+typedef stan::interface_callbacks::writer::noop writer_t;
 
 TEST(McmcDerivedNuts, compute_criterion_unit_e) {
   
@@ -25,7 +27,10 @@ TEST(McmcDerivedNuts, compute_criterion_unit_e) {
   Eigen::VectorXd rho(model_size);
   
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::unit_e_nuts<stan::mcmc::mock_model, rng_t> sampler(model, base_rng, 0, 0);
+  
+  writer_t writer;
+  stan::mcmc::unit_e_nuts<stan::mcmc::mock_model, rng_t, writer_t>
+    sampler(model, base_rng, writer);
   
   start.q(0) = 1;
   start.p(0) = 1;
@@ -60,7 +65,10 @@ TEST(McmcDerivedNuts, compute_criterion_diag_e) {
   Eigen::VectorXd rho(model_size);
   
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::diag_e_nuts<stan::mcmc::mock_model, rng_t> sampler(model, base_rng, 0, 0);
+  
+  writer_t writer;
+  stan::mcmc::diag_e_nuts<stan::mcmc::mock_model, rng_t, writer_t>
+      sampler(model, base_rng, writer);
   
   start.q(0) = 1;
   start.p(0) = 1;
@@ -94,7 +102,10 @@ TEST(McmcDerivedNuts, compute_criterion_dense_e) {
   Eigen::VectorXd rho(model_size);
   
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::dense_e_nuts<stan::mcmc::mock_model, rng_t> sampler(model, base_rng, 0, 0);
+  
+  writer_t writer;
+  stan::mcmc::dense_e_nuts<stan::mcmc::mock_model, rng_t, writer_t>
+    sampler(model, base_rng, writer);
   
   start.q(0) = 1;
   start.p(0) = 1;

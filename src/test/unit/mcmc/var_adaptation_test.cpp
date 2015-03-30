@@ -1,5 +1,8 @@
+#include <stan/interface_callbacks/writer/noop.hpp>
 #include <stan/mcmc/var_adaptation.hpp>
 #include <gtest/gtest.h>
+
+typedef stan::interface_callbacks::writer::noop writer_t;
 
 TEST(McmcVarAdaptation, learn_variance) {
   
@@ -13,7 +16,9 @@ TEST(McmcVarAdaptation, learn_variance) {
   target_var *= 1e-3 * 5.0 / (n_learn + 5.0);
   
   stan::mcmc::var_adaptation adapter(n);
-  adapter.set_window_params(50, 0, 0, n_learn);
+  
+  writer_t writer;
+  adapter.set_window_params(50, 0, 0, n_learn, writer);
   
   for (int i = 0; i < n_learn; ++i)
     adapter.learn_variance(var, q);

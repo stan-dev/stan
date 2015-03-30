@@ -8,12 +8,11 @@
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/integrators/base_integrator.hpp>
+#include <stan/interface_callbacks/writer/stringstream.hpp>
 
 namespace stan {
-  
   namespace mcmc {
     
-
     // Mock Model
     class mock_model: public model::prob_grad {
     public:
@@ -43,16 +42,14 @@ namespace stan {
     };
 
     // Mock Hamiltonian
-    template <typename M, typename BaseRNG>
-    class mock_hamiltonian: public base_hamiltonian<M,
-                                                    ps_point,
-                                                    BaseRNG> {
+    template <typename M, typename BaseRNG, typename Writer>
+    class mock_hamiltonian: public base_hamiltonian
+                                     <M, ps_point, BaseRNG, Writer> {
       
     public:
       
-      mock_hamiltonian(M& m, std::ostream *e): base_hamiltonian<M,
-                                               ps_point,
-                                               BaseRNG> (m,e) {};
+      mock_hamiltonian(M& m, Writer& w): base_hamiltonian
+                                           <M, ps_point, BaseRNG, Writer> (m, w) {};
       
       double T(ps_point& z) { return 0; }
       
@@ -76,15 +73,13 @@ namespace stan {
     };
     
     // Mock Integrator
-    template <typename H, typename P>
-    class mock_integrator: public base_integrator<H, P> {
+    template <typename H>
+    class mock_integrator: public base_integrator<H> {
     
     public:
-      mock_integrator(std::ostream* o) 
-      : base_integrator<H,P>(o)
-      { }
+      mock_integrator(): base_integrator<H>() {}
       
-      void evolve(P& z, H& hamiltonian, const double epsilon) {
+      void evolve(typename H::PointType& z, H& hamiltonian, const double epsilon) {
         z.q += epsilon * z.p;
       };
       

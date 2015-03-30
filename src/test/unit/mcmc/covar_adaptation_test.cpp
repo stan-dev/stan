@@ -1,5 +1,8 @@
+#include <stan/interface_callbacks/writer/noop.hpp>
 #include <stan/mcmc/covar_adaptation.hpp>
 #include <gtest/gtest.h>
+
+typedef stan::interface_callbacks::writer::noop writer_t;
 
 TEST(McmcCovarAdaptation, learn_covariance) {
 
@@ -13,7 +16,9 @@ TEST(McmcCovarAdaptation, learn_covariance) {
   target_covar *= 1e-3 * 5.0 / (n_learn + 5.0);
   
   stan::mcmc::covar_adaptation adapter(n);
-  adapter.set_window_params(50, 0, 0, n_learn);
+  
+  writer_t writer;
+  adapter.set_window_params(50, 0, 0, n_learn, writer);
   
   for (int i = 0; i < n_learn; ++i)
     adapter.learn_covariance(covar, q);
