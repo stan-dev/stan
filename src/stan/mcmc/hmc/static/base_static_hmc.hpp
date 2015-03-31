@@ -15,12 +15,12 @@ namespace stan {
 
     // Hamiltonian Monte Carlo
     // with static integration time
-    template <class M, template<class, class, class> class H,
-              template<class> class I, class BaseRNG, class Writer>
-    class base_static_hmc : public base_hmc<M, H, I, BaseRNG, Writer> {
+    template <class M, template<class, class> class H,
+              template<class> class I, class BaseRNG>
+    class base_static_hmc : public base_hmc<M, H, I, BaseRNG> {
     public:
-      base_static_hmc(M &m, BaseRNG& rng, Writer& writer)
-        : base_hmc<M, H, I, BaseRNG, Writer>(m, rng, writer), T_(1) {
+      base_static_hmc(M &m, BaseRNG& rng)
+        : base_hmc<M, H, I, BaseRNG>(m, rng), T_(1) {
         update_L_();
       }
 

@@ -12,18 +12,18 @@ namespace stan {
     // Euclidean manifold with diagonal metric,
     // static integration time,
     // and adaptive stepsize
-    template <class M, class BaseRNG, class Writer>
-    class adapt_diag_e_static_hmc : public diag_e_static_hmc<M, BaseRNG, Writer>,
+    template <class M, class BaseRNG>
+    class adapt_diag_e_static_hmc : public diag_e_static_hmc<M, BaseRNG>,
                                     public stepsize_var_adapter {
     public:
-        adapt_diag_e_static_hmc(M &m, BaseRNG& rng, Writer& writer)
-          : diag_e_static_hmc<M, BaseRNG, Writer>(m, rng, writer),
-          stepsize_var_adapter(m.num_params_r()) {}
+        adapt_diag_e_static_hmc(M &m, BaseRNG& rng)
+          : diag_e_static_hmc<M, BaseRNG>(m, rng),
+            stepsize_var_adapter(m.num_params_r()) {}
 
       ~adapt_diag_e_static_hmc() {}
 
       sample transition(sample& init_sample) {
-        sample s = diag_e_static_hmc<M, BaseRNG, Writer>::transition(init_sample);
+        sample s = diag_e_static_hmc<M, BaseRNG>::transition(init_sample);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

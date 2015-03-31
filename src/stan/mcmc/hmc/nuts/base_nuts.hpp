@@ -29,12 +29,12 @@ namespace stan {
 
     // The No-U-Turn Sampler (NUTS).
 
-    template <class M, template<class, class, class> class H,
-              template<class> class I, class BaseRNG, class Writer>
-    class base_nuts: public base_hmc<M, H, I, BaseRNG, Writer> {
+    template <class M, template<class, class> class H,
+              template<class> class I, class BaseRNG>
+    class base_nuts: public base_hmc<M, H, I, BaseRNG> {
     public:
-      base_nuts(M &m, BaseRNG& rng, Writer& writer)
-        : base_hmc<M, H, I, BaseRNG, Writer>(m, rng, writer),
+      base_nuts(M &m, BaseRNG& rng)
+        : base_hmc<M, H, I, BaseRNG>(m, rng),
         depth_(0), max_depth_(5), max_delta_(1000),
         n_leapfrog_(0), n_divergent_(0) {
       }
@@ -162,7 +162,7 @@ namespace stan {
       }
 
       virtual bool compute_criterion(ps_point& start,
-                                     typename H<M, BaseRNG, Writer>::PointType& finish,
+                                     typename H<M, BaseRNG>::PointType& finish,
                                      Eigen::VectorXd& rho) = 0;
 
       // Returns number of valid points in the completed subtree

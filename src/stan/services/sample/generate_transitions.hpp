@@ -26,10 +26,13 @@ namespace stan {
           
           if (io::do_print(n, (start + n + 1 == finish), refresh)) {
             std::string msg = progress(n, start, finish, refresh, warmup);
-            mcmc_writer.write_message(msg);
+            mcmc_writer.write_info_message(msg);
           }
           
           sample = sampler.transition(sample);
+          mcmc_writer.write_info_message(sampler.flush_info_buffer());
+          mcmc_writer.write_err_message(sampler.flush_err_buffer());
+          sampler.clear_buffers();
             
           if ( save && ( (n % num_thin) == 0) )
             mcmc_writer.write_state(sample, sampler);

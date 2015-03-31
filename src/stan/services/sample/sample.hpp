@@ -84,8 +84,9 @@ namespace stan {
             (adapt->arg("engaged"))->value();
         
         mcmc_writer<Model, RNG,
-                    OutputWriter, DiagnosticWriter, InfoWriter>
-          writer(model, base_rng, output, diagnostic, info);
+                    OutputWriter, DiagnosticWriter,
+                    InfoWriter, ErrWriter>
+          writer(model, base_rng, output, diagnostic, info, err);
         
         stan::mcmc::sample s(cont_params, 0, 0);
         
@@ -127,8 +128,8 @@ namespace stan {
           if (   engine->value() == "static"
               && metric->value() == "unit_e"
               && adapt_engaged == false) {
-            stan::mcmc::unit_e_static_hmc<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::unit_e_static_hmc<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
@@ -143,8 +144,8 @@ namespace stan {
           if (   engine->value() == "nuts"
               && metric->value() == "unit_e"
               && adapt_engaged == false) {
-            stan::mcmc::unit_e_nuts<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::unit_e_nuts<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
@@ -159,8 +160,8 @@ namespace stan {
           if (   engine->value() == "static"
               && metric->value() == "diag_e"
               && adapt_engaged == false) {
-            stan::mcmc::diag_e_static_hmc<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::diag_e_static_hmc<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
@@ -175,8 +176,8 @@ namespace stan {
           if (   engine->value() == "nuts"
               && metric->value() == "diag_e"
               && adapt_engaged == false) {
-            stan::mcmc::diag_e_nuts<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::diag_e_nuts<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
@@ -191,8 +192,8 @@ namespace stan {
           if (   engine->value() == "static"
               && metric->value() == "dense_e"
               && adapt_engaged == false) {
-            stan::mcmc::dense_e_static_hmc<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::dense_e_static_hmc<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
@@ -207,8 +208,8 @@ namespace stan {
           if (   engine->value() == "nuts"
               && metric->value() == "dense_e"
               && adapt_engaged == false) {
-            stan::mcmc::dense_e_nuts<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::dense_e_nuts<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
@@ -223,8 +224,8 @@ namespace stan {
           if (   engine->value() == "static"
               && metric->value() == "unit_e"
               && adapt_engaged == true) {
-            stan::mcmc::adapt_unit_e_static_hmc<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::adapt_unit_e_static_hmc<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
@@ -241,8 +242,8 @@ namespace stan {
           if (   engine->value() == "nuts"
               && metric->value() == "unit_e"
               && adapt_engaged == true) {
-            stan::mcmc::adapt_unit_e_nuts<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::adapt_unit_e_nuts<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
@@ -259,8 +260,8 @@ namespace stan {
           if (   engine->value() == "static"
               && metric->value() == "diag_e"
               && adapt_engaged == true) {
-            stan::mcmc::adapt_diag_e_static_hmc<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::adapt_diag_e_static_hmc<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
@@ -277,8 +278,8 @@ namespace stan {
           if (   engine->value() == "nuts"
               && metric->value() == "diag_e"
               && adapt_engaged == true) {
-            stan::mcmc::adapt_diag_e_nuts<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::adapt_diag_e_nuts<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
@@ -295,8 +296,8 @@ namespace stan {
           if (   engine->value() == "static"
               && metric->value() == "dense_e"
               && adapt_engaged == true) {
-            stan::mcmc::adapt_dense_e_static_hmc<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::adapt_dense_e_static_hmc<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
@@ -313,8 +314,8 @@ namespace stan {
           if (   engine->value() == "nuts"
               && metric->value() == "dense_e"
               && adapt_engaged == true) {
-            stan::mcmc::adapt_dense_e_nuts<Model, RNG, ErrWriter>
-            sampler(model, base_rng, err);
+            stan::mcmc::adapt_dense_e_nuts<Model, RNG>
+            sampler(model, base_rng);
             
             if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;

@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;
-typedef stan::interface_callbacks::writer::stringstream writer_t;
 
 TEST(BaseHamiltonian, update) {
 
@@ -16,11 +15,8 @@ TEST(BaseHamiltonian, update) {
 
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
   
-  writer_t metric_output;
-  
-  stan::mcmc::mock_hamiltonian
-    <funnel_model_namespace::funnel_model, rng_t, writer_t>
-      metric(model, metric_output);
+  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t>
+      metric(model);
   
   stan::mcmc::ps_point z(11);
   z.q.setOnes();
@@ -32,8 +28,8 @@ TEST(BaseHamiltonian, update) {
   EXPECT_FLOAT_EQ(8.757758279, z.g(0));
   for (int i = 1; i < z.q.size(); ++i)
     EXPECT_FLOAT_EQ(0.1353352832, z.g(i));
-  
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.contents());
+  EXPECT_EQ("", metric.info().str());
+  EXPECT_EQ("", metric.err().str());
 }

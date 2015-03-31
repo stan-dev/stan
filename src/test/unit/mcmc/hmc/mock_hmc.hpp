@@ -8,7 +8,6 @@
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/integrators/base_integrator.hpp>
-#include <stan/interface_callbacks/writer/stringstream.hpp>
 
 namespace stan {
   namespace mcmc {
@@ -42,14 +41,12 @@ namespace stan {
     };
 
     // Mock Hamiltonian
-    template <typename M, typename BaseRNG, typename Writer>
-    class mock_hamiltonian: public base_hamiltonian
-                                     <M, ps_point, BaseRNG, Writer> {
+    template <typename M, typename BaseRNG>
+    class mock_hamiltonian: public base_hamiltonian<M, ps_point, BaseRNG> {
       
     public:
       
-      mock_hamiltonian(M& m, Writer& w): base_hamiltonian
-                                           <M, ps_point, BaseRNG, Writer> (m, w) {};
+      mock_hamiltonian(M& m): base_hamiltonian<M, ps_point, BaseRNG> (m) {};
       
       double T(ps_point& z) { return 0; }
       

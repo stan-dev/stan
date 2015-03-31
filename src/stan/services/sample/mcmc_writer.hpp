@@ -13,7 +13,7 @@ namespace stan {
 
       template <class Model, class RNG,
                 class SampleWriter, class DiagnosticWriter,
-                class InfoWriter>
+                class InfoWriter, class ErrWriter>
       class mcmc_writer {
       private:
         Model& model_;
@@ -21,6 +21,7 @@ namespace stan {
         SampleWriter& sample_writer_;
         DiagnosticWriter& diagnostic_writer_;
         InfoWriter& info_writer_;
+        ErrWriter& err_writer_;
 
       public:
 
@@ -28,12 +29,14 @@ namespace stan {
                     RNG& rng,
                     SampleWriter& sample_writer,
                     DiagnosticWriter& diagnostic_writer,
-                    InfoWriter& info_writer)
+                    InfoWriter& info_writer,
+                    ErrWriter& err_writer)
           : model_(model),
             rng_(rng),
             sample_writer_(sample_writer),
             diagnostic_writer_(diagnostic_writer),
-            info_writer_(info_writer) {
+            info_writer_(info_writer),
+            err_writer_(err_writer) {
         }
 
         template <class Sampler>
@@ -76,7 +79,7 @@ namespace stan {
 
           model_.write_array(rng_,
                             const_cast<Eigen::VectorXd&>(sample.cont_params()),
-                            model_values, true, true, &std::cout); // FIXME: remove cout in the future
+                            model_values, true, true, 0);
 
           for (int i = 0; i < model_values.size(); ++i)
             values.push_back(model_values(i));
@@ -106,8 +109,12 @@ namespace stan {
           write_timing_(warm_delta_t, sample_delta_t, info_writer_, "");
         }
         
-        void write_message(const std::string& message) {
-          info_writer_(message);
+        void write_info_message(const std::string& message) {
+          if (message.size()) info_writer_(message);
+        }
+        
+        void write_err_message(const std::string& message) {
+          if (message.size()) err_writer_(message);
         }
         
       private:

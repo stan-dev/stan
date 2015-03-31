@@ -12,18 +12,18 @@ namespace stan {
     // Euclidean manifold with diagonal metric
     // and adaptive stepsize
 
-    template <class M, class BaseRNG, class Writer>
-    class adapt_diag_e_nuts: public diag_e_nuts<M, BaseRNG, Writer>,
+    template <class M, class BaseRNG>
+    class adapt_diag_e_nuts: public diag_e_nuts<M, BaseRNG>,
                              public stepsize_var_adapter {
     public:
-        adapt_diag_e_nuts(M &m, BaseRNG& rng, Writer& writer)
-          : diag_e_nuts<M, BaseRNG, Writer>(m, rng, writer),
+        adapt_diag_e_nuts(M &m, BaseRNG& rng)
+          : diag_e_nuts<M, BaseRNG>(m, rng),
           stepsize_var_adapter(m.num_params_r()) {}
 
       ~adapt_diag_e_nuts() {}
 
       sample transition(sample& init_sample) {
-        sample s = diag_e_nuts<M, BaseRNG, Writer>::transition(init_sample);
+        sample s = diag_e_nuts<M, BaseRNG>::transition(init_sample);
 
         if (this->adapt_flag_) {
           this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

@@ -11,7 +11,6 @@
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;
-typedef stan::interface_callbacks::writer::stringstream writer_t;
 
 TEST(McmcDiagEMetric, sample_p) {
   
@@ -21,12 +20,10 @@ TEST(McmcDiagEMetric, sample_p) {
   q(0) = 5;
   q(1) = 1;
   
-  writer_t metric_output;
-
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::diag_e_metric<stan::mcmc::mock_model, rng_t, writer_t>
-    metric(model, metric_output);
+  stan::mcmc::diag_e_metric<stan::mcmc::mock_model, rng_t>
+    metric(model);
   stan::mcmc::diag_e_point z(q.size());
   
   int n_samples = 1000;
@@ -50,7 +47,8 @@ TEST(McmcDiagEMetric, sample_p) {
   // Variance within 10% of expected value (d / 2)
   EXPECT_EQ(true, fabs(var - 0.5 * q.size()) < 0.1 * q.size());
   
-  EXPECT_EQ("", metric_output.contents());
+  EXPECT_EQ("", metric.info().str());
+  EXPECT_EQ("", metric.err().str());
 }
 
 TEST(McmcDiagEMetric, gradients) {
@@ -70,11 +68,8 @@ TEST(McmcDiagEMetric, gradients) {
   
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
   
-  writer_t metric_output;
-  
-  stan::mcmc::diag_e_metric
-    <funnel_model_namespace::funnel_model, rng_t, writer_t>
-      metric(model, metric_output);
+  stan::mcmc::diag_e_metric<funnel_model_namespace::funnel_model, rng_t>
+      metric(model);
   
   double epsilon = 1e-6;
   
@@ -147,5 +142,6 @@ TEST(McmcDiagEMetric, gradients) {
   }
 
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.contents());
+  EXPECT_EQ("", metric.info().str());
+  EXPECT_EQ("", metric.err().str());
 }

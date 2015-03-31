@@ -139,7 +139,9 @@ namespace stan {
       //                Initialize Model              //
       //////////////////////////////////////////////////
 
-      Model model(data_var_context, &std::cout); /////***** FIXME NOW *****//////
+      std::stringstream model_output;
+      Model model(data_var_context, &model_output);
+      if (model_output.str().size()) info(model_output.str());
 
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 

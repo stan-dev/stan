@@ -10,10 +10,8 @@
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
-#include <stan/interface_callbacks/writer/stringstream.hpp>
 
 typedef boost::ecuyer1988 rng_t;
-typedef stan::interface_callbacks::writer::stringstream writer_t;
 
 TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {  
   rng_t base_rng(0);
@@ -27,13 +25,11 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
   
   stan::mcmc::expl_leapfrog
-    <stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t, writer_t> >
+    <stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
       integrator;
 
-   writer_t metric_output;
-  
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t, writer_t>
-    metric(model, metric_output);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t>
+    metric(model);
   
   stan::mcmc::unit_e_point z(1);
   z.q(0) = 1;
@@ -61,7 +57,8 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   EXPECT_NEAR(aveDeltaH, 0, epsilon * epsilon);
   
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.contents());
+  EXPECT_EQ("", metric.info().str());
+  EXPECT_EQ("", metric.err().str());
 }
 
 TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {  
@@ -76,14 +73,11 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   gauss_model_namespace::gauss_model model(data_var_context, &model_output);
   
   stan::mcmc::expl_leapfrog
-    <stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model,
-                               rng_t, writer_t> >
+    <stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
       integrator;
 
-  writer_t metric_output;
-  
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t, writer_t>
-    metric(model, metric_output);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t>
+    metric(model);
   
   // Create a circle of points
   const int n_points = 1000;
@@ -148,8 +142,8 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   // Symplectic integrators preserve volume (area in 2D)
   EXPECT_NEAR(area, pi * r * r, 1e-2);
 
-
   EXPECT_EQ("", model_output.str());
-  EXPECT_EQ("", metric_output.contents());
+  EXPECT_EQ("", metric.info().str());
+  EXPECT_EQ("", metric.err().str());
 }
 

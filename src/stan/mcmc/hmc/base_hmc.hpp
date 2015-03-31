@@ -19,17 +19,16 @@ namespace stan {
   namespace mcmc {
 
     template <class Model,
-              template<class, class, class> class Hamiltonian,
+              template<class, class> class Hamiltonian,
               template<class> class Integrator,
-              class BaseRNG,
-              class Writer>
+              class BaseRNG>
     class base_hmc : public base_mcmc {
     public:
-      base_hmc(Model &m, BaseRNG& rng, Writer& writer)
+      base_hmc(Model &m, BaseRNG& rng)
         : base_mcmc(),
           z_(m.num_params_r()),
           integrator_(),
-          hamiltonian_(m, writer),
+          hamiltonian_(m),
           rand_int_(rng),
           rand_uniform_(rand_int_),
           nom_epsilon_(0.1),
@@ -114,7 +113,7 @@ namespace stan {
         this->z_.ps_point::operator=(z_init);
       }
 
-     typename Hamiltonian<Model, BaseRNG, Writer>::PointType& z() {
+     typename Hamiltonian<Model, BaseRNG>::PointType& z() {
         return z_;
       }
 
@@ -146,11 +145,21 @@ namespace stan {
           this->epsilon_ *= 1.0
             + this->epsilon_jitter_ * (2.0 * this->rand_uniform_() - 1.0);
       }
+      
+      std::string flush_info_buffer() { return hamiltonian_.info().str(); }
+      std::string flush_err_buffer() { return hamiltonian_.err().str(); }
+      
+      void clear_buffers() {
+        hamiltonian_.info().str(std::string());
+        hamiltonian_.info().clear();
+        hamiltonian_.err().str(std::string());
+        hamiltonian_.err().clear();
+      }
 
     protected:
-      typename Hamiltonian<Model, BaseRNG, Writer>::PointType z_;
-      Integrator<Hamiltonian<Model, BaseRNG, Writer> > integrator_;
-      Hamiltonian<Model, BaseRNG, Writer> hamiltonian_;
+      typename Hamiltonian<Model, BaseRNG>::PointType z_;
+      Integrator<Hamiltonian<Model, BaseRNG> > integrator_;
+      Hamiltonian<Model, BaseRNG> hamiltonian_;
 
       BaseRNG& rand_int_;
 

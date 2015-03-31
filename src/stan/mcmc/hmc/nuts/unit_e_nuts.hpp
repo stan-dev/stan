@@ -12,14 +12,12 @@ namespace stan {
 
     // The No-U-Turn Sampler (NUTS) on a
     // Euclidean manifold with unit metric
-    template <class M, class BaseRNG, class Writer>
+    template <class M, class BaseRNG>
     class unit_e_nuts
-      : public base_nuts<M, unit_e_metric,
-                         expl_leapfrog, BaseRNG, Writer> {
+      : public base_nuts<M, unit_e_metric, expl_leapfrog, BaseRNG> {
     public:
-      unit_e_nuts(M &m, BaseRNG& rng, Writer& writer)
-        : base_nuts<M, unit_e_metric, expl_leapfrog,
-                    BaseRNG, Writer>(m, rng, writer) {
+      unit_e_nuts(M &m, BaseRNG& rng)
+        : base_nuts<M, unit_e_metric, expl_leapfrog, BaseRNG>(m, rng) {
         this->name_ = "NUTS with a unit Euclidean metric";
       }
 

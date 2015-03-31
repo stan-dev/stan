@@ -9,7 +9,6 @@
 #include <stan/interface_callbacks/writer/stringstream.hpp>
 
 typedef boost::ecuyer1988 rng_t;
-typedef stan::interface_callbacks::writer::stringstream writer_t;
 
 namespace stan {
   
@@ -18,14 +17,13 @@ namespace stan {
     class mock_hmc: public base_hmc<mock_model,
                                     mock_hamiltonian,
                                     mock_integrator,
-                                    rng_t,
-                                    writer_t> {
+                                    rng_t> {
       
     public:
       
-      mock_hmc(mock_model& m, rng_t& rng, writer_t& w) :
-        base_hmc<mock_model, mock_hamiltonian, mock_integrator, rng_t, writer_t>
-          (m, rng, w)
+      mock_hmc(mock_model& m, rng_t& rng) :
+        base_hmc<mock_model, mock_hamiltonian, mock_integrator, rng_t>
+          (m, rng)
       { this->name_ = "Mock HMC"; }
       
       
@@ -51,15 +49,14 @@ TEST(McmcBaseHMC, point_construction) {
   q(0) = 5;
   q(1) = 1;
 
-  writer_t info;
-
   stan::mcmc::mock_model model(q.size());  
-  stan::mcmc::mock_hmc sampler(model, base_rng, info);
+  stan::mcmc::mock_hmc sampler(model, base_rng);
 
   EXPECT_EQ(q.size(), sampler.z().q.size());
   EXPECT_EQ(static_cast<int>(q.size()), sampler.z().g.size());
 
-  EXPECT_EQ("", info.contents());
+  EXPECT_EQ("", sampler.flush_info_buffer());
+  EXPECT_EQ("", sampler.flush_err_buffer());
 }
 
 TEST(McmcBaseHMC, seed) {
@@ -70,17 +67,16 @@ TEST(McmcBaseHMC, seed) {
   q(0) = 5;
   q(1) = 1;
   
-  writer_t info;
-
   stan::mcmc::mock_model model(q.size());  
-  stan::mcmc::mock_hmc sampler(model, base_rng, info);
+  stan::mcmc::mock_hmc sampler(model, base_rng);
 
   sampler.seed(q);
   
   for (int i = 0; i < q.size(); ++i)
     EXPECT_EQ(q(i), sampler.z().q(i));
   
-  EXPECT_EQ("", info.contents());
+  EXPECT_EQ("", sampler.flush_info_buffer());
+  EXPECT_EQ("", sampler.flush_err_buffer());
 }
 
 TEST(McmcBaseHMC, set_nominal_stepsize) {
@@ -91,10 +87,8 @@ TEST(McmcBaseHMC, set_nominal_stepsize) {
   q(0) = 5;
   q(1) = 1;
   
-  writer_t info;
-
   stan::mcmc::mock_model model(q.size());  
-  stan::mcmc::mock_hmc sampler(model, base_rng, info);
+  stan::mcmc::mock_hmc sampler(model, base_rng);
   
   double old_epsilon = 1.0;
   sampler.set_nominal_stepsize(old_epsilon);
@@ -103,7 +97,8 @@ TEST(McmcBaseHMC, set_nominal_stepsize) {
   sampler.set_nominal_stepsize(-0.1);
   EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   
-  EXPECT_EQ("", info.contents());
+  EXPECT_EQ("", sampler.flush_info_buffer());
+  EXPECT_EQ("", sampler.flush_err_buffer());
 }
 
 TEST(McmcBaseHMC, set_stepsize_jitter) {
@@ -114,10 +109,8 @@ TEST(McmcBaseHMC, set_stepsize_jitter) {
   q(0) = 5;
   q(1) = 1;
   
-  writer_t info;
-
   stan::mcmc::mock_model model(q.size());  
-  stan::mcmc::mock_hmc sampler(model, base_rng, info);
+  stan::mcmc::mock_hmc sampler(model, base_rng);
   
   double old_jitter = 0.1;
   sampler.set_stepsize_jitter(old_jitter);
@@ -126,6 +119,7 @@ TEST(McmcBaseHMC, set_stepsize_jitter) {
   sampler.set_nominal_stepsize(-0.1);
   EXPECT_EQ(old_jitter, sampler.get_stepsize_jitter());
   
-  EXPECT_EQ("", info.contents());
+  EXPECT_EQ("", sampler.flush_info_buffer());
+  EXPECT_EQ("", sampler.flush_err_buffer());
 }
 

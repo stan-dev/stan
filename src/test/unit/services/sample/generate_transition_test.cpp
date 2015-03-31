@@ -55,6 +55,7 @@ public:
     output.clear();
     diagnostic.clear();
     info.clear();
+    err.clear();
     
     base_rng.seed(123456);
     
@@ -67,8 +68,8 @@ public:
     model = new stan_model(empty_data_context, &model_output);
     
     writer = new stan::services::sample::mcmc_writer
-      <stan_model, rng_t, writer_t, writer_t, writer_t>
-        (*model, base_rng, output, diagnostic, info);
+      <stan_model, rng_t, writer_t, writer_t, writer_t, writer_t>
+        (*model, base_rng, output, diagnostic, info, err);
     
     q = Eigen::VectorXd::Zero(4);
     log_prob = 0;
@@ -85,13 +86,14 @@ public:
   writer_t output;
   writer_t diagnostic;
   writer_t info;
+  writer_t err;
   
   rng_t base_rng;
   
   mock_sampler* sampler;
   stan_model* model;
   stan::services::sample::mcmc_writer
-    <stan_model, rng_t, writer_t, writer_t, writer_t>* writer;
+    <stan_model, rng_t, writer_t, writer_t, writer_t, writer_t>* writer;
   
   Eigen::VectorXd q;
   double log_prob;
@@ -104,6 +106,7 @@ TEST_F(StanServices, Warmup) {
   std::string expected_output = "";
   std::string expected_diagnostic = "";
   std::string expected_info = "Iteration:  1 / 60 [  1%]  (Warmup)\nIteration:  4 / 60 [  6%]  (Warmup)\nIteration:  8 / 60 [ 13%]  (Warmup)\nIteration: 12 / 60 [ 20%]  (Warmup)\nIteration: 16 / 60 [ 26%]  (Warmup)\nIteration: 20 / 60 [ 33%]  (Warmup)\nIteration: 24 / 60 [ 40%]  (Warmup)\nIteration: 28 / 60 [ 46%]  (Warmup)\n";
+  std::string expected_err = "";
   
   int num_warmup = 30;
   int num_samples = 60;
@@ -122,11 +125,11 @@ TEST_F(StanServices, Warmup) {
   EXPECT_EQ(num_warmup, sampler->n_transition_called());
   EXPECT_EQ(num_warmup, interrupt.n());
   
-  EXPECT_EQ(expected_info, info.contents());
-  
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ(expected_output, output.contents());
   EXPECT_EQ(expected_diagnostic, diagnostic.contents());
+  EXPECT_EQ(expected_info, info.contents());
+  EXPECT_EQ(expected_err, err.contents());
 }
 
 TEST_F(StanServices, Sample) {
@@ -134,6 +137,7 @@ TEST_F(StanServices, Sample) {
   std::string expected_output = "0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n0,0,0,0,1,1,2713\n";
   std::string expected_diagnostic = "0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n0,0\n";
   std::string expected_info = "Iteration: 31 / 90 [ 34%]  (Sampling)\nIteration: 34 / 90 [ 37%]  (Sampling)\nIteration: 38 / 90 [ 42%]  (Sampling)\nIteration: 42 / 90 [ 46%]  (Sampling)\nIteration: 46 / 90 [ 51%]  (Sampling)\nIteration: 50 / 90 [ 55%]  (Sampling)\nIteration: 54 / 90 [ 60%]  (Sampling)\nIteration: 58 / 90 [ 64%]  (Sampling)\nIteration: 62 / 90 [ 68%]  (Sampling)\nIteration: 66 / 90 [ 73%]  (Sampling)\nIteration: 70 / 90 [ 77%]  (Sampling)\nIteration: 74 / 90 [ 82%]  (Sampling)\nIteration: 78 / 90 [ 86%]  (Sampling)\nIteration: 82 / 90 [ 91%]  (Sampling)\nIteration: 86 / 90 [ 95%]  (Sampling)\nIteration: 90 / 90 [100%]  (Sampling)\n";
+  std::string expected_err = "";
   
   int num_warmup = 30;
   int num_samples = 60;
@@ -152,10 +156,10 @@ TEST_F(StanServices, Sample) {
   EXPECT_EQ(num_samples, sampler->n_transition_called());
   EXPECT_EQ(num_samples, interrupt.n());
   
-  EXPECT_EQ(expected_info, info.contents());
-  
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ(expected_output, output.contents());
   EXPECT_EQ(expected_diagnostic, diagnostic.contents());
+  EXPECT_EQ(expected_info, info.contents());
+  EXPECT_EQ(expected_err, err.contents());
 }
 

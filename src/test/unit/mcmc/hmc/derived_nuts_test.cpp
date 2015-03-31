@@ -28,9 +28,8 @@ TEST(McmcDerivedNuts, compute_criterion_unit_e) {
   
   stan::mcmc::mock_model model(model_size);
   
-  writer_t writer;
-  stan::mcmc::unit_e_nuts<stan::mcmc::mock_model, rng_t, writer_t>
-    sampler(model, base_rng, writer);
+  stan::mcmc::unit_e_nuts<stan::mcmc::mock_model, rng_t>
+    sampler(model, base_rng);
   
   start.q(0) = 1;
   start.p(0) = 1;
@@ -67,8 +66,8 @@ TEST(McmcDerivedNuts, compute_criterion_diag_e) {
   stan::mcmc::mock_model model(model_size);
   
   writer_t writer;
-  stan::mcmc::diag_e_nuts<stan::mcmc::mock_model, rng_t, writer_t>
-      sampler(model, base_rng, writer);
+  stan::mcmc::diag_e_nuts<stan::mcmc::mock_model, rng_t>
+      sampler(model, base_rng);
   
   start.q(0) = 1;
   start.p(0) = 1;
@@ -104,8 +103,8 @@ TEST(McmcDerivedNuts, compute_criterion_dense_e) {
   stan::mcmc::mock_model model(model_size);
   
   writer_t writer;
-  stan::mcmc::dense_e_nuts<stan::mcmc::mock_model, rng_t, writer_t>
-    sampler(model, base_rng, writer);
+  stan::mcmc::dense_e_nuts<stan::mcmc::mock_model, rng_t>
+    sampler(model, base_rng);
   
   start.q(0) = 1;
   start.p(0) = 1;
