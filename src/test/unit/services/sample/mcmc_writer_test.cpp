@@ -171,10 +171,10 @@ TEST(StanIoMcmcWriter, write_adapt_finish) {
   
   std::string expected_output =
     "# Adaptation terminated\nStep size = 0.1\n"
-    "# Diagonal elements of inverse mass matrix:\nM_inv = 1,1\n";
+    "# Diagonal Euclidean metric\nM_inv = 1,1\n";
   std::string expected_diagnostic =
     "# Adaptation terminated\nStep size = 0.1\n"
-    "# Diagonal elements of inverse mass matrix:\nM_inv = 1,1\n";
+    "# Diagonal Euclidean metric\nM_inv = 1,1\n";
   std::string expected_info = "";
   std::string expected_err = "";
   
@@ -227,9 +227,9 @@ TEST(StanIoMcmcWriter, write_timing) {
   writer.write_timing(10, 10);
   
   std::string expected_output =
-    "\n# Elapsed Time (seconds):\n# Warmup = 10\n# Sampling = 10\n# Total = 20\n\n";
+    "\n# Elapsed Time (seconds):\nWarmup = 10\nSampling = 10\nTotal = 20\n\n";
   std::string expected_diagnostic =
-    "\n# Elapsed Time (seconds):\n# Warmup = 10\n# Sampling = 10\n# Total = 20\n\n";
+    "\n# Elapsed Time (seconds):\nWarmup = 10\nSampling = 10\nTotal = 20\n\n";
   std::string expected_info =
     "\nElapsed Time (seconds):\nWarmup = 10\nSampling = 10\nTotal = 20\n\n";
   std::string expected_err = "";

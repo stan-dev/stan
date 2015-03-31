@@ -25,7 +25,7 @@ namespace stan {
 
       template <class Writer>
       void write_metric(Writer& writer) {
-        writer("# Elements of inverse mass matrix:");
+        writer("# Dense Euclidean metric");
         writer("M_inv", mInv.data(), mInv.rows(), mInv.cols());
       }
     };

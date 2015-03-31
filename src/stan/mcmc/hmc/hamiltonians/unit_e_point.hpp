@@ -16,7 +16,7 @@ namespace stan {
       
       template <class Writer>
       void write_metric(Writer& writer) {
-        writer("# No free parameters for unit metric");
+        writer("# Unit Eucliden metric");
       }
       
     };

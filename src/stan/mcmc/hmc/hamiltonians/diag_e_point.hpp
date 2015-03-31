@@ -24,7 +24,7 @@ namespace stan {
 
       template <class Writer>
       void write_metric(Writer& writer) {
-        writer("# Diagonal elements of inverse mass matrix:");
+        writer("# Diagonal Euclidean metric");
         writer("M_inv", mInv.data(), mInv.size());
       }
     };

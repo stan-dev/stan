@@ -17,11 +17,11 @@ namespace stan {
         bool good() { return output.good(); }
         
         void operator()(const std::string& key, double value) {
-          output << key << " = " << value << std::endl;
+          output << "# " << key << " = " << value << std::endl;
         };
         
         void operator()(const std::string& key, const std::string& value) {
-          output << key << " = " << value << std::endl;
+          output << "# " << key << " = " << value << std::endl;
         };
         
         void operator()(const std::string& key,
@@ -29,7 +29,7 @@ namespace stan {
                         int n_values) {
           if (n_values == 0) return;
           
-          output << key << " = ";
+          output << "# " << key << " = ";
           
           output << values[0];
           for (int n = 1; n < n_values; ++n)
@@ -42,10 +42,10 @@ namespace stan {
                         int n_rows, int n_cols) {
           if (n_rows == 0 || n_cols == 0) return;
           
-          output << key << ":" << std::endl;
+          output << "# " << key << ":" << std::endl;
           
           for (int i = 0; i < n_rows; ++i) {
-            output << "," << values[i];
+            output << "# " << "," << values[i];
             for (int j = 1; j < n_cols; ++j)
               output << "," << values[i * n_cols + j];
             output << std::endl;
