@@ -263,12 +263,13 @@ namespace stan {
      * Jacobian determinant of inverse parameter transforms is added to the
      * log probability.
      * @tparam M Class of model.
+     * @tparam Writer Class of writer callback
      * @param model Model.
      * @param params_r Real-valued parameter vector.
      * @param params_i Integer-valued parameter vector.
+     * @param writer Writer callback for output.
      * @param epsilon Real-valued scalar saying how much to perturb. Defaults to 1e-6.
      * @param error Real-valued scalar saying how much error to allow. Defaults to 1e-6.
-     * @param o Output stream for messages. Defaults to std::cout.
      * @param msgs Stream to which Stan programs write. Defaults to 0.
      * @return number of failed gradient comparisons versus allowed
      * error, so 0 if all gradients pass

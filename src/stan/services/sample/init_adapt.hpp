@@ -9,13 +9,14 @@ namespace stan {
   namespace services {
     namespace sample {
     
-      template<class Sampler>
+      template<class Sampler, class ErrWriter>
       bool init_adapt(Sampler& sampler,
                       const double delta,
                       const double gamma,
                       const double kappa, 
                       const double t0,
-                      const Eigen::VectorXd& cont_params) {
+                      const Eigen::VectorXd& cont_params,
+                      ErrWriter& err) {
         const double epsilon = sampler.get_nominal_stepsize();
         
         sampler.get_stepsize_adaptation().set_mu(log(10 * epsilon));
@@ -30,18 +31,19 @@ namespace stan {
           sampler.z().q = cont_params;
           sampler.init_stepsize();
         } catch (const std::exception& e) {
-          std::cout << "Exception initializing step size." << std::endl
-                    << e.what() << std::endl;
+          err("Error initializing step size.");
+          err(e.what());
           return false;
         }
         
         return true;
       }
 
-      template<class Sampler>
+      template<class Sampler, class ErrWriter>
       bool init_adapt(Sampler& sampler,
                       stan::services::categorical_argument* adapt,
-                      const Eigen::VectorXd& cont_params) {
+                      const Eigen::VectorXd& cont_params,
+                      ErrWriter& err) {
         
         double delta = dynamic_cast<stan::services::real_argument*>
                        (adapt->arg("delta"))->value();
@@ -52,7 +54,7 @@ namespace stan {
         double t0    = dynamic_cast<stan::services::real_argument*>
                        (adapt->arg("t0"))->value();
         
-        return init_adapt(sampler, delta, gamma, kappa, t0, cont_params);
+        return init_adapt(sampler, delta, gamma, kappa, t0, cont_params, err);
       }
 
     } // sample

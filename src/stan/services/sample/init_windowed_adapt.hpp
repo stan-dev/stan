@@ -16,7 +16,7 @@ namespace stan {
                                const Eigen::VectorXd& cont_params,
                                ErrWriter& err) {
         
-        init_adapt<Sampler>(sampler, adapt, cont_params);
+        init_adapt<Sampler>(sampler, adapt, cont_params, err);
         
         unsigned int init_buffer 
           = dynamic_cast<stan::services::u_int_argument*>

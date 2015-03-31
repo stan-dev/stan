@@ -42,8 +42,7 @@ namespace stan {
         double init_log_prob;
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         
-        stan::model::gradient(model, cont_params, init_log_prob,
-                              init_grad, &std::cout); // FIXME
+        stan::model::gradient(model, cont_params, init_log_prob, init_grad);
         
         clock_t end_check = clock();
         double deltaT
@@ -229,7 +228,7 @@ namespace stan {
             
             if (!init_static_hmc(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init_adapt(sampler, adapt, cont_params))
+            if (!init_adapt(sampler, adapt, cont_params, err))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,
@@ -247,7 +246,7 @@ namespace stan {
             
             if (!init_nuts(sampler, algo))
               return stan::services::error_codes::SOFTWARE;
-            if (!init_adapt(sampler, adapt, cont_params))
+            if (!init_adapt(sampler, adapt, cont_params, err))
               return stan::services::error_codes::SOFTWARE;
             
             sample::run_adaptive_sampler(sampler, s, num_warmup, num_samples,

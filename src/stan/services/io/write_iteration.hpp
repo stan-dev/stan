@@ -3,10 +3,6 @@
 
 #include <vector>
 
-// FIXME: write_iteration calls std::cout directly.
-//   once removed, remove this include
-#include <iostream>
-
 namespace stan {
   namespace services {
     namespace io {
@@ -19,8 +15,8 @@ namespace stan {
                            std::vector<double>& cont_vector,
                            std::vector<int>& disc_vector) {
         std::vector<double> values;
-        model.write_array(base_rng, cont_vector, disc_vector, values,
-                          true, true, &std::cout); /////***** FIXME NOW *****//////
+        model.write_array(base_rng, cont_vector, disc_vector,
+                          values, true, true);
         values.insert(values.begin(), lp);
         writer(values);
       }
