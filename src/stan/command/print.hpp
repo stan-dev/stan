@@ -3,7 +3,7 @@
 
 #include <stan/mcmc/chains.hpp>
 #include <algorithm>
-#include <iostream>
+#include <ostream>
 #include <iomanip>
 #include <ios>
 #include <string>
@@ -99,20 +99,20 @@ calculate_column_widths(const Eigen::MatrixXd& values,
   return column_widths;
 }
 
-void print_usage() {
-  std::cout << "USAGE:  print <filename 1> [<filename 2> ... <filename N>]"
-            << std::endl
-            << std::endl;
+void print_usage(std::ostream& output) {
+  output << "USAGE:  print <filename 1> [<filename 2> ... <filename N>]"
+         << std::endl
+         << std::endl;
 
-  std::cout << "OPTIONS:" << std::endl << std::endl;
-  std::cout << "  --autocorr=<chain_index>\tAppend the autocorrelations "
-            << "for the given chain"
-            << std::endl
-            << std::endl;
-  std::cout << "  --sig_figs=<int>\tSet significant figures of output "
-            << "(Defaults to 2)"
-            << std::endl
-            << std::endl;
+  output << "OPTIONS:" << std::endl << std::endl;
+  output << "  --autocorr=<chain_index>\tAppend the autocorrelations "
+         << "for the given chain"
+         << std::endl
+         << std::endl;
+  output << "  --sig_figs=<int>\tSet significant figures of output "
+         << "(Defaults to 2)"
+         << std::endl
+         << std::endl;
 }
 
 bool is_matrix(const std::string& parameter_name) {

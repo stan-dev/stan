@@ -58,8 +58,11 @@ namespace stan {
           
           std::vector<double> gradient;
           try {
+            msg.str(std::string());
+            msg.clear();
             lp = model.template log_prob<false, false>
-            (cont_vector, disc_vector, &std::cout); /////***** FIXME NOW *****//////
+                   (cont_vector, disc_vector, &msg);
+            if (msg.str().size()) info(msg.str());
           } catch (const std::exception& e) {
             services::io::write_error_msg(err, e);
             lp = -std::numeric_limits<double>::infinity();
@@ -110,9 +113,12 @@ namespace stan {
         
         if (algo->value() == "bfgs") {
           
+          msg.str(std::string());
+          msg.clear();
+          
           typedef stan::optimization::BFGSLineSearch
-          <Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
-          Optimizer bfgs(model, cont_vector, disc_vector, &std::cout); /////***** FIXME NOW *****//////
+            <Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
+          Optimizer bfgs(model, cont_vector, disc_vector, &msg);
           
           bfgs._ls_opts.alpha0
             = dynamic_cast<stan::services::real_argument*>
@@ -139,14 +145,19 @@ namespace stan {
                                   output, info,
                                   save_iterations, refresh,
                                   iteration_interrupt);
+          
+          if (msg.str().size()) info(msg.str());
+          
         }
         
         if (algo->value() == "lbfgs") {
           
+          msg.str(std::string());
+          msg.clear();
+          
           typedef stan::optimization::BFGSLineSearch
             <Model,stan::optimization::LBFGSUpdate<> > Optimizer;
-          
-          Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
+          Optimizer bfgs(model, cont_vector, disc_vector, &msg);
           
           bfgs.get_qnupdate().set_history_size(dynamic_cast<services::int_argument*>
                                                (algo->arg("lbfgs")->arg("history_size"))->value());
@@ -175,6 +186,9 @@ namespace stan {
                                   output, info,
                                   save_iterations, refresh,
                                   iteration_interrupt);
+          
+          if (msg.str().size()) info(msg.str());
+            
         }
         
         return stan::services::error_codes::USAGE;
