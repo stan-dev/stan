@@ -1,5 +1,5 @@
-#ifndef STAN__VB__VB_PARAMS_FULLRANK__HPP
-#define STAN__VB__VB_PARAMS_FULLRANK__HPP
+#ifndef STAN__VARIATIONAL__ADVI_PARAMS_FULLRANK__HPP
+#define STAN__VARIATIONAL__ADVI_PARAMS_FULLRANK__HPP
 
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -10,9 +10,9 @@
 
 namespace stan {
 
-  namespace vb {
+  namespace variational {
 
-    class vb_params_fullrank {
+    class advi_params_fullrank {
 
     private:
 
@@ -23,22 +23,23 @@ namespace stan {
 
     public:
 
-      vb_params_fullrank(Eigen::VectorXd const& mu,
-                          Eigen::MatrixXd const& L_chol) :
+      advi_params_fullrank(Eigen::VectorXd const& mu,
+                           Eigen::MatrixXd const& L_chol) :
       mu_(mu), L_chol_(L_chol), dimension_(mu.size()) {
 
-        static const char* function = "stan::vb::vb_params_fullrank(%1%)";
+        static const char* function =
+          "stan::variational::advi_params_fullrank(%1%)";
 
         stan::math::check_square(function, "Cholesky factor", L_chol_);
         stan::math::check_size_match(function,
                                "Dimension of mean vector",     dimension_,
                                "Dimension of Cholesky factor", L_chol_.rows() );
         stan::math::check_cholesky_factor(function,
-                                 "Cholesky factor", L_chol_);
+                               "Cholesky factor", L_chol_);
 
       };
 
-      virtual ~vb_params_fullrank() {}; // No-op
+      virtual ~advi_params_fullrank() {}; // No-op
 
       // Accessors
       int dimension() const { return dimension_; }
@@ -62,29 +63,29 @@ namespace stan {
         return result;
       }
 
-      // Calculate natural parameters
-      Eigen::VectorXd nat_params() const {
+      // // Calculate natural parameters
+      // Eigen::VectorXd nat_params() const {
 
-        // FIXME: stupid Eigen. can't initialize LLT factor with L.
-        // Compute the covariance matrix
-        Eigen::MatrixXd Sigma = L_chol_ * L_chol_.transpose();
-        stan::math::LDLT_factor<double,-1,-1> Sigma_LDLT(Sigma);
+      //   // FIXME: stupid Eigen. can't initialize LLT factor with L.
+      //   // Compute the covariance matrix
+      //   Eigen::MatrixXd Sigma = L_chol_ * L_chol_.transpose();
+      //   stan::math::LDLT_factor<double,-1,-1> Sigma_LDLT(Sigma);
 
-        // Create a vector twice the dimension size
-        Eigen::VectorXd natural_params(dimension_ + dimension_^2);
+      //   // Create a vector twice the dimension size
+      //   Eigen::VectorXd natural_params(dimension_ + dimension_^2);
 
-        // Concatenate the natural parameters
-        natural_params << (Sigma_LDLT.solve(mu_)).array(),
-                          (Sigma_LDLT.solve(
-                            Eigen::MatrixXd::Identity(dimension_,dimension_))
-                          ).array();
+      //   // Concatenate the natural parameters
+      //   natural_params << (Sigma_LDLT.solve(mu_)).array(),
+      //                     (Sigma_LDLT.solve(
+      //                       Eigen::MatrixXd::Identity(dimension_,dimension_))
+      //                     ).array();
 
-        return natural_params;
-      }
+      //   return natural_params;
+      // }
 
       // Implements f^{-1}(\check{z}) = L\check{z} + \mu
       Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& z_check) const {
-        static const char* function = "stan::vb::vb_params_fullrank"
+        static const char* function = "stan::variational::advi_params_fullrank"
                                       "::to_unconstrained(%1%)";
 
         stan::math::check_size_match(function,
@@ -96,7 +97,7 @@ namespace stan {
 
     };
 
-  } // vb
+  } // variational
 
 } // stan
 

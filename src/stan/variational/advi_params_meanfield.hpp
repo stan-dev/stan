@@ -1,5 +1,5 @@
-#ifndef STAN__VB__VB_PARAMS_MEANFIELD__HPP
-#define STAN__VB__VB_PARAMS_MEANFIELD__HPP
+#ifndef STAN__VARIATIONAL__ADVI_PARAMS_MEANFIELD__HPP
+#define STAN__VARIATIONAL__ADVI_PARAMS_MEANFIELD__HPP
 
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -8,9 +8,9 @@
 
 namespace stan {
 
-  namespace vb {
+  namespace variational {
 
-    class vb_params_meanfield {
+    class advi_params_meanfield {
 
     private:
 
@@ -20,13 +20,14 @@ namespace stan {
 
     public:
 
-      vb_params_meanfield(Eigen::VectorXd const& mu,
+      advi_params_meanfield(Eigen::VectorXd const& mu,
                           Eigen::VectorXd const& sigma_tilde) :
       mu_(mu),
       sigma_tilde_(sigma_tilde),
       dimension_(mu.size()) {
 
-        static const char* function = "stan::vb::vb_params_meanfield(%1%)";
+        static const char* function =
+          "stan::variational::advi_params_meanfield(%1%)";
 
         stan::math::check_size_match(function,
                                "Dimension of mean vector", dimension_,
@@ -34,7 +35,7 @@ namespace stan {
 
       };
 
-      virtual ~vb_params_meanfield() {}; // No-op
+      virtual ~advi_params_meanfield() {}; // No-op
 
       // Accessors
       int dimension() const { return dimension_; }
@@ -53,25 +54,25 @@ namespace stan {
         return stan::math::sum( sigma_tilde_ );
       }
 
-      // Calculate natural parameters
-      Eigen::VectorXd nat_params() const {
+      // // Calculate natural parameters
+      // Eigen::VectorXd nat_params() const {
 
-        // Compute the variance
-        Eigen::VectorXd variance = sigma_tilde_.array().exp().square();
+      //   // Compute the variance
+      //   Eigen::VectorXd variance = sigma_tilde_.array().exp().square();
 
-        // Create a vector twice the dimension size
-        Eigen::VectorXd natural_params(2*dimension_);
+      //   // Create a vector twice the dimension size
+      //   Eigen::VectorXd natural_params(2*dimension_);
 
-        // Concatenate the natural parameters
-        natural_params << mu_.array().cwiseQuotient(variance.array()),
-                          variance.array().cwiseInverse();
+      //   // Concatenate the natural parameters
+      //   natural_params << mu_.array().cwiseQuotient(variance.array()),
+      //                     variance.array().cwiseInverse();
 
-        return natural_params;
-      }
+      //   return natural_params;
+      // }
 
       // Implement f^{-1}(\check{z}) = sigma * \check{z} + \mu
       Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& z_check) const {
-        static const char* function = "stan::vb::vb_params_meanfield"
+        static const char* function = "stan::variational::advi_params_meanfield"
                                       "::to_unconstrained(%1%)";
 
         stan::math::check_size_match(function,
@@ -85,7 +86,7 @@ namespace stan {
 
     };
 
-  } // vb
+  } // variational
 
 } // stan
 

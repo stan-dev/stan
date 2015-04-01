@@ -1,5 +1,5 @@
-#ifndef STAN__VB__BBVB__HPP
-#define STAN__VB__BBVB__HPP
+#ifndef STAN__VARIATIONAL__ADVI__HPP
+#define STAN__VARIATIONAL__ADVI__HPP
 
 #include <boost/circular_buffer.hpp>
 #include <ostream>
@@ -11,21 +11,21 @@
 
 #include <stan/services/io/write_iteration_csv.hpp>
 
-#include <stan/vb/vb_params_fullrank.hpp>
-#include <stan/vb/vb_params_meanfield.hpp>
+#include <stan/variational/advi_params_fullrank.hpp>
+#include <stan/variational/advi_params_meanfield.hpp>
 
 #include <stan/io/dump.hpp>
 
 namespace stan {
 
-  namespace vb {
+  namespace variational {
 
     template <class M, class BaseRNG>
-    class bbvb {
+    class advi {
 
     public:
 
-      bbvb(M& m,
+      advi(M& m,
            Eigen::VectorXd& cont_params,
            double& elbo,
            int& n_monte_carlo_grad,
@@ -46,7 +46,7 @@ namespace stan {
         out_stream_(output_stream),
         diag_stream_(diagnostic_stream) {};
 
-      virtual ~bbvb() {};
+      virtual ~advi() {};
 
 
       /**
@@ -57,15 +57,15 @@ namespace stan {
        * the sample, and evaluating the log joint, adjusted by the entropy
        * term of the normal
        *
-       * @param   vb_params        variational parameters class
+       * @param   advi_params        variational parameters class
        * @param   constant_factor  difference between log_prob agrad and double
        * @return                   evidence lower bound (elbo)
        */
       template <typename T>
-      double calc_ELBO(T const& vb_params,
+      double calc_ELBO(T const& advi_params,
                        double constant_factor) {
         double elbo(0.0);
-        int dim = vb_params.dimension();
+        int dim = advi_params.dimension();
 
         Eigen::VectorXd z_check   = Eigen::VectorXd::Zero(dim);
         Eigen::VectorXd z_tilde   = Eigen::VectorXd::Zero(dim);
@@ -75,7 +75,7 @@ namespace stan {
           for (int d = 0; d < dim; ++d) {
             z_check(d) = stan::prob::normal_rng(0,1,rng_);
           }
-          z_tilde = vb_params.to_unconstrained(z_check);
+          z_tilde = advi_params.to_unconstrained(z_check);
 
           // Accumulate log probability
           elbo += (model_.template log_prob<false,true>(z_tilde, &std::cout))
@@ -85,7 +85,7 @@ namespace stan {
         elbo /= static_cast<double>(n_monte_carlo_elbo_);
 
         // Add entropy term
-        elbo += vb_params.entropy();
+        elbo += advi_params.entropy();
 
         return elbo;
       }
@@ -103,10 +103,11 @@ namespace stan {
        * @param L_grad  gradient of scale matrix parameter
        */
       void calc_combined_grad(
-        vb_params_fullrank const& muL,
+        advi_params_fullrank const& muL,
         Eigen::VectorXd& mu_grad,
         Eigen::MatrixXd& L_grad) {
-        static const char* function = "stan::vb::bbvb.calc_combined_grad(%1%)";
+        static const char* function =
+          "stan::variational::advi.calc_combined_grad(%1%)";
 
         int dim       = muL.dimension();
         double tmp_lp = 0.0;
@@ -172,10 +173,11 @@ namespace stan {
        * @param sigma_tilde_grad  gradient of log-std vector parameter
        */
       void calc_combined_grad(
-        vb_params_meanfield const& musigmatilde,
+        advi_params_meanfield const& musigmatilde,
         Eigen::VectorXd& mu_grad,
         Eigen::VectorXd& sigma_tilde_grad) {
-        static const char* function = "stan::vb::bbvb.calc_combined_grad(%1%)";
+        static const char* function =
+          "stan::variational::advi.calc_combined_grad(%1%)";
 
         int dim       = musigmatilde.dimension();
         double tmp_lp = 0.0;
@@ -239,7 +241,7 @@ namespace stan {
        * @param tol_rel_obj    relative tolerance parameter for convergence
        * @param max_iterations max number of iterations to run algorithm
        */
-      void do_robbins_monro_adagrad( vb_params_fullrank& muL,
+      void do_robbins_monro_adagrad( advi_params_fullrank& muL,
                                      double tol_rel_obj,
                                      int max_iterations ) {
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(model_.num_params_r());
@@ -390,7 +392,7 @@ namespace stan {
        * @param tol_rel_obj   relative tolerance parameter for convergence
        * @param max_iterations  max number of iterations to run algorithm
        */
-      void do_robbins_monro_adagrad( vb_params_meanfield& musigmatilde,
+      void do_robbins_monro_adagrad( advi_params_meanfield& musigmatilde,
                                      double tol_rel_obj,
                                      int max_iterations ) {
 
@@ -536,13 +538,13 @@ namespace stan {
 
       void run_fullrank(double tol_rel_obj, int max_iterations) {
         std::cout
-        << "This is base_vb::bbvb::run_fullrank()" << std::endl;
+        << "This is stan::variational::advi::run_fullrank()" << std::endl;
 
         // Initialize variational parameters: mu, L
         Eigen::VectorXd mu = cont_params_;
         Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(),
                                                        model_.num_params_r());
-        vb_params_fullrank muL = vb_params_fullrank(mu,L);
+        advi_params_fullrank muL = advi_params_fullrank(mu,L);
 
         // Robbins Monro ADAgrad
         do_robbins_monro_adagrad(muL, tol_rel_obj, max_iterations);
@@ -570,14 +572,14 @@ namespace stan {
 
       void run_meanfield(double tol_rel_obj, int max_iterations) {
         std::cout
-        << "This is base_vb::bbvb::run_meanfield()" << std::endl;
+        << "This is stan::variational::advi::run_meanfield()" << std::endl;
 
         // Initialize variational parameters: mu, sigma_tilde
         Eigen::VectorXd mu           = cont_params_;
         Eigen::MatrixXd sigma_tilde  = Eigen::VectorXd::Constant(
                                                 model_.num_params_r(),
                                                 1.0);
-        vb_params_meanfield musigmatilde = vb_params_meanfield(mu,sigma_tilde);
+        advi_params_meanfield musigmatilde = advi_params_meanfield(mu,sigma_tilde);
 
         // Robbins Monro ADAgrad
         do_robbins_monro_adagrad(musigmatilde, tol_rel_obj, max_iterations);
@@ -640,7 +642,7 @@ namespace stan {
 
     };
 
-  } // vb
+  } // variational
 
 } // stan
 

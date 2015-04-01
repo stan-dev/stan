@@ -27,7 +27,7 @@
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/bfgs.hpp>
 
-#include <stan/vb/bbvb.hpp>
+#include <stan/variational/advi.hpp>
 
 #include <stan/services/diagnose.hpp>
 #include <stan/services/init.hpp>
@@ -705,15 +705,16 @@ namespace stan {
             (*output_stream) << 0 << "," ;
           }
 
-          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params,
-                                              elbo, grad_samples, elbo_samples,
-                                              eta_stepsize,
-                                              base_rng,
-                                              output_stream,
-                                              refresh, diagnostic_stream);
-          cmd_vb.run_fullrank(tol_rel_obj, max_iterations);
+          stan::variational::advi<Model, rng_t>
+            cmd_advi(model, cont_params,
+                     elbo, grad_samples, elbo_samples,
+                     eta_stepsize,
+                     base_rng,
+                     output_stream,
+                     refresh, diagnostic_stream);
+          cmd_advi.run_fullrank(tol_rel_obj, max_iterations);
 
-          cont_params = cmd_vb.cont_params();
+          cont_params = cmd_advi.cont_params();
 
           std::vector<double> cont_vector(cont_params.size());
           for (int i = 0; i < cont_params.size(); ++i)
@@ -744,15 +745,16 @@ namespace stan {
             (*output_stream) << 0 << "," ;
           }
 
-          stan::vb::bbvb<Model, rng_t> cmd_vb(model, cont_params,
-                                              elbo, grad_samples, elbo_samples,
-                                              eta_stepsize,
-                                              base_rng,
-                                              output_stream,
-                                              refresh, diagnostic_stream);
-          cmd_vb.run_meanfield(tol_rel_obj, max_iterations);
+          stan::variational::advi<Model, rng_t>
+            cmd_advi(model, cont_params,
+                     elbo, grad_samples, elbo_samples,
+                     eta_stepsize,
+                     base_rng,
+                     output_stream,
+                     refresh, diagnostic_stream);
+          cmd_advi.run_meanfield(tol_rel_obj, max_iterations);
 
-          cont_params = cmd_vb.cont_params();
+          cont_params = cmd_advi.cont_params();
 
           std::vector<double> cont_vector(cont_params.size());
           for (int i = 0; i < cont_params.size(); ++i)
