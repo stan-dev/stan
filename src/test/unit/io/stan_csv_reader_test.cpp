@@ -46,11 +46,11 @@ public:
 
 TEST_F(StanIoStanCsvReader,read_metadata1) {
   stan::io::stan_csv_metadata metadata;
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_metadata(metadata1_stream, metadata));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_metadata(metadata1_stream, metadata, std::cout));
   
-  EXPECT_EQ(1, metadata.stan_version_major);
-  EXPECT_EQ(3, metadata.stan_version_minor);
-  EXPECT_EQ(0, metadata.stan_version_patch);
+  EXPECT_EQ(2, metadata.stan_version_major);
+  EXPECT_EQ(6, metadata.stan_version_minor);
+  EXPECT_EQ(3, metadata.stan_version_patch);
   
   EXPECT_EQ("blocker_model", metadata.model);
   EXPECT_EQ("src/models/bugs_examples/vol1/blocker/blocker.data.R", metadata.data);
@@ -68,7 +68,7 @@ TEST_F(StanIoStanCsvReader,read_metadata1) {
 }
 TEST_F(StanIoStanCsvReader,read_header1) {
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> header;
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header1_stream, header));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header1_stream, header, std::cout));
   
   ASSERT_EQ(52, header.size());
   EXPECT_EQ("lp__", header(0));
@@ -128,7 +128,7 @@ TEST_F(StanIoStanCsvReader,read_header1) {
 
 TEST_F(StanIoStanCsvReader,read_adaptation1) {
   stan::io::stan_csv_adaptation adaptation;
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_adaptation(adaptation1_stream, adaptation));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_adaptation(adaptation1_stream, adaptation, std::cout));
   
   EXPECT_FLOAT_EQ(0.311368, adaptation.step_size);
   ASSERT_EQ(47, adaptation.metric.size());
@@ -186,7 +186,7 @@ TEST_F(StanIoStanCsvReader,read_samples1) {
   Eigen::MatrixXd samples;
   stan::io::stan_csv_timing timing;
   
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples1_stream, samples, timing));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples1_stream, samples, timing, std::cout));
   
   ASSERT_EQ(5, samples.rows());
   ASSERT_EQ(52, samples.cols());
@@ -211,12 +211,12 @@ TEST_F(StanIoStanCsvReader,read_samples1) {
 TEST_F(StanIoStanCsvReader,ParseBlocker) {
   
   stan::io::stan_csv blocker0;
-  blocker0 = stan::io::stan_csv_reader::parse(blocker0_stream);
+  blocker0 = stan::io::stan_csv_reader::parse(blocker0_stream, std::cout);
   
   // metadata
-  EXPECT_EQ(1, blocker0.metadata.stan_version_major);
-  EXPECT_EQ(3, blocker0.metadata.stan_version_minor);
-  EXPECT_EQ(0, blocker0.metadata.stan_version_patch);
+  EXPECT_EQ(2, blocker0.metadata.stan_version_major);
+  EXPECT_EQ(6, blocker0.metadata.stan_version_minor);
+  EXPECT_EQ(3, blocker0.metadata.stan_version_patch);
   
   EXPECT_EQ("blocker_model", blocker0.metadata.model);
   EXPECT_EQ("src/models/bugs_examples/vol1/blocker/blocker.data.R", blocker0.metadata.data);
@@ -362,11 +362,11 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
 
 TEST_F(StanIoStanCsvReader,read_metadata2) {
   stan::io::stan_csv_metadata metadata;
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_metadata(metadata2_stream, metadata));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_metadata(metadata2_stream, metadata, std::cout));
   
-  EXPECT_EQ(1, metadata.stan_version_major);
-  EXPECT_EQ(3, metadata.stan_version_minor);
-  EXPECT_EQ(0, metadata.stan_version_patch);
+  EXPECT_EQ(2, metadata.stan_version_major);
+  EXPECT_EQ(6, metadata.stan_version_minor);
+  EXPECT_EQ(3, metadata.stan_version_patch);
   
   EXPECT_EQ("src/models/bugs_examples/vol1/epil/epil.data.R", metadata.data);
   EXPECT_EQ("2", metadata.init);
@@ -384,7 +384,7 @@ TEST_F(StanIoStanCsvReader,read_metadata2) {
 
 TEST_F(StanIoStanCsvReader,read_header2) {
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> header;
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header2_stream, header));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header2_stream, header, std::cout));
   
   ASSERT_EQ(310, header.size());
   EXPECT_EQ("lp__", header(0));
@@ -416,7 +416,7 @@ TEST_F(StanIoStanCsvReader,read_header2) {
 
 TEST_F(StanIoStanCsvReader,read_adaptation2) {
   stan::io::stan_csv_adaptation adaptation;
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_adaptation(adaptation2_stream, adaptation));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_adaptation(adaptation2_stream, adaptation, std::cout));
   
   EXPECT_FLOAT_EQ(0.0822187, adaptation.step_size);
   ASSERT_EQ(303, adaptation.metric.size());
@@ -432,7 +432,7 @@ TEST_F(StanIoStanCsvReader,read_samples2) {
   Eigen::MatrixXd samples;
   stan::io::stan_csv_timing timing;
   
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples2_stream, samples, timing));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples2_stream, samples, timing, std::cout));
   
   ASSERT_EQ(3, samples.rows());
   ASSERT_EQ(310, samples.cols());
@@ -454,12 +454,12 @@ TEST_F(StanIoStanCsvReader,read_samples2) {
 
 TEST_F(StanIoStanCsvReader,ParseEpil) {
   stan::io::stan_csv epil0;
-  epil0 = stan::io::stan_csv_reader::parse(epil0_stream);
+  epil0 = stan::io::stan_csv_reader::parse(epil0_stream, std::cout);
   
   // metadata
-  EXPECT_EQ(1, epil0.metadata.stan_version_major);
-  EXPECT_EQ(3, epil0.metadata.stan_version_minor);
-  EXPECT_EQ(0, epil0.metadata.stan_version_patch);
+  EXPECT_EQ(2, epil0.metadata.stan_version_major);
+  EXPECT_EQ(6, epil0.metadata.stan_version_minor);
+  EXPECT_EQ(3, epil0.metadata.stan_version_patch);
   
   EXPECT_EQ("src/models/bugs_examples/vol1/epil/epil.data.R", epil0.metadata.data);
   EXPECT_EQ("2", epil0.metadata.init);
@@ -529,12 +529,12 @@ TEST_F(StanIoStanCsvReader,ParseEpil) {
 
 TEST_F(StanIoStanCsvReader,ParseBlockerNondiag) {
   stan::io::stan_csv blocker_nondiag;
-  blocker_nondiag = stan::io::stan_csv_reader::parse(blocker_nondiag0_stream);
+  blocker_nondiag = stan::io::stan_csv_reader::parse(blocker_nondiag0_stream, std::cout);
   
   // metadata
-  EXPECT_EQ(1, blocker_nondiag.metadata.stan_version_major);
-  EXPECT_EQ(3, blocker_nondiag.metadata.stan_version_minor);
-  EXPECT_EQ(0, blocker_nondiag.metadata.stan_version_patch);
+  EXPECT_EQ(2, blocker_nondiag.metadata.stan_version_major);
+  EXPECT_EQ(6, blocker_nondiag.metadata.stan_version_minor);
+  EXPECT_EQ(3, blocker_nondiag.metadata.stan_version_patch);
   
   EXPECT_EQ("src/models/bugs_examples/vol1/blocker/blocker.data.R", blocker_nondiag.metadata.data);
   EXPECT_EQ("src/models/bugs_examples/vol1/blocker/blocker.init.R", blocker_nondiag.metadata.init);

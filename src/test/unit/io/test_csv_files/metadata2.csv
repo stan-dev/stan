@@ -1,6 +1,6 @@
-# stan_version_major = 1
-# stan_version_minor = 3
-# stan_version_patch = 0
+# stan_version_major = 2
+# stan_version_minor = 6
+# stan_version_patch = 3
 # model = epil_model
 # method = sample (Default)
 #   sample
