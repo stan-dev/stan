@@ -22,7 +22,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T>::type
     Phi_approx(T x) {
       using std::pow;
-      return inv_logit(0.07056 * pow(x,3.0) + 1.5976 * x);
+      return inv_logit(0.07056 * pow(x, 3.0) + 1.5976 * x);
     }
 
   }

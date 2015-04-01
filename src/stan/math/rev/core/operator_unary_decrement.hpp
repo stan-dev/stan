@@ -4,14 +4,15 @@
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/v_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <limits>
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class decrement_vari : public op_v_vari {
       public:
-        decrement_vari(vari* avi) :
+        explicit decrement_vari(vari* avi) :
           op_v_vari(avi->val_ - 1.0, avi) {
         }
         void chain() {
@@ -24,9 +25,9 @@ namespace stan {
     }
 
     /**
-     * Prefix decrement operator for variables (C++).  
+     * Prefix decrement operator for variables (C++).
      *
-     * Following C++, <code>(--a)</code> is defined to behave exactly as 
+     * Following C++, <code>(--a)</code> is defined to behave exactly as
      *
      * <code>a = a - 1.0)</code>
      *
@@ -42,22 +43,22 @@ namespace stan {
     }
 
     /**
-     * Postfix decrement operator for variables (C++).  
-     * 
+     * Postfix decrement operator for variables (C++).
+     *
      * Following C++, the expression <code>(a--)</code> is defined to
      * behave like the sequence of operations
      *
      * <code>var temp = a;  a = a - 1.0;  return temp;</code>
      *
      * @param a Variable to decrement.
-     * @return Input variable. 
+     * @return Input variable.
      */
     inline var operator--(var& a, int /*dummy*/) {
       var temp(a);
       a.vi_ = new decrement_vari(a.vi_);
       return temp;
     }
-    
+
   }
 }
 #endif

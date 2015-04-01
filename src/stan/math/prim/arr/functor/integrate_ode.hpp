@@ -1,10 +1,6 @@
 #ifndef STAN__MATH__PRIM__ARR__FUNCTOR__INTEGRATE_ODE_HPP
 #define STAN__MATH__PRIM__ARR__FUNCTOR__INTEGRATE_ODE_HPP
 
-#include <ostream>
-#include <vector>
-#include <boost/numeric/odeint.hpp>
-
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/err/check_less.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
@@ -13,11 +9,14 @@
 #include <stan/math/prim/scal/meta/return_type.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_observer.hpp>
+#include <boost/numeric/odeint.hpp>
+#include <ostream>
+#include <vector>
 
 namespace stan {
-  
+
   namespace math {
-    
+
     /**
      * Return the solutions for the specified system of ordinary
      * differential equations given the specified initial state,
@@ -52,12 +51,12 @@ namespace stan {
      * @param[in] theta parameter vector for the ODE.
      * @param[in] x continuous data vector for the ODE.
      * @param[in] x_int integer data vector for the ODE.
-     * @param[in,out] msgs the print stream for warning messages.
+     * @param[in, out] msgs the print stream for warning messages.
      * @return a vector of states, each state being a vector of the
      * same size as the state variable, corresponding to a time in ts.
      */
     template <typename F, typename T1, typename T2>
-    std::vector<std::vector<typename stan::return_type<T1,T2>::type> >
+    std::vector<std::vector<typename stan::return_type<T1, T2>::type> >
     integrate_ode(const F& f,
                   const std::vector<T1> y0,
                   const double t0,
@@ -65,11 +64,11 @@ namespace stan {
                   const std::vector<T2>& theta,
                   const std::vector<double>& x,
                   const std::vector<int>& x_int,
-                  std::ostream* msgs) {            
-      using boost::numeric::odeint::integrate_times;  
-      using boost::numeric::odeint::make_dense_output;  
+                  std::ostream* msgs) {
+      using boost::numeric::odeint::integrate_times;
+      using boost::numeric::odeint::make_dense_output;
       using boost::numeric::odeint::runge_kutta_dopri5;
-      
+
       stan::math::check_finite("integrate_ode", "initial state", y0);
       stan::math::check_finite("integrate_ode", "initial time", t0);
       stan::math::check_finite("integrate_ode", "times", ts);
@@ -80,7 +79,7 @@ namespace stan {
       stan::math::check_nonzero_size("integrate_ode", "initial state", y0);
       stan::math::check_ordered("integrate_ode", "times", ts);
       stan::math::check_less("integrate_ode", "initial time", t0, ts[0]);
-      
+
       const double absolute_tolerance = 1e-6;
       const double relative_tolerance = 1e-6;
       const double step_size = 0.1;
@@ -88,20 +87,20 @@ namespace stan {
       // creates basic or coupled system by template specializations
       coupled_ode_system<F, T1, T2>
         coupled_system(f, y0, theta, x, x_int, msgs);
-      
+
       // first time in the vector must be time of initial state
       std::vector<double> ts_vec(ts.size() + 1);
       ts_vec[0] = t0;
       for (size_t n = 0; n < ts.size(); n++)
         ts_vec[n+1] = ts[n];
-      
+
       std::vector<std::vector<double> > y_coupled(ts_vec.size());
       coupled_ode_observer observer(y_coupled);
 
       // the coupled system creates the coupled initial state
-      std::vector<double> initial_coupled_state 
+      std::vector<double> initial_coupled_state
         = coupled_system.initial_state();
-      
+
       integrate_times(make_dense_output(absolute_tolerance,
                                         relative_tolerance,
                                         runge_kutta_dopri5<std::vector<double>,
@@ -110,17 +109,17 @@ namespace stan {
                                                            double>() ),
                       coupled_system,
                       initial_coupled_state,
-                      boost::begin(ts_vec), boost::end(ts_vec), 
+                      boost::begin(ts_vec), boost::end(ts_vec),
                       step_size,
                       observer);
 
       // remove the first state corresponding to the initial value
       y_coupled.erase(y_coupled.begin());
-      
+
       // the coupled system also encapsulates the decoupling operation
       return coupled_system.decouple_states(y_coupled);
     }
-                   
+
   }
 
 }

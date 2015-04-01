@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__REV__MAT__FUN__STAN_PRINT_HPP
 #define STAN__MATH__REV__MAT__FUN__STAN_PRINT_HPP
 
-#include <ostream>
 #include <stan/math/rev/core.hpp>
+#include <ostream>
 
 namespace stan {
   namespace agrad {

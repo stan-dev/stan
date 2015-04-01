@@ -11,7 +11,7 @@ namespace stan {
     /**
      * Returns <code>true</code> if the specified variable is
      * uninitialized.
-     * 
+     *
      * This overload of the
      * <code>stan::math::is_uninitialized()</code> function delegates
      * the return to the <code>is_uninitialized()</code> method on the

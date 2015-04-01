@@ -14,8 +14,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    diag_matrix(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
+    diag_matrix(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
       return v.asDiagonal();
     }
 

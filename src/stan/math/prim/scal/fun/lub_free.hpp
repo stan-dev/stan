@@ -5,9 +5,10 @@
 #include <stan/math/prim/scal/fun/logit.hpp>
 #include <stan/math/prim/scal/fun/lb_free.hpp>
 #include <stan/math/prim/scal/fun/ub_free.hpp>
+#include <limits>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -15,7 +16,7 @@ namespace stan {
      * specified lower- and upper-bounded scalar given the specified
      * bounds.
      *
-     * <p>The transfrom in <code>lub_constrain(T,double,double)</code>, 
+     * <p>The transfrom in <code>lub_constrain(T, double, double)</code>,
      * is reversed by a transformed and scaled logit,
      *
      * <p>\f$f^{-1}(y) = \mbox{logit}(\frac{y - L}{U - L})\f$
@@ -23,11 +24,11 @@ namespace stan {
      * where \f$U\f$ and \f$L\f$ are the lower and upper bounds.
      *
      * <p>If the lower bound is negative infinity and upper bound finite,
-     * this function reduces to <code>ub_free(y,ub)</code>.  If
+     * this function reduces to <code>ub_free(y, ub)</code>.  If
      * the upper bound is positive infinity and the lower bound
      * finite, this function reduces to
-     * <code>lb_free(x,lb)</code>.  If the upper bound is
-     * positive infinity and the lower bound negative infinity, 
+     * <code>lb_free(x, lb)</code>.  If the upper bound is
+     * positive infinity and the lower bound negative infinity,
      * this function reduces to <code>identity_free(y)</code>.
      *
      * @tparam T Type of scalar.
@@ -42,7 +43,7 @@ namespace stan {
      */
     template <typename T, typename TL, typename TU>
     inline
-    typename boost::math::tools::promote_args<T,TL,TU>::type
+    typename boost::math::tools::promote_args<T, TL, TU>::type
     lub_free(const T y, TL lb, TU ub) {
       using stan::math::logit;
       stan::math::check_bounded<T, TL, TU>
@@ -50,9 +51,9 @@ namespace stan {
          "Bounded variable",
          y, lb, ub);
       if (lb == -std::numeric_limits<double>::infinity())
-        return ub_free(y,ub);
+        return ub_free(y, ub);
       if (ub == std::numeric_limits<double>::infinity())
-        return lb_free(y,lb);
+        return lb_free(y, lb);
       return logit((y - lb) / (ub - lb));
     }
 

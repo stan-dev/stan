@@ -15,12 +15,13 @@ namespace stan {
     struct scalar_type_helper {
       typedef T type;
     };
-    
-    template <typename T> 
+
+    template <typename T>
     struct scalar_type_helper<true, T> {
-      typedef typename 
-      scalar_type_helper<is_vector<typename stan::math::value_type<T>::type>::value, 
-                         typename stan::math::value_type<T>::type>::type 
+      typedef typename
+      scalar_type_helper<is_vector<typename
+                                   stan::math::value_type<T>::type>::value,
+                         typename stan::math::value_type<T>::type>::type
       type;
     };
   }
@@ -39,7 +40,7 @@ namespace stan {
 
   // ****************** additions for new VV *************************
   template <typename T>
-  struct scalar_type<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > {
+  struct scalar_type<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > {
     typedef typename scalar_type<T>::type type;
   };
 

@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__DIMS_HPP
 #define STAN__MATH__PRIM__MAT__FUN__DIMS_HPP
 
-#include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <vector>
 
 namespace stan {
   namespace math {
@@ -15,7 +15,7 @@ namespace stan {
     }
     template <typename T, int R, int C>
     inline void
-    dims(const Eigen::Matrix<T,R,C>& x,
+    dims(const Eigen::Matrix<T, R, C>& x,
          std::vector<int>& result) {
       result.push_back(x.rows());
       result.push_back(x.cols());
@@ -26,14 +26,14 @@ namespace stan {
          std::vector<int>& result) {
       result.push_back(x.size());
       if (x.size() > 0)
-        dims(x[0],result);
+        dims(x[0], result);
     }
 
     template <typename T>
     inline std::vector<int>
     dims(const T& x) {
       std::vector<int> result;
-      dims(x,result);
+      dims(x, result);
       return result;
     }
 

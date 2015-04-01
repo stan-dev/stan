@@ -14,11 +14,11 @@ namespace stan {
     return 1U;
   }
   template <typename T, int R, int C>
-  size_t length_mvt(const Eigen::Matrix<T,R,C>& ) {
+  size_t length_mvt(const Eigen::Matrix<T, R, C>& ) {
     return 1U;
   }
   template <typename T, int R, int C>
-  size_t length_mvt(const std::vector<Eigen::Matrix<T,R,C> >& x) {
+  size_t length_mvt(const std::vector<Eigen::Matrix<T, R, C> >& x) {
     return x.size();
   }
 

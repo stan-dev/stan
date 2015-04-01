@@ -13,8 +13,8 @@
 #include <stan/math/prim/scal/prob/uniform_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
-namespace stan { 
-  
+namespace stan {
+
   namespace prob {
 
     // The algorithm used in von_mises_rng is a modified version of the
@@ -22,8 +22,9 @@ namespace stan {
     //
     // Efficient Simulation of the von Mises Distribution
     // D. J. Best and N. I. Fisher
-    // Journal of the Royal Statistical Society. Series C (Applied Statistics), Vol. 28, No. 2 (1979), pp. 152-157
-    // 
+    // Journal of the Royal Statistical Society. Series C (Applied Statistics),
+    // Vol. 28, No. 2 (1979), pp. 152-157
+    //
     // See licenses/stan-license.txt for Stan license.
 
     template <class RNG>
@@ -51,8 +52,8 @@ namespace stan {
         double Y = kappa * (s - W);
         double U2 = uniform_rng(0.0, 1.0, rng);
         done = Y * (2 - Y) - U2 > 0;
-        
-        if(!done)
+
+        if (!done)
           done = log(Y / U2) + 1 - Y >= 0;
       }
 
@@ -60,9 +61,11 @@ namespace stan {
       double sign = ((U3 >= 0) - (U3 <= 0));
 
       //  it's really an fmod() with a positivity constraint
-      return sign * std::acos(W) + fmod(fmod(mu,2*stan::math::pi())+2*stan::math::pi(),2*stan::math::pi());
+      return sign * std::acos(W)
+        + fmod(fmod(mu, 2*stan::math::pi())+2*stan::math::pi(),
+               2*stan::math::pi());
     }
 
-  } 
+  }
 }
 #endif

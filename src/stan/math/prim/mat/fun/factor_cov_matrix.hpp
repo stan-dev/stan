@@ -7,7 +7,7 @@
 
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -24,28 +24,28 @@ namespace stan {
      */
     template<typename T>
     bool
-    factor_cov_matrix(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                      Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
-                      Eigen::Array<T,Eigen::Dynamic,1>& sds) {
-
+    factor_cov_matrix(const Eigen::Matrix
+                      <T, Eigen::Dynamic, Eigen::Dynamic>& Sigma,
+                      Eigen::Array<T, Eigen::Dynamic, 1>& CPCs,
+                      Eigen::Array<T, Eigen::Dynamic, 1>& sds) {
       size_t K = sds.rows();
 
       sds = Sigma.diagonal().array();
-      if( (sds <= 0.0).any() ) return false;
+      if ( (sds <= 0.0).any() ) return false;
       sds = sds.sqrt();
 
-      Eigen::DiagonalMatrix<T,Eigen::Dynamic> D(K);
+      Eigen::DiagonalMatrix<T, Eigen::Dynamic> D(K);
       D.diagonal() = sds.inverse();
-      sds = sds.log(); // now unbounded
+      sds = sds.log();  // now unbounded
 
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> R = D * Sigma * D;
+      Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> R = D * Sigma * D;
       // to hopefully prevent pivoting due to floating point error
-      R.diagonal().setOnes(); 
-      Eigen::LDLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > ldlt;
+      R.diagonal().setOnes();
+      Eigen::LDLT<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > ldlt;
       ldlt = R.ldlt();
-      if (!ldlt.isPositive()) 
+      if (!ldlt.isPositive())
         return false;
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> U = ldlt.matrixU();
+      Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> U = ldlt.matrixU();
       factor_U(U, CPCs);
       return true;
     }

@@ -10,14 +10,14 @@ namespace stan {
   namespace math {
 
     template <typename T>
-    inline 
+    inline
     Eigen::Matrix<typename boost::math::tools::promote_args<T>::type,
-                  Eigen::Dynamic,1>
+                  Eigen::Dynamic, 1>
     rep_vector(const T& x, int n) {
       using stan::math::check_nonnegative;
       check_nonnegative("rep_vector", "n", n);
       return Eigen::Matrix<typename boost::math::tools::promote_args<T>::type,
-                           Eigen::Dynamic,1>::Constant(n,x);
+                           Eigen::Dynamic, 1>::Constant(n, x);
     }
 
 

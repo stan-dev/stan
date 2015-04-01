@@ -142,7 +142,7 @@ namespace stan {
           //                 typename value_type<T_loc>::type,
           //                 typename value_type<T_y>::type>::type>::type,
           //               Dynamic, 1>
-          //   half(mdivide_left_tri_low(L,subtract(y,mu)));
+          //   half(mdivide_left_tri_low(L, subtract(y, mu)));
           sum_lp_vec += dot_self(half);
         }
         lp -= 0.5*sum_lp_vec;

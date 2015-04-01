@@ -10,7 +10,7 @@ namespace stan {
      * Inequality operator comparing two variables' values (C++).
      *
        \f[
-       \mbox{operator!=}(x,y) = 
+       \mbox{operator!=}(x, y) =
        \begin{cases}
          0 & \mbox{if } x = y\\
          1 & \mbox{if } x \neq y \\[6pt]
@@ -18,8 +18,8 @@ namespace stan {
        \end{cases}
        \f]
      *
-     * @param a First variable.  
-     * @param b Second variable. 
+     * @param a First variable.
+     * @param b Second variable.
      * @return True if the first variable's value is not the same as the
      * second's.
      */
@@ -31,7 +31,7 @@ namespace stan {
      * Inequality operator comparing a variable's value and a double
      * (C++).
      *
-     * @param a First variable.  
+     * @param a First variable.
      * @param b Second value.
      * @return True if the first variable's value is not the same as the
      * second value.
@@ -45,7 +45,7 @@ namespace stan {
      * (C++).
      *
      * @param a First value.
-     * @param b Second variable. 
+     * @param b Second variable.
      * @return True if the first value is not the same as the
      * second variable's value.
      */

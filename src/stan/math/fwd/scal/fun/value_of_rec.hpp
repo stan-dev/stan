@@ -8,7 +8,7 @@ namespace stan {
   namespace agrad {
 
     /**
-     * Return the value of the specified variable.  
+     * Return the value of the specified variable.
      *
      * T must implement value_of_rec.
      *
@@ -23,7 +23,7 @@ namespace stan {
       return value_of_rec(v.val_);
     }
 
-    
+
   }
 }
 #endif

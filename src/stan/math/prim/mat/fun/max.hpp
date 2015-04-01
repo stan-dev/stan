@@ -1,13 +1,15 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__MAX_HPP
 #define STAN__MATH__PRIM__MAT__FUN__MAX_HPP
 
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <algorithm>
+#include <limits>
 #include <stdexcept>
 #include <vector>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the maximum coefficient in the specified
      * column vector.
@@ -21,7 +23,7 @@ namespace stan {
         throw std::domain_error("error: cannot take max of empty int vector");
       int max = x[0];
       for (size_t i = 1; i < x.size(); ++i)
-        if (x[i] > max) 
+        if (x[i] > max)
           max = x[i];
       return max;
     }
@@ -39,7 +41,7 @@ namespace stan {
         return -std::numeric_limits<T>::infinity();
       T max = x[0];
       for (size_t i = 1; i < x.size(); ++i)
-        if (x[i] > max) 
+        if (x[i] > max)
           max = x[i];
       return max;
     }
@@ -51,12 +53,12 @@ namespace stan {
      * @return Maximum coefficient value in the vector.
      */
     template <typename T, int R, int C>
-    inline T max(const Eigen::Matrix<T,R,C>& m) {
+    inline T max(const Eigen::Matrix<T, R, C>& m) {
       if (m.size() == 0)
         return -std::numeric_limits<double>::infinity();
       return m.maxCoeff();
     }
-    
+
   }
 }
 #endif

@@ -21,6 +21,7 @@
 #include <stan/math/prim/scal/prob/neg_binomial_ccdf_log.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+#include <vector>
 
 namespace stan {
 
@@ -35,13 +36,13 @@ namespace stan {
                             const T_precision& phi) {
       if ( !( stan::length(n) && stan::length(mu) && stan::length(phi) ) )
         return 0.0;
-      
+
       using stan::math::check_nonnegative;
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_less;
-      
+
       static const char* function("stan::prob::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
@@ -50,14 +51,15 @@ namespace stan {
                              "Random variable", n,
                              "Location parameter", mu,
                              "Precision Parameter", phi);
-      
+
       VectorView<const T_n> n_vec(n);
       VectorView<const T_location> mu_vec(mu);
       VectorView<const T_precision> phi_vec(phi);
-      
+
       size_t size_beta = max_size(mu, phi);
-      
-      std::vector<typename return_type<T_location, T_precision>::type> beta_vec(size_beta);
+
+      std::vector<typename return_type<T_location, T_precision>::type>
+        beta_vec(size_beta);
       for (size_t i = 0; i < size_beta; ++i)
         beta_vec[i] = phi_vec[i] / mu_vec[i];
 
@@ -67,7 +69,6 @@ namespace stan {
         return neg_binomial_ccdf_log(n, phi, beta_vec[0]);
       else
         return neg_binomial_ccdf_log(n, phi, beta_vec);
-      
     }
   }
 }

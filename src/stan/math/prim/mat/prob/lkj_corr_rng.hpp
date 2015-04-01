@@ -54,15 +54,15 @@ namespace stan {
     lkj_corr_rng(const size_t K,
                  const double eta,
                  RNG& rng) {
-
       static const char* function("stan::prob::lkj_corr_rng");
 
       using stan::math::check_positive;
-      
+
       check_positive(function, "Shape parameter", eta);
 
       using stan::math::multiply_lower_tri_self_transpose;
-      return multiply_lower_tri_self_transpose(lkj_corr_cholesky_rng(K, eta, rng));
+      return multiply_lower_tri_self_transpose(lkj_corr_cholesky_rng(K, eta,
+                                                                     rng));
     }
 
   }
