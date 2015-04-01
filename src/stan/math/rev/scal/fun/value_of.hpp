@@ -7,7 +7,7 @@ namespace stan {
   namespace agrad {
 
     /**
-     * Return the value of the specified variable.  
+     * Return the value of the specified variable.
      *
      * <p>This function is used internally by auto-dif functions along
      * with <code>stan::math::value_of(T x)</code> to extract the
@@ -22,7 +22,7 @@ namespace stan {
     inline double value_of(const agrad::var& v) {
       return v.vi_->val_;
     }
-    
+
   }
 }
 #endif

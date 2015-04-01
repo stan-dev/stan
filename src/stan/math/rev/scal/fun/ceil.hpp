@@ -5,6 +5,7 @@
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/meta/likely.hpp>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -12,8 +13,8 @@ namespace stan {
     namespace {
       class ceil_vari : public op_v_vari {
       public:
-        ceil_vari(vari* avi) :
-          op_v_vari(::ceil(avi->val_),avi) {
+        explicit ceil_vari(vari* avi) :
+          op_v_vari(::ceil(avi->val_), avi) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)))
@@ -21,13 +22,13 @@ namespace stan {
         }
       };
     }
-    
+
     /**
      * Return the ceiling of the specified variable (cmath).
      *
      * The derivative of the ceiling function is defined and
      * zero everywhere but at integers, and we set them to zero for
-     * convenience, 
+     * convenience,
      *
      * \f$\frac{d}{dx} {\lceil x \rceil} = 0\f$.
      *
@@ -38,15 +39,15 @@ namespace stan {
      * as zero everywhere.
      *
        \f[
-       \mbox{ceil}(x) = 
+       \mbox{ceil}(x) =
        \begin{cases}
          \lceil x\rceil & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{ceil}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{ceil}(x)}{\partial x} =
        \begin{cases}
          0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

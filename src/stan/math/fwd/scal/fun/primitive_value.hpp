@@ -23,7 +23,7 @@ namespace stan {
       using stan::math::primitive_value;
       return primitive_value(v.val_);
     }
-    
+
 
   }
 

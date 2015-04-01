@@ -26,7 +26,7 @@ namespace stan {
                       const double alpha,
                       RNG& rng) {
       static const char* function("stan::prob::pareto_type_2_rng");
-      
+
       stan::math::check_positive(function, "scale parameter", lambda);
 
       double uniform_01 = stan::prob::uniform_rng(0.0, 1.0, rng);

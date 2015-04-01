@@ -12,20 +12,19 @@ namespace stan {
     /**
      * Compute trace(D B^T A B).
      **/
-    template<int RD,int CD,int RA,int CA,int RB,int CB>
+    template<int RD, int CD, int RA, int CA, int RB, int CB>
     inline double
-    trace_gen_quad_form(const Eigen::Matrix<double,RD,CD> &D,
-                        const Eigen::Matrix<double,RA,CA> &A,
-                        const Eigen::Matrix<double,RB,CB> &B)
-    {
+    trace_gen_quad_form(const Eigen::Matrix<double, RD, CD> &D,
+                        const Eigen::Matrix<double, RA, CA> &A,
+                        const Eigen::Matrix<double, RB, CB> &B) {
       stan::math::check_square("trace_gen_quad_form", "A", A);
       stan::math::check_square("trace_gen_quad_form", "D", D);
       stan::math::check_multiplicable("trace_gen_quad_form",
-                                                "A", A,
-                                                "B", B);
+                                      "A", A,
+                                      "B", B);
       stan::math::check_multiplicable("trace_gen_quad_form",
-                                                "B", B,
-                                                "D", D);
+                                      "B", B,
+                                      "D", D);
       return (D*B.transpose()*A*B).trace();
     }
   }

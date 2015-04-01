@@ -6,9 +6,9 @@
 #include <stan/math/prim/scal/fun/log_diff_exp.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T> inline fvar<T>
     log_diff_exp(const fvar<T>& x1, const fvar<T>& x2) {
@@ -18,7 +18,8 @@ namespace stan{
        if (x1.val_ <= x2.val_)
          return fvar<T>(NOT_A_NUMBER, NOT_A_NUMBER);
        return fvar<T>(log_diff_exp(x1.val_, x2.val_),
-        x1.d_ / (1 - exp(x2.val_ - x1.val_) ) + x2.d_ / (1 - exp(x1.val_ - x2.val_) ) );
+                      x1.d_ / (1 - exp(x2.val_ - x1.val_))
+                      + x2.d_ / (1 - exp(x1.val_ - x2.val_)));
     }
 
     template <typename T1, typename T2> inline fvar<T2>

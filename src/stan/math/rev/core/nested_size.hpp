@@ -10,7 +10,8 @@ namespace stan {
   namespace agrad {
 
     static inline size_t nested_size() {
-      return ChainableStack::var_stack_.size() - ChainableStack::nested_var_stack_sizes_.back();
+      return ChainableStack::var_stack_.size()
+        - ChainableStack::nested_var_stack_sizes_.back();
     }
 
   }

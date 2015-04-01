@@ -18,10 +18,10 @@ namespace stan {
      */
     template <typename T, int R, int C>
     struct index_type<Eigen::Matrix<T, R, C> > {
-      typedef typename Eigen::Matrix<T,R,C>::Index type;
+      typedef typename Eigen::Matrix<T, R, C>::Index type;
     };
 
-    
+
   }
 
 }

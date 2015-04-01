@@ -19,11 +19,13 @@ namespace stan {
      * @throw std::domain_error if m is not a symmetric matrix.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    cholesky_decompose(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
+    cholesky_decompose(const Eigen::Matrix
+                       <T, Eigen::Dynamic, Eigen::Dynamic>& m) {
       stan::math::check_square("cholesky_decompose", "m", m);
       stan::math::check_symmetric("cholesky_decompose", "m", m);
-      Eigen::LLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >llt(m.rows());
+      Eigen::LLT<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >
+        llt(m.rows());
       llt.compute(m);
       return llt.matrixL();
     }

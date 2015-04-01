@@ -13,12 +13,12 @@ namespace stan {
      * The log loss function for prediction \f$\hat{y} \in [0, 1]\f$
      * given outcome \f$y \in \{ 0, 1 \}\f$ is
      *
-     * \f$\mbox{logloss}(1,\hat{y}) = -\log \hat{y} \f$, and
+     * \f$\mbox{logloss}(1, \hat{y}) = -\log \hat{y} \f$, and
      *
-     * \f$\mbox{logloss}(0,\hat{y}) = -\log (1 - \hat{y}) \f$.
+     * \f$\mbox{logloss}(0, \hat{y}) = -\log (1 - \hat{y}) \f$.
      *
      * @param y Reference value in { 0 , 1 }.
-     * @param y_hat Response value in [0,1].
+     * @param y_hat Response value in [0, 1].
      * @return Log loss for response given reference value.
      */
     template <typename T>

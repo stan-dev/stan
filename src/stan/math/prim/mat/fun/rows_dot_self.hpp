@@ -5,18 +5,18 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the dot product of each row of a matrix with itself.
      * @param x Matrix.
      * @tparam T scalar type
      */
-    template<typename T,int R,int C>
-    inline Eigen::Matrix<T,R,1> 
-    rows_dot_self(const Eigen::Matrix<T,R,C>& x) {
+    template<typename T, int R, int C>
+    inline Eigen::Matrix<T, R, 1>
+    rows_dot_self(const Eigen::Matrix<T, R, C>& x) {
       return x.rowwise().squaredNorm();
     }
-    
+
   }
 }
 #endif

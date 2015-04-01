@@ -17,7 +17,7 @@ namespace stan {
      * @return <code>1</code> if the value is infinite and <code>0</code> otherwise.
      */
     template <typename T>
-    inline 
+    inline
     int
     is_inf(const fvar<T>& x) {
       using stan::math::is_inf;

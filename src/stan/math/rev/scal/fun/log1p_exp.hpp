@@ -11,14 +11,14 @@ namespace stan {
     namespace {
       class log1p_exp_v_vari : public op_v_vari {
       public:
-        log1p_exp_v_vari(vari* avi) :
+        explicit log1p_exp_v_vari(vari* avi) :
           op_v_vari(stan::math::log1p_exp(avi->val_),
                     avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * calculate_chain(avi_->val_, val_);
         }
-      };      
+      };
     }
 
     /**

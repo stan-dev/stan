@@ -23,10 +23,10 @@ namespace stan {
   namespace prob {
 
     template <typename T_y, typename T_scale>
-    typename return_type<T_y,T_scale>::type
+    typename return_type<T_y, T_scale>::type
     rayleigh_ccdf_log(const T_y& y, const T_scale& sigma) {
       static const char* function("stan::prob::rayleigh_ccdf_log");
-      typedef typename stan::partials_return_type<T_y,T_scale>::type
+      typedef typename stan::partials_return_type<T_y, T_scale>::type
         T_partials_return;
 
       using stan::math::check_nonnegative;
@@ -59,7 +59,7 @@ namespace stan {
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
-      
+
       VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
@@ -70,7 +70,7 @@ namespace stan {
         const T_partials_return y_sqr = y_dbl * y_dbl;
         const T_partials_return inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
 
-        if (include_summand<false,T_y,T_scale>::value)
+        if (include_summand<false, T_y, T_scale>::value)
           ccdf_log += -0.5 * y_sqr * inv_sigma_sqr;
 
         if (!is_constant_struct<T_y>::value)
@@ -80,7 +80,7 @@ namespace stan {
             * inv_sigma[n];
       }
 
-      return operands_and_partials.to_var(ccdf_log,y,sigma);
+      return operands_and_partials.to_var(ccdf_log, y, sigma);
     }
   }
 }

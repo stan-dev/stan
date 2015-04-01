@@ -14,13 +14,13 @@ namespace stan {
       double db_;
       double dc_;
     public:
-      precomp_vvv_vari(double val, 
+      precomp_vvv_vari(double val,
                        vari* avi, vari* bvi, vari* cvi,
                        double da, double db, double dc)
-        : op_vvv_vari(val,avi,bvi,cvi),
+        : op_vvv_vari(val, avi, bvi, cvi),
           da_(da),
           db_(db),
-          dc_(dc) { 
+          dc_(dc) {
       }
       void chain() {
         avi_->adj_ += adj_ * da_;

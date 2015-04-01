@@ -10,7 +10,7 @@ namespace stan {
      * Less than operator comparing variables' values (C++).
      *
      \f[
-       \mbox{operator\textless}(x,y) = 
+       \mbox{operator\textless}(x, y) =
        \begin{cases}
          0 & \mbox{if } x \geq y \\
          1 & \mbox{if } x < y \\[6pt]

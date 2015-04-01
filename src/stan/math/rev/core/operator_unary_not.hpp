@@ -5,7 +5,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     /**
      * Prefix logical negation for the value of variables (C++).  The
      * expression (!a) is equivalent to negating the scalar value of
@@ -14,14 +14,14 @@ namespace stan {
      * Note that this is the only logical operator defined for
      * variables.  Overridden logical conjunction (&&) and disjunction
      * (||) operators do not apply the same "short circuit" rules
-     * as the built-in logical operators.  
+     * as the built-in logical operators.
      *
         \f[
-        \mbox{operator!}(x) = 
+        \mbox{operator!}(x) =
         \begin{cases}
           0 & \mbox{if } x \neq 0 \\
           1 & \mbox{if } x = 0 \\[6pt]
-          0 & \mbox{if } x = \textrm{NaN} 
+          0 & \mbox{if } x = \textrm{NaN}
         \end{cases}
         \f]
      *

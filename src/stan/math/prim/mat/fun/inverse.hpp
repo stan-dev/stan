@@ -14,8 +14,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    inverse(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
+    inverse(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
       stan::math::check_square("inverse", "m", m);
       return m.inverse();
     }

@@ -1,12 +1,12 @@
 #ifndef STAN__MATH__REV__MAT__FUN__DOT_SELF_HPP
 #define STAN__MATH__REV__MAT__FUN__DOT_SELF_HPP
 
-#include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/err/check_vector.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/mat/fun/typedefs.hpp>
+#include <vector>
 
 namespace stan {
   namespace agrad {
@@ -16,23 +16,26 @@ namespace stan {
       protected:
         vari** v_;
         size_t size_;
+
       public:
-        dot_self_vari(vari** v, size_t size) 
-          : vari(var_dot_self(v,size)), 
+        dot_self_vari(vari** v, size_t size)
+          : vari(var_dot_self(v, size)),
             v_(v),
             size_(size) {
         }
         template<typename Derived>
-        dot_self_vari(const Eigen::DenseBase<Derived> &v) : 
+        explicit dot_self_vari(const Eigen::DenseBase<Derived> &v) :
           vari(var_dot_self(v)), size_(v.size()) {
-          v_ = (vari**)ChainableStack::memalloc_.alloc(size_*sizeof(vari*));
+          v_ = reinterpret_cast<vari**>(ChainableStack::memalloc_
+                                        .alloc(size_*sizeof(vari*)));
           for (size_t i = 0; i < size_; i++)
             v_[i] = v[i].vi_;
         }
         template <int R, int C>
-        dot_self_vari(const Eigen::Matrix<var,R,C>& v) :
+        explicit dot_self_vari(const Eigen::Matrix<var, R, C>& v) :
           vari(var_dot_self(v)), size_(v.size()) {
-          v_ = (vari**) ChainableStack::memalloc_.alloc(size_ * sizeof(vari*));
+          v_ = reinterpret_cast<vari**>
+            (ChainableStack::memalloc_.alloc(size_ * sizeof(vari*)));
           for (size_t i = 0; i < size_; ++i)
             v_[i] = v(i).vi_;
         }
@@ -51,14 +54,14 @@ namespace stan {
           return sum;
         }
         template <int R, int C>
-        inline static double var_dot_self(const Eigen::Matrix<var,R,C> &v) {
+        inline static double var_dot_self(const Eigen::Matrix<var, R, C> &v) {
           double sum = 0.0;
           for (int i = 0; i < v.size(); ++i)
             sum += square(v(i).vi_->val_);
           return sum;
         }
         virtual void chain() {
-          for (size_t i = 0; i < size_; ++i) 
+          for (size_t i = 0; i < size_; ++i)
             v_[i]->adj_ += adj_ * 2.0 * v_[i]->val_;
         }
       };

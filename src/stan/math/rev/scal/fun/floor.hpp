@@ -5,6 +5,7 @@
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/meta/likely.hpp>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -12,8 +13,8 @@ namespace stan {
     namespace {
       class floor_vari : public op_v_vari {
       public:
-        floor_vari(vari* avi) :
-          op_v_vari(::floor(avi->val_),avi) {
+        explicit floor_vari(vari* avi) :
+          op_v_vari(::floor(avi->val_), avi) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)))
@@ -21,13 +22,13 @@ namespace stan {
         }
       };
     }
-    
+
     /**
-     * Return the floor of the specified variable (cmath).  
+     * Return the floor of the specified variable (cmath).
      *
      * The derivative of the floor function is defined and
      * zero everywhere but at integers, so we set these derivatives
-     * to zero for convenience, 
+     * to zero for convenience,
      *
      * \f$\frac{d}{dx} {\lfloor x \rfloor} = 0\f$.
      *
@@ -36,9 +37,9 @@ namespace stan {
      * Although this function is not differentiable because it is
      * discontinuous at integral values, its gradient is returned as
      * zero everywhere.
-     * 
+     *
        \f[
-       \mbox{floor}(x) = 
+       \mbox{floor}(x) =
        \begin{cases}
          \lfloor x \rfloor & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
@@ -46,7 +47,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{floor}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{floor}(x)}{\partial x} =
        \begin{cases}
          0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

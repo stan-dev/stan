@@ -6,12 +6,12 @@
 
 namespace stan {
   namespace math {
-    
+
     using Eigen::Dynamic;
-    using Eigen::Matrix; 
+    using Eigen::Matrix;
     using std::vector;
-    
-    //real[,] to_array_2d(matrix)
+
+    // real[, ] to_array_2d(matrix)
     template <typename T>
     inline vector< vector<T> >
     to_array_2d(const Matrix<T, Dynamic, Dynamic> & matrix) {
@@ -24,7 +24,7 @@ namespace stan {
           result[j][i] = datap[ij];
       return result;
     }
-    
+
   }
 }
 #endif

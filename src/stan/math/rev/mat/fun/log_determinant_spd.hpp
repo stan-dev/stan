@@ -12,17 +12,17 @@ namespace stan {
   namespace agrad {
 
     template <int R, int C>
-    inline var log_determinant_spd(const Eigen::Matrix<var,R,C>& m) {
+    inline var log_determinant_spd(const Eigen::Matrix<var, R, C>& m) {
       using stan::math::domain_error;
       using Eigen::Matrix;
 
       math::check_square("log_determinant_spd", "m", m);
 
-      Matrix<double,R,C> m_d(m.rows(),m.cols());
+      Matrix<double, R, C> m_d(m.rows(), m.cols());
       for (int i = 0; i < m.size(); ++i)
         m_d(i) = m(i).val();
 
-      Eigen::LDLT<Matrix<double,R,C> > ldlt(m_d);
+      Eigen::LDLT<Matrix<double, R, C> > ldlt(m_d);
       if (ldlt.info() != Eigen::Success) {
         double y = 0;
         domain_error("log_determinant_spd",
@@ -33,7 +33,7 @@ namespace stan {
        // compute the inverse of A (needed for the derivative)
       m_d.setIdentity(m.rows(), m.cols());
       ldlt.solveInPlace(m_d);
-          
+
       if (ldlt.isNegative() || (ldlt.vectorD().array() <= 1e-16).any()) {
         double y = 0;
         domain_error("log_determinant_spd",
@@ -60,9 +60,10 @@ namespace stan {
       for (int i = 0; i < m.size(); ++i)
         gradients[i] = m_d(i);
 
-      return var(new precomputed_gradients_vari(val,m.size(),operands,gradients));
+      return var(new precomputed_gradients_vari(val, m.size(),
+                                                operands, gradients));
     }
-    
+
 
   }
 

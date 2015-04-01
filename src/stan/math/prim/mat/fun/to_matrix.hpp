@@ -2,26 +2,26 @@
 #define STAN__MATH__PRIM__MAT__FUN__TO_MATRIX_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
- //stan::scalar_type
+ // stan::scalar_type
 #include <vector>
 
 namespace stan {
   namespace math {
-    
+
     using Eigen::Dynamic;
-    using Eigen::Matrix; 
+    using Eigen::Matrix;
     using std::vector;
-    
-    //matrix to_matrix(matrix)    
-    //matrix to_matrix(vector)    
-    //matrix to_matrix(row_vector)
+
+    // matrix to_matrix(matrix)
+    // matrix to_matrix(vector)
+    // matrix to_matrix(row_vector)
     template <typename T, int R, int C>
     inline Matrix<T, Dynamic, Dynamic>
     to_matrix(Matrix<T, R, C> matrix) {
       return matrix;
     }
 
-    //matrix to_matrix(real[,])
+    // matrix to_matrix(real[, ])
     template <typename T>
     inline Matrix<T, Dynamic, Dynamic>
     to_matrix(const vector< vector<T> > & vec) {
@@ -38,8 +38,8 @@ namespace stan {
         return Matrix<T, Dynamic, Dynamic> (0, 0);
       }
     }
-    
-    //matrix to_matrix(int[,])
+
+    // matrix to_matrix(int[, ])
     inline Matrix<double, Dynamic, Dynamic>
     to_matrix(const vector< vector<int> > & vec) {
       size_t R = vec.size();
@@ -55,7 +55,7 @@ namespace stan {
         return Matrix<double, Dynamic, Dynamic> (0, 0);
       }
     }
-    
+
   }
 }
 #endif

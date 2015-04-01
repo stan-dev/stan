@@ -39,10 +39,10 @@ namespace stan {
 
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
-                            
 
-      return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/mu,
-                                                           rng),rng);
+
+      return stan::prob::poisson_rng(stan::prob::gamma_rng(phi, phi/mu,
+                                                           rng), rng);
     }
   }
 }

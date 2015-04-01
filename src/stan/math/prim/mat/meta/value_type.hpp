@@ -18,10 +18,10 @@ namespace stan {
      */
     template <typename T, int R, int C>
     struct value_type<Eigen::Matrix<T, R, C> > {
-      typedef typename Eigen::Matrix<T,R,C>::Scalar type;
+      typedef typename Eigen::Matrix<T, R, C>::Scalar type;
     };
 
-    
+
   }
 
 }

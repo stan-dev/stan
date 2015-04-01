@@ -22,7 +22,7 @@ namespace stan {
     }
 
     template <typename T>
-    inline 
+    inline
     fvar<T>
     operator+(const fvar<T>& x1, const double x2) {
       return fvar<T>(x1.val_ + x2, x1.d_);

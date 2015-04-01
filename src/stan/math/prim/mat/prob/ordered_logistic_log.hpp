@@ -27,14 +27,15 @@ namespace stan {
       using std::exp;
       using stan::math::log1m_exp;
       using stan::math::log1p_exp;
-      return beta + log1m_exp(alpha - beta) - log1p_exp(alpha) - log1p_exp(beta);
+      return beta + log1m_exp(alpha - beta) - log1p_exp(alpha)
+        - log1p_exp(beta);
     }
- 
-    // y in 0,...,K-1;   c.size()==K-2,  c increasing,  lambda finite
+
+    // y in 0, ..., K-1;   c.size()==K-2, c increasing,  lambda finite
     /**
      * Returns the (natural) log probability of the specified integer
      * outcome given the continuous location and specified cutpoints
-     * in an ordered logistic model.  
+     * in an ordered logistic model.
      *
      * <p>Typically the continous location
      * will be the dot product of a vector of regression coefficients
@@ -48,7 +49,7 @@ namespace stan {
      * @param c Positive increasing vector of cutpoints.
      * @return Log probability of outcome given location and
      * cutpoints.
-     
+
      * @throw std::domain_error If the outcome is not between 1 and
      * the number of cutpoints plus 2; if the cutpoint vector is
      * empty; if the cutpoint vector contains a non-positive,
@@ -56,9 +57,9 @@ namespace stan {
      * ascending order.
      */
     template <bool propto, typename T_lambda, typename T_cut>
-    typename boost::math::tools::promote_args<T_lambda,T_cut>::type
-    ordered_logistic_log(int y, const T_lambda& lambda,  
-                         const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c) {
+    typename boost::math::tools::promote_args<T_lambda, T_cut>::type
+    ordered_logistic_log(int y, const T_lambda& lambda,
+                         const Eigen::Matrix<T_cut, Eigen::Dynamic, 1>& c) {
       using std::exp;
       using std::log;
       using stan::math::inv_logit;
@@ -66,7 +67,7 @@ namespace stan {
       using stan::math::log1p_exp;
 
       static const char* function("stan::prob::ordered_logistic");
-      
+
       using stan::math::check_finite;
       using stan::math::check_positive;
       using stan::math::check_nonnegative;
@@ -88,7 +89,7 @@ namespace stan {
 
       // log(1 - inv_logit(lambda))
       if (y == 1)
-        return -log1p_exp(lambda - c(0)); 
+        return -log1p_exp(lambda - c(0));
 
       // log(inv_logit(lambda - c(K-3)));
       if (y == K) {
@@ -97,16 +98,15 @@ namespace stan {
 
       // if (2 < y < K) { ... }
       // log(inv_logit(lambda - c(y-2)) - inv_logit(lambda - c(y-1)))
-      return log_inv_logit_diff(c(y-2) - lambda, 
+      return log_inv_logit_diff(c(y-2) - lambda,
                                 c(y-1) - lambda);
-
     }
 
     template <typename T_lambda, typename T_cut>
-    typename boost::math::tools::promote_args<T_lambda,T_cut>::type
-    ordered_logistic_log(int y, const T_lambda& lambda,  
-                         const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c) {
-      return ordered_logistic_log<false>(y,lambda,c);
+    typename boost::math::tools::promote_args<T_lambda, T_cut>::type
+    ordered_logistic_log(int y, const T_lambda& lambda,
+                         const Eigen::Matrix<T_cut, Eigen::Dynamic, 1>& c) {
+      return ordered_logistic_log<false>(y, lambda, c);
     }
   }
 }

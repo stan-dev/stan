@@ -38,7 +38,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_positive;
-  
+
       check_finite(function, "Shape parameter", alpha);
       check_positive(function, "Shape parameter", alpha);
       check_not_nan(function, "Scale parameter", sigma);

@@ -8,7 +8,7 @@
 #include <cmath>
 
 namespace stan {
-  
+
   namespace prob {
 
     // COVARIANCE MATRIX
@@ -26,32 +26,33 @@ namespace stan {
      * @throws std::domain_error if (x.size() != K + (K choose 2)).
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
-    cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
-                 typename math::index_type<Eigen::Matrix<T,Eigen::Dynamic,1> >::type K) {
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
+    cov_matrix_constrain(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
+                         typename math::index_type
+                         <Eigen::Matrix<T, Eigen::Dynamic, 1> >::type K) {
       using std::exp;
 
       using Eigen::Dynamic;
       using Eigen::Matrix;
       using stan::math::index_type;
       using stan::math::multiply_lower_tri_self_transpose;
-      typedef typename index_type<Matrix<T,Dynamic,Dynamic> >::type size_type;
+      typedef typename index_type<Matrix<T, Dynamic, Dynamic> >::type size_type;
 
-      Matrix<T,Dynamic,Dynamic> L(K,K);
-      if (x.size() != (K * (K + 1)) / 2) 
+      Matrix<T, Dynamic, Dynamic> L(K, K);
+      if (x.size() != (K * (K + 1)) / 2)
         throw std::domain_error("x.size() != K + (K choose 2)");
       int i = 0;
       for (size_type m = 0; m < K; ++m) {
         for (int n = 0; n < m; ++n)
-          L(m,n) = x(i++);
-        L(m,m) = exp(x(i++));
-        for (size_type n = m + 1; n < K; ++n) 
-          L(m,n) = 0.0;
+          L(m, n) = x(i++);
+        L(m, m) = exp(x(i++));
+        for (size_type n = m + 1; n < K; ++n)
+          L(m, n) = 0.0;
       }
-      return multiply_lower_tri_self_transpose(L); 
+      return multiply_lower_tri_self_transpose(L);
     }
 
-    
+
     /**
      * Return the symmetric, positive-definite matrix of dimensions K
      * by K resulting from transforming the specified finite vector of
@@ -65,8 +66,8 @@ namespace stan {
      * @throws std::domain_error if (x.size() != K + (K choose 2)).
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
-    cov_matrix_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, 
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
+    cov_matrix_constrain(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
          typename math::index_type<Eigen::Matrix<T,
                                                  Eigen::Dynamic,
                                                  Eigen::Dynamic> >::type K,
@@ -76,25 +77,25 @@ namespace stan {
       using Eigen::Dynamic;
       using Eigen::Matrix;
       using stan::math::index_type;
-      typedef typename index_type<Matrix<T,Dynamic,Dynamic> >::type size_type;
+      typedef typename index_type<Matrix<T, Dynamic, Dynamic> >::type size_type;
 
-      if (x.size() != (K * (K + 1)) / 2) 
+      if (x.size() != (K * (K + 1)) / 2)
         throw std::domain_error("x.size() != K + (K choose 2)");
-      Matrix<T,Dynamic,Dynamic> L(K,K);
+      Matrix<T, Dynamic, Dynamic> L(K, K);
       int i = 0;
       for (size_type m = 0; m < K; ++m) {
         for (size_type n = 0; n < m; ++n)
-          L(m,n) = x(i++);
-        L(m,m) = exp(x(i++));
-        for (size_type n = m + 1; n < K; ++n) 
-          L(m,n) = 0.0;
+          L(m, n) = x(i++);
+        L(m, m) = exp(x(i++));
+        for (size_type n = m + 1; n < K; ++n)
+          L(m, n) = 0.0;
       }
       // Jacobian for complete transform, including exp() above
-      lp += (K * stan::math::LOG_2); // needless constant; want propto
+      lp += (K * stan::math::LOG_2);  // needless constant; want propto
       for (int k = 0; k < K; ++k)
-        lp += (K - k + 1) * log(L(k,k)); // only +1 because index from 0
+        lp += (K - k + 1) * log(L(k, k));  // only +1 because index from 0
       return L * L.transpose();
-      // return tri_multiply_transpose(L); 
+      // return tri_multiply_transpose(L);
     }
 
   }

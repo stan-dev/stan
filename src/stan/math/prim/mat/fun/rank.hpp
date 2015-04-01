@@ -1,13 +1,13 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__RANK_HPP
 #define STAN__MATH__PRIM__MAT__FUN__RANK_HPP
 
-#include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/err/check_range.hpp>
+#include <vector>
 
 namespace stan {
   namespace math {
-   
+
     /**
      * Return the number of components of v less than v[s].
      *
@@ -23,7 +23,8 @@ namespace stan {
       size_t count(0U);
       T compare(v[s]);
       for (size_t i = 0U; i < size; ++i)
-        if (v[i]<compare) count++;
+        if (v[i] < compare)
+          count++;
       return count;
     }
 
@@ -34,7 +35,7 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
     template <typename T, int R, int C>
-    inline size_t rank(const Eigen::Matrix<T,R,C> & v, int s) {
+    inline size_t rank(const Eigen::Matrix<T, R, C> & v, int s) {
       using stan::math::check_range;
       size_t size = v.size();
 
@@ -44,10 +45,11 @@ namespace stan {
       size_t count(0U);
       T compare(vv[s]);
       for (size_t i = 0U; i < size; ++i)
-        if (vv[i]<compare) count++;
+        if (vv[i] < compare)
+          count++;
       return count;
     }
-    
+
   }
 }
 #endif

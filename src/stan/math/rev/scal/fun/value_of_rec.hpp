@@ -7,7 +7,7 @@ namespace stan {
   namespace agrad {
 
     /**
-     * Return the value of the specified variable.  
+     * Return the value of the specified variable.
      *
      * @param v Variable.
      * @return Value of variable.

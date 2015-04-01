@@ -9,10 +9,10 @@ namespace stan {
     // Returns log(abs(det(A))) given a LDLT_factor of A
     template<int R, int C, typename T>
     inline T
-    log_determinant_ldlt(stan::math::LDLT_factor<T,R,C> &A) {
+    log_determinant_ldlt(stan::math::LDLT_factor<T, R, C> &A) {
       return A.log_abs_det();
     }
-    
+
   }
 }
 #endif

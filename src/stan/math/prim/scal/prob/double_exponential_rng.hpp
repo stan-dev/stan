@@ -41,9 +41,9 @@ namespace stan {
         rng_unit_01(rng, uniform_01<>());
       double a = 0;
       double laplaceRN = rng_unit_01();
-      if(0.5 - laplaceRN > 0)
+      if (0.5 - laplaceRN > 0)
         a = 1.0;
-      else if(0.5 - laplaceRN < 0)
+      else if (0.5 - laplaceRN < 0)
         a = -1.0;
       return mu - sigma * a * log1m(2 * abs(0.5 - laplaceRN));
     }

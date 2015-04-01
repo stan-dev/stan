@@ -9,7 +9,7 @@ namespace stan {
   namespace agrad {
 
     template <typename T>
-    inline 
+    inline
     fvar<T>
     operator-(const fvar<T>& x) {
       return fvar<T>(-x.val_, -x.d_);

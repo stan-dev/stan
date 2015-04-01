@@ -1,25 +1,25 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__COSH_HPP
 #define STAN__MATH__REV__SCAL__FUN__COSH_HPP
 
-#include <valarray>
 #include <stan/math/rev/core.hpp>
 #include <math.h>
+#include <valarray>
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class cosh_vari : public op_v_vari {
       public:
-        cosh_vari(vari* avi) :
-          op_v_vari(::cosh(avi->val_),avi) {
+        explicit cosh_vari(vari* avi) :
+          op_v_vari(::cosh(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * ::sinh(avi_->val_);
         }
       };
     }
-    
+
     /**
      * Return the hyperbolic cosine of the specified variable (cmath).
      *
@@ -29,15 +29,15 @@ namespace stan {
      *
      *
        \f[
-       \mbox{cosh}(x) = 
+       \mbox{cosh}(x) =
        \begin{cases}
          \cosh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{cosh}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{cosh}(x)}{\partial x} =
        \begin{cases}
          \sinh(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
@@ -50,7 +50,7 @@ namespace stan {
     inline var cosh(const var& a) {
       return var(new cosh_vari(a.vi_));
     }
-    
+
   }
 }
 #endif
