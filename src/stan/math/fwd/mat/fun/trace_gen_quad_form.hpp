@@ -10,25 +10,24 @@
 
 namespace stan {
   namespace agrad {
-    template<int RD,int CD,int RA,int CA,int RB,int CB,typename T>
+    template<int RD, int CD, int RA, int CA, int RB, int CB, typename T>
     inline fvar<T>
-    trace_gen_quad_form(const Eigen::Matrix<fvar<T>,RD,CD> &D,
-                        const Eigen::Matrix<fvar<T>,RA,CA> &A,
-                        const Eigen::Matrix<fvar<T>,RB,CB> &B)
-    {
+    trace_gen_quad_form(const Eigen::Matrix<fvar<T>, RD, CD> &D,
+                        const Eigen::Matrix<fvar<T>, RA, CA> &A,
+                        const Eigen::Matrix<fvar<T>, RB, CB> &B) {
       using stan::agrad::multiply;
       using stan::math::multiply;
 
       stan::math::check_square("trace_gen_quad_form", "A", A);
       stan::math::check_square("trace_gen_quad_form", "D", D);
       stan::math::check_multiplicable("trace_gen_quad_form",
-                                                "A", A,
-                                                "B", B);
-      stan::math::check_multiplicable("trace_gen_quad_form", 
-                                                "B", B, 
-                                                "D", D);
-      return stan::math::trace(multiply(multiply(D,stan::math::transpose(B)),
-                                        multiply(A,B)));
+                                      "A", A,
+                                      "B", B);
+      stan::math::check_multiplicable("trace_gen_quad_form",
+                                      "B", B,
+                                      "D", D);
+      return stan::math::trace(multiply(multiply(D, stan::math::transpose(B)),
+                                        multiply(A, B)));
     }
   }
 }

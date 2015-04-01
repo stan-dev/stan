@@ -13,8 +13,8 @@ namespace stan {
       double da_;
     public:
       precomp_v_vari(double val, vari* avi, double da)
-        : op_v_vari(val,avi),
-          da_(da) { 
+        : op_v_vari(val, avi),
+          da_(da) {
       }
       void chain() {
         avi_->adj_ += adj_ * da_;

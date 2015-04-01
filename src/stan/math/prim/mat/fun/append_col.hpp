@@ -9,17 +9,17 @@
 namespace stan {
 
   namespace math {
-    
+
     /**
      * Return the result of appending the second argument matrix after the
      * first argument matrix, that is, putting them side by side, with
-     * the first matrix followed by the second matrix. 
+     * the first matrix followed by the second matrix.
      *
-     * The inputs can be 
-     * (matrix,matrix),
-     * (matrix,vector),
-     * (vector,matrix), or 
-     * (vector,vector)
+     * The inputs can be
+     * (matrix, matrix),
+     * (matrix, vector),
+     * (vector, matrix), or
+     * (vector, vector)
      * and the output is always a matrix.
      *
      * @tparam T1 Scalar type of first matrix.
@@ -34,13 +34,12 @@ namespace stan {
      * second matrix side by side.
      */
     template <typename T1, typename T2, int R1, int C1, int R2, int C2>
-    inline Eigen::Matrix<typename return_type<T1, T2>::type, 
+    inline Eigen::Matrix<typename return_type<T1, T2>::type,
                          Eigen::Dynamic, Eigen::Dynamic>
     append_col(const Eigen::Matrix<T1, R1, C1>& A,
                const Eigen::Matrix<T2, R2, C2>& B) {
-
       using Eigen::Dynamic;
-      using Eigen::Matrix; 
+      using Eigen::Matrix;
       using stan::math::check_size_match;
 
       int Arows = A.rows();
@@ -48,29 +47,29 @@ namespace stan {
       int Acols = A.cols();
       int Bcols = B.cols();
       check_size_match("append_col",
-                       "rows of A", Arows, 
+                       "rows of A", Arows,
                        "rows of B", Brows);
-      
+
       Matrix<typename return_type<T1, T2>::type, Dynamic, Dynamic>
         result(Arows, Acols+Bcols);
       for (int j = 0; j < Acols; j++)
         for (int i = 0; i < Arows; i++)
           result(i, j) = A(i, j);
-          
+
       for (int j = Acols, k = 0; k < Bcols; j++, k++)
         for (int i = 0; i < Arows; i++)
           result(i, j) = B(i, k);
       return result;
     }
-    
+
     /**
      * Return the result of concatenaing the first row vector followed
      * by the second row vector side by side, with the result being a
      * row vector.
      *
-     * This function applies to (row_vector,row_vector) and returns a
+     * This function applies to (row_vector, row_vector) and returns a
      * row_vector.
-     * 
+     *
      * @tparam T1 Scalar type of first row vector.
      * @tparam T2 Scalar type of second row vector.
      * @tparam C1 Column specification of first row vector.
@@ -81,13 +80,12 @@ namespace stan {
      * of the first row vector.
      */
     template <typename T1, typename T2, int C1, int C2>
-    inline Eigen::Matrix<typename return_type<T1, T2>::type, 
+    inline Eigen::Matrix<typename return_type<T1, T2>::type,
                          1, Eigen::Dynamic>
     append_col(const Eigen::Matrix<T1, 1, C1>& A,
              const Eigen::Matrix<T2, 1, C2>& B) {
-
       using Eigen::Dynamic;
-      using Eigen::Matrix; 
+      using Eigen::Matrix;
 
       int Asize = A.size();
       int Bsize = B.size();
@@ -99,8 +97,8 @@ namespace stan {
         result(j) = B(i);
       return result;
     }
-    
-       
+
+
     /**
      * Return the result of appending the second argument matrix after the
      * first argument matrix, that is, putting them side by side, with
@@ -108,11 +106,11 @@ namespace stan {
      * overloaded template function for the case when both matrices
      * have the same type.
      *
-     * The inputs can be 
-     * (matrix,matrix),
-     * (matrix,vector),
-     * (vector,matrix), or 
-     * (vector,vector),
+     * The inputs can be
+     * (matrix, matrix),
+     * (matrix, vector),
+     * (vector, matrix), or
+     * (vector, vector),
      * and the output is always a matrix.
      *
      * @tparam T Scalar type of both matrices.
@@ -129,27 +127,26 @@ namespace stan {
     inline Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
     append_col(const Eigen::Matrix<T, R1, C1>& A,
                const Eigen::Matrix<T, R2, C2>& B) {
-
       using Eigen::Matrix;
       using Eigen::Dynamic;
 
       check_size_match("append_col",
                        "rows of A", A.rows(),
                        "rows of B", B.rows());
-      
+
       Matrix<T, Dynamic, Dynamic> result(A.rows(), A.cols()+B.cols());
       result << A, B;
       return result;
     }
-       
+
     /**
      * Return the result of concatenaing the first row vector followed
      * by the second row vector side by side, with the result being a
      * row vector.
      *
-     * This function applies to (row_vector,row_vector) and returns a
+     * This function applies to (row_vector, row_vector) and returns a
      * row_vector.
-     * 
+     *
      * @tparam T Scalar type of both vectors.
      * @tparam C1 Column specification of first row vector.
      * @tparam C2 Column specification of second row vector.
@@ -161,8 +158,7 @@ namespace stan {
     template <typename T, int C1, int C2>
     inline Eigen::Matrix<T, 1, Eigen::Dynamic>
     append_col(const Eigen::Matrix<T, 1, C1>& A,
-               const Eigen::Matrix<T, 1, C2>& B) {          
-
+               const Eigen::Matrix<T, 1, C2>& B) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
 
@@ -170,7 +166,7 @@ namespace stan {
       result << A, B;
       return result;
     }
-    
+
   }
 
 }

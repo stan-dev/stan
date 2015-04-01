@@ -1,10 +1,9 @@
 #ifndef STAN__MATH__REV__MAT__FUN__EIGEN_NUMTRAITS_HPP
 #define STAN__MATH__REV__MAT__FUN__EIGEN_NUMTRAITS_HPP
 
-#include <limits>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-
+#include <limits>
 
 namespace Eigen {
 
@@ -41,15 +40,15 @@ namespace Eigen {
      *
      * @return Same epsilon as a <code>double</code>.
      */
-    inline static Real epsilon() { 
-      return std::numeric_limits<double>::epsilon(); 
+    inline static Real epsilon() {
+      return std::numeric_limits<double>::epsilon();
     }
 
     /**
      * Return dummy precision
      */
     inline static Real dummy_precision() {
-      return 1e-12; // copied from NumTraits.h values for double
+      return 1e-12;  // copied from NumTraits.h values for double
     }
 
     /**
@@ -67,7 +66,7 @@ namespace Eigen {
      * point, <code>&#45;std::numeric_limits&lt;double&gt;::max()</code>.
      *
      * @return Same lowest value as a <code>double</code>.
-     */    
+     */
     inline static Real lowest() {
       return -std::numeric_limits<double>::max();
     }
@@ -93,14 +92,13 @@ namespace Eigen {
      * Implemented this for printing to stream.
      */
     template<>
-    struct significant_decimals_default_impl<stan::agrad::var,false>
-    {
-      static inline int run()
-      {
+    struct significant_decimals_default_impl<stan::agrad::var, false> {
+      static inline int run() {
         using std::ceil;
         using std::log;
-        return cast<double,int>(ceil(-log(std::numeric_limits<double>::epsilon())
-                                     / log(10.0)));
+        return cast<double, int>(ceil(-log(std::numeric_limits<double>
+                                           ::epsilon())
+                                      / log(10.0)));
       }
     };
 
@@ -108,8 +106,8 @@ namespace Eigen {
      * Scalar product traits override for Eigen for automatic
      * gradient variables.
      */
-    template <>  
-    struct scalar_product_traits<stan::agrad::var,double> {
+    template <>
+    struct scalar_product_traits<stan::agrad::var, double> {
       typedef stan::agrad::var ReturnType;
     };
 
@@ -117,8 +115,8 @@ namespace Eigen {
      * Scalar product traits override for Eigen for automatic
      * gradient variables.
      */
-    template <>  
-    struct scalar_product_traits<double,stan::agrad::var> {
+    template <>
+    struct scalar_product_traits<double, stan::agrad::var> {
       typedef stan::agrad::var ReturnType;
     };
 
@@ -126,62 +124,89 @@ namespace Eigen {
      * Override matrix-vector and matrix-matrix products to use more efficient implementation.
      */
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
-    struct general_matrix_vector_product<Index,stan::agrad::var,ColMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
-    {
+    struct general_matrix_vector_product<Index, stan::agrad::var, ColMajor,
+                                         ConjugateLhs, stan::agrad::var,
+                                         ConjugateRhs> {
       typedef stan::agrad::var LhsScalar;
       typedef stan::agrad::var RhsScalar;
-      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType
+      ResScalar;
       enum { LhsStorageOrder = ColMajor };
 
       EIGEN_DONT_INLINE static void run(
                                         Index rows, Index cols,
                                         const LhsScalar* lhs, Index lhsStride,
                                         const RhsScalar* rhs, Index rhsIncr,
-                                        ResScalar* res, Index resIncr, const ResScalar &alpha)
-      {
+                                        ResScalar* res, Index resIncr,
+                                        const ResScalar &alpha) {
         for (Index i = 0; i < rows; i++) {
-          res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,((int)LhsStorageOrder == (int)ColMajor)?(&lhs[i]):(&lhs[i*lhsStride]),((int)LhsStorageOrder == (int)ColMajor)?(lhsStride):(1),rhs,rhsIncr,cols));
+          res[i*resIncr]
+            += stan::agrad::var
+            (new stan::agrad::gevv_vvv_vari
+             (&alpha,
+              (static_cast<int>(LhsStorageOrder) == static_cast<int>(ColMajor))
+              ?(&lhs[i]):(&lhs[i*lhsStride]),
+              (static_cast<int>(LhsStorageOrder) == static_cast<int>(ColMajor))
+              ?(lhsStride):(1),
+              rhs, rhsIncr, cols));
         }
       }
     };
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
-    struct general_matrix_vector_product<Index,stan::agrad::var,RowMajor,ConjugateLhs,stan::agrad::var,ConjugateRhs>
-    {
+    struct general_matrix_vector_product<Index, stan::agrad::var,
+                                         RowMajor, ConjugateLhs,
+                                         stan::agrad::var, ConjugateRhs> {
       typedef stan::agrad::var LhsScalar;
       typedef stan::agrad::var RhsScalar;
-      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType
+      ResScalar;
       enum { LhsStorageOrder = RowMajor };
 
-      EIGEN_DONT_INLINE static void run(
-                                        Index rows, Index cols,
-                                        const LhsScalar* lhs, Index lhsStride,
-                                        const RhsScalar* rhs, Index rhsIncr,
-                                        ResScalar* res, Index resIncr, const RhsScalar &alpha)
-      {
+      EIGEN_DONT_INLINE static void
+      run(Index rows, Index cols,
+          const LhsScalar* lhs, Index lhsStride,
+          const RhsScalar* rhs, Index rhsIncr,
+          ResScalar* res, Index resIncr, const RhsScalar &alpha) {
         for (Index i = 0; i < rows; i++) {
-          res[i*resIncr] += stan::agrad::var(new stan::agrad::gevv_vvv_vari(&alpha,((int)LhsStorageOrder == (int)ColMajor)?(&lhs[i]):(&lhs[i*lhsStride]),((int)LhsStorageOrder == (int)ColMajor)?(lhsStride):(1),rhs,rhsIncr,cols));
+          res[i*resIncr]
+            += stan::agrad::var
+            (new stan::agrad::gevv_vvv_vari
+             (&alpha,
+              (static_cast<int>(LhsStorageOrder) == static_cast<int>(ColMajor))
+              ? (&lhs[i]) : (&lhs[i*lhsStride]),
+              (static_cast<int>(LhsStorageOrder) == static_cast<int>(ColMajor))
+              ? (lhsStride) : (1),
+              rhs, rhsIncr, cols));
         }
       }
     };
-    template<typename Index, int LhsStorageOrder, bool ConjugateLhs, int RhsStorageOrder, bool ConjugateRhs>
-    struct general_matrix_matrix_product<Index,stan::agrad::var,LhsStorageOrder,ConjugateLhs,stan::agrad::var,RhsStorageOrder,ConjugateRhs,ColMajor>
-    {
+    template<typename Index, int LhsStorageOrder, bool ConjugateLhs,
+             int RhsStorageOrder, bool ConjugateRhs>
+    struct general_matrix_matrix_product<Index, stan::agrad::var,
+                                         LhsStorageOrder, ConjugateLhs,
+                                         stan::agrad::var, RhsStorageOrder,
+                                         ConjugateRhs, ColMajor> {
       typedef stan::agrad::var LhsScalar;
       typedef stan::agrad::var RhsScalar;
-      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
+      typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType
+      ResScalar;
       static void run(Index rows, Index cols, Index depth,
                       const LhsScalar* _lhs, Index lhsStride,
                       const RhsScalar* _rhs, Index rhsStride,
                       ResScalar* res, Index resStride,
                       const ResScalar &alpha,
-                      level3_blocking<LhsScalar,RhsScalar>& /* blocking */,
-                      GemmParallelInfo<Index>* /* info = 0 */)
-      {
+                      level3_blocking<LhsScalar, RhsScalar>& /* blocking */,
+                      GemmParallelInfo<Index>* /* info = 0 */) {
         for (Index i = 0; i < cols; i++) {
-          general_matrix_vector_product<Index,LhsScalar,LhsStorageOrder,ConjugateLhs,RhsScalar,ConjugateRhs>::run(
-                                                                                                                  rows,depth,_lhs,lhsStride,
-                                                                                                                  &_rhs[((int)RhsStorageOrder == (int)ColMajor)?(i*rhsStride):(i)],((int)RhsStorageOrder == (int)ColMajor)?(1):(rhsStride),
-                                                                                                                  &res[i*resStride],1,alpha);
+          general_matrix_vector_product<Index, LhsScalar, LhsStorageOrder,
+                                        ConjugateLhs, RhsScalar, ConjugateRhs>
+            ::run(rows, depth, _lhs, lhsStride,
+                  &_rhs[(static_cast<int>(RhsStorageOrder)
+                         == static_cast<int>(ColMajor))
+                        ? (i*rhsStride) :(i) ],
+                  (static_cast<int>(RhsStorageOrder)
+                   == static_cast<int>(ColMajor)) ? (1) : (rhsStride),
+                  &res[i*resStride], 1, alpha);
         }
       }
     };

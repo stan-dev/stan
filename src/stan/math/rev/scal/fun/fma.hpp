@@ -1,12 +1,13 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__FMA_HPP
 #define STAN__MATH__REV__SCAL__FUN__FMA_HPP
 
-#include <cmath>
-#include <valarray>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/meta/likely.hpp>
+#include <cmath>
+#include <valarray>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -16,7 +17,7 @@ namespace stan {
       public:
         fma_vvv_vari(vari* avi, vari* bvi, vari* cvi) :
           op_vvv_vari(::fma(avi->val_, bvi->val_, cvi->val_),
-                      avi,bvi,cvi) {
+                      avi, bvi, cvi) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)
@@ -37,7 +38,7 @@ namespace stan {
       public:
         fma_vvd_vari(vari* avi, vari* bvi, double c) :
           op_vvd_vari(::fma(avi->val_, bvi->val_, c),
-                      avi,bvi,c) {
+                      avi, bvi, c) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)
@@ -56,7 +57,7 @@ namespace stan {
       public:
         fma_vdv_vari(vari* avi, double b, vari* cvi) :
           op_vdv_vari(::fma(avi->val_ , b, cvi->val_),
-                      avi,b,cvi) {
+                      avi, b, cvi) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)
@@ -73,9 +74,9 @@ namespace stan {
 
       class fma_vdd_vari : public op_vdd_vari {
       public:
-        fma_vdd_vari(vari* avi, double b, double c) : 
+        fma_vdd_vari(vari* avi, double b, double c) :
           op_vdd_vari(::fma(avi->val_ , b, c),
-                      avi,b,c) {
+                      avi, b, c) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)
@@ -90,11 +91,10 @@ namespace stan {
       class fma_ddv_vari : public op_ddv_vari {
       public:
         fma_ddv_vari(double a, double b, vari* cvi) :
-          op_ddv_vari(::fma(a, b, cvi->val_), 
-                      a,b,cvi) {
+          op_ddv_vari(::fma(a, b, cvi->val_),
+                      a, b, cvi) {
         }
         void chain() {
-
           if (unlikely(boost::math::isnan(cvi_->val_)
                        || boost::math::isnan(ad_)
                        || boost::math::isnan(bd_)))
@@ -111,7 +111,7 @@ namespace stan {
      * plus the third argument.
      *
      * The double-based version
-     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double, double, double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -129,7 +129,7 @@ namespace stan {
     inline var fma(const stan::agrad::var& a,
                    const stan::agrad::var& b,
                    const stan::agrad::var& c) {
-      return var(new fma_vvv_vari(a.vi_,b.vi_,c.vi_));
+      return var(new fma_vvv_vari(a.vi_, b.vi_, c.vi_));
     }
 
     /**
@@ -138,7 +138,7 @@ namespace stan {
      * arguments plus the third argument.
      *
      * The double-based version
-     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double, double, double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -154,7 +154,7 @@ namespace stan {
     inline var fma(const stan::agrad::var& a,
                    const stan::agrad::var& b,
                    const double& c) {
-      return var(new fma_vvd_vari(a.vi_,b.vi_,c));
+      return var(new fma_vvd_vari(a.vi_, b.vi_, c));
     }
 
     /**
@@ -163,7 +163,7 @@ namespace stan {
      * two arguments plus the third argument.
      *
      * The double-based version
-     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double, double, double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivatives are
      *
@@ -179,7 +179,7 @@ namespace stan {
     inline var fma(const stan::agrad::var& a,
                    const double& b,
                    const stan::agrad::var& c) {
-      return var(new fma_vdv_vari(a.vi_,b,c.vi_));
+      return var(new fma_vdv_vari(a.vi_, b, c.vi_));
     }
 
     /**
@@ -188,7 +188,7 @@ namespace stan {
      * arguments plus the third argument.
      *
      * The double-based version
-     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double, double, double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -200,9 +200,9 @@ namespace stan {
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
     inline var fma(const stan::agrad::var& a,
-                   const double& b, 
+                   const double& b,
                    const double& c) {
-      return var(new fma_vdd_vari(a.vi_,b,c));
+      return var(new fma_vdd_vari(a.vi_, b, c));
     }
 
     /**
@@ -211,7 +211,7 @@ namespace stan {
      * two arguments plus the third argument.
      *
      * The double-based version
-     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double, double, double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -225,7 +225,7 @@ namespace stan {
     inline var fma(const double& a,
                    const stan::agrad::var& b,
                    const double& c) {
-      return var(new fma_vdd_vari(b.vi_,a,c));
+      return var(new fma_vdd_vari(b.vi_, a, c));
     }
 
     /**
@@ -234,7 +234,7 @@ namespace stan {
      * first two arguments plus the third argument.
      *
      * The double-based version
-     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double, double, double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The derivative is
      *
@@ -248,7 +248,7 @@ namespace stan {
     inline var fma(const double& a,
                    const double& b,
                    const stan::agrad::var& c) {
-      return var(new fma_ddv_vari(a,b,c.vi_));
+      return var(new fma_ddv_vari(a, b, c.vi_));
     }
 
     /**
@@ -257,7 +257,7 @@ namespace stan {
      * arguments plus the third argument.
      *
      * The double-based version
-     * <code>::%fma(double,double,double)</code> is defined in <code>&lt;cmath&gt;</code>.
+     * <code>::%fma(double, double, double)</code> is defined in <code>&lt;cmath&gt;</code>.
      *
      * The partial derivaties are
      *
@@ -273,7 +273,7 @@ namespace stan {
     inline var fma(const double& a,
                    const stan::agrad::var& b,
                    const stan::agrad::var& c) {
-      return var(new fma_vdv_vari(b.vi_,a,c.vi_)); // a-b symmetry
+      return var(new fma_vdv_vari(b.vi_, a, c.vi_));  // a-b symmetry
     }
 
   }

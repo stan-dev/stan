@@ -1,12 +1,12 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__PROD_HPP
 #define STAN__MATH__PRIM__MAT__FUN__PROD_HPP
 
-#include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <vector>
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the product of the coefficients of the specified
      * standard vector.
@@ -21,7 +21,7 @@ namespace stan {
         product *= v[i];
       return product;
     }
-    
+
     /**
      * Returns the product of the coefficients of the specified
      * column vector.
@@ -29,11 +29,11 @@ namespace stan {
      * @return Product of coefficients of vector.
      */
     template <typename T, int R, int C>
-    inline T prod(const Eigen::Matrix<T,R,C>& v) {
+    inline T prod(const Eigen::Matrix<T, R, C>& v) {
       if (v.size() == 0) return 1.0;
       return v.prod();
     }
-    
+
   }
 }
 #endif

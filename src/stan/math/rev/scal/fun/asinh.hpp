@@ -1,10 +1,10 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__ASINH_HPP
 #define STAN__MATH__REV__SCAL__FUN__ASINH_HPP
 
-#include <valarray>
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <math.h>
+#include <valarray>
 
 namespace stan {
   namespace agrad {
@@ -13,7 +13,7 @@ namespace stan {
       class asinh_vari : public op_v_vari {
       public:
         asinh_vari(double val, vari* avi) :
-          op_v_vari(val,avi) {
+          op_v_vari(val, avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / std::sqrt(avi_->val_ * avi_->val_ + 1.0);
@@ -23,7 +23,7 @@ namespace stan {
 
     /**
      * The inverse hyperbolic sine function for variables (C99).
-     * 
+     *
      * For non-variable function, see boost::math::asinh().
      *
      * The derivative is defined by
@@ -32,25 +32,25 @@ namespace stan {
      *
      *
        \f[
-       \mbox{asinh}(x) = 
+       \mbox{asinh}(x) =
        \begin{cases}
          \sinh^{-1}(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{asinh}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{asinh}(x)}{\partial x} =
        \begin{cases}
          \frac{\partial\, \sinh^{-1}(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
        \sinh^{-1}(x)=\ln\left(x+\sqrt{x^2+1}\right)
        \f]
-       
+
        \f[
        \frac{\partial \, \sinh^{-1}(x)}{\partial x} = \frac{1}{\sqrt{x^2+1}}
        \f]
@@ -61,7 +61,7 @@ namespace stan {
     inline var asinh(const stan::agrad::var& a) {
       if (boost::math::isinf(a.val()))
         return var(new asinh_vari(a.val(), a.vi_));
-      return var(new asinh_vari(::asinh(a.val()),a.vi_));
+      return var(new asinh_vari(::asinh(a.val()), a.vi_));
     }
 
   }

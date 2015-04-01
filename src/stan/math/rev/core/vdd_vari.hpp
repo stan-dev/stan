@@ -15,7 +15,7 @@ namespace stan {
       op_vdd_vari(double f, vari* avi, double b, double c) :
         vari(f),
         avi_(avi),
-        bd_(b), 
+        bd_(b),
         cd_(c) {
       }
     };

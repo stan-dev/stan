@@ -6,7 +6,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the determinant of the specified square matrix.
      *
@@ -14,12 +14,12 @@ namespace stan {
      * @return Determinant of the matrix.
      * @throw std::domain_error if matrix is not square.
      */
-    template <typename T,int R, int C>
-    inline T determinant(const Eigen::Matrix<T,R,C>& m) {
+    template <typename T, int R, int C>
+    inline T determinant(const Eigen::Matrix<T, R, C>& m) {
       stan::math::check_square("determinant", "m", m);
       return m.determinant();
-    }    
-    
+    }
+
   }
 }
 #endif

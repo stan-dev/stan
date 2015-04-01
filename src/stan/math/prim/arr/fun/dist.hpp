@@ -8,7 +8,8 @@
 namespace stan {
   namespace math {
 
-    inline double dist(const std::vector<double>& x, const std::vector<double>& y) {
+    inline double dist(const std::vector<double>& x,
+                       const std::vector<double>& y) {
       using std::sqrt;
       double result = 0;
       for (size_t i = 0; i < x.size(); ++i) {

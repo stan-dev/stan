@@ -1,9 +1,8 @@
 #ifndef STAN__MATH__PRIM__ARR__FUN__REP_ARRAY_HPP
 #define STAN__MATH__PRIM__ARR__FUN__REP_ARRAY_HPP
 
-#include <vector>
-
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
+#include <vector>
 
 namespace stan {
 
@@ -14,7 +13,7 @@ namespace stan {
     rep_array(const T& x, int n) {
       using stan::math::check_nonnegative;
       check_nonnegative("rep_array", "n", n);
-      return std::vector<T>(n,x);
+      return std::vector<T>(n, x);
     }
 
     template <typename T>

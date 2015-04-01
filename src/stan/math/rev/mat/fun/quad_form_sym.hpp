@@ -19,39 +19,39 @@ namespace stan {
 
     template <typename TA, int RA, int CA, typename TB, int RB, int CB>
     inline typename
-    boost::enable_if_c< boost::is_same<TA,var>::value ||
-                        boost::is_same<TB,var>::value,
-                        Eigen::Matrix<var,CB,CB> >::type
-    quad_form_sym(const Eigen::Matrix<TA,RA,CA>& A,
-                  const Eigen::Matrix<TB,RB,CB>& B)
-    {
+    boost::enable_if_c< boost::is_same<TA, var>::value ||
+    boost::is_same<TB, var>::value,
+                        Eigen::Matrix<var, CB, CB> >::type
+      quad_form_sym(const Eigen::Matrix<TA, RA, CA>& A,
+                    const Eigen::Matrix<TB, RB, CB>& B) {
       stan::math::check_square("quad_form", "A", A);
       stan::math::check_symmetric("quad_form_sym", "A", A);
-      stan::math::check_multiplicable("quad_form_sym", 
-                                                "A", A, 
-                                                "B", B);
-      
-      quad_form_vari<TA,RA,CA,TB,RB,CB> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,CB>(A,B,true);
-      
+      stan::math::check_multiplicable("quad_form_sym",
+                                      "A", A,
+                                      "B", B);
+
+      quad_form_vari<TA, RA, CA, TB, RB, CB> *baseVari
+        = new quad_form_vari<TA, RA, CA, TB, RB, CB>(A, B, true);
+
       return baseVari->_impl->C_;
     }
     template <typename TA, int RA, int CA, typename TB, int RB>
     inline typename
-    boost::enable_if_c< boost::is_same<TA,var>::value ||
-                        boost::is_same<TB,var>::value,
+    boost::enable_if_c< boost::is_same<TA, var>::value ||
+    boost::is_same<TB, var>::value,
                         var >::type
-    quad_form_sym(const Eigen::Matrix<TA,RA,CA>& A,
-                  const Eigen::Matrix<TB,RB,1>& B)
-    {
+      quad_form_sym(const Eigen::Matrix<TA, RA, CA>& A,
+                    const Eigen::Matrix<TB, RB, 1>& B) {
       stan::math::check_square("quad_form", "A", A);
       stan::math::check_symmetric("quad_form_sym", "A", A);
-      stan::math::check_multiplicable("quad_form_sym", 
-                                                "A", A, 
-                                                "B", B);
-      
-      quad_form_vari<TA,RA,CA,TB,RB,1> *baseVari = new quad_form_vari<TA,RA,CA,TB,RB,1>(A,B,true);
-      
-      return baseVari->_impl->C_(0,0);
+      stan::math::check_multiplicable("quad_form_sym",
+                                      "A", A,
+                                      "B", B);
+
+      quad_form_vari<TA, RA, CA, TB, RB, 1> *baseVari
+        = new quad_form_vari<TA, RA, CA, TB, RB, 1>(A, B, true);
+
+      return baseVari->_impl->C_(0, 0);
     }
   }
 }

@@ -35,7 +35,7 @@ namespace stan {
     multiply_log(const fvar<T>& x1, const double x2) {
       using stan::math::multiply_log;
       using std::log;
-      return fvar<T>(multiply_log(x1.val_, x2), 
+      return fvar<T>(multiply_log(x1.val_, x2),
                      x1.d_ * log(x2));
     }
   }

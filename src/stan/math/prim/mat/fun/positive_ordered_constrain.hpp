@@ -6,7 +6,7 @@
 #include <cmath>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -19,15 +19,15 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
-    positive_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+    Eigen::Matrix<T, Eigen::Dynamic, 1>
+    positive_ordered_constrain(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
       using stan::math::index_type;
-      typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
+      typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 
       size_type k = x.size();
-      Matrix<T,Dynamic,1> y(k);
+      Matrix<T, Dynamic, 1> y(k);
       if (k == 0)
         return y;
       y[0] = exp(x[0]);
@@ -45,17 +45,18 @@ namespace stan {
      *
      * @param x Free vector of scalars.
      * @param lp Log probability reference.
-     * @return Positive, increasing ordered vector. 
+     * @return Positive, increasing ordered vector.
      * @tparam T Type of scalar.
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
-    positive_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
+    Eigen::Matrix<T, Eigen::Dynamic, 1>
+    positive_ordered_constrain(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
+                               T& lp) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
       using stan::math::index_type;
-      typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
+      typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 
       for (size_type i = 0; i < x.size(); ++i)
         lp += x(i);

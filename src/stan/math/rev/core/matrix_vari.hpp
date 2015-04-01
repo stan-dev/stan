@@ -15,11 +15,12 @@ namespace stan {
       vari** vis_;
     public:
       template <int R, int C>
-      op_matrix_vari(double f, const Eigen::Matrix<stan::agrad::var,R,C>& vs) :
+      op_matrix_vari(double f,
+                     const Eigen::Matrix<stan::agrad::var, R, C>& vs) :
         vari(f),
         size_(vs.size()) {
-
-        vis_ = (vari**) operator new(sizeof(vari*) * vs.size()); 
+        vis_ = reinterpret_cast<vari**>
+          (operator new(sizeof(vari*) * vs.size()));
         for (int i = 0; i < vs.size(); ++i)
           vis_[i] = vs(i).vi_;
       }

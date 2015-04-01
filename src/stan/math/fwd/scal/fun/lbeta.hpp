@@ -16,8 +16,8 @@ namespace stan {
     lbeta(const fvar<T>& x1, const fvar<T>& x2) {
       using stan::math::lbeta;
       using boost::math::digamma;
-      return fvar<T>(lbeta(x1.val_, x2.val_), 
-                     x1.d_ * digamma(x1.val_) 
+      return fvar<T>(lbeta(x1.val_, x2.val_),
+                     x1.d_ * digamma(x1.val_)
                      + x2.d_ * digamma(x2.val_)
                      - (x1.d_ + x2.d_) * digamma(x1.val_ + x2.val_));
     }
@@ -28,7 +28,7 @@ namespace stan {
     lbeta(const double x1, const fvar<T>& x2) {
       using stan::math::lbeta;
       using boost::math::digamma;
-      return fvar<T>(lbeta(x1, x2.val_), 
+      return fvar<T>(lbeta(x1, x2.val_),
                      x2.d_ * digamma(x2.val_) - x2.d_ * digamma(x1 + x2.val_));
     }
 
@@ -38,7 +38,7 @@ namespace stan {
     lbeta(const fvar<T>& x1, const double x2) {
       using stan::math::lbeta;
       using boost::math::digamma;
-      return fvar<T>(lbeta(x1.val_, x2), 
+      return fvar<T>(lbeta(x1.val_, x2),
                      x1.d_ * digamma(x1.val_) - x1.d_ * digamma(x1.val_ + x2));
     }
   }

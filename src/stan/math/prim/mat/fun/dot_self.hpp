@@ -6,7 +6,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the dot product of the specified vector with itself.
      * @param v Vector.
@@ -18,8 +18,8 @@ namespace stan {
     inline double dot_self(const Eigen::Matrix<double, R, C>& v) {
       stan::math::check_vector("dot_self", "v", v);
       return v.squaredNorm();
-    }    
-    
+    }
+
   }
 }
 #endif

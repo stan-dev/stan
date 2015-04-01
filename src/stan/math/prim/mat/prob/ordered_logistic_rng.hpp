@@ -22,13 +22,13 @@ namespace stan {
     template <class RNG>
     inline int
     ordered_logistic_rng(const double eta,
-                         const Eigen::Matrix<double,Eigen::Dynamic,1>& c,
+                         const Eigen::Matrix<double, Eigen::Dynamic, 1>& c,
                          RNG& rng) {
       using boost::variate_generator;
       using stan::math::inv_logit;
 
       static const char* function("stan::prob::ordered_logistic");
-      
+
       using stan::math::check_finite;
       using stan::math::check_positive;
       using stan::math::check_nonnegative;
@@ -47,7 +47,7 @@ namespace stan {
 
       Eigen::VectorXd cut(c.rows()+1);
       cut(0) = 1 - inv_logit(eta - c(0));
-      for(int j = 1; j < c.rows(); j++)
+      for (int j = 1; j < c.rows(); j++)
         cut(j) = inv_logit(eta - c(j - 1)) - inv_logit(eta - c(j));
       cut(c.rows()) = inv_logit(eta - c(c.rows() - 1));
 

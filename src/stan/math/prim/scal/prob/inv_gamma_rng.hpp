@@ -40,14 +40,14 @@ namespace stan {
       static const char* function("stan::prob::inv_gamma_rng");
 
       using stan::math::check_positive_finite;
- 
+
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", beta);
 
       variate_generator<RNG&, gamma_distribution<> >
         gamma_rng(rng, gamma_distribution<>(alpha, 1 / beta));
       return 1 / gamma_rng();
-    }          
+    }
   }
 }
 

@@ -11,6 +11,7 @@
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/is_constant_struct.hpp>
+#include <vector>
 
 namespace stan {
 
@@ -20,8 +21,8 @@ namespace stan {
     template <bool propto,
               typename T_prob>
     typename boost::math::tools::promote_args<T_prob>::type
-    categorical_log(int n, 
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
+    categorical_log(int n,
+                    const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
       static const char* function("stan::prob::categorical_log");
 
       using stan::math::check_bounded;
@@ -33,7 +34,7 @@ namespace stan {
 
       T_prob lp = 0.0;
       check_bounded(function, "Number of categories", n, lb, theta.size());
-      
+
       if (!stan::is_constant_struct<T_prob>::value) {
         if (!check_simplex(function, "Probabilities parameter", theta))
           return lp;
@@ -42,7 +43,7 @@ namespace stan {
           return lp;
       }
 
-      if (include_summand<propto,T_prob>::value)
+      if (include_summand<propto, T_prob>::value)
         return log(theta(n-1));
       return 0.0;
     }
@@ -50,12 +51,11 @@ namespace stan {
     template <typename T_prob>
     inline
     typename boost::math::tools::promote_args<T_prob>::type
-    categorical_log(const typename 
+    categorical_log(const typename
                     math::index_type<Eigen::Matrix<T_prob,
-                    Eigen::Dynamic,1> >::type n, 
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
-
-      return categorical_log<false>(n,theta);
+                    Eigen::Dynamic, 1> >::type n,
+                    const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
+      return categorical_log<false>(n, theta);
     }
 
 
@@ -63,8 +63,8 @@ namespace stan {
     template <bool propto,
               typename T_prob>
     typename boost::math::tools::promote_args<T_prob>::type
-    categorical_log(const std::vector<int>& ns, 
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
+    categorical_log(const std::vector<int>& ns,
+                    const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
       static const char* function("stan::prob::categorical_log");
 
       using boost::math::tools::promote_args;
@@ -77,8 +77,9 @@ namespace stan {
 
       T_prob lp = 0.0;
       for (size_t i = 0; i < ns.size(); ++i)
-        check_bounded(function, "element of outcome array", ns[i], lb, theta.size());
-      
+        check_bounded(function, "element of outcome array", ns[i],
+                      lb, theta.size());
+
       if (!stan::is_constant_struct<T_prob>::value) {
         if (!check_simplex(function, "Probabilities parameter", theta))
           return lp;
@@ -87,21 +88,21 @@ namespace stan {
           return lp;
       }
 
-      if (!include_summand<propto,T_prob>::value)
+      if (!include_summand<propto, T_prob>::value)
         return 0.0;
-      
+
       if (ns.size() == 0)
         return 0.0;
 
-      Eigen::Matrix<T_prob,Eigen::Dynamic,1> log_theta(theta.size());
+      Eigen::Matrix<T_prob, Eigen::Dynamic, 1> log_theta(theta.size());
       for (int i = 0; i < theta.size(); ++i)
         log_theta(i) = log(theta(i));
-      
+
       Eigen::Matrix<typename boost::math::tools::promote_args<T_prob>::type,
-                    Eigen::Dynamic,1> log_theta_ns(ns.size());
+                    Eigen::Dynamic, 1> log_theta_ns(ns.size());
       for (size_t i = 0; i < ns.size(); ++i)
         log_theta_ns(i) = log_theta(ns[i] - 1);
-    
+
       return sum(log_theta_ns);
     }
 
@@ -109,9 +110,9 @@ namespace stan {
     template <typename T_prob>
     inline
     typename boost::math::tools::promote_args<T_prob>::type
-    categorical_log(const std::vector<int>& ns, 
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
-      return categorical_log<false>(ns,theta);
+    categorical_log(const std::vector<int>& ns,
+                    const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
+      return categorical_log<false>(ns, theta);
     }
 
   }

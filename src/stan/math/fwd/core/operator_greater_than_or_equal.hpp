@@ -16,14 +16,14 @@ namespace stan {
     }
 
     template <typename T>
-    inline 
+    inline
     bool
     operator>=(const fvar<T>& x, double y) {
       return x.val_ >= y;
     }
 
     template <typename T>
-    inline 
+    inline
     bool
     operator>=(double x, const fvar<T>& y) {
       return x >= y.val_;

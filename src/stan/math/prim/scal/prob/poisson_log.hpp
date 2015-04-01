@@ -1,10 +1,6 @@
 #ifndef STAN__MATH__PRIM__SCAL__PROB__POISSON_LOG_HPP
 #define STAN__MATH__PRIM__SCAL__PROB__POISSON_LOG_HPP
 
-#include <limits>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/random/poisson_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
 #include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_less.hpp>
@@ -17,6 +13,10 @@
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/random/poisson_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <limits>
 
 namespace stan {
 
@@ -26,18 +26,18 @@ namespace stan {
     template <bool propto, typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_log(const T_n& n, const T_rate& lambda) {
-      typedef typename stan::partials_return_type<T_n,T_rate>::type
+      typedef typename stan::partials_return_type<T_n, T_rate>::type
         T_partials_return;
 
       static const char* function("stan::prob::poisson_log");
-      
+
       using boost::math::lgamma;
       using stan::math::check_consistent_sizes;
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
       using stan::prob::include_summand;
       using stan::math::value_of;
-      
+
       // check if any vectors are zero length
       if (!(stan::length(n)
             && stan::length(lambda)))
@@ -51,11 +51,11 @@ namespace stan {
       check_not_nan(function, "Rate parameter", lambda);
       check_nonnegative(function, "Rate parameter", lambda);
       check_consistent_sizes(function,
-                             "Random variable", n, 
+                             "Random variable", n,
                              "Rate parameter", lambda);
-      
+
       // check if no variables are involved and prop-to
-      if (!include_summand<propto,T_rate>::value)
+      if (!include_summand<propto, T_rate>::value)
         return 0.0;
 
       // set up expression templates wrapping scalars/vecs into vector views
@@ -69,7 +69,7 @@ namespace stan {
       for (size_t i = 0; i < size; i++)
         if (lambda_vec[i] == 0 && n_vec[i] != 0)
           return LOG_ZERO;
-      
+
       // return accumulator with gradients
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
@@ -78,28 +78,27 @@ namespace stan {
         if (!(lambda_vec[i] == 0 && n_vec[i] == 0)) {
           if (include_summand<propto>::value)
             logp -= lgamma(n_vec[i] + 1.0);
-          if (include_summand<propto,T_rate>::value)
-            logp += multiply_log(n_vec[i], value_of(lambda_vec[i])) 
+          if (include_summand<propto, T_rate>::value)
+            logp += multiply_log(n_vec[i], value_of(lambda_vec[i]))
               - value_of(lambda_vec[i]);
         }
-  
+
         // gradients
         if (!is_constant_struct<T_rate>::value)
-          operands_and_partials.d_x1[i] 
+          operands_and_partials.d_x1[i]
             += n_vec[i] / value_of(lambda_vec[i]) - 1.0;
-        
       }
 
 
-      return operands_and_partials.to_var(logp,lambda);
+      return operands_and_partials.to_var(logp, lambda);
     }
-    
+
     template <typename T_n,
               typename T_rate>
     inline
     typename return_type<T_rate>::type
     poisson_log(const T_n& n, const T_rate& lambda) {
-      return poisson_log<false>(n,lambda);
+      return poisson_log<false>(n, lambda);
     }
   }
 }

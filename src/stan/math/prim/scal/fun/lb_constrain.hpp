@@ -7,7 +7,7 @@
 #include <limits>
 
 namespace stan {
-  
+
   namespace prob {
     // LOWER BOUND
 
@@ -45,7 +45,7 @@ namespace stan {
      * transform.
      *
      * If the lower bound is negative infinity, this function
-     * reduces to <code>identity_constraint(x,lp)</code>.
+     * reduces to <code>identity_constraint(x, lp)</code>.
      *
      * @param x Unconstrained scalar input.
      * @param lb Lower-bound on output.
@@ -56,10 +56,10 @@ namespace stan {
      */
     template <typename T, typename TL>
     inline
-    typename boost::math::tools::promote_args<T,TL>::type
+    typename boost::math::tools::promote_args<T, TL>::type
     lb_constrain(const T x, const TL lb, T& lp) {
       if (lb == -std::numeric_limits<double>::infinity())
-        return identity_constrain(x,lp);
+        return identity_constrain(x, lp);
       lp += x;
       return exp(x) + lb;
     }

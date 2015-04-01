@@ -19,18 +19,18 @@ namespace stan {
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
     inv_wishart_rng(const double nu,
-                    const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
+                    const Eigen::Matrix
+                    <double, Eigen::Dynamic, Eigen::Dynamic>& S,
                     RNG& rng) {
-
       static const char* function("stan::prob::inv_wishart_rng");
-      
+
       using stan::math::check_greater;
       using stan::math::check_square;
       using Eigen::MatrixXd;
       using stan::math::index_type;
 
       typename index_type<MatrixXd>::type k = S.rows();
-      
+
       check_greater(function, "Degrees of freedom parameter", nu, k-1);
       check_square(function, "scale parameter", S);
 

@@ -36,7 +36,7 @@ namespace stan {
       static const char* function("stan::prob::beta_rng");
 
       using stan::math::check_positive_finite;
-        
+
       check_positive_finite(function, "First shape parameter", alpha);
       check_positive_finite(function, "Second shape parameter", beta);
 

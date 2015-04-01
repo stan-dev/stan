@@ -24,7 +24,7 @@ namespace stan {
   };
 
   template <typename T, int R, int C>
-  struct is_constant_struct<Eigen::Matrix<T,R,C> > {
+  struct is_constant_struct<Eigen::Matrix<T, R, C> > {
     enum { value = is_constant_struct<T>::value };
   };
 
