@@ -27,7 +27,7 @@
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::expr_type,
                           (stan::lang::base_expr_type, base_type_)
-                          (size_t, num_dims_) );
+                          (size_t, num_dims_) )
 
 namespace stan {
 
