@@ -21,7 +21,7 @@ namespace stan {
     public:
 
       advi_params_meanfield(Eigen::VectorXd const& mu,
-                          Eigen::VectorXd const& sigma_tilde) :
+                            Eigen::VectorXd const& sigma_tilde) :
       mu_(mu),
       sigma_tilde_(sigma_tilde),
       dimension_(mu.size()) {
@@ -51,7 +51,7 @@ namespace stan {
       // Entropy of normal: 0.5 * log det diag(sigma^2) = sum(log(sigma))
       //                                                = sum(sigma_tilde)
       double entropy() const {
-        return stan::math::sum( sigma_tilde_ );
+        return sigma_tilde_.sum();
       }
 
       // // Calculate natural parameters
