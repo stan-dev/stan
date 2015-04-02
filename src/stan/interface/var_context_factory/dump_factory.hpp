@@ -1,9 +1,9 @@
 #ifndef STAN__INTERFACE__VAR_CONTEXT_FACTORY__DUMP_FACTORY_HPP
 #define STAN__INTERFACE__VAR_CONTEXT_FACTORY__DUMP_FACTORY_HPP
 
-#include <fstream>
+#include <stan/interface/var_context_factory/var_context_factory.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/interface/var_context_factory.hpp>
+#include <fstream>
 
 namespace stan {
   namespace interface {
