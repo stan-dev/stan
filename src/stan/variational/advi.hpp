@@ -34,8 +34,9 @@ namespace stan {
            int n_monte_carlo_elbo,
            double eta_stepsize,
            BaseRNG& rng,
-           std::ostream* output_stream,
            int refresh,
+           std::ostream* print_stream,
+           std::ostream* output_stream,
            std::ostream* diagnostic_stream):
         model_(m),
         cont_params_(cont_params),
@@ -45,6 +46,7 @@ namespace stan {
         n_monte_carlo_elbo_(n_monte_carlo_elbo),
         eta_stepsize_(eta_stepsize),
         refresh_(refresh),
+        print_stream_(print_stream),
         out_stream_(output_stream),
         diag_stream_(diagnostic_stream) {
 
@@ -74,7 +76,7 @@ namespace stan {
        * the sample, and evaluating the log joint, adjusted by the entropy
        * term of the normal
        *
-       * @param   advi_params        variational parameters class
+       * @param   advi_params      variational parameters class
        * @param   constant_factor  difference between log_prob agrad and double
        * @return                   evidence lower bound (elbo)
        */
@@ -95,7 +97,7 @@ namespace stan {
           z_tilde = advi_params.to_unconstrained(z_check);
 
           // Accumulate log probability
-          elbo += (model_.template log_prob<false,true>(z_tilde, &std::cout))
+          elbo += (model_.template log_prob<false,true>(z_tilde, print_stream_))
                    + constant_factor;
         }
         // Divide to get Monte Carlo integral estimate
@@ -154,7 +156,7 @@ namespace stan {
 
           // Compute gradient step in unconstrained space
           stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,
-                                &std::cout);
+                                print_stream_);
           stan::agrad::recover_memory();
 
           // Update mu
@@ -223,7 +225,7 @@ namespace stan {
 
           // Compute gradient step in unconstrained space
           stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,
-                                &std::cout);
+                                print_stream_);
           stan::agrad::recover_memory();
 
           // Update mu
@@ -248,9 +250,9 @@ namespace stan {
 
 
       /**
-       * FULL-RANK ROBBINS-MONRO
+       * FULL-RANK ROBBINS-MONRO ADAGRAD
        *
-       * Runs Robbins-Monro Stochastic Gradient for some number of iterations
+       * Runs stochastic gradient ascent for some number of iterations
        *
        * @param muL            mean and cholesky factor of affine transform
        * @param tol_rel_obj    relative tolerance parameter for convergence
@@ -295,17 +297,17 @@ namespace stan {
             z_tmp_agrad(var_index) = stan::agrad::var(0.0);
           }
         double constant_factor = (model_.template
-                   log_prob<true,true>(z_tmp_agrad, &std::cout)).val()
+                   log_prob<true,true>(z_tmp_agrad, print_stream_)).val()
                    -
-                   (model_.template log_prob<false,true>(z_tmp, &std::cout));
+                   (model_.template log_prob<false,true>(z_tmp, print_stream_));
 
         // Print stuff
-        std::cout << "  iter"
-                  << "       ELBO"
-                  << "   delta_ELBO_mean"
-                  << "   delta_ELBO_med"
-                  << "   notes "
-                  << std::endl;
+        *print_stream_ << "  iter"
+                       << "       ELBO"
+                       << "   delta_ELBO_mean"
+                       << "   delta_ELBO_med"
+                       << "   notes "
+                       << std::endl;
 
         // Timing variables
         clock_t start = clock();
@@ -346,7 +348,9 @@ namespace stan {
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / (double)(cb.size());
             delta_elbo_med = circ_buff_median(cb);
-            std::cout << "  " << std::setw(4) << iter_counter
+            *print_stream_
+                      << "  "
+                      << std::setw(4) << iter_counter
                       << "  "
                       << std::right << std::setw(9) << std::setprecision(1)
                       << elbo
@@ -369,27 +373,27 @@ namespace stan {
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
-              std::cout << "   MEAN ELBO CONVERGED";
+              *print_stream_ << "   MEAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (delta_elbo_med < tol_rel_obj) {
-              std::cout << "   MEDIAN ELBO CONVERGED";
+              *print_stream_ << "   MEDIAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (iter_counter > 100){
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
-                std::cout << "   MAY BE DIVERGING... INSPECT ELBO";
+                *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
               }
             }
 
-            std::cout << std::endl;
+            *print_stream_ << std::endl;
           }
 
           // Check for max iterations
           if (iter_counter == max_iterations) {
-            std::cout << "MAX ITERATIONS" << std::endl;
+            *print_stream_ << "MAX ITERATIONS" << std::endl;
             do_more_iterations = false;
           }
 
@@ -399,9 +403,9 @@ namespace stan {
 
 
       /**
-       * MEAN-FIELD ROBBINS-MONRO
+       * MEAN-FIELD ROBBINS-MONRO ADAGRAD
        *
-       * Runs Robbins-Monro Stochastic Gradient for some number of iterations
+       * Runs stochastic gradient ascent for some number of iterations
        *
        * @param musigmatilde    mean and log-std vector of affine transform
        * @param tol_rel_obj   relative tolerance parameter for convergence
@@ -446,17 +450,17 @@ namespace stan {
             z_tmp_agrad(var_index) = stan::agrad::var(0.0);
           }
         double constant_factor = (model_.template
-                   log_prob<true,true>(z_tmp_agrad, &std::cout)).val()
+                   log_prob<true,true>(z_tmp_agrad, print_stream_)).val()
                    -
-                   (model_.template log_prob<false,true>(z_tmp, &std::cout));
+                   (model_.template log_prob<false,true>(z_tmp, print_stream_));
 
         // Print stuff
-        std::cout << "  iter"
-                  << "       ELBO"
-                  << "   delta_ELBO_mean"
-                  << "   delta_ELBO_med"
-                  << "   notes "
-                  << std::endl;
+        *print_stream_ << "  iter"
+                       << "       ELBO"
+                       << "   delta_ELBO_mean"
+                       << "   delta_ELBO_med"
+                       << "   notes "
+                       << std::endl;
 
         // Timing variables
         clock_t start = clock();
@@ -500,7 +504,9 @@ namespace stan {
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
                              / (double)(cb.size());
             delta_elbo_med = circ_buff_median(cb);
-            std::cout << "  " << std::setw(4) << iter_counter
+            *print_stream_
+                      << "  "
+                      << std::setw(4) << iter_counter
                       << "  "
                       << std::right << std::setw(9) << std::setprecision(1)
                       << elbo
@@ -523,27 +529,27 @@ namespace stan {
             }
 
             if (delta_elbo_ave < tol_rel_obj) {
-              std::cout << "   MEAN ELBO CONVERGED";
+              *print_stream_ << "   MEAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (delta_elbo_med < tol_rel_obj) {
-              std::cout << "   MEDIAN ELBO CONVERGED";
+              *print_stream_ << "   MEDIAN ELBO CONVERGED";
               do_more_iterations = false;
             }
 
             if (iter_counter > 100){
               if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
-                std::cout << "   MAY BE DIVERGING... INSPECT ELBO";
+                *print_stream_ << "   MAY BE DIVERGING... INSPECT ELBO";
               }
             }
 
-            std::cout << std::endl;
+            *print_stream_ << std::endl;
           }
 
           // Check for max iterations
           if (iter_counter == max_iterations) {
-            std::cout << "MAX ITERATIONS REACHED" << std::endl;
+            *print_stream_ << "MAX ITERATIONS REACHED" << std::endl;
             do_more_iterations = false;
           }
 
@@ -552,7 +558,7 @@ namespace stan {
       }
 
       void run_fullrank(double tol_rel_obj, int max_iterations) {
-        std::cout
+        *print_stream_
         << "This is stan::variational::advi::run_fullrank()" << std::endl;
 
         // Initialize variational parameters: mu, L
@@ -566,11 +572,11 @@ namespace stan {
 
         cont_params_ = muL.mu();
 
-        // std::cout
+        // *print_stream_
         // << "mu = " << std::endl
         // << muL.mu() << std::endl;
 
-        // std::cout
+        // *print_stream_
         // << "Sigma = " << std::endl
         // << muL.L_chol() * muL.L_chol().transpose() << std::endl;
 
@@ -580,13 +586,13 @@ namespace stan {
         // s << "\n";
         // writer.write("L_chol", muL.L_chol());
         // std::string written = s.str();
-        // std::cout << written << std::endl;
+        // *print_stream_ << written << std::endl;
 
         return;
       }
 
       void run_meanfield(double tol_rel_obj, int max_iterations) {
-        std::cout
+        *print_stream_
         << "This is stan::variational::advi::run_meanfield()" << std::endl;
 
         // Initialize variational parameters: mu, sigma_tilde
@@ -601,22 +607,23 @@ namespace stan {
 
         cont_params_ = musigmatilde.mu();
 
-        // std::cout
+        // *print_stream_
         // << "mu = " << std::endl
         // << musigmatilde.mu() << std::endl;
 
-        // std::cout
+        // *print_stream_
         // << "sigma_tilde = " << std::endl
         // << musigmatilde.sigma_tilde() << std::endl;
 
         return;
       }
 
+      // Accessor to get results from command.hpp
       const Eigen::VectorXd& cont_params() {
         return cont_params_;
       }
 
-      // Compute the median of a circular buffer
+      // Helper function: compute the median of a circular buffer
       double circ_buff_median(const boost::circular_buffer<double>& cb) {
 
           // FIXME: naive implementation; creates a copy as a vector
@@ -631,13 +638,7 @@ namespace stan {
           return v[n];
       }
 
-      // double rel_param_decrease(Eigen::VectorXd const& prev,
-      //                           Eigen::VectorXd const& curr) const {
-      //   return (prev - curr).norm() / std::max(prev.norm(),
-      //                                          std::max(curr.norm(),
-      //                                                   1.0));
-      // }
-
+      // Helper function: compute relative decrease between two doubles
       double rel_decrease(double prev, double curr) const {
         return std::abs(curr - prev) / std::abs(prev);
       }
@@ -652,6 +653,7 @@ namespace stan {
       int n_monte_carlo_elbo_;
       double eta_stepsize_;
       int refresh_;
+      std::ostream* print_stream_;
       std::ostream* out_stream_;
       std::ostream* diag_stream_;
 

@@ -710,8 +710,10 @@ namespace stan {
                      elbo, grad_samples, elbo_samples,
                      eta_stepsize,
                      base_rng,
+                     refresh,
+                     &std::cout,
                      output_stream,
-                     refresh, diagnostic_stream);
+                     diagnostic_stream);
           cmd_advi.run_fullrank(tol_rel_obj, max_iterations);
 
           cont_params = cmd_advi.cont_params();
@@ -750,8 +752,10 @@ namespace stan {
                      elbo, grad_samples, elbo_samples,
                      eta_stepsize,
                      base_rng,
+                     refresh,
+                     &std::cout,
                      output_stream,
-                     refresh, diagnostic_stream);
+                     diagnostic_stream);
           cmd_advi.run_meanfield(tol_rel_obj, max_iterations);
 
           cont_params = cmd_advi.cont_params();
