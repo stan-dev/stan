@@ -10,7 +10,7 @@ namespace stan {
     class chainable;
     class chainable_alloc;
 
-    typedef AutodiffStackStorage<chainable,chainable_alloc> ChainableStack;
+    typedef AutodiffStackStorage<chainable, chainable_alloc> ChainableStack;
 
   }
 }

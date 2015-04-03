@@ -3,7 +3,7 @@
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Return 1 if the first argument is less than or equal to the second.
      * Equivalent to <code>x1 &lt;= x2</code>.

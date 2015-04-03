@@ -6,6 +6,7 @@
 #include <stan/math/prim/scal/meta/is_vector_like.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
+#include <functional>
 #include <string>
 
 namespace stan {
@@ -76,7 +77,7 @@ namespace stan {
      * @param low Lower bound
      *
      * @return <code>true</code> if y is strictly greater than low.
-     * @throw <code>domain_error</code> if y is not greater than low or 
+     * @throw <code>domain_error</code> if y is not greater than low or
      *   if any element of y or low is NaN.
      */
     template <typename T_y, typename T_low>

@@ -12,7 +12,7 @@ namespace stan {
     namespace {
       class digamma_vari : public op_v_vari {
       public:
-        digamma_vari(vari* avi) :
+        explicit digamma_vari(vari* avi) :
           op_v_vari(boost::math::digamma(avi->val_), avi) {
         }
         void chain() {

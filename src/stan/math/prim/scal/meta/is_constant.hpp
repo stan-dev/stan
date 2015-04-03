@@ -24,7 +24,7 @@ namespace stan {
      * A boolean constant with equal to <code>true</code> if the
      * type parameter <code>T</code> is a mathematical constant.
      */
-    enum { value = boost::is_convertible<T,double>::value };
+    enum { value = boost::is_convertible<T, double>::value };
   };
 
 }

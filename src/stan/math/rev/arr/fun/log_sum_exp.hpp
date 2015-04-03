@@ -5,6 +5,7 @@
 #include <stan/math/rev/scal/fun/calculate_chain.hpp>
 #include <stan/math/prim/arr/fun/log_sum_exp.hpp>
 #include <vector>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -15,19 +16,19 @@ namespace stan {
         using std::exp;
         using std::log;
         double max = -numeric_limits<double>::infinity();
-        for (size_t i = 0; i < x.size(); ++i) 
-          if (x[i] > max) 
+        for (size_t i = 0; i < x.size(); ++i)
+          if (x[i] > max)
             max = x[i].val();
         double sum = 0.0;
-        for (size_t i = 0; i < x.size(); ++i) 
-          if (x[i] != -numeric_limits<double>::infinity()) 
+        for (size_t i = 0; i < x.size(); ++i)
+          if (x[i] != -numeric_limits<double>::infinity())
             sum += exp(x[i].val() - max);
         return max + log(sum);
       }
 
       class log_sum_exp_vector_vari : public op_vector_vari {
       public:
-        log_sum_exp_vector_vari(const std::vector<var>& x) :
+        explicit log_sum_exp_vector_vari(const std::vector<var>& x) :
           op_vector_vari(log_sum_exp_as_double(x), x) {
         }
         void chain() {

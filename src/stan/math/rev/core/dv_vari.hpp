@@ -5,7 +5,7 @@
 
 namespace stan {
   namespace agrad {
-    
+
     class op_dv_vari : public vari {
     protected:
       double ad_;

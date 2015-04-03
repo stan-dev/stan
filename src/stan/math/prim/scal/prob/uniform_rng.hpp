@@ -27,7 +27,7 @@ namespace stan {
       using boost::random::uniform_real_distribution;
 
       static const char* function("stan::prob::uniform_rng");
-      
+
       using stan::math::check_finite;
       using stan::math::check_greater;
 

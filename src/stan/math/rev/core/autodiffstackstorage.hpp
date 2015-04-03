@@ -22,19 +22,34 @@ namespace stan {
     };
 
     template<typename ChainableT, typename ChainableAllocT>
-    std::vector<ChainableT*> AutodiffStackStorage<ChainableT,ChainableAllocT>::var_stack_;
+    std::vector<ChainableT*>
+    AutodiffStackStorage<ChainableT, ChainableAllocT>::var_stack_;
+
     template<typename ChainableT, typename ChainableAllocT>
-    std::vector<ChainableT*> AutodiffStackStorage<ChainableT,ChainableAllocT>::var_nochain_stack_;
+    std::vector<ChainableT*>
+    AutodiffStackStorage<ChainableT, ChainableAllocT>::var_nochain_stack_;
+
     template<typename ChainableT, typename ChainableAllocT>
-    std::vector<ChainableAllocT*> AutodiffStackStorage<ChainableT,ChainableAllocT>::var_alloc_stack_;
+    std::vector<ChainableAllocT*>
+    AutodiffStackStorage<ChainableT, ChainableAllocT>::var_alloc_stack_;
+
     template<typename ChainableT, typename ChainableAllocT>
-    memory::stack_alloc AutodiffStackStorage<ChainableT,ChainableAllocT>::memalloc_;
+    memory::stack_alloc
+    AutodiffStackStorage<ChainableT, ChainableAllocT>::memalloc_;
+
     template<typename ChainableT, typename ChainableAllocT>
-    std::vector<size_t> AutodiffStackStorage<ChainableT,ChainableAllocT>::nested_var_stack_sizes_;
+    std::vector<size_t>
+    AutodiffStackStorage<ChainableT, ChainableAllocT>::nested_var_stack_sizes_;
+
     template<typename ChainableT, typename ChainableAllocT>
-    std::vector<size_t> AutodiffStackStorage<ChainableT,ChainableAllocT>::nested_var_nochain_stack_sizes_;
+    std::vector<size_t>
+    AutodiffStackStorage<ChainableT, ChainableAllocT>
+    ::nested_var_nochain_stack_sizes_;
+
     template<typename ChainableT, typename ChainableAllocT>
-    std::vector<size_t> AutodiffStackStorage<ChainableT,ChainableAllocT>::nested_var_alloc_stack_starts_;
+    std::vector<size_t>
+    AutodiffStackStorage<ChainableT, ChainableAllocT>
+    ::nested_var_alloc_stack_starts_;
 
   }
 }

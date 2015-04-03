@@ -9,7 +9,7 @@ namespace stan {
 
     /**
      * Calculates the log of 1 plus the exponential of the specified
-     * value without overflow.                  
+     * value without overflow.
      *
      * This function is related to other special functions by:
      *
@@ -19,19 +19,19 @@ namespace stan {
      *
      * <code> = log(1 + exp(x))</code>
      *
-     * <code> = log_sum_exp(0,x)</code>.
+     * <code> = log_sum_exp(0, x)</code>.
      *
      *
        \f[
-       \mbox{log1p\_exp}(x) = 
+       \mbox{log1p\_exp}(x) =
        \begin{cases}
          \ln(1+\exp(x)) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{log1p\_exp}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{log1p\_exp}(x)}{\partial x} =
        \begin{cases}
          \frac{\exp(x)}{1+\exp(x)} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
@@ -45,7 +45,7 @@ namespace stan {
       using std::exp;
       // like log_sum_exp below with b=0.0; prevents underflow
       if (a > 0.0)
-        return a + log1p(exp(-a)); 
+        return a + log1p(exp(-a));
       return log1p(exp(a));
     }
 

@@ -10,7 +10,7 @@ namespace stan {
     namespace {
       class tgamma_vari : public op_v_vari {
       public:
-        tgamma_vari(vari* avi) :
+        explicit tgamma_vari(vari* avi) :
           op_v_vari(boost::math::tgamma(avi->val_), avi) {
         }
         void chain() {
@@ -34,27 +34,27 @@ namespace stan {
      *
      *
        \f[
-       \mbox{tgamma}(x) = 
+       \mbox{tgamma}(x) =
        \begin{cases}
-         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
-         \Gamma(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{error} & \mbox{if } x\in \{\dots, -3, -2, -1, 0\}\\
+         \Gamma(x) & \mbox{if } x\not\in \{\dots, -3, -2, -1, 0\}\\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{tgamma}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{tgamma}(x)}{\partial x} =
        \begin{cases}
-         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
-         \frac{\partial\, \Gamma(x)}{\partial x} & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{error} & \mbox{if } x\in \{\dots, -3, -2, -1, 0\}\\
+         \frac{\partial\, \Gamma(x)}{\partial x} & \mbox{if } x\not\in \{\dots, -3, -2, -1, 0\}\\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
        \Gamma(x)=\int_0^{\infty} u^{x - 1} \exp(-u) \, du
        \f]
-       
+
        \f[
        \frac{\partial \, \Gamma(x)}{\partial x} = \Gamma(x)\Psi(x)
        \f]

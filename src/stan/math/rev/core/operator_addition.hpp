@@ -5,6 +5,7 @@
 #include <stan/math/rev/core/vv_vari.hpp>
 #include <stan/math/rev/core/vd_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -45,33 +46,33 @@ namespace stan {
     /**
      * Addition operator for variables (C++).
      *
-     * The partial derivatives are defined by 
+     * The partial derivatives are defined by
      *
      * \f$\frac{\partial}{\partial x} (x+y) = 1\f$, and
      *
      * \f$\frac{\partial}{\partial y} (x+y) = 1\f$.
      *
-     * 
+     *
        \f[
-       \mbox{operator+}(x,y) = 
+       \mbox{operator+}(x, y) =
        \begin{cases}
-         x+y & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         x+y & \mbox{if } -\infty\leq x, y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{operator+}(x,y)}{\partial x} = 
+       \frac{\partial\, \mbox{operator+}(x, y)}{\partial x} =
        \begin{cases}
-         1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         1 & \mbox{if } -\infty\leq x, y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
-       \frac{\partial\,\mbox{operator+}(x,y)}{\partial y} = 
+       \frac{\partial\, \mbox{operator+}(x, y)}{\partial y} =
        \begin{cases}
-         1 & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         1 & \mbox{if } -\infty\leq x, y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
@@ -80,8 +81,8 @@ namespace stan {
      * @param b Second variable operand.
      * @return Variable result of adding two variables.
      */
-    inline var operator+(const var& a, const var& b) {    
-      return var(new add_vv_vari(a.vi_,b.vi_));
+    inline var operator+(const var& a, const var& b) {
+      return var(new add_vv_vari(a.vi_, b.vi_));
     }
 
     /**
@@ -98,7 +99,7 @@ namespace stan {
     inline var operator+(const var& a, const double b) {
       if (b == 0.0)
         return a;
-      return var(new add_vd_vari(a.vi_,b));
+      return var(new add_vd_vari(a.vi_, b));
     }
 
     /**
@@ -115,7 +116,7 @@ namespace stan {
     inline var operator+(const double a, const var& b) {
       if (a == 0.0)
         return b;
-      return var(new add_vd_vari(b.vi_,a)); // by symmetry
+      return var(new add_vd_vari(b.vi_, a));  // by symmetry
     }
 
   }

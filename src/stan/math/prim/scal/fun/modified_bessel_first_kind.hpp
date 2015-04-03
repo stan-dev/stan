@@ -10,37 +10,37 @@ namespace stan {
     /**
      *
        \f[
-       \mbox{modified\_bessel\_first\_kind}(v,z) = 
+       \mbox{modified\_bessel\_first\_kind}(v, z) =
        \begin{cases}
          I_v(z) & \mbox{if } -\infty\leq z \leq \infty \\[6pt]
          \textrm{error} & \mbox{if } z = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
-       \frac{\partial\,\mbox{modified\_bessel\_first\_kind}(v,z)}{\partial z} = 
+       \frac{\partial\, \mbox{modified\_bessel\_first\_kind}(v, z)}{\partial z} =
        \begin{cases}
          \frac{\partial\, I_v(z)}{\partial z} & \mbox{if } -\infty\leq z\leq \infty \\[6pt]
          \textrm{error} & \mbox{if } z = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
          {I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
          \f]
-   
+
          \f[
          \frac{\partial \, I_v(z)}{\partial z} = I_{v-1}(z)-\frac{v}{z}I_v(z)
          \f]
      *
      */
     template<typename T2>
-    inline T2 
-    modified_bessel_first_kind(const int v, const T2 z) { 
+    inline T2
+    modified_bessel_first_kind(const int v, const T2 z) {
       using stan::math::check_not_nan;
       check_not_nan("modified_bessel_first_kind", "z", z);
 
-      return boost::math::cyl_bessel_i(v,z); 
+      return boost::math::cyl_bessel_i(v, z);
     }
 
   }

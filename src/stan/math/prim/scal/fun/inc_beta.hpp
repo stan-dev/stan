@@ -11,7 +11,7 @@ namespace stan {
                            const double& b,
                            const double& x) {
       using boost::math::ibeta;
-      return ibeta(a,b,x);
+      return ibeta(a, b, x);
     }
   }
 }

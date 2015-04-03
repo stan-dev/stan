@@ -12,9 +12,9 @@ namespace stan {
 
     /**
      * Recover memory used for all variables for reuse.
-     * 
+     *
      * @throw std::logic_error if <code>empty_nested()</code> returns
-     * <code>false</code> 
+     * <code>false</code>
      */
     static inline void recover_memory() {
       if (!empty_nested())

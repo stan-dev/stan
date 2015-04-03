@@ -47,7 +47,8 @@ namespace stan {
                  const Eigen::Matrix<double, Dynamic, 1>& x,
                  double& fx,
                  Eigen::Matrix<double, Dynamic, Dynamic>& H,
-                 std::vector<Eigen::Matrix<double, Dynamic, Dynamic> >& grad_H) {
+                 std::vector<Eigen::Matrix<double, Dynamic, Dynamic> >&
+                 grad_H) {
       using Eigen::Matrix;
       fx = f(x);
       int d = x.size();

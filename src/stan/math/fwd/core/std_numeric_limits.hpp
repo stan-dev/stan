@@ -2,6 +2,7 @@
 #define STAN__MATH__FWD__CORE__STD_NUMERIC_LIMITS_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
+#include <limits>
 
 namespace std {
 
@@ -17,9 +18,9 @@ namespace std {
     static const bool is_integer = numeric_limits<double>::is_integer;
     static const bool is_exact = numeric_limits<double>::is_exact;
     static const int radix = numeric_limits<double>::radix;
-    static stan::agrad::fvar<T> epsilon() { 
+    static stan::agrad::fvar<T> epsilon() {
       return numeric_limits<double>::epsilon(); }
-    static stan::agrad::fvar<T> round_error() { 
+    static stan::agrad::fvar<T> round_error() {
       return numeric_limits<double>::round_error(); }
 
     static const int  min_exponent = numeric_limits<double>::min_exponent;
@@ -29,18 +30,18 @@ namespace std {
 
     static const bool has_infinity = numeric_limits<double>::has_infinity;
     static const bool has_quiet_NaN = numeric_limits<double>::has_quiet_NaN;
-    static const bool has_signaling_NaN = 
+    static const bool has_signaling_NaN =
                                       numeric_limits<double>::has_signaling_NaN;
-    static const float_denorm_style has_denorm = 
+    static const float_denorm_style has_denorm =
                                              numeric_limits<double>::has_denorm;
     static const bool has_denorm_loss = numeric_limits<double>::has_denorm_loss;
-    static stan::agrad::fvar<T> infinity() { 
+    static stan::agrad::fvar<T> infinity() {
       return numeric_limits<double>::infinity(); }
-    static stan::agrad::fvar<T> quiet_NaN() { 
+    static stan::agrad::fvar<T> quiet_NaN() {
       return numeric_limits<double>::quiet_NaN(); }
-    static stan::agrad::fvar<T> signaling_NaN() { 
+    static stan::agrad::fvar<T> signaling_NaN() {
       return numeric_limits<double>::signaling_NaN(); }
-    static stan::agrad::fvar<T> denorm_min() { 
+    static stan::agrad::fvar<T> denorm_min() {
       return numeric_limits<double>::denorm_min(); }
 
     static const bool is_iec559 = numeric_limits<double>::is_iec559;
@@ -49,7 +50,7 @@ namespace std {
 
     static const bool traps = numeric_limits<double>::traps;
     static const bool tinyness_before = numeric_limits<double>::tinyness_before;
-    static const float_round_style round_style = 
+    static const float_round_style round_style =
       numeric_limits<double>::round_style;
   };
 }

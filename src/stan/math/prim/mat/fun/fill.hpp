@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__FILL_HPP
 #define STAN__MATH__PRIM__MAT__FUN__FILL_HPP
 
-#include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <vector>
 
 namespace stan {
 
@@ -22,7 +22,7 @@ namespace stan {
     void fill(T& x, const S& y) {
       x = y;
     }
-    
+
     /**
      * Fill the specified container with the specified value.
      *
@@ -36,7 +36,7 @@ namespace stan {
      * @param y Value.
      */
     template <typename T, int R, int C, typename S>
-    void fill(Eigen::Matrix<T,R,C>& x, const S& y) {
+    void fill(Eigen::Matrix<T, R, C>& x, const S& y) {
       x.fill(y);
     }
 
@@ -54,10 +54,10 @@ namespace stan {
     template <typename T, typename S>
     void fill(std::vector<T>& x, const S& y) {
       for (size_t i = 0; i < x.size(); ++i)
-        fill(x[i],y);
+        fill(x[i], y);
     }
 
-    
+
 
   }
 }

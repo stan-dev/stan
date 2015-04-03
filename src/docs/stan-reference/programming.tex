@@ -1133,7 +1133,7 @@ approximate probit regression model may be coded with the following.
         y[n] ~ bernoulli(Phi_approx(alpha + beta * x[n]));
 \end{stancode}
 
-\section{Multi-Logit Regression}
+\section{Multi-Logit Regression}\label{multi-logit.section}
 
 Multiple outcome forms of logistic regression can be coded directly in
 \Stan.  For instance, suppose there are $K$ possible outcomes for each
@@ -1155,28 +1155,31 @@ parameters {
 }
 model {
   for (k in 1:K)
-    for (d in 1:D)
-      beta[k,d] ~ normal(0,5);
+    beta[k] ~ normal(0,5);
   for (n in 1:N)
     y[n] ~ categorical(softmax(beta * x[n]));
 }
 \end{stancode}
 %
-
-The softmax function is defined for a $K$-vector $\gamma \in \reals^K$ by
-\[
-\mbox{softmax}(\gamma) = 
-\left(
- \frac{\exp(\gamma_1)}
-      {\sum_{k=1}^K \exp(\gamma_k)},
-  \ldots,
-  \frac{\exp(\gamma_K)}
-       {\sum_{k=1}^K \exp(\gamma_k)}
-\right).
-\]
+See \refsection{softmax} for a definition of the softmax
+function.   A more efficient way to write the final line is
 %
-The result is in the unit $K$-simplex and thus appropriate to use as
-the parameter for a categorical distribution.
+\begin{stancode}
+    y[n] ~ categorical_logit(beta * x[n]);
+\end{stancode}
+%
+The \code{categorical\_logit} distribution is like the categorical
+distribution, with the parameters on the logit scale (see
+\refsection{categorical-distribution} for a full definition of
+\code{categorical\_logit}).
+
+The first loop may be made more efficient by vectorizing the first
+loop by converting the matrix \code{beta} to a vector, 
+%
+\begin{stancode}
+to_vector(beta) ~ normal(0,5);
+\end{stancode}
+
 
 \subsubsection{Constraints on Data Declarations}
 
@@ -1220,9 +1223,132 @@ Because softmax is invariant under adding a constant to each component
 of its input, the model is typically only identified if there is a
 suitable prior on the coefficients.
 
-An alternative is to use $K-1$ vectors by fixing one of them to be
-zero.  See \refsection{partially-known-parameters} for an example of
-how to mix known quantities and unknown quantities in a vector.
+An alternative is to use $(K-1)$-vectors by fixing one of them to be
+zero. \refsection{partially-known-parameters} discusses how to mix 
+constants and parameters in a vector.  In the multi-logit case, the
+parameter block would be redefined to use $(K-1)$-vectors
+%
+\begin{stancode}
+parameters {
+  matrix[K - 1, D] beta_raw;
+}
+\end{stancode}
+%
+and then these are transformed to parameters to use in the model.
+First, a transformed data block is added before the parameters block
+to define a column vector of zero values,
+%
+\begin{stancode}
+transformed data {
+  vector[D] zeros;
+  zeros <- rep_vector(0, D);
+}
+\end{stancode}
+%
+and then these are appended to \code{beta\_row} to produce the
+coefficient matrix \code{beta},
+%
+\begin{stancode}
+transformed parameters {
+  matrix[K, D] beta;
+  beta <- append_col(beta_raw, zeros);
+}
+\end{stancode}
+%
+See \refsection{matrix-broadcast} for a definition of \code{rep\_vector} and
+\refsection{matrix-concatenation} for a definition of
+\code{append\_col}.
+
+This is not quite the same model as using $K$-vectors as parameters,
+because now the prior only applies to $(K-1)$-vectors.  In practice,
+this will cause the maximum likelihood solutions to be different and
+also the posteriors to be slightly different when taking priors
+centered around zero, as is typical for regression coefficients.
+
+\section{Parameterizing Centered Vectors}
+
+It is often convenient to define a parameter vector $\beta$ that is
+centered in the sense of satisfying the sum-to-zero constraint,
+%
+\[
+\sum_{k=1}^K \beta_k = 0.
+\]
+%
+Such a parameter vector may be used to identify a multi-logit
+regression parameter vector (see \refsection{multi-logit}), or may be
+used for ability or difficulty parameters (but not both) in an IRT
+model (see \refsection{item-response-models}).
+
+
+\subsection{$K-1$ Degrees of Freedom}
+
+There is more than one way to enforce a sum-to-zero constraint on a
+parameter vector, the most efficient of which is to define the $K$-th
+element as the negation of the sum of the elements $1$ through $K-1$.
+%
+\begin{stancode}
+parameters {
+  vector[K-1] beta_raw;
+  ...
+transformed parameters {
+  vector[K] beta;  // centered
+
+  for (k in 1:(K-1)) {
+    beta[k] <- beta_raw[k];
+  }
+  beta[K] <- -sum(beta_raw);
+  ...
+\end{stancode}
+
+Placing a prior on \code{beta\_raw} in this parameterization leads to
+a subtly different posterior than that resulting from the same prior
+on \code{beta} in the original parameterization without the
+sum-to-zero constraint.  Most notably, a simple prior on each
+component of \code{beta\_raw} produces different results than putting
+the same prior on each component of an unconstrained $K$-vector
+\code{beta}.  For example, providing a $\distro{Normal}(0,5)$ prior
+on \code{beta} will produce a different posterior mode than placing
+the same prior on \code{beta\_raw}.
+
+
+\subsection{Translated and Scaled Simplex}
+
+An alternative approch that's less efficient, but amenable to a
+a symmetric prior, is to offset and scale a simplex.
+%
+\begin{stancode}
+parameters {
+  simplex[K] beta_raw;
+  real beta_scale;
+  ...
+transformed parameters {
+  vector[K] beta;
+  beta <- beta_scale * (beta_raw - 1.0 / K);
+  ...
+\end{stancode}
+%
+Given that \code{beta\_raw} sums to 1 because it is a simplex, the
+elementwise subtraction of $1 / K$ is guaranteed to sum to zero (note
+that the expression \code{1.0 / K} is used rather than \code{1 / K} to
+prevent integer arithmetic rounding down to zero).  Because the
+magnitude of the elements of the simplex is bounded, a scaling factor
+is required to provide \code{beta} with $K$ degrees of freedom
+necessary to take on every possible value that sums to zero.
+
+With this parameterization, a Dirichlet prior can be placed on
+\code{beta\_raw}, perhaps uniform, and another prior put on
+\code{beta\_scale}, typically for ``shrinkage.''  
+
+
+\subsection{Soft Centering}
+
+Adding a prior such as $\beta \sim \distro{Normal}(0,\sigma)$ will provide a kind
+of soft centering of a parameter vector $\beta$ by preferring, all
+else being equal, that $\sum_{k=1}^K \beta_k = 0$.  This approach is only
+guaranteed to roughly center  if $\beta$ and the elementwise addition $\beta + c$
+for a scalar constant $c$ produce the same likelihood (perhaps by
+another vector $\alpha$ being transformed to $\alpha - c$, as in the
+IRT models).  This is another way of achieving a symmetric prior.
 
 
 \section{Ordered Logistic and Probit Regression}\label{ordered-logistic.section}
@@ -1608,7 +1734,7 @@ parameters are declared as follows.
 
 \begin{stancode}
 parameters {    
-  real delta;                  // mean student ability
+  real mu_beta;                  // mean student ability
   real alpha[J];               // ability for j - mean
   real beta[K];                // difficulty for k
   real<lower=0> gamma[K];      // discrimination of k
@@ -1675,14 +1801,14 @@ Non-centered parameterizations tend to be more efficient in
 hierarchical models; see \refsection{reparameterization} for more
 information on non-centered reparameterizations.
 
-The intercept term \code{delta} can't be modeled hierarchically, so it
-is given a weakly informative $\distro{Cauchy}(0,5)$ prior.
-Similarly, the scale terms, \code{sigma\_alpha}, \code{sigma\_beta},
-and \code{sigma\_gamma}, are given half-Cauchy priors.  The truncation
-in the half-Cauchy prior is implicit; explicit truncation is not
-necessary because the log probability need only be calculated up to a
-proportion and the scale variables are constrained to $(0,\infty)$ by 
-their declarations.
+The intercept term \code{mu\_beta} can't itself be modeled
+hierarchically, so it is given a weakly informative
+$\distro{Cauchy}(0,5)$ prior.  Similarly, the scale terms,
+\code{sigma\_alpha}, \code{sigma\_beta}, and \code{sigma\_gamma}, are
+given half-Cauchy priors.  The truncation in the half-Cauchy prior is
+implicit; explicit truncation is not necessary because the log
+probability need only be calculated up to a proportion and the scale
+variables are constrained to $(0,\infty)$ by their declarations.
 
 
 
@@ -3587,7 +3713,7 @@ model. If $Y$ is a mixture of $K$ normal distributions with
 locations $\mu_k$ and scales $\sigma_k$ with mixing proportions
 $\theta$ in the unit $K$-simplex, then 
 \[
-p_Y(y\theta,\mu,\sigma) = \sum_{k=1}^K \theta_k \, \distro{Normal}(\mu_k,\sigma_k).
+p_Y(y | \theta,\mu,\sigma) = \sum_{k=1}^K \theta_k \, \distro{Normal}(\mu_k,\sigma_k).
 \]
 
 \section{Log Sum of Exponentials: Linear Sums on the Log Scale}
@@ -3628,14 +3754,14 @@ model {
   increment_log_prob(log_sum_exp(log(0.3) 
                                    + normal_log(y,-1,2),
                                  log(0.7) 
-                                   + normal_log(y,3,1));
+                                   + normal_log(y,3,1)));
 }
 \end{stancode}
 %
 The log probabilty term is derived by taking
 %
 \begin{eqnarray*}
-\log p_Y(y|\theta,\mu,\sigma) & = & \log\!\left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
+\log p_Y(y | \theta,\mu,\sigma) & = & \log\!\left( 0.3 \times \distro{Normal}(y|-1,2) \, + \,
   0.7 \times
   \distro{Normal}(y|3,1) \, \right)
 \\[2pt]
@@ -3894,7 +4020,7 @@ now \code{x\_meas}, which is a measurement of the true \code{x} value
 with noise scale \code{tau}.  The model then specifies that the
 measurement error for \code{x\_meas[n]} given true value \code{x[n]}
 is normal with deviation \code{tau}.  Furthermore, the true values
-\code{x} are given a hierarchical prior;  without 
+\code{x} are given a hierarchical prior here.
 
 In cases where the measurement errors are not normal, richer
 measurement error models may be specified.  The prior on the true
@@ -6301,8 +6427,12 @@ transformed data {
 }
 parameters {
   real<lower=0> eta_sq;
-  real<lower=0> rho_sq;
+  real<lower=0> inv_rho_sq;
   real<lower=0> sigma_sq;
+}
+transformed parameters {
+  real<lower=0> rho_sq;
+  rho_sq <- inv(inv_rho_sq);
 }
 model {
   matrix[N,N] Sigma;
@@ -6318,7 +6448,7 @@ model {
     Sigma[k,k] <- eta_sq + sigma_sq;  // + jitter
 
   eta_sq ~ cauchy(0,5);
-  rho_sq ~ cauchy(0,5);
+  inv_rho_sq ~ cauchy(0,5);
   sigma_sq ~ cauchy(0,5);
 
   y ~ multi_normal(mu,Sigma);
@@ -6335,7 +6465,11 @@ precomputed as transformed data.  The rest of the model consists of
 the priors for the hyperparameters and the multivariate
 normal likelihood, only now the value \code{y} is known and the
 covariance matrix \code{Sigma} is an unknown dependent on the
-hyperparameters.  
+hyperparameters.  Note that a prior is put on the scale term
+\code{inv\_rho\_sq}, then \code{rho\_sq} is defined as
+\code{inv(inv\_rho\_sq)}, which is just a more efficient way of
+expressing \code{1~/~rho\_sq}.  An alternative would be to just divide
+by \code{inv\_rho\_sq}.
 
 Hamiltonian Monte Carlo sampling is quite fast and effective for
 hyperparameter inference in this model \citep{Neal:1997}, and the Stan
@@ -6376,8 +6510,8 @@ this subsection.
 The parameters $\rho$ and $\eta$ are only weakly identifiable, and the
 ratio of them is better identified and affects the
 nonlinearity. However it is usual to use independent priors.  It may
-be easier to formulate a prior for $1/rho$, which is the length
-scale.  
+be easier to formulate a prior for $1/\rho$, which is the length
+scale or $1/\rho^2$ as in the earlier example.  
 
 If the length scale is larger than the scale of the data the model is
 practically linear (with respect to the particular covariate) and
@@ -6405,7 +6539,7 @@ of x1 is higher. That is, $\rho$ is related to the relevance, but it
 is more accurate to say that it measures the nonlinearity or the
 expected number of upcrossings \cite[page~80]{RasmussenWilliams:2006}.
 
-The collection of $\rho_d$ (or $1/rho_d$) parameters can also be
+The collection of $\rho_d$ (or $1/\rho_d$) parameters can also be
 modeled hierarchically.
 
 
@@ -6578,7 +6712,7 @@ transformed data {
         K[i,j] <- exp(-pow(x1[i] - x2[j],2));
     
     K_transpose_div_Sigma <- K' / Sigma;
-<    mu <- K_transpose_div_Sigma * y1; 
+    mu <- K_transpose_div_Sigma * y1; 
     Tau <- Omega - K_transpose_div_Sigma * K;
     for (i in 1:(N2-1))
       for (j in (i+1):N2)
@@ -6750,6 +6884,41 @@ defining the covariance matrix in the model block as a local variable.
 As with BUGS, Stan supports a direct encoding of reparameterizations.
 Stan also supports changes of variables by directly incrementing the
 log probability accumulator with the log Jacobian of the transform.
+
+\section{Theoretical and Practical Background}
+
+A Bayesian posterior is technically a probability \emph{measure},
+which is a parameterization-invariant, abstract mathematical object.%
+%
+\footnote{This is in contrast to (penalized) maximum likelihood
+  estimates, which are not parameterization invariant.}
+%
+Stan's modeling language, on the other hand, defines a probability
+\emph{density}, which is a non-unique, parameterization-dependent
+function in $\reals^N \rightarrow \reals^{+}$.  In practice, this
+means a given model can be represented different ways in Stan, and
+different representations have different computational performances.
+
+As pointed out by \cite{Gelman:2004} in a paper discussing the
+relation between parameterizations and Bayesian modeling, a change of
+parameterization often carries with it suggestions of how the model
+might change, because we tend to use certain natural classes of prior
+distributions.  Thus, it's not \emph{just}\ that we have a fixed
+distribution that we want to sample from, with reparameterizations
+being computational aids.  In addition, once we reparameterize and add
+prior information, the model itself typically changes, often in useful
+ways.%
+%
+\footnote{Gelman's handy statistical lexicon
+  (\url{http://andrewgelman.com/2009/05/24/handy_statistic/}) calls
+  this \emph{The Pinocchio Principle}, ``A model that is created
+  solely for computational reasons can take on a life of its own.''
+  This principle is also related to what Gelman calls \emph{The Folk
+    Theorem}, ``When you have computational problems, often there's a
+  problem with your model.''}
+
+
+
 
 \section{Reparameterizations}
 
@@ -7682,7 +7851,7 @@ and ending with \code{*/} to the Stan parser.
 For functions that raise exceptions, exceptions can be documented using
 \code{@throws}.%
 %
-\footnote{As of Stan 2.6.1, the only way a user-defined
+\footnote{As of Stan 2.6.3, the only way a user-defined
 producer will raise an exception is if a function it calls (including
 sampling statements) raises an exception via the reject statement.}
 %

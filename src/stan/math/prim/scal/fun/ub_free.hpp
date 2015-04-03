@@ -8,7 +8,7 @@
 #include <limits>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -16,7 +16,7 @@ namespace stan {
      * upper-bounded value with respect to the specified upper bound.
      *
      * <p>The transform is the reverse of the
-     * <code>ub_constrain(T,double)</code> transform,
+     * <code>ub_constrain(T, double)</code> transform,
      *
      * <p>\f$f^{-1}(y) = \log -(y - U)\f$
      *
@@ -35,12 +35,12 @@ namespace stan {
      */
     template <typename T, typename TU>
     inline
-    typename boost::math::tools::promote_args<T,TU>::type
+    typename boost::math::tools::promote_args<T, TU>::type
     ub_free(const T y, const TU ub) {
       if (ub == std::numeric_limits<double>::infinity())
         return identity_free(y);
-      stan::math::check_less_or_equal("stan::prob::ub_free", 
-                                                "Upper bounded variable", y, ub);
+      stan::math::check_less_or_equal("stan::prob::ub_free",
+                                      "Upper bounded variable", y, ub);
       return log(ub - y);
     }
 

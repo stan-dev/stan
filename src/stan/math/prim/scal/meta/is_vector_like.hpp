@@ -10,7 +10,7 @@ namespace stan {
   // handles scalar, eigen vec, eigen row vec, std vec
   template <typename T>
   struct is_vector_like {
-    enum { value = stan::is_vector<T>::value };  
+    enum { value = stan::is_vector<T>::value };
   };
   template <typename T>
   struct is_vector_like<T*> {
@@ -19,7 +19,7 @@ namespace stan {
   // handles const
   template <typename T>
   struct is_vector_like<const T> {
-    enum { value = stan::is_vector_like<T>::value };  
+    enum { value = stan::is_vector_like<T>::value };
   };
 }
 #endif

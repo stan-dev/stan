@@ -32,7 +32,7 @@ namespace stan {
       using boost::random::exponential_distribution;
 
       static const char* function("stan::prob::logistic_rng");
-      
+
       using stan::math::check_positive_finite;
       using stan::math::check_finite;
 

@@ -1,15 +1,15 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__VARIANCE_HPP
 #define STAN__MATH__PRIM__MAT__FUN__VARIANCE_HPP
 
-#include <vector>
-#include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/mean.hpp>
 #include <stan/math/prim/scal/err/check_nonzero_size.hpp>
+#include <boost/math/tools/promotion.hpp>
+#include <vector>
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the sample variance (divide by length - 1) of the
      * coefficients in the specified standard vector.
@@ -19,7 +19,7 @@ namespace stan {
      * than 1.
      */
     template <typename T>
-    inline 
+    inline
     typename boost::math::tools::promote_args<T>::type
     variance(const std::vector<T>& v) {
       stan::math::check_nonzero_size("variance", "v", v);
@@ -43,23 +43,23 @@ namespace stan {
     template <typename T, int R, int C>
     inline
     typename boost::math::tools::promote_args<T>::type
-    variance(const Eigen::Matrix<T,R,C>& m) {
+    variance(const Eigen::Matrix<T, R, C>& m) {
       stan::math::check_nonzero_size("variance", "m", m);
 
       if (m.size() == 1)
         return 0.0;
-      typename boost::math::tools::promote_args<T>::type 
+      typename boost::math::tools::promote_args<T>::type
         mn(mean(m));
-      typename boost::math::tools::promote_args<T>::type 
+      typename boost::math::tools::promote_args<T>::type
         sum_sq_diff(0);
       for (int i = 0; i < m.size(); ++i) {
-        typename boost::math::tools::promote_args<T>::type 
+        typename boost::math::tools::promote_args<T>::type
           diff = m(i) - mn;
         sum_sq_diff += diff * diff;
       }
       return sum_sq_diff / (m.size() - 1);
     }
-    
+
   }
 }
 #endif
