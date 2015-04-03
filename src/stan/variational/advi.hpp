@@ -7,6 +7,8 @@
 #include <algorithm>
 
 #include <stan/math/prim.hpp>
+#include <stan/math/prim/scal/err/check_positive.hpp>
+
 #include <stan/model/util.hpp>
 
 #include <stan/services/io/write_iteration_csv.hpp>
@@ -44,7 +46,22 @@ namespace stan {
         eta_stepsize_(eta_stepsize),
         refresh_(refresh),
         out_stream_(output_stream),
-        diag_stream_(diagnostic_stream) {};
+        diag_stream_(diagnostic_stream) {
+
+        static const char* function =
+          "stan::variational::advi";
+
+        stan::math::check_positive(function,
+                                   "Number of Monte Carlo samples for gradients",
+                                   n_monte_carlo_grad_);
+
+        stan::math::check_positive(function,
+                                   "Number of Monte Carlo samples for ELBO",
+                                   n_monte_carlo_elbo_);
+
+        stan::math::check_positive(function, "Eta stepsize", eta_stepsize_);
+
+        };
 
       virtual ~advi() {};
 
@@ -176,7 +193,7 @@ namespace stan {
                               Eigen::VectorXd& sigma_tilde_grad) {
         static const char* function =
           "stan::variational::advi.calc_combined_grad";
-        
+
         int dim       = musigmatilde.dimension();
         double tmp_lp = 0.0;
 
