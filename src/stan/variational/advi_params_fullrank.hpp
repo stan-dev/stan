@@ -28,7 +28,7 @@ namespace stan {
       mu_(mu), L_chol_(L_chol), dimension_(mu.size()) {
 
         static const char* function =
-          "stan::variational::advi_params_fullrank(%1%)";
+          "stan::variational::advi_params_fullrank";
 
         stan::math::check_square(function, "Cholesky factor", L_chol_);
         stan::math::check_size_match(function,
@@ -86,7 +86,7 @@ namespace stan {
       // Implements f^{-1}(\check{z}) = L\check{z} + \mu
       Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& z_check) const {
         static const char* function = "stan::variational::advi_params_fullrank"
-                                      "::to_unconstrained(%1%)";
+                                      "::to_unconstrained";
 
         stan::math::check_size_match(function,
                          "Dimension of input vector", z_check.size(),

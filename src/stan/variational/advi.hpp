@@ -107,7 +107,7 @@ namespace stan {
         Eigen::VectorXd& mu_grad,
         Eigen::MatrixXd& L_grad) {
         static const char* function =
-          "stan::variational::advi.calc_combined_grad(%1%)";
+          "stan::variational::advi.calc_combined_grad";
 
         int dim       = muL.dimension();
         double tmp_lp = 0.0;
@@ -177,7 +177,7 @@ namespace stan {
         Eigen::VectorXd& mu_grad,
         Eigen::VectorXd& sigma_tilde_grad) {
         static const char* function =
-          "stan::variational::advi.calc_combined_grad(%1%)";
+          "stan::variational::advi.calc_combined_grad";
 
         int dim       = musigmatilde.dimension();
         double tmp_lp = 0.0;

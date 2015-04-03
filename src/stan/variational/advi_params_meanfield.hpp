@@ -27,7 +27,7 @@ namespace stan {
       dimension_(mu.size()) {
 
         static const char* function =
-          "stan::variational::advi_params_meanfield(%1%)";
+          "stan::variational::advi_params_meanfield";
 
         stan::math::check_size_match(function,
                                "Dimension of mean vector", dimension_,
@@ -73,7 +73,7 @@ namespace stan {
       // Implement f^{-1}(\check{z}) = sigma * \check{z} + \mu
       Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& z_check) const {
         static const char* function = "stan::variational::advi_params_meanfield"
-                                      "::to_unconstrained(%1%)";
+                                      "::to_unconstrained";
 
         stan::math::check_size_match(function,
                          "Dimension of mean vector", dimension_,
