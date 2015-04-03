@@ -25,14 +25,12 @@ namespace stan {
       mu_(mu),
       sigma_tilde_(sigma_tilde),
       dimension_(mu.size()) {
-
         static const char* function =
           "stan::variational::advi_params_meanfield";
 
         stan::math::check_size_match(function,
                                "Dimension of mean vector", dimension_,
                                "Dimension of std vector", sigma_tilde_.size() );
-
       };
 
       virtual ~advi_params_meanfield() {}; // No-op
@@ -43,8 +41,25 @@ namespace stan {
       const Eigen::VectorXd& sigma_tilde() const { return sigma_tilde_; }
 
       // Mutators
-      void set_mu(const Eigen::VectorXd& mu) { mu_ = mu; }
+      void set_mu(const Eigen::VectorXd& mu) {
+        static const char* function =
+          "stan::variational::advi_params_meanfield::set_mu";
+
+        stan::math::check_size_match(function,
+                               "Dimension of input vector", mu.size(),
+                               "Dimension of current vector", dimension_ );
+
+        mu_ = mu;
+      }
+
       void set_sigma_tilde(const Eigen::VectorXd& sigma_tilde) {
+        static const char* function =
+          "stan::variational::advi_params_meanfield::set_sigma_tilde";
+
+        stan::math::check_size_match(function,
+                               "Dimension of input vector", sigma_tilde.size(),
+                               "Dimension of current vector", dimension_ );
+
         sigma_tilde_ = sigma_tilde;
       }
 

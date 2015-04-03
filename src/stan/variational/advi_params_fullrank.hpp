@@ -30,7 +30,6 @@ namespace stan {
         static const char* function =
           "stan::variational::advi_params_fullrank";
 
-        stan::math::check_square(function, "Cholesky factor", L_chol_);
         stan::math::check_size_match(function,
                                "Dimension of mean vector",     dimension_,
                                "Dimension of Cholesky factor", L_chol_.rows() );
@@ -47,8 +46,28 @@ namespace stan {
       const Eigen::MatrixXd& L_chol() const { return L_chol_; }
 
       // Mutators
-      void set_mu(const Eigen::VectorXd& mu) { mu_ = mu; }
-      void set_L_chol(const Eigen::MatrixXd& L_chol) { L_chol_ = L_chol; }
+      void set_mu(const Eigen::VectorXd& mu) {
+        static const char* function =
+          "stan::variational::advi_params_fullrank::set_mu";
+
+        stan::math::check_size_match(function,
+                               "Dimension of input vector", mu.size(),
+                               "Dimension of current vector", dimension_ );
+        mu_ = mu;
+      }
+
+      void set_L_chol(const Eigen::MatrixXd& L_chol) {
+        static const char* function =
+          "stan::variational::advi_params_fullrank::set_L_chol";
+
+        stan::math::check_size_match(function,
+                               "Dimension of mean vector",     dimension_,
+                               "Dimension of Cholesky factor", L_chol.rows() );
+        stan::math::check_cholesky_factor(function,
+                               "Cholesky factor", L_chol);
+
+        L_chol_ = L_chol;
+      }
 
       // Entropy of normal: 0.5 * log det (L^T L) = sum(log(abs(diag(L))))
       double entropy() const {
