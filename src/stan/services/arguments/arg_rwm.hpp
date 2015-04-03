@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__RWM__HPP
-#define STAN__SERVICES__ARGUMENTS__RWM__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_RWM_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_RWM_HPP
 
 #include <stan/services/arguments/categorical_argument.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__PARSER__VAR_DECLS_GRAMMAR_DEF__HPP
-#define STAN__LANG__PARSER__VAR_DECLS_GRAMMAR_DEF__HPP
+#ifndef STAN_LANG_GRAMMARS_VAR_DECLS_GRAMMAR_DEF_HPP
+#define STAN_LANG_GRAMMARS_VAR_DECLS_GRAMMAR_DEF_HPP
 
 #include <boost/spirit/include/qi.hpp>
 // FIXME: get rid of unused include

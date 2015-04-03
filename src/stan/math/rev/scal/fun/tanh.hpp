@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__TANH_HPP
-#define STAN__MATH__REV__SCAL__FUN__TANH_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_TANH_HPP
+#define STAN_MATH_REV_SCAL_FUN_TANH_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <cmath>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__GUMBEL_CCDF_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__GUMBEL_CCDF_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_GUMBEL_CCDF_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_GUMBEL_CCDF_LOG_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>

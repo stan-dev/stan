@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__LOG1M_EXP_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__LOG1M_EXP_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_LOG1M_EXP_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_LOG1M_EXP_HPP
 
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <boost/math/tools/promotion.hpp>

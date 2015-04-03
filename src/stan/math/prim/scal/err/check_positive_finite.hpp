@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__ERR__CHECK_POSITIVE_FINITE_HPP
-#define STAN__MATH__PRIM__SCAL__ERR__CHECK_POSITIVE_FINITE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_ERR_CHECK_POSITIVE_FINITE_HPP
+#define STAN_MATH_PRIM_SCAL_ERR_CHECK_POSITIVE_FINITE_HPP
 
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>

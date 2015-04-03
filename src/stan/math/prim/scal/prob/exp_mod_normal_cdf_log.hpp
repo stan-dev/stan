@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__EXP_MOD_NORMAL_CDF_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__EXP_MOD_NORMAL_CDF_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_EXP_MOD_NORMAL_CDF_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_EXP_MOD_NORMAL_CDF_LOG_HPP
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

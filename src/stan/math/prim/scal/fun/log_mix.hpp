@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__LOG_MIX_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__LOG_MIX_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_LOG_MIX_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_LOG_MIX_HPP
 
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>

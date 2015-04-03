@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__IS_VAR_OR_ARITHMETIC_HPP
-#define STAN__MATH__PRIM__SCAL__META__IS_VAR_OR_ARITHMETIC_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_IS_VAR_OR_ARITHMETIC_HPP
+#define STAN_MATH_PRIM_SCAL_META_IS_VAR_OR_ARITHMETIC_HPP
 
 #include <stan/math/prim/scal/meta/is_var.hpp>
 #include <stan/math/prim/scal/meta/scalar_type.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__PROMOTE_COMMON_HPP
-#define STAN__MATH__PRIM__MAT__FUN__PROMOTE_COMMON_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_PROMOTE_COMMON_HPP
+#define STAN_MATH_PRIM_MAT_FUN_PROMOTE_COMMON_HPP
 
 #include <stan/math/prim/mat/fun/common_type.hpp>
 #include <stan/math/prim/mat/fun/promoter.hpp>

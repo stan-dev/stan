@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__SCALAR_TYPE_PRE_HPP
-#define STAN__MATH__PRIM__SCAL__META__SCALAR_TYPE_PRE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_SCALAR_TYPE_PRE_HPP
+#define STAN_MATH_PRIM_SCAL_META_SCALAR_TYPE_PRE_HPP
 
 #include <stan/math/prim/scal/meta/is_vector.hpp>
 #include <stan/math/prim/mat/meta/is_vector.hpp>

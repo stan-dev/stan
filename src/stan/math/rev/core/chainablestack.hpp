@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__CHAINABLESTACK_HPP
-#define STAN__MATH__REV__CORE__CHAINABLESTACK_HPP
+#ifndef STAN_MATH_REV_CORE_CHAINABLESTACK_HPP
+#define STAN_MATH_REV_CORE_CHAINABLESTACK_HPP
 
 #include <stan/math/rev/core/autodiffstackstorage.hpp>
 

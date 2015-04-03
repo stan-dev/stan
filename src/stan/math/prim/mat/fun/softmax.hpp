@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__SOFTMAX_HPP
-#define STAN__MATH__PRIM__MAT__FUN__SOFTMAX_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_SOFTMAX_HPP
+#define STAN_MATH_PRIM_MAT_FUN_SOFTMAX_HPP
 
 #include <stan/math/prim/scal/err/check_nonzero_size.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

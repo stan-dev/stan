@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__SD_HPP
-#define STAN__MATH__REV__MAT__FUN__SD_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_SD_HPP
+#define STAN_MATH_REV_MAT_FUN_SD_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/mean.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__IBETA_HPP
-#define STAN__MATH__REV__SCAL__FUN__IBETA_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_IBETA_HPP
+#define STAN_MATH_REV_SCAL_FUN_IBETA_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>

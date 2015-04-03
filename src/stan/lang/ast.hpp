@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__AST_HPP
-#define STAN__LANG__AST_HPP
+#ifndef STAN_LANG_AST_HPP
+#define STAN_LANG_AST_HPP
 
 #include <map>
 #include <string>

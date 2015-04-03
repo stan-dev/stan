@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__TRACE_GEN_INV_QUAD_FORM_LDLT_HPP
-#define STAN__MATH__PRIM__MAT__FUN__TRACE_GEN_INV_QUAD_FORM_LDLT_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_TRACE_GEN_INV_QUAD_FORM_LDLT_HPP
+#define STAN_MATH_PRIM_MAT_FUN_TRACE_GEN_INV_QUAD_FORM_LDLT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/LDLT_factor.hpp>

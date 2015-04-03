@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__BETA_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__BETA_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_BETA_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_BETA_LOG_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>

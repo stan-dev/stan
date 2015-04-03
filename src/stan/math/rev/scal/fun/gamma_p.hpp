@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__GAMMA_P_HPP
-#define STAN__MATH__REV__SCAL__FUN__GAMMA_P_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_GAMMA_P_HPP
+#define STAN_MATH_REV_SCAL_FUN_GAMMA_P_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/gamma_p.hpp>

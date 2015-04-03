@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__VAR_HPP
-#define STAN__MATH__REV__CORE__VAR_HPP
+#ifndef STAN_MATH_REV_CORE_VAR_HPP
+#define STAN_MATH_REV_CORE_VAR_HPP
 
 #include <stan/math/rev/core/vari.hpp>
 #include <stan/math/rev/core/grad.hpp>

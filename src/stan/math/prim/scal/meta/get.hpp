@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__GET_HPP
-#define STAN__MATH__PRIM__SCAL__META__GET_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_GET_HPP
+#define STAN_MATH_PRIM_SCAL_META_GET_HPP
 
 #include <cmath>
 #include <cstddef>

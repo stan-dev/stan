@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__SORT_DESC_HPP
-#define STAN__MATH__FWD__MAT__FUN__SORT_DESC_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_SORT_DESC_HPP
+#define STAN_MATH_FWD_MAT_FUN_SORT_DESC_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
