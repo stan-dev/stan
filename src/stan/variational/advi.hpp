@@ -27,13 +27,13 @@ namespace stan {
 
       advi(M& m,
            Eigen::VectorXd& cont_params,
-           double& elbo,
-           int& n_monte_carlo_grad,
-           int& n_monte_carlo_elbo,
-           double& eta_stepsize,
+           double elbo,
+           int n_monte_carlo_grad,
+           int n_monte_carlo_elbo,
+           double eta_stepsize,
            BaseRNG& rng,
            std::ostream* output_stream,
-           int& refresh,
+           int refresh,
            std::ostream* diagnostic_stream):
         model_(m),
         cont_params_(cont_params),
