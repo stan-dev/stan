@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__STEPSIZE__HPP
-#define STAN__SERVICES__ARGUMENTS__STEPSIZE__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_STEPSIZE_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_STEPSIZE_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 

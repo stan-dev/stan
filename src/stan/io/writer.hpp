@@ -1,5 +1,5 @@
-#ifndef STAN__IO__WRITER_HPP
-#define STAN__IO__WRITER_HPP
+#ifndef STAN_IO_WRITER_HPP
+#define STAN_IO_WRITER_HPP
 
 #include <stan/math/prim/arr.hpp>
 #include <stan/math/prim/mat.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__PROB_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__PROB_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_PROB_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_PROB_CONSTRAIN_HPP
 
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>

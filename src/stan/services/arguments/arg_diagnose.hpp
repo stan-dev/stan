@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__DIAGNOSE__HPP
-#define STAN__SERVICES__ARGUMENTS__DIAGNOSE__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_DIAGNOSE_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_DIAGNOSE_HPP
 
 #include <stan/services/arguments/categorical_argument.hpp>
 

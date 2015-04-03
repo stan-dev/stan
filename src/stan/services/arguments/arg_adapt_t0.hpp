@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__ADAPT__T0__HPP
-#define STAN__SERVICES__ARGUMENTS__ADAPT__T0__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_ADAPT_T0_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_ADAPT_T0_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 

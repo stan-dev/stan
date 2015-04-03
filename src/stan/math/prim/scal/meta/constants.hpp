@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__CONSTANTS_HPP
-#define STAN__MATH__PRIM__SCAL__META__CONSTANTS_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_CONSTANTS_HPP
+#define STAN_MATH_PRIM_SCAL_META_CONSTANTS_HPP
 
 #include <boost/math/constants/constants.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__ARR__FUNCTOR__INTEGRATE_ODE_HPP
-#define STAN__MATH__PRIM__ARR__FUNCTOR__INTEGRATE_ODE_HPP
+#ifndef STAN_MATH_PRIM_ARR_FUNCTOR_INTEGRATE_ODE_HPP
+#define STAN_MATH_PRIM_ARR_FUNCTOR_INTEGRATE_ODE_HPP
 
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/err/check_less.hpp>

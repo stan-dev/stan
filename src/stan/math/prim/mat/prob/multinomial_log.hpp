@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MULTINOMIAL_LOG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MULTINOMIAL_LOG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_MULTINOMIAL_LOG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_MULTINOMIAL_LOG_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/uniform_01.hpp>

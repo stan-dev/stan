@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__SQUARED_DISTANCE_HPP
-#define STAN__MATH__REV__MAT__FUN__SQUARED_DISTANCE_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_SQUARED_DISTANCE_HPP
+#define STAN_MATH_REV_MAT_FUN_SQUARED_DISTANCE_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/sqrt.hpp>

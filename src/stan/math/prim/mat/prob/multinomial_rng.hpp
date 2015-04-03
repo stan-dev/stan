@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MULTINOMIAL_RNG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MULTINOMIAL_RNG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_MULTINOMIAL_RNG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_MULTINOMIAL_RNG_HPP
 
 #include <stan/math/prim/mat/err/check_simplex.hpp>
 #include <stan/math/prim/scal/err/check_size_match.hpp>

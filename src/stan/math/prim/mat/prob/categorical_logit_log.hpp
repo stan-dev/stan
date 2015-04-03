@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_LOGIT_LOG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__CATEGORICAL_LOGIT_LOG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_CATEGORICAL_LOGIT_LOG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_CATEGORICAL_LOGIT_LOG_HPP
 
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>

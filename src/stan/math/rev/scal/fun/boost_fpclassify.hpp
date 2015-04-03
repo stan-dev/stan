@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__BOOST_FPCLASSIFY_HPP
-#define STAN__MATH__REV__SCAL__FUN__BOOST_FPCLASSIFY_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_BOOST_FPCLASSIFY_HPP
+#define STAN_MATH_REV_SCAL_FUN_BOOST_FPCLASSIFY_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/rev/core.hpp>
