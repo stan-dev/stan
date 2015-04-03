@@ -74,7 +74,7 @@ namespace stan {
         double tmp(0.0);
         double result(0.0);
         for (int d = 0; d < dimension_; ++d) {
-          tmp = abs(L_chol_(d,d));
+          tmp = fabs(L_chol_(d,d));
           if (tmp != 0.0) {
             result += log(tmp);
           }

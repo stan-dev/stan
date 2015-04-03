@@ -12,8 +12,8 @@ TEST(advi_params_meanfield_test, dimension) {
 
   stan::variational::advi_params_meanfield my_advi_params_meanfield(mu, sigma_tilde);
 
-  EXPECT_EQ(mu.size(), my_advi_params_meanfield.dimension());
-  EXPECT_EQ(sigma_tilde.size(), my_advi_params_meanfield.dimension());
+  EXPECT_FLOAT_EQ(mu.size(), my_advi_params_meanfield.dimension());
+  EXPECT_FLOAT_EQ(sigma_tilde.size(), my_advi_params_meanfield.dimension());
 
 }
 
@@ -30,7 +30,7 @@ TEST(advi_params_meanfield_test, mean_vector) {
   const Eigen::Vector3d& mu_out = my_advi_params_meanfield.mu();
 
   for (int i = 0; i < my_advi_params_meanfield.dimension(); ++i)
-    EXPECT_EQ(mu(i), mu_out(i));
+    EXPECT_FLOAT_EQ(mu(i), mu_out(i));
 
 }
 
@@ -47,7 +47,25 @@ TEST(advi_params_meanfield_test, sigma_tilde_vector) {
   const Eigen::Vector3d& sigma_tilde_out = my_advi_params_meanfield.sigma_tilde();
 
   for (int i = 0; i < my_advi_params_meanfield.dimension(); ++i)
-    EXPECT_EQ(sigma_tilde(i), sigma_tilde_out(i));
+    EXPECT_FLOAT_EQ(sigma_tilde(i), sigma_tilde_out(i));
+
+}
+
+TEST(advi_params_meanfield_test, entropy) {
+
+  Eigen::Vector3d mu;
+  mu << 5.7, -3.2, 0.1332;
+
+  Eigen::Vector3d sigma_tilde;
+  sigma_tilde << -0.42, 0.8922, 13.4;
+
+  double entropy_true = 13.8722;
+
+  stan::variational::advi_params_meanfield my_advi_params_meanfield(mu, sigma_tilde);
+
+  const double entropy_out = my_advi_params_meanfield.entropy();
+
+  EXPECT_FLOAT_EQ(entropy_out, entropy_true);
 
 }
 
@@ -72,6 +90,6 @@ TEST(advi_params_meanfield_test, transform_to_unconstrained) {
   x_result = my_advi_params_meanfield.to_unconstrained(x);
 
   for (int i = 0; i < my_advi_params_meanfield.dimension(); ++i)
-    EXPECT_DOUBLE_EQ(x_result(i), x_transformed(i));
+    EXPECT_FLOAT_EQ(x_result(i), x_transformed(i));
 
 }
