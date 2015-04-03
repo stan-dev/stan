@@ -23,8 +23,8 @@ namespace stan {
 
     public:
 
-      advi_params_fullrank(Eigen::VectorXd const& mu,
-                           Eigen::MatrixXd const& L_chol) :
+      advi_params_fullrank(const Eigen::VectorXd& mu,
+                           const Eigen::MatrixXd& L_chol) :
       mu_(mu), L_chol_(L_chol), dimension_(mu.size()) {
 
         static const char* function =
@@ -43,12 +43,12 @@ namespace stan {
 
       // Accessors
       int dimension() const { return dimension_; }
-      Eigen::VectorXd const& mu()     const { return mu_; }
-      Eigen::MatrixXd const& L_chol() const { return L_chol_; }
+      const Eigen::VectorXd& mu()     const { return mu_; }
+      const Eigen::MatrixXd& L_chol() const { return L_chol_; }
 
       // Mutators
-      void set_mu(Eigen::VectorXd const& mu) { mu_ = mu; }
-      void set_L_chol(Eigen::MatrixXd const& L_chol) { L_chol_ = L_chol; }
+      void set_mu(const Eigen::VectorXd& mu) { mu_ = mu; }
+      void set_L_chol(const Eigen::MatrixXd& L_chol) { L_chol_ = L_chol; }
 
       // Entropy of normal: 0.5 * log det (L^T L) = sum(log(abs(diag(L))))
       double entropy() const {
@@ -84,7 +84,7 @@ namespace stan {
       // }
 
       // Implements f^{-1}(\check{z}) = L\check{z} + \mu
-      Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& z_check) const {
+      Eigen::VectorXd to_unconstrained(const Eigen::VectorXd& z_check) const {
         static const char* function = "stan::variational::advi_params_fullrank"
                                       "::to_unconstrained";
 

@@ -20,8 +20,8 @@ namespace stan {
 
     public:
 
-      advi_params_meanfield(Eigen::VectorXd const& mu,
-                            Eigen::VectorXd const& sigma_tilde) :
+      advi_params_meanfield(const Eigen::VectorXd& mu,
+                            const Eigen::VectorXd& sigma_tilde) :
       mu_(mu),
       sigma_tilde_(sigma_tilde),
       dimension_(mu.size()) {
@@ -39,12 +39,12 @@ namespace stan {
 
       // Accessors
       int dimension() const { return dimension_; }
-      Eigen::VectorXd const& mu()          const { return mu_; }
-      Eigen::VectorXd const& sigma_tilde() const { return sigma_tilde_; }
+      const Eigen::VectorXd& mu()          const { return mu_; }
+      const Eigen::VectorXd& sigma_tilde() const { return sigma_tilde_; }
 
       // Mutators
-      void set_mu(Eigen::VectorXd const& mu) { mu_ = mu; }
-      void set_sigma_tilde(Eigen::VectorXd const& sigma_tilde) {
+      void set_mu(const Eigen::VectorXd& mu) { mu_ = mu; }
+      void set_sigma_tilde(const Eigen::VectorXd& sigma_tilde) {
         sigma_tilde_ = sigma_tilde;
       }
 
@@ -71,7 +71,7 @@ namespace stan {
       // }
 
       // Implement f^{-1}(\check{z}) = sigma * \check{z} + \mu
-      Eigen::VectorXd to_unconstrained(Eigen::VectorXd const& z_check) const {
+      Eigen::VectorXd to_unconstrained(const Eigen::VectorXd& z_check) const {
         static const char* function = "stan::variational::advi_params_meanfield"
                                       "::to_unconstrained";
 
