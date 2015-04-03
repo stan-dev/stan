@@ -27,13 +27,13 @@ namespace stan {
 
       advi(M& m,
            Eigen::VectorXd& cont_params,
-           double& elbo,
-           int& n_monte_carlo_grad,
-           int& n_monte_carlo_elbo,
-           double& eta_stepsize,
+           double elbo,
+           int n_monte_carlo_grad,
+           int n_monte_carlo_elbo,
+           double eta_stepsize,
            BaseRNG& rng,
            std::ostream* output_stream,
-           int& refresh,
+           int refresh,
            std::ostream* diagnostic_stream):
         model_(m),
         cont_params_(cont_params),
@@ -62,7 +62,7 @@ namespace stan {
        * @return                   evidence lower bound (elbo)
        */
       template <typename T>
-      double calc_ELBO(T const& advi_params,
+      double calc_ELBO(const T& advi_params,
                        double constant_factor) {
         double elbo(0.0);
         int dim = advi_params.dimension();
@@ -102,12 +102,11 @@ namespace stan {
        * @param mu_grad gradient of location vector parameter
        * @param L_grad  gradient of scale matrix parameter
        */
-      void calc_combined_grad(
-        advi_params_fullrank const& muL,
-        Eigen::VectorXd& mu_grad,
-        Eigen::MatrixXd& L_grad) {
+      void calc_combined_grad(const advi_params_fullrank& muL,
+                              Eigen::VectorXd& mu_grad,
+                              Eigen::MatrixXd& L_grad) {
         static const char* function =
-          "stan::variational::advi.calc_combined_grad(%1%)";
+          "stan::variational::advi.calc_combined_grad";
 
         int dim       = muL.dimension();
         double tmp_lp = 0.0;
@@ -172,13 +171,12 @@ namespace stan {
        * @param mu_grad           gradient of mean vector parameter
        * @param sigma_tilde_grad  gradient of log-std vector parameter
        */
-      void calc_combined_grad(
-        advi_params_meanfield const& musigmatilde,
-        Eigen::VectorXd& mu_grad,
-        Eigen::VectorXd& sigma_tilde_grad) {
+      void calc_combined_grad(const advi_params_meanfield& musigmatilde,
+                              Eigen::VectorXd& mu_grad,
+                              Eigen::VectorXd& sigma_tilde_grad) {
         static const char* function =
-          "stan::variational::advi.calc_combined_grad(%1%)";
-
+          "stan::variational::advi.calc_combined_grad";
+        
         int dim       = musigmatilde.dimension();
         double tmp_lp = 0.0;
 
@@ -597,12 +595,12 @@ namespace stan {
         return;
       }
 
-      Eigen::VectorXd const& cont_params() {
+      const Eigen::VectorXd& cont_params() {
         return cont_params_;
       }
 
       // Compute the median of a circular buffer
-      double circ_buff_median(boost::circular_buffer<double> const& cb) {
+      double circ_buff_median(const boost::circular_buffer<double>& cb) {
 
           // FIXME: naive implementation; creates a copy as a vector
           std::vector<double> v;
