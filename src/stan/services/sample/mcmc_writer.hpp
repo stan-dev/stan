@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__SAMPLE__MCMC__WRITER__HPP
-#define STAN__SERVICES__SAMPLE__MCMC__WRITER__HPP
+#ifndef STAN_SERVICES_SAMPLE_MCMC_WRITER_HPP
+#define STAN_SERVICES_SAMPLE_MCMC_WRITER_HPP
 
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>

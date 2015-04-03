@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__UNIT__E__POINT__BETA
-#define STAN__MCMC__UNIT__E__POINT__BETA
+#ifndef STAN_MCMC_HMC_HAMILTONIANS_UNIT_E_POINT_HPP
+#define STAN_MCMC_HMC_HAMILTONIANS_UNIT_E_POINT_HPP
 
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 

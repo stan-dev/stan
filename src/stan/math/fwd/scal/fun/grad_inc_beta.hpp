@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__GRAD_INC_BETA_HPP
-#define STAN__MATH__FWD__SCAL__FUN__GRAD_INC_BETA_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_GRAD_INC_BETA_HPP
+#define STAN_MATH_FWD_SCAL_FUN_GRAD_INC_BETA_HPP
 
 #include <math.h>
 #include <stan/math/fwd/scal/fun/fabs.hpp>

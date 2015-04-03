@@ -1,5 +1,5 @@
-#ifndef STAN__MODEL__UTIL_HPP
-#define STAN__MODEL__UTIL_HPP
+#ifndef STAN_MODEL_UTIL_HPP
+#define STAN_MODEL_UTIL_HPP
 
 #include <stan/math/fwd/scal/fun/square.hpp>
 #include <stan/math/fwd/core.hpp>

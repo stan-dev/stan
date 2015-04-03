@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__ORDERED_LOGISTIC_RNG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__ORDERED_LOGISTIC_RNG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_ORDERED_LOGISTIC_RNG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_ORDERED_LOGISTIC_RNG_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>

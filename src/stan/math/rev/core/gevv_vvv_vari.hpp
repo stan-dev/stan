@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__GEVV_VVV_VARI_HPP
-#define STAN__MATH__REV__CORE__GEVV_VVV_VARI_HPP
+#ifndef STAN_MATH_REV_CORE_GEVV_VVV_VARI_HPP
+#define STAN_MATH_REV_CORE_GEVV_VVV_VARI_HPP
 
 #include <stan/math/rev/core/vari.hpp>
 #include <stan/math/rev/core/var.hpp>

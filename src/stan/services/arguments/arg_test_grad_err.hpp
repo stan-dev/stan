@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__TEST__GRAD__ERR__HPP
-#define STAN__SERVICES__ARGUMENTS__TEST__GRAD__ERR__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_TEST_GRAD_ERR_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_TEST_GRAD_ERR_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__STEPSIZE__VAR__ADAPTER__BETA
-#define STAN__MCMC__STEPSIZE__VAR__ADAPTER__BETA
+#ifndef STAN_MCMC_STEPSIZE_VAR_ADAPTER_HPP
+#define STAN_MCMC_STEPSIZE_VAR_ADAPTER_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/mcmc/base_adapter.hpp>

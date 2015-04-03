@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__VON_MISES_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__VON_MISES_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_VON_MISES_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_VON_MISES_RNG_HPP
 
 #include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>

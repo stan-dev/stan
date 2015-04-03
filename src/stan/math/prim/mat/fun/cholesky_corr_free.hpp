@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__CHOLESKY_CORR_FREE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__CHOLESKY_CORR_FREE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_CHOLESKY_CORR_FREE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_CHOLESKY_CORR_FREE_HPP
 
 #include <stan/math/prim/mat/err/check_square.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__INIT__INITIALIZE_STATE_HPP
-#define STAN__SERVICES__INIT__INITIALIZE_STATE_HPP
+#ifndef STAN_SERVICES_INIT_INITIALIZE_STATE_HPP
+#define STAN_SERVICES_INIT_INITIALIZE_STATE_HPP
 
 #include <boost/lexical_cast.hpp>
 #include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG

@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__SAMPLE__INIT_WINDOWED_ADAPT_HPP
-#define STAN__SERVICES__SAMPLE__INIT_WINDOWED_ADAPT_HPP
+#ifndef STAN_SERVICES_SAMPLE_INIT_WINDOWED_ADAPT_HPP
+#define STAN_SERVICES_SAMPLE_INIT_WINDOWED_ADAPT_HPP
 
 #include <stan/services/arguments/categorical_argument.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

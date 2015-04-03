@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__EIGEN_NUMTRAITS_HPP
-#define STAN__MATH__REV__MAT__FUN__EIGEN_NUMTRAITS_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_EIGEN_NUMTRAITS_HPP
+#define STAN_MATH_REV_MAT_FUN_EIGEN_NUMTRAITS_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

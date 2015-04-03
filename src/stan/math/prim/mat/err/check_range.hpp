@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_RANGE_HPP
-#define STAN__MATH__PRIM__MAT__ERR__CHECK_RANGE_HPP
+#ifndef STAN_MATH_PRIM_MAT_ERR_CHECK_RANGE_HPP
+#define STAN_MATH_PRIM_MAT_ERR_CHECK_RANGE_HPP
 
 #include <stan/math/prim/scal/err/out_of_range.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>

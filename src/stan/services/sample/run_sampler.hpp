@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__SAMPLE__RUN_SAMPLER_HPP
-#define STAN__SERVICES__SAMPLE__RUN_SAMPLER_HPP
+#ifndef STAN_SERVICES_SAMPLE_RUN_SAMPLER_HPP
+#define STAN_SERVICES_SAMPLE_RUN_SAMPLER_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/sample/generate_transitions.hpp>

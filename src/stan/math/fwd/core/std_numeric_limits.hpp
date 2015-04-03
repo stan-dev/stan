@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__CORE__STD_NUMERIC_LIMITS_HPP
-#define STAN__MATH__FWD__CORE__STD_NUMERIC_LIMITS_HPP
+#ifndef STAN_MATH_FWD_CORE_STD_NUMERIC_LIMITS_HPP
+#define STAN_MATH_FWD_CORE_STD_NUMERIC_LIMITS_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
 #include <limits>

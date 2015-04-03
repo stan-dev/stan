@@ -1,5 +1,5 @@
-#ifndef STAN__INTERFACE_CALLBACKS__WRITER__CERR_HPP
-#define STAN__INTERFACE_CALLBACKS__WRITER__CERR_HPP
+#ifndef STAN_INTERFACE_CALLBACKS_WRITER_CERR_HPP
+#define STAN_INTERFACE_CALLBACKS_WRITER_CERR_HPP
 
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <iostream>

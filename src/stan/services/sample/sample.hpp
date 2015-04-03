@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__SAMPLE__SAMPLE_HPP
-#define STAN__SERVICES__SAMPLE__SAMPLE_HPP
+#ifndef STAN_SERVICES_SAMPLE_SAMPLE_HPP
+#define STAN_SERVICES_SAMPLE_SAMPLE_HPP
 
 #include <cmath>
 #include <sstream>

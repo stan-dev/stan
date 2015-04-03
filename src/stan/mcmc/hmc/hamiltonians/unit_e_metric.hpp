@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__UNIT__E__METRIC__BETA
-#define STAN__MCMC__UNIT__E__METRIC__BETA
+#ifndef STAN_MCMC_HMC_HAMILTONIANS_UNIT_E_METRIC_HPP
+#define STAN_MCMC_HMC_HAMILTONIANS_UNIT_E_METRIC_HPP
 
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>

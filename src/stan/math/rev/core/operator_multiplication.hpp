@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__OPERATOR_MULTIPLICATION_HPP
-#define STAN__MATH__REV__CORE__OPERATOR_MULTIPLICATION_HPP
+#ifndef STAN_MATH_REV_CORE_OPERATOR_MULTIPLICATION_HPP
+#define STAN_MATH_REV_CORE_OPERATOR_MULTIPLICATION_HPP
 
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/vv_vari.hpp>

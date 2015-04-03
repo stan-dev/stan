@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__LOG_MIX_HPP
-#define STAN__MATH__FWD__SCAL__FUN__LOG_MIX_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_LOG_MIX_HPP
+#define STAN_MATH_FWD_SCAL_FUN_LOG_MIX_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>

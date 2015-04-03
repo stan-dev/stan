@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__COV_MATRIX_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__MAT__FUN__COV_MATRIX_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_COV_MATRIX_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_MAT_FUN_COV_MATRIX_CONSTRAIN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>

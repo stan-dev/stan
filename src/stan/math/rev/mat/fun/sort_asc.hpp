@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__SORT_ASC_HPP
-#define STAN__MATH__REV__MAT__FUN__SORT_ASC_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_SORT_ASC_HPP
+#define STAN_MATH_REV_MAT_FUN_SORT_ASC_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

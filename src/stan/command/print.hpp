@@ -1,5 +1,5 @@
-#ifndef STAN__COMMAND__PRINT_HPP
-#define STAN__COMMAND__PRINT_HPP
+#ifndef STAN_COMMAND_PRINT_HPP
+#define STAN_COMMAND_PRINT_HPP
 
 #include <stan/mcmc/chains.hpp>
 #include <algorithm>

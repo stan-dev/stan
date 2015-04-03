@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__LOGISTIC_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__LOGISTIC_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_LOGISTIC_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_LOGISTIC_RNG_HPP
 
 #include <boost/random/exponential_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

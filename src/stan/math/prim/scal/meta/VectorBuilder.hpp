@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__VECTORBUILDER_HPP
-#define STAN__MATH__PRIM__SCAL__META__VECTORBUILDER_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_VECTORBUILDER_HPP
+#define STAN_MATH_PRIM_SCAL_META_VECTORBUILDER_HPP
 
 #include <stan/math/prim/scal/meta/contains_vector.hpp>
 #include <stdexcept>

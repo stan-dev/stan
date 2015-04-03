@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__MAX_DEPTH__HPP
-#define STAN__SERVICES__ARGUMENTS__MAX_DEPTH__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_MAX_DEPTH_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_MAX_DEPTH_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__SAMPLE_HPP
-#define STAN__SERVICES__SAMPLE_HPP
+#ifndef STAN_SERVICES_SAMPLE_HPP
+#define STAN_SERVICES_SAMPLE_HPP
 
 #include <stan/services/sample/generate_transitions.hpp>
 #include <stan/services/sample/init_adapt.hpp>

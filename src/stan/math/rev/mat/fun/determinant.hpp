@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__DETERMINANT_HPP
-#define STAN__MATH__REV__MAT__FUN__DETERMINANT_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_DETERMINANT_HPP
+#define STAN_MATH_REV_MAT_FUN_DETERMINANT_HPP
 
 #include <stan/math/prim/mat/err/check_square.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__BASE__NUTS__BETA
-#define STAN__MCMC__BASE__NUTS__BETA
+#ifndef STAN_MCMC_HMC_NUTS_BASE_NUTS_HPP
+#define STAN_MCMC_HMC_NUTS_BASE_NUTS_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/fun/min.hpp>

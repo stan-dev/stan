@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__ERR__INVALID_ARGUMENT_VEC_HPP
-#define STAN__MATH__PRIM__SCAL__ERR__INVALID_ARGUMENT_VEC_HPP
+#ifndef STAN_MATH_PRIM_SCAL_ERR_INVALID_ARGUMENT_VEC_HPP
+#define STAN_MATH_PRIM_SCAL_ERR_INVALID_ARGUMENT_VEC_HPP
 
 #include <stan/math/prim/scal/err/invalid_argument.hpp>
 #include <stan/math/prim/scal/meta/value_type.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__IO__STAN_CSV_READER_HPP
-#define STAN__IO__STAN_CSV_READER_HPP
+#ifndef STAN_IO_STAN_CSV_READER_HPP
+#define STAN_IO_STAN_CSV_READER_HPP
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__IO__JSON__JSON_PARSER_HPP
-#define STAN__IO__JSON__JSON_PARSER_HPP
+#ifndef STAN_IO_JSON_JSON_PARSER_HPP
+#define STAN_IO_JSON_JSON_PARSER_HPP
 
 #include <boost/lexical_cast.hpp>
 

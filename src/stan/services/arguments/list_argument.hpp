@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__LIST__ARGUMENT__BETA
-#define STAN__SERVICES__ARGUMENTS__LIST__ARGUMENT__BETA
+#ifndef STAN_SERVICES_ARGUMENTS_LIST_ARGUMENT_HPP
+#define STAN_SERVICES_ARGUMENTS_LIST_ARGUMENT_HPP
 
 #include <iostream>
 #include <stan/services/arguments/valued_argument.hpp>

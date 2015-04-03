@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__HMC__INTEGRATORS__BASE_LEAPFROG_HPP
-#define STAN__MCMC__HMC__INTEGRATORS__BASE_LEAPFROG_HPP
+#ifndef STAN_MCMC_HMC_INTEGRATORS_BASE_LEAPFROG_HPP
+#define STAN_MCMC_HMC_INTEGRATORS_BASE_LEAPFROG_HPP
 
 #include <stan/mcmc/hmc/integrators/base_integrator.hpp>
 #include <iostream>

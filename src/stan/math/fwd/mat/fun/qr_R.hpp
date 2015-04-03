@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__QR_R_HPP
-#define STAN__MATH__FWD__MAT__FUN__QR_R_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_QR_R_HPP
+#define STAN_MATH_FWD_MAT_FUN_QR_R_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <Eigen/QR>

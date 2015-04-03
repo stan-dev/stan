@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__BASE__HMC__BETA
-#define STAN__MCMC__BASE__HMC__BETA
+#ifndef STAN_MCMC_HMC_BASE_HMC_HPP
+#define STAN_MCMC_HMC_BASE_HMC_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/variate_generator.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__FIXED__PARAM__SAMPLER__HPP
-#define STAN__MCMC__FIXED__PARAM__SAMPLER__HPP
+#ifndef STAN_MCMC_FIXED_PARAM_SAMPLER_HPP
+#define STAN_MCMC_FIXED_PARAM_SAMPLER_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>

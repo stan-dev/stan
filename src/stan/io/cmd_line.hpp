@@ -1,5 +1,5 @@
-#ifndef STAN__IO__CMD_LINE_HPP
-#define STAN__IO__CMD_LINE_HPP
+#ifndef STAN_IO_CMD_LINE_HPP
+#define STAN_IO_CMD_LINE_HPP
 
 #include <map>
 #include <ostream>

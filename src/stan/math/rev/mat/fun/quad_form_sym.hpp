@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__QUAD_FORM_SYM_HPP
-#define STAN__MATH__REV__MAT__FUN__QUAD_FORM_SYM_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_QUAD_FORM_SYM_HPP
+#define STAN_MATH_REV_MAT_FUN_QUAD_FORM_SYM_HPP
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>

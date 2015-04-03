@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__SQUARE_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__SQUARE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_SQUARE_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_SQUARE_HPP
 
 namespace stan {
   namespace math {

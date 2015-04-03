@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__ARR__FUN__LOG_SUM_EXP_HPP
-#define STAN__MATH__PRIM__ARR__FUN__LOG_SUM_EXP_HPP
+#ifndef STAN_MATH_PRIM_ARR_FUN_LOG_SUM_EXP_HPP
+#define STAN_MATH_PRIM_ARR_FUN_LOG_SUM_EXP_HPP
 
 #include <cmath>
 #include <cstdlib>
