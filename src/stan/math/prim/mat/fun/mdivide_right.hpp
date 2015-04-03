@@ -20,22 +20,23 @@ namespace stan {
      * match the size of A.
      */
     template <typename T1, typename T2, int R1, int C1, int R2, int C2>
-    inline 
-    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
-    mdivide_right(const Eigen::Matrix<T1,R1,C1> &b,
-                  const Eigen::Matrix<T2,R2,C2> &A) {
+    inline
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1, T2>::type,
+                  R1, C2>
+    mdivide_right(const Eigen::Matrix<T1, R1, C1> &b,
+                  const Eigen::Matrix<T2, R2, C2> &A) {
       stan::math::check_square("mdivide_right", "A", A);
       stan::math::check_multiplicable("mdivide_right",
                                                 "b", b,
                                                 "A", A);
       // FIXME: This is nice and general but likely slow.
-      return transpose(mdivide_left(transpose(A),transpose(b)));
-//      return promote_common<Eigen::Matrix<T1,R2,C2>,
-//                            Eigen::Matrix<T2,R2,C2> >(A)
+      return transpose(mdivide_left(transpose(A), transpose(b)));
+//      return promote_common<Eigen::Matrix<T1, R2, C2>,
+//                            Eigen::Matrix<T2, R2, C2> >(A)
 //        .transpose()
 //        .lu()
-//        .solve(promote_common<Eigen::Matrix<T1,R1,C1>,
-//                              Eigen::Matrix<T2,R1,C1> >(b)
+//        .solve(promote_common<Eigen::Matrix<T1, R1, C1>,
+//                              Eigen::Matrix<T2, R1, C1> >(b)
 //               .transpose())
 //        .transpose();
     }

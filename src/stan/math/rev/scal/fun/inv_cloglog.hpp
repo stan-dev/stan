@@ -10,7 +10,7 @@ namespace stan {
     namespace {
       class inv_cloglog_vari : public op_v_vari {
       public:
-        inv_cloglog_vari(vari* avi) :
+        explicit inv_cloglog_vari(vari* avi) :
           op_v_vari(stan::math::inv_cloglog(avi->val_), avi) {
         }
         void chain() {

@@ -9,7 +9,7 @@ namespace stan {
     using Eigen::Dynamic;
     /**
      * Return <code>true</code> if the specified matrix is a valid
-     * covariance matrix. 
+     * covariance matrix.
      *
      * A valid covariance matrix is a square, symmetric matrix that is
      * positive definite.

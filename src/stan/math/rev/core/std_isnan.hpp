@@ -8,7 +8,7 @@ namespace std {
 
   /**
    * Checks if the given number is NaN.
-   * 
+   *
    * Return <code>true</code> if the value of the
    * specified variable is not a number.
    *

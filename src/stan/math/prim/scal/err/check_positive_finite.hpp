@@ -19,8 +19,8 @@ namespace stan {
      * @param name Variable name (for error messages)
      * @param y Variable to check
      *
-     * @return <code>true</code> if every element of y is greater than 0 
-     *   and y is not infinite. 
+     * @return <code>true</code> if every element of y is greater than 0
+     *   and y is not infinite.
      * @throw <code>domain_error</code> if any element of y is not positive or
      *   if any element of y is NaN.
      */

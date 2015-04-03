@@ -22,21 +22,22 @@ namespace stan {
      * match the size of A.
      */
     template <typename T1, typename T2, int R1, int C1, int R2, int C2>
-    inline 
-    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
-    mdivide_left_spd(const Eigen::Matrix<T1,R1,C1> &A,
-                     const Eigen::Matrix<T2,R2,C2> &b) {
+    inline
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1, T2>::type,
+                  R1, C2>
+    mdivide_left_spd(const Eigen::Matrix<T1, R1, C1> &A,
+                     const Eigen::Matrix<T2, R2, C2> &b) {
       stan::math::check_symmetric("mdivide_left_spd", "A", A);
       stan::math::check_pos_definite("mdivide_left_spd", "A", A);
       stan::math::check_square("mdivide_left_spd", "A", A);
-      stan::math::check_multiplicable("mdivide_left_spd", 
+      stan::math::check_multiplicable("mdivide_left_spd",
                                                 "A", A,
                                                 "b", b);
-      return promote_common<Eigen::Matrix<T1,R1,C1>,
-                            Eigen::Matrix<T2,R1,C1> >(A)
+      return promote_common<Eigen::Matrix<T1, R1, C1>,
+                            Eigen::Matrix<T2, R1, C1> >(A)
         .llt()
-        .solve( promote_common<Eigen::Matrix<T1,R2,C2>,
-                               Eigen::Matrix<T2,R2,C2> >(b) );
+        .solve(promote_common<Eigen::Matrix<T1, R2, C2>,
+                               Eigen::Matrix<T2, R2, C2> >(b));
     }
 
   }

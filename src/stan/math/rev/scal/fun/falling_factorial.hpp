@@ -13,11 +13,16 @@ namespace stan {
       class falling_factorial_vv_vari : public op_vv_vari {
       public:
         falling_factorial_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(stan::math::falling_factorial(avi->val_, bvi->val_), avi, bvi) {
+          op_vv_vari(stan::math::falling_factorial(avi->val_, bvi->val_),
+                     avi, bvi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * stan::math::falling_factorial(avi_->val_, bvi_->val_) * boost::math::digamma(avi_->val_ + 1);
-          bvi_->adj_ -= adj_ * stan::math::falling_factorial(avi_->val_, bvi_->val_) * boost::math::digamma(bvi_->val_ + 1);
+          avi_->adj_ += adj_
+            * stan::math::falling_factorial(avi_->val_, bvi_->val_)
+            * boost::math::digamma(avi_->val_ + 1);
+          bvi_->adj_ -= adj_
+            * stan::math::falling_factorial(avi_->val_, bvi_->val_)
+            * boost::math::digamma(bvi_->val_ + 1);
         }
       };
 
@@ -27,7 +32,8 @@ namespace stan {
           op_vd_vari(stan::math::falling_factorial(avi->val_, b), avi, b) {
         }
         void chain() {
-          avi_->adj_ += adj_ * stan::math::falling_factorial(avi_->val_, bd_) * boost::math::digamma(avi_->val_ + 1);
+          avi_->adj_ += adj_ * stan::math::falling_factorial(avi_->val_, bd_)
+            * boost::math::digamma(avi_->val_ + 1);
         }
       };
 
@@ -37,22 +43,23 @@ namespace stan {
           op_dv_vari(stan::math::falling_factorial(a, bvi->val_), a, bvi) {
         }
         void chain() {
-          bvi_->adj_ += adj_ * -stan::math::falling_factorial(ad_, bvi_->val_) * boost::math::digamma(bvi_->val_ + 1);
+          bvi_->adj_ += adj_ * -stan::math::falling_factorial(ad_, bvi_->val_)
+            * boost::math::digamma(bvi_->val_ + 1);
         }
       };
     }
 
-    inline var falling_factorial(const var& a, 
+    inline var falling_factorial(const var& a,
                                  const double& b) {
       return var(new falling_factorial_vd_vari(a.vi_, b));
     }
 
-    inline var falling_factorial(const var& a, 
+    inline var falling_factorial(const var& a,
                                  const var& b) {
       return var(new falling_factorial_vv_vari(a.vi_, b.vi_));
     }
 
-    inline var falling_factorial(const double& a, 
+    inline var falling_factorial(const double& a,
                                  const var& b) {
       return var(new falling_factorial_dv_vari(a, b.vi_));
     }

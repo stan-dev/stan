@@ -13,15 +13,15 @@ namespace stan {
      *
      * This is equivalent to calling <code>m.col(i - 1)</code> and
      * assigning the resulting template expression to a column vector.
-     * 
+     *
      * @param m Matrix.
      * @param j Column index (count from 1).
      * @return Specified column of the matrix.
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,Eigen::Dynamic,1>
-    col(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m,
+    Eigen::Matrix<T, Eigen::Dynamic, 1>
+    col(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
         size_t j) {
       stan::math::check_column_index("col", "j", m, j);
       return m.col(j - 1);

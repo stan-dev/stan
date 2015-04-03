@@ -33,7 +33,7 @@ namespace stan {
       int max = a - 1;
       while (min < max) {
         int mid = (min + max) / 2;
-        if (cdf(dist,mid + 1) > u)
+        if (cdf(dist, mid + 1) > u)
           max = mid;
         else
           min = mid + 1;

@@ -23,10 +23,10 @@ namespace stan {
   namespace prob {
 
     template <bool propto, typename T_y, typename T_loc, typename T_scale>
-    typename return_type<T_y,T_loc,T_scale>::type
+    typename return_type<T_y, T_loc, T_scale>::type
     gumbel_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
       static const char* function("stan::prob::gumbel_log");
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+      typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
       using std::log;
@@ -40,8 +40,8 @@ namespace stan {
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(beta)))
         return 0.0;
 
@@ -58,11 +58,11 @@ namespace stan {
                              "Scale parameter", beta);
 
       // check if no variables are involved and prop-to
-      if (!include_summand<propto,T_y,T_loc,T_scale>::value)
+      if (!include_summand<propto, T_y, T_loc, T_scale>::value)
         return 0.0;
-      
+
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, beta);
 
       VectorView<const T_y> y_vec(y);
@@ -71,11 +71,11 @@ namespace stan {
       size_t N = max_size(y, mu, beta);
 
       VectorBuilder<true, T_partials_return, T_scale> inv_beta(length(beta));
-      VectorBuilder<include_summand<propto,T_scale>::value,
+      VectorBuilder<include_summand<propto, T_scale>::value,
                     T_partials_return, T_scale> log_beta(length(beta));
       for (size_t i = 0; i < length(beta); i++) {
         inv_beta[i] = 1.0 / value_of(beta_vec[i]);
-        if (include_summand<propto,T_scale>::value)
+        if (include_summand<propto, T_scale>::value)
           log_beta[i] = log(value_of(beta_vec[i]));
       }
 
@@ -83,37 +83,37 @@ namespace stan {
         // pull out values of arguments
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
-      
+
         // reusable subexpression values
-        const T_partials_return y_minus_mu_over_beta 
+        const T_partials_return y_minus_mu_over_beta
           = (y_dbl - mu_dbl) * inv_beta[n];
 
         // log probability
-        if (include_summand<propto,T_scale>::value)
+        if (include_summand<propto, T_scale>::value)
           logp -= log_beta[n];
-        if (include_summand<propto,T_y,T_loc,T_scale>::value)
+        if (include_summand<propto, T_y, T_loc, T_scale>::value)
           logp += -y_minus_mu_over_beta - exp(-y_minus_mu_over_beta);
 
         // gradients
-        T_partials_return scaled_diff = inv_beta[n] 
+        T_partials_return scaled_diff = inv_beta[n]
           * exp(-y_minus_mu_over_beta);
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= inv_beta[n] - scaled_diff;
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] += inv_beta[n] - scaled_diff;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
-            += -inv_beta[n] + y_minus_mu_over_beta * inv_beta[n] 
+          operands_and_partials.d_x3[n]
+            += -inv_beta[n] + y_minus_mu_over_beta * inv_beta[n]
             - scaled_diff * y_minus_mu_over_beta;
       }
-      return operands_and_partials.to_var(logp,y,mu,beta);
+      return operands_and_partials.to_var(logp, y, mu, beta);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
     inline
-    typename return_type<T_y,T_loc,T_scale>::type
+    typename return_type<T_y, T_loc, T_scale>::type
     gumbel_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
-      return gumbel_log<false>(y,mu,beta);
+      return gumbel_log<false>(y, mu, beta);
     }
   }
 }

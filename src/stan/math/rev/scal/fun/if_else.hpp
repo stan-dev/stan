@@ -27,9 +27,9 @@ namespace stan {
      * @param y_false Variable to return if condition is false.
      */
     inline var if_else(bool c, double y_true, const var& y_false) {
-      if (c) 
+      if (c)
         return var(y_true);
-      else 
+      else
         return y_false;
     }
     /**
@@ -42,9 +42,9 @@ namespace stan {
      * @param y_false Value to promote to variable and return if condition is false.
      */
     inline var if_else(bool c, const var& y_true, const double y_false) {
-      if (c) 
+      if (c)
         return y_true;
-      else 
+      else
         return var(y_false);
     }
 

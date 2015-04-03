@@ -2,8 +2,8 @@
 #define STAN__MATH__FWD__ARR__FUN__LOG_SUM_EXP_HPP
 
 #include <stan/math/fwd/core.hpp>
-
 #include <stan/math/prim/arr/fun/log_sum_exp.hpp>
+#include <vector>
 
 namespace stan {
 
@@ -26,7 +26,7 @@ namespace stan {
       }
       return fvar<T>(log_sum_exp(vals), deriv / denominator);
     }
-    
+
   }
 }
 #endif

@@ -16,9 +16,11 @@ namespace stan {
       using stan::math::binary_log_loss;
 
       if (y)
-        return fvar<T>(binary_log_loss(y,y_hat.val_), -y_hat.d_ / y_hat.val_);
+        return fvar<T>(binary_log_loss(y, y_hat.val_),
+                       -y_hat.d_ / y_hat.val_);
       else
-        return fvar<T>(binary_log_loss(y,y_hat.val_), y_hat.d_ / (1.0 - y_hat.val_));
+        return fvar<T>(binary_log_loss(y, y_hat.val_),
+                       y_hat.d_ / (1.0 - y_hat.val_));
     }
   }
 }

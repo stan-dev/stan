@@ -1,8 +1,8 @@
 #ifndef STAN__MATH__PRIM__MAT__FUN__NUM_ELEMENTS_HPP
 #define STAN__MATH__PRIM__MAT__FUN__NUM_ELEMENTS_HPP
 
-#include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <vector>
 
 namespace stan {
 
@@ -27,8 +27,8 @@ namespace stan {
      * @return size of matrix
      */
     template <typename T, int R, int C>
-    inline int 
-    num_elements(const Eigen::Matrix<T,R,C>& m) {
+    inline int
+    num_elements(const Eigen::Matrix<T, R, C>& m) {
       return m.size();
     }
 
@@ -43,7 +43,7 @@ namespace stan {
     template <typename T>
     inline int
     num_elements(const std::vector<T>& v) {
-      if (v.size() == 0) 
+      if (v.size() == 0)
         return 0;
       return v.size() * num_elements(v[0]);
     }

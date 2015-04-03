@@ -19,7 +19,7 @@
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
     template <class RNG>

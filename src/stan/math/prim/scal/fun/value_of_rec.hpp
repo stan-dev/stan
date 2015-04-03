@@ -4,12 +4,12 @@
 namespace stan {
 
   namespace math {
-    
+
     /**
      * Return the value of the specified scalar argument
      * converted to a double value.
      *
-     * <p>See the <code>stan::math::primitive_value</code> function to 
+     * <p>See the <code>stan::math::primitive_value</code> function to
      * extract values without casting to <code>double</code>.
      *
      * <p>This function is meant to cover the primitive types. For
@@ -26,11 +26,11 @@ namespace stan {
     }
 
     /**
-     * Return the specified argument. 
+     * Return the specified argument.
      *
      * <p>See <code>value_of(T)</code> for a polymorphic
      * implementation using static casts.
-     * 
+     *
      * <p>This inline pass-through no-op should be compiled away.
      *
      * @param x Specified value.
@@ -38,7 +38,7 @@ namespace stan {
      */
     template <>
     inline double value_of_rec<double>(const double x) {
-      return x; 
+      return x;
     }
 
   }

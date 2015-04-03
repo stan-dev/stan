@@ -1,25 +1,25 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__ASIN_HPP
 #define STAN__MATH__REV__SCAL__FUN__ASIN_HPP
 
-#include <cmath>
 #include <stan/math/rev/core.hpp>
 #include <math.h>
+#include <cmath>
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class asin_vari : public op_v_vari {
       public:
-        asin_vari(vari* avi) :
-          op_v_vari(::asin(avi->val_),avi) {
+        explicit asin_vari(vari* avi) :
+          op_v_vari(::asin(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / std::sqrt(1.0 - (avi_->val_ * avi_->val_));
         }
       };
     }
-    
+
     /**
      * Return the principal value of the arc sine, in radians, of the
      * specified variable (cmath).
@@ -30,7 +30,7 @@ namespace stan {
      *
      *
        \f[
-       \mbox{asin}(x) = 
+       \mbox{asin}(x) =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < -1\\
          \arcsin(x) & \mbox{if } -1\leq x\leq 1 \\
@@ -38,23 +38,23 @@ namespace stan {
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{asin}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{asin}(x)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < -1\\
-         \frac{\partial\,\arcsin(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
+         \frac{\partial\, \arcsin(x)}{\partial x} & \mbox{if } -1\leq x\leq 1 \\
          \textrm{NaN} & \mbox{if } x < -1\\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
        \frac{\partial \, \arcsin(x)}{\partial x} = \frac{1}{\sqrt{1-x^2}}
        \f]
      *
-     * @param a Variable in range [-1,1].
-     * @return Arc sine of variable, in radians. 
+     * @param a Variable in range [-1, 1].
+     * @return Arc sine of variable, in radians.
      */
     inline var asin(const var& a) {
       return var(new asin_vari(a.vi_));

@@ -6,15 +6,16 @@
 
 namespace stan {
 
-  // FIXME: use boost::type_traits::remove_all_extents to extend to array/ptr types
+  // FIXME: use boost::type_traits::remove_all_extents to
+  //        extend to array/ptr types
 
   template <typename T>
-  struct is_vector<Eigen::Matrix<T,Eigen::Dynamic,1> > {
+  struct is_vector<Eigen::Matrix<T, Eigen::Dynamic, 1> > {
     enum { value = 1 };
     typedef T type;
   };
   template <typename T>
-  struct is_vector<Eigen::Matrix<T,1,Eigen::Dynamic> > {
+  struct is_vector<Eigen::Matrix<T, 1, Eigen::Dynamic> > {
     enum { value = 1 };
     typedef T type;
   };

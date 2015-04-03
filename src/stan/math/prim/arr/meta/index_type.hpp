@@ -16,15 +16,13 @@ namespace stan {
      */
     template <typename T>
     struct index_type<std::vector<T> > {
-
       /**
        * Typedef for index of standard vectors.
        */
       typedef typename std::vector<T>::size_type type;
-
     };
 
-    
+
   }
 }
 

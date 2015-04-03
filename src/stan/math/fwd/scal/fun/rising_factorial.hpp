@@ -17,9 +17,10 @@ namespace stan {
       using stan::math::rising_factorial;
       using boost::math::digamma;
 
-      T rising_fact(rising_factorial(x.val_,n.val_));
-      return fvar<T>(rising_fact, rising_fact * (digamma(x.val_ + n.val_)
-                                                 * (x.d_ + n.d_) - digamma(x.val_) * x.d_));
+      T rising_fact(rising_factorial(x.val_, n.val_));
+      return fvar<T>(rising_fact,
+                     rising_fact * (digamma(x.val_ + n.val_)
+                                    * (x.d_ + n.d_) - digamma(x.val_) * x.d_));
     }
 
     template<typename T>
@@ -29,9 +30,10 @@ namespace stan {
       using stan::math::rising_factorial;
       using boost::math::digamma;
 
-      T rising_fact(rising_factorial(x.val_,n));
-      return fvar<T>(rising_fact, 
-                     rising_fact * x.d_ * (digamma(x.val_ + n) - digamma(x.val_)));
+      T rising_fact(rising_factorial(x.val_, n));
+      return fvar<T>(rising_fact,
+                     rising_fact * x.d_
+                     * (digamma(x.val_ + n) - digamma(x.val_)));
     }
 
     template<typename T>
@@ -41,8 +43,8 @@ namespace stan {
       using stan::math::rising_factorial;
       using boost::math::digamma;
 
-      T rising_fact(rising_factorial(x,n.val_));
-      return fvar<T>(rising_fact, 
+      T rising_fact(rising_factorial(x, n.val_));
+      return fvar<T>(rising_fact,
                      rising_fact * (digamma(x + n.val_) * n.d_));
     }
   }

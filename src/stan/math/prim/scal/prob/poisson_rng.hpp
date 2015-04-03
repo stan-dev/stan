@@ -1,10 +1,6 @@
 #ifndef STAN__MATH__PRIM__SCAL__PROB__POISSON_RNG_HPP
 #define STAN__MATH__PRIM__SCAL__PROB__POISSON_RNG_HPP
 
-#include <limits>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/random/poisson_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
 #include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_less.hpp>
@@ -15,12 +11,16 @@
 #include <stan/math/prim/scal/fun/gamma_q.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/random/poisson_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <limits>
 
 namespace stan {
 
   namespace prob {
 
-    static const double POISSON_MAX_RATE = pow(2,30);
+    static const double POISSON_MAX_RATE = pow(2, 30);
 
     template <class RNG>
     inline int
@@ -30,11 +30,11 @@ namespace stan {
       using boost::random::poisson_distribution;
 
       static const char* function("stan::prob::poisson_rng");
-      
+
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
       using stan::math::check_less;
- 
+
       check_not_nan(function, "Rate parameter", lambda);
       check_nonnegative(function, "Rate parameter", lambda);
       check_less(function, "Rate parameter", lambda, POISSON_MAX_RATE);

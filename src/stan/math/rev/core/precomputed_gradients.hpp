@@ -1,16 +1,16 @@
 #ifndef STAN__MATH__REV__CORE__PRECOMPUTED_GRADIENTS_HPP
 #define STAN__MATH__REV__CORE__PRECOMPUTED_GRADIENTS_HPP
 
+#include <stan/math/rev/core/vari.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <algorithm>
 #include <vector>
 #include <stdexcept>
-#include <stan/math/rev/core/vari.hpp>
-#include <stan/math/rev/core/var.hpp>
 
 namespace stan {
 
   namespace agrad {
-    
+
     /**
      * A variable implementation taking a sequence of operands and
      * partial derivatives with respect to the operands.
@@ -20,24 +20,22 @@ namespace stan {
      */
     class precomputed_gradients_vari : public vari {
     protected:
-
       const size_t size_;
       vari** varis_;
       double* gradients_;
 
     public:
-
       /**
        * Construct a precomputed vari with the specified value,
        * operands, and gradients.
-       * 
+       *
        * @param[in] val The value of the variable.
        * @param[in] size Size of operands and gradients
        * @param[in] varis Operand implementations.
        * @param[in] gradients Gradients with respect to operands.
        */
       precomputed_gradients_vari(double val,
-                                 size_t size, 
+                                 size_t size,
                                  vari** varis,
                                  double* gradients)
         : vari(val),
@@ -49,7 +47,7 @@ namespace stan {
       /**
        * Construct a precomputed vari with the specified value,
        * operands, and gradients.
-       * 
+       *
        * @param[in] val The value of the variable.
        * @param[in] vars Vector of operands.
        * @param[in] gradients Vector of partial derivatives of value
@@ -70,16 +68,16 @@ namespace stan {
           throw std::invalid_argument("sizes of vars and gradients"
                                       " do not match");
         for (size_t i = 0; i < vars.size(); ++i)
-          varis_[i] = vars[i].vi_; 
+          varis_[i] = vars[i].vi_;
         std::copy(gradients.begin(), gradients.end(), gradients_);
       }
-      
+
       /**
        * Implements the chain rule for this variable, using the
-       * prestored operands and gradient. 
+       * prestored operands and gradient.
        */
       void chain() {
-        for (size_t i = 0; i < size_; ++i) 
+        for (size_t i = 0; i < size_; ++i)
           varis_[i]->adj_ += adj_ * gradients_[i];
       }
     };
@@ -94,7 +92,7 @@ namespace stan {
      * @param[in] operands operands.
      * @param[in] gradients vector of partial derivatives of result with
      * respect to operands.
-     * @return An auto-diff variable that uses the precomputed 
+     * @return An auto-diff variable that uses the precomputed
      *   gradients provided.
      */
     var precomputed_gradients(const double value,

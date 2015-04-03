@@ -16,7 +16,7 @@ namespace stan {
       using ::expm1;
       using ::exp;
       return fvar<T>(expm1(x.val_), x.d_ * exp(x.val_));
-    } 
+    }
   }
 }
 #endif

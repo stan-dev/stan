@@ -1,9 +1,9 @@
 #ifndef STAN__MATH__FWD__CORE__FVAR_HPP
 #define STAN__MATH__FWD__CORE__FVAR_HPP
 
-#include <ostream>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal/meta/likely.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <ostream>
 
 namespace stan {
 
@@ -11,7 +11,6 @@ namespace stan {
 
     template <typename T>
     struct fvar {
-
       T val_;  // value
       T d_;    // tangent (aka derivative)
 
@@ -22,24 +21,25 @@ namespace stan {
 
       fvar() : val_(0.0), d_(0.0) { }
 
-      fvar(const fvar<T>& x) 
-        : val_(x.val_), d_(x.d_) { 
+      fvar(const fvar<T>& x)
+        : val_(x.val_), d_(x.d_) {
       }
 
       // TV and TD must be assignable to T
       template <typename TV, typename TD>
-      fvar(const TV& val, const TD& deriv) : val_(val), d_(deriv) { 
+      fvar(const TV& val, const TD& deriv) : val_(val), d_(deriv) {
         if (unlikely(boost::math::isnan(val)))
           d_ = val;
       }
 
       // TV must be assignable to T
       template <typename TV>
-      fvar(const TV& val) : val_(val), d_(0.0) {
+      fvar(const TV& val)  // NOLINT
+        : val_(val), d_(0.0) {
         if (unlikely(boost::math::isnan(val)))
           d_ = val;
       }
-      
+
 
       template <typename T2>
       inline
@@ -98,7 +98,7 @@ namespace stan {
       inline
       fvar<T>&
       operator/=(const fvar<T2>& x2) {
-        d_ = (d_ * x2.val_ - val_ * x2.d_) / ( x2.val_ * x2.val_);
+        d_ = (d_ * x2.val_ - val_ * x2.d_) / (x2.val_ * x2.val_);
         val_ /= x2.val_;
         return *this;
       }
@@ -121,7 +121,7 @@ namespace stan {
       inline
       fvar<T>
       operator++(int /*dummy*/) {
-        fvar<T> result(val_,d_);
+        fvar<T> result(val_, d_);
         ++val_;
         return result;
       }
@@ -135,13 +135,13 @@ namespace stan {
       inline
       fvar<T>
       operator--(int /*dummy*/) {
-        fvar<T> result(val_,d_);
+        fvar<T> result(val_, d_);
         --val_;
         return result;
       }
 
       friend
-      std::ostream& 
+      std::ostream&
       operator<<(std::ostream& os, const fvar<T>& v) {
         return os << v.val_;
       }

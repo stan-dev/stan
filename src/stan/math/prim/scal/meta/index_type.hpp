@@ -22,7 +22,7 @@ namespace stan {
 
     /**
      * Template class for metaprogram to compute the type of indexes
-     * used in a constant container type. 
+     * used in a constant container type.
      *
      * @tparam T type of container without const modifier.
      */

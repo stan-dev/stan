@@ -1,10 +1,10 @@
 #ifndef STAN__MATH__REV__SCAL__FUN__BINARY_LOG_LOSS_HPP
 #define STAN__MATH__REV__SCAL__FUN__BINARY_LOG_LOSS_HPP
 
-#include <valarray>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/log1p.hpp>
+#include <valarray>
 
 namespace stan {
   namespace agrad {
@@ -12,8 +12,8 @@ namespace stan {
     namespace {
       class binary_log_loss_1_vari : public op_v_vari {
       public:
-        binary_log_loss_1_vari(vari* avi) :
-          op_v_vari(-std::log(avi->val_),avi) {
+        explicit binary_log_loss_1_vari(vari* avi) :
+          op_v_vari(-std::log(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ -= adj_ / avi_->val_;
@@ -22,8 +22,8 @@ namespace stan {
 
       class binary_log_loss_0_vari : public op_v_vari {
       public:
-        binary_log_loss_0_vari(vari* avi) :
-          op_v_vari(-stan::math::log1p(-avi->val_),avi) {
+        explicit binary_log_loss_0_vari(vari* avi) :
+          op_v_vari(-stan::math::log1p(-avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (1.0 - avi_->val_);
@@ -38,25 +38,25 @@ namespace stan {
      *
      * The derivative with respect to the variable \f$\hat{y}\f$ is
      *
-     * \f$\frac{d}{d\hat{y}} \mbox{logloss}(1,\hat{y}) = - \frac{1}{\hat{y}}\f$, and
+     * \f$\frac{d}{d\hat{y}} \mbox{logloss}(1, \hat{y}) = - \frac{1}{\hat{y}}\f$, and
      *
-     * \f$\frac{d}{d\hat{y}} \mbox{logloss}(0,\hat{y}) = \frac{1}{1 - \hat{y}}\f$.
+     * \f$\frac{d}{d\hat{y}} \mbox{logloss}(0, \hat{y}) = \frac{1}{1 - \hat{y}}\f$.
      *
      *
        \f[
-       \mbox{binary\_log\_loss}(y,\hat{y}) = 
+       \mbox{binary\_log\_loss}(y, \hat{y}) =
        \begin{cases}
-         y \log \hat{y} + (1 - y) \log (1 - \hat{y}) & \mbox{if } 0\leq \hat{y}\leq 1, 
-         y\in\{ 0,1 \}\\[6pt]
+         y \log \hat{y} + (1 - y) \log (1 - \hat{y}) & \mbox{if } 0\leq \hat{y}\leq 1,
+         y\in\{ 0, 1 \}\\[6pt]
          \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
-       \frac{\partial\,\mbox{binary\_log\_loss}(y,\hat{y})}{\partial \hat{y}} = 
+       \frac{\partial\, \mbox{binary\_log\_loss}(y, \hat{y})}{\partial \hat{y}} =
        \begin{cases}
-         \frac{y}{\hat{y}}-\frac{1-y}{1-\hat{y}} & \mbox{if } 0\leq \hat{y}\leq 1, 
-         y\in\{ 0,1 \}\\[6pt]
+         \frac{y}{\hat{y}}-\frac{1-y}{1-\hat{y}} & \mbox{if } 0\leq \hat{y}\leq 1,
+         y\in\{ 0, 1 \}\\[6pt]
          \textrm{NaN} & \mbox{if } \hat{y} = \textrm{NaN}
        \end{cases}
        \f]

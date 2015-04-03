@@ -11,7 +11,7 @@ namespace stan {
 
     /**
      * Throw an invalid_argument exception with a consistently formatted message.
-     * 
+     *
      * This is an abstraction for all Stan functions to use when throwing
      * invalid argument. This will allow us to change the behavior for all
      * functions at once.
@@ -34,7 +34,7 @@ namespace stan {
                                  const char* msg1,
                                  const char* msg2) {
       std::ostringstream message;
-      
+
       message << function << ": "
               << name << " "
               << msg1
@@ -46,7 +46,7 @@ namespace stan {
 
     /**
      * Throw an invalid_argument exception with a consistently formatted message.
-     * 
+     *
      * This is an abstraction for all Stan functions to use when throwing
      * invalid argument. This will allow us to change the behavior for all
      * functions at once. (We've already changed behavior mulitple times up

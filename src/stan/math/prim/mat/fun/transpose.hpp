@@ -7,9 +7,9 @@ namespace stan {
   namespace math {
 
     template <typename T, int R, int C>
-    Eigen::Matrix<T,C,R>
+    Eigen::Matrix<T, C, R>
     inline
-    transpose(const Eigen::Matrix<T,R,C>& m) {
+    transpose(const Eigen::Matrix<T, R, C>& m) {
       return m.transpose();
     }
 
