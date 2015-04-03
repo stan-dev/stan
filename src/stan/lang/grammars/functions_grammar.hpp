@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__PARSER__FUNCTIONS_GRAMMAR_HPP__
-#define STAN__LANG__PARSER__FUNCTIONS_GRAMMAR_HPP__
+#ifndef STAN_LANG_GRAMMARS_FUNCTIONS_GRAMMAR_HPP
+#define STAN_LANG_GRAMMARS_FUNCTIONS_GRAMMAR_HPP
 
 #include <set>
 #include <string>
@@ -34,7 +34,7 @@ namespace stan {
                          function_signature_t> > functions_defined_;
 
       std::stringstream& error_msgs_;
-      
+
       // grammars
       statement_grammar<Iterator> statement_g;
       bare_type_grammar<Iterator> bare_type_g;

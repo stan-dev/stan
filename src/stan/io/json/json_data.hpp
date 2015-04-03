@@ -1,5 +1,5 @@
-#ifndef STAN__IO__JSON__JSON_DATA_HPP
-#define STAN__IO__JSON__JSON_DATA_HPP
+#ifndef STAN_IO_JSON_JSON_DATA_HPP
+#define STAN_IO_JSON_JSON_DATA_HPP
 
 #include <boost/throw_exception.hpp>
 #include <boost/lexical_cast.hpp>

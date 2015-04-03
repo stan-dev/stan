@@ -1,5 +1,5 @@
-#ifndef STAN__MEMORY__STACK_ALLOC_HPP
-#define STAN__MEMORY__STACK_ALLOC_HPP
+#ifndef STAN_MEMORY_STACK_ALLOC_HPP
+#define STAN_MEMORY_STACK_ALLOC_HPP
 
 #include <cstdlib>
 #include <cstddef>

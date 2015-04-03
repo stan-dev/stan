@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__LOG1M_EXP_HPP
-#define STAN__MATH__FWD__SCAL__FUN__LOG1M_EXP_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_LOG1M_EXP_HPP
+#define STAN_MATH_FWD_SCAL_FUN_LOG1M_EXP_HPP
 
 #include <stan/math/fwd/core.hpp>
 
@@ -7,9 +7,9 @@
 #include <boost/math/special_functions/expm1.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline

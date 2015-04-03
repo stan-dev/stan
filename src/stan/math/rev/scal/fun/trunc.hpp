@@ -1,9 +1,10 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__TRUNC_HPP
-#define STAN__MATH__REV__SCAL__FUN__TRUNC_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_TRUNC_HPP
+#define STAN_MATH_REV_SCAL_FUN_TRUNC_HPP
 
-#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <math.h>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -11,8 +12,8 @@ namespace stan {
     namespace {
       class trunc_vari : public op_v_vari {
       public:
-        trunc_vari(vari* avi) :
-          op_v_vari(::trunc(avi->val_),avi) {
+        explicit trunc_vari(vari* avi) :
+          op_v_vari(::trunc(avi->val_), avi) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)))
@@ -33,15 +34,15 @@ namespace stan {
      *
      *
        \f[
-       \mbox{trunc}(x) = 
+       \mbox{trunc}(x) =
        \begin{cases}
          \lfloor x \rfloor & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{trunc}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{trunc}(x)}{\partial x} =
        \begin{cases}
          0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

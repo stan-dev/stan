@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__PARSER__BARE_TYPE_GRAMMAR_DEF_HPP__
-#define STAN__LANG__PARSER__BARE_TYPE_GRAMMAR_DEF_HPP__
+#ifndef STAN_LANG_GRAMMARS_BARE_TYPE_GRAMMAR_DEF_HPP
+#define STAN_LANG_GRAMMARS_BARE_TYPE_GRAMMAR_DEF_HPP
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/lexical_cast.hpp>
@@ -27,7 +27,7 @@
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::expr_type,
                           (stan::lang::base_expr_type, base_type_)
-                          (size_t, num_dims_) );
+                          (size_t, num_dims_) )
 
 namespace stan {
 

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__TRACE_GEN_QUAD_FORM_HPP
-#define STAN__MATH__FWD__MAT__FUN__TRACE_GEN_QUAD_FORM_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_TRACE_GEN_QUAD_FORM_HPP
+#define STAN_MATH_FWD_MAT_FUN_TRACE_GEN_QUAD_FORM_HPP
 
 #include <stan/math/prim/mat/err/check_multiplicable.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>
@@ -10,25 +10,24 @@
 
 namespace stan {
   namespace agrad {
-    template<int RD,int CD,int RA,int CA,int RB,int CB,typename T>
+    template<int RD, int CD, int RA, int CA, int RB, int CB, typename T>
     inline fvar<T>
-    trace_gen_quad_form(const Eigen::Matrix<fvar<T>,RD,CD> &D,
-                        const Eigen::Matrix<fvar<T>,RA,CA> &A,
-                        const Eigen::Matrix<fvar<T>,RB,CB> &B)
-    {
+    trace_gen_quad_form(const Eigen::Matrix<fvar<T>, RD, CD> &D,
+                        const Eigen::Matrix<fvar<T>, RA, CA> &A,
+                        const Eigen::Matrix<fvar<T>, RB, CB> &B) {
       using stan::agrad::multiply;
       using stan::math::multiply;
 
       stan::math::check_square("trace_gen_quad_form", "A", A);
       stan::math::check_square("trace_gen_quad_form", "D", D);
       stan::math::check_multiplicable("trace_gen_quad_form",
-                                                "A", A,
-                                                "B", B);
-      stan::math::check_multiplicable("trace_gen_quad_form", 
-                                                "B", B, 
-                                                "D", D);
-      return stan::math::trace(multiply(multiply(D,stan::math::transpose(B)),
-                                        multiply(A,B)));
+                                      "A", A,
+                                      "B", B);
+      stan::math::check_multiplicable("trace_gen_quad_form",
+                                      "B", B,
+                                      "D", D);
+      return stan::math::trace(multiply(multiply(D, stan::math::transpose(B)),
+                                        multiply(A, B)));
     }
   }
 }

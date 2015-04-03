@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__BESSEL_FIRST_KIND_HPP
-#define STAN__MATH__FWD__SCAL__FUN__BESSEL_FIRST_KIND_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_BESSEL_FIRST_KIND_HPP
+#define STAN_MATH_FWD_SCAL_FUN_BESSEL_FIRST_KIND_HPP
 
 #include <stan/math/fwd/core.hpp>
 
@@ -17,8 +17,8 @@ namespace stan {
 
       T bessel_first_kind_z(bessel_first_kind(v, z.val_));
       return fvar<T>(bessel_first_kind_z,
-                     v * z.d_ * bessel_first_kind_z / z.val_ 
-                     - z.d_ * bessel_first_kind(v + 1,z.val_));
+                     v * z.d_ * bessel_first_kind_z / z.val_
+                     - z.d_ * bessel_first_kind(v + 1, z.val_));
     }
   }
 }

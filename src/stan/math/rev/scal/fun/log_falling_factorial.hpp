@@ -1,10 +1,11 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__LOG_FALLING_FACTORIAL_HPP
-#define STAN__MATH__REV__SCAL__FUN__LOG_FALLING_FACTORIAL_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_LOG_FALLING_FACTORIAL_HPP
+#define STAN_MATH_REV_SCAL_FUN_LOG_FALLING_FACTORIAL_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/log_falling_factorial.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -14,7 +15,8 @@ namespace stan {
       class log_falling_factorial_vv_vari : public op_vv_vari {
       public:
         log_falling_factorial_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(stan::math::log_falling_factorial(avi->val_, bvi->val_), avi, bvi) {
+          op_vv_vari(stan::math::log_falling_factorial(avi->val_, bvi->val_),
+                     avi, bvi) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)
@@ -57,17 +59,17 @@ namespace stan {
       };
     }
 
-    inline var log_falling_factorial(const var& a, 
+    inline var log_falling_factorial(const var& a,
                                      const double& b) {
       return var(new log_falling_factorial_vd_vari(a.vi_, b));
     }
 
-    inline var log_falling_factorial(const var& a, 
+    inline var log_falling_factorial(const var& a,
                                      const var& b) {
       return var(new log_falling_factorial_vv_vari(a.vi_, b.vi_));
     }
 
-    inline var log_falling_factorial(const double& a, 
+    inline var log_falling_factorial(const double& a,
                                      const var& b) {
       return var(new log_falling_factorial_dv_vari(a, b.vi_));
     }

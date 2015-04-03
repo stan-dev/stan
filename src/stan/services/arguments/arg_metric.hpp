@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__METRIC__HPP
-#define STAN__SERVICES__ARGUMENTS__METRIC__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_METRIC_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_METRIC_HPP
 
 #include <stan/services/arguments/list_argument.hpp>
 

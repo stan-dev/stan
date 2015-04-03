@@ -1,13 +1,13 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__INV_SQRT_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__INV_SQRT_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_INV_SQRT_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_INV_SQRT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 
 namespace stan {
   namespace math {
-    
+
     template <typename T>
-    inline 
+    inline
     typename boost::math::tools::promote_args<T>::type
     inv_sqrt(const T x) {
       using std::sqrt;

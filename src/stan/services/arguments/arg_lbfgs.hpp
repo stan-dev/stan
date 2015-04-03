@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__LBFGS__HPP
-#define STAN__SERVICES__ARGUMENTS__LBFGS__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_LBFGS_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_LBFGS_HPP
 
 #include <stan/services/arguments/arg_bfgs.hpp>
 

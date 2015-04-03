@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MULTI_STUDENT_T_RNG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MULTI_STUDENT_T_RNG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_MULTI_STUDENT_T_RNG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_MULTI_STUDENT_T_RNG_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

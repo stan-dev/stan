@@ -1,19 +1,17 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__SORT_INDICES_HPP
-#define STAN__MATH__PRIM__MAT__FUN__SORT_INDICES_HPP
-
-
-#include <vector>
-#include <algorithm>    // std::sort
-#include <iostream>
+#ifndef STAN_MATH_PRIM_MAT_FUN_SORT_INDICES_HPP
+#define STAN_MATH_PRIM_MAT_FUN_SORT_INDICES_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/math/prim/arr/meta/index_type.hpp>
+#include <algorithm>    // std::sort
+#include <iostream>
+#include <vector>
 
 namespace stan {
 
   namespace math {
-    
+
     /**
      * A comparator that works for any container type that has the
      * brackets operator.
@@ -25,6 +23,7 @@ namespace stan {
       template <bool ascending, typename C>
       class index_comparator {
          const C& xs_;
+
       public:
         /**
          * Construct an index comparator holding a reference
@@ -32,7 +31,7 @@ namespace stan {
          *
          * @patam xs Container
          */
-         index_comparator(const C& xs) : xs_(xs) { }
+        explicit index_comparator(const C& xs) : xs_(xs) { }
 
         /**
          * Return true if the value at the first index is sorted in
@@ -50,7 +49,7 @@ namespace stan {
          }
       };
 
-    
+
       /**
        * Return an integer array of indices of the specified container
        * sorting the values in ascending or descending order based on
@@ -69,11 +68,11 @@ namespace stan {
         idxs.resize(size);
         for (idx_t i = 0; i < size; ++i)
           idxs[i] = i + 1;
-        index_comparator<ascending,C> comparator(xs);
+        index_comparator<ascending, C> comparator(xs);
         std::sort(idxs.begin(), idxs.end(), comparator);
         return idxs;
       }
-    
+
     }
 
   }

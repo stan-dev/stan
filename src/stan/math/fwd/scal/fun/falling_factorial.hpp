@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__FALLING_FACTORIAL_HPP
-#define STAN__MATH__FWD__SCAL__FUN__FALLING_FACTORIAL_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_FALLING_FACTORIAL_HPP
+#define STAN_MATH_FWD_SCAL_FUN_FALLING_FACTORIAL_HPP
 
 #include <stan/math/fwd/core.hpp>
 
@@ -16,8 +16,8 @@ namespace stan {
       using stan::math::falling_factorial;
       using boost::math::digamma;
 
-      T falling_fact(falling_factorial(x.val_,n.val_));
-      return fvar<T>(falling_fact, falling_fact * digamma(x.val_ + 1) * x.d_ 
+      T falling_fact(falling_factorial(x.val_, n.val_));
+      return fvar<T>(falling_fact, falling_fact * digamma(x.val_ + 1) * x.d_
                      - falling_fact * digamma(n.val_ + 1) * n.d_);
     }
 
@@ -27,8 +27,8 @@ namespace stan {
       using stan::math::falling_factorial;
       using boost::math::digamma;
 
-      T falling_fact(falling_factorial(x.val_,n));
-      return fvar<T>(falling_fact, 
+      T falling_fact(falling_factorial(x.val_, n));
+      return fvar<T>(falling_fact,
                      falling_fact * digamma(x.val_ + 1) * x.d_);
     }
 
@@ -39,7 +39,7 @@ namespace stan {
       using boost::math::digamma;
 
       T falling_fact(falling_factorial(x, n.val_));
-      return fvar<T>(falling_fact, 
+      return fvar<T>(falling_fact,
                      -falling_fact * digamma(n.val_ + 1) * n.d_);
     }
   }

@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__PARSER__PARSER__HPP
-#define STAN__LANG__PARSER__PARSER__HPP
+#ifndef STAN_LANG_PARSER_HPP
+#define STAN_LANG_PARSER_HPP
 
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -83,8 +83,8 @@ namespace stan {
       typedef std::string::const_iterator input_iterator;
       typedef boost::spirit::line_pos_iterator<input_iterator> lp_iterator;
 
-      lp_iterator fwd_begin = lp_iterator (stan_string.begin());
-      lp_iterator fwd_end = lp_iterator (stan_string.end());
+      lp_iterator fwd_begin = lp_iterator(stan_string.begin());
+      lp_iterator fwd_end = lp_iterator(stan_string.end());
 
       program_grammar<lp_iterator> prog_grammar(model_name);
       whitespace_grammar<lp_iterator> whitesp_grammar;

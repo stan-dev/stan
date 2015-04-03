@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__ARR__META__GET_HPP
-#define STAN__MATH__PRIM__ARR__META__GET_HPP
+#ifndef STAN_MATH_PRIM_ARR_META_GET_HPP
+#define STAN_MATH_PRIM_ARR_META_GET_HPP
 
 #include <cstdlib>
 #include <vector>

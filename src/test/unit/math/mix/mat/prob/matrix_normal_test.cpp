@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/prim/mat/prob/matrix_normal_prec_log.hpp>
 #include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/mat/fun/eigen_numtraits.hpp>
+#include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>
@@ -14,7 +14,7 @@
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 #include <stan/math/fwd/mat/fun/trace_gen_quad_form.hpp>
-#include <stan/math/rev/mat/err/check_pos_definite.hpp>
+#include <stan/math/prim/mat/err/check_pos_definite.hpp>
 #include <stan/math/fwd/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>

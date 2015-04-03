@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__IBETA_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__IBETA_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_IBETA_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_IBETA_HPP
 
 #include <boost/math/special_functions/beta.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
@@ -7,17 +7,17 @@
 namespace stan {
   namespace math {
 
-    /** 
+    /**
      * The normalized incomplete beta function of a, b, and x.
      *
      * Used to compute the cumulative density function for the beta
      * distribution.
-     * 
+     *
      * @param a Shape parameter a <= 0; a and b can't both be 0
      * @param b Shape parameter b <= 0
      * @param x Random variate. 0 <= x <= 1
      * @throws if constraints are violated or if any argument is NaN
-     * 
+     *
      * @return The normalized incomplete beta function.
      */
     inline double ibeta(const double a,

@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__PARSER__TERM_GRAMMAR_DEF__HPP
-#define STAN__LANG__PARSER__TERM_GRAMMAR_DEF__HPP
+#ifndef STAN_LANG_GRAMMARS_TERM_GRAMMAR_DEF_HPP
+#define STAN_LANG_GRAMMARS_TERM_GRAMMAR_DEF_HPP
 
 #include <cstddef>
 #include <iomanip>
@@ -48,7 +48,7 @@
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op,
                           (stan::lang::expression, expr_)
                           (std::vector<std::vector<stan::lang::expression> >, 
-                           dimss_) );
+                           dimss_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (std::string, system_function_name_)
@@ -57,19 +57,19 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (stan::lang::expression, ts_)
                           (stan::lang::expression, theta_)
                           (stan::lang::expression, x_)
-                          (stan::lang::expression, x_int_) );
+                          (stan::lang::expression, x_int_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
                           (std::string, name_)
-                          (std::vector<stan::lang::expression>, args_) );
+                          (std::vector<stan::lang::expression>, args_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
                           (int,val_)
-                          (stan::lang::expr_type,type_));
+                          (stan::lang::expr_type,type_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_literal,
                           (double,val_)
-                          (stan::lang::expr_type,type_) );
+                          (stan::lang::expr_type,type_) )
 
 
 namespace stan { 

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__BINOMIAL_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__BINOMIAL_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_BINOMIAL_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_BINOMIAL_RNG_HPP
 
 #include <boost/random/binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -36,7 +36,7 @@ namespace stan {
       using boost::binomial_distribution;
 
       static const char* function("stan::prob::binomial_rng");
-      
+
       using stan::math::check_finite;
       using stan::math::check_less_or_equal;
       using stan::math::check_greater_or_equal;
@@ -51,7 +51,7 @@ namespace stan {
         binomial_rng(rng, binomial_distribution<>(N, theta));
       return binomial_rng();
     }
-    
+
   }
 }
 #endif

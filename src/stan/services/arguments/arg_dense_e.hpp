@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__DENSE_E__HPP
-#define STAN__SERVICES__ARGUMENTS__DENSE_E__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_DENSE_E_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_DENSE_E_HPP
 
 #include <stan/services/arguments/unvalued_argument.hpp>
 

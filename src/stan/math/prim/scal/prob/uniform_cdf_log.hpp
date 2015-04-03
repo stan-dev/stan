@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__UNIFORM_CDF_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__UNIFORM_CDF_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_UNIFORM_CDF_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_UNIFORM_CDF_LOG_HPP
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -19,12 +19,12 @@ namespace stan {
   namespace prob {
 
     template <typename T_y, typename T_low, typename T_high>
-    typename return_type<T_y,T_low,T_high>::type
+    typename return_type<T_y, T_low, T_high>::type
     uniform_cdf_log(const T_y& y, const T_low& alpha, const T_high& beta) {
       static const char* function("stan::prob::uniform_cdf_log");
-      typedef typename stan::partials_return_type<T_y,T_low,T_high>::type
+      typedef typename stan::partials_return_type<T_y, T_low, T_high>::type
         T_partials_return;
-      
+
       using stan::math::check_not_nan;
       using stan::math::check_finite;
       using stan::math::check_greater;
@@ -32,8 +32,8 @@ namespace stan {
       using stan::math::check_consistent_sizes;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(alpha) 
+      if (!(stan::length(y)
+            && stan::length(alpha)
             && stan::length(beta)))
         return 0.0;
 
@@ -53,16 +53,16 @@ namespace stan {
       VectorView<const T_high> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
 
-      agrad::OperandsAndPartials<T_y,T_low,T_high> 
-        operands_and_partials(y,alpha,beta);
+      agrad::OperandsAndPartials<T_y, T_low, T_high>
+        operands_and_partials(y, alpha, beta);
 
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);
-        if (y_dbl < value_of(alpha_vec[n]) 
+        if (y_dbl < value_of(alpha_vec[n])
             || y_dbl > value_of(beta_vec[n]))
           return stan::math::negative_infinity();
         if (y_dbl == value_of(beta_vec[n]))
-          return operands_and_partials.to_var(0.0,y,alpha,beta);
+          return operands_and_partials.to_var(0.0, y, alpha, beta);
       }
 
       for (size_t n = 0; n < N; n++) {
@@ -72,10 +72,10 @@ namespace stan {
         const T_partials_return b_min_a = beta_dbl - alpha_dbl;
         const T_partials_return cdf_log_ = (y_dbl - alpha_dbl) / b_min_a;
 
-        //cdf_log
+        // cdf_log
         cdf_log += log(cdf_log_);
 
-        //gradients
+        // gradients
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += 1.0 / b_min_a / cdf_log_;
         if (!is_constant_struct<T_low>::value)
@@ -85,7 +85,7 @@ namespace stan {
           operands_and_partials.d_x3[n] -= 1.0 / b_min_a;
       }
 
-      return operands_and_partials.to_var(cdf_log,y,alpha,beta);
+      return operands_and_partials.to_var(cdf_log, y, alpha, beta);
     }
   }
 }

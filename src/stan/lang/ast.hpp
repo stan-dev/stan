@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__AST_HPP
-#define STAN__LANG__AST_HPP
+#ifndef STAN_LANG_AST_HPP
+#define STAN_LANG_AST_HPP
 
 #include <map>
 #include <string>
@@ -649,6 +649,8 @@ namespace stan {
       statement_t;
     
       statement_t statement_;
+      size_t begin_line_;
+      size_t end_line_;
 
       statement();
       statement(const statement_t& st);
