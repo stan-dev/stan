@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__HMC__STATIC_HPP
-#define STAN__MCMC__HMC__STATIC_HPP
+#ifndef STAN_MCMC_HMC_STATIC_HPP
+#define STAN_MCMC_HMC_STATIC_HPP
 
 #include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>

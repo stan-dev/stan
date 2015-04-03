@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__ARR__FUN_HPP
-#define STAN__MATH__PRIM__ARR__FUN_HPP
+#ifndef STAN_MATH_PRIM_ARR_FUN_HPP
+#define STAN_MATH_PRIM_ARR_FUN_HPP
 
 #include <stan/math/prim/arr/fun/dist.hpp>
 #include <stan/math/prim/arr/fun/dot.hpp>

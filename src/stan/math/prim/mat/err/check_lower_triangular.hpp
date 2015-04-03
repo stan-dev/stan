@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_LOWER_TRIANGULAR_HPP
-#define STAN__MATH__PRIM__MAT__ERR__CHECK_LOWER_TRIANGULAR_HPP
+#ifndef STAN_MATH_PRIM_MAT_ERR_CHECK_LOWER_TRIANGULAR_HPP
+#define STAN_MATH_PRIM_MAT_ERR_CHECK_LOWER_TRIANGULAR_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/meta/error_index.hpp>

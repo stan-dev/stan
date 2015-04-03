@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META_HPP
-#define STAN__MATH__PRIM__SCAL__META_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_HPP
+#define STAN_MATH_PRIM_SCAL_META_HPP
 
 #include <stan/math/prim/scal/meta/child_type.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>

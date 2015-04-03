@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__CROSSPROD_HPP
-#define STAN__MATH__FWD__MAT__FUN__CROSSPROD_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_CROSSPROD_HPP
+#define STAN_MATH_FWD_MAT_FUN_CROSSPROD_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__NEG_BINOMIAL_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__NEG_BINOMIAL_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_LOG_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/random/negative_binomial_distribution.hpp>

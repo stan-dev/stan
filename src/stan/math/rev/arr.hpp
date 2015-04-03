@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__ARR_HPP
-#define STAN__MATH__REV__ARR_HPP
+#ifndef STAN_MATH_REV_ARR_HPP
+#define STAN_MATH_REV_ARR_HPP
 
 #include <stan/math/rev/arr/fun.hpp>
 #include <stan/math/rev/arr/functor.hpp>

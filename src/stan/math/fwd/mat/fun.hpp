@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN_HPP
-#define STAN__MATH__FWD__MAT__FUN_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_HPP
+#define STAN_MATH_FWD_MAT_FUN_HPP
 
 #include <stan/math/fwd/mat/fun/columns_dot_product.hpp>
 #include <stan/math/fwd/mat/fun/columns_dot_self.hpp>

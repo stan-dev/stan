@@ -1,5 +1,5 @@
-#ifndef STAN__OPTIMIZATION_HPP
-#define STAN__OPTIMIZATION_HPP
+#ifndef STAN_OPTIMIZATION_HPP
+#define STAN_OPTIMIZATION_HPP
 
 #include <stan/optimization/bfgs.hpp>
 #include <stan/optimization/bfgs_linesearch.hpp>

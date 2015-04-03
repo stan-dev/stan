@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__OPERATOR_UNARY_PLUS_HPP
-#define STAN__MATH__REV__CORE__OPERATOR_UNARY_PLUS_HPP
+#ifndef STAN_MATH_REV_CORE_OPERATOR_UNARY_PLUS_HPP
+#define STAN_MATH_REV_CORE_OPERATOR_UNARY_PLUS_HPP
 
 #include <stan/math/rev/core/var.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

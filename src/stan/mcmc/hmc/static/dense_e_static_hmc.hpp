@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__DENSE__E__STATIC__HMC__BETA
-#define STAN__MCMC__DENSE__E__STATIC__HMC__BETA
+#ifndef STAN_MCMC_HMC_STATIC_DENSE_E_STATIC_HMC_HPP
+#define STAN_MCMC_HMC_STATIC_DENSE_E_STATIC_HMC_HPP
 
 #include <stan/mcmc/hmc/static/base_static_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__INTERFACE__RECORDER__SUM_VALUES_HPP
-#define STAN__INTERFACE__RECORDER__SUM_VALUES_HPP
+#ifndef STAN_INTERFACE_RECORDER_SUM_VALUES_HPP
+#define STAN_INTERFACE_RECORDER_SUM_VALUES_HPP
 
 #include <stdexcept>
 #include <stan/interface/recorder/recorder.hpp>

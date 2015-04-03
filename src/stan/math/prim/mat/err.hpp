@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__ERR_HPP
-#define STAN__MATH__PRIM__MAT__ERR_HPP
+#ifndef STAN_MATH_PRIM_MAT_ERR_HPP
+#define STAN_MATH_PRIM_MAT_ERR_HPP
 
 #include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
 #include <stan/math/prim/mat/err/check_cholesky_factor_corr.hpp>

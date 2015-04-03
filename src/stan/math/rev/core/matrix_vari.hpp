@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__MATRIX_VARI_HPP
-#define STAN__MATH__REV__CORE__MATRIX_VARI_HPP
+#ifndef STAN_MATH_REV_CORE_MATRIX_VARI_HPP
+#define STAN_MATH_REV_CORE_MATRIX_VARI_HPP
 
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

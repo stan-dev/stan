@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__HMC__NUTS_HPP
-#define STAN__MCMC__HMC__NUTS_HPP
+#ifndef STAN_MCMC_HMC_NUTS_HPP
+#define STAN_MCMC_HMC_NUTS_HPP
 
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>

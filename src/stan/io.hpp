@@ -1,5 +1,5 @@
-#ifndef STAN__IO_HPP
-#define STAN__IO_HPP
+#ifndef STAN_IO_HPP
+#define STAN_IO_HPP
 
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>

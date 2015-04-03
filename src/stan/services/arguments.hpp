@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS_HPP
-#define STAN__SERVICES__ARGUMENTS_HPP
+#ifndef STAN_SERVICES_ARGUMENTS_HPP
+#define STAN_SERVICES_ARGUMENTS_HPP
 
 #include <stan/services/arguments/arg_adapt.hpp>
 #include <stan/services/arguments/arg_adapt_delta.hpp>

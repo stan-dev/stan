@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__ARR__FUN_HPP
-#define STAN__MATH__FWD__ARR__FUN_HPP
+#ifndef STAN_MATH_FWD_ARR_FUN_HPP
+#define STAN_MATH_FWD_ARR_FUN_HPP
 
 #include <stan/math/fwd/arr/fun/log_sum_exp.hpp>
 

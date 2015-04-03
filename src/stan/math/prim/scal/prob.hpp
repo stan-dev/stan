@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB_HPP
-#define STAN__MATH__PRIM__SCAL__PROB_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_HPP
 
 #include <stan/math/prim/scal/prob/bernoulli_ccdf_log.hpp>
 #include <stan/math/prim/scal/prob/bernoulli_cdf.hpp>

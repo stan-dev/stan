@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL_HPP
-#define STAN__MATH__PRIM__SCAL_HPP
+#ifndef STAN_MATH_PRIM_SCAL_HPP
+#define STAN_MATH_PRIM_SCAL_HPP
 
 #include <stan/math/prim/scal/err.hpp>
 #include <stan/math/prim/scal/fun.hpp>

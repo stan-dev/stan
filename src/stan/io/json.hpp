@@ -1,5 +1,5 @@
-#ifndef STAN__IO__JSON_HPP
-#define STAN__IO__JSON_HPP
+#ifndef STAN_IO_JSON_HPP
+#define STAN_IO_JSON_HPP
 
 #include <stan/io/json/json_data.hpp>
 #include <stan/io/json/json_data_handler.hpp>

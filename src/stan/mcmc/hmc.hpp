@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__HMC_HPP
-#define STAN__MCMC__HMC_HPP
+#ifndef STAN_MCMC_HMC_HPP
+#define STAN_MCMC_HMC_HPP
 
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians.hpp>

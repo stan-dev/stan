@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN_HPP
-#define STAN__MATH__REV__MAT__FUN_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_HPP
+#define STAN_MATH_REV_MAT_FUN_HPP
 
 #include <stan/math/rev/mat/fun/columns_dot_product.hpp>
 #include <stan/math/rev/mat/fun/columns_dot_self.hpp>

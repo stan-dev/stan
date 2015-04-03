@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MIX__MAT__FUN_HPP
-#define STAN__MATH__MIX__MAT__FUN_HPP
+#ifndef STAN_MATH_MIX_MAT_FUN_HPP
+#define STAN_MATH_MIX_MAT_FUN_HPP
 
 #include <stan/math/mix/mat/fun/typedefs.hpp>
 

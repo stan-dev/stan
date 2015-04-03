@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT_HPP
-#define STAN__MATH__FWD__MAT_HPP
+#ifndef STAN_MATH_FWD_MAT_HPP
+#define STAN_MATH_FWD_MAT_HPP
 
 #include <stan/math/fwd/mat/fun.hpp>
 #include <stan/math/fwd/mat/functor.hpp>

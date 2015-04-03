@@ -1,5 +1,5 @@
-#ifndef STAN__MATH_HPP
-#define STAN__MATH_HPP
+#ifndef STAN_MATH_HPP
+#define STAN_MATH_HPP
 
 #include <stan/math/fwd.hpp>
 #include <stan/math/mix.hpp>

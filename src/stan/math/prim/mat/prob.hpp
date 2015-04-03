@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB_HPP
-#define STAN__MATH__PRIM__MAT__PROB_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_HPP
+#define STAN_MATH_PRIM_MAT_PROB_HPP
 
 #include <stan/math/prim/mat/prob/categorical_log.hpp>
 #include <stan/math/prim/mat/prob/categorical_logit_log.hpp>

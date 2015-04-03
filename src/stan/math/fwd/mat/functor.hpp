@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUNCTOR_HPP
-#define STAN__MATH__FWD__MAT__FUNCTOR_HPP
+#ifndef STAN_MATH_FWD_MAT_FUNCTOR_HPP
+#define STAN_MATH_FWD_MAT_FUNCTOR_HPP
 
 #include <stan/math/fwd/mat/functor/gradient.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__ERR__CHECK_GREATER_OR_EQUAL_HPP
-#define STAN__MATH__PRIM__SCAL__ERR__CHECK_GREATER_OR_EQUAL_HPP
+#ifndef STAN_MATH_PRIM_SCAL_ERR_CHECK_GREATER_OR_EQUAL_HPP
+#define STAN_MATH_PRIM_SCAL_ERR_CHECK_GREATER_OR_EQUAL_HPP
 
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>

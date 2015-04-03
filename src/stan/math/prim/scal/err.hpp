@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__ERR_HPP
-#define STAN__MATH__PRIM__SCAL__ERR_HPP
+#ifndef STAN_MATH_PRIM_SCAL_ERR_HPP
+#define STAN_MATH_PRIM_SCAL_ERR_HPP
 
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/err/check_consistent_size.hpp>

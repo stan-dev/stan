@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__TO_VAR_HPP
-#define STAN__MATH__REV__MAT__FUN__TO_VAR_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_TO_VAR_HPP
+#define STAN_MATH_REV_MAT_FUN_TO_VAR_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>

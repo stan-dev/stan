@@ -1,5 +1,5 @@
-#ifndef STAN__MODEL__MODEL__HEADER_HPP__
-#define STAN__MODEL__MODEL__HEADER_HPP__
+#ifndef STAN_MODEL_MODEL_HEADER_HPP
+#define STAN_MODEL_MODEL_HEADER_HPP
 
 #include <stan/math/prim/arr/meta.hpp>
 #include <stan/math/prim/mat/meta.hpp>

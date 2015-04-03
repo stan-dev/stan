@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__GRAMMARS_HPP
-#define STAN__LANG__GRAMMARS_HPP
+#ifndef STAN_LANG_GRAMMARS_HPP
+#define STAN_LANG_GRAMMARS_HPP
 
 #include <stan/lang/grammars/bare_type_grammar.hpp>
 #include <stan/lang/grammars/bare_type_grammar_def.hpp>

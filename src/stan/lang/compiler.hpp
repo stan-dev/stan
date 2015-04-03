@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__COMPILER_HPP
-#define STAN__LANG__COMPILER_HPP
+#ifndef STAN_LANG_COMPILER_HPP
+#define STAN_LANG_COMPILER_HPP
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator.hpp>

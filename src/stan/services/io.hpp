@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__IO_HPP
-#define STAN__SERVICES__IO_HPP
+#ifndef STAN_SERVICES_IO_HPP
+#define STAN_SERVICES_IO_HPP
 
 #include <stan/services/io/do_print.hpp>
 #include <stan/services/io/write_error_msg.hpp>

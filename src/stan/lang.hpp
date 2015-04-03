@@ -1,5 +1,5 @@
-#ifndef STAN__LANG_HPP
-#define STAN__LANG_HPP
+#ifndef STAN_LANG_HPP
+#define STAN_LANG_HPP
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/compiler.hpp>

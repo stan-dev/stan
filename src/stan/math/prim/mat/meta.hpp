@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__META_HPP
-#define STAN__MATH__PRIM__MAT__META_HPP
+#ifndef STAN_MATH_PRIM_MAT_META_HPP
+#define STAN_MATH_PRIM_MAT_META_HPP
 
 #include <stan/math/prim/mat/meta/get.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>

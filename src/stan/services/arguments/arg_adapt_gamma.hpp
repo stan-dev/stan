@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__ADAPT__GAMMA__HPP
-#define STAN__SERVICES__ARGUMENTS__ADAPT__GAMMA__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_ADAPT_GAMMA_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_ADAPT_GAMMA_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 

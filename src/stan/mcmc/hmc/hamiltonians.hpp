@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__HMC__HAMILTONIANS_HPP
-#define STAN__MCMC__HMC__HAMILTONIANS_HPP
+#ifndef STAN_MCMC_HMC_HAMILTONIANS_HPP
+#define STAN_MCMC_HMC_HAMILTONIANS_HPP
 
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_metric.hpp>

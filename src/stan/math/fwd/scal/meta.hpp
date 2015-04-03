@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__META_HPP
-#define STAN__MATH__FWD__SCAL__META_HPP
+#ifndef STAN_MATH_FWD_SCAL_META_HPP
+#define STAN_MATH_FWD_SCAL_META_HPP
 
 #include <stan/math/fwd/scal/meta/is_fvar.hpp>
 #include <stan/math/fwd/scal/meta/partials_type.hpp>

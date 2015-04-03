@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__LUB_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__LUB_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_LUB_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_LUB_CONSTRAIN_HPP
 
 #include <stan/math/prim/scal/err/check_less.hpp>
 #include <stan/math/prim/scal/fun/lb_constrain.hpp>

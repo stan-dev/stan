@@ -1,5 +1,5 @@
-#ifndef STAN__INTERFACE__CALLBACK_HPP
-#define STAN__INTERFACE__CALLBACK_HPP
+#ifndef STAN_INTERFACE_CALLBACK_HPP
+#define STAN_INTERFACE_CALLBACK_HPP
 
 #include <stan/interface/callback/callback.hpp>
 #include <stan/interface/callback/noop_callback.hpp>
