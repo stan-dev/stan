@@ -3,10 +3,13 @@
 
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/scal/err/check_size_match.hpp>
+#include <stan/math/prim/mat/fun/LDLT_factor.hpp>
+#include <stan/math/prim/scal/meta/constants.hpp>
+
 #include <stan/math/prim/mat/err/check_square.hpp>
 #include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
-#include <stan/math/prim/mat/fun/LDLT_factor.hpp>
+#include <stan/math/prim/scal/err/check_size_match.hpp>
+#include <stan/math/prim/scal/err/check_size_match.hpp>
 
 namespace stan {
 
@@ -69,10 +72,14 @@ namespace stan {
         L_chol_ = L_chol;
       }
 
-      // Entropy of normal: 0.5 * log det (L^T L) = sum(log(abs(diag(L))))
+      // Entropy of normal:
+      // 0.5 * dim * (1+log2pi) + 0.5 * log det (L^T L) =
+      // 0.5 * dim * (1+log2pi) + sum(log(abs(diag(L))))
       double entropy() const {
         double tmp(0.0);
-        double result(0.0);
+        double result(
+          0.5 * static_cast<double>(dimension_) * (1.0 + stan::prob::LOG_TWO_PI)
+          );
         for (int d = 0; d < dimension_; ++d) {
           tmp = fabs(L_chol_(d,d));
           if (tmp != 0.0) {

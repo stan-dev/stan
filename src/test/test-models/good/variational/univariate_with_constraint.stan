@@ -4,7 +4,8 @@ transformed data {
     real sigma;
 
     y[1]  <- 1.6;
-    y[2]  <- 1.0;
+    y[2]  <- 1.4;
+
     mu0   <- 1.5;
     sigma <- 1.0;
 }

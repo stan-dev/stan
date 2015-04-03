@@ -3,8 +3,9 @@
 
 #include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/scal/err/check_size_match.hpp>
 #include <stan/math/prim/scal/fun/max.hpp>
+#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/err/check_size_match.hpp>
 
 namespace stan {
 
@@ -63,10 +64,13 @@ namespace stan {
         sigma_tilde_ = sigma_tilde;
       }
 
-      // Entropy of normal: 0.5 * log det diag(sigma^2) = sum(log(sigma))
-      //                                                = sum(sigma_tilde)
+      // Entropy of normal:
+      // 0.5 * dim * (1+log2pi) + 0.5 * log det diag(sigma^2) =
+      // 0.5 * dim * (1+log2pi) + sum(log(sigma)) =
+      // 0.5 * dim * (1+log2pi) + sum(sigma_tilde)
       double entropy() const {
-        return sigma_tilde_.sum();
+        return 0.5 * static_cast<double>(dimension_) *
+               (1.0 + stan::prob::LOG_TWO_PI) + sigma_tilde_.sum();
       }
 
       // // Calculate natural parameters

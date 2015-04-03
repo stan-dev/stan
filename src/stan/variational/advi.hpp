@@ -300,6 +300,7 @@ namespace stan {
                    log_prob<true,true>(z_tmp_agrad, print_stream_)).val()
                    -
                    (model_.template log_prob<false,true>(z_tmp, print_stream_));
+        constant_factor = 0.0;                                                  //FIXME
 
         // Print stuff
         *print_stream_ << "  iter"
@@ -453,6 +454,7 @@ namespace stan {
                    log_prob<true,true>(z_tmp_agrad, print_stream_)).val()
                    -
                    (model_.template log_prob<false,true>(z_tmp, print_stream_));
+        constant_factor = 0.0;
 
         // Print stuff
         *print_stream_ << "  iter"
