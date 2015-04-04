@@ -1,17 +1,18 @@
-#ifndef STAN__MATH__REV__CORE__OPERATOR_UNARY_NEGATIVE_HPP
-#define STAN__MATH__REV__CORE__OPERATOR_UNARY_NEGATIVE_HPP
+#ifndef STAN_MATH_REV_CORE_OPERATOR_UNARY_NEGATIVE_HPP
+#define STAN_MATH_REV_CORE_OPERATOR_UNARY_NEGATIVE_HPP
 
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/v_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <limits>
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class neg_vari : public op_v_vari {
-      public: 
-        neg_vari(vari* avi) :
+      public:
+        explicit neg_vari(vari* avi) :
           op_v_vari(-(avi->val_), avi) {
         }
         void chain() {
@@ -29,7 +30,7 @@ namespace stan {
      * \f$\frac{d}{dx} -x = -1\f$.
      *
        \f[
-       \mbox{operator-}(x) = 
+       \mbox{operator-}(x) =
        \begin{cases}
          -x & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
@@ -37,7 +38,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator-}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{operator-}(x)}{\partial x} =
        \begin{cases}
          -1 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

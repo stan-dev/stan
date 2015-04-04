@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__INV_LOGIT_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__INV_LOGIT_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_INV_LOGIT_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_INV_LOGIT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 
@@ -18,28 +18,28 @@ namespace stan {
      * for logistic regression.
      *
      * The inverse to this function is <code>stan::math::logit</code>.
-     * 
+     *
      *
        \f[
-       \mbox{inv\_logit}(y) = 
+       \mbox{inv\_logit}(y) =
        \begin{cases}
          \mbox{logit}^{-1}(y) & \mbox{if } -\infty\leq y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } y = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{inv\_logit}(y)}{\partial y} = 
+       \frac{\partial\, \mbox{inv\_logit}(y)}{\partial y} =
        \begin{cases}
          \frac{\partial\, \mbox{logit}^{-1}(y)}{\partial y} & \mbox{if } -\infty\leq y\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } y = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
        \mbox{logit}^{-1}(y) = \frac{1}{1 + \exp(-y)}
        \f]
-       
+
        \f[
        \frac{\partial \, \mbox{logit}^{-1}(y)}{\partial y} = \frac{\exp(y)}{(\exp(y)+1)^2}
        \f]
@@ -53,9 +53,9 @@ namespace stan {
       using std::exp;
       return 1.0 / (1.0 + exp(-a));
     }
-   
+
   }
 }
-   
+
 #endif
-   
+

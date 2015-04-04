@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__REV__ARR__FUNCTOR__COUPLED_ODE_SYSTEM_HPP
-#define STAN__MATH__REV__ARR__FUNCTOR__COUPLED_ODE_SYSTEM_HPP
+#ifndef STAN_MATH_REV_ARR_FUNCTOR_COUPLED_ODE_SYSTEM_HPP
+#define STAN_MATH_REV_ARR_FUNCTOR_COUPLED_ODE_SYSTEM_HPP
 
-#include <ostream>
-#include <vector>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/err/check_equal.hpp>
 #include <stan/math/prim/arr/functor/coupled_ode_system.hpp>
+#include <ostream>
+#include <vector>
 
 namespace stan {
 
@@ -15,17 +15,17 @@ namespace stan {
     // This code is in this directory because it includes agrad::var
     // It is in namespace stan::math so that the partial template
     // specializations are treated as such.
-    
+
 
     /**
      * Increment the state derived from the coupled system in the with
      * the original initial state.  This is necessary because the
      * coupled system subtracts out the initial state in its
-     * representation when the initial state is unknown.  
+     * representation when the initial state is unknown.
      *
      * @param[in] y0 original initial values to add back into the
      * coupled system.
-     * @param[in,out] y state of the coupled system on input,
+     * @param[in, out] y state of the coupled system on input,
      * incremented with initial values on output.
      */
     void add_initial_values(const std::vector<stan::agrad::var>& y0,
@@ -34,21 +34,21 @@ namespace stan {
         for (size_t m = 0; m < y0.size(); m++)
           y[n][m] += y0[m];
     }
-    
+
     /**
      * The coupled ODE system for known initial values and unknown
-     * parameters. 
+     * parameters.
      *
      * <p>If the base ODE state is size N and there are M parameters,
      * the coupled system has N + N * M states.
      * <p>The first N states correspond to the base system's N states:
      * \f$ \frac{d x_n}{dt} \f$
-     * 
-     * <p>The next M states correspond to the sensitivities of the 
+     *
+     * <p>The next M states correspond to the sensitivities of the
      * parameters with respect to the first base system equation:
-     * \f[ 
-     *   \frac{d x_{N+m}}{dt}  
-     *   = \frac{d}{dt} \frac{\partial x_1}{\partial \theta_m} 
+     * \f[
+     *   \frac{d x_{N+m}}{dt}
+     *   = \frac{d}{dt} \frac{\partial x_1}{\partial \theta_m}
      * \f]
      *
      * <p>The final M states correspond to the sensitivities with respect
@@ -58,7 +58,6 @@ namespace stan {
      */
     template <typename F>
     struct coupled_ode_system <F, double, stan::agrad::var> {
-
       const F& f_;
       const std::vector<double>& y0_dbl_;
       const std::vector<stan::agrad::var>& theta_;
@@ -74,13 +73,13 @@ namespace stan {
        * Construct a coupled ODE system with the specified base
        * ODE system, base initial state, parameters, data, and a
        * message stream.
-       * 
+       *
        * @param[in] f the base ODE system functor.
        * @param[in] y0 the initial state of the base ode.
        * @param[in] theta parameters of the base ode.
        * @param[in] x real data.
        * @param[in] x_int integer data.
-       * @param[in,out] msgs stream to which messages are printed.
+       * @param[in, out] msgs stream to which messages are printed.
        */
       coupled_ode_system(const F& f,
                          const std::vector<double>& y0,
@@ -88,17 +87,16 @@ namespace stan {
                          const std::vector<double>& x,
                          const std::vector<int>& x_int,
                          std::ostream* msgs)
-        : f_(f), 
+        : f_(f),
           y0_dbl_(y0),
           theta_(theta),
           theta_dbl_(theta.size(), 0.0),
           x_(x),
-          x_int_(x_int), 
+          x_int_(x_int),
           N_(y0.size()),
           M_(theta.size()),
           size_(N_ + N_ * M_),
                 msgs_(msgs) {
-
         for (size_t m = 0; m < M_; m++)
           theta_dbl_[m] = stan::agrad::value_of(theta[m]);
       }
@@ -124,7 +122,7 @@ namespace stan {
         using stan::agrad::var;
 
         vector<double> y_base(y.begin(), y.begin()+N_);
-        dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,msgs_);
+        dy_dt = f_(t, y_base, theta_dbl_, x_, x_int_, msgs_);
         stan::math::check_equal("coupled_ode_system",
                                           "dy_dt", dy_dt.size(), N_);
 
@@ -152,12 +150,12 @@ namespace stan {
               theta_temp.push_back(theta_dbl_[j]);
               vars.push_back(theta_temp[j]);
             }
-            dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_,msgs_);
+            dy_dt_temp = f_(t, y_temp, theta_temp, x_, x_int_, msgs_);
             dy_dt_temp[i].grad(vars, grad);
-          
-            for (size_t j = 0; j < M_; j++) { 
-              // orders derivatives by equation (i.e. if there are 2 eqns 
-              // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
+
+            for (size_t j = 0; j < M_; j++) {
+              // orders derivatives by equation (i.e. if there are 2 eqns
+              // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as:
               // dy1_dt, dy2_dt, dy1_da, dy2_da, dy1_db, dy2_db
               double temp_deriv = grad[y_temp.size() + j];
               for (size_t k = 0; k < N_; k++)
@@ -174,7 +172,7 @@ namespace stan {
 
         dy_dt.insert(dy_dt.end(), coupled_sys.begin(), coupled_sys.end());
       }
-      
+
       /**
        * Returns the size of the coupled system.
        *
@@ -188,14 +186,14 @@ namespace stan {
        * Returns the initial state of the coupled system.  Because the
        * initial values are known, the initial state of the coupled
        * system is the same as the initial state of the base ODE
-       * system. 
+       * system.
        *
        * <p>This initial state returned is of size <code>size()</code>
        * where the first N (base ODE system size) parameters are the
        * initial conditions of the base ode system and the rest of the
        * initial condition elements are 0.
        *
-       * @return the initial condition of the coupled system. 
+       * @return the initial condition of the coupled system.
        */
       std::vector<double> initial_state() {
         std::vector<double> state(size_, 0.0);
@@ -207,11 +205,11 @@ namespace stan {
 
       /**
        * Returns the base ODE system state corresponding to the
-       * specified coupled system state. 
+       * specified coupled system state.
        *
-       * @param y coupled states after solving the ode 
+       * @param y coupled states after solving the ode
        */
-      std::vector<std::vector<stan::agrad::var> > 
+      std::vector<std::vector<stan::agrad::var> >
       decouple_states(const std::vector<std::vector<double> >& y) {
         using stan::agrad::precomputed_gradients;
         std::vector<stan::agrad::var> temp_vars;
@@ -220,18 +218,18 @@ namespace stan {
 
         for (size_t i = 0; i < y.size(); i++) {
           temp_vars.clear();
-        
-          //iterate over number of equations
-          for (size_t j = 0; j < N_; j++) { 
+
+          // iterate over number of equations
+          for (size_t j = 0; j < N_; j++) {
             temp_gradients.clear();
-          
-            //iterate over parameters for each equation
+
+            // iterate over parameters for each equation
             for (size_t k = 0; k < M_; k++)
-              temp_gradients.push_back(y[i][y0_dbl_.size() 
+              temp_gradients.push_back(y[i][y0_dbl_.size()
                                             + y0_dbl_.size() * k + j]);
 
-            temp_vars.push_back(precomputed_gradients(y[i][j], 
-                                                      theta_, 
+            temp_vars.push_back(precomputed_gradients(y[i][j],
+                                                      theta_,
                                                       temp_gradients));
           }
           y_return[i] = temp_vars;
@@ -239,35 +237,34 @@ namespace stan {
 
         return y_return;
       }
-
     };
 
 
 
 
 
-    
+
     /**
      * The coupled ODE system for unknown initial values and known
-     * parameters. 
-     * 
-     * <p>If the original ODE has states of size N, the 
+     * parameters.
+     *
+     * <p>If the original ODE has states of size N, the
      * coupled system has N + N * N states. (derivatives of each
      * state with respect to each initial value)
      *
      * <p>The coupled system has N + N * N states, where N is the size of
-     * the state vector in the base system. 
+     * the state vector in the base system.
      *
      * <p>The first N states correspond to the base system's N states:
      * \f$ \frac{d x_n}{dt} \f$
      *
      * <p>The next N states correspond to the sensitivities of the initial
      * conditions with respect to the to the first base system equation:
-     * \f[ 
-     *  \frac{d x_{N+n}}{dt}  
+     * \f[
+     *  \frac{d x_{N+n}}{dt}
      *     = \frac{d}{dt} \frac{\partial x_1}{\partial y0_n}
      * \f]
-     * 
+     *
      * <p>The next N states correspond to the sensitivities with respect
      * to the second base system equation, etc.
      *
@@ -275,7 +272,6 @@ namespace stan {
      */
     template <typename F>
     struct coupled_ode_system <F, stan::agrad::var, double> {
-
       const F& f_;
       const std::vector<stan::agrad::var>& y0_;
       std::vector<double> y0_dbl_;
@@ -292,13 +288,13 @@ namespace stan {
        * and known parameters givne the specified base system functor,
        * base initial state, parameters, data, and an output stream
        * for messages.
-       * 
+       *
        * @param[in] f base ODE system functor.
        * @param[in] y0 initial state of the base ODE.
        * @param[in] theta system parameters.
        * @param[in] x real data.
        * @param[in] x_int integer data.
-       * @param[in,out] msgs output stream for messages.
+       * @param[in, out] msgs output stream for messages.
        */
       coupled_ode_system(const F& f,
                          const std::vector<stan::agrad::var>& y0,
@@ -306,17 +302,16 @@ namespace stan {
                          const std::vector<double>& x,
                          const std::vector<int>& x_int,
                          std::ostream* msgs)
-        : f_(f), 
+        : f_(f),
           y0_(y0),
           y0_dbl_(y0.size(), 0.0),
-          theta_dbl_(theta), 
-          x_(x), 
-          x_int_(x_int), 
+          theta_dbl_(theta),
+          x_(x),
+          x_int_(x_int),
           msgs_(msgs),
           N_(y0.size()),
         M_(theta.size()),
         size_(N_ + N_ * N_) {
-
         for (size_t n = 0; n < N_; n++)
           y0_dbl_[n] = stan::agrad::value_of(y0_[n]);
       }
@@ -341,7 +336,7 @@ namespace stan {
         for (size_t n = 0; n < N_; n++)
           y_base[n] += y0_dbl_[n];
 
-        dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,msgs_);
+        dy_dt = f_(t, y_base, theta_dbl_, x_, x_int_, msgs_);
         stan::math::check_equal("coupled_ode_system",
                                           "dy_dt", dy_dt.size(), N_);
 
@@ -364,12 +359,12 @@ namespace stan {
               vars.push_back(y_temp[j]);
             }
 
-            dy_dt_temp = f_(t,y_temp,theta_dbl_,x_,x_int_,msgs_);
+            dy_dt_temp = f_(t, y_temp, theta_dbl_, x_, x_int_, msgs_);
             dy_dt_temp[i].grad(vars, grad);
 
-            for (size_t j = 0; j < N_; j++) { 
-              // orders derivatives by equation (i.e. if there are 2 eqns 
-              // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
+            for (size_t j = 0; j < N_; j++) {
+              // orders derivatives by equation (i.e. if there are 2 eqns
+              // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as:
               // dy1_dt, dy2_dt, dy1_da, dy2_da, dy1_db, dy2_db
               double temp_deriv = grad[j];
               for (size_t k = 0; k < N_; k++)
@@ -407,7 +402,7 @@ namespace stan {
        * parameters.
        *
        * @return the initial condition of the coupled system.
-       *   This is a vector of length size() where all elements 
+       *   This is a vector of length size() where all elements
        *   are 0.
        */
       std::vector<double> initial_state() {
@@ -419,9 +414,9 @@ namespace stan {
        * appropriate autodiff partial derivatives, given the specified
        * coupled system solution.
        *
-       * @param y the vector of the coupled states after solving the ode 
+       * @param y the vector of the coupled states after solving the ode
        */
-      std::vector<std::vector<stan::agrad::var> > 
+      std::vector<std::vector<stan::agrad::var> >
       decouple_states(const std::vector<std::vector<double> >& y) {
         using stan::agrad::precomputed_gradients;
         using stan::agrad::var;
@@ -433,16 +428,16 @@ namespace stan {
 
         for (size_t i = 0; i < y.size(); i++) {
           temp_vars.clear();
-        
+
           // iterate over number of equations
-          for (size_t j = 0; j < N_; j++) { 
+          for (size_t j = 0; j < N_; j++) {
             temp_gradients.clear();
-          
+
             // iterate over parameters for each equation
             for (size_t k = 0; k < N_; k++)
               temp_gradients.push_back(y[i][y0_.size() + y0_.size() * k + j]);
 
-            temp_vars.push_back(precomputed_gradients(y[i][j], 
+            temp_vars.push_back(precomputed_gradients(y[i][j],
                                                       y0_, temp_gradients));
           }
 
@@ -453,7 +448,6 @@ namespace stan {
 
         return y_return;
       }
-
     };
 
 
@@ -461,10 +455,10 @@ namespace stan {
 
 
 
-    
+
     /**
      * The coupled ode system for unknown intial values and unknown
-     * parameters. 
+     * parameters.
      *
      * <p>The coupled system has N + N * (N + M) states, where N is
      * size of the base ODE state vector and M is the number of
@@ -472,21 +466,21 @@ namespace stan {
      *
      * <p>The first N states correspond to the base system's N states:
      *   \f$ \frac{d x_n}{dt} \f$
-     * 
+     *
      * <p>The next N+M states correspond to the sensitivities of the
      * initial conditions, then to the parameters with respect to the
      * to the first base system equation:
      *
-     * \f[ 
+     * \f[
      *   \frac{d x_{N + n}}{dt}
      *     = \frac{d}{dt} \frac{\partial x_1}{\partial y0_n}
      * \f]
      *
-     * \f[ 
+     * \f[
      *   \frac{d x_{N+N+m}}{dt}
      *     = \frac{d}{dt} \frac{\partial x_1}{\partial \theta_m}
      * \f]
-     * 
+     *
      * <p>The next N+M states correspond to the sensitivities with
      * respect to the second base system equation, etc.
      *
@@ -516,13 +510,13 @@ namespace stan {
        * known parameters, given the base ODE system functor, the
        * initial state of the base ODE, the parameters, data, and an
        * output stream to which to write messages.
-       * 
+       *
        * @param[in] f the base ode system functor.
        * @param[in] y0 the initial state of the base ode.
        * @param[in] theta parameters of the base ode.
        * @param[in] x real data.
        * @param[in] x_int integer data.
-       * @param[in,out] msgs output stream to which to print messages.
+       * @param[in, out] msgs output stream to which to print messages.
        */
       coupled_ode_system(const F& f,
                          const std::vector<stan::agrad::var>& y0,
@@ -530,18 +524,17 @@ namespace stan {
                          const std::vector<double>& x,
                          const std::vector<int>& x_int,
                          std::ostream* msgs)
-        : f_(f), 
+        : f_(f),
           y0_(y0),
           y0_dbl_(y0.size(), 0.0),
-          theta_(theta), 
-          theta_dbl_(theta.size(), 0.0), 
-          x_(x), 
-          x_int_(x_int), 
+          theta_(theta),
+          theta_dbl_(theta.size(), 0.0),
+          x_(x),
+          x_int_(x_int),
           N_(y0.size()),
-          M_(theta.size()),          
+          M_(theta.size()),
           size_(N_ + N_ * (N_ + M_)),
           msgs_(msgs) {
-
         for (size_t n = 0; n < N_; n++)
           y0_dbl_[n] = stan::agrad::value_of(y0[n]);
 
@@ -556,7 +549,7 @@ namespace stan {
        *
        * @param[in]  y the current state of the coupled ode system,
        * of size <code>size()</code>.
-       * @param[in,out] dy_dt populate with the derivatives of the
+       * @param[in, out] dy_dt populate with the derivatives of the
        * coupled system evaluated at the specified state and time.
        * @param[in] t time.
        * @throw exception if the base system does not return a
@@ -567,12 +560,12 @@ namespace stan {
                       double t) {
         using std::vector;
         using stan::agrad::var;
-          
+
         vector<double> y_base(y.begin(), y.begin()+N_);
         for (size_t n = 0; n < N_; n++)
           y_base[n] += y0_dbl_[n];
 
-        dy_dt = f_(t,y_base,theta_dbl_,x_,x_int_,msgs_);
+        dy_dt = f_(t, y_base, theta_dbl_, x_, x_int_, msgs_);
         stan::math::check_equal("coupled_ode_system",
                                           "dy_dt", dy_dt.size(), N_);
 
@@ -602,12 +595,12 @@ namespace stan {
               vars.push_back(theta_temp[j]);
             }
 
-            dy_dt_temp = f_(t,y_temp,theta_temp,x_,x_int_,msgs_);
+            dy_dt_temp = f_(t, y_temp, theta_temp, x_, x_int_, msgs_);
             dy_dt_temp[i].grad(vars, grad);
 
-            for (size_t j = 0; j < N_+M_; j++) { 
-              // orders derivatives by equation (i.e. if there are 2 eqns 
-              // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as: 
+            for (size_t j = 0; j < N_+M_; j++) {
+              // orders derivatives by equation (i.e. if there are 2 eqns
+              // (y1, y2) and 2 parameters (a, b), dy_dt will be ordered as:
               // dy1_dt, dy2_dt, dy1_da, dy2_da, dy1_db, dy2_db
               double temp_deriv = grad[j];
               for (size_t k = 0; k < N_; k++)
@@ -634,7 +627,7 @@ namespace stan {
       }
 
       /**
-       * Returns the initial state of the coupled system.  
+       * Returns the initial state of the coupled system.
        *
        * Because the initial state is unknown, the coupled system
        * incorporates the initial condition offset from zero as
@@ -653,9 +646,9 @@ namespace stan {
        * system solutions, including the partials versus the
        * parameters encoded in the autodiff results.
        *
-       * @param y the vector of the coupled states after solving the ode 
-       */    
-      std::vector<std::vector<stan::agrad::var> > 
+       * @param y the vector of the coupled states after solving the ode
+       */
+      std::vector<std::vector<stan::agrad::var> >
       decouple_states(const std::vector<std::vector<double> >& y) {
         using std::vector;
         using stan::agrad::var;
@@ -663,23 +656,23 @@ namespace stan {
 
         vector<var> vars = y0_;
         vars.insert(vars.end(), theta_.begin(), theta_.end());
-        
+
         vector<var> temp_vars;
         vector<double> temp_gradients;
         vector<vector<var> > y_return(y.size());
-        
+
         for (size_t i = 0; i < y.size(); i++) {
           temp_vars.clear();
-          
-          //iterate over number of equations
-          for (size_t j = 0; j < N_; j++) { 
+
+          // iterate over number of equations
+          for (size_t j = 0; j < N_; j++) {
             temp_gradients.clear();
-            
-            //iterate over parameters for each equation
+
+            // iterate over parameters for each equation
             for (size_t k = 0; k < N_ + M_; k++)
               temp_gradients.push_back(y[i][N_ + N_ * k + j]);
 
-            temp_vars.push_back(precomputed_gradients(y[i][j], 
+            temp_vars.push_back(precomputed_gradients(y[i][j],
                                                       vars, temp_gradients));
           }
           y_return[i] = temp_vars;
@@ -687,7 +680,6 @@ namespace stan {
         add_initial_values(y0_, y_return);
         return y_return;
       }
-
     };
 
 

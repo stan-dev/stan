@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__MCMC__RUN_MARKOV_CHAIN_HPP
-#define STAN__SERVICES__MCMC__RUN_MARKOV_CHAIN_HPP
+#ifndef STAN_SERVICES_MCMC_RUN_MARKOV_CHAIN_HPP
+#define STAN_SERVICES_MCMC_RUN_MARKOV_CHAIN_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/io/mcmc_writer.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__ADAPT__KAPPA__HPP
-#define STAN__SERVICES__ARGUMENTS__ADAPT__KAPPA__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_ADAPT_KAPPA_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_ADAPT_KAPPA_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 

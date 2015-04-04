@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__RANDOM__HPP
-#define STAN__SERVICES__ARGUMENTS__RANDOM__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_RANDOM_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_RANDOM_HPP
 
 #include <stan/services/arguments/categorical_argument.hpp>
 

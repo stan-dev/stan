@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__ARR__FUN__DIST_HPP
-#define STAN__MATH__PRIM__ARR__FUN__DIST_HPP
+#ifndef STAN_MATH_PRIM_ARR_FUN_DIST_HPP
+#define STAN_MATH_PRIM_ARR_FUN_DIST_HPP
 
 #include <vector>
 #include <cstddef>
@@ -8,7 +8,8 @@
 namespace stan {
   namespace math {
 
-    inline double dist(const std::vector<double>& x, const std::vector<double>& y) {
+    inline double dist(const std::vector<double>& x,
+                       const std::vector<double>& y) {
       using std::sqrt;
       double result = 0;
       for (size_t i = 0; i < x.size(); ++i) {

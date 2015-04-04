@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__MDIVIDE_LEFT_HPP
-#define STAN__MATH__PRIM__MAT__FUN__MDIVIDE_LEFT_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_MDIVIDE_LEFT_HPP
+#define STAN_MATH_PRIM_MAT_FUN_MDIVIDE_LEFT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -19,19 +19,20 @@ namespace stan {
      * match the size of A.
      */
     template <typename T1, typename T2, int R1, int C1, int R2, int C2>
-    inline 
-    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
-    mdivide_left(const Eigen::Matrix<T1,R1,C1> &A,
-                 const Eigen::Matrix<T2,R2,C2> &b) {
+    inline
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1, T2>::type,
+                  R1, C2>
+    mdivide_left(const Eigen::Matrix<T1, R1, C1> &A,
+                 const Eigen::Matrix<T2, R2, C2> &b) {
       stan::math::check_square("mdivide_left", "A", A);
       stan::math::check_multiplicable("mdivide_left",
-                                                "A", A, 
+                                                "A", A,
                                                 "b", b);
-      return promote_common<Eigen::Matrix<T1,R1,C1>,
-                            Eigen::Matrix<T2,R1,C1> >(A)
+      return promote_common<Eigen::Matrix<T1, R1, C1>,
+                            Eigen::Matrix<T2, R1, C1> >(A)
         .lu()
-        .solve( promote_common<Eigen::Matrix<T1,R2,C2>,
-                               Eigen::Matrix<T2,R2,C2> >(b) );
+        .solve(promote_common<Eigen::Matrix<T1, R2, C2>,
+               Eigen::Matrix<T2, R2, C2> >(b));
     }
 
   }

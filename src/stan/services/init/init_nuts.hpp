@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__INIT__INIT_NUTS_HPP
-#define STAN__SERVICES__INIT__INIT_NUTS_HPP
+#ifndef STAN_SERVICES_INIT_INIT_NUTS_HPP
+#define STAN_SERVICES_INIT_INIT_NUTS_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/arguments/argument.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__RAYLEIGH_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__RAYLEIGH_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_RAYLEIGH_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_RAYLEIGH_LOG_HPP
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -22,12 +22,12 @@ namespace stan {
 
   namespace prob {
 
-    template <bool propto, 
+    template <bool propto,
               typename T_y, typename T_scale>
-    typename return_type<T_y,T_scale>::type
+    typename return_type<T_y, T_scale>::type
     rayleigh_log(const T_y& y, const T_scale& sigma) {
       static const char* function("stan::prob::rayleigh_log");
-      typedef typename stan::partials_return_type<T_y,T_scale>::type 
+      typedef typename stan::partials_return_type<T_y, T_scale>::type
         T_partials_return;
 
       using std::log;
@@ -54,9 +54,9 @@ namespace stan {
                              "Scale parameter", sigma);
 
       // check if no variables are involved and prop-to
-      if (!include_summand<propto,T_y,T_scale>::value)
+      if (!include_summand<propto, T_y, T_scale>::value)
         return 0.0;
-      
+
       // set up template expressions wrapping scalars into vector views
       agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
 
@@ -65,29 +65,29 @@ namespace stan {
       size_t N = max_size(y, sigma);
 
       VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
-      VectorBuilder<include_summand<propto,T_scale>::value,
+      VectorBuilder<include_summand<propto, T_scale>::value,
                     T_partials_return, T_scale> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
-        if (include_summand<propto,T_scale>::value)
+        if (include_summand<propto, T_scale>::value)
           log_sigma[i] = log(value_of(sigma_vec[i]));
       }
 
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
         const T_partials_return y_dbl = value_of(y_vec[n]);
-      
+
         // reusable subexpression values
         const T_partials_return y_over_sigma = y_dbl * inv_sigma[n];
 
         static double NEGATIVE_HALF = -0.5;
 
         // log probability
-        if (include_summand<propto,T_scale>::value)
-          logp -= 2.0 * log_sigma[n];        
-        if (include_summand<propto,T_y>::value)
+        if (include_summand<propto, T_scale>::value)
+          logp -= 2.0 * log_sigma[n];
+        if (include_summand<propto, T_y>::value)
           logp += log(y_dbl);
-        // if (include_summand<propto,T_y,T_scale>::value)
+        // if (include_summand<propto, T_y, T_scale>::value)
         logp += NEGATIVE_HALF * y_over_sigma * y_over_sigma;
 
         // gradients
@@ -95,17 +95,17 @@ namespace stan {
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += 1.0 / y_dbl - scaled_diff;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x2[n] 
+          operands_and_partials.d_x2[n]
             += y_over_sigma * scaled_diff - 2.0 * inv_sigma[n];
       }
-      return operands_and_partials.to_var(logp,y,sigma);
+      return operands_and_partials.to_var(logp, y, sigma);
     }
 
     template <typename T_y, typename T_scale>
     inline
-    typename return_type<T_y,T_scale>::type
+    typename return_type<T_y, T_scale>::type
     rayleigh_log(const T_y& y, const T_scale& sigma) {
-      return rayleigh_log<false>(y,sigma);
+      return rayleigh_log<false>(y, sigma);
     }
   }
 }

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__WISHART_RNG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__WISHART_RNG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_WISHART_RNG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_WISHART_RNG_HPP
 
 #include <stan/math/prim/scal/err/check_size_match.hpp>
 #include <stan/math/prim/mat/err/check_ldlt_factor.hpp>
@@ -27,9 +27,8 @@ namespace stan {
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
     wishart_rng(const double nu,
-                const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
+                const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& S,
                 RNG& rng) {
-
       using Eigen::MatrixXd;
       using stan::math::index_type;
       using stan::math::check_positive;
@@ -48,9 +47,9 @@ namespace stan {
       for (int j = 0; j < k; ++j) {
         for (int i = 0; i < j; ++i)
           B(i, j) = normal_rng(0, 1, rng);
-        B(j,j) = std::sqrt(chi_square_rng(nu - j, rng));
+        B(j, j) = std::sqrt(chi_square_rng(nu - j, rng));
       }
-                
+
       return stan::math::crossprod(B * S.llt().matrixU());
     }
 

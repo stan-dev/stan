@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__PARSER__PROGRAM_GRAMMAR_DEF__HPP
-#define STAN__LANG__PARSER__PROGRAM_GRAMMAR_DEF__HPP
+#ifndef STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_DEF_HPP
+#define STAN_LANG_GRAMMARS_PROGRAM_GRAMMAR_DEF_HPP
 
 #include <cstddef>
 #include <iomanip>
@@ -115,7 +115,7 @@ namespace stan {
 
 
           std::basic_stringstream<char> sprogram;
-          sprogram << boost::make_iterator_range (_begin, _end);
+          sprogram << boost::make_iterator_range(_begin, _end);
 
           // show error in context 2 lines before, 1 lines after
           size_t idx_errcol = 0;
@@ -163,7 +163,7 @@ namespace stan {
     boost::phoenix::function<program_error> program_error_f;
 
     template <typename Iterator>
-    program_grammar<Iterator>::program_grammar(const std::string& model_name) 
+    program_grammar<Iterator>::program_grammar(const std::string& model_name)
         : program_grammar::base_type(program_r),
           model_name_(model_name),
           var_map_(),
@@ -172,15 +172,13 @@ namespace stan {
           var_decls_g(var_map_,error_msgs_),
           statement_g(var_map_,error_msgs_),
           functions_g(var_map_,error_msgs_) {
-
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;
         using boost::spirit::qi::char_;
         using boost::spirit::qi::_pass;
         using boost::spirit::qi::lexeme;
 
-
-        // add model_name to var_map with special origin and no 
+        // add model_name to var_map with special origin and no
         var_map_.add(model_name,
                      base_var_decl(),
                      model_name_origin);

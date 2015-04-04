@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__GUMBEL_CDF_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__GUMBEL_CDF_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_GUMBEL_CDF_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_GUMBEL_CDF_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -23,10 +23,10 @@ namespace stan {
   namespace prob {
 
     template <typename T_y, typename T_loc, typename T_scale>
-    typename return_type<T_y,T_loc,T_scale>::type
+    typename return_type<T_y, T_loc, T_scale>::type
     gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta) {
       static const char* function("stan::prob::gumbel_cdf");
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type 
+      typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
       using stan::math::check_positive;
@@ -37,8 +37,8 @@ namespace stan {
 
       T_partials_return cdf(1.0);
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(beta)))
         return cdf;
 
@@ -46,12 +46,12 @@ namespace stan {
       check_finite(function, "Location parameter", mu);
       check_not_nan(function, "Scale parameter", beta);
       check_positive(function, "Scale parameter", beta);
-      check_consistent_sizes(function, 
+      check_consistent_sizes(function,
                              "Random variable", y,
                              "Location parameter", mu,
                              "Scale parameter", beta);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, beta);
 
       VectorView<const T_y> y_vec(y);
@@ -65,7 +65,7 @@ namespace stan {
         const T_partials_return beta_dbl = value_of(beta_vec[n]);
         const T_partials_return scaled_diff = (y_dbl - mu_dbl) / beta_dbl;
         const T_partials_return rep_deriv = exp(-scaled_diff
-                                                - exp(-scaled_diff)) 
+                                                - exp(-scaled_diff))
           / beta_dbl;
         const T_partials_return cdf_ = exp(-exp(-scaled_diff));
         cdf *= cdf_;
@@ -79,19 +79,19 @@ namespace stan {
       }
 
       if (!is_constant_struct<T_y>::value) {
-        for(size_t n = 0; n < stan::length(y); ++n) 
+        for (size_t n = 0; n < stan::length(y); ++n)
           operands_and_partials.d_x1[n] *= cdf;
       }
       if (!is_constant_struct<T_loc>::value) {
-        for(size_t n = 0; n < stan::length(mu); ++n) 
+        for (size_t n = 0; n < stan::length(mu); ++n)
           operands_and_partials.d_x2[n] *= cdf;
       }
       if (!is_constant_struct<T_scale>::value) {
-        for(size_t n = 0; n < stan::length(beta); ++n) 
+        for (size_t n = 0; n < stan::length(beta); ++n)
           operands_and_partials.d_x3[n] *= cdf;
       }
 
-      return operands_and_partials.to_var(cdf,y,mu,beta);
+      return operands_and_partials.to_var(cdf, y, mu, beta);
     }
   }
 }

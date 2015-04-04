@@ -1,14 +1,15 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__AUTOCOVARIANCE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__AUTOCOVARIANCE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_AUTOCOVARIANCE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_AUTOCOVARIANCE_HPP
 
 #include <stan/math/prim/mat/fun/autocorrelation.hpp>
 #include <stan/math/prim/mat/fun/variance.hpp>
+#include <vector>
 
 namespace stan {
-  
+
   namespace prob {
 
-    
+
     /**
      * Write autocovariance estimates for every lag for the specified
      * input sequence into the specified result using the specified
@@ -19,7 +20,7 @@ namespace stan {
      * followed by a normalization, followed by an inverse transform.
      *
      * <p>An FFT engine can be created for reuse for type double with:
-     * 
+     *
      * <pre>
      *     Eigen::FFT<double> fft;
      * </pre>
@@ -33,7 +34,6 @@ namespace stan {
     void autocovariance(const std::vector<T>& y,
                         std::vector<T>& acov,
                         Eigen::FFT<T>& fft) {
-      
       stan::prob::autocorrelation(y, acov, fft);
 
       T var = stan::math::variance(y) * (y.size()-1) / y.size();
@@ -46,7 +46,7 @@ namespace stan {
      * Write autocovariance estimates for every lag for the specified
      * input sequence into the specified result.  The return vector be
      * resized to the same length as the input sequence with lags
-     * given by array index. 
+     * given by array index.
      *
      * <p>The implementation involves a fast Fourier transform,
      * followed by a normalization, followed by an inverse transform.
@@ -62,7 +62,7 @@ namespace stan {
     void autocovariance(const std::vector<T>& y,
                         std::vector<T>& acov) {
       Eigen::FFT<T> fft;
-      autocovariance(y,acov,fft);
+      autocovariance(y, acov, fft);
     }
 
 

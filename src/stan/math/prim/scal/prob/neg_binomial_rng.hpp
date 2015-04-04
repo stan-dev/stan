@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__NEG_BINOMIAL_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__NEG_BINOMIAL_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_RNG_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/random/negative_binomial_distribution.hpp>
@@ -36,13 +36,13 @@ namespace stan {
 
       static const char* function("stan::prob::neg_binomial_rng");
 
-      using stan::math::check_positive_finite;      
+      using stan::math::check_positive_finite;
 
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Inverse scale parameter", beta);
 
       return stan::prob::poisson_rng(stan::prob::gamma_rng(alpha, beta,
-                                                           rng),rng);
+                                                           rng), rng);
     }
   }
 }

@@ -1,18 +1,18 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__INV_HPP
-#define STAN__MATH__REV__SCAL__FUN__INV_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_INV_HPP
+#define STAN_MATH_REV_SCAL_FUN_INV_HPP
 
-#include <valarray>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/inv.hpp>
+#include <valarray>
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class inv_vari : public op_v_vari {
       public:
-        inv_vari(vari* avi) :
-          op_v_vari(stan::math::inv(avi->val_),avi) {
+        explicit inv_vari(vari* avi) :
+          op_v_vari(stan::math::inv(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ -= adj_ / (avi_->val_ * avi_->val_);
@@ -23,7 +23,7 @@ namespace stan {
     /**
      *
        \f[
-       \mbox{inv}(x) = 
+       \mbox{inv}(x) =
        \begin{cases}
          \frac{1}{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
@@ -31,7 +31,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{inv}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{inv}(x)}{\partial x} =
        \begin{cases}
          -\frac{1}{x^2} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

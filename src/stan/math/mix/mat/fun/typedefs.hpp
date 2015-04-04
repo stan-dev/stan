@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MIX__MAT__FUN__TYPEDEFS_HPP
-#define STAN__MATH__MIX__MAT__FUN__TYPEDEFS_HPP
+#ifndef STAN_MATH_MIX_MAT_FUN_TYPEDEFS_HPP
+#define STAN_MATH_MIX_MAT_FUN_TYPEDEFS_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/fwd/core.hpp>
@@ -8,29 +8,29 @@
 
 namespace stan {
   namespace agrad {
-    
-    typedef 
-    Eigen::Matrix<fvar<var>,Eigen::Dynamic,Eigen::Dynamic>
+
+    typedef
+    Eigen::Matrix<fvar<var>, Eigen::Dynamic, Eigen::Dynamic>
     matrix_fv;
 
-    typedef 
-    Eigen::Matrix<fvar<fvar<var> >,Eigen::Dynamic,Eigen::Dynamic>
+    typedef
+    Eigen::Matrix<fvar<fvar<var> >, Eigen::Dynamic, Eigen::Dynamic>
     matrix_ffv;
 
-    typedef 
-    Eigen::Matrix<fvar<var>,Eigen::Dynamic,1>
+    typedef
+    Eigen::Matrix<fvar<var>, Eigen::Dynamic, 1>
     vector_fv;
 
-    typedef 
-    Eigen::Matrix<fvar<fvar<var> >,Eigen::Dynamic,1>
+    typedef
+    Eigen::Matrix<fvar<fvar<var> >, Eigen::Dynamic, 1>
     vector_ffv;
 
-    typedef 
-    Eigen::Matrix<fvar<var>,1,Eigen::Dynamic>
+    typedef
+    Eigen::Matrix<fvar<var>, 1, Eigen::Dynamic>
     row_vector_fv;
 
-    typedef 
-    Eigen::Matrix<fvar<fvar<var> >,1,Eigen::Dynamic>
+    typedef
+    Eigen::Matrix<fvar<fvar<var> >, 1, Eigen::Dynamic>
     row_vector_ffv;
 
   }

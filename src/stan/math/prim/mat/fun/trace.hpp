@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__TRACE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__TRACE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_TRACE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_TRACE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the trace of the specified matrix.  The trace
      * is defined as the sum of the elements on the diagonal.
@@ -17,10 +17,10 @@ namespace stan {
      * @return Trace of the matrix.
      */
     template <typename T>
-    inline T trace(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+    inline T trace(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
       return m.trace();
     }
-    
+
     template <typename T>
     inline T
       trace(const T& m) {

@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__PS_POINT__BETA
-#define STAN__MCMC__PS_POINT__BETA
+#ifndef STAN_MCMC_HMC_HAMILTONIANS_PS_POINT_HPP
+#define STAN_MCMC_HMC_HAMILTONIANS_PS_POINT_HPP
 
 #include <boost/lexical_cast.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
