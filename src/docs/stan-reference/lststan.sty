@@ -1,0 +1,26 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lstBUGS}[2014/11/13 listings language support Stan]
+\RequirePackage{listings}
+
+\lstdefinelanguage{Stan}{
+  %% Cannot figure out how to get spaces in a keyword
+  %% Reserved + block declarations
+  keywords=[1]{functions,data,parameters,transformed,model,generated,quantities,%
+    for,in,while,print,if,else,lp__,lower,upper,increment_log_prob,T,return,%
+    reject,integrate_ode},%
+  keywords=[2]{int,real,vector,%
+    ordered,positive_ordered,simplex,unit_vector,%
+    row_vector,matrix,%
+    cholesky_factor_corr,cholesky_factor_cov,%
+    coor_matrix,cov_matrix,%
+    void}%
+  % Just assignment operators
+  otherkeywords={<-,~},%
+  sensitive=true,%
+  morecomment=[l]{\#},%
+  morecomment=[l]{//},%
+  morecomment=[n]{/*}{*/},%
+  string=[d]"%,
+  literate={<-}{{$\leftarrow$}}1 {~}{{$\sim$}}1%
+}
+

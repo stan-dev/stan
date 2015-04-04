@@ -1,0 +1,41 @@
+\begin{document}
+
+\pagestyle{plain}
+
+\newcommand{\stanversion}{2.6.3}
+
+\frontmatter
+\include{title}
+%\include{abstract}
+\tableofcontents
+\include{preface}
+\include{acknowledgements}
+\newcounter{savepage}
+\setcounter{savepage}{\arabic{page} + 1}
+
+\mainmatter
+\setcounter{page}{\thesavepage}
+\include{introduction}
+\include{programming}
+\include{language}
+\include{functions}
+\include{distributions}
+\include{advanced}
+\include{algorithms}
+\include{process}
+\include{contributed}
+
+% \appendix
+% \include{appendices}
+% \include{references}
+\titlespacing{\chapter}{0pt}{-4pt}{24pt}{}
+{\footnotesize
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Index}
+\printindex
+}
+
+\backmatter % after appendices or problems
+%\listoffixmes
+\end{document}

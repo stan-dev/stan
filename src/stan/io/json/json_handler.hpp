@@ -1,5 +1,5 @@
-#ifndef STAN__IO__JSON__JSON_HANDLER_HPP
-#define STAN__IO__JSON__JSON_HANDLER_HPP
+#ifndef STAN_IO_JSON_JSON_HANDLER_HPP
+#define STAN_IO_JSON_JSON_HANDLER_HPP
 
 #include <string>
 
@@ -8,15 +8,14 @@ namespace stan {
   namespace json {
 
     /**
-     * Abstract base class for JSON handlers.  More efficient to just 
+     * Abstract base class for JSON handlers.  More efficient to just
      * implement directly and pass in as a template, but this version
      * is available for convenience.
      */
     class json_handler {
-    public: 
-
+    public:
       json_handler() { }
-      
+
       ~json_handler() { }
 
       /**
@@ -53,7 +52,7 @@ namespace stan {
        * Handle the null literal value.
        */
       virtual void null() { }
-      
+
       /**
        * Handle the boolean literal value of the specified polarity.
        *
@@ -68,7 +67,7 @@ namespace stan {
        * @param x Value to handle.
        */
       virtual void number_double(double x) { }
-      
+
       /**
        * Handle a the specified long integer value.
        *
@@ -85,7 +84,7 @@ namespace stan {
 
       /**
        * Handle the specified string value.
-       * 
+       *
        * @param s String value to handle.
        */
       virtual void string(const std::string& s) { }
@@ -95,7 +94,7 @@ namespace stan {
        *
        * @param s String object key to handle.
        */
-      virtual void key(const std::string& s) { } 
+      virtual void key(const std::string& s) { }
     };
 
   }

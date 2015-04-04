@@ -1,20 +1,17 @@
-#ifndef STAN__MCMC__BASE__ADAPTATION__BETA
-#define STAN__MCMC__BASE__ADAPTATION__BETA
+#ifndef STAN_MCMC_BASE_ADAPTATION_HPP
+#define STAN_MCMC_BASE_ADAPTATION_HPP
 
 namespace stan {
-  
+
   namespace mcmc {
-    
+
     class base_adaptation {
-      
     public:
-      
-      virtual void restart() {};
-      
+      virtual void restart() {}
     };
-    
-  } // mcmc
-  
-} // stan
+
+  }  // mcmc
+
+}  // stan
 
 #endif

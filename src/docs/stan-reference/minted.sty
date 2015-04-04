@@ -5,7 +5,7 @@
 %% The original source files were:
 %%
 %% minted.dtx  (with options: `package')
-%% Copyright 2013--2014 Geoffrey M. Poore
+%% Copyright 2013--2015 Geoffrey M. Poore
 %% Copyright 2010--2011 Konrad Rudolph
 %% 
 %% This work may be distributed and/or modified under the
@@ -26,7 +26,8 @@
 %% This work consists of the files minted.dtx and minted.ins
 %% and the derived file minted.sty.
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{minted}[2013/12/21 v2.0-alpha3 ]
+\ProvidesPackage{minted}
+    [2015/01/31 v2.0 Yet another Pygments shim for LaTeX]
 \RequirePackage{keyval}
 \RequirePackage{kvoptions}
 \RequirePackage{fancyvrb}
@@ -38,18 +39,18 @@
 \RequirePackage{etoolbox}
 \RequirePackage{xstring}
 \RequirePackage{lineno}
-\AtBeginDocument{\@ifpackageloaded{color}{}{\RequirePackage{xcolor}}}
+\AtBeginDocument{%
+  \@ifpackageloaded{color}{}{%
+    \@ifpackageloaded{xcolor}{}{\RequirePackage{xcolor}}}%
+}
 \DeclareVoidOption{chapter}{\def\minted@float@within{chapter}}
 \DeclareVoidOption{section}{\def\minted@float@within{section}}
-\newboolean{minted@cache}
-\DeclareVoidOption{cache}{%
-  \minted@cachetrue
-  \AtEndOfPackage{\ProvideDirectory{\minted@outputdir\minted@cachedir}}%
-}
+\DeclareBoolOption{newfloat}
+\DeclareBoolOption[true]{cache}
 \StrSubstitute{\jobname}{ }{_}[\minted@jobname]
 \StrSubstitute{\minted@jobname}{"}{}[\minted@jobname]
 \StrSubstitute{\minted@jobname}{*}{-}[\minted@jobname]
-\newcommand{\minted@cachedir}{.minted-\minted@jobname}
+\newcommand{\minted@cachedir}{\detokenize{_}minted-\minted@jobname}
 \let\minted@cachedir@windows\minted@cachedir
 \define@key{minted}{cachedir}{%
   \@namedef{minted@cachedir}{#1}%
@@ -60,48 +61,64 @@
   \@namedef{minted@outputdir}{#1/}%
   \StrSubstitute{\minted@outputdir}{/}%
     {\@backslashchar}[\minted@outputdir@windows]}
-\newboolean{minted@langlinenos}
-\DeclareVoidOption{langlinenos}{\minted@langlinenostrue}
+\DeclareBoolOption{kpsewhich}
+\DeclareBoolOption{langlinenos}
 \DeclareBoolOption{draft}
+\DeclareComplementaryOption{final}{draft}
 \ProcessKeyvalOptions*
-\newcommand{\minted@infile}{\jobname.out.pyg}
-\newcommand{\minted@cachefiles}{}
-\newcommand{\minted@addcachefile}[1]{%
-  \expandafter\gdef\expandafter\minted@cachefiles\expandafter{%
-    \minted@cachefiles,#1}%
-  \expandafter\gdef\csname minted@current@#1\endcsname{}%
+\ifthenelse{\boolean{minted@newfloat}}{\RequirePackage{newfloat}}{}
+\ifthenelse{\boolean{minted@cache}}{%
+  \AtEndOfPackage{\ProvideDirectory{\minted@outputdir\minted@cachedir}}}{}
+\newcommand{\minted@input}[1]{%
+  \IfFileExists{#1}%
+   {\input{#1}}%
+   {\PackageError{minted}{Missing Pygments output; \string\inputminted\space
+     was^^Jprobably given a file that does not exist--otherwise, you may need
+     ^^Jthe outputdir package option, or may be using an incompatible build
+     tool\ifwindows,^^Jor may be using the kpsewhich option without having
+     PowerShell installed\fi}%
+    {This could be caused by using -output-directory or -aux-directory
+     ^^Jwithout setting minted's outputdir, or by using a build tool that
+     ^^Jchanges paths in ways minted cannot detect\ifwindows, or by using the
+     ^^Jkpsewhich option without PowerShell\fi.}}%
 }
-\newcommand{\minted@savecachefiles}{%
-  \immediate\write\@mainaux{%
-    \string\gdef\string\minted@oldcachefiles\string{%
-      \minted@cachefiles\string}}%
+\newcommand{\minted@infile}{\jobname.out.pyg}
+\newcommand{\minted@cachelist}{}
+\newcommand{\minted@addcachefile}[1]{%
+  \expandafter\long\expandafter\gdef\expandafter\minted@cachelist\expandafter{%
+    \minted@cachelist,^^J%
+    \space\space#1}%
+  \expandafter\gdef\csname minted@cached@#1\endcsname{}%
+}
+\newcommand{\minted@savecachelist}{%
+  \ifdefempty{\minted@cachelist}{}{%
+    \immediate\write\@mainaux{%
+      \string\gdef\string\minted@oldcachelist\string{%
+        \minted@cachelist\string}}%
+  }%
 }
 \newcommand{\minted@cleancache}{%
-  \ifthenelse{\boolean{minted@cache}}{%
-    \ifcsname minted@oldcachefiles\endcsname
-      \def\do##1{%
-        \ifthenelse{\equal{##1}{}}{}{%
-          \ifcsname minted@current@##1\endcsname\else
-            \DeleteFile[\minted@outputdir\minted@cachedir]{##1}%
-          \fi
-        }%
+  \ifcsname minted@oldcachelist\endcsname
+    \def\do##1{%
+      \ifthenelse{\equal{##1}{}}{}{%
+        \ifcsname minted@cached@##1\endcsname\else
+          \DeleteFile[\minted@outputdir\minted@cachedir]{##1}%
+        \fi
       }%
-      \expandafter\docsvlist\expandafter{\minted@oldcachefiles}%
-    \else
-    \fi
-  }{}%
+    }%
+    \expandafter\docsvlist\expandafter{\minted@oldcachelist}%
+  \else
+  \fi
 }
-\ifthenelse{\boolean{minted@cache}}%
+\ifthenelse{\boolean{minted@draft}}%
   {\AtEndDocument{%
-    \ifthenelse{\boolean{minted@draft}}%
-      {\ifcsname minted@oldcachefiles\endcsname
-        \let\minted@cachefiles\minted@oldcachefiles
-        \minted@savecachefiles
-        \fi}%
-      {\minted@savecachefiles
-        \minted@cleancache}}%
-  }%
-  {}%
+      \ifcsname minted@oldcachelist\endcsname
+        \let\minted@cachelist\minted@oldcachelist
+        \minted@savecachelist
+      \fi}}%
+  {\AtEndDocument{%
+      \minted@savecachelist
+      \minted@cleancache}}%
 \ifwindows
   \providecommand{\DeleteFile}[2][]{%
     \ifthenelse{\equal{#1}{}}%
@@ -129,8 +146,8 @@
   \ifwindows
     \DeleteFile{\jobname.aex}
     \immediate\write18{for \string^\@percentchar i in (#1.exe #1.bat #1.cmd)
-      do set >\jobname.aex <nul: /p
-      x=\string^\@percentchar \string~$PATH:i>>\jobname.aex}
+      do set >"\jobname.aex" <nul: /p
+      x=\string^\@percentchar \string~$PATH:i>>"\jobname.aex"}
     %$ <- balance syntax highlighting
     \immediate\openin\minted@appexistsfile\jobname.aex
     \expandafter\def\expandafter\@tmp@cr\expandafter{\the\endlinechar}
@@ -142,164 +159,186 @@
      {\AppExiststrue}
     \immediate\closein\minted@appexistsfile
     \DeleteFile{\jobname.aex}
-    \immediate\typeout{file deleted}
   \else
-    \immediate\write18{which #1 && touch \jobname.aex}
+    \immediate\write18{which "#1" && touch "\jobname.aex"}
     \IfFileExists{\jobname.aex}
       {\AppExiststrue
         \DeleteFile{\jobname.aex}}
       {\AppExistsfalse}
   \fi
 }
-\newcommand{\minted@optg}{}
+\newcommand{\minted@optlistcl@g}{}
+\newcommand{\minted@optlistcl@g@i}{}
 \let\minted@lang\@empty
-\newcommand{\minted@optlang}{}
-\newcommand{\minted@optcmd}{}
-\newcommand{\minted@checklang}{%
-  \ifcsname minted@optlang\minted@lang\endcsname\else
-    \expandafter\def\csname minted@optlang\minted@lang\endcsname{}%
+\newcommand{\minted@optlistcl@lang}{}
+\newcommand{\minted@optlistcl@lang@i}{}
+\newcommand{\minted@optlistcl@cmd}{}
+\newcommand{\minted@optlistfv@g}{}
+\newcommand{\minted@optlistfv@g@i}{}
+\newcommand{\minted@optlistfv@lang}{}
+\newcommand{\minted@optlistfv@lang@i}{}
+\newcommand{\minted@optlistfv@cmd}{}
+\newcommand{\minted@configlang}[1]{%
+  \def\minted@lang{#1}%
+  \ifcsname minted@optlistcl@lang\minted@lang\endcsname\else
+    \expandafter\gdef\csname minted@optlistcl@lang\minted@lang\endcsname{}%
   \fi
-  \ifcsname minted@optlang\minted@lang @extra\endcsname\else
-    \expandafter\def\csname minted@optlang\minted@lang @extra\endcsname{}%
+  \ifcsname minted@optlistcl@lang\minted@lang @i\endcsname\else
+    \expandafter\gdef\csname minted@optlistcl@lang\minted@lang @i\endcsname{}%
   \fi
-}
-\newcommand{\minted@resetoptcmd}{%
-  \@namedef{minted@optcmd@extra}{}%
-  \let\minted@optcmd@autogobble\relax}
-\newcommand{\minted@getoptg}[1]{%
-  \expandafter\detokenize%
-  \expandafter\expandafter\expandafter{\csname minted@optg@#1\endcsname}}
-\newcommand{\minted@getoptlang}[1]{%
-  \expandafter\detokenize\expandafter\expandafter\expandafter{%
-    \csname minted@optlang\minted@lang @#1\endcsname}}
-\newcommand{\minted@getoptcmd}[1]{%
-  \expandafter\detokenize%
-  \expandafter\expandafter\expandafter{\csname minted@optcmd@#1\endcsname}}
-\newcommand{\minted@regoptg}[1]{%
-  \ifcsname minted@optg@#1@reg\endcsname\else
-    \expandafter\let\csname minted@optg@#1@reg\endcsname\@empty
-    \expandafter\def\expandafter\minted@optg\expandafter{%
-      \minted@optg\space\minted@getoptg{#1}}%
+  \ifcsname minted@optlistfv@lang\minted@lang\endcsname\else
+    \expandafter\gdef\csname minted@optlistfv@lang\minted@lang\endcsname{}%
+  \fi
+  \ifcsname minted@optlistfv@lang\minted@lang @i\endcsname\else
+    \expandafter\gdef\csname minted@optlistfv@lang\minted@lang @i\endcsname{}%
   \fi
 }
-\newcommand{\minted@regoptlang}[1]{%
-  \ifcsname minted@optlang\minted@lang @#1@reg\endcsname\else
-    \ifcsname minted@optlang\minted@lang\endcsname\else
-      \expandafter\def\csname minted@optlang\minted@lang\endcsname{}%
-    \fi
-    \expandafter\let\csname minted@optlang\minted@lang @#1@reg\endcsname\@empty
-    \expandafter\let\expandafter\minted@optlang%
-      \csname minted@optlang\minted@lang\endcsname
-    \expandafter\def\expandafter\minted@optlang\expandafter{%
-      \minted@optlang\space\minted@getoptlang{#1}}%
-    \expandafter\let\csname minted@optlang\minted@lang\endcsname\minted@optlang
-    \let\minted@optlang\@empty
-  \fi
-}
-\newcommand{\minted@regoptcmd}[1]{%
-  \ifcsname minted@optcmd@#1@reg\endcsname\else
-    \expandafter\let\csname minted@optcmd@#1@reg\endcsname\@empty
-    \expandafter\def\expandafter\minted@optcmd\expandafter{%
-      \minted@optcmd\space\minted@getoptcmd{#1}}%
-    \expandafter\def\expandafter\minted@resetoptcmd\expandafter{%
-        \minted@resetoptcmd
-        \@namedef{minted@optcmd@#1}{}}%
-  \fi
-}
-\newcommand{\minted@define@opt}[4][]{%
+\newcommand{\minted@addto@optlistcl}[2]{%
+  \expandafter\def\expandafter#1\expandafter{#1%
+    \detokenize{#2}\space}}
+\newcommand{\minted@addto@optlistcl@lang}[2]{%
+  \expandafter\let\expandafter\minted@tmp\csname #1\endcsname
+  \expandafter\def\expandafter\minted@tmp\expandafter{\minted@tmp%
+    \detokenize{#2}\space}%
+  \expandafter\let\csname #1\endcsname\minted@tmp}
+\newcommand{\minted@def@optcl}[4][]{%
   \ifthenelse{\equal{#1}{}}%
-    {\define@key{minted@optg}{#2}{\@namedef{minted@optg@#2}{#3=#4}%
-        \@namedef{minted@optg@#2@val}{#4}%
-        \minted@regoptg{#2}}%
-      \define@key{minted@optlang}{#2}{%
-        \@namedef{minted@optlang\minted@lang @#2}{#3=#4}%
-        \@namedef{minted@optlang\minted@lang @#2@val}{#4}%
-        \minted@regoptlang{#2}}%
-      \define@key{minted@optcmd}{#2}{\@namedef{minted@optcmd@#2}{#3=#4}%
-        \@namedef{minted@optcmd@#2@val}{#4}%
-        \minted@regoptcmd{#2}}}%
-    {\define@key{minted@optg}{#2}[#1]{\@namedef{minted@optg@#2}{#3=#4}%
-        \@namedef{minted@optg@#2@val}{#4}%
-        \minted@regoptg{#2}}%
-      \define@key{minted@optlang}{#2}[#1]{%
-        \@namedef{minted@optlang\minted@lang @#2}{#3=#4}%
-        \@namedef{minted@optlang\minted@lang @#2@val}{#4}%
-        \minted@regoptlang{#2}}%
-      \define@key{minted@optcmd}{#2}[#1]{\@namedef{minted@optcmd@#2}{#3=#4}%
-        \@namedef{minted@optcmd@#2@val}{#4}%
-        \minted@regoptcmd{#2}}}%
+    {\define@key{minted@opt@g}{#2}{%
+        \minted@addto@optlistcl{\minted@optlistcl@g}{#3=#4}%
+        \@namedef{minted@opt@g:#2}{#4}}%
+      \define@key{minted@opt@g@i}{#2}{%
+        \minted@addto@optlistcl{\minted@optlistcl@g@i}{#3=#4}%
+        \@namedef{minted@opt@g@i:#2}{#4}}%
+      \define@key{minted@opt@lang}{#2}{%
+        \minted@addto@optlistcl@lang{minted@optlistcl@lang\minted@lang}{#3=#4}%
+        \@namedef{minted@opt@lang\minted@lang:#2}{#4}}%
+      \define@key{minted@opt@lang@i}{#2}{%
+        \minted@addto@optlistcl@lang{%
+          minted@optlistcl@lang\minted@lang @i}{#3=#4}%
+        \@namedef{minted@opt@lang\minted@lang @i:#2}{#4}}%
+      \define@key{minted@opt@cmd}{#2}{%
+        \minted@addto@optlistcl{\minted@optlistcl@cmd}{#3=#4}%
+        \@namedef{minted@opt@cmd:#2}{#4}}}%
+    {\define@key{minted@opt@g}{#2}[#1]{%
+        \minted@addto@optlistcl{\minted@optlistcl@g}{#3=#4}%
+        \@namedef{minted@opt@g:#2}{#4}}%
+      \define@key{minted@opt@g@i}{#2}[#1]{%
+        \minted@addto@optlistcl{\minted@optlistcl@g@i}{#3=#4}%
+        \@namedef{minted@opt@g@i:#2}{#4}}%
+      \define@key{minted@opt@lang}{#2}[#1]{%
+        \minted@addto@optlistcl@lang{minted@optlistcl@lang\minted@lang}{#3=#4}%
+        \@namedef{minted@opt@lang\minted@lang:#2}{#4}}%
+      \define@key{minted@opt@lang@i}{#2}[#1]{%
+        \minted@addto@optlistcl@lang{%
+          minted@optlistcl@lang\minted@lang @i}{#3=#4}%
+        \@namedef{minted@opt@lang\minted@lang @i:#2}{#4}}%
+      \define@key{minted@opt@cmd}{#2}[#1]{%
+        \minted@addto@optlistcl{\minted@optlistcl@cmd}{#3=#4}%
+        \@namedef{minted@opt@cmd:#2}{#4}}}%
 }
-\newcommand{\minted@namexdef}[1]{\expandafter\xdef\csname #1\endcsname}
 \edef\minted@hashchar{\string#}
-\edef\minted@lbracechar{\string{}
-\edef\minted@rbracechar{\string}}
 \edef\minted@dollarchar{\string$}
 \edef\minted@ampchar{\string&}
-\edef\minted@uscorechar{\string_}
-\newcommand{\minted@bechar}{%
-  \begingroup
+\edef\minted@underscorechar{\string_}
+\edef\minted@tildechar{\string~}
+\newcommand{\minted@escchars}{%
   \let\#\minted@hashchar
   \let\%\@percentchar
-  \let\{\minted@lbracechar
-  \let\}\minted@rbracechar
+  \let\{\@charlb
+  \let\}\@charrb
   \let\$\minted@dollarchar
   \let\&\minted@ampchar
-  \let\_\minted@uscorechar
-}
-\newcommand{\minted@eechar}{\endgroup}
-\newcommand{\minted@define@opt@escchar}[4][]{%
+  \let\_\minted@underscorechar
+  \let\\\@backslashchar
+  \let~\minted@tildechar
+  \let\~\minted@tildechar
+} %$ <- highlighting
+\newcommand{\minted@addto@optlistcl@e}[2]{%
+  \begingroup
+  \minted@escchars
+  \xdef\minted@xtmp{#2}%
+  \endgroup
+  \expandafter\minted@addto@optlistcl@e@i\expandafter{\minted@xtmp}{#1}}
+\def\minted@addto@optlistcl@e@i#1#2{%
+  \expandafter\def\expandafter#2\expandafter{#2#1\space}}
+\newcommand{\minted@addto@optlistcl@lang@e}[2]{%
+  \begingroup
+  \minted@escchars
+  \xdef\minted@xtmp{#2}%
+  \endgroup
+  \expandafter\minted@addto@optlistcl@lang@e@i\expandafter{\minted@xtmp}{#1}}
+\def\minted@addto@optlistcl@lang@e@i#1#2{%
+  \expandafter\let\expandafter\minted@tmp\csname #2\endcsname
+  \expandafter\def\expandafter\minted@tmp\expandafter{\minted@tmp#1\space}%
+  \expandafter\let\csname #2\endcsname\minted@tmp}
+\newcommand{\minted@def@optcl@e}[4][]{%
   \ifthenelse{\equal{#1}{}}%
-    {\define@key{minted@optg}{#2}{\minted@bechar%
-        \minted@namexdef{minted@optg@#2}{#3=#4}%
-        \minted@eechar%
-        \@namedef{minted@optg@#2@val}{#4}%
-        \minted@regoptg{#2}}%
-      \define@key{minted@optlang}{#2}{%
-        \minted@bechar%
-        \minted@namexdef{minted@optlang\minted@lang @#2}{#3=#4}%
-        \minted@eechar%
-        \@namedef{minted@optlang\minted@lang @#2@val}{#4}%
-        \minted@regoptlang{#2}}%
-      \define@key{minted@optcmd}{#2}{\minted@bechar%
-        \minted@namexdef{minted@optcmd@#2}{#3=#4}%
-        \minted@eechar%
-        \@namedef{minted@optcmd@#2@val}{#4}%
-        \minted@regoptcmd{#2}}}%
-    {\define@key{minted@optg}{#2}[#1]{\minted@bechar%
-        \minted@namexdef{minted@optg@#2}{#3=#4}%
-        \minted@eechar%
-        \@namedef{minted@optg@#2@val}{#4}%
-        \minted@regoptg{#2}}%
-      \define@key{minted@optlang}{#2}[#1]{%
-        \minted@bechar%
-        \minted@namexdef{minted@optlang\minted@lang @#2}{#3=#4}%
-        \minted@eechar%
-        \@namedef{minted@optlang\minted@lang @#2@val}{#4}%
-        \minted@regoptlang{#2}}%
-      \define@key{minted@optcmd}{#2}[#1]{\minted@bechar%
-        \minted@namexdef{minted@optcmd@#2}{#3=#4}%
-        \minted@eechar%
-        \@namedef{minted@optcmd@#2@val}{#4}%
-        \minted@regoptcmd{#2}}}%
+    {\define@key{minted@opt@g}{#2}{%
+        \minted@addto@optlistcl@e{\minted@optlistcl@g}{#3=#4}%
+        \@namedef{minted@opt@g:#2}{#4}}%
+      \define@key{minted@opt@g@i}{#2}{%
+        \minted@addto@optlistcl@e{\minted@optlistcl@g@i}{#3=#4}%
+        \@namedef{minted@opt@g@i:#2}{#4}}%
+      \define@key{minted@opt@lang}{#2}{%
+        \minted@addto@optlistcl@lang@e{minted@optlistcl@lang\minted@lang}{#3=#4}%
+        \@namedef{minted@opt@lang\minted@lang:#2}{#4}}%
+      \define@key{minted@opt@lang@i}{#2}{%
+        \minted@addto@optlistcl@lang@e{%
+          minted@optlistcl@lang\minted@lang @i}{#3=#4}%
+        \@namedef{minted@opt@lang\minted@lang @i:#2}{#4}}%
+      \define@key{minted@opt@cmd}{#2}{%
+        \minted@addto@optlistcl@e{\minted@optlistcl@cmd}{#3=#4}%
+        \@namedef{minted@opt@cmd:#2}{#4}}}%
+    {\define@key{minted@opt@g}{#2}[#1]{%
+        \minted@addto@optlistcl@e{\minted@optlistcl@g}{#3=#4}%
+        \@namedef{minted@opt@g:#2}{#4}}%
+      \define@key{minted@opt@g@i}{#2}[#1]{%
+        \minted@addto@optlistcl@e{\minted@optlistcl@g@i}{#3=#4}%
+        \@namedef{minted@opt@g@i:#2}{#4}}%
+      \define@key{minted@opt@lang}{#2}[#1]{%
+        \minted@addto@optlistcl@lang@e{minted@optlistcl@lang\minted@lang}{#3=#4}%
+        \@namedef{minted@opt@lang\minted@lang:#2}{#4}}%
+      \define@key{minted@opt@lang@i}{#2}[#1]{%
+        \minted@addto@optlistcl@lang@e{%
+          minted@optlistcl@lang\minted@lang @i}{#3=#4}%
+        \@namedef{minted@opt@lang\minted@lang @i:#2}{#4}}%
+      \define@key{minted@opt@cmd}{#2}[#1]{%
+        \minted@addto@optlistcl@e{\minted@optlistcl@cmd}{#3=#4}%
+        \@namedef{minted@opt@cmd:#2}{#4}}}%
 }
-\newcommand{\minted@define@optstyle}{%
-  \define@key{minted@optg}{style}{%
-    \@namedef{minted@optg@style}{-P style=##1 -P commandprefix=PYG##1}%
-    \minted@regoptg{style}\minted@regstyle{##1}}%
-  \define@key{minted@optlang}{style}{%
-    \@namedef{minted@optlang\minted@lang @style}%
+\newcommand{\minted@def@optcl@style}{%
+  \define@key{minted@opt@g}{style}{%
+    \minted@addto@optlistcl{\minted@optlistcl@g}%
       {-P style=##1 -P commandprefix=PYG##1}%
-    \minted@regoptlang{style}\minted@regstyle{##1}}%
-  \define@key{minted@optcmd}{style}{%
-    \@namedef{minted@optcmd@style}{-P style=##1 -P commandprefix=PYG##1}%
-    \minted@regoptcmd{style}\minted@regstyle{##1}}%
+    \minted@checkstyle{##1}%
+    \@namedef{minted@opt@g:style}{##1}}%
+  \define@key{minted@opt@g@i}{style}{%
+    \minted@addto@optlistcl{\minted@optlistcl@g@i}%
+      {-P style=##1 -P commandprefix=PYG##1}%
+    \minted@checkstyle{##1}%
+    \@namedef{minted@opt@g@i:style}{##1}}%
+  \define@key{minted@opt@lang}{style}{%
+    \minted@addto@optlistcl@lang{minted@optlistcl@lang\minted@lang}%
+      {-P style=##1 -P commandprefix=PYG##1}%
+    \minted@checkstyle{##1}%
+    \@namedef{minted@opt@lang\minted@lang:style}{##1}}%
+  \define@key{minted@opt@lang@i}{style}{%
+    \minted@addto@optlistcl@lang{minted@optlistcl@lang\minted@lang @i}%
+      {-P style=##1 -P commandprefix=PYG##1}%
+    \minted@checkstyle{##1}%
+    \@namedef{minted@opt@lang\minted@lang @i:style}{##1}}%
+  \define@key{minted@opt@cmd}{style}{%
+    \minted@addto@optlistcl{\minted@optlistcl@cmd}%
+      {-P style=##1 -P commandprefix=PYG##1}%
+    \minted@checkstyle{##1}%
+    \@namedef{minted@opt@cmd:style}{##1}}%
 }
-\newcommand{\minted@patchZsq}[1]{%
+\newcommand{\minted@patch@Zsq}[1]{%
   \ifx\upquote@cmtt\minted@undefined\else
     \ifx\encodingdefault\upquote@OTone
       \ifx\ttdefault\upquote@cmtt
         \expandafter\ifdefstring\expandafter{\csname PYG#1Zsq\endcsname}{\char`\'}%
-                {\expandafter\gdef\csname PYG#1Zsq\endcsname{\char13 }}{}%
+        {\expandafter\gdef\csname PYG#1Zsq\endcsname{\char13 }}{}%
       \else
         \expandafter\ifdefstring\expandafter{\csname PYG#1Zsq\endcsname}{\char`\'}%
         {\expandafter\gdef\csname PYG#1Zsq\endcsname{\textquotesingle}}{}%
@@ -310,10 +349,9 @@
     \fi
   \fi
 }
-\newcommand{\minted@regstyle}[1]{%
-  \ifcsname minted@stylereg@#1\endcsname\else
-    \expandafter\global\expandafter%
-      \let\csname minted@stylereg@#1\endcsname\@empty
+\newcommand{\minted@checkstyle}[1]{%
+  \ifcsname minted@styleloaded@#1\endcsname\else
+    \expandafter\gdef\csname minted@styleloaded@#1\endcsname{}%
     \ifthenelse{\boolean{minted@cache}}%
       {\IfFileExists{\minted@outputdir\minted@cachedir/#1.pygstyle}{}{%
         \ifwindows
@@ -329,7 +367,7 @@
         \begingroup
         \let\def\gdef
         \endlinechar=-1\relax
-        \input{\minted@outputdir\minted@cachedir/#1.pygstyle}%
+        \minted@input{\minted@outputdir\minted@cachedir/#1.pygstyle}%
         \endgroup
         \minted@addcachefile{#1.pygstyle}}%
       {\ifwindows
@@ -342,194 +380,280 @@
         \begingroup
         \let\def\gdef
         \endlinechar=-1\relax
-        \input{\minted@outputdir\jobname.out.pyg}%
+        \minted@input{\minted@outputdir\jobname.out.pyg}%
         \endgroup}%
     \ifx\@onlypreamble\@notprerr
-      \minted@patchZsq{#1}%
+      \minted@patch@Zsq{#1}%
     \else
-      \minted@patchZsq{#1}%
-      \AtBeginDocument{\minted@patchZsq{#1}}%
+      \minted@patch@Zsq{#1}%
+      \AtBeginDocument{\minted@patch@Zsq{#1}}%
     \fi
   \fi
 }
-\ifthenelse{\boolean{minted@draft}}{\renewcommand{\minted@regstyle}[1]{}}{}
-\newcommand{\minted@define@switch}[3][]{
-  \define@booleankey{minted@optg}{#2}
-    {\@namedef{minted@optg@#2}{#3}\minted@regoptg{#2}}
-    {\@namedef{minted@optg@#2}{#1}\minted@regoptg{#2}}
-  \define@booleankey{minted@optlang}{#2}
-    {\@namedef{minted@optlang\minted@lang @#2}{#3}\minted@regoptlang{#2}}
-    {\@namedef{minted@optlang\minted@lang @#2}{#1}\minted@regoptlang{#2}}
-  \define@booleankey{minted@optcmd}{#2}
-    {\@namedef{minted@optcmd@#2}{#3}\minted@regoptcmd{#2}}
-    {\@namedef{minted@optcmd@#2}{#1}\minted@regoptcmd{#2}}
+\ifthenelse{\boolean{minted@draft}}{\renewcommand{\minted@checkstyle}[1]{}}{}
+\newcommand{\minted@def@optcl@switch}[2]{%
+  \define@booleankey{minted@opt@g}{#1}%
+    {\minted@addto@optlistcl{\minted@optlistcl@g}{#2=True}%
+      \@namedef{minted@opt@g:#1}{true}}
+    {\minted@addto@optlistcl{\minted@optlistcl@g}{#2=False}%
+      \@namedef{minted@opt@g:#1}{false}}
+  \define@booleankey{minted@opt@g@i}{#1}%
+    {\minted@addto@optlistcl{\minted@optlistcl@g@i}{#2=True}%
+      \@namedef{minted@opt@g@i:#1}{true}}
+    {\minted@addto@optlistcl{\minted@optlistcl@g@i}{#2=False}%
+      \@namedef{minted@opt@g@i:#1}{false}}
+  \define@booleankey{minted@opt@lang}{#1}%
+    {\minted@addto@optlistcl@lang{minted@optlistcl@lang\minted@lang}{#2=True}%
+      \@namedef{minted@opt@lang\minted@lang:#1}{true}}
+    {\minted@addto@optlistcl@lang{minted@optlistcl@lang\minted@lang}{#2=False}%
+      \@namedef{minted@opt@lang\minted@lang:#1}{false}}
+  \define@booleankey{minted@opt@lang@i}{#1}%
+    {\minted@addto@optlistcl@lang{minted@optlistcl@lang\minted@lang @i}{#2=True}%
+      \@namedef{minted@opt@lang\minted@lang @i:#1}{true}}
+    {\minted@addto@optlistcl@lang{minted@optlistcl@lang\minted@lang @i}{#2=False}%
+      \@namedef{minted@opt@lang\minted@lang @i:#1}{false}}
+  \define@booleankey{minted@opt@cmd}{#1}%
+      {\minted@addto@optlistcl{\minted@optlistcl@cmd}{#2=True}%
+        \@namedef{minted@opt@cmd:#1}{true}}
+      {\minted@addto@optlistcl{\minted@optlistcl@cmd}{#2=False}%
+        \@namedef{minted@opt@cmd:#1}{false}}
 }
-\newcommand{\minted@define@extra}[1]{
-  \define@key{minted@optg}{#1}{%
-    \expandafter\def\expandafter\minted@optg@extra\expandafter{%
-      \minted@optg@extra,#1=##1}}
-  \@namedef{minted@optg@extra}{}
-  \define@key{minted@optlang}{#1}{%
-    \ifcsname minted@optlang\minted@lang @extra\endcsname\else
-      \expandafter\def\csname minted@optlang\minted@lang @extra\endcsname{}%
-    \fi
-    \expandafter\let\expandafter\minted@optlang@extra%
-      \csname minted@optlang\minted@lang @extra \endcsname
-    \expandafter\def\expandafter\minted@optlang@extra\expandafter{%
-      \minted@optlang@extra,#1=##1}%
-    \expandafter\let\csname minted@optlang\minted@lang @extra\endcsname%
-      \minted@optlang@extra
-    \let\minted@optlang@extra\@empty}%
-  \@namedef{minted@optlang@extra}{}
-  \define@key{minted@optcmd}{#1}{%
-    \expandafter\def\expandafter\minted@optcmd@extra\expandafter{%
-      \minted@optcmd@extra,#1=##1}}
-  \@namedef{minted@optcmd@extra}{}
+\newcommand{\minted@def@optfv}[1]{%
+  \define@key{minted@opt@g}{#1}{%
+    \expandafter\def\expandafter\minted@optlistfv@g\expandafter{%
+      \minted@optlistfv@g#1=##1,}%
+    \@namedef{minted@opt@g:#1}{##1}}
+  \define@key{minted@opt@g@i}{#1}{%
+    \expandafter\def\expandafter\minted@optlistfv@g@i\expandafter{%
+      \minted@optlistfv@g@i#1=##1,}%
+    \@namedef{minted@opt@g@i:#1}{##1}}
+  \define@key{minted@opt@lang}{#1}{%
+    \expandafter\let\expandafter\minted@tmp%
+      \csname minted@optlistfv@lang\minted@lang\endcsname
+    \expandafter\def\expandafter\minted@tmp\expandafter{%
+      \minted@tmp#1=##1,}%
+    \expandafter\let\csname minted@optlistfv@lang\minted@lang\endcsname%
+      \minted@tmp
+    \@namedef{minted@opt@lang\minted@lang:#1}{##1}}
+  \define@key{minted@opt@lang@i}{#1}{%
+    \expandafter\let\expandafter\minted@tmp%
+      \csname minted@optlistfv@lang\minted@lang @i\endcsname
+    \expandafter\def\expandafter\minted@tmp\expandafter{%
+      \minted@tmp#1=##1,}%
+    \expandafter\let\csname minted@optlistfv@lang\minted@lang @i\endcsname%
+      \minted@tmp
+    \@namedef{minted@opt@lang\minted@lang @i:#1}{##1}}
+  \define@key{minted@opt@cmd}{#1}{%
+    \expandafter\def\expandafter\minted@optlistfv@cmd\expandafter{%
+      \minted@optlistfv@cmd#1=##1,}%
+    \@namedef{minted@opt@cmd:#1}{##1}}
 }
-\newcommand{\minted@define@extra@switch}[1]{
-  \define@booleankey{minted@optg}{#1}
-    {\expandafter\def\expandafter\minted@optg@extra\expandafter{%
-      \minted@optg@extra,#1}}
-    {\expandafter\def\expandafter\minted@optg@extra\expandafter{%
-      \minted@optg@extra,#1=false}}
-  \define@booleankey{minted@optlang}{#1}
-    {%
-      \ifcsname minted@optlang\minted@lang @extra\endcsname\else
-        \expandafter\def\csname minted@optlang\minted@lang @extra\endcsname{}%
-      \fi
-      \expandafter\let\expandafter\minted@optlang@extra%
-        \csname minted@optlang\minted@lang @extra\endcsname
-      \expandafter\def\expandafter\minted@optlang@extra\expandafter{%
-        \minted@optlang@extra,#1}%
-      \expandafter\let\csname minted@optlang\minted@lang @extra\endcsname%
-        \minted@optlang@extra
-      \let\minted@optlang@extra\@empty}
-    {%
-      \ifcsname minted@optlang\minted@lang @extra\endcsname\else
-        \expandafter\def\csname minted@optlang\minted@lang @extra\endcsname{}%
-      \fi
-      \expandafter\let\expandafter\minted@optlang@extra%
-        \csname minted@optlang\minted@lang @extra\endcsname
-      \expandafter\def\expandafter\minted@optlang@extra\expandafter{%
-        \minted@optlang@extra,#1=false}%
-      \expandafter\let\csname minted@optlang\minted@lang @extra\endcsname%
-        \minted@optlang@extra
-      \let\minted@optlang@extra\@empty}
-  \define@booleankey{minted@optcmd}{#1}
-    {\expandafter\def\expandafter\minted@optcmd@extra\expandafter{%
-      \minted@optcmd@extra,#1}}
-    {\expandafter\def\expandafter\minted@optcmd@extra\expandafter{%
-      \minted@optcmd@extra,#1=false}}
+\newcommand{\minted@def@optfv@switch}[1]{%
+  \define@booleankey{minted@opt@g}{#1}%
+    {\expandafter\def\expandafter\minted@optlistfv@g\expandafter{%
+      \minted@optlistfv@g#1=true,}%
+     \@namedef{minted@opt@g:#1}{true}}%
+    {\expandafter\def\expandafter\minted@optlistfv@g\expandafter{%
+      \minted@optlistfv@g#1=false,}%
+     \@namedef{minted@opt@g:#1}{false}}%
+  \define@booleankey{minted@opt@g@i}{#1}%
+    {\expandafter\def\expandafter\minted@optlistfv@g@i\expandafter{%
+      \minted@optlistfv@g@i#1=true,}%
+     \@namedef{minted@opt@g@i:#1}{true}}%
+    {\expandafter\def\expandafter\minted@optlistfv@g@i\expandafter{%
+      \minted@optlistfv@g@i#1=false,}%
+     \@namedef{minted@opt@g@i:#1}{false}}%
+  \define@booleankey{minted@opt@lang}{#1}%
+    {\expandafter\let\expandafter\minted@tmp%
+        \csname minted@optlistfv@lang\minted@lang\endcsname
+      \expandafter\def\expandafter\minted@tmp\expandafter{%
+        \minted@tmp#1=true,}%
+      \expandafter\let\csname minted@optlistfv@lang\minted@lang\endcsname%
+        \minted@tmp
+     \@namedef{minted@opt@lang\minted@lang:#1}{true}}%
+    {\expandafter\let\expandafter\minted@tmp%
+        \csname minted@optlistfv@lang\minted@lang\endcsname
+      \expandafter\def\expandafter\minted@tmp\expandafter{%
+        \minted@tmp#1=false,}%
+      \expandafter\let\csname minted@optlistfv@lang\minted@lang\endcsname%
+        \minted@tmp
+     \@namedef{minted@opt@lang\minted@lang:#1}{false}}%
+  \define@booleankey{minted@opt@lang@i}{#1}%
+    {\expandafter\let\expandafter\minted@tmp%
+        \csname minted@optlistfv@lang\minted@lang @i\endcsname
+      \expandafter\def\expandafter\minted@tmp\expandafter{%
+        \minted@tmp#1=true,}%
+      \expandafter\let\csname minted@optlistfv@lang\minted@lang @i\endcsname%
+        \minted@tmp
+     \@namedef{minted@opt@lang\minted@lang @i:#1}{true}}%
+    {\expandafter\let\expandafter\minted@tmp%
+        \csname minted@optlistfv@lang\minted@lang @i\endcsname
+      \expandafter\def\expandafter\minted@tmp\expandafter{%
+        \minted@tmp#1=false,}%
+      \expandafter\let\csname minted@optlistfv@lang\minted@lang @i\endcsname%
+        \minted@tmp
+     \@namedef{minted@opt@lang\minted@lang @i:#1}{false}}%
+  \define@booleankey{minted@opt@cmd}{#1}%
+    {\expandafter\def\expandafter\minted@optlistfv@cmd\expandafter{%
+      \minted@optlistfv@cmd#1=true,}%
+     \@namedef{minted@opt@cmd:#1}{true}}%
+    {\expandafter\def\expandafter\minted@optlistfv@cmd\expandafter{%
+      \minted@optlistfv@cmd#1=false,}%
+     \@namedef{minted@opt@cmd:#1}{false}}%
 }
-\minted@define@opt{encoding}{-P encoding}{#1}
-\minted@define@opt{outencoding}{-P outencoding}{#1}
-\minted@define@opt@escchar{escapeinside}{-O escapeinside}{"#1"}
-\minted@define@opt{stripnl}{-P stripnl}{#1}
-\minted@define@switch[-P python3=False]{python3}{-P python3=True}
-\minted@define@switch[-P funcnamehighlighting=False]%
-  {funcnamehighlighting}{-P funcnamehighlighting}
-\minted@define@switch[-P startinline=False]{startinline}{-P startinline}
-\ifthenelse{\boolean{minted@draft}}%
-  {\minted@define@extra{gobble}}%
-  {\minted@define@opt{gobble}{-F gobble:n}{#1}}
-\minted@define@opt{codetagify}{-F codetagify:codetags}{#1}
-\minted@define@opt{keywordcase}{-F keywordcase:case}{#1}
-\minted@define@switch[-P texcomments=False]{texcl}{-P texcomments}
-\minted@define@switch[-P texcomments=False]{texcomments}{-P texcomments}
-\minted@define@switch[-P mathescape=False]{mathescape}{-P mathescape}
-\ifthenelse{\boolean{minted@draft}}%
-  {\define@booleankey{FV}{linenos}{\@nameuse{FV@Numbers@left}}{\@nameuse{FV@Numbers@none}}%
-    \minted@define@extra@switch{linenos}}%
-  {\minted@define@switch[-P linenos=False]{linenos}{-P linenos}}
-\minted@define@optstyle
-\minted@define@extra{frame}
-\minted@define@extra{framesep}
-\minted@define@extra{framerule}
-\minted@define@extra{rulecolor}
-\minted@define@extra{numbersep}
-\minted@define@extra{numbers}
-\minted@define@extra{firstnumber}
-\minted@define@extra{stepnumber}
-\minted@define@extra{firstline}
-\minted@define@extra{lastline}
-\minted@define@extra{baselinestretch}
-\minted@define@extra{xleftmargin}
-\minted@define@extra{xrightmargin}
-\minted@define@extra{fillcolor}
-\minted@define@extra{tabsize}
-\minted@define@extra{fontfamily}
-\minted@define@extra{fontsize}
-\minted@define@extra{fontshape}
-\minted@define@extra{fontseries}
-\minted@define@extra{formatcom}
-\minted@define@extra{label}
-\minted@define@extra@switch{numberblanklines}
-\minted@define@extra@switch{showspaces}
-\minted@define@extra@switch{resetmargins}
-\minted@define@extra@switch{samepage}
-\minted@define@extra@switch{showtabs}
-\minted@define@extra@switch{obeytabs}
-\minted@define@extra@switch{breaklines}
-\minted@define@extra{breakindent}
-\minted@define@extra@switch{breakautoindent}
-\minted@define@extra{breaksymbol}
-\minted@define@extra{breaksymbolsep}
-\minted@define@extra{breaksymbolindent}
-\let\minted@optcmd@bgcolor\@empty
-\define@key{minted@optcmd}{bgcolor}{\@namedef{minted@optcmd@bgcolor}{#1}}
-\newcommand{\minted@encoding}{%
-  \ifcsname minted@optcmd@encoding@val\endcsname
-    \csname minted@optcmd@encoding@val\endcsname
+\newboolean{minted@isinline}
+\newcommand{\minted@fvset}{%
+  \expandafter\fvset\expandafter{\minted@optlistfv@g}%
+  \expandafter\let\expandafter\minted@tmp%
+    \csname minted@optlistfv@lang\minted@lang\endcsname
+  \expandafter\fvset\expandafter{\minted@tmp}%
+  \ifthenelse{\boolean{minted@isinline}}%
+   {\expandafter\fvset\expandafter{\minted@optlistfv@g@i}%
+    \expandafter\let\expandafter\minted@tmp%
+      \csname minted@optlistfv@lang\minted@lang @i\endcsname
+    \expandafter\fvset\expandafter{\minted@tmp}}%
+   {}%
+  \expandafter\fvset\expandafter{\minted@optlistfv@cmd}%
+}
+\def\minted@get@opt#1#2{%
+  \ifcsname minted@opt@cmd:#1\endcsname
+    \csname minted@opt@cmd:#1\endcsname
   \else
-    \ifcsname minted@optlang\minted@lang @encoding@val\endcsname
-      \csname minted@optlang\minted@lang @encoding@val\endcsname
-    \else
-      \ifcsname minted@optg@encoding@val\endcsname
-        \csname minted@optg@encoding@val\endcsname
+    \ifminted@isinline
+      \ifcsname minted@opt@lang\minted@lang @i:#1\endcsname
+        \csname minted@opt@lang\minted@lang @i:#1\endcsname
       \else
-        UTF8%
+        \ifcsname minted@opt@g@i:#1\endcsname
+          \csname minted@opt@g@i:#1\endcsname
+        \else
+          \ifcsname minted@opt@lang\minted@lang:#1\endcsname
+            \csname minted@opt@lang\minted@lang:#1\endcsname
+          \else
+            \ifcsname minted@opt@g:#1\endcsname
+              \csname minted@opt@g:#1\endcsname
+            \else
+              #2%
+            \fi
+          \fi
+        \fi
+      \fi
+    \else
+      \ifcsname minted@opt@lang\minted@lang:#1\endcsname
+        \csname minted@opt@lang\minted@lang:#1\endcsname
+      \else
+        \ifcsname minted@opt@g:#1\endcsname
+          \csname minted@opt@g:#1\endcsname
+        \else
+          #2%
+        \fi
       \fi
     \fi
   \fi
+}%
+\newcommand{\minted@def@opt}[2][]{%
+  \define@key{minted@opt@g}{#2}{%
+    \@namedef{minted@opt@g:#2}{##1}}
+  \define@key{minted@opt@g@i}{#2}{%
+    \@namedef{minted@opt@g@i:#2}{##1}}
+  \define@key{minted@opt@lang}{#2}{%
+    \@namedef{minted@opt@lang\minted@lang:#2}{##1}}
+  \define@key{minted@opt@lang@i}{#2}{%
+    \@namedef{minted@opt@lang\minted@lang @i:#2}{##1}}
+  \define@key{minted@opt@cmd}{#2}{%
+    \@namedef{minted@opt@cmd:#2}{##1}}
 }
-\define@booleankey{minted@optg}{autogobble}
-    {\expandafter\let\csname minted@optg@autogobble\endcsname\@empty}
-    {\expandafter\let\csname minted@optg@autogobble\endcsname\relax}
-\define@booleankey{minted@optlang}{autogobble}
-    {\expandafter\let\csname minted@optlang\minted@lang @autogobble\endcsname\@empty}
-    {\expandafter\let\csname minted@optlang\minted@lang @autogobble\endcsname\relax}
-\define@booleankey{minted@optcmd}{autogobble}
-    {\expandafter\let\csname minted@optcmd@autogobble\endcsname\@empty}
-    {\expandafter\let\csname minted@optcmd@autogobble\endcsname\relax}
-\newboolean{minted@autogobble}
-\newcommand{\minted@set@autogobble}{%
-  \ifcsname minted@optg@autogobble\endcsname\else
-    \expandafter\let\csname minted@optg@autogobble\endcsname\relax
-  \fi
-  \ifcsname minted@optlang\minted@lang @autogobble\endcsname\else
-    \expandafter\let\csname minted@optlang\minted@lang @autogobble\endcsname\relax
-  \fi
-  \ifcsname minted@optcmd@autogobble\endcsname\else
-    \expandafter\let\csname minted@optcmd@autogobble\endcsname\relax
-  \fi
-  \expandafter\ifx\csname minted@optcmd@autogobble\endcsname\@empty
-    \setboolean{minted@autogobble}{true}%
-  \else
-    \expandafter\ifx\csname minted@optlang\minted@lang @autogobble\endcsname\@empty
-      \setboolean{minted@autogobble}{true}%
-    \else
-      \expandafter\ifx\csname minted@optg@autogobble\endcsname\@empty
-        \setboolean{minted@autogobble}{true}%
-      \else
-        \setboolean{minted@autogobble}{false}%
-      \fi
-    \fi
-  \fi
+\newcommand{\minted@def@opt@switch}[2][false]{%
+  \define@booleankey{minted@opt@g}{#2}%
+    {\@namedef{minted@opt@g:#2}{true}}%
+    {\@namedef{minted@opt@g:#2}{false}}
+  \define@booleankey{minted@opt@g@i}{#2}%
+    {\@namedef{minted@opt@g@i:#2}{true}}%
+    {\@namedef{minted@opt@g@i:#2}{false}}
+  \define@booleankey{minted@opt@lang}{#2}%
+    {\@namedef{minted@opt@lang\minted@lang:#2}{true}}%
+    {\@namedef{minted@opt@lang\minted@lang:#2}{false}}
+  \define@booleankey{minted@opt@lang@i}{#2}%
+    {\@namedef{minted@opt@lang\minted@lang @i:#2}{true}}%
+    {\@namedef{minted@opt@lang\minted@lang @i:#2}{false}}
+  \define@booleankey{minted@opt@cmd}{#2}%
+    {\@namedef{minted@opt@cmd:#2}{true}}%
+    {\@namedef{minted@opt@cmd:#2}{false}}%
+  \@namedef{minted@opt@g:#2}{#1}%
 }
+
+\minted@def@optcl{encoding}{-P encoding}{#1}
+\minted@def@optcl{outencoding}{-P outencoding}{#1}
+\minted@def@optcl@e{escapeinside}{-P "escapeinside}{#1"}
+\minted@def@optcl@switch{stripnl}{-P stripnl}
+\minted@def@optcl@switch{stripall}{-P stripall}
+\minted@def@optcl@switch{python3}{-P python3}
+\minted@def@optcl@switch{funcnamehighlighting}{-P funcnamehighlighting}
+\minted@def@optcl@switch{startinline}{-P startinline}
+\ifthenelse{\boolean{minted@draft}}%
+  {\minted@def@optfv{gobble}}%
+  {\minted@def@optcl{gobble}{-F gobble:n}{#1}}
+\minted@def@optcl{codetagify}{-F codetagify:codetags}{#1}
+\minted@def@optcl{keywordcase}{-F keywordcase:case}{#1}
+\minted@def@optcl@switch{texcl}{-P texcomments}
+\minted@def@optcl@switch{texcomments}{-P texcomments}
+\minted@def@optcl@switch{mathescape}{-P mathescape}
+\ifcsname KV@FV@linenos\endcsname\else
+\define@booleankey{FV}{linenos}%
+  {\@nameuse{FV@Numbers@left}}{\@nameuse{FV@Numbers@none}}
+\fi
+\minted@def@optfv@switch{linenos}
+\minted@def@optcl@style
+\minted@def@optfv{frame}
+\minted@def@optfv{framesep}
+\minted@def@optfv{framerule}
+\minted@def@optfv{rulecolor}
+\minted@def@optfv{numbersep}
+\minted@def@optfv{numbers}
+\minted@def@optfv{firstnumber}
+\minted@def@optfv{stepnumber}
+\minted@def@optfv{firstline}
+\minted@def@optfv{lastline}
+\minted@def@optfv{baselinestretch}
+\minted@def@optfv{xleftmargin}
+\minted@def@optfv{xrightmargin}
+\minted@def@optfv{fillcolor}
+\minted@def@optfv{tabsize}
+\minted@def@optfv{fontfamily}
+\minted@def@optfv{fontsize}
+\minted@def@optfv{fontshape}
+\minted@def@optfv{fontseries}
+\minted@def@optfv{formatcom}
+\minted@def@optfv{label}
+\minted@def@optfv@switch{numberblanklines}
+\minted@def@optfv@switch{showspaces}
+\minted@def@optfv@switch{resetmargins}
+\minted@def@optfv@switch{samepage}
+\minted@def@optfv@switch{showtabs}
+\minted@def@optfv@switch{obeytabs}
+\minted@def@optfv@switch{breaklines}
+\minted@def@optfv{breakindent}
+\minted@def@optfv@switch{breakautoindent}
+\minted@def@optfv{breaksymbol}
+\minted@def@optfv{breaksymbolsep}
+\minted@def@optfv{breaksymbolindent}
+\minted@def@optfv{breaksymbolleft}
+\minted@def@optfv{breaksymbolsepleft}
+\minted@def@optfv{breaksymbolindentleft}
+\minted@def@optfv{breaksymbolright}
+\minted@def@optfv{breaksymbolsepright}
+\minted@def@optfv{breaksymbolindentright}
+\minted@def@opt@switch{breakbytoken}
+\minted@def@opt{bgcolor}
+\minted@def@opt@switch{autogobble}
+\newcommand{\minted@encoding}{\minted@get@opt{encoding}{UTF8}}
+\ifcsname KV@FV@breaklines\endcsname\else
+\newboolean{FV@BreakLines}
 \let\FV@ListProcessLine@Orig\FV@ListProcessLine
 \define@booleankey{FV}{breaklines}%
-  {\let\FV@ListProcessLine\FV@ListProcessLine@Break}%
-  {\let\FV@ListProcessLine\FV@ListProcessLine@Orig}
+  {\FV@BreakLinestrue
+    \let\FV@ListProcessLine\FV@ListProcessLine@Break}%
+  {\FV@BreakLinesfalse
+    \let\FV@ListProcessLine\FV@ListProcessLine@Orig}
 \newdimen\FV@BreakIndent
 \define@key{FV}{breakindent}{\FV@BreakIndent=#1}
 \fvset{breakindent=0pt}
@@ -537,22 +661,39 @@
 \define@booleankey{FV}{breakautoindent}%
   {\FV@BreakAutoIndenttrue}{\FV@BreakAutoIndentfalse}
 \fvset{breakautoindent=true}
-\define@key{FV}{breaksymbol}{\def\FancyVerbBreakSymbol{#1}}
-\fvset{breaksymbol=\ensuremath{\hookrightarrow}}
-\newdimen\FV@BreakSymbolSep
-\define@key{FV}{breaksymbolsep}{\FV@BreakSymbolSep=#1}
-\fvset{breaksymbolsep=10pt}
-\newdimen\FV@BreakSymbolIndent
-\settowidth{\FV@BreakSymbolIndent}{\ttfamily xxxx}
-\define@key{FV}{breaksymbolindent}{\FV@BreakSymbolIndent=#1}
+\define@key{FV}{breaksymbolleft}{\def\FancyVerbBreakSymbolLeft{#1}}
+\define@key{FV}{breaksymbol}{\fvset{breaksymbolleft=#1}}
+\fvset{breaksymbolleft=\tiny\ensuremath{\hookrightarrow}}
+\define@key{FV}{breaksymbolright}{\def\FancyVerbBreakSymbolRight{#1}}
+\fvset{breaksymbolright={}}
+\newdimen\FV@BreakSymbolSepLeft
+\define@key{FV}{breaksymbolsepleft}{\FV@BreakSymbolSepLeft=#1}
+\define@key{FV}{breaksymbolsep}{\fvset{breaksymbolsepleft=#1}}
+\fvset{breaksymbolsepleft=1em}
+\newdimen\FV@BreakSymbolSepRight
+\define@key{FV}{breaksymbolsepright}{\FV@BreakSymbolSepRight=#1}
+\fvset{breaksymbolsepright=1em}
+\newdimen\FV@BreakSymbolIndentLeft
+\settowidth{\FV@BreakSymbolIndentLeft}{\ttfamily xxxx}
+\define@key{FV}{breaksymbolindentleft}{\FV@BreakSymbolIndentLeft=#1}
+\define@key{FV}{breaksymbolindent}{\fvset{breaksymbolindentleft=#1}}
+\newdimen\FV@BreakSymbolIndentRight
+\settowidth{\FV@BreakSymbolIndentRight}{\ttfamily xxxx}
+\define@key{FV}{breaksymbolindentright}{\FV@BreakSymbolIndentRight=#1}
+\newcommand{\FancyVerbFormatBreakSymbolLeft}[1]{%
+  \ifnum\value{linenumber}=1\relax\else{#1}\fi}
+\newcounter{FancyVerbLineBreakLast}
+\newcommand{\FV@SetLineBreakLast}{%
+  \setcounter{FancyVerbLineBreakLast}{\value{linenumber}}}
+\newcommand{\FancyVerbFormatBreakSymbolRight}[1]{%
+  \ifnum\value{linenumber}=\value{FancyVerbLineBreakLast}\relax\else{#1}\fi}
 \newsavebox{\FV@LineBox}
-\newsavebox{\FV@IndentBox}
-\newsavebox{\FV@LinenoBox}
+\newsavebox{\FV@LineIndentBox}
 \let\FV@LineIndentChars\@empty
 \def\FV@GetNextChar{\let\FV@NextChar=}
 \def\FV@CleanRemainingChars#1\FV@Undefined{}
-\def\FV@GetLineIndent{\afterassignment\FV@CheckChar\FV@GetNextChar}
-\def\FV@CheckChar{%
+\def\FV@GetLineIndent{\afterassignment\FV@CheckIndentChar\FV@GetNextChar}
+\def\FV@CheckIndentChar{%
   \ifx\FV@NextChar\FV@Undefined
     \let\FV@Next=\relax
   \else
@@ -570,65 +711,84 @@
   \fi
   \FV@Next
 }
-\newcommand{\FancyVerbFormatBreakSymbol}{%
-  \ifnum\value{linenumber}=1\relax\else\FancyVerbBreakSymbol\fi}%
-\AtBeginEnvironment{Verbatim}{\lineskip=0pt\xdef\FV@theprevdepth{0pt}}
+\def\FV@makeLineNumber{%
+  \hss
+  \FancyVerbFormatBreakSymbolLeft{\FancyVerbBreakSymbolLeft}%
+  \hbox to \FV@BreakSymbolSepLeft{\hfill}%
+  \rlap{\hskip\linewidth
+    \hbox to \FV@BreakSymbolSepRight{\hfill}%
+    \FancyVerbFormatBreakSymbolRight{\FancyVerbBreakSymbolRight}%
+    \FV@SetLineBreakLast
+  }%
+}
+\def\FV@SaveLineBox#1{%
+  \savebox{\FV@LineBox}{%
+    \advance\linewidth by -\FV@BreakIndent
+    \hbox to \FV@BreakIndent{\hfill}%
+    \ifthenelse{\boolean{FV@BreakAutoIndent}}%
+     {\let\FV@LineIndentChars\@empty
+      \FV@GetLineIndent#1\FV@Undefined
+      \savebox{\FV@LineIndentBox}{\FV@LineIndentChars}%
+      \hbox to \wd\FV@LineIndentBox{\hfill}%
+      \advance\linewidth by -\wd\FV@LineIndentBox}%
+     {}%
+    \ifdefempty{\FancyVerbBreakSymbolLeft}{}%
+     {\hbox to \FV@BreakSymbolIndentLeft{\hfill}%
+      \advance\linewidth by -\FV@BreakSymbolIndentLeft}%
+    \ifdefempty{\FancyVerbBreakSymbolRight}{}%
+     {\advance\linewidth by -\FV@BreakSymbolIndentRight}%
+    \parbox[t]{\linewidth}{%
+      \raggedright
+      \leftlinenumbers*
+      \begin{internallinenumbers*}%
+      \let\makeLineNumber\FV@makeLineNumber
+      \noindent\hspace*{-\FV@BreakIndent}%
+      \ifdefempty{\FancyVerbBreakSymbolLeft}{}{%
+        \hspace*{-\FV@BreakSymbolIndentLeft}}%
+      \ifthenelse{\boolean{FV@BreakAutoIndent}}%
+       {\hspace*{-\wd\FV@LineIndentBox}}%
+       {}%
+      \strut#1\strut
+      \end{internallinenumbers*}
+    }%
+    \ifdefempty{\FancyVerbBreakSymbolRight}{}%
+     {\hbox to \FV@BreakSymbolIndentRight{\hfill}}%
+  }%
+}
 \def\FV@ListProcessLine@Break#1{%
   \hbox to \hsize{%
   \kern\leftmargin
   \hbox to \linewidth{%
+  \ifx\FV@RightListFrame\relax\else
+    \advance\linewidth by -\FV@FrameSep
+    \advance\linewidth by -\FV@FrameRule
+  \fi
+  \ifx\FV@LeftListFrame\relax\else
+    \advance\linewidth by -\FV@FrameSep
+    \advance\linewidth by -\FV@FrameRule
+  \fi
   \sbox{\FV@LineBox}{\FancyVerbFormatLine{#1}}%
   \ifdim\wd\FV@LineBox>\linewidth
-    \let\FV@theprevdepth@temp\FV@theprevdepth
-    \savebox{\FV@LineBox}{%
-      \begingroup
-      \vbox{\hsize=\linewidth
-        \raggedright
-        \prevdepth\FV@theprevdepth
-        \leftlinenumbers*
-        \setcounter{linenumber}{1}%
-        \let\thelinenumber\FancyVerbFormatBreakSymbol
-        \begin{internallinenumbers}%
-        \linenumbersep=\FV@BreakSymbolSep
-        \advance\hsize by -\FV@BreakIndent
-        \advance\linewidth by -\FV@BreakIndent
-        \noindent\hspace*{-\FV@BreakIndent}%
-        \ifdefempty{\FancyVerbBreakSymbol}{}{%
-          \advance\hsize by -\FV@BreakSymbolIndent
-          \advance\linewidth by -\FV@BreakSymbolIndent
-          \hspace*{-\FV@BreakSymbolIndent}}%
-        \ifthenelse{\boolean{FV@BreakAutoIndent}}%
-          {\let\FV@LineIndentChars\@empty
-            \FV@GetLineIndent#1\FV@Undefined
-            \savebox{\FV@IndentBox}{\FV@LineIndentChars}%
-            \advance\hsize by -\wd\FV@IndentBox
-            \advance\linewidth by -\wd\FV@IndentBox
-            \hspace*{-\wd\FV@IndentBox}%
-          }{}%
-        \FancyVerbFormatLine{#1}%
-        \end{internallinenumbers}%
-        \par\xdef\FV@theprevdepth{\the\prevdepth}}%
-        \endgroup
-    }%
-    \savebox{\FV@LinenoBox}{\FV@LeftListNumber}%
-    \vbox to\ht\FV@LineBox{%
-      \prevdepth\FV@theprevdepth@temp\FV@LeftListNumber\vfill}%
+    \setcounter{FancyVerbLineBreakLast}{0}%
+    \FV@SaveLineBox{#1}%
+    \ifdefempty{\FancyVerbBreakSymbolRight}{}{%
+      \let\FV@SetLineBreakLast\relax
+      \FV@SaveLineBox{#1}}%
+    \FV@LeftListNumber
     \FV@LeftListFrame
-    \null\hfill\usebox{\FV@LineBox}\hss
+    \FancyVerbFormatLine{\usebox{\FV@LineBox}}%
     \FV@RightListFrame
-    \vbox to\ht\FV@LineBox{%
-      \prevdepth\FV@theprevdepth@temp\FV@RightListNumber\vfill}%
+    \FV@RightListNumber
   \else
     \FV@LeftListNumber
     \FV@LeftListFrame
-    \vbox{\hsize=\linewidth
-      \prevdepth\FV@theprevdepth
-      \noindent\FancyVerbFormatLine{#1}%
-      \par\xdef\FV@theprevdepth{\the\prevdepth}}\hss
+    \FancyVerbFormatLine{%
+      \parbox[t]{\linewidth}{\noindent\strut#1\strut}}%
     \FV@RightListFrame
     \FV@RightListNumber
   \fi}%
-  \hss}}
+  \hss}\baselineskip\z@\lineskip\z@}
+\fi
 \newsavebox{\minted@bgbox}
 \newenvironment{minted@colorbg}[1]{
     %\setlength{\fboxsep}{-\fboxrule}
@@ -644,9 +804,11 @@
   \immediate\openout\minted@code\jobname.pyg\relax
   \immediate\write\minted@code{\expandafter\detokenize\expandafter{#1}}%
   \immediate\closeout\minted@code}
+\newcounter{minted@FancyVerbLineTemp}
 \newcommand{\minted@write@detok}[1]{%
   \immediate\write\FV@OutFile{\detokenize{#1}}}
 \newcommand{\minted@FVB@VerbatimOut}[1]{%
+  \setcounter{minted@FancyVerbLineTemp}{\value{FancyVerbLine}}%
   \@bsphack
   \begingroup
     \FV@UseKeyValues
@@ -658,27 +820,43 @@
     \let\FV@FontScanPrep\relax
     \let\@noligs\relax
     \FV@Scan}
+\newcommand{\minted@FVE@VerbatimOut}{%
+  \immediate\closeout\FV@OutFile\endgroup\@esphack
+  \setcounter{FancyVerbLine}{\value{minted@FancyVerbLineTemp}}}%
 \newcommand{\MintedPygmentize}{pygmentize}
-\newcommand{\minted@pygmentize}[2][\jobname.pyg]{%
-  \minted@checklang
-  \minted@set@autogobble
-  \ifthenelse{\boolean{minted@autogobble}}%
-    {\def\minted@codefile{\jobname.pyg}}%
+\newcommand{\minted@pygmentize}[2][\minted@outputdir\jobname.pyg]{%
+  \ifthenelse{\equal{\minted@get@opt{autogobble}{false}}{true}}%
+    {\def\minted@codefile{\minted@outputdir\jobname.pyg}}%
     {\def\minted@codefile{#1}}%
-  \def\minted@cmd{\MintedPygmentize\space -l #2
+  \ifthenelse{\boolean{minted@isinline}}%
+    {\def\minted@optlistcl@inlines{%
+      \minted@optlistcl@g@i
+      \csname minted@optlistcl@lang\minted@lang @i\endcsname}}%
+    {\let\minted@optlistcl@inlines\@empty}%
+  \def\minted@cmd{%
+    \ifminted@kpsewhich\ifwindows powershell\space\fi\fi
+    \MintedPygmentize\space -l #2
     -f latex -F tokenmerge
-    \minted@optg \space \csname minted@optlang\minted@lang\endcsname
-    \space \minted@optcmd \space -P "verboptions=\minted@getoptg{extra}%
-      \minted@getoptlang{extra}\minted@getoptcmd{extra}"
-    -o "\minted@outputdir\minted@infile" \space
-    "\minted@outputdir\minted@codefile"}%
+    \minted@optlistcl@g \csname minted@optlistcl@lang\minted@lang\endcsname
+    \minted@optlistcl@inlines
+    \minted@optlistcl@cmd -o "\minted@outputdir\minted@infile"
+    \ifminted@kpsewhich
+      \ifwindows
+        \detokenize{$}(kpsewhich "\minted@codefile")%
+      \else
+        \detokenize{`}kpsewhich "\minted@codefile"
+          \detokenize{||} "\minted@codefile"\detokenize{`}%
+      \fi
+    \else
+      "\minted@codefile"
+    \fi}%
   % For debugging, uncomment: %%%%
   % \immediate\typeout{\minted@cmd}%
   % %%%%
   \ifthenelse{\boolean{minted@cache}}%
     {%
       \ifx\XeTeXinterchartoks\minted@undefined
-        \ifthenelse{\boolean{minted@autogobble}}%
+        \ifthenelse{\equal{\minted@get@opt{autogobble}{false}}{true}}%
           {\edef\minted@hash{\pdf@filemdfivesum{#1}%
             \pdf@mdfivesum{\minted@cmd autogobble}}}%
           {\edef\minted@hash{\pdf@filemdfivesum{#1}%
@@ -686,7 +864,7 @@
       \else
         \immediate\openout\minted@code\jobname.mintedcmd\relax
         \immediate\write\minted@code{\minted@cmd}%
-        \ifthenelse{\boolean{minted@autogobble}}%
+        \ifthenelse{\equal{\minted@get@opt{autogobble}{false}}{true}}%
           {\immediate\write\minted@code{autogobble}}{}%
         \immediate\closeout\minted@code
         %Cheating a little here by using ASCII codes to write `{` and `}`
@@ -697,7 +875,7 @@
             f = open(\"}\minted@outputdir\jobname.mintedcmd\detokenize{\", \"rb\");
             hasher.update(f.read());
             f.close();
-            f = open(\"}\minted@outputdir#1\detokenize{\", \"rb\");
+            f = open(\"}#1\detokenize{\", \"rb\");
             hasher.update(f.read());
             f.close();
             f = open(\"}\minted@outputdir\jobname.mintedmd5\detokenize{\", \"w\");
@@ -705,23 +883,17 @@
             f.write(\"\\makeatletter\" + macro + \"\\makeatother\\endinput\n\");
             f.close();"}}%
         \immediate\write18{\minted@hashcmd}%
-        \input{\minted@outputdir\jobname.mintedmd5}%
+        \minted@input{\minted@outputdir\jobname.mintedmd5}%
       \fi
-      \ifwindows
-        \edef\minted@infile{%
-          \minted@cachedir@windows\@backslashchar\minted@hash.pygtex}%
-      \else
-        \edef\minted@infile{%
-          \minted@cachedir/\minted@hash.pygtex}%
-      \fi
-      \IfFileExists{\minted@cachedir/\minted@hash.pygtex}{}{%
-        \ifthenelse{\boolean{minted@autogobble}}{%
+      \edef\minted@infile{\minted@cachedir/\minted@hash.pygtex}%
+      \IfFileExists{\minted@infile}{}{%
+        \ifthenelse{\equal{\minted@get@opt{autogobble}{false}}{true}}{%
           %Need a version of open() that supports encoding under Python 2
           \edef\minted@autogobblecmd{%
             \detokenize{python -c "import sys;
             import textwrap;
             from io import open;
-            f = open(\"}\minted@outputdir#1\detokenize{\", \"r\", encoding=\"}\minted@encoding\detokenize{\");
+            f = open(\"}#1\detokenize{\", \"r\", encoding=\"}\minted@encoding\detokenize{\");
             t = f.read();
             f.close();
             f = open(\"}\minted@outputdir\jobname.pyg\detokenize{\", \"w\", encoding=\"}\minted@encoding\detokenize{\");
@@ -733,13 +905,13 @@
       \expandafter\minted@addcachefile\expandafter{\minted@hash.pygtex}%
       \minted@inputpyg}%
     {%
-      \ifthenelse{\boolean{minted@autogobble}}{%
+      \ifthenelse{\equal{\minted@get@opt{autogobble}{false}}{true}}{%
         %Need a version of open() that supports encoding under Python 2
         \edef\minted@autogobblecmd{%
           \detokenize{python -c "import sys;
           import textwrap;
           from io import open;
-          f = open(\"}\minted@outputdir#1\detokenize{\", \"r\", encoding=\"}\minted@encoding\detokenize{\");
+          f = open(\"}#1\detokenize{\", \"r\", encoding=\"}\minted@encoding\detokenize{\");
           t = f.read();
           f.close();
           f = open(\"}\minted@outputdir\jobname.pyg\detokenize{\", \"w\", encoding=\"}\minted@encoding\detokenize{\");
@@ -750,16 +922,43 @@
       \immediate\write18{\minted@cmd}%
       \minted@inputpyg}%
 }
+\def\FV@SpaceMMode{ }
 \newcommand{\minted@inputpyg}{%
-  \ifthenelse{\equal{\minted@optcmd@bgcolor}{}}%
-    {}%
-    {\begin{minted@colorbg}{\minted@optcmd@bgcolor}}%
-  \input{\minted@outputdir\minted@infile}%
-  \ifthenelse{\equal{\minted@optcmd@bgcolor}{}}%
-    {}%
-    {\end{minted@colorbg}}%
+  \everymath\expandafter{\the\everymath\let\FV@Space\FV@SpaceMMode}%
+  \ifthenelse{\boolean{minted@isinline}}%
+   {\ifthenelse{\equal{\minted@get@opt{breaklines}{false}}{true}}%
+    {\let\FV@BeginVBox\relax
+     \let\FV@EndVBox\relax
+     \def\FV@BProcessLine##1{\FancyVerbFormatLine{##1}}%
+     \ifthenelse{\equal{\minted@get@opt{breakbytoken}{false}}{true}}%
+      {\expandafter\let\expandafter\minted@orig@PYG%
+       \csname PYG\minted@get@opt{style}{default}\endcsname
+       \expandafter\def\csname PYG\minted@get@opt{style}{default}\endcsname##1##2{%
+         \allowbreak{}\hbox{\minted@orig@PYG{##1}{##2}}}%
+       \minted@inputpyg@inline}%
+      {\minted@inputpyg@inline}}%
+    {\minted@inputpyg@inline}}%
+   {\ifthenelse{\equal{\minted@get@opt{breaklines}{false}}{true}}%
+     {\ifthenelse{\equal{\minted@get@opt{breakbytoken}{false}}{true}}%
+       {\expandafter\let\expandafter\minted@orig@PYG%
+        \csname PYG\minted@get@opt{style}{default}\endcsname
+        \expandafter\def\csname PYG\minted@get@opt{style}{default}\endcsname##1##2{%
+        \allowbreak{}\hbox{\minted@orig@PYG{##1}{##2}}}%
+        \minted@inputpyg@block}%
+       {\minted@inputpyg@block}}%
+     {\minted@inputpyg@block}}%
 }
-\newcounter{minted@FancyVerbLineTemp}
+\def\minted@inputpyg@inline{%
+  \ifthenelse{\equal{\minted@get@opt{bgcolor}{}}{}}%
+   {\minted@input{\minted@outputdir\minted@infile}}%
+   {\colorbox{\minted@get@opt{bgcolor}{}}{\minted@input{\minted@outputdir\minted@infile}}}%
+}
+\def\minted@inputpyg@block{%
+  \ifthenelse{\equal{\minted@get@opt{bgcolor}{}}{}}%
+   {\minted@input{\minted@outputdir\minted@infile}}%
+   {\begin{minted@colorbg}{\minted@get@opt{bgcolor}{}}%
+    \minted@input{\minted@outputdir\minted@infile}%
+    \end{minted@colorbg}}}
 \newcommand{\minted@langlinenoson}{%
   \ifcsname c@minted@lang\minted@lang\endcsname\else
     \newcounter{minted@lang\minted@lang}%
@@ -777,14 +976,31 @@
 }
 \newcommand{\setminted}[2][]{%
   \ifthenelse{\equal{#1}{}}%
-    {\setkeys{minted@optg}{#2}}%
-    {\def\minted@lang{#1}\setkeys{minted@optlang}{#2}}%
-}
+    {\setkeys{minted@opt@g}{#2}}%
+    {\minted@configlang{#1}%
+      \setkeys{minted@opt@lang}{#2}}}
+\newcommand{\setmintedinline}[2][]{%
+  \ifthenelse{\equal{#1}{}}%
+    {\setkeys{minted@opt@g@i}{#2}}%
+    {\minted@configlang{#1}%
+      \setkeys{minted@opt@lang@i}{#2}}}
+\setmintedinline[php]{startinline=true}
 \newcommand{\usemintedstyle}[2][]{\setminted[#1]{style=#2}}
+\begingroup
+\catcode`\ =\active
+\catcode`\^^I=\active
+\gdef\minted@defwhitespace@retok{\def {\noexpand\FV@Space}\def^^I{\noexpand\FV@Tab}}%
+\endgroup
+\newcommand{\minted@writecmdcode}[1]{%
+  \immediate\openout\minted@code\jobname.pyg\relax
+  \immediate\write\minted@code{\detokenize{#1}}%
+  \immediate\closeout\minted@code}
 \newrobustcmd{\mintinline}[2][]{%
-  \minted@resetoptcmd
-  \setkeys{minted@optcmd}{#1}%
-  \def\minted@lang{#2}%
+  \begingroup
+  \setboolean{minted@isinline}{true}%
+  \minted@configlang{#2}%
+  \setkeys{minted@opt@cmd}{#1}%
+  \minted@fvset
   \begingroup
   \let\do\@makeother\dospecials
   \catcode`\{=1
@@ -800,88 +1016,95 @@
     \minted@inline@iii{##1}}%
   \begingroup
   \let\do\@makeother\dospecials
+  \catcode`\^^I=\active
   \minted@inline@ii}
 \ifthenelse{\boolean{minted@draft}}%
   {\newcommand{\minted@inline@iii}[1]{%
     \endgroup
-    \def\minted@argretok{%
-      \begingroup
-      \everyeof{\noexpand}%
-      \endlinechar-1\relax
-      \let\do\@makeother\dospecials
-      \catcode`\ =\active
-      \catcode`\^^I=\active
-      \scantokens{#1}%
-      \endgroup}%
     \begingroup
-    \expandafter\fvset\expandafter{\minted@optg@extra}%
-    \minted@checklang
-    \expandafter\let\expandafter\minted@optlang@extra\csname minted@optlang\minted@lang @extra\endcsname
-    \expandafter\fvset\expandafter{\minted@optlang@extra}%
-    \expandafter\fvset\expandafter{\minted@optcmd@extra}%
-    \FV@BeginVBox
-    \frenchspacing
-    \FV@SetupFont
-    \FV@DefineWhiteSpace
-    \FancyVerbDefineActive
-    \FancyVerbFormatCom
-    \FV@ObeyTabsInit
-    \hbox{\FancyVerbFormatLine{\minted@argretok}}%
-    \FV@EndVBox
+    \minted@defwhitespace@retok
+    \everyeof{\noexpand}%
+    \endlinechar-1\relax
+    \let\do\@makeother\dospecials
+    \catcode`\ =\active
+    \catcode`\^^I=\active
+    \xdef\minted@tmp{\scantokens{#1}}%
+    \endgroup
+    \let\FV@Line\minted@tmp
+    \def\FV@SV@minted@tmp{%
+      \FV@Gobble
+      \expandafter\FV@ProcessLine\expandafter{\FV@Line}}%
+    \ifthenelse{\equal{\minted@get@opt{breaklines}{false}}{true}}%
+     {\let\FV@BeginVBox\relax
+      \let\FV@EndVBox\relax
+      \def\FV@BProcessLine##1{\FancyVerbFormatLine{##1}}%
+      \BUseVerbatim{minted@tmp}}%
+     {\BUseVerbatim{minted@tmp}}%
     \endgroup}}%
   {\newcommand{\minted@inline@iii}[1]{%
     \endgroup
-    \immediate\openout\minted@code\jobname.pyg\relax
-    \immediate\write\minted@code{\detokenize{#1}}%
-    \immediate\closeout\minted@code
-    \begingroup
+    \minted@writecmdcode{#1}%
     \RecustomVerbatimEnvironment{Verbatim}{BVerbatim}{}%
+    \setcounter{minted@FancyVerbLineTemp}{\value{FancyVerbLine}}%
     \minted@pygmentize{\minted@lang}%
+    \setcounter{FancyVerbLine}{\value{minted@FancyVerbLineTemp}}%
     \endgroup}}
+\newrobustcmd{\mint}[2][]{%
+  \begingroup
+  \minted@configlang{#2}%
+  \setkeys{minted@opt@cmd}{#1}%
+  \minted@fvset
+  \begingroup
+  \let\do\@makeother\dospecials
+  \catcode`\{=1
+  \catcode`\}=2
+  \catcode`\^^I=\active
+  \@ifnextchar\bgroup
+    {\mint@iii}%
+    {\catcode`\{=12\catcode`\}=12
+      \mint@i}}
+\def\mint@i#1{%
+  \endgroup
+  \def\mint@ii##1#1{%
+    \mint@iii{##1}}%
+  \begingroup
+  \let\do\@makeother\dospecials
+  \catcode`\^^I=\active
+  \mint@ii}
 \ifthenelse{\boolean{minted@draft}}%
-  {\newcommand{\mint}[3][]{%
-    \def\minted@lang{#2}%
-    \DefineShortVerb{#3}%
-    \minted@resetoptcmd
-    \setkeys{minted@optcmd}{#1}%
-    \minted@langlinenoson
+  {\newcommand{\mint@iii}[1]{%
+    \endgroup
     \begingroup
-    \expandafter\fvset\expandafter{\minted@optg@extra}%
-    \minted@checklang
-    \expandafter\let\expandafter\minted@optlang@extra\csname minted@optlang\minted@lang @extra\endcsname
-    \expandafter\fvset\expandafter{\minted@optlang@extra}%
-    \expandafter\fvset\expandafter{\minted@optcmd@extra}%
-    \SaveVerb[aftersave={%
-      \UndefineShortVerb{#3}%
-      \let\FV@Line\FV@SV@minted@verb
-      \FV@VerbatimBegin\FV@PreProcessLine\FV@VerbatimEnd
-      \endgroup
-      \UndefineShortVerb{#3}%
-      \minted@langlinenosoff
-      \@doendpe\global\@ignorefalse\ignorespaces}]{minted@verb}#3}}%
-  {\newcommand{\mint}[3][]{%
-    \def\minted@lang{#2}%
-    \DefineShortVerb{#3}%
-    \minted@resetoptcmd
-    \setkeys{minted@optcmd}{#1}%
-    \SaveVerb[aftersave={%
-      \UndefineShortVerb{#3}%
-      \minted@langlinenoson
-      \minted@savecode{\FV@SV@minted@verb}%
-      \minted@pygmentize{#2}%
-      \minted@langlinenosoff}]{minted@verb}#3}}
+    \minted@defwhitespace@retok
+    \everyeof{\noexpand}%
+    \endlinechar-1\relax
+    \let\do\@makeother\dospecials
+    \catcode`\ =\active
+    \catcode`\^^I=\active
+    \xdef\minted@tmp{\scantokens{#1}}%
+    \endgroup
+    \let\FV@Line\minted@tmp
+    \def\FV@SV@minted@tmp{%
+      \FV@CodeLineNo=1\FV@StepLineNo
+      \FV@Gobble
+      \expandafter\FV@ProcessLine\expandafter{\FV@Line}}%
+    \minted@langlinenoson
+    \UseVerbatim{minted@tmp}%
+    \minted@langlinenosoff
+    \endgroup}}%
+  {\newcommand{\mint@iii}[1]{%
+    \endgroup
+    \minted@writecmdcode{#1}%
+    \minted@langlinenoson
+    \minted@pygmentize{\minted@lang}%
+    \minted@langlinenosoff
+    \endgroup}}
 \ifthenelse{\boolean{minted@draft}}%
   {\newenvironment{minted}[2][]
     {\VerbatimEnvironment
-      \let\FVB@VerbatimOut\minted@FVB@VerbatimOut
-      \def\minted@lang{#2}%
-      \minted@resetoptcmd
-      \setkeys{minted@optcmd}{#1}%
-      \expandafter\fvset\expandafter{\minted@optg@extra}%
-      \minted@checklang
-      \expandafter\let\expandafter\minted@optlang@extra\csname minted@optlang\minted@lang @extra\endcsname
-      \expandafter\fvset\expandafter{\minted@optlang@extra}%
-      \expandafter\fvset\expandafter{\minted@optcmd@extra}%
+      \minted@configlang{#2}%
+      \setkeys{minted@opt@cmd}{#1}%
+      \minted@fvset
       \minted@langlinenoson
       \begin{Verbatim}}%
     {\end{Verbatim}%
@@ -889,9 +1112,10 @@
   {\newenvironment{minted}[2][]
     {\VerbatimEnvironment
       \let\FVB@VerbatimOut\minted@FVB@VerbatimOut
-      \def\minted@lang{#2}%
-      \minted@resetoptcmd
-      \setkeys{minted@optcmd}{#1}%
+      \let\FVE@VerbatimOut\minted@FVE@VerbatimOut
+      \minted@configlang{#2}%
+      \setkeys{minted@opt@cmd}{#1}%
+      \minted@fvset
       \begin{VerbatimOut}[codes={\catcode`\^^I=12}]{\jobname.pyg}}%
     {\end{VerbatimOut}%
         \minted@langlinenoson
@@ -899,22 +1123,19 @@
         \minted@langlinenosoff}}
 \ifthenelse{\boolean{minted@draft}}%
   {\newcommand{\inputminted}[3][]{%
-    \def\minted@lang{#2}%
-    \minted@resetoptcmd
-    \setkeys{minted@optcmd}{#1}%
     \begingroup
-    \expandafter\fvset\expandafter{\minted@optg@extra}%
-    \minted@checklang
-    \expandafter\let\expandafter\minted@optlang@extra\csname minted@optlang\minted@lang @extra\endcsname
-    \expandafter\fvset\expandafter{\minted@optlang@extra}%
-    \expandafter\fvset\expandafter{\minted@optcmd@extra}%
+    \minted@configlang{#2}%
+    \setkeys{minted@optcmd}{#1}%
+    \minted@fvset
     \VerbatimInput{#3}%
     \endgroup}}%
   {\newcommand{\inputminted}[3][]{%
-    \def\minted@lang{#2}%
-    \minted@resetoptcmd
-    \setkeys{minted@optcmd}{#1}%
-    \minted@pygmentize[#3]{#2}}}
+    \begingroup
+    \minted@configlang{#2}%
+    \setkeys{minted@opt@cmd}{#1}%
+    \minted@fvset
+    \minted@pygmentize[#3]{#2}%
+    \endgroup}}
 \newcommand{\newminted}[3][]{
   \ifthenelse{\equal{#1}{}}
     {\def\minted@envname{#2code}}
@@ -951,13 +1172,21 @@
         {\endgroup\minted@inliner[#3][#2][]}}%
     \def\minted@inliner[##1][##2][##3]{\mintinline[##1,##3]{##2}}%
 }
-\@ifundefined{minted@float@within}
-  {\newfloat{listing}{h}{lol}}
-  {\newfloat{listing}{h}{lol}[\minted@float@within]}
+\ifthenelse{\boolean{minted@newfloat}}%
+ {\@ifundefined{minted@float@within}%
+    {\DeclareFloatingEnvironment[fileext=lol,placement=h]{listing}}%
+    {\def\minted@tmp#1{%
+       \DeclareFloatingEnvironment[fileext=lol,placement=h, within=#1]{listing}}%
+     \expandafter\minted@tmp\expandafter{\minted@float@within}}}%
+ {\@ifundefined{minted@float@within}%
+    {\newfloat{listing}{h}{lol}}%
+    {\newfloat{listing}{h}{lol}[\minted@float@within]}}
+\ifminted@newfloat\else
 \newcommand{\listingscaption}{Listing}
 \floatname{listing}{\listingscaption}
-\newcommand{\listoflistingscaption}{List of listings}
+\newcommand{\listoflistingscaption}{List of Listings}
 \providecommand{\listoflistings}{\listof{listing}{\listoflistingscaption}}
+\fi
 \AtEndOfPackage{%
   \ifthenelse{\boolean{minted@draft}}{}{%
     \ifnum\pdf@shellescape=1\relax\else
@@ -987,7 +1216,6 @@
   \DeleteFile[\minted@outputdir]{\jobname.pyg}%
   \DeleteFile[\minted@outputdir]{\jobname.out.pyg}%
 }
-%% \Finale
 \endinput
 %%
 %% End of file `minted.sty'.

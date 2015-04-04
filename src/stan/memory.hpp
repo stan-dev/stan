@@ -4,4 +4,3 @@
 #include <stan/memory/stack_alloc.hpp>
 
 #endif
-

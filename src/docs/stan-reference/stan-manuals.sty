@@ -1,3 +1,16 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{stan-manuals}[2015/04/03 Stan Manuals style]
+
+% To highlight code
+\newif\if@highlightcode\@highlightcodefalse
+\DeclareOption{highlight}{
+  \@highlightcodetrue
+}
+
+% end option processing
+\ProcessOptions\relax
+
+
 \IfFileExists{lucimatx.sty}{
   % ----- if Lucida availalable------------------
   \usepackage[
@@ -20,7 +33,7 @@
 % \usepackage{index}
 % \newindex{funs}{fdx}{fns}{Functions}
 
-
+\usepackage[T1]{fontenc} % needed for |
 \usepackage{amsmath}
 \usepackage{xspace}
 \usepackage{fancyvrb}
@@ -78,7 +91,7 @@
 
 \newcommand{\Stan}{Stan\xspace}
 \newcommand{\stanc}{{\ttfamily stanc}\xspace}
-\newcommand*{\Cpp}{C\raise.2ex\hbox{\footnotesize ++}\xspace} %\ensuremath{++}
+\newcommand*{\Cpp}{C\raise.15ex\hbox{\footnotesize ++}\xspace} %\ensuremath{++}
 \newcommand{\clang}{{\ttfamily clang\raise.2ex\hbox{\footnotesize ++}}\xspace} 
 \newcommand{\gpp}{{\ttfamily g\raise.2ex\hbox{\footnotesize ++}}\xspace} 
 
@@ -144,6 +157,8 @@
   \\[2pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt
       (#3):\,#1}|hyperpage}}
 
+\newcommand{\indexref}[2]{\index{{\tt\bfseries #1}@{\tt #1}|see {#2}}}
+
 \newcommand{\farg}[1]{{\tt\slshape #1}}
 
 \newcommand{\pitem}[3]{\subsubsection{Sampling Statement}
@@ -188,14 +203,17 @@
 \renewcommand{\floatpagefraction}{0.75}
 \renewcommand{\textfraction}{0.07}
 
-\usepackage{xcolor}
-\usepackage{minted}
-
-\newminted[stancode]{stan}{xleftmargin=2em,fontsize=small,}
-
-
-% environment for Stan code
-% \DefineVerbatimEnvironment{stancode}{Verbatim}{fontsize=\small,xleftmargin=2em}
+\if@highlightcode
+%\RequirePackage{lststan}
+%\lstnewenvironment{stancode}{\lstset{language=stan}}{}
+\RequirePackage{minted}
+%\newminted[stancode]{stan}{xleftmargin=2em,fontsize=small}
+\newminted[stancode]{stan}{xleftmargin=2em,fontsize=\small}
+\newmintedfile[stancodefile]{stan}{xleftmargin=2em,fontsize=\small}
+\else
+\DefineVerbatimEnvironment{stancode}{Verbatim}{fontsize=\small,xleftmargin=2em}
+\newcommand{\stancodefile}[1]{\VerbatimInput[fontsize=\small,xleftmargin=2em]{#1}}
+\fi
 
 \raggedbottom
 
