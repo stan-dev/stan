@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__COMMAND_HPP
-#define STAN__SERVICES__COMMAND_HPP
+#ifndef STAN_SERVICES_COMMAND_HPP
+#define STAN_SERVICES_COMMAND_HPP
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

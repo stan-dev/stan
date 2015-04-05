@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__CHAINABLE_ALLOC_HPP
-#define STAN__MATH__REV__CORE__CHAINABLE_ALLOC_HPP
+#ifndef STAN_MATH_REV_CORE_CHAINABLE_ALLOC_HPP
+#define STAN_MATH_REV_CORE_CHAINABLE_ALLOC_HPP
 
 #include <stan/math/rev/core/chainablestack.hpp>
 #include <stdexcept>

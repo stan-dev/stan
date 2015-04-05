@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__IS_CONSTANT_STRUCT_HPP
-#define STAN__MATH__PRIM__SCAL__META__IS_CONSTANT_STRUCT_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_IS_CONSTANT_STRUCT_HPP
+#define STAN_MATH_PRIM_SCAL_META_IS_CONSTANT_STRUCT_HPP
 
 #include <stan/math/prim/scal/meta/is_constant.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

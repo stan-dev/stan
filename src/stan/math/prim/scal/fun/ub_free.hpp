@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__UB_FREE_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__UB_FREE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_UB_FREE_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_UB_FREE_HPP
 
 #include <stan/math/prim/scal/fun/identity_free.hpp>
 #include <stan/math/prim/scal/err/check_less_or_equal.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__OPTIMIZATION__NEWTON_HPP
-#define STAN__OPTIMIZATION__NEWTON_HPP
+#ifndef STAN_OPTIMIZATION_NEWTON_HPP
+#define STAN_OPTIMIZATION_NEWTON_HPP
 
 #include <Eigen/Dense>
 #include <Eigen/Cholesky>

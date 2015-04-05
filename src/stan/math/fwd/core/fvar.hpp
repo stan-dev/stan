@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__CORE__FVAR_HPP
-#define STAN__MATH__FWD__CORE__FVAR_HPP
+#ifndef STAN_MATH_FWD_CORE_FVAR_HPP
+#define STAN_MATH_FWD_CORE_FVAR_HPP
 
 #include <stan/math/prim/scal/meta/likely.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>

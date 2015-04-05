@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__PARSER__PARSER__HPP
-#define STAN__LANG__PARSER__PARSER__HPP
+#ifndef STAN_LANG_PARSER_HPP
+#define STAN_LANG_PARSER_HPP
 
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>

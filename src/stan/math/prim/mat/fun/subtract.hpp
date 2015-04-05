@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__SUBTRACT_HPP
-#define STAN__MATH__PRIM__MAT__FUN__SUBTRACT_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_SUBTRACT_HPP
+#define STAN_MATH_PRIM_MAT_FUN_SUBTRACT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

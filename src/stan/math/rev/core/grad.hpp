@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__GRAD_HPP
-#define STAN__MATH__REV__CORE__GRAD_HPP
+#ifndef STAN_MATH_REV_CORE_GRAD_HPP
+#define STAN_MATH_REV_CORE_GRAD_HPP
 
 #include <stan/math/rev/core/chainable.hpp>
 #include <stan/math/rev/core/chainable_alloc.hpp>

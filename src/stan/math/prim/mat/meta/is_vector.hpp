@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__META__IS_VECTOR_HPP
-#define STAN__MATH__PRIM__MAT__META__IS_VECTOR_HPP
+#ifndef STAN_MATH_PRIM_MAT_META_IS_VECTOR_HPP
+#define STAN_MATH_PRIM_MAT_META_IS_VECTOR_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/meta/is_vector.hpp>

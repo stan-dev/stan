@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__SIMPLEX_FREE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__SIMPLEX_FREE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_SIMPLEX_FREE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_SIMPLEX_FREE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/err/check_simplex.hpp>

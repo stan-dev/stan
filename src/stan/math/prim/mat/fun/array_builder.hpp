@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__ARRAY_BUILDER_HPP
-#define STAN__MATH__PRIM__MAT__FUN__ARRAY_BUILDER_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_ARRAY_BUILDER_HPP
+#define STAN_MATH_PRIM_MAT_FUN_ARRAY_BUILDER_HPP
 
 #include <stan/math/prim/mat/fun/promoter.hpp>
 #include <vector>

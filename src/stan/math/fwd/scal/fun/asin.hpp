@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__ASIN_HPP
-#define STAN__MATH__FWD__SCAL__FUN__ASIN_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_ASIN_HPP
+#define STAN_MATH_FWD_SCAL_FUN_ASIN_HPP
 
 #include <stan/math/fwd/core.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__PARSER__TERM_GRAMMAR__HPP
-#define STAN__LANG__PARSER__TERM_GRAMMAR__HPP
+#ifndef STAN_LANG_GRAMMARS_TERM_GRAMMAR_HPP
+#define STAN_LANG_GRAMMARS_TERM_GRAMMAR_HPP
 
 #include <string>
 #include <sstream>
