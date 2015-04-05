@@ -19,6 +19,8 @@
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
+#include <stan/math/prim/scal/meta/return_type.hpp>
+#include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <boost/math/distributions.hpp>
 #include <cmath>
 
