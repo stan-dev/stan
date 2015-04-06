@@ -25,8 +25,6 @@ namespace stan {
       using stan::math::square;
       int k_choose_2 = (K * (K - 1)) / 2;
       if (k_choose_2 != y.size()) {
-        std::cout << "k_choose_2 = " << k_choose_2
-                  << " y.size()=" << y.size() << std::endl;
         throw std::domain_error("y is not a valid unconstrained cholesky "
                                 "correlation matrix."
                                 "Require (K choose 2) elements in y.");
@@ -67,8 +65,6 @@ namespace stan {
       using stan::math::square;
       int k_choose_2 = (K * (K - 1)) / 2;
       if (k_choose_2 != y.size()) {
-        std::cout << "k_choose_2 = " << k_choose_2
-                  << " y.size()=" << y.size() << std::endl;
         throw std::domain_error("y is not a valid unconstrained cholesky "
                                 "correlation matrix."
                                 " Require (K choose 2) elements in y.");
