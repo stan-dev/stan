@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__TO_FVAR_HPP
-#define STAN__MATH__FWD__MAT__FUN__TO_FVAR_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_TO_FVAR_HPP
+#define STAN_MATH_FWD_MAT_FUN_TO_FVAR_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/fwd/core.hpp>
@@ -11,15 +11,15 @@ namespace stan {
   namespace agrad {
 
     template<typename T>
-    inline 
-    fvar<T> 
+    inline
+    fvar<T>
     to_fvar(const T& x) {
       return fvar<T>(x);
     }
 
-    template<typename T> 
-    inline 
-    fvar<T> 
+    template<typename T>
+    inline
+    fvar<T>
     to_fvar(const fvar<T>& x) {
       return x;
     }
@@ -45,17 +45,16 @@ namespace stan {
     template<typename T, int R, int C>
     inline
     Eigen::Matrix<fvar<T>, R, C>
-    to_fvar(const Eigen::Matrix<T,R,C>& val,
-            const Eigen::Matrix<T,R,C>& deriv) {
-      
+    to_fvar(const Eigen::Matrix<T, R, C>& val,
+            const Eigen::Matrix<T, R, C>& deriv) {
       stan::math::check_matching_dims("to_fvar",
                                       "value", val,
                                       "deriv", deriv);
-      Eigen::Matrix<fvar<T>,R,C> ret(val.rows(), val.cols());
-      for(int i = 0; i < val.rows(); i++) {
-        for(int j = 0; j < val.cols(); j++) {
-          ret(i,j).val_ = val(i,j);
-          ret(i,j).d_ = deriv(i,j);
+      Eigen::Matrix<fvar<T>, R, C> ret(val.rows(), val.cols());
+      for (int i = 0; i < val.rows(); i++) {
+        for (int j = 0; j < val.cols(); j++) {
+          ret(i, j).val_ = val(i, j);
+          ret(i, j).d_ = deriv(i, j);
         }
       }
       return ret;

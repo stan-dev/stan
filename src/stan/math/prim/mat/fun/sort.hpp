@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__SORT_HPP
-#define STAN__MATH__PRIM__MAT__FUN__SORT_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_SORT_HPP
+#define STAN_MATH_PRIM_MAT_FUN_SORT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <vector>
@@ -8,7 +8,7 @@
 
 namespace stan {
   namespace math {
-   
+
     /**
      * Return the specified standard vector in ascending order.
      *
@@ -43,7 +43,7 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
     template <typename T, int R, int C>
-    inline typename Eigen::Matrix<T,R,C> sort_asc(Eigen::Matrix<T,R,C> xs) {
+    inline typename Eigen::Matrix<T, R, C> sort_asc(Eigen::Matrix<T, R, C> xs) {
       std::sort(xs.data(), xs.data()+xs.size());
       return xs;
     }
@@ -56,11 +56,12 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
     template <typename T, int R, int C>
-    inline typename Eigen::Matrix<T,R,C> sort_desc(Eigen::Matrix<T,R,C> xs) {
+    inline typename Eigen::Matrix<T, R, C>
+    sort_desc(Eigen::Matrix<T, R, C> xs) {
       std::sort(xs.data(), xs.data()+xs.size(), std::greater<T>());
       return xs;
     }
-    
+
   }
 }
 #endif

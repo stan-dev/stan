@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__FAIL__HPP
-#define STAN__SERVICES__ARGUMENTS__FAIL__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_FAIL_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_FAIL_HPP
 
 #include <stan/services/arguments/unvalued_argument.hpp>
 

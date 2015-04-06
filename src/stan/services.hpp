@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES_HPP
-#define STAN__SERVICES_HPP
+#ifndef STAN_SERVICES_HPP
+#define STAN_SERVICES_HPP
 
 #include <stan/services/arguments.hpp>
 #include <stan/services/command.hpp>

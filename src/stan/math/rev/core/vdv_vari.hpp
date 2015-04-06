@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__VDV_VARI_HPP
-#define STAN__MATH__REV__CORE__VDV_VARI_HPP
+#ifndef STAN_MATH_REV_CORE_VDV_VARI_HPP
+#define STAN_MATH_REV_CORE_VDV_VARI_HPP
 
 #include <stan/math/rev/core/vari.hpp>
 
@@ -15,7 +15,7 @@ namespace stan {
       op_vdv_vari(double f, vari* avi, double b, vari* cvi) :
         vari(f),
         avi_(avi),
-        bd_(b), 
+        bd_(b),
         cvi_(cvi) {
       }
     };

@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__BASE__HAMILTONIAN__BETA
-#define STAN__MCMC__BASE__HAMILTONIAN__BETA
+#ifndef STAN_MCMC_HMC_HAMILTONIANS_BASE_HAMILTONIAN_HPP
+#define STAN_MCMC_HMC_HAMILTONIANS_BASE_HAMILTONIAN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/model/util.hpp>

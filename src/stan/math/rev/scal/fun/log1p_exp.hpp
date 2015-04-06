@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__LOG1P_EXP_HPP
-#define STAN__MATH__REV__SCAL__FUN__LOG1P_EXP_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_LOG1P_EXP_HPP
+#define STAN_MATH_REV_SCAL_FUN_LOG1P_EXP_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/log1p_exp.hpp>
@@ -11,14 +11,14 @@ namespace stan {
     namespace {
       class log1p_exp_v_vari : public op_v_vari {
       public:
-        log1p_exp_v_vari(vari* avi) :
+        explicit log1p_exp_v_vari(vari* avi) :
           op_v_vari(stan::math::log1p_exp(avi->val_),
                     avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * calculate_chain(avi_->val_, val_);
         }
-      };      
+      };
     }
 
     /**

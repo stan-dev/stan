@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__DOT_SELF_HPP
-#define STAN__MATH__PRIM__MAT__FUN__DOT_SELF_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_DOT_SELF_HPP
+#define STAN_MATH_PRIM_MAT_FUN_DOT_SELF_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/err/check_vector.hpp>
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the dot product of the specified vector with itself.
      * @param v Vector.
@@ -18,8 +18,8 @@ namespace stan {
     inline double dot_self(const Eigen::Matrix<double, R, C>& v) {
       stan::math::check_vector("dot_self", "v", v);
       return v.squaredNorm();
-    }    
-    
+    }
+
   }
 }
 #endif

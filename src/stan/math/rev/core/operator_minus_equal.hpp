@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__OPERATOR_MINUS_EQUAL_HPP
-#define STAN__MATH__REV__CORE__OPERATOR_MINUS_EQUAL_HPP
+#ifndef STAN_MATH_REV_CORE_OPERATOR_MINUS_EQUAL_HPP
+#define STAN_MATH_REV_CORE_OPERATOR_MINUS_EQUAL_HPP
 
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/operator_subtraction.hpp>
@@ -8,14 +8,14 @@ namespace stan {
   namespace agrad {
 
     inline var& var::operator-=(const var& b) {
-      vi_ = new subtract_vv_vari(vi_,b.vi_);
+      vi_ = new subtract_vv_vari(vi_, b.vi_);
       return *this;
     }
 
     inline var& var::operator-=(const double b) {
       if (b == 0.0)
         return *this;
-      vi_ = new subtract_vd_vari(vi_,b);
+      vi_ = new subtract_vd_vari(vi_, b);
       return *this;
     }
 

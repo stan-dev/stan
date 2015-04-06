@@ -1,11 +1,12 @@
-#ifndef STAN__MATH__REV__CORE__OPERATOR_DIVISION_HPP
-#define STAN__MATH__REV__CORE__OPERATOR_DIVISION_HPP
+#ifndef STAN_MATH_REV_CORE_OPERATOR_DIVISION_HPP
+#define STAN_MATH_REV_CORE_OPERATOR_DIVISION_HPP
 
 #include <stan/math/rev/core/var.hpp>
 #include <stan/math/rev/core/vv_vari.hpp>
 #include <stan/math/rev/core/vd_vari.hpp>
 #include <stan/math/rev/core/dv_vari.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -64,25 +65,25 @@ namespace stan {
      * \f$\frac{\partial}{\partial y} (x/y) = -x / y^2\f$.
      *
        \f[
-       \mbox{operator/}(x,y) = 
+       \mbox{operator/}(x, y) =
        \begin{cases}
-         \frac{x}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \frac{x}{y} & \mbox{if } -\infty\leq x, y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator/}(x,y)}{\partial x} = 
+       \frac{\partial\, \mbox{operator/}(x, y)}{\partial x} =
        \begin{cases}
-         \frac{1}{y} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         \frac{1}{y} & \mbox{if } -\infty\leq x, y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
 
        \f[
-       \frac{\partial\,\mbox{operator/}(x,y)}{\partial y} = 
+       \frac{\partial\, \mbox{operator/}(x, y)}{\partial y} =
        \begin{cases}
-         -\frac{x}{y^2} & \mbox{if } -\infty\leq x,y \leq \infty \\[6pt]
+         -\frac{x}{y^2} & \mbox{if } -\infty\leq x, y \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN or } y = \textrm{NaN}
        \end{cases}
        \f]
@@ -93,7 +94,7 @@ namespace stan {
      * second.
      */
     inline var operator/(const var& a, const var& b) {
-      return var(new divide_vv_vari(a.vi_,b.vi_));
+      return var(new divide_vv_vari(a.vi_, b.vi_));
     }
 
     /**
@@ -110,7 +111,7 @@ namespace stan {
     inline var operator/(const var& a, const double b) {
       if (b == 1.0)
         return a;
-      return var(new divide_vd_vari(a.vi_,b));
+      return var(new divide_vd_vari(a.vi_, b));
     }
 
     /**
@@ -119,13 +120,13 @@ namespace stan {
      * The derivative with respect to the variable is
      *
      * \f$\frac{d}{d y} (c/y) = -c / y^2\f$.
-     * 
+     *
      * @param a Scalar operand.
      * @param b Variable operand.
      * @return Variable result of dividing the scalar by the variable.
      */
     inline var operator/(const double a, const var& b) {
-      return var(new divide_dv_vari(a,b.vi_));
+      return var(new divide_dv_vari(a, b.vi_));
     }
 
   }

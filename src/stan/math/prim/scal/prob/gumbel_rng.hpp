@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__GUMBEL_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__GUMBEL_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_GUMBEL_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_GUMBEL_RNG_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -37,7 +37,7 @@ namespace stan {
 
 
       check_finite(function, "Location parameter", mu);
-      check_positive(function, "Scale parameter", beta); 
+      check_positive(function, "Scale parameter", beta);
 
       variate_generator<RNG&, uniform_01<> >
         uniform01_rng(rng, uniform_01<>());

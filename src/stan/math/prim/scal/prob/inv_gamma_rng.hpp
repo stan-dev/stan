@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__INV_GAMMA_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__INV_GAMMA_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_INV_GAMMA_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_INV_GAMMA_RNG_HPP
 
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -40,14 +40,14 @@ namespace stan {
       static const char* function("stan::prob::inv_gamma_rng");
 
       using stan::math::check_positive_finite;
- 
+
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", beta);
 
       variate_generator<RNG&, gamma_distribution<> >
         gamma_rng(rng, gamma_distribution<>(alpha, 1 / beta));
       return 1 / gamma_rng();
-    }          
+    }
   }
 }
 

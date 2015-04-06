@@ -1,7 +1,6 @@
-#ifndef STAN__MATH__FWD__ARR_HPP
-#define STAN__MATH__FWD__ARR_HPP
+#ifndef STAN_MATH_FWD_ARR_HPP
+#define STAN_MATH_FWD_ARR_HPP
 
-#include <stan/math/fwd/core.hpp>
-#include <stan/math/fwd/arr/fun/log_sum_exp.hpp>
+#include <stan/math/fwd/arr/fun.hpp>
 
 #endif

@@ -1,10 +1,10 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__ERF_HPP
-#define STAN__MATH__REV__SCAL__FUN__ERF_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_ERF_HPP
+#define STAN_MATH_REV_SCAL_FUN_ERF_HPP
 
-#include <valarray>
-#include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
+#include <math.h>
+#include <valarray>
 
 namespace stan {
   namespace agrad {
@@ -12,11 +12,11 @@ namespace stan {
     namespace {
       class erf_vari : public op_v_vari {
       public:
-        erf_vari(vari* avi) :
-          op_v_vari(::erf(avi->val_),avi) {
+        explicit erf_vari(vari* avi) :
+          op_v_vari(::erf(avi->val_), avi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * stan::math::TWO_OVER_SQRT_PI 
+          avi_->adj_ += adj_ * stan::math::TWO_OVER_SQRT_PI
             * ::exp(- avi_->val_ * avi_->val_);
         }
       };
@@ -30,28 +30,28 @@ namespace stan {
      * The derivative is
      *
      * \f$\frac{d}{dx} \mbox{erf}(x) = \frac{2}{\sqrt{\pi}} \exp(-x^2)\f$.
-     * 
+     *
      *
        \f[
-       \mbox{erf}(x) = 
+       \mbox{erf}(x) =
        \begin{cases}
          \operatorname{erf}(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{erf}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{erf}(x)}{\partial x} =
        \begin{cases}
          \frac{\partial\, \operatorname{erf}(x)}{\partial x} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
        \operatorname{erf}(x)=\frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt
        \f]
-       
+
        \f[
        \frac{\partial \, \operatorname{erf}(x)}{\partial x} = \frac{2}{\sqrt{\pi}} e^{-x^2}
        \f]

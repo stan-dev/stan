@@ -1,11 +1,12 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__LOG1M_EXP_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__LOG1M_EXP_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_LOG1M_EXP_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_LOG1M_EXP_HPP
 
+#include <stan/math/prim/scal/fun/log1m.hpp>
 #include <boost/math/tools/promotion.hpp>
-#include <stdexcept>
 #include <boost/throw_exception.hpp>
 #include <boost/math/special_functions/expm1.hpp>
-#include <stan/math/prim/scal/fun/log1m.hpp>
+#include <stdexcept>
+#include <limits>
 
 namespace stan {
   namespace math {
@@ -18,22 +19,22 @@ namespace stan {
      *
      *
        \f[
-       \mbox{log1m\_exp}(x) = 
+       \mbox{log1m\_exp}(x) =
        \begin{cases}
          \ln(1-\exp(x)) & \mbox{if } x < 0 \\
          \textrm{NaN} & \mbox{if } x \geq 0\\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{asinh}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{asinh}(x)}{\partial x} =
        \begin{cases}
          -\frac{\exp(x)}{1-\exp(x)} & \mbox{if } x < 0 \\
          \textrm{NaN} & \mbox{if } x \geq 0\\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
-       \f]     
+       \f]
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
@@ -41,7 +42,7 @@ namespace stan {
       if (a >= 0)
         return std::numeric_limits<double>::quiet_NaN();
       else if (a > -0.693147)
-        return std::log(-boost::math::expm1(a)); //0.693147 is approximatelly equal to log(2)
+        return std::log(-boost::math::expm1(a));  // 0.693147 ~= log(2)
       else
         return log1m(std::exp(a));
     }

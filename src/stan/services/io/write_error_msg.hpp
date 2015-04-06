@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__IO__WRITE_ERROR_MSG_HPP
-#define STAN__SERVICES__IO__WRITE_ERROR_MSG_HPP
+#ifndef STAN_SERVICES_IO_WRITE_ERROR_MSG_HPP
+#define STAN_SERVICES_IO_WRITE_ERROR_MSG_HPP
 
 #include <ostream>
 #include <stdexcept>

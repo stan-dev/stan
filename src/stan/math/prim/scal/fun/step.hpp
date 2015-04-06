@@ -1,18 +1,18 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__STEP_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__STEP_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_STEP_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_STEP_HPP
 
 namespace stan {
   namespace math {
 
     /**
-     * The step, or Heaviside, function.  
+     * The step, or Heaviside, function.
      *
-     * The function is defined by 
+     * The function is defined by
      *
      * <code>step(y) = (y < 0.0) ? 0 : 1</code>.
      *
        \f[
-       \mbox{step}(x) = 
+       \mbox{step}(x) =
        \begin{cases}
          0 & \mbox{if } x \leq 0 \\
          1 & \mbox{if } x > 0  \\[6pt]

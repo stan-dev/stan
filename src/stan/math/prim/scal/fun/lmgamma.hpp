@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__LMGAMMA_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__LMGAMMA_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_LMGAMMA_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_LMGAMMA_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
@@ -22,27 +22,27 @@ namespace stan {
      *
      *
        \f[
-       \mbox{lmgamma}(n,x) = 
+       \mbox{lmgamma}(n, x) =
        \begin{cases}
-         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
-         \ln\Gamma_n(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{error} & \mbox{if } x\in \{\dots, -3, -2, -1, 0\}\\
+         \ln\Gamma_n(x) & \mbox{if } x\not\in \{\dots, -3, -2, -1, 0\}\\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{lmgamma}(n,x)}{\partial x} = 
+       \frac{\partial\, \mbox{lmgamma}(n, x)}{\partial x} =
        \begin{cases}
-         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
-         \frac{\partial\, \ln\Gamma_n(x)}{\partial x} & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{error} & \mbox{if } x\in \{\dots, -3, -2, -1, 0\}\\
+         \frac{\partial\, \ln\Gamma_n(x)}{\partial x} & \mbox{if } x\not\in \{\dots, -3, -2, -1, 0\}\\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
        \ln\Gamma_n(x) = \pi^{n(n-1)/4} \, \prod_{j=1}^n \Gamma(x + (1 - j)/2)
        \f]
-       
+
        \f[
        \frac{\partial \, \ln\Gamma_n(x)}{\partial x} = \sum_{j=1}^n \Psi(x + (1 - j) / 2)
        \f]
@@ -56,14 +56,14 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T>::type
     lmgamma(const int k, T x) {
       using boost::math::lgamma;
-      typename boost::math::tools::promote_args<T>::type result 
+      typename boost::math::tools::promote_args<T>::type result
         = k * (k - 1) * LOG_PI_OVER_FOUR;
 
       for (int j = 1; j <= k; ++j)
         result += lgamma(x + (1.0 - j) / 2.0);
       return result;
     }
-      
+
   }
 }
 #endif

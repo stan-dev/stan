@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__ABS_HPP
-#define STAN__MATH__FWD__SCAL__FUN__ABS_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_ABS_HPP
+#define STAN_MATH_FWD_SCAL_FUN_ABS_HPP
 
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/fwd/core.hpp>
@@ -25,8 +25,8 @@ namespace stan {
         return fvar<T>(-x.val_, -x.d_);
       else if (x.val_ == 0.0)
         return fvar<T>(0, 0);
-      else // if (unlikely(boost::math::isnan(value_of(x.val_)))) 
-        return fvar<T>(abs(x.val_),stan::math::NOT_A_NUMBER);
+      else  // if (unlikely(boost::math::isnan(value_of(x.val_))))
+        return fvar<T>(abs(x.val_), stan::math::NOT_A_NUMBER);
     }
   }
 }

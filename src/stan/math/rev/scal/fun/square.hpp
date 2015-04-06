@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__SQUARE_HPP
-#define STAN__MATH__REV__SCAL__FUN__SQUARE_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_SQUARE_HPP
+#define STAN_MATH_REV_SCAL_FUN_SQUARE_HPP
 
 #include <stan/math/rev/core.hpp>
 
@@ -9,8 +9,8 @@ namespace stan {
     namespace {
       class square_vari : public op_v_vari {
       public:
-        square_vari(vari* avi) :
-          op_v_vari(avi->val_ * avi->val_,avi) {
+        explicit square_vari(vari* avi) :
+          op_v_vari(avi->val_ * avi->val_, avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * 2.0 * avi_->val_;
@@ -25,15 +25,15 @@ namespace stan {
      * than using <code>x * x</code>.
      *
        \f[
-       \mbox{square}(x) = 
+       \mbox{square}(x) =
        \begin{cases}
          x^2 & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-   
+
        \f[
-       \frac{\partial\,\mbox{square}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{square}(x)}{\partial x} =
        \begin{cases}
          2x & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

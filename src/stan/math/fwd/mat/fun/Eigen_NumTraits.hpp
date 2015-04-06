@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__MAT__FUN__EIGEN_NUMTRAITS_HPP
-#define STAN__MATH__FWD__MAT__FUN__EIGEN_NUMTRAITS_HPP
+#ifndef STAN_MATH_FWD_MAT_FUN_EIGEN_NUMTRAITS_HPP
+#define STAN_MATH_FWD_MAT_FUN_EIGEN_NUMTRAITS_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -66,7 +66,7 @@ namespace Eigen {
      * point, <code>&#45;std::numeric_limits&lt;double&gt;::max()</code>.
      *
      * @return Same lowest value as a <code>double</code>.
-     */    
+     */
     inline static Real lowest() {
       return -std::numeric_limits<double>::max();
     }

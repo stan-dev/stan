@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__MDIVIDE_RIGHT_LDLT_HPP
-#define STAN__MATH__PRIM__MAT__FUN__MDIVIDE_RIGHT_LDLT_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_MDIVIDE_RIGHT_LDLT_HPP
+#define STAN_MATH_PRIM_MAT_FUN_MDIVIDE_RIGHT_LDLT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/LDLT_factor.hpp>
@@ -20,24 +20,25 @@ namespace stan {
      */
 
     template <typename T1, typename T2, int R1, int C1, int R2, int C2>
-    inline 
-    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
-    mdivide_right_ldlt(const Eigen::Matrix<T1,R1,C1> &b,
-                       const stan::math::LDLT_factor<T2,R2,C2> &A) {
+    inline
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1, T2>::type,
+                  R1, C2>
+    mdivide_right_ldlt(const Eigen::Matrix<T1, R1, C1> &b,
+                       const stan::math::LDLT_factor<T2, R2, C2> &A) {
       using stan::math::transpose;
       stan::math::check_multiplicable("mdivide_right_ldlt",
                                                 "b", b,
                                                 "A", A);
 
-      return transpose(mdivide_left_ldlt(A,transpose(b)));
+      return transpose(mdivide_left_ldlt(A, transpose(b)));
     }
-    
+
     template <int R1, int C1, int R2, int C2>
-    inline Eigen::Matrix<double,R1,C2>
-    mdivide_right_ldlt(const Eigen::Matrix<double,R1,C1> &b,
-                       const stan::math::LDLT_factor<double,R2,C2> &A) {
-      stan::math::check_multiplicable("mdivide_right_ldlt", 
-                                                "b", b, 
+    inline Eigen::Matrix<double, R1, C2>
+    mdivide_right_ldlt(const Eigen::Matrix<double, R1, C1> &b,
+                       const stan::math::LDLT_factor<double, R2, C2> &A) {
+      stan::math::check_multiplicable("mdivide_right_ldlt",
+                                                "b", b,
                                                 "A", A);
       return A.solveRight(b);
     }

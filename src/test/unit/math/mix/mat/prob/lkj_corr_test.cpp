@@ -27,7 +27,7 @@
 #include <stan/math/prim/mat/fun/value_of_rec.hpp>
 #include <stan/math/rev/mat/fun/sum.hpp>
 #include <stan/math/fwd/mat/fun/sum.hpp>
-#include <stan/math/rev/mat/err/check_pos_definite.hpp>
+#include <stan/math/prim/mat/err/check_pos_definite.hpp>
 #include <stan/math/prim/mat/err/check_symmetric.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/scal/fun/tan.hpp>

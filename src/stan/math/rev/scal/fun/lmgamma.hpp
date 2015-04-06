@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__LMGAMMA_HPP
-#define STAN__MATH__REV__SCAL__FUN__LMGAMMA_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_LMGAMMA_HPP
+#define STAN_MATH_REV_SCAL_FUN_LMGAMMA_HPP
 
-#include <valarray>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/lmgamma.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
+#include <valarray>
 
 namespace stan {
   namespace agrad {
@@ -14,7 +14,7 @@ namespace stan {
       class lmgamma_dv_vari : public op_dv_vari {
       public:
         lmgamma_dv_vari(int a, vari* bvi) :
-          op_dv_vari(stan::math::lmgamma(a, bvi->val_),a,bvi) {
+          op_dv_vari(stan::math::lmgamma(a, bvi->val_), a, bvi) {
         }
         void chain() {
           double deriv = 0;

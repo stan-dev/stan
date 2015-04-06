@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__META__VALUE_TYPE_HPP
-#define STAN__MATH__PRIM__MAT__META__VALUE_TYPE_HPP
+#ifndef STAN_MATH_PRIM_MAT_META_VALUE_TYPE_HPP
+#define STAN_MATH_PRIM_MAT_META_VALUE_TYPE_HPP
 
 #include <stan/math/prim/scal/meta/value_type.hpp>
 #include <Eigen/Core>
@@ -18,10 +18,10 @@ namespace stan {
      */
     template <typename T, int R, int C>
     struct value_type<Eigen::Matrix<T, R, C> > {
-      typedef typename Eigen::Matrix<T,R,C>::Scalar type;
+      typedef typename Eigen::Matrix<T, R, C>::Scalar type;
     };
 
-    
+
   }
 
 }
