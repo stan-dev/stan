@@ -1,3 +1,4 @@
+#include <test/test-models/good/variational/multivariate_no_constraint.hpp>
 #include <stan/variational/advi.hpp>
 #include <gtest/gtest.h>
 #include <vector>
@@ -5,7 +6,6 @@
 
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 
-#include <test/test-models/good/variational/multivariate_no_constraint.hpp>
 
 typedef boost::ecuyer1988 rng_t;
 typedef multivariate_no_constraint_model_namespace::multivariate_no_constraint_model Model;
