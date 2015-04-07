@@ -59,7 +59,7 @@ TEST(advi_params_meanfield_test, entropy) {
   Eigen::Vector3d sigma_tilde;
   sigma_tilde << -0.42, 0.8922, 13.4;
 
-  double entropy_true = 13.8722;
+  double entropy_true = 18.129015599614018;
 
   stan::variational::advi_params_meanfield my_advi_params_meanfield(mu, sigma_tilde);
 

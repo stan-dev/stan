@@ -601,7 +601,8 @@ namespace stan {
         Eigen::VectorXd mu           = cont_params_;
         Eigen::MatrixXd sigma_tilde  = Eigen::VectorXd::Constant(
                                                 model_.num_params_r(),
-                                                1.0);
+                                                0.0); // initializing sigma_tilde = 0
+                                                      // means sigma = 1
         advi_params_meanfield musigmatilde = advi_params_meanfield(mu,sigma_tilde);
 
         // Robbins Monro ADAgrad

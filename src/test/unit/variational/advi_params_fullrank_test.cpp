@@ -71,7 +71,7 @@ TEST(advi_params_fullrank_test, entropy) {
 
   stan::variational::advi_params_fullrank my_advi_params_fullrank(mu, L);
 
-  double entropy_true = 8.4977249082208388;
+  double entropy_true = 12.754540507834857;
 
   const double entropy_out = my_advi_params_fullrank.entropy();
 
