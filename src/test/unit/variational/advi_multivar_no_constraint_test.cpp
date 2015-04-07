@@ -51,6 +51,7 @@ TEST(advi_test, multivar_no_constraint_fullrank_ELBO) {
   elbo = test_advi.calc_ELBO(muL, 0.0);//constant_factor);
   std::cout << elbo << std::endl;
 
+  // Can calculate ELBO analytically
   double zeta = -0.5 * ( 3*2*log(2.0*stan::math::pi()) + 18.5 + 25 + 13 );
   Eigen::VectorXd mu_J = Eigen::VectorXd::Zero(2);
   mu_J(0) = 10.5;
@@ -59,25 +60,11 @@ TEST(advi_test, multivar_no_constraint_fullrank_ELBO) {
   double elbo_true = 0.0;
   elbo_true += zeta;
   elbo_true += mu_J.dot(mu);
-  elbo_true += -0.5 * ( mu.dot(mu) + 3*2 );
+  elbo_true += -0.5 * ( 3*mu.dot(mu) + 3*2 );
   elbo_true += 1 + log(2.0*stan::math::pi());
   std::cout << elbo_true << std::endl;
 
-  // Can calculate ELBO using formula for E_normal[(something - x)^2]
-  // (see Sam Roweis' notes on Gaussian identities)
-  //
-  // mu0 = np.array([3.7, 2.7])
-  // x1  = np.array([4.0, 3.0])
-  // x2  = np.array([3.5, 2.5])
-  // z   = np.array([5, 5])
-  //
-  // ELBO = - 0.5 * ( 6 + np.linalg.norm(x1-z)**2
-  //                    + np.linalg.norm(x2-z)**2
-  //                    + np.linalg.norm(z-mu0)**2 ) + 2
-  //
-
-  // FIXME: perhaps make EPSILON depend on stan::vb::bbvb.n_monte_carlo_ ?
-  double const EPSILON = 1.0;
+  double const EPSILON = 0.1;
   EXPECT_NEAR(elbo_true, elbo, EPSILON);
 
 }
