@@ -12,7 +12,7 @@ manual: $(MANUAL_PDF) $(STAN_FUNCTIONS_TXT) $(MANUAL_PDF_HIGHLIGHT)
 	@mkdir -p doc/
 	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING)$(suffix $(artifact));)
 
-.PHONY: manual $(STANAPI_HOME)src/docs/stan-reference/stan-reference.tex $(STANAPI_HOME)src/docs/stan-reference/stan-functions.txt
+.PHONY: manual $(STAN_MANUAL_PDF:%.pdf=%.tex) $(STAN_FUNCTIONS_TXT)
 
 $(STAN_FUNCTIONS_TXT): $(MANUAL_PDF)
 	@echo '  building $@'
@@ -41,4 +41,4 @@ $(STAN_FUNCTIONS_TXT): $(MANUAL_PDF)
 MANUAL_FLAGS=
 
 %.pdf: %.tex
-	cd $(dir $@); latexmk -pdf -bibtex -pdflatex="pdflatex --shell-escape -interaction nonstopmode -file-line-error" $(notdir $^)
+	cd $(dir $@); latexmk -pdf -use-make -pdflatex="pdflatex --shell-escape -interaction nonstopmode -file-line-error" $(notdir $^)

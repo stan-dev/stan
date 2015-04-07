@@ -10,4 +10,5 @@
 *.upa
 stan-reference/stan-reference.pdf
 stan-reference/stan-functions.txt
-
+stan-reference/stan-reference-highlighted.pdf
+stan-reference/_minted-stan-reference-highlighted/
