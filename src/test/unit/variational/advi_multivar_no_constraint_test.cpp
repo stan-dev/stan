@@ -3,9 +3,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 #include <string>
-
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
-
 
 typedef boost::ecuyer1988 rng_t;
 typedef multivariate_no_constraint_model_namespace::multivariate_no_constraint_model Model;

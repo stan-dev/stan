@@ -1,11 +1,9 @@
+#include <test/test-models/good/variational/univariate_with_constraint.hpp>
 #include <stan/variational/advi.hpp>
 #include <gtest/gtest.h>
 #include <vector>
 #include <string>
-
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
-
-#include <test/test-models/good/variational/univariate_with_constraint.hpp>
 
 typedef boost::ecuyer1988 rng_t;
 typedef univariate_with_constraint_model_namespace::univariate_with_constraint_model Model;
