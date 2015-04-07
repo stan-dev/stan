@@ -166,8 +166,7 @@ src/test/unit/lang/reject/reject_func_call_generated_quantities_test.cpp: src/te
 src/test/unit/variational/advi_univar_no_constraint_test.cpp: src/test/test-models/good/variational/univariate_no_constraint.hpp
 src/test/unit/variational/advi_univar_with_constraint_test.cpp: src/test/test-models/good/variational/univariate_with_constraint.hpp
 src/test/unit/variational/advi_multivar_no_constraint_test.cpp: src/test/test-models/good/variational/multivariate_no_constraint.hpp
-
-# src/test/unit/vb/bbvb_multivar_no_constraint_test.cpp src/test/unit/vb/bbvb_multivar_with_constraint_test.cpp src/test/unit/vb/bbvb_univar_with_constraint_test.cpp src/test/unit/vb/latent_vars_test.cpp src/test/unit/vb/call_log_prob_test.cpp: src/test/test-models/good/vb/multivariate_no_constraint.hpp src/test/test-models/good/vb/multivariate_with_constraint.hpp  src/test/test-models/good/vb/univariate_with_constraint.hpp
+src/test/unit/variational/advi_multivar_with_constraint_test.cpp: src/test/test-models/good/variational/multivariate_with_constraint.hpp
 
 ##
 # Compile models depends on every model within

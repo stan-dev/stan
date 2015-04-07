@@ -30,7 +30,7 @@ TEST(advi_test, univar_with_constraint_fullrank_ELBO) {
                                                   cont_params,
                                                   0,
                                                   10,
-                                                  1e5, // absurdly high!
+                                                  5e5, // absurdly high!
                                                   0.1,
                                                   base_rng,
                                                   100,
@@ -48,7 +48,6 @@ TEST(advi_test, univar_with_constraint_fullrank_ELBO) {
 
   double elbo = 0.0;
   elbo = test_advi.calc_ELBO(muL, 0.0);//constant_factor);
-  std::cout << elbo << std::endl;
 
   // Can calculate ELBO analytically + moment generating function of Gaussians
   double one_over_sigma_j_sq = 1.0 + 2*1.0;
@@ -70,10 +69,9 @@ TEST(advi_test, univar_with_constraint_fullrank_ELBO) {
   elbo_true += -0.5*one_over_sigma_j_sq * ( exp(2.0*log(1.88)) * exp(2.0*1.0) );
   elbo_true += -0.5*one_over_sigma_j_sq * ( -2.0*mu_j*exp(log(1.88))*exp(0.5*1.0) );
   elbo_true += -0.5*one_over_sigma_j_sq * ( pow(mu_j, 2.0) );
-  elbo_true += mu_j;
+  elbo_true += log(1.88);
   elbo_true += 0.5 * (1 + log(2.0*stan::math::pi()));
 
-  std::cout << elbo_true << std::endl;
 
   double const EPSILON = 1.0;
   EXPECT_NEAR(elbo_true, elbo, EPSILON);

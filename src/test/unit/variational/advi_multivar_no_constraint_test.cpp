@@ -49,7 +49,6 @@ TEST(advi_test, multivar_no_constraint_fullrank_ELBO) {
 
   double elbo = 0.0;
   elbo = test_advi.calc_ELBO(muL, 0.0);//constant_factor);
-  std::cout << elbo << std::endl;
 
   // Can calculate ELBO analytically
   double zeta = -0.5 * ( 3*2*log(2.0*stan::math::pi()) + 18.5 + 25 + 13 );
@@ -62,7 +61,6 @@ TEST(advi_test, multivar_no_constraint_fullrank_ELBO) {
   elbo_true += mu_J.dot(mu);
   elbo_true += -0.5 * ( 3*mu.dot(mu) + 3*2 );
   elbo_true += 1 + log(2.0*stan::math::pi());
-  std::cout << elbo_true << std::endl;
 
   double const EPSILON = 0.1;
   EXPECT_NEAR(elbo_true, elbo, EPSILON);
