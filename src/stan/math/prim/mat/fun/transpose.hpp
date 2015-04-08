@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__TRANSPOSE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__TRANSPOSE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_TRANSPOSE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_TRANSPOSE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
@@ -7,9 +7,9 @@ namespace stan {
   namespace math {
 
     template <typename T, int R, int C>
-    Eigen::Matrix<T,C,R>
+    Eigen::Matrix<T, C, R>
     inline
-    transpose(const Eigen::Matrix<T,R,C>& m) {
+    transpose(const Eigen::Matrix<T, R, C>& m) {
       return m.transpose();
     }
 

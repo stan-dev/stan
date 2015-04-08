@@ -1,5 +1,5 @@
-#ifndef STAN__INTERFACE__RECORDER_HPP
-#define STAN__INTERFACE__RECORDER_HPP
+#ifndef STAN_INTERFACE_RECORDER_HPP
+#define STAN_INTERFACE_RECORDER_HPP
 
 #include <stan/interface/recorder/csv.hpp>
 #include <stan/interface/recorder/filtered_values.hpp>

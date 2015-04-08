@@ -1,5 +1,5 @@
-#ifndef STAN__VERSION_HPP
-#define STAN__VERSION_HPP
+#ifndef STAN_VERSION_HPP
+#define STAN_VERSION_HPP
 
 #include <string>
 
@@ -12,7 +12,7 @@ namespace stan {
   const std::string MINOR_VERSION = "6";
 
   /** Patch version for Stan package. */
-  const std::string PATCH_VERSION = "2";
+  const std::string PATCH_VERSION = "3";
 
 }
 

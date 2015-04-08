@@ -1,27 +1,29 @@
-#ifndef STAN__MATH__REV__MAT__FUN__SD_HPP
-#define STAN__MATH__REV__MAT__FUN__SD_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_SD_HPP
+#define STAN_MATH_REV_MAT_FUN_SD_HPP
 
-#include <cmath>
-#include <vector>
-#include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/mean.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/err/check_nonzero_size.hpp>
+#include <boost/math/tools/promotion.hpp>
+#include <cmath>
+#include <vector>
 
 namespace stan {
 
   namespace agrad {
-    
+
     namespace {  // anonymous
 
-      // if x.size() = N, and x[i] = x[j] = 
+      // if x.size() = N, and x[i] = x[j] =
       // then lim sd(x) -> 0 [ d/dx[n] sd(x) ] = sqrt(N) / N
 
       var calc_sd(size_t size,
                   const var* dtrs) {
         using std::sqrt;
-        vari** varis = (vari**) ChainableStack::memalloc_.alloc(size * sizeof(vari*));
+        vari** varis
+          = reinterpret_cast<vari**>(ChainableStack::memalloc_
+                                     .alloc(size * sizeof(vari*)));
         for (size_t i = 0; i < size; ++i)
           varis[i] = dtrs[i].vi_;
         double sum = 0.0;
@@ -35,9 +37,11 @@ namespace stan {
         }
         double variance = sum_of_squares / (size - 1);
         double sd = sqrt(variance);
-        double* partials = (double*) ChainableStack::memalloc_.alloc(size * sizeof(double));
+        double* partials
+          = reinterpret_cast<double*>(ChainableStack::memalloc_
+                                      .alloc(size * sizeof(double)));
         if (sum_of_squares < 1e-20) {
-          double grad_limit = 1 / std::sqrt((double)size);
+          double grad_limit = 1 / std::sqrt(static_cast<double>(size));
           for (size_t i = 0; i < size; ++i)
             partials[i] = grad_limit;
         } else {
@@ -75,7 +79,7 @@ namespace stan {
      * @return sample standard deviation of specified matrix
      */
     template <int R, int C>
-    var sd(const Eigen::Matrix<var,R,C>& m) {
+    var sd(const Eigen::Matrix<var, R, C>& m) {
       stan::math::check_nonzero_size("sd", "m", m);
       if (m.size() == 1) return 0;
       return calc_sd(m.size(), &m(0));

@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__AST_DEF_HPP__
-#define __STAN__GM__AST_DEF_HPP__
+#ifndef STAN_LANG_AST_DEF_CPP
+#define STAN_LANG_AST_DEF_CPP
 
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>

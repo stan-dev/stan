@@ -1,13 +1,13 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__PROMOTER_HPP
-#define STAN__MATH__PRIM__MAT__FUN__PROMOTER_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_PROMOTER_HPP
+#define STAN_MATH_PRIM_MAT_FUN_PROMOTER_HPP
 
-#include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <vector>
 
 namespace stan {
-  
+
   namespace math {
-    // from input type F to output type T 
+    // from input type F to output type T
 
     // scalar, F != T  (base template)
     template <typename F, typename T>
@@ -21,7 +21,7 @@ namespace stan {
     };
     // scalar, F == T
     template <typename T>
-    struct promoter<T,T> {
+    struct promoter<T, T> {
       inline static void promote(const T& u, T& t) {
         t = u;
       }
@@ -37,12 +37,12 @@ namespace stan {
                           std::vector<T>& t) {
         t.resize(u.size());
         for (size_t i = 0; i < u.size(); ++i)
-          promoter<F,T>::promote(u[i],t[i]);
+          promoter<F, T>::promote(u[i], t[i]);
       }
       inline static std::vector<T>
       promote_to(const std::vector<F>& u) {
         std::vector<T> t;
-        promoter<std::vector<F>,std::vector<T> >::promote(u,t);
+        promoter<std::vector<F>, std::vector<T> >::promote(u, t);
         return t;
       }
     };
@@ -60,28 +60,30 @@ namespace stan {
 
     // Eigen::Matrix, F != T
     template <typename F, typename T, int R, int C>
-    struct promoter<Eigen::Matrix<F,R,C>, Eigen::Matrix<T,R,C> > {
-      inline static void promote(const Eigen::Matrix<F,R,C>& u,
-                          Eigen::Matrix<T,R,C>& t) {
+    struct promoter<Eigen::Matrix<F, R, C>, Eigen::Matrix<T, R, C> > {
+      inline static void promote(const Eigen::Matrix<F, R, C>& u,
+                          Eigen::Matrix<T, R, C>& t) {
         t.resize(u.rows(), u.cols());
         for (int i = 0; i < u.size(); ++i)
-          promoter<F,T>::promote(u(i),t(i));
+          promoter<F, T>::promote(u(i), t(i));
       }
-      inline static Eigen::Matrix<T,R,C>
-      promote_to(const Eigen::Matrix<F,R,C>& u) {
-        Eigen::Matrix<T,R,C> t;
-        promoter<Eigen::Matrix<F,R,C>,Eigen::Matrix<T,R,C> >::promote(u,t);
+      inline static Eigen::Matrix<T, R, C>
+      promote_to(const Eigen::Matrix<F, R, C>& u) {
+        Eigen::Matrix<T, R, C> t;
+        promoter<Eigen::Matrix<F, R, C>,
+                 Eigen::Matrix<T, R, C> >::promote(u, t);
         return t;
       }
     };
     // Eigen::Matrix, F == T
     template <typename T, int R, int C>
-    struct promoter<Eigen::Matrix<T,R,C>, Eigen::Matrix<T,R,C> > {
-      inline static void promote(const Eigen::Matrix<T,R,C>& u,
-                          Eigen::Matrix<T,R,C>& t) {
+    struct promoter<Eigen::Matrix<T, R, C>, Eigen::Matrix<T, R, C> > {
+      inline static void promote(const Eigen::Matrix<T, R, C>& u,
+                          Eigen::Matrix<T, R, C>& t) {
         t = u;
       }
-      inline static Eigen::Matrix<T,R,C> promote_to(const Eigen::Matrix<T,R,C>& u) {
+      inline static Eigen::Matrix<T, R, C>
+      promote_to(const Eigen::Matrix<T, R, C>& u) {
         return u;
       }
     };

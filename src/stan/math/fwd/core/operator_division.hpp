@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__CORE__OPERATOR_DIVISION_HPP
-#define STAN__MATH__FWD__CORE__OPERATOR_DIVISION_HPP
+#ifndef STAN_MATH_FWD_CORE_OPERATOR_DIVISION_HPP
+#define STAN_MATH_FWD_CORE_OPERATOR_DIVISION_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
 
@@ -12,7 +12,7 @@ namespace stan {
     inline
     fvar<T>
     operator/(const fvar<T>& x1, const fvar<T>& x2) {
-      return fvar<T>(x1.val_ / x2.val_, 
+      return fvar<T>(x1.val_ / x2.val_,
                      (x1.d_ * x2.val_ - x1.val_ * x2.d_) / (x2.val_ * x2.val_));
     }
 
@@ -28,9 +28,8 @@ namespace stan {
     inline
     fvar<T>
     operator/(const double x1, const fvar<T>& x2) {
-      return fvar<T>(x1 / x2.val_, 
+      return fvar<T>(x1 / x2.val_,
                      - x1 * x2.d_ / (x2.val_ * x2.val_));
-                     
     }
   }
 }

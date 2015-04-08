@@ -1,9 +1,9 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__SOFTMAX_HPP
-#define STAN__MATH__PRIM__MAT__FUN__SOFTMAX_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_SOFTMAX_HPP
+#define STAN_MATH_PRIM_MAT_FUN_SOFTMAX_HPP
 
 #include <stan/math/prim/scal/err/check_nonzero_size.hpp>
-#include <cmath>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {
@@ -25,7 +25,7 @@ namespace stan {
      * \frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
      * \\[8pt]
      * \displaystyle
-     * \mbox{ } \ \ \ = \left\{ 
+     * \mbox{ } \ \ \ = \left\{
      * \begin{array}{ll}
      * \mbox{softmax}(y)[k] - \mbox{softmax}(y)[k] \times \mbox{softmax}(y)[m]
      * & \mbox{ if } m = k, \mbox{ and}
@@ -42,15 +42,15 @@ namespace stan {
      * @return Unit simplex result of the softmax transform of the vector.
      */
     template <typename T>
-    inline Eigen::Matrix<T,Eigen::Dynamic,1>
-    softmax(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
+    inline Eigen::Matrix<T, Eigen::Dynamic, 1>
+    softmax(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v) {
       using std::exp;
       stan::math::check_nonzero_size("softmax", "v", v);
-      Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
+      Eigen::Matrix<T, Eigen::Dynamic, 1> theta(v.size());
       T sum(0.0);
       T max_v = v.maxCoeff();
       for (int i = 0; i < v.size(); ++i) {
-        theta(i) = exp(v(i) - max_v); // extra work for (v[i] == max_v)
+        theta(i) = exp(v(i) - max_v);  // extra work for (v[i] == max_v)
         sum += theta(i);              // extra work vs. sum() w. auto-diff
       }
       for (int i = 0; i < v.size(); ++i)

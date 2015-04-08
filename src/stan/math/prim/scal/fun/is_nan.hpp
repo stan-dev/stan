@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__IS_NAN_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__IS_NAN_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_IS_NAN_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_IS_NAN_HPP
 
 #include <boost/math/special_functions/fpclassify.hpp>
 

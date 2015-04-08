@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MULTI_NORMAL_LOG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MULTI_NORMAL_LOG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_MULTI_NORMAL_LOG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_MULTI_NORMAL_LOG_HPP
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>

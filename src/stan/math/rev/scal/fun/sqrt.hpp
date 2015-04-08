@@ -1,17 +1,17 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__SQRT_HPP
-#define STAN__MATH__REV__SCAL__FUN__SQRT_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_SQRT_HPP
+#define STAN_MATH_REV_SCAL_FUN_SQRT_HPP
 
-#include <cmath>
 #include <stan/math/rev/core.hpp>
+#include <cmath>
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class sqrt_vari : public op_v_vari {
       public:
-        sqrt_vari(vari* avi) :
-          op_v_vari(std::sqrt(avi->val_),avi) {
+        explicit sqrt_vari(vari* avi) :
+          op_v_vari(std::sqrt(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (2.0 * val_);
@@ -25,9 +25,9 @@ namespace stan {
      * The derivative is defined by
      *
      * \f$\frac{d}{dx} \sqrt{x} = \frac{1}{2 \sqrt{x}}\f$.
-     * 
+     *
        \f[
-       \mbox{sqrt}(x) = 
+       \mbox{sqrt}(x) =
        \begin{cases}
          \textrm{NaN} & x < 0 \\
          \sqrt{x} & \mbox{if } x\geq 0\\[6pt]
@@ -36,7 +36,7 @@ namespace stan {
        \f]
 
        \f[
-       \frac{\partial\,\mbox{sqrt}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{sqrt}(x)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & x < 0 \\
          \frac{1}{2\sqrt{x}} & x\geq 0\\[6pt]

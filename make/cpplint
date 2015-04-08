@@ -1,4 +1,4 @@
-CPPLINT ?= cpplint.py
+CPPLINT ?= python lib/cpplint_4.45/cpplint.py
 
 .PHONY: cpplint
 cpplint:

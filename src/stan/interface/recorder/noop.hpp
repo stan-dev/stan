@@ -1,5 +1,5 @@
-#ifndef STAN__INTERFACE__RECORDER__NOOP_HPP
-#define STAN__INTERFACE__RECORDER__NOOP_HPP
+#ifndef STAN_INTERFACE_RECORDER_NOOP_HPP
+#define STAN_INTERFACE_RECORDER_NOOP_HPP
 
 #include <stan/interface/recorder/recorder.hpp>
 

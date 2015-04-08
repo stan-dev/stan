@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__RAYLEIGH_CDF_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__RAYLEIGH_CDF_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_RAYLEIGH_CDF_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_RAYLEIGH_CDF_HPP
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -23,10 +23,10 @@ namespace stan {
   namespace prob {
 
     template <typename T_y, typename T_scale>
-    typename return_type<T_y,T_scale>::type
+    typename return_type<T_y, T_scale>::type
     rayleigh_cdf(const T_y& y, const T_scale& sigma) {
       static const char* function("stan::prob::rayleigh_cdf");
-      typedef typename stan::partials_return_type<T_y,T_scale>::type 
+      typedef typename stan::partials_return_type<T_y, T_scale>::type
         T_partials_return;
 
       using stan::math::check_nonnegative;
@@ -59,7 +59,7 @@ namespace stan {
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
-      
+
       VectorBuilder<true, T_partials_return, T_scale> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
@@ -71,11 +71,11 @@ namespace stan {
         const T_partials_return inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
         const T_partials_return exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
 
-        if (include_summand<false,T_y,T_scale>::value)
+        if (include_summand<false, T_y, T_scale>::value)
           cdf *= (1.0 - exp_val);
       }
 
-      //gradients
+      // gradients
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return y_sqr = square(y_dbl);
@@ -84,14 +84,14 @@ namespace stan {
         const T_partials_return exp_div_1m_exp = exp_val / (1.0 - exp_val);
 
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += y_dbl * inv_sigma_sqr 
+          operands_and_partials.d_x1[n] += y_dbl * inv_sigma_sqr
             * exp_div_1m_exp * cdf;
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x2[n] -= y_sqr * inv_sigma_sqr
             * inv_sigma[n] * exp_div_1m_exp * cdf;
       }
 
-      return operands_and_partials.to_var(cdf,y,sigma);
+      return operands_and_partials.to_var(cdf, y, sigma);
     }
   }
 }

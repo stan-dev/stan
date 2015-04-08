@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__CORE__OPERATOR_ADDITION_HPP
-#define STAN__MATH__FWD__CORE__OPERATOR_ADDITION_HPP
+#ifndef STAN_MATH_FWD_CORE_OPERATOR_ADDITION_HPP
+#define STAN_MATH_FWD_CORE_OPERATOR_ADDITION_HPP
 
 #include <stan/math/fwd/core/fvar.hpp>
 
@@ -22,7 +22,7 @@ namespace stan {
     }
 
     template <typename T>
-    inline 
+    inline
     fvar<T>
     operator+(const fvar<T>& x1, const double x2) {
       return fvar<T>(x1.val_ + x2, x1.d_);

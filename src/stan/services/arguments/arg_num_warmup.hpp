@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__NUM__WARMUP__HPP
-#define STAN__SERVICES__ARGUMENTS__NUM__WARMUP__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_NUM_WARMUP_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_NUM_WARMUP_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 

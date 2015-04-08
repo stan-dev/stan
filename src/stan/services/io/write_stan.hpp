@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__IO__WRITE_STAN_HPP
-#define STAN__SERVICES__IO__WRITE_STAN_HPP
+#ifndef STAN_SERVICES_IO_WRITE_STAN_HPP
+#define STAN_SERVICES_IO_WRITE_STAN_HPP
 
 #include <ostream>
 #include <string>

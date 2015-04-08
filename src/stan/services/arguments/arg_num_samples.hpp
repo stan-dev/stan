@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__NUM__SAMPLES__HPP
-#define STAN__SERVICES__ARGUMENTS__NUM__SAMPLES__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_NUM_SAMPLES_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_NUM_SAMPLES_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 

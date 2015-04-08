@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__WEIBULL_CDF_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__WEIBULL_CDF_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_WEIBULL_CDF_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_WEIBULL_CDF_HPP
 
 #include <boost/random/weibull_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -22,9 +22,9 @@ namespace stan {
   namespace prob {
 
     template <typename T_y, typename T_shape, typename T_scale>
-    typename return_type<T_y,T_shape,T_scale>::type
+    typename return_type<T_y, T_shape, T_scale>::type
     weibull_cdf(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
-      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type
+      typedef typename stan::partials_return_type<T_y, T_shape, T_scale>::type
         T_partials_return;
 
       static const char* function("stan::prob::weibull_cdf");
@@ -35,8 +35,8 @@ namespace stan {
       using stan::math::value_of;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(alpha) 
+      if (!(stan::length(y)
+            && stan::length(alpha)
             && stan::length(sigma)))
         return 1.0;
 
@@ -44,8 +44,8 @@ namespace stan {
       check_nonnegative(function, "Random variable", y);
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", sigma);
-      
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
+
+      agrad::OperandsAndPartials<T_y, T_shape, T_scale>
         operands_and_partials(y, alpha, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -60,10 +60,10 @@ namespace stan {
         const T_partials_return exp_ = exp(-pow_);
         const T_partials_return cdf_ = 1.0 - exp_;
 
-        //cdf
+        // cdf
         cdf *= cdf_;
 
-        //gradients
+        // gradients
         const T_partials_return rep_deriv = exp_ * pow_ / cdf_;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv * alpha_dbl / y_dbl;
@@ -73,17 +73,20 @@ namespace stan {
           operands_and_partials.d_x3[n] -= rep_deriv * alpha_dbl / sigma_dbl;
       }
 
-      if (!is_constant_struct<T_y>::value)
-        for (size_t n = 0; n < stan::length(y); ++n) 
+      if (!is_constant_struct<T_y>::value) {
+        for (size_t n = 0; n < stan::length(y); ++n)
           operands_and_partials.d_x1[n] *= cdf;
-      if (!is_constant_struct<T_shape>::value)
-        for (size_t n = 0; n < stan::length(alpha); ++n) 
+      }
+      if (!is_constant_struct<T_shape>::value) {
+        for (size_t n = 0; n < stan::length(alpha); ++n)
           operands_and_partials.d_x2[n] *= cdf;
-      if (!is_constant_struct<T_scale>::value)
-        for (size_t n = 0; n < stan::length(sigma); ++n) 
+      }
+      if (!is_constant_struct<T_scale>::value) {
+        for (size_t n = 0; n < stan::length(sigma); ++n)
           operands_and_partials.d_x3[n] *= cdf;
+      }
 
-      return operands_and_partials.to_var(cdf,y,alpha,sigma);    
+      return operands_and_partials.to_var(cdf, y, alpha, sigma);
     }
   }
 }

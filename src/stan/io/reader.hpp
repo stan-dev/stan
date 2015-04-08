@@ -1,5 +1,5 @@
-#ifndef STAN__IO__READER_HPP
-#define STAN__IO__READER_HPP
+#ifndef STAN_IO_READER_HPP
+#define STAN_IO_READER_HPP
 
 #include <boost/throw_exception.hpp>
 #include <stan/math/prim/arr.hpp>

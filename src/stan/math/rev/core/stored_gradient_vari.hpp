@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__STORED_GRADIENT_VARI_HPP
-#define STAN__MATH__REV__CORE__STORED_GRADIENT_VARI_HPP
+#ifndef STAN_MATH_REV_CORE_STORED_GRADIENT_VARI_HPP
+#define STAN_MATH_REV_CORE_STORED_GRADIENT_VARI_HPP
 
 #include <stan/math/rev/core/vari.hpp>
 
@@ -11,20 +11,17 @@ namespace stan {
      * A var implementation that stores the daughter variable
      * implementation pointers and the partial derivative with respect
      * to the result explicitly in arrays constructed on the
-     * auto-diff memory stack.  
+     * auto-diff memory stack.
      *
      * Like a simplified version of OperandsAndPartials.
      */
     class stored_gradient_vari : public vari {
-
-    protected: 
-
+    protected:
       size_t size_;
       vari** dtrs_;
       double* partials_;
 
-    public: 
-
+    public:
       /**
        * Construct a stored gradient vari with the specified
        * value, size, daughter varis, and partial derivatives.
@@ -41,7 +38,7 @@ namespace stan {
                            double* partials)
         : vari(value),
           size_(size),
-          dtrs_(dtrs), 
+          dtrs_(dtrs),
           partials_(partials) {
       }
 

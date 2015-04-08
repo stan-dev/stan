@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__PARSER__BARE_TYPE_GRAMMAR_HPP__
-#define STAN__LANG__PARSER__BARE_TYPE_GRAMMAR_HPP__
+#ifndef STAN_LANG_GRAMMARS_BARE_TYPE_GRAMMAR_HPP
+#define STAN_LANG_GRAMMARS_BARE_TYPE_GRAMMAR_HPP
 
 #include <string>
 #include <sstream>
@@ -25,7 +25,6 @@ namespace stan {
       variable_map& var_map_;
       std::stringstream& error_msgs_;
       
-      // constructor
       bare_type_grammar(variable_map& var_map,
                         std::stringstream& error_msgs);
 
