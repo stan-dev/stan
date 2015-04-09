@@ -128,12 +128,15 @@ namespace stan {
         double tmp_lp = 0.0;
 
         stan::math::check_size_match(function,
-                              "Dimension of mu grad vector", mu_grad.size(),
-                              "Dimension of mean vector in variational q", dim);
-        stan::math::check_square(function, "Scale matrix", L_grad);
+                        "Dimension of muL", muL.dimension(),
+                        "Dimension of variables in model", cont_params_.size());
         stan::math::check_size_match(function,
-                              "Dimension of scale matrix", L_grad.rows(),
-                              "Dimension of mean vector in variational q", dim);
+                        "Dimension of mu grad vector", mu_grad.size(),
+                        "Dimension of mean vector in variational q", dim);
+        stan::math::check_size_match(function,
+                        "Dimension of scale matrix", L_grad.rows(),
+                        "Dimension of mean vector in variational q", dim);
+        stan::math::check_square(function, "Scale matrix", L_grad);
 
         // Initialize everything to zero
         mu_grad = Eigen::VectorXd::Zero(dim);
@@ -199,6 +202,13 @@ namespace stan {
         stan::math::check_size_match(function,
                               "Dimension of mu grad vector", mu_grad.size(),
                               "Dimension of mean vector in variational q", dim);
+        stan::math::check_size_match(function,
+                "Dimension of sigma_tilde grad vector", sigma_tilde_grad.size(),
+                "Dimension of mean vector in variational q", dim);
+        stan::math::check_size_match(function,
+                        "Dimension of musigmatilde", dim,
+                        "Dimension of variables in model", cont_params_.size());
+
 
         // Initialize everything to zero
         mu_grad          = Eigen::VectorXd::Zero(dim);
@@ -284,20 +294,6 @@ namespace stan {
         int cb_size = (int)
                 std::max(0.1*max_iterations/static_cast<double>(refresh_),1.0);
         boost::circular_buffer<double> cb(cb_size);
-
-        // // Compute difference between agrad::var version of log_prob
-        // // and double version. This is used in the ELBO calculation.
-        // int dim = muL.dimension();
-        // Eigen::VectorXd z_tmp = Eigen::VectorXd::Zero(dim);
-        // Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tmp_agrad(dim);
-        // for (int var_index = 0; var_index < dim; ++var_index) {
-        //     z_tmp_agrad(var_index) = stan::agrad::var(0.0);
-        //   }
-        // double constant_factor = (model_.template
-        //            log_prob<true,true>(z_tmp_agrad, print_stream_)).val()
-        //            -
-        //            (model_.template log_prob<false,true>(z_tmp, print_stream_));
-        // constant_factor = 0.0;                                                  //FIXME
 
         // Print stuff
         *print_stream_ << "  iter"
@@ -438,20 +434,6 @@ namespace stan {
         int cb_size = (int)
                 std::max(0.1*max_iterations/static_cast<double>(refresh_),1.0);
         boost::circular_buffer<double> cb(cb_size);
-
-        // // Compute difference between agrad::var version of log_prob
-        // // and double version. This is used in the ELBO calculation.
-        // int dim = musigmatilde.dimension();
-        // Eigen::VectorXd z_tmp = Eigen::VectorXd::Zero(dim);
-        // Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tmp_agrad(dim);
-        // for (int var_index = 0; var_index < dim; ++var_index) {
-        //     z_tmp_agrad(var_index) = stan::agrad::var(0.0);
-        //   }
-        // double constant_factor = (model_.template
-        //            log_prob<true,true>(z_tmp_agrad, print_stream_)).val()
-        //            -
-        //            (model_.template log_prob<false,true>(z_tmp, print_stream_));
-        // constant_factor = 0.0;
 
         // Print stuff
         *print_stream_ << "  iter"

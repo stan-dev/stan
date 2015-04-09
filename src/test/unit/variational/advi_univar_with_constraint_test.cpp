@@ -1,6 +1,7 @@
 #include <test/test-models/good/variational/univariate_with_constraint.hpp>
 #include <stan/variational/advi.hpp>
 #include <gtest/gtest.h>
+#include <test/unit/util.hpp>
 #include <vector>
 #include <string>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
@@ -47,7 +48,7 @@ TEST(advi_test, univar_with_constraint_fullrank_ELBO) {
     stan::variational::advi_params_fullrank(mu, L_chol);
 
   double elbo = 0.0;
-  elbo = test_advi.calc_ELBO(muL, 0.0);//constant_factor);
+  elbo = test_advi.calc_ELBO(muL);
 
   // Can calculate ELBO analytically + moment generating function of Gaussians
   double one_over_sigma_j_sq = 1.0 + 2*1.0;
@@ -72,9 +73,62 @@ TEST(advi_test, univar_with_constraint_fullrank_ELBO) {
   elbo_true += log(1.88);
   elbo_true += 0.5 * (1 + log(2.0*stan::math::pi()));
 
-
   double const EPSILON = 1.0;
   EXPECT_NEAR(elbo_true, elbo, EPSILON);
+
+  Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(3);
+  Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Identity(my_model.num_params_r(),
+                                                     my_model.num_params_r());
+
+  std::string error = "stan::variational::advi.calc_combined_grad: "
+                      "Dimension of mu grad vector (3) and Dimension of mean "
+                      "vector in variational q (1) must match in size";
+  EXPECT_THROW_MSG(test_advi.calc_combined_grad(muL, mu_grad, L_grad),
+                   std::invalid_argument, error);
+
+  mu_grad = Eigen::VectorXd::Zero(0);
+  error = "stan::variational::advi.calc_combined_grad: "
+          "Dimension of mu grad vector (0) and Dimension of mean "
+          "vector in variational q (1) must match in size";
+  EXPECT_THROW_MSG(test_advi.calc_combined_grad(muL, mu_grad, L_grad),
+                   std::invalid_argument, error);
+
+  mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
+  L_grad  = Eigen::MatrixXd::Identity(3,3);
+
+  error = "stan::variational::advi.calc_combined_grad: "
+          "Dimension of scale matrix (3) and Dimension of mean "
+          "vector in variational q (1) must match in size";
+  EXPECT_THROW_MSG(test_advi.calc_combined_grad(muL, mu_grad, L_grad),
+                   std::invalid_argument, error);
+
+  mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
+  L_grad  = Eigen::MatrixXd::Identity(0,0);
+
+  error = "stan::variational::advi.calc_combined_grad: "
+          "Dimension of scale matrix (0) and Dimension of mean "
+          "vector in variational q (1) must match in size";
+  EXPECT_THROW_MSG(test_advi.calc_combined_grad(muL, mu_grad, L_grad),
+                   std::invalid_argument, error);
+
+  mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
+  L_grad  = Eigen::MatrixXd::Identity(1,4);
+
+  error = "stan::variational::advi.calc_combined_grad: "
+          "Expecting a square matrix; rows of Scale matrix (1) and "
+          "columns of Scale matrix (4) must match in size";
+  EXPECT_THROW_MSG(test_advi.calc_combined_grad(muL, mu_grad, L_grad),
+                   std::invalid_argument, error);
+
+  mu_grad = Eigen::VectorXd::Zero(3);
+  L_grad  = Eigen::MatrixXd::Identity(3,3);
+  stan::variational::advi_params_fullrank muL_wrongdim =
+    stan::variational::advi_params_fullrank(mu_grad, L_grad);
+
+  error = "stan::variational::advi.calc_combined_grad: Dimension of muL (3) "
+          "and Dimension of variables in model (1) must match in size";
+  EXPECT_THROW_MSG(test_advi.calc_combined_grad(muL_wrongdim, mu_grad, L_grad),
+                   std::invalid_argument, error);
 
 }
 
@@ -119,7 +173,7 @@ TEST(advi_test, univar_with_constraint_meanfield_ELBO) {
     stan::variational::advi_params_meanfield(mu,sigma_tilde);
 
   double elbo = 0.0;
-  elbo = test_advi.calc_ELBO(musigmatilde, 0.0);//constant_factor);
+  elbo = test_advi.calc_ELBO(musigmatilde);
 
   // Can calculate ELBO analytically + moment generating function of Gaussians
   double one_over_sigma_j_sq = 1.0 + 2*1.0;
@@ -147,6 +201,51 @@ TEST(advi_test, univar_with_constraint_meanfield_ELBO) {
 
   double const EPSILON = 1.0;
   EXPECT_NEAR(elbo_true, elbo, EPSILON);
+
+  Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(3);
+  Eigen::VectorXd st_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
+
+  std::string error = "stan::variational::advi.calc_combined_grad: "
+                      "Dimension of mu grad vector (3) and Dimension of mean "
+                      "vector in variational q (1) must match in size";
+  EXPECT_THROW_MSG(test_advi.calc_combined_grad(musigmatilde, mu_grad, st_grad),
+                   std::invalid_argument, error);
+
+  mu_grad = Eigen::VectorXd::Zero(0);
+  error = "stan::variational::advi.calc_combined_grad: "
+          "Dimension of mu grad vector (0) and Dimension of mean "
+          "vector in variational q (1) must match in size";
+  EXPECT_THROW_MSG(test_advi.calc_combined_grad(musigmatilde, mu_grad, st_grad),
+                   std::invalid_argument, error);
+
+  mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
+  st_grad  = Eigen::VectorXd::Zero(3);
+
+  error = "stan::variational::advi.calc_combined_grad: "
+          "Dimension of sigma_tilde grad vector (3) and Dimension of "
+          "mean vector in variational q (1) must match in size";
+  EXPECT_THROW_MSG(test_advi.calc_combined_grad(musigmatilde, mu_grad, st_grad),
+                   std::invalid_argument, error);
+
+  mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
+  st_grad  = Eigen::VectorXd::Zero(0);
+
+  error = "stan::variational::advi.calc_combined_grad: "
+          "Dimension of sigma_tilde grad vector (0) and Dimension of "
+          "mean vector in variational q (1) must match in size";
+  EXPECT_THROW_MSG(test_advi.calc_combined_grad(musigmatilde, mu_grad, st_grad),
+                   std::invalid_argument, error);
+
+  mu_grad = Eigen::VectorXd::Zero(3);
+  st_grad  = Eigen::VectorXd::Zero(3);
+  stan::variational::advi_params_meanfield mst_wrongdim =
+    stan::variational::advi_params_meanfield(mu_grad, st_grad);
+
+  error = "stan::variational::advi.calc_combined_grad: "
+          "Dimension of musigmatilde (3) and Dimension of "
+          "variables in model (1) must match in size";
+  EXPECT_THROW_MSG(test_advi.calc_combined_grad(mst_wrongdim, mu_grad, st_grad),
+                   std::invalid_argument, error);
 
 }
 

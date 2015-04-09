@@ -48,7 +48,7 @@ TEST(advi_test, multivar_with_constraint_fullrank_ELBO) {
     stan::variational::advi_params_fullrank(mu, L_chol);
 
   double elbo = 0.0;
-  elbo = test_advi.calc_ELBO(muL, 0.0);//constant_factor);
+  elbo = test_advi.calc_ELBO(muL);
 
   // Can calculate ELBO analytically
   double zeta = -0.5 * ( 3*2*log(2.0*stan::math::pi()) + 18.5 + 25 + 13 );
