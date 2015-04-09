@@ -268,6 +268,15 @@ namespace stan {
       void do_robbins_monro_adagrad( advi_params_fullrank& muL,
                                      double tol_rel_obj,
                                      int max_iterations ) {
+
+        stan::math::check_positive(function,
+                                   "Relative objective function tolerance",
+                                   tol_rel_obj);
+        stan::math::check_positive(function,
+                                   "Maximum iterations",
+                                   max_iterations);
+
+        // Gradients
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(model_.num_params_r());
         Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(model_.num_params_r(),
                                                         model_.num_params_r());
@@ -408,6 +417,13 @@ namespace stan {
       void do_robbins_monro_adagrad( advi_params_meanfield& musigmatilde,
                                      double tol_rel_obj,
                                      int max_iterations ) {
+
+        stan::math::check_positive(function,
+                                   "Relative objective function tolerance",
+                                   tol_rel_obj);
+        stan::math::check_positive(function,
+                                   "Maximum iterations",
+                                   max_iterations);
 
         // Gradients
         Eigen::VectorXd mu_grad           = Eigen::VectorXd::Zero(model_.num_params_r());
