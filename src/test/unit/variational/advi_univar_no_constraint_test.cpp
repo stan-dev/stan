@@ -129,7 +129,7 @@ TEST(advi_test, univar_no_constraint_fullrank) {
 
 }
 
-TEST(advi_test, univar_no_constraint_meanfield_ELBO) {
+TEST(advi_test, univar_no_constraint_meanfield) {
 
   // Create mock data_var_context
   static const std::string DATA = "";

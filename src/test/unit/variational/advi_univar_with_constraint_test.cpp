@@ -9,7 +9,7 @@
 typedef boost::ecuyer1988 rng_t;
 typedef univariate_with_constraint_model_namespace::univariate_with_constraint_model Model;
 
-TEST(advi_test, univar_with_constraint_fullrank_ELBO) {
+TEST(advi_test, univar_with_constraint_fullrank) {
 
   // Create mock data_var_context
   static const std::string DATA = "";
@@ -132,7 +132,7 @@ TEST(advi_test, univar_with_constraint_fullrank_ELBO) {
 
 }
 
-TEST(advi_test, univar_with_constraint_meanfield_ELBO) {
+TEST(advi_test, univar_with_constraint_meanfield) {
 
   // Create mock data_var_context
   static const std::string DATA = "";

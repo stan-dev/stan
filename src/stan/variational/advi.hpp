@@ -133,10 +133,10 @@ namespace stan {
         stan::math::check_size_match(function,
                         "Dimension of mu grad vector", mu_grad.size(),
                         "Dimension of mean vector in variational q", dim);
+        stan::math::check_square(function, "Scale matrix", L_grad);
         stan::math::check_size_match(function,
                         "Dimension of scale matrix", L_grad.rows(),
                         "Dimension of mean vector in variational q", dim);
-        stan::math::check_square(function, "Scale matrix", L_grad);
 
         // Initialize everything to zero
         mu_grad = Eigen::VectorXd::Zero(dim);
