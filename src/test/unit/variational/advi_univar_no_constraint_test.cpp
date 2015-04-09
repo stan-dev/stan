@@ -126,7 +126,6 @@ TEST(advi_test, univar_no_constraint_fullrank) {
           "and Dimension of variables in model (1) must match in size";
   EXPECT_THROW_MSG(test_advi.calc_combined_grad(muL_wrongdim, mu_grad, L_grad),
                    std::invalid_argument, error);
-
 }
 
 TEST(advi_test, univar_no_constraint_meanfield) {

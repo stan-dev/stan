@@ -10,6 +10,7 @@
 #include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
 #include <stan/math/prim/scal/err/check_size_match.hpp>
 #include <stan/math/prim/scal/err/check_size_match.hpp>
+#include <stan/math/prim/scal/err/check_not_nan.hpp>
 
 namespace stan {
 
@@ -36,6 +37,8 @@ namespace stan {
         stan::math::check_size_match(function,
                                "Dimension of mean vector",     dimension_,
                                "Dimension of Cholesky factor", L_chol_.rows() );
+        for (int i = 0; i < dimension_; ++i)
+          stan::math::check_not_nan(function, "Mean vector", mu_(i));
         stan::math::check_cholesky_factor(function,
                                "Cholesky factor", L_chol_);
 
@@ -56,6 +59,8 @@ namespace stan {
         stan::math::check_size_match(function,
                                "Dimension of input vector", mu.size(),
                                "Dimension of current vector", dimension_ );
+        for (int i = 0; i < dimension_; ++i)
+          stan::math::check_not_nan(function, "Input vector", mu(i));
         mu_ = mu;
       }
 
@@ -117,6 +122,8 @@ namespace stan {
         stan::math::check_size_match(function,
                          "Dimension of input vector", z_check.size(),
                          "Dimension of mean vector",  dimension_ );
+        for (int i = 0; i < dimension_; ++i)
+          stan::math::check_not_nan(function, "Input vector", z_check(i));
 
         return L_chol_*z_check + mu_;
       };

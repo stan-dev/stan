@@ -1,6 +1,7 @@
 #include <stan/variational/advi_params_fullrank.hpp>
 #include <vector>
 #include <gtest/gtest.h>
+#include <test/unit/util.hpp>
 
 TEST(advi_params_fullrank_test, dimension) {
 
@@ -34,6 +35,26 @@ TEST(advi_params_fullrank_test, mean_vector) {
 
   for (int i = 0; i < my_advi_params_fullrank.dimension(); ++i)
     EXPECT_FLOAT_EQ(mu(i), mu_out(i));
+
+
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  Eigen::Vector3d mu_nan = Eigen::VectorXd::Constant(3, nan);
+
+  std::string error = "stan::variational::advi_params_fullrank: "
+                      "Mean vector is nan, but must not be nan!";
+  EXPECT_THROW_MSG(stan::variational::advi_params_fullrank my_advi_params_fullrank_nan(mu_nan, L);,
+                   std::domain_error, error);
+
+  error = "stan::variational::advi_params_fullrank::set_mu: "
+          "Input vector is nan, but must not be nan!";
+  EXPECT_THROW_MSG(my_advi_params_fullrank.set_mu(mu_nan);,
+                   std::domain_error, error);
+
+  Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3,3,nan);
+  error = "stan::variational::advi_params_fullrank: "
+          "Cholesky factor is not lower triangular; Cholesky factor[1,2]=nan";
+  EXPECT_THROW_MSG(stan::variational::advi_params_fullrank my_advi_params_fullrank_nan(mu, L_nan);,
+                   std::domain_error, error);
 
 }
 
@@ -103,4 +124,11 @@ TEST(advi_params_fullrank_test, transform_to_unconstrained) {
   for (int i = 0; i < my_advi_params_fullrank.dimension(); ++i)
     EXPECT_FLOAT_EQ(x_result(i), x_transformed(i));
 
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  Eigen::Vector3d x_nan = Eigen::VectorXd::Constant(3, nan);
+
+  std::string error = "stan::variational::advi_params_fullrank::to_unconstrained: "
+          "Input vector is nan, but must not be nan!";
+  EXPECT_THROW_MSG(my_advi_params_fullrank.to_unconstrained(x_nan);,
+                   std::domain_error, error);
 }
