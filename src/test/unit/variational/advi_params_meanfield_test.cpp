@@ -1,6 +1,7 @@
 #include <stan/variational/advi_params_meanfield.hpp>
 #include <vector>
 #include <gtest/gtest.h>
+#include <test/unit/util.hpp>
 
 TEST(advi_params_meanfield_test, dimension) {
 
@@ -32,6 +33,25 @@ TEST(advi_params_meanfield_test, mean_vector) {
   for (int i = 0; i < my_advi_params_meanfield.dimension(); ++i)
     EXPECT_FLOAT_EQ(mu(i), mu_out(i));
 
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  Eigen::Vector3d mu_nan = Eigen::VectorXd::Constant(3, nan);
+
+  std::string error = "stan::variational::advi_params_meanfield: "
+                      "Mean vector is nan, but must not be nan!";
+  EXPECT_THROW_MSG(stan::variational::advi_params_meanfield my_advi_params_meanfield_nan(mu_nan, sigma_tilde);,
+                   std::domain_error, error);
+
+  error = "stan::variational::advi_params_meanfield::set_mu: "
+          "Input vector is nan, but must not be nan!";
+  EXPECT_THROW_MSG(my_advi_params_meanfield.set_mu(mu_nan);,
+                   std::domain_error, error);
+
+  Eigen::Vector3d sigma_tilde_nan = Eigen::VectorXd::Constant(3,nan);
+  error = "stan::variational::advi_params_meanfield: "
+          "Sigma tilde vector is nan, but must not be nan!";
+  EXPECT_THROW_MSG(stan::variational::advi_params_meanfield my_advi_params_meanfield_nan(mu, sigma_tilde_nan);,
+                   std::domain_error, error);
+
 }
 
 TEST(advi_params_meanfield_test, sigma_tilde_vector) {
@@ -48,6 +68,14 @@ TEST(advi_params_meanfield_test, sigma_tilde_vector) {
 
   for (int i = 0; i < my_advi_params_meanfield.dimension(); ++i)
     EXPECT_FLOAT_EQ(sigma_tilde(i), sigma_tilde_out(i));
+
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  Eigen::Vector3d sigma_tilde_nan = Eigen::VectorXd::Constant(3, nan);
+
+  std::string error = "stan::variational::advi_params_meanfield::set_sigma_tilde: "
+          "Input vector is nan, but must not be nan!";
+  EXPECT_THROW_MSG(my_advi_params_meanfield.set_sigma_tilde(sigma_tilde_nan);,
+                   std::domain_error, error);
 
 }
 
@@ -91,5 +119,13 @@ TEST(advi_params_meanfield_test, transform_to_unconstrained) {
 
   for (int i = 0; i < my_advi_params_meanfield.dimension(); ++i)
     EXPECT_FLOAT_EQ(x_result(i), x_transformed(i));
+
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  Eigen::Vector3d x_nan = Eigen::VectorXd::Constant(3, nan);
+
+  std::string error = "stan::variational::advi_params_meanfield::to_unconstrained: "
+          "Input vector is nan, but must not be nan!";
+  EXPECT_THROW_MSG(my_advi_params_meanfield.to_unconstrained(x_nan);,
+                   std::domain_error, error);
 
 }

@@ -6,6 +6,7 @@
 #include <stan/math/prim/scal/fun/max.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/err/check_size_match.hpp>
+#include <stan/math/prim/scal/err/check_not_nan.hpp>
 
 namespace stan {
 
@@ -23,15 +24,18 @@ namespace stan {
 
       advi_params_meanfield(const Eigen::VectorXd& mu,
                             const Eigen::VectorXd& sigma_tilde) :
-      mu_(mu),
-      sigma_tilde_(sigma_tilde),
-      dimension_(mu.size()) {
+      mu_(mu), sigma_tilde_(sigma_tilde), dimension_(mu.size()) {
+
         static const char* function =
           "stan::variational::advi_params_meanfield";
 
         stan::math::check_size_match(function,
                                "Dimension of mean vector", dimension_,
                                "Dimension of std vector", sigma_tilde_.size() );
+        for (int i = 0; i < dimension_; ++i) {
+          stan::math::check_not_nan(function, "Mean vector", mu_(i));
+          stan::math::check_not_nan(function, "Sigma tilde vector", sigma_tilde_(i));
+        }
       };
 
       virtual ~advi_params_meanfield() {}; // No-op
@@ -49,7 +53,8 @@ namespace stan {
         stan::math::check_size_match(function,
                                "Dimension of input vector", mu.size(),
                                "Dimension of current vector", dimension_ );
-
+        for (int i = 0; i < dimension_; ++i)
+          stan::math::check_not_nan(function, "Input vector", mu(i));
         mu_ = mu;
       }
 
@@ -60,7 +65,8 @@ namespace stan {
         stan::math::check_size_match(function,
                                "Dimension of input vector", sigma_tilde.size(),
                                "Dimension of current vector", dimension_ );
-
+        for (int i = 0; i < dimension_; ++i)
+          stan::math::check_not_nan(function, "Input vector", sigma_tilde(i));
         sigma_tilde_ = sigma_tilde;
       }
 
@@ -97,6 +103,8 @@ namespace stan {
         stan::math::check_size_match(function,
                          "Dimension of mean vector", dimension_,
                          "Dimension of input vector", z_check.size() );
+        for (int i = 0; i < dimension_; ++i)
+          stan::math::check_not_nan(function, "Input vector", z_check(i));
 
         // exp(sigma_tilde) * z_check + mu
         return z_check.array().cwiseProduct(sigma_tilde_.array().exp())

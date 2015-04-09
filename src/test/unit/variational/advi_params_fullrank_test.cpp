@@ -78,6 +78,13 @@ TEST(advi_params_fullrank_test, cholesky_factor) {
     }
   }
 
+  double nan = std::numeric_limits<double>::quiet_NaN();
+  Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3,3,nan);
+  std::string error = "stan::variational::advi_params_fullrank::set_L_chol: "
+          "Cholesky factor is not lower triangular; Cholesky factor[1,2]=nan";
+  EXPECT_THROW_MSG(my_advi_params_fullrank.set_L_chol(L_nan),
+                   std::domain_error, error);
+
 }
 
 TEST(advi_params_fullrank_test, entropy) {
