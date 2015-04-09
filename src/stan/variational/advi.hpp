@@ -77,12 +77,10 @@ namespace stan {
        * term of the normal
        *
        * @param   advi_params      variational parameters class
-       * @param   constant_factor  difference between log_prob agrad and double
        * @return                   evidence lower bound (elbo)
        */
       template <typename T>
-      double calc_ELBO(const T& advi_params,
-                       double constant_factor) {
+      double calc_ELBO(const T& advi_params) {
         double elbo(0.0);
         int dim = advi_params.dimension();
 
@@ -97,8 +95,7 @@ namespace stan {
           z_tilde = advi_params.to_unconstrained(z_check);
 
           // Accumulate log probability
-          elbo += (model_.template log_prob<false,true>(z_tilde, print_stream_))
-                   + constant_factor;
+          elbo += (model_.template log_prob<false,true>(z_tilde, print_stream_));
         }
         // Divide to get Monte Carlo integral estimate
         elbo /= static_cast<double>(n_monte_carlo_elbo_);
@@ -288,19 +285,19 @@ namespace stan {
                 std::max(0.1*max_iterations/static_cast<double>(refresh_),1.0);
         boost::circular_buffer<double> cb(cb_size);
 
-        // Compute difference between agrad::var version of log_prob
-        // and double version. This is used in the ELBO calculation.
-        int dim = muL.dimension();
-        Eigen::VectorXd z_tmp = Eigen::VectorXd::Zero(dim);
-        Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tmp_agrad(dim);
-        for (int var_index = 0; var_index < dim; ++var_index) {
-            z_tmp_agrad(var_index) = stan::agrad::var(0.0);
-          }
-        double constant_factor = (model_.template
-                   log_prob<true,true>(z_tmp_agrad, print_stream_)).val()
-                   -
-                   (model_.template log_prob<false,true>(z_tmp, print_stream_));
-        constant_factor = 0.0;                                                  //FIXME
+        // // Compute difference between agrad::var version of log_prob
+        // // and double version. This is used in the ELBO calculation.
+        // int dim = muL.dimension();
+        // Eigen::VectorXd z_tmp = Eigen::VectorXd::Zero(dim);
+        // Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tmp_agrad(dim);
+        // for (int var_index = 0; var_index < dim; ++var_index) {
+        //     z_tmp_agrad(var_index) = stan::agrad::var(0.0);
+        //   }
+        // double constant_factor = (model_.template
+        //            log_prob<true,true>(z_tmp_agrad, print_stream_)).val()
+        //            -
+        //            (model_.template log_prob<false,true>(z_tmp, print_stream_));
+        // constant_factor = 0.0;                                                  //FIXME
 
         // Print stuff
         *print_stream_ << "  iter"
@@ -343,7 +340,7 @@ namespace stan {
           // Check for convergence every "refresh_"th iteration
           if (iter_counter % refresh_ == 0) {
             elbo_prev = elbo;
-            elbo = calc_ELBO(muL, constant_factor);
+            elbo = calc_ELBO(muL);
             delta_elbo = rel_decrease(elbo, elbo_prev);
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
@@ -442,19 +439,19 @@ namespace stan {
                 std::max(0.1*max_iterations/static_cast<double>(refresh_),1.0);
         boost::circular_buffer<double> cb(cb_size);
 
-        // Compute difference between agrad::var version of log_prob
-        // and double version. This is used in the ELBO calculation.
-        int dim = musigmatilde.dimension();
-        Eigen::VectorXd z_tmp = Eigen::VectorXd::Zero(dim);
-        Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tmp_agrad(dim);
-        for (int var_index = 0; var_index < dim; ++var_index) {
-            z_tmp_agrad(var_index) = stan::agrad::var(0.0);
-          }
-        double constant_factor = (model_.template
-                   log_prob<true,true>(z_tmp_agrad, print_stream_)).val()
-                   -
-                   (model_.template log_prob<false,true>(z_tmp, print_stream_));
-        constant_factor = 0.0;
+        // // Compute difference between agrad::var version of log_prob
+        // // and double version. This is used in the ELBO calculation.
+        // int dim = musigmatilde.dimension();
+        // Eigen::VectorXd z_tmp = Eigen::VectorXd::Zero(dim);
+        // Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> z_tmp_agrad(dim);
+        // for (int var_index = 0; var_index < dim; ++var_index) {
+        //     z_tmp_agrad(var_index) = stan::agrad::var(0.0);
+        //   }
+        // double constant_factor = (model_.template
+        //            log_prob<true,true>(z_tmp_agrad, print_stream_)).val()
+        //            -
+        //            (model_.template log_prob<false,true>(z_tmp, print_stream_));
+        // constant_factor = 0.0;
 
         // Print stuff
         *print_stream_ << "  iter"
@@ -500,7 +497,7 @@ namespace stan {
           // Check for convergence every "refresh_"th iteration
           if (iter_counter % refresh_ == 0) {
             elbo_prev = elbo;
-            elbo = calc_ELBO(musigmatilde, constant_factor);
+            elbo = calc_ELBO(musigmatilde);
             delta_elbo = rel_decrease(elbo, elbo_prev);
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
