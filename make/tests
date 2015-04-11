@@ -1,3 +1,5 @@
+N_TESTS = 100 # override this in make/local. If <= 0, N_TESTS + 1 is interpreted as the number of batches to group the tests into
+
 ##
 # LIBGTEST is the google test library
 # GTEST_MAIN is the file that contains the google test
@@ -193,9 +195,8 @@ test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
 # test_types := v fd fv ffd ffv
 
 .SECONDEXPANSION:
-#src/test/prob/%_generated_test.cpp : src/test/prob/$$(call test_name,$$*) test/prob/generate_tests$(EXE)
 src/test/prob/%_generated_v_test.cpp src/test/prob/%_generated_fd_test.cpp src/test/prob/%_generated_fv_test.cpp src/test/prob/%_generated_ffd_test.cpp src/test/prob/%_generated_ffv_test.cpp: src/test/prob/$$(call test_name,$$*) test/prob/generate_tests$(EXE)
-	$(WINE) test/prob/generate_tests$(EXE) $<
+	$(WINE) test/prob/generate_tests$(EXE) $< $(N_TESTS)
 
 LIST_OF_GENERATED_TESTS := $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_v_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fd_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_fv_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffd_test.cpp,g') $(shell find src/test/prob -type f -name '*_test.hpp' | sed 's,_test.hpp,_00000_generated_ffv_test.cpp,g')
 
