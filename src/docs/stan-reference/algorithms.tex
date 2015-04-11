@@ -824,11 +824,9 @@ With unconstrained parameterizations of parameters with constrained
 support, it is important to provide a custom initialization that is
 within the support.  For example, declaring a vector
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 vector[M] sigma;
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 and using the default random initialization which is
 $\distro{Uniform}(-2,2)$ on the unconstrained scale, means that there

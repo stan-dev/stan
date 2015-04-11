@@ -692,11 +692,9 @@ improper priors for the two regression coefficients.
 
 The sampling statement in the previous model is vectorized, with
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
   y ~ normal(alpha + beta * x, sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 providing the same model as the unvectorized version,
 %
@@ -5296,20 +5294,18 @@ consider the coding of sparse data for the IRT models discussed in
 questions, and if every student answers every question, then it is
 practical to declare the data as a $J \times K$ array of answers.
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
   int<lower=1> J;
   int<lower=1> K;
   int<lower=0,upper=1> y[J,K];
-  ...
+  // ...
 model {
   for (j in 1:J)
     for (k in 1:K)
       y[j,k] ~ bernoulli_logit(delta[k] * (alpha[j] - beta[k]));
-  ...
-\end{Verbatim}
-\end{quote}
+  // ...
+\end{stancode}
 %
 
 \begin{figure}
@@ -5374,22 +5370,20 @@ with all other entries undefined.
 Letting $N$ be the number of $y$ that are defined, here $N=6$,
 the data and model can be formulated as follows.
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
-  ...
+  // ...
   int<lower=1> N;
   int<lower=1,upper=J> jj[N];
   int<lower=1,upper=K> kk[N];
   int<lower=0,upper=1> y[N];
-  ...
+  // ...
 model {
   for (n in 1:N)
     y[n] ~ bernoulli_logit(delta[kk[n]]
                            * (alpha[jj[n]] - beta[kk[n]]));
-  ...
-\end{Verbatim}
-\end{quote}
+  // ...
+\end{stancode}
 %
 In the situation where there are no missing values, the two model
 formulations produce exactly the same log posterior density.
@@ -5454,21 +5448,19 @@ single array for the values and a separate array for the sizes of each
 row.  
 
 The model can then be coded up using slicing operations as follows.
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
   int<lower=0> N;   // # observations
   int<lower=0> K;   // # of groups
   vector[N] y;      // observations
   int s[K];         // group sizes
-  ...
+  // ...
 model {
   int pos;
   pos <- 1;
   for (k in 1:K)
     segment(y, pos, s[k]) ~ normal(mu[k], sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 This coding allows for efficient vectorization, which is worth the
 copy cost entailed by the \code{segment()} vector slicing operation.
