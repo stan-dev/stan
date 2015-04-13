@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__ARR__FUN__LOG_SUM_EXP_HPP
-#define STAN__MATH__PRIM__ARR__FUN__LOG_SUM_EXP_HPP
+#ifndef STAN_MATH_PRIM_ARR_FUN_LOG_SUM_EXP_HPP
+#define STAN_MATH_PRIM_ARR_FUN_LOG_SUM_EXP_HPP
 
 #include <cmath>
 #include <cstdlib>
@@ -17,7 +17,7 @@ namespace stan {
      * calculations.
      *
      * \f$\log \sum_{n=1}^N \exp(x_n) = \max(x) + \log \sum_{n=1}^N \exp(x_n - \max(x))\f$.
-     * 
+     *
      * @param[in] x array of specified values
      * @return The log of the sum of the exponentiated vector values.
      */
@@ -26,15 +26,15 @@ namespace stan {
       using std::log;
       using std::exp;
       double max = -numeric_limits<double>::infinity();
-      for (size_t ii = 0; ii < x.size(); ii++) 
-        if (x[ii] > max) 
+      for (size_t ii = 0; ii < x.size(); ii++)
+        if (x[ii] > max)
           max = x[ii];
-            
+
       double sum = 0.0;
-      for (size_t ii = 0; ii < x.size(); ii++) 
-        if (x[ii] != -numeric_limits<double>::infinity()) 
+      for (size_t ii = 0; ii < x.size(); ii++)
+        if (x[ii] != -numeric_limits<double>::infinity())
           sum += exp(x[ii] - max);
-          
+
       return max + log(sum);
     }
 

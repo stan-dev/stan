@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__OPERATOR_EQUAL_HPP
-#define STAN__MATH__REV__CORE__OPERATOR_EQUAL_HPP
+#ifndef STAN_MATH_REV_CORE_OPERATOR_EQUAL_HPP
+#define STAN_MATH_REV_CORE_OPERATOR_EQUAL_HPP
 
 #include <stan/math/rev/core/var.hpp>
 
@@ -10,7 +10,7 @@ namespace stan {
      * Equality operator comparing two variables' values (C++).
      *
        \f[
-       \mbox{operator==}(x,y) = 
+       \mbox{operator==}(x, y) =
        \begin{cases}
          0 & \mbox{if } x \neq y\\
          1 & \mbox{if } x = y \\[6pt]
@@ -18,8 +18,8 @@ namespace stan {
        \end{cases}
        \f]
      *
-     * @param a First variable.  
-     * @param b Second variable. 
+     * @param a First variable.
+     * @param b Second variable.
      * @return True if the first variable's value is the same as the
      * second's.
      */
@@ -31,7 +31,7 @@ namespace stan {
      * Equality operator comparing a variable's value and a double
      * (C++).
      *
-     * @param a First variable.  
+     * @param a First variable.
      * @param b Second value.
      * @return True if the first variable's value is the same as the
      * second value.
@@ -39,7 +39,7 @@ namespace stan {
     inline bool operator==(const var& a, const double b) {
       return a.val() == b;
     }
-  
+
     /**
      * Equality operator comparing a scalar and a variable's value
      * (C++).

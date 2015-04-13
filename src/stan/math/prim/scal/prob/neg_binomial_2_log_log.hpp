@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__NEG_BINOMIAL_2_LOG_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__NEG_BINOMIAL_2_LOG_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_2_LOG_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_2_LOG_LOG_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/random/negative_binomial_distribution.hpp>
@@ -25,7 +25,7 @@ namespace stan {
 
   namespace prob {
 
-    // NegBinomial(n|eta,phi)  [phi > 0;  n >= 0]
+    // NegBinomial(n|eta, phi)  [phi > 0;  n >= 0]
     template <bool propto,
               typename T_n,
               typename T_log_location, typename T_precision>
@@ -33,8 +33,8 @@ namespace stan {
     neg_binomial_2_log_log(const T_n& n,
                            const T_log_location& eta,
                            const T_precision& phi) {
-      typedef typename stan::partials_return_type<T_n,T_log_location,
-                                                  T_precision>::type 
+      typedef typename stan::partials_return_type<T_n, T_log_location,
+                                                  T_precision>::type
         T_partials_return;
 
       static const char* function("stan::prob::neg_binomial_log");
@@ -62,7 +62,7 @@ namespace stan {
                              "Precision parameter", phi);
 
       // check if no variables are involved and prop-to
-      if (!include_summand<propto,T_log_location,T_precision>::value)
+      if (!include_summand<propto, T_log_location, T_precision>::value)
         return 0.0;
 
       using stan::math::multiply_log;
@@ -77,8 +77,8 @@ namespace stan {
       VectorView<const T_precision> phi_vec(phi);
       size_t size = max_size(n, eta, phi);
 
-      agrad::OperandsAndPartials<T_log_location,T_precision>
-        operands_and_partials(eta,phi);
+      agrad::OperandsAndPartials<T_log_location, T_precision>
+        operands_and_partials(eta, phi);
 
       size_t len_ep = max_size(eta, phi);
       size_t len_np = max_size(n, phi);
@@ -86,11 +86,11 @@ namespace stan {
       VectorBuilder<true, T_partials_return, T_log_location> eta__(length(eta));
       for (size_t i = 0, size = length(eta); i < size; ++i)
         eta__[i] = value_of(eta_vec[i]);
-  
+
       VectorBuilder<true, T_partials_return, T_precision> phi__(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
-        phi__[i] = value_of(phi_vec[i]);  
-        
+        phi__[i] = value_of(phi_vec[i]);
+
 
       VectorBuilder<true, T_partials_return, T_precision>
         log_phi(length(phi));
@@ -110,13 +110,13 @@ namespace stan {
       for (size_t i = 0; i < size; i++) {
         if (include_summand<propto>::value)
           logp -= lgamma(n_vec[i] + 1.0);
-        if (include_summand<propto,T_precision>::value)
+        if (include_summand<propto, T_precision>::value)
           logp += multiply_log(phi__[i], phi__[i]) - lgamma(phi__[i]);
-        if (include_summand<propto,T_log_location,T_precision>::value)
+        if (include_summand<propto, T_log_location, T_precision>::value)
           logp -= (n_plus_phi[i])*logsumexp_eta_logphi[i];
-        if (include_summand<propto,T_log_location>::value)
+        if (include_summand<propto, T_log_location>::value)
           logp += n_vec[i]*eta__[i];
-        if (include_summand<propto,T_precision>::value)
+        if (include_summand<propto, T_precision>::value)
           logp += lgamma(n_plus_phi[i]);
 
         if (!is_constant_struct<T_log_location>::value)
@@ -126,10 +126,10 @@ namespace stan {
         if (!is_constant_struct<T_precision>::value)
           operands_and_partials.d_x2[i]
             += 1.0 - n_plus_phi[i]/(exp(eta__[i]) + phi__[i])
-            + log_phi[i] - logsumexp_eta_logphi[i] - digamma(phi__[i]) 
+            + log_phi[i] - logsumexp_eta_logphi[i] - digamma(phi__[i])
             + digamma(n_plus_phi[i]);
       }
-      return operands_and_partials.to_var(logp,eta,phi);
+      return operands_and_partials.to_var(logp, eta, phi);
     }
 
     template <typename T_n,
@@ -139,7 +139,7 @@ namespace stan {
     neg_binomial_2_log_log(const T_n& n,
                            const T_log_location& eta,
                            const T_precision& phi) {
-      return neg_binomial_2_log_log<false>(n,eta,phi);
+      return neg_binomial_2_log_log<false>(n, eta, phi);
     }
   }
 }

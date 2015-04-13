@@ -1,13 +1,13 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__GET_BASE1_LHS_HPP
-#define STAN__MATH__PRIM__MAT__FUN__GET_BASE1_LHS_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_GET_BASE1_LHS_HPP
+#define STAN_MATH_PRIM_MAT_FUN_GET_BASE1_LHS_HPP
 
-#include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/err/check_range.hpp>
+#include <vector>
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Return a reference to the value of the specified vector at the
      * specified base-one index.  If the index is out of range, throw
@@ -24,8 +24,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<T>& x, 
-                     size_t i, 
+    T& get_base1_lhs(std::vector<T>& x,
+                     size_t i,
                      const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
@@ -50,14 +50,14 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<T> >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<T> >& x,
+                     size_t i1,
                      size_t i2,
                      const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
-      return get_base1_lhs(x[i1 - 1],i2,error_msg,idx+1);
+      return get_base1_lhs(x[i1 - 1], i2, error_msg, idx+1);
     }
 
     /**
@@ -78,15 +78,15 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<T> > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector<T> > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      const char* error_msg,
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
-      return get_base1_lhs(x[i1 - 1],i2,i3,error_msg,idx+1);
+      return get_base1_lhs(x[i1 - 1], i2, i3, error_msg, idx+1);
     }
 
     /**
@@ -108,8 +108,9 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<T> > > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector
+                     <std::vector<T> > > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      size_t i4,
@@ -117,7 +118,7 @@ namespace stan {
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
-      return get_base1_lhs(x[i1 - 1],i2,i3,i4,error_msg,idx+1);
+      return get_base1_lhs(x[i1 - 1], i2, i3, i4, error_msg, idx+1);
     }
 
     /**
@@ -140,8 +141,9 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector
+                     <std::vector<T> > > > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      size_t i4,
@@ -150,7 +152,7 @@ namespace stan {
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
-      return get_base1_lhs(x[i1 - 1],i2,i3,i4,i5,error_msg,idx+1);
+      return get_base1_lhs(x[i1 - 1], i2, i3, i4, i5, error_msg, idx+1);
     }
 
     /**
@@ -174,8 +176,9 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector
+                     <std::vector<std::vector<T> > > > > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      size_t i4,
@@ -185,7 +188,7 @@ namespace stan {
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
-      return get_base1_lhs(x[i1 - 1],i2,i3,i4,i5,i6,error_msg,idx+1);
+      return get_base1_lhs(x[i1 - 1], i2, i3, i4, i5, i6, error_msg, idx+1);
     }
 
 
@@ -211,8 +214,10 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector
+                     <std::vector<std::vector
+                     <std::vector<T> > > > > > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      size_t i4,
@@ -223,7 +228,7 @@ namespace stan {
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
-      return get_base1_lhs(x[i1 - 1],i2,i3,i4,i5,i6,i7,error_msg,idx+1);
+      return get_base1_lhs(x[i1 - 1], i2, i3, i4, i5, i6, i7, error_msg, idx+1);
     }
 
 
@@ -250,8 +255,10 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > > >& x, 
-                     size_t i1, 
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector
+                     <std::vector<std::vector<std::vector
+                     <std::vector<T> > > > > > > >& x,
+                     size_t i1,
                      size_t i2,
                      size_t i3,
                      size_t i4,
@@ -263,7 +270,8 @@ namespace stan {
                      size_t idx) {
       using stan::math::check_range;
       check_range("[]", "x", x.size(), i1, idx, error_msg);
-      return get_base1_lhs(x[i1 - 1],i2,i3,i4,i5,i6,i7,i8,error_msg,idx+1);
+      return get_base1_lhs(x[i1 - 1], i2, i3, i4, i5, i6, i7, i8,
+                           error_msg, idx+1);
     }
 
 
@@ -276,7 +284,7 @@ namespace stan {
      *
      * <b>Warning</b>:  Because a copy is involved, it is inefficient
      * to access element of matrices by first using this method
-     * to get a row then using a second call to get the value at 
+     * to get a row then using a second call to get the value at
      a specified column.
      *
      * @param x Matrix from which to get a row
@@ -289,14 +297,14 @@ namespace stan {
      */
     template <typename T>
     inline
-    Eigen::Block<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
-    get_base1_lhs(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
+    Eigen::Block<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >
+    get_base1_lhs(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
                   size_t m,
                   const char* error_msg,
                   size_t idx) {
       using stan::math::check_range;
       check_range("[]", "rows of x", x.rows(), m, idx, error_msg);
-      return x.block(m-1,0,1,x.cols());
+      return x.block(m-1, 0, 1, x.cols());
     }
 
     /**
@@ -317,7 +325,7 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
+    T& get_base1_lhs(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
                      size_t m,
                      size_t n,
                      const char* error_msg,
@@ -344,7 +352,7 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+    T& get_base1_lhs(Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
                      size_t m,
                      const char* error_msg,
                      size_t idx) {
@@ -369,7 +377,7 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1_lhs(Eigen::Matrix<T,1,Eigen::Dynamic>& x,
+    T& get_base1_lhs(Eigen::Matrix<T, 1, Eigen::Dynamic>& x,
                      size_t n,
                      const char* error_msg,
                      size_t idx) {
@@ -377,7 +385,7 @@ namespace stan {
       check_range("[]", "x", x.size(), n, idx, error_msg);
       return x(n - 1);
     }
-    
+
   }
 }
 #endif

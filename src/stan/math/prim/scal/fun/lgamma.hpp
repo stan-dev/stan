@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__LGAMMA_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__LGAMMA_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_LGAMMA_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_LGAMMA_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 
@@ -10,19 +10,19 @@ namespace stan {
     /**
      *
        \f[
-       \mbox{lgamma}(x) = 
+       \mbox{lgamma}(x) =
        \begin{cases}
-         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
-         \ln\Gamma(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{error} & \mbox{if } x\in \{\dots, -3, -2, -1, 0\}\\
+         \ln\Gamma(x) & \mbox{if } x\not\in \{\dots, -3, -2, -1, 0\}\\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{lgamma}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{lgamma}(x)}{\partial x} =
        \begin{cases}
-         \textrm{error} & \mbox{if } x\in \{\dots,-3,-2,-1,0\}\\
-         \Psi(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\[6pt]
+         \textrm{error} & \mbox{if } x\in \{\dots, -3, -2, -1, 0\}\\
+         \Psi(x) & \mbox{if } x\not\in \{\dots, -3, -2, -1, 0\}\\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
     \f]

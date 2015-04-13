@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__STD_ISNAN_HPP
-#define STAN__MATH__REV__CORE__STD_ISNAN_HPP
+#ifndef STAN_MATH_REV_CORE_STD_ISNAN_HPP
+#define STAN_MATH_REV_CORE_STD_ISNAN_HPP
 
 #include <stan/math/rev/core/var.hpp>
 #include <cmath>
@@ -8,7 +8,7 @@ namespace std {
 
   /**
    * Checks if the given number is NaN.
-   * 
+   *
    * Return <code>true</code> if the value of the
    * specified variable is not a number.
    *

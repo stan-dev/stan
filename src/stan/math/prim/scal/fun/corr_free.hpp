@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__CORR_FREE_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__CORR_FREE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_CORR_FREE_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_CORR_FREE_HPP
 
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <cmath>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -27,7 +27,7 @@ namespace stan {
     template <typename T>
     inline
     T corr_free(const T y) {
-      stan::math::check_bounded<T,double,double>
+      stan::math::check_bounded<T, double, double>
         ("stan::prob::lub_free",
          "Correlation variable", y, -1, 1);
       return atanh(y);

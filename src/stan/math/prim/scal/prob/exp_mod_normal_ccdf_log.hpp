@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__EXP_MOD_NORMAL_CCDF_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__EXP_MOD_NORMAL_CCDF_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_EXP_MOD_NORMAL_CCDF_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_EXP_MOD_NORMAL_CCDF_LOG_HPP
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -19,13 +19,13 @@ namespace stan {
 
   namespace prob {
 
-    template <typename T_y, typename T_loc, typename T_scale, 
+    template <typename T_y, typename T_loc, typename T_scale,
               typename T_inv_scale>
-    typename return_type<T_y,T_loc,T_scale,T_inv_scale>::type
-    exp_mod_normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+    typename return_type<T_y, T_loc, T_scale, T_inv_scale>::type
+    exp_mod_normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
                             const T_inv_scale& lambda) {
       static const char* function("stan::prob::exp_mod_normal_ccdf_log");
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,
+      typedef typename stan::partials_return_type<T_y, T_loc, T_scale,
                                                   T_inv_scale>::type
         T_partials_return;
 
@@ -36,9 +36,9 @@ namespace stan {
       using stan::math::value_of;
 
       T_partials_return ccdf_log(0.0);
-      //check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      // check if any vectors are zero length
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(sigma)
             && stan::length(lambda)))
         return ccdf_log;
@@ -50,14 +50,14 @@ namespace stan {
       check_positive_finite(function, "Inv_scale parameter", lambda);
       check_not_nan(function, "Inv_scale parameter", lambda);
       check_consistent_sizes(function,
-                             "Random variable",y,
+                             "Random variable", y,
                              "Location parameter", mu,
                              "Scale parameter", sigma,
                              "Inv_scale paramter", lambda);
-      
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale> 
-        operands_and_partials(y, mu, sigma,lambda);
+
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale>
+        operands_and_partials(y, mu, sigma, lambda);
 
       using stan::math::SQRT_2;
       using std::log;
@@ -69,13 +69,12 @@ namespace stan {
       size_t N = max_size(y, mu, sigma, lambda);
       const double sqrt_pi = std::sqrt(stan::math::pi());
       for (size_t n = 0; n < N; n++) {
-
-        if(boost::math::isinf(y_vec[n])) {
+        if (boost::math::isinf(y_vec[n])) {
           if (y_vec[n] > 0.0)
             return operands_and_partials.to_var(stan::math::negative_infinity(),
-                                                y,mu,sigma,lambda);
+                                                y, mu, sigma, lambda);
           else
-            return operands_and_partials.to_var(0.0,y,mu,sigma,lambda);
+            return operands_and_partials.to_var(0.0, y, mu, sigma, lambda);
         }
 
         const T_partials_return y_dbl = value_of(y_vec[n]);
@@ -83,26 +82,26 @@ namespace stan {
         const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
         const T_partials_return lambda_dbl = value_of(lambda_vec[n]);
         const T_partials_return u = lambda_dbl * (y_dbl - mu_dbl);
-        const T_partials_return v = lambda_dbl * sigma_dbl ;
+        const T_partials_return v = lambda_dbl * sigma_dbl;
         const T_partials_return v_sq = v * v;
-        const T_partials_return scaled_diff = (y_dbl - mu_dbl) 
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl)
           / (SQRT_2 * sigma_dbl);
         const T_partials_return scaled_diff_sq = scaled_diff * scaled_diff;
         const T_partials_return erf_calc1 = 0.5 * (1 + erf(u / (v * SQRT_2)));
-        const T_partials_return erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2) 
+        const T_partials_return erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2)
                                                            - v / SQRT_2));
 
-        const T_partials_return deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) 
+        const T_partials_return deriv_1 = lambda_dbl * exp(0.5 * v_sq - u)
           * erf_calc2;
-        const T_partials_return deriv_2 = SQRT_2 / sqrt_pi * 0.5 
-          * exp(0.5 * v_sq 
-                - (-scaled_diff + (v / SQRT_2)) * (-scaled_diff  
-                                                   + (v / SQRT_2)) - u) 
+        const T_partials_return deriv_2 = SQRT_2 / sqrt_pi * 0.5
+          * exp(0.5 * v_sq
+                - (-scaled_diff + (v / SQRT_2)) * (-scaled_diff
+                                                   + (v / SQRT_2)) - u)
           / sigma_dbl;
-        const T_partials_return deriv_3 = SQRT_2 / sqrt_pi * 0.5 
+        const T_partials_return deriv_3 = SQRT_2 / sqrt_pi * 0.5
           * exp(-scaled_diff_sq) / sigma_dbl;
 
-        const T_partials_return ccdf_ = 1.0 - erf_calc1 + exp(-u + v_sq * 0.5) 
+        const T_partials_return ccdf_ = 1.0 - erf_calc1 + exp(-u + v_sq * 0.5)
           * (erf_calc2);
 
         ccdf_log += log(ccdf_);
@@ -111,25 +110,25 @@ namespace stan {
           operands_and_partials.d_x1[n]
             -= (deriv_1 - deriv_2 + deriv_3) / ccdf_;
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] 
+          operands_and_partials.d_x2[n]
             -= (-deriv_1 + deriv_2 - deriv_3) / ccdf_;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
-            -= (-deriv_1 * v - deriv_3 * scaled_diff * SQRT_2 - deriv_2 
-                * sigma_dbl * SQRT_2 
-                * (-SQRT_2 * 0.5 * (-lambda_dbl + scaled_diff * SQRT_2 
+          operands_and_partials.d_x3[n]
+            -= (-deriv_1 * v - deriv_3 * scaled_diff * SQRT_2 - deriv_2
+                * sigma_dbl * SQRT_2
+                * (-SQRT_2 * 0.5 * (-lambda_dbl + scaled_diff * SQRT_2
                                     / sigma_dbl)
-                   - SQRT_2 * lambda_dbl)) 
+                   - SQRT_2 * lambda_dbl))
             / ccdf_;
         if (!is_constant_struct<T_inv_scale>::value)
-          operands_and_partials.d_x4[n] -= exp(0.5 * v_sq - u) 
-            * (SQRT_2 / sqrt_pi * 0.5 * sigma_dbl 
-               * exp(-(v / SQRT_2 - scaled_diff) * (v / SQRT_2 - scaled_diff)) 
-               - (v * sigma_dbl + mu_dbl - y_dbl) * erf_calc2) 
+          operands_and_partials.d_x4[n] -= exp(0.5 * v_sq - u)
+            * (SQRT_2 / sqrt_pi * 0.5 * sigma_dbl
+               * exp(-(v / SQRT_2 - scaled_diff) * (v / SQRT_2 - scaled_diff))
+               - (v * sigma_dbl + mu_dbl - y_dbl) * erf_calc2)
             / ccdf_;
       }
 
-      return operands_and_partials.to_var(ccdf_log,y,mu,sigma,lambda);
+      return operands_and_partials.to_var(ccdf_log, y, mu, sigma, lambda);
     }
   }
 }

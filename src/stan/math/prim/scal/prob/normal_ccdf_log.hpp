@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__NORMAL_CCDF_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__NORMAL_CCDF_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_NORMAL_CCDF_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_NORMAL_CCDF_LOG_HPP
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -13,16 +13,17 @@
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
 #include <stan/math/prim/scal/meta/max_size.hpp>
+#include <limits>
 
 namespace stan {
 
   namespace prob {
 
     template <typename T_y, typename T_loc, typename T_scale>
-    typename return_type<T_y,T_loc,T_scale>::type
+    typename return_type<T_y, T_loc, T_scale>::type
     normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function("stan::prob::normal_ccdf_log");
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+      typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
       using stan::math::check_positive;
@@ -34,8 +35,8 @@ namespace stan {
 
       T_partials_return ccdf_log(0.0);
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(sigma)))
         return ccdf_log;
 
@@ -55,17 +56,17 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
-      double log_half = std::log(0.5);  
-    
+      double log_half = std::log(0.5);
+
       const double SQRT_TWO_OVER_PI = std::sqrt(2.0 / stan::math::pi());
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);
         const T_partials_return mu_dbl = value_of(mu_vec[n]);
         const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
 
-        const T_partials_return scaled_diff = (y_dbl - mu_dbl) 
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl)
           / (sigma_dbl * SQRT_2);
-        
+
         T_partials_return one_m_erf;
         if (scaled_diff < -37.5 * INV_SQRT_2)
           one_m_erf = 2.0;
@@ -95,7 +96,7 @@ namespace stan {
               * scaled_diff * stan::math::SQRT_2;
         }
       }
-      return operands_and_partials.to_var(ccdf_log,y,mu,sigma);
+      return operands_and_partials.to_var(ccdf_log, y, mu, sigma);
     }
   }
 }

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__VALUE_TYPE_HPP
-#define STAN__MATH__PRIM__SCAL__META__VALUE_TYPE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_VALUE_TYPE_HPP
+#define STAN_MATH_PRIM_SCAL_META_VALUE_TYPE_HPP
 
 #include <vector>
 
@@ -42,16 +42,14 @@ namespace stan {
      */
     template <typename T>
     struct value_type<std::vector<T> > {
-
       /**
        * Type of value stored in a standard vector with type
-       * <code>T</code> entries. 
+       * <code>T</code> entries.
        */
       typedef typename std::vector<T>::value_type type;
-
     };
-    
-    
+
+
   }
 }
 

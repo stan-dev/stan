@@ -1,10 +1,11 @@
-#ifndef STAN__MATH__REV__MAT__FUN__LOG_SUM_EXP_HPP
-#define STAN__MATH__REV__MAT__FUN__LOG_SUM_EXP_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_LOG_SUM_EXP_HPP
+#define STAN_MATH_REV_MAT_FUN_LOG_SUM_EXP_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/calculate_chain.hpp>
 #include <stan/math/prim/scal/fun/log_sum_exp.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -13,19 +14,19 @@ namespace stan {
 
       // these function and the following class just translate
       // log_sum_exp for std::vector for Eigen::Matrix
-      
+
       template <int R, int C>
-      double log_sum_exp_as_double(const Eigen::Matrix<var,R,C>& x) {
+      double log_sum_exp_as_double(const Eigen::Matrix<var, R, C>& x) {
         using std::numeric_limits;
         using std::exp;
         using std::log;
         double max = -numeric_limits<double>::infinity();
-        for (int i = 0; i < x.size(); ++i) 
-          if (x(i) > max) 
+        for (int i = 0; i < x.size(); ++i)
+          if (x(i) > max)
             max = x(i).val();
         double sum = 0.0;
-        for (int i = 0; i < x.size(); ++i) 
-          if (x(i) != -numeric_limits<double>::infinity()) 
+        for (int i = 0; i < x.size(); ++i)
+          if (x(i) != -numeric_limits<double>::infinity())
             sum += exp(x(i).val() - max);
         return max + log(sum);
       }
@@ -33,7 +34,7 @@ namespace stan {
       class log_sum_exp_matrix_vari : public op_matrix_vari {
       public:
         template <int R, int C>
-        log_sum_exp_matrix_vari(const Eigen::Matrix<var,R,C>& x) :
+        explicit log_sum_exp_matrix_vari(const Eigen::Matrix<var, R, C>& x) :
           op_matrix_vari(log_sum_exp_as_double(x), x) {
         }
         void chain() {
@@ -50,7 +51,7 @@ namespace stan {
      * @param x matrix
      */
     template <int R, int C>
-    inline var log_sum_exp(const Eigen::Matrix<var,R,C>& x) {
+    inline var log_sum_exp(const Eigen::Matrix<var, R, C>& x) {
       return var(new log_sum_exp_matrix_vari(x));
     }
 

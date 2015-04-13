@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__ROUND_HPP
-#define STAN__MATH__FWD__SCAL__FUN__ROUND_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_ROUND_HPP
+#define STAN_MATH_FWD_SCAL_FUN_ROUND_HPP
 
 #include <math.h>
 #include <stan/math/fwd/core.hpp>

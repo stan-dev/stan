@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__BASE_MCMC__HPP
-#define STAN__MCMC__BASE_MCMC__HPP
+#ifndef STAN_MCMC_BASE_MCMC_HPP
+#define STAN_MCMC_BASE_MCMC_HPP
 
 #include <stan/mcmc/sample.hpp>
 

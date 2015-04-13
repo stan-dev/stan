@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__INDEX_TYPE_HPP
-#define STAN__MATH__PRIM__SCAL__META__INDEX_TYPE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_INDEX_TYPE_HPP
+#define STAN_MATH_PRIM_SCAL_META_INDEX_TYPE_HPP
 
 namespace stan {
 
@@ -22,7 +22,7 @@ namespace stan {
 
     /**
      * Template class for metaprogram to compute the type of indexes
-     * used in a constant container type. 
+     * used in a constant container type.
      *
      * @tparam T type of container without const modifier.
      */

@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__OUTPUT__HPP
-#define STAN__SERVICES__ARGUMENTS__OUTPUT__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_OUTPUT_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_OUTPUT_HPP
 
 #include <stan/services/arguments/categorical_argument.hpp>
 

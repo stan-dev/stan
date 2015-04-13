@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__PRIMITIVE_VALUE_HPP
-#define STAN__MATH__FWD__SCAL__FUN__PRIMITIVE_VALUE_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_PRIMITIVE_VALUE_HPP
+#define STAN_MATH_FWD_SCAL_FUN_PRIMITIVE_VALUE_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/scal/fun/primitive_value.hpp>
@@ -23,7 +23,7 @@ namespace stan {
       using stan::math::primitive_value;
       return primitive_value(v.val_);
     }
-    
+
 
   }
 

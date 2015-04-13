@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__MDIVIDE_LEFT_LDLT_HPP
-#define STAN__MATH__PRIM__MAT__FUN__MDIVIDE_LEFT_LDLT_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_MDIVIDE_LEFT_LDLT_HPP
+#define STAN_MATH_PRIM_MAT_FUN_MDIVIDE_LEFT_LDLT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -19,16 +19,18 @@ namespace stan {
      * @throws std::domain_error if rows of b don't match the size of A.
      */
 
-    template <int R1,int C1,int R2,int C2, typename T1, typename T2>
-    inline Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
-    mdivide_left_ldlt(const stan::math::LDLT_factor<T1,R1,C1> &A,
-                      const Eigen::Matrix<T2,R2,C2> &b) {
-      stan::math::check_multiplicable("mdivide_left_ldlt", 
+    template <int R1, int C1, int R2, int C2, typename T1, typename T2>
+    inline Eigen::Matrix<typename
+                         boost::math::tools::promote_args<T1, T2>::type,
+                         R1, C2>
+    mdivide_left_ldlt(const stan::math::LDLT_factor<T1, R1, C1> &A,
+                      const Eigen::Matrix<T2, R2, C2> &b) {
+      stan::math::check_multiplicable("mdivide_left_ldlt",
                                                 "A", A,
                                                 "b", b);
-      
-      return A.solve(promote_common<Eigen::Matrix<T1,R2,C2>,
-                                      Eigen::Matrix<T2,R2,C2> >(b));
+
+      return A.solve(promote_common<Eigen::Matrix<T1, R2, C2>,
+                                      Eigen::Matrix<T2, R2, C2> >(b));
     }
 
   }

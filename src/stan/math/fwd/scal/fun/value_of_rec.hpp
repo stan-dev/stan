@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__VALUE_OF_REC_HPP
-#define STAN__MATH__FWD__SCAL__FUN__VALUE_OF_REC_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_VALUE_OF_REC_HPP
+#define STAN_MATH_FWD_SCAL_FUN_VALUE_OF_REC_HPP
 
 #include <stan/math/prim/scal/fun/value_of_rec.hpp>
 #include <stan/math/fwd/core.hpp>
@@ -8,7 +8,7 @@ namespace stan {
   namespace agrad {
 
     /**
-     * Return the value of the specified variable.  
+     * Return the value of the specified variable.
      *
      * T must implement value_of_rec.
      *
@@ -23,7 +23,7 @@ namespace stan {
       return value_of_rec(v.val_);
     }
 
-    
+
   }
 }
 #endif

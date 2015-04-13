@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__TCROSSPROD_HPP
-#define STAN__MATH__PRIM__MAT__FUN__TCROSSPROD_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_TCROSSPROD_HPP
+#define STAN_MATH_PRIM_MAT_FUN_TCROSSPROD_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
@@ -16,10 +16,10 @@ namespace stan {
     inline matrix_d
     tcrossprod(const matrix_d& M) {
         if (M.rows() == 0)
-          return matrix_d(0,0);
+          return matrix_d(0, 0);
         if (M.rows() == 1)
           return M * M.transpose();
-        matrix_d result(M.rows(),M.rows());
+        matrix_d result(M.rows(), M.rows());
         return result
           .setZero()
           .selfadjointView<Eigen::Upper>()

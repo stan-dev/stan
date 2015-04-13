@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__ACCUMULATOR_HPP
-#define STAN__MATH__PRIM__MAT__FUN__ACCUMULATOR_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_ACCUMULATOR_HPP
+#define STAN_MATH_PRIM_MAT_FUN_ACCUMULATOR_HPP
 
-#include <vector>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat/fun/sum.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/type_traits/is_same.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/mat/fun/sum.hpp>
+#include <vector>
 
 namespace stan {
   namespace math {
@@ -28,7 +28,7 @@ namespace stan {
 
     public:
       /**
-       * Construct an accumulator. 
+       * Construct an accumulator.
        */
       accumulator()
         : buf_() {
@@ -38,7 +38,7 @@ namespace stan {
        * Destroy an accumulator.
        */
       ~accumulator() { }
-      
+
       /**
        * Add the specified arithmetic type value to the buffer after
        * static casting it to the class type <code>T</code>.
@@ -68,8 +68,8 @@ namespace stan {
        * @param x Value to add
        */
       template <typename S>
-      typename boost::disable_if<boost::is_arithmetic<S>, 
-                                 typename boost::enable_if<boost::is_same<S,T>,
+      typename boost::disable_if<boost::is_arithmetic<S>,
+                                 typename boost::enable_if<boost::is_same<S, T>,
                                                            void>::type >::type
       add(const S& x) {
         buf_.push_back(x);
@@ -85,11 +85,11 @@ namespace stan {
        * @param m Matrix of values to add
        */
       template <typename S, int R, int C>
-      void add(const Eigen::Matrix<S,R,C>& m) {
+      void add(const Eigen::Matrix<S, R, C>& m) {
         for (int i = 0; i < m.size(); ++i)
           add(m(i));
       }
-      
+
       /**
        * Recursively add each entry in the specified standard vector
        * to the buffer.  This will allow vectors of primitives,
@@ -104,7 +104,7 @@ namespace stan {
         for (size_t i = 0; i < xs.size(); ++i)
           add(xs[i]);
       }
-      
+
       /**
        * Return the sum of the accumulated values.
        *
@@ -114,7 +114,6 @@ namespace stan {
         using math::sum;
         return sum(buf_);
       }
-
     };
 
 

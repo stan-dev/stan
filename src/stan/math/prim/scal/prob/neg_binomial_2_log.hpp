@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__NEG_BINOMIAL_2_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__NEG_BINOMIAL_2_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_2_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_2_LOG_HPP
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/random/negative_binomial_distribution.hpp>
@@ -29,7 +29,7 @@ namespace stan {
 
   namespace prob {
 
-    // NegBinomial(n|mu,phi)  [mu >= 0; phi > 0;  n >= 0]
+    // NegBinomial(n|mu, phi)  [mu >= 0; phi > 0;  n >= 0]
     template <bool propto,
               typename T_n,
               typename T_location, typename T_precision>
@@ -37,8 +37,8 @@ namespace stan {
     neg_binomial_2_log(const T_n& n,
                        const T_location& mu,
                        const T_precision& phi) {
-      typedef typename stan::partials_return_type<T_n,T_location,
-                                                  T_precision>::type 
+      typedef typename stan::partials_return_type<T_n, T_location,
+                                                  T_precision>::type
         T_partials_return;
 
       static const char* function("stan::prob::neg_binomial_2_log");
@@ -65,7 +65,7 @@ namespace stan {
                              "Precision parameter", phi);
 
       // check if no variables are involved and prop-to
-      if (!include_summand<propto,T_location,T_precision>::value)
+      if (!include_summand<propto, T_location, T_precision>::value)
         return 0.0;
 
       using stan::math::multiply_log;
@@ -84,15 +84,15 @@ namespace stan {
 
       size_t len_ep = max_size(mu, phi);
       size_t len_np = max_size(n, phi);
-      
+
       VectorBuilder<true, T_partials_return, T_location> mu__(length(mu));
       for (size_t i = 0, size = length(mu); i < size; ++i)
         mu__[i] = value_of(mu_vec[i]);
-  
+
       VectorBuilder<true, T_partials_return, T_precision> phi__(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         phi__[i] = value_of(phi_vec[i]);
-      
+
       VectorBuilder<true, T_partials_return, T_precision> log_phi(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         log_phi[i] = log(phi__[i]);
@@ -102,7 +102,7 @@ namespace stan {
       for (size_t i = 0; i < len_ep; ++i)
         log_mu_plus_phi[i] = log(mu__[i] + phi__[i]);
 
-      VectorBuilder<true, T_partials_return, T_n, T_precision> 
+      VectorBuilder<true, T_partials_return, T_n, T_precision>
         n_plus_phi(len_np);
       for (size_t i = 0; i < len_np; ++i)
         n_plus_phi[i] = n_vec[i] + phi__[i];
@@ -110,27 +110,27 @@ namespace stan {
       for (size_t i = 0; i < size; i++) {
         if (include_summand<propto>::value)
           logp -= lgamma(n_vec[i] + 1.0);
-        if (include_summand<propto,T_precision>::value)
+        if (include_summand<propto, T_precision>::value)
           logp += multiply_log(phi__[i], phi__[i]) - lgamma(phi__[i]);
-        if (include_summand<propto,T_location,T_precision>::value)
+        if (include_summand<propto, T_location, T_precision>::value)
           logp -= (n_plus_phi[i])*log_mu_plus_phi[i];
-        if (include_summand<propto,T_location>::value)
+        if (include_summand<propto, T_location>::value)
           logp += multiply_log(n_vec[i], mu__[i]);
-        if (include_summand<propto,T_precision>::value)
+        if (include_summand<propto, T_precision>::value)
           logp += lgamma(n_plus_phi[i]);
 
         if (!is_constant_struct<T_location>::value)
           operands_and_partials.d_x1[i]
-            += n_vec[i]/mu__[i] 
+            += n_vec[i]/mu__[i]
             - (n_vec[i] + phi__[i])
             / (mu__[i] + phi__[i]);
         if (!is_constant_struct<T_precision>::value)
           operands_and_partials.d_x2[i]
             += 1.0 - n_plus_phi[i]/(mu__[i] + phi__[i])
-            + log_phi[i] - log_mu_plus_phi[i] - digamma(phi__[i]) 
+            + log_phi[i] - log_mu_plus_phi[i] - digamma(phi__[i])
             + digamma(n_plus_phi[i]);
       }
-      return operands_and_partials.to_var(logp,mu,phi);
+      return operands_and_partials.to_var(logp, mu, phi);
     }
 
     template <typename T_n,

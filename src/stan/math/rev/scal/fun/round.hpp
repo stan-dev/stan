@@ -1,9 +1,10 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__ROUND_HPP
-#define STAN__MATH__REV__SCAL__FUN__ROUND_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_ROUND_HPP
+#define STAN_MATH_REV_SCAL_FUN_ROUND_HPP
 
 #include <math.h>
 #include <stan/math/rev/core.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <limits>
 
 namespace stan {
   namespace agrad {
@@ -11,8 +12,8 @@ namespace stan {
     namespace {
       class round_vari : public op_v_vari {
       public:
-        round_vari(vari* avi) :
-          op_v_vari(::round(avi->val_),avi) {
+        explicit round_vari(vari* avi) :
+          op_v_vari(::round(avi->val_), avi) {
         }
         void chain() {
           if (unlikely(boost::math::isnan(avi_->val_)))
@@ -34,16 +35,16 @@ namespace stan {
      *
      *
        \f[
-       \mbox{round}(x) = 
+       \mbox{round}(x) =
        \begin{cases}
          \lceil x \rceil & \mbox{if } x-\lfloor x\rfloor \geq 0.5 \\
          \lfloor x \rfloor & \mbox{if } x-\lfloor x\rfloor < 0.5 \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{round}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{round}(x)}{\partial x} =
        \begin{cases}
          0 & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

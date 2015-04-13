@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__GUMBEL_CDF_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__GUMBEL_CDF_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_GUMBEL_CDF_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_GUMBEL_CDF_LOG_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -23,10 +23,10 @@ namespace stan {
   namespace prob {
 
     template <typename T_y, typename T_loc, typename T_scale>
-    typename return_type<T_y,T_loc,T_scale>::type
+    typename return_type<T_y, T_loc, T_scale>::type
     gumbel_cdf_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
       static const char* function("stan::prob::gumbel_cdf_log");
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type
+      typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
       using stan::math::check_positive;
@@ -37,8 +37,8 @@ namespace stan {
 
       T_partials_return cdf_log(0.0);
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
+      if (!(stan::length(y)
+            && stan::length(mu)
             && stan::length(beta)))
         return cdf_log;
 
@@ -46,12 +46,12 @@ namespace stan {
       check_finite(function, "Location parameter", mu);
       check_not_nan(function, "Scale parameter", beta);
       check_positive(function, "Scale parameter", beta);
-      check_consistent_sizes(function, 
+      check_consistent_sizes(function,
                              "Random variable", y,
                              "Location parameter", mu,
                              "Scale parameter", beta);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, beta);
 
       VectorView<const T_y> y_vec(y);
@@ -75,7 +75,7 @@ namespace stan {
           operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff;
       }
 
-      return operands_and_partials.to_var(cdf_log,y,mu,beta);
+      return operands_and_partials.to_var(cdf_log, y, mu, beta);
     }
   }
 }

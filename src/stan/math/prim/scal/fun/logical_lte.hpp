@@ -1,9 +1,9 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__LOGICAL_LTE_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__LOGICAL_LTE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_LOGICAL_LTE_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_LOGICAL_LTE_HPP
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Return 1 if the first argument is less than or equal to the second.
      * Equivalent to <code>x1 &lt;= x2</code>.

@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__POSITIVE_ORDERED_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__MAT__FUN__POSITIVE_ORDERED_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_POSITIVE_ORDERED_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_MAT_FUN_POSITIVE_ORDERED_CONSTRAIN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <cmath>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -19,15 +19,15 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
-    positive_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+    Eigen::Matrix<T, Eigen::Dynamic, 1>
+    positive_ordered_constrain(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
       using stan::math::index_type;
-      typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
+      typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 
       size_type k = x.size();
-      Matrix<T,Dynamic,1> y(k);
+      Matrix<T, Dynamic, 1> y(k);
       if (k == 0)
         return y;
       y[0] = exp(x[0]);
@@ -45,17 +45,18 @@ namespace stan {
      *
      * @param x Free vector of scalars.
      * @param lp Log probability reference.
-     * @return Positive, increasing ordered vector. 
+     * @return Positive, increasing ordered vector.
      * @tparam T Type of scalar.
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,Eigen::Dynamic,1> 
-    positive_ordered_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x, T& lp) {
+    Eigen::Matrix<T, Eigen::Dynamic, 1>
+    positive_ordered_constrain(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
+                               T& lp) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
       using stan::math::index_type;
-      typedef typename index_type<Matrix<T,Dynamic,1> >::type size_type;
+      typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 
       for (size_type i = 0; i < x.size(); ++i)
         lp += x(i);
