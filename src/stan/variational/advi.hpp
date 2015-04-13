@@ -268,6 +268,8 @@ namespace stan {
       void do_robbins_monro_adagrad( advi_params_fullrank& muL,
                                      double tol_rel_obj,
                                      int max_iterations ) {
+        static const char* function =
+          "stan::variational::advi.do_robbins_monro_adagrad";
 
         stan::math::check_positive(function,
                                    "Relative objective function tolerance",
@@ -417,6 +419,8 @@ namespace stan {
       void do_robbins_monro_adagrad( advi_params_meanfield& musigmatilde,
                                      double tol_rel_obj,
                                      int max_iterations ) {
+        static const char* function =
+          "stan::variational::advi.do_robbins_monro_adagrad";
 
         stan::math::check_positive(function,
                                    "Relative objective function tolerance",
