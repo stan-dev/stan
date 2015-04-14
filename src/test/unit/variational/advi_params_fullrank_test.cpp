@@ -40,21 +40,13 @@ TEST(advi_params_fullrank_test, mean_vector) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::Vector3d mu_nan = Eigen::VectorXd::Constant(3, nan);
 
-  std::string error = "stan::variational::advi_params_fullrank: "
-                      "Mean vector is nan, but must not be nan!";
-  EXPECT_THROW_MSG(stan::variational::advi_params_fullrank my_advi_params_fullrank_nan(mu_nan, L);,
-                   std::domain_error, error);
-
-  error = "stan::variational::advi_params_fullrank::set_mu: "
-          "Input vector is nan, but must not be nan!";
-  EXPECT_THROW_MSG(my_advi_params_fullrank.set_mu(mu_nan);,
-                   std::domain_error, error);
-
+  EXPECT_THROW(stan::variational::advi_params_fullrank my_advi_params_fullrank_nan(mu_nan, L);,
+                   std::domain_error);
+  EXPECT_THROW(my_advi_params_fullrank.set_mu(mu_nan);,
+                   std::domain_error);
   Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3,3,nan);
-  error = "stan::variational::advi_params_fullrank: "
-          "Cholesky factor is not lower triangular; Cholesky factor[1,2]=nan";
-  EXPECT_THROW_MSG(stan::variational::advi_params_fullrank my_advi_params_fullrank_nan(mu, L_nan);,
-                   std::domain_error, error);
+  EXPECT_THROW(stan::variational::advi_params_fullrank my_advi_params_fullrank_nan(mu, L_nan);,
+                   std::domain_error);
 
 }
 
@@ -80,10 +72,8 @@ TEST(advi_params_fullrank_test, cholesky_factor) {
 
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3,3,nan);
-  std::string error = "stan::variational::advi_params_fullrank::set_L_chol: "
-          "Cholesky factor is not lower triangular; Cholesky factor[1,2]=nan";
-  EXPECT_THROW_MSG(my_advi_params_fullrank.set_L_chol(L_nan),
-                   std::domain_error, error);
+  EXPECT_THROW(my_advi_params_fullrank.set_L_chol(L_nan),
+                   std::domain_error);
 
 }
 
@@ -133,9 +123,6 @@ TEST(advi_params_fullrank_test, transform_to_unconstrained) {
 
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::Vector3d x_nan = Eigen::VectorXd::Constant(3, nan);
-
-  std::string error = "stan::variational::advi_params_fullrank::to_unconstrained: "
-          "Input vector is nan, but must not be nan!";
-  EXPECT_THROW_MSG(my_advi_params_fullrank.to_unconstrained(x_nan);,
-                   std::domain_error, error);
+  EXPECT_THROW(my_advi_params_fullrank.to_unconstrained(x_nan);,
+                   std::domain_error);
 }
