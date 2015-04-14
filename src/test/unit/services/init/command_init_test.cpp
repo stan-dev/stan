@@ -1,6 +1,6 @@
+#include <test/test-models/good/services/test_lp.hpp>
 #include <stan/services/command.hpp>
 #include <gtest/gtest.h>
-#include <test/test-models/good/services/test_lp.hpp>
 
 typedef test_lp_model_namespace::test_lp_model Model;
 typedef boost::ecuyer1988 rng_t;
