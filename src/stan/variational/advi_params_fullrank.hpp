@@ -1,7 +1,6 @@
 #ifndef STAN__VARIATIONAL__ADVI_PARAMS_FULLRANK__HPP
 #define STAN__VARIATIONAL__ADVI_PARAMS_FULLRANK__HPP
 
-#include <vector>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/LDLT_factor.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
@@ -9,28 +8,25 @@
 #include <stan/math/prim/mat/err/check_square.hpp>
 #include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
 #include <stan/math/prim/scal/err/check_size_match.hpp>
-#include <stan/math/prim/scal/err/check_size_match.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
+
+#include <vector>
 
 namespace stan {
 
   namespace variational {
 
     class advi_params_fullrank {
-
     private:
-
-      Eigen::VectorXd mu_;     // Mean of location-scale family
-      Eigen::MatrixXd L_chol_; // Cholesky factor of scale matrix
-                               // NOTE: \Sigma = L_chol_ * L_chol_.transpose()
+      Eigen::VectorXd mu_;      // Mean of location-scale family
+      Eigen::MatrixXd L_chol_;  // Cholesky factor of scale matrix
+                                // NOTE: \Sigma = L_chol_ * L_chol_.transpose()
       int dimension_;
 
     public:
-
       advi_params_fullrank(const Eigen::VectorXd& mu,
                            const Eigen::MatrixXd& L_chol) :
       mu_(mu), L_chol_(L_chol), dimension_(mu.size()) {
-
         static const char* function =
           "stan::variational::advi_params_fullrank";
 
@@ -41,10 +37,9 @@ namespace stan {
           stan::math::check_not_nan(function, "Mean vector", mu_(i));
         stan::math::check_cholesky_factor(function,
                                "Cholesky factor", L_chol_);
+      }
 
-      };
-
-      virtual ~advi_params_fullrank() {}; // No-op
+      virtual ~advi_params_fullrank() {}  // No-op
 
       // Accessors
       int dimension() const { return dimension_; }
@@ -58,7 +53,7 @@ namespace stan {
 
         stan::math::check_size_match(function,
                                "Dimension of input vector", mu.size(),
-                               "Dimension of current vector", dimension_ );
+                               "Dimension of current vector", dimension_);
         for (int i = 0; i < dimension_; ++i)
           stan::math::check_not_nan(function, "Input vector", mu(i));
         mu_ = mu;
@@ -70,7 +65,7 @@ namespace stan {
 
         stan::math::check_size_match(function,
                                "Dimension of mean vector",     dimension_,
-                               "Dimension of Cholesky factor", L_chol.rows() );
+                               "Dimension of Cholesky factor", L_chol.rows());
         stan::math::check_cholesky_factor(function,
                                "Cholesky factor", L_chol);
 
@@ -83,10 +78,10 @@ namespace stan {
       double entropy() const {
         double tmp(0.0);
         double result(
-          0.5 * static_cast<double>(dimension_) * (1.0 + stan::prob::LOG_TWO_PI)
-          );
+          0.5 * static_cast<double>(dimension_)
+          * (1.0 + stan::prob::LOG_TWO_PI));
         for (int d = 0; d < dimension_; ++d) {
-          tmp = fabs(L_chol_(d,d));
+          tmp = fabs(L_chol_(d, d));
           if (tmp != 0.0) {
             result += log(tmp);
           }
@@ -121,17 +116,14 @@ namespace stan {
 
         stan::math::check_size_match(function,
                          "Dimension of input vector", z_check.size(),
-                         "Dimension of mean vector",  dimension_ );
+                         "Dimension of mean vector",  dimension_);
         for (int i = 0; i < dimension_; ++i)
           stan::math::check_not_nan(function, "Input vector", z_check(i));
 
         return L_chol_*z_check + mu_;
-      };
-
+      }
     };
-
-  } // variational
-
-} // stan
+  }  // variational
+}  // stan
 
 #endif

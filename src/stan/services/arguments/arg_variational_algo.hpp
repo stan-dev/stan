@@ -11,11 +11,8 @@ namespace stan {
   namespace services {
 
     class arg_variational_algo: public list_argument {
-
     public:
-
       arg_variational_algo() {
-
         _name = "algorithm";
         _description = "Variational inference algorithm";
 
@@ -24,14 +21,10 @@ namespace stan {
 
         _default_cursor = 0;
         _cursor = _default_cursor;
-
       }
-
     };
-
-  } // services
-
-} // stan
+  }  // services
+}  // stan
 
 #endif
 

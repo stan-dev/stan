@@ -14,11 +14,8 @@ namespace stan {
   namespace services {
 
     class arg_variational: public categorical_argument {
-
     public:
-
       arg_variational() {
-
         _name = "variational";
         _description = "Variational inference";
 
@@ -31,14 +28,10 @@ namespace stan {
         _subarguments.push_back(new arg_iter());
         _subarguments.push_back(new arg_tolerance("tol_rel_obj",
           "Convergence tolerance on the relative norm of the objective", 1e-2));
-
       }
-
     };
-
-  } // services
-
-} // stan
+  }  // services
+}  // stan
 
 #endif
 

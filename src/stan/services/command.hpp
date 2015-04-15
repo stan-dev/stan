@@ -664,7 +664,6 @@ namespace stan {
       //////////////////////////////////////////////////
 
       if (parser.arg("method")->arg("variational")) {
-
         stan::services::list_argument* algo
           = dynamic_cast<stan::services::list_argument*>(parser.arg("method")
             ->arg("variational")->arg("algorithm"));
@@ -695,14 +694,14 @@ namespace stan {
             std::vector<std::string> names;
             names.push_back("lp");
             names.push_back("ELBO");
-            model.constrained_param_names(names,true,true);
+            model.constrained_param_names(names, true, true);
 
             (*output_stream) << names.at(0);
             for (size_t i = 1; i < names.size(); ++i) {
               (*output_stream) << "," << names.at(i);
             }
             (*output_stream) << std::endl;
-            (*output_stream) << 0 << "," ;
+            (*output_stream) << 0 << ",";
           }
 
           stan::variational::advi<Model, rng_t>
@@ -727,7 +726,6 @@ namespace stan {
             io::write_iteration(*output_stream, model, base_rng,
                             elbo, cont_vector, disc_vector);
           }
-
         }
 
         if (algo->value() == "meanfield") {
@@ -737,14 +735,14 @@ namespace stan {
             std::vector<std::string> names;
             names.push_back("lp");
             names.push_back("ELBO");
-            model.constrained_param_names(names,true,true);
+            model.constrained_param_names(names, true, true);
 
             (*output_stream) << names.at(0);
             for (size_t i = 1; i < names.size(); ++i) {
               (*output_stream) << "," << names.at(i);
             }
             (*output_stream) << std::endl;
-            (*output_stream) << 0 << "," ;
+            (*output_stream) << 0 << ",";
           }
 
           stan::variational::advi<Model, rng_t>
@@ -769,9 +767,7 @@ namespace stan {
             io::write_iteration(*output_stream, model, base_rng,
                             elbo, cont_vector, disc_vector);
           }
-
         }
-
       }
 
       if (output_stream) {
