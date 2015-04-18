@@ -496,7 +496,7 @@ discrete distributions, require integer arguments.
 A two-dimensional array is just an array of arrays, both conceptually
 and in terms of current implementation.  When an index is supplied to
 an array, it returns the value at that index.  When more than one
-index is supplied, this idexing operation is chained.  For example, if
+index is supplied, this indexing operation is chained.  For example, if
 \code{a} is a two-dimensional array, then \code{a[m,n]} is just
 a convenient shorthand for \code{a[m][n]}.
 
@@ -748,7 +748,7 @@ model {
 The constraint \code{lower=0} in the declaration of \code{sigma}
 constrains the value to be greater than or equal to 0.  With no prior
 in the model block, the effect is an improper prior on non-negative
-real numbers.  Althogh a more informative prior may be added, improper
+real numbers.  Although a more informative prior may be added, improper
 priors are acceptable as long as they lead to proper posteriors.
 
 In the model above, \code{x} is an $N \times K$ matrix of predictors
@@ -968,7 +968,7 @@ without such constraints, or boundary-avoid priors should be used (see
 
 \subsection{Fat-Tailed Priors and ``Default'' Priors}
 
-A reasonable alternative if we want to accomodate outliers is to use a
+A reasonable alternative if we want to accommodate outliers is to use a
 prior that concentrates most of mass around the area where values are
 expected to be, but still leaves a lot of mass in its tails.  The
 usual choice in such a situation is to use a Cauchy distribution for a
@@ -1313,7 +1313,7 @@ the same prior on \code{beta\_raw}.
 
 \subsection{Translated and Scaled Simplex}
 
-An alternative approch that's less efficient, but amenable to a
+An alternative approach that's less efficient, but amenable to a
 a symmetric prior, is to offset and scale a simplex.
 %
 \begin{stancode}
@@ -1400,7 +1400,7 @@ the probability is needed only up to a proportion.
 \subsubsection{Ordered Probit}
 
 An ordered probit model could be coded in exactly the same way by
-swapping the cumultive logistic (\code{inv\_logit}) for the cumulative
+swapping the cumulative logistic (\code{inv\_logit}) for the cumulative
 normal (\code{Phi}).
 %
 
@@ -8291,7 +8291,7 @@ and $\lambda_2=-1000000000$ as it does in the neighborhood of
 $\lambda_1=0$ and $\lambda_2=0$, and so on for ever more far-ranging
 values.
 
-The maringal posterior $p(\lambda_1,\lambda_2|y)$ for this model is
+The marginal posterior $p(\lambda_1,\lambda_2|y)$ for this model is
 thus improper.%
 %
 \footnote{The marginal posterior $p(\sigma|y)$ for $\sigma$ is proper
@@ -8784,7 +8784,7 @@ $\psi$ at all points in $[0,1]$.
 
 With an improper posterior, it is theoretically impossible to properly
 explore the posterior. However, Gibbs sampling as performed by BUGS
-and JAGS, although still ineable to properly sample from such an
+and JAGS, although still unable to properly sample from such an
 improper posterior, behaves quite differently in practice than the
 Hamiltonian Monte Carlo sampling performed by Stan when faced with an
 example such as the two intercept model discussed in
