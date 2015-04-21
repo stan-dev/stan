@@ -122,7 +122,8 @@ namespace stan {
       VectorView<const T_tau> tau_vec(tau);
       VectorView<const T_delta> delta_vec(delta);
 
-      if (!include_summand<propto, T_y, T_alpha, T_tau, T_beta, T_delta>::value) {
+      if (!include_summand<propto, T_y, T_alpha, T_tau,
+          T_beta, T_delta>::value) {
         return 0;
       }
 
@@ -134,7 +135,8 @@ namespace stan {
 
         for (size_t i = 0; i < N; i++) {
           typename scalar_type<T_beta>::type one_minus_beta = 1.0 - beta_vec[i];
-          typename scalar_type<T_alpha>::type alpha2 = alpha_vec[i] * alpha_vec[i];
+          typename scalar_type<T_alpha>::type alpha2 = alpha_vec[i] *
+                                                       alpha_vec[i];
           T_return_type x = y_vec[i];
           T_return_type kl, ks, tmp = 0;
           T_return_type k, K;
