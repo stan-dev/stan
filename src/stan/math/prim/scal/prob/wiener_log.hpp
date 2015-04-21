@@ -89,7 +89,8 @@ namespace stan {
         && stan::length(delta)))
         return 0.0;
 
-      typedef typename return_type<T_y, T_alpha, T_tau, T_beta, T_delta>::type T_return_type;
+      typedef typename return_type<T_y, T_alpha, T_tau,
+                                   T_beta, T_delta>::type T_return_type;
       T_return_type lp(0.0);
 
       check_not_nan(function, "Random variable", y);
