@@ -89,7 +89,7 @@ namespace stan {
         && stan::length(delta)))
         return 0.0;
 
-      typedef typename return_type<T_y, T_alpha,T_tau,T_beta,T_delta>::type T_return_type;
+      typedef typename return_type<T_y, T_alpha, T_tau, T_beta, T_delta>::type T_return_type;
       T_return_type lp(0.0);
 
       check_not_nan(function, "Random variable", y);
@@ -142,21 +142,22 @@ namespace stan {
         x = x - tau_vec[i];  // remove non-decision time from x
         x = x / alpha2;  // convert t to normalized time tt
 
-        // calculate number of terms needed for large t: 
+        // calculate number of terms needed for large t:
         // if error threshold is set low enough
-        if (MY_PI * x * WIENER_ERR < 1) {  
+        if (MY_PI * x * WIENER_ERR < 1) {
           // compute bound
           kl = sqrt(-2.0 * log(MY_PI * x * WIENER_ERR) / (pow(MY_PI, 2) * x));
           // ensure boundary conditions met
           kl = (kl > 1.0 / (MY_PI * sqrt(x))) ? kl : 1.0 / (MY_PI * sqrt(x));
-        } else {// if error threshold set too high
+        } else {  // if error threshold set too high
           kl = 1.0 / (MY_PI * sqrt(x));  // set to boundary condition
         }
         // calculate number of terms needed for small t:
         // if error threshold is set low enough
-        if ((2.0 * sqrt(2.0 * MY_PI * x) * WIENER_ERR) < 1) { 
+        if ((2.0 * sqrt(2.0 * MY_PI * x) * WIENER_ERR) < 1) {
           // compute bound
-          ks = 2.0 + sqrt(-2.0 * x * log(2.0 * sqrt(2.0 * MY_PI * x) * WIENER_ERR));
+          ks = 2.0 + sqrt(-2.0 * x *
+               log(2.0 * sqrt(2.0 * MY_PI * x) * WIENER_ERR));
           // ensure boundary conditions are met
           ks = (ks > sqrt(x) + 1.0) ? ks : sqrt(x) + 1.0;
         } else {  // if error threshold was set too high
@@ -167,19 +168,23 @@ namespace stan {
           K = ceil(ks);  // round to smallest integer meeting error
           for (k = -floor((K - 1.0) / 2.0); k <= ceil((K - 1.0) / 2.0); k++)
             // increment sum
-            tmp += (one_minus_beta + 2.0 * k) * exp(-(pow((one_minus_beta + 2.0 * k), 2)) / 2.0 / x);
+            tmp += (one_minus_beta + 2.0 * k) *
+                    exp(-(pow((one_minus_beta + 2.0 * k), 2)) / 2.0 / x);
             // add constant term
-            tmp = log(tmp) - 0.5 * log(2.0) - MY_LN_SQRT_PI - 1.5 * log(x); 
-        } else { // if large t is better...
-          K = ceil(kl); // round to smallest integer meeting error
+            tmp = log(tmp) - 0.5 * log(2.0) - MY_LN_SQRT_PI - 1.5 * log(x);
+        } else {  // if large t is better...
+          K = ceil(kl);  // round to smallest integer meeting error
           for (k = 1; k <= K; k++)
             // increment sum
-            tmp += k * exp(-(pow(k, 2)) * (pow(MY_PI, 2)) * x / 2.0) * sin(k * MY_PI * one_minus_beta);
+            tmp += k * exp(-(pow(k, 2)) *
+                   (pow(MY_PI, 2)) * x / 2.0) *
+                   sin(k * MY_PI * one_minus_beta);
             tmp = log(tmp) + 2.0 * MY_LN_SQRT_PI;  // add constant term
         }
 
         // convert to f(t|v,a,w) and return result
-        lp += delta_vec[i] * alpha_vec[i] * one_minus_beta - pow(delta_vec[i], 2) * x * alpha2 / 2.0 - log(alpha2) + tmp;
+        lp += delta_vec[i] * alpha_vec[i] * one_minus_beta -
+              pow(delta_vec[i], 2) * x * alpha2 / 2.0 - log(alpha2) + tmp;
       }
 
       return lp;
