@@ -6,7 +6,7 @@
 #include <stan/math/prim/scal/meta/constants.hpp>
 
 #include <stan/math/prim/mat/err/check_square.hpp>
-#include <stan/math/prim/mat/err/check_cholesky_factor.hpp>
+#include <stan/math/prim/mat/err/check_lower_triangular.hpp>
 #include <stan/math/prim/scal/err/check_size_match.hpp>
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
 
@@ -35,7 +35,7 @@ namespace stan {
                                "Dimension of Cholesky factor", L_chol_.rows() );
         for (int i = 0; i < dimension_; ++i)
           stan::math::check_not_nan(function, "Mean vector", mu_(i));
-        stan::math::check_cholesky_factor(function,
+        stan::math::check_lower_triangular(function,
                                "Cholesky factor", L_chol_);
       }
 
@@ -66,7 +66,7 @@ namespace stan {
         stan::math::check_size_match(function,
                                "Dimension of mean vector",     dimension_,
                                "Dimension of Cholesky factor", L_chol.rows());
-        stan::math::check_cholesky_factor(function,
+        stan::math::check_lower_triangular(function,
                                "Cholesky factor", L_chol);
 
         L_chol_ = L_chol;
