@@ -83,7 +83,7 @@
 #include <stan/math/prim/scal/fun/prob_free.hpp>
 #include <stan/math/prim/scal/fun/promote_scalar.hpp>
 #include <stan/math/prim/scal/fun/promote_scalar_type.hpp>
-#include <stan/math/prim/scal/run/reg_inc_beta_derivs.hpp>
+#include <stan/math/prim/scal/fun/reg_inc_beta_derivs.hpp>
 #include <stan/math/prim/scal/fun/rising_factorial.hpp>
 #include <stan/math/prim/scal/fun/sign.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>

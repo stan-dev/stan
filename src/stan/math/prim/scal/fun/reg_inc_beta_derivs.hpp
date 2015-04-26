@@ -28,7 +28,7 @@ namespace stan {
       digamma_ab += 1.0 / (a + b);
       digamma_a += 1.0 / (a + 1);
 
-      while (std::fabs(summand) > threshold) {
+      while (fabs(summand) > threshold) {
         sum_numer += (digamma_ab - digamma_a) * summand;
         sum_denom += summand;
 
@@ -44,7 +44,7 @@ namespace stan {
       }
 
       return boost::math::ibeta(a, b, z)
-             * (std::log(z) + sum_numer / sum_denom);
+      * (std::log(z) + sum_numer / sum_denom);
     }
     
     template <typename T>
@@ -64,7 +64,7 @@ namespace stan {
       T k = 1;
       digamma_ab += 1.0 / (a + b);
 
-      while (std::fabs(summand) > threshold) {
+      while (fabs(summand) > threshold) {
         sum_numer += digamma_ab * summand;
         sum_denom += summand;
 
@@ -79,7 +79,7 @@ namespace stan {
       }
 
       return boost::math::ibeta(a, b, z)
-             * (std::log(1 - z) - digamma_b + sum_numer / sum_denom);
+      * (std::log(1 - z) - digamma_b + sum_numer / sum_denom);
     }
 
   } // math
