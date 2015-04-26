@@ -1,29 +1,23 @@
 #ifndef STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_CDF_HPP
 #define STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_CDF_HPP
 
+#include <boost/math/special_functions/beta.hpp>
 #include <boost/math/special_functions/digamma.hpp>
-#include <boost/random/negative_binomial_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
+
 #include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
-#include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
-#include <stan/math/prim/scal/err/check_nonnegative.hpp>
-#include <stan/math/prim/scal/err/check_positive_finite.hpp>
-#include <stan/math/prim/scal/fun/constants.hpp>
-#include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/prim/scal/fun/binomial_coefficient_log.hpp>
-#include <stan/math/prim/scal/fun/multiply_log.hpp>
-#include <stan/math/prim/scal/fun/digamma.hpp>
-#include <stan/math/prim/scal/fun/lgamma.hpp>
-#include <stan/math/prim/scal/fun/lbeta.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
-#include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
-#include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+
+#include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
+#include <stan/math/prim/scal/err/check_positive_finite.hpp>
+
+#include <stan/math/prim/scal/fun/value_of.hpp>
+#include <stan/math/prim/scal/fun/reg_inc_beta_derivs.hpp>
+
 #include <limits>
 
 namespace stan {
-
   namespace prob {
 
     // Negative Binomial CDF
@@ -40,7 +34,6 @@ namespace stan {
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
 
       // Ensure non-zero arugment lengths
       if (!(stan::length(n) && stan::length(alpha) && stan::length(beta)))
@@ -64,11 +57,6 @@ namespace stan {
 
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
-      using stan::math::inc_beta;
-      using stan::math::digamma;
-      using stan::math::lbeta;
-      using std::exp;
-      using std::pow;
 
       agrad::OperandsAndPartials<T_shape, T_inv_scale>
         operands_and_partials(alpha, beta);
@@ -83,29 +71,26 @@ namespace stan {
       // Cache a few expensive function calls if alpha is a parameter
       VectorBuilder<!is_constant_struct<T_shape>::value,
                     T_partials_return, T_shape>
-        digammaN_vec(stan::length(alpha));
+        digamma_alpha_vec(stan::length(alpha));
+      
       VectorBuilder<!is_constant_struct<T_shape>::value,
                     T_partials_return, T_shape>
-        digammaAlpha_vec(stan::length(alpha));
-      VectorBuilder<!is_constant_struct<T_shape>::value,
-                    T_partials_return, T_shape>
-        digammaSum_vec(stan::length(alpha));
+        digamma_sum_vec(stan::length(alpha));
+
       if (!is_constant_struct<T_shape>::value) {
         for (size_t i = 0; i < stan::length(alpha); i++) {
           const T_partials_return n_dbl = value_of(n_vec[i]);
           const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
 
-          digammaN_vec[i] = digamma(n_dbl + 1);
-          digammaAlpha_vec[i] = digamma(alpha_dbl);
-          digammaSum_vec[i] = digamma(n_dbl + alpha_dbl + 1);
+          digamma_alpha_vec[i] = boost::math::digamma(alpha_dbl);
+          digamma_sum_vec[i] = boost::math::digamma(n_dbl + alpha_dbl + 1);
         }
       }
 
       for (size_t i = 0; i < size; i++) {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
-        if (value_of(n_vec[i])
-            == std::numeric_limits<int>::max())
+        if (value_of(n_vec[i]) == std::numeric_limits<int>::max())
           return operands_and_partials.to_var(1.0, alpha, beta);
 
         const T_partials_return n_dbl = value_of(n_vec[i]);
@@ -116,31 +101,22 @@ namespace stan {
         const T_partials_return d_dbl = 1.0 / ( (1.0 + beta_dbl)
                                                 * (1.0 + beta_dbl) );
 
-        const T_partials_return Pi = inc_beta(alpha_dbl, n_dbl + 1.0, p_dbl);
+        const T_partials_return P_i =
+          boost::math::ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
 
-        const T_partials_return beta_func = exp(lbeta(n_dbl + 1, alpha_dbl));
-
-
-        P *= Pi;
+        P *= P_i;
 
         if (!is_constant_struct<T_shape>::value) {
-          T_partials_return g1 = 0;
-          T_partials_return g2 = 0;
-
-          stan::math::grad_reg_inc_beta(g1, g2, alpha_dbl,
-                                        n_dbl + 1, p_dbl,
-                                        digammaAlpha_vec[i],
-                                        digammaN_vec[i],
-                                        digammaSum_vec[i],
-                                        beta_func);
-
           operands_and_partials.d_x1[i]
-            += g1 / Pi;
+            += stan::math::dda_grad_reg_inc_beta(alpha_dbl, n_dbl + 1, p_dbl,
+                                                 digamma_alpha_vec[i],
+                                                 digamma_sum_vec[i]) / P_i;
         }
 
         if (!is_constant_struct<T_inv_scale>::value)
-          operands_and_partials.d_x2[i]  += d_dbl * pow(1-p_dbl, n_dbl)
-            * pow(p_dbl, alpha_dbl-1) / beta_func / Pi;
+          operands_and_partials.d_x2[i] +=
+            boost::math::ibeta_derivative(alpha_dbl, n_dbl + 1.0, p_dbl)
+              * d_dbl / P_i;
       }
 
       if (!is_constant_struct<T_shape>::value) {
@@ -155,6 +131,7 @@ namespace stan {
 
       return operands_and_partials.to_var(P, alpha, beta);
     }
-  }
-}
+    
+  }  // prob
+}  // stan
 #endif
