@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['usage',['USAGE',['../structstan_1_1gm_1_1error__codes.html#aa63873e8f7e9dd7f8af3502e4003292fab91146036be9b2c1e9bd09619da086ba',1,'stan::gm::error_codes']]]
+  ['usage',['USAGE',['../structstan_1_1services_1_1error__codes.html#af63ff2c4cfc91b7606093e5ac7a1eb70adf27074bf1305fb8b8e8d5bb4dce0988',1,'stan::services::error_codes']]]
 ];

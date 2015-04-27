@@ -7,7 +7,7 @@
 #   - EXE
 # 
 # Additionally, set the following variables to build
-# demo/gm using the Microsoft Visual Studio compiler.
+# demo/lang using the Microsoft Visual Studio compiler.
 #   - CC_STANC
 #   - CFLAGS_STANC
 #   - OUTPUT_OPTION_STANC
@@ -22,6 +22,7 @@ ifeq (g++,$(CC_TYPE))
   CFLAGS += -m$(BIT)
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
+  CFLAGS += -Wno-unused-but-set
   LDLIBS += -static-libgcc
   LDLIBS += -static-libstdc++
 endif
@@ -34,7 +35,3 @@ endif
 ifeq (clang++,$(CC_TYPE))
 endif
 
-## adding target that maps targets without extensions
-## to targets with .exe at the end.
-%: %.exe %.stan
-	@# this is an intentional blank line

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>Stan: src/stan/math/error_handling/matrix/check_cov_matrix.hpp Source File</title>
+<title>Stan: src/stan/math/prim/mat/err/check_cov_matrix.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_3995d5884456238d20884a417bb53c63.html">math</a></li><li class="navelem"><a class="el" href="dir_99fdd75913c28d151522a8b8afede414.html">error_handling</a></li><li class="navelem"><a class="el" href="dir_22b468d2bc5e21cba3741edb912cd36a.html">matrix</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_74dffc450e0f1a697b45b136c6270db1.html">src</a></li><li class="navelem"><a class="el" href="dir_803b5608bcbe879b166efa51ba84b7e9.html">stan</a></li><li class="navelem"><a class="el" href="dir_668e8ef714ddacd4c07848956741d104.html">math</a></li><li class="navelem"><a class="el" href="dir_893ab7068649a078cc677542d38e83c3.html">prim</a></li><li class="navelem"><a class="el" href="dir_a9c2875b19de2d2a81f2dfd613184f18.html">mat</a></li><li class="navelem"><a class="el" href="dir_d52cd469a5aeb3b62da009ae6b9e9704.html">err</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -92,48 +91,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">check_cov_matrix.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="check__cov__matrix_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_COV_MATRIX_HPP__</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_COV_MATRIX_HPP__</span></div>
+<a href="check__cov__matrix_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_COV_MATRIX_HPP</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define STAN__MATH__PRIM__MAT__ERR__CHECK_COV_MATRIX_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;sstream&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/matrix/Eigen.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="check__positive_8hpp.html">stan/math/error_handling/check_positive.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2error__handling_2matrix_2check__pos__definite_8hpp.html">stan/math/error_handling/matrix/check_pos_definite.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="check__symmetric_8hpp.html">stan/math/error_handling/matrix/check_symmetric.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="check__size__match_8hpp.html">stan/math/error_handling/matrix/check_size_match.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">namespace </span>stan {</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  <span class="keyword">namespace </span>math {</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="comment">// FIXME: update warnings</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T_y, <span class="keyword">typename</span> T_result&gt;</div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="namespacestan_1_1math.html#a90326b7bfecdcd28d2555c001ca7cf0f">   28</a></span>&#160;    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="namespacestan_1_1math.html#a90326b7bfecdcd28d2555c001ca7cf0f">check_cov_matrix</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">function</span>,</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                                 <span class="keyword">const</span> Eigen::Matrix&lt;T_y,Eigen::Dynamic,Eigen::Dynamic&gt;&amp; y,</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                                 <span class="keyword">const</span> <span class="keywordtype">char</span>* name,</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                                 T_result* result) {</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <a class="code" href="namespacestan_1_1math.html#aa604267d7189b6fde0be2c83f03f60f8">check_size_match</a>(<span class="keyword">function</span>, </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                       y.rows(), <span class="stringliteral">&quot;Rows of covariance matrix&quot;</span>,</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                       y.cols(), <span class="stringliteral">&quot;columns of covariance matrix&quot;</span>,</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                       result);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <a class="code" href="namespacestan_1_1math.html#a573ec8402d9e6928596057ee179a96a9">check_positive</a>(<span class="keyword">function</span>, y.rows(), <span class="stringliteral">&quot;rows&quot;</span>, result);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      <a class="code" href="namespacestan_1_1math.html#a7d97aebea4cf628724dfd08030284bb2">check_symmetric</a>(<span class="keyword">function</span>, y, name, result);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      <a class="code" href="namespacestan_1_1math.html#aa543443cb0c96a44613255c83d593a86">check_pos_definite</a>(<span class="keyword">function</span>, y, name, result);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    }</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  }</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="math_2error__handling_2matrix_2check__pos__definite_8hpp_html"><div class="ttname"><a href="math_2error__handling_2matrix_2check__pos__definite_8hpp.html">check_pos_definite.hpp</a></div></div>
-<div class="ttc" id="namespacestan_1_1math_html_a90326b7bfecdcd28d2555c001ca7cf0f"><div class="ttname"><a href="namespacestan_1_1math.html#a90326b7bfecdcd28d2555c001ca7cf0f">stan::math::check_cov_matrix</a></div><div class="ttdeci">bool check_cov_matrix(const char *function, const Eigen::Matrix&lt; T_y, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;y, const char *name, T_result *result)</div><div class="ttdoc">Return true if the specified matrix is a valid covariance matrix. </div><div class="ttdef"><b>Definition:</b> <a href="check__cov__matrix_8hpp_source.html#l00028">check_cov_matrix.hpp:28</a></div></div>
-<div class="ttc" id="check__size__match_8hpp_html"><div class="ttname"><a href="check__size__match_8hpp.html">check_size_match.hpp</a></div></div>
-<div class="ttc" id="check__positive_8hpp_html"><div class="ttname"><a href="check__positive_8hpp.html">check_positive.hpp</a></div></div>
-<div class="ttc" id="namespacestan_1_1math_html_aa604267d7189b6fde0be2c83f03f60f8"><div class="ttname"><a href="namespacestan_1_1math.html#aa604267d7189b6fde0be2c83f03f60f8">stan::math::check_size_match</a></div><div class="ttdeci">bool check_size_match(const char *function, T_size1 i, const char *name_i, T_size2 j, const char *name_j, T_result *result)</div><div class="ttdef"><b>Definition:</b> <a href="check__size__match_8hpp_source.html#l00013">check_size_match.hpp:13</a></div></div>
-<div class="ttc" id="check__symmetric_8hpp_html"><div class="ttname"><a href="check__symmetric_8hpp.html">check_symmetric.hpp</a></div></div>
-<div class="ttc" id="namespacestan_1_1math_html_a7d97aebea4cf628724dfd08030284bb2"><div class="ttname"><a href="namespacestan_1_1math.html#a7d97aebea4cf628724dfd08030284bb2">stan::math::check_symmetric</a></div><div class="ttdeci">bool check_symmetric(const char *function, const Eigen::Matrix&lt; T_y, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;y, const char *name, T_result *result)</div><div class="ttdoc">Return true if the specified matrix is symmetric. </div><div class="ttdef"><b>Definition:</b> <a href="check__symmetric_8hpp_source.html#l00026">check_symmetric.hpp:26</a></div></div>
-<div class="ttc" id="namespacestan_1_1math_html_aa543443cb0c96a44613255c83d593a86"><div class="ttname"><a href="namespacestan_1_1math.html#aa543443cb0c96a44613255c83d593a86">stan::math::check_pos_definite</a></div><div class="ttdeci">bool check_pos_definite(const char *function, const Eigen::Matrix&lt; T_y, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;y, const char *name, T_result *result)</div><div class="ttdoc">Return true if the specified matrix is positive definite. </div><div class="ttdef"><b>Definition:</b> <a href="math_2error__handling_2matrix_2check__pos__definite_8hpp_source.html#l00026">check_pos_definite.hpp:26</a></div></div>
-<div class="ttc" id="namespacestan_1_1math_html_a573ec8402d9e6928596057ee179a96a9"><div class="ttname"><a href="namespacestan_1_1math.html#a573ec8402d9e6928596057ee179a96a9">stan::math::check_positive</a></div><div class="ttdeci">bool check_positive(const char *function, const T_y &amp;y, const char *name, T_result *result)</div><div class="ttdef"><b>Definition:</b> <a href="check__positive_8hpp_source.html#l00048">check_positive.hpp:48</a></div></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/prim/mat/fun/Eigen.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="prim_2mat_2err_2check__pos__definite_8hpp.html">stan/math/prim/mat/err/check_pos_definite.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span>stan {</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;  <span class="keyword">namespace </span>math {</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    <span class="keyword">using</span> Eigen::Dynamic;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T_y&gt;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">inline</span> <span class="keywordtype">bool</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="namespacestan_1_1math.html#aeb915b09e2e60dd76885b6d68655790c">   32</a></span>&#160;    <a class="code" href="namespacestan_1_1math.html#aeb915b09e2e60dd76885b6d68655790c">check_cov_matrix</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">function</span>,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                     <span class="keyword">const</span> <span class="keywordtype">char</span>* name,</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                     <span class="keyword">const</span> Eigen::Matrix&lt;T_y, Dynamic, Dynamic&gt;&amp; y) {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      <a class="code" href="namespacestan_1_1math.html#ac0133fd07702f5253126a385703b7d73">check_pos_definite</a>(<span class="keyword">function</span>, name, y);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    }</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  }</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;}</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="namespacestan_1_1math_html_aeb915b09e2e60dd76885b6d68655790c"><div class="ttname"><a href="namespacestan_1_1math.html#aeb915b09e2e60dd76885b6d68655790c">stan::math::check_cov_matrix</a></div><div class="ttdeci">bool check_cov_matrix(const char *function, const char *name, const Eigen::Matrix&lt; T_y, Dynamic, Dynamic &gt; &amp;y)</div><div class="ttdoc">Return true if the specified matrix is a valid covariance matrix. </div><div class="ttdef"><b>Definition:</b> <a href="check__cov__matrix_8hpp_source.html#l00032">check_cov_matrix.hpp:32</a></div></div>
+<div class="ttc" id="namespacestan_1_1math_html_ac0133fd07702f5253126a385703b7d73"><div class="ttname"><a href="namespacestan_1_1math.html#ac0133fd07702f5253126a385703b7d73">stan::math::check_pos_definite</a></div><div class="ttdeci">bool check_pos_definite(const char *function, const char *name, const Eigen::Matrix&lt; T_y, Dynamic, Dynamic &gt; &amp;y)</div><div class="ttdoc">Return true if the specified square, symmetric matrix is positive definite. </div><div class="ttdef"><b>Definition:</b> <a href="prim_2mat_2err_2check__pos__definite_8hpp_source.html#l00038">check_pos_definite.hpp:38</a></div></div>
 <div class="ttc" id="_eigen_8hpp_html"><div class="ttname"><a href="_eigen_8hpp.html">Eigen.hpp</a></div></div>
+<div class="ttc" id="prim_2mat_2err_2check__pos__definite_8hpp_html"><div class="ttname"><a href="prim_2mat_2err_2check__pos__definite_8hpp.html">check_pos_definite.hpp</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

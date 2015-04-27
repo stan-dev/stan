@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['default_5finitial_5fnchunks',['DEFAULT_INITIAL_NCHUNKS',['../chunk__alloc_8hpp.html#a5f845c774e340bc6030d5ce15487812a',1,'chunk_alloc.hpp']]]
+  ['likely',['likely',['../likely_8hpp.html#a217a0bd562b98ae8c2ffce44935351e1',1,'likely.hpp']]]
 ];

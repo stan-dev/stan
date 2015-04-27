@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['lhsscalar',['LhsScalar',['../struct_eigen_1_1internal_1_1general__matrix__vector__product_3_01_index_00_01stan_1_1agrad_1_1va44da5f98e1caea9523bacbd5bdc025fe.html#a53b8b1e508aa14de16ac804960453975',1,'Eigen::internal::general_matrix_vector_product&lt; Index, stan::agrad::var, ColMajor, ConjugateLhs, stan::agrad::var, ConjugateRhs &gt;::LhsScalar()'],['../struct_eigen_1_1internal_1_1general__matrix__vector__product_3_01_index_00_01stan_1_1agrad_1_1vacd54cabc78c49ca719650381b68b105e.html#a8b1863097b547b5a7f2d24b8ccfe5796',1,'Eigen::internal::general_matrix_vector_product&lt; Index, stan::agrad::var, RowMajor, ConjugateLhs, stan::agrad::var, ConjugateRhs &gt;::LhsScalar()'],['../struct_eigen_1_1internal_1_1general__matrix__matrix__product_3_01_index_00_01stan_1_1agrad_1_1va9b485de9571b6e46d7a64aff43a6d9d3.html#a4b77e4f22ba05c8daaa850af323db4c5',1,'Eigen::internal::general_matrix_matrix_product&lt; Index, stan::agrad::var, LhsStorageOrder, ConjugateLhs, stan::agrad::var, RhsStorageOrder, ConjugateRhs, ColMajor &gt;::LhsScalar()']]]
+  ['idx_5ft',['idx_t',['../classstan_1_1optimization_1_1_b_f_g_s_line_search.html#a7501d10f44237d264e637352bdc1ca4e',1,'stan::optimization::BFGSLineSearch']]],
+  ['input_5fiterator_5ft',['input_iterator_t',['../namespacestan_1_1lang.html#ae782260f5a96de91250c10d1ef3b3545',1,'stan::lang']]],
+  ['int_5fargument',['int_argument',['../namespacestan_1_1services.html#abf6790d43872b456350d91d16e85a147',1,'stan::services']]]
 ];

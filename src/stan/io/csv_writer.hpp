@@ -1,10 +1,13 @@
-#ifndef __STAN__IO__CSV_WRITER_HPP__
-#define __STAN__IO__CSV_WRITER_HPP__
+#ifndef STAN__IO__CSV_WRITER_HPP
+#define STAN__IO__CSV_WRITER_HPP
 
-#include <stan/math/matrix.hpp>
-#include <ostream>
-#include <limits>
+#include <stan/math/prim/scal/meta/index_type.hpp>
+#include <stan/math/prim/arr/meta/index_type.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
 #include <iomanip>
+#include <limits>
+#include <ostream>
+#include <string>
 
 namespace stan {
 
@@ -16,15 +19,14 @@ namespace stan {
      *
      * <p>All output is written to the same line and separated by commas.
      * Use the <code>newline()</code> method to advance to the next line
-     * of CSV output.  
+     * of CSV output.
      */
     class csv_writer {
     private:
       std::ostream& o_;
       bool at_bol_;
 
-    public: 
-
+    public:
       /**
        * Write a comma.
        *
@@ -46,7 +48,7 @@ namespace stan {
        *
        * @param o Output stream on which to write.
        */
-      csv_writer(std::ostream& o)
+      explicit csv_writer(std::ostream& o)
         : o_(o), at_bol_(true) {
       }
 
@@ -54,7 +56,7 @@ namespace stan {
        * Write a newline character.
        *
        * End a line of output and start a new line.  This
-       * method needs to be called rather than writing 
+       * method needs to be called rather than writing
        * a newline to the output stream because it resets
        * the comma flag.
        */
@@ -65,7 +67,7 @@ namespace stan {
 
       /**
        * Write a value.
-       * 
+       *
        * Write the specified integer to the output stream
        * on the current line.
        *
@@ -78,7 +80,7 @@ namespace stan {
 
       /**
        * Write a value.
-       * 
+       *
        * Write the specified double to the output stream
        * on the current line.
        *
@@ -86,49 +88,55 @@ namespace stan {
        */
       void write(double x) {
         comma();
-        o_ << std::setprecision (std::numeric_limits<double>::digits10 + 1) << x;
+        o_ << std::setprecision(std::numeric_limits<double>::digits10 + 1)
+           << x;
       }
 
       /**
        * Write a value.
-       * 
+       *
        * Write the specified matrix to the output stream in
        * row-major order.
        *
        * @param m Matrix to write.
        */
       template<int R, int C>
-      void write_row_major(const Eigen::Matrix<double,R,C>& m) {
-        typedef typename Eigen::Matrix<double,R,C>::size_type size_type;
-        for (size_type i = 0; i < m.rows(); ++i)
-          for (size_type j = 0; j < m.cols(); ++j)
-            write(m(i,j));
+      void write_row_major(const Eigen::Matrix<double, R, C>& m) {
+        using Eigen::Matrix;
+        using stan::math::index_type;
+        typedef typename index_type<Matrix<double, R, C> >::type idx_t;
+        for (idx_t i = 0; i < m.rows(); ++i)
+          for (idx_t j = 0; j < m.cols(); ++j)
+            write(m(i, j));
       }
 
       /**
        * Write a value in column-major order.
-       * 
+       *
        * Write the specified matrix to the output stream in
        * column-major order.
        *
        * @param m Matrix of doubles to write.
        */
       template<int R, int C>
-      void write_col_major(const Eigen::Matrix<double,R,C>& m) {
-        typedef typename Eigen::Matrix<double,R,C>::size_type size_type;
-        for (size_type j = 0; j < m.cols(); ++j)
-          for (size_type i = 0; i < m.rows(); ++i)
-            write(m(i,j));
+      void write_col_major(const Eigen::Matrix<double, R, C>& m) {
+        using Eigen::Matrix;
+        using stan::math::index_type;
+        typedef typename index_type<Matrix<double, R, C> >::type idx_t;
+
+        for (idx_t j = 0; j < m.cols(); ++j)
+          for (idx_t i = 0; i < m.rows(); ++i)
+            write(m(i, j));
       }
 
       template<int R, int C>
-      void write(const Eigen::Matrix<double,R,C>& m) {
+      void write(const Eigen::Matrix<double, R, C>& m) {
         write_col_major(m);
       }
 
       /**
        * Write a value.
-       * 
+       *
        * Write the specified string to the output stream with
        * quotes around it and quotes inside escaped to double
        * quotes.
@@ -141,15 +149,13 @@ namespace stan {
         o_ << '"';
         for (size_t i = 0; i < s.size(); ++i) {
           if (s.at(i) == '"') {
-            o_ << '"' << '"'; // double quotes
+            o_ << '"' << '"';  // double quotes
           } else {
             o_ << s.at(i);
           }
         }
         o_ << '"';
       }
-
-
     };
 
   }

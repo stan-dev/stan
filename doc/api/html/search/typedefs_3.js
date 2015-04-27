@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['function_5fsignature_5ft',['function_signature_t',['../namespacestan_1_1gm.html#ab969833a2ffdf92a759238a5d9ba5859',1,'stan::gm']]]
+  ['expression_5ft',['expression_t',['../structstan_1_1lang_1_1expression.html#a15716bc3f3b2fb15e663c10204f22e5b',1,'stan::lang::expression']]]
 ];

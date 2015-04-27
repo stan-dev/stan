@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>Stan: src/stan/math/matrix/accumulator.hpp Source File</title>
+<title>Stan: src/stan/math/prim/mat/fun/accumulator.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_3995d5884456238d20884a417bb53c63.html">math</a></li><li class="navelem"><a class="el" href="dir_99762ae463b7309a47de4b14a14d0e0f.html">matrix</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_74dffc450e0f1a697b45b136c6270db1.html">src</a></li><li class="navelem"><a class="el" href="dir_803b5608bcbe879b166efa51ba84b7e9.html">stan</a></li><li class="navelem"><a class="el" href="dir_668e8ef714ddacd4c07848956741d104.html">math</a></li><li class="navelem"><a class="el" href="dir_893ab7068649a078cc677542d38e83c3.html">prim</a></li><li class="navelem"><a class="el" href="dir_a9c2875b19de2d2a81f2dfd613184f18.html">mat</a></li><li class="navelem"><a class="el" href="dir_7e601073d4ed027081684ecabdee672e.html">fun</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -92,15 +91,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">accumulator.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="accumulator_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef __STAN__MATH__MATRIX__ACCUMULATOR_HPP__</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define __STAN__MATH__MATRIX__ACCUMULATOR_HPP__</span></div>
+<a href="accumulator_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef STAN__MATH__PRIM__MAT__FUN__ACCUMULATOR_HPP</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define STAN__MATH__PRIM__MAT__FUN__ACCUMULATOR_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;boost/utility/enable_if.hpp&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;boost/type_traits/is_arithmetic.hpp&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;boost/type_traits/is_same.hpp&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/matrix/Eigen.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2matrix_2sum_8hpp.html">stan/math/matrix/sum.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/prim/mat/fun/Eigen.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="prim_2mat_2fun_2sum_8hpp.html">stan/math/prim/mat/fun/sum.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">namespace </span>stan {</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  <span class="keyword">namespace </span>math {</div>
@@ -143,9 +142,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;          <a class="code" href="classstan_1_1math_1_1accumulator.html#af2da77a509c4e7e9c16d8a6f691a6901">add</a>(xs[i]);</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      }</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      </div>
-<div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="classstan_1_1math_1_1accumulator.html#a289e9e869da8e29e78fa6c6c5bb9bddf">  113</a></span>&#160;      T <a class="code" href="classstan_1_1math_1_1accumulator.html#a289e9e869da8e29e78fa6c6c5bb9bddf">sum</a>() {</div>
+<div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="classstan_1_1math_1_1accumulator.html#ad24d63f81d6c3028abc73e102c60edf8">  113</a></span>&#160;      T <a class="code" href="classstan_1_1math_1_1accumulator.html#ad24d63f81d6c3028abc73e102c60edf8">sum</a>()<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        <span class="keyword">using</span> <a class="code" href="namespacestan_1_1math.html#adde1fe0f002efa49cf9f7c129fe1a1d0">math::sum</a>;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classstan_1_1math_1_1accumulator.html#a289e9e869da8e29e78fa6c6c5bb9bddf">sum</a>(buf_);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classstan_1_1math_1_1accumulator.html#ad24d63f81d6c3028abc73e102c60edf8">sum</a>(buf_);</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      }</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    };</div>
@@ -157,16 +156,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;}</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="classstan_1_1math_1_1accumulator_html_ad24d63f81d6c3028abc73e102c60edf8"><div class="ttname"><a href="classstan_1_1math_1_1accumulator.html#ad24d63f81d6c3028abc73e102c60edf8">stan::math::accumulator::sum</a></div><div class="ttdeci">T sum() const </div><div class="ttdoc">Return the sum of the accumulated values. </div><div class="ttdef"><b>Definition:</b> <a href="accumulator_8hpp_source.html#l00113">accumulator.hpp:113</a></div></div>
 <div class="ttc" id="classstan_1_1math_1_1accumulator_html_a35bd3df3c2f49e6e4e13e8c09da5ac89"><div class="ttname"><a href="classstan_1_1math_1_1accumulator.html#a35bd3df3c2f49e6e4e13e8c09da5ac89">stan::math::accumulator::add</a></div><div class="ttdeci">boost::disable_if&lt; boost::is_arithmetic&lt; S &gt;, typename boost::enable_if&lt; boost::is_same&lt; S, T &gt;, void &gt;::type &gt;::type add(const S &amp;x)</div><div class="ttdoc">Add the specified non-arithmetic value to the buffer. </div><div class="ttdef"><b>Definition:</b> <a href="accumulator_8hpp_source.html#l00074">accumulator.hpp:74</a></div></div>
 <div class="ttc" id="classstan_1_1math_1_1accumulator_html_afb44f3c753ac1373482e123df612a266"><div class="ttname"><a href="classstan_1_1math_1_1accumulator.html#afb44f3c753ac1373482e123df612a266">stan::math::accumulator::accumulator</a></div><div class="ttdeci">accumulator()</div><div class="ttdoc">Construct an accumulator. </div><div class="ttdef"><b>Definition:</b> <a href="accumulator_8hpp_source.html#l00033">accumulator.hpp:33</a></div></div>
-<div class="ttc" id="classstan_1_1math_1_1accumulator_html_a289e9e869da8e29e78fa6c6c5bb9bddf"><div class="ttname"><a href="classstan_1_1math_1_1accumulator.html#a289e9e869da8e29e78fa6c6c5bb9bddf">stan::math::accumulator::sum</a></div><div class="ttdeci">T sum()</div><div class="ttdoc">Return the sum of the accumulated values. </div><div class="ttdef"><b>Definition:</b> <a href="accumulator_8hpp_source.html#l00113">accumulator.hpp:113</a></div></div>
 <div class="ttc" id="_eigen_8hpp_html"><div class="ttname"><a href="_eigen_8hpp.html">Eigen.hpp</a></div></div>
-<div class="ttc" id="namespacestan_1_1math_html_adde1fe0f002efa49cf9f7c129fe1a1d0"><div class="ttname"><a href="namespacestan_1_1math.html#adde1fe0f002efa49cf9f7c129fe1a1d0">stan::math::sum</a></div><div class="ttdeci">double sum(std::vector&lt; double &gt; &amp;x)</div><div class="ttdef"><b>Definition:</b> <a href="math_2functions_2sum_8hpp_source.html#l00010">sum.hpp:10</a></div></div>
+<div class="ttc" id="namespacestan_1_1math_html_adde1fe0f002efa49cf9f7c129fe1a1d0"><div class="ttname"><a href="namespacestan_1_1math.html#adde1fe0f002efa49cf9f7c129fe1a1d0">stan::math::sum</a></div><div class="ttdeci">double sum(std::vector&lt; double &gt; &amp;x)</div><div class="ttdef"><b>Definition:</b> <a href="prim_2arr_2fun_2sum_8hpp_source.html#l00010">sum.hpp:10</a></div></div>
 <div class="ttc" id="classstan_1_1math_1_1accumulator_html"><div class="ttname"><a href="classstan_1_1math_1_1accumulator.html">stan::math::accumulator</a></div><div class="ttdoc">Class to accumulate values and eventually return their sum. </div><div class="ttdef"><b>Definition:</b> <a href="accumulator_8hpp_source.html#l00025">accumulator.hpp:25</a></div></div>
+<div class="ttc" id="prim_2mat_2fun_2sum_8hpp_html"><div class="ttname"><a href="prim_2mat_2fun_2sum_8hpp.html">sum.hpp</a></div></div>
 <div class="ttc" id="classstan_1_1math_1_1accumulator_html_acf91e7cb369f45142386598d552a30e2"><div class="ttname"><a href="classstan_1_1math_1_1accumulator.html#acf91e7cb369f45142386598d552a30e2">stan::math::accumulator::add</a></div><div class="ttdeci">void add(const std::vector&lt; S &gt; &amp;xs)</div><div class="ttdoc">Recursively add each entry in the specified standard vector to the buffer. </div><div class="ttdef"><b>Definition:</b> <a href="accumulator_8hpp_source.html#l00103">accumulator.hpp:103</a></div></div>
 <div class="ttc" id="classstan_1_1math_1_1accumulator_html_af66ce8b37f8d8af158dd38784b34d86b"><div class="ttname"><a href="classstan_1_1math_1_1accumulator.html#af66ce8b37f8d8af158dd38784b34d86b">stan::math::accumulator::add</a></div><div class="ttdeci">void add(const Eigen::Matrix&lt; S, R, C &gt; &amp;m)</div><div class="ttdoc">Add each entry in the specified matrix, vector, or row vector of values to the buffer. </div><div class="ttdef"><b>Definition:</b> <a href="accumulator_8hpp_source.html#l00088">accumulator.hpp:88</a></div></div>
 <div class="ttc" id="classstan_1_1math_1_1accumulator_html_a298d4088fbfdfca98d2c8e36a5ea4f1c"><div class="ttname"><a href="classstan_1_1math_1_1accumulator.html#a298d4088fbfdfca98d2c8e36a5ea4f1c">stan::math::accumulator::~accumulator</a></div><div class="ttdeci">~accumulator()</div><div class="ttdoc">Destroy an accumulator. </div><div class="ttdef"><b>Definition:</b> <a href="accumulator_8hpp_source.html#l00040">accumulator.hpp:40</a></div></div>
-<div class="ttc" id="math_2matrix_2sum_8hpp_html"><div class="ttname"><a href="math_2matrix_2sum_8hpp.html">sum.hpp</a></div></div>
 <div class="ttc" id="classstan_1_1math_1_1accumulator_html_af2da77a509c4e7e9c16d8a6f691a6901"><div class="ttname"><a href="classstan_1_1math_1_1accumulator.html#af2da77a509c4e7e9c16d8a6f691a6901">stan::math::accumulator::add</a></div><div class="ttdeci">boost::enable_if&lt; boost::is_arithmetic&lt; S &gt;, void &gt;::type add(S x)</div><div class="ttdoc">Add the specified arithmetic type value to the buffer after static casting it to the class type T...</div><div class="ttdef"><b>Definition:</b> <a href="accumulator_8hpp_source.html#l00054">accumulator.hpp:54</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>

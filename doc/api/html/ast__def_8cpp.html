@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>Stan: src/stan/gm/ast_def.cpp File Reference</title>
+<title>Stan: src/stan/lang/ast_def.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_29b20cd43524c7f0fc77aef3c7e38f50.html">gm</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_74dffc450e0f1a697b45b136c6270db1.html">src</a></li><li class="navelem"><a class="el" href="dir_803b5608bcbe879b166efa51ba84b7e9.html">stan</a></li><li class="navelem"><a class="el" href="dir_f31756577f8c81fb97f1e68de059ca48.html">lang</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -107,8 +106,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;string&gt;</code><br/>
 <code>#include &lt;utility&gt;</code><br/>
 <code>#include &lt;vector&gt;</code><br/>
-<code>#include &lt;<a class="el" href="ast_8hpp_source.html">stan/gm/ast.hpp</a>&gt;</code><br/>
-<code>#include &lt;stan/gm/function_signatures.h&gt;</code><br/>
+<code>#include &lt;<a class="el" href="ast_8hpp_source.html">stan/lang/ast.hpp</a>&gt;</code><br/>
+<code>#include &lt;stan/lang/function_signatures.h&gt;</code><br/>
 </div>
 <p><a href="ast__def_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -117,8 +116,7 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespacestan"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan.html">stan</a></td></tr>
 <tr class="memdesc:namespacestan"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probability, optimization and sampling library. <br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:namespacestan_1_1gm"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html">stan::gm</a></td></tr>
-<tr class="memdesc:namespacestan_1_1gm"><td class="mdescLeft">&#160;</td><td class="mdescRight">Directed graphical model compiler. <br/></td></tr>
+<tr class="memitem:namespacestan_1_1lang"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html">stan::lang</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -128,46 +126,46 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a281907d01ac42b6c4c703f9285361419"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a281907d01ac42b6c4c703f9285361419">stan::gm::write_base_expr_type</a> (std::ostream &amp;o, base_expr_type type)</td></tr>
-<tr class="separator:a281907d01ac42b6c4c703f9285361419"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9c40c419ed4088b66443029e8359904"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#ae9c40c419ed4088b66443029e8359904">stan::gm::operator&lt;&lt;</a> (std::ostream &amp;o, const expr_type &amp;et)</td></tr>
-<tr class="separator:ae9c40c419ed4088b66443029e8359904"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ca8ea09cf26b1fdd7c5e31c8febd8d9"><td class="memItemLeft" align="right" valign="top">expr_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a6ca8ea09cf26b1fdd7c5e31c8febd8d9">stan::gm::promote_primitive</a> (const expr_type &amp;et)</td></tr>
-<tr class="separator:a6ca8ea09cf26b1fdd7c5e31c8febd8d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08ffae837e524e7ee4ede3cc51c7a2fb"><td class="memItemLeft" align="right" valign="top">expr_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a08ffae837e524e7ee4ede3cc51c7a2fb">stan::gm::promote_primitive</a> (const expr_type &amp;et1, const expr_type &amp;et2)</td></tr>
-<tr class="separator:a08ffae837e524e7ee4ede3cc51c7a2fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77c7ba6907af0f0ea0b7b10164cc8bc9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a77c7ba6907af0f0ea0b7b10164cc8bc9">stan::gm::returns_type</a> (const expr_type &amp;return_type, const statement &amp;statement, std::ostream &amp;error_msgs)</td></tr>
-<tr class="separator:a77c7ba6907af0f0ea0b7b10164cc8bc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9604969385f580f3a32e362fe7304c7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#af9604969385f580f3a32e362fe7304c7">stan::gm::is_linear_function</a> (const std::string &amp;name)</td></tr>
-<tr class="separator:af9604969385f580f3a32e362fe7304c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2fd9d0472225916eae17d19fde00fe30"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a2fd9d0472225916eae17d19fde00fe30">stan::gm::has_var</a> (const expression &amp;e, const variable_map &amp;var_map)</td></tr>
-<tr class="separator:a2fd9d0472225916eae17d19fde00fe30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5cd24fa3880414fae68b9f140341781c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a5cd24fa3880414fae68b9f140341781c">stan::gm::has_non_param_var</a> (const expression &amp;e, const variable_map &amp;var_map)</td></tr>
-<tr class="separator:a5cd24fa3880414fae68b9f140341781c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90e5f154350b02c39f381659672f9581"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a90e5f154350b02c39f381659672f9581">stan::gm::is_nil</a> (const expression &amp;e)</td></tr>
-<tr class="separator:a90e5f154350b02c39f381659672f9581"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0888f90c4bb279ad09b9f7724912a2cd"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a0888f90c4bb279ad09b9f7724912a2cd">stan::gm::total_dims</a> (const std::vector&lt; std::vector&lt; expression &gt; &gt; &amp;dimss)</td></tr>
-<tr class="separator:a0888f90c4bb279ad09b9f7724912a2cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17574edb8e226bfd71f69da1d4f97168"><td class="memItemLeft" align="right" valign="top">expr_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a17574edb8e226bfd71f69da1d4f97168">stan::gm::infer_type_indexing</a> (const base_expr_type &amp;expr_base_type, size_t num_expr_dims, size_t num_index_dims)</td></tr>
-<tr class="separator:a17574edb8e226bfd71f69da1d4f97168"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46f979229875f1d6d427dbbe87fa8a59"><td class="memItemLeft" align="right" valign="top">expr_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a46f979229875f1d6d427dbbe87fa8a59">stan::gm::infer_type_indexing</a> (const expression &amp;expr, size_t num_index_dims)</td></tr>
-<tr class="separator:a46f979229875f1d6d427dbbe87fa8a59"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbacd22142d44e8f79d40a512441c060"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#afbacd22142d44e8f79d40a512441c060">stan::gm::print_var_origin</a> (std::ostream &amp;o, const var_origin &amp;vo)</td></tr>
-<tr class="separator:afbacd22142d44e8f79d40a512441c060"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adbc7bd18dc8464af8d3deee3dc1119de"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#adbc7bd18dc8464af8d3deee3dc1119de">stan::gm::has_rng_suffix</a> (const std::string &amp;s)</td></tr>
-<tr class="separator:adbc7bd18dc8464af8d3deee3dc1119de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53b74d123d351fa6a92dbdf0bfaf1ddd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a53b74d123d351fa6a92dbdf0bfaf1ddd">stan::gm::has_lp_suffix</a> (const std::string &amp;s)</td></tr>
-<tr class="separator:a53b74d123d351fa6a92dbdf0bfaf1ddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9856f69b4866a45abfa089dc5634ec9f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a9856f69b4866a45abfa089dc5634ec9f">stan::gm::is_user_defined</a> (const std::string &amp;name, const std::vector&lt; expression &gt; &amp;args)</td></tr>
-<tr class="separator:a9856f69b4866a45abfa089dc5634ec9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a50b3a99564bd5582dfdd993f15b068"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a8a50b3a99564bd5582dfdd993f15b068">stan::gm::is_user_defined_prob_function</a> (const std::string &amp;name, const expression &amp;variate, const std::vector&lt; expression &gt; &amp;params)</td></tr>
-<tr class="separator:a8a50b3a99564bd5582dfdd993f15b068"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa8660aaeb09c1d3383bc5cfdf5447e17"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#aa8660aaeb09c1d3383bc5cfdf5447e17">stan::gm::is_user_defined</a> (const fun &amp;fx)</td></tr>
-<tr class="separator:aa8660aaeb09c1d3383bc5cfdf5447e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2deb8ed7dc223cdaa9794f3ebc35adbd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a2deb8ed7dc223cdaa9794f3ebc35adbd">stan::gm::is_assignable</a> (const expr_type &amp;l_type, const expr_type &amp;r_type, const std::string &amp;failure_message, std::ostream &amp;error_msgs)</td></tr>
-<tr class="separator:a2deb8ed7dc223cdaa9794f3ebc35adbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1531be45cde7074c35182871aba0724e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a1531be45cde7074c35182871aba0724e">stan::gm::ends_with</a> (const std::string &amp;suffix, const std::string &amp;s)</td></tr>
-<tr class="separator:a1531be45cde7074c35182871aba0724e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ff27aba1e70ef30121a6abc7901a23a"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a0ff27aba1e70ef30121a6abc7901a23a">stan::lang::write_base_expr_type</a> (std::ostream &amp;o, base_expr_type type)</td></tr>
+<tr class="separator:a0ff27aba1e70ef30121a6abc7901a23a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d8c19e05423f019874999bfca2d18ac"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a9d8c19e05423f019874999bfca2d18ac">stan::lang::operator&lt;&lt;</a> (std::ostream &amp;o, const expr_type &amp;et)</td></tr>
+<tr class="separator:a9d8c19e05423f019874999bfca2d18ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af68eacf4ea9f2c64c869c72c55cc649b"><td class="memItemLeft" align="right" valign="top">expr_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#af68eacf4ea9f2c64c869c72c55cc649b">stan::lang::promote_primitive</a> (const expr_type &amp;et)</td></tr>
+<tr class="separator:af68eacf4ea9f2c64c869c72c55cc649b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46109ea20ae5db396814aa9f54677d05"><td class="memItemLeft" align="right" valign="top">expr_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a46109ea20ae5db396814aa9f54677d05">stan::lang::promote_primitive</a> (const expr_type &amp;et1, const expr_type &amp;et2)</td></tr>
+<tr class="separator:a46109ea20ae5db396814aa9f54677d05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04c62e86ae5453b817e25b2bec9e6be5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a04c62e86ae5453b817e25b2bec9e6be5">stan::lang::returns_type</a> (const expr_type &amp;return_type, const statement &amp;statement, std::ostream &amp;error_msgs)</td></tr>
+<tr class="separator:a04c62e86ae5453b817e25b2bec9e6be5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b7f940afd153a816c0c4114e58bac9d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a2b7f940afd153a816c0c4114e58bac9d">stan::lang::is_linear_function</a> (const std::string &amp;name)</td></tr>
+<tr class="separator:a2b7f940afd153a816c0c4114e58bac9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf7ee6aa6282ef4e6b2662783145a087"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#abf7ee6aa6282ef4e6b2662783145a087">stan::lang::has_var</a> (const expression &amp;e, const variable_map &amp;var_map)</td></tr>
+<tr class="separator:abf7ee6aa6282ef4e6b2662783145a087"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12445f29328788d14a292974c22f6f53"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a12445f29328788d14a292974c22f6f53">stan::lang::has_non_param_var</a> (const expression &amp;e, const variable_map &amp;var_map)</td></tr>
+<tr class="separator:a12445f29328788d14a292974c22f6f53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3464b73e4e976ed85f3faf2554611826"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a3464b73e4e976ed85f3faf2554611826">stan::lang::is_nil</a> (const expression &amp;e)</td></tr>
+<tr class="separator:a3464b73e4e976ed85f3faf2554611826"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add818c85ac1c2c2d11dd9d25c26ed7aa"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#add818c85ac1c2c2d11dd9d25c26ed7aa">stan::lang::total_dims</a> (const std::vector&lt; std::vector&lt; expression &gt; &gt; &amp;dimss)</td></tr>
+<tr class="separator:add818c85ac1c2c2d11dd9d25c26ed7aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fc632c04d1dcb7418bfd0afa199e02d"><td class="memItemLeft" align="right" valign="top">expr_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a4fc632c04d1dcb7418bfd0afa199e02d">stan::lang::infer_type_indexing</a> (const base_expr_type &amp;expr_base_type, size_t num_expr_dims, size_t num_index_dims)</td></tr>
+<tr class="separator:a4fc632c04d1dcb7418bfd0afa199e02d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a701776c4b46d1aced9b9b32c0b5ee29c"><td class="memItemLeft" align="right" valign="top">expr_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a701776c4b46d1aced9b9b32c0b5ee29c">stan::lang::infer_type_indexing</a> (const expression &amp;expr, size_t num_index_dims)</td></tr>
+<tr class="separator:a701776c4b46d1aced9b9b32c0b5ee29c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af39f8ba4a85644f8bb2e2216f76c374c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#af39f8ba4a85644f8bb2e2216f76c374c">stan::lang::print_var_origin</a> (std::ostream &amp;o, const var_origin &amp;vo)</td></tr>
+<tr class="separator:af39f8ba4a85644f8bb2e2216f76c374c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9b2237b3fdc10da0e68a1e252125a10"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#ac9b2237b3fdc10da0e68a1e252125a10">stan::lang::has_rng_suffix</a> (const std::string &amp;s)</td></tr>
+<tr class="separator:ac9b2237b3fdc10da0e68a1e252125a10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7930865b54ced1543780e6ac38f2259"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#aa7930865b54ced1543780e6ac38f2259">stan::lang::has_lp_suffix</a> (const std::string &amp;s)</td></tr>
+<tr class="separator:aa7930865b54ced1543780e6ac38f2259"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ff40a7a2ce84d02e5b4fe69a11277e3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a3ff40a7a2ce84d02e5b4fe69a11277e3">stan::lang::is_user_defined</a> (const std::string &amp;name, const std::vector&lt; expression &gt; &amp;args)</td></tr>
+<tr class="separator:a3ff40a7a2ce84d02e5b4fe69a11277e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2491b5c8b3cc203be2acfefdd4650c39"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a2491b5c8b3cc203be2acfefdd4650c39">stan::lang::is_user_defined_prob_function</a> (const std::string &amp;name, const expression &amp;variate, const std::vector&lt; expression &gt; &amp;params)</td></tr>
+<tr class="separator:a2491b5c8b3cc203be2acfefdd4650c39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b8b4ce523118153a33565cc27afcc03"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a8b8b4ce523118153a33565cc27afcc03">stan::lang::is_user_defined</a> (const fun &amp;fx)</td></tr>
+<tr class="separator:a8b8b4ce523118153a33565cc27afcc03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adaeddc18b2b07e4dfdfda4ad88e8b9a3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#adaeddc18b2b07e4dfdfda4ad88e8b9a3">stan::lang::is_assignable</a> (const expr_type &amp;l_type, const expr_type &amp;r_type, const std::string &amp;failure_message, std::ostream &amp;error_msgs)</td></tr>
+<tr class="separator:adaeddc18b2b07e4dfdfda4ad88e8b9a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a614834662faa194706352ca2fb07d6bb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1lang.html#a614834662faa194706352ca2fb07d6bb">stan::lang::ends_with</a> (const std::string &amp;suffix, const std::string &amp;s)</td></tr>
+<tr class="separator:a614834662faa194706352ca2fb07d6bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a class="anchor" id="a8d8277f93d7f31b96e2609f6388d6409"></a>

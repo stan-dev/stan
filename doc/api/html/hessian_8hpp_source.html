@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>Stan: src/stan/agrad/hessian.hpp Source File</title>
+<title>Stan: src/stan/math/mix/mat/functor/hessian.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_52c3c3fe3bff0ba6815d4f34971ed7d3.html">agrad</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_74dffc450e0f1a697b45b136c6270db1.html">src</a></li><li class="navelem"><a class="el" href="dir_803b5608bcbe879b166efa51ba84b7e9.html">stan</a></li><li class="navelem"><a class="el" href="dir_668e8ef714ddacd4c07848956741d104.html">math</a></li><li class="navelem"><a class="el" href="dir_4f7ef2d3a8e7e2cec267ca39e3280492.html">mix</a></li><li class="navelem"><a class="el" href="dir_72b2c9a98917de060b8f4e1db521d315.html">mat</a></li><li class="navelem"><a class="el" href="dir_ee62002a6c6104001b1f847197e1b09e.html">functor</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -92,60 +91,91 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">hessian.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="hessian_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef __STAN__AGRAD__HESSIAN_HPP__</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define __STAN__AGRAD__HESSIAN_HPP__</span></div>
+<a href="hessian_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef STAN__MATH__MIX__MAT__FUNCTOR__HESSIAN_HPP</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define STAN__MATH__MIX__MAT__FUNCTOR__HESSIAN_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;</div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="rev_8hpp.html">stan/agrad/rev.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_8hpp.html">stan/agrad/fwd.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_2core_8hpp.html">stan/math/fwd/core.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/prim/mat/fun/Eigen.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="rev_2core_8hpp.html">stan/math/rev/core.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/matrix/Eigen.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">namespace </span>stan {</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">namespace </span>stan {</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <span class="keyword">namespace </span>agrad {</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <span class="keyword">namespace </span>agrad {</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keyword">using</span> Eigen::Dynamic;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="comment">// f: vector&lt;T&gt; -&gt; T</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="comment">// Hv = H(f(x)) * v;  return f(x)</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> F&gt;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keywordtype">double</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="namespacestan_1_1agrad.html#a7bb9b2db82474a079e4fe1cfe980f41b">   20</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a757135302068c250c2379b0c13a28e2e">hessian</a>(<span class="keyword">const</span> F&amp; f,</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;            <span class="keyword">const</span> std::vector&lt;double&gt;&amp; x,</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;            <span class="keyword">const</span> std::vector&lt;double&gt;&amp; v,</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;            std::vector&lt;double&gt;&amp; Hv) {</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      <span class="keyword">using</span> <a class="code" href="classstan_1_1agrad_1_1var.html">stan::agrad::var</a>;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      <span class="keyword">using</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">stan::agrad::fvar</a>;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      std::vector&lt;var&gt; x_var(x.size());</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; x_var.size(); ++i)</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        x_var[i] = x[i];</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      std::vector&lt;fvar&lt;var&gt; &gt; x_fvar(x.size());</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; x_fvar.size(); ++i)</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        x_fvar[i] = <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;var&gt;</a>(x_var[i], v[i]);  </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;var&gt;</a> y = f(x_fvar);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      y.<a class="code" href="structstan_1_1agrad_1_1fvar.html#a189f3e99b3716c92b73b43e709245787">d_</a>.<a class="code" href="classstan_1_1agrad_1_1var.html#adafe2731ffff76ed74a84299633d70ac">grad</a>(x_var,Hv);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      <span class="keywordflow">return</span> y.<a class="code" href="structstan_1_1agrad_1_1fvar.html#a8aa2f2b763eea9bf8928fe5f4dcd0a3d">val_</a>.<a class="code" href="classstan_1_1agrad_1_1var.html#a3c15579ed3018cae0a0bf556bed164e3">val</a>();</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    }</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  }</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;}</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;            </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="classstan_1_1agrad_1_1var_html_a3c15579ed3018cae0a0bf556bed164e3"><div class="ttname"><a href="classstan_1_1agrad_1_1var.html#a3c15579ed3018cae0a0bf556bed164e3">stan::agrad::var::val</a></div><div class="ttdeci">double val() const </div><div class="ttdoc">Return the value of this variable. </div><div class="ttdef"><b>Definition:</b> <a href="agrad__thread__safe_8hpp_source.html#l00849">agrad_thread_safe.hpp:849</a></div></div>
-<div class="ttc" id="structstan_1_1agrad_1_1fvar_html"><div class="ttname"><a href="structstan_1_1agrad_1_1fvar.html">stan::agrad::fvar</a></div><div class="ttdef"><b>Definition:</b> <a href="fvar_8hpp_source.html#l00011">fvar.hpp:11</a></div></div>
-<div class="ttc" id="fwd_8hpp_html"><div class="ttname"><a href="fwd_8hpp.html">fwd.hpp</a></div></div>
-<div class="ttc" id="rev_8hpp_html"><div class="ttname"><a href="rev_8hpp.html">rev.hpp</a></div></div>
-<div class="ttc" id="classstan_1_1agrad_1_1var_html_adafe2731ffff76ed74a84299633d70ac"><div class="ttname"><a href="classstan_1_1agrad_1_1var.html#adafe2731ffff76ed74a84299633d70ac">stan::agrad::var::grad</a></div><div class="ttdeci">void grad(std::vector&lt; var &gt; &amp;x, std::vector&lt; double &gt; &amp;g)</div><div class="ttdoc">Compute the gradient of this dependent variable with respect to the specified vector of independent v...</div><div class="ttdef"><b>Definition:</b> <a href="agrad__thread__safe_8hpp_source.html#l00865">agrad_thread_safe.hpp:865</a></div></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> F&gt;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="namespacestan_1_1agrad.html#a314e76d2e9ec6e8f0e8595447ac8c950">   46</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a314e76d2e9ec6e8f0e8595447ac8c950">hessian</a>(<span class="keyword">const</span> F&amp; f,</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            <span class="keyword">const</span> Eigen::Matrix&lt;double, Dynamic, 1&gt;&amp; x,</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;            <span class="keywordtype">double</span>&amp; fx,</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;            Eigen::Matrix&lt;double, Dynamic, 1&gt;&amp; <a class="code" href="namespacestan_1_1agrad.html#a1fb22c831a12e8fea76ef7ee0bd32cb3">grad</a>,</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;            Eigen::Matrix&lt;double, Dynamic, Dynamic&gt;&amp; H) {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      H.resize(x.size(), x.size());</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      grad.resize(x.size());</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      <span class="keywordflow">try</span> {</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; x.size(); ++i) {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;          <a class="code" href="namespacestan_1_1agrad.html#a121d1cb0c26db26ef9feb0bd4f78b4c7">start_nested</a>();</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;          Eigen::Matrix&lt;fvar&lt;var&gt;, Dynamic, 1&gt; x_fvar(x.size());</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; x.size(); ++j)</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            x_fvar(j) = <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;var&gt;</a>(x(j), i == j);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;          <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;var&gt;</a> fx_fvar = f(x_fvar);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;          <a class="code" href="namespacestan_1_1agrad.html#a1fb22c831a12e8fea76ef7ee0bd32cb3">grad</a>(i) = fx_fvar.<a class="code" href="structstan_1_1agrad_1_1fvar.html#a189f3e99b3716c92b73b43e709245787">d_</a>.<a class="code" href="classstan_1_1agrad_1_1var.html#a3c15579ed3018cae0a0bf556bed164e3">val</a>();</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;          <span class="keywordflow">if</span> (i == 0) fx = fx_fvar.<a class="code" href="structstan_1_1agrad_1_1fvar.html#a8aa2f2b763eea9bf8928fe5f4dcd0a3d">val_</a>.<a class="code" href="classstan_1_1agrad_1_1var.html#a3c15579ed3018cae0a0bf556bed164e3">val</a>();</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;          <a class="code" href="namespacestan_1_1agrad.html#a1fb22c831a12e8fea76ef7ee0bd32cb3">stan::agrad::grad</a>(fx_fvar.<a class="code" href="structstan_1_1agrad_1_1fvar.html#a189f3e99b3716c92b73b43e709245787">d_</a>.<a class="code" href="classstan_1_1agrad_1_1var.html#afa91116cfe4571849cc53b454d977a88">vi_</a>);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; x.size(); ++j)</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;            H(i, j) = x_fvar(j).val_.adj();</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;          <a class="code" href="namespacestan_1_1agrad.html#a49840f2ff3d412722cf7fb4050b6d452">stan::agrad::recover_memory_nested</a>();</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; <a class="code" href="namespacestan_1_1math.html#a3b650a0131d41167ef4837ecc7d02be5">e</a>) {</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <a class="code" href="namespacestan_1_1agrad.html#a49840f2ff3d412722cf7fb4050b6d452">stan::agrad::recover_memory_nested</a>();</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordflow">throw</span>;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      }</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="comment">// time O(N^3);  space O(N^2)</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> F&gt;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="namespacestan_1_1agrad.html#a443a0b9dc581b63a12565d3fb57dab8c">   75</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a314e76d2e9ec6e8f0e8595447ac8c950">hessian</a>(<span class="keyword">const</span> F&amp; f,</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;            <span class="keyword">const</span> Eigen::Matrix&lt;T, Dynamic, 1&gt;&amp; x,</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;            T&amp; fx,</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            Eigen::Matrix&lt;T, Dynamic, 1&gt;&amp; <a class="code" href="namespacestan_1_1agrad.html#a1fb22c831a12e8fea76ef7ee0bd32cb3">grad</a>,</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;            Eigen::Matrix&lt;T, Dynamic, Dynamic&gt;&amp; H) {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      H.resize(x.size(), x.size());</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      grad.resize(x.size());</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      Eigen::Matrix&lt;fvar&lt;fvar&lt;T&gt; &gt;, Dynamic, 1&gt; x_fvar(x.size());</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; x.size(); ++i) {</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = i; j &lt; x.size(); ++j) {</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 0; k &lt; x.size(); ++k)</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            x_fvar(k) = <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;fvar&lt;T&gt;</a> &gt;(<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>(x(k), j == k),</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;                                       <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>(i == k, 0));</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;          <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;fvar&lt;T&gt;</a> &gt; fx_fvar = f(x_fvar);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;          <span class="keywordflow">if</span> (j == 0)</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            fx = fx_fvar.<a class="code" href="structstan_1_1agrad_1_1fvar.html#a8aa2f2b763eea9bf8928fe5f4dcd0a3d">val_</a>.val_;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;          <span class="keywordflow">if</span> (i == j)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            <a class="code" href="namespacestan_1_1agrad.html#a1fb22c831a12e8fea76ef7ee0bd32cb3">grad</a>(i) = fx_fvar.<a class="code" href="structstan_1_1agrad_1_1fvar.html#a189f3e99b3716c92b73b43e709245787">d_</a>.val_;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;          H(i, j) = fx_fvar.<a class="code" href="structstan_1_1agrad_1_1fvar.html#a189f3e99b3716c92b73b43e709245787">d_</a>.d_;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;          H(j, i) = H(i, j);</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        }</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      }</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    }</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  }  <span class="comment">// namespace agrad</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}  <span class="comment">// namespace stan</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="fwd_2core_8hpp_html"><div class="ttname"><a href="fwd_2core_8hpp.html">core.hpp</a></div></div>
+<div class="ttc" id="rev_2core_8hpp_html"><div class="ttname"><a href="rev_2core_8hpp.html">core.hpp</a></div></div>
+<div class="ttc" id="namespacestan_1_1agrad_html_a121d1cb0c26db26ef9feb0bd4f78b4c7"><div class="ttname"><a href="namespacestan_1_1agrad.html#a121d1cb0c26db26ef9feb0bd4f78b4c7">stan::agrad::start_nested</a></div><div class="ttdeci">static void start_nested()</div><div class="ttdoc">Record the current position so that recover_memory_nested() can find it. </div><div class="ttdef"><b>Definition:</b> <a href="start__nested_8hpp_source.html#l00013">start_nested.hpp:13</a></div></div>
+<div class="ttc" id="classstan_1_1agrad_1_1var_html_a3c15579ed3018cae0a0bf556bed164e3"><div class="ttname"><a href="classstan_1_1agrad_1_1var.html#a3c15579ed3018cae0a0bf556bed164e3">stan::agrad::var::val</a></div><div class="ttdeci">double val() const </div><div class="ttdoc">Return the value of this variable. </div><div class="ttdef"><b>Definition:</b> <a href="var_8hpp_source.html#l00232">var.hpp:232</a></div></div>
+<div class="ttc" id="structstan_1_1agrad_1_1fvar_html"><div class="ttname"><a href="structstan_1_1agrad_1_1fvar.html">stan::agrad::fvar</a></div><div class="ttdef"><b>Definition:</b> <a href="fvar_8hpp_source.html#l00013">fvar.hpp:13</a></div></div>
+<div class="ttc" id="namespacestan_1_1agrad_html_a1fb22c831a12e8fea76ef7ee0bd32cb3"><div class="ttname"><a href="namespacestan_1_1agrad.html#a1fb22c831a12e8fea76ef7ee0bd32cb3">stan::agrad::grad</a></div><div class="ttdeci">static void grad(chainable *vi)</div><div class="ttdoc">Compute the gradient for all variables starting from the specified root variable implementation. </div><div class="ttdef"><b>Definition:</b> <a href="core_2grad_8hpp_source.html#l00030">grad.hpp:30</a></div></div>
+<div class="ttc" id="namespacestan_1_1agrad_html_a314e76d2e9ec6e8f0e8595447ac8c950"><div class="ttname"><a href="namespacestan_1_1agrad.html#a314e76d2e9ec6e8f0e8595447ac8c950">stan::agrad::hessian</a></div><div class="ttdeci">void hessian(const F &amp;f, const Eigen::Matrix&lt; double, Dynamic, 1 &gt; &amp;x, double &amp;fx, Eigen::Matrix&lt; double, Dynamic, 1 &gt; &amp;grad, Eigen::Matrix&lt; double, Dynamic, Dynamic &gt; &amp;H)</div><div class="ttdoc">Calculate the value, the gradient, and the Hessian, of the specified function at the specified argume...</div><div class="ttdef"><b>Definition:</b> <a href="hessian_8hpp_source.html#l00046">hessian.hpp:46</a></div></div>
+<div class="ttc" id="classstan_1_1agrad_1_1var_html_afa91116cfe4571849cc53b454d977a88"><div class="ttname"><a href="classstan_1_1agrad_1_1var.html#afa91116cfe4571849cc53b454d977a88">stan::agrad::var::vi_</a></div><div class="ttdeci">vari * vi_</div><div class="ttdoc">Pointer to the implementation of this variable. </div><div class="ttdef"><b>Definition:</b> <a href="var_8hpp_source.html#l00044">var.hpp:44</a></div></div>
 <div class="ttc" id="_eigen_8hpp_html"><div class="ttname"><a href="_eigen_8hpp.html">Eigen.hpp</a></div></div>
-<div class="ttc" id="classstan_1_1agrad_1_1var_html"><div class="ttname"><a href="classstan_1_1agrad_1_1var.html">stan::agrad::var</a></div><div class="ttdoc">Independent (input) and dependent (output) variables for gradients. </div><div class="ttdef"><b>Definition:</b> <a href="agrad__thread__safe_8hpp_source.html#l00701">agrad_thread_safe.hpp:701</a></div></div>
-<div class="ttc" id="structstan_1_1agrad_1_1fvar_html_a189f3e99b3716c92b73b43e709245787"><div class="ttname"><a href="structstan_1_1agrad_1_1fvar.html#a189f3e99b3716c92b73b43e709245787">stan::agrad::fvar::d_</a></div><div class="ttdeci">T d_</div><div class="ttdef"><b>Definition:</b> <a href="fvar_8hpp_source.html#l00014">fvar.hpp:14</a></div></div>
-<div class="ttc" id="namespacestan_1_1agrad_html_a757135302068c250c2379b0c13a28e2e"><div class="ttname"><a href="namespacestan_1_1agrad.html#a757135302068c250c2379b0c13a28e2e">stan::agrad::hessian</a></div><div class="ttdeci">void hessian(const F &amp;f, const Eigen::Matrix&lt; double, Eigen::Dynamic, 1 &gt; &amp;x, double &amp;fx, Eigen::Matrix&lt; double, Eigen::Dynamic, 1 &gt; &amp;grad, Eigen::Matrix&lt; double, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;H)</div><div class="ttdef"><b>Definition:</b> <a href="autodiff_8hpp_source.html#l00207">autodiff.hpp:207</a></div></div>
-<div class="ttc" id="structstan_1_1agrad_1_1fvar_html_a8aa2f2b763eea9bf8928fe5f4dcd0a3d"><div class="ttname"><a href="structstan_1_1agrad_1_1fvar.html#a8aa2f2b763eea9bf8928fe5f4dcd0a3d">stan::agrad::fvar::val_</a></div><div class="ttdeci">T val_</div><div class="ttdef"><b>Definition:</b> <a href="fvar_8hpp_source.html#l00013">fvar.hpp:13</a></div></div>
+<div class="ttc" id="namespacestan_1_1math_html_a3b650a0131d41167ef4837ecc7d02be5"><div class="ttname"><a href="namespacestan_1_1math.html#a3b650a0131d41167ef4837ecc7d02be5">stan::math::e</a></div><div class="ttdeci">double e()</div><div class="ttdoc">Return the base of the natural logarithm. </div><div class="ttdef"><b>Definition:</b> <a href="fun_2constants_8hpp_source.html#l00086">constants.hpp:86</a></div></div>
+<div class="ttc" id="structstan_1_1agrad_1_1fvar_html_a189f3e99b3716c92b73b43e709245787"><div class="ttname"><a href="structstan_1_1agrad_1_1fvar.html#a189f3e99b3716c92b73b43e709245787">stan::agrad::fvar::d_</a></div><div class="ttdeci">T d_</div><div class="ttdef"><b>Definition:</b> <a href="fvar_8hpp_source.html#l00016">fvar.hpp:16</a></div></div>
+<div class="ttc" id="namespacestan_1_1agrad_html_a49840f2ff3d412722cf7fb4050b6d452"><div class="ttname"><a href="namespacestan_1_1agrad.html#a49840f2ff3d412722cf7fb4050b6d452">stan::agrad::recover_memory_nested</a></div><div class="ttdeci">static void recover_memory_nested()</div><div class="ttdoc">Recover only the memory used for the top nested call. </div><div class="ttdef"><b>Definition:</b> <a href="recover__memory__nested_8hpp_source.html#l00021">recover_memory_nested.hpp:21</a></div></div>
+<div class="ttc" id="structstan_1_1agrad_1_1fvar_html_a8aa2f2b763eea9bf8928fe5f4dcd0a3d"><div class="ttname"><a href="structstan_1_1agrad_1_1fvar.html#a8aa2f2b763eea9bf8928fe5f4dcd0a3d">stan::agrad::fvar::val_</a></div><div class="ttdeci">T val_</div><div class="ttdef"><b>Definition:</b> <a href="fvar_8hpp_source.html#l00015">fvar.hpp:15</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

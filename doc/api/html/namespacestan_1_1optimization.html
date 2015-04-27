@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -158,9 +157,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a24a320be733b83342237b0a1a81446f2"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1optimization.html#a24a320be733b83342237b0a1a81446f2">WolfeLineSearch</a> (FunctorType &amp;func, Scalar &amp;alpha, XType &amp;x1, Scalar &amp;f1, XType &amp;gradx1, const XType &amp;p, const XType &amp;x0, const Scalar &amp;f0, const XType &amp;gradx0, const Scalar &amp;c1, const Scalar &amp;c2, const Scalar &amp;minAlpha)</td></tr>
 <tr class="memdesc:a24a320be733b83342237b0a1a81446f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a line search which finds an approximate solution to: </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \min_\alpha f(x_0 + \alpha p) \]" src="form_138.png"/>
+<img class="formulaDsp" alt="\[ \min_\alpha f(x_0 + \alpha p) \]" src="form_442.png"/>
 </p>
-<p> satisfying the strong Wolfe conditions: 1) <img class="formulaInl" alt="$ f(x_0 + \alpha p) \leq f(x_0) + c_1 \alpha p^T g(x_0) $" src="form_139.png"/> 2) <img class="formulaInl" alt="$ \vert p^T g(x_0 + \alpha p) \vert \leq c_2 \vert p^T g(x_0) \vert $" src="form_140.png"/> where <img class="formulaInl" alt="$g(x) = \frac{\partial f}{\partial x}$" src="form_141.png"/> is the gradient of f(x).  <a href="#a24a320be733b83342237b0a1a81446f2">More...</a><br/></td></tr>
+<p> satisfying the strong Wolfe conditions: 1) <img class="formulaInl" alt="$ f(x_0 + \alpha p) \leq f(x_0) + c_1 \alpha p^T g(x_0) $" src="form_443.png"/> 2) <img class="formulaInl" alt="$ \vert p^T g(x_0 + \alpha p) \vert \leq c_2 \vert p^T g(x_0) \vert $" src="form_444.png"/> where <img class="formulaInl" alt="$g(x) = \frac{\partial f}{\partial x}$" src="form_445.png"/> is the gradient of f(x).  <a href="#a24a320be733b83342237b0a1a81446f2">More...</a><br/></td></tr>
 <tr class="separator:a24a320be733b83342237b0a1a81446f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96fbc01564bc465d164199b41891be0d"><td class="memTemplParams" colspan="2">template&lt;typename M &gt; </td></tr>
 <tr class="memitem:a96fbc01564bc465d164199b41891be0d"><td class="memTemplItemLeft" align="right" valign="top">double&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1optimization.html#a96fbc01564bc465d164199b41891be0d">newton_step</a> (M &amp;model, std::vector&lt; double &gt; &amp;params_r, std::vector&lt; int &gt; &amp;params_i, std::ostream *output_stream=0)</td></tr>
@@ -224,7 +223,7 @@ Functions</h2></td></tr>
 </td></tr>
 </table>
 
-<p>Definition at line <a class="el" href="bfgs_8hpp_source.html#l00020">20</a> of file <a class="el" href="bfgs_8hpp_source.html">bfgs.hpp</a>.</p>
+<p>Definition at line <a class="el" href="bfgs_8hpp_source.html#l00021">21</a> of file <a class="el" href="bfgs_8hpp_source.html">bfgs.hpp</a>.</p>
 
 </div>
 </div>
@@ -418,7 +417,7 @@ template&lt;typename M &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="bfgs_8hpp_source.html#l00287">287</a> of file <a class="el" href="bfgs_8hpp_source.html">bfgs.hpp</a>.</p>
+<p>Definition at line <a class="el" href="bfgs_8hpp_source.html#l00288">288</a> of file <a class="el" href="bfgs_8hpp_source.html">bfgs.hpp</a>.</p>
 
 </div>
 </div>
@@ -552,9 +551,9 @@ template&lt;typename FunctorType , typename Scalar , typename XType &gt; </div>
 
 <p>Perform a line search which finds an approximate solution to: </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \min_\alpha f(x_0 + \alpha p) \]" src="form_138.png"/>
+<img class="formulaDsp" alt="\[ \min_\alpha f(x_0 + \alpha p) \]" src="form_442.png"/>
 </p>
-<p> satisfying the strong Wolfe conditions: 1) <img class="formulaInl" alt="$ f(x_0 + \alpha p) \leq f(x_0) + c_1 \alpha p^T g(x_0) $" src="form_139.png"/> 2) <img class="formulaInl" alt="$ \vert p^T g(x_0 + \alpha p) \vert \leq c_2 \vert p^T g(x_0) \vert $" src="form_140.png"/> where <img class="formulaInl" alt="$g(x) = \frac{\partial f}{\partial x}$" src="form_141.png"/> is the gradient of f(x). </p>
+<p> satisfying the strong Wolfe conditions: 1) <img class="formulaInl" alt="$ f(x_0 + \alpha p) \leq f(x_0) + c_1 \alpha p^T g(x_0) $" src="form_443.png"/> 2) <img class="formulaInl" alt="$ \vert p^T g(x_0 + \alpha p) \vert \leq c_2 \vert p^T g(x_0) \vert $" src="form_444.png"/> where <img class="formulaInl" alt="$g(x) = \frac{\partial f}{\partial x}$" src="form_445.png"/> is the gradient of f(x). </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">FunctorType</td><td>A type which supports being called as ret = func(x,f,g) where x is the input point, f and g are the function value and gradient at x and ret is non-zero if function evaluation fails.</td></tr>
@@ -564,16 +563,16 @@ template&lt;typename FunctorType , typename Scalar , typename XType &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">func</td><td>Function which is being minimized.</td></tr>
-    <tr><td class="paramname">alpha</td><td>First value of <img class="formulaInl" alt="$ \alpha $" src="form_142.png"/> to try. Upon return this contains the final value of the <img class="formulaInl" alt="$ \alpha $" src="form_142.png"/>.</td></tr>
-    <tr><td class="paramname">x1</td><td>Final point, equal to <img class="formulaInl" alt="$ x_0 + \alpha p $" src="form_143.png"/>.</td></tr>
-    <tr><td class="paramname">f1</td><td>Final point function value, equal to <img class="formulaInl" alt="$ f(x_0 + \alpha p) $" src="form_144.png"/>.</td></tr>
-    <tr><td class="paramname">gradx1</td><td>Final point gradient, equal to <img class="formulaInl" alt="$ g(x_0 + \alpha p) $" src="form_145.png"/>.</td></tr>
-    <tr><td class="paramname">p</td><td>Search direction. It is assumed to be a descent direction such that <img class="formulaInl" alt="$ p^T g(x_0) < 0 $" src="form_146.png"/>.</td></tr>
-    <tr><td class="paramname">x0</td><td>Value of starting point, <img class="formulaInl" alt="$ x_0 $" src="form_147.png"/>.</td></tr>
-    <tr><td class="paramname">f0</td><td>Value of function at starting point, <img class="formulaInl" alt="$ f(x_0) $" src="form_148.png"/>.</td></tr>
-    <tr><td class="paramname">gradx0</td><td>Value of function gradient at starting point, <img class="formulaInl" alt="$ g(x_0) $" src="form_149.png"/>.</td></tr>
-    <tr><td class="paramname">c1</td><td>Parameter of the Wolfe conditions. <img class="formulaInl" alt="$ 0 < c_1 < c_2 < 1 $" src="form_150.png"/> Typically c1 = 1e-4.</td></tr>
-    <tr><td class="paramname">c2</td><td>Parameter of the Wolfe conditions. <img class="formulaInl" alt="$ 0 < c_1 < c_2 < 1 $" src="form_150.png"/> Typically c2 = 0.9.</td></tr>
+    <tr><td class="paramname">alpha</td><td>First value of <img class="formulaInl" alt="$ \alpha $" src="form_446.png"/> to try. Upon return this contains the final value of the <img class="formulaInl" alt="$ \alpha $" src="form_446.png"/>.</td></tr>
+    <tr><td class="paramname">x1</td><td>Final point, equal to <img class="formulaInl" alt="$ x_0 + \alpha p $" src="form_447.png"/>.</td></tr>
+    <tr><td class="paramname">f1</td><td>Final point function value, equal to <img class="formulaInl" alt="$ f(x_0 + \alpha p) $" src="form_448.png"/>.</td></tr>
+    <tr><td class="paramname">gradx1</td><td>Final point gradient, equal to <img class="formulaInl" alt="$ g(x_0 + \alpha p) $" src="form_449.png"/>.</td></tr>
+    <tr><td class="paramname">p</td><td>Search direction. It is assumed to be a descent direction such that <img class="formulaInl" alt="$ p^T g(x_0) < 0 $" src="form_450.png"/>.</td></tr>
+    <tr><td class="paramname">x0</td><td>Value of starting point, <img class="formulaInl" alt="$ x_0 $" src="form_451.png"/>.</td></tr>
+    <tr><td class="paramname">f0</td><td>Value of function at starting point, <img class="formulaInl" alt="$ f(x_0) $" src="form_452.png"/>.</td></tr>
+    <tr><td class="paramname">gradx0</td><td>Value of function gradient at starting point, <img class="formulaInl" alt="$ g(x_0) $" src="form_453.png"/>.</td></tr>
+    <tr><td class="paramname">c1</td><td>Parameter of the Wolfe conditions. <img class="formulaInl" alt="$ 0 < c_1 < c_2 < 1 $" src="form_454.png"/> Typically c1 = 1e-4.</td></tr>
+    <tr><td class="paramname">c2</td><td>Parameter of the Wolfe conditions. <img class="formulaInl" alt="$ 0 < c_1 < c_2 < 1 $" src="form_454.png"/> Typically c2 = 0.9.</td></tr>
     <tr><td class="paramname">minAlpha</td><td>Smallest allowable step-size.</td></tr>
   </table>
   </dd>

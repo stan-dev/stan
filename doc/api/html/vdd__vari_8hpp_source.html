@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>Stan: src/stan/agrad/rev/internal/vdd_vari.hpp Source File</title>
+<title>Stan: src/stan/math/rev/core/vdd_vari.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_52c3c3fe3bff0ba6815d4f34971ed7d3.html">agrad</a></li><li class="navelem"><a class="el" href="dir_f2ec37f115c79ba754de20300359aed5.html">rev</a></li><li class="navelem"><a class="el" href="dir_0c7ba03e05d7755a93c72a387515f18e.html">internal</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_74dffc450e0f1a697b45b136c6270db1.html">src</a></li><li class="navelem"><a class="el" href="dir_803b5608bcbe879b166efa51ba84b7e9.html">stan</a></li><li class="navelem"><a class="el" href="dir_668e8ef714ddacd4c07848956741d104.html">math</a></li><li class="navelem"><a class="el" href="dir_634fbc9f48c560122e5e5ba552395bcc.html">rev</a></li><li class="navelem"><a class="el" href="dir_bf535e0bc396c926c2eaa18680215d8a.html">core</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -92,15 +91,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">vdd_vari.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="vdd__vari_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef __STAN__AGRAD__REV__INTERNAL__VDD_VARI_HPP__</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define __STAN__AGRAD__REV__INTERNAL__VDD_VARI_HPP__</span></div>
+<a href="vdd__vari_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef STAN__MATH__REV__CORE__VDD_VARI_HPP</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define STAN__MATH__REV__CORE__VDD_VARI_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="vari_8hpp.html">stan/agrad/rev/vari.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="vari_8hpp.html">stan/math/rev/core/vari.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;</div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace </span>stan {</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;  <span class="keyword">namespace </span>agrad {</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
-<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classstan_1_1agrad_1_1op__vdd__vari.html">    9</a></span>&#160;    <span class="keyword">class </span>op_vdd_vari : <span class="keyword">public</span> <a class="code" href="classstan_1_1agrad_1_1vari.html">vari</a> {</div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classstan_1_1agrad_1_1op__vdd__vari.html">    9</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classstan_1_1agrad_1_1op__vdd__vari.html">op_vdd_vari</a> : <span class="keyword">public</span> <a class="code" href="classstan_1_1agrad_1_1vari.html">vari</a> {</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keyword">protected</span>:</div>
 <div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="classstan_1_1agrad_1_1op__vdd__vari.html#ac48a55ac9e4fe37c975bc0da3795e5cc">   11</a></span>&#160;      <a class="code" href="classstan_1_1agrad_1_1vari.html">vari</a>* <a class="code" href="classstan_1_1agrad_1_1op__vdd__vari.html#ac48a55ac9e4fe37c975bc0da3795e5cc">avi_</a>;</div>
 <div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="classstan_1_1agrad_1_1op__vdd__vari.html#a287e3ff89d946a2eb877abbc525ed132">   12</a></span>&#160;      <span class="keywordtype">double</span> <a class="code" href="classstan_1_1agrad_1_1op__vdd__vari.html#a287e3ff89d946a2eb877abbc525ed132">bd_</a>;</div>
@@ -108,9 +107,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classstan_1_1agrad_1_1op__vdd__vari.html#a422712bd9ca49f7295d63efd9db459e1">   15</a></span>&#160;      <a class="code" href="classstan_1_1agrad_1_1op__vdd__vari.html#a422712bd9ca49f7295d63efd9db459e1">op_vdd_vari</a>(<span class="keywordtype">double</span> f, <a class="code" href="classstan_1_1agrad_1_1vari.html">vari</a>* avi, <span class="keywordtype">double</span> b, <span class="keywordtype">double</span> c) :</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;        <a class="code" href="classstan_1_1agrad_1_1vari.html">vari</a>(f),</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        <a class="code" href="agrad__thread__safe_8hpp.html#a7ed9dc49639747c6e4466603cb99f37a">avi_</a>(avi),</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <a class="code" href="agrad__thread__safe_8hpp.html#a6bc687cb96fe2e6f4d9f4db190eb789f">bd_</a>(b), </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <a class="code" href="agrad__thread__safe_8hpp.html#a1671afec9ddeea25855e744cb53988f4">cd_</a>(c) {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        <a class="code" href="classstan_1_1agrad_1_1op__vdd__vari.html#ac48a55ac9e4fe37c975bc0da3795e5cc">avi_</a>(avi),</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <a class="code" href="classstan_1_1agrad_1_1op__vdd__vari.html#a287e3ff89d946a2eb877abbc525ed132">bd_</a>(b), </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <a class="code" href="classstan_1_1agrad_1_1op__vdd__vari.html#a07feae28b7d06e95a4c5221728eaeb59">cd_</a>(c) {</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      }</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    };</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
@@ -118,14 +117,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;}</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="vari_8hpp_html"><div class="ttname"><a href="vari_8hpp.html">vari.hpp</a></div></div>
-<div class="ttc" id="agrad__thread__safe_8hpp_html_a1671afec9ddeea25855e744cb53988f4"><div class="ttname"><a href="agrad__thread__safe_8hpp.html#a1671afec9ddeea25855e744cb53988f4">cd_</a></div><div class="ttdeci">double cd_</div><div class="ttdef"><b>Definition:</b> <a href="agrad__thread__safe_8hpp_source.html#l00217">agrad_thread_safe.hpp:217</a></div></div>
 <div class="ttc" id="classstan_1_1agrad_1_1op__vdd__vari_html_a07feae28b7d06e95a4c5221728eaeb59"><div class="ttname"><a href="classstan_1_1agrad_1_1op__vdd__vari.html#a07feae28b7d06e95a4c5221728eaeb59">stan::agrad::op_vdd_vari::cd_</a></div><div class="ttdeci">double cd_</div><div class="ttdef"><b>Definition:</b> <a href="vdd__vari_8hpp_source.html#l00013">vdd_vari.hpp:13</a></div></div>
 <div class="ttc" id="classstan_1_1agrad_1_1op__vdd__vari_html_a287e3ff89d946a2eb877abbc525ed132"><div class="ttname"><a href="classstan_1_1agrad_1_1op__vdd__vari.html#a287e3ff89d946a2eb877abbc525ed132">stan::agrad::op_vdd_vari::bd_</a></div><div class="ttdeci">double bd_</div><div class="ttdef"><b>Definition:</b> <a href="vdd__vari_8hpp_source.html#l00012">vdd_vari.hpp:12</a></div></div>
-<div class="ttc" id="classstan_1_1agrad_1_1vari_html"><div class="ttname"><a href="classstan_1_1agrad_1_1vari.html">stan::agrad::vari</a></div><div class="ttdoc">The variable implementation base class. </div><div class="ttdef"><b>Definition:</b> <a href="agrad__thread__safe_8hpp_source.html#l00053">agrad_thread_safe.hpp:53</a></div></div>
+<div class="ttc" id="classstan_1_1agrad_1_1vari_html"><div class="ttname"><a href="classstan_1_1agrad_1_1vari.html">stan::agrad::vari</a></div><div class="ttdoc">The variable implementation base class. </div><div class="ttdef"><b>Definition:</b> <a href="vari_8hpp_source.html#l00028">vari.hpp:28</a></div></div>
 <div class="ttc" id="classstan_1_1agrad_1_1op__vdd__vari_html_a422712bd9ca49f7295d63efd9db459e1"><div class="ttname"><a href="classstan_1_1agrad_1_1op__vdd__vari.html#a422712bd9ca49f7295d63efd9db459e1">stan::agrad::op_vdd_vari::op_vdd_vari</a></div><div class="ttdeci">op_vdd_vari(double f, vari *avi, double b, double c)</div><div class="ttdef"><b>Definition:</b> <a href="vdd__vari_8hpp_source.html#l00015">vdd_vari.hpp:15</a></div></div>
 <div class="ttc" id="classstan_1_1agrad_1_1op__vdd__vari_html_ac48a55ac9e4fe37c975bc0da3795e5cc"><div class="ttname"><a href="classstan_1_1agrad_1_1op__vdd__vari.html#ac48a55ac9e4fe37c975bc0da3795e5cc">stan::agrad::op_vdd_vari::avi_</a></div><div class="ttdeci">vari * avi_</div><div class="ttdef"><b>Definition:</b> <a href="vdd__vari_8hpp_source.html#l00011">vdd_vari.hpp:11</a></div></div>
-<div class="ttc" id="agrad__thread__safe_8hpp_html_a7ed9dc49639747c6e4466603cb99f37a"><div class="ttname"><a href="agrad__thread__safe_8hpp.html#a7ed9dc49639747c6e4466603cb99f37a">avi_</a></div><div class="ttdeci">vari * avi_</div><div class="ttdef"><b>Definition:</b> <a href="agrad__thread__safe_8hpp_source.html#l00155">agrad_thread_safe.hpp:155</a></div></div>
-<div class="ttc" id="agrad__thread__safe_8hpp_html_a6bc687cb96fe2e6f4d9f4db190eb789f"><div class="ttname"><a href="agrad__thread__safe_8hpp.html#a6bc687cb96fe2e6f4d9f4db190eb789f">bd_</a></div><div class="ttdeci">double bd_</div><div class="ttdef"><b>Definition:</b> <a href="agrad__thread__safe_8hpp_source.html#l00178">agrad_thread_safe.hpp:178</a></div></div>
+<div class="ttc" id="classstan_1_1agrad_1_1op__vdd__vari_html"><div class="ttname"><a href="classstan_1_1agrad_1_1op__vdd__vari.html">stan::agrad::op_vdd_vari</a></div><div class="ttdef"><b>Definition:</b> <a href="vdd__vari_8hpp_source.html#l00009">vdd_vari.hpp:9</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

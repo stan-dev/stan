@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['idx_5ft',['idx_t',['../classstan_1_1optimization_1_1_b_f_g_s_line_search.html#a56eeab857c5a29b91ca92ec3cd6eebd9',1,'stan::optimization::BFGSLineSearch']]],
-  ['input_5fiterator_5ft',['input_iterator_t',['../namespacestan_1_1gm.html#ac7f317507dcc0c48875b10b44f76bba5',1,'stan::gm']]],
-  ['int_5fargument',['int_argument',['../namespacestan_1_1gm.html#ab772327341c716a591776dda31107ee7',1,'stan::gm']]]
+  ['hessiant',['HessianT',['../classstan_1_1optimization_1_1_b_f_g_s_minimizer.html#a3c23a971510358627d22a3e8d43922db',1,'stan::optimization::BFGSMinimizer::HessianT()'],['../classstan_1_1optimization_1_1_b_f_g_s_update___h_inv.html#a99507484d2e364d1e1e5b0298475f305',1,'stan::optimization::BFGSUpdate_HInv::HessianT()'],['../classstan_1_1optimization_1_1_l_b_f_g_s_update.html#a5daea9adb7cf5cf48dbd51b2299d75c6',1,'stan::optimization::LBFGSUpdate::HessianT()']]]
 ];

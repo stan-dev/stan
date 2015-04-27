@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>Stan: src/stan/gm/grammars/functions_grammar_def.hpp File Reference</title>
+<title>Stan: src/stan/lang/grammars/functions_grammar_def.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,13 +83,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_29b20cd43524c7f0fc77aef3c7e38f50.html">gm</a></li><li class="navelem"><a class="el" href="dir_bfdd916fd7a3310c7c8c32c9dbb4c5dd.html">grammars</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_74dffc450e0f1a697b45b136c6270db1.html">src</a></li><li class="navelem"><a class="el" href="dir_803b5608bcbe879b166efa51ba84b7e9.html">stan</a></li><li class="navelem"><a class="el" href="dir_f31756577f8c81fb97f1e68de059ca48.html">lang</a></li><li class="navelem"><a class="el" href="dir_85d09308b099395ca380c416980db6a4.html">grammars</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -118,148 +116,258 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;boost/variant/recursive_variant.hpp&gt;</code><br/>
 <code>#include &lt;boost/spirit/include/version.hpp&gt;</code><br/>
 <code>#include &lt;boost/spirit/include/support_line_pos_iterator.hpp&gt;</code><br/>
-<code>#include &lt;<a class="el" href="ast_8hpp_source.html">stan/gm/ast.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="functions__grammar_8hpp_source.html">stan/gm/grammars/functions_grammar.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="statement__grammar_8hpp_source.html">stan/gm/grammars/statement_grammar.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="whitespace__grammar_8hpp_source.html">stan/gm/grammars/whitespace_grammar.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="ast_8hpp_source.html">stan/lang/ast.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="functions__grammar_8hpp_source.html">stan/lang/grammars/functions_grammar.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="statement__grammar_8hpp_source.html">stan/lang/grammars/statement_grammar.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="whitespace__grammar_8hpp_source.html">stan/lang/grammars/whitespace_grammar.hpp</a>&gt;</code><br/>
 </div>
 <p><a href="functions__grammar__def_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1validate__non__void__arg__function.html">stan::gm::validate_non_void_arg_function</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structset__void__function.html">set_void_function</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1validate__non__void__arg__function_1_1result.html">stan::gm::validate_non_void_arg_function::result&lt; T1, T2, T3 &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structset__void__function_1_1result.html">set_void_function::result&lt; T1, T2, T3, T4 &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1set__void__function.html">stan::gm::set_void_function</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structset__allows__sampling__origin.html">set_allows_sampling_origin</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1set__void__function_1_1result.html">stan::gm::set_void_function::result&lt; T1, T2, T3, T4 &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structset__allows__sampling__origin_1_1result.html">set_allows_sampling_origin::result&lt; T1, T2, T3 &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1set__allows__sampling__origin.html">stan::gm::set_allows_sampling_origin</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvalidate__declarations.html">validate_declarations</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1set__allows__sampling__origin_1_1result.html">stan::gm::set_allows_sampling_origin::result&lt; T1, T2, T3 &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvalidate__declarations_1_1result.html">validate_declarations::result&lt; T1, T2, T3, T4 &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1validate__declarations.html">stan::gm::validate_declarations</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structadd__function__signature.html">add_function_signature</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1validate__declarations_1_1result.html">stan::gm::validate_declarations::result&lt; T1, T2, T3, T4 &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structadd__function__signature_1_1result.html">add_function_signature::result&lt; T1, T2, T3, T4, T5 &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1add__function__signature.html">stan::gm::add_function_signature</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvalidate__return__type.html">validate_return_type</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1add__function__signature_1_1result.html">stan::gm::add_function_signature::result&lt; T1, T2, T3, T4, T5 &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvalidate__return__type_1_1result.html">validate_return_type::result&lt; T1, T2, T3 &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1validate__return__type.html">stan::gm::validate_return_type</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscope__lp.html">scope_lp</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1validate__return__type_1_1result.html">stan::gm::validate_return_type::result&lt; T1, T2, T3 &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscope__lp_1_1result.html">scope_lp::result&lt; T1 &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1scope__lp.html">stan::gm::scope_lp</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structunscope__variables.html">unscope_variables</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1scope__lp_1_1result.html">stan::gm::scope_lp::result&lt; T1 &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structunscope__variables_1_1result.html">unscope_variables::result&lt; T1, T2 &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1unscope__variables.html">stan::gm::unscope_variables</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structadd__fun__var.html">add_fun_var</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1unscope__variables_1_1result.html">stan::gm::unscope_variables::result&lt; T1, T2 &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1add__fun__var.html">stan::gm::add_fun_var</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1gm_1_1add__fun__var_1_1result.html">stan::gm::add_fun_var::result&lt; T1, T2, T3, T4 &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
-Namespaces</h2></td></tr>
-<tr class="memitem:namespacestan"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan.html">stan</a></td></tr>
-<tr class="memdesc:namespacestan"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probability, optimization and sampling library. <br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:namespacestan_1_1gm"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html">stan::gm</a></td></tr>
-<tr class="memdesc:namespacestan_1_1gm"><td class="mdescLeft">&#160;</td><td class="mdescRight">Directed graphical model compiler. <br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structadd__fun__var_1_1result.html">add_fun_var::result&lt; T1, T2, T3, T4 &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:acede4a329d24f404519b7f59424ea404"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#acede4a329d24f404519b7f59424ea404">BOOST_FUSION_ADAPT_STRUCT</a> (<a class="el" href="structstan_1_1gm_1_1function__decl__def.html">stan::gm::function_decl_def</a>,(<a class="el" href="structstan_1_1gm_1_1expr__type.html">stan::gm::expr_type</a>, return_type_)(std::string, name_)(std::vector&lt; <a class="el" href="structstan_1_1gm_1_1arg__decl.html">stan::gm::arg_decl</a> &gt;, arg_decls_)(<a class="el" href="structstan_1_1gm_1_1statement.html">stan::gm::statement</a>, body_))</td></tr>
-<tr class="separator:acede4a329d24f404519b7f59424ea404"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3fcc7a3bc48a8fc46002e45b4cb8dea5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#a3fcc7a3bc48a8fc46002e45b4cb8dea5">BOOST_FUSION_ADAPT_STRUCT</a> (<a class="el" href="structstan_1_1gm_1_1arg__decl.html">stan::gm::arg_decl</a>,(<a class="el" href="structstan_1_1gm_1_1expr__type.html">stan::gm::expr_type</a>, arg_type_)(std::string, name_)(<a class="el" href="structstan_1_1gm_1_1statement.html">stan::gm::statement</a>, body_))</td></tr>
-<tr class="separator:a3fcc7a3bc48a8fc46002e45b4cb8dea5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f0a0c3a119c3180f2ca17307aa5104f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#a6f0a0c3a119c3180f2ca17307aa5104f">operator()</a> (const expr_type &amp;arg_type, bool &amp;pass, std::ostream &amp;error_msgs) const </td></tr>
+<tr class="separator:a6f0a0c3a119c3180f2ca17307aa5104f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a3fdd4f175de426aa37fca452d766f4bb"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
-&lt; validate_non_void_arg_function &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a3fdd4f175de426aa37fca452d766f4bb">stan::gm::validate_non_void_arg_f</a></td></tr>
-<tr class="separator:a3fdd4f175de426aa37fca452d766f4bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7103328c3fc76802bc8a9adc032d23a"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
-&lt; set_void_function &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#ad7103328c3fc76802bc8a9adc032d23a">stan::gm::set_void_function_f</a></td></tr>
-<tr class="separator:ad7103328c3fc76802bc8a9adc032d23a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeac3ff1898ffab4ea6d96d5287b51852"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
-&lt; set_allows_sampling_origin &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#aeac3ff1898ffab4ea6d96d5287b51852">stan::gm::set_allows_sampling_origin_f</a></td></tr>
-<tr class="separator:aeac3ff1898ffab4ea6d96d5287b51852"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afce91ef7da6a992f221387f6967f748b"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
-&lt; validate_declarations &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#afce91ef7da6a992f221387f6967f748b">stan::gm::validate_declarations_f</a></td></tr>
-<tr class="separator:afce91ef7da6a992f221387f6967f748b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2a3859e722cbb9d87201971c493a1fb"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
-&lt; add_function_signature &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#ad2a3859e722cbb9d87201971c493a1fb">stan::gm::add_function_signature_f</a></td></tr>
-<tr class="separator:ad2a3859e722cbb9d87201971c493a1fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4487ce0f3ae1923e96e5606054cf1317"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
-&lt; validate_return_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a4487ce0f3ae1923e96e5606054cf1317">stan::gm::validate_return_type_f</a></td></tr>
-<tr class="separator:a4487ce0f3ae1923e96e5606054cf1317"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab74540faae5f650a34d84c55159b8b82"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
-&lt; scope_lp &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#ab74540faae5f650a34d84c55159b8b82">stan::gm::scope_lp_f</a></td></tr>
-<tr class="separator:ab74540faae5f650a34d84c55159b8b82"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8700ca24ba66dfd8b437eb71cc770bb2"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
-&lt; unscope_variables &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a8700ca24ba66dfd8b437eb71cc770bb2">stan::gm::unscope_variables_f</a></td></tr>
-<tr class="separator:a8700ca24ba66dfd8b437eb71cc770bb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a527780d538999562d2b37eb32d3cec"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
-&lt; add_fun_var &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1gm.html#a0a527780d538999562d2b37eb32d3cec">stan::gm::add_fun_var_f</a></td></tr>
-<tr class="separator:a0a527780d538999562d2b37eb32d3cec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac11bb32d7a473237be317495535edece"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#ac11bb32d7a473237be317495535edece">BOOST_FUSION_ADAPT_STRUCT</a> (<a class="el" href="structstan_1_1lang_1_1function__decl__def.html">stan::lang::function_decl_def</a>,(<a class="el" href="structstan_1_1lang_1_1expr__type.html">stan::lang::expr_type</a>, return_type_)(std::string, name_)(std::vector&lt; <a class="el" href="structstan_1_1lang_1_1arg__decl.html">stan::lang::arg_decl</a> &gt;, arg_decls_)(<a class="el" href="structstan_1_1lang_1_1statement.html">stan::lang::statement</a>, body_)) BOOST_FUSION_ADAPT_STRUCT(stan</td></tr>
+<tr class="separator:ac11bb32d7a473237be317495535edece"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40bd6329cea7a08301afb71b65ee3d28"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
+&lt; validate_non_void_arg_function &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#a40bd6329cea7a08301afb71b65ee3d28">validate_non_void_arg_f</a></td></tr>
+<tr class="separator:a40bd6329cea7a08301afb71b65ee3d28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab51847ac5a5a456b310f2ea5c12222c"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
+&lt; <a class="el" href="structset__void__function.html">set_void_function</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#aab51847ac5a5a456b310f2ea5c12222c">set_void_function_f</a></td></tr>
+<tr class="separator:aab51847ac5a5a456b310f2ea5c12222c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af37abc1958ee02503a842801cda00dbf"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
+&lt; <a class="el" href="structset__allows__sampling__origin.html">set_allows_sampling_origin</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#af37abc1958ee02503a842801cda00dbf">set_allows_sampling_origin_f</a></td></tr>
+<tr class="separator:af37abc1958ee02503a842801cda00dbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc6341fe72c08b09cd0dbb941af6f114"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
+&lt; <a class="el" href="structvalidate__declarations.html">validate_declarations</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#abc6341fe72c08b09cd0dbb941af6f114">validate_declarations_f</a></td></tr>
+<tr class="separator:abc6341fe72c08b09cd0dbb941af6f114"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a809c1f1e32c46dcfb843bb1438d5a610"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
+&lt; <a class="el" href="structadd__function__signature.html">add_function_signature</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#a809c1f1e32c46dcfb843bb1438d5a610">add_function_signature_f</a></td></tr>
+<tr class="separator:a809c1f1e32c46dcfb843bb1438d5a610"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94db9cb721cc77ab9483b2381670cf25"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
+&lt; <a class="el" href="structvalidate__return__type.html">validate_return_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#a94db9cb721cc77ab9483b2381670cf25">validate_return_type_f</a></td></tr>
+<tr class="separator:a94db9cb721cc77ab9483b2381670cf25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a508d7e36c3d6254a3494ec6e616bc43e"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
+&lt; <a class="el" href="structscope__lp.html">scope_lp</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#a508d7e36c3d6254a3494ec6e616bc43e">scope_lp_f</a></td></tr>
+<tr class="separator:a508d7e36c3d6254a3494ec6e616bc43e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71484a21cee244ac8d83cf3033318d18"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
+&lt; <a class="el" href="structunscope__variables.html">unscope_variables</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#a71484a21cee244ac8d83cf3033318d18">unscope_variables_f</a></td></tr>
+<tr class="separator:a71484a21cee244ac8d83cf3033318d18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74415c4a3c0415262bdaf63498154ab4"><td class="memItemLeft" align="right" valign="top">boost::phoenix::function<br class="typebreak"/>
+&lt; <a class="el" href="structadd__fun__var.html">add_fun_var</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="functions__grammar__def_8hpp.html#a74415c4a3c0415262bdaf63498154ab4">add_fun_var_f</a></td></tr>
+<tr class="separator:a74415c4a3c0415262bdaf63498154ab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="acede4a329d24f404519b7f59424ea404"></a>
+<a class="anchor" id="a6f0a0c3a119c3180f2ca17307aa5104f"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">BOOST_FUSION_ADAPT_STRUCT </td>
+          <td class="memname">void operator() </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structstan_1_1gm_1_1function__decl__def.html">stan::gm::function_decl_def</a>&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramtype">const expr_type &amp;&#160;</td>
+          <td class="paramname"><em>arg_type</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">(<a class="el" href="structstan_1_1gm_1_1expr__type.html">stan::gm::expr_type</a>, return_type_)(std::string, name_)(std::vector&lt; <a class="el" href="structstan_1_1gm_1_1arg__decl.html">stan::gm::arg_decl</a> &gt;, arg_decls_)(<a class="el" href="structstan_1_1gm_1_1statement.html">stan::gm::statement</a>, body_)&#160;</td>
-          <td class="paramname">&#160;</td>
+          <td class="paramtype">bool &amp;&#160;</td>
+          <td class="paramname"><em>pass</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>error_msgs</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Definition at line <a class="el" href="functions__grammar__def_8hpp_source.html#l00052">52</a> of file <a class="el" href="functions__grammar__def_8hpp_source.html">functions_grammar_def.hpp</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a3fcc7a3bc48a8fc46002e45b4cb8dea5"></a>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="a74415c4a3c0415262bdaf63498154ab4"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">BOOST_FUSION_ADAPT_STRUCT </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structstan_1_1gm_1_1arg__decl.html">stan::gm::arg_decl</a>&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">(<a class="el" href="structstan_1_1gm_1_1expr__type.html">stan::gm::expr_type</a>, arg_type_)(std::string, name_)(<a class="el" href="structstan_1_1gm_1_1statement.html">stan::gm::statement</a>, body_)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="memname">boost::phoenix::function&lt;<a class="el" href="structadd__fun__var.html">add_fun_var</a>&gt; add_fun_var_f</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="functions__grammar__def_8hpp_source.html#l00287">287</a> of file <a class="el" href="functions__grammar__def_8hpp_source.html">functions_grammar_def.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a809c1f1e32c46dcfb843bb1438d5a610"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::phoenix::function&lt;<a class="el" href="structadd__function__signature.html">add_function_signature</a>&gt; add_function_signature_f</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="functions__grammar__def_8hpp_source.html#l00210">210</a> of file <a class="el" href="functions__grammar__def_8hpp_source.html">functions_grammar_def.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac11bb32d7a473237be317495535edece"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">BOOST_FUSION_ADAPT_STRUCT(<a class="el" href="structstan_1_1lang_1_1function__decl__def.html">stan::lang::function_decl_def</a>,(<a class="el" href="structstan_1_1lang_1_1expr__type.html">stan::lang::expr_type</a>, return_type_)(std::string, name_)(std::vector&lt; <a class="el" href="structstan_1_1lang_1_1arg__decl.html">stan::lang::arg_decl</a> &gt;, arg_decls_)(<a class="el" href="structstan_1_1lang_1_1statement.html">stan::lang::statement</a>, body_)) BOOST_FUSION_ADAPT_STRUCT(stan</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="functions__grammar__def_8hpp_source.html#l00034">34</a> of file <a class="el" href="functions__grammar__def_8hpp_source.html">functions_grammar_def.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a508d7e36c3d6254a3494ec6e616bc43e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::phoenix::function&lt;<a class="el" href="structscope__lp.html">scope_lp</a>&gt; scope_lp_f</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="functions__grammar__def_8hpp_source.html#l00242">242</a> of file <a class="el" href="functions__grammar__def_8hpp_source.html">functions_grammar_def.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af37abc1958ee02503a842801cda00dbf"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::phoenix::function&lt;<a class="el" href="structset__allows__sampling__origin.html">set_allows_sampling_origin</a>&gt; set_allows_sampling_origin_f</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="functions__grammar__def_8hpp_source.html#l00109">109</a> of file <a class="el" href="functions__grammar__def_8hpp_source.html">functions_grammar_def.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aab51847ac5a5a456b310f2ea5c12222c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::phoenix::function&lt;<a class="el" href="structset__void__function.html">set_void_function</a>&gt; set_void_function_f</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="functions__grammar__def_8hpp_source.html#l00082">82</a> of file <a class="el" href="functions__grammar__def_8hpp_source.html">functions_grammar_def.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a71484a21cee244ac8d83cf3033318d18"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::phoenix::function&lt;<a class="el" href="structunscope__variables.html">unscope_variables</a>&gt; unscope_variables_f</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="functions__grammar__def_8hpp_source.html#l00255">255</a> of file <a class="el" href="functions__grammar__def_8hpp_source.html">functions_grammar_def.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="abc6341fe72c08b09cd0dbb941af6f114"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::phoenix::function&lt;<a class="el" href="structvalidate__declarations.html">validate_declarations</a>&gt; validate_declarations_f</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="functions__grammar__def_8hpp_source.html#l00136">136</a> of file <a class="el" href="functions__grammar__def_8hpp_source.html">functions_grammar_def.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a40bd6329cea7a08301afb71b65ee3d28"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::phoenix::function&lt;validate_non_void_arg_function&gt; validate_non_void_arg_f</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="functions__grammar__def_8hpp_source.html#l00061">61</a> of file <a class="el" href="functions__grammar__def_8hpp_source.html">functions_grammar_def.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a94db9cb721cc77ab9483b2381670cf25"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::phoenix::function&lt;<a class="el" href="structvalidate__return__type.html">validate_return_type</a>&gt; validate_return_type_f</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="functions__grammar__def_8hpp_source.html#l00233">233</a> of file <a class="el" href="functions__grammar__def_8hpp_source.html">functions_grammar_def.hpp</a>.</p>
 
 </div>
 </div>

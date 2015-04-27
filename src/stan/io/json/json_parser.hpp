@@ -1,5 +1,9 @@
-#ifndef __STAN__IO__JSON__JSON_PARSER_HPP__
-#define __STAN__IO__JSON__JSON_PARSER_HPP__
+#ifndef STAN__IO__JSON__JSON_PARSER_HPP
+#define STAN__IO__JSON__JSON_PARSER_HPP
+
+#include <boost/lexical_cast.hpp>
+
+#include <stan/io/json/json_error.hpp>
 
 #include <stdexcept>
 #include <iostream>
@@ -7,12 +11,8 @@
 #include <sstream>
 #include <string>
 
-#include <boost/lexical_cast.hpp>
-
-#include <stan/io/json/json_error.hpp>
-
 namespace stan {
-  
+
   namespace json {
 
     namespace {
@@ -21,7 +21,7 @@ namespace stan {
       const unsigned int MAX_HIGH_SURROGATE = 0xDBFF;
       const unsigned int MIN_LOW_SURROGATE = 0xDC00;
       const unsigned int MAX_LOW_SURROGATE = 0xDFFF;
-      const unsigned int MIN_SUPPLEMENTARY_CODE_POINT = 0x010000;            
+      const unsigned int MIN_SUPPLEMENTARY_CODE_POINT = 0x010000;
 
       inline bool is_high_surrogate(unsigned int cp) {
         return (cp >= MIN_HIGH_SURROGATE && cp <= MAX_HIGH_SURROGATE);
@@ -37,25 +37,23 @@ namespace stan {
 
       /**
        * A <code>json_parser</code> is a SAX-style streaming parser
-       * that enforces JSON syntax and parses JSON elements 
+       * that enforces JSON syntax and parses JSON elements
        * from an input stream, sending callbacks to a user-supplied
        * <code>json_handler</code>.
        */
       template <typename Handler, bool Validate_UTF_8>
       class parser {
-
       public:
-
-        parser(Handler& h, 
+        parser(Handler& h,
                std::istream& in)
-          : h_(h), 
-            in_(in), 
+          : h_(h),
+            in_(in),
             next_char_(0),
             line_(0),
             column_(0)
         {  }
 
-        ~parser() { 
+        ~parser() {
         }
 
         void parse() {
@@ -65,7 +63,6 @@ namespace stan {
         }
 
       private:
-
         json_error json_exception(const std::string& msg) const {
           std::stringstream ss;
           ss << "Error in JSON parsing at"
@@ -92,10 +89,10 @@ namespace stan {
             throw json_exception("expecting start of object ({) or array ([)");
           }
         }
-    
+
         // value =  false / null / true / object / array / number / string
         void parse_value() {
-          // value 
+          // value
           char c = get_non_ws_char();
           if (c == 'f') {
             // false
@@ -106,22 +103,23 @@ namespace stan {
           } else if (c == 't') {
             // true
             parse_true_literal();
-          } else if (c == '"') { 
+          } else if (c == '"') {
             // string
             h_.string(parse_string_chars_quotation_mark());
           } else if (c == '{' || c == '[') {
             // object / array
             unget_char();
             parse_text();
-          } else if (c == '-' || 
+          } else if (c == '-' ||
                      (c >= '0' && c <= '9') ) {
             unget_char();
             parse_number();
           } else {
-            throw json_exception("illegal value, expecting object, array, number, string, or literal true/false/null");
+            throw json_exception("illegal value, expecting object, array, "
+                                 "number, string, or literal true/false/null");
           }
         }
-      
+
         void parse_number() {
           bool is_positive = true;
 
@@ -132,11 +130,11 @@ namespace stan {
             is_positive = false;
             ss << c;
             c = get_char();
-          } 
+          }
 
           // int
           //   zero / digit1-9
-          if (c < '0' || c > '9') 
+          if (c < '0' || c > '9')
             throw json_exception("expecting int part of number");
           ss << c;
 
@@ -189,7 +187,7 @@ namespace stan {
           if (is_integer) {
             if (is_positive) {
               unsigned long n;
-              try {   
+              try {
                 n = boost::lexical_cast<unsigned long>(ss.str());
               } catch (const boost::bad_lexical_cast & ) {
                 throw json_exception("number exceeds integer range");
@@ -198,7 +196,7 @@ namespace stan {
               h_.number_unsigned_long(n);
             } else {
               long n;
-              try {   
+              try {
                 n = boost::lexical_cast<unsigned long>(ss.str());
               } catch (const boost::bad_lexical_cast & ) {
                 throw json_exception("number exceeds integer range");
@@ -208,7 +206,7 @@ namespace stan {
             }
           } else {
             double x;
-            try {   
+            try {
               x = boost::lexical_cast<double>(ss.str());
             } catch (const boost::bad_lexical_cast & ) {
               throw json_exception("number exceeds double range");
@@ -217,7 +215,7 @@ namespace stan {
             h_.number_double(x);
           }
         }
-      
+
         std::string parse_string_chars_quotation_mark() {
           std::stringstream s;
           while (true) {
@@ -244,9 +242,9 @@ namespace stan {
                 throw json_exception("expecting legal escape");
               }
               continue;
-            } else if (c > 0 && c < 0x20) { // ASCII control characters
-              throw json_exception("found control character, "
-                                   "char values less than U+0020 must be \\u escaped");
+            } else if (c > 0 && c < 0x20) {  // ASCII control characters
+              throw json_exception("found control character, char values less "
+                                   "than U+0020 must be \\u escaped");
             }
             s << c;
           }
@@ -270,36 +268,36 @@ namespace stan {
         void get_escaped_unicode(std::stringstream& s) {
           unsigned int codepoint = get_int_as_hex_chars();
           if (!(is_high_surrogate(codepoint) || is_low_surrogate(codepoint))) {
-            putCodepoint(s,codepoint);
+            putCodepoint(s, codepoint);
           } else if (!is_high_surrogate(codepoint)) {
-              throw json_exception("illegal unicode values, "
-                                   "found low-surrogate, missing high-surrogate");
+              throw json_exception("illegal unicode values, found "
+                                   "low-surrogate, missing high-surrogate");
           } else {
             char c = get_char();
-            if (! (c == '\\'))
-              throw json_exception("illegal unicode values, "
-                                   "found high-surrogate, expecting low-surrogate");
+            if (!(c == '\\'))
+              throw json_exception("illegal unicode values, found "
+                                   "high-surrogate, expecting low-surrogate");
             c = get_char();
-            if (! (c == 'u'))
-              throw json_exception("illegal unicode values, "
-                                   "found high-surrogate, expecting low-surrogate");
+            if (!(c == 'u'))
+              throw json_exception("illegal unicode values, found "
+                                   "high-surrogate, expecting low-surrogate");
             unsigned int codepoint2 = get_int_as_hex_chars();
-            unsigned int supplemental 
+            unsigned int supplemental
               = ((codepoint - MIN_HIGH_SURROGATE) << 10)
-              + (codepoint2 - MIN_LOW_SURROGATE) 
+              + (codepoint2 - MIN_LOW_SURROGATE)
               + MIN_SUPPLEMENTARY_CODE_POINT;
-            putCodepoint(s,supplemental);
+            putCodepoint(s, supplemental);
           }
         }
 
         unsigned int get_int_as_hex_chars() {
           std::stringstream s;
           s << std::hex;
-          for (int i=0; i<4; i++) {
+          for (int i = 0; i < 4; i++) {
             char c = get_char();
-            if (! ((c >= 'a' && c<= 'f') 
-                   || (c >= 'A' && c<= 'F')
-                   || (c >= '0' && c<= '9')))
+            if (!((c >= 'a' && c<= 'f')
+                  || (c >= 'A' && c<= 'F')
+                  || (c >= '0' && c<= '9')))
               throw json_exception("illegal unicode code point");
             s << c;
           }
@@ -308,10 +306,10 @@ namespace stan {
           return hex;
         }
 
-        void putCodepoint(std::stringstream& s, unsigned int codepoint){
-          if (codepoint <= 0x7f)
+        void putCodepoint(std::stringstream& s, unsigned int codepoint) {
+          if (codepoint <= 0x7f) {
             s.put(codepoint);
-          else if (codepoint <= 0x7ff) {
+          } else if (codepoint <= 0x7ff) {
             s.put(0xc0 | ((codepoint >> 6) & 0x1f));
             s.put(0x80 | (codepoint & 0x3f));
           } else if (codepoint <= 0xffff) {
@@ -330,7 +328,7 @@ namespace stan {
           for (size_t i = 0; i < s.size(); ++i) {
             char c = get_char();
             if (c != s[i])
-              throw json_exception("expecting rest of literal: " 
+              throw json_exception("expecting rest of literal: "
                                    + s.substr(i));
           }
         }
@@ -347,7 +345,7 @@ namespace stan {
               throw json_exception("in array, expecting ] or ,");
             }
             c = get_non_ws_char();
-            if (c == ']') 
+            if (c == ']')
               throw json_exception("in array, expecting value");
             unget_char();
           }
@@ -358,21 +356,21 @@ namespace stan {
           if (c == '}') return;
           while (true) {
             // string (key)
-            if (c != '"') 
+            if (c != '"')
               throw json_exception("expecting member key"
                                    " or end of object marker (})");
             std::string key = parse_string_chars_quotation_mark();
             h_.key(key);
             // name-separator separator
             c = get_non_ws_char();
-            if (c != ':') 
+            if (c != ':')
               throw json_exception("expecting key-value separator :");
             // value
             parse_value();
 
             // continuation
             c = get_non_ws_char();
-            if (c == '}') 
+            if (c == '}')
               return;
             if (c != ',')
               throw json_exception("expecting end of object } or separator ,");
@@ -420,15 +418,15 @@ namespace stan {
      * sending events to the specified handler, and optionally
      * validating the UTF-8 encoding.
      *
-     * @tparam Validate_UTF_8 
+     * @tparam Validate_UTF_8
      * @tparam Handler
      * @param in Input stream from which to parse
-     * @param Handler Handler for events from parser
+     * @param handler Handler for events from parser
      */
     template <bool Validate_UTF_8, typename Handler>
-    void parse(std::istream& in, 
+    void parse(std::istream& in,
                Handler& handler) {
-      parser<Handler,Validate_UTF_8>(handler,in).parse();
+      parser<Handler, Validate_UTF_8>(handler, in).parse();
     }
 
     /**
@@ -436,18 +434,16 @@ namespace stan {
      * sending events to the specified handler, and optionally
      * validating the UTF-8 encoding.
      *
-     * @tparam Validate_UTF_8 
      * @tparam Handler
      * @param in Input stream from which to parse
-     * @param Handler Handler for events from parser
+     * @param handler Handler for events from parser
      */
     template <typename Handler>
-    void parse(std::istream& in, 
+    void parse(std::istream& in,
                Handler& handler) {
-      parse<false>(in,handler);
+      parse<false>(in, handler);
     }
 
   }
 }
-  
 #endif

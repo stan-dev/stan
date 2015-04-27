@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>Stan: src/stan/math/functions/inverse_softmax.hpp Source File</title>
+<title>Stan: src/stan/math/prim/scal/fun/inverse_softmax.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_3995d5884456238d20884a417bb53c63.html">math</a></li><li class="navelem"><a class="el" href="dir_d06f81619dd9bcc28d70dd2c97937727.html">functions</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_74dffc450e0f1a697b45b136c6270db1.html">src</a></li><li class="navelem"><a class="el" href="dir_803b5608bcbe879b166efa51ba84b7e9.html">stan</a></li><li class="navelem"><a class="el" href="dir_668e8ef714ddacd4c07848956741d104.html">math</a></li><li class="navelem"><a class="el" href="dir_893ab7068649a078cc677542d38e83c3.html">prim</a></li><li class="navelem"><a class="el" href="dir_d8a20fac4883979e78a4c3a2e9da58e2.html">scal</a></li><li class="navelem"><a class="el" href="dir_ea5331f488e74d2d8daa78db819cc954.html">fun</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -92,8 +91,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">inverse_softmax.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="inverse__softmax_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef __STAN__MATH__FUNCTIONS__INVERSE_SOFTMAX_HPP__</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define __STAN__MATH__FUNCTIONS__INVERSE_SOFTMAX_HPP__</span></div>
+<a href="inverse__softmax_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef STAN__MATH__PRIM__SCAL__FUN__INVERSE_SOFTMAX_HPP</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define STAN__MATH__PRIM__SCAL__FUN__INVERSE_SOFTMAX_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;boost/math/tools/promotion.hpp&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;stdexcept&gt;</span></div>
@@ -104,9 +103,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Vector&gt;</div>
 <div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="namespacestan_1_1math.html#a1edc35cc581dda178263f6a4a4fd1158">   34</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="namespacestan_1_1math.html#a1edc35cc581dda178263f6a4a4fd1158">inverse_softmax</a>(<span class="keyword">const</span> Vector&amp; simplex, Vector&amp; y) {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      <span class="keyword">using</span> <a class="code" href="namespacestan_1_1agrad.html#ac98c1c298301701efe36438130bac705">std::log</a>;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      <span class="keyword">using</span> <a class="code" href="namespacestan_1_1agrad.html#a43089bcc90b7c1aaff44406aaa426e85">std::log</a>;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <span class="keywordflow">if</span>(simplex.size() != y.size())</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        BOOST_THROW_EXCEPTION(std::invalid_argument (<span class="stringliteral">&quot;simplex.size() != y.size()&quot;</span>));</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        BOOST_THROW_EXCEPTION(<a class="code" href="namespacestan_1_1math.html#a9bcb1af5657f92ccadf5204fc43377fd">std::invalid_argument</a> (<span class="stringliteral">&quot;simplex.size() != y.size()&quot;</span>));</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; simplex.size(); ++i)</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        y[i] = <a class="code" href="namespacestan_1_1math.html#ae3e7ce33064686ec2a2591fa5d4227cf">log</a>(simplex[i]);</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    }</div>
@@ -116,8 +115,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="namespacestan_1_1math_html_a1edc35cc581dda178263f6a4a4fd1158"><div class="ttname"><a href="namespacestan_1_1math.html#a1edc35cc581dda178263f6a4a4fd1158">stan::math::inverse_softmax</a></div><div class="ttdeci">void inverse_softmax(const Vector &amp;simplex, Vector &amp;y)</div><div class="ttdoc">Writes the inverse softmax of the simplex argument into the second argument. </div><div class="ttdef"><b>Definition:</b> <a href="inverse__softmax_8hpp_source.html#l00034">inverse_softmax.hpp:34</a></div></div>
-<div class="ttc" id="namespacestan_1_1agrad_html_ac98c1c298301701efe36438130bac705"><div class="ttname"><a href="namespacestan_1_1agrad.html#ac98c1c298301701efe36438130bac705">stan::agrad::log</a></div><div class="ttdeci">var log(const var &amp;a)</div><div class="ttdoc">Return the natural log of the specified variable (cmath). </div><div class="ttdef"><b>Definition:</b> <a href="agrad__thread__safe_8hpp_source.html#l01585">agrad_thread_safe.hpp:1585</a></div></div>
-<div class="ttc" id="namespacestan_1_1math_html_ae3e7ce33064686ec2a2591fa5d4227cf"><div class="ttname"><a href="namespacestan_1_1math.html#ae3e7ce33064686ec2a2591fa5d4227cf">stan::math::log</a></div><div class="ttdeci">Eigen::Matrix&lt; T, Rows, Cols &gt; log(const Eigen::Matrix&lt; T, Rows, Cols &gt; &amp;m)</div><div class="ttdoc">Return the element-wise logarithm of the matrix or vector. </div><div class="ttdef"><b>Definition:</b> <a href="math_2matrix_2log_8hpp_source.html#l00016">log.hpp:16</a></div></div>
+<div class="ttc" id="namespacestan_1_1math_html_a9bcb1af5657f92ccadf5204fc43377fd"><div class="ttname"><a href="namespacestan_1_1math.html#a9bcb1af5657f92ccadf5204fc43377fd">stan::math::invalid_argument</a></div><div class="ttdeci">void invalid_argument(const char *function, const char *name, const T &amp;y, const char *msg1, const char *msg2)</div><div class="ttdoc">Throw an invalid_argument exception with a consistently formatted message. </div><div class="ttdef"><b>Definition:</b> <a href="invalid__argument_8hpp_source.html#l00031">invalid_argument.hpp:31</a></div></div>
+<div class="ttc" id="namespacestan_1_1math_html_ae3e7ce33064686ec2a2591fa5d4227cf"><div class="ttname"><a href="namespacestan_1_1math.html#ae3e7ce33064686ec2a2591fa5d4227cf">stan::math::log</a></div><div class="ttdeci">Eigen::Matrix&lt; T, Rows, Cols &gt; log(const Eigen::Matrix&lt; T, Rows, Cols &gt; &amp;m)</div><div class="ttdoc">Return the element-wise logarithm of the matrix or vector. </div><div class="ttdef"><b>Definition:</b> <a href="prim_2mat_2fun_2log_8hpp_source.html#l00016">log.hpp:16</a></div></div>
+<div class="ttc" id="namespacestan_1_1agrad_html_a43089bcc90b7c1aaff44406aaa426e85"><div class="ttname"><a href="namespacestan_1_1agrad.html#a43089bcc90b7c1aaff44406aaa426e85">stan::agrad::log</a></div><div class="ttdeci">fvar&lt; T &gt; log(const fvar&lt; T &gt; &amp;x)</div><div class="ttdef"><b>Definition:</b> <a href="fwd_2scal_2fun_2log_8hpp_source.html#l00015">log.hpp:15</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

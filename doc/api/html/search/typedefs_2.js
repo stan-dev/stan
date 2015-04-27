@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['expression_5ft',['expression_t',['../structstan_1_1gm_1_1expression.html#abae5cb68846d118c4e78e11afbaa4826',1,'stan::gm::expression']]]
+  ['chainablestack',['ChainableStack',['../namespacestan_1_1agrad.html#a392ee009e4227bcf4f50402c673240e6',1,'stan::agrad']]]
 ];

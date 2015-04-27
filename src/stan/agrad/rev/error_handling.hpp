@@ -1,4 +1,0 @@
-#ifndef __STAN__AGRAD__REV__ERROR_HANDLING_HPP__
-#define __STAN__AGRAD__REV__ERROR_HANDLING_HPP__
-
-#endif

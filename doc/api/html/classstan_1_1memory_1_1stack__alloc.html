@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -75,7 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -114,9 +113,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a90eb1978d8bbc20e4357b1ea2c686f5b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1memory_1_1stack__alloc.html#a90eb1978d8bbc20e4357b1ea2c686f5b">alloc</a> (size_t len)</td></tr>
 <tr class="memdesc:a90eb1978d8bbc20e4357b1ea2c686f5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a newly allocated block of memory of the appropriate size managed by the stack allocator.  <a href="#a90eb1978d8bbc20e4357b1ea2c686f5b">More...</a><br/></td></tr>
 <tr class="separator:a90eb1978d8bbc20e4357b1ea2c686f5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21377f02a47fb2634f16ac3d99c2471c"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a21377f02a47fb2634f16ac3d99c2471c"><td class="memTemplItemLeft" align="right" valign="top">T *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classstan_1_1memory_1_1stack__alloc.html#a21377f02a47fb2634f16ac3d99c2471c">alloc_array</a> (size_t n)</td></tr>
+<tr class="memdesc:a21377f02a47fb2634f16ac3d99c2471c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate an array on the arena of the specified size to hold values of the specified template parameter type.  <a href="#a21377f02a47fb2634f16ac3d99c2471c">More...</a><br/></td></tr>
+<tr class="separator:a21377f02a47fb2634f16ac3d99c2471c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a453c7dd354d0cb89389f648882cd459d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1memory_1_1stack__alloc.html#a453c7dd354d0cb89389f648882cd459d">recover_all</a> ()</td></tr>
 <tr class="memdesc:a453c7dd354d0cb89389f648882cd459d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recover all the memory used by the stack allocator.  <a href="#a453c7dd354d0cb89389f648882cd459d">More...</a><br/></td></tr>
 <tr class="separator:a453c7dd354d0cb89389f648882cd459d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54e8140c76e6ed110f53312dab5cf4e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1memory_1_1stack__alloc.html#a54e8140c76e6ed110f53312dab5cf4e5">start_nested</a> ()</td></tr>
+<tr class="memdesc:a54e8140c76e6ed110f53312dab5cf4e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store current positions before doing nested operation so can recover back to start.  <a href="#a54e8140c76e6ed110f53312dab5cf4e5">More...</a><br/></td></tr>
+<tr class="separator:a54e8140c76e6ed110f53312dab5cf4e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d5e96d900ce59aa25b4218477f5a70d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1memory_1_1stack__alloc.html#a6d5e96d900ce59aa25b4218477f5a70d">recover_nested</a> ()</td></tr>
+<tr class="memdesc:a6d5e96d900ce59aa25b4218477f5a70d"><td class="mdescLeft">&#160;</td><td class="mdescRight">recover memory back to the last start_nested call.  <a href="#a6d5e96d900ce59aa25b4218477f5a70d">More...</a><br/></td></tr>
+<tr class="separator:a6d5e96d900ce59aa25b4218477f5a70d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02e126e827732287d7f4ede17316089a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1memory_1_1stack__alloc.html#a02e126e827732287d7f4ede17316089a">free_all</a> ()</td></tr>
 <tr class="memdesc:a02e126e827732287d7f4ede17316089a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free all memory used by the stack allocator other than the initial block allocation back to the system.  <a href="#a02e126e827732287d7f4ede17316089a">More...</a><br/></td></tr>
 <tr class="separator:a02e126e827732287d7f4ede17316089a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -130,7 +139,7 @@ Public Member Functions</h2></td></tr>
 <p>Memory is allocated on a stack of blocks. Each block allocated is twice as large as the previous one. The memory may be recovered, with the blocks being reused, or all blocks may be freed, resetting the stack of blocks to its original state.</p>
 <p>Alignment up to 8 byte boundaries guaranteed for the first malloc, and after that it's up to the caller. On 64-bit architectures, all struct values should be padded to 8-byte boundaries if they contain an 8-byte member or a virtual function. </p>
 
-<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00083">83</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00076">76</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a3da167b8f4f9bd981f948ac03c29604b"></a>
 <div class="memitem">
@@ -168,7 +177,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00134">134</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00133">133</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
 
 </div>
 </div>
@@ -196,7 +205,7 @@ Public Member Functions</h2></td></tr>
 <p>Destroy this memory allocator. </p>
 <p>This is implemented as a no-op as there is no destruction required. </p>
 
-<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00150">150</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00149">149</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
 
 </div>
 </div>
@@ -234,7 +243,50 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the allocated memory. </dd></dl>
 
-<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00169">169</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00168">168</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a21377f02a47fb2634f16ac3d99c2471c"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T* stan::memory::stack_alloc::alloc_array </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Allocate an array on the arena of the specified size to hold values of the specified template parameter type. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>type of entries in allocated array. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>size of array to allocate. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>new array allocated on the arena. </dd></dl>
+
+<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00188">188</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
 
 </div>
 </div>
@@ -263,7 +315,7 @@ Public Member Functions</h2></td></tr>
 <p>This is not the same as the number of bytes allocated through calls to memalloc_. The latter number is not calculatable because space is wasted at the end of blocks if the next alloc request doesn't fit. (Perhaps we could trim down to what is actually used?)</p>
 <dl class="section return"><dt>Returns</dt><dd>number of bytes allocated to this instance </dd></dl>
 
-<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00216">216</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00257">257</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
 
 </div>
 </div>
@@ -291,7 +343,7 @@ Public Member Functions</h2></td></tr>
 <p>Free all memory used by the stack allocator other than the initial block allocation back to the system. </p>
 <p>Note: the destructor will free all memory. </p>
 
-<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00196">196</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00237">237</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
 
 </div>
 </div>
@@ -319,7 +371,61 @@ Public Member Functions</h2></td></tr>
 <p>Recover all the memory used by the stack allocator. </p>
 <p>The stack of memory blocks allocated so far will be available for further allocations. To free memory back to the system, use the function <a class="el" href="classstan_1_1memory_1_1stack__alloc.html#a02e126e827732287d7f4ede17316089a" title="Free all memory used by the stack allocator other than the initial block allocation back to the syste...">free_all()</a>. </p>
 
-<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00185">185</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00199">199</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6d5e96d900ce59aa25b4218477f5a70d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void stan::memory::stack_alloc::recover_nested </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>recover memory back to the last start_nested call. </p>
+
+<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00218">218</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a54e8140c76e6ed110f53312dab5cf4e5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void stan::memory::stack_alloc::start_nested </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Store current positions before doing nested operation so can recover back to start. </p>
+
+<p>Definition at line <a class="el" href="stack__alloc_8hpp_source.html#l00209">209</a> of file <a class="el" href="stack__alloc_8hpp_source.html">stack_alloc.hpp</a>.</p>
 
 </div>
 </div>

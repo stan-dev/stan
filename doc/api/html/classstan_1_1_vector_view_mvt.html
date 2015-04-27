@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -75,7 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -99,7 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_vector_view_mvt_8hpp_source.html">VectorViewMvt.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
@@ -116,17 +115,17 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a279439cc5038dfd0ea4da7fe58c1f6d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::value_type&gt;::value, bool throw_if_accessed = false&gt;<br/>
+<div class="textblock"><h3>template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename stan::math::value_type&lt;T&gt;::type&gt;::value, bool throw_if_accessed = false&gt;<br/>
 class stan::VectorViewMvt&lt; T, is_array, throw_if_accessed &gt;</h3>
 
 
-<p>Definition at line <a class="el" href="meta_2traits_8hpp_source.html#l00493">493</a> of file <a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>.</p>
+<p>Definition at line <a class="el" href="_vector_view_mvt_8hpp_source.html#l00016">16</a> of file <a class="el" href="_vector_view_mvt_8hpp_source.html">VectorViewMvt.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a class="anchor" id="a2c3d0382bf37405f20e83adec38db42e"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::value_type&gt;::value, bool throw_if_accessed = false&gt; </div>
+template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename stan::math::value_type&lt;T&gt;::type&gt;::value, bool throw_if_accessed = false&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">typedef <a class="el" href="structstan_1_1scalar__type__pre.html">scalar_type_pre</a>&lt;T&gt;::type <a class="el" href="classstan_1_1_vector_view_mvt.html">stan::VectorViewMvt</a>&lt; T, is_array, throw_if_accessed &gt;::<a class="el" href="classstan_1_1_vector_view_mvt.html#a2c3d0382bf37405f20e83adec38db42e">matrix_t</a></td>
@@ -134,7 +133,7 @@ template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::valu
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="meta_2traits_8hpp_source.html#l00495">495</a> of file <a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>.</p>
+<p>Definition at line <a class="el" href="_vector_view_mvt_8hpp_source.html#l00018">18</a> of file <a class="el" href="_vector_view_mvt_8hpp_source.html">VectorViewMvt.hpp</a>.</p>
 
 </div>
 </div>
@@ -143,7 +142,7 @@ template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::valu
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::value_type&gt;::value, bool throw_if_accessed = false&gt; </div>
+template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename stan::math::value_type&lt;T&gt;::type&gt;::value, bool throw_if_accessed = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -163,7 +162,7 @@ template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::valu
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="meta_2traits_8hpp_source.html#l00497">497</a> of file <a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>.</p>
+<p>Definition at line <a class="el" href="_vector_view_mvt_8hpp_source.html#l00020">20</a> of file <a class="el" href="_vector_view_mvt_8hpp_source.html">VectorViewMvt.hpp</a>.</p>
 
 </div>
 </div>
@@ -171,7 +170,7 @@ template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::valu
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::value_type&gt;::value, bool throw_if_accessed = false&gt; </div>
+template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename stan::math::value_type&lt;T&gt;::type&gt;::value, bool throw_if_accessed = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -191,7 +190,7 @@ template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::valu
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="meta_2traits_8hpp_source.html#l00499">499</a> of file <a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>.</p>
+<p>Definition at line <a class="el" href="_vector_view_mvt_8hpp_source.html#l00022">22</a> of file <a class="el" href="_vector_view_mvt_8hpp_source.html">VectorViewMvt.hpp</a>.</p>
 
 </div>
 </div>
@@ -200,7 +199,7 @@ template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::valu
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::value_type&gt;::value, bool throw_if_accessed = false&gt; </div>
+template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename stan::math::value_type&lt;T&gt;::type&gt;::value, bool throw_if_accessed = false&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -220,12 +219,12 @@ template&lt;typename T, bool is_array = stan::is_vector_like&lt;typename T::valu
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="meta_2traits_8hpp_source.html#l00501">501</a> of file <a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>.</p>
+<p>Definition at line <a class="el" href="_vector_view_mvt_8hpp_source.html#l00024">24</a> of file <a class="el" href="_vector_view_mvt_8hpp_source.html">VectorViewMvt.hpp</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/stan/meta/<a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a></li>
+<li>src/stan/math/prim/scal/meta/<a class="el" href="_vector_view_mvt_8hpp_source.html">VectorViewMvt.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <hr/>

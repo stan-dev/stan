@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['eigen_5fdensebase_5fplugin',['EIGEN_DENSEBASE_PLUGIN',['../_eigen_8hpp.html#a90ac195153d63737038c5b747962f4df',1,'Eigen.hpp']]]
+  ['unlikely',['unlikely',['../likely_8hpp.html#ac6c45889010c1bd68631771b64f18101',1,'likely.hpp']]]
 ];

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>Stan: src/stan/math/matrix/check_range.hpp File Reference</title>
+<title>Stan: src/stan/math/prim/mat/err/check_range.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_3995d5884456238d20884a417bb53c63.html">math</a></li><li class="navelem"><a class="el" href="dir_99762ae463b7309a47de4b14a14d0e0f.html">matrix</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_74dffc450e0f1a697b45b136c6270db1.html">src</a></li><li class="navelem"><a class="el" href="dir_803b5608bcbe879b166efa51ba84b7e9.html">stan</a></li><li class="navelem"><a class="el" href="dir_668e8ef714ddacd4c07848956741d104.html">math</a></li><li class="navelem"><a class="el" href="dir_893ab7068649a078cc677542d38e83c3.html">prim</a></li><li class="navelem"><a class="el" href="dir_a9c2875b19de2d2a81f2dfd613184f18.html">mat</a></li><li class="navelem"><a class="el" href="dir_d52cd469a5aeb3b62da009ae6b9e9704.html">err</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -95,8 +94,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">check_range.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;sstream&gt;</code><br/>
-<code>#include &lt;stdexcept&gt;</code><br/>
+<div class="textblock"><code>#include &lt;<a class="el" href="out__of__range_8hpp_source.html">stan/math/prim/scal/err/out_of_range.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="mat_2meta_2index__type_8hpp_source.html">stan/math/prim/mat/meta/index_type.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="error__index_8hpp_source.html">stan/math/prim/scal/meta/error_index.hpp</a>&gt;</code><br/>
+<code>#include &lt;sstream&gt;</code><br/>
+<code>#include &lt;string&gt;</code><br/>
 </div>
 <p><a href="check__range_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -111,8 +113,15 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1220906f5cf5892f9867a4b9bcec08c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1math.html#a1220906f5cf5892f9867a4b9bcec08c9">stan::math::check_range</a> (size_t max, size_t i, const char *msg, size_t idx)</td></tr>
-<tr class="separator:a1220906f5cf5892f9867a4b9bcec08c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcd4dcac328824f71f31d6861b8610ee"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1math.html#adcd4dcac328824f71f31d6861b8610ee">stan::math::check_range</a> (const char *function, const char *name, const int max, const int index, const int nested_level, const char *error_msg)</td></tr>
+<tr class="memdesc:adcd4dcac328824f71f31d6861b8610ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <code>true</code> if specified index is within range.  <a href="#adcd4dcac328824f71f31d6861b8610ee">More...</a><br/></td></tr>
+<tr class="separator:adcd4dcac328824f71f31d6861b8610ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8822ad6a9b8706465e8e1f90c336e3c2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1math.html#a8822ad6a9b8706465e8e1f90c336e3c2">stan::math::check_range</a> (const char *function, const char *name, const int max, const int index, const char *error_msg)</td></tr>
+<tr class="memdesc:a8822ad6a9b8706465e8e1f90c336e3c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <code>true</code> if specified index is within range.  <a href="#a8822ad6a9b8706465e8e1f90c336e3c2">More...</a><br/></td></tr>
+<tr class="separator:a8822ad6a9b8706465e8e1f90c336e3c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e76ffb67d3c6c6c225b0ba7b991f449"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1math.html#a7e76ffb67d3c6c6c225b0ba7b991f449">stan::math::check_range</a> (const char *function, const char *name, const int max, const int index)</td></tr>
+<tr class="memdesc:a7e76ffb67d3c6c6c225b0ba7b991f449"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <code>true</code> if specified index is within range.  <a href="#a7e76ffb67d3c6c6c225b0ba7b991f449">More...</a><br/></td></tr>
+<tr class="separator:a7e76ffb67d3c6c6c225b0ba7b991f449"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <hr/>

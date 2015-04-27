@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>Stan: stan::math::detail::bounded&lt; T_y, T_low, T_high, T_result, y_is_vec &gt; Struct Template Reference</title>
+<title>Stan: stan::math::detail::bounded&lt; T_y, T_low, T_high, y_is_vec &gt; Struct Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -75,7 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -94,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="structstan_1_1math_1_1detail_1_1bounded-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">stan::math::detail::bounded&lt; T_y, T_low, T_high, T_result, y_is_vec &gt; Struct Template Reference</div>  </div>
+<div class="title">stan::math::detail::bounded&lt; T_y, T_low, T_high, y_is_vec &gt; Struct Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -102,30 +101,36 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a9800b813c8581310c2fc054cb6f1294f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1math_1_1detail_1_1bounded.html#a9800b813c8581310c2fc054cb6f1294f">check</a> (const char *function, const T_y &amp;y, const T_low &amp;low, const T_high &amp;high, const char *name, T_result *result)</td></tr>
-<tr class="separator:a9800b813c8581310c2fc054cb6f1294f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacb059ebca7a577b043db54f9f79cc9f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1math_1_1detail_1_1bounded.html#aacb059ebca7a577b043db54f9f79cc9f">check</a> (const char *function, const char *name, const T_y &amp;y, const T_low &amp;low, const T_high &amp;high)</td></tr>
+<tr class="separator:aacb059ebca7a577b043db54f9f79cc9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename T_y, typename T_low, typename T_high, typename T_result, bool y_is_vec&gt;<br/>
-struct stan::math::detail::bounded&lt; T_y, T_low, T_high, T_result, y_is_vec &gt;</h3>
+<div class="textblock"><h3>template&lt;typename T_y, typename T_low, typename T_high, bool y_is_vec&gt;<br/>
+struct stan::math::detail::bounded&lt; T_y, T_low, T_high, y_is_vec &gt;</h3>
 
 
-<p>Definition at line <a class="el" href="check__bounded_8hpp_source.html#l00020">20</a> of file <a class="el" href="check__bounded_8hpp_source.html">check_bounded.hpp</a>.</p>
+<p>Definition at line <a class="el" href="check__bounded_8hpp_source.html#l00024">24</a> of file <a class="el" href="check__bounded_8hpp_source.html">check_bounded.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a9800b813c8581310c2fc054cb6f1294f"></a>
+<a class="anchor" id="aacb059ebca7a577b043db54f9f79cc9f"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename T_y , typename T_low , typename T_high , typename T_result , bool y_is_vec&gt; </div>
+template&lt;typename T_y , typename T_low , typename T_high , bool y_is_vec&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static bool <a class="el" href="structstan_1_1math_1_1detail_1_1bounded.html">stan::math::detail::bounded</a>&lt; T_y, T_low, T_high, T_result, y_is_vec &gt;::check </td>
+          <td class="memname">static bool <a class="el" href="structstan_1_1math_1_1detail_1_1bounded.html">stan::math::detail::bounded</a>&lt; T_y, T_low, T_high, y_is_vec &gt;::check </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>function</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -143,19 +148,7 @@ template&lt;typename T_y , typename T_low , typename T_high , typename T_result 
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const T_high &amp;&#160;</td>
-          <td class="paramname"><em>high</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">T_result *&#160;</td>
-          <td class="paramname"><em>result</em>&#160;</td>
+          <td class="paramname"><em>high</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -170,12 +163,12 @@ template&lt;typename T_y , typename T_low , typename T_high , typename T_result 
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="check__bounded_8hpp_source.html#l00021">21</a> of file <a class="el" href="check__bounded_8hpp_source.html">check_bounded.hpp</a>.</p>
+<p>Definition at line <a class="el" href="check__bounded_8hpp_source.html#l00025">25</a> of file <a class="el" href="check__bounded_8hpp_source.html">check_bounded.hpp</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>src/stan/math/error_handling/<a class="el" href="check__bounded_8hpp_source.html">check_bounded.hpp</a></li>
+<li>src/stan/math/prim/scal/err/<a class="el" href="check__bounded_8hpp_source.html">check_bounded.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <hr/>

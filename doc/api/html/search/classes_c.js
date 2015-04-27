@@ -14,5 +14,5 @@ var searchData=
   ['op_5fvvd_5fvari',['op_vvd_vari',['../classstan_1_1agrad_1_1op__vvd__vari.html',1,'stan::agrad']]],
   ['op_5fvvv_5fvari',['op_vvv_vari',['../classstan_1_1agrad_1_1op__vvv__vari.html',1,'stan::agrad']]],
   ['operandsandpartials',['OperandsAndPartials',['../structstan_1_1agrad_1_1_operands_and_partials.html',1,'stan::agrad']]],
-  ['ordered_5fvar_5fdecl',['ordered_var_decl',['../structstan_1_1gm_1_1ordered__var__decl.html',1,'stan::gm']]]
+  ['ordered_5fvar_5fdecl',['ordered_var_decl',['../structstan_1_1lang_1_1ordered__var__decl.html',1,'stan::lang']]]
 ];

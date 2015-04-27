@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['noinput',['NOINPUT',['../structstan_1_1gm_1_1error__codes.html#aa63873e8f7e9dd7f8af3502e4003292fa2fcaec15ffdd862e869b23a13b4a4d7c',1,'stan::gm::error_codes']]]
+  ['noinput',['NOINPUT',['../structstan_1_1services_1_1error__codes.html#af63ff2c4cfc91b7606093e5ac7a1eb70a76c3e4a47ad9f13570244812ce855bc5',1,'stan::services::error_codes']]]
 ];

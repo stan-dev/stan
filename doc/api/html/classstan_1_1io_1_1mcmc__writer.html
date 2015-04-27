@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -75,7 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -150,7 +149,7 @@ class stan::io::mcmc_writer&lt; M, SampleRecorder, DiagnosticRecorder, MessageRe
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00029">29</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00027">27</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a9469f6c242cfcc2678c1cb30c8cda156"></a>
 <div class="memitem">
@@ -201,17 +200,18 @@ template&lt;class M , class SampleRecorder , class DiagnosticRecorder , class Me
 <p>Constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">sample_stream</td><td>samples are "written" to this stream (can abstract this?) </td></tr>
-    <tr><td class="paramname">diagnostic_stream</td><td>diagnostic information is "written" to this stream </td></tr>
+    <tr><td class="paramname">sample_recorder</td><td>samples are "written" to this stream (can abstract this?) </td></tr>
+    <tr><td class="paramname">diagnostic_recorder</td><td>diagnostic information is "written" to this stream </td></tr>
+    <tr><td class="paramname">message_recorder</td><td>messages are written to this stream </td></tr>
     <tr><td class="paramname">msg_stream</td><td>messages are output to this stream</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd>arguments == 0 if and only if they are not meant to be used </dd></dl>
 <dl class="section post"><dt>Postcondition</dt><dd>none </dd></dl>
-<dl class="section user"><dt>Side effects: streams are stored in this object </dt><dd></dd></dl>
+<dl class="section user"><dt>Side effects: streams are stored in this object</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00051">51</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00048">48</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -257,12 +257,12 @@ template&lt;class Recorder &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">sampler</td><td>sampler </td></tr>
-    <tr><td class="paramname">stream</td><td>stream to output stuff to </td></tr>
+    <tr><td class="paramname">recorder</td><td>stream to output stuff to </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00139">139</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00136">136</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -299,7 +299,7 @@ template&lt;class M , class SampleRecorder , class DiagnosticRecorder , class Me
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00157">157</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00154">154</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -356,7 +356,7 @@ template&lt;class M , class SampleRecorder , class DiagnosticRecorder , class Me
 <dl class="section post"><dt>Postcondition</dt><dd>none </dd></dl>
 <dl class="section user"><dt>Side effects: diagnostic_stream_ is appended with comma</dt><dd>separated names with newline at the end </dd></dl>
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00175">175</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00172">172</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -406,7 +406,7 @@ template&lt;class M , class SampleRecorder , class DiagnosticRecorder , class Me
 <dl class="section post"><dt>Postcondition</dt><dd>none. </dd></dl>
 <dl class="section user"><dt>Side effects: diagnostic_stream_ is appended with csv values of the</dt><dd>sample's get_sample_params(), the sampler's get_sampler_params(), and get_sampler_diagnostics() </dd></dl>
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00203">203</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00200">200</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -465,7 +465,7 @@ template&lt;class M , class SampleRecorder , class DiagnosticRecorder , class Me
 <dl class="section post"><dt>Postcondition</dt><dd>none </dd></dl>
 <dl class="section user"><dt>Side effects: sample_stream_ is written to with comma separated values</dt><dd>with a newline at the end </dd></dl>
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00079">79</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00076">76</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -530,7 +530,7 @@ template&lt;class RNG &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00107">107</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00104">104</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -582,8 +582,7 @@ template&lt;class Recorder &gt; </div>
   <table class="params">
     <tr><td class="paramname">warmDeltaT</td><td>warmup time in seconds </td></tr>
     <tr><td class="paramname">sampleDeltaT</td><td>sample time in seconds </td></tr>
-    <tr><td class="paramname">stream</td><td>output stream </td></tr>
-    <tr><td class="paramname">prefix</td><td>prepend each line with the prefix; default is ""</td></tr>
+    <tr><td class="paramname">recorder</td><td>output stream</td></tr>
   </table>
   </dd>
 </dl>
@@ -591,7 +590,7 @@ template&lt;class Recorder &gt; </div>
 <dl class="section post"><dt>Postcondition</dt><dd>none </dd></dl>
 <dl class="section user"><dt>Side effects: stream is updated with information about timing</dt><dd></dd></dl>
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00231">231</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00227">227</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -638,7 +637,7 @@ template&lt;class M , class SampleRecorder , class DiagnosticRecorder , class Me
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00267">267</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00263">263</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>

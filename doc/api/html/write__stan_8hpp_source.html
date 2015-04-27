@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>Stan: src/stan/common/write_stan.hpp Source File</title>
+<title>Stan: src/stan/services/io/write_stan.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="stanlogo-main.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Stan
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.6.3</span>
    </div>
    <div id="projectbrief">probability, sampling &amp; optimization</div>
   </td>
@@ -40,7 +40,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -73,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_34177b290fffdbdb584997ce852f13d5.html">common</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_74dffc450e0f1a697b45b136c6270db1.html">src</a></li><li class="navelem"><a class="el" href="dir_803b5608bcbe879b166efa51ba84b7e9.html">stan</a></li><li class="navelem"><a class="el" href="dir_2264e81d1df47ce91d0b46fead080f54.html">services</a></li><li class="navelem"><a class="el" href="dir_d562275972e82ab476d2af3868685f0e.html">io</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -92,31 +91,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">write_stan.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="write__stan_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef __STAN__COMMON__WRITE_STAN_HPP__</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define __STAN__COMMON__WRITE_STAN_HPP__</span></div>
+<a href="write__stan_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef STAN__SERVICES__IO__WRITE_STAN_HPP</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define STAN__SERVICES__IO__WRITE_STAN_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;ostream&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="version_8hpp.html">stan/version.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>stan {</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  <span class="keyword">namespace </span>common {</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  <span class="keyword">namespace </span>services {</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keyword">namespace </span>io {</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;</div>
-<div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="namespacestan_1_1common.html#a347e70e891761c68bf4ad10afbe9825b">   12</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="namespacestan_1_1common.html#a347e70e891761c68bf4ad10afbe9825b">write_stan</a>(std::ostream* s, <span class="keyword">const</span> std::string prefix = <span class="stringliteral">&quot;&quot;</span>) {</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;      <span class="keywordflow">if</span> (!s) <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;      </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;      *s &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot; stan_version_major = &quot;</span> &lt;&lt; <a class="code" href="namespacestan.html#a75c4bb3d494fafd9d1714d4db258975c">stan::MAJOR_VERSION</a> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;      *s &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot; stan_version_minor = &quot;</span> &lt;&lt; <a class="code" href="namespacestan.html#ad48b562c737bb49645bd8117067858b9">stan::MINOR_VERSION</a> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;      *s &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot; stan_version_patch = &quot;</span> &lt;&lt; <a class="code" href="namespacestan.html#ae9ae37a39676ea8ca7cbfeffce12f938">stan::PATCH_VERSION</a> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    }</div>
+<div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="namespacestan_1_1services_1_1io.html#abd1a18dce79c3bc52b5d4d2d8bbd2457">   12</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="namespacestan_1_1services_1_1io.html#abd1a18dce79c3bc52b5d4d2d8bbd2457">write_stan</a>(std::ostream* s, <span class="keyword">const</span> std::string prefix = <span class="stringliteral">&quot;&quot;</span>) {</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;        <span class="keywordflow">if</span> (!s) <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;        </div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        *s &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot; stan_version_major = &quot;</span> &lt;&lt; <a class="code" href="namespacestan.html#a75c4bb3d494fafd9d1714d4db258975c">stan::MAJOR_VERSION</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;        *s &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot; stan_version_minor = &quot;</span> &lt;&lt; <a class="code" href="namespacestan.html#ad48b562c737bb49645bd8117067858b9">stan::MINOR_VERSION</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        *s &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot; stan_version_patch = &quot;</span> &lt;&lt; <a class="code" href="namespacestan.html#ae9ae37a39676ea8ca7cbfeffce12f938">stan::PATCH_VERSION</a> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      }</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  } <span class="comment">// namespace common</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;} <span class="comment">// namespace stan</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    }</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  }</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;}</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="namespacestan_1_1common_html_a347e70e891761c68bf4ad10afbe9825b"><div class="ttname"><a href="namespacestan_1_1common.html#a347e70e891761c68bf4ad10afbe9825b">stan::common::write_stan</a></div><div class="ttdeci">void write_stan(std::ostream *s, const std::string prefix=&quot;&quot;)</div><div class="ttdef"><b>Definition:</b> <a href="write__stan_8hpp_source.html#l00012">write_stan.hpp:12</a></div></div>
+<div class="ttc" id="namespacestan_1_1services_1_1io_html_abd1a18dce79c3bc52b5d4d2d8bbd2457"><div class="ttname"><a href="namespacestan_1_1services_1_1io.html#abd1a18dce79c3bc52b5d4d2d8bbd2457">stan::services::io::write_stan</a></div><div class="ttdeci">void write_stan(std::ostream *s, const std::string prefix=&quot;&quot;)</div><div class="ttdef"><b>Definition:</b> <a href="write__stan_8hpp_source.html#l00012">write_stan.hpp:12</a></div></div>
 <div class="ttc" id="namespacestan_html_ad48b562c737bb49645bd8117067858b9"><div class="ttname"><a href="namespacestan.html#ad48b562c737bb49645bd8117067858b9">stan::MINOR_VERSION</a></div><div class="ttdeci">const std::string MINOR_VERSION</div><div class="ttdoc">Minor version number for Stan package. </div><div class="ttdef"><b>Definition:</b> <a href="version_8hpp_source.html#l00012">version.hpp:12</a></div></div>
 <div class="ttc" id="namespacestan_html_ae9ae37a39676ea8ca7cbfeffce12f938"><div class="ttname"><a href="namespacestan.html#ae9ae37a39676ea8ca7cbfeffce12f938">stan::PATCH_VERSION</a></div><div class="ttdeci">const std::string PATCH_VERSION</div><div class="ttdoc">Patch version for Stan package. </div><div class="ttdef"><b>Definition:</b> <a href="version_8hpp_source.html#l00015">version.hpp:15</a></div></div>
 <div class="ttc" id="namespacestan_html_a75c4bb3d494fafd9d1714d4db258975c"><div class="ttname"><a href="namespacestan.html#a75c4bb3d494fafd9d1714d4db258975c">stan::MAJOR_VERSION</a></div><div class="ttdeci">const std::string MAJOR_VERSION</div><div class="ttdoc">Major version number for Stan package. </div><div class="ttdef"><b>Definition:</b> <a href="version_8hpp_source.html#l00009">version.hpp:9</a></div></div>
