@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__ADAPT__DIAG__E__NUTS__BETA
-#define STAN__MCMC__ADAPT__DIAG__E__NUTS__BETA
+#ifndef STAN_MCMC_HMC_NUTS_ADAPT_DIAG_E_NUTS_HPP
+#define STAN_MCMC_HMC_NUTS_ADAPT_DIAG_E_NUTS_HPP
 
 #include <stan/mcmc/stepsize_var_adapter.hpp>
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>

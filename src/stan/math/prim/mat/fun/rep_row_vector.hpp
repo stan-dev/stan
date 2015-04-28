@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__REP_ROW_VECTOR_HPP
-#define STAN__MATH__PRIM__MAT__FUN__REP_ROW_VECTOR_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_REP_ROW_VECTOR_HPP
+#define STAN_MATH_PRIM_MAT_FUN_REP_ROW_VECTOR_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
@@ -11,12 +11,12 @@ namespace stan {
 
     template <typename T>
     inline Eigen::Matrix<typename boost::math::tools::promote_args<T>::type,
-                         1,Eigen::Dynamic>
+                         1, Eigen::Dynamic>
     rep_row_vector(const T& x, int m) {
       using stan::math::check_nonnegative;
       check_nonnegative("rep_row_vector", "m",  m);
       return Eigen::Matrix<typename boost::math::tools::promote_args<T>::type,
-                           1,Eigen::Dynamic>::Constant(m,x);
+                           1, Eigen::Dynamic>::Constant(m, x);
     }
 
   }

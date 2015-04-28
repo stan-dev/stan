@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__ERR__CHECK_GREATER_OR_EQUAL_HPP
-#define STAN__MATH__PRIM__SCAL__ERR__CHECK_GREATER_OR_EQUAL_HPP
+#ifndef STAN_MATH_PRIM_SCAL_ERR_CHECK_GREATER_OR_EQUAL_HPP
+#define STAN_MATH_PRIM_SCAL_ERR_CHECK_GREATER_OR_EQUAL_HPP
 
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
@@ -77,7 +77,7 @@ namespace stan {
      * @param low Lower bound
      *
      * @return <code>true</code> if y is greater or equal than low.
-     * @throw <code>domain_error</code> if y is not greater or equal to low or 
+     * @throw <code>domain_error</code> if y is not greater or equal to low or
      *   if any element of y or low is NaN.
      */
     template <typename T_y, typename T_low>

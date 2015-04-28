@@ -1,5 +1,5 @@
-#ifndef STAN__OPTIMIZATION__BFGS_HPP
-#define STAN__OPTIMIZATION__BFGS_HPP
+#ifndef STAN_OPTIMIZATION_BFGS_HPP
+#define STAN_OPTIMIZATION_BFGS_HPP
 
 #include <cmath>
 #include <cstdlib>

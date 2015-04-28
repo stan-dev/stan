@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__PARSER__PARSER__ITERATOR_TYPEDEFS__HPP
-#define STAN__LANG__PARSER__PARSER__ITERATOR_TYPEDEFS__HPP
+#ifndef STAN_LANG_GRAMMARS_ITERATOR_TYPEDEFS_HPP
+#define STAN_LANG_GRAMMARS_ITERATOR_TYPEDEFS_HPP
 
 #include <boost/spirit/include/version.hpp>
 #include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__PRINT_STACK_HPP
-#define STAN__MATH__REV__CORE__PRINT_STACK_HPP
+#ifndef STAN_MATH_REV_CORE_PRINT_STACK_HPP
+#define STAN_MATH_REV_CORE_PRINT_STACK_HPP
 
 #include <stan/math/rev/core/chainable.hpp>
 #include <stan/math/rev/core/chainable_alloc.hpp>
@@ -9,20 +9,20 @@
 
 namespace stan {
   namespace agrad {
-        
-    /** 
+
+    /**
      * Prints the auto-dif variable stack. This function
      * is used for debugging purposes.
-     * 
+     *
      * Only works if all members of stack are vari* as it
-     * casts to vari*.  
-     * 
+     * casts to vari*.
+     *
      * @param o ostream to modify
      */
     inline void print_stack(std::ostream& o) {
       o << "STACK, size=" << ChainableStack::var_stack_.size() << std::endl;
       for (size_t i = 0; i < ChainableStack::var_stack_.size(); ++i)
-        o << i 
+        o << i
           << "  " << ChainableStack::var_stack_[i]
           << "  " << (static_cast<vari*>(ChainableStack::var_stack_[i]))->val_
           << " : " << (static_cast<vari*>(ChainableStack::var_stack_[i]))->adj_

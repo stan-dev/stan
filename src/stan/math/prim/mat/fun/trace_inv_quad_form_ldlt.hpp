@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__TRACE_INV_QUAD_FORM_LDLT_HPP
-#define STAN__MATH__PRIM__MAT__FUN__TRACE_INV_QUAD_FORM_LDLT_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_TRACE_INV_QUAD_FORM_LDLT_HPP
+#define STAN_MATH_PRIM_MAT_FUN_TRACE_INV_QUAD_FORM_LDLT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/LDLT_factor.hpp>
@@ -12,24 +12,25 @@
 
 namespace stan {
   namespace math {
-    
+
     /*
      * Compute the trace of an inverse quadratic form.  I.E., this computes
      *       trace(B^T A^-1 B)
      * where the LDLT_factor of A is provided.
      */
-    template <typename T1, typename T2, int R2,int C2,int R3,int C3>
-    inline typename 
-    boost::enable_if_c<!stan::is_var<T1>::value && 
-                       !stan::is_var<T2>::value, 
-                       typename boost::math::tools::promote_args<T1,T2>::type>::type
-    trace_inv_quad_form_ldlt(const stan::math::LDLT_factor<T1,R2,C2> &A,
-                             const Eigen::Matrix<T2,R3,C3> &B) {
+    template <typename T1, typename T2, int R2, int C2, int R3, int C3>
+    inline typename
+    boost::enable_if_c<!stan::is_var<T1>::value &&
+                       !stan::is_var<T2>::value,
+                       typename
+                       boost::math::tools::promote_args<T1, T2>::type>::type
+    trace_inv_quad_form_ldlt(const stan::math::LDLT_factor<T1, R2, C2> &A,
+                             const Eigen::Matrix<T2, R3, C3> &B) {
       stan::math::check_multiplicable("trace_inv_quad_form_ldlt",
                                                 "A", A,
                                                 "B", B);
-      
-      return trace(multiply(transpose(B),mdivide_left_ldlt(A,B)));
+
+      return trace(multiply(transpose(B), mdivide_left_ldlt(A, B)));
     }
   }
 }

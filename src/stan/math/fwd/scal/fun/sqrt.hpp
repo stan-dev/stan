@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__SQRT_HPP
-#define STAN__MATH__FWD__SCAL__FUN__SQRT_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_SQRT_HPP
+#define STAN_MATH_FWD_SCAL_FUN_SQRT_HPP
 
 #include <stan/math/fwd/core.hpp>
 
@@ -10,7 +10,7 @@ namespace stan {
   namespace agrad {
 
     template <typename T>
-    inline 
+    inline
     fvar<T>
     sqrt(const fvar<T>& x) {
       using std::sqrt;

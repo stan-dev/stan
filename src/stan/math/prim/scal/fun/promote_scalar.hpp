@@ -1,10 +1,10 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__PROMOTE_SCALAR_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__PROMOTE_SCALAR_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_PROMOTE_SCALAR_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_PROMOTE_SCALAR_HPP
 
-#include <vector>
 #include <stan/math/prim/scal/fun/promote_scalar_type.hpp>
 #include <stan/math/prim/scal/meta/index_type.hpp>
 #include <stan/math/prim/arr/meta/index_type.hpp>
+#include <vector>
 
 namespace stan {
 
@@ -20,10 +20,9 @@ namespace stan {
      */
     template <typename T, typename S>
     struct promote_scalar_struct {
-
       /**
        * Return the value of the input argument promoted to the type
-       * specified by the template parameter.  
+       * specified by the template parameter.
        *
        * This is the base case for mismatching template parameter
        * types in which the underlying scalar type of template
@@ -41,12 +40,11 @@ namespace stan {
      * Struct to hold static function for promoting underlying scalar
      * types.  This specialization is for equal input and output types
      * of function types.
-     * 
+     *
      * @tparam T input and return type of nested static function.
      */
     template <typename T>
-    struct promote_scalar_struct<T,T> {
-
+    struct promote_scalar_struct<T, T> {
       /**
        * Return the unmodified input.
        *
@@ -61,7 +59,7 @@ namespace stan {
     /**
      * Struct to hold static function for promoting underlying scalar
      * types.  This specialization is for standard vector inputs.
-     * 
+     *
      * @tparam T return scalar type
      * @tparam S input type for standard vector elements in static
      * nested function, which must have an underlying scalar type
@@ -69,7 +67,6 @@ namespace stan {
      */
     template <typename T, typename S>
     struct promote_scalar_struct<T, std::vector<S> > {
-
       /**
        * Return the standard vector consisting of the recursive
        * promotion of the elements of the input standard vector to the
@@ -78,16 +75,15 @@ namespace stan {
        * @param x input standard vector.
        * @return standard vector with values promoted from input vector.
        */
-      static std::vector<typename promote_scalar_type<T,S>::type>
+      static std::vector<typename promote_scalar_type<T, S>::type>
       apply(const std::vector<S>& x) {
-        typedef std::vector<typename promote_scalar_type<T,S>::type> return_t; 
+        typedef std::vector<typename promote_scalar_type<T, S>::type> return_t;
         typedef typename index_type<return_t>::type idx_t;
         return_t y(x.size());
         for (idx_t i = 0; i < x.size(); ++i)
-          y[i] = promote_scalar_struct<T,S>::apply(x[i]);
+          y[i] = promote_scalar_struct<T, S>::apply(x[i]);
         return y;
       }
-
     };
 
     /**
@@ -100,9 +96,9 @@ namespace stan {
      * @return input vector with scalars promoted to type T.
      */
     template <typename T, typename S>
-    typename promote_scalar_type<T,S>::type
+    typename promote_scalar_type<T, S>::type
     promote_scalar(const S& x) {
-      return promote_scalar_struct<T,S>::apply(x);
+      return promote_scalar_struct<T, S>::apply(x);
     }
 
 

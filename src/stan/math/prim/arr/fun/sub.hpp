@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__ARR__FUN__SUB_HPP
-#define STAN__MATH__PRIM__ARR__FUN__SUB_HPP
+#ifndef STAN_MATH_PRIM_ARR_FUN_SUB_HPP
+#define STAN_MATH_PRIM_ARR_FUN_SUB_HPP
 
 #include <vector>
 #include <cstddef>

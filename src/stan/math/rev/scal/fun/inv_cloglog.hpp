@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__INV_CLOGLOG_HPP
-#define STAN__MATH__REV__SCAL__FUN__INV_CLOGLOG_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_INV_CLOGLOG_HPP
+#define STAN_MATH_REV_SCAL_FUN_INV_CLOGLOG_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/inv_cloglog.hpp>
@@ -10,7 +10,7 @@ namespace stan {
     namespace {
       class inv_cloglog_vari : public op_v_vari {
       public:
-        inv_cloglog_vari(vari* avi) :
+        explicit inv_cloglog_vari(vari* avi) :
           op_v_vari(stan::math::inv_cloglog(avi->val_), avi) {
         }
         void chain() {

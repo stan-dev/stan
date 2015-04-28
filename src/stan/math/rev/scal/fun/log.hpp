@@ -1,8 +1,8 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__LOG_HPP
-#define STAN__MATH__REV__SCAL__FUN__LOG_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_LOG_HPP
+#define STAN_MATH_REV_SCAL_FUN_LOG_HPP
 
-#include <cmath>
 #include <stan/math/rev/core.hpp>
+#include <cmath>
 
 namespace stan {
   namespace agrad {
@@ -10,8 +10,8 @@ namespace stan {
     namespace {
       class log_vari : public op_v_vari {
       public:
-        log_vari(vari* avi) :
-          op_v_vari(std::log(avi->val_),avi) {
+        explicit log_vari(vari* avi) :
+          op_v_vari(std::log(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / avi_->val_;
@@ -27,16 +27,16 @@ namespace stan {
      * \f$\frac{d}{dx} \log x = \frac{1}{x}\f$.
      *
        \f[
-       \mbox{log}(x) = 
+       \mbox{log}(x) =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < 0\\
          \ln(x) & \mbox{if } x \geq 0 \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{log}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{log}(x)}{\partial x} =
        \begin{cases}
          \textrm{NaN} & \mbox{if } x < 0\\
          \frac{1}{x} & \mbox{if } x\geq 0 \\[6pt]
@@ -50,7 +50,7 @@ namespace stan {
     inline var log(const var& a) {
       return var(new log_vari(a.vi_));
     }
-    
+
   }
 }
 #endif

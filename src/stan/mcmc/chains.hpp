@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__CHAINS_HPP
-#define STAN__MCMC__CHAINS_HPP
+#ifndef STAN_MCMC_CHAINS_HPP
+#define STAN_MCMC_CHAINS_HPP
 
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>

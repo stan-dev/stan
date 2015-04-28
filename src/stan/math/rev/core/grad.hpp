@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__GRAD_HPP
-#define STAN__MATH__REV__CORE__GRAD_HPP
+#ifndef STAN_MATH_REV_CORE_GRAD_HPP
+#define STAN_MATH_REV_CORE_GRAD_HPP
 
 #include <stan/math/rev/core/chainable.hpp>
 #include <stan/math/rev/core/chainable_alloc.hpp>
@@ -23,29 +23,29 @@ namespace stan {
      * as the last nesting.
      *
      * <p>This function does not recover any memory from the computation.
-     * 
+     *
      * @param vi Variable implementation for root of partial
      * derivative propagation.
      */
     static void grad(chainable* vi) {
-
       // simple reference implementation (intended as doc):
-      //   vi->init_dependent(); 
+      //   vi->init_dependent();
       //   size_t end = var_stack_.size();
       //   size_t begin = empty_nested() ? 0 : end - nested_size();
-      //   for (size_t i = end; --i > begin; )  
+      //   for (size_t i = end; --i > begin; )
       //     var_stack_[i]->chain();
 
       typedef std::vector<chainable*>::reverse_iterator it_t;
-      vi->init_dependent(); 
+      vi->init_dependent();
       it_t begin = ChainableStack::var_stack_.rbegin();
-      it_t end = empty_nested() ? ChainableStack::var_stack_.rend() : begin + nested_size();
+      it_t end = empty_nested()
+        ? ChainableStack::var_stack_.rend() : begin + nested_size();
       for (it_t it = begin; it < end; ++it) {
         (*it)->chain();
       }
     }
 
-    
+
   }
 }
 

@@ -1,5 +1,5 @@
-#ifndef STAN__MCMC__EXPL__LEAPFROG__BETA
-#define STAN__MCMC__EXPL__LEAPFROG__BETA
+#ifndef STAN_MCMC_HMC_INTEGRATORS_EXPL_LEAPFROG_HPP
+#define STAN_MCMC_HMC_INTEGRATORS_EXPL_LEAPFROG_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/mcmc/hmc/integrators/base_leapfrog.hpp>

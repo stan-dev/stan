@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__OPERATOR_GREATER_THAN_OR_EQUAL_HPP
-#define STAN__MATH__REV__CORE__OPERATOR_GREATER_THAN_OR_EQUAL_HPP
+#ifndef STAN_MATH_REV_CORE_OPERATOR_GREATER_THAN_OR_EQUAL_HPP
+#define STAN_MATH_REV_CORE_OPERATOR_GREATER_THAN_OR_EQUAL_HPP
 
 #include <stan/math/rev/core/var.hpp>
 
@@ -11,7 +11,7 @@ namespace stan {
      * (C++).
      *
        \f[
-       \mbox{operator\textgreater=}(x,y) = 
+       \mbox{operator\textgreater=}(x, y) =
        \begin{cases}
          0 & \mbox{if } x < y\\
          1 & \mbox{if } x \geq y \\[6pt]

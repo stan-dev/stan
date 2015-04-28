@@ -1,5 +1,5 @@
-#ifndef STAN__IO__JSON__JSON_ERROR_HPP
-#define STAN__IO__JSON__JSON_ERROR_HPP
+#ifndef STAN_IO_JSON_JSON_ERROR_HPP
+#define STAN_IO_JSON_JSON_ERROR_HPP
 
 #include <stdexcept>
 #include <string>

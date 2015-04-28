@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__INV_LOGIT_HPP
-#define STAN__MATH__FWD__SCAL__FUN__INV_LOGIT_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_INV_LOGIT_HPP
+#define STAN_MATH_FWD_SCAL_FUN_INV_LOGIT_HPP
 
 #include <stan/math/fwd/core.hpp>
 
@@ -16,7 +16,7 @@ namespace stan {
       using std::exp;
       using std::pow;
       using stan::math::inv_logit;
-      return fvar<T>(inv_logit(x.val_), 
+      return fvar<T>(inv_logit(x.val_),
            x.d_ * inv_logit(x.val_) * (1 - inv_logit(x.val_)));
     }
   }

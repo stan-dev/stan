@@ -1,5 +1,5 @@
-#ifndef STAN__LANG__PARSER__EXPRESSION_GRAMMAR__HPP
-#define STAN__LANG__PARSER__EXPRESSION_GRAMMAR__HPP
+#ifndef STAN_LANG_GRAMMARS_EXPRESSION_GRAMMAR_HPP
+#define STAN_LANG_GRAMMARS_EXPRESSION_GRAMMAR_HPP
 
 #include <string>
 #include <sstream>
@@ -35,7 +35,6 @@ namespace stan {
                          std::stringstream& error_msgs);
 
       variable_map& var_map_;
-
       std::stringstream& error_msgs_;
 
       expression07_grammar<Iterator> expression07_g;

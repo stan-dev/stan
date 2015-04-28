@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__HEAD_HPP
-#define STAN__MATH__PRIM__MAT__FUN__HEAD_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_HEAD_HPP
+#define STAN_MATH_PRIM_MAT_FUN_HEAD_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <vector>
 #include <stan/math/prim/mat/err/check_column_index.hpp>
 #include <stan/math/prim/mat/err/check_row_index.hpp>
 #include <stan/math/prim/mat/err/check_std_vector_index.hpp>
+#include <vector>
 
 namespace stan {
   namespace math {
@@ -15,13 +15,13 @@ namespace stan {
      * from the front of the specified vector.
      * @tparam T Type of value in vector
      * @param v Vector input
-     * @param n Size of return 
+     * @param n Size of return
      * @return The first n elements of v
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,Eigen::Dynamic,1>
-    head(const Eigen::Matrix<T,Eigen::Dynamic,1>& v,
+    Eigen::Matrix<T, Eigen::Dynamic, 1>
+    head(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
          size_t n) {
       if (n != 0)
         stan::math::check_row_index("head", "n", v, n);
@@ -38,8 +38,8 @@ namespace stan {
      */
     template <typename T>
     inline
-    Eigen::Matrix<T,1,Eigen::Dynamic>
-    head(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv,
+    Eigen::Matrix<T, 1, Eigen::Dynamic>
+    head(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv,
          size_t n) {
       if (n != 0)
         stan::math::check_column_index("head", "n", rv, n);
@@ -51,7 +51,7 @@ namespace stan {
      * from the front of the specified standard vector.
      * @tparam T Type of value in vector
      * @param sv Standard vector
-     * @param n Size of return 
+     * @param n Size of return
      * @return The first n elements of sv
      */
     template <typename T>

@@ -1,5 +1,5 @@
-#ifndef STAN__IO__MCMC__WRITER__HPP
-#define STAN__IO__MCMC__WRITER__HPP
+#ifndef STAN_IO_MCMC_WRITER_HPP
+#define STAN_IO_MCMC_WRITER_HPP
 
 #include <stan/interface/recorder/csv.hpp>
 #include <stan/mcmc/base_mcmc.hpp>

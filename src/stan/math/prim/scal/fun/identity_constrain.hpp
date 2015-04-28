@@ -1,8 +1,8 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__IDENTITY_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__IDENTITY_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_IDENTITY_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_IDENTITY_CONSTRAIN_HPP
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -18,7 +18,7 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    inline 
+    inline
     T identity_constrain(T x) {
       return x;
     }
@@ -37,11 +37,11 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     template <typename T>
-    inline 
+    inline
     T identity_constrain(const T x, T& /*lp*/) {
       return x;
     }
-    
+
   }
 
 }

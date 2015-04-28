@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__SINGULAR_VALUES_HPP
-#define STAN__MATH__PRIM__MAT__FUN__SINGULAR_VALUES_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_SINGULAR_VALUES_HPP
+#define STAN_MATH_PRIM_MAT_FUN_SINGULAR_VALUES_HPP
 
 // NOTE: if using this with rev mode, include numeric_limits
 //  or else this seg-faults.
@@ -17,10 +17,10 @@ namespace stan {
      * @return Singular values of the matrix.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1>
-    singular_values(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      return Eigen::JacobiSVD<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >(m)
-        .singularValues();
+    Eigen::Matrix<T, Eigen::Dynamic, 1>
+    singular_values(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m) {
+      return Eigen::JacobiSVD
+        <Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >(m).singularValues();
     }
 
   }

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__LDLT_ALLOC_HPP
-#define STAN__MATH__REV__MAT__FUN__LDLT_ALLOC_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_LDLT_ALLOC_HPP
+#define STAN_MATH_REV_MAT_FUN_LDLT_ALLOC_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/core.hpp>
@@ -20,28 +20,28 @@ namespace stan {
     class LDLT_alloc : public chainable_alloc {
     public:
       LDLT_alloc() : N_(0) {}
-      LDLT_alloc(const Eigen::Matrix<var,R,C> &A) : N_(0) {
+      explicit LDLT_alloc(const Eigen::Matrix<var, R, C> &A) : N_(0) {
         compute(A);
       }
-      
+
       /**
-       * Compute the LDLT factorization and store pointers to the 
+       * Compute the LDLT factorization and store pointers to the
        * vari's of the matrix entries to be used when chain() is
        * called elsewhere.
        **/
-      inline void compute(const Eigen::Matrix<var,R,C> &A) {
-        Eigen::Matrix<double,R,C> Ad(A.rows(),A.cols());
+      inline void compute(const Eigen::Matrix<var, R, C> &A) {
+        Eigen::Matrix<double, R, C> Ad(A.rows(), A.cols());
 
         N_ = A.rows();
-        _variA.resize(A.rows(),A.cols());
+        _variA.resize(A.rows(), A.cols());
 
         for (size_t j = 0; j < N_; j++) {
           for (size_t i = 0; i < N_; i++) {
-            Ad(i,j) = A(i,j).val();
-            _variA(i,j) = A(i,j).vi_;
+            Ad(i, j) = A(i, j).val();
+            _variA(i, j) = A(i, j).vi_;
           }
         }
-          
+
         _ldlt.compute(Ad);
       }
 
@@ -49,10 +49,10 @@ namespace stan {
       inline double log_abs_det() const {
         return _ldlt.vectorD().array().log().sum();
       }
-        
+
       size_t N_;
-      Eigen::LDLT<Eigen::Matrix<double,R,C> > _ldlt;
-      Eigen::Matrix<vari*,R,C> _variA;
+      Eigen::LDLT<Eigen::Matrix<double, R, C> > _ldlt;
+      Eigen::Matrix<vari*, R, C> _variA;
     };
   }
 }

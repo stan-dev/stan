@@ -1,14 +1,14 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__LOG_DIFF_EXP_HPP
-#define STAN__MATH__FWD__SCAL__FUN__LOG_DIFF_EXP_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_LOG_DIFF_EXP_HPP
+#define STAN_MATH_FWD_SCAL_FUN_LOG_DIFF_EXP_HPP
 
 #include <stan/math/fwd/core.hpp>
 
 #include <stan/math/prim/scal/fun/log_diff_exp.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T> inline fvar<T>
     log_diff_exp(const fvar<T>& x1, const fvar<T>& x2) {
@@ -18,7 +18,8 @@ namespace stan{
        if (x1.val_ <= x2.val_)
          return fvar<T>(NOT_A_NUMBER, NOT_A_NUMBER);
        return fvar<T>(log_diff_exp(x1.val_, x2.val_),
-        x1.d_ / (1 - exp(x2.val_ - x1.val_) ) + x2.d_ / (1 - exp(x1.val_ - x2.val_) ) );
+                      x1.d_ / (1 - exp(x2.val_ - x1.val_))
+                      + x2.d_ / (1 - exp(x1.val_ - x2.val_)));
     }
 
     template <typename T1, typename T2> inline fvar<T2>
