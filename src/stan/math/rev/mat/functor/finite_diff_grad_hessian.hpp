@@ -41,6 +41,7 @@ namespace stan {
     finite_diff_grad_hessian(const F& f,
                              const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
                              double& fx,
+                             Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& hess,
                              std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >& grad_hess_fx,
                              const double epsilon = 1e-04) {
       using Eigen::Matrix;
@@ -51,33 +52,34 @@ namespace stan {
 
       Matrix<double,Dynamic,1> x_temp(x);
       Matrix<double,Dynamic,1> grad_auto(d);
-      Matrix<double,Dynamic,Dynamic> H_auto(d,d);
-      Matrix<double,Dynamic,Dynamic> H_diff(d,d);
+      Matrix<double,Dynamic,Dynamic> hess_auto(d,d);
+      Matrix<double,Dynamic,Dynamic> hess_diff(d,d);
 
       
+      hessian(f, x, fx, grad_auto, hess);
       for (int i = 0; i < d; ++i) {
-        H_diff.setZero();
+        hess_diff.setZero();
 
         x_temp(i) = x(i) + 2.0 * epsilon;
-        hessian(f, x_temp, dummy_fx_eval, grad_auto, H_auto);
-        H_diff = -H_auto;
+        hessian(f, x_temp, dummy_fx_eval, grad_auto, hess_auto);
+        hess_diff = -hess_auto;
 
         x_temp(i) = x(i) + -2.0 * epsilon;
-        hessian(f, x_temp, dummy_fx_eval, grad_auto, H_auto);
-        H_diff += H_auto;
+        hessian(f, x_temp, dummy_fx_eval, grad_auto, hess_auto);
+        hess_diff += hess_auto;
 
         x_temp(i) = x(i) + epsilon;
-        hessian(f, x_temp, dummy_fx_eval, grad_auto, H_auto);
-        H_diff += 8.0 * H_auto;
+        hessian(f, x_temp, dummy_fx_eval, grad_auto, hess_auto);
+        hess_diff += 8.0 * hess_auto;
 
         x_temp(i) = x(i) + -epsilon;
-        hessian(f, x_temp, dummy_fx_eval, grad_auto, H_auto);
-        H_diff -= 8.0 * H_auto;
+        hessian(f, x_temp, dummy_fx_eval, grad_auto, hess_auto);
+        hess_diff -= 8.0 * hess_auto;
 
         x_temp(i) = x(i);
-        H_diff /= 12.0 * epsilon;
+        hess_diff /= 12.0 * epsilon;
         
-        grad_hess_fx.push_back(H_diff);
+        grad_hess_fx.push_back(hess_diff);
       }
       fx = f(x);
     }

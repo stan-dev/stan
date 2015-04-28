@@ -42,6 +42,7 @@ namespace stan {
     finite_diff_hessian(const F& f,
                         const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
                         double& fx,
+                        Eigen::Matrix<double,Eigen::Dynamic,1>& grad_fx,
                         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& hess_fx, 
                         const double epsilon = 1e-03) {
       using Eigen::Matrix;
@@ -56,6 +57,7 @@ namespace stan {
       hess_fx.resize(d, d);
 
       
+      gradient(f, x, fx, grad_fx);
       for (int i = 0; i < d; ++i) {
         VectorXd g_diff = VectorXd::Zero(d);
         x_temp(i) = x(i) + 2.0 * epsilon;
@@ -79,7 +81,6 @@ namespace stan {
         
         hess_fx.col(i) = g_diff;
       }
-      fx = f(x);
     }
   }
 }

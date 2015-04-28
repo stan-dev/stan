@@ -2,6 +2,7 @@
 #define STAN__MATH__PRIM__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat/functor/finite_diff_gradient.hpp>
 
 namespace stan {
   
@@ -65,6 +66,7 @@ namespace stan {
     finite_diff_hessian(const F& f,
                         const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
                         double& fx,
+                        Eigen::Matrix<double,Eigen::Dynamic,1>& grad_fx,
                         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& hess_fx, 
                         const double epsilon = 1e-03) {
       using Eigen::Matrix;
@@ -75,8 +77,8 @@ namespace stan {
       Matrix<double,Dynamic,1> x_temp(x);
       hess_fx.resize(d, d);
 
-      fx = f(x);
       
+      finite_diff_gradient(f, x, fx, grad_fx);
       double f_diff(0.0);
       for (int i = 0; i < d; ++i) {
         for (int j = i; j < d; ++j) {
