@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__ERF_HPP
-#define STAN__MATH__FWD__SCAL__FUN__ERF_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_ERF_HPP
+#define STAN_MATH_FWD_SCAL_FUN_ERF_HPP
 
 #include <stan/math/fwd/core.hpp>
 
@@ -19,7 +19,7 @@ namespace stan {
       using ::exp;
       using ::erf;
       using stan::math::square;
-      return fvar<T>(erf(x.val_), x.d_ * exp(-square(x.val_)) 
+      return fvar<T>(erf(x.val_), x.d_ * exp(-square(x.val_))
                                   * stan::math::TWO_OVER_SQRT_PI);
     }
   }

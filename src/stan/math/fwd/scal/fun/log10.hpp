@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__LOG10_HPP
-#define STAN__MATH__FWD__SCAL__FUN__LOG10_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_LOG10_HPP
+#define STAN_MATH_FWD_SCAL_FUN_LOG10_HPP
 
 #include <stan/math/fwd/core.hpp>
 
@@ -16,7 +16,7 @@ namespace stan {
       using std::log;
       using std::log10;
       using stan::math::NOT_A_NUMBER;
-      if(x.val_ < 0.0)
+      if (x.val_ < 0.0)
         return fvar<T>(NOT_A_NUMBER, NOT_A_NUMBER);
       else
         return fvar<T>(log10(x.val_), x.d_ / (x.val_ * stan::math::LOG_10));

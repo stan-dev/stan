@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MULTINOMIAL_LOG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MULTINOMIAL_LOG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_MULTINOMIAL_LOG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_MULTINOMIAL_LOG_HPP
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/uniform_01.hpp>
@@ -11,17 +11,18 @@
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <vector>
 
 namespace stan {
 
   namespace prob {
-    // Multinomial(ns|N,theta)   [0 <= n <= N;  SUM ns = N;   
+    // Multinomial(ns|N, theta)   [0 <= n <= N;  SUM ns = N;
     //                            0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto,
               typename T_prob>
     typename boost::math::tools::promote_args<T_prob>::type
     multinomial_log(const std::vector<int>& ns,
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
+                    const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
       static const char* function("stan::prob::multinomial_log");
 
       using stan::math::check_nonnegative;
@@ -33,30 +34,31 @@ namespace stan {
       typename promote_args<T_prob>::type lp(0.0);
       check_nonnegative(function, "Number of trials variable", ns);
       check_simplex(function, "Probabilites parameter", theta);
-      check_size_match(function, 
+      check_size_match(function,
                        "Size of number of trials variable", ns.size(),
                        "rows of probabilities parameter", theta.rows());
       using stan::math::multiply_log;
 
-      if (include_summand<propto>::value) {     
+      if (include_summand<propto>::value) {
         double sum = 1.0;
-        for (unsigned int i = 0; i < ns.size(); ++i) 
+        for (unsigned int i = 0; i < ns.size(); ++i)
           sum += ns[i];
         lp += lgamma(sum);
         for (unsigned int i = 0; i < ns.size(); ++i)
           lp -= lgamma(ns[i] + 1.0);
       }
-      if (include_summand<propto,T_prob>::value)
+      if (include_summand<propto, T_prob>::value) {
         for (unsigned int i = 0; i < ns.size(); ++i)
           lp += multiply_log(ns[i], theta[i]);
+      }
       return lp;
     }
 
     template <typename T_prob>
     typename boost::math::tools::promote_args<T_prob>::type
     multinomial_log(const std::vector<int>& ns,
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
-      return multinomial_log<false>(ns,theta);
+                    const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
+      return multinomial_log<false>(ns, theta);
     }
 
   }

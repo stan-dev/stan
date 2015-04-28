@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__PRECOMP_V_VARI_HPP
-#define STAN__MATH__REV__CORE__PRECOMP_V_VARI_HPP
+#ifndef STAN_MATH_REV_CORE_PRECOMP_V_VARI_HPP
+#define STAN_MATH_REV_CORE_PRECOMP_V_VARI_HPP
 
 #include <stan/math/rev/core/vari.hpp>
 #include <stan/math/rev/core/v_vari.hpp>
@@ -13,8 +13,8 @@ namespace stan {
       double da_;
     public:
       precomp_v_vari(double val, vari* avi, double da)
-        : op_v_vari(val,avi),
-          da_(da) { 
+        : op_v_vari(val, avi),
+          da_(da) {
       }
       void chain() {
         avi_->adj_ += adj_ * da_;

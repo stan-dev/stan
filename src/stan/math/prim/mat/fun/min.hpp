@@ -1,13 +1,15 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__MIN_HPP
-#define STAN__MATH__PRIM__MAT__FUN__MIN_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_MIN_HPP
+#define STAN_MATH_PRIM_MAT_FUN_MIN_HPP
 
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <algorithm>
+#include <limits>
 #include <stdexcept>
 #include <vector>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
 
 namespace stan {
   namespace math {
-    
+
     /**
      * Returns the minimum coefficient in the specified
      * column vector.
@@ -20,7 +22,7 @@ namespace stan {
         throw std::domain_error("error: cannot take min of empty int vector");
       int min = x[0];
       for (size_t i = 1; i < x.size(); ++i)
-        if (x[i] < min) 
+        if (x[i] < min)
           min = x[i];
       return min;
     }
@@ -38,7 +40,7 @@ namespace stan {
         return std::numeric_limits<T>::infinity();
       T min = x[0];
       for (size_t i = 1; i < x.size(); ++i)
-        if (x[i] < min) 
+        if (x[i] < min)
           min = x[i];
       return min;
     }
@@ -50,12 +52,12 @@ namespace stan {
      * @return Minimum coefficient value in the vector.
      */
     template <typename T, int R, int C>
-    inline T min(const Eigen::Matrix<T,R,C>& m) {
-      if (m.size() == 0) 
+    inline T min(const Eigen::Matrix<T, R, C>& m) {
+      if (m.size() == 0)
         return std::numeric_limits<double>::infinity();
       return m.minCoeff();
-    }    
-    
+    }
+
   }
 }
 #endif

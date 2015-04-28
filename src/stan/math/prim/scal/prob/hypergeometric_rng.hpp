@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__HYPERGEOMETRIC_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__HYPERGEOMETRIC_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_HYPERGEOMETRIC_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_HYPERGEOMETRIC_RNG_HPP
 
 #include <boost/math/distributions/hypergeometric.hpp>
 
@@ -33,7 +33,7 @@ namespace stan {
       int max = a - 1;
       while (min < max) {
         int mid = (min + max) / 2;
-        if (cdf(dist,mid + 1) > u)
+        if (cdf(dist, mid + 1) > u)
           max = mid;
         else
           min = mid + 1;

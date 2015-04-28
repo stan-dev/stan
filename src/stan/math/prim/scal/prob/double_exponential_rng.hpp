@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__DOUBLE_EXPONENTIAL_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__DOUBLE_EXPONENTIAL_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_DOUBLE_EXPONENTIAL_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_DOUBLE_EXPONENTIAL_RNG_HPP
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -41,9 +41,9 @@ namespace stan {
         rng_unit_01(rng, uniform_01<>());
       double a = 0;
       double laplaceRN = rng_unit_01();
-      if(0.5 - laplaceRN > 0)
+      if (0.5 - laplaceRN > 0)
         a = 1.0;
-      else if(0.5 - laplaceRN < 0)
+      else if (0.5 - laplaceRN < 0)
         a = -1.0;
       return mu - sigma * a * log1m(2 * abs(0.5 - laplaceRN));
     }

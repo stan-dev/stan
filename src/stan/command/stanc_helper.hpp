@@ -1,3 +1,6 @@
+#ifndef STAN_COMMAND_STANC_HELPER_HPP
+#define STAN_COMMAND_STANC_HELPER_HPP
+
 #include <stan/version.hpp>
 #include <stan/lang/compiler.hpp>
 #include <stan/io/cmd_line.hpp>
@@ -176,3 +179,4 @@ int stanc_helper(int argc, const char* argv[],
   return SUCCESS_RC;
 }
 
+#endif

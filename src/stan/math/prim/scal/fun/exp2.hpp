@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__EXP2_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__EXP2_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_EXP2_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_EXP2_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <math.h>
@@ -12,7 +12,7 @@ namespace stan {
      *
      * The exponent base 2 function is defined by
      *
-     * <code>exp2(y) = pow(2.0,y)</code>.
+     * <code>exp2(y) = pow(2.0, y)</code>.
      *
      * @param y Value.
      * @tparam T Type of scalar.
@@ -22,7 +22,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T>::type
     exp2(const T y) {
       using ::pow;
-      return pow(2.0,y);
+      return pow(2.0, y);
     }
   }
 }

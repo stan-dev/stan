@@ -1,20 +1,12 @@
-#ifndef STAN__MODEL__MODEL__HEADER_HPP__
-#define STAN__MODEL__MODEL__HEADER_HPP__
+#ifndef STAN_MODEL_MODEL_HEADER_HPP
+#define STAN_MODEL_MODEL_HEADER_HPP
 
-#include <boost/exception/all.hpp>
-#include <boost/random/linear_congruential.hpp>
-
-// FIXME: this currently needs to be included first
-#include <stan/math/prim/mat/fun/value_of_rec.hpp>
-#include <stan/math/prim/mat/meta/get.hpp>
-
-#include <stan/math/prim/arr.hpp>
-#include <stan/math/prim/mat.hpp>
-#include <stan/math/prim/scal.hpp>
-#include <stan/math/rev/core.hpp>
-#include <stan/math/rev/arr.hpp>
-#include <stan/math/rev/mat.hpp>
-#include <stan/math/rev/scal.hpp>
+#include <stan/math/prim/arr/meta.hpp>
+#include <stan/math/prim/mat/meta.hpp>
+#include <stan/math/prim/scal/meta.hpp>
+#include <stan/math/rev/scal/meta.hpp>
+#include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
@@ -25,6 +17,9 @@
 #include <stan/lang/rethrow_located.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/services/command.hpp>
+
+#include <boost/exception/all.hpp>
+#include <boost/random/linear_congruential.hpp>
 
 #include <cmath>
 #include <cstddef>

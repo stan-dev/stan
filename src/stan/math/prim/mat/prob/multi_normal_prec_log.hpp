@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__MULTI_NORMAL_PREC_LOG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__MULTI_NORMAL_PREC_LOG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_MULTI_NORMAL_PREC_LOG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_MULTI_NORMAL_PREC_LOG_HPP
 
 #include <stan/math/prim/mat/err/check_ldlt_factor.hpp>
 #include <stan/math/prim/scal/err/check_size_match.hpp>

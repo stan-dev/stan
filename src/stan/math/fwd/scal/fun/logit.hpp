@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__LOGIT_HPP
-#define STAN__MATH__FWD__SCAL__FUN__LOGIT_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_LOGIT_HPP
+#define STAN_MATH_FWD_SCAL_FUN_LOGIT_HPP
 
 #include <stan/math/fwd/core.hpp>
 
@@ -18,9 +18,9 @@ namespace stan {
       using stan::math::logit;
       using stan::math::square;
       using stan::math::NOT_A_NUMBER;
-      if(x.val_ > 1 || x.val_ < 0)
+      if (x.val_ > 1 || x.val_ < 0)
         return fvar<T>(NOT_A_NUMBER, NOT_A_NUMBER);
-      else 
+      else
         return fvar<T>(logit(x.val_), x.d_ / (x.val_ - square(x.val_)));
     }
   }

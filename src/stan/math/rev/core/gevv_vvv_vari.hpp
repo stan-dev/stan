@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__CORE__GEVV_VVV_VARI_HPP
-#define STAN__MATH__REV__CORE__GEVV_VVV_VARI_HPP
+#ifndef STAN_MATH_REV_CORE_GEVV_VVV_VARI_HPP
+#define STAN_MATH_REV_CORE_GEVV_VVV_VARI_HPP
 
 #include <stan/math/rev/core/vari.hpp>
 #include <stan/math/rev/core/var.hpp>
@@ -25,13 +25,17 @@ namespace stan {
         *dotprod = result;
         return alpha->vi_->val_ * result;
       }
+
     public:
-      gevv_vvv_vari(const stan::agrad::var* alpha, 
-                    const stan::agrad::var* v1, int stride1, 
-                    const stan::agrad::var* v2, int stride2, size_t length) : 
-        vari(eval_gevv(alpha,v1,stride1,v2,stride2,length,&dotval_)), length_(length) {
+      gevv_vvv_vari(const stan::agrad::var* alpha,
+                    const stan::agrad::var* v1, int stride1,
+                    const stan::agrad::var* v2, int stride2, size_t length) :
+        vari(eval_gevv(alpha, v1, stride1, v2, stride2, length, &dotval_)),
+        length_(length) {
         alpha_ = alpha->vi_;
-        v1_ = (stan::agrad::vari**)stan::agrad::ChainableStack::memalloc_.alloc(2*length_*sizeof(stan::agrad::vari*));
+        v1_ = reinterpret_cast<stan::agrad::vari**>
+          (stan::agrad::ChainableStack::memalloc_
+           .alloc(2 * length_ * sizeof(stan::agrad::vari*)));
         v2_ = v1_ + length_;
         for (size_t i = 0; i < length_; i++)
           v1_[i] = v1[i*stride1].vi_;
@@ -48,7 +52,7 @@ namespace stan {
         alpha_->adj_ += adj_ * dotval_;
       }
     };
-    
+
   }
 }
 

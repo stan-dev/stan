@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__FWD__SCAL__FUN__EXPM1_HPP
-#define STAN__MATH__FWD__SCAL__FUN__EXPM1_HPP
+#ifndef STAN_MATH_FWD_SCAL_FUN_EXPM1_HPP
+#define STAN_MATH_FWD_SCAL_FUN_EXPM1_HPP
 
 #include <stan/math/fwd/core.hpp>
 
@@ -16,7 +16,7 @@ namespace stan {
       using ::expm1;
       using ::exp;
       return fvar<T>(expm1(x.val_), x.d_ * exp(x.val_));
-    } 
+    }
   }
 }
 #endif

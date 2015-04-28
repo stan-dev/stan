@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__REV__CORE__VVV_VARI_HPP
-#define STAN__MATH__REV__CORE__VVV_VARI_HPP
+#ifndef STAN_MATH_REV_CORE_VVV_VARI_HPP
+#define STAN_MATH_REV_CORE_VVV_VARI_HPP
 
 #include <stan/math/rev/core/vari.hpp>
 
 namespace stan {
 
   namespace agrad {
-    
+
     class op_vvv_vari : public vari {
     protected:
       vari* avi_;

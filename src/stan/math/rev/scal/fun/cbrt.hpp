@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__CBRT_HPP
-#define STAN__MATH__REV__SCAL__FUN__CBRT_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_CBRT_HPP
+#define STAN_MATH_REV_SCAL_FUN_CBRT_HPP
 
 #include <math.h>
 #include <stan/math/rev/core.hpp>
@@ -10,8 +10,8 @@ namespace stan {
     namespace {
       class cbrt_vari : public op_v_vari {
       public:
-        cbrt_vari(vari* avi) :
-          op_v_vari(::cbrt(avi->val_),avi) {
+        explicit cbrt_vari(vari* avi) :
+          op_v_vari(::cbrt(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (3.0 * val_ * val_);
@@ -29,15 +29,15 @@ namespace stan {
      * \f$\frac{d}{dx} x^{1/3} = \frac{1}{3 x^{2/3}}\f$.
      *
        \f[
-       \mbox{cbrt}(x) = 
+       \mbox{cbrt}(x) =
        \begin{cases}
          \sqrt[3]{x} & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{cbrt}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{cbrt}(x)}{\partial x} =
        \begin{cases}
          \frac{1}{3x^{2/3}} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__GAUSSIAN_DLM_OBS_LOG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__GAUSSIAN_DLM_OBS_LOG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_GAUSSIAN_DLM_OBS_LOG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_GAUSSIAN_DLM_OBS_LOG_HPP
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -75,18 +75,24 @@ namespace stan {
               >
     typename return_type<
       T_y,
-      typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
-    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                         const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
-                         const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
-                         const Eigen::Matrix<T_V,Eigen::Dynamic,Eigen::Dynamic>& V,
-                         const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
-                         const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
-                         const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
+      typename return_type<T_F, T_G, T_V, T_W, T_m0, T_C0>::type >::type
+    gaussian_dlm_obs_log(const Eigen::Matrix
+                         <T_y, Eigen::Dynamic, Eigen::Dynamic>& y,
+                         const Eigen::Matrix
+                         <T_F, Eigen::Dynamic, Eigen::Dynamic>& F,
+                         const Eigen::Matrix
+                         <T_G, Eigen::Dynamic, Eigen::Dynamic>& G,
+                         const Eigen::Matrix
+                         <T_V, Eigen::Dynamic, Eigen::Dynamic>& V,
+                         const Eigen::Matrix
+                         <T_W, Eigen::Dynamic, Eigen::Dynamic>& W,
+                         const Eigen::Matrix<T_m0, Eigen::Dynamic, 1>& m0,
+                         const Eigen::Matrix
+                         <T_C0, Eigen::Dynamic, Eigen::Dynamic>& C0) {
       static const char* function("stan::prob::gaussian_dlm_obs_log");
       typedef typename return_type<
         T_y,
-        typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type  >::type T_lp;
+        typename return_type<T_F, T_G, T_V, T_W, T_m0, T_C0>::type>::type T_lp;
       T_lp lp(0.0);
 
       using stan::math::add;
@@ -104,19 +110,19 @@ namespace stan {
       using stan::math::trace_quad_form;
       using stan::math::transpose;
 
-      int r = y.rows(); // number of variables
-      int T = y.cols(); // number of observations
-      int n = G.rows(); // number of states
+      int r = y.rows();  // number of variables
+      int T = y.cols();  // number of observations
+      int n = G.rows();  // number of states
 
       // check y
       check_finite(function, "y", y);
       check_not_nan(function, "y", y);
       // check F
       check_size_match(function,
-                       "columns of F", F.cols(), 
+                       "columns of F", F.cols(),
                        "rows of y", y.rows());
       check_size_match(function,
-                       "rows of F", F.rows(), 
+                       "rows of F", F.rows(),
                        "rows of G", G.rows());
       check_finite(function, "F", F);
       // check G
@@ -126,14 +132,14 @@ namespace stan {
       check_size_match(function,
                        "rows of V", V.rows(),
                        "rows of y", y.rows());
-      // TODO: incorporate support for infinite V
+      // TODO(anyone): incorporate support for infinite V
       check_finite(function, "V", V);
       check_spsd_matrix(function, "V", V);
       // check W
       check_size_match(function,
                        "rows of W", W.rows(),
                        "rows of G", G.rows());
-      // TODO: incorporate support for infinite W
+      // TODO(anyone): incorporate support for infinite W
       check_finite(function, "W", W);
       check_spsd_matrix(function, "W", W);
       // check m0
@@ -143,7 +149,7 @@ namespace stan {
       check_finite(function, "m0", m0);
       // check C0
       check_size_match(function,
-                       "rows of C0", C0.rows(), 
+                       "rows of C0", C0.rows(),
                        "rows of G", G.rows());
       check_cov_matrix(function, "C0", C0);
       check_finite(function, "C0", C0);
@@ -155,29 +161,29 @@ namespace stan {
         lp -= 0.5 * LOG_TWO_PI * r * T;
       }
 
-      if (include_summand<propto,T_y,T_F,T_G,T_V,T_W,T_m0,T_C0>::value) {
-        Eigen::Matrix<T_lp,Eigen::Dynamic, 1> m(n);
-        Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> C(n, n);
+      if (include_summand<propto, T_y, T_F, T_G, T_V, T_W, T_m0, T_C0>::value) {
+        Eigen::Matrix<T_lp, Eigen::Dynamic, 1> m(n);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> C(n, n);
 
-        // TODO: how to recast matrices
-        for (int i = 0; i < m0.size(); i ++ ) {
+        // TODO(anyone): how to recast matrices
+        for (int i = 0; i < m0.size(); i++) {
           m(i) = m0(i);
         }
-        for (int i = 0; i < C0.rows(); i ++ ) {
-          for (int j = 0; j < C0.cols(); j ++ ) {
+        for (int i = 0; i < C0.rows(); i++) {
+          for (int j = 0; j < C0.cols(); j++) {
             C(i, j) = C0(i, j);
           }
         }
 
         Eigen::Matrix<typename return_type<T_y>::type,
                       Eigen::Dynamic, 1> yi(r);
-        Eigen::Matrix<T_lp,Eigen::Dynamic, 1> a(n);
-        Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> R(n, n);
-        Eigen::Matrix<T_lp,Eigen::Dynamic, 1> f(r);
-        Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> Q(r, r);
-        Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> Q_inv(r, r);
-        Eigen::Matrix<T_lp,Eigen::Dynamic, 1> e(r);
-        Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> A(n, r);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, 1> a(n);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> R(n, n);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, 1> f(r);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> Q(r, r);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> Q_inv(r, r);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, 1> e(r);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> A(n, r);
 
         for (int i = 0; i < y.cols(); i++) {
           yi = y.col(i);
@@ -215,14 +221,20 @@ namespace stan {
     inline
     typename return_type<
       T_y,
-      typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
-    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                         const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
-                         const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
-                         const Eigen::Matrix<T_V,Eigen::Dynamic,Eigen::Dynamic>& V,
-                         const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
-                         const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
-                         const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
+      typename return_type<T_F, T_G, T_V, T_W, T_m0, T_C0>::type >::type
+    gaussian_dlm_obs_log(const Eigen::Matrix
+                         <T_y, Eigen::Dynamic, Eigen::Dynamic>& y,
+                         const Eigen::Matrix
+                         <T_F, Eigen::Dynamic, Eigen::Dynamic>& F,
+                         const Eigen::Matrix
+                         <T_G, Eigen::Dynamic, Eigen::Dynamic>& G,
+                         const Eigen::Matrix
+                         <T_V, Eigen::Dynamic, Eigen::Dynamic>& V,
+                         const Eigen::Matrix
+                         <T_W, Eigen::Dynamic, Eigen::Dynamic>& W,
+                         const Eigen::Matrix<T_m0, Eigen::Dynamic, 1>& m0,
+                         const Eigen::Matrix
+                         <T_C0, Eigen::Dynamic, Eigen::Dynamic>& C0) {
       return gaussian_dlm_obs_log<false>(y, F, G, V, W, m0, C0);
     }
 
@@ -269,18 +281,24 @@ namespace stan {
               >
     typename return_type<
       T_y,
-      typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
-    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                         const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
-                         const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
-                         const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
-                         const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
-                         const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
-                         const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
+      typename return_type<T_F, T_G, T_V, T_W, T_m0, T_C0>::type >::type
+    gaussian_dlm_obs_log(const Eigen::Matrix
+                         <T_y, Eigen::Dynamic, Eigen::Dynamic>& y,
+                         const Eigen::Matrix
+                         <T_F, Eigen::Dynamic, Eigen::Dynamic>& F,
+                         const Eigen::Matrix
+                         <T_G, Eigen::Dynamic, Eigen::Dynamic>& G,
+                         const Eigen::Matrix<T_V, Eigen::Dynamic, 1>& V,
+                         const Eigen::Matrix
+                         <T_W, Eigen::Dynamic, Eigen::Dynamic>& W,
+                         const Eigen::Matrix<T_m0, Eigen::Dynamic, 1>& m0,
+                         const Eigen::Matrix
+                         <T_C0, Eigen::Dynamic, Eigen::Dynamic>& C0) {
       static const char* function("stan::prob::gaussian_dlm_obs_log");
-      typedef typename return_type<
-        T_y,
-        typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type  >::type T_lp;
+      typedef
+        typename return_type
+        <T_y, typename return_type<T_F, T_G, T_V, T_W, T_m0, T_C0>::type>::type
+        T_lp;
       T_lp lp(0.0);
 
       using stan::math::add;
@@ -298,9 +316,9 @@ namespace stan {
       using stan::math::trace_quad_form;
       using stan::math::transpose;
 
-      int r = y.rows(); // number of variables
-      int T = y.cols(); // number of observations
-      int n = G.rows(); // number of states
+      int r = y.rows();  // number of variables
+      int T = y.cols();  // number of observations
+      int n = G.rows();  // number of states
 
       // check y
       check_finite(function, "y", y);
@@ -310,22 +328,22 @@ namespace stan {
                        "columns of F", F.cols(),
                        "rows of y", y.rows());
       check_size_match(function,
-                       "rows of F", F.rows(), 
+                       "rows of F", F.rows(),
                        "rows of G", G.rows());
       check_finite(function, "F", F);
       check_not_nan(function, "F", F);
       // check G
       check_size_match(function,
-                       "rows of G", G.rows(), 
+                       "rows of G", G.rows(),
                        "columns of G", G.cols());
       check_finite(function, "G", G);
       check_not_nan(function, "G", G);
       // check V
       check_nonnegative(function, "V", V);
       check_size_match(function,
-                       "size of V", V.size(), 
+                       "size of V", V.size(),
                        "rows of y", y.rows());
-      // TODO: support infinite V
+      // TODO(anyone): support infinite V
       check_finite(function, "V", V);
       check_not_nan(function, "V", V);
       // check W
@@ -333,7 +351,7 @@ namespace stan {
       check_size_match(function,
                        "rows of W", W.rows(),
                        "rows of G", G.rows());
-      // TODO: support infinite W
+      // TODO(anyone): support infinite W
       check_finite(function, "W", W);
       check_not_nan(function, "W", W);
       // check m0
@@ -345,7 +363,7 @@ namespace stan {
       // check C0
       check_cov_matrix(function, "C0", C0);
       check_size_match(function,
-                       "rows of C0", C0.rows(), 
+                       "rows of C0", C0.rows(),
                        "rows of G", G.rows());
       check_finite(function, "C0", C0);
       check_not_nan(function, "C0", C0);
@@ -357,7 +375,7 @@ namespace stan {
         lp += 0.5 * NEG_LOG_TWO_PI * r * T;
       }
 
-      if (include_summand<propto,T_y,T_F,T_G,T_V,T_W,T_m0,T_C0>::value) {
+      if (include_summand<propto, T_y, T_F, T_G, T_V, T_W, T_m0, T_C0>::value) {
         T_lp f;
         T_lp Q;
         T_lp Q_inv;
@@ -367,12 +385,12 @@ namespace stan {
         Eigen::Matrix<T_lp, Eigen::Dynamic, 1> m(n);
         Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> C(n, n);
 
-        // TODO: how to recast matrices
-        for (int i = 0; i < m0.size(); i ++ ) {
+        // TODO(anyone): how to recast matrices
+        for (int i = 0; i < m0.size(); i++) {
           m(i) = m0(i);
         }
-        for (int i = 0; i < C0.rows(); i ++ ) {
-          for (int j = 0; j < C0.cols(); j ++ ) {
+        for (int i = 0; i < C0.rows(); i++) {
+          for (int j = 0; j < C0.cols(); j++) {
             C(i, j) = C0(i, j);
           }
         }
@@ -389,18 +407,18 @@ namespace stan {
             for (int k = 0; k < F.rows(); ++k) {
               Fj(k) = F(k, j);
             }
-            // // f_{t,i} = F_{t,i}' m_{t,i-1}
+            // // f_{t, i} = F_{t, i}' m_{t, i-1}
             f = dot_product(Fj, m);
             Q = trace_quad_form(C, Fj) + V(j);
             Q_inv = 1.0 / Q;
             // // filtered observation
-            // // e_{t,i} = y_{t,i} - f_{t,i}
+            // // e_{t, i} = y_{t, i} - f_{t, i}
             e = yij - f;
-            // // A_{t,i} = C_{t,i-1} F_{t,i} Q_{t,i}^{-1}
+            // // A_{t, i} = C_{t, i-1} F_{t, i} Q_{t, i}^{-1}
             A = multiply(multiply(C, Fj), Q_inv);
-            // // m_{t,i} = m_{t,i-1} + A_{t,i} e_{t,i}
+            // // m_{t, i} = m_{t, i-1} + A_{t, i} e_{t, i}
             m += multiply(A, e);
-            // // c_{t,i} = C_{t,i-1} - Q_{t,i} A_{t,i} A_{t,i}'
+            // // c_{t, i} = C_{t, i-1} - Q_{t, i} A_{t, i} A_{t, i}'
             // // // tcrossprod throws an error (ambiguous)
             // C = subtract(C, multiply(Q, tcrossprod(A)));
             C -= multiply(Q, multiply(A, transpose(A)));
@@ -415,20 +433,18 @@ namespace stan {
     template <typename T_y,
               typename T_F, typename T_G,
               typename T_V, typename T_W,
-              typename T_m0, typename T_C0
-              >
+              typename T_m0, typename T_C0>
     inline
-    typename return_type<
-      T_y,
-      typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type
-      >::type
-    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                         const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
-                         const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
-                         const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
-                         const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
-                         const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
-                         const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
+    typename return_type
+    <T_y, typename return_type<T_F, T_G, T_V, T_W, T_m0, T_C0>::type>::type
+    gaussian_dlm_obs_log
+    (const Eigen::Matrix<T_y, Eigen::Dynamic, Eigen::Dynamic>& y,
+     const Eigen::Matrix<T_F, Eigen::Dynamic, Eigen::Dynamic>& F,
+     const Eigen::Matrix<T_G, Eigen::Dynamic, Eigen::Dynamic>& G,
+     const Eigen::Matrix<T_V, Eigen::Dynamic, 1>& V,
+     const Eigen::Matrix<T_W, Eigen::Dynamic, Eigen::Dynamic>& W,
+     const Eigen::Matrix<T_m0, Eigen::Dynamic, 1>& m0,
+     const Eigen::Matrix<T_C0, Eigen::Dynamic, Eigen::Dynamic>& C0) {
       return gaussian_dlm_obs_log<false>(y, F, G, V, W, m0, C0);
     }
   }

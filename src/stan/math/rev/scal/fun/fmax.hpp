@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__FMAX_HPP
-#define STAN__MATH__REV__SCAL__FUN__FMAX_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_FMAX_HPP
+#define STAN_MATH_REV_SCAL_FUN_FMAX_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/is_nan.hpp>
@@ -18,40 +18,40 @@ namespace stan {
      * No new variable implementations are created, with this function
      * defined as if by
      *
-     * <code>fmax(a,b) = a</code> if a's value is greater than b's, and .
+     * <code>fmax(a, b) = a</code> if a's value is greater than b's, and .
      *
-     * <code>fmax(a,b) = b</code> if b's value is greater than or equal to a's.
-     * 
+     * <code>fmax(a, b) = b</code> if b's value is greater than or equal to a's.
+     *
        \f[
-       \mbox{fmax}(x,y) = 
+       \mbox{fmax}(x, y) =
        \begin{cases}
          x & \mbox{if } x \geq y \\
          y & \mbox{if } x < y \\[6pt]
          x & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
          y & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
-         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+         \textrm{NaN} & \mbox{if } x, y = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{fmax}(x,y)}{\partial x} = 
+       \frac{\partial\, \mbox{fmax}(x, y)}{\partial x} =
        \begin{cases}
          1 & \mbox{if } x \geq y \\
          0 & \mbox{if } x < y \\[6pt]
          1 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
          0 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
-         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+         \textrm{NaN} & \mbox{if } x, y = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{fmax}(x,y)}{\partial y} = 
+       \frac{\partial\, \mbox{fmax}(x, y)}{\partial y} =
        \begin{cases}
          0 & \mbox{if } x \geq y \\
          1 & \mbox{if } x < y \\[6pt]
          0 & \mbox{if } -\infty\leq x\leq \infty, y = \textrm{NaN}\\
          1 & \mbox{if } -\infty\leq y\leq \infty, x = \textrm{NaN}\\
-         \textrm{NaN} & \mbox{if } x,y = \textrm{NaN}
+         \textrm{NaN} & \mbox{if } x, y = \textrm{NaN}
        \end{cases}
        \f]
      *
@@ -82,7 +82,7 @@ namespace stan {
      * Returns the maximum of the variable and scalar, promoting the
      * scalar to a variable if it is larger (C99).
      *
-     * For <code>fmax(a,b)</code>, if a's value is greater than b,
+     * For <code>fmax(a, b)</code>, if a's value is greater than b,
      * then a is returned, otherwise a fesh variable implementation
      * wrapping the value b is returned.
      *
@@ -102,7 +102,7 @@ namespace stan {
                                         stan::math::NOT_A_NUMBER));
 
         return var(b);
-      }      
+      }
 
       if (unlikely(is_nan(b)))
         return a;
@@ -114,14 +114,14 @@ namespace stan {
      * Returns the maximum of a scalar and variable, promoting the scalar to
      * a variable if it is larger (C99).
      *
-     * For <code>fmax(a,b)</code>, if a is greater than b's value,
-     * then a fresh variable implementation wrapping a is returned, otherwise 
+     * For <code>fmax(a, b)</code>, if a is greater than b's value,
+     * then a fresh variable implementation wrapping a is returned, otherwise
      * b is returned.
      *
      * @param a First value.
      * @param b Second variable.
      * @return If the first value is larger than the second variable's value,
-     * return the first value promoted to a variable, otherwise return the 
+     * return the first value promoted to a variable, otherwise return the
      * second variable.
      */
     inline var fmax(const double& a,

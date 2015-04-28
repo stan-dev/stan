@@ -1,5 +1,5 @@
-#ifndef STAN__IO__CHAINED_VAR_CONTEXT_HPP
-#define STAN__IO__CHAINED_VAR_CONTEXT_HPP
+#ifndef STAN_IO_CHAINED_VAR_CONTEXT_HPP
+#define STAN_IO_CHAINED_VAR_CONTEXT_HPP
 
 #include <stan/io/var_context.hpp>
 #include <string>

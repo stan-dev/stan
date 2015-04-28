@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__ERR__CHECK_EQUAL_HPP
-#define STAN__MATH__PRIM__SCAL__ERR__CHECK_EQUAL_HPP
+#ifndef STAN_MATH_PRIM_SCAL_ERR_CHECK_EQUAL_HPP
+#define STAN_MATH_PRIM_SCAL_ERR_CHECK_EQUAL_HPP
 
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <stan/math/prim/scal/err/domain_error_vec.hpp>
@@ -83,7 +83,7 @@ namespace stan {
      * @param eq Expected value for y
      *
      * @return <code>true</code> if y is equal to eq
-     * @throw <code>std::domain_error</code> if y is unequal to eq or 
+     * @throw <code>std::domain_error</code> if y is unequal to eq or
      *    if any element of y or eq is NaN.
      */
     template <typename T_y, typename T_eq>

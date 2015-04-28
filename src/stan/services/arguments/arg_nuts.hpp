@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__NUTS__HMC__HPP
-#define STAN__SERVICES__ARGUMENTS__NUTS__HMC__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_NUTS_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_NUTS_HPP
 
 #include <stan/services/arguments/categorical_argument.hpp>
 

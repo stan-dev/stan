@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__SIZE_OF_HPP
-#define STAN__MATH__PRIM__SCAL__META__SIZE_OF_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_SIZE_OF_HPP
+#define STAN_MATH_PRIM_SCAL_META_SIZE_OF_HPP
 
 #include <stan/math/prim/scal/meta/is_vector.hpp>
 #include <stan/math/prim/mat/meta/is_vector.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__IO__DUMP_HPP
-#define STAN__IO__DUMP_HPP
+#ifndef STAN_IO_DUMP_HPP
+#define STAN_IO_DUMP_HPP
 
 #include <boost/lexical_cast.hpp>
 #include <boost/throw_exception.hpp>

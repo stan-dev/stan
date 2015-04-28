@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__FUN__CHOLESKY_DECOMPOSE_HPP
-#define STAN__MATH__PRIM__MAT__FUN__CHOLESKY_DECOMPOSE_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUN_CHOLESKY_DECOMPOSE_HPP
+#define STAN_MATH_PRIM_MAT_FUN_CHOLESKY_DECOMPOSE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/err/check_square.hpp>
@@ -19,11 +19,13 @@ namespace stan {
      * @throw std::domain_error if m is not a symmetric matrix.
      */
     template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    cholesky_decompose(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
+    cholesky_decompose(const Eigen::Matrix
+                       <T, Eigen::Dynamic, Eigen::Dynamic>& m) {
       stan::math::check_square("cholesky_decompose", "m", m);
       stan::math::check_symmetric("cholesky_decompose", "m", m);
-      Eigen::LLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >llt(m.rows());
+      Eigen::LLT<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >
+        llt(m.rows());
       llt.compute(m);
       return llt.matrixL();
     }

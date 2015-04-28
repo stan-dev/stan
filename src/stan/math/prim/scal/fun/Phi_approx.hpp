@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__PHI_APPROX_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__PHI_APPROX_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_PHI_APPROX_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_PHI_APPROX_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
@@ -22,7 +22,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T>::type
     Phi_approx(T x) {
       using std::pow;
-      return inv_logit(0.07056 * pow(x,3.0) + 1.5976 * x);
+      return inv_logit(0.07056 * pow(x, 3.0) + 1.5976 * x);
     }
 
   }

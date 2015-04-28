@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__LOG1M_INV_LOGIT_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__LOG1M_INV_LOGIT_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_LOG1M_INV_LOGIT_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_LOG1M_INV_LOGIT_HPP
 
 #include <boost/math/tools/promotion.hpp>
 
@@ -12,15 +12,15 @@ namespace stan {
      *
      *
        \f[
-       \mbox{log1m\_inv\_logit}(x) = 
+       \mbox{log1m\_inv\_logit}(x) =
        \begin{cases}
          -\ln(\exp(x)+1) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{log1m\_inv\_logit}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{log1m\_inv\_logit}(x)}{\partial x} =
        \begin{cases}
          -\frac{\exp(x)}{\exp(x)+1} & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}

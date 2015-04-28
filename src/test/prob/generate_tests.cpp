@@ -8,14 +8,13 @@
 #include <iomanip>
 #include <boost/algorithm/string.hpp>
 #include <cmath>
+#include <cstdlib>
 
 using std::vector;
 using std::string;
 using std::stringstream;
 using std::endl;
 using std::pair;
-
-const int N_TESTS = 75;
 
 vector<string> lookup_argument(const string& argument, const int& ind) {
   using boost::iequals;
@@ -246,13 +245,13 @@ int num_ints(string arguments) {
 
 void write_types_typedef(vector<std::ostream *>& outs, string base, size_t& N, 
                          vector<vector<string> > argument_sequence, 
-                         const size_t depth, const int& index) {
+                         const size_t depth, const int& index, const int& N_TESTS) {
   vector<string> args = argument_sequence.front();
   argument_sequence.erase(argument_sequence.begin());
   if (argument_sequence.size() > 0) {
     for (size_t n = 0; n < args.size(); n++)
       write_types_typedef(outs, base + args[n] + ", ", N, argument_sequence,
-                          depth, index);
+                          depth, index, N_TESTS);
   } else {
     string extra_args;
     for (size_t n = depth; n < 6; n++) {
@@ -288,16 +287,18 @@ void write_types_typedef(vector<std::ostream *>& outs, string base, size_t& N,
 
 size_t write_types(vector<std::ostream *>& outs, 
                  const vector<vector<string> >& argument_sequence,
-                 const int& index) {
+                 const int& index, const int& N_TESTS) {
   size_t N = 0;
-  write_types_typedef(outs, "", N, argument_sequence, argument_sequence.size(),index);
+  write_types_typedef(outs, "", N, argument_sequence,
+                      argument_sequence.size(),index,N_TESTS);
   for (size_t n = 0; n < outs.size(); n++)
     *outs[n] << endl;
   return N;
 }
 
 void write_test(vector<std::ostream *>& outs, const string& test_name, 
-                const string& fixture_name, const size_t N, const int& index) {
+                const string& fixture_name, const size_t N, const int& index,
+                const int& N_TESTS) {
   for (size_t n = 0; n < N; n++) {
     std::ostream *out = outs[int(n / N_TESTS)];
     if (index == 1)
@@ -334,18 +335,18 @@ void write_test(vector<std::ostream *>& outs, const string& test_name,
 
 void write_test_cases(vector<std::ostream *>& outs, const string& in_name,
                       const vector<vector<string> >& argument_sequence,
-                      const int& index) {
+                      const int& index, const int& N_TESTS) {
   pair<string, string> name = read_test_name_from_file(in_name);
   string test_name = name.first;
   string fixture_name = name.second;
-  
-  size_t num_tests = write_types(outs, argument_sequence,index); 
-  write_test(outs, test_name, fixture_name, num_tests,index);
+
+  size_t num_tests = write_types(outs, argument_sequence,index,N_TESTS); 
+  write_test(outs, test_name, fixture_name, num_tests,index,N_TESTS);
 }
 
 int create_files(const int& argc, const char* argv[],const int& index, 
-                 const int& start) {
-  if (argc != 2)
+                 const int& start, const int& N_TESTS) {
+  if (argc != 3)
     return -1;
   string in_suffix = "_test.hpp";
 
@@ -365,7 +366,8 @@ int create_files(const int& argc, const char* argv[],const int& index,
       * std::pow(4, num_doubles(arguments));
 
   vector<std::ostream *> outs;
-  for (int n = start+1; n < start+1+int(num_tests / N_TESTS) + 1; n++) {
+  const double BATCHES = N_TESTS > 0 ? num_tests / N_TESTS : -N_TESTS;
+  for (int n = start+1; n < start+1+BATCHES+1; n++) {
     stringstream out_name;
     out_name << out_name_base;
     out_name << "_" << std::setw(5) << std::setfill('0') << n;
@@ -384,7 +386,11 @@ int create_files(const int& argc, const char* argv[],const int& index,
   }
 
   write_includes(outs, in_name);
-  write_test_cases(outs, in_name, argument_sequence,index);
+  if(N_TESTS > 0)
+    write_test_cases(outs, in_name, argument_sequence,index,N_TESTS);
+  else if(num_tests > 0)
+    write_test_cases(outs, in_name, argument_sequence,index,ceil(num_tests / BATCHES));
+
 
   for (size_t n = 0; n < outs.size(); n++) {
     static_cast<std::ofstream*>(outs[n])->close();
@@ -392,23 +398,25 @@ int create_files(const int& argc, const char* argv[],const int& index,
   }
   outs.clear();
 
-  return start+int(num_tests / N_TESTS);
+  return start+BATCHES;
 }
 
 /** 
  * Generate test cases.
  * 
  * @param argc Number of arguments
- * @param argv Arguments. Should contain one argument with a filename.
+ * @param argv Arguments. Should contain one argument with a filename and
+ * the number of tests per file or if non-positive, the number of files - 1
  * 
  * @return 0 for success, negative number otherwise.
  */
 int main(int argc, const char* argv[]) {
-  create_files(argc,argv,1,-1);  // create var tests
-  create_files(argc,argv,2,-1);   // create fd tests
-  create_files(argc,argv,3,-1);   // create fv tests
-  create_files(argc,argv,4,-1);  // create ffd tests
-  create_files(argc,argv,5,-1);  // create ffv tests
+  int N_TESTS = atoi(argv[2]);
+  create_files(argc,argv,1,-1,N_TESTS);  // create var tests
+  create_files(argc,argv,2,-1,N_TESTS);  // create fd tests
+  create_files(argc,argv,3,-1,N_TESTS);  // create fv tests
+  create_files(argc,argv,4,-1,N_TESTS);  // create ffd tests
+  create_files(argc,argv,5,-1,N_TESTS);  // create ffv tests
   
   return 0;
 }

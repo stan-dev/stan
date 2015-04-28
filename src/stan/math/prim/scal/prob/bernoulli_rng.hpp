@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__BERNOULLI_RNG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__BERNOULLI_RNG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_BERNOULLI_RNG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_BERNOULLI_RNG_HPP
 
 #include <boost/random/bernoulli_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -30,7 +30,7 @@ namespace stan {
 
       using stan::math::check_finite;
       using stan::math::check_bounded;
- 
+
       check_finite(function, "Probability parameter", theta);
       check_bounded(function, "Probability parameter", theta, 0, 1);
 

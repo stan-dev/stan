@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__MCMC__WARMUP_HPP
-#define STAN__SERVICES__MCMC__WARMUP_HPP
+#ifndef STAN_SERVICES_MCMC_WARMUP_HPP
+#define STAN_SERVICES_MCMC_WARMUP_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/io/mcmc_writer.hpp>

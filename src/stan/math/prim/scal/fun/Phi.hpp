@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__PHI_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__PHI_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_PHI_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_PHI_HPP
 
 #include <boost/math/tools/promotion.hpp>
 #include <boost/math/special_functions/erf.hpp>
@@ -10,21 +10,21 @@ namespace stan {
   namespace math {
 
     /**
-     * The unit normal cumulative distribution function.  
+     * The unit normal cumulative distribution function.
      *
      * The return value for a specified input is the probability that
      * a random unit normal variate is less than or equal to the
      * specified value, defined by
      *
-     * \f$\Phi(x) = \int_{-\infty}^x \mbox{\sf Norm}(x|0,1) \ dx\f$
+     * \f$\Phi(x) = \int_{-\infty}^x \mbox{\sf Norm}(x|0, 1) \ dx\f$
      *
      * This function can be used to implement the inverse link function
-     * for probit regression.  
+     * for probit regression.
      *
      * Phi will underflow to 0 below -37.5 and overflow to 1 above 8
      *
      * @param x Argument.
-     * @return Probability random sample is less than or equal to argument. 
+     * @return Probability random sample is less than or equal to argument.
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
@@ -32,7 +32,7 @@ namespace stan {
       // overridden in fvar and var, so can hard-code boost versions
       // here for scalars only
       using stan::math::check_not_nan;
-      
+
       check_not_nan("Phi",  "x", x);
       if (x < -37.5)
         return 0;
