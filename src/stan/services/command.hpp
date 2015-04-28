@@ -660,112 +660,125 @@ namespace stan {
       }
 
       //////////////////////////////////////////////////
-      //            Variational Algorithms            //
+      //           EXPERIMENTAL Algorithms            //
       //////////////////////////////////////////////////
 
-      if (parser.arg("method")->arg("variational")) {
-        stan::services::list_argument* algo
-          = dynamic_cast<stan::services::list_argument*>(parser.arg("method")
-            ->arg("variational")->arg("algorithm"));
+      if (parser.arg("method")->arg("experimental")) {
+        if (parser.arg("method")->arg("experimental")->arg("variational")) {
+          stan::services::list_argument* algo
+            = dynamic_cast<stan::services::list_argument*>(parser.arg("method")
+              ->arg("experimental")->arg("variational")->arg("algorithm"));
 
-        int grad_samples = dynamic_cast<stan::services::int_argument*>
-          (parser.arg("method")->arg("variational")
-                               ->arg("grad_samples"))->value();
+          int grad_samples = dynamic_cast<stan::services::int_argument*>
+            (parser.arg("method")->arg("experimental")
+                                 ->arg("variational")
+                                 ->arg("grad_samples"))->value();
 
-        int elbo_samples = dynamic_cast<stan::services::int_argument*>
-          (parser.arg("method")->arg("variational")
-                               ->arg("elbo_samples"))->value();
+          int elbo_samples = dynamic_cast<stan::services::int_argument*>
+            (parser.arg("method")->arg("experimental")
+                                 ->arg("variational")
+                                 ->arg("elbo_samples"))->value();
 
-        int max_iterations = dynamic_cast<stan::services::int_argument*>
-          (parser.arg("method")->arg("variational")->arg("iter"))->value();
+          int max_iterations = dynamic_cast<stan::services::int_argument*>
+            (parser.arg("method")->arg("experimental")
+                                 ->arg("variational")
+                                 ->arg("iter"))->value();
 
-        double tol_rel_obj = dynamic_cast<stan::services::real_argument*>
-          (parser.arg("method")->arg("variational")
-                               ->arg("tol_rel_obj"))->value();
+          double tol_rel_obj = dynamic_cast<stan::services::real_argument*>
+            (parser.arg("method")->arg("experimental")
+                                 ->arg("variational")
+                                 ->arg("tol_rel_obj"))->value();
 
-        double eta_stepsize = dynamic_cast<stan::services::real_argument*>
-          (parser.arg("method")->arg("variational")
-                               ->arg("eta_stepsize"))->value();
+          double eta_stepsize = dynamic_cast<stan::services::real_argument*>
+            (parser.arg("method")->arg("experimental")
+                                 ->arg("variational")
+                                 ->arg("eta_stepsize"))->value();
 
-        if (algo->value() == "fullrank") {
-          double elbo = 0.0;
+          int eval_elbo = dynamic_cast<stan::services::int_argument*>
+            (parser.arg("method")->arg("experimental")
+                                 ->arg("variational")
+                                 ->arg("eval_elbo"))->value();
 
-          if (output_stream) {
-            std::vector<std::string> names;
-            names.push_back("lp");
-            names.push_back("ELBO");
-            model.constrained_param_names(names, true, true);
+          if (algo->value() == "fullrank") {
+            double elbo = 0.0;
 
-            (*output_stream) << names.at(0);
-            for (size_t i = 1; i < names.size(); ++i) {
-              (*output_stream) << "," << names.at(i);
+            if (output_stream) {
+              std::vector<std::string> names;
+              names.push_back("lp");
+              names.push_back("ELBO");
+              model.constrained_param_names(names, true, true);
+
+              (*output_stream) << names.at(0);
+              for (size_t i = 1; i < names.size(); ++i) {
+                (*output_stream) << "," << names.at(i);
+              }
+              (*output_stream) << std::endl;
+              (*output_stream) << 0 << ",";
             }
-            (*output_stream) << std::endl;
-            (*output_stream) << 0 << ",";
-          }
 
-          stan::variational::advi<Model, rng_t>
-            cmd_advi(model, cont_params,
-                     elbo, grad_samples, elbo_samples,
-                     eta_stepsize,
-                     base_rng,
-                     refresh,
-                     &std::cout,
-                     output_stream,
-                     diagnostic_stream);
-          cmd_advi.run_fullrank(tol_rel_obj, max_iterations);
+            stan::variational::advi<Model, rng_t>
+              cmd_advi(model, cont_params,
+                       elbo, grad_samples, elbo_samples,
+                       eta_stepsize,
+                       base_rng,
+                       eval_elbo,
+                       &std::cout,
+                       output_stream,
+                       diagnostic_stream);
+            cmd_advi.run_fullrank(tol_rel_obj, max_iterations);
 
-          cont_params = cmd_advi.cont_params();
+            cont_params = cmd_advi.cont_params();
 
-          std::vector<double> cont_vector(cont_params.size());
-          for (int i = 0; i < cont_params.size(); ++i)
-            cont_vector.at(i) = cont_params(i);
-          std::vector<int> disc_vector;
+            std::vector<double> cont_vector(cont_params.size());
+            for (int i = 0; i < cont_params.size(); ++i)
+              cont_vector.at(i) = cont_params(i);
+            std::vector<int> disc_vector;
 
-          if (output_stream) {
-            io::write_iteration(*output_stream, model, base_rng,
-                            elbo, cont_vector, disc_vector);
-          }
-        }
-
-        if (algo->value() == "meanfield") {
-          double elbo = 0.0;
-
-          if (output_stream) {
-            std::vector<std::string> names;
-            names.push_back("lp");
-            names.push_back("ELBO");
-            model.constrained_param_names(names, true, true);
-
-            (*output_stream) << names.at(0);
-            for (size_t i = 1; i < names.size(); ++i) {
-              (*output_stream) << "," << names.at(i);
+            if (output_stream) {
+              io::write_iteration(*output_stream, model, base_rng,
+                              elbo, cont_vector, disc_vector);
             }
-            (*output_stream) << std::endl;
-            (*output_stream) << 0 << ",";
           }
 
-          stan::variational::advi<Model, rng_t>
-            cmd_advi(model, cont_params,
-                     elbo, grad_samples, elbo_samples,
-                     eta_stepsize,
-                     base_rng,
-                     refresh,
-                     &std::cout,
-                     output_stream,
-                     diagnostic_stream);
-          cmd_advi.run_meanfield(tol_rel_obj, max_iterations);
+          if (algo->value() == "meanfield") {
+            double elbo = 0.0;
 
-          cont_params = cmd_advi.cont_params();
+            if (output_stream) {
+              std::vector<std::string> names;
+              names.push_back("lp");
+              names.push_back("ELBO");
+              model.constrained_param_names(names, true, true);
 
-          std::vector<double> cont_vector(cont_params.size());
-          for (int i = 0; i < cont_params.size(); ++i)
-            cont_vector.at(i) = cont_params(i);
-          std::vector<int> disc_vector;
+              (*output_stream) << names.at(0);
+              for (size_t i = 1; i < names.size(); ++i) {
+                (*output_stream) << "," << names.at(i);
+              }
+              (*output_stream) << std::endl;
+              (*output_stream) << 0 << ",";
+            }
 
-          if (output_stream) {
-            io::write_iteration(*output_stream, model, base_rng,
-                            elbo, cont_vector, disc_vector);
+            stan::variational::advi<Model, rng_t>
+              cmd_advi(model, cont_params,
+                       elbo, grad_samples, elbo_samples,
+                       eta_stepsize,
+                       base_rng,
+                       eval_elbo,
+                       &std::cout,
+                       output_stream,
+                       diagnostic_stream);
+            cmd_advi.run_meanfield(tol_rel_obj, max_iterations);
+
+            cont_params = cmd_advi.cont_params();
+
+            std::vector<double> cont_vector(cont_params.size());
+            for (int i = 0; i < cont_params.size(); ++i)
+              cont_vector.at(i) = cont_params(i);
+            std::vector<int> disc_vector;
+
+            if (output_stream) {
+              io::write_iteration(*output_stream, model, base_rng,
+                              elbo, cont_vector, disc_vector);
+            }
           }
         }
       }
