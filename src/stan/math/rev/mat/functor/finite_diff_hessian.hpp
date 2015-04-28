@@ -3,7 +3,7 @@
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/mix/mat/functor/gradient.hpp>
+#include <stan/math/rev/mat/functor/gradient.hpp>
 
 namespace stan {
   
