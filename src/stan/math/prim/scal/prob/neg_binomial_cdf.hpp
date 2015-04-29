@@ -8,6 +8,7 @@
 
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_positive_finite.hpp>
+#include <stan/math/prim/scal/err/check_not_nan.hpp>
 
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
@@ -31,7 +32,6 @@ namespace stan {
         T_partials_return;
 
       using stan::math::check_positive_finite;
-      using stan::math::check_nonnegative;
       using stan::math::check_consistent_sizes;
 
       // Ensure non-zero arugment lengths
