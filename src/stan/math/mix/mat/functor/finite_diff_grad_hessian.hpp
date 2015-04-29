@@ -2,9 +2,9 @@
 #define STAN_MATH_MIX_MAT_FUNCTOR_FINITE_DIFF_GRAD_HESSIAN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <vector>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/mix/mat/functor/hessian.hpp>
+#include <vector>
 
 namespace stan {
 
