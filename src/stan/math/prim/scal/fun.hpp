@@ -27,6 +27,7 @@
 #include <stan/math/prim/scal/fun/identity_constrain.hpp>
 #include <stan/math/prim/scal/fun/identity_free.hpp>
 #include <stan/math/prim/scal/fun/if_else.hpp>
+#include <stan/math/prim/scal/fun/inc_beta_derivatives.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/fun/int_step.hpp>
 #include <stan/math/prim/scal/fun/inv.hpp>
@@ -83,7 +84,6 @@
 #include <stan/math/prim/scal/fun/prob_free.hpp>
 #include <stan/math/prim/scal/fun/promote_scalar.hpp>
 #include <stan/math/prim/scal/fun/promote_scalar_type.hpp>
-#include <stan/math/prim/scal/fun/reg_inc_beta_derivs.hpp>
 #include <stan/math/prim/scal/fun/rising_factorial.hpp>
 #include <stan/math/prim/scal/fun/sign.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>

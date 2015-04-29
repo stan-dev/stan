@@ -1,9 +1,6 @@
 #ifndef STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_CDF_HPP
 #define STAN_MATH_PRIM_SCAL_PROB_NEG_BINOMIAL_CDF_HPP
 
-#include <boost/math/special_functions/beta.hpp>
-#include <boost/math/special_functions/digamma.hpp>
-
 #include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
@@ -13,7 +10,9 @@
 #include <stan/math/prim/scal/err/check_positive_finite.hpp>
 
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/prim/scal/fun/reg_inc_beta_derivs.hpp>
+#include <stan/math/prim/scal/fun/digamma.hpp>
+#include <stan/math/prim/scal/fun/inc_beta.hpp>
+#include <stan/math/prim/scal/fun/inc_beta_derivatives.hpp>
 
 #include <limits>
 
@@ -57,6 +56,10 @@ namespace stan {
 
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
+      using stan::math::inc_beta;
+      using stan::math::ddz_inc_beta;
+      using stan::math::dda_inc_beta;
+      using stan::math::digamma;
 
       agrad::OperandsAndPartials<T_shape, T_inv_scale>
         operands_and_partials(alpha, beta);
@@ -82,8 +85,8 @@ namespace stan {
           const T_partials_return n_dbl = value_of(n_vec[i]);
           const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
 
-          digamma_alpha_vec[i] = boost::math::digamma(alpha_dbl);
-          digamma_sum_vec[i] = boost::math::digamma(n_dbl + alpha_dbl + 1);
+          digamma_alpha_vec[i] = digamma(alpha_dbl);
+          digamma_sum_vec[i] = digamma(n_dbl + alpha_dbl + 1);
         }
       }
 
@@ -102,21 +105,20 @@ namespace stan {
                                                 * (1.0 + beta_dbl) );
 
         const T_partials_return P_i =
-          boost::math::ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
+          inc_beta(alpha_dbl, n_dbl + 1.0, p_dbl);
 
         P *= P_i;
 
         if (!is_constant_struct<T_shape>::value) {
           operands_and_partials.d_x1[i]
-            += stan::math::dda_grad_reg_inc_beta(alpha_dbl, n_dbl + 1, p_dbl,
-                                                 digamma_alpha_vec[i],
-                                                 digamma_sum_vec[i]) / P_i;
+            += dda_inc_beta(alpha_dbl, n_dbl + 1, p_dbl,
+                            digamma_alpha_vec[i],
+                            digamma_sum_vec[i]) / P_i;
         }
 
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x2[i] +=
-            boost::math::ibeta_derivative(alpha_dbl, n_dbl + 1.0, p_dbl)
-              * d_dbl / P_i;
+            ddz_inc_beta(alpha_dbl, n_dbl + 1.0, p_dbl) * d_dbl / P_i;
       }
 
       if (!is_constant_struct<T_shape>::value) {
