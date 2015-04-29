@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/mix/mat/functor/grad_hessian.hpp>
-#include <stan/math/mix/mat/functor/gradient.hpp>
+#include <stan/math/rev/mat/functor/gradient.hpp>
 #include <stan/math/mix/mat/functor/hessian.hpp>
 #include <stan/math/prim/scal/prob/normal_log.hpp>
 #include <stan/math/fwd/core.hpp>
