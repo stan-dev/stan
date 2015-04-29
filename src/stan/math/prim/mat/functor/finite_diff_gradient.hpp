@@ -37,9 +37,9 @@ namespace stan {
     template <typename F>
     void
     finite_diff_gradient(const F& f,
-                         const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+                         const Eigen::Matrix<double, -1, 1>& x,
                          double& fx,
-                         Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_fx, 
+                         Eigen::Matrix<double, -1, 1>& grad_fx,
                          const double epsilon = 1e-03) {
       using Eigen::Matrix;
       using Eigen::Dynamic;

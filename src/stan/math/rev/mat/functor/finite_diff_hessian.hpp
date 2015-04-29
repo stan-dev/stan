@@ -19,7 +19,7 @@ namespace stan {
      * <code>
      * double
      * operator()(const
-     * Eigen::Matrix<double,Eigen::Dynamic,1>&)
+     * Eigen::Matrix<double, Eigen::Dynamic, 1>&)
      * </code>
      *
      * The reference for this algorithm is:
@@ -40,10 +40,10 @@ namespace stan {
     template <typename F>
     void
     finite_diff_hessian(const F& f,
-                        const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+                        const Eigen::Matrix<double, -1, 1>& x,
                         double& fx,
-                        Eigen::Matrix<double,Eigen::Dynamic,1>& grad_fx,
-                        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& hess_fx, 
+                        Eigen::Matrix<double, -1, 1>& grad_fx,
+                        Eigen::Matrix<double, -1, -1>& hess_fx,
                         const double epsilon = 1e-03) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
@@ -52,8 +52,8 @@ namespace stan {
       int d = x.size();
       double dummy_fx_eval;
 
-      Matrix<double,Dynamic,1> x_temp(x);
-      Matrix<double,Dynamic,1> g_auto(d);
+      Matrix<double, Dynamic, 1> x_temp(x);
+      Matrix<double, Dynamic, 1> g_auto(d);
       hess_fx.resize(d, d);
 
 

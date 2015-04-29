@@ -2,6 +2,7 @@
 #define STAN_MATH_MIX_MAT_FUNCTOR_FINITE_DIFF_GRAD_HESSIAN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <vector>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/mix/mat/functor/hessian.hpp>
 
@@ -39,10 +40,10 @@ namespace stan {
     template <typename F>
     void
     finite_diff_grad_hessian(const F& f,
-                             const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+                             const Eigen::Matrix<double, -1, 1>& x,
                              double& fx,
-                             Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& hess,
-                             std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& grad_hess_fx,
+                             Eigen::Matrix<double, -1, -1>& hess,
+                             std::vector<Eigen::Matrix<double, -1, -1> >& grad_hess_fx,
                              const double epsilon = 1e-04) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
