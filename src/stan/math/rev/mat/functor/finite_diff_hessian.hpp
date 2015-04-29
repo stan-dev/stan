@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__REV__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_HPP
-#define STAN__MATH__REV__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_HPP
+#ifndef STAN_MATH_REV_MAT_FUNCTOR_FINITE_DIFF_HESSIAN_HPP
+#define STAN_MATH_REV_MAT_FUNCTOR_FINITE_DIFF_HESSIAN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/mat/functor/gradient.hpp>
 
 namespace stan {
-  
+
   namespace agrad {
 
     /**
@@ -56,7 +56,7 @@ namespace stan {
       Matrix<double,Dynamic,1> g_auto(d);
       hess_fx.resize(d, d);
 
-      
+
       gradient(f, x, fx, grad_fx);
       for (int i = 0; i < d; ++i) {
         VectorXd g_diff = VectorXd::Zero(d);
@@ -78,7 +78,7 @@ namespace stan {
 
         x_temp(i) = x(i);
         g_diff /= 12.0 * epsilon;
-        
+
         hess_fx.col(i) = g_diff;
       }
     }

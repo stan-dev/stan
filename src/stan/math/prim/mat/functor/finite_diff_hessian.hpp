@@ -1,23 +1,23 @@
-#ifndef STAN__MATH__PRIM__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_HPP
-#define STAN__MATH__PRIM__MAT__FUNCTOR__FINITE_DIFF_HESSIAN_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUNCTOR_FINITE_DIFF_HESSIAN_HPP
+#define STAN_MATH_PRIM_MAT_FUNCTOR_FINITE_DIFF_HESSIAN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/functor/finite_diff_gradient.hpp>
 
 namespace stan {
-  
+
   namespace math {
 
     template <typename F>
     double
     finite_diff_hess_helper(const F& f,
-                            const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+                            const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                             const int lambda,
                             const double epsilon = 1e-03) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
 
-      Matrix<double,Dynamic,1> x_temp(x);
+      Matrix<double, Dynamic, 1> x_temp(x);
 
       double grad = 0.0;
       x_temp(lambda) = x(lambda) + 2.0 * epsilon;
@@ -44,7 +44,7 @@ namespace stan {
      * <code>
      * double
      * operator()(const
-     * Eigen::Matrix<double,Eigen::Dynamic,1>&)
+     * Eigen::Matrix<double, Eigen::Dynamic, 1>&)
      * </code>
      *
      * Error should be on order of epsilon ^ 4, with 4 
@@ -64,33 +64,32 @@ namespace stan {
     template <typename F>
     void
     finite_diff_hessian(const F& f,
-                        const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+                        const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                         double& fx,
-                        Eigen::Matrix<double,Eigen::Dynamic,1>& grad_fx,
-                        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& hess_fx, 
+                        Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_fx,
+                        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& hess_fx, 
                         const double epsilon = 1e-03) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
 
       int d = x.size();
 
-      Matrix<double,Dynamic,1> x_temp(x);
+      Matrix<double, Dynamic, 1> x_temp(x);
       hess_fx.resize(d, d);
 
-      
       finite_diff_gradient(f, x, fx, grad_fx);
       double f_diff(0.0);
       for (int i = 0; i < d; ++i) {
         for (int j = i; j < d; ++j) {
           x_temp(i) += 2.0 * epsilon;
           if (i != j) {
-            f_diff = -finite_diff_hess_helper(f,x_temp,j);
+            f_diff = -finite_diff_hess_helper(f, x_temp, j);
             x_temp(i) = x(i) + -2.0 * epsilon;
-            f_diff += finite_diff_hess_helper(f,x_temp,j);
+            f_diff += finite_diff_hess_helper(f, x_temp, j);
             x_temp(i) = x(i) + epsilon;
-            f_diff += 8.0 * finite_diff_hess_helper(f,x_temp,j);
+            f_diff += 8.0 * finite_diff_hess_helper(f, x_temp, j);
             x_temp(i) = x(i) + -epsilon;
-            f_diff -= 8.0 * finite_diff_hess_helper(f,x_temp,j);
+            f_diff -= 8.0 * finite_diff_hess_helper(f, x_temp, j);
             f_diff /= 12.0 * epsilon * 12.0 * epsilon;
           } else {
             f_diff = -f(x_temp);
@@ -105,9 +104,9 @@ namespace stan {
           }
 
           x_temp(i) = x(i);
-          
-          hess_fx(j,i) = f_diff;
-          hess_fx(i,j) = hess_fx(j,i);
+
+          hess_fx(j, i) = f_diff;
+          hess_fx(i, j) = hess_fx(j, i);
         }
       }
     }

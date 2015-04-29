@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__MIX__MAT__FUNCTOR__FINITE_DIFF_GRAD_HESSIAN_HPP
-#define STAN__MATH__MIX__MAT__FUNCTOR__FINITE_DIFF_GRAD_HESSIAN_HPP
+#ifndef STAN_MATH_MIX_MAT_FUNCTOR_FINITE_DIFF_GRAD_HESSIAN_HPP
+#define STAN_MATH_MIX_MAT_FUNCTOR_FINITE_DIFF_GRAD_HESSIAN_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/rev/core.hpp>
 #include <stan/math/mix/mat/functor/hessian.hpp>
 
 namespace stan {
-  
+
   namespace agrad {
 
     /** 
@@ -19,7 +19,7 @@ namespace stan {
      * <code>
      * double
      * operator()(const
-     * Eigen::Matrix<double,Eigen::Dynamic,1>&)
+     * Eigen::Matrix<double, Eigen::Dynamic, 1>&)
      * </code>
      *
      * Reference:
@@ -39,10 +39,10 @@ namespace stan {
     template <typename F>
     void
     finite_diff_grad_hessian(const F& f,
-                             const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+                             const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                              double& fx,
-                             Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& hess,
-                             std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> >& grad_hess_fx,
+                             Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& hess,
+                             std::vector<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >& grad_hess_fx,
                              const double epsilon = 1e-04) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
@@ -50,12 +50,11 @@ namespace stan {
       int d = x.size();
       double dummy_fx_eval;
 
-      Matrix<double,Dynamic,1> x_temp(x);
-      Matrix<double,Dynamic,1> grad_auto(d);
-      Matrix<double,Dynamic,Dynamic> hess_auto(d,d);
-      Matrix<double,Dynamic,Dynamic> hess_diff(d,d);
+      Matrix<double, Dynamic, 1> x_temp(x);
+      Matrix<double, Dynamic, 1> grad_auto(d);
+      Matrix<double, Dynamic, Dynamic> hess_auto(d, d);
+      Matrix<double, Dynamic, Dynamic> hess_diff(d, d);
 
-      
       hessian(f, x, fx, grad_auto, hess);
       for (int i = 0; i < d; ++i) {
         hess_diff.setZero();
@@ -78,7 +77,7 @@ namespace stan {
 
         x_temp(i) = x(i);
         hess_diff /= 12.0 * epsilon;
-        
+
         grad_hess_fx.push_back(hess_diff);
       }
       fx = f(x);

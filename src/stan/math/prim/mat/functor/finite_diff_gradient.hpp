@@ -1,10 +1,10 @@
-#ifndef STAN__MATH__PRIM__MAT__FUNCTOR__FINITE_DIFF_GRADIENT_HPP
-#define STAN__MATH__PRIM__MAT__FUNCTOR__FINITE_DIFF_GRADIENT_HPP
+#ifndef STAN_MATH_PRIM_MAT_FUNCTOR_FINITE_DIFF_GRADIENT_HPP
+#define STAN_MATH_PRIM_MAT_FUNCTOR_FINITE_DIFF_GRADIENT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 
 namespace stan {
-  
+
   namespace math {
 
     /**
@@ -16,7 +16,7 @@ namespace stan {
      * <code>
      * double
      * operator()(const
-     * Eigen::Matrix<double,Eigen::Dynamic,1>&)
+     * Eigen::Matrix<double, Eigen::Dynamic, 1>&)
      * </code>
      *
      * Error should be on order of epsilon ^ 6. 
@@ -37,19 +37,19 @@ namespace stan {
     template <typename F>
     void
     finite_diff_gradient(const F& f,
-                         const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+                         const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                          double& fx,
-                         Eigen::Matrix<double,Eigen::Dynamic,1>& grad_fx, 
+                         Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_fx, 
                          const double epsilon = 1e-03) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
-      Matrix<double,Dynamic,1> x_temp(x);
+      Matrix<double, Dynamic, 1> x_temp(x);
 
       int d = x.size();
       grad_fx.resize(d);
 
       fx = f(x);
-      
+
       for (int i = 0; i < d; ++i) {
         double delta_f = 0.0;
 

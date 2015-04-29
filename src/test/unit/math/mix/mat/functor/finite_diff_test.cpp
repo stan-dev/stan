@@ -17,7 +17,7 @@
 #include <stan/math/prim/mat/functor/finite_diff_hessian.hpp>
 #include <stan/math/prim/mat/functor/finite_diff_gradient.hpp>
 #include <stan/math/rev/mat/functor/finite_diff_hessian.hpp>
-#include <stan/math/rev/mat/functor/finite_diff_grad_hessian.hpp>
+#include <stan/math/mix/mat/functor/finite_diff_grad_hessian.hpp>
 #include <stan/math/prim/mat/fun/sum.hpp>
 #include <stan/math/rev/mat/fun/sum.hpp>
 #include <stan/math/fwd/mat/fun/sum.hpp>
