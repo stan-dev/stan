@@ -97,7 +97,7 @@ TEST(advi_params_fullrank_test, entropy) {
 
 }
 
-TEST(advi_params_fullrank_test, transform_to_unconstrained) {
+TEST(advi_params_fullrank_test, transform_loc_scale) {
 
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
@@ -116,13 +116,13 @@ TEST(advi_params_fullrank_test, transform_to_unconstrained) {
   stan::variational::advi_params_fullrank my_advi_params_fullrank(mu, L);
 
   Eigen::Vector3d x_result;
-  x_result = my_advi_params_fullrank.to_unconstrained(x);
+  x_result = my_advi_params_fullrank.loc_scale_transform(x);
 
   for (int i = 0; i < my_advi_params_fullrank.dimension(); ++i)
     EXPECT_FLOAT_EQ(x_result(i), x_transformed(i));
 
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::Vector3d x_nan = Eigen::VectorXd::Constant(3, nan);
-  EXPECT_THROW(my_advi_params_fullrank.to_unconstrained(x_nan);,
+  EXPECT_THROW(my_advi_params_fullrank.loc_scale_transform(x_nan);,
                    std::domain_error);
 }

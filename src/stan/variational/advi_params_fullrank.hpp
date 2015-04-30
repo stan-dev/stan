@@ -1,9 +1,16 @@
-#ifndef STAN__VARIATIONAL__ADVI_PARAMS_FULLRANK__HPP
-#define STAN__VARIATIONAL__ADVI_PARAMS_FULLRANK__HPP
+#ifndef STAN_VARIATIONAL_ADVI_PARAMS_FULLRANK__HPP
+#define STAN_VARIATIONAL_ADVI_PARAMS_FULLRANK__HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/fun/LDLT_factor.hpp>
 #include <stan/math/prim/scal/meta/constants.hpp>
+
+#include <stan/math/prim/mat/meta/get.hpp>
+#include <stan/math/prim/arr/meta/get.hpp>
+#include <stan/math/prim/mat/meta/length.hpp>
+#include <stan/math/prim/mat/meta/is_vector.hpp>
+#include <stan/math/prim/mat/meta/is_vector_like.hpp>
+#include <stan/math/prim/mat/fun/value_of_rec.hpp>
 
 #include <stan/math/prim/mat/err/check_square.hpp>
 #include <stan/math/prim/mat/err/check_lower_triangular.hpp>
@@ -33,13 +40,10 @@ namespace stan {
         stan::math::check_size_match(function,
                                "Dimension of mean vector",     dimension_,
                                "Dimension of Cholesky factor", L_chol_.rows() );
-        for (int i = 0; i < dimension_; ++i)
-          stan::math::check_not_nan(function, "Mean vector", mu_(i));
+        stan::math::check_not_nan(function, "Mean vector", mu_);
         stan::math::check_lower_triangular(function,
                                "Cholesky factor", L_chol_);
       }
-
-      virtual ~advi_params_fullrank() {}  // No-op
 
       // Accessors
       int dimension() const { return dimension_; }
@@ -54,8 +58,7 @@ namespace stan {
         stan::math::check_size_match(function,
                                "Dimension of input vector", mu.size(),
                                "Dimension of current vector", dimension_);
-        for (int i = 0; i < dimension_; ++i)
-          stan::math::check_not_nan(function, "Input vector", mu(i));
+        stan::math::check_not_nan(function, "Input vector", mu);
         mu_ = mu;
       }
 
@@ -72,7 +75,7 @@ namespace stan {
         L_chol_ = L_chol;
       }
 
-      // Entropy of normal:
+        // Entropy of normal:
       // 0.5 * dim * (1+log2pi) + 0.5 * log det (L^T L) =
       // 0.5 * dim * (1+log2pi) + sum(log(abs(diag(L))))
       double entropy() const {
@@ -110,15 +113,14 @@ namespace stan {
       // }
 
       // Implements f^{-1}(\check{z}) = L\check{z} + \mu
-      Eigen::VectorXd to_unconstrained(const Eigen::VectorXd& z_check) const {
+      Eigen::VectorXd loc_scale_transform(const Eigen::VectorXd& z_check) const {
         static const char* function = "stan::variational::advi_params_fullrank"
-                                      "::to_unconstrained";
+                                      "::loc_scale_transform";
 
         stan::math::check_size_match(function,
                          "Dimension of input vector", z_check.size(),
                          "Dimension of mean vector",  dimension_);
-        for (int i = 0; i < dimension_; ++i)
-          stan::math::check_not_nan(function, "Input vector", z_check(i));
+        stan::math::check_not_nan(function, "Input vector", z_check);
 
         return L_chol_*z_check + mu_;
       }

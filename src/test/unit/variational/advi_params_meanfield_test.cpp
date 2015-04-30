@@ -86,7 +86,7 @@ TEST(advi_params_meanfield_test, entropy) {
 
 }
 
-TEST(advi_params_meanfield_test, transform_to_unconstrained) {
+TEST(advi_params_meanfield_test, transform_loc_scale) {
 
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
@@ -104,7 +104,7 @@ TEST(advi_params_meanfield_test, transform_to_unconstrained) {
          3.894020358120325e05;
 
   Eigen::Vector3d x_result;
-  x_result = my_advi_params_meanfield.to_unconstrained(x);
+  x_result = my_advi_params_meanfield.loc_scale_transform(x);
 
   for (int i = 0; i < my_advi_params_meanfield.dimension(); ++i)
     EXPECT_FLOAT_EQ(x_result(i), x_transformed(i));
@@ -112,7 +112,7 @@ TEST(advi_params_meanfield_test, transform_to_unconstrained) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::Vector3d x_nan = Eigen::VectorXd::Constant(3, nan);
 
-  EXPECT_THROW(my_advi_params_meanfield.to_unconstrained(x_nan);,
+  EXPECT_THROW(my_advi_params_meanfield.loc_scale_transform(x_nan);,
                    std::domain_error);
 
 }
