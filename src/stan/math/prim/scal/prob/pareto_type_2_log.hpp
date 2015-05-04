@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__PROB__PARETO_TYPE_2_LOG_HPP
-#define STAN__MATH__PRIM__SCAL__PROB__PARETO_TYPE_2_LOG_HPP
+#ifndef STAN_MATH_PRIM_SCAL_PROB_PARETO_TYPE_2_LOG_HPP
+#define STAN_MATH_PRIM_SCAL_PROB_PARETO_TYPE_2_LOG_HPP
 
 #include <boost/random/variate_generator.hpp>
 #include <stan/math/prim/scal/meta/OperandsAndPartials.hpp>
@@ -21,15 +21,16 @@
 namespace stan {
   namespace prob {
 
-    // pareto_type_2(y|lambda,alpha)  [y >= 0;  lambda > 0;  alpha > 0]
+    // pareto_type_2(y|lambda, alpha)  [y >= 0;  lambda > 0;  alpha > 0]
     template <bool propto,
               typename T_y, typename T_loc, typename T_scale, typename T_shape>
-    typename return_type<T_y,T_loc,T_scale,T_shape>::type
-    pareto_type_2_log(const T_y& y, const T_loc& mu, const T_scale& lambda, 
+    typename return_type<T_y, T_loc, T_scale, T_shape>::type
+    pareto_type_2_log(const T_y& y, const T_loc& mu, const T_scale& lambda,
                       const T_shape& alpha) {
       static const char* function("stan::prob::pareto_type_2_log");
-      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_shape>::type 
-        T_partials_return;      
+      typedef
+        typename stan::partials_return_type<T_y, T_loc, T_scale, T_shape>::type
+        T_partials_return;
 
       using std::log;
       using stan::math::value_of;
@@ -41,15 +42,15 @@ namespace stan {
       using stan::math::check_consistent_sizes;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
-            && stan::length(lambda) 
+      if (!(stan::length(y)
+            && stan::length(mu)
+            && stan::length(lambda)
             && stan::length(alpha)))
         return 0.0;
-      
+
       // set up return value accumulator
       T_partials_return logp(0.0);
-      
+
       // validate args (here done over var, which should be OK)
       check_greater_or_equal(function, "Random variable", y, mu);
       check_not_nan(function, "Random variable", y);
@@ -62,9 +63,9 @@ namespace stan {
 
 
       // check if no variables are involved and prop-to
-      if (!include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
+      if (!include_summand<propto, T_y, T_loc, T_scale, T_shape>::value)
         return 0.0;
-      
+
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> lambda_vec(lambda);
@@ -72,34 +73,40 @@ namespace stan {
       size_t N = max_size(y, mu, lambda, alpha);
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y,T_loc,T_scale,T_shape> 
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
         operands_and_partials(y, mu, lambda, alpha);
-      
-      VectorBuilder<include_summand<propto,T_y,T_loc,T_scale,T_shape>::value,
-                    T_partials_return, T_y,T_loc,T_scale> log1p_scaled_diff(N);
-      if (include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
+
+      VectorBuilder<include_summand<propto, T_y, T_loc, T_scale, T_shape>
+                    ::value,
+                    T_partials_return, T_y, T_loc, T_scale>
+        log1p_scaled_diff(N);
+      if (include_summand<propto, T_y, T_loc, T_scale, T_shape>::value) {
         for (size_t n = 0; n < N; n++)
-          log1p_scaled_diff[n] = log1p((value_of(y_vec[n]) 
+          log1p_scaled_diff[n] = log1p((value_of(y_vec[n])
                                         - value_of(mu_vec[n]))
                                        / value_of(lambda_vec[n]));
+      }
 
-      VectorBuilder<include_summand<propto,T_scale>::value,
+      VectorBuilder<include_summand<propto, T_scale>::value,
                     T_partials_return, T_scale> log_lambda(length(lambda));
-      if (include_summand<propto,T_scale>::value)
+      if (include_summand<propto, T_scale>::value) {
         for (size_t n = 0; n < length(lambda); n++)
           log_lambda[n] = log(value_of(lambda_vec[n]));
+      }
 
-      VectorBuilder<include_summand<propto,T_shape>::value,
+      VectorBuilder<include_summand<propto, T_shape>::value,
                     T_partials_return, T_shape> log_alpha(length(alpha));
-      if (include_summand<propto,T_shape>::value)
+      if (include_summand<propto, T_shape>::value) {
         for (size_t n = 0; n < length(alpha); n++)
           log_alpha[n] = log(value_of(alpha_vec[n]));
+      }
 
       VectorBuilder<!is_constant_struct<T_shape>::value,
                     T_partials_return, T_shape> inv_alpha(length(alpha));
-      if (!is_constant_struct<T_shape>::value)
+      if (!is_constant_struct<T_shape>::value) {
         for (size_t n = 0; n < length(alpha); n++)
           inv_alpha[n] = 1 / value_of(alpha_vec[n]);
+      }
 
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);
@@ -112,13 +119,13 @@ namespace stan {
         const T_partials_return deriv_1_2 = inv_sum + alpha_div_sum;
 
         // // log probability
-        if (include_summand<propto,T_shape>::value)
+        if (include_summand<propto, T_shape>::value)
           logp += log_alpha[n];
-        if (include_summand<propto,T_scale>::value)
+        if (include_summand<propto, T_scale>::value)
           logp -= log_lambda[n];
-        if (include_summand<propto,T_y,T_scale,T_shape>::value)
+        if (include_summand<propto, T_y, T_scale, T_shape>::value)
           logp -= (alpha_dbl + 1.0) * log1p_scaled_diff[n];
-  
+
         // gradients
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= deriv_1_2;
@@ -130,15 +137,15 @@ namespace stan {
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x4[n] += inv_alpha[n] - log1p_scaled_diff[n];
       }
-      return operands_and_partials.to_var(logp,y,mu,lambda,alpha);
+      return operands_and_partials.to_var(logp, y, mu, lambda, alpha);
     }
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     inline
-    typename return_type<T_y,T_loc,T_scale,T_shape>::type
-    pareto_type_2_log(const T_y& y, const T_loc& mu, 
+    typename return_type<T_y, T_loc, T_scale, T_shape>::type
+    pareto_type_2_log(const T_y& y, const T_loc& mu,
                       const T_scale& lambda, const T_shape& alpha) {
-      return pareto_type_2_log<false>(y,mu,lambda,alpha);
+      return pareto_type_2_log<false>(y, mu, lambda, alpha);
     }
   }
 }

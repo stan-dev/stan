@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MIX__MAT__FUNCTOR__DERIVATIVE_HPP
-#define STAN__MATH__MIX__MAT__FUNCTOR__DERIVATIVE_HPP
+#ifndef STAN_MATH_MIX_MAT_FUNCTOR_DERIVATIVE_HPP
+#define STAN_MATH_MIX_MAT_FUNCTOR_DERIVATIVE_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

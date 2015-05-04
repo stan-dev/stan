@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__GRAD_REG_INC_GAMMA_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__GRAD_REG_INC_GAMMA_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_GRAD_REG_INC_GAMMA_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_GRAD_REG_INC_GAMMA_HPP
 
 #include <math.h>
 #include <stan/math/prim/scal/fun/gamma_p.hpp>
 
 namespace stan {
-    
+
   namespace math {
 
     // Gradient of the regularized incomplete gamma functions igamma(a, g)
@@ -13,7 +13,7 @@ namespace stan {
     // g   = boost::math::tgamma(a)
     // dig = boost::math::digamma(a)
     template<typename T>
-    T grad_reg_inc_gamma(T a, T z, T g, T dig, 
+    T grad_reg_inc_gamma(T a, T z, T g, T dig,
                          T precision = 1e-6) {
       using stan::math::gamma_p;
       using std::log;
@@ -23,10 +23,10 @@ namespace stan {
       T S = 0;
       T s = 1;
       T l = log(z);
-          
+
       int k = 0;
       T delta = s / (a * a);
-          
+
       while (fabs(delta) > precision) {
         S += delta;
         ++k;
@@ -37,7 +37,7 @@ namespace stan {
       }
       return gamma_p(a, z) * ( dig - l ) + exp( a * l ) * S / g;
     }
-      
+
   }
 
 }

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__MAT__FUN__GRAD_HPP
-#define STAN__MATH__REV__MAT__FUN__GRAD_HPP
+#ifndef STAN_MATH_REV_MAT_FUN_GRAD_HPP
+#define STAN_MATH_REV_MAT_FUN_GRAD_HPP
 
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -9,7 +9,7 @@
 namespace stan {
 
   namespace agrad {
-   
+
     /**
      * Propagate chain rule to calculate gradients starting from
      * the specified variable.  Resizes the input vector to be the
@@ -25,14 +25,14 @@ namespace stan {
      * @param[out] g Gradient, d/dx v, evaluated at x.
      */
     void grad(var& v,
-              Eigen::Matrix<var,Eigen::Dynamic,1>& x,
+              Eigen::Matrix<var, Eigen::Dynamic, 1>& x,
               Eigen::VectorXd& g) {
       stan::agrad::grad(v.vi_);
       g.resize(x.size());
       for (int i = 0; i < x.size(); ++i)
         g(i) = x(i).vi_->adj_;
     }
-    
+
   }
 }
 

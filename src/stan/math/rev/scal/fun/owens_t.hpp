@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__OWENS_T_HPP
-#define STAN__MATH__REV__SCAL__FUN__OWENS_T_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_OWENS_T_HPP
+#define STAN_MATH_REV_SCAL_FUN_OWENS_T_HPP
 
 #include <math.h>
 #include <stan/math/rev/core.hpp>
@@ -26,7 +26,7 @@ namespace stan {
 
           avi_->adj_ += adj_ * ::erf(bvi_->val_ * avi_->val_ * INV_SQRT_2)
             * std::exp(neg_avi_sq_div_2) * INV_SQRT_TWO_PI * -0.5;
-          bvi_->adj_ += adj_ * std::exp(neg_avi_sq_div_2 * one_p_bvi_sq) 
+          bvi_->adj_ += adj_ * std::exp(neg_avi_sq_div_2 * one_p_bvi_sq)
             / (one_p_bvi_sq * 2.0 * pi());
         }
       };
@@ -40,7 +40,7 @@ namespace stan {
           using stan::math::INV_SQRT_TWO_PI;
           using stan::math::INV_SQRT_2;
           using stan::math::square;
-          
+
           avi_->adj_ += adj_ * ::erf(bd_ * avi_->val_ * INV_SQRT_2)
             * std::exp(-square(avi_->val_) * 0.5)
             * INV_SQRT_TWO_PI * -0.5;
@@ -70,45 +70,45 @@ namespace stan {
      *
      * Used to compute the cumulative density function for the skew normal
      * distribution.
-     * 
+     *
      * @param h var parameter.
      * @param a var parameter.
-     * 
+     *
      * @return The Owen's T function.
      */
-    inline var owens_t(const var& h, 
+    inline var owens_t(const var& h,
                        const var& a) {
       return var(new owens_t_vv_vari(h.vi_, a.vi_));
     }
 
-    /** 
+    /**
      * The Owen's T function of h and a.
      *
      * Used to compute the cumulative density function for the skew normal
      * distribution.
-     * 
+     *
      * @param h var parameter.
      * @param a double parameter.
-     * 
+     *
      * @return The Owen's T function.
      */
-    inline var owens_t(const var& h, 
+    inline var owens_t(const var& h,
                        const double& a) {
       return var(new owens_t_vd_vari(h.vi_, a));
     }
 
-    /** 
+    /**
      * The Owen's T function of h and a.
      *
      * Used to compute the cumulative density function for the skew normal
      * distribution.
-     * 
+     *
      * @param h double parameter.
      * @param a var parameter.
-     * 
+     *
      * @return The Owen's T function.
      */
-    inline var owens_t(const double& h, 
+    inline var owens_t(const double& h,
                        const var& a) {
       return var(new owens_t_dv_vari(h, a.vi_));
     }

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__INV_LOGIT_HPP
-#define STAN__MATH__REV__SCAL__FUN__INV_LOGIT_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_INV_LOGIT_HPP
+#define STAN_MATH_REV_SCAL_FUN_INV_LOGIT_HPP
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
@@ -10,8 +10,8 @@ namespace stan {
     namespace {
       class inv_logit_vari : public op_v_vari {
       public:
-        inv_logit_vari(vari* avi) :
-          op_v_vari(stan::math::inv_logit(avi->val_),avi) {
+        explicit inv_logit_vari(vari* avi) :
+          op_v_vari(stan::math::inv_logit(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ +=  adj_ * val_ * (1.0 - val_);

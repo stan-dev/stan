@@ -1,11 +1,11 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__PROB_FREE_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__PROB_FREE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_PROB_FREE_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_PROB_FREE_HPP
 
 #include <stan/math/prim/scal/err/check_bounded.hpp>
 #include <stan/math/prim/scal/fun/logit.hpp>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -17,7 +17,7 @@ namespace stan {
      * function,
      *
      * <p>\f$f^{-1}(y) = \mbox{logit}(y) = \frac{1 - y}{y}\f$.
-     * 
+     *
      * @param y Scalar input.
      * @tparam T Type of scalar.
      * @throw std::domain_error if y is less than 0 or greater than 1.
@@ -26,12 +26,12 @@ namespace stan {
     inline
     T prob_free(const T y) {
       using stan::math::logit;
-      stan::math::check_bounded<T,double,double>
+      stan::math::check_bounded<T, double, double>
         ("stan::prob::prob_free", "Probability variable",
          y, 0, 1);
       return logit(y);
     }
-    
+
   }
 
 }

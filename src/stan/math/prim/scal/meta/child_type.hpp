@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__CHILD_TYPE_HPP
-#define STAN__MATH__PRIM__SCAL__META__CHILD_TYPE_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_CHILD_TYPE_HPP
+#define STAN_MATH_PRIM_SCAL_META_CHILD_TYPE_HPP
 
 namespace stan {
 
@@ -9,7 +9,7 @@ namespace stan {
      * Primary template class for metaprogram to compute child type of
      * T.
      *
-     * See <code>test/unit/math/meta/child_type_test.cpp</code> for 
+     * See <code>test/unit/math/meta/child_type_test.cpp</code> for
      * intended usage.
      *
      * @tparam T type of container.
@@ -23,7 +23,7 @@ namespace stan {
     /**
      * Specialization for template classes / structs.
      *
-     * See <code>test/unit/math/meta/child_type_test.cpp</code> for 
+     * See <code>test/unit/math/meta/child_type_test.cpp</code> for
      * intended usage.
      *
      * @tparam T_struct type of parent.
@@ -34,7 +34,7 @@ namespace stan {
     struct child_type<T_struct<T_child> >{
       typedef T_child type;
     };
-    
+
   }
 }
 

@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__INIT__INIT_WINDOWED_ADAPT_HPP
-#define STAN__SERVICES__INIT__INIT_WINDOWED_ADAPT_HPP
+#ifndef STAN_SERVICES_INIT_INIT_WINDOWED_ADAPT_HPP
+#define STAN_SERVICES_INIT_INIT_WINDOWED_ADAPT_HPP
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/arguments/categorical_argument.hpp>

@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__SCAL__META__VECTORVIEW_HPP
-#define STAN__MATH__PRIM__SCAL__META__VECTORVIEW_HPP
+#ifndef STAN_MATH_PRIM_SCAL_META_VECTORVIEW_HPP
+#define STAN_MATH_PRIM_SCAL_META_VECTORVIEW_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/scal/meta/scalar_type.hpp>
@@ -25,7 +25,7 @@ namespace stan {
    *  Note: this is not safe. It is possible to read past the size of
    *  an array.
    *
-   *  Uses: 
+   *  Uses:
    *    Read arguments to prob functions as vectors, even if scalars, so
    *    they can be read by common code (and scalars automatically
    *    broadcast up to behave like vectors) : VectorView of immutable
@@ -39,24 +39,24 @@ namespace stan {
             bool is_array = stan::is_vector_like<T>::value,
             bool throw_if_accessed = false>
   class VectorView {
-  public: 
+  public:
     typedef typename scalar_type<T>::type scalar_t;
 
-    VectorView(scalar_t& c) : x_(&c) { }
+    explicit VectorView(scalar_t& c) : x_(&c) { }
 
-    VectorView(std::vector<scalar_t>& v) : x_(&v[0]) { }
+    explicit VectorView(std::vector<scalar_t>& v) : x_(&v[0]) { }
 
     template <int R, int C>
-    VectorView(Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
+    explicit VectorView(Eigen::Matrix<scalar_t, R, C>& m) : x_(&m(0)) { }
 
-    VectorView(scalar_t* x) : x_(x) { }
+    explicit VectorView(scalar_t* x) : x_(x) { }
 
     scalar_t& operator[](int i) {
-      if (throw_if_accessed) 
+      if (throw_if_accessed)
         throw std::out_of_range("VectorView: this cannot be accessed");
-      if (is_array) 
+      if (is_array)
         return x_[i];
-      else 
+      else
         return x_[0];
     }
   private:
@@ -73,21 +73,21 @@ namespace stan {
   public:
     typedef typename scalar_type<T>::type scalar_t;
 
-    VectorView(const scalar_t& c) : x_(&c) { }
+    explicit VectorView(const scalar_t& c) : x_(&c) { }
 
-    VectorView(const scalar_t* x) : x_(x) { }
+    explicit VectorView(const scalar_t* x) : x_(x) { }
 
-    VectorView(const std::vector<scalar_t>& v) : x_(&v[0]) { }
+    explicit VectorView(const std::vector<scalar_t>& v) : x_(&v[0]) { }
 
     template <int R, int C>
-    VectorView(const Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
+    explicit VectorView(const Eigen::Matrix<scalar_t, R, C>& m) : x_(&m(0)) { }
 
     const scalar_t& operator[](int i) const {
-      if (throw_if_accessed) 
+      if (throw_if_accessed)
         throw std::out_of_range("VectorView: this cannot be accessed");
       if (is_array)
         return x_[i];
-      else 
+      else
         return x_[0];
     }
   private:
@@ -98,7 +98,7 @@ namespace stan {
   template <>
   class VectorView<const double, false, false> {
   public:
-    VectorView(double x) : x_(x) { }
+    explicit VectorView(double x) : x_(x) { }
     double operator[](int /* i */)  const {
       return x_;
     }

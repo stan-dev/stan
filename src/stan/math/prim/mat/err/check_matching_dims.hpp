@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__ERR__CHECK_MATCHING_DIMS_HPP
-#define STAN__MATH__PRIM__MAT__ERR__CHECK_MATCHING_DIMS_HPP
+#ifndef STAN_MATH_PRIM_MAT_ERR_CHECK_MATCHING_DIMS_HPP
+#define STAN_MATH_PRIM_MAT_ERR_CHECK_MATCHING_DIMS_HPP
 
 #include <stan/math/prim/scal/err/domain_error.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>

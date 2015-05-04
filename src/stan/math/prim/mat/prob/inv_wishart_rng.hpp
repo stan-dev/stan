@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__PRIM__MAT__PROB__INV_WISHART_RNG_HPP
-#define STAN__MATH__PRIM__MAT__PROB__INV_WISHART_RNG_HPP
+#ifndef STAN_MATH_PRIM_MAT_PROB_INV_WISHART_RNG_HPP
+#define STAN_MATH_PRIM_MAT_PROB_INV_WISHART_RNG_HPP
 
 #include <stan/math/prim/mat/err/check_ldlt_factor.hpp>
 #include <stan/math/prim/scal/err/check_greater.hpp>
@@ -19,18 +19,18 @@ namespace stan {
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
     inv_wishart_rng(const double nu,
-                    const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
+                    const Eigen::Matrix
+                    <double, Eigen::Dynamic, Eigen::Dynamic>& S,
                     RNG& rng) {
-
       static const char* function("stan::prob::inv_wishart_rng");
-      
+
       using stan::math::check_greater;
       using stan::math::check_square;
       using Eigen::MatrixXd;
       using stan::math::index_type;
 
       typename index_type<MatrixXd>::type k = S.rows();
-      
+
       check_greater(function, "Degrees of freedom parameter", nu, k-1);
       check_square(function, "scale parameter", S);
 

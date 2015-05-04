@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__IO__DO_PRINT_HPP
-#define STAN__SERVICES__IO__DO_PRINT_HPP
+#ifndef STAN_SERVICES_IO_DO_PRINT_HPP
+#define STAN_SERVICES_IO_DO_PRINT_HPP
 
 namespace stan {
   namespace services {

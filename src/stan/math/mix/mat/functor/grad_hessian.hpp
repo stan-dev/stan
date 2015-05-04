@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__MIX__MAT__FUNCTOR__GRAD_HESSIAN_HPP
-#define STAN__MATH__MIX__MAT__FUNCTOR__GRAD_HESSIAN_HPP
+#ifndef STAN_MATH_MIX_MAT_FUNCTOR_GRAD_HESSIAN_HPP
+#define STAN_MATH_MIX_MAT_FUNCTOR_GRAD_HESSIAN_HPP
 
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -47,7 +47,8 @@ namespace stan {
                  const Eigen::Matrix<double, Dynamic, 1>& x,
                  double& fx,
                  Eigen::Matrix<double, Dynamic, Dynamic>& H,
-                 std::vector<Eigen::Matrix<double, Dynamic, Dynamic> >& grad_H) {
+                 std::vector<Eigen::Matrix<double, Dynamic, Dynamic> >&
+                 grad_H) {
       using Eigen::Matrix;
       fx = f(x);
       int d = x.size();

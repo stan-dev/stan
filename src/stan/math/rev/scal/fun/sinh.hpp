@@ -1,17 +1,17 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__SINH_HPP
-#define STAN__MATH__REV__SCAL__FUN__SINH_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_SINH_HPP
+#define STAN_MATH_REV_SCAL_FUN_SINH_HPP
 
-#include <valarray>
 #include <stan/math/rev/core.hpp>
+#include <valarray>
 
 namespace stan {
   namespace agrad {
-    
+
     namespace {
       class sinh_vari : public op_v_vari {
       public:
-        sinh_vari(vari* avi) :
-          op_v_vari(std::sinh(avi->val_),avi) {
+        explicit sinh_vari(vari* avi) :
+          op_v_vari(std::sinh(avi->val_), avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * std::cosh(avi_->val_);
@@ -28,15 +28,15 @@ namespace stan {
      *
      *
        \f[
-       \mbox{sinh}(x) = 
+       \mbox{sinh}(x) =
        \begin{cases}
          \sinh(x) & \mbox{if } -\infty\leq x \leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
        \end{cases}
        \f]
-       
+
        \f[
-       \frac{\partial\,\mbox{sinh}(x)}{\partial x} = 
+       \frac{\partial\, \mbox{sinh}(x)}{\partial x} =
        \begin{cases}
          \cosh(x) & \mbox{if } -\infty\leq x\leq \infty \\[6pt]
          \textrm{NaN} & \mbox{if } x = \textrm{NaN}
@@ -49,7 +49,7 @@ namespace stan {
     inline var sinh(const var& a) {
       return var(new sinh_vari(a.vi_));
     }
-    
+
   }
 }
 #endif

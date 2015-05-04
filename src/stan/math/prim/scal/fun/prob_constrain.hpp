@@ -1,12 +1,12 @@
-#ifndef STAN__MATH__PRIM__SCAL__FUN__PROB_CONSTRAIN_HPP
-#define STAN__MATH__PRIM__SCAL__FUN__PROB_CONSTRAIN_HPP
+#ifndef STAN_MATH_PRIM_SCAL_FUN_PROB_CONSTRAIN_HPP
+#define STAN_MATH_PRIM_SCAL_FUN_PROB_CONSTRAIN_HPP
 
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <cmath>
 
 namespace stan {
-  
+
   namespace prob {
 
     /**
@@ -35,10 +35,10 @@ namespace stan {
      * specified log probability reference with the log absolute Jacobian
      * determinant of the transform.
      *
-     * <p>The transform is as defined for <code>prob_constrain(T)</code>. 
+     * <p>The transform is as defined for <code>prob_constrain(T)</code>.
      * The log absolute Jacobian determinant is
      *
-     * <p>The log absolute Jacobian determinant is 
+     * <p>The log absolute Jacobian determinant is
      *
      * <p>\f$\log | \frac{d}{dx} \mbox{logit}^{-1}(x) |\f$
      * <p>\f$\log ((\mbox{logit}^{-1}(x)) (1 - \mbox{logit}^{-1}(x))\f$

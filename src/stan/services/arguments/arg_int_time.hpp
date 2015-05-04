@@ -1,5 +1,5 @@
-#ifndef STAN__SERVICES__ARGUMENTS__INT__TIME__HPP
-#define STAN__SERVICES__ARGUMENTS__INT__TIME__HPP
+#ifndef STAN_SERVICES_ARGUMENTS_ARG_INT_TIME_HPP
+#define STAN_SERVICES_ARGUMENTS_ARG_INT_TIME_HPP
 
 #include <stan/services/arguments/singleton_argument.hpp>
 

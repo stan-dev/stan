@@ -1,5 +1,5 @@
-#ifndef STAN__MATH__REV__SCAL__FUN__VALUE_OF_HPP
-#define STAN__MATH__REV__SCAL__FUN__VALUE_OF_HPP
+#ifndef STAN_MATH_REV_SCAL_FUN_VALUE_OF_HPP
+#define STAN_MATH_REV_SCAL_FUN_VALUE_OF_HPP
 
 #include <stan/math/rev/core.hpp>
 
@@ -7,7 +7,7 @@ namespace stan {
   namespace agrad {
 
     /**
-     * Return the value of the specified variable.  
+     * Return the value of the specified variable.
      *
      * <p>This function is used internally by auto-dif functions along
      * with <code>stan::math::value_of(T x)</code> to extract the
@@ -22,7 +22,7 @@ namespace stan {
     inline double value_of(const agrad::var& v) {
       return v.vi_->val_;
     }
-    
+
   }
 }
 #endif
