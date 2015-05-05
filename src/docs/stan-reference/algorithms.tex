@@ -433,6 +433,68 @@ a diagonal matrix, whihc is itself regularized toward a unit matrix.
 Variances or covariances are estimated using Welford accumulators
 to avoid a loss of precision over many floating point operations.
 
+\subsubsection{Warmup Times and Estimating the Mass Matrix}
+
+The mass matrix can compensate for linear (i.e. global) correlations
+in the posterior which can dramatically improve the performance of HMC
+in some problems. This requires knowing the global correlations.
+
+In complex models, the global correlations are usually difficult, if
+not impossible, to derivate analytically; for example, nonlinear model
+components convolve the scales of the data, so standardizing the data
+doesn’t always help.  Therefore, Stan estimates these correlations
+online with an adaptive warmup.  In models with strong nonlinear
+(i.e. local) correlations this learning can be slow, even with
+regularization. This is ultimately why warmup in Stan often needs to
+be so long, and why a sufficiently long warmup can yield such
+substantial performance improvements.
+
+\subsubsection{Nonlinearity}
+
+The mass matrix compensates for only linear (equivalently global or
+position-independent) correlations in the posterior. The hierarchical
+parameterizations, on the other hand, affect some of the nasty
+nonlinear (equivalently local or position-dependent) correlations
+common in hierarchical models.%
+%
+\footnote{Only in Riemannian HMC does the metric, which can be thought
+  of as a position-dependent mass matrix, start compensating for
+  nonlinear correlations.}
+
+One of the biggest difficulties with dense mass matrices is the
+estimation of the mass matrix itself which introduces a bit of a
+chicken-and-egg scenario;  in order to estimate an appropriate mass
+matrix for sampling, convergence is required, and in order to
+converge, an appropriate mass matrix is required.
+
+\subsubsection{Dense vs.\ Diagonal Mass Matrices}
+
+Statistical models for which sampling is problematic are not typically
+dominated by linear correlations for which a dense mass matrix can
+adjust.  Rather, they are governed by more complex nonlinear
+correlations that are best tackled with better parameterizations or
+more advanced algorithms, such as Riemannian HMC.
+
+\subsubsection{Warmup Times and Curvature}
+
+MCMC convergence time is roughly equivalent to the autocorrelation
+time.  Because HMC (and NUTS) chains tend to be lowly autocorrelated
+they also tend to converge quite rapidly. 
+
+This only applies wehn there is uniformity of curvature across the
+posterior, an assumption which is violated in many complex models.
+Quite often, the tails have large curvature while the bulk of the
+posterior mass is relatively well-behaved; in other words, warmup is slow
+not because the actual convergence time is slow but rather because the
+cost of an HMC iteration is more expensive out in the tails.
+
+Poor behavior in the tails is the kind of pathology that can be
+uncovered by running only a few warmup iterations. By looking at the
+acceptance probabilities and step sizes of the first few iterations
+provides an idea of how bad the problem is and whether it must be
+addressed with modeling efforts such as tighter priors or
+reparameterizations.  
+
 
 \subsection{NUTS and its Configuration}
 
@@ -504,9 +566,39 @@ graphical model (e.g., where you can work down generatively from known
 hyperpriors to simulate parameters and data), there is no need to
 declare any parameters in Stan, the model block will be empty, and all
 output quantities will be produced in the generated quantities block.
-In this situation, the sampler must be configured to use the
-fixed-parameters setting.  Without parameters there is no need for
-adaptation and the number of warmup iterations should be set to zero.
+For example, to generate a sequence of $N$ draws from a binomial with
+trials $K$ and chance of success $\theta$, the following program suffices.
+%
+\begin{stancode}
+data {
+  real<lower=0,upper=1> theta;
+  int<lower=0> K;
+  int<lower=0> N;
+}
+model { 
+}
+generated quantities {
+  int<lower=0,upper=K> y[N];
+  for (n in 1:N)
+    y[n] <- binomial_rng(K, theta);
+}
+\end{stancode}
+%
+This program includes an empty model block because every Stan program
+must have a model block, even if it's empty.  For this model, the
+sampler must be configured to use the fixed-parameters setting because
+there are no parameters.  Without parameter sampling there is no need
+for adaptation and the number of warmup iterations should be set to
+zero.
+
+Most models that are written to be sampled without parameters will not
+declare any parameters, instead putting anything parameter-like in the
+data block.  Nevertheless, it is possible to include parameters for
+fixed-parameters sampling and initialize them in any of the usual ways
+(randomly, fixed to zero on the unconstrained scale, or with
+user-specified values).  For exmaple, \code{theta} in the example
+above could be declared as a parameter and initialized as a parameter.
+
 
 
 \section{General Configuration Options}\label{general-config.section}
@@ -715,6 +807,40 @@ The general configuration options for optimization are the same as
 those for MCMC;  see \refsection{general-config} for details.
 
 
+\section{Writing Models for Optimization}
+
+\subsection{Constrained vs.\ Unconstrained Parameters}
+
+For constrained optimization problems, for instance, with a standard
+deviation parameter $\sigma$ constrained so that $\sigma > 0$, it can
+be much more efficient to declare a parameter \code{sigma} with no
+constraints.  This allows the optimizer to easily get close to 0
+without having to tend toward $-\infty$ on the $\log \sigma$ scale.  
+
+The Jacobian adjustment is not an issue for posterior modes, because
+Stan turns off the built-in Jacobian adjustments for optimization.
+
+With unconstrained parameterizations of parameters with constrained
+support, it is important to provide a custom initialization that is
+within the support.  For example, declaring a vector
+%
+\begin{quote}
+\begin{Verbatim}
+vector[M] sigma;
+\end{Verbatim}
+\end{quote}
+%
+and using the default random initialization which is
+$\distro{Uniform}(-2,2)$ on the unconstrained scale, means that there
+is only a $2^{-M}$ chance that the initialization will be within
+support.  
+
+For any given optimization problem, it is probably worthwhile trying
+the program both ways, with and without the constraint, to see which
+one is more efficient.  
+
+
+
 \chapter{Diagnostic Mode}\label{diagnostic-algorithms.chapter}
 
 \noindent
@@ -755,7 +881,7 @@ The output is for the variable values and their gradients are on the
 unconstrained scale, which means each variable is a vector of size
 corresponding to the number of unconstrained variables required to
 define it. For example, an $N \times N$ correlation matrix, requires
-${N \choose 2}$ unconstrained parameters. The
+$\binom{N}{2}$ unconstrained parameters. The
 transformations from constrained to unconstrained parameters are based
 on the constraints in the parameter declarations and described in
 detail in \refchapter{variable-transforms}.

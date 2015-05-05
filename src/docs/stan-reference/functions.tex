@@ -4,7 +4,8 @@
 \chapter{Vectorization}\label{vectorization.chapter}
 
 \noindent
-Stan's scalar log probability functions all support vectorized
+Stan's scalar log probability functions, including the density
+functions, mass functions, CDFs, and CCDFs, all support vectorized
 function application, with results defined to be the sum of the
 elementwise application of the function.  In all cases, matrix
 operations are faster than loops and vectorized log probability
@@ -27,11 +28,9 @@ repeated application and assignment in a loop.
 
 The normal probability function is specified with the signature
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 normal_log(reals,reals,reals);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The pseudo-type \code{reals} is used to indicate that an argument
 position may be vectorized.  Argument positions declared as
@@ -46,11 +45,9 @@ row vector have the same size.
 
 The multivariate normal distribution accepting vector or array of
 vector arguments is written as
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 multi_normal_log(vectors,vectors,matrix);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 \subsection{Vectorized Integer Arguments}
 
@@ -65,38 +62,30 @@ namely \code{real} or \code{int}, is repeated.  For instance, if
 \code{y} is a vector of size \code{N}, \code{mu} is a vector of size
 \code{N}, and \code{sigma} is a scalar, then
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 ll <- normal_log(y, mu, sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 is just a more efficient way to write
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 ll <- 0;
 for (n in 1:N)
   ll <- ll + normal_log(y[n], mu[n], sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 With the same arguments, the vectorized sampling statement
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 y ~ normal(mu, sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 has the same effect on the total log probability as
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 for (n in 1:N)
   y[n] ~ normal(mu[n], sigma);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 
 
@@ -222,16 +211,32 @@ two real arguments and returns a real value.
 \begin{description}
 %
 \fitem{int}{operator+}{int \farg{x}, int \farg{y}}{
-The sum of the addends \farg{x} and \farg{y}}
+The sum of the addends \farg{x} and \farg{y}
+\[
+\mbox{\code{operator+}}(x,y) = (x + y)
+\]
+}
 %
 \fitem{int}{operator-}{int \farg{x}, int \farg{y}}{
-The difference between the minuend \farg{x} and subtrahend \farg{y}}
+The difference between the minuend \farg{x} and subtrahend \farg{y}
+\[
+\mbox{\code{operator-}}(x,y) = (x - y)
+\]
+}
 %
 \fitem{int}{operator*}{int \farg{x}, int \farg{y}}{
-The product of the factors \farg{x} and \farg{y}}
+The product of the factors \farg{x} and \farg{y}
+\[
+\mbox{\code{operator*}}(x,y) = (x \times y)
+\]
+}
 %
 \fitem{int}{operator/}{int \farg{x}, int \farg{y}}{
-The integer quotient of the dividend \farg{x} and divisor \farg{y}}
+The integer quotient of the dividend \farg{x} and divisor \farg{y}
+\[
+\mbox{\code{operator/}}(x,y) = \lfloor x / y \rfloor
+\]
+}
 %
 \end{description}
 
@@ -239,10 +244,18 @@ The integer quotient of the dividend \farg{x} and divisor \farg{y}}
 
 \begin{description}
 \fitem{int}{operator-}{int \farg{x}}{
-The negation of the subtrahend \farg{x}}
-
+The negation of the subtrahend \farg{x}
+\[ 
+\mbox{\code{operator-}}(x) = (-x)
+}
+\]
+%
 \fitem{int}{operator+}{int \farg{x}}{
-This is a no-op.}
+This is a no-op.
+\[
+\mbox{\code{operator+}}(x) = x
+\]
+}
 \end{description}
 
 \section{Absolute Functions}
@@ -405,11 +418,11 @@ carried out by first promoting the integer value.
   \fitem{int}{operator<}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is less than \farg{y} and 0 otherwise.
     \[
-    (x \mbox{<} y) = 
-    \mbox{operator\textless}(x,y) =
+    \mbox{\code{operator<}}(x,y)
+    =
     \begin{cases}
-      1 & \mbox{if } x < y\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x < y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -417,11 +430,10 @@ carried out by first promoting the integer value.
   \fitem{int}{operator<=}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is less than or equal \farg{y} and 0 otherwise.
     \[
-    (x \mbox{<=} y)
-    = \mbox{operator\textless=}(x,y)
+    \mbox{\code{operator<=}}(x,y)
     = \begin{cases}
-        1 & \mbox{if } x \leq y\\
-        0 & \mbox{otherwise}
+        1 & \text{if $x \leq y$} \\
+        0 & \text{otherwise}
       \end{cases}
     \]}
   %
@@ -429,11 +441,11 @@ carried out by first promoting the integer value.
   \fitem{int}{operator>}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is greater than \farg{y} and 0 otherwise.
     \[
-    (x \mbox{>} y) = 
-    \mbox{operator\textgreater}(x,y) = 
+    \mbox{\code{operator>}}
+    =
     \begin{cases}
-      1 & \mbox{if } x > y\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x > y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -442,11 +454,11 @@ carried out by first promoting the integer value.
     Returns 1 if \farg{x} is greater than or equal to \farg{y}
     and 0 otherwise.
     \[
-    (x \mbox{>=} y) =
-    \mbox{operator\textgreater=}(x,y) = 
+    \mbox{\code{operator>=}}
+    =
     \begin{cases}
-      1 & \mbox{if } x \geq y \\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \geq y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -454,11 +466,10 @@ carried out by first promoting the integer value.
   \fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is equal to \farg{y} and 0 otherwise.
     \[
-    (x \mbox{==} y) = 
-    \mbox{operator==}(x,y) = 
+    \mbox{\code{operator==}}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x = y \\
-      0 & \mbox{otherwise}
+      1 & \text{if $x = y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -466,11 +477,11 @@ carried out by first promoting the integer value.
   \fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is not equal to \farg{y} and 0 otherwise.
     \[
-    (x \mbox{!=} y) = 
-    \mbox{operator!=}(x,y) = 
+    \mbox{\code{operator!=}}(x,y) 
+    = 
     \begin{cases}
-      1 & \mbox{if } x \neq y \\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \neq y$} \\
+      0 & \text{otherwise}
     \end{cases}
     \]}{operator"!"=}
   %
@@ -495,11 +506,11 @@ tightly than the comparisons.  Thus an expression such as
   \fitemindex{int}{operator!}{real \farg{x}}{
     Returns 1 if \farg{x} is zero and 0 otherwise.
     \[
-    (\mbox{!}x) =
-    \mbox{operator!}(x) = 
+    \mbox{\code{operator!}}(x) 
+    = 
     \begin{cases}
-      0 & \mbox{if } x \neq 0 \\
-      1 & \mbox{if } x = 0
+      0 & \text{if $x \neq 0$} \\
+      1 & \text{if $x = 0$}
     \end{cases}
     \]}{operator"!}
   %
@@ -507,11 +518,11 @@ tightly than the comparisons.  Thus an expression such as
   \fitem{int}{operator{\&\&}}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is unequal to 0 and \farg{y} is unequal to 0.
     \[
-    (x \mbox{\&\&} y) =
-    \mbox{operator\&\&}(x,y) = 
+    \mbox{\code{operator\&\&}}(x,y) 
+    = 
     \begin{cases}
-      1 & \mbox{if } x \neq 0 \mbox{ and } y \neq 0\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \neq 0$} \text{ and } y \neq 0\\
+      0 & \text{otherwise}
     \end{cases}
     \]}
   %
@@ -519,11 +530,10 @@ tightly than the comparisons.  Thus an expression such as
   \fitemindex{int}{operator||}{real \farg{x}, real \farg{y}}{
     Returns 1 if \farg{x} is unequal to 0 or \farg{y} is unequal to 0.
     \[
-    (x \mbox{||} y) = 
-    \mbox{operator||}(x,y) = 
+    \mbox{\code{operator||}}(x,y) = 
     \begin{cases}
-      1 & \mbox{if } x \neq 0 \textrm{ or } y \neq 0\\
-      0 & \mbox{otherwise}
+      1 & \text{if $x \neq 0$} \textrm{ or } y \neq 0\\
+      0 & \text{otherwise}
     \end{cases}
     \]
   }{operator"|"|}
@@ -591,30 +601,24 @@ with mulitplications by step functions.  For example, if \code{y} is a
 scalar expressions (type \code{real} or \code{int}), then the
 assignment statements
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 y <- x1 * step(c) + x2 * (1 - step(c));
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 and
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 y <- if_else(c > 0, x1, x2);
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 are more efficiently written with the conditional statement
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 if (c > 0)
   y <- x1;
 else
   y <- x2;
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The reason the functional versions are slower is that they evaluate
 all of their arguments; the step function approach is particularly
@@ -659,7 +663,7 @@ as \code{x~+~y} and \code{-x}, respectively.
   \fitem{real}{operator+}{real \farg{x}, real \farg{y}}{
     Returns the sum of \farg{x} and \farg{y}.
     \[
-    (x + y) = \mbox{operator+}(x,y) = x+y
+    (x + y) = \mbox{\code{operator+}}(x,y) = x+y
     \]}
   %
   \fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
@@ -696,13 +700,13 @@ as \code{x~+~y} and \code{-x}, respectively.
   \fitem{real}{operator-}{real \farg{x}}{
     Returns the negation of the subtrahend \farg{x}.
     \[
-    (-x) = \mbox{operator-}(x) = -x
+    \mbox{\code{operator-}}(x) = (-x)
     \]}
   %
   \fitem{real}{operator+}{real \farg{x}}{
     Returns the value of \farg{x}.
     \[
-    (+x) = \mbox{operator+}(x) = x
+    \mbox{\code{operator+}}(x) = x
     \]}
 \end{description}
 
@@ -726,14 +730,14 @@ as \code{x~+~y} and \code{-x}, respectively.
     this function is deprecated and will be removed in the future;
     please use \code{fabs} instead.
     \[
-    \mbox{abs}(x) = |x|
+    \mbox{\code{abs}}(x) = |x|
     \]}
   %
   \fitem{real}{fabs}{real \farg{x}}{
     Returns the absolute value of \farg{x};  
     see warning at start of \refsection{step-functions}.
     \[
-    \mbox{fabs}(x) = |x|
+    \mbox{\code{fabs}}(x) = |x|
     \]}
   %
   \fitem{real}{fdim}{real \farg{x}, real \farg{y}}{
@@ -742,7 +746,7 @@ as \code{x~+~y} and \code{-x}, respectively.
     and 0 otherwise;
     see warning at start of \refsection{step-functions}.
     \[
-    \mbox{fdim}(x,y) = 
+    \mbox{\code{fdim}}(x,y) = 
     \begin{cases}
       x-y & \mbox{if } x \geq y \\
       0 & \mbox{otherwise}
@@ -759,7 +763,7 @@ as \code{x~+~y} and \code{-x}, respectively.
     Returns the minimum of \farg{x} and \farg{y}\,; 
     see warning at start of \refsection{step-functions}.
     \[
-    \mbox{fmin}(x,y) = 
+    \mbox{\code{fmin}}(x,y) = 
     \begin{cases}
       x & \mbox{if } x \leq y \\
       y & \mbox{otherwise}
@@ -770,7 +774,7 @@ as \code{x~+~y} and \code{-x}, respectively.
     Returns the maximum of \farg{x} and \farg{y}\,;
     see warning at start of \refsection{step-functions}.
     \[
-    \mbox{fmax}(x,y) = 
+    \mbox{\code{fmax}}(x,y) = 
     \begin{cases}
       x & \mbox{if } x \geq y \\
       y & \mbox{otherwise}
@@ -788,7 +792,7 @@ as \code{x~+~y} and \code{-x}, respectively.
     Returns the real value remainder after dividing \farg{x} by \farg{y}\,;
     see warning at start of \refsection{step-functions}.
     \[
-    \mbox{fmod}(x,y) = x - \left\lfloor \frac{x}{y} \right\rfloor \, y
+    \mbox{\code{fmod}}(x,y) = x - \left\lfloor \frac{x}{y} \right\rfloor \, y
     \]
   The operator $\lfloor u \rfloor$ is the floor operation; see below.}
   %
@@ -816,7 +820,7 @@ of these in the future, but as of now, there is no good workaround.
     than or equal to \farg{x}, converted to a real value;
     see warning at start of \refsection{step-functions}.
     \[
-    \mbox{floor}(x) = \lfloor x \rfloor
+    \mbox{\code{floor}}(x) = \lfloor x \rfloor
     \]}
   %
   \fitem{real}{ceil}{real \farg{x}}{
@@ -824,14 +828,14 @@ of these in the future, but as of now, there is no good workaround.
     than or equal to \farg{x}, converted to a real value;
     see warning at start of \refsection{step-functions}.
     \[
-    \mbox{ceil}(x) = \lceil x\rceil
+    \mbox{\code{ceil}}(x) = \lceil x\rceil
     \]}
   %
   \fitem{real}{round}{real \farg{x}}{
     Returns the nearest integer to \farg{x}, converted to a real value;
     see warning at start of \refsection{step-functions}.
     \[
-    \mbox{round}(x) = 
+    \mbox{\code{round}}(x) = 
     \begin{cases}
       \lceil x \rceil & \mbox{if } x-\lfloor x\rfloor \geq 0.5 \\
       \lfloor x \rfloor & \mbox{otherwise}
@@ -843,7 +847,7 @@ of these in the future, but as of now, there is no good workaround.
     converted to a double value;
     see warning at start of \refsection{step-functions}.
     \[
-    \mbox{trunc}(x) = \lfloor x \rfloor
+    \mbox{\code{trunc}}(x) = \lfloor x \rfloor
     \]
   Note that this function is redundant with \code{floor}.}
   %
@@ -857,7 +861,7 @@ of these in the future, but as of now, there is no good workaround.
   \fitem{real}{sqrt}{real \farg{x}}{
     Returns the square root of \farg{x}.
     \[
-    \mbox{sqrt}(x) = 
+    \mbox{\code{sqrt}}(x) = 
     \begin{cases}
       \sqrt{x} & \mbox{if } x\geq 0\\
       \textrm{NaN} & \mbox{otherwise}
@@ -867,32 +871,32 @@ of these in the future, but as of now, there is no good workaround.
   \fitem{real}{cbrt}{real \farg{x}}{
     Returns the cube root of \farg{x}
     \[
-    \mbox{cbrt}(x) = \sqrt[3]{x}
+    \mbox{\code{cbrt}}(x) = \sqrt[3]{x}
     \]}
   %
   \fitem{real}{square}{real \farg{x}}{
     Returns the square of \farg{x}.
     \[
-    \mbox{square}(x) = x^2
+    \mbox{\code{square}}(x) = x^2
     \]}
   %
   \fitem{real}{exp}{real \farg{x}}{
     Returns the natural exponential of \farg{x}.
     \[
-    \mbox{exp}(x) = 
-    e^x
+    \mbox{\code{exp}}(x) \ = \ \exp(x)
+    \ = \ e^x
     \]}
   %
   \fitem{real}{exp2}{real \farg{x}}{
     Returns the base-2 exponential of \farg{x}.
     \[
-    \mbox{exp2}(x) = 2^x
+    \mbox{\code{exp2}}(x) = 2^x
     \]}
   %
   \fitem{real}{log}{real \farg{x}}{
     Returns the natural logarithm of \farg{x}.
     \[
-    \mbox{log}(x) = 
+    \mbox{\code{log}}(x) = \log x =
     \begin{cases}
       \log_{e}(x) & \mbox{if } x \geq 0 \\
       \textrm{NaN} & \mbox{otherwise}
@@ -902,7 +906,7 @@ of these in the future, but as of now, there is no good workaround.
   \fitem{real}{log2}{real \farg{x}}{
     Returns the base-2 logarithm of \farg{x}.
     \[
-    \mbox{log2}(x) = 
+    \mbox{\code{log2}}(x) = 
     \begin{cases}
       \log_2(x) & \mbox{if } x\geq 0 \\
       \textrm{NaN} & \mbox{otherwise}
@@ -912,7 +916,7 @@ of these in the future, but as of now, there is no good workaround.
   \fitem{real}{log10}{real \farg{x}}{
     Returns the base-10 logarithm of \farg{x}.
     \[
-    \mbox{log10}(x) = 
+    \mbox{\code{log10}}(x) = 
     \begin{cases}
       \log_{10}(x) & \mbox{if } x \geq 0 \\
       \textrm{NaN} & \mbox{otherwise}
@@ -922,19 +926,19 @@ of these in the future, but as of now, there is no good workaround.
   \fitem{real}{pow}{real \farg{x}, real \farg{y}}{
     Returns \farg{x} raised to the power of \farg{y}.
     \[
-    \mbox{pow}(x,y) = x^y
+    \mbox{\code{pow}}(x,y) = x^y
     \]}
   %
   \fitem{real}{inv}{real \farg{x}}{
     Returns the inverse of \farg{x}.
     \[
-    \mbox{inv}(x) = \frac{1}{x}
+    \mbox{\code{inv}}(x) = \frac{1}{x}
     \]}    
   %
   \fitem{real}{inv\_sqrt}{real \farg{x}}{
     Returns the inverse of the square root of \farg{x}.
     \[
-    \mbox{inv\_sqrt}(x) = 
+    \mbox{\code{inv\_sqrt}}(x) = 
     \begin{cases}
       \frac{1}{\sqrt{x}} & \mbox{if } x \geq 0 \\
       \textrm{NaN} & \mbox{otherwise}
@@ -944,7 +948,7 @@ of these in the future, but as of now, there is no good workaround.
   \fitem{real}{inv\_square}{real \farg{x}}{
     Returns the inverse of the square of \farg{x}.
     \[
-    \mbox{inv\_square}(x) = \frac{1}{x^2}
+    \mbox{\code{inv\_square}}(x) = \frac{1}{x^2}
     \]}
   %
 \end{description}
@@ -958,7 +962,7 @@ of these in the future, but as of now, there is no good workaround.
     Returns the length of the hypotenuse of a right triangle with sides of
     length \farg{x} and \farg{y}.
     \[
-    \mbox{hypot}(x,y) = 
+    \mbox{\code{hypot}}(x,y) = 
     \begin{cases}
       \sqrt{x^2+y^2} & \mbox{if } x,y\geq 0 \\
       \textrm{NaN} & \mbox{otherwise}
@@ -968,13 +972,13 @@ of these in the future, but as of now, there is no good workaround.
   \fitem{real}{cos}{real \farg{x}}{
     Returns the cosine of the angle \farg{x} (in radians).
     \[
-    \mbox{cos}(x) = \cos(x)
+    \mbox{\code{cos}}(x) = \cos(x)
     \]}
   %
   \fitem{real}{sin}{real \farg{x}}{
     Returns the sine of the angle \farg{x} (in radians).
     \[
-    \mbox{sin}(x) = \sin(x)
+    \mbox{\code{sin}}(x) = \sin(x)
     \]}
   %
   \fitem{real}{tan}{real \farg{x}}{
@@ -986,7 +990,7 @@ of these in the future, but as of now, there is no good workaround.
   \fitem{real}{acos}{real \farg{x}}{
     Returns the principal arc (inverse) cosine (in radians) of \farg{x}.
     \[
-    \mbox{acos}(x) = 
+    \mbox{\code{acos}}(x) = 
     \begin{cases}
       \arccos(x) & \mbox{if } -1\leq x\leq 1 \\
       \textrm{NaN} & \mbox{otherwise}
@@ -996,7 +1000,7 @@ of these in the future, but as of now, there is no good workaround.
   \fitem{real}{asin}{real \farg{x}}{
     Returns the principal arc (inverse) sine (in radians) of \farg{x}.
     \[
-    \mbox{asin}(x) = 
+    \mbox{\code{asin}}(x) = 
     \begin{cases}
       \arcsin(x) & \mbox{if } -1\leq x\leq 1 \\
       \textrm{NaN} & \mbox{otherwise}
@@ -1006,14 +1010,14 @@ of these in the future, but as of now, there is no good workaround.
   \fitem{real}{atan}{real \farg{x}}{
     Returns the principal arc (inverse) tangent (in radians) of \farg{x}.
     \[
-    \mbox{atan}(x) = \arctan(x)
+    \mbox{\code{atan}}(x) = \arctan(x)
     \]}
   %
   \fitem{real}{atan2}{real \farg{x}, real \farg{y}}{
     Returns the principal arc (inverse) tangent (in radians) of \farg{x} divided
     by \farg{y}.
     \[
-    \mbox{atan2}(x,y) = \arctan\left(\frac{x}{y}\right)
+    \mbox{\code{atan2}}(x,y) = \arctan\left(\frac{x}{y}\right)
     \]}
   %
 \end{description}
@@ -1026,26 +1030,26 @@ of these in the future, but as of now, there is no good workaround.
   \fitem{real}{cosh}{real \farg{x}}{
     Returns the hyperbolic cosine of \farg{x} (in radians).
     \[
-    \mbox{cosh}(x) = \cosh(x)
+    \mbox{\code{cosh}}(x) = \cosh(x)
     \]}
   %
   \fitem{real}{sinh}{real \farg{x}}{
     Returns the hyperbolic sine of \farg{x} (in radians).
     \[
-    \mbox{sinh}(x) = \sinh(x)
+    \mbox{\code{sinh}}(x) = \sinh(x)
     \]}
   %
   \fitem{real}{tanh}{real \farg{x}}{
     Returns the hyperbolic tangent of \farg{x} (in radians).
     \[
-    \mbox{tanh}(x) = \tanh(x)
+    \mbox{\code{tanh}}(x) = \tanh(x)
     \]}
   %
   \fitem{real}{acosh}{real \farg{x}}{
     Returns the inverse hyperbolic cosine (in radians) of \farg{x}.
     %
     \[
-    \mbox{acosh}(x) = 
+    \mbox{\code{acosh}}(x) = 
     \begin{cases}
       \cosh^{-1}(x) & \mbox{if } x \geq 1 \\
       \textrm{NaN} & \mbox{otherwise}
@@ -1056,13 +1060,13 @@ of these in the future, but as of now, there is no good workaround.
     Returns the inverse hyperbolic cosine (in radians) of \farg{x}.
     %
     \[
-    \mbox{asinh}(x) = \sinh^{-1}(x)
+    \mbox{\code{asinh}}(x) = \sinh^{-1}(x)
     \]}
   %
   \fitem{real}{atanh}{real \farg{x}}{
     Returns the inverse hyperbolic tangent (in radians) of \farg{x}.
     \[
-    \mbox{atanh}(x) = 
+    \mbox{\code{atanh}}(x) = 
     \begin{cases}
       \tanh^{-1}(x) & \mbox{if } -1\leq x \leq 1 \\
       \textrm{NaN} & \mbox{otherwise}
@@ -1084,24 +1088,25 @@ commonly used as a link function (see \refsection{Phi-function}).
   \fitem{real}{logit}{real \farg{x}}{
     Returns the log odds, or logit, function applied to \farg{x}.
     \[
-    \mbox{logit}(x) = 
+    \mbox{\code{logit}}(x) = 
     \begin{cases}
       \log\frac{x}{1-x} & \mbox{if } 0\leq x \leq 1 \\
-      \textrm{NaN}& \mbox{otherwise}
+      \textrm{NaN} & \mbox{otherwise}
     \end{cases}
-    \]}
+    \]
+  }
   %
   \fitem{real}{inv\_logit}{real \farg{y}}{
     Returns the logistic sigmoid function applied to \farg{y}.
     \[
-    \mbox{inv\_logit}(y) = \frac{1}{1 + \exp(-y)}
+    \mbox{\code{inv\_logit}}(y) = \frac{1}{1 + \exp(-y)}
     \]}
   %
   \fitem{real}{inv\_cloglog}{real \farg{y}}{
     Returns the inverse of the complementary log-log function 
     applied to \farg{y}.
     \[
-    \mbox{inv\_cloglog}(y) = 1 - \exp \! \left( - \exp(y) \right)
+    \mbox{\code{inv\_cloglog}}(y) = 1 - \exp \! \left( - \exp(y) \right)
     \]}
   %
 \end{description}
@@ -1121,19 +1126,19 @@ distribution function (and its complement).
   \fitem{real}{erf}{real \farg{x}}{
     Returns the error function, also known as the Gauss error function, of \farg{x}.
     \[
-    \mbox{erf}(x) = \frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt
+    \mbox{\code{erf}}(x) = \frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt
     \]}
   %
   \fitem{real}{erfc}{real \farg{x}}{
     Returns the complementary error function of \farg{x}.
     \[
-    \mbox{erfc}(x) = \frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
+    \mbox{\code{erfc}}(x) = \frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
     \]}
   %
   \fitemindexsort{real}{Phi}{real \farg{x}}{
     Returns the unit normal cumulative distribution function of \farg{x}.
     \[
-    \mbox{Phi}(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
+    \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
     \]}{Phi}{phi}
   %
   \fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
@@ -1141,9 +1146,8 @@ distribution function (and its complement).
     function of \farg{x}. This approximation has a maximum absolute error 
     of 0.00014 and may be used instead of \code{Phi} for probit regression.  See
     \citep{BowlingEtAl:2009} for details.  
-
     \[
-    \mbox{Phi\_approx}(x) = \mbox{logit}^{-1}(0.07056 \, x^3 + 1.5976 \, x)
+    \mbox{\code{Phi\_approx}}(x) = \mbox{logit}^{-1}(0.07056 \, x^3 + 1.5976 \, x)
     \]}{Phi\_approx}{phi\_approx}
 \end{description}
 
@@ -1155,7 +1159,7 @@ distribution function (and its complement).
     Returns the log loss function for for predicting $\hat{y} \in [0,1]$ for 
     boolean outcome $y \in \setlist{0,1}$.
     \[
-    \mbox{binary\_log\_loss}(y,\hat{y}) = 
+    \mbox{\code{binary\_log\_loss}}(y,\hat{y}) = 
     \begin{cases}
       -\log \hat{y}       & \mbox{if } y = 0\\
       -\log (1 - \hat{y}) & \mbox{otherwise}
@@ -1167,7 +1171,8 @@ distribution function (and its complement).
     and $0<Y<aX$ where \farg{X} and \farg{Y} are independent standard 
     normal random variables.
     \[
-    \mbox{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx
+    \mbox{\code{owens\_t}}(h,a)
+    = \frac{1}{2\pi} \int_0^a \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx
     \]}
   %
 \end{description}
@@ -1185,7 +1190,8 @@ distribution function (and its complement).
     computes the normalizing constant for the beta distribution, and
     is defined for $\alpha > 0$ and $\beta > 0$.
     \[
-    \mbox{lbeta}(\alpha,\beta) = \log \Gamma(a) + \log \Gamma(b) - \log \Gamma(a+b)
+    \mbox{\code{lbeta}}(\alpha,\beta) 
+    = \log \Gamma(a) + \log \Gamma(b) - \log \Gamma(a+b)
     \]
     See \refsection{beta-appendix} for definition of $\mbox{B}(\alpha, \beta)$.
   }
@@ -1196,7 +1202,8 @@ distribution function (and its complement).
     defined so that $\Gamma(n+1) = n!$.  The function is defined for
     positive numbers and non-integral negative numbers.
     \[
-    \mbox{tgamma}(x) = 
+    \mbox{\code{tgamma}}(x) 
+    = 
     \begin{cases}
       \Gamma(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
       \textrm{error} & \mbox{otherwise}
@@ -1209,7 +1216,8 @@ distribution function (and its complement).
   \fitem{real}{lgamma}{real \farg{x}}{
     Returns the natural logarithm of the gamma function applied to \farg{x}.
     \[
-    \mbox{lgamma}(x) = 
+    \mbox{\code{lgamma}}(x) 
+    = 
     \begin{cases}
       \log\Gamma(x)   & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
       \textrm{error} & \mbox{otherwise}
@@ -1223,7 +1231,8 @@ distribution function (and its complement).
     derivative of the natural logarithm of the Gamma function.  The function is defined 
     for positive numbers and non-integral negative numbers.
     \[
-    \mbox{digamma}(x) = 
+    \mbox{\code{digamma}}(x) 
+    = 
     \begin{cases}
       \frac{\Gamma'(x)}{\Gamma(x)}  & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
       \textrm{error}                & \mbox{otherwise}
@@ -1235,7 +1244,8 @@ distribution function (and its complement).
     Returns the trigamma function applied to \farg{x}.  The trigamma function is the
     second derivative of the natural logarithm of the Gamma function.
     \[
-    \mbox{trigamma}(x) = 
+    \mbox{\code{trigamma}}(x) 
+    = 
     \begin{cases}
       \sum_{n=0}^\infty \frac{1}{(x+n)^2}        & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
       \textrm{error}                           & \mbox{otherwise}
@@ -1246,7 +1256,8 @@ distribution function (and its complement).
     Returns the natural logarithm of the multinomial gamma function with \farg{n}
     dimensions applied to \farg{x}.
     \[
-    \mbox{lmgamma}(n,x) = 
+    \mbox{\code{lmgamma}}(n,x) 
+    = 
     \begin{cases}
       \pi^{n(n-1)/4} \, \prod_{j=1}^n \Gamma(x + (1 - j)/2) 
                      & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
@@ -1254,20 +1265,23 @@ distribution function (and its complement).
     \end{cases}
     \]}
   %
-  \fitem{real}{gamma\_p}{real \farg{a}, real \farg{z}}{
-    Returns the normalized lower incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z}.
+  \fitem{real}{gamma\_p}{real \farg{a}, real \farg{z}}{ Returns the
+    normalized lower incomplete gamma function of \farg{a} and
+    \farg{z} defined for positive \farg{a} and nonnegative \farg{z}.
     \[
-    \mbox{gamma\_p}(a,z) = 
+    \mbox{\code{gamma\_p}}(a,z) 
+    = 
     \begin{cases}
       \frac{1}{\Gamma(a)}\int_0^zt^{a-1}e^{-t}dt & \mbox{if } a > 0, z \geq 0 \\
       \textrm{error} & \mbox{otherwise}
     \end{cases}
     \]}
   %
-  \fitem{real}{gamma\_q}{real \farg{a}, real \farg{z}}{
-    Returns the normalized upper incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z}.
+  \fitem{real}{gamma\_q}{real \farg{a}, real \farg{z}}{ Returns the
+    normalized upper incomplete gamma function of \farg{a} and
+    \farg{z} defined for positive \farg{a} and nonnegative \farg{z}.
     \[
-    \mbox{gamma\_q}(a,z) = 
+    \mbox{\code{gamma\_q}}(a,z) = 
     \begin{cases}
       \frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt & \mbox{if } a > 0, z \geq 0 \\[6pt]
       \textrm{error} & \mbox{otherwise}
@@ -1283,14 +1297,15 @@ distribution function (and its complement).
 
     For $0 \leq y \leq x$,
     \[
-    \mbox{binomial\_coefficient\_log}(x,y)
+    \mbox{\code{binomial\_coefficient\_log}}(x,y)
     = \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1)
     \]}
   %
   \fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{x}}{
-    Returns the Bessel function of the first kind with order \farg{v} applied to \farg{x}.
+    Returns the Bessel function of the first kind with order \farg{v}
+    applied to \farg{x}.
     \[
-    \mbox{bessel\_first\_kind}(v,x) =  J_v(x)
+    \mbox{\code{bessel\_first\_kind}}(v,x) =  J_v(x)
     \]
     where 
     %
@@ -1300,11 +1315,12 @@ distribution function (and its complement).
     \]}
   %
   \fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{x}}{
-    Returns the Bessel function of the second kind with order \farg{v} applied to \farg{x} defined for  positive \farg{x} and \farg{v}.
+    Returns the Bessel function of the second kind with order \farg{v}
+    applied to \farg{x} defined for positive \farg{x} and \farg{v}.
 
     For $x,v > 0$,
     \[
-    \mbox{bessel\_second\_kind}(v,x) = 
+    \mbox{\code{bessel\_second\_kind}}(v,x) = 
     \begin{cases}
       Y_v(x) & \mbox{if } x > 0 \\
       \textrm{error} & \mbox{otherwise}
@@ -1315,12 +1331,12 @@ distribution function (and its complement).
     Y_v(x)=\frac{J_v(x)\cos(v\pi)-J_{-v}(x)}{\sin(v\pi)}
     \]}
   %
-  \fitem{real}{modified\_bessel\_first\_kind}{int \farg{v}, real \farg{z}}{
-    Returns the modified Bessel function of the first kind with order \farg{v} 
-    applied to \farg{z} defined for all \farg{z} and \farg{v}.
-    
+  \fitem{real}{modified\_bessel\_first\_kind}{int \farg{v}, real
+    \farg{z}}{ Returns the modified Bessel function of the first kind
+    with order \farg{v} applied to \farg{z} defined for all \farg{z}
+    and \farg{v}.
     \[
-    \mbox{modified\_bessel\_first\_kind}(v,z) = I_v(z)
+    \mbox{\code{modified\_bessel\_first\_kind}}(v,z) = I_v(z)
     \]
     where
     %
@@ -1352,7 +1368,7 @@ distribution function (and its complement).
     Returns the falling factorial of \farg{x} with power \farg{n} 
     defined for positive \farg{x} and real \farg{n}.
     \[
-    \mbox{falling\_factorial}(x,n) = 
+    \mbox{\code{falling\_factorial}}(x,n) = 
     \begin{cases}
       (x)_n          & \mbox{if } x > 0 \\
       \textrm{error} & \mbox{if } x \leq 0
@@ -1367,7 +1383,7 @@ distribution function (and its complement).
     Returns the log of the falling factorial of \farg{x} with power 
     \farg{n} defined for positive \farg{x} and real \farg{n}.
     \[
-    \mbox{log\_falling\_factorial}(x,n) = 
+    \mbox{\code{log\_falling\_factorial}}(x,n) = 
     \begin{cases}
       \log (x)_n      & \mbox{if } x > 0 \\
       \textrm{error} & \mbox{if } x \leq 0
@@ -1378,7 +1394,7 @@ distribution function (and its complement).
     Returns the rising factorial of \farg{x} with power \farg{n} 
     defined for positive \farg{x} and real \farg{n}.
     \[
-    \mbox{rising\_factorial}(x,n) = 
+    \mbox{\code{rising\_factorial}}(x,n) = 
     \begin{cases}
       x^{(n)}         & \mbox{if } x > 0 \\
       \textrm{error} & \mbox{if } x \leq 0
@@ -1393,7 +1409,7 @@ distribution function (and its complement).
     Returns the log of the rising factorial of \farg{x} with power 
     \farg{n} defined for positive \farg{x} and real \farg{n}.
     \[
-    \mbox{log\_rising\_factorial}(x,n) = 
+    \mbox{\code{log\_rising\_factorial}}(x,n) = 
     \begin{cases}
       \log x^{(n)}     & \mbox{if } x > 0 \\
       \textrm{error} & \mbox{if } x \leq 0
@@ -1415,22 +1431,22 @@ using more basic \Stan functions.
   \fitem{real}{expm1}{real \farg{x}}{
     Returns the natural exponential of \farg{x} minus 1.
     \[
-    \mbox{expm1}(x) = e^x-1
+    \mbox{\code{expm1}}(x) = e^x - 1
     \]}
   %
   \fitem{real}{fma}{real \farg{x}, real \farg{y}, real \farg{z}}{
     Returns \farg{z} plus the result of \farg{x} multiplied by \farg{y}.
     \[
-    \mbox{fma}(x,y,z) = x\cdot y+z
+    \mbox{\code{fma}}(x,y,z) = (x \times y) + z
     \]}
   %
   \fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
     Returns the product of \farg{x} and the natural logarithm of \farg{y}.
     \[
-    \mbox{multiply\_log}(x,y) = 
+    \mbox{\code{multiply\_log}}(x,y) = 
     \begin{cases}
-      0 & \mbox{if } x=y=0 \\
-      x\log y & \mbox{if } x, y \neq 0 \\
+      0 & \mbox{if } x = y = 0 \\
+      x \log y & \mbox{if } x, y \neq 0 \\
       \mbox{NaN} & \mbox{otherwise}
     \end{cases}
     \]}
@@ -1438,9 +1454,9 @@ using more basic \Stan functions.
   \fitem{real}{log1p}{real \farg{x}}{
     Returns the natural logarithm of 1 plus \farg{x}.
     \[
-    \mbox{log1p}(x) = 
+    \mbox{\code{log1p}}(x) = 
     \begin{cases}
-      \log(1+x)& \mbox{if } x\geq -1 \\
+      \log(1+x)& \mbox{if } x \geq -1 \\
       \textrm{NaN} & \mbox{otherwise}
     \end{cases}
     \]}
@@ -1448,7 +1464,7 @@ using more basic \Stan functions.
   \fitem{real}{log1m}{real \farg{x}}{
     Returns the natural logarithm of 1 minus \farg{x}.
     \[
-    \mbox{log1m}(x) = 
+    \mbox{\code{log1m}}(x) = 
     \begin{cases}
       \log(1-x) & \mbox{if } x \leq 1 \\
       \textrm{NaN} & \mbox{otherwise}
@@ -1459,14 +1475,13 @@ using more basic \Stan functions.
     Returns the natural logarithm of one plus the natural exponentiation 
     of \farg{x}.
     \[
-    \mbox{log1p\_exp}(x) = \log(1+\exp(x))
+    \mbox{\code{log1p\_exp}}(x) = \log(1+\exp(x))
     \]}
   %
-  \fitem{real}{log1m\_exp}{real \farg{x}}{ 
-    Returns the natural logarithm of one minus the natural exponentiation of
-    \farg{x}.
+  \fitem{real}{log1m\_exp}{real \farg{x}}{ Returns the natural
+    logarithm of one minus the natural exponentiation of \farg{x}.
     \[
-    \mbox{log1m\_exp}(x) = 
+    \mbox{\code{log1m\_exp}}(x) = 
     \begin{cases}
       \log(1-\exp(x)) & \mbox{if } x < 0 \\
       \textrm{NaN} & \mbox{if } x \geq 0 
@@ -1477,34 +1492,49 @@ using more basic \Stan functions.
     Returns the natural logarithm of the difference of the natural exponentiation
     of \farg{x} and the natural exponentiation of \farg{y}.
     \[
-    \mbox{log\_diff\_exp}(x,y) = 
+    \mbox{\code{log\_diff\_exp}}(x,y) = 
     \begin{cases}
       \log(\exp(x)-\exp(y)) & \mbox{if } x > y \\[6pt]
       \textrm{NaN} & \mbox{otherwise}
     \end{cases}
     \]}
   %
+  \fitem{real}{log\_mix}{real \farg{theta}, real \farg{lp1}, real
+    \farg{lp2}}{
+    Returns the log mixture of the log densities \farg{lp1} and
+    \farg{lp2} with mixing proportion \farg{theta}, defined by
+    \begin{eqnarray*}
+      \mbox{\code{log\_mix}}(\theta, \lambda_1, \lambda_2) 
+      & = & \log \!\left( \theta \exp(\lambda_1) 
+      + \left( 1 - \theta \right) \exp(\lambda_2)
+    \right)
+    \\[3pt]
+    & = & \mbox{\code{log\_sum\_exp}}\!\left(\log(\theta) + \lambda_1, \
+                               \log(1 - \theta) + \lambda_2\right).
+    \end{eqnarray*}
+  %
   \fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{ 
     Returns the natural logarithm of the sum of the natural exponentiation
     of \farg{x} and the natural exponentiation of \farg{y}.
     \[
-    \mbox{log\_sum\_exp}(x,y) = \log(\exp(x)+\exp(y)) 
+    \mbox{\code{log\_sum\_exp}}(x,y) = \log(\exp(x)+\exp(y)) 
     \]}
   %
   \fitem{real}{log\_inv\_logit}{real \farg{x}}{
     Returns the natural logarithm of the inverse logit function of \farg{x}.
     \[
-    \mbox{log\_inv\_logit}(x) = \log \, \mbox{logit}^{-1}(x)
+    \mbox{\code{log\_inv\_logit}}(x) = \log \, \mbox{logit}^{-1}(x)
     \]
   See \refsection{link-functions} for a definition of inverse logit.}
   %
   \fitem{real}{log1m\_inv\_logit}{real \farg{x}}{
     Returns the natural logarithm of 1 minus the inverse logit function of \farg{x}.
     \[
-    \mbox{log1m\_inv\_logit}(x) = \log(1 - \mbox{logit}^{-1}(x))
+    \mbox{\code{log1m\_inv\_logit}}(x) = \log(1 - \mbox{logit}^{-1}(x))
     \]
   See \refsection{link-functions} for a definition of inverse logit.}
-  %
+}
+    
 \end{description}
 
 
@@ -1523,16 +1553,16 @@ with respect to the combination operation (min, max, sum, or product).
 
 \begin{description}
 \fitem{real}{min}{real \farg{x}[]}{
-The minimum value in \farg{x}, or $+\infty$ if \farg{x} is empty}
+The minimum value in \farg{x}, or $+\infty$ if \farg{x} is size 0.}
 %
 \fitem{int}{min}{int \farg{x}[]}{
-The minimum value in \farg{x}, or raise exception if \farg{x} is empty}
+The minimum value in \farg{x}, or error if \farg{x} is size 0.}
 %
 \fitem{real}{max}{real \farg{x}[]}{
-The maximum value in \farg{x}, or $-\infty$ if \farg{x} is empty}
+The maximum value in \farg{x}, or $-\infty$ if \farg{x} is size 0.}
 %
 \fitem{int}{max}{int \farg{x}[]}{
-The maximum value in \farg{x}, or raise exception if \farg{x} is empty}
+The maximum value in \farg{x}, or error if \farg{x} is size 0.}
 %
 \end{description}
 
@@ -1541,16 +1571,35 @@ The maximum value in \farg{x}, or raise exception if \farg{x} is empty}
 \begin{description}
 %
 \fitem{int}{sum}{int \farg{x}[]}{
-The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
+The sum of the elements in \farg{x}, defined for $x$ of size $N$ by
+\[
+\mbox{\code{sum}}(x)
+= 
+\begin{cases}
+\sum_{n=1}^N x_n & \mbox{if}  N > 0 
+\\[4pt]
+0 & \mbox{if} N = 0
+\end{cases}
+\]
+}
 %
 \fitem{real}{sum}{real \farg{x}[]}{
-The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
+The sum of the elements in \farg{x}; see definition above.}
 %
 \fitem{real}{prod}{real \farg{x}[]}{
-The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
+The product of the elements in \farg{x}, or 1 if \farg{x} is size 0.}
 %
 \fitem{real}{prod}{int \farg{x}[]}{
-The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
+The product of the elements in \farg{x},
+\[
+\mbox{\code{product}}(x) = 
+\begin{cases}
+\prod_{n=1}^N x_n & \mbox{if}  N > 0 
+\\[4pt]
+1 & \mbox{if} N = 0
+\end{cases}
+\]
+}
 %
 \fitem{real}{log\_sum\_exp}{real \farg{x}[]}{
 The natural logarithm of the sum of the exponentials of the elements
@@ -1558,101 +1607,107 @@ in \farg{x}, or $-\infty$ if the array is empty.}
 \end{description}
 
 
-\subsection{Moments}
+\subsection{Sample Mean, Variance, and Standard Deviation}
 
-Moments are only defined for arrays $x$ of size $N \geq 1$; it is an
-error to call them with arrays of size $N = 0$.  The sample mean is
-defined by
-\[
-\mbox{mean}(x) = \frac{1}{N} \sum_{n=1}^N x_n.
-\]
+The sample mean, variance, and standard deviation are calculated in
+the usual way.  For i.i.d. draws from a distribution of finite
+mean, the sample mean is an unbiased estimate of the mean of the
+distribution.  Similarly, for i.i.d. draws from a distribution of
+finite variance, the sample variance is an unbiased estimate of the
+variance.%
 %
-For $N \geq 2$, sample variance is defined for $N \geq 1$ by
-\[
-\mbox{variance}(x) 
-= 
-\frac{1}{N-1} \sum_{n=1}^N (x_n - \mbox{mean}(x))^2
-\]
-and sample standard deviation by 
-\[
-\mbox{sd}(x) = \sqrt{\, \mbox{variance}(x)},
-\]
-For convenience, when $N = 1$, $\mbox{variance(x)}$ and 
-$\mbox{sd}(x)$ are defined to be 0.
-
-% leaving gradients following for ref and in case we want
-% to add them for all functions at some point
-
-% For $N \geq 2$,
-% \[
-% \frac{\partial}{\partial x_n} \mbox{mean}(x)
-% = \frac{1}{N}.
-% \]
-% For $N \geq 2$,
-% \[
-% \frac{\partial}{\partial x_n} \mbox{variance}(x)
-% = \frac{2}{N-1} 
-%   \left( x_n - \mbox{mean}(x) \right).
-% \]
-% For $N \geq 2$,
-% \[
-% \frac{\partial}{\partial x_n} \mbox{sd}(x)
-% = \frac{1}{(N - 1) \, \mbox{sd}(x)} 
-%   \left( x_m - \mbox{mean}(x) \right)
-% \]
-% For $N \geq 2$, in the limit where $\mbox{sd}(x) = 0$, 
-% % 
-% \[
-% \frac{\partial}{\partial x_n} \mbox{sd}(x)
-% = \frac{1}{\sqrt{N}}.
-% \]
-
-
+\footnote{Dividing by $N$ rather than $(N-1)$ produces a maximum
+  likelihood estimate of variance, which is biased to underestimate
+  variance.}
+% 
+The sample deviation is defined as the square root of the
+sample deviation, but is not unbiased.
 
 \begin{description}
 \fitem{real}{mean}{real \farg{x}[]}{
-The sample mean of the elements in \farg{x}}
+The sample mean of the elements in \farg{x}.  
+For an array $x$ of size
+$N > 0$,
+\[
+\mbox{\code{mean}}(x) 
+\ = \
+\bar{x}
+\ = \
+\frac{1}{N} \sum_{n=1}^N x_n.
+\]
+It is an error to the call the mean function with an array of size $0$.
+}
 %
 \fitem{real}{variance}{real \farg{x}[]}{
-The sample variance of the elements in \farg{x}}
+The sample variance of the elements in \farg{x}. For $N > 0$,
+\[
+\mbox{\code{variance}}(x) 
+\ = \
+\begin{cases}
+\frac{1}{N-1} \sum_{n=1}^N (x_n - \bar{x})^2
+& \mbox{if } N > 1
+\\[4pt]
+0 & \mbox{if } N = 1
+\end{cases}
+\]
+It is an error to call the \code{variance} function with an array of size 0.
+}
 %
 \fitem{real}{sd}{real \farg{x}[]}{The sample standard deviation of
-elements in \farg{x}}
+elements in \farg{x}.
+\[
+\mbox{sd}(x) 
+= 
+\begin{cases}
+\sqrt{\, \mbox{\code{variance}}(x)} & \mbox{if } N > 1
+\\[4pt]
+0 & \mbox{if } N = 0
+\end{cases}
+\]
+It is an error to call the \code{sd} function with an array of size 0.
+}
 \end{description}
 
-\subsection{Distance and Squared Distance}
+\subsection{Euclidean Distance and Squared Distance}
 
 \begin{description}
-\fitem{real}{distance}{vector \farg{x}, vector \farg{y}}{The Euclidean
+  \fitem{real}{distance}{vector \farg{x}, vector \farg{y}}{The
+    Euclidean distance between \farg{x} and \farg{y}, defined by
+\[
+\mbox{\code{distance}}(x,y)
+\ = \
+\sqrt{\textstyle \sum_{n=1}^N (x_n - y_n)^2}
+\]
+where \code{N} is the size of \farg{x} and \farg{y}. It is an error to
+call \code{distance} with arguments of unequal size.}
+%
+\fitem{real}{distance}{vector \farg{x}, row\_vector \farg{y}}{The
+  Euclidean distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{distance}{row\_vector \farg{x}, vector \farg{y}}{The
+  Euclidean distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{distance}{row\_vector \farg{x}, row\_vector \farg{y}}{The
+  Euclidean distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{vector \farg{x}, vector
+  \farg{y}}{The squared Euclidean
   distance between \farg{x} and \farg{y}, defined by
 \[
-\mbox{distance}(\mbox{\farg{x}},\mbox{\farg{y}}) 
-= \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
+\mbox{\code{squared\_distance}}(x,y)
+\ = \ 
+\mbox{\code{distance}}(x,y)^2
+\ = \ 
+\textstyle \sum_{n=1}^N (x_n - y_n)^2,
 \]
-where \code{N} is the size of \farg{x} and \farg{y}.}
+where \code{N} is the size of \farg{x} and \farg{y}.  It is an error
+to call \code{squared\_distance} with arguments of unequal size.}
 %
-\fitem{real}{distance}{vector \farg{x}, row\_vector \farg{y}}{The Euclidean
-  distance between \farg{x} and \farg{y}}
+\fitem{real}{squared\_distance}{vector \farg{x}, row\_vector
+  \farg{y}[]}{The squared Euclidean distance between \farg{x} and \farg{y}}
 %
-\fitem{real}{distance}{row\_vector \farg{x}, vector \farg{y}}{The Euclidean
-  distance between \farg{x} and \farg{y}}
-%
-\fitem{real}{distance}{row\_vector \farg{x}, row\_vector \farg{y}}{The Euclidean
-  distance between \farg{x} and \farg{y}}
-%
-\fitem{real}{squared\_distance}{vector \farg{x}, vector \farg{y}[]}{The Euclidean
-  distance between \farg{x} and \farg{y}, defined by
-\[
-\mbox{squared\_distance}(\mbox{\farg{x}},\mbox{\farg{y}}) 
-= \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
-\]
-where \code{N} is the size of \farg{x} and \farg{y}.}
-%
-\fitem{real}{squared\_distance}{vector \farg{x}, row\_vector \farg{y}[]}{The Euclidean
-  distance between \farg{x} and \farg{y}}
-%
-\fitem{real}{squared\_distance}{row\_vector \farg{x}, vector \farg{y}[]}{The Euclidean
-  distance between \farg{x} and \farg{y}}
+\fitem{real}{squared\_distance}{row\_vector \farg{x}, vector
+  \farg{y}[]}{The squared Euclidean distance between \farg{x} and \farg{y}}
 %
 \fitem{real}{squared\_distance}{row\_vector \farg{x}, row\_vector \farg{y}[]}{The Euclidean
   distance between \farg{x} and \farg{y}}
@@ -1666,19 +1721,29 @@ function.  The \code{dims()} function is defined to take an argument
 consisting of any variable with up to 8 array dimensions (and up to 2
 additional matrix dimensions) and returns an array of integers with
 the dimensions.  For example, if two variables are declared as follows,
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real x[7,8,9];
 matrix[8,9] y[7];
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 then calling \code{dims(x)} or \code{dims(y)} returns an integer 
 array of size 3 containing the elements 7, 8, and 9 in that order. 
 
 The \code{size()} function extracts the number of elements in an
-array.  The function is overloaded to apply to arrays of integers,
-reals, matrices, vectors, and row vectors.
+array.  This is just the top-level elements, so if the array is
+declared as 
+%
+\begin{stancode}
+real a[M,N];
+\end{stancode}
+% 
+the size of \code{a} is \code{M}. 
+
+The function \code{num\_elements}, on the other hand, measures all of
+the elements, so that the array \code{a} above has $M \times N$ elements.
+
+The specialized functions \code{rows()} and \code{cols()} should be
+used to extract the dimensions of vectors and matrices.
 
 \begin{description}
 \fitem{int[]}{dims}{\farg{T} \farg{x}}{Returns an integer array
@@ -1730,8 +1795,7 @@ important because it is not possible to assign an integer array to a
 real array.  For example, the following example contrasts legal with
 illegal array creation and assignment
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real y[5];
 int x[5];
 
@@ -1743,37 +1807,32 @@ y <- rep_array(1,5);     // illegal
 
 x <- y;                  // illegal
 y <- x;                  // illegal
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 If the value being repeated \code{v} is a vector (i.e., \code{T} is
 \code{vector}), then \code{rep\_array(v,27)} is a size 27 array
 consisting of 27 copies of the vector \code{v}.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 vector[5] v;
 vector[5] a[3];
-...
+// ...
 a <- rep_array(v,3);  // fill a with copies of v
 a[2,4] <- 9.0;        // v[4], a[1,4], a[2,4] unchanged
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 If the type \farg{T} of \farg{x} is itself an array type, then the
 result will be an array with one, two, or three added dimensions,
 depending on which of the \code{rep\_array} functions is called.  For
 instance, consider the following legal code snippet.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 real a[5,6];
 real b[3,4,5,6];
-...
+// ...
 b <- rep_array(a,3,4); //  make (3 x 4) copies of a
 b[1,1,1,1] <- 27.9;    //  a[1,1] unchanged
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 After the assignment to \code{b}, the value for \code{b[j,k,m,n]} is
 equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
@@ -1892,13 +1951,13 @@ postfix operations.  This section lists the operations supported by
 \begin{description}
 %
 \fitem{vector}{operator-}{vector \farg{x}}{The negation of the vector
-\farg{x}}
+\farg{x}.}
 %
 \fitem{row\_vector}{operator-}{row\_vector \farg{x}}{The negation of the row
-vector \farg{x}}
+vector \farg{x}.}
 %
 \fitem{matrix}{operator-}{matrix \farg{x}}{The negation of the matrix
-  \farg{x}}
+  \farg{x}.}
 %
 \end{description}
 
@@ -1908,10 +1967,10 @@ vector \farg{x}}
 \begin{description}
 %
 \fitem{vector}{operator+}{vector \farg{x}, vector \farg{y}}{The sum of
-the vectors \farg{x} and \farg{y}}
+the vectors \farg{x} and \farg{y}.}
 %
 \fitem{row\_vector}{operator+}{row\_vector \farg{x}, row\_vector \farg{y}}{The sum of
-the row vectors \farg{x} and \farg{y}}
+the row vectors \farg{x} and \farg{y}.}
 %
 \fitem{matrix}{operator+}{matrix \farg{x}, matrix \farg{y}}{The sum of
 the matrices \farg{x} and \farg{y}}
@@ -1920,7 +1979,7 @@ the matrices \farg{x} and \farg{y}}
 \vspace*{-4pt}
 \begin{description}
 \fitem{vector}{operator-}{vector \farg{x}, vector \farg{y}}{The difference between
-the vectors \farg{x} and \farg{y}}
+the vectors \farg{x} and \farg{y}.}
 %
 \fitem{row\_vector}{operator-}{row\_vector \farg{x}, row\_vector \farg{y}}{The
   difference between the row vectors \farg{x} and \farg{y}}
@@ -2032,7 +2091,7 @@ dividing each entry in the matrix \farg{x} by \farg{y}}
 %
 \end{description}
 
-\subsection{Elementwise Products}
+\subsection{Elementwise Arithmetic Operations}
 
 \begin{description}
 %
@@ -2077,7 +2136,28 @@ elementwise quotient of \farg{y} and \farg{x}}
 \end{description}
 \vspace*{-4pt}
 
-\subsection{Elementwise Logarithms}
+\section{Transposition Operator}
+
+Matrix transposition is represented using a postfix operator.
+
+\begin{description}
+%
+\fitem{matrix}{operator'}{matrix \farg{x}}{The transpose of the matrix
+ \farg{x}, written as \code{x'}}
+%
+\fitem{row\_vector}{operator'}{vector \farg{x}}{The transpose of the vector
+ \farg{x}, written as \code{x'}}
+%
+\fitem{vector}{operator'}{row\_vector \farg{x}}{The transpose of the row vector
+ \farg{x}, written as \code{x'}}
+%
+\end{description}
+
+
+\section{Elementwise Functions}
+
+Elementwise functions apply a function to each element of a vector or
+matrix, returning a result of the same shape as the argument.
 
 \begin{description}
 %
@@ -2101,31 +2181,9 @@ The elementwise exponential of \farg{x}}
 \end{description}
 
 
-\subsection{Cumulative Sums}
-
-The cumulative sum of a sequence $x_1,\ldots,x_N$ is the 
-sequence $y_1,\ldots,y_N$, where 
-%
-\[
-y_n = \sum_{m = 1}^{n} x_n.
-\]
-
-\begin{description}
-%
-\fitem{real[]}{cumulative\_sum}{real[] \farg{x}}{
-The cumulative sum of \farg{x}}
-%
-\fitem{vector}{cumulative\_sum}{vector \farg{v}}{
-The cumulative sum of \farg{v}}
-%
-\fitem{row\_vector}{cumulative\_sum}{row\_vector \farg{rv}}{
-The cumulative sum of \farg{rv}}
-%
-\end{description}
 
 
-
-\subsection{Dot Products}
+\section{Dot Products and Specialized Products}
 
 \begin{description}
 %
@@ -2279,6 +2337,9 @@ matrices.  The input matrix does not need to be square.}
 \end{description}
 
 
+
+
+
 \section{Reductions}
 
 \subsection{Log Sum of Exponents}
@@ -2392,7 +2453,7 @@ see \refsection{array-reductions} for details.}%
 \end{description}
 
 
-\section{Broadcast Functions}
+\section{Broadcast Functions}\label{matrix-broadcast.section}
 
 The following broadcast functions allow vectors, row vectors and
 matrices to be created by copying a single element into all of their
@@ -2429,20 +2490,17 @@ distinction between integer and real arguments, the following two
 statements produce the same result for vector broadcasting;  row vector
 and matrix broadcasting behave similarly.
 %
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{stancode}
 vector[3] x;
 x <- rep_vector(1, 3);
 x <- rep_vector(1.0, 3);  
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 There are no integer vector or matrix types, so integer values are
 automatically promoted.
 
-\section{Slice and Package Functions}
 
-\subsection{Diagonal Matrices}
+\section{Diagonal Matrix Functions}
 
 \begin{description}
 %
@@ -2453,6 +2511,13 @@ of the matrix \farg{x}}
 matrix with diagonal \farg{x}}
 %
 \end{description}
+
+
+
+\section{Slicing and Blocking Functions}
+
+Stan provides several functions for generating slices or blocks or
+diagonal entries for matrices.
 
 \subsection{Columns and Rows}
 
@@ -2520,7 +2585,7 @@ arbitrary subvector.
     \farg{rv}.}
 %
   \fitem{T[]}{head}{T[] \farg{sv}, int \farg{n}}{Return
-    the standard vector consisting of the first \farg{n} elements of
+    the array consisting of the first \farg{n} elements of
     \farg{sv}; applies to up to three-dimensional arrays containing
     any type of elements \code{T}.}
 %
@@ -2532,7 +2597,7 @@ arbitrary subvector.
     \farg{rv}.}
 %
   \fitem{T[]}{tail}{T[] \farg{sv}, int \farg{n}}{Return
-    the standard vector consisting of the last \farg{n} elements of
+    the array consisting of the last \farg{n} elements of
     \farg{sv}; applies to up to three-dimensional arrays containing
     any type of elements \code{T}.}
 %
@@ -2547,7 +2612,7 @@ arbitrary subvector.
     \farg{i} through through \farg{i} + \farg{n} - 1.}
 %
   \fitem{T[]}{segment}{T[] \farg{sv}, int \farg{i}, int
-    \farg{n}}{Return the standard vector consisting of the \farg{n}
+    \farg{n}}{Return the array consisting of the \farg{n}
     elements of \farg{sv} starting at \farg{i}; i.e., elements
     \farg{i} through through \farg{i} + \farg{n} - 1. Applies to up to
     three-dimensional arrays containing any type of elements
@@ -2556,21 +2621,44 @@ arbitrary subvector.
 \end{description}
 
 
-\subsection{Concatenation Operations}
+\section{Matrix Concatenation}\label{matrix-concatenation.section}
+
+Stan's matrix concatenation operations \code{append\_col} and
+\code{append\_row} are like the operations \code{cbind} and
+\code{rbind} in R.%
+
+% THIS WAS REALLY HARD WORK FIGURING OUT HOW TO GET THESE IN, SO
+% I'M LEAVING THIS HERE IN CASE WE WANT THEM BACK AGAIN OR SOMETHING
+% LIKE THEM:
+%
+% \indexref{cbind}{{\tt\bfseries append\_col}}
+% \indexref{rbind}{{\tt\bfseries append\_row}}
+
+
 
 \subsubsection{Horizontal concatenation}
 
 \begin{description}
 %
-\fitem{matrix}{append\_col}{matrix \farg{x}, matrix \farg{y}}{Combine matrices \farg{x} and \farg{y} by columns. The matrices must have the same number of rows.}
+  \fitem{matrix}{append\_col}{matrix \farg{x}, matrix
+    \farg{y}}{Combine matrices \farg{x} and \farg{y} by columns. The
+    matrices must have the same number of rows.}
 %
-\fitem{matrix}{append\_col}{matrix \farg{x}, vector \farg{y}}{Combine matrix \farg{x} and vector \farg{y} by columns. The matrix and the vector must have the same number of rows.}
+\fitem{matrix}{append\_col}{matrix \farg{x}, vector \farg{y}}{Combine
+  matrix \farg{x} and vector \farg{y} by columns. The matrix and the
+  vector must have the same number of rows.}
 %
-\fitem{matrix}{append\_col}{vector \farg{x}, matrix \farg{y}}{Combine vector \farg{x} and matrix \farg{y} by columns. The vector and the matrix must have the same number of rows.}
+\fitem{matrix}{append\_col}{vector \farg{x}, matrix \farg{y}}{Combine
+  vector \farg{x} and matrix \farg{y} by columns. The vector and the
+  matrix must have the same number of rows.}
 %
-\fitem{matrix}{append\_col}{vector \farg{x}, vector \farg{y}}{Combine vectors \farg{x} and \farg{y} by columns. The vectors must have the same number of rows.}
+\fitem{matrix}{append\_col}{vector \farg{x}, vector \farg{y}}{Combine
+  vectors \farg{x} and \farg{y} by columns. The vectors must have the
+  same number of rows.}
 %
-\fitem{row\_vector}{append\_col}{row\_vector \farg{x}, row\_vector \farg{y}}{Combine row vectors \farg{x} and \farg{y} of any size into another row vector.}
+\fitem{row\_vector}{append\_col}{row\_vector \farg{x}, row\_vector
+  \farg{y}}{Combine row vectors \farg{x} and \farg{y} of any size into
+  another row vector.}
 %
 \end{description}
 
@@ -2578,37 +2666,45 @@ arbitrary subvector.
 
 \begin{description}
 %
-\fitem{matrix}{append\_row}{matrix \farg{x}, matrix \farg{y}}{Combine matrices \farg{x} and \farg{y} by columns. The matrices must have the same number of rows.}
+  \fitem{matrix}{append\_row}{matrix \farg{x}, matrix
+    \farg{y}}{Combine matrices \farg{x} and \farg{y} by rows. The
+    matrices must have the same number of columns.}
 %
-\fitem{matrix}{append\_row}{matrix \farg{x}, row\_vector \farg{y}}{Combine matrix \farg{x} and row vector \farg{y} by columns. The matrix and the row vector must have the same number of rows.}
+  \fitem{matrix}{append\_row}{matrix \farg{x}, row\_vector
+    \farg{y}}{Combine matrix \farg{x} and row vector \farg{y} by
+    rows. The matrix and the row vector must have the same number
+    of columns.}
 %
-\fitem{matrix}{append\_row}{row\_vector \farg{x}, matrix \farg{y}}{Combine row vector \farg{x} and matrix \farg{y} by columns. The row vector and the matrix must have the same number of rows.}
+  \fitem{matrix}{append\_row}{row\_vector \farg{x}, matrix
+    \farg{y}}{Combine row vector \farg{x} and matrix \farg{y} by
+    rows. The row vector and the matrix must have the same number
+    of columns.}
 %
-\fitem{matrix}{append\_row}{row\_vector \farg{x}, row\_vector \farg{y}}{Combine row vectors \farg{x} and \farg{y} by columns. The row vectors must have the same number of rows.}
+  \fitem{matrix}{append\_row}{row\_vector \farg{x}, row\_vector
+    \farg{y}}{Combine row vectors \farg{x} and \farg{y} by row. The
+    row vectors must have the same number of columns.}
 %
-\fitem{vector}{append\_row}{vector \farg{x}, vector \farg{y}}{Combine vectors \farg{x} and \farg{y} of any size into another vector.}
+  \fitem{vector}{append\_row}{vector \farg{x}, vector
+    \farg{y}}{Concatenate vectors \farg{x} and \farg{y} of any size into
+    another vector.}
 %
 \end{description}
 
-\subsection{Transposition Postfix Operator}
 
-\begin{description}
-%
-\fitem{matrix}{operator'}{matrix \farg{x}}{The transpose of the matrix
- \farg{x}, written as \code{x'}}
-%
-\fitem{row\_vector}{operator'}{vector \farg{x}}{The transpose of the vector
- \farg{x}, written as \code{x'}}
-%
-\fitem{vector}{operator'}{row\_vector \farg{x}}{The transpose of the row vector
- \farg{x}, written as \code{x'}}
-%
-\end{description}
 
 
 \section{Special Matrix Functions}\label{softmax.section}
 
-The softmax function maps $y \in \reals^K$ to the $K$-simplex by
+\subsection{Softmax}
+
+The softmax function%
+%
+\footnote{The softmax function is so called because in the limit as
+  $y_n \rightarrow \infty$ with $y_m$ for $m \neq n$ held constant,
+  the result tends toward the ``one-hot'' vector $\theta$ with
+  $\theta_n = 1$ and $\theta_m = 0$ for $m \neq n$, thus providing a
+  ``soft'' version of the maximum function.}  
+maps $y \in \reals^K$ to the $K$-simplex by
 \[
 \mbox{softmax}(y)
  = \frac{\exp(y)}
@@ -2618,12 +2714,17 @@ The softmax function maps $y \in \reals^K$ to the $K$-simplex by
 where $\exp(y)$ is the componentwise exponentiation of $y$.
 %
 Softmax is usually calculated on the log scale, 
-\[
-\log \mbox{softmax}(y)
- \ = \ y - \log \sum_{k=1}^K \exp(y_k)
- \ = \ y - \mbox{log\_sum\_exp}(y).
-\]
 %
+\begin{eqnarray*}
+\log \mbox{softmax}(y)
+& = & \ y - \log \sum_{k=1}^K \exp(y_k)
+\\[4pt]
+& = & y - \mbox{log\_sum\_exp}(y).
+\end{eqnarray*}
+%
+where the vector $y$ minus the scalar $\mbox{log\_sum\_exp}(y)$
+subtracts the scalar from each component of $y$.
+
 Stan provides the following functions for softmax and its log.
 %
 \begin{description}
@@ -2634,6 +2735,29 @@ The softmax of \farg{x}}
 The natural logarithm of the softmax of \farg{x}}
 \end{description}
 %
+
+\subsection{Cumulative Sums}
+
+The cumulative sum of a sequence $x_1,\ldots,x_N$ is the 
+sequence $y_1,\ldots,y_N$, where 
+%
+\[
+y_n = \sum_{m = 1}^{n} x_n.
+\]
+
+\begin{description}
+%
+\fitem{real[]}{cumulative\_sum}{real[] \farg{x}}{
+The cumulative sum of \farg{x}}
+%
+\fitem{vector}{cumulative\_sum}{vector \farg{v}}{
+The cumulative sum of \farg{v}}
+%
+\fitem{row\_vector}{cumulative\_sum}{row\_vector \farg{rv}}{
+The cumulative sum of \farg{rv}}
+%
+\end{description}
+
 
 
 

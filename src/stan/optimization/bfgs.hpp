@@ -1,5 +1,5 @@
-#ifndef STAN__OPTIMIZATION__BFGS_HPP
-#define STAN__OPTIMIZATION__BFGS_HPP
+#ifndef STAN_OPTIMIZATION_BFGS_HPP
+#define STAN_OPTIMIZATION_BFGS_HPP
 
 #include <cmath>
 #include <cstdlib>
@@ -8,8 +8,8 @@
 
 #include <boost/math/special_functions/fpclassify.hpp>
 
-#include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/meta/index_type.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/model/util.hpp>
 
 #include <stan/optimization/bfgs_linesearch.hpp>

@@ -113,8 +113,7 @@ just the square root of the average squared residual,
 The squared error approach to linear regression can be directly coded
 in Stan with the following model.
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
   int<lower=0> N;
   int<lower=1> K;
@@ -135,8 +134,7 @@ generated quantities {
   real<lower=0> sigma_squared;
   sigma_squared <- squared_error / N;
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 Running Stan's optimizer on this model produces the MLE for the linear
 regression by directly minimizing the sum of squared errors and using
@@ -224,19 +222,17 @@ maximum likelihood estimate.
 In Stan, adding the ridge penalty involves adding its magnitude as a
 data variable and the penalty itself to the model block,
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
-  ...
+  // ...
   real<lower=0> lambda;
 }
-...
+// ...
 model {
-  ...
+  // ...
   increment_log_prob(- lambda * dot_self(beta));
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The noise term calculation remains the same.
 
@@ -259,38 +255,38 @@ the $\beta_k$,
 \]
 it has the effect of shrinking parameters all the way to 0 in maximum
 likelihood estimates.  Thus it can be used for variable selection as
-well as just shrinkage.
-
-But there is one drawback.  Stan's optimizers are not set up to deal
-with the absolute value in the formula, so they are unlikely to drive
-estimates all the way to 0.  
-
+well as just shrinkage.%
+%
+\footnote{In practice, Stan's gradient-based optimizers are not
+  guaranteed to produce exact zero values; see
+  \cite{LangfordEtAl:2009} for a discussion of getting exactly zero
+  values with gradient descent.}
+%
 The lasso can be implemented in Stan just as easily as ridge
 regression, with the magnitude declared as data and the penalty added
 to the model block,
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
-  ...
+  // ...
   real<lower=0> lambda;
 }
-...
+// ...
 model {
-  ...
+  // ...
   for (k in 1:K)
     increment_log_prob(- lambda * abs(beta[k]));
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 
 \subsubsection{The Elastic Net}
 
 The naive elastic net \citep{ZouHastie:2005} involves a weighted
 average of ridge and lasso penalties, with a penalty function
 \[
-r(\beta) = \lambda_1 \sum_{k=1}^K \beta_k^2 + \lambda_2 \sum_{k=1}^K
-|\beta_k|.
+r(\beta)
+= \lambda_1 \sum_{k=1}^K |\beta_k|
++ \lambda_2 \sum_{k=1}^K \beta_k^2.
 \]
 The naive elastic net combines properties of both ridge regression and
 the lasso, providing both identification and variable selection.
@@ -298,23 +294,23 @@ the lasso, providing both identification and variable selection.
 The naive elastic net can be implemented directly in Stan by combining
 implementations of ridge regression and the lasso, as
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 data {
   real<lower=0> lambda1;
   real<lower=0> lambda2;
-  ...
+  // ...
 }
-...
+// ...
 model {
-  ...
-  increment_log_prob(lambda2 * dot_self(beta));
+  // ...
   for (k in 1:K)
-    increment_log_prob(lambda1 * abs(beta[k]));
+    increment_log_prob(-lambda1 * fabs(beta[k]));
+  increment_log_prob(-lambda2 * dot_self(beta));
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
+Note that the signs are negative in the program because $r(\beta)$ is
+a penalty function.
 
 The elastic net \citep{ZouHastie:2005} involves adjusting the final estimate for
 $\beta$ based on the fit $\hat{\beta}$ produced by the naive elastic
@@ -328,15 +324,13 @@ To implement the elastic net in Stan, the data, parameter, and model
 blocks are the same as for the naive elastic net.  In addition, the
 elastic net estimate is calculated in the generated quantities block.
 %
-\begin{quote}
-\begin{Verbatim}
+\begin{stancode}
 generated quantities {
   vector[K] beta_elastic_net;
-  ...
+  // ...
   beta_elastic_net <- (1 + lambda2) * beta;
 }
-\end{Verbatim}
-\end{quote}
+\end{stancode}
 %
 The error scale also needs to be calculated in the generated
 quantities block based on the elastic net coefficients
@@ -855,7 +849,7 @@ described in \refchapter{hmc}.
 
 The Markov chains \Stan and other \MCMC samplers generate are ergodic
 in the sense required by the Markov chain central limit theorem,
-meaning roughly that there is there is a reasonable chance of reaching
+meaning roughly that there is a reasonable chance of reaching
 one value of $\theta$ from another.  The Markov chains are also
 stationary, meaning that the transition probabilities do not change at
 different positions in the chain, so that for $n, n' \geq 0$, the
@@ -1127,7 +1121,14 @@ and can apply the standard tests.
 The second technical difficulty posed by \MCMC methods is that the
 samples will typically be autocorrelated within a chain.  This
 increases the uncertainty of the estimation of posterior quantities of
-interest, such as means, variances or quantiles.
+interest, such as means, variances or quantiles.  
+
+A nice introductory reference for analyzing MCMC results in general
+and effective sample size in particular is \citep{Geyer:2011}.  The
+particular calculations used by Stan follow those for split-$\hat{R}$,
+which involve both cross-chain (mean) and within-chain calculations
+(autocorrelation); they were introduced in this manual and explained
+in more detail in \citep{GelmanEtAl:2013}.
 
 \subsection{Definition of Effective Sample Size}
 
@@ -1195,7 +1196,7 @@ V_t =
 \sum_{m=1}^M 
 \
 \left(
-\frac{1}{N_m}
+\frac{1}{N_m - t}
 \sum_{n=t+1}^{N_m}
 \left(
 \theta_m^{(n)} - \theta_m^{(n-t)}
@@ -1218,8 +1219,9 @@ effective sample size.
 
 Because of the noise in the correlation estimates $\hat{\rho}_t$ as $t$
 increases, typically only the initial estimates of $\hat{\rho}_t$
-where $\hat{\rho}_t < 0$ will be used.  Setting $T'$ to be the
+where $\hat{\rho}_t > 0$ will be used.  Setting $T'$ to be the
 first lag such that $\rho_{T' + 1} < 0$, 
+%
 \[
 T' = \arg\min_t \ \hat{\rho}_{t+1} < 0,
 \]
@@ -1230,6 +1232,21 @@ the effective sample size estimator is defined as
 \frac{MN}
      {1 + \sum_{t=1}^{T'} \hat{\rho}_t}.
 \]
+%
+Exact autocorrelations can happen only on odd lags \citep{Geyer:2011}.
+By summing over pairs, the paired autocorrelation is guaranteed to be
+positive modulo estimator noise.  This is the motivation behind the
+many termination criterion of \cite{Geyer:2011}. Stan does not (yet)
+do the paired expectations because NUTS almost by construction avoids
+the negative autocorrelation regime.  Thus terminating at the first
+negative autocorrelation is a reasonable approximation for stopping
+when the noise in the autocorrelation estimator dominates.
+
+Stan carries out the autocorrelation computations for all lags
+simultaneously using Eigen's fast Fourier transform (FFT) package with
+appropriate padding; see \citep{Geyer:2011} for more detail on using
+FFT for autocorrelation calculations.
+
 
 \subsection{Thinning Samples}
 

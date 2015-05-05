@@ -20,6 +20,7 @@
 % \usepackage{index}
 % \newindex{funs}{fdx}{fns}{Functions}
 
+\usepackage[T1]{fontenc} % needed for |
 \usepackage{amsmath}
 \usepackage{xspace}
 \usepackage{fancyvrb}
@@ -76,7 +77,7 @@
 
 \newcommand{\Stan}{Stan\xspace}
 \newcommand{\stanc}{{\ttfamily stanc}\xspace}
-\newcommand*{\Cpp}{C\raise.2ex\hbox{\footnotesize ++}\xspace} %\ensuremath{++}
+\newcommand*{\Cpp}{C\raise.15ex\hbox{\footnotesize ++}\xspace} %\ensuremath{++}
 \newcommand{\clang}{{\ttfamily clang\raise.2ex\hbox{\footnotesize ++}}\xspace} 
 \newcommand{\gpp}{{\ttfamily g\raise.2ex\hbox{\footnotesize ++}}\xspace} 
 
@@ -142,6 +143,8 @@
   \\[2pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt
       (#3):\,#1}|hyperpage}}
 
+\newcommand{\indexref}[2]{\index{{\tt\bfseries #1}@{\tt #1}|see {#2}}}
+
 \newcommand{\farg}[1]{{\tt\slshape #1}}
 
 \newcommand{\pitem}[3]{\subsubsection{Sampling Statement}
@@ -185,6 +188,10 @@
 \renewcommand{\bottomfraction}{0.8}
 \renewcommand{\floatpagefraction}{0.75}
 \renewcommand{\textfraction}{0.07}
+
+
+% environment for Stan code
+\DefineVerbatimEnvironment{stancode}{Verbatim}{fontsize=\small,xleftmargin=2em}
 
 \raggedbottom
 

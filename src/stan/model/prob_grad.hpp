@@ -1,5 +1,5 @@
-#ifndef STAN__MODEL__PROB_GRAD_HPP
-#define STAN__MODEL__PROB_GRAD_HPP
+#ifndef STAN_MODEL_PROB_GRAD_HPP
+#define STAN_MODEL_PROB_GRAD_HPP
 
 #include <utility>
 #include <vector>

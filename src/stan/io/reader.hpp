@@ -1,8 +1,11 @@
-#ifndef STAN__IO__READER_HPP
-#define STAN__IO__READER_HPP
+#ifndef STAN_IO_READER_HPP
+#define STAN_IO_READER_HPP
 
 #include <boost/throw_exception.hpp>
-#include <stan/prob/transform.hpp>
+#include <stan/math/prim/arr.hpp>
+#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/scal.hpp>
+#include <vector>
 
 namespace stan {
 
@@ -32,18 +35,16 @@ namespace stan {
      */
     template <typename T>
     class reader {
-
     private:
-
       std::vector<T>& data_r_;
       std::vector<int>& data_i_;
       size_t pos_;
       size_t int_pos_;
-      
+
       inline T& scalar_ptr() {
         return data_r_.at(pos_);
       }
-      
+
       inline T& scalar_ptr_increment(size_t m) {
         pos_ += m;
         return data_r_.at(pos_ - m);
@@ -52,17 +53,16 @@ namespace stan {
       inline int& int_ptr() {
         return data_i_.at(int_pos_);
       }
-      
+
       inline int& int_ptr_increment(size_t m) {
         int_pos_ += m;
         return data_i_.at(int_pos_ - m);
       }
 
     public:
-
-      typedef Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> matrix_t;
-      typedef Eigen::Matrix<T,Eigen::Dynamic,1> vector_t;
-      typedef Eigen::Matrix<T,1,Eigen::Dynamic> row_vector_t;
+      typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
+      typedef Eigen::Matrix<T, Eigen::Dynamic, 1> vector_t;
+      typedef Eigen::Matrix<T, 1, Eigen::Dynamic> row_vector_t;
 
       typedef Eigen::Map<matrix_t> map_matrix_t;
       typedef Eigen::Map<vector_t> map_vector_t;
@@ -89,7 +89,7 @@ namespace stan {
       }
 
       /**
-       * Destroy this variable reader.  
+       * Destroy this variable reader.
        */
       ~reader() { }
 
@@ -133,7 +133,7 @@ namespace stan {
       inline int integer_constrain() {
         return integer();
       }
-      
+
       /**
        * Return the next integer in the integer sequence.
        * This form is a convenience method to make compiling
@@ -144,7 +144,7 @@ namespace stan {
       inline int integer_constrain(T& /*log_prob*/) {
         return integer();
       }
-      
+
 
 
       /**
@@ -171,10 +171,10 @@ namespace stan {
       /**
        * Return the next scalar in the sequence, incrementing
        * the specified reference with the log absolute Jacobian determinant.
-       * 
+       *
        * <p>With no transformation, the Jacobian increment is a no-op.
-       * 
-       * <p>See <code>scalar_constrain()</code>.  
+       *
+       * <p>See <code>scalar_constrain()</code>.
        *
        * log_prob Reference to log probability variable to increment.
        * @return Next scalar.
@@ -206,7 +206,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline vector_t vector(size_t m) {
-        return map_vector_t(&scalar_ptr_increment(m),m);
+        return map_vector_t(&scalar_ptr_increment(m), m);
       }
       /**
        * Return a column vector of specified dimensionality made up of
@@ -216,7 +216,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline vector_t vector_constrain(size_t m) {
-        return map_vector_t(&scalar_ptr_increment(m),m);
+        return map_vector_t(&scalar_ptr_increment(m), m);
       }
       /**
        * Return a column vector of specified dimensionality made up of
@@ -227,7 +227,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline vector_t vector_constrain(size_t m, T& /*lp*/) {
-        return map_vector_t(&scalar_ptr_increment(m),m);
+        return map_vector_t(&scalar_ptr_increment(m), m);
       }
 
 
@@ -240,7 +240,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline row_vector_t row_vector(size_t m) {
-        return map_row_vector_t(&scalar_ptr_increment(m),m);
+        return map_row_vector_t(&scalar_ptr_increment(m), m);
       }
 
       /**
@@ -251,7 +251,7 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline row_vector_t row_vector_constrain(size_t m) {
-        return map_row_vector_t(&scalar_ptr_increment(m),m);
+        return map_row_vector_t(&scalar_ptr_increment(m), m);
       }
 
       /**
@@ -264,28 +264,28 @@ namespace stan {
        * @return Column vector made up of the next scalars.
        */
       inline row_vector_t row_vector_constrain(size_t m, T& /*lp*/) {
-        return map_row_vector_t(&scalar_ptr_increment(m),m);
+        return map_row_vector_t(&scalar_ptr_increment(m), m);
       }
-      
+
       /**
        * Return a matrix of the specified dimensionality made up of
        * the next scalars arranged in column-major order.
        *
        * Row-major reading means that if a matrix of <code>m=2</code>
        * rows and <code>n=3</code> columns is reada and the next
-       * scalar values are <code>1,2,3,4,5,6</code>, the result is 
+       * scalar values are <code>1,2,3,4,5,6</code>, the result is
        *
-       * <pre> 
+       * <pre>
        * a = 1 4
        *     2 5
        *     3 6</pre>
        *
-       * @param m Number of rows.  
+       * @param m Number of rows.
        * @param n Number of columns.
        * @return Eigen::Matrix made up of the next scalars.
        */
       inline matrix_t matrix(size_t m, size_t n) {
-        return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
+        return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 
       /**
@@ -294,12 +294,12 @@ namespace stan {
        * constraint is a no-op.  See <code>matrix(size_t,
        * size_t)</code> for more information.
        *
-       * @param m Number of rows.  
+       * @param m Number of rows.
        * @param n Number of columns.
        * @return Matrix made up of the next scalars.
        */
       inline matrix_t matrix_constrain(size_t m, size_t n) {
-        return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
+        return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 
       /**
@@ -309,13 +309,13 @@ namespace stan {
        * incremented.  See <code>matrix(size_t, size_t)</code>
        * for more information.
        *
-       * @param m Number of rows.  
+       * @param m Number of rows.
        * @param n Number of columns.
        * lp Log probability to increment.
        * @return Matrix made up of the next scalars.
        */
       inline matrix_t matrix_constrain(size_t m, size_t n, T& /*lp*/) {
-        return map_matrix_t(&scalar_ptr_increment(m*n),m,n);
+        return map_matrix_t(&scalar_ptr_increment(m*n), m, n);
       }
 
 
@@ -338,7 +338,7 @@ namespace stan {
       /**
        * Return the next integer, checking that it is greater than
        * or equal to the specified lower bound.
-       * 
+       *
        * @param lb Lower bound.
        * @return Next integer read.
        * @throw std::runtime_error If the next integer read is not
@@ -350,7 +350,7 @@ namespace stan {
       /**
        * Return the next integer, checking that it is greater than
        * or equal to the specified lower bound.
-       * 
+       *
        * @param lb Lower bound.
        * lp Log probability (ignored because no Jacobian)
        * @return Next integer read.
@@ -381,7 +381,7 @@ namespace stan {
       /**
        * Return the next integer, checking that it is less than
        * or equal to the specified upper bound.
-       * 
+       *
        * @param ub Upper bound.
        * @return Next integer read.
        * @throw std::runtime_error If the next integer read is not
@@ -393,7 +393,7 @@ namespace stan {
       /**
        * Return the next integer, checking that it is less than
        * or equal to the specified upper bound.
-       * 
+       *
        * @param ub Upper bound.
        * lp Log probability (ignored because no Jacobian)
        * @return Next integer read.
@@ -418,7 +418,7 @@ namespace stan {
        */
       inline int integer_lub(int lb, int ub) {
         // read first to make position deterministic [arbitrary choice]
-        int i = integer(); 
+        int i = integer();
         if (lb > ub)
           BOOST_THROW_EXCEPTION(
             std::runtime_error("lower bound must be less than or equal to ub"));
@@ -433,7 +433,7 @@ namespace stan {
       /**
        * Return the next integer, checking that it is less than
        * or equal to the specified upper bound.
-       * 
+       *
        * @param lb Lower bound.
        * @param ub Upper bound.
        * @return Next integer read.
@@ -441,12 +441,12 @@ namespace stan {
        * less than or equal to the upper bound.
        */
       inline int integer_lub_constrain(int lb, int ub) {
-        return integer_lub(lb,ub);
+        return integer_lub(lb, ub);
       }
       /**
        * Return the next integer, checking that it is less than
        * or equal to the specified upper bound.
-       * 
+       *
        * @param lb Lower bound.
        * @param ub Upper bound.
        * lp Log probability (ignored because no Jacobian)
@@ -455,24 +455,24 @@ namespace stan {
        * less than or equal to the upper bound.
        */
       inline int integer_lub_constrain(int lb, int ub, T& /*lp*/) {
-        return integer_lub(lb,ub);
+        return integer_lub(lb, ub);
       }
-      
+
 
 
       /**
        * Return the next scalar, checking that it is
-       * positive.  
+       * positive.
        *
-       * <p>See <code>stan::error_handling::check_positive(T)</code>.
+       * <p>See <code>stan::math::check_positive(T)</code>.
        *
        * @return Next positive scalar.
        * @throw std::runtime_error if x is not positive
        */
       inline T scalar_pos() {
         T x(scalar());
-        stan::error_handling::check_positive("stan::io::scalar_pos(%1%)", x, 
-                                   "Constrained scalar", (double*)0);
+        stan::math::check_positive("stan::io::scalar_pos",
+                                   "Constrained scalar", x);
         return x;
       }
 
@@ -493,19 +493,19 @@ namespace stan {
        * determinant of the Jacobian.
        *
        * <p>See <code>stan::prob::positive_constrain(T,T&)</code>.
-       * 
+       *
        * @param lp Reference to log probability variable to increment.
        * @return The next scalar transformed to be positive.
        */
       inline T scalar_pos_constrain(T& lp) {
-        return stan::prob::positive_constrain(scalar(),lp);
+        return stan::prob::positive_constrain(scalar(), lp);
       }
 
       /**
        * Return the next scalar, checking that it is
        * greater than or equal to the specified lower bound.
        *
-       * <p>See <code>stan::error_handling::check_greater_or_equal(T,double)</code>.
+       * <p>See <code>stan::math::check_greater_or_equal(T,double)</code>.
        *
        * @param lb Lower bound.
        * @return Next scalar value.
@@ -516,9 +516,8 @@ namespace stan {
       template <typename TL>
       inline T scalar_lb(const TL lb) {
         T x(scalar());
-        stan::error_handling::check_greater_or_equal("stan::io::scalar_lb(%1%)",
-                                           x, lb, "Constrained scalar", 
-                                           (double*)0);
+        stan::math::check_greater_or_equal("stan::io::scalar_lb",
+                                           "Constrained scalar", x, lb);
         return x;
       }
 
@@ -535,7 +534,7 @@ namespace stan {
        */
       template <typename TL>
       inline T scalar_lb_constrain(const TL lb) {
-        return stan::prob::lb_constrain(scalar(),lb);
+        return stan::prob::lb_constrain(scalar(), lb);
       }
 
       /**
@@ -551,7 +550,7 @@ namespace stan {
        */
       template <typename TL>
       inline T scalar_lb_constrain(const TL lb, T& lp) {
-        return stan::prob::lb_constrain(scalar(),lb,lp);
+        return stan::prob::lb_constrain(scalar(), lb, lp);
       }
 
 
@@ -560,7 +559,7 @@ namespace stan {
        * Return the next scalar, checking that it is
        * less than or equal to the specified upper bound.
        *
-       * <p>See <code>stan::error_handling::check_less_or_equal(T,double)</code>.
+       * <p>See <code>stan::math::check_less_or_equal(T,double)</code>.
        *
        * @tparam TU Type of upper bound.
        * @param ub Upper bound.
@@ -571,8 +570,8 @@ namespace stan {
       template <typename TU>
       inline T scalar_ub(TU ub) {
         T x(scalar());
-        stan::error_handling::check_less_or_equal("stan::io::scalar_ub(%1%)", x, ub, 
-                                        "Constrained scalar", (double*)0);
+        stan::math::check_less_or_equal("stan::io::scalar_ub",
+                                        "Constrained scalar", x, ub);
         return x;
       }
 
@@ -589,7 +588,7 @@ namespace stan {
        */
       template <typename TU>
       inline T scalar_ub_constrain(const TU ub) {
-        return stan::prob::ub_constrain(scalar(),ub);
+        return stan::prob::ub_constrain(scalar(), ub);
       }
 
       /**
@@ -605,14 +604,14 @@ namespace stan {
        */
       template <typename TU>
       inline T scalar_ub_constrain(const TU ub, T& lp) {
-        return stan::prob::ub_constrain(scalar(),ub,lp);
+        return stan::prob::ub_constrain(scalar(), ub, lp);
       }
 
       /**
        * Return the next scalar, checking that it is between
        * the specified lower and upper bound.
        *
-       * <p>See <code>stan::error_handling::check_bounded(T,double,double)</code>.
+       * <p>See <code>stan::math::check_bounded(T, double, double)</code>.
        *
        * @tparam TL Type of lower bound.
        * @tparam TU Type of upper bound.
@@ -625,8 +624,8 @@ namespace stan {
       template <typename TL, typename TU>
       inline T scalar_lub(const TL lb, const TU ub) {
         T x(scalar());
-        stan::error_handling::check_bounded<T,TL,TU,T>
-          ("stan::io::scalar_lub(%1%)", x, lb, ub, "Constrained scalar",0);
+        stan::math::check_bounded<T, TL, TU>
+          ("stan::io::scalar_lub", "Constrained scalar", x, lb, ub);
         return x;
       }
 
@@ -634,7 +633,7 @@ namespace stan {
        * Return the next scalar transformed to be between
        * the specified lower and upper bounds.
        *
-       * <p>See <code>stan::prob::lub_constrain(T,double,double)</code>.
+       * <p>See <code>stan::prob::lub_constrain(T, double, double)</code>.
        *
        * @tparam TL Type of lower bound.
        * @tparam TU Type of upper bound.
@@ -645,15 +644,15 @@ namespace stan {
        */
       template <typename TL, typename TU>
       inline T scalar_lub_constrain(const TL lb, const TU ub) {
-        return stan::prob::lub_constrain(scalar(),lb,ub);
+        return stan::prob::lub_constrain(scalar(), lb, ub);
       }
 
       /**
-       * Return the next scalar transformed to be between the 
+       * Return the next scalar transformed to be between the
        * the specified lower and upper bounds.
-       * 
-       * <p>See <code>stan::prob::lub_constrain(T,double,double,T&)</code>.
-       * 
+       *
+       * <p>See <code>stan::prob::lub_constrain(T, double, double, T&)</code>.
+       *
        * @param lb Lower bound.
        * @param ub Upper bound.
        * @param lp Reference to log probability variable to increment.
@@ -663,21 +662,21 @@ namespace stan {
        */
       template <typename TL, typename TU>
       inline T scalar_lub_constrain(TL lb, TU ub, T& lp) {
-        return stan::prob::lub_constrain(scalar(),lb,ub,lp);
+        return stan::prob::lub_constrain(scalar(), lb, ub, lp);
       }
 
       /**
        * Return the next scalar, checking that it is a valid value for
        * a probability, between 0 (inclusive) and 1 (inclusive).
        *
-       * <p>See <code>stan::error_handling::check_bounded(T)</code>.
-       * 
+       * <p>See <code>stan::math::check_bounded(T)</code>.
+       *
        * @return Next probability value.
        */
       inline T prob() {
         T x(scalar());
-        stan::error_handling::check_bounded<T,double,double,double>
-          ("stan::io::prob(%1%)", x, 0, 1, "Constrained probability", 0);
+        stan::math::check_bounded<T, double, double>
+          ("stan::io::prob", "Constrained probability", x, 0, 1);
         return x;
       }
 
@@ -697,14 +696,14 @@ namespace stan {
        * Return the next scalar transformed to be a probability
        * between 0 and 1, incrementing the specified reference with
        * the log of the absolute Jacobian determinant.
-       * 
+       *
        * <p>See <code>stan::prob::prob_constrain(T)</code>.
        *
        * @param lp Reference to log probability variable to increment.
        * @return The next scalar transformed to a probability.
        */
       inline T prob_constrain(T& lp) {
-        return stan::prob::prob_constrain(scalar(),lp);
+        return stan::prob::prob_constrain(scalar(), lp);
       }
 
 
@@ -715,7 +714,7 @@ namespace stan {
        * value for a correlation, between -1 (inclusive) and
        * 1 (inclusive).
        *
-       * <p>See <code>stan::error_handling::check_bounded(T)</code>.
+       * <p>See <code>stan::math::check_bounded(T)</code>.
        *
        * @return Next correlation value.
        * @throw std::runtime_error if the value is not valid
@@ -723,8 +722,8 @@ namespace stan {
        */
       inline T corr() {
         T x(scalar());
-        stan::error_handling::check_bounded<T,double,double,double>
-          ("stan::io::corr(%1%)", x, -1, 1, "Correlation value",0);
+        stan::math::check_bounded<T, double, double>
+          ("stan::io::corr", "Correlation value", x, -1, 1);
         return x;
       }
 
@@ -746,20 +745,20 @@ namespace stan {
        * reference with the log of the absolute Jacobian determinant.
        *
        * <p>See <code>stan::prob::corr_constrain(T,T&)</code>.
-       * 
+       *
        * @param lp The reference to the variable holding the log
        * probability to increment.
        * @return The next scalar transformed to a correlation.
        */
       inline T corr_constrain(T& lp) {
-        return stan::prob::corr_constrain(scalar(),lp);
+        return stan::prob::corr_constrain(scalar(), lp);
       }
 
       /**
        * Return a unit_vector of the specified size made up of the
-       * next scalars.  
+       * next scalars.
        *
-       * <p>See <code>stan::error_handling::check_unit_vector</code>.
+       * <p>See <code>stan::math::check_unit_vector</code>.
        *
        * @param k Size of returned unit_vector.
        * @return unit_vector read from the specified size number of scalars.
@@ -767,23 +766,23 @@ namespace stan {
        */
       inline vector_t unit_vector(size_t k) {
         vector_t theta(vector(k));
-        stan::error_handling::check_unit_vector("stan::io::unit_vector(%1%)", theta, "Constrained vector",
-                                      (double*)0);
+        stan::math::check_unit_vector("stan::io::unit_vector",
+                                      "Constrained vector", theta);
         return theta;
       }
 
       /**
        * Return the next unit_vector transformed vector of the specified
        * length.  This operation consumes one less than the specified
-       * length number of scalars.  
+       * length number of scalars.
        *
        * <p>See <code>stan::prob::unit_vector_constrain(Eigen::Matrix)</code>.
        *
        * @param k Number of dimensions in resulting unit_vector.
        * @return unit_vector derived from next <code>k-1</code> scalars.
        */
-      inline 
-      Eigen::Matrix<T,Eigen::Dynamic,1> unit_vector_constrain(size_t k) {
+      inline
+      Eigen::Matrix<T, Eigen::Dynamic, 1> unit_vector_constrain(size_t k) {
         return stan::prob::unit_vector_constrain(vector(k-1));
       }
 
@@ -800,14 +799,14 @@ namespace stan {
        * @return The next unit_vector of the specified size.
        */
       inline vector_t unit_vector_constrain(size_t k, T& lp) {
-        return stan::prob::unit_vector_constrain(vector(k-1),lp);
+        return stan::prob::unit_vector_constrain(vector(k-1), lp);
       }
 
       /**
        * Return a simplex of the specified size made up of the
-       * next scalars.  
+       * next scalars.
        *
-       * <p>See <code>stan::error_handling::check_simplex</code>.
+       * <p>See <code>stan::math::check_simplex</code>.
        *
        * @param k Size of returned simplex.
        * @return Simplex read from the specified size number of scalars.
@@ -815,23 +814,23 @@ namespace stan {
        */
       inline vector_t simplex(size_t k) {
         vector_t theta(vector(k));
-        stan::error_handling::check_simplex("stan::io::simplex(%1%)", theta, "Constrained vector",
-                                  (double*)0);
+        stan::math::check_simplex("stan::io::simplex",
+                                  "Constrained vector", theta);
         return theta;
       }
 
       /**
        * Return the next simplex transformed vector of the specified
        * length.  This operation consumes one less than the specified
-       * length number of scalars.  
+       * length number of scalars.
        *
        * <p>See <code>stan::prob::simplex_constrain(Eigen::Matrix)</code>.
        *
        * @param k Number of dimensions in resulting simplex.
        * @return Simplex derived from next <code>k-1</code> scalars.
        */
-      inline 
-      Eigen::Matrix<T,Eigen::Dynamic,1> simplex_constrain(size_t k) {
+      inline
+      Eigen::Matrix<T, Eigen::Dynamic, 1> simplex_constrain(size_t k) {
         return stan::prob::simplex_constrain(vector(k-1));
       }
 
@@ -848,14 +847,14 @@ namespace stan {
        * @return The next simplex of the specified size.
        */
       inline vector_t simplex_constrain(size_t k, T& lp) {
-        return stan::prob::simplex_constrain(vector(k-1),lp);
+        return stan::prob::simplex_constrain(vector(k-1), lp);
       }
 
       /**
        * Return the next vector of specified size containing
-       * values in ascending order.  
+       * values in ascending order.
        *
-       * <p>See <code>stan::error_handling::check_ordered(T)</code> for
+       * <p>See <code>stan::math::check_ordered(T)</code> for
        * behavior on failure.
        *
        * @param k Size of returned vector.
@@ -863,7 +862,7 @@ namespace stan {
        */
       inline vector_t ordered(size_t k) {
         vector_t x(vector(k));
-        stan::error_handling::check_ordered("stan::io::ordered(%1%)", x, "Constrained vector");
+        stan::math::check_ordered("stan::io::ordered", "Constrained vector", x);
         return x;
       }
 
@@ -871,7 +870,7 @@ namespace stan {
        * Return the next ordered vector of the specified length.
        *
        * <p>See <code>stan::prob::ordered_constrain(Matrix)</code>.
-       * 
+       *
        * @param k Length of returned vector.
        * @return Next ordered vector of the specified
        * length.
@@ -892,14 +891,14 @@ namespace stan {
        * @return Next ordered vector of the specified size.
        */
       inline vector_t ordered_constrain(size_t k, T& lp) {
-        return stan::prob::ordered_constrain(vector(k),lp);
+        return stan::prob::ordered_constrain(vector(k), lp);
       }
 
       /**
        * Return the next vector of specified size containing
-       * positive values in ascending order.  
+       * positive values in ascending order.
        *
-       * <p>See <code>stan::error_handling::check_positive_ordered(T)</code> for
+       * <p>See <code>stan::math::check_positive_ordered(T)</code> for
        * behavior on failure.
        *
        * @param k Size of returned vector.
@@ -907,9 +906,8 @@ namespace stan {
        */
       inline vector_t positive_ordered(size_t k) {
         vector_t x(vector(k));
-        stan::error_handling::check_positive_ordered("stan::io::positive_ordered(%1%)", 
-                                           x, "Constrained vector",
-                                           (double*)0);
+        stan::math::check_positive_ordered("stan::io::positive_ordered",
+                                           "Constrained vector", x);
         return x;
       }
 
@@ -917,7 +915,7 @@ namespace stan {
        * Return the next positive ordered vector of the specified length.
        *
        * <p>See <code>stan::prob::positive_ordered_constrain(Matrix)</code>.
-       * 
+       *
        * @param k Length of returned vector.
        * @return Next positive_ordered vector of the specified
        * length.
@@ -938,7 +936,7 @@ namespace stan {
        * @return Next positive_ordered vector of the specified size.
        */
       inline vector_t positive_ordered_constrain(size_t k, T& lp) {
-        return stan::prob::positive_ordered_constrain(vector(k),lp);
+        return stan::prob::positive_ordered_constrain(vector(k), lp);
       }
 
 
@@ -954,10 +952,9 @@ namespace stan {
        * Cholesky factor.
        */
       inline matrix_t cholesky_factor(size_t M, size_t N) {
-        matrix_t y(matrix(M,N));
-        stan::error_handling::check_cholesky_factor("stan::io::cholesky_factor(%1%)", 
-                                          y, "Constrained matrix",
-                                          (double*)0);
+        matrix_t y(matrix(M, N));
+        stan::math::check_cholesky_factor("stan::io::cholesky_factor",
+                                          "Constrained matrix", y);
         return y;
       }
 
@@ -973,8 +970,8 @@ namespace stan {
        *    Cholesky factor.
        */
       inline matrix_t cholesky_factor_constrain(size_t M, size_t N) {
-        return stan::prob::cholesky_factor_constrain(vector((N * (N + 1)) / 2 + (M - N) * N),
-                                                     M,N);
+        return stan::prob::cholesky_factor_constrain
+          (vector((N * (N + 1)) / 2 + (M - N) * N), M, N);
       }
 
       /**
@@ -991,8 +988,8 @@ namespace stan {
        *    Cholesky factor.
        */
       inline matrix_t cholesky_factor_constrain(size_t M, size_t N, T& lp) {
-        return stan::prob::cholesky_factor_constrain(vector((N * (N + 1)) / 2 + (M - N) * N),
-                                                     M,N,lp);
+        return stan::prob::cholesky_factor_constrain
+          (vector((N * (N + 1)) / 2 + (M - N) * N), M, N, lp);
       }
 
 
@@ -1008,8 +1005,10 @@ namespace stan {
        * Cholesky factor for a correlation matrix.
        */
       inline matrix_t cholesky_corr(size_t K) {
-        matrix_t y(matrix(K,K));
-        stan::error_handling::check_cholesky_factor_corr("stan::io::cholesky_factor_corr(%1%)", y, "Constrained matrix");
+        using stan::math::check_cholesky_factor_corr;
+        matrix_t y(matrix(K, K));
+        check_cholesky_factor_corr("stan::io::cholesky_factor_corr",
+                                   "Constrained matrix", y);
         return y;
       }
 
@@ -1036,22 +1035,23 @@ namespace stan {
        * the transform.
        *
        * @param K Rows and columns of Cholesky factor
+       * @param lp Log probability reference to increment.
        * @return Next Cholesky factor for a correlation matrix.
        * @throw std::domain_error if the matrix is not a valid
        *    Cholesky factor for a correlation matrix.
        */
       inline matrix_t cholesky_corr_constrain(size_t K, T& lp) {
         return stan::prob::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
-                                                   K,lp);
+                                                   K, lp);
       }
 
 
 
       /**
-       * Return the next covariance matrix with the specified 
-       * dimensionality.  
+       * Return the next covariance matrix with the specified
+       * dimensionality.
        *
-       * <p>See <code>stan::error_handling::check_cov_matrix(Matrix)</code>.
+       * <p>See <code>stan::math::check_cov_matrix(Matrix)</code>.
        *
        * @param k Dimensionality of covariance matrix.
        * @return Next covariance matrix of the specified dimensionality.
@@ -1059,9 +1059,9 @@ namespace stan {
        *    covariance matrix
        */
       inline matrix_t cov_matrix(size_t k) {
-        matrix_t y(matrix(k,k));
-        stan::error_handling::check_cov_matrix("stan::io::cov_matrix(%1%)", y, "Constrained matrix",
-                                     (double*)0);
+        matrix_t y(matrix(k, k));
+        stan::math::check_cov_matrix("stan::io::cov_matrix",
+                                     "Constrained matrix", y);
         return y;
       }
 
@@ -1069,7 +1069,7 @@ namespace stan {
        * Return the next covariance matrix of the specified dimensionality.
        *
        * <p>See <code>stan::prob::cov_matrix_constrain(Matrix)</code>.
-       * 
+       *
        * @param k Dimensionality of covariance matrix.
        * @return Next covariance matrix of the specified dimensionality.
        */
@@ -1082,7 +1082,7 @@ namespace stan {
        * Return the next covariance matrix of the specified dimensionality,
        * incrementing the specified reference with the log absolute Jacobian
        * determinant.
-       * 
+       *
        * <p>See <code>stan::prob::cov_matrix_constrain(Matrix,T&)</code>.
        *
        * @param k Dimensionality of the (square) covariance matrix.
@@ -1091,24 +1091,23 @@ namespace stan {
        */
       inline matrix_t cov_matrix_constrain(size_t k, T& lp) {
         return stan::prob::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
-                                                k,lp);
+                                                k, lp);
       }
 
 
       /**
        * Returns the next correlation matrix of the specified dimensionality.
        *
-       * <p>See <code>stan::error_handling::check_corr_matrix(Matrix)</code>.
+       * <p>See <code>stan::math::check_corr_matrix(Matrix)</code>.
        *
        * @param k Dimensionality of correlation matrix.
        * @return Next correlation matrix of the specified dimensionality.
        * @throw std::runtime_error if the matrix is not a correlation matrix
        */
       inline matrix_t corr_matrix(size_t k) {
-        matrix_t x(matrix(k,k));
-        stan::error_handling::check_corr_matrix("stan::math::corr_matrix(%1%)", 
-                                      x, "Constrained matrix",
-                                      (double*)0);
+        matrix_t x(matrix(k, k));
+        stan::math::check_corr_matrix("stan::math::corr_matrix",
+                                      "Constrained matrix", x);
         return x;
       }
 
@@ -1121,14 +1120,14 @@ namespace stan {
        * @return Next correlation matrix of the specified dimensionality.
        */
       inline matrix_t corr_matrix_constrain(size_t k) {
-        return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),k);
+        return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2), k);
       }
 
       /**
        * Return the next correlation matrix of the specified dimensionality,
        * incrementing the specified reference with the log absolute Jacobian
        * determinant.
-       * 
+       *
        * <p>See <code>stan::prob::corr_matrix_constrain(Matrix,T&)</code>.
        *
        * @param k Dimensionality of the (square) correlation matrix.
@@ -1137,7 +1136,7 @@ namespace stan {
        */
       inline matrix_t corr_matrix_constrain(size_t k, T& lp) {
         return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),
-                                                 k,lp);
+                                                 k, lp);
       }
 
       template <typename TL>
@@ -1147,6 +1146,7 @@ namespace stan {
           v(i) = scalar_lb(lb);
         return v;
       }
+
       template <typename TL>
       inline vector_t vector_lb_constrain(const TL lb, size_t m) {
         vector_t v(m);
@@ -1154,11 +1154,12 @@ namespace stan {
           v(i) = scalar_lb_constrain(lb);
         return v;
       }
+
       template <typename TL>
       inline vector_t vector_lb_constrain(const TL lb, size_t m, T& lp) {
         vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_lb_constrain(lb,lp);
+          v(i) = scalar_lb_constrain(lb, lp);
         return v;
       }
 
@@ -1169,6 +1170,7 @@ namespace stan {
           v(i) = scalar_lb(lb);
         return v;
       }
+
       template <typename TL>
       inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m) {
         row_vector_t v(m);
@@ -1176,36 +1178,41 @@ namespace stan {
           v(i) = scalar_lb_constrain(lb);
         return v;
       }
+
       template <typename TL>
-      inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m, T& lp) {
+      inline row_vector_t
+      row_vector_lb_constrain(const TL lb, size_t m, T& lp) {
         row_vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_lb_constrain(lb,lp);
+          v(i) = scalar_lb_constrain(lb, lp);
         return v;
       }
 
       template <typename TL>
       inline matrix_t matrix_lb(const TL lb, size_t m, size_t n) {
-        matrix_t v(m,n);
+        matrix_t v(m, n);
         for (size_t j  = 0; j < n; ++j)
           for (size_t i = 0; i < m; ++i)
-            v(i,j) = scalar_lb(lb);
+            v(i, j) = scalar_lb(lb);
         return v;
       }
+
       template <typename TL>
       inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n) {
-        matrix_t v(m,n);
+        matrix_t v(m, n);
         for (size_t j = 0; j < n; ++j)
           for (size_t i = 0; i < m; ++i)
-            v(i,j) = scalar_lb_constrain(lb);
+            v(i, j) = scalar_lb_constrain(lb);
         return v;
       }
+
       template <typename TL>
-      inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n, T& lp) {
-        matrix_t v(m,n);
+      inline matrix_t
+      matrix_lb_constrain(const TL lb, size_t m, size_t n, T& lp) {
+        matrix_t v(m, n);
         for (size_t j = 0; j < n; ++j)
           for (size_t i = 0; i < m; ++i)
-            v(i,j) = scalar_lb_constrain(lb,lp);
+            v(i, j) = scalar_lb_constrain(lb, lp);
         return v;
       }
 
@@ -1216,6 +1223,7 @@ namespace stan {
           v(i) = scalar_ub(ub);
         return v;
       }
+
       template <typename TU>
       inline vector_t vector_ub_constrain(const TU ub, size_t m) {
         vector_t v(m);
@@ -1223,11 +1231,12 @@ namespace stan {
           v(i) = scalar_ub_constrain(ub);
         return v;
       }
+
       template <typename TU>
       inline vector_t vector_ub_constrain(const TU ub, size_t m, T& lp) {
         vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_ub_constrain(ub,lp);
+          v(i) = scalar_ub_constrain(ub, lp);
         return v;
       }
 
@@ -1238,6 +1247,7 @@ namespace stan {
           v(i) = scalar_ub(ub);
         return v;
       }
+
       template <typename TU>
       inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m) {
         row_vector_t v(m);
@@ -1245,59 +1255,67 @@ namespace stan {
           v(i) = scalar_ub_constrain(ub);
         return v;
       }
+
       template <typename TU>
-      inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m, T& lp) {
+      inline row_vector_t
+      row_vector_ub_constrain(const TU ub, size_t m, T& lp) {
         row_vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_ub_constrain(ub,lp);
+          v(i) = scalar_ub_constrain(ub, lp);
         return v;
       }
 
       template <typename TU>
       inline matrix_t matrix_ub(const TU ub, size_t m, size_t n) {
-        matrix_t v(m,n);
+        matrix_t v(m, n);
         for (size_t j  = 0; j < n; ++j)
           for (size_t i = 0; i < m; ++i)
-            v(i,j) = scalar_ub(ub);
-        return v;
-      }
-      template <typename TU>
-      inline matrix_t matrix_ub_constrain(const TU ub, size_t m, size_t n) {
-        matrix_t v(m,n);
-        for (size_t j = 0; j < n; ++j)
-          for (size_t i = 0; i < m; ++i)
-            v(i,j) = scalar_ub_constrain(ub);
-        return v;
-      }
-      template <typename TU>
-      inline matrix_t matrix_ub_constrain(const TU ub, size_t m, size_t n, T& lp) {
-        matrix_t v(m,n);
-        for (size_t j = 0; j < n; ++j)
-          for (size_t i = 0; i < m; ++i)
-            v(i,j) = scalar_ub_constrain(ub,lp);
+            v(i, j) = scalar_ub(ub);
         return v;
       }
 
+      template <typename TU>
+      inline matrix_t matrix_ub_constrain(const TU ub, size_t m, size_t n) {
+        matrix_t v(m, n);
+        for (size_t j = 0; j < n; ++j)
+          for (size_t i = 0; i < m; ++i)
+            v(i, j) = scalar_ub_constrain(ub);
+        return v;
+      }
+
+      template <typename TU>
+      inline matrix_t
+      matrix_ub_constrain(const TU ub, size_t m, size_t n, T& lp) {
+        matrix_t v(m, n);
+        for (size_t j = 0; j < n; ++j)
+          for (size_t i = 0; i < m; ++i)
+            v(i, j) = scalar_ub_constrain(ub, lp);
+        return v;
+      }
 
       template <typename TL, typename TU>
       inline vector_t vector_lub(const TL lb, const TU ub, size_t m) {
         vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_lub(lb,ub);
+          v(i) = scalar_lub(lb, ub);
         return v;
       }
+
       template <typename TL, typename TU>
-      inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m) {
+      inline vector_t
+      vector_lub_constrain(const TL lb, const TU ub, size_t m) {
         vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_lub_constrain(lb,ub);
+          v(i) = scalar_lub_constrain(lb, ub);
         return v;
       }
+
       template <typename TL, typename TU>
-      inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m, T& lp) {
+      inline vector_t
+      vector_lub_constrain(const TL lb, const TU ub, size_t m, T& lp) {
         vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_lub_constrain(lb,ub,lp);
+          v(i) = scalar_lub_constrain(lb, ub, lp);
         return v;
       }
 
@@ -1305,51 +1323,56 @@ namespace stan {
       inline row_vector_t row_vector_lub(const TL lb, const TU ub, size_t m) {
         row_vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_lub(lb,ub);
+          v(i) = scalar_lub(lb, ub);
         return v;
       }
       template <typename TL, typename TU>
-      inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub, size_t m) {
+      inline row_vector_t
+      row_vector_lub_constrain(const TL lb, const TU ub, size_t m) {
         row_vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_lub_constrain(lb,ub);
+          v(i) = scalar_lub_constrain(lb, ub);
         return v;
       }
+
       template <typename TL, typename TU>
-      inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub, size_t m, T& lp) {
+      inline row_vector_t
+      row_vector_lub_constrain(const TL lb, const TU ub, size_t m, T& lp) {
         row_vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_lub_constrain(lb,ub,lp);
+          v(i) = scalar_lub_constrain(lb, ub, lp);
         return v;
       }
 
       template <typename TL, typename TU>
       inline matrix_t matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
-        matrix_t v(m,n);
+        matrix_t v(m, n);
         for (size_t j  = 0; j < n; ++j)
           for (size_t i = 0; i < m; ++i)
-            v(i,j) = scalar_lub(lb,ub);
+            v(i, j) = scalar_lub(lb, ub);
         return v;
       }
+
       template <typename TL, typename TU>
-      inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m, size_t n) {
-        matrix_t v(m,n);
+      inline matrix_t
+      matrix_lub_constrain(const TL lb, const TU ub, size_t m, size_t n) {
+        matrix_t v(m, n);
         for (size_t j = 0; j < n; ++j)
           for (size_t i = 0; i < m; ++i)
-            v(i,j) = scalar_lub_constrain(lb,ub);
+            v(i, j) = scalar_lub_constrain(lb, ub);
         return v;
       }
+
       template <typename TL, typename TU>
-      inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m, size_t n, T& lp) {
-        matrix_t v(m,n);
+      inline matrix_t
+      matrix_lub_constrain(const TL lb, const TU ub, size_t m, size_t n,
+                           T& lp) {
+        matrix_t v(m, n);
         for (size_t j = 0; j < n; ++j)
           for (size_t i = 0; i < m; ++i)
-            v(i,j) = scalar_lub_constrain(lb,ub,lp);
+            v(i, j) = scalar_lub_constrain(lb, ub, lp);
         return v;
       }
-
-
-
     };
 
   }

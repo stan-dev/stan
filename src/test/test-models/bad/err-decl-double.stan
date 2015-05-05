@@ -1,0 +1,5 @@
+data {
+  double y;
+}
+model {
+}

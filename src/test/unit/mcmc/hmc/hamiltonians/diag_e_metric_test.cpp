@@ -6,7 +6,7 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
 
-#include <test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp>
+#include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
 
 #include <gtest/gtest.h>
 
