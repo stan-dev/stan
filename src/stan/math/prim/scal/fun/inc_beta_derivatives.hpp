@@ -37,8 +37,14 @@ namespace stan {
                    T digamma_a, T digamma_ab) {
       using std::log;
       
-      if (z > 0.5 && a < 250)
-        return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
+      if (b > a) {
+        if (0.1 < z && z <= 0.75 && b > 500)
+          return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
+        if (0.01 < z && z <= 0.1 && b > 2500)
+          return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
+        if (0.001 < z && z <= 0.01 && b > 1e5)
+          return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
+      }
       if (z > 0.75 && a < 500)
         return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
       if (z > 0.9 && a < 2500)
@@ -47,7 +53,7 @@ namespace stan {
         return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
       if (z > 0.999)
         return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
-      
+        
       double threshold = 1e-10;
       
       digamma_a += 1.0 / a; // Need digamma(a + 1), not digamma(a);
@@ -87,9 +93,15 @@ namespace stan {
     T ddb_inc_beta(T a, T b, T z,
                    T digamma_b, T digamma_ab) {
       using std::log;
-      
-      if (z > 0.5 && a < 250)
-        return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
+
+      if (b > a) {
+        if (0.1 < z && z <= 0.75 && b > 500)
+          return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
+        if (0.01 < z && z <= 0.1 && b > 2500)
+          return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
+        if (0.001 < z && z <= 0.01 && b > 1e5)
+          return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
+      }
       if (z > 0.75 && a < 500)
         return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
       if (z > 0.9 && a < 2500)
@@ -98,7 +110,7 @@ namespace stan {
         return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
       if (z > 0.999)
         return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
-      
+
       double threshold = 1e-10;
 
       // Common prefactor to regularize numerator and denomentator
