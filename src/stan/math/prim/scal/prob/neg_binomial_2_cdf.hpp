@@ -27,7 +27,6 @@ namespace stan {
     neg_binomial_2_cdf(const T_n& n,
                        const T_location& mu,
                        const T_precision& phi) {
-      
       static const char* function("stan::prob::neg_binomial_2_cdf");
       typedef typename stan::partials_return_type<T_n, T_location,
                                                   T_precision>::type
@@ -108,12 +107,12 @@ namespace stan {
         const T_partials_return p_dbl = phi_dbl / (mu_dbl + phi_dbl);
         const T_partials_return d_dbl = 1.0 / ((mu_dbl + phi_dbl)
                                                * (mu_dbl + phi_dbl));
-        
+
         const T_partials_return P_i =
           inc_beta(phi_dbl, n_dbl + 1.0, p_dbl);
 
         P *= P_i;
-        
+
         if (!is_constant_struct<T_location>::value)
           operands_and_partials.d_x1[i] +=
             - ddz_inc_beta(phi_dbl, n_dbl + 1.0, p_dbl) * phi_dbl * d_dbl / P_i;
@@ -126,7 +125,6 @@ namespace stan {
                + ddz_inc_beta(phi_dbl, n_dbl + 1.0, p_dbl)
                  * mu_dbl * d_dbl / P_i;
         }
-        
       }
 
       if (!is_constant_struct<T_location>::value) {
@@ -141,7 +139,7 @@ namespace stan {
 
       return operands_and_partials.to_var(P, mu, phi);
     }
-    
+
   }  // math
 }  // stan
 #endif

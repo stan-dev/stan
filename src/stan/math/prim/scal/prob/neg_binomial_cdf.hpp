@@ -75,7 +75,7 @@ namespace stan {
       VectorBuilder<!is_constant_struct<T_shape>::value,
                     T_partials_return, T_shape>
         digamma_alpha_vec(stan::length(alpha));
-      
+
       VectorBuilder<!is_constant_struct<T_shape>::value,
                     T_partials_return, T_shape>
         digamma_sum_vec(stan::length(alpha));
@@ -133,7 +133,7 @@ namespace stan {
 
       return operands_and_partials.to_var(P, alpha, beta);
     }
-    
+
   }  // prob
 }  // stan
 #endif
