@@ -3,7 +3,7 @@
 
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/prob/beta_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/mat/fun/factor_cov_matrix.hpp>

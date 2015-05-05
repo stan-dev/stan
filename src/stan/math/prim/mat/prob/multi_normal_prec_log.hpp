@@ -22,7 +22,7 @@
 #include <stan/math/prim/mat/fun/trace_quad_form.hpp>
 #include <stan/math/prim/scal/meta/VectorViewMvt.hpp>
 #include <stan/math/prim/scal/meta/max_size_mvt.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {

@@ -8,7 +8,7 @@
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {

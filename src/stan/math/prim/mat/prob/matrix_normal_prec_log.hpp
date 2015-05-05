@@ -14,7 +14,7 @@
 #include <stan/math/prim/mat/fun/subtract.hpp>
 #include <stan/math/prim/mat/fun/trace_quad_form.hpp>
 #include <stan/math/prim/mat/fun/trace_gen_quad_form.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {

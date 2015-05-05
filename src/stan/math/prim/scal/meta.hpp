@@ -2,7 +2,7 @@
 #define STAN_MATH_PRIM_SCAL_META_HPP
 
 #include <stan/math/prim/scal/meta/child_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/contains_fvar.hpp>
 #include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
 #include <stan/math/prim/scal/meta/contains_vector.hpp>

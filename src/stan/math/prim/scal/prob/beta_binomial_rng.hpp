@@ -12,7 +12,7 @@
 #include <stan/math/prim/scal/fun/lgamma.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/prob/binomial_rng.hpp>
 #include <stan/math/prim/scal/prob/beta_rng.hpp>
 #include <stan/math/prim/scal/fun/F32.hpp>

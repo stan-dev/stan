@@ -15,7 +15,7 @@
 #include <stan/math/prim/mat/fun/mdivide_left_tri_low.hpp>
 #include <stan/math/prim/mat/fun/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/prob/normal_rng.hpp>
 #include <stan/math/prim/scal/prob/chi_square_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>

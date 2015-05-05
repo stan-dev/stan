@@ -12,7 +12,7 @@
 #include <stan/math/prim/scal/err/check_less_or_equal.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/mat/prob/categorical_rng.hpp>
 
 namespace stan {

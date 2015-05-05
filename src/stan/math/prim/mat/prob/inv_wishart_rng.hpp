@@ -9,7 +9,7 @@
 #include <stan/math/prim/mat/fun/log_determinant_ldlt.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_ldlt.hpp>
 
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/mat/prob/wishart_rng.hpp>
 
