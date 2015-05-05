@@ -15,7 +15,7 @@ TEST(AgradFwdPhi,Fvar) {
   fvar<double> Phi_x = Phi(x);
 
   EXPECT_FLOAT_EQ(Phi(1.0), Phi_x.val_);
-  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)),
+  EXPECT_FLOAT_EQ(exp(stan::math::normal_log<false>(1.0,0.0,1.0)),
                   Phi_x.d_);
 }
 TEST(AgradFwdPhi, FvarDerivUnderOverFlow) {
@@ -42,7 +42,7 @@ TEST(AgradFwdPhi, FvarFvarDouble) {
   fvar<fvar<double> > a = Phi(x);
 
   EXPECT_FLOAT_EQ(Phi(1.0), a.val_.val_);
-  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), a.val_.d_);
+  EXPECT_FLOAT_EQ(exp(stan::math::normal_log<false>(1.0,0.0,1.0)), a.val_.d_);
   EXPECT_FLOAT_EQ(0, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 
@@ -53,7 +53,7 @@ TEST(AgradFwdPhi, FvarFvarDouble) {
   a = Phi(y);
   EXPECT_FLOAT_EQ(Phi(1.0), a.val_.val_);
   EXPECT_FLOAT_EQ(0, a.val_.d_);
-  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), a.d_.val_);
+  EXPECT_FLOAT_EQ(exp(stan::math::normal_log<false>(1.0,0.0,1.0)), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
 

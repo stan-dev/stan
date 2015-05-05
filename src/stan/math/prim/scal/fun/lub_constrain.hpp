@@ -10,7 +10,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
     /**
      * Return the lower- and upper-bounded scalar derived by
      * transforming the specified free scalar given the specified

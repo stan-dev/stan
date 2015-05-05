@@ -17,7 +17,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Calculates the double exponential cumulative density function.
@@ -37,7 +37,7 @@ namespace stan {
     typename return_type<T_y, T_loc, T_scale>::type
     double_exponential_cdf(const T_y& y,
                            const T_loc& mu, const T_scale& sigma) {
-      static const char* function("stan::prob::double_exponential_cdf");
+      static const char* function("stan::math::double_exponential_cdf");
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 

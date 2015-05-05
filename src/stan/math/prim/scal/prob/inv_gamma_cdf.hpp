@@ -28,7 +28,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The CDF of an inverse gamma density for y with the specified
@@ -57,7 +57,7 @@ namespace stan {
         return 1.0;
 
       // Error checks
-      static const char* function("stan::prob::inv_gamma_cdf");
+      static const char* function("stan::math::inv_gamma_cdf");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;

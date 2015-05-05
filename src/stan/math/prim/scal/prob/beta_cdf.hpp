@@ -26,7 +26,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Calculates the beta cumulative distribution function for the given
@@ -55,7 +55,7 @@ namespace stan {
         return 1.0;
 
       // Error checks
-      static const char* function("stan::prob::beta_cdf");
+      static const char* function("stan::math::beta_cdf");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;

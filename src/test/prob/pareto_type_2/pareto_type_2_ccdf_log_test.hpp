@@ -66,7 +66,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale, T_shape>::type 
   ccdf_log(const T_y& y, const T_loc& mu, const T_scale& lambda, 
            const T_shape& alpha, const T4&, const T5&) {
-    return stan::prob::pareto_type_2_ccdf_log(y, mu, lambda, alpha);
+    return stan::math::pareto_type_2_ccdf_log(y, mu, lambda, alpha);
   }
   
   template <typename T_y, typename T_loc, typename T_scale, typename T_shape,

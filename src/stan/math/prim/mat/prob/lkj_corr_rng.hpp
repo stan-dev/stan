@@ -47,14 +47,14 @@
 #include <stan/math/prim/mat/prob/lkj_corr_cholesky_rng.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline Eigen::MatrixXd
     lkj_corr_rng(const size_t K,
                  const double eta,
                  RNG& rng) {
-      static const char* function("stan::prob::lkj_corr_rng");
+      static const char* function("stan::math::lkj_corr_rng");
 
       using stan::math::check_positive;
 

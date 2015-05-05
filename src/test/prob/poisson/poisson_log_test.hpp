@@ -47,7 +47,7 @@ public:
   typename stan::return_type<T_n, T_rate>::type 
   log_prob(const T_n& n, const T_rate& alpha, const T2&,
            const T3&, const T4&, const T5&) {
-    return stan::prob::poisson_log_log(n, alpha);
+    return stan::math::poisson_log_log(n, alpha);
   }
 
   template <bool propto, 
@@ -56,7 +56,7 @@ public:
   typename stan::return_type<T_n, T_rate>::type 
   log_prob(const T_n& n, const T_rate& alpha, const T2&,
            const T3&, const T4&, const T5&) {
-    return stan::prob::poisson_log_log<propto>(n, alpha);
+    return stan::math::poisson_log_log<propto>(n, alpha);
   }
   
   
@@ -68,7 +68,7 @@ public:
     using std::exp;
     using boost::math::lgamma;
     using stan::math::multiply_log;
-    using stan::prob::LOG_ZERO;
+    using stan::math::LOG_ZERO;
 
 
     if (alpha == -std::numeric_limits<double>::infinity())

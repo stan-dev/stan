@@ -28,7 +28,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y, T_shape, T_scale>::type
@@ -42,7 +42,7 @@ namespace stan {
         return 0.0;
 
       // Error checks
-      static const char* function("stan::prob::inv_gamma_ccdf_log");
+      static const char* function("stan::math::inv_gamma_ccdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;

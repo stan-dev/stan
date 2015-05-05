@@ -72,7 +72,7 @@ public:
   typename stan::return_type<T_y, T_scale_succ, T_scale_fail>::type 
   ccdf_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::beta_ccdf_log(y, alpha, beta);
+    return stan::math::beta_ccdf_log(y, alpha, beta);
   }
   
   template <typename T_y, typename T_scale_succ, typename T_scale_fail,
@@ -80,7 +80,7 @@ public:
   typename stan::return_type<T_y, T_scale_succ, T_scale_fail>::type 
   ccdf_log_function(const T_y& y, const T_scale_succ& alpha, 
                     const T_scale_fail& beta, const T3&, const T4&, const T5&) {
-    return stan::prob::beta_ccdf_log(y, alpha, beta);
+    return stan::math::beta_ccdf_log(y, alpha, beta);
       
   }
     

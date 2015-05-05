@@ -19,7 +19,7 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 using std::vector;
-using stan::prob::multi_student_t_log;
+using stan::math::multi_student_t_log;
 
 TEST(ProbDistributionsMultiStudentT,fvar_double) {
   using stan::agrad::fvar;

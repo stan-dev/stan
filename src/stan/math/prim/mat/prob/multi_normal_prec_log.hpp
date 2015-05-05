@@ -27,7 +27,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
     using Eigen::Dynamic;
 
     template <bool propto,
@@ -36,7 +36,7 @@ namespace stan {
     multi_normal_prec_log(const T_y& y,
                           const T_loc& mu,
                           const T_covar& Sigma) {
-      static const char* function("stan::prob::multi_normal_prec_log");
+      static const char* function("stan::math::multi_normal_prec_log");
       typedef typename scalar_type<T_covar>::type T_covar_elem;
       typedef typename return_type<T_y, T_loc, T_covar>::type lp_type;
       lp_type lp(0.0);

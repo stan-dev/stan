@@ -47,7 +47,7 @@ TEST(ProbDistributionsMultiNormal,fvar_var) {
       Sigma(i,j).d_ = 1.0;
   }
 
-  fvar<var> res = stan::prob::multi_normal_log(y,mu,Sigma);
+  fvar<var> res = stan::math::multi_normal_log(y,mu,Sigma);
   EXPECT_FLOAT_EQ(-11.73908, res.val_.val());
   EXPECT_FLOAT_EQ(0.54899865, res.d_.val());
 }
@@ -71,7 +71,7 @@ TEST(ProbDistributionsMultiNormal,fvar_fvar_var) {
       Sigma(i,j).d_ = 1.0;
   }
 
-  fvar<fvar<var> > res = stan::prob::multi_normal_log(y,mu,Sigma);
+  fvar<fvar<var> > res = stan::math::multi_normal_log(y,mu,Sigma);
   EXPECT_FLOAT_EQ(-11.73908, res.val_.val_.val());
   EXPECT_FLOAT_EQ(0.54899865, res.d_.val_.val());
 }

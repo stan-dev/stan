@@ -23,7 +23,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -34,7 +34,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::student_t_distribution;
 
-      static const char* function("stan::prob::student_t_rng");
+      static const char* function("stan::math::student_t_rng");
 
       using stan::math::check_positive_finite;
       using stan::math::check_finite;

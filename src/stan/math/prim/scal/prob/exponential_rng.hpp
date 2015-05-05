@@ -20,7 +20,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -29,7 +29,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::exponential_distribution;
 
-      static const char* function("stan::prob::exponential_rng");
+      static const char* function("stan::math::exponential_rng");
 
       using stan::math::check_positive_finite;
 

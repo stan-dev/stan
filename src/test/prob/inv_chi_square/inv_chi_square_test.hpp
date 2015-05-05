@@ -44,7 +44,7 @@ public:
   typename stan::return_type<T_y, T_dof>::type 
   log_prob(const T_y& y, const T_dof& nu, 
            const T2&, const T3&, const T4&, const T5&) {
-    return stan::prob::inv_chi_square_log(y, nu);
+    return stan::math::inv_chi_square_log(y, nu);
   }
 
   template <bool propto, 
@@ -53,7 +53,7 @@ public:
   typename stan::return_type<T_y, T_dof>::type 
   log_prob(const T_y& y, const T_dof& nu, 
            const T2&, const T3&, const T4&, const T5&) {
-    return stan::prob::inv_chi_square_log<propto>(y, nu);
+    return stan::math::inv_chi_square_log<propto>(y, nu);
   }
   
   
@@ -64,7 +64,7 @@ public:
                     const T2&, const T3&, const T4&, const T5&) {
     using stan::math::multiply_log;
     using boost::math::lgamma;
-    using stan::prob::NEG_LOG_TWO_OVER_TWO;
+    using stan::math::NEG_LOG_TWO_OVER_TWO;
     
     return nu * NEG_LOG_TWO_OVER_TWO - lgamma(0.5 * nu) 
       - multiply_log(0.5*nu+1.0, y) - 0.5 / y;

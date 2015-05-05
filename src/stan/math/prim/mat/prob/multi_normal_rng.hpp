@@ -17,7 +17,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
     using Eigen::Dynamic;
 
     template <class RNG>
@@ -28,7 +28,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::normal_distribution;
 
-      static const char* function("stan::prob::multi_normal_rng");
+      static const char* function("stan::math::multi_normal_rng");
 
       using stan::math::check_finite;
       using stan::math::check_positive;

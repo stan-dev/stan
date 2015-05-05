@@ -17,7 +17,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
@@ -30,7 +30,7 @@ namespace stan {
               && stan::length(sigma) ) )
         return 0.0;
 
-      static const char* function("stan::prob::cauchy_cdf");
+      static const char* function("stan::math::cauchy_cdf");
 
       using stan::math::check_positive_finite;
       using stan::math::check_finite;

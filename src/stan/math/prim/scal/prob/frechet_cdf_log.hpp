@@ -23,7 +23,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y, T_shape, T_scale>::type
@@ -31,7 +31,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y, T_shape, T_scale>::type
         T_partials_return;
 
-      static const char* function("stan::prob::frechet_cdf_log");
+      static const char* function("stan::math::frechet_cdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_positive;

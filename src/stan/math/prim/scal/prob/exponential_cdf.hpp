@@ -20,7 +20,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Calculates the exponential cumulative distribution function for
@@ -40,7 +40,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y, T_inv_scale>::type
         T_partials_return;
 
-      static const char* function("stan::prob::exponential_cdf");
+      static const char* function("stan::math::exponential_cdf");
 
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;

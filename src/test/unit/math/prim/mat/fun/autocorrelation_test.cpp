@@ -23,7 +23,7 @@ TEST(ProbAutocorrelation,test1) {
 
    size_t ITS = 1;  // only need one for test
    for (size_t n = 0; n < ITS; ++n) {
-     stan::prob::autocorrelation(y,ac);
+     stan::math::autocorrelation(y,ac);
    }
 
    EXPECT_EQ(1000U, ac.size());
@@ -37,12 +37,12 @@ TEST(ProbAutocorrelation,test1) {
 }
 
 TEST(ProbAutocorrelation,fft_next_good_size) {
-  EXPECT_EQ(2U, stan::prob::fft_next_good_size(0));
-  EXPECT_EQ(2U, stan::prob::fft_next_good_size(1));
-  EXPECT_EQ(2U, stan::prob::fft_next_good_size(2));
-  EXPECT_EQ(3U, stan::prob::fft_next_good_size(3));
+  EXPECT_EQ(2U, stan::math::fft_next_good_size(0));
+  EXPECT_EQ(2U, stan::math::fft_next_good_size(1));
+  EXPECT_EQ(2U, stan::math::fft_next_good_size(2));
+  EXPECT_EQ(3U, stan::math::fft_next_good_size(3));
   
-  EXPECT_EQ(4U, stan::prob::fft_next_good_size(4));
-  EXPECT_EQ(128U, stan::prob::fft_next_good_size(128));
-  EXPECT_EQ(135U, stan::prob::fft_next_good_size(129));
+  EXPECT_EQ(4U, stan::math::fft_next_good_size(4));
+  EXPECT_EQ(128U, stan::math::fft_next_good_size(128));
+  EXPECT_EQ(135U, stan::math::fft_next_good_size(129));
 }

@@ -17,7 +17,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -27,7 +27,7 @@ namespace stan {
                     RNG& rng) {
       boost::math::skew_normal_distribution<> dist(mu, sigma, alpha);
 
-      static const char* function("stan::prob::skew_normal_rng");
+      static const char* function("stan::math::skew_normal_rng");
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -36,7 +36,7 @@ namespace stan {
       check_finite(function, "Shape parameter", alpha);
       check_positive(function, "Scale parameter", sigma);
 
-      return quantile(dist, stan::prob::uniform_rng(0.0, 1.0, rng));
+      return quantile(dist, stan::math::uniform_rng(0.0, 1.0, rng));
     }
   }
 }

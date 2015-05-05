@@ -20,14 +20,14 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_n, typename T_N,
               typename T_size1, typename T_size2>
     typename return_type<T_size1, T_size2>::type
     beta_binomial_cdf_log(const T_n& n, const T_N& N, const T_size1& alpha,
                           const T_size2& beta) {
-      static const char* function("stan::prob::beta_binomial_cdf_log");
+      static const char* function("stan::math::beta_binomial_cdf_log");
       typedef typename stan::partials_return_type<T_n, T_N, T_size1,
                                                   T_size2>::type
         T_partials_return;
@@ -36,7 +36,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // Ensure non-zero argument lengths
       if (!(stan::length(n) && stan::length(N) && stan::length(alpha)

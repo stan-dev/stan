@@ -57,7 +57,7 @@ public:
   typename stan::return_type<T_n, T_prob>::type 
   log_prob(const T_n& n, const T_prob& theta, const T2&,
            const T3&, const T4&, const T5&) {
-    return stan::prob::bernoulli_log(n, theta);
+    return stan::math::bernoulli_log(n, theta);
   }
 
   template <bool propto, 
@@ -66,7 +66,7 @@ public:
   typename stan::return_type<T_n, T_prob>::type 
   log_prob(const T_n& n, const T_prob& theta, const T2&,
            const T3&, const T4&, const T5&) {
-    return stan::prob::bernoulli_log<propto>(n, theta);
+    return stan::math::bernoulli_log<propto>(n, theta);
   }
   
   
@@ -85,6 +85,6 @@ public:
 };
 
 TEST(ProbDistributionsBernoulliCDF,Values) {
-    EXPECT_FLOAT_EQ(1, stan::prob::bernoulli_cdf(1, 0.57));
-    EXPECT_FLOAT_EQ(1 - 0.57, stan::prob::bernoulli_cdf(0, 0.57));
+    EXPECT_FLOAT_EQ(1, stan::math::bernoulli_cdf(1, 0.57));
+    EXPECT_FLOAT_EQ(1 - 0.57, stan::math::bernoulli_cdf(0, 0.57));
 }

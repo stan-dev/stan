@@ -39,8 +39,8 @@ TEST(ProbDistributionsWishart, fvar_double) {
   
   double lp = log(8.658e-07); // computed with MCMCpack in R
  
-  EXPECT_NEAR(lp, stan::prob::wishart_log(Y,dof,Sigma).val_, 0.01);
-  EXPECT_NEAR(-0.76893887, stan::prob::wishart_log(Y,dof,Sigma).d_, 0.01);
+  EXPECT_NEAR(lp, stan::math::wishart_log(Y,dof,Sigma).val_, 0.01);
+  EXPECT_NEAR(-0.76893887, stan::math::wishart_log(Y,dof,Sigma).d_, 0.01);
 }
 
 TEST(ProbDistributionsWishart, fvar_fvar_double) {
@@ -62,6 +62,6 @@ TEST(ProbDistributionsWishart, fvar_fvar_double) {
   
   double lp = log(8.658e-07); // computed with MCMCpack in R
  
-  EXPECT_NEAR(lp, stan::prob::wishart_log(Y,dof,Sigma).val_.val_, 0.01);
-  EXPECT_NEAR(-0.76893887, stan::prob::wishart_log(Y,dof,Sigma).d_.val_, 0.01);
+  EXPECT_NEAR(lp, stan::math::wishart_log(Y,dof,Sigma).val_.val_, 0.01);
+  EXPECT_NEAR(-0.76893887, stan::math::wishart_log(Y,dof,Sigma).d_.val_, 0.01);
 }

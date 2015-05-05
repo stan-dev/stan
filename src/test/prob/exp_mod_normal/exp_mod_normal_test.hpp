@@ -74,7 +74,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale,T_inv_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T_inv_scale& lambda, const T4&, const T5&) {
-    return stan::prob::exp_mod_normal_log(y, mu, sigma, lambda);
+    return stan::math::exp_mod_normal_log(y, mu, sigma, lambda);
   }
 
   template <bool propto, 
@@ -83,7 +83,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale, T_inv_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T_inv_scale& lambda, const T4&, const T5&) {
-    return stan::prob::exp_mod_normal_log<propto>(y, mu, sigma, lambda);
+    return stan::math::exp_mod_normal_log<propto>(y, mu, sigma, lambda);
   }
   
   

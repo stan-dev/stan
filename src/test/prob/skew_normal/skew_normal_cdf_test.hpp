@@ -82,7 +82,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale,T_shape>::type 
   cdf(const T_y& y, const T_loc& mu, const T_scale& sigma,
       const T_shape& alpha, const T4&, const T5&) {
-    return stan::prob::skew_normal_cdf(y, mu, sigma, alpha);
+    return stan::math::skew_normal_cdf(y, mu, sigma, alpha);
   }
 
 

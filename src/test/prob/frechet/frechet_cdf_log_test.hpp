@@ -74,7 +74,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   cdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma,
           const T3&, const T4&, const T5&) {
-    return stan::prob::frechet_cdf_log(y, alpha, sigma);
+    return stan::math::frechet_cdf_log(y, alpha, sigma);
   }
   
   template <typename T_y, typename T_shape, typename T_scale,

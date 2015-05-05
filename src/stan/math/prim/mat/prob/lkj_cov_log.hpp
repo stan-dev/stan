@@ -13,7 +13,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // LKJ_cov(y|mu, sigma, eta) [ y covariance matrix (not correlation matrix)
     //                         mu vector, sigma > 0 vector, eta > 0 ]
@@ -25,7 +25,7 @@ namespace stan {
                 const Eigen::Matrix<T_loc, Eigen::Dynamic, 1>& mu,
                 const Eigen::Matrix<T_scale, Eigen::Dynamic, 1>& sigma,
                 const T_shape& eta) {
-      static const char* function("stan::prob::lkj_cov_log");
+      static const char* function("stan::math::lkj_cov_log");
 
       using stan::math::check_size_match;
       using stan::math::check_finite;
@@ -88,7 +88,7 @@ namespace stan {
                 const T_loc& mu,
                 const T_scale& sigma,
                 const T_shape& eta) {
-      static const char* function("stan::prob::lkj_cov_log");
+      static const char* function("stan::math::lkj_cov_log");
 
       using stan::math::check_finite;
       using stan::math::check_positive;

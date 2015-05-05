@@ -13,7 +13,7 @@
 
 std::vector<double> test_fun(double y, double mu, double sigma) {
   using stan::agrad::var;
-  using stan::prob::normal_log;
+  using stan::math::normal_log;
   var y_var = y;
   var mu_var = mu;
   var sigma_var = sigma;
@@ -31,7 +31,7 @@ std::vector<double> test_fun(double y, double mu, double sigma) {
 
 TEST(ProbAgradDistributionsNormal, derivatives) {
   using stan::agrad::fvar;
-  using stan::prob::normal_log;
+  using stan::math::normal_log;
    
   std::vector<double> grad = test_fun(0,0,1);
 
@@ -48,7 +48,7 @@ TEST(ProbAgradDistributionsNormal, derivatives) {
 TEST(ProbAgradDistributionsNormal, FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::prob::normal_log;
+  using stan::math::normal_log;
    
   fvar<var> y_ (2,1);
   double mu (0);
@@ -65,7 +65,7 @@ TEST(ProbAgradDistributionsNormal, FvarVar_1stDeriv) {
 TEST(ProbAgradDistributionsNormal, FvarVar_2ndDeriv1) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::prob::normal_log;
+  using stan::math::normal_log;
    
   double y_ (1);
   fvar<var> mu (0,1);
@@ -80,7 +80,7 @@ TEST(ProbAgradDistributionsNormal, FvarVar_2ndDeriv1) {
 TEST(ProbAgradDistributionsNormal, FvarVar_2ndDeriv2) {
   using stan::agrad::fvar;
   using stan::agrad::var;
-  using stan::prob::normal_log;
+  using stan::math::normal_log;
    
   double y_ (1);
   double mu (0);

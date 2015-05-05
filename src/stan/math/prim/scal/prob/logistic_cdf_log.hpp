@@ -23,7 +23,7 @@
 #include <limits>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
@@ -36,7 +36,7 @@ namespace stan {
         return 0.0;
 
       // Error checks
-      static const char* function("stan::prob::logistic_cdf_log");
+      static const char* function("stan::math::logistic_cdf_log");
 
       using stan::math::check_not_nan;
       using stan::math::check_positive_finite;

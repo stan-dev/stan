@@ -18,12 +18,12 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_cdf_log(const T_n& n, const T_rate& lambda) {
-      static const char* function("stan::prob::poisson_cdf_log");
+      static const char* function("stan::math::poisson_cdf_log");
       typedef typename stan::partials_return_type<T_n, T_rate>::type
         T_partials_return;
 

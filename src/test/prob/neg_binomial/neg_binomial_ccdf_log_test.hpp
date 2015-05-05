@@ -54,7 +54,7 @@ public:
   typename stan::return_type<T_shape, T_inv_scale>::type
   ccdf_log(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::neg_binomial_ccdf_log(n, alpha, beta);
+    return stan::math::neg_binomial_ccdf_log(n, alpha, beta);
   }
 
 

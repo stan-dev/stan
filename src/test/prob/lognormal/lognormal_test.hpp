@@ -58,7 +58,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::lognormal_log(y, mu, sigma);
+    return stan::math::lognormal_log(y, mu, sigma);
   }
 
   template <bool propto, 
@@ -67,7 +67,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::lognormal_log<propto>(y, mu, sigma);
+    return stan::math::lognormal_log<propto>(y, mu, sigma);
   }
   
   
@@ -78,7 +78,7 @@ public:
                     const T3&, const T4&, const T5&) {
     using stan::math::pi;
     using stan::math::square;
-    using stan::prob::NEG_LOG_SQRT_TWO_PI;
+    using stan::math::NEG_LOG_SQRT_TWO_PI;
       
     return NEG_LOG_SQRT_TWO_PI - log(sigma) - log(y) 
       - square(log(y) - mu) / (2.0 * sigma * sigma);
@@ -88,7 +88,7 @@ public:
 
 
 TEST(ProbDistributionsLognormal,Cumulative) {
-  using stan::prob::lognormal_cdf;
+  using stan::math::lognormal_cdf;
   EXPECT_FLOAT_EQ(0.4687341, lognormal_cdf(1.2,0.3,1.5));
   EXPECT_FLOAT_EQ(0.2835506, lognormal_cdf(12.0,3.0,0.9));
 

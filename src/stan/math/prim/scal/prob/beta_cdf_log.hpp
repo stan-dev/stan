@@ -25,7 +25,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
     typename return_type<T_y, T_scale_succ, T_scale_fail>::type
@@ -41,7 +41,7 @@ namespace stan {
         return 0.0;
 
       // Error checks
-      static const char* function("stan::prob::beta_cdf");
+      static const char* function("stan::math::beta_cdf");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;

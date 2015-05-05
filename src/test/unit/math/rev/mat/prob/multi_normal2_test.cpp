@@ -32,10 +32,10 @@ template <typename T_y, typename T_loc, typename T_scale>
 void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
                    T_y y2, T_loc mu2, T_scale sigma2,
                    std::string message = "") {
-  expect_eq_diffs(stan::prob::multi_normal_log<false>(y1,mu1,sigma1),
-                  stan::prob::multi_normal_log<false>(y2,mu2,sigma2),
-                  stan::prob::multi_normal_log<true>(y1,mu1,sigma1),
-                  stan::prob::multi_normal_log<true>(y2,mu2,sigma2),
+  expect_eq_diffs(stan::math::multi_normal_log<false>(y1,mu1,sigma1),
+                  stan::math::multi_normal_log<false>(y2,mu2,sigma2),
+                  stan::math::multi_normal_log<true>(y1,mu1,sigma1),
+                  stan::math::multi_normal_log<true>(y2,mu2,sigma2),
                   message);
 }
 
@@ -128,13 +128,13 @@ TEST(ProbDistributionsMultiNormal,MultiNormalVar) {
   Sigma << 9.0, -3.0, 0.0,
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma).val());
+  EXPECT_FLOAT_EQ(-11.73908, stan::math::multi_normal_log(y,mu,Sigma).val());
 }
 TEST(ProbDistributionsMultiNormal,MultiNormalGradientUnivariate) {
   using stan::agrad::var;
   using std::vector;
   using Eigen::VectorXd;
-  using stan::prob::multi_normal_log;
+  using stan::math::multi_normal_log;
   
   Matrix<var,Dynamic,1> y_var(1,1);
   y_var << 2.0;
@@ -150,7 +150,7 @@ TEST(ProbDistributionsMultiNormal,MultiNormalGradientUnivariate) {
   x.push_back(mu_var(0));
   x.push_back(Sigma_var(0,0));
 
-  var lp = stan::prob::multi_normal_log(y_var,mu_var,Sigma_var);
+  var lp = stan::math::multi_normal_log(y_var,mu_var,Sigma_var);
   vector<double> grad;
   lp.grad(x,grad);
 
@@ -222,7 +222,7 @@ struct multi_normal_fun {
         Sigma(j,i) = Sigma(i,j);
       }
     }
-    return stan::prob::multi_normal_log<false>(y,mu,Sigma);
+    return stan::math::multi_normal_log<false>(y,mu,Sigma);
   }
 };
 
@@ -296,15 +296,15 @@ struct vectorized_multi_normal_fun {
     
     if (dont_vectorize_y) {
       if (dont_vectorize_mu)
-        return stan::prob::multi_normal_log<false>(y[0], mu[0], Sigma);
+        return stan::math::multi_normal_log<false>(y[0], mu[0], Sigma);
       else
-        return stan::prob::multi_normal_log<false>(y[0], mu, Sigma);
+        return stan::math::multi_normal_log<false>(y[0], mu, Sigma);
     }
     else {
       if (dont_vectorize_mu)
-        return stan::prob::multi_normal_log<false>(y, mu[0], Sigma);
+        return stan::math::multi_normal_log<false>(y, mu[0], Sigma);
       else
-        return stan::prob::multi_normal_log<false>(y, mu, Sigma);
+        return stan::math::multi_normal_log<false>(y, mu, Sigma);
     }
   }
 };

@@ -13,7 +13,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of the Dirichlet density for the given theta and
@@ -46,7 +46,7 @@ namespace stan {
     dirichlet_log(const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta,
                   const Eigen::Matrix
                   <T_prior_sample_size, Eigen::Dynamic, 1>& alpha) {
-      static const char* function("stan::prob::dirichlet_log");
+      static const char* function("stan::math::dirichlet_log");
       using boost::math::lgamma;
       using boost::math::tools::promote_args;
       using stan::math::check_consistent_sizes;

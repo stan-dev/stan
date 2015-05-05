@@ -18,19 +18,19 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_n, typename T_prob>
     typename return_type<T_prob>::type
     bernoulli_cdf_log(const T_n& n, const T_prob& theta) {
-      static const char* function("stan::prob::bernoulli_cdf_log");
+      static const char* function("stan::math::bernoulli_cdf_log");
       typedef typename stan::partials_return_type<T_n, T_prob>::type
         T_partials_return;
 
       using stan::math::check_finite;
       using stan::math::check_bounded;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // Ensure non-zero argument lenghts
       if (!(stan::length(n) && stan::length(theta)))

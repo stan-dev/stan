@@ -10,7 +10,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the simplex corresponding to the specified free vector.

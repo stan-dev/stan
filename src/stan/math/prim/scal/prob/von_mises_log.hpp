@@ -18,13 +18,13 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template<bool propto,
              typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     von_mises_log(T_y const& y, T_loc const& mu, T_scale const& kappa) {
-      static char const* const function = "stan::prob::von_mises_log";
+      static char const* const function = "stan::math::von_mises_log";
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 

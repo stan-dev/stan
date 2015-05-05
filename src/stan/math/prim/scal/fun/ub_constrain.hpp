@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // UPPER BOUND
 

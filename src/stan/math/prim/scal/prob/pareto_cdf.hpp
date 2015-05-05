@@ -17,7 +17,7 @@
 
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y, T_scale, T_shape>::type
@@ -31,7 +31,7 @@ namespace stan {
         return 1.0;
 
       // Check errors
-      static const char* function("stan::prob::pareto_cdf");
+      static const char* function("stan::math::pareto_cdf");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;

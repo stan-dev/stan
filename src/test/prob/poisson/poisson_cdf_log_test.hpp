@@ -51,7 +51,7 @@ public:
   typename stan::return_type<T_rate>::type
   cdf_log(const T_n& n, const T_rate& lambda, const T2&,
           const T3&, const T4&, const T5&) {
-    return stan::prob::poisson_cdf_log(n, lambda);
+    return stan::math::poisson_cdf_log(n, lambda);
   }
 
 

@@ -17,7 +17,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -27,7 +27,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::cauchy_distribution;
 
-      static const char* function("stan::prob::cauchy_rng");
+      static const char* function("stan::math::cauchy_rng");
 
       using stan::math::check_positive_finite;
       using stan::math::check_finite;

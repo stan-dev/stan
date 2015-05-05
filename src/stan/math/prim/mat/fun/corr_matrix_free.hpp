@@ -10,7 +10,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     const double CONSTRAINT_TOLERANCE = 1E-8;
 

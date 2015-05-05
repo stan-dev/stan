@@ -57,7 +57,7 @@ public:
   typename stan::return_type<T_y, T_scale>::type 
   log_prob(const T_y& y, const T_scale& sigma, const T2&,
            const T3&, const T4&, const T5&) {
-    return stan::prob::rayleigh_log(y, sigma);
+    return stan::math::rayleigh_log(y, sigma);
   }
 
   template <bool propto, 
@@ -66,7 +66,7 @@ public:
   typename stan::return_type<T_y, T_scale>::type 
   log_prob(const T_y& y, const T_scale& sigma, const T2&,
            const T3&, const T4&, const T5&) {
-    return stan::prob::rayleigh_log<propto>(y, sigma);
+    return stan::math::rayleigh_log<propto>(y, sigma);
   }
   
   

@@ -35,10 +35,10 @@ template <typename T_y, typename T_loc, typename T_scale>
 void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
                    T_y y2, T_loc mu2, T_scale sigma2,
                    std::string message = "") {
-  expect_eq_diffs(stan::prob::multi_normal_prec_log<false>(y1,mu1,sigma1),
-                  stan::prob::multi_normal_prec_log<false>(y2,mu2,sigma2),
-                  stan::prob::multi_normal_prec_log<true>(y1,mu1,sigma1),
-                  stan::prob::multi_normal_prec_log<true>(y2,mu2,sigma2),
+  expect_eq_diffs(stan::math::multi_normal_prec_log<false>(y1,mu1,sigma1),
+                  stan::math::multi_normal_prec_log<false>(y2,mu2,sigma2),
+                  stan::math::multi_normal_prec_log<true>(y1,mu1,sigma1),
+                  stan::math::multi_normal_prec_log<true>(y2,mu2,sigma2),
                   message);
 }
 
@@ -143,7 +143,7 @@ struct multi_normal_prec_fun {
         Sigma(j,i) = Sigma(i,j);
       }
     }
-    return stan::prob::multi_normal_prec_log<false>(y,mu,Sigma);
+    return stan::math::multi_normal_prec_log<false>(y,mu,Sigma);
   }
 };
 
@@ -218,15 +218,15 @@ struct vectorized_multi_normal_prec_fun {
     
     if (dont_vectorize_y) {
       if (dont_vectorize_mu)
-        return stan::prob::multi_normal_prec_log<false>(y[0], mu[0], Sigma);
+        return stan::math::multi_normal_prec_log<false>(y[0], mu[0], Sigma);
       else
-        return stan::prob::multi_normal_prec_log<false>(y[0], mu, Sigma);
+        return stan::math::multi_normal_prec_log<false>(y[0], mu, Sigma);
     }
     else {
       if (dont_vectorize_mu)
-        return stan::prob::multi_normal_prec_log<false>(y, mu[0], Sigma);
+        return stan::math::multi_normal_prec_log<false>(y, mu[0], Sigma);
       else
-        return stan::prob::multi_normal_prec_log<false>(y, mu, Sigma);
+        return stan::math::multi_normal_prec_log<false>(y, mu, Sigma);
     }
   }
 };

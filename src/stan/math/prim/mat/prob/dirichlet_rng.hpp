@@ -13,7 +13,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline Eigen::VectorXd

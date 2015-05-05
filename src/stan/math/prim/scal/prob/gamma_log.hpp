@@ -23,7 +23,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of a gamma density for y with the specified
@@ -51,7 +51,7 @@ namespace stan {
               typename T_y, typename T_shape, typename T_inv_scale>
     typename return_type<T_y, T_shape, T_inv_scale>::type
     gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
-      static const char* function("stan::prob::gamma_log");
+      static const char* function("stan::math::gamma_log");
       typedef typename stan::partials_return_type<T_y, T_shape,
                                                   T_inv_scale>::type
         T_partials_return;

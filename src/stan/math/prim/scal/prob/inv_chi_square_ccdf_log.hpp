@@ -26,7 +26,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_dof>
     typename return_type<T_y, T_dof>::type
@@ -38,7 +38,7 @@ namespace stan {
       if ( !( stan::length(y) && stan::length(nu) ) ) return 0.0;
 
       // Error checks
-      static const char* function("stan::prob::inv_chi_square_ccdf_log");
+      static const char* function("stan::math::inv_chi_square_ccdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;

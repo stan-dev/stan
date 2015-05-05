@@ -20,7 +20,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of a chi-squared density for y with the specified
@@ -45,7 +45,7 @@ namespace stan {
               typename T_y, typename T_dof>
     typename return_type<T_y, T_dof>::type
     chi_square_log(const T_y& y, const T_dof& nu) {
-      static const char* function("stan::prob::chi_square_log");
+      static const char* function("stan::math::chi_square_log");
       typedef typename stan::partials_return_type<T_y, T_dof>::type
         T_partials_return;
 

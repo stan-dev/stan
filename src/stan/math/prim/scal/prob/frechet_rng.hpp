@@ -23,7 +23,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -33,7 +33,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::weibull_distribution;
 
-      static const char* function("stan::prob::frechet_rng");
+      static const char* function("stan::math::frechet_rng");
 
       using stan::math::check_finite;
       using stan::math::check_not_nan;

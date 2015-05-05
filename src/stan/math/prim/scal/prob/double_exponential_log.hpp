@@ -18,7 +18,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // DoubleExponential(y|mu, sigma)  [sigma > 0]
     // FIXME: add documentation
@@ -27,7 +27,7 @@ namespace stan {
     typename return_type<T_y, T_loc, T_scale>::type
     double_exponential_log(const T_y& y,
                            const T_loc& mu, const T_scale& sigma) {
-      static const char* function("stan::prob::double_exponential_log");
+      static const char* function("stan::math::double_exponential_log");
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
@@ -36,7 +36,7 @@ namespace stan {
       using stan::math::check_positive_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
       using std::log;
       using std::fabs;
       using stan::math::sign;

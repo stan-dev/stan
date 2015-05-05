@@ -20,7 +20,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Wishart(Sigma|n, Omega)  [Sigma, Omega symmetric, non-neg, definite;
     //                          Sigma.dims() = Omega.dims();
@@ -59,7 +59,7 @@ namespace stan {
                 const T_dof& nu,
                 const Eigen::Matrix<T_scale, Eigen::Dynamic, Eigen::Dynamic>&
                 S) {
-      static const char* function("stan::prob::wishart_log");
+      static const char* function("stan::math::wishart_log");
 
       using boost::math::tools::promote_args;
       using Eigen::Dynamic;

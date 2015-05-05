@@ -15,7 +15,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // The algorithm used in von_mises_rng is a modified version of the
     // algorithm in:
@@ -33,9 +33,9 @@ namespace stan {
                   const double kappa,
                   RNG& rng) {
       using boost::variate_generator;
-      using stan::prob::uniform_rng;
+      using stan::math::uniform_rng;
 
-      static const char* function("stan::prob::von_mises_rng");
+      static const char* function("stan::math::von_mises_rng");
 
       stan::math::check_finite(function, "mean", mu);
       stan::math::check_positive_finite(function, "inverse of variance", kappa);

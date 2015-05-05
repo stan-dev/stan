@@ -16,7 +16,7 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 using Eigen::MatrixXd;
-using stan::prob::gaussian_dlm_obs_log;
+using stan::math::gaussian_dlm_obs_log;
 
 TEST(ProbDistributionsGaussianDLM,LoglikeUU_fvar_double) {
   using stan::agrad::fvar;

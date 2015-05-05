@@ -23,7 +23,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // NegBinomial(n|eta, phi)  [phi > 0;  n >= 0]
     template <bool propto,
@@ -37,14 +37,14 @@ namespace stan {
                                                   T_precision>::type
         T_partials_return;
 
-      static const char* function("stan::prob::neg_binomial_log");
+      static const char* function("stan::math::neg_binomial_log");
 
       using stan::math::check_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_positive_finite;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // check if any vectors are zero length
       if (!(stan::length(n)

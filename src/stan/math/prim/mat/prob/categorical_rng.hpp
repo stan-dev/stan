@@ -13,7 +13,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline int
@@ -23,7 +23,7 @@ namespace stan {
       using boost::uniform_01;
       using stan::math::check_simplex;
 
-      static const char* function("stan::prob::categorical_rng");
+      static const char* function("stan::math::categorical_rng");
 
       check_simplex(function, "Probabilities parameter", theta);
 

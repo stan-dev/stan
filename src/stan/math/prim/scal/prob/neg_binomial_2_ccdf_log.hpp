@@ -25,7 +25,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Temporary neg_binomial_2_ccdf implementation that
     // transforms the input parameters and calls neg_binomial_ccdf
@@ -43,7 +43,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::check_less;
 
-      static const char* function("stan::prob::neg_binomial_2_cdf");
+      static const char* function("stan::math::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Precision parameter", phi);
       check_not_nan(function, "Random variable", n);

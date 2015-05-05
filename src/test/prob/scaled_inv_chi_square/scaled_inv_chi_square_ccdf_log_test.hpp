@@ -65,7 +65,7 @@ public:
   typename stan::return_type<T_y, T_dof, T_scale>::type 
   ccdf_log(const T_y& y, const T_dof& nu, const T_scale& s,
            const T3&, const T4&, const T5&) {
-    return stan::prob::scaled_inv_chi_square_ccdf_log(y, nu, s);
+    return stan::math::scaled_inv_chi_square_ccdf_log(y, nu, s);
   }
 
 

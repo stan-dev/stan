@@ -21,7 +21,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // BetaBinomial(n|alpha, beta) [alpha > 0;  beta > 0;  n >= 0]
     template <bool propto,
@@ -32,7 +32,7 @@ namespace stan {
                       const T_N& N,
                       const T_size1& alpha,
                       const T_size2& beta) {
-      static const char* function("stan::prob::beta_binomial_log");
+      static const char* function("stan::math::beta_binomial_log");
       typedef typename stan::partials_return_type<T_size1, T_size2>::type
         T_partials_return;
 
@@ -40,7 +40,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // check if any vectors are zero length
       if (!(stan::length(n)

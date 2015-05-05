@@ -50,7 +50,7 @@ public:
   typename stan::return_type<T_log_location,T_inv_scale>::type
   log_prob(const T_n& n, const T_log_location& eta, const T_inv_scale& phi,
            const T3&, const T4&, const T5&) {
-    return stan::prob::neg_binomial_2_log_log(n, eta, phi);
+    return stan::math::neg_binomial_2_log_log(n, eta, phi);
   }
 
   template <bool propto,
@@ -59,7 +59,7 @@ public:
   typename stan::return_type<T_log_location,T_inv_scale>::type
   log_prob(const T_n& n, const T_log_location& eta, const T_inv_scale& phi,
            const T3&, const T4&, const T5&) {
-    return stan::prob::neg_binomial_2_log_log<propto>(n, eta, phi);
+    return stan::math::neg_binomial_2_log_log<propto>(n, eta, phi);
   }
 
 

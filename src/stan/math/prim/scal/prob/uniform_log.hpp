@@ -16,7 +16,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // CONTINUOUS, UNIVARIATE DENSITIES
     /**
@@ -44,7 +44,7 @@ namespace stan {
               typename T_y, typename T_low, typename T_high>
     typename return_type<T_y, T_low, T_high>::type
     uniform_log(const T_y& y, const T_low& alpha, const T_high& beta) {
-      static const char* function("stan::prob::uniform_log");
+      static const char* function("stan::math::uniform_log");
       typedef typename stan::partials_return_type<T_y, T_low, T_high>::type
         T_partials_return;
 

@@ -22,7 +22,7 @@
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     // Logistic(y|mu, sigma)    [sigma > 0]
     // FIXME: document
@@ -30,7 +30,7 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     logistic_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const char* function("stan::prob::logistic_log");
+      static const char* function("stan::math::logistic_log");
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
@@ -38,7 +38,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // check if any vectors are zero length
       if (!(stan::length(y)

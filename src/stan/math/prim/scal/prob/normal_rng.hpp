@@ -14,7 +14,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -27,7 +27,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
 
-      static const char* function("stan::prob::normal_rng");
+      static const char* function("stan::math::normal_rng");
 
       check_finite(function, "Location parameter", mu);
       check_not_nan(function, "Location parameter", mu);

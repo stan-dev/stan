@@ -7,7 +7,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return a probability value constrained to fall between 0 and 1

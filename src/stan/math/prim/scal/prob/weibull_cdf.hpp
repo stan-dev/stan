@@ -19,7 +19,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y, T_shape, T_scale>::type
@@ -27,7 +27,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y, T_shape, T_scale>::type
         T_partials_return;
 
-      static const char* function("stan::prob::weibull_cdf");
+      static const char* function("stan::math::weibull_cdf");
 
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;

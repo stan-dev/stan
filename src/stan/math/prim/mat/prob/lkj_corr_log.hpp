@@ -49,7 +49,7 @@
 #include <stan/math/prim/mat/fun/sum.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <typename T_shape>
     T_shape do_lkj_constant(const T_shape& eta, const unsigned int& K) {
@@ -87,7 +87,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y, T_shape>::type
     lkj_corr_log(const Eigen::Matrix<T_y, Eigen::Dynamic, Eigen::Dynamic>& y,
                  const T_shape& eta) {
-      static const char* function("stan::prob::lkj_corr_log");
+      static const char* function("stan::math::lkj_corr_log");
 
       using stan::math::check_positive;
       using stan::math::check_corr_matrix;

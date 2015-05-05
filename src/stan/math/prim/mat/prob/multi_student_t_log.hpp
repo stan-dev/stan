@@ -22,7 +22,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
     using Eigen::Dynamic;
     /**
      * Return the log of the multivariate Student t distribution
@@ -37,7 +37,7 @@ namespace stan {
                         const T_dof& nu,
                         const T_loc& mu,
                         const T_scale& Sigma) {
-      static const char* function("stan::prob::multi_student_t");
+      static const char* function("stan::math::multi_student_t");
 
       using stan::math::check_size_match;
       using stan::math::check_finite;

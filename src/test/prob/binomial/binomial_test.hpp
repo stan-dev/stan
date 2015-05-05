@@ -54,7 +54,7 @@ public:
   typename stan::return_type<T_prob>::type 
   log_prob(const T_n& n, const T_N& N, const T_prob& theta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::binomial_log(n, N, theta);
+    return stan::math::binomial_log(n, N, theta);
   }
 
   template <bool propto, 
@@ -63,7 +63,7 @@ public:
   typename stan::return_type<T_prob>::type 
   log_prob(const T_n& n, const T_N& N, const T_prob& theta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::binomial_log<propto>(n, N, theta);
+    return stan::math::binomial_log<propto>(n, N, theta);
   }
   
   
@@ -83,9 +83,9 @@ public:
 };
 
 TEST(ProbDistributionsBinomialCDF,Values) {
-    EXPECT_FLOAT_EQ(0.042817421, stan::prob::binomial_cdf(24, 54, 0.57));
-    EXPECT_FLOAT_EQ(1.0 - 0.57, stan::prob::binomial_cdf(0, 1, 0.57)); // Consistency with expected Bernoulli
-    EXPECT_FLOAT_EQ(1.0, stan::prob::binomial_cdf(1, 1, 0.57));        // Consistency with expected Bernoulli
-    EXPECT_FLOAT_EQ(stan::prob::bernoulli_cdf(0, 0.57), stan::prob::binomial_cdf(0, 1, 0.57)); // Consistency with implemented Bernoulli
-    EXPECT_FLOAT_EQ(stan::prob::bernoulli_cdf(1, 0.57), stan::prob::binomial_cdf(1, 1, 0.57)); // Consistency with implemented Bernoulli
+    EXPECT_FLOAT_EQ(0.042817421, stan::math::binomial_cdf(24, 54, 0.57));
+    EXPECT_FLOAT_EQ(1.0 - 0.57, stan::math::binomial_cdf(0, 1, 0.57)); // Consistency with expected Bernoulli
+    EXPECT_FLOAT_EQ(1.0, stan::math::binomial_cdf(1, 1, 0.57));        // Consistency with expected Bernoulli
+    EXPECT_FLOAT_EQ(stan::math::bernoulli_cdf(0, 0.57), stan::math::binomial_cdf(0, 1, 0.57)); // Consistency with implemented Bernoulli
+    EXPECT_FLOAT_EQ(stan::math::bernoulli_cdf(1, 0.57), stan::math::binomial_cdf(1, 1, 0.57)); // Consistency with implemented Bernoulli
 }

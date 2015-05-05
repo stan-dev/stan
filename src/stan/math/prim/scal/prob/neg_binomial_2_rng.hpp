@@ -23,7 +23,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline int
@@ -33,7 +33,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
 
-      static const char* function("stan::prob::neg_binomial_2_rng");
+      static const char* function("stan::math::neg_binomial_2_rng");
 
       using stan::math::check_positive_finite;
 
@@ -41,7 +41,7 @@ namespace stan {
       check_positive_finite(function, "Precision parameter", phi);
 
 
-      return stan::prob::poisson_rng(stan::prob::gamma_rng(phi, phi/mu,
+      return stan::math::poisson_rng(stan::math::gamma_rng(phi, phi/mu,
                                                            rng), rng);
     }
   }

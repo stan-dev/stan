@@ -71,7 +71,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   ccdf_log(const T_y& y, const T_loc& mu, const T_scale& beta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::gumbel_ccdf_log(y, mu, beta);
+    return stan::math::gumbel_ccdf_log(y, mu, beta);
   }
 
 

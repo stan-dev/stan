@@ -25,7 +25,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline int
@@ -35,7 +35,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::binomial_distribution;
 
-      static const char* function("stan::prob::binomial_rng");
+      static const char* function("stan::math::binomial_rng");
 
       using stan::math::check_finite;
       using stan::math::check_less_or_equal;

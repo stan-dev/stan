@@ -16,14 +16,14 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline std::vector<int>
     multinomial_rng(const Eigen::Matrix<double, Eigen::Dynamic, 1>& theta,
                     const int N,
                     RNG& rng) {
-      static const char* function("stan::prob::multinomial_rng");
+      static const char* function("stan::math::multinomial_rng");
       using stan::math::check_simplex;
       using stan::math::check_positive;
 

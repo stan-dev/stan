@@ -18,14 +18,14 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     // Pareto(y|y_m, alpha)  [y > y_m;  y_m > 0;  alpha > 0]
     template <bool propto,
               typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y, T_scale, T_shape>::type
     pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
-      static const char* function("stan::prob::pareto_log");
+      static const char* function("stan::math::pareto_log");
       typedef typename stan::partials_return_type<T_y, T_scale, T_shape>::type
         T_partials_return;
 

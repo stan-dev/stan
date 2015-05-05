@@ -20,7 +20,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Poisson(n|lambda)  [lambda > 0;  n >= 0]
     template <bool propto, typename T_n, typename T_rate>
@@ -29,13 +29,13 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n, T_rate>::type
         T_partials_return;
 
-      static const char* function("stan::prob::poisson_log");
+      static const char* function("stan::math::poisson_log");
 
       using boost::math::lgamma;
       using stan::math::check_consistent_sizes;
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
       using stan::math::value_of;
 
       // check if any vectors are zero length

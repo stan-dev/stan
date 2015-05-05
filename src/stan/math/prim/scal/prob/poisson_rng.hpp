@@ -18,7 +18,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     static const double POISSON_MAX_RATE = pow(2, 30);
 
@@ -29,7 +29,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::poisson_distribution;
 
-      static const char* function("stan::prob::poisson_rng");
+      static const char* function("stan::math::poisson_rng");
 
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;

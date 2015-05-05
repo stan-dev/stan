@@ -64,7 +64,7 @@ public:
   typename stan::return_type<T_y, T_inv_scale>::type 
   cdf(const T_y& y, const T_inv_scale& beta, const T2&,
       const T3&, const T4&, const T5&) {
-    return stan::prob::exponential_cdf(y, beta);
+    return stan::math::exponential_cdf(y, beta);
   }
   
   

@@ -28,7 +28,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The cumulative density function for a gamma distribution for y
@@ -55,7 +55,7 @@ namespace stan {
         T_partials_return;
 
       // Error checks
-      static const char* function("stan::prob::gamma_cdf");
+      static const char* function("stan::math::gamma_cdf");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;

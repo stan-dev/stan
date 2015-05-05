@@ -18,7 +18,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Bernoulli(n|theta)   [0 <= n <= 1;   0 <= theta <= 1]
     // FIXME: documentation
@@ -26,7 +26,7 @@ namespace stan {
     typename return_type<T_prob>::type
     bernoulli_log(const T_n& n,
                   const T_prob& theta) {
-      static const char* function("stan::prob::bernoulli_log");
+      static const char* function("stan::math::bernoulli_log");
       typedef typename stan::partials_return_type<T_n, T_prob>::type
         T_partials_return;
 
@@ -35,7 +35,7 @@ namespace stan {
       using stan::math::log1m;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -121,6 +121,6 @@ namespace stan {
                   const T_prob& theta) {
       return bernoulli_log<false>(n, theta);
     }
-  }  // namespace prob
+  }  // namespace math
 }  // namespace stan
 #endif

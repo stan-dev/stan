@@ -20,7 +20,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_inv_scale>
     typename return_type<T_y, T_inv_scale>::type
@@ -28,7 +28,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y, T_inv_scale>::type
         T_partials_return;
 
-      static const char* function("stan::prob::exponential_ccdf_log");
+      static const char* function("stan::math::exponential_ccdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;

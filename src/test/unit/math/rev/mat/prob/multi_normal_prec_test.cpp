@@ -31,5 +31,5 @@ TEST(ProbDistributionsMultiNormalPrec,MultiNormalVar) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   Matrix<var,Dynamic,Dynamic> L = Sigma.inverse();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_prec_log(y,mu,L).val());
+  EXPECT_FLOAT_EQ(-11.73908, stan::math::multi_normal_prec_log(y,mu,L).val());
 }

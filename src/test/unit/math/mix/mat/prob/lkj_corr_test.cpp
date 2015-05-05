@@ -52,14 +52,14 @@ TEST(ProbDistributionsLkjCorr,fvar_var) {
   Sigma.diagonal().setOnes();
   for (int i = 0; i < K*K; i++)
     Sigma(i).d_ = 1.0;
-  fvar<var> eta = stan::prob::uniform_rng(0,2,rng);
-  fvar<var> f = stan::prob::do_lkj_constant(eta, K);
-  EXPECT_FLOAT_EQ(f.val_.val(), stan::prob::lkj_corr_log(Sigma, eta).val_.val());
-  EXPECT_FLOAT_EQ(2.5177896, stan::prob::lkj_corr_log(Sigma, eta).d_.val());
+  fvar<var> eta = stan::math::uniform_rng(0,2,rng);
+  fvar<var> f = stan::math::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val(), stan::math::lkj_corr_log(Sigma, eta).val_.val());
+  EXPECT_FLOAT_EQ(2.5177896, stan::math::lkj_corr_log(Sigma, eta).d_.val());
   eta = 1.0;
-  f = stan::prob::do_lkj_constant(eta, K);
-  EXPECT_FLOAT_EQ(f.val_.val(), stan::prob::lkj_corr_log(Sigma, eta).val_.val());
-  EXPECT_FLOAT_EQ(f.d_.val(), stan::prob::lkj_corr_log(Sigma, eta).d_.val());
+  f = stan::math::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val(), stan::math::lkj_corr_log(Sigma, eta).val_.val());
+  EXPECT_FLOAT_EQ(f.d_.val(), stan::math::lkj_corr_log(Sigma, eta).d_.val());
 }
 
 TEST(ProbDistributionsLkjCorrCholesky,fvar_var) {
@@ -72,14 +72,14 @@ TEST(ProbDistributionsLkjCorrCholesky,fvar_var) {
   Sigma.diagonal().setOnes();
   for (int i = 0; i < K*K; i++)
     Sigma(i).d_ = 1.0;
-  fvar<var> eta = stan::prob::uniform_rng(0,2,rng);
-  fvar<var> f = stan::prob::do_lkj_constant(eta, K);
-  EXPECT_FLOAT_EQ(f.val_.val(), stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_.val());
-  EXPECT_FLOAT_EQ(6.7766843, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_.val());
+  fvar<var> eta = stan::math::uniform_rng(0,2,rng);
+  fvar<var> f = stan::math::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val(), stan::math::lkj_corr_cholesky_log(Sigma, eta).val_.val());
+  EXPECT_FLOAT_EQ(6.7766843, stan::math::lkj_corr_cholesky_log(Sigma, eta).d_.val());
   eta = 1.0;
-  f = stan::prob::do_lkj_constant(eta, K);
-  EXPECT_FLOAT_EQ(f.val_.val(), stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_.val());
-  EXPECT_FLOAT_EQ(3, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_.val());
+  f = stan::math::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val(), stan::math::lkj_corr_cholesky_log(Sigma, eta).val_.val());
+  EXPECT_FLOAT_EQ(3, stan::math::lkj_corr_cholesky_log(Sigma, eta).d_.val());
 }
 
 TEST(ProbDistributionsLkjCorr,fvar_fvar_var) {
@@ -92,14 +92,14 @@ TEST(ProbDistributionsLkjCorr,fvar_fvar_var) {
   Sigma.diagonal().setOnes();
   for (int i = 0; i < K*K; i++)
     Sigma(i).d_.val_ = 1.0;
-  fvar<fvar<var> > eta = stan::prob::uniform_rng(0,2,rng);
-  fvar<fvar<var> > f = stan::prob::do_lkj_constant(eta, K);
-  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::prob::lkj_corr_log(Sigma, eta).val_.val_.val());
-  EXPECT_FLOAT_EQ(2.5177896, stan::prob::lkj_corr_log(Sigma, eta).d_.val_.val());
+  fvar<fvar<var> > eta = stan::math::uniform_rng(0,2,rng);
+  fvar<fvar<var> > f = stan::math::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::math::lkj_corr_log(Sigma, eta).val_.val_.val());
+  EXPECT_FLOAT_EQ(2.5177896, stan::math::lkj_corr_log(Sigma, eta).d_.val_.val());
   eta = 1.0;
-  f = stan::prob::do_lkj_constant(eta, K);
-  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::prob::lkj_corr_log(Sigma, eta).val_.val_.val());
-  EXPECT_FLOAT_EQ(f.d_.val_.val(), stan::prob::lkj_corr_log(Sigma, eta).d_.val_.val());
+  f = stan::math::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::math::lkj_corr_log(Sigma, eta).val_.val_.val());
+  EXPECT_FLOAT_EQ(f.d_.val_.val(), stan::math::lkj_corr_log(Sigma, eta).d_.val_.val());
 }
 
 TEST(ProbDistributionsLkjCorrCholesky,fvar_fvar_var) {
@@ -112,12 +112,12 @@ TEST(ProbDistributionsLkjCorrCholesky,fvar_fvar_var) {
   Sigma.diagonal().setOnes();
   for (int i = 0; i < K*K; i++)
     Sigma(i).d_.val_ = 1.0;
-  fvar<fvar<var> > eta = stan::prob::uniform_rng(0,2,rng);
-  fvar<fvar<var> > f = stan::prob::do_lkj_constant(eta, K);
-  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_.val_.val());
-  EXPECT_FLOAT_EQ(6.7766843, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_.val_.val());
+  fvar<fvar<var> > eta = stan::math::uniform_rng(0,2,rng);
+  fvar<fvar<var> > f = stan::math::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::math::lkj_corr_cholesky_log(Sigma, eta).val_.val_.val());
+  EXPECT_FLOAT_EQ(6.7766843, stan::math::lkj_corr_cholesky_log(Sigma, eta).d_.val_.val());
   eta = 1.0;
-  f = stan::prob::do_lkj_constant(eta, K);
-  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::prob::lkj_corr_cholesky_log(Sigma, eta).val_.val_.val());
-  EXPECT_FLOAT_EQ(3, stan::prob::lkj_corr_cholesky_log(Sigma, eta).d_.val_.val());
+  f = stan::math::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f.val_.val_.val(), stan::math::lkj_corr_cholesky_log(Sigma, eta).val_.val_.val());
+  EXPECT_FLOAT_EQ(3, stan::math::lkj_corr_cholesky_log(Sigma, eta).d_.val_.val());
 }

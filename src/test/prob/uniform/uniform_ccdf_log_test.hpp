@@ -58,7 +58,7 @@ public:
   typename stan::return_type<T_y, T_low, T_high>::type 
   ccdf_log(const T_y& y, const T_low& alpha, const T_high& beta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::uniform_ccdf_log(y, alpha, beta);
+    return stan::math::uniform_ccdf_log(y, alpha, beta);
   }
   
   template <class T_y, class T_low, class T_high,
@@ -66,8 +66,8 @@ public:
   typename stan::return_type<T_y, T_low, T_high>::type 
   ccdf_log_function(const T_y& y, const T_low& alpha, const T_high& beta,
                     const T3&, const T4&, const T5&) {
-      using stan::prob::include_summand;
-      using stan::prob::LOG_ZERO;
+      using stan::math::include_summand;
+      using stan::math::LOG_ZERO;
 
       if (y < alpha || y > beta)
         return 0.0;

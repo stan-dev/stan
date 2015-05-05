@@ -33,7 +33,7 @@
 */
 
 namespace stan {
-  namespace prob {
+  namespace math {
     /**
      * The log of a Gaussian dynamic linear model (GDLM).
      * This distribution is equivalent to, for \f$t = 1:T\f$,
@@ -89,7 +89,7 @@ namespace stan {
                          const Eigen::Matrix<T_m0, Eigen::Dynamic, 1>& m0,
                          const Eigen::Matrix
                          <T_C0, Eigen::Dynamic, Eigen::Dynamic>& C0) {
-      static const char* function("stan::prob::gaussian_dlm_obs_log");
+      static const char* function("stan::math::gaussian_dlm_obs_log");
       typedef typename return_type<
         T_y,
         typename return_type<T_F, T_G, T_V, T_W, T_m0, T_C0>::type>::type T_lp;
@@ -294,7 +294,7 @@ namespace stan {
                          const Eigen::Matrix<T_m0, Eigen::Dynamic, 1>& m0,
                          const Eigen::Matrix
                          <T_C0, Eigen::Dynamic, Eigen::Dynamic>& C0) {
-      static const char* function("stan::prob::gaussian_dlm_obs_log");
+      static const char* function("stan::math::gaussian_dlm_obs_log");
       typedef
         typename return_type
         <T_y, typename return_type<T_F, T_G, T_V, T_W, T_m0, T_C0>::type>::type

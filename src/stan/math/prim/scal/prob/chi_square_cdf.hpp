@@ -21,7 +21,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Calculates the chi square cumulative distribution function for the given
@@ -35,7 +35,7 @@ namespace stan {
     template <typename T_y, typename T_dof>
     typename return_type<T_y, T_dof>::type
     chi_square_cdf(const T_y& y, const T_dof& nu) {
-      static const char* function("stan::prob::chi_square_cdf");
+      static const char* function("stan::math::chi_square_cdf");
       typedef typename stan::partials_return_type<T_y, T_dof>::type
         T_partials_return;
 

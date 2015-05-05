@@ -70,7 +70,7 @@ public:
   typename stan::return_type<T_y, T_scale1, T_scale2>::type 
   log_prob(const T_y& y, const T_scale1& alpha, const T_scale2& beta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::beta_log(y, alpha, beta);
+    return stan::math::beta_log(y, alpha, beta);
   }
 
   template <bool propto, 
@@ -79,7 +79,7 @@ public:
   typename stan::return_type<T_y, T_scale1, T_scale2>::type 
   log_prob(const T_y& y, const T_scale1& alpha, const T_scale2& beta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::beta_log<propto>(y, alpha, beta);
+    return stan::math::beta_log<propto>(y, alpha, beta);
   }
   
   template <typename T_y, typename T_scale1, typename T_scale2,

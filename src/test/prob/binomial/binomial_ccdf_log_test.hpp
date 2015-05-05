@@ -47,7 +47,7 @@ public:
   typename stan::return_type<T_prob>::type
   ccdf_log(const T_n& n, const T_N& N, const T_prob& theta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::binomial_ccdf_log(n, N, theta);
+    return stan::math::binomial_ccdf_log(n, N, theta);
   }
 
 

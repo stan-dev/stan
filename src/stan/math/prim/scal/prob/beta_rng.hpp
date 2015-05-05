@@ -23,7 +23,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -33,7 +33,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::gamma_distribution;
       // Error checks
-      static const char* function("stan::prob::beta_rng");
+      static const char* function("stan::math::beta_rng");
 
       using stan::math::check_positive_finite;
 

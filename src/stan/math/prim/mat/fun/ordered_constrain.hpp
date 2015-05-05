@@ -7,7 +7,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return an increasing ordered vector derived from the specified

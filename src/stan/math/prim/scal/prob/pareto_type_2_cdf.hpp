@@ -18,7 +18,7 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y, T_loc, T_scale, T_shape>::type
@@ -37,7 +37,7 @@ namespace stan {
         return 1.0;
 
       // Check errors
-      static const char* function("stan::prob::pareto_type_2_cdf");
+      static const char* function("stan::math::pareto_type_2_cdf");
 
       using stan::math::check_greater_or_equal;
       using stan::math::check_finite;

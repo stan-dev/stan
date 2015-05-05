@@ -6,15 +6,15 @@
 
 TEST(ProbDistributionsHypergeometric, error_check) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::hypergeometric_rng(10, 10, 15,rng));
+  EXPECT_NO_THROW(stan::math::hypergeometric_rng(10, 10, 15,rng));
 
-  EXPECT_THROW(stan::prob::hypergeometric_rng(30, 10, 15,rng),
+  EXPECT_THROW(stan::math::hypergeometric_rng(30, 10, 15,rng),
                std::domain_error);
-  EXPECT_THROW(stan::prob::hypergeometric_rng(-30, 10, 15,rng),
+  EXPECT_THROW(stan::math::hypergeometric_rng(-30, 10, 15,rng),
                std::domain_error);
-  EXPECT_THROW(stan::prob::hypergeometric_rng(30, -10, 15,rng),
+  EXPECT_THROW(stan::math::hypergeometric_rng(30, -10, 15,rng),
                std::domain_error);
-  EXPECT_THROW(stan::prob::hypergeometric_rng(30, 10, -15,rng),
+  EXPECT_THROW(stan::math::hypergeometric_rng(30, 10, -15,rng),
                std::domain_error);
 }
 
@@ -39,7 +39,7 @@ TEST(ProbDistributionsHypergeometric, chiSquareGoodnessFitTest) {
   }
 
   while (count < N) {
-    int a = stan::prob::hypergeometric_rng(num_draws, 10, 15,rng);
+    int a = stan::math::hypergeometric_rng(num_draws, 10, 15,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

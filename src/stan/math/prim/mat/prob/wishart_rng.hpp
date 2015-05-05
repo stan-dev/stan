@@ -22,7 +22,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
@@ -35,7 +35,7 @@ namespace stan {
       using stan::math::check_size_match;
       using stan::math::check_square;
 
-      static const char* function("stan::prob::wishart_rng");
+      static const char* function("stan::math::wishart_rng");
 
       typename index_type<MatrixXd>::type k = S.rows();
 

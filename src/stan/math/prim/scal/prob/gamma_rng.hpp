@@ -28,7 +28,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -38,7 +38,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::gamma_distribution;
 
-      static const char* function("stan::prob::gamma_rng");
+      static const char* function("stan::math::gamma_rng");
 
       using stan::math::check_positive_finite;
 

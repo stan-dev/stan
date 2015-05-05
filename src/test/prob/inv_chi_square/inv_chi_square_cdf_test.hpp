@@ -54,7 +54,7 @@ public:
   typename stan::return_type<T_y, T_dof>::type 
   cdf(const T_y& y, const T_dof& nu, const T2&,
       const T3&, const T4&, const T5&) {
-    return stan::prob::inv_chi_square_cdf(y, nu);
+    return stan::math::inv_chi_square_cdf(y, nu);
   }
 
 

@@ -14,7 +14,7 @@
 #include <stan/math/prim/mat/prob/wishart_rng.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
@@ -22,7 +22,7 @@ namespace stan {
                     const Eigen::Matrix
                     <double, Eigen::Dynamic, Eigen::Dynamic>& S,
                     RNG& rng) {
-      static const char* function("stan::prob::inv_wishart_rng");
+      static const char* function("stan::math::inv_wishart_rng");
 
       using stan::math::check_greater;
       using stan::math::check_square;

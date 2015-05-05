@@ -6,7 +6,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the result of transforming the specified scalar to have

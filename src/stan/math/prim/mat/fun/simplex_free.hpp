@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return an unconstrained vector that when transformed produces
@@ -34,7 +34,7 @@ namespace stan {
 
       typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 
-      stan::math::check_simplex("stan::prob::simplex_free",
+      stan::math::check_simplex("stan::math::simplex_free",
                                 "Simplex variable", x);
       int Km1 = x.size() - 1;
       Eigen::Matrix<T, Eigen::Dynamic, 1> y(Km1);

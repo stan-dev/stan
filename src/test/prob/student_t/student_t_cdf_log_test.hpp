@@ -71,7 +71,7 @@ public:
   typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type
   cdf_log(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
           const T4&, const T5&) {
-    return stan::prob::student_t_cdf_log(y, nu, mu, sigma);
+    return stan::math::student_t_cdf_log(y, nu, mu, sigma);
   }
 
   template <typename T_y, typename T_dof, typename T_loc, typename T_scale, 
@@ -79,6 +79,6 @@ public:
   typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type
   cdf_log_function(const T_y& y, const T_dof& nu, const T_loc& mu, 
                    const T_scale& sigma, const T4&, const T5&) {
-    return stan::prob::student_t_cdf_log(y, nu, mu, sigma);
+    return stan::math::student_t_cdf_log(y, nu, mu, sigma);
   }
 };

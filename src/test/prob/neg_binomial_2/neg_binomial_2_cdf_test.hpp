@@ -85,7 +85,7 @@ public:
   typename stan::return_type<T_location, T_precision>::type
   cdf(const T_n& n, const T_location& alpha, const T_precision& beta,
       const T3&, const T4&, const T5&) {
-    return stan::prob::neg_binomial_2_cdf(n, alpha, beta);
+    return stan::math::neg_binomial_2_cdf(n, alpha, beta);
   }
 
 

@@ -61,7 +61,7 @@ using Eigen::Dynamic;
 
 TEST(prob_transform,ordered_jacobian_ad) {
   using stan::agrad::var;
-  using stan::prob::ordered_constrain;
+  using stan::math::ordered_constrain;
   using stan::math::determinant;
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -103,7 +103,7 @@ TEST(prob_transform,ordered_jacobian_ad) {
 
 TEST(prob_transform,positive_ordered_jacobian_ad) {
   using stan::agrad::var;
-  using stan::prob::positive_ordered_constrain;
+  using stan::math::positive_ordered_constrain;
   using stan::math::determinant;
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -157,7 +157,7 @@ TEST(prob_transform,corr_matrix_jacobian) {
   for (int i = 0; i < X.size(); ++i)
     x.push_back(X(i));
   var lp = 0.0;
-  Matrix<var,Dynamic,Dynamic> Sigma = stan::prob::corr_matrix_constrain(X,K,lp);
+  Matrix<var,Dynamic,Dynamic> Sigma = stan::math::corr_matrix_constrain(X,K,lp);
   std::vector<var> y;
   for (int m = 0; m < K; ++m)
     for (int n = 0; n < m; ++n)
@@ -193,7 +193,7 @@ TEST(prob_transform,cov_matrix_jacobian) {
   for (int i = 0; i < X.size(); ++i)
     x.push_back(X(i));
   var lp = 0.0;
-  Matrix<var,Dynamic,Dynamic> Sigma = stan::prob::cov_matrix_constrain(X,K,lp);
+  Matrix<var,Dynamic,Dynamic> Sigma = stan::math::cov_matrix_constrain(X,K,lp);
   std::vector<var> y;
   for (int m = 0; m < K; ++m)
     for (int n = 0; n <= m; ++n)
@@ -223,7 +223,7 @@ TEST(probTransform,simplex_jacobian) {
   
   var lp(0);
   Matrix<var,Dynamic,1> x 
-    = stan::prob::simplex_constrain(y,lp);
+    = stan::math::simplex_constrain(y,lp);
   
   vector<var> indeps;
   indeps.push_back(a);
@@ -262,7 +262,7 @@ TEST(probTransform,unit_vector_jacobian) {
   
   var lp(0);
   Matrix<var,Dynamic,1> x 
-    = stan::prob::unit_vector_constrain(y,lp);
+    = stan::math::unit_vector_constrain(y,lp);
   
   vector<var> indeps;
   indeps.push_back(a);
@@ -302,7 +302,7 @@ test_cholesky_correlation_jacobian(const Eigen::Matrix<stan::agrad::var,
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::agrad::var;
-  using stan::prob::cholesky_corr_constrain;
+  using stan::math::cholesky_corr_constrain;
 
   int K_choose_2 = (K * (K - 1)) / 2;
 

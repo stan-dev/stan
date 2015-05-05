@@ -17,7 +17,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline int
@@ -26,7 +26,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::bernoulli_distribution;
 
-      static const char* function("stan::prob::bernoulli_rng");
+      static const char* function("stan::math::bernoulli_rng");
 
       using stan::math::check_finite;
       using stan::math::check_bounded;

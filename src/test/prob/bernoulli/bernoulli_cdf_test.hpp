@@ -47,7 +47,7 @@ public:
   typename stan::return_type<T_prob>::type
   cdf(const T_n& n, const T_prob& theta, const T2&,
       const T3&, const T4&, const T5&) {
-    return stan::prob::bernoulli_cdf(n, theta);
+    return stan::math::bernoulli_cdf(n, theta);
   }
 
 

@@ -19,7 +19,7 @@
 
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     // pareto_type_2(y|lambda, alpha)  [y >= 0;  lambda > 0;  alpha > 0]
     template <bool propto,
@@ -27,7 +27,7 @@ namespace stan {
     typename return_type<T_y, T_loc, T_scale, T_shape>::type
     pareto_type_2_log(const T_y& y, const T_loc& mu, const T_scale& lambda,
                       const T_shape& alpha) {
-      static const char* function("stan::prob::pareto_type_2_log");
+      static const char* function("stan::math::pareto_type_2_log");
       typedef
         typename stan::partials_return_type<T_y, T_loc, T_scale, T_shape>::type
         T_partials_return;

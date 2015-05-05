@@ -15,7 +15,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Categorical(n|theta)  [0 < n <= N;   0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto,
@@ -23,7 +23,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_log(int n,
                     const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
-      static const char* function("stan::prob::categorical_log");
+      static const char* function("stan::math::categorical_log");
 
       using stan::math::check_bounded;
       using stan::math::check_simplex;
@@ -65,7 +65,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_log(const std::vector<int>& ns,
                     const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
-      static const char* function("stan::prob::categorical_log");
+      static const char* function("stan::math::categorical_log");
 
       using boost::math::tools::promote_args;
       using stan::math::check_bounded;

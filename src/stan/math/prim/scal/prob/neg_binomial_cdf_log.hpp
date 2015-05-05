@@ -24,14 +24,14 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_n, typename T_shape,
               typename T_inv_scale>
     typename return_type<T_shape, T_inv_scale>::type
     neg_binomial_cdf_log(const T_n& n, const T_shape& alpha,
                          const T_inv_scale& beta) {
-      static const char* function("stan::prob::neg_binomial_cdf_log");
+      static const char* function("stan::math::neg_binomial_cdf_log");
       typedef typename stan::partials_return_type<T_n, T_shape,
                                                   T_inv_scale>::type
         T_partials_return;
@@ -39,7 +39,7 @@ namespace stan {
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // Ensure non-zero arugment lengths
       if (!(stan::length(n) && stan::length(alpha) && stan::length(beta)))

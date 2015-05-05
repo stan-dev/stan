@@ -23,7 +23,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of the Student-t density for the given y, nu, mean, and
@@ -55,7 +55,7 @@ namespace stan {
     typename return_type<T_y, T_dof, T_loc, T_scale>::type
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu,
                   const T_scale& sigma) {
-      static const char* function("stan::prob::student_t_log");
+      static const char* function("stan::math::student_t_log");
       typedef typename stan::partials_return_type<T_y, T_dof, T_loc,
                                                   T_scale>::type
         T_partials_return;

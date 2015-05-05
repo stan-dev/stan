@@ -19,7 +19,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Hypergeometric(n|N, a, b)  [0 <= n <= a;  0 <= N-n <= b;  0 <= N <= a+b]
     // n: #white balls drawn;  N: #balls drawn;
@@ -30,13 +30,13 @@ namespace stan {
     double
     hypergeometric_log(const T_n& n, const T_N& N,
                        const T_a& a, const T_b& b) {
-      static const char* function("stan::prob::hypergeometric_log");
+      static const char* function("stan::math::hypergeometric_log");
 
       using stan::math::check_finite;
       using stan::math::check_bounded;
       using stan::math::check_greater;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // check if any vectors are zero length
       if (!(stan::length(n)

@@ -5,7 +5,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
 
     namespace {

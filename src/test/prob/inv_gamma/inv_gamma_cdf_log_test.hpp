@@ -64,7 +64,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   cdf_log(const T_y& y, const T_shape& alpha, const T_scale& beta,
           const T3&, const T4&, const T5&) {
-    return stan::prob::inv_gamma_cdf_log(y, alpha, beta);
+    return stan::math::inv_gamma_cdf_log(y, alpha, beta);
   }
 
 

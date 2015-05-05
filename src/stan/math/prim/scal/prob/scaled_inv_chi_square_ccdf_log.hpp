@@ -24,7 +24,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_dof, typename T_scale>
     typename return_type<T_y, T_dof, T_scale>::type
@@ -37,7 +37,7 @@ namespace stan {
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
         return 0.0;
 
-      static const char* function("stan::prob::scaled_inv_chi_square_ccdf_log");
+      static const char* function("stan::math::scaled_inv_chi_square_ccdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;

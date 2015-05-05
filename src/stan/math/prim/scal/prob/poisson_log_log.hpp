@@ -21,7 +21,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // PoissonLog(n|alpha)  [n >= 0]   = Poisson(n|exp(alpha))
     template <bool propto,
@@ -31,14 +31,14 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n, T_log_rate>::type
         T_partials_return;
 
-      static const char* function("stan::prob::poisson_log_log");
+      static const char* function("stan::math::poisson_log_log");
 
       using boost::math::lgamma;
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
       using std::exp;
 
       // check if any vectors are zero length

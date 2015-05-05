@@ -17,14 +17,14 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
     double_exponential_rng(const double mu,
                            const double sigma,
                            RNG& rng) {
-      static const char* function("stan::prob::double_exponential_rng");
+      static const char* function("stan::math::double_exponential_rng");
 
       using boost::variate_generator;
       using boost::random::uniform_01;

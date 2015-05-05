@@ -5,7 +5,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the positive value for the specified unconstrained input.

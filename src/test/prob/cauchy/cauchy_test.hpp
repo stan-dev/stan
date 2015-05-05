@@ -64,7 +64,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::cauchy_log(y, mu, sigma);
+    return stan::math::cauchy_log(y, mu, sigma);
   }
 
   template <bool propto, 
@@ -73,7 +73,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::cauchy_log<propto>(y, mu, sigma);
+    return stan::math::cauchy_log<propto>(y, mu, sigma);
   }
   
   
@@ -84,14 +84,14 @@ public:
                         const T3&, const T4&, const T5&) {
     using stan::math::log1p;
     using stan::math::square;
-    return stan::prob::NEG_LOG_PI - log(sigma) 
+    return stan::math::NEG_LOG_PI - log(sigma) 
       - log1p(square((y - mu) / sigma));
   }
 };
 
 
 TEST(ProbDistributionsCauchy,Cumulative) {
-  using stan::prob::cauchy_cdf;
+  using stan::math::cauchy_cdf;
   EXPECT_FLOAT_EQ(0.75, cauchy_cdf(1.0, 0.0, 1.0));
   EXPECT_FLOAT_EQ(0.187167, cauchy_cdf(-1.5, 0.0, 1.0));
   EXPECT_FLOAT_EQ(0.187167, cauchy_cdf(-2.5, -1.0, 1.0));

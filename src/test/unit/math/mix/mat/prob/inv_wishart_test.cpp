@@ -27,7 +27,7 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
-using stan::prob::inv_wishart_log;
+using stan::math::inv_wishart_log;
 
 TEST(ProbDistributionsInvWishart,fvar_var) {
   using stan::agrad::fvar;
@@ -52,8 +52,8 @@ TEST(ProbDistributionsInvWishart,fvar_var) {
       Sigma(i,j).d_ = 1.0;
     }
 
-  EXPECT_NEAR(log_p, stan::prob::inv_wishart_log(Y,dof,Sigma).val_.val(), 0.01);
-  EXPECT_NEAR(-1.4893348387330674, stan::prob::inv_wishart_log(Y,dof,Sigma).d_.val(), 0.01);
+  EXPECT_NEAR(log_p, stan::math::inv_wishart_log(Y,dof,Sigma).val_.val(), 0.01);
+  EXPECT_NEAR(-1.4893348387330674, stan::math::inv_wishart_log(Y,dof,Sigma).d_.val(), 0.01);
 }
 
 TEST(ProbDistributionsInvWishart,fvar_fvar_var) {
@@ -79,6 +79,6 @@ TEST(ProbDistributionsInvWishart,fvar_fvar_var) {
       Sigma(i,j).d_ = 1.0;
     }
 
-  EXPECT_NEAR(log_p, stan::prob::inv_wishart_log(Y,dof,Sigma).val_.val_.val(), 0.01);
-  EXPECT_NEAR(-1.4893348387330674, stan::prob::inv_wishart_log(Y,dof,Sigma).d_.val_.val(), 0.01);
+  EXPECT_NEAR(log_p, stan::math::inv_wishart_log(Y,dof,Sigma).val_.val_.val(), 0.01);
+  EXPECT_NEAR(-1.4893348387330674, stan::math::inv_wishart_log(Y,dof,Sigma).d_.val_.val(), 0.01);
 }

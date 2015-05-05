@@ -57,7 +57,7 @@ struct norm_functor {
   template <typename T>
   inline
   T operator()(const Eigen::Matrix<T,Eigen::Dynamic,1>& inp_vec) const {
-    return stan::prob::normal_log(inp_vec(0), inp_vec(1), inp_vec(2)); 
+    return stan::math::normal_log(inp_vec(0), inp_vec(1), inp_vec(2)); 
   }
 };
 

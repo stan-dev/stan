@@ -7,7 +7,7 @@
 
 TEST(normal_cdf, tails) {
   using stan::agrad::var;
-  using stan::prob::normal_cdf;
+  using stan::math::normal_cdf;
 
   EXPECT_FLOAT_EQ(1, 4.60535300958196e-308 / normal_cdf(var(-37.5),0,1).val());
   EXPECT_FLOAT_EQ(1, 5.72557122252458e-300 / normal_cdf(var(-37),0,1).val());
@@ -113,7 +113,7 @@ void test_value_and_derivatives(double expected_val,
                                 double y_dbl, double mu_dbl, double sigma_dbl) {
   using stan::math::is_nan;
   using stan::agrad::var;  
-  using stan::prob::normal_cdf;
+  using stan::math::normal_cdf;
   std::stringstream msg_ss;
   msg_ss << "parameters: (" << y_dbl << ", " << mu_dbl << ", " << sigma_dbl << ")";
   std::string msg = msg_ss.str();

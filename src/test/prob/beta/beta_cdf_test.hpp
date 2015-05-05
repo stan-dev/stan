@@ -72,7 +72,7 @@ public:
   typename stan::return_type<T_y, T_scale_succ, T_scale_fail>::type 
   cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta,
       const T3&, const T4&, const T5&) {
-    return stan::prob::beta_cdf(y, alpha, beta);
+    return stan::math::beta_cdf(y, alpha, beta);
   }
 
 
@@ -83,7 +83,7 @@ public:
   cdf_function(const T_y& y, const T_scale_succ& alpha, 
                const T_scale_fail& beta,
                const T3&, const T4&, const T5&) {
-    return stan::prob::beta_cdf(y, alpha, beta);
+    return stan::math::beta_cdf(y, alpha, beta);
       
   }
     

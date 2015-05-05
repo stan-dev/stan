@@ -24,7 +24,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
     typename return_type<T_y, T_dof, T_loc, T_scale>::type
@@ -39,7 +39,7 @@ namespace stan {
             && stan::length(sigma)))
         return 0.0;
 
-      static const char* function("stan::prob::student_t_cdf_log");
+      static const char* function("stan::math::student_t_cdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_finite;
