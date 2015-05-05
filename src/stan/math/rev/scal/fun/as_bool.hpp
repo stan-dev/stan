@@ -4,7 +4,7 @@
 #include <stan/math/rev/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Return 1 if the argument is unequal to zero and 0 otherwise.

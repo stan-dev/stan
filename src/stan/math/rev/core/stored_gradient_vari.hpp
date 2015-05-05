@@ -5,7 +5,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /**
      * A var implementation that stores the daughter variable

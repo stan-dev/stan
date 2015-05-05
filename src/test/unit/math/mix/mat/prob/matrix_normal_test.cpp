@@ -25,8 +25,8 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 TEST(ProbDistributionsMatrixNormal,fvar_var) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
 
   Matrix<fvar<var>,Dynamic,Dynamic> mu(3,5);
   mu.setZero();
@@ -64,8 +64,8 @@ TEST(ProbDistributionsMatrixNormal,fvar_var) {
   EXPECT_FLOAT_EQ(-2075.1274, lp_ref.d_.val());
 }
 TEST(ProbDistributionsMatrixNormal,fvar_fvar_var) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
 
   Matrix<fvar<fvar<var> >,Dynamic,Dynamic> mu(3,5);
   mu.setZero();

@@ -65,7 +65,7 @@ public:
 };
 
 TEST_F(ErrorHandlingScalar_domain_error, var) {
-  stan::agrad::var y = 10;
+  stan::math::var y = 10;
   
-  test_throw<stan::agrad::var>(y);
+  test_throw<stan::math::var>(y);
 }

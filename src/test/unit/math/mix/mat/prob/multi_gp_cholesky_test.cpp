@@ -33,8 +33,8 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 TEST(ProbDistributionsMultiGPCholesky,fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   Matrix<fvar<var>,Dynamic,1> mu(5,1);
   mu.setZero();
   
@@ -76,8 +76,8 @@ TEST(ProbDistributionsMultiGPCholesky,fvar_var) {
 }
 
 TEST(ProbDistributionsMultiGPCholesky,fvar_fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   Matrix<fvar<fvar<var> >,Dynamic,1> mu(5,1);
   mu.setZero();
   

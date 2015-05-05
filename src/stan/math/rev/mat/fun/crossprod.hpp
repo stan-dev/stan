@@ -5,7 +5,7 @@
 #include <stan/math/rev/mat/fun/tcrossprod.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Returns the result of pre-multiplying a matrix by its

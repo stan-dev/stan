@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     using Eigen::Dynamic;
 
@@ -21,8 +21,8 @@ namespace stan {
                         const Eigen::Matrix<T2, Dynamic, 1>& v,
                         T1& fx,
                         T1& grad_fx_dot_v) {
-      using stan::agrad::fvar;
-      using stan::agrad::var;
+      using stan::math::fvar;
+      using stan::math::var;
       using Eigen::Matrix;
       Matrix<fvar<T1>, Dynamic, 1> x_fvar(x.size());
       for (int i = 0; i < x.size(); ++i)
@@ -32,6 +32,6 @@ namespace stan {
       grad_fx_dot_v = fx_fvar.d_;
     }
 
-  }  // namespace agrad
+  }  // namespace math
 }  // namespace stan
 #endif

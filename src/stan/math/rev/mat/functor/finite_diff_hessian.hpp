@@ -7,7 +7,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /**
      * Calculate the value and the hessian of the specified function

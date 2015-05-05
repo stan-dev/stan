@@ -11,7 +11,7 @@
 #include <stan/math/rev/core.hpp>
 
 using stan::math::check_less_or_equal;
-using stan::agrad::var;
+using stan::math::var;
 
 TEST(AgradRevErrorHandlingScalar,CheckLessOrEqual) {
   const char* function = "check_less_or_equal";
@@ -44,7 +44,7 @@ TEST(AgradRevErrorHandlingScalar,CheckLessOrEqual) {
   lb = -std::numeric_limits<double>::infinity();
   EXPECT_NO_THROW(check_less_or_equal(function, "x", x, lb))
     << "check_less should not throw an exception with x == -Inf and lb == -Inf";
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar,CheckLessOrEqual_Matrix) {
@@ -125,38 +125,38 @@ TEST(AgradRevErrorHandlingScalar,CheckLessOrEqual_Matrix) {
     std::numeric_limits<double>::infinity(), 
     std::numeric_limits<double>::infinity();
   EXPECT_TRUE(check_less_or_equal(function, "x", x, high_vec));
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckLessOrEqualVarCheckUnivariate) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::check_less_or_equal;
 
   const char* function = "check_less_or_equal";
   var a(5.0);
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(1U,stack_size);
   EXPECT_THROW(check_less_or_equal(function,"a",a,2.0),std::domain_error);
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(1U,stack_size_after_call);
 
   EXPECT_TRUE(check_less_or_equal(function,"a",a,5.0));
 
-  stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(1U,stack_size_after_call);
 
   EXPECT_TRUE(check_less_or_equal(function,"a",a,10.0));
-  stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(1U,stack_size_after_call);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckLessOrEqualVarCheckVectorized) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using stan::math::check_less_or_equal;
 
@@ -167,17 +167,17 @@ TEST(AgradRevErrorHandlingScalar, CheckLessOrEqualVarCheckVectorized) {
   for (int i = 0; i < N; ++i)
    a.push_back(var(i));
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(5U,stack_size);
   EXPECT_TRUE(check_less_or_equal(function,"a",a,10.0));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(5U,stack_size_after_call);
 
   EXPECT_THROW(check_less_or_equal(function,"a",a,2.0),std::domain_error);
-  stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(5U,stack_size_after_call);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }

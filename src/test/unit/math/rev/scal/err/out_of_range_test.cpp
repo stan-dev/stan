@@ -61,7 +61,7 @@ public:
 };
 
 TEST_F(ErrorHandlingScalar_out_of_range, var) {
-  std::vector<stan::agrad::var> y(4);
+  std::vector<stan::math::var> y(4);
   
   test_throw(y, 0);
   test_throw(y, 5);

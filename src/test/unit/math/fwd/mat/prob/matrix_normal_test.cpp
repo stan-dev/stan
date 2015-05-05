@@ -18,7 +18,7 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 TEST(ProbDistributionsMatrixNormal,fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Matrix<fvar<double>,Dynamic,Dynamic> mu(3,5);
   mu.setZero();
@@ -57,7 +57,7 @@ TEST(ProbDistributionsMatrixNormal,fvar_double) {
 }
 
 TEST(ProbDistributionsMatrixNormal,fvar_fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Matrix<fvar<fvar<double> >,Dynamic,Dynamic> mu(3,5);
   mu.setZero();

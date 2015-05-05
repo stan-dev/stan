@@ -7,10 +7,10 @@
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/core.hpp>
 
-typedef stan::agrad::fvar<double> AVAR;
+typedef stan::math::fvar<double> AVAR;
 typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
-using stan::agrad::fvar;
+using stan::math::fvar;
 using stan::math::sort_indices_asc;
 using stan::math::sort_indices_desc;
   

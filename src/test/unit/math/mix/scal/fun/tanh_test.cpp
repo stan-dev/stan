@@ -8,14 +8,14 @@
 
 class AgradFwdTanh : public testing::Test {
   void SetUp() {
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
   }
 };
 
 
 TEST_F(AgradFwdTanh, FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::tanh;
 
   fvar<var> x(1.5,1.3);
@@ -30,8 +30,8 @@ TEST_F(AgradFwdTanh, FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ((1.0 - tanh(1.5) * tanh(1.5)), g[0]);
 }
 TEST_F(AgradFwdTanh, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::tanh;
   using std::cosh;
 
@@ -46,8 +46,8 @@ TEST_F(AgradFwdTanh, FvarVar_2ndDeriv) {
 
 
 TEST_F(AgradFwdTanh, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::tanh;
 
   fvar<fvar<var> > x;
@@ -64,7 +64,7 @@ TEST_F(AgradFwdTanh, FvarFvarVar_1stDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.val_.grad(p,g);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   EXPECT_FLOAT_EQ((1.0 - tanh(1.5) * tanh(1.5)), g[0]);
 
   fvar<fvar<var> > y;
@@ -83,8 +83,8 @@ TEST_F(AgradFwdTanh, FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ((1.0 - tanh(1.5) * tanh(1.5)), r[0]);
 }
 TEST_F(AgradFwdTanh, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::tanh;
   using std::cosh;
 
@@ -97,7 +97,7 @@ TEST_F(AgradFwdTanh, FvarFvarVar_2ndDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.d_.grad(p,g);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   EXPECT_FLOAT_EQ(2.0 * -2.0 * tanh(1.5) / (cosh(1.5) * cosh(1.5)), g[0]);
 
   fvar<fvar<var> > y;
@@ -112,8 +112,8 @@ TEST_F(AgradFwdTanh, FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(2.0 * -2.0 * tanh(1.5) / (cosh(1.5) * cosh(1.5)), r[0]);
 }
 TEST_F(AgradFwdTanh, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::tanh;
   using std::cosh;
 

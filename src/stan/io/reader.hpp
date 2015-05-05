@@ -24,7 +24,7 @@ namespace stan {
      * <code>T t = 0.0;</code>
      *
      * This includes <code>double</code> itself and the reverse-mode
-     * algorithmic differentiation class <code>stan::agrad::var</code>.
+     * algorithmic differentiation class <code>stan::math::var</code>.
      *
      * <p>For transformed values, the scalar type parameter <code>T</code>
      * must support the transforming operations, such as <code>exp(x)</code>

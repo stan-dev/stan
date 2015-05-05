@@ -5,7 +5,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionNormal : public AgradDistributionTest {
 public:

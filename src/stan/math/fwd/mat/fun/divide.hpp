@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template <typename T1, typename T2>
     inline

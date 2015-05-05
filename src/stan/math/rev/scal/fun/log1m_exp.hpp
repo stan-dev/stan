@@ -7,7 +7,7 @@
 #include <boost/math/special_functions/expm1.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class log1m_exp_v_vari : public op_v_vari {
@@ -30,7 +30,7 @@ namespace stan {
      * Return the log of 1 minus the exponential of the specified
      * variable.
      */
-    inline var log1m_exp(const stan::agrad::var& a) {
+    inline var log1m_exp(const stan::math::var& a) {
       return var(new log1m_exp_v_vari(a.vi_));
     }
 

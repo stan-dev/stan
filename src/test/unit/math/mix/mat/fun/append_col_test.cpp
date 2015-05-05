@@ -8,7 +8,7 @@
 
 TEST(AgradMixMatrixAppendCol,fv) {
   using stan::math::append_col;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using Eigen::MatrixXd;
 
   matrix_fv a(2,2);
@@ -40,7 +40,7 @@ TEST(AgradMixMatrixAppendCol,fv) {
     for (int j = 0; j < 4; j++)
       EXPECT_EQ(ab_append_col(i, j).val_.val(), adb_append_col(i ,j));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0,0).val_);
   vars.push_back(a(0,1).val_);
   vars.push_back(a(1,0).val_);
@@ -56,7 +56,7 @@ TEST(AgradMixMatrixAppendCol,fv) {
 
 TEST(AgradMixRowVectorAppendCol,fv) {
   using stan::math::append_col;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
   using Eigen::RowVectorXd;
 
   row_vector_fv a(4);
@@ -83,7 +83,7 @@ TEST(AgradMixRowVectorAppendCol,fv) {
   for (int i = 0; i < 7; i++)
     EXPECT_EQ(ab_append_col(i).val_.val(), adb_append_col(i));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0).val_);
   vars.push_back(a(1).val_);
   vars.push_back(a(2).val_);
@@ -99,7 +99,7 @@ TEST(AgradMixRowVectorAppendCol,fv) {
 
 TEST(AgradMixMatrixAppendCol,fv2) {
   using stan::math::append_col;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using Eigen::MatrixXd;
 
   matrix_fv a(2,2);
@@ -131,7 +131,7 @@ TEST(AgradMixMatrixAppendCol,fv2) {
     for (int j = 0; j < 4; j++)
       EXPECT_EQ(ab_append_col(i, j).val_.val(), adb_append_col(i ,j));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0,0).val_);
   vars.push_back(a(0,1).val_);
   vars.push_back(a(1,0).val_);
@@ -147,7 +147,7 @@ TEST(AgradMixMatrixAppendCol,fv2) {
 
 TEST(AgradMixRowVectorAppendCol,fv2) {
   using stan::math::append_col;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
   using Eigen::RowVectorXd;
 
   row_vector_fv a(4);
@@ -174,7 +174,7 @@ TEST(AgradMixRowVectorAppendCol,fv2) {
   for (int i = 0; i < 7; i++)
       EXPECT_EQ(ab_append_col(i).val_, adb_append_col(i));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0).val_);
   vars.push_back(a(1).val_);
   vars.push_back(a(2).val_);
@@ -191,7 +191,7 @@ TEST(AgradMixRowVectorAppendCol,fv2) {
 
 TEST(AgradMixMatrixAppendCol,ffv1) {
   using stan::math::append_col;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using Eigen::MatrixXd;
 
   matrix_ffv a(2,2);
@@ -223,7 +223,7 @@ TEST(AgradMixMatrixAppendCol,ffv1) {
     for (int j = 0; j < 4; j++)
       EXPECT_EQ(ab_append_col(i, j).val_.val().val(), adb_append_col(i ,j));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0,0).val_.val_);
   vars.push_back(a(0,1).val_.val_);
   vars.push_back(a(1,0).val_.val_);
@@ -239,7 +239,7 @@ TEST(AgradMixMatrixAppendCol,ffv1) {
 
 TEST(AgradMixRowVectorAppendCol,ffv1) {
   using stan::math::append_col;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using Eigen::RowVectorXd;
 
   row_vector_ffv a(4);
@@ -266,7 +266,7 @@ TEST(AgradMixRowVectorAppendCol,ffv1) {
   for (int i = 0; i < 7; i++)
     EXPECT_EQ(ab_append_col(i).val_.val().val(), adb_append_col(i));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0).val_.val_);
   vars.push_back(a(1).val_.val_);
   vars.push_back(a(2).val_.val_);
@@ -282,7 +282,7 @@ TEST(AgradMixRowVectorAppendCol,ffv1) {
 
 TEST(AgradMixMatrixAppendCol,ffv2) {
   using stan::math::append_col;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using Eigen::MatrixXd;
 
   matrix_ffv a(2,2);
@@ -318,7 +318,7 @@ TEST(AgradMixMatrixAppendCol,ffv2) {
     for (int j = 0; j < 4; j++)
       EXPECT_EQ(ab_append_col(i, j).val_.val().val(), adb_append_col(i ,j));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0,0).val_.val_);
   vars.push_back(a(0,1).val_.val_);
   vars.push_back(a(1,0).val_.val_);
@@ -334,7 +334,7 @@ TEST(AgradMixMatrixAppendCol,ffv2) {
 
 TEST(AgradMixRowVectorAppendCol,ffv2) {
   using stan::math::append_col;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using Eigen::RowVectorXd;
 
   row_vector_ffv a(4);
@@ -365,7 +365,7 @@ TEST(AgradMixRowVectorAppendCol,ffv2) {
   for (int i = 0; i < 7; i++)
     EXPECT_EQ(ab_append_col(i).val_.val().val(), adb_append_col(i));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0).val_.val_);
   vars.push_back(a(1).val_.val_);
   vars.push_back(a(2).val_.val_);
@@ -381,7 +381,7 @@ TEST(AgradMixRowVectorAppendCol,ffv2) {
 
 TEST(AgradMixMatrixAppendCol,ffv3) {
   using stan::math::append_col;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using Eigen::MatrixXd;
 
   matrix_ffv a(2,2);
@@ -417,7 +417,7 @@ TEST(AgradMixMatrixAppendCol,ffv3) {
     for (int j = 0; j < 4; j++)
       EXPECT_EQ(ab_append_col(i, j).val_.val().val(), adb_append_col(i ,j));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0,0).val_.val_);
   vars.push_back(a(0,1).val_.val_);
   vars.push_back(a(1,0).val_.val_);
@@ -433,7 +433,7 @@ TEST(AgradMixMatrixAppendCol,ffv3) {
 
 TEST(AgradMixRowVectorAppendCol,ffv3) {
   using stan::math::append_col;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using Eigen::RowVectorXd;
 
   row_vector_ffv a(4);
@@ -464,7 +464,7 @@ TEST(AgradMixRowVectorAppendCol,ffv3) {
   for (int i = 0; i < 7; i++)
     EXPECT_EQ(ab_append_col(i).val_.val().val(), adb_append_col(i));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0).val_.val_);
   vars.push_back(a(1).val_.val_);
   vars.push_back(a(2).val_.val_);
@@ -480,7 +480,7 @@ TEST(AgradMixRowVectorAppendCol,ffv3) {
 
 TEST(AgradMixMatrixAppendCol,ffv4) {
   using stan::math::append_col;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using Eigen::MatrixXd;
 
   matrix_ffv a(2,2);
@@ -516,7 +516,7 @@ TEST(AgradMixMatrixAppendCol,ffv4) {
     for (int j = 0; j < 4; j++)
       EXPECT_EQ(ab_append_col(i, j).val_.val().val(), adb_append_col(i ,j));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0,0).val_.val_);
   vars.push_back(a(0,1).val_.val_);
   vars.push_back(a(1,0).val_.val_);
@@ -532,7 +532,7 @@ TEST(AgradMixMatrixAppendCol,ffv4) {
 
 TEST(AgradMixRowVectorAppendCol,ffv4) {
   using stan::math::append_col;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using Eigen::RowVectorXd;
 
   row_vector_ffv a(4);
@@ -563,7 +563,7 @@ TEST(AgradMixRowVectorAppendCol,ffv4) {
   for (int i = 0; i < 7; i++)
     EXPECT_EQ(ab_append_col(i).val_.val().val(), adb_append_col(i));
 
-  std::vector<stan::agrad::var> vars;
+  std::vector<stan::math::var> vars;
   vars.push_back(a(0).val_.val_);
   vars.push_back(a(1).val_.val_);
   vars.push_back(a(2).val_.val_);

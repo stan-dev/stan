@@ -21,7 +21,7 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 TEST(ProbDistributions,fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Matrix<fvar<double>,Dynamic,1> theta(3,1);
   theta << 0.2, 0.3, 0.5;
@@ -49,7 +49,7 @@ TEST(ProbDistributions,fvar_double) {
 }
 
 TEST(ProbDistributions,fvar_fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Matrix<fvar<fvar<double> >,Dynamic,1> theta(3,1);
   theta << 0.2, 0.3, 0.5;

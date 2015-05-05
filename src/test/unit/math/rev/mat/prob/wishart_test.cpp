@@ -31,8 +31,8 @@ void expect_propto(T_y W1, T_dof nu1, T_scale S1,
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
-using stan::agrad::var;
-using stan::agrad::to_var;
+using stan::math::var;
+using stan::math::to_var;
 
 class AgradDistributionsWishart : public ::testing::Test {
 protected:

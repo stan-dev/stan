@@ -26,8 +26,8 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 TEST(ProbDistributionsWishart, fvar_var) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   Matrix<fvar<var>,Dynamic,Dynamic> Sigma(2,2);
   Sigma << 1.848220, 1.899623, 
     1.899623, 12.751941;
@@ -50,8 +50,8 @@ TEST(ProbDistributionsWishart, fvar_var) {
 }
 
 TEST(ProbDistributionsWishart, fvar_fvar_var) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   Matrix<fvar<fvar<var> >,Dynamic,Dynamic> Sigma(2,2);
   Sigma << 1.848220, 1.899623, 
     1.899623, 12.751941;

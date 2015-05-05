@@ -15,7 +15,7 @@ namespace std {
    * @param a Variable to test.
    * @return <code>true</code> if value is infinite.
    */
-  inline int isinf(const stan::agrad::var& a) {
+  inline int isinf(const stan::math::var& a) {
     return isinf(a.val());
   }
 

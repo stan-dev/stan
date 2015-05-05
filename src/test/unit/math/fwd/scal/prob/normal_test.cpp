@@ -8,7 +8,7 @@
 
 
 TEST(ProbAgradDistributionsNormal, fwd) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::normal_log;
 
   EXPECT_FLOAT_EQ(-0.918938533204673, 

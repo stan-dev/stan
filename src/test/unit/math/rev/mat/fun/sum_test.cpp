@@ -13,7 +13,7 @@
 TEST(AgradRevMatrix, sum_vector) {
   using stan::math::sum;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d d(6);
   vector_v v(6);
@@ -36,7 +36,7 @@ TEST(AgradRevMatrix, sum_vector) {
 TEST(AgradRevMatrix, sum_rowvector) {
   using stan::math::sum;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d d(6);
   row_vector_v v(6);
@@ -59,7 +59,7 @@ TEST(AgradRevMatrix, sum_rowvector) {
 TEST(AgradRevMatrix, sum_matrix) {
   using stan::math::sum;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_d d(2, 3);
   matrix_v v(2, 3);

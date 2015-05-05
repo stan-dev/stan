@@ -6,33 +6,33 @@
 #include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixSegment,SegmentVector1_fv) {
   using stan::math::segment;
-  stan::agrad::vector_fv v(3);
+  stan::math::vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, segment(v,1,0).size());
 }
 TEST(AgradMixMatrixSegment,SegmentVector2_fv) {
   using stan::math::segment;
-  stan::agrad::vector_fv v(3);
+  stan::math::vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, segment(v,1,3).size());
 }
 TEST(AgradMixMatrixSegment,SegmentVector3_fv) {
   using stan::math::segment;
-  stan::agrad::vector_fv v(3);
+  stan::math::vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_THROW(segment(v,1,4), std::domain_error);
 }
 TEST(AgradMixMatrixSegment,SegmentVector4_fv) {
   using stan::math::segment;
-  stan::agrad::vector_fv v(4);
+  stan::math::vector_fv v(4);
   v << 1, 2, 3, 4;
 
-  stan::agrad::vector_fv v23 = segment(v,2,2);
+  stan::math::vector_fv v23 = segment(v,2,2);
   EXPECT_EQ(2,v23.size());
   for (int n = 0; n < 2; ++n)
     EXPECT_FLOAT_EQ(v[n+1].val_.val(),v23[n].val_.val());
@@ -40,28 +40,28 @@ TEST(AgradMixMatrixSegment,SegmentVector4_fv) {
 
 TEST(AgradMixMatrixSegment,SegmentRowVector1_fv) {
   using stan::math::segment;
-  stan::agrad::row_vector_fv v(3);
+  stan::math::row_vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, segment(v,1,0).size());
 }
 TEST(AgradMixMatrixSegment,SegmentRowVector2_fv) {
   using stan::math::segment;
-  stan::agrad::row_vector_fv v(3);
+  stan::math::row_vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, segment(v,1,3).size());
 }
 TEST(AgradMixMatrixSegment,SegmentRowVector3_fv) {
   using stan::math::segment;
-  stan::agrad::row_vector_fv v(3);
+  stan::math::row_vector_fv v(3);
   v << 1, 2, 3;
   EXPECT_THROW(segment(v,1,4), std::domain_error);
 }
 TEST(AgradMixMatrixSegment,SegmentRowVector4_fv) {
   using stan::math::segment;
-  stan::agrad::row_vector_fv v(4);
+  stan::math::row_vector_fv v(4);
   v << 1, 2, 3, 4;
 
-  stan::agrad::row_vector_fv v23 = segment(v,2,2);
+  stan::math::row_vector_fv v23 = segment(v,2,2);
   EXPECT_EQ(2,v23.size());
   for (int n = 0; n < 2; ++n)
     EXPECT_FLOAT_EQ(v[n+1].val_.val(),v23[n].val_.val());
@@ -96,28 +96,28 @@ TEST(AgradMixMatrixSegment,SegmentStdVector4_fv) {
 }
 TEST(AgradMixMatrixSegment,SegmentVector1_ffv) {
   using stan::math::segment;
-  stan::agrad::vector_ffv v(3);
+  stan::math::vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, segment(v,1,0).size());
 }
 TEST(AgradMixMatrixSegment,SegmentVector2_ffv) {
   using stan::math::segment;
-  stan::agrad::vector_ffv v(3);
+  stan::math::vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, segment(v,1,3).size());
 }
 TEST(AgradMixMatrixSegment,SegmentVector3_ffv) {
   using stan::math::segment;
-  stan::agrad::vector_ffv v(3);
+  stan::math::vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_THROW(segment(v,1,4), std::domain_error);
 }
 TEST(AgradMixMatrixSegment,SegmentVector4_ffv) {
   using stan::math::segment;
-  stan::agrad::vector_ffv v(4);
+  stan::math::vector_ffv v(4);
   v << 1, 2, 3, 4;
 
-  stan::agrad::vector_ffv v23 = segment(v,2,2);
+  stan::math::vector_ffv v23 = segment(v,2,2);
   EXPECT_EQ(2,v23.size());
   for (int n = 0; n < 2; ++n)
     EXPECT_FLOAT_EQ(v[n+1].val_.val_.val(),v23[n].val_.val_.val());
@@ -125,28 +125,28 @@ TEST(AgradMixMatrixSegment,SegmentVector4_ffv) {
 
 TEST(AgradMixMatrixSegment,SegmentRowVector1_ffv) {
   using stan::math::segment;
-  stan::agrad::row_vector_ffv v(3);
+  stan::math::row_vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(0, segment(v,1,0).size());
 }
 TEST(AgradMixMatrixSegment,SegmentRowVector2_ffv) {
   using stan::math::segment;
-  stan::agrad::row_vector_ffv v(3);
+  stan::math::row_vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_EQ(3, segment(v,1,3).size());
 }
 TEST(AgradMixMatrixSegment,SegmentRowVector3_ffv) {
   using stan::math::segment;
-  stan::agrad::row_vector_ffv v(3);
+  stan::math::row_vector_ffv v(3);
   v << 1, 2, 3;
   EXPECT_THROW(segment(v,1,4), std::domain_error);
 }
 TEST(AgradMixMatrixSegment,SegmentRowVector4_ffv) {
   using stan::math::segment;
-  stan::agrad::row_vector_ffv v(4);
+  stan::math::row_vector_ffv v(4);
   v << 1, 2, 3, 4;
 
-  stan::agrad::row_vector_ffv v23 = segment(v,2,2);
+  stan::math::row_vector_ffv v23 = segment(v,2,2);
   EXPECT_EQ(2,v23.size());
   for (int n = 0; n < 2; ++n)
     EXPECT_FLOAT_EQ(v[n+1].val_.val_.val(),v23[n].val_.val_.val());

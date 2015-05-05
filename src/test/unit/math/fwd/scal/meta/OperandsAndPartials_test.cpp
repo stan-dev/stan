@@ -4,8 +4,8 @@
 
 
 TEST(AgradPartialsVari, OperandsAndPartialsFvar) {
-  using stan::agrad::OperandsAndPartials;
-  using stan::agrad::fvar;
+  using stan::math::OperandsAndPartials;
+  using stan::math::fvar;
 
   fvar<double> x1 = 2.0;
   fvar<double> x2 = 3.0;
@@ -24,8 +24,8 @@ TEST(AgradPartialsVari, OperandsAndPartialsFvar) {
   EXPECT_FLOAT_EQ(-1,y.val_);
 }
 TEST(AgradPartialsVari, OperandsAndPartialsFvarVec) {
-  using stan::agrad::OperandsAndPartials;
-  using stan::agrad::fvar;
+  using stan::math::OperandsAndPartials;
+  using stan::math::fvar;
 
   std::vector<fvar<double> > x1;
   x1.push_back(fvar<double>(2.0,2.0));
@@ -51,10 +51,10 @@ TEST(AgradPartialsVari, OperandsAndPartialsFvarVec) {
 
 TEST(AgradPartialsVari, incr_deriv_fvar) {
   using stan::VectorView;
-  using stan::agrad::incr_deriv;
+  using stan::math::incr_deriv;
   using stan::is_vector;
   using stan::is_constant_struct;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> c;
   c.val_ = 1.0;
@@ -76,10 +76,10 @@ TEST(AgradPartialsVari, incr_deriv_fvar) {
 
 TEST(AgradPartialsVari, incr_deriv_vec_fvar) {
   using stan::VectorView;
-  using stan::agrad::incr_deriv;
+  using stan::math::incr_deriv;
   using stan::is_vector;
   using stan::is_constant_struct;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> c(1,1);
 

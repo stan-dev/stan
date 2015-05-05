@@ -20,7 +20,7 @@
 #include <stan/math/rev/scal/fun/abs.hpp>
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -54,7 +54,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt) {
   cv.setIdentity(2,2);
 
   stan::math::LDLT_factor<double,-1,-1> ldlt_ad;
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
   ASSERT_TRUE(ldlt_av.success());
   ldlt_ad.compute(ad);
@@ -95,7 +95,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvv) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -127,7 +127,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvv) {
         3.0,  2.0, 1.0, 112.0;
   cd.setIdentity(2,2);
 
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
   ASSERT_TRUE(ldlt_av.success());
 
@@ -158,7 +158,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvv) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdv) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_d ad(4,4);
@@ -217,7 +217,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdv) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvd) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -246,7 +246,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvd) {
   cd.setIdentity(2,2);
   cv.setIdentity(2,2);
 
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
   ASSERT_TRUE(ldlt_av.success());
 
@@ -277,7 +277,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvd) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdd) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_d ad(4,4);
@@ -324,7 +324,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdd) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvd) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -351,7 +351,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvd) {
         3.0,  2.0, 1.0, 112.0;
   cd.setIdentity(2,2);
 
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
   ASSERT_TRUE(ldlt_av.success());
 
@@ -374,7 +374,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvd) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_ddv) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_d ad(4,4);
@@ -424,7 +424,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_ddv) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvv) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -458,7 +458,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvv) {
   cd.setIdentity(2,2);
   cv.setIdentity(2,2);
 
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
   ASSERT_TRUE(ldlt_av.success());
 
@@ -495,7 +495,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvv) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvv_basic) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   using stan::math::trace;
   using stan::math::multiply;
@@ -509,7 +509,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvv_basic) {
   AVEC vars;
   VEC grad, grad_basic;
   size_type i,j;
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   
   // calculate gradient using trace_gen_inv_quad_form_ldlt
   bv << 100, 10,
@@ -573,7 +573,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvv_basic) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdv_basic) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   using stan::math::inverse;
   using stan::math::multiply;
@@ -654,7 +654,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdv_basic) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvd_basic) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   using stan::math::inverse;
   using stan::math::multiply;
@@ -668,7 +668,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvd_basic) {
   AVEC vars;
   VEC grad, grad_basic;
   size_t i,j;
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   
   // calculate gradient using trace_gen_inv_quad_form_ldlt  
   bd << 100, 10,
@@ -735,7 +735,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvd_basic) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdd_basic) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   using stan::math::inverse;
   using stan::math::multiply;
@@ -806,7 +806,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdd_basic) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvd_basic) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   using stan::math::inverse;
   using stan::math::multiply;
@@ -820,7 +820,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvd_basic) {
   AVEC vars;
   VEC grad, grad_basic;
   size_t i,j;
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   
   // calculate gradient using trace_gen_inv_quad_form_ldlt  
   bd << 100, 10,
@@ -880,7 +880,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvd_basic) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_ddv_basic) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   using stan::math::inverse;
   using stan::math::multiply;
@@ -952,7 +952,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_ddv_basic) {
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvv_basic) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   using stan::math::inverse;
   using stan::math::multiply;
@@ -967,7 +967,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvv_basic) {
   AVEC vars;
   VEC grad, grad_basic;
   size_t i,j;
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   
   // calculate gradient using trace_gen_inv_quad_form_ldlt  
   bv << 100, 10,

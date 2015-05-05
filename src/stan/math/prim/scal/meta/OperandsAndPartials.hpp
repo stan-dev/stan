@@ -23,7 +23,7 @@
 #include <stan/math/rev/scal/meta/partials_type.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     class partials_vari : public vari {
     private:
@@ -191,7 +191,7 @@ namespace stan {
                                               is_vector<T6>::value,
                                               is_constant_struct<T6>::value>,
                                    T6, T_partials_return>().incr(d_x6, x6);
-          return stan::agrad::fvar<T_partials_return>(logp, temp_deriv);
+          return stan::math::fvar<T_partials_return>(logp, temp_deriv);
         }
       };
 

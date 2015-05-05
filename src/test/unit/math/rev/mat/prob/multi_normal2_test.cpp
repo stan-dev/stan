@@ -39,8 +39,8 @@ void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
                   message);
 }
 
-using stan::agrad::var;
-using stan::agrad::to_var;
+using stan::math::var;
+using stan::math::to_var;
 
 
 TEST_F(agrad_distributions_multi_normal,Propto) {
@@ -119,7 +119,7 @@ TEST_F(agrad_distributions_multi_normal_multi_row,ProptoSigma) {
 
 
 TEST(ProbDistributionsMultiNormal,MultiNormalVar) {
-  using stan::agrad::var;
+  using stan::math::var;
   Matrix<var,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
   Matrix<var,Dynamic,1> mu(3,1);
@@ -131,7 +131,7 @@ TEST(ProbDistributionsMultiNormal,MultiNormalVar) {
   EXPECT_FLOAT_EQ(-11.73908, stan::math::multi_normal_log(y,mu,Sigma).val());
 }
 TEST(ProbDistributionsMultiNormal,MultiNormalGradientUnivariate) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using Eigen::VectorXd;
   using stan::math::multi_normal_log;
@@ -207,7 +207,7 @@ struct multi_normal_fun {
   T operator()(const std::vector<T>& x) const {
     using Eigen::Matrix;
     using Eigen::Dynamic;
-    using stan::agrad::var;
+    using stan::math::var;
     Matrix<T,Dynamic,1> y(K_);
     Matrix<T,Dynamic,1> mu(K_);
     Matrix<T,Dynamic,Dynamic> Sigma(K_,K_);

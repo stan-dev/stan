@@ -37,8 +37,8 @@ void expect_propto(T_y y1, T_scale L1, T_w w1,
                   message);
 }
 
-using stan::agrad::var;
-using stan::agrad::to_var;
+using stan::math::var;
+using stan::math::to_var;
 
 
 TEST_F(agrad_distributions_multi_gp_cholesky,Propto) {
@@ -80,7 +80,7 @@ TEST_F(agrad_distributions_multi_gp_cholesky,ProptoSigma) {
 
 
 TEST(ProbDistributionsMultiGPCholesky,MultiGPCholeskyVar) {
-  using stan::agrad::var;
+  using stan::math::var;
   Matrix<var,Dynamic,Dynamic> y(3,3);
   y <<  2.0, -2.0, 11.0,
        -4.0, 0.0, 2.0,
@@ -96,7 +96,7 @@ TEST(ProbDistributionsMultiGPCholesky,MultiGPCholeskyVar) {
 }
 
 TEST(ProbDistributionsMultiGPCholesky,MultiGPCholeskyGradientUnivariate) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using Eigen::VectorXd;
   using stan::math::multi_gp_cholesky_log;
@@ -172,7 +172,7 @@ struct multi_gp_cholesky_fun {
   T operator()(const std::vector<T>& x) const {
     using Eigen::Matrix;
     using Eigen::Dynamic;
-    using stan::agrad::var;
+    using stan::math::var;
     Matrix<T,Dynamic,Dynamic> y(K_,N_);
     Matrix<T,Dynamic,Dynamic> Sigma(N_,N_);
     Matrix<T,Dynamic,1> w(K_);

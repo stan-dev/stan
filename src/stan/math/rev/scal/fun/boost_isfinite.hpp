@@ -19,7 +19,7 @@ namespace boost {
      */
     template <>
     inline
-    bool isfinite(const stan::agrad::var& v) {
+    bool isfinite(const stan::math::var& v) {
       return (boost::math::isfinite)(v.val());
     }
 

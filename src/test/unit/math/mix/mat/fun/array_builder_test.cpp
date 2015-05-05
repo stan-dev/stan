@@ -3,8 +3,8 @@
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixArrayBuilder,fvar_var) {
   using std::vector;

@@ -7,7 +7,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCdfNormal : public AgradCdfTest {
 public:

@@ -26,7 +26,7 @@ using stan::math::inv_wishart_log;
 
 
 TEST(ProbDistributionsInvWishart,fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Matrix<fvar<double>,Dynamic,Dynamic> Y(3,3);
   Y <<  12.147233, -11.9036079, 1.0910458,
@@ -52,7 +52,7 @@ TEST(ProbDistributionsInvWishart,fvar_double) {
 }
 
 TEST(ProbDistributionsInvWishart,fvar_fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Matrix<fvar<fvar<double> >,Dynamic,Dynamic> Y(3,3);
   Y <<  12.147233, -11.9036079, 1.0910458,

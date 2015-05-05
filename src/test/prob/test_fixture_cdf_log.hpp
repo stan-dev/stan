@@ -10,7 +10,7 @@
 using std::vector;
 using Eigen::Matrix;
 using Eigen::Dynamic;
-using stan::agrad::var;
+using stan::math::var;
 using stan::scalar_type;
 using stan::is_vector;
 using stan::is_constant;
@@ -89,7 +89,7 @@ public:
   typedef typename scalar_type<T4>::type Scalar4;
   typedef typename scalar_type<T5>::type Scalar5;
 
-  typedef typename stan::agrad::fvar<typename stan::partials_return_type<T0,T1,T2,T3,T4,T5>::type> T_fvar_return;
+  typedef typename stan::math::fvar<typename stan::partials_return_type<T0,T1,T2,T3,T4,T5>::type> T_fvar_return;
   typedef typename stan::return_type<T0,T1,T2,T3,T4,T5>::type T_return_type;
 
   void call_all_versions() {
@@ -137,7 +137,7 @@ public:
         << cdf_log;
 
       if (all_scalar<T0,T1,T2,T3,T4,T5>::value) {
-        EXPECT_TRUE(stan::agrad::abs(expected_cdf_log[n] - cdf_log) < 1e-8)
+        EXPECT_TRUE(stan::math::abs(expected_cdf_log[n] - cdf_log) < 1e-8)
           << "For all scalar inputs cdf_log should match the provided value. Failed at index: " << n << std::endl
           << "expected: " << expected_cdf_log[n] << std::endl
           << "actual:   " << cdf_log;
@@ -264,7 +264,7 @@ public:
                                       var& cdf_log,
                                       vector<var>& x) {
     cdf_log.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return cdf_log.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad,
@@ -319,14 +319,14 @@ public:
                                       fvar<var>& cdf_log, 
                                       vector<var>& x) {
     cdf_log.val_.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return cdf_log.val_.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad, 
                                       fvar<var>& cdf_log, 
                                       vector<var>& x) {
     cdf_log.d_.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return cdf_log.val_.val();
   }
   double calculate_gradients_3rdorder(vector<double>& grad, 
@@ -340,21 +340,21 @@ public:
                                       fvar<fvar<var> >& cdf_log,
                                       vector<var>& x) {
     cdf_log.val_.val_.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return cdf_log.val_.val_.val();
   }
   double calculate_gradients_2ndorder(vector<double>& grad,
                                       fvar<fvar<var> >& cdf_log, 
                                       vector<var>& x) {
     cdf_log.d_.val_.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return cdf_log.val_.val_.val();
   }
   double calculate_gradients_3rdorder(vector<double>& grad,
                                       fvar<fvar<var> >& cdf_log, 
                                       vector<var>& x) {
     cdf_log.d_.d_.grad(x, grad);
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return cdf_log.val_.val_.val();
   }
 
@@ -719,7 +719,7 @@ public:
   }
 
   void test_lower_bound() {
-    using stan::agrad::value_of;
+    using stan::math::value_of;
     const size_t N_REPEAT = 3;
     vector<double> expected_cdf_log;
     vector<vector<double> > parameters;
@@ -755,7 +755,7 @@ public:
   }
   
   void test_upper_bound() {
-    using stan::agrad::value_of;
+    using stan::math::value_of;
     const size_t N_REPEAT = 3;
     vector<double> expected_cdf_log;
     vector<vector<double> > parameters;

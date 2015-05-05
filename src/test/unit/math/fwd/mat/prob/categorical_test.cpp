@@ -21,7 +21,7 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 TEST(ProbDistributionsCategorical,fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   Matrix<fvar<double>,Dynamic,1> theta(3,1);
   theta << 0.3, 0.5, 0.2;
   for (int i = 0; i < 3; i++)
@@ -35,7 +35,7 @@ TEST(ProbDistributionsCategorical,fvar_double) {
   EXPECT_FLOAT_EQ(1.0/0.2, stan::math::categorical_log(3,theta).d_);
 }
 TEST(ProbDistributionsCategorical,fvar_double_vector) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   Matrix<fvar<double>,Dynamic,1> theta(3,1);
   theta << 0.3, 0.5, 0.2;
   for (int i = 0; i < 3; i++)
@@ -53,7 +53,7 @@ TEST(ProbDistributionsCategorical,fvar_double_vector) {
 }
 
 TEST(ProbDistributionsCategorical,fvar_fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   Matrix<fvar<fvar<double> >,Dynamic,1> theta(3,1);
   theta << 0.3, 0.5, 0.2;
   for (int i = 0; i < 3; i++)
@@ -67,7 +67,7 @@ TEST(ProbDistributionsCategorical,fvar_fvar_double) {
   EXPECT_FLOAT_EQ(1.0/0.2, stan::math::categorical_log(3,theta).d_.val_);
 }
 TEST(ProbDistributionsCategorical,fvar_fvar_double_vector) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   Matrix<fvar<fvar<double> >,Dynamic,1> theta(3,1);
   theta << 0.3, 0.5, 0.2;
   for (int i = 0; i < 3; i++)

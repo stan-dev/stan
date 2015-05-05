@@ -6,7 +6,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class atanh_vari : public op_v_vari {
@@ -61,7 +61,7 @@ namespace stan {
      * @param a The variable.
      * @return Inverse hyperbolic tangent of the variable.
      */
-    inline var atanh(const stan::agrad::var& a) {
+    inline var atanh(const stan::math::var& a) {
       if (a == 1.0)
         return var(new atanh_vari(std::numeric_limits<double>::infinity(),
                                   a.vi_));

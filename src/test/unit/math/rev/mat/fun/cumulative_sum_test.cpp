@@ -47,7 +47,7 @@ void test_cumulative_sum() {
   EXPECT_FLOAT_EQ(1.0,grad[2]);
 }
 TEST(AgradRevMatrix, cumulative_sum) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::cumulative_sum;
 
   EXPECT_FLOAT_EQ(0, cumulative_sum(std::vector<var>(0)).size());

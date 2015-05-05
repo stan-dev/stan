@@ -7,7 +7,7 @@
 #include <stan/math/fwd/scal/fun/exp.hpp>
 
 TEST(AgradFwdPhi,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::Phi;
   fvar<double> x = 1.0;
   x.d_ = 1.0;
@@ -19,7 +19,7 @@ TEST(AgradFwdPhi,Fvar) {
                   Phi_x.d_);
 }
 TEST(AgradFwdPhi, FvarDerivUnderOverFlow) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   fvar<double> x = -27.5;
   x.d_ = 1.0;
   fvar<double> Phi_x = Phi(x);
@@ -32,7 +32,7 @@ TEST(AgradFwdPhi, FvarDerivUnderOverFlow) {
 }
 
 TEST(AgradFwdPhi, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::Phi;
 
   fvar<fvar<double> > x;
@@ -59,17 +59,17 @@ TEST(AgradFwdPhi, FvarFvarDouble) {
 
 double fun_value_of(double x) { return x; }
 // inefficient calls by value because neither const& nor & compile
-double fun_value_of(stan::agrad::fvar<double> x) {
+double fun_value_of(stan::math::fvar<double> x) {
   return x.val();
 }
-double fun_value_of(stan::agrad::fvar<stan::agrad::fvar<double> > x) {
+double fun_value_of(stan::math::fvar<stan::math::fvar<double> > x) {
   return x.val().val();
 }
 
 // tests calculating using R 3.0.2 Snow Leopard build (6558)
 template <typename T>
 void test_tails() {
-  using stan::agrad::Phi;
+  using stan::math::Phi;
 
   EXPECT_EQ(0, fun_value_of(Phi(T(-40))));
 
@@ -171,7 +171,7 @@ void test_tails() {
   EXPECT_FLOAT_EQ(1, 1 / fun_value_of(Phi(T(10))));
 }
 TEST(AgradFwdPhi, PhiTails) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   test_tails<fvar<double> >();
   test_tails<fvar<fvar<double> > >();
 }

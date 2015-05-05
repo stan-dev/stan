@@ -6,14 +6,14 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     typedef
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Index
     size_type;
 
     /**
-     * The type of a matrix holding <code>stan::agrad::var</code>
+     * The type of a matrix holding <code>stan::math::var</code>
      * values.
      */
     typedef
@@ -21,7 +21,7 @@ namespace stan {
     matrix_v;
 
     /**
-     * The type of a (column) vector holding <code>stan::agrad::var</code>
+     * The type of a (column) vector holding <code>stan::math::var</code>
      * values.
      */
     typedef
@@ -29,7 +29,7 @@ namespace stan {
     vector_v;
 
     /**
-     * The type of a row vector holding <code>stan::agrad::var</code>
+     * The type of a row vector holding <code>stan::math::var</code>
      * values.
      */
     typedef

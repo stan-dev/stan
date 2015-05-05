@@ -41,8 +41,8 @@ void expect_propto(T_y y1, T_dof nu1, T_loc mu1, T_scale sigma1,
                   message);
 }
 
-using stan::agrad::var;
-using stan::agrad::to_var;
+using stan::math::var;
+using stan::math::to_var;
 
 
 TEST_F(agrad_distributions_multi_student_t,Propto) {
@@ -83,7 +83,7 @@ TEST_F(agrad_distributions_multi_student_t,ProptoSigma) {
 
 
 TEST(ProbDistributionsMultiStudentT,MultiStudentTVar) {
-  using stan::agrad::var;
+  using stan::math::var;
   var nu(5);
   Matrix<var,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
@@ -96,7 +96,7 @@ TEST(ProbDistributionsMultiStudentT,MultiStudentTVar) {
   EXPECT_FLOAT_EQ(-10.213695, stan::math::multi_student_t_log(y,nu,mu,Sigma).val());
 }
 TEST(ProbDistributionsMultiStudentT,MultiStudentTGradientUnivariate) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using Eigen::VectorXd;
   using stan::math::multi_student_t_log;
@@ -182,7 +182,7 @@ struct multi_student_t_fun {
   T operator()(const std::vector<T>& x) const {
     using Eigen::Matrix;
     using Eigen::Dynamic;
-    using stan::agrad::var;
+    using stan::math::var;
     T nu;
     Matrix<T,Dynamic,1> y(K_);
     Matrix<T,Dynamic,1> mu(K_);

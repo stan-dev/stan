@@ -14,7 +14,7 @@
 #include <boost/math/tools/promotion.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Return the product of two scalars.

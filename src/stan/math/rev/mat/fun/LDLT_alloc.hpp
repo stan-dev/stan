@@ -5,7 +5,7 @@
 #include <stan/math/rev/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
     /**
      * This object stores the actual (double typed) LDLT factorization of
      * an Eigen::Matrix<var> along with pointers to its vari's which allow the

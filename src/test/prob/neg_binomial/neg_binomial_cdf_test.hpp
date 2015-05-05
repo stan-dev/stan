@@ -6,7 +6,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCdfNegBinomial : public AgradCdfTest {
 public:

@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     using Eigen::Dynamic;
 
@@ -20,7 +20,7 @@ namespace stan {
              Eigen::Matrix<double, Dynamic, 1>& fx,
              Eigen::Matrix<double, Dynamic, Dynamic>& J) {
       using Eigen::Matrix;
-      using stan::agrad::var;
+      using stan::math::var;
       start_nested();
       try {
         Matrix<var, Dynamic, 1> x_var(x.size());
@@ -39,10 +39,10 @@ namespace stan {
             J(k, i) = x_var(k).adj();
         }
       } catch (const std::exception& e) {
-        stan::agrad::recover_memory_nested();
+        stan::math::recover_memory_nested();
         throw;
       }
-      stan::agrad::recover_memory_nested();
+      stan::math::recover_memory_nested();
     }
     template <typename T, typename F>
     void
@@ -51,7 +51,7 @@ namespace stan {
              Eigen::Matrix<T, Dynamic, 1>& fx,
              Eigen::Matrix<T, Dynamic, Dynamic>& J) {
       using Eigen::Matrix;
-      using stan::agrad::fvar;
+      using stan::math::fvar;
       Matrix<fvar<T>, Dynamic, 1> x_fvar(x.size());
       for (int i = 0; i < x.size(); ++i) {
         for (int k = 0; k < x.size(); ++k)
@@ -70,6 +70,6 @@ namespace stan {
       }
     }
 
-  }  // namespace agrad
+  }  // namespace math
 }  // namespace stan
 #endif

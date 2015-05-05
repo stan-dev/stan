@@ -24,7 +24,7 @@ void expect_propto(unsigned int n1, T_prob theta1,
                   message);
 }
 
-using stan::agrad::var;
+using stan::math::var;
 using Eigen::Dynamic;
 using Eigen::Matrix;
 

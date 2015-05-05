@@ -4,7 +4,7 @@
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdFma,Fvar) { 
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   fvar<double> x(0.5);
   fvar<double> y(1.2);
   fvar<double> z(1.8);
@@ -46,7 +46,7 @@ TEST(AgradFwdFma,Fvar) {
 
 
 TEST(AgradFwdFma,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > x;
   x.val_.val_ = 2.5;

@@ -6,7 +6,7 @@
 #include <stan/math/prim/scal/fun/bessel_second_kind.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
 

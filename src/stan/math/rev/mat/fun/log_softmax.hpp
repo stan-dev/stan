@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
 

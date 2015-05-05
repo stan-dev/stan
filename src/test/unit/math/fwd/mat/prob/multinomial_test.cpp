@@ -20,7 +20,7 @@ using Eigen::Matrix;
 using Eigen::Dynamic;
 
 TEST(ProbDistributionsMultinomial,fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   std::vector<int> ns;
   ns.push_back(1);
   ns.push_back(2);
@@ -35,7 +35,7 @@ TEST(ProbDistributionsMultinomial,fvar_double) {
 }
 
 TEST(ProbDistributionsMultinomial,fvar_fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   std::vector<int> ns;
   ns.push_back(1);
   ns.push_back(2);

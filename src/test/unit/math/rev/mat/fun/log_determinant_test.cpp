@@ -15,10 +15,10 @@
 #include <stan/math/rev/scal/fun/abs.hpp>
 
 TEST(AgradRevMatrix,log_determinant_diff) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::determinant;
-  using stan::agrad::fabs;
-  using stan::agrad::log;
+  using stan::math::fabs;
+  using stan::math::log;
 
   // expected from auto-diff/Eigen
   AVEC x1 = createAVEC(0,1,2,3);
@@ -43,7 +43,7 @@ TEST(AgradRevMatrix,log_determinant_diff) {
 }
 
 TEST(AgradRevMatrix,log_determinant) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::log_determinant;
   
   matrix_v v(2,2);
@@ -55,14 +55,14 @@ TEST(AgradRevMatrix,log_determinant) {
 }
 
 TEST(AgradRevMatrix,log_deteriminant_exception) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::log_determinant;
   
   EXPECT_THROW(log_determinant(matrix_v(2,3)), std::invalid_argument);
 }
 
 TEST(AgradRevMatrix,log_determinant_grad) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::log_determinant;
   
   matrix_v X(2,2);

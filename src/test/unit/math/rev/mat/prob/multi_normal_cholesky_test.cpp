@@ -24,7 +24,7 @@ using Eigen::Matrix;
 using std::vector;
 
 TEST(ProbDistributionsMultiNormalCholesky,MultiNormalVar) {
-  using stan::agrad::var;
+  using stan::math::var;
   Matrix<var,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
   Matrix<var,Dynamic,1> mu(3,1);

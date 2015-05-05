@@ -12,8 +12,8 @@
 #include <stan/math/rev/scal/fun/sqrt.hpp>
 
 TEST(AgradMixMatrixSingularValues, mat_fv_1st_deriv) {
-  stan::agrad::matrix_fv m1(2,2);
-  stan::agrad::vector_fv res;
+  stan::math::matrix_fv m1(2,2);
+  stan::math::vector_fv res;
 
   m1 << 1,2,3,4;
   m1(0,0).d_ = 1.0;
@@ -38,8 +38,8 @@ TEST(AgradMixMatrixSingularValues, mat_fv_1st_deriv) {
   EXPECT_FLOAT_EQ(0.74753821,h[3]);
 }
 TEST(AgradMixMatrixSingularValues, mat_fv_2nd_deriv) {
-  stan::agrad::matrix_fv m1(2,2);
-  stan::agrad::vector_fv res;
+  stan::math::matrix_fv m1(2,2);
+  stan::math::vector_fv res;
 
   m1 << 1,2,3,4;
   m1(0,0).d_ = 1.0;
@@ -65,8 +65,8 @@ TEST(AgradMixMatrixSingularValues, mat_fv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixSingularValues, mat_ffv_1st_deriv) {
-  stan::agrad::matrix_ffv m1(2,2);
-  stan::agrad::vector_ffv res;
+  stan::math::matrix_ffv m1(2,2);
+  stan::math::vector_ffv res;
 
   m1 << 1,2,3,4;
   m1(0,0).d_ = 1.0;
@@ -92,8 +92,8 @@ TEST(AgradMixMatrixSingularValues, mat_ffv_1st_deriv) {
   EXPECT_FLOAT_EQ(0.74753821,h[3]);
 }
 TEST(AgradMixMatrixSingularValues, mat_ffv_2nd_deriv) {
-  stan::agrad::matrix_ffv m1(2,2);
-  stan::agrad::vector_ffv res;
+  stan::math::matrix_ffv m1(2,2);
+  stan::math::vector_ffv res;
 
   m1 << 1,2,3,4;
   m1(0,0).d_ = 1.0;
@@ -120,8 +120,8 @@ TEST(AgradMixMatrixSingularValues, mat_ffv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixSingularValues, mat_ffv_3rd_deriv) {
-  stan::agrad::matrix_ffv m1(2,2);
-  stan::agrad::vector_ffv res;
+  stan::math::matrix_ffv m1(2,2);
+  stan::math::vector_ffv res;
 
   m1 << 1,2,3,4;
   m1(0,0).d_ = 1.0;

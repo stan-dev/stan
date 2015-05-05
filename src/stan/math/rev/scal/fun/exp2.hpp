@@ -7,7 +7,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class exp2_vari : public op_v_vari {
@@ -49,7 +49,7 @@ namespace stan {
      * @param a The variable.
      * @return Two to the power of the specified variable.
      */
-    inline var exp2(const stan::agrad::var& a) {
+    inline var exp2(const stan::math::var& a) {
       return var(new exp2_vari(a.vi_));
     }
 

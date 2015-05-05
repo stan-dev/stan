@@ -25,8 +25,8 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 using std::vector;
 
-using stan::agrad::var;
-using stan::agrad::to_var;
+using stan::math::var;
+using stan::math::to_var;
 
 
 
@@ -39,7 +39,7 @@ struct multi_normal_cholesky_fun {
   T operator()(const std::vector<T>& x) const {
     using Eigen::Matrix;
     using Eigen::Dynamic;
-    using stan::agrad::var;
+    using stan::math::var;
     Matrix<T,Dynamic,1> y(K_);
     Matrix<T,Dynamic,1> mu(K_);
     Matrix<T,Dynamic,Dynamic> L(K_,K_);

@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /** 
      * Calculate the value and the gradient of the hessian of the specified

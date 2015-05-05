@@ -5,7 +5,7 @@
 #include <stan/math/prim/scal/fun/primitive_value.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Return the primitive double value for the specified auto-diff

@@ -3,12 +3,12 @@
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/core.hpp>
 
-using stan::agrad::fvar;
-using stan::agrad::log_sum_exp;
+using stan::math::fvar;
+using stan::math::log_sum_exp;
 using stan::math::log_sum_exp;
 
 TEST(AgradFwdMatrixLogSumExp,vector_fd) {
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_fd b(4);
   b << 1, 2, 3, 4;
@@ -23,7 +23,7 @@ TEST(AgradFwdMatrixLogSumExp,vector_fd) {
   EXPECT_FLOAT_EQ(1,a.d_);
 }
 TEST(AgradFwdMatrixLogSumExp,row_vector_fd) {
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_fd b(4);
   b << 1, 2, 3, 4;
@@ -39,7 +39,7 @@ TEST(AgradFwdMatrixLogSumExp,row_vector_fd) {
 }
 
 TEST(AgradFwdMatrixLogSumExp,matrix_fd) {
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_fd b(2,2);
   b << 1, 2, 3, 4;
@@ -55,7 +55,7 @@ TEST(AgradFwdMatrixLogSumExp,matrix_fd) {
 }
 
 TEST(AgradFwdMatrixLogSumExp,vector_ffd) {
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   vector_ffd b(4);
   b << 1, 2, 3, 4;
@@ -70,7 +70,7 @@ TEST(AgradFwdMatrixLogSumExp,vector_ffd) {
   EXPECT_FLOAT_EQ(1,a.d_.val_);
 }
 TEST(AgradFwdMatrixLogSumExp,row_vector_ffd) {
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
   row_vector_ffd b(4);
   b << 1, 2, 3, 4;
@@ -86,7 +86,7 @@ TEST(AgradFwdMatrixLogSumExp,row_vector_ffd) {
 }
 
 TEST(AgradFwdMatrixLogSumExp,matrix_ffd) {
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
 
   matrix_ffd b(2,2);
   b << 1, 2, 3, 4;

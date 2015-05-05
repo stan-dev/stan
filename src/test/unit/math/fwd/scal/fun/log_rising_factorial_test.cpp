@@ -10,8 +10,8 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 
 TEST(AgradFwdLogRisingFactorial,Fvar) {
-  using stan::agrad::fvar;
-  using stan::agrad::log_rising_factorial;
+  using stan::math::fvar;
+  using stan::math::log_rising_factorial;
   using boost::math::digamma;
 
   fvar<double> a(4.0,1.0);
@@ -35,7 +35,7 @@ TEST(AgradFwdLogRisingFactorial,Fvar) {
 }
 
 TEST(AgradFwdLogRisingFactorial,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_rising_factorial;
   using boost::math::digamma;
 

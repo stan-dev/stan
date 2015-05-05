@@ -26,8 +26,8 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 TEST(ProbDistributionsMultiGP,fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   Matrix<fvar<var>,Dynamic,1> mu(5,1);
   mu.setZero();
   
@@ -67,8 +67,8 @@ TEST(ProbDistributionsMultiGP,fvar_var) {
 }
 
 TEST(ProbDistributionsMultiGP,fvar_fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   Matrix<fvar<fvar<var> >,Dynamic,1> mu(5,1);
   mu.setZero();
   

@@ -5,7 +5,7 @@
 #include <stan/math/rev/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class tgamma_vari : public op_v_vari {
@@ -62,7 +62,7 @@ namespace stan {
      * @param a Argument to function.
      * @return The Gamma function applied to the specified argument.
      */
-    inline var tgamma(const stan::agrad::var& a) {
+    inline var tgamma(const stan::math::var& a) {
       return var(new tgamma_vari(a.vi_));
     }
 

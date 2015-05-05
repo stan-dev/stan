@@ -7,7 +7,7 @@
 #include <ostream>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     // forward declaration of var
     class var;

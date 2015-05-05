@@ -5,7 +5,7 @@
 #include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdAtan2,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::atan2;
 
   fvar<double> x(0.5,1.0);
@@ -27,7 +27,7 @@ TEST(AgradFwdAtan2,Fvar) {
 
 
 TEST(AgradFwdAtan2,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::atan2;
 
   fvar<fvar<double> > x;

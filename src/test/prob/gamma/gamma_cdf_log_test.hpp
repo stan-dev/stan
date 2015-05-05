@@ -5,7 +5,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCdfLogGamma : public AgradCdfLogTest {
 public:
@@ -92,7 +92,7 @@ public:
   cdf_log_function(const T_y& y, const T_shape& alpha,
                    const T_inv_scale& beta,
                    const T3&, const T4&, const T5&) {
-    using stan::agrad::gamma_p;
+    using stan::math::gamma_p;
     using boost::math::gamma_p;
     using std::log;
 

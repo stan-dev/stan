@@ -11,8 +11,8 @@
 
 void test_log1m_exp(double val) {
   using stan::math::log1m_exp;
-  using stan::agrad::log1m_exp;
-  using stan::agrad::exp;
+  using stan::math::log1m_exp;
+  using stan::math::exp;
   using std::exp;
 
   AVAR a(val);   
@@ -46,7 +46,7 @@ TEST(AgradRev, log1m_exp) {
 
 TEST(AgradRev, log1m_exp_exception) {
   using stan::math::log1m_exp;
-  using stan::agrad::log1m_exp;
+  using stan::math::log1m_exp;
   EXPECT_NO_THROW(log1m_exp(AVAR(-3)));
   EXPECT_NO_THROW(log1m_exp(AVAR(3)));
 }

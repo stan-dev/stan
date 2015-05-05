@@ -43,8 +43,8 @@
 #include <boost/math/distributions.hpp>
 
 TEST(ProbDistributionsLkjCorr,fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   boost::random::mt19937 rng;
   int K = 4;
   Eigen::Matrix<fvar<var>,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);
@@ -63,8 +63,8 @@ TEST(ProbDistributionsLkjCorr,fvar_var) {
 }
 
 TEST(ProbDistributionsLkjCorrCholesky,fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   boost::random::mt19937 rng;
   int K = 4;
   Eigen::Matrix<fvar<var>,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);
@@ -83,8 +83,8 @@ TEST(ProbDistributionsLkjCorrCholesky,fvar_var) {
 }
 
 TEST(ProbDistributionsLkjCorr,fvar_fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   boost::random::mt19937 rng;
   int K = 4;
   Eigen::Matrix<fvar<fvar<var> >,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);
@@ -103,8 +103,8 @@ TEST(ProbDistributionsLkjCorr,fvar_fvar_var) {
 }
 
 TEST(ProbDistributionsLkjCorrCholesky,fvar_fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   boost::random::mt19937 rng;
   int K = 4;
   Eigen::Matrix<fvar<fvar<var> >,Eigen::Dynamic,Eigen::Dynamic> Sigma(K,K);

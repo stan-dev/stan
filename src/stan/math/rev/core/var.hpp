@@ -11,7 +11,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     // forward declare
     static void grad(chainable* vi);
@@ -261,7 +261,7 @@ namespace stan {
        */
       void grad(std::vector<var>& x,
                 std::vector<double>& g) {
-        stan::agrad::grad(vi_);  // defined in chainable.hpp
+        stan::math::grad(vi_);  // defined in chainable.hpp
         g.resize(x.size());
         for (size_t i = 0; i < x.size(); ++i)
           g[i] = x[i].vi_->adj_;

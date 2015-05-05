@@ -6,7 +6,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class hypot_vv_vari : public op_vv_vari {
@@ -49,8 +49,8 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const stan::agrad::var& a,
-                     const stan::agrad::var& b) {
+    inline var hypot(const stan::math::var& a,
+                     const stan::math::var& b) {
       return var(new hypot_vv_vari(a.vi_, b.vi_));
     }
 
@@ -68,7 +68,7 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const stan::agrad::var& a,
+    inline var hypot(const stan::math::var& a,
                      const double& b) {
       return var(new hypot_vd_vari(a.vi_, b));
     }
@@ -115,7 +115,7 @@ namespace stan {
      * @return Length of hypoteneuse.
      */
     inline var hypot(const double& a,
-                     const stan::agrad::var& b) {
+                     const stan::math::var& b) {
       return var(new hypot_vd_vari(b.vi_, a));
     }
 

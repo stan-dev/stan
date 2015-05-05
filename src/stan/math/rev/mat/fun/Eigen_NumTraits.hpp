@@ -12,27 +12,27 @@ namespace Eigen {
    * gradient variables.
    */
   template <>
-  struct NumTraits<stan::agrad::var> {
+  struct NumTraits<stan::math::var> {
     /**
      * Real-valued variables.
      *
      * Required for numerical traits.
      */
-    typedef stan::agrad::var Real;
+    typedef stan::math::var Real;
 
     /**
      * Non-integer valued variables.
      *
      * Required for numerical traits.
      */
-    typedef stan::agrad::var NonInteger;
+    typedef stan::math::var NonInteger;
 
     /**
      * Nested variables.
      *
      * Required for numerical traits.
      */
-    typedef stan::agrad::var Nested;
+    typedef stan::math::var Nested;
 
     /**
      * Return standard library's epsilon for double-precision floating
@@ -92,7 +92,7 @@ namespace Eigen {
      * Implemented this for printing to stream.
      */
     template<>
-    struct significant_decimals_default_impl<stan::agrad::var, false> {
+    struct significant_decimals_default_impl<stan::math::var, false> {
       static inline int run() {
         using std::ceil;
         using std::log;
@@ -107,8 +107,8 @@ namespace Eigen {
      * gradient variables.
      */
     template <>
-    struct scalar_product_traits<stan::agrad::var, double> {
-      typedef stan::agrad::var ReturnType;
+    struct scalar_product_traits<stan::math::var, double> {
+      typedef stan::math::var ReturnType;
     };
 
     /**
@@ -116,19 +116,19 @@ namespace Eigen {
      * gradient variables.
      */
     template <>
-    struct scalar_product_traits<double, stan::agrad::var> {
-      typedef stan::agrad::var ReturnType;
+    struct scalar_product_traits<double, stan::math::var> {
+      typedef stan::math::var ReturnType;
     };
 
     /**
      * Override matrix-vector and matrix-matrix products to use more efficient implementation.
      */
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
-    struct general_matrix_vector_product<Index, stan::agrad::var, ColMajor,
-                                         ConjugateLhs, stan::agrad::var,
+    struct general_matrix_vector_product<Index, stan::math::var, ColMajor,
+                                         ConjugateLhs, stan::math::var,
                                          ConjugateRhs> {
-      typedef stan::agrad::var LhsScalar;
-      typedef stan::agrad::var RhsScalar;
+      typedef stan::math::var LhsScalar;
+      typedef stan::math::var RhsScalar;
       typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType
       ResScalar;
       enum { LhsStorageOrder = ColMajor };
@@ -141,8 +141,8 @@ namespace Eigen {
                                         const ResScalar &alpha) {
         for (Index i = 0; i < rows; i++) {
           res[i*resIncr]
-            += stan::agrad::var
-            (new stan::agrad::gevv_vvv_vari
+            += stan::math::var
+            (new stan::math::gevv_vvv_vari
              (&alpha,
               (static_cast<int>(LhsStorageOrder) == static_cast<int>(ColMajor))
               ?(&lhs[i]):(&lhs[i*lhsStride]),
@@ -153,11 +153,11 @@ namespace Eigen {
       }
     };
     template<typename Index, bool ConjugateLhs, bool ConjugateRhs>
-    struct general_matrix_vector_product<Index, stan::agrad::var,
+    struct general_matrix_vector_product<Index, stan::math::var,
                                          RowMajor, ConjugateLhs,
-                                         stan::agrad::var, ConjugateRhs> {
-      typedef stan::agrad::var LhsScalar;
-      typedef stan::agrad::var RhsScalar;
+                                         stan::math::var, ConjugateRhs> {
+      typedef stan::math::var LhsScalar;
+      typedef stan::math::var RhsScalar;
       typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType
       ResScalar;
       enum { LhsStorageOrder = RowMajor };
@@ -169,8 +169,8 @@ namespace Eigen {
           ResScalar* res, Index resIncr, const RhsScalar &alpha) {
         for (Index i = 0; i < rows; i++) {
           res[i*resIncr]
-            += stan::agrad::var
-            (new stan::agrad::gevv_vvv_vari
+            += stan::math::var
+            (new stan::math::gevv_vvv_vari
              (&alpha,
               (static_cast<int>(LhsStorageOrder) == static_cast<int>(ColMajor))
               ? (&lhs[i]) : (&lhs[i*lhsStride]),
@@ -182,12 +182,12 @@ namespace Eigen {
     };
     template<typename Index, int LhsStorageOrder, bool ConjugateLhs,
              int RhsStorageOrder, bool ConjugateRhs>
-    struct general_matrix_matrix_product<Index, stan::agrad::var,
+    struct general_matrix_matrix_product<Index, stan::math::var,
                                          LhsStorageOrder, ConjugateLhs,
-                                         stan::agrad::var, RhsStorageOrder,
+                                         stan::math::var, RhsStorageOrder,
                                          ConjugateRhs, ColMajor> {
-      typedef stan::agrad::var LhsScalar;
-      typedef stan::agrad::var RhsScalar;
+      typedef stan::math::var LhsScalar;
+      typedef stan::math::var RhsScalar;
       typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType
       ResScalar;
       static void run(Index rows, Index cols, Index depth,

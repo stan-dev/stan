@@ -4,11 +4,6 @@
  */ 
 
 /**
- * @namespace stan::agrad 
- * Function gradients via reverse-mode automatic differentiation.
- */
-
-/**
  * @namespace stan::gm
  * Directed graphical model compiler
  */
@@ -23,6 +18,7 @@
  * Matrices and templated mathematical functions.
  * Templated probability distributions. All paramaterizations
  *   are based on Bayesian Data Analysis.
+ * Function gradients via reverse-mode automatic differentiation.
  */
 
 /**
