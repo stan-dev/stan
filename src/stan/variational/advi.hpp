@@ -1,5 +1,5 @@
-#ifndef STAN__VARIATIONAL__ADVI__HPP
-#define STAN__VARIATIONAL__ADVI__HPP
+#ifndef STAN_VARIATIONAL_ADVI_HPP
+#define STAN_VARIATIONAL_ADVI_HPP
 
 #include <stan/math/prim.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
@@ -63,9 +63,6 @@ namespace stan {
         stan::math::check_positive(function, "Eta stepsize", eta_stepsize_);
         }
 
-      virtual ~advi() {}
-
-
       /**
        * ELBO
        *
@@ -90,7 +87,7 @@ namespace stan {
           for (int d = 0; d < dim; ++d) {
             z_check(d) = stan::prob::normal_rng(0, 1, rng_);
           }
-          z_tilde = advi_params.to_unconstrained(z_check);
+          z_tilde = advi_params.loc_scale_transform(z_check);
 
           // Accumulate log probability
           elbo += (model_.template
@@ -150,7 +147,7 @@ namespace stan {
           for (int d = 0; d < dim; ++d) {
             z_check(d) = stan::prob::normal_rng(0, 1, rng_);
           }
-          z_tilde = muL.to_unconstrained(z_check);
+          z_tilde = muL.loc_scale_transform(z_check);
 
           // Compute gradient step in unconstrained space
           stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,
@@ -222,7 +219,7 @@ namespace stan {
           for (int d = 0; d < dim; ++d) {
             z_check(d) = stan::prob::normal_rng(0, 1, rng_);
           }
-          z_tilde = musigmatilde.to_unconstrained(z_check);
+          z_tilde = musigmatilde.loc_scale_transform(z_check);
 
           stan::math::check_not_nan(function, "z_tilde", z_tilde);
 
@@ -260,11 +257,11 @@ namespace stan {
        * @param tol_rel_obj    relative tolerance parameter for convergence
        * @param max_iterations max number of iterations to run algorithm
        */
-      void do_robbins_monro_adagrad(advi_params_fullrank& muL,
+      void robbins_monro_adagrad(advi_params_fullrank& muL,
                                     double tol_rel_obj,
                                     int max_iterations) {
         static const char* function =
-          "stan::variational::advi.do_robbins_monro_adagrad";
+          "stan::variational::advi.robbins_monro_adagrad";
 
         stan::math::check_positive(function,
                                    "Relative objective function tolerance",
@@ -297,8 +294,8 @@ namespace stan {
         double delta_elbo_med = std::numeric_limits<double>::max();
 
         // Heuristic to estimate how far to look back in rolling window
-        int cb_size = (int)
-                std::max(0.1*max_iterations/static_cast<double>(refresh_), 1.0);
+        int cb_size = static_cast<int>(
+                std::max(0.1*max_iterations/static_cast<double>(refresh_), 1.0));
         boost::circular_buffer<double> cb(cb_size);
 
         // Print stuff
@@ -328,15 +325,19 @@ namespace stan {
 
           // RMSprop moving average weighting
           mu_s.array() = pre_factor * mu_s.array()
-                       + post_factor * mu_grad.array().square();
+                       + post_factor * 
+                       mu_grad.array().square();
           L_s.array()  = pre_factor * L_s.array()
-                       + post_factor * L_grad.array().square();
+                       + post_factor * 
+                       L_grad.array().square();
 
           // Take ADAgrad or rmsprop step
-          muL.set_mu(muL.mu().array() +
-            eta_stepsize_ * mu_grad.array() / (tau + mu_s.array().sqrt()));
-          muL.set_L_chol(muL.L_chol().array()  +
-            eta_stepsize_ * L_grad.array()  / (tau + L_s.array().sqrt()));
+          muL.set_mu(muL.mu().array() 
+             + eta_stepsize_ * mu_grad.array() 
+             / (tau + mu_s.array().sqrt()));
+          muL.set_L_chol(muL.L_chol().array() 
+             + eta_stepsize_ * L_grad.array()  
+             / (tau + L_s.array().sqrt()));
 
           // Check for convergence every "refresh_"th iteration
           if (iter_counter % refresh_ == 0) {
@@ -345,7 +346,7 @@ namespace stan {
             delta_elbo = rel_decrease(elbo, elbo_prev);
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
-                             / (double)(cb.size());
+                             / static_cast<double>(cb.size());
             delta_elbo_med = circ_buff_median(cb);
             *print_stream_
                       << "  "
@@ -410,11 +411,11 @@ namespace stan {
        * @param tol_rel_obj   relative tolerance parameter for convergence
        * @param max_iterations  max number of iterations to run algorithm
        */
-      void do_robbins_monro_adagrad(advi_params_meanfield& musigmatilde,
+      void robbins_monro_adagrad(advi_params_meanfield& musigmatilde,
                                     double tol_rel_obj,
                                     int max_iterations) {
         static const char* function =
-          "stan::variational::advi.do_robbins_monro_adagrad";
+          "stan::variational::advi.robbins_monro_adagrad";
 
         stan::math::check_positive(function,
                                    "Relative objective function tolerance",
@@ -449,8 +450,8 @@ namespace stan {
         double delta_elbo_med = std::numeric_limits<double>::max();
 
         // Heuristic to estimate how far to look back in rolling window
-        int cb_size = (int)
-                std::max(0.1*max_iterations/static_cast<double>(refresh_), 1.0);
+        int cb_size = static_cast<int>(
+                std::max(0.1*max_iterations/static_cast<double>(refresh_), 1.0));
         boost::circular_buffer<double> cb(cb_size);
 
         // Print stuff
@@ -487,12 +488,12 @@ namespace stan {
 
           // Take ADAgrad or rmsprop step
           musigmatilde.set_mu(
-            musigmatilde.mu().array() +
-            eta_stepsize_ * mu_grad.array()
+            musigmatilde.mu().array() 
+            + eta_stepsize_ * mu_grad.array()
             / (tau + mu_s.array().sqrt()));
           musigmatilde.set_sigma_tilde(
-            musigmatilde.sigma_tilde().array()  +
-            eta_stepsize_ * sigma_tilde_grad.array()
+            musigmatilde.sigma_tilde().array()  
+            + eta_stepsize_ * sigma_tilde_grad.array()
             / (tau + sigma_tilde_s.array().sqrt()));
 
           // Check for convergence every "refresh_"th iteration
@@ -502,7 +503,7 @@ namespace stan {
             delta_elbo = rel_decrease(elbo, elbo_prev);
             cb.push_back(delta_elbo);
             delta_elbo_ave = std::accumulate(cb.begin(), cb.end(), 0.0)
-                             / (double)(cb.size());
+                             / static_cast<double>(cb.size());
             delta_elbo_med = circ_buff_median(cb);
             *print_stream_
                       << "  "
@@ -561,32 +562,14 @@ namespace stan {
         *print_stream_
         << "This is stan::variational::advi::run_fullrank()" << std::endl;
 
-        // Initialize variational parameters: mu, L
         Eigen::VectorXd mu = cont_params_;
         Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(),
                                                        model_.num_params_r());
         advi_params_fullrank muL = advi_params_fullrank(mu, L);
 
-        // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(muL, tol_rel_obj, max_iterations);
+        robbins_monro_adagrad(muL, tol_rel_obj, max_iterations);
 
         cont_params_ = muL.mu();
-
-        // *print_stream_
-        // << "mu = " << std::endl
-        // << muL.mu() << std::endl;
-
-        // *print_stream_
-        // << "Sigma = " << std::endl
-        // << muL.L_chol() * muL.L_chol().transpose() << std::endl;
-
-        // std::stringstream s;
-        // stan::io::dump_writer writer(s);
-        // writer.write("mu", muL.mu());
-        // s << "\n";
-        // writer.write("L_chol", muL.L_chol());
-        // std::string written = s.str();
-        // *print_stream_ << written << std::endl;
 
         return;
       }
@@ -595,7 +578,6 @@ namespace stan {
         *print_stream_
         << "This is stan::variational::advi::run_meanfield()" << std::endl;
 
-        // Initialize variational parameters: mu, sigma_tilde
         Eigen::VectorXd mu           = cont_params_;
         Eigen::MatrixXd sigma_tilde  = Eigen::VectorXd::Constant(
                                                 model_.num_params_r(),
@@ -605,18 +587,9 @@ namespace stan {
         advi_params_meanfield musigmatilde =
           advi_params_meanfield(mu, sigma_tilde);
 
-        // Robbins Monro ADAgrad
-        do_robbins_monro_adagrad(musigmatilde, tol_rel_obj, max_iterations);
+        robbins_monro_adagrad(musigmatilde, tol_rel_obj, max_iterations);
 
         cont_params_ = musigmatilde.mu();
-
-        // *print_stream_
-        // << "mu = " << std::endl
-        // << musigmatilde.mu() << std::endl;
-
-        // *print_stream_
-        // << "sigma_tilde = " << std::endl
-        // << musigmatilde.sigma_tilde() << std::endl;
 
         return;
       }
