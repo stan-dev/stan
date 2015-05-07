@@ -20,7 +20,7 @@ namespace stan {
 
   namespace math {
 
-    static const double POISSON_MAX_LOG_RATE = 30 * log(2);
+    static const double POISSON_MAX_LOG_RATE = 30 * std::log(2);
 
     template <class RNG>
     inline int

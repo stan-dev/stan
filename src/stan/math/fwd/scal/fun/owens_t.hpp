@@ -3,7 +3,6 @@
 
 #include <math.h>
 #include <stan/math/fwd/core.hpp>
-
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/owens_t.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>

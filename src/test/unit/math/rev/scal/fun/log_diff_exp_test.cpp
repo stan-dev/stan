@@ -3,8 +3,9 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <stan/math/rev/scal/fun/exp.hpp>
 #include <stan/math/rev/core.hpp>
+#include <stan/math/rev/scal/fun/exp.hpp>
+#include <stan/math/rev/scal/fun/fabs.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 
 TEST(AgradRev,log_diff_exp_vv) {

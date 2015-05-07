@@ -11,6 +11,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/is_constant_struct.hpp>
+#include <cmath>
 #include <vector>
 
 namespace stan {
@@ -29,6 +30,7 @@ namespace stan {
       using stan::math::check_simplex;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
+      using std::log;
 
       int lb = 1;
 
@@ -72,6 +74,7 @@ namespace stan {
       using stan::math::check_simplex;
       using stan::math::sum;
       using stan::math::value_of;
+      using std::log;
 
       int lb = 1;
 

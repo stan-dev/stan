@@ -22,6 +22,7 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -69,7 +70,7 @@ namespace stan {
       VectorView<const T_scale_fail> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
 
-      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail>
+      OperandsAndPartials<T_y, T_scale_succ, T_scale_fail>
         operands_and_partials(y, alpha, beta);
 
       // Compute CDF and its gradients
@@ -77,6 +78,8 @@ namespace stan {
       using stan::math::digamma;
       using stan::math::lbeta;
       using std::pow;
+      using std::exp;
+      using std::log;
       using std::exp;
 
       // Cache a few expensive function calls if alpha or beta is a parameter

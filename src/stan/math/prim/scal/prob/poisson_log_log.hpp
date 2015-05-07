@@ -17,6 +17,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/poisson_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
@@ -39,6 +40,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::math::include_summand;
+      using std::exp;
       using std::exp;
 
       // check if any vectors are zero length
@@ -75,7 +77,7 @@ namespace stan {
           return LOG_ZERO;
 
       // return accumulator with gradients
-      agrad::OperandsAndPartials<T_log_rate> operands_and_partials(alpha);
+      OperandsAndPartials<T_log_rate> operands_and_partials(alpha);
 
       // FIXME: cache value_of for alpha_vec?  faster if only one?
       VectorBuilder<include_summand<propto, T_log_rate>::value,

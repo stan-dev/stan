@@ -3,6 +3,7 @@
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
+#include <stan/math/prim/mat/err/constraint_tolerance.hpp>
 #include <boost/throw_exception.hpp>
 #include <cmath>
 #include <sstream>
@@ -11,8 +12,6 @@
 namespace stan {
 
   namespace math {
-
-    const double CONSTRAINT_TOLERANCE = 1E-8;
 
     /**
      * Return the vector of unconstrained partial correlations that

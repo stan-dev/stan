@@ -22,6 +22,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
@@ -46,6 +47,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
+      using std::exp;
 
       T_partials_return P(1.0);
 
@@ -61,7 +63,7 @@ namespace stan {
       VectorView<const T_dof> nu_vec(nu);
       size_t N = max_size(y, nu);
 
-      agrad::OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
+      OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
 
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero

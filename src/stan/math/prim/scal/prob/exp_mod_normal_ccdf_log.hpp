@@ -10,10 +10,10 @@
 #include <stan/math/prim/scal/err/check_not_nan.hpp>
 #include <stan/math/prim/scal/err/check_positive_finite.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
-
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -56,11 +56,13 @@ namespace stan {
                              "Inv_scale paramter", lambda);
 
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale>
         operands_and_partials(y, mu, sigma, lambda);
 
       using stan::math::SQRT_2;
       using std::log;
+      using std::log;
+      using std::exp;
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);

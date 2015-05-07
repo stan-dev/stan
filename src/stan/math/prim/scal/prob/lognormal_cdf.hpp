@@ -14,6 +14,7 @@
 #include <stan/math/prim/scal/fun/square.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {
@@ -34,6 +35,8 @@ namespace stan {
       using stan::math::check_positive_finite;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
+      using std::exp;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -46,7 +49,7 @@ namespace stan {
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);

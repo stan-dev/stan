@@ -71,7 +71,7 @@ namespace stan {
           return LOG_ZERO;
 
       // return accumulator with gradients
-      agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
+      OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
       using stan::math::multiply_log;
       for (size_t i = 0; i < size; i++) {

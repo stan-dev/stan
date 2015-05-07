@@ -35,6 +35,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T, TU>::type
     ub_constrain(const T x, const TU ub) {
+      using std::exp;
       if (ub == std::numeric_limits<double>::infinity())
         return identity_constrain(x);
       return ub - exp(x);
@@ -67,6 +68,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T, TU>::type
     ub_constrain(const T x, const TU ub, T& lp) {
+      using std::exp;
       if (ub == std::numeric_limits<double>::infinity())
         return identity_constrain(x, lp);
       lp += x;

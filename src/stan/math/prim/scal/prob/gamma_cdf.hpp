@@ -24,6 +24,7 @@
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
@@ -65,6 +66,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
+      using std::exp;
 
       T_partials_return P(1.0);
 
@@ -83,7 +85,7 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
 
-      agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale>
+      OperandsAndPartials<T_y, T_shape, T_inv_scale>
         operands_and_partials(y, alpha, beta);
 
       // Explicit return for extreme values

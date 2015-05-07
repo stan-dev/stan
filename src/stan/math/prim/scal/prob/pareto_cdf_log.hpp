@@ -13,8 +13,8 @@
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
+#include <cmath>
 #include <limits>
-
 
 namespace stan {
   namespace math {
@@ -38,6 +38,8 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
+      using std::log;
+      using std::exp;
 
       T_partials_return P(0.0);
 
@@ -56,7 +58,7 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, y_min, alpha);
 
-      agrad::OperandsAndPartials<T_y, T_scale, T_shape>
+      OperandsAndPartials<T_y, T_scale, T_shape>
         operands_and_partials(y, y_min, alpha);
 
       // Explicit return for extreme values

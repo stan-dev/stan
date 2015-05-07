@@ -15,6 +15,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/sign.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -40,6 +41,7 @@ namespace stan {
       using std::log;
       using std::fabs;
       using stan::math::sign;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -66,7 +68,7 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorBuilder<include_summand<propto, T_y, T_loc, T_scale>::value,

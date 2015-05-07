@@ -15,7 +15,7 @@ namespace stan {
      */
     inline matrix_v
     crossprod(const matrix_v& M) {
-      return tcrossprod(M.transpose());
+      return tcrossprod(static_cast<matrix_v>(M.transpose()));
     }
 
   }

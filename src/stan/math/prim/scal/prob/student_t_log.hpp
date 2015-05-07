@@ -20,6 +20,7 @@
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -100,6 +101,7 @@ namespace stan {
       using stan::math::lgamma;
       using stan::math::square;
       using stan::math::value_of;
+      using std::log;
 
       VectorBuilder<include_summand<propto, T_y, T_dof, T_loc, T_scale>::value,
                     T_partials_return, T_dof> half_nu(length(nu));
@@ -162,7 +164,7 @@ namespace stan {
           log1p_exp[i] = log1p(square_y_minus_mu_over_sigma__over_nu[i]);
         }
 
-      agrad::OperandsAndPartials<T_y, T_dof, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_dof, T_loc, T_scale>
         operands_and_partials(y, nu, mu, sigma);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);

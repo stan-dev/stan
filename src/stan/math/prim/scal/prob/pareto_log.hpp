@@ -16,6 +16,7 @@
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {
@@ -33,6 +34,7 @@ namespace stan {
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -67,7 +69,7 @@ namespace stan {
       }
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_scale, T_shape>
+      OperandsAndPartials<T_y, T_scale, T_shape>
         operands_and_partials(y, y_min, alpha);
 
       VectorBuilder<include_summand<propto, T_y, T_shape>::value,

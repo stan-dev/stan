@@ -5,6 +5,7 @@
 #include <stan/math/prim/mat/err/check_simplex.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
 #include <stan/math/prim/scal/fun/logit.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -31,6 +32,7 @@ namespace stan {
       using Eigen::Matrix;
       using stan::math::index_type;
       using stan::math::logit;
+      using std::log;
 
       typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 

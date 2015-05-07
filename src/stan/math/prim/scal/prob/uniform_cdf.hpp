@@ -60,7 +60,7 @@ namespace stan {
           return 0.0;
       }
 
-      agrad::OperandsAndPartials<T_y, T_low, T_high>
+      OperandsAndPartials<T_y, T_low, T_high>
         operands_and_partials(y, alpha, beta);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);

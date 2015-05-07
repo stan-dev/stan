@@ -12,6 +12,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/prob/uniform_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -34,7 +35,9 @@ namespace stan {
                   RNG& rng) {
       using boost::variate_generator;
       using stan::math::uniform_rng;
-
+      using std::log;
+      using std::log;
+      
       static const char* function("stan::math::von_mises_rng");
 
       stan::math::check_finite(function, "mean", mu);

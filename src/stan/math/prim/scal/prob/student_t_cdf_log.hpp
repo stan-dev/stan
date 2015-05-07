@@ -21,6 +21,7 @@
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <limits>
+#include <cmath>
 
 namespace stan {
 
@@ -46,6 +47,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
+      using std::exp;
 
       T_partials_return P(0.0);
 
@@ -61,7 +63,7 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, nu, mu, sigma);
 
-      agrad::OperandsAndPartials<T_y, T_dof, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_dof, T_loc, T_scale>
         operands_and_partials(y, nu, mu, sigma);
 
       // Explicit return for extreme values
@@ -77,6 +79,7 @@ namespace stan {
       using stan::math::inc_beta;
       using std::pow;
       using std::exp;
+      using std::log;
 
       // Cache a few expensive function calls if nu is a parameter
       T_partials_return digammaHalf = 0;

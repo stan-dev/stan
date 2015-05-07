@@ -17,6 +17,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -38,6 +39,7 @@ namespace stan {
       using stan::math::square;
       using stan::math::value_of;
       using stan::math::log1m;
+      using std::exp;
 
       T_partials_return cdf_log(0.0);
 
@@ -54,7 +56,7 @@ namespace stan {
                              "Scale parameter", sigma);
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
+      OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);

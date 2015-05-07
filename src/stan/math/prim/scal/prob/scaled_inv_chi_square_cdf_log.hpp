@@ -19,9 +19,9 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
 #include <limits>
+#include <cmath>
 
 
 namespace stan {
@@ -46,6 +46,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
+      using std::exp;
 
       T_partials_return P(0.0);
 
@@ -64,7 +65,7 @@ namespace stan {
       VectorView<const T_scale> s_vec(s);
       size_t N = max_size(y, nu, s);
 
-      agrad::OperandsAndPartials<T_y, T_dof, T_scale>
+      OperandsAndPartials<T_y, T_dof, T_scale>
         operands_and_partials(y, nu, s);
 
       // Explicit return for extreme values
@@ -81,6 +82,7 @@ namespace stan {
       using boost::math::tgamma;
       using std::exp;
       using std::pow;
+      using std::log;
 
       // Cache a few expensive function calls if nu is a parameter
       VectorBuilder<!is_constant_struct<T_dof>::value,

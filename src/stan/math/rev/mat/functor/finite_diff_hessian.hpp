@@ -39,12 +39,12 @@ namespace stan {
      */
     template <typename F>
     void
-    finite_diff_hessian(const F& f,
-                        const Eigen::Matrix<double, -1, 1>& x,
-                        double& fx,
-                        Eigen::Matrix<double, -1, 1>& grad_fx,
-                        Eigen::Matrix<double, -1, -1>& hess_fx,
-                        const double epsilon = 1e-03) {
+    finite_diff_hessian_autodiff(const F& f,
+                                 const Eigen::Matrix<double, -1, 1>& x,
+                                 double& fx,
+                                 Eigen::Matrix<double, -1, 1>& grad_fx,
+                                 Eigen::Matrix<double, -1, -1>& hess_fx,
+                                 const double epsilon = 1e-03) {
       using Eigen::Matrix;
       using Eigen::Dynamic;
       using Eigen::VectorXd;

@@ -53,7 +53,7 @@ namespace stan {
 
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      OperandsAndPartials<T_prob> operands_and_partials(theta);
 
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero

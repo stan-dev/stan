@@ -13,6 +13,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/max_size.hpp>
 #include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
@@ -32,6 +33,8 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::math::INV_SQRT_2;
+      using std::log;
+      using std::exp;
 
       T_partials_return cdf_log(0.0);
       // check if any vectors are zero length
@@ -49,7 +52,7 @@ namespace stan {
                              "Location parameter", mu,
                              "Scale parameter", sigma);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);

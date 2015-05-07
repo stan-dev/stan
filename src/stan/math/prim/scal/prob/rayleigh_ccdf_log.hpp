@@ -54,7 +54,7 @@ namespace stan {
 
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
+      OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);

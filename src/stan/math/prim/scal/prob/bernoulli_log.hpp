@@ -12,9 +12,9 @@
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -36,6 +36,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::math::include_summand;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -61,7 +62,7 @@ namespace stan {
       VectorView<const T_n> n_vec(n);
       VectorView<const T_prob> theta_vec(theta);
       size_t N = max_size(n, theta);
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      OperandsAndPartials<T_prob> operands_and_partials(theta);
 
       if (length(theta) == 1) {
         size_t sum = 0;

@@ -23,11 +23,11 @@ namespace stan {
      * an agenda-based memory manager scoped to a single gradient
      * calculation.
      *
-     * An agrad::var is constructed with a double and used like any
+     * An var is constructed with a double and used like any
      * other scalar.  Arithmetical functions like negation, addition,
      * and subtraction, as well as a range of mathematical functions
      * like exponentiation and powers are overridden to operate on
-     * agrad::var values objects.
+     * var values objects.
      */
     class var {
     public:

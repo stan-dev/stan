@@ -42,6 +42,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T, TL, TU>::type
     lub_constrain(const T x, TL lb, TU ub) {
+      using std::exp;
       stan::math::check_less("lub_constrain", "lb", lb, ub);
       if (lb == -std::numeric_limits<double>::infinity())
         return ub_constrain(x, ub);
@@ -111,6 +112,8 @@ namespace stan {
     template <typename T, typename TL, typename TU>
     typename boost::math::tools::promote_args<T, TL, TU>::type
     lub_constrain(const T x, const TL lb, const TU ub, T& lp) {
+      using std::log;
+      using std::exp;
       if (!(lb < ub)) {
         std::stringstream s;
         s << "domain error in lub_constrain;  lower bound = " << lb

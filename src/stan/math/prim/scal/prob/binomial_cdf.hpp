@@ -21,6 +21,7 @@
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -69,8 +70,9 @@ namespace stan {
       using stan::math::lbeta;
       using std::exp;
       using std::pow;
+      using std::exp;
 
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      OperandsAndPartials<T_prob> operands_and_partials(theta);
 
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero

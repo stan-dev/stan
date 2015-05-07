@@ -37,6 +37,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T, TU>::type
     ub_free(const T y, const TU ub) {
+      using std::log;
       if (ub == std::numeric_limits<double>::infinity())
         return identity_free(y);
       stan::math::check_less_or_equal("stan::math::ub_free",

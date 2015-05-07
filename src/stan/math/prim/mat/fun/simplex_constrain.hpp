@@ -7,6 +7,7 @@
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/fun/log1p_exp.hpp>
 #include <stan/math/prim/scal/fun/logit.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -34,6 +35,7 @@ namespace stan {
       using stan::math::inv_logit;
       using stan::math::logit;
       using stan::math::log1m;
+      using std::log;
       typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 
 
@@ -73,6 +75,7 @@ namespace stan {
       using stan::math::logit;
       using stan::math::log1m;
       using stan::math::log1p_exp;
+      using std::log;
 
       typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 

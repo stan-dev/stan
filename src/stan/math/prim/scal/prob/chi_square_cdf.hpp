@@ -17,6 +17,7 @@
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <boost/random/chi_squared_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
@@ -63,7 +64,7 @@ namespace stan {
       VectorView<const T_dof> nu_vec(nu);
       size_t N = max_size(y, nu);
 
-      agrad::OperandsAndPartials<T_y, T_dof>
+      OperandsAndPartials<T_y, T_dof>
         operands_and_partials(y, nu);
 
       // Explicit return for extreme values
@@ -79,6 +80,7 @@ namespace stan {
       using boost::math::tgamma;
       using std::exp;
       using std::pow;
+      using std::exp;
 
       // Cache a few expensive function calls if nu is a parameter
       VectorBuilder<!is_constant_struct<T_dof>::value,

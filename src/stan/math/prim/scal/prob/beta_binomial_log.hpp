@@ -65,7 +65,7 @@ namespace stan {
       if (!include_summand<propto, T_size1, T_size2>::value)
         return 0.0;
 
-      agrad::OperandsAndPartials<T_size1, T_size2>
+      OperandsAndPartials<T_size1, T_size2>
         operands_and_partials(alpha, beta);
 
       VectorView<const T_n> n_vec(n);

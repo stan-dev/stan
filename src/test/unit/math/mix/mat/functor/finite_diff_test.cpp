@@ -111,7 +111,7 @@ TEST(AgradFiniteDiff,hessian) {
 
   stan::math::hessian(f, f_vec, f_eval, grad_f, H_f);
   stan::math::finite_diff_hessian(f, f_vec, f_fin_diff_eval, fin_diff_grad_f, fin_diff_H_f);
-  stan::math::finite_diff_hessian(f, f_vec, f_fin_diff_auto_eval,
+  stan::math::finite_diff_hessian_autodiff(f, f_vec, f_fin_diff_auto_eval,
                                    fin_diff_auto_grad_f, fin_diff_auto_H_f);
 
   EXPECT_FLOAT_EQ(f_eval,f_fin_diff_eval);
@@ -270,7 +270,7 @@ TEST(AgradFiniteDiff,hessianZeroOneArg) {
 
   stan::math::hessian(sum_f,sum_vec,eval_sum,grad_sum,hess_sum);
   stan::math::finite_diff_hessian(sum_f,sum_vec,f_eval_sum,f_grad_sum,f_hess_sum);
-  stan::math::finite_diff_hessian(sum_f,sum_vec,fa_eval_sum,fa_grad_sum,fa_hess_sum);
+  stan::math::finite_diff_hessian_autodiff(sum_f,sum_vec,fa_eval_sum,fa_grad_sum,fa_hess_sum);
 
   EXPECT_NEAR(grad_sum(0), f_grad_sum(0), 1e-12); 
   EXPECT_FLOAT_EQ(grad_sum(0), fa_grad_sum(0)); 
@@ -294,7 +294,7 @@ TEST(AgradFiniteDiff,hessianZeroOneArg) {
 
   stan::math::hessian(sum_f, z_sum_vec, z_eval_sum, z_grad_sum, z_hess_sum);
   stan::math::finite_diff_hessian(sum_f,  z_sum_vec,  f_z_eval_sum,  f_z_grad_sum,  f_z_hess_sum);
-  stan::math::finite_diff_hessian(sum_f,  z_sum_vec,  fa_z_eval_sum,  fa_z_grad_sum,  fa_z_hess_sum);
+  stan::math::finite_diff_hessian_autodiff(sum_f,  z_sum_vec,  fa_z_eval_sum,  fa_z_grad_sum,  fa_z_hess_sum);
 }
 
 TEST(AgradFiniteDiff,grad_hessianZeroOneArg) {

@@ -18,6 +18,7 @@
 #include <stan/math/prim/mat/prob/multi_normal_log.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorViewMvt.hpp>
+#include <cmath>
 #include <cstdlib>
 
 namespace stan {
@@ -49,6 +50,7 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
       using stan::math::log1p;
+      using std::log;
 
       typedef typename scalar_type<T_scale>::type T_scale_elem;
       typedef typename return_type<T_y, T_dof, T_loc, T_scale>::type lp_type;

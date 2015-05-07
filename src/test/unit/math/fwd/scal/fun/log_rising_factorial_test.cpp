@@ -3,9 +3,14 @@
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 #include <stan/math/fwd/scal/fun/log_rising_factorial.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
+#include <stan/math/fwd/scal/fun/digamma.hpp>
+#include <stan/math/fwd/scal/fun/exp.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/fwd/scal/fun/floor.hpp>
+#include <stan/math/fwd/scal/fun/lgamma.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
+#include <stan/math/fwd/scal/fun/pow.hpp>
+#include <stan/math/fwd/scal/fun/sin.hpp>
 #include <stan/math/fwd/scal/fun/tan.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 

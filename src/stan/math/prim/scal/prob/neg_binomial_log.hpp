@@ -26,6 +26,7 @@
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/meta/max_size.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -75,6 +76,7 @@ namespace stan {
       using stan::math::digamma;
       using stan::math::lgamma;
       using std::log;
+      using std::log;
 
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
@@ -82,7 +84,7 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t size = max_size(n, alpha, beta);
 
-      agrad::OperandsAndPartials<T_shape, T_inv_scale>
+      OperandsAndPartials<T_shape, T_inv_scale>
         operands_and_partials(alpha, beta);
 
       size_t len_ab = max_size(alpha, beta);

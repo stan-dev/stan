@@ -24,6 +24,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -93,11 +94,12 @@ namespace stan {
       }
 
       size_t N = max_size(y, alpha, beta);
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale>
+      OperandsAndPartials<T_y, T_shape, T_scale>
         operands_and_partials(y, alpha, beta);
 
       using stan::math::lgamma;
       using stan::math::digamma;
+      using std::log;
 
       VectorBuilder<include_summand<propto, T_y, T_shape>::value,
                     T_partials_return, T_y> log_y(length(y));

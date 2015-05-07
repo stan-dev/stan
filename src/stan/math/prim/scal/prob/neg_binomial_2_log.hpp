@@ -24,6 +24,7 @@
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -72,6 +73,7 @@ namespace stan {
       using stan::math::digamma;
       using stan::math::lgamma;
       using std::log;
+      using std::log;
 
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
@@ -79,7 +81,7 @@ namespace stan {
       VectorView<const T_precision> phi_vec(phi);
       size_t size = max_size(n, mu, phi);
 
-      agrad::OperandsAndPartials<T_location, T_precision>
+      OperandsAndPartials<T_location, T_precision>
         operands_and_partials(mu, phi);
 
       size_t len_ep = max_size(mu, phi);

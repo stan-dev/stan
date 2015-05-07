@@ -13,6 +13,7 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -30,6 +31,7 @@ namespace stan {
       using stan::math::check_greater;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -53,7 +55,7 @@ namespace stan {
       VectorView<const T_high> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
 
-      agrad::OperandsAndPartials<T_y, T_low, T_high>
+      OperandsAndPartials<T_y, T_low, T_high>
         operands_and_partials(y, alpha, beta);
 
       for (size_t n = 0; n < N; n++) {

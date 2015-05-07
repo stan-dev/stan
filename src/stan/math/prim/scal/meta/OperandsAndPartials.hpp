@@ -77,7 +77,7 @@ namespace stan {
       struct partials_to_var {
         inline
         T_return_type to_var(double logp, size_t /* nvaris */,
-                             agrad::vari** /* all_varis */,
+                             vari** /* all_varis */,
                              T_partials_return* /* all_partials */,
                              const T1& x1, const T2& x2, const T3& x3,
                              const T4& x4, const T5& x5, const T6& x6,
@@ -110,7 +110,7 @@ namespace stan {
                              T1, T2, T3, T4, T5, T6,
                              false, false> {
         inline T_return_type to_var(T_partials_return logp, size_t nvaris,
-                                    agrad::vari** all_varis,
+                                    vari** all_varis,
                                     T_partials_return* all_partials,
                                     const T1& x1, const T2& x2, const T3& x3,
                                     const T4& x4, const T5& x5, const T6& x6,
@@ -132,7 +132,7 @@ namespace stan {
                                     VectorView<T_partials_return,
                                     is_vector<T6>::value,
                                     is_constant_struct<T6>::value> d_x6) {
-          return var(new agrad::partials_vari(logp, nvaris, all_varis,
+          return var(new partials_vari(logp, nvaris, all_varis,
                                               all_partials));
         }
       };
@@ -144,7 +144,7 @@ namespace stan {
                              T1, T2, T3, T4, T5, T6,
                              true, false> {
         inline T_return_type to_var(T_partials_return logp, size_t nvaris,
-                                    agrad::vari** all_varis,
+                                    vari** all_varis,
                                     T_partials_return* all_partials,
                                     const T1& x1, const T2& x2, const T3& x3,
                                     const T4& x4, const T5& x5, const T6& x6,
@@ -200,13 +200,13 @@ namespace stan {
                bool is_const = is_constant_struct<T>::value,
                bool contain_fvar = contains_fvar<T>::value>
       struct set_varis {
-        inline size_t set(agrad::vari** /*varis*/, const T& /*x*/) {
+        inline size_t set(vari** /*varis*/, const T& /*x*/) {
           return 0U;
         }
       };
       template<typename T>
       struct set_varis<T, true, false, false> {
-        inline size_t set(agrad::vari** varis, const T& x) {
+        inline size_t set(vari** varis, const T& x) {
           for (size_t n = 0; n < length(x); n++)
             varis[n] = x[n].vi_;
           return length(x);
@@ -214,15 +214,15 @@ namespace stan {
       };
       template<typename T>
       struct set_varis<T, true, false, true> {
-        inline size_t set(agrad::vari** varis, const T& x) {
+        inline size_t set(vari** varis, const T& x) {
           for (size_t n = 0; n < length(x); n++)
             varis[n] = 0;
           return length(x);
         }
       };
       template<>
-      struct set_varis<agrad::var, false, false, false> {
-        inline size_t set(agrad::vari** varis, const agrad::var& x) {
+      struct set_varis<var, false, false, false> {
+        inline size_t set(vari** varis, const var& x) {
           varis[0] = x.vi_;
           return (1);
         }
@@ -245,7 +245,7 @@ namespace stan {
 
       static const bool all_constant = is_constant<T_return_type>::value;
       size_t nvaris;
-      agrad::vari** all_varis;
+      vari** all_varis;
       T_partials_return* all_partials;
 
       VectorView<T_partials_return,
@@ -275,11 +275,11 @@ namespace stan {
                  !is_constant_struct<T4>::value * length(x4) +
                  !is_constant_struct<T5>::value * length(x5) +
                  !is_constant_struct<T6>::value * length(x6)),
-          all_varis(static_cast<agrad::vari**>
-                    (agrad::chainable::operator new
-                     (sizeof(agrad::vari*) * nvaris))),
+          all_varis(static_cast<vari**>
+                    (chainable::operator new
+                     (sizeof(vari*) * nvaris))),
           all_partials(static_cast<T_partials_return*>
-                       (agrad::chainable::operator new
+                       (chainable::operator new
                         (sizeof(T_partials_return) * nvaris))),
           d_x1(all_partials),
           d_x2(all_partials

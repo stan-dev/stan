@@ -75,7 +75,7 @@ namespace stan {
       VectorView<const T_prob> alpha_vec(alpha);
       size_t size = max_size(n, N, alpha);
 
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(alpha);
+      OperandsAndPartials<T_prob> operands_and_partials(alpha);
 
       using stan::math::binomial_coefficient_log;
       using stan::math::log_inv_logit;

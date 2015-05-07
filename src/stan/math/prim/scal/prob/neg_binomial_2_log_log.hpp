@@ -20,6 +20,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -69,6 +70,7 @@ namespace stan {
       using stan::math::log_sum_exp;
       using stan::math::digamma;
       using stan::math::lgamma;
+      using std::exp;
       using std::log;
 
       // set up template expressions wrapping scalars into vector views
@@ -77,7 +79,7 @@ namespace stan {
       VectorView<const T_precision> phi_vec(phi);
       size_t size = max_size(n, eta, phi);
 
-      agrad::OperandsAndPartials<T_log_location, T_precision>
+      OperandsAndPartials<T_log_location, T_precision>
         operands_and_partials(eta, phi);
 
       size_t len_ep = max_size(eta, phi);

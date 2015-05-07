@@ -20,6 +20,7 @@
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
@@ -69,8 +70,9 @@ namespace stan {
       using stan::math::lbeta;
       using std::exp;
       using std::pow;
+      using std::exp;
 
-      agrad::OperandsAndPartials<T_shape, T_inv_scale>
+      OperandsAndPartials<T_shape, T_inv_scale>
         operands_and_partials(alpha, beta);
 
       // Explicit return for extreme values

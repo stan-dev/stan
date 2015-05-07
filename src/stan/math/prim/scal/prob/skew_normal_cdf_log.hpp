@@ -15,6 +15,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -58,11 +59,13 @@ namespace stan {
                              "Shape paramter", alpha);
 
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
+      OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
         operands_and_partials(y, mu, sigma, alpha);
 
       using stan::math::SQRT_2;
       using stan::math::pi;
+      using std::log;
+      using std::exp;
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);

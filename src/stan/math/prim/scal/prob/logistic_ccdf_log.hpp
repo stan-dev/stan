@@ -21,6 +21,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/prob/logistic_log.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
@@ -45,6 +46,8 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
+      using std::log;
+      using std::exp;
 
       T_partials_return P(0.0);
 
@@ -62,7 +65,7 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       // Explicit return for extreme values

@@ -256,7 +256,7 @@ namespace stan {
      * Test the log_prob_grad() function's ability to produce
      * accurate gradients using finite differences.  This shouldn't
      * be necessary when using autodiff, but is useful for finding
-     * bugs in hand-written code (or agrad).
+     * bugs in hand-written code (or var).
      *
      * @tparam propto True if calculation is up to proportion
      * (double-only terms dropped).

@@ -22,6 +22,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -84,6 +85,7 @@ namespace stan {
       using boost::math::digamma;
       using boost::math::lgamma;
       using stan::math::multiply_log;
+      using std::log;
 
       VectorBuilder<include_summand<propto, T_y, T_dof>::value,
                     T_partials_return, T_y> log_y(length(y));
@@ -110,7 +112,7 @@ namespace stan {
           digamma_half_nu_over_two[i] = digamma(half_nu) * 0.5;
       }
 
-      agrad::OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
+      OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return nu_dbl = value_of(nu_vec[n]);
         const T_partials_return half_nu = 0.5 * nu_dbl;

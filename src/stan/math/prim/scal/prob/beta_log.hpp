@@ -22,6 +22,7 @@
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -71,6 +72,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::check_nonnegative;
       using stan::math::check_less_or_equal;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -108,7 +110,7 @@ namespace stan {
       }
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail>
+      OperandsAndPartials<T_y, T_scale_succ, T_scale_fail>
         operands_and_partials(y, alpha, beta);
 
       VectorBuilder<include_summand<propto, T_y, T_scale_succ>::value,

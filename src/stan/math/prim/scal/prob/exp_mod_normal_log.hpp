@@ -13,6 +13,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -36,6 +37,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using stan::math::include_summand;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -64,9 +66,11 @@ namespace stan {
 
       using boost::math::erfc;
       using std::sqrt;
+      using std::log;
+      using std::exp;
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale>
         operands_and_partials(y, mu, sigma, lambda);
 
       VectorView<const T_y> y_vec(y);

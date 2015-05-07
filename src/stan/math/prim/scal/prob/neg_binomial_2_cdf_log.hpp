@@ -19,6 +19,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/random/negative_binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <cmath>
 #include <vector>
 
 namespace stan {
@@ -41,6 +42,8 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_less;
+      using std::log;
+      using std::log;
 
       static const char* function("stan::math::neg_binomial_2_cdf");
       check_positive_finite(function, "Location parameter", mu);

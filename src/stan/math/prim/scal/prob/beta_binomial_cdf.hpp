@@ -17,6 +17,7 @@
 #include <stan/math/prim/scal/prob/beta_rng.hpp>
 #include <stan/math/prim/scal/fun/F32.hpp>
 #include <stan/math/prim/scal/fun/grad_F32.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -70,8 +71,9 @@ namespace stan {
       using stan::math::lbeta;
       using stan::math::digamma;
       using std::exp;
+      using std::exp;
 
-      agrad::OperandsAndPartials<T_size1, T_size2>
+      OperandsAndPartials<T_size1, T_size2>
         operands_and_partials(alpha, beta);
 
       // Explicit return for extreme values

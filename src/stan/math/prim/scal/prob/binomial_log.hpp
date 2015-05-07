@@ -76,7 +76,7 @@ namespace stan {
       VectorView<const T_prob> theta_vec(theta);
       size_t size = max_size(n, N, theta);
 
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      OperandsAndPartials<T_prob> operands_and_partials(theta);
 
       using stan::math::multiply_log;
       using stan::math::binomial_coefficient_log;

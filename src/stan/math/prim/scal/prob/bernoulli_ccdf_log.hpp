@@ -12,9 +12,9 @@
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -52,7 +52,8 @@ namespace stan {
 
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      using std::log;
+      OperandsAndPartials<T_prob> operands_and_partials(theta);
 
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero

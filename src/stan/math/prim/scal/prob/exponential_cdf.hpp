@@ -17,6 +17,7 @@
 #include <stan/math/prim/scal/meta/return_type.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -47,6 +48,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
+      using std::exp;
 
       T_partials_return cdf(1.0);
       // check if any vectors are zero length
@@ -58,7 +60,7 @@ namespace stan {
       check_nonnegative(function, "Random variable", y);
       check_positive_finite(function, "Inverse scale parameter", beta);
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale>
+      OperandsAndPartials<T_y, T_inv_scale>
         operands_and_partials(y, beta);
 
       VectorView<const T_y> y_vec(y);

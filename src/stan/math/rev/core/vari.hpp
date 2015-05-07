@@ -71,7 +71,7 @@ namespace stan {
       /**
        * Throw an illegal argument exception.
        *
-       * <i>Warning</i>: Destructors should never called for agrad objects.
+       * <i>Warning</i>: Destructors should never called for var objects.
        *
        * @throw Logic exception always.
        */

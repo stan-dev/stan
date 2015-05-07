@@ -21,6 +21,7 @@
 #include <stan/math/prim/scal/meta/return_type.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {
@@ -73,12 +74,13 @@ namespace stan {
         if (value_of(y_vec[n]) <= 0)
           return LOG_ZERO;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       using stan::math::square;
       using std::log;
       using stan::math::NEG_LOG_SQRT_TWO_PI;
+      using std::log;
 
 
       VectorBuilder<include_summand<propto, T_scale>::value,

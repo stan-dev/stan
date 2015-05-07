@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/fwd/core.hpp>
 
+
 class AgradFwdMatrixInverseSPD : public testing::Test {
   void SetUp() {
   }

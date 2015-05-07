@@ -19,7 +19,7 @@ namespace stan {
      * @param v Variable.
      * @return Value of variable.
      */
-    inline double value_of(const agrad::var& v) {
+    inline double value_of(const var& v) {
       return v.vi_->val_;
     }
 

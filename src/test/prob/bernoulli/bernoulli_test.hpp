@@ -1,8 +1,8 @@
 // Arguments: Ints, Doubles
 #include <stan/math/prim/scal/prob/bernoulli_log.hpp>
 #include <stan/math/prim/scal/prob/bernoulli_cdf.hpp>
-
 #include <stan/math/prim/scal/fun/log1m.hpp>
+#include <stdexcept>
 
 using std::vector;
 using std::numeric_limits;
@@ -81,6 +81,7 @@ public:
       return log(theta);
     else if (n == 0)
       return log1m(theta);
+    throw std::domain_error("n should either be 1 or 0");
   }
 };
 

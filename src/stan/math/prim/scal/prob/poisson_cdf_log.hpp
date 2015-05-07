@@ -14,6 +14,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/poisson_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
@@ -56,8 +57,10 @@ namespace stan {
       using boost::math::tgamma;
       using std::exp;
       using std::pow;
+      using std::log;
+      using std::exp;
 
-      agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
+      OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as neg infinity

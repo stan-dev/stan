@@ -15,6 +15,7 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -43,6 +44,7 @@ namespace stan {
       using stan::math::value_of;
 
       using stan::math::modified_bessel_first_kind;
+      using std::log;
 
       // Result accumulator.
       T_partials_return logp = 0.0;
@@ -86,7 +88,7 @@ namespace stan {
             = log(modified_bessel_first_kind(0, value_of(kappa_vec[i])));
       }
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> oap(y, mu, kappa);
+      OperandsAndPartials<T_y, T_loc, T_scale> oap(y, mu, kappa);
 
       size_t N = max_size(y, mu, kappa);
 

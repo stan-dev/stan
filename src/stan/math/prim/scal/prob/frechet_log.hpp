@@ -20,6 +20,7 @@
 #include <stan/math/prim/scal/meta/return_type.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
@@ -41,6 +42,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
       using stan::math::multiply_log;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -101,7 +103,7 @@ namespace stan {
                                          alpha_dbl);
         }
 
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale>
+      OperandsAndPartials<T_y, T_shape, T_scale>
         operands_and_partials(y, alpha, sigma);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return alpha_dbl = value_of(alpha_vec[n]);

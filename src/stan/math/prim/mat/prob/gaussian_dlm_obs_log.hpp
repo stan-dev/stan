@@ -315,6 +315,7 @@ namespace stan {
       using stan::math::tcrossprod;
       using stan::math::trace_quad_form;
       using stan::math::transpose;
+      using std::log;
 
       int r = y.rows();  // number of variables
       int T = y.cols();  // number of observations

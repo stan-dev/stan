@@ -19,8 +19,8 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
+#include <cmath>
 
 
 namespace stan {
@@ -91,6 +91,7 @@ namespace stan {
       using stan::math::lgamma;
       using stan::math::digamma;
       using stan::math::square;
+      using std::log;
 
       VectorBuilder<include_summand<propto, T_dof, T_y, T_scale>::value,
                     T_partials_return, T_dof> half_nu(length(nu));
@@ -132,7 +133,7 @@ namespace stan {
           digamma_half_nu_over_two[i] = digamma(half_nu[i]) * 0.5;
       }
 
-      agrad::OperandsAndPartials<T_y, T_dof, T_scale>
+      OperandsAndPartials<T_y, T_dof, T_scale>
         operands_and_partials(y, nu, s);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return s_dbl = value_of(s_vec[n]);
