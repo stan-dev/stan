@@ -2,5 +2,6 @@
 #define STAN_MATH_FWD_ARR_FUN_HPP
 
 #include <stan/math/fwd/arr/fun/log_sum_exp.hpp>
+#include <stan/math/fwd/arr/fun/sum.hpp>
 
 #endif
