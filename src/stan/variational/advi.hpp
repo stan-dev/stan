@@ -7,6 +7,7 @@
 #include <stan/model/util.hpp>
 
 #include <stan/services/io/write_iteration_csv.hpp>
+#include <stan/services/io/write_iteration.hpp>
 
 #include <stan/variational/advi_params_fullrank.hpp>
 #include <stan/variational/advi_params_meanfield.hpp>
@@ -29,23 +30,23 @@ namespace stan {
     public:
       advi(M& m,
            Eigen::VectorXd& cont_params,
-           double elbo,
            int n_monte_carlo_grad,
            int n_monte_carlo_elbo,
            double eta_stepsize,
            BaseRNG& rng,
-           int refresh,
+           int eval_elbo,
+           int n_posterior_samples,
            std::ostream* print_stream,
            std::ostream* output_stream,
            std::ostream* diagnostic_stream):
         model_(m),
         cont_params_(cont_params),
-        elbo_(elbo),
         rng_(rng),
         n_monte_carlo_grad_(n_monte_carlo_grad),
         n_monte_carlo_elbo_(n_monte_carlo_elbo),
         eta_stepsize_(eta_stepsize),
-        refresh_(refresh),
+        eval_elbo_(eval_elbo),
+        n_posterior_samples_(n_posterior_samples),
         print_stream_(print_stream),
         out_stream_(output_stream),
         diag_stream_(diagnostic_stream) {
@@ -59,6 +60,10 @@ namespace stan {
         stan::math::check_positive(function,
                                    "Number of Monte Carlo samples for ELBO",
                                    n_monte_carlo_elbo_);
+
+        stan::math::check_positive(function,
+                                   "Number of posterior samples for output",
+                                   n_posterior_samples_);
 
         stan::math::check_positive(function, "Eta stepsize", eta_stepsize_);
         }
@@ -100,6 +105,19 @@ namespace stan {
         elbo += advi_params.entropy();
 
         return elbo;
+      }
+
+      template <typename T>
+      Eigen::VectorXd draw_posterior_sample(const T& advi_params) {
+        int dim = advi_params.dimension();
+        Eigen::VectorXd z_check = Eigen::VectorXd::Zero(dim);
+
+        // Draw from standard normal and transform to unconstrained space
+        for (int d = 0; d < dim; ++d) {
+          z_check(d) = stan::prob::normal_rng(0, 1, rng_);
+        }
+
+        return advi_params.loc_scale_transform(z_check);
       }
 
       /**
@@ -295,7 +313,7 @@ namespace stan {
 
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = static_cast<int>(
-                std::max(0.1*max_iterations/static_cast<double>(refresh_), 1.0));
+                std::max(0.1*max_iterations/static_cast<double>(eval_elbo_), 1.0));
         boost::circular_buffer<double> cb(cb_size);
 
         // Print stuff
@@ -325,22 +343,22 @@ namespace stan {
 
           // RMSprop moving average weighting
           mu_s.array() = pre_factor * mu_s.array()
-                       + post_factor * 
+                       + post_factor *
                        mu_grad.array().square();
           L_s.array()  = pre_factor * L_s.array()
-                       + post_factor * 
+                       + post_factor *
                        L_grad.array().square();
 
           // Take ADAgrad or rmsprop step
-          muL.set_mu(muL.mu().array() 
-             + eta_stepsize_ * mu_grad.array() 
+          muL.set_mu(muL.mu().array()
+             + eta_stepsize_ * mu_grad.array()
              / (tau + mu_s.array().sqrt()));
-          muL.set_L_chol(muL.L_chol().array() 
-             + eta_stepsize_ * L_grad.array()  
+          muL.set_L_chol(muL.L_chol().array()
+             + eta_stepsize_ * L_grad.array()
              / (tau + L_s.array().sqrt()));
 
-          // Check for convergence every "refresh_"th iteration
-          if (iter_counter % refresh_ == 0) {
+          // Check for convergence every "eval_elbo_"th iteration
+          if (iter_counter % eval_elbo_ == 0) {
             elbo_prev = elbo;
             elbo = calc_ELBO(muL);
             delta_elbo = rel_decrease(elbo, elbo_prev);
@@ -451,7 +469,7 @@ namespace stan {
 
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = static_cast<int>(
-                std::max(0.1*max_iterations/static_cast<double>(refresh_), 1.0));
+                std::max(0.1*max_iterations/static_cast<double>(eval_elbo_), 1.0));
         boost::circular_buffer<double> cb(cb_size);
 
         // Print stuff
@@ -488,16 +506,16 @@ namespace stan {
 
           // Take ADAgrad or rmsprop step
           musigmatilde.set_mu(
-            musigmatilde.mu().array() 
+            musigmatilde.mu().array()
             + eta_stepsize_ * mu_grad.array()
             / (tau + mu_s.array().sqrt()));
           musigmatilde.set_sigma_tilde(
-            musigmatilde.sigma_tilde().array()  
+            musigmatilde.sigma_tilde().array()
             + eta_stepsize_ * sigma_tilde_grad.array()
             / (tau + sigma_tilde_s.array().sqrt()));
 
-          // Check for convergence every "refresh_"th iteration
-          if (iter_counter % refresh_ == 0) {
+          // Check for convergence every "eval_elbo_"th iteration
+          if (iter_counter % eval_elbo_ == 0) {
             elbo_prev = elbo;
             elbo = calc_ELBO(musigmatilde);
             delta_elbo = rel_decrease(elbo, elbo_prev);
@@ -562,14 +580,39 @@ namespace stan {
         *print_stream_
         << "This is stan::variational::advi::run_fullrank()" << std::endl;
 
+        // initialize variational approximation
         Eigen::VectorXd mu = cont_params_;
         Eigen::MatrixXd L  = Eigen::MatrixXd::Identity(model_.num_params_r(),
                                                        model_.num_params_r());
         advi_params_fullrank muL = advi_params_fullrank(mu, L);
 
+        // run inference algorithm
         robbins_monro_adagrad(muL, tol_rel_obj, max_iterations);
 
+        // get mean of posterior approximation and write on first output line
         cont_params_ = muL.mu();
+        std::vector<double> cont_vector(cont_params_.size());
+        for (int i = 0; i < cont_params_.size(); ++i)
+          cont_vector.at(i) = cont_params_(i);
+        std::vector<int> disc_vector;
+
+        if (out_stream_) {
+          services::io::write_iteration(*out_stream_, model_, rng_,
+                          0.0, cont_vector, disc_vector);
+        }
+
+        // draw more samples from posterior and write on subsequent lines
+        if (out_stream_) {
+          for (int n = 0; n < n_posterior_samples_; ++n) {
+
+            cont_params_ = draw_posterior_sample(muL);
+            for (int i = 0; i < cont_params_.size(); ++i)
+              cont_vector.at(i) = cont_params_(i);
+
+            services::io::write_iteration(*out_stream_, model_, rng_,
+                          0.0, cont_vector, disc_vector);
+          }
+        }
 
         return;
       }
@@ -578,6 +621,7 @@ namespace stan {
         *print_stream_
         << "This is stan::variational::advi::run_meanfield()" << std::endl;
 
+        // initialize variational approximation
         Eigen::VectorXd mu           = cont_params_;
         Eigen::MatrixXd sigma_tilde  = Eigen::VectorXd::Constant(
                                                 model_.num_params_r(),
@@ -587,16 +631,35 @@ namespace stan {
         advi_params_meanfield musigmatilde =
           advi_params_meanfield(mu, sigma_tilde);
 
+        // run inference algorithm
         robbins_monro_adagrad(musigmatilde, tol_rel_obj, max_iterations);
 
+        // get mean of posterior approximation and write on first output line
         cont_params_ = musigmatilde.mu();
+        std::vector<double> cont_vector(cont_params_.size());
+        for (int i = 0; i < cont_params_.size(); ++i)
+          cont_vector.at(i) = cont_params_(i);
+        std::vector<int> disc_vector;
+
+        if (out_stream_) {
+          services::io::write_iteration(*out_stream_, model_, rng_,
+                          0.0, cont_vector, disc_vector);
+        }
+
+        // draw more samples from posterior and write on subsequent lines
+        if (out_stream_) {
+          for (int n = 0; n < n_posterior_samples_; ++n) {
+
+            cont_params_ = draw_posterior_sample(musigmatilde);
+            for (int i = 0; i < cont_params_.size(); ++i)
+              cont_vector.at(i) = cont_params_(i);
+
+            services::io::write_iteration(*out_stream_, model_, rng_,
+                          0.0, cont_vector, disc_vector);
+          }
+        }
 
         return;
-      }
-
-      // Accessor to get results from command.hpp
-      const Eigen::VectorXd& cont_params() {
-        return cont_params_;
       }
 
       // Helper function: compute the median of a circular buffer
@@ -621,12 +684,12 @@ namespace stan {
     protected:
       M& model_;
       Eigen::VectorXd& cont_params_;
-      double elbo_;
       BaseRNG& rng_;
       int n_monte_carlo_grad_;
       int n_monte_carlo_elbo_;
       double eta_stepsize_;
-      int refresh_;
+      int eval_elbo_;
+      int n_posterior_samples_;
       std::ostream* print_stream_;
       std::ostream* out_stream_;
       std::ostream* diag_stream_;
