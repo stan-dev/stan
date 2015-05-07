@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Return the sum of the entries of the specified standard

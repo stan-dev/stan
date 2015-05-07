@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Class for sums of variables constructed with standard vectors.

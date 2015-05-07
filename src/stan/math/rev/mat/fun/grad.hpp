@@ -17,8 +17,7 @@ namespace stan {
      *
      * The grad() function does not itself recover any memory.  use
      * <code>recover_memory()</code> or
-     * <code>recover_memory_nested()</code>, defined in ,
-     * defined in agrad/rev/var_stack.hpp, to recover memory.
+     * <code>recover_memory_nested()</code> to recover memory.
      *
      * @param[in] v Value of function being differentiated
      * @param[in] x Variables being differentiated with respect to
