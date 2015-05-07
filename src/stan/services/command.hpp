@@ -699,6 +699,11 @@ namespace stan {
                                  ->arg("variational")
                                  ->arg("eval_elbo"))->value();
 
+          int output_samples = dynamic_cast<stan::services::int_argument*>
+            (parser.arg("method")->arg("experimental")
+                                 ->arg("variational")
+                                 ->arg("output_samples"))->value();
+
           if (algo->value() == "fullrank") {
 
             if (output_stream) {
@@ -721,7 +726,7 @@ namespace stan {
                        eta_stepsize,
                        base_rng,
                        eval_elbo,
-                       100,
+                       output_samples,
                        &std::cout,
                        output_stream,
                        diagnostic_stream);
@@ -750,7 +755,7 @@ namespace stan {
                        eta_stepsize,
                        base_rng,
                        eval_elbo,
-                       100,
+                       output_samples,
                        &std::cout,
                        output_stream,
                        diagnostic_stream);
