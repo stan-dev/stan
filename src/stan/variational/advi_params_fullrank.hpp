@@ -75,7 +75,7 @@ namespace stan {
         L_chol_ = L_chol;
       }
 
-        // Entropy of normal:
+      // Entropy of normal:
       // 0.5 * dim * (1+log2pi) + 0.5 * log det (L^T L) =
       // 0.5 * dim * (1+log2pi) + sum(log(abs(diag(L))))
       double entropy() const {
@@ -91,26 +91,6 @@ namespace stan {
         }
         return result;
       }
-
-      // // Calculate natural parameters
-      // Eigen::VectorXd nat_params() const {
-
-      //   // FIXME: stupid Eigen. can't initialize LLT factor with L.
-      //   // Compute the covariance matrix
-      //   Eigen::MatrixXd Sigma = L_chol_ * L_chol_.transpose();
-      //   stan::math::LDLT_factor<double,-1,-1> Sigma_LDLT(Sigma);
-
-      //   // Create a vector twice the dimension size
-      //   Eigen::VectorXd natural_params(dimension_ + dimension_^2);
-
-      //   // Concatenate the natural parameters
-      //   natural_params << (Sigma_LDLT.solve(mu_)).array(),
-      //                     (Sigma_LDLT.solve(
-      //                       Eigen::MatrixXd::Identity(dimension_,dimension_))
-      //                     ).array();
-
-      //   return natural_params;
-      // }
 
       // Implements f^{-1}(\check{z}) = L\check{z} + \mu
       Eigen::VectorXd loc_scale_transform(const Eigen::VectorXd& z_check) const {

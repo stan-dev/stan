@@ -9,6 +9,7 @@
 #include <stan/services/arguments/arg_variational_eta_stepsize.hpp>
 #include <stan/services/arguments/arg_tolerance.hpp>
 #include <stan/services/arguments/arg_variational_eval_elbo.hpp>
+#include <stan/services/arguments/arg_variational_output_samples.hpp>
 
 namespace stan {
 
@@ -31,6 +32,8 @@ namespace stan {
           "Convergence tolerance on the relative norm of the objective", 1e-2));
         _subarguments.push_back(new arg_variational_eval_elbo("eval_elbo",
           "Evaluate ELBO every Nth iteration", 100));
+        _subarguments.push_back(new arg_variational_output_samples("output_samples",
+          "Number of posterior samples to draw and save", 1000));
 
       }
     };

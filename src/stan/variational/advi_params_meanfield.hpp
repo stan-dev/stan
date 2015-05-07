@@ -80,22 +80,6 @@ namespace stan {
                (1.0 + stan::prob::LOG_TWO_PI) + sigma_tilde_.sum();
       }
 
-      // // Calculate natural parameters
-      // Eigen::VectorXd nat_params() const {
-
-      //   // Compute the variance
-      //   Eigen::VectorXd variance = sigma_tilde_.array().exp().square();
-
-      //   // Create a vector twice the dimension size
-      //   Eigen::VectorXd natural_params(2*dimension_);
-
-      //   // Concatenate the natural parameters
-      //   natural_params << mu_.array().cwiseQuotient(variance.array()),
-      //                     variance.array().cwiseInverse();
-
-      //   return natural_params;
-      // }
-
       // Implement f^{-1}(\check{z}) = sigma * \check{z} + \mu
       Eigen::VectorXd loc_scale_transform(const Eigen::VectorXd& z_check) const {
         static const char* function = "stan::variational::advi_params_meanfield"
