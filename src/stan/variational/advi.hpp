@@ -107,6 +107,14 @@ namespace stan {
         return elbo;
       }
 
+      /**
+       * Draws samples from the (converged) posterior, which is a multivariate
+       * Gaussian distribution. The posterior can be either a fullrank Gaussian
+       * or a mean-field (diagonal) Gaussian.
+       *
+       * @param   advi_params      variational parameters class
+       * @return                   a sample from the posterior distribution
+       */
       template <typename T>
       Eigen::VectorXd draw_posterior_sample(const T& advi_params) {
         int dim = advi_params.dimension();
@@ -313,7 +321,8 @@ namespace stan {
 
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = static_cast<int>(
-                std::max(0.1*max_iterations/static_cast<double>(eval_elbo_), 1.0));
+                std::max(0.1*max_iterations/static_cast<double>(eval_elbo_),
+                         1.0));
         boost::circular_buffer<double> cb(cb_size);
 
         // Print stuff
@@ -469,7 +478,8 @@ namespace stan {
 
         // Heuristic to estimate how far to look back in rolling window
         int cb_size = static_cast<int>(
-                std::max(0.1*max_iterations/static_cast<double>(eval_elbo_), 1.0));
+                std::max(0.1*max_iterations/static_cast<double>(eval_elbo_),
+                         1.0));
         boost::circular_buffer<double> cb(cb_size);
 
         // Print stuff
