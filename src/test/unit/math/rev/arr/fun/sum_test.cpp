@@ -5,7 +5,7 @@
 TEST(AgradRevMatrix, sum_std_vector) {
   using stan::math::sum;
   using std::vector;
-  using stan::agrad::var;
+  using stan::math::var;
 
   vector<var> x;
   for (size_t i = 0; i < 6; ++i)

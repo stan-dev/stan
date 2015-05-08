@@ -29,7 +29,6 @@ TEST(AgradRevMatrix,log_determinant_spd_diff) {
   std::vector<double> g1;
   det1.grad(x1,g1);
   
-  // optimized in agrad::matrix
   AVEC x2 = createAVEC(2,1,1,3);
   matrix_v v2(2,2);
   v2 << x2[0], x2[1], x2[2], x2[3];

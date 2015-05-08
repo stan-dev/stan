@@ -30,7 +30,6 @@ TEST(AgradRevMatrix,log_determinant_ldlt_diff) {
   std::vector<double> g1;
   det1.grad(x1,g1);
   
-  // optimized in agrad::matrix
   stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_v;
   AVEC x2 = createAVEC(2,1,1,3);
   matrix_v v2(2,2);

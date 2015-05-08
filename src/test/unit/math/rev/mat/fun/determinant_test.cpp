@@ -25,7 +25,6 @@ TEST(AgradRevMatrix,determinant) {
   std::vector<double> g1;
   det1.grad(x1,g1);
   
-  // optimized in agrad::matrix
   AVEC x2 = createAVEC(0,1,2,3);
   matrix_v v2(2,2);
   v2 << x2[0], x2[1], x2[2], x2[3];
