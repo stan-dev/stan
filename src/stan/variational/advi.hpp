@@ -178,7 +178,6 @@ namespace stan {
           // Compute gradient step in unconstrained space
           stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,
                                 print_stream_);
-          stan::agrad::recover_memory();
 
           // Update mu
           mu_grad += tmp_mu_grad;
@@ -252,7 +251,6 @@ namespace stan {
           // Compute gradient step in unconstrained space
           stan::model::gradient(model_, z_tilde, tmp_lp, tmp_mu_grad,
                                 print_stream_);
-          stan::agrad::recover_memory();
 
           // Update mu
           mu_grad.array() = mu_grad.array() + tmp_mu_grad.array();
