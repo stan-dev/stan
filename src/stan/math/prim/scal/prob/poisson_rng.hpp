@@ -14,13 +14,14 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/poisson_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
 
   namespace math {
 
-    static const double POISSON_MAX_RATE = pow(2, 30);
+    static const double POISSON_MAX_RATE = std::pow(2, 30);
 
     template <class RNG>
     inline int

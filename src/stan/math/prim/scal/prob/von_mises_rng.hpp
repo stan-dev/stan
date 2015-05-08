@@ -35,8 +35,9 @@ namespace stan {
                   RNG& rng) {
       using boost::variate_generator;
       using stan::math::uniform_rng;
+      using std::fmod;
       using std::log;
-      using std::log;
+      using std::pow;
       
       static const char* function("stan::math::von_mises_rng");
 
