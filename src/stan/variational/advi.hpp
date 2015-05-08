@@ -612,7 +612,6 @@ namespace stan {
         // draw more samples from posterior and write on subsequent lines
         if (out_stream_) {
           for (int n = 0; n < n_posterior_samples_; ++n) {
-
             cont_params_ = draw_posterior_sample(muL);
             for (int i = 0; i < cont_params_.size(); ++i)
               cont_vector.at(i) = cont_params_(i);
@@ -657,7 +656,6 @@ namespace stan {
         // draw more samples from posterior and write on subsequent lines
         if (out_stream_) {
           for (int n = 0; n < n_posterior_samples_; ++n) {
-
             cont_params_ = draw_posterior_sample(musigmatilde);
             for (int i = 0; i < cont_params_.size(); ++i)
               cont_vector.at(i) = cont_params_(i);

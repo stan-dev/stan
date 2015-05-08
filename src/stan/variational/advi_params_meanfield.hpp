@@ -81,7 +81,8 @@ namespace stan {
       }
 
       // Implement f^{-1}(\check{z}) = sigma * \check{z} + \mu
-      Eigen::VectorXd loc_scale_transform(const Eigen::VectorXd& z_check) const {
+      Eigen::VectorXd
+      loc_scale_transform(const Eigen::VectorXd& z_check) const {
         static const char* function = "stan::variational::advi_params_meanfield"
                                       "::loc_scale_transform";
 
