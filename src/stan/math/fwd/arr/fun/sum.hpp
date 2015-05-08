@@ -10,7 +10,7 @@ namespace stan {
 
     /**
      * Return the sum of the entries of the specified standard
-     * vector. 
+     * vector.
      *
      * @tparam T Type of vector entries.
      * @param m Vector.

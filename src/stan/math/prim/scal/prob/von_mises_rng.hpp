@@ -38,7 +38,7 @@ namespace stan {
       using std::fmod;
       using std::log;
       using std::pow;
-      
+
       static const char* function("stan::math::von_mises_rng");
 
       stan::math::check_finite(function, "mean", mu);

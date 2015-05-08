@@ -11,7 +11,7 @@ namespace stan {
 
     /**
      * Class for representing sums with constructors for Eigen.
-     * The <code>chain()</code> method and member variables are 
+     * The <code>chain()</code> method and member variables are
      * managed by the superclass <code>sum_v_vari</code>.
      */
     class sum_eigen_v_vari : public sum_v_vari {

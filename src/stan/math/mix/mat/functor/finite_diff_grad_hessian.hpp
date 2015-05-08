@@ -10,13 +10,13 @@ namespace stan {
 
   namespace math {
 
-    /** 
+    /**
      * Calculate the value and the gradient of the hessian of the specified
      * function at the specified argument using second-order autodiff and
-       * first-order finite difference.  
+       * first-order finite difference.
      *
-     * <p>The functor must implement 
-     * 
+     * <p>The functor must implement
+     *
      * <code>
      * double
      * operator()(const
@@ -26,7 +26,7 @@ namespace stan {
      * Reference:
      *
      * De Levie: An improved numerical approximation
-     * for the first derivative, page 3 
+     * for the first derivative, page 3
      *
      * 4 calls to the function, f.
      *
@@ -43,7 +43,8 @@ namespace stan {
                              const Eigen::Matrix<double, -1, 1>& x,
                              double& fx,
                              Eigen::Matrix<double, -1, -1>& hess,
-                             std::vector<Eigen::Matrix<double, -1, -1> >& grad_hess_fx,
+                             std::vector<Eigen::Matrix<double, -1, -1> >&
+                             grad_hess_fx,
                              const double epsilon = 1e-04) {
       using Eigen::Matrix;
       using Eigen::Dynamic;

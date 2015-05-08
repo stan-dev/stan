@@ -46,7 +46,7 @@ namespace stan {
 
     /**
      * Returns the sum of the entries of the specified vector.
-     * 
+     *
      * @param m Vector.
      * @return Sum of vector entries.
      */

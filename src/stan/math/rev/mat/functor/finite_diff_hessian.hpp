@@ -11,11 +11,11 @@ namespace stan {
 
     /**
      * Calculate the value and the hessian of the specified function
-     * at the specified argument using first-order autodiff and 
-     * first-order finite difference.  
+     * at the specified argument using first-order autodiff and
+     * first-order finite difference.
      *
-     * <p>The functor must implement 
-     * 
+     * <p>The functor must implement
+     *
      * <code>
      * double
      * operator()(const
@@ -25,9 +25,9 @@ namespace stan {
      * The reference for this algorithm is:
      *
      * De Levie: An improved numerical approximation
-     * for the first derivative, page 3 
+     * for the first derivative, page 3
      *
-     * This function involves 4 calls to f. Error 
+     * This function involves 4 calls to f. Error
      * on order of epsilon ^ 4.
      *
      * @tparam F Type of function
