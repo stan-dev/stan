@@ -25,16 +25,20 @@ namespace stan {
         _subarguments.push_back(new arg_iter());
         _subarguments.push_back(new arg_variational_num_samples("grad_samples",
           "Number of samples for Monte Carlo estimate of gradients", 10));
-        _subarguments.push_back(new arg_variational_num_samples("elbo_samples",
-          "Number of samples for Monte Carlo estimate of ELBO (objective function)", 100));
+        _subarguments.push_back(new arg_variational_num_samples
+                                ("elbo_samples",
+                                 "Number of samples for Monte Carlo estimate "
+                                 "of ELBO (objective function)",
+                                 100));
         _subarguments.push_back(new arg_variational_eta_stepsize());
         _subarguments.push_back(new arg_tolerance("tol_rel_obj",
           "Convergence tolerance on the relative norm of the objective", 1e-2));
         _subarguments.push_back(new arg_variational_eval_elbo("eval_elbo",
           "Evaluate ELBO every Nth iteration", 100));
-        _subarguments.push_back(new arg_variational_output_samples("output_samples",
-          "Number of posterior samples to draw and save", 1000));
-
+        _subarguments.push_back(new arg_variational_output_samples
+                                ("output_samples",
+                                 "Number of posterior samples to draw and save",
+                                 1000));
       }
     };
   }  // services

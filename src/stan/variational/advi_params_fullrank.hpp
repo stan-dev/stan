@@ -93,7 +93,8 @@ namespace stan {
       }
 
       // Implements f^{-1}(\check{z}) = L\check{z} + \mu
-      Eigen::VectorXd loc_scale_transform(const Eigen::VectorXd& z_check) const {
+      Eigen::VectorXd
+      loc_scale_transform(const Eigen::VectorXd& z_check) const {
         static const char* function = "stan::variational::advi_params_fullrank"
                                       "::loc_scale_transform";
 
