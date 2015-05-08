@@ -30,17 +30,17 @@ TEST(advi_test, hier_logistic_cp_constraint_fullrank) {
   // ADVI
   stan::variational::advi<Model_cp, rng_t> test_advi(my_model,
                                                      cont_params,
-                                                     0,
                                                      10,
-                                                     10, // absurdly high!
+                                                     100,
                                                      0.01,
                                                      base_rng,
-                                                     10,
+                                                     100,
+                                                     1,
                                                      &std::cout,
                                                      &std::cout,
                                                      &std::cout);
 
-  test_advi.run_fullrank(1,1e4);
+  test_advi.run_fullrank(1,2e4);
 }
 
 TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
@@ -63,15 +63,15 @@ TEST(advi_test, hier_logistic_cp_constraint_meanfield) {
   // ADVI
   stan::variational::advi<Model_cp, rng_t> test_advi(my_model,
                                                      cont_params,
-                                                     0,
                                                      10,
-                                                     10, // absurdly high!
+                                                     100,
                                                      0.01,
                                                      base_rng,
-                                                     10,
+                                                     100,
+                                                     1,
                                                      &std::cout,
                                                      &std::cout,
                                                      &std::cout);
 
-  test_advi.run_meanfield(1,1e4);
+  test_advi.run_meanfield(1,2e4);
 }

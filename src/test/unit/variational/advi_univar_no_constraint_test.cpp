@@ -29,12 +29,12 @@ TEST(advi_test, univar_no_constraint_fullrank) {
   // ADVI
   stan::variational::advi<Model, rng_t> test_advi(my_model,
                                                   cont_params,
-                                                  0,
                                                   10,
                                                   1e4, // absurdly high!
                                                   0.1,
                                                   base_rng,
                                                   100,
+                                                  1,
                                                   &std::cout,
                                                   &std::cout,
                                                   &std::cout);
@@ -148,12 +148,12 @@ TEST(advi_test, univar_no_constraint_meanfield) {
   // ADVI
   stan::variational::advi<Model, rng_t> test_advi(my_model,
                                                   cont_params,
-                                                  0,
                                                   10,
                                                   1e4, // absurdly high!
                                                   0.1,
                                                   base_rng,
                                                   100,
+                                                  1,
                                                   &std::cout,
                                                   &std::cout,
                                                   &std::cout);
