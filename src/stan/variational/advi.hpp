@@ -25,6 +25,28 @@ namespace stan {
 
   namespace variational {
 
+    /**
+     * AUTOMATIC DIFFERENTIATION VARIATIONAL INFERENCE
+     *
+     * Calculates the "blackbox" Evidence Lower BOund (ELBO) by sampling
+     * from the standard multivariate normal (for now), affine transform
+     * the sample, and evaluating the log joint, adjusted by the entropy
+     * term of the normal
+     *
+     * @tparam M                     class of model
+     * @tparam BaseRNG               class of random number generator
+     * @param  m                     stan model
+     * @param  cont_params           initialization of continuous parameters
+     * @param  n_monte_carlo_grad    number of samples for gradient computation
+     * @param  n_monte_carlo_elbo    number of samples for ELBO computation
+     * @param  eta_stepsize          eta stepize parameter for gradient steps
+     * @param  rng                   random number generator
+     * @param  eval_elbo             evaluate ELBO at every "eval_elbo" iters
+     * @param  n_posterior_samples   number of samples to draw from posterior
+     * @param  print_stream          stream for convergence assessment output
+     * @param  output_stream         stream for parameters output
+     * @param  diagnostic_stream     stresm for ELBO output
+     */
     template <class M, class BaseRNG>
     class advi {
     public:
@@ -76,6 +98,7 @@ namespace stan {
        * the sample, and evaluating the log joint, adjusted by the entropy
        * term of the normal
        *
+       * @tparam  T                type of advi_params (meanfield or fullrank)
        * @param   advi_params      variational parameters class
        * @return                   evidence lower bound (elbo)
        */
@@ -99,7 +122,7 @@ namespace stan {
                    log_prob<false, true>(z_tilde, print_stream_));
         }
         // Divide to get Monte Carlo integral estimate
-        elbo /= static_cast<double>(n_monte_carlo_elbo_);
+        elbo /= n_monte_carlo_elbo_;
 
         // Add entropy term
         elbo += advi_params.entropy();
@@ -112,6 +135,7 @@ namespace stan {
        * Gaussian distribution. The posterior can be either a fullrank Gaussian
        * or a mean-field (diagonal) Gaussian.
        *
+       * @tparam  T                type of advi_params (meanfield or fullrank)
        * @param   advi_params      variational parameters class
        * @return                   a sample from the posterior distribution
        */
