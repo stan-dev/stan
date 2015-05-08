@@ -738,7 +738,7 @@ namespace stan {
             if (i == dims.size() - 1) {
               generate_indent(i + 3, o_);
               o_ << "if (jacobian__)" << EOL;
- 
+
               // w Jacobian
 
               generate_indent(i + 4, o_);
@@ -754,7 +754,7 @@ namespace stan {
 
               generate_indent(i + 3, o_);
               o_ << "else" << EOL;
- 
+
               // w/o Jacobian
 
               generate_indent(i + 4, o_);
@@ -1662,7 +1662,7 @@ namespace stan {
           generate_local_var_init_nan(x.local_decl_,indent, o_,
                                       is_var_,is_fun_return_);
         }
-                      
+
         for (size_t i = 0; i < x.statements_.size(); ++i)
           generate_statement(x.statements_[i],indent, o_,include_sampling_,is_var_,
                              is_fun_return_);

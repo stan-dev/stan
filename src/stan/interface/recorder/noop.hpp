@@ -6,7 +6,7 @@
 namespace stan {
   namespace interface {
     namespace recorder {
-      
+
       class noop: public recorder {
       public:
 
