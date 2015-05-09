@@ -8,51 +8,51 @@
 
 namespace stan {
   namespace math {
-
+    
     // Gradients of the regularized incomplete beta function ibeta(a, b, z)
 
     template <typename T>
-    T ddz_inc_beta(T a, T b, T z) {
+    T inc_beta_ddz(T a, T b, T z) {
       return exp((b - 1) * log(1 - z) + (a - 1) * log(z)
                  + lgamma(a + b) - lgamma(a) - lgamma(b));
     }
 
     template <>
-    double ddz_inc_beta(double a, double b, double z) {
+    double inc_beta_ddz(double a, double b, double z) {
       using boost::math::ibeta_derivative;
       return ibeta_derivative(a, b, z);
     }
 
     template <typename T>
-    T dda_inc_beta(T a, T b, T z,
+    T inc_beta_dda(T a, T b, T z,
                    T digamma_a, T digamma_ab);
 
     template <typename T>
-    T ddb_inc_beta(T a, T b, T z,
+    T inc_beta_ddb(T a, T b, T z,
                    T digamma_b, T digamma_ab);
 
     template <typename T>
-    T dda_inc_beta(T a, T b, T z,
+    T inc_beta_dda(T a, T b, T z,
                    T digamma_a, T digamma_ab) {
       using std::log;
 
       if (b > a) {
         if (0.1 < z && z <= 0.75 && b > 500)
-          return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
+          return -inc_beta_ddb(b, a, 1 - z, digamma_a, digamma_ab);
         if (0.01 < z && z <= 0.1 && b > 2500)
-          return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
+          return -inc_beta_ddb(b, a, 1 - z, digamma_a, digamma_ab);
         if (0.001 < z && z <= 0.01 && b > 1e5)
-          return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
+          return -inc_beta_ddb(b, a, 1 - z, digamma_a, digamma_ab);
       }
 
       if (z > 0.75 && a < 500)
-        return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
+        return -inc_beta_ddb(b, a, 1 - z, digamma_a, digamma_ab);
       if (z > 0.9 && a < 2500)
-        return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
+        return -inc_beta_ddb(b, a, 1 - z, digamma_a, digamma_ab);
       if (z > 0.99 && a < 1e5)
-        return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
+        return -inc_beta_ddb(b, a, 1 - z, digamma_a, digamma_ab);
       if (z > 0.999)
-        return -ddb_inc_beta(b, a, 1 - z, digamma_a, digamma_ab);
+        return -inc_beta_ddb(b, a, 1 - z, digamma_a, digamma_ab);
 
       double threshold = 1e-10;
 
@@ -82,34 +82,34 @@ namespace stan {
         summand *= z / k;
 
         if (k > 1e5)
-          throw std::domain_error("stan::math::dda_inc_beta did "
+          throw std::domain_error("stan::math::inc_beta_dda did "
                                   "not converge within 100000 iterations");
       }
       return inc_beta(a, b, z) * (log(z) + sum_numer / sum_denom);
     }
 
     template <typename T>
-    T ddb_inc_beta(T a, T b, T z,
+    T inc_beta_ddb(T a, T b, T z,
                    T digamma_b, T digamma_ab) {
       using std::log;
 
       if (b > a) {
         if (0.1 < z && z <= 0.75 && b > 500)
-          return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
+          return -inc_beta_dda(b, a, 1 - z, digamma_b, digamma_ab);
         if (0.01 < z && z <= 0.1 && b > 2500)
-          return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
+          return -inc_beta_dda(b, a, 1 - z, digamma_b, digamma_ab);
         if (0.001 < z && z <= 0.01 && b > 1e5)
-          return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
+          return -inc_beta_dda(b, a, 1 - z, digamma_b, digamma_ab);
       }
 
       if (z > 0.75 && a < 500)
-        return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
+        return -inc_beta_dda(b, a, 1 - z, digamma_b, digamma_ab);
       if (z > 0.9 && a < 2500)
-        return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
+        return -inc_beta_dda(b, a, 1 - z, digamma_b, digamma_ab);
       if (z > 0.99 && a < 1e5)
-        return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
+        return -inc_beta_dda(b, a, 1 - z, digamma_b, digamma_ab);
       if (z > 0.999)
-        return -dda_inc_beta(b, a, 1 - z, digamma_b, digamma_ab);
+        return -inc_beta_dda(b, a, 1 - z, digamma_b, digamma_ab);
 
       double threshold = 1e-10;
 
@@ -135,7 +135,7 @@ namespace stan {
         summand *= z / k;
 
         if (k > 1e5)
-          throw std::domain_error("stan::math::ddb_inc_beta did "
+          throw std::domain_error("stan::math::inc_beta_ddb did "
                                   "not converge within 100000 iterations");
       }
 
