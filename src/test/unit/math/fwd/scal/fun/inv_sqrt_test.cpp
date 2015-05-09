@@ -6,7 +6,7 @@
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
 
 TEST(AgradFwdInvSqrt,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::inv_sqrt;
 
   fvar<double> x(0.5);
@@ -32,7 +32,7 @@ TEST(AgradFwdInvSqrt,Fvar) {
 }   
 
 TEST(AgradFwdInvSqrt,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::inv_sqrt;
   using std::log;
 

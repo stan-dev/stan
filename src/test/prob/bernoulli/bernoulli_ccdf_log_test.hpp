@@ -3,7 +3,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCcdfLogBernoulli: public AgradCcdfLogTest {
 public:
@@ -41,7 +41,7 @@ public:
   typename stan::return_type<T_prob>::type
   ccdf_log(const T_n& n, const T_prob& theta, const T2&,
            const T3&, const T4&, const T5&) {
-    return stan::prob::bernoulli_ccdf_log(n, theta);
+    return stan::math::bernoulli_ccdf_log(n, theta);
   }
 
 

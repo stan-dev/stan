@@ -8,8 +8,8 @@
 #include <stan/math/rev/core.hpp>
 #include <stan/math/fwd/core.hpp>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 // test sum of first n numbers for sum of a
 template <typename T>
@@ -36,8 +36,8 @@ TEST(AgradMixMatrixAccumulate,collection_fvar_var) {
 
   using stan::math::accumulator;
   using std::vector;
-  using stan::agrad::vector_fv;
-  using stan::agrad::matrix_fv;
+  using stan::math::vector_fv;
+  using stan::math::matrix_fv;
 
   accumulator<fvar<var> > a;
 
@@ -109,8 +109,8 @@ TEST(AgradMixMatrixAccumulate,collection_fvar_fvar_var) {
 
   using stan::math::accumulator;
   using std::vector;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::matrix_ffv;
+  using stan::math::vector_ffv;
+  using stan::math::matrix_ffv;
 
   accumulator<fvar<fvar<var> > > a;
 

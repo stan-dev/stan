@@ -15,16 +15,16 @@
 #include <stan/math/prim/scal/fun/lgamma.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <limits>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
     typename return_type<T_y, T_dof, T_loc, T_scale>::type
@@ -39,13 +39,14 @@ namespace stan {
             && stan::length(sigma)))
         return 0.0;
 
-      static const char* function("stan::prob::student_t_cdf_log");
+      static const char* function("stan::math::student_t_cdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
+      using std::exp;
 
       T_partials_return P(0.0);
 
@@ -61,7 +62,7 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, nu, mu, sigma);
 
-      agrad::OperandsAndPartials<T_y, T_dof, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_dof, T_loc, T_scale>
         operands_and_partials(y, nu, mu, sigma);
 
       // Explicit return for extreme values
@@ -77,6 +78,7 @@ namespace stan {
       using stan::math::inc_beta;
       using std::pow;
       using std::exp;
+      using std::log;
 
       // Cache a few expensive function calls if nu is a parameter
       T_partials_return digammaHalf = 0;

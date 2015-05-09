@@ -8,17 +8,17 @@ TEST(ProbDistributionsPoisson, error_check) {
   using std::log;
 
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::poisson_rng(6, rng));
+  EXPECT_NO_THROW(stan::math::poisson_rng(6, rng));
 
-  EXPECT_THROW(stan::prob::poisson_rng(-6, rng),std::domain_error);
+  EXPECT_THROW(stan::math::poisson_rng(-6, rng),std::domain_error);
 
-  EXPECT_NO_THROW(stan::prob::poisson_rng(1e9, rng));
+  EXPECT_NO_THROW(stan::math::poisson_rng(1e9, rng));
 
-  EXPECT_THROW(stan::prob::poisson_rng(pow(2.0,31), rng),std::domain_error);
+  EXPECT_THROW(stan::math::poisson_rng(pow(2.0,31), rng),std::domain_error);
 
-  EXPECT_NO_THROW(stan::prob::poisson_log_rng(log(1e9), rng));
+  EXPECT_NO_THROW(stan::math::poisson_log_rng(log(1e9), rng));
 
-  EXPECT_THROW(stan::prob::poisson_log_rng(log(pow(2.0,31)), rng),std::domain_error);
+  EXPECT_THROW(stan::math::poisson_log_rng(log(pow(2.0,31)), rng),std::domain_error);
 }
 
 TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest) {
@@ -42,7 +42,7 @@ TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest) {
   expect[K-1] = N * (1 - cdf(dist, K - 1));
 
   while (count < N) {
-    int a = stan::prob::poisson_rng(5,rng);
+    int a = stan::math::poisson_rng(5,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;
@@ -81,7 +81,7 @@ TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest2) {
   expect[K-1] = N * (1 - cdf(dist, K - 1));
 
   while (count < N) {
-    int a = stan::prob::poisson_log_rng(log(5),rng);
+    int a = stan::math::poisson_log_rng(log(5),rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

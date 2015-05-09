@@ -11,7 +11,7 @@
 #include <stan/math/rev/mat/fun/trace_inv_quad_form_ldlt.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Compute the trace of an inverse quadratic form.  I.E., this computes

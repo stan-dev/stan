@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class softmax_elt_vari : public vari {

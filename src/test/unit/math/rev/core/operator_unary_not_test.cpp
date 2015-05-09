@@ -10,6 +10,6 @@ TEST(AgradRev,not_a) {
 }
 
 TEST(AgradRev,not_nan) {
-  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
+  stan::math::var nan = std::numeric_limits<double>::quiet_NaN();
   EXPECT_FALSE(!nan);
 }

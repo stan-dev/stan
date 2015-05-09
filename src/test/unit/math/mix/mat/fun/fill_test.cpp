@@ -4,8 +4,8 @@
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/mat/fun/fill.hpp>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixFill, fv) {
   using stan::math::fill;

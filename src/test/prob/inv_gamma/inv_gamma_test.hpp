@@ -6,7 +6,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsInvGamma : public AgradDistributionTest {
 public:
@@ -63,7 +63,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& beta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::inv_gamma_log(y, alpha, beta);
+    return stan::math::inv_gamma_log(y, alpha, beta);
   }
 
   template <bool propto, 
@@ -72,7 +72,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& beta,
            const T3&, const T4&, const T5&) {
-    return stan::prob::inv_gamma_log<propto>(y, alpha, beta);
+    return stan::math::inv_gamma_log<propto>(y, alpha, beta);
   }
   
   
@@ -82,7 +82,7 @@ public:
   log_prob_function(const T_y& y, const T_shape& alpha, const T_scale& beta,
                     const T3&, const T4&, const T5&) {
     if (y <= 0)
-      return stan::prob::LOG_ZERO;
+      return stan::math::LOG_ZERO;
     
     using boost::math::lgamma;
     using stan::math::multiply_log;
@@ -93,5 +93,5 @@ public:
 };
 
 TEST(ProbDistributionsInvGammaCdf,Values) {
-    EXPECT_FLOAT_EQ(0.557873, stan::prob::inv_gamma_cdf(4.39, 1.349, 3.938));
+    EXPECT_FLOAT_EQ(0.557873, stan::math::inv_gamma_cdf(4.39, 1.349, 3.938));
 }

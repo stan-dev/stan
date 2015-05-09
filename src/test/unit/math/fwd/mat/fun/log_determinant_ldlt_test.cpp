@@ -7,8 +7,8 @@
 #include <stan/math/fwd/scal/fun/log.hpp>
 
 TEST(AgradFwdMatrixLogDeterminantLDLT,fd) {
-  using stan::agrad::matrix_fd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_fd;
+  using stan::math::fvar;
   using stan::math::log_determinant_ldlt;
   
   matrix_fd v(2,2);
@@ -27,8 +27,8 @@ TEST(AgradFwdMatrixLogDeterminantLDLT,fd) {
   EXPECT_FLOAT_EQ(0.83333333, det.d_);
 }
 TEST(AgradFwdMatrixLogDeterminantLDLT,ffd) {
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
   using stan::math::log_determinant_ldlt;
   
   fvar<fvar<double> > a,b,c,d;

@@ -5,7 +5,7 @@
 #include <stan/math/prim/scal/fun/modified_bessel_first_kind.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
 

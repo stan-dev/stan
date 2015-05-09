@@ -5,8 +5,8 @@
 #include <stan/math/rev/scal/fun/log.hpp>
 
 TEST(AgradFwdLog,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
 
   fvar<var> x(0.5,1.3);
@@ -22,8 +22,8 @@ TEST(AgradFwdLog,FvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdLog,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
 
   fvar<var> x(0.5,1.3);
@@ -36,8 +36,8 @@ TEST(AgradFwdLog,FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdLog,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
 
   fvar<fvar<var> > x;
@@ -72,8 +72,8 @@ TEST(AgradFwdLog,FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.0 / 0.5, r[0]);
 }
 TEST(AgradFwdLog,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::log;
 
   fvar<fvar<var> > x;
@@ -99,8 +99,8 @@ TEST(AgradFwdLog,FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(-1.0 / 0.25, r[0]);
 }
 TEST(AgradFwdLog,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 0.5;

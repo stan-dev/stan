@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     template <typename T>
     inline fvar<T> Phi(const fvar<T>& x) {

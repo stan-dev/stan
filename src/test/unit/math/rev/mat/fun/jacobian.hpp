@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /**
      * Return the Jacobian of the function producing the specified

@@ -6,7 +6,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsExponential : public AgradDistributionTest {
 public:
@@ -48,7 +48,7 @@ public:
   typename stan::return_type<T_y, T_inv_scale>::type 
   log_prob(const T_y& y, const T_inv_scale& beta, 
            const T2&, const T3&, const T4&, const T5&) {
-    return stan::prob::exponential_log(y, beta);
+    return stan::math::exponential_log(y, beta);
   }
 
   template <bool propto, 
@@ -57,7 +57,7 @@ public:
   typename stan::return_type<T_y, T_inv_scale>::type 
   log_prob(const T_y& y, const T_inv_scale& beta, 
            const T2&, const T3&, const T4&, const T5&) {
-    return stan::prob::exponential_log<propto>(y, beta);
+    return stan::math::exponential_log<propto>(y, beta);
   }
   
   
@@ -68,7 +68,7 @@ public:
                         const T2&, const T3&, const T4&, const T5&) {
     using stan::math::multiply_log;
     using boost::math::lgamma;
-    using stan::prob::NEG_LOG_TWO_OVER_TWO;
+    using stan::math::NEG_LOG_TWO_OVER_TWO;
     
     return log(beta) - beta * y;
   }
@@ -76,7 +76,7 @@ public:
 
 TEST(ProbDistributionsExponential,Cumulative) {
   using std::numeric_limits;
-  using stan::prob::exponential_cdf;
+  using stan::math::exponential_cdf;
   EXPECT_FLOAT_EQ(0.95021293, exponential_cdf(2.0,1.5));
   EXPECT_FLOAT_EQ(1.0, exponential_cdf(15.0,3.9));
   EXPECT_FLOAT_EQ(0.62280765, exponential_cdf(0.25,3.9));

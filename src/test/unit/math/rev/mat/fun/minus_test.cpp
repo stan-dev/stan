@@ -20,7 +20,7 @@ TEST(AgradRevMatrix, minus_scalar) {
 }
 TEST(AgradRevMatrix, minus_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
   using stan::math::minus;
 
   vector_d d(3);
@@ -43,7 +43,7 @@ TEST(AgradRevMatrix, minus_vector) {
 }
 TEST(AgradRevMatrix, minus_rowvector) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
   using stan::math::minus;
 
   row_vector_d d(3);
@@ -66,7 +66,7 @@ TEST(AgradRevMatrix, minus_rowvector) {
 }
 TEST(AgradRevMatrix, minus_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::minus;
 
   matrix_d d(2, 3);

@@ -5,7 +5,7 @@
 #include <stan/math/prim/scal/fun/primitive_value.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Return the primitive double value for the specified auto-diff
@@ -14,7 +14,7 @@ namespace stan {
      * @param v input variable.
      * @return value of input.
      */
-    inline double primitive_value(const agrad::var& v) {
+    inline double primitive_value(const var& v) {
       return v.val();
     }
 

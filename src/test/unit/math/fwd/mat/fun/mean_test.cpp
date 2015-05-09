@@ -8,8 +8,8 @@
 TEST(AgradFwdMatrixMean, fd_vector) {
   using stan::math::mean;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
-  using stan::agrad::fvar;
+  using stan::math::vector_fd;
+  using stan::math::fvar;
 
   vector_d d1(3);
   vector_fd v1(3);
@@ -32,7 +32,7 @@ TEST(AgradFwdMatrixMean, fd_vector) {
 TEST(AgradFwdMatrixMean, fd_vector_exception) {
   using stan::math::mean;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d d;
   vector_fd v;
@@ -42,8 +42,8 @@ TEST(AgradFwdMatrixMean, fd_vector_exception) {
 TEST(AgradFwdMatrixMean, fd_rowvector) {
   using stan::math::mean;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_fd;
+  using stan::math::fvar;
 
   row_vector_d d1(3);
   row_vector_fd v1(3);
@@ -66,7 +66,7 @@ TEST(AgradFwdMatrixMean, fd_rowvector) {
 TEST(AgradFwdMatrixMean, fd_rowvector_exception) {
   using stan::math::mean;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d d;
   row_vector_fd v;
@@ -76,8 +76,8 @@ TEST(AgradFwdMatrixMean, fd_rowvector_exception) {
 TEST(AgradFwdMatrixMean, fd_matrix) {
   using stan::math::mean;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_fd;
+  using stan::math::fvar;
 
   matrix_d d1(3,1);
   matrix_fd v1(1,3);
@@ -100,7 +100,7 @@ TEST(AgradFwdMatrixMean, fd_matrix) {
 TEST(AgradFwdMatrixMean, fd_matrix_exception) {
   using stan::math::mean;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
  
   matrix_d d;
   matrix_fd v;
@@ -109,7 +109,7 @@ TEST(AgradFwdMatrixMean, fd_matrix_exception) {
 }
 TEST(AgradFwdMatrixMean, fd_StdVector) {
   using stan::math::mean;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   std::vector<fvar<double> > x(0);
   EXPECT_THROW(mean(x), std::invalid_argument);
@@ -133,8 +133,8 @@ TEST(AgradFwdMatrixMean, fd_StdVector) {
 TEST(AgradFwdMatrixMean, ffd_vector) {
   using stan::math::mean;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::vector_ffd;
+  using stan::math::fvar;
 
   vector_d d1(3);
   vector_ffd v1(3);
@@ -161,7 +161,7 @@ TEST(AgradFwdMatrixMean, ffd_vector) {
 TEST(AgradFwdMatrixMean, ffd_vector_exception) {
   using stan::math::mean;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   vector_d d;
   vector_ffd v;
@@ -171,8 +171,8 @@ TEST(AgradFwdMatrixMean, ffd_vector_exception) {
 TEST(AgradFwdMatrixMean, ffd_rowvector) {
   using stan::math::mean;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_ffd;
+  using stan::math::fvar;
 
   row_vector_d d1(3);
   row_vector_ffd v1(3);
@@ -199,7 +199,7 @@ TEST(AgradFwdMatrixMean, ffd_rowvector) {
 TEST(AgradFwdMatrixMean, ffd_rowvector_exception) {
   using stan::math::mean;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
   row_vector_d d;
   row_vector_ffd v;
@@ -209,8 +209,8 @@ TEST(AgradFwdMatrixMean, ffd_rowvector_exception) {
 TEST(AgradFwdMatrixMean, ffd_matrix) {
   using stan::math::mean;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
 
   matrix_d d1(3,1);
   matrix_ffd v1(1,3);
@@ -237,7 +237,7 @@ TEST(AgradFwdMatrixMean, ffd_matrix) {
 TEST(AgradFwdMatrixMean, ffd_matrix_exception) {
   using stan::math::mean;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
  
   matrix_d d;
   matrix_ffd v;
@@ -246,7 +246,7 @@ TEST(AgradFwdMatrixMean, ffd_matrix_exception) {
 }
 TEST(AgradFwdMatrixMean, ffd_StdVector) {
   using stan::math::mean;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   std::vector<fvar<fvar<double> > > x(0);
   EXPECT_THROW(mean(x), std::invalid_argument);

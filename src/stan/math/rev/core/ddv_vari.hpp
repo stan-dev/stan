@@ -4,7 +4,7 @@
 #include <stan/math/rev/core/vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     class op_ddv_vari : public vari {
     protected:

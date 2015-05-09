@@ -12,26 +12,24 @@
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Bernoulli CDF
     template <typename T_n, typename T_prob>
     typename return_type<T_prob>::type
     bernoulli_cdf(const T_n& n, const T_prob& theta) {
-      static const char* function("stan::prob::bernoulli_cdf");
+      static const char* function("stan::math::bernoulli_cdf");
       typedef typename stan::partials_return_type<T_n, T_prob>::type
         T_partials_return;
 
       using stan::math::check_finite;
       using stan::math::check_bounded;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // Ensure non-zero argument lenghts
       if (!(stan::length(n) && stan::length(theta)))
@@ -53,7 +51,7 @@ namespace stan {
 
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      OperandsAndPartials<T_prob> operands_and_partials(theta);
 
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
@@ -83,6 +81,6 @@ namespace stan {
       return operands_and_partials.to_var(P, theta);
     }
 
-  }  // namespace prob
+  }  // namespace math
 }  // namespace stan
 #endif

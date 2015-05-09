@@ -5,8 +5,8 @@
 #include <stan/math/fwd/scal/fun/exp.hpp>
 
 TEST(AgradFwdOwensT,Fvar) {
-  using stan::agrad::fvar;
-  using stan::agrad::owens_t;
+  using stan::math::fvar;
+  using stan::math::owens_t;
   using boost::math::owens_t;
 
   fvar<double> h(1.0,1.0);
@@ -25,8 +25,8 @@ TEST(AgradFwdOwensT,Fvar) {
 }
 
 TEST(AgradFwdOwensT,FvarFvarDouble) {
-  using stan::agrad::fvar;
-  using stan::agrad::owens_t;
+  using stan::math::fvar;
+  using stan::math::owens_t;
   using boost::math::owens_t;
 
   fvar<fvar<double> > h,a;

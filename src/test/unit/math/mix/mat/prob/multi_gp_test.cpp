@@ -12,6 +12,7 @@
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/abs.hpp>
+#include <stan/math/rev/mat/fun/sum.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
@@ -26,8 +27,8 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 TEST(ProbDistributionsMultiGP,fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   Matrix<fvar<var>,Dynamic,1> mu(5,1);
   mu.setZero();
   
@@ -59,16 +60,16 @@ TEST(ProbDistributionsMultiGP,fvar_var) {
   for (size_t i = 0; i < 3; i++) {
     Matrix<fvar<var>,Dynamic,1> cy(y.row(i).transpose());
     Matrix<fvar<var>,Dynamic,Dynamic> cSigma((1.0/w[i])*Sigma);
-    lp_ref += stan::prob::multi_normal_log(cy,mu,cSigma);
+    lp_ref += stan::math::multi_normal_log(cy,mu,cSigma);
   }
   
-  EXPECT_FLOAT_EQ(lp_ref.val_.val(), stan::prob::multi_gp_log(y,Sigma,w).val_.val());
-  EXPECT_FLOAT_EQ(-74.572952, stan::prob::multi_gp_log(y,Sigma,w).d_.val());
+  EXPECT_FLOAT_EQ(lp_ref.val_.val(), stan::math::multi_gp_log(y,Sigma,w).val_.val());
+  EXPECT_FLOAT_EQ(-74.572952, stan::math::multi_gp_log(y,Sigma,w).d_.val());
 }
 
 TEST(ProbDistributionsMultiGP,fvar_fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   Matrix<fvar<fvar<var> >,Dynamic,1> mu(5,1);
   mu.setZero();
   
@@ -100,9 +101,9 @@ TEST(ProbDistributionsMultiGP,fvar_fvar_var) {
   for (size_t i = 0; i < 3; i++) {
     Matrix<fvar<fvar<var> >,Dynamic,1> cy(y.row(i).transpose());
     Matrix<fvar<fvar<var> >,Dynamic,Dynamic> cSigma((1.0/w[i])*Sigma);
-    lp_ref += stan::prob::multi_normal_log(cy,mu,cSigma);
+    lp_ref += stan::math::multi_normal_log(cy,mu,cSigma);
   }
   
-  EXPECT_FLOAT_EQ(lp_ref.val_.val_.val(), stan::prob::multi_gp_log(y,Sigma,w).val_.val_.val());
-  EXPECT_FLOAT_EQ(-74.572952, stan::prob::multi_gp_log(y,Sigma,w).d_.val_.val());
+  EXPECT_FLOAT_EQ(lp_ref.val_.val_.val(), stan::math::multi_gp_log(y,Sigma,w).val_.val_.val());
+  EXPECT_FLOAT_EQ(-74.572952, stan::math::multi_gp_log(y,Sigma,w).d_.val_.val());
 }

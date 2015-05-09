@@ -9,9 +9,9 @@
 
 TEST(AgradMixMatrixColumnsDotSelf,matrix_fv_1stDeriv) {
   using stan::math::columns_dot_self;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(2.0,1.0);
   fvar<var> b(3.0,1.0);
@@ -50,9 +50,9 @@ TEST(AgradMixMatrixColumnsDotSelf,matrix_fv_1stDeriv) {
 }
 TEST(AgradMixMatrixColumnsDotSelf,matrix_fv_2ndDeriv) {
   using stan::math::columns_dot_self;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(2.0,1.0);
   fvar<var> b(3.0,1.0);
@@ -73,9 +73,9 @@ TEST(AgradMixMatrixColumnsDotSelf,matrix_fv_2ndDeriv) {
 }
 TEST(AgradMixMatrixColumnsDotSelf,matrix_ffv_1stDeriv) {
   using stan::math::columns_dot_self;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(2.0,1.0);
   fvar<fvar<var> > b(3.0,1.0);
@@ -114,9 +114,9 @@ TEST(AgradMixMatrixColumnsDotSelf,matrix_ffv_1stDeriv) {
 }
 TEST(AgradMixMatrixColumnsDotSelf,matrix_ffv_2ndDeriv_1) {
   using stan::math::columns_dot_self;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(2.0,1.0);
   fvar<fvar<var> > b(3.0,1.0);
@@ -138,9 +138,9 @@ TEST(AgradMixMatrixColumnsDotSelf,matrix_ffv_2ndDeriv_1) {
 
 TEST(AgradMixMatrixColumnsDotSelf,matrix_ffv_2ndDeriv_2) {
   using stan::math::columns_dot_self;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(2.0,1.0);
   fvar<fvar<var> > b(3.0,1.0);
@@ -161,9 +161,9 @@ TEST(AgradMixMatrixColumnsDotSelf,matrix_ffv_2ndDeriv_2) {
 }
 TEST(AgradMixMatrixColumnsDotSelf,matrix_ffv_3rdDeriv) {
   using stan::math::columns_dot_self;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(2.0,1.0);
   fvar<fvar<var> > b(3.0,1.0);

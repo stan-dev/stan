@@ -7,7 +7,7 @@
 #include <stan/math/fwd/scal/fun/sin.hpp>
 
 TEST(AgradFwdDigamma,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::digamma;
   using boost::math::zeta;
 
@@ -18,7 +18,7 @@ TEST(AgradFwdDigamma,Fvar) {
 }
 
 TEST(AgradFwdDigamma,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::digamma;
 
   fvar<fvar<double> > x;

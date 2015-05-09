@@ -15,11 +15,12 @@
 #include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta_derivatives.hpp>
+#include <vector>
 
 #include <limits>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <typename T_n, typename T_location,
               typename T_precision>
@@ -31,7 +32,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n, T_location,
                                                   T_precision>::type
         T_partials_return;
-
+      
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_not_nan;

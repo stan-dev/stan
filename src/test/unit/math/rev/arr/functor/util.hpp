@@ -110,11 +110,11 @@ void test_ode_finite_diff_dv(const F& f,
 
   std::vector<double> grads_eff;
 
-  std::vector<stan::agrad::var> theta_v;
+  std::vector<stan::math::var> theta_v;
   for (size_t i = 0; i < theta.size(); i++)
     theta_v.push_back(theta[i]);
 
-  std::vector<std::vector<stan::agrad::var> > ode_res;
+  std::vector<std::vector<stan::math::var> > ode_res;
 
   ode_res = stan::math::integrate_ode(f, y_in, t_in,
                                       ts, theta_v, x, x_int, &msgs);
@@ -131,7 +131,7 @@ void test_ode_finite_diff_dv(const F& f,
           << ", equation index " << j 
           << ", and parameter index: " << k;
 
-      stan::agrad::set_zero_all_adjoints();
+      stan::math::set_zero_all_adjoints();
     }
   }
 }
@@ -156,11 +156,11 @@ void test_ode_finite_diff_vd(const F& f,
 
   std::vector<double> grads_eff;
 
-  std::vector<stan::agrad::var> y_in_v;
+  std::vector<stan::math::var> y_in_v;
   for (size_t k = 0; k < y_in.size(); k++)
     y_in_v.push_back(y_in[k]);
 
-  std::vector<std::vector<stan::agrad::var> > ode_res;
+  std::vector<std::vector<stan::math::var> > ode_res;
 
   ode_res = stan::math::integrate_ode(f, y_in_v, t_in,
                                       ts, theta, x, x_int, &msgs);
@@ -177,7 +177,7 @@ void test_ode_finite_diff_vd(const F& f,
           << ", equation index " << j 
           << ", and parameter index: " << k;
 
-      stan::agrad::set_zero_all_adjoints();
+      stan::math::set_zero_all_adjoints();
     }
   }
 }
@@ -209,20 +209,20 @@ void test_ode_finite_diff_vv(const F& f,
 
 
   std::vector<double> grads_eff;
-  std::vector<stan::agrad::var> y_in_v;
+  std::vector<stan::math::var> y_in_v;
   for (size_t i = 0; i < y_in.size(); i++)
     y_in_v.push_back(y_in[i]);
 
-  std::vector<stan::agrad::var> vars = y_in_v;
+  std::vector<stan::math::var> vars = y_in_v;
 
-  std::vector<stan::agrad::var> theta_v;
+  std::vector<stan::math::var> theta_v;
   for (size_t i = 0; i < theta.size(); i++)
     theta_v.push_back(theta[i]);
 
   for (size_t i = 0; i < theta_v.size(); i++)
     vars.push_back(theta_v[i]);
 
-  std::vector<std::vector<stan::agrad::var> > ode_res;
+  std::vector<std::vector<stan::math::var> > ode_res;
 
   ode_res = stan::math::integrate_ode(f, y_in_v, t_in,
                                       ts, theta_v, x, x_int, &msgs);
@@ -245,7 +245,7 @@ void test_ode_finite_diff_vv(const F& f,
           << ", equation index " << j 
           << ", and parameter index: " << k;
 
-      stan::agrad::set_zero_all_adjoints();
+      stan::math::set_zero_all_adjoints();
     }
   }
 }
@@ -516,7 +516,7 @@ void test_ode_error_conditions_vd(const F& f,
                                   const std::vector<double>& theta,
                                   const std::vector<double>& x,
                                   const std::vector<int>& x_int) {
-  std::vector<stan::agrad::var> y_var;
+  std::vector<stan::math::var> y_var;
   for (size_t i = 0; i < y_in.size(); i++) 
     y_var.push_back(y_in[i]);
   test_ode_error_conditions(f, t_in, ts, y_var, theta, x, x_int);
@@ -530,7 +530,7 @@ void test_ode_error_conditions_dv(const F& f,
                                   const std::vector<double>& theta,
                                   const std::vector<double>& x,
                                   const std::vector<int>& x_int) {
-  std::vector<stan::agrad::var> theta_var;
+  std::vector<stan::math::var> theta_var;
   for (size_t i = 0; i < theta.size(); i++) 
     theta_var.push_back(theta[i]);
   test_ode_error_conditions(f, t_in, ts, y_in, theta_var, x, x_int);
@@ -544,10 +544,10 @@ void test_ode_error_conditions_vv(const F& f,
                                   const std::vector<double>& theta,
                                   const std::vector<double>& x,
                                   const std::vector<int>& x_int) {
-  std::vector<stan::agrad::var> y_var;
+  std::vector<stan::math::var> y_var;
   for (size_t i = 0; i < y_in.size(); i++) 
     y_var.push_back(y_in[i]); 
-  std::vector<stan::agrad::var> theta_var;
+  std::vector<stan::math::var> theta_var;
   for (size_t i = 0; i < theta.size(); i++) 
     theta_var.push_back(theta[i]);
   test_ode_error_conditions(f, t_in, ts, y_var, theta_var, x, x_int);

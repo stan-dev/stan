@@ -4,7 +4,7 @@
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixMinus, fd_scalar) {
   using stan::math::minus;
@@ -18,7 +18,7 @@ TEST(AgradFwdMatrixMinus, fd_scalar) {
 }
 TEST(AgradFwdMatrixMinus, fd_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
   using stan::math::minus;
 
   vector_d d(3);
@@ -47,7 +47,7 @@ TEST(AgradFwdMatrixMinus, fd_vector) {
 }
 TEST(AgradFwdMatrixMinus, fd_rowvector) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
   using stan::math::minus;
 
   row_vector_d d(3);
@@ -76,7 +76,7 @@ TEST(AgradFwdMatrixMinus, fd_rowvector) {
 }
 TEST(AgradFwdMatrixMinus, fd_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   using stan::math::minus;
 
   matrix_d d(2, 3);
@@ -125,7 +125,7 @@ TEST(AgradFwdMatrixMinus, ffd_scalar) {
 }
 TEST(AgradFwdMatrixMinus, ffd_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
   using stan::math::minus;
 
   vector_d d(3);
@@ -158,7 +158,7 @@ TEST(AgradFwdMatrixMinus, ffd_vector) {
 }
 TEST(AgradFwdMatrixMinus, ffd_rowvector) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
   using stan::math::minus;
 
   row_vector_d d(3);
@@ -191,7 +191,7 @@ TEST(AgradFwdMatrixMinus, ffd_rowvector) {
 }
 TEST(AgradFwdMatrixMinus, ffd_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   using stan::math::minus;
 
   matrix_d dd(2, 3);

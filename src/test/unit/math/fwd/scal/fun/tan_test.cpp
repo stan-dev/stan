@@ -6,7 +6,7 @@
 #include <stan/math/fwd/scal/fun/tan.hpp>
 
 TEST(AgradFwdTan, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::tan;
   using std::cos;
 
@@ -39,7 +39,7 @@ TEST(AgradFwdTan, Fvar) {
 }
 
 TEST(AgradFwdTan, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::tan;
   using std::cos;
 

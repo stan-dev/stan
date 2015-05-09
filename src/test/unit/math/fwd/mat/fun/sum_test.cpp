@@ -5,11 +5,11 @@
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 TEST(AgradFwdMatrixSum, fd_vector) {
   using stan::math::sum;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d d(6);
   vector_fd v(6);
@@ -41,7 +41,7 @@ TEST(AgradFwdMatrixSum, fd_vector) {
 TEST(AgradFwdMatrixSum, fd_rowvector) {
   using stan::math::sum;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d d(6);
   row_vector_fd v(6);
@@ -73,7 +73,7 @@ TEST(AgradFwdMatrixSum, fd_rowvector) {
 TEST(AgradFwdMatrixSum, fd_matrix) {
   using stan::math::sum;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_d d(2, 3);
   matrix_fd v(2, 3);
@@ -105,7 +105,7 @@ TEST(AgradFwdMatrixSum, fd_matrix) {
 TEST(AgradFwdMatrixSum, ffd_vector) {
   using stan::math::sum;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   vector_d d(6);
   vector_ffd v(6);
@@ -137,7 +137,7 @@ TEST(AgradFwdMatrixSum, ffd_vector) {
 TEST(AgradFwdMatrixSum, ffd_rowvector) {
   using stan::math::sum;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
   row_vector_d d(6);
   row_vector_ffd v(6);
@@ -169,7 +169,7 @@ TEST(AgradFwdMatrixSum, ffd_rowvector) {
 TEST(AgradFwdMatrixSum, ffd_matrix) {
   using stan::math::sum;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
 
   matrix_d d(2, 3);
   matrix_ffd v(2, 3);

@@ -8,8 +8,8 @@
 #include <stan/math/rev/scal/fun/square.hpp>
 
 TEST(AgradFwdSquare, FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::square;
 
   fvar<var> x(1.5,1.3);
@@ -24,8 +24,8 @@ TEST(AgradFwdSquare, FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(2.0 * (1.5), g[0]);
 }
 TEST(AgradFwdSquare, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::square;
 
   fvar<var> x(1.5,1.3);
@@ -38,8 +38,8 @@ TEST(AgradFwdSquare, FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdSquare, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::square;
 
   fvar<fvar<var> > x;
@@ -74,8 +74,8 @@ TEST(AgradFwdSquare, FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(2.0 * 1.5, r[0]);
 }
 TEST(AgradFwdSquare, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::square;
 
   fvar<fvar<var> > x;
@@ -101,8 +101,8 @@ TEST(AgradFwdSquare, FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(2.0 * 2.0, r[0]);
 }
 TEST(AgradFwdSquare, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::square;
 
   fvar<fvar<var> > x;

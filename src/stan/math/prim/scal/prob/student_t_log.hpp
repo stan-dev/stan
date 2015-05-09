@@ -15,15 +15,16 @@
 #include <stan/math/prim/scal/fun/lgamma.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of the Student-t density for the given y, nu, mean, and
@@ -55,7 +56,7 @@ namespace stan {
     typename return_type<T_y, T_dof, T_loc, T_scale>::type
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu,
                   const T_scale& sigma) {
-      static const char* function("stan::prob::student_t_log");
+      static const char* function("stan::math::student_t_log");
       typedef typename stan::partials_return_type<T_y, T_dof, T_loc,
                                                   T_scale>::type
         T_partials_return;
@@ -100,6 +101,7 @@ namespace stan {
       using stan::math::lgamma;
       using stan::math::square;
       using stan::math::value_of;
+      using std::log;
 
       VectorBuilder<include_summand<propto, T_y, T_dof, T_loc, T_scale>::value,
                     T_partials_return, T_dof> half_nu(length(nu));
@@ -162,7 +164,7 @@ namespace stan {
           log1p_exp[i] = log1p(square_y_minus_mu_over_sigma__over_nu[i]);
         }
 
-      agrad::OperandsAndPartials<T_y, T_dof, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_dof, T_loc, T_scale>
         operands_and_partials(y, nu, mu, sigma);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);

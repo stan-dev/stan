@@ -11,8 +11,8 @@
 
 TEST(AgradRevMatrix, distance_vector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
-  using stan::agrad::squared_distance;
+  using stan::math::vector_v;
+  using stan::math::squared_distance;
 
   vector_d vd_1(3), vd_2(3);
   vector_v vv_1(3), vv_2(3);
@@ -28,7 +28,7 @@ TEST(AgradRevMatrix, distance_vector_vector) {
 }
 TEST(AgradRevMatrix, distance_vector_vector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d d1(3);
   vector_v v1(3);
@@ -41,9 +41,9 @@ TEST(AgradRevMatrix, distance_vector_vector_exception) {
 }
 TEST(AgradRevMatrix, distance_rowvector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d d1(3);
   row_vector_v v1(3);
@@ -61,9 +61,9 @@ TEST(AgradRevMatrix, distance_rowvector_vector) {
 }
 TEST(AgradRevMatrix, distance_rowvector_vector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d d1(3);
   row_vector_v v1(3);
@@ -76,9 +76,9 @@ TEST(AgradRevMatrix, distance_rowvector_vector_exception) {
 }
 TEST(AgradRevMatrix, distance_vector_rowvector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   vector_d d1(3);
   vector_v v1(3);
@@ -96,9 +96,9 @@ TEST(AgradRevMatrix, distance_vector_rowvector) {
 }
 TEST(AgradRevMatrix, distance_vector_rowvector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   vector_d d1(3);
   vector_v v1(3);
@@ -111,7 +111,7 @@ TEST(AgradRevMatrix, distance_vector_rowvector_exception) {
 }
 TEST(AgradRevMatrix, distance_rowvector_rowvector) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d d1(3), d2(3);
   row_vector_v v1(3), v2(3);
@@ -127,7 +127,7 @@ TEST(AgradRevMatrix, distance_rowvector_rowvector) {
 }
 TEST(AgradRevMatrix, distance_rowvector_rowvector_exception) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d d1(3), d2(2);
   row_vector_v v1(3), v2(4);
@@ -138,7 +138,7 @@ TEST(AgradRevMatrix, distance_rowvector_rowvector_exception) {
 }
 
 TEST(AgradRevMatrix, distance_vv) {
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_v a(3), b(3);
   AVAR c;
@@ -164,7 +164,7 @@ TEST(AgradRevMatrix, distance_vv) {
 }
 TEST(AgradRevMatrix, distance_dv) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d a(3);
   vector_v b(3);
@@ -187,7 +187,7 @@ TEST(AgradRevMatrix, distance_dv) {
 }
 TEST(AgradRevMatrix, distance_vd) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_v a(3);
   vector_d b(3);

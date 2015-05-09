@@ -10,7 +10,7 @@ namespace stan {
         callback() {}
         virtual void operator()() = 0;
       };
-    
+
     }
   }
 }

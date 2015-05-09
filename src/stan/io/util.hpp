@@ -10,7 +10,7 @@ namespace stan {
 
     /**
      * Return the current coordinated universal time (UTC) as a string.
-     * 
+     *
      * Output is of the form "Fri Feb 24 21:15:36 2012"
      *
      * @return String representation of current UTC.

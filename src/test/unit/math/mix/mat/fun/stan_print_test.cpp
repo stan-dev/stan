@@ -10,8 +10,8 @@ TEST(AgradMixMatrixStanPrint,fvar_var) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::stan_print;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   std::stringstream output;
   fvar<var> a(1,2);
@@ -54,8 +54,8 @@ TEST(AgradMixMatrixStanPrint,fvar_fvar_var) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::stan_print;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   std::stringstream output;
   fvar<fvar<var> > a(1,2);

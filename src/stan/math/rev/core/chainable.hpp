@@ -5,7 +5,7 @@
 #include <cstddef>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Abstract base class for variable implementations that handles

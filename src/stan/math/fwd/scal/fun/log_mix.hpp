@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
     using boost::math::tools::promote_args;
     using boost::is_same;
 

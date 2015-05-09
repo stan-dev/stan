@@ -14,11 +14,11 @@
 #include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta_derivatives.hpp>
-
+#include <cmath>
 #include <limits>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     // Negative Binomial CDF
     template <typename T_n, typename T_shape,
@@ -26,7 +26,7 @@ namespace stan {
     typename return_type<T_shape, T_inv_scale>::type
     neg_binomial_cdf(const T_n& n, const T_shape& alpha,
                      const T_inv_scale& beta) {
-      static const char* function("stan::prob::neg_binomial_cdf");
+      static const char* function("stan::math::neg_binomial_cdf");
       typedef typename stan::partials_return_type<T_n, T_shape,
                                                   T_inv_scale>::type
         T_partials_return;
@@ -61,7 +61,7 @@ namespace stan {
       using stan::math::dda_inc_beta;
       using stan::math::digamma;
 
-      agrad::OperandsAndPartials<T_shape, T_inv_scale>
+      OperandsAndPartials<T_shape, T_inv_scale>
         operands_and_partials(alpha, beta);
 
       // Explicit return for extreme values

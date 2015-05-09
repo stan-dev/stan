@@ -4,7 +4,7 @@
 
 TEST(AgradFwd,asBool) {
   using stan::math::as_bool;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   EXPECT_TRUE(as_bool(fvar<double>(1)));
   EXPECT_TRUE(as_bool(fvar<double>(-10L)));
@@ -20,6 +20,6 @@ TEST(AgradFwd,asBool) {
   EXPECT_FALSE(as_bool(fvar<double>(0.0f)));
 }
 TEST(AgradFwd,as_bool_nan) {
-  stan::agrad::fvar<double> nan = std::numeric_limits<double>::quiet_NaN();
+  stan::math::fvar<double> nan = std::numeric_limits<double>::quiet_NaN();
   EXPECT_TRUE(stan::math::as_bool(nan));
 }

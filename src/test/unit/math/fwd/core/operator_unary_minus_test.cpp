@@ -3,7 +3,7 @@
 #include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdOperatorUnaryMinus, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> x1(0.5,1.0);
   fvar<double> a = -x1;
@@ -12,7 +12,7 @@ TEST(AgradFwdOperatorUnaryMinus, Fvar) {
 }
 
 TEST(AgradFwdOperatorUnaryMinus, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;

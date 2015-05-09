@@ -5,7 +5,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCdfGamma : public AgradCdfTest {
 public:
@@ -82,7 +82,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_inv_scale>::type 
   cdf(const T_y& y, const T_shape& alpha, const T_inv_scale& beta,
       const T3&, const T4&, const T5&) {
-    return stan::prob::gamma_cdf(y, alpha, beta);
+    return stan::math::gamma_cdf(y, alpha, beta);
   }
   
   
@@ -91,7 +91,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_inv_scale>::type 
   cdf_function(const T_y& y, const T_shape& alpha, const T_inv_scale& beta,
                const T3&, const T4&, const T5&) {
-    using stan::agrad::gamma_p;
+    using stan::math::gamma_p;
     using boost::math::gamma_p;
 
     return gamma_p(alpha, beta * y);

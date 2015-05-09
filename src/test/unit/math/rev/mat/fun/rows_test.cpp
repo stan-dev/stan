@@ -9,8 +9,8 @@
 #include <stan/math/rev/mat/fun/typedefs.hpp>
 
 TEST(AgradRevMatrix,rows_vector) {
-  using stan::agrad::vector_v;
-  using stan::agrad::row_vector_v;
+  using stan::math::vector_v;
+  using stan::math::row_vector_v;
   using stan::math::rows;
 
   vector_v v(5);
@@ -21,7 +21,7 @@ TEST(AgradRevMatrix,rows_vector) {
   EXPECT_EQ(0U, rows(v));
 }
 TEST(AgradRevMatrix,rows_rowvector) {
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
   using stan::math::rows;
 
   row_vector_v rv(5);
@@ -32,7 +32,7 @@ TEST(AgradRevMatrix,rows_rowvector) {
   EXPECT_EQ(1U, rows(rv));
 }
 TEST(AgradRevMatrix,rows_matrix) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::rows;
 
   matrix_v m(2,3);

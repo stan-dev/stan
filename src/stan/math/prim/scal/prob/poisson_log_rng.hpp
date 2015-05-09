@@ -10,7 +10,6 @@
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <stan/math/prim/scal/fun/gamma_q.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/poisson_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -18,9 +17,9 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
-    static const double POISSON_MAX_LOG_RATE = 30 * log(2);
+    static const double POISSON_MAX_LOG_RATE = 30 * std::log(2);
 
     template <class RNG>
     inline int
@@ -29,7 +28,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::poisson_distribution;
 
-      static const char* function("stan::prob::poisson_log_rng");
+      static const char* function("stan::math::poisson_log_rng");
 
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;

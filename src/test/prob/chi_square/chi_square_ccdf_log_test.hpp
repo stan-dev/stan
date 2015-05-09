@@ -5,7 +5,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCcdfLogChiSquare : public AgradCcdfLogTest {
 public:
@@ -58,7 +58,7 @@ public:
   typename stan::return_type<T_y, T_dof, T2>::type 
   ccdf_log(const T_y& y, const T_dof& nu, 
            const T2&, const T3&, const T4&, const T5&) {
-    return stan::prob::chi_square_ccdf_log(y, nu);
+    return stan::math::chi_square_ccdf_log(y, nu);
   }
 
   template <typename T_y, typename T_dof, typename T2,
@@ -66,7 +66,7 @@ public:
   typename stan::return_type<T_y, T_dof, T2>::type 
   ccdf_log_function(const T_y& y, const T_dof& nu, 
                     const T2&, const T3&, const T4&, const T5&) {
-    using stan::agrad::gamma_p;
+    using stan::math::gamma_p;
     using stan::math::gamma_p;
     using std::log;
 

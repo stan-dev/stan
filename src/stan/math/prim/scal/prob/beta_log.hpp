@@ -18,14 +18,15 @@
 #include <stan/math/prim/scal/fun/lbeta.hpp>
 #include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of the beta density for the specified scalar(s) given the specified
@@ -50,7 +51,7 @@ namespace stan {
     typename return_type<T_y, T_scale_succ, T_scale_fail>::type
     beta_log(const T_y& y,
              const T_scale_succ& alpha, const T_scale_fail& beta) {
-      static const char* function("stan::prob::beta_log");
+      static const char* function("stan::math::beta_log");
 
       typedef typename stan::partials_return_type<T_y,
                                                   T_scale_succ,
@@ -65,12 +66,13 @@ namespace stan {
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
       using stan::math::log1m;
       using stan::math::multiply_log;
       using stan::math::value_of;
       using stan::math::check_nonnegative;
       using stan::math::check_less_or_equal;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -108,7 +110,7 @@ namespace stan {
       }
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail>
+      OperandsAndPartials<T_y, T_scale_succ, T_scale_fail>
         operands_and_partials(y, alpha, beta);
 
       VectorBuilder<include_summand<propto, T_y, T_scale_succ>::value,

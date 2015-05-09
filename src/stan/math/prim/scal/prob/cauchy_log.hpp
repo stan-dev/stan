@@ -12,13 +12,13 @@
 #include <stan/math/prim/scal/fun/square.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/log1p.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of the Cauchy density for the specified scalar(s) given
@@ -41,7 +41,7 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const char* function("stan::prob::cauchy_log");
+      static const char* function("stan::math::cauchy_log");
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
@@ -76,6 +76,7 @@ namespace stan {
 
       using stan::math::log1p;
       using stan::math::square;
+      using std::log;
 
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_y> y_vec(y);
@@ -97,7 +98,7 @@ namespace stan {
         }
       }
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       for (size_t n = 0; n < N; n++) {

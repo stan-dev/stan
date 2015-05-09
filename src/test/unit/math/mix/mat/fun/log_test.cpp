@@ -12,9 +12,9 @@
 TEST(AgradMixMatrixLog, fv_matrix_1stDeriv) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -48,9 +48,9 @@ TEST(AgradMixMatrixLog, fv_matrix_1stDeriv) {
 TEST(AgradMixMatrixLog, fv_matrix_2ndDeriv) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -75,9 +75,9 @@ TEST(AgradMixMatrixLog, fv_matrix_2ndDeriv) {
 TEST(AgradMixMatrixLog, fv_vector_1stDeriv) {
   using stan::math::log;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -109,9 +109,9 @@ TEST(AgradMixMatrixLog, fv_vector_1stDeriv) {
 TEST(AgradMixMatrixLog, fv_vector_2ndDeriv) {
   using stan::math::log;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -135,9 +135,9 @@ TEST(AgradMixMatrixLog, fv_vector_2ndDeriv) {
 TEST(AgradMixMatrixLog, fv_rowvector_1stDeriv) {
   using stan::math::log;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::row_vector_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -169,9 +169,9 @@ TEST(AgradMixMatrixLog, fv_rowvector_1stDeriv) {
 TEST(AgradMixMatrixLog, fv_rowvector_2ndDeriv) {
   using stan::math::log;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::row_vector_fv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(2.0,1.0);
@@ -196,9 +196,9 @@ TEST(AgradMixMatrixLog, fv_rowvector_2ndDeriv) {
 TEST(AgradMixMatrixLog, ffv_matrix_1stDeriv) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -232,9 +232,9 @@ TEST(AgradMixMatrixLog, ffv_matrix_1stDeriv) {
 TEST(AgradMixMatrixLog, ffv_matrix_2ndDeriv_1) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -258,9 +258,9 @@ TEST(AgradMixMatrixLog, ffv_matrix_2ndDeriv_1) {
 TEST(AgradMixMatrixLog, ffv_matrix_2ndDeriv_2) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -284,9 +284,9 @@ TEST(AgradMixMatrixLog, ffv_matrix_2ndDeriv_2) {
 TEST(AgradMixMatrixLog, ffv_matrix_3rdDeriv) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -315,9 +315,9 @@ TEST(AgradMixMatrixLog, ffv_matrix_3rdDeriv) {
 TEST(AgradMixMatrixLog, ffv_vector_1stDeriv) {
   using stan::math::log;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -349,9 +349,9 @@ TEST(AgradMixMatrixLog, ffv_vector_1stDeriv) {
 TEST(AgradMixMatrixLog, ffv_vector_2ndDeriv_1) {
   using stan::math::log;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -374,9 +374,9 @@ TEST(AgradMixMatrixLog, ffv_vector_2ndDeriv_1) {
 TEST(AgradMixMatrixLog, ffv_vector_2ndDeriv_2) {
   using stan::math::log;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -399,9 +399,9 @@ TEST(AgradMixMatrixLog, ffv_vector_2ndDeriv_2) {
 TEST(AgradMixMatrixLog, ffv_vector_3rdDeriv) {
   using stan::math::log;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -429,9 +429,9 @@ TEST(AgradMixMatrixLog, ffv_vector_3rdDeriv) {
 TEST(AgradMixMatrixLog, ffv_rowvector_1stDeriv) {
   using stan::math::log;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::row_vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -463,9 +463,9 @@ TEST(AgradMixMatrixLog, ffv_rowvector_1stDeriv) {
 TEST(AgradMixMatrixLog, ffv_rowvector_2ndDeriv_1) {
   using stan::math::log;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::row_vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -490,9 +490,9 @@ TEST(AgradMixMatrixLog, ffv_rowvector_2ndDeriv_1) {
 TEST(AgradMixMatrixLog, ffv_rowvector_2ndDeriv_2) {
   using stan::math::log;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::row_vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -517,9 +517,9 @@ TEST(AgradMixMatrixLog, ffv_rowvector_2ndDeriv_2) {
 TEST(AgradMixMatrixLog, ffv_rowvector_3rdDeriv) {
   using stan::math::log;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::row_vector_ffv;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);

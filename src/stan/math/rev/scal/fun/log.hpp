@@ -5,7 +5,7 @@
 #include <cmath>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class log_vari : public op_v_vari {

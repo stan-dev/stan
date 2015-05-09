@@ -13,7 +13,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /* Computes shared terms in log_mix partial derivative calculations
      *
@@ -142,7 +142,7 @@ namespace stan {
       return operands_and_partials.to_var(log_mix_function_value);
     }
 
-  }  // namespace agrad
+  }  // namespace math
 
 }  // namespace stan
 

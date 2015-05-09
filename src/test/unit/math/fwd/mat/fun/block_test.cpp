@@ -4,8 +4,8 @@
 
 TEST(AgradFwdMatrixBlock,matrix_fd) {
   using stan::math::block;
-  using stan::agrad::matrix_fd;
-  using stan::agrad::vector_fd;
+  using stan::math::matrix_fd;
+  using stan::math::vector_fd;
 
   matrix_fd v(3,3);
   v << 1, 4, 9,1, 4, 9,1, 4, 9;
@@ -50,7 +50,7 @@ TEST(AgradFwdMatrixBlock,matrix_fd) {
 }
 TEST(AgradFwdMatrixBlock,matrix_fd_exception) {
   using stan::math::block;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_fd v(3,3);
   EXPECT_THROW(block(v,0,0,1,1), std::out_of_range);
@@ -58,9 +58,9 @@ TEST(AgradFwdMatrixBlock,matrix_fd_exception) {
 }
 TEST(AgradFwdMatrixBlock,matrix_ffd) {
   using stan::math::block;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::vector_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a;
   fvar<fvar<double> > b;
@@ -108,7 +108,7 @@ TEST(AgradFwdMatrixBlock,matrix_ffd) {
 }
 TEST(AgradFwdMatrixBlock,matrix_ffd_exception) {
   using stan::math::block;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
 
   matrix_ffd v(3,3);
   EXPECT_THROW(block(v,0,0,1,1), std::out_of_range);

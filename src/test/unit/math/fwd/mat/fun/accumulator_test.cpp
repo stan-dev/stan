@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/fwd/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 // test sum of first n numbers for sum of a
 template <typename T>
@@ -33,8 +33,8 @@ TEST(AgradFwdMatrixAccumulate,collection_fvar_double) {
 
   using stan::math::accumulator;
   using std::vector;
-  using stan::agrad::vector_fd;
-  using stan::agrad::matrix_fd;
+  using stan::math::vector_fd;
+  using stan::math::matrix_fd;
 
   accumulator<fvar<double> > a;
 
@@ -106,8 +106,8 @@ TEST(AgradFwdMatrixAccumulate,collection_fvar_fvar_double) {
 
   using stan::math::accumulator;
   using std::vector;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::matrix_ffd;
+  using stan::math::vector_ffd;
+  using stan::math::matrix_ffd;
 
   accumulator<fvar<fvar<double> > > a;
 

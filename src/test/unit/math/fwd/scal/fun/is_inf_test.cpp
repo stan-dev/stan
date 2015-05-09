@@ -3,7 +3,7 @@
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdIsInf,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::is_inf;
 
   double infinity = std::numeric_limits<double>::infinity();
@@ -25,7 +25,7 @@ TEST(AgradFwdIsInf,Fvar) {
 }
 
 TEST(AgradFwdIsInf,FvarFvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::is_inf;
 
   double infinity = std::numeric_limits<double>::infinity();

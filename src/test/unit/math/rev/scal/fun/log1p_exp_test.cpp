@@ -11,8 +11,8 @@
 
 void test_log1p_exp(double val) {
   using stan::math::log1p_exp;
-  using stan::agrad::log1p_exp;
-  using stan::agrad::exp;
+  using stan::math::log1p_exp;
+  using stan::math::exp;
   using std::exp;
 
   AVAR a(val);   
