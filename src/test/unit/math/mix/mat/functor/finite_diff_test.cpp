@@ -84,8 +84,6 @@ TEST(AgradFiniteDiff,hessian) {
 
   f_vec << 0.5, 0.7, 0.4;
 
-  Matrix<double,3,3> an_H_f = third_order_mixed_hess(f_vec);
-
   norm_vec << 0.5, 0.3, 0.7;
 
   double f_eval(0);
