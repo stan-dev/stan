@@ -8,6 +8,7 @@
 
 #include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_iteration.hpp>
+#include <stan/services/error_codes.hpp>
 
 #include <stan/variational/advi_params_fullrank.hpp>
 #include <stan/variational/advi_params_meanfield.hpp>
@@ -45,7 +46,7 @@ namespace stan {
      * @param  n_posterior_samples   number of samples to draw from posterior
      * @param  print_stream          stream for convergence assessment output
      * @param  output_stream         stream for parameters output
-     * @param  diagnostic_stream     stresm for ELBO output
+     * @param  diagnostic_stream     stream for ELBO output
      */
     template <class M, class BaseRNG>
     class advi {
@@ -608,7 +609,7 @@ namespace stan {
         }
       }
 
-      void run_fullrank(double tol_rel_obj, int max_iterations) {
+      int run_fullrank(double tol_rel_obj, int max_iterations) {
         *print_stream_
         << "This is stan::variational::advi::run_fullrank()" << std::endl;
 
@@ -645,10 +646,10 @@ namespace stan {
           }
         }
 
-        return;
+        return stan::services::error_codes::OK;
       }
 
-      void run_meanfield(double tol_rel_obj, int max_iterations) {
+      int run_meanfield(double tol_rel_obj, int max_iterations) {
         *print_stream_
         << "This is stan::variational::advi::run_meanfield()" << std::endl;
 
@@ -689,7 +690,7 @@ namespace stan {
           }
         }
 
-        return;
+        return stan::services::error_codes::OK;
       }
 
       // Helper function: compute the median of a circular buffer
