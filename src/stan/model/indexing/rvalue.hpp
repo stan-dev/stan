@@ -95,7 +95,7 @@ namespace stan {
       static inline return_t
       apply(const C& c, const index_t& idx) {
         return_t result;
-        for (int n = 0; n < idx.head_.max_; ++n)
+        for (int n = 0; n <= idx.head_.max_; ++n)
           result.push_back(rvalue(c[n], idx.tail_));
         return result;
       }

@@ -94,7 +94,7 @@ TEST(ModelIndexing, rvalue_vector_max_nil) {
     std::vector<double> rx
       = rvalue(x, cons_index_list<index_max, nil_index_list>(index_max(k), 
                                                              nil_index_list()));
-    EXPECT_FLOAT_EQ(k, rx.size());
+    EXPECT_FLOAT_EQ(k + 1, rx.size());
     for (size_t n = 0; n < rx.size(); ++n)
       EXPECT_FLOAT_EQ(x[n], rx[n]);
   }
