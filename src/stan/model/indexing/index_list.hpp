@@ -1,11 +1,10 @@
-#ifndef STAN__MATH__INDEXING__INDEX_LIST_HPP
-#define STAN__MATH__INDEXING__INDEX_LIST_HPP
+#ifndef STAN_MODEL_INDEXING_INDEX_LIST_HPP
+#define STAN_MODEL_INDEXING_INDEX_LIST_HPP
 
-#include <stan/meta/typelist.hpp>
+#include <stan/model/indexing/typelist.hpp>
 
 namespace stan {
-  
-  namespace math {
+  namespace model {
 
     /**
      * Structure for an empty (size zero) index list.
@@ -14,9 +13,9 @@ namespace stan {
 
       /**
        * The typelist for an empty index list, namely
-       * <code>meta::nil</code>.
+       * <code>model::nil</code>.
        */
-      typedef meta::nil typelist;
+      typedef model::nil typelist;
 
       nil_index_list() { 
       }
@@ -39,30 +38,26 @@ namespace stan {
        * index type of the head of the list followed by the typelist
        * of the tail of the list.
        */
-      typedef typename meta::cons<typename H::index_type, 
-                                  typename T::typelist> typelist;
+      typedef typename model::cons<typename H::index_type, 
+                                   typename T::typelist> typelist;
 
-      H head_;
-      T tail_;
+      const H head_;
+      const T tail_;
 
       /**
        * Construct a non-empty index list with the specified index for
        * a head and specified index list for a tail.
        *
-       * @param head Index for head of list.
-       * @param tail Index for tail of list.
+       * @param head Index for head.
+       * @param tail Index list for tail.
        */
       cons_index_list(const H& head, const T& tail) 
         : head_(head),
           tail_(tail) {
       }
 
-
     };
 
-
   }
-
 }
-
 #endif

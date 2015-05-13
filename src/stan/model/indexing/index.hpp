@@ -1,13 +1,11 @@
-#ifndef STAN__MATH__INDEXING__INDEX_HPP
-#define STAN__MATH__INDEXING__INDEX_HPP
+#ifndef STAN_MODEL_INDEXING_INDEX_HPP
+#define STAN_MODEL_INDEXING_INDEX_HPP
 
 #include <vector>
-#include <stan/meta/indexed_type.hpp>
+#include <stan/model/indexing/indexed_type.hpp>
 
 namespace stan {
-  
-  namespace math {
-
+  namespace model {
 
     // SINGLE INDEXING (reduces dimensionality)
 
@@ -22,7 +20,7 @@ namespace stan {
        * Type indicating that index_uni is a single index that reduces
        * dimensionality when applied.
        */
-      typedef meta::uni_index index_type;
+      typedef model::uni_index index_type;
 
       int n_;
 
@@ -52,7 +50,7 @@ namespace stan {
        * Type indicating that index_multi is a multiple indexing that
        * does not reduce dimensionality when applied.
        */
-      typedef meta::multi_index index_type;
+      typedef model::multi_index index_type;
 
       std::vector<int> ns_;
 
@@ -78,7 +76,7 @@ namespace stan {
        * Type indicating that index_omni is a multiple indexing that
        * does not reduce dimensionality when applied.
        */
-      typedef meta::multi_index index_type;
+      typedef model::multi_index index_type;
     };
 
 
@@ -92,7 +90,7 @@ namespace stan {
        * Type indicating that index_min is a multiple indexing that
        * does not reduce dimensionality when applied.
        */
-      typedef meta::multi_index index_type;
+      typedef model::multi_index index_type;
       
       int min_;
 
@@ -118,7 +116,7 @@ namespace stan {
        * Type indicating that index_max is a multiple indexing that
        * does not reduce dimensionality when applied.
        */
-      typedef meta::multi_index index_type;
+      typedef model::multi_index index_type;
       
       int max_;
 
@@ -146,7 +144,7 @@ namespace stan {
        * Type indicating that index_min_max is a multiple indexing that
        * does not reduce dimensionality when applied.
        */
-      typedef meta::multi_index index_type;
+      typedef model::multi_index index_type;
 
       int min_;
       int max_;
@@ -164,9 +162,6 @@ namespace stan {
 
     };
 
-
   }
-
 }
-
 #endif

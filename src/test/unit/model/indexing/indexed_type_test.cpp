@@ -1,27 +1,25 @@
 #include <vector>
-#include <stan/meta/indexed_type.hpp>
-#include <stan/meta/typelist.hpp>
-
+#include <stan/model/indexing/indexed_type.hpp>
+#include <stan/model/indexing/typelist.hpp>
 #include <test/unit/meta/util.hpp>
-
 #include <gtest/gtest.h>
 
-TEST(MetaIndexedType, testDouble) {
-  using stan::meta::nil;
-  using stan::meta::indexed_type;
+TEST(ModelIndexedType, testDouble) {
+  using stan::model::nil;
+  using stan::model::indexed_type;
 
   // double -- ()
   expect_eq_indexed<double,
                     indexed_type<double,nil> >();
 }
 
-TEST(MetaIndexedType, testVec) {
-  using stan::meta::nil;
-  using stan::meta::cons;
-  using stan::meta::indexed_type;
-  using stan::meta::uni_index;
-  using stan::meta::multi_index;
-  using stan::meta::typelist;
+TEST(ModelIndexedType, testVec) {
+  using stan::model::nil;
+  using stan::model::cons;
+  using stan::model::indexed_type;
+  using stan::model::uni_index;
+  using stan::model::multi_index;
+  using stan::model::typelist;
   using std::vector;
 
   // double[] --  (uni)
@@ -45,15 +43,15 @@ TEST(MetaIndexedType, testVec) {
                                  typelist<>::type> >();
 }
 
-TEST(MetaIndexedType, testVecVec) {
-  using stan::meta::nil;
-  using stan::meta::cons;
-  using stan::meta::indexed_type;
-  using stan::meta::uni_index;
-  using stan::meta::multi_index;
+TEST(ModelIndexedType, testVecVec) {
+  using stan::model::nil;
+  using stan::model::cons;
+  using stan::model::indexed_type;
+  using stan::model::uni_index;
+  using stan::model::multi_index;
   using std::vector;
 
-  using stan::meta::typelist;
+  using stan::model::typelist;
 
   // double[,] -- ()
   expect_eq_indexed<vector<vector<double> >,

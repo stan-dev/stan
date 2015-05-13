@@ -1,22 +1,22 @@
 #include <vector>
-#include <stan/math/indexing/index_list.hpp>
-#include <stan/math/indexing/index.hpp>
+#include <stan/model/indexing/index_list.hpp>
+#include <stan/model/indexing/index.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::nil_index_list;
-using stan::math::cons_index_list;
+using stan::model::nil_index_list;
+using stan::model::cons_index_list;
 
-using stan::math::index_uni;
-using stan::math::index_multi;
-using stan::meta::nil;
-using stan::meta::cons;
+using stan::model::index_uni;
+using stan::model::index_multi;
+using stan::model::nil;
+using stan::model::cons;
 
 TEST(MathIndexingIndexList, cons_index_list) {
   nil_index_list empty;  // ()
 
   index_uni idx_u(7);  
 
-  cons_index_list<index_uni, nil_index_list>  cil(idx_u, empty);  (7)
+  cons_index_list<index_uni, nil_index_list>  cil(idx_u, empty);
   EXPECT_EQ(index_uni(7).n_, cil.head_.n_);
 
   std::vector<int> ns;

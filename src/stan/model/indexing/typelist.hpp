@@ -1,9 +1,8 @@
-#ifndef STAN__META__TYPELIST_HPP
-#define STAN__META__TYPELIST_HPP
+#ifndef STAN_MODEL_INDEXING_TYPELIST_HPP
+#define STAN_MODEL_INDEXING_TYPELIST_HPP
 
 namespace stan {
-
-  namespace meta {
+  namespace model {
 
     // See Alexandrescu's C++ template book for details or
     // his Dr. Dobbs article, "Generic Programming:Typelists and Applications", 
@@ -22,7 +21,7 @@ namespace stan {
 
     /**
      * A non-empty type list composed of a type and a type list.
-     * Lists are terminated using <code>stan::meta::null_typelist</code>.
+     * Lists are terminated using <code>stan::model::null_typelist</code>.
      *
      * <p>This struct is the analogue of the "cons" operation in LISP,
      * with the <code>head</code> providing the head of the list (what
@@ -49,13 +48,10 @@ namespace stan {
 
 
     /**
-     * A no-op struct to use as a default in typelists to suppress the
-     * not-enough template arguments gripe that occurs otherwise.
+     * A no-op struct to use as a default value in typelists to block
+     * other instantiations.
      */
     struct dummy {
-      // dummy() { 
-      //   throw std::exception("dummy not constructible"); 
-      // }
     };
 
 
@@ -67,7 +63,7 @@ namespace stan {
      * specializations for one to four parameters.  
      *
      * All of the template parameters default to <code>dummy</code>, a
-     * dummy class defined in <code>stan::meta</code> to act as
+     * dummy class defined in <code>stan::model</code> to act as
      * default values for list templates.
      *
      * @tparam T1 first typename in result list.
@@ -182,10 +178,7 @@ namespace stan {
 
     };
 
-
   }
-
 }
-
 #endif
 

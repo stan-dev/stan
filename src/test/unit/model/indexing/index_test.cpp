@@ -1,17 +1,17 @@
 #include <vector>
 #include <boost/type_traits/is_same.hpp> 
-#include <stan/math/indexing/index.hpp>
+#include <stan/model/indexing/index.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::index_uni;
-using stan::math::index_multi;
-using stan::math::index_omni;
-using stan::math::index_min;
-using stan::math::index_max;
-using stan::math::index_min_max;
+using stan::model::index_uni;
+using stan::model::index_multi;
+using stan::model::index_omni;
+using stan::model::index_min;
+using stan::model::index_max;
+using stan::model::index_min_max;
 
-using stan::meta::uni_index;
-using stan::meta::multi_index;
+using stan::model::uni_index;
+using stan::model::multi_index;
 
 TEST(MathIndexingIndex, index_uni) {
   EXPECT_TRUE(( boost::is_same<uni_index, index_uni::index_type>::value ));
@@ -29,7 +29,7 @@ TEST(MathIndexingIndex, index_multi) {
 
   index_multi idx(ns);
   EXPECT_EQ(2, idx.ns_.size());
-  for (int i = 0; i < ns.size(); ++i)
+  for (size_t i = 0; i < ns.size(); ++i)
     EXPECT_EQ(ns[i], idx.ns_[i]);
 }
 

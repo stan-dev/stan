@@ -1,5 +1,4 @@
-#include <stan/meta/typelist.hpp>
-
+#include <stan/model/indexing/typelist.hpp>
 #include <boost/type_traits/is_same.hpp> 
 #include <gtest/gtest.h>
 
@@ -13,15 +12,15 @@ void expect_diff_type() {
 }
 
 TEST(MetaTypelist, typelist0) {
-  using stan::meta::nil;
-  using stan::meta::typelist;
+  using stan::model::nil;
+  using stan::model::typelist;
   expect_same_type<nil, 
                    typelist< >::type>();
 }
 TEST(MetaTypelist, typelist1) {
-  using stan::meta::nil;
-  using stan::meta::cons;
-  using stan::meta::typelist;
+  using stan::model::nil;
+  using stan::model::cons;
+  using stan::model::typelist;
 
   expect_same_type<cons<double,nil>,
                    typelist<double>::type>();
@@ -29,9 +28,9 @@ TEST(MetaTypelist, typelist1) {
                    typelist<int>::type>();
 }
 TEST(MetaTypelist, typelist2) {
-  using stan::meta::nil;
-  using stan::meta::cons;
-  using stan::meta::typelist;
+  using stan::model::nil;
+  using stan::model::cons;
+  using stan::model::typelist;
 
   expect_same_type<cons<double,cons<int,nil> >,
                    typelist<double,int>::type>();
@@ -40,9 +39,9 @@ TEST(MetaTypelist, typelist2) {
                    typelist<double,int>::type>();
 }
 TEST(MetaTypelist, typelist3) {
-  using stan::meta::nil;
-  using stan::meta::cons;
-  using stan::meta::typelist;
+  using stan::model::nil;
+  using stan::model::cons;
+  using stan::model::typelist;
 
   expect_same_type<cons<double,cons<int,cons<short,nil> > >,
                    typelist<double,int,short>::type>();
@@ -50,9 +49,9 @@ TEST(MetaTypelist, typelist3) {
                    typelist<double,int>::type>();
 }
 TEST(MetaTypelist, typelist4) {
-  using stan::meta::nil;
-  using stan::meta::cons;
-  using stan::meta::typelist;
+  using stan::model::nil;
+  using stan::model::cons;
+  using stan::model::typelist;
   
   expect_same_type<cons<double,cons<int,cons<short,cons<int,nil> > > >,
                    typelist<double,int,short,int>::type>();
@@ -61,9 +60,9 @@ TEST(MetaTypelist, typelist4) {
 }
 
 TEST(MetaTypelist, typelist5) {
-  using stan::meta::nil;
-  using stan::meta::cons;
-  using stan::meta::typelist;
+  using stan::model::nil;
+  using stan::model::cons;
+  using stan::model::typelist;
   expect_same_type<cons<double,cons<int,cons<short,cons<int,cons<long,nil> > > > >,
                    typelist<double,int,short,int,long>::type>();
   expect_diff_type<typelist<double,int,short,int,long>::type, 
