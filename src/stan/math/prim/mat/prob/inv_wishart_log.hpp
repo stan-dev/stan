@@ -9,13 +9,13 @@
 #include <stan/math/prim/mat/fun/log_determinant_ldlt.hpp>
 #include <stan/math/prim/mat/fun/mdivide_left_ldlt.hpp>
 
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/lmgamma.hpp>
 #include <stan/math/prim/mat/fun/trace.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
     // InvWishart(Sigma|n, Omega)  [W, S symmetric, non-neg, definite;
     //                             W.dims() = S.dims();
     //                             n > S.rows() - 1]
@@ -53,7 +53,7 @@ namespace stan {
                     const T_dof& nu,
                     const Eigen::Matrix
                     <T_scale, Eigen::Dynamic, Eigen::Dynamic>& S) {
-      static const char* function("stan::prob::inv_wishart_log");
+      static const char* function("stan::math::inv_wishart_log");
 
       using boost::math::tools::promote_args;
       using Eigen::Dynamic;

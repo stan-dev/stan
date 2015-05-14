@@ -7,7 +7,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /**
      * The fused multiply-add operation (C99).

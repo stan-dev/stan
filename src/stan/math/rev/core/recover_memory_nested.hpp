@@ -8,7 +8,7 @@
 #include <stdexcept>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Recover only the memory used for the top nested call.  If there

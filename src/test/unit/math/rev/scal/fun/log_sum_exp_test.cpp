@@ -154,8 +154,8 @@ void test_log_sum_exp_2_vv(double a_val,
   
   double f_val = f.val();
 
-  stan::agrad::var a2(a_val);
-  stan::agrad::var b2(b_val);
+  stan::math::var a2(a_val);
+  stan::math::var b2(b_val);
   AVEC x2 = createAVEC(a2,b2);
   AVAR f2 = log(exp(a2) + exp(b2));
   VEC g2;
@@ -181,7 +181,7 @@ void test_log_sum_exp_2_vd(double a_val,
   
   double f_val = f.val();
 
-  stan::agrad::var a2(a_val);
+  stan::math::var a2(a_val);
   AVEC x2 = createAVEC(a2);
   AVAR f2 = log(exp(a2) + exp(b));
   VEC g2;
@@ -238,7 +238,7 @@ TEST(AgradRev,log_sum_exp_2) {
 
 TEST(AgradRev, log_sum_exp_vec_1) {
   using stan::math::log_sum_exp;
-  using stan::agrad::log_sum_exp;
+  using stan::math::log_sum_exp;
   AVAR a(5.0);
   AVEC as = createAVEC(a);
   AVEC x = createAVEC(a);
@@ -253,7 +253,7 @@ TEST(AgradRev, log_sum_exp_vec_1) {
 
 TEST(AgradRev, log_sum_exp_vec_2) {
   using stan::math::log_sum_exp;
-  using stan::agrad::log_sum_exp;
+  using stan::math::log_sum_exp;
   AVAR a(5.0);
   AVAR b(-7.0);
   AVEC as = createAVEC(a,b);
@@ -269,7 +269,7 @@ TEST(AgradRev, log_sum_exp_vec_2) {
   AVAR b2(-7.0);
   AVEC as2 = createAVEC(a2,b2);
   AVEC x2 = createAVEC(a2,b2);
-  AVAR f2 = stan::agrad::log(stan::agrad::exp(a2) + stan::agrad::exp(b2));
+  AVAR f2 = stan::math::log(stan::math::exp(a2) + stan::math::exp(b2));
   VEC g2;
   f2.grad(x2,g2);
 
@@ -282,7 +282,7 @@ TEST(AgradRev, log_sum_exp_vec_2) {
 
 TEST(AgradRev, log_sum_exp_vec_3) {
   using stan::math::log_sum_exp;
-  using stan::agrad::log_sum_exp;
+  using stan::math::log_sum_exp;
   AVAR a(5.0);
   AVAR b(-7.0);
   AVAR c(2.3);

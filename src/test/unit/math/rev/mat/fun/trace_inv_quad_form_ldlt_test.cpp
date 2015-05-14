@@ -19,7 +19,7 @@
 #include <stan/math/rev/scal/fun/abs.hpp>
 
 TEST(AgradRevMatrix, trace_inv_quad_form_ldlt_mat) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   using stan::math::multiply;
   
@@ -50,7 +50,7 @@ TEST(AgradRevMatrix, trace_inv_quad_form_ldlt_mat) {
         3.0,  2.0, 1.0, 112.0;
 
   stan::math::LDLT_factor<double,-1,-1> ldlt_ad;
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
   ASSERT_TRUE(ldlt_av.success());
   ldlt_ad.compute(ad);
@@ -75,7 +75,7 @@ TEST(AgradRevMatrix, trace_inv_quad_form_ldlt_mat) {
 
 TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_vd) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -101,7 +101,7 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_vd) {
         3.0,  2.0, 7.0,   1.0,
         3.0,  2.0, 1.0, 112.0;
 
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
   ASSERT_TRUE(ldlt_av.success());
   
@@ -124,7 +124,7 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_vd) {
 
 TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_dv) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_d ad(4,4);
@@ -172,7 +172,7 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_dv) {
 
 TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_vv) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -203,7 +203,7 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_vv) {
         3.0,  2.0, 1.0, 112.0;
 
   stan::math::LDLT_factor<double,-1,-1> ldlt_ad;
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
+  stan::math::LDLT_factor<stan::math::var,-1,-1> ldlt_av;
   ldlt_ad.compute(ad);
   ASSERT_TRUE(ldlt_ad.success());
   ldlt_av.compute(av);
@@ -234,10 +234,10 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_vv) {
 }
 
 TEST(AgradRevMatrix, trace_quad_form_ldlt_vv_basic) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   using stan::math::LDLT_factor;
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using stan::math::trace;
   using stan::math::transpose;
@@ -306,10 +306,10 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_vv_basic) {
 }
 
 TEST(AgradRevMatrix, trace_quad_form_ldlt_vd_basic) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   using stan::math::LDLT_factor;
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using stan::math::trace;
   using stan::math::transpose;
@@ -355,8 +355,8 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_vd_basic) {
     0,  1,
     -3, -3,
     5,  2;
-  matrix_v tmp = multiply(stan::agrad::to_var(transpose(B)), 
-                          multiply(inverse(A), stan::agrad::to_var(B)));
+  matrix_v tmp = multiply(stan::math::to_var(transpose(B)), 
+                          multiply(inverse(A), stan::math::to_var(B)));
   x_basic = trace(tmp);
   x_basic_val = x_basic.val();
   
@@ -374,10 +374,10 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_vd_basic) {
 }
 
 TEST(AgradRevMatrix, trace_quad_form_ldlt_dv_basic) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
   using stan::math::LDLT_factor;
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using stan::math::trace;
   using stan::math::transpose;
@@ -424,7 +424,7 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_dv_basic) {
     -3, -3,
     5,  2;
   matrix_v tmp = multiply(transpose(B),
-                          multiply(stan::agrad::to_var(A.inverse().eval()),
+                          multiply(stan::math::to_var(A.inverse().eval()),
                                    B));
   x_basic = trace(tmp);
   x_basic_val = x_basic.val();

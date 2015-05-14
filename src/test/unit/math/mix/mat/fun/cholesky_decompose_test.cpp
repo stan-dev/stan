@@ -13,7 +13,7 @@
 #include <stan/math/rev/scal/fun/fabs.hpp>
 
 TEST(AgradMixMatrixCholeskyDecompose, exception_mat_fv) {
-  stan::agrad::matrix_fv m;
+  stan::math::matrix_fv m;
   
   m.resize(2,2);
   m << 1.0, 2.0, 
@@ -33,7 +33,7 @@ TEST(AgradMixMatrixCholeskyDecompose, exception_mat_fv) {
   EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
 }
 TEST(AgradMixMatrixCholeskyDecompose, exception_mat_ffv) {
-  stan::agrad::matrix_ffv m;
+  stan::math::matrix_ffv m;
   
   m.resize(2,2);
   m << 1.0, 2.0, 
@@ -54,7 +54,7 @@ TEST(AgradMixMatrixCholeskyDecompose, exception_mat_ffv) {
 }
 
 TEST(AgradMixMatrixCholeskyDecompose, mat_fv_1st_deriv) {
-  stan::agrad::matrix_fv m1(2,2);
+  stan::math::matrix_fv m1(2,2);
   m1 << 1, 2, 2, 4;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
@@ -63,7 +63,7 @@ TEST(AgradMixMatrixCholeskyDecompose, mat_fv_1st_deriv) {
 
   using stan::math::cholesky_decompose;
 
-  stan::agrad::matrix_fv res = cholesky_decompose(m1);
+  stan::math::matrix_fv res = cholesky_decompose(m1);
 
   EXPECT_FLOAT_EQ(1, res(0,0).val_.val());
   EXPECT_FLOAT_EQ(0, res(0,1).val_.val());
@@ -84,7 +84,7 @@ TEST(AgradMixMatrixCholeskyDecompose, mat_fv_1st_deriv) {
 }
 
 TEST(AgradMixMatrixCholeskyDecompose, mat_fv_2nd_deriv) {
-  stan::agrad::matrix_fv m1(2,2);
+  stan::math::matrix_fv m1(2,2);
   m1 << 1, 2, 2, 4;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
@@ -93,7 +93,7 @@ TEST(AgradMixMatrixCholeskyDecompose, mat_fv_2nd_deriv) {
 
   using stan::math::cholesky_decompose;
 
-  stan::agrad::matrix_fv res = cholesky_decompose(m1);
+  stan::math::matrix_fv res = cholesky_decompose(m1);
 
   AVEC z = createAVEC(m1(0,0).val_,m1(0,1).val_,m1(1,0).val_,m1(1,1).val_);
   VEC h;
@@ -105,7 +105,7 @@ TEST(AgradMixMatrixCholeskyDecompose, mat_fv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixCholeskyDecompose, mat_ffv_1st_deriv) {
-  stan::agrad::matrix_ffv m1(2,2);
+  stan::math::matrix_ffv m1(2,2);
   m1 << 1, 2, 2, 4;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
@@ -114,7 +114,7 @@ TEST(AgradMixMatrixCholeskyDecompose, mat_ffv_1st_deriv) {
 
   using stan::math::cholesky_decompose;
 
-  stan::agrad::matrix_ffv res = cholesky_decompose(m1);
+  stan::math::matrix_ffv res = cholesky_decompose(m1);
 
   EXPECT_FLOAT_EQ(1, res(0,0).val_.val_.val());
   EXPECT_FLOAT_EQ(0, res(0,1).val_.val_.val());
@@ -136,7 +136,7 @@ TEST(AgradMixMatrixCholeskyDecompose, mat_ffv_1st_deriv) {
 }
 
 TEST(AgradMixMatrixCholeskyDecompose, mat_ffv_2nd_deriv) {
-  stan::agrad::matrix_ffv m1(2,2);
+  stan::math::matrix_ffv m1(2,2);
   m1 << 1, 2, 2, 4;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
@@ -145,7 +145,7 @@ TEST(AgradMixMatrixCholeskyDecompose, mat_ffv_2nd_deriv) {
 
   using stan::math::cholesky_decompose;
 
-  stan::agrad::matrix_ffv res = cholesky_decompose(m1);
+  stan::math::matrix_ffv res = cholesky_decompose(m1);
 
   AVEC z = createAVEC(m1(0,0).val_.val_,m1(0,1).val_.val_,
                       m1(1,0).val_.val_,m1(1,1).val_.val_);
@@ -157,7 +157,7 @@ TEST(AgradMixMatrixCholeskyDecompose, mat_ffv_2nd_deriv) {
   EXPECT_FLOAT_EQ(0.0,h[3]);
 }
 TEST(AgradMixMatrixCholeskyDecompose, mat_ffv_3rd_deriv) {
-  stan::agrad::matrix_ffv m1(2,2);
+  stan::math::matrix_ffv m1(2,2);
   m1 << 1, 2, 2, 4;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
@@ -170,7 +170,7 @@ TEST(AgradMixMatrixCholeskyDecompose, mat_ffv_3rd_deriv) {
 
   using stan::math::cholesky_decompose;
 
-  stan::agrad::matrix_ffv res = cholesky_decompose(m1);
+  stan::math::matrix_ffv res = cholesky_decompose(m1);
 
   AVEC z = createAVEC(m1(0,0).val_.val_,m1(0,1).val_.val_,
                       m1(1,0).val_.val_,m1(1,1).val_.val_);

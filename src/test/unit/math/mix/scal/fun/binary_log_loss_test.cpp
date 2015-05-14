@@ -55,8 +55,8 @@ double finite_diff_2(const int y, const double y_hat) {
 
 
 TEST(AgradFwdBinaryLogLoss,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::binary_log_loss;
 
   fvar<var> z(0.4,3.0);
@@ -73,8 +73,8 @@ TEST(AgradFwdBinaryLogLoss,FvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdBinaryLogLoss,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::binary_log_loss;
 
   fvar<var> z(0.4,3.0);
@@ -89,8 +89,8 @@ TEST(AgradFwdBinaryLogLoss,FvarVar_2ndDeriv) {
 
 
 TEST(AgradFwdBinaryLogLoss,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::binary_log_loss;
 
   fvar<fvar<var> > y;
@@ -129,8 +129,8 @@ TEST(AgradFwdBinaryLogLoss,FvarFvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdBinaryLogLoss,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::binary_log_loss;
 
   fvar<fvar<var> > y;
@@ -168,8 +168,8 @@ TEST(AgradFwdBinaryLogLoss,FvarFvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdBinaryLogLoss,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::binary_log_loss;
 
   fvar<fvar<var> > y;

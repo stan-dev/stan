@@ -11,7 +11,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // CHOLESKY CORRELATION MATRIX
 

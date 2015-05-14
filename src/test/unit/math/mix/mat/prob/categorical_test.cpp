@@ -28,23 +28,23 @@ using Eigen::Matrix;
 
 
 TEST(ProbDistributionsCategorical,fvar_var) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   Matrix<fvar<var>,Dynamic,1> theta(3,1);
   theta << 0.3, 0.5, 0.2;
   for (int i = 0; i < 3; i++)
     theta(i).d_ = 1.0;
 
-  EXPECT_FLOAT_EQ(std::log(0.3), stan::prob::categorical_log(1,theta).val_.val());
-  EXPECT_FLOAT_EQ(std::log(0.5), stan::prob::categorical_log(2,theta).val_.val());
-  EXPECT_FLOAT_EQ(std::log(0.2), stan::prob::categorical_log(3,theta).val_.val());
-  EXPECT_FLOAT_EQ(1.0/0.3, stan::prob::categorical_log(1,theta).d_.val());
-  EXPECT_FLOAT_EQ(1.0/0.5, stan::prob::categorical_log(2,theta).d_.val());
-  EXPECT_FLOAT_EQ(1.0/0.2, stan::prob::categorical_log(3,theta).d_.val());
+  EXPECT_FLOAT_EQ(std::log(0.3), stan::math::categorical_log(1,theta).val_.val());
+  EXPECT_FLOAT_EQ(std::log(0.5), stan::math::categorical_log(2,theta).val_.val());
+  EXPECT_FLOAT_EQ(std::log(0.2), stan::math::categorical_log(3,theta).val_.val());
+  EXPECT_FLOAT_EQ(1.0/0.3, stan::math::categorical_log(1,theta).d_.val());
+  EXPECT_FLOAT_EQ(1.0/0.5, stan::math::categorical_log(2,theta).d_.val());
+  EXPECT_FLOAT_EQ(1.0/0.2, stan::math::categorical_log(3,theta).d_.val());
 }
 TEST(ProbDistributionsCategorical,fvar_var_vector) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   Matrix<fvar<var>,Dynamic,1> theta(3,1);
   theta << 0.3, 0.5, 0.2;
   for (int i = 0; i < 3; i++)
@@ -56,30 +56,30 @@ TEST(ProbDistributionsCategorical,fvar_var_vector) {
   xs[2] = 1;
   
   EXPECT_FLOAT_EQ(log(0.3) + log(0.2) + log(0.3),
-                  stan::prob::categorical_log(xs,theta).val_.val());
+                  stan::math::categorical_log(xs,theta).val_.val());
   EXPECT_FLOAT_EQ(1.0 / 0.3 + 1.0 / 0.2 + 1.0 / 0.3,
-                  stan::prob::categorical_log(xs,theta).d_.val());
+                  stan::math::categorical_log(xs,theta).d_.val());
 }
 
 
 TEST(ProbDistributionsCategorical,fvar_fvar_var) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   Matrix<fvar<fvar<var> >,Dynamic,1> theta(3,1);
   theta << 0.3, 0.5, 0.2;
   for (int i = 0; i < 3; i++)
     theta(i).d_.val_ = 1.0;
 
-  EXPECT_FLOAT_EQ(std::log(0.3), stan::prob::categorical_log(1,theta).val_.val_.val());
-  EXPECT_FLOAT_EQ(std::log(0.5), stan::prob::categorical_log(2,theta).val_.val_.val());
-  EXPECT_FLOAT_EQ(std::log(0.2), stan::prob::categorical_log(3,theta).val_.val_.val());
-  EXPECT_FLOAT_EQ(1.0/0.3, stan::prob::categorical_log(1,theta).d_.val_.val());
-  EXPECT_FLOAT_EQ(1.0/0.5, stan::prob::categorical_log(2,theta).d_.val_.val());
-  EXPECT_FLOAT_EQ(1.0/0.2, stan::prob::categorical_log(3,theta).d_.val_.val());
+  EXPECT_FLOAT_EQ(std::log(0.3), stan::math::categorical_log(1,theta).val_.val_.val());
+  EXPECT_FLOAT_EQ(std::log(0.5), stan::math::categorical_log(2,theta).val_.val_.val());
+  EXPECT_FLOAT_EQ(std::log(0.2), stan::math::categorical_log(3,theta).val_.val_.val());
+  EXPECT_FLOAT_EQ(1.0/0.3, stan::math::categorical_log(1,theta).d_.val_.val());
+  EXPECT_FLOAT_EQ(1.0/0.5, stan::math::categorical_log(2,theta).d_.val_.val());
+  EXPECT_FLOAT_EQ(1.0/0.2, stan::math::categorical_log(3,theta).d_.val_.val());
 }
 TEST(ProbDistributionsCategorical,fvar_fvar_var_vector) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   Matrix<fvar<fvar<var> >,Dynamic,1> theta(3,1);
   theta << 0.3, 0.5, 0.2;
   for (int i = 0; i < 3; i++)
@@ -91,7 +91,7 @@ TEST(ProbDistributionsCategorical,fvar_fvar_var_vector) {
   xs[2] = 1;
   
   EXPECT_FLOAT_EQ(log(0.3) + log(0.2) + log(0.3),
-                  stan::prob::categorical_log(xs,theta).val_.val_.val());
+                  stan::math::categorical_log(xs,theta).val_.val_.val());
   EXPECT_FLOAT_EQ(1.0 / 0.3 + 1.0 / 0.2 + 1.0 / 0.3,
-                  stan::prob::categorical_log(xs,theta).d_.val_.val());
+                  stan::math::categorical_log(xs,theta).d_.val_.val());
 }

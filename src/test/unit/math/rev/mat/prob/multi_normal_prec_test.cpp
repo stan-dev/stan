@@ -21,7 +21,7 @@ using Eigen::Matrix;
 using std::vector;
 
 TEST(ProbDistributionsMultiNormalPrec,MultiNormalVar) {
-  using stan::agrad::var;
+  using stan::math::var;
   Matrix<var,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
   Matrix<var,Dynamic,1> mu(3,1);
@@ -31,5 +31,5 @@ TEST(ProbDistributionsMultiNormalPrec,MultiNormalVar) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   Matrix<var,Dynamic,Dynamic> L = Sigma.inverse();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_prec_log(y,mu,L).val());
+  EXPECT_FLOAT_EQ(-11.73908, stan::math::multi_normal_prec_log(y,mu,L).val());
 }

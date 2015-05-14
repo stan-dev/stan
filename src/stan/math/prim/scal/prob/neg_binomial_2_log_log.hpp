@@ -17,13 +17,13 @@
 #include <stan/math/prim/scal/fun/log_sum_exp.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // NegBinomial(n|eta, phi)  [phi > 0;  n >= 0]
     template <bool propto,
@@ -37,14 +37,14 @@ namespace stan {
                                                   T_precision>::type
         T_partials_return;
 
-      static const char* function("stan::prob::neg_binomial_log");
+      static const char* function("stan::math::neg_binomial_log");
 
       using stan::math::check_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_positive_finite;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -69,6 +69,7 @@ namespace stan {
       using stan::math::log_sum_exp;
       using stan::math::digamma;
       using stan::math::lgamma;
+      using std::exp;
       using std::log;
 
       // set up template expressions wrapping scalars into vector views
@@ -77,7 +78,7 @@ namespace stan {
       VectorView<const T_precision> phi_vec(phi);
       size_t size = max_size(n, eta, phi);
 
-      agrad::OperandsAndPartials<T_log_location, T_precision>
+      OperandsAndPartials<T_log_location, T_precision>
         operands_and_partials(eta, phi);
 
       size_t len_ep = max_size(eta, phi);

@@ -7,9 +7,9 @@
 #include <stan/math/fwd/scal/fun/log.hpp>
 
 TEST(AgradFwdMatrixLogDeterminant,fd) {
-  using stan::agrad::matrix_fd;
-  using stan::agrad::fvar;
-  using stan::agrad::log_determinant;
+  using stan::math::matrix_fd;
+  using stan::math::fvar;
+  using stan::math::log_determinant;
   
   matrix_fd v(2,2);
   v << 0, 1, 2, 3;
@@ -25,15 +25,15 @@ TEST(AgradFwdMatrixLogDeterminant,fd) {
 }
 
 TEST(AgradFwdMatrixLogDeterminant,fd_exception) {
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   using stan::math::log_determinant;
   
   EXPECT_THROW(log_determinant(matrix_fd(2,3)), std::invalid_argument);
 }
 TEST(AgradFwdMatrixLogDeterminant,ffd) {
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
-  using stan::agrad::log_determinant;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
+  using stan::math::log_determinant;
   
   fvar<fvar<double> > a,b,c,d;
   a.val_.val_ = 0.0;
@@ -55,7 +55,7 @@ TEST(AgradFwdMatrixLogDeterminant,ffd) {
 }
 
 TEST(AgradFwdMatrixLogDeterminant,ffd_exception) {
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   using stan::math::log_determinant;
   
   EXPECT_THROW(log_determinant(matrix_ffd(2,3)), std::invalid_argument);

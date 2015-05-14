@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /**
      * Propagate chain rule to calculate gradients starting from
@@ -16,9 +16,8 @@ namespace stan {
      * correct size.
      *
      * The grad() function does not itself recover any memory.  use
-     * <code>agrad::recover_memory()</code> or
-     * <code>agrad::recover_memory_nested()</code>, defined in ,
-     * defined in agrad/rev/var_stack.hpp, to recover memory.
+     * <code>recover_memory()</code> or
+     * <code>recover_memory_nested()</code> to recover memory.
      *
      * @param[in] v Value of function being differentiated
      * @param[in] x Variables being differentiated with respect to
@@ -27,7 +26,7 @@ namespace stan {
     void grad(var& v,
               Eigen::Matrix<var, Eigen::Dynamic, 1>& x,
               Eigen::VectorXd& g) {
-      stan::agrad::grad(v.vi_);
+      stan::math::grad(v.vi_);
       g.resize(x.size());
       for (int i = 0; i < x.size(); ++i)
         g(i) = x(i).vi_->adj_;

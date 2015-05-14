@@ -6,7 +6,7 @@
 
 TEST(AgradRev,trunc) {
   AVAR a = 1.2;
-  AVAR f = stan::agrad::trunc(a);
+  AVAR f = stan::math::trunc(a);
   EXPECT_FLOAT_EQ(1.0, f.val());
   
   AVEC x = createAVEC(a);
@@ -17,7 +17,7 @@ TEST(AgradRev,trunc) {
 
 TEST(AgradRev,trunc_2) {
   AVAR a = -1.2;
-  AVAR f = stan::agrad::trunc(a);
+  AVAR f = stan::math::trunc(a);
   EXPECT_FLOAT_EQ(-1.0, f.val());
   
   AVEC x = createAVEC(a);

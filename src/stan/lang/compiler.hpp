@@ -25,7 +25,7 @@ namespace stan {
      * messages; defaults to <code>input</code>.
      *
      * @return <code>false</code> if code could not be generated
-     *    due to syntax error in the Stan model; 
+     *    due to syntax error in the Stan model;
      *    <code>true</code> otherwise.
      */
     bool compile(std::ostream* msgs, // for warnings
@@ -35,12 +35,12 @@ namespace stan {
                  const std::string& in_file_name = "input") {
       program prog;
       bool parsed_ok = parse(msgs,stan_lang_in,in_file_name,model_name,prog);
-      if (!parsed_ok) 
+      if (!parsed_ok)
         return false; // syntax error in program
       generate_cpp(prog,model_name,cpp_out);
       return true;
     }
-    
+
 
   }
 

@@ -13,7 +13,7 @@
 TEST(AgradRevMatrix, exp_matrix) {
   using stan::math::exp;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_d expected_output(2,2);
   matrix_v mv(2,2), output;

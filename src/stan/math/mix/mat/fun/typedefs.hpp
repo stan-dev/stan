@@ -7,7 +7,7 @@
 #include <stan/math/fwd/mat/fun/Eigen_NumTraits.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     typedef
     Eigen::Matrix<fvar<var>, Eigen::Dynamic, Eigen::Dynamic>

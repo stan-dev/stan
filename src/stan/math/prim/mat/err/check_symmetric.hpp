@@ -42,6 +42,7 @@ namespace stan {
 
       using Eigen::Matrix;
       using stan::math::index_type;
+      using std::fabs;
 
       typedef typename index_type<Matrix<T_y, Dynamic, Dynamic> >::type
         size_type;

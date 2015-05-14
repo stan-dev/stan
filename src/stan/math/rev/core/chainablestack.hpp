@@ -4,7 +4,7 @@
 #include <stan/math/rev/core/autodiffstackstorage.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     // forward declaration of chainable
     class chainable;

@@ -6,7 +6,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class inv_sqrt_vari : public op_v_vari {

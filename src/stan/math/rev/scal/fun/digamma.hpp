@@ -7,7 +7,7 @@
 #include <stan/math/prim/scal/fun/trigamma.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class digamma_vari : public op_v_vari {
@@ -21,7 +21,7 @@ namespace stan {
       };
     }
 
-    inline var digamma(const stan::agrad::var& a) {
+    inline var digamma(const stan::math::var& a) {
       return var(new digamma_vari(a.vi_));
     }
 

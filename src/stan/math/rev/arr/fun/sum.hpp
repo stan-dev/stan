@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Class for sums of variables constructed with standard vectors.
@@ -46,7 +46,7 @@ namespace stan {
 
     /**
      * Returns the sum of the entries of the specified vector.
-     * 
+     *
      * @param m Vector.
      * @return Sum of vector entries.
      */

@@ -8,7 +8,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class lgamma_vari : public op_v_vari {
@@ -32,7 +32,7 @@ namespace stan {
      * @param a The variable.
      * @return Log gamma of the variable.
      */
-    inline var lgamma(const stan::agrad::var& a) {
+    inline var lgamma(const stan::math::var& a) {
       double lgamma_a = boost::math::lgamma(a.val());
       return var(new lgamma_vari(lgamma_a, a.vi_));
     }

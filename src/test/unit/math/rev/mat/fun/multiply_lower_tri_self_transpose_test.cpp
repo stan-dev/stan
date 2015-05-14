@@ -9,8 +9,8 @@
 #include <test/unit/math/rev/mat/fun/jacobian.hpp>
 #include <stan/math/rev/core.hpp>
 
-stan::agrad::matrix_v generate_large_L_tri_mat(){
-  using stan::agrad::matrix_v;
+stan::math::matrix_v generate_large_L_tri_mat(){
+  using stan::math::matrix_v;
   using stan::math::matrix_d;
 
   matrix_v ret_mat(100,100);
@@ -31,8 +31,8 @@ stan::agrad::matrix_v generate_large_L_tri_mat(){
   return ret_mat;
 }
 
-void test_mult_LLT(const stan::agrad::matrix_v& L) {
-  using stan::agrad::matrix_v;
+void test_mult_LLT(const stan::math::matrix_v& L) {
+  using stan::math::matrix_v;
   matrix_v Lp = L; 
   for (int m = 0; m < L.rows(); ++m)
     for (int n = (m+1); n < L.cols(); ++n)
@@ -47,8 +47,8 @@ void test_mult_LLT(const stan::agrad::matrix_v& L) {
 }
 
 TEST(AgradRevMatrix, multiplyLowerTriSelfTransposeGrad1) {
-  using stan::agrad::multiply_lower_tri_self_transpose;
-  using stan::agrad::matrix_v;
+  using stan::math::multiply_lower_tri_self_transpose;
+  using stan::math::matrix_v;
 
   matrix_v L(1,1);
   L << 3.0;
@@ -62,14 +62,14 @@ TEST(AgradRevMatrix, multiplyLowerTriSelfTransposeGrad1) {
   EXPECT_FLOAT_EQ(9.0, LLt(0,0).val());
 
   std::vector<VEC > J;
-  stan::agrad::jacobian(y,x,J);
+  stan::math::jacobian(y,x,J);
   
   EXPECT_FLOAT_EQ(6.0, J[0][0]);
 }
 
 TEST(AgradRevMatrix, multiplyLowerTriSelfTransposeGrad2) {
-  using stan::agrad::multiply_lower_tri_self_transpose;
-  using stan::agrad::matrix_v;
+  using stan::math::multiply_lower_tri_self_transpose;
+  using stan::math::matrix_v;
 
   matrix_v L(2,2);
   L << 
@@ -93,7 +93,7 @@ TEST(AgradRevMatrix, multiplyLowerTriSelfTransposeGrad2) {
   EXPECT_FLOAT_EQ(13.0, LLt(1,1).val());
 
   std::vector<VEC > J;
-  stan::agrad::jacobian(y,x,J);
+  stan::math::jacobian(y,x,J);
 
   // L = 1 0
   //     2 3
@@ -120,8 +120,8 @@ TEST(AgradRevMatrix, multiplyLowerTriSelfTransposeGrad2) {
 }
 
 TEST(AgradRevMatrix, multiplyLowerTriSelfTransposeGrad3) {
-  using stan::agrad::multiply_lower_tri_self_transpose;
-  using stan::agrad::matrix_v;
+  using stan::math::multiply_lower_tri_self_transpose;
+  using stan::math::matrix_v;
   
   matrix_v L(3,3);
   L << 
@@ -149,7 +149,7 @@ TEST(AgradRevMatrix, multiplyLowerTriSelfTransposeGrad3) {
   y[8] = LLt(2,2);
   
   std::vector<VEC > J;
-  stan::agrad::jacobian(y,x,J);
+  stan::math::jacobian(y,x,J);
 
   // L = 1 0 0
   //     2 3 0
@@ -229,8 +229,8 @@ TEST(AgradRevMatrix, multiplyLowerTriSelfTransposeGrad3) {
 }
 
 TEST(AgradRevMatrix, multiplyLowerTriSelfTranspose) {
-  using stan::agrad::multiply_lower_tri_self_transpose;
-  using stan::agrad::matrix_v;
+  using stan::math::multiply_lower_tri_self_transpose;
+  using stan::math::matrix_v;
   
   matrix_v L;
 

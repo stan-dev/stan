@@ -13,7 +13,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     inline matrix_v
     multiply_lower_tri_self_transpose(const matrix_v& L) {

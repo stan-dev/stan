@@ -4,7 +4,7 @@
 #include <stan/math/fwd/scal/fun/log.hpp>
 
 TEST(AgradFwdPow, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::pow;
   using std::log;
   using std::isnan;
@@ -32,7 +32,7 @@ TEST(AgradFwdPow, Fvar) {
 }
 
 TEST(AgradFwdPow, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::pow;
   using std::log;
 

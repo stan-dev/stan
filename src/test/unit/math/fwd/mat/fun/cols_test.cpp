@@ -3,8 +3,8 @@
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 
 TEST(AgradFwdMatrixCols,vector_fd) {
-  using stan::agrad::vector_fd;
-  using stan::agrad::row_vector_fd;
+  using stan::math::vector_fd;
+  using stan::math::row_vector_fd;
   using stan::math::cols;
 
   vector_fd v(5);
@@ -20,7 +20,7 @@ TEST(AgradFwdMatrixCols,vector_fd) {
   EXPECT_EQ(1U, cols(v));
 }
 TEST(AgradFwdMatrixCols,row_vector_fd) {
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
   using stan::math::cols;
 
   row_vector_fd rv(5);
@@ -36,7 +36,7 @@ TEST(AgradFwdMatrixCols,row_vector_fd) {
   EXPECT_EQ(0U, cols(rv));
 }
 TEST(AgradFwdMatrixCols,matrix_fd) {
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   using stan::math::cols;
 
   matrix_fd m(2,3);
@@ -48,10 +48,10 @@ TEST(AgradFwdMatrixCols,matrix_fd) {
   EXPECT_EQ(0U, cols(m));
 }
 TEST(AgradFwdFvarFvarMatrix,vector_ffd) {
-  using stan::agrad::vector_ffd;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::vector_ffd;
+  using stan::math::row_vector_ffd;
   using stan::math::cols;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a;
   fvar<fvar<double> > b;
@@ -77,9 +77,9 @@ TEST(AgradFwdFvarFvarMatrix,vector_ffd) {
   EXPECT_EQ(1U, cols(v));
 }
 TEST(AgradFwdMatrixCols,rowvector_ffd) {
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
   using stan::math::cols;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a;
   fvar<fvar<double> > b;
@@ -105,9 +105,9 @@ TEST(AgradFwdMatrixCols,rowvector_ffd) {
   EXPECT_EQ(0U, cols(rv));
 }
 TEST(AgradFwdMatrixCols,matrix_ffd) {
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   using stan::math::cols;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a;
   fvar<fvar<double> > b;

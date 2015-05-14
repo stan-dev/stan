@@ -8,7 +8,7 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 
 TEST(AgradFwdLog1mExp,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log1m_exp;
   using std::exp;
   using std::log;
@@ -36,7 +36,7 @@ TEST(AgradFwdLog1mExp,Fvar) {
 }
 
 TEST(AgradFwdLog1mExp,Fvar_exception) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log1m_exp;
   EXPECT_NO_THROW(log1m_exp(fvar<double>(-3)));
   EXPECT_NO_THROW(log1m_exp(fvar<double>(3)));
@@ -44,7 +44,7 @@ TEST(AgradFwdLog1mExp,Fvar_exception) {
 
 
 TEST(AgradFwdLog1mExp,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log1m_exp;
   using std::exp;
 

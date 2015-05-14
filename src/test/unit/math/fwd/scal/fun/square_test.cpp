@@ -5,7 +5,7 @@
 #include <stan/math/fwd/scal/fun/square.hpp>
 
 TEST(AgradFwdSquare, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::square;
 
   fvar<double> x(0.5,1.0);
@@ -42,7 +42,7 @@ TEST(AgradFwdSquare, Fvar) {
 }   
 
 TEST(AgradFwdSquare, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::square;
 
   fvar<fvar<double> > x;

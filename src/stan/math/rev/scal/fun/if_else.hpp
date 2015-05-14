@@ -4,7 +4,7 @@
 #include <stan/math/rev/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * If the specified condition is true, return the first

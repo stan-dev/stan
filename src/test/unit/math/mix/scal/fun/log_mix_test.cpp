@@ -20,8 +20,8 @@
 void test_log_mix_3xfvar_var_D1(double theta,
     double lambda1, double lambda2, double theta_d, 
     double lambda1_d, double lambda2_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -64,7 +64,7 @@ void test_log_mix_3xfvar_var_D1(double theta,
 
   fvar<var> theta_fv_invalid(-1.0,theta_d);
   EXPECT_THROW(log_mix(theta_fv_invalid,lambda1_fv,lambda2_fv),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 VEC log_mix_D3(double theta, double lambda1, double lambda2,
@@ -73,7 +73,7 @@ VEC log_mix_D3(double theta, double lambda1, double lambda2,
   using stan::math::log_mix;
   using std::exp;
   using std::pow;
-  using stan::agrad::var;
+  using stan::math::var;
 
   var theta_v(theta);
   var lambda1_v(lambda1);
@@ -232,15 +232,15 @@ VEC log_mix_D3(double theta, double lambda1, double lambda2,
     d1_d2_d3.push_back(d3[1]);
     d1_d2_d3.push_back(d3[2]);
 
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
     return d1_d2_d3;
 } 
 
 void test_log_mix_3xfvar_var_D2(double theta,
     double lambda1, double lambda2, double theta_d, 
     double lambda1_d, double lambda2_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -288,14 +288,14 @@ void test_log_mix_3xfvar_var_D2(double theta,
   EXPECT_FLOAT_EQ(res.d_.val(),auto_calc[0]);
   EXPECT_FLOAT_EQ(result, res.val_.val());
   EXPECT_FLOAT_EQ(deriv, res.d_.val());
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xdouble_fvar_fvar_var_theta_D3(double theta,
     double lambda1, double lambda2, 
     double theta_d,double theta_d2){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -328,14 +328,14 @@ void test_log_mix_2xdouble_fvar_fvar_var_theta_D3(double theta,
   theta_ffv_invalid.d_.val_ = theta_d;
 
   EXPECT_THROW(log_mix(theta_ffv_invalid,lambda1,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xdouble_fvar_fvar_var_lam_1_D3(double theta,
     double lambda1, double lambda2, double lambda1_d, 
     double lambda1_d2){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -363,14 +363,14 @@ void test_log_mix_2xdouble_fvar_fvar_var_lam_1_D3(double theta,
   EXPECT_NEAR(result, res.val_.val_.val(),8e-13);
 
   EXPECT_THROW(log_mix(-1.0,lambda1_ffv,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xdouble_fvar_fvar_var_lam_2_D3(double theta,
     double lambda1, double lambda2,double lambda2_d, 
     double lambda2_d2){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -398,15 +398,15 @@ void test_log_mix_2xdouble_fvar_fvar_var_lam_2_D3(double theta,
   EXPECT_NEAR(result, res.val_.val_.val(),8e-13);
 
   EXPECT_THROW(log_mix(-1.0,lambda1,lambda2_ffv),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xfvar_fvar_var_ex_theta_D3(double theta,
     double lambda1, double lambda2,  
     double lambda1_d, double lambda2_d,
     double lambda1_d2, double lambda2_d2){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -447,14 +447,14 @@ void test_log_mix_2xfvar_fvar_var_ex_theta_D3(double theta,
   EXPECT_NEAR(result, res.val_.val_.val(),8e-13);
 
   EXPECT_THROW(log_mix(-1.0,lambda1_ffv,lambda2_ffv),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(double theta,
     double lambda1, double lambda2, double theta_d, 
     double lambda2_d, double lambda2_d2, double theta_d2){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -496,14 +496,14 @@ void test_log_mix_2xfvar_fvar_var_ex_lam_1_D3(double theta,
   theta_ffv_invalid.d_.val_ = theta_d;
 
   EXPECT_THROW(log_mix(theta_ffv_invalid,lambda1,lambda2_ffv),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(double theta,
     double lambda1, double lambda2, double theta_d, 
     double lambda1_d, double lambda1_d2, double theta_d2){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -548,13 +548,13 @@ void test_log_mix_2xfvar_fvar_var_ex_lam_2_D3(double theta,
   theta_ffv_invalid.d_.val_ = theta_d;
 
   EXPECT_THROW(log_mix(theta_ffv_invalid,lambda1_ffv,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xdouble_fvar_fvar_var_theta_D2(double theta,
     double lambda1, double lambda2, double theta_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -586,13 +586,13 @@ void test_log_mix_2xdouble_fvar_fvar_var_theta_D2(double theta,
   theta_ffv_invalid.d_.val_ = theta_d;
 
   EXPECT_THROW(log_mix(theta_ffv_invalid,lambda1,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xdouble_fvar_fvar_var_lam_1_D2(double theta,
     double lambda1, double lambda2, double lambda1_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -619,13 +619,13 @@ void test_log_mix_2xdouble_fvar_fvar_var_lam_1_D2(double theta,
   EXPECT_FLOAT_EQ(result, res.val_.val_.val());
 
   EXPECT_THROW(log_mix(-1.0,lambda1_ffv,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xdouble_fvar_fvar_var_lam_2_D2(double theta,
     double lambda1, double lambda2, double lambda2_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -652,14 +652,14 @@ void test_log_mix_2xdouble_fvar_fvar_var_lam_2_D2(double theta,
   EXPECT_FLOAT_EQ(result, res.val_.val_.val());
 
   EXPECT_THROW(log_mix(-1.0,lambda1,lambda2_ffv),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(double theta,
     double lambda1, double lambda2, double theta_d, 
     double lambda2_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -699,14 +699,14 @@ void test_log_mix_2xfvar_fvar_var_ex_lam_1_D2(double theta,
   theta_ffv_invalid.d_.val_ = theta_d;
 
   EXPECT_THROW(log_mix(theta_ffv_invalid,lambda1,lambda2_ffv),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(double theta,
     double lambda1, double lambda2, double theta_d, 
     double lambda1_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -749,14 +749,14 @@ void test_log_mix_2xfvar_fvar_var_ex_lam_2_D2(double theta,
   theta_ffv_invalid.d_.val_ = theta_d;
 
   EXPECT_THROW(log_mix(theta_ffv_invalid,lambda1_ffv,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xfvar_fvar_var_ex_theta_D2(double theta,
     double lambda1, double lambda2, 
     double lambda1_d, double lambda2_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -795,15 +795,15 @@ void test_log_mix_2xfvar_fvar_var_ex_theta_D2(double theta,
   EXPECT_FLOAT_EQ(result, res.val_.val_.val());
 
   EXPECT_THROW(log_mix(-1.0,lambda1_ffv,lambda2_ffv),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_3xfvar_fvar_var_D3(double theta,
     double lambda1, double lambda2, double theta_d, 
     double lambda1_d, double lambda2_d,
     double lambda1_d2, double lambda2_d2, double theta_d2){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -853,15 +853,15 @@ void test_log_mix_3xfvar_fvar_var_D3(double theta,
   theta_ffv_invalid.d_.val_ = theta_d;
 
   EXPECT_THROW(log_mix(theta_ffv_invalid,lambda1_ffv,lambda2_ffv),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 
 void test_log_mix_3xfvar_fvar_var_D2(double theta,
     double lambda1, double lambda2, double theta_d, 
     double lambda1_d, double lambda2_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using std::pow;
   using stan::math::log_mix;
@@ -902,14 +902,14 @@ void test_log_mix_3xfvar_fvar_var_D2(double theta,
 
   EXPECT_FLOAT_EQ(res.d_.val_.val(),auto_calc[0]);
   EXPECT_FLOAT_EQ(result, res.val_.val_.val());
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xfvar_var_lam_2_double(double theta,
     double lambda1, double lambda2, double theta_d, 
     double lambda1_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using stan::math::log_mix;
 
@@ -939,14 +939,14 @@ void test_log_mix_2xfvar_var_lam_2_double(double theta,
   fvar<var> theta_fv_invalid(-1.0,theta_d);
 
   EXPECT_THROW(log_mix(theta_fv_invalid,lambda1_fv,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xfvar_var_lam_1_double(double theta,
             double lambda1, double lambda2, double theta_d, 
             double lambda2_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using stan::math::log_mix;
 
@@ -977,14 +977,14 @@ void test_log_mix_2xfvar_var_lam_1_double(double theta,
   fvar<var> theta_fv_invalid(-1.0,theta_d);
 
   EXPECT_THROW(log_mix(theta_fv_invalid,lambda1,lambda2_fv),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xfvar_var_theta_double(double theta,
     double lambda1, double lambda2, 
     double lambda1_d, double lambda2_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using stan::math::log_mix;
 
@@ -1013,13 +1013,13 @@ void test_log_mix_2xfvar_var_theta_double(double theta,
   EXPECT_FLOAT_EQ(lambda2_deriv,g[1]);
 
   EXPECT_THROW(log_mix(-1.0,lambda1_fv,lambda2_fv),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xdouble_theta_fvar_var(double theta,
     double lambda1, double lambda2, double theta_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using stan::math::log_mix;
 
@@ -1044,14 +1044,14 @@ void test_log_mix_2xdouble_theta_fvar_var(double theta,
   fvar<var> theta_fv_invalid(-1.0,theta_d);
 
   EXPECT_THROW(log_mix(theta_fv_invalid,lambda1,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 void test_log_mix_2xdouble_lam_1_fvar_var(double theta,
     double lambda1, double lambda2, 
     double lambda1_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using stan::math::log_mix;
 
@@ -1074,14 +1074,14 @@ void test_log_mix_2xdouble_lam_1_fvar_var(double theta,
   EXPECT_FLOAT_EQ(lambda1_deriv,g[0]);
 
   EXPECT_THROW(log_mix(-1.0,lambda1_fv,lambda2),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 
 void test_log_mix_2xdouble_lam_2_fvar_var(double theta,
     double lambda1, double lambda2, double lambda2_d){
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   using std::exp;
   using stan::math::log_mix;
 
@@ -1104,7 +1104,7 @@ void test_log_mix_2xdouble_lam_2_fvar_var(double theta,
   EXPECT_FLOAT_EQ(lambda2_deriv,g[0]);
 
   EXPECT_THROW(log_mix(-1.0,lambda1,lambda2_fv),std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradFwdLogMix, FvarFvarVar_Double_Double_D3){

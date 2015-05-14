@@ -9,13 +9,13 @@
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <vector>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
     // Multinomial(ns|N, theta)   [0 <= n <= N;  SUM ns = N;
     //                            0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto,
@@ -23,7 +23,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_prob>::type
     multinomial_log(const std::vector<int>& ns,
                     const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta) {
-      static const char* function("stan::prob::multinomial_log");
+      static const char* function("stan::math::multinomial_log");
 
       using stan::math::check_nonnegative;
       using stan::math::check_simplex;

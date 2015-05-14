@@ -5,7 +5,7 @@
 #include <stan/math/fwd/scal/fun/exp.hpp>
 
 TEST(AgradFwdInvCLogLog,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::inv_cloglog;
 
   fvar<double> x(0.5,1.0);
@@ -28,7 +28,7 @@ TEST(AgradFwdInvCLogLog,Fvar) {
 }
 
 TEST(AgradFwdInvCLogLog,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::inv_cloglog;
   using std::exp;
 

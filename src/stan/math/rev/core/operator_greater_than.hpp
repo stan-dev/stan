@@ -4,7 +4,7 @@
 #include <stan/math/rev/core/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Greater than operator comparing variables' values (C++).

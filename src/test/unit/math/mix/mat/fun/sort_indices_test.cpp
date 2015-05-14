@@ -9,8 +9,8 @@
 #include <stan/math/rev/core.hpp>
 
 typedef std::vector<double> VEC;
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 using stan::math::sort_indices_asc;
 using stan::math::sort_indices_desc;
 

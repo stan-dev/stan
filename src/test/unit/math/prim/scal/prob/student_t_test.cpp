@@ -5,19 +5,19 @@
 
 TEST(ProbDistributionsStudentT, error_check) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::student_t_rng(3.0, 2.0, 2.0, rng));
+  EXPECT_NO_THROW(stan::math::student_t_rng(3.0, 2.0, 2.0, rng));
 
-  EXPECT_THROW(stan::prob::student_t_rng(3.0, 2.0, -2.0, rng),
+  EXPECT_THROW(stan::math::student_t_rng(3.0, 2.0, -2.0, rng),
                std::domain_error);
-  EXPECT_THROW(stan::prob::student_t_rng(-3.0, 2.0, 2.0, rng),
+  EXPECT_THROW(stan::math::student_t_rng(-3.0, 2.0, 2.0, rng),
                std::domain_error);
-  EXPECT_THROW(stan::prob::student_t_rng(stan::math::positive_infinity(), 2.0,
+  EXPECT_THROW(stan::math::student_t_rng(stan::math::positive_infinity(), 2.0,
                                          2.0, rng),
                std::domain_error);
-  EXPECT_THROW(stan::prob::student_t_rng(3,stan::math::positive_infinity(),
+  EXPECT_THROW(stan::math::student_t_rng(3,stan::math::positive_infinity(),
                                          2.0, rng),
                std::domain_error);
-  EXPECT_THROW(stan::prob::student_t_rng(3,2,stan::math::positive_infinity(),
+  EXPECT_THROW(stan::math::student_t_rng(3,2,stan::math::positive_infinity(),
                                          rng),
                std::domain_error);
 
@@ -38,7 +38,7 @@ TEST(ProbDistributionsStudentT, chiSquareGoodnessFitTest) {
   int bin [5] = {0, 0, 0, 0, 0};
 
   while (count < N) {
-    double a = (stan::prob::student_t_rng(3.0,2.0,2.0,rng) - 2.0) / 2.0;
+    double a = (stan::math::student_t_rng(3.0,2.0,2.0,rng) - 2.0) / 2.0;
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

@@ -15,12 +15,13 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of an exponential density for y with the specified
@@ -51,7 +52,7 @@ namespace stan {
     template <bool propto, typename T_y, typename T_inv_scale>
     typename return_type<T_y, T_inv_scale>::type
     exponential_log(const T_y& y, const T_inv_scale& beta) {
-      static const char* function("stan::prob::exponential_log");
+      static const char* function("stan::math::exponential_log");
       typedef typename stan::partials_return_type<T_y, T_inv_scale>::type
         T_partials_return;
 
@@ -64,6 +65,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
+      using std::log;
 
       T_partials_return logp(0.0);
       check_not_nan(function, "Random variable", y);
@@ -84,7 +86,7 @@ namespace stan {
         if (include_summand<propto, T_inv_scale>::value)
           log_beta[i] = log(value_of(beta_vec[i]));
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale>
+      OperandsAndPartials<T_y, T_inv_scale>
         operands_and_partials(y, beta);
 
       for (size_t n = 0; n < N; n++) {

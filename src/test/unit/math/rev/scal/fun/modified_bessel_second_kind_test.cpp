@@ -6,7 +6,7 @@
 TEST(AgradRev,modified_bessel_second_kind_int_var) {
   int a(1);
   AVAR b(4.0);
-  AVAR f = stan::agrad::modified_bessel_second_kind(a,b);
+  AVAR f = stan::math::modified_bessel_second_kind(a,b);
   EXPECT_FLOAT_EQ(0.01248349888726843147038417998080606848384,f.val());
 
   AVEC x = createAVEC(a,b);
@@ -17,10 +17,10 @@ TEST(AgradRev,modified_bessel_second_kind_int_var) {
 
   a = 1;
   b = -3.0;
-  EXPECT_THROW(stan::agrad::modified_bessel_second_kind(a,b), std::domain_error);
+  EXPECT_THROW(stan::math::modified_bessel_second_kind(a,b), std::domain_error);
 
   a = -1;
-  EXPECT_THROW(stan::agrad::modified_bessel_second_kind(a,b), std::domain_error);
+  EXPECT_THROW(stan::math::modified_bessel_second_kind(a,b), std::domain_error);
 }
 
 struct modified_bessel_second_kind_fun {

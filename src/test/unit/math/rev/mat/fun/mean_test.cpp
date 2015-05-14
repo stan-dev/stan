@@ -13,7 +13,7 @@
 TEST(AgradRevMatrix, mean_vector) {
   using stan::math::mean;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d d1(3);
   vector_v v1(3);
@@ -31,7 +31,7 @@ TEST(AgradRevMatrix, mean_vector) {
 TEST(AgradRevMatrix, mean_vector_exception) {
   using stan::math::mean;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d d;
   vector_v v;
@@ -41,7 +41,7 @@ TEST(AgradRevMatrix, mean_vector_exception) {
 TEST(AgradRevMatrix, mean_rowvector) {
   using stan::math::mean;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d d1(3);
   row_vector_v v1(3);
@@ -59,7 +59,7 @@ TEST(AgradRevMatrix, mean_rowvector) {
 TEST(AgradRevMatrix, mean_rowvector_exception) {
   using stan::math::mean;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d d;
   row_vector_v v;
@@ -69,7 +69,7 @@ TEST(AgradRevMatrix, mean_rowvector_exception) {
 TEST(AgradRevMatrix, mean_matrix) {
   using stan::math::mean;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_d d1(3,1);
   matrix_v v1(1,3);
@@ -87,7 +87,7 @@ TEST(AgradRevMatrix, mean_matrix) {
 TEST(AgradRevMatrix, mean_matrix_exception) {
   using stan::math::mean;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
  
   matrix_d d;
   matrix_v v;

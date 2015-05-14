@@ -13,8 +13,8 @@
 
 using stan::math::sum;
 using stan::math::append_row;
-using stan::agrad::matrix_v;
-using stan::agrad::vector_v;
+using stan::math::matrix_v;
+using stan::math::vector_v;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
@@ -33,7 +33,7 @@ TEST(AgradRevMatrix, append_row_matrix) {
   for (int i = 0; i < 2; ++i) {
     for (int j = 0; j < 2; ++j) {
       x.push_back(a(i,j));
-      a_exp(i, j) = stan::agrad::exp(a(i, j));
+      a_exp(i, j) = stan::math::exp(a(i, j));
     }
   }
   
@@ -59,7 +59,7 @@ TEST(AgradRevMatrix, append_row_row_vector) {
   AVEC x;
   for (int i = 0; i < 3; ++i) {
     x.push_back(a(i));
-    a_exp(i) = stan::agrad::exp(a(i));
+    a_exp(i) = stan::math::exp(a(i));
   }
   
   AVAR append_row_ab = sum(append_row(a_exp, b));
@@ -89,9 +89,9 @@ TEST(MathMatrix, append_row_different_types) {
   using Eigen::MatrixXd;
   using Eigen::VectorXd;
   using Eigen::RowVectorXd;
-  using stan::agrad::matrix_v;
-  using stan::agrad::row_vector_v;
-  using stan::agrad::vector_v;
+  using stan::math::matrix_v;
+  using stan::math::row_vector_v;
+  using stan::math::vector_v;
   using std::vector;  
   
   MatrixXd m33(3, 3);
