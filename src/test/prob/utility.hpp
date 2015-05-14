@@ -130,8 +130,8 @@
 #include <stan/math/fwd/core.hpp>
 
 using std::vector;
-using stan::agrad::var;
-using stan::agrad::fvar;
+using stan::math::var;
+using stan::math::fvar;
 using stan::is_vector;
 using stan::is_constant_struct;
 using stan::scalar_type;

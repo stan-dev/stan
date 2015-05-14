@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Initialize variable to value.  (Function may look pointless, but

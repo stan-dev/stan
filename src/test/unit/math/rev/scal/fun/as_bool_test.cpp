@@ -5,7 +5,7 @@
 
 TEST(AgradRev,asBool) {
   using stan::math::as_bool;
-  using stan::agrad::var;
+  using stan::math::var;
 
   EXPECT_TRUE(as_bool(var(1)));
   EXPECT_TRUE(as_bool(var(-10L)));
@@ -21,6 +21,6 @@ TEST(AgradRev,asBool) {
   EXPECT_FALSE(as_bool(var(0.0f)));
 }
 TEST(AgradRev,as_bool_nan) {
-  stan::agrad::var nan = std::numeric_limits<double>::quiet_NaN();
-EXPECT_TRUE(stan::agrad::as_bool(nan));
+  stan::math::var nan = std::numeric_limits<double>::quiet_NaN();
+EXPECT_TRUE(stan::math::as_bool(nan));
 }

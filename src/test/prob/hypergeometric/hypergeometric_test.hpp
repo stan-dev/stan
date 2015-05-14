@@ -5,7 +5,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsNegBinomial : public AgradDistributionTest {
 public:
@@ -46,7 +46,7 @@ public:
   typename stan::return_type<T_n,T_N,T_a,T_b>::type 
   log_prob(const T_n& n, const T_N& N, const T_a& a, const T_b& b,
            const T4&, const T5&) {
-    return stan::prob::hypergeometric_log(n, N, a, b);
+    return stan::math::hypergeometric_log(n, N, a, b);
   }
 
   template <bool propto, 
@@ -55,7 +55,7 @@ public:
   double
   log_prob(const T_n& n, const T_N& N, const T_a& a, const T_b& b,
            const T4&, const T5&) {
-    return stan::prob::hypergeometric_log<propto>(n, N, a, b);
+    return stan::math::hypergeometric_log<propto>(n, N, a, b);
   }
   
 

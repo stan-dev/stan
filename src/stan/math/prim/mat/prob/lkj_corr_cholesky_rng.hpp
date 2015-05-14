@@ -3,7 +3,7 @@
 
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/prob/beta_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/mat/fun/factor_cov_matrix.hpp>
@@ -47,14 +47,14 @@
 #include <stan/math/prim/mat/fun/cov_matrix_free_lkj.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline Eigen::MatrixXd
     lkj_corr_cholesky_rng(const size_t K,
                           const double eta,
                           RNG& rng) {
-      static const char* function("stan::prob::lkj_corr_cholesky_rng");
+      static const char* function("stan::math::lkj_corr_cholesky_rng");
 
       using stan::math::check_positive;
 
@@ -66,11 +66,11 @@ namespace stan {
       for (size_t i = 0; i < (K - 1); i++) {
         alpha -= 0.5;
         for (size_t j = i + 1; j < K; j++) {
-          CPCs(count) = 2.0 * stan::prob::beta_rng(alpha, alpha, rng) - 1.0;
+          CPCs(count) = 2.0 * stan::math::beta_rng(alpha, alpha, rng) - 1.0;
           count++;
         }
       }
-      return stan::prob::read_corr_L(CPCs, K);
+      return stan::math::read_corr_L(CPCs, K);
     }
 
   }

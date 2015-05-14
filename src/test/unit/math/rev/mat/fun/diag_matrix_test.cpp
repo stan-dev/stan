@@ -11,9 +11,9 @@
 
 TEST(AgradRevMatrix,diagMatrix) {
   using stan::math::diag_matrix;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   EXPECT_EQ(0,diag_matrix(vector_v()).size());
   EXPECT_EQ(4,diag_matrix(vector_v(2)).size());

@@ -1,7 +1,6 @@
 #ifndef STAN_MATH_PRIM_SCAL_FUN_OWENS_T_HPP
 #define STAN_MATH_PRIM_SCAL_FUN_OWENS_T_HPP
 
-#include <boost/math/tools/promotion.hpp>
 #include <boost/math/special_functions/owens_t.hpp>
 
 namespace stan {
@@ -59,9 +58,8 @@ namespace stan {
      * @param a Second argument
      * @return The Owen's T function.
      */
-    template <typename T1, typename T2>
-    inline typename boost::math::tools::promote_args<T1, T2>::type
-    owens_t(const T1& h, const T2& a) {
+    inline
+    double owens_t(const double h, const double a) {
       return boost::math::owens_t(h, a);
     }
   }

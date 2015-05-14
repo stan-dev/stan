@@ -23,7 +23,7 @@ using Eigen::Matrix;
 using std::vector;
 
 TEST(ProbDistributionsMultiNormal,fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Matrix<fvar<double>,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
@@ -39,12 +39,12 @@ TEST(ProbDistributionsMultiNormal,fvar_double) {
     for (int j = 0; j < 3; j++)
       Sigma(i,j).d_ = 1.0;
   }
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma).val_);
-  EXPECT_FLOAT_EQ(0.54899865, stan::prob::multi_normal_log(y,mu,Sigma).d_);
+  EXPECT_FLOAT_EQ(-11.73908, stan::math::multi_normal_log(y,mu,Sigma).val_);
+  EXPECT_FLOAT_EQ(0.54899865, stan::math::multi_normal_log(y,mu,Sigma).d_);
 }
 
 TEST(ProbDistributionsMultiNormal,fvar_fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Matrix<fvar<fvar<double> >,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
@@ -60,6 +60,6 @@ TEST(ProbDistributionsMultiNormal,fvar_fvar_double) {
     for (int j = 0; j < 3; j++)
       Sigma(i,j).d_ = 1.0;
   }
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma).val_.val_);
-  EXPECT_FLOAT_EQ(0.54899865, stan::prob::multi_normal_log(y,mu,Sigma).d_.val_);
+  EXPECT_FLOAT_EQ(-11.73908, stan::math::multi_normal_log(y,mu,Sigma).val_.val_);
+  EXPECT_FLOAT_EQ(0.54899865, stan::math::multi_normal_log(y,mu,Sigma).d_.val_);
 }

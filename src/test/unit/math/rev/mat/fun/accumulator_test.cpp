@@ -11,14 +11,14 @@
 #include <gtest/gtest.h>
 
 // test sum of first n numbers for sum of a
-void test_sum(stan::math::accumulator<stan::agrad::var>& a,
+void test_sum(stan::math::accumulator<stan::math::var>& a,
               int n) {
   EXPECT_FLOAT_EQ((n * (n + 1)) / 2, a.sum().val());
 }
 
 TEST(AgradRevMatrix,accumulateDouble) {
   using stan::math::accumulator;
-  using stan::agrad::var;
+  using stan::math::var;
 
   accumulator<var> a;
   test_sum(a, 0);
@@ -43,7 +43,7 @@ TEST(AgradRevMathMatrix,accumulateCollection) {
   using Eigen::MatrixXd;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::math::var;
 
   accumulator<var> a;
 

@@ -16,14 +16,13 @@
 #include <stan/math/prim/scal/fun/gamma_p.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of a gamma density for y with the specified
@@ -51,7 +50,7 @@ namespace stan {
               typename T_y, typename T_shape, typename T_inv_scale>
     typename return_type<T_y, T_shape, T_inv_scale>::type
     gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
-      static const char* function("stan::prob::gamma_log");
+      static const char* function("stan::math::gamma_log");
       typedef typename stan::partials_return_type<T_y, T_shape,
                                                   T_inv_scale>::type
         T_partials_return;
@@ -97,12 +96,13 @@ namespace stan {
       }
 
       size_t N = max_size(y, alpha, beta);
-      agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale>
+      OperandsAndPartials<T_y, T_shape, T_inv_scale>
         operands_and_partials(y, alpha, beta);
 
       using boost::math::lgamma;
       using stan::math::multiply_log;
       using boost::math::digamma;
+      using std::log;
 
       VectorBuilder<include_summand<propto, T_y, T_shape>::value,
                     T_partials_return, T_y> log_y(length(y));

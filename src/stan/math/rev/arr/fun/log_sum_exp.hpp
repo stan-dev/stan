@@ -8,7 +8,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       double log_sum_exp_as_double(const std::vector<var>& x) {

@@ -17,16 +17,16 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <boost/random/chi_squared_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_dof>
     typename return_type<T_y, T_dof>::type
@@ -38,7 +38,7 @@ namespace stan {
       if ( !( stan::length(y) && stan::length(nu) ) ) return 0.0;
 
       // Error checks
-      static const char* function("stan::prob::inv_chi_square_cdf_log");
+      static const char* function("stan::math::inv_chi_square_cdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
@@ -46,6 +46,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
+      using std::exp;
 
       T_partials_return P(0.0);
 
@@ -61,7 +62,7 @@ namespace stan {
       VectorView<const T_dof> nu_vec(nu);
       size_t N = max_size(y, nu);
 
-      agrad::OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
+      OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
 
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
@@ -77,6 +78,7 @@ namespace stan {
       using boost::math::tgamma;
       using std::exp;
       using std::pow;
+      using std::log;
 
       // Cache a few expensive function calls if nu is a parameter
       VectorBuilder<!is_constant_struct<T_dof>::value,

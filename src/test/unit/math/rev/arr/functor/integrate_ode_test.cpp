@@ -38,7 +38,7 @@ void sho_value_test(F harm_osc,
                     std::vector<double>& x,
                     std::vector<int>& x_int) {
   
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::promote_scalar;
 
   std::vector<std::vector<var> >  ode_res_vd
@@ -54,7 +54,7 @@ void sho_value_test(F harm_osc,
 }
 
 void sho_finite_diff_test(double t0) {
-  using stan::agrad::var;  
+  using stan::math::var;  
   harm_osc_ode_fun harm_osc;
 
   std::vector<double> theta;
@@ -80,7 +80,7 @@ void sho_finite_diff_test(double t0) {
 }
 
 void sho_data_finite_diff_test(double t0) {
-  using stan::agrad::var;  
+  using stan::math::var;  
   harm_osc_ode_data_fun harm_osc;
 
   std::vector<double> theta;

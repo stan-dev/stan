@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       template<int R, int C>
@@ -25,10 +25,10 @@ namespace stan {
             _rows(A.rows()),
             _cols(A.cols()),
             A_(reinterpret_cast<double*>
-               (stan::agrad::ChainableStack::memalloc_
+               (stan::math::ChainableStack::memalloc_
                 .alloc(sizeof(double) * A.rows() * A.cols()))),
             _adjARef(reinterpret_cast<vari**>
-                     (stan::agrad::ChainableStack::memalloc_
+                     (stan::math::ChainableStack::memalloc_
                       .alloc(sizeof(vari*) * A.rows() * A.cols()))) {
           size_t pos = 0;
           for (size_type j = 0; j < _cols; j++) {

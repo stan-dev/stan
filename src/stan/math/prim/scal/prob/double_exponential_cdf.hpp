@@ -10,14 +10,14 @@
 #include <stan/math/prim/scal/err/check_positive_finite.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
-
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/sign.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Calculates the double exponential cumulative density function.
@@ -37,7 +37,7 @@ namespace stan {
     typename return_type<T_y, T_loc, T_scale>::type
     double_exponential_cdf(const T_y& y,
                            const T_loc& mu, const T_scale& sigma) {
-      static const char* function("stan::prob::double_exponential_cdf");
+      static const char* function("stan::math::double_exponential_cdf");
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
@@ -51,6 +51,7 @@ namespace stan {
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
+      using std::exp;
 
       T_partials_return cdf(1.0);
 
@@ -58,7 +59,7 @@ namespace stan {
       check_finite(function, "Location parameter", mu);
       check_positive_finite(function, "Scale parameter", sigma);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);

@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T, int R, int C>
     inline
@@ -17,7 +17,7 @@ namespace stan {
     crossprod(const Eigen::Matrix<fvar<T>, R, C>& m) {
       if (m.rows() == 0)
         return Eigen::Matrix<fvar<T>, C, C>(0, 0);
-      return stan::agrad::multiply(stan::math::transpose(m), m);
+      return stan::math::multiply(stan::math::transpose(m), m);
     }
 
   }

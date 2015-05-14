@@ -3,7 +3,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 TEST(AgradFwdNumericLimits,All_Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::isnan;
   using stan::math::INFTY;
 

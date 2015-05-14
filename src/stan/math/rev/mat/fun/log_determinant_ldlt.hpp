@@ -7,7 +7,7 @@
 #include <stan/math/rev/mat/fun/LDLT_factor.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
     namespace {
 
     /**

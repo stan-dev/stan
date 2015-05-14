@@ -17,14 +17,14 @@ template <typename T_prob>
 void expect_propto(unsigned int n1, T_prob theta1, 
                    unsigned int n2, T_prob theta2, 
                    std::string message) {
-  expect_eq_diffs(stan::prob::categorical_log<false>(n1, theta1),
-                  stan::prob::categorical_log<false>(n2, theta2),
-                  stan::prob::categorical_log<true>(n1, theta1),
-                  stan::prob::categorical_log<true>(n2, theta2),
+  expect_eq_diffs(stan::math::categorical_log<false>(n1, theta1),
+                  stan::math::categorical_log<false>(n2, theta2),
+                  stan::math::categorical_log<true>(n1, theta1),
+                  stan::math::categorical_log<true>(n2, theta2),
                   message);
 }
 
-using stan::agrad::var;
+using stan::math::var;
 using Eigen::Dynamic;
 using Eigen::Matrix;
 

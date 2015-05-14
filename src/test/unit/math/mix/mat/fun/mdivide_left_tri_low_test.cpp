@@ -20,8 +20,8 @@
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_fv_1stDeriv) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
 
   matrix_fv Y(3,3);
   Y << 1, 0, 0,
@@ -43,7 +43,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_fv_1stDeriv) {
     Z(1).d_ = 2.0;
     Z(2).d_ = 2.0;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val(),1.0E-08);
   EXPECT_NEAR(0,output(1,0).val_.val(), 1.0E-08);
@@ -63,8 +63,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_fv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_fv_2ndDeriv) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
 
   matrix_fv Y(3,3);
   Y << 1, 0, 0,
@@ -86,7 +86,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_fv_2ndDeriv) {
     Z(1).d_ = 2.0;
     Z(2).d_ = 2.0;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   AVEC q = createAVEC(Y(0,0).val(),Y(0,1).val(),Y(0,2).val(),Y(1,0).val(),Y(1,1).val(),Y(1,2).val());
   VEC h;
@@ -99,7 +99,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_fv_2ndDeriv) {
   EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_matrix_fv_1stDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::vector_d;
 
   matrix_fv Y(3,3);
@@ -119,7 +119,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_matrix_fv_1stDeriv) {
    vector_d Z(3);
    Z << 1, 2, 3;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val(), 1.0E-08);
   EXPECT_NEAR(0,output(1,0).val_.val(), 1.0E-08);
@@ -139,7 +139,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_matrix_fv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_matrix_fv_2ndDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::vector_d;
 
   matrix_fv Y(3,3);
@@ -159,7 +159,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_matrix_fv_2ndDeriv) {
    vector_d Z(3);
    Z << 1, 2, 3;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   AVEC q = createAVEC(Y(0,0).val(),Y(0,1).val(),Y(0,2).val(),Y(1,0).val(),Y(1,1).val(),Y(1,2).val());
   VEC h;
@@ -173,8 +173,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_matrix_fv_2ndDeriv) {
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_1stDeriv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -187,7 +187,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_1stDeriv) {
    Z(1).d_ = 2.0;
    Z(2).d_ = 2.0;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val(), 1.0E-08);
   EXPECT_NEAR(0,output(1,0).val_.val(), 1.0E-08);
@@ -205,8 +205,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_1stDeriv) {
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_2ndDeriv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -219,7 +219,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_2ndDeriv) {
    Z(1).d_ = 2.0;
    Z(2).d_ = 2.0;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val(), 1.0E-08);
   EXPECT_NEAR(0,output(1,0).val_.val(), 1.0E-08);
@@ -236,8 +236,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_fv_matrix_2ndDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[2]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_fv_1stDeriv) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::row_vector_fv;
 
   matrix_fv Y(3,3);
   Y << 1, 0, 0,
@@ -267,7 +267,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_fv_1stDeriv) {
    Z(2,1).d_ = 2.0;
    Z(2,2).d_ = 2.0;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val(), 1.0E-08);
   EXPECT_NEAR(0,output(0,1).val_.val(),1.0E-08);
@@ -299,8 +299,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_fv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_fv_2ndDeriv) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::row_vector_fv;
 
   matrix_fv Y(3,3);
   Y << 1, 0, 0,
@@ -330,7 +330,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_fv_2ndDeriv) {
    Z(2,1).d_ = 2.0;
    Z(2,2).d_ = 2.0;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Y(0,0).val(),Y(0,1).val(),Y(0,2).val(),Y(1,0).val(),Y(1,1).val(),Y(1,2).val());
   VEC h;
@@ -343,9 +343,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_fv_2ndDeriv) {
   EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_1stDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -366,7 +366,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_1stDeriv) {
    Z(2,1).d_ = 2.0;
    Z(2,2).d_ = 2.0;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val(), 1.0E-08);
   EXPECT_NEAR(0,output(0,1).val_.val(),1.0E-08);
@@ -398,9 +398,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_1stDeriv) {
   EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_2ndDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -421,7 +421,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_2ndDeriv) {
    Z(2,1).d_ = 2.0;
    Z(2,2).d_ = 2.0;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Z(0,0).val(),Z(0,1).val(),Z(0,2).val(),Z(1,0).val(),Z(1,1).val(),Z(1,2).val());
   VEC h;
@@ -434,9 +434,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_2ndDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_matrix_fv_1stDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   matrix_fv Y(3,3);
   Y << 1, 0, 0,
@@ -457,7 +457,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_matrix_fv_1stDeriv) {
     6, 5, 4,
     7, 8, 9;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val(), 1.0E-08);
   EXPECT_NEAR(0,output(0,1).val_.val(),1.0E-08);
@@ -489,9 +489,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_matrix_fv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_matrix_fv_2ndDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   matrix_fv Y(3,3);
   Y << 1, 0, 0,
@@ -512,7 +512,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_matrix_fv_2ndDeriv) {
     6, 5, 4,
     7, 8, 9;
 
-  matrix_fv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_fv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Y(0,0).val(),Y(0,1).val(),Y(0,2).val(),Y(1,0).val(),Y(1,1).val(),Y(1,2).val());
   VEC h;
@@ -526,10 +526,10 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_matrix_fv_2ndDeriv) {
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_matrix_exceptions) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
   using stan::math::vector_d;
-  using stan::agrad::mdivide_left_tri_low;
+  using stan::math::mdivide_left_tri_low;
 
   vector_fv fv1(4), fv2(3);
   vector_d v1(4), v2(3);
@@ -545,8 +545,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_vector_matrix_exceptions) {
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_matrix_exceptions) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::mdivide_left_tri_low;
+  using stan::math::matrix_fv;
+  using stan::math::mdivide_left_tri_low;
 
   matrix_fv fvm1(4,4), fvm2(3,3);
   matrix_d vm1(4,4), vm2(3,3);
@@ -556,8 +556,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,fv_matrix_matrix_exceptions) {
   EXPECT_THROW(mdivide_left_tri_low(vm1,fvm2), std::invalid_argument);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_1stDeriv) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -579,7 +579,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_1stDeriv) {
     Z(1).d_ = 2.0;
     Z(2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val().val(),1.0E-08);
   EXPECT_NEAR(0,output(1,0).val_.val().val(), 1.0E-08);
@@ -599,8 +599,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_2ndDeriv_1) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -622,7 +622,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_2ndDeriv_1) {
     Z(1).d_ = 2.0;
     Z(2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -635,8 +635,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_2ndDeriv_1) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_2ndDeriv_2) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -658,7 +658,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_2ndDeriv_2) {
     Z(1).d_ = 2.0;
     Z(2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -671,8 +671,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_2ndDeriv_2) {
   EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_3rdDeriv) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -707,7 +707,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_3rdDeriv) {
     Z(2).val_.d_ = 1.0;
 
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -720,7 +720,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_3rdDeriv) {
   EXPECT_NEAR(0.0,h[5],1e-8);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_1stDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::vector_d;
 
   matrix_ffv Y(3,3);
@@ -740,7 +740,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_1stDeriv) {
    vector_d Z(3);
    Z << 1, 2, 3;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val().val(), 1.0E-08);
   EXPECT_NEAR(0,output(1,0).val_.val().val(), 1.0E-08);
@@ -760,7 +760,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_2ndDeriv_1) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::vector_d;
 
   matrix_ffv Y(3,3);
@@ -780,7 +780,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_2ndDeriv_1) {
    vector_d Z(3);
    Z << 1, 2, 3;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -793,7 +793,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_2ndDeriv_1) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_2ndDeriv_2) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::vector_d;
 
   matrix_ffv Y(3,3);
@@ -813,7 +813,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_2ndDeriv_2) {
    vector_d Z(3);
    Z << 1, 2, 3;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -826,7 +826,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_2ndDeriv_2) {
   EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_3rdDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::vector_d;
 
   matrix_ffv Y(3,3);
@@ -855,7 +855,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_3rdDeriv) {
    vector_d Z(3);
    Z << 1, 2, 3;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -869,8 +869,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_3rdDeriv) {
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_1stDeriv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -883,7 +883,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_1stDeriv) {
    Z(1).d_ = 2.0;
    Z(2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val().val(), 1.0E-08);
   EXPECT_NEAR(0,output(1,0).val_.val().val(), 1.0E-08);
@@ -901,8 +901,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_1stDeriv) {
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_2ndDeriv_1) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -915,7 +915,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_2ndDeriv_1) {
    Z(1).d_ = 2.0;
    Z(2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   AVEC q = createAVEC(Z(0).val().val(),Z(1).val().val(),Z(2).val().val());
   VEC h;
@@ -926,8 +926,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_2ndDeriv_1) {
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_2ndDeriv_2) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -940,7 +940,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_2ndDeriv_2) {
    Z(1).d_ = 2.0;
    Z(2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   AVEC q = createAVEC(Z(0).val().val(),Z(1).val().val(),Z(2).val().val());
   VEC h;
@@ -951,8 +951,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_2ndDeriv_2) {
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_3rdDeriv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -968,7 +968,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_3rdDeriv) {
    Z(1).val_.d_ = 1.0;
    Z(2).val_.d_ = 1.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Y,Z);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Y,Z);
 
   AVEC q = createAVEC(Z(0).val().val(),Z(1).val().val(),Z(2).val().val());
   VEC h;
@@ -978,8 +978,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_3rdDeriv) {
   EXPECT_NEAR(0.0,h[2],1e-8);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_1stDeriv) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -1009,7 +1009,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_1stDeriv) {
    Z(2,1).d_ = 2.0;
    Z(2,2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val().val(), 1.0E-08);
   EXPECT_NEAR(0,output(0,1).val_.val().val(),1.0E-08);
@@ -1041,8 +1041,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_2ndDeriv_1) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -1072,7 +1072,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_2ndDeriv_1) {
    Z(2,1).d_ = 2.0;
    Z(2,2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -1085,8 +1085,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_2ndDeriv_1) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_2ndDeriv_2) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -1116,7 +1116,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_2ndDeriv_2) {
    Z(2,1).d_ = 2.0;
    Z(2,2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -1129,8 +1129,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_2ndDeriv_2) {
   EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_3rdDeriv) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -1178,7 +1178,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_3rdDeriv) {
    Z(2,1).val_.d_ = 1.0;
    Z(2,2).val_.d_ = 1.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -1191,9 +1191,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_3rdDeriv) {
   EXPECT_NEAR(0.0,h[5],1e-8);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_1stDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -1214,7 +1214,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_1stDeriv) {
    Z(2,1).d_ = 2.0;
    Z(2,2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val().val(), 1.0E-08);
   EXPECT_NEAR(0,output(0,1).val_.val().val(),1.0E-08);
@@ -1246,9 +1246,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_1stDeriv) {
   EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_2ndDeriv_1) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -1269,7 +1269,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_2ndDeriv_1) {
    Z(2,1).d_ = 2.0;
    Z(2,2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Z(0,0).val().val(),Z(0,1).val().val(),Z(0,2).val().val(),Z(1,0).val().val(),Z(1,1).val().val(),Z(1,2).val().val());
   VEC h;
@@ -1282,9 +1282,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_2ndDeriv_1) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_2ndDeriv_2) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -1305,7 +1305,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_2ndDeriv_2) {
    Z(2,1).d_ = 2.0;
    Z(2,2).d_ = 2.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Z(0,0).val().val(),Z(0,1).val().val(),Z(0,2).val().val(),Z(1,0).val().val(),Z(1,1).val().val(),Z(1,2).val().val());
   VEC h;
@@ -1318,9 +1318,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_2ndDeriv_2) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_3rdDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_d Y(3,3);
   Y << 1, 0, 0,
@@ -1350,7 +1350,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_3rdDeriv) {
    Z(2,1).val_.d_ = 1.0;
    Z(2,2).val_.d_ = 1.0;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Z(0,0).val().val(),Z(0,1).val().val(),Z(0,2).val().val(),Z(1,0).val().val(),Z(1,1).val().val(),Z(1,2).val().val());
   VEC h;
@@ -1363,9 +1363,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_3rdDeriv) {
   EXPECT_NEAR(0.0,h[5],1e-8);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_1stDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -1386,7 +1386,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_1stDeriv) {
     6, 5, 4,
     7, 8, 9;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   EXPECT_NEAR(1.0,output(0,0).val_.val().val(), 1.0E-08);
   EXPECT_NEAR(0,output(0,1).val_.val().val(),1.0E-08);
@@ -1418,9 +1418,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_2ndDeriv_1) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -1441,7 +1441,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_2ndDeriv_1) {
     6, 5, 4,
     7, 8, 9;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -1454,9 +1454,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_2ndDeriv_1) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_2ndDeriv_2) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -1477,7 +1477,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_2ndDeriv_2) {
     6, 5, 4,
     7, 8, 9;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -1490,9 +1490,9 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_2ndDeriv_2) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_3rdDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv Y(3,3);
   Y << 1, 0, 0,
@@ -1522,7 +1522,7 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_3rdDeriv) {
     6, 5, 4,
     7, 8, 9;
 
-  matrix_ffv output = stan::agrad::mdivide_left_tri_low(Z,Y);
+  matrix_ffv output = stan::math::mdivide_left_tri_low(Z,Y);
 
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
@@ -1536,10 +1536,10 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_ffv_3rdDeriv) {
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_exceptions) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   using stan::math::vector_d;
-  using stan::agrad::mdivide_left_tri_low;
+  using stan::math::mdivide_left_tri_low;
 
   vector_ffv fv1(4), fv2(3);
   vector_d v1(4), v2(3);
@@ -1555,8 +1555,8 @@ TEST(AgradMixMatrixMdivideLeftTriLow,ffv_vector_matrix_exceptions) {
 }
 TEST(AgradMixMatrixMdivideLeftTriLow,ffv_matrix_matrix_exceptions) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::mdivide_left_tri_low;
+  using stan::math::matrix_ffv;
+  using stan::math::mdivide_left_tri_low;
 
   matrix_ffv fvm1(4,4), fvm2(3,3);
   matrix_d vm1(4,4), vm2(3,3);

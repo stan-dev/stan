@@ -9,8 +9,8 @@ TEST(AgradMixMatrixSize,fvar_var) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::size;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   vector<fvar<var> > y(6);
   EXPECT_EQ(6,size(y));
@@ -48,8 +48,8 @@ TEST(AgradMixMatrixSize,fvar_fvar_var) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::size;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   vector<fvar<fvar<var> > > y(6);
   EXPECT_EQ(6,size(y));

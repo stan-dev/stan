@@ -24,7 +24,7 @@ public:
     else
       y = in__.scalar_lub_constrain(0,1);
     
-    lp_accum__.add(stan::prob::uniform_log<propto__>(y, 0, 1));
+    lp_accum__.add(stan::math::uniform_log<propto__>(y, 0, 1));
     lp_accum__.add(lp__);
 
     return lp_accum__.sum();

@@ -7,7 +7,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class trunc_vari : public op_v_vari {
@@ -52,7 +52,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Truncation of the variable.
      */
-    inline var trunc(const stan::agrad::var& a) {
+    inline var trunc(const stan::math::var& a) {
       return var(new trunc_vari(a.vi_));
     }
 

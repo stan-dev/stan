@@ -15,8 +15,8 @@
 #include <stan/math/rev/scal/fun/value_of.hpp>
 
 TEST(AgradMixMatrixEigenvaluesSym, exceptions_matrix_fv) {
-  stan::agrad::matrix_fv m0;
-  stan::agrad::matrix_fv m1(2,3);
+  stan::math::matrix_fv m0;
+  stan::math::matrix_fv m1(2,3);
   m1 << 1, 2, 3, 4, 5, 6;
 
   using stan::math::eigenvalues_sym;
@@ -25,8 +25,8 @@ TEST(AgradMixMatrixEigenvaluesSym, exceptions_matrix_fv) {
 }
 
 TEST(AgradMixMatrixEigenvaluesSym, exceptions_matrix_ffv) {
-  stan::agrad::matrix_ffv m0;
-  stan::agrad::matrix_ffv m1(2,3);
+  stan::math::matrix_ffv m0;
+  stan::math::matrix_ffv m1(2,3);
   m1 << 1, 2, 3, 4, 5, 6;
 
   using stan::math::eigenvalues_sym;
@@ -35,15 +35,15 @@ TEST(AgradMixMatrixEigenvaluesSym, exceptions_matrix_ffv) {
 }
 
 TEST(AgradMixMatrixEigenvaluesSym, matrix_fv_1st_deriv) {
-  stan::agrad::matrix_fv m0;
-  stan::agrad::matrix_fv m1(2,2);
+  stan::math::matrix_fv m0;
+  stan::math::matrix_fv m1(2,2);
   m1 << 1, 2, 2,1;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
   m1(1,0).d_ = 1.0;
   m1(1,1).d_ = 1.0;
 
-  stan::agrad::vector_fv res0 = stan::math::eigenvalues_sym(m1);
+  stan::math::vector_fv res0 = stan::math::eigenvalues_sym(m1);
 
   EXPECT_FLOAT_EQ(-1, res0(0).val_.val());
   EXPECT_FLOAT_EQ(3, res0(1).val_.val());
@@ -59,15 +59,15 @@ TEST(AgradMixMatrixEigenvaluesSym, matrix_fv_1st_deriv) {
   EXPECT_FLOAT_EQ(0.5,h[3]);
 }
 TEST(AgradMixMatrixEigenvaluesSym, matrix_fv_2nd_deriv) {
-  stan::agrad::matrix_fv m0;
-  stan::agrad::matrix_fv m1(2,2);
+  stan::math::matrix_fv m0;
+  stan::math::matrix_fv m1(2,2);
   m1 << 1, 2, 2,1;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
   m1(1,0).d_ = 1.0;
   m1(1,1).d_ = 1.0;
 
-  stan::agrad::vector_fv res0 = stan::math::eigenvalues_sym(m1);
+  stan::math::vector_fv res0 = stan::math::eigenvalues_sym(m1);
 
   EXPECT_FLOAT_EQ(-1, res0(0).val_.val());
   EXPECT_FLOAT_EQ(3, res0(1).val_.val());
@@ -85,15 +85,15 @@ TEST(AgradMixMatrixEigenvaluesSym, matrix_fv_2nd_deriv) {
 
 
 TEST(AgradMixMatrixEigenvaluesSym, matrix_ffv_1st_deriv) {
-  stan::agrad::matrix_ffv m0;
-  stan::agrad::matrix_ffv m1(2,2);
+  stan::math::matrix_ffv m0;
+  stan::math::matrix_ffv m1(2,2);
   m1 << 1, 2, 2,1;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
   m1(1,0).d_ = 1.0;
   m1(1,1).d_ = 1.0;
 
-  stan::agrad::vector_ffv res0 = stan::math::eigenvalues_sym(m1);
+  stan::math::vector_ffv res0 = stan::math::eigenvalues_sym(m1);
 
   EXPECT_FLOAT_EQ(-1, res0(0).val_.val_.val());
   EXPECT_FLOAT_EQ(3, res0(1).val_.val_.val());
@@ -109,15 +109,15 @@ TEST(AgradMixMatrixEigenvaluesSym, matrix_ffv_1st_deriv) {
   EXPECT_FLOAT_EQ(0.5,h[3]);
 }
 TEST(AgradMixMatrixEigenvaluesSym, matrix_ffv_2nd_deriv) {
-  stan::agrad::matrix_ffv m0;
-  stan::agrad::matrix_ffv m1(2,2);
+  stan::math::matrix_ffv m0;
+  stan::math::matrix_ffv m1(2,2);
   m1 << 1, 2, 2,1;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
   m1(1,0).d_ = 1.0;
   m1(1,1).d_ = 1.0;
 
-  stan::agrad::vector_ffv res0 = stan::math::eigenvalues_sym(m1);
+  stan::math::vector_ffv res0 = stan::math::eigenvalues_sym(m1);
 
   EXPECT_FLOAT_EQ(-1, res0(0).val_.val_.val());
   EXPECT_FLOAT_EQ(3, res0(1).val_.val_.val());
@@ -133,8 +133,8 @@ TEST(AgradMixMatrixEigenvaluesSym, matrix_ffv_2nd_deriv) {
   EXPECT_NEAR(1.110223e-16,h[3],1e-8);
 }
 TEST(AgradMixMatrixEigenvaluesSym, matrix_ffv_3rd_deriv) {
-  stan::agrad::matrix_ffv m0;
-  stan::agrad::matrix_ffv m1(2,2);
+  stan::math::matrix_ffv m0;
+  stan::math::matrix_ffv m1(2,2);
   m1 << 1, 2, 2,1;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
@@ -145,7 +145,7 @@ TEST(AgradMixMatrixEigenvaluesSym, matrix_ffv_3rd_deriv) {
   m1(1,0).val_.d_ = 1.0;
   m1(1,1).val_.d_ = 1.0;
 
-  stan::agrad::vector_ffv res0 = stan::math::eigenvalues_sym(m1);
+  stan::math::vector_ffv res0 = stan::math::eigenvalues_sym(m1);
 
   EXPECT_FLOAT_EQ(-1, res0(0).val_.val_.val());
   EXPECT_FLOAT_EQ(3, res0(1).val_.val_.val());

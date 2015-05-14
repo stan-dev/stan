@@ -15,12 +15,13 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_inv_scale>
     typename return_type<T_y, T_inv_scale>::type
@@ -29,13 +30,15 @@ namespace stan {
         typename stan::partials_return_type<T_y, T_inv_scale>::type
         T_partials_return;
 
-      static const char* function("stan::prob::exponential_cdf_log");
+      static const char* function("stan::math::exponential_cdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
+      using std::log;
+      using std::exp;
 
       T_partials_return cdf_log(0.0);
       // check if any vectors are zero length
@@ -47,7 +50,7 @@ namespace stan {
       check_nonnegative(function, "Random variable", y);
       check_positive_finite(function, "Inverse scale parameter", beta);
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale>
+      OperandsAndPartials<T_y, T_inv_scale>
         operands_and_partials(y, beta);
 
       VectorView<const T_y> y_vec(y);

@@ -6,7 +6,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCcdfLogLognormal : public AgradCcdfLogTest {
 public:
@@ -74,7 +74,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::lognormal_ccdf_log(y, mu, sigma);
+    return stan::math::lognormal_ccdf_log(y, mu, sigma);
   }
   
   template <typename T_y, typename T_loc, typename T_scale,

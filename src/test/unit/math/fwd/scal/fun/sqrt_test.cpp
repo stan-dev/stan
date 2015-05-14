@@ -4,7 +4,7 @@
 #include <stan/math/fwd/scal/fun/sinh.hpp>
 
 TEST(AgradFwdSqrt, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::sqrt;
   using std::isnan;
 
@@ -42,7 +42,7 @@ TEST(AgradFwdSqrt, Fvar) {
 }
 
 TEST(AgradFwdSqrt, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::sqrt;
 
   fvar<fvar<double> > x;

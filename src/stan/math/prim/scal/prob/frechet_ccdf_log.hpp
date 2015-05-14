@@ -18,12 +18,13 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y, T_shape, T_scale>::type
@@ -31,7 +32,7 @@ namespace stan {
       typedef typename stan::partials_return_type<T_y, T_shape, T_scale>::type
         T_partials_return;
 
-      static const char* function("stan::prob::frechet_ccdf_log");
+      static const char* function("stan::math::frechet_ccdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_positive;
@@ -50,10 +51,12 @@ namespace stan {
       check_positive_finite(function, "Shape parameter", alpha);
       check_positive_finite(function, "Scale parameter", sigma);
 
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale>
+      OperandsAndPartials<T_y, T_shape, T_scale>
         operands_and_partials(y, alpha, sigma);
 
       using stan::math::log1m;
+      using std::log;
+      using std::exp;
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);
       VectorView<const T_shape> alpha_vec(alpha);

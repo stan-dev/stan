@@ -17,8 +17,8 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 
 TEST(AgradFwdGammaQ, Fvar){
-  using stan::agrad::fvar;
-  using stan::agrad::gamma_q;
+  using stan::math::fvar;
+  using stan::math::gamma_q;
   using boost::math::gamma_q;
 
   fvar<double> x(0.5);
@@ -46,7 +46,7 @@ TEST(AgradFwdGammaQ, Fvar){
 }
 
 TEST(AgradFwdGammaQ, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::gamma_q;
 
   fvar<fvar<double> > x;

@@ -12,12 +12,11 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <cmath>
 #include <limits>
 
-
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y, T_scale, T_shape>::type
@@ -31,7 +30,7 @@ namespace stan {
         return 0.0;
 
       // Check errors
-      static const char* function("stan::prob::pareto_ccdf_log");
+      static const char* function("stan::math::pareto_ccdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
@@ -39,6 +38,8 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
+      using std::log;
+      using std::exp;
 
       T_partials_return P(0.0);
 
@@ -57,7 +58,7 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, y_min, alpha);
 
-      agrad::OperandsAndPartials<T_y, T_scale, T_shape>
+      OperandsAndPartials<T_y, T_scale, T_shape>
         operands_and_partials(y, y_min, alpha);
 
       // Explicit return for extreme values

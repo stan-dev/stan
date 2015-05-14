@@ -8,7 +8,7 @@
 
 class AgradFwdExp2 : public testing::Test {
   void SetUp() {
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
   }
 };
 
@@ -16,8 +16,8 @@ class AgradFwdExp2 : public testing::Test {
 
 
 TEST_F(AgradFwdExp2,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::exp2;
   using std::log;
 
@@ -34,8 +34,8 @@ TEST_F(AgradFwdExp2,FvarVar_1stDeriv) {
 }
 
 TEST_F(AgradFwdExp2,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::exp2;
   using std::log;
 
@@ -50,8 +50,8 @@ TEST_F(AgradFwdExp2,FvarVar_2ndDeriv) {
 
 
 TEST_F(AgradFwdExp2,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::exp2;
   using std::log;
 
@@ -69,7 +69,7 @@ TEST_F(AgradFwdExp2,FvarFvarVar_1stDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.val_.grad(p,g);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   EXPECT_FLOAT_EQ(exp2(0.5) * log(2), g[0]);
 
   fvar<fvar<var> > y;
@@ -89,8 +89,8 @@ TEST_F(AgradFwdExp2,FvarFvarVar_1stDeriv) {
 }
 
 TEST_F(AgradFwdExp2,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::exp2;
   using std::log;
 
@@ -108,7 +108,7 @@ TEST_F(AgradFwdExp2,FvarFvarVar_2ndDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.d_.grad(p,g);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 
   EXPECT_FLOAT_EQ(exp2(0.5) * log(2) * log(2), g[0]);
 
@@ -129,8 +129,8 @@ TEST_F(AgradFwdExp2,FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(exp2(0.5) * log(2) * log(2), r[0]);
 }
 TEST_F(AgradFwdExp2,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::exp;
 
   fvar<fvar<var> > x;

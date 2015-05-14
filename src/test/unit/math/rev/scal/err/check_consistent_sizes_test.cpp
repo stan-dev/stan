@@ -15,7 +15,7 @@ TEST(AgradRevErrorHandlingScalar, checkConsistentSizes) {
   using Eigen::Dynamic;
   using stan::math::check_consistent_sizes;
   using stan::size_of;
-  using stan::agrad::var;
+  using stan::math::var;
 
   const char* function = "testConsSizes";
   const char* name1 = "name1";
@@ -59,11 +59,11 @@ TEST(AgradRevErrorHandlingScalar, checkConsistentSizes) {
                std::invalid_argument);
   EXPECT_THROW(check_consistent_sizes(function, name, v, name2, v2, name3, v3, name, v),
                std::invalid_argument);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckConsistentSizeVarCheckVectorized) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using stan::math::check_consistent_sizes;
 
@@ -77,12 +77,12 @@ TEST(AgradRevErrorHandlingScalar, CheckConsistentSizeVarCheckVectorized) {
    a.push_back(var(i));
   }
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(10U,stack_size);
   EXPECT_TRUE(check_consistent_sizes(function,"a",a,"b",b));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(10U,stack_size_after_call);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }

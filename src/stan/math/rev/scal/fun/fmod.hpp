@@ -7,7 +7,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class fmod_vv_vari : public op_vv_vari {

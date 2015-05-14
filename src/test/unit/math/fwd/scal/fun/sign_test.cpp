@@ -3,7 +3,7 @@
 #include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdSign, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   fvar<double> x;
   x = 0;
   EXPECT_EQ(0, stan::math::sign(x));
@@ -14,7 +14,7 @@ TEST(AgradFwdSign, Fvar) {
 }
 
 TEST(AgradFwdSign, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::sign;
 
   fvar<fvar<double> > x;

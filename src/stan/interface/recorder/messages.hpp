@@ -6,7 +6,7 @@
 
 namespace stan {
   namespace interface {
-    namespace recorder { 
+    namespace recorder {
       class messages: public recorder {
       private:
         std::ostream *o_;

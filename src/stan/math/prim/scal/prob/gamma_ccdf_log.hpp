@@ -19,16 +19,16 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_shape, typename T_inv_scale>
     typename return_type<T_y, T_shape, T_inv_scale>::type
@@ -43,7 +43,7 @@ namespace stan {
         T_partials_return;
 
       // Error checks
-      static const char* function("stan::prob::gamma_ccdf_log");
+      static const char* function("stan::math::gamma_ccdf_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
@@ -53,6 +53,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
+      using std::exp;
 
       T_partials_return P(0.0);
 
@@ -71,7 +72,7 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
 
-      agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale>
+      OperandsAndPartials<T_y, T_shape, T_inv_scale>
         operands_and_partials(y, alpha, beta);
 
       // Explicit return for extreme values
@@ -88,6 +89,7 @@ namespace stan {
       using boost::math::tgamma;
       using std::exp;
       using std::pow;
+      using std::log;
 
       // Cache a few expensive function calls if nu is a parameter
       VectorBuilder<!is_constant_struct<T_shape>::value,

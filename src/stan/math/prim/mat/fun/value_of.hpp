@@ -12,7 +12,7 @@ namespace stan {
      * Convert a matrix of type T to a matrix of doubles.
      *
      * T must implement value_of. See
-     * test/agrad/fwd/matrix/value_of.cpp for fvar and var usage.
+     * test/math/fwd/mat/fun/value_of.cpp for fvar and var usage.
      *
      * @tparam T Scalar type in matrix
      * @tparam R Rows of matrix

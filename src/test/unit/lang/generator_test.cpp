@@ -137,7 +137,7 @@ TEST(lang, logProbPolymorphismVar) {
   using std::vector;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::math::var;
 
   std::string txt = "foo <- 3\nbar <- 4";
   std::stringstream in(txt);
