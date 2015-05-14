@@ -8,7 +8,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionWiener : public AgradDistributionTest {
  public:
@@ -82,7 +82,7 @@ class AgradDistributionWiener : public AgradDistributionTest {
   typename stan::return_type<T_y, T_alpha, T_tau, T_beta, T_delta>::type
   log_prob(const T_y& y, const T_alpha& alpha, const T_tau& tau,
            const T_beta& beta, const T_delta& delta, const T5&) {
-    return stan::prob::wiener_log(y, alpha, tau, beta, delta);
+    return stan::math::wiener_log(y, alpha, tau, beta, delta);
   }
 
   template <bool propto,
@@ -91,7 +91,7 @@ class AgradDistributionWiener : public AgradDistributionTest {
   typename stan::return_type<T_y, T_alpha, T_tau, T_beta, T_delta>::type
   log_prob(const T_y& y, const T_alpha& alpha, const T_tau& tau,
            const T_beta& beta, const T_delta& delta, const T5&) {
-    return stan::prob::wiener_log<propto>(y, alpha, tau, beta, delta);
+    return stan::math::wiener_log<propto>(y, alpha, tau, beta, delta);
   }
 
 
@@ -100,13 +100,13 @@ class AgradDistributionWiener : public AgradDistributionTest {
   typename stan::return_type<T_y, T_alpha, T_tau, T_beta, T_delta, T5>::type
   log_prob_function(const T_y& y, const T_alpha& alpha, const T_tau& tau,
            const T_beta& beta, const T_delta& delta, const T5&) {
-    using stan::prob::include_summand;
+    using stan::math::include_summand;
     using stan::math::pi;
     using stan::math::square;
     using boost::math::tools::promote_args;
 
     // FIXME
-    return stan::prob::wiener_log<true>(y, alpha, tau, beta, delta);
+    return stan::math::wiener_log<true>(y, alpha, tau, beta, delta);
   }
 };
 

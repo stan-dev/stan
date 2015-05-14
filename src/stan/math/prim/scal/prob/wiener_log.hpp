@@ -44,7 +44,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
     /**
      * The log of the first passage time density function for a (Wiener) drift diffusion model for the given $y$,
      * boundary separation $\alpha$, nondecision time $\tau$, relative bias $\beta$, and drift rate $\delta$.
@@ -70,7 +70,7 @@ namespace stan {
      typename return_type<T_y, T_alpha, T_tau, T_beta, T_delta>::type
      wiener_log(const T_y& y, const T_alpha& alpha, const T_tau& tau,
        const T_beta& beta, const T_delta& delta) {
-      static const char* function("stan::prob::wiener_log(%1%)");
+      static const char* function("stan::math::wiener_log(%1%)");
 
       using stan::math::check_not_nan;
       using stan::math::check_finite;
@@ -81,6 +81,8 @@ namespace stan {
       using boost::math::tools::promote_args;
       using boost::math::isinf;
       using boost::math::isfinite;
+      using std::log;
+      using std::exp;
 
       if (!(stan::length(y)
         && stan::length(alpha)
@@ -174,7 +176,7 @@ namespace stan {
             tmp += (one_minus_beta + 2.0 * k) *
                     exp(-(pow((one_minus_beta + 2.0 * k), 2)) / 2.0 / x);
             // add constant term
-            tmp = log(tmp) - 0.5 * log(2.0) - MY_LN_SQRT_PI - 1.5 * log(x);
+            tmp = log(tmp) - 0.5 * LOG_TWO - MY_LN_SQRT_PI - 1.5 * log(x);
         } else {  // if large t is better...
           K = ceil(kl);  // round to smallest integer meeting error
           for (k = 1; k <= K; k++)
@@ -211,8 +213,8 @@ namespace stan {
          const double delta,
                      RNG& rng) {
       using boost::variate_generator;
-      double a = tau+alpha*beta/stan::prob::normal_rng(delta,1,rng); 
-      //stan::prob::wiener_rng(alpha, tau, beta, delta, rng);
+      double a = tau+alpha*beta/stan::math::normal_rng(delta,1,rng);
+      //stan::math::wiener_rng(alpha, tau, beta, delta, rng);
       return a;
     }
     */
