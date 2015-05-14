@@ -5,7 +5,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     class op_vvv_vari : public vari {
     protected:

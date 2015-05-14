@@ -1,17 +1,22 @@
 #include <gtest/gtest.h>
-#include <boost/math/special_functions/digamma.hpp>
-#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
+#include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
+#include <stan/math/fwd/scal/fun/exp.hpp>
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/fwd/scal/fun/falling_factorial.hpp>
 #include <stan/math/fwd/scal/fun/floor.hpp>
+#include <stan/math/fwd/scal/fun/lgamma.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
+#include <stan/math/fwd/scal/fun/pow.hpp>
+#include <stan/math/fwd/scal/fun/sin.hpp>
 #include <stan/math/fwd/scal/fun/tan.hpp>
+#include <stan/math/fwd/scal/fun/trunc.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
+#include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdFallingFactorial,Fvar) {
-  using stan::agrad::fvar;
-  using stan::agrad::falling_factorial;
+  using stan::math::fvar;
+  using stan::math::falling_factorial;
   using boost::math::digamma;
 
   fvar<double> a(4.0,1.0);
@@ -35,7 +40,7 @@ TEST(AgradFwdFallingFactorial,Fvar) {
 }
 
 TEST(AgradFwdFallingFactorial,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::falling_factorial;
 
   fvar<fvar<double> > x;

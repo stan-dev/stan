@@ -4,7 +4,7 @@
 #include <stan/math/rev/scal/fun/fabs.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Return the absolute value of the variable (std).

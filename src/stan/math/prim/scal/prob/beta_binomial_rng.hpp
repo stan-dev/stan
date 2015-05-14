@@ -12,7 +12,6 @@
 #include <stan/math/prim/scal/fun/lgamma.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/prob/binomial_rng.hpp>
 #include <stan/math/prim/scal/prob/beta_rng.hpp>
 #include <stan/math/prim/scal/fun/F32.hpp>
@@ -20,7 +19,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline int
@@ -28,7 +27,7 @@ namespace stan {
                       const double alpha,
                       const double beta,
                       RNG& rng) {
-      static const char* function("stan::prob::beta_binomial_rng");
+      static const char* function("stan::math::beta_binomial_rng");
 
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
@@ -39,10 +38,10 @@ namespace stan {
       check_positive_finite(function,
                             "Second prior sample size parameter", beta);
 
-      double a = stan::prob::beta_rng(alpha, beta, rng);
+      double a = stan::math::beta_rng(alpha, beta, rng);
       while (a > 1 || a < 0)
-        a = stan::prob::beta_rng(alpha, beta, rng);
-      return stan::prob::binomial_rng(N, a, rng);
+        a = stan::math::beta_rng(alpha, beta, rng);
+      return stan::math::binomial_rng(N, a, rng);
     }
   }
 }

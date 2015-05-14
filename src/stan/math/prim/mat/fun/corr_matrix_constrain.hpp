@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the correlation matrix of the specified dimensionality

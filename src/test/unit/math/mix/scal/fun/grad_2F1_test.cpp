@@ -9,7 +9,7 @@
 #include <stan/math/rev/scal/fun/value_of.hpp>
 
 TEST(ProbInternalMath, grad2F1_fd1) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> a = 2.0;
   a.d_ = 1.0;
@@ -25,7 +25,7 @@ TEST(ProbInternalMath, grad2F1_fd1) {
   EXPECT_NEAR(-0.461773435230326182245722531773361592054302268779753796048,gradC.val_,1e-6);
 }
 TEST(ProbInternalMath, grad2F1_fd2) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> a = 2.0;
   fvar<double> b = 1.0;
@@ -41,7 +41,7 @@ TEST(ProbInternalMath, grad2F1_fd2) {
   EXPECT_NEAR(0.5744063304437309685867184312646717864627845936245830896889,gradC.d_,1e-5);
 }
 TEST(ProbInternalMath, grad2F1_ffd1) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 2.0;
   a.d_ = 1.0;
@@ -57,7 +57,7 @@ TEST(ProbInternalMath, grad2F1_ffd1) {
   EXPECT_NEAR(-0.46177343523032618224572253177336159205430226877975379604859,gradC.val_.val_, 1e-6);
 }
 TEST(ProbInternalMath, grad2F1_ffd2) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 2.0;
   fvar<fvar<double> > b = 1.0;
@@ -74,8 +74,8 @@ TEST(ProbInternalMath, grad2F1_ffd2) {
 }
 
 TEST(ProbInternalMath, grad2F1_fv1) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 2.0;
   a.d_ = 1.0;
@@ -90,8 +90,8 @@ TEST(ProbInternalMath, grad2F1_fv1) {
   EXPECT_NEAR(-0.4617734352303261822457225317733615920543022687797537960, gradC.val_.val(),1e-6);
 }
 TEST(ProbInternalMath, grad2F1_fv2) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 2.0;
   fvar<var> b = 1.0;
@@ -107,8 +107,8 @@ TEST(ProbInternalMath, grad2F1_fv2) {
 }
 
 TEST(ProbInternalMath, grad2F1_fv_1stderiv1) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 2.0;
   a.d_ = 1.0;
@@ -125,8 +125,8 @@ TEST(ProbInternalMath, grad2F1_fv_1stderiv1) {
   EXPECT_NEAR(0.163714876516383746459968120418298168600425943651588679302872,grad1[0],1e-5);
 }
 TEST(ProbInternalMath, grad2F1_fv_1stderiv2) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 2.0;
   fvar<var> b = 1.0;
@@ -144,8 +144,8 @@ TEST(ProbInternalMath, grad2F1_fv_1stderiv2) {
 }
 
 TEST(ProbInternalMath, grad2F1_fv_2ndderiv1) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 2.0;
   a.d_ = 1.0;
@@ -163,8 +163,8 @@ TEST(ProbInternalMath, grad2F1_fv_2ndderiv1) {
 }
 
 TEST(ProbInternalMath, grad2F1_fv_2ndderiv2) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a = 2.0;
   fvar<var> b = 1.0;

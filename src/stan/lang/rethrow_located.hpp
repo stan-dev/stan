@@ -54,7 +54,7 @@ namespace stan {
        * @param[in] orig_type Original type.
        */
       located_exception(const std::string& what,
-                        const std::string& orig_type) throw() 
+                        const std::string& orig_type) throw()
         : what_(what + " [origin: " + orig_type + "]") {
       }
 
@@ -70,7 +70,7 @@ namespace stan {
        *
        * @return Description of exception.
        */
-      const char* what() const throw() { 
+      const char* what() const throw() {
         return what_.c_str();
       }
 
@@ -106,7 +106,7 @@ namespace stan {
       using std::exception;
 
       std::stringstream o;
-      o << "Exception thrown at line " << line << ":" 
+      o << "Exception thrown at line " << line << ":"
         << std::endl
         << e.what();
       std::string s = o.str();

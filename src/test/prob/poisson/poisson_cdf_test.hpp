@@ -3,7 +3,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCdfPoisson : public AgradCdfTest {
 public:
@@ -51,7 +51,7 @@ public:
   typename stan::return_type<T_rate>::type
   cdf(const T_n& n, const T_rate& lambda, const T2&,
       const T3&, const T4&, const T5&) {
-    return stan::prob::poisson_cdf(n, lambda);
+    return stan::math::poisson_cdf(n, lambda);
   }
 
 
@@ -61,11 +61,11 @@ public:
   cdf_function(const T_n& n, const T_rate& lambda, const T2&,
                const T3&, const T4&, const T5&) {
     using std::pow;
-    using stan::agrad::pow;
-    using stan::agrad::lgamma;
+    using stan::math::pow;
+    using stan::math::lgamma;
     using boost::math::lgamma;
     using std::exp;
-    using stan::agrad::exp;
+    using stan::math::exp;
     using std::log;
     
     typename stan::return_type<T_rate>::type cdf(0);

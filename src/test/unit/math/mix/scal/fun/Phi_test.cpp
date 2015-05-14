@@ -13,25 +13,25 @@
 #include <stan/math/rev/scal/fun/exp.hpp>
 
 TEST(AgradFwdPhi, FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::Phi;
 
   fvar<var> x(1.0,1.3);
   fvar<var> a = Phi(x);
 
   EXPECT_FLOAT_EQ(Phi(1.0), a.val_.val());
-  EXPECT_FLOAT_EQ(1.3 * exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), 
+  EXPECT_FLOAT_EQ(1.3 * exp(stan::math::normal_log<false>(1.0,0.0,1.0)), 
                   a.d_.val());
 
   AVEC y = createAVEC(x.val_);
   VEC g;
   a.val_.grad(y,g);
-  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), g[0]);
+  EXPECT_FLOAT_EQ(exp(stan::math::normal_log<false>(1.0,0.0,1.0)), g[0]);
 }
 TEST(AgradFwdPhi, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::Phi;
 
   fvar<var> x(1.0,1.3);
@@ -40,13 +40,13 @@ TEST(AgradFwdPhi, FvarVar_2ndDeriv) {
   AVEC y = createAVEC(x.val_);
   VEC g;
   a.d_.grad(y,g);
-  EXPECT_FLOAT_EQ(-1.3 * exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), g[0]);
+  EXPECT_FLOAT_EQ(-1.3 * exp(stan::math::normal_log<false>(1.0,0.0,1.0)), g[0]);
 }
 
 TEST(AgradFwdPhi, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::Phi;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 1.0;
@@ -55,7 +55,7 @@ TEST(AgradFwdPhi, FvarFvarVar_1stDeriv) {
   fvar<fvar<var> > a = Phi(x);
 
   EXPECT_FLOAT_EQ(Phi(1.0), a.val_.val_.val());
-  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), 
+  EXPECT_FLOAT_EQ(exp(stan::math::normal_log<false>(1.0,0.0,1.0)), 
                   a.val_.d_.val());
   EXPECT_FLOAT_EQ(0, a.d_.val_.val());
   EXPECT_FLOAT_EQ(0, a.d_.d_.val());
@@ -63,7 +63,7 @@ TEST(AgradFwdPhi, FvarFvarVar_1stDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.val_.grad(p,g);
-  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), g[0]);
+  EXPECT_FLOAT_EQ(exp(stan::math::normal_log<false>(1.0,0.0,1.0)), g[0]);
 
   fvar<fvar<var> > y;
   y.val_.val_ = 1.0;
@@ -72,20 +72,20 @@ TEST(AgradFwdPhi, FvarFvarVar_1stDeriv) {
   fvar<fvar<var> > b = Phi(y);
   EXPECT_FLOAT_EQ(Phi(1.0), b.val_.val_.val());
   EXPECT_FLOAT_EQ(0, b.val_.d_.val());
-  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)),
+  EXPECT_FLOAT_EQ(exp(stan::math::normal_log<false>(1.0,0.0,1.0)),
                   b.d_.val_.val());
   EXPECT_FLOAT_EQ(0, b.d_.d_.val());
 
   AVEC q = createAVEC(y.val_.val_);
   VEC r;
   b.val_.val_.grad(q,r);
-  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), r[0]);
+  EXPECT_FLOAT_EQ(exp(stan::math::normal_log<false>(1.0,0.0,1.0)), r[0]);
 }
 
 TEST(AgradFwdPhi, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::Phi;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 1.0;
@@ -96,7 +96,7 @@ TEST(AgradFwdPhi, FvarFvarVar_2ndDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(-exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), g[0]);
+  EXPECT_FLOAT_EQ(-exp(stan::math::normal_log<false>(1.0,0.0,1.0)), g[0]);
 
   fvar<fvar<var> > y;
   y.val_.val_ = 1.0;
@@ -107,12 +107,12 @@ TEST(AgradFwdPhi, FvarFvarVar_2ndDeriv) {
   AVEC q = createAVEC(y.val_.val_);
   VEC r;
   b.d_.val_.grad(q,r);
-  EXPECT_FLOAT_EQ(-exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), r[0]);
+  EXPECT_FLOAT_EQ(-exp(stan::math::normal_log<false>(1.0,0.0,1.0)), r[0]);
 }
 TEST(AgradFwdPhi, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::Phi;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.0;

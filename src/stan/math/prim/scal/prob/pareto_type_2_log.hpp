@@ -12,14 +12,14 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     // pareto_type_2(y|lambda, alpha)  [y >= 0;  lambda > 0;  alpha > 0]
     template <bool propto,
@@ -27,7 +27,7 @@ namespace stan {
     typename return_type<T_y, T_loc, T_scale, T_shape>::type
     pareto_type_2_log(const T_y& y, const T_loc& mu, const T_scale& lambda,
                       const T_shape& alpha) {
-      static const char* function("stan::prob::pareto_type_2_log");
+      static const char* function("stan::math::pareto_type_2_log");
       typedef
         typename stan::partials_return_type<T_y, T_loc, T_scale, T_shape>::type
         T_partials_return;
@@ -40,6 +40,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
+      using std::log;
 
       // check if any vectors are zero length
       if (!(stan::length(y)
@@ -73,7 +74,7 @@ namespace stan {
       size_t N = max_size(y, mu, lambda, alpha);
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
+      OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
         operands_and_partials(y, mu, lambda, alpha);
 
       VectorBuilder<include_summand<propto, T_y, T_loc, T_scale, T_shape>

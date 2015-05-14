@@ -10,7 +10,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
 
     // MATRIX TRANSFORMS +/- JACOBIANS

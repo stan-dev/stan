@@ -7,7 +7,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsFrechet : public AgradDistributionTest {
 public:
@@ -58,7 +58,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::frechet_log(y, alpha, sigma);
+    return stan::math::frechet_log(y, alpha, sigma);
   }
 
   template <bool propto, 
@@ -67,7 +67,7 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::frechet_log<propto>(y, alpha, sigma);
+    return stan::math::frechet_log<propto>(y, alpha, sigma);
   }
   
   
@@ -81,7 +81,7 @@ public:
     using std::pow;
     using stan::math::multiply_log;
     using stan::math::value_of;
-    using stan::prob::include_summand;
+    using stan::math::include_summand;
     
     return log(alpha) + multiply_log(alpha, sigma) 
       - multiply_log(alpha+1, y) - pow(sigma / y, alpha);
@@ -89,7 +89,7 @@ public:
 };
 
 TEST(ProbDistributionsFrechet,Cumulative) {
-  using stan::prob::frechet_cdf;
+  using stan::math::frechet_cdf;
   using std::numeric_limits;
   EXPECT_FLOAT_EQ(0.6065306597, frechet_cdf(2.0,1.0,1.0));
   EXPECT_FLOAT_EQ(2.744338423e-5, frechet_cdf(0.8,2.9,1.8));

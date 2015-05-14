@@ -47,7 +47,7 @@
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op,
                           (stan::lang::expression, expr_)
-                          (std::vector<std::vector<stan::lang::expression> >, 
+                          (std::vector<std::vector<stan::lang::expression> >,
                            dimss_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
@@ -72,7 +72,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_literal,
                           (stan::lang::expr_type,type_) )
 
 
-namespace stan { 
+namespace stan {
 
   namespace lang {
 
@@ -108,15 +108,15 @@ namespace stan {
         if (ode_fun.y0_.expression_type() != expr_type(DOUBLE_T,1)) {
           error_msgs << "second argument to integrate_ode must be type real[]"
                      << " for intial system state"
-                     << "; found type=" 
+                     << "; found type="
                      << ode_fun.y0_.expression_type()
                      << ". ";
           pass = false;
-        } 
+        }
         if (!ode_fun.t0_.expression_type().is_primitive()) {
           error_msgs << "third argument to integrate_ode must be type real or int"
                      << " for initial time"
-                     << "; found type=" 
+                     << "; found type="
                      << ode_fun.t0_.expression_type()
                      << ". ";
           pass = false;
@@ -124,7 +124,7 @@ namespace stan {
         if (ode_fun.ts_.expression_type() != expr_type(DOUBLE_T,1)) {
           error_msgs << "fourth argument to integrate_ode must be type real[]"
                      << " for requested solution times"
-                     << "; found type=" 
+                     << "; found type="
                      << ode_fun.ts_.expression_type()
                      << ". ";
           pass = false;
@@ -132,7 +132,7 @@ namespace stan {
         if (ode_fun.theta_.expression_type() != expr_type(DOUBLE_T,1)) {
           error_msgs << "fifth argument to integrate_ode must be type real[]"
                      << " for parameters"
-                     << "; found type=" 
+                     << "; found type="
                      << ode_fun.theta_.expression_type()
                      << ". ";
           pass = false;
@@ -140,7 +140,7 @@ namespace stan {
         if (ode_fun.x_.expression_type() != expr_type(DOUBLE_T,1)) {
           error_msgs << "sixth argument to integrate_ode must be type real[]"
                      << " for real data;"
-                     << " found type=" 
+                     << " found type="
                      << ode_fun.x_.expression_type()
                      << ". ";
           pass = false;
@@ -148,7 +148,7 @@ namespace stan {
         if (ode_fun.x_int_.expression_type() != expr_type(INT_T,1)) {
           error_msgs << "seventh argument to integrate_ode must be type int[]"
                      << " for integer data;"
-                     << " found type=" 
+                     << " found type="
                      << ode_fun.x_int_.expression_type()
                      << ". ";
           pass = false;
@@ -173,7 +173,7 @@ namespace stan {
       }
     };
     boost::phoenix::function<validate_integrate_ode> validate_integrate_ode_f;
-    
+
     struct set_fun_type {
       template <typename T1, typename T2>
       struct result { typedef fun type; };
@@ -213,7 +213,7 @@ namespace stan {
         }
 
 
-        if (has_rng_suffix(fun.name_)) {  
+        if (has_rng_suffix(fun.name_)) {
           if (!( var_origin == derived_origin
                  || var_origin == function_argument_origin_rng )) {
             error_msgs << "random number generators only allowed in"
@@ -233,7 +233,7 @@ namespace stan {
           // that's only viable context
           if (!( var_origin == parameter_origin
                  || var_origin == transformed_parameter_origin
-                 || var_origin == function_argument_origin_lp 
+                 || var_origin == function_argument_origin_lp
                  || var_origin == local_origin )) {
             error_msgs << "lp suffixed functions only allowed in"
                        << " transformed parameter, function argument, or model"
@@ -246,8 +246,8 @@ namespace stan {
           }
         }
 
-        if (fun.name_ == "abs" 
-            && fun.args_.size() > 0 
+        if (fun.name_ == "abs"
+            && fun.args_.size() > 0
             && fun.args_[0].expression_type().is_primitive_double()) {
           error_msgs << "Warning: Function abs(real) is deprecated."
                      << std::endl
@@ -256,7 +256,7 @@ namespace stan {
                      << "         Use fabs(real) instead."
                      << std::endl << std::endl;
         }
-        
+
         if (fun.name_ == "lkj_cov_log") {
           error_msgs << "Warning: the lkj_cov_log() function"
                      << " is deprecated.  It will be removed in Stan 3."
@@ -272,7 +272,7 @@ namespace stan {
       }
     };
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
- 
+
     struct exponentiation_expr {
       template <typename T1, typename T2, typename T3, typename T4, typename T5>
       struct result { typedef void type; };
@@ -283,12 +283,12 @@ namespace stan {
                       bool& pass,
                       std::ostream& error_msgs) const {
 
-        if (!expr1.expression_type().is_primitive() 
+        if (!expr1.expression_type().is_primitive()
             || !expr2.expression_type().is_primitive()) {
           error_msgs << "arguments to ^ must be primitive (real or int)"
                      << "; cannot exponentiate "
                      << expr1.expression_type()
-                     << " by " 
+                     << " by "
                      << expr2.expression_type()
                      << " in block=";
           print_var_origin(error_msgs,var_origin);
@@ -346,7 +346,7 @@ namespace stan {
                 || expr2.expression_type().is_primitive_double())) {
           expr1 /= expr2;
           return;
-        } 
+        }
         std::vector<expression> args;
         args.push_back(expr1);
         args.push_back(expr2);
@@ -393,12 +393,12 @@ namespace stan {
                       const expression& expr2,
                       bool& pass,
                       std::ostream& error_msgs) const {
-        if (!expr1.expression_type().is_primitive_int() 
+        if (!expr1.expression_type().is_primitive_int()
             && !expr2.expression_type().is_primitive_int()) {
           error_msgs << "both operands of % must be int"
                      << "; cannot modulo "
                      << expr1.expression_type()
-                     << " by " 
+                     << " by "
                      << expr2.expression_type();
           error_msgs << std::endl;
           pass = false;
@@ -592,7 +592,7 @@ namespace stan {
                      << std::endl;
           pass = false;
           return;
-        } 
+        }
         pass = true;
         expression = iop;
       }
@@ -602,14 +602,14 @@ namespace stan {
     struct set_var_type {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef variable type; };
-      variable operator()(variable& var_expr, 
+      variable operator()(variable& var_expr,
                           variable_map& vm,
                           std::ostream& error_msgs,
                           bool& pass) const {
         std::string name = var_expr.name_;
         if (!vm.exists(name)) {
           pass = false;
-          error_msgs << "variable \"" << name << '"' << " does not exist." 
+          error_msgs << "variable \"" << name << '"' << " does not exist."
                      << std::endl;
           return var_expr;
         }
@@ -636,7 +636,7 @@ namespace stan {
       bool operator()(const expression& expr,
                       std::stringstream& error_msgs) const {
         if (!expr.expression_type().is_primitive_int()) {
-          error_msgs << "array indices must be integer expressions; found type=" 
+          error_msgs << "array indices must be integer expressions; found type="
                      << expr.expression_type() << std::endl;
           return false;
         }
@@ -673,25 +673,25 @@ namespace stan {
       // _r1 : var_origin
 
       term_r.name("expression");
-      term_r 
-        = ( negated_factor_r(_r1)                       
+      term_r
+        = ( negated_factor_r(_r1)
             [_val = _1]
-            >> *( (lit('*') > negated_factor_r(_r1)     
+            >> *( (lit('*') > negated_factor_r(_r1)
                               [multiplication_f(_val,_1,
                                                 boost::phoenix::ref(error_msgs_))])
-                  | (lit('/') > negated_factor_r(_r1)   
+                  | (lit('/') > negated_factor_r(_r1)
                                 [division_f(_val,_1,
                                             boost::phoenix::ref(error_msgs_))])
-                  | (lit('%') > negated_factor_r(_r1)   
+                  | (lit('%') > negated_factor_r(_r1)
                                 [modulus_f(_val,_1,_pass,
                                            boost::phoenix::ref(error_msgs_))])
-                  | (lit('\\') > negated_factor_r(_r1)   
+                  | (lit('\\') > negated_factor_r(_r1)
                                  [left_division_f(_val,_1,
                                                    boost::phoenix::ref(error_msgs_))])
-                  | (lit(".*") > negated_factor_r(_r1)   
+                  | (lit(".*") > negated_factor_r(_r1)
                                  [elt_multiplication_f(_val,_1,
                                                         boost::phoenix::ref(error_msgs_))])
-                  | (lit("./") > negated_factor_r(_r1)   
+                  | (lit("./") > negated_factor_r(_r1)
                                  [elt_division_f(_val,_1,
                                                  boost::phoenix::ref(error_msgs_))])
                    )
@@ -699,10 +699,10 @@ namespace stan {
         ;
 
       negated_factor_r.name("expression");
-      negated_factor_r 
-        = lit('-') >> negated_factor_r(_r1) 
+      negated_factor_r
+        = lit('-') >> negated_factor_r(_r1)
                       [negate_expr_f(_val,_1,_pass,boost::phoenix::ref(error_msgs_))]
-        | lit('!') >> negated_factor_r(_r1) 
+        | lit('!') >> negated_factor_r(_r1)
                       [logical_negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)  [_val = _1]
         | exponentiated_factor_r(_r1) [_val = _1]
@@ -710,31 +710,31 @@ namespace stan {
 
 
       exponentiated_factor_r.name("expression");
-      exponentiated_factor_r 
-        = ( indexed_factor_r(_r1) [_val = _1] 
-            >> lit('^') 
+      exponentiated_factor_r
+        = ( indexed_factor_r(_r1) [_val = _1]
+            >> lit('^')
             > negated_factor_r(_r1)
             [exponentiation_f(_val,_1,_r1,_pass,
-                              boost::phoenix::ref(error_msgs_))] 
+                              boost::phoenix::ref(error_msgs_))]
             )
         ;
 
       indexed_factor_r.name("expression");
-      indexed_factor_r 
+      indexed_factor_r
         = factor_r(_r1) [_val = _1]
-        > * (  
+        > * (
              ( ( +dims_r(_r1)) [_a = _1]
                  > eps
                [add_expression_dimss_f(_val, _a, _pass,
                                        boost::phoenix::ref(error_msgs_))] )
-             | 
-               lit("'") 
-               [_val = transpose_f(_val, boost::phoenix::ref(error_msgs_))] 
+             |
+               lit("'")
+               [_val = transpose_f(_val, boost::phoenix::ref(error_msgs_))]
                )
         ;
-      
+
       integrate_ode_r.name("expression");
-      integrate_ode_r 
+      integrate_ode_r
         %= (lit("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > identifier_r          // system function name (function only)
@@ -750,7 +750,7 @@ namespace stan {
         > expression_g(_r1)     // x (data only)
         > lit(',')
         > expression_g(_r1)     // x_int (data only)
-        > lit(')') [validate_integrate_ode_f(_val, 
+        > lit(')') [validate_integrate_ode_f(_val,
                                          boost::phoenix::ref(var_map_),
                                          _pass,
                                          boost::phoenix::ref(error_msgs_))];
@@ -767,14 +767,14 @@ namespace stan {
                                         _pass)] )
         | int_literal_r       [_val = _1]
         | double_literal_r    [_val = _1]
-        | ( lit('(') 
+        | ( lit('(')
             > expression_g(_r1)    [_val = _1]
             > lit(')') )
         ;
 
       int_literal_r.name("integer literal");
       int_literal_r
-        %= int_ 
+        %= int_
         >> !( lit('.')
               | lit('e')
               | lit('E') );
@@ -786,19 +786,19 @@ namespace stan {
 
 
       fun_r.name("function and argument expressions");
-      fun_r 
+      fun_r
         %= identifier_r
         >> args_r(_r1);
 
 
       identifier_r.name("identifier");
       identifier_r
-        %= lexeme[char_("a-zA-Z") 
+        %= lexeme[char_("a-zA-Z")
                   >> *char_("a-zA-Z0-9_.")];
 
 
       args_r.name("function arguments");
-      args_r 
+      args_r
         %= (lit('(') >> lit(')'))
         | ( ( lit('(')
               >> (expression_g(_r1) % ',') )
@@ -812,8 +812,8 @@ namespace stan {
         ;
 
       dims_r.name("array dimensions");
-      dims_r 
-        %= lit('[') 
+      dims_r
+        %= lit('[')
         > ( dim_r(_r1)
             % ',' )
         > lit(']')
@@ -823,7 +823,7 @@ namespace stan {
 
       variable_r.name("variable name");
       variable_r
-        %= identifier_r 
+        %= identifier_r
         > !lit('(');    // negative lookahead to prevent failure in
                         // fun to try to evaluate as variable [cleaner
                         // error msgs]

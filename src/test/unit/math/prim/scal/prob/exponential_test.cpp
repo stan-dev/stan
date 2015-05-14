@@ -6,10 +6,10 @@
 
 TEST(ProbDistributionsExponential, error_check) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::exponential_rng(2.0,rng));
+  EXPECT_NO_THROW(stan::math::exponential_rng(2.0,rng));
 
-  EXPECT_THROW(stan::prob::exponential_rng(-2.0,rng),std::domain_error);
-  EXPECT_THROW(stan::prob::exponential_rng(stan::math::positive_infinity(),rng),
+  EXPECT_THROW(stan::math::exponential_rng(-2.0,rng),std::domain_error);
+  EXPECT_THROW(stan::math::exponential_rng(stan::math::positive_infinity(),rng),
                std::domain_error);
 }
 
@@ -33,7 +33,7 @@ TEST(ProbDistributionsExponential, chiSquareGoodnessFitTest) {
   }
 
   while (count < N) {
-    double a = stan::prob::exponential_rng(2.0,rng);
+    double a = stan::math::exponential_rng(2.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

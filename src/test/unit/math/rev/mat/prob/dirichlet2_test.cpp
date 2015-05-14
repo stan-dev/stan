@@ -18,17 +18,17 @@ template <typename T_prob, typename T_prior_sample_size>
 void expect_propto(T_prob theta, T_prior_sample_size alpha,
                    T_prob theta2, T_prior_sample_size alpha2,
                    std::string message) {
-  expect_eq_diffs(stan::prob::dirichlet_log<false>(theta, alpha),
-                  stan::prob::dirichlet_log<false>(theta2, alpha2),
-                  stan::prob::dirichlet_log<true>(theta, alpha),
-                  stan::prob::dirichlet_log<true>(theta2, alpha2),
+  expect_eq_diffs(stan::math::dirichlet_log<false>(theta, alpha),
+                  stan::math::dirichlet_log<false>(theta2, alpha2),
+                  stan::math::dirichlet_log<true>(theta, alpha),
+                  stan::math::dirichlet_log<true>(theta2, alpha2),
                   message);
 }
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
-using stan::agrad::var;
-using stan::agrad::to_var;
+using stan::math::var;
+using stan::math::to_var;
 
 class AgradDistributionsDirichlet : public ::testing::Test {
 protected:
@@ -64,7 +64,7 @@ TEST_F(AgradDistributionsDirichlet,ProptoAlpha) {
                 "var: alpha");
 }
 TEST_F(AgradDistributionsDirichlet,Bounds) {
-  using stan::prob::dirichlet_log;
+  using stan::math::dirichlet_log;
   Matrix<double,Dynamic,1> good_alpha(2,1), bad_alpha(2,1);
   Matrix<double,Dynamic,1> good_theta(2,1), bad_theta(2,1);
 

@@ -69,8 +69,8 @@ void test_rank_int() {
 
 TEST(AgradMixMatrixRank,rank) {
   using stan::math::rank;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
 
   test_rank< std::vector<fvar<var> > >();

@@ -25,7 +25,7 @@ TEST(AgradAutoDiff,gradient) {
 
   double fx2(0);
   Matrix<double,Dynamic,1> grad_fx2;
-  stan::agrad::gradient<double>(f,x,fx2,grad_fx2);
+  stan::math::gradient<double>(f,x,fx2,grad_fx2);
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx2);
   EXPECT_EQ(2,grad_fx2.size());
   EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx2(0));

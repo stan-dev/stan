@@ -15,11 +15,11 @@ TEST(AgradRevMatrix,softmaxLeak) {
   // FIXME: very brittle test depending on unrelated constants of 
   //        block sizes/growth in stan::memory::stack_alloc
   using stan::math::softmax;
-  using stan::agrad::softmax;
+  using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_v;
-  using stan::agrad::var;
+  using stan::math::vector_v;
+  using stan::math::var;
 
   int SIZE = 20;
   int NUM = 112;  // alloc on stack: 458752; bug fix used: = 196608
@@ -31,15 +31,15 @@ TEST(AgradRevMatrix,softmaxLeak) {
     Matrix<var,Dynamic,1> theta = softmax(x);
   }
   // test is greater than because leak is on heap, not stack
-  EXPECT_TRUE(stan::agrad::ChainableStack::memalloc_.bytes_allocated() > 200000);
+  EXPECT_TRUE(stan::math::ChainableStack::memalloc_.bytes_allocated() > 200000);
 }
 
 TEST(AgradRevMatrix,softmax) {
   using stan::math::softmax;
-  using stan::agrad::softmax;
+  using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   EXPECT_THROW(softmax(vector_v()),std::invalid_argument);
   
@@ -73,7 +73,7 @@ softmax_grad(Eigen::Matrix<double,Eigen::Dynamic,1>& alpha_dbl,
              int k) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::math::var;
   Matrix<var,Dynamic,1> alpha(alpha_dbl.size());
   for (int i = 0; i < alpha.size(); ++i)
     alpha(i) = alpha_dbl(i);
@@ -89,7 +89,7 @@ softmax_grad(Eigen::Matrix<double,Eigen::Dynamic,1>& alpha_dbl,
 }
 TEST(AgradRevSoftmax, Grad) {
   using stan::math::softmax;
-  using stan::agrad::var;
+  using stan::math::var;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   for (int k = 0; k < 3; ++k) {

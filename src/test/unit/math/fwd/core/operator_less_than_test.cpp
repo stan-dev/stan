@@ -2,7 +2,7 @@
 #include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdOperatorLessThan,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   fvar<double> v4 = 4;
   fvar<double> v5 = 5;
   double d4 = 4;
@@ -25,7 +25,7 @@ TEST(AgradFwdOperatorLessThan,Fvar) {
 }
 
 TEST(AgradFwdOperatorLessThan, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > x;
   x.val_.val_ = 1.5;
@@ -44,7 +44,7 @@ TEST(AgradFwdOperatorLessThan, FvarFvarDouble) {
   EXPECT_FALSE(y < z);
 }
 TEST(AgradFwdOperatorLessThan, lt_nan) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   double nan = std::numeric_limits<double>::quiet_NaN();
   double a = 3.0;
   fvar<double> nan_fd = std::numeric_limits<double>::quiet_NaN();

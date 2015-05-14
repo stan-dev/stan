@@ -3,7 +3,7 @@
 #include <stan/math/fwd/scal/fun/fmax.hpp>
 
 TEST(AgradFwdFmax,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::isnan;
 
   fvar<double> x(2.0,1.0);
@@ -37,7 +37,7 @@ TEST(AgradFwdFmax,Fvar) {
  }
 
 TEST(AgradFwdFmax,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > x;
   x.val_.val_ = 2.5;

@@ -63,15 +63,15 @@ namespace stan {
                        "   e.g. real[,] for a 2D array or int for a single integer,\n"
                        "   and constrained types such as cov_matrix not allowed)");
       bare_type_r
-        %= 
+        %=
         type_identifier_r
         >> array_dims_r
         ;
-      
+
       type_identifier_r.name("bare type identifier\n"
                              "    legal values: void, int, real, vector, row_vector, matrix");
       type_identifier_r
-        %= 
+        %=
         lit("void")[_val = VOID_T]
         | lit("int")[_val = INT_T]
         | lit("real")[_val = DOUBLE_T]
@@ -79,11 +79,11 @@ namespace stan {
         | lit("row_vector")[_val = ROW_VECTOR_T]
         | lit("matrix")[_val = MATRIX_T]
         ;
-      
+
       array_dims_r.name("array dimensions,\n"
                         "    e.g., empty (not an array) [] (1D array) or [,] (2D array)");
       array_dims_r
-        %= 
+        %=
         eps[_val = 0]
         >> - ( lit('[')[_val = 1]
                > *(lit(',')[_val += 1])
@@ -93,7 +93,7 @@ namespace stan {
       end_bare_types_r.name("comma to indicate more dimensions or ] to end type declaration");
       end_bare_types_r
         %= lit(']');
-      
+
      }
   }
 }

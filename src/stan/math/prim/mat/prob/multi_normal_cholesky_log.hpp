@@ -19,12 +19,12 @@
 #include <stan/math/prim/mat/fun/sum.hpp>
 #include <stan/math/prim/scal/meta/VectorViewMvt.hpp>
 #include <stan/math/prim/scal/meta/max_size_mvt.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
     using Eigen::Dynamic;
 
     /**
@@ -50,7 +50,7 @@ namespace stan {
     multi_normal_cholesky_log(const T_y& y,
                               const T_loc& mu,
                               const T_covar& L) {
-      static const char* function("stan::prob::multi_normal_cholesky_log");
+      static const char* function("stan::math::multi_normal_cholesky_log");
       typedef typename scalar_type<T_covar>::type T_covar_elem;
       typedef typename return_type<T_y, T_loc, T_covar>::type lp_type;
       lp_type lp(0.0);

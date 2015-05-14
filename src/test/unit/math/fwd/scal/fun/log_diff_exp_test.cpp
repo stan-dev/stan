@@ -6,7 +6,7 @@
 #include <stan/math/fwd/scal/fun/log.hpp>
 
 TEST(AgradFwdLogDiffExp,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_diff_exp;
   using std::exp;
 
@@ -31,14 +31,14 @@ TEST(AgradFwdLogDiffExp,Fvar) {
 }
 
 TEST(AgradFwdLogDiffExp, AgradFvar_exception) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   EXPECT_NO_THROW(log_diff_exp(fvar<double>(3), fvar<double>(4)));
   EXPECT_NO_THROW(log_diff_exp(fvar<double>(3), 4));
   EXPECT_NO_THROW(log_diff_exp(3, fvar<double>(4)));
 }
 
 TEST(AgradFwdLogDiffExp,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log_diff_exp;
   using std::exp;
 

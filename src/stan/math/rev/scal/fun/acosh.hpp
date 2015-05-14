@@ -6,7 +6,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class acosh_vari : public op_v_vari {
@@ -59,7 +59,7 @@ namespace stan {
      * @param a The variable.
      * @return Inverse hyperbolic cosine of the variable.
      */
-    inline var acosh(const stan::agrad::var& a) {
+    inline var acosh(const stan::math::var& a) {
       if (boost::math::isinf(a.val()) && a > 0.0)
         return var(new acosh_vari(a.val(), a.vi_));
       return var(new acosh_vari(::acosh(a.val()), a.vi_));

@@ -33,7 +33,7 @@
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::function_decl_def,
                           (stan::lang::expr_type, return_type_)
-                          (std::string, name_) 
+                          (std::string, name_)
                           (std::vector<stan::lang::arg_decl>, arg_decls_)
                           (stan::lang::statement, body_) )
 
@@ -75,7 +75,7 @@ namespace stan {
           return;
         }
         origin = return_type.is_void()
-          ? void_function_argument_origin 
+          ? void_function_argument_origin
           : function_argument_origin;
       }
     };
@@ -112,9 +112,9 @@ namespace stan {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef void type; };
       void operator()(bool& pass,
-                      std::set<std::pair<std::string, 
+                      std::set<std::pair<std::string,
                                          function_signature_t> >& declared,
-                      std::set<std::pair<std::string, 
+                      std::set<std::pair<std::string,
                                          function_signature_t> >& defined,
                       std::ostream& error_msgs) const {
         using std::set;
@@ -138,23 +138,23 @@ namespace stan {
     struct add_function_signature {
       template <typename T1, typename T2, typename T3, typename T4, typename T5>
       struct result { typedef void type; };
-      static bool fun_exists(const std::set<std::pair<std::string, 
+      static bool fun_exists(const std::set<std::pair<std::string,
                                                       function_signature_t> >& existing,
                              const std::pair<std::string,function_signature_t>& name_sig) {
-        for (std::set<std::pair<std::string, function_signature_t> >::const_iterator it 
+        for (std::set<std::pair<std::string, function_signature_t> >::const_iterator it
                = existing.begin();
              it != existing.end();
              ++it)
-          if (name_sig.first == (*it).first 
+          if (name_sig.first == (*it).first
               && name_sig.second.second == (*it).second.second)
             return true;  // name and arg sequences match
         return false;
       }
       void operator()(const function_decl_def& decl,
                       bool& pass,
-                      std::set<std::pair<std::string, 
+                      std::set<std::pair<std::string,
                                          function_signature_t> >& functions_declared,
-                      std::set<std::pair<std::string, 
+                      std::set<std::pair<std::string,
                                          function_signature_t> >& functions_defined,
                       std::ostream& error_msgs) const {
 
@@ -167,7 +167,7 @@ namespace stan {
                                         decl.arg_decls_[i].arg_type_.num_dims_));
         function_signature_t sig(result_type, arg_types);
         std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
-        
+
         // check that not already declared if just declaration
         if (decl.body_.is_no_op_statement()
             && fun_exists(functions_declared,name_sig)) {
@@ -200,7 +200,7 @@ namespace stan {
             function_signatures::instance()
               .set_user_defined(name_sig);
         }
-        
+
         // add as definition if there's a body
         if (!decl.body_.is_no_op_statement())
           functions_defined.insert(name_sig);
@@ -216,7 +216,7 @@ namespace stan {
                       bool& pass,
                       std::ostream& error_msgs) const {
         pass = decl.body_.is_no_op_statement()
-          || stan::lang::returns_type(decl.return_type_, decl.body_, 
+          || stan::lang::returns_type(decl.return_type_, decl.body_,
                                     error_msgs);
         if (!pass) {
           error_msgs << "Improper return in body of function.";
@@ -240,7 +240,7 @@ namespace stan {
       }
     };
     boost::phoenix::function<scope_lp> scope_lp_f;
-    
+
 
     struct unscope_variables {
       template <typename T1, typename T2>
@@ -317,12 +317,12 @@ namespace stan {
       using namespace boost::spirit::qi::labels;
 
       functions_r.name("function declarations and definitions");
-      functions_r 
+      functions_r
         %= ( lit("functions")  // block, so doesn't need guard to not be continued
              > lit("{") )
         >> *function_r
         > lit('}')
-        > eps[ validate_declarations_f(_pass, 
+        > eps[ validate_declarations_f(_pass,
                                        boost::phoenix::ref(functions_declared_),
                                        boost::phoenix::ref(functions_defined_),
                                        boost::phoenix::ref(error_msgs_) ) ]
@@ -330,7 +330,7 @@ namespace stan {
       // locals: _a = allow sampling, _b = origin (function, rng/lp)
       function_r.name("function declaration or definition");
       function_r
-        %= bare_type_g[ set_void_function_f(_1,_b, _pass, 
+        %= bare_type_g[ set_void_function_f(_1,_b, _pass,
                                             boost::phoenix::ref(error_msgs_)) ]
         > identifier_r[ set_allows_sampling_origin_f(_1,_a,_b) ]
         > lit('(')
@@ -347,7 +347,7 @@ namespace stan {
                                           boost::phoenix::ref(functions_defined_),
                                           boost::phoenix::ref(error_msgs_) ) ]
         ;
-      
+
       close_arg_decls_r.name("argument declaration or close paren ) to end argument declarations");
       close_arg_decls_r %= lit(')');
 
@@ -358,8 +358,8 @@ namespace stan {
         ;
 
       arg_decl_r.name("function argument declaration");
-      arg_decl_r 
-        %= bare_type_g [ validate_non_void_arg_f(_1, _pass, 
+      arg_decl_r
+        %= bare_type_g [ validate_non_void_arg_f(_1, _pass,
                                                  boost::phoenix::ref(error_msgs_)) ]
         > identifier_r
         > eps[ add_fun_var_f(_val,_pass,
@@ -369,7 +369,7 @@ namespace stan {
 
       identifier_r.name("identifier");
       identifier_r
-        %= lexeme[char_("a-zA-Z") 
+        %= lexeme[char_("a-zA-Z")
                    >> *char_("a-zA-Z0-9_.")];
 
     }

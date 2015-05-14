@@ -6,7 +6,7 @@
 
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Return the absolute value of the variable (cmath).

@@ -68,7 +68,7 @@ namespace stan {
         cs.conditions_.push_back(e);
         pass = true;
         return;
-      }               
+      }
     };
     boost::phoenix::function<add_conditional_condition> add_conditional_condition_f;
 
@@ -82,7 +82,7 @@ namespace stan {
     };
     boost::phoenix::function<add_conditional_body> add_conditional_body_f;
 
- 
+
 
     template <typename Iterator>
     statement_2_grammar<Iterator>::statement_2_grammar(variable_map& var_map,
@@ -113,7 +113,7 @@ namespace stan {
         %= conditional_statement_r(_r1,_r2,_r3)
         ;
 
-      
+
       conditional_statement_r.name("if-else statement");
       conditional_statement_r
         = (lit("if")  >> no_skip[!char_("a-zA-Z0-9_")])

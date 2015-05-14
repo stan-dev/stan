@@ -7,7 +7,7 @@
 #include <stan/math/fwd/scal/fun/sin.hpp>
 
 TEST(AgradFwdTrigamma, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::trigamma;
 
   fvar<double> x(0.5,1.0);

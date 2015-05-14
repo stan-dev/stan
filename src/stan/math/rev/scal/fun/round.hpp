@@ -7,7 +7,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class round_vari : public op_v_vari {
@@ -54,7 +54,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Rounded variable.
      */
-    inline var round(const stan::agrad::var& a) {
+    inline var round(const stan::math::var& a) {
       return var(new round_vari(a.vi_));
     }
 

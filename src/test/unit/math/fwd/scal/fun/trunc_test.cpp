@@ -4,7 +4,7 @@
 #include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdTrunc, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::trunc;
 
   fvar<double> x(0.5,1.0);

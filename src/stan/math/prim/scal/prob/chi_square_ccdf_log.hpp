@@ -14,19 +14,19 @@
 #include <stan/math/prim/scal/fun/gamma_p.hpp>
 #include <stan/math/prim/scal/fun/digamma.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_dof>
     typename return_type<T_y, T_dof>::type
     chi_square_ccdf_log(const T_y& y, const T_dof& nu) {
-      static const char* function("stan::prob::chi_square_ccdf_log");
+      static const char* function("stan::math::chi_square_ccdf_log");
       typedef typename stan::partials_return_type<T_y, T_dof>::type
         T_partials_return;
 
@@ -54,7 +54,7 @@ namespace stan {
       VectorView<const T_dof> nu_vec(nu);
       size_t N = max_size(y, nu);
 
-      agrad::OperandsAndPartials<T_y, T_dof>
+      OperandsAndPartials<T_y, T_dof>
         operands_and_partials(y, nu);
 
       // Explicit return for extreme values
@@ -70,6 +70,8 @@ namespace stan {
       using boost::math::tgamma;
       using std::exp;
       using std::pow;
+      using std::log;
+      using std::exp;
 
       // Cache a few expensive function calls if nu is a parameter
       VectorBuilder<!is_constant_struct<T_dof>::value,

@@ -4,8 +4,8 @@
 #include <sstream>
 
 TEST(AgradFwdFvar, insertion_operator) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(5.0);
   std::stringstream ss;

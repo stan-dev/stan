@@ -6,7 +6,7 @@
 #include <test/unit/math/fwd/scal/fun/nan_util.hpp>
 
 TEST(AgradFwdHypot,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::hypot;
   using std::isnan;
 
@@ -34,7 +34,7 @@ TEST(AgradFwdHypot,Fvar) {
 }
 
 TEST(AgradFwdHypot,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::hypot;
 
   fvar<fvar<double> > x;

@@ -10,7 +10,6 @@
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
 #include <stan/math/prim/scal/fun/gamma_q.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -20,7 +19,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Poisson(n|lambda)  [lambda > 0;  n >= 0]
     template <bool propto, typename T_n, typename T_rate>
@@ -29,13 +28,13 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n, T_rate>::type
         T_partials_return;
 
-      static const char* function("stan::prob::poisson_log");
+      static const char* function("stan::math::poisson_log");
 
       using boost::math::lgamma;
       using stan::math::check_consistent_sizes;
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
       using stan::math::value_of;
 
       // check if any vectors are zero length
@@ -71,7 +70,7 @@ namespace stan {
           return LOG_ZERO;
 
       // return accumulator with gradients
-      agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
+      OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
       using stan::math::multiply_log;
       for (size_t i = 0; i < size; i++) {

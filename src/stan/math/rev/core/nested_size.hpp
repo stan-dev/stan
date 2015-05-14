@@ -7,7 +7,7 @@
 #include <cstdlib>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     static inline size_t nested_size() {
       return ChainableStack::var_stack_.size()

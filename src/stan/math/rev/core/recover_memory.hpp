@@ -8,7 +8,7 @@
 #include <stdexcept>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Recover memory used for all variables for reuse.

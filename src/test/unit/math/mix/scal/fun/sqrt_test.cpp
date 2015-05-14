@@ -7,8 +7,8 @@
 #include <stan/math/rev/scal/fun/sinh.hpp>
 
 TEST(AgradFwdSqrt, FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sqrt;
 
   fvar<var> x(1.5,1.3);
@@ -23,8 +23,8 @@ TEST(AgradFwdSqrt, FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(0.5 / sqrt(1.5), g[0]);
 }
 TEST(AgradFwdSqrt, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sqrt;
 
   fvar<var> x(1.5,1.3);
@@ -37,8 +37,8 @@ TEST(AgradFwdSqrt, FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdSqrt, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sqrt;
 
   fvar<fvar<var> > x;
@@ -73,8 +73,8 @@ TEST(AgradFwdSqrt, FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(0.5 / sqrt(1.5), r[0]);
 }
 TEST(AgradFwdSqrt, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sqrt;
 
   fvar<fvar<var> > x;
@@ -100,8 +100,8 @@ TEST(AgradFwdSqrt, FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0.5 * -2.0 * 0.5 / 1.5 / sqrt(1.5), r[0]);
 }
 TEST(AgradFwdSqrt, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sqrt;
 
   fvar<fvar<var> > x;

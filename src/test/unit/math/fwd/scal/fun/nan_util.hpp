@@ -12,7 +12,7 @@ template <typename F>
 void test_nan_fd(const F& f,
                  const double& arg1,
                  const bool& throws) {
-  stan::agrad::fvar<double> arg1_v = arg1;
+  stan::math::fvar<double> arg1_v = arg1;
   arg1_v.d_ = 1.0;
   if (throws)
     EXPECT_THROW(f(arg1_v), std::domain_error);
@@ -26,7 +26,7 @@ template <typename F>
 void test_nan_ffd(const F& f,
                   const double& arg1,
                   const bool& throws) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   fvar<fvar<double> > arg1_v(fvar<double>(arg1,1.0),fvar<double>(1.0,1.0));
 
   if (throws)
@@ -53,7 +53,7 @@ void test_nan_fd(const F& f,
                  const double& arg1,
                  const double& arg2,
                  const bool& throws) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   fvar<double> arg1_v(arg1,1.0);
   fvar<double> arg2_v(arg2,1.0);
 
@@ -88,7 +88,7 @@ void test_nan_ffd(const F& f,
                   const double& arg1,
                   const double& arg2,
                   const bool& throws) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   fvar<fvar<double> > arg1_v = arg1;
   arg1_v.val_.d_ = 1.0;
   arg1_v.d_.val_ = 1.0;
@@ -153,7 +153,7 @@ void test_nan_fd(const F& f,
                  const double& arg2,
                  const double& arg3,
                  const bool& throws) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::isnan;
   fvar<double> arg1_v(arg1,1.0);
   fvar<double> arg2_v(arg2,1.0);
@@ -197,7 +197,7 @@ void test_nan_ffd(const F& f,
                  const double& arg2,
                  const double& arg3,
                  const bool& throws) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using boost::math::isnan;
   fvar<fvar<double> > arg1_v(arg1,1.0);
   fvar<fvar<double> > arg2_v(arg2,1.0);

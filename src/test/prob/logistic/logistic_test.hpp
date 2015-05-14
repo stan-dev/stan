@@ -6,7 +6,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsLogistic : public AgradDistributionTest {
 public:
@@ -57,7 +57,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::logistic_log(y, mu, sigma);
+    return stan::math::logistic_log(y, mu, sigma);
   }
 
   template <bool propto, 
@@ -66,7 +66,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::logistic_log<propto>(y, mu, sigma);
+    return stan::math::logistic_log<propto>(y, mu, sigma);
   }
   
   
@@ -82,5 +82,5 @@ public:
 
 
 TEST(ProbDistributionsLogisticCDF, Values) {
-    EXPECT_FLOAT_EQ(0.047191944, stan::prob::logistic_cdf(-3.45, 5.235, 2.89));
+    EXPECT_FLOAT_EQ(0.047191944, stan::math::logistic_cdf(-3.45, 5.235, 2.89));
 }

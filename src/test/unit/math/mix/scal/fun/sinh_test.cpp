@@ -9,13 +9,13 @@
 
 class AgradFwdSinh : public testing::Test {
   void SetUp() {
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
   }
 };
 
 TEST_F(AgradFwdSinh, FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sinh;
   using std::cosh;
 
@@ -32,8 +32,8 @@ TEST_F(AgradFwdSinh, FvarVar_1stDeriv) {
 }
 
 TEST_F(AgradFwdSinh, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sinh;
   using std::cosh;
 
@@ -47,8 +47,8 @@ TEST_F(AgradFwdSinh, FvarVar_2ndDeriv) {
 }
 
 TEST_F(AgradFwdSinh, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sinh;
   using std::cosh;
 
@@ -66,7 +66,7 @@ TEST_F(AgradFwdSinh, FvarFvarVar_1stDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.val_.grad(p,g);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   EXPECT_FLOAT_EQ(cosh(1.5), g[0]);
 
   fvar<fvar<var> > y;
@@ -86,8 +86,8 @@ TEST_F(AgradFwdSinh, FvarFvarVar_1stDeriv) {
 }
 
 TEST_F(AgradFwdSinh, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sinh;
   using std::cosh;
 
@@ -100,7 +100,7 @@ TEST_F(AgradFwdSinh, FvarFvarVar_2ndDeriv) {
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.val_.d_.grad(p,g);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
   EXPECT_FLOAT_EQ(2.0 * sinh(1.5), g[0]);
 
   fvar<fvar<var> > y;
@@ -116,8 +116,8 @@ TEST_F(AgradFwdSinh, FvarFvarVar_2ndDeriv) {
 }
 
 TEST_F(AgradFwdSinh, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::sinh;
   using std::cosh;
 

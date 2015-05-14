@@ -8,12 +8,12 @@
 #include <stan/math/fwd/core.hpp>
 
 TEST(AgradMixMatrixDiagPreMultiply, vector_fv_1stDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
   using stan::math::vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   matrix_d Z(3,3);
   Z << 1, 2, 3,
@@ -64,12 +64,12 @@ TEST(AgradMixMatrixDiagPreMultiply, vector_fv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, vector_fv_2ndDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
   using stan::math::vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,2.0);
   fvar<var> b(2.0,2.0);
@@ -96,8 +96,8 @@ TEST(AgradMixMatrixDiagPreMultiply, vector_fv_2ndDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, vector_fv_exception) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
 
   matrix_fv Y(3,3);
   matrix_fv Z(2,3);
@@ -110,12 +110,12 @@ TEST(AgradMixMatrixDiagPreMultiply, vector_fv_exception) {
   EXPECT_THROW(stan::math::diag_pre_multiply(Y,Z), std::domain_error);
 }
 TEST(AgradMixMatrixDiagPreMultiply, rowvector_fv_1stDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   matrix_d Z(3,3);
   Z << 1, 2, 3,
@@ -166,12 +166,12 @@ TEST(AgradMixMatrixDiagPreMultiply, rowvector_fv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, rowvector_fv_2ndDeriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<var> a(1.0,2.0);
   fvar<var> b(2.0,2.0);
@@ -198,8 +198,8 @@ TEST(AgradMixMatrixDiagPreMultiply, rowvector_fv_2ndDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, rowvector_fv_exception) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::row_vector_fv;
 
   matrix_fv Y(3,3);
   matrix_fv Z(2,3);
@@ -212,12 +212,12 @@ TEST(AgradMixMatrixDiagPreMultiply, rowvector_fv_exception) {
   EXPECT_THROW(stan::math::diag_pre_multiply(Y,Z), std::domain_error);
 }
 TEST(AgradMixMatrixDiagPreMultiply, vector_ffv_1stDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
   using stan::math::vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   matrix_d Z(3,3);
   Z << 1, 2, 3,
@@ -268,12 +268,12 @@ TEST(AgradMixMatrixDiagPreMultiply, vector_ffv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, vector_ffv_2ndDeriv_1) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
   using stan::math::vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,2.0);
   fvar<fvar<var> > b(2.0,2.0);
@@ -300,12 +300,12 @@ TEST(AgradMixMatrixDiagPreMultiply, vector_ffv_2ndDeriv_1) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, vector_ffv_2ndDeriv_2) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
   using stan::math::vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,2.0);
   fvar<fvar<var> > b(2.0,2.0);
@@ -332,12 +332,12 @@ TEST(AgradMixMatrixDiagPreMultiply, vector_ffv_2ndDeriv_2) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, vector_ffv_3rdDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
   using stan::math::vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -370,8 +370,8 @@ TEST(AgradMixMatrixDiagPreMultiply, vector_ffv_3rdDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, vector_ffv_exception) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
 
   matrix_ffv Y(3,3);
   matrix_ffv Z(2,3);
@@ -385,12 +385,12 @@ TEST(AgradMixMatrixDiagPreMultiply, vector_ffv_exception) {
 }
 
 TEST(AgradMixMatrixDiagPreMultiply, rowvector_ffv_1stDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using stan::math::row_vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   matrix_d Z(3,3);
   Z << 1, 2, 3,
@@ -441,12 +441,12 @@ TEST(AgradMixMatrixDiagPreMultiply, rowvector_ffv_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, rowvector_ffv_2ndDeriv_1) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using stan::math::row_vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,2.0);
   fvar<fvar<var> > b(2.0,2.0);
@@ -473,12 +473,12 @@ TEST(AgradMixMatrixDiagPreMultiply, rowvector_ffv_2ndDeriv_1) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, rowvector_ffv_2ndDeriv_2) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using stan::math::row_vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,2.0);
   fvar<fvar<var> > b(2.0,2.0);
@@ -505,12 +505,12 @@ TEST(AgradMixMatrixDiagPreMultiply, rowvector_ffv_2ndDeriv_2) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, rowvector_ffv_3rdDeriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
   using stan::math::row_vector_d;
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > a(1.0,1.0);
   fvar<fvar<var> > b(2.0,1.0);
@@ -543,8 +543,8 @@ TEST(AgradMixMatrixDiagPreMultiply, rowvector_ffv_3rdDeriv) {
   EXPECT_FLOAT_EQ(0.0,h[5]);
 }
 TEST(AgradMixMatrixDiagPreMultiply, rowvector_ffv_exception) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv Y(3,3);
   matrix_ffv Z(2,3);

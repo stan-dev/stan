@@ -11,7 +11,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     // forward declare
     static void grad(chainable* vi);
@@ -23,11 +23,11 @@ namespace stan {
      * an agenda-based memory manager scoped to a single gradient
      * calculation.
      *
-     * An agrad::var is constructed with a double and used like any
+     * An var is constructed with a double and used like any
      * other scalar.  Arithmetical functions like negation, addition,
      * and subtraction, as well as a range of mathematical functions
      * like exponentiation and powers are overridden to operate on
-     * agrad::var values objects.
+     * var values objects.
      */
     class var {
     public:
@@ -261,7 +261,7 @@ namespace stan {
        */
       void grad(std::vector<var>& x,
                 std::vector<double>& g) {
-        stan::agrad::grad(vi_);  // defined in chainable.hpp
+        stan::math::grad(vi_);  // defined in chainable.hpp
         g.resize(x.size());
         for (size_t i = 0; i < x.size(); ++i)
           g[i] = x[i].vi_->adj_;

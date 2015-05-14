@@ -3,7 +3,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCdfParetoType2 : public AgradCdfTest {
 public:
@@ -66,7 +66,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale, T_shape>::type 
   cdf(const T_y& y, const T_loc& mu, const T_scale& lambda, 
       const T_shape& alpha, const T4&, const T5&) {
-    return stan::prob::pareto_type_2_cdf(y, mu, lambda, alpha);
+    return stan::math::pareto_type_2_cdf(y, mu, lambda, alpha);
   }
   
   template <typename T_y, typename T_loc, typename T_scale, typename T_shape,

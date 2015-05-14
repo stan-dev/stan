@@ -17,15 +17,16 @@
 #include <stan/math/prim/scal/fun/lgamma.hpp>
 #include <stan/math/prim/scal/fun/lbeta.hpp>
 #include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
     typename return_type<T_y, T_scale_succ, T_scale_fail>::type
@@ -41,7 +42,7 @@ namespace stan {
         return 0.0;
 
       // Error checks
-      static const char* function("stan::prob::beta_cdf");
+      static const char* function("stan::math::beta_cdf");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
@@ -69,7 +70,7 @@ namespace stan {
       VectorView<const T_scale_fail> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
 
-      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail>
+      OperandsAndPartials<T_y, T_scale_succ, T_scale_fail>
         operands_and_partials(y, alpha, beta);
 
       // Compute CDF and its gradients
@@ -77,6 +78,8 @@ namespace stan {
       using stan::math::digamma;
       using stan::math::lbeta;
       using std::pow;
+      using std::exp;
+      using std::log;
       using std::exp;
 
       // Cache a few expensive function calls if alpha or beta is a parameter

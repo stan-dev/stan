@@ -7,8 +7,8 @@
 #include <gtest/gtest.h>
 
 TEST(AgradRevMatrix, LDLT_alloc_default_constructor) {
-  using stan::agrad::LDLT_alloc;
-  using stan::agrad::var;
+  using stan::math::LDLT_alloc;
+  using stan::math::var;
   
   LDLT_alloc<-1,-1> *alloc = new LDLT_alloc<-1,-1>(); // DO NOT DELETE, allocated on the vari stack
   EXPECT_EQ(0U, alloc->N_);
@@ -32,8 +32,8 @@ TEST(AgradRevMatrix, LDLT_alloc_default_constructor) {
 }
 
 TEST(AgradRevMatrix,LDLT_alloc_constructor) {
-  using stan::agrad::LDLT_alloc;
-  using stan::agrad::var;
+  using stan::math::LDLT_alloc;
+  using stan::math::var;
 
   Eigen::Matrix<var,-1,-1> A(2,2);
   A << 2,1,1,2;
@@ -58,8 +58,8 @@ TEST(AgradRevMatrix,LDLT_alloc_constructor) {
 
 
 TEST(AgradRevMatrix, LDLT_alloc_compute) {
-  using stan::agrad::LDLT_alloc;
-  using stan::agrad::var;
+  using stan::math::LDLT_alloc;
+  using stan::math::var;
   
   LDLT_alloc<-1,-1> *alloc = new LDLT_alloc<-1,-1>(); // DO NOT DELETE, allocated on the vari stack
 

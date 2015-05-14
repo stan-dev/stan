@@ -5,7 +5,7 @@
 #include <ostream>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     void stan_print(std::ostream* o, const var& x) {
       *o << x.val();

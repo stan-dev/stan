@@ -6,7 +6,7 @@
 #include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdAcos,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::acos;
   using std::sqrt;
   using std::isnan;
@@ -54,7 +54,7 @@ TEST(AgradFwdAcos,Fvar) {
 }
 
 TEST(AgradFwdAcos,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::acos;
 
   fvar<fvar<double> > x;

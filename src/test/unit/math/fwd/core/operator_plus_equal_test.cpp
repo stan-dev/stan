@@ -2,7 +2,7 @@
 #include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdOperatorPlusEqual, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> a(0.5,1.0);
   fvar<double> x1(0.4,2.0);
@@ -29,7 +29,7 @@ TEST(AgradFwdOperatorPlusEqual, Fvar) {
   EXPECT_FLOAT_EQ(1.0 + 2.0, d.d_);
 }
 TEST(AgradFwdOperatorPlusEqual, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;
@@ -43,7 +43,7 @@ TEST(AgradFwdOperatorPlusEqual, FvarFvarDouble) {
 }
 
 TEST(AgradFwdOperatorPlusEqual, plus_eq_nan) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   double nan = std::numeric_limits<double>::quiet_NaN();
   double a = 3.0;
   fvar<double> nan_fd = std::numeric_limits<double>::quiet_NaN();

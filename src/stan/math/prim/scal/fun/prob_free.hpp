@@ -6,7 +6,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the free scalar that when transformed to a probability
@@ -27,7 +27,7 @@ namespace stan {
     T prob_free(const T y) {
       using stan::math::logit;
       stan::math::check_bounded<T, double, double>
-        ("stan::prob::prob_free", "Probability variable",
+        ("stan::math::prob_free", "Probability variable",
          y, 0, 1);
       return logit(y);
     }

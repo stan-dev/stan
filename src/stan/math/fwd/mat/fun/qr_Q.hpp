@@ -8,7 +8,7 @@
 #include <stan/math/fwd/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template <typename T>
     Eigen::Matrix<fvar<T>, Eigen::Dynamic, Eigen::Dynamic>

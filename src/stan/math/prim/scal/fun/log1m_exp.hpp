@@ -39,12 +39,15 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     log1m_exp(const T a) {
+      using std::log;
+      using std::exp;
+
       if (a >= 0)
         return std::numeric_limits<double>::quiet_NaN();
       else if (a > -0.693147)
-        return std::log(-boost::math::expm1(a));  // 0.693147 ~= log(2)
+        return log(-boost::math::expm1(a));  // 0.693147 ~= log(2)
       else
-        return log1m(std::exp(a));
+        return log1m(exp(a));
     }
 
   }
