@@ -9,9 +9,9 @@ namespace boost {
   namespace math {
 
     /**
-     * Categorizes the given stan::agrad::var value.
+     * Categorizes the given stan::math::var value.
      *
-     * Categorizes the stan::agrad::var value, v, into the following categories:
+     * Categorizes the stan::math::var value, v, into the following categories:
      * zero, subnormal, normal, infinite, or NAN.
      *
      * @param v Variable to classify.
@@ -21,7 +21,7 @@ namespace boost {
      */
     template <>
     inline
-    int fpclassify(const stan::agrad::var& v) {
+    int fpclassify(const stan::math::var& v) {
       return (boost::math::fpclassify)(v.val());
     }
 

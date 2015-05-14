@@ -8,7 +8,7 @@
 #include <boost/utility/enable_if.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T>
     inline

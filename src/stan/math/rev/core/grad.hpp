@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Compute the gradient for all variables starting from the

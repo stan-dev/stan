@@ -18,14 +18,14 @@ template <typename T_prob>
 void expect_propto(std::vector<int>& ns1, T_prob theta1, 
                    std::vector<int>& ns2, T_prob theta2, 
                    std::string message) {
-  expect_eq_diffs(stan::prob::multinomial_log<false>(ns1, theta1),
-                  stan::prob::multinomial_log<false>(ns2, theta2),
-                  stan::prob::multinomial_log<true>(ns1, theta1),
-                  stan::prob::multinomial_log<true>(ns2, theta2),
+  expect_eq_diffs(stan::math::multinomial_log<false>(ns1, theta1),
+                  stan::math::multinomial_log<false>(ns2, theta2),
+                  stan::math::multinomial_log<true>(ns1, theta1),
+                  stan::math::multinomial_log<true>(ns2, theta2),
                   message);
 }
 
-using stan::agrad::var;
+using stan::math::var;
 using Eigen::Dynamic;
 using Eigen::Matrix;
 

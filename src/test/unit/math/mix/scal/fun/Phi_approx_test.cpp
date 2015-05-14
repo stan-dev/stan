@@ -14,8 +14,8 @@
 #include <stan/math/rev/scal/fun/inv_logit.hpp>
 
 TEST(AgradFwdPhi_approx, FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::Phi_approx;
 
   fvar<var> x(1.0,1.3);
@@ -30,8 +30,8 @@ TEST(AgradFwdPhi_approx, FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(0.24152729, g[0]);
 }
 TEST(AgradFwdPhi_approx, FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::Phi_approx;
 
   fvar<var> x(1.0,1.3);
@@ -44,9 +44,9 @@ TEST(AgradFwdPhi_approx, FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdPhi_approx, FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::Phi_approx;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 1.0;
@@ -81,9 +81,9 @@ TEST(AgradFwdPhi_approx, FvarFvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdPhi_approx, FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::Phi_approx;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 1.0;
@@ -108,9 +108,9 @@ TEST(AgradFwdPhi_approx, FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(-0.24180038, r[0]);
 }
 TEST(AgradFwdPhi_approx, FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::Phi_approx;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 2.0;

@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 
 TEST(AgradMatrix,value_of_rec) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::value_of_rec;
   using std::vector;
 

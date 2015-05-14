@@ -6,7 +6,7 @@
 #include <stan/math/fwd/scal/fun/exp.hpp>
 
 TEST(AgradFwdLog1pExp,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log1p_exp;
   using std::exp;
 
@@ -30,7 +30,7 @@ TEST(AgradFwdLog1pExp,Fvar) {
 }
 
 TEST(AgradFwdLog1pExp,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::log1p_exp;
   using std::exp;
 

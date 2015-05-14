@@ -7,7 +7,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class erf_vari : public op_v_vari {
@@ -59,7 +59,7 @@ namespace stan {
      * @param a The variable.
      * @return Error function applied to the variable.
      */
-    inline var erf(const stan::agrad::var& a) {
+    inline var erf(const stan::math::var& a) {
       return var(new erf_vari(a.vi_));
     }
 

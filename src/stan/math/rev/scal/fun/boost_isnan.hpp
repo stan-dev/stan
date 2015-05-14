@@ -19,7 +19,7 @@ namespace boost {
      */
     template <>
     inline
-    bool isnan(const stan::agrad::var& v) {
+    bool isnan(const stan::math::var& v) {
       return (boost::math::isnan)(v.val());
     }
 

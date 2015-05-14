@@ -29,8 +29,8 @@ using Eigen::Matrix;
 using std::vector;
 
 TEST(ProbDistributionsMultiNormalPrec,fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   Matrix<fvar<var>,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
   Matrix<fvar<var>,Dynamic,1> mu(3,1);
@@ -51,13 +51,13 @@ TEST(ProbDistributionsMultiNormalPrec,fvar_var) {
   }
 
   Matrix<fvar<var>,Dynamic,Dynamic> L = Sigma.inverse();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_prec_log(y,mu,L).val_.val());
-  EXPECT_FLOAT_EQ(0.54899865, stan::prob::multi_normal_prec_log(y,mu,L).d_.val());
+  EXPECT_FLOAT_EQ(-11.73908, stan::math::multi_normal_prec_log(y,mu,L).val_.val());
+  EXPECT_FLOAT_EQ(0.54899865, stan::math::multi_normal_prec_log(y,mu,L).d_.val());
 }
 
 TEST(ProbDistributionsMultiNormalPrec,fvar_fvar_var) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   Matrix<fvar<fvar<var> >,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
   Matrix<fvar<fvar<var> >,Dynamic,1> mu(3,1);
@@ -78,6 +78,6 @@ TEST(ProbDistributionsMultiNormalPrec,fvar_fvar_var) {
   }
 
   Matrix<fvar<fvar<var> >,Dynamic,Dynamic> L = Sigma.inverse();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_prec_log(y,mu,L).val_.val_.val());
-  EXPECT_FLOAT_EQ(0.54899865, stan::prob::multi_normal_prec_log(y,mu,L).d_.val_.val());
+  EXPECT_FLOAT_EQ(-11.73908, stan::math::multi_normal_prec_log(y,mu,L).val_.val_.val());
+  EXPECT_FLOAT_EQ(0.54899865, stan::math::multi_normal_prec_log(y,mu,L).d_.val_.val());
 }

@@ -2,7 +2,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <gtest/gtest.h>
 
-struct foo : public stan::agrad::chainable_alloc {
+struct foo : public stan::math::chainable_alloc {
   std::vector<double> x_;
   foo() : x_(3) { }
   ~foo() { }
@@ -11,12 +11,12 @@ struct foo : public stan::agrad::chainable_alloc {
 
 TEST(AgradRev, varStackRecoverNestedSegFaultFix) {
   // this test failed in 2.5, but passes in 2.6
-  stan::agrad::start_nested();
+  stan::math::start_nested();
   foo* x = new foo();
   x->chain();
-  stan::agrad::recover_memory_nested();
+  stan::math::recover_memory_nested();
   // should be able to do this redundantly:
-  stan::agrad::recover_memory(); 
+  stan::math::recover_memory(); 
 }
 
 // just test basic autodiff;  no more free_memory operation
@@ -45,11 +45,11 @@ TEST(AgradRev,varStack) {
 }
 
 TEST(AgradRev, recoverMemoryLogicError) {
-  stan::agrad::start_nested();
-  EXPECT_THROW(stan::agrad::recover_memory(), std::logic_error);
-  stan::agrad::recover_memory_nested(); // clean up for next test
+  stan::math::start_nested();
+  EXPECT_THROW(stan::math::recover_memory(), std::logic_error);
+  stan::math::recover_memory_nested(); // clean up for next test
 }
 
 TEST(AgradRev, recoverMemoryNestedLogicError) {
-  EXPECT_THROW(stan::agrad::recover_memory_nested(), std::logic_error);
+  EXPECT_THROW(stan::math::recover_memory_nested(), std::logic_error);
 }

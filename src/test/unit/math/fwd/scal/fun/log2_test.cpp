@@ -4,7 +4,7 @@
 #include <stan/math/fwd/scal/fun/log2.hpp>
 
 TEST(AgradFwdLog2,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::log;
   using std::isnan;
   using stan::math::log2;
@@ -40,7 +40,7 @@ TEST(AgradFwdLog2,Fvar) {
 
 
 TEST(AgradFwdLog2,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::log;
 
   fvar<fvar<double> > x;

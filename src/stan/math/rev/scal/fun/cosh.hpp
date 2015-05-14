@@ -6,7 +6,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class cosh_vari : public op_v_vari {

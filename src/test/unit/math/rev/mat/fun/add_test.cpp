@@ -11,7 +11,7 @@
 #include <stan/math/rev/core.hpp>
 
 TEST(AgradRevMatrix,add_scalar) {
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::add;
 
   matrix_v v(2,2);
@@ -34,7 +34,7 @@ TEST(AgradRevMatrix,add_scalar) {
 TEST(AgradRevMatrix, add_vector_vector) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d vd_1(5);
   vector_d vd_2(5);
@@ -81,7 +81,7 @@ TEST(AgradRevMatrix, add_vector_vector) {
 TEST(AgradRevMatrix, add_vector_vector_exception) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d d1(5), d2(1);
   vector_v v1(5), v2(1);
@@ -94,7 +94,7 @@ TEST(AgradRevMatrix, add_vector_vector_exception) {
 TEST(AgradRevMatrix, add_rowvector_rowvector) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d rvd_1(5), rvd_2(5);
   row_vector_v rvv_1(5), rvv_2(5);
@@ -138,7 +138,7 @@ TEST(AgradRevMatrix, add_rowvector_rowvector) {
 TEST(AgradRevMatrix, add_rowvector_rowvector_exception) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d d1(5), d2(2);
   row_vector_v v1(5), v2(2);
@@ -152,7 +152,7 @@ TEST(AgradRevMatrix, add_rowvector_rowvector_exception) {
 TEST(AgradRevMatrix, add_matrix_matrix) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_d md_1(2,2), md_2(2,2);
   matrix_v mv_1(2,2), mv_2(2,2);
@@ -192,7 +192,7 @@ TEST(AgradRevMatrix, add_matrix_matrix) {
 TEST(AgradRevMatrix, add_matrix_matrix_exception) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   
   matrix_d d1(2,2), d2(1,2);
   matrix_v v1(2,2), v2(1,2);

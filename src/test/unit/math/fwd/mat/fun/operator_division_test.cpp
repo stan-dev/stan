@@ -6,9 +6,9 @@
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/prim/mat/fun/typedefs.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 TEST(AgradFwdMatrixOperatorDivision,fd_scalar) {
-  using stan::agrad::divide;
+  using stan::math::divide;
   double d1, d2;
   fvar<double>   v1, v2;
 
@@ -51,7 +51,7 @@ TEST(AgradFwdMatrixOperatorDivision,fd_scalar) {
 TEST(AgradFwdMatrixOperatorDivision,fd_vector) {
   using stan::math::divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d d1(3);
   vector_fd v1(3);
@@ -132,7 +132,7 @@ TEST(AgradFwdMatrixOperatorDivision,fd_vector) {
 TEST(AgradFwdMatrixOperatorDivision,fd_rowvector) {
   using stan::math::divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d d1(3);
   row_vector_fd v1(3);
@@ -212,7 +212,7 @@ TEST(AgradFwdMatrixOperatorDivision,fd_rowvector) {
 TEST(AgradFwdMatrixOperatorDivision,fd_matrix) {
   using stan::math::divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_d d1(2,2);
   matrix_fd v1(2,2);
@@ -305,7 +305,7 @@ TEST(AgradFwdMatrixOperatorDivision,fd_matrix) {
   EXPECT_TRUE (std::isnan(output(1,1).d_));
 }
 TEST(AgradFwdMatrixOperatorDivision,ffd_scalar) {
-  using stan::agrad::divide;
+  using stan::math::divide;
   double d1, d2;
   fvar<fvar<double> > v1, v2;
 
@@ -352,7 +352,7 @@ TEST(AgradFwdMatrixOperatorDivision,ffd_scalar) {
 TEST(AgradFwdMatrixOperatorDivision,ffd_vector) {
   using stan::math::divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   vector_d d1(3);
   vector_ffd v1(3);
@@ -441,7 +441,7 @@ TEST(AgradFwdMatrixOperatorDivision,ffd_vector) {
 TEST(AgradFwdMatrixOperatorDivision,ffd_rowvector) {
   using stan::math::divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
   row_vector_d d1(3);
   row_vector_ffd v1(3);
@@ -531,7 +531,7 @@ TEST(AgradFwdMatrixOperatorDivision,ffd_rowvector) {
 TEST(AgradFwdMatrixOperatorDivision,ffd_matrix) {
   using stan::math::divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
 
   matrix_d d1(2,2);
   matrix_ffd v1(2,2);

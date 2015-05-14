@@ -8,7 +8,7 @@
 TEST(AgradFwdMatrixLog, fd_matrix) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_d expected_output(2,2);
   matrix_fd mv(2,2), output;
@@ -34,7 +34,7 @@ TEST(AgradFwdMatrixLog, fd_matrix) {
 TEST(AgradFwdMatrixLog, fd_vector) {
   using stan::math::log;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d expected_output(4);
   vector_fd mv(4), output;
@@ -58,7 +58,7 @@ TEST(AgradFwdMatrixLog, fd_vector) {
 TEST(AgradFwdMatrixLog, fd_rowvector) {
   using stan::math::log;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d expected_output(4);
   row_vector_fd mv(4), output;
@@ -81,8 +81,8 @@ TEST(AgradFwdMatrixLog, fd_rowvector) {
 TEST(AgradFwdMatrixLog, ffd_matrix) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a,b,c,d;
   a.val_.val_ = 1.0;
@@ -114,8 +114,8 @@ TEST(AgradFwdMatrixLog, ffd_matrix) {
 TEST(AgradFwdMatrixLog, ffd_vector) {
   using stan::math::log;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::vector_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a,b,c,d;
   a.val_.val_ = 1.0;
@@ -145,8 +145,8 @@ TEST(AgradFwdMatrixLog, ffd_vector) {
 TEST(AgradFwdMatrixLog, ffd_rowvector) {
   using stan::math::log;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_ffd;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a,b,c,d;
   a.val_.val_ = 1.0;

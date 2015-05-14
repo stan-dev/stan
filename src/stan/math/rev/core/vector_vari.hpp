@@ -6,14 +6,14 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     class op_vector_vari : public vari {
     protected:
       const size_t size_;
       vari** vis_;
     public:
-      op_vector_vari(double f, const std::vector<stan::agrad::var>& vs) :
+      op_vector_vari(double f, const std::vector<stan::math::var>& vs) :
         vari(f),
         size_(vs.size()) {
         vis_ = reinterpret_cast<vari**>

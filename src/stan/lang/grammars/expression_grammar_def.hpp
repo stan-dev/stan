@@ -47,7 +47,7 @@
 #include <stan/lang/grammars/expression07_grammar.hpp>
 
 
-namespace stan { 
+namespace stan {
 
   namespace lang {
 
@@ -82,7 +82,7 @@ namespace stan {
         if (!expr1.expression_type().is_primitive()
             || !expr2.expression_type().is_primitive()) {
           error_msgs << "binary infix operator "
-                     << op 
+                     << op
                      << " with functional interpretation "
                      << fun_name
                      << " requires arguments or primitive type (int or real)"
@@ -126,49 +126,49 @@ namespace stan {
       expression_r.name("expression");
       expression_r
         = expression14_r(_r1) [_val = _1]
-        > *( lit("||") 
+        > *( lit("||")
              > expression14_r(_r1)  [_val = binary_op_f(_val,_1,"||","logical_or",
-                                                   boost::phoenix::ref(error_msgs))] 
+                                                   boost::phoenix::ref(error_msgs))]
              );
 
       expression14_r.name("expression");
-      expression14_r 
+      expression14_r
         = expression10_r(_r1) [_val = _1]
-        > *( lit("&&") 
+        > *( lit("&&")
              > expression10_r(_r1)  [_val = binary_op_f(_val,_1,"&&","logical_and",
-                                                   boost::phoenix::ref(error_msgs))] 
+                                                   boost::phoenix::ref(error_msgs))]
              );
 
       expression10_r.name("expression");
-      expression10_r 
+      expression10_r
         = expression09_r(_r1) [_val = _1]
-        > *( ( lit("==") 
+        > *( ( lit("==")
                > expression09_r(_r1)  [_val = binary_op_f(_val,_1,"==","logical_eq",
                                                        boost::phoenix::ref(error_msgs))] )
               |
-              ( lit("!=") 
+              ( lit("!=")
                 > expression09_r(_r1)  [_val = binary_op_f(_val,_1,"!=","logical_neq",
-                                                      boost::phoenix::ref(error_msgs))] ) 
+                                                      boost::phoenix::ref(error_msgs))] )
               );
 
       expression09_r.name("expression");
-      expression09_r 
+      expression09_r
         = expression07_g(_r1) [_val = _1]
         > *( ( lit("<=")
                > expression07_g(_r1)  [_val = binary_op_f(_val,_1,"<","logical_lte",
                                                       boost::phoenix::ref(error_msgs))] )
               |
-              ( lit("<") 
+              ( lit("<")
                 > expression07_g(_r1)  [_val = binary_op_f(_val,_1,"<=","logical_lt",
-                                                      boost::phoenix::ref(error_msgs))] ) 
+                                                      boost::phoenix::ref(error_msgs))] )
               |
-              ( lit(">=") 
+              ( lit(">=")
                 > expression07_g(_r1)  [_val = binary_op_f(_val,_1,">","logical_gte",
-                                                      boost::phoenix::ref(error_msgs))] ) 
+                                                      boost::phoenix::ref(error_msgs))] )
               |
-              ( lit(">") 
+              ( lit(">")
                 > expression07_g(_r1)  [_val = binary_op_f(_val,_1,">=","logical_gt",
-                                                      boost::phoenix::ref(error_msgs))] ) 
+                                                      boost::phoenix::ref(error_msgs))] )
               );
 
     }

@@ -15,11 +15,11 @@ test-math-dependencies:
 	@$(call math_warnings, 'prim', 'src/stan/math/prim',\
              '<stan/math/rev/', 'File includes a stan/math/rev header file.')
 	@$(call math_warnings, 'prim', 'src/stan/math/prim',\
-             'stan::agrad::rev', 'File uses stan::agrad::var.')
+             'stan::math::rev', 'File uses stan::math::var.')
 	@$(call math_warnings, 'prim', 'src/stan/math/prim',\
              '<stan/math/fwd/', 'File includes a stan/math/fwd header file.')
 	@$(call math_warnings, 'prim', 'src/stan/math/prim',\
-             'stan::agrad::fvar', 'File uses stan::agrad::fvar.')
+             'stan::math::fvar', 'File uses stan::math::fvar.')
 	@$(call math_warnings, 'prim', 'src/stan/math/prim',\
              '<stan/math/mix/', 'File includes a stan/math/mix header file.')
 ## Check for files inside src/stan/math/rev that contain
@@ -27,7 +27,7 @@ test-math-dependencies:
 	@$(call math_warnings, 'rev', 'src/stan/math/rev',\
              '<stan/math/fwd/', 'File includes a stan/math/fwd header file.')
 	@$(call math_warnings, 'rev', 'src/stan/math/rev',\
-             'stan::agrad::fvar', 'File uses stan::agrad::fvar.')
+             'stan::math::fvar', 'File uses stan::math::fvar.')
 	@$(call math_warnings, 'rev', 'src/stan/math/rev',\
              '<stan/math/mix/', 'File includes a stan/math/mix header file.')
 ## Check for files inside src/stan/math/rev that contain
@@ -35,7 +35,7 @@ test-math-dependencies:
 	@$(call math_warnings, 'fwd', 'src/stan/math/fwd',\
              '<stan/math/rev/', 'File includes a stan/math/rev header file.')
 	@$(call math_warnings, 'fwd', 'src/stan/math/fwd',\
-             'stan::agrad::var', 'File uses stan::agrad::vvar.')
+             'stan::math::var', 'File uses stan::math::var.')
 	@$(call math_warnings, 'fwd', 'src/stan/math/fwd',\
              '<stan/math/mix/', 'File includes a stan/math/mix header file.')
 ## Check for files inside src/stan/math/*/scal that contain

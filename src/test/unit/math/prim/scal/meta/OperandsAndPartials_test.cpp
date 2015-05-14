@@ -3,7 +3,7 @@
 
 TEST(AgradPartialsVari, incr_deriv_double) {
   using stan::VectorView;
-  using stan::agrad::incr_deriv;
+  using stan::math::incr_deriv;
   using stan::is_vector;
   using stan::is_constant_struct;
 
@@ -23,7 +23,7 @@ TEST(AgradPartialsVari, incr_deriv_double) {
 
 TEST(AgradPartialsVari, incr_deriv_vec_double) {
   using stan::VectorView;
-  using stan::agrad::incr_deriv;
+  using stan::math::incr_deriv;
   using stan::is_vector;
   using stan::is_constant_struct;
 

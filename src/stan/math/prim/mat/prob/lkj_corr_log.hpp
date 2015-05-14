@@ -4,7 +4,7 @@
 #include <stan/math/prim/mat/err/check_corr_matrix.hpp>
 #include <stan/math/prim/scal/err/check_finite.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/fun/lgamma.hpp>
 #include <stan/math/prim/mat/fun/factor_cov_matrix.hpp>
@@ -49,7 +49,7 @@
 #include <stan/math/prim/mat/fun/sum.hpp>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <typename T_shape>
     T_shape do_lkj_constant(const T_shape& eta, const unsigned int& K) {
@@ -87,7 +87,7 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y, T_shape>::type
     lkj_corr_log(const Eigen::Matrix<T_y, Eigen::Dynamic, Eigen::Dynamic>& y,
                  const T_shape& eta) {
-      static const char* function("stan::prob::lkj_corr_log");
+      static const char* function("stan::math::lkj_corr_log");
 
       using stan::math::check_positive;
       using stan::math::check_corr_matrix;

@@ -3,7 +3,7 @@
 #include <sstream>
 
 TEST(AgradRev, insertion_operator) {
-  stan::agrad::vari v(5);
+  stan::math::vari v(5);
   std::stringstream ss;
   ss << &v;
   EXPECT_EQ("5:0", ss.str());

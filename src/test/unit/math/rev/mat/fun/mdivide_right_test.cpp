@@ -13,7 +13,7 @@
 
 TEST(AgradRevMatrix,mdivide_right_val) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   using stan::math::mdivide_right;
 
   matrix_v Av(2,2);

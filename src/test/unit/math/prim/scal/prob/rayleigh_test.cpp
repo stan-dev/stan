@@ -6,9 +6,9 @@
 
 TEST(ProbDistributionsRayleigh, error_check) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::rayleigh_rng(2.0,rng));
+  EXPECT_NO_THROW(stan::math::rayleigh_rng(2.0,rng));
 
-  EXPECT_THROW(stan::prob::rayleigh_rng(-2.0,rng),std::domain_error);
+  EXPECT_THROW(stan::math::rayleigh_rng(-2.0,rng),std::domain_error);
 }
 
 TEST(ProbDistributionsRayleigh, chiSquareGoodnessFitTest) {
@@ -31,7 +31,7 @@ TEST(ProbDistributionsRayleigh, chiSquareGoodnessFitTest) {
   }
 
   while (count < N) {
-    double a = stan::prob::rayleigh_rng(2.0,rng);
+    double a = stan::math::rayleigh_rng(2.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

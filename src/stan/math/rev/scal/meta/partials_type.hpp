@@ -7,7 +7,7 @@
 namespace stan {
 
   template <>
-  struct partials_type<stan::agrad::var> {
+  struct partials_type<stan::math::var> {
     typedef double type;
   };
 

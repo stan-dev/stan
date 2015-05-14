@@ -8,7 +8,7 @@
 TEST(AgradFwdMatrixExp, fd_matrix) {
   using stan::math::exp;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_d expected_output(2,2);
   matrix_fd mv(2,2), output;
@@ -33,7 +33,7 @@ TEST(AgradFwdMatrixExp, fd_matrix) {
 TEST(AgradFwdMatrixExp, fd_vector) {
   using stan::math::exp;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d expected_output(4);
   vector_fd mv(4), output;
@@ -56,7 +56,7 @@ TEST(AgradFwdMatrixExp, fd_vector) {
 TEST(AgradFwdMatrixExp, fd_rowvector) {
   using stan::math::exp;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d expected_output(4);
   row_vector_fd mv(4), output;
@@ -79,8 +79,8 @@ TEST(AgradFwdMatrixExp, fd_rowvector) {
 TEST(AgradFwdMatrixExp, ffd_matrix) {
   using stan::math::exp;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
 
   matrix_d expected_output(2,2);
   matrix_ffd mv(2,2), output;
@@ -111,8 +111,8 @@ TEST(AgradFwdMatrixExp, ffd_matrix) {
 TEST(AgradFwdMatrixExp, ffd_vector) {
   using stan::math::exp;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::vector_ffd;
+  using stan::math::fvar;
 
   vector_d expected_output(4);
   vector_ffd mv(4), output;
@@ -141,8 +141,8 @@ TEST(AgradFwdMatrixExp, ffd_vector) {
 TEST(AgradFwdMatrixExp, ffd_rowvector) {
   using stan::math::exp;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_ffd;
+  using stan::math::fvar;
 
   row_vector_d expected_output(4);
   row_vector_ffd mv(4), output;

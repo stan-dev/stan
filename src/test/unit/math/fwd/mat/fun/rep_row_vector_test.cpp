@@ -5,8 +5,8 @@
 
 TEST(AgradFwdMatrixRepRowVector,fd_rowvector) {
   using stan::math::rep_row_vector;
-  using stan::agrad::row_vector_fd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_fd;
+  using stan::math::fvar;
   fvar<double> a;
   a.val_ = 3.0;
   a.d_ = 2.0;
@@ -25,8 +25,8 @@ TEST(AgradFwdMatrixRepRowVector,fd_rowvector) {
 
 TEST(AgradFwdMatrixRepRowVector,fd_rowvector_exception) {
   using stan::math::rep_row_vector;
-  using stan::agrad::row_vector_fd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_fd;
+  using stan::math::fvar;
   fvar<double> a;
   a.val_ = 3.0;
   a.d_ = 2.0;
@@ -35,8 +35,8 @@ TEST(AgradFwdMatrixRepRowVector,fd_rowvector_exception) {
 }
 TEST(AgradFwdMatrixRepRowVector,ffd_rowvector) {
   using stan::math::rep_row_vector;
-  using stan::agrad::row_vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_ffd;
+  using stan::math::fvar;
   fvar<fvar<double> > a;
   a.val_ = 3.0;
   a.d_ = 2.0;
@@ -55,8 +55,8 @@ TEST(AgradFwdMatrixRepRowVector,ffd_rowvector) {
 
 TEST(AgradFwdMatrixRepRowVector,ffd_rowvector_exception) {
   using stan::math::rep_row_vector;
-  using stan::agrad::row_vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_ffd;
+  using stan::math::fvar;
   fvar<fvar<double> > a;
   a.val_ = 3.0;
   a.d_ = 2.0;

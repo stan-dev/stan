@@ -9,7 +9,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class gamma_q_vv_vari : public op_vv_vari {
@@ -55,18 +55,18 @@ namespace stan {
       };
     }
 
-    inline var gamma_q(const stan::agrad::var& a,
-                       const stan::agrad::var& b) {
+    inline var gamma_q(const stan::math::var& a,
+                       const stan::math::var& b) {
       return var(new gamma_q_vv_vari(a.vi_, b.vi_));
     }
 
-    inline var gamma_q(const stan::agrad::var& a,
+    inline var gamma_q(const stan::math::var& a,
                        const double& b) {
       return var(new gamma_q_vd_vari(a.vi_, b));
     }
 
     inline var gamma_q(const double& a,
-                       const stan::agrad::var& b) {
+                       const stan::math::var& b) {
       return var(new gamma_q_dv_vari(a, b.vi_));
     }
 

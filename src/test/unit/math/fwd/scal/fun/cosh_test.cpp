@@ -5,7 +5,7 @@
 #include <stan/math/fwd/scal/fun/sinh.hpp>
 
 TEST(AgradFwdCosh,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::sinh;
   using std::cosh;
 
@@ -28,7 +28,7 @@ TEST(AgradFwdCosh,Fvar) {
 
 
 TEST(AgradFwdCosh,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::sinh;
   using std::cosh;
 

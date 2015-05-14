@@ -6,7 +6,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsStudentT : public AgradDistributionTest {
 public:
@@ -72,7 +72,7 @@ public:
   typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
            const T4&, const T5&) {
-    return stan::prob::student_t_log(y, nu, mu, sigma);
+    return stan::math::student_t_log(y, nu, mu, sigma);
   }
   
   template <bool propto, 
@@ -81,7 +81,7 @@ public:
   typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
            const T4&, const T5&) {
-    return stan::prob::student_t_log<propto>(y, nu, mu, sigma);
+    return stan::math::student_t_log<propto>(y, nu, mu, sigma);
   }
   
   
@@ -94,7 +94,7 @@ public:
     using stan::math::square;
     using stan::math::log1p;
     using boost::math::lgamma;
-    using stan::prob::NEG_LOG_SQRT_PI;
+    using stan::math::NEG_LOG_SQRT_PI;
     
     return lgamma( (nu + 1.0) / 2.0) - lgamma(nu / 2.0) 
       + NEG_LOG_SQRT_PI - 0.5 * log(nu) - log(sigma) 

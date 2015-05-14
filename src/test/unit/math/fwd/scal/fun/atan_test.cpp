@@ -10,7 +10,7 @@ class AgradFwdAtan : public testing::Test {
 
 
 TEST_F(AgradFwdAtan,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::atan;
 
   fvar<double> x(0.5,1.0);
@@ -34,7 +34,7 @@ TEST_F(AgradFwdAtan,Fvar) {
 
 
 TEST_F(AgradFwdAtan,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::atan;
 
   fvar<fvar<double> > x;

@@ -18,7 +18,7 @@ TEST(ProbDistributionsMultinomial,RNGSize) {
   Matrix<double,Dynamic,1> theta(5);
   // error in 2.1.0 due to overflow in binomial call due to division
   theta << 0.3, 0.1, 0.2, 0.2, 0.2;  
-  std::vector<int> sample = stan::prob::multinomial_rng(theta,10,rng);
+  std::vector<int> sample = stan::math::multinomial_rng(theta,10,rng);
   // bug in 2.1.0 returned 10 rather than 5 for returned size
   EXPECT_EQ(5U, sample.size());  
 }
@@ -30,7 +30,7 @@ TEST(ProbDistributionsMultinomial,Multinomial) {
   ns.push_back(3);
   Matrix<double,Dynamic,1> theta(3,1);
   theta << 0.2, 0.3, 0.5;
-  EXPECT_FLOAT_EQ(-2.002481, stan::prob::multinomial_log(ns,theta));
+  EXPECT_FLOAT_EQ(-2.002481, stan::math::multinomial_log(ns,theta));
 }
 TEST(ProbDistributionsMultinomial,Propto) {
   std::vector<int> ns;
@@ -39,10 +39,10 @@ TEST(ProbDistributionsMultinomial,Propto) {
   ns.push_back(3);
   Matrix<double,Dynamic,1> theta(3,1);
   theta << 0.2, 0.3, 0.5;
-  EXPECT_FLOAT_EQ(0.0, stan::prob::multinomial_log<true>(ns,theta));
+  EXPECT_FLOAT_EQ(0.0, stan::math::multinomial_log<true>(ns,theta));
 }
 
-using stan::prob::multinomial_log;
+using stan::math::multinomial_log;
 
 TEST(ProbDistributionsMultinomial, error) {
   double nan = std::numeric_limits<double>::quiet_NaN();
@@ -110,10 +110,10 @@ TEST(ProbDistributionsMultinomial, error_check) {
   Matrix<double,Dynamic,1> theta(3);
   theta << 0.15, 0.45, 0.40;
 
-  EXPECT_THROW(stan::prob::multinomial_rng(theta,-3,rng), std::domain_error);
+  EXPECT_THROW(stan::math::multinomial_rng(theta,-3,rng), std::domain_error);
 
   theta << 0.15, 0.45, 0.50;
-  EXPECT_THROW(stan::prob::multinomial_rng(theta,3,rng), std::domain_error);
+  EXPECT_THROW(stan::math::multinomial_rng(theta,3,rng), std::domain_error);
 }
 
 TEST(ProbDistributionsMultinomial, chiSquareGoodnessFitTest) {
@@ -136,7 +136,7 @@ TEST(ProbDistributionsMultinomial, chiSquareGoodnessFitTest) {
     bin[i] = 0;
 
   for (int count = 0; count < M; ++count) {
-    std::vector<int> a = stan::prob::multinomial_rng(theta,trials,rng);
+    std::vector<int> a = stan::math::multinomial_rng(theta,trials,rng);
     for (int i = 0; i < K; ++i)
       bin[i] += a[i];
   }

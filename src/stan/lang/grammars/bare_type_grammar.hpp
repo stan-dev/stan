@@ -11,7 +11,7 @@
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <stan/lang/grammars/statement_grammar.hpp>
 
-namespace stan { 
+namespace stan {
 
   namespace lang {
 
@@ -24,23 +24,23 @@ namespace stan {
       // global info for function defs
       variable_map& var_map_;
       std::stringstream& error_msgs_;
-      
+
       bare_type_grammar(variable_map& var_map,
                         std::stringstream& error_msgs);
 
-      boost::spirit::qi::rule<Iterator, 
+      boost::spirit::qi::rule<Iterator,
                               expr_type(),
-                              whitespace_grammar<Iterator> > 
+                              whitespace_grammar<Iterator> >
       bare_type_r;
 
-      boost::spirit::qi::rule<Iterator, 
+      boost::spirit::qi::rule<Iterator,
                               base_expr_type(),
-                              whitespace_grammar<Iterator> > 
+                              whitespace_grammar<Iterator> >
       type_identifier_r;
 
-      boost::spirit::qi::rule<Iterator, 
+      boost::spirit::qi::rule<Iterator,
                               size_t(),
-                              whitespace_grammar<Iterator> > 
+                              whitespace_grammar<Iterator> >
       array_dims_r;
 
       boost::spirit::qi::rule<Iterator,
@@ -48,7 +48,7 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       end_bare_types_r;
 
-      
+
     };
   }
 }

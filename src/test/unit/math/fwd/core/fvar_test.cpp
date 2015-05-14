@@ -3,8 +3,8 @@
 #include <stan/math/fwd/core.hpp>
 
 TEST(AgradFwdFvar,Fvar) {
-  using stan::agrad::fvar;
-  typedef stan::agrad::fvar<double> fvd;
+  using stan::math::fvar;
+  typedef stan::math::fvar<double> fvd;
 
   fvar<double> a;
   EXPECT_FLOAT_EQ(0.0, a.val_);
@@ -51,7 +51,7 @@ TEST(AgradFwdFvar,Fvar) {
 }
 
 TEST(AgradFwdFvar, insertion_operator) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   fvar<double> a(5.0);
   std::stringstream ss;
   ss << a;

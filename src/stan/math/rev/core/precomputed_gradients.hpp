@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /**
      * A variable implementation taking a sequence of operands and

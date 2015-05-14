@@ -50,7 +50,7 @@ double finite_diff_2(const int y, const double y_hat) {
 
 
 TEST(AgradFwdBinaryLogLoss,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::binary_log_loss;
 
 
@@ -101,7 +101,7 @@ TEST(AgradFwdBinaryLogLoss,Fvar) {
 
 
 TEST(AgradFwdBinaryLogLoss,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::binary_log_loss;
 
 

@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Return the specified standard vector in ascending order with gradients kept.

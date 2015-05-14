@@ -14,7 +14,7 @@
 #include <stan/math/prim/mat/err/check_square.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
     namespace {
       template <typename TD, int RD, int CD,
                 typename TA, int RA, int CA,

@@ -37,23 +37,23 @@ namespace stan {
 
     /**
      * Calculate the value and the Hessian of the specified function
-     * at the specified argument using second-order finite difference.  
+     * at the specified argument using second-order finite difference.
      *
-     * <p>The functor must implement 
-     * 
+     * <p>The functor must implement
+     *
      * <code>
      * double
      * operator()(const
      * Eigen::Matrix<double, Eigen::Dynamic, 1>&)
      * </code>
      *
-     * Error should be on order of epsilon ^ 4, with 4 
+     * Error should be on order of epsilon ^ 4, with 4
      * calls to the function f.
      *
-     * Reference: 
+     * Reference:
      * Eberly: Derivative Approximation by Finite Differences
      * Page 6
-     * 
+     *
      * @tparam F Type of function
      * @param[in] f Function
      * @param[in] x Argument to function

@@ -9,7 +9,7 @@ TEST(AgradFwdMatrixStanPrint,fvar_double) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::stan_print;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   std::stringstream output;
   fvar<double> a(1,2);
@@ -52,7 +52,7 @@ TEST(AgradFwdMatrixStanPrint,fvar_fvar_double) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::stan_print;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   std::stringstream output;
   fvar<fvar<double> > a(1,2);

@@ -8,12 +8,12 @@
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/fwd/scal/fun/abs.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_fd_matrix_fd) {
   stan::math::LDLT_factor<fvar<double>,-1,-1> ldlt_Ad;
-  stan::agrad::matrix_fd Ad(2,2);
-  stan::agrad::matrix_fd Av(2,2);
+  stan::math::matrix_fd Ad(2,2);
+  stan::math::matrix_fd Av(2,2);
   fvar<double> I;
 
   Ad << 2.0, 3.0, 
@@ -43,7 +43,7 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_fd_matrix_fd) {
 
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_fd_matrix_d) {
   stan::math::LDLT_factor<fvar<double>,-1,-1> ldlt_Ad;
-  stan::agrad::matrix_fd Ad(2,2);
+  stan::math::matrix_fd Ad(2,2);
   stan::math::matrix_d Av(2,2);
   fvar<double> I;
 
@@ -67,7 +67,7 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_fd_matrix_d) {
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_d_matrix_fd) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_Ad;
   stan::math::matrix_d Ad(2,2);
-  stan::agrad::matrix_fd Av(2,2);
+  stan::math::matrix_fd Av(2,2);
   fvar<double> I;
 
   Ad << 2.0, 3.0, 
@@ -88,8 +88,8 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_d_matrix_fd) {
 
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_fd_vector_fd) {
   stan::math::LDLT_factor<fvar<double>,-1,-1> ldlt_Ad;
-  stan::agrad::matrix_fd Ad(2,2);
-  stan::agrad::vector_fd Av(2);
+  stan::math::matrix_fd Ad(2,2);
+  stan::math::vector_fd Av(2);
   fvar<double> I;
 
   Ad << 2.0, 3.0, 
@@ -112,7 +112,7 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_fd_vector_fd) {
 
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_fd_vector_d) {
   stan::math::LDLT_factor<fvar<double>,-1,-1> ldlt_Ad;
-  stan::agrad::matrix_fd Ad(2,2);
+  stan::math::matrix_fd Ad(2,2);
   stan::math::vector_d Av(2);
   fvar<double> I;
 
@@ -135,7 +135,7 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_fd_vector_d) {
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_d_vector_fd) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_Ad;
   stan::math::matrix_d Ad(2,2);
-  stan::agrad::vector_fd Av(2);
+  stan::math::vector_fd Av(2);
   fvar<double> I;
 
   Ad << 2.0, 3.0, 
@@ -156,9 +156,9 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,fd_exceptions) {
   using stan::math::matrix_d;
   using stan::math::vector_d;
   using stan::math::row_vector_d;
-  using stan::agrad::matrix_fd;
-  using stan::agrad::vector_fd;
-  using stan::agrad::row_vector_fd;
+  using stan::math::matrix_fd;
+  using stan::math::vector_fd;
+  using stan::math::row_vector_fd;
 
   matrix_fd fv1_(3,3), fv2_(4,4);
   fv1_ << 1,2,3,4,5,6,7,8,9;
@@ -208,8 +208,8 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,fd_exceptions) {
 
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_ffd_matrix_ffd) {
   stan::math::LDLT_factor<fvar<fvar<double> >,-1,-1> ldlt_Ad;
-  stan::agrad::matrix_ffd Ad(2,2);
-  stan::agrad::matrix_ffd Av(2,2);
+  stan::math::matrix_ffd Ad(2,2);
+  stan::math::matrix_ffd Av(2,2);
   fvar<fvar<double> > I;
 
   Ad << 2.0, 3.0, 
@@ -239,7 +239,7 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_ffd_matrix_ffd) {
 
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_ffd_matrix_d) {
   stan::math::LDLT_factor<fvar<fvar<double> >,-1,-1> ldlt_Ad;
-  stan::agrad::matrix_ffd Ad(2,2);
+  stan::math::matrix_ffd Ad(2,2);
   stan::math::matrix_d Av(2,2);
   fvar<fvar<double> > I;
 
@@ -263,7 +263,7 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_ffd_matrix_d) {
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_d_matrix_ffd) {
   stan::math::LDLT_factor<double ,-1,-1> ldlt_Ad;
   stan::math::matrix_d Ad(2,2);
-  stan::agrad::matrix_ffd Av(2,2);
+  stan::math::matrix_ffd Av(2,2);
   fvar<fvar<double> > I;
 
   Ad << 2.0, 3.0, 
@@ -284,8 +284,8 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_d_matrix_ffd) {
 
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_ffd_vector_ffd) {
   stan::math::LDLT_factor<fvar<fvar<double> >,-1,-1> ldlt_Ad;
-  stan::agrad::matrix_ffd Ad(2,2);
-  stan::agrad::vector_ffd Av(2);
+  stan::math::matrix_ffd Ad(2,2);
+  stan::math::vector_ffd Av(2);
   fvar<fvar<double> > I;
 
   Ad << 2.0, 3.0, 
@@ -308,7 +308,7 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_ffd_vector_ffd) {
 
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_ffd_vector_d) {
   stan::math::LDLT_factor<fvar<fvar<double> >,-1,-1> ldlt_Ad;
-  stan::agrad::matrix_ffd Ad(2,2);
+  stan::math::matrix_ffd Ad(2,2);
   stan::math::vector_d Av(2);
   fvar<fvar<double> > I;
 
@@ -331,7 +331,7 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_ffd_vector_d) {
 TEST(AgradFwdMatrixTraceInvQuadFormLDLT,matrix_d_vector_ffd) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_Ad;
   stan::math::matrix_d Ad(2,2);
-  stan::agrad::vector_ffd Av(2);
+  stan::math::vector_ffd Av(2);
   fvar<fvar<double> > I;
 
   Ad << 2.0, 3.0, 
@@ -352,9 +352,9 @@ TEST(AgradFwdMatrixTraceInvQuadFormLDLT,ffd_exceptions) {
   using stan::math::matrix_d;
   using stan::math::vector_d;
   using stan::math::row_vector_d;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::matrix_ffd;
+  using stan::math::vector_ffd;
+  using stan::math::row_vector_ffd;
 
   matrix_ffd fv1_(3,3), fv2_(4,4);
   fv1_ << 1,2,3,4,5,6,7,8,9;

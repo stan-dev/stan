@@ -7,7 +7,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class neg_vari : public op_v_vari {

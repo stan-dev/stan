@@ -3,7 +3,7 @@
 #include <stan/math/fwd/scal/fun/exp.hpp>
 
 TEST(AgradFwdExp,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::exp;
 
   fvar<double> x(0.5,1.0);
@@ -37,7 +37,7 @@ TEST(AgradFwdExp,Fvar) {
 
 
 TEST(AgradFwdExp,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::exp;
 
   fvar<fvar<double> > x;

@@ -9,22 +9,22 @@
 #include <stan/math/prim/scal/err/check_positive_finite.hpp>
 #include <stan/math/prim/scal/meta/is_constant_struct.hpp>
 #include <stan/math/prim/scal/fun/modified_bessel_first_kind.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/prim/scal/fun/constants.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template<bool propto,
              typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     von_mises_log(T_y const& y, T_loc const& mu, T_scale const& kappa) {
-      static char const* const function = "stan::prob::von_mises_log";
+      static char const* const function = "stan::math::von_mises_log";
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
@@ -43,6 +43,7 @@ namespace stan {
       using stan::math::value_of;
 
       using stan::math::modified_bessel_first_kind;
+      using std::log;
 
       // Result accumulator.
       T_partials_return logp = 0.0;
@@ -86,7 +87,7 @@ namespace stan {
             = log(modified_bessel_first_kind(0, value_of(kappa_vec[i])));
       }
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> oap(y, mu, kappa);
+      OperandsAndPartials<T_y, T_loc, T_scale> oap(y, mu, kappa);
 
       size_t N = max_size(y, mu, kappa);
 

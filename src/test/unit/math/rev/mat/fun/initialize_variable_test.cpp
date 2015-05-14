@@ -8,7 +8,7 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 
 TEST(AgradRevMatrix, initializeVariable) {
-  using stan::agrad::initialize_variable;
+  using stan::math::initialize_variable;
   using std::vector;
 
   using Eigen::Matrix;

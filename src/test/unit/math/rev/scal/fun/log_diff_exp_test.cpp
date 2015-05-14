@@ -3,8 +3,9 @@
 #include <gtest/gtest.h>
 #include <test/unit/math/rev/scal/fun/nan_util.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <stan/math/rev/scal/fun/exp.hpp>
 #include <stan/math/rev/core.hpp>
+#include <stan/math/rev/scal/fun/exp.hpp>
+#include <stan/math/rev/scal/fun/fabs.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
 
 TEST(AgradRev,log_diff_exp_vv) {
@@ -91,8 +92,8 @@ void test_log_diff_exp_2_vv(double a_val,
   
   double f_val = f.val();
 
-  stan::agrad::var a2(a_val);
-  stan::agrad::var b2(b_val);
+  stan::math::var a2(a_val);
+  stan::math::var b2(b_val);
   AVEC x2 = createAVEC(a2,b2);
   AVAR f2 = log(exp(a2) - exp(b2));
   VEC g2;
@@ -118,7 +119,7 @@ void test_log_diff_exp_2_vd(double a_val,
   
   double f_val = f.val();
 
-  stan::agrad::var a2(a_val);
+  stan::math::var a2(a_val);
   AVEC x2 = createAVEC(a2);
   AVAR f2 = log(exp(a2) - exp(b));
   VEC g2;

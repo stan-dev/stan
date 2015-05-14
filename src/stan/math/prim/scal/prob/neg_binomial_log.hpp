@@ -22,14 +22,14 @@
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/fun/grad_reg_inc_beta.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 #include <stan/math/prim/scal/meta/max_size.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // NegBinomial(n|alpha, beta)  [alpha > 0;  beta > 0;  n >= 0]
     template <bool propto,
@@ -43,13 +43,13 @@ namespace stan {
                                                   T_inv_scale>::type
         T_partials_return;
 
-      static const char* function("stan::prob::neg_binomial_log");
+      static const char* function("stan::math::neg_binomial_log");
 
       using stan::math::check_positive_finite;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -75,6 +75,7 @@ namespace stan {
       using stan::math::digamma;
       using stan::math::lgamma;
       using std::log;
+      using std::log;
 
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
@@ -82,7 +83,7 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t size = max_size(n, alpha, beta);
 
-      agrad::OperandsAndPartials<T_shape, T_inv_scale>
+      OperandsAndPartials<T_shape, T_inv_scale>
         operands_and_partials(alpha, beta);
 
       size_t len_ab = max_size(alpha, beta);

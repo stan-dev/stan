@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     template <typename T> inline fvar<T>
     log_diff_exp(const fvar<T>& x1, const fvar<T>& x2) {

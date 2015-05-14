@@ -6,7 +6,7 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class log2_vari : public op_v_vari {
@@ -50,7 +50,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Base 2 logarithm of the variable.
      */
-    inline var log2(const stan::agrad::var& a) {
+    inline var log2(const stan::math::var& a) {
       return var(new log2_vari(a.vi_));
     }
 

@@ -15,14 +15,14 @@
 #include <stan/math/fwd/scal/fun/is_nan.hpp>
 #include <stan/math/rev/scal/fun/is_nan.hpp>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_fv_matrix_fv1) {
   stan::math::LDLT_factor<fvar<var>,-1,-1> ldlt_A;
-  stan::agrad::matrix_fv D(2,2);
-  stan::agrad::matrix_fv A(2,2);
-  stan::agrad::matrix_fv B(2,2);
+  stan::math::matrix_fv D(2,2);
+  stan::math::matrix_fv A(2,2);
+  stan::math::matrix_fv B(2,2);
   std::vector<var> vars;
   fvar<var> I;
 
@@ -63,9 +63,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_fv_matrix_fv1) {
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_fv_matrix_fv2) {
   stan::math::LDLT_factor<fvar<var>,-1,-1> ldlt_A;
-  stan::agrad::matrix_fv D(2,2);
-  stan::agrad::matrix_fv A(2,2);
-  stan::agrad::matrix_fv B(2,2);
+  stan::math::matrix_fv D(2,2);
+  stan::math::matrix_fv A(2,2);
+  stan::math::matrix_fv B(2,2);
   std::vector<var> vars;
   fvar<var> I;
 
@@ -103,8 +103,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_fv_matrix_fv2) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_fv_matrix_d1) {
   stan::math::LDLT_factor<fvar<var>,-1,-1> ldlt_A;
-  stan::agrad::matrix_fv D(2,2);
-  stan::agrad::matrix_fv A(2,2);
+  stan::math::matrix_fv D(2,2);
+  stan::math::matrix_fv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<var> I;
@@ -140,8 +140,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_fv_matrix_d1) {
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_fv_matrix_d2) {
   stan::math::LDLT_factor<fvar<var>,-1,-1> ldlt_A;
-  stan::agrad::matrix_fv D(2,2);
-  stan::agrad::matrix_fv A(2,2);
+  stan::math::matrix_fv D(2,2);
+  stan::math::matrix_fv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<var> I;
@@ -176,9 +176,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_fv_matrix_d2) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_d_matrix_fv1) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_fv D(2,2);
+  stan::math::matrix_fv D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_fv B(2,2);
+  stan::math::matrix_fv B(2,2);
   std::vector<var> vars;
   fvar<var> I;
 
@@ -212,9 +212,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_d_matrix_fv1) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_d_matrix_fv2) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_fv D(2,2);
+  stan::math::matrix_fv D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_fv B(2,2);
+  stan::math::matrix_fv B(2,2);
   std::vector<var> vars;
   fvar<var> I;
 
@@ -248,8 +248,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_d_matrix_fv2) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_fv_matrix_fv1) {
   stan::math::LDLT_factor<fvar<var>,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_fv A(2,2);
-  stan::agrad::matrix_fv B(2,2);
+  stan::math::matrix_fv A(2,2);
+  stan::math::matrix_fv B(2,2);
   std::vector<var> vars;
   fvar<var> I;
 
@@ -285,8 +285,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_fv_matrix_fv1) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_fv_matrix_fv2) {
   stan::math::LDLT_factor<fvar<var>,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_fv A(2,2);
-  stan::agrad::matrix_fv B(2,2);
+  stan::math::matrix_fv A(2,2);
+  stan::math::matrix_fv B(2,2);
   std::vector<var> vars;
   fvar<var> I;
 
@@ -319,7 +319,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_fv_matrix_fv2) {
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_d_matrix_d1) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_fv D(2,2);
+  stan::math::matrix_fv D(2,2);
   stan::math::matrix_d A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
@@ -350,7 +350,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_d_matrix_d1) {
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_d_matrix_d2) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_fv D(2,2);
+  stan::math::matrix_fv D(2,2);
   stan::math::matrix_d A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
@@ -381,7 +381,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_fv_matrix_d_matrix_d2) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_fv_matrix_d1) {
   stan::math::LDLT_factor<fvar<var>,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_fv A(2,2);
+  stan::math::matrix_fv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<var> I;
@@ -411,7 +411,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_fv_matrix_d1) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_fv_matrix_d2) {
   stan::math::LDLT_factor<fvar<var>,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_fv A(2,2);
+  stan::math::matrix_fv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<var> I;
@@ -443,7 +443,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_d_matrix_fv1) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_fv B(2,2);
+  stan::math::matrix_fv B(2,2);
   std::vector<var> vars;
   fvar<var> I;
 
@@ -473,7 +473,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_d_matrix_fv2) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_fv B(2,2);
+  stan::math::matrix_fv B(2,2);
   std::vector<var> vars;
   fvar<var> I;
 
@@ -504,9 +504,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,exceptions_fv) {
   using stan::math::matrix_d;
   using stan::math::vector_d;
   using stan::math::row_vector_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
+  using stan::math::row_vector_fv;
 
   matrix_fv fv1_(3,3), fv2_(4,4);
   fv1_ << 1,2,3,4,5,6,7,8,9;
@@ -556,9 +556,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,exceptions_fv) {
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_ffv1) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv D(2,2);
+  stan::math::matrix_ffv A(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -599,9 +599,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_ffv1) {
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_ffv2) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv D(2,2);
+  stan::math::matrix_ffv A(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -640,9 +640,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_ffv2) {
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_ffv3) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv D(2,2);
+  stan::math::matrix_ffv A(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -683,9 +683,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_ffv3) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_ffv4) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv D(2,2);
+  stan::math::matrix_ffv A(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -726,8 +726,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_ffv4) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_d1) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
+  stan::math::matrix_ffv D(2,2);
+  stan::math::matrix_ffv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
@@ -763,8 +763,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_d1) {
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_d2) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
+  stan::math::matrix_ffv D(2,2);
+  stan::math::matrix_ffv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
@@ -800,8 +800,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_d2) {
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_d3) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
+  stan::math::matrix_ffv D(2,2);
+  stan::math::matrix_ffv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
@@ -838,8 +838,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_d3) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_d4) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
+  stan::math::matrix_ffv D(2,2);
+  stan::math::matrix_ffv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
@@ -876,9 +876,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_ffv_matrix_d4) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_ffv1) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
+  stan::math::matrix_ffv D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -912,9 +912,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_ffv1) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_ffv2) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
+  stan::math::matrix_ffv D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -946,9 +946,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_ffv2) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_ffv3) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
+  stan::math::matrix_ffv D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -982,9 +982,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_ffv3) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_ffv4) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
+  stan::math::matrix_ffv D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -1020,8 +1020,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_ffv4) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_ffv1) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv A(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -1057,8 +1057,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_ffv1) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_ffv2) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv A(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -1091,8 +1091,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_ffv2) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_ffv3) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv A(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -1128,8 +1128,8 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_ffv3) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_ffv4) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv A(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -1164,7 +1164,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_ffv4) {
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_d1) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
+  stan::math::matrix_ffv D(2,2);
   stan::math::matrix_d A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
@@ -1195,7 +1195,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_d1) {
 
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_d2) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
+  stan::math::matrix_ffv D(2,2);
   stan::math::matrix_d A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
@@ -1225,7 +1225,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_d2) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_d3) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
+  stan::math::matrix_ffv D(2,2);
   stan::math::matrix_d A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
@@ -1256,7 +1256,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_d3) {
 }
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_d4) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
-  stan::agrad::matrix_ffv D(2,2);
+  stan::math::matrix_ffv D(2,2);
   stan::math::matrix_d A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
@@ -1288,7 +1288,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_ffv_matrix_d_matrix_d4) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_d1) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
+  stan::math::matrix_ffv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
@@ -1318,7 +1318,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_d1) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_d2) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
+  stan::math::matrix_ffv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
@@ -1348,7 +1348,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_d2) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_d3) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
+  stan::math::matrix_ffv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
@@ -1379,7 +1379,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_d3) {
 TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_ffv_matrix_d4) {
   stan::math::LDLT_factor<fvar<fvar<var> >,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
-  stan::agrad::matrix_ffv A(2,2);
+  stan::math::matrix_ffv A(2,2);
   stan::math::matrix_d B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
@@ -1412,7 +1412,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_d_matrix_ffv1) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -1442,7 +1442,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_d_matrix_ffv2) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -1472,7 +1472,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_d_matrix_ffv3) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -1503,7 +1503,7 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,matrix_d_matrix_d_matrix_ffv4) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
   stan::math::matrix_d D(2,2);
   stan::math::matrix_d A(2,2);
-  stan::agrad::matrix_ffv B(2,2);
+  stan::math::matrix_ffv B(2,2);
   std::vector<var> vars;
   fvar<fvar<var> > I;
 
@@ -1535,9 +1535,9 @@ TEST(AgradMixMatrixTraceGenInvQuadFormLDLT,exceptions_ffv) {
   using stan::math::matrix_d;
   using stan::math::vector_d;
   using stan::math::row_vector_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv fv1_(3,3), fv2_(4,4);
   fv1_ << 1,2,3,4,5,6,7,8,9;

@@ -18,8 +18,8 @@
 
 TEST(AgradRevMatrix, sd_eq) {
   using stan::math::sd;
-  using stan::agrad::var;
-  using stan::agrad::vector_v;
+  using stan::math::var;
+  using stan::math::vector_v;
   using std::vector;
 
   for (size_t size = 2; size <= 200; size *= 3) {
@@ -30,7 +30,7 @@ TEST(AgradRevMatrix, sd_eq) {
       x_std_vec[i] = x(i);
     }
 
-    stan::agrad::var f = sd(x);
+    stan::math::var f = sd(x);
     EXPECT_NEAR(0.0, f.val(), 1e-12);
 
     vector<double> grad;
@@ -46,7 +46,7 @@ TEST(AgradRevMatrix, sd_eq) {
 TEST(AgradRevMatrix, sd_vector) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d v(1);
   v << 1.0;
@@ -70,7 +70,7 @@ TEST(AgradRevMatrix, sd_vector) {
 TEST(AgradRevMatrix, sd_vector_exception) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d d1;
   vector_v v1;
@@ -80,7 +80,7 @@ TEST(AgradRevMatrix, sd_vector_exception) {
 TEST(AgradRevMatrix, sd_rowvector) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d v(1);
   v << 1.0;
@@ -105,7 +105,7 @@ TEST(AgradRevMatrix, sd_rowvector) {
 TEST(AgradRevMatrix, sd_rowvector_exception) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::math::row_vector_v;
 
   row_vector_d d;
   row_vector_v v;
@@ -116,7 +116,7 @@ TEST(AgradRevMatrix, sd_rowvector_exception) {
 TEST(AgradRevMatrix, sd_matrix) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_d v(1,1);
   v << 1.0;
@@ -139,7 +139,7 @@ TEST(AgradRevMatrix, sd_matrix) {
 TEST(AgradRevMatrix, sd_matrix_exception) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_d d;
   matrix_v v;

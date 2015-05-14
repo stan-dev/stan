@@ -9,7 +9,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsBinomialLogit : public AgradDistributionTest {
 public:
@@ -51,7 +51,7 @@ public:
   typename stan::return_type<T_prob>::type 
   log_prob(const T_n& n, const T_N& N, const T_prob& alpha,
            const T3&, const T4&, const T5&) {
-    return stan::prob::binomial_logit_log(n, N, alpha);
+    return stan::math::binomial_logit_log(n, N, alpha);
   }
 
   template <bool propto, 
@@ -60,7 +60,7 @@ public:
   typename stan::return_type<T_prob>::type 
   log_prob(const T_n& n, const T_N& N, const T_prob& alpha,
            const T3&, const T4&, const T5&) {
-    return stan::prob::binomial_logit_log<propto>(n, N, alpha);
+    return stan::math::binomial_logit_log<propto>(n, N, alpha);
   }
   
   

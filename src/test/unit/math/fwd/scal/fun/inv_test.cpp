@@ -5,7 +5,7 @@
 #include <stan/math/fwd/scal/fun/inv.hpp>
 
 TEST(AgradFwdInv,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::inv;
 
   fvar<double> x(0.5);

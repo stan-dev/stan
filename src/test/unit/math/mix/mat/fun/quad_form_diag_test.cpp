@@ -12,13 +12,13 @@
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_fv_1) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
   
   matrix_fv ad(2,2);
   vector_fv bd(2);
@@ -63,8 +63,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_fv_1) {
 
 TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_fv_2) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
   
   matrix_fv ad(2,2);
   vector_fv bd(2);
@@ -100,8 +100,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_fv_2) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_fv_row_vector_fv_1) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::row_vector_fv;
   
   matrix_fv ad(2,2);
   row_vector_fv bd(2);
@@ -145,8 +145,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_fv_row_vector_fv_1) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_fv_row_vector_fv_2) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::row_vector_fv;
   
   matrix_fv ad(2,2);
   row_vector_fv bd(2);
@@ -183,9 +183,9 @@ TEST(AgradMixMatrixQuadFormDiag, mat_fv_row_vector_fv_2) {
 
 TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_fv_exception) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
+  using stan::math::row_vector_fv;
 
   matrix_fv m1(2,2);
   matrix_fv m2(3,2);
@@ -214,8 +214,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_fv_exception) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_fv_1) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
   
   matrix_d ad(2,2);
   vector_fv bd(2);
@@ -248,8 +248,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_fv_1) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_fv_2) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::vector_fv;
   
   matrix_d ad(2,2);
   vector_fv bd(2);
@@ -275,8 +275,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_fv_2) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_fv_1) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::row_vector_fv;
   
   matrix_d ad(2,2);
   row_vector_fv bd(2);
@@ -310,8 +310,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_fv_1) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_fv_2) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::matrix_fv;
+  using stan::math::row_vector_fv;
   
   matrix_d ad(2,2);
   row_vector_fv bd(2);
@@ -337,8 +337,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_fv_2) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_fv_exception) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::vector_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::math::vector_fv;
+  using stan::math::row_vector_fv;
 
   matrix_d m1(2,2);
   matrix_d m2(3,2);
@@ -367,7 +367,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_fv_exception) {
 
 TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_d_1) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::vector_d;
   
   matrix_fv ad(2,2);
@@ -406,7 +406,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_d_1) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_d_2) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::vector_d;
   
   matrix_fv ad(2,2);
@@ -438,7 +438,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_d_2) {
 
 TEST(AgradMixMatrixQuadFormDiag, mat_fv_row_vector_d_1) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::row_vector_d;
   
   matrix_fv ad(2,2);
@@ -478,7 +478,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_fv_row_vector_d_1) {
 
 TEST(AgradMixMatrixQuadFormDiag, mat_fv_row_vector_d_2) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::row_vector_d;
   
   matrix_fv ad(2,2);
@@ -510,7 +510,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_fv_row_vector_d_2) {
 
 TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_d_exception) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
   using stan::math::vector_d;
   using stan::math::row_vector_d;
 
@@ -541,8 +541,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_fv_vector_d_exception) {
 
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_ffv_1) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   
   matrix_ffv ad(2,2);
   vector_ffv bd(2);
@@ -593,8 +593,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_ffv_1) {
 
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_ffv_2) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   
   matrix_ffv ad(2,2);
   vector_ffv bd(2);
@@ -636,8 +636,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_ffv_2) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_ffv_3) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   
   matrix_ffv ad(2,2);
   vector_ffv bd(2);
@@ -679,8 +679,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_ffv_3) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_ffv_4) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   
   matrix_ffv ad(2,2);
   vector_ffv bd(2);
@@ -722,8 +722,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_ffv_4) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_ffv_1) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
   
   matrix_ffv ad(2,2);
   row_vector_ffv bd(2);
@@ -773,8 +773,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_ffv_1) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_ffv_2) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
   
   matrix_ffv ad(2,2);
   row_vector_ffv bd(2);
@@ -816,8 +816,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_ffv_2) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_ffv_3) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
   
   matrix_ffv ad(2,2);
   row_vector_ffv bd(2);
@@ -859,8 +859,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_ffv_3) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_ffv_4) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
   
   matrix_ffv ad(2,2);
   row_vector_ffv bd(2);
@@ -902,9 +902,9 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_ffv_4) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_ffv_exception) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_ffv m1(2,2);
   matrix_ffv m2(3,2);
@@ -933,8 +933,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_ffv_exception) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_ffv_1) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   
   matrix_d ad(2,2);
   vector_ffv bd(2);
@@ -969,8 +969,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_ffv_1) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_ffv_2) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   
   matrix_d ad(2,2);
   vector_ffv bd(2);
@@ -997,8 +997,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_ffv_2) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_ffv_3) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   
   matrix_d ad(2,2);
   vector_ffv bd(2);
@@ -1025,8 +1025,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_ffv_3) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_ffv_4) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::vector_ffv;
   
   matrix_d ad(2,2);
   vector_ffv bd(2);
@@ -1054,8 +1054,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_ffv_4) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_ffv_1) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
   
   matrix_d ad(2,2);
   row_vector_ffv bd(2);
@@ -1091,8 +1091,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_ffv_1) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_ffv_2) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
   
   matrix_d ad(2,2);
   row_vector_ffv bd(2);
@@ -1120,8 +1120,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_ffv_2) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_ffv_3) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
   
   matrix_d ad(2,2);
   row_vector_ffv bd(2);
@@ -1148,8 +1148,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_ffv_3) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_ffv_4) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::matrix_ffv;
+  using stan::math::row_vector_ffv;
   
   matrix_d ad(2,2);
   row_vector_ffv bd(2);
@@ -1176,8 +1176,8 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_row_vector_ffv_4) {
 TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_ffv_exception) {
   using stan::math::quad_form_diag;
   using stan::math::matrix_d;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::vector_ffv;
+  using stan::math::row_vector_ffv;
 
   matrix_d m1(2,2);
   matrix_d m2(3,2);
@@ -1206,7 +1206,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_d_vector_ffv_exception) {
 
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_d_1) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::vector_d;
   
   matrix_ffv ad(2,2);
@@ -1249,7 +1249,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_d_1) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_d_2) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::vector_d;
   
   matrix_ffv ad(2,2);
@@ -1284,7 +1284,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_d_2) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_d_3) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::vector_d;
   
   matrix_ffv ad(2,2);
@@ -1319,7 +1319,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_d_3) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_d_4) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::vector_d;
   
   matrix_ffv ad(2,2);
@@ -1355,7 +1355,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_d_4) {
 
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_d_1) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::row_vector_d;
   
   matrix_ffv ad(2,2);
@@ -1399,7 +1399,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_d_1) {
 
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_d_2) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::row_vector_d;
   
   matrix_ffv ad(2,2);
@@ -1434,7 +1434,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_d_2) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_d_3) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::row_vector_d;
   
   matrix_ffv ad(2,2);
@@ -1469,7 +1469,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_d_3) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_d_4) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::row_vector_d;
   
   matrix_ffv ad(2,2);
@@ -1504,7 +1504,7 @@ TEST(AgradMixMatrixQuadFormDiag, mat_ffv_row_vector_d_4) {
 }
 TEST(AgradMixMatrixQuadFormDiag, mat_ffv_vector_d_exception) {
   using stan::math::quad_form_diag;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
   using stan::math::vector_d;
   using stan::math::row_vector_d;
 

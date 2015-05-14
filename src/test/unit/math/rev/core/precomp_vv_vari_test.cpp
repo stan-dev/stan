@@ -14,7 +14,7 @@ TEST(StanAgradRevInternal, precomp_vv_vari) {
   AVEC vars = createAVEC(x1, x2);
 
   EXPECT_NO_THROW(y 
-      = stan::agrad::var(new stan::agrad::precomp_vv_vari(value, 
+      = stan::math::var(new stan::math::precomp_vv_vari(value, 
           x1.vi_, x2.vi_, gradient1, gradient2)));
   EXPECT_FLOAT_EQ(value, y.val());
 
@@ -24,5 +24,5 @@ TEST(StanAgradRevInternal, precomp_vv_vari) {
   EXPECT_FLOAT_EQ(gradient1, g[0]);
   EXPECT_FLOAT_EQ(gradient2, g[1]);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }

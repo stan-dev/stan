@@ -39,20 +39,20 @@ TEST(MetaTraits, error_index) {
 
 TEST(MetaTraits, isConstant) {
   using stan::is_constant;
-  using stan::agrad::var;
+  using stan::math::var;
 
   EXPECT_FALSE(is_constant<var>::value);
 }
 
-typedef Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic> var_t1;
+typedef Eigen::Matrix<stan::math::var,Eigen::Dynamic,Eigen::Dynamic> var_t1;
 typedef std::vector<var_t1> var_t2;
 typedef std::vector<var_t2> var_t3;
 
-typedef Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> var_u1;
+typedef Eigen::Matrix<stan::math::var,Eigen::Dynamic,1> var_u1;
 typedef std::vector<var_u1> var_u2;
 typedef std::vector<var_u2> var_u3;
 
-typedef Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> var_v1;
+typedef Eigen::Matrix<stan::math::var,1,Eigen::Dynamic> var_v1;
 typedef std::vector<var_v1> var_v2;
 typedef std::vector<var_v2> var_v3;
 
@@ -63,10 +63,10 @@ TEST(MetaTraits, isConstantStruct) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
 
-  EXPECT_FALSE(is_constant_struct<stan::agrad::var>::value);
-  EXPECT_FALSE(is_constant_struct<vector<stan::agrad::var> >::value);
-  EXPECT_FALSE(is_constant_struct<vector<vector<stan::agrad::var> > >::value);
-  EXPECT_FALSE(is_constant_struct<vector<vector<vector<stan::agrad::var> > > >::value);
+  EXPECT_FALSE(is_constant_struct<stan::math::var>::value);
+  EXPECT_FALSE(is_constant_struct<vector<stan::math::var> >::value);
+  EXPECT_FALSE(is_constant_struct<vector<vector<stan::math::var> > >::value);
+  EXPECT_FALSE(is_constant_struct<vector<vector<vector<stan::math::var> > > >::value);
   EXPECT_FALSE(is_constant_struct<var_t1>::value);
   EXPECT_FALSE(is_constant_struct<var_t2>::value);
   EXPECT_FALSE(is_constant_struct<var_t3>::value);
@@ -85,10 +85,10 @@ TEST(MetaTraits, containsNonconstantStruct) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
 
-  EXPECT_TRUE(contains_nonconstant_struct<stan::agrad::var>::value);
-  EXPECT_TRUE(contains_nonconstant_struct<vector<stan::agrad::var> >::value);
-  EXPECT_TRUE(contains_nonconstant_struct<vector<vector<stan::agrad::var> > >::value);
-  EXPECT_TRUE(contains_nonconstant_struct<vector<vector<vector<stan::agrad::var> > > >::value);
+  EXPECT_TRUE(contains_nonconstant_struct<stan::math::var>::value);
+  EXPECT_TRUE(contains_nonconstant_struct<vector<stan::math::var> >::value);
+  EXPECT_TRUE(contains_nonconstant_struct<vector<vector<stan::math::var> > >::value);
+  EXPECT_TRUE(contains_nonconstant_struct<vector<vector<vector<stan::math::var> > > >::value);
   EXPECT_TRUE(contains_nonconstant_struct<var_t1>::value);
   EXPECT_TRUE(contains_nonconstant_struct<var_t2>::value);
   EXPECT_TRUE(contains_nonconstant_struct<var_t3>::value);
@@ -105,7 +105,7 @@ TEST(MetaTraits, containsNonconstantStruct) {
 
 TEST(MetaTraits, VectorView_var) {
   using stan::VectorView;
-  using stan::agrad::var;
+  using stan::math::var;
   
   var d(10);
   VectorView<var> dv(d);
@@ -122,7 +122,7 @@ TEST(MetaTraits, VectorView_var) {
 TEST(MetaTraits, VectorView_vector_var) {
   using stan::VectorView;
   using std::vector;
-  using stan::agrad::var;
+  using stan::math::var;
   
   vector<var> x(10);
   for (size_t n = 0; n < 10; ++n) 
@@ -145,7 +145,7 @@ TEST(MetaTraits, VectorView_vector_var) {
 
 TEST(MetaTraits, VectorView_matrix_var) {
   using stan::VectorView;
-  using stan::agrad::var;
+  using stan::math::var;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   
@@ -191,7 +191,7 @@ TEST(MetaTraits, VectorBuilderHelper_false_true) {
   using stan::VectorBuilderHelper;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::math::var;
 
   var a_var(1);
   std::vector<var> a_std_vector(3);
@@ -216,7 +216,7 @@ TEST(MetaTraits, VectorBuilderHelper_true_true) {
   using stan::VectorBuilderHelper;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::math::var;
 
   var a_var(1);
   std::vector<var> a_std_vector(3);
@@ -257,7 +257,7 @@ TEST(MetaTraits, VectorBuilder_false_true) {
   using stan::VectorBuilder;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::math::var;
 
   var a_var(1);
   std::vector<var> a_std_vector(3);
@@ -282,7 +282,7 @@ TEST(MetaTraits, VectorBuilder_true_true) {
   using stan::VectorBuilder;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::math::var;
 
   var a_var(1);
   std::vector<var> a_std_vector(3);
@@ -319,7 +319,7 @@ TEST(MetaTraits, VectorBuilder_true_true) {
 }
 
 TEST(MetaTraits, partials_type) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::partials_type;
 
   stan::partials_type<var>::type f(2.0);
@@ -327,12 +327,12 @@ TEST(MetaTraits, partials_type) {
 }
 
 TEST(MetaTraits, partials_return_type) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::partials_return_type;
 
-  partials_return_type<double,stan::agrad::var>::type f(5.0);
+  partials_return_type<double,stan::math::var>::type f(5.0);
   EXPECT_EQ(5.0,f);
 
-  partials_return_type<double,stan::agrad::var,std::vector<stan::agrad::var> >::type g(5.0);
+  partials_return_type<double,stan::math::var,std::vector<stan::math::var> >::type g(5.0);
   EXPECT_EQ(5.0,g);
 }
