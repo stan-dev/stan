@@ -20,7 +20,7 @@ namespace stan {
     /**
      * The log of the normal density for the specified scalar(s) given
      * the specified mean(s) and deviation(s). y, mu, or sigma can
-     * each be either a scalar or a std::vector. Any vector inputs
+     * each be either a scalar or a std vector. Any vector inputs
      * must be the same length.
      *
      * <p>The result log probability is defined to be the sum of the
