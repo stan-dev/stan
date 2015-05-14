@@ -19,9 +19,9 @@ TEST(ProbDistributionsCategoricalLogit,Categorical) {
   theta << -1, 2, -10;
   Matrix<double,Dynamic,1> theta_log_softmax = log_softmax(theta);
 
-  EXPECT_FLOAT_EQ(theta_log_softmax[0], stan::prob::categorical_logit_log(1,theta));
-  EXPECT_FLOAT_EQ(theta_log_softmax[1], stan::prob::categorical_logit_log(2,theta));
-  EXPECT_FLOAT_EQ(theta_log_softmax[2], stan::prob::categorical_logit_log(3,theta));
+  EXPECT_FLOAT_EQ(theta_log_softmax[0], stan::math::categorical_logit_log(1,theta));
+  EXPECT_FLOAT_EQ(theta_log_softmax[1], stan::math::categorical_logit_log(2,theta));
+  EXPECT_FLOAT_EQ(theta_log_softmax[2], stan::math::categorical_logit_log(3,theta));
 }
 
 TEST(ProbDistributionsCategoricalLogit,CategoricalVectorized) {
@@ -29,7 +29,7 @@ TEST(ProbDistributionsCategoricalLogit,CategoricalVectorized) {
   theta << -1, 2, -10;
 
   std::vector<int> ns(0);
-  EXPECT_FLOAT_EQ(0.0, stan::prob::categorical_logit_log(ns,theta));
+  EXPECT_FLOAT_EQ(0.0, stan::math::categorical_logit_log(ns,theta));
 
   Matrix<double,Dynamic,1> theta_log_softmax = log_softmax(theta);
 
@@ -38,7 +38,7 @@ TEST(ProbDistributionsCategoricalLogit,CategoricalVectorized) {
   ms[1] = 2;
   ms[2] = 1;
   EXPECT_FLOAT_EQ(theta_log_softmax[0] + theta_log_softmax[1] + theta_log_softmax[0],
-                  stan::prob::categorical_logit_log(ms,theta));
+                  stan::math::categorical_logit_log(ms,theta));
 }
 
 
@@ -46,13 +46,13 @@ TEST(ProbDistributionsCategoricalLogit,CategoricalVectorized) {
 TEST(ProbDistributionsCategoricalLogit,Propto) {
   Matrix<double,Dynamic,1> theta(3,1);
   theta << -1, 2, 10;
-  EXPECT_FLOAT_EQ(0, stan::prob::categorical_logit_log<true>(1,theta));
-  EXPECT_FLOAT_EQ(0, stan::prob::categorical_logit_log<true>(3,theta));
+  EXPECT_FLOAT_EQ(0, stan::math::categorical_logit_log<true>(1,theta));
+  EXPECT_FLOAT_EQ(0, stan::math::categorical_logit_log<true>(3,theta));
 }
 
 
 TEST(ProbDistributionsCategoricalLogit, error) {
-  using stan::prob::categorical_logit_log;
+  using stan::math::categorical_logit_log;
 
   unsigned int n = 1;
   unsigned int N = 3;

@@ -5,10 +5,10 @@
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <stan/math/rev/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 TEST(AgradMixMatrixDotSelf, vec_fv_1stDeriv) {
   using stan::math::dot_self;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<var> a(2.0,1.0);
   fvar<var> b(3.0,1.0);
@@ -36,7 +36,7 @@ TEST(AgradMixMatrixDotSelf, vec_fv_1stDeriv) {
 }
 TEST(AgradMixMatrixDotSelf, vec_fv_2ndDeriv) {
   using stan::math::dot_self;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<var> a(2.0,1.0);
   fvar<var> b(3.0,1.0);
@@ -54,7 +54,7 @@ TEST(AgradMixMatrixDotSelf, vec_fv_2ndDeriv) {
 }
 TEST(AgradMixMatrixDotSelf, vec_ffv_1stDeriv) {
   using stan::math::dot_self;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<fvar<var> > a(2.0,1.0);
   fvar<fvar<var> > b(3.0,1.0);
@@ -82,7 +82,7 @@ TEST(AgradMixMatrixDotSelf, vec_ffv_1stDeriv) {
 }
 TEST(AgradMixMatrixDotSelf, vec_ffv_2ndDeriv_1) {
   using stan::math::dot_self;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<fvar<var> > a(2.0,1.0);
   fvar<fvar<var> > b(3.0,1.0);
@@ -101,7 +101,7 @@ TEST(AgradMixMatrixDotSelf, vec_ffv_2ndDeriv_1) {
 
 TEST(AgradMixMatrixDotSelf, vec_ffv_2ndDeriv_2) {
   using stan::math::dot_self;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<fvar<var> > a(2.0,1.0);
   fvar<fvar<var> > b(3.0,1.0);
@@ -119,7 +119,7 @@ TEST(AgradMixMatrixDotSelf, vec_ffv_2ndDeriv_2) {
 }
 TEST(AgradMixMatrixDotSelf, vec_ffv_3rdDeriv) {
   using stan::math::dot_self;
-  using stan::agrad::var;
+  using stan::math::var;
 
   fvar<fvar<var> > a(2.0,1.0);
   fvar<fvar<var> > b(3.0,1.0);

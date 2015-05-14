@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     using Eigen::Dynamic;
 
@@ -19,14 +19,14 @@ namespace stan {
      * <p>The functor must implement
      *
      * <code>
-     * stan::agrad::fvar<stan::agrad::fvar<stan::agrad::var> >
+     * stan::math::fvar<stan::math::fvar<stan::math::var> >
      * operator()(const
-     * Eigen::Matrix<stan::agrad::fvar<stan::agrad::fvar<stan::agrad::var> >,
+     * Eigen::Matrix<stan::math::fvar<stan::math::fvar<stan::math::var> >,
      *               Eigen::Dynamic, 1>&)
      * </code>
      *
      * using only operations that are defined for
-     * <code>stan::agrad::fvar</code> and <code>stan::agrad::var</code>.
+     * <code>stan::math::fvar</code> and <code>stan::math::var</code>.
      *
      * This latter constraint usually
      * requires the functions to be defined in terms of the libraries
@@ -65,7 +65,7 @@ namespace stan {
             fvar<fvar<var> > fx_ffvar = f(x_ffvar);
             H(i, j) = fx_ffvar.d_.d_.val();
             H(j, i) = H(i, j);
-            stan::agrad::grad(fx_ffvar.d_.d_.vi_);
+            stan::math::grad(fx_ffvar.d_.d_.vi_);
             for (int k = 0; k < d; ++k) {
               grad_H[i](j, k) = x_ffvar(k).val_.val_.adj();
               grad_H[j](i, k) = grad_H[i](j, k);
@@ -74,11 +74,11 @@ namespace stan {
           }
         }
       } catch (const std::exception& e) {
-        stan::agrad::recover_memory_nested();
+        stan::math::recover_memory_nested();
         throw;
       }
     }
 
-  }  // namespace agrad
+  }  // namespace math
 }  // namespace stan
 #endif

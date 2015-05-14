@@ -15,7 +15,7 @@
 #include <stan/math/rev/mat/fun/quad_form.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template <typename TA, int RA, int CA, typename TB, int RB, int CB>
     inline typename

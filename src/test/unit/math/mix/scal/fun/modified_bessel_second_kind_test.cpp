@@ -5,8 +5,8 @@
 #include <stan/math/rev/scal/fun/modified_bessel_second_kind.hpp>
 
 TEST(AgradFwdModifiedBesselSecondKind,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::modified_bessel_second_kind;
 
   fvar<var> z(4.0,2.0);
@@ -21,8 +21,8 @@ TEST(AgradFwdModifiedBesselSecondKind,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-0.014280550807670132, g[0]);
 }
 TEST(AgradFwdModifiedBesselSecondKind,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::modified_bessel_second_kind;
 
   fvar<var> z(4.0,2.0);
@@ -35,8 +35,8 @@ TEST(AgradFwdModifiedBesselSecondKind,FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdModifiedBesselSecondKind,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::modified_bessel_second_kind;
 
   fvar<fvar<var> > y;
@@ -72,8 +72,8 @@ TEST(AgradFwdModifiedBesselSecondKind,FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-0.014280550807670132, r[0]);
 }
 TEST(AgradFwdModifiedBesselSecondKind,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::modified_bessel_second_kind;
 
   fvar<fvar<var> > y;
@@ -99,8 +99,8 @@ TEST(AgradFwdModifiedBesselSecondKind,FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0.016833855, r[0]);
 }
 TEST(AgradFwdModifiedBesselSecondKind,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
 
   fvar<fvar<var> > x;
   x.val_.val_ = 4.0;

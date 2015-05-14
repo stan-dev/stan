@@ -43,7 +43,7 @@ TEST(ProbInternalMath, gradRegIncGamma_infLoopInVersion2_0_1) {
                std::domain_error);
 }
 TEST(ProbInternalMath, gradRegIncGamma_fd) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> a = 0.5;
   fvar<double> b = 1.0;
@@ -53,7 +53,7 @@ TEST(ProbInternalMath, gradRegIncGamma_fd) {
   EXPECT_FLOAT_EQ(0.38984156, stan::math::grad_reg_inc_gamma(a, b, g, dig).val());
 }
 TEST(ProbInternalMath, gradRegIncGamma_ffd) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > a = 0.5;
   fvar<fvar<double> > b = 1.0;
@@ -64,9 +64,9 @@ TEST(ProbInternalMath, gradRegIncGamma_ffd) {
 }
 
 TEST(ProbInternalMath, gradRegIncGamma_fv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-  using stan::agrad::digamma;
+  using stan::math::fvar;
+  using stan::math::var;
+  using stan::math::digamma;
 
   fvar<var> a = 0.5;
   fvar<var> b = 1.0;
@@ -77,10 +77,10 @@ TEST(ProbInternalMath, gradRegIncGamma_fv) {
 }
 
 TEST(ProbInternalMath, gradRegIncGamma_fv_1stderiv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-  using stan::agrad::digamma;
-  using stan::agrad::tgamma;
+  using stan::math::fvar;
+  using stan::math::var;
+  using stan::math::digamma;
+  using stan::math::tgamma;
 
   fvar<var> a = 0.5;
   a.d_ = 1.0;
@@ -98,10 +98,10 @@ TEST(ProbInternalMath, gradRegIncGamma_fv_1stderiv) {
 }
 
 TEST(ProbInternalMath, gradRegIncGamma_fv_2ndderiv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
-  using stan::agrad::digamma;
-  using stan::agrad::tgamma;
+  using stan::math::fvar;
+  using stan::math::var;
+  using stan::math::digamma;
+  using stan::math::tgamma;
 
   fvar<var> a = 0.5;
   a.d_ = 1.0;

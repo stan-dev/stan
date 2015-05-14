@@ -19,11 +19,12 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     // LogNormal(y|mu, sigma)  [y >= 0;  sigma > 0]
     // FIXME: document
@@ -31,7 +32,7 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     lognormal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const char* function("stan::prob::lognormal_log");
+      static const char* function("stan::math::lognormal_log");
       typedef typename stan::partials_return_type<T_y, T_loc, T_scale>::type
         T_partials_return;
 
@@ -42,7 +43,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
 
       // check if any vectors are zero length
@@ -73,12 +74,13 @@ namespace stan {
         if (value_of(y_vec[n]) <= 0)
           return LOG_ZERO;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       using stan::math::square;
       using std::log;
-      using stan::prob::NEG_LOG_SQRT_TWO_PI;
+      using stan::math::NEG_LOG_SQRT_TWO_PI;
+      using std::log;
 
 
       VectorBuilder<include_summand<propto, T_scale>::value,

@@ -7,7 +7,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return an increasing ordered vector derived from the specified
@@ -24,6 +24,7 @@ namespace stan {
       using Eigen::Matrix;
       using Eigen::Dynamic;
       using stan::math::index_type;
+      using std::exp;
 
       typedef typename index_type<Matrix<T, Dynamic, 1> >::type size_type;
 

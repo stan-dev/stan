@@ -6,7 +6,7 @@
 #include <cmath>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class asin_vari : public op_v_vari {

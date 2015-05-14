@@ -2,6 +2,7 @@
 #define STAN_MATH_PRIM_SCAL_FUN_FALLING_FACTORIAL_HPP
 
 #include <stan/math/prim/scal/fun/log_falling_factorial.hpp>
+#include <cmath>
 
 namespace stan {
   namespace math {
@@ -51,7 +52,8 @@ namespace stan {
     template<typename T1, typename T2>
     inline typename boost::math::tools::promote_args<T1, T2>::type
     falling_factorial(const T1 x, const T2 n) {
-      return std::exp(stan::math::log_falling_factorial(x, n));
+      using std::exp;
+      return exp(log_falling_factorial(x, n));
     }
 
   }

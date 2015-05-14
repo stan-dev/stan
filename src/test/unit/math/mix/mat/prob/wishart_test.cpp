@@ -26,8 +26,8 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 TEST(ProbDistributionsWishart, fvar_var) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   Matrix<fvar<var>,Dynamic,Dynamic> Sigma(2,2);
   Sigma << 1.848220, 1.899623, 
     1.899623, 12.751941;
@@ -45,13 +45,13 @@ TEST(ProbDistributionsWishart, fvar_var) {
   
   double lp = log(8.658e-07); // computed with MCMCpack in R
  
-  EXPECT_NEAR(lp, stan::prob::wishart_log(Y,dof,Sigma).val_.val(), 0.01);
-  EXPECT_NEAR(-0.76893887, stan::prob::wishart_log(Y,dof,Sigma).d_.val(), 0.01);
+  EXPECT_NEAR(lp, stan::math::wishart_log(Y,dof,Sigma).val_.val(), 0.01);
+  EXPECT_NEAR(-0.76893887, stan::math::wishart_log(Y,dof,Sigma).d_.val(), 0.01);
 }
 
 TEST(ProbDistributionsWishart, fvar_fvar_var) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::math::var;
+  using stan::math::fvar;
   Matrix<fvar<fvar<var> >,Dynamic,Dynamic> Sigma(2,2);
   Sigma << 1.848220, 1.899623, 
     1.899623, 12.751941;
@@ -69,6 +69,6 @@ TEST(ProbDistributionsWishart, fvar_fvar_var) {
   
   double lp = log(8.658e-07); // computed with MCMCpack in R
  
-  EXPECT_NEAR(lp, stan::prob::wishart_log(Y,dof,Sigma).val_.val_.val(), 0.01);
-  EXPECT_NEAR(-0.76893887, stan::prob::wishart_log(Y,dof,Sigma).d_.val_.val(), 0.01);
+  EXPECT_NEAR(lp, stan::math::wishart_log(Y,dof,Sigma).val_.val_.val(), 0.01);
+  EXPECT_NEAR(-0.76893887, stan::math::wishart_log(Y,dof,Sigma).d_.val_.val(), 0.01);
 }

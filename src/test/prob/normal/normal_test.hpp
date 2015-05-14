@@ -5,7 +5,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionNormal : public AgradDistributionTest {
 public:
@@ -65,7 +65,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
            const T3&, const T4&, const T5&) {
-    return stan::prob::normal_log(y, mu, sigma);
+    return stan::math::normal_log(y, mu, sigma);
   }
 
   template <bool propto, 
@@ -74,7 +74,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
      const T3&, const T4&, const T5&) {
-    return stan::prob::normal_log<propto>(y, mu, sigma);
+    return stan::math::normal_log<propto>(y, mu, sigma);
   }
   
   

@@ -16,7 +16,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template <typename T, int R1, int C1, int R2, int C2>
     inline
@@ -59,7 +59,7 @@ namespace stan {
       Eigen::Matrix<T, R1, C2> deriv(A.rows(), b.cols());
       deriv = deriv_A_mult_inv_b - multiply(A_mult_inv_b, deriv_b_mult_inv_b);
 
-      return stan::agrad::to_fvar(A_mult_inv_b, deriv);
+      return stan::math::to_fvar(A_mult_inv_b, deriv);
     }
 
     template <typename T, int R1, int C1, int R2, int C2>
@@ -85,7 +85,7 @@ namespace stan {
         }
       }
 
-      return stan::agrad::to_fvar(mdivide_right(val_A, b),
+      return stan::math::to_fvar(mdivide_right(val_A, b),
                                   mdivide_right(deriv_A, b));
     }
 
@@ -120,7 +120,7 @@ namespace stan {
         deriv(A.rows(), b.cols());
       deriv = -multiply(A_mult_inv_b, deriv_b_mult_inv_b);
 
-      return stan::agrad::to_fvar(A_mult_inv_b, deriv);
+      return stan::math::to_fvar(A_mult_inv_b, deriv);
     }
   }
 }

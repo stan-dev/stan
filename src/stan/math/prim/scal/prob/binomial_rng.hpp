@@ -19,13 +19,12 @@
 #include <stan/math/prim/scal/fun/binomial_coefficient_log.hpp>
 #include <stan/math/prim/scal/fun/lbeta.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline int
@@ -35,7 +34,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::binomial_distribution;
 
-      static const char* function("stan::prob::binomial_rng");
+      static const char* function("stan::math::binomial_rng");
 
       using stan::math::check_finite;
       using stan::math::check_less_or_equal;

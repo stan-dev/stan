@@ -4,13 +4,13 @@
 #include <stan/services/arguments/singleton_argument.hpp>
 
 namespace stan {
-  
+
   namespace services {
-    
+
     class arg_save_iterations: public bool_argument {
-      
+
     public:
-      
+
       arg_save_iterations(): bool_argument() {
         _name = "save_iterations";
         _description = "Stream optimization progress to output?";
@@ -21,11 +21,11 @@ namespace stan {
         _good_value = 1;
         _value = _default_value;
       };
-      
+
     };
-    
+
   } // services
-  
+
 } // stan
 
 #endif

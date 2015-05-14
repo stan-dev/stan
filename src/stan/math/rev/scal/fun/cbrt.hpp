@@ -5,7 +5,7 @@
 #include <stan/math/rev/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class cbrt_vari : public op_v_vari {
@@ -47,7 +47,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Cube root of the variable.
      */
-    inline var cbrt(const stan::agrad::var& a) {
+    inline var cbrt(const stan::math::var& a) {
       return var(new cbrt_vari(a.vi_));
     }
 

@@ -3,11 +3,11 @@
 #include <gtest/gtest.h>
 #include <stan/math/fwd/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixTraceGenQuadForm, mat_fd) {
-  using stan::agrad::trace_gen_quad_form;
-  using stan::agrad::matrix_fd;
+  using stan::math::trace_gen_quad_form;
+  using stan::math::matrix_fd;
   
   matrix_fd ad(4,4);
   matrix_fd bd(4,2);
@@ -61,8 +61,8 @@ TEST(AgradFwdMatrixTraceGenQuadForm, mat_fd) {
 }
 
 TEST(AgradFwdMatrixTraceGenQuadForm, mat_ffd) {
-  using stan::agrad::trace_gen_quad_form;
-  using stan::agrad::matrix_ffd;
+  using stan::math::trace_gen_quad_form;
+  using stan::math::matrix_ffd;
   
   matrix_ffd ad(4,4);
   matrix_ffd bd(4,2);

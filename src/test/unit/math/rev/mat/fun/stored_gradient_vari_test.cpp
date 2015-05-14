@@ -9,22 +9,22 @@
 #include <stan/math/rev/core.hpp>
 
 TEST(StoredGradientVari, propagate3) {
-  using stan::agrad::var;
-  using stan::agrad::vari;
+  using stan::math::var;
+  using stan::math::vari;
   vari** xs
-    = (vari**) stan::agrad::ChainableStack::memalloc_.alloc(3 * sizeof(vari*));
+    = (vari**) stan::math::ChainableStack::memalloc_.alloc(3 * sizeof(vari*));
   var xs1 = 1; // value not used here
   var xs2 = 4; // value not used here
   var xs3 = 9; // value not used here
   xs[0] = xs1.vi_;
   xs[1] = xs2.vi_;
   xs[2] = xs3.vi_;
-  double* partials = (double*) stan::agrad::ChainableStack::memalloc_.alloc(3 * sizeof(double));
+  double* partials = (double*) stan::math::ChainableStack::memalloc_.alloc(3 * sizeof(double));
   partials[0] = 10;
   partials[1] = 100;
   partials[2] = 1000;
 
-  var sum = var(new stan::agrad::stored_gradient_vari(-14.7, 3, xs, partials));
+  var sum = var(new stan::math::stored_gradient_vari(-14.7, 3, xs, partials));
   EXPECT_FLOAT_EQ(-14.7, sum.val());
 
   std::vector<var> in(3);
@@ -43,12 +43,12 @@ TEST(StoredGradientVari, propagate3) {
 }
 
 TEST(StoredGradientVari, propagate0) {
-  using stan::agrad::var;
-  using stan::agrad::vari;
+  using stan::math::var;
+  using stan::math::vari;
   vari** xs = 0;
   double* partials = (double*) 0;
 
-  var sum = var(new stan::agrad::stored_gradient_vari(-14.7, 0, xs, partials));
+  var sum = var(new stan::math::stored_gradient_vari(-14.7, 0, xs, partials));
   EXPECT_FLOAT_EQ(-14.7, sum.val());
 
   std::vector<var> dummy(3);

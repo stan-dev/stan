@@ -7,8 +7,8 @@
 #include <stan/math/fwd/scal/fun/sqrt.hpp>
 
 TEST(AgradFwdMatrixSingularValues, mat_fd) {
-  stan::agrad::matrix_fd m0(2,2);
-  stan::agrad::vector_fd res;
+  stan::math::matrix_fd m0(2,2);
+  stan::math::vector_fd res;
 
   m0 << 1,2,3,4;
   m0(0,0).d_ = 1.0;
@@ -26,8 +26,8 @@ TEST(AgradFwdMatrixSingularValues, mat_fd) {
 }
 
 TEST(AgradFwdMatrixSingularValues, mat_ffd) {
-  stan::agrad::matrix_ffd m0(2,2);
-  stan::agrad::vector_ffd res;
+  stan::math::matrix_ffd m0(2,2);
+  stan::math::vector_ffd res;
 
   m0 << 1,2,3,4;
   m0(0,0).d_ = 1.0;

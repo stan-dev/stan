@@ -3,7 +3,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCcdfLogPareto : public AgradCcdfLogTest {
 public:
@@ -65,7 +65,7 @@ public:
   typename stan::return_type<T_y, T_scale, T_shape>::type 
   ccdf_log(const T_y& y, const T_scale& y_min, const T_shape& alpha,
            const T3&, const T4&, const T5&) {
-    return stan::prob::pareto_ccdf_log(y, y_min, alpha);
+    return stan::math::pareto_ccdf_log(y, y_min, alpha);
   }
 
 

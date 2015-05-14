@@ -7,7 +7,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsBetaBinomial : public AgradDistributionTest {
 public:
@@ -67,7 +67,7 @@ public:
   log_prob(const T_n& n, const T_N& N, 
            const T_size1& alpha, const T_size2& beta, 
            const T4&, const T5&) {
-    return stan::prob::beta_binomial_log(n, N, alpha, beta);
+    return stan::math::beta_binomial_log(n, N, alpha, beta);
   }
 
   template <bool propto, 
@@ -78,7 +78,7 @@ public:
   log_prob(const T_n& n, const T_N& N, 
            const T_size1& alpha, const T_size2& beta, 
            const T4&, const T5&) {
-    return stan::prob::beta_binomial_log<propto>(n, N, alpha, beta);
+    return stan::math::beta_binomial_log<propto>(n, N, alpha, beta);
   }
   
   
@@ -101,5 +101,5 @@ public:
 };
 
 TEST(ProbDistributionsBetaBinomialCDF,Values) {
-    EXPECT_FLOAT_EQ(0.8868204314, stan::prob::beta_binomial_cdf(49, 100, 1.349, 3.938));
+    EXPECT_FLOAT_EQ(0.8868204314, stan::math::beta_binomial_cdf(49, 100, 1.349, 3.938));
 }

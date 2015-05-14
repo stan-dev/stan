@@ -6,7 +6,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * This is the function that should be called prior to evaluating

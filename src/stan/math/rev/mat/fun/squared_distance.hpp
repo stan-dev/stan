@@ -15,7 +15,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     namespace {
 

@@ -18,12 +18,12 @@
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/partials_return_type.hpp>
 #include <stan/math/prim/scal/meta/return_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 #include <limits>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
@@ -36,7 +36,7 @@ namespace stan {
         return 0.0;
 
       // Error checks
-      static const char* function("stan::prob::logistic_cdf_log");
+      static const char* function("stan::math::logistic_cdf_log");
 
       using stan::math::check_not_nan;
       using stan::math::check_positive_finite;
@@ -44,6 +44,8 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       using boost::math::tools::promote_args;
+      using std::log;
+      using std::exp;
 
       T_partials_return P(0.0);
 
@@ -61,7 +63,7 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       // Explicit return for extreme values

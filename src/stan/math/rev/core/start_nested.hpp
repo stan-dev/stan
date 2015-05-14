@@ -4,7 +4,7 @@
 #include <stan/math/rev/core/chainablestack.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Record the current position so that <code>recover_memory_nested()</code>

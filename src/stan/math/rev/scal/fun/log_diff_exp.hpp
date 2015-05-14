@@ -7,7 +7,7 @@
 #include <boost/math/special_functions/expm1.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class log_diff_exp_vv_vari : public op_vv_vari {
@@ -46,14 +46,14 @@ namespace stan {
     /**
      * Returns the log sum of exponentials.
      */
-    inline var log_diff_exp(const stan::agrad::var& a,
-                            const stan::agrad::var& b) {
+    inline var log_diff_exp(const stan::math::var& a,
+                            const stan::math::var& b) {
       return var(new log_diff_exp_vv_vari(a.vi_, b.vi_));
     }
     /**
      * Returns the log sum of exponentials.
      */
-    inline var log_diff_exp(const stan::agrad::var& a,
+    inline var log_diff_exp(const stan::math::var& a,
                             const double& b) {
       return var(new log_diff_exp_vd_vari(a.vi_, b));
     }
@@ -61,7 +61,7 @@ namespace stan {
      * Returns the log sum of exponentials.
      */
     inline var log_diff_exp(const double& a,
-                            const stan::agrad::var& b) {
+                            const stan::math::var& b) {
       return var(new log_diff_exp_dv_vari(a, b.vi_));
     }
 

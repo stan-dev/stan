@@ -3,7 +3,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradCdfStudentT : public AgradCdfTest {
 public:
@@ -72,7 +72,7 @@ public:
   typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type
   cdf(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
       const T4&, const T5&) {
-    return stan::prob::student_t_cdf(y, nu, mu, sigma);
+    return stan::math::student_t_cdf(y, nu, mu, sigma);
   }
 
 
@@ -82,7 +82,7 @@ public:
   typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type 
   cdf_function(const T_y& y, const T_dof& nu, const T_loc& mu, 
                const T_scale& sigma, const T4&, const T5&) {
-      return stan::prob::student_t_cdf(y, nu, mu, sigma);
+      return stan::math::student_t_cdf(y, nu, mu, sigma);
   }
     
 };

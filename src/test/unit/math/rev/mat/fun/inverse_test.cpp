@@ -15,7 +15,7 @@
 
 TEST(AgradRevMatrix,inverse_val) {
   using stan::math::inverse;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_v a(2,2);
   a << 2.0, 3.0, 
@@ -34,7 +34,7 @@ TEST(AgradRevMatrix,inverse_val) {
 }
 TEST(AgradRevMatrix,inverse_grad) {
   using stan::math::inverse;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
   
   for (size_t k = 0; k < 2; ++k) {
     for (size_t l = 0; l < 2; ++l) {
@@ -65,7 +65,7 @@ TEST(AgradRevMatrix,inverse_grad) {
 TEST(AgradRevMatrix,inverse_inverse_sum) {
   using stan::math::sum;
   using stan::math::inverse;
-  using stan::agrad::matrix_v;
+  using stan::math::matrix_v;
 
   matrix_v a(4,4);
   a << 2.0, 3.0, 4.0, 5.0, 

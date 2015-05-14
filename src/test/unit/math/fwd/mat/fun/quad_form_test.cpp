@@ -10,11 +10,11 @@
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 
 TEST(AgradFwdMatrixQuadForm, quad_form_mat_fd) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   
   matrix_fd ad(4,4);
   matrix_fd bd(4,2);
@@ -67,7 +67,7 @@ TEST(AgradFwdMatrixQuadForm, quad_form_mat_fd) {
 
 TEST(AgradFwdMatrixQuadForm, quad_form_sym_mat_fd) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   
   matrix_fd ad(4,4);
   matrix_fd bd(4,2);
@@ -120,8 +120,8 @@ TEST(AgradFwdMatrixQuadForm, quad_form_sym_mat_fd) {
 
 TEST(AgradFwdMatrixQuadForm, quad_form_vec_fd) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_fd;
-  using stan::agrad::vector_fd;
+  using stan::math::matrix_fd;
+  using stan::math::vector_fd;
 
   matrix_fd ad(4,4);
   vector_fd bd(4);
@@ -163,8 +163,8 @@ TEST(AgradFwdMatrixQuadForm, quad_form_vec_fd) {
 
 TEST(AgradFwdMatrixQuadForm, quad_form_sym_vec_fd) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_fd;
-  using stan::agrad::vector_fd;
+  using stan::math::matrix_fd;
+  using stan::math::vector_fd;
   
   matrix_fd ad(4,4);
   vector_fd bd(4);
@@ -205,7 +205,7 @@ TEST(AgradFwdMatrixQuadForm, quad_form_sym_vec_fd) {
 
 TEST(AgradFwdMatrixQuadForm, quad_form_sym_symmetry_fd) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   
   matrix_fd ad(4,4);
   matrix_fd bd(4,2);
@@ -279,7 +279,7 @@ TEST(AgradFwdMatrixQuadForm, quad_form_sym_symmetry_fd) {
 
 TEST(AgradFwdMatrixQuadForm, quad_form_sym_asymmetric_fd) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   
   matrix_fd ad(4,4);
   matrix_fd bd(4,2);
@@ -324,7 +324,7 @@ TEST(AgradFwdMatrixQuadForm, quad_form_sym_asymmetric_fd) {
 }
 TEST(AgradFwdMatrixQuadForm, quad_form_mat_ffd) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   
   matrix_ffd ad(4,4);
   matrix_ffd bd(4,2);
@@ -377,7 +377,7 @@ TEST(AgradFwdMatrixQuadForm, quad_form_mat_ffd) {
 
 TEST(AgradFwdMatrixQuadForm, quad_form_sym_mat_ffd) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   
   matrix_ffd ad(4,4);
   matrix_ffd bd(4,2);
@@ -430,8 +430,8 @@ TEST(AgradFwdMatrixQuadForm, quad_form_sym_mat_ffd) {
 
 TEST(AgradFwdMatrixQuadForm, quad_form_vec_ffd) {
   using stan::math::quad_form;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::vector_ffd;
+  using stan::math::matrix_ffd;
+  using stan::math::vector_ffd;
 
   matrix_ffd ad(4,4);
   vector_ffd bd(4);
@@ -473,8 +473,8 @@ TEST(AgradFwdMatrixQuadForm, quad_form_vec_ffd) {
 
 TEST(AgradFwdMatrixQuadForm, quad_form_sym_vec_ffd) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::vector_ffd;
+  using stan::math::matrix_ffd;
+  using stan::math::vector_ffd;
   
   matrix_ffd ad(4,4);
   vector_ffd bd(4);
@@ -515,7 +515,7 @@ TEST(AgradFwdMatrixQuadForm, quad_form_sym_vec_ffd) {
 
 TEST(AgradFwdMatrixQuadForm, quad_form_sym_symmetry_ffd) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   
   matrix_ffd ad(4,4);
   matrix_ffd bd(4,2);
@@ -589,7 +589,7 @@ TEST(AgradFwdMatrixQuadForm, quad_form_sym_symmetry_ffd) {
 
 TEST(AgradFwdMatrixQuadForm, quad_form_sym_asymmetric_ffd) {
   using stan::math::quad_form_sym;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   
   matrix_ffd ad(4,4);
   matrix_ffd bd(4,2);

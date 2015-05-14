@@ -9,10 +9,10 @@ using stan::math::vector_d;
 using stan::math::row_vector_d;
 using stan::math::diag_post_multiply;
 
-using stan::agrad::matrix_fd;
-using stan::agrad::fvar;
-using stan::agrad::vector_fd;
-using stan::agrad::row_vector_fd;
+using stan::math::matrix_fd;
+using stan::math::fvar;
+using stan::math::vector_fd;
+using stan::math::row_vector_fd;
 
 void test_fwd_diag_post_multiply_vv(matrix_d md, vector_d vd) {
   int M = md.rows();
@@ -315,11 +315,11 @@ TEST(AgradFwdMatrixDiagPostMultiply, exceptions) {
 }
 
 TEST(AgradFwdMatrixDiagPostMultiply, vector_ffd) {
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   using stan::math::matrix_d;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
   using stan::math::vector_d;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   matrix_d Z(3,3);
   Z << 1, 2, 3,
@@ -372,9 +372,9 @@ TEST(AgradFwdMatrixDiagPostMultiply, vector_ffd) {
   EXPECT_FLOAT_EQ(18,output(2,2).d_.val());
 }
 TEST(AgradFwdMatrixDiagPostMultiply, vector_ffd_exception) {
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::vector_ffd;
+  using stan::math::fvar;
 
   matrix_ffd Y(3,3);
   matrix_ffd Z(2,3);
@@ -388,11 +388,11 @@ TEST(AgradFwdMatrixDiagPostMultiply, vector_ffd_exception) {
 }
 
 TEST(AgradFwdMatrixDiagPostMultiply, rowvector_ffd) {
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
   using stan::math::row_vector_d;
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   matrix_d Z(3,3);
   Z << 1, 2, 3,
@@ -445,9 +445,9 @@ TEST(AgradFwdMatrixDiagPostMultiply, rowvector_ffd) {
   EXPECT_FLOAT_EQ(18,output(2,2).d_.val());
 }
 TEST(AgradFwdMatrixDiagPostMultiply, rowvector_ffd_exception) {
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::row_vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::row_vector_ffd;
+  using stan::math::fvar;
 
   matrix_ffd Y(3,3);
   matrix_ffd Z(2,3);

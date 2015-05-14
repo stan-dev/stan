@@ -8,7 +8,7 @@
 #include <stan/math/prim/mat/fun/softmax.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template <typename T>
     inline

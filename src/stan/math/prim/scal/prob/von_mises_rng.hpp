@@ -9,13 +9,14 @@
 #include <stan/math/prim/scal/err/check_positive_finite.hpp>
 #include <stan/math/prim/scal/meta/is_constant_struct.hpp>
 #include <stan/math/prim/scal/fun/modified_bessel_first_kind.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/prob/uniform_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // The algorithm used in von_mises_rng is a modified version of the
     // algorithm in:
@@ -33,9 +34,12 @@ namespace stan {
                   const double kappa,
                   RNG& rng) {
       using boost::variate_generator;
-      using stan::prob::uniform_rng;
+      using stan::math::uniform_rng;
+      using std::fmod;
+      using std::log;
+      using std::pow;
 
-      static const char* function("stan::prob::von_mises_rng");
+      static const char* function("stan::math::von_mises_rng");
 
       stan::math::check_finite(function, "mean", mu);
       stan::math::check_positive_finite(function, "inverse of variance", kappa);

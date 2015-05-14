@@ -11,13 +11,13 @@
 #include <stan/math/prim/scal/fun/owens_t.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/is_constant_struct.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/prob/uniform_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <class RNG>
     inline double
@@ -27,7 +27,7 @@ namespace stan {
                     RNG& rng) {
       boost::math::skew_normal_distribution<> dist(mu, sigma, alpha);
 
-      static const char* function("stan::prob::skew_normal_rng");
+      static const char* function("stan::math::skew_normal_rng");
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -36,7 +36,7 @@ namespace stan {
       check_finite(function, "Shape parameter", alpha);
       check_positive(function, "Scale parameter", sigma);
 
-      return quantile(dist, stan::prob::uniform_rng(0.0, 1.0, rng));
+      return quantile(dist, stan::math::uniform_rng(0.0, 1.0, rng));
     }
   }
 }

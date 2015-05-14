@@ -14,14 +14,13 @@
 #include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/prob/beta_rng.hpp>
 #include <stan/math/prim/scal/fun/F32.hpp>
 #include <stan/math/prim/scal/fun/grad_F32.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // BetaBinomial(n|alpha, beta) [alpha > 0;  beta > 0;  n >= 0]
     template <bool propto,
@@ -32,7 +31,7 @@ namespace stan {
                       const T_N& N,
                       const T_size1& alpha,
                       const T_size2& beta) {
-      static const char* function("stan::prob::beta_binomial_log");
+      static const char* function("stan::math::beta_binomial_log");
       typedef typename stan::partials_return_type<T_size1, T_size2>::type
         T_partials_return;
 
@@ -40,7 +39,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -65,7 +64,7 @@ namespace stan {
       if (!include_summand<propto, T_size1, T_size2>::value)
         return 0.0;
 
-      agrad::OperandsAndPartials<T_size1, T_size2>
+      OperandsAndPartials<T_size1, T_size2>
         operands_and_partials(alpha, beta);
 
       VectorView<const T_n> n_vec(n);

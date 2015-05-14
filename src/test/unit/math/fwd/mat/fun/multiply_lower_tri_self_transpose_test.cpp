@@ -12,9 +12,9 @@
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/fwd/scal/fun/value_of_rec.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, fd_3x3_matrix) {
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   using stan::math::matrix_d;
   matrix_d Z(3,3);
   Z << 1, 0, 0,
@@ -34,7 +34,7 @@ TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, fd_3x3_matrix) {
    Y(2,1).d_ = 2.0;
    Y(2,2).d_ = 2.0;
   matrix_d X = stan::math::multiply_lower_tri_self_transpose(Z);
-  matrix_fd output = stan::agrad::multiply_lower_tri_self_transpose(Y);
+  matrix_fd output = stan::math::multiply_lower_tri_self_transpose(Y);
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
       EXPECT_FLOAT_EQ(X(i,j), output(i,j).val_);
@@ -51,7 +51,7 @@ TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, fd_3x3_matrix) {
   EXPECT_FLOAT_EQ(60,output(2,2).d_);
 }
 TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, fd_3x2_matrix) {
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   using stan::math::matrix_d;
   matrix_d Z(3,2);
   Z << 1, 0, 0,
@@ -66,7 +66,7 @@ TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, fd_3x2_matrix) {
    Y(2,0).d_ = 2.0;
    Y(2,1).d_ = 2.0;
   matrix_d X = stan::math::multiply_lower_tri_self_transpose(Z);
-  matrix_fd output = stan::agrad::multiply_lower_tri_self_transpose(Y);
+  matrix_fd output = stan::math::multiply_lower_tri_self_transpose(Y);
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
       EXPECT_FLOAT_EQ(X(i,j), output(i,j).val_);
@@ -83,7 +83,7 @@ TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, fd_3x2_matrix) {
   EXPECT_FLOAT_EQ(12,output(2,2).d_);
 }
 TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, ffd_3x3_matrix) {
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   using stan::math::matrix_d;
   matrix_d Z(3,3);
   Z << 1, 0, 0,
@@ -109,7 +109,7 @@ TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, ffd_3x3_matrix) {
   matrix_ffd Y(3,3);
   Y << b,a,a,c,d,a,e,f,g;
   matrix_d X = stan::math::multiply_lower_tri_self_transpose(Z);
-  matrix_ffd output = stan::agrad::multiply_lower_tri_self_transpose(Y);
+  matrix_ffd output = stan::math::multiply_lower_tri_self_transpose(Y);
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
       EXPECT_FLOAT_EQ(X(i,j), output(i,j).val_.val());
@@ -126,7 +126,7 @@ TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, ffd_3x3_matrix) {
   EXPECT_FLOAT_EQ(60,output(2,2).d_.val());
 }
 TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, ffd_3x2_matrix) {
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   using stan::math::matrix_d;
   matrix_d Z(3,2);
   Z << 1, 0, 0,
@@ -146,7 +146,7 @@ TEST(AgradFwdMatrixMultiplyLowerTriSelfTranspose, ffd_3x2_matrix) {
   Y << b,a,a,c,d,a;
 
   matrix_d X = stan::math::multiply_lower_tri_self_transpose(Z);
-  matrix_ffd output = stan::agrad::multiply_lower_tri_self_transpose(Y);
+  matrix_ffd output = stan::math::multiply_lower_tri_self_transpose(Y);
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
       EXPECT_FLOAT_EQ(X(i,j), output(i,j).val_.val());

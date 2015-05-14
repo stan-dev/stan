@@ -11,7 +11,7 @@
 #include <stan/math/rev/core.hpp>
 #include <stan/math/rev/scal/fun/value_of_rec.hpp>
 
-using stan::agrad::var;
+using stan::math::var;
 
 TEST(AgradRevErrorHandlingScalar,CheckPositive) {
   using stan::math::check_positive;
@@ -38,29 +38,29 @@ TEST(AgradRevErrorHandlingScalar,CheckPositive) {
 
   EXPECT_THROW(check_positive(function, "x", x_mat),
                std::domain_error);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckPositiveVarCheckUnivariate) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::check_positive;
 
   const char* function = "check_positive";
   var a(5.0);
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(1U,stack_size);
   EXPECT_TRUE(check_positive(function,"a",a));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(1U,stack_size_after_call);
 
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }
 
 TEST(AgradRevErrorHandlingScalar, CheckPositiveVarCheckVectorized) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using stan::math::check_positive;
 
@@ -71,13 +71,13 @@ TEST(AgradRevErrorHandlingScalar, CheckPositiveVarCheckVectorized) {
   for (int i = 0; i < N; ++i)
    a.push_back(var(i));
 
-  size_t stack_size = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size = stan::math::ChainableStack::var_stack_.size();
 
   EXPECT_EQ(5U,stack_size);
   EXPECT_THROW(check_positive(function,"a",a),std::domain_error);
   EXPECT_TRUE(check_positive(function,"a",a[2]));
 
-  size_t stack_size_after_call = stan::agrad::ChainableStack::var_stack_.size();
+  size_t stack_size_after_call = stan::math::ChainableStack::var_stack_.size();
   EXPECT_EQ(5U,stack_size_after_call);
-  stan::agrad::recover_memory();
+  stan::math::recover_memory();
 }

@@ -7,7 +7,7 @@
 TEST(AgradRev,lmgamma) {
   using stan::math::lmgamma;
   AVAR a = 3.2;
-  AVAR f = stan::agrad::lmgamma(3,a);
+  AVAR f = stan::math::lmgamma(3,a);
   EXPECT_FLOAT_EQ(lmgamma(3,3.2),f.val());
 
   AVEC x = createAVEC(a);

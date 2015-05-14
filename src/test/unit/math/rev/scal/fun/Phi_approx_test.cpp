@@ -9,7 +9,7 @@
 #include <stan/math/rev/scal/fun/inv_logit.hpp>
 
 TEST(AgradRev, Phi_approx) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::abs;
   using stan::math::Phi_approx;
 
@@ -21,7 +21,7 @@ TEST(AgradRev, Phi_approx) {
   for (size_t i = 0; i < y_values.size(); i++) {
     var y, phi_y, phi_approx_y;
     y = y_values[i];
-    phi_y = stan::agrad::Phi(y);
+    phi_y = stan::math::Phi(y);
     phi_approx_y = Phi_approx(y);
     EXPECT_NEAR(phi_y.val(), phi_approx_y.val(), 0.00014);
 

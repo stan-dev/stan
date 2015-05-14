@@ -5,7 +5,7 @@
 
 TEST(AgradFwdMatrixTranspose,fd_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   using stan::math::transpose;
 
   EXPECT_EQ(0,transpose(matrix_fd()).size());
@@ -39,10 +39,10 @@ TEST(AgradFwdMatrixTranspose,fd_matrix) {
 
 }
 TEST(AgradFwdMatrixTranspose,fd_vector) {
-  using stan::agrad::vector_fd;
-  using stan::agrad::row_vector_fd;
+  using stan::math::vector_fd;
+  using stan::math::row_vector_fd;
   using stan::math::transpose;
-  using stan::agrad::size_type;
+  using stan::math::size_type;
 
   vector_fd a(3);
   a << 1.0, 2.0, 3.0;
@@ -59,10 +59,10 @@ TEST(AgradFwdMatrixTranspose,fd_vector) {
   EXPECT_FLOAT_EQ(1.0, a_tr(2).d_);
 }
 TEST(AgradFwdMatrixTranspose,fd_row_vector) {
-  using stan::agrad::vector_fd;
-  using stan::agrad::row_vector_fd;
+  using stan::math::vector_fd;
+  using stan::math::row_vector_fd;
   using stan::math::transpose;
-  using stan::agrad::size_type;
+  using stan::math::size_type;
 
   row_vector_fd a(3);
   a << 1.0, 2.0, 3.0;
@@ -80,7 +80,7 @@ TEST(AgradFwdMatrixTranspose,fd_row_vector) {
 }
 TEST(AgradFwdMatrixTranspose,ffd_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   using stan::math::transpose;
 
   EXPECT_EQ(0,transpose(matrix_ffd()).size());
@@ -114,10 +114,10 @@ TEST(AgradFwdMatrixTranspose,ffd_matrix) {
 
 }
 TEST(AgradFwdMatrixTranspose,ffd_vector) {
-  using stan::agrad::vector_ffd;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::vector_ffd;
+  using stan::math::row_vector_ffd;
   using stan::math::transpose;
-  using stan::agrad::size_type;
+  using stan::math::size_type;
 
   vector_ffd a(3);
   a << 1.0, 2.0, 3.0;
@@ -134,10 +134,10 @@ TEST(AgradFwdMatrixTranspose,ffd_vector) {
   EXPECT_FLOAT_EQ(1.0, a_tr(2).d_.val());
 }
 TEST(AgradFwdMatrixTranspose,ffd_row_vector) {
-  using stan::agrad::vector_ffd;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::vector_ffd;
+  using stan::math::row_vector_ffd;
   using stan::math::transpose;
-  using stan::agrad::size_type;
+  using stan::math::size_type;
 
   row_vector_ffd a(3);
   a << 1.0, 2.0, 3.0;

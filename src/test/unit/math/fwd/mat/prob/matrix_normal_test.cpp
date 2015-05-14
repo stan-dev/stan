@@ -18,7 +18,7 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 TEST(ProbDistributionsMatrixNormal,fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Matrix<fvar<double>,Dynamic,Dynamic> mu(3,5);
   mu.setZero();
@@ -51,13 +51,13 @@ TEST(ProbDistributionsMatrixNormal,fvar_double) {
       }
     } 
 
-  fvar<double> lp_ref = stan::prob::matrix_normal_prec_log(y,mu,D,Sigma);
+  fvar<double> lp_ref = stan::math::matrix_normal_prec_log(y,mu,D,Sigma);
   EXPECT_FLOAT_EQ(-2132.07482, lp_ref.val_);
   EXPECT_FLOAT_EQ(-2075.1274, lp_ref.d_);
 }
 
 TEST(ProbDistributionsMatrixNormal,fvar_fvar_double) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   Matrix<fvar<fvar<double> >,Dynamic,Dynamic> mu(3,5);
   mu.setZero();
@@ -90,7 +90,7 @@ TEST(ProbDistributionsMatrixNormal,fvar_fvar_double) {
       }
     } 
 
-  fvar<fvar<double> > lp_ref = stan::prob::matrix_normal_prec_log(y,mu,D,Sigma);
+  fvar<fvar<double> > lp_ref = stan::math::matrix_normal_prec_log(y,mu,D,Sigma);
   EXPECT_FLOAT_EQ(-2132.07482, lp_ref.val_.val_);
   EXPECT_FLOAT_EQ(-2075.1274, lp_ref.d_.val_);
 }

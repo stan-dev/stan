@@ -3,7 +3,7 @@
 #include <stan/math/prim/mat/fun/dot_self.hpp>
 #include <stan/math/fwd/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 TEST(AgradFwdMatrixDotSelf, vec_fd) {
   using stan::math::dot_self;
 

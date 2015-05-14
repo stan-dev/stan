@@ -15,7 +15,7 @@ namespace std {
    * @param a Variable to test.
    * @return <code>true</code> if value is not a number.
    */
-  inline int isnan(const stan::agrad::var& a) {
+  inline int isnan(const stan::math::var& a) {
     return isnan(a.val());
   }
 

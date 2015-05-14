@@ -8,13 +8,13 @@
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
-using stan::agrad::log_sum_exp;
+using stan::math::fvar;
+using stan::math::var;
+using stan::math::log_sum_exp;
 using stan::math::log_sum_exp;
 
 TEST(AgradMixMatrixLogSumExp,vector_fv_1st_deriv) {
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
 
   vector_fv b(4);
   b << 1, 2, 3, 4;
@@ -43,7 +43,7 @@ TEST(AgradMixMatrixLogSumExp,vector_fv_1st_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,row_vector_fv_1st_deriv) {
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   row_vector_fv b(4);
   b << 1, 2, 3, 4;
@@ -72,7 +72,7 @@ TEST(AgradMixMatrixLogSumExp,row_vector_fv_1st_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,matrix_fv_1st_deriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
 
   matrix_fv b(2,2);
   b << 1, 2, 3, 4;
@@ -101,7 +101,7 @@ TEST(AgradMixMatrixLogSumExp,matrix_fv_1st_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,vector_fv_2nd_deriv) {
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
 
   vector_fv b(4);
   b << 1, 2, 3, 4;
@@ -130,7 +130,7 @@ TEST(AgradMixMatrixLogSumExp,vector_fv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,row_vector_fv_2nd_deriv) {
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   row_vector_fv b(4);
   b << 1, 2, 3, 4;
@@ -156,7 +156,7 @@ TEST(AgradMixMatrixLogSumExp,row_vector_fv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,matrix_fv_2nd_deriv) {
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
 
   matrix_fv b(2,2);
   b << 1, 2, 3, 4;
@@ -182,7 +182,7 @@ TEST(AgradMixMatrixLogSumExp,matrix_fv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,vector_ffv_1st_deriv) {
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_ffv b(4);
   b << 1, 2, 3, 4;
@@ -211,7 +211,7 @@ TEST(AgradMixMatrixLogSumExp,vector_ffv_1st_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,row_vector_ffv_1st_deriv) {
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_ffv b(4);
   b << 1, 2, 3, 4;
@@ -240,7 +240,7 @@ TEST(AgradMixMatrixLogSumExp,row_vector_ffv_1st_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,matrix_ffv_1st_deriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_ffv b(2,2);
   b << 1, 2, 3, 4;
@@ -269,7 +269,7 @@ TEST(AgradMixMatrixLogSumExp,matrix_ffv_1st_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,vector_ffv_2nd_deriv) {
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_ffv b(4);
   b << 1, 2, 3, 4;
@@ -295,7 +295,7 @@ TEST(AgradMixMatrixLogSumExp,vector_ffv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,row_vector_ffv_2nd_deriv) {
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_ffv b(4);
   b << 1, 2, 3, 4;
@@ -321,7 +321,7 @@ TEST(AgradMixMatrixLogSumExp,row_vector_ffv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,matrix_ffv_2nd_deriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_ffv b(2,2);
   b << 1, 2, 3, 4;
@@ -347,7 +347,7 @@ TEST(AgradMixMatrixLogSumExp,matrix_ffv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,vector_ffv_3rd_deriv) {
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_ffv b(4);
   b << 1, 2, 3, 4;
@@ -377,7 +377,7 @@ TEST(AgradMixMatrixLogSumExp,vector_ffv_3rd_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,row_vector_ffv_3rd_deriv) {
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_ffv b(4);
   b << 1, 2, 3, 4;
@@ -407,7 +407,7 @@ TEST(AgradMixMatrixLogSumExp,row_vector_ffv_3rd_deriv) {
 }
 
 TEST(AgradMixMatrixLogSumExp,matrix_ffv_3rd_deriv) {
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_ffv b(2,2);
   b << 1, 2, 3, 4;

@@ -6,12 +6,12 @@
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixTraceGenQuadForm, mat_fv_1st_deriv) {
-  using stan::agrad::trace_gen_quad_form;
-  using stan::agrad::matrix_fv;
+  using stan::math::trace_gen_quad_form;
+  using stan::math::matrix_fv;
   
   matrix_fv ad(4,4);
   matrix_fv bd(4,2);
@@ -126,8 +126,8 @@ TEST(AgradMixMatrixTraceGenQuadForm, mat_fv_1st_deriv) {
 }
 
 TEST(AgradMixMatrixTraceGenQuadForm, mat_fv_2nd_deriv) {
-  using stan::agrad::trace_gen_quad_form;
-  using stan::agrad::matrix_fv;
+  using stan::math::trace_gen_quad_form;
+  using stan::math::matrix_fv;
   
   matrix_fv ad(4,4);
   matrix_fv bd(4,2);
@@ -242,8 +242,8 @@ TEST(AgradMixMatrixTraceGenQuadForm, mat_fv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixTraceGenQuadForm, mat_ffv_1st_deriv) {
-  using stan::agrad::trace_gen_quad_form;
-  using stan::agrad::matrix_ffv;
+  using stan::math::trace_gen_quad_form;
+  using stan::math::matrix_ffv;
   
   matrix_ffv ad(4,4);
   matrix_ffv bd(4,2);
@@ -358,8 +358,8 @@ TEST(AgradMixMatrixTraceGenQuadForm, mat_ffv_1st_deriv) {
 }
 
 TEST(AgradMixMatrixTraceGenQuadForm, mat_ffv_2nd_deriv) {
-  using stan::agrad::trace_gen_quad_form;
-  using stan::agrad::matrix_ffv;
+  using stan::math::trace_gen_quad_form;
+  using stan::math::matrix_ffv;
   
   matrix_ffv ad(4,4);
   matrix_ffv bd(4,2);
@@ -474,8 +474,8 @@ TEST(AgradMixMatrixTraceGenQuadForm, mat_ffv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixTraceGenQuadForm, mat_ffv_3rd_deriv) {
-  using stan::agrad::trace_gen_quad_form;
-  using stan::agrad::matrix_ffv;
+  using stan::math::trace_gen_quad_form;
+  using stan::math::matrix_ffv;
   
   matrix_ffv ad(4,4);
   matrix_ffv bd(4,2);

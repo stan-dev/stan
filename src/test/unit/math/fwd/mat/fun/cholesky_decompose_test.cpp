@@ -7,7 +7,7 @@
 #include <stan/math/fwd/scal/fun/fabs.hpp>
 
 TEST(AgradFwdMatrixCholeskyDecompose, exception_mat_fd) {
-  stan::agrad::matrix_fd m;
+  stan::math::matrix_fd m;
   
   m.resize(2,2);
   m << 1.0, 2.0, 
@@ -27,7 +27,7 @@ TEST(AgradFwdMatrixCholeskyDecompose, exception_mat_fd) {
   EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
 }
 TEST(AgradFwdMatrixCholeskyDecompose, exception_mat_ffd) {
-  stan::agrad::matrix_ffd m;
+  stan::math::matrix_ffd m;
   
   m.resize(2,2);
   m << 1.0, 2.0, 
@@ -47,7 +47,7 @@ TEST(AgradFwdMatrixCholeskyDecompose, exception_mat_ffd) {
   EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
 }
 TEST(AgradFwdMatrixCholeskyDecompose, mat_fd) {
-  stan::agrad::matrix_fd m0(2,2);
+  stan::math::matrix_fd m0(2,2);
   m0 << 1, 2, 2, 4;
   m0(0,0).d_ = 1.0;
   m0(0,1).d_ = 1.0;
@@ -56,7 +56,7 @@ TEST(AgradFwdMatrixCholeskyDecompose, mat_fd) {
 
   using stan::math::cholesky_decompose;
 
-  stan::agrad::matrix_fd res = cholesky_decompose(m0);
+  stan::math::matrix_fd res = cholesky_decompose(m0);
 
   EXPECT_FLOAT_EQ(1, res(0,0).val_);
   EXPECT_FLOAT_EQ(0, res(0,1).val_);
@@ -68,7 +68,7 @@ TEST(AgradFwdMatrixCholeskyDecompose, mat_fd) {
   EXPECT_FLOAT_EQ(1, res(1,1).d_);
 }
 TEST(AgradFwdMatrixCholeskyDecompose, mat_ffd) {
-  stan::agrad::matrix_ffd m0(2,2);
+  stan::math::matrix_ffd m0(2,2);
   m0 << 1, 2, 2, 4;
   m0(0,0).d_ = 1.0;
   m0(0,1).d_ = 1.0;
@@ -77,7 +77,7 @@ TEST(AgradFwdMatrixCholeskyDecompose, mat_ffd) {
 
   using stan::math::cholesky_decompose;
 
-  stan::agrad::matrix_ffd res = cholesky_decompose(m0);
+  stan::math::matrix_ffd res = cholesky_decompose(m0);
 
   EXPECT_FLOAT_EQ(1, res(0,0).val_.val_);
   EXPECT_FLOAT_EQ(0, res(0,1).val_.val_);

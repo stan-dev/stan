@@ -4,8 +4,8 @@
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/mat/fun/initialize.hpp>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixInitialize, fv) {
   using stan::math::initialize;

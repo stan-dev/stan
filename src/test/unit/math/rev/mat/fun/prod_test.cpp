@@ -13,7 +13,7 @@
 TEST(AgradRevMatrix,prod) {
   using stan::math::prod;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::math::vector_v;
 
   vector_d vd;
   vector_v vv;

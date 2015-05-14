@@ -5,7 +5,7 @@
 #include <stan/math/prim/scal/fun/inv_logit.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class inv_logit_vari : public op_v_vari {
@@ -31,7 +31,7 @@ namespace stan {
      * @param a Argument variable.
      * @return Inverse logit of argument.
      */
-    inline var inv_logit(const stan::agrad::var& a) {
+    inline var inv_logit(const stan::math::var& a) {
       return var(new inv_logit_vari(a.vi_));
     }
 

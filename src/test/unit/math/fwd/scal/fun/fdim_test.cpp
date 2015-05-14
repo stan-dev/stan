@@ -4,7 +4,7 @@
 #include <stan/math/fwd/scal/fun/floor.hpp>
 
 TEST(AgradFwdFdim,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::fdim;
   using std::isnan;
   using std::floor;
@@ -41,7 +41,7 @@ TEST(AgradFwdFdim,Fvar) {
 
 
 TEST(AgradFwdFdim,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::fdim;
   using std::floor;
 

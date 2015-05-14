@@ -5,7 +5,7 @@
 #include <stan/math/rev/core/v_vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     // use for single precomputed partials
     class precomp_v_vari : public op_v_vari {

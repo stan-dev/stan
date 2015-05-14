@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       template <int TriView, int R1, int C1, int R2, int C2>
@@ -30,19 +30,19 @@ namespace stan {
             M_(A.rows()),
             N_(B.cols()),
             A_(reinterpret_cast<double*>
-               (stan::agrad::ChainableStack::memalloc_
+               (stan::math::ChainableStack::memalloc_
                 .alloc(sizeof(double) * A.rows() * A.cols()))),
             C_(reinterpret_cast<double*>
-               (stan::agrad::ChainableStack::memalloc_
+               (stan::math::ChainableStack::memalloc_
                 .alloc(sizeof(double) * B.rows() * B.cols()))),
             _variRefA(reinterpret_cast<vari**>
-                      (stan::agrad::ChainableStack::memalloc_
+                      (stan::math::ChainableStack::memalloc_
                        .alloc(sizeof(vari*) * A.rows() * (A.rows() + 1) / 2))),
             _variRefB(reinterpret_cast<vari**>
-                      (stan::agrad::ChainableStack::memalloc_
+                      (stan::math::ChainableStack::memalloc_
                        .alloc(sizeof(vari*) * B.rows() * B.cols()))),
             _variRefC(reinterpret_cast<vari**>
-                      (stan::agrad::ChainableStack::memalloc_
+                      (stan::math::ChainableStack::memalloc_
                        .alloc(sizeof(vari*) * B.rows() * B.cols()))) {
           using Eigen::Matrix;
           using Eigen::Map;
@@ -140,16 +140,16 @@ namespace stan {
             M_(A.rows()),
             N_(B.cols()),
             A_(reinterpret_cast<double*>
-               (stan::agrad::ChainableStack::memalloc_
+               (stan::math::ChainableStack::memalloc_
                 .alloc(sizeof(double) * A.rows() * A.cols()))),
             C_(reinterpret_cast<double*>
-               (stan::agrad::ChainableStack::memalloc_
+               (stan::math::ChainableStack::memalloc_
                 .alloc(sizeof(double) * B.rows() * B.cols()))),
             _variRefB(reinterpret_cast<vari**>
-                      (stan::agrad::ChainableStack::memalloc_
+                      (stan::math::ChainableStack::memalloc_
                        .alloc(sizeof(vari*) * B.rows() * B.cols()))),
             _variRefC(reinterpret_cast<vari**>
-                      (stan::agrad::ChainableStack::memalloc_
+                      (stan::math::ChainableStack::memalloc_
                        .alloc(sizeof(vari*) * B.rows() * B.cols()))) {
           using Eigen::Matrix;
           using Eigen::Map;
@@ -222,16 +222,16 @@ namespace stan {
             M_(A.rows()),
             N_(B.cols()),
             A_(reinterpret_cast<double*>
-               (stan::agrad::ChainableStack::memalloc_
+               (stan::math::ChainableStack::memalloc_
                 .alloc(sizeof(double) * A.rows() * A.cols()))),
             C_(reinterpret_cast<double*>
-               (stan::agrad::ChainableStack::memalloc_
+               (stan::math::ChainableStack::memalloc_
                 .alloc(sizeof(double) * B.rows() * B.cols()))),
             _variRefA(reinterpret_cast<vari**>
-                      (stan::agrad::ChainableStack::memalloc_
+                      (stan::math::ChainableStack::memalloc_
                        .alloc(sizeof(vari*) * A.rows() * (A.rows() + 1) / 2))),
             _variRefC(reinterpret_cast<vari**>
-                      (stan::agrad::ChainableStack::memalloc_
+                      (stan::math::ChainableStack::memalloc_
                        .alloc(sizeof(vari*) * B.rows() * B.cols()))) {
           using Eigen::Matrix;
           using Eigen::Map;

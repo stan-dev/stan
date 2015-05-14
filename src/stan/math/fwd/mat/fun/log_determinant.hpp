@@ -12,7 +12,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T, int R, int C>
     inline
@@ -20,7 +20,7 @@ namespace stan {
     log_determinant(const Eigen::Matrix<fvar<T>, R, C>& m) {
       stan::math::check_square("log_determinant", "m", m);
 
-      return stan::agrad::log(stan::agrad::fabs(stan::agrad::determinant(m)));
+      return stan::math::log(stan::math::fabs(stan::math::determinant(m)));
     }
   }
 }

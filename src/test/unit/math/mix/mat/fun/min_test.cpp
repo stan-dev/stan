@@ -7,12 +7,12 @@
 #include <stan/math/fwd/core.hpp>
 #include <stan/math/rev/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 TEST(AgradMixMatrixMin, fv_vector_1stDeriv) {
   using stan::math::min;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
-  using stan::agrad::var;
+  using stan::math::vector_fv;
+  using stan::math::var;
 
   vector_d d1(3);
   vector_fv v1(3);
@@ -42,8 +42,8 @@ TEST(AgradMixMatrixMin, fv_vector_1stDeriv) {
 TEST(AgradMixMatrixMin, fv_vector_2ndDeriv) {
   using stan::math::min;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
-  using stan::agrad::var;
+  using stan::math::vector_fv;
+  using stan::math::var;
 
   vector_d d1(3);
   vector_fv v1(3);
@@ -67,7 +67,7 @@ TEST(AgradMixMatrixMin, fv_vector_2ndDeriv) {
 TEST(AgradMixMatrixMin, fv_vector_exception) {
   using stan::math::min;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::math::vector_fv;
 
   vector_d d;
   vector_fv v;
@@ -79,8 +79,8 @@ TEST(AgradMixMatrixMin, fv_vector_exception) {
 TEST(AgradMixMatrixMin, fv_rowvector_1stDeriv) {
   using stan::math::min;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
-  using stan::agrad::var;
+  using stan::math::row_vector_fv;
+  using stan::math::var;
 
   row_vector_d d1(3);
   row_vector_fv v1(3);
@@ -110,8 +110,8 @@ TEST(AgradMixMatrixMin, fv_rowvector_1stDeriv) {
 TEST(AgradMixMatrixMin, fv_rowvector_2ndDeriv) {
   using stan::math::min;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
-  using stan::agrad::var;
+  using stan::math::row_vector_fv;
+  using stan::math::var;
 
   row_vector_d d1(3);
   row_vector_fv v1(3);
@@ -134,7 +134,7 @@ TEST(AgradMixMatrixMin, fv_rowvector_2ndDeriv) {
 }
 TEST(AgradMixMatrixMin, fv_rowvector_exception) {
   using stan::math::min;
-  using stan::agrad::row_vector_fv;
+  using stan::math::row_vector_fv;
 
   row_vector_fv v;
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), min(v).val_.val());
@@ -143,8 +143,8 @@ TEST(AgradMixMatrixMin, fv_rowvector_exception) {
 TEST(AgradMixMatrixMin, fv_matrix_1stDeriv) {
   using stan::math::min;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::var;
 
   matrix_d d1(3,1);
   matrix_fv v1(1,3);
@@ -174,8 +174,8 @@ TEST(AgradMixMatrixMin, fv_matrix_1stDeriv) {
 TEST(AgradMixMatrixMin, fv_matrix_2ndDeriv) {
   using stan::math::min;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::var;
+  using stan::math::matrix_fv;
+  using stan::math::var;
 
   matrix_d d1(3,1);
   matrix_fv v1(1,3);
@@ -198,7 +198,7 @@ TEST(AgradMixMatrixMin, fv_matrix_2ndDeriv) {
 }
 TEST(AgradMixMatrixMin, fv_matrix_exception) {
   using stan::math::min;
-  using stan::agrad::matrix_fv;
+  using stan::math::matrix_fv;
 
   matrix_fv v;
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), min(v).val_.val());
@@ -207,8 +207,8 @@ TEST(AgradMixMatrixMin, fv_matrix_exception) {
 TEST(AgradMixMatrixMin, ffv_vector_1stDeriv) {
   using stan::math::min;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::var;
 
   vector_d d1(3);
   vector_ffv v1(3);
@@ -238,8 +238,8 @@ TEST(AgradMixMatrixMin, ffv_vector_1stDeriv) {
 TEST(AgradMixMatrixMin, ffv_vector_2ndDeriv_1) {
   using stan::math::min;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::var;
 
   vector_d d1(3);
   vector_ffv v1(3);
@@ -263,8 +263,8 @@ TEST(AgradMixMatrixMin, ffv_vector_2ndDeriv_1) {
 TEST(AgradMixMatrixMin, ffv_vector_2ndDeriv_2) {
   using stan::math::min;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::var;
 
   vector_d d1(3);
   vector_ffv v1(3);
@@ -288,8 +288,8 @@ TEST(AgradMixMatrixMin, ffv_vector_2ndDeriv_2) {
 TEST(AgradMixMatrixMin, ffv_vector_3rdDeriv) {
   using stan::math::min;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
-  using stan::agrad::var;
+  using stan::math::vector_ffv;
+  using stan::math::var;
 
   vector_d d1(3);
   vector_ffv v1(3);
@@ -316,7 +316,7 @@ TEST(AgradMixMatrixMin, ffv_vector_3rdDeriv) {
 TEST(AgradMixMatrixMin, ffv_vector_exception) {
   using stan::math::min;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::math::vector_ffv;
 
   vector_d d;
   vector_ffv v;
@@ -328,8 +328,8 @@ TEST(AgradMixMatrixMin, ffv_vector_exception) {
 TEST(AgradMixMatrixMin, ffv_rowvector_1stDeriv) {
   using stan::math::min;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
-  using stan::agrad::var;
+  using stan::math::row_vector_ffv;
+  using stan::math::var;
 
   row_vector_d d1(3);
   row_vector_ffv v1(3);
@@ -359,8 +359,8 @@ TEST(AgradMixMatrixMin, ffv_rowvector_1stDeriv) {
 TEST(AgradMixMatrixMin, ffv_rowvector_2ndDeriv_1) {
   using stan::math::min;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
-  using stan::agrad::var;
+  using stan::math::row_vector_ffv;
+  using stan::math::var;
 
   row_vector_d d1(3);
   row_vector_ffv v1(3);
@@ -384,8 +384,8 @@ TEST(AgradMixMatrixMin, ffv_rowvector_2ndDeriv_1) {
 TEST(AgradMixMatrixMin, ffv_rowvector_2ndDeriv_2) {
   using stan::math::min;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
-  using stan::agrad::var;
+  using stan::math::row_vector_ffv;
+  using stan::math::var;
 
   row_vector_d d1(3);
   row_vector_ffv v1(3);
@@ -409,8 +409,8 @@ TEST(AgradMixMatrixMin, ffv_rowvector_2ndDeriv_2) {
 TEST(AgradMixMatrixMin, ffv_rowvector_3rdDeriv) {
   using stan::math::min;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
-  using stan::agrad::var;
+  using stan::math::row_vector_ffv;
+  using stan::math::var;
 
   row_vector_d d1(3);
   row_vector_ffv v1(3);
@@ -436,7 +436,7 @@ TEST(AgradMixMatrixMin, ffv_rowvector_3rdDeriv) {
 }
 TEST(AgradMixMatrixMin, ffv_rowvector_exception) {
   using stan::math::min;
-  using stan::agrad::row_vector_ffv;
+  using stan::math::row_vector_ffv;
 
   row_vector_ffv v;
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), min(v).val_.val().val());
@@ -445,8 +445,8 @@ TEST(AgradMixMatrixMin, ffv_rowvector_exception) {
 TEST(AgradMixMatrixMin, ffv_matrix_1stDeriv) {
   using stan::math::min;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::var;
 
   matrix_d d1(3,1);
   matrix_ffv v1(1,3);
@@ -476,8 +476,8 @@ TEST(AgradMixMatrixMin, ffv_matrix_1stDeriv) {
 TEST(AgradMixMatrixMin, ffv_matrix_2ndDeriv_1) {
   using stan::math::min;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::var;
 
   matrix_d d1(3,1);
   matrix_ffv v1(1,3);
@@ -501,8 +501,8 @@ TEST(AgradMixMatrixMin, ffv_matrix_2ndDeriv_1) {
 TEST(AgradMixMatrixMin, ffv_matrix_2ndDeriv_2) {
   using stan::math::min;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::var;
 
   matrix_d d1(3,1);
   matrix_ffv v1(1,3);
@@ -526,8 +526,8 @@ TEST(AgradMixMatrixMin, ffv_matrix_2ndDeriv_2) {
 TEST(AgradMixMatrixMin, ffv_matrix_3rdDeriv) {
   using stan::math::min;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::var;
+  using stan::math::matrix_ffv;
+  using stan::math::var;
 
   matrix_d d1(3,1);
   matrix_ffv v1(1,3);
@@ -553,7 +553,7 @@ TEST(AgradMixMatrixMin, ffv_matrix_3rdDeriv) {
 }
 TEST(AgradMixMatrixMin, ffv_matrix_exception) {
   using stan::math::min;
-  using stan::agrad::matrix_ffv;
+  using stan::math::matrix_ffv;
 
   matrix_ffv v;
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), min(v).val_.val().val());

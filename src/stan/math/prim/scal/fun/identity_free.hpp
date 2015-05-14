@@ -3,7 +3,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Returns the result of applying the inverse of the identity

@@ -12,13 +12,12 @@
 #include <stan/math/prim/scal/fun/log1p.hpp>
 #include <stan/math/prim/scal/fun/square.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <limits>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Calculates the cauchy cumulative distribution function for
@@ -43,7 +42,7 @@ namespace stan {
               && stan::length(sigma) ) )
         return 1.0;
 
-      static const char* function("stan::prob::cauchy_cdf");
+      static const char* function("stan::math::cauchy_cdf");
 
       using stan::math::check_positive_finite;
       using stan::math::check_finite;
@@ -68,7 +67,7 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       // Explicit return for extreme values

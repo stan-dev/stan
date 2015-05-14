@@ -5,8 +5,8 @@
 #include <stan/math/prim/scal/meta/return_type.hpp>
 
 TEST(AgradRev,owens_t_vv) {
-  using stan::agrad::var;
-  using stan::agrad::owens_t;
+  using stan::math::var;
+  using stan::math::owens_t;
   using boost::math::owens_t;
 
   var h = 1.0;
@@ -21,8 +21,8 @@ TEST(AgradRev,owens_t_vv) {
   EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
 }
 TEST(AgradRev,owens_t_vd) {
-  using stan::agrad::var;
-  using stan::agrad::owens_t;
+  using stan::math::var;
+  using stan::math::owens_t;
   using boost::math::owens_t;
 
   AVAR h = 1.0;
@@ -37,8 +37,8 @@ TEST(AgradRev,owens_t_vd) {
   EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
 }
 TEST(AgradRev,owens_t_dv) {
-  using stan::agrad::var;
-  using stan::agrad::owens_t;
+  using stan::math::var;
+  using stan::math::owens_t;
   using boost::math::owens_t;
 
   double h = 1.0;

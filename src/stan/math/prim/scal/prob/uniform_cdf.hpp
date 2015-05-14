@@ -11,17 +11,16 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_low, typename T_high>
     typename return_type<T_y, T_low, T_high>::type
     uniform_cdf(const T_y& y, const T_low& alpha, const T_high& beta) {
-      static const char* function("stan::prob::uniform_cdf");
+      static const char* function("stan::math::uniform_cdf");
       typedef typename stan::partials_return_type<T_y, T_low, T_high>::type
         T_partials_return;
 
@@ -60,7 +59,7 @@ namespace stan {
           return 0.0;
       }
 
-      agrad::OperandsAndPartials<T_y, T_low, T_high>
+      OperandsAndPartials<T_y, T_low, T_high>
         operands_and_partials(y, alpha, beta);
       for (size_t n = 0; n < N; n++) {
         const T_partials_return y_dbl = value_of(y_vec[n]);

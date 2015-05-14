@@ -7,7 +7,7 @@
 #include <stan/math/rev/core/vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     class op_matrix_vari : public vari {
     protected:
@@ -16,7 +16,7 @@ namespace stan {
     public:
       template <int R, int C>
       op_matrix_vari(double f,
-                     const Eigen::Matrix<stan::agrad::var, R, C>& vs) :
+                     const Eigen::Matrix<stan::math::var, R, C>& vs) :
         vari(f),
         size_(vs.size()) {
         vis_ = reinterpret_cast<vari**>

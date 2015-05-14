@@ -15,10 +15,10 @@
 #include <stan/math/rev/scal/fun/value_of.hpp>
 
 TEST(AgradMixMatrixEigenvectorsSym, excepts_fv) {
-  stan::agrad::matrix_fv m0;
-  stan::agrad::matrix_fv m1(2,3);
+  stan::math::matrix_fv m0;
+  stan::math::matrix_fv m1(2,3);
   m1 << 1, 2, 3, 4, 5, 6;
-  stan::agrad::matrix_fv ev_m1(1,1);
+  stan::math::matrix_fv ev_m1(1,1);
   ev_m1 << 2.0;
 
   using stan::math::eigenvectors_sym;
@@ -27,10 +27,10 @@ TEST(AgradMixMatrixEigenvectorsSym, excepts_fv) {
   EXPECT_THROW(eigenvectors_sym(m1),std::invalid_argument);
 }
 TEST(AgradMixMatrixEigenvectorsSym, excepts_ffv) {
-  stan::agrad::matrix_ffv m0;
-  stan::agrad::matrix_ffv m1(2,3);
+  stan::math::matrix_ffv m0;
+  stan::math::matrix_ffv m1(2,3);
   m1 << 1, 2, 3, 4, 5, 6;
-  stan::agrad::matrix_ffv ev_m1(1,1);
+  stan::math::matrix_ffv ev_m1(1,1);
   ev_m1 << 2.0;
 
   using stan::math::eigenvectors_sym;
@@ -40,15 +40,15 @@ TEST(AgradMixMatrixEigenvectorsSym, excepts_ffv) {
 }
 
 TEST(AgradMixMatrixEigenvectorsSym, matrix_fv_1st_deriv) {
-  stan::agrad::matrix_fv m0;
-  stan::agrad::matrix_fv m1(2,2);
+  stan::math::matrix_fv m0;
+  stan::math::matrix_fv m1(2,2);
   m1 << 1, 2, 2,1;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
   m1(1,0).d_ = 1.0;
   m1(1,1).d_ = 1.0;
 
-  stan::agrad::matrix_fv res0 = stan::math::eigenvectors_sym(m1);
+  stan::math::matrix_fv res0 = stan::math::eigenvectors_sym(m1);
 
   EXPECT_FLOAT_EQ(-0.70710677, res0(0,0).val_.val());
   EXPECT_FLOAT_EQ(0.70710677, res0(0,1).val_.val());
@@ -69,15 +69,15 @@ TEST(AgradMixMatrixEigenvectorsSym, matrix_fv_1st_deriv) {
   EXPECT_FLOAT_EQ(-0.17677669,h[3]);
 }
 TEST(AgradMixMatrixEigenvectorsSym, matrix_fv_2nd_deriv) {
-  stan::agrad::matrix_fv m0;
-  stan::agrad::matrix_fv m1(2,2);
+  stan::math::matrix_fv m0;
+  stan::math::matrix_fv m1(2,2);
   m1 << 1, 2, 2,1;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
   m1(1,0).d_ = 1.0;
   m1(1,1).d_ = 1.0;
 
-  stan::agrad::matrix_fv res0 = stan::math::eigenvectors_sym(m1);
+  stan::math::matrix_fv res0 = stan::math::eigenvectors_sym(m1);
 
   EXPECT_FLOAT_EQ(-0.70710677, res0(0,0).val_.val());
   EXPECT_FLOAT_EQ(0.70710677, res0(0,1).val_.val());
@@ -99,15 +99,15 @@ TEST(AgradMixMatrixEigenvectorsSym, matrix_fv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixEigenvectorsSym, matrix_ffv_1st_deriv) {
-  stan::agrad::matrix_ffv m0;
-  stan::agrad::matrix_ffv m1(2,2);
+  stan::math::matrix_ffv m0;
+  stan::math::matrix_ffv m1(2,2);
   m1 << 1, 2, 2,1;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
   m1(1,0).d_ = 1.0;
   m1(1,1).d_ = 1.0;
 
-  stan::agrad::matrix_ffv res0 = stan::math::eigenvectors_sym(m1);
+  stan::math::matrix_ffv res0 = stan::math::eigenvectors_sym(m1);
 
   EXPECT_FLOAT_EQ(-0.70710677, res0(0,0).val_.val_.val());
   EXPECT_FLOAT_EQ(0.70710677, res0(0,1).val_.val_.val());
@@ -129,15 +129,15 @@ TEST(AgradMixMatrixEigenvectorsSym, matrix_ffv_1st_deriv) {
   EXPECT_FLOAT_EQ(-0.17677669,h[3]);
 }
 TEST(AgradMixMatrixEigenvectorsSym, matrix_ffv_2nd_deriv) {
-  stan::agrad::matrix_ffv m0;
-  stan::agrad::matrix_ffv m1(2,2);
+  stan::math::matrix_ffv m0;
+  stan::math::matrix_ffv m1(2,2);
   m1 << 1, 2, 2,1;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
   m1(1,0).d_ = 1.0;
   m1(1,1).d_ = 1.0;
 
-  stan::agrad::matrix_ffv res0 = stan::math::eigenvectors_sym(m1);
+  stan::math::matrix_ffv res0 = stan::math::eigenvectors_sym(m1);
 
   EXPECT_FLOAT_EQ(-0.70710677, res0(0,0).val_.val_.val());
   EXPECT_FLOAT_EQ(0.70710677, res0(0,1).val_.val_.val());
@@ -160,8 +160,8 @@ TEST(AgradMixMatrixEigenvectorsSym, matrix_ffv_2nd_deriv) {
 }
 
 TEST(AgradMixMatrixEigenvectorsSym, matrix_ffv_3rd_deriv) {
-  stan::agrad::matrix_ffv m0;
-  stan::agrad::matrix_ffv m1(2,2);
+  stan::math::matrix_ffv m0;
+  stan::math::matrix_ffv m1(2,2);
   m1 << 1, 2, 2,1;
   m1(0,0).d_ = 1.0;
   m1(0,1).d_ = 1.0;
@@ -172,7 +172,7 @@ TEST(AgradMixMatrixEigenvectorsSym, matrix_ffv_3rd_deriv) {
   m1(1,0).val_.d_ = 1.0;
   m1(1,1).val_.d_ = 1.0;
 
-  stan::agrad::matrix_ffv res0 = stan::math::eigenvectors_sym(m1);
+  stan::math::matrix_ffv res0 = stan::math::eigenvectors_sym(m1);
 
   EXPECT_FLOAT_EQ(-0.70710677, res0(0,0).val_.val_.val());
   EXPECT_FLOAT_EQ(0.70710677, res0(0,1).val_.val_.val());

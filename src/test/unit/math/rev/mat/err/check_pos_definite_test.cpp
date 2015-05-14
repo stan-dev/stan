@@ -12,7 +12,7 @@
 #include <stan/math/rev/mat/fun/Eigen_NumTraits.hpp>
 
 TEST(AgradRevErrorHandlingMatrix, checkPosDefiniteMatrix_nan) {
-  using stan::agrad::var;
+  using stan::math::var;
   using Eigen::Dynamic;
   using Eigen::Matrix;
 

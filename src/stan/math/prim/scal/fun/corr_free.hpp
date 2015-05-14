@@ -6,7 +6,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the unconstrained scalar that when transformed to
@@ -28,7 +28,7 @@ namespace stan {
     inline
     T corr_free(const T y) {
       stan::math::check_bounded<T, double, double>
-        ("stan::prob::lub_free",
+        ("stan::math::lub_free",
          "Correlation variable", y, -1, 1);
       return atanh(y);
     }

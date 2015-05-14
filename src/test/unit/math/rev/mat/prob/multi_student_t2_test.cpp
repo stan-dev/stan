@@ -34,15 +34,15 @@ template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
 void expect_propto(T_y y1, T_dof nu1, T_loc mu1, T_scale sigma1,
                    T_y y2, T_dof nu2, T_loc mu2, T_scale sigma2,
                    std::string message = "") {
-  expect_eq_diffs(stan::prob::multi_student_t_log<false>(y1,nu1,mu1,sigma1),
-                  stan::prob::multi_student_t_log<false>(y2,nu2,mu2,sigma2),
-                  stan::prob::multi_student_t_log<true>(y1,nu1,mu1,sigma1),
-                  stan::prob::multi_student_t_log<true>(y2,nu2,mu2,sigma2),
+  expect_eq_diffs(stan::math::multi_student_t_log<false>(y1,nu1,mu1,sigma1),
+                  stan::math::multi_student_t_log<false>(y2,nu2,mu2,sigma2),
+                  stan::math::multi_student_t_log<true>(y1,nu1,mu1,sigma1),
+                  stan::math::multi_student_t_log<true>(y2,nu2,mu2,sigma2),
                   message);
 }
 
-using stan::agrad::var;
-using stan::agrad::to_var;
+using stan::math::var;
+using stan::math::to_var;
 
 
 TEST_F(agrad_distributions_multi_student_t,Propto) {
@@ -83,7 +83,7 @@ TEST_F(agrad_distributions_multi_student_t,ProptoSigma) {
 
 
 TEST(ProbDistributionsMultiStudentT,MultiStudentTVar) {
-  using stan::agrad::var;
+  using stan::math::var;
   var nu(5);
   Matrix<var,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
@@ -93,13 +93,13 @@ TEST(ProbDistributionsMultiStudentT,MultiStudentTVar) {
   Sigma << 9.0, -3.0, 0.0,
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
-  EXPECT_FLOAT_EQ(-10.213695, stan::prob::multi_student_t_log(y,nu,mu,Sigma).val());
+  EXPECT_FLOAT_EQ(-10.213695, stan::math::multi_student_t_log(y,nu,mu,Sigma).val());
 }
 TEST(ProbDistributionsMultiStudentT,MultiStudentTGradientUnivariate) {
-  using stan::agrad::var;
+  using stan::math::var;
   using std::vector;
   using Eigen::VectorXd;
-  using stan::prob::multi_student_t_log;
+  using stan::math::multi_student_t_log;
   
   var nu_var(5);
 
@@ -118,7 +118,7 @@ TEST(ProbDistributionsMultiStudentT,MultiStudentTGradientUnivariate) {
   x.push_back(Sigma_var(0,0));
   x.push_back(nu_var);
 
-  var lp = stan::prob::multi_student_t_log(y_var,nu_var,mu_var,Sigma_var);
+  var lp = stan::math::multi_student_t_log(y_var,nu_var,mu_var,Sigma_var);
   vector<double> grad;
   lp.grad(x,grad);
 
@@ -182,7 +182,7 @@ struct multi_student_t_fun {
   T operator()(const std::vector<T>& x) const {
     using Eigen::Matrix;
     using Eigen::Dynamic;
-    using stan::agrad::var;
+    using stan::math::var;
     T nu;
     Matrix<T,Dynamic,1> y(K_);
     Matrix<T,Dynamic,1> mu(K_);
@@ -199,7 +199,7 @@ struct multi_student_t_fun {
       }
     }
     nu = x[pos++];
-    return stan::prob::multi_student_t_log<false>(y,nu,mu,Sigma);
+    return stan::math::multi_student_t_log<false>(y,nu,mu,Sigma);
   }
 };
 
@@ -277,15 +277,15 @@ struct vectorized_multi_student_t_fun {
     
     if (dont_vectorize_y) {
       if (dont_vectorize_mu)
-        return stan::prob::multi_student_t_log<false>(y[0], nu, mu[0], Sigma);
+        return stan::math::multi_student_t_log<false>(y[0], nu, mu[0], Sigma);
       else
-        return stan::prob::multi_student_t_log<false>(y[0], nu, mu, Sigma);
+        return stan::math::multi_student_t_log<false>(y[0], nu, mu, Sigma);
     }
     else {
       if (dont_vectorize_mu)
-        return stan::prob::multi_student_t_log<false>(y, nu, mu[0], Sigma);
+        return stan::math::multi_student_t_log<false>(y, nu, mu[0], Sigma);
       else
-        return stan::prob::multi_student_t_log<false>(y, nu, mu, Sigma);
+        return stan::math::multi_student_t_log<false>(y, nu, mu, Sigma);
     }
   }
 };
