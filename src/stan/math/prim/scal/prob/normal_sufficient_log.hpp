@@ -8,14 +8,13 @@
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/max_size.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of the normal density for the specified scalar(s) given
@@ -42,7 +41,7 @@ namespace stan {
     normal_sufficient_log(const T_y& y_bar, const T_s& s_squared,
                           const T_n& n_obs, const T_loc& mu,
                           const T_scale& sigma) {
-      static const char* function = "stan::prob::normal_log(%1%)";
+      static const char* function = "stan::math::normal_log(%1%)";
       typedef typename
         stan::partials_return_type<T_y, T_s, T_n, T_loc, T_scale>::type
         T_partials_return;
@@ -54,7 +53,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // check if any vectors are zero length
       if (!(stan::length(y_bar)
@@ -94,7 +93,7 @@ namespace stan {
         return 0.0;
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_s, T_loc, T_scale>
+      OperandsAndPartials<T_y, T_s, T_loc, T_scale>
         operands_and_partials(y_bar, s_squared, mu, sigma);
 
       VectorView<const T_y> y_bar_vec(y_bar);
