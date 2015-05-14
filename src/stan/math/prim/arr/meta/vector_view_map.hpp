@@ -4,17 +4,23 @@
 #include <stan/math/prim/scal/meta/vector_view_map.hpp>
 #include <vector>
 
-template <typename T1, typename T2>
-class vector_view_map<std::vector<T1>, T2> {
-  public:
-    vector_view_map(const std::vector<T1>& x, T2* y) 
-     : y_(y) { }
+namespace stan {
 
-    T2& operator[](int i) {
-      return y_[i];
-    }
-  private:
-    T2* y_;
-};
+  namespace math {
+
+    template <typename T1, typename T2>
+    class vector_view_map<std::vector<T1>, T2> {
+      public:
+        vector_view_map(const std::vector<T1>& x, T2* y) 
+         : y_(y) { }
+
+        T2& operator[](int i) {
+          return y_[i];
+        }
+      private:
+        T2* y_;
+    };
+  }
+}
 
 #endif
