@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the unconstrained value that produces the specified
@@ -30,9 +30,10 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T, TL>::type
     lb_free(const T y, const TL lb) {
+      using std::log;
       if (lb == -std::numeric_limits<double>::infinity())
         return identity_free(y);
-      stan::math::check_greater_or_equal("stan::prob::lb_free",
+      stan::math::check_greater_or_equal("stan::math::lb_free",
                                          "Lower bounded variable", y, lb);
       return log(y - lb);
     }

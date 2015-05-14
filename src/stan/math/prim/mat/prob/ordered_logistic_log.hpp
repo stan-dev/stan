@@ -14,13 +14,13 @@
 #include <stan/math/prim/scal/err/check_less_or_equal.hpp>
 #include <stan/math/prim/scal/err/check_nonnegative.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/mat/prob/categorical_rng.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     template <typename T>
     inline T log_inv_logit_diff(const T& alpha, const T& beta) {
@@ -66,7 +66,7 @@ namespace stan {
       using stan::math::log1m;
       using stan::math::log1p_exp;
 
-      static const char* function("stan::prob::ordered_logistic");
+      static const char* function("stan::math::ordered_logistic");
 
       using stan::math::check_finite;
       using stan::math::check_positive;

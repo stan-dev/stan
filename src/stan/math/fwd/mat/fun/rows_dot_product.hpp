@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename T, int R1, int C1, int R2, int C2>
     inline

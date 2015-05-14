@@ -20,13 +20,12 @@
 #include <stan/math/prim/scal/fun/lbeta.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
 
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Binomial(n|N, theta)  [N >= 0;  0 <= n <= N;  0 <= theta <= 1]
     template <bool propto,
@@ -40,14 +39,14 @@ namespace stan {
       typedef typename stan::partials_return_type<T_n, T_N, T_prob>::type
         T_partials_return;
 
-      static const char* function("stan::prob::binomial_log");
+      static const char* function("stan::math::binomial_log");
 
       using stan::math::check_finite;
       using stan::math::check_bounded;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // check if any vectors are zero length
       if (!(stan::length(n)
@@ -76,7 +75,7 @@ namespace stan {
       VectorView<const T_prob> theta_vec(theta);
       size_t size = max_size(n, N, theta);
 
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      OperandsAndPartials<T_prob> operands_and_partials(theta);
 
       using stan::math::multiply_log;
       using stan::math::binomial_coefficient_log;

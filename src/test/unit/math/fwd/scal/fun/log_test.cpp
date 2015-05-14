@@ -3,7 +3,7 @@
 #include <stan/math/fwd/scal/fun/log.hpp>
 
 TEST(AgradFwdLog,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::log;
   using std::isnan;
 
@@ -38,7 +38,7 @@ TEST(AgradFwdLog,Fvar) {
 
 
 TEST(AgradFwdLog,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using std::log;
 
   fvar<fvar<double> > x;

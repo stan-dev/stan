@@ -12,7 +12,7 @@
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
-using stan::agrad::var;
+using stan::math::var;
 using stan::math::diag_pre_multiply;
 
 TEST(MathMatrix,diagPreMultiply2_vv) {

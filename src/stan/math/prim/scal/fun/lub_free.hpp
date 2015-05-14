@@ -9,7 +9,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * Return the unconstrained scalar that transforms to the
@@ -47,7 +47,7 @@ namespace stan {
     lub_free(const T y, TL lb, TU ub) {
       using stan::math::logit;
       stan::math::check_bounded<T, TL, TU>
-        ("stan::prob::lub_free",
+        ("stan::math::lub_free",
          "Bounded variable",
          y, lb, ub);
       if (lb == -std::numeric_limits<double>::infinity())

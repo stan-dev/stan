@@ -16,17 +16,16 @@
 #include <stan/math/prim/scal/fun/square.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/length.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-
 #include <stan/math/prim/scal/fun/grad_reg_inc_gamma.hpp>
 #include <limits>
+#include <cmath>
 
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The CDF of a scaled inverse chi-squared density for y with the
@@ -53,13 +52,14 @@ namespace stan {
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
         return 1.0;
 
-      static const char* function("stan::prob::scaled_inv_chi_square_cdf");
+      static const char* function("stan::math::scaled_inv_chi_square_cdf");
 
       using stan::math::check_positive_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
+      using std::exp;
 
       T_partials_return P(1.0);
 
@@ -78,7 +78,7 @@ namespace stan {
       VectorView<const T_scale> s_vec(s);
       size_t N = max_size(y, nu, s);
 
-      agrad::OperandsAndPartials<T_y, T_dof, T_scale>
+      OperandsAndPartials<T_y, T_dof, T_scale>
         operands_and_partials(y, nu, s);
 
       // Explicit return for extreme values

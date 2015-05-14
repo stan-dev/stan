@@ -6,7 +6,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::math::var;
 
 class AgradDistributionsPoisson : public AgradDistributionTest {
 public:
@@ -49,7 +49,7 @@ public:
   typename stan::return_type<T_n, T_rate>::type 
   log_prob(const T_n& n, const T_rate& lambda, const T2&,
            const T3&, const T4&, const T5&) {
-    return stan::prob::poisson_log(n, lambda);
+    return stan::math::poisson_log(n, lambda);
   }
 
   template <bool propto, 
@@ -58,7 +58,7 @@ public:
   typename stan::return_type<T_n, T_rate>::type 
   log_prob(const T_n& n, const T_rate& lambda, const T2&,
            const T3&, const T4&, const T5&) {
-    return stan::prob::poisson_log<propto>(n, lambda);
+    return stan::math::poisson_log<propto>(n, lambda);
   }
   
   
@@ -69,7 +69,7 @@ public:
                     const T3&, const T4&, const T5&) {
     using boost::math::lgamma;
     using stan::math::multiply_log;
-    using stan::prob::LOG_ZERO;
+    using stan::math::LOG_ZERO;
 
     if (lambda == 0)
       return n == 0 ? 0 : LOG_ZERO;

@@ -4,9 +4,9 @@
 #include <stan/math/prim/scal/fun/value_of.hpp>
 
 TEST(AgradRev,value_of) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::value_of;
-  using stan::agrad::value_of;
+  using stan::math::value_of;
 
   var a = 5.0;
   EXPECT_FLOAT_EQ(5.0, value_of(a));

@@ -15,12 +15,12 @@
 #include <stan/math/prim/mat/fun/mdivide_left_tri_low.hpp>
 #include <stan/math/prim/mat/fun/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/prim/mat/meta/index_type.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Wishart(Sigma|n, Omega)  [Sigma, Omega symmetric, non-neg, definite;
     //                          Sigma.dims() = Omega.dims();
@@ -59,7 +59,7 @@ namespace stan {
                 const T_dof& nu,
                 const Eigen::Matrix<T_scale, Eigen::Dynamic, Eigen::Dynamic>&
                 S) {
-      static const char* function("stan::prob::wishart_log");
+      static const char* function("stan::math::wishart_log");
 
       using boost::math::tools::promote_args;
       using Eigen::Dynamic;

@@ -4,11 +4,11 @@
 #include <stan/math/fwd/mat/fun/typedefs.hpp>
 #include <stan/math/fwd/core.hpp>
 
-using stan::agrad::fvar;
+using stan::math::fvar;
 TEST(AgradFwdMatrixMax, fd_vector) {
   using stan::math::max;
   using stan::math::vector_d;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_d d1(3);
   vector_fd v1(3);
@@ -30,7 +30,7 @@ TEST(AgradFwdMatrixMax, fd_vector) {
 }
 TEST(AgradFwdMatrixMax, fd_vector_exception) {
   using stan::math::max;
-  using stan::agrad::vector_fd;
+  using stan::math::vector_fd;
 
   vector_fd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
@@ -39,7 +39,7 @@ TEST(AgradFwdMatrixMax, fd_vector_exception) {
 TEST(AgradFwdMatrixMax, fd_rowvector) {
   using stan::math::max;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_d d1(3);
   row_vector_fd v1(3);
@@ -61,7 +61,7 @@ TEST(AgradFwdMatrixMax, fd_rowvector) {
 }
 TEST(AgradFwdMatrixMax, fd_rowvector_exception) {
   using stan::math::max;
-  using stan::agrad::row_vector_fd;
+  using stan::math::row_vector_fd;
 
   row_vector_fd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
@@ -70,7 +70,7 @@ TEST(AgradFwdMatrixMax, fd_rowvector_exception) {
 TEST(AgradFwdMatrixMax, fd_matrix) {
   using stan::math::max;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
 
   matrix_d d1(3,1);
   matrix_fd v1(1,3);
@@ -92,7 +92,7 @@ TEST(AgradFwdMatrixMax, fd_matrix) {
 }
 TEST(AgradFwdMatrixMax, fd_matrix_exception) {
   using stan::math::max;
-  using stan::agrad::matrix_fd;
+  using stan::math::matrix_fd;
   
   matrix_fd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
@@ -101,8 +101,8 @@ TEST(AgradFwdMatrixMax, fd_matrix_exception) {
 TEST(AgradFwdMatrixMax, ffd_vector) {
   using stan::math::max;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::vector_ffd;
+  using stan::math::fvar;
 
   vector_d d1(3);
   vector_ffd v1(3);
@@ -129,7 +129,7 @@ TEST(AgradFwdMatrixMax, ffd_vector) {
 }
 TEST(AgradFwdMatrixMax, ffd_vector_exception) {
   using stan::math::max;
-  using stan::agrad::vector_ffd;
+  using stan::math::vector_ffd;
 
   vector_ffd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
@@ -138,8 +138,8 @@ TEST(AgradFwdMatrixMax, ffd_vector_exception) {
 TEST(AgradFwdMatrixMax, ffd_rowvector) {
   using stan::math::max;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffd;
-  using stan::agrad::fvar;
+  using stan::math::row_vector_ffd;
+  using stan::math::fvar;
 
   row_vector_d d1(3);
   row_vector_ffd v1(3);
@@ -166,7 +166,7 @@ TEST(AgradFwdMatrixMax, ffd_rowvector) {
 }
 TEST(AgradFwdMatrixMax, ffd_rowvector_exception) {
   using stan::math::max;
-  using stan::agrad::row_vector_ffd;
+  using stan::math::row_vector_ffd;
 
   row_vector_ffd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
@@ -175,8 +175,8 @@ TEST(AgradFwdMatrixMax, ffd_rowvector_exception) {
 TEST(AgradFwdMatrixMax, ffd_matrix) {
   using stan::math::max;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffd;
-  using stan::agrad::fvar;
+  using stan::math::matrix_ffd;
+  using stan::math::fvar;
 
   matrix_d d1(3,1);
   matrix_ffd v1(1,3);
@@ -203,7 +203,7 @@ TEST(AgradFwdMatrixMax, ffd_matrix) {
 }
 TEST(AgradFwdMatrixMax, ffd_matrix_exception) {
   using stan::math::max;
-  using stan::agrad::matrix_ffd;
+  using stan::math::matrix_ffd;
   
   matrix_ffd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());

@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     template<typename ChainableT,
              typename ChainableAllocT>

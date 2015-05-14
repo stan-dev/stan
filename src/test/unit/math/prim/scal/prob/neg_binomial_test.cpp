@@ -6,19 +6,19 @@
 
 TEST(ProbDistributionsNegBinomial, error_check) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::neg_binomial_rng(6, 2, rng));
-  EXPECT_NO_THROW(stan::prob::neg_binomial_rng(0.5,1,rng));
-  EXPECT_NO_THROW(stan::prob::neg_binomial_rng(1e9,1,rng));
+  EXPECT_NO_THROW(stan::math::neg_binomial_rng(6, 2, rng));
+  EXPECT_NO_THROW(stan::math::neg_binomial_rng(0.5,1,rng));
+  EXPECT_NO_THROW(stan::math::neg_binomial_rng(1e9,1,rng));
 
-  EXPECT_THROW(stan::prob::neg_binomial_rng(0, 2, rng),std::domain_error);
-  EXPECT_THROW(stan::prob::neg_binomial_rng(-6, 2, rng),std::domain_error);
-  EXPECT_THROW(stan::prob::neg_binomial_rng(6, -2, rng),std::domain_error);
-  EXPECT_THROW(stan::prob::neg_binomial_rng(stan::math::positive_infinity(), 2, 
+  EXPECT_THROW(stan::math::neg_binomial_rng(0, 2, rng),std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_rng(-6, 2, rng),std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_rng(6, -2, rng),std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_rng(stan::math::positive_infinity(), 2, 
                                             rng),
                std::domain_error);
-  EXPECT_THROW(stan::prob::neg_binomial_rng(1e10,1,rng),std::domain_error);
+  EXPECT_THROW(stan::math::neg_binomial_rng(1e10,1,rng),std::domain_error);
 
-  EXPECT_THROW(stan::prob::neg_binomial_rng(6,stan::math::positive_infinity(), 
+  EXPECT_THROW(stan::math::neg_binomial_rng(6,stan::math::positive_infinity(), 
                                             rng),
                std::domain_error);
 }
@@ -28,8 +28,8 @@ void expected_bin_sizes(double *expect, const int K,
                         const double alpha, const double beta) {
   double p = 0;
   for(int i = 0 ; i < K; i++)  {
-    expect[i] = N * std::exp(stan::prob::neg_binomial_log(i, alpha, beta));
-    p += std::exp(stan::prob::neg_binomial_log(i, alpha, beta));
+    expect[i] = N * std::exp(stan::math::neg_binomial_log(i, alpha, beta));
+    p += std::exp(stan::math::neg_binomial_log(i, alpha, beta));
   }
   expect[K-1] = N * (1.0 - p);
 }
@@ -56,7 +56,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest) {
   expected_bin_sizes(expect, K, N, alpha, beta);
 
   while (count < N) {
-    int a = stan::prob::neg_binomial_rng(alpha, beta, rng);
+    int a = stan::math::neg_binomial_rng(alpha, beta, rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;
@@ -94,7 +94,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest2) {
   expected_bin_sizes(expect, K, N, alpha, beta);
 
   while (count < N) {
-    int a = stan::prob::neg_binomial_rng(alpha, beta, rng);
+    int a = stan::math::neg_binomial_rng(alpha, beta, rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;
@@ -132,7 +132,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest3) {
   expected_bin_sizes(expect, K, N, alpha, beta);
 
   while (count < N) {
-    int a = stan::prob::neg_binomial_rng(alpha, beta, rng);
+    int a = stan::math::neg_binomial_rng(alpha, beta, rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

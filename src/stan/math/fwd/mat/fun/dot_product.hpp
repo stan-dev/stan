@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     // dot_product for vec (in matrix) * vec (in matrix);
     // does all combos of row row, col col, row col, col row

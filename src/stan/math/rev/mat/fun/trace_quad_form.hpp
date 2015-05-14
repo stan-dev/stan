@@ -14,7 +14,7 @@
 #include <stan/math/prim/mat/err/check_square.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
     namespace {
       template <typename TA, int RA, int CA, typename TB, int RB, int CB>
       class trace_quad_form_vari_alloc : public chainable_alloc {

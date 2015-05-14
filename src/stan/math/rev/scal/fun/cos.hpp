@@ -5,7 +5,7 @@
 #include <stan/math/rev/core.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class cos_vari : public op_v_vari {

@@ -8,12 +8,12 @@
 #include <stan/math/prim/scal/err/check_consistent_sizes.hpp>
 #include <stan/math/prim/scal/err/check_positive.hpp>
 #include <stan/math/prim/scal/fun/multiply_log.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
+#include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     /**
      * The log of the Dirichlet density for the given theta and
@@ -46,7 +46,7 @@ namespace stan {
     dirichlet_log(const Eigen::Matrix<T_prob, Eigen::Dynamic, 1>& theta,
                   const Eigen::Matrix
                   <T_prior_sample_size, Eigen::Dynamic, 1>& alpha) {
-      static const char* function("stan::prob::dirichlet_log");
+      static const char* function("stan::math::dirichlet_log");
       using boost::math::lgamma;
       using boost::math::tools::promote_args;
       using stan::math::check_consistent_sizes;

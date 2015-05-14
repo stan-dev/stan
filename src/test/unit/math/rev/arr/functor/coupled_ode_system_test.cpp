@@ -8,7 +8,7 @@
 
 struct StanAgradRevOde : public ::testing::Test {
   void SetUp() {
-    stan::agrad::recover_memory();
+    stan::math::recover_memory();
   }
   std::stringstream msgs;
   std::vector<double> x;
@@ -22,7 +22,7 @@ TEST_F(StanAgradRevOde, coupled_ode_system_dv) {
 
   harm_osc_ode_fun harm_osc;
 
-  std::vector<stan::agrad::var> theta;
+  std::vector<stan::math::var> theta;
   std::vector<double> coupled_y0;
   std::vector<double> y0;
   double t0;
@@ -40,7 +40,7 @@ TEST_F(StanAgradRevOde, coupled_ode_system_dv) {
   coupled_y0.push_back(1.0);
   coupled_y0.push_back(2.0);
 
-  coupled_ode_system<harm_osc_ode_fun, double, stan::agrad::var> 
+  coupled_ode_system<harm_osc_ode_fun, double, stan::math::var> 
     system(harm_osc, y0, theta, x, x_int, &msgs);
 
   system(coupled_y0, dy_dt, t0);
@@ -52,7 +52,7 @@ TEST_F(StanAgradRevOde, coupled_ode_system_dv) {
 }
 TEST_F(StanAgradRevOde, decouple_states_dv) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
 
   mock_ode_functor mock_ode;
   
@@ -91,7 +91,7 @@ TEST_F(StanAgradRevOde, decouple_states_dv) {
 }
 TEST_F(StanAgradRevOde, initial_state_dv) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   mock_ode_functor base_ode;
 
   const size_t N = 3;
@@ -117,7 +117,7 @@ TEST_F(StanAgradRevOde, initial_state_dv) {
 }
 TEST_F(StanAgradRevOde, size_dv) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   mock_ode_functor base_ode;
 
   const size_t N = 3;
@@ -134,7 +134,7 @@ TEST_F(StanAgradRevOde, size_dv) {
 
 TEST_F(StanAgradRevOde, memory_recovery_dv) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   mock_ode_functor base_ode;
 
   const size_t N = 3;
@@ -150,14 +150,14 @@ TEST_F(StanAgradRevOde, memory_recovery_dv) {
   std::vector<double> dy_dt(3,0);
   double t = 10;
   
-  EXPECT_TRUE(stan::agrad::empty_nested());
+  EXPECT_TRUE(stan::math::empty_nested());
   EXPECT_NO_THROW(coupled_system_dv(y, dy_dt, t));
-  EXPECT_TRUE(stan::agrad::empty_nested());
+  EXPECT_TRUE(stan::math::empty_nested());
 }
 
 TEST_F(StanAgradRevOde, memory_recovery_exception_dv) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   std::string message = "ode throws";
 
   const size_t N = 3;
@@ -178,11 +178,11 @@ TEST_F(StanAgradRevOde, memory_recovery_exception_dv) {
     std::vector<double> dy_dt(3,0);
     double t = 10;
     
-    EXPECT_TRUE(stan::agrad::empty_nested());
+    EXPECT_TRUE(stan::math::empty_nested());
     EXPECT_THROW_MSG(coupled_system_dv(y, dy_dt, t),
                      std::logic_error,
                      message);
-    EXPECT_TRUE(stan::agrad::empty_nested());
+    EXPECT_TRUE(stan::math::empty_nested());
   }
 }
 
@@ -195,7 +195,7 @@ TEST_F(StanAgradRevOde, coupled_ode_system_vd) {
 
   std::vector<double> theta;
   std::vector<double> coupled_y0;
-  std::vector<stan::agrad::var> y0_var;
+  std::vector<stan::math::var> y0_var;
   std::vector<double> y0_adj;
   double t0;
   std::vector<double> dy_dt;
@@ -215,7 +215,7 @@ TEST_F(StanAgradRevOde, coupled_ode_system_vd) {
   y0_var.push_back(1.0);
   y0_var.push_back(0.5);
   
-  coupled_ode_system<harm_osc_ode_fun, stan::agrad::var, double> 
+  coupled_ode_system<harm_osc_ode_fun, stan::math::var, double> 
     system(harm_osc, y0_var, theta, x, x_int, &msgs);
 
   system(coupled_y0, dy_dt, t0);
@@ -229,7 +229,7 @@ TEST_F(StanAgradRevOde, coupled_ode_system_vd) {
 }
 TEST_F(StanAgradRevOde, decouple_states_vd) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
 
   mock_ode_functor mock_ode;
   size_t T = 10;
@@ -267,7 +267,7 @@ TEST_F(StanAgradRevOde, decouple_states_vd) {
 }
 TEST_F(StanAgradRevOde, initial_state_vd) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   mock_ode_functor base_ode;
 
   const size_t N = 3;
@@ -295,7 +295,7 @@ TEST_F(StanAgradRevOde, initial_state_vd) {
 }
 TEST_F(StanAgradRevOde, size_vd) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   mock_ode_functor base_ode;
 
   const size_t N = 3;
@@ -312,7 +312,7 @@ TEST_F(StanAgradRevOde, size_vd) {
 
 TEST_F(StanAgradRevOde, memory_recovery_vd) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   mock_ode_functor base_ode;
 
   const size_t N = 3;
@@ -328,14 +328,14 @@ TEST_F(StanAgradRevOde, memory_recovery_vd) {
   std::vector<double> dy_dt(3,0);
   double t = 10;
   
-  EXPECT_TRUE(stan::agrad::empty_nested());
+  EXPECT_TRUE(stan::math::empty_nested());
   EXPECT_NO_THROW(coupled_system_vd(y, dy_dt, t));
-  EXPECT_TRUE(stan::agrad::empty_nested());
+  EXPECT_TRUE(stan::math::empty_nested());
 }
 
 TEST_F(StanAgradRevOde, memory_recovery_exception_vd) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   std::string message = "ode throws";
 
   const size_t N = 3;
@@ -356,11 +356,11 @@ TEST_F(StanAgradRevOde, memory_recovery_exception_vd) {
     std::vector<double> dy_dt(3,0);
     double t = 10;
     
-    EXPECT_TRUE(stan::agrad::empty_nested());
+    EXPECT_TRUE(stan::math::empty_nested());
     EXPECT_THROW_MSG(coupled_system_vd(y, dy_dt, t),
                      std::logic_error,
                      message);
-    EXPECT_TRUE(stan::agrad::empty_nested());
+    EXPECT_TRUE(stan::math::empty_nested());
   }
 }
 
@@ -370,15 +370,15 @@ TEST_F(StanAgradRevOde, memory_recovery_exception_vd) {
 TEST_F(StanAgradRevOde, coupled_ode_system_vv) {
   using stan::math::coupled_ode_system;
 
-  std::vector<stan::agrad::var> y0_var;
+  std::vector<stan::math::var> y0_var;
   y0_var.push_back(1.0);
   y0_var.push_back(0.5);
 
-  std::vector<stan::agrad::var> theta_var;
+  std::vector<stan::math::var> theta_var;
   theta_var.push_back(0.15);
 
   harm_osc_ode_fun harm_osc;
-  coupled_ode_system<harm_osc_ode_fun, stan::agrad::var, stan::agrad::var> 
+  coupled_ode_system<harm_osc_ode_fun, stan::math::var, stan::math::var> 
     system(harm_osc, y0_var, theta_var, x, x_int, &msgs);
   
   std::vector<double> coupled_y0(8, 0);
@@ -410,7 +410,7 @@ TEST_F(StanAgradRevOde, coupled_ode_system_vv) {
 }
 TEST_F(StanAgradRevOde, decouple_states_vv) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
 
   harm_osc_ode_fun harm_osc;
 
@@ -448,7 +448,7 @@ TEST_F(StanAgradRevOde, decouple_states_vv) {
 }
 TEST_F(StanAgradRevOde, initial_state_vv) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   mock_ode_functor base_ode;
 
   const size_t N = 3;
@@ -474,7 +474,7 @@ TEST_F(StanAgradRevOde, initial_state_vv) {
 }
 TEST_F(StanAgradRevOde, size_vv) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   mock_ode_functor base_ode;
 
   const size_t N = 3;
@@ -491,7 +491,7 @@ TEST_F(StanAgradRevOde, size_vv) {
 
 TEST_F(StanAgradRevOde, memory_recovery_vv) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   mock_ode_functor base_ode;
 
   const size_t N = 3;
@@ -507,14 +507,14 @@ TEST_F(StanAgradRevOde, memory_recovery_vv) {
   std::vector<double> dy_dt(3,0);
   double t = 10;
   
-  EXPECT_TRUE(stan::agrad::empty_nested());
+  EXPECT_TRUE(stan::math::empty_nested());
   EXPECT_NO_THROW(coupled_system_vv(y, dy_dt, t));
-  EXPECT_TRUE(stan::agrad::empty_nested());
+  EXPECT_TRUE(stan::math::empty_nested());
 }
 
 TEST_F(StanAgradRevOde, memory_recovery_exception_vv) {
   using stan::math::coupled_ode_system;
-  using stan::agrad::var;
+  using stan::math::var;
   std::string message = "ode throws";
 
   const size_t N = 3;
@@ -535,11 +535,11 @@ TEST_F(StanAgradRevOde, memory_recovery_exception_vv) {
     std::vector<double> dy_dt(3,0);
     double t = 10;
     
-    EXPECT_TRUE(stan::agrad::empty_nested());
+    EXPECT_TRUE(stan::math::empty_nested());
     EXPECT_THROW_MSG(coupled_system_vv(y, dy_dt, t),
                      std::logic_error,
                      message);
-    EXPECT_TRUE(stan::agrad::empty_nested());
+    EXPECT_TRUE(stan::math::empty_nested());
   }
 }
 

@@ -9,7 +9,7 @@
 #include <stan/math/rev/scal/fun/log1p.hpp>
 
 void test_log_inv_logit(const double x) {
-  using stan::agrad::var;
+  using stan::math::var;
   using stan::math::log_inv_logit;
   using std::log;
   using stan::math::inv_logit;

@@ -12,13 +12,13 @@
 #include <stan/math/prim/scal/fun/constants.hpp>
 #include <stan/math/prim/scal/fun/value_of.hpp>
 #include <stan/math/prim/scal/fun/log1m.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/meta/contains_nonconstant_struct.hpp>
 #include <stan/math/prim/scal/meta/VectorView.hpp>
 #include <stan/math/prim/scal/meta/VectorBuilder.hpp>
+#include <cmath>
 
 namespace stan {
-  namespace prob {
+  namespace math {
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y, T_loc, T_scale, T_shape>::type
@@ -37,7 +37,7 @@ namespace stan {
         return 1.0;
 
       // Check errors
-      static const char* function("stan::prob::pareto_type_2_cdf");
+      static const char* function("stan::math::pareto_type_2_cdf");
 
       using stan::math::check_greater_or_equal;
       using stan::math::check_finite;
@@ -47,6 +47,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
+      using std::log;
 
       T_partials_return P(1.0);
 
@@ -67,7 +68,7 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, mu, lambda, alpha);
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
+      OperandsAndPartials<T_y, T_loc, T_scale, T_shape>
         operands_and_partials(y, mu, lambda, alpha);
 
       VectorBuilder<true, T_partials_return,

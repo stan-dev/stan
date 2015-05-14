@@ -10,7 +10,7 @@
 #include <test/unit/util.hpp>
 
 TEST(AgradRevErrorHandlingMatrix, checkNonzeroSizeMatrix) {
-  using stan::agrad::var;
+  using stan::math::var;
   Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> y;
   using stan::math::check_nonzero_size;
   var result;
@@ -45,7 +45,7 @@ TEST(AgradRevErrorHandlingMatrix, checkNonzeroSizeMatrix) {
 }
 
 TEST(AgradRevErrorHandlingMatrix, checkNonzeroSizeMatrix_nan) {
-  using stan::agrad::var;
+  using stan::math::var;
   Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> y;
   var result;
   var nan = std::numeric_limits<var>::quiet_NaN();

@@ -5,8 +5,8 @@
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixResize, fvar_var) {
   fvar<var> x = 5;

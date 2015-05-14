@@ -8,7 +8,7 @@
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
     // LOWER BOUND
 
     /**
@@ -33,6 +33,7 @@ namespace stan {
     template <typename T, typename TL>
     inline
     T lb_constrain(const T x, const TL lb) {
+      using std::exp;
       if (lb == -std::numeric_limits<double>::infinity())
         return identity_constrain(x);
       return exp(x) + lb;
@@ -58,6 +59,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T, TL>::type
     lb_constrain(const T x, const TL lb, T& lp) {
+      using std::exp;
       if (lb == -std::numeric_limits<double>::infinity())
         return identity_constrain(x, lp);
       lp += x;

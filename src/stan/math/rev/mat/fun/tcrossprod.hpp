@@ -13,7 +13,7 @@
 #include <vector>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Returns the result of post-multiplying a matrix by its

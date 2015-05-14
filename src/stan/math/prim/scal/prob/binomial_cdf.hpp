@@ -19,18 +19,18 @@
 #include <stan/math/prim/scal/fun/binomial_coefficient_log.hpp>
 #include <stan/math/prim/scal/fun/lbeta.hpp>
 #include <stan/math/prim/scal/meta/include_summand.hpp>
-#include <stan/math/prim/scal/meta/constants.hpp>
 #include <stan/math/prim/scal/fun/inc_beta.hpp>
+#include <cmath>
 
 namespace stan {
 
-  namespace prob {
+  namespace math {
 
     // Binomial CDF
     template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
     binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta) {
-      static const char* function("stan::prob::binomial_cdf");
+      static const char* function("stan::math::binomial_cdf");
       typedef typename stan::partials_return_type<T_n, T_N, T_prob>::type
         T_partials_return;
 
@@ -39,7 +39,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::prob::include_summand;
+      using stan::math::include_summand;
 
       // Ensure non-zero arguments lenghts
       if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
@@ -69,8 +69,9 @@ namespace stan {
       using stan::math::lbeta;
       using std::exp;
       using std::pow;
+      using std::exp;
 
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      OperandsAndPartials<T_prob> operands_and_partials(theta);
 
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero

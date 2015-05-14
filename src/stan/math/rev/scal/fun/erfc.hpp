@@ -8,7 +8,7 @@
 #include <valarray>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class erfc_vari : public op_v_vari {
@@ -60,7 +60,7 @@ namespace stan {
      * @param a The variable.
      * @return Complementary error function applied to the variable.
      */
-    inline var erfc(const stan::agrad::var& a) {
+    inline var erfc(const stan::math::var& a) {
       return var(new erfc_vari(a.vi_));
     }
 

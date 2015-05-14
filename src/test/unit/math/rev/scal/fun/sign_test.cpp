@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 TEST(MathFunctions, sign) {
-  using stan::agrad::var;
+  using stan::math::var;
   var x;
   x = 0;
   EXPECT_EQ(0, stan::math::sign(x));

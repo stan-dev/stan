@@ -11,8 +11,8 @@
 
 
 TEST(AgradFwdAsin,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::asin;
 
   fvar<var> x(0.5,0.3);
@@ -28,8 +28,8 @@ TEST(AgradFwdAsin,FvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdAsin,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::asin;
 
   fvar<var> x(0.5,0.3);
@@ -47,8 +47,8 @@ TEST(AgradFwdAsin,FvarVar_2ndDeriv) {
 
 
 TEST(AgradFwdAsin,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::asin;
 
   fvar<fvar<var> > x;
@@ -84,8 +84,8 @@ TEST(AgradFwdAsin,FvarFvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdAsin,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::asin;
 
   fvar<fvar<var> > x;
@@ -111,8 +111,8 @@ TEST(AgradFwdAsin,FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(2.0 * 0.76980033, r[0]);
 }
 TEST(AgradFwdAsin,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::asin;
 
   fvar<fvar<var> > x;

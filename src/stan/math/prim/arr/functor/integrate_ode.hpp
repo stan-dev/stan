@@ -31,7 +31,7 @@ namespace stan {
      * This function is templated to allow the initial times to be
      * either data or autodiff variables and the parameters to be data
      * or autodiff variables.  The autodiff-based implementation for
-     * reverse-mode are defined in namespace <code>stan::agrad</code>
+     * reverse-mode are defined in namespace <code>stan::math</code>
      * and may be invoked via argument-dependent lookup by including
      * their headers.
      *

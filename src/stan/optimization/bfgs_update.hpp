@@ -17,7 +17,7 @@ namespace stan {
        *
        * @param yk Difference between the current and previous gradient vector.
        * @param sk Difference between the current and previous state vector.
-       * @param reset Whether to reset the approximation, forgetting about 
+       * @param reset Whether to reset the approximation, forgetting about
        * previous values.
        * @return In the case of a reset, returns the optimal scaling of the
        * initial Hessian approximation which is useful for predicting
@@ -31,7 +31,7 @@ namespace stan {
         skyk = yk.dot(sk);
         rhok = 1.0/skyk;
 
-        Hupd.noalias() = HessianT::Identity(yk.size(),yk.size()) 
+        Hupd.noalias() = HessianT::Identity(yk.size(),yk.size())
                                         - rhok*sk*yk.transpose();
         if (reset) {
           B0fact = yk.squaredNorm()/skyk;

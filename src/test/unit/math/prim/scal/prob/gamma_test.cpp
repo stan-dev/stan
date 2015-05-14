@@ -5,13 +5,13 @@
 
 TEST(ProbDistributionGamma, error_check) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::gamma_rng(2.0,3.0,rng));
+  EXPECT_NO_THROW(stan::math::gamma_rng(2.0,3.0,rng));
 
-  EXPECT_THROW(stan::prob::gamma_rng(-2.0,3.0,rng),std::domain_error);
-  EXPECT_THROW(stan::prob::gamma_rng(2.0,-3.0,rng),std::domain_error);
-  EXPECT_THROW(stan::prob::gamma_rng(stan::math::positive_infinity(),3.0,rng),
+  EXPECT_THROW(stan::math::gamma_rng(-2.0,3.0,rng),std::domain_error);
+  EXPECT_THROW(stan::math::gamma_rng(2.0,-3.0,rng),std::domain_error);
+  EXPECT_THROW(stan::math::gamma_rng(stan::math::positive_infinity(),3.0,rng),
                std::domain_error);
-  EXPECT_THROW(stan::prob::gamma_rng(2,stan::math::positive_infinity(),rng),
+  EXPECT_THROW(stan::math::gamma_rng(2,stan::math::positive_infinity(),rng),
                std::domain_error);
 }
 
@@ -39,7 +39,7 @@ TEST(ProbDistributionGamma, chiSquareGoodnessFitTest) {
       the stan gamma distribution is defined by
       shape and rate (hence 0.5 here and 2 above).
     */
-    double a = stan::prob::gamma_rng(2.0,0.5,rng);
+    double a = stan::math::gamma_rng(2.0,0.5,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

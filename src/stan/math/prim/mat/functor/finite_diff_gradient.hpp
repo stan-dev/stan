@@ -9,24 +9,24 @@ namespace stan {
 
     /**
      * Calculate the value and the gradient of the specified function
-     * at the specified argument using finite difference.  
+     * at the specified argument using finite difference.
      *
-     * <p>The functor must implement 
-     * 
+     * <p>The functor must implement
+     *
      * <code>
      * double
      * operator()(const
      * Eigen::Matrix<double, Eigen::Dynamic, 1>&)
      * </code>
      *
-     * Error should be on order of epsilon ^ 6. 
+     * Error should be on order of epsilon ^ 6.
      * The reference for this algorithm is:
      *
      * De Levie: An improved numerical approximation
-     * for the first derivative, page 3 
+     * for the first derivative, page 3
      *
      * This function involves 6 calls to f.
-     * 
+     *
      * @tparam F Type of function
      * @param[in] f Function
      * @param[in] x Argument to function

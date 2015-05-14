@@ -3,7 +3,7 @@
 #include <stan/math/prim/scal/meta/return_type.hpp>
 
 TEST(AgradFwdOperatorMultiplication, Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<double> x1(0.5,1.0);
   fvar<double> x2(0.4,2.0);
@@ -32,7 +32,7 @@ TEST(AgradFwdOperatorMultiplication, Fvar) {
 }
 
 TEST(AgradFwdOperatorMultiplication, FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
 
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;

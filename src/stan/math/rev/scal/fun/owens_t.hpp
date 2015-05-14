@@ -8,7 +8,7 @@
 #include <boost/math/special_functions/owens_t.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
 

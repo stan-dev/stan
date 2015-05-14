@@ -4,8 +4,8 @@
 #include <stan/math/rev/core.hpp>
 #include <gtest/gtest.h>
 
-using stan::agrad::fvar;
-using stan::agrad::var;
+using stan::math::fvar;
+using stan::math::var;
 
 TEST(AgradMixMatrixGetBase1,failing_pre_20_fv) {
   using Eigen::Matrix;

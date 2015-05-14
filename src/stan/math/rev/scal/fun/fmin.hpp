@@ -10,7 +10,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace math {
 
     /**
      * Returns the minimum of the two variable arguments (C99).
@@ -56,8 +56,8 @@ namespace stan {
      * @return If the first variable's value is smaller than the
      * second's, the first variable, otherwise the second variable.
      */
-    inline var fmin(const stan::agrad::var& a,
-                    const stan::agrad::var& b) {
+    inline var fmin(const stan::math::var& a,
+                    const stan::math::var& b) {
       using stan::math::NOT_A_NUMBER;
       if (unlikely(is_nan(a))) {
         if (unlikely(is_nan(b)))
@@ -86,7 +86,7 @@ namespace stan {
      * @return If the first variable's value is less than or equal to the second value,
      * the first variable, otherwise the second value promoted to a fresh variable.
      */
-    inline var fmin(const stan::agrad::var& a,
+    inline var fmin(const stan::math::var& a,
                     double b) {
       using stan::math::NOT_A_NUMBER;
       if (unlikely(is_nan(a))) {
@@ -118,7 +118,7 @@ namespace stan {
      * second variable.
      */
     inline var fmin(double a,
-                    const stan::agrad::var& b) {
+                    const stan::math::var& b) {
       using stan::math::NOT_A_NUMBER;
       if (unlikely(is_nan(b))) {
         if (unlikely(is_nan(a)))

@@ -9,7 +9,7 @@
 #include <limits>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     namespace {
       class subtract_vv_vari : public op_vv_vari {

@@ -4,7 +4,7 @@
 #include <stan/math/rev/core/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace math {
 
     /**
      * Less than or equal operator comparing two variables' values

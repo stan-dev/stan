@@ -8,7 +8,7 @@ TEST(ProbWelfordVarEstimator, restart) {
   
   const int n_learn = 10;
   
-  stan::prob::welford_var_estimator estimator(n);
+  stan::math::welford_var_estimator estimator(n);
   
   for (int i = 0; i < n_learn; ++i)
     estimator.add_sample(q);
@@ -32,7 +32,7 @@ TEST(ProbWelfordVarEstimator, num_samples) {
   
   const int n_learn = 10;
   
-  stan::prob::welford_var_estimator estimator(n);
+  stan::math::welford_var_estimator estimator(n);
   
   for (int i = 0; i < n_learn; ++i)
     estimator.add_sample(q);
@@ -46,7 +46,7 @@ TEST(ProbWelfordVarEstimator, sample_mean) {
   const int n = 10;
   const int n_learn = 10;
   
-  stan::prob::welford_var_estimator estimator(n);
+  stan::math::welford_var_estimator estimator(n);
   
   for (int i = 0; i < n_learn; ++i) {
     Eigen::VectorXd q = Eigen::VectorXd::Constant(n, i);
@@ -66,7 +66,7 @@ TEST(ProbWelfordVarEstimator, sample_variance) {
   const int n = 10;
   const int n_learn = 10;
   
-  stan::prob::welford_var_estimator estimator(n);
+  stan::math::welford_var_estimator estimator(n);
   
   for (int i = 0; i < n_learn; ++i) {
     Eigen::VectorXd q = Eigen::VectorXd::Constant(n, i);

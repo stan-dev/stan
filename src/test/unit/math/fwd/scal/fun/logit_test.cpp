@@ -12,7 +12,7 @@ class AgradFwdLogit : public testing::Test {
 
 
 TEST_F(AgradFwdLogit,Fvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::logit;
   using std::isnan;
 
@@ -36,7 +36,7 @@ TEST_F(AgradFwdLogit,Fvar) {
 }
 
 TEST_F(AgradFwdLogit,FvarFvarDouble) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::logit;
 
   fvar<fvar<double> > x;

@@ -10,8 +10,8 @@
 
 
 TEST(AgradFwdErf,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::exp;
   using std::sqrt;
   using boost::math::erf;
@@ -30,8 +30,8 @@ TEST(AgradFwdErf,FvarVar_1stDeriv) {
                   sqrt(boost::math::constants::pi<double>()), g[0]);
 }
 TEST(AgradFwdErf,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::exp;
   using std::sqrt;
   using boost::math::erf;
@@ -49,8 +49,8 @@ TEST(AgradFwdErf,FvarVar_2ndDeriv) {
 
 
 TEST(AgradFwdErf,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::exp;
   using std::sqrt;
   using boost::math::erf;
@@ -92,8 +92,8 @@ TEST(AgradFwdErf,FvarFvarVar_1stDeriv) {
 }
 
 TEST(AgradFwdErf,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::exp;
   using std::sqrt;
   using boost::math::erf;
@@ -134,8 +134,8 @@ TEST(AgradFwdErf,FvarFvarVar_2ndDeriv) {
                   sqrt(boost::math::constants::pi<double>()), r[0]);
 }
 TEST(AgradFwdErf,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using std::exp;
   using std::sqrt;
   using boost::math::erf;

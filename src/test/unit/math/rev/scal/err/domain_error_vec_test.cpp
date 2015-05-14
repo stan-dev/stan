@@ -78,8 +78,8 @@ public:
 };
 
 TEST_F(ErrorHandlingScalar_domain_error_vec, vvar) {
-  std::vector<stan::agrad::var> y;
+  std::vector<stan::math::var> y;
   y.push_back(10);
   
-  test_throw<std::vector<stan::agrad::var> >(y);
+  test_throw<std::vector<stan::math::var> >(y);
 }

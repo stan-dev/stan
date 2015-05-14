@@ -4,7 +4,7 @@
 #include <stan/math/prim/mat/fun/sum.hpp>
 
 TEST(AgradFwdMatrixSum, vectorFvar) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::sum;
   using std::vector;
 
@@ -26,7 +26,7 @@ TEST(AgradFwdMatrixSum, vectorFvar) {
 }
 
 TEST(AgradFwdMatrixSum, ffd_vector) {
-  using stan::agrad::fvar;
+  using stan::math::fvar;
   using stan::math::sum;
   using std::vector;
 

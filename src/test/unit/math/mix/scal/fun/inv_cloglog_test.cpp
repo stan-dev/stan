@@ -10,8 +10,8 @@
 
 
 TEST(AgradFwdInvCLogLog,FvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::inv_cloglog;
   using std::exp;
 
@@ -27,8 +27,8 @@ TEST(AgradFwdInvCLogLog,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(exp(0.5 - exp(0.5)), g[0]);
 }
 TEST(AgradFwdInvCLogLog,FvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::inv_cloglog;
   using std::exp;
 
@@ -42,8 +42,8 @@ TEST(AgradFwdInvCLogLog,FvarVar_2ndDeriv) {
 }
 
 TEST(AgradFwdInvCLogLog,FvarFvarVar_1stDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::inv_cloglog;
   using std::exp;
 
@@ -79,8 +79,8 @@ TEST(AgradFwdInvCLogLog,FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(exp(0.5 - exp(0.5)), r[0]);
 }
 TEST(AgradFwdInvCLogLog,FvarFvarVar_2ndDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::inv_cloglog;
   using std::exp;
 
@@ -116,8 +116,8 @@ TEST(AgradFwdInvCLogLog,FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(exp(0.5 - exp(0.5)) * (1.0 - exp(0.5)), r[0]);
 }
 TEST(AgradFwdInvCLogLog,FvarFvarVar_3rdDeriv) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::math::fvar;
+  using stan::math::var;
   using stan::math::inv_cloglog;
   using std::exp;
 
