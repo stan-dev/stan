@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include <stan/model/indexing/rvalue.hpp>
 #include <gtest/gtest.h>
@@ -102,4 +103,173 @@ TEST(ModelIndexing, rvalue_vector_min_max_nil) {
         EXPECT_FLOAT_EQ(x[n], rx[n - mn]);
     }
   }
+}
+
+TEST(ModelIndexing, rvalue_doubless_uni_uni) {
+  using std::vector;
+  
+  vector<double> x0;
+  x0.push_back(0.0);
+  x0.push_back(0.1);
+
+  vector<double> x1;
+  x1.push_back(1.0);
+  x1.push_back(1.1);
+
+  vector<vector<double> > x;
+  x.push_back(x0);
+  x.push_back(x1);
+  
+  for (int m = 0; m < 2; ++m)
+    for (int n = 0; n < 2; ++n)
+      EXPECT_FLOAT_EQ(m + n / 10.0, 
+                      rvalue(x, index_list(index_uni(m), index_uni(n))));
+}
+
+TEST(ModelIndexing, rvalue_doubless_uni_multi) {
+  using std::vector;
+  
+  vector<double> x0;
+  x0.push_back(0.0);
+  x0.push_back(0.1);
+  x0.push_back(0.2);
+
+  vector<double> x1;
+  x1.push_back(1.0);
+  x1.push_back(1.1);
+  x1.push_back(1.2);
+
+  vector<double> x2;
+  x2.push_back(2.0);
+  x2.push_back(2.1);
+  x2.push_back(2.2);
+
+  vector<vector<double> > x;
+  x.push_back(x0);
+  x.push_back(x1);
+  x.push_back(x2);
+
+  vector<double> y = rvalue(x, index_list(index_uni(0), index_min(1)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(0.1, y[0]);
+  EXPECT_FLOAT_EQ(0.2, y[1]);
+
+  y = rvalue(x, index_list(index_uni(1), index_max(1)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(1.0, y[0]);
+  EXPECT_FLOAT_EQ(1.1, y[1]);
+
+  y = rvalue(x, index_list(index_uni(1), index_min_max(1,2)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(1.1, y[0]);
+  EXPECT_FLOAT_EQ(1.2, y[1]);
+
+  y = rvalue(x, index_list(index_uni(1), index_min_max(1,1)));
+  EXPECT_EQ(1, y.size());
+  EXPECT_FLOAT_EQ(1.1, y[0]);
+
+  y = rvalue(x, index_list(index_uni(2), index_omni()));
+  EXPECT_EQ(3, y.size());
+  EXPECT_FLOAT_EQ(2.0, y[0]);
+  EXPECT_FLOAT_EQ(2.1, y[1]);
+  EXPECT_FLOAT_EQ(2.2, y[2]);
+
+  vector<int> ns;
+  ns.push_back(2);
+  ns.push_back(0);
+  y = rvalue(x, index_list(index_uni(0), index_multi(ns)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(0.2, y[0]);
+  EXPECT_FLOAT_EQ(0.0, y[1]);
+}
+
+
+TEST(ModelIndexing, rvalue_doubless_multi_uni) {
+  using std::vector;
+  
+  vector<double> x0;
+  x0.push_back(0.0);
+  x0.push_back(0.1);
+  x0.push_back(0.2);
+
+  vector<double> x1;
+  x1.push_back(1.0);
+  x1.push_back(1.1);
+  x1.push_back(1.2);
+
+  vector<double> x2;
+  x2.push_back(2.0);
+  x2.push_back(2.1);
+  x2.push_back(2.2);
+
+  vector<vector<double> > x;
+  x.push_back(x0);
+  x.push_back(x1);
+  x.push_back(x2);
+
+  vector<double> y = rvalue(x, index_list(index_min(1), index_uni(0)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(1.0, y[0]);
+  EXPECT_FLOAT_EQ(2.0, y[1]);
+
+  y = rvalue(x, index_list(index_max(1), index_uni(2)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(0.2, y[0]);
+  EXPECT_FLOAT_EQ(1.2, y[1]);
+
+  y = rvalue(x, index_list(index_min_max(1,2), index_uni(1)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(1.1, y[0]);
+  EXPECT_FLOAT_EQ(2.1, y[1]);
+
+  y = rvalue(x, index_list(index_min_max(1,1), index_uni(1)));
+  EXPECT_EQ(1, y.size());
+  EXPECT_FLOAT_EQ(1.1, y[0]);
+
+  y = rvalue(x, index_list(index_omni(), index_uni(2)));
+  EXPECT_EQ(3, y.size());
+  EXPECT_FLOAT_EQ(0.2, y[0]);
+  EXPECT_FLOAT_EQ(1.2, y[1]);
+  EXPECT_FLOAT_EQ(2.2, y[2]);
+
+  vector<int> ns;
+  ns.push_back(2);
+  ns.push_back(0);
+  y = rvalue(x, index_list(index_multi(ns), index_uni(0)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(2.0, y[0]);
+  EXPECT_FLOAT_EQ(0.0, y[1]);
+}
+
+TEST(ModelIndexing, rvalue_doubless_multi_multi) {
+  using std::vector;
+  
+  vector<double> x0;
+  x0.push_back(0.0);
+  x0.push_back(0.1);
+  x0.push_back(0.2);
+
+  vector<double> x1;
+  x1.push_back(1.0);
+  x1.push_back(1.1);
+  x1.push_back(1.2);
+
+  vector<double> x2;
+  x2.push_back(2.0);
+  x2.push_back(2.1);
+  x2.push_back(2.2);
+
+  vector<vector<double> > x;
+  x.push_back(x0);
+  x.push_back(x1);
+  x.push_back(x2);
+
+  vector<vector<double> > y = rvalue(x, index_list(index_max(1), index_min(1)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_EQ(2, y[0].size());
+  EXPECT_EQ(2, y[1].size());
+  EXPECT_FLOAT_EQ(0.1, y[0][0]);
+  EXPECT_FLOAT_EQ(0.2, y[0][1]);
+  EXPECT_FLOAT_EQ(1.1, y[1][0]);
+  EXPECT_FLOAT_EQ(1.2, y[1][1]);
 }

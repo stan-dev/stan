@@ -2,6 +2,7 @@
 #define STAN_MODEL_INDEXING_RVALUE_HPP
 
 #include <vector>
+#include <Eigen/Dense>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_return.hpp>
@@ -11,6 +12,10 @@ namespace stan {
 
     /**
      * Primary template structure for the rvalue indexer.
+     * Specializations will implement a static function
+     * <code>apply()</code> function mapping a container of type
+     * <code>C</code> and index list of type <code>I</code> to the
+     * result of applying the indexing.
      *
      * @tparam C type of container.
      * @tparam I index type list.
@@ -21,16 +26,16 @@ namespace stan {
 
     template <typename C>
     struct rvalue_indexer<C, nil_index_list> {
-      static inline C
-      apply(const C& c,
-            const nil_index_list& /*idx*/) {
+      static inline C apply(const C& c, const nil_index_list& /*idx*/) {
         return c;
       }
     };
     
-    template <typename C, typename T>
-    struct rvalue_indexer<C, cons_index_list<index_uni, T> > {
-      typedef cons_index_list<index_uni, T> index_t;
+
+    template <typename C, typename L>
+    struct rvalue_indexer<C, cons_index_list<index_uni, L> > {
+      typedef cons_index_list<index_uni, L> index_t;
+
       typedef typename rvalue_return<C, index_t>::type return_t;
 
       static inline return_t apply(const C& c, const index_t& idx) {
@@ -41,6 +46,7 @@ namespace stan {
     template <typename C, typename T>
     struct rvalue_indexer<C, cons_index_list<index_multi, T> > {
       typedef cons_index_list<index_multi, T> index_t;
+
       typedef typename rvalue_return<C, index_t>::type return_t;
       
       static inline return_t apply(const C& c, const index_t& idx) {
@@ -54,6 +60,7 @@ namespace stan {
     template <typename C, typename T>
     struct rvalue_indexer<C, cons_index_list<index_omni, T> > {
       typedef cons_index_list<index_omni, T> index_t;
+
       typedef typename rvalue_return<C, index_t>::type return_t;
 
       static inline return_t apply(const C& c, const index_t& idx) {
@@ -67,8 +74,9 @@ namespace stan {
     template <typename C, typename T>
     struct rvalue_indexer<C, cons_index_list<index_min, T> > {
       typedef cons_index_list<index_min, T> index_t;
+
       typedef typename rvalue_return<C, index_t>::type return_t;
-      
+
       static inline return_t apply(const C& c, const index_t& idx) {
         return_t result;
         for (size_t n = idx.head_.min_; n < c.size(); ++n)
@@ -80,6 +88,7 @@ namespace stan {
     template <typename C, typename T>
     struct rvalue_indexer<C, cons_index_list<index_max, T> > {
       typedef cons_index_list<index_max, T> index_t;
+
       typedef typename rvalue_return<C, index_t>::type return_t;
 
       static inline return_t apply(const C& c, const index_t& idx) {
@@ -93,8 +102,9 @@ namespace stan {
     template <typename C, typename T>
     struct rvalue_indexer<C, cons_index_list<index_min_max, T> > {
       typedef cons_index_list<index_min_max, T> index_t;
+
       typedef typename rvalue_return<C, index_t>::type return_t;
-      
+
       static inline return_t apply(const C& c, const index_t& idx) {
         return_t result;
         for (int n = idx.head_.min_; n <= idx.head_.max_; ++n)
@@ -103,6 +113,29 @@ namespace stan {
       }
     };
 
+    // mat[uni]
+    template <typename T>
+    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                          cons_index_list<index_uni, nil_index_list> > {
+      static inline Eigen::Matrix<T, 1, Eigen::Dynamic> 
+      apply(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
+            const cons_index_list<index_uni, nil_index_list>& idx) {
+        return m.row(idx.head_.n_);
+      }
+    };
+
+    // needs 52 implementations!  6 hrs at 10 minutes each!
+    // mat[multi] : ns, omni, min, max, minmax
+    // mat[uni,multi];
+    // mat[multi,uni]
+    // mat[multi,multi] :  (25 instances?)
+
+    // vec[uni]
+    // vec[multi]
+    // rowvec[uni]
+    // rowvec[multi]
+
+    // 
 
     /**
      * Return the result of indexing the specified container
