@@ -83,6 +83,7 @@ namespace stan {
       using boost::math::isfinite;
       using std::log;
       using std::exp;
+      using std::pow;
 
       if (!(stan::length(y)
         && stan::length(alpha)
