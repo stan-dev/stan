@@ -2,7 +2,6 @@
 #define STAN_MODEL_INDEXING_INDEX_HPP
 
 #include <vector>
-#include <stan/model/indexing/indexed_type.hpp>
 
 namespace stan {
   namespace model {
@@ -15,13 +14,6 @@ namespace stan {
      * to which it is applied by one.
      */
     struct index_uni {
-      
-      /**
-       * Type indicating that index_uni is a single index that reduces
-       * dimensionality when applied.
-       */
-      typedef model::uni_index index_type;
-
       int n_;
 
       /**
@@ -32,7 +24,6 @@ namespace stan {
       index_uni(int n) 
       : n_(n) {
       }
-
     };
 
 
@@ -45,13 +36,6 @@ namespace stan {
      * indexes do not need to be unique or in order.
      */
     struct index_multi {
-
-      /*
-       * Type indicating that index_multi is a multiple indexing that
-       * does not reduce dimensionality when applied.
-       */
-      typedef model::multi_index index_type;
-
       std::vector<int> ns_;
 
       /**
@@ -62,7 +46,6 @@ namespace stan {
       index_multi(const std::vector<int>& ns) 
         : ns_(ns) { 
       }
-
     };
 
 
@@ -71,12 +54,6 @@ namespace stan {
      * container.  Applying this index is a no-op.
      */
     struct index_omni {
-
-      /*
-       * Type indicating that index_omni is a multiple indexing that
-       * does not reduce dimensionality when applied.
-       */
-      typedef model::multi_index index_type;
     };
 
 
@@ -85,13 +62,6 @@ namespace stan {
      * the end of a container. 
      */
     struct index_min {
-      
-      /**
-       * Type indicating that index_min is a multiple indexing that
-       * does not reduce dimensionality when applied.
-       */
-      typedef model::multi_index index_type;
-      
       int min_;
 
       /**
@@ -102,7 +72,6 @@ namespace stan {
       index_min(int min) 
       : min_(min) {
       }
-
     };
 
 
@@ -111,13 +80,6 @@ namespace stan {
      * specified maximum index (inclusive).
      */
     struct index_max {
-
-      /**
-       * Type indicating that index_max is a multiple indexing that
-       * does not reduce dimensionality when applied.
-       */
-      typedef model::multi_index index_type;
-      
       int max_;
 
       /**
@@ -129,7 +91,6 @@ namespace stan {
       index_max(int max) 
       : max_(max) {
       }
-
     };
 
 
@@ -139,13 +100,6 @@ namespace stan {
      * maximum index (inclusive).
      */
     struct index_min_max {
-
-      /**
-       * Type indicating that index_min_max is a multiple indexing that
-       * does not reduce dimensionality when applied.
-       */
-      typedef model::multi_index index_type;
-
       int min_;
       int max_;
 
@@ -159,7 +113,6 @@ namespace stan {
       index_min_max(int min, int max) 
         : min_(min), max_(max) {
       }
-
     };
 
   }

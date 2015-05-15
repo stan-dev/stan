@@ -8,8 +8,6 @@ using stan::model::cons_index_list;
 
 using stan::model::index_uni;
 using stan::model::index_multi;
-using stan::model::nil;
-using stan::model::cons;
 
 TEST(MathIndexingIndexList, cons_index_list) {
   nil_index_list empty;  // ()

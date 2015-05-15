@@ -10,8 +10,6 @@ using stan::model::index_omni;
 using stan::model::index_min;
 using stan::model::index_max;
 using stan::model::index_min_max;
-using stan::model::nil;
-using stan::model::cons;
 
 TEST(ModelIndexing, rvalue_vector_nil) {
   std::vector<double> x;
@@ -30,9 +28,7 @@ TEST(ModelIndexing, rvalue_vector_uni_nil) {
   x.push_back(3.3);
 
   for (size_t k = 0; k < x.size(); ++k)
-    EXPECT_EQ(x[k],
-              rvalue(x, cons_index_list<index_uni, nil_index_list>(index_uni(k), 
-                                                                   nil_index_list())));
+    EXPECT_EQ(x[k], rvalue(x, index_list(index_uni(k))));
 }
 TEST(ModelIndexing, rvalue_vector_multi_nil) {
   std::vector<double> x;
@@ -48,9 +44,7 @@ TEST(ModelIndexing, rvalue_vector_multi_nil) {
   idxs.push_back(3);
   idxs.push_back(4);
   
-  std::vector<double> rx
-    = rvalue(x, cons_index_list<index_multi, nil_index_list>(index_multi(idxs), 
-                                                             nil_index_list()));
+  std::vector<double> rx = rvalue(x, index_list(index_multi(idxs)));
   EXPECT_FLOAT_EQ(3, rx.size());
   EXPECT_FLOAT_EQ(x[0], rx[0]);
   EXPECT_FLOAT_EQ(x[3], rx[1]);
@@ -62,9 +56,7 @@ TEST(ModelIndexing, rvalue_vector_omni_nil) {
   x.push_back(2.2);
   x.push_back(3.3);
 
-  std::vector<double> rx
-    = rvalue(x, cons_index_list<index_omni, nil_index_list>(index_omni(), 
-                                                             nil_index_list()));
+  std::vector<double> rx = rvalue(x, index_list(index_omni()));
   EXPECT_FLOAT_EQ(3, rx.size());
   for (size_t n = 0; n < rx.size(); ++n)
     EXPECT_FLOAT_EQ(x[n], rx[n]);
@@ -76,9 +68,7 @@ TEST(ModelIndexing, rvalue_vector_min_nil) {
   x.push_back(3.3);
 
   for (int k = 0; k < 4; ++k) {
-    std::vector<double> rx
-      = rvalue(x, cons_index_list<index_min, nil_index_list>(index_min(k), 
-                                                             nil_index_list()));
+    std::vector<double> rx = rvalue(x, index_list(index_min(k)));
     EXPECT_FLOAT_EQ(3 - k, rx.size());
     for (size_t n = 0; n < rx.size(); ++n)
       EXPECT_FLOAT_EQ(x[n + k], rx[n]);
@@ -91,9 +81,7 @@ TEST(ModelIndexing, rvalue_vector_max_nil) {
   x.push_back(3.3);
 
   for (int k = 0; k < 3; ++k) {
-    std::vector<double> rx
-      = rvalue(x, cons_index_list<index_max, nil_index_list>(index_max(k), 
-                                                             nil_index_list()));
+    std::vector<double> rx = rvalue(x, index_list(index_max(k)));
     EXPECT_FLOAT_EQ(k + 1, rx.size());
     for (size_t n = 0; n < rx.size(); ++n)
       EXPECT_FLOAT_EQ(x[n], rx[n]);
@@ -108,24 +96,10 @@ TEST(ModelIndexing, rvalue_vector_min_max_nil) {
 
   for (int mn = 0; mn < 4; ++mn) {
     for (int mx = mn; mx < 4; ++mx) {
-      std::vector<double> rx
-        = rvalue(x, cons_index_list<index_min_max, nil_index_list>(index_min_max(mn,mx), 
-                                                                   nil_index_list()));
+      std::vector<double> rx = rvalue(x, index_list(index_min_max(mn, mx)));
       EXPECT_FLOAT_EQ(mx - mn + 1, rx.size());
       for (int n = mn; n <= mx; ++n)
         EXPECT_FLOAT_EQ(x[n], rx[n - mn]);
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

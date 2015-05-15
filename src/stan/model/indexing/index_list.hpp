@@ -1,7 +1,6 @@
 #ifndef STAN_MODEL_INDEXING_INDEX_LIST_HPP
 #define STAN_MODEL_INDEXING_INDEX_LIST_HPP
 
-#include <stan/model/indexing/typelist.hpp>
 
 namespace stan {
   namespace model {
@@ -10,16 +9,6 @@ namespace stan {
      * Structure for an empty (size zero) index list.
      */
     struct nil_index_list {
-
-      /**
-       * The typelist for an empty index list, namely
-       * <code>model::nil</code>.
-       */
-      typedef model::nil typelist;
-
-      nil_index_list() { 
-      }
-
     };
 
 
@@ -32,15 +21,6 @@ namespace stan {
      */
     template <typename H, typename T>
     struct cons_index_list {
-
-      /**
-       * The typelist for a non-empty index list, consisting of the
-       * index type of the head of the list followed by the typelist
-       * of the tail of the list.
-       */
-      typedef typename model::cons<typename H::index_type, 
-                                   typename T::typelist> typelist;
-
       const H head_;
       const T tail_;
 
@@ -57,6 +37,40 @@ namespace stan {
       }
 
     };
+
+
+    template <typename I, typename T>
+    inline cons_index_list<I, T>
+    cons_list(const I& idx1, const T& t) {
+      return cons_index_list<I, T>(idx1, t);
+    }
+
+    inline nil_index_list
+    index_list() {
+      return nil_index_list();
+    }
+
+    template <typename I>
+    inline cons_index_list<I, nil_index_list>
+    index_list(const I& idx) {
+      return cons_list(idx, index_list());
+    }
+
+    template <typename I1, typename I2>
+    inline cons_index_list<I1, cons_index_list<I2, nil_index_list> >
+    index_list(const I1& idx1, const I2& idx2) {
+      return cons_list(idx1, index_list(idx2));
+    }
+
+    template <typename I1, typename I2, typename I3>
+    inline 
+    cons_index_list<I1, 
+                    cons_index_list<I2, 
+                                    cons_index_list<I3, 
+                                                    nil_index_list> > >
+    index_list(const I1& idx1, const I2& idx2, const I3& idx3) {
+      return cons_list(idx1, index_list(idx2, idx3));
+    }
 
   }
 }

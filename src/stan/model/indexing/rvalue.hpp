@@ -4,7 +4,7 @@
 #include <vector>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
-#include <stan/model/indexing/typelist.hpp>
+#include <stan/model/indexing/rvalue_return.hpp>
 
 namespace stan {
   namespace model {
@@ -15,7 +15,7 @@ namespace stan {
      * @tparam C type of container.
      * @tparam I index type list.
      */
-    template <typename C = model::dummy, typename I = model::dummy>
+    template <typename C, typename I>
     struct rvalue_indexer {
     };
 
@@ -30,25 +30,20 @@ namespace stan {
     
     template <typename C, typename T>
     struct rvalue_indexer<C, cons_index_list<index_uni, T> > {
-
       typedef cons_index_list<index_uni, T> index_t;
-      typedef typename index_t::typelist typelist_t;
-      typedef typename model::indexed_type<C, typelist_t>::type return_t;
-      
-      static inline return_t
-      apply(const C& c, const index_t& idx) {
+      typedef typename rvalue_return<C, index_t>::type return_t;
+
+      static inline return_t apply(const C& c, const index_t& idx) {
         return rvalue(c[idx.head_.n_], idx.tail_);
       }
     };
 
     template <typename C, typename T>
-    struct rvalue_indexer<C, cons_index_list<index_multi,T> > {
+    struct rvalue_indexer<C, cons_index_list<index_multi, T> > {
       typedef cons_index_list<index_multi, T> index_t;
-      typedef typename index_t::typelist typelist_t;
-      typedef typename model::indexed_type<C, typelist_t>::type return_t; 
+      typedef typename rvalue_return<C, index_t>::type return_t;
       
-      static inline return_t
-      apply(const C& c, const index_t& idx) {
+      static inline return_t apply(const C& c, const index_t& idx) {
         return_t result;
         for (size_t n = 0; n < idx.head_.ns_.size(); ++n)
           result.push_back(rvalue(c[idx.head_.ns_[n]], idx.tail_));
@@ -57,13 +52,11 @@ namespace stan {
     };
 
     template <typename C, typename T>
-    struct rvalue_indexer<C, cons_index_list<index_omni,T> > {
+    struct rvalue_indexer<C, cons_index_list<index_omni, T> > {
       typedef cons_index_list<index_omni, T> index_t;
-      typedef typename index_t::typelist typelist_t;
-      typedef typename model::indexed_type<C, typelist_t>::type return_t; 
-      
-      static inline return_t
-      apply(const C& c, const index_t& idx) {
+      typedef typename rvalue_return<C, index_t>::type return_t;
+
+      static inline return_t apply(const C& c, const index_t& idx) {
         return_t result;
         for (size_t n = 0; n < c.size(); ++n)
           result.push_back(rvalue(c[n], idx.tail_));
@@ -72,13 +65,11 @@ namespace stan {
     };
 
     template <typename C, typename T>
-    struct rvalue_indexer<C, cons_index_list<index_min,T> > {
+    struct rvalue_indexer<C, cons_index_list<index_min, T> > {
       typedef cons_index_list<index_min, T> index_t;
-      typedef typename index_t::typelist typelist_t;
-      typedef typename model::indexed_type<C, typelist_t>::type return_t; 
+      typedef typename rvalue_return<C, index_t>::type return_t;
       
-      static inline return_t
-      apply(const C& c, const index_t& idx) {
+      static inline return_t apply(const C& c, const index_t& idx) {
         return_t result;
         for (size_t n = idx.head_.min_; n < c.size(); ++n)
           result.push_back(rvalue(c[n], idx.tail_));
@@ -87,13 +78,11 @@ namespace stan {
     };
 
     template <typename C, typename T>
-    struct rvalue_indexer<C, cons_index_list<index_max,T> > {
+    struct rvalue_indexer<C, cons_index_list<index_max, T> > {
       typedef cons_index_list<index_max, T> index_t;
-      typedef typename index_t::typelist typelist_t;
-      typedef typename model::indexed_type<C, typelist_t>::type return_t; 
-      
-      static inline return_t
-      apply(const C& c, const index_t& idx) {
+      typedef typename rvalue_return<C, index_t>::type return_t;
+
+      static inline return_t apply(const C& c, const index_t& idx) {
         return_t result;
         for (int n = 0; n <= idx.head_.max_; ++n)
           result.push_back(rvalue(c[n], idx.tail_));
@@ -102,13 +91,11 @@ namespace stan {
     };
 
     template <typename C, typename T>
-    struct rvalue_indexer<C, cons_index_list<index_min_max,T> > {
+    struct rvalue_indexer<C, cons_index_list<index_min_max, T> > {
       typedef cons_index_list<index_min_max, T> index_t;
-      typedef typename index_t::typelist typelist_t;
-      typedef typename model::indexed_type<C, typelist_t>::type return_t; 
+      typedef typename rvalue_return<C, index_t>::type return_t;
       
-      static inline return_t
-      apply(const C& c, const index_t& idx) {
+      static inline return_t apply(const C& c, const index_t& idx) {
         return_t result;
         for (int n = idx.head_.min_; n <= idx.head_.max_; ++n)
           result.push_back(rvalue(c[n], idx.tail_));
@@ -131,10 +118,9 @@ namespace stan {
      * @return slice of container picked out by index.
      */
     template <typename C, typename I>
-    inline
-    typename model::indexed_type<C, typename I::typelist>::type
+    inline typename rvalue_return<C, I>::type 
     rvalue(const C& c, const I& idx) {
-      return rvalue_indexer<C,I>::apply(c,idx);
+      return rvalue_indexer<C, I>::apply(c, idx);
     }
 
   }
