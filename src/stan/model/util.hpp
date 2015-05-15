@@ -14,7 +14,8 @@
 #include <stan/math/mix/mat/functor/gradient_dot_vector.hpp>
 #include <stan/math/mix/mat/functor/hessian.hpp>
 #include <stan/math/mix/mat/functor/hessian_times_vector.hpp>
-#include <stan/math/mix/mat/functor/jacobian.hpp>
+#include <stan/math/mix/fwd/functor/jacobian.hpp>
+#include <stan/math/mix/rev/functor/jacobian.hpp>
 #include <stan/math/mix/mat/functor/partial_derivative.hpp>
 
 #include <cmath>
