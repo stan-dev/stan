@@ -273,3 +273,181 @@ TEST(ModelIndexing, rvalue_doubless_multi_multi) {
   EXPECT_FLOAT_EQ(1.1, y[1][0]);
   EXPECT_FLOAT_EQ(1.2, y[1][1]);
 }
+
+template <typename T>
+void vector_uni_test() {
+  T v(3);
+  v << 0, 1, 2;
+  
+  EXPECT_FLOAT_EQ(0, rvalue(v, index_list(index_uni(0))));
+  EXPECT_FLOAT_EQ(1, rvalue(v, index_list(index_uni(1))));
+  EXPECT_FLOAT_EQ(2, rvalue(v, index_list(index_uni(2))));
+}
+TEST(ModelIndexing, rvalueVectorUni) {
+  vector_uni_test<Eigen::VectorXd>();
+}
+TEST(ModelIndexing, rvalueRowVectorUni) {
+  vector_uni_test<Eigen::RowVectorXd>();
+}
+
+template <typename T>
+void vector_multi_test() {
+  T v(5);
+  v << 0, 1, 2, 3, 4;
+  
+  T vi = rvalue(v, index_list(index_omni()));
+  EXPECT_EQ(5, vi.size());
+  EXPECT_FLOAT_EQ(0, vi(0));
+  EXPECT_FLOAT_EQ(2, vi(2));
+  EXPECT_FLOAT_EQ(4, vi(4));
+  
+  vi = rvalue(v, index_list(index_min(2)));
+  EXPECT_EQ(3, vi.size());
+  EXPECT_FLOAT_EQ(2, vi(0));
+  EXPECT_FLOAT_EQ(4, vi(2));
+
+  vi = rvalue(v, index_list(index_max(2)));
+  EXPECT_EQ(3, vi.size());
+  EXPECT_FLOAT_EQ(0, vi(0));
+  EXPECT_FLOAT_EQ(2, vi(2));
+
+  vi = rvalue(v, index_list(index_min_max(1,3)));
+  EXPECT_EQ(3, vi.size());
+  EXPECT_FLOAT_EQ(1, vi(0));
+  EXPECT_FLOAT_EQ(3, vi(2));
+
+  std::vector<int> ns;
+  ns.push_back(3);
+  ns.push_back(1);
+  ns.push_back(1);
+  ns.push_back(0);
+  ns.push_back(4);
+  ns.push_back(1);
+  ns.push_back(3);
+  
+  vi = rvalue(v, index_list(index_multi(ns)));
+  EXPECT_EQ(7, vi.size());
+  EXPECT_FLOAT_EQ(3.0, vi(0));
+  EXPECT_FLOAT_EQ(1.0, vi(2));
+  EXPECT_FLOAT_EQ(4.0, vi(4));
+  EXPECT_FLOAT_EQ(3.0, vi(6));
+}
+TEST(ModelIndexing, rvalueVectorMulti) {
+  vector_multi_test<Eigen::VectorXd>();
+}
+TEST(ModelIndexing, rvalueRowVectorMulti) {
+  vector_multi_test<Eigen::RowVectorXd>();
+}
+
+TEST(ModelIndexing, rvalueMatrixUni) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  
+  MatrixXd m(4,3);
+  m << 
+    0.0, 0.1, 0.2, 
+    1.0, 1.1, 1.2,
+    2.0, 2.1, 2.2,
+    3.0, 3.1, 3.2;
+  
+  RowVectorXd v = rvalue(m, index_list(index_uni(0)));
+  EXPECT_EQ(3, v.size());
+  EXPECT_FLOAT_EQ(0.0, v(0));
+  EXPECT_FLOAT_EQ(0.1, v(1));
+  EXPECT_FLOAT_EQ(0.2, v(2));
+
+  v = rvalue(m, index_list(index_uni(1)));
+  EXPECT_EQ(3, v.size());
+  EXPECT_FLOAT_EQ(1.0, v(0));
+  EXPECT_FLOAT_EQ(1.1, v(1));
+  EXPECT_FLOAT_EQ(1.2, v(2));
+}
+
+TEST(ModelIndexing, rvalueMatrixMulti) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  
+  MatrixXd m(4,3);
+  m << 
+    0.0, 0.1, 0.2, 
+    1.0, 1.1, 1.2,
+    2.0, 2.1, 2.2,
+    3.0, 3.1, 3.2;
+  
+  MatrixXd a = rvalue(m, index_list(index_min(2)));
+  EXPECT_EQ(2, a.rows());
+  EXPECT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(2.0, a(0,0));
+  EXPECT_FLOAT_EQ(2.1, a(0,1));
+  EXPECT_FLOAT_EQ(2.2, a(0,2));
+  EXPECT_FLOAT_EQ(3.0, a(1,0));
+  EXPECT_FLOAT_EQ(3.1, a(1,1));
+  EXPECT_FLOAT_EQ(3.2, a(1,2));
+
+  a = rvalue(m, index_list(index_max(1)));
+  EXPECT_EQ(2, a.rows());
+  EXPECT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(0.0, a(0,0));
+  EXPECT_FLOAT_EQ(0.1, a(0,1));
+  EXPECT_FLOAT_EQ(0.2, a(0,2));
+  EXPECT_FLOAT_EQ(1.0, a(1,0));
+  EXPECT_FLOAT_EQ(1.1, a(1,1));
+  EXPECT_FLOAT_EQ(1.2, a(1,2));
+
+  a = rvalue(m, index_list(index_min_max(1,2)));
+  EXPECT_EQ(2, a.rows());
+  EXPECT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(1.0, a(0,0));
+  EXPECT_FLOAT_EQ(1.1, a(0,1));
+  EXPECT_FLOAT_EQ(1.2, a(0,2));
+  EXPECT_FLOAT_EQ(2.0, a(1,0));
+  EXPECT_FLOAT_EQ(2.1, a(1,1));
+  EXPECT_FLOAT_EQ(2.2, a(1,2));
+
+  a = rvalue(m, index_list(index_omni()));
+  EXPECT_EQ(4, a.rows());
+  EXPECT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(0.0, a(0,0));
+  EXPECT_FLOAT_EQ(0.1, a(0,1));
+  EXPECT_FLOAT_EQ(0.2, a(0,2));
+  EXPECT_FLOAT_EQ(3.0, a(3,0));
+  EXPECT_FLOAT_EQ(3.1, a(3,1));
+  EXPECT_FLOAT_EQ(3.2, a(3,2));
+
+  std::vector<int> ns;
+  ns.push_back(2);
+  ns.push_back(3);
+  ns.push_back(0);
+  ns.push_back(3);
+  ns.push_back(0);
+  ns.push_back(3);
+  ns.push_back(0);
+  a = rvalue(m, index_list(index_multi(ns)));
+  EXPECT_FLOAT_EQ(7, a.rows());
+  EXPECT_FLOAT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(2.0, a(0,0));
+  EXPECT_FLOAT_EQ(2.1, a(0,1));
+  EXPECT_FLOAT_EQ(2.2, a(0,2));
+  EXPECT_FLOAT_EQ(3.0, a(5,0));
+  EXPECT_FLOAT_EQ(3.1, a(5,1));
+  EXPECT_FLOAT_EQ(3.2, a(5,2));
+  EXPECT_FLOAT_EQ(0.0, a(6,0));
+  EXPECT_FLOAT_EQ(0.1, a(6,1));
+  EXPECT_FLOAT_EQ(0.2, a(6,2));
+}
+
+TEST(ModelIndexing, rvalueMatrixSingleSingle) {
+  Eigen::MatrixXd x(3,4);
+  x << 
+    0.0, 0.1, 0.2, 0.3,
+    1.0, 1.1, 1.2, 1.3,
+    2.0, 2.1, 2.2, 2.3;
+
+  for (int m = 0; m < 3; ++m)
+    for (int n = 0; n < 4; ++n)
+      EXPECT_FLOAT_EQ(m + n / 10.0, 
+                      rvalue(x, index_list(index_uni(m), index_uni(n))));
+  
+}
