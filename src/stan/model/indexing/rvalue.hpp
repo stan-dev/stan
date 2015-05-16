@@ -16,15 +16,19 @@ namespace stan {
     inline int rvalue_index_size(const index_multi& idx, int size) {
       return idx.ns_.size();
     }
+
     inline int rvalue_index_size(const index_omni& idx, int size) {
       return size;
     }
+
     inline int rvalue_index_size(const index_min& idx, int size) {
       return size - idx.min_;
     }
+
     inline int rvalue_index_size(const index_max& idx, int size) {
       return idx.max_ + 1;
     }
+
     inline int rvalue_index_size(const index_min_max& idx, int size) {
       return idx.max_ - idx.min_ + 1;
     }
@@ -32,19 +36,22 @@ namespace stan {
     inline int rvalue_at(int n, const index_multi& idx) {
       return idx.ns_[n];
     }
+
     inline int rvalue_at(int n, const index_omni& idx) {
       return n;
     }
+
     inline int rvalue_at(int n, const index_min& idx) {
       return idx.min_ + n;
     }
+
     inline int rvalue_at(int n, const index_max& idx) {
       return n;
     }
+
     inline int rvalue_at(int n, const index_min_max& idx) {
       return idx.min_ + n;
     }
-
 
     typedef cons_index_list<index_uni, nil_index_list> single_index_list_t;
 
@@ -64,7 +71,6 @@ namespace stan {
     template <typename C, typename I>
     struct rvalue_indexer {
     };
-
 
     // C[]
     template <typename C>
@@ -153,7 +159,6 @@ namespace stan {
       }
     };
 
-
     // mat[single] : rowvec
     template <typename T>
     struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
@@ -191,17 +196,64 @@ namespace stan {
       }
     };
 
-
-
-
-
-
-
-    // use recursion and done!
     // mat[single,multiple] : row vector
-    // mat[multiple,single] : vector
-    // mat[multiple,multiple] : matrix
+    template <typename T, typename I>
+    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                          cons_index_list<index_uni,
+                                          cons_index_list<I, 
+                                                          nil_index_list> > > {
+      typedef cons_index_list<index_uni, cons_index_list<I, nil_index_list> > 
+      index_t;
 
+      static inline Eigen::Matrix<T, 1, Eigen::Dynamic>
+      apply(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
+            const index_t& idx) {
+        Eigen::Matrix<T, 1, Eigen::Dynamic> r = m.row(idx.head_.n_);
+        return rvalue(r, idx.tail_);
+      }
+    };
+
+    // mat[multiple,single] : vector
+    template <typename T, typename I>
+    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                          cons_index_list<I,
+                                          cons_index_list<index_uni, 
+                                                          nil_index_list> > > {
+      typedef cons_index_list<I, cons_index_list<index_uni, nil_index_list> > 
+      index_t;
+
+      static inline Eigen::Matrix<T, Eigen::Dynamic, 1>
+      apply(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
+            const index_t& idx) {
+        int rows = rvalue_index_size(idx.head_, m.rows());
+        Eigen::Matrix<T, Eigen::Dynamic, 1> c(rows);
+        for (int i = 0; i < rows; ++i)
+          c(i) = m(rvalue_at(i, idx.head_), idx.tail_.head_.n_);
+        return c;
+      }
+    };
+
+    // mat[multiple,multiple] : matrix
+    template <typename T, typename I1, typename I2>
+    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                          cons_index_list<I1, 
+                                          cons_index_list<I2,
+                                                          nil_index_list> > > {
+      typedef cons_index_list<I1, cons_index_list<I2, nil_index_list> > 
+      index_t;
+
+      static inline Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
+      apply(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
+            const index_t& idx) {
+        int rows = rvalue_index_size(idx.head_, m.rows());
+        int cols = rvalue_index_size(idx.tail_.head_, m.cols());
+        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> c(rows, cols);
+        for (int i = 0; i < rows; ++i)
+          for (int j = 0; j < cols; ++j)
+            c(i,j) = m(rvalue_at(i, idx.head_), rvalue_at(j, idx.tail_.head_));
+        return c;
+      }
+    };
 
     /**
      * Return the result of indexing the specified container
@@ -225,4 +277,3 @@ namespace stan {
   }
 }
 #endif
-

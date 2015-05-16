@@ -449,5 +449,67 @@ TEST(ModelIndexing, rvalueMatrixSingleSingle) {
     for (int n = 0; n < 4; ++n)
       EXPECT_FLOAT_EQ(m + n / 10.0, 
                       rvalue(x, index_list(index_uni(m), index_uni(n))));
-  
 }
+
+TEST(ModelIndexing, rvalueMatrixSingleMulti) {
+  Eigen::MatrixXd x(3,4);
+  x << 
+    0.0, 0.1, 0.2, 0.3,
+    1.0, 1.1, 1.2, 1.3,
+    2.0, 2.1, 2.2, 2.3;
+
+  Eigen::RowVectorXd v = rvalue(x, index_list(index_uni(1), index_omni()));
+  EXPECT_EQ(4, v.size());
+  for (int i = 0; i < 4; ++i)
+    EXPECT_FLOAT_EQ(v(i), x(1,i));
+
+  v = rvalue(x, index_list(index_uni(2), index_min(1)));
+  EXPECT_EQ(3, v.size());
+  for (int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(v(i), x(2,i + 1));
+}
+
+TEST(ModelIndexing, rvalueMatrixMultiSingle) {
+  Eigen::MatrixXd x(3,4);
+  x << 
+    0.0, 0.1, 0.2, 0.3,
+    1.0, 1.1, 1.2, 1.3,
+    2.0, 2.1, 2.2, 2.3;
+  
+  Eigen::VectorXd v = rvalue(x, index_list(index_omni(), index_uni(1)));
+  EXPECT_EQ(3, v.size());
+  for (int j = 0; j < 3; ++j)
+    EXPECT_FLOAT_EQ(j + 0.1, v(j));
+
+  v = rvalue(x, index_list(index_min(1), index_uni(2)));
+  EXPECT_EQ(2, v.size());
+  for (int j = 0; j < 2; ++j)
+    EXPECT_EQ(1 + j + 0.2, v(j));
+}
+
+
+
+TEST(ModelIndexing, rvalueMatrixMultiMulti) {
+  Eigen::MatrixXd x(3,4);
+  x << 
+    0.0, 0.1, 0.2, 0.3,
+    1.0, 1.1, 1.2, 1.3,
+    2.0, 2.1, 2.2, 2.3;
+
+  Eigen::MatrixXd y = rvalue(x, index_list(index_omni(), index_omni()));
+  EXPECT_EQ(x.rows(), y.rows());
+  EXPECT_EQ(x.cols(), y.cols());
+  for (int i = 0; i < x.rows(); ++i)
+    for (int j = 0; j < x.cols(); ++j)
+      EXPECT_FLOAT_EQ(x(i,j), y(i,j));
+
+  y = rvalue(x, index_list(index_min(1), index_min(2)));
+  EXPECT_EQ(2, y.rows());
+  EXPECT_EQ(2, y.cols());
+  for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 2; ++j)
+      EXPECT_FLOAT_EQ(i + 1 + (j + 2) / 10.0, y(i,j));
+}
+
+
+  
