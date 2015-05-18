@@ -21,3 +21,15 @@ TEST(MathMeta, container_view) {
   EXPECT_FLOAT_EQ(2.0,view_test_v[0].val());
   EXPECT_FLOAT_EQ(2.0,test[0].val());
 }
+
+TEST(MathMeta, container_view_no_throw) {
+  using stan::math::container_view;
+  using boost::conditional;
+  using stan::math::dummy;
+  using stan::is_constant_struct;
+	using stan::math::var;
+
+  double arr[1];
+  container_view<conditional<is_constant_struct<var>::value,dummy,var>::type, double> view_test(var(4.0), arr);
+  EXPECT_NO_THROW(view_test[0]);
+}
