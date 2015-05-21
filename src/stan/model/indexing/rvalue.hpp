@@ -2,6 +2,8 @@
 #define STAN_MODEL_INDEXING_RVALUE_HPP
 
 #include <vector>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_same.hpp>
 #include <Eigen/Dense>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
@@ -51,226 +53,140 @@ namespace stan {
       return idx.min_ + n;
     }
 
-    typedef cons_index_list<index_uni, nil_index_list> single_index_list_t;
 
-    typedef cons_index_list<index_uni, single_index_list_t> 
-    single_single_index_list_t;
-
-    /**
-     * Primary template structure for the rvalue indexer.
-     * Specializations will implement a static function
-     * <code>apply()</code> function mapping a container of type
-     * <code>C</code> and index list of type <code>I</code> to the
-     * result of applying the indexing.
-     *
-     * @tparam C type of container.
-     * @tparam I index type list.
-     */
-    template <typename C, typename I>
-    struct rvalue_indexer {
-    };
-
-    // C[]
-    template <typename C>
-    struct rvalue_indexer<C, nil_index_list> {
-      static inline C apply(const C& c, const nil_index_list& /*idx*/) {
-        return c;
-      }
-    };
+    // T[] : T
+    template <typename T>
+    inline T rvalue(const T& c, const nil_index_list& /*idx*/) {
+      return c;
+    }
     
-    // std::vector<T>[single | L]
-    template <typename C, typename L>
-    struct rvalue_indexer<C, cons_index_list<index_uni, L> > {
-      typedef cons_index_list<index_uni, L> index_t;
-
-      typedef typename rvalue_return<C, index_t>::type return_t;
-
-      static inline return_t apply(const C& c, const index_t& idx) {
-        return rvalue(c[idx.head_.n_], idx.tail_);
-      }
-    };
-
-    // std::vector<T>[multiple | L]
-    template <typename C, typename I, typename L>
-    struct rvalue_indexer<C, cons_index_list<I, L> > {
-      typedef cons_index_list<I, L> index_t;
-
-      typedef typename rvalue_return<C, index_t>::type return_t;
-      
-      static inline return_t apply(const C& c, const index_t& idx) {
-        return_t result;
-        for (int n = 0; n < rvalue_index_size(idx.head_, c.size()); ++n)
-          result.push_back(rvalue(c[rvalue_at(n, idx.head_)], idx.tail_));
-        return result;
-      }
-    };
-
-    // vec[single]
+    // vec[single] : scal
     template <typename T>
-    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, 1>,
-                          single_index_list_t> {
-      static inline T 
-      apply(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
-            const single_index_list_t& idx) {
-        return v(idx.head_.n_);
-      }
-    };
+    inline T 
+    rvalue(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
+           const cons_index_list<index_uni, nil_index_list>& idx) {
+      return v(idx.head_.n_);
+    }
 
-    // vec[multiple]
-    template <typename T, typename I>
-    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, 1>,
-                          cons_index_list<I, nil_index_list> > {
-      static inline Eigen::Matrix<T, Eigen::Dynamic, 1> 
-      apply(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
-            const cons_index_list<I, nil_index_list>& idx) {
-        int size = rvalue_index_size(idx.head_, v.size());
-        Eigen::Matrix<T, Eigen::Dynamic, 1> a(size);
-        for (int i = 0; i < size; ++i)
-          a(i) = v(rvalue_at(i, idx.head_));
-        return a;
-      }
-    };
-
-    // rowvec[single]
+    // rowvec[single] : scal
     template <typename T>
-    struct rvalue_indexer<Eigen::Matrix<T, 1, Eigen::Dynamic>,
-                          single_index_list_t> {
-      static inline T 
-      apply(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
-            const single_index_list_t& idx) {
-        return v(idx.head_.n_);
-      }
-    };
+    inline T 
+    rvalue(const Eigen::Matrix<T, 1, Eigen::Dynamic>& v,
+           const cons_index_list<index_uni, nil_index_list>& idx) {
+      return v(idx.head_.n_);
+    }
 
-    // rowvec[multiple]
+    // vec[multiple] : vec
     template <typename T, typename I>
-    struct rvalue_indexer<Eigen::Matrix<T, 1, Eigen::Dynamic>,
-                          cons_index_list<I, nil_index_list> > {
-      static inline Eigen::Matrix<T, 1, Eigen::Dynamic> 
-      apply(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
-            const cons_index_list<I, nil_index_list>& idx) {
-        int size = rvalue_index_size(idx.head_, v.size());
-        Eigen::Matrix<T, 1, Eigen::Dynamic> a(size);
-        for (int i = 0; i < size; ++i)
-          a(i) = v(rvalue_at(i, idx.head_));
-        return a;
-      }
-    };
+    inline typename boost::disable_if<boost::is_same<I, index_uni>, 
+                                      Eigen::Matrix<T, Eigen::Dynamic, 1> >::type
+    rvalue(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
+           const cons_index_list<I, nil_index_list>& idx) {
+      int size = rvalue_index_size(idx.head_, v.size());
+      Eigen::Matrix<T, Eigen::Dynamic, 1> a(size);
+      for (int i = 0; i < size; ++i)
+        a(i) = v(rvalue_at(i, idx.head_));
+      return a;
+    }
+
+    // rowvec[multiple] : rowvec
+    template <typename T, typename I>
+    inline typename boost::disable_if<boost::is_same<I, index_uni>, 
+                                      Eigen::Matrix<T, 1, Eigen::Dynamic> >::type
+    rvalue(const Eigen::Matrix<T, 1, Eigen::Dynamic>& v,
+           const cons_index_list<I, nil_index_list>& idx) {
+      int size = rvalue_index_size(idx.head_, v.size());
+      Eigen::Matrix<T, 1, Eigen::Dynamic> a(size);
+      for (int i = 0; i < size; ++i)
+        a(i) = v(rvalue_at(i, idx.head_));
+      return a;
+    }
 
     // mat[single] : rowvec
     template <typename T>
-    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
-                          single_index_list_t> {
-      static inline Eigen::Matrix<T, 1, Eigen::Dynamic> 
-      apply(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
-            const cons_index_list<index_uni, nil_index_list>& idx) {
-        return m.row(idx.head_.n_);
-      }
-    };
+    inline Eigen::Matrix<T, 1, Eigen::Dynamic> 
+    rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
+          const cons_index_list<index_uni, nil_index_list>& idx) {
+      return m.row(idx.head_.n_);
+    }
 
     // mat[multiple] : mat
     template <typename T, typename I>
-    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
-                          cons_index_list<I, nil_index_list> > {
-      static inline Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> 
-      apply(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
-            const cons_index_list<I, nil_index_list>& idx) {
-        int n_rows = rvalue_index_size(idx.head_, m.rows());
-        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> a(n_rows, m.cols());
-        for (int i = 0; i < n_rows; ++i)
-          a.row(i) = m.row(rvalue_at(i, idx.head_));
-        return a;
-      }
-    };
+    inline typename boost::disable_if<boost::is_same<I, index_uni>, 
+                                      Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >::type
+    rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
+           const cons_index_list<I, nil_index_list>& idx) {
+      int n_rows = rvalue_index_size(idx.head_, m.rows());
+      Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> a(n_rows, m.cols());
+      for (int i = 0; i < n_rows; ++i)
+        a.row(i) = m.row(rvalue_at(i, idx.head_));
+      return a;
+    }
 
     // mat[single,single] : scalar
     template <typename T> 
-    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
-                          single_single_index_list_t> {
-      static inline T 
-      apply(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
-            const single_single_index_list_t& idx) {
-        return m(idx.head_.n_, idx.tail_.head_.n_);
-      }
-    };
+    inline T 
+    rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
+           const cons_index_list<index_uni, cons_index_list<index_uni, nil_index_list> >& idx) {
+      return m(idx.head_.n_, idx.tail_.head_.n_);
+    }
 
     // mat[single,multiple] : row vector
     template <typename T, typename I>
-    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
-                          cons_index_list<index_uni,
-                                          cons_index_list<I, 
-                                                          nil_index_list> > > {
-      typedef cons_index_list<index_uni, cons_index_list<I, nil_index_list> > 
-      index_t;
-
-      static inline Eigen::Matrix<T, 1, Eigen::Dynamic>
-      apply(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
-            const index_t& idx) {
-        Eigen::Matrix<T, 1, Eigen::Dynamic> r = m.row(idx.head_.n_);
-        return rvalue(r, idx.tail_);
-      }
-    };
+    inline typename boost::disable_if<boost::is_same<I, index_uni>, 
+                                      Eigen::Matrix<T, 1, Eigen::Dynamic> >::type
+    rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
+           const cons_index_list<index_uni, cons_index_list<I, nil_index_list> >& idx) {
+      Eigen::Matrix<T, 1, Eigen::Dynamic> r = m.row(idx.head_.n_);
+      return rvalue(r, idx.tail_);
+    }
 
     // mat[multiple,single] : vector
     template <typename T, typename I>
-    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
-                          cons_index_list<I,
-                                          cons_index_list<index_uni, 
-                                                          nil_index_list> > > {
-      typedef cons_index_list<I, cons_index_list<index_uni, nil_index_list> > 
-      index_t;
-
-      static inline Eigen::Matrix<T, Eigen::Dynamic, 1>
-      apply(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
-            const index_t& idx) {
-        int rows = rvalue_index_size(idx.head_, m.rows());
-        Eigen::Matrix<T, Eigen::Dynamic, 1> c(rows);
-        for (int i = 0; i < rows; ++i)
-          c(i) = m(rvalue_at(i, idx.head_), idx.tail_.head_.n_);
-        return c;
-      }
-    };
-
-    // mat[multiple,multiple] : matrix
-    template <typename T, typename I1, typename I2>
-    struct rvalue_indexer<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
-                          cons_index_list<I1, 
-                                          cons_index_list<I2,
-                                                          nil_index_list> > > {
-      typedef cons_index_list<I1, cons_index_list<I2, nil_index_list> > 
-      index_t;
-
-      static inline Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
-      apply(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
-            const index_t& idx) {
-        int rows = rvalue_index_size(idx.head_, m.rows());
-        int cols = rvalue_index_size(idx.tail_.head_, m.cols());
-        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> c(rows, cols);
-        for (int j = 0; j < cols; ++j)
-          for (int i = 0; i < rows; ++i)
-            c(i,j) = m(rvalue_at(i, idx.head_), rvalue_at(j, idx.tail_.head_));
-        return c;
-      }
-    };
-
-    /**
-     * Return the result of indexing the specified container
-     * with the specified index list.
-     *
-     * <p>The return type reduces dimensions where the index
-     * provides a single index.
-     *
-     * @tparam C type of container.
-     * @tparam I type of index list.
-     * @param[in] c container.
-     * @param[in] idx index.
-     * @return slice of container picked out by index.
-     */
-    template <typename C, typename I>
-    inline typename rvalue_return<C, I>::type 
-    rvalue(const C& c, const I& idx) {
-      return rvalue_indexer<C, I>::apply(c, idx);
+    inline typename boost::disable_if<boost::is_same<I, index_uni>, 
+                                      Eigen::Matrix<T, Eigen::Dynamic, 1> >::type
+    rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
+           const cons_index_list<I, cons_index_list<index_uni, nil_index_list> >& idx) {
+      int rows = rvalue_index_size(idx.head_, m.rows());
+      Eigen::Matrix<T, Eigen::Dynamic, 1> c(rows);
+      for (int i = 0; i < rows; ++i)
+        c(i) = m(rvalue_at(i, idx.head_), idx.tail_.head_.n_);
+      return c;
     }
+
+    // mat[multiple,multiple] : mat
+    template <typename T, typename I1, typename I2>
+    inline typename boost::disable_if_c<boost::is_same<I1, index_uni>::value 
+                                        || boost::is_same<I2, index_uni>::value, 
+                                        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >::type
+    rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& m,
+           const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idx) {
+      int rows = rvalue_index_size(idx.head_, m.rows());
+      int cols = rvalue_index_size(idx.tail_.head_, m.cols());
+      Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> c(rows, cols);
+      for (int j = 0; j < cols; ++j)
+        for (int i = 0; i < rows; ++i)
+          c(i,j) = m(rvalue_at(i, idx.head_), rvalue_at(j, idx.tail_.head_));
+      return c;
+    }
+
+    // std::vector<T>[single | L] : T[L]
+    template <typename T, typename L>
+    inline typename rvalue_return<std::vector<T>, cons_index_list<index_uni, L> >::type 
+    rvalue(const std::vector<T>& c, const cons_index_list<index_uni, L>& idx) {
+      return rvalue(c[idx.head_.n_], idx.tail_);
+    }
+
+    // std::vector<T>[multiple | L] : std::vector<T[L]>
+    template <typename T, typename I, typename L>
+    inline typename rvalue_return<std::vector<T>, cons_index_list<I, L> >::type
+    rvalue(const std::vector<T>& c, const cons_index_list<I, L>& idx) {
+      typename rvalue_return<std::vector<T>, cons_index_list<I, L> >::type result;
+      for (int n = 0; n < rvalue_index_size(idx.head_, c.size()); ++n)
+        result.push_back(rvalue(c[rvalue_at(n, idx.head_)], idx.tail_));
+      return result;
+    }
+
 
   }
 }

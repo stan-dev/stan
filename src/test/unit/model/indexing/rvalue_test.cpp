@@ -350,6 +350,8 @@ TEST(ModelIndexing, rvalueMatrixUni) {
     1.0, 1.1, 1.2,
     2.0, 2.1, 2.2,
     3.0, 3.1, 3.2;
+
+  // FIXME
   
   RowVectorXd v = rvalue(m, index_list(index_uni(0)));
   EXPECT_EQ(3, v.size());
