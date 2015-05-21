@@ -7,8 +7,6 @@
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_return.hpp>
 
-// ******** ALL OFF BY ONE FOR LANGUAGE **********
-
 namespace stan {
   namespace model {
 
@@ -248,8 +246,8 @@ namespace stan {
         int rows = rvalue_index_size(idx.head_, m.rows());
         int cols = rvalue_index_size(idx.tail_.head_, m.cols());
         Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> c(rows, cols);
-        for (int i = 0; i < rows; ++i)
-          for (int j = 0; j < cols; ++j)
+        for (int j = 0; j < cols; ++j)
+          for (int i = 0; i < rows; ++i)
             c(i,j) = m(rvalue_at(i, idx.head_), rvalue_at(j, idx.tail_.head_));
         return c;
       }

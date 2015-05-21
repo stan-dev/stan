@@ -10,7 +10,8 @@
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue.hpp>
 
-// ***** DOCUMENT ALIASING ISSUE ******
+// ***** DOCUMENT ALIASING ISSUE if RHS isn't copy ******
+
 // given sizings and rvalue copy, only for index_multi()
 
 namespace stan {
@@ -147,10 +148,10 @@ namespace stan {
            const cons_index_list<I1,
                                  cons_index_list<I2, nil_index_list> >& idxs,
            const Eigen::Matrix<U, Eigen::Dynamic, Eigen::Dynamic>& y) {
-      for (int i = 0; i < y.rows(); ++i) {
-        int m = rvalue_at(i, idxs.head_);
-        for (int j = 0; j < y.cols(); ++j) {
-          int n = rvalue_at(j, idxs.tail_.head_);
+      for (int j = 0; j < y.cols(); ++j) {
+        int n = rvalue_at(j, idxs.tail_.head_);
+        for (int i = 0; i < y.rows(); ++i) {
+          int m = rvalue_at(i, idxs.head_);
           x(m, n) = y(i, j);
         }
       }
