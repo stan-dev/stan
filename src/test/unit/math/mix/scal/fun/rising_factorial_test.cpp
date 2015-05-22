@@ -2,6 +2,8 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <test/unit/math/rev/mat/fun/util.hpp>
 #include <test/unit/math/mix/scal/fun/nan_util.hpp>
+#include <stan/math/fwd/scal/fun/digamma.hpp>
+#include <stan/math/rev/scal/fun/digamma.hpp>
 #include <stan/math/fwd/scal/fun/rising_factorial.hpp>
 #include <stan/math/rev/scal/fun/rising_factorial.hpp>
 #include <stan/math/fwd/scal/fun/cos.hpp>
@@ -12,8 +14,11 @@
 #include <stan/math/rev/scal/fun/floor.hpp>
 #include <stan/math/fwd/scal/fun/log.hpp>
 #include <stan/math/rev/scal/fun/log.hpp>
+#include <stan/math/fwd/scal/fun/sin.hpp>
+#include <stan/math/rev/scal/fun/sin.hpp>
 #include <stan/math/fwd/scal/fun/tan.hpp>
 #include <stan/math/rev/scal/fun/tan.hpp>
+#include <stan/math/prim/scal/fun/trigamma.hpp>
 #include <stan/math/fwd/scal/fun/value_of.hpp>
 #include <stan/math/rev/scal/fun/value_of.hpp>
 
@@ -343,3 +348,4 @@ TEST(AgradFwdRisingFactorial, nan) {
   rising_factorial_fun rising_factorial_;
   test_nan_mix(rising_factorial_,3.0,5.0,false);
 }
+
